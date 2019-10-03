@@ -1,0 +1,5 @@
+---
+title: Prevent accidental project deletion by introducing soft-delete feature
+merge_request: 18542
+author:
+type: added

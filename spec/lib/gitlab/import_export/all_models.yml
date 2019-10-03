@@ -416,6 +416,7 @@ project:
 - pages_metadatum
 - alerts_service
 - grafana_integration
+- deleting_user
 award_emoji:
 - awardable
 - user

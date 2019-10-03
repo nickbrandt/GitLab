@@ -44,6 +44,7 @@ module EE
           expose :external_authorization_classification_label,
                  if: ->(_, _) { License.feature_available?(:external_authorization_service_api_management) }
           expose :packages_enabled, if: ->(project, _) { project.feature_available?(:packages) }
+          expose :marked_for_deletion_at, if: ->(project, _) { project.feature_available?(:marking_project_for_deletion) }
         end
       end
 
@@ -182,6 +183,7 @@ module EE
           expose :email_additional_text, if: ->(_instance, _opts) { ::License.feature_available?(:email_additional_text) }
           expose :file_template_project_id, if: ->(_instance, _opts) { ::License.feature_available?(:custom_file_templates) }
           expose :default_project_deletion_protection, if: ->(_instance, _opts) { ::License.feature_available?(:default_project_deletion_protection) }
+          expose :project_deletion_adjourned_period, if: ->(_instance, _opts) { ::License.feature_available?(:marking_project_for_deletion) }
         end
       end
 

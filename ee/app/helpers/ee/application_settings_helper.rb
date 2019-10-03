@@ -75,6 +75,7 @@ module EE
         email_additional_text
         file_template_project_id
         default_project_deletion_protection
+        project_deletion_adjourned_period
       ]
     end
   end

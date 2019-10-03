@@ -33,7 +33,7 @@ class GroupChildEntity < Grape::Entity
   end
 
   # Project only attributes
-  expose :star_count, :archived,
+  expose :star_count, :archived, :marked_for_deletion_at,
          if: lambda { |_instance, _options| project? }
 
   # Group only attributes

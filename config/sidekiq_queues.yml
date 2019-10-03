@@ -57,6 +57,7 @@
   - [project_cache, 1]
   - [project_destroy, 1]
   - [project_export, 1]
+  - [planned_project_destroy, 1]
   - [web_hook, 1]
   - [repository_check, 1]
   - [git_garbage_collect, 1]

@@ -95,6 +95,7 @@ class License < ApplicationRecord
     smartcard_auth
     type_of_work_analytics
     unprotection_restrictions
+    marking_project_for_deletion
   ]
   EEP_FEATURES.freeze
 
