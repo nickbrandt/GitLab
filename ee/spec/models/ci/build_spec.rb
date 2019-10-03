@@ -202,7 +202,7 @@ describe Ci::Build do
         end
 
         it 'raises an error' do
-          expect { subject }.to raise_error(Gitlab::Ci::Parsers::LicenseManagement::LicenseManagement::LicenseManagementParserError)
+          expect { subject }.to raise_error(Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning::LicenseScanningParserError)
         end
       end
 
