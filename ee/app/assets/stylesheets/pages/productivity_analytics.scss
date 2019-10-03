@@ -21,8 +21,8 @@
 }
 
 .filter-container {
-  flex: 1 1 50%;
-  width: 50%;
+  flex: 1 1 35%;
+  width: 35%;
 
   @include media-breakpoint-down(md) {
     width: 100%;
@@ -34,6 +34,32 @@
     .issues-details-filters {
       padding: 0;
       background: transparent;
+    }
+  }
+}
+
+.daterange-container {
+  flex: 1 1 30%;
+  width: 30%;
+
+  @include media-breakpoint-down(md) {
+    width: 100%;
+  }
+
+  .gl-daterange-picker {
+    .gl-datepicker-input {
+      width: 140px;
+
+      @include media-breakpoint-down(md) {
+        width: 100%;
+      }
+    }
+
+    label {
+      @include media-breakpoint-up(lg) {
+        margin-bottom: 0;
+        margin-right: $gl-padding-4;
+      }
     }
   }
 }

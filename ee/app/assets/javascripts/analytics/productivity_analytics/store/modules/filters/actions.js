@@ -53,8 +53,10 @@ export const setPath = ({ commit, dispatch }, path) => {
   });
 };
 
-export const setDaysInPast = ({ commit, dispatch }, days) => {
-  commit(types.SET_DAYS_IN_PAST, days);
+export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDate, endDate }) => {
+  commit(types.SET_DATE_RANGE, { startDate, endDate });
+
+  if (skipFetch) return false;
 
   dispatch(
     'charts/updateSelectedItems',

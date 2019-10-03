@@ -52,12 +52,12 @@ export const getMilestonesEndpoint = (namespacePath, projectPathWithNamespace) =
  * ]
  *
  * @param {Object} data The raw data which will be transformed
- * @param {String} dateInPast Date string in ISO format
+ * @param {Date} dateInPast Date in the past
  * @returns {Array} The transformed data array sorted by date ascending
  */
 export const getScatterPlotData = (data, dateInPast) =>
   Object.keys(data)
-    .filter(key => new Date(data[key].merged_at) >= new Date(dateInPast))
+    .filter(key => new Date(data[key].merged_at) >= dateInPast)
     .map(key => [data[key].merged_at, data[key].metric])
     .sort((a, b) => new Date(a[0]) - new Date(b[0]));
 

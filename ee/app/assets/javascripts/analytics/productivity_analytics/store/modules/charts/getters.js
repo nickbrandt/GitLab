@@ -1,7 +1,6 @@
 import _ from 'underscore';
 import { s__ } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
-import { getDateInPast } from '~/lib/utils/datetime_utility';
 import {
   chartKeys,
   metricTypes,
@@ -54,6 +53,7 @@ export const getColumnChartData = state => chartKey => {
 };
 
 export const chartHasData = state => chartKey => !_.isEmpty(state.charts[chartKey].data);
+
 /**
  * Creates a series array of main data for the scatterplot chart.
  *
@@ -72,13 +72,10 @@ export const chartHasData = state => chartKey => !_.isEmpty(state.charts[chartKe
  *   ["2019-07-10T11:13:23.557Z", 139],
  * ]
  *
- * It eliminates items which were merged before today minus the selected daysInPast.
+ * It eliminates items which were merged before the startDate (minus an additional days offset).
  */
-export const getScatterPlotMainData = (state, getters, rootState) => {
-  const { data } = state.charts.scatterplot;
-  const dateInPast = getDateInPast(new Date(), rootState.filters.daysInPast);
-  return getScatterPlotData(data, dateInPast);
-};
+export const getScatterPlotMainData = (state, getters, rootState) =>
+  getScatterPlotData(state.charts.scatterplot.data, rootState.filters.startDate);
 
 /**
  * Creates a series array of median data for the scatterplot chart.
