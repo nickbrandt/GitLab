@@ -186,6 +186,7 @@ module EE
               create: usage_activity_by_stage_create,
               manage: usage_activity_by_stage_manage,
               monitor: usage_activity_by_stage_monitor,
+              package: usage_activity_by_stage_package,
               plan: usage_activity_by_stage_plan,
               verify: usage_activity_by_stage_verify
             }
@@ -226,6 +227,12 @@ module EE
             projects_prometheus_active: ::Project.with_active_prometheus_service.distinct_count_by(:creator_id),
             projects_with_error_tracking_enabled: ::Project.with_enabled_error_tracking.distinct_count_by(:creator_id),
             projects_with_tracing_enabled: ::Project.with_tracing_enabled.distinct_count_by(:creator_id)
+          }
+        end
+
+        def usage_activity_by_stage_package
+          {
+            projects_with_packages: ::Project.with_packages.distinct_count_by(:creator_id)
           }
         end
 
