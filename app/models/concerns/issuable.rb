@@ -75,6 +75,19 @@ module Issuable
     has_many :labels, through: :label_links
     has_many :todos, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
+    has_many :user_mentions, class_name: "#{self.to_s}UserMention"
+
+    has_many :referenced_users, through: :user_mentions, source: :mentioned_user, class_name: 'User'
+    has_many :referenced_groups, through: :user_mentions, source: :mentioned_group, class_name: 'Group'
+    has_many :referenced_projects, through: :user_mentions, source: :mentioned_project, class_name: 'Project'
+
+    has_many :own_referenced_users, ->(issuable) { where("#{issuable.class.to_s.underscore}_user_mentions": { note_id: nil }) },
+             through: :user_mentions, source: :mentioned_user, class_name: 'User'
+    has_many :own_referenced_groups, ->(issuable) { where("#{issuable.class.to_s.underscore}_user_mentions": { note_id: nil }) },
+             through: :user_mentions, source: :mentioned_group, class_name: 'Group'
+    has_many :own_referenced_projects, ->(issuable) { where("#{issuable.class.to_s.underscore}_user_mentions": { note_id: nil }) },
+             through: :user_mentions, source: :mentioned_project, class_name: 'Project'
+
     has_one :metrics
 
     delegate :name,
@@ -149,6 +162,28 @@ module Issuable
 
     def has_multiple_assignees?
       assignees.count > 1
+    end
+
+    def referenced_group_users
+      User.joins(:group_members).where(members: { source_id: referenced_groups }).distinct
+    end
+
+    def referenced_project_users
+      User.joins(:project_members).where(members: { source_id: referenced_projects }).distinct
+    end
+
+    def parsed?
+      !user_mentions.where("note_id IS NULL").blank?
+    end
+
+    def update_mentions!
+      refs = all_references(self.author)
+
+      self.own_referenced_users = refs.mentioned_users
+      self.own_referenced_groups = refs.mentioned_users_by_groups
+      self.own_referenced_projects = refs.mentioned_users_by_projects
+
+      self.save!
     end
 
     private
@@ -434,9 +469,9 @@ module Issuable
     includes << :award_emoji unless notes.award_emojis_loaded?
 
     if includes.any?
-      notes.includes(includes)
+      notes.not_parsed(self).includes(includes)
     else
-      notes
+      notes.not_parsed(self)
     end
   end
 

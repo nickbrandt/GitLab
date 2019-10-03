@@ -64,7 +64,12 @@ module Participable
 
   def all_participants
     @all_participants ||= Hash.new do |hash, user|
-      hash[user] = raw_participants(user)
+      hash[user] = [
+        raw_participants(user),
+        respond_to?(:referenced_users) ? referenced_users : [],
+        respond_to?(:referenced_group_users) ? referenced_group_users : [],
+        respond_to?(:referenced_project_users) ? referenced_project_users : []
+      ].flatten.uniq
     end
   end
 

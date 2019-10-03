@@ -23,4 +23,8 @@ class Review < ApplicationRecord
 
     ext
   end
+
+  def parsed?
+    false
+  end
 end

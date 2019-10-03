@@ -222,6 +222,10 @@ class Snippet < ApplicationRecord
     model_name.singular
   end
 
+  def parsed?
+    false
+  end
+
   class << self
     # Searches for snippets with a matching title or file name.
     #

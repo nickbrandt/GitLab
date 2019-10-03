@@ -10,6 +10,9 @@ class NewNoteWorker
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(note_id, _params = {})
     if note = Note.find_by(id: note_id)
+
+      note.update_mentions!
+
       NotificationService.new.new_note(note) unless skip_notification?(note)
       Notes::PostProcessService.new(note).execute
     else

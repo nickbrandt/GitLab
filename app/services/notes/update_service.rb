@@ -9,6 +9,8 @@ module Notes
 
       note.update(params.merge(updated_by: current_user))
 
+      note.update_mentions!
+
       only_commands = false
 
       quick_actions_service = QuickActionsService.new(project, current_user)

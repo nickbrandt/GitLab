@@ -77,7 +77,11 @@ module Mentionable
   end
 
   def mentioned_users(current_user = nil)
-    all_references(current_user).users
+    if respond_to?(:parsed?) && parsed?
+      [referenced_users, referenced_group_users, referenced_projects.collect(&:users)].flatten.uniq
+    else
+      all_references(current_user).users
+    end
   end
 
   def directly_addressed_users(current_user = nil)

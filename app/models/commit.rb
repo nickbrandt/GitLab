@@ -281,6 +281,22 @@ class Commit
     project.notes.for_commit_id(self.id)
   end
 
+  def user_mentions
+    CommitUserMention.where(commit_id: self.id)
+  end
+
+  def referenced_users
+    User.where(id: user_mentions.select(:mentioned_user_id))
+  end
+
+  def referenced_projects
+    Project.where(id: user_mentions.select(:mentioned_project_id))
+  end
+
+  def referenced_groups
+    Group.where(id: user_mentions.select(:mentioned_group_id))
+  end
+
   def discussion_notes
     notes.non_diff_notes
   end

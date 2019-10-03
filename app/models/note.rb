@@ -148,6 +148,41 @@ class Note < ApplicationRecord
   scope :for_note_or_capitalized_note, ->(text) { where(note: [text, text.capitalize]) }
   scope :like_note_or_capitalized_note, ->(text) { where('(note LIKE ? OR note LIKE ?)', text, text.capitalize) }
 
+  # TODO: remove parsed and not_parsed scopes after all notes are migrated to user mentions tables.
+  # These scopes will serve as temporary filtering of the notes that have been parsed for user mentions.
+  # Not ideal, as it would not track notes that do not refer any user, group or project, and those notes
+  # will be parsed every time list of participants is built, so maybe adding a boolean flag field to notes table
+  # would work better
+  scope :parsed, ->(noteable) do
+    where("id IN (SELECT note_id FROM #{noteable.class.underscore}_user_mentions WHERE #{noteable.class.underscore}_id = :noteable_id)",
+          { noteable_id: noteable.id })
+  end
+
+  scope :not_parsed, ->(noteable) do
+    where("id NOT IN (SELECT note_id FROM #{noteable.class.underscore}_user_mentions WHERE #{noteable.class.underscore}_id = :noteable_id)",
+          { noteable_id: noteable.id })
+  end
+
+  has_many :issue_user_mentions, -> (note) { where(issue_id: note.noteable_id) }, inverse_of: :note
+  has_many :issue_referenced_users, through: :issue_user_mentions, source: :mentioned_user
+  has_many :issue_referenced_groups, through: :issue_user_mentions, source: :mentioned_group
+  has_many :issue_referenced_projects, through: :issue_user_mentions, source: :mentioned_project
+
+  has_many :merge_request_user_mentions, -> (note) { where(merge_request_id: note.noteable_id) }, inverse_of: :note
+  has_many :merge_request_referenced_users, through: :merge_request_user_mentions, source: :mentioned_user
+  has_many :merge_request_referenced_groups, through: :merge_request_user_mentions, source: :mentioned_group
+  has_many :merge_request_referenced_projects, through: :merge_request_user_mentions, source: :mentioned_project
+
+  has_many :epic_user_mentions, -> (note) { where(epic_id: note.noteable_id) }, inverse_of: :note
+  has_many :epic_referenced_users, through: :epic_user_mentions, source: :mentioned_user
+  has_many :epic_referenced_groups, through: :epic_user_mentions, source: :mentioned_group
+  has_many :epic_referenced_projects, through: :epic_user_mentions, source: :mentioned_project
+
+  has_many :commit_user_mentions, -> (note) { where(commit_id: note.commit_id) }, inverse_of: :note
+  has_many :commit_referenced_users, through: :commit_user_mentions, source: :mentioned_user
+  has_many :commit_referenced_groups, through: :commit_user_mentions, source: :mentioned_group
+  has_many :commit_referenced_projects, through: :commit_user_mentions, source: :mentioned_project
+
   after_initialize :ensure_discussion_id
   before_validation :nullify_blank_type, :nullify_blank_line_code
   before_validation :set_discussion_id, on: :create
@@ -296,6 +331,44 @@ class Note < ApplicationRecord
     # Temp fix to prevent app crash
     # if note commit id doesn't exist
     nil
+  end
+
+  def referenced_users
+    association("#{noteable_type.underscore}_referenced_users").scope
+  end
+
+  def referenced_users=(users)
+    self.send(:"#{noteable_type.underscore}_referenced_users=", users) # rubocop:disable GitlabSecurity/PublicSend
+  end
+
+  def referenced_groups
+    association("#{noteable_type.underscore}_referenced_groups").scope
+  end
+
+  def referenced_groups=(groups)
+    self.send(:"#{noteable_type.underscore}_referenced_groups=", groups) # rubocop:disable GitlabSecurity/PublicSend
+  end
+
+  def referenced_projects
+    association("#{noteable_type.underscore}_referenced_projects").scope
+  end
+
+  def referenced_projects=(projects)
+    self.send(:"#{noteable_type.underscore}_referenced_projects=", projects) # rubocop:disable GitlabSecurity/PublicSend
+  end
+
+  def update_mentions!
+    refs = all_references(self.author)
+
+    self.referenced_users = refs.mentioned_users
+    self.referenced_groups = refs.mentioned_users_by_groups
+    self.referenced_projects = refs.mentioned_users_by_projects
+
+    self.save!
+  end
+
+  def parsed?
+    Note.parsed(self.noteable).where(id: self.id).exists?
   end
 
   # FIXME: Hack for polymorphic associations with STI
