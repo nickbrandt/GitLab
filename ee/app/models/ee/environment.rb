@@ -14,8 +14,8 @@ module EE
       # Returns environments where its latest deployment is to a cluster
       scope :deployed_to_cluster, -> (cluster) do
         environments = model.arel_table
-        deployments = Deployment.arel_table
-        later_deployments = Deployment.arel_table.alias('latest_deployments')
+        deployments = ::Deployment.arel_table
+        later_deployments = ::Deployment.arel_table.alias('latest_deployments')
         join_conditions = later_deployments[:environment_id]
           .eq(deployments[:environment_id])
           .and(deployments[:id].lt(later_deployments[:id]))

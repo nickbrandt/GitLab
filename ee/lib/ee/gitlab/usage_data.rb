@@ -64,20 +64,6 @@ module EE
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
-        def projects_mirrored_with_pipelines_enabled
-          count(
-            ::Project.joins(:project_feature).where(
-              mirror: true,
-              mirror_trigger_builds: true,
-              project_features: {
-                builds_access_level: ::ProjectFeature::ENABLED
-              }
-            )
-          )
-        end
-        # rubocop: enable CodeReuse/ActiveRecord
-
-        # rubocop: disable CodeReuse/ActiveRecord
         def service_desk_counts
           return {} unless ::License.feature_available?(:service_desk)
 
@@ -148,7 +134,7 @@ module EE
                                          operations_dashboard: operations_dashboard_usage,
                                          pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
                                          projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
-                                         projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
+                                         projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
                                          projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
                                          projects_with_packages: count(::Packages::Package.select('distinct project_id')),
                                          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
@@ -188,6 +174,7 @@ module EE
               monitor: usage_activity_by_stage_monitor,
               package: usage_activity_by_stage_package,
               plan: usage_activity_by_stage_plan,
+              release: usage_activity_by_stage_release,
               verify: usage_activity_by_stage_verify
             }
           }
@@ -254,6 +241,17 @@ module EE
             service_desk_enabled_projects: ::Project.with_active_services.service_desk_enabled.distinct_count_by(:creator_id),
             service_desk_issues: ::Issue.service_desk.distinct_count_by,
             todos: ::Todo.distinct_count_by(:author_id)
+          }
+        end
+
+        # Omitted because no user, creator or author associated: `environments`, `feature_flags`, `in_review_folder`, `pages_domains`
+        def usage_activity_by_stage_release
+          {
+            deployments: ::Deployment.distinct_count_by(:user_id),
+            failed_deployments: ::Deployment.failed.distinct_count_by(:user_id),
+            projects_mirrored_with_pipelines_enabled: ::Project.mirrored_with_enabled_pipelines.distinct_count_by(:creator_id),
+            releases: ::Release.distinct_count_by(:author_id),
+            successful_deployments: ::Deployment.success.distinct_count_by(:user_id)
           }
         end
 
