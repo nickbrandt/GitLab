@@ -187,8 +187,8 @@ describe Projects::Security::DependenciesController do
           get :index, params: params, format: :json
         end
 
-        it 'returns 403' do
-          expect(response).to have_gitlab_http_status(403)
+        it 'returns 404' do
+          expect(response).to have_gitlab_http_status(404)
         end
       end
     end
@@ -201,8 +201,8 @@ describe Projects::Security::DependenciesController do
         get :index, params: params, format: :json
       end
 
-      it 'returns 403' do
-        expect(response).to have_gitlab_http_status(403)
+      it 'returns 404' do
+        expect(response).to have_gitlab_http_status(404)
       end
     end
   end

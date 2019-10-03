@@ -3,7 +3,7 @@
 module Projects
   module Security
     class DependenciesController < Projects::ApplicationController
-      before_action :authorize_read_dependency_list!
+      before_action :authorize_read_dependencies!
 
       def index
         respond_to do |format|
@@ -20,10 +20,6 @@ module Projects
       def collect_dependencies
         found_dependencies = report_service.able_to_fetch? ? service.execute : []
         ::Gitlab::DependenciesCollection.new(found_dependencies)
-      end
-
-      def authorize_read_dependency_list!
-        render_403 unless can?(current_user, :read_dependencies, project)
       end
 
       def dependencies
