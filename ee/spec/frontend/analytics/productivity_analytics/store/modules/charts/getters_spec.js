@@ -11,9 +11,6 @@ import { getScatterPlotData, getMedianLineData } from 'ee/analytics/productivity
 import { mockHistogramData, mockScatterplotData } from '../../../mock_data';
 
 jest.mock('ee/analytics/productivity_analytics/utils');
-jest.mock('~/lib/utils/datetime_utility', () => ({
-  getDateInPast: jest.fn().mockReturnValue('2019-07-16T00:00:00.00Z'),
-}));
 
 describe('Productivity analytics chart getters', () => {
   let state;
@@ -61,16 +58,13 @@ describe('Productivity analytics chart getters', () => {
 
       const rootState = {
         filters: {
-          daysInPast: 30,
+          startDate: '2019-07-16',
         },
       };
 
       getters.getScatterPlotMainData(state, null, rootState);
 
-      expect(getScatterPlotData).toHaveBeenCalledWith(
-        mockScatterplotData,
-        '2019-07-16T00:00:00.00Z',
-      );
+      expect(getScatterPlotData).toHaveBeenCalledWith(mockScatterplotData, '2019-07-16');
     });
   });
 

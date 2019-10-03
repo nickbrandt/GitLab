@@ -11,7 +11,8 @@ export default {
   [types.SET_PATH](state, path) {
     state.filters = path;
   },
-  [types.SET_DAYS_IN_PAST](state, daysInPast) {
-    state.daysInPast = daysInPast;
+  [types.SET_DATE_RANGE](state, { startDate, endDate }) {
+    state.startDate = startDate;
+    state.endDate = endDate;
   },
 };

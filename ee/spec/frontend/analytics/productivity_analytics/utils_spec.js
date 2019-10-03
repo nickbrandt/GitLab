@@ -37,7 +37,7 @@ describe('Productivity Analytics utils', () => {
 
   describe('getScatterPlotData', () => {
     it('filters out data before given "dateInPast", transforms the data and sorts by date ascending', () => {
-      const dateInPast = '2019-08-09T22:00:00.000Z';
+      const dateInPast = new Date(2019, 7, 9); // '2019-08-09T22:00:00.000Z';
       const result = getScatterPlotData(mockScatterplotData, dateInPast);
       const expected = [
         ['2019-08-09T22:00:00.000Z', 44],

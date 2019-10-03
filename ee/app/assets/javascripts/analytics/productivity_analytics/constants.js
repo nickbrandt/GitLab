@@ -91,5 +91,5 @@ export const columnHighlightStyle = { color: '#418cd8', opacity: 0.8 };
 export const scatterPlotAddonQueryDays = 30;
 
 export const accessLevelReporter = 20;
-
 export const projectsPerPage = 50;
+export const defaultDaysInPast = 90;

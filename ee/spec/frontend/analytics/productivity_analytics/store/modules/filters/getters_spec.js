@@ -4,6 +4,9 @@ import { chartKeys } from 'ee/analytics/productivity_analytics/constants';
 
 describe('Productivity analytics filter getters', () => {
   let state;
+  const currentYear = new Date().getFullYear();
+  const startDate = new Date(currentYear, 8, 1);
+  const endDate = new Date(currentYear, 8, 7);
 
   beforeEach(() => {
     state = createState();
@@ -15,7 +18,8 @@ describe('Productivity analytics filter getters', () => {
         groupNamespace: 'gitlab-org',
         projectPath: 'gitlab-org/gitlab-test',
         filters: '?author_username=root&milestone_title=foo&label_name[]=labelxyz',
-        daysInPast: 30,
+        startDate,
+        endDate,
       };
     });
 
@@ -25,7 +29,8 @@ describe('Productivity analytics filter getters', () => {
           author_username: 'root',
           group_id: 'gitlab-org',
           label_name: ['labelxyz'],
-          merged_at_after: '30days',
+          merged_at_after: '2019-09-01',
+          merged_at_before: '2019-09-07',
           milestone_title: 'foo',
           project_id: 'gitlab-org/gitlab-test',
         };
@@ -37,12 +42,13 @@ describe('Productivity analytics filter getters', () => {
     });
 
     describe('when chart is scatterplot', () => {
-      it('returns an object with common filter params and adds additional days to the merged_at_after property', () => {
+      it('returns an object with common filter params and subtracts 30 days from the merged_at_after date', () => {
         const expected = {
           author_username: 'root',
           group_id: 'gitlab-org',
           label_name: ['labelxyz'],
-          merged_at_after: '60days',
+          merged_at_after: '2019-08-02',
+          merged_at_before: '2019-09-07',
           milestone_title: 'foo',
           project_id: 'gitlab-org/gitlab-test',
         };

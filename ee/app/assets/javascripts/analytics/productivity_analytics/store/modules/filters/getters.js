@@ -1,5 +1,8 @@
+import dateFormat from 'dateformat';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { chartKeys, scatterPlotAddonQueryDays } from '../../../constants';
+import { dateFormats } from '../../../../shared/constants';
 
 /**
  * Returns an object of common filter parameters based on the filter's state
@@ -12,19 +15,23 @@ import { chartKeys, scatterPlotAddonQueryDays } from '../../../constants';
  *   author_username: 'author',
  *   milestone_title: 'my milestone',
  *   label_name: ['my label', 'yet another label'],
- *   merged_at_after: '2019-05-09T16:20:18.393Z'
+ *   merged_at_after: '2019-06-11'
+ *   merged_at_before: '2019-09-09'
  * }
  *
  */
 export const getCommonFilterParams = state => chartKey => {
-  const { groupNamespace, projectPath, filters } = state;
+  const { groupNamespace, projectPath, filters, startDate, endDate } = state;
   const { author_username, milestone_title, label_name } = urlParamsToObject(filters);
 
-  // for the scatterplot we need to add additional 30 days to the desired date in the past
-  const daysInPast =
+  // for the scatterplot we need to remove 30 days from the state's merged_at_after date
+  const mergedAtAfterDate =
     chartKey && chartKey === chartKeys.scatterplot
-      ? state.daysInPast + scatterPlotAddonQueryDays
-      : state.daysInPast;
+      ? dateFormat(
+          new Date(getDateInPast(new Date(startDate), scatterPlotAddonQueryDays)),
+          dateFormats.isoDate,
+        )
+      : dateFormat(startDate, dateFormats.isoDate);
 
   return {
     group_id: groupNamespace,
@@ -32,7 +39,8 @@ export const getCommonFilterParams = state => chartKey => {
     author_username,
     milestone_title,
     label_name,
-    merged_at_after: `${daysInPast}days`,
+    merged_at_after: mergedAtAfterDate,
+    merged_at_before: dateFormat(endDate, dateFormats.isoDate),
   };
 };
 
