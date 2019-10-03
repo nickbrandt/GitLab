@@ -27,7 +27,7 @@ describe AtomicInternalId do
           stub_feature_flags(iid_always_track: false)
         end
 
-        it 'does not track the value' do  
+        it 'does not track the value' do
           expect(InternalId).not_to receive(:track_greatest)
 
           milestone.ensure_project_iid!
