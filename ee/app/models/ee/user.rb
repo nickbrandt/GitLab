@@ -40,8 +40,6 @@ module EE
       has_many :approvals,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
       has_many :approvers,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
 
-      has_many :developer_groups, -> { where(members: { access_level: ::Gitlab::Access::DEVELOPER }) }, through: :group_members, source: :group
-
       has_many :users_ops_dashboard_projects
       has_many :ops_dashboard_projects, through: :users_ops_dashboard_projects, source: :project
 
