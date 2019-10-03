@@ -122,6 +122,7 @@ module EE
       scope :with_active_prometheus_service, -> { joins(:prometheus_service).merge(PrometheusService.active) }
       scope :with_enabled_error_tracking, -> { joins(:error_tracking_setting).where(project_error_tracking_settings: { enabled: true }) }
       scope :with_tracing_enabled, -> { joins(:tracing_setting) }
+      scope :with_packages, -> { joins(:packages) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true

@@ -107,6 +107,16 @@ describe Gitlab::UsageData do
         end
       end
 
+      context 'for package' do
+        it 'includes accurate usage_activity_by_stage data' do
+          create(:project, packages: [create(:package)] )
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:package]).to eq(
+            projects_with_packages: 1
+          )
+        end
+      end
+
       context 'for plan' do
         it 'includes accurate usage_activity_by_stage data' do
           stub_licensed_features(board_assignee_lists: true, board_milestone_lists: true)
