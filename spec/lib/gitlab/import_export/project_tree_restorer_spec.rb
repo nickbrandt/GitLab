@@ -534,7 +534,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
       it 'uses the project visibility' do
         expect(restorer.restore).to eq(true)
-        expect(restorer.restored_project.visibility_level).to eq(visibility)
+        expect(restorer.project.visibility_level).to eq(visibility)
       end
     end
 
@@ -546,7 +546,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
           stub_application_setting(restricted_visibility_levels: [Gitlab::VisibilityLevel::INTERNAL])
 
           expect(restorer.restore).to eq(true)
-          expect(restorer.restored_project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
+          expect(restorer.project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
         end
       end
     end
@@ -564,7 +564,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
         it 'uses the group visibility' do
           expect(restorer.restore).to eq(true)
-          expect(restorer.restored_project.visibility_level).to eq(group_visibility)
+          expect(restorer.project.visibility_level).to eq(group_visibility)
         end
       end
 
@@ -574,7 +574,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
         it 'uses the project visibility' do
           expect(restorer.restore).to eq(true)
-          expect(restorer.restored_project.visibility_level).to eq(visibility)
+          expect(restorer.project.visibility_level).to eq(visibility)
         end
       end
 
@@ -584,7 +584,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
         it 'uses the group visibility' do
           expect(restorer.restore).to eq(true)
-          expect(restorer.restored_project.visibility_level).to eq(group_visibility)
+          expect(restorer.project.visibility_level).to eq(group_visibility)
         end
 
         context 'with restricted internal visibility' do
@@ -592,7 +592,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
             stub_application_setting(restricted_visibility_levels: [Gitlab::VisibilityLevel::INTERNAL])
 
             expect(restorer.restore).to eq(true)
-            expect(restorer.restored_project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
+            expect(restorer.project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
           end
         end
       end

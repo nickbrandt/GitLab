@@ -7,7 +7,8 @@ module Gitlab
       GROUP_MODELS = [GroupLabel, Milestone].freeze
 
       attr_reader :user
-      attr_reader :restored_project
+      attr_reader :shared
+      attr_reader :project
 
       def initialize(user:, shared:, project:)
         @path = File.join(shared.export_path, 'project.json')
@@ -37,7 +38,7 @@ module Gitlab
         end
 
         # ensure that we have latest version of the restore
-        @restored_project = @project.reload # rubocop:disable Cop/ActiveRecordAssociationReload
+        @project.reload # rubocop:disable Cop/ActiveRecordAssociationReload
 
         true
       rescue => e
