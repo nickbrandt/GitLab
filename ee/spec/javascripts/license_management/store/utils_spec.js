@@ -69,6 +69,31 @@ describe('utils', () => {
 
       expect(result.length).toBe(0);
     });
+
+    it('applies the correct approval status', () => {
+      const policies = [{ id: 1, name: 'LGPL', approvalStatus: 'blacklisted' }];
+      const dependency = {
+        license: { name: 'lgpl', url: 'http://example.org' },
+        dependency: { name: 'geoip' },
+      };
+      const headReport = {
+        licenses: [{ count: 1, name: 'BSD' }, { count: 1, name: 'lgpl' }],
+        dependencies: [dependency],
+      };
+      const baseReport = { licenses: [{ count: 1, name: 'bsd' }], dependencies: [] };
+      const result = parseLicenseReportMetrics(headReport, baseReport, policies);
+
+      expect(result.length).toBe(1);
+      expect(result[0]).toEqual(
+        jasmine.objectContaining({
+          approvalStatus: 'blacklisted',
+          count: 1,
+          status: 'failed',
+          name: 'lgpl',
+          packages: [{ name: 'geoip' }],
+        }),
+      );
+    });
   });
 
   describe('byLicenseNameComparator', () => {

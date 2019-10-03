@@ -1,0 +1,5 @@
+---
+title: Display appropriate approval status icon next to license
+merge_request: 17613
+author:
+type: fixed
