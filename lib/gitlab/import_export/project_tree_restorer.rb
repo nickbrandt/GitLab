@@ -36,9 +36,8 @@ module Gitlab
           end
         end
 
-        # ensure that we have latest version
-        # of the restore
-        @restored_project = @project.reload
+        # ensure that we have latest version of the restore
+        @restored_project = @project.reload # rubocop:disable Cop/ActiveRecordAssociationReload
 
         true
       rescue => e
@@ -95,7 +94,7 @@ module Gitlab
         save_id_mappings(relation_key, relation_hash_batch, relation_hash)
 
         @project.reset
-       end
+      end
 
       # Older, serialized CI pipeline exports may only have a
       # merge_request_id and not the full hash of the merge request. To

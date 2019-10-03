@@ -11,7 +11,9 @@ module EE
 
         override :remove_feature_dependent_sub_relations
         def remove_feature_dependent_sub_relations(relation_item)
-          if relation_item.is_a?(Hash) && ::Feature.disabled?(:export_designs, @project, default_enabled: true)
+          export_designs_disabled = ::Feature.disabled?(:export_designs, @project, default_enabled: true) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+
+          if relation_item.is_a?(Hash) && export_designs_disabled
             relation_item.except!('designs', 'design_versions')
           end
         end
