@@ -28,7 +28,7 @@ describe "User edits merge request with blocking MRs", :js do
       it 'can add the other MR' do
         visit edit_project_merge_request_path(project, merge_request)
 
-        fill_in 'Cross-project dependencies', with: other_mr.to_reference(full: true)
+        fill_in 'Merge request dependencies', with: other_mr.to_reference(full: true)
 
         click_button 'Save changes'
 
@@ -54,7 +54,7 @@ describe "User edits merge request with blocking MRs", :js do
       it 'cannot add the other MR' do
         visit edit_project_merge_request_path(project, merge_request)
 
-        fill_in 'Cross-project dependencies', with: other_mr.to_reference(full: true)
+        fill_in 'Merge request dependencies', with: other_mr.to_reference(full: true)
 
         click_button 'Save changes'
 
