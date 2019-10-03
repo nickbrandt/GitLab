@@ -7,6 +7,7 @@ module EE
 
       prepended do
         prepend HasEnvironmentScope
+        include UsageStatistics
 
         validate :unique_environment_scope
       end

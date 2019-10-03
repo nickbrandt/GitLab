@@ -39,21 +39,6 @@ describe Gitlab::UsageData do
         expect(described_class.uncached_data).to include(:usage_activity_by_stage)
       end
 
-      context 'for Manage' do
-        it 'includes accurate usage_activity_by_stage data' do
-          user = create(:user)
-          create(:group_member, user: user)
-          create(:key, type: 'LDAPKey', user: user)
-          create(:group_member, ldap: true, user: user)
-
-          expect(described_class.uncached_data[:usage_activity_by_stage][:manage]).to eq(
-            groups: 1,
-            ldap_keys: 1,
-            ldap_users: 1
-          )
-        end
-      end
-
       context 'for create' do
         it 'includes accurate usage_activity_by_stage data' do
           user = create(:user)
@@ -79,6 +64,45 @@ describe Gitlab::UsageData do
             remote_mirrors: 1,
             snippets: 1,
             suggestions: 1
+          )
+        end
+      end
+
+      context 'for manage' do
+        it 'includes accurate usage_activity_by_stage data' do
+          user = create(:user)
+          create(:group_member, user: user)
+          create(:key, type: 'LDAPKey', user: user)
+          create(:group_member, ldap: true, user: user)
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:manage]).to eq(
+            groups: 1,
+            ldap_keys: 1,
+            ldap_users: 1
+          )
+        end
+      end
+
+      context 'for monitor' do
+        it 'includes accurate usage_activity_by_stage data' do
+          user    = create(:user, dashboard: 'operations')
+          cluster = create(:cluster, user: user)
+          project = create(:project, creator: user)
+
+          create(:clusters_applications_prometheus, :installed, cluster: cluster)
+          create(:users_ops_dashboard_project, user: user)
+          create(:prometheus_service, project: project)
+          create(:project_error_tracking_setting, project: project)
+          create(:project_tracing_setting, project: project)
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:monitor]).to eq(
+            clusters: 1,
+            clusters_applications_prometheus: 1,
+            operations_dashboard_default_dashboard: 1,
+            operations_dashboard_users_with_projects_added: 1,
+            projects_prometheus_active: 1,
+            projects_with_error_tracking_enabled: 1,
+            projects_with_tracing_enabled: 1
           )
         end
       end
