@@ -1,0 +1,5 @@
+---
+title: Unpin ingress image version, default to installing latest
+merge_request: 18047
+author:
+type: added
