@@ -1,11 +1,10 @@
 = form_for @group, html: { multipart: true, class: 'gl-show-field-errors js-general-permissions-form' }, authenticity_token: true do |f|
-  - if Gitlab.config.pages.external_http || Gitlab.config.pages.external_https
-    .form-group
-      = f.label :max_pages_size, class: 'label-bold' do
-        Maximum size of pages (MB)
-      = f.number_field :max_pages_size, value: f.object.max_pages_size.try(:to_mb), class: 'form-control', min: 0
-      %span.form-text.text-muted#repository_size_limit_help_block
-        = s_('GitLabPages|The total size of deployed static content will be limited to this size.  0 for unlimited.  Leave empty to inherit the global value.')
+  .form-group
+    = f.label :max_pages_size, class: 'label-bold' do
+      Maximum size of pages (MB)
+    = f.number_field :max_pages_size, value: f.object.max_pages_size.try(:to_mb), class: 'form-control', min: 0
+    %span.form-text.text-muted#repository_size_limit_help_block
+      = s_('GitLabPages|The total size of deployed static content will be limited to this size.  0 for unlimited.  Leave empty to inherit the global value.')
 
-    .prepend-top-10
-      = f.submit s_('GitLabPages|Save'), class: 'btn btn-success'
+  .prepend-top-10
+    = f.submit s_('GitLabPages|Save'), class: 'btn btn-success'
