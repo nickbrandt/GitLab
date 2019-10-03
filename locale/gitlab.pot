@@ -16623,6 +16623,9 @@ msgstr ""
 msgid "Size limit per repository (MB)"
 msgstr ""
 
+msgid "Size settings for static websites"
+msgstr ""
+
 msgid "Skip Trial (Continue with Free Account)"
 msgstr ""
 
