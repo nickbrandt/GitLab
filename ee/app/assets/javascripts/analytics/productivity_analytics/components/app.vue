@@ -177,6 +177,27 @@ export default {
 
       <template v-if="showSecondaryCharts">
         <div ref="secondaryCharts">
+          <metric-chart
+            v-if="isChartEnabled(chartKeys.scatterplot)"
+            ref="scatterplot"
+            class="mb-4"
+            :title="s__('ProductivityAnalytics|Trendline')"
+            :is-loading="chartLoading(chartKeys.scatterplot)"
+            :metric-types="getMetricTypes(chartKeys.scatterplot)"
+            :chart-data="getScatterPlotMainData"
+            :selected-metric="getSelectedMetric(chartKeys.scatterplot)"
+            @metricTypeChange="
+              metric => setMetricType({ metricType: metric, chartKey: chartKeys.scatterplot })
+            "
+          >
+            <scatterplot
+              :x-axis-title="s__('ProductivityAnalytics|Merge date')"
+              :y-axis-title="scatterplotYaxisLabel"
+              :scatter-data="getScatterPlotMainData"
+              :median-line-data="getScatterPlotMedianData"
+            />
+          </metric-chart>
+
           <div class="row">
             <metric-chart
               ref="timeBasedChart"
@@ -230,27 +251,6 @@ export default {
               />
             </metric-chart>
           </div>
-
-          <metric-chart
-            v-if="isChartEnabled(chartKeys.scatterplot)"
-            ref="scatterplot"
-            class="mb-4"
-            :title="s__('ProductivityAnalytics|Trendline')"
-            :is-loading="chartLoading(chartKeys.scatterplot)"
-            :metric-types="getMetricTypes(chartKeys.scatterplot)"
-            :chart-data="getScatterPlotMainData"
-            :selected-metric="getSelectedMetric(chartKeys.scatterplot)"
-            @metricTypeChange="
-              metric => setMetricType({ metricType: metric, chartKey: chartKeys.scatterplot })
-            "
-          >
-            <scatterplot
-              :x-axis-title="s__('ProductivityAnalytics|Merge date')"
-              :y-axis-title="scatterplotYaxisLabel"
-              :scatter-data="getScatterPlotMainData"
-              :median-line-data="getScatterPlotMedianData"
-            />
-          </metric-chart>
 
           <div
             class="js-mr-table-sort d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-2"
