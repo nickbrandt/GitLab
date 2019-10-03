@@ -195,6 +195,7 @@ class Project < ApplicationRecord
   has_one :project_repository, inverse_of: :project
   has_one :error_tracking_setting, inverse_of: :project, class_name: 'ErrorTracking::ProjectErrorTrackingSetting'
   has_one :metrics_setting, inverse_of: :project, class_name: 'ProjectMetricsSetting'
+  has_one :grafana_integration, inverse_of: :project
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id', inverse_of: :target_project
@@ -311,6 +312,7 @@ class Project < ApplicationRecord
 
   accepts_nested_attributes_for :error_tracking_setting, update_only: true
   accepts_nested_attributes_for :metrics_setting, update_only: true, allow_destroy: true
+  accepts_nested_attributes_for :grafana_integration, update_only: true, allow_destroy: true
 
   delegate :name, to: :owner, allow_nil: true, prefix: true
   delegate :members, to: :team, prefix: true

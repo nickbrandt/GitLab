@@ -354,6 +354,14 @@ module ProjectsHelper
     @project.metrics_setting_external_dashboard_url
   end
 
+  def grafana_integration_url
+    @project.grafana_integration&.grafana_url
+  end
+
+  def grafana_integration_token
+    @project.grafana_integration&.token
+  end
+
   private
 
   def get_project_nav_tabs(project, current_user)
