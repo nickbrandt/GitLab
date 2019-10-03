@@ -24,7 +24,7 @@ describe Gitlab::UsageData do
       end
     end
 
-    context 'when the :usage_activity_by_stage feaure is not enabled' do
+    context 'when the :usage_activity_by_stage feature is not enabled' do
       before do
         stub_feature_flags(usage_activity_by_stage: false)
       end
