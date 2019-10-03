@@ -13,7 +13,7 @@ describe Projects::AutocompleteSourcesController do
     sign_in(user)
   end
 
-  context 'when epics feture is disabled' do
+  context 'when epics feature is disabled' do
     it 'returns 404 status' do
       get :epics, params: { namespace_id: project.namespace, project_id: project }
 
@@ -21,7 +21,7 @@ describe Projects::AutocompleteSourcesController do
     end
   end
 
-  context 'when epics feture is enabled' do
+  context 'when epics feature is enabled' do
     before do
       stub_licensed_features(epics: true)
     end
