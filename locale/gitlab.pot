@@ -14039,6 +14039,12 @@ msgstr ""
 msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
 msgstr ""
 
+msgid "SecurityDashboard|%{firstProject} and %{secondProject}"
+msgstr ""
+
+msgid "SecurityDashboard|%{firstProject}, %{secondProject}, and %{rest}"
+msgstr ""
+
 msgid "SecurityDashboard|Confidence"
 msgstr ""
 
@@ -14058,6 +14064,9 @@ msgid "SecurityDashboard|Report type"
 msgstr ""
 
 msgid "SecurityDashboard|Severity"
+msgstr ""
+
+msgid "SecurityDashboard|Unable to add %{invalidProjects}"
 msgstr ""
 
 msgid "See metrics"
@@ -14783,6 +14792,9 @@ msgid "Something went wrong while stopping this environment. Please try again."
 msgstr ""
 
 msgid "Something went wrong, unable to add %{project} to dashboard"
+msgstr ""
+
+msgid "Something went wrong, unable to add projects to dashboard"
 msgstr ""
 
 msgid "Something went wrong, unable to get projects"
