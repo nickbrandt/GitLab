@@ -121,6 +121,23 @@ describe PipelineDetailsEntity do
         expect(subject[:details]).to include(:test_reports)
         expect(subject[:details][:test_reports][:total_time]).to eq(pipeline.test_reports.total_time)
       end
+
+      context 'when pipeline has corrupt test reports' do
+        before do
+          job = create(:ci_build, pipeline: pipeline)
+          create(:ci_job_artifact, :junit_with_corrupted_data, job: job)
+        end
+
+        it 'does not error out' do
+          expect { subject }.not_to raise_error
+        end
+
+        it 'shows an empty test_reports section' do
+          expect(subject).to include(:details)
+          expect(subject[:details]).to include(:test_reports)
+          expect(subject[:details][:test_reports]).to eq(nil)
+        end
+      end
     end
 
     context 'when pipeline has YAML errors' do
