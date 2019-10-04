@@ -259,6 +259,7 @@ module QA
       module Milestone
         autoload :New, 'qa/page/project/milestone/new'
         autoload :Index, 'qa/page/project/milestone/index'
+        autoload :Show, 'qa/page/project/milestone/show'
       end
 
       module Operations
