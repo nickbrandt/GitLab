@@ -69,7 +69,7 @@ take the latest Code Quality artifact available.
 The included `code_quality` job is running in the `test` stage, so it needs to be included in your CI config, like so:
 
 ```yaml
-stages: 
+stages:
   - test
 ```
 
