@@ -163,7 +163,7 @@ describe API::NpmPackages do
         end
 
         context 'invalid package name' do
-          let(:package_name) { "@#{group.path}/my_inv@lid_package_name" }
+          let(:package_name) { "@#{group.path}/my_inv@@lid_package_name" }
           let(:params) { upload_params(package_name) }
 
           it 'handles an ActiveRecord::RecordInvalid exception with 400 error' do

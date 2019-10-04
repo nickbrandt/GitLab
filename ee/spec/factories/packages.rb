@@ -29,6 +29,12 @@ FactoryBot.define do
         create :package_file, :npm, package: package
       end
     end
+
+    factory :conan_package do
+      sequence(:name) { |n| "package-#{n}/1.0.0@#{project.full_path.tr('/', '+')}/stable"}
+      version { '1.0.0' }
+      package_type { 'conan' }
+    end
   end
 
   factory :package_file, class: Packages::PackageFile do
