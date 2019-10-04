@@ -17,7 +17,7 @@ module EE::Gitlab::ImportExport::Importer
     Gitlab::ImportExport::DesignRepoRestorer.new(
       path_to_bundle: design_repo_path,
       shared: shared,
-      project: project_tree.restored_project
+      project: project
     )
   end
 
