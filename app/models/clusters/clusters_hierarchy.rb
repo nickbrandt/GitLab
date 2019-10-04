@@ -4,8 +4,9 @@ module Clusters
   class ClustersHierarchy
     DEPTH_COLUMN = :depth
 
-    def initialize(clusterable)
+    def initialize(clusterable, include_management_project: true)
       @clusterable = clusterable
+      @include_management_project = include_management_project
     end
 
     # Returns clusters in order from deepest to highest group
@@ -24,7 +25,7 @@ module Clusters
 
     private
 
-    attr_reader :clusterable
+    attr_reader :clusterable, :include_management_project
 
     def recursive_cte
       cte = Gitlab::SQL::RecursiveCTE.new(:clusters_cte)
@@ -38,7 +39,7 @@ module Clusters
                      raise ArgumentError, "unknown type for #{clusterable}"
                    end
 
-      if clusterable.is_a?(::Project)
+      if clusterable.is_a?(::Project) && include_management_project
         cte << management_clusters_query
       end
 
