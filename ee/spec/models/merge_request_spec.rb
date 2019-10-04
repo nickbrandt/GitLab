@@ -548,29 +548,6 @@ describe MergeRequest do
     end
   end
 
-  describe '#all_approvers_including_groups' do
-    it 'returns correct set of users' do
-      user = create :user
-      user1 = create :user
-      user2 = create :user
-      create :user
-
-      project = create :project
-      group = create :group
-      group.add_maintainer user
-      create :approver_group, target: project, group: group
-
-      merge_request = create :merge_request, target_project: project, source_project: project
-      group1 = create :group
-      group1.add_maintainer user1
-      create :approver_group, target: merge_request, group: group1
-
-      create(:approver, user: user2, target: merge_request)
-
-      expect(merge_request.all_approvers_including_groups).to match_array([user1, user2])
-    end
-  end
-
   describe '#approver_group_ids=' do
     it 'create approver_groups' do
       group = create :group

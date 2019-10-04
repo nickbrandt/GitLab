@@ -22,21 +22,11 @@ module VisibleApprovable
     approvers
   end
 
-  def all_approvers_including_groups
-    approval_state.approvers
-  end
-
-  def approvers_from_groups
-    groups = approval_state.wrapped_approval_rules.flat_map(&:groups)
-    User.joins(:group_members).where(members: { source_id: groups })
-  end
-
   def reset_approval_cache!
     approvals.reset
     approved_by_users.reset
     approval_rules.reset
 
-    clear_memoization(:all_approvers_including_groups)
     clear_memoization(:approval_state)
   end
 end
