@@ -9,7 +9,7 @@ module Groups
     def index
       @packages = ::Packages::GroupPackagesFinder.new(current_user, group)
         .execute
-        .sort_by_attribute(@sort = params[:sort] || 'created_desc')
+        .sort_by_attribute(@sort = params[:sort] || sort_value_recently_created)
         .page(params[:page])
     end
 

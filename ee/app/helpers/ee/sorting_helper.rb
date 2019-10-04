@@ -72,7 +72,7 @@ module EE
         sort_value_name_desc         => sort_title_name,
         sort_value_version_desc      => sort_title_version,
         sort_value_version_asc       => sort_title_version,
-        sort_value_type_desc         => sort_value_type_desc,
+        sort_value_type_desc         => sort_title_type,
         sort_value_type_asc          => sort_title_type,
         sort_value_project_name_desc => sort_title_project_name,
         sort_value_project_name_asc  => sort_title_project_name

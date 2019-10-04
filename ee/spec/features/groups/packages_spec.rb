@@ -78,49 +78,57 @@ describe 'Group Packages' do
     end
 
     it 'sorts by created date descending' do
-      visit group_packages_path(group, sort: sort_value_created_date)
+      visit group_packages_path(group, sort: sort_value_recently_created)
+      expect(sort_dropdown_button_text).to eq(sort_title_created_date)
       expect(first_package).to include(bbb_package.name)
       expect(last_package).to include(aaa_package.name)
     end
 
     it 'sorts by created date ascending' do
       visit group_packages_path(group, sort: sort_value_oldest_created)
+      expect(sort_dropdown_button_text).to eq(sort_title_created_date)
       expect(first_package).to include(aaa_package.name)
       expect(last_package).to include(bbb_package.name)
     end
 
     it 'sorts by name descending' do
       visit group_packages_path(group, sort: sort_value_name_desc)
+      expect(sort_dropdown_button_text).to eq(sort_title_name)
       expect(first_package).to include(bbb_package.name)
       expect(last_package).to include(aaa_package.name)
     end
 
     it 'sorts by name ascending' do
       visit group_packages_path(group, sort: sort_value_name)
+      expect(sort_dropdown_button_text).to eq(sort_title_name)
       expect(first_package).to include(aaa_package.name)
       expect(last_package).to include(bbb_package.name)
     end
 
     it 'sorts by version descending' do
       visit group_packages_path(group, sort: sort_value_version_desc)
+      expect(sort_dropdown_button_text).to eq(sort_title_version)
       expect(first_package).to include(bbb_package.name)
       expect(last_package).to include(aaa_package.name)
     end
 
     it 'sorts by version ascending' do
       visit group_packages_path(group, sort: sort_value_version_asc)
+      expect(sort_dropdown_button_text).to eq(sort_title_version)
       expect(first_package).to include(aaa_package.name)
       expect(last_package).to include(bbb_package.name)
     end
 
     it 'sorts by project descending' do
       visit group_packages_path(group, sort: sort_value_project_name_desc)
+      expect(sort_dropdown_button_text).to eq(sort_title_project_name)
       expect(first_package).to include(bbb_package.name)
       expect(last_package).to include(aaa_package.name)
     end
 
     it 'sorts by project ascending' do
       visit group_packages_path(group, sort: sort_value_project_name_asc)
+      expect(sort_dropdown_button_text).to eq(sort_title_project_name)
       expect(first_package).to include(aaa_package.name)
       expect(last_package).to include(bbb_package.name)
     end
@@ -132,12 +140,14 @@ describe 'Group Packages' do
 
     it 'sorts by type descending' do
       visit group_packages_path(group, sort: sort_value_type_desc)
+      expect(sort_dropdown_button_text).to eq(sort_title_type)
       expect(first_package).to include(npm_package.name)
       expect(last_package).to include(maven_package.name)
     end
 
     it 'sorts by type ascending' do
       visit group_packages_path(group, sort: sort_value_type_asc)
+      expect(sort_dropdown_button_text).to eq(sort_title_type)
       expect(first_package).to include(maven_package.name)
       expect(last_package).to include(npm_package.name)
     end
@@ -148,10 +158,14 @@ describe 'Group Packages' do
   end
 
   def first_package
-    page.all('.table-holder .package-row').first.text
+    page.all('[data-qa-selector="package-row"]').first.text
   end
 
   def last_package
-    page.all('.table-holder .package-row').last.text
+    page.all('[data-qa-selector="package-row"]').last.text
+  end
+
+  def sort_dropdown_button_text
+    page.find('[data-qa-selector="sort-dropdown-button"]').text
   end
 end
