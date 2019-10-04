@@ -27,24 +27,30 @@ module Epics
     end
 
     def before_object
-      return unless params[:relative_position].to_sym == :before
+      return unless params[:relative_position] == 'before'
 
       adjacent_reference
     end
 
     def after_object
-      return unless params[:relative_position].to_sym == :after
+      return unless params[:relative_position] == 'after'
 
       adjacent_reference
     end
 
     def validate_objects
+      return 'Relative position is not valid.' unless valid_relative_position?
+
       unless supported_type?(moving_object) && supported_type?(adjacent_reference)
         return 'Only epics and epic_issues are supported.'
       end
 
       return 'You don\'t have permissions to move the objects.' unless authorized?
-      return 'Both object have to belong to same parent epic.' unless same_parent?
+      return 'Both objects have to belong to the same parent epic.' unless same_parent?
+    end
+
+    def valid_relative_position?
+      %w(before after).include?(params[:relative_position])
     end
 
     def same_parent?

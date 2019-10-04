@@ -15,7 +15,7 @@ describe Epics::TreeReorderService do
     let(:epic_issue1) { create(:epic_issue, epic: epic, issue: issue1, relative_position: 30) }
     let(:epic_issue2) { create(:epic_issue, epic: epic, issue: issue2, relative_position: 40) }
 
-    let(:relative_position) { :after }
+    let(:relative_position) { 'after' }
     let!(:tree_object_1) { epic1 }
     let!(:tree_object_2) { epic2 }
     let(:adjacent_reference_id) { GitlabSchema.id_from_object(tree_object_1) }
@@ -45,7 +45,7 @@ describe Epics::TreeReorderService do
       end
     end
 
-    context 'when epics feature is enabled' do
+    context 'when epics feature is not enabled' do
       it_behaves_like 'error for the tree update', 'You don\'t have permissions to move the objects.'
     end
 
@@ -61,6 +61,12 @@ describe Epics::TreeReorderService do
       context 'when user does has permissions to admin the base epic' do
         before do
           group.add_developer(user)
+        end
+
+        context 'when relative_position is not valid' do
+          let(:relative_position) { 'whatever' }
+
+          it_behaves_like 'error for the tree update', 'Relative position is not valid.'
         end
 
         context 'when moving EpicIssue' do
@@ -93,7 +99,7 @@ describe Epics::TreeReorderService do
               epic_issue2.update(epic: other_epic)
             end
 
-            it_behaves_like 'error for the tree update', 'Both object have to belong to same parent epic.'
+            it_behaves_like 'error for the tree update', 'Both objects have to belong to the same parent epic.'
           end
 
           context 'when object being moved is not supported type' do
@@ -145,13 +151,13 @@ describe Epics::TreeReorderService do
             it_behaves_like 'error for the tree update', 'You don\'t have permissions to move the objects.'
           end
 
-          context 'when object being moved is from of another epic' do
+          context 'when object being moved is froms another epic' do
             before do
               other_epic = create(:epic, group: group)
               epic2.update(parent: other_epic)
             end
 
-            it_behaves_like 'error for the tree update', 'Both object have to belong to same parent epic.'
+            it_behaves_like 'error for the tree update', 'Both objects have to belong to the same parent epic.'
           end
 
           context 'when moving is successful' do

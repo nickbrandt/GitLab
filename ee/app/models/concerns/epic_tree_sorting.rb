@@ -21,11 +21,13 @@ module EpicTreeSorting
   included do
     def move_sequence(start_pos, end_pos, delta)
       items_to_update = scoped_items
+        .select(:id, :object_type)
         .where('relative_position BETWEEN ? AND ?', start_pos, end_pos)
+        .where.not('object_type = ? AND id = ?', self.class.table_name.singularize, self.id)
 
       items_to_update.group_by { |item| item.object_type }.each do |type, group_items|
-        items = type.camelcase.constantize.where(id: group_items.map(&:id))
-        items = items.where.not(id: self.id) if type == self.class.underscore
+        ids = group_items.map(&:id)
+        items = type.camelcase.constantize.where(id: ids).select(:id)
         items.update_all("relative_position = relative_position + #{delta}")
       end
     end
