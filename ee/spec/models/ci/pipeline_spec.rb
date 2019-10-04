@@ -239,7 +239,7 @@ describe Ci::Pipeline do
     end
   end
 
-  describe '#license_management_reports' do
+  describe '#license_scanning_reports' do
     subject { pipeline.license_scanning_report }
 
     before do
