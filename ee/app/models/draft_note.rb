@@ -28,6 +28,12 @@ class DraftNote < ApplicationRecord
 
   scope :authored_by, ->(u) { where(author_id: u.id) }
 
+  def self.positions
+    where.not(position: nil)
+      .select(:position)
+      .map(&:position)
+  end
+
   def project
     merge_request.target_project
   end
