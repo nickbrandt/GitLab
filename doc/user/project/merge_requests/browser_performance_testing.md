@@ -77,6 +77,10 @@ that's provided as a part of your GitLab installation.
 For GitLab versions earlier than 12.4, you can copy and use the job as defined
 in that template.
 
+CAUTION: **Caution:**
+The job definition provided by the template does not support Kubernetes yet. For a complete example of a more complex setup
+that works in Kubernetes, see [here](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/Browser-Performance-Testing.gitlab-ci.yml).
+
 Add the following to your `.gitlab-ci.yml` file:
 
 ```yaml
