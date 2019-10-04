@@ -2251,10 +2251,7 @@ class Project < ApplicationRecord
   end
 
   def closest_setting(name)
-    setting = read_attribute(name)
-    setting ||= closest_namespace_setting(name)
-    setting ||= Gitlab::CurrentSettings.send(name) # rubocop:disable GitlabSecurity/PublicSend
-    setting
+    read_attribute(name) || closest_namespace_setting(name) || app_settings_for(name)
   end
 
   private
@@ -2264,6 +2261,10 @@ class Project < ApplicationRecord
       .self_and_ancestors(hierarchy_order: :asc)
       .find { |n| !n.read_attribute(name).nil? }
       .try(name)
+  end
+
+  def app_settings_for(name)
+    Gitlab::CurrentSettings.send(name) # rubocop:disable GitlabSecurity/PublicSend
   end
 
   def merge_requests_allowing_collaboration(source_branch = nil)
