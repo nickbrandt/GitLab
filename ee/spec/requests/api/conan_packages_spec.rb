@@ -3,6 +3,10 @@ require 'spec_helper'
 
 describe API::ConanPackages do
   let(:base_secret) { SecureRandom.base64(64) }
+  let(:personal_access_token) { create(:personal_access_token) }
+  let(:headers) do
+    { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('foo', personal_access_token.token) }
+  end
 
   let(:jwt_secret) do
     OpenSSL::HMAC.hexdigest(
@@ -10,11 +14,6 @@ describe API::ConanPackages do
       base_secret,
       Gitlab::ConanToken::HMAC_KEY
     )
-  end
-
-  let(:personal_access_token) { create(:personal_access_token) }
-  let(:headers) do
-    { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('foo', personal_access_token.token) }
   end
 
   before do
@@ -96,6 +95,35 @@ describe API::ConanPackages do
           expect(response).to have_gitlab_http_status(404)
         end
       end
+    end
+  end
+
+  describe 'GET /api/v4/packages/conan/v1/conans/search' do
+    let(:project) { create(:project, :public) }
+    let(:package) { create(:conan_package, project: project) }
+
+    before do
+      get api('/packages/conan/v1/conans/search'), headers: headers, params: params
+    end
+
+    subject { JSON.parse(response.body)['results'] }
+
+    context 'returns packages with a matching name' do
+      let(:params) { { q: package.name } }
+
+      it { is_expected.to contain_exactly(package.name) }
+    end
+
+    context 'returns packages using a * wildcard' do
+      let(:params) {{ q: "#{package.name[0, 3]}*" }}
+
+      it { is_expected.to contain_exactly(package.name) }
+    end
+
+    context 'does not return non-matching packages' do
+      let(:params) {{ q: "foo" }}
+
+      it { is_expected.to be_blank }
     end
   end
 

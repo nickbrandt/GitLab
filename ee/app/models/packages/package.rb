@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 class Packages::Package < ApplicationRecord
+  include Sortable
+
   belongs_to :project
   # package_files must be destroyed by ruby code in order to properly remove carrierwave uploads and update project statistics
   has_many :package_files, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -16,9 +18,10 @@ class Packages::Package < ApplicationRecord
   validate :valid_npm_package_name, if: :npm?
   validate :package_already_taken, if: :npm?
 
-  enum package_type: { maven: 1, npm: 2 }
+  enum package_type: { maven: 1, npm: 2, conan: 3 }
 
   scope :with_name, ->(name) { where(name: name) }
+  scope :with_name_like, ->(name) { where(arel_table[:name].matches(name)) }
   scope :with_version, ->(version) { where(version: version) }
   scope :has_version, -> { where.not(version: nil) }
   scope :preload_files, -> { preload(:package_files) }
@@ -48,6 +51,10 @@ class Packages::Package < ApplicationRecord
     with_name(name)
       .joins(:package_files)
       .where(packages_package_files: { file_name: file_name }).last!
+  end
+
+  def self.pluck_names
+    pluck(:name)
   end
 
   def self.sort_by_attribute(method)

@@ -7,7 +7,7 @@ module EE
 
       class_methods do
         def package_name_regex
-          @package_name_regex ||= %r{\A\@?(([\w\-\.]*)/)*([\w\-\.]*)\z}.freeze
+          @package_name_regex ||= %r{\A\@?(([\w\-\.\+]*)\/)*([\w\-\.]+)@?(([\w\-\.\+]*)\/)*([\w\-\.]*)\z}.freeze
         end
 
         def maven_path_regex
