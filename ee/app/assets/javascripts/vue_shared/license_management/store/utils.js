@@ -1,6 +1,7 @@
 import { n__, sprintf } from '~/locale';
 import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
+import ReportMapper from 'ee/vue_shared/license_management/report_mapper';
 
 const toLowerCase = name => name.toLowerCase();
 /**
@@ -85,10 +86,13 @@ export const parseLicenseReportMetrics = (headMetrics, baseMetrics, managedLicen
   if (!headMetrics && !baseMetrics) {
     return [];
   }
+  const reportMapper = new ReportMapper();
+  const headReport = reportMapper.mapFrom(headMetrics);
+  const baseReport = reportMapper.mapFrom(baseMetrics);
 
-  const headLicenses = headMetrics.licenses || [];
-  const headDependencies = headMetrics.dependencies || [];
-  const baseLicenses = baseMetrics.licenses || [];
+  const headLicenses = headReport.licenses || [];
+  const headDependencies = headReport.dependencies || [];
+  const baseLicenses = baseReport.licenses || [];
   const managedLicenseList = managedLicenses || [];
 
   if (!headLicenses.length && !headDependencies.length) return [];

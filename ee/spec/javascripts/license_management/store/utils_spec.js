@@ -17,6 +17,11 @@ import {
 } from 'ee_spec/license_management/mock_data';
 
 describe('utils', () => {
+  beforeEach(() => {
+    gon.features = gon.features || {};
+    gon.features.licenseScanV2 = true;
+  });
+
   describe('parseLicenseReportMetrics', () => {
     it('should return empty result, if no parameters are given', () => {
       const result = parseLicenseReportMetrics();
@@ -61,6 +66,97 @@ describe('utils', () => {
       expect(result[0].id).toBe(approvedLicense.id);
       expect(result[1].approvalStatus).toBe(blacklistedLicense.approvalStatus);
       expect(result[1].id).toBe(blacklistedLicense.id);
+    });
+
+    it('compares a v2 report with a v2 report', () => {
+      const policies = [{ id: 100, name: 'BSD License', approvalStatus: 'blacklisted' }];
+      const baseReport = {
+        version: '2.0',
+        licenses: [{ id: 'MIT', name: 'MIT License', url: 'https://opensource.org/licenses/MIT' }],
+        dependencies: [
+          { name: 'x', url: 'https://www.example.com/x', licenses: ['MIT'], description: 'X' },
+        ],
+      };
+
+      const headReport = {
+        version: '2.0',
+        licenses: [
+          { id: 'MIT', name: 'MIT License', url: 'https://opensource.org/licenses/MIT' },
+          { id: 'BSD', name: 'BSD License', url: 'https://opensource.org/licenses/BSD' },
+        ],
+        dependencies: [
+          { name: 'x', url: 'https://www.example.com/x', licenses: ['MIT'], description: 'X' },
+          { name: 'y', url: 'https://www.example.com/y', licenses: ['BSD'], description: 'Y' },
+          {
+            name: 'z',
+            url: 'https://www.example.com/z',
+            licenses: ['BSD', 'MIT'],
+            description: 'Z',
+          },
+        ],
+      };
+
+      const result = parseLicenseReportMetrics(headReport, baseReport, policies);
+
+      expect(result.length).toBe(1);
+      expect(result[0]).toEqual(
+        jasmine.objectContaining({
+          id: 100,
+          approvalStatus: 'blacklisted',
+          count: 2,
+          status: 'failed',
+          name: 'BSD License',
+          packages: [{ name: 'y', url: 'https://www.example.com/y', description: 'Y' }],
+        }),
+      );
+    });
+
+    it('compares a v1 report with a v2 report', () => {
+      const policies = [{ id: 101, name: 'BSD License', approvalStatus: 'blacklisted' }];
+      const baseReport = {
+        licenses: [{ name: 'MIT License', url: 'https://opensource.org/licenses/MIT' }],
+        dependencies: [
+          {
+            license: {
+              name: 'MIT License',
+              url: 'https://opensource.org/licenses/MIT',
+            },
+            dependency: { name: 'x', url: 'https://www.example.com/x', description: 'X' },
+          },
+        ],
+      };
+
+      const headReport = {
+        version: '2.0',
+        licenses: [
+          { id: 'MIT', name: 'MIT License', url: 'https://opensource.org/licenses/MIT' },
+          { id: 'BSD', name: 'BSD License', url: 'https://opensource.org/licenses/BSD' },
+        ],
+        dependencies: [
+          { name: 'x', url: 'https://www.example.com/x', licenses: ['MIT'], description: 'X' },
+          { name: 'y', url: 'https://www.example.com/y', licenses: ['BSD'], description: 'Y' },
+          {
+            name: 'z',
+            url: 'https://www.example.com/z',
+            licenses: ['BSD', 'MIT'],
+            description: 'Z',
+          },
+        ],
+      };
+
+      const result = parseLicenseReportMetrics(headReport, baseReport, policies);
+
+      expect(result.length).toBe(1);
+      expect(result[0]).toEqual(
+        jasmine.objectContaining({
+          id: 101,
+          approvalStatus: 'blacklisted',
+          count: 2,
+          status: 'failed',
+          name: 'BSD License',
+          packages: [{ name: 'y', url: 'https://www.example.com/y', description: 'Y' }],
+        }),
+      );
     });
 
     it('matches using a case insensitive match on license name', () => {
