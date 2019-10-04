@@ -38,10 +38,23 @@ module Clusters
                      raise ArgumentError, "unknown type for #{clusterable}"
                    end
 
+      if clusterable.is_a?(::Project)
+        cte << management_clusters_query
+      end
+
       cte << base_query
       cte << parent_query(cte)
 
       cte
+    end
+
+    # Management clusters should be first in the hierarchy so we use 0 for the
+    # depth column.
+    #
+    # group_parent_id is un-used but we still need to match the same number of
+    # columns as other queries in the CTE.
+    def management_clusters_query
+      clusterable.management_clusters.select([clusters_star, 'NULL AS group_parent_id', "0 AS #{DEPTH_COLUMN}"])
     end
 
     def group_clusters_base_query
