@@ -55,7 +55,7 @@
 
 = render 'shared/confirm_modal', phrase: @group.path
 
-- if Gitlab.config.pages.external_http || Gitlab.config.pages.external_https
+- if current_user.admin? && License.feature_available?(:max_pages_size) && (Gitlab.config.pages.external_http || Gitlab.config.pages.external_https)
   %section.settings.gs-pages.no-animate#js-pages-settings{ class: ('expanded' if expanded) }
     .settings-header
       %h4.settings-title.js-settings-toggle.js-settings-toggle-trigger-only{ role: 'button' }
