@@ -136,7 +136,7 @@ module EE
       def license_management_report
         ::Gitlab::Ci::Reports::LicenseScanning::Report.new.tap do |license_management_report|
           builds.latest.with_reports(::Ci::JobArtifact.license_management_reports).each do |build|
-            build.collect_license_management_reports!(license_management_report)
+            build.collect_license_scanning_reports!(license_management_report)
           end
         end
       end

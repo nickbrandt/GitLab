@@ -61,7 +61,7 @@ module EE
         end
       end
 
-      def collect_license_management_reports!(license_management_report)
+      def collect_license_scanning_reports!(license_management_report)
         each_report(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES) do |file_type, blob|
           next if ::Feature.disabled?(:parse_license_management_reports, default_enabled: true)
 

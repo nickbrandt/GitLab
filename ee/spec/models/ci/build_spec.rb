@@ -171,7 +171,7 @@ describe Ci::Build do
   end
 
   describe '#collect_license_management_reports!' do
-    subject { job.collect_license_management_reports!(license_scanning_report) }
+    subject { job.collect_license_scanning_reports!(license_scanning_report) }
 
     let(:license_scanning_report) { Gitlab::Ci::Reports::LicenseScanning::Report.new }
 
