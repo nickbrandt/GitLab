@@ -54,17 +54,10 @@ export default {
         .map(this.formatAlertSummary)
         .join(', ');
     },
-    supportsComputedAlerts() {
-      return gon.features && gon.features.prometheusComputedAlerts;
-    },
   },
   created() {
     this.service = new AlertsService({ alertsEndpoint: this.alertsEndpoint });
     this.fetchAlertData();
-  },
-  beforeDestroy() {
-    // clean up external event listeners
-    document.removeEventListener('click', this.handleOutsideClick);
   },
   methods: {
     fetchAlertData() {
