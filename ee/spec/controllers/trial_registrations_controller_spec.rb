@@ -4,6 +4,8 @@ require 'spec_helper'
 
 describe TrialRegistrationsController do
   describe '#new' do
+    let(:user) { create(:user) }
+
     before do
       allow(Gitlab).to receive(:com?).and_return(true)
     end
@@ -17,6 +19,26 @@ describe TrialRegistrationsController do
         get :new
 
         expect(response).to redirect_to("#{EE::SUBSCRIPTIONS_URL}/trials/new?gl_com=true")
+      end
+    end
+
+    context 'when customer is authenticated' do
+      before do
+        sign_in(user)
+      end
+
+      it 'redirects to the new trial page' do
+        get :new
+
+        expect(response).to redirect_to(new_trial_url)
+      end
+    end
+
+    context 'when customer is not authenticated' do
+      it 'renders the regular template' do
+        get :new
+
+        expect(response).to render_template(:new)
       end
     end
   end

@@ -2,9 +2,9 @@
 - max_username_length = 255
 #register-pane.tab-pane.login-box{ role: 'tabpanel' }
   .login-body
-    = form_for(User.new, as: :new_user, url: trial_registrations_path, html: { class: 'new_user gl-show-field-errors', 'aria-live' => 'assertive' }) do |f|
+    = form_for(user, as: :new_user, url: trial_registrations_path, html: { class: 'new_user gl-show-field-errors', 'aria-live' => 'assertive' }) do |f|
       .devise-errors
-        = render 'devise/shared/error_messages', resource: User.new
+        = render 'devise/shared/error_messages', resource: user
       - if Feature.enabled?(:invisible_captcha)
         = invisible_captcha
       .name.form-row
