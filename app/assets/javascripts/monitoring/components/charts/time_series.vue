@@ -62,6 +62,11 @@ export default {
       required: false,
       default: s__('Metrics|Max'),
     },
+    groupId: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -274,6 +279,7 @@ export default {
       :is="glChartComponent"
       ref="chart"
       v-bind="$attrs"
+      :group-id="groupId"
       :data="chartData"
       :option="chartOptions"
       :format-tooltip-text="formatTooltipText"
