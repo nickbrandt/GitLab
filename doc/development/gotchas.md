@@ -106,7 +106,7 @@ end
        Using `any_instance` to stub a method (elasticsearch_indexing) that has been defined on a prepended module (EE::ApplicationSetting) is not supported.
   ```
 
-### Alternative: `expect_next_instance_of`
+### Alternative: `expect_next_instance_of` or `allow_next_instance_of`
 
 Instead of writing:
 
