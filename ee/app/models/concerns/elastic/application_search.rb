@@ -374,7 +374,10 @@ module Elastic
         {
           query: {
             bool: {
-               filter: [{ term: { iid: iid } }]
+              filter: [
+                { term: { iid: iid } },
+                { term: { type: self.es_type } }
+              ]
             }
           }
         }
@@ -393,7 +396,7 @@ module Elastic
         query_hash[:query][:bool][:filter] ||= []
         query_hash[:query][:bool][:filter] << {
           has_parent: {
-            parent_type: "project",
+            parent_type: 'project',
             query: {
               bool: project_query
             }
