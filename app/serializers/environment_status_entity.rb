@@ -39,6 +39,10 @@ class EnvironmentStatusEntity < Grape::Entity
 
   expose :changes
 
+  expose :deployment_manual_actions, using: JobEntity do |es|
+    es.deployment.manual_actions
+  end
+
   private
 
   def environment
