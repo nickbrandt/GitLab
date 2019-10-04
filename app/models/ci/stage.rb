@@ -12,9 +12,11 @@ module Ci
     belongs_to :project
     belongs_to :pipeline
 
-    has_many :statuses, class_name: 'CommitStatus', foreign_key: :stage_id
-    has_many :builds, foreign_key: :stage_id
-    has_many :bridges, foreign_key: :stage_id
+    with_options(inverse_of: :stage, foreign_key: :stage_id) do
+      has_many :statuses, class_name: 'CommitStatus'
+      has_many :builds
+      has_many :bridges
+    end
 
     with_options unless: :importing? do
       validates :project, presence: true

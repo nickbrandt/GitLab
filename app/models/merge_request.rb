@@ -54,16 +54,16 @@ class MergeRequest < ApplicationRecord
     fallback || super
   end
 
-  belongs_to :head_pipeline, foreign_key: "head_pipeline_id", class_name: "Ci::Pipeline"
+  belongs_to :head_pipeline, inverse_of: :merge_requests_as_head_pipeline, foreign_key: "head_pipeline_id", class_name: "Ci::Pipeline"
 
-  has_many :events, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
+  has_many :events, inverse_of: :target, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
   has_many :merge_requests_closing_issues,
     class_name: 'MergeRequestsClosingIssues',
     dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
   has_many :cached_closes_issues, through: :merge_requests_closing_issues, source: :issue
-  has_many :pipelines_for_merge_request, foreign_key: 'merge_request_id', class_name: 'Ci::Pipeline'
+  has_many :pipelines_for_merge_request, inverse_of: :merge_request, foreign_key: 'merge_request_id', class_name: 'Ci::Pipeline'
   has_many :suggestions, through: :notes
 
   has_many :merge_request_assignees

@@ -7,6 +7,6 @@ module Clusters
     belongs_to :cluster, class_name: 'Clusters::Cluster'
     belongs_to :project, class_name: '::Project'
 
-    has_many :kubernetes_namespaces, class_name: 'Clusters::KubernetesNamespace', foreign_key: :cluster_project_id
+    has_many :kubernetes_namespaces, inverse_of: :cluster_project, class_name: 'Clusters::KubernetesNamespace', foreign_key: :cluster_project_id
   end
 end

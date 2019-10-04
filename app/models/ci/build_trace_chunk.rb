@@ -6,7 +6,7 @@ module Ci
     include ::Gitlab::ExclusiveLeaseHelpers
     extend Gitlab::Ci::Model
 
-    belongs_to :build, class_name: "Ci::Build", foreign_key: :build_id
+    belongs_to :build, inverse_of: :build_trace_chunks, class_name: "Ci::Build", foreign_key: :build_id
 
     default_value_for :data_store, :redis
 

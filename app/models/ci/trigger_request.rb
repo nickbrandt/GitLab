@@ -5,7 +5,7 @@ module Ci
     extend Gitlab::Ci::Model
 
     belongs_to :trigger
-    belongs_to :pipeline, foreign_key: :commit_id
+    belongs_to :pipeline, inverse_of: :trigger_requests, foreign_key: :commit_id
     has_many :builds
 
     delegate :short_token, to: :trigger, prefix: true, allow_nil: true

@@ -13,7 +13,7 @@ class CommitStatus < ApplicationRecord
 
   belongs_to :user
   belongs_to :project
-  belongs_to :pipeline, class_name: 'Ci::Pipeline', foreign_key: :commit_id
+  belongs_to :pipeline, inverse_of: :builds, class_name: 'Ci::Pipeline', foreign_key: :commit_id
   belongs_to :auto_canceled_by, class_name: 'Ci::Pipeline'
 
   delegate :commit, to: :pipeline

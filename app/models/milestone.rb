@@ -36,7 +36,7 @@ class Milestone < ApplicationRecord
   has_many :issues
   has_many :labels, -> { distinct.reorder('labels.title') }, through: :issues
   has_many :merge_requests
-  has_many :events, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
+  has_many :events, inverse_of: :target, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
   scope :of_projects, ->(ids) { where(project_id: ids) }
   scope :of_groups, ->(ids) { where(group_id: ids) }

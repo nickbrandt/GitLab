@@ -10,7 +10,7 @@ module Spammable
   end
 
   included do
-    has_one :user_agent_detail, as: :subject, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+    has_one :user_agent_detail, inverse_of: :subject, as: :subject, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
     attr_accessor :spam
     attr_accessor :spam_log

@@ -8,7 +8,7 @@ module Ci
 
     belongs_to :project
     belongs_to :owner, class_name: 'User'
-    has_one :last_pipeline, -> { order(id: :desc) }, class_name: 'Ci::Pipeline'
+    has_one :last_pipeline, -> { order(id: :desc) }, inverse_of: :pipeline_schedule, class_name: 'Ci::Pipeline'
     has_many :pipelines
     has_many :variables, class_name: 'Ci::PipelineScheduleVariable', validate: false
 

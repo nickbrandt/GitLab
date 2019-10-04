@@ -40,7 +40,7 @@ class Todo < ApplicationRecord
   }, polymorphic: true, touch: true # rubocop:disable Cop/PolymorphicAssociations
 
   belongs_to :user
-  belongs_to :issue, -> { where("target_type = 'Issue'") }, foreign_key: :target_id
+  belongs_to :issue, -> { where("target_type = 'Issue'") }, inverse_of: :target, foreign_key: :target_id
 
   delegate :name, :email, to: :author, prefix: true, allow_nil: true
 

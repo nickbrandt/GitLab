@@ -36,16 +36,18 @@ module Ci
       refspecs: -> (build) { build.merge_request_ref? }
     }.freeze
 
-    has_one :deployment, as: :deployable, class_name: 'Deployment'
+    has_one :deployment, inverse_of: :deployable, as: :deployable, class_name: 'Deployment'
     has_many :trace_sections, class_name: 'Ci::BuildTraceSection'
-    has_many :trace_chunks, class_name: 'Ci::BuildTraceChunk', foreign_key: :build_id
-    has_many :needs, class_name: 'Ci::BuildNeed', foreign_key: :build_id, inverse_of: :build
+    has_many :trace_chunks, inverse_of: :build, class_name: 'Ci::BuildTraceChunk', foreign_key: :build_id
+    has_many :needs, inverse_of: :build, class_name: 'Ci::BuildNeed', foreign_key: :build_id
 
-    has_many :job_artifacts, class_name: 'Ci::JobArtifact', foreign_key: :job_id, dependent: :destroy, inverse_of: :job # rubocop:disable Cop/ActiveRecordDependent
-    has_many :job_variables, class_name: 'Ci::JobVariable', foreign_key: :job_id
+    with_options(inverse_of: :job, foreign_key: :job_id) do
+      has_many :job_artifacts, class_name: 'Ci::JobArtifact', dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+      has_many :job_variables, class_name: 'Ci::JobVariable'
 
-    Ci::JobArtifact.file_types.each do |key, value|
-      has_one :"job_artifacts_#{key}", -> { where(file_type: value) }, class_name: 'Ci::JobArtifact', inverse_of: :job, foreign_key: :job_id
+      Ci::JobArtifact.file_types.each do |key, value|
+        has_one :"job_artifacts_#{key}", -> { where(file_type: value) }, class_name: 'Ci::JobArtifact'
+      end
     end
 
     has_one :runner_session, class_name: 'Ci::BuildRunnerSession', validate: true, inverse_of: :build

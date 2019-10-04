@@ -73,7 +73,7 @@ class ProjectFeature < ApplicationRecord
   # Default scopes force us to unscope here since a service may need to check
   # permissions for a project in pending_delete
   # http://stackoverflow.com/questions/1540645/how-to-disable-default-scope-for-a-belongs-to
-  belongs_to :project, -> { unscope(where: :pending_delete) }
+  belongs_to :project, -> { unscope(where: :pending_delete) }, inverse_of: :project_feature
 
   validates :project, presence: true
 

@@ -52,7 +52,7 @@ module Ci
     TYPE_AND_FORMAT_PAIRS = INTERNAL_TYPES.merge(REPORT_TYPES).freeze
 
     belongs_to :project
-    belongs_to :job, class_name: "Ci::Build", foreign_key: :job_id
+    belongs_to :job, inverse_of: :job_artifacts, class_name: "Ci::Build", foreign_key: :job_id
 
     mount_uploader :file, JobArtifactUploader
 

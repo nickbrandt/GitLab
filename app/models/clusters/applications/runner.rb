@@ -12,7 +12,7 @@ module Clusters
       include ::Clusters::Concerns::ApplicationVersion
       include ::Clusters::Concerns::ApplicationData
 
-      belongs_to :runner, class_name: 'Ci::Runner', foreign_key: :runner_id
+      belongs_to :runner, inverse_of: :cluster_applications_runners, class_name: 'Ci::Runner', foreign_key: :runner_id
       delegate :project, :group, to: :cluster
 
       default_value_for :version, VERSION

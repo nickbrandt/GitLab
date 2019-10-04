@@ -5,7 +5,7 @@ class GroupMember < Member
 
   SOURCE_TYPE = 'Namespace'
 
-  belongs_to :group, foreign_key: 'source_id'
+  belongs_to :group, inverse_of: :group_members, foreign_key: 'source_id'
 
   delegate :update_two_factor_requirement, to: :user
 

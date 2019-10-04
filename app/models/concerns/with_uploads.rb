@@ -26,8 +26,9 @@ module WithUploads
   FILE_UPLOADERS = %w(PersonalFileUploader NamespaceFileUploader FileUploader).freeze
 
   included do
-    has_many :uploads, as: :model
+    has_many :uploads, inverse_of: :model, as: :model
     has_many :file_uploads, -> { where(uploader: FILE_UPLOADERS) },
+      inverse_of: :model,
       class_name: 'Upload', as: :model,
       dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 

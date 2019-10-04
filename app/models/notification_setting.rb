@@ -7,7 +7,7 @@ class NotificationSetting < ApplicationRecord
 
   belongs_to :user
   belongs_to :source, polymorphic: true # rubocop:disable Cop/PolymorphicAssociations
-  belongs_to :project, foreign_key: 'source_id'
+  belongs_to :project, inverse_of: :notification_settings, foreign_key: 'source_id'
 
   validates :user, presence: true
   validates :level, presence: true

@@ -137,12 +137,12 @@ class Project < ApplicationRecord
   # Relations
   belongs_to :pool_repository
   belongs_to :creator, class_name: 'User'
-  belongs_to :group, -> { where(type: 'Group') }, foreign_key: 'namespace_id'
+  belongs_to :group, -> { where(type: 'Group') }, inverse_of: :projects, foreign_key: 'namespace_id'
   belongs_to :namespace
   alias_method :parent, :namespace
   alias_attribute :parent_id, :namespace_id
 
-  has_one :last_event, -> {order 'events.created_at DESC'}, class_name: 'Event'
+  has_one :last_event, -> { order('events.created_at DESC') }, inverse_of: :events, class_name: 'Event'
   has_many :boards
 
   # Project services
@@ -187,7 +187,7 @@ class Project < ApplicationRecord
   has_one :fork_network_member
   has_one :fork_network, through: :fork_network_member
   has_one :forked_from_project, through: :fork_network_member
-  has_many :forked_to_members, class_name: 'ForkNetworkMember', foreign_key: 'forked_from_project_id'
+  has_many :forked_to_members, inverse_of: :forked_from_project, class_name: 'ForkNetworkMember', foreign_key: 'forked_from_project_id'
   has_many :forks, through: :forked_to_members, source: :project, inverse_of: :forked_from_project
 
   has_one :import_state, autosave: true, class_name: 'ProjectImportState', inverse_of: :project
@@ -199,7 +199,7 @@ class Project < ApplicationRecord
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id', inverse_of: :target_project
-  has_many :source_of_merge_requests, foreign_key: 'source_project_id', class_name: 'MergeRequest'
+  has_many :source_of_merge_requests, inverse_of: :source_project, foreign_key: 'source_project_id', class_name: 'MergeRequest'
   has_many :issues
   has_many :labels, class_name: 'ProjectLabel'
   has_many :services
@@ -210,19 +210,19 @@ class Project < ApplicationRecord
   has_many :hooks, class_name: 'ProjectHook'
   has_many :protected_branches
   has_many :protected_tags
-  has_many :repository_languages, -> { order "share DESC" }
+  has_many :repository_languages, -> { order "share DESC" }, inverse_of: :project
 
   has_many :project_authorizations
   has_many :authorized_users, through: :project_authorizations, source: :user, class_name: 'User'
-  has_many :project_members, -> { where(requested_at: nil) },
+  has_many :project_members, -> { where(requested_at: nil) }, inverse_of: :source,
     as: :source, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
   alias_method :members, :project_members
   has_many :users, through: :project_members
 
-  has_many :requesters, -> { where.not(requested_at: nil) },
+  has_many :requesters, -> { where.not(requested_at: nil) }, inverse_of: :source,
     as: :source, class_name: 'ProjectMember', dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
-  has_many :members_and_requesters, as: :source, class_name: 'ProjectMember'
+  has_many :members_and_requesters, inverse_of: :source, as: :source, class_name: 'ProjectMember'
 
   has_many :deploy_keys_projects, inverse_of: :project
   has_many :deploy_keys, through: :deploy_keys_projects
@@ -236,7 +236,7 @@ class Project < ApplicationRecord
   has_many :invited_groups, through: :project_group_links, source: :group
   has_many :pages_domains
   has_many :todos
-  has_many :notification_settings, as: :source, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
+  has_many :notification_settings, inverse_of: :source, as: :source, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
   has_many :internal_ids
 
@@ -282,7 +282,7 @@ class Project < ApplicationRecord
   has_many :variables, class_name: 'Ci::Variable'
   has_many :triggers, class_name: 'Ci::Trigger'
   has_many :environments
-  has_many :deployments, -> { success }
+  has_many :deployments, -> { success }, inverse_of: :project
   has_many :pipeline_schedules, class_name: 'Ci::PipelineSchedule'
   has_many :project_deploy_tokens
   has_many :deploy_tokens, through: :project_deploy_tokens

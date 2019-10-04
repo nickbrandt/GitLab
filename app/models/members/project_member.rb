@@ -3,7 +3,7 @@
 class ProjectMember < Member
   SOURCE_TYPE = 'Project'
 
-  belongs_to :project, foreign_key: 'source_id'
+  belongs_to :project, inverse_of: :project_members, foreign_key: 'source_id'
 
   # Make sure project member points only to project as it source
   default_value_for :source_type, SOURCE_TYPE

@@ -17,7 +17,7 @@ class Group < Namespace
 
   ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT = 10
 
-  has_many :group_members, -> { where(requested_at: nil) }, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
+  has_many :group_members, -> { where(requested_at: nil) }, inverse_of: :group, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
   alias_method :members, :group_members
   has_many :users, through: :group_members
   has_many :owners,
@@ -25,8 +25,8 @@ class Group < Namespace
     through: :group_members,
     source: :user
 
-  has_many :requesters, -> { where.not(requested_at: nil) }, dependent: :destroy, as: :source, class_name: 'GroupMember' # rubocop:disable Cop/ActiveRecordDependent
-  has_many :members_and_requesters, as: :source, class_name: 'GroupMember'
+  has_many :requesters, -> { where.not(requested_at: nil) }, inverse_of: :source, dependent: :destroy, as: :source, class_name: 'GroupMember' # rubocop:disable Cop/ActiveRecordDependent
+  has_many :members_and_requesters, inverse_of: :source, as: :source, class_name: 'GroupMember'
 
   has_many :milestones
   has_many :project_group_links, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -34,7 +34,7 @@ class Group < Namespace
 
   # Overridden on another method
   # Left here just to be dependent: :destroy
-  has_many :notification_settings, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
+  has_many :notification_settings, inverse_of: :source, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
 
   has_many :labels, class_name: 'GroupLabel'
   has_many :variables, class_name: 'Ci::GroupVariable'

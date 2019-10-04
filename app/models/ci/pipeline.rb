@@ -34,24 +34,26 @@ module Ci
     has_many :processables, -> { processables },
              class_name: 'CommitStatus', foreign_key: :commit_id, inverse_of: :pipeline
     has_many :builds, foreign_key: :commit_id, inverse_of: :pipeline
-    has_many :trigger_requests, dependent: :destroy, foreign_key: :commit_id # rubocop:disable Cop/ActiveRecordDependent
+    has_many :trigger_requests, inverse_of: :pipeline, dependent: :destroy, foreign_key: :commit_id # rubocop:disable Cop/ActiveRecordDependent
     has_many :variables, class_name: 'Ci::PipelineVariable'
     has_many :deployments, through: :builds
     has_many :environments, -> { distinct }, through: :deployments
 
     # Merge requests for which the current pipeline is running against
     # the merge request's latest commit.
-    has_many :merge_requests_as_head_pipeline, foreign_key: "head_pipeline_id", class_name: 'MergeRequest'
+    has_many :merge_requests_as_head_pipeline, inverse_of: :head_pipeline, foreign_key: "head_pipeline_id", class_name: 'MergeRequest'
 
-    has_many :pending_builds, -> { pending }, foreign_key: :commit_id, class_name: 'Ci::Build'
-    has_many :retryable_builds, -> { latest.failed_or_canceled.includes(:project) }, foreign_key: :commit_id, class_name: 'Ci::Build'
-    has_many :cancelable_statuses, -> { cancelable }, foreign_key: :commit_id, class_name: 'CommitStatus'
-    has_many :manual_actions, -> { latest.manual_actions.includes(:project) }, foreign_key: :commit_id, class_name: 'Ci::Build'
-    has_many :scheduled_actions, -> { latest.scheduled_actions.includes(:project) }, foreign_key: :commit_id, class_name: 'Ci::Build'
-    has_many :artifacts, -> { latest.with_artifacts_not_expired.includes(:project) }, foreign_key: :commit_id, class_name: 'Ci::Build'
+    with_options(inverse_of: :pipeline, foreign_key: :commit_id, class_name: 'Ci::Build') do
+      has_many :pending_builds, -> { pending }
+      has_many :retryable_builds, -> { latest.failed_or_canceled.includes(:project) }
+      has_many :cancelable_statuses, -> { cancelable }, class_name: 'CommitStatus'
+      has_many :manual_actions, -> { latest.manual_actions.includes(:project) }
+      has_many :scheduled_actions, -> { latest.scheduled_actions.includes(:project) }
+      has_many :artifacts, -> { latest.with_artifacts_not_expired.includes(:project) }
+    end
 
-    has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
-    has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
+    has_many :auto_canceled_pipelines, inverse_of: :pipeline, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
+    has_many :auto_canceled_jobs, inverse_of: :pipeline, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
 
     has_one :chat_data, class_name: 'Ci::PipelineChatData'
 
