@@ -3,6 +3,7 @@
 module EE
   module Clusters
     module ClustersController
+      include MetricsDashboard
       extend ActiveSupport::Concern
 
       prepended do
@@ -47,26 +48,6 @@ module EE
             status: result[:http_status] || :bad_request,
             json: { status: result[:status], message: result[:message] }
           )
-        end
-      end
-
-      def metrics_dashboard
-        project_for_dashboard = defined?(project) ? project : nil # Project is not defined for group and admin level clusters
-        dashboard = ::Gitlab::Metrics::Dashboard::Finder.find(project_for_dashboard, current_user, metrics_dashboard_params)
-
-        respond_to do |format|
-          if dashboard[:status] == :success
-            format.json do
-              render status: :ok, json: dashboard.slice(:dashboard, :status)
-            end
-          else
-            format.json do
-              render(
-                status: dashboard[:http_status],
-                json: dashboard.slice(:message, :status)
-              )
-            end
-          end
         end
       end
 
