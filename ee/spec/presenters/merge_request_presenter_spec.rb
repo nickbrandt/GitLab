@@ -83,25 +83,6 @@ describe MergeRequestPresenter do
     it { is_expected.to eq(expose_path("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/unapprove")) }
   end
 
-  describe '#all_approvers_including_groups with approval_rule enabled' do
-    let!(:private_group) { create(:group_with_members, :private) }
-    let!(:public_group) { create(:group_with_members) }
-    let!(:approver) { create(:user) }
-    let!(:approval_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: [approver], groups: [private_group, public_group]) }
-
-    before do
-      project.add_developer(approver)
-    end
-
-    subject { described_class.new(merge_request, current_user: user).all_approvers_including_groups }
-
-    it do
-      approvers = [public_group.users, private_group.users, approver].flatten - [user]
-
-      is_expected.to match_array(approvers)
-    end
-  end
-
   describe '#suggested_approvers' do
     subject { described_class.new(merge_request, current_user: user).suggested_approvers }
 
