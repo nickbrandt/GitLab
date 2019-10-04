@@ -99,10 +99,14 @@ export default {
       required: false,
       default: true,
     },
+    fieldName: {
+      type: String,
+      required: false,
+      default: () => _.uniqueId('dateType_'),
+    },
   },
   data() {
     return {
-      fieldName: _.uniqueId('dateType_'),
       editing: false,
     };
   },
@@ -171,8 +175,8 @@ export default {
       this.editing = false;
       this.$emit('toggleDateType', true, true);
     },
-    toggleDatePicker(e) {
-      this.editing = !this.editing;
+    startEditing(e) {
+      this.editing = true;
       e.stopPropagation();
     },
     newDateSelected(date = null) {
@@ -204,9 +208,10 @@ export default {
         />
         <gl-button
           v-show="canUpdate && !editing"
+          ref="editButton"
           variant="link"
           class="btn-sidebar-action"
-          @click="toggleDatePicker"
+          @click="startEditing"
         >
           {{ __('Edit') }}
         </gl-button>
@@ -250,6 +255,7 @@ export default {
             <span v-if="selectedAndEditable" class="no-value d-flex">
               &nbsp;&ndash;&nbsp;
               <gl-button
+                ref="removeButton"
                 variant="link"
                 class="btn-sidebar-date-remove"
                 @click="newDateSelected(null)"
