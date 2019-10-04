@@ -121,7 +121,7 @@ module EE
         job_artifacts.where(file_type: ::Ci::JobArtifact.file_types[file_type]).last
       end
 
-      def expose_license_management_data?
+      def expose_license_scanning_data?
         any_report_artifact_for_type(:license_management)
       end
 

@@ -7,7 +7,7 @@
       = _("Security")
       %span.badge.badge-pill.js-security-counter.hidden{ 'data-qa-selector': 'security_counter' }
 
-- if pipeline.expose_license_management_data?
+- if pipeline.expose_license_scanning_data?
   %li.js-licenses-tab-link
     = link_to licenses_project_pipeline_path(project, pipeline), data: { target: '#js-tab-licenses', action: 'licenses', toggle: 'tab' }, class: 'licenses-tab' do
       = _("Licenses")

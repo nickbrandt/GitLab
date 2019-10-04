@@ -25,7 +25,7 @@ module EE
       end
 
       def licenses
-        report_exists = pipeline.expose_license_management_data?
+        report_exists = pipeline.expose_license_scanning_data?
 
         respond_to do |format|
           if report_exists
