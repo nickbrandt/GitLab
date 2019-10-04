@@ -87,21 +87,76 @@ describe('BurndownChartData', () => {
       });
     });
 
-    describe('when first two days of milestone have negative issue count', () => {
-      beforeAll(() => {
-        milestoneEvents.push(
-          { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'closed' },
-          { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'closed' },
-          { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'closed' },
-        );
+    describe('when days in milestone have negative counts', () => {
+      describe('and the first two days have a negative count', () => {
+        beforeAll(() => {
+          milestoneEvents.length = 0;
+          milestoneEvents.push(
+            { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'closed' },
+            { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'closed' },
+            { created_at: '2017-03-02T00:00:00.000Z', weight: 2, action: 'created' },
+            { created_at: '2017-03-03T00:00:00.000Z', weight: 2, action: 'created' },
+            { created_at: '2017-03-03T00:00:00.000Z', weight: 2, action: 'created' },
+          );
+        });
+
+        it('generates an array where the first two days counts are zero', () => {
+          expect(burndownChartData.generate()).toEqual([
+            ['2017-03-01', 0, 0],
+            ['2017-03-02', 0, 0],
+            ['2017-03-03', 1, 2],
+          ]);
+        });
       });
 
-      it('sets first two dates data to 0 and carries forward negative total to the third day', () => {
-        expect(burndownChartData.generate()).toEqual([
-          ['2017-03-01', 0, 0],
-          ['2017-03-02', 0, 0],
-          ['2017-03-03', 1, 2],
-        ]);
+      describe('and the middle day has a negative count', () => {
+        // This scenario is unlikely to occur as this implies there are more
+        // closed issues than total issues, but we account for it anyway as a
+        // potential edge case.
+
+        beforeAll(() => {
+          milestoneEvents.length = 0;
+          milestoneEvents.push(
+            { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'created' },
+            { created_at: '2017-03-02T00:00:00.000Z', weight: 2, action: 'closed' },
+            { created_at: '2017-03-02T00:00:00.000Z', weight: 2, action: 'closed' },
+            { created_at: '2017-03-03T00:00:00.000Z', weight: 2, action: 'created' },
+            { created_at: '2017-03-03T00:00:00.000Z', weight: 2, action: 'created' },
+          );
+        });
+
+        it('generates an array where the middle day count is zero', () => {
+          expect(burndownChartData.generate()).toEqual([
+            ['2017-03-01', 1, 2],
+            ['2017-03-02', 0, 0],
+            ['2017-03-03', 1, 2],
+          ]);
+        });
+      });
+
+      describe('and the last day has a negative count', () => {
+        // This scenario is unlikely to occur as this implies there are more
+        // closed issues than total issues, but we account for it anyway as a
+        // potential edge case.
+
+        beforeAll(() => {
+          milestoneEvents.length = 0;
+          milestoneEvents.push(
+            { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'closed' },
+            { created_at: '2017-03-02T00:00:00.000Z', weight: 2, action: 'created' },
+            { created_at: '2017-03-02T00:00:00.000Z', weight: 2, action: 'closed' },
+            { created_at: '2017-03-03T00:00:00.000Z', weight: 2, action: 'created' },
+            { created_at: '2017-03-03T00:00:00.000Z', weight: 2, action: 'closed' },
+          );
+        });
+
+        it('generates an array where all counts are zero', () => {
+          expect(burndownChartData.generate()).toEqual([
+            ['2017-03-01', 0, 0],
+            ['2017-03-02', 0, 0],
+            ['2017-03-03', 0, 0],
+          ]);
+        });
       });
     });
   });

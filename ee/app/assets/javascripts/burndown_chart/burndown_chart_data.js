@@ -53,13 +53,13 @@ export default class BurndownChartData {
       // weight count on an given date. To mitigate this, we reset the current
       // date's counters to 0 and carry forward the negative count to a future
       // date until the total is positive again.
-      if (openIssuesCount < 0 || openIssuesWeight < 0) {
-        carriedIssuesCount = openIssuesCount;
-        carriedIssuesWeight = openIssuesWeight;
+      if (openIssuesCount + carriedIssuesCount < 0 || openIssuesWeight + carriedIssuesWeight < 0) {
+        carriedIssuesCount += openIssuesCount;
+        carriedIssuesWeight += openIssuesWeight;
 
         openIssuesCount = 0;
         openIssuesWeight = 0;
-      } else if (carriedIssuesCount < 0 || carriedIssuesWeight < 0) {
+      } else {
         openIssuesCount += carriedIssuesCount;
         openIssuesWeight += carriedIssuesWeight;
 
