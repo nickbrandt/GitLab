@@ -4,6 +4,7 @@ module Projects
   module Prometheus
     class AlertPresenter < Gitlab::View::Presenter::Delegated
       RESERVED_ANNOTATIONS = %w(gitlab_incident_markdown).freeze
+      MARKDOWN_LINE_BREAK = "  \n".freeze
 
       def full_title
         [environment_name, alert_title].compact.join(': ')
@@ -57,10 +58,10 @@ module Projects
       def metadata_list
         metadata = []
 
-        metadata << bullet('starts_at', starts_at) if starts_at
-        metadata << bullet('full_query', backtick(full_query)) if full_query
+        metadata << list_item('starts_at', starts_at) if starts_at
+        metadata << list_item('full_query', backtick(full_query)) if full_query
 
-        metadata.join("\n")
+        metadata.join(MARKDOWN_LINE_BREAK)
       end
 
       def alert_details
@@ -78,13 +79,13 @@ module Projects
         strong_memoize(:annotation_list) do
           annotations
             .reject { |annotation| RESERVED_ANNOTATIONS.include?(annotation.label) }
-            .map { |annotation| bullet(annotation.label, annotation.value) }
-            .join("\n")
+            .map { |annotation| list_item(annotation.label, annotation.value) }
+            .join(MARKDOWN_LINE_BREAK)
         end
       end
 
-      def bullet(key, value)
-        "* #{key}: #{value}"
+      def list_item(key, value)
+        "**#{key}:** #{value}".strip
       end
 
       def backtick(value)
