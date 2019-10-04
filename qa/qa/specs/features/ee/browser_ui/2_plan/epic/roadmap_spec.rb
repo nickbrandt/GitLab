@@ -4,17 +4,15 @@ module QA
   # https://gitlab.com/gitlab-org/gitlab/issues/13360
   context 'Plan', :skip do
     describe 'Epics roadmap' do
+      include Support::Dates
+
       let(:epic) do
         EE::Resource::Epic.fabricate_via_api! do |epic|
-          current_date = DateTime.now
-          current_date_yyyy_mm_dd = current_date.strftime("%Y/%m/%d")
-          next_month_date_yyyy_mm_dd = current_date.next_month.strftime("%Y/%m/%d")
-
           epic.title = 'Epic created via API to test roadmap'
           epic.start_date_is_fixed = true
           epic.start_date_fixed = current_date_yyyy_mm_dd
           epic.due_date_is_fixed = true
-          epic.due_date_fixed = next_month_date_yyyy_mm_dd
+          epic.due_date_fixed = next_month_yyyy_mm_dd
         end
       end
 
