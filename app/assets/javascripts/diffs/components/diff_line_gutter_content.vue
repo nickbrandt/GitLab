@@ -125,8 +125,8 @@ export default {
     <button
       v-if="shouldRenderCommentButton"
       v-show="shouldShowCommentButton"
-      type="button"
       v-gl-tooltip
+      type="button"
       title="Add a comment to this line"
       class="add-diff-note js-add-diff-note-button qa-diff-comment"
       @click="handleCommentButton"

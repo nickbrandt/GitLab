@@ -30,8 +30,8 @@ export default {
 <template>
   <div class="dropdown">
     <button
-      type="button"
       v-gl-tooltip.hover
+      type="button"
       :title="__('Preferences')"
       :aria-label="__('Preferences')"
       class="btn btn-default js-show-diff-settings"
