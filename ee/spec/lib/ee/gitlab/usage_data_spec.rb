@@ -170,6 +170,16 @@ describe Gitlab::UsageData do
         end
       end
 
+      context 'for secure' do
+        it 'includes accurate usage_activity_by_stage data' do
+          create(:user, group_view: :security_dashboard)
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:secure]).to eq(
+            user_preferences_group_overview_security_dashboard: 1
+          )
+        end
+      end
+
       context 'for verify' do
         it 'includes accurate usage_activity_by_stage data' do
           user = create(:user)
