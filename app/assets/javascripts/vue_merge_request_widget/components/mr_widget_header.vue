@@ -144,7 +144,7 @@ export default {
             type="button"
             class="btn dropdown-toggle qa-dropdown-toggle"
             data-toggle="dropdown"
-            :aria-label="__('Download changes')"
+            :aria-label="s__('MergeRequests|Download changes')"
             aria-haspopup="true"
             aria-expanded="false"
           >

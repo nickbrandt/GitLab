@@ -5481,9 +5481,6 @@ msgstr ""
 msgid "Download asset"
 msgstr ""
 
-msgid "Download changes"
-msgstr ""
-
 msgid "Download codes"
 msgstr ""
 
