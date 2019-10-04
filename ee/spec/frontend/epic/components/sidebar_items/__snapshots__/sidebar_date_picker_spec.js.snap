@@ -24,7 +24,7 @@ exports[`SidebarDatePicker renders expected template 1`] = `
       class="float-right d-flex"
     >
       <icon-stub
-        cssclasses="help-icon append-right-5"
+        class="help-icon append-right-5"
         name="question-o"
         size="16"
         tabindex="0"
