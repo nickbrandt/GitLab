@@ -175,6 +175,7 @@ module EE
               package: usage_activity_by_stage_package,
               plan: usage_activity_by_stage_plan,
               release: usage_activity_by_stage_release,
+              secure: usage_activity_by_stage_secure,
               verify: usage_activity_by_stage_verify
             }
           }
@@ -268,6 +269,15 @@ module EE
             ci_triggers: ::Ci::Trigger.distinct_count_by(:owner_id),
             clusters_applications_runner: ::Clusters::Applications::Runner.distinct_by_user,
             projects_reporting_ci_cd_back_to_github: ::Project.with_github_service_pipeline_events.distinct_count_by(:creator_id)
+          }
+        end
+
+        # Currently too complicated and to get reliable counts for these stats:
+        # container_scanning_jobs, dast_jobs, dependency_scanning_jobs, license_management_jobs, sast_jobs
+        # Once https://gitlab.com/gitlab-org/gitlab/merge_requests/17568 is merged, this might be doable
+        def usage_activity_by_stage_secure
+          {
+            user_preferences_group_overview_security_dashboard: count(::User.active.group_view_security_dashboard)
           }
         end
       end
