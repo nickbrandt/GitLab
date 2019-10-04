@@ -220,9 +220,13 @@ describe('Insights store actions', () => {
   });
 
   describe('setActiveTab', () => {
-    it('commits SET_ACTIVE_TAB and SET_ACTIVE_PAGE', done => {
-      const state = { configData };
+    let state;
 
+    beforeEach(() => {
+      state = { configData };
+    });
+
+    it('commits SET_ACTIVE_TAB and SET_ACTIVE_PAGE', done => {
       testAction(
         actions.setActiveTab,
         key,
@@ -231,6 +235,16 @@ describe('Insights store actions', () => {
         [],
         done,
       );
+    });
+
+    it('does not mutate with no configData', done => {
+      state = { configData: null };
+
+      testAction(actions.setActiveTab, key, state, [], [], done);
+    });
+
+    it('does not mutate with no matching tab', done => {
+      testAction(actions.setActiveTab, 'invalidTab', state, [], [], done);
     });
   });
 

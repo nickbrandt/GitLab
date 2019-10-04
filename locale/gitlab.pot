@@ -15930,6 +15930,9 @@ msgstr ""
 msgid "The snippet is visible to any logged in user."
 msgstr ""
 
+msgid "The specified tab is invalid, please select another"
+msgstr ""
+
 msgid "The staging stage shows the time between merging the MR and deploying code to the production environment. The data will be automatically added once you deploy to production for the first time."
 msgstr ""
 
