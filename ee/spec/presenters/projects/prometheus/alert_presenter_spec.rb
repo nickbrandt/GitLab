@@ -43,7 +43,7 @@ describe Projects::Prometheus::AlertPresenter do
       it do
         is_expected.to eq(
           <<~MARKDOWN.chomp
-            ## Summary
+            #### Summary
 
             * starts_at: #{presenter.starts_at}
 
@@ -60,9 +60,12 @@ describe Projects::Prometheus::AlertPresenter do
       it do
         is_expected.to eq(
           <<~MARKDOWN.chomp
-            ## Summary
+            #### Summary
 
             * starts_at: #{presenter.starts_at}
+
+            #### Alert Details
+
             * foo: value1
             * bar: value2
           MARKDOWN
@@ -78,7 +81,7 @@ describe Projects::Prometheus::AlertPresenter do
       it do
         is_expected.to eq(
           <<~MARKDOWN.chomp
-            ## Summary
+            #### Summary
 
             * starts_at: #{presenter.starts_at}
             * full_query: `query`

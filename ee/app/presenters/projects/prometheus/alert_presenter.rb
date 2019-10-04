@@ -35,10 +35,10 @@ module Projects
 
       def issue_summary_markdown
         <<~MARKDOWN.chomp
-          ## Summary
+          #### Summary
 
           #{metadata_list}
-          #{annotation_list}
+          #{alert_details}
         MARKDOWN
       end
 
@@ -61,6 +61,17 @@ module Projects
         metadata << bullet('full_query', backtick(full_query)) if full_query
 
         metadata.join("\n")
+      end
+
+      def alert_details
+        if annotation_list.present?
+          <<~MARKDOWN.chomp
+
+            #### Alert Details
+
+            #{annotation_list}
+          MARKDOWN
+        end
       end
 
       def annotation_list
