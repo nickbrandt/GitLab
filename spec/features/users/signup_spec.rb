@@ -129,7 +129,7 @@ shared_examples 'Signup' do
 
   describe 'user\'s full name validation', :js do
     before do
-      if Feature.enabled?(:experimental_separate_sign_up_flow)
+      if Gitlab::Experimentation.enabled?(:signup_flow)
         user = create(:user, role: nil)
         sign_in(user)
         visit users_sign_up_welcome_path
@@ -188,7 +188,7 @@ shared_examples 'Signup' do
           fill_in 'new_user_username', with: new_user.username
           fill_in 'new_user_email', with: new_user.email
 
-          unless Feature.enabled?(:experimental_separate_sign_up_flow)
+          unless Gitlab::Experimentation.enabled?(:signup_flow)
             fill_in 'new_user_name', with: new_user.name
             fill_in 'new_user_email_confirmation', with: new_user.email
           end
@@ -213,7 +213,7 @@ shared_examples 'Signup' do
           fill_in 'new_user_username', with: new_user.username
           fill_in 'new_user_email', with: new_user.email
 
-          unless Feature.enabled?(:experimental_separate_sign_up_flow)
+          unless Gitlab::Experimentation.enabled?(:signup_flow)
             fill_in 'new_user_name', with: new_user.name
             fill_in 'new_user_email_confirmation', with: new_user.email
           end
@@ -222,7 +222,7 @@ shared_examples 'Signup' do
 
           expect { click_button 'Register' }.to change { User.count }.by(1)
 
-          if Feature.enabled?(:experimental_separate_sign_up_flow)
+          if Gitlab::Experimentation.enabled?(:signup_flow)
             expect(current_path).to eq users_sign_up_welcome_path
           else
             expect(current_path).to eq dashboard_projects_path
@@ -239,7 +239,7 @@ shared_examples 'Signup' do
         fill_in 'new_user_username', with: new_user.username
         fill_in 'new_user_email', with: new_user.email
 
-        unless Feature.enabled?(:experimental_separate_sign_up_flow)
+        unless Gitlab::Experimentation.enabled?(:signup_flow)
           fill_in 'new_user_name', with: new_user.name
           fill_in 'new_user_email_confirmation', with: new_user.email.capitalize
         end
@@ -247,7 +247,7 @@ shared_examples 'Signup' do
         fill_in 'new_user_password', with: new_user.password
         click_button "Register"
 
-        if Feature.enabled?(:experimental_separate_sign_up_flow)
+        if Gitlab::Experimentation.enabled?(:signup_flow)
           expect(current_path).to eq users_sign_up_welcome_path
         else
           expect(current_path).to eq dashboard_projects_path
@@ -267,7 +267,7 @@ shared_examples 'Signup' do
         fill_in 'new_user_username', with: new_user.username
         fill_in 'new_user_email', with: new_user.email
 
-        unless Feature.enabled?(:experimental_separate_sign_up_flow)
+        unless Gitlab::Experimentation.enabled?(:signup_flow)
           fill_in 'new_user_name', with: new_user.name
           fill_in 'new_user_email_confirmation', with: new_user.email
         end
@@ -275,7 +275,7 @@ shared_examples 'Signup' do
         fill_in 'new_user_password', with: new_user.password
         click_button "Register"
 
-        if Feature.enabled?(:experimental_separate_sign_up_flow)
+        if Gitlab::Experimentation.enabled?(:signup_flow)
           expect(current_path).to eq users_sign_up_welcome_path
         else
           expect(current_path).to eq dashboard_projects_path
@@ -291,7 +291,7 @@ shared_examples 'Signup' do
 
       visit new_user_registration_path
 
-      unless Feature.enabled?(:experimental_separate_sign_up_flow)
+      unless Gitlab::Experimentation.enabled?(:signup_flow)
         fill_in 'new_user_name', with: new_user.name
       end
 
@@ -302,7 +302,7 @@ shared_examples 'Signup' do
 
       expect(current_path).to eq user_registration_path
 
-      if Feature.enabled?(:experimental_separate_sign_up_flow)
+      if Gitlab::Experimentation.enabled?(:signup_flow)
         expect(page).to have_content("error prohibited this user from being saved")
       else
         expect(page).to have_content("errors prohibited this user from being saved")
@@ -317,7 +317,7 @@ shared_examples 'Signup' do
 
       visit new_user_registration_path
 
-      unless Feature.enabled?(:experimental_separate_sign_up_flow)
+      unless Gitlab::Experimentation.enabled?(:signup_flow)
         fill_in 'new_user_name', with: new_user.name
       end
 
@@ -342,7 +342,7 @@ shared_examples 'Signup' do
       fill_in 'new_user_username', with: new_user.username
       fill_in 'new_user_email', with: new_user.email
 
-      unless Feature.enabled?(:experimental_separate_sign_up_flow)
+      unless Gitlab::Experimentation.enabled?(:signup_flow)
         fill_in 'new_user_name', with: new_user.name
         fill_in 'new_user_email_confirmation', with: new_user.email
       end
@@ -361,7 +361,7 @@ shared_examples 'Signup' do
       fill_in 'new_user_username', with: new_user.username
       fill_in 'new_user_email', with: new_user.email
 
-      unless Feature.enabled?(:experimental_separate_sign_up_flow)
+      unless Gitlab::Experimentation.enabled?(:signup_flow)
         fill_in 'new_user_name', with: new_user.name
         fill_in 'new_user_email_confirmation', with: new_user.email
       end
@@ -371,7 +371,7 @@ shared_examples 'Signup' do
 
       click_button "Register"
 
-      if Feature.enabled?(:experimental_separate_sign_up_flow)
+      if Gitlab::Experimentation.enabled?(:signup_flow)
         expect(current_path).to eq users_sign_up_welcome_path
       else
         expect(current_path).to eq dashboard_projects_path
@@ -382,16 +382,15 @@ end
 
 describe 'With original flow' do
   before do
-    stub_feature_flags(experimental_separate_sign_up_flow: false)
+    stub_experiment(signup_flow: false)
   end
 
   it_behaves_like 'Signup'
 end
 
-describe 'With experimental flow on GitLab.com' do
+describe 'With experimental flow' do
   before do
-    allow(::Gitlab).to receive(:com?).and_return(true)
-    stub_feature_flags(experimental_separate_sign_up_flow: true)
+    stub_experiment(signup_flow: true)
   end
 
   it_behaves_like 'Signup'

@@ -550,7 +550,7 @@ class ApplicationController < ActionController::Base
   end
 
   def require_role
-    return unless current_user && current_user.role.blank? && helpers.use_experimental_separate_sign_up_flow?
+    return unless current_user && current_user.role.blank? && experiment_enabled?(:signup_flow)
 
     redirect_to users_sign_up_welcome_path
   end

@@ -15,7 +15,7 @@ class RegistrationsController < Devise::RegistrationsController
     if: -> { action_name == 'create' && Gitlab::CurrentSettings.current_application_settings.enforce_terms? }
 
   def new
-    if helpers.use_experimental_separate_sign_up_flow?
+    if experiment_enabled?(:signup_flow)
       @resource = build_resource
     else
       redirect_to new_user_session_path(anchor: 'register-pane')
@@ -98,7 +98,7 @@ class RegistrationsController < Devise::RegistrationsController
   def after_sign_up_path_for(user)
     Gitlab::AppLogger.info(user_created_message(confirmed: user.confirmed?))
 
-    return users_sign_up_welcome_path if helpers.use_experimental_separate_sign_up_flow?
+    return users_sign_up_welcome_path if experiment_enabled?(:signup_flow)
 
     confirmed_or_unconfirmed_access_allowed(user) ? stored_location_or_dashboard(user) : users_almost_there_path
   end
@@ -140,7 +140,7 @@ class RegistrationsController < Devise::RegistrationsController
   def sign_up_params
     clean_params = params.require(:user).permit(:username, :email, :email_confirmation, :name, :password)
 
-    if helpers.use_experimental_separate_sign_up_flow?
+    if experiment_enabled?(:signup_flow)
       clean_params[:name] = clean_params[:username]
     end
 
@@ -184,7 +184,7 @@ class RegistrationsController < Devise::RegistrationsController
   # Part of an experiment to build a new sign up flow. Will be resolved
   # with https://gitlab.com/gitlab-org/growth/engineering/issues/64
   def choose_layout
-    if helpers.use_experimental_separate_sign_up_flow?
+    if experiment_enabled?(:signup_flow)
       'devise_experimental_separate_sign_up_flow'
     else
       'devise'

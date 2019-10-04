@@ -88,6 +88,7 @@ RSpec.configure do |config|
   config.include FixtureHelpers
   config.include GitlabRoutingHelper
   config.include StubFeatureFlags
+  config.include StubExperiments
   config.include StubGitlabCalls
   config.include StubGitlabData
   config.include NextInstanceOf

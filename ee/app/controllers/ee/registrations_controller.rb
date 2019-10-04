@@ -23,7 +23,7 @@ module EE
         clean_params[:email_opted_in_at] = Time.zone.now
       end
 
-      if helpers.use_experimental_separate_sign_up_flow?
+      if experiment_enabled?(:signup_flow)
         clean_params[:name] = clean_params[:username]
       end
 
