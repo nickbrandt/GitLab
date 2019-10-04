@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon, GlButton, GlTooltipDirective } from '@gitlab/ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 
 /* eslint-disable vue/require-default-prop */
 /* This is a re-usable vue component for rendering a button
@@ -22,10 +22,6 @@ import { GlLoadingIcon, GlButton, GlTooltipDirective } from '@gitlab/ui';
 export default {
   components: {
     GlLoadingIcon,
-    GlButton,
-  },
-  directives: {
-    GlTooltip: GlTooltipDirective,
   },
   props: {
     loading: {
@@ -57,11 +53,10 @@ export default {
 </script>
 
 <template>
-  <gl-button
+  <button
     :class="containerClass"
     :disabled="loading || disabled"
     @click="onClick"
-    v-gl-tooltip
   >
     <transition name="fade-in">
       <gl-loading-icon
@@ -78,5 +73,5 @@ export default {
         <span v-if="label" class="js-loading-button-label"> {{ label }} </span>
       </slot>
     </transition>
-  </gl-button>
+  </button>
 </template>

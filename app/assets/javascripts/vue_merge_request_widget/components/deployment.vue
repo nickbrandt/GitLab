@@ -1,14 +1,11 @@
 <script>
 import { GlTooltipDirective } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
-import FilteredSearchDropdown from '~/vue_shared/components/filtered_search_dropdown.vue';
 import { __ } from '~/locale';
-import LoadingButton from '../../vue_shared/components/loading_button.vue';
-import { visitUrl } from '../../lib/utils/url_utility';
-import createFlash from '../../flash';
-import MRWidgetService from '../services/mr_widget_service';
-import DeploymentInfo from './deployment_info.vue'
-import DeploymentViewButton from './deployment_view_button.vue'
+import DeploymentInfo from './deployment_info.vue';
+import DeploymentViewButton from './deployment_view_button.vue';
+import DeploymentManualButton from './deployment_manual_button.vue';
+import DeploymentRedeployButton from './deployment_redeploy_button.vue';
+import DeploymentStopButton from './deployment_stop_button.vue';
 
 export default {
   // name: 'Deployment' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
@@ -16,12 +13,10 @@ export default {
   name: 'Deployment',
   components: {
     DeploymentInfo,
+    DeploymentManualButton,
+    DeploymentRedeployButton,
+    DeploymentStopButton,
     DeploymentViewButton,
-    LoadingButton,
-    Icon,
-    FilteredSearchDropdown,
-    VisualReviewAppLink: () =>
-      import('ee_component/vue_merge_request_widget/components/visual_review_app_link.vue'),
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -51,23 +46,12 @@ export default {
       }),
     },
   },
-  data() {
-    return {
-      isStopping: false,
-    };
-  },
   computed: {
     computedDeploymentStatus() {
       if (this.deployment.status === 'created') {
         return this.deployment.isManual ? 'manual_deploy' : 'will_deploy';
       }
       return this.deployment.status;
-    },
-    deploymentExternalUrl() {
-      if (this.deployment.changes && this.deployment.changes.length === 1) {
-        return this.deployment.changes[0].external_url;
-      }
-      return this.deployment.external_url;
     },
     hasExternalUrls() {
       return Boolean(this.deployment.external_url && this.deployment.external_url_formatted);
@@ -78,42 +62,24 @@ export default {
     isCurrent() {
       return this.computedDeploymentStatus === 'success';
     },
+    isManual() {
+      return Boolean(this.deployment.deployment_manual_actions.length > 0);
+    },
     isDeployInProgress() {
       return this.deployment.status === 'running';
     },
-    deployInProgressTooltip() {
-      return this.isDeployInProgress
-        ? __('Stopping this environment is currently not possible as a deployment is in progress')
-        : '';
+    isRedeployable() {
+      return this.isManual;
+      // return this.isManual && this.deployment.status === 'failed';
+    },
+    playPath() {
+      return this.isManual ? this.deployment.deployment_manual_actions[0].play_path : '' ;
+    },
+    retryPath() {
+      return this.isRedeployable ? this.deployment.deployment_manual_actions[0].retry_path : '';
     },
     shouldRenderDropdown() {
       return this.deployment.changes && this.deployment.changes.length > 1;
-    },
-  },
-  methods: {
-    stopEnvironment() {
-      const msg = __('Are you sure you want to stop this environment?');
-      const isConfirmed = confirm(msg); // eslint-disable-line
-
-      if (isConfirmed) {
-        this.isStopping = true;
-
-        MRWidgetService.stopEnvironment(this.deployment.stop_url)
-          .then(res => res.data)
-          .then(data => {
-            if (data.redirect_url) {
-              visitUrl(data.redirect_url);
-            }
-
-            this.isStopping = false;
-          })
-          .catch(() => {
-            createFlash(
-              __('Something went wrong while stopping this environment. Please try again.'),
-            );
-            this.isStopping = false;
-          });
-      }
     },
   },
 };
@@ -130,34 +96,31 @@ export default {
             :show-metrics="showMetrics">
           </deployment-info>
           <div>
-            <template v-if="hasExternalUrls">
-              <deployment-view-button
-                :is-current="isCurrent"
-                :deployment="deployment"
-              />
-              <visual-review-app-link
-                v-if="showVisualReviewApp"
-                :link="deploymentExternalUrl"
-                :app-metadata="visualReviewAppMeta"
-              />
-            </template>
-            <span
+            <!-- if manual deploy, show deploy -->
+            <deployment-manual-button
+              v-if="isManual"
+              :is-deploy-in-progress="isDeployInProgress"
+              :play-path="playPath"
+            />
+            <!-- if it is failed, show re-deploy -->
+            <deployment-redeploy-button
+              v-if="isRedeployable"
+              :is-deploy-in-progress="isDeployInProgress"
+              :retry-path="retryPath"
+            />
+            <!-- show appropriate version of review app button  -->
+            <deployment-view-button
+              v-if="hasExternalUrls"
+              :is-current="isCurrent"
+              :deployment="deployment"
+              :show-visual-review-app="showVisualReviewApp"
+              :visual-review-app-metadata="visualReviewAppMeta"
+            />
+            <!-- if it is stoppable, show stop -->
+            <deployment-stop-button
               v-if="deployment.stop_url"
-              v-gl-tooltip
-              :title="deployInProgressTooltip"
-              class="d-inline-block"
-              tabindex="0"
-            >
-              <loading-button
-                :loading="isStopping"
-                :disabled="isDeployInProgress"
-                :title="__('Stop environment')"
-                container-class="js-stop-env btn btn-default btn-sm inline prepend-left-4"
-                @click="stopEnvironment"
-              >
-                <icon name="stop" />
-              </loading-button>
-            </span>
+              :is-deploy-in-progress="isDeployInProgress"
+            />
           </div>
         </div>
       </div>

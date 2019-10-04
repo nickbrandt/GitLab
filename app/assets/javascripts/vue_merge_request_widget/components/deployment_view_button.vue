@@ -10,6 +10,8 @@ export default {
   components: {
     FilteredSearchDropdown,
     ReviewAppLink,
+    VisualReviewAppLink: () =>
+      import('ee_component/vue_merge_request_widget/components/visual_review_app_link.vue'),
   },
   props: {
     deployment: {
@@ -19,6 +21,21 @@ export default {
     isCurrent: {
       type: Boolean,
       required: true,
+    },
+    showVisualReviewApp: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    visualReviewAppMeta: {
+      type: Object,
+      required: false,
+      default: () => ({
+        sourceProjectId: '',
+        sourceProjectPath: '',
+        mergeRequestId: '',
+        appUrl: '',
+      }),
     },
   },
   computed: {
@@ -77,5 +94,10 @@ export default {
         css-class="js-deploy-url deploy-link btn btn-default btn-sm inline"
       />
     </template>
+    <visual-review-app-link
+      v-if="showVisualReviewApp"
+      :link="deploymentExternalUrl"
+      :app-metadata="visualReviewAppMeta"
+    />
   </span>
 </template>
