@@ -357,7 +357,7 @@ shared_examples 'pages settings editing' do
 
         expect(page).not_to have_field(:project_pages_https_only)
         expect(page).not_to have_content('Force HTTPS (requires valid certificates)')
-        expect(page).to have_button('Save')
+        expect(page).not_to have_button('Save')
       end
     end
   end
