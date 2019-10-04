@@ -1,8 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { GlButton } from '@gitlab/ui';
+import { GlButton, GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
-import { GlTooltipDirective } from '@gitlab/ui';
 
 export default {
   components: {

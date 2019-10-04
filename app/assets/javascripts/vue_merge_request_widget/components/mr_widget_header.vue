@@ -1,4 +1,5 @@
 <script>
+import { GlTooltipDirective } from '@gitlab/ui';
 import _ from 'underscore';
 import { n__, s__, sprintf } from '~/locale';
 import { mergeUrlParams, webIDEUrl } from '~/lib/utils/url_utility';
@@ -7,7 +8,6 @@ import clipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
 import MrWidgetIcon from './mr_widget_icon.vue';
-import { GlTooltipDirective } from '@gitlab/ui';
 
 export default {
   name: 'MRWidgetHeader',
@@ -139,9 +139,9 @@ export default {
         </template>
         <span class="dropdown">
           <button
-            type="button"
             v-gl-tooltip.hover
             :title="s__('MergeRequests|Download changes')"
+            type="button"
             class="btn dropdown-toggle qa-dropdown-toggle"
             data-toggle="dropdown"
             :aria-label="__('Download changes')"

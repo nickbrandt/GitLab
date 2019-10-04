@@ -1,9 +1,9 @@
 <script>
+import { GlTooltipDirective } from '@gitlab/ui';
 import { mapState, mapGetters, mapActions } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
 import DiffGutterAvatars from './diff_gutter_avatars.vue';
 import { LINE_POSITION_RIGHT } from '../constants';
-import { GlTooltipDirective } from '@gitlab/ui';
 
 export default {
   components: {
@@ -126,9 +126,9 @@ export default {
       v-if="shouldRenderCommentButton"
       v-show="shouldShowCommentButton"
       type="button"
-      class="add-diff-note js-add-diff-note-button qa-diff-comment"
       v-gl-tooltip
       title="Add a comment to this line"
+      class="add-diff-note js-add-diff-note-button qa-diff-comment"
       @click="handleCommentButton"
     >
       <icon :size="12" name="comment" />
