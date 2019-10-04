@@ -39,6 +39,44 @@ describe Gitlab::UsageData do
         expect(described_class.uncached_data).to include(:usage_activity_by_stage)
       end
 
+      context 'for configure' do
+        it 'includes accurate usage_activity_by_stage data' do
+          user    = create(:user)
+          cluster = create(:cluster, user: user)
+          project = create(:project, creator: user)
+          create(:clusters_applications_cert_manager, :installed, cluster: cluster)
+          create(:clusters_applications_helm, :installed, cluster: cluster)
+          create(:clusters_applications_ingress, :installed, cluster: cluster)
+          create(:clusters_applications_knative, :installed, cluster: cluster)
+          create(:cluster, :disabled, user: user)
+          create(:cluster, :provided_by_gcp, user: user)
+          create(:cluster, :provided_by_user, user: user)
+          create(:cluster, :group, :disabled, user: user)
+          create(:cluster, :group, user: user)
+          create(:slack_service, project: project)
+          create(:slack_slash_commands_service, project: project)
+          create(:prometheus_service, project: project)
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:configure]).to eq(
+            clusters_applications_cert_managers: 1,
+            clusters_applications_helm: 1,
+            clusters_applications_ingress: 1,
+            clusters_applications_knative: 1,
+            clusters_disabled: 1,
+            clusters_enabled: 4,
+            clusters_platforms_gke: 1,
+            clusters_platforms_user: 1,
+            group_clusters_disabled: 1,
+            group_clusters_enabled: 1,
+            project_clusters_disabled: 1,
+            project_clusters_enabled: 4,
+            projects_slack_notifications_active: 1,
+            projects_slack_slash_active: 1,
+            projects_with_prometheus_alerts: 1
+          )
+        end
+      end
+
       context 'for create' do
         it 'includes accurate usage_activity_by_stage data' do
           user = create(:user)
