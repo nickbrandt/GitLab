@@ -29,6 +29,7 @@ class ApplicationController < ActionController::Base
   before_action :active_user_check, unless: :devise_controller?
   before_action :set_usage_stats_consent_flag
   before_action :check_impersonation_availability
+  before_action :require_role
 
   around_action :set_locale
   around_action :set_session_storage
@@ -546,6 +547,12 @@ class ApplicationController < ActionController::Base
 
   def current_user_mode
     @current_user_mode ||= Gitlab::Auth::CurrentUserMode.new(current_user)
+  end
+
+  def require_role
+    return unless current_user && current_user.role.blank? && helpers.use_experimental_separate_sign_up_flow?
+
+    redirect_to users_sign_up_welcome_path
   end
 end
 

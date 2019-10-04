@@ -401,10 +401,10 @@ describe 'With experimental flow on GitLab.com' do
 
     before do
       sign_in(user)
-      visit users_sign_up_welcome_path
+      visit root_path
     end
 
-    it 'is shows step 2 of the signup process' do
+    it 'is redirected to step 2 of the signup process' do
       expect(page).to have_text("Welcome to GitLab.com#{user.username}!")
     end
 
