@@ -34,6 +34,7 @@ export default {
       type="button"
       v-gl-tooltip.hover
       :title="__('Preferences')"
+      :aria-label="__('Preferences')"
       class="btn btn-default js-show-diff-settings"
       data-toggle="dropdown"
       data-display="static"

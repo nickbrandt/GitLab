@@ -1,5 +1,5 @@
 ---
-title: Add tooltips to download changes & preferences buttons
-merge_request: !18067
+title: Add tooltips to buttons on merge request page
+merge_request: 18067
 author:
 type: changed

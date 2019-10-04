@@ -3,11 +3,15 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
 import DiffGutterAvatars from './diff_gutter_avatars.vue';
 import { LINE_POSITION_RIGHT } from '../constants';
+import { GlTooltipDirective } from '@gitlab/ui';
 
 export default {
   components: {
     DiffGutterAvatars,
     Icon,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     line: {
@@ -123,6 +127,7 @@ export default {
       v-show="shouldShowCommentButton"
       type="button"
       class="add-diff-note js-add-diff-note-button qa-diff-comment"
+      v-gl-tooltip
       title="Add a comment to this line"
       @click="handleCommentButton"
     >

@@ -5478,10 +5478,10 @@ msgstr ""
 msgid "Download artifacts"
 msgstr ""
 
-msgid "Download as"
+msgid "Download asset"
 msgstr ""
 
-msgid "Download asset"
+msgid "Download changes"
 msgstr ""
 
 msgid "Download codes"
@@ -9879,6 +9879,9 @@ msgid "MergeRequests|Add a reply"
 msgstr ""
 
 msgid "MergeRequests|An error occurred while saving the draft comment."
+msgstr ""
+
+msgid "MergeRequests|Download changes"
 msgstr ""
 
 msgid "MergeRequests|Failed to squash. Should be done manually."

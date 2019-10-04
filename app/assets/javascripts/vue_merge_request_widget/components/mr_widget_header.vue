@@ -141,10 +141,10 @@ export default {
           <button
             type="button"
             v-gl-tooltip.hover
-            :title="__('Download changes')"
+            :title="s__('MergeRequests|Download changes')"
             class="btn dropdown-toggle qa-dropdown-toggle"
             data-toggle="dropdown"
-            :aria-label="__('Download as')"
+            :aria-label="__('Download changes')"
             aria-haspopup="true"
             aria-expanded="false"
           >
