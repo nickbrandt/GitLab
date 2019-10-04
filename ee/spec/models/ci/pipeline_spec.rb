@@ -240,7 +240,7 @@ describe Ci::Pipeline do
   end
 
   describe '#license_management_reports' do
-    subject { pipeline.license_management_report }
+    subject { pipeline.license_scanning_report }
 
     before do
       stub_licensed_features(license_management: true)

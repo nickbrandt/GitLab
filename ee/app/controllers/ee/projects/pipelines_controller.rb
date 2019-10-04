@@ -31,7 +31,7 @@ module EE
           if report_exists
             format.html { render_show }
             format.json do
-              data = LicenseManagementReportsSerializer.new(project: project, current_user: current_user).represent(pipeline&.license_management_report&.licenses)
+              data = LicenseManagementReportsSerializer.new(project: project, current_user: current_user).represent(pipeline&.license_scanning_report&.licenses)
               render json: data, status: :ok
             end
           else

@@ -26,7 +26,7 @@ describe RefreshLicenseComplianceChecksWorker do
           let!(:closed_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [closed_merge_request]) }
           let!(:blacklist_policy) { create(:software_license_policy, project: project, software_license: license, approval_status: :blacklisted) }
           let(:license) { create(:software_license, name: license_report.license_names[0]) }
-          let(:license_report) { open_pipeline.license_management_report }
+          let(:license_report) { open_pipeline.license_scanning_report }
 
           before do
             subject.perform(project.id)
