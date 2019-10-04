@@ -11,11 +11,13 @@ const EmptyRouterComponent = {
   },
 };
 
-const routes = [{ path: '/', name: 'dashboard', component: EmptyRouterComponent }];
-const router = new VueRouter({
-  mode: 'history',
-  base: window.location.pathname,
-  routes,
-});
+export default () => {
+  const routes = [{ path: '/', name: 'dashboard', component: EmptyRouterComponent }];
+  const router = new VueRouter({
+    mode: 'history',
+    base: window.location.pathname,
+    routes,
+  });
 
-export default router;
+  return router;
+};
