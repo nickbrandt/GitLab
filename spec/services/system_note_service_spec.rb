@@ -23,7 +23,7 @@ describe SystemNoteService do
         expect(service).to receive(:add_commits).with(new_commits, old_commits, oldrev)
       end
 
-      described_class.add_commits(noteable, project, author, new_commits, old_commits, oldrev)
+      described_class.add_commits(double, double, double, new_commits, old_commits, oldrev)
     end
   end
 
@@ -35,7 +35,7 @@ describe SystemNoteService do
         expect(service).to receive(:tag_commit).with(tag_name)
       end
 
-      described_class.tag_commit(noteable, project, author, tag_name)
+      described_class.tag_commit(double, double, double, tag_name)
     end
   end
 

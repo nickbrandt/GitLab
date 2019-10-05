@@ -11,10 +11,10 @@ describe ::SystemNotes::IssuablesService do
   let(:issue)    { noteable }
   let(:epic)     { create(:epic, group: group) }
 
-  let(:service) { described_class.new(noteable: noteable, project: project, author: author) }
-
   describe '#relate_issue' do
     let(:noteable_ref) { create(:issue) }
+
+    let(:service) { described_class.new(noteable: noteable, project: project, author: author) }
 
     subject { service.relate_issue(noteable_ref) }
 
