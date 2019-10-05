@@ -14,6 +14,12 @@ module Gitlab
             validates :config, presence: true
 
             validate do
+              unless config.is_a?(Hash) || config.is_a?(Array)
+                errors.add(:config, 'can only be a hash or an array')
+              end
+            end
+
+            validate do
               [config].flatten.each do |need|
                 if Needs.find_type(need).nil?
                   errors.add(:need, 'has an unsupported type')

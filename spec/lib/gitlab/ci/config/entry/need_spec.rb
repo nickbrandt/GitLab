@@ -19,20 +19,6 @@ describe ::Gitlab::Ci::Config::Entry::Need do
     end
   end
 
-  context 'when job is specified as symbol' do
-    let(:config) { :job_name }
-
-    describe '#valid?' do
-      it { is_expected.to be_valid }
-    end
-
-    describe '#value' do
-      it 'returns job needs configuration' do
-        expect(need.value).to eq(name: :job_name)
-      end
-    end
-  end
-
   context 'when need is empty' do
     let(:config) { '' }
 

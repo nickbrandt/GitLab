@@ -1305,12 +1305,6 @@ module Gitlab
           end
         end
 
-        context 'needs two builds defined as symbols' do
-          let(:needs) { [:build1, :build2] }
-
-          it { expect { subject }.not_to raise_error }
-        end
-
         context 'undefined need' do
           let(:needs) { ['undefined'] }
 

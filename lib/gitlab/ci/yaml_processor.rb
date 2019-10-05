@@ -163,7 +163,7 @@ module Gitlab
 
         stage_index = @stages.index(job[:stage])
 
-        job[:needs][:pipeline].each do |need|
+        job.dig(:needs, :pipeline).each do |need|
           need_job_name = need[:name]
 
           raise ValidationError, "#{name} job: undefined need: #{need_job_name}" unless @jobs[need_job_name.to_sym]

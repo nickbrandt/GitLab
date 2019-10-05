@@ -5,17 +5,18 @@ module Gitlab
     class Config
       module Entry
         class Need < ::Gitlab::Config::Entry::Simplifiable
-          strategy :Pipeline, if: -> (config) { config.is_a?(String) || config.is_a?(Symbol) }
+          strategy :Pipeline, if: -> (config) { config.is_a?(String) }
 
           class Pipeline < ::Gitlab::Config::Entry::Node
             include ::Gitlab::Config::Entry::Validatable
 
             validations do
               validates :config, presence: true
+              validates :config, type: String
             end
 
             def self.matching?(config)
-              config.is_a?(String) || config.is_a?(Symbol)
+              config.is_a?(String)
             end
 
             def type

@@ -18,6 +18,21 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
       end
     end
 
+    context 'when config value has wrong type' do
+      let(:config) { 123 }
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+
+      describe '#errors' do
+        it 'returns error about incorrect type' do
+          expect(needs.errors)
+            .to include('needs config can only be a hash or an array')
+        end
+      end
+    end
+
     context 'when wrong needs type is used' do
       let(:config) { [123] }
 
