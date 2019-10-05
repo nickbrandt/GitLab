@@ -88,7 +88,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       describe '#value' do
         it 'is returns a bridge job configuration' do
           expect(subject.value).to eq(name: :my_bridge,
-                                      needs: { bridge: { pipeline: 'some/project' } },
+                                      needs: { bridge: [{ pipeline: 'some/project' }] },
                                       ignore: false,
                                       stage: 'test',
                                       only: { refs: %w[branches tags] })

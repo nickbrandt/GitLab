@@ -58,12 +58,8 @@ module Gitlab
           end
 
           def value
-            values = @entries.values.group_by(&:type).transform_values do |values|
+            @entries.values.group_by(&:type).transform_values do |values|
               values.map(&:value)
-            end
-
-            values.tap do |values_hash|
-              values_hash[:bridge] = values_hash[:bridge].first if values_hash[:bridge]
             end
           end
         end

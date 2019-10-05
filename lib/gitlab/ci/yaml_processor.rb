@@ -59,7 +59,7 @@ module Gitlab
             instance: job[:instance],
             start_in: job[:start_in],
             trigger: job[:trigger],
-            bridge_needs: job.dig(:needs, :bridge)
+            bridge_needs: job.dig(:needs, :bridge)&.first
           }.compact }.compact
       end
 

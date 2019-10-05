@@ -52,7 +52,7 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
 
       describe '#value' do
         it 'returns key value' do
-          expect(needs.value).to eq(pipeline: [{ name: 'first_job_name' }], bridge: { pipeline: 'some/project' })
+          expect(needs.value).to eq(pipeline: [{ name: 'first_job_name' }], bridge: [{ pipeline: 'some/project' }])
         end
       end
 
