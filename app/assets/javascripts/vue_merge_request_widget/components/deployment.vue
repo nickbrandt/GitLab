@@ -232,6 +232,7 @@ export default {
                 :loading="isStopping"
                 :disabled="isDeployInProgress"
                 :title="__('Stop environment')"
+                :aria-label="__('Stop environment')"
                 container-class="js-stop-env btn btn-default btn-sm inline prepend-left-4"
                 @click="stopEnvironment"
               >
