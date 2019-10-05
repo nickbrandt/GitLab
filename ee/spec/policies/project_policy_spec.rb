@@ -242,15 +242,26 @@ describe ProjectPolicy do
           let(:current_user) { admin }
 
           it 'allows access' do
-            is_expected.to be_allowed(:read_project)
+            is_expected.to allow_action(:read_project)
           end
         end
 
-        context 'as an owner' do
-          let(:current_user) { owner }
+        context 'as a group owner' do
+          before do
+            group.add_owner(current_user)
+          end
 
           it 'prevents access without a SAML session' do
-            is_expected.not_to be_allowed(:read_project)
+            is_expected.not_to allow_action(:read_project)
+          end
+        end
+
+        context 'with public access' do
+          let(:group) { create(:group, :public) }
+          let(:project) { create(:project, :public, group: saml_provider.group) }
+
+          it 'allows access desipte group enforcement' do
+            is_expected.to allow_action(:read_project)
           end
         end
 
