@@ -1253,7 +1253,7 @@ module Gitlab
         end
       end
 
-      describe "Needs" do
+      describe "Job Needs" do
         let(:needs) { }
         let(:dependencies) { }
 
@@ -1322,6 +1322,80 @@ module Gitlab
           let(:dependencies) { %w(build2) }
 
           it { expect { subject }.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, 'jobs:test1 dependencies the build2 should be part of needs') }
+        end
+      end
+
+      describe 'Bridge Needs' do
+        let(:config) do
+          {
+            build: { stage: 'build', script: 'test' },
+            bridge: { stage: 'test', needs: needs }
+          }
+        end
+
+        subject { Gitlab::Ci::YamlProcessor.new(YAML.dump(config)) }
+
+        context 'needs upstream pipeline' do
+          let(:needs) { { pipeline: 'some/project' } }
+
+          it 'creates jobs with valid specification' do
+            expect(subject.builds.size).to eq(2)
+            expect(subject.builds[0]).to eq(
+              stage: "build",
+              stage_idx: 0,
+              name: "build",
+              options: {
+                script: ["test"]
+              },
+              when: "on_success",
+              allow_failure: false,
+              yaml_variables: []
+            )
+            expect(subject.builds[1]).to eq(
+              stage: "test",
+              stage_idx: 1,
+              name: "bridge",
+              options: {
+                bridge_needs: { pipeline: 'some/project' }
+              },
+              when: "on_success",
+              allow_failure: false,
+              yaml_variables: []
+            )
+          end
+        end
+
+        context 'needs both job and pipeline' do
+          let(:needs) { ['build', { pipeline: 'some/project' }] }
+
+          it 'creates jobs with valid specification' do
+            expect(subject.builds.size).to eq(2)
+            expect(subject.builds[0]).to eq(
+              stage: "build",
+              stage_idx: 0,
+              name: "build",
+              options: {
+                script: ["test"]
+              },
+              when: "on_success",
+              allow_failure: false,
+              yaml_variables: []
+            )
+            expect(subject.builds[1]).to eq(
+              stage: "test",
+              stage_idx: 1,
+              name: "bridge",
+              options: {
+                bridge_needs: { pipeline: 'some/project' }
+              },
+              needs_attributes: [
+                { name: "build" }
+              ],
+              when: "on_success",
+              allow_failure: false,
+              yaml_variables: []
+            )
+          end
         end
       end
 
