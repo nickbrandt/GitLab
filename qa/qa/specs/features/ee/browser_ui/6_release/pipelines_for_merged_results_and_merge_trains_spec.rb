@@ -70,7 +70,11 @@ module QA
           show.merge_immediately
         end
 
-        expect(page).to have_content('The changes were merged')
+        merged = Support::Retrier.retry_until(reload_page: page) do
+          page.has_content?('The changes were merged')
+        end
+
+        expect(merged).to be_truthy, "Expected content 'The changes were merged' but it did not appear."
       end
 
       it 'merges via a merge train' do
