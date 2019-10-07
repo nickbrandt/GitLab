@@ -192,7 +192,10 @@ module Elastic
         {
           query: {
             bool: {
-               filter: [{ term: { iid: iid } }]
+              filter: [
+                { term: { iid: iid } },
+                { term: { type: self.es_type } }
+              ]
             }
           }
         }
