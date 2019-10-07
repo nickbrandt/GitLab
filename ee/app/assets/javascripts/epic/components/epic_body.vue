@@ -1,7 +1,8 @@
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 
 import IssuableBody from '~/issue_show/components/app.vue';
+import IssuableSidebar from '~/issuable_sidebar/components/sidebar_app.vue';
 import RelatedItems from 'ee/related_issues/components/related_issues_root.vue';
 
 import EpicSidebar from './epic_sidebar.vue';
@@ -10,6 +11,7 @@ export default {
   epicsPathIdSeparator: '&',
   components: {
     IssuableBody,
+    IssuableSidebar,
     RelatedItems,
     EpicSidebar,
   },
@@ -30,9 +32,17 @@ export default {
       'initialDescriptionHtml',
       'initialDescriptionText',
       'lockVersion',
+      'sidebarCollapsed',
     ]),
+    ...mapGetters(['isUserSignedIn']),
     isEpicTreeEnabled() {
       return gon.features && gon.features.epicTrees;
+    },
+    isVueIssuableEpicSidebarEnabled() {
+      return gon.features && gon.features.vueIssuableEpicSidebar;
+    },
+    sidebarStatusClass() {
+      return this.sidebarCollapsed ? 'right-sidebar-collapsed' : 'right-sidebar-expanded';
     },
   },
 };
@@ -84,6 +94,11 @@ export default {
       css-class="js-related-issues-block"
       path-id-separator="#"
     />
-    <epic-sidebar />
+    <issuable-sidebar
+      v-if="isVueIssuableEpicSidebarEnabled"
+      :signed-in="isUserSignedIn"
+      :sidebar-status-class="sidebarStatusClass"
+    />
+    <epic-sidebar v-else />
   </div>
 </template>
