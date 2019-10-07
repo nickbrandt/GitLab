@@ -307,6 +307,13 @@ entry.
 - Updates tooltip of 'detached' label/state.
 
 
+## 12.2.8
+
+### Security (1 change)
+
+- Limit search for IID to a type to avoid leaking records with the same IID that the user does not have access to.
+
+
 ## 12.2.7
 
 ### Security (1 change)
