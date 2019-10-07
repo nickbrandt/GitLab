@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.14
+
+### Fixed (1 change)
+
+- Geo: LFS not being synced. !17633
+
+
 ## 12.1.13
 
 - No changes.
