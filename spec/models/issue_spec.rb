@@ -922,6 +922,7 @@ describe Issue do
         release_1.milestones << milestone
         release_2.milestones << milestone
       end
+
       it 'returns the latest evidences for each releases tied to this milestone' do
         latest_evidence_1 = release_1.latest_evidences.first
 
@@ -942,6 +943,7 @@ describe Issue do
     let_it_be(:project) { create(:project) }
     let_it_be(:release_1) { create(:release, project: project) }
     let_it_be(:release_2) { create(:release, project: project) }
+    let_it_be(:release_3) { create(:release, project: project) }
     let(:milestone) { create(:milestone, project: project, releases: [release_1, release_2]) }
     let(:issue) { build(:issue, milestone: milestone) }
 
