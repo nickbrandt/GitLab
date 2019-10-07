@@ -2,6 +2,13 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 12.1.14
+
+### Security (1 change)
+
+- Limit search for IID to a type to avoid leaking records with the same IID that the user does not have access to.
+
+
 ## 12.1.13
 
 ### Security (1 change)
