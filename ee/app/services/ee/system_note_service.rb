@@ -15,36 +15,12 @@ module EE
       extend_if_ee('EE::SystemNoteService') # rubocop: disable Cop/InjectEnterpriseEditionModule
     end
 
-    #
-    # noteable     - Noteable object
-    # noteable_ref - Referenced noteable object
-    # user         - User performing reference
-    #
-    # Example Note text:
-    #
-    #   "marked this issue as related to gitlab-foss#9001"
-    #
-    # Returns the created Note object
     def relate_issue(noteable, noteable_ref, user)
-      body = "marked this issue as related to #{noteable_ref.to_reference(noteable.project)}"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'relate'))
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: noteable.project, author: user).relate_issue(noteable_ref)
     end
 
-    #
-    # noteable     - Noteable object
-    # noteable_ref - Referenced noteable object
-    # user         - User performing reference
-    #
-    # Example Note text:
-    #
-    #   "removed the relation with gitlab-foss#9001"
-    #
-    # Returns the created Note object
     def unrelate_issue(noteable, noteable_ref, user)
-      body = "removed the relation with #{noteable_ref.to_reference(noteable.project)}"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'unrelate'))
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: noteable.project, author: user).unrelate_issue(noteable_ref)
     end
 
     # Parameters:
@@ -174,8 +150,7 @@ module EE
     #
     # Returns the created Note object
     def change_weight_note(noteable, project, author)
-      body = noteable.weight ? "changed weight to **#{noteable.weight}**" : 'removed the weight'
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'weight'))
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: project, author: author).change_weight_note
     end
 
     # Called when the start or end date of an Issuable is changed
