@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ci_reports_license_management_report, class: ::Gitlab::Ci::Reports::LicenseManagement::Report do
+  factory :ci_reports_license_management_report, class: ::Gitlab::Ci::Reports::LicenseScanning::Report do
     trait :report_1 do
       after(:build) do |report, evaluator|
         report.add_dependency('MIT', 1, 'https://opensource.org/licenses/mit', 'Library1')

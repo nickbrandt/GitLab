@@ -3,7 +3,7 @@
 module Gitlab
   module Ci
     module Reports
-      module LicenseManagement
+      module LicenseScanning
         class License
           attr_reader :name, :url, :count
 
@@ -15,7 +15,7 @@ module Gitlab
           end
 
           def add_dependency(name)
-            @dependencies.add(::Gitlab::Ci::Reports::LicenseManagement::Dependency.new(name))
+            @dependencies.add(::Gitlab::Ci::Reports::LicenseScanning::Dependency.new(name))
           end
 
           def dependencies

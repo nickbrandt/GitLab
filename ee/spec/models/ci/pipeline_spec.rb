@@ -255,7 +255,7 @@ describe Ci::Pipeline do
         create(:ee_ci_job_artifact, :license_management_feature_branch, job: build_2, project: project)
       end
 
-      it 'returns a license management report with collected data' do
+      it 'returns a license scanning report with collected data' do
         expect(subject.licenses.count).to eq(5)
         expect(subject.licenses.map(&:name)).to include('WTFPL', 'MIT')
       end
@@ -271,7 +271,7 @@ describe Ci::Pipeline do
     end
 
     context 'when pipeline does not have any builds with license management reports' do
-      it 'returns an empty license management report' do
+      it 'returns an empty license scanning report' do
         expect(subject.licenses).to be_empty
       end
     end
