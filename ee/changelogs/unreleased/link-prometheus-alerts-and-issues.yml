@@ -1,0 +1,5 @@
+---
+title: Link Gitlab managed Prometheus alerts and issues
+merge_request: 17477
+author:
+type: added

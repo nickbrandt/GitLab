@@ -52,6 +52,7 @@
 - pipeline_default:ci_pipeline_bridge_status
 
 - incident_management:incident_management_process_alert
+- incident_management:incident_management_process_prometheus_alert
 
 - jira_connect:jira_connect_sync_branch
 - jira_connect:jira_connect_sync_merge_request
