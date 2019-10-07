@@ -24,11 +24,11 @@ module Resolvers
 
     argument :author_username, GraphQL::STRING_TYPE,
              required: false,
-             description: 'List epics for author'
+             description: 'Filter epics by author'
 
     argument :label_name, [GraphQL::STRING_TYPE],
              required: false,
-             description: 'List epics that has given label names'
+             description: 'Filter epics by labels'
 
     argument :start_date, Types::TimeType,
              required: false,

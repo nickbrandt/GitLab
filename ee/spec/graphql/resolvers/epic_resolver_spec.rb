@@ -154,25 +154,25 @@ describe Resolvers::EpicResolver do
         it 'orders epics by start date in descending order' do
           epics = resolve_epics(sort: 'start_date_desc')
 
-          expect(epics).to match_array([epic3, epic2, epic1])
+          expect(epics).to eq([epic1, epic2, epic3])
         end
 
         it 'orders epics by start date in ascending order' do
           epics = resolve_epics(sort: 'start_date_asc')
 
-          expect(epics).to match_array([epic1, epic2, epic3])
+          expect(epics).to eq([epic3, epic2, epic1])
         end
 
         it 'orders epics by end date in descending order' do
-          epics = resolve_epics(sort: 'start_date_asc')
+          epics = resolve_epics(sort: 'end_date_desc')
 
-          expect(epics).to match_array([epic1, epic2, epic3])
+          expect(epics).to eq([epic3, epic2, epic1])
         end
 
         it 'orders epics by end date in ascending order' do
-          epics = resolve_epics(sort: 'start_date_asc')
+          epics = resolve_epics(sort: 'end_date_asc')
 
-          expect(epics).to match_array([epic3, epic2, epic1])
+          expect(epics).to eq([epic1, epic2, epic3])
         end
       end
 
