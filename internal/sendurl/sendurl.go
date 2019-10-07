@@ -36,6 +36,14 @@ var rangeHeaderKeys = []string{
 	"Range",
 }
 
+// Keep cache headers from the original response, not the proxied response. The
+// original response comes from the Rails application, which should be the
+// source of truth for caching.
+var preserveHeaderKeys = map[string]bool{
+	"Cache-Control": true,
+	"Expires":       true,
+}
+
 // httpTransport defines a http.Transport with values
 // that are more restrictive than for http.DefaultTransport,
 // they define shorter TLS Handshake, and more aggressive connection closing
@@ -138,9 +146,11 @@ func (e *entry) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		return
 	}
 
-	// copy response headers and body
+	// copy response headers and body, except the headers from preserveHeaderKeys
 	for key, value := range resp.Header {
-		w.Header()[key] = value
+		if !preserveHeaderKeys[key] {
+			w.Header()[key] = value
+		}
 	}
 	w.WriteHeader(resp.StatusCode)
 
