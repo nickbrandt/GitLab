@@ -93,7 +93,7 @@ describe Analytics::CycleAnalytics::StagesController do
   end
 
   it 'renders 403 based on the response of the service object' do
-    expect_any_instance_of(Analytics::CycleAnalytics::StageListService).to receive(:allowed?).and_return(false)
+    expect_any_instance_of(Analytics::CycleAnalytics::Stages::ListService).to receive(:can?).and_return(false)
 
     subject
 

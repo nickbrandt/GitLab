@@ -31,7 +31,7 @@ module Analytics
       end
 
       def stage_list_service
-        Analytics::CycleAnalytics::StageListService.new(
+        Analytics::CycleAnalytics::Stages::ListService.new(
           parent: @group,
           current_user: current_user
         )

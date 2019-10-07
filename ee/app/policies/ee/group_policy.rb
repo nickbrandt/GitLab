@@ -69,8 +69,9 @@ module EE
       rule { can?(:read_group) & contribution_analytics_available }
         .enable :read_group_contribution_analytics
 
-      rule { reporter & cycle_analytics_available }
-        .enable :read_group_cycle_analytics
+      rule { reporter & cycle_analytics_available }.policy do
+        enable :read_group_cycle_analytics, :create_group_stage, :read_group_stage, :update_group_stage, :delete_group_stage
+      end
 
       rule { can?(:read_group) & dependency_proxy_available }
         .enable :read_dependency_proxy
