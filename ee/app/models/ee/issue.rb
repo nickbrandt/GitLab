@@ -27,6 +27,9 @@ module EE
         end
       end
 
+      has_and_belongs_to_many :prometheus_alert_events, join_table: :issues_prometheus_alert_events
+      has_many :prometheus_alerts, through: :prometheus_alert_events
+
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
     end
 
