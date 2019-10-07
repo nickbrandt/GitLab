@@ -171,18 +171,18 @@ describe Ci::Build do
   end
 
   describe '#collect_license_management_reports!' do
-    subject { job.collect_license_management_reports!(license_management_report) }
+    subject { job.collect_license_management_reports!(license_scanning_report) }
 
-    let(:license_management_report) { Gitlab::Ci::Reports::LicenseManagement::Report.new }
+    let(:license_scanning_report) { Gitlab::Ci::Reports::LicenseScanning::Report.new }
 
     before do
       stub_licensed_features(license_management: true)
     end
 
-    it { expect(license_management_report.licenses.count).to eq(0) }
+    it { expect(license_scanning_report.licenses.count).to eq(0) }
 
     context 'when build has a license management report' do
-      context 'when there is a license management report' do
+      context 'when there is a license scanning report' do
         before do
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
@@ -190,9 +190,9 @@ describe Ci::Build do
         it 'parses blobs and add the results to the report' do
           expect { subject }.not_to raise_error
 
-          expect(license_management_report.licenses.count).to eq(4)
-          expect(license_management_report.found_licenses['MIT'].name).to eq('MIT')
-          expect(license_management_report.found_licenses['MIT'].dependencies.count).to eq(52)
+          expect(license_scanning_report.licenses.count).to eq(4)
+          expect(license_scanning_report.found_licenses['MIT'].name).to eq('MIT')
+          expect(license_scanning_report.found_licenses['MIT'].dependencies.count).to eq(52)
         end
       end
 
@@ -206,16 +206,16 @@ describe Ci::Build do
         end
       end
 
-      context 'when Feature flag is disabled for License Management reports parsing' do
+      context 'when Feature flag is disabled for License Scanning reports parsing' do
         before do
           stub_feature_flags(parse_license_management_reports: false)
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
 
-        it 'does NOT parse license management report' do
+        it 'does NOT parse license scanning report' do
           subject
 
-          expect(license_management_report.licenses.count).to eq(0)
+          expect(license_scanning_report.licenses.count).to eq(0)
         end
       end
 
@@ -225,10 +225,10 @@ describe Ci::Build do
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
 
-        it 'does NOT parse license management report' do
+        it 'does NOT parse license scanning report' do
           subject
 
-          expect(license_management_report.licenses.count).to eq(0)
+          expect(license_scanning_report.licenses.count).to eq(0)
         end
       end
     end

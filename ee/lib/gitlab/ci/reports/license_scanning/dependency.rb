@@ -3,7 +3,7 @@
 module Gitlab
   module Ci
     module Reports
-      module LicenseManagement
+      module LicenseScanning
         class Dependency
           attr_reader :name
 

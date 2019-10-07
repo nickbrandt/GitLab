@@ -3,7 +3,7 @@
 module Gitlab
   module Ci
     module Reports
-      module LicenseManagement
+      module LicenseScanning
         class Report
           attr_reader :found_licenses
 
@@ -21,7 +21,7 @@ module Gitlab
 
           def add_dependency(license_name, license_count, license_url, dependency_name)
             key = license_name.upcase
-            found_licenses[key] ||= ::Gitlab::Ci::Reports::LicenseManagement::License.new(license_name, license_count, license_url)
+            found_licenses[key] ||= ::Gitlab::Ci::Reports::LicenseScanning::License.new(license_name, license_count, license_url)
             found_licenses[key].add_dependency(dependency_name)
           end
 

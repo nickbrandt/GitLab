@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Reports::LicenseManagement::Report do
+describe Gitlab::Ci::Reports::LicenseScanning::Report do
   subject { build(:ci_reports_license_management_report, :mit) }
 
   describe '#violates?' do
