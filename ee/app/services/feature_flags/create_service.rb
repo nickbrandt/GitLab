@@ -3,6 +3,8 @@
 module FeatureFlags
   class CreateService < FeatureFlags::BaseService
     def execute
+      return error('Access Denied', 403) unless can_create?
+
       ActiveRecord::Base.transaction do
         feature_flag = project.operations_feature_flags.new(params)
 
@@ -11,7 +13,7 @@ module FeatureFlags
 
           success(feature_flag: feature_flag)
         else
-          error(feature_flag.errors.full_messages)
+          error(feature_flag.errors.full_messages, 400)
         end
       end
     end
@@ -27,6 +29,10 @@ module FeatureFlags
       end
 
       message_parts.join(" ")
+    end
+
+    def can_create?
+      Ability.allowed?(current_user, :create_feature_flag, project)
     end
   end
 end
