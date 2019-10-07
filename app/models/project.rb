@@ -2258,7 +2258,6 @@ class Project < ApplicationRecord
     setting
   end
 
-  # TODO: unit test this method
   def correct_visibility_level
     if group && group.visibility_level < visibility_level
       self.visibility_level = group.visibility_level
