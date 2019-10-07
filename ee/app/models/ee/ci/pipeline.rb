@@ -17,7 +17,7 @@ module EE
 
         has_many :job_artifacts, through: :builds
         has_many :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
-        has_many :vulnerabilities, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
+        has_many :vulnerability_findings, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
 
         has_one :source_pipeline, class_name: "::Ci::Sources::Pipeline", inverse_of: :pipeline
         has_many :sourced_pipelines, class_name: "::Ci::Sources::Pipeline", foreign_key: :source_pipeline_id
