@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class ZoomMeeting < ApplicationRecord
-  belongs_to :project, required: true
-  belongs_to :issue, required: true
+  belongs_to :project, optional: false
+  belongs_to :issue, optional: false
 
   validates :url, presence: true, length: { maximum: 255 }
 
