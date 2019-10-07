@@ -170,9 +170,14 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
         context 'when `projects.only` are specified by two ids' do
           let(:projects) { { only: [project.id, other_project.id] } }
 
-          it 'returns issuables for all projects' do
-            expect(subject.to_a)
-              .to eq([issuable0, issuable1, issuable2, issuable3, issuable4])
+          it 'returns issuables for all valid projects' do
+            expected = [issuable0, issuable1, issuable2, issuable3, issuable4]
+
+            if entity.id == project.id
+              expected.shift(2) # Those are from other_project
+            end
+
+            expect(subject.to_a).to eq(expected)
           end
         end
 
@@ -185,10 +190,10 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
         end
 
         context 'when `projects.only` are specified by bad id and good id' do
-          let(:projects) { { only: [0, other_project.id] } }
+          let(:projects) { { only: [0, project.id] } }
 
           it 'returns issuables for good project' do
-            expect(subject.to_a).to eq([issuable0, issuable1])
+            expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
           end
         end
 
@@ -203,14 +208,35 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
         context 'when `projects.only` are specified by project full path and id' do
           let(:projects) { { only: [project.id, other_project.full_path] } }
 
-          it 'returns issuables for all projects' do
-            expect(subject.to_a)
-              .to eq([issuable0, issuable1, issuable2, issuable3, issuable4])
+          it 'returns issuables for all valid projects' do
+            expected = [issuable0, issuable1, issuable2, issuable3, issuable4]
+
+            if entity.id == project.id
+              expected.shift(2) # Those are from other_project
+            end
+
+            expect(subject.to_a).to eq(expected)
+          end
+        end
+
+        context 'when `projects.only` are specified by duplicated projects' do
+          let(:projects) { { only: [project.id, project.full_path] } }
+
+          it 'returns issuables for that project without duplicated issuables' do
+            expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
           end
         end
 
         context 'when `projects.only` are specified by bad project path' do
           let(:projects) { { only: [project.full_path.reverse] } }
+
+          it 'returns nothing' do
+            expect(subject.to_a).to be_empty
+          end
+        end
+
+        context 'when `projects.only` are specified by unrelated project' do
+          let(:projects) { { only: [create(:project, :public).id] } }
 
           it 'returns nothing' do
             expect(subject.to_a).to be_empty
