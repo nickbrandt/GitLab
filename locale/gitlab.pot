@@ -827,6 +827,9 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
+msgid "Account ID"
+msgstr ""
+
 msgid "Account and limit"
 msgstr ""
 
@@ -1456,6 +1459,9 @@ msgid "Also called \"Relying party service URL\" or \"Reply URL\""
 msgstr ""
 
 msgid "Alternate support URL for help page and help dropdown"
+msgstr ""
+
+msgid "Amazon authentication is not %{link_start}property configured%{link_end}. Ask your GitLab administrator if you want to use this service."
 msgstr ""
 
 msgid "Amount of time (in hours) that users are allowed to skip forced configuration of two-factor authentication"
@@ -2128,6 +2134,9 @@ msgid "Authenticate"
 msgstr ""
 
 msgid "Authenticate with GitHub"
+msgstr ""
+
+msgid "Authenticating"
 msgstr ""
 
 msgid "Authentication Log"
@@ -3465,6 +3474,12 @@ msgstr ""
 msgid "ClusterIntegration|Are you sure you want to remove this Kubernetes cluster's integration? This will not delete your actual Kubernetes cluster."
 msgstr ""
 
+msgid "ClusterIntegration|Authenticate with AWS"
+msgstr ""
+
+msgid "ClusterIntegration|Authenticate with Amazon Web Services"
+msgstr ""
+
 msgid "ClusterIntegration|Base domain"
 msgstr ""
 
@@ -3550,6 +3565,9 @@ msgid "ClusterIntegration|Could not load subnets for the selected VPC"
 msgstr ""
 
 msgid "ClusterIntegration|Create Kubernetes cluster"
+msgstr ""
+
+msgid "ClusterIntegration|Create a provision role on %{startAwsLink}Amazon Web Services%{endLink} using the account and external ID above. %{startMoreInfoLink}More information%{endLink}"
 msgstr ""
 
 msgid "ClusterIntegration|Create cluster on"
@@ -3843,6 +3861,9 @@ msgstr ""
 msgid "ClusterIntegration|Prometheus is an open-source monitoring system with %{gitlabIntegrationLink} to monitor deployed applications."
 msgstr ""
 
+msgid "ClusterIntegration|Provision Role ARN"
+msgstr ""
+
 msgid "ClusterIntegration|RBAC-enabled cluster"
 msgstr ""
 
@@ -3978,6 +3999,9 @@ msgstr ""
 msgid "ClusterIntegration|Subnet"
 msgstr ""
 
+msgid "ClusterIntegration|The Amazon Resource Name (ARN) associated with your role. If you do not have a provision role, first create one on  %{startAwsLink}Amazon Web Services%{endLink} using the above account and external IDs. %{startMoreInfoLink}More information%{endLink}"
+msgstr ""
+
 msgid "ClusterIntegration|The Kubernetes certificate used to authenticate to the cluster."
 msgstr ""
 
@@ -4045,6 +4069,9 @@ msgid "ClusterIntegration|You are about to uninstall %{appTitle} from your clust
 msgstr ""
 
 msgid "ClusterIntegration|You must first install Helm Tiller before installing the applications below"
+msgstr ""
+
+msgid "ClusterIntegration|You must grant access to your organization’s AWS resources in order to create a new EKS cluster. To grant access, create a provision role using the account and external ID below and provide us the ARN."
 msgstr ""
 
 msgid "ClusterIntegration|You must have an RBAC-enabled cluster to install Knative."
@@ -4544,6 +4571,12 @@ msgid "Copy %{protocol} clone URL"
 msgstr ""
 
 msgid "Copy %{proxy_url}"
+msgstr ""
+
+msgid "Copy Account ID to clipboard"
+msgstr ""
+
+msgid "Copy External ID to clipboard"
 msgstr ""
 
 msgid "Copy ID"
@@ -6778,6 +6811,9 @@ msgid "Export this project with all its related data in order to move your proje
 msgstr ""
 
 msgid "External Classification Policy Authorization"
+msgstr ""
+
+msgid "External ID"
 msgstr ""
 
 msgid "External URL"
