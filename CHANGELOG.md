@@ -649,6 +649,13 @@ entry.
 - Update Packer.gitlab-ci.yml to use latest image. (Kelly Hair)
 
 
+## 12.1.14
+
+### Security (1 change)
+
+- Limit search for IID to a type to avoid leaking records with the same IID that the user does not have access to.
+
+
 ## 12.1.12
 
 ### Security (12 changes)
