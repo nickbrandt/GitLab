@@ -5122,55 +5122,48 @@ describe Project do
   end
 
   describe '#closest_setting' do
-    let(:root_namespace) { create(:namespace) }
-    let(:namespace) { create(:namespace, parent: root_namespace) }
-    let(:project) { create(:project, namespace: namespace) }
-    let(:setting) { project.closest_setting(:max_artifacts_size) }
+    using RSpec::Parameterized::TableSyntax
 
-    before do
-      stub_application_setting(max_artifacts_size: 100)
-      root_namespace.update!(max_artifacts_size: 200)
-      namespace.update!(max_artifacts_size: 300)
-      project.update!(max_artifacts_size: 400)
-    end
+    shared_examples_for 'fetching closest setting' do
+      let!(:namespace) { create(:namespace) }
+      let!(:project) { create(:project, namespace: namespace) }
 
-    context 'when project has non-nil value for setting' do
-      it 'returns project level setting' do
-        expect(setting).to eq(400)
-      end
-    end
+      let(:setting_name) { :some_setting }
+      let(:setting) { project.closest_setting(setting_name) }
 
-    context 'when project has nil value for setting' do
       before do
-        project.update!(max_artifacts_size: nil)
+        allow(project).to receive(:read_attribute).with(setting_name).and_return(project_setting)
+        allow(namespace).to receive(:closest_setting).with(setting_name).and_return(group_setting)
+        allow(Gitlab::CurrentSettings).to receive(setting_name).and_return(global_setting)
       end
 
-      context 'and namespace has non-nil value for setting' do
-        it 'returns namespace level setting' do
-          expect(setting).to eq(300)
-        end
+      it 'returns closest non-nil value' do
+        expect(setting).to eq(result)
+      end
+    end
+
+    context 'when setting is of non-boolean type' do
+      where(:global_setting, :group_setting, :project_setting, :result) do
+        100 | 200 | 300 | 300
+        100 | 200 | nil | 200
+        100 | nil | nil | 100
+        nil | nil | nil | nil
       end
 
-      context 'and namespace has nil value for setting' do
-        before do
-          namespace.update!(max_artifacts_size: nil)
-        end
+      with_them do
+        it_behaves_like 'fetching closest setting'
+      end
+    end
 
-        context 'and root namespace has non-nil value for setting' do
-          it 'returns root namespace level setting' do
-            expect(setting).to eq(200)
-          end
-        end
+    context 'when setting is of boolean type' do
+      where(:global_setting, :group_setting, :project_setting, :result) do
+        true | true  | false | false
+        true | false | nil   | false
+        true | nil   | nil   | true
+      end
 
-        context 'and root namespace has nil value for setting' do
-          before do
-            root_namespace.update!(max_artifacts_size: nil)
-          end
-
-          it 'returns application level setting' do
-            expect(setting).to eq(100)
-          end
-        end
+      with_them do
+        it_behaves_like 'fetching closest setting'
       end
     end
   end

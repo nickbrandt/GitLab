@@ -2251,16 +2251,16 @@ class Project < ApplicationRecord
   end
 
   def closest_setting(name)
-    read_attribute(name) || closest_namespace_setting(name) || app_settings_for(name)
+    setting = read_attribute(name)
+    setting = closest_namespace_setting(name) if setting.nil?
+    setting = app_settings_for(name) if setting.nil?
+    setting
   end
 
   private
 
   def closest_namespace_setting(name)
-    namespace
-      .self_and_ancestors(hierarchy_order: :asc)
-      .find { |n| !n.read_attribute(name).nil? }
-      .try(name)
+    namespace.closest_setting(name)
   end
 
   def app_settings_for(name)
