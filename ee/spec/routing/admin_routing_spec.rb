@@ -59,4 +59,16 @@ describe 'EE-specific admin routing' do
       expect(post('/admin/email')).to route_to('admin/emails#create')
     end
   end
+
+  describe Admin::ApplicationSettingsController, 'routing' do
+    it 'routes to #geo' do
+      expect(get('/admin/application_settings/geo')).to route_to('admin/application_settings#geo')
+      expect(patch('/admin/application_settings/geo')).to route_to('admin/application_settings#geo')
+    end
+
+    it 'routes to #templates' do
+      expect(get('/admin/application_settings/templates')).to route_to('admin/application_settings#templates')
+      expect(patch('/admin/application_settings/templates')).to route_to('admin/application_settings#templates')
+    end
+  end
 end
