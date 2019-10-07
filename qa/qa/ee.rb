@@ -107,7 +107,7 @@ module QA
         end
 
         module Milestone
-          autoload :Index, 'qa/ee/page/project/milestone/index'
+          autoload :Show, 'qa/ee/page/project/milestone/show'
         end
 
         module Settings
