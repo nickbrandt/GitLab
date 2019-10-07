@@ -18,6 +18,7 @@ module API
     resource 'projects/:id', requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       resource :feature_flags do
         desc 'Get all feature flags of a project' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
           success EE::API::Entities::FeatureFlag
         end
         params do
@@ -34,6 +35,7 @@ module API
         end
 
         desc 'Create a new feature flag' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
           success EE::API::Entities::FeatureFlag
         end
         params do
@@ -68,6 +70,7 @@ module API
       end
       resource 'feature_flags/:name', requirements: FEATURE_FLAG_ENDPOINT_REQUIREMENTS do
         desc 'Get a feature flag of a project' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
           success EE::API::Entities::FeatureFlag
         end
         get do
@@ -77,6 +80,7 @@ module API
         end
 
         desc 'Enable a strategy for a feature flag on an environment' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
           success EE::API::Entities::FeatureFlag
         end
         params do
@@ -96,6 +100,7 @@ module API
         end
 
         desc 'Disable a strategy for a feature flag on an environment' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
           success EE::API::Entities::FeatureFlag
         end
         params do
@@ -115,6 +120,7 @@ module API
         end
 
         desc 'Delete a feature flag' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
           success EE::API::Entities::FeatureFlag
         end
         delete do
