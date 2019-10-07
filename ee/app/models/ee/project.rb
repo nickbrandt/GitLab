@@ -61,10 +61,15 @@ module EE
       has_many :audit_events, as: :entity
       has_many :designs, inverse_of: :project, class_name: 'DesignManagement::Design'
       has_many :path_locks
+
+      # the rationale behind vulnerabilities and vulnerability_findings can be found here:
+      # https://gitlab.com/gitlab-org/gitlab/issues/10252#terminology
+      has_many :vulnerabilities
       has_many :vulnerability_feedback, class_name: 'Vulnerabilities::Feedback'
-      has_many :vulnerabilities, class_name: 'Vulnerabilities::Occurrence'
+      has_many :vulnerability_findings, class_name: 'Vulnerabilities::Occurrence'
       has_many :vulnerability_identifiers, class_name: 'Vulnerabilities::Identifier'
       has_many :vulnerability_scanners, class_name: 'Vulnerabilities::Scanner'
+
       has_many :protected_environments
       has_many :software_license_policies, inverse_of: :project, class_name: 'SoftwareLicensePolicy'
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true

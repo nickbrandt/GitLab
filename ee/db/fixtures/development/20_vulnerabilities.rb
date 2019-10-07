@@ -35,7 +35,7 @@ class Gitlab::Seeder::Vulnerabilities
   private
 
   def create_occurrence(rank, primary_identifier)
-    project.vulnerabilities.create!(
+    project.vulnerability_findings.create!(
       uuid: random_uuid,
       name: 'Cipher with no integrity',
       report_type: :sast,
