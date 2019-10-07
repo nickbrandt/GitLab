@@ -154,6 +154,8 @@ class Projects::PipelinesController < Projects::ApplicationController
   end
 
   def test_report
+    return unless Feature.enabled?(:junit_pipeline_view, project)
+
     if pipeline_test_report == :error
       render json: { status: :error_parsing_report }
       return
