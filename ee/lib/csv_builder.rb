@@ -104,7 +104,7 @@ class CsvBuilder
   def excel_sanitize(line)
     return if line.nil?
 
-    line.prepend("'") if line =~ /^[=\+\-@;]/
+    line = ["'", line].join if line =~ /^[=\+\-@;]/
     line
   end
 end
