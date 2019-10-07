@@ -203,6 +203,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Fixes style-lint errors and warnings for EE builds.scss file.
 
 
+## 12.2.8
+
+### Fixed (1 change)
+
+- Geo: LFS not being synced. !17633
+
+
 ## 12.2.7
 
 ### Security (1 change)
