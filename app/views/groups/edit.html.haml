@@ -53,16 +53,6 @@
   .settings-content
     = render 'groups/settings/advanced'
 
-= render 'shared/confirm_modal', phrase: @group.path
+= render_if_exists 'shared/groups/max_pages_size_setting'
 
-- if current_user.admin? && License.feature_available?(:max_pages_size) && (Gitlab.config.pages.external_http || Gitlab.config.pages.external_https)
-  %section.settings.gs-pages.no-animate#js-pages-settings{ class: ('expanded' if expanded) }
-    .settings-header
-      %h4.settings-title.js-settings-toggle.js-settings-toggle-trigger-only{ role: 'button' }
-        = _('Pages')
-      %button.btn.js-settings-toggle{ type: 'button' }
-        = expanded ? _('Collapse') : _('Expand')
-      %p
-        = _('Size settings for static websites')
-    .settings-content
-      = render 'groups/settings/pages_settings'
+= render 'shared/confirm_modal', phrase: @group.path
