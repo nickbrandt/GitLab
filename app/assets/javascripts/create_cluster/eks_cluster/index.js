@@ -14,11 +14,34 @@ export default el => {
     components: {
       CreateEksCluster,
     },
+    data() {
+      const {
+        gitlabManagedClusterHelpPath,
+        accountAndExternalIdsHelpPath,
+        createRoleArnHelpPath,
+        externalId,
+        accountId,
+        validCredentials,
+      } = document.querySelector(this.$options.el).dataset;
+
+      return {
+        gitlabManagedClusterHelpPath,
+        accountAndExternalIdsHelpPath,
+        createRoleArnHelpPath,
+        externalId,
+        accountId,
+        validCredentials,
+      };
+    },
     render(createElement) {
       return createElement('create-eks-cluster', {
         props: {
-          gitlabManagedClusterHelpPath,
-          kubernetesIntegrationHelpPath,
+          gitlabManagedClusterHelpPath: this.gitlabManagedClusterHelpPath,
+          accountAndExternalIdsHelpPath: this.accountAndExternalIdsHelpPath,
+          createRoleArnHelpPath: this.createRoleArnHelpPath,
+          externalId: this.externalId,
+          accountId: this.accountId,
+          validCredentials: this.validCredentials,
         },
       });
     },

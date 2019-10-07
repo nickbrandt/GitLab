@@ -16,14 +16,40 @@ export default {
       type: String,
       required: true,
     },
+    accountAndExternalIdsHelpPath: {
+      type: String,
+      required: true,
+    },
+    createRoleArnHelpPath: {
+      type: String,
+      required: true,
+    },
+    externalId: {
+      type: String,
+      required: true,
+    },
+    accountId: {
+      type: String,
+      required: true,
+    },
+    validCredentials: {
+      type: Boolean,
+      required: true,
+    },
   },
 };
 </script>
 <template>
   <div class="js-create-eks-cluster">
     <eks-cluster-configuration-form
+      v-if="hasCredentials"
       :gitlab-managed-cluster-help-path="gitlabManagedClusterHelpPath"
       :kubernetes-integration-help-path="kubernetesIntegrationHelpPath"
+    />
+    <service-credentials-form
+      v-else
+      :create-role-arn-help-path="createRoleArnHelpPath"
+      :account-and-external-ids-help-path="accountAndExternalIdsHelpPath"
     />
   </div>
 </template>
