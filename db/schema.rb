@@ -3175,8 +3175,8 @@ ActiveRecord::Schema.define(version: 2019_10_04_133612) do
     t.string "tag"
     t.text "description"
     t.integer "project_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text "description_html"
     t.integer "cached_markdown_version"
     t.integer "author_id"

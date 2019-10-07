@@ -16,6 +16,27 @@ describe ZoomMeeting do
     it { is_expected.to belong_to(:issue).required }
   end
 
+  describe 'scopes' do
+    let(:issue) { create(:issue, project: project) }
+    let!(:added_meeting) { create(:zoom_meeting, :added_to_issue, issue: issue) }
+    let!(:removed_meeting) { create(:zoom_meeting, :removed_from_issue, issue: issue) }
+
+    describe '.added_to_issue' do
+      it 'gets only added meetings' do
+        meetings_added = ZoomMeeting.added_to_issue.pluck(:id)
+        expect(meetings_added).to include(added_meeting.id)
+        expect(meetings_added).not_to include(removed_meeting.id)
+      end
+    end
+    describe '.removed_from_issue' do
+      it 'gets only removed meetings' do
+        meetings_removed = ZoomMeeting.removed_from_issue.pluck(:id)
+        expect(meetings_removed).to include(removed_meeting.id)
+        expect(meetings_removed).to_not include(added_meeting.id)
+      end
+    end
+  end
+
   describe 'Validations' do
     describe 'url' do
       it { is_expected.to validate_presence_of(:url) }
