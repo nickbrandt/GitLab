@@ -1,6 +1,7 @@
 import {
   getLabelsEndpoint,
   getMilestonesEndpoint,
+  initDateArray,
   getScatterPlotData,
   getMedianLineData,
 } from 'ee/analytics/productivity_analytics/utils';
@@ -32,6 +33,15 @@ describe('Productivity Analytics utils', () => {
       expect(getMilestonesEndpoint(namespacePath, projectWithNamespace)).toBe(
         '/gitlab-org/gitlab-test/-/milestones',
       );
+    });
+  });
+
+  describe('initDateArray', () => {
+    it('creates a two-dimensional array with 3 empty arrays for startDate=2019-09-01 and endDate=2019-09-03', () => {
+      const startDate = new Date('2019-09-01');
+      const endDate = new Date('2019-09-03');
+
+      expect(initDateArray(startDate, endDate)).toEqual([[], [], []]);
     });
   });
 

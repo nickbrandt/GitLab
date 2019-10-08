@@ -1,4 +1,4 @@
-import { getDateInPast } from '~/lib/utils/datetime_utility';
+import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
 import { median } from '~/lib/utils/number_utils';
 
 /**
@@ -27,6 +27,21 @@ export const getMilestonesEndpoint = (namespacePath, projectPathWithNamespace) =
   }
 
   return `/groups/${namespacePath}/-/milestones`;
+};
+
+/**
+ * Computes the day difference 'days' between a given start and end date
+ * and creates an array of length 'days'.
+ * For each day in the array it initializes an empty array.
+ *
+ * E.g. initDateArray(new Date('2019-01-01'), new Date('2019-01-03'))
+ * the following data structure gets generated: [ [], [], [] ]
+ * @param {Date} startDate - The start date
+ * @param {Date} endDate - The end date
+ */
+export const initDateArray = (startDate, endDate) => {
+  const days = getDayDifference(startDate, endDate);
+  return Array.from({ length: days + 1 }, () => []);
 };
 
 /**
