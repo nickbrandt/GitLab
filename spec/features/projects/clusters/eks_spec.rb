@@ -5,11 +5,13 @@ require 'spec_helper'
 describe 'AWS EKS Cluster', :js do
   let(:project) { create(:project) }
   let(:user) { create(:user) }
+  let(:provision_config) { instance_double(Gitlab::Kubernetes::Provisioners::Aws, account_id: '123456789012') }
 
   before do
     project.add_maintainer(user)
     gitlab_sign_in(user)
     allow(Projects::ClustersController).to receive(:STATUS_POLLING_INTERVAL) { 100 }
+    allow(Gitlab::Kubernetes::Provisioners::Aws).to receive(:new).and_return(provision_config)
   end
 
   context 'when user does not have a cluster and visits cluster index page' do

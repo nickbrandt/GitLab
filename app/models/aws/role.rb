@@ -13,5 +13,15 @@ module Aws
         with: Gitlab::Regex.aws_arn_regex,
         message: Gitlab::Regex.aws_arn_regex_message
       }
+
+    def role_external_id
+      super || generate_external_id
+    end
+
+    private
+
+    def generate_external_id
+      self.role_external_id = SecureRandom.hex(20)
+    end
   end
 end

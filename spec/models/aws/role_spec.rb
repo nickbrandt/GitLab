@@ -31,4 +31,26 @@ describe Aws::Role do
       end
     end
   end
+
+  describe '#role_external_id' do
+    let(:role) { build(:aws_role, role_external_id: external_id) }
+
+    context 'no external ID set' do
+      let(:external_id) { nil }
+
+      it 'generates a new random external ID' do
+        allow(SecureRandom).to receive(:hex).and_return('random-id')
+
+        expect(role.role_external_id).to eq 'random-id'
+      end
+    end
+
+    context 'external ID is present' do
+      let(:external_id) { '12345' }
+
+      it 'returns the existing ID' do
+        expect(role.role_external_id).to eq external_id
+      end
+    end
+  end
 end

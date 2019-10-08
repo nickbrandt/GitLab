@@ -1070,6 +1070,15 @@ production: &base
       # Ban an IP for one hour (3600s) after too many auth attempts
       # bantime: 3600
 
+  kubernetes:
+    provisioners:
+      aws:
+        # EKS integration. Uncomment and add account credentials
+        # to allow GitLab to create EKS clusters.
+        # account_id: 'account_id'
+        # access_key_id: 'access_key_id'
+        # secret_access_key: 'secret_access_key'
+
 development:
   <<: *base
 
