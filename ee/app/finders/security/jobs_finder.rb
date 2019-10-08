@@ -7,7 +7,7 @@
 # Arguments:
 #   pipeline:              only jobs for the specified pipeline will be found
 #   params:
-#     all:                 boolean, include jobs for all secure job types
+#     all:                 boolean, include jobs for all secure job types. Takes precedence over other options.
 #     sast:                boolean, include jobs for SAST
 #     dast:                boolean, include jobs for DAST
 #     container_scanning:  boolean, include jobs for Container Scanning

@@ -50,6 +50,14 @@ describe Security::JobsFinder do
         it { is_expected.to be_empty }
       end
 
+      context 'searching for all types takes precedence over excluding specific types' do
+        let!(:build) { create(:ci_build, :dast, pipeline: pipeline) }
+
+        let(:finder) { described_class.new(pipeline, all: true, dast: false) }
+
+        it { is_expected.to eq([build]) }
+      end
+
       context 'with dast jobs' do
         let!(:build) { create(:ci_build, :dast, pipeline: pipeline) }
 
