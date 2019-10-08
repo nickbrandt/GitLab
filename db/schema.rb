@@ -3898,8 +3898,8 @@ ActiveRecord::Schema.define(version: 2019_10_04_133612) do
   end
 
   create_table "zoom_meetings", force: :cascade do |t|
-    t.integer "project_id", null: false
-    t.integer "issue_id", null: false
+    t.bigint "project_id", null: false
+    t.bigint "issue_id", null: false
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
     t.integer "issue_status", limit: 2, default: 1, null: false
