@@ -26,6 +26,13 @@ describe API::Vulnerabilities do
         expect(response).to match_response_schema('vulnerability_list', dir: 'ee')
         expect(response.headers['X-Total']).to eq project.vulnerabilities.count.to_s
       end
+
+      it 'paginates the vulnerabilities according to the pagination params' do
+        get api("#{project_vulnerabilities_path}?page=2&per_page=1", user)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response.map { |v| v['id'] }).to contain_exactly(project.vulnerabilities.drop(1).take(1).first.id)
+      end
     end
 
     it_behaves_like 'forbids access to vulnerability-like endpoint in expected cases'

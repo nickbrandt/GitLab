@@ -7,8 +7,8 @@ module API
     helpers ::API::Helpers::VulnerabilityFindingsHelpers
 
     helpers do
-      def vulnerabilities_by(project, params)
-        Security::VulnerabilitiesFinder.new(project, params).execute
+      def vulnerabilities_by(project)
+        Security::VulnerabilitiesFinder.new(project).execute
       end
     end
 
@@ -36,7 +36,7 @@ module API
           authorize! :read_project_security_dashboard, user_project
 
           vulnerabilities = paginate(
-            vulnerabilities_by(user_project, declared_params)
+            vulnerabilities_by(user_project)
           )
 
           present vulnerabilities, with: VulnerabilityEntity
