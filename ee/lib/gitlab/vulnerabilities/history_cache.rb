@@ -12,7 +12,7 @@ module Gitlab
 
       def fetch(range, force: false)
         Rails.cache.fetch(cache_key, force: force, expires_in: 1.day) do
-          vulnerabilities = ::Security::VulnerabilitiesFinder
+          vulnerabilities = ::Security::VulnerabilityFindingsFinder
             .new(group, params: { project_id: [project_id] })
             .execute(:all)
             .count_by_day_and_severity(range)
