@@ -1480,6 +1480,15 @@ msgstr ""
 msgid "Alternate support URL for help page and help dropdown"
 msgstr ""
 
+msgid "Amazon EKS"
+msgstr ""
+
+msgid "Amazon EKS integration allows you to provision EKS clusters from GitLab."
+msgstr ""
+
+msgid "Amazon authentication is not %{link_start}property configured%{link_end}. Ask your GitLab administrator if you want to use this service."
+msgstr ""
+
 msgid "Amount of time (in hours) that users are allowed to skip forced configuration of two-factor authentication"
 msgstr ""
 
