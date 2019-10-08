@@ -19,6 +19,8 @@ module EE
 
       with_scope :global
       condition(:license_block) { License.block_changes? }
+
+      rule { auditor }.enable :full_private_access
     end
   end
 end
