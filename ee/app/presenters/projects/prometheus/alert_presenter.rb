@@ -4,6 +4,7 @@ module Projects
   module Prometheus
     class AlertPresenter < Gitlab::View::Presenter::Delegated
       RESERVED_ANNOTATIONS = %w(gitlab_incident_markdown).freeze
+      GENERIC_ALERT_SUMMARY_ANNOTATIONS = %w(monitoring_tool service hosts).freeze
       MARKDOWN_LINE_BREAK = "  \n".freeze
 
       def full_title
@@ -60,6 +61,9 @@ module Projects
 
         metadata << list_item('Start time', starts_at) if starts_at
         metadata << list_item('full_query', backtick(full_query)) if full_query
+        metadata << list_item('Service', service) if service
+        metadata << list_item('Monitoring Tool', monitoring_tool) if monitoring_tool
+        metadata << list_item('Hosts', hosts.join(' ')) if hosts
 
         metadata.join(MARKDOWN_LINE_BREAK)
       end
@@ -78,7 +82,7 @@ module Projects
       def annotation_list
         strong_memoize(:annotation_list) do
           annotations
-            .reject { |annotation| RESERVED_ANNOTATIONS.include?(annotation.label) }
+            .reject { |annotation| annotation.label.in?(RESERVED_ANNOTATIONS | GENERIC_ALERT_SUMMARY_ANNOTATIONS) }
             .map { |annotation| list_item(annotation.label, annotation.value) }
             .join(MARKDOWN_LINE_BREAK)
         end
@@ -90,6 +94,24 @@ module Projects
 
       def backtick(value)
         "`#{value}`"
+      end
+
+      def markdown_link(title, url)
+        "[#{title}](#{url})"
+      end
+
+      def service
+        annotations.find { |a| a.label == 'service' }.try(:value)
+      end
+
+      def monitoring_tool
+        annotations.find { |a| a.label == 'monitoring_tool' }.try(:value)
+      end
+
+      def hosts
+        if value = annotations.find { |a| a.label == 'hosts' }.try(:value)
+          Array(value).map { |host| markdown_link(host, host) }
+        end
       end
     end
   end
