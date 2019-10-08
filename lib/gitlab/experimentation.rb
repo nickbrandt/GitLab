@@ -40,8 +40,12 @@ module Gitlab
         }
       end
 
-      def experiment_enabled?(experiment)
-        Experimentation.enabled?(experiment, experimentation_subject_index)
+      def experiment_enabled?(experiment_key)
+        Experimentation.enabled?(experiment_key, experimentation_subject_index)
+      end
+
+      def experiment_enabled_since(experiment_key)
+        Experimentation.enabled_since(experiment_key)
       end
 
       private
@@ -55,14 +59,22 @@ module Gitlab
     end
 
     class << self
+      def experiment(key)
+        Experiment.new(EXPERIMENTS[key].merge(key: key))
+      end
+
       def enabled?(experiment_key, experimentation_subject_index)
         return false unless EXPERIMENTS.key?(experiment_key)
 
-        experiment = Experiment.new(EXPERIMENTS[experiment_key].merge(key: experiment_key))
+        experiment = experiment(experiment_key)
 
         experiment.feature_toggle_enabled? &&
           experiment.enabled_for_environment? &&
           experiment.enabled_for_experimentation_subject?(experimentation_subject_index)
+      end
+
+      def enabled_since(experiment_key)
+        experiment(experiment_key).feature_toggle_enabled_since
       end
     end
 
@@ -71,6 +83,10 @@ module Gitlab
         return Feature.enabled?(key, default_enabled: true) if feature_toggle.nil?
 
         Feature.enabled?(feature_toggle)
+      end
+
+      def feature_toggle_enabled_since
+        Feature.enabled_since(feature_toggle)
       end
 
       def enabled_for_environment?

@@ -54,6 +54,16 @@ describe Gitlab::Experimentation::ControllerConcern, type: :controller do
       end
     end
   end
+
+  describe '#experiment_enabled_since' do
+    it 'returns the enabled_since time of the experiment' do
+      enabled_time = 1.day.ago
+
+      allow(Gitlab::Experimentation).to receive(:enabled_since).with(:test_experiment).and_return(enabled_time)
+
+      expect(controller.experiment_enabled_since(:test_experiment)).to eq(enabled_time)
+    end
+  end
 end
 
 describe Gitlab::Experimentation do
@@ -151,6 +161,16 @@ describe Gitlab::Experimentation do
 
         it { is_expected.to be_falsey }
       end
+    end
+  end
+
+  describe '.feature_toggle_enabled_since' do
+    it 'returns the enabled_since time of the feature' do
+      enabled_since_time = 1.day.ago
+
+      allow(Feature).to receive(:enabled_since).with(:test_experiment_toggle).and_return(enabled_since_time)
+
+      expect(described_class.enabled_since(:test_experiment)).to eq(enabled_since_time)
     end
   end
 end

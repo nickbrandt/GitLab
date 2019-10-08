@@ -18,6 +18,10 @@ class Feature
 
   class FlipperGate < Flipper::Adapters::ActiveRecord::Gate
     superclass.table_name = 'feature_gates'
+
+    def self.created_date(feature_name)
+      find_by(feature_key: feature_name).created_at
+    end
   end
 
   class << self
@@ -87,6 +91,10 @@ class Feature
       return unless persisted?(feature)
 
       feature.remove
+    end
+
+    def enabled_since(key)
+      FlipperGate.created_date(key) if enabled?(key)
     end
 
     def flipper

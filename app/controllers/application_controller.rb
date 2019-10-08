@@ -549,8 +549,15 @@ class ApplicationController < ActionController::Base
     @current_user_mode ||= Gitlab::Auth::CurrentUserMode.new(current_user)
   end
 
+  # A user requires a role when he is part of the experimental signup flow (executed by the Growth team)
+  # A user is redirected to the welcome page when his role is still blank, his name is equal to his username,
+  # the experiment is enabled for the current user and the user was created after the experiment was initiated.
   def require_role
-    return unless current_user && current_user.role.blank? && experiment_enabled?(:signup_flow)
+    return unless current_user &&
+      current_user.role.blank? &&
+      current_user.name == current_user.username &&
+      experiment_enabled?(:signup_flow) &&
+      experiment_enabled_since(:signup_flow) < current_user.created_at
 
     redirect_to users_sign_up_welcome_path
   end

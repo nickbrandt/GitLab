@@ -391,12 +391,13 @@ end
 describe 'With experimental flow' do
   before do
     stub_experiment(signup_flow: true)
+    allow(Gitlab::Experimentation).to receive(:enabled_since).with(:signup_flow).and_return(1.day.ago)
   end
 
   it_behaves_like 'Signup'
 
   describe 'user without role' do
-    let(:user) { create(:user, role: nil) }
+    let(:user) { create(:user, role: nil, name: 'some_name', username: 'some_name') }
 
     before do
       sign_in(user)

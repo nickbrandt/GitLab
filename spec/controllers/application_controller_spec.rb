@@ -842,4 +842,48 @@ describe ApplicationController do
       end
     end
   end
+
+  describe '#require_role' do
+    controller(described_class) do
+      def index; end
+    end
+
+    before do
+      stub_experiment(signup_flow: experiment_enabled)
+      allow(Gitlab::Experimentation).to receive(:enabled_since).with(:signup_flow).and_return(1.day.ago)
+      sign_in(user)
+      get :index
+    end
+
+    context 'all the right conditions' do
+      let(:user) { create(:user, role: nil, name: 'some_name', username: 'some_name') }
+      let(:experiment_enabled) { true }
+
+      it { is_expected.to redirect_to users_sign_up_welcome_path }
+
+      context 'a user with a role' do
+        let(:user) { create(:user, name: 'some_name', username: 'some_name') }
+
+        it { is_expected.not_to redirect_to users_sign_up_welcome_path }
+      end
+
+      context 'a user with a name other than the username' do
+        let(:user) { create(:user, role: nil) }
+
+        it { is_expected.not_to redirect_to users_sign_up_welcome_path }
+      end
+
+      context 'user created before the experiment started' do
+        let(:user) { create(:user, role: nil, name: 'some_name', username: 'some_name', created_at: 2.days.ago) }
+
+        it { is_expected.not_to redirect_to users_sign_up_welcome_path }
+      end
+
+      context 'experiment disabled' do
+        let(:experiment_enabled) { false }
+
+        it { is_expected.not_to redirect_to users_sign_up_welcome_path }
+      end
+    end
+  end
 end

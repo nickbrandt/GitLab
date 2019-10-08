@@ -231,7 +231,7 @@ class User < ApplicationRecord
   # Note: When adding an option, it MUST go on the end of the array.
   enum project_view: [:readme, :activity, :files]
 
-  # User's Project preference
+  # User's role
   # Note: When adding an option, it MUST go on the end of the array.
   enum role: [:software_developer, :development_team_lead, :devops_engineer, :systems_administrator, :security_analyst, :data_analyst, :product_manager, :product_designer, :other]
 
