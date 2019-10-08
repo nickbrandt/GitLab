@@ -8,7 +8,7 @@ describe IncidentManagement::ProcessPrometheusAlertWorker do
     let_it_be(:prometheus_alert) { create(:prometheus_alert, project: project) }
 
     before_all do
-      payload_key = PrometheusAlertEvent.payload_key_for(prometheus_alert.id, prometheus_alert.created_at.rfc3339)
+      payload_key = PrometheusAlertEvent.payload_key_for(prometheus_alert.prometheus_metric_id, prometheus_alert.created_at.rfc3339)
       create(:prometheus_alert_event, prometheus_alert: prometheus_alert, payload_key: payload_key)
     end
 
@@ -16,7 +16,7 @@ describe IncidentManagement::ProcessPrometheusAlertWorker do
       {
         startsAt: prometheus_alert.created_at.rfc3339,
         labels: {
-          gitlab_alert_id: prometheus_alert.id
+          gitlab_alert_id: prometheus_alert.prometheus_metric_id
         }
       }.with_indifferent_access
     end
