@@ -45,7 +45,7 @@ describe Projects::Prometheus::AlertPresenter do
           <<~MARKDOWN.chomp
             #### Summary
 
-            **starts_at:** #{presenter.starts_at}
+            **Start time:** #{presenter.starts_at}
 
           MARKDOWN
         )
@@ -62,7 +62,7 @@ describe Projects::Prometheus::AlertPresenter do
           <<~MARKDOWN.chomp
             #### Summary
 
-            **starts_at:** #{presenter.starts_at}
+            **Start time:** #{presenter.starts_at}
 
             #### Alert Details
 
@@ -82,7 +82,7 @@ describe Projects::Prometheus::AlertPresenter do
           <<~MARKDOWN.chomp
             #### Summary
 
-            **starts_at:** #{presenter.starts_at}  \n**full_query:** `query`
+            **Start time:** #{presenter.starts_at}  \n**full_query:** `query`
 
           MARKDOWN
         )

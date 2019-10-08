@@ -58,7 +58,7 @@ module Projects
       def metadata_list
         metadata = []
 
-        metadata << list_item('starts_at', starts_at) if starts_at
+        metadata << list_item('Start time', starts_at) if starts_at
         metadata << list_item('full_query', backtick(full_query)) if full_query
 
         metadata.join(MARKDOWN_LINE_BREAK)
