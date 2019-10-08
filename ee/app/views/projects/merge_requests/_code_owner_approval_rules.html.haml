@@ -1,4 +1,4 @@
-- return unless @project.merge_requests_require_code_owner_approval?
+- return unless ProtectedBranch.branch_requires_code_owner_approval?(@project, merge_request.target_branch)
 - code_owner_rules = merge_request.code_owner_rules_with_users
 - return unless code_owner_rules.any?
 
