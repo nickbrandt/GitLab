@@ -192,3 +192,22 @@ export const createCustomStage = ({ dispatch, state }, data) => {
     .then(response => dispatch('receiveCreateCustomStageSuccess', response))
     .catch(error => dispatch('receiveCreateCustomStageError', { error, data }));
 };
+
+export const receiveTasksByTypeSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_TASKS_BY_TYPE_SUCCESS, data);
+export const receiveTasksByTypeError = ({ commit }, error) => {
+  commit(types.RECEIVE_TASKS_BY_TYPE_ERROR, error);
+  createFlash(__('There was an error fetching data for the form'));
+};
+export const requestTasksByType = ({ commit }) => commit(types.REQUEST_TASKS_BY_TYPE);
+
+export const fetchTasksByType = ({ dispatch }, { groupPath, labelIds }) => {
+  const endpoint = '/~/analytics/tasks_by_type';
+  const params = { group_id: groupPath, label_ids: labelIds };
+  dispatch('requestTasksByTypeData');
+
+  return axios
+    .get(endpoint, params)
+    .then(data => dispatch('receiveTasksByTypeSuccess', data))
+    .catch(error => dispatch('receiveTasksByTypeError', error));
+};
