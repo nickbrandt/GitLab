@@ -135,7 +135,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   end
 
   def refresh_license_management_approvals(project_approval_rule)
-    license_report = merge_request.head_pipeline&.license_management_report
+    license_report = merge_request.head_pipeline&.license_scanning_report
     return if license_report.blank?
 
     if license_report.violates?(project.software_license_policies)

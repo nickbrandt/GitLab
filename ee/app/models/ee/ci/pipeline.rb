@@ -121,7 +121,7 @@ module EE
         job_artifacts.where(file_type: ::Ci::JobArtifact.file_types[file_type]).last
       end
 
-      def expose_license_management_data?
+      def expose_license_scanning_data?
         any_report_artifact_for_type(:license_management)
       end
 
@@ -133,10 +133,10 @@ module EE
         end
       end
 
-      def license_management_report
+      def license_scanning_report
         ::Gitlab::Ci::Reports::LicenseScanning::Report.new.tap do |license_management_report|
           builds.latest.with_reports(::Ci::JobArtifact.license_management_reports).each do |build|
-            build.collect_license_management_reports!(license_management_report)
+            build.collect_license_scanning_reports!(license_management_report)
           end
         end
       end

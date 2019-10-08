@@ -321,7 +321,7 @@ describe ApprovalMergeRequestRule do
 
       context "when the latest license report violates the compliance policy" do
         let(:license) { create(:software_license, name: license_report.license_names[0]) }
-        let(:license_report) { open_pipeline.license_management_report }
+        let(:license_report) { open_pipeline.license_scanning_report }
 
         specify { expect(subject.approvals_required).to be(project_approval_rule.approvals_required) }
       end

@@ -61,16 +61,16 @@ module EE
         end
       end
 
-      def collect_license_management_reports!(license_management_report)
+      def collect_license_scanning_reports!(license_scanning_report)
         each_report(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES) do |file_type, blob|
           next if ::Feature.disabled?(:parse_license_management_reports, default_enabled: true)
 
           next unless project.feature_available?(:license_management)
 
-          ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, license_management_report)
+          ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, license_scanning_report)
         end
 
-        license_management_report
+        license_scanning_report
       end
 
       def collect_dependency_list_reports!(dependency_list_report)

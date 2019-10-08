@@ -8,7 +8,7 @@ module Security
     end
 
     def execute
-      pipeline.license_management_report.licenses
+      pipeline.license_scanning_report.licenses
     end
 
     private

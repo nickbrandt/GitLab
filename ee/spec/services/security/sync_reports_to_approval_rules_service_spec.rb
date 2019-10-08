@@ -73,7 +73,7 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
         context "when a license violates the license compliance policy" do
           let!(:blacklisted_license) { create(:software_license, name: license_name) }
           let!(:ci_build) { create(:ee_ci_build, :success, :license_management, pipeline: pipeline, project: project) }
-          let!(:license_name) { ci_build.pipeline.license_management_report.license_names[0] }
+          let!(:license_name) { ci_build.pipeline.license_scanning_report.license_names[0] }
 
           specify { expect { subject }.not_to change { license_compliance_rule.reload.approvals_required } }
           specify { expect(subject[:status]).to be(:success) }
