@@ -72,7 +72,7 @@ describe('Daterange component', () => {
       it('dispatches setDateRange with skipFetch=true', () => {
         expect(actionSpies.setDateRange).toHaveBeenCalledWith({
           skipFetch: true,
-          startDate: new Date('2019-06-27T00:00:00.000Z'),
+          startDate: new Date('2019-08-26T00:00:00.000Z'),
           endDate: new Date('2019-09-25T00:00:00.000Z'),
         });
       });
