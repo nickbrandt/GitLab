@@ -45,6 +45,49 @@ export const initDateArray = (startDate, endDate) => {
 };
 
 /**
+ * Transforms the raw scatter data into a data strucuture that allows easy access.
+ * It creates a two dimensional array where each item in the first dimension corresponds to one day (date).
+ *
+ * I.e., the first item corresponds to the start date, the second item corresponds to the start date plus one day,
+ * the last item corresponds to the end date.
+ *
+ * For each date, we store an array of individual MRs for the particular date (i.e, the second dimension) in the following form:
+ * { merged_at: '2019-09-01T04:55:05.757Z', metric: 10 }
+ *
+ * Given that startDate=2019-09-01 and endDate=2019-09-03 we receive the following data structure:
+ * [
+ *   [{ merged_at: '2019-09-01T04:55:05.757Z', metric: 10 }, { merged_at: '2019-09-01T14:12:09.757Z', metric: 8 }, { ... }] // 2019-09-01
+ *   [{ merged_at: '2019-09-02T08:29:33.748Z', metric: 7 }, ... ] // 2019-09-02
+ *   [{ merged_at: '2019-09-03T21:29:49.351Z', metric: 24 }, ... ] // 2019-09-03
+ * ]
+ *
+ * @param {*} data - The raw data received from the API.
+ * @param {*} startDate - The start date selected by the user minus an additional offset in days (e.g., 30 days).
+ * @param {*} endDate - The end date selected by the user.
+ * @returns {Array} The transformed data array (first item corresponds to start date, last item to end date)
+ */
+export const transformScatterData = (data, startDate, endDate) => {
+  const result = initDateArray(startDate, endDate);
+  const totalItems = result.length;
+
+  Object.keys(data).forEach(id => {
+    const mergedAtDate = new Date(data[id].merged_at);
+    const d = new Date();
+    d.setDate(mergedAtDate.getDate());
+    d.setMonth(mergedAtDate.getMonth());
+    d.setFullYear(mergedAtDate.getFullYear());
+
+    const dayDiff = getDayDifference(d, endDate);
+    if (dayDiff > -1) {
+      const idx = totalItems - (dayDiff + 1);
+      result[idx].push(data[id]);
+    }
+  });
+
+  return result;
+};
+
+/**
  * Transforms a given data object into an array
  * which will be used as series data for the scatterplot chart.
  * It eliminates items which were merged before a "dateInPast" and sorts
