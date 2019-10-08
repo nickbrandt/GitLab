@@ -782,6 +782,8 @@ In this example, a job either set to:
 
 #### `rules:exists`
 
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/16574) in GitLab 12.4.
+
 `exists` accepts an array of paths and will match if any of these paths exist
 as files in the repository.
 
