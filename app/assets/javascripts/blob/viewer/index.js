@@ -4,6 +4,10 @@ import Flash from '../../flash';
 import { handleLocationHash } from '../../lib/utils/common_utils';
 import axios from '../../lib/utils/axios_utils';
 import { __ } from '~/locale';
+import { blobLinkRegex } from '~/blob/blob_utils';
+
+const SIMPLE_VIEWER_NAME = 'simple';
+const RICH_VIEWER_NAME = 'rich';
 
 export default class BlobViewer {
   constructor() {
@@ -21,7 +25,7 @@ export default class BlobViewer {
   }
 
   static initRichViewer() {
-    const viewer = document.querySelector('.blob-viewer[data-type="rich"]');
+    const viewer = document.querySelector(`.blob-viewer[data-type="${RICH_VIEWER_NAME}"]`);
     if (!viewer || !viewer.dataset.richType) return;
 
     const initViewer = promise =>
@@ -61,8 +65,12 @@ export default class BlobViewer {
     this.switcherBtns = document.querySelectorAll('.js-blob-viewer-switch-btn');
     this.copySourceBtn = document.querySelector('.js-copy-blob-source-btn');
 
-    this.simpleViewer = this.$fileHolder[0].querySelector('.blob-viewer[data-type="simple"]');
-    this.richViewer = this.$fileHolder[0].querySelector('.blob-viewer[data-type="rich"]');
+    this.simpleViewer = this.$fileHolder[0].querySelector(
+      `.blob-viewer[data-type="${SIMPLE_VIEWER_NAME}"]`,
+    );
+    this.richViewer = this.$fileHolder[0].querySelector(
+      `.blob-viewer[data-type="${RICH_VIEWER_NAME}"]`,
+    );
 
     this.initBindings();
 
@@ -74,7 +82,7 @@ export default class BlobViewer {
     let initialViewerName = initialViewer.getAttribute('data-type');
 
     if (this.switcher && window.location.hash.indexOf('#L') === 0) {
-      initialViewerName = 'simple';
+      initialViewerName = SIMPLE_VIEWER_NAME;
     }
 
     this.switchToViewer(initialViewerName);
@@ -91,9 +99,20 @@ export default class BlobViewer {
       this.copySourceBtn.addEventListener('click', () => {
         if (this.copySourceBtn.classList.contains('disabled')) return this.copySourceBtn.blur();
 
-        return this.switchToViewer('simple');
+        return this.switchToViewer(SIMPLE_VIEWER_NAME);
       });
     }
+  }
+
+  static linkifyURLs(viewer) {
+    if (viewer.getAttribute('data-linkified')) return;
+
+    document.querySelectorAll('.js-blob-content .code .line').forEach(line => {
+      // eslint-disable-next-line no-param-reassign
+      line.innerHTML = line.innerHTML.replace(blobLinkRegex, '<a href="$&">$&</a>');
+    });
+
+    viewer.setAttribute('data-linkified', 'true');
   }
 
   switchViewHandler(e) {
@@ -158,6 +177,8 @@ export default class BlobViewer {
 
         this.$fileHolder.trigger('highlight:line');
         handleLocationHash();
+
+        if (name === SIMPLE_VIEWER_NAME) BlobViewer.linkifyURLs(viewer);
 
         this.toggleCopyButtonState();
       })
