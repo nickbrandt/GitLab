@@ -27,6 +27,14 @@ module QA
                 element :save_changes_button
               end
 
+              view 'app/assets/javascripts/vue_shared/components/sidebar/labels_select/base.vue' do
+                element :labels_dropdown_content
+              end
+
+              view 'app/assets/javascripts/vue_shared/components/sidebar/labels_select/dropdown_title.vue' do
+                element :labels_edit_button
+              end
+
               view 'app/views/shared/boards/_show.html.haml' do
                 element :boards_list
               end
@@ -95,6 +103,14 @@ module QA
                 click_element(:focus_mode_button)
               end
 
+              def configure_by_label(label)
+                click_boards_config_button
+                click_element(:labels_edit_button)
+                find_element(:labels_dropdown_content).find('li', text: label).click
+                click_element(:save_changes_button)
+                wait_boards_list_finish_loading
+              end
+
               def has_modal_board_name_field?
                 has_element?(:board_name_field, wait: 1)
               end
@@ -109,8 +125,7 @@ module QA
               def wait_boards_list_finish_loading
                 within_element(:boards_list) do
                   wait(reload: false, max: 5, interval: 1) do
-                    finished_loading?
-                    yield
+                    finished_loading? && (block_given? ? yield : true)
                   end
                 end
               end
