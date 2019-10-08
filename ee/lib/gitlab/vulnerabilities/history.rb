@@ -24,7 +24,7 @@ module Gitlab
       private
 
       def found_vulnerabilities
-        ::Security::VulnerabilitiesFinder.new(group, params: filters).execute(:all)
+        ::Security::VulnerabilityFindingsFinder.new(group, params: filters).execute(:all)
       end
 
       def cached_vulnerability_history
