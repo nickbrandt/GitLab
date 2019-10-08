@@ -6,23 +6,17 @@
 #
 # Arguments:
 #   project: a Project to query for Vulnerabilities
-#   params:
-#     page: Integer
-#     per_page: Integer
 
 module Security
   class VulnerabilitiesFinder
     attr_reader :project
-    attr_reader :page, :per_page
 
-    def initialize(project, params = {})
+    def initialize(project)
       @project = project
-      @page = params[:page] || 1
-      @per_page = params[:per_page] || 20
     end
 
     def execute
-      project.vulnerabilities.page(page).per(per_page)
+      project.vulnerabilities
     end
   end
 end
