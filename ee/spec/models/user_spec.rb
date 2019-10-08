@@ -302,6 +302,7 @@ describe User do
         let!(:private_project) { create :project, :private, namespace: group, name: 'private_project' }
         let!(:internal_project) { create :project, :internal, namespace: group, name: 'internal_project' }
         let!(:public_project) { create :project, :public, namespace: group, name: 'public_project' }
+        let!(:public_project_two) { create :project, :public, namespace: group, name: 'public_project_second' }
 
         it 'returns public projects' do
           expect(user.available_custom_project_templates).to include public_project
@@ -332,8 +333,26 @@ describe User do
         it 'allows to search available project templates by name' do
           projects = user.available_custom_project_templates(search: 'publi')
 
-          expect(projects.count).to eq 1
+          expect(projects.count).to eq 2
           expect(projects.first).to eq public_project
+        end
+
+        it 'filters by project ID' do
+          projects = user.available_custom_project_templates(project_id: public_project.id)
+
+          expect(projects.count).to eq 1
+          expect(projects).to match_array([public_project])
+
+          projects = user.available_custom_project_templates(project_id: [public_project.id, public_project_two.id])
+
+          expect(projects.count).to eq 2
+          expect(projects).to match_array([public_project, public_project_two])
+        end
+
+        it 'does not return inaccessible projects' do
+          projects = user.available_custom_project_templates(project_id: private_project.id)
+
+          expect(projects.count).to eq 0
         end
       end
     end

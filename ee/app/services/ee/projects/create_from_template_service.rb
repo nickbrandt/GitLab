@@ -6,6 +6,16 @@ module EE
       extend ::Gitlab::Utils::Override
       include ::Gitlab::Utils::StrongMemoize
 
+      attr_reader :template_project_id, :subgroup_id
+
+      override :initialize
+      def initialize(user, params)
+        super
+
+        @template_project_id = @params.delete(:template_project_id).to_i if @params[:template_project_id].present?
+        @subgroup_id = @params.delete(:group_with_project_templates_id).presence
+      end
+
       override :execute
       def execute
         return super unless use_custom_template?
@@ -27,13 +37,19 @@ module EE
 
         return true if template_project.present?
 
-        project.errors.add(:template_name, _("'%{template_name}' is unknown or invalid" % { template_name: template_name }))
+        if template_project_id.present?
+          project.errors.add(:template_project_id,
+                             _("%{template_project_id} is unknown or invalid" % { template_project_id: template_project_id }))
+        else
+          project.errors.add(:template_name, _("'%{template_name}' is unknown or invalid" % { template_name: template_name }))
+        end
+
         false
       end
 
       def use_custom_template?
         strong_memoize(:use_custom_template) do
-          template_name &&
+          template_requested? &&
             ::Gitlab::Utils.to_boolean(params.delete(:use_custom_template)) &&
             ::Gitlab::CurrentSettings.custom_project_templates_enabled?
         end
@@ -41,13 +57,19 @@ module EE
 
       def template_project
         strong_memoize(:template_project) do
-          current_user.available_custom_project_templates(search: template_name, subgroup_id: subgroup_id)
-                      .first
+          templates =
+            if template_project_id.present?
+              current_user.available_custom_project_templates(project_id: template_project_id, subgroup_id: subgroup_id)
+            else
+              current_user.available_custom_project_templates(search: template_name, subgroup_id: subgroup_id)
+            end
+
+          templates.first
         end
       end
 
-      def subgroup_id
-        @subgroup_id ||= params.delete(:group_with_project_templates_id).presence
+      def template_requested?
+        template_name.present? || template_project_id.is_a?(Integer)
       end
 
       # rubocop: disable CodeReuse/ActiveRecord

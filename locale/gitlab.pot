@@ -358,6 +358,9 @@ msgstr[1] ""
 msgid "%{tabname} changed"
 msgstr ""
 
+msgid "%{template_project_id} is unknown or invalid"
+msgstr ""
+
 msgid "%{text} %{files}"
 msgid_plural "%{text} %{files} files"
 msgstr[0] ""
