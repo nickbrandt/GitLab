@@ -33,33 +33,35 @@ module Elastic
       # Add to the registry if it's a class (and not in intermediate module)
       Elasticsearch::Model::Registry.add(self) if self.is_a?(Class)
 
-      after_commit on: :create do
-        if Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
-          ElasticIndexerWorker.perform_async(:index, self.class.to_s, self.id, self.es_id)
+      if self < ActiveRecord::Base
+        after_commit on: :create do
+          if Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
+            ElasticIndexerWorker.perform_async(:index, self.class.to_s, self.id, self.es_id)
+          end
         end
-      end
 
-      after_commit on: :update do
-        if Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
-          ElasticIndexerWorker.perform_async(
-            :update,
-            self.class.to_s,
-            self.id,
-            self.es_id,
-            changed_fields: self.previous_changes.keys
-          )
+        after_commit on: :update do
+          if Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
+            ElasticIndexerWorker.perform_async(
+              :update,
+              self.class.to_s,
+              self.id,
+              self.es_id,
+              changed_fields: self.previous_changes.keys
+            )
+          end
         end
-      end
 
-      after_commit on: :destroy do
-        if Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
-          ElasticIndexerWorker.perform_async(
-            :delete,
-            self.class.to_s,
-            self.id,
-            self.es_id,
-            es_parent: self.es_parent
-          )
+        after_commit on: :destroy do
+          if Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
+            ElasticIndexerWorker.perform_async(
+              :delete,
+              self.class.to_s,
+              self.id,
+              self.es_id,
+              es_parent: self.es_parent
+            )
+          end
         end
       end
     end

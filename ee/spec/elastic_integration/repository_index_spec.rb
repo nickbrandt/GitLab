@@ -23,7 +23,7 @@ describe 'Repository index', :elastic do
     end
 
     def indexed_file_paths_for(term)
-      blobs = Repository.search(term, type: :blob)[:blobs][:results].response
+      blobs = Repository.elastic_search(term, type: :blob)[:blobs][:results].response
       blobs.map do |blob|
         blob['_source']['blob']['path']
       end

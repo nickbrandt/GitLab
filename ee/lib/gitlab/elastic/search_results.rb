@@ -230,7 +230,7 @@ module Gitlab
             additional_filter: repository_filter
           }
 
-          Repository.search(
+          Repository.elastic_search(
             query,
             type: :blob,
             options: opt.merge({ highlight: true })
@@ -246,7 +246,7 @@ module Gitlab
             additional_filter: wiki_filter
           }
 
-          ProjectWiki.search(
+          ProjectWiki.elastic_search(
             query,
             type: :wiki_blob,
             options: opt.merge({ highlight: true })
