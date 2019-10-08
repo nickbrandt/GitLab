@@ -1,0 +1,5 @@
+---
+title: Respect Group SSO Enforcement on projects where the user is an owner
+merge_request: 18154
+author:
+type: fixed
