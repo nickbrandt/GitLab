@@ -115,7 +115,6 @@ module QA
           autoload :MirroringRepositories, 'qa/ee/page/project/settings/mirroring_repositories'
           autoload :Main, 'qa/ee/page/project/settings/main'
           autoload :MergeRequest, 'qa/ee/page/project/settings/merge_request'
-          autoload :MergeRequestApproval, 'qa/ee/page/project/settings/merge_request_approval'
           autoload :Repository, 'qa/ee/page/project/settings/repository'
           autoload :PushRules, 'qa/ee/page/project/settings/push_rules'
         end

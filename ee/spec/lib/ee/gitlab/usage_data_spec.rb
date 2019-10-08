@@ -95,7 +95,7 @@ describe Gitlab::UsageData do
             deploy_keys: 1,
             keys: 1,
             merge_requests: 1,
-            projects_enforcing_code_owner_approval: 1,
+            projects_enforcing_code_owner_approval: 0,
             projects_imported_from_github: 1,
             projects_with_repositories_enabled: 1,
             protected_branches: 1,

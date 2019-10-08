@@ -1,0 +1,5 @@
+---
+title: Add configurable Code Owner approvals for protected branches
+merge_request: 15862
+author:
+type: added
