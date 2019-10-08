@@ -23,6 +23,10 @@ module QA
                 element :boards_dropdown
               end
 
+              view 'app/assets/javascripts/vue_shared/components/deprecated_modal.vue' do
+                element :save_changes_button
+              end
+
               view 'app/views/shared/boards/_show.html.haml' do
                 element :boards_list
               end
@@ -93,6 +97,11 @@ module QA
 
               def has_modal_board_name_field?
                 has_element?(:board_name_field, wait: 1)
+              end
+
+              def set_name(name)
+                find_element(:board_name_field).set(name)
+                click_element(:save_changes_button)
               end
 
               private
