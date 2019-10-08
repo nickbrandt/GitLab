@@ -137,4 +137,15 @@ describe Geo::DesignRepositorySyncService do
       end
     end
   end
+
+  context 'race condition when RepositoryUpdatedEvent was processed during a sync' do
+    let(:registry) { subject.send(:registry) }
+
+    it 'reschedules the sync' do
+      expect(::Geo::DesignRepositorySyncWorker).to receive(:perform_async)
+      expect(registry).to receive(:finish_sync!).and_return(false)
+
+      subject.send(:mark_sync_as_successful)
+    end
+  end
 end
