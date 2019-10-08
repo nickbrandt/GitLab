@@ -1,3 +1,5 @@
+import { TASKS_BY_TYPE_SUBJECT_ISSUE } from '../constants';
+
 export default () => ({
   endpoints: {
     cycleAnalyticsData: null,
@@ -29,4 +31,10 @@ export default () => ({
   labels: [],
 
   customStageFormEvents: [],
+  tasksByType: {
+    subject: TASKS_BY_TYPE_SUBJECT_ISSUE, // issues | merge_requests, defaults to issues
+    // list of selected labels for the tasks by type chart
+    labelIds: [],
+    data: []
+  },
 });

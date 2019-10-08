@@ -199,15 +199,41 @@ export const receiveTasksByTypeError = ({ commit }, error) => {
   commit(types.RECEIVE_TASKS_BY_TYPE_ERROR, error);
   createFlash(__('There was an error fetching data for the form'));
 };
-export const requestTasksByType = ({ commit }) => commit(types.REQUEST_TASKS_BY_TYPE);
 
-export const fetchTasksByType = ({ dispatch }, { groupPath, labelIds }) => {
-  const endpoint = '/~/analytics/tasks_by_type';
-  const params = { group_id: groupPath, label_ids: labelIds };
-  dispatch('requestTasksByTypeData');
+export const receiveTasksByTypeDataSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data);
+export const receiveTasksByTypeDataError = ({ commit }, error) => {
+  commit(types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR, error);
+  createFlash(__('There was an error fetching data for the chart'));
+};
+export const requestTasksByTypeData = ({ commit }) => commit(types.REQUEST_TASKS_BY_TYPE_DATA);
 
-  return axios
-    .get(endpoint, params)
-    .then(data => dispatch('receiveTasksByTypeSuccess', data))
-    .catch(error => dispatch('receiveTasksByTypeError', error));
+export const fetchTasksByTypeData = ({ dispatch, state }, groupPath) => {
+  const endpoint = '/-/analytics/type_of_work/tasks_by_type';
+  const {
+    tasksByType: { labelIds, subject },
+    selectedProjectIds,
+    timeFrameCreatedBefore,
+    timeFrameCreatedAfter,
+  } = state;
+
+  // dont request if we have no labels selected...for now
+  if (!labelIds.length) {
+    const params = {
+      group_id: groupPath,
+      label_ids: labelIds,
+      project_ids: selectedProjectIds,
+      created_before: timeFrameCreatedBefore,
+      created_after: timeFrameCreatedAfter,
+      subject,
+    };
+
+    dispatch('requestTasksByTypeData');
+
+    // TODO: move to service / api
+    return axios
+      .get(endpoint, { params })
+      .then(data => dispatch('receiveTasksByTypeDataSuccess', data))
+      .catch(error => dispatch('receiveTasksByTypeDataError', error));
+  }
 };

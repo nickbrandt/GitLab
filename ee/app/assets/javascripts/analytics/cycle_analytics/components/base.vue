@@ -100,11 +100,13 @@ export default {
       'showCustomStageForm',
       'setDateRange',
       'createCustomStage',
+      'fetchTasksByTypeData',
     ]),
     onGroupSelect(group) {
       this.setCycleAnalyticsDataEndpoint(group.full_path);
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
+      this.fetchTasksByTypeData(group.path);
     },
     onProjectsSelect(projects) {
       const projectIds = projects.map(value => value.id);

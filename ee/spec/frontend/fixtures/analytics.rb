@@ -107,6 +107,8 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   describe Analytics::TasksByTypeController, type: :controller do
     render_views
 
+    let(:label) { create(:group_label, group: group) }
+
     before do
       stub_licensed_features(type_of_work_analytics: true)
       stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => true)
@@ -117,7 +119,7 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
     end
 
     it 'analytics/tasks_by_type.json' do
-      params = { group_id: group.full_path, label_ids: [1, 2], created_after: '2018-01-01', created_before: '2019-01-01' }
+      params = { group_id: group.full_path, label_ids: [label.id], created_after: 10.days.ago, subject: 'Issue' }
 
       get(:show, params: params, format: :json)
 
