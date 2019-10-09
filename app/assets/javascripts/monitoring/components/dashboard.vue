@@ -271,7 +271,7 @@ export default {
       return Object.values(this.getGraphAlerts(queries));
     },
     showToast() {
-      this.$toast.show(__('Link copied to clipboard'));
+      this.$toast.show(__('Link copied'));
     },
     // TODO: END
     generateLink(group, title, yLabel) {

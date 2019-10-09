@@ -37,8 +37,8 @@ export default {
   computed: {
     copyToClipboard() {
       return {
-        script: s__('VisualReviewApp|Copy script to clipboard'),
-        mrId: s__('VisualReviewApp|Copy merge request ID to clipboard'),
+        script: s__('VisualReviewApp|Copy script'),
+        mrId: s__('VisualReviewApp|Copy merge request ID'),
       };
     },
     copyString() {
