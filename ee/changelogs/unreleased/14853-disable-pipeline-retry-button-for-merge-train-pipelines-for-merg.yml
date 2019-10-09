@@ -1,0 +1,5 @@
+---
+title: Inactivate pipeline retries for Merge Trains
+merge_request: 17065
+author:
+type: added

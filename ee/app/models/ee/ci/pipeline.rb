@@ -98,6 +98,10 @@ module EE
         source_bridge&.dependent?
       end
 
+      def retryable?
+        !merge_train_pipeline? && super
+      end
+
       def update_bridge_status!
         raise ArgumentError unless bridge_triggered?
         raise BridgeStatusError unless source_bridge.active?
