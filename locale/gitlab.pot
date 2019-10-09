@@ -12641,6 +12641,9 @@ msgstr ""
 msgid "Prometheus listen_address in config/gitlab.yml is not a valid URI"
 msgstr ""
 
+msgid "PrometheusAlerts|%{count} alerts applied"
+msgstr ""
+
 msgid "PrometheusAlerts|Add alert"
 msgstr ""
 
