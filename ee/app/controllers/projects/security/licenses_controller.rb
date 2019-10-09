@@ -24,7 +24,7 @@ module Projects
       end
 
       def report_service
-        @report_service ||= ::Security::ReportFetchService.new(project, ::Ci::JobArtifact.license_management_reports)
+        @report_service ||= ::Security::ReportFetchService.new(project, ::Ci::JobArtifact.license_scanning_reports)
       end
 
       def serializer

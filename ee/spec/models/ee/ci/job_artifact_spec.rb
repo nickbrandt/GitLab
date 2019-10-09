@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe EE::Ci::JobArtifact do
-  describe '.license_management_reports' do
-    subject { Ci::JobArtifact.license_management_reports }
+  describe '.license_scanning_reports' do
+    subject { Ci::JobArtifact.license_scanning_reports }
 
     context 'when there is a license management report' do
       let!(:artifact) { create(:ee_ci_job_artifact, :license_management) }

@@ -26,7 +26,7 @@ module EE
         with_file_types(SECURITY_REPORT_FILE_TYPES)
       end
 
-      scope :license_management_reports, -> do
+      scope :license_scanning_reports, -> do
         with_file_types(LICENSE_SCANNING_REPORT_FILE_TYPES)
       end
 
