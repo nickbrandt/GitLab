@@ -4,8 +4,8 @@ class ZoomMeeting < ApplicationRecord
   belongs_to :project, optional: false
   belongs_to :issue, optional: false
 
-  validates :url, presence: true, length: { maximum: 255 }
-  validates_with ZoomMeetingValidator
+  validates :url, presence: true, length: { maximum: 255 }, zoom_url: true
+  validates :issue, project_association: true
 
   enum issue_status: {
     added: 1,
@@ -14,5 +14,4 @@ class ZoomMeeting < ApplicationRecord
 
   scope :added_to_issue, -> { where(issue_status: :added) }
   scope :removed_from_issue, -> { where(issue_status: :removed) }
-
 end
