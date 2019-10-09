@@ -18,9 +18,9 @@ and they will assist you with any issues you are having.
 
 ### Procedures
 
-- [Connect to the PostgreSQL console.](/omnibus/settings/database.html#connecting-to-the-bundled-postgresql-database)
+- [Connect to the PostgreSQL console.](https://docs.gitlab.com/omnibus/settings/database.html#connecting-to-the-bundled-postgresql-database)
 
-- [Omnibus database procedures](/omnibus/settings/database.html) including
+- [Omnibus database procedures](https://docs.gitlab.com/omnibus/settings/database.html) including
   - SSL: enabling, disabling, and verifying.
   - Enabling Write Ahead Log (WAL) archiving.
   - Using an external (non-Omnibus) PostgreSQL installation; and backing it up.
@@ -33,7 +33,7 @@ and they will assist you with any issues you are having.
 
 - [Running GEO with external PostgreSQL](/ee/administration/geo/replication/external_database.html)
 
-- [Upgrades when running PostgreSQL configured for HA.](/omnibus/settings/database.html#upgrading-a-gitlab-ha-cluster)
+- [Upgrades when running PostgreSQL configured for HA.](https://docs.gitlab.com/omnibus/settings/database.html#upgrading-a-gitlab-ha-cluster)
 
 - Consuming PostgreSQL from [within CI runners](/ee/ci/services/postgres.html)
 
@@ -41,7 +41,7 @@ and they will assist you with any issues you are having.
   - Uses replication to handle PostgreSQL upgrades - providing the schemas are the same.
   - Reduces downtime to a short window for swinging over to the newer vewrsion.
 
-- Managing Omnibus PostgreSQL versions [from the development docs](/omnibus/development/managing-postgresql-versions.html)
+- Managing Omnibus PostgreSQL versions [from the development docs](https://docs.gitlab.com/omnibus/development/managing-postgresql-versions.html)
 
 - [PostgreSQL scaling and HA](/ee/administration/high_availability/database.html)
   - including [troubleshooting](/ee/administration/high_availability/database.html#troubleshooting) gitlab-ctl repmgr-check-master and pgbouncer errors
@@ -56,13 +56,13 @@ and they will assist you with any issues you are having.
   - required extension pg_trgm
   - required extension postgres_fdw for Geo
 
-- Errors like this in the production/sidekiq log;  see: [Set default_transaction_isolation into read committed](/omnibus/settings/database.html#set-default_transaction_isolation-into-read-committed)
+- Errors like this in the production/sidekiq log;  see: [Set default_transaction_isolation into read committed](https://docs.gitlab.com/omnibus/settings/database.html#set-default_transaction_isolation-into-read-committed)
 
 ```
 ActiveRecord::StatementInvalid PG::TRSerializationFailure: ERROR:  could not serialize access due to concurrent update
 ```
 
-- PostgreSQL HA - [replication slot errors](/omnibus/settings/database.html#troubleshooting-upgrades-in-an-ha-cluster)
+- PostgreSQL HA - [replication slot errors](https://docs.gitlab.com/omnibus/settings/database.html#troubleshooting-upgrades-in-an-ha-cluster)
 
 ```
 pg_basebackup: could not create temporary replication slot "pg_basebackup_12345": ERROR:  all replication slots are in use
