@@ -11,12 +11,12 @@ module EE
     prepended do
       after_destroy :log_geo_deleted_event
 
-      SECURITY_REPORT_FILE_TYPES = %w[sast dependency_scanning container_scanning dast].freeze
-      LICENSE_MANAGEMENT_REPORT_FILE_TYPES = %w[license_management].freeze
-      DEPENDENCY_LIST_REPORT_FILE_TYPES = %w[dependency_scanning].freeze
-      METRICS_REPORT_FILE_TYPES = %w[metrics].freeze
-      CONTAINER_SCANNING_REPORT_TYPES = %w[container_scanning].freeze
-      SAST_REPORT_TYPES = %w[sast].freeze
+      SECURITY_REPORT_FILE_TYPES         = %w[sast dependency_scanning container_scanning dast].freeze
+      LICENSE_SCANNING_REPORT_FILE_TYPES = %w[license_scanning license_management].freeze
+      DEPENDENCY_LIST_REPORT_FILE_TYPES  = %w[dependency_scanning].freeze
+      METRICS_REPORT_FILE_TYPES          = %w[metrics].freeze
+      CONTAINER_SCANNING_REPORT_TYPES    = %w[container_scanning].freeze
+      SAST_REPORT_TYPES                  = %w[sast].freeze
 
       scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
       scope :project_id_in, ->(ids) { joins(:project).merge(::Project.id_in(ids)) }
@@ -27,7 +27,7 @@ module EE
       end
 
       scope :license_management_reports, -> do
-        with_file_types(LICENSE_MANAGEMENT_REPORT_FILE_TYPES)
+        with_file_types(LICENSE_SCANNING_REPORT_FILE_TYPES)
       end
 
       scope :dependency_list_reports, -> do
