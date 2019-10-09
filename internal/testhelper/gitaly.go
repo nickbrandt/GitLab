@@ -22,6 +22,9 @@ type GitalyTestServer struct {
 	finalMessageCode codes.Code
 	sync.WaitGroup
 	LastIncomingMetadata metadata.MD
+	gitalypb.UnimplementedRepositoryServiceServer
+	gitalypb.UnimplementedBlobServiceServer
+	gitalypb.UnimplementedDiffServiceServer
 }
 
 var (
