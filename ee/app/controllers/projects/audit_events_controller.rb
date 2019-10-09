@@ -9,7 +9,7 @@ class Projects::AuditEventsController < Projects::ApplicationController
   layout 'project_settings'
 
   def index
-    @events = project.audit_events.page(params[:page])
+    @events = LogFinder.new(entity_type: project.class.name, entity_id: project.id).execute.page(params[:page])
   end
 
   def check_audit_events_available!
