@@ -96,7 +96,11 @@ export default {
       >
         <icon :name="chevronType" />
       </gl-button>
-      <gl-loading-icon v-if="childrenFlags[itemReference].itemChildrenFetchInProgress" size="sm" />
+      <gl-loading-icon
+        v-if="childrenFlags[itemReference].itemChildrenFetchInProgress"
+        class="loading-icon"
+        size="sm"
+      />
       <tree-item-body
         class="tree-item-row"
         :parent-item="parentItem"
