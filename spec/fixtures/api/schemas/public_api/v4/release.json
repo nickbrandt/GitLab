@@ -36,6 +36,13 @@
         }
       },
       "additionalProperties": false
+    },
+    "_links": {
+      "required": ["merge_requests", "issues"],
+      "properties": {
+        "merge_requests": { "type": "string" },
+        "issues": { "type": "string" }
+      }
     }
   },
   "additionalProperties": false

@@ -63,6 +63,30 @@ describe API::Releases do
         expect(json_response.second['commit_path']).to eq("/#{release_1.project.full_path}/commit/#{release_1.commit.id}")
         expect(json_response.second['tag_path']).to eq("/#{release_1.project.full_path}/-/tags/#{release_1.tag}")
       end
+
+      it 'returns the merge requests and issues links' do
+        get api("/projects/#{project.id}/releases", maintainer)
+
+        links = json_response.first['_links']
+
+        expect(links.keys).to include('merge_requests', 'issues')
+        expect(links['merge_requests']).to include("/#{release_2.project.full_path}/merge_requests")
+        expect(links['issues']).to include("/#{release_2.project.full_path}/issues")
+      end
+
+      it 'returns urls with correct parameters and release tag' do
+        get api("/projects/#{project.id}/releases", maintainer)
+
+        links = json_response.first['_links']
+        release = json_response.first['tag_name']
+        expected_params = %w(release_tag scope state)
+        release_tag_param = "release_tag=#{release}"
+
+        expect(links['merge_requests'].split('?')[1]).to include(*expected_params)
+        expect(links['issues'].split('?')[1]).to include(*expected_params)
+        expect(links['merge_requests']).to include(release_tag_param)
+        expect(links['issues']).to include(release_tag_param)
+      end
     end
 
     it 'returns an upcoming_release status for a future release' do
