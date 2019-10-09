@@ -1554,13 +1554,20 @@ describe User do
   end
 
   describe '.find_by_ssh_key_id' do
-    context 'using an existing SSH key ID' do
-      let(:user) { create(:user) }
-      let(:key) { create(:key, user: user) }
+    let_it_be(:user) { create(:user) }
+    let_it_be(:key) { create(:key, user: user) }
 
+    context 'using an existing SSH key ID' do
       it 'returns the corresponding User' do
         expect(described_class.find_by_ssh_key_id(key.id)).to eq(user)
       end
+    end
+
+    it 'only performs a single query' do
+      key # Don't count the queries for creating the key and user
+
+      expect { described_class.find_by_ssh_key_id(key.id) }
+        .not_to exceed_query_limit(1)
     end
 
     context 'using an invalid SSH key ID' do
