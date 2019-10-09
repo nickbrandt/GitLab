@@ -39,12 +39,6 @@ module QA
           end
         end
 
-        def resource_web_url(resource)
-          super
-        rescue ResourceURLMissingError
-          "#{group.web_url}/-/epics/#{iid}"
-        end
-
         def api_get_path
           "/groups/#{group.id}/epics/#{id}"
         end
