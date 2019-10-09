@@ -4258,9 +4258,6 @@ msgid_plural "ContainerRegistry|Remove tags"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "ContainerRegistry|Remove tag(s)"
-msgstr ""
-
 msgid "ContainerRegistry|Size"
 msgstr ""
 
