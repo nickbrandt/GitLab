@@ -5,7 +5,7 @@ class ZoomMeeting < ApplicationRecord
   belongs_to :issue, optional: false
 
   validates :url, presence: true, length: { maximum: 255 }, zoom_url: true
-  validates :issue, project_association: true
+  validates :issue, same_project_association: true
 
   enum issue_status: {
     added: 1,

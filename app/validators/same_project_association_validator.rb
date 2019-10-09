@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# IssueProjectAssociationValidator
+# SameProjectAssociationValidator
 #
 # Custom validator to validate that the same project associated with
 # the record is also associated with the value
@@ -10,9 +10,9 @@
 #   belongs_to :project, optional: false
 #   belongs_to :issue, optional: false
 
-#   validates :issue, issue_project_association: true
+#   validates :issue, same_project_association: true
 # end
-class ProjectAssociationValidator < ActiveModel::EachValidator
+class SameProjectAssociationValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     return if record.project == value&.project
 
