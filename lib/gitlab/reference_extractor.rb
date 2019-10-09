@@ -3,7 +3,8 @@
 module Gitlab
   # Extract possible GFM references from an arbitrary String for further processing.
   class ReferenceExtractor < Banzai::ReferenceExtractor
-    REFERABLES = %i(user issue label milestone merge_request snippet commit commit_range directly_addressed_user epic).freeze
+    REFERABLES = %i(user mentioned_user mentioned_users_by_group mentioned_users_by_project issue label milestone
+                    merge_request snippet commit commit_range directly_addressed_user epic).freeze
     attr_accessor :project, :current_user, :author
 
     def initialize(project, current_user = nil)
@@ -55,7 +56,8 @@ module Gitlab
       return @pattern if @pattern
 
       patterns = REFERABLES.map do |ref|
-        ref.to_s.classify.constantize.try(:reference_pattern)
+        klass = ref.to_s.classify
+        klass.constantize.try(:reference_pattern) if Object.const_defined?(klass)
       end
 
       @pattern = Regexp.union(patterns.compact)
