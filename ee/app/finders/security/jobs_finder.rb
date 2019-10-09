@@ -47,18 +47,16 @@ module Security
     end
 
     def find_jobs_legacy(job_types)
-      # first job type is added as a WHERE statement
-      query = @pipeline.builds.with_secure_reports_from_options(job_types.first)
-
-      # following job types are added as OR statements
-      jobs = job_types.drop(1).reduce(query) do |qry, job_type|
-        qry.or(@pipeline.builds.with_secure_reports_from_options(job_type))
-      end
-
       # the query doesn't guarantee accuracy, so we verify it here
-      jobs.select do |job|
+      legacy_jobs_query(job_types) do |job|
         job_types.find { |job_type| job.options.dig(:artifacts, :reports, job_type) }
       end
+    end
+
+    def legacy_jobs_query(job_types)
+      job_types.map do |job_type|
+        @pipeline.builds.with_secure_reports_from_options(job_type)
+      end.reduce(&:or)
     end
   end
 end
