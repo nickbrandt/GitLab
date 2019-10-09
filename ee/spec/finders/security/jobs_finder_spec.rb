@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Security::JobsFinder do
   let(:pipeline) { create(:ci_pipeline) }
-  let(:finder) { described_class.new(pipeline) }
+  let(:finder) { described_class.new(pipeline: pipeline, job_types: ::Security::JobsFinder::JOB_TYPES) }
 
   describe '#execute' do
     subject { finder.execute }
@@ -53,7 +53,7 @@ describe Security::JobsFinder do
       context 'searching for all types takes precedence over excluding specific types' do
         let!(:build) { create(:ci_build, :dast, pipeline: pipeline) }
 
-        let(:finder) { described_class.new(pipeline, all: true, dast: false) }
+        let(:finder) { described_class.new(pipeline: pipeline, job_types: [:dast]) }
 
         it { is_expected.to eq([build]) }
       end
@@ -99,7 +99,7 @@ describe Security::JobsFinder do
         let!(:container_scanning_build) { create(:ci_build, :container_scanning, pipeline: pipeline) }
         let!(:dast_build) { create(:ci_build, :dast, pipeline: pipeline) }
 
-        let(:finder) { described_class.new(pipeline, { sast: true, container_scanning: true }) }
+        let(:finder) { described_class.new(pipeline: pipeline, job_types: [:sast, :container_scanning]) }
 
         it 'returns only those requested' do
           is_expected.to include(sast_build)
@@ -183,7 +183,7 @@ describe Security::JobsFinder do
         let!(:container_scanning_build) { create(:ci_build, :container_scanning, pipeline: pipeline) }
         let!(:dast_build) { create(:ci_build, :dast, pipeline: pipeline) }
 
-        let(:finder) { described_class.new(pipeline, { sast: true, container_scanning: true }) }
+        let(:finder) { described_class.new(pipeline: pipeline, job_types: [:sast, :container_scanning]) }
 
         it 'returns only those requested' do
           is_expected.to include(sast_build)
