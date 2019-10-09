@@ -527,4 +527,22 @@ describe Ci::Pipeline do
       it { is_expected.to be_falsy }
     end
   end
+
+  describe '#retryable?' do
+    subject { pipeline.retryable? }
+    let(:pipeline) { merge_request.all_pipelines.last }
+    let!(:build) { create(:ci_build, :canceled, pipeline: pipeline) }
+
+    context 'with pipeline for merged results' do
+      let(:merge_request) { create(:merge_request, :with_merge_request_pipeline) }
+
+      it { is_expected.to be true }
+    end
+
+    context 'with pipeline for merge train' do
+      let(:merge_request) { create(:merge_request, :on_train, :with_merge_train_pipeline) }
+
+      it { is_expected.to be false }
+    end
+  end
 end

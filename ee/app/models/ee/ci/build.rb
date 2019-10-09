@@ -107,6 +107,10 @@ module EE
         metrics_report
       end
 
+      def retryable?
+        !merge_train_pipeline? && super
+      end
+
       private
 
       def name_in?(names)
