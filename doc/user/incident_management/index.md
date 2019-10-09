@@ -14,11 +14,13 @@ GitLab offers solutions for handling incidents in your applications and services
 ### Alerting
 
 #### Prometheus Alerts
+
 Prometheus alerts can be setup in both GitLab-managed Prometheus installs and self-managed Prometheus installs.
 
-  Documentation for each method can be found here:
-  - [GitLab-managed Prometheus](https://docs.gitlab.com/ee/user/project/integrations/prometheus.html#setting-up-alerts-for-prometheus-metrics-ultimate)
-  - [Self-managed Prometheus](https://docs.gitlab.com/ee/user/project/integrations/prometheus.html#external-prometheus-instances)
+Documentation for each method can be found here:
+
+- [GitLab-managed Prometheus](https://docs.gitlab.com/ee/user/project/integrations/prometheus.html#setting-up-alerts-for-prometheus-metrics-ultimate)
+- [Self-managed Prometheus](https://docs.gitlab.com/ee/user/project/integrations/prometheus.html#external-prometheus-instances)
 
 #### Alert Endpoint
 
