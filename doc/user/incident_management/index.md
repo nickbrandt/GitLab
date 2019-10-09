@@ -51,12 +51,12 @@ To select your Issue Template for use within Incident Management, head to Projec
 
 #### GitLab hosted metrics
 
-You can embed metrics that are served by GitLab by following [these instructions](../project/integrations/prometheus.html#embedding-metric-charts-within-gitlab-flavored-markdown).
+You can embed metrics that are served by GitLab by following [these instructions](../project/integrations/prometheus#embedding-metric-charts-within-gitlab-flavored-markdown).
 Including links to embedded metrics in issues templates
 
 #### Grafana metrics
 
-You can embed externally hosted Grafana metrics into GitLab issues by following [these instructions](user/project/integrations/prometheus.html#embedding-live-grafana-charts).
+You can embed externally hosted Grafana metrics into GitLab issues by following [these instructions](user/project/integrations/prometheus#embedding-live-grafana-charts).
 
 #### Metrics in issue templates
 
@@ -72,7 +72,7 @@ To setup Slack slash commands with GitLab, see [this guide](../project/integrati
 
 #### Slash commands
 
-Examples of Slash commands and how to use them can be [found here](../../ee/integration/slash_commands).
+Examples of Slash commands and how to use them can be [found here](../../integration/slash_commands).
 
 ### Zoom in Issues
 
