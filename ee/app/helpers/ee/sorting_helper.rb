@@ -95,7 +95,7 @@ module EE
     end
 
     def packages_sort_option_title(sort_value)
-      packages_sort_options_hash[sort_value]
+      packages_sort_options_hash[sort_value] || sort_title_created_date
     end
 
     def packages_sort_direction_button(sort_value)

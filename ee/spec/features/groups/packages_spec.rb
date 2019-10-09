@@ -77,6 +77,20 @@ describe 'Group Packages' do
         project: second_project)
     end
 
+    it 'sorts by created date descending by default' do
+      visit group_packages_path(group)
+      expect(sort_dropdown_button_text).to eq(sort_title_created_date)
+      expect(first_package).to include(bbb_package.name)
+      expect(last_package).to include(aaa_package.name)
+    end
+
+    it 'handles an invalid param' do
+      visit group_packages_path(group, sort: 'garbage') # bad sort param
+      expect(sort_dropdown_button_text).to eq(sort_title_created_date)
+      expect(first_package).to include(bbb_package.name)
+      expect(last_package).to include(aaa_package.name)
+    end
+
     it 'sorts by created date descending' do
       visit group_packages_path(group, sort: sort_value_recently_created)
       expect(sort_dropdown_button_text).to eq(sort_title_created_date)
