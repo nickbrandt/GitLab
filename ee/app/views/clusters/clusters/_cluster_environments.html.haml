@@ -6,18 +6,18 @@
   .js-toggle-container
     %ul.nav-links.mobile-separator.nav.nav-tabs{ role: 'tablist' }
       %li.nav-item{ role: 'presentation' }
-        %a.nav-link{ class: active_when(is_configure_active), href: clusterable.cluster_path(@cluster.id, params: {tab: 'configure'}), id: 'group-cluster-configure-tab' }
+        %a.nav-link{ class: active_when(is_configure_active), href: clusterable.cluster_path(@cluster.id, params: {tab: 'configure'}), id: 'cluster-configure-tab' }
           %span= _('Configuration')
       %li.nav-item{ role: 'presentation' }
-        %a.nav-link{ class: active_when(!is_configure_active), href: clusterable.cluster_path(@cluster.id, params: {tab: 'environments'}), id: 'group-cluster-environments-tab' }
+        %a.nav-link{ class: active_when(!is_configure_active), href: clusterable.cluster_path(@cluster.id, params: {tab: 'environments'}), id: 'cluster-environments-tab' }
           %span.js-cluster-nav-environments= _('Environments')
 
     .tab-content
       - if is_configure_active
-        .tab-pane.active{ id: 'group-cluster-configure-pane', role: 'tabpanel' }
+        .tab-pane.active{ id: 'cluster-configure-pane', role: 'tabpanel' }
           = render 'configure', expanded: expanded
       - else
-        .tab-pane.active{ id: 'group-cluster-environments-pane', role: 'tabpanel' }
+        .tab-pane.active{ id: 'cluster-environments-pane', role: 'tabpanel' }
           #js-cluster-environments
 
 - else
