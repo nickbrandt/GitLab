@@ -5,18 +5,14 @@ module QA
     module Page
       module Project
         module Milestone
-          module Show
-            def self.prepended(page)
-              page.module_eval do
-                view 'ee/app/views/shared/milestones/_burndown.html.haml' do
-                  element :burndown_chart
-                  element :weight_button
-                end
+          class Show < ::QA::Page::Base
+            view 'ee/app/views/shared/milestones/_burndown.html.haml' do
+              element :burndown_chart
+              element :weight_button
+            end
 
-                view 'ee/app/views/shared/milestones/_weight.html.haml' do
-                  element :total_issue_weight_value
-                end
-              end
+            view 'ee/app/views/shared/milestones/_weight.html.haml' do
+              element :total_issue_weight_value
             end
 
             def click_weight_button
