@@ -106,6 +106,18 @@ module EE
       hidden.count
     end
 
+    override :note_positions_for_paths
+    def note_positions_for_paths(file_paths, user = nil)
+      return super unless user
+
+      positions = draft_notes
+        .authored_by(user)
+        .positions
+        .select { |pos| file_paths.include?(pos.file_path) }
+
+      super.concat(positions)
+    end
+
     def participant_approvers
       strong_memoize(:participant_approvers) do
         next [] unless approval_needed?
