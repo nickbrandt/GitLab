@@ -279,7 +279,7 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
     dispatch('requestTasksByTypeData');
 
     return Api.cycleAnalyticsTasksByType(params)
-      .then(data => dispatch('receiveTasksByTypeDataSuccess', data))
+      .then(({ data }) => dispatch('receiveTasksByTypeDataSuccess', data))
       .catch(error => dispatch('receiveTasksByTypeDataError', error));
   }
   return Promise.resolve();

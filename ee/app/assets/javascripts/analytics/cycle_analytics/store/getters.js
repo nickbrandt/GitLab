@@ -26,4 +26,4 @@ export const durationChartPlottableData = state => {
   return plottableData.length ? plottableData : null;
 };
 export const tasksByTypeData = state =>
-  state.tasksByType && state.tasksByType.data ? state.tasksByType.data : [];
+  state.tasksByType && state.tasksByType.data ? state.tasksByType.data : {};

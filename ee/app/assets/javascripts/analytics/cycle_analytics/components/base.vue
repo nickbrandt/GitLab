@@ -1,12 +1,13 @@
 <script>
-import { GlEmptyState, GlDaterangePicker,GlLoadingIcon } from '@gitlab/ui';
+import { GlEmptyState, GlDaterangePicker, GlLoadingIcon } from '@gitlab/ui';
 import { GlStackedColumnChart } from '@gitlab/ui/dist/charts';
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { __ } from '~/locale';
-import createFlash from '~/flash';
-import { getDateInPast, getDayDifference } from '~/lib/utils/datetime_utility';
+import dateFormat from 'dateformat';
+import { s__, sprintf } from '~/locale';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { prepareLabelDatasetForChart, generateDatesInRange } from '../utils';
 import { PROJECTS_PER_PAGE, DEFAULT_DAYS_IN_PAST } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
@@ -14,40 +15,14 @@ import Scatterplot from '../../shared/components/scatterplot.vue';
 import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
-import { LAST_ACTIVITY_AT } from '../../shared/constants';
-import { toYmd } from '../../shared/utils';
-
-const generateDatesBetweenStartAndEnd = (start, end) => {
-  const dayDifference = getDayDifference(start, end);
-  return [...Array(dayDifference).keys()].map(i => {
-    const d = getDateInPast(end, i);
-    return toYmd(new Date(d));
-  });
-};
-
-const prepareDataset = ({ dataset, range }) =>
-  dataset.reduce(
-    (acc, curr) => {
-      const {
-        label: { title },
-        series: [datapoints],
-      } = curr;
-      acc.seriesNames = [...acc.seriesNames, title];
-      acc.data = [...acc.data, range.map(index => (datapoints[index] ? datapoints[index] : 0))];
-      return acc;
-    },
-    { data: [], seriesNames: [] },
-  );
+import { LAST_ACTIVITY_AT, dateFormats } from '../../shared/constants';
 
 export default {
   name: 'CycleAnalytics',
   components: {
     GlLoadingIcon,
-<<<<<<< HEAD
     GlEmptyState,
-=======
     GlStackedColumnChart,
->>>>>>> Scaffold ui for type of work chart
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
     SummaryTable,
@@ -90,7 +65,7 @@ export default {
       'featureFlags',
       'isLoading',
       'isLoadingStage',
-      'isLoadingChartData',
+      'isLoadingTasksByTypeChart',
       'isLoadingDurationChart',
       'isEmptyStage',
       'isSavingCustomStage',
@@ -109,7 +84,7 @@ export default {
       'tasksByType',
       'medians',
     ]),
-    ...mapGetters(['hasNoAccessError', 'currentGroupPath', 'durationChartPlottableData','tasksByTypeData']),
+    ...mapGetters(['hasNoAccessError', 'currentGroupPath', 'durationChartPlottableData']),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -137,18 +112,54 @@ export default {
       return this.startDate && this.endDate;
     },
     typeOfWork() {
-      if (!this.hasDateRangeSet) {
-        return { option: { legend: false }, datatset: [], range: [] };
-      }
-      const range = generateDatesBetweenStartAndEnd(this.startDate, this.endDate).reverse();
+      // generate settings for the tasksByType chart
+      // if (!this.hasDateRangeSet) {
+      //   return { option: { legend: false }, datatset: [], range: [] };
+      // }
+
+      // const range = generateDatesInRange(this.startDate, this.endDate).reverse();
+
+      // // TODO: diff and data should be replaced with the tasksByTypeData getter
+      // const diff = range.length + 1;
+      // const rawData = typeOfWork(diff);
+
+      // const { data, seriesNames } = prepareLabelDatasetForChart({
+      //   dataset: Object.values(rawData),
+      //   range,
+      // });
+
       return {
         option: { legend: false },
-        range,
-        ...prepareDataset({ dataset: this.tasksByTypeData, range }),
+        range: [],
+        data: [],
+        seriesNames: [],
       };
+    },
+    chartDataDescription() {
+      if (this.selectedGroup) {
+        const selectedProjectCount = this.setSelectedProjects.length;
+        const { startDate, endDate } = this;
+        const { name: groupName } = this.selectedGroup;
+        const str =
+          selectedProjectCount > 0
+            ? s__(
+                "CycleAnalyticsCharts|Showing data for group '%{groupName}' and %{selectedProjectCount} projects from %{startDate} to %{endDate}",
+              )
+            : s__(
+                "CycleAnalyticsCharts|Showing data for group '%{groupName}' from %{startDate} to %{endDate}",
+              );
+        return sprintf(str, {
+          startDate: dateFormat(startDate, dateFormats.defaultDate),
+          endDate: dateFormat(endDate, dateFormats.defaultDate),
+          groupName,
+          selectedProjectCount,
+        });
+      }
+      return null;
     },
   },
   mounted() {
+    // console.log('this.tasksByType', this.tasksByType);
     this.initDateRange();
     this.setFeatureFlags({
       hasDurationChart: this.glFeatures.cycleAnalyticsScatterplotEnabled,
@@ -342,6 +353,7 @@ export default {
       </template>
     </div>
     <div v-if="hasDateRangeSet">
+      <!-- TODO: move into component file -->
       <div class="row">
         <div class="col-12">
           <h2>{{ __('Type of work') }}</h2>
@@ -349,7 +361,7 @@ export default {
         </div>
       </div>
       <div class="row">
-        <div class="col-6">
+        <div class="col-12">
           <header>
             <h3>{{ __('Tasks by type') }}</h3>
           </header>

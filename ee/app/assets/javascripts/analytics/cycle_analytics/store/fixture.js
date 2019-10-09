@@ -6,12 +6,13 @@ import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { toYmd } from '../../shared/utils';
 
 const today = new Date();
-const dataRange = [...Array(30).keys()]
-  .map(i => {
-    const d = getDateInPast(today, i);
-    return toYmd(new Date(d));
-  })
-  .reverse();
+const generateRange = (limit = 30) =>
+  [...Array(limit).keys()]
+    .map(i => {
+      const d = getDateInPast(today, i);
+      return toYmd(new Date(d));
+    })
+    .reverse();
 
 function randomInt(range) {
   return Math.floor(Math.random() * Math.floor(range));
@@ -24,41 +25,58 @@ function arrayToObject(arr) {
   }, {});
 }
 
-const genSeries = () => arrayToObject(dataRange.map(key => [key, randomInt(100)]));
+const genSeries = dayRange =>
+  arrayToObject(generateRange(dayRange).map(key => [key, randomInt(100)]));
 
-const fakeApiResponse = convertObjectPropsToCamelCase(
-  [
-    {
-      label: {
-        id: 1,
-        title: __('Bug'),
-        color: '#428BCA',
-        text_color: '#FFFFFF',
+const generateApiResponse = dayRange =>
+  convertObjectPropsToCamelCase(
+    [
+      {
+        label: {
+          id: 1,
+          title: __('Bug'),
+          color: '#428BCA',
+          text_color: '#FFFFFF',
+        },
+        series: [genSeries(dayRange)],
       },
-      series: [genSeries()],
-    },
-    {
-      label: {
-        id: 3,
-        title: __('Backstage'),
-        color: '#327BCA',
-        text_color: '#FFFFFF',
+      {
+        label: {
+          id: 3,
+          title: __('Backstage'),
+          color: '#327BCA',
+          text_color: '#FFFFFF',
+        },
+        series: [genSeries(dayRange)],
       },
-      series: [genSeries()],
-    },
-    {
-      label: {
-        id: 2,
-        title: __('Feature'),
-        color: '#428BCA',
-        text_color: '#FFFFFF',
+      {
+        label: {
+          id: 2,
+          title: __('Feature'),
+          color: '#428BCA',
+          text_color: '#FFFFFF',
+        },
+        series: [genSeries(dayRange)],
       },
-      series: [genSeries()],
-    },
-  ],
-  { deep: true },
-);
+    ],
+    { deep: true },
+  );
 
-const transformResponseToLabelHash = data => {};
+const transformResponseToLabelHash = data =>
+  data.reduce(
+    (acc, { label: { id, ...labelRest }, series }) => ({
+      ...acc,
+      [id]: {
+        label: { id, ...labelRest },
+        series,
+      },
+    }),
+    {},
+  );
 
-export const typeOfWork = convertObjectPropsToCamelCase(fakeApiResponse, { deep: true });
+export const typeOfWork = dayRange =>
+  transformResponseToLabelHash(
+    convertObjectPropsToCamelCase(generateApiResponse(dayRange), { deep: true }),
+  );
+
+export default {};

@@ -133,16 +133,16 @@ export default {
     );
   },
   [types.REQUEST_TASKS_BY_TYPE_DATA](state) {
-    state.isLoadingChartData = true;
+    state.isLoadingTasksByTypeChart = true;
   },
   [types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR](state) {
-    state.isLoadingChartData = false;
+    state.isLoadingTasksByTypeChart = false;
   },
   [types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, data) {
-    state.isLoadingChartData = false;
+    state.isLoadingTasksByTypeChart = false;
     state.tasksByType = {
       ...state.tasksByType,
-      data,
+      data: convertObjectPropsToCamelCase(data, { deep: true }),
     };
   },
   [types.REQUEST_CREATE_CUSTOM_STAGE](state) {
@@ -176,5 +176,3 @@ export default {
     state.isLoadingDurationChart = false;
   },
 };
-
-

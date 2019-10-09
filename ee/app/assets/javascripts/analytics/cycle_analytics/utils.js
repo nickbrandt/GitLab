@@ -2,9 +2,10 @@ import { isString, isNumber } from 'underscore';
 import dateFormat from 'dateformat';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
-import { newDate, dayAfter, secondsToDays } from '~/lib/utils/datetime_utility';
+import { newDate, dayAfter, secondsToDays, getDatesInRange } from '~/lib/utils/datetime_utility';
 import { dateFormats } from '../shared/constants';
 import { STAGE_NAME } from './constants';
+import { toYmd } from '../shared/utils';
 
 const EVENT_TYPE_LABEL = 'label';
 
@@ -189,5 +190,58 @@ export const getDurationChartData = (data, startDate, endDate) => {
 
   return eventData;
 };
+
 // takes the type of work data and converts to a k:v structure
 export const transformRawTypeOfWorkData = raw => {};
+
+export const prepareLabelDatasetForChart = ({ dataset, range }) =>
+  dataset.reduce(
+    (acc, curr) => {
+      const {
+        label: { title },
+        series: [datapoints],
+      } = curr;
+      acc.seriesNames = [...acc.seriesNames, title];
+      acc.data = [...acc.data, range.map(index => (datapoints[index] ? datapoints[index] : 0))];
+      return acc;
+    },
+    { data: [], seriesNames: [] },
+  );
+
+export const flattenTaskByTypeSeries = series =>
+  series.map(dataSet => {
+    // ignore the date, just return the value
+    return dataSet[1];
+  });
+
+// TODO: docblocks
+export const getTasksByTypeData = ({ data, startDate, endDate }) => {
+  // TODO: check that the date range and datapoint values are in the same order
+  const range = getDatesInRange(startDate, endDate, toYmd).reverse();
+
+  // TODO: handle zero's?
+  // TODO: fixup seeded data so it falls in the correct date range
+
+  const transformed = data.reduce(
+    (acc, curr) => {
+      const {
+        label: { title },
+        series,
+      } = curr;
+      // TODO: double check if BE fills in all the dates and adds zeros
+      acc.seriesNames = [...acc.seriesNames, title];
+      // TODO: maybe flatmap
+      acc.data = [...acc.data, flattenTaskByTypeSeries(series)];
+      return acc;
+    },
+    {
+      data: [],
+      seriesNames: [],
+    },
+  );
+
+  return {
+    ...transformed,
+    range,
+  };
+};

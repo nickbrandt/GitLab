@@ -10,6 +10,8 @@ import {
   getDurationChartData,
   transformRawStages,
   isPersistedStage,
+  getTasksByTypeData,
+  flattenTaskByTypeSeries,
 } from 'ee/analytics/cycle_analytics/utils';
 import {
   customStageEvents as events,
@@ -23,6 +25,7 @@ import {
   endDate,
   issueStage,
   rawCustomStage,
+  tasksByTypeData,
 } from './mock_data';
 
 const labelEvents = [labelStartEvent, labelStopEvent].map(i => i.identifier);
@@ -197,6 +200,72 @@ describe('Cycle analytics utils', () => {
       ${false} | ${'this-is-a-string'} | ${false}
     `('with custom=$custom and id=$id', ({ custom, id, expected }) => {
       expect(isPersistedStage({ custom, id })).toEqual(expected);
+    });
+  });
+
+  describe.skip('flattenTaskByTypeSeries', () => {});
+
+  describe.only('getTasksByTypeData', () => {
+    let transformed = {};
+    const rawData = tasksByTypeData;
+    const labels = rawData.map(d => {
+      const { label } = d;
+      return label.title;
+    });
+
+    const data = rawData.map(d => {
+      const { series } = d;
+      return flattenTaskByTypeSeries(series);
+    });
+
+    const range = [];
+    console.log('rawData', rawData);
+    // console.log('labels', labels);
+    console.log('data', data);
+
+    beforeEach(() => {
+      transformed = getTasksByTypeData({ data: rawData, startDate, endDate });
+    });
+
+    it('will return an object with the properties needed for the chart', () => {
+      ['seriesNames', 'data', 'range'].forEach(key => {
+        expect(transformed).toHaveProperty(key);
+      });
+    });
+
+    describe('seriesNames', () => {
+      it('returns the names of all the labels in the dataset', () => {
+        expect(transformed.seriesNames).toEqual(labels);
+      });
+    });
+
+    describe('range', () => {
+      it('returns the date range as an array', () => {
+        expect(transformed.range).toEqual(range);
+      });
+      it('includes each day between the start date and end date', () => {
+        expect(transformed.range).toEqual(range);
+      });
+      it('includes the start date and end date', () => {
+        expect(transformed.range).toContain(startDate);
+        expect(transformed.range).toContain(endDate);
+      });
+    });
+
+    describe('data', () => {
+      it('returns an array of data points', () => {
+        expect(transformed.data).toEqual(data);
+      });
+
+      it('contains an array of data for each label', () => {
+        expect(transformed.data.length).toEqual(labels.length);
+      });
+
+      it('contains a value for each day in the range', () => {
+        transformed.data.forEach(d => {
+          expect(d.length).toEqual(transformed.range.length);
+        });
+      });
     });
   });
 });

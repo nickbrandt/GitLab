@@ -2480,6 +2480,9 @@ msgstr ""
 msgid "Background color"
 msgstr ""
 
+msgid "Backstage"
+msgstr ""
+
 msgid "Badges"
 msgstr ""
 
@@ -2895,6 +2898,9 @@ msgid "Browse artifacts"
 msgstr ""
 
 msgid "Browse files"
+msgstr ""
+
+msgid "Bug"
 msgstr ""
 
 msgid "BuildArtifacts|An error occurred while fetching the artifacts"
@@ -5541,6 +5547,12 @@ msgstr ""
 msgid "CycleAnalyticsEvent|Issue closed"
 msgstr ""
 
+msgid "CycleAnalyticsCharts|Showing data for group '%{groupName}' and %{selectedProjectCount} projects from %{startDate} to %{endDate}"
+msgstr ""
+
+msgid "CycleAnalyticsCharts|Showing data for group '%{groupName}' from %{startDate} to %{endDate}"
+msgstr ""
+
 msgid "CycleAnalyticsEvent|Issue created"
 msgstr ""
 
@@ -7768,6 +7780,9 @@ msgid "Faster releases. Better code. Less pain."
 msgstr ""
 
 msgid "Favicon was successfully removed."
+msgstr ""
+
+msgid "Feature"
 msgstr ""
 
 msgid "Feature Flags"
@@ -17941,6 +17956,9 @@ msgstr ""
 msgid "Target-Branch"
 msgstr ""
 
+msgid "Tasks by type"
+msgstr ""
+
 msgid "Team"
 msgstr ""
 
@@ -19531,6 +19549,9 @@ msgid "Type"
 msgstr ""
 
 msgid "Type/State"
+msgstr ""
+
+msgid "Type of work"
 msgstr ""
 
 msgid "U2F Devices (%{length})"
