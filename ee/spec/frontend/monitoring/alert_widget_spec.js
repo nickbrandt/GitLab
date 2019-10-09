@@ -132,7 +132,7 @@ describe('AlertWidget', () => {
     };
     createComponent(propsWithManyAlerts);
 
-    expect(findCurrentSettings().text()).toEqual('alert-label > 42, alert-label2 = 900');
+    expect(findCurrentSettings().text()).toEqual('2 alerts applied');
   });
 
   it('creates an alert with an appropriate handler', () => {
