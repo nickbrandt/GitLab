@@ -52,10 +52,16 @@ export const fetchChartData = ({ dispatch }, { endpoint, chart }) =>
 export const setActiveTab = ({ commit, state }, key) => {
   const { configData } = state;
 
-  const page = configData[key];
+  if (configData) {
+    const page = configData[key];
 
-  commit(types.SET_ACTIVE_TAB, key);
-  commit(types.SET_ACTIVE_PAGE, page);
+    if (page) {
+      commit(types.SET_ACTIVE_TAB, key);
+      commit(types.SET_ACTIVE_PAGE, page);
+    } else {
+      createFlash(__('The specified tab is invalid, please select another'));
+    }
+  }
 };
 
 export const initChartData = ({ commit }, store) => commit(types.INIT_CHART_DATA, store);

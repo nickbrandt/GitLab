@@ -38,7 +38,14 @@ export default {
       }
 
       if (!activeTab) {
-        this.setActiveTab(Object.keys(configData)[0]);
+        if (this.validSpecifiedTab()) {
+          this.setActiveTab(this.specifiedTab);
+        } else {
+          const defaultTab = Object.keys(configData)[0];
+
+          this.setActiveTab(defaultTab);
+          this.$router.replace(defaultTab);
+        }
       }
 
       return Object.keys(configData).map(key => ({
@@ -50,6 +57,9 @@ export default {
     configPresent() {
       return !this.configLoading && this.configData != null;
     },
+    specifiedTab() {
+      return this.$route.params.tabId;
+    },
   },
   mounted() {
     this.fetchConfigData(this.endpoint);
@@ -57,7 +67,15 @@ export default {
   methods: {
     ...mapActions('insights', ['fetchConfigData', 'setActiveTab']),
     onChangePage(page) {
-      this.setActiveTab(page);
+      if (this.validTab(page) && this.activeTab !== page) {
+        this.$router.push(page);
+      }
+    },
+    validSpecifiedTab() {
+      return this.specifiedTab && this.validTab(this.specifiedTab);
+    },
+    validTab(tab) {
+      return Object.prototype.hasOwnProperty.call(this.configData, tab);
     },
   },
 };

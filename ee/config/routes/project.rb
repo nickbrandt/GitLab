@@ -77,7 +77,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resource :insights, only: [:show] do
+      resource :insights, only: [:show], trailing_slash: true do
         collection do
           post :query
         end

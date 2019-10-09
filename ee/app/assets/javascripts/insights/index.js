@@ -1,23 +1,27 @@
 import Vue from 'vue';
 import Insights from './components/insights.vue';
+import createRouter from './insights_router';
 import store from './stores';
 
 export default () => {
   const el = document.querySelector('#js-insights-pane');
+  const { endpoint, queryEndpoint } = el.dataset;
+  const router = createRouter(endpoint);
 
   if (!el) return null;
 
   return new Vue({
     el,
     store,
+    router,
     components: {
       Insights,
     },
     render(createElement) {
       return createElement('insights', {
         props: {
-          endpoint: el.dataset.endpoint,
-          queryEndpoint: el.dataset.queryEndpoint,
+          endpoint,
+          queryEndpoint,
         },
       });
     },
