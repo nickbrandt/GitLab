@@ -83,10 +83,16 @@ shared_examples 'getting list of vulnerability findings' do
       project.add_developer(user)
     end
 
+    # Because fixture reports that power :ee_ci_job_artifact factory contain long report lists,
+    # we need to make sure that all occurrences for both SAST and Dependency Scanning are included in the response.
+    # That's why the page size is 40.
+    let(:pagination) { { per_page: 40 } }
+
     it 'returns all non-dismissed vulnerabilities' do
+      # all occurrences except one that was dismissed
       occurrence_count = (sast_report.occurrences.count + ds_report.occurrences.count - 1).to_s
 
-      get api(project_vulnerabilities_path, user), params: { per_page: 40 }
+      get api(project_vulnerabilities_path, user), params: pagination
 
       expect(response).to have_gitlab_http_status(200)
       expect(response).to include_pagination_headers
@@ -107,7 +113,7 @@ shared_examples 'getting list of vulnerability findings' do
 
     describe 'filtering' do
       it 'returns vulnerabilities with sast report_type' do
-        occurrence_count = (sast_report.occurrences.count - 1).to_s
+        occurrence_count = (sast_report.occurrences.count - 1).to_s # all SAST occurrences except one that was dismissed
 
         get api(project_vulnerabilities_path, user), params: { report_type: 'sast' }
 
@@ -147,7 +153,7 @@ shared_examples 'getting list of vulnerability findings' do
       it 'returns dismissed vulnerabilities with `all` scope' do
         occurrence_count = (sast_report.occurrences.count + ds_report.occurrences.count).to_s
 
-        get api(project_vulnerabilities_path, user), params: { per_page: 40, scope: 'all' }
+        get api(project_vulnerabilities_path, user), params: { scope: 'all' }.merge(pagination)
 
         expect(response).to have_gitlab_http_status(200)
 
@@ -155,7 +161,7 @@ shared_examples 'getting list of vulnerability findings' do
       end
 
       it 'returns vulnerabilities with low severity' do
-        get api(project_vulnerabilities_path, user), params: { per_page: 40, severity: 'low' }
+        get api(project_vulnerabilities_path, user), params: { severity: 'low' }.merge(pagination)
 
         expect(response).to have_gitlab_http_status(200)
 
@@ -169,7 +175,7 @@ shared_examples 'getting list of vulnerability findings' do
       end
 
       it 'returns vulnerabilities with high confidence' do
-        get api(project_vulnerabilities_path, user), params: { per_page: 40, confidence: 'high' }
+        get api(project_vulnerabilities_path, user), params: { confidence: 'high' }.merge(pagination)
 
         expect(response).to have_gitlab_http_status(200)
 
@@ -186,7 +192,7 @@ shared_examples 'getting list of vulnerability findings' do
         it 'returns vulnerabilities from supplied pipeline' do
           occurrence_count = (sast_report.occurrences.count + ds_report.occurrences.count - 1).to_s
 
-          get api(project_vulnerabilities_path, user), params: { per_page: 40, pipeline_id: pipeline.id }
+          get api(project_vulnerabilities_path, user), params: { pipeline_id: pipeline.id }.merge(pagination)
 
           expect(response).to have_gitlab_http_status(200)
 
@@ -195,7 +201,7 @@ shared_examples 'getting list of vulnerability findings' do
 
         context 'pipeline has no reports' do
           it 'returns empty results' do
-            get api(project_vulnerabilities_path, user), params: { per_page: 40, pipeline_id: pipeline_without_vulnerabilities.id }
+            get api(project_vulnerabilities_path, user), params: { pipeline_id: pipeline_without_vulnerabilities.id }.merge(pagination)
 
             expect(json_response).to eq []
           end
@@ -203,7 +209,7 @@ shared_examples 'getting list of vulnerability findings' do
 
         context 'with unknown pipeline' do
           it 'returns empty results' do
-            get api(project_vulnerabilities_path, user), params: { per_page: 40, pipeline_id: 0 }
+            get api(project_vulnerabilities_path, user), params: { pipeline_id: 0 }.merge(pagination)
 
             expect(json_response).to eq []
           end
