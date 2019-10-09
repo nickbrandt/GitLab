@@ -1,0 +1,5 @@
+---
+title: Scoped labels do not remove old label in board sidebar
+merge_request: 18313
+author:
+type: fixed
