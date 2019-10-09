@@ -29,30 +29,34 @@ describe Gitlab::BackgroundMigration::PopulateAnyApprovalRuleForMergeRequests, :
 
     # Test filtering already migrated rows
     create_merge_request(4, approvals_before_merge: 3)
-    approval_merge_request_rules.create(id: 3,
+    approval_merge_request_rules.create(id: 4,
       merge_request_id: 4, approvals_required: 3, rule_type: 4, name: ApprovalRuleLike::ALL_MEMBERS)
 
     # Test filtering MRs with existing rules
     create_merge_request(5, approvals_before_merge: 3)
-    approval_merge_request_rules.create(id: 4,
+    approval_merge_request_rules.create(id: 5,
       merge_request_id: 5, approvals_required: 3, rule_type: 1, name: 'Regular rules')
 
     create_merge_request(6, approvals_before_merge: 5)
 
     # Test filtering rows with zero approvals_before_merge column
     create_merge_request(7, approvals_before_merge: 0)
+
+    # Test rows with too big approvals_before_merge value
+    create_merge_request(8, approvals_before_merge: 2**30)
   end
 
   describe '#perform' do
     it 'creates approval_merge_request_rules rows according to merge_requests' do
-      expect { subject.perform(1, 7) }.to change(ApprovalMergeRequestRule, :count).by(2)
+      expect { subject.perform(1, 8) }.to change(ApprovalMergeRequestRule, :count).by(3)
 
       created_rows = [
         { 'merge_request_id' => 2, 'approvals_required' => 2 },
         { 'merge_request_id' => 6, 'approvals_required' => 5 }
       ]
       existing_rows = [
-        { 'merge_request_id' => 4, 'approvals_required' => 3 }
+        { 'merge_request_id' => 4, 'approvals_required' => 3 },
+        { 'merge_request_id' => 8, 'approvals_required' => 2**15 - 1 }
       ]
 
       rows = approval_merge_request_rules.where(rule_type: 4).order(:id).map do |row|
