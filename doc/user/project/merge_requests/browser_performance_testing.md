@@ -155,7 +155,7 @@ stages:
   - performance
 
 include:
-  template: Browser-Performance.gitlab-ci.yml
+  template: Verify/Browser-Performance.gitlab-ci.yml
 
 review:
   stage: deploy
