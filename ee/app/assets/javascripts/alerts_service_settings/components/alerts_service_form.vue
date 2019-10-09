@@ -8,7 +8,7 @@ import { s__, __, sprintf } from '~/locale';
 import createFlash from '~/flash';
 
 export default {
-  COPY_TO_CLIPBOARD: __('Copy to clipboard'),
+  COPY_TO_CLIPBOARD: __('Copy'),
   RESET_KEY: __('Reset key'),
   components: {
     GlButton,
