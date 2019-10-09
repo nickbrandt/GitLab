@@ -4130,6 +4130,9 @@ msgstr ""
 msgid "Configure limits for web and API requests."
 msgstr ""
 
+msgid "Configure limits on the number of inbound alerts able to be sent to a project."
+msgstr ""
+
 msgid "Configure paths to be protected by Rack Attack. A web server restart is required after changing these settings."
 msgstr ""
 
@@ -5746,6 +5749,9 @@ msgid "Enable Auto DevOps"
 msgstr ""
 
 msgid "Enable HTML emails"
+msgstr ""
+
+msgid "Enable Incident Management inbound alert limit"
 msgstr ""
 
 msgid "Enable Pseudonymizer data collection"
@@ -8252,6 +8258,9 @@ msgstr ""
 msgid "Helps prevent bots from creating accounts."
 msgstr ""
 
+msgid "Helps reduce alert volume (e.g. if creating too many issues)"
+msgstr ""
+
 msgid "Helps reduce request volume for protected paths"
 msgstr ""
 
@@ -8594,6 +8603,9 @@ msgid "In order to gather accurate feature usage data, it can take 1 to 2 weeks 
 msgstr ""
 
 msgid "In the next step, you'll be able to select the projects you want to import."
+msgstr ""
+
+msgid "Incident Management Limits"
 msgstr ""
 
 msgid "Incidents"
