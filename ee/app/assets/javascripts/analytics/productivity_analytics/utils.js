@@ -1,5 +1,8 @@
+import _ from 'underscore';
+import dateFormat from 'dateformat';
 import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
 import { median } from '~/lib/utils/number_utils';
+import { dateFormats } from '../shared/constants';
 
 /**
  * Gets the labels endpoint for a given group or project
@@ -120,6 +123,45 @@ export const getScatterPlotData = (data, dateInPast) =>
     .sort((a, b) => new Date(a[0]) - new Date(b[0]));
 
 /**
+ * Brings the data the we receive from transformScatterData into a format that can be passed to the chart.
+ * Since transformScatterData contains more data than we actually want to display on the scatterplot
+ * (it also contains historical data for median computation), we need to extract only the relevant portion of data.
+ * First, this method computes the visibleData based on the number of days between startDate and the endDate.
+ * Eventually it flattens the data an returns an array of the following structure:
+ * [
+ *  ['2019-09-02', 7, '2019-09-02T16:21:29.512Z'],
+ *  ['2019-09-03', 10, '2019-09-03T04:55:05.757Z'],
+ *  ['2019-09-03', 8, '2019-09-03T12:00:01.432Z'],
+ *  ...
+ * ]
+ *
+ * In the data above, each array i represents an MR in the scatterplot with the following data:
+ * i[0] = date, displayed on x axis
+ * i[1] = metric, displayed on y axis
+ * i[2] = datetime, used in the tooltip
+ *
+ * @param {*} data - The already transformed scatterplot data (which is computed by transformScatterData)
+ * @param {*} startDate - The start date selected by the user
+ * @param {*} endDate - The end date selected by the user
+ * @returns {Array} An array with each item being another arry of two items (date, computed median)
+ */
+export const getScatterPlotDataNew = (data, startDate, endDate) => {
+  if (!data.length) return [];
+
+  const startIndex = data.length - 1 - getDayDifference(startDate, endDate);
+  const visibleData = data.slice(startIndex);
+
+  // group by date
+  const result = _.flatten(visibleData).map(item => [
+    dateFormat(item.merged_at, dateFormats.isoDate),
+    item.metric,
+    item.merged_at,
+  ]);
+
+  return result;
+};
+
+/**
  * Computes the moving median line data.
  * It takes the raw data object (which contains historical data) and the scatterData (from getScatterPlotData)
  * and computes the median for every date in scatterData.
@@ -151,3 +193,47 @@ export const getMedianLineData = (data, scatterData, daysOffset) =>
     const computedMedian = values.length ? median(values) : 0;
     return [dateString, computedMedian];
   });
+
+/**
+ * Computes the moving median line data, i.e, it computes the 30 day rolling median for every item displayd on the scatterplot
+ * For example the 30 day rolling median for startDate=2019-09-01 and endDate=2019-09-03 is computed as follows:
+ * First we get the number of days between start and end date.
+ * Then, we make sure to simplify our data by only storing an array of the metric values (without other meta info) every datebundleRenderer.renderToStream
+ * Finally, for every day i between start and end date, we compute the median of all the metric values for that given day i
+ *
+ * Example: Rolling median for m days:
+ * Calculate median for day i: median[i - m + 1 ... i]
+ *
+ * @param {*} data - The already transformed scatterplot data (which is computed by transformScatterData)
+ * @param {*} startDate - The start date selected by the user
+ * @param {*} endDate - The end date selected by the user
+ * @param {Number} daysOffset The number of days that to look up data in the past (e.g. 30 days in the past for 30 day rolling median)
+ * @returns {Array} An array with each item being another arry of two items (date, computed median)
+ */
+export const getMedianLineDataNew = (data, startDate, endDate, daysOffset) => {
+  const result = [];
+  const dayDiff = getDayDifference(startDate, endDate);
+  const transformedData = data.map(arr => arr.map(x => x.metric));
+  const len = data.length;
+
+  let i = len - dayDiff;
+  let medianData;
+  let flattenedData;
+  let startIndex;
+  let d;
+
+  while (i <= len) {
+    startIndex = i - daysOffset - 1;
+    if (transformedData[startIndex] && transformedData[i - 1]) {
+      medianData = transformedData.slice(startIndex, i);
+      flattenedData = _.flatten(medianData);
+      if (flattenedData.length) {
+        d = getDateInPast(endDate, len - i);
+        result.push([dateFormat(d, dateFormats.isoDate), median(flattenedData)]);
+      }
+    }
+    i += 1;
+  }
+
+  return result;
+};
