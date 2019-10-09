@@ -54,7 +54,7 @@ module API
           project = find_project!(
             ::Gitlab::Jira::Dvcs.restore_full_path(params.slice(:namespace, :project).symbolize_keys)
           )
-          not_found! unless licensed_project?(project)
+          not_found! unless licensed?(project)
           project
         end
 
@@ -62,7 +62,7 @@ module API
         def find_merge_requests
           merge_requests = authorized_merge_requests.reorder(updated_at: :desc).preload(:target_project)
           merge_requests = paginate(merge_requests)
-          merge_requests.select { |mr| licensed_project?(mr.target_project) }
+          merge_requests.select { |mr| licensed?(mr.target_project) }
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
@@ -87,8 +87,8 @@ module API
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
-        def licensed_project?(project)
-          project.feature_available?(JIRA_DEV_PANEL_FEATURE)
+        def licensed?(routable)
+          routable.feature_available?(JIRA_DEV_PANEL_FEATURE)
         end
       end
 
@@ -111,15 +111,16 @@ module API
 
         get ':namespace/repos' do
           namespace = Namespace.find_by_full_path(params[:namespace])
-          not_found!('Namespace') unless namespace
+          not_found!('Namespace') unless namespace && licensed?(namespace)
 
           projects = Project.public_or_visible_to_user(current_user)
                             .in_namespace(namespace.self_and_descendants)
-                            .to_a
-          projects.select! { |project| licensed_project?(project) }
-          projects = ::Kaminari.paginate_array(projects)
+                            .eager_load_namespace_and_owner
+                            .with_route
 
-          present paginate(projects), with: ::API::Github::Entities::Repository
+          present paginate(projects),
+                  with: ::API::Github::Entities::Repository,
+                  root_namespace: namespace.root_ancestor
         end
 
         get ':username' do
