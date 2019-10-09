@@ -7,7 +7,7 @@ describe Security::VulnerabilitiesFinder do
 
   subject { described_class.new(project).execute }
 
-  it 'returns vulnerabilities of a project and respects pagination params' do
+  it 'returns vulnerabilities of a project' do
     expect(subject).to match_array(project.vulnerabilities)
   end
 end
