@@ -61,9 +61,9 @@ module Projects
 
         metadata << list_item('Start time', starts_at) if starts_at
         metadata << list_item('full_query', backtick(full_query)) if full_query
-        metadata << list_item('Service', service) if service
-        metadata << list_item('Monitoring Tool', monitoring_tool) if monitoring_tool
-        metadata << list_item('Hosts', hosts.join(' ')) if hosts
+        metadata << list_item(service.label.humanize, service.value) if service
+        metadata << list_item(monitoring_tool.label.humanize, monitoring_tool.value) if monitoring_tool
+        metadata << list_item(hosts.label.humanize, host_links.join(' ')) if hosts
 
         metadata.join(MARKDOWN_LINE_BREAK)
       end
@@ -100,18 +100,14 @@ module Projects
         "[#{title}](#{url})"
       end
 
-      def service
-        annotations.find { |a| a.label == 'service' }.try(:value)
-      end
-
-      def monitoring_tool
-        annotations.find { |a| a.label == 'monitoring_tool' }.try(:value)
-      end
-
-      def hosts
-        if value = annotations.find { |a| a.label == 'hosts' }.try(:value)
-          Array(value).map { |host| markdown_link(host, host) }
+      GENERIC_ALERT_SUMMARY_ANNOTATIONS.each do |annotation_name|
+        define_method(annotation_name) do
+          annotations.find { |a| a.label == annotation_name }
         end
+      end
+
+      def host_links
+        Array(hosts.value).map { |host| markdown_link(host, host) }
       end
     end
   end
