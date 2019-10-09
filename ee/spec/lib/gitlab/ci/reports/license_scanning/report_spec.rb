@@ -68,4 +68,13 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
     it { expect(empty_report).to be_empty }
     it { expect(completed_report).not_to be_empty }
   end
+
+  describe ".parse_from" do
+    context "when parsing a v1 report" do
+      subject { described_class.parse_from(v1_json) }
+      let(:v1_json) { fixture_file('security_reports/master/gl-license-management-report.json', dir: 'ee') }
+
+      specify { expect(subject.licenses.count).to eq(4) }
+    end
+  end
 end

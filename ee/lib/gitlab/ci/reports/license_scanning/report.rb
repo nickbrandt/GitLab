@@ -49,6 +49,12 @@ module Gitlab
             found_licenses.empty?
           end
 
+          def self.parse_from(json)
+            new.tap do |report|
+              ::Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning.new.parse!(json, report)
+            end
+          end
+
           private
 
           def canonicalize(name)
