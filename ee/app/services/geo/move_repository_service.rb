@@ -30,8 +30,6 @@ module Geo
     private
 
     def move_repositories!
-      project.ensure_storage_path_exists
-
       unless move_project_repository
         log_error('Repository cannot be moved')
         return false
