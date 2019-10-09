@@ -2,7 +2,7 @@
 
 class Groups::Security::VulnerabilitiesController < Groups::ApplicationController
   include SecurityDashboardsPermissions
-  include VulnerabilitiesActions
+  include VulnerabilityFindingsActions
 
   alias_method :vulnerable, :group
 
