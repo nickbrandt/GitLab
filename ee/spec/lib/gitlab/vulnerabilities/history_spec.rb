@@ -13,8 +13,8 @@ describe Gitlab::Vulnerabilities::History do
     create_vulnerabilities(2, project2, { severity: :high, report_type: :sast })
   end
 
-  describe '#vulnerabilities_counter', :use_clean_rails_memory_store_caching do
-    subject(:counter) { described_class.new(group, filters).vulnerabilities_counter }
+  describe '#findings_counter', :use_clean_rails_memory_store_caching do
+    subject(:counter) { described_class.new(group, filters).findings_counter }
 
     context 'feature disabled' do
       before do
