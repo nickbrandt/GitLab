@@ -16,6 +16,8 @@ and they will assist you with any issues you are having.
 
 ## Other GitLab PostgreSQL documentation
 
+This section is for links to information elsewhere in the GitLab documentation.
+
 ### Procedures
 
 - [Connect to the PostgreSQL console.](https://docs.gitlab.com/omnibus/settings/database.html#connecting-to-the-bundled-postgresql-database)
@@ -86,3 +88,59 @@ PANIC: could not write to file ‘pg_xlog/xlogtemp.123’: No space left on devi
   - checking and fixing user/password mappings
 
 - [Common GEO errors](/ee/administration/geo/replication/troubleshooting.html#fixing-common-errors)
+
+## Support topics
+
+### Database deadlocks
+
+References:
+
+- [Issue #1 Deadlocks with GitLab 12.1, PostgreSQL 10.7](https://gitlab.com/gitlab-org/gitlab/issues/30528)
+- [Customer ticket (internal) GitLab 12.1.6](https://gitlab.zendesk.com/agent/tickets/134307) and [google doc (internal)](https://docs.google.com/document/d/19xw2d_D1ChLiU-MO1QzWab-4-QXgsIUcN5e_04WTKy4)
+- [Issue #2 deadlocks can occur if an instance is flooded with pushes](https://gitlab.com/gitlab-org/gitlab/issues/33650). Provided for context about how GitLab code can have this sort of unanticipated effect in unusual situations.
+
+```
+ERROR: deadlock detected
+```
+
+Three applicable timeouts are identified in the issue #1; our recommended settings are as follows:
+
+```
+deadlock_timeout = 5s
+statement_timeout = 15s
+idle_in_transaction_session_timeout = 60s
+```
+
+Quoting from from issue #1:
+
+> "If a deadlock is hit, and we resolve it through aborting the transaction after a short period, then the retry mechanisms we already have will make the deadlocked piece of work try again, and it's unlikely we'll deadlock multiple times in a row."
+
+TIP: **Tip:** In support, our general approach to reconfiguring timeouts (applies also to the HTTP stack as well) is that it's acceptable to do it temporarily as a workaround. If it makes GitLab usable for the customer, then it buys time to understand the problem more completely, implement a hot fix, or make some other change that addresses the root cause. Generally, the timeouts should be put back to reasonable defaults once the root cause is resolved.
+
+In this case, the guidance we had from development was to drop deadlock_timeout and/or statement_timeout but to leave the third setting at 60s. Setting idle_in_transaction protects the database from sessions potentially hanging for days. There's more discussion in [the issue relating to introducing this timeout on gitlab.com.](https://gitlab.com/gitlab-com/gl-infra/production/issues/1053)
+
+PostgresSQL defaults:
+
+- statement_timeout = 0 (never)
+- idle_in_transaction_session_timeout = 0 (never)
+
+Comments in issue #1 indicate that these should both be set to at least a number of minutes for all Omnibus installations (so they don't hang indefinitely). However, 15s for statement_timeout is very short, and will only be effective if the underlying infrastructure is very performant.
+
+See current settings with:
+
+```
+sudo gitlab-rails runner "c = ApplicationRecord.connection ; puts c.execute('SHOW statement_timeout').to_a ;
+puts c.execute('SHOW lock_timeout').to_a ;
+puts c.execute('SHOW idle_in_transaction_session_timeout').to_a ;"
+```
+
+It may take a little while to respond.
+
+```
+{"statement_timeout"=>"1min"}
+{"lock_timeout"=>"0"}
+{"idle_in_transaction_session_timeout"=>"1min"}
+```
+
+NOTE: **Note:**
+These are Omnibus settings. If an external database, such as a customer's PostgreSQL installation or Amazon RDS is being used, these values don't get set, and would have to be set externally.
