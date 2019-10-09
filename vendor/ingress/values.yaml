@@ -10,5 +10,3 @@ controller:
 
 rbac:
   create: false
-  createRole: false
-  createClusterRole: false
