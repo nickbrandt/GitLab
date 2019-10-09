@@ -3,7 +3,7 @@
 module Gitlab
   module Ci
     module Reports
-      module LicenseManagement
+      module LicenseScanning
         class ReportsComparer
           include Gitlab::Utils::StrongMemoize
 

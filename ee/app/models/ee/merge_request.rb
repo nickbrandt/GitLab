@@ -159,7 +159,7 @@ module EE
         return { status: :error, status_reason: 'This merge request does not have license management reports' }
       end
 
-      compare_reports(::Ci::CompareLicenseManagementReportsService, current_user)
+      compare_reports(::Ci::CompareLicenseScanningReportsService, current_user)
     end
 
     def has_metrics_reports?

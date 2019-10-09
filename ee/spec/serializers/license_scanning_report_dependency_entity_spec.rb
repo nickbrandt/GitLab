@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-describe LicenseManagementReportDependencyEntity do
-  include LicenseManagementReportHelper
+describe LicenseScanningReportDependencyEntity do
+  include LicenseScanningReportHelper
 
   let(:dependency) { create_dependency }
   let(:entity) { described_class.new(dependency) }

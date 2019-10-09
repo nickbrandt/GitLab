@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-describe LicenseManagementReportLicenseEntity do
-  include LicenseManagementReportHelper
+describe LicenseScanningReportLicenseEntity do
+  include LicenseScanningReportHelper
 
   let(:user) { build(:user) }
   let(:project) { build(:project, :repository) }

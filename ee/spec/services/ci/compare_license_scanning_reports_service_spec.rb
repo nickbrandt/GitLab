@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::CompareLicenseManagementReportsService do
+describe Ci::CompareLicenseScanningReportsService do
   let(:current_user) { project.users.take }
   let(:service) { described_class.new(project, current_user) }
   let(:project) { create(:project, :repository) }
@@ -14,7 +14,7 @@ describe Ci::CompareLicenseManagementReportsService do
   describe '#execute' do
     subject { service.execute(base_pipeline, head_pipeline) }
 
-    context 'when head pipeline has license management reports' do
+    context 'when head pipeline has license scanning reports' do
       let!(:base_pipeline) { nil }
       let!(:head_pipeline) { create(:ee_ci_pipeline, :with_license_management_report, project: project) }
 
@@ -49,7 +49,7 @@ describe Ci::CompareLicenseManagementReportsService do
       end
     end
 
-    context 'when head pipeline has corrupted license management reports' do
+    context 'when head pipeline has corrupted license scanning reports' do
       let!(:base_pipeline) { create(:ee_ci_pipeline, :with_corrupted_license_management_report, project: project) }
       let!(:head_pipeline) { create(:ee_ci_pipeline, :with_corrupted_license_management_report, project: project) }
 
