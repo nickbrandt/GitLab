@@ -3159,6 +3159,7 @@ ActiveRecord::Schema.define(version: 2019_10_16_072826) do
     t.binary "commit_to"
     t.text "ref"
     t.string "commit_title", limit: 70
+    t.integer "ref_count"
     t.index ["event_id"], name: "index_push_event_payloads_on_event_id", unique: true
   end
 
