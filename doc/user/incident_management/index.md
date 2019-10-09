@@ -43,7 +43,7 @@ GitLab Issues can automatically be created as a result of an Alert notification.
 #### Issue templates
 
 You can create your own Issue Templates than can be used within Incident Management.
-To read how to create your own templates visit the [*Creating Issue Templates page*](../project/description_templates#creating-issue-templates).
+To read how to create your own templates visit the [*Creating Issue Templates page*](../project/description_templates.md#creating-issue-templates).
 
 To select your Issue Template for use within Incident Management, head to Project -> Settings -> Operations -> Incidents and select it under **Issue Template**.
 
@@ -51,12 +51,12 @@ To select your Issue Template for use within Incident Management, head to Projec
 
 #### GitLab hosted metrics
 
-You can embed metrics that are served by GitLab by following [these instructions](../project/integrations/prometheus#embedding-metric-charts-within-gitlab-flavored-markdown).
+You can embed metrics that are served by GitLab by following [these instructions](../project/integrations/prometheus.md#embedding-metric-charts-within-gitlab-flavored-markdown).
 Including links to embedded metrics in issues templates
 
 #### Grafana metrics
 
-You can embed externally hosted Grafana metrics into GitLab issues by following [these instructions](user/project/integrations/prometheus#embedding-live-grafana-charts).
+You can embed externally hosted Grafana metrics into GitLab issues by following [these instructions](../project/integrations/prometheus.md#embedding-live-grafana-charts).
 
 #### Metrics in issue templates
 
@@ -68,11 +68,11 @@ Slack slash commands allow you to control GitLab and view content right inside S
 
 #### Setting it up
 
-To setup Slack slash commands with GitLab, see [this guide](../project/integrations/slack_slash_commands).
+To setup Slack slash commands with GitLab, see [this guide](../project/integrations/slack_slash_commands.md).
 
 #### Slash commands
 
-Examples of Slash commands and how to use them can be [found here](../../integration/slash_commands).
+Examples of Slash commands and how to use them can be [found here](../../integration/slash_commands.md).
 
 ### Zoom in Issues
 
