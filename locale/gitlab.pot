@@ -14207,6 +14207,12 @@ msgstr ""
 msgid "SecurityDashboard|Project"
 msgstr ""
 
+msgid "SecurityDashboard|Projects added"
+msgstr ""
+
+msgid "SecurityDashboard|Remove project from dashboard"
+msgstr ""
+
 msgid "SecurityDashboard|Report type"
 msgstr ""
 
@@ -14214,6 +14220,9 @@ msgid "SecurityDashboard|Return to dashboard"
 msgstr ""
 
 msgid "SecurityDashboard|Security Dashboard"
+msgstr ""
+
+msgid "SecurityDashboard|Select a project to add by using the project search field above."
 msgstr ""
 
 msgid "SecurityDashboard|Severity"
