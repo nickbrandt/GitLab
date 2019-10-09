@@ -2,7 +2,7 @@
 
 # Security::VulnerabilitiesFinder
 #
-# Used to filter Vulnerability record by set of params for Vulnerabilities API
+# Used to filter Vulnerability records by set of params for Vulnerabilities API
 #
 # Arguments:
 #   project: a Project to query for Vulnerabilities
