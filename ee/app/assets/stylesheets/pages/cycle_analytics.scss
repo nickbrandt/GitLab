@@ -1,0 +1,16 @@
+.gl-daterange-picker {
+  .gl-datepicker-input {
+    width: 140px;
+
+    @include media-breakpoint-down(md) {
+      width: 100%;
+    }
+  }
+
+  label {
+    @include media-breakpoint-up(lg) {
+      margin-bottom: 0;
+      margin-right: $gl-padding-4;
+    }
+  }
+}

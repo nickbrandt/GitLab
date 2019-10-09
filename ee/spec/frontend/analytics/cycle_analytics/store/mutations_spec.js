@@ -13,6 +13,8 @@ import {
   reviewStage,
   productionStage,
   groupLabels,
+  startDate,
+  endDate,
 } from '../mock_data';
 
 let state = null;
@@ -45,13 +47,13 @@ describe('Cycle analytics mutations', () => {
   });
 
   it.each`
-    mutation                                   | payload                 | expectedState
-    ${types.SET_CYCLE_ANALYTICS_DATA_ENDPOINT} | ${'cool-beans'}         | ${{ endpoints: { cycleAnalyticsData: '/groups/cool-beans/-/cycle_analytics' } }}
-    ${types.SET_STAGE_DATA_ENDPOINT}           | ${'rad-stage'}          | ${{ endpoints: { stageData: '/fake/api/events/rad-stage.json' } }}
-    ${types.SET_SELECTED_GROUP}                | ${'cool-beans'}         | ${{ selectedGroup: 'cool-beans', selectedProjectIds: [] }}
-    ${types.SET_SELECTED_PROJECTS}             | ${[606, 707, 808, 909]} | ${{ selectedProjectIds: [606, 707, 808, 909] }}
-    ${types.SET_SELECTED_TIMEFRAME}            | ${60}                   | ${{ dataTimeframe: 60 }}
-    ${types.SET_SELECTED_STAGE_NAME}           | ${'first-stage'}        | ${{ selectedStageName: 'first-stage' }}
+    mutation                                   | payload                   | expectedState
+    ${types.SET_CYCLE_ANALYTICS_DATA_ENDPOINT} | ${'cool-beans'}           | ${{ endpoints: { cycleAnalyticsData: '/groups/cool-beans/-/cycle_analytics' } }}
+    ${types.SET_STAGE_DATA_ENDPOINT}           | ${'rad-stage'}            | ${{ endpoints: { stageData: '/fake/api/events/rad-stage.json' } }}
+    ${types.SET_SELECTED_GROUP}                | ${'cool-beans'}           | ${{ selectedGroup: 'cool-beans', selectedProjectIds: [] }}
+    ${types.SET_SELECTED_PROJECTS}             | ${[606, 707, 808, 909]}   | ${{ selectedProjectIds: [606, 707, 808, 909] }}
+    ${types.SET_DATE_RANGE}                    | ${{ startDate, endDate }} | ${{ startDate, endDate }}
+    ${types.SET_SELECTED_STAGE_NAME}           | ${'first-stage'}          | ${{ selectedStageName: 'first-stage' }}
   `(
     '$mutation with payload $payload will update state with $expectedState',
     ({ mutation, payload, expectedState }) => {

@@ -1,12 +1,12 @@
 <script>
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlDaterangePicker } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { PROJECTS_PER_PAGE } from '../constants';
+import { PROJECTS_PER_PAGE, DEFAULT_DAYS_IN_PAST } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
-import DateRangeDropdown from '../../shared/components/date_range_dropdown.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
 
@@ -16,9 +16,9 @@ export default {
     GlEmptyState,
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
-    DateRangeDropdown,
     SummaryTable,
     StageTable,
+    GlDaterangePicker,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -61,11 +61,12 @@ export default {
       'selectedStageName',
       'stages',
       'summary',
-      'dataTimeframe',
       'labels',
       'currentStageEvents',
       'customStageFormEvents',
       'errorCode',
+      'startDate',
+      'endDate',
     ]),
     ...mapGetters(['currentStage', 'defaultStage', 'hasNoAccessError', 'currentGroupPath']),
     shouldRenderEmptyState() {
@@ -77,6 +78,17 @@ export default {
     shouldDisplayFilters() {
       return this.selectedGroup && !this.errorCode;
     },
+    dateRange: {
+      get() {
+        return { startDate: this.startDate, endDate: this.endDate };
+      },
+      set({ startDate, endDate }) {
+        this.setDateRange({ startDate, endDate });
+      },
+    },
+  },
+  mounted() {
+    this.initDateRange();
   },
   methods: {
     ...mapActions([
@@ -88,8 +100,10 @@ export default {
       'setSelectedGroup',
       'setSelectedProjects',
       'setSelectedTimeframe',
+      'fetchStageData',
       'setSelectedStageName',
       'hideCustomStageForm',
+      'setDateRange',
     ]),
     onGroupSelect(group) {
       this.setCycleAnalyticsDataEndpoint(group.path);
@@ -101,10 +115,6 @@ export default {
       this.setSelectedProjects(projectIds);
       this.fetchCycleAnalyticsData();
     },
-    onTimeframeSelect(days) {
-      this.setSelectedTimeframe(days);
-      this.fetchCycleAnalyticsData();
-    },
     onStageSelect(stage) {
       this.hideCustomStageForm();
       this.setSelectedStageName(stage.name);
@@ -113,6 +123,11 @@ export default {
     },
     onShowAddStageForm() {
       this.fetchCustomStageFormData(this.currentGroupPath);
+    },
+    initDateRange() {
+      const endDate = new Date(Date.now());
+      const startDate = new Date(getDateInPast(endDate, DEFAULT_DAYS_IN_PAST));
+      this.setDateRange({ skipFetch: true, startDate, endDate });
     },
   },
 };
@@ -145,12 +160,14 @@ export default {
           v-if="shouldDisplayFilters"
           class="ml-0 ml-md-auto mt-2 mt-md-0 d-flex flex-column flex-md-row align-items-md-center justify-content-md-end"
         >
-          <label class="text-bold mb-0 mr-1">{{ __('Timeframe') }}</label>
-          <date-range-dropdown
-            class="js-timeframe-filter"
-            :available-days-in-past="dateOptions"
-            :default-selected="dataTimeframe"
-            @selected="onTimeframeSelect"
+          <gl-daterange-picker
+            v-model="dateRange"
+            class="d-flex flex-column flex-lg-row js-daterange-picker"
+            :default-start-date="startDate"
+            :default-end-date="endDate"
+            start-picker-class="d-flex flex-column flex-lg-row align-items-lg-center mr-lg-2"
+            end-picker-class="d-flex flex-column flex-lg-row align-items-lg-center"
+            theme="animate-picker"
           />
         </div>
       </div>

@@ -47,7 +47,7 @@ describe 'Group Cycle Analytics', :js do
     end
 
     it 'shows the date filter' do
-      expect(page).to have_selector('.js-timeframe-filter', visible: true)
+      expect(page).to have_selector('.js-daterange-picker', visible: true)
     end
   end
 
