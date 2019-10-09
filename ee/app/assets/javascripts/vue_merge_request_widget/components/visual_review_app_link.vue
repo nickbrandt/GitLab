@@ -132,7 +132,14 @@ export default {
       ok-variant="success"
     >
       <template slot="modal-ok">
-        <a :href="link" target="_blank" rel="noopener noreferrer nofollow" class="text-white">
+        <a
+          :href="link"
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          class="text-white js-review-app-link"
+          data-track-event="open_review_app"
+          data-track-label="review_app"
+        >
           {{ s__('VisualReviewApp|Open review app') }}
           <icon class="fwhite" name="external-link" />
         </a>
