@@ -258,6 +258,13 @@
       }
     }
   }
+
+  .file-editor {
+    .ace_line a {
+      pointer-events: auto;
+      color: inherit;
+    }
+  }
 }
 
 span.idiff {
