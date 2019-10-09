@@ -20,3 +20,7 @@ GitLab will try match to clusters in the following order:
 
 To be selected, the cluster must be enabled and
 match the [environment selector](../../../ci/environments.md#scoping-environments-with-specs).
+
+## Cluster environments **(PREMIUM)**
+
+Please see the documentation for [cluster environments](../../clusters/environments.md).
