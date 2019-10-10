@@ -91,38 +91,6 @@ export const transformScatterData = (data, startDate, endDate) => {
 };
 
 /**
- * Transforms a given data object into an array
- * which will be used as series data for the scatterplot chart.
- * It eliminates items which were merged before a "dateInPast" and sorts
- * the result by date (ascending)
- *
- * Takes an object of the form
- * {
- *   "1": { "metric": 138", merged_at": "2019-07-09T14:58:07.756Z" },
- *   "2": { "metric": 139, "merged_at": "2019-07-10T11:13:23.557Z" },
- *   "3": { "metric": 24, "merged_at": "2019-07-01T07:06:23.193Z" }
- * }
- *
- * and creates the following two-dimensional array
- * where the first value is the "merged_at" date and the second value is the metric:
- *
- * [
- *   ["2019-07-01T07:06:23.193Z", 24],
- *   ["2019-07-09T14:58:07.756Z", 138],
- *   ["2019-07-10T11:13:23.557Z", 139],
- * ]
- *
- * @param {Object} data The raw data which will be transformed
- * @param {Date} dateInPast Date in the past
- * @returns {Array} The transformed data array sorted by date ascending
- */
-export const getScatterPlotData = (data, dateInPast) =>
-  Object.keys(data)
-    .filter(key => new Date(data[key].merged_at) >= dateInPast)
-    .map(key => [data[key].merged_at, data[key].metric])
-    .sort((a, b) => new Date(a[0]) - new Date(b[0]));
-
-/**
  * Brings the data the we receive from transformScatterData into a format that can be passed to the chart.
  * Since transformScatterData contains more data than we actually want to display on the scatterplot
  * (it also contains historical data for median computation), we need to extract only the relevant portion of data.
@@ -145,7 +113,7 @@ export const getScatterPlotData = (data, dateInPast) =>
  * @param {*} endDate - The end date selected by the user
  * @returns {Array} An array with each item being another arry of two items (date, computed median)
  */
-export const getScatterPlotDataNew = (data, startDate, endDate) => {
+export const getScatterPlotData = (data, startDate, endDate) => {
   if (!data.length) return [];
 
   const startIndex = data.length - 1 - getDayDifference(startDate, endDate);
@@ -160,39 +128,6 @@ export const getScatterPlotDataNew = (data, startDate, endDate) => {
 
   return result;
 };
-
-/**
- * Computes the moving median line data.
- * It takes the raw data object (which contains historical data) and the scatterData (from getScatterPlotData)
- * and computes the median for every date in scatterData.
- * The median for a given date in scatterData (called item) is computed by taking all metrics of the raw data into account
- * which are before (or eqaul to) the the item's merged_at date
- * and after (or equal to) the item's merged_at date minus a given "daysOffset" (e.g., 30 days for "30 day rolling median")
- *
- * i.e., moving median for a given DAY is the median the range of values (DAY-30 ... DAY)
- *
- * @param {Object} data The raw data which will be used for computing the median
- * @param {Array} scatterData The transformed data from getScatterPlotData
- * @param {Number} daysOffset The number of days that is substracted from each date in scatterData (e.g. 30 days in the past)
- * @returns {Array} An array with each item being another arry of two items (date, computed median)
- */
-export const getMedianLineData = (data, scatterData, daysOffset) =>
-  scatterData.map(item => {
-    const [dateString] = item;
-    const values = Object.keys(data)
-      .filter(key => {
-        const mergedAtDate = new Date(data[key].merged_at);
-        const itemDate = new Date(dateString);
-
-        return (
-          mergedAtDate <= itemDate && mergedAtDate >= new Date(getDateInPast(itemDate, daysOffset))
-        );
-      })
-      .map(key => data[key].metric);
-
-    const computedMedian = values.length ? median(values) : 0;
-    return [dateString, computedMedian];
-  });
 
 /**
  * Computes the moving median line data, i.e, it computes the 30 day rolling median for every item displayd on the scatterplot
@@ -210,7 +145,7 @@ export const getMedianLineData = (data, scatterData, daysOffset) =>
  * @param {Number} daysOffset The number of days that to look up data in the past (e.g. 30 days in the past for 30 day rolling median)
  * @returns {Array} An array with each item being another arry of two items (date, computed median)
  */
-export const getMedianLineDataNew = (data, startDate, endDate, daysOffset) => {
+export const getMedianLineData = (data, startDate, endDate, daysOffset) => {
   const result = [];
   const dayDiff = getDayDifference(startDate, endDate);
   const transformedData = data.map(arr => arr.map(x => x.metric));
