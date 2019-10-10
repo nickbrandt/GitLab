@@ -103,7 +103,7 @@ References:
 ERROR: deadlock detected
 ```
 
-Three applicable timeouts are identified in the issue #1; our recommended settings are as follows:
+Three applicable timeouts are identified in the issue [#1](https://gitlab.com/gitlab-org/gitlab/issues/30528); our recommended settings are as follows:
 
 ```
 deadlock_timeout = 5s
@@ -111,7 +111,7 @@ statement_timeout = 15s
 idle_in_transaction_session_timeout = 60s
 ```
 
-Quoting from from issue #1:
+Quoting from from issue [#1](https://gitlab.com/gitlab-org/gitlab/issues/30528):
 
 > "If a deadlock is hit, and we resolve it through aborting the transaction after a short period, then the retry mechanisms we already have will make the deadlocked piece of work try again, and it's unlikely we'll deadlock multiple times in a row."
 
@@ -124,7 +124,7 @@ PostgresSQL defaults:
 - statement_timeout = 0 (never)
 - idle_in_transaction_session_timeout = 0 (never)
 
-Comments in issue #1 indicate that these should both be set to at least a number of minutes for all Omnibus installations (so they don't hang indefinitely). However, 15s for statement_timeout is very short, and will only be effective if the underlying infrastructure is very performant.
+Comments in issue [#1](https://gitlab.com/gitlab-org/gitlab/issues/30528) indicate that these should both be set to at least a number of minutes for all Omnibus installations (so they don't hang indefinitely). However, 15s for statement_timeout is very short, and will only be effective if the underlying infrastructure is very performant.
 
 See current settings with:
 
