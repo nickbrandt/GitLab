@@ -2,7 +2,7 @@
 description: "GitLab - Incident Management. GitLab offers solutions for handling incidents in your applications and services"
 ---
 
-# Incident Management **(ULTIMATE)** (1)
+# Incident Management **(ULTIMATE)**
 
 <!--For pages on newly introduced features, add the following line. If only some aspects of the feature have been introduced, specify what parts of the feature.-->
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4925) in GitLab (Ultimate) 11.11.
@@ -13,28 +13,32 @@ GitLab offers solutions for handling incidents in your applications and services
 
 ### Alerting
 
+You can let GitLab know of alerts that may be triggering in your applications and services. GitLab can react to these by automatically creating Issues, and alerting developers via Email.
+
 #### Prometheus Alerts
 
 Prometheus alerts can be setup in both GitLab-managed Prometheus installs and self-managed Prometheus installs.
 
 Documentation for each method can be found here:
 
-- [GitLab-managed Prometheus](https://docs.gitlab.com/ee/user/project/integrations/prometheus.html#setting-up-alerts-for-prometheus-metrics-ultimate)
-- [Self-managed Prometheus](https://docs.gitlab.com/ee/user/project/integrations/prometheus.html#external-prometheus-instances)
+- [GitLab-managed Prometheus](../project/integrations/prometheus.html#setting-up-alerts-for-prometheus-metrics-ultimate)
+- [Self-managed Prometheus](../project/integrations/prometheus.html#external-prometheus-instances)
 
 #### Alert Endpoint
 
-Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
-
-#### Deduplication of alerts
+This generic alert endpoint allows you to send GitLab alert notifications via a Webhook.
 
 Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
 
-#### Recovery Alerts *
+#### Recovery Alerts
+
+GitLab can automatically close Issues that have been automatically created when we receive notification that the alert is resolved.
 
 Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
 
 ### Configuring Incidents
+
+Incident Management features can be easily enabled & disabled via the Project settings page. Head to Project -> Settings -> Operations -> Incidents.
 
 #### Auto-creation
 
@@ -48,6 +52,8 @@ To read how to create your own templates visit the [*Creating Issue Templates pa
 To select your Issue Template for use within Incident Management, head to Project -> Settings -> Operations -> Incidents and select it under **Issue Template**.
 
 ### Embedded metrics
+
+Metrics can be embedded anywhere where GitLab Markdown is used. This issues issues, merge requests and comments.
 
 #### GitLab hosted metrics
 
