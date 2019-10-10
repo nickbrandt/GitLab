@@ -1,13 +1,18 @@
 import { byLicenseNameComparator } from './store/utils';
 
-class V2ToV1Mapper {
-  mapFrom(report) {
-    this.licenseMap = V2ToV1Mapper.createLicenseMap(report.licenses);
-    this.licenses = report.licenses.sort(byLicenseNameComparator).map(V2ToV1Mapper.mapFromLicense);
+class V2Report {
+  constructor(report) {
+    this.report = report;
+    this.licenseMap = V2Report.createLicenseMap(report.licenses);
+    this.licenses = report.licenses.sort(byLicenseNameComparator).map(V2Report.mapFromLicense);
+  }
 
+  toV1Schema() {
     return {
       licenses: this.licenses,
-      dependencies: report.dependencies.map(v2Dependency => this.mapFromDependency(v2Dependency)),
+      dependencies: this.report.dependencies.map(v2Dependency =>
+        this.mapFromDependency(v2Dependency),
+      ),
     };
   }
 
@@ -63,7 +68,7 @@ export default class ReportMapper {
   constructor() {
     this.mappers = {
       '1': report => report,
-      '2': report => new V2ToV1Mapper().mapFrom(report),
+      '2': report => new V2Report(report).toV1Schema(),
     };
   }
 
