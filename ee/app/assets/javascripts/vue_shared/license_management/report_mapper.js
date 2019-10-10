@@ -20,8 +20,7 @@ class V2Report {
     const reducer = (memo, licenseId) => {
       const license = this.licenseMap[licenseId];
       visitor(license);
-      if (memo)
-        return { name: `${memo.name}, ${license.name}`, url: '' };
+      if (memo) return { name: `${memo.name}, ${license.name}`, url: '' };
       return { name: license.name, url: license.url };
     };
 
