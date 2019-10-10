@@ -138,12 +138,10 @@ module QA
               Time.new.tap do |start|
                 while Time.new - start < 120
                   begin
-                    Net::HTTP.get(URI.join(@address, '/-/readiness')).tap do |body|
-                      if JSON.parse(body).all? { |_, service| service['status'] == 'ok' }
-                        return puts "\nSecondary ready after #{Time.now - start} seconds." # rubocop:disable Cop/AvoidReturnFromBlocks
-                      else
-                        print '.'
-                      end
+                    if host_ready?
+                      return puts "\nSecondary ready after #{Time.now - start} seconds." # rubocop:disable Cop/AvoidReturnFromBlocks
+                    else
+                      print '.'
                     end
                   rescue StandardError
                     print 'e'
@@ -167,6 +165,13 @@ module QA
                 # Log out so that tests are in an initially unauthenticated state
                 QA::Page::Main::Menu.perform(&:sign_out)
               end
+            end
+
+            private
+
+            def host_ready?
+              body = Net::HTTP.get(URI.join(@address, '/-/readiness'))
+              JSON.parse(body)['status'] == 'ok'
             end
           end
         end
