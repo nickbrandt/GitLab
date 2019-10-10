@@ -1,10 +1,10 @@
 import { KUBERNETES_VERSIONS } from '../constants';
 
 export default () => ({
-  isAuthenticating: false,
-  hasCredentials: false,
-  invalidCredentials: false,
-  invalidCredentialsError: null,
+  isCreatingRole: false,
+  roleCreated: false,
+  createRoleError: false,
+
   accountId: '',
   externalId: '',
 
