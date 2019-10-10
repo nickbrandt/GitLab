@@ -7,7 +7,7 @@ export default class V2 {
 
     return {
       licenses: this.licenses,
-      dependencies: report.dependencies.map(x => this.mapFromDependency(x)),
+      dependencies: report.dependencies.map(v2Dependency => this.mapFromDependency(v2Dependency)),
     };
   }
 

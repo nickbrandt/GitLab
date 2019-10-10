@@ -17,11 +17,6 @@ import {
 } from 'ee_spec/license_management/mock_data';
 
 describe('utils', () => {
-  beforeEach(() => {
-    gon.features = gon.features || {};
-    gon.features.licenseScanV2 = true;
-  });
-
   describe('parseLicenseReportMetrics', () => {
     it('should return empty result, if no parameters are given', () => {
       const result = parseLicenseReportMetrics();
