@@ -16,6 +16,10 @@ module QA
         def simple_saml_hostname
           ENV['SIMPLE_SAML_HOSTNAME']
         end
+
+        def simple_saml_fingerprint
+          ENV['SIMPLE_SAML_FINGERPRINT']
+        end
       end
     end
   end
