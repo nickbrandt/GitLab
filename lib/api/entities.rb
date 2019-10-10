@@ -1315,8 +1315,8 @@ module API
         end
       end
       expose :_links do
-        expose :merge_requests
-        expose :issues
+        expose :merge_requests_url
+        expose :issues_url
       end
 
       private
@@ -1335,11 +1335,11 @@ module API
         Gitlab::Routing.url_helpers.project_tag_path(project, object.tag)
       end
 
-      def merge_requests
+      def merge_requests_url
         Gitlab::Routing.url_helpers.project_merge_requests_url(project, params_for_issues_and_mrs)
       end
 
-      def issues
+      def issues_url
         Gitlab::Routing.url_helpers.project_issues_url(project, params_for_issues_and_mrs)
       end
 

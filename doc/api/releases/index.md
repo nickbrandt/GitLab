@@ -123,8 +123,8 @@ Example response:
          ]
       },
       "_links":{
-         "merge_requests": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.2&scope=all&state=opened",
-         "issues": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.2&scope=all&state=opened"
+         "merge_requests_url": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.2&scope=all&state=opened",
+         "issues_url": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.2&scope=all&state=opened"
       }
    },
    {
@@ -183,8 +183,8 @@ Example response:
          ]
       },
       "_links":{
-         "merge_requests": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.1&scope=all&state=opened",
-         "issues": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.1&scope=all&state=opened"
+         "merge_requests_url": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.1&scope=all&state=opened",
+         "issues_url": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.1&scope=all&state=opened"
       }
    }
 ]
@@ -298,8 +298,8 @@ Example response:
       ]
    },
    "_links":{
-      "merge_requests": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.1&scope=all&state=opened",
-      "issues": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.1&scope=all&state=opened"
+      "merge_requests_url": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.1&scope=all&state=opened",
+      "issues_url": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.1&scope=all&state=opened"
    }
 }
 ```
@@ -427,8 +427,8 @@ Example response:
       ]
    },
    "_links":{
-      "merge_requests": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.3&scope=all&state=opened",
-      "issues": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.3&scope=all&state=opened"
+      "merge_requests_url": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.3&scope=all&state=opened",
+      "issues_url": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.3&scope=all&state=opened"
    }
 }
 ```
@@ -532,8 +532,8 @@ Example response:
       ]
    },
    "_links":{
-      "merge_requests": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.1&scope=all&state=opened",
-      "issues": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.1&scope=all&state=opened"
+      "merge_requests_url": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.1&scope=all&state=opened",
+      "issues_url": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.1&scope=all&state=opened"
    }
 }
 ```
@@ -618,8 +618,8 @@ Example response:
       ]
    },
    "_links":{
-      "merge_requests": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.1&scope=all&state=opened",
-      "issues": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.1&scope=all&state=opened"
+      "merge_requests_url": "https://gitlab.example.com/root/awesome_app/merge_requests?release_tag=v0.1&scope=all&state=opened",
+      "issues_url": "https://gitlab.example.com/root/awesome_app/issues?release_tag=v0.1&scope=all&state=opened"
    }
 }
 ```

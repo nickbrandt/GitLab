@@ -64,28 +64,20 @@ describe API::Releases do
         expect(json_response.second['tag_path']).to eq("/#{release_1.project.full_path}/-/tags/#{release_1.tag}")
       end
 
-      it 'returns the merge requests and issues links' do
-        get api("/projects/#{project.id}/releases", maintainer)
-
-        links = json_response.first['_links']
-
-        expect(links.keys).to include('merge_requests', 'issues')
-        expect(links['merge_requests']).to include("/#{release_2.project.full_path}/merge_requests")
-        expect(links['issues']).to include("/#{release_2.project.full_path}/issues")
-      end
-
-      it 'returns urls with correct parameters and release tag' do
+      it 'returns the merge requests and issues links, with correct query' do
         get api("/projects/#{project.id}/releases", maintainer)
 
         links = json_response.first['_links']
         release = json_response.first['tag_name']
-        expected_params = %w(release_tag scope state)
-        release_tag_param = "release_tag=#{release}"
+        expected_query = "release_tag=#{release}&scope=all&state=opened"
+        path_base = "/#{project.namespace.path}/#{project.path}"
+        mr_uri = URI.parse(links['merge_requests_url'])
+        issue_uri = URI.parse(links['issues_url'])
 
-        expect(links['merge_requests'].split('?')[1]).to include(*expected_params)
-        expect(links['issues'].split('?')[1]).to include(*expected_params)
-        expect(links['merge_requests']).to include(release_tag_param)
-        expect(links['issues']).to include(release_tag_param)
+        expect(mr_uri.path).to eq("#{path_base}/merge_requests")
+        expect(issue_uri.path).to eq("#{path_base}/issues")
+        expect(mr_uri.query).to eq(expected_query)
+        expect(issue_uri.query).to eq(expected_query)
       end
     end
 

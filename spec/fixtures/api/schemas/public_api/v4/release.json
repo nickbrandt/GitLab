@@ -38,10 +38,10 @@
       "additionalProperties": false
     },
     "_links": {
-      "required": ["merge_requests", "issues"],
+      "required": ["merge_requests_url", "issues_url"],
       "properties": {
-        "merge_requests": { "type": "string" },
-        "issues": { "type": "string" }
+        "merge_requests_url": { "type": "string" },
+        "issues_url": { "type": "string" }
       }
     }
   },
