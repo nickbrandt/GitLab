@@ -30,8 +30,10 @@ func testEntryServer(t *testing.T, requestURL string, httpHeaders http.Header, a
 
 		// The server returns a Content-Disposition
 		w.Header().Set("Content-Disposition", "attachment; filename=\"archive.txt\"")
-		w.Header().Set("Cache-Control", "no-store")
+		w.Header().Set("Cache-Control", "no-cache")
 		w.Header().Set("Expires", "")
+		w.Header().Set("Date", "Wed, 21 Oct 2015 05:28:00 GMT")
+		w.Header().Set("Pragma", "no-cache")
 
 		SendURL.Inject(w, r, data)
 	}
@@ -48,6 +50,8 @@ func testEntryServer(t *testing.T, requestURL string, httpHeaders http.Header, a
 		w.Header().Set("Etag", testDataEtag)
 		w.Header().Set("Cache-Control", "public")
 		w.Header().Set("Expires", "Wed, 21 Oct 2015 07:28:00 GMT")
+		w.Header().Set("Date", "Wed, 21 Oct 2015 06:28:00 GMT")
+		w.Header().Set("Pragma", "")
 
 		http.ServeContent(w, r, "archive.txt", time.Now(), tempFile)
 	}
@@ -170,10 +174,16 @@ func TestOriginalCacheHeadersPreservedWithSendURL(t *testing.T) {
 
 	testhelper.AssertResponseWriterHeader(t, response,
 		"Cache-Control",
-		"no-store")
+		"no-cache")
 	testhelper.AssertResponseWriterHeader(t, response,
 		"Expires",
 		"")
+	testhelper.AssertResponseWriterHeader(t, response,
+		"Date",
+		"Wed, 21 Oct 2015 05:28:00 GMT")
+	testhelper.AssertResponseWriterHeader(t, response,
+		"Pragma",
+		"no-cache")
 }
 
 func TestDownloadingNonExistingFileUsingSendURL(t *testing.T) {
