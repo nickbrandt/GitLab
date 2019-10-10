@@ -38,7 +38,7 @@ module Security
 
     def find_jobs_legacy
       # the query doesn't guarantee accuracy, so we verify it here
-      legacy_jobs_query do |job|
+      legacy_jobs_query.select do |job|
         @job_types.find { |job_type| job.options.dig(:artifacts, :reports, job_type) }
       end
     end

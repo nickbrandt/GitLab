@@ -44,7 +44,7 @@ describe Security::JobsFinder do
 
       context 'with jobs having report artifacts that are similar to secure artifacts' do
         before do
-          create(:ci_build, pipeline: pipeline, options: { artifacts: { reports: { file: 'sast.file' } } })
+          create(:ci_build, pipeline: pipeline, options: { artifacts: { reports: { file: 'report:sast:result.file' } } })
         end
 
         it { is_expected.to be_empty }
