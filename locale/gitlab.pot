@@ -8440,7 +8440,7 @@ msgstr ""
 msgid "I forgot my password"
 msgstr ""
 
-msgid "I have read and agree to the Let's Encrypt %{link_start}Terms of Service%{link_end}"
+msgid "I have read and agree to the Let's Encrypt %{link_start}Terms of Service%{link_end} (PDF)"
 msgstr ""
 
 msgid "I'd like to receive updates via email about GitLab"
