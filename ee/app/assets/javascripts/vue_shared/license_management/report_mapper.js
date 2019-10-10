@@ -16,12 +16,11 @@ class V2Report {
     };
   }
 
-  combine(licenses) {
+  combine(licenses, visitor) {
     return licenses.reduce(
       (memo, licenseId) => {
         const license = this.licenseMap[licenseId];
-        this.incrementCountFor(license.name);
-
+        visitor(license);
         if (memo.name === null) {
           return {
             name: license.name,
@@ -35,13 +34,17 @@ class V2Report {
   }
 
   incrementCountFor(licenseName) {
-    const legacyLicense = this.licenses.find(license => license.name === licenseName);
-    if (legacyLicense) legacyLicense.count += 1;
+    const license = this.licenses.find(license => license.name === licenseName);
+    if (license) license.count += 1;
   }
 
   mapFromDependency(dependency) {
+    const combinedLicense = this.combine(dependency.licenses, license => {
+      this.incrementCountFor(license.name);
+    });
+
     return {
-      license: this.combine(dependency.licenses),
+      license: combinedLicense,
       dependency: {
         name: dependency.name,
         url: dependency.url,
