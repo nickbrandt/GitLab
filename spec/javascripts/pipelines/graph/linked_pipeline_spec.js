@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import LinkedPipelineComponent from 'ee/pipelines/components/graph/linked_pipeline.vue';
+import LinkedPipelineComponent from '~/pipelines/components/graph/linked_pipeline.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import mockData from './linked_pipelines_mock_data';
 

@@ -1,4 +1,4 @@
-import PipelineStore from 'ee/pipelines/stores/pipeline_store';
+import PipelineStore from '~/pipelines/stores/pipeline_store';
 import LinkedPipelines from '../linked_pipelines_mock.json';
 
 describe('EE Pipeline store', () => {
