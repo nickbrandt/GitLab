@@ -35,6 +35,7 @@ module EE
         mount ::API::Scim
         mount ::API::ManagedLicenses
         mount ::API::ProjectApprovals
+        mount ::API::Vulnerabilities
         mount ::API::VulnerabilityFindings
         mount ::API::MergeRequestApprovals
         mount ::API::MergeRequestApprovalRules
