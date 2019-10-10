@@ -143,7 +143,7 @@ module Gitlab
             excluded_keys: excluded_keys_for_relation(:project))
 
           @project.assign_attributes(project_params)
-          @project.correct_visibility_level
+          @project.drop_visibility_level!
           @project.save!
         end
       end

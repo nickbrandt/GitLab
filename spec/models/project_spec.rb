@@ -5179,7 +5179,7 @@ describe Project do
     end
   end
 
-  describe '#correct_visibility_level' do
+  describe '#drop_visibility_level!' do
     context 'when has a group' do
       let(:group) { create(:group, visibility_level: group_visibility_level) }
       let(:project) { build(:project, namespace: group, visibility_level: project_visibility_level) }
@@ -5189,7 +5189,7 @@ describe Project do
         let(:project_visibility_level) { Gitlab::VisibilityLevel::INTERNAL }
 
         it 'sets `visibility_level` value from the group' do
-          expect { project.correct_visibility_level }
+          expect { project.drop_visibility_level! }
             .to change { project.visibility_level }
             .to(Gitlab::VisibilityLevel::PRIVATE)
         end
@@ -5200,7 +5200,7 @@ describe Project do
         let(:project_visibility_level) { Gitlab::VisibilityLevel::PRIVATE }
 
         it 'does not change the value of the `visibility_level` field' do
-          expect { project.correct_visibility_level }
+          expect { project.drop_visibility_level! }
             .not_to change { project.visibility_level }
         end
       end
@@ -5217,7 +5217,7 @@ describe Project do
         let(:project_visibility_level) { Gitlab::VisibilityLevel::INTERNAL }
 
         it 'sets `visibility_level` value to `PRIVATE`' do
-          expect { project.correct_visibility_level }
+          expect { project.drop_visibility_level! }
             .to change { project.visibility_level }
             .to(Gitlab::VisibilityLevel::PRIVATE)
         end
@@ -5227,7 +5227,7 @@ describe Project do
         let(:project_visibility_level) { Gitlab::VisibilityLevel::PUBLIC }
 
         it 'does not change the value of the `visibility_level` field' do
-          expect { project.correct_visibility_level }
+          expect { project.drop_visibility_level! }
             .to not_change { project.visibility_level }
         end
       end

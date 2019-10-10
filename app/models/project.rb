@@ -2258,7 +2258,7 @@ class Project < ApplicationRecord
     setting
   end
 
-  def correct_visibility_level
+  def drop_visibility_level!
     if group && group.visibility_level < visibility_level
       self.visibility_level = group.visibility_level
     end
