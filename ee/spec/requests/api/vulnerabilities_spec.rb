@@ -33,16 +33,16 @@ describe API::Vulnerabilities do
         expect(response).to have_gitlab_http_status(200)
         expect(json_response.map { |v| v['id'] }).to contain_exactly(project.vulnerabilities.second.id)
       end
+
+      context 'when "first-class vulnerabilities" feature is disabled' do
+        before do
+          stub_feature_flags(first_class_vulnerabilities: false)
+        end
+
+        it_behaves_like 'getting list of vulnerability findings'
+      end
     end
 
     it_behaves_like 'forbids access to vulnerability-like endpoint in expected cases'
-
-    context 'when "first-class vulnerabilities" feature is disabled' do
-      before do
-        stub_feature_flags(first_class_vulnerabilities: false)
-      end
-
-      it_behaves_like 'getting list of vulnerability findings'
-    end
   end
 end
