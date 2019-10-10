@@ -186,6 +186,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         resource :import, only: [:new, :create, :show]
         resource :avatar, only: [:show, :destroy]
+
+        get 'grafana/proxy/:datasource_id/*proxy_path',
+            to: 'grafana_api#proxy',
+            as: :grafana_api
       end
       # End of the /-/ scope.
 
