@@ -553,11 +553,9 @@ class ApplicationController < ActionController::Base
   # A user is redirected to the welcome page when his role is still blank, his name is equal to his username,
   # the experiment is enabled for the current user and the user was created after the experiment was initiated.
   def require_role
-    return unless current_user &&
-      current_user.role.blank? &&
-      current_user.name == current_user.username &&
-      experiment_enabled?(:signup_flow) &&
-      experiment_enabled_since(:signup_flow) < current_user.created_at
+    return unless current_user && current_user.role_required? && experiment_enabled?(:signup_flow)
+
+    store_location_for :user, request.fullpath
 
     redirect_to users_sign_up_welcome_path
   end

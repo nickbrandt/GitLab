@@ -233,7 +233,7 @@ class User < ApplicationRecord
 
   # User's role
   # Note: When adding an option, it MUST go on the end of the array.
-  enum role: [:software_developer, :development_team_lead, :devops_engineer, :systems_administrator, :security_analyst, :data_analyst, :product_manager, :product_designer, :other]
+  enum role: [:software_developer, :development_team_lead, :devops_engineer, :systems_administrator, :security_analyst, :data_analyst, :product_manager, :product_designer, :other], _suffix: true
 
   delegate :path, to: :namespace, allow_nil: true, prefix: true
   delegate :notes_filter_for, to: :user_preference
@@ -1561,6 +1561,19 @@ class User < ApplicationRecord
 
     [last_activity, last_sign_in].compact.max
   end
+
+  # Below is used for the signup_flow experiment. Should be removed
+  # when experiment finishes. See gitlab-org/growth/engineering#64
+  REQUIRES_ROLE_VALUE = 99
+
+  def role_required?
+    role_before_type_cast == REQUIRES_ROLE_VALUE
+  end
+
+  def set_role_required!
+    update_column(:role, REQUIRES_ROLE_VALUE)
+  end
+  # End of signup_flow experiment methods
 
   # @deprecated
   alias_method :owned_or_masters_groups, :owned_or_maintainers_groups

@@ -254,28 +254,6 @@ describe Feature do
     end
   end
 
-  describe '.enabled_since' do
-    it 'returns nil when the feature is not enabled' do
-      described_class.disable(:disabled_feature_flag)
-
-      expect(described_class.enabled_since(:disabled_feature_flag)).to be_nil
-    end
-
-    it 'returns nil when the feature does not exist' do
-      expect(described_class.enabled_since(:non_existent_feature_flag)).to be_nil
-    end
-
-    it 'returns the created_at date when the feature is enabled' do
-      created_time = 1.day.ago
-
-      travel_to(created_time) do
-        described_class.enable(:enabled_feature_flag)
-      end
-
-      expect(described_class.enabled_since(:enabled_feature_flag)).to be_within(1.second).of(created_time)
-    end
-  end
-
   describe '.remove' do
     context 'for a non-persisted feature' do
       it 'returns nil' do

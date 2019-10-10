@@ -13453,7 +13453,7 @@ msgstr ""
 msgid "Register and see your runners for this project."
 msgstr ""
 
-msgid "Register for GitLab.com"
+msgid "Register for GitLab"
 msgstr ""
 
 msgid "Register now"

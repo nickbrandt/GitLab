@@ -27,8 +27,13 @@ class RegistrationsController < Devise::RegistrationsController
 
     super do |new_user|
       persist_accepted_terms_if_required(new_user)
+      set_role_required(new_user)
       yield new_user if block_given?
     end
+
+    # Do not show the signed_up notice message when the signup_flow experiment is enabled.
+    # Instead, show it after succesfully updating the role.
+    flash[:notice] = nil if experiment_enabled?(:signup_flow)
   rescue Gitlab::Access::AccessDeniedError
     redirect_to(new_user_session_path)
   end
@@ -45,9 +50,8 @@ class RegistrationsController < Devise::RegistrationsController
 
   def welcome
     return redirect_to new_user_registration_path unless current_user
-    return redirect_to stored_location_or_dashboard(current_user) if current_user.role.present?
+    return redirect_to stored_location_or_dashboard_or_almost_there_path(current_user) if current_user.role.present?
 
-    flash[:notice] = nil
     current_user.name = nil
     render layout: 'devise_experimental_separate_sign_up_flow'
   end
@@ -57,7 +61,8 @@ class RegistrationsController < Devise::RegistrationsController
     result = ::Users::UpdateService.new(current_user, user_params.merge(user: current_user)).execute
 
     if result[:status] == :success
-      redirect_to stored_location_or_dashboard(current_user)
+      set_flash_message! :notice, :signed_up
+      redirect_to stored_location_or_dashboard_or_almost_there_path(current_user)
     else
       redirect_to users_sign_up_welcome_path, alert: result[:message]
     end
@@ -73,6 +78,10 @@ class RegistrationsController < Devise::RegistrationsController
       terms = ApplicationSetting::Term.latest
       Users::RespondToTermsService.new(new_user, terms).execute(accepted: true)
     end
+  end
+
+  def set_role_required(new_user)
+    new_user.set_role_required! if new_user.persisted? && experiment_enabled?(:signup_flow)
   end
 
   def destroy_confirmation_valid?
@@ -100,7 +109,7 @@ class RegistrationsController < Devise::RegistrationsController
 
     return users_sign_up_welcome_path if experiment_enabled?(:signup_flow)
 
-    confirmed_or_unconfirmed_access_allowed(user) ? stored_location_or_dashboard(user) : users_almost_there_path
+    stored_location_or_dashboard_or_almost_there_path(user)
   end
 
   def after_inactive_sign_up_path_for(resource)
@@ -174,11 +183,15 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def confirmed_or_unconfirmed_access_allowed(user)
-    user.confirmed? || Feature.enabled?(:soft_email_confirmation)
+    user.confirmed? || Feature.enabled?(:soft_email_confirmation) || experiment_enabled?(:signup_flow)
   end
 
   def stored_location_or_dashboard(user)
     stored_location_for(user) || dashboard_projects_path
+  end
+
+  def stored_location_or_dashboard_or_almost_there_path(user)
+    confirmed_or_unconfirmed_access_allowed(user) ? stored_location_or_dashboard(user) : users_almost_there_path
   end
 
   # Part of an experiment to build a new sign up flow. Will be resolved

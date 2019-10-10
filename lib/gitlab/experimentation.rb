@@ -44,10 +44,6 @@ module Gitlab
         Experimentation.enabled?(experiment_key, experimentation_subject_index)
       end
 
-      def experiment_enabled_since(experiment_key)
-        Experimentation.enabled_since(experiment_key)
-      end
-
       private
 
       def experimentation_subject_index
@@ -72,10 +68,6 @@ module Gitlab
           experiment.enabled_for_environment? &&
           experiment.enabled_for_experimentation_subject?(experimentation_subject_index)
       end
-
-      def enabled_since(experiment_key)
-        experiment(experiment_key).feature_toggle_enabled_since
-      end
     end
 
     Experiment = Struct.new(:key, :feature_toggle, :environment, :enabled_ratio, keyword_init: true) do
@@ -83,10 +75,6 @@ module Gitlab
         return Feature.enabled?(key, default_enabled: true) if feature_toggle.nil?
 
         Feature.enabled?(feature_toggle)
-      end
-
-      def feature_toggle_enabled_since
-        Feature.enabled_since(feature_toggle)
       end
 
       def enabled_for_environment?

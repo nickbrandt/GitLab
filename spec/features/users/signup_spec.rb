@@ -391,31 +391,33 @@ end
 describe 'With experimental flow' do
   before do
     stub_experiment(signup_flow: true)
-    allow(Gitlab::Experimentation).to receive(:enabled_since).with(:signup_flow).and_return(1.day.ago)
   end
 
   it_behaves_like 'Signup'
 
-  describe 'user without role' do
-    let(:user) { create(:user, role: nil, name: 'some_name', username: 'some_name') }
+  describe 'when role is required' do
+    let(:user) { create(:user) }
 
     before do
+      user.set_role_required!
+      user.reload
       sign_in(user)
-      visit root_path
+      visit new_project_path
     end
 
     it 'is redirected to step 2 of the signup process' do
       expect(page).to have_text("Welcome to GitLab.com#{user.username}!")
     end
 
-    it 'updates the user and sets the name and role' do
+    it 'updates the user, sets the name and role and redirects to the requested url' do
       fill_in 'user_name', with: 'New name'
       select 'Software Developer', from: 'user_role'
       click_button 'Get started!'
 
       user.reload
       expect(user.name).to eq 'New name'
-      expect(user.role).to eq 'software_developer'
+      expect(user.software_developer_role?).to be_truthy
+      expect(page).to have_current_path(new_project_path)
     end
   end
 end

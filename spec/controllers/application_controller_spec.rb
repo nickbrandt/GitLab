@@ -848,42 +848,42 @@ describe ApplicationController do
       def index; end
     end
 
+    let(:user) { create(:user) }
+    let(:experiment_enabled) { true }
+
     before do
       stub_experiment(signup_flow: experiment_enabled)
-      allow(Gitlab::Experimentation).to receive(:enabled_since).with(:signup_flow).and_return(1.day.ago)
-      sign_in(user)
-      get :index
     end
 
-    context 'all the right conditions' do
-      let(:user) { create(:user, role: nil, name: 'some_name', username: 'some_name') }
-      let(:experiment_enabled) { true }
+    context 'experiment enabled and user with required role' do
+      before do
+        user.set_role_required!
+        sign_in(user)
+        get :index
+      end
 
       it { is_expected.to redirect_to users_sign_up_welcome_path }
+    end
 
-      context 'a user with a role' do
-        let(:user) { create(:user, name: 'some_name', username: 'some_name') }
-
-        it { is_expected.not_to redirect_to users_sign_up_welcome_path }
+    context 'experiment enabled and user without a role' do
+      before do
+        sign_in(user)
+        get :index
       end
 
-      context 'a user with a name other than the username' do
-        let(:user) { create(:user, role: nil) }
+      it { is_expected.not_to redirect_to users_sign_up_welcome_path }
+    end
 
-        it { is_expected.not_to redirect_to users_sign_up_welcome_path }
+    context 'experiment disabled and user with required role' do
+      let(:experiment_enabled) { false }
+
+      before do
+        user.set_role_required!
+        sign_in(user)
+        get :index
       end
 
-      context 'user created before the experiment started' do
-        let(:user) { create(:user, role: nil, name: 'some_name', username: 'some_name', created_at: 2.days.ago) }
-
-        it { is_expected.not_to redirect_to users_sign_up_welcome_path }
-      end
-
-      context 'experiment disabled' do
-        let(:experiment_enabled) { false }
-
-        it { is_expected.not_to redirect_to users_sign_up_welcome_path }
-      end
+      it { is_expected.not_to redirect_to users_sign_up_welcome_path }
     end
   end
 end
