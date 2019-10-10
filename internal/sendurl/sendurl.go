@@ -42,6 +42,8 @@ var rangeHeaderKeys = []string{
 var preserveHeaderKeys = map[string]bool{
 	"Cache-Control": true,
 	"Expires":       true,
+	"Date":          true, // Support for HTTP 1.0 proxies
+	"Pragma":        true, // Support for HTTP 1.0 proxies
 }
 
 // httpTransport defines a http.Transport with values
