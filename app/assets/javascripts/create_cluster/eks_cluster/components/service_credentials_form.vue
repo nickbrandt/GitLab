@@ -2,6 +2,7 @@
 import { GlFormInput, GlButton } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import _ from 'underscore';
+import { mapState } from 'vuex';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 
 export default {
@@ -11,14 +12,6 @@ export default {
     ClipboardButton,
   },
   props: {
-    accountId: {
-      type: String,
-      required: true,
-    },
-    externalId: {
-      type: String,
-      required: true,
-    },
     accountAndExternalIdsHelpPath: {
       type: String,
       required: true,
@@ -34,6 +27,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(['accountId', 'externalId']),
     accountAndExternalIdsHelpText() {
       const escapedUrl = _.escape(this.accountAndExternalIdsHelpPath);
 

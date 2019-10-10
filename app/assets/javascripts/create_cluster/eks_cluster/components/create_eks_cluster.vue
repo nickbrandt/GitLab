@@ -1,6 +1,7 @@
 <script>
 import ServiceCredentialsForm from './service_credentials_form.vue';
 import EksClusterConfigurationForm from './eks_cluster_configuration_form.vue';
+import { mapState } from 'vuex';
 
 export default {
   components: {
@@ -24,18 +25,9 @@ export default {
       type: String,
       required: true,
     },
-    externalId: {
-      type: String,
-      required: true,
-    },
-    accountId: {
-      type: String,
-      required: true,
-    },
-    validCredentials: {
-      type: Boolean,
-      required: true,
-    },
+  },
+  computed: {
+    ...mapState(['hasCredentials']),
   },
 };
 </script>
