@@ -3,66 +3,79 @@
 module QA
   context 'Create' do
     describe 'Codeowners' do
-      it 'merge request assigns code owners as approvers' do
+      # Create one user to be the assigned approver and another user who will not be an approver
+      let(:approver) { Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1) }
+      let(:non_approver) { Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2) }
+
+      let(:project) do
+        Resource::Project.fabricate_via_api! do |project|
+          project.name = "assign-approvers"
+          project.initialize_with_readme = true
+        end
+      end
+      let(:branch_name) { 'protected-branch' }
+
+      before do
+        project.add_member(approver, Resource::Members::AccessLevel::DEVELOPER)
+        project.add_member(non_approver, Resource::Members::AccessLevel::DEVELOPER)
+
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)
 
-        # Create one user to be the assigned approver and another user who will
-        # not be an approver
-        approver = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
-        non_approver = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
-
-        # Create a project and assign the users to it
-        project = Resource::Project.fabricate! do |project|
-          project.name = "assign-approvers"
-        end
         project.visit!
+      end
 
-        Page::Project::Menu.perform(&:go_to_members_settings)
-        Page::Project::Settings::Members.perform do |members_page|
-          members_page.add_member(approver.username)
-          members_page.add_member(non_approver.username)
+      it 'merge request assigns code owners as approvers' do
+        # Commit CODEOWNERS to master
+        Resource::Repository::Commit.fabricate_via_api! do |commit|
+          commit.project = project
+          commit.commit_message = 'Add CODEOWNERS and test files'
+          commit.add_files(
+            [
+              {
+                file_path: 'CODEOWNERS',
+                content: <<~CONTENT
+                  CODEOWNERS @#{approver.username}
+                CONTENT
+              }
+            ]
+          )
         end
 
-        Page::Project::Menu.perform(&:go_to_general_settings)
-
-        Page::Project::Settings::Main.perform do |settings|
-          settings.expand_request_approval_settings do |page|
-            page.click_require_code_owners_approval_checkbox
-            page.click_save_merge_request_approval_button
-          end
+        # Create a projected branch that requires approval from code owners
+        Resource::ProtectedBranch.fabricate! do |protected_branch|
+          protected_branch.branch_name = branch_name
+          protected_branch.project = project
         end
 
-        # Push CODEOWNERS to master
-        project_push = Resource::Repository::ProjectPush.fabricate! do |push|
-          push.project = project
+        # Push a new CODEOWNERS file
+        Resource::Repository::Push.fabricate! do |push|
+          push.repository_http_uri = project.repository_http_location.uri
+          push.branch_name = branch_name + '-patch'
           push.file_name = 'CODEOWNERS'
           push.file_content = <<~CONTENT
-            CODEOWNERS @#{approver.username}
-          CONTENT
-          push.commit_message = 'Add CODEOWNERS and test files'
-        end
-
-        # Push a new CODEOWNERS file and create a merge request
-        merge_request = Resource::MergeRequest.fabricate! do |merge_request|
-          merge_request.title = 'This is a merge request'
-          merge_request.description = 'Change code owners'
-          merge_request.project = project_push.project
-          merge_request.file_name = 'CODEOWNERS'
-          merge_request.target_new_branch = false
-          merge_request.file_content = <<~CONTENT
             CODEOWNERS @#{non_approver.username}
           CONTENT
         end
 
-        merge_request.visit!
+        # Create a merge request
+        Resource::MergeRequest.fabricate! do |merge_request|
+          merge_request.project = project
+          merge_request.target_new_branch = false
+          merge_request.source_branch = branch_name + '-patch'
+          merge_request.target_branch = branch_name
+          merge_request.no_preparation = true
+        end.visit!
+
         # Check that the merge request assigns the original code owner as an
         # approver (because the current CODEOWNERS file in the master branch
         # doesn't have the new owner yet)
-        Page::MergeRequest::Show.perform do |mr_page|
-          mr_page.edit!
-          expect(mr_page.approvers).to include(approver.name)
-          expect(mr_page.approvers).not_to include(non_approver.name)
+        Page::MergeRequest::Show.perform do |show|
+          show.edit!
+          approvers = show.approvers
+
+          expect(approvers).to include(approver.name)
+          expect(approvers).not_to include(non_approver.name)
         end
       end
     end
