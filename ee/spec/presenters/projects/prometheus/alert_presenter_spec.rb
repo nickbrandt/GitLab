@@ -116,7 +116,7 @@ describe Projects::Prometheus::AlertPresenter do
             **Start time:** #{presenter.starts_at}#{markdown_line_break}
             **Service:** service_name#{markdown_line_break}
             **Monitoring tool:** monitoring_tool_name#{markdown_line_break}
-            **Hosts:** [http://localhost:3000](http://localhost:3000) [http://localhost:3001](http://localhost:3001)
+            **Hosts:** http://localhost:3000 http://localhost:3001
 
             #### Alert Details
 
@@ -137,7 +137,7 @@ describe Projects::Prometheus::AlertPresenter do
             #### Summary
 
             **Start time:** #{presenter.starts_at}#{markdown_line_break}
-            **Hosts:** [http://localhost:3000](http://localhost:3000)
+            **Hosts:** http://localhost:3000
 
             MARKDOWN
           )

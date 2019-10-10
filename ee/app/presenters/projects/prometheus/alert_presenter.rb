@@ -63,7 +63,7 @@ module Projects
         metadata << list_item('full_query', backtick(full_query)) if full_query
         metadata << list_item(service.label.humanize, service.value) if service
         metadata << list_item(monitoring_tool.label.humanize, monitoring_tool.value) if monitoring_tool
-        metadata << list_item(hosts.label.humanize, host_links.join(' ')) if hosts
+        metadata << list_item(hosts.label.humanize, host_links) if hosts
 
         metadata.join(MARKDOWN_LINE_BREAK)
       end
@@ -96,10 +96,6 @@ module Projects
         "`#{value}`"
       end
 
-      def markdown_link(title, url)
-        "[#{title}](#{url})"
-      end
-
       GENERIC_ALERT_SUMMARY_ANNOTATIONS.each do |annotation_name|
         define_method(annotation_name) do
           annotations.find { |a| a.label == annotation_name }
@@ -107,7 +103,7 @@ module Projects
       end
 
       def host_links
-        Array(hosts.value).map { |host| markdown_link(host, host) }
+        Array(hosts.value).join(' ')
       end
     end
   end
