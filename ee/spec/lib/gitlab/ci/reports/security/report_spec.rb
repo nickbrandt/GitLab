@@ -119,4 +119,63 @@ describe Gitlab::Ci::Reports::Security::Report do
       expect(report).to have_received(:replace_with!).with(merged_report)
     end
   end
+
+  describe "#safe?" do
+    subject { described_class.new('sast', commit_sha) }
+
+    let(:commit_sha) { Digest::SHA1.hexdigest(SecureRandom.uuid) }
+
+    %w[unknown Unknown high High critical Critical].each do |severity|
+      context "when the sast report has a #{severity} severity vulnerability" do
+        let(:occurrence) { build(:ci_reports_security_occurrence, severity: severity) }
+
+        before do
+          subject.add_occurrence(occurrence)
+        end
+
+        it { expect(subject.unsafe_severity?).to be(true) }
+        it { expect(subject.safe?).to be(false) }
+      end
+    end
+
+    %w[medium Medium low Low].each do |severity|
+      context "when the sast report has a #{severity} severity vulnerability" do
+        let(:occurrence) { build(:ci_reports_security_occurrence, severity: severity) }
+
+        before do
+          subject.add_occurrence(occurrence)
+        end
+
+        it { expect(subject.unsafe_severity?).to be(false) }
+        it { expect(subject.safe?).to be(true) }
+      end
+    end
+
+    context "when the sast report has a vulnerability with a `nil` severity" do
+      let(:occurrence) { build(:ci_reports_security_occurrence, severity: nil) }
+
+      before do
+        subject.add_occurrence(occurrence)
+      end
+
+      it { expect(subject.unsafe_severity?).to be(false) }
+      it { expect(subject.safe?).to be(true) }
+    end
+
+    context "when the sast report has a vulnerability with a blank severity" do
+      let(:occurrence) { build(:ci_reports_security_occurrence, severity: '') }
+
+      before do
+        subject.add_occurrence(occurrence)
+      end
+
+      it { expect(subject.unsafe_severity?).to be(false) }
+      it { expect(subject.safe?).to be(true) }
+    end
+
+    context "when the sast report has zero vulnerabilities" do
+      it { expect(subject.unsafe_severity?).to be(false) }
+      it { expect(subject.safe?).to be(true) }
+    end
+  end
 end

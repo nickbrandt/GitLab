@@ -7,6 +7,8 @@ module Gitlab
         class Reports
           attr_reader :reports, :commit_sha
 
+          delegate :empty?, to: :reports
+
           def initialize(commit_sha)
             @reports = {}
             @commit_sha = commit_sha
@@ -14,6 +16,12 @@ module Gitlab
 
           def get_report(report_type)
             reports[report_type] ||= Report.new(report_type, commit_sha)
+          end
+
+          def violates_default_policy?
+            reports.values.any? do |report|
+              report.unsafe_severity?
+            end
           end
         end
       end

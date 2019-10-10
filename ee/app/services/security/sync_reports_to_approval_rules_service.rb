@@ -37,12 +37,11 @@ module Security
     end
 
     def sync_vulnerability_rules
-      reports = pipeline.security_reports.reports
-      safe = reports.any? && reports.none? do |_report_type, report|
-        report.unsafe_severity?
-      end
+      reports = pipeline.security_reports
+      return if reports.empty? && !pipeline.complete?
+      return if reports.violates_default_policy?
 
-      remove_required_approvals_for(ApprovalMergeRequestRule.security_report) if safe
+      remove_required_approvals_for(ApprovalMergeRequestRule.security_report)
     end
 
     def remove_required_approvals_for(rules)

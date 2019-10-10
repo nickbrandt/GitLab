@@ -1,0 +1,5 @@
+---
+title: Prevent parser errors from approving the License-Check rule
+merge_request: 18423
+author:
+type: fixed
