@@ -2,7 +2,11 @@ import { KUBERNETES_VERSIONS } from '../constants';
 
 export default () => ({
   isValidatingCredentials: false,
-  validCredentials: false,
+  hasCredentials: false,
+  invalidCredentials: false,
+  invalidCredentialsError: null,
+  accountId: '',
+  externalId: '',
 
   clusterName: '',
   environmentScope: '*',

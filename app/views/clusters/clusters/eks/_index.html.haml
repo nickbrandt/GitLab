@@ -7,4 +7,4 @@
     'account-id' => @account_id,
     'external-id' => @aws_role.role_external_id,
     'kubernetes-integration-help-path' => help_page_path('user/project/clusters/index'),
-    'valid-credentials' => @aws_role.role_arn.present? } }
+    'has-credentials' => @aws_role.role_arn.present? } }

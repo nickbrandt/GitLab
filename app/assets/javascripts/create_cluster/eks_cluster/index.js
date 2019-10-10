@@ -6,42 +6,39 @@ import createStore from './store';
 Vue.use(Vuex);
 
 export default el => {
-  const { gitlabManagedClusterHelpPath, kubernetesIntegrationHelpPath } = el.dataset;
+  const {
+    gitlabManagedClusterHelpPath,
+    kubernetesIntegrationHelpPath,
+    accountAndExternalIdsHelpPath,
+    createRoleArnHelpPath,
+    externalId,
+    accountId,
+    hasCredentials,
+    createCredentialsPath,
+  } = el.dataset;
 
   return new Vue({
     el,
-    store: createStore(),
+    store: createStore({
+      initialState: {
+        hasCredentials,
+        externalId,
+        accountId,
+      },
+      apiPaths: {
+        createCredentialsPath,
+      },
+    }),
     components: {
       CreateEksCluster,
-    },
-    data() {
-      const {
-        gitlabManagedClusterHelpPath,
-        accountAndExternalIdsHelpPath,
-        createRoleArnHelpPath,
-        externalId,
-        accountId,
-        validCredentials,
-      } = document.querySelector(this.$options.el).dataset;
-
-      return {
-        gitlabManagedClusterHelpPath,
-        accountAndExternalIdsHelpPath,
-        createRoleArnHelpPath,
-        externalId,
-        accountId,
-        validCredentials,
-      };
     },
     render(createElement) {
       return createElement('create-eks-cluster', {
         props: {
-          gitlabManagedClusterHelpPath: this.gitlabManagedClusterHelpPath,
-          accountAndExternalIdsHelpPath: this.accountAndExternalIdsHelpPath,
-          createRoleArnHelpPath: this.createRoleArnHelpPath,
-          externalId: this.externalId,
-          accountId: this.accountId,
-          validCredentials: this.validCredentials,
+          gitlabManagedClusterHelpPath,
+          kubernetesIntegrationHelpPath,
+          accountAndExternalIdsHelpPath,
+          createRoleArnHelpPath,
         },
       });
     },
