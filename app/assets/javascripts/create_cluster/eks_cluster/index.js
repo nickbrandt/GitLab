@@ -14,7 +14,7 @@ export default el => {
     externalId,
     accountId,
     hasCredentials,
-    createCredentialsPath,
+    createRolePath,
   } = el.dataset;
 
   return new Vue({
@@ -26,7 +26,7 @@ export default el => {
         accountId,
       },
       apiPaths: {
-        createCredentialsPath,
+        createRolePath,
       },
     }),
     components: {

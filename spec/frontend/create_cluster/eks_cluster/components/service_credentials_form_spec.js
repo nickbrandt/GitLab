@@ -92,12 +92,12 @@ describe('ServiceCredentialsForm', () => {
 
     it('sets submit button as loading', () => {
       expect(findSubmitButton().props('loading')).toBe(true);
-    })
+    });
 
     it('displays Authenticating label on submit button', () => {
       expect(findSubmitButton().props('label')).toBe('Authenticating');
     });
-  })
+  });
 
   describe('when role can’t be created', () => {
     beforeEach(() => {

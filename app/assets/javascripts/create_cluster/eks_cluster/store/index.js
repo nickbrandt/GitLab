@@ -1,5 +1,5 @@
 import Vuex from 'vuex';
-import * as actions from './actions';
+import actions from './actions';
 import * as getters from './getters';
 import mutations from './mutations';
 import state from './state';
@@ -8,9 +8,9 @@ import clusterDropdownStore from './cluster_dropdown';
 
 import * as awsServices from '../services/aws_services_facade';
 
-const createStore = ({ initialState }) =>
+const createStore = ({ initialState, apiPaths }) =>
   new Vuex.Store({
-    actions,
+    actions: actions(apiPaths),
     getters,
     mutations,
     state: Object.assign(state(), initialState),
