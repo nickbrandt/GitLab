@@ -333,6 +333,35 @@ describe Project do
     end
   end
 
+  describe '#can_store_security_reports?' do
+    context 'when the feature is enabled for the namespace' do
+      it 'returns true' do
+        stub_licensed_features(sast: true)
+        project = create(:project, :private)
+
+        expect(project.can_store_security_reports?).to be_truthy
+      end
+    end
+
+    context 'when the project is public' do
+      it 'returns true' do
+        stub_licensed_features(sast: false)
+        project = create(:project, :public)
+
+        expect(project.can_store_security_reports?).to be_truthy
+      end
+    end
+
+    context 'when the feature is disabled for the namespace and the project is not public' do
+      it 'returns false' do
+        stub_licensed_features(sast: false)
+        project = create(:project, :private)
+
+        expect(project.can_store_security_reports?).to be_falsy
+      end
+    end
+  end
+
   describe '#deployment_variables' do
     context 'when project has a deployment platforms' do
       context 'when multiple clusters (EEP) is enabled' do
@@ -1658,18 +1687,6 @@ describe Project do
       it "provides an existing one" do
         is_expected.to eq('token')
       end
-    end
-  end
-
-  describe '#store_security_reports_available?' do
-    let(:project) { create(:project) }
-
-    subject { project.store_security_reports_available? }
-
-    it 'delegates to namespace' do
-      expect(project.namespace).to receive(:store_security_reports_available?).once.and_call_original
-
-      subject
     end
   end
 

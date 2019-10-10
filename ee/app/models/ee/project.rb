@@ -166,8 +166,6 @@ module EE
 
       default_value_for :packages_enabled, true
 
-      delegate :store_security_reports_available?, to: :namespace
-
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :alerting_setting, update_only: true
       accepts_nested_attributes_for :incident_management_setting, update_only: true
@@ -184,6 +182,10 @@ module EE
         joins('LEFT JOIN services ON services.project_id = projects.id AND services.type = \'GitlabSlackApplicationService\' AND services.active IS true')
           .where('services.id IS NULL')
       end
+    end
+
+    def can_store_security_reports?
+      namespace.store_security_reports_available? || public?
     end
 
     def tracing_external_url
