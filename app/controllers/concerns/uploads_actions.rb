@@ -32,15 +32,12 @@ module UploadsActions
     # We need to reset caching from the applications controller to get rid of the no-store value
     headers['Cache-Control'] = ''
     headers['Pragma'] = ''
-    if cache_publicly?
-      # Caching for user avatars
-      expires_in 5.minutes, public: true, must_revalidate: false
-    elsif avatar?
-      # Caching for Project + Group Avatars
-      expires_in 5.minutes, private: true, must_revalidate: true
-    else
-      expires_in 6.months, private: true, must_revalidate: true
-    end
+
+    ttl, directives = *cache_settings
+    ttl ||= 6.months
+    directives ||= { private: true, must_revalidate: true }
+
+    expires_in ttl, directives
 
     disposition = uploader.embeddable? ? 'inline' : 'attachment'
 
@@ -125,12 +122,8 @@ module UploadsActions
     nil
   end
 
-  def cache_publicly?
-    false
-  end
-
-  def avatar?
-    false
+  def cache_settings
+    []
   end
 
   def model

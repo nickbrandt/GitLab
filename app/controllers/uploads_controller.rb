@@ -81,16 +81,13 @@ class UploadsController < ApplicationController
     end
   end
 
-  def cache_publicly?
-    User === model || Appearance === model
-  end
-
-  def avatar?
-    User === model || Project === model || Group === model
-  end
-
-  def note_upload?
-    Note === model
+  def cache_settings
+    case model
+    when User, Appearance
+      [5.minutes, { public: true, must_revalidate: false }]
+    when Project, Group
+      [5.minutes, { private: true, must_revalidate: true }]
+    end
   end
 
   def secret?
