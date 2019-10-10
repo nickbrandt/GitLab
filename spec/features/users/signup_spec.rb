@@ -5,10 +5,6 @@ require 'spec_helper'
 shared_examples 'Signup' do
   include TermsHelper
 
-  before do
-    stub_feature_flags(invisible_captcha: false)
-  end
-
   let(:new_user) { build_stubbed(:user) }
 
   describe 'username validation', :js do
@@ -396,20 +392,14 @@ describe 'With experimental flow' do
   it_behaves_like 'Signup'
 
   describe 'when role is required' do
-    let(:user) { create(:user) }
-
-    before do
+    it 'redirects to step 2 of the signup process, updates the user, sets the name and role and then redirects to the requested url' do
+      user = create(:user)
       user.set_role_required!
-      user.reload
       sign_in(user)
       visit new_project_path
-    end
 
-    it 'is redirected to step 2 of the signup process' do
-      expect(page).to have_text("Welcome to GitLab.com#{user.username}!")
-    end
+      expect(current_path).to eq users_sign_up_welcome_path
 
-    it 'updates the user, sets the name and role and redirects to the requested url' do
       fill_in 'user_name', with: 'New name'
       select 'Software Developer', from: 'user_role'
       click_button 'Get started!'
