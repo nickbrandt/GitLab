@@ -2,8 +2,6 @@
 
 require_relative '../qa'
 
-# rubocop:disable Cop/ConstGetInheritFalse
 QA::Scenario
   .const_get(ARGV.shift)
   .launch!(ARGV)
-# rubocop:enable Cop/ConstGetInheritFalse
