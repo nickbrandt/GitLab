@@ -6,14 +6,6 @@
 = warning
 
 - if can_generate_chart?(milestone, burndown)
-  .burndown-header
-    %h3
-      Burndown chart
-      .btn-group.js-burndown-data-selector
-        %button.btn.btn-sm.btn-primary{ data: { show: 'count' } }
-          Issues
-        %button.btn.btn-sm.btn-primary.btn-inverted{ data: { show: 'weight', qa_selector: 'weight_button' } }
-          Issue weight
   .burndown-chart{ data: { start_date: burndown.start_date.strftime("%Y-%m-%d"),
     due_date: burndown.due_date.strftime("%Y-%m-%d"),
     burndown_events_path: expose_url(burndown_endpoint), qa_selector: 'burndown_chart' } }

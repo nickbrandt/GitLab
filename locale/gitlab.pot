@@ -375,6 +375,12 @@ msgstr ""
 msgid "%{title} changes"
 msgstr ""
 
+msgid "%{total} open issue weight"
+msgstr ""
+
+msgid "%{total} open issues"
+msgstr ""
+
 msgid "%{unstaged} unstaged and %{staged} staged changes"
 msgstr ""
 
@@ -2649,19 +2655,13 @@ msgstr ""
 msgid "Built-in"
 msgstr ""
 
-msgid "BurndownChartLabel|Guideline"
+msgid "Burndown chart"
 msgstr ""
 
 msgid "BurndownChartLabel|Open issue weight"
 msgstr ""
 
 msgid "BurndownChartLabel|Open issues"
-msgstr ""
-
-msgid "BurndownChartLabel|Progress"
-msgstr ""
-
-msgid "BurndownChartLabel|Remaining"
 msgstr ""
 
 msgid "Business"
@@ -8303,6 +8303,9 @@ msgstr ""
 msgid "GroupsTree|Search by name"
 msgstr ""
 
+msgid "Guideline"
+msgstr ""
+
 msgid "HTTP Basic: Access denied\\nYou must use a personal access token with 'api' scope for Git over HTTP.\\nYou can generate one at %{profile_personal_access_tokens_url}"
 msgstr ""
 
@@ -8941,6 +8944,9 @@ msgid "Issue update failed"
 msgstr ""
 
 msgid "Issue was closed by %{name} %{reason}"
+msgstr ""
+
+msgid "Issue weight"
 msgstr ""
 
 msgid "IssueBoards|Board"
@@ -17062,7 +17068,13 @@ msgstr ""
 msgid "Total artifacts size: %{total_size}"
 msgstr ""
 
+msgid "Total issues"
+msgstr ""
+
 msgid "Total test time for all commits/merges"
+msgstr ""
+
+msgid "Total weight"
 msgstr ""
 
 msgid "Total: %{total}"

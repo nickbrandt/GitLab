@@ -1,10 +1,11 @@
+import Vue from 'vue';
 import $ from 'jquery';
 import Cookies from 'js-cookie';
-import BurndownChart from './burndown_chart';
+import BurndownChart from './components/burndown_chart.vue';
 import BurndownChartData from './burndown_chart_data';
 import Flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
-import { s__, __ } from '~/locale';
+import { __ } from '~/locale';
 
 export default () => {
   // handle hint dismissal
@@ -32,44 +33,22 @@ export default () => {
         const openIssuesCount = chartData.map(d => [d[0], d[1]]);
         const openIssuesWeight = chartData.map(d => [d[0], d[2]]);
 
-        const chart = new BurndownChart({ container, startDate, dueDate });
-
-        let currentView = 'count';
-        chart.setData(openIssuesCount, {
-          label: s__('BurndownChartLabel|Open issues'),
-          animate: true,
+        return new Vue({
+          el: container,
+          components: {
+            BurndownChart,
+          },
+          render(createElement) {
+            return createElement('burndown-chart', {
+              props: {
+                startDate,
+                dueDate,
+                openIssuesCount,
+                openIssuesWeight,
+              },
+            });
+          },
         });
-
-        $('.js-burndown-data-selector').on('click', 'button', function switchData() {
-          const $this = $(this);
-          const show = $this.data('show');
-          if (currentView !== show) {
-            currentView = show;
-            $this
-              .removeClass('btn-inverted')
-              .siblings()
-              .addClass('btn-inverted');
-            switch (show) {
-              case 'count':
-                chart.setData(openIssuesCount, {
-                  label: s__('BurndownChartLabel|Open issues'),
-                  animate: true,
-                });
-                break;
-              case 'weight':
-                chart.setData(openIssuesWeight, {
-                  label: s__('BurndownChartLabel|Open issue weight'),
-                  animate: true,
-                });
-                break;
-              default:
-                break;
-            }
-          }
-        });
-
-        window.addEventListener('resize', () => chart.animateResize(1));
-        $(document).on('click', '.js-sidebar-toggle', () => chart.animateResize(2));
       })
       .catch(() => new Flash(__('Error loading burndown chart data')));
   }

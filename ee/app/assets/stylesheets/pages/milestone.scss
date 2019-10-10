@@ -63,16 +63,7 @@
 
 .burndown-chart {
   width: 100%;
-  height: 380px;
   margin: 5px 0;
-
-  @include media-breakpoint-down(sm) {
-    height: 320px;
-  }
-
-  @include media-breakpoint-down(xs) {
-    height: 200px;
-  }
 
   .axis {
     font-size: 12px;
