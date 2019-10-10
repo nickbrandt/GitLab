@@ -1,7 +1,7 @@
 import { KUBERNETES_VERSIONS } from '../constants';
 
 export default () => ({
-  isValidatingCredentials: false,
+  isAuthenticating: false,
   hasCredentials: false,
   invalidCredentials: false,
   invalidCredentialsError: null,

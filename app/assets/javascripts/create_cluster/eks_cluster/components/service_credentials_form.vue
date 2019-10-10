@@ -1,14 +1,15 @@
 <script>
-import { GlFormInput, GlButton } from '@gitlab/ui';
-import { sprintf, s__ } from '~/locale';
+import { GlFormInput } from '@gitlab/ui';
+import { sprintf, s__, __ } from '~/locale';
 import _ from 'underscore';
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
+import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {
   components: {
     GlFormInput,
-    GlButton,
+    LoadingButton,
     ClipboardButton,
   },
   props: {
@@ -27,7 +28,15 @@ export default {
     };
   },
   computed: {
-    ...mapState(['accountId', 'externalId']),
+    ...mapState(['accountId', 'externalId', 'isCreatingRole', 'createRoleError']),
+    submitButtonDisabled() {
+      return this.isCreatingRole || !this.roleArn;
+    },
+    submitButtonLabel() {
+      return this.isCreatingRole
+        ? __('Authenticating')
+        : s__('ClusterIntegration|Authenticate with AWS');
+    },
     accountAndExternalIdsHelpText() {
       const escapedUrl = _.escape(this.accountAndExternalIdsHelpPath);
 
@@ -61,6 +70,14 @@ export default {
       );
     },
   },
+  methods: {
+    ...mapActions(['createRole']),
+    handleAuthenticate() {
+      const { roleArn, externalId } = this;
+
+      this.createRole({ roleArn, externalId });
+    },
+  },
 };
 </script>
 <template>
@@ -73,11 +90,14 @@ export default {
         )
       }}
     </p>
+    <div v-if="createRoleError" class="js-invalid-credentials bs-callout bs-callout-danger">
+      {{ createRoleError }}
+    </div>
     <div class="form-row">
       <div class="form-group col-md-6">
         <label for="gitlab-account-id">{{ __('Account ID') }}</label>
         <div class="input-group">
-          <gl-form-input type="text" readonly :value="accountId" id="gitlab-account-id" />
+          <gl-form-input id="gitlab-account-id" type="text" readonly :value="accountId" />
           <div class="input-group-append">
             <clipboard-button
               :text="accountId"
@@ -90,7 +110,7 @@ export default {
       <div class="form-group col-md-6">
         <label for="eks-external-id">{{ __('External ID') }}</label>
         <div class="input-group">
-          <gl-form-input type="text" readonly :value="externalId" id="eks-external-id" />
+          <gl-form-input id="eks-external-id" type="text" readonly :value="externalId" />
           <div class="input-group-append">
             <clipboard-button
               :text="externalId"
@@ -109,8 +129,12 @@ export default {
       <gl-form-input id="eks-provision-role-arn" v-model="roleArn" />
       <p class="form-text text-muted" v-html="provisionRoleArnHelpText"></p>
     </div>
-    <gl-button class="js-submit-service-credentials" :disabled="!roleArn">
-      {{ s__('ClusterIntegration|Authenticate with AWS') }}
-    </gl-button>
+    <loading-button
+      class="js-submit-service-credentials"
+      :disabled="submitButtonDisabled"
+      :loading="isCreatingRole"
+      :label="submitButtonLabel"
+      @click="handleAuthenticate($event)"
+    />
   </form>
 </template>
