@@ -5,7 +5,7 @@ require 'spec_helper'
 describe StoreSecurityReportsWorker do
   describe '#perform' do
     let(:group)   { create(:group) }
-    let(:project) { create(:project, :public, namespace: group) }
+    let(:project) { create(:project, namespace: group) }
     let(:pipeline) { create(:ci_pipeline, ref: 'master', project: project) }
 
     before do

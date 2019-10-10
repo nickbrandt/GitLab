@@ -8,7 +8,7 @@ class StoreSecurityReportsWorker
 
   def perform(pipeline_id)
     Ci::Pipeline.find(pipeline_id).try do |pipeline|
-      break unless pipeline.project.store_security_reports_available?
+      break unless pipeline.project.can_store_security_reports?
 
       ::Security::StoreReportsService.new(pipeline).execute
     end
