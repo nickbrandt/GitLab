@@ -17,25 +17,20 @@ class V2Report {
   }
 
   combine(licenses, visitor) {
-    return licenses.reduce(
-      (memo, licenseId) => {
-        const license = this.licenseMap[licenseId];
-        visitor(license);
-        if (memo.name === null) {
-          return {
-            name: license.name,
-            url: license.url,
-          };
-        }
+    const reducer = (memo, licenseId) => {
+      const license = this.licenseMap[licenseId];
+      visitor(license);
+      if (memo)
         return { name: `${memo.name}, ${license.name}`, url: '' };
-      },
-      { name: null, url: null },
-    );
+      return { name: license.name, url: license.url };
+    };
+
+    return licenses.reduce(reducer, null);
   }
 
   incrementCountFor(licenseName) {
-    const license = this.licenses.find(license => license.name === licenseName);
-    if (license) license.count += 1;
+    const matchingLicense = this.licenses.find(license => license.name === licenseName);
+    if (matchingLicense) matchingLicense.count += 1;
   }
 
   mapFromDependency(dependency) {
@@ -58,10 +53,11 @@ class V2Report {
   }
 
   static createLicenseMap(licenses) {
-    return licenses.reduce((memo, item) => {
+    const reducer = (memo, item) => {
       memo[item.id] = { name: item.name, url: item.url }; // eslint-disable-line no-param-reassign
       return memo;
-    }, {});
+    };
+    return licenses.reduce(reducer, {});
   }
 }
 
