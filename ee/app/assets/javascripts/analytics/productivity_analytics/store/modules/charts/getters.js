@@ -54,28 +54,12 @@ export const getColumnChartData = state => chartKey => {
 
 export const chartHasData = state => chartKey => !_.isEmpty(state.charts[chartKey].data);
 
-/**
- * Creates a series array of main data for the scatterplot chart.
- *
- * Takes an object of the form
- * {
- *   "1": { "metric": 138", merged_at": "2019-07-09T14:58:07.756Z" },
- *   "2": { "metric": 139, "merged_at": "2019-07-10T11:13:23.557Z" },
- *   "3": { "metric": 24, "merged_at": "2019-07-01T07:06:23.193Z" }
- * }
- *
- * and creates the following structure:
- *
- * [
- *   ["2019-07-01T07:06:23.193Z", 24],
- *   ["2019-07-09T14:58:07.756Z", 138],
- *   ["2019-07-10T11:13:23.557Z", 139],
- * ]
- *
- * It eliminates items which were merged before the startDate (minus an additional days offset).
- */
 export const getScatterPlotMainData = (state, getters, rootState) =>
-  getScatterPlotData(state.charts.scatterplot.data, rootState.filters.startDate);
+  getScatterPlotData(
+    state.charts.scatterplot.transformedData,
+    new Date(rootState.filters.startDate),
+    new Date(rootState.filters.endDate),
+  );
 
 /**
  * Creates a series array of median data for the scatterplot chart.
@@ -83,10 +67,11 @@ export const getScatterPlotMainData = (state, getters, rootState) =>
  * It calls getMedianLineData internally with the raw scatterplot data and the computed by getters.getScatterPlotMainData.
  * scatterPlotAddonQueryDays is necessary since we query the API with an additional day offset to compute the median.
  */
-export const getScatterPlotMedianData = (state, getters) =>
+export const getScatterPlotMedianData = (state, getters, rootState) =>
   getMedianLineData(
-    state.charts.scatterplot.data,
-    getters.getScatterPlotMainData,
+    state.charts.scatterplot.transformedData,
+    new Date(rootState.filters.startDate),
+    new Date(rootState.filters.endDate),
     scatterPlotAddonQueryDays,
   );
 

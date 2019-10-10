@@ -2,7 +2,7 @@ import * as types from 'ee/analytics/productivity_analytics/store/modules/charts
 import mutations from 'ee/analytics/productivity_analytics/store/modules/charts/mutations';
 import getInitialState from 'ee/analytics/productivity_analytics/store/modules/charts/state';
 import { chartKeys } from 'ee/analytics/productivity_analytics/constants';
-import { mockHistogramData } from '../../../mock_data';
+import { mockHistogramData, mockScatterplotData } from '../../../mock_data';
 
 describe('Productivity analytics chart mutations', () => {
   let state;
@@ -37,22 +37,53 @@ describe('Productivity analytics chart mutations', () => {
       expect(state.charts[chartKey].errorCode).toBe(null);
       expect(state.charts[chartKey].data).toEqual(mockHistogramData);
     });
+
+    it('updates the transformedData when chartKey=scatterplot', () => {
+      const transformedData = [
+        [
+          {
+            metric: 139,
+            merged_at: '2019-08-18T22:00:00.000Z',
+          },
+        ],
+        [
+          {
+            metric: 138,
+            merged_at: '2019-08-17T22:00:00.000Z',
+          },
+        ],
+      ];
+      mutations[types.RECEIVE_CHART_DATA_SUCCESS](state, {
+        chartKey: chartKeys.scatterplot,
+        data: mockScatterplotData,
+        transformedData,
+      });
+
+      expect(state.charts[chartKey].isLoading).toBe(false);
+      expect(state.charts[chartKey].errorCode).toBe(null);
+      expect(state.charts[chartKey].data).toEqual(mockScatterplotData);
+      expect(state.charts[chartKey].transformedData).toEqual(transformedData);
+    });
   });
 
   describe(types.RECEIVE_CHART_DATA_ERROR, () => {
     const status = 500;
-    beforeEach(() => {
-      mutations[types.RECEIVE_CHART_DATA_ERROR](state, { chartKey, status });
-    });
 
     it('sets errorCode to 500', () => {
+      mutations[types.RECEIVE_CHART_DATA_ERROR](state, { chartKey, status });
       expect(state.charts[chartKey].isLoading).toBe(false);
       expect(state.charts[chartKey].errorCode).toBe(status);
     });
 
     it('clears data', () => {
+      mutations[types.RECEIVE_CHART_DATA_ERROR](state, { chartKey, status });
       expect(state.charts[chartKey].isLoading).toBe(false);
       expect(state.charts[chartKey].data).toEqual({});
+    });
+
+    it('clears transformedData when chartKey=scatterplot', () => {
+      mutations[types.RECEIVE_CHART_DATA_ERROR](state, { chartKey: chartKeys.scatterplot, status });
+      expect(state.charts[chartKey].transformedData).toEqual([]);
     });
   });
 

@@ -6,7 +6,13 @@ import * as actions from 'ee/analytics/productivity_analytics/store/modules/char
 import * as types from 'ee/analytics/productivity_analytics/store/modules/charts/mutation_types';
 import getInitialState from 'ee/analytics/productivity_analytics/store/modules/charts/state';
 import { chartKeys } from 'ee/analytics/productivity_analytics/constants';
-import { mockHistogramData } from '../../../mock_data';
+import { mockHistogramData, mockScatterplotData } from '../../../mock_data';
+
+jest.mock('ee/analytics/productivity_analytics/utils', () => ({
+  transformScatterData: jest
+    .fn()
+    .mockImplementation(() => [[{ merged_at: '2019-09-01T00:00:000Z', metric: 10 }]]),
+}));
 
 describe('Productivity analytics chart actions', () => {
   let mockedContext;
@@ -24,6 +30,10 @@ describe('Productivity analytics chart actions', () => {
       dispatch() {},
       rootState: {
         endpoint: `${TEST_HOST}/analytics/productivity_analytics.json`,
+        filters: {
+          startDate: '2019-09-01',
+          endDate: '2091-09-05',
+        },
       },
       getters: {
         getFilterParams: () => globalParams,
@@ -49,33 +59,62 @@ describe('Productivity analytics chart actions', () => {
   describe('fetchChartData', () => {
     describe('when chart is enabled', () => {
       describe('success', () => {
-        beforeEach(() => {
-          mock.onGet(mockedState.endpoint).replyOnce(200, mockHistogramData);
+        describe('histogram charts', () => {
+          beforeEach(() => {
+            mock.onGet(mockedState.endpoint).replyOnce(200, mockHistogramData);
+          });
+
+          it('calls API with params', () => {
+            jest.spyOn(axios, 'get');
+
+            actions.fetchChartData(mockedContext, chartKey);
+
+            expect(axios.get).toHaveBeenCalledWith(mockedState.endpoint, { params: globalParams });
+          });
+
+          it('dispatches success with received data', done =>
+            testAction(
+              actions.fetchChartData,
+              chartKey,
+              mockedState,
+              [],
+              [
+                { type: 'requestChartData', payload: chartKey },
+                {
+                  type: 'receiveChartDataSuccess',
+                  payload: expect.objectContaining({ chartKey, data: mockHistogramData }),
+                },
+              ],
+              done,
+            ));
         });
 
-        it('calls API with params', () => {
-          jest.spyOn(axios, 'get');
+        describe('scatterplot chart', () => {
+          beforeEach(() => {
+            mock.onGet(mockedState.endpoint).replyOnce(200, mockScatterplotData);
+          });
 
-          actions.fetchChartData(mockedContext, chartKey);
-
-          expect(axios.get).toHaveBeenCalledWith(mockedState.endpoint, { params: globalParams });
+          it('dispatches success with received data and transformedData', done => {
+            testAction(
+              actions.fetchChartData,
+              chartKeys.scatterplot,
+              mockedState,
+              [],
+              [
+                { type: 'requestChartData', payload: chartKeys.scatterplot },
+                {
+                  type: 'receiveChartDataSuccess',
+                  payload: {
+                    chartKey: chartKeys.scatterplot,
+                    data: mockScatterplotData,
+                    transformedData: [[{ merged_at: '2019-09-01T00:00:000Z', metric: 10 }]],
+                  },
+                },
+              ],
+              done,
+            );
+          });
         });
-
-        it('dispatches success with received data', done =>
-          testAction(
-            actions.fetchChartData,
-            chartKey,
-            mockedState,
-            [],
-            [
-              { type: 'requestChartData', payload: chartKey },
-              {
-                type: 'receiveChartDataSuccess',
-                payload: expect.objectContaining({ chartKey, data: mockHistogramData }),
-              },
-            ],
-            done,
-          ));
       });
 
       describe('error', () => {
@@ -149,7 +188,7 @@ describe('Productivity analytics chart actions', () => {
         [
           {
             type: types.RECEIVE_CHART_DATA_SUCCESS,
-            payload: { chartKey, data: mockHistogramData },
+            payload: { chartKey, data: mockHistogramData, transformedData: null },
           },
         ],
         [],
