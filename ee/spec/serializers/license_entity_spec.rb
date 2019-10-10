@@ -6,7 +6,7 @@ describe LicenseEntity do
   describe '#as_json' do
     subject { described_class.represent(license).as_json }
 
-    let(:license) { build(:ci_reports_license_management_report, :mit).licenses.first }
+    let(:license) { build(:ci_reports_license_scanning_report, :mit).licenses.first }
 
     let(:assert_license) do
       {

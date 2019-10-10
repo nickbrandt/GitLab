@@ -13,7 +13,7 @@ describe LicensesListSerializer do
     let(:project) { create(:project, :repository) }
     let(:user) { create(:user) }
     let(:ci_build) { create(:ee_ci_build, :success) }
-    let(:report) { build(:ci_reports_license_management_report, :mit) }
+    let(:report) { build(:ci_reports_license_scanning_report, :mit) }
 
     before do
       project.add_guest(user)

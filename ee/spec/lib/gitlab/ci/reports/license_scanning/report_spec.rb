@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Ci::Reports::LicenseScanning::Report do
-  subject { build(:ci_reports_license_management_report, :mit) }
+  subject { build(:ci_reports_license_scanning_report, :mit) }
 
   describe '#violates?' do
     let(:project) { create(:project) }
@@ -43,8 +43,8 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
   end
 
   describe "#diff_with" do
-    let(:report_1) { build(:ci_reports_license_management_report, :report_1) }
-    let(:report_2) { build(:ci_reports_license_management_report, :report_2) }
+    let(:report_1) { build(:ci_reports_license_scanning_report, :report_1) }
+    let(:report_2) { build(:ci_reports_license_scanning_report, :report_2) }
     subject { report_1.diff_with(report_2) }
 
     before do
@@ -62,8 +62,8 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
   end
 
   describe "#empty?" do
-    let(:completed_report) { build(:ci_reports_license_management_report, :report_1) }
-    let(:empty_report) { build(:ci_reports_license_management_report) }
+    let(:completed_report) { build(:ci_reports_license_scanning_report, :report_1) }
+    let(:empty_report) { build(:ci_reports_license_scanning_report) }
 
     it { expect(empty_report).to be_empty }
     it { expect(completed_report).not_to be_empty }
