@@ -72,6 +72,7 @@ describe Gitlab::UsageData do
         ldap_keys
         ldap_users
         license_management_jobs
+        licenses_list_views
         operations_dashboard_default_dashboard
         operations_dashboard_users_with_projects_added
         pod_logs_usages_total
