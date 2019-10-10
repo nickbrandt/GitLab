@@ -2,9 +2,9 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
-Next
+v 8.13.0
 
-- Preserve original HTTP cache headers when proxying with sendurl
+- Preserve original HTTP cache headers when proxying with sendurl !428
 
 v8.12.0
 
