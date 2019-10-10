@@ -260,6 +260,10 @@
   }
 
   .file-editor {
+    .ace_underline {
+      text-decoration: none;
+    }
+
     .ace_line a {
       pointer-events: auto;
       color: inherit;
