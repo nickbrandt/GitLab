@@ -186,6 +186,159 @@ describe API::FeatureFlags do
     end
   end
 
+  describe 'POST /projects/:id/feature_flags/:name/enable' do
+    subject do
+      post api("/projects/#{project.id}/feature_flags/#{params[:name]}/enable", user),
+           params: params
+    end
+
+    let(:params) do
+      {
+        name: 'awesome-feature',
+        environment_scope: 'production',
+        strategy: { name: 'userWithId', parameters: { userIds: 'Project:1' } }.to_json
+      }
+    end
+
+    context 'when feature flag does not exist yet' do
+      it 'creates a new feature flag with the specified scope and strategy' do
+        subject
+
+        feature_flag = project.operations_feature_flags.last
+        scope = feature_flag.scopes.find_by_environment_scope(params[:environment_scope])
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(feature_flag.name).to eq(params[:name])
+        expect(scope.strategies).to eq([JSON.parse(params[:strategy])])
+      end
+
+      it_behaves_like 'check user permission'
+    end
+
+    context 'when feature flag exists already' do
+      let!(:feature_flag) { create_flag(project, params[:name]) }
+
+      context 'when feature flag scope does not exist yet' do
+        it 'creates a new scope with the specified strategy' do
+          subject
+
+          scope = feature_flag.scopes.find_by_environment_scope(params[:environment_scope])
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(scope.strategies).to eq([JSON.parse(params[:strategy])])
+        end
+
+        it_behaves_like 'check user permission'
+      end
+
+      context 'when feature flag scope exists already' do
+        let(:defined_strategy) { { name: 'userWithId', parameters: { userIds: 'Project:2' } } }
+
+        before do
+          create_scope(feature_flag, params[:environment_scope], true, [defined_strategy])
+        end
+
+        it 'adds an additional strategy to the scope' do
+          subject
+
+          scope = feature_flag.scopes.find_by_environment_scope(params[:environment_scope])
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(scope.strategies).to eq([defined_strategy.deep_stringify_keys, JSON.parse(params[:strategy])])
+        end
+
+        context 'when the specified strategy exists already' do
+          let(:defined_strategy) { JSON.parse(params[:strategy]) }
+
+          it 'does not add a duplicate strategy' do
+            subject
+
+            scope = feature_flag.scopes.find_by_environment_scope(params[:environment_scope])
+            strategy_count = scope.strategies.select { |strategy| strategy['name'] == 'userWithId' }.count
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(strategy_count).to eq(1)
+          end
+        end
+      end
+    end
+  end
+
+  describe 'POST /projects/:id/feature_flags/:name/disable' do
+    subject do
+      post api("/projects/#{project.id}/feature_flags/#{params[:name]}/disable", user),
+           params: params
+    end
+
+    let(:params) do
+      {
+        name: 'awesome-feature',
+        environment_scope: 'production',
+        strategy: { name: 'userWithId', parameters: { userIds: 'Project:1' } }.to_json
+      }
+    end
+
+    context 'when feature flag does not exist yet' do
+      it_behaves_like 'not found'
+    end
+
+    context 'when feature flag exists already' do
+      let!(:feature_flag) { create_flag(project, params[:name]) }
+
+      context 'when feature flag scope does not exist yet' do
+        it_behaves_like 'not found'
+      end
+
+      context 'when feature flag scope exists already and has the specified strategy' do
+        let(:defined_strategies) do
+          [
+            { name: 'userWithId', parameters: { userIds: 'Project:1' } },
+            { name: 'userWithId', parameters: { userIds: 'Project:2' } }
+          ]
+        end
+
+        before do
+          create_scope(feature_flag, params[:environment_scope], true, defined_strategies)
+        end
+
+        it 'removes the strategy from the scope' do
+          subject
+
+          scope = feature_flag.scopes.find_by_environment_scope(params[:environment_scope])
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+          expect(scope.strategies)
+            .to eq([{ name: 'userWithId', parameters: { userIds: 'Project:2' } }.deep_stringify_keys])
+        end
+
+        it_behaves_like 'check user permission'
+
+        context 'when strategies become empty array after the removal' do
+          let(:defined_strategies) do
+            [{ name: 'userWithId', parameters: { userIds: 'Project:1' } }]
+          end
+
+          it 'destroys the scope' do
+            subject
+
+            scope = feature_flag.scopes.find_by_environment_scope(params[:environment_scope])
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(scope).to be_nil
+          end
+
+          it_behaves_like 'check user permission'
+        end
+      end
+
+      context 'when scope exists already but cannot find the corresponding strategy' do
+        let(:defined_strategy) { { name: 'userWithId', parameters: { userIds: 'Project:2' } } }
+
+        before do
+          create_scope(feature_flag, params[:environment_scope], true, [defined_strategy])
+        end
+
+        it_behaves_like 'not found'
+      end
+    end
+  end
+
   describe 'DELETE /projects/:id/feature_flags/:name' do
     subject do
       delete api("/projects/#{project.id}/feature_flags/#{feature_flag.name}", user),
