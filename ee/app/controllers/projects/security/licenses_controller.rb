@@ -8,6 +8,8 @@ module Projects
       def index
         respond_to do |format|
           format.json do
+            ::Gitlab::UsageDataCounters::LicensesList.count(:views)
+
             render json: serializer.represent(licenses, build: report_service.build)
           end
         end
