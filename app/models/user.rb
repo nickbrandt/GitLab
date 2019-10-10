@@ -1563,7 +1563,8 @@ class User < ApplicationRecord
   end
 
   # Below is used for the signup_flow experiment. Should be removed
-  # when experiment finishes. See gitlab-org/growth/engineering#64
+  # when experiment finishes.
+  # See https://gitlab.com/gitlab-org/growth/engineering/issues/64
   REQUIRES_ROLE_VALUE = 99
 
   def role_required?

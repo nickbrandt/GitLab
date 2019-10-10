@@ -4,8 +4,6 @@
 # for more information on how to write migrations for GitLab.
 
 class AddRoleToUsers < ActiveRecord::Migration[5.2]
-  include Gitlab::Database::MigrationHelpers
-
   DOWNTIME = false
 
   def change

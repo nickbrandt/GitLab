@@ -374,6 +374,40 @@ shared_examples 'Signup' do
       end
     end
   end
+
+  context 'when reCAPTCHA and invisible captcha are enabled' do
+    before do
+      InvisibleCaptcha.timestamp_enabled = true
+      stub_application_setting(recaptcha_enabled: true)
+      allow_any_instance_of(RegistrationsController).to receive(:verify_recaptcha).and_return(false)
+    end
+
+    after do
+      InvisibleCaptcha.timestamp_enabled = false
+    end
+
+    it 'prevents from signing up' do
+      visit new_user_registration_path
+
+      fill_in 'new_user_username', with: new_user.username
+      fill_in 'new_user_email', with: new_user.email
+
+      unless Gitlab::Experimentation.enabled?(:signup_flow)
+        fill_in 'new_user_name', with: new_user.name
+        fill_in 'new_user_email_confirmation', with: new_user.email
+      end
+
+      fill_in 'new_user_password', with: new_user.password
+
+      expect { click_button 'Register' }.not_to change { User.count }
+
+      if Gitlab::Experimentation.enabled?(:signup_flow)
+        expect(page).to have_content('That was a bit too quick! Please resubmit.')
+      else
+        expect(page).to have_content('There was an error with the reCAPTCHA. Please solve the reCAPTCHA again.')
+      end
+    end
+  end
 end
 
 describe 'With original flow' do
@@ -392,21 +426,24 @@ describe 'With experimental flow' do
   it_behaves_like 'Signup'
 
   describe 'when role is required' do
-    it 'redirects to step 2 of the signup process, updates the user, sets the name and role and then redirects to the requested url' do
-      user = create(:user)
-      user.set_role_required!
-      sign_in(user)
+    it 'after registering, it redirects to step 2 of the signup process, sets the name and role and then redirects to the original requested url' do
+      new_user = build_stubbed(:user)
+      visit new_user_registration_path
+      fill_in 'new_user_username', with: new_user.username
+      fill_in 'new_user_email', with: new_user.email
+      fill_in 'new_user_password', with: new_user.password
+      click_button 'Register'
       visit new_project_path
 
-      expect(current_path).to eq users_sign_up_welcome_path
+      expect(page).to have_current_path(users_sign_up_welcome_path)
 
       fill_in 'user_name', with: 'New name'
       select 'Software Developer', from: 'user_role'
       click_button 'Get started!'
+      new_user = User.find_by_username(new_user.username)
 
-      user.reload
-      expect(user.name).to eq 'New name'
-      expect(user.software_developer_role?).to be_truthy
+      expect(new_user.name).to eq 'New name'
+      expect(new_user.software_developer_role?).to be_truthy
       expect(page).to have_current_path(new_project_path)
     end
   end
