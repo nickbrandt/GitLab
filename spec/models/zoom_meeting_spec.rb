@@ -95,6 +95,12 @@ describe ZoomMeeting do
       end
     end
 
+    shared_examples 'can remove meetings' do
+      it 'can remove Zoom meetings' do
+        create(:zoom_meeting, :removed_from_issue, issue: issue)
+      end
+    end
+
     shared_examples 'cannot add meetings' do
       it 'fails to add a new meeting' do
         expect do
@@ -133,6 +139,14 @@ describe ZoomMeeting do
       end
 
       it_behaves_like 'can add meetings'
+    end
+
+    context 'when second meeting is removed' do
+      before do
+        create(:zoom_meeting, :removed_from_issue, issue: issue)
+      end
+
+      it_behaves_like 'can remove meetings'
     end
   end
 end
