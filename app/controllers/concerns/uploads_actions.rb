@@ -29,12 +29,17 @@ module UploadsActions
   def show
     return render_404 unless uploader&.exists?
 
+    # We need to reset caching from the applications controller to get rid of the no-store value
+    headers['Cache-Control'] = ''
+    headers['Pragma'] = ''
     if cache_publicly?
-      # We need to reset caching from the applications controller to get rid of the no-store value
-      headers['Cache-Control'] = ''
+      # Caching for user avatars
       expires_in 5.minutes, public: true, must_revalidate: false
+    elsif avatar?
+      # Caching for Project + Group Avatars
+      expires_in 5.minutes, private: true, must_revalidate: true
     else
-      expires_in 0.seconds, must_revalidate: true, private: true
+      expires_in 6.months, private: true, must_revalidate: true
     end
 
     disposition = uploader.embeddable? ? 'inline' : 'attachment'
@@ -121,6 +126,10 @@ module UploadsActions
   end
 
   def cache_publicly?
+    false
+  end
+
+  def avatar?
     false
   end
 

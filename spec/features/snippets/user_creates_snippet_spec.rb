@@ -45,7 +45,7 @@ describe 'User creates snippet', :js do
       link = find('a.no-attachment-icon img[alt="banana_sample"]')['src']
       expect(link).to match(%r{/uploads/-/system/user/#{user.id}/\h{32}/banana_sample\.gif\z})
 
-      reqs = inspect_requests { visit(link) }
+      reqs = inspect_requests { visit("#{link}?ran=#{SecureRandom.base64(20)}") }
       expect(reqs.first.status_code).to eq(200)
     end
   end
@@ -63,7 +63,7 @@ describe 'User creates snippet', :js do
     link = find('a.no-attachment-icon img[alt="banana_sample"]')['src']
     expect(link).to match(%r{/uploads/-/system/personal_snippet/#{Snippet.last.id}/\h{32}/banana_sample\.gif\z})
 
-    reqs = inspect_requests { visit(link) }
+    reqs = inspect_requests { visit("#{link}?ran=#{SecureRandom.base64(20)}") }
     expect(reqs.first.status_code).to eq(200)
   end
 
@@ -88,7 +88,7 @@ describe 'User creates snippet', :js do
     link = find('a.no-attachment-icon img[alt="banana_sample"]')['src']
     expect(link).to match(%r{/uploads/-/system/personal_snippet/#{Snippet.last.id}/\h{32}/banana_sample\.gif\z})
 
-    reqs = inspect_requests { visit(link) }
+    reqs = inspect_requests { visit("#{link}?ran=#{SecureRandom.base64(20)}") }
     expect(reqs.first.status_code).to eq(200)
   end
 

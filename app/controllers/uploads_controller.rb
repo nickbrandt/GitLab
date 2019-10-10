@@ -85,6 +85,14 @@ class UploadsController < ApplicationController
     User === model || Appearance === model
   end
 
+  def avatar?
+    User === model || Project === model || Group === model
+  end
+
+  def note_upload?
+    Note === model
+  end
+
   def secret?
     params[:secret].present?
   end
