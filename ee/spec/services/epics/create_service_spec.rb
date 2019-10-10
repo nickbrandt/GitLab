@@ -25,4 +25,19 @@ describe Epics::CreateService do
       expect(NewEpicWorker).to have_received(:perform_async).with(epic.id, user.id)
     end
   end
+
+  context 'handling fixed dates' do
+    it 'sets the fixed date correctly' do
+      date = Date.new(2019, 10, 10)
+      params[:start_date_fixed] = date
+      params[:start_date_is_fixed] = true
+
+      subject
+
+      epic = Epic.last
+      expect(epic.start_date).to eq(date)
+      expect(epic.start_date_fixed).to eq(date)
+      expect(epic.start_date_is_fixed).to be_truthy
+    end
+  end
 end
