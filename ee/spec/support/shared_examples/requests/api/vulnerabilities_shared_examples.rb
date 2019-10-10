@@ -217,6 +217,4 @@ shared_examples 'getting list of vulnerability findings' do
       end
     end
   end
-
-  it_behaves_like 'forbids access to vulnerability-like endpoint in expected cases'
 end
