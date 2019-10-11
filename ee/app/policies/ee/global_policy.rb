@@ -9,7 +9,13 @@ module EE
         License.feature_available?(:operations_dashboard)
       end
 
+      condition(:security_dashboard_available) do
+        License.feature_available?(:security_dashboard)
+      end
+
       rule { operations_dashboard_available }.enable :read_operations_dashboard
+      rule { ~anonymous & security_dashboard_available }.enable :read_security_dashboard
+
       rule { admin }.policy do
         enable :read_licenses
         enable :destroy_licenses
