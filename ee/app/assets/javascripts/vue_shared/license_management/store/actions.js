@@ -1,6 +1,8 @@
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
+import { convertToOldReportFormat } from './utils';
+import { pollUntilComplete } from '../../security_reports/store/utils';
 
 export const setAPISettings = ({ commit }, data) => {
   commit(types.SET_API_SETTINGS, data);
@@ -58,6 +60,29 @@ export const loadManagedLicenses = ({ dispatch, state }) => {
     })
     .catch(error => {
       dispatch('receiveLoadManagedLicensesError', error);
+    });
+};
+
+export const requestLoadParsedLicenseReport = ({ commit }) => {
+  commit(types.REQUEST_LOAD_PARSED_LICENSE_REPORT);
+};
+export const receiveLoadParsedLicenseReport = ({ commit }, reports) => {
+  commit(types.RECEIVE_LOAD_PARSED_LICENSE_REPORT, reports);
+};
+export const receiveLoadParsedLicenseReportError = ({ commit }, error) => {
+  commit(types.RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR, error);
+};
+export const loadParsedLicenseReport = ({ dispatch, state }) => {
+  dispatch('requestLoadParsedLicenseReport');
+
+  pollUntilComplete(state.licensesApiPath)
+    .then(({ data }) => {
+      const newLicenses = (data.new_licenses || data).map(convertToOldReportFormat);
+      const existingLicenses = (data.existing_licenses || []).map(convertToOldReportFormat);
+      dispatch('receiveLoadParsedLicenseReport', { newLicenses, existingLicenses });
+    })
+    .catch(() => {
+      dispatch('receiveLoadLicenseReportError');
     });
 };
 

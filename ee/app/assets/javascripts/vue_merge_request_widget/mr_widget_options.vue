@@ -145,6 +145,9 @@ export default {
         !this.mr.autoMergeEnabled
       );
     },
+    licensesApiPath() {
+      return (gl && gl.mrWidgetData && gl.mrWidgetData.license_management_comparison_path) || null;
+    },
   },
   created() {
     if (this.shouldRenderCodeQuality) {
@@ -297,6 +300,7 @@ export default {
       <mr-widget-licenses
         v-if="shouldRenderLicenseReport"
         :api-url="mr.licenseManagement.managed_licenses_path"
+        :licenses-api-path="licensesApiPath"
         :pipeline-path="mr.pipeline.path"
         :can-manage-licenses="mr.licenseManagement.can_manage_licenses"
         :full-report-path="mr.licenseManagement.license_management_full_report_path"

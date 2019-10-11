@@ -4,12 +4,15 @@ import { parseLicenseReportMetrics } from './utils';
 export const isLoading = state => state.isLoadingManagedLicenses || state.isLoadingLicenseReport;
 
 export const licenseReport = state =>
-  parseLicenseReportMetrics(state.headReport, state.baseReport, state.managedLicenses);
+  gon.features && gon.features.parsedLicenseReport
+    ? state.newLicenses
+    : parseLicenseReportMetrics(state.headReport, state.baseReport, state.managedLicenses);
 
 export const licenseSummaryText = (state, getters) => {
   const hasReportItems = getters.licenseReport && getters.licenseReport.length;
   const baseReportHasLicenses =
-    state.baseReport && state.baseReport.licenses && state.baseReport.licenses.length;
+    state.existingLicenses.length ||
+    (state.baseReport && state.baseReport.licenses && state.baseReport.licenses.length);
 
   if (getters.isLoading) {
     return sprintf(s__('ciReport|Loading %{reportName} report'), {

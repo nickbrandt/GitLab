@@ -154,3 +154,26 @@ export const getPackagesString = (packages, truncate, maxPackages) => {
     lastPackage,
   });
 };
+
+/**
+ * This converts the newer licence format into the old one so we can use it with our older components.
+ *
+ * NOTE: This helper is temporary and can be removed once we flip the `parsedLicenseReport` feature flag
+ * The below issue is for tracking its removal:
+ * https://gitlab.com/gitlab-org/gitlab/issues/33878
+ *
+ * @param {Object} license The license in the newer format that needs converting
+ * @returns {Object} The converted license;
+ */
+
+export const convertToOldReportFormat = license => {
+  const approvalStatus = license.classification.approval_status;
+
+  return {
+    ...license,
+    approvalStatus,
+    id: license.classification.id,
+    packages: license.dependencies,
+    status: getIssueStatusFromLicenseStatus(approvalStatus),
+  };
+};
