@@ -54,6 +54,16 @@ Example response:
       "namespace":"cluster-1-namespace",
       "authorization_type":"rbac",
       "ca_cert":"-----BEGIN CERTIFICATE-----\r\nhFiK1L61owwDQYJKoZIhvcNAQELBQAw\r\nLzEtMCsGA1UEAxMkZDA1YzQ1YjctNzdiMS00NDY0LThjNmEtMTQ0ZDJkZjM4ZDBj\r\nMB4XDTE4MTIyNzIwMDM1MVoXDTIzMTIyNjIxMDM1MVowLzEtMCsGA1UEAxMkZDA1\r\nYzQ1YjctNzdiMS00NDY0LThjNmEtMTQ0ZDJkZjM.......-----END CERTIFICATE-----"
+    },
+    "management_project":
+    {
+      "id":2,
+      "description":null,
+      "name":"project2",
+      "name_with_namespace":"John Doe8 / project2",
+      "path":"project2",
+      "path_with_namespace":"namespace2/project2",
+      "created_at":"2019-10-11T02:55:54.138Z"
     }
   },
   {
@@ -112,6 +122,16 @@ Example response:
     "namespace":"cluster-1-namespace",
     "authorization_type":"rbac",
     "ca_cert":"-----BEGIN CERTIFICATE-----\r\nhFiK1L61owwDQYJKoZIhvcNAQELBQAw\r\nLzEtMCsGA1UEAxMkZDA1YzQ1YjctNzdiMS00NDY0LThjNmEtMTQ0ZDJkZjM4ZDBj\r\nMB4XDTE4MTIyNzIwMDM1MVoXDTIzMTIyNjIxMDM1MVowLzEtMCsGA1UEAxMkZDA1\r\nYzQ1YjctNzdiMS00NDY0LThjNmEtMTQ0ZDJkZjM.......-----END CERTIFICATE-----"
+  },
+  "management_project":
+  {
+    "id":2,
+    "description":null,
+    "name":"project2",
+    "name_with_namespace":"John Doe8 / project2",
+    "path":"project2",
+    "path_with_namespace":"namespace2/project2",
+    "created_at":"2019-10-11T02:55:54.138Z"
   },
   "project":
   {
@@ -205,6 +225,7 @@ Example response:
     "authorization_type":"rbac",
     "ca_cert":"-----BEGIN CERTIFICATE-----\r\nhFiK1L61owwDQYJKoZIhvcNAQELBQAw\r\nLzEtMCsGA1UEAxMkZDA1YzQ1YjctNzdiMS00NDY0LThjNmEtMTQ0ZDJkZjM4ZDBj\r\nMB4XDTE4MTIyNzIwMDM1MVoXDTIzMTIyNjIxMDM1MVowLzEtMCsGA1UEAxMkZDA1\r\nYzQ1YjctNzdiMS00NDY0LThjNmEtMTQ0ZDJkZjM.......-----END CERTIFICATE-----"
   },
+  "management_project":null,
   "project":
   {
     "id":26,
@@ -300,6 +321,16 @@ Example response:
     "namespace":"cluster-5-namespace",
     "authorization_type":"rbac",
     "ca_cert":null
+  },
+  "management_project":
+  {
+    "id":2,
+    "description":null,
+    "name":"project2",
+    "name_with_namespace":"John Doe8 / project2",
+    "path":"project2",
+    "path_with_namespace":"namespace2/project2",
+    "created_at":"2019-10-11T02:55:54.138Z"
   },
   "project":
   {
