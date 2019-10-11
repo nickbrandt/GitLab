@@ -17,9 +17,9 @@ class TrialsController < ApplicationController
   end
 
   def create_lead
-    @lead_result = GitlabSubscriptions::CreateLeadService.new.execute({ trial_user: company_params })
+    @result = GitlabSubscriptions::CreateLeadService.new.execute({ trial_user: company_params })
 
-    if @lead_result[:success]
+    if @result[:success]
       redirect_to select_trials_url
     else
       render :new
@@ -29,9 +29,9 @@ class TrialsController < ApplicationController
   def apply
     return render(:select) if @namespace.invalid?
 
-    @trial_result = GitlabSubscriptions::ApplyTrialService.new.execute(apply_trial_params)
+    @result = GitlabSubscriptions::ApplyTrialService.new.execute(apply_trial_params)
 
-    if @trial_result&.dig(:success)
+    if @result&.dig(:success)
       redirect_to group_url(@namespace, { trial: true })
     else
       render :select
