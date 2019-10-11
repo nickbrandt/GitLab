@@ -32,7 +32,6 @@ module QA
           EE::Page::Component::IssueBoard::Show.perform do |show|
             expect(show.boards_dropdown).to have_content(label_board_list.board.name)
             expect(show.boards_list_header_with_index(1)).to have_content(label)
-            expect(show.boards_list_cards_area_with_index(1)).to have_content(label)
             expect(show.card_of_list_with_index(1)).to have_content(issue_title)
           end
         end
