@@ -20,7 +20,7 @@ module ApplicationSettings
       add_to_outbound_local_requests_whitelist(@params.delete(:add_to_outbound_local_requests_whitelist))
 
       if params.key?(:performance_bar_allowed_group_path)
-        group_id = performance_bar_allowed_group_id
+        group_id = process_performance_bar_allowed_group_id
 
         return false if application_setting.errors.any?
 
@@ -69,22 +69,20 @@ module ApplicationSettings
       @application_setting.reset_memoized_terms
     end
 
-    def performance_bar_allowed_group_id
+    def process_performance_bar_allowed_group_id
       group_full_path = params.delete(:performance_bar_allowed_group_path)
-      enable_param_set = params.key?(:performance_bar_enabled)
       enable_param_on = Gitlab::Utils.to_boolean(params.delete(:performance_bar_enabled))
-      performance_bar_disabled_by_user = enable_param_set && !enable_param_on
-      performance_bar_enabled = !enable_param_set || enable_param_on
+      performance_bar_enabled = enable_param_on.nil? || enable_param_on # Default to true
 
       return if group_full_path.blank?
-      return if performance_bar_disabled_by_user
+      return if enable_param_on == false # Explicitly disabling
 
       unless performance_bar_enabled
         application_setting.errors.add(:performance_bar_allowed_group_id, 'not allowed when performance bar is disabled')
         return
       end
 
-      group = Group.find_by_full_path(group_full_path)
+      group = Group.find_by_full_path(group_full_path.chomp('/'))
 
       unless group
         application_setting.errors.add(:performance_bar_allowed_group_id, 'not found')

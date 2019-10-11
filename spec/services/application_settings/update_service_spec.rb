@@ -159,6 +159,7 @@ describe ApplicationSettings::UpdateService do
       true | 'foo' | 42_000_000 | 42_000_000 | false
       true | 'group_a' | nil | 42_000_000 | true
       true | 'group_b' | 42_000_000 | 43_000_000 | true
+      true | 'group_b/' | 42_000_000 | 43_000_000 | true
       true | 'group_a' | 42_000_000 | 42_000_000 | true
       false | '' | nil | nil | true
       false | '' | 42_000_000 | nil | true
