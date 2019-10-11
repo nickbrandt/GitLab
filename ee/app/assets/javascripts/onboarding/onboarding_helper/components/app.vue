@@ -137,7 +137,7 @@ export default {
         }
       }
     },
-    handleClickPopoverButton(button) {
+    handleStepContentButton(button) {
       const { showExitTourContent, redirectPath, nextPart, dismissPopover } = button;
       const helpContentItems = this.stepContent
         ? this.stepContent.getHelpContent({ projectName: this.projectName })
@@ -248,7 +248,7 @@ export default {
       :initial-show="initialShowPopover"
       :dismiss-popover="dismissPopover"
       :golden-tanuki-svg-path="goldenTanukiSvgPath"
-      @clickPopoverButton="handleClickPopoverButton"
+      @clickStepContentButton="handleStepContentButton"
       @clickExitTourButton="handleExitTourButton"
       @clickFeedbackButton="handleFeedbackButton"
       @restartStep="handleRestartStep"

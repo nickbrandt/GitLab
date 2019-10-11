@@ -35,8 +35,8 @@ export default {
     },
   },
   methods: {
-    callButtonAction(button) {
-      this.$emit('clickActionButton', button);
+    callStepContentButton(button) {
+      this.$emit('clickStepContentButton', button);
     },
     callExitTour() {
       this.$emit('clickExitTourButton');
@@ -66,7 +66,7 @@ export default {
             :key="index"
             :class="button.btnClass"
             class="btn btn-sm mr-2"
-            @click="callButtonAction(button)"
+            @click="callStepContentButton(button)"
           >
             {{ button.text }}
           </gl-button>
