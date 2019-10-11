@@ -6,12 +6,7 @@
 %p.center
   = _('We need some additional information to activate your free trial')
 
-- if @lead_result&.dig(:errors).present?
-  .flash-container
-    .flash-alert.text-center
-      = _('We have found the following errors:')
-      .flash-text
-        = @lead_result[:errors]
+= render 'errors'
 
 = form_tag create_lead_trials_path, method: :post do |f|
   .form-group
