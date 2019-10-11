@@ -24,6 +24,10 @@ test using go 1.12:
   image: golang:1.12
   <<: *test_definition
 
+test using go 1.13:
+  image: golang:1.13
+  <<: *test_definition
+
 test:release:
   only:
     - tags
