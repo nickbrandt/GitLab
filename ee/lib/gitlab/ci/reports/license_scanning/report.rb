@@ -5,10 +5,16 @@ module Gitlab
     module Reports
       module LicenseScanning
         class Report
-          attr_reader :found_licenses
+          delegate :empty?, :fetch, to: :found_licenses
+          attr_accessor :version
 
-          def initialize
+          def initialize(version: '1.0')
+            @version = version
             @found_licenses = {}
+          end
+
+          def major_version
+            version.split('.')[0]
           end
 
           def licenses
@@ -19,10 +25,12 @@ module Gitlab
             found_licenses.values.map(&:name)
           end
 
-          def add_dependency(license_name, license_count, license_url, dependency_name)
-            key = license_name.upcase
-            found_licenses[key] ||= ::Gitlab::Ci::Reports::LicenseScanning::License.new(license_name, license_count, license_url)
-            found_licenses[key].add_dependency(dependency_name)
+          def add_license(id:, name:, url: '')
+            add(::Gitlab::Ci::Reports::LicenseScanning::License.new(id: id, name: name, url: url))
+          end
+
+          def add(license)
+            found_licenses[license.canonical_id] ||= license
           end
 
           def violates?(software_license_policies)
@@ -30,23 +38,14 @@ module Gitlab
           end
 
           def diff_with(other_report)
-            base = self.license_names.map { |name| canonicalize(name) }
-            head = other_report.license_names.map { |name| canonicalize(name) }
+            base = self.licenses
+            head = other_report.licenses
 
             {
-              added: other_report.find_by_names(head - base),
-              unchanged: find_by_names(base & head),
-              removed: find_by_names(base - head)
+              added: (head - base),
+              unchanged: (base & head),
+              removed: (base - head)
             }
-          end
-
-          def find_by_names(names)
-            names = names.map { |name| canonicalize(name) }
-            licenses.select { |license| names.include?(canonicalize(license.name)) }
-          end
-
-          def empty?
-            found_licenses.empty?
           end
 
           def self.parse_from(json)
@@ -57,9 +56,7 @@ module Gitlab
 
           private
 
-          def canonicalize(name)
-            name.downcase
-          end
+          attr_reader :found_licenses
         end
       end
     end

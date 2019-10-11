@@ -191,8 +191,8 @@ describe Ci::Build do
           expect { subject }.not_to raise_error
 
           expect(license_scanning_report.licenses.count).to eq(4)
-          expect(license_scanning_report.found_licenses['MIT'].name).to eq('MIT')
-          expect(license_scanning_report.found_licenses['MIT'].dependencies.count).to eq(52)
+          expect(license_scanning_report.licenses.map(&:name)).to contain_exactly("Apache 2.0", "MIT", "New BSD", "unknown")
+          expect(license_scanning_report.licenses.find { |x| x.name == 'MIT' }.dependencies.count).to eq(52)
         end
       end
 

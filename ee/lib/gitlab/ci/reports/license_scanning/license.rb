@@ -5,13 +5,23 @@ module Gitlab
     module Reports
       module LicenseScanning
         class License
-          attr_reader :name, :url, :count
+          attr_reader :id, :name, :url
 
-          def initialize(name, count, url)
+          delegate :count, to: :dependencies
+
+          def initialize(id:, name:, url:)
+            @id = 'unknown' == id ? nil : id
             @name = name
-            @count = count
             @url = url
             @dependencies = Set.new
+          end
+
+          def canonical_id
+            id || name&.downcase
+          end
+
+          def hash
+            canonical_id.hash
           end
 
           def add_dependency(name)
@@ -20,6 +30,12 @@ module Gitlab
 
           def dependencies
             @dependencies.to_a
+          end
+
+          def eql?(other)
+            super(other) ||
+              (id && other.id && id.eql?(other.id)) ||
+              (name && other.name && name.casecmp?(other.name))
           end
         end
       end

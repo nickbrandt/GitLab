@@ -10,6 +10,14 @@ module Gitlab
           def initialize(name)
             @name = name
           end
+
+          def hash
+            name.hash
+          end
+
+          def eql?(other)
+            self.name == other.name
+          end
         end
       end
     end

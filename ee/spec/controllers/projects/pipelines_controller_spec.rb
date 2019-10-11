@@ -291,7 +291,7 @@ describe Projects::PipelinesController do
 
         it 'will return mit license approved status' do
           payload_mit = payload.find { |l| l['name'] == 'MIT' }
-          expect(payload_mit['count']).to eq(pipeline.license_scanning_report.found_licenses['MIT'].count)
+          expect(payload_mit['count']).to eq(pipeline.license_scanning_report.licenses.find { |x| x.name == 'MIT' }.count)
           expect(payload_mit['url']).to eq('http://opensource.org/licenses/mit-license')
           expect(payload_mit['classification']['approval_status']).to eq('approved')
         end
