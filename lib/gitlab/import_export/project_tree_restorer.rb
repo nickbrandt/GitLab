@@ -87,6 +87,8 @@ module Gitlab
 
         # consume and remove objects from memory
         while data_hash = data_hashes.shift
+          remove_feature_dependent_sub_relations!(data_hash)
+
           process_project_relation_item!(relation_key, relation_definition, data_hash)
         end
       end
