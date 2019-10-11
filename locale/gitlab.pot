@@ -4005,6 +4005,9 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
+msgid "Code Analytics"
+msgstr ""
+
 msgid "Code Owners"
 msgstr ""
 
@@ -8528,6 +8531,12 @@ msgid "IP subnet restriction only allowed for top-level groups"
 msgstr ""
 
 msgid "Identifier"
+msgstr ""
+
+msgid "Identify areas of the codebase associated with a lot of churn, which can indicate potential code hotspots."
+msgstr ""
+
+msgid "Identify the most frequently changed files in your repository"
 msgstr ""
 
 msgid "Identities"
