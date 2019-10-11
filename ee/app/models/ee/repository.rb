@@ -60,24 +60,14 @@ module EE
       upstream_branch = upstream_branch_name(branch_name)
       return false unless upstream_branch
 
-      branch_commit = commit("refs/heads/#{branch_name}")
-      upstream_commit = commit("refs/remotes/#{MIRROR_REMOTE}/#{upstream_branch}")
-
-      if branch_commit && upstream_commit
+      diverged?(branch_name, MIRROR_REMOTE, upstream_branch_name: upstream_branch) do |branch_commit, upstream_commit|
         !raw_repository.ancestor?(branch_commit.id, upstream_commit.id)
-      else
-        false
       end
     end
 
     def upstream_has_diverged?(branch_name, remote_ref)
-      branch_commit = commit("refs/heads/#{branch_name}")
-      upstream_commit = commit("refs/remotes/#{remote_ref}/#{branch_name}")
-
-      if branch_commit && upstream_commit
+      diverged?(branch_name, remote_ref) do |branch_commit, upstream_commit|
         !raw_repository.ancestor?(upstream_commit.id, branch_commit.id)
-      else
-        false
       end
     end
 
@@ -85,13 +75,8 @@ module EE
       upstream_branch = upstream_branch_name(branch_name)
       return false unless upstream_branch
 
-      branch_commit = commit("refs/heads/#{branch_name}")
-      upstream_commit = commit("refs/remotes/#{MIRROR_REMOTE}/#{upstream_branch}")
-
-      if branch_commit && upstream_commit
+      diverged?(branch_name, MIRROR_REMOTE, upstream_branch_name: upstream_branch) do |branch_commit, upstream_commit|
         ancestor?(branch_commit.id, upstream_commit.id)
-      else
-        false
       end
     end
 
@@ -122,6 +107,19 @@ module EE
 
     def insights_config_for(sha)
       blob_data_at(sha, ::Gitlab::Insights::CONFIG_FILE_PATH)
+    end
+
+    private
+
+    def diverged?(branch_name, remote_ref, upstream_branch_name: branch_name)
+      branch_commit = commit("refs/heads/#{branch_name}")
+      upstream_commit = commit("refs/remotes/#{remote_ref}/#{upstream_branch_name}")
+
+      if branch_commit && upstream_commit
+        yield branch_commit, upstream_commit
+      else
+        false
+      end
     end
   end
 end
