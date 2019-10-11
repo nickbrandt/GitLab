@@ -18,7 +18,7 @@ module QA
         project.visit!
 
         Page::Project::Menu.perform(&:go_to_boards)
-        EE::Page::Project::Issue::Board::Show.perform do |show|
+        EE::Page::Component::IssueBoard::Show.perform do |show|
           show.click_focus_mode_button
 
           expect(show.focused_board).to be_visible

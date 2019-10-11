@@ -25,7 +25,7 @@ module QA
       end
 
       it 'shows only issues that match the configured label' do
-        EE::Page::Project::Issue::Board::Show.perform do |show|
+        EE::Page::Component::IssueBoard::Show.perform do |show|
           show.configure_by_label(doing)
 
           expect(show).not_to have_content(issue_2)

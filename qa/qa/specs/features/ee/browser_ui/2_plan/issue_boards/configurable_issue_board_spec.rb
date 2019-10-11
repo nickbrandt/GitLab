@@ -18,7 +18,7 @@ module QA
       it 'renames the issue board' do
         new_board_name = 'UX'
 
-        EE::Page::Project::Issue::Board::Show.perform do |show|
+        EE::Page::Component::IssueBoard::Show.perform do |show|
           show.click_boards_config_button
 
           show.set_name(new_board_name)
