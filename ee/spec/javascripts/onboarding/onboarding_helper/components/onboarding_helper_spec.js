@@ -230,13 +230,15 @@ describe('User onboarding tour parts list', () => {
       });
     });
 
-    describe('callButtonAction', () => {
-      it('emits the "clickPopoverButton" event when a popover button is clicked', () => {
+    describe('callStepContentButton', () => {
+      it('emits the "clickStepContentButton" event when a popover button is clicked', () => {
         const button = defaultProps.helpContent.buttons[0];
 
-        wrapper.vm.callButtonAction(button);
+        wrapper.vm.callStepContentButton(button);
 
-        expect(wrapper.emittedByOrder()).toEqual([{ name: 'clickPopoverButton', args: [button] }]);
+        expect(wrapper.emittedByOrder()).toEqual([
+          { name: 'clickStepContentButton', args: [button] },
+        ]);
       });
     });
 

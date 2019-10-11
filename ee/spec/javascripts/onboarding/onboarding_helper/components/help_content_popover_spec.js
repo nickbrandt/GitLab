@@ -49,14 +49,14 @@ describe('User onboarding help content popover', () => {
   });
 
   describe('methods', () => {
-    describe('callButtonAction', () => {
-      it('emits clickActionButton when called', () => {
+    describe('callStepContentButton', () => {
+      it('emits clickStepContentButton when called', () => {
         createComponent(defaultProps);
 
         wrapper.find('.btn-primary').vm.$emit('click');
 
         expect(wrapper.emittedByOrder()).toEqual([
-          { name: 'clickActionButton', args: [defaultProps.helpContent.buttons[0]] },
+          { name: 'clickStepContentButton', args: [defaultProps.helpContent.buttons[0]] },
         ]);
       });
     });
