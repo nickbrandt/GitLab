@@ -8,8 +8,8 @@ describe Gitlab::Ci::Reports::LicenseScanning::ReportsComparer do
   let(:report_comparer) { described_class.new(report_1, report_2) }
 
   before do
-    report_1.add_dependency('BSD', 1, 'https://opensource.org/licenses/0BSD', 'Library1')
-    report_2.add_dependency('bsd', 1, 'https://opensource.org/licenses/0BSD', 'Library1')
+    report_1.add_license(id: nil, name: 'BSD').add_dependency('Library1')
+    report_2.add_license(id: nil, name: 'bsd').add_dependency('Library1')
   end
 
   def names_from(licenses)
