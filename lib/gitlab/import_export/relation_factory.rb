@@ -42,6 +42,9 @@ module Gitlab
 
       TOKEN_RESET_MODELS = %i[Project Namespace Ci::Trigger Ci::Build Ci::Runner ProjectHook].freeze
 
+      # This represents all relations that have unique key on `project_id`
+      UNIQUE_RELATIONS = %i[project_feature ProjectCiCdSetting].freeze
+
       def self.create(*args)
         new(*args).create
       end
@@ -324,7 +327,8 @@ module Gitlab
       end
 
       def find_or_create_object!
-        return relation_class.find_or_create_by(project_id: @project.id) if @relation_name == :project_feature
+        return relation_class.find_or_create_by(project_id: @project.id) if UNIQUE_RELATIONS.include?(@relation_name)
+
         return find_or_create_merge_request! if @relation_name == :merge_request
 
         # Can't use IDs as validation exists calling `group` or `project` attributes
