@@ -94,7 +94,7 @@ module Gitlab
       def process_project_relation_item!(relation_key, relation_definition, data_hash)
         relation_object = build_relation(relation_key, relation_definition, data_hash)
         return unless relation_object
-        return if is_group_model?(relation_object)
+        return if group_model?(relation_object)
 
         relation_object.project = @project
         relation_object.save!
@@ -207,7 +207,7 @@ module Gitlab
         end
       end
 
-      def is_group_model?(relation_object)
+      def group_model?(relation_object)
         GROUP_MODELS.include?(relation_object.class) && relation_object.group_id
       end
 
