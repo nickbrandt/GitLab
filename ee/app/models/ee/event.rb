@@ -3,6 +3,7 @@
 module EE
   module Event
     extend ActiveSupport::Concern
+    extend ::Gitlab::Utils::Override
 
     prepended do
       scope :issues, -> { where(target_type: 'Issue') }
@@ -12,6 +13,18 @@ module EE
       scope :merged, -> { where(action: ::Event::MERGED) }
       scope :totals_by_author, -> { group(:author_id).count }
       scope :totals_by_author_target_type_action, -> { group(:author_id, :target_type, :action).count }
+      scope :epics, -> { where(target_type: 'Epic') }
+    end
+
+    override :visible_to_user?
+    def visible_to_user?(user = nil)
+      if epic?
+        Ability.allowed?(user, :read_epic, target)
+      elsif epic_note?
+        Ability.allowed?(user, :read_epic, note_target)
+      else
+        super
+      end
     end
 
     def epic_note?

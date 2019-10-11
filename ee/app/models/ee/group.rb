@@ -232,6 +232,11 @@ module EE
       ::Gitlab.config.dependency_proxy.enabled && feature_available?(:dependency_proxy)
     end
 
+    override :supports_events?
+    def supports_events?
+      ::Feature.enabled?(:group_events) && feature_available?(:epics)
+    end
+
     private
 
     def custom_project_templates_group_allowed
