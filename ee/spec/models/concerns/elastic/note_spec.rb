@@ -75,22 +75,32 @@ describe Note, :elastic do
   end
 
   it "returns json with all needed elements" do
-    note = create :note
+    assignee = create(:user)
+    issue = create(:issue, assignees: [assignee])
+    note = create(:note, noteable: issue, project: issue.project)
 
-    expected_hash_keys = %w(
-      id
-      note
-      project_id
-      noteable_type
-      noteable_id
-      created_at
-      updated_at
-      issue
-      join_field
-      type
-    )
+    expected_hash = note.attributes.extract!(
+      'id',
+      'note',
+      'project_id',
+      'noteable_type',
+      'noteable_id',
+      'created_at',
+      'updated_at'
+    ).merge({
+      'issue' => {
+        'assignee_id' => issue.assignee_ids,
+        'author_id' => issue.author_id,
+        'confidential' => issue.confidential
+      },
+      'type' => note.es_type,
+      'join_field' => {
+        'name' => note.es_type,
+        'parent' => note.es_parent
+      }
+    })
 
-    expect(note.__elasticsearch__.as_indexed_json.keys).to eq(expected_hash_keys)
+    expect(note.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 
   it "does not create ElasticIndexerWorker job for system messages" do

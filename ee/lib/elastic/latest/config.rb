@@ -66,6 +66,7 @@ module Elastic
               blob
               wiki_blob
               commit
+              snippet
             )
           }
         # ES6 requires a single type per index, so we implement our own "type"

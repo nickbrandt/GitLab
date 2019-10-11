@@ -4,7 +4,7 @@ module Elastic
     extend ActiveSupport::Concern
 
     FORWARDABLE_INSTANCE_METHODS = [:es_id, :es_parent].freeze
-    FORWARDABLE_CLASS_METHODS = [:elastic_search, :es_import, :nested?, :es_type, :index_name, :document_type, :mapping, :mappings, :settings, :import].freeze
+    FORWARDABLE_CLASS_METHODS = [:elastic_search, :es_import, :es_type, :index_name, :document_type, :mapping, :mappings, :settings, :import].freeze
 
     def __elasticsearch__(&block)
       @__elasticsearch__ ||= ::Elastic::MultiVersionInstanceProxy.new(self)
