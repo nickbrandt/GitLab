@@ -37,8 +37,8 @@ export default {
   computed: {
     copyToClipboard() {
       return {
-        script: s__('VisualReviewApp|Copy script to clipboard'),
-        mrId: s__('VisualReviewApp|Copy merge request ID to clipboard'),
+        script: s__('VisualReviewApp|Copy script'),
+        mrId: s__('VisualReviewApp|Copy merge request ID'),
       };
     },
     copyString() {
@@ -147,7 +147,7 @@ export default {
       <template slot="modal-ok">
         <a :href="link" target="_blank" rel="noopener noreferrer nofollow" class="text-white">
           {{ s__('VisualReviewApp|Open review app') }}
-          <icon css-classes="fwhite" name="external-link" />
+          <icon class="fwhite" name="external-link" />
         </a>
       </template>
       <p v-html="instructionText.intro.p1"></p>

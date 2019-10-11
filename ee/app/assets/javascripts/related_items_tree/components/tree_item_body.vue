@@ -110,7 +110,7 @@ export default {
         <div class="item-title d-flex align-items-center mb-1 mb-xl-0">
           <icon
             ref="stateIconLg"
-            :css-classes="stateIconClass"
+            :class="stateIconClass"
             :name="stateIconName"
             :size="16"
             :aria-label="stateText"
@@ -129,7 +129,7 @@ export default {
             :title="__('Confidential')"
             :aria-label="__('Confidential')"
             name="eye-slash"
-            css-classes="confidential-icon append-right-4 align-self-baseline align-self-md-auto mt-xl-0"
+            class="confidential-icon append-right-4 align-self-baseline align-self-md-auto mt-xl-0"
           />
           <gl-link :href="computedPath" class="sortable-link">{{ item.title }}</gl-link>
         </div>
@@ -139,7 +139,7 @@ export default {
           >
             <icon
               ref="stateIconMd"
-              :css-classes="stateIconClass"
+              :class="stateIconClass"
               :name="stateIconName"
               :size="16"
               :aria-label="stateText"
@@ -193,7 +193,7 @@ export default {
           class="btn-svg btn-item-remove js-issue-item-remove-button qa-remove-issue-button"
           @click="handleRemoveClick"
         >
-          <icon :size="16" name="close" css-classes="btn-item-remove-icon" />
+          <icon :size="16" name="close" class="btn-item-remove-icon" />
         </gl-button>
         <span v-if="!parentItem.userPermissions.adminEpic" class="p-3"></span>
       </div>

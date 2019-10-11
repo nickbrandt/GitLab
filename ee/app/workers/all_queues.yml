@@ -14,6 +14,7 @@
 - cronjob:geo_repository_verification_secondary_shard
 - cronjob:geo_container_repository_sync_dispatch
 - cronjob:historical_data
+- cronjob:import_software_licenses
 - cronjob:ldap_all_groups_sync
 - cronjob:ldap_sync
 - cronjob:update_all_mirrors
@@ -32,6 +33,7 @@
 - geo:geo_hashed_storage_migration
 - geo:geo_project_sync
 - geo:geo_container_repository_sync
+- geo:geo_design_repository_sync
 - geo:geo_rename_repository
 - geo:geo_secondary_repository_backfill
 - geo:geo_repositories_clean_up
@@ -51,12 +53,14 @@
 - pipeline_default:ci_pipeline_bridge_status
 
 - incident_management:incident_management_process_alert
+- incident_management:incident_management_process_prometheus_alert
 
 - jira_connect:jira_connect_sync_branch
 - jira_connect:jira_connect_sync_merge_request
 
 - admin_emails
 - create_github_webhook
+- design_management_new_version
 - elastic_batch_project_indexer
 - elastic_namespace_indexer
 - elastic_commit_indexer

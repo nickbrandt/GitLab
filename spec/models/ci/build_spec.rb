@@ -2210,6 +2210,7 @@ describe Ci::Build do
           { key: 'CI_BUILD_STAGE', value: 'test', public: true, masked: false },
           { key: 'CI_PROJECT_ID', value: project.id.to_s, public: true, masked: false },
           { key: 'CI_PROJECT_NAME', value: project.path, public: true, masked: false },
+          { key: 'CI_PROJECT_TITLE', value: project.title, public: true, masked: false },
           { key: 'CI_PROJECT_PATH', value: project.full_path, public: true, masked: false },
           { key: 'CI_PROJECT_PATH_SLUG', value: project.full_path_slug, public: true, masked: false },
           { key: 'CI_PROJECT_NAMESPACE', value: project.namespace.full_path, public: true, masked: false },
@@ -3077,6 +3078,12 @@ describe Ci::Build do
     def run_job_without_exception
       job.run!
     rescue StateMachines::InvalidTransition
+    end
+
+    it 'ensures pipeline ref existence' do
+      expect(job.pipeline.persistent_ref).to receive(:create).once
+
+      run_job_without_exception
     end
 
     shared_examples 'saves data on transition' do

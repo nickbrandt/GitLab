@@ -38,6 +38,15 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
 
   it { is_expected.to respond_to :project }
 
+  describe 'applications have inverse_of: :cluster option' do
+    let(:cluster) { create(:cluster) }
+    let!(:helm) { create(:clusters_applications_helm, cluster: cluster) }
+
+    it 'does not do a third query when referencing cluster again' do
+      expect { cluster.application_helm.cluster }.not_to exceed_query_limit(2)
+    end
+  end
+
   describe '.enabled' do
     subject { described_class.enabled }
 
@@ -537,7 +546,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
 
     before do
       expect(Clusters::KubernetesNamespaceFinder).to receive(:new)
-        .with(cluster, project: environment.project, environment_slug: environment.slug)
+        .with(cluster, project: environment.project, environment_name: environment.name)
         .and_return(double(execute: persisted_namespace))
     end
 
@@ -745,6 +754,28 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
           subject
         end
       end
+    end
+  end
+
+  describe '#knative_pre_installed?' do
+    subject { cluster.knative_pre_installed? }
+
+    context 'with a GCP provider without cloud_run' do
+      let(:cluster) { create(:cluster, :provided_by_gcp) }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'with a GCP provider with cloud_run' do
+      let(:cluster) { create(:cluster, :provided_by_gcp, :cloud_run_enabled) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'with a user provider' do
+      let(:cluster) { create(:cluster, :provided_by_user) }
+
+      it { is_expected.to be_falsey }
     end
   end
 end

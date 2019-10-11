@@ -18,10 +18,22 @@ module EE
             ::Gitlab::UsageCounters::PodLogs.increment(project.id)
             ::Gitlab::PollingInterval.set_header(response, interval: 3_000)
 
-            render json: {
-              logs: pod_logs.strip.split("\n").as_json,
-              pods: environment.pod_names
-            }
+            result = PodLogsService.new(environment, params: params.permit!).execute
+
+            if result.nil?
+              head :accepted
+            elsif result[:status] == :success
+              render json: {
+                pods: environment.pod_names,
+                logs: result[:logs],
+                message: result[:message]
+              }
+            else
+              render status: :bad_request, json: {
+                pods: environment.pod_names,
+                message: result[:message]
+              }
+            end
           end
         end
       end
@@ -30,10 +42,6 @@ module EE
 
       def environment_ee
         environment
-      end
-
-      def pod_logs
-        environment.deployment_platform.read_pod_logs(params[:pod_name], environment.deployment_namespace)
       end
 
       def authorize_create_environment_terminal!

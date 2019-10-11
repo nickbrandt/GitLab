@@ -36,12 +36,15 @@ describe('Productivity analytics filter mutations', () => {
     });
   });
 
-  describe(types.SET_DAYS_IN_PAST, () => {
-    it('sets the daysInPast', () => {
-      const daysInPast = 14;
-      mutations[types.SET_DAYS_IN_PAST](state, daysInPast);
+  describe(types.SET_DATE_RANGE, () => {
+    it('sets the startDate and endDate', () => {
+      const currentYear = new Date().getFullYear();
+      const startDate = new Date(currentYear, 8, 1);
+      const endDate = new Date(currentYear, 8, 7);
+      mutations[types.SET_DATE_RANGE](state, { startDate, endDate });
 
-      expect(state.daysInPast).toBe(daysInPast);
+      expect(state.startDate).toBe(startDate);
+      expect(state.endDate).toBe(endDate);
     });
   });
 });

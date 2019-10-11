@@ -1,5 +1,0 @@
----
-title: Eliminate analytics feature flag requirement for /analytics routes
-merge_request: 16663
-author:
-type: fixed

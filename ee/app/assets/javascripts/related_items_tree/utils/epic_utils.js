@@ -14,7 +14,7 @@ export const gqClient = createGqClient();
  * @param {cbject} childA
  * @param {object} childB
  */
-export const sortChildren = (childA, childB) => childB.relativePosition - childA.relativePosition;
+export const sortChildren = (childA, childB) => childA.relativePosition - childB.relativePosition;
 
 /**
  * Returns formatted child item to include additional

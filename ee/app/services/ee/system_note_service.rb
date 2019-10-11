@@ -15,36 +15,39 @@ module EE
       extend_if_ee('EE::SystemNoteService') # rubocop: disable Cop/InjectEnterpriseEditionModule
     end
 
-    #
-    # noteable     - Noteable object
-    # noteable_ref - Referenced noteable object
-    # user         - User performing reference
-    #
-    # Example Note text:
-    #
-    #   "marked this issue as related to gitlab-foss#9001"
-    #
-    # Returns the created Note object
     def relate_issue(noteable, noteable_ref, user)
-      body = "marked this issue as related to #{noteable_ref.to_reference(noteable.project)}"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'relate'))
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: noteable.project, author: user).relate_issue(noteable_ref)
     end
 
-    #
-    # noteable     - Noteable object
-    # noteable_ref - Referenced noteable object
-    # user         - User performing reference
+    def unrelate_issue(noteable, noteable_ref, user)
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: noteable.project, author: user).unrelate_issue(noteable_ref)
+    end
+
+    # Parameters:
+    #   - version [DesignManagement::Version]
     #
     # Example Note text:
     #
-    #   "removed the relation with gitlab-foss#9001"
+    #   "added [1 designs](link-to-version)"
+    #   "changed [2 designs](link-to-version)"
     #
-    # Returns the created Note object
-    def unrelate_issue(noteable, noteable_ref, user)
-      body = "removed the relation with #{noteable_ref.to_reference(noteable.project)}"
+    # Returns [Array<Note>]: the created Note objects
+    def design_version_added(version)
+      events = DesignManagement::Action.events
+      issue = version.issue
+      project = issue.project
+      user = version.author
+      link_href = design_version_path(version)
 
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'unrelate'))
+      version.designs_by_event.map do |(event_name, designs)|
+        note_data = design_event_note_data(events[event_name])
+        icon_name = note_data[:icon]
+        n = designs.size
+
+        body = "%s [%d %s](%s)" % [note_data[:past_tense], n, 'design'.pluralize(n), link_href]
+
+        create_note(NoteSummary.new(issue, project, user, body, action: icon_name))
+      end
     end
 
     def epic_issue(epic, issue, user, type)
@@ -147,8 +150,7 @@ module EE
     #
     # Returns the created Note object
     def change_weight_note(noteable, project, author)
-      body = noteable.weight ? "changed weight to **#{noteable.weight}**" : 'removed the weight'
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'weight'))
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: project, author: author).change_weight_note
     end
 
     # Called when the start or end date of an Issuable is changed
@@ -242,6 +244,41 @@ module EE
       # TODO: Abort message should be sent by the system, not a particular user.
       # See https://gitlab.com/gitlab-org/gitlab-foss/issues/63187.
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+    end
+
+    private
+
+    # We do not have a named route for DesignManagement::Version, instead
+    # we route to `/designs`, with the version in the query parameters.
+    # This is because this route is not managed by Rails, but Vue:
+    def design_version_path(version)
+      ::Gitlab::Routing.url_helpers.designs_project_issue_path(
+        version.project,
+        version.issue,
+        version: version.id
+      )
+    end
+
+    # Take one of the `DesignManagement::Action.events` and
+    # return:
+    #   * an English past-tense verb.
+    #   * the name of an icon used in renderin a system note
+    #
+    # We do not currently internationalize our system notes,
+    # instead we just produce English-language descriptions.
+    # See: https://gitlab.com/gitlab-org/gitlab/issues/30408
+    # See: https://gitlab.com/gitlab-org/gitlab/issues/14056
+    def design_event_note_data(event)
+      case event
+      when DesignManagement::Action.events[:creation]
+        { icon: 'designs_added', past_tense: 'added' }
+      when DesignManagement::Action.events[:modification]
+        { icon: 'designs_modified', past_tense: 'updated' }
+      when DesignManagement::Action.events[:deletion]
+        { icon: 'designs_removed', past_tense: 'removed' }
+      else
+        raise "Unknown event: #{event}"
+      end
     end
   end
 end

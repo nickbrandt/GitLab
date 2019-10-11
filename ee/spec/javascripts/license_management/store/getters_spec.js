@@ -1,3 +1,4 @@
+import createState from 'ee/vue_shared/license_management/store/state';
 import * as getters from 'ee/vue_shared/license_management/store/getters';
 import { parseLicenseReportMetrics } from 'ee/vue_shared/license_management/store/utils';
 
@@ -9,9 +10,11 @@ import {
 } from 'ee_spec/license_management/mock_data';
 
 describe('getters', () => {
+  let state;
+
   describe('isLoading', () => {
     it('is true if `isLoadingManagedLicenses` is true OR `isLoadingLicenseReport` is true', () => {
-      const state = {};
+      state = createState();
       state.isLoadingManagedLicenses = true;
       state.isLoadingLicenseReport = true;
 
@@ -32,32 +35,61 @@ describe('getters', () => {
   });
 
   describe('licenseReport', () => {
-    it('returns empty array, if the reports are empty', () => {
-      const state = { headReport: {}, baseReport: {}, managedLicenses: [] };
+    describe('with parsedLicenseReport set to false', () => {
+      beforeAll(() => {
+        gon.features = gon.features || {};
+        gon.features.parsedLicenseReport = false;
+      });
 
-      expect(getters.licenseReport(state)).toEqual([]);
+      it('returns empty array, if the reports are empty', () => {
+        state = { ...createState(), headReport: {}, baseReport: {}, managedLicenses: [] };
+
+        expect(getters.licenseReport(state)).toEqual([]);
+      });
+
+      it('returns license report, if the license report is not loading', () => {
+        state = {
+          ...createState(),
+          headReport: licenseHeadIssues,
+          baseReport: licenseBaseIssues,
+          managedLicenses: [approvedLicense],
+        };
+
+        expect(getters.licenseReport(state)).toEqual(
+          parseLicenseReportMetrics(licenseHeadIssues, licenseBaseIssues, [approvedLicense]),
+        );
+      });
     });
 
-    it('returns license report, if the license report is not loading', () => {
-      const state = {
-        headReport: licenseHeadIssues,
-        baseReport: licenseBaseIssues,
-        managedLicenses: [approvedLicense],
-      };
+    describe('with parsedLicenseReport set to true', () => {
+      beforeAll(() => {
+        gon.features = gon.features || {};
+        gon.features.parsedLicenseReport = true;
+      });
 
-      expect(getters.licenseReport(state)).toEqual(
-        parseLicenseReportMetrics(licenseHeadIssues, licenseBaseIssues, [approvedLicense]),
-      );
+      afterAll(() => {
+        gon.features.parsedLicenseReport = false;
+      });
+
+      it('should return the new licenses from the state', () => {
+        const newLicenses = { test: 'foo' };
+        state = { ...createState(), newLicenses };
+
+        expect(getters.licenseReport(state)).toBe(newLicenses);
+      });
     });
   });
 
   describe('licenseSummaryText', () => {
     describe('when licenses exist on both the HEAD and the BASE', () => {
-      const state = {
-        loadLicenseReportError: null,
-        headReport: licenseHeadIssues,
-        baseReport: licenseBaseIssues,
-      };
+      beforeEach(() => {
+        state = {
+          ...createState(),
+          loadLicenseReportError: null,
+          headReport: licenseHeadIssues,
+          baseReport: licenseBaseIssues,
+        };
+      });
 
       it('should be `Loading License Compliance report` text if isLoading', () => {
         const mockGetters = {};
@@ -70,10 +102,11 @@ describe('getters', () => {
 
       it('should be `Failed to load License Compliance report` text if an error has happened', () => {
         const mockGetters = {};
+        state.loadLicenseReportError = new Error('Test');
 
-        expect(
-          getters.licenseSummaryText({ loadLicenseReportError: new Error('Test') }, mockGetters),
-        ).toBe('Failed to load License Compliance report');
+        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
+          'Failed to load License Compliance report',
+        );
       });
 
       it('should be `License Compliance detected no new licenses`, if the report is empty', () => {
@@ -102,7 +135,9 @@ describe('getters', () => {
     });
 
     describe('when there are no licences on the BASE', () => {
-      const state = { baseReport: {} };
+      beforeEach(() => {
+        state = { ...createState(), baseReport: {} };
+      });
 
       it('should be `License Compliance detected no licenses for the source branch only` with no new licences', () => {
         const mockGetters = { licenseReport: [] };

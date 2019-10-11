@@ -5,7 +5,7 @@
   background-color: $gray-light;
   min-height: 20px;
 
-  > .loading-container,
+  > .loading-icon,
   > .deploy-board-empty,
   > .deploy-board-information {
     padding: 10px;
@@ -117,13 +117,13 @@
   vertical-align: middle;
 }
 
+.alert-modal-message {
+  margin-left: -1rem;
+  margin-right: -3rem;
+  margin-top: -1rem;
+}
+
 .alert-form {
-  padding: $gl-padding $gl-padding $gl-padding-8;
-
-  label {
-    font-weight: normal;
-  }
-
   .btn-group,
   .action-group {
     display: flex;

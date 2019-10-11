@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe MergeRequestPresenter do
@@ -81,41 +83,13 @@ describe MergeRequestPresenter do
     it { is_expected.to eq(expose_path("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/unapprove")) }
   end
 
-  describe '#approvers_left' do
-    let!(:private_group) { create(:group_with_members, :private) }
-    let!(:public_group) { create(:group_with_members) }
-    let!(:approver) { create(:user) }
-    let!(:approval_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: [approver], groups: [private_group, public_group]) }
+  describe '#suggested_approvers' do
+    subject { described_class.new(merge_request, current_user: user).suggested_approvers }
 
-    before do
-      merge_request.approvals.create!(user: approver)
-    end
+    it 'delegates to the approval state' do
+      expect(merge_request.approval_state).to receive(:suggested_approvers).with(current_user: user) { [:ok] }
 
-    subject { described_class.new(merge_request, current_user: user).approvers_left }
-
-    it 'contains all approvers' do
-      approvers = public_group.users + private_group.users - [user]
-
-      is_expected.to match_array(approvers)
-    end
-  end
-
-  describe '#all_approvers_including_groups with approval_rule enabled' do
-    let!(:private_group) { create(:group_with_members, :private) }
-    let!(:public_group) { create(:group_with_members) }
-    let!(:approver) { create(:user) }
-    let!(:approval_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: [approver], groups: [private_group, public_group]) }
-
-    before do
-      project.add_developer(approver)
-    end
-
-    subject { described_class.new(merge_request, current_user: user).all_approvers_including_groups }
-
-    it do
-      approvers = [public_group.users, private_group.users, approver].flatten - [user]
-
-      is_expected.to match_array(approvers)
+      is_expected.to contain_exactly(:ok)
     end
   end
 

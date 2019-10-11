@@ -12,8 +12,9 @@ content of a previous job. It can be particularly useful when you are
 developing software that depends on other libraries which are fetched via the
 internet during build time.
 
-If caching is enabled, it's shared between pipelines and jobs by default,
-starting from GitLab 9.0.
+If caching is enabled, it's shared between pipelines and jobs at the project
+level by default, starting from GitLab 9.0. Caches are not shared across
+projects.
 
 Make sure you read the [`cache` reference](../yaml/README.md#cache) to learn
 how it is defined in `.gitlab-ci.yml`.
@@ -202,7 +203,7 @@ For more fine tuning, read also about the
 
 The most common use case of cache is to preserve contents between subsequent
 runs of jobs for things like dependencies and commonly used libraries
-(Nodejs packages, PHP packages, rubygems, python libraries, etc.),
+(Nodejs packages, PHP packages, rubygems, Python libraries, etc.),
 so they don't have to be re-fetched from the public internet.
 
 NOTE: **Note:**
@@ -268,7 +269,7 @@ test:
 ### Caching Python dependencies
 
 Assuming your project is using [pip](https://pip.pypa.io/en/stable/) to install
-the python dependencies, the following example defines `cache` globally so that
+the Python dependencies, the following example defines `cache` globally so that
 all jobs inherit it. Python libraries are installed in a virtualenv under `venv/`,
 pip's cache is defined under `.cache/pip/` and both are cached per-branch:
 

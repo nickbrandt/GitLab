@@ -5,6 +5,7 @@ $: << File.expand_path(File.dirname(__FILE__))
 Encoding.default_external = 'UTF-8'
 
 require_relative '../lib/gitlab'
+require_relative '../lib/gitlab/utils'
 require_relative '../config/initializers/0_inject_enterprise_edition_module'
 
 module QA
@@ -114,6 +115,7 @@ module QA
       module Integration
         autoload :Github, 'qa/scenario/test/integration/github'
         autoload :LDAPNoTLS, 'qa/scenario/test/integration/ldap_no_tls'
+        autoload :LDAPNoServer, 'qa/scenario/test/integration/ldap_no_server'
         autoload :LDAPTLS, 'qa/scenario/test/integration/ldap_tls'
         autoload :InstanceSAML, 'qa/scenario/test/integration/instance_saml'
         autoload :OAuth, 'qa/scenario/test/integration/oauth'
@@ -290,6 +292,8 @@ module QA
       autoload :Menu, 'qa/page/profile/menu'
       autoload :PersonalAccessTokens, 'qa/page/profile/personal_access_tokens'
       autoload :SSHKeys, 'qa/page/profile/ssh_keys'
+      autoload :Emails, 'qa/page/profile/emails'
+      autoload :Password, 'qa/page/profile/password'
       autoload :TwoFactorAuth, 'qa/page/profile/two_factor_auth'
     end
 
@@ -332,6 +336,13 @@ module QA
           autoload :PerformanceBar, 'qa/page/admin/settings/component/performance_bar'
         end
       end
+
+      module Overview
+        module Users
+          autoload :Index, 'qa/page/admin/overview/users/index'
+          autoload :Show, 'qa/page/admin/overview/users/show'
+        end
+      end
     end
 
     module Mattermost
@@ -347,6 +358,7 @@ module QA
     # Classes describing components that are used by several pages.
     #
     module Component
+      autoload :CiBadgeLink, 'qa/page/component/ci_badge_link'
       autoload :ClonePanel, 'qa/page/component/clone_panel'
       autoload :LazyLoader, 'qa/page/component/lazy_loader'
       autoload :LegacyClonePanel, 'qa/page/component/legacy_clone_panel'
@@ -385,6 +397,7 @@ module QA
     autoload :KubernetesCluster, 'qa/service/kubernetes_cluster'
     autoload :Omnibus, 'qa/service/omnibus'
     autoload :Runner, 'qa/service/runner'
+    autoload :LDAP, 'qa/service/ldap'
 
     module ClusterProvider
       autoload :Base, 'qa/service/cluster_provider/base'
@@ -424,6 +437,10 @@ module QA
         autoload :Login, 'qa/vendor/github/page/login'
       end
     end
+
+    module OnePassword
+      autoload :CLI, 'qa/vendor/one_password/cli'
+    end
   end
 
   # Classes that provide support to other parts of the framework.
@@ -433,6 +450,7 @@ module QA
       autoload :Logging, 'qa/support/page/logging'
     end
     autoload :Api, 'qa/support/api'
+    autoload :Dates, 'qa/support/dates'
     autoload :Waiter, 'qa/support/waiter'
     autoload :Retrier, 'qa/support/retrier'
   end

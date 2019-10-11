@@ -2,5 +2,6 @@ export default () => ({
   groupNamespace: null,
   projectPath: null,
   filters: '',
-  daysInPast: 90,
+  startDate: null,
+  endDate: null,
 });

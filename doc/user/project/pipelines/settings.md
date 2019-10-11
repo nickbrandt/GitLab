@@ -21,8 +21,8 @@ from GitLab in a job.
 There are two options. Using:
 
 - `git clone`, which is slower since it clones the repository from scratch
-  for every job, ensuring that the project workspace is always pristine.
-- `git fetch`, which is faster as it re-uses the project workspace (falling
+  for every job, ensuring that the local working copy is always pristine.
+- `git fetch`, which is faster as it re-uses the local working copy (falling
   back to clone if it doesn't exist).
 
 The default Git strategy can be overridden by the [GIT_STRATEGY variable](../../../ci/yaml/README.md#git-strategy)
@@ -92,7 +92,7 @@ job log using a regular expression. In the pipelines settings, search for the
 ![Pipelines settings test coverage](img/pipelines_settings_test_coverage.png)
 
 Leave blank if you want to disable it or enter a ruby regular expression. You
-can use <http://rubular.com> to test your regex.
+can use <https://rubular.com> to test your regex.
 
 If the pipeline succeeds, the coverage is shown in the merge request widget and
 in the jobs table.
@@ -122,37 +122,40 @@ lein cloverage | perl -pe 's/\e\[?.*?[\@-~]//g'
 
 ## Visibility of pipelines
 
-Access to pipelines and job details (including output of logs and artifacts)
-is checked against your current user access level and the **Public pipelines**
-project setting under your project's **Settings > CI/CD > General pipelines settings**.
+Pipeline visibility is determined by:
+
+- Your current [user access level](../../permissions.md).
+- The **Public pipelines** project setting under your project's **Settings > CI/CD > General pipelines**.
+
+This also determines the visibility of these related features:
+
+- Job output logs
+- Job artifacts
+- The [pipeline security dashboard](../../application_security/security_dashboard/index.md#pipeline-security-dashboard) **(ULTIMATE)**
 
 If **Public pipelines** is enabled (default):
 
-- For **public** projects, anyone can view the pipelines and access the job details
-  (output logs and artifacts).
+- For **public** projects, anyone can view the pipelines and related features.
 - For **internal** projects, any logged in user can view the pipelines
-  and access the job details
-  (output logs and artifacts).
-- For **private** projects, any member (guest or higher) can view the pipelines
-  and access the job details
-  (output logs and artifacts).
+  and related features.
+- For **private** projects, any project member (guest or higher) can view the pipelines
+  and related features.
 
 If **Public pipelines** is disabled:
 
 - For **public** projects, anyone can view the pipelines, but only members
-  (reporter or higher) can access the job details (output logs and artifacts).
+  (reporter or higher) can access the related features.
 - For **internal** projects, any logged in user can view the pipelines.
-  However, only members (reporter or higher) can access the job details (output logs
-  and artifacts).
-- For **private** projects, only members (reporter or higher)
-  can view the pipelines and access the job details (output logs and artifacts).
+  However, only members (reporter or higher) can access the job related features.
+- For **private** projects, only project members (reporter or higher)
+  can view the pipelines or access the related features.
 
 ## Auto-cancel pending pipelines
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/9362) in GitLab 9.1.
 
 If you want to auto-cancel all pending non-HEAD pipelines on branch, when
-new pipeline will be created (after your git push or manually from UI),
+new pipeline will be created (after your Git push or manually from UI),
 check **Auto-cancel pending pipelines** checkbox and save the changes.
 
 ## Pipeline Badges

@@ -50,6 +50,48 @@ describe MergeRequest do
     end
   end
 
+  describe '#note_positions_for_paths' do
+    let(:user) { create(:user) }
+    let(:merge_request) { create(:merge_request, :with_diffs) }
+    let(:project) { merge_request.project }
+    let!(:diff_note) do
+      create(:diff_note_on_merge_request, project: project, noteable: merge_request)
+    end
+    let!(:draft_note) do
+      create(:draft_note_on_text_diff, author: user, merge_request: merge_request)
+    end
+
+    let(:file_paths) { merge_request.diffs.diff_files.map(&:file_path) }
+
+    subject do
+      merge_request.note_positions_for_paths(file_paths)
+    end
+
+    it 'returns a Gitlab::Diff::PositionCollection' do
+      expect(subject).to be_a(Gitlab::Diff::PositionCollection)
+    end
+
+    context 'when user is given' do
+      subject do
+        merge_request.note_positions_for_paths(file_paths, user)
+      end
+
+      it 'returns notes and draft notes positions' do
+        expect(subject).to match_array([draft_note.position, diff_note.position])
+      end
+    end
+
+    context 'when user is not given' do
+      subject do
+        merge_request.note_positions_for_paths(file_paths)
+      end
+
+      it 'returns notes positions' do
+        expect(subject).to match_array([diff_note.position])
+      end
+    end
+  end
+
   describe '#participant_approvers' do
     let(:approvers) { create_list(:user, 2) }
     let(:code_owners) { create_list(:user, 2) }
@@ -400,7 +442,7 @@ describe MergeRequest do
         end
 
         it 'returns status and data' do
-          expect_any_instance_of(Ci::CompareLicenseManagementReportsService)
+          expect_any_instance_of(Ci::CompareLicenseScanningReportsService)
               .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
 
           subject
@@ -408,7 +450,7 @@ describe MergeRequest do
 
         context 'when cached results is not latest' do
           before do
-            allow_any_instance_of(Ci::CompareLicenseManagementReportsService)
+            allow_any_instance_of(Ci::CompareLicenseScanningReportsService)
                 .to receive(:latest?).and_return(false)
           end
 
@@ -545,68 +587,6 @@ describe MergeRequest do
           expect(merge_request.mergeable_with_quick_action?(developer, last_diff_sha: mr_sha)).to be_truthy
         end
       end
-    end
-  end
-
-  describe "#approvers_left" do
-    let(:merge_request) {create :merge_request}
-
-    it "returns correct value" do
-      user = create(:user)
-      user1 = create(:user)
-      create(:approver, target: merge_request, user: user)
-      create(:approver, target: merge_request, user: user1)
-      merge_request.approvals.create(user_id: user1.id)
-
-      expect(merge_request.approvers_left).to eq [user]
-    end
-
-    it "returns correct value when there is a group approver" do
-      user = create(:user)
-      user1 = create(:user)
-      user2 = create(:user)
-      group = create(:group)
-
-      group.add_developer(user2)
-      create(:approver_group, target: merge_request, group: group)
-      create(:approver, target: merge_request, user: user)
-      create(:approver, target: merge_request, user: user1)
-      merge_request.approvals.create(user_id: user1.id)
-
-      expect(merge_request.approvers_left).to match_array [user, user2]
-    end
-
-    it "returns correct value when there is only a group approver" do
-      user = create(:user)
-      group = create(:group)
-      group.add_developer(user)
-
-      merge_request.approver_groups.create(group: group)
-
-      expect(merge_request.approvers_left).to eq [user]
-    end
-  end
-
-  describe '#all_approvers_including_groups' do
-    it 'returns correct set of users' do
-      user = create :user
-      user1 = create :user
-      user2 = create :user
-      create :user
-
-      project = create :project
-      group = create :group
-      group.add_maintainer user
-      create :approver_group, target: project, group: group
-
-      merge_request = create :merge_request, target_project: project, source_project: project
-      group1 = create :group
-      group1.add_maintainer user1
-      create :approver_group, target: merge_request, group: group1
-
-      create(:approver, user: user2, target: merge_request)
-
-      expect(merge_request.all_approvers_including_groups).to match_array([user1, user2])
     end
   end
 

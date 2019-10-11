@@ -5,7 +5,7 @@
         = _('Discussion')
         %span.badge.badge-pill.js-discussions-count
     %li
-      = link_to '#designs-tab', class: 'js-issue-tabs', id: 'designs', role: 'tab', 'aria-controls': 'js-designs', 'aria-selected': 'false', data: { toggle: 'tab', target: '#designs-tab' } do
+      = link_to '#designs-tab', class: 'js-issue-tabs', id: 'designs', role: 'tab', 'aria-controls': 'js-designs', 'aria-selected': 'false', data: { toggle: 'tab', target: '#designs-tab', qa_selector: 'designs_tab' } do
         = _('Designs')
         %span.badge.badge-pill.js-designs-count
   .tab-content

@@ -5,7 +5,7 @@
 .row
   .col-lg-8.col-md-12.input-group
     = text_field_tag :url, "#{proxy_url}", class: 'js-dependency-proxy-url form-control', readonly: true
-    = clipboard_button(text: "#{proxy_url}", title: _("Copy %{proxy_url} to clipboard") % { proxy_url: proxy_url })
+    = clipboard_button(text: "#{proxy_url}", title: _("Copy %{proxy_url}") % { proxy_url: proxy_url })
 
 .row
   .col-12.help-block.prepend-top-10

@@ -7,7 +7,7 @@ description: How to add docs for new or enhanced GitLab features.
 At GitLab, developers contribute new or updated documentation along with their code, but product managers and technical writers also have essential roles in the process.
 
 - **Developers**: Author/update documentation in the same MR as their code, and
-  merge it by the feature freeze for the assigned milestone. Request technical writer
+  merge it in the assigned milestone. Request technical writer
   assistance if needed. Other developers typically act as reviewers.
 - **Product Managers** (PMs): In the issue for all new and enhanced features,
   confirm the documentation requirements, plus the mentioned feature description
@@ -40,7 +40,7 @@ interact with GitLab.
 NOTE: **Note:**
 When revamping documentation, if unrelated to the feature change, this should be submitted
 in its own MR (using the [documentation improvement workflow](improvement-workflow.md))
-so that we can ensure the more time-sensitive doc updates are merged with code by the freeze.
+so that we can ensure the more time-sensitive doc updates are merged sooner.
 
 ## Documentation requirements in feature issues
 
@@ -77,7 +77,7 @@ and default merge request template will assist you with following this process.
 For issues requiring any new or updated documentation, the Product Manager (PM)
 must:
 
-- Add the `Documentation` label.
+- Add the ~documentation label.
 - Confirm or add the [documentation requirements](#documentation-requirements-in-feature-issues).
 - Ensure the issue contains any new or updated feature name, overview/description,
   and use cases, as required per the [documentation structure and template](structure.md), when applicable.
@@ -92,7 +92,7 @@ do the following:
 
 #### Authoring
 
-As a developer, if a ~feature issue also contains the ~Documentation label, you must ship the new or updated documentation with the code of the feature. The documentation is an essential part of the product.
+As a developer, if a ~feature issue also contains the ~documentation label, you must ship the new or updated documentation with the code of the feature. The documentation is an essential part of the product.
 Technical writers are happy to help, as requested and planned on an issue-by-issue basis.
 
 For feature issues requiring documentation, follow the process below unless otherwise agreed with the product manager and technical writer for a given issue:

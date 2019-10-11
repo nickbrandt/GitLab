@@ -1,36 +1,56 @@
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
-import { chartKeys } from '../../../constants';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
+import { chartKeys, scatterPlotAddonQueryDays } from '../../../constants';
+import { transformScatterData } from '../../../utils';
 
-export const fetchAllChartData = ({ commit, state, dispatch }) => {
-  // let's reset any data on the main chart first
-  // since any selected items will be used as query params for other charts)
-  commit(types.RESET_CHART_DATA, chartKeys.main);
-
+/**
+ * Fetches data for all charts except for the main chart
+ */
+export const fetchSecondaryChartData = ({ state, dispatch }) => {
   Object.keys(state.charts).forEach(chartKey => {
-    dispatch('fetchChartData', chartKey);
+    if (chartKey !== chartKeys.main) {
+      dispatch('fetchChartData', chartKey);
+    }
   });
 };
 
 export const requestChartData = ({ commit }, chartKey) =>
   commit(types.REQUEST_CHART_DATA, chartKey);
 
-export const fetchChartData = ({ dispatch, getters, rootState }, chartKey) => {
-  dispatch('requestChartData', chartKey);
+export const fetchChartData = ({ dispatch, getters, state, rootState }, chartKey) => {
+  // let's fetch data for enabled charts only
+  if (state.charts[chartKey].enabled) {
+    dispatch('requestChartData', chartKey);
 
-  const params = getters.getFilterParams(chartKey);
+    const params = getters.getFilterParams(chartKey);
 
-  return axios
-    .get(rootState.endpoint, { params })
-    .then(response => {
-      const { data } = response;
-      dispatch('receiveChartDataSuccess', { chartKey, data });
-    })
-    .catch(error => dispatch('receiveChartDataError', { chartKey, error }));
+    axios
+      .get(rootState.endpoint, { params })
+      .then(response => {
+        const { data } = response;
+
+        if (chartKey === chartKeys.scatterplot) {
+          const transformedData = transformScatterData(
+            data,
+            new Date(getDateInPast(rootState.filters.startDate, scatterPlotAddonQueryDays)),
+            new Date(rootState.filters.endDate),
+          );
+
+          dispatch('receiveChartDataSuccess', { chartKey, data, transformedData });
+        } else {
+          dispatch('receiveChartDataSuccess', { chartKey, data });
+        }
+      })
+      .catch(error => dispatch('receiveChartDataError', { chartKey, error }));
+  }
 };
 
-export const receiveChartDataSuccess = ({ commit }, { chartKey, data = {} }) => {
-  commit(types.RECEIVE_CHART_DATA_SUCCESS, { chartKey, data });
+export const receiveChartDataSuccess = (
+  { commit },
+  { chartKey, data = {}, transformedData = null },
+) => {
+  commit(types.RECEIVE_CHART_DATA_SUCCESS, { chartKey, data, transformedData });
 };
 
 export const receiveChartDataError = ({ commit }, { chartKey, error }) => {
@@ -46,18 +66,23 @@ export const setMetricType = ({ commit, dispatch }, { chartKey, metricType }) =>
   dispatch('fetchChartData', chartKey);
 };
 
-export const chartItemClicked = ({ commit, dispatch }, { chartKey, item }) => {
+export const updateSelectedItems = (
+  { commit, dispatch },
+  { chartKey, item, skipReload = false },
+) => {
   commit(types.UPDATE_SELECTED_CHART_ITEMS, { chartKey, item });
 
-  // update histograms
-  dispatch('fetchChartData', chartKeys.timeBasedHistogram);
-  dispatch('fetchChartData', chartKeys.commitBasedHistogram);
+  if (!skipReload) {
+    // update secondary charts
+    dispatch('fetchSecondaryChartData');
 
-  // TODO: update scatterplot
-
-  // update table
-  dispatch('table/fetchMergeRequests', null, { root: true });
+    // let's reset the page on the MR table and fetch data
+    dispatch('table/setPage', 0, { root: true });
+  }
 };
+
+export const setChartEnabled = ({ commit }, { chartKey, isEnabled }) =>
+  commit(types.SET_CHART_ENABLED, { chartKey, isEnabled });
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

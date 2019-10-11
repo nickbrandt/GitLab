@@ -203,7 +203,7 @@ remove the OmniAuth provider named `kerberos` from your `gitlab.yml` /
 
 **For installations from source**
 
-1. Edit [`gitlab.yml`](https://gitlab.com/gitlab-org/gitlab/blob/master/config/gitlab.yml.example) and remove the `- { name: 'kerberos' }` line under omniauth
+1. Edit [`gitlab.yml`](https://gitlab.com/gitlab-org/gitlab/blob/master/config/gitlab.yml.example) and remove the `- { name: 'kerberos' }` line under OmniAuth
    providers:
 
    ```yaml
@@ -293,7 +293,7 @@ See also: [Git v2.11 release notes](https://github.com/git/git/blob/master/Docum
 
 - <https://help.ubuntu.com/community/Kerberos>
 - <http://blog.manula.org/2012/04/setting-up-kerberos-server-with-debian.html>
-- <http://www.roguelynn.com/words/explain-like-im-5-kerberos/>
+- <https://www.roguelynn.com/words/explain-like-im-5-kerberos/>
 
 [restart gitlab]: ../administration/restart_gitlab.md#installations-from-source
 [reconfigure gitlab]: ../administration/restart_gitlab.md#omnibus-gitlab-reconfigure

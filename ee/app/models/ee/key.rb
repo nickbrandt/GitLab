@@ -5,6 +5,8 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
+      include UsageStatistics
+
       scope :ldap, -> { where(type: 'LDAPKey') }
     end
 

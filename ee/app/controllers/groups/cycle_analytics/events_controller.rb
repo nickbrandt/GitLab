@@ -45,13 +45,7 @@ class Groups::CycleAnalytics::EventsController < Groups::ApplicationController
   end
 
   def cycle_analytics
-    @cycle_analytics ||= ::CycleAnalytics::GroupLevel.new(group: group, options: options(cycle_analytics_params))
-  end
-
-  def cycle_analytics_params
-    return {} unless params[:cycle_analytics].present?
-
-    params[:cycle_analytics].permit(:start_date, :branch_name, project_ids: [])
+    @cycle_analytics ||= ::CycleAnalytics::GroupLevel.new(group: group, options: options(cycle_analytics_group_params))
   end
 
   def authorize_group_cycle_analytics!

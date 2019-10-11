@@ -10,25 +10,16 @@ module Projects
           format.json do
             ::Gitlab::UsageCounters::DependencyList.increment(project.id)
 
-            render json: serializer.represent(dependencies, build: build)
+            render json: serializer.represent(dependencies, build: report_service.build)
           end
         end
       end
 
       private
 
-      def build
-        return unless pipeline
-        return @build if @build
-
-        @build = pipeline.builds.latest
-                  .with_reports(::Ci::JobArtifact.dependency_list_reports)
-                  .last
-      end
-
       def collect_dependencies
-        found_dependencies = build&.success? ? service.execute : []
-        ::Gitlab::DependenciesCollection.new(found_dependencies)
+        found_dependencies = report_service.able_to_fetch? ? service.execute : []
+        ::Gitlab::ItemsCollection.new(found_dependencies)
       end
 
       def authorize_read_dependency_list!
@@ -46,13 +37,17 @@ module Projects
       end
 
       def pipeline
-        @pipeline ||= project.all_pipelines.latest_successful_for_ref(project.default_branch)
+        @pipeline ||= report_service.pipeline
       end
 
       def query_params
         params.permit(:sort, :sort_by, :filter).delete_if do |key, value|
           match_disallowed(key, value)
         end
+      end
+
+      def report_service
+        @report_service ||= ::Security::ReportFetchService.new(project, ::Ci::JobArtifact.dependency_list_reports)
       end
 
       def serializer

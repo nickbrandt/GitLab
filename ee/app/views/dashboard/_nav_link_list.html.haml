@@ -1,0 +1,9 @@
+- if dashboard_nav_link?(:environments)
+  = link_to operations_environments_path, class: 'dropdown-item' do
+    = _('Environments')
+- if dashboard_nav_link?(:operations)
+  = link_to operations_path, class: 'dropdown-item' do
+    = _('Operations')
+- if dashboard_nav_link?(:security)
+  = link_to security_root_path, class: 'dropdown-item' do
+    = _('Security')

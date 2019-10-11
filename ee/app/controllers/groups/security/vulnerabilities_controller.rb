@@ -2,12 +2,12 @@
 
 class Groups::Security::VulnerabilitiesController < Groups::ApplicationController
   include SecurityDashboardsPermissions
-  include VulnerabilitiesActions
+  include VulnerabilityFindingsActions
 
   alias_method :vulnerable, :group
 
   def history
-    history_count = Gitlab::Vulnerabilities::History.new(group, filter_params).vulnerabilities_counter
+    history_count = Gitlab::Vulnerabilities::History.new(group, filter_params).findings_counter
 
     respond_to do |format|
       format.json do

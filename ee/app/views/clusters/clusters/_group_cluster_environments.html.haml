@@ -10,7 +10,7 @@
           %span= _('Configuration')
       %li.nav-item{ role: 'presentation' }
         %a.nav-link{ class: active_when(!is_configure_active), href: clusterable.cluster_path(@cluster.id, params: {tab: 'environments'}), id: 'group-cluster-environments-tab' }
-          %span= _('Environments')
+          %span.js-cluster-nav-environments= _('Environments')
 
     .tab-content
       - if is_configure_active

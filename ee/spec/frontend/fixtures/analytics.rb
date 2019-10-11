@@ -45,7 +45,6 @@ describe 'Analytics (JavaScript fixtures)' do
   end
 
   describe Groups::CycleAnalytics::EventsController, type: :controller do
-    using RSpec::Parameterized::TableSyntax
     render_views
 
     before do
@@ -83,6 +82,23 @@ describe 'Analytics (JavaScript fixtures)' do
         group_id: group.name,
         cycle_analytics: { start_date: 30 }
       }, format: :json)
+
+      expect(response).to be_successful
+    end
+  end
+
+  describe Analytics::CycleAnalytics::StagesController, type: :controller do
+    render_views
+
+    before do
+      stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
+      stub_licensed_features(cycle_analytics_for_groups: true)
+
+      sign_in(user)
+    end
+
+    it 'analytics/cycle_analytics/stages.json' do
+      get(:index, params: { group_id: group.name }, format: :json)
 
       expect(response).to be_successful
     end

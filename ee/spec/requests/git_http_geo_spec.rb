@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe "Git HTTP requests (Geo)", :geo do
@@ -299,7 +301,7 @@ describe "Git HTTP requests (Geo)", :geo do
         #   * Gitaly outputs the messages in the stream of Proto messages
         #   * Pipe the output through Workhorse and NGINX
         #
-        # See https://gitlab.com/gitlab-org/gitlab-ee/issues/9195
+        # See https://gitlab.com/gitlab-org/gitlab/issues/9195
         #
         it 'stores the secondary node ID so the internal API post_receive request can generate the replication lag message' do
           is_expected.to have_gitlab_http_status(:ok)

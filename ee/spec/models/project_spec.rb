@@ -45,11 +45,15 @@ describe Project do
 
   context 'scopes' do
     describe '.requiring_code_owner_approval' do
-      it 'only includes the right projects' do
-        create(:project)
-        expected_project = create(:project, merge_requests_require_code_owner_approval: true)
+      let!(:project) { create(:project) }
+      let!(:expected_project) { protected_branch_needing_approval.project }
+      let!(:protected_branch_needing_approval) { create(:protected_branch, code_owner_approval_required: true) }
 
-        expect(described_class.requiring_code_owner_approval).to contain_exactly(expected_project)
+      it 'only includes the right projects' do
+        scoped_query_result = described_class.requiring_code_owner_approval
+
+        expect(described_class.count).to eq(2)
+        expect(scoped_query_result).to contain_exactly(expected_project)
       end
     end
 
@@ -60,6 +64,106 @@ describe Project do
 
         expect(described_class.with_wiki_enabled).to include(project)
         expect(described_class.with_wiki_enabled).not_to include(project1)
+      end
+    end
+
+    describe '.with_active_services' do
+      it 'returns the correct project' do
+        active_service = create(:service, active: true)
+        inactive_service = create(:service, active: false)
+
+        expect(described_class.with_active_services).to include(active_service.project)
+        expect(described_class.with_active_services).not_to include(inactive_service.project)
+      end
+    end
+
+    describe '.with_active_jira_services' do
+      it 'returns the correct project' do
+        active_jira_service = create(:jira_service)
+        active_service = create(:service, active: true)
+
+        expect(described_class.with_active_jira_services).to include(active_jira_service.project)
+        expect(described_class.with_active_jira_services).not_to include(active_service.project)
+      end
+    end
+
+    describe '.service_desk_enabled' do
+      it 'returns the correct project' do
+        project_with_service_desk_enabled = create(:project)
+        project_with_service_desk_disabled = create(:project, :service_desk_disabled)
+
+        expect(described_class.service_desk_enabled).to include(project_with_service_desk_enabled)
+        expect(described_class.service_desk_enabled).not_to include(project_with_service_desk_disabled)
+      end
+    end
+
+    describe '.with_jira_dvcs_cloud' do
+      it 'returns the correct project' do
+        jira_dvcs_cloud_project = create(:project, :jira_dvcs_cloud)
+        jira_dvcs_server_project = create(:project, :jira_dvcs_server)
+
+        expect(described_class.with_jira_dvcs_cloud).to include(jira_dvcs_cloud_project)
+        expect(described_class.with_jira_dvcs_cloud).not_to include(jira_dvcs_server_project)
+      end
+    end
+
+    describe '.with_jira_dvcs_server' do
+      it 'returns the correct project' do
+        jira_dvcs_server_project = create(:project, :jira_dvcs_server)
+        jira_dvcs_cloud_project = create(:project, :jira_dvcs_cloud)
+
+        expect(described_class.with_jira_dvcs_server).to include(jira_dvcs_server_project)
+        expect(described_class.with_jira_dvcs_server).not_to include(jira_dvcs_cloud_project)
+      end
+    end
+
+    describe '.github_imported' do
+      it 'returns the correct project' do
+        project_imported_from_github = create(:project, :github_imported)
+        project_not_imported_from_github = create(:project)
+
+        expect(described_class.github_imported).to include(project_imported_from_github)
+        expect(described_class.github_imported).not_to include(project_not_imported_from_github)
+      end
+    end
+
+    describe '.with_protected_branches' do
+      it 'returns the correct project' do
+        project_with_protected_branches = create(:project, protected_branches: [create(:protected_branch)])
+        project_without_protected_branches = create(:project)
+
+        expect(described_class.with_protected_branches).to include(project_with_protected_branches)
+        expect(described_class.with_protected_branches).not_to include(project_without_protected_branches)
+      end
+    end
+
+    describe '.with_repositories_enabled' do
+      it 'returns the correct project' do
+        project_with_repositories_enabled = create(:project, :repository_enabled)
+        project_with_repositories_disabled = create(:project, :repository_disabled)
+
+        expect(described_class.with_repositories_enabled).to include(project_with_repositories_enabled)
+        expect(described_class.with_repositories_enabled).not_to include(project_with_repositories_disabled)
+      end
+    end
+
+    describe '.with_github_service_pipeline_events' do
+      it 'returns the correct project' do
+        project_with_github_service_pipeline_events = create(:project, github_service: create(:github_service))
+        project_without_github_service_pipeline_events = create(:project)
+
+        expect(described_class.with_github_service_pipeline_events).to include(project_with_github_service_pipeline_events)
+        expect(described_class.with_github_service_pipeline_events).not_to include(project_without_github_service_pipeline_events)
+      end
+    end
+
+    describe '.with_active_prometheus_service' do
+      it 'returns the correct project' do
+        project_with_active_prometheus_service = create(:prometheus_project)
+        project_without_active_prometheus_service = create(:project)
+
+        expect(described_class.with_active_prometheus_service).to include(project_with_active_prometheus_service)
+        expect(described_class.with_active_prometheus_service).not_to include(project_without_active_prometheus_service)
       end
     end
   end
@@ -102,6 +206,16 @@ describe Project do
       expect do
         project2.update(mirror: true, import_url: generate(:url), mirror_user: project.creator)
       end.to change { ProjectImportState.where(project: project2).count }.from(0).to(1)
+    end
+
+    describe 'pull_mirror_branch_prefix' do
+      it { is_expected.to validate_length_of(:pull_mirror_branch_prefix).is_at_most(50) }
+
+      it 'rejects invalid git refs' do
+        project = build(:project, pull_mirror_branch_prefix: 'an invalid prefix..')
+
+        expect(project).not_to be_valid
+      end
     end
   end
 
@@ -215,6 +329,35 @@ describe Project do
         it 'returns empty' do
           expect(described_class.mirrors_to_sync(timestamp)).to be_empty
         end
+      end
+    end
+  end
+
+  describe '#can_store_security_reports?' do
+    context 'when the feature is enabled for the namespace' do
+      it 'returns true' do
+        stub_licensed_features(sast: true)
+        project = create(:project, :private)
+
+        expect(project.can_store_security_reports?).to be_truthy
+      end
+    end
+
+    context 'when the project is public' do
+      it 'returns true' do
+        stub_licensed_features(sast: false)
+        project = create(:project, :public)
+
+        expect(project.can_store_security_reports?).to be_truthy
+      end
+    end
+
+    context 'when the feature is disabled for the namespace and the project is not public' do
+      it 'returns false' do
+        stub_licensed_features(sast: false)
+        project = create(:project, :private)
+
+        expect(project.can_store_security_reports?).to be_falsy
       end
     end
   end
@@ -906,13 +1049,17 @@ describe Project do
       true  | true  | true
       false | true  | false
       true  | false | false
-      true  | nil   | false
     end
 
     with_them do
       before do
         stub_licensed_features(code_owner_approval_required: feature_available)
-        project.merge_requests_require_code_owner_approval = feature_enabled
+
+        if feature_enabled
+          create(:protected_branch,
+            project: project,
+            code_owner_approval_required: true)
+        end
       end
 
       it 'requires code owner approval when needed' do
@@ -970,6 +1117,7 @@ describe Project do
     where(:license_feature, :disabled_services) do
       :jenkins_integration                | %w(jenkins jenkins_deprecated)
       :github_project_service_integration | %w(github)
+      :incident_management                | %w(alerts)
     end
 
     with_them do
@@ -987,6 +1135,20 @@ describe Project do
         end
 
         it { is_expected.to include(*disabled_services) }
+      end
+    end
+
+    context 'when incident_management is available' do
+      before do
+        stub_licensed_features(incident_management: true)
+      end
+
+      context 'when feature flag generic_alert_endpoint is disabled' do
+        before do
+          stub_feature_flags(generic_alert_endpoint: false)
+        end
+
+        it { is_expected.to include('alerts') }
       end
     end
   end
@@ -1318,6 +1480,7 @@ describe Project do
     let(:project) { create(:project) }
     let(:repository_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
     let(:wiki_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
+    let(:design_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
 
     before do
       create(:import_state, project: project)
@@ -1331,6 +1494,11 @@ describe Project do
         .to receive(:new)
         .with(project.wiki.repository)
         .and_return(wiki_updated_service)
+
+      allow(::Geo::RepositoryUpdatedService)
+        .to receive(:new)
+        .with(project.design_repository)
+        .and_return(design_updated_service)
     end
 
     it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node' do
@@ -1338,6 +1506,7 @@ describe Project do
 
       expect(repository_updated_service).to receive(:execute).once
       expect(wiki_updated_service).to receive(:execute).once
+      expect(design_updated_service).to receive(:execute).once
 
       project.after_import
     end
@@ -1518,18 +1687,6 @@ describe Project do
       it "provides an existing one" do
         is_expected.to eq('token')
       end
-    end
-  end
-
-  describe '#store_security_reports_available?' do
-    let(:project) { create(:project) }
-
-    subject { project.store_security_reports_available? }
-
-    it 'delegates to namespace' do
-      expect(project.namespace).to receive(:store_security_reports_available?).once.and_call_original
-
-      subject
     end
   end
 

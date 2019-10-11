@@ -193,6 +193,12 @@ class Note < ApplicationRecord
       groups
     end
 
+    def positions
+      where.not(position: nil)
+        .select(:id, :type, :position) # ActiveRecord needs id and type for typecasting.
+        .map(&:position)
+    end
+
     def count_for_collection(ids, type)
       user.select('noteable_id', 'COUNT(*) as count')
         .group(:noteable_id)
@@ -215,7 +221,7 @@ class Note < ApplicationRecord
     if force_cross_reference_regex_check?
       matches_cross_reference_regex?
     else
-      SystemNoteService.cross_reference?(note)
+      ::SystemNotes::IssuablesService.cross_reference?(note)
     end
   end
   # rubocop: enable CodeReuse/ServiceClass

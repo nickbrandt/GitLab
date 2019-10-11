@@ -13,7 +13,7 @@ module Gitlab
           return file_not_found(recorded_file) unless recorded_file.exist?
           return error('Upload not found') unless valid?
 
-          success(CarrierWave::SanitizedFile.new(recorded_file.absolute_path))
+          success(recorded_file.retrieve_uploader)
         end
 
         private

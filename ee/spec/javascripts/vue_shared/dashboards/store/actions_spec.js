@@ -328,7 +328,34 @@ describe('actions', () => {
   });
 
   describe('fetchSearchResults', () => {
-    it('dispatches an error if the search query was empty', done => {
+    it('dispatches minimumQueryMessage if the search query is falsy', done => {
+      const searchQueries = [null, undefined, false, NaN];
+
+      Promise.all(
+        searchQueries.map(searchQuery => {
+          store.state.searchQuery = searchQuery;
+
+          return testAction(
+            actions.fetchSearchResults,
+            null,
+            store.state,
+            [],
+            [
+              {
+                type: 'requestSearchResults',
+              },
+              {
+                type: 'minimumQueryMessage',
+              },
+            ],
+          );
+        }),
+      )
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('dispatches minimumQueryMessage if the search query was empty', done => {
       store.state.searchQuery = '';
 
       testAction(
@@ -341,14 +368,14 @@ describe('actions', () => {
             type: 'requestSearchResults',
           },
           {
-            type: 'receiveSearchResultsError',
+            type: 'minimumQueryMessage',
           },
         ],
         done,
       );
     });
 
-    it(`dispatches an error if the search query wasn't long enough`, done => {
+    it(`dispatches minimumQueryMessage if the search query wasn't long enough`, done => {
       store.state.searchQuery = 'a';
 
       testAction(
@@ -361,7 +388,7 @@ describe('actions', () => {
             type: 'requestSearchResults',
           },
           {
-            type: 'receiveSearchResultsError',
+            type: 'minimumQueryMessage',
           },
         ],
         done,

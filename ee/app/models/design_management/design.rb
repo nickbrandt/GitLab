@@ -2,6 +2,7 @@
 
 module DesignManagement
   class Design < ApplicationRecord
+    include Importable
     include Noteable
     include Gitlab::FileTypeDetection
     include Gitlab::Utils::StrongMemoize
@@ -16,7 +17,8 @@ module DesignManagement
     # data
     has_many :notes, as: :noteable, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
-    validates :project, :issue, :filename, presence: true
+    validates :project, :filename, presence: true
+    validates :issue, presence: true, unless: :importing?
     validates :filename, uniqueness: { scope: :issue_id }
     validate :validate_file_is_image
 
@@ -46,6 +48,9 @@ module DesignManagement
 
       joins(join.join_sources).where(actions[:event].not_eq(deletion))
     end
+
+    # Scope called by our REST API to avoid N+1 problems
+    scope :with_api_entity_associations, -> { preload(:issue) }
 
     # A design is current if the most recent event is not a deletion
     scope :current, -> { visible_at_version(nil) }
@@ -130,10 +135,18 @@ module DesignManagement
       strong_memoize(:head_sha) { versions.ordered.first }
     end
 
+    def allow_dangerous_images?
+      Feature.enabled?(:design_management_allow_dangerous_images, project)
+    end
+
+    def valid_file_extensions
+      allow_dangerous_images? ? (SAFE_IMAGE_EXT + DANGEROUS_IMAGE_EXT) : SAFE_IMAGE_EXT
+    end
+
     def validate_file_is_image
-      unless image?
+      unless image? || (dangerous_image? && allow_dangerous_images?)
         message = _("Only these extensions are supported: %{extension_list}") % {
-          extension_list: Gitlab::FileTypeDetection::IMAGE_EXT.join(", ")
+          extension_list: valid_file_extensions.to_sentence
         }
         errors.add(:filename, message)
       end

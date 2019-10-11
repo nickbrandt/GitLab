@@ -25,6 +25,8 @@ issues:
 - epic
 - designs
 - design_versions
+- prometheus_alerts
+- prometheus_alert_events
 events:
 - author
 - project
@@ -172,7 +174,7 @@ ci_pipelines:
 - downstream_bridges
 - job_artifacts
 - vulnerabilities_occurrence_pipelines
-- vulnerabilities
+- vulnerability_findings
 pipeline_variables:
 - pipeline
 stages:
@@ -250,7 +252,6 @@ project:
 - cluster
 - clusters
 - cluster_project
-- cluster_ingresses
 - creator
 - cycle_analytics_stages
 - group
@@ -390,6 +391,7 @@ project:
 - sourced_pipelines
 - prometheus_metrics
 - vulnerabilities
+- vulnerability_findings
 - vulnerability_feedback
 - vulnerability_identifiers
 - vulnerability_scanners
@@ -410,6 +412,9 @@ project:
 - designs
 - project_aliases
 - external_pull_requests
+- pages_metadatum
+- alerts_service
+- grafana_integration
 award_emoji:
 - awardable
 - user
@@ -500,3 +505,17 @@ lists:
 milestone_releases:
 - milestone
 - release
+design: &design
+- issue
+- actions
+- versions
+- notes
+designs: *design
+actions:
+- design
+- version
+versions: &version
+- issue
+- designs
+- actions
+design_versions: *version

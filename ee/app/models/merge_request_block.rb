@@ -27,8 +27,5 @@ class MergeRequestBlock < ApplicationRecord
 
     errors.add(:blocked_merge_request, _('cannot block others')) if
       blocked_merge_request.blocks_as_blocker.any?
-
-    errors.add(:blocked_merge_request, _('cannot be in the same project')) if
-      blocked_merge_request.target_project_id == blocking_merge_request.target_project_id
   end
 end

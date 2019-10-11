@@ -37,13 +37,20 @@ describe Projects::Prometheus::AlertPresenter do
   end
 
   describe '#issue_summary_markdown' do
+    let(:markdown_line_break) { '  ' }
+
     subject { presenter.issue_summary_markdown }
 
     context 'without default payload' do
       it do
-        is_expected.to include('## Summary')
-        is_expected.to include('* starts_at:')
-        is_expected.not_to include('* full_query:')
+        is_expected.to eq(
+          <<~MARKDOWN.chomp
+            #### Summary
+
+            **Start time:** #{presenter.starts_at}
+
+          MARKDOWN
+        )
       end
     end
 
@@ -53,8 +60,18 @@ describe Projects::Prometheus::AlertPresenter do
       end
 
       it do
-        is_expected.to include('* foo: value1')
-        is_expected.to include('* bar: value2')
+        is_expected.to eq(
+          <<~MARKDOWN.chomp
+            #### Summary
+
+            **Start time:** #{presenter.starts_at}
+
+            #### Alert Details
+
+            **foo:** value1#{markdown_line_break}
+            **bar:** value2
+          MARKDOWN
+        )
       end
     end
 
@@ -63,7 +80,69 @@ describe Projects::Prometheus::AlertPresenter do
         payload['generatorURL'] = 'http://host?g0.expr=query'
       end
 
-      it { is_expected.to include('* full_query: `query`') }
+      it do
+        is_expected.to eq(
+          <<~MARKDOWN.chomp
+            #### Summary
+
+            **Start time:** #{presenter.starts_at}#{markdown_line_break}
+            **full_query:** `query`
+
+          MARKDOWN
+        )
+      end
+    end
+
+    context 'with the Generic Alert parameters' do
+      let(:generic_alert_params) do
+        {
+          'title' => 'The Generic Alert Title',
+          'description' => 'The Generic Alert Description',
+          'monitoring_tool' => 'monitoring_tool_name',
+          'service' => 'service_name',
+          'hosts' => ['http://localhost:3000', 'http://localhost:3001']
+        }
+      end
+
+      before do
+        payload['annotations'] = generic_alert_params
+      end
+
+      it do
+        is_expected.to eq(
+          <<~MARKDOWN.chomp
+            #### Summary
+
+            **Start time:** #{presenter.starts_at}#{markdown_line_break}
+            **Service:** service_name#{markdown_line_break}
+            **Monitoring tool:** monitoring_tool_name#{markdown_line_break}
+            **Hosts:** http://localhost:3000 http://localhost:3001
+
+            #### Alert Details
+
+            **title:** The Generic Alert Title#{markdown_line_break}
+            **description:** The Generic Alert Description
+          MARKDOWN
+        )
+      end
+
+      context 'when hosts is a string' do
+        before do
+          payload['annotations'] = { 'hosts' => 'http://localhost:3000' }
+        end
+
+        it do
+          is_expected.to eq(
+            <<~MARKDOWN.chomp
+            #### Summary
+
+            **Start time:** #{presenter.starts_at}#{markdown_line_break}
+            **Hosts:** http://localhost:3000
+
+            MARKDOWN
+          )
+        end
+      end
     end
   end
 

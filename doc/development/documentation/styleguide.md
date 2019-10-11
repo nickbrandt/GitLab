@@ -216,11 +216,18 @@ Do not include the same information in multiple places. [Link to a SSOT instead.
 - Be clear, concise, and stick to the goal of the doc.
 - Write in US English.
 - Capitalize "G" and "L" in GitLab.
-- Use title case when referring to [features](https://about.gitlab.com/features/) or
-  [products](https://about.gitlab.com/pricing/) (e.g., GitLab Runner, Geo,
-  Issue Boards, GitLab Core, Git, Prometheus, Kubernetes, etc), and methods or methodologies
-  (e.g., Continuous Integration, Continuous Deployment, Scrum, Agile, etc). Note that
-  some features are also objects (e.g. "GitLab's Merge Requests support X." and "Create a new merge request for Z.").
+- Use title case when referring to:
+  - [GitLab Features](https://about.gitlab.com/features/). For example, Issue Board,
+    Geo, and Runner.
+  - GitLab [product tiers](https://about.gitlab.com/pricing/). For example, GitLab Core
+    and GitLab Ultimate.
+  - Third-party products. For example, Prometheus, Kubernetes, and Git.
+  - Methods or methodologies. For example, Continuous Integration, Continuous
+    Deployment, Scrum, and Agile.
+
+NOTE: **Note:**
+Some features are also objects. For example, "GitLab's Merge Requests support X." and
+"Create a new merge request for Z.".
 
 ## Text
 
@@ -238,20 +245,6 @@ Do not include the same information in multiple places. [Link to a SSOT instead.
   - List item 1
   - List item 2
   ```
-
-### Tables overlapping the TOC
-
-By default, all tables have a width of 100% on docs.gitlab.com.
-In a few cases, the table will overlap the table of contents (ToC).
-For these cases, add an entry to the document's frontmatter to
-render them displaying block. This will make sure the table
-is displayed behind the ToC, scrolling horizontally:
-
-```md
----
-table_display_block: true
----
-```
 
 ### Emphasis
 
@@ -549,7 +542,7 @@ To indicate the steps of navigation through the UI:
   a valid name for an illustration is `devops_diagram_v11_1.png`.
 - Keep all file names in lower case.
 - Consider using PNG images instead of JPEG.
-- Compress all images with <https://tinypng.com/> or similar tool.
+- Compress all images with <https://pngquant.org/> or similar tool.
 - Compress gifs with <https://ezgif.com/optimize> or similar tool.
 - Images should be used (only when necessary) to _illustrate_ the description
   of a process, not to _replace_ it.
@@ -571,7 +564,7 @@ Inside the document:
 
 ### Remove image shadow
 
-All images displayed on docs.gitlab.com have a box shadow by default.
+All images displayed on the [GitLab Docs site](https://docs.gitlab.com) have a box shadow by default.
 To remove the box shadow, use the image class `.image-noshadow` applied
 directly to an HTML `img` tag:
 
@@ -605,7 +598,7 @@ You can link any up-to-date video that is useful to the GitLab user.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/472) in GitLab 12.1.
 
-GitLab docs (docs.gitlab.com) support embedded videos.
+The [GitLab docs site](https://docs.gitlab.com) supports embedded videos.
 
 You can only embed videos from
 [GitLab's official YouTube account](https://www.youtube.com/channel/UCnMGQ8QHMAnVIsI3xJrihhg).
@@ -641,7 +634,7 @@ leave a blank line here
 leave a blank line here
 ```
 
-This is how it renders on docs.gitlab.com:
+This is how it renders on the GitLab Docs site:
 
 <div class="video-fallback">
   See the video: <a href="https://www.youtube.com/watch?v=enMumwvLAug">What is GitLab</a>.
@@ -700,6 +693,10 @@ use the following markup for highlighting.
 _Note that the alert boxes only work for one paragraph only. Multiple paragraphs,
 lists, headers, etc will not render correctly. For multiple lines, use blockquotes instead._
 
+Alert boxes only render properly on the GitLab Docs site (<http://docs.gitlab.com>).
+Within GitLab itself, they will appear as plain markdown text (like the examples
+above the rendered versions, below).
+
 ### Note
 
 Notes catch the eye of most readers, and therefore should be used very sparingly.
@@ -724,7 +721,7 @@ NOTE: **Note:**
 This is something to note.
 ```
 
-How it renders in docs.gitlab.com:
+How it renders on the GitLab Docs site:
 
 NOTE: **Note:**
 This is something to note.
@@ -736,7 +733,7 @@ TIP: **Tip:**
 This is a tip.
 ```
 
-How it renders in docs.gitlab.com:
+How it renders on the GitLab Docs site:
 
 TIP: **Tip:**
 This is a tip.
@@ -748,7 +745,7 @@ CAUTION: **Caution:**
 This is something to be cautious about.
 ```
 
-How it renders in docs.gitlab.com:
+How it renders on the GitLab Docs site:
 
 CAUTION: **Caution:**
 This is something to be cautious about.
@@ -760,7 +757,7 @@ DANGER: **Danger:**
 This is a breaking change, a bug, or something very important to note.
 ```
 
-How it renders in docs.gitlab.com:
+How it renders on the GitLab Docs site:
 
 DANGER: **Danger:**
 This is a breaking change, a bug, or something very important to note.
@@ -773,7 +770,7 @@ For highlighting a text within a blue blockquote, use this format:
 > This is a blockquote.
 ```
 
-which renders in docs.gitlab.com to:
+which renders on the [GitLab Docs site](https://docs.gitlab.com) as:
 
 > This is a blockquote.
 
@@ -1114,7 +1111,7 @@ Rendered example:
 
 ### cURL Examples
 
-Below is a set of [cURL][] examples that you can use in the API documentation.
+Below is a set of [cURL](https://curl.haxx.se) examples that you can use in the API documentation.
 
 #### Simple cURL command
 
@@ -1161,7 +1158,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "title=
 ```
 
 The above example is run by and administrator and will add an SSH public key
-titled ssh-key to user's account which has an id of 25.
+titled `ssh-key` to user's account which has an id of 25.
 
 #### Escape special characters
 
@@ -1186,7 +1183,6 @@ restrict the sign-up e-mail domains of a GitLab instance to `*.example.com` and
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" --data "domain_whitelist[]=*.example.com" --data "domain_whitelist[]=example.net" https://gitlab.example.com/api/v4/application/settings
 ```
 
-[cURL]: http://curl.haxx.se/ "cURL website"
 [single spaces]: http://www.slate.com/articles/technology/technology/2011/01/space_invaders.html
 [gfm]: ../../user/markdown.md#newlines "GitLab flavored markdown documentation"
 [ce-1242]: https://gitlab.com/gitlab-org/gitlab-foss/issues/1242

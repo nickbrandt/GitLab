@@ -13,7 +13,7 @@ module QA
             end
 
             view 'app/assets/javascripts/vue_shared/components/issue/related_issuable_item.vue' do
-              element :remove_issue_button
+              element :remove_related_issue_button
             end
 
             view 'ee/app/assets/javascripts/epic/components/epic_header.vue' do
@@ -49,7 +49,7 @@ module QA
             end
 
             def remove_issue_from_epic
-              click_element :remove_issue_button
+              click_element :remove_related_issue_button
             end
 
             def click_edit_button

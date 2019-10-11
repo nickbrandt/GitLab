@@ -51,6 +51,6 @@ export default {
         </span>
       </template>
     </span>
-    <div class="note-text md" v-html="note.bodyHtml"></div>
+    <div class="note-text md" data-qa-selector="note_content" v-html="note.bodyHtml"></div>
   </timeline-entry-item>
 </template>

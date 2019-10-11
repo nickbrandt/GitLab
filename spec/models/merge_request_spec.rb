@@ -650,6 +650,46 @@ describe MergeRequest do
     end
   end
 
+  describe '#note_positions_for_paths' do
+    let(:merge_request) { create(:merge_request, :with_diffs) }
+    let(:project) { merge_request.project }
+    let!(:diff_note) do
+      create(:diff_note_on_merge_request, project: project, noteable: merge_request)
+    end
+
+    let(:file_paths) { merge_request.diffs.diff_files.map(&:file_path) }
+
+    subject do
+      merge_request.note_positions_for_paths(file_paths)
+    end
+
+    it 'returns a Gitlab::Diff::PositionCollection' do
+      expect(subject).to be_a(Gitlab::Diff::PositionCollection)
+    end
+
+    context 'within all diff files' do
+      it 'returns correct positions' do
+        expect(subject).to match_array([diff_note.position])
+      end
+    end
+
+    context 'within specific diff file' do
+      let(:file_paths) { [diff_note.position.file_path] }
+
+      it 'returns correct positions' do
+        expect(subject).to match_array([diff_note.position])
+      end
+    end
+
+    context 'within no diff files' do
+      let(:file_paths) { [] }
+
+      it 'returns no positions' do
+        expect(subject.to_a).to be_empty
+      end
+    end
+  end
+
   describe '#discussions_diffs' do
     let(:merge_request) { create(:merge_request) }
 
@@ -3256,5 +3296,39 @@ describe MergeRequest do
         subject
       end
     end
+  end
+
+  describe '.with_open_merge_when_pipeline_succeeds' do
+    let!(:project) { create(:project) }
+    let!(:fork) { fork_project(project) }
+    let!(:merge_request1) do
+      create(:merge_request,
+             :merge_when_pipeline_succeeds,
+             target_project: project,
+             target_branch: 'master',
+             source_project: project,
+             source_branch: 'feature-1')
+    end
+
+    let!(:merge_request2) do
+      create(:merge_request,
+             :merge_when_pipeline_succeeds,
+             target_project: project,
+             target_branch: 'master',
+             source_project: fork,
+             source_branch: 'fork-feature-1')
+    end
+
+    let!(:merge_request4) do
+      create(:merge_request,
+             target_project: project,
+             target_branch: 'master',
+             source_project: fork,
+             source_branch: 'fork-feature-2')
+    end
+
+    let(:query) { described_class.with_open_merge_when_pipeline_succeeds }
+
+    it { expect(query).to contain_exactly(merge_request1, merge_request2) }
   end
 end

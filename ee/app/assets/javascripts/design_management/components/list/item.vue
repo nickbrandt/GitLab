@@ -77,14 +77,14 @@ export default {
     <div class="card-body p-0 d-flex align-items-center overflow-hidden position-relative">
       <div v-if="icon.name" class="design-event position-absolute">
         <span :title="icon.tooltip" :aria-label="icon.tooltip">
-          <icon :name="icon.name" :size="18" :css-classes="icon.classes" />
+          <icon :name="icon.name" :size="18" :class="icon.classes" />
         </span>
       </div>
       <img :src="image" :alt="name" class="block ml-auto mr-auto mw-100 mh-100 design-img" />
     </div>
     <div class="card-footer d-flex w-100">
       <div class="d-flex flex-column str-truncated-100">
-        <span class="bold str-truncated-100">{{ name }}</span>
+        <span class="bold str-truncated-100" data-qa-selector="design_file_name">{{ name }}</span>
         <span v-if="updatedAt" class="str-truncated-100">
           {{ __('Updated') }} <timeago :time="updatedAt" tooltip-placement="bottom" />
         </span>

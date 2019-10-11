@@ -1,0 +1,5 @@
+---
+title: Add rack attack settings for prometheus and generic alert endpoint
+merge_request: 17859
+author:
+type: added

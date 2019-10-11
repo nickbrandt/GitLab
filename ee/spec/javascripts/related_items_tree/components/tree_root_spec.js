@@ -109,7 +109,7 @@ describe('RelatedItemsTree', () => {
                 jasmine.objectContaining({
                   id: targetItem.id,
                   adjacentReferenceId: mockEpic1.id,
-                  relativePosition: 'before',
+                  relativePosition: 'after',
                 }),
               );
             });
@@ -127,7 +127,7 @@ describe('RelatedItemsTree', () => {
                 jasmine.objectContaining({
                   id: targetItem.id,
                   adjacentReferenceId: mockEpic1.id,
-                  relativePosition: 'after',
+                  relativePosition: 'before',
                 }),
               );
             });
@@ -145,7 +145,7 @@ describe('RelatedItemsTree', () => {
                 jasmine.objectContaining({
                   id: targetItem.epicIssueId,
                   adjacentReferenceId: mockIssue1.epicIssueId,
-                  relativePosition: 'before',
+                  relativePosition: 'after',
                 }),
               );
             });
@@ -163,7 +163,7 @@ describe('RelatedItemsTree', () => {
                 jasmine.objectContaining({
                   id: targetItem.epicIssueId,
                   adjacentReferenceId: mockIssue1.epicIssueId,
-                  relativePosition: 'after',
+                  relativePosition: 'before',
                 }),
               );
             });

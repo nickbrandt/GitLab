@@ -84,7 +84,7 @@ export default {
             <icon
               v-show="vulnerability.dismissal_feedback.comment_details"
               name="comment"
-              css-classes="text-warning vertical-align-middle"
+              class="text-warning vertical-align-middle"
             />
             <span class="vertical-align-middle text-uppercase">{{
               s__('vulnerability|dismissed')

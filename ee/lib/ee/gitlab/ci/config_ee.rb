@@ -14,7 +14,7 @@ module EE
         end
 
         override :build_config
-        def build_config(config, project:, sha:, user:)
+        def build_config(config)
           process_required_includes(super)
         end
 

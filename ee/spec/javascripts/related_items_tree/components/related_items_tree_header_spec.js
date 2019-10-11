@@ -70,18 +70,12 @@ describe('RelatedItemsTree', () => {
           });
         });
 
-        it('calls `toggleCreateItemForm` action when provided `id` param value is not `0`', () => {
-          spyOn(wrapper.vm, 'toggleCreateItemForm');
+        it('calls `toggleCreateEpicForm` action when provided `id` param value is not `0`', () => {
+          spyOn(wrapper.vm, 'toggleCreateEpicForm');
 
-          wrapper.vm.handleActionClick({
-            id: 1,
-            actionType,
-          });
+          wrapper.vm.handleActionClick({ id: 1 });
 
-          expect(wrapper.vm.toggleCreateItemForm).toHaveBeenCalledWith({
-            actionType,
-            toggleState: true,
-          });
+          expect(wrapper.vm.toggleCreateEpicForm).toHaveBeenCalledWith({ toggleState: true });
         });
       });
     });

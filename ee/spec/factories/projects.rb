@@ -3,9 +3,9 @@
 FactoryBot.modify do
   factory :project do
     transient do
-      last_update_at nil
-      last_successful_update_at nil
-      retry_count 0
+      last_update_at { nil }
+      last_successful_update_at { nil }
+      retry_count { 0 }
     end
 
     after(:create) do |project, evaluator|
@@ -30,24 +30,30 @@ FactoryBot.modify do
       end
     end
 
+    trait :design_repo do
+      after(:create) do |project|
+        raise 'Failed to create design repository!' unless project.design_repository.create_if_not_exists
+      end
+    end
+
     trait :import_none do
-      import_status :none
+      import_status { :none }
     end
 
     trait :import_hard_failed do
-      import_status :failed
+      import_status { :failed }
       last_update_at { Time.now - 1.minute }
       retry_count { Gitlab::Mirror::MAX_RETRY + 1 }
     end
 
     trait :disabled_mirror do
-      mirror false
+      mirror { false }
       import_url { generate(:url) }
       mirror_user_id { creator_id }
     end
 
     trait :mirror do
-      mirror true
+      mirror { true }
       import_url { generate(:url) }
       mirror_user_id { creator_id }
     end
@@ -57,7 +63,37 @@ FactoryBot.modify do
     end
 
     trait :requiring_code_owner_approval do
-      merge_requests_require_code_owner_approval true
+      merge_requests_require_code_owner_approval { true }
+    end
+
+    trait :jira_dvcs_cloud do
+      before(:create) do |project|
+        create(:project_feature_usage, :dvcs_cloud, project: project)
+      end
+    end
+
+    trait :jira_dvcs_server do
+      before(:create) do |project|
+        create(:project_feature_usage, :dvcs_server, project: project)
+      end
+    end
+
+    trait :service_desk_disabled do
+      service_desk_enabled { nil }
+    end
+
+    trait(:service_desk_enabled) do
+      service_desk_enabled { true }
+    end
+
+    trait :github_imported do
+      import_type { 'github' }
+    end
+
+    trait :with_vulnerabilities do
+      after(:create) do |project|
+        create_list(:vulnerability, 2, :opened, project: project)
+      end
     end
   end
 end

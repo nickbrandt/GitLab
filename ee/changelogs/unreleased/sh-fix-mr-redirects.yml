@@ -1,5 +1,0 @@
----
-title: Fix merge request redirects going to /commits page
-merge_request: 16705
-author:
-type: fixed

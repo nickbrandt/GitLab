@@ -19,13 +19,11 @@ export default {
       required: false,
     },
   },
-  computed: {
-    activeClass() {
-      return 'active font-weight-bold border-style-solid border-color-blue-300';
-    },
-    inactiveClass() {
-      return 'bg-transparent border-style-dashed border-color-default';
-    },
+  data() {
+    return {
+      activeClass: 'active font-weight-bold border-color-blue-300',
+      inactiveClass: 'bg-transparent border-color-default',
+    };
   },
 };
 </script>
@@ -33,7 +31,7 @@ export default {
 <template>
   <div
     :class="[isActive ? activeClass : inactiveClass]"
-    class="stage-nav-item d-flex pl-4 pr-4 m-0 mb-1 ml-2 rounded border-width-1px"
+    class="stage-nav-item d-flex pl-4 pr-4 m-0 mb-1 ml-2 rounded border-width-1px border-style-solid"
   >
     <slot></slot>
     <div v-if="canEdit" class="dropdown">
@@ -42,7 +40,7 @@ export default {
         class="more-actions-toggle btn btn-transparent p-0"
         data-toggle="dropdown"
       >
-        <icon css-classes="icon" name="ellipsis_v" />
+        <icon class="icon" name="ellipsis_v" />
       </gl-button>
       <ul class="more-actions-dropdown dropdown-menu dropdown-open-left">
         <slot name="dropdown-options"></slot>

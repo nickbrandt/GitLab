@@ -193,7 +193,7 @@ cd /home/git/gitlab-shell
 
 sudo -u git -H git fetch --all --tags --prune
 sudo -u git -H git checkout v$(</home/git/gitlab/GITLAB_SHELL_VERSION)
-sudo -u git -H bin/compile
+sudo -u git -H make build
 ```
 
 ### 9. Update GitLab Workhorse
@@ -253,7 +253,7 @@ cd /home/git/gitlab
 git diff origin/PREVIOUS_BRANCH:config/gitlab.yml.example origin/BRANCH:config/gitlab.yml.example
 ```
 
-#### Nginx configuration
+#### NGINX configuration
 
 Ensure you're still up-to-date with the latest NGINX configuration changes:
 
@@ -268,7 +268,7 @@ git diff origin/PREVIOUS_BRANCH:lib/support/nginx/gitlab origin/BRANCH:lib/suppo
 ```
 
 If you are using Strict-Transport-Security in your installation to continue
-using it you must enable it in your Nginx configuration as GitLab application no
+using it you must enable it in your NGINX configuration as GitLab application no
 longer handles setting it.
 
 If you are using Apache instead of NGINX please see the updated [Apache templates].

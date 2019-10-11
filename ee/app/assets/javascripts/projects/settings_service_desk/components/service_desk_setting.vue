@@ -65,7 +65,7 @@ export default {
             />
             <div class="input-group-append">
               <clipboard-button
-                :title="__('Copy to clipboard')"
+                :title="__('Copy')"
                 :text="incomingEmail"
                 css-class="btn qa-clipboard-button"
               />

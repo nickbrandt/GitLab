@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ProjectPolicy do
@@ -240,15 +242,26 @@ describe ProjectPolicy do
           let(:current_user) { admin }
 
           it 'allows access' do
-            is_expected.to be_allowed(:read_project)
+            is_expected.to allow_action(:read_project)
           end
         end
 
-        context 'as an owner' do
-          let(:current_user) { owner }
+        context 'as a group owner' do
+          before do
+            group.add_owner(current_user)
+          end
 
           it 'prevents access without a SAML session' do
-            is_expected.not_to be_allowed(:read_project)
+            is_expected.not_to allow_action(:read_project)
+          end
+        end
+
+        context 'with public access' do
+          let(:group) { create(:group, :public) }
+          let(:project) { create(:project, :public, group: saml_provider.group) }
+
+          it 'allows access desipte group enforcement' do
+            is_expected.to allow_action(:read_project)
           end
         end
 
@@ -730,6 +743,64 @@ describe ProjectPolicy do
     end
   end
 
+  describe 'read_licenses_list' do
+    context 'when licenses list feature available' do
+      context 'when license management feature available' do
+        before do
+          stub_licensed_features(licenses_list: true, license_management: true)
+        end
+
+        context 'with public project' do
+          let(:current_user) { create(:user) }
+
+          context 'with public access to repository' do
+            it { is_expected.to be_allowed(:read_licenses_list) }
+          end
+        end
+
+        context 'with private project' do
+          let(:project) { create(:project, :private, namespace: owner.namespace) }
+
+          where(role: %w[admin owner maintainer developer reporter guest])
+
+          with_them do
+            let(:current_user) { public_send(role) }
+
+            it { is_expected.to be_allowed(:read_licenses_list) }
+          end
+
+          context 'with not member' do
+            let(:current_user) { create(:user) }
+
+            it { is_expected.to be_disallowed(:read_licenses_list) }
+          end
+
+          context 'with anonymous' do
+            let(:current_user) { nil }
+
+            it { is_expected.to be_disallowed(:read_licenses_list) }
+          end
+        end
+      end
+
+      context 'when license management feature in not available' do
+        let(:current_user) { admin }
+
+        before do
+          stub_licensed_features(licenses_list: true)
+        end
+
+        it { is_expected.to be_disallowed(:read_licenses_list) }
+      end
+    end
+
+    context 'when licenses list feature not available' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_disallowed(:read_licenses_list) }
+    end
+  end
+
   describe 'create_web_ide_terminal' do
     before do
       stub_licensed_features(web_ide_terminal: true)
@@ -863,6 +934,34 @@ describe ProjectPolicy do
       let(:project) { create(:project, :private) }
 
       it { is_expected.to be_allowed(:admin_issue) }
+    end
+  end
+
+  context 'support bot' do
+    let(:current_user) { User.support_bot }
+
+    context 'with service desk disabled' do
+      it { expect_allowed(:guest_access) }
+      it { expect_disallowed(:create_note, :read_project) }
+    end
+
+    context 'with service desk enabled' do
+      let(:project) { create(:project, :public, service_desk_enabled: true) }
+
+      before do
+        allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).and_return(true)
+        allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).with(project: project).and_return(true)
+      end
+
+      it { expect_allowed(:guest_access, :create_note, :read_issue) }
+
+      context 'when issues are protected members only' do
+        before do
+          project.project_feature.update!(issues_access_level: ProjectFeature::PRIVATE)
+        end
+
+        it { expect_allowed(:guest_access, :create_note, :read_issue) }
+      end
     end
   end
 

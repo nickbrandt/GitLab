@@ -27,8 +27,6 @@ export default function trackNavbarEvents() {
   const navbar = document.querySelector('.navbar-gitlab');
   if (!navbar) return;
 
-  new Tracking(TRACKING_CATEGORY).bind(navbar);
-
   // track search inputs within frequent-items component
   navbar.querySelectorAll(`.frequent-items-dropdown-container input`).forEach(el => {
     el.addEventListener('click', e => {

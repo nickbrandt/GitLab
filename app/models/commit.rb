@@ -119,8 +119,20 @@ class Commit
 
     @raw = raw_commit
     @project = project
-    @statuses = {}
     @gpg_commit = Gitlab::Gpg::Commit.new(self) if project
+  end
+
+  delegate \
+    :pipelines,
+    :last_pipeline,
+    :latest_pipeline,
+    :latest_pipeline_for_project,
+    :set_latest_pipeline_for_ref,
+    :status,
+    to: :with_pipeline
+
+  def with_pipeline
+    @with_pipeline ||= CommitWithPipeline.new(self)
   end
 
   def id
@@ -301,30 +313,6 @@ class Commit
     )
   end
 
-  def pipelines
-    project.ci_pipelines.where(sha: sha)
-  end
-
-  def last_pipeline
-    strong_memoize(:last_pipeline) do
-      pipelines.last
-    end
-  end
-
-  def status(ref = nil)
-    return @statuses[ref] if @statuses.key?(ref)
-
-    @statuses[ref] = status_for_project(ref, project)
-  end
-
-  def status_for_project(ref, pipeline_project)
-    pipeline_project.ci_pipelines.latest_status_per_commit(id, ref)[id]
-  end
-
-  def set_status_for_ref(ref, status)
-    @statuses[ref] = status
-  end
-
   def signature
     return @signature if defined?(@signature)
 
@@ -427,7 +415,7 @@ class Commit
 
     if entry[:type] == :blob
       blob = ::Blob.decorate(Gitlab::Git::Blob.new(name: entry[:name]), @project)
-      blob.image? || blob.video? ? :raw : :blob
+      blob.image? || blob.video? || blob.audio? ? :raw : :blob
     else
       entry[:type]
     end

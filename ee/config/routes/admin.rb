@@ -25,6 +25,11 @@ namespace :admin do
     get :download, on: :member
   end
 
+  # using `only: []` to keep duplicate routes from being created
+  resource :application_settings, only: [] do
+    match :geo, :templates, via: [:get, :patch]
+  end
+
   namespace :geo do
     get '/' => 'nodes#index'
 

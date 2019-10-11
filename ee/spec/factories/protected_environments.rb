@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 FactoryBot.define do
   factory :protected_environment do
-    name 'production'
+    name { 'production' }
     project
 
     transient do
-      authorize_user_to_deploy nil
-      authorize_group_to_deploy nil
+      authorize_user_to_deploy { nil }
+      authorize_group_to_deploy { nil }
     end
 
     after(:build) do |protected_environment, evaluator|
@@ -36,7 +36,7 @@ FactoryBot.define do
     end
 
     trait :staging do
-      name 'staging'
+      name { 'staging' }
     end
   end
 end

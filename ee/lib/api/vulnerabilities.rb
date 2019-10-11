@@ -4,17 +4,11 @@ module API
   class Vulnerabilities < Grape::API
     include PaginationParams
 
+    helpers ::API::Helpers::VulnerabilityFindingsHelpers
+
     helpers do
-      def vulnerability_occurrences_by(params)
-        pipeline = if params[:pipeline_id]
-                     params[:project].all_pipelines.find_by(id: params[:pipeline_id]) # rubocop:disable CodeReuse/ActiveRecord
-                   else
-                     params[:project].latest_pipeline_with_security_reports
-                   end
-
-        return [] unless pipeline
-
-        Security::PipelineVulnerabilitiesFinder.new(pipeline: pipeline, params: params).execute
+      def vulnerabilities_by(project)
+        Security::VulnerabilitiesFinder.new(project).execute
       end
     end
 
@@ -27,40 +21,28 @@ module API
     end
 
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
-      desc 'Get a list of project vulnerabilities' do
-        success ::Vulnerabilities::OccurrenceEntity
-      end
-
       params do
-        optional :report_type, type: Array[String], desc: 'The type of report vulnerability belongs to', default: ::Vulnerabilities::Occurrence.report_types.keys
-        optional :scope, type: String, desc: 'Return vulnerabilities for the given scope: `dismissed` or `all`', default: 'dismissed', values: %w[all dismissed]
-        optional :severity,
-                 type: Array[String],
-                 desc: 'Returns issues belonging to specified severity level: `undefined`, `info`, `unknown`, `low`, `medium`, `high`, or `critical`. Defaults to all',
-                 default: ::Vulnerabilities::Occurrence.severities.keys
-        optional :confidence,
-                 type: Array[String],
-                 desc: 'Returns vulnerabilities belonging to specified confidence level: `undefined`, `ignore`, `unknown`, `experimental`, `low`, `medium`, `high`, or `confirmed`. Defaults to all',
-                 default: ::Vulnerabilities::Occurrence.confidences.keys
-        optional :pipeline_id, type: String, desc: 'The ID of the pipeline'
-
-        use :pagination
+        # These params have no effect for Vulnerabilities API but are required to support falling back to
+        # responding with Vulnerability Findings when :first_class_vulnerabilities feature is disabled.
+        # TODO: remove usage of :vulnerability_findings_params when feature flag is removed
+        # https://gitlab.com/gitlab-org/gitlab/issues/33488
+        use :vulnerability_findings_params
       end
-
+      desc 'Get a list of project vulnerabilities' do
+        success VulnerabilityEntity
+      end
       get ':id/vulnerabilities' do
-        authorize! :read_project_security_dashboard, user_project
+        if Feature.enabled?(:first_class_vulnerabilities)
+          authorize! :read_project_security_dashboard, user_project
 
-        vulnerability_occurrences = paginate(
-          Kaminari.paginate_array(
-            vulnerability_occurrences_by(declared_params.merge(project: user_project))
+          vulnerabilities = paginate(
+            vulnerabilities_by(user_project)
           )
-        )
 
-        Gitlab::Vulnerabilities::OccurrencesPreloader.preload_feedback!(vulnerability_occurrences)
-
-        present vulnerability_occurrences,
-          with: ::Vulnerabilities::OccurrenceEntity,
-          request: GrapeRequestProxy.new(request, current_user)
+          present vulnerabilities, with: VulnerabilityEntity
+        else
+          respond_with_vulnerability_findings
+        end
       end
     end
   end

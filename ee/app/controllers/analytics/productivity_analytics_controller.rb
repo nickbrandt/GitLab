@@ -11,7 +11,10 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
     check_feature_availability!(:productivity_analytics)
   }
   before_action -> {
-    authorize_view_productivity_analytics!(:view_productivity_analytics)
+    authorize_view_by_action!(:view_productivity_analytics)
+  }
+  before_action -> {
+    push_frontend_feature_flag(:productivity_analytics_scatterplot_enabled, default_enabled: true)
   }
 
   include IssuableCollections

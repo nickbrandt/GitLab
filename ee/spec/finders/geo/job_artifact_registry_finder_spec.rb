@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Geo::JobArtifactRegistryFinder, :geo_fdw do

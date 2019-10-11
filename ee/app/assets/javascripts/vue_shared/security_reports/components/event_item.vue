@@ -93,7 +93,7 @@ export default {
           :title="button.title"
           @click="$emit(button.emit)"
         >
-          <icon :name="button.iconName" css-classes="link-highlight" />
+          <icon :name="button.iconName" class="link-highlight" />
         </gl-button>
       </div>
     </div>

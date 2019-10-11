@@ -93,5 +93,42 @@ describe Gitlab::Alerting::NotificationPayloadParser do
         )
       end
     end
+
+    context 'when payload has secondary params' do
+      let(:payload) do
+        {
+          'description' => 'Description',
+          'additional' => {
+            'params' => {
+              '1' => 'Some value 1',
+              '2' => 'Some value 2',
+              'blank' => ''
+            }
+          }
+        }
+      end
+
+      it 'adds secondary params to annotations' do
+        is_expected.to eq(
+          'annotations' => {
+            'title' => 'New: Incident',
+            'description' => 'Description',
+            'additional.params.1' => 'Some value 1',
+            'additional.params.2' => 'Some value 2'
+          },
+          'startsAt' => starts_at.rfc3339
+        )
+      end
+    end
+
+    context 'when secondary params hash is too big' do
+      before do
+        allow(Gitlab::Utils::SafeInlineHash).to receive(:merge_keys!).and_raise(ArgumentError)
+      end
+
+      it 'catches and re-raises an error' do
+        expect { subject }.to raise_error Gitlab::Alerting::NotificationPayloadParser::BadPayloadError, 'The payload is too big'
+      end
+    end
   end
 end

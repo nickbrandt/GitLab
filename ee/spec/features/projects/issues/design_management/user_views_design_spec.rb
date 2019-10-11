@@ -1,28 +1,27 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'User views issue designs', :js do
   include DesignManagementTestHelpers
 
-  let(:project) { create(:project_empty_repo, :public) }
-  let(:issue) { create(:issue, project: project) }
+  set(:project) { create(:project_empty_repo, :public) }
+  set(:issue) { create(:issue, project: project) }
+  set(:design) { create(:design, :with_file, issue: issue) }
 
   before do
     enable_design_management
 
-    create(:design, :with_file, issue: issue, filename: 'world.png')
-
     visit project_issue_path(project, issue)
 
     click_link 'Designs'
-
-    wait_for_requests
   end
 
   it 'opens design detail' do
-    find('.js-design-list-item', match: :first).click
+    click_link design.filename
 
     page.within(find('.js-design-header')) do
-      expect(page).to have_content('world.png')
+      expect(page).to have_content(design.filename)
     end
 
     expect(page).to have_selector('.js-design-image')

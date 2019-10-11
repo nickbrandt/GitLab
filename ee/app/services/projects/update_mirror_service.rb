@@ -34,7 +34,7 @@ module Projects
       errors = []
 
       repository.upstream_branches.each do |upstream_branch|
-        name = upstream_branch.name
+        name = target_branch_name(upstream_branch.name)
 
         next if skip_branch?(name)
 
@@ -83,12 +83,12 @@ module Projects
         Git::TagPushService.new(
           project,
           current_user,
-          {
+          change: {
             oldrev: old_tag_target,
             newrev: tag_target,
-            ref: "#{Gitlab::Git::TAG_REF_PREFIX}#{tag.name}",
-            mirror_update: true
-          }
+            ref: "#{Gitlab::Git::TAG_REF_PREFIX}#{tag.name}"
+          },
+          mirror_update: true
         ).execute
       end
 
@@ -146,6 +146,12 @@ module Projects
 
     def log_error(error_message)
       service_logger.error(base_payload.merge(error_message: error_message))
+    end
+
+    def target_branch_name(upstream_branch_name)
+      return upstream_branch_name unless Feature.enabled?(:pull_mirror_branch_prefix, project)
+
+      "#{project.pull_mirror_branch_prefix}#{upstream_branch_name}"
     end
   end
 end

@@ -66,6 +66,36 @@ describe Boards::ListsController do
       end
     end
 
+    context 'with max issue count' do
+      let(:label) { create(:group_label, group: group, name: 'Development') }
+
+      context 'with licensed wip limits' do
+        before do
+          stub_licensed_features(wip_limits: true)
+        end
+
+        it 'returns the created list' do
+          create_board_list user: user, board: board, label_id: label.id, max_issue_count: 2
+
+          expect(response).to match_response_schema('list', dir: 'ee')
+          expect(json_response).to include('max_issue_count' => 2)
+        end
+      end
+
+      context 'without licensed wip limits' do
+        before do
+          stub_licensed_features(wip_limits: false)
+        end
+
+        it 'ignores max issue count' do
+          create_board_list user: user, board: board, label_id: label.id, max_issue_count: 2
+
+          expect(response).to match_response_schema('list', dir: 'ee')
+          expect(json_response).not_to include('max_issue_count')
+        end
+      end
+    end
+
     context 'with invalid params' do
       context 'when label is nil' do
         it 'returns a not found 404 response' do
@@ -96,12 +126,12 @@ describe Boards::ListsController do
       end
     end
 
-    def create_board_list(user:, board:, label_id:)
+    def create_board_list(user:, board:, label_id:, max_issue_count: 0)
       sign_in(user)
 
       post :create, params: {
                       board_id: board.to_param,
-                      list: { label_id: label_id }
+                      list: { label_id: label_id, max_issue_count: max_issue_count }
                     },
                     format: :json
     end
@@ -110,6 +140,132 @@ describe Boards::ListsController do
   describe 'PATCH update' do
     let!(:planning)    { create(:list, board: board, position: 0) }
     let!(:development) { create(:list, board: board, position: 1) }
+
+    context 'when updating max issue count' do
+      before do
+        sign_in(user)
+        stub_licensed_features(wip_limits: true)
+      end
+
+      it 'returns a successful 200 response' do
+        params = update_params_with_max_issue_count_of(42)
+
+        patch :update, params: params, as: :json
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(development.reload.max_issue_count).to eq(42)
+      end
+
+      context 'multiple fields update behavior' do
+        shared_examples 'field updates' do
+          it 'updates fields as expected' do
+            params = update_params_with_list_params(update_params)
+
+            patch :update, params: params, as: :json
+
+            expect(response).to have_gitlab_http_status(200)
+
+            reloaded_list = development.reload
+            expect(reloaded_list.position).to eq(expected_position)
+            expect(reloaded_list.preferences_for(user).collapsed).to eq(expected_collapsed)
+            expect(reloaded_list.max_issue_count).to eq(expected_max_issue_count)
+          end
+        end
+
+        it_behaves_like 'field updates' do
+          let(:update_params) { { max_issue_count: 99, position: 0, collapsed: true } }
+
+          let(:expected_position) { 0 }
+          let(:expected_collapsed) { true }
+          let(:expected_max_issue_count) { 99 }
+        end
+
+        it_behaves_like 'field updates' do
+          let(:update_params) { { position: 0, collapsed: true } }
+
+          let(:expected_position) { 0 }
+          let(:expected_collapsed) { true }
+          let(:expected_max_issue_count) { 0 }
+        end
+
+        it_behaves_like 'field updates' do
+          let(:update_params) { { position: 0 } }
+
+          let(:expected_position) { 0 }
+          let(:expected_collapsed) { nil }
+          let(:expected_max_issue_count) { 0 }
+        end
+
+        it_behaves_like 'field updates' do
+          let(:update_params) { { max_issue_count: 42 } }
+
+          let(:expected_position) { 1 }
+          let(:expected_collapsed) { nil }
+          let(:expected_max_issue_count) { 42 }
+        end
+
+        it_behaves_like 'field updates' do
+          let(:update_params) { { collapsed: true } }
+
+          let(:expected_position) { 1 }
+          let(:expected_collapsed) { true }
+          let(:expected_max_issue_count) { 0 }
+        end
+
+        it_behaves_like 'field updates' do
+          let(:update_params) { { max_issue_count: 42, collapsed: true } }
+
+          let(:expected_position) { 1 }
+          let(:expected_collapsed) { true }
+          let(:expected_max_issue_count) { 42 }
+        end
+
+        it_behaves_like 'field updates' do
+          let(:update_params) { { max_issue_count: 42, position: 0 } }
+
+          let(:expected_position) { 0 }
+          let(:expected_collapsed) { nil }
+          let(:expected_max_issue_count) { 42 }
+        end
+      end
+
+      it 'fails if negative max_issue_count is provided' do
+        params = update_params_with_max_issue_count_of(-1)
+
+        patch :update, params: params, as: :json
+
+        expect(response).to have_gitlab_http_status(422)
+        expect(development.reload.max_issue_count).not_to eq(-1)
+      end
+
+      context 'when wip limits are not licensed' do
+        before do
+          stub_licensed_features(wip_limits: false)
+        end
+
+        it 'fails to update max issue count with expected status' do
+          params = update_params_with_max_issue_count_of(2)
+
+          patch :update, params: params, as: :json
+
+          expect(response).to have_gitlab_http_status(422)
+          expect(development.reload.max_issue_count).not_to eq(2)
+        end
+      end
+
+      def update_params_with_max_issue_count_of(count)
+        update_params_with_list_params(max_issue_count: count)
+      end
+
+      def update_params_with_list_params(list_update_params)
+        { namespace_id: group.to_param,
+          project_id: board.project,
+          board_id: board.to_param,
+          id: development.to_param,
+          list: list_update_params,
+          format: :json }
+      end
+    end
 
     context 'with valid position' do
       it 'returns a successful 200 response' do
@@ -142,10 +298,10 @@ describe Boards::ListsController do
     end
 
     context 'with unauthorized user' do
-      it 'returns a forbidden 403 response' do
+      it 'returns a 422 unprocessable entity response' do
         move user: guest, board: board, list: planning, position: 6
 
-        expect(response).to have_gitlab_http_status(403)
+        expect(response).to have_gitlab_http_status(422)
       end
     end
 

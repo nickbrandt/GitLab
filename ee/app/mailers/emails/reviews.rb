@@ -13,7 +13,7 @@ module Emails
     def review_thread_options(recipient_id)
       {
         from: sender(@author.id),
-        to: recipient(recipient_id, @merge_request.target_project.group),
+        to: User.find(recipient_id).notification_email_for(@merge_request.target_project.group),
         subject: subject("#{@merge_request.title} (#{@merge_request.to_reference})")
       }
     end

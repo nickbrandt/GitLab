@@ -156,9 +156,7 @@ export const parseSastContainer = (issues = [], feedback = [], image) =>
      before switching to the Backend implementation
      */
     const frontendOnly = {
-      project_fingerprint: sha1(
-        `${issue.namespace}:${issue.vulnerability}:${issue.featurename}:${issue.featureversion}`,
-      ),
+      project_fingerprint: sha1(issue.vulnerability),
       title: message,
       vulnerability: issue.vulnerability,
     };

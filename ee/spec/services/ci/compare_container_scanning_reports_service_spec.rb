@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Ci::CompareContainerScanningReportsService do
@@ -59,12 +61,19 @@ describe Ci::CompareContainerScanningReportsService do
     end
 
     context 'when head pipeline has corrupted container scanning vulnerability reports' do
-      let!(:base_pipeline) { nil }
+      let!(:base_pipeline) { create(:ee_ci_pipeline, :with_corrupted_container_scanning_report, project: project) }
       let!(:head_pipeline) { create(:ee_ci_pipeline, :with_corrupted_container_scanning_report, project: project) }
 
       it 'returns status and error message' do
         expect(subject[:status]).to eq(:error)
         expect(subject[:status_reason]).to include('JSON parsing failed')
+      end
+
+      it 'returns status and error message when pipeline is nil' do
+        result = service.execute(nil, head_pipeline)
+
+        expect(result[:status]).to eq(:error)
+        expect(result[:status_reason]).to include('JSON parsing failed')
       end
     end
   end

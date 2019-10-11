@@ -6,6 +6,7 @@ describe SystemNoteService do
   include ProjectForksHelper
   include Gitlab::Routing
   include RepoHelpers
+  include DesignManagementTestHelpers
 
   set(:group)    { create(:group) }
   set(:project)  { create(:project, :repository, group: group) }
@@ -14,58 +15,121 @@ describe SystemNoteService do
   let(:issue)    { noteable }
   let(:epic)     { create(:epic, group: group) }
 
-  shared_examples_for 'a system note' do
-    let(:expected_noteable) { noteable }
-    let(:commit_count)      { nil }
-
-    it 'has the correct attributes', :aggregate_failures do
-      expect(subject).to be_valid
-      expect(subject).to be_system
-
-      expect(subject.noteable).to eq expected_noteable
-      expect(subject.author).to eq author
-
-      expect(subject.system_note_metadata.action).to eq(action)
-      expect(subject.system_note_metadata.commit_count).to eq(commit_count)
-    end
-  end
-
-  shared_examples_for 'a project system note' do
-    it 'has the project attribute set' do
-      expect(subject.project).to eq project
-    end
-
-    it_behaves_like 'a system note'
-  end
-
   describe '.relate_issue' do
-    let(:noteable_ref) { create(:issue) }
+    let(:noteable_ref) { double }
+    let(:noteable) { double }
 
-    subject { described_class.relate_issue(noteable, noteable_ref, author) }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'relate' }
+    before do
+      allow(noteable).to receive(:project).and_return(double)
     end
 
-    context 'when issue marks another as related' do
-      it 'sets the note text' do
-        expect(subject.note).to eq "marked this issue as related to #{noteable_ref.to_reference(project)}"
+    it 'calls IssuableService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:relate_issue).with(noteable_ref)
       end
+
+      described_class.relate_issue(noteable, noteable_ref, double)
     end
   end
 
   describe '.unrelate_issue' do
-    let(:noteable_ref) { create(:issue) }
+    let(:noteable_ref) { double }
+    let(:noteable) { double }
 
-    subject { described_class.unrelate_issue(noteable, noteable_ref, author) }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'unrelate' }
+    before do
+      allow(noteable).to receive(:project).and_return(double)
     end
 
-    context 'when issue relation is removed' do
-      it 'sets the note text' do
-        expect(subject.note).to eq "removed the relation with #{noteable_ref.to_reference(project)}"
+    it 'calls IssuableService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:unrelate_issue).with(noteable_ref)
+      end
+
+      described_class.unrelate_issue(noteable, noteable_ref, double)
+    end
+  end
+
+  describe '.design_version_added' do
+    subject { described_class.design_version_added(version) }
+
+    # default (valid) parameters:
+    set(:issue) { create(:issue) }
+    let(:n_designs) { 3 }
+    let(:designs) { create_list(:design, n_designs, issue: issue) }
+    let(:user) { build(:user) }
+    let(:version) do
+      create(:design_version, issue: issue, designs: designs)
+    end
+
+    before do
+      # Avoid needing to call into gitaly
+      allow(version).to receive(:author).and_return(user)
+    end
+
+    context 'with one kind of event' do
+      before do
+        DesignManagement::Action
+          .where(design: designs).update_all(event: :modification)
+      end
+
+      it 'makes just one note' do
+        expect(subject).to contain_exactly(Note)
+      end
+
+      it 'adds a new system note' do
+        expect { subject }.to change { Note.system.count }.by(1)
+      end
+    end
+
+    context 'with a mixture of events' do
+      let(:n_designs) { DesignManagement::Action.events.size }
+
+      before do
+        designs.each_with_index do |design, i|
+          design.actions.update_all(event: i)
+        end
+      end
+
+      it 'makes one note for each kind of event' do
+        expect(subject).to have_attributes(size: n_designs)
+      end
+
+      it 'adds a system note for each kind of event' do
+        expect { subject }.to change { Note.system.count }.by(n_designs)
+      end
+    end
+
+    context 'it succeeds' do
+      where(:action, :icon, :human_description) do
+        [
+          [:creation,     'designs_added',    'added'],
+          [:modification, 'designs_modified', 'updated'],
+          [:deletion,     'designs_removed',  'removed']
+        ]
+      end
+
+      with_them do
+        before do
+          version.actions.update_all(event: action)
+        end
+
+        let(:anchor_tag) { %r{ <a[^>]*>#{link}</a>} }
+        let(:href) { described_class.send(:design_version_path, version) }
+        let(:link) { "#{n_designs} designs" }
+
+        subject(:note) { described_class.design_version_added(version).first }
+
+        it 'has the correct data' do
+          expect(note)
+            .to be_system
+            .and have_attributes(
+              system_note_metadata: have_attributes(action: icon),
+              note: include(human_description)
+                      .and(include link)
+                      .and(include href),
+              note_html: a_string_matching(anchor_tag)
+            )
+        end
       end
     end
   end
@@ -89,7 +153,7 @@ describe SystemNoteService do
     let(:noteable) { create(:merge_request, source_project: project) }
     subject { described_class.unapprove_mr(noteable, author) }
 
-    it_behaves_like 'a system note' do
+    it_behaves_like 'a system note', exclude_project: true do
       let(:action) { 'unapproved' }
     end
 
@@ -101,32 +165,12 @@ describe SystemNoteService do
   end
 
   describe '.change_weight_note' do
-    context 'when weight changed' do
-      let(:noteable) { create(:issue, project: project, title: 'Lorem ipsum', weight: 4) }
-
-      subject { described_class.change_weight_note(noteable, project, author) }
-
-      it_behaves_like 'a project system note' do
-        let(:action) { 'weight' }
+    it 'calls IssuableService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:change_weight_note)
       end
 
-      it 'sets the note text' do
-        expect(subject.note).to eq "changed weight to **4**"
-      end
-    end
-
-    context 'when weight removed' do
-      let(:noteable) { create(:issue, project: project, title: 'Lorem ipsum', weight: nil) }
-
-      subject { described_class.change_weight_note(noteable, project, author) }
-
-      it_behaves_like 'a project system note' do
-        let(:action) { 'weight' }
-      end
-
-      it 'sets the note text' do
-        expect(subject.note).to eq 'removed the weight'
-      end
+      described_class.change_weight_note(noteable, project, author)
     end
   end
 
@@ -138,7 +182,7 @@ describe SystemNoteService do
 
       subject { described_class.change_epic_date_note(noteable, author, 'start date', timestamp) }
 
-      it_behaves_like 'a system note' do
+      it_behaves_like 'a system note', exclude_project: true do
         let(:action) { 'epic_date_changed' }
       end
 
@@ -152,7 +196,7 @@ describe SystemNoteService do
 
       subject { described_class.change_epic_date_note(noteable, author, 'start date', nil) }
 
-      it_behaves_like 'a system note' do
+      it_behaves_like 'a system note', exclude_project: true do
         let(:action) { 'epic_date_changed' }
       end
 
@@ -165,7 +209,7 @@ describe SystemNoteService do
       context 'note on the epic' do
         subject { described_class.issue_promoted(epic, issue, author, direction: :from) }
 
-        it_behaves_like 'a system note' do
+        it_behaves_like 'a system note', exclude_project: true do
           let(:action) { 'moved' }
           let(:expected_noteable) { epic }
         end
@@ -191,12 +235,11 @@ describe SystemNoteService do
 
   describe '.epic_issue' do
     let(:noteable) { epic }
-    let(:project) { nil }
 
     context 'issue added to an epic' do
       subject { described_class.epic_issue(epic, issue, author, :added) }
 
-      it_behaves_like 'a system note' do
+      it_behaves_like 'a system note', exclude_project: true do
         let(:action) { 'epic_issue_added' }
       end
 
@@ -208,7 +251,7 @@ describe SystemNoteService do
     context 'issue removed from an epic' do
       subject { described_class.epic_issue(epic, issue, author, :removed) }
 
-      it_behaves_like 'a system note' do
+      it_behaves_like 'a system note', exclude_project: true do
         let(:action) { 'epic_issue_removed' }
       end
 
@@ -264,7 +307,7 @@ describe SystemNoteService do
 
     subject { described_class.change_epics_relation(epic, child_epic, author, 'relate_epic') }
 
-    it_behaves_like 'a system note' do
+    it_behaves_like 'a system note', exclude_project: true do
       let(:action) { 'relate_epic' }
     end
 
@@ -297,7 +340,7 @@ describe SystemNoteService do
 
     subject { described_class.change_epics_relation(epic, child_epic, author, 'unrelate_epic') }
 
-    it_behaves_like 'a system note' do
+    it_behaves_like 'a system note', exclude_project: true do
       let(:action) { 'unrelate_epic' }
     end
 

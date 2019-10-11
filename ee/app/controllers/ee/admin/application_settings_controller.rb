@@ -3,6 +3,14 @@
 module EE
   module Admin
     module ApplicationSettingsController
+      extend ::Gitlab::Utils::Override
+
+      EE_VALID_SETTING_PANELS = %w(geo templates).freeze
+
+      EE_VALID_SETTING_PANELS.each do |action|
+        define_method(action) { perform_update if submitted? }
+      end
+
       def visible_application_setting_attributes
         attrs = super
 
@@ -35,6 +43,13 @@ module EE
         end
 
         attrs
+      end
+
+      private
+
+      override :valid_setting_panels
+      def valid_setting_panels
+        super + EE_VALID_SETTING_PANELS
       end
     end
   end

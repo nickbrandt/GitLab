@@ -1097,10 +1097,50 @@ describe User do
   describe 'blocking user' do
     let(:user) { create(:user, name: 'John Smith') }
 
-    it "blocks user" do
+    it 'blocks user' do
       user.block
 
       expect(user.blocked?).to be_truthy
+    end
+
+    context 'when user has running CI pipelines' do
+      let(:service) { double }
+
+      before do
+        pipeline = create(:ci_pipeline, :running, user: user)
+        create(:ci_build, :running, pipeline: pipeline)
+      end
+
+      it 'cancels all running pipelines and related jobs' do
+        expect(Ci::CancelUserPipelinesService).to receive(:new).and_return(service)
+        expect(service).to receive(:execute).with(user)
+
+        user.block
+      end
+    end
+  end
+
+  describe 'deactivating a user' do
+    let(:user) { create(:user, name: 'John Smith') }
+
+    context "an active user" do
+      it "can be deactivated" do
+        user.deactivate
+
+        expect(user.deactivated?).to be_truthy
+      end
+    end
+
+    context "a user who is blocked" do
+      before do
+        user.block
+      end
+
+      it "cannot be deactivated" do
+        user.deactivate
+
+        expect(user.reload.deactivated?).to be_falsy
+      end
     end
   end
 
@@ -1123,6 +1163,12 @@ describe User do
       expect(described_class).to receive(:blocked).and_return([user])
 
       expect(described_class.filter_items('blocked')).to include user
+    end
+
+    it 'filters by deactivated' do
+      expect(described_class).to receive(:deactivated).and_return([user])
+
+      expect(described_class.filter_items('deactivated')).to include user
     end
 
     it 'filters by two_factor_disabled' do
@@ -1411,8 +1457,16 @@ describe User do
         expect(described_class.search(user.username)).to eq([user, user2])
       end
 
+      it 'returns users with a matching username starting with a @' do
+        expect(described_class.search("@#{user.username}")).to eq([user, user2])
+      end
+
       it 'returns users with a partially matching username' do
         expect(described_class.search(user.username[0..2])).to eq([user, user2])
+      end
+
+      it 'returns users with a partially matching username starting with @' do
+        expect(described_class.search("@#{user.username[0..2]}")).to eq([user, user2])
       end
 
       it 'returns users with a matching username regardless of the casing' do
@@ -1500,13 +1554,20 @@ describe User do
   end
 
   describe '.find_by_ssh_key_id' do
-    context 'using an existing SSH key ID' do
-      let(:user) { create(:user) }
-      let(:key) { create(:key, user: user) }
+    let_it_be(:user) { create(:user) }
+    let_it_be(:key) { create(:key, user: user) }
 
+    context 'using an existing SSH key ID' do
       it 'returns the corresponding User' do
         expect(described_class.find_by_ssh_key_id(key.id)).to eq(user)
       end
+    end
+
+    it 'only performs a single query' do
+      key # Don't count the queries for creating the key and user
+
+      expect { described_class.find_by_ssh_key_id(key.id) }
+        .not_to exceed_query_limit(1)
     end
 
     context 'using an invalid SSH key ID' do
@@ -2015,6 +2076,95 @@ describe User do
 
     it 'sorts users by id in descending order when nil is passed' do
       expect(described_class.sort_by_attribute(nil).first).to eq(@user2)
+    end
+  end
+
+  describe "#last_active_at" do
+    let(:last_activity_on) { 5.days.ago.to_date }
+    let(:current_sign_in_at) { 8.days.ago }
+
+    context 'for a user that has `last_activity_on` set' do
+      let(:user) { create(:user, last_activity_on: last_activity_on) }
+
+      it 'returns `last_activity_on` with current time zone' do
+        expect(user.last_active_at).to eq(last_activity_on.to_time.in_time_zone)
+      end
+    end
+
+    context 'for a user that has `current_sign_in_at` set' do
+      let(:user) { create(:user, current_sign_in_at: current_sign_in_at) }
+
+      it 'returns `current_sign_in_at`' do
+        expect(user.last_active_at).to eq(current_sign_in_at)
+      end
+    end
+
+    context 'for a user that has both `current_sign_in_at` & ``last_activity_on`` set' do
+      let(:user) { create(:user, current_sign_in_at: current_sign_in_at, last_activity_on: last_activity_on) }
+
+      it 'returns the latest among `current_sign_in_at` & `last_activity_on`' do
+        latest_event = [current_sign_in_at, last_activity_on.to_time.in_time_zone].max
+        expect(user.last_active_at).to eq(latest_event)
+      end
+    end
+
+    context 'for a user that does not have both `current_sign_in_at` & `last_activity_on` set' do
+      let(:user) { create(:user, current_sign_in_at: nil, last_activity_on: nil) }
+
+      it 'returns nil' do
+        expect(user.last_active_at).to eq(nil)
+      end
+    end
+  end
+
+  describe "#can_be_deactivated?" do
+    let(:activity) { {} }
+    let(:user) { create(:user, name: 'John Smith', **activity) }
+    let(:day_within_minium_inactive_days_threshold) { User::MINIMUM_INACTIVE_DAYS.pred.days.ago }
+    let(:day_outside_minium_inactive_days_threshold) { User::MINIMUM_INACTIVE_DAYS.next.days.ago }
+
+    shared_examples 'not eligible for deactivation' do
+      it 'returns false' do
+        expect(user.can_be_deactivated?).to be_falsey
+      end
+    end
+
+    shared_examples 'eligible for deactivation' do
+      it 'returns true' do
+        expect(user.can_be_deactivated?).to be_truthy
+      end
+    end
+
+    context "a user who is not active" do
+      before do
+        user.block
+      end
+
+      it_behaves_like 'not eligible for deactivation'
+    end
+
+    context 'a user who has activity within the specified minimum inactive days' do
+      let(:activity) { { last_activity_on: day_within_minium_inactive_days_threshold } }
+
+      it_behaves_like 'not eligible for deactivation'
+    end
+
+    context 'a user who has signed in within the specified minimum inactive days' do
+      let(:activity) { { current_sign_in_at: day_within_minium_inactive_days_threshold } }
+
+      it_behaves_like 'not eligible for deactivation'
+    end
+
+    context 'a user who has no activity within the specified minimum inactive days' do
+      let(:activity) { { last_activity_on: day_outside_minium_inactive_days_threshold } }
+
+      it_behaves_like 'eligible for deactivation'
+    end
+
+    context 'a user who has not signed in within the specified minimum inactive days' do
+      let(:activity) { { current_sign_in_at: day_outside_minium_inactive_days_threshold } }
+
+      it_behaves_like 'eligible for deactivation'
     end
   end
 
@@ -3613,6 +3763,36 @@ describe User do
         create(:notification_setting, user: user, source: group, notification_email: group_notification_email)
 
         is_expected.to eq(group_notification_email)
+      end
+    end
+  end
+
+  describe '#password_expired?' do
+    let(:user) { build(:user, password_expires_at: password_expires_at) }
+
+    subject { user.password_expired? }
+
+    context 'when password_expires_at is not set' do
+      let(:password_expires_at) {}
+
+      it 'returns false' do
+        is_expected.to be_falsey
+      end
+    end
+
+    context 'when password_expires_at is in the past' do
+      let(:password_expires_at) { 1.minute.ago }
+
+      it 'returns true' do
+        is_expected.to be_truthy
+      end
+    end
+
+    context 'when password_expires_at is in the future' do
+      let(:password_expires_at) { 1.minute.from_now }
+
+      it 'returns false' do
+        is_expected.to be_falsey
       end
     end
   end

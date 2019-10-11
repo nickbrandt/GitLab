@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Project mirror', :js do
@@ -148,7 +150,7 @@ describe 'Project mirror', :js do
 
         expect(page).to have_content('Mirroring settings were successfully updated')
         expect(page).not_to have_content('Verified by')
-        expect(find('.qa-copy-ssh-public-key')['data-clipboard-text']).to eq(import_data.ssh_public_key)
+        expect(find('.rspec-copy-ssh-public-key')['data-clipboard-text']).to eq(import_data.ssh_public_key)
         expect(project.mirror?).to be_truthy
         expect(project.username_only_import_url).to eq('ssh://user@example.com')
         expect(import_data.auth_method).to eq('ssh_public_key')

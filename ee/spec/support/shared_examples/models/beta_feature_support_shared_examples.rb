@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This needs an `entity` object: Project or Group.
 RSpec.shared_examples 'an entity with beta feature support' do
   context 'when license does not allow it' do

@@ -1,4 +1,4 @@
-/* eslint-disable prefer-arrow-callback, no-var, one-var, consistent-return, func-names */
+/* eslint-disable no-var, one-var, consistent-return, func-names */
 
 import $ from 'jquery';
 import Api from 'ee/api';
@@ -14,8 +14,8 @@ export default function initLDAPGroupsSelect() {
   };
   import(/* webpackChunkName: 'select2' */ 'select2/select2')
     .then(() => {
-      $('.ajax-ldap-groups-select').each(function(i, select) {
-        return $(select).select2({
+      $('.ajax-ldap-groups-select').each((i, select) => {
+        $(select).select2({
           id(group) {
             return group.cn;
           },
@@ -24,7 +24,7 @@ export default function initLDAPGroupsSelect() {
           query(query) {
             var provider;
             provider = $('#ldap_group_link_provider').val();
-            return Api.ldapGroups(query.term, provider, function(groups) {
+            return Api.ldapGroups(query.term, provider, groups => {
               var data;
               data = {
                 results: groups,
@@ -52,7 +52,7 @@ export default function initLDAPGroupsSelect() {
     })
     .catch(() => {});
 
-  return $('#ldap_group_link_provider').on('change', function() {
-    return $('.ajax-ldap-groups-select').select2('data', null);
+  $('#ldap_group_link_provider').on('change', () => {
+    $('.ajax-ldap-groups-select').select2('data', null);
   });
 }

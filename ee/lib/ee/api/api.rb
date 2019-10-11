@@ -11,6 +11,7 @@ module EE
         mount ::EE::API::Boards
         mount ::EE::API::GroupBoards
 
+        mount ::API::AuditEvents
         mount ::API::ProjectApprovalRules
         mount ::API::ProjectApprovalSettings
         mount ::API::Unleash
@@ -35,6 +36,7 @@ module EE
         mount ::API::ManagedLicenses
         mount ::API::ProjectApprovals
         mount ::API::Vulnerabilities
+        mount ::API::VulnerabilityFindings
         mount ::API::MergeRequestApprovals
         mount ::API::MergeRequestApprovalRules
         mount ::API::ProjectAliases

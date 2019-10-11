@@ -40,7 +40,7 @@ these additional steps before proceeding with GitLab installation.
    ```
 
 1. Download/install GitLab Omnibus using **steps 1 and 2** from
-   [GitLab downloads](https://about.gitlab.com/downloads). Do not complete other
+   [GitLab downloads](https://about.gitlab.com/install/). Do not complete other
    steps on the download page.
 1. Create/edit `/etc/gitlab/gitlab.rb` and use the following configuration.
    Be sure to change the `external_url` to match your eventual GitLab front-end
@@ -90,8 +90,8 @@ these additional steps before proceeding with GitLab installation.
 
    NOTE: **Note:** When you specify `https` in the `external_url`, as in the example
    above, GitLab assumes you have SSL certificates in `/etc/gitlab/ssl/`. If
-   certificates are not present, Nginx will fail to start. See
-   [Nginx documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
+   certificates are not present, NGINX will fail to start. See
+   [NGINX documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
    for more information.
 
    NOTE: **Note:** It is best to set the `uid` and `gid`s prior to the initial reconfigure
@@ -175,7 +175,7 @@ If you enable Monitoring, it must be enabled on **all** GitLab servers.
 
    CAUTION: **Warning:**
    After changing `unicorn['listen']` in `gitlab.rb`, and running `sudo gitlab-ctl reconfigure`,
-   it can take an extended period of time for unicorn to complete reloading after receiving a `HUP`.
+   it can take an extended period of time for Unicorn to complete reloading after receiving a `HUP`.
    For more information, see the [issue](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/4401).
 
 ## Troubleshooting

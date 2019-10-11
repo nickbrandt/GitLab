@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Environment > Pod Logs', :js do
@@ -9,15 +11,20 @@ describe 'Environment > Pod Logs', :js do
   let(:pod_name) { pod_names.first }
   let(:project) { create(:project, :repository) }
   let(:environment) { create(:environment, project: project) }
+  let(:service) { create(:cluster_platform_kubernetes, :configured) }
 
   before do
     stub_licensed_features(pod_logs: true)
 
+    # We're setting this feature flag to false since the FE does not support it
+    # as yet.
+    stub_feature_flags(pod_logs_reactive_cache: false)
+
     create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
     create(:deployment, :success, environment: environment)
 
-    allow_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
-      .with(pod_name, environment.deployment_namespace).and_return(kube_logs_body)
+    stub_kubeclient_logs(pod_name, environment.deployment_namespace, container: nil)
+
     allow_any_instance_of(EE::Environment).to receive(:pod_names).and_return(pod_names)
 
     sign_in(project.owner)
@@ -39,7 +46,7 @@ describe 'Environment > Pod Logs', :js do
           expect(item.text).to eq(pod_names[i])
         end
       end
-      expect(page).to have_content("Log 1 Log 2 Log 3")
+      expect(page).to have_content("Log 1\\nLog 2\\nLog 3")
     end
   end
 
@@ -77,11 +84,11 @@ describe 'Environment > Pod Logs', :js do
   end
 
   def perf_bar_height
-    page.evaluate_script("$('#js-peek').height()")
+    page.evaluate_script("$('#js-peek').height()").to_i
   end
 
   def navbar_height
-    page.evaluate_script("$('.js-navbar').height()")
+    page.evaluate_script("$('.js-navbar').height()").to_i
   end
 
   def log_header_top

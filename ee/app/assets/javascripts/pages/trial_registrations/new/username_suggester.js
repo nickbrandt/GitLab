@@ -8,23 +8,25 @@ const USERNAME_SUGGEST_DEBOUNCE_TIME = 300;
 export default class UsernameSuggester {
   /**
    * Creates an instance of UsernameSuggester.
-   * @param {HTMLElement} targetElement target input element id for suggested username
-   * @param {HTMLElement[]} sourceElementsIds array of HTML input element ids used for generating username
+   * @param {string} targetElement target input element id for suggested username
+   * @param {string[]} sourceElementsIds array of HTML input element ids used for generating username
    */
   constructor(targetElement, sourceElementsIds = []) {
     if (!targetElement) {
-      throw new Error(__("Required argument 'targetElement' is missing"));
+      throw new Error("Required argument 'targetElement' is missing");
     }
 
     this.usernameElement = document.getElementById(targetElement);
 
     if (!this.usernameElement) {
-      throw new Error(__('The target element is missing.'));
+      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      throw new Error('The target element is missing.');
     }
 
     this.apiPath = this.usernameElement.dataset.apiPath;
     if (!this.apiPath) {
-      throw new Error(__('The API path was not specified.'));
+      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+      throw new Error('The API path was not specified.');
     }
 
     this.sourceElements = sourceElementsIds.map(id => document.getElementById(id)).filter(Boolean);

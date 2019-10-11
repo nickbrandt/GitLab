@@ -1,4 +1,6 @@
 import * as types from './mutation_types';
+import { ALL } from './constants';
+import { isBaseFilterOption } from './utils';
 
 export default {
   [types.SET_ALL_FILTERS](state, payload = {}) {
@@ -12,11 +14,12 @@ export default {
 
       // This prevents us from selecting nothing at all
       if (selection.size === 0) {
-        selection.add('all');
+        selection.add(ALL);
       }
 
       return { ...filter, selection };
     });
+    state.hide_dismissed = payload.scope !== 'all';
   },
   [types.SET_FILTER](state, payload) {
     const { filterId, optionId } = payload;
@@ -25,10 +28,10 @@ export default {
     if (activeFilter) {
       let selection = new Set(activeFilter.selection);
 
-      if (optionId === 'all') {
-        selection = new Set(['all']);
+      if (isBaseFilterOption(optionId)) {
+        selection = new Set([ALL]);
       } else {
-        selection.delete('all');
+        selection.delete(ALL);
         if (selection.has(optionId)) {
           selection.delete(optionId);
         } else {
@@ -38,7 +41,7 @@ export default {
 
       // This prevents us from selecting nothing at all
       if (selection.size === 0) {
-        selection.add('all');
+        selection.add(ALL);
       }
       activeFilter.selection = selection;
     }

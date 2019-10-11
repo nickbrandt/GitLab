@@ -170,19 +170,19 @@ describe Ci::Build do
     end
   end
 
-  describe '#collect_license_management_reports!' do
-    subject { job.collect_license_management_reports!(license_management_report) }
+  describe '#collect_license_scanning_reports!' do
+    subject { job.collect_license_scanning_reports!(license_scanning_report) }
 
-    let(:license_management_report) { Gitlab::Ci::Reports::LicenseManagement::Report.new }
+    let(:license_scanning_report) { Gitlab::Ci::Reports::LicenseScanning::Report.new }
 
     before do
       stub_licensed_features(license_management: true)
     end
 
-    it { expect(license_management_report.licenses.count).to eq(0) }
+    it { expect(license_scanning_report.licenses.count).to eq(0) }
 
     context 'when build has a license management report' do
-      context 'when there is a license management report' do
+      context 'when there is a license scanning report' do
         before do
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
@@ -190,9 +190,9 @@ describe Ci::Build do
         it 'parses blobs and add the results to the report' do
           expect { subject }.not_to raise_error
 
-          expect(license_management_report.licenses.count).to eq(4)
-          expect(license_management_report.found_licenses['MIT'].name).to eq('MIT')
-          expect(license_management_report.found_licenses['MIT'].dependencies.count).to eq(52)
+          expect(license_scanning_report.licenses.count).to eq(4)
+          expect(license_scanning_report.licenses.map(&:name)).to contain_exactly("Apache 2.0", "MIT", "New BSD", "unknown")
+          expect(license_scanning_report.licenses.find { |x| x.name == 'MIT' }.dependencies.count).to eq(52)
         end
       end
 
@@ -202,20 +202,20 @@ describe Ci::Build do
         end
 
         it 'raises an error' do
-          expect { subject }.to raise_error(Gitlab::Ci::Parsers::LicenseManagement::LicenseManagement::LicenseManagementParserError)
+          expect { subject }.to raise_error(Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning::LicenseScanningParserError)
         end
       end
 
-      context 'when Feature flag is disabled for License Management reports parsing' do
+      context 'when Feature flag is disabled for License Scanning reports parsing' do
         before do
           stub_feature_flags(parse_license_management_reports: false)
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
 
-        it 'does NOT parse license management report' do
+        it 'does NOT parse license scanning report' do
           subject
 
-          expect(license_management_report.licenses.count).to eq(0)
+          expect(license_scanning_report.licenses.count).to eq(0)
         end
       end
 
@@ -225,10 +225,10 @@ describe Ci::Build do
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
 
-        it 'does NOT parse license management report' do
+        it 'does NOT parse license scanning report' do
           subject
 
-          expect(license_management_report.licenses.count).to eq(0)
+          expect(license_scanning_report.licenses.count).to eq(0)
         end
       end
     end
@@ -331,6 +331,24 @@ describe Ci::Build do
           expect(metrics_report.metrics.count).to eq(0)
         end
       end
+    end
+  end
+
+  describe '#retryable?' do
+    subject { build.retryable? }
+    let(:pipeline) { merge_request.all_pipelines.last }
+    let!(:build) { create(:ci_build, :canceled, pipeline: pipeline) }
+
+    context 'with pipeline for merged results' do
+      let(:merge_request) { create(:merge_request, :with_merge_request_pipeline) }
+
+      it { is_expected.to be true }
+    end
+
+    context 'with pipeline for merge train' do
+      let(:merge_request) { create(:merge_request, :on_train, :with_merge_train_pipeline) }
+
+      it { is_expected.to be false }
     end
   end
 end

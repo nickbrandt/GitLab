@@ -118,7 +118,7 @@ export default {
       data-placement="bottom"
     >
       <strong>{{ syncType }}</strong>
-      <icon name="retry" css-classes="sync-status-icon prepend-left-5" />
+      <icon name="retry" class="sync-status-icon prepend-left-5" />
       <span v-if="!eventTimestampEmpty" class="sync-status-event-info prepend-left-5">
         {{ syncStatusEventInfo }}
       </span>

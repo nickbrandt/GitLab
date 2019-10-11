@@ -1,5 +1,0 @@
----
-title: Fix alignment of comments count in issue and MR lists
-merge_request: 16829
-author:
-type: fixed

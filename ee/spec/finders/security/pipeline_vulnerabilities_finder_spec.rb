@@ -49,7 +49,6 @@ describe Security::PipelineVulnerabilitiesFinder do
         let(:params) { { report_type: %w[dast] } }
 
         it 'includes only dast' do
-          # binding.pry
           expect(subject.count).to eq dast_count
         end
       end
@@ -140,7 +139,7 @@ describe Security::PipelineVulnerabilitiesFinder do
         subject { described_class.new(pipeline: pipeline).execute }
 
         it 'returns all vulnerability confidence levels' do
-          expect(subject.map(&:confidence).uniq).to match_array %w[undefined low medium high]
+          expect(subject.map(&:confidence).uniq).to match_array %w[undefined unknown low medium high]
         end
       end
 
@@ -159,7 +158,7 @@ describe Security::PipelineVulnerabilitiesFinder do
 
         it 'filters by all params' do
           expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count
-          expect(subject.map(&:confidence).uniq).to match_array %w[undefined low medium high]
+          expect(subject.map(&:confidence).uniq).to match_array %w[undefined unknown low medium high]
           expect(subject.map(&:severity).uniq).to match_array %w[undefined unknown low medium high critical]
         end
       end

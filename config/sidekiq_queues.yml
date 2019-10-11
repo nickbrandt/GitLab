@@ -49,7 +49,7 @@
   - [delete_user, 1]
   - [todos_destroyer, 1]
   - [delete_merged_branches, 1]
-  - [authorized_projects, 1]
+  - [authorized_projects, 2]
   - [expire_build_instance_artifacts, 1]
   - [group_destroy, 1]
   - [irker, 1]
@@ -117,3 +117,4 @@
   - [jira_connect, 1]
   - [update_external_pull_requests, 3]
   - [refresh_license_compliance_checks, 2]
+  - [design_management_new_version, 1]

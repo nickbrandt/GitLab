@@ -1,11 +1,11 @@
 <script>
 import $ from 'jquery';
 import { __, s__ } from '~/locale';
+import Tracking from '~/tracking';
 import eventHub from '~/sidebar/event_hub';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
 import { GlLoadingIcon } from '@gitlab/ui';
-import { trackEvent } from 'ee/event_tracking/issue_sidebar';
 
 export default {
   components: {
@@ -15,6 +15,7 @@ export default {
   directives: {
     tooltip,
   },
+  mixins: [Tracking.mixin({ label: 'right_sidebar' })],
   props: {
     fetching: {
       type: Boolean,
@@ -105,7 +106,7 @@ export default {
     onEditClick(shouldShowEditField = true) {
       this.showEditField(shouldShowEditField);
 
-      trackEvent('click_edit_button', 'weight');
+      this.track('click_edit_button', { property: 'weight' });
     },
     showEditField(bool = true) {
       this.shouldShowEditField = bool;

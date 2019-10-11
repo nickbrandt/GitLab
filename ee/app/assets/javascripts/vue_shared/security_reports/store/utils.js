@@ -181,7 +181,7 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
     const parsed = {
       ...adaptDeprecatedIssueFormat(issue),
       category: 'dependency_scanning',
-      project_fingerprint: sha1(issue.cve || issue.message),
+      project_fingerprint: sha1(issue.cve),
       title: issue.message,
     };
 
@@ -457,7 +457,11 @@ export const pollUntilComplete = endpoint =>
     const eTagPoll = new Poll({
       resource: {
         getReports(url) {
-          return axios.get(url);
+          return axios.get(url, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
         },
       },
       data: endpoint,

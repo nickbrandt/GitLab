@@ -25,11 +25,6 @@ export default {
       type: String,
       required: true,
     },
-    projectsEndpoint: {
-      type: String,
-      required: false,
-      default: null,
-    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -62,7 +57,6 @@ export default {
   },
   computed: {
     ...mapState('vulnerabilities', ['modal', 'pageInfo']),
-    ...mapState('projects', ['projects']),
     ...mapGetters('filters', ['activeFilters']),
     canCreateIssue() {
       const path = this.vulnerability.create_vulnerability_feedback_issue_path;
@@ -106,14 +100,12 @@ export default {
     if (this.showHideDismissedToggle) {
       this.setHideDismissedToggleInitialState();
     }
-    this.setProjectsEndpoint(this.projectsEndpoint);
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
     this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
     this.fetchVulnerabilities({ ...this.activeFilters, page: this.pageInfo.page });
     this.fetchVulnerabilitiesCount(this.activeFilters);
     this.fetchVulnerabilitiesHistory(this.activeFilters);
-    this.fetchProjects();
   },
   methods: {
     ...mapActions('vulnerabilities', [
@@ -136,7 +128,6 @@ export default {
       'undoDismiss',
       'downloadPatch',
     ]),
-    ...mapActions('projects', ['setProjectsEndpoint', 'fetchProjects']),
     ...mapActions('filters', ['lockFilter', 'setHideDismissedToggleInitialState']),
     emitVulnerabilitiesCountChanged(count) {
       this.$emit('vulnerabilitiesCountChanged', count);

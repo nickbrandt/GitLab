@@ -7,6 +7,18 @@ describe Issue do
 
   using RSpec::Parameterized::TableSyntax
 
+  context 'scopes' do
+    describe '.service_desk' do
+      it 'returns the service desk issue' do
+        service_desk_issue = create(:issue, author: ::User.support_bot)
+        regular_issue = create(:issue)
+
+        expect(described_class.service_desk).to include(service_desk_issue)
+        expect(described_class.service_desk).not_to include(regular_issue)
+      end
+    end
+  end
+
   describe 'validations' do
     subject { build(:issue) }
 
@@ -33,6 +45,8 @@ describe Issue do
   describe 'relations' do
     it { is_expected.to have_many(:designs) }
     it { is_expected.to have_many(:design_versions) }
+    it { is_expected.to have_and_belong_to_many(:prometheus_alert_events) }
+    it { is_expected.to have_many(:prometheus_alerts) }
 
     describe 'versions.most_recent' do
       it 'returns the most recent version' do

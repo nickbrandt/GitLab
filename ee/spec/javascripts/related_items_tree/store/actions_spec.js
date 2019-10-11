@@ -732,13 +732,13 @@ describe('RelatedItemTree', () => {
         });
       });
 
-      describe('toggleCreateItemForm', () => {
-        it('should set `state.showCreateItemForm` to true', done => {
+      describe('toggleCreateEpicForm', () => {
+        it('should set `state.showCreateEpicForm` to true', done => {
           testAction(
-            actions.toggleCreateItemForm,
+            actions.toggleCreateEpicForm,
             {},
             {},
-            [{ type: types.TOGGLE_CREATE_ITEM_FORM, payload: {} }],
+            [{ type: types.TOGGLE_CREATE_EPIC_FORM, payload: {} }],
             [],
             done,
           );
@@ -806,6 +806,9 @@ describe('RelatedItemTree', () => {
       describe('receiveAddItemSuccess', () => {
         it('should set `state.itemAddInProgress` to false and dispatches actions `setPendingReferences`, `setItemInputValue` and `toggleAddItemForm`', done => {
           state.epicsBeginAtIndex = 0;
+          state.actionType = ActionType.Epic;
+          state.isEpic = true;
+
           const mockEpicsWithoutPerm = mockEpics.map(item =>
             Object.assign({}, item, {
               pathIdSeparator: PathIdSeparator.Epic,
@@ -815,7 +818,7 @@ describe('RelatedItemTree', () => {
 
           testAction(
             actions.receiveAddItemSuccess,
-            { actionType: ActionType.Epic, rawItems: mockEpicsWithoutPerm },
+            { rawItems: mockEpicsWithoutPerm },
             state,
             [
               {
@@ -906,6 +909,7 @@ describe('RelatedItemTree', () => {
           state.actionType = ActionType.Epic;
           state.epicsEndpoint = '/foo/bar';
           state.pendingReferences = ['foo'];
+          state.isEpic = true;
 
           mock.onPost(state.epicsEndpoint).replyOnce(200, { issuables: [mockEpic1] });
 
@@ -920,7 +924,7 @@ describe('RelatedItemTree', () => {
               },
               {
                 type: 'receiveAddItemSuccess',
-                payload: { actionType: ActionType.Epic, rawItems: [mockEpic1] },
+                payload: { rawItems: [mockEpic1] },
               },
             ],
             done,
@@ -976,10 +980,12 @@ describe('RelatedItemTree', () => {
           state.parentItem = {
             fullPath: createdEpic.group.fullPath,
           };
+          state.actionType = ActionType.Epic;
+          state.isEpic = true;
 
           testAction(
             actions.receiveCreateItemSuccess,
-            { rawItem: mockEpic1, actionType: ActionType.Epic },
+            { rawItem: mockEpic1 },
             state,
             [
               {
@@ -997,7 +1003,7 @@ describe('RelatedItemTree', () => {
                 payload: { children: [createdEpic], isSubItem: false },
               },
               {
-                type: 'toggleCreateItemForm',
+                type: 'toggleCreateEpicForm',
                 payload: { actionType: ActionType.Epic, toggleState: false },
               },
             ],
@@ -1068,7 +1074,6 @@ describe('RelatedItemTree', () => {
               {
                 type: 'receiveCreateItemSuccess',
                 payload: {
-                  actionType: ActionType.Epic,
                   rawItem: Object.assign({}, mockEpic1, {
                     path: '',
                     state: ChildState.Open,

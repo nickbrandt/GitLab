@@ -17,12 +17,13 @@ export default (containerId = 'js-billing-plans') => {
     },
     data() {
       const { dataset } = this.$options.el;
-      const { namespaceId, namespaceName, planUpgradeHref } = dataset;
+      const { namespaceId, namespaceName, planUpgradeHref, customerPortalUrl } = dataset;
 
       return {
         namespaceId,
         namespaceName,
         planUpgradeHref,
+        customerPortalUrl,
       };
     },
     render(createElement) {
@@ -31,6 +32,7 @@ export default (containerId = 'js-billing-plans') => {
           namespaceId: this.namespaceId,
           namespaceName: this.namespaceName,
           planUpgradeHref: this.planUpgradeHref,
+          customerPortalUrl: this.customerPortalUrl,
         },
       });
     },

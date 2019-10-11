@@ -62,7 +62,7 @@ can lead to confusion during deployments.
 > - Introduced in GitLab 10.2 for project-level clusters.
 > - Introduced in GitLab 11.6 for group-level clusters.
 
-[Helm](https://docs.helm.sh/) is a package manager for Kubernetes and is
+[Helm](https://helm.sh/docs/) is a package manager for Kubernetes and is
 required to install all the other applications. It is installed in its
 own pod inside the cluster which can run the `helm` CLI in a safe
 environment.
@@ -106,11 +106,10 @@ mode** by default. Make sure you read the [security
 implications](../project/clusters/index.md#security-implications) before doing so.
 
 NOTE: **Note:**
-The
-[runner/gitlab-runner](https://gitlab.com/gitlab-org/charts/gitlab-runner)
+The [`runner/gitlab-runner`](https://gitlab.com/gitlab-org/charts/gitlab-runner)
 chart is used to install this application with a
 [`values.yaml`](https://gitlab.com/gitlab-org/gitlab/blob/master/vendor/runner/values.yaml)
-file.
+file. Customizing installation by modifying this file is not supported.
 
 ### Ingress
 
@@ -123,8 +122,7 @@ web proxy for your applications and is useful if you want to use [Auto
 DevOps](../../topics/autodevops/index.md) or deploy your own web apps.
 
 NOTE: **Note:**
-The
-[stable/nginx-ingress](https://github.com/helm/charts/tree/master/stable/nginx-ingress)
+The [`stable/nginx-ingress`](https://github.com/helm/charts/tree/master/stable/nginx-ingress)
 chart is used to install this application with a
 [`values.yaml`](https://gitlab.com/gitlab-org/gitlab/blob/master/vendor/ingress/values.yaml)
 file.
@@ -139,7 +137,7 @@ to check requests against [OWASP's Core Rule Set](https://www.modsecurity.org/CR
 This feature:
 
 - Runs in "Detection-only mode" unless configured otherwise.
-- Is viewable by checking your ingress controller's `modsec` log for rule violations.
+- Is viewable by checking your Ingress controller's `modsec` log for rule violations.
   For example:
 
   ```sh
@@ -160,7 +158,7 @@ application for the changes to take effect.
 ### JupyterHub
 
 > - Introduced in GitLab 11.0 for project-level clusters.
-> - Introduced in GitLab 12.3 for group-level clusters.
+> - Introduced in GitLab 12.3 for group and instance-level clusters.
 
 [JupyterHub](https://jupyterhub.readthedocs.io/en/stable/) is a
 multi-user service for managing notebooks across a team. [Jupyter
@@ -176,7 +174,7 @@ higher](../permissions.md) access to the associated project or group.
 We use a [custom Jupyter
 image](https://gitlab.com/gitlab-org/jupyterhub-user-image/blob/master/Dockerfile)
 that installs additional useful packages on top of the base Jupyter. You
-will also see ready-to-use DevOps Runbooks built with Nurtch's [Rubix library](https://github.com/amit1rrr/rubix).
+will also see ready-to-use DevOps Runbooks built with Nurtch's [Rubix library](https://github.com/Nurtch/rubix).
 
 More information on
 creating executable runbooks can be found in [our Runbooks
@@ -185,8 +183,7 @@ Ingress must be installed and have an IP address assigned before
 JupyterHub can be installed.
 
 NOTE: **Note:**
-The
-[jupyter/jupyterhub](https://jupyterhub.github.io/helm-chart/)
+The [`jupyter/jupyterhub`](https://jupyterhub.github.io/helm-chart/)
 chart is used to install this application with a
 [`values.yaml`](https://gitlab.com/gitlab-org/gitlab/blob/master/vendor/jupyter/values.yaml)
 file.
@@ -194,6 +191,7 @@ file.
 #### Jupyter Git Integration
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/28783) in GitLab 12.0 for project-level clusters.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/32512) in GitLab 12.3 for group and instance-level clusters.
 
 When installing JupyterHub onto your Kubernetes cluster, [JupyterLab's Git extension](https://github.com/jupyterlab/jupyterlab-git)
 is automatically provisioned and configured using the authenticated user's:
@@ -223,7 +221,7 @@ You can clone repositories from the files tab in Jupyter:
 > - Introduced in GitLab 11.5 for project-level clusters.
 > - Introduced in GitLab 12.3 for group- and instance-level clusters.
 
-[Knative](https://cloud.google.com/knative) provides a platform to
+[Knative](https://cloud.google.com/knative/) provides a platform to
 create, deploy, and manage serverless workloads from a Kubernetes
 cluster. It is used in conjunction with, and includes
 [Istio](https://istio.io) to provide an external IP address for all
@@ -234,12 +232,11 @@ domain where your applications will be exposed. Configure your DNS
 server to use the external IP address for that domain. For any
 application created and installed, they will be accessible as
 `<program_name>.<kubernetes_namespace>.<domain_name>`. This will require
-your kubernetes cluster to have [RBAC
+your Kubernetes cluster to have [RBAC
 enabled](../project/clusters/index.md#rbac-cluster-resources).
 
 NOTE: **Note:**
-The
-[knative/knative](https://storage.googleapis.com/triggermesh-charts)
+The [`knative/knative`](https://storage.googleapis.com/triggermesh-charts)
 chart is used to install this application.
 
 ### Prometheus
@@ -252,8 +249,7 @@ open-source monitoring and alerting system useful to supervise your
 deployed applications.
 
 NOTE: **Note:**
-The
-[stable/prometheus](https://github.com/helm/charts/tree/master/stable/prometheus)
+The [`stable/prometheus`](https://github.com/helm/charts/tree/master/stable/prometheus)
 chart is used to install this application with a
 [`values.yaml`](https://gitlab.com/gitlab-org/gitlab/blob/master/vendor/prometheus/values.yaml)
 file.
@@ -293,7 +289,7 @@ The applications below can be uninstalled.
 | ----------- | -------------- | ----- |
 | Cert-Manager | 12.2+         | The associated private key will be deleted and cannot be restored. Deployed applications will continue to use HTTPS, but certificates will not be renewed. Before uninstalling, you may wish to [back up your configuration](https://docs.cert-manager.io/en/latest/tasks/backup-restore-crds.html) or [revoke your certificates](https://letsencrypt.org/docs/revoking/) |
 | GitLab Runner  | 12.2+         | Any running pipelines will be canceled. |
-| Helm  | 12.2+         | The associated Tiller pod will be deleted and cannot be restored. |
+| Helm  | 12.2+         | The associated Tiller pod, the `gitlab-managed-apps` namespace, and all of its resources will be deleted and cannot be restored. |
 | Ingress  | 12.1+         | The associated load balancer and IP will be deleted and cannot be restored. Furthermore, it can only be uninstalled if JupyterHub is not installed. |
 | JupyterHub  | 12.1+         | All data not committed to GitLab will be deleted and cannot be restored. |
 | Knative  | 12.1+         | The associated IP will be deleted and cannot be restored. |

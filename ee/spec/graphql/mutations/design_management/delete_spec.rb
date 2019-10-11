@@ -84,9 +84,9 @@ describe Mutations::DesignManagement::Delete do
           end
         end
 
-        it 'runs no more than 27 queries' do
+        it 'runs no more than 28 queries' do
           filenames.each(&:present?) # ignore setup
-          # Queries: as of 2019-08-08
+          # Queries: as of 2019-08-28
           # -------------
           # 01. routing query
           # 02. find project by id
@@ -112,10 +112,11 @@ describe Mutations::DesignManagement::Delete do
           # 23.   create version with sha and issue
           # 24.   create design-version links
           # 25.   validate version.actions.present?
-          # 26.   validate version.sha is unique
-          # 27. leave transaction 1
+          # 26.   validate version.issue.present?
+          # 27.   validate version.sha is unique
+          # 28. leave transaction 1
           #
-          expect { run_mutation }.not_to exceed_query_limit(27)
+          expect { run_mutation }.not_to exceed_query_limit(28)
         end
       end
 

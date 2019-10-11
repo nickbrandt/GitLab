@@ -7,7 +7,8 @@ describe Issue, :elastic do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
   end
 
-  let(:project) { create :project }
+  let(:project) { create :project, :public }
+  let(:admin) { create :user, :admin }
 
   context 'when limited indexing is on' do
     set(:project) { create :project, name: 'test1' }
@@ -71,7 +72,29 @@ describe Issue, :elastic do
 
     expect(described_class.elastic_search('(term1 | term2 | term3) +bla-bla', options: options).total_count).to eq(2)
     expect(described_class.elastic_search(Issue.last.to_reference, options: options).total_count).to eq(1)
-    expect(described_class.elastic_search('bla-bla', options: { project_ids: :any }).total_count).to eq(3)
+    expect(described_class.elastic_search('bla-bla', options: { project_ids: :any, public_and_internal_projects: true }).total_count).to eq(3)
+  end
+
+  it "searches by iid and scopes to type: issue only" do
+    issue = nil
+
+    Sidekiq::Testing.inline! do
+      issue = create :issue, title: 'bla-bla issue', project: project
+      create :issue, description: 'term2 in description', project: project
+
+      # MergeRequest with the same iid should not be found in Issue search
+      create :merge_request, title: 'bla-bla', source_project: project, iid: issue.iid
+
+      Gitlab::Elastic::Helper.refresh_index
+    end
+
+    # User needs to be admin or the MergeRequest would just be filtered by
+    # confidential: false
+    options = { project_ids: [project.id], current_user: admin }
+
+    results = described_class.elastic_search("##{issue.iid}", options: options)
+    expect(results.total_count).to eq(1)
+    expect(results.first.title).to eq('bla-bla issue')
   end
 
   it "returns json with all needed elements" do

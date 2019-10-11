@@ -1,5 +1,0 @@
----
-title: Allow to filter epics by timeframe or state using GraphQL
-merge_request: 15110
-author:
-type: added

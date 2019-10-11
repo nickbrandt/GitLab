@@ -14,28 +14,25 @@ module EE
         private
 
         DEFAULT_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse'
-        ITEMS_PER_PAGE = 20
-        START_INDEX = 1
 
         def schemas
           [DEFAULT_SCHEMA]
         end
 
         def total_results
-          resources.count
+          object[:total_results] || resources.count
         end
 
         def items_per_page
-          ITEMS_PER_PAGE
+          object[:items_per_page] || Kaminari.config.default_per_page
         end
 
         def start_index
-          START_INDEX
+          object[:start_index].presence || 1
         end
 
-        # We only support a single resource at the moment
         def resources
-          [object].select(&:present?)
+          object[:resources] || []
         end
       end
     end

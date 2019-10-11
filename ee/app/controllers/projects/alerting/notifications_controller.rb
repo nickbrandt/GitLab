@@ -5,6 +5,7 @@ module Projects
     class NotificationsController < Projects::ApplicationController
       respond_to :json
 
+      skip_before_action :verify_authenticity_token
       skip_before_action :project
 
       prepend_before_action :repository, :project_without_auth
@@ -18,8 +19,6 @@ module Projects
       end
 
       private
-
-      PARAMS_TO_EXCLUDE = %w(controller action namespace_id project_id).freeze
 
       def project_without_auth
         @project ||= Project
@@ -36,7 +35,7 @@ module Projects
 
       def notify_service
         Projects::Alerting::NotifyService
-          .new(project, current_user, permitted_params)
+          .new(project, current_user, notification_payload)
       end
 
       def response_status(result)
@@ -45,8 +44,8 @@ module Projects
         result.http_status
       end
 
-      def permitted_params
-        params.except(*PARAMS_TO_EXCLUDE).permit!
+      def notification_payload
+        params.permit![:notification]
       end
     end
   end

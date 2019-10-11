@@ -25,6 +25,41 @@ describe ProtectedBranches::CreateService do
       target_project.add_user(user, :developer)
     end
 
+    context "code_owner_approval_required" do
+      context "when unavailable" do
+        before do
+          stub_licensed_features(code_owner_approval_required: false)
+
+          params[:code_owner_approval_required] = true
+        end
+
+        it "ignores incoming params and sets code_owner_approval_required to false" do
+          expect { service.execute }.to change(ProtectedBranch, :count).by(1)
+          expect(ProtectedBranch.last.code_owner_approval_required).to be_falsy
+        end
+      end
+
+      context "when available" do
+        before do
+          stub_licensed_features(code_owner_approval_required: true)
+        end
+
+        it "sets code_owner_approval_required to true when param is true" do
+          params[:code_owner_approval_required] = true
+
+          expect { service.execute }.to change(ProtectedBranch, :count).by(1)
+          expect(ProtectedBranch.last.code_owner_approval_required).to be_truthy
+        end
+
+        it "sets code_owner_approval_required to false when param is false" do
+          params[:code_owner_approval_required] = false
+
+          expect { service.execute }.to change(ProtectedBranch, :count).by(1)
+          expect(ProtectedBranch.last.code_owner_approval_required).to be_falsy
+        end
+      end
+    end
+
     context "when there are open merge requests" do
       let!(:merge_request) do
         create(:merge_request,

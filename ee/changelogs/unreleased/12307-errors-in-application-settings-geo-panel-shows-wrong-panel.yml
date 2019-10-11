@@ -1,0 +1,5 @@
+---
+title: Admin settings errors now shown in the correct panel
+merge_request: 14374
+author:
+type: fixed

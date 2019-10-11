@@ -56,9 +56,12 @@ describe('Productivity analytics table actions', () => {
       },
       rootGetters: {
         // eslint-disable-next-line no-useless-computed-key
-        ['filters/getCommonFilterParams']: {
-          group_id: groupNamespace,
-          project_id: projectPath,
+        ['filters/getCommonFilterParams']: () => {
+          const params = {
+            group_id: groupNamespace,
+            project_id: projectPath,
+          };
+          return params;
         },
       },
       state: getInitialState(),
@@ -232,13 +235,13 @@ describe('Productivity analytics table actions', () => {
       ));
   });
 
-  describe('setMergeRequestsPage', () => {
-    it('should commit setMergeRequestsPage', done =>
+  describe('setPage', () => {
+    it('should commit setPage', done =>
       testAction(
-        actions.setMergeRequestsPage,
+        actions.setPage,
         2,
         mockedContext.state,
-        [{ type: types.SET_MERGE_REQUESTS_PAGE, payload: 2 }],
+        [{ type: types.SET_PAGE, payload: 2 }],
         [{ type: 'fetchMergeRequests' }],
         done,
       ));

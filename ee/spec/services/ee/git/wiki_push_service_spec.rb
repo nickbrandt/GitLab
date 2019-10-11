@@ -26,7 +26,7 @@ describe Git::WikiPushService do
       it 'triggers a wiki update' do
         expect(project.wiki).to receive(:index_wiki_blobs).with("797823")
 
-        described_class.new(project, project.owner, changes: post_received.enum_for(:changes_refs)).execute
+        described_class.new(project, project.owner, changes: post_received.changes).execute
       end
     end
 
@@ -36,7 +36,7 @@ describe Git::WikiPushService do
       it 'does not trigger a wiki update' do
         expect(project.wiki).not_to receive(:index_wiki_blobs)
 
-        described_class.new(project, project.owner, changes: post_received.enum_for(:changes_refs)).execute
+        described_class.new(project, project.owner, changes: post_received.changes).execute
       end
     end
   end
@@ -52,7 +52,7 @@ describe Git::WikiPushService do
       it 'does nothing even if changes include master ref' do
         expect(project.wiki).not_to receive(:index_wiki_blobs)
 
-        described_class.new(project, project.owner, changes: post_received.enum_for(:changes_refs)).execute
+        described_class.new(project, project.owner, changes: post_received.changes).execute
       end
     end
   end

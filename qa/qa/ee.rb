@@ -13,6 +13,8 @@ module QA
 
     module Page
       module Component
+        autoload :DesignManagement, 'qa/ee/page/component/design_management'
+
         module WebIDE
           autoload :WebTerminalPanel, 'qa/ee/page/component/web_ide/web_terminal_panel'
         end
@@ -59,6 +61,10 @@ module QA
           end
         end
 
+        module Monitoring
+          autoload :AuditLog, 'qa/ee/page/admin/monitoring/audit_log.rb'
+        end
+
         module Settings
           autoload :Templates, 'qa/ee/page/admin/settings/templates'
           autoload :Integration, 'qa/ee/page/admin/settings/integration'
@@ -101,14 +107,13 @@ module QA
         end
 
         module Milestone
-          autoload :Index, 'qa/ee/page/project/milestone/index'
+          autoload :Show, 'qa/ee/page/project/milestone/show'
         end
 
         module Settings
           autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
           autoload :MirroringRepositories, 'qa/ee/page/project/settings/mirroring_repositories'
-          autoload :Main, 'qa/ee/page/project/settings/main'
-          autoload :MergeRequestApproval, 'qa/ee/page/project/settings/merge_request_approval'
+          autoload :MergeRequest, 'qa/ee/page/project/settings/merge_request'
           autoload :Repository, 'qa/ee/page/project/settings/repository'
           autoload :PushRules, 'qa/ee/page/project/settings/push_rules'
         end

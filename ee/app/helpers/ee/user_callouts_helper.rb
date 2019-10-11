@@ -66,7 +66,7 @@ module EE
     end
 
     def show_privacy_policy_update?
-      !user_dismissed?(PRIVACY_POLICY_UPDATE)
+      ::Feature.enabled?(:privacy_policy_update_callout) && !user_dismissed?(PRIVACY_POLICY_UPDATE)
     end
 
     private

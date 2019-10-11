@@ -389,6 +389,40 @@ describe OperationsController do
           expect(project_json['environments'].first['within_folder']).to eq(true)
           expect(project_json['environments'].first['id']).to eq(environment.id)
         end
+
+        it 'returns the last deployment for an environment' do
+          environment = create(:environment, project: project)
+          deployment = create(:deployment, project: project, environment: environment, status: :success)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+          environment_json = project_json['environments'].first
+          last_deployment_json = environment_json['last_deployment']
+
+          expect(last_deployment_json['id']).to eq(deployment.id)
+        end
+
+        it "returns the last deployment's deployable" do
+          environment = create(:environment, project: project)
+          ci_build = create(:ci_build, project: project)
+          create(:deployment, project: project, environment: environment, deployable: ci_build, status: :success)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+          environment_json = project_json['environments'].first
+          deployable_json = environment_json['last_deployment']['deployable']
+
+          expect(deployable_json['id']).to eq(ci_build.id)
+          expect(deployable_json['build_path']).to eq(project_job_path(project, ci_build))
+        end
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module HttpIOHelpers
   def stub_remote_trace_206
     WebMock.stub_request(:get, remote_trace_url)

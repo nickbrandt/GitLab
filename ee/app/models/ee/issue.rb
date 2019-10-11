@@ -12,9 +12,11 @@ module EE
       WEIGHT_NONE = 'None'.freeze
 
       include Elastic::ApplicationVersionedSearch
+      include UsageStatistics
 
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }
+      scope :service_desk, -> { where(author: ::User.support_bot) }
 
       has_one :epic_issue
       has_one :epic, through: :epic_issue
@@ -24,6 +26,9 @@ module EE
           ordered.first
         end
       end
+
+      has_and_belongs_to_many :prometheus_alert_events, join_table: :issues_prometheus_alert_events
+      has_many :prometheus_alerts, through: :prometheus_alert_events
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
     end

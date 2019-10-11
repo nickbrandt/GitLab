@@ -12,6 +12,7 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
 
   let(:email_raw) { email_fixture('emails/service_desk.eml', dir: 'ee') }
   let(:namespace) { create(:namespace, name: "email") }
+  let(:expected_description) { "Service desk stuff!\n\n```\na = b\n```\n\n![image](uploads/image.png)" }
 
   context 'service desk is enabled for the project' do
     let(:project) { create(:project, :public, namespace: namespace, path: 'test', service_desk_enabled: true) }
@@ -35,7 +36,7 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
         expect(new_issue.confidential?).to be true
         expect(new_issue.all_references.all).to be_empty
         expect(new_issue.title).to eq("Service Desk (from jake@adventuretime.ooo): The message subject! @all")
-        expect(new_issue.description).to eq("Service desk stuff!\n\n```\na = b\n```\n\n![image](uploads/image.png)")
+        expect(new_issue.description).to eq(expected_description.strip)
       end
 
       it 'sends thank you email' do
@@ -124,6 +125,27 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
       let(:email_raw) { email_fixture('emails/service_desk_forwarded.eml', dir: 'ee') }
 
       it_behaves_like 'a new issue request'
+    end
+
+    context 'when the email is forwarded' do
+      let(:email_raw) { email_fixture('emails/service_desk_forwarded_new_issue.eml', dir: 'ee') }
+
+      it_behaves_like 'a new issue request' do
+        let(:expected_description) do
+          <<~EOF
+            Service desk stuff!
+
+            ---------- Forwarded message ---------
+            From: Jake the Dog <jake@adventuretime.ooo>
+            To: <jake@adventuretime.ooo>
+
+
+            forwarded content
+
+            ![image](uploads/image.png)
+          EOF
+        end
+      end
     end
   end
 

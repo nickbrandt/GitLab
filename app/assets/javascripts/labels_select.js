@@ -1,4 +1,4 @@
-/* eslint-disable no-useless-return, func-names, no-var, no-underscore-dangle, prefer-arrow-callback, one-var, prefer-template, no-new, consistent-return, no-shadow, no-param-reassign, vars-on-top, no-lonely-if, no-else-return, dot-notation, no-empty */
+/* eslint-disable no-useless-return, func-names, no-var, no-underscore-dangle, one-var, no-new, consistent-return, no-shadow, no-param-reassign, vars-on-top, no-lonely-if, no-else-return, dot-notation, no-empty */
 /* global Issuable */
 /* global ListLabel */
 
@@ -24,7 +24,7 @@ export default class LabelsSelect {
       $els = $('.js-label-select');
     }
 
-    $els.each(function(i, dropdown) {
+    $els.each((i, dropdown) => {
       var $block,
         $dropdown,
         $form,
@@ -70,7 +70,7 @@ export default class LabelsSelect {
       $loading = $block.find('.block-loading').fadeOut();
       fieldName = $dropdown.data('fieldName');
       initialSelected = $selectbox
-        .find('input[name="' + $dropdown.data('fieldName') + '"]')
+        .find(`input[name="${$dropdown.data('fieldName')}"]`)
         .map(function() {
           return this.value;
         })
@@ -92,7 +92,7 @@ export default class LabelsSelect {
         var data, selected;
         selected = $dropdown
           .closest('.selectbox')
-          .find("input[name='" + fieldName + "']")
+          .find(`input[name='${fieldName}']`)
           .map(function() {
             return this.value;
           })
@@ -120,7 +120,7 @@ export default class LabelsSelect {
             labelCount = 0;
             if (data.labels.length && issueUpdateURL) {
               template = LabelsSelect.getLabelTemplate({
-                labels: data.labels,
+                labels: _.sortBy(data.labels, 'title'),
                 issueUpdateURL,
                 enableScopedLabels: scopedLabels,
                 scopedLabelsDocumentationLink,
@@ -172,9 +172,7 @@ export default class LabelsSelect {
             $sidebarCollapsedValue.text(labelCount);
 
             if (data.labels.length) {
-              labelTitles = data.labels.map(function(label) {
-                return label.title;
-              });
+              labelTitles = data.labels.map(label => label.title);
 
               if (labelTitles.length > 5) {
                 labelTitles = labelTitles.slice(0, 5);
@@ -269,11 +267,7 @@ export default class LabelsSelect {
 
               if (
                 $form.find(
-                  "input[type='hidden'][name='" +
-                    this.fieldName +
-                    "'][value='" +
-                    dropdownValue +
-                    "']",
+                  `input[type='hidden'][name='${this.fieldName}'][value='${dropdownValue}']`,
                 ).length
               ) {
                 selectedClass.push('is-active');
@@ -286,8 +280,7 @@ export default class LabelsSelect {
           }
 
           if (label.color) {
-            colorEl =
-              "<span class='dropdown-label-box' style='background: " + label.color + "'></span>";
+            colorEl = `<span class='dropdown-label-box' style='background: ${label.color}'></span>`;
           } else {
             colorEl = '';
           }
@@ -456,9 +449,7 @@ export default class LabelsSelect {
               );
             } else {
               var { labels } = boardsStore.detail.issue;
-              labels = labels.filter(function(selectedLabel) {
-                return selectedLabel.id !== label.id;
-              });
+              labels = labels.filter(selectedLabel => selectedLabel.id !== label.id);
               boardsStore.detail.issue.labels = labels;
             }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :slack_integration do
     sequence(:team_id) { |n| "T123#{n}" }

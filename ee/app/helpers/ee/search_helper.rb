@@ -3,6 +3,7 @@ module EE
   module SearchHelper
     extend ::Gitlab::Utils::Override
 
+    override :search_filter_input_options
     def search_filter_input_options(type)
       options = super
       options[:data][:'multiple-assignees'] = 'true' if search_multiple_assignees?(type)
@@ -42,6 +43,23 @@ module EE
       end
     end
 
+    # This is a special case for snippet searches in .com.
+    # The scope used to gather the snippets is too wide and
+    # we have to process a lot of them, what leads to time outs.
+    # We're reducing the scope only in .com because the current
+    # one is still valid in smaller installations.
+    # https://gitlab.com/gitlab-org/gitlab/issues/26123
+    override :search_entries_info_template
+    def search_entries_info_template(collection)
+      return super unless gitlab_com_snippet_db_search?
+
+      if collection.total_pages > 1
+        s_("SearchResults|Showing %{from} - %{to} of %{count} %{scope} for \"%{term}\" in your personal and project snippets")
+      else
+        s_("SearchResults|Showing %{count} %{scope} for \"%{term}\" in your personal and project snippets")
+      end
+    end
+
     private
 
     def search_multiple_assignees?(type)
@@ -53,6 +71,14 @@ module EE
 
     def blob_project_id(blob_result)
       blob_result.dig('_source', 'join_field', 'parent')&.split('_')&.last.to_i
+    end
+
+    def gitlab_com_snippet_db_search?
+      @current_user &&
+        @show_snippets &&
+        ::Gitlab.com? &&
+        ::Feature.enabled?(:restricted_snippet_scope_search, default_enabled: true) &&
+        ::Gitlab::CurrentSettings.search_using_elasticsearch?(scope: nil)
     end
   end
 end

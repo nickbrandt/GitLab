@@ -1,6 +1,0 @@
----
-title: Update GitHub Importer Personal Access Token field description for CI/CD projects
-  only to reflect latest OAuth changes
-merge_request: 16453
-author:
-type: fixed

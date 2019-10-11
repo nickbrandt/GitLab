@@ -1,5 +1,0 @@
----
-title: Match environment names case insensitively for feature flag spec search
-merge_request: 16691
-author:
-type: fixed

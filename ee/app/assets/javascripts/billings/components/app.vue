@@ -11,12 +11,17 @@ export default {
     planUpgradeHref: {
       type: String,
       required: false,
-      default: null,
+      default: '',
     },
     namespaceId: {
       type: String,
       required: false,
-      default: null,
+      default: '',
+    },
+    customerPortalUrl: {
+      type: String,
+      required: false,
+      default: '',
     },
     namespaceName: {
       type: String,
@@ -33,5 +38,9 @@ export default {
 </script>
 
 <template>
-  <subscription-table :namespace-name="namespaceName" :plan-upgrade-href="planUpgradeHref" />
+  <subscription-table
+    :namespace-name="namespaceName"
+    :plan-upgrade-href="planUpgradeHref"
+    :customer-portal-url="customerPortalUrl"
+  />
 </template>

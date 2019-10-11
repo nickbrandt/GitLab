@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples_for 'audit event logging' do
   before do
     stub_licensed_features(extended_audit_events: true)

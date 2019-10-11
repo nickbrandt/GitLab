@@ -13,7 +13,7 @@
     %p
       - instance_link_start = '<a href="%{url}">'.html_safe % { url: help_page_path('user/admin_area/settings/instance_template_repository') }
       = s_('AdminSettings|The required pipeline configuration can be selected from the %{code_start}gitlab-ci%{code_end} directory inside of the configured %{link_start}instance template repository%{link_end} or from GitLab provided configurations.').html_safe % { code_start: '<code>'.html_safe, code_end: '</code>'.html_safe, link_start: instance_link_start, link_end: '</a>'.html_safe }
-    = form_for @application_setting, url: admin_application_settings_path(anchor: 'js-required-pipeline-settings'), html: { class: 'fieldset-form' } do |f|
+    = form_for @application_setting, url: ci_cd_admin_application_settings_path(anchor: 'js-required-pipeline-settings'), html: { class: 'fieldset-form' } do |f|
       = form_errors(@application_setting)
 
       %fieldset

@@ -10,6 +10,10 @@ describe List do
     it { is_expected.to belong_to(:milestone) }
   end
 
+  describe 'validations' do
+    it { is_expected.to validate_numericality_of(:max_issue_count).only_integer.is_greater_than_or_equal_to(0) }
+  end
+
   context 'when it is an assignee type' do
     subject { described_class.new(list_type: :assignee, board: board) }
 

@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :gitlab_subscription do
     namespace
     association :hosted_plan, factory: :gold_plan
-    seats 10
+    seats { 10 }
     start_date { Date.today }
     end_date { Date.today.advance(years: 1) }
-    trial false
+    trial { false }
 
     trait :free do
-      hosted_plan_id nil
+      hosted_plan_id { nil }
     end
 
     trait :early_adopter do

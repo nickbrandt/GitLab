@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples 'no results when the user cannot read cross project' do
   let(:user) { create(:user) }
   let(:project) { create(:project, :public) }

@@ -28,21 +28,22 @@ export const REPORT_TYPES = {
   sast: s__('ciReport|SAST'),
 };
 
+export const ALL = 'all';
 export const BASE_FILTERS = {
   severity: {
     name: s__('ciReport|All severities'),
-    id: 'all',
+    id: ALL,
   },
   confidence: {
     name: s__('ciReport|All confidence levels'),
-    id: 'all',
+    id: ALL,
   },
   report_type: {
     name: s__('ciReport|All report types'),
-    id: 'all',
+    id: ALL,
   },
   project_id: {
     name: s__('ciReport|All projects'),
-    id: 'all',
+    id: ALL,
   },
 };

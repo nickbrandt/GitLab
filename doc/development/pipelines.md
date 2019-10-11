@@ -27,6 +27,7 @@ The current stages are:
 - `review`: This stage includes jobs that deploy the GitLab and Docs Review Apps.
 - `qa`: This stage includes jobs that perform QA tasks against the Review App
   that is deployed in the previous stage.
+- `notification`: This stage includes jobs that sends notifications about pipeline status.
 - `post-test`: This stage includes jobs that build reports or gather data from
   the previous stages' jobs (e.g. coverage, Knapsack metadata etc.).
 - `pages`: This stage includes a job that deploys the various reports as
@@ -61,7 +62,6 @@ each pipeline includes the following [variables](../ci/variables/README.md):
 - `GIT_SUBMODULE_STRATEGY: "none"`
 - `GET_SOURCES_ATTEMPTS: "3"`
 - `KNAPSACK_RSPEC_SUITE_REPORT_PATH: knapsack/${CI_PROJECT_NAME}/rspec_report-master.json`
-- `EE_KNAPSACK_RSPEC_SUITE_REPORT_PATH: knapsack/${CI_PROJECT_NAME}/rspec_report-master-ee.json`
 - `FLAKY_RSPEC_SUITE_REPORT_PATH: rspec_flaky/report-suite.json`
 - `BUILD_ASSETS_IMAGE: "false"`
 - `ES_JAVA_OPTS: "-Xms256m -Xmx256m"`
@@ -92,9 +92,17 @@ These common definitions are:
   for `master` and auto-deploy branches.
 - `.only-review-schedules`: Same as `.only-review` but also restrict a job to
   only run for [schedules](../user/project/pipelines/schedules.md).
-- `.use-pg`: Allows a job to use the `postgres:9.6.14` and `redis:alpine` services.
-- `.use-pg-10`: Allows a job to use the `postgres:10.9` and `redis:alpine` services.
+- `.only-canonical-schedules`: Only creates a job for scheduled pipelines in
+  the `gitlab-org/gitlab` and `gitlab-org/gitlab-foss` projects
+- `.use-pg9`: Allows a job to use the `postgres:9.6` and `redis:alpine` services.
+- `.use-pg10`: Allows a job to use the `postgres:10.9` and `redis:alpine` services.
+- `.use-pg9-ee`: Same as `.use-pg9` but also use the
+  `docker.elastic.co/elasticsearch/elasticsearch:5.6.12` services.
+- `.use-pg10-ee`: Same as `.use-pg10` but also use the
+  `docker.elastic.co/elasticsearch/elasticsearch:5.6.12` services.
 - `.only-ee`: Only creates a job for the `gitlab` project.
+- `.only-ee-as-if-foss`: Same as `.only-ee` but simulate the FOSS project by
+  setting the `IS_GITLAB_EE='0'` environment variable.
 
 ## Changes detection
 
@@ -134,7 +142,7 @@ graph RL;
   M[coverage];
   N[pages];
   O[static-analysis];
-  P["package-and-qa-manual:master<br/>(master schedule only)"];
+  P["schedule:package-and-qa<br/>(master schedule only)"];
   Q[package-and-qa];
   R[package-and-qa-manual];
 
@@ -184,11 +192,16 @@ subgraph "`qa` stage"
     R --> |needs| F;
     P --> |needs| B;
     P --> |needs| F;
-    review-qa-smoke -.-> |depends on| G;
-    review-qa-all -.-> |depends on| G;
-    review-qa-performance -.-> |depends on| G;
-    X2["schedule:review-performance<br/>(master only)"] -.-> |depends on| G2;
-    dast -.-> |depends on| G;
+    review-qa-smoke -.-> |needs and depends on| G;
+    review-qa-all -.-> |needs and depends on| G;
+    review-performance -.-> |needs and depends on| G;
+    X2["schedule:review-performance<br/>(master only)"] -.-> |needs and depends on| G2;
+    dast -.-> |needs and depends on| G;
+    end
+
+subgraph "`notification` stage"
+    NOTIFICATION1["schedule:package-and-qa:notify-success<br>(on_success)"] -.-> |needs| P;
+    NOTIFICATION2["schedule:package-and-qa:notify-failure<br>(on_failure)"] -.-> |needs| P;
     end
 
 subgraph "`post-test` stage"

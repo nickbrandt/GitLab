@@ -1,0 +1,5 @@
+---
+title: 'Monitor charts: Validate form for creating an alert before submitting'
+merge_request: 17109
+author:
+type: fixed

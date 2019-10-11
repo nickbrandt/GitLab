@@ -86,10 +86,20 @@ describe Projects::EnvironmentsController do
              environment_scope: '*', projects: [project])
       create(:deployment, :success, environment: environment)
 
-      allow_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
-        .with(pod_name, environment.deployment_namespace).and_return(kube_logs_body)
       allow_any_instance_of(Gitlab::Kubernetes::RolloutStatus).to receive(:instances)
         .and_return([{ pod_name: pod_name }])
+    end
+
+    shared_examples 'resource not found' do |message|
+      let(:service_result) { { status: :error, message: message } }
+
+      it 'returns 400' do
+        get :logs, params: environment_params(pod_name: pod_name, format: :json)
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(json_response['message']).to eq(message)
+        expect(json_response['pods']).to match_array([pod_name])
+      end
     end
 
     context 'when unlicensed' do
@@ -114,18 +124,60 @@ describe Projects::EnvironmentsController do
     end
 
     context 'when using JSON format' do
+      let(:service_result) do
+        {
+          status: :success,
+          logs: ['Log 1', 'Log 2', 'Log 3'],
+          message: 'message'
+        }
+      end
+
+      before do
+        allow_any_instance_of(PodLogsService).to receive(:execute).and_return(service_result)
+      end
+
       it 'returns the logs for a specific pod' do
         get :logs, params: environment_params(pod_name: pod_name, format: :json)
 
-        expect(response).to be_ok
+        expect(response).to have_gitlab_http_status(:success)
         expect(json_response["logs"]).to match_array(["Log 1", "Log 2", "Log 3"])
         expect(json_response["pods"]).to match_array([pod_name])
+        expect(json_response['message']).to eq(service_result[:message])
       end
 
       it 'registers a usage of the endpoint' do
         expect(::Gitlab::UsageCounters::PodLogs).to receive(:increment).with(project.id)
 
         get :logs, params: environment_params(pod_name: pod_name, format: :json)
+      end
+
+      context 'when kubernetes API returns error' do
+        let(:service_result) { { status: :error, message: 'Kubernetes API returned status code: 400' } }
+
+        it 'returns bad request' do
+          get :logs, params: environment_params(pod_name: pod_name, format: :json)
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(json_response["logs"]).to eq(nil)
+          expect(json_response["pods"]).to match_array([pod_name])
+          expect(json_response["message"]).to eq('Kubernetes API returned status code: 400')
+        end
+      end
+
+      context 'when pod does not exist' do
+        let(:service_result) { { status: :error, message: 'Pod not found' } }
+
+        it_behaves_like 'resource not found', 'Pod not found'
+      end
+
+      context 'when service returns nil' do
+        let(:service_result) { nil }
+
+        it 'renders accepted' do
+          get :logs, params: environment_params(pod_name: pod_name, format: :json)
+
+          expect(response).to have_gitlab_http_status(:accepted)
+        end
       end
     end
   end

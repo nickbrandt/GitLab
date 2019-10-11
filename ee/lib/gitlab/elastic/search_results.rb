@@ -278,20 +278,26 @@ module Gitlab
       end
 
       def wiki_filter
-        blob_filter(:wiki_access_level, visible_for_guests: true)
+        blob_filter(:wiki, visible_for_guests: true)
       end
 
       def repository_filter
-        blob_filter(:repository_access_level)
+        blob_filter(:repository)
       end
 
-      def blob_filter(project_feature_name, visible_for_guests: false)
+      def blob_filter(feature, visible_for_guests: false)
         project_ids = visible_for_guests ? limit_project_ids : non_guest_project_ids
+        key_name = "#{feature}_access_level"
 
         conditions =
           if project_ids == :any
             [{ exists: { field: "id" } }]
           else
+            project_ids = Project
+              .id_in(project_ids)
+              .filter_by_feature_visibility(feature, current_user)
+              .pluck_primary_key
+
             [{ terms: { id: project_ids } }]
           end
 
@@ -300,7 +306,7 @@ module Gitlab
                           bool: {
                             filter: [
                               { term: { visibility_level: Project::PUBLIC } },
-                              { term: { project_feature_name => ProjectFeature::ENABLED } }
+                              { term: { key_name => ProjectFeature::ENABLED } }
                             ]
                           }
                         }
@@ -310,7 +316,7 @@ module Gitlab
                             bool: {
                               filter: [
                                 { term: { visibility_level: Project::INTERNAL } },
-                                { term: { project_feature_name => ProjectFeature::ENABLED } }
+                                { term: { key_name => ProjectFeature::ENABLED } }
                               ]
                             }
                           }
@@ -323,7 +329,7 @@ module Gitlab
             query: {
               bool: {
                 should: conditions,
-                must_not: { term: { project_feature_name => ProjectFeature::DISABLED } }
+                must_not: { term: { key_name => ProjectFeature::DISABLED } }
               }
             }
           }

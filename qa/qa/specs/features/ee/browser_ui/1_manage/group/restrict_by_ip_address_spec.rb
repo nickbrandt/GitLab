@@ -44,7 +44,7 @@ module QA
           end
 
           Page::Main::Login.perform do |menu|
-            menu.sign_in_using_credentials(@user)
+            menu.sign_in_using_credentials(user: @user)
           end
 
           @group.sandbox.visit!
@@ -72,7 +72,7 @@ module QA
           end
 
           Page::Main::Login.perform do |menu|
-            menu.sign_in_using_credentials(@user)
+            menu.sign_in_using_credentials(user: @user)
           end
 
           @group.sandbox.visit!

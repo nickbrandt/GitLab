@@ -1,0 +1,38 @@
+# frozen_string_literal: true
+
+module QA
+  context 'Plan' do
+    describe 'Read-only board configuration' do
+      let(:qa_user) do
+        Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
+      end
+
+      let(:label_board_list) do
+        EE::Resource::Board::BoardList::Project::LabelBoardList.fabricate_via_api!
+      end
+
+      before do
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        Page::Main::Login.perform(&:sign_in_using_credentials)
+
+        label_board_list.project.add_member(qa_user, Resource::Members::AccessLevel::GUEST)
+
+        Page::Main::Login.perform do |login|
+          login.sign_out_and_sign_in_as user: qa_user
+        end
+
+        label_board_list.project.visit!
+        Page::Project::Menu.perform(&:go_to_boards)
+      end
+
+      it 'shows board configuration to user without edit permission' do
+        EE::Page::Project::Issue::Board::Show.perform do |show|
+          show.click_boards_config_button
+
+          expect(show.board_scope_modal).to be_visible
+          expect(show).not_to have_modal_board_name_field
+        end
+      end
+    end
+  end
+end

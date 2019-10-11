@@ -1,0 +1,5 @@
+---
+title: Backfill SPDX identifiers in software_licenses table
+merge_request: 17004
+author:
+type: fixed

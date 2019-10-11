@@ -182,14 +182,16 @@ There are two different ways to add a new project to a group:
 > Brought to [GitLab Starter][ee] in 10.7.
 > [Moved](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/25975) to [GitLab Core](https://about.gitlab.com/pricing/) in 11.10.
 
-Group owners and administrators can allow users with the
-Developer role to create projects under groups.
+By default, [Developers and Maintainers](../permissions.md#group-members-permissions) can create projects under a group.
 
-By default, [Developers and Maintainers](../permissions.md#group-members-permissions) can create projects under a group. You can change this setting for a specific group within the group settings, or
-you can set this option globally in the Admin area
-at **Settings > General > Visibility and access controls** (you must be a GitLab administrator).
+To change this setting for a specific group:
 
-Available settings are `No one`, `Maintainers`, or `Developers + Maintainers`.
+1. Go to the group's **Settings > General** page.
+1. Expand the **Permissions, LFS, 2FA** section.
+1. Select the desired option in the **Allowed to create projects** dropdown list.
+1. Click **Save changes**.
+
+To change this setting globally, see [Default project creation protection](../admin_area/settings/visibility_and_access_controls.md#default-project-creation-protection).
 
 ## Transfer projects into groups
 
@@ -334,10 +336,10 @@ This will disable the option for all users who previously had permissions to
 operate project memberships, so no new users can be added. Furthermore, any
 request to add a new user to a project through API will not be possible.
 
-#### IP access restriction **(ULTIMATE ONLY)**
+#### IP access restriction **(ULTIMATE)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1985) in
-[GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.
+[GitLab Ultimate and Gold](https://about.gitlab.com/pricing/) 12.0.
 
 To make sure only people from within your organization can access particular
 resources, you have the option to restrict access to groups and their
@@ -349,14 +351,14 @@ Add one or more whitelisted IP subnets using CIDR notation in comma separated fo
 coming from a different IP address won't be able to access the restricted
 content.
 
-Restriction currently applies to UI and API access, Git actions via ssh are not restricted.
+Restriction currently applies to UI, API access and Git actions via SSH.
 To avoid accidental lock-out, admins and group owners are are able to access
 the group regardless of the IP restriction.
 
-#### Allowed domain restriction **(PREMIUM ONLY)**
+#### Allowed domain restriction **(PREMIUM)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7297) in
-[GitLab Premium](https://about.gitlab.com/pricing/) 12.2.
+[GitLab Premium and Silver](https://about.gitlab.com/pricing/) 12.2.
 
 You can restrict access to groups and their underlying projects by
 allowing only users with email addresses in particular domains to be added to the group.

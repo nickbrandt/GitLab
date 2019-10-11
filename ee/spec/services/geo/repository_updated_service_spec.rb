@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Geo::RepositoryUpdatedService do
@@ -83,6 +85,20 @@ describe Geo::RepositoryUpdatedService do
       include_examples 'repository being updated' do
         let(:repository) { project.wiki.repository }
         let(:method_prefix) { 'wiki' }
+      end
+    end
+
+    context 'when design repository is being updated' do
+      let(:repository) { project.design_repository }
+
+      it 'creates a design repository updated event' do
+        expect { subject.execute }.to change(Geo::RepositoryUpdatedEvent, :count).by(1)
+      end
+
+      it 'does not create a design repository updated event when feature is disabled' do
+        stub_feature_flags(enable_geo_design_sync: false)
+
+        expect { subject.execute }.not_to change(Geo::RepositoryUpdatedEvent, :count)
       end
     end
   end

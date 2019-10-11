@@ -56,6 +56,8 @@ describe ApplicationController do
     end
   end
 
+  it_behaves_like 'a Trackable Controller'
+
   describe '#add_gon_variables' do
     before do
       Gon.clear
@@ -94,14 +96,30 @@ describe ApplicationController do
           request.path = '/-/peek'
         end
 
-        it_behaves_like 'not setting gon variables'
+        # TODO:
+        # remove line below once `privacy_policy_update_callout`
+        # feature flag is removed and `gon` reverts back to
+        # to not setting any variables.
+        if Gitlab.ee?
+          it_behaves_like 'setting gon variables'
+        else
+          it_behaves_like 'not setting gon variables'
+        end
       end
     end
 
     context 'with json format' do
       let(:format) { :json }
 
-      it_behaves_like 'not setting gon variables'
+      # TODO:
+      # remove line below once `privacy_policy_update_callout`
+      # feature flag is removed and `gon` reverts back to
+      # to not setting any variables.
+      if Gitlab.ee?
+        it_behaves_like 'setting gon variables'
+      else
+        it_behaves_like 'not setting gon variables'
+      end
     end
   end
 
@@ -442,6 +460,25 @@ describe ApplicationController do
     end
   end
 
+  context 'deactivated user' do
+    controller(described_class) do
+      def index
+        render html: 'authenticated'
+      end
+    end
+
+    before do
+      sign_in user
+      user.deactivate
+    end
+
+    it 'signs out a deactivated user' do
+      get :index
+      expect(response).to redirect_to(new_user_session_path)
+      expect(flash[:alert]).to eq('Your account has been deactivated by your administrator. Please log back in to reactivate your account.')
+    end
+  end
+
   context 'terms' do
     controller(described_class) do
       def index
@@ -758,6 +795,50 @@ describe ApplicationController do
         get :index, format: :atom, params: { private_token: personal_access_token.token }
 
         expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+  end
+
+  describe '#current_user_mode', :do_not_mock_admin_mode do
+    include_context 'custom session'
+
+    controller(described_class) do
+      def index
+        render html: 'authenticated'
+      end
+    end
+
+    before do
+      allow(ActiveSession).to receive(:list_sessions).with(user).and_return([session])
+
+      sign_in(user)
+      get :index
+    end
+
+    context 'with a regular user' do
+      it 'admin mode is not set' do
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(Gitlab::Auth::CurrentUserMode.new(user).admin_mode?).to be(false)
+      end
+    end
+
+    context 'with an admin user' do
+      let(:user) { create(:admin) }
+
+      it 'admin mode is not set' do
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(Gitlab::Auth::CurrentUserMode.new(user).admin_mode?).to be(false)
+      end
+
+      context 'that re-authenticated' do
+        before do
+          Gitlab::Auth::CurrentUserMode.new(user).enable_admin_mode!(password: user.password)
+        end
+
+        it 'admin mode is set' do
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(Gitlab::Auth::CurrentUserMode.new(user).admin_mode?).to be(true)
+        end
       end
     end
   end

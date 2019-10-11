@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import { s__ } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import {
   chartKeys,
@@ -7,7 +8,10 @@ import {
   defaultMaxColumnChartItemsPerPage,
   maxColumnChartItemsPerPage,
   dataZoomOptions,
+  scatterPlotAddonQueryDays,
+  daysToMergeMetric,
 } from '../../../constants';
+import { getScatterPlotData, getMedianLineData } from '../../../utils';
 
 export const chartLoading = state => chartKey => state.charts[chartKey].isLoading;
 
@@ -30,7 +34,7 @@ export const chartLoading = state => chartKey => state.charts[chartKey].isLoadin
  * the itemStyle will be set accordingly in order to highlight the relevant bar.
  *
  */
-export const getChartData = state => chartKey => {
+export const getColumnChartData = state => chartKey => {
   const dataWithSelected = Object.keys(state.charts[chartKey].data).map(key => {
     const dataArr = [key, state.charts[chartKey].data[key]];
     let itemStyle = {};
@@ -50,7 +54,28 @@ export const getChartData = state => chartKey => {
 
 export const chartHasData = state => chartKey => !_.isEmpty(state.charts[chartKey].data);
 
-export const getMetricDropdownLabel = state => chartKey =>
+export const getScatterPlotMainData = (state, getters, rootState) =>
+  getScatterPlotData(
+    state.charts.scatterplot.transformedData,
+    new Date(rootState.filters.startDate),
+    new Date(rootState.filters.endDate),
+  );
+
+/**
+ * Creates a series array of median data for the scatterplot chart.
+ *
+ * It calls getMedianLineData internally with the raw scatterplot data and the computed by getters.getScatterPlotMainData.
+ * scatterPlotAddonQueryDays is necessary since we query the API with an additional day offset to compute the median.
+ */
+export const getScatterPlotMedianData = (state, getters, rootState) =>
+  getMedianLineData(
+    state.charts.scatterplot.transformedData,
+    new Date(rootState.filters.startDate),
+    new Date(rootState.filters.endDate),
+    scatterPlotAddonQueryDays,
+  );
+
+export const getMetricLabel = state => chartKey =>
   metricTypes.find(m => m.key === state.charts[chartKey].params.metricType).label;
 
 export const getFilterParams = (state, getters, rootState, rootGetters) => chartKey => {
@@ -58,7 +83,7 @@ export const getFilterParams = (state, getters, rootState, rootGetters) => chart
 
   // common filter params
   const params = {
-    ...rootGetters['filters/getCommonFilterParams'],
+    ...rootGetters['filters/getCommonFilterParams'](chartKey),
     chart_type: chartParams.chartType,
   };
 
@@ -107,11 +132,26 @@ export const getColumnChartDatazoomOption = state => chartKey => {
   };
 };
 
-export const isSelectedMetric = state => ({ metric, chartKey }) =>
-  state.charts[chartKey].params.metricType === metric;
+export const getSelectedMetric = state => chartKey => state.charts[chartKey].params.metricType;
+
+/**
+ * Returns the y axis label for the scatterplot.
+ * This can either be "Days", "Hours" or some other metric label from the state's metricTypes.
+ */
+export const scatterplotYaxisLabel = (_state, getters, rootState) => {
+  const selectedMetric = getters.getSelectedMetric(chartKeys.scatterplot);
+  const metricTypesInHours = rootState.metricTypes
+    .filter(metric => metric.charts.indexOf(chartKeys.timeBasedHistogram) !== -1)
+    .map(metric => metric.key);
+  if (selectedMetric === daysToMergeMetric.key) return s__('ProductivityAnalytics|Days');
+  if (metricTypesInHours.indexOf(selectedMetric) !== -1) return s__('ProductivityAnalytics|Hours');
+  return getters.getMetricLabel(chartKeys.scatterplot);
+};
 
 export const hasNoAccessError = state =>
   state.charts[chartKeys.main].errorCode === httpStatus.FORBIDDEN;
+
+export const isChartEnabled = state => chartKey => state.charts[chartKey].enabled;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

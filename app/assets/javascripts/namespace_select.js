@@ -1,4 +1,4 @@
-/* eslint-disable func-names, no-else-return, prefer-template, prefer-arrow-callback */
+/* eslint-disable no-else-return */
 
 import $ from 'jquery';
 import '~/gl_dropdown';
@@ -24,11 +24,11 @@ export default class NamespaceSelect {
         if (selected.id == null) {
           return selected.text;
         } else {
-          return selected.kind + ': ' + selected.full_path;
+          return `${selected.kind}: ${selected.full_path}`;
         }
       },
       data(term, dataCallback) {
-        return Api.namespaces(term, function(namespaces) {
+        return Api.namespaces(term, namespaces => {
           if (isFilter) {
             const anyNamespace = {
               text: __('Any namespace'),
@@ -44,7 +44,7 @@ export default class NamespaceSelect {
         if (namespace.id == null) {
           return namespace.text;
         } else {
-          return namespace.kind + ': ' + namespace.full_path;
+          return `${namespace.kind}: ${namespace.full_path}`;
         }
       },
       renderRow: this.renderRow,

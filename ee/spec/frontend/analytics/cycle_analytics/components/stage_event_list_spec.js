@@ -23,6 +23,8 @@ const generateEvents = n =>
     .fill(issueEvents[0])
     .map((ev, k) => ({ ...ev, title: `event-${k}`, id: k }));
 
+const bulkEvents = generateEvents(50);
+
 const mockStubs = {
   'stage-event-item': true,
   'stage-build-item': true,
@@ -54,8 +56,9 @@ describe('Stage', () => {
     beforeEach(() => {
       wrapper = createComponent({
         props: {
-          events: generateEvents(50),
+          events: bulkEvents,
         },
+        stubs: mockStubs,
       });
     });
 

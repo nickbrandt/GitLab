@@ -6,6 +6,8 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        field :epic, ::Types::EpicType, null: true, description: 'The epic to which issue belongs'
+
         field :weight, GraphQL::INT_TYPE, # rubocop:disable Graphql/Descriptions
               null: true,
               resolve: -> (obj, _args, _ctx) { obj.supports_weight? ? obj.weight : nil }

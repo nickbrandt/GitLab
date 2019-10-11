@@ -4,12 +4,7 @@ import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import SubscriptionTableRow from './subscription_table_row.vue';
-import {
-  CUSTOMER_PORTAL_URL,
-  TABLE_TYPE_DEFAULT,
-  TABLE_TYPE_FREE,
-  TABLE_TYPE_TRIAL,
-} from '../constants';
+import { TABLE_TYPE_DEFAULT, TABLE_TYPE_FREE, TABLE_TYPE_TRIAL } from '../constants';
 
 export default {
   name: 'SubscriptionTable',
@@ -22,10 +17,15 @@ export default {
       type: String,
       required: true,
     },
+    customerPortalUrl: {
+      type: String,
+      required: false,
+      default: '',
+    },
     planUpgradeHref: {
       type: String,
       required: false,
-      default: null,
+      default: '',
     },
   },
   computed: {
@@ -44,7 +44,8 @@ export default {
 
       return {
         text: s__('SubscriptionTable|Upgrade'),
-        href: !this.isFreePlan && this.planUpgradeHref ? this.planUpgradeHref : CUSTOMER_PORTAL_URL,
+        href:
+          !this.isFreePlan && this.planUpgradeHref ? this.planUpgradeHref : this.customerPortalUrl,
       };
     },
     manageButton() {
@@ -54,7 +55,7 @@ export default {
 
       return {
         text: s__('SubscriptionTable|Manage'),
-        href: CUSTOMER_PORTAL_URL,
+        href: this.customerPortalUrl,
       };
     },
     buttons() {
@@ -78,7 +79,6 @@ export default {
   methods: {
     ...mapActions('subscription', ['fetchSubscription']),
   },
-  customerPortalUrl: CUSTOMER_PORTAL_URL,
 };
 </script>
 
@@ -89,7 +89,7 @@ export default {
       class="card prepend-top-default subscription-table js-subscription-table"
     >
       <div class="js-subscription-header card-header">
-        <strong> {{ subscriptionHeader }} </strong>
+        <strong>{{ subscriptionHeader }}</strong>
         <div class="controls">
           <a
             v-for="(button, index) in buttons"
@@ -99,9 +99,8 @@ export default {
             rel="noopener noreferrer"
             class="btn btn-inverted-secondary"
             :class="{ 'ml-2': index !== 0 }"
+            >{{ button.text }}</a
           >
-            {{ button.text }}
-          </a>
         </div>
       </div>
       <div class="card-body flex-grid d-flex flex-column flex-sm-row flex-md-row flex-lg-column">

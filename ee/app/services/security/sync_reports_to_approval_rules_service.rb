@@ -29,7 +29,7 @@ module Security
 
     def sync_license_management_rules
       project = pipeline.project
-      report = pipeline.license_management_report
+      report = pipeline.license_scanning_report
       return if report.empty? && !pipeline.complete?
       return if report.violates?(project.software_license_policies)
 

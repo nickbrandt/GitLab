@@ -1,23 +1,25 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :geo_file_registry, class: Geo::FileRegistry do
     sequence(:file_id)
-    file_type :file
-    success true
+    file_type { :file }
+    success { true }
 
-    trait(:attachment) { file_type :attachment }
-    trait(:avatar) { file_type :avatar }
-    trait(:file) { file_type :file }
-    trait(:lfs) { file_type :lfs }
-    trait(:namespace_file) { file_type :namespace_file }
-    trait(:personal_file) { file_type :personal_file }
-    trait(:favicon) { file_type :favicon }
-    trait(:import_export) { file_type :import_export }
+    trait(:attachment) { file_type { :attachment } }
+    trait(:avatar) { file_type { :avatar } }
+    trait(:file) { file_type { :file } }
+    trait(:lfs) { file_type { :lfs } }
+    trait(:namespace_file) { file_type { :namespace_file } }
+    trait(:personal_file) { file_type { :personal_file } }
+    trait(:favicon) { file_type { :favicon } }
+    trait(:import_export) { file_type { :import_export } }
 
     factory :geo_upload_registry, class: Geo::UploadRegistry
 
     trait :failed do
-      success false
-      retry_count 1
+      success { false }
+      retry_count { 1 }
     end
 
     trait :with_file do

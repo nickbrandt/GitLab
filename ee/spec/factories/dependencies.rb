@@ -2,9 +2,9 @@
 
 FactoryBot.define do
   factory :dependency, class: Hash do
-    name 'nokogiri'
-    packager 'Ruby (Bundler)'
-    version '1.8.0'
+    name { 'nokogiri' }
+    packager { 'Ruby (Bundler)' }
+    version { '1.8.0' }
     licenses { [] }
     location do
       {

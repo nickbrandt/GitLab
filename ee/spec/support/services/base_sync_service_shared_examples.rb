@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples 'geo base sync execution' do
   describe '#execute' do
     let(:project) { build('project')}
@@ -40,7 +42,7 @@ shared_examples 'cleans temporary repositories' do
       allow(subject).to receive(:gitlab_shell).and_return(gitlab_shell)
       allow(subject).to receive(:fetch_geo_mirror)
 
-      expect(gitlab_shell).to receive(:exists?).and_return(true)
+      expect(gitlab_shell).to receive(:repository_exists?).and_return(true)
       expect(gitlab_shell).to receive(:remove_repository).with(project.repository_storage, temp_repo_path)
 
       subject.execute
@@ -92,8 +94,6 @@ shared_examples 'geo base sync fetch' do
 end
 
 shared_examples 'sync retries use the snapshot RPC' do
-  let(:retry_count) { Geo::ProjectRegistry::RETRIES_BEFORE_REDOWNLOAD }
-
   context 'snapshot synchronization method' do
     before do
       allow(subject).to receive(:temp_repo) { repository }
@@ -111,7 +111,7 @@ shared_examples 'sync retries use the snapshot RPC' do
     end
 
     it 'does not attempt to snapshot for ordinary retries' do
-      create(:geo_project_registry, project: project, repository_retry_count: retry_count - 1, wiki_retry_count: retry_count - 1)
+      registry_with_retry_count(retry_count - 1)
 
       expect(repository).not_to receive_create_from_snapshot
       expect(subject).to receive(:fetch_geo_mirror).with(repository)
@@ -120,7 +120,7 @@ shared_examples 'sync retries use the snapshot RPC' do
     end
 
     context 'registry is ready to be snapshotted' do
-      let!(:registry) { create(:geo_project_registry, project: project, repository_retry_count: retry_count + 1, wiki_retry_count: retry_count + 1) }
+      let!(:registry) { registry_with_retry_count(retry_count + 1) }
 
       it 'attempts to snapshot' do
         expect(repository).to receive_create_from_snapshot
@@ -152,5 +152,31 @@ shared_examples 'reschedules sync due to race condition instead of waiting for b
         mark_sync_as_successful
       end
     end
+  end
+end
+
+shared_context 'lease handling' do
+  it 'returns the lease when succeed' do
+    expect_to_cancel_exclusive_lease(lease_key, lease_uuid)
+
+    subject.execute
+  end
+
+  it 'returns the lease when sync fail' do
+    allow(repository).to receive(:fetch_as_mirror)
+      .with(url_to_repo, remote_name: 'geo', forced: true)
+      .and_raise(Gitlab::Shell::Error)
+
+    expect_to_cancel_exclusive_lease(lease_key, lease_uuid)
+
+    subject.execute
+  end
+
+  it 'does not fetch project repository if cannot obtain a lease' do
+    stub_exclusive_lease_taken(lease_key)
+
+    expect(repository).not_to receive(:fetch_as_mirror)
+
+    subject.execute
   end
 end

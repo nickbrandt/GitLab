@@ -408,12 +408,12 @@ group, you can use the following syntax:
 ```
 
 Find more information about this "LDAP_MATCHING_RULE_IN_CHAIN" filter at
-<https://docs.microsoft.com/en-us/windows/desktop/ADSI/search-filter-syntax>. Support for
+<https://docs.microsoft.com/en-us/windows/win32/adsi/search-filter-syntax>. Support for
 nested members in the user filter should not be confused with
 [group sync nested groups support](ldap-ee.md#supported-ldap-group-typesattributes). **(STARTER ONLY)**
 
 Please note that GitLab does not support the custom filter syntax used by
-omniauth-ldap.
+OmniAuth LDAP.
 
 ### Escaping special characters
 
@@ -536,7 +536,7 @@ ldapsearch -H ldaps://$host:$port -D "$bind_dn" -y bind_dn_password.txt  -b "$ba
 
 - Variables beginning with a `$` refer to a variable from the LDAP section of
   your configuration file.
-- Replace ldaps:// with ldap:// if you are using the plain authentication method.
+- Replace `ldaps://` with `ldap://` if you are using the plain authentication method.
   Port `389` is the default `ldap://` port and `636` is the default `ldaps://`
   port.
 - We are assuming the password for the bind_dn user is in bind_dn_password.txt.

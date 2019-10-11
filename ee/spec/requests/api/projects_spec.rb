@@ -355,6 +355,8 @@ describe API::Projects do
       end
 
       context 'as an admin' do
+        include_context 'custom session'
+
         let(:admin) { create(:admin) }
 
         it 'returns 500 when repository storage is unknown' do

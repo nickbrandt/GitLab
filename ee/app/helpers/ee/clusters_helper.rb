@@ -17,6 +17,7 @@ module EE
       {
         'clusters-path': clusterable.index_path,
         'metrics-endpoint': clusterable.metrics_cluster_path(cluster, format: :json),
+        'dashboard-endpoint': clusterable.metrics_dashboard_path(cluster),
         'documentation-path': help_page_path('administration/monitoring/prometheus/index.md'),
         'empty-getting-started-svg-path': image_path('illustrations/monitoring/getting_started.svg'),
         'empty-loading-svg-path': image_path('illustrations/monitoring/loading.svg'),

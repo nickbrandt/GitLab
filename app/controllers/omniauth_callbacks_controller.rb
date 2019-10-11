@@ -40,6 +40,8 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   def saml
     omniauth_flow(Gitlab::Auth::Saml)
+  rescue Gitlab::Auth::Saml::IdentityLinker::UnverifiedRequest
+    redirect_unverified_saml_initiation
   end
 
   def omniauth_error
@@ -73,6 +75,14 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     end
   end
 
+  def salesforce
+    if oauth.dig('extra', 'email_verified')
+      handle_omniauth
+    else
+      fail_salesforce_login
+    end
+  end
+
   private
 
   def omniauth_flow(auth_module, identity_linker: nil)
@@ -84,8 +94,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
       return render_403 unless link_provider_allowed?(oauth['provider'])
 
       log_audit_event(current_user, with: oauth['provider'])
-
-      identity_linker ||= auth_module::IdentityLinker.new(current_user, oauth)
+      identity_linker ||= auth_module::IdentityLinker.new(current_user, oauth, session)
 
       link_identity(identity_linker)
 
@@ -139,6 +148,11 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
       if user.two_factor_enabled? && !auth_user.bypass_two_factor?
         prompt_for_two_factor(user)
       else
+        if user.deactivated?
+          user.activate
+          flash[:notice] = _('Welcome back! Your account had been deactivated due to inactivity but is now reactivated.')
+        end
+
         sign_in_and_redirect(user, event: :authentication)
       end
     else
@@ -173,9 +187,21 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def fail_auth0_login
-    flash[:alert] = _('Wrong extern UID provided. Make sure Auth0 is configured correctly.')
+    fail_login_with_message(_('Wrong extern UID provided. Make sure Auth0 is configured correctly.'))
+  end
+
+  def fail_salesforce_login
+    fail_login_with_message(_('Email not verified. Please verify your email in Salesforce.'))
+  end
+
+  def fail_login_with_message(message)
+    flash[:alert] = message
 
     redirect_to new_user_session_path
+  end
+
+  def redirect_unverified_saml_initiation
+    redirect_to profile_account_path, notice: _('Request to link SAML account must be authorized')
   end
 
   def handle_disabled_provider

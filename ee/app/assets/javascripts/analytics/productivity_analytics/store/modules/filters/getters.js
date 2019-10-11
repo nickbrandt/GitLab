@@ -1,4 +1,8 @@
+import dateFormat from 'dateformat';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
+import { getDateInPast, beginOfDayTime, endOfDayTime } from '~/lib/utils/datetime_utility';
+import { chartKeys, scatterPlotAddonQueryDays } from '../../../constants';
+import { dateFormats } from '../../../../shared/constants';
 
 /**
  * Returns an object of common filter parameters based on the filter's state
@@ -11,13 +15,23 @@ import { urlParamsToObject } from '~/lib/utils/common_utils';
  *   author_username: 'author',
  *   milestone_title: 'my milestone',
  *   label_name: ['my label', 'yet another label'],
- *   merged_at_after: '2019-05-09T16:20:18.393Z'
+ *   merged_at_after: '2019-06-11T00:00:00Z'
+ *   merged_at_before: '2019-09-09T23:59:59Z'
  * }
  *
  */
-export const getCommonFilterParams = (state, getters) => {
-  const { groupNamespace, projectPath, filters } = state;
+export const getCommonFilterParams = state => chartKey => {
+  const { groupNamespace, projectPath, filters, startDate, endDate } = state;
   const { author_username, milestone_title, label_name } = urlParamsToObject(filters);
+
+  // for the scatterplot we need to remove 30 days from the state's merged_at_after date
+  const mergedAtAfterDate =
+    chartKey && chartKey === chartKeys.scatterplot
+      ? dateFormat(
+          new Date(getDateInPast(new Date(startDate), scatterPlotAddonQueryDays)),
+          dateFormats.isoDate,
+        )
+      : dateFormat(startDate, dateFormats.isoDate);
 
   return {
     group_id: groupNamespace,
@@ -25,18 +39,9 @@ export const getCommonFilterParams = (state, getters) => {
     author_username,
     milestone_title,
     label_name,
-    merged_at_after: getters.mergedOnAfterDate,
+    merged_at_after: `${mergedAtAfterDate}${beginOfDayTime}`,
+    merged_at_before: `${dateFormat(endDate, dateFormats.isoDate)}${endOfDayTime}`,
   };
-};
-
-/**
- * Computes the "merged_at_after" date which will be used in the getCommonFilterParams getter.
- * It subtracts the number of days (based on the state's daysInPast property) from today's date
- * and returns the new date.
- */
-export const mergedOnAfterDate = state => {
-  const d = new Date();
-  return new Date(d.setTime(d.getTime() - state.daysInPast * 24 * 60 * 60 * 1000)).toISOString();
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

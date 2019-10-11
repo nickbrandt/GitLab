@@ -132,5 +132,13 @@ describe Admin::ApplicationSettingsController do
       expect(response).to render_template(:general)
       expect(assigns(:application_setting).errors[:repository_size_limit]).to be_present
     end
+
+    describe 'verify panel actions' do
+      Admin::ApplicationSettingsController::EE_VALID_SETTING_PANELS.each do |valid_action|
+        it_behaves_like 'renders correct panels' do
+          let(:action) { valid_action }
+        end
+      end
+    end
   end
 end

@@ -66,13 +66,7 @@ suitable to your workflow:
 
 ## Editing approvals **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1979) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
-
-CAUTION: **Caution:**
-There was a [regression affecting this feature in 11.8](https://gitlab.com/gitlab-org/gitlab/merge_requests/9648). We recommend upgrading _at least_ to version 11.8.2. to avoid any issues.
-
-NOTE: **Note:**
-In 11.8 this feature does not work in [private groups](https://gitlab.com/gitlab-org/gitlab/issues/10356).
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1979) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.10.
 
 For GitLab Premium, [multiple approver rules](#multiple-approval-rules-premium) can be configured. To configure the merge
 request approval rules:
@@ -87,7 +81,7 @@ request approval rules:
 
 ## Multiple approval rules **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1979) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1979) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.10.
 
 For GitLab Premium, a merge request's overall approval status is determined by a set of rules. Each rule contains:
 
@@ -329,10 +323,20 @@ the dropdown) `approver` and select the user.
 
 ## Security approvals in merge requests **(ULTIMATE)**
 
-> Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing) 12.2.
+> Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.2.
 
 Merge Request Approvals can be configured to require approval from a member
 of your security team when a vulnerability would be introduced by a merge request.
+
+For more information, see
+[Security approvals in merge requests](../../application_security/index.md#security-approvals-in-merge-requests-ultimate).
+
+## License compliance approvals in merge requests **(ULTIMATE)**
+
+> Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.3.
+
+Merge Request Approvals can be configured to require approval from a member
+of your security team when a blacklisted software license would be introduced by a merge request.
 
 For more information, see
 [Security approvals in merge requests](../../application_security/index.md#security-approvals-in-merge-requests-ultimate).

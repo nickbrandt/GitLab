@@ -1,25 +1,16 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import router from './router';
-import configureModerator from './moderator';
-import syncWithRouter from './sync_with_router';
+import mediator from './plugins/mediator';
 import filters from './modules/filters/index';
-import projects from './modules/projects/index';
 import vulnerabilities from './modules/vulnerabilities/index';
 
 Vue.use(Vuex);
 
-export default () => {
-  const store = new Vuex.Store({
+export default ({ plugins = [] } = {}) =>
+  new Vuex.Store({
     modules: {
       filters,
-      projects,
       vulnerabilities,
     },
-    plugins: [configureModerator, syncWithRouter(router)],
+    plugins: [mediator, ...plugins],
   });
-
-  store.$router = router;
-
-  return store;
-};

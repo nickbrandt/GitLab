@@ -1,6 +1,0 @@
----
-title: Expose a count of Notes for a Design in a new notes_count property of DesignType
-  in GraphQL
-merge_request: 15433
-author:
-type: added

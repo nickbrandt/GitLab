@@ -24,24 +24,22 @@ module Security
     end
 
     def execute
-      pipeline_reports.each_with_object([]) do |(type, report), occurrences|
+      pipeline_reports&.each_with_object([]) do |(type, report), occurrences|
         next unless requested_type?(type)
+
+        raise ParseError, 'JSON parsing failed' if report.error.is_a?(Gitlab::Ci::Parsers::Security::Common::SecurityReportParserError)
 
         normalized_occurrences = normalize_report_occurrences(report.occurrences)
         filtered_occurrences = filter(normalized_occurrences)
 
         occurrences.concat(filtered_occurrences)
       end
-
-    # Created follow-up issue to better handle exception case - https://gitlab.com/gitlab-org/gitlab/issues/14007
-    rescue NoMethodError => _ # propagate error for CompareReportsBaseService
-      raise ParseError, 'JSON parsing failed'
     end
 
     private
 
     def pipeline_reports
-      pipeline.security_reports.reports
+      pipeline&.security_reports&.reports
     end
 
     def normalize_report_occurrences(report_occurrences)

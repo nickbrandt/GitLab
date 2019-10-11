@@ -38,7 +38,7 @@ describe 'User Onboarding' do
         end
 
         it 'does not show the "Learn GitLab" item in the help menu' do
-          page.within('.header-help') do
+          page.within('.header-user') do
             expect(page).not_to have_link('Learn GitLab')
           end
         end

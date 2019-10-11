@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-describe 'Burndown charts' do
+describe 'Burndown charts', :js do
   let(:current_user) { create(:user) }
   let(:milestone) do
     create(:milestone, project: project,

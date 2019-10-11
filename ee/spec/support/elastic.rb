@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.configure do |config|
   config.before(:each, :elastic) do
     Gitlab::Elastic::Helper.create_empty_index

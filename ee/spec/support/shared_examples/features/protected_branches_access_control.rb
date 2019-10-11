@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples "protected branches > access control > EE" do
   %w[merge push].each do |git_operation|
     # Need to set a default for the `git_operation` access level that _isn't_ being tested

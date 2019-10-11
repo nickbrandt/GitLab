@@ -1,0 +1,5 @@
+---
+title: Fix time tracking info when the sidebar is collapsed
+merge_request:
+author:
+type: fixed

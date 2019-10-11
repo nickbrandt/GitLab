@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'EE > Projects > Settings > User manages merge requests template' do

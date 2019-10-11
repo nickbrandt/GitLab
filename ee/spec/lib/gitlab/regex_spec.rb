@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Regex do
@@ -19,8 +21,11 @@ describe Gitlab::Regex do
     it { is_expected.to match('foo/bar') }
     it { is_expected.to match('@foo/bar') }
     it { is_expected.to match('com/mycompany/app/my-app') }
+    it { is_expected.to match('my-package/1.0.0@my+project+path/beta') }
+    it { is_expected.not_to match('my-package/1.0.0@@@@@my+project+path/beta') }
     it { is_expected.not_to match('$foo/bar') }
     it { is_expected.not_to match('@foo/@/bar') }
+    it { is_expected.not_to match('@@foo/bar') }
     it { is_expected.not_to match('my package name') }
     it { is_expected.not_to match('!!()()') }
   end

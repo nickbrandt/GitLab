@@ -25,6 +25,7 @@ exports[`Design management list item component hides comment count 1`] = `
     >
       <span
         class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
       >
         test
       </span>
@@ -63,7 +64,7 @@ exports[`Design management list item component renders item with correct status 
         title="Added in this version"
       >
         <icon-stub
-          cssclasses="text-success-500"
+          class="text-success-500"
           name="file-addition-solid"
           size="18"
         />
@@ -85,6 +86,7 @@ exports[`Design management list item component renders item with correct status 
     >
       <span
         class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
       >
         test
       </span>
@@ -123,7 +125,7 @@ exports[`Design management list item component renders item with correct status 
         title="Deleted in this version"
       >
         <icon-stub
-          cssclasses="text-danger-500"
+          class="text-danger-500"
           name="file-deletion-solid"
           size="18"
         />
@@ -145,6 +147,7 @@ exports[`Design management list item component renders item with correct status 
     >
       <span
         class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
       >
         test
       </span>
@@ -183,7 +186,7 @@ exports[`Design management list item component renders item with correct status 
         title="Modified in this version"
       >
         <icon-stub
-          cssclasses="text-primary-500"
+          class="text-primary-500"
           name="file-modified-solid"
           size="18"
         />
@@ -205,6 +208,7 @@ exports[`Design management list item component renders item with correct status 
     >
       <span
         class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
       >
         test
       </span>
@@ -252,6 +256,7 @@ exports[`Design management list item component renders item with multiple commen
     >
       <span
         class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
       >
         test
       </span>
@@ -274,7 +279,6 @@ exports[`Design management list item component renders item with multiple commen
     >
       <icon-stub
         class="ml-1"
-        cssclasses=""
         name="comments"
         size="16"
       />
@@ -317,6 +321,7 @@ exports[`Design management list item component renders item with no status icon 
     >
       <span
         class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
       >
         test
       </span>
@@ -364,6 +369,7 @@ exports[`Design management list item component renders item with single comment 
     >
       <span
         class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
       >
         test
       </span>
@@ -386,7 +392,6 @@ exports[`Design management list item component renders item with single comment 
     >
       <icon-stub
         class="ml-1"
-        cssclasses=""
         name="comments"
         size="16"
       />

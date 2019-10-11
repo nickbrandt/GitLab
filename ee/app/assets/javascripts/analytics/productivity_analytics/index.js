@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import store from './store';
 import FilterDropdowns from './components/filter_dropdowns.vue';
-import TimeFrameDropdown from './components/timeframe_dropdown.vue';
+import DateRange from './components/daterange.vue';
 import ProductivityAnalyticsApp from './components/app.vue';
 import FilteredSearchProductivityAnalytics from './filtered_search_productivity_analytics';
 import { getLabelsEndpoint, getMilestonesEndpoint } from './utils';
@@ -71,7 +71,7 @@ export default () => {
     el: timeframeContainer,
     store,
     render(h) {
-      return h(TimeFrameDropdown, {});
+      return h(DateRange, {});
     },
   });
 

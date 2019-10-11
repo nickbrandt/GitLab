@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::ProjectMirror do
@@ -22,64 +24,70 @@ describe API::ProjectMirror do
       end
 
       context 'when it receives a "push" event' do
-        context 'when import state is' do
-          def project_in_state(state)
-            project = create(:project, :repository, namespace: user.namespace)
-            import_state = create(:import_state, :mirror, state, project: project)
-            import_state.update(next_execution_timestamp: 10.minutes.from_now)
-
-            project
-          end
-
-          it 'none it triggers the pull mirroring operation' do
-            project = project_in_state(:none)
-
+        shared_examples_for 'an API endpoint that triggers pull mirroring operation' do
+          it 'executes UpdateAllMirrorsWorker' do
             expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
 
             post api("/projects/#{project.id}/mirror/pull", user)
 
             expect(response).to have_gitlab_http_status(200)
           end
+        end
 
-          it 'failed it triggers the pull mirroring operation' do
-            project = project_in_state(:failed)
-
-            expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
-
-            post api("/projects/#{project.id}/mirror/pull", user)
-
-            expect(response).to have_gitlab_http_status(200)
-          end
-
-          it 'finished it triggers the pull mirroring operation' do
-            project = project_in_state(:finished)
-
-            expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
-
-            post api("/projects/#{project.id}/mirror/pull", user)
-
-            expect(response).to have_gitlab_http_status(200)
-          end
-
-          it 'scheduled does not trigger the pull mirroring operation and returns 200' do
-            project = project_in_state(:scheduled)
-
+        shared_examples_for 'an API endpoint that does not trigger pull mirroring operation' do |status_code|
+          it "does not execute UpdateAllMirrorsWorker and returns #{status_code}" do
             expect(UpdateAllMirrorsWorker).not_to receive(:perform_async)
 
             post api("/projects/#{project.id}/mirror/pull", user)
 
-            expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(status_code)
           end
+        end
 
-          it 'started does not trigger the pull mirroring operation and returns 200' do
-            project = project_in_state(:started)
-
-            expect(UpdateAllMirrorsWorker).not_to receive(:perform_async)
-
-            post api("/projects/#{project.id}/mirror/pull", user)
-
-            expect(response).to have_gitlab_http_status(200)
+        let(:project) do
+          create(:project, :repository, namespace: user.namespace) do |project|
+            create(:import_state, :mirror, state, project: project) do |import_state|
+              import_state.update(next_execution_timestamp: 10.minutes.from_now)
+            end
           end
+        end
+
+        context 'when import state is none' do
+          let(:state) { :none }
+
+          it_behaves_like 'an API endpoint that triggers pull mirroring operation'
+        end
+
+        context 'when import state is failed' do
+          let(:state) { :failed }
+
+          it_behaves_like 'an API endpoint that triggers pull mirroring operation'
+
+          context "and retried more than #{Gitlab::Mirror::MAX_RETRY} times" do
+            before do
+              project.import_state.update(retry_count: Gitlab::Mirror::MAX_RETRY + 1)
+            end
+
+            it_behaves_like 'an API endpoint that does not trigger pull mirroring operation', 403
+          end
+        end
+
+        context 'when import state is finished' do
+          let(:state) { :finished }
+
+          it_behaves_like 'an API endpoint that triggers pull mirroring operation'
+        end
+
+        context 'when import state is scheduled' do
+          let(:state) { :scheduled }
+
+          it_behaves_like 'an API endpoint that does not trigger pull mirroring operation', 200
+        end
+
+        context 'when import state is started' do
+          let(:state) { :started }
+
+          it_behaves_like 'an API endpoint that does not trigger pull mirroring operation', 200
         end
       end
 

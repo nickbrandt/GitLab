@@ -10,7 +10,6 @@ exports[`DependencyListAlert component given no props matches the snapshot 1`] =
   >
     <icon-stub
       aria-hidden="true"
-      cssclasses=""
       name="close"
       size="16"
     />
@@ -37,7 +36,6 @@ exports[`DependencyListAlert component given the headerText prop matches the sna
   >
     <icon-stub
       aria-hidden="true"
-      cssclasses=""
       name="close"
       size="16"
     />
@@ -68,7 +66,6 @@ exports[`DependencyListAlert component given the warning type and headerText pro
   >
     <icon-stub
       aria-hidden="true"
-      cssclasses=""
       name="close"
       size="16"
     />

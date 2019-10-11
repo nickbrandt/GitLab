@@ -2,6 +2,7 @@
 
 module DesignManagement
   class Version < ApplicationRecord
+    include Importable
     include ShaAttribute
 
     NotSameIssue = Class.new(StandardError)
@@ -34,15 +35,17 @@ module DesignManagement
              source: :design,
              inverse_of: :versions
 
-    validates :designs, presence: true
+    validates :designs, presence: true, unless: :importing?
     validates :sha, presence: true
     validates :sha, uniqueness: { case_sensitive: false, scope: :issue_id }
     # We are not validating the issue object as it incurs an extra query to fetch
     # the record from the DB. Instead, we rely on the foreign key constraint to
     # ensure referential integrity.
-    validates :issue_id, presence: true
+    validates :issue_id, presence: true, unless: :importing?
 
     sha_attribute :sha
+
+    delegate :project, to: :issue
 
     scope :for_designs, -> (designs) do
       where(id: Action.where(design_id: designs).select(:version_id)).distinct
@@ -82,6 +85,23 @@ module DesignManagement
       end
     rescue
       raise CouldNotCreateVersion.new(sha, issue_id, design_actions)
+    end
+
+    def designs_by_event
+      actions
+        .includes(:design)
+        .group_by(&:event)
+        .transform_values { |group| group.map(&:design) }
+    end
+
+    def author
+      commit&.author
+    end
+
+    private
+
+    def commit
+      @commit ||= issue.project.design_repository.commit(sha)
     end
   end
 end

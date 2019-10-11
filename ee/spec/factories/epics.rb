@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :epic do
     title { generate(:title) }
@@ -7,24 +9,24 @@ FactoryBot.define do
     trait :use_fixed_dates do
       start_date { Date.new(2010, 1, 1) }
       start_date_fixed { Date.new(2010, 1, 1) }
-      start_date_is_fixed true
+      start_date_is_fixed { true }
       end_date { Date.new(2010, 1, 3) }
       due_date_fixed { Date.new(2010, 1, 3) }
-      due_date_is_fixed true
+      due_date_is_fixed { true }
     end
 
     trait :opened do
-      state :opened
+      state { :opened }
     end
 
     trait :closed do
-      state :closed
+      state { :closed }
       closed_at { Time.now }
     end
 
     factory :labeled_epic do
       transient do
-        labels []
+        labels { [] }
       end
 
       after(:create) do |epic, evaluator|

@@ -1,5 +1,0 @@
----
-title: SAST template that doesn't rely on Docker-in-Docker
-merge_request: 16487
-author:
-type: other

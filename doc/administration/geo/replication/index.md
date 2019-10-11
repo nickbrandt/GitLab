@@ -63,7 +63,7 @@ Keep in mind that:
   - Get user data for logins (API).
   - Replicate repositories, LFS Objects, and Attachments (HTTPS + JWT).
 - Since GitLab Premium 10.0, the **primary** node no longer talks to **secondary** nodes to notify for changes (API).
-- Pushing directly to a **secondary** node (for both HTTP and SSH, including git-lfs) was [introduced](https://about.gitlab.com/2018/09/22/gitlab-11-3-released/) in [GitLab Premium](https://about.gitlab.com/pricing/#self-managed) 11.3.
+- Pushing directly to a **secondary** node (for both HTTP and SSH, including Git LFS) was [introduced](https://about.gitlab.com/2018/09/22/gitlab-11-3-released/) in [GitLab Premium](https://about.gitlab.com/pricing/#self-managed) 11.3.
 - There are [limitations](#current-limitations) in the current implementation.
 
 ### Architecture
@@ -108,7 +108,7 @@ The following are required to run Geo:
   [fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md))
   The following operating systems are known to ship with a current version of OpenSSH:
   - [CentOS](https://www.centos.org) 7.4+
-  - [Ubuntu](https://www.ubuntu.com) 16.04+
+  - [Ubuntu](https://ubuntu.com) 16.04+
 - PostgreSQL 9.6+ with [FDW](https://www.postgresql.org/docs/9.6/postgres-fdw.html) support and [Streaming Replication](https://wiki.postgresql.org/wiki/Streaming_Replication)
 - Git 2.9+
 - All nodes must run the same GitLab version.
@@ -229,6 +229,10 @@ For more information on Geo security, see [Geo security review](security_review.
 
 For more information on tuning Geo, see [Tuning Geo](tuning.md).
 
+### Set up a location-aware Git URL
+
+For an example of how to set up a location-aware Git remote URL with AWS Route53, see [Location-aware Git remote URL with AWS Route53](location_aware_git_url.md).
+
 ## Remove Geo node
 
 For more information on removing a Geo node, see [Removing **secondary** Geo nodes](remove_geo_node.md).
@@ -240,7 +244,7 @@ This list of limitations only reflects the latest version of GitLab. If you are 
 
 - Pushing directly to a **secondary** node redirects (for HTTP) or proxies (for SSH) the request to the **primary** node instead of [handling it directly](https://gitlab.com/gitlab-org/gitlab/issues/1381), except when using Git over HTTP with credentials embedded within the URI. For example, `https://user:password@secondary.tld`.
 - The **primary** node has to be online for OAuth login to happen. Existing sessions and Git are not affected.
-- The installation takes multiple manual steps that together can take about an hour depending on circumstances. We are working on improving this experience. See [gitlab-org/omnibus-gitlab#2978](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2978) for details.
+- The installation takes multiple manual steps that together can take about an hour depending on circumstances. We are working on improving this experience. See [Omnibus GitLab issue #2978](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2978) for details.
 - Real-time updates of issues/merge requests (for example, via long polling) doesn't work on the **secondary** node.
 - [Selective synchronization](configuration.md#selective-synchronization) applies only to files and repositories. Other datasets are replicated to the **secondary** node in full, making it inappropriate for use as an access control mechanism.
 - Object pools for forked project deduplication work only on the **primary** node, and are duplicated on the **secondary** node.
@@ -277,6 +281,7 @@ You can keep track of the progress to include the missing items in:
 | [Container Registry](../../packages/container_registry.md) | Yes | No |
 | [NPM Registry](../../../user/packages/npm_registry/index.md) | No | No |
 | [Maven Packages](../../../user/packages/maven_repository/index.md) | No | No |
+| [Conan Packages](../../../user/packages/conan_repository/index.md) | No | No |
 | [External merge request diffs](../../merge_request_diffs.md) | No, if they are on-disk | No |
 | Content in object storage ([track progress](https://gitlab.com/groups/gitlab-org/-/epics/1526)) | No | No |
 

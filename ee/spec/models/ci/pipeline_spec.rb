@@ -16,7 +16,7 @@ describe Ci::Pipeline do
   it { is_expected.to have_many(:triggered_pipelines) }
   it { is_expected.to have_many(:downstream_bridges) }
   it { is_expected.to have_many(:job_artifacts).through(:builds) }
-  it { is_expected.to have_many(:vulnerabilities).through(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::Occurrence') }
+  it { is_expected.to have_many(:vulnerability_findings).through(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::Occurrence') }
   it { is_expected.to have_many(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::OccurrencePipeline') }
 
   describe '.failure_reasons' do
@@ -239,8 +239,8 @@ describe Ci::Pipeline do
     end
   end
 
-  describe '#license_management_reports' do
-    subject { pipeline.license_management_report }
+  describe '#license_scanning_reports' do
+    subject { pipeline.license_scanning_report }
 
     before do
       stub_licensed_features(license_management: true)
@@ -255,7 +255,7 @@ describe Ci::Pipeline do
         create(:ee_ci_job_artifact, :license_management_feature_branch, job: build_2, project: project)
       end
 
-      it 'returns a license management report with collected data' do
+      it 'returns a license scanning report with collected data' do
         expect(subject.licenses.count).to eq(5)
         expect(subject.licenses.map(&:name)).to include('WTFPL', 'MIT')
       end
@@ -271,7 +271,7 @@ describe Ci::Pipeline do
     end
 
     context 'when pipeline does not have any builds with license management reports' do
-      it 'returns an empty license management report' do
+      it 'returns an empty license scanning report' do
         expect(subject.licenses).to be_empty
       end
     end
@@ -525,6 +525,24 @@ describe Ci::Pipeline do
       end
 
       it { is_expected.to be_falsy }
+    end
+  end
+
+  describe '#retryable?' do
+    subject { pipeline.retryable? }
+    let(:pipeline) { merge_request.all_pipelines.last }
+    let!(:build) { create(:ci_build, :canceled, pipeline: pipeline) }
+
+    context 'with pipeline for merged results' do
+      let(:merge_request) { create(:merge_request, :with_merge_request_pipeline) }
+
+      it { is_expected.to be true }
+    end
+
+    context 'with pipeline for merge train' do
+      let(:merge_request) { create(:merge_request, :on_train, :with_merge_train_pipeline) }
+
+      it { is_expected.to be false }
     end
   end
 end

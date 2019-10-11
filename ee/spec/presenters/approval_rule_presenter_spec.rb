@@ -7,7 +7,28 @@ describe ApprovalRulePresenter do
   set(:public_group) { create(:group) }
   set(:private_group) { create(:group, :private) }
   let(:groups) { [public_group, private_group] }
-  subject { described_class.new(rule, current_user: user) }
+
+  subject(:presenter) { described_class.new(rule, current_user: user) }
+
+  describe '#approvers' do
+    set(:private_member) { create(:group_member, group: private_group) }
+    set(:public_member) { create(:group_member, group: public_group) }
+    set(:rule) { create(:approval_merge_request_rule, groups: [public_group, private_group]) }
+
+    subject { presenter.approvers }
+
+    context 'user cannot see one of the groups' do
+      it { is_expected.to be_empty }
+    end
+
+    context 'user can see all groups' do
+      before do
+        private_group.add_guest(user)
+      end
+
+      it { is_expected.to contain_exactly(user, private_member.user, public_member.user) }
+    end
+  end
 
   describe '#groups' do
     shared_examples 'filtering private group' do

@@ -15,7 +15,7 @@ class Analytics::ApplicationController < ApplicationController
     before_action(*args) { counter_klass.count(counter) }
   end
 
-  def authorize_view_productivity_analytics!(action)
+  def authorize_view_by_action!(action)
     return render_403 unless can?(current_user, action, @group || :global)
   end
 

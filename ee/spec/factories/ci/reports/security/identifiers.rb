@@ -2,8 +2,8 @@
 
 FactoryBot.define do
   factory :ci_reports_security_identifier, class: ::Gitlab::Ci::Reports::Security::Identifier do
-    external_id 'PREDICTABLE_RANDOM'
-    external_type 'find_sec_bugs_type'
+    external_id { 'PREDICTABLE_RANDOM' }
+    external_type { 'find_sec_bugs_type' }
     name { "#{external_type}-#{external_id}" }
 
     skip_create

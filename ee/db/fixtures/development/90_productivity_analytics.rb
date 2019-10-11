@@ -87,9 +87,11 @@ class Gitlab::Seeder::ProductivityAnalytics
         ::Git::BranchPushService.new(
           issue.project,
           @user,
-          oldrev: issue.project.repository.commit("master").sha,
-          newrev: commit_sha,
-          ref: 'refs/heads/master'
+          change: {
+            oldrev: issue.project.repository.commit("master").sha,
+            newrev: commit_sha,
+            ref: 'refs/heads/master'
+          }
         ).execute
       end
 

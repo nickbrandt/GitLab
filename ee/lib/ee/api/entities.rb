@@ -168,6 +168,7 @@ module EE
         prepended do
           expose :milestone, using: ::API::Entities::Milestone, if: -> (entity, _) { entity.milestone? }
           expose :user, as: :assignee, using: ::API::Entities::UserSafe, if: -> (entity, _) { entity.assignee? }
+          expose :max_issue_count, if: -> (list, _) { list.board.parent.feature_available?(:wip_limits) }
         end
       end
 
@@ -185,8 +186,10 @@ module EE
       end
 
       module Todo
+        extend ::Gitlab::Utils::Override
         extend ActiveSupport::Concern
 
+        override :todo_target_class
         def todo_target_class(target_type)
           super
         rescue NameError
@@ -194,11 +197,35 @@ module EE
           # see also https://gitlab.com/gitlab-org/gitlab-foss/issues/59719
           ::EE::API::Entities.const_get(target_type, false)
         end
+
+        override :todo_target_url
+        def todo_target_url(todo)
+          return super unless todo.target_type == ::DesignManagement::Design.name
+
+          design = todo.target
+          path_options = {
+            anchor: todo_target_anchor(todo),
+            vueroute: design.filename
+          }
+
+          ::Gitlab::Routing.url_helpers.designs_project_issue_url(design.project, design.issue, path_options)
+        end
       end
 
       ########################
       # EE-specific entities #
       ########################
+      module DesignManagement
+        class Design < Grape::Entity
+          expose :id
+          expose :project_id
+          expose :filename
+          expose :image_url do |design|
+            ::Gitlab::UrlBuilder.build(design)
+          end
+        end
+      end
+
       class ProjectPushRule < Grape::Entity
         extend EntityHelpers
         expose :id, :project_id, :created_at
@@ -238,6 +265,17 @@ module EE
         end
       end
 
+      class AuditEvent < Grape::Entity
+        expose :id
+        expose :author_id
+        expose :entity_id
+        expose :entity_type
+        expose :details do |audit_event|
+          audit_event.formatted_details
+        end
+        expose :created_at
+      end
+
       class Epic < Grape::Entity
         can_admin_epic = ->(epic, opts) { Ability.allowed?(opts[:user], :admin_epic, epic) }
 
@@ -256,14 +294,14 @@ module EE
         expose :due_date_is_fixed?, as: :due_date_is_fixed, if: can_admin_epic
         expose :due_date_fixed, :due_date_from_milestones, if: can_admin_epic
         expose :state
-        expose :web_edit_url, if: can_admin_epic do |epic|
-          ::Gitlab::Routing.url_helpers.group_epic_path(epic.group, epic)
-        end
+        expose :web_edit_url, if: can_admin_epic # @deprecated
+        expose :web_url
         expose :reference, if: { with_reference: true } do |epic|
           epic.to_reference(full: true)
         end
         expose :created_at
         expose :updated_at
+        expose :closed_at
         expose :labels do |epic|
           # Avoids an N+1 query since labels are preloaded
           epic.labels.map(&:title).sort
@@ -283,6 +321,14 @@ module EE
           else
             epic.downvotes
           end
+        end
+
+        def web_url
+          ::Gitlab::Routing.url_helpers.group_epic_url(object.group, object)
+        end
+
+        def web_edit_url
+          ::Gitlab::Routing.url_helpers.group_epic_path(object.group, object)
         end
       end
 
@@ -423,8 +469,7 @@ module EE
         end
 
         expose :suggested_approvers, using: ::API::Entities::UserBasic do |approval_state, options|
-          # TODO order by relevance
-          approval_state.unactioned_approvers
+          approval_state.suggested_approvers(current_user: options[:current_user])
         end
 
         # @deprecated, reads from first regular rule instead

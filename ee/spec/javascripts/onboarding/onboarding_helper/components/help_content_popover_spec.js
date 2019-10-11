@@ -1,5 +1,6 @@
 import component from 'ee/onboarding/onboarding_helper/components/help_content_popover.vue';
 import { shallowMount } from '@vue/test-utils';
+import { GlButton } from '@gitlab/ui';
 
 describe('User onboarding help content popover', () => {
   let wrapper;
@@ -18,6 +19,27 @@ describe('User onboarding help content popover', () => {
     disabled: false,
   };
 
+  const exitTourContent = {
+    text: 'some help content',
+    exitTour: true,
+  };
+
+  const exitTourProps = {
+    ...defaultProps,
+    helpContent: exitTourContent,
+  };
+
+  const feedbackContent = {
+    text: 'some help content',
+    feedbackButtons: true,
+    feedbackSize: 5,
+  };
+
+  const feedbackProps = {
+    ...defaultProps,
+    helpContent: feedbackContent,
+  };
+
   function createComponent(propsData) {
     wrapper = shallowMount(component, { propsData });
   }
@@ -27,14 +49,36 @@ describe('User onboarding help content popover', () => {
   });
 
   describe('methods', () => {
-    describe('callButtonAction', () => {
-      it('emits clickActionButton when called', () => {
+    describe('callStepContentButton', () => {
+      it('emits clickStepContentButton when called', () => {
         createComponent(defaultProps);
 
         wrapper.find('.btn-primary').vm.$emit('click');
 
         expect(wrapper.emittedByOrder()).toEqual([
-          { name: 'clickActionButton', args: [defaultProps.helpContent.buttons[0]] },
+          { name: 'clickStepContentButton', args: [defaultProps.helpContent.buttons[0]] },
+        ]);
+      });
+    });
+
+    describe('callExitTour', () => {
+      it('emits clickExitTourButton when called', () => {
+        createComponent(exitTourProps);
+
+        wrapper.find(GlButton).vm.$emit('click');
+
+        expect(wrapper.emittedByOrder()).toEqual([{ name: 'clickExitTourButton', args: [] }]);
+      });
+    });
+
+    describe('submitFeedback', () => {
+      it('emits clickFeedbackButton when called', () => {
+        createComponent(feedbackProps);
+
+        wrapper.find(GlButton).vm.$emit('click');
+
+        expect(wrapper.emittedByOrder()).toEqual([
+          { name: 'clickFeedbackButton', args: [{ feedbackResult: 1 }] },
         ]);
       });
     });
@@ -49,6 +93,16 @@ describe('User onboarding help content popover', () => {
       expect(wrapper.text()).toContain(defaultProps.helpContent.text);
       expect(btn.exists()).toBe(true);
       expect(btn.text()).toBe(defaultProps.helpContent.buttons[0].text);
+    });
+
+    it('displays the help content text and renders a primary button with exit text when there is no buttons in help content', () => {
+      createComponent(exitTourProps);
+
+      const btn = wrapper.find('.btn-primary');
+
+      expect(wrapper.text()).toContain(exitTourProps.helpContent.text);
+      expect(btn.exists()).toBe(true);
+      expect(btn.text()).toBe("Close 'Learn GitLab'");
     });
 
     it('renders a secondary button with the text "button"', () => {

@@ -11,7 +11,7 @@ module QA
 
       def login(user = nil)
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform { |login| login.sign_in_using_credentials(user) }
+        Page::Main::Login.perform { |login| login.sign_in_using_credentials(user: user) }
       end
 
       before do

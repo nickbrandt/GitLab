@@ -482,7 +482,7 @@ As long as the fixtures don't change, `yarn test` is sufficient (and saves you s
 
 While developing locally, it may be helpful to keep Karma running so that you
 can get instant feedback on as you write tests and modify code. To do this
-you can start Karma with `yarn run karma-start`. It will compile the javascript
+you can start Karma with `yarn run karma-start`. It will compile the JavaScript
 assets and run a server at `http://localhost:9876/` where it will automatically
 run the tests on any browser which connects to it. You can enter that url on
 multiple browsers at once to have it run the tests on each in parallel.
@@ -515,11 +515,6 @@ glob otherwise your shell may split it into multiple arguments:
 # Run all specs named `file_spec` within the IDE subdirectory
 yarn karma -f 'spec/javascripts/ide/**/file_spec.js'
 ```
-
-## RSpec feature integration tests
-
-Information on setting up and running RSpec integration tests with
-[Capybara] can be found in the [Testing Best Practices](best_practices.md).
 
 ## Frontend test fixtures
 
@@ -598,7 +593,6 @@ end
 [karma]: http://karma-runner.github.io/
 [vue-test]: ../fe_guide/vue.md#testing-vue-components
 [rspec]: https://github.com/rspec/rspec-rails#feature-specs
-[capybara]: https://github.com/teamcapybara/capybara
 [jasmine]: https://jasmine.github.io/
 
 ## Overview of Frontend Testing Levels
@@ -955,7 +949,11 @@ graph RL
 In contrast to [frontend integration tests](#frontend-integration-tests), feature tests make requests against the real backend instead of using fixtures.
 This also implies that database queries are executed which makes this category significantly slower.
 
-See also the [RSpec testing guidelines](../testing_guide/best_practices.md#rspec).
+See also
+
+- The [RSpec testing guidelines](../testing_guide/best_practices.md#rspec).
+- System / Feature tests in the [Testing Best Practices](best_practices.md#system--feature-tests).
+- [Issue #26159](https://gitlab.com/gitlab-org/gitlab/issues/26159) which aims at combine those guidelines with this page.
 
 ```mermaid
 graph RL

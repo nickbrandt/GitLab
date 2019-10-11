@@ -1,5 +1,0 @@
----
-title: Reinitialize metrics files on webserver master process start
-merge_request: 16623
-author:
-type: fixed

@@ -164,7 +164,7 @@ module QA
 
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform do |login_page|
-          login_page.sign_in_using_ldap_credentials(user)
+          login_page.sign_in_using_ldap_credentials(user: user)
         end
 
         group.visit!

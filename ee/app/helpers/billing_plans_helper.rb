@@ -31,7 +31,8 @@ module BillingPlansHelper
     {
       namespace_id: group.id,
       namespace_name: group.name,
-      plan_upgrade_href: plan_upgrade_url(group, plan)
+      plan_upgrade_href: plan_upgrade_url(group, plan),
+      customer_portal_url: "#{EE::SUBSCRIPTIONS_URL}/subscriptions"
     }
   end
 
@@ -39,5 +40,12 @@ module BillingPlansHelper
     return unless group && plan&.id
 
     "#{EE::SUBSCRIPTIONS_URL}/gitlab/namespaces/#{group.id}/upgrade/#{plan.id}"
+  end
+
+  def show_trial_banner?(namespace)
+    return false unless params[:trial]
+
+    root = namespace.has_parent? ? namespace.root_ancestor : namespace
+    root.trial_active?
   end
 end

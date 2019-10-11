@@ -29,7 +29,7 @@ export default {
   [types.SET_COLUMN_METRIC](state, columnMetric) {
     state.columnMetric = columnMetric;
   },
-  [types.SET_MERGE_REQUESTS_PAGE](state, page) {
+  [types.SET_PAGE](state, page) {
     state.pageInfo = { ...state.pageInfo, page };
   },
 };

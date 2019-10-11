@@ -230,13 +230,33 @@ describe('User onboarding tour parts list', () => {
       });
     });
 
-    describe('callButtonAction', () => {
-      it('emits the "clickPopoverButton" event when a popover button is clicked', () => {
+    describe('callStepContentButton', () => {
+      it('emits the "clickStepContentButton" event when a popover button is clicked', () => {
         const button = defaultProps.helpContent.buttons[0];
 
-        wrapper.vm.callButtonAction(button);
+        wrapper.vm.callStepContentButton(button);
 
-        expect(wrapper.emittedByOrder()).toEqual([{ name: 'clickPopoverButton', args: [button] }]);
+        expect(wrapper.emittedByOrder()).toEqual([
+          { name: 'clickStepContentButton', args: [button] },
+        ]);
+      });
+    });
+
+    describe('callExitTour', () => {
+      it('emits the "clickExitTourButton" event when close Learn GitLab is clicked', () => {
+        wrapper.vm.callExitTour();
+
+        expect(wrapper.emittedByOrder()).toEqual([{ name: 'clickExitTourButton', args: [] }]);
+      });
+    });
+
+    describe('submitFeedback', () => {
+      it('emits the "clickFeedbackButton" event when feedback on tour is clicked', () => {
+        const button = defaultProps.helpContent.buttons[0];
+
+        wrapper.vm.submitFeedback(button);
+
+        expect(wrapper.emittedByOrder()).toEqual([{ name: 'clickFeedbackButton', args: [button] }]);
       });
     });
   });

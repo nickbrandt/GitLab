@@ -3,6 +3,11 @@ import { getJSONFixture } from 'helpers/fixtures';
 import mutations from 'ee/analytics/cycle_analytics/store/mutations';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
+import { DEFAULT_DAYS_IN_PAST } from 'ee/analytics/cycle_analytics/constants';
+import { mockLabels } from '../../../../../spec/javascripts/vue_shared/components/sidebar/labels_select/mock_data';
+
+export const groupLabels = mockLabels.map(({ title, ...rest }) => ({ ...rest, name: title }));
 
 export const group = {
   id: 1,
@@ -44,6 +49,9 @@ const stageFixtures = defaultStages.reduce((acc, stage) => {
   };
 }, {});
 
+export const endDate = new Date(Date.now());
+export const startDate = new Date(getDateInPast(endDate, DEFAULT_DAYS_IN_PAST));
+
 export const issueEvents = stageFixtures.issue;
 export const planEvents = stageFixtures.plan;
 export const reviewEvents = stageFixtures.review;
@@ -51,3 +59,25 @@ export const codeEvents = stageFixtures.code;
 export const testEvents = stageFixtures.test;
 export const stagingEvents = stageFixtures.staging;
 export const productionEvents = stageFixtures.production;
+
+const { events: rawCustomStageEvents } = getJSONFixture('analytics/cycle_analytics/stages.json');
+const camelCasedStageEvents = rawCustomStageEvents.map(deepCamelCase);
+
+export const customStageStartEvents = camelCasedStageEvents.filter(ev => ev.canBeStartEvent);
+export const customStageStopEvents = camelCasedStageEvents.filter(ev => !ev.canBeStartEvent);
+
+// TODO: the shim below should be removed once we have label events seeding
+export const labelStartEvent = { ...customStageStartEvents[0], type: 'label' };
+const firstAllowedStopEvent = labelStartEvent.allowedEndEvents[0];
+// We need to enusre that the stop event can be applied to the start event
+export const labelStopEvent = {
+  ...customStageStopEvents.find(ev => ev.identifier === firstAllowedStopEvent),
+  type: 'label',
+};
+
+export const customStageEvents = [
+  ...customStageStartEvents.filter(ev => ev.identifier !== labelStartEvent.identifier),
+  ...customStageStopEvents.filter(ev => ev.identifier !== labelStopEvent.identifier),
+  labelStartEvent,
+  labelStopEvent,
+];

@@ -22,6 +22,9 @@ module DesignManagement
       uploaded_designs = upload_designs!
       skipped_designs = designs - uploaded_designs
 
+      # Create a Geo event so changes will be replicated to secondary node(s)
+      repository.log_geo_updated_event
+
       success({ designs: uploaded_designs, skipped_designs: skipped_designs })
     rescue ::ActiveRecord::RecordInvalid => e
       error(e.message)
@@ -33,7 +36,10 @@ module DesignManagement
 
     def upload_designs!
       actions = build_actions
-      run_actions(actions) unless actions.empty?
+      return [] if actions.empty?
+
+      version = run_actions(actions)
+      ::DesignManagement::NewVersionWorker.perform_async(version.id)
 
       actions.map(&:design)
     end

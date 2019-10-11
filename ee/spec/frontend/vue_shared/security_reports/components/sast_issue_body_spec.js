@@ -19,8 +19,8 @@ describe('sast issue body', () => {
     tool: 'bundler_audit',
     url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
     urlPath: '/Gemfile.lock',
-    severity: 'Medium',
-    confidence: 'Low',
+    severity: 'medium',
+    confidence: 'low',
   };
 
   const status = STATUS_FAILED;
@@ -36,9 +36,7 @@ describe('sast issue body', () => {
         status,
       });
 
-      expect(vm.$el.textContent.trim()).toContain(
-        `${sastIssue.severity} (${sastIssue.confidence}):`,
-      );
+      expect(vm.$el.textContent.trim()).toContain('Medium (Low):');
     });
   });
 
@@ -51,7 +49,7 @@ describe('sast issue body', () => {
         status,
       });
 
-      expect(vm.$el.textContent.trim()).toContain(`${issueCopy.severity}:`);
+      expect(vm.$el.textContent.trim()).toContain('Medium:');
     });
   });
 
@@ -64,7 +62,7 @@ describe('sast issue body', () => {
         status,
       });
 
-      expect(vm.$el.textContent.trim()).toContain(`(${issueCopy.confidence}):`);
+      expect(vm.$el.textContent.trim()).toContain('(Low):');
     });
   });
 

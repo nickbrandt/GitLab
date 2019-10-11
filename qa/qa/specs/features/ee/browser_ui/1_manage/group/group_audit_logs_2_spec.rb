@@ -20,8 +20,8 @@ module QA
         end
       end
 
-      # Bug issue: https://gitlab.com/gitlab-org/gitlab-ee/issues/14756
-      context 'Disable and Enable LFS', :quarantine do
+      # Bug issue: https://gitlab.com/gitlab-org/gitlab/issues/14756
+      context 'Disable and Enable LFS', :skip do
         before do
           sign_in
           @group.visit!
@@ -63,8 +63,8 @@ module QA
         it_behaves_like 'group audit event logs', ["Change request access enabled from true to false", "Change request access enabled from false to true"]
       end
 
-      # Bug issue: https://gitlab.com/gitlab-org/gitlab-ce/issues/67283
-      context 'Enable and disable 2FA requirement', :quarantine do
+      # Bug issue: https://gitlab.com/gitlab-org/gitlab/issues/31764
+      context 'Enable and disable 2FA requirement', :skip do
         before do
           sign_in
           @group.visit!

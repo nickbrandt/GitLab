@@ -2,6 +2,17 @@
 
 .mb-2= render_billings_gold_trial(current_user, parent_group || namespace)
 
+- if show_trial_banner?(parent_group || namespace)
+  .user-callout
+    .alert.bordered-box.landing.justify-content-start.pl-md-8
+      %button{ type:"button", class:"btn btn-default close", "data-dismiss":"alert", "aria-label": _("Close") }
+        = sprite_icon('close', size: 16)
+      .svg-container
+        = custom_icon('trial_activated_banner')
+      .user-callout-copy
+        %h4
+          = s_("BillingPlans|Congratulations, your new trial is activated")
+
 .billing-plan-header.content-block.center
   .billing-plan-logo
     - if namespace == current_user.namespace

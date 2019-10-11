@@ -42,6 +42,14 @@ describe MergeRequestBlock do
       expect(another_block).to be_valid
     end
 
+    it 'allows blocks to be intra-project' do
+      project = blocking_mr.target_project
+      intra_project_mr = create(:merge_request, :rebased, source_project: project, target_project: project)
+      block.blocked_merge_request = intra_project_mr
+
+      is_expected.to be_valid
+    end
+
     it 'forbids duplicate blocks' do
       new_block = described_class.new(block.attributes)
 
@@ -58,14 +66,6 @@ describe MergeRequestBlock do
       new_block = build(:merge_request_block, blocking_merge_request: block.blocked_merge_request)
 
       expect(new_block).not_to be_valid
-    end
-
-    it 'forbids blocks from being intra-project' do
-      project = blocking_mr.target_project
-      intra_project_mr = create(:merge_request, :rebased, source_project: project, target_project: project)
-      block.blocked_merge_request = intra_project_mr
-
-      is_expected.not_to be_valid
     end
   end
 

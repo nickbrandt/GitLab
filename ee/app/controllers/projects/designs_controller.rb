@@ -8,7 +8,7 @@ class Projects::DesignsController < Projects::ApplicationController
   def show
     blob = design_repository.blob_at(ref, design.full_path)
 
-    send_blob(design_repository, blob, inline: (params[:inline] != 'false'))
+    send_blob(design_repository, blob, { inline: false })
   end
 
   private

@@ -43,17 +43,17 @@ export default {
         (!isEpic && newIndex > currentItemIssuesBeginAtIndex)
       ) {
         // We set `adjacentReferenceId` to the item ID that's _above_ the target items new position.
-        // And since adjacent item is above, we set `relativePosition` to `above`.
+        // And since adjacent item is above, we set `relativePosition` to `Before`.
         adjacentReferenceId = children[newIndex - 1][idPropVal];
-        relativePosition = relativePositions.After;
+        relativePosition = relativePositions.Before;
       } else {
         // We set `adjacentReferenceId` to the item ID that's on top of the list (either Epics or Issues)
-        // And since adjacent item is below, we set `relativePosition` to `below`.
+        // And since adjacent item is below, we set `relativePosition` to `After`.
         adjacentReferenceId =
           children[isEpic ? currentItemEpicsBeginAtIndex : currentItemIssuesBeginAtIndex][
             idPropVal
           ];
-        relativePosition = relativePositions.Before;
+        relativePosition = relativePositions.After;
       }
 
       return {

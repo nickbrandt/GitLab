@@ -1,32 +1,58 @@
 import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
-import { getParameterValues } from '~/lib/utils/url_utility';
+import { getParameterValues, redirectTo } from '~/lib/utils/url_utility';
 import { isScrolledToBottom, scrollDown, toggleDisableButton } from '~/lib/utils/scroll_utils';
+import httpStatusCodes from '~/lib/utils/http_status';
 import LogOutputBehaviours from '~/lib/utils/logoutput_behaviours';
-import createFlash from '~/flash';
-import { __, s__ } from '~/locale';
+import flash from '~/flash';
+import { __, s__, sprintf } from '~/locale';
 import _ from 'underscore';
+import { backOff } from '~/lib/utils/common_utils';
+
+const requestWithBackoff = (url, params) =>
+  backOff((next, stop) => {
+    axios
+      .get(url, {
+        params,
+      })
+      .then(res => {
+        if (!res.data) {
+          next();
+          return;
+        }
+        stop(res);
+      })
+      .catch(err => {
+        stop(err);
+      });
+  });
 
 export default class KubernetesPodLogs extends LogOutputBehaviours {
   constructor(container) {
     super();
     this.options = $(container).data();
+
+    const { currentEnvironmentName, environmentsPath, logsPath, logsPage } = this.options;
+    this.environmentName = currentEnvironmentName;
+    this.environmentsPath = environmentsPath;
+    this.logsPath = logsPath;
+    this.logsPage = logsPage;
+
     [this.podName] = getParameterValues('pod_name');
-    this.podName = _.escape(this.podName);
-    this.$buildOutputContainer = $(container).find('.js-build-output');
-    this.$window = $(window);
-    this.$refreshLogBtn = $(container).find('.js-refresh-log');
-    this.$buildRefreshAnimation = $(container).find('.js-build-refresh');
-    this.isLogComplete = false;
-    this.$podDropdown = $(container).find('.js-pod-dropdown');
-
-    this.scrollThrottled = _.throttle(this.toggleScroll.bind(this), 100);
-
-    if (!this.podName) {
-      createFlash(s__('Environments|No pod name has been specified'));
-      return;
+    if (this.podName) {
+      this.podName = _.escape(this.podName);
     }
 
+    this.$window = $(window);
+    this.$buildOutputContainer = $(container).find('.js-build-output');
+    this.$refreshLogBtn = $(container).find('.js-refresh-log');
+    this.$buildRefreshAnimation = $(container).find('.js-build-refresh');
+    this.$podDropdown = $(container).find('.js-pod-dropdown');
+    this.$envDropdown = $(container).find('.js-environment-dropdown');
+
+    this.isLogComplete = false;
+
+    this.scrollThrottled = _.throttle(this.toggleScroll.bind(this), 100);
     this.$window.off('scroll').on('scroll', () => {
       if (!isScrolledToBottom()) {
         this.toggleScrollAnimation(false);
@@ -36,7 +62,7 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
       this.scrollThrottled();
     });
 
-    this.$refreshLogBtn.off('click').on('click', this.getPodLogs.bind(this));
+    this.$refreshLogBtn.off('click').on('click', this.getData.bind(this));
   }
 
   scrollToBottom() {
@@ -49,58 +75,122 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
     this.toggleScroll();
   }
 
-  getPodLogs() {
+  getData() {
     this.scrollToTop();
     this.$buildOutputContainer.empty();
     this.$buildRefreshAnimation.show();
     toggleDisableButton(this.$refreshLogBtn, 'true');
 
-    return axios
-      .get(this.options.logsPath, {
-        params: { pod_name: this.podName },
-      })
-      .then(res => {
-        const { logs } = res.data;
-        this.populateDropdown(res.data.pods);
-        const formattedLogs = logs.map(logEntry => `${_.escape(logEntry)} <br />`);
-        this.$buildOutputContainer.append(formattedLogs);
-        scrollDown();
-        this.isLogComplete = true;
-        this.$buildRefreshAnimation.hide();
-        toggleDisableButton(this.$refreshLogBtn, false);
-      })
-      .catch(() => createFlash(__('Something went wrong on our end')));
+    return Promise.all([this.getEnvironments(), this.getLogs()]);
   }
 
-  populateDropdown(pods) {
-    // set the selected element from the pod set on the url params
-    const $podDropdownMenu = this.$podDropdown.find('.dropdown-menu');
+  getEnvironments() {
+    return axios
+      .get(this.environmentsPath)
+      .then(res => {
+        const { environments } = res.data;
+        this.setupEnvironmentsDropdown(environments);
+      })
+      .catch(() => flash(s__('Environments|An error occurred while fetching the environments.')));
+  }
 
-    this.$podDropdown
+  getLogs() {
+    return requestWithBackoff(this.logsPath, { pod_name: this.podName })
+      .then(res => {
+        const { logs, pods } = res.data;
+        this.setupPodsDropdown(pods);
+        this.displayLogs(logs);
+      })
+      .catch(err => {
+        const { response } = err;
+        if (response && response.status === httpStatusCodes.BAD_REQUEST) {
+          if (response.data && response.data.message) {
+            flash(
+              sprintf(
+                s__('Environments|An error occurred while fetching the logs - Error: %{message}'),
+                {
+                  message: response.data.message,
+                },
+              ),
+              'notice',
+            );
+          } else {
+            flash(
+              s__(
+                'Environments|An error occurred while fetching the logs for this environment or pod. Please try again',
+              ),
+              'notice',
+            );
+          }
+        } else {
+          flash(__('Environments|An error occurred while fetching the logs'));
+        }
+      })
+      .finally(() => {
+        this.$buildRefreshAnimation.hide();
+      });
+  }
+
+  setupEnvironmentsDropdown(environments) {
+    this.setupDropdown(
+      this.$envDropdown,
+      this.environmentName,
+      environments.map(({ name, id }) => ({ name, value: id })),
+      el => {
+        const envId = el.currentTarget.value;
+        const envRegexp = /environments\/[0-9]+/gi;
+        const url = this.logsPage.replace(envRegexp, `environments/${envId}`);
+        redirectTo(url);
+      },
+    );
+  }
+
+  setupPodsDropdown(pods) {
+    // Show first pod, it is selected by default
+    this.podName = this.podName || pods[0];
+    this.setupDropdown(
+      this.$podDropdown,
+      this.podName,
+      pods.map(podName => ({ name: podName, value: podName })),
+      el => {
+        const selectedPodName = el.currentTarget.value;
+        if (selectedPodName !== this.podName) {
+          this.podName = selectedPodName;
+          this.getData();
+        }
+      },
+    );
+  }
+
+  displayLogs(logs) {
+    const formattedLogs = logs.map(logEntry => `${_.escape(logEntry)} <br />`);
+
+    this.$buildOutputContainer.append(formattedLogs);
+    scrollDown();
+    this.isLogComplete = true;
+    toggleDisableButton(this.$refreshLogBtn, false);
+  }
+
+  setupDropdown($dropdown, activeOption = '', options, onSelect) {
+    const $dropdownMenu = $dropdown.find('.dropdown-menu');
+
+    $dropdown
       .find('.dropdown-menu-toggle')
       .html(
-        `<span class="dropdown-toggle-text text-truncate">${this.podName}</span><i class="fa fa-chevron-down"></i>`,
+        `<span class="dropdown-toggle-text text-truncate">${activeOption}</span><i class="fa fa-chevron-down"></i>`,
       );
-    $podDropdownMenu.off('click');
-    $podDropdownMenu.empty();
 
-    pods.forEach(pod => {
-      $podDropdownMenu.append(`
-        <button class='dropdown-item'>
-          ${_.escape(pod)}
+    $dropdownMenu.off('click');
+    $dropdownMenu.empty();
+
+    options.forEach(option => {
+      $dropdownMenu.append(`
+        <button class='dropdown-item' value='${option.value}'>
+          ${_.escape(option.name)}
         </button>
       `);
     });
 
-    $podDropdownMenu.find('button').on('click', this.changePodLog.bind(this));
-  }
-
-  changePodLog(el) {
-    const selectedPodName = el.currentTarget.textContent.trim();
-
-    if (selectedPodName !== this.podName) {
-      this.podName = selectedPodName;
-      this.getPodLogs();
-    }
+    $dropdownMenu.find('button').on('click', onSelect.bind(this));
   }
 }

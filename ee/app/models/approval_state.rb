@@ -120,18 +120,21 @@ class ApprovalState
     rules.concat(code_owner_rules) if code_owner
     rules.concat(report_approver_rules) if report_approver
 
-    users = rules.flat_map(&target)
-    users.uniq!
-
-    users -= approved_approvers if unactioned
-
-    users = self.class.filter_author(users, merge_request)
-    self.class.filter_committers(users, merge_request)
+    filter_approvers(rules.flat_map(&target), unactioned: unactioned)
   end
 
-  # approvers_left
   def unactioned_approvers
     strong_memoize(:unactioned_approvers) { approvers - approved_approvers }
+  end
+
+  # TODO order by relevance
+  def suggested_approvers(current_user:)
+    # Ignore approvers from rules containing hidden groups
+    rules = wrapped_approval_rules.reject do |rule|
+      ApprovalRules::GroupFinder.new(rule, current_user).contains_hidden_groups?
+    end
+
+    filter_approvers(rules.flat_map(&:approvers), unactioned: true)
   end
 
   def can_approve?(user)
@@ -174,6 +177,14 @@ class ApprovalState
   end
 
   private
+
+  def filter_approvers(approvers, unactioned:)
+    approvers = approvers.uniq
+    approvers -= approved_approvers if unactioned
+    approvers = self.class.filter_author(approvers, merge_request)
+
+    self.class.filter_committers(approvers, merge_request)
+  end
 
   def has_regular_rule_with_approvers?
     regular_rules.any? { |rule| rule.approvers.present? }

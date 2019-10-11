@@ -3,30 +3,26 @@
 FactoryBot.define do
   factory :container_repository_registry, class: Geo::ContainerRepositoryRegistry do
     container_repository
-    last_sync_failure nil
-    last_synced_at nil
-    state :pending
-
-    trait :started do
-      state :started
-    end
+    last_sync_failure { nil }
+    last_synced_at { nil }
+    state { :pending }
 
     trait :synced do
-      state :synced
+      state { :synced }
       last_synced_at { 5.days.ago }
     end
 
     trait :sync_failed do
-      state :failed
+      state { :failed }
       last_synced_at { 1.day.ago }
-      retry_count 2
-      last_sync_failure 'Random error'
+      retry_count { 2 }
+      last_sync_failure { 'Random error' }
     end
 
     trait :sync_started do
-      state :started
+      state { :started }
       last_synced_at { 1.day.ago }
-      retry_count 0
+      retry_count { 0 }
     end
   end
 end

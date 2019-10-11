@@ -1,15 +1,15 @@
-import { DEFAULT_DATA_TIME_FRAME } from '../constants';
-
 export default () => ({
   endpoints: {
-    cycleAnalyticsData: '',
-    stageData: '',
+    cycleAnalyticsData: null,
+    stageData: null,
   },
 
-  dataTimeframe: DEFAULT_DATA_TIME_FRAME,
+  startDate: null,
+  endDate: null,
 
   isLoading: false,
   isLoadingStage: false,
+  isLoadingStageForm: false,
 
   isEmptyStage: false,
   errorCode: null,
@@ -20,7 +20,11 @@ export default () => ({
   selectedProjectIds: [],
   selectedStageName: null,
 
-  events: [],
+  currentStageEvents: [],
+
   stages: [],
   summary: [],
+  labels: [],
+
+  customStageFormEvents: [],
 });

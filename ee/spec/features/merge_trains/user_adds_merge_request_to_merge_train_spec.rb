@@ -61,6 +61,25 @@ describe 'User adds a merge request to a merge train', :js do
       end
     end
 
+    context 'when pipeline for merge train succeeds' do
+      before do
+        visit project_merge_request_path(project, merge_request)
+        merge_request.merge_train.pipeline.builds.map(&:success!)
+      end
+
+      it 'displays pipeline control' do
+        expect(page).to have_selector('.mini-pipeline-graph-dropdown-toggle')
+      end
+
+      it 'does not allow retry for merge train pipeline' do
+        find('.mini-pipeline-graph-dropdown-toggle').click
+        page.within '.ci-job-component' do
+          expect(page).to have_selector('.ci-status-icon')
+          expect(page).not_to have_selector('.retry')
+        end
+      end
+    end
+
     context "when user clicks 'Remove from merge train' button" do
       before do
         click_link 'Remove from merge train'

@@ -1,5 +1,0 @@
----
-title: 'Enable "only/except: external_pull_request" with GitHub integration when a pull request is open for the given ref'
-merge_request: 15082
-author:
-type: added

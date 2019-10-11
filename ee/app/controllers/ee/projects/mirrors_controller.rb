@@ -67,6 +67,7 @@ module EE
           :mirror_trigger_builds,
           :only_mirror_protected_branches,
           :mirror_overwrites_diverged_branches,
+          :pull_mirror_branch_prefix,
 
           import_data_attributes: %i[
             id

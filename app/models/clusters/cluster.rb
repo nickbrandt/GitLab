@@ -39,7 +39,7 @@ module Clusters
 
     def self.has_one_cluster_application(name) # rubocop:disable Naming/PredicateName
       application = APPLICATIONS[name.to_s]
-      has_one application.association_name, class_name: application.to_s # rubocop:disable Rails/ReflectionClassName
+      has_one application.association_name, class_name: application.to_s, inverse_of: :cluster # rubocop:disable Rails/ReflectionClassName
     end
 
     has_one_cluster_application :helm
@@ -101,7 +101,7 @@ module Clusters
     scope :disabled, -> { where(enabled: false) }
     scope :user_provided, -> { where(provider_type: ::Clusters::Cluster.provider_types[:user]) }
     scope :gcp_provided, -> { where(provider_type: ::Clusters::Cluster.provider_types[:gcp]) }
-    scope :gcp_installed, -> { gcp_provided.includes(:provider_gcp).where(cluster_providers_gcp: { status: ::Clusters::Providers::Gcp.state_machines[:status].states[:created].value }) }
+    scope :gcp_installed, -> { gcp_provided.joins(:provider_gcp).merge(Clusters::Providers::Gcp.with_status(:created)) }
     scope :managed, -> { where(managed: true) }
 
     scope :default_environment, -> { where(environment_scope: DEFAULT_ENVIRONMENT) }
@@ -172,7 +172,7 @@ module Clusters
       persisted_namespace = Clusters::KubernetesNamespaceFinder.new(
         self,
         project: project,
-        environment_slug: environment.slug
+        environment_name: environment.name
       ).execute
 
       persisted_namespace&.namespace || Gitlab::Kubernetes::DefaultNamespace.new(self, project: project).from_environment_slug(environment.slug)
@@ -192,6 +192,10 @@ module Clusters
 
         variables.append(key: KUBE_INGRESS_BASE_DOMAIN, value: kube_ingress_domain)
       end
+    end
+
+    def knative_pre_installed?
+      provider&.knative_pre_installed?
     end
 
     private

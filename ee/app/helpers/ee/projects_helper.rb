@@ -44,6 +44,10 @@ module EE
         nav_tabs << :dependencies
       end
 
+      if can?(current_user, :read_licenses_list, project)
+        nav_tabs << :licenses
+      end
+
       if ::Gitlab.config.packages.enabled &&
           project.feature_available?(:packages) &&
           can?(current_user, :read_package, project)
@@ -79,7 +83,7 @@ module EE
     def project_permissions_panel_data(project)
       super.merge(
         packagesAvailable: ::Gitlab.config.packages.enabled && project.feature_available?(:packages),
-        packagesHelpPath: help_page_path('user/packages/maven_repository/index')
+        packagesHelpPath: help_page_path('user/packages/index')
       )
     end
 
@@ -138,6 +142,7 @@ module EE
       %w[
         projects/security/dashboard#show
         projects/dependencies#show
+        projects/licenses#show
       ]
     end
 
@@ -176,8 +181,8 @@ module EE
       else
         {
           project: { id: project.id, name: project.name },
-          vulnerabilities_endpoint: project_security_vulnerabilities_path(project),
-          vulnerabilities_summary_endpoint: summary_project_security_vulnerabilities_path(project),
+          vulnerabilities_endpoint: project_vulnerabilities_endpoint_path(project),
+          vulnerabilities_summary_endpoint: project_vulnerabilities_summary_endpoint_path(project),
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
           empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
@@ -194,6 +199,22 @@ module EE
           pipeline_created: pipeline.created_at.to_s(:iso8601),
           has_pipeline_data: "true"
         }
+      end
+    end
+
+    def project_vulnerabilities_endpoint_path(project)
+      if ::Feature.enabled?(:first_class_vulnerabilities)
+        project_security_vulnerability_findings_path(project)
+      else
+        project_security_vulnerabilities_path(project)
+      end
+    end
+
+    def project_vulnerabilities_summary_endpoint_path(project)
+      if ::Feature.enabled?(:first_class_vulnerabilities)
+        summary_project_security_vulnerability_findings_path(project)
+      else
+        summary_project_security_vulnerabilities_path(project)
       end
     end
 
@@ -220,6 +241,10 @@ module EE
       end
     end
 
+    def any_project_nav_tab?(tabs)
+      tabs.any? { |tab| project_nav_tab?(tab) }
+    end
+
     def settings_operations_available?
       return true if super
 
@@ -234,6 +259,18 @@ module EE
     override :can_import_members?
     def can_import_members?
       super && !membership_locked?
+    end
+
+    def api_projects_vulnerability_findings_path(project, pipeline)
+      params = { id: project.id, params: { pipeline_id: pipeline.id, scope: 'dismissed' } }
+
+      path = if ::Feature.enabled?(:first_class_vulnerabilities)
+               api_v4_projects_vulnerability_findings_path(params)
+             else
+               api_v4_projects_vulnerabilities_path(params)
+             end
+
+      expose_path(path)
     end
   end
 end
