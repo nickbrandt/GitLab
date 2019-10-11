@@ -9,7 +9,38 @@ module Clusters
     end
 
     def execute(cluster)
-      cluster.update(params)
+      if validate_params(cluster)
+        cluster.update(params)
+      else
+        false
+      end
+    end
+
+    private
+
+    def can_admin_pipeline_for_project?(project)
+      Ability.allowed?(current_user, :admin_pipeline, project)
+    end
+
+    def validate_params(cluster)
+      if params[:management_project_id]
+        management_project = ::Project.find_by_id(params[:management_project_id])
+
+        unless management_project
+          cluster.errors.add(:management_project_id, _('Project does not exist or you don\'t have permission to perform this action'))
+
+          return false
+        end
+
+        unless can_admin_pipeline_for_project?(management_project)
+          # Use same message as not found to prevent enumeration
+          cluster.errors.add(:management_project_id, _('Project does not exist or you don\'t have permission to perform this action'))
+
+          return false
+        end
+      end
+
+      true
     end
   end
 end

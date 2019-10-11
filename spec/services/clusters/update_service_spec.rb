@@ -90,5 +90,55 @@ describe Clusters::UpdateService do
         end
       end
     end
+
+    context 'when params includes :management_project_id' do
+      let(:management_project) { create(:project) }
+
+      context 'management_project is non-existent' do
+        let(:params) do
+          { management_project_id: 0 }
+        end
+
+        it 'does not update management_project_id' do
+          is_expected.to eq(false)
+
+          expect(cluster.errors[:management_project_id]).to include('Project does not exist or you don\'t have permission to perform this action')
+
+          cluster.reload
+          expect(cluster.management_project_id).to be_nil
+        end
+      end
+
+      context 'user is authorized to adminster manangement_project' do
+        before do
+          management_project.add_maintainer(cluster.user)
+        end
+
+        let(:params) do
+          { management_project_id: management_project.id }
+        end
+
+        it 'updates management_project_id' do
+          is_expected.to eq(true)
+
+          expect(cluster.management_project).to eq(management_project)
+        end
+      end
+
+      context 'user is not authorized to adminster manangement_project' do
+        let(:params) do
+          { management_project_id: management_project.id }
+        end
+
+        it 'does not update management_project_id' do
+          is_expected.to eq(false)
+
+          expect(cluster.errors[:management_project_id]).to include('Project does not exist or you don\'t have permission to perform this action')
+
+          cluster.reload
+          expect(cluster.management_project_id).to be_nil
+        end
+      end
+    end
   end
 end
