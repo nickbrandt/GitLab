@@ -66,7 +66,7 @@ You can embed externally hosted Grafana metrics into GitLab issues by following 
 
 #### Metrics in issue templates
 
-Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
+GitLab hosted metrics can be embedded in the issue templates by following [these instructions](../project/integrations/prometheus.md#embedding-metrics-in-issue-templates).
 
 ### Slack integration
 

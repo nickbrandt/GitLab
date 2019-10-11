@@ -414,6 +414,12 @@ The following requirements must be met for the metric to unfurl:
 
 ![Embedded Metrics](img/embed_metrics.png)
 
+### Embedding metrics in issue templates
+
+It is also possible to embed either a dashboard or individual metrics in issue templates. The entire dashboard can be embedded as well as individual metrics, separated by either a comma or a space.
+
+![Embedded Metrics in issue templates](img/embed_metrics_issue_template.png)
+
 ### Embedding live Grafana charts
 
 It is also possible to embed live [Grafana](https://docs.gitlab.com/omnibus/settings/grafana.html) charts within issues, as a [Direct Linked Rendered Image](https://grafana.com/docs/reference/sharing/#direct-link-rendered-image).
