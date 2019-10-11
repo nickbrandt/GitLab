@@ -45,6 +45,8 @@ describe 'User creates snippet', :js do
       link = find('a.no-attachment-icon img[alt="banana_sample"]')['src']
       expect(link).to match(%r{/uploads/-/system/user/#{user.id}/\h{32}/banana_sample\.gif\z})
 
+      # Adds a cache buster for checking if the image exists as Selenium is now handling the cached regquests
+      # not anymore as requests when they come straight from memory cache.
       reqs = inspect_requests { visit("#{link}?ran=#{SecureRandom.base64(20)}") }
       expect(reqs.first.status_code).to eq(200)
     end
