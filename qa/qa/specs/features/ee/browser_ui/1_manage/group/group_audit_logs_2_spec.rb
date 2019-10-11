@@ -21,7 +21,7 @@ module QA
       end
 
       # Bug issue: https://gitlab.com/gitlab-org/gitlab/issues/14756
-      context 'Disable and Enable LFS', :quarantine do
+      context 'Disable and Enable LFS', :skip do
         before do
           sign_in
           @group.visit!
@@ -64,7 +64,7 @@ module QA
       end
 
       # Bug issue: https://gitlab.com/gitlab-org/gitlab/issues/31764
-      context 'Enable and disable 2FA requirement', :quarantine do
+      context 'Enable and disable 2FA requirement', :skip do
         before do
           sign_in
           @group.visit!
