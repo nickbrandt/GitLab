@@ -15,6 +15,7 @@ export default () => {
       canManageLicenses,
       apiUrl,
       licenseManagementSettingsPath,
+      licensesApiPath,
     } = licensesTab.dataset;
 
     // eslint-disable-next-line no-new
@@ -27,6 +28,7 @@ export default () => {
         return createElement('license-report-app', {
           props: {
             apiUrl,
+            licensesApiPath,
             licenseManagementSettingsPath,
             headPath: licenseHeadPath,
             canManageLicenses: parseBoolean(canManageLicenses),

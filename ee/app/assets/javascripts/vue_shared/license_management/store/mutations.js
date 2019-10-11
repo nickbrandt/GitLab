@@ -38,6 +38,26 @@ export default {
     });
   },
 
+  [types.RECEIVE_LOAD_PARSED_LICENSE_REPORT](state, { newLicenses, existingLicenses }) {
+    Object.assign(state, {
+      newLicenses,
+      existingLicenses,
+      isLoadingLicenseReport: false,
+      loadLicenseReportError: false,
+    });
+  },
+  [types.RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR](state, error) {
+    Object.assign(state, {
+      isLoadingLicenseReport: false,
+      loadLicenseReportError: error,
+    });
+  },
+  [types.REQUEST_LOAD_PARSED_LICENSE_REPORT](state) {
+    Object.assign(state, {
+      isLoadingLicenseReport: true,
+    });
+  },
+
   [types.RECEIVE_LOAD_LICENSE_REPORT](state, reports) {
     const { headReport, baseReport } = reports;
 
