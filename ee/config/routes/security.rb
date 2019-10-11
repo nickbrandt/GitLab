@@ -1,3 +1,7 @@
 # frozen_string_literal: true
 
-get 'security' => 'security#index'
+namespace :security do
+  root to: 'dashboard#show'
+
+  resources :projects, only: [:index, :create, :destroy]
+end
