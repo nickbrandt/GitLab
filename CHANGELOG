@@ -2,9 +2,9 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
-Next
+v 8.14.0
 
-- Keep HTTP 1.0 cache headers from sendurl proxies
+- Keep HTTP 1.0 cache headers from sendurl proxies !431
 
 v 8.13.0
 
