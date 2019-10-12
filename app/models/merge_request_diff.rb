@@ -136,6 +136,7 @@ class MergeRequestDiff < ApplicationRecord
   # All diff information is collected from repository after object is created.
   # It allows you to override variables like head_commit_sha before getting diff.
   after_create :save_git_content, unless: :importing?
+  after_create_commit :set_as_latest_diff, unless: :importing?
 
   after_save :update_external_diff_store, if: -> { !importing? && saved_change_to_external_diff? }
 
@@ -150,10 +151,6 @@ class MergeRequestDiff < ApplicationRecord
   # Collect information about commits and diff from repository
   # and save it to the database as serialized data
   def save_git_content
-    MergeRequest
-      .where('id = ? AND COALESCE(latest_merge_request_diff_id, 0) < ?', self.merge_request_id, self.id)
-      .update_all(latest_merge_request_diff_id: self.id)
-
     ensure_commit_shas
     save_commits
     save_diffs
@@ -166,6 +163,12 @@ class MergeRequestDiff < ApplicationRecord
     reset
 
     keep_around_commits
+  end
+
+  def set_as_latest_diff
+    MergeRequest
+      .where('id = ? AND COALESCE(latest_merge_request_diff_id, 0) < ?', self.merge_request_id, self.id)
+      .update_all(latest_merge_request_diff_id: self.id)
   end
 
   def ensure_commit_shas
