@@ -505,11 +505,6 @@ class MergeRequestDiff < ApplicationRecord
     merge_request.closed? && merge_request.metrics.latest_closed_at < EXTERNAL_DIFF_CUTOFF.ago
   end
 
-  # We can't rely on `merge_request.latest_merge_request_diff_id` because that
-  # may have been changed in `save_git_content` without being reflected in
-  # the association's instance. This query is always subject to races, but
-  # the worst case is that we *don't* make a diff external when we could. The
-  # background worker will make it external at a later date.
   def old_version?
     latest_id = MergeRequest
       .where(id: merge_request_id)
@@ -517,7 +512,7 @@ class MergeRequestDiff < ApplicationRecord
       .pluck(:latest_merge_request_diff_id)
       .first
 
-    self.id != latest_id
+    latest_id && self.id < latest_id
   end
 
   def load_diffs(options)
