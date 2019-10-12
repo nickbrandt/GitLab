@@ -25,10 +25,6 @@ module EE
                 validates :pipeline, type: String, presence: true
               end
 
-              def self.matching?(config)
-                config.is_a?(Hash)
-              end
-
               def type
                 :bridge
               end

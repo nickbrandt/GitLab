@@ -5,6 +5,10 @@ require 'spec_helper'
 describe ::Gitlab::Ci::Config::Entry::Needs do
   subject(:needs) { described_class.new(config) }
 
+  before do
+    needs.metadata[:allowed_needs] = %i[job]
+  end
+
   describe 'validations' do
     before do
       needs.compose!
@@ -42,8 +46,8 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
 
       describe '#errors' do
         it 'returns error about incorrect type' do
-          expect(needs.errors)
-            .to contain_exactly('needs need has an unsupported type')
+          expect(needs.errors).to contain_exactly(
+            'need has an unsupported type')
         end
       end
     end
@@ -59,7 +63,12 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
 
       describe '#value' do
         it 'returns key value' do
-          expect(needs.value).to eq(pipeline: [{ name: 'first_job_name' }, { name: 'second_job_name' }])
+          expect(needs.value).to eq(
+            job: [
+              { name: 'first_job_name' },
+              { name: 'second_job_name' }
+            ]
+          )
         end
       end
 

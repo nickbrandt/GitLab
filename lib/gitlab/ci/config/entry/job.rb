@@ -58,14 +58,6 @@ module Gitlab
             validates :start_in, absence: true, if: -> { has_rules? || !delayed? }
 
             validate do
-              next unless needs.present?
-
-              if [needs].flatten.any? { |need| !Entry::Need::Pipeline.matching?(need) }
-                errors.add(:needs, 'can only have pipeline type needs')
-              end
-            end
-
-            validate do
               next unless dependencies.present?
               next unless needs.present?
 
@@ -122,7 +114,8 @@ module Gitlab
             inherit: false
 
           entry :needs, Entry::Needs,
-            description: 'Needs configuration for this job.'
+            description: 'Needs configuration for this job.',
+            metadata: { allowed_needs: %i[job] }
 
           entry :variables, Entry::Variables,
             description: 'Environment variables available for this job.',

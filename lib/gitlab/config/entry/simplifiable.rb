@@ -8,7 +8,7 @@ module Gitlab
 
         attr_reader :subject
 
-        def initialize(config, **metadata)
+        def initialize(config, **metadata, &blk)
           unless self.class.const_defined?(:UnknownStrategy)
             raise ArgumentError, 'UndefinedStrategy not available!'
           end
@@ -19,9 +19,8 @@ module Gitlab
 
           entry = self.class.entry_class(strategy)
 
-          @subject = entry.new(config, metadata)
+          @subject = entry.new(config, metadata, &blk)
 
-          yield(@subject) if block_given?
           super(@subject)
         end
 

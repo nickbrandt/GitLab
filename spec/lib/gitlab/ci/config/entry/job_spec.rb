@@ -413,21 +413,6 @@ describe Gitlab::Ci::Config::Entry::Job do
             expect(entry.errors).to include 'job config missing required keys: stage'
           end
         end
-
-        context 'when needs is bridge type' do
-          let(:config) do
-            {
-              script: 'echo',
-              stage: 'test',
-              needs: { pipeline: 'some/project' }
-            }
-          end
-
-          it 'returns error about invalid needs type' do
-            expect(entry).not_to be_valid
-            expect(entry.errors).to contain_exactly('job needs can only have pipeline type needs')
-          end
-        end
       end
 
       context 'when timeout value is not correct' do

@@ -23,33 +23,25 @@ module EE
               validates :name, presence: true
               validates :name, type: Symbol
 
-              validate do
-                unless trigger.present? || needs.present?
-                  errors.add(:config, 'should contain either a trigger or a needs:pipeline')
-                end
-              end
-
-              validate do
-                next unless needs.present?
-
-                if [needs].flatten.any? { |need| !(Entry::Need::Bridge.matching?(need) || ::Gitlab::Ci::Config::Entry::Need::Pipeline.matching?(need)) }
-                  errors.add(:needs, 'can only have bridge or pipeline type needs')
-                end
-              end
-
-              validate do
-                next unless needs.present?
-
-                if [needs].flatten.count { |need| Entry::Need::Bridge.matching?(need) } > 1
-                  errors.add(:needs, 'can only have one bridge type needs')
-                end
-              end
-
               with_options allow_nil: true do
                 validates :when,
                   inclusion: { in: %w[on_success on_failure always],
                                message: 'should be on_success, on_failure or always' }
                 validates :extends, type: String
+              end
+
+              validate on: :composed do
+                unless trigger.present? || bridge_needs.present?
+                  errors.add(:config, 'should contain either a trigger or a needs:pipeline')
+                end
+              end
+
+              validate on: :composed do
+                next unless bridge_needs.present?
+
+                unless bridge_needs.one?
+                  errors.add(:config, 'should contain exactly one bridge need')
+                end
               end
             end
 
@@ -59,7 +51,8 @@ module EE
 
             entry :needs, ::Gitlab::Ci::Config::Entry::Needs,
               description: 'CI/CD Bridge needs dependency definition.',
-              inherit: false
+              inherit: false,
+              metadata: { allowed_needs: %i[bridge job] }
 
             entry :stage, ::Gitlab::Ci::Config::Entry::Stage,
               description: 'Pipeline stage this job will be executed into.',
@@ -113,6 +106,10 @@ module EE
 
             def overwrite_entry(deps, key, current_entry)
               deps.default[key] unless current_entry.specified?
+            end
+
+            def bridge_needs
+              needs_value[:bridge] if needs_value
             end
           end
         end

@@ -15,30 +15,15 @@ module Gitlab
 
             validate do
               unless config.is_a?(Hash) || config.is_a?(Array)
-                errors.add(:config, 'can only be a hash or an array')
+                errors.add(:config, 'can only be a Hash or an Array')
               end
             end
 
-            validate do
-              [config].flatten.each do |need|
-                if Needs.find_type(need).nil?
-                  errors.add(:need, 'has an unsupported type')
-                end
+            validate on: :composed do
+              extra_keys = value.keys - opt(:allowed_needs)
+              if extra_keys.any?
+                errors.add(:config, "uses #{extra_keys.join(', ')} type(s)")
               end
-            end
-          end
-
-          TYPES = [Entry::Need::Pipeline].freeze
-
-          private_constant :TYPES
-
-          def self.all_types
-            TYPES
-          end
-
-          def self.find_type(config)
-            self.all_types.find do |type|
-              type.matching?(config)
             end
           end
 
@@ -58,7 +43,8 @@ module Gitlab
           end
 
           def value
-            @entries.values.group_by(&:type).transform_values do |values|
+            values = @entries.values.select(&:type)
+            values.group_by(&:type).transform_values do |values|
               values.map(&:value)
             end
           end
@@ -67,5 +53,3 @@ module Gitlab
     end
   end
 end
-
-::Gitlab::Ci::Config::Entry::Needs.prepend_if_ee('::EE::Gitlab::Ci::Config::Entry::Needs')

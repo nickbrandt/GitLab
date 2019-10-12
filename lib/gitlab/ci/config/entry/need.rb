@@ -5,9 +5,9 @@ module Gitlab
     class Config
       module Entry
         class Need < ::Gitlab::Config::Entry::Simplifiable
-          strategy :Pipeline, if: -> (config) { config.is_a?(String) }
+          strategy :Job, if: -> (config) { config.is_a?(String) }
 
-          class Pipeline < ::Gitlab::Config::Entry::Node
+          class Job < ::Gitlab::Config::Entry::Node
             include ::Gitlab::Config::Entry::Validatable
 
             validations do
@@ -15,12 +15,8 @@ module Gitlab
               validates :config, type: String
             end
 
-            def self.matching?(config)
-              config.is_a?(String)
-            end
-
             def type
-              :pipeline
+              :job
             end
 
             def value
@@ -29,6 +25,15 @@ module Gitlab
           end
 
           class UnknownStrategy < ::Gitlab::Config::Entry::Node
+            def type
+            end
+
+            def value
+            end
+
+            def errors
+              ["#{location} has an unsupported type"]
+            end
           end
         end
       end

@@ -40,7 +40,7 @@ module Gitlab
           environment: job[:environment_name],
           coverage_regex: job[:coverage],
           yaml_variables: yaml_variables(name),
-          needs_attributes: job.dig(:needs, :pipeline),
+          needs_attributes: job.dig(:needs, :job),
           interruptible: job[:interruptible],
           rules: job[:rules],
           options: {
@@ -159,11 +159,11 @@ module Gitlab
       end
 
       def validate_job_needs!(name, job)
-        return unless job.dig(:needs, :pipeline)
+        return unless job.dig(:needs, :job)
 
         stage_index = @stages.index(job[:stage])
 
-        job.dig(:needs, :pipeline).each do |need|
+        job.dig(:needs, :job).each do |need|
           need_job_name = need[:name]
 
           raise ValidationError, "#{name} job: undefined need: #{need_job_name}" unless @jobs[need_job_name.to_sym]

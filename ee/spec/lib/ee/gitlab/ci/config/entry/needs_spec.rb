@@ -5,6 +5,10 @@ require 'spec_helper'
 describe ::Gitlab::Ci::Config::Entry::Needs do
   subject(:needs) { described_class.new(config) }
 
+  before do
+    needs.metadata[:allowed_needs] = %i[job bridge]
+  end
+
   describe 'validations' do
     before do
       needs.compose!
@@ -27,8 +31,8 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
 
       describe '#errors' do
         it 'returns error about incorrect type' do
-          expect(needs.errors)
-            .to contain_exactly('needs need has an unsupported type')
+          expect(needs.errors).to contain_exactly(
+            'need has an unsupported type')
         end
       end
     end
@@ -50,9 +54,16 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
         needs.compose!
       end
 
+      it 'is valid' do
+        expect(needs).to be_valid
+      end
+
       describe '#value' do
         it 'returns key value' do
-          expect(needs.value).to eq(pipeline: [{ name: 'first_job_name' }], bridge: [{ pipeline: 'some/project' }])
+          expect(needs.value).to eq(
+            job: [{ name: 'first_job_name' }],
+            bridge: [{ pipeline: 'some/project' }]
+          )
         end
       end
 

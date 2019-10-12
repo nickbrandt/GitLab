@@ -160,7 +160,19 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
     end
 
-    context 'when bridge has bridge and pipeline needs' do
+    context 'when bridge has only job needs' do
+      let(:config) do
+        {
+          needs: ['some_job']
+        }
+      end
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+    end
+
+    context 'when bridge has bridge and job needs' do
       let(:config) do
         {
           trigger: 'other-project',
@@ -187,7 +199,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#errors' do
         it 'returns an error about too many bridge needs' do
-          expect(subject.errors).to contain_exactly('bridge needs can only have one bridge type needs')
+          expect(subject.errors).to contain_exactly('bridge config should contain exactly one bridge need')
         end
       end
     end

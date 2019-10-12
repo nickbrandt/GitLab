@@ -29,7 +29,7 @@ describe ::Gitlab::Ci::Config::Entry::Need do
     describe '#errors' do
       it 'is returns an error about an empty config' do
         expect(need.errors)
-          .to contain_exactly("pipeline config can't be blank")
+          .to contain_exactly("job config can't be blank")
       end
     end
   end
