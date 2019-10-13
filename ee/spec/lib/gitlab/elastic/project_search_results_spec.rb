@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Elastic::ProjectSearchResults, :elastic do
   let(:user) { create(:user) }
-  let(:project) { create(:project, :repository) }
+  let(:project) { create(:project, :public, :repository) }
   let(:query) { 'hello world' }
 
   before do
@@ -31,8 +33,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
       project = create :project, :public, :repository, :wiki_repo
       project1 = create :project, :public, :repository, :wiki_repo
 
-      project.repository.index_blobs
-      project.repository.index_commits
+      project.repository.index_commits_and_blobs
 
       # Notes
       create :note, note: 'bla-bla term', project: project

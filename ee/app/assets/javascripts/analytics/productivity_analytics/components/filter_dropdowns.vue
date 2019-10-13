@@ -2,7 +2,7 @@
 import { mapState, mapActions } from 'vuex';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
-import { accessLevelReporter } from '../constants';
+import { accessLevelReporter, projectsPerPage } from '../constants';
 
 export default {
   components: {
@@ -14,6 +14,11 @@ export default {
       groupId: null,
       groupsQueryParams: {
         min_access_level: accessLevelReporter,
+      },
+      projectsQueryParams: {
+        per_page: projectsPerPage,
+        with_shared: false, // exclude forks
+        order_by: 'last_activity_at',
       },
     };
   },
@@ -28,12 +33,24 @@ export default {
     onGroupSelected({ id, full_path }) {
       this.groupId = id;
       this.setGroupNamespace(full_path);
-      this.$emit('groupSelected', full_path);
+      this.$emit('groupSelected', { groupId: id, groupNamespace: full_path });
     },
-    onProjectsSelected([selectedProject]) {
-      const { path } = selectedProject;
-      this.setProjectPath(path);
-      this.$emit('projectSelected', { namespacePath: this.groupNamespace, project: path });
+    onProjectsSelected(selectedProjects) {
+      let projectNamespace = null;
+      let projectId = null;
+
+      if (selectedProjects.length) {
+        projectNamespace = selectedProjects[0].path_with_namespace;
+        projectId = selectedProjects[0].id;
+      }
+
+      this.setProjectPath(projectNamespace);
+      this.$emit('projectSelected', {
+        groupNamespace: this.groupNamespace,
+        groupId: this.groupId,
+        projectNamespace,
+        projectId,
+      });
     },
   },
 };
@@ -50,6 +67,7 @@ export default {
       v-if="showProjectsDropdownFilter"
       :key="groupId"
       class="project-select"
+      :query-params="projectsQueryParams"
       :group-id="groupId"
       @selected="onProjectsSelected"
     />

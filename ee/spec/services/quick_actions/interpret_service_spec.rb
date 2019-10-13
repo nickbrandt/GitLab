@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe QuickActions::InterpretService do
@@ -217,24 +219,55 @@ describe QuickActions::InterpretService do
           stub_licensed_features(epics: true)
         end
 
-        it 'assigns an issue to an epic' do
-          _, updates = service.execute(content, issue)
+        context 'when epic exists' do
+          it 'assigns an issue to an epic' do
+            _, updates, message = service.execute(content, issue)
 
-          expect(updates).to eq(epic: epic)
+            expect(updates).to eq(epic: epic)
+            expect(message).to eq('Added an issue to an epic.')
+          end
+
+          context 'when an issue belongs to a project without group' do
+            let(:user_project) { create(:project) }
+            let(:issue)        { create(:issue, project: user_project) }
+
+            before do
+              user_project.add_developer(user)
+            end
+
+            it 'does not assign an issue to an epic' do
+              _, updates = service.execute(content, issue)
+
+              expect(updates).to be_empty
+            end
+          end
         end
 
-        context 'when an issue belongs to a project without group' do
-          let(:user_project) { create(:project) }
-          let(:issue)        { create(:issue, project: user_project) }
+        context 'when epic does not exist' do
+          let(:content) { "/epic none" }
+
+          it 'does not assign an issue to an epic' do
+            _, updates, message = service.execute(content, issue)
+
+            expect(updates).to be_empty
+            expect(message).to eq("This epic does not exist or you don't have sufficient permission.")
+          end
+        end
+
+        context 'when user has no permissions to read epic' do
+          let(:content) { "/epic #{epic.to_reference(project)}" }
 
           before do
-            user_project.add_developer(user)
+            allow(current_user).to receive(:can?).with(:use_quick_actions).and_return(true)
+            allow(current_user).to receive(:can?).with(:admin_issue, issue).and_return(true)
+            allow(current_user).to receive(:can?).with(:read_epic, epic).and_return(false)
           end
 
           it 'does not assign an issue to an epic' do
-            _, updates = service.execute(content, issue)
+            _, updates, message = service.execute(content, issue)
 
             expect(updates).to be_empty
+            expect(message).to eq("This epic does not exist or you don't have sufficient permission.")
           end
         end
       end
@@ -923,12 +956,21 @@ describe QuickActions::InterpretService do
       shared_examples 'adds epic relation' do |relation|
         context 'when correct epic reference' do
           let(:content) { "/#{relation}_epic #{epic2&.to_reference(epic)}" }
-          let(:action) { relation == :child ? 'Adds' : 'Sets'}
+          let(:explain_action) { relation == :child ? 'Adds' : 'Sets'}
+          let(:execute_action) { relation == :child ? 'Added' : 'Set'}
+          let(:article)        { relation == :child ? 'a' : 'the'}
 
-          it 'returns message with epic reference' do
+          it 'returns explain message with epic reference' do
             _, explanations = service.explain(content, epic)
             expect(explanations)
-              .to eq(["#{action} #{epic2.group.name}&#{epic2.iid} as #{relation} epic."])
+              .to eq(["#{explain_action} #{epic2.group.name}&#{epic2.iid} as #{relation} epic."])
+          end
+
+          it 'returns successful execution message' do
+            _, _, message = service.execute(content, epic)
+
+            expect(message)
+              .to eq("#{execute_action} #{epic2.group.name}&#{epic2.iid} as #{article} #{relation} epic.")
           end
         end
 
@@ -942,17 +984,94 @@ describe QuickActions::InterpretService do
         end
       end
 
+      shared_examples 'target epic does not exist' do |relation|
+        it 'returns unsuccessful execution message' do
+          _, _, message = service.execute(content, epic)
+
+          expect(message)
+            .to eq("#{relation.capitalize} epic doesn't exist.")
+        end
+      end
+
+      shared_examples 'epics are already related' do
+        it 'returns unsuccessful execution message' do
+          _, _, message = service.execute(content, epic)
+
+          expect(message)
+            .to eq("Given epic is already related to this epic.")
+        end
+      end
+
+      shared_examples 'without permissions for action' do
+        it 'returns unsuccessful execution message' do
+          _, _, message = service.execute(content, epic)
+
+          expect(message)
+            .to eq("You don't have sufficient permission to perform this action.")
+        end
+      end
+
       context 'child_epic command' do
         it_behaves_like 'adds epic relation', :child
+
+        context 'when epic is already a child epic' do
+          let(:content) { "/child_epic #{epic2&.to_reference(epic)}" }
+
+          before do
+            epic2.update!(parent: epic)
+          end
+
+          it_behaves_like 'epics are already related'
+        end
+
+        context 'when epic is the parent epic' do
+          let(:content) { "/child_epic #{epic2&.to_reference(epic)}" }
+
+          before do
+            epic.update!(parent: epic2)
+          end
+
+          it_behaves_like 'epics are already related'
+        end
+
+        context 'when epic does not exist' do
+          let(:content) { "/child_epic none" }
+
+          it_behaves_like 'target epic does not exist', :child
+        end
+
+        context 'when user has no permission to read epic' do
+          let(:content) { "/child_epic #{epic2&.to_reference(epic)}" }
+
+          before do
+            allow(current_user).to receive(:can?).with(:use_quick_actions).and_return(true)
+            allow(current_user).to receive(:can?).with(:admin_epic, epic).and_return(true)
+            allow(current_user).to receive(:can?).with(:read_epic, epic2).and_return(false)
+          end
+
+          it_behaves_like 'without permissions for action'
+        end
       end
 
       context 'remove_child_epic command' do
         context 'when correct epic reference' do
           let(:content) { "/remove_child_epic #{epic2&.to_reference(epic)}" }
 
-          it 'returns message with epic reference' do
+          before do
+            epic2.update!(parent: epic)
+          end
+
+          it 'returns explain message with epic reference' do
             _, explanations = service.explain(content, epic)
+
             expect(explanations).to eq(["Removes #{epic2.group.name}&#{epic2.iid} from child epics."])
+          end
+
+          it 'returns successful execution message' do
+            _, _, message = service.execute(content, epic)
+
+            expect(message)
+              .to eq("Removed #{epic2.group.name}&#{epic2.iid} from child epics.")
           end
         end
 
@@ -964,10 +1083,63 @@ describe QuickActions::InterpretService do
             expect(explanations).to eq([])
           end
         end
+
+        context 'when child epic does not exist' do
+          let(:content) { "/remove_child_epic #{epic2&.to_reference(epic)}" }
+
+          before do
+            epic.update!(parent: nil)
+          end
+
+          it 'returns unsuccessful execution message' do
+            _, _, message = service.execute(content, epic)
+
+            expect(message)
+              .to eq("Child epic does not exist.")
+          end
+        end
       end
 
       context 'parent_epic command' do
         it_behaves_like 'adds epic relation', :parent
+
+        context 'when epic is already a parent epic' do
+          let(:content) { "/parent_epic #{epic2&.to_reference(epic)}" }
+
+          before do
+            epic.update!(parent: epic2)
+          end
+
+          it_behaves_like 'epics are already related'
+        end
+
+        context 'when epic is a an existing child epic' do
+          let(:content) { "/parent_epic #{epic2&.to_reference(epic)}" }
+
+          before do
+            epic2.update!(parent: epic)
+          end
+
+          it_behaves_like 'epics are already related'
+        end
+
+        context 'when epic does not exist' do
+          let(:content) { "/parent_epic none" }
+
+          it_behaves_like 'target epic does not exist', :parent
+        end
+
+        context 'when user has no permission to read epic' do
+          let(:content) { "/parent_epic #{epic2&.to_reference(epic)}" }
+
+          before do
+            allow(current_user).to receive(:can?).with(:use_quick_actions).and_return(true)
+            allow(current_user).to receive(:can?).with(:admin_epic, epic).and_return(true)
+            allow(current_user).to receive(:can?).with(:read_epic, epic2).and_return(false)
+          end
+
+          it_behaves_like 'without permissions for action'
+        end
       end
 
       context 'remove_parent_epic command' do
@@ -976,9 +1148,17 @@ describe QuickActions::InterpretService do
             epic.parent = epic2
           end
 
-          it 'returns message with epic reference' do
+          it 'returns explain message with epic reference' do
             _, explanations = service.explain("/remove_parent_epic", epic)
+
             expect(explanations).to eq(["Removes parent epic #{epic2.group.name}&#{epic2.iid}."])
+          end
+
+          it 'returns successful execution message' do
+            _, _, message = service.execute("/remove_parent_epic", epic)
+
+            expect(message)
+              .to eq("Removed parent epic #{epic2.group.name}&#{epic2.iid}.")
           end
         end
 
@@ -989,7 +1169,15 @@ describe QuickActions::InterpretService do
 
           it 'returns empty explain message' do
             _, explanations = service.explain("/remove_parent_epic", epic)
+
             expect(explanations).to eq([])
+          end
+
+          it 'returns unsuccessful execution message' do
+            _, _, message = service.execute("/remove_parent_epic", epic)
+
+            expect(message)
+              .to eq("Parent epic is not present.")
           end
         end
       end

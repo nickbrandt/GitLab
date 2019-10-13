@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::Boards do
@@ -32,6 +34,34 @@ describe API::Boards do
       get api(url, user)
 
       expect(json_response["milestone"]["title"]).to eq(Milestone::Started.title)
+    end
+  end
+
+  describe 'GET /projects/:id/boards/:board_id/lists with max_issue_count' do
+    let(:url) { "/projects/#{board_parent.id}/boards/#{board.id}/lists" }
+
+    let!(:list) { create(:list, board: board) }
+
+    context 'with WIP limits license' do
+      it 'includes max_issue_count' do
+        stub_licensed_features(wip_limits: true)
+
+        get api(url, user)
+
+        expect(json_response).not_to be_empty
+        expect(json_response.all? { |list_response| list_response.include?('max_issue_count') }).to be_truthy
+      end
+    end
+
+    context 'without WIP limits license' do
+      it 'does not include max_issue_count' do
+        stub_licensed_features(wip_limits: false)
+
+        get api(url, user)
+
+        expect(json_response).not_to be_empty
+        expect(json_response.none? { |list_response| list_response.include?('max_issue_count') }).to be_truthy
+      end
     end
   end
 end

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Projects::PipelinesController < Projects::ApplicationController
+  include ::Gitlab::Utils::StrongMemoize
+
   before_action :whitelist_query_limiting, only: [:create, :retry]
   before_action :pipeline, except: [:index, :new, :create, :charts]
   before_action :set_pipeline_path, only: [:show]
@@ -8,6 +10,9 @@ class Projects::PipelinesController < Projects::ApplicationController
   before_action :authorize_read_build!, only: [:index]
   before_action :authorize_create_pipeline!, only: [:new, :create]
   before_action :authorize_update_pipeline!, only: [:retry, :cancel]
+  before_action do
+    push_frontend_feature_flag(:hide_dismissed_vulnerabilities)
+  end
 
   around_action :allow_gitaly_ref_name_caching, only: [:index, :show]
 
@@ -148,6 +153,19 @@ class Projects::PipelinesController < Projects::ApplicationController
     @counts[:failed] = @project.all_pipelines.failed.count(:all)
   end
 
+  def test_report
+    return unless Feature.enabled?(:junit_pipeline_view, project)
+
+    if pipeline_test_report == :error
+      render json: { status: :error_parsing_report }
+      return
+    end
+
+    render json: TestReportSerializer
+      .new(current_user: @current_user)
+      .represent(pipeline_test_report)
+  end
+
   private
 
   def serialize_pipelines
@@ -196,18 +214,13 @@ class Projects::PipelinesController < Projects::ApplicationController
   end
 
   def latest_pipeline
-    ref = params['ref'].presence || @project.default_branch
-    sha = @project.commit(ref)&.sha
-
-    @project.ci_pipelines
-            .newest_first(ref: ref, sha: sha)
-            .first
+    @project.latest_pipeline_for_ref(params['ref'])
             &.present(current_user: current_user)
   end
 
   def whitelist_query_limiting
-    # Also see https://gitlab.com/gitlab-org/gitlab-ce/issues/42343
-    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42339')
+    # Also see https://gitlab.com/gitlab-org/gitlab-foss/issues/42343
+    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42339')
   end
 
   def authorize_update_pipeline!
@@ -218,6 +231,14 @@ class Projects::PipelinesController < Projects::ApplicationController
     finder = PipelinesFinder.new(project, current_user, scope: scope)
 
     view_context.limited_counter_with_delimiter(finder.execute)
+  end
+
+  def pipeline_test_report
+    strong_memoize(:pipeline_test_report) do
+      @pipeline.test_reports
+    rescue Gitlab::Ci::Parsers::ParserError
+      :error
+    end
   end
 end
 

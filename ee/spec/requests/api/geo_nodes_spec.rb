@@ -1,8 +1,12 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::GeoNodes, :geo, :prometheus, api: true do
   include ApiHelpers
   include ::EE::GeoHelpers
+
+  include_context 'custom session'
 
   set(:primary) { create(:geo_node, :primary) }
   set(:secondary) { create(:geo_node) }

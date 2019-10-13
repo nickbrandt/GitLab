@@ -4,7 +4,7 @@ import { getParameterValues } from '~/lib/utils/url_utility';
 import { isScrolledToBottom, scrollDown, toggleDisableButton } from '~/lib/utils/scroll_utils';
 import LogOutputBehaviours from '~/lib/utils/logoutput_behaviours';
 import createFlash from '~/flash';
-import { __, s__ } from '~/locale';
+import { sprintf, __, s__ } from '~/locale';
 import _ from 'underscore';
 
 export default class KubernetesPodLogs extends LogOutputBehaviours {
@@ -69,7 +69,18 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
         this.$buildRefreshAnimation.hide();
         toggleDisableButton(this.$refreshLogBtn, false);
       })
-      .catch(() => createFlash(__('Something went wrong on our end')));
+      .catch(err => {
+        let message = '';
+        if (err.response) {
+          message = sprintf(`Error: %{message}`, { message: err.response.data.message });
+        }
+
+        createFlash(
+          sprintf(__(`Something went wrong on our end. %{message}`), {
+            message,
+          }),
+        );
+      });
   }
 
   populateDropdown(pods) {

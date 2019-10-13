@@ -10,7 +10,7 @@ describe GitlabSchema.types['Epic'] do
       due_date due_date_is_fixed due_date_fixed due_date_from_milestones
       closed_at created_at updated_at children has_children has_issues
       web_path web_url relation_path reference issues
-      user_permissions notes discussions
+      user_permissions notes discussions relative_position
     ]
   end
 

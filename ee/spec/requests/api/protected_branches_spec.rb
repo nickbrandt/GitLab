@@ -82,6 +82,57 @@ describe API::ProtectedBranches do
     end
   end
 
+  describe "PATCH /projects/:id/protected_branches/:branch" do
+    let(:route) { "/projects/#{project.id}/protected_branches/#{branch_name}" }
+
+    context 'when authenticated as a maintainer' do
+      before do
+        project.add_maintainer(user)
+      end
+
+      context "when the feature is enabled" do
+        before do
+          stub_licensed_features(code_owner_approval_required: true)
+        end
+
+        it "updates the protected branch" do
+          expect do
+            patch api(route, user), params: { code_owner_approval_required: true }
+          end.to change { protected_branch.reload.code_owner_approval_required }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['code_owner_approval_required']).to eq(true)
+        end
+      end
+
+      context "when the feature is disabled" do
+        before do
+          stub_licensed_features(code_owner_approval_required: false)
+        end
+
+        it "does not change the protected branch" do
+          expect do
+            patch api(route, user), params: { code_owner_approval_required: true }
+          end.not_to change { protected_branch.reload.code_owner_approval_required }
+
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+    end
+
+    context 'when authenticated as a guest' do
+      before do
+        project.add_guest(user)
+      end
+
+      it "returns a 403 response" do
+        patch api(route, user)
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+  end
+
   describe 'POST /projects/:id/protected_branches' do
     let(:branch_name) { 'new_branch' }
     let(:post_endpoint) { api("/projects/#{project.id}/protected_branches", user) }

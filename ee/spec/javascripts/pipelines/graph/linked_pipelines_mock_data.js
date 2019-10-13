@@ -2,7 +2,7 @@ export default {
   triggered_by: {
     id: 129,
     active: true,
-    path: '/gitlab-org/gitlab-ce/pipelines/129',
+    path: '/gitlab-org/gitlab-foss/pipelines/129',
     project: {
       name: 'GitLabCE',
     },
@@ -13,7 +13,7 @@ export default {
         label: 'running',
         group: 'running',
         has_details: true,
-        details_path: '/gitlab-org/gitlab-ce/pipelines/129',
+        details_path: '/gitlab-org/gitlab-foss/pipelines/129',
         favicon:
           '/assets/ci_favicons/dev/favicon_status_running-c3ad2fc53ea6079c174e5b6c1351ff349e99ec3af5a5622fb77b0fe53ea279c1.ico',
       },
@@ -28,7 +28,7 @@ export default {
     },
     ref: {
       name: '7-5-stable',
-      path: '/gitlab-org/gitlab-ce/commits/7-5-stable',
+      path: '/gitlab-org/gitlab-foss/commits/7-5-stable',
       tag: false,
       branch: true,
     },
@@ -48,11 +48,11 @@ export default {
       author_gravatar_url:
         'http://www.gravatar.com/avatar/e66d11c0eedf8c07b3b18fca46599807?s=80&d=identicon',
       commit_url:
-        'http://localhost:3000/gitlab-org/gitlab-ce/commit/23433d4d8b20d7e45c103d0b6048faad38a130ab',
-      commit_path: '/gitlab-org/gitlab-ce/commit/23433d4d8b20d7e45c103d0b6048faad38a130ab',
+        'http://localhost:3000/gitlab-org/gitlab-foss/commit/23433d4d8b20d7e45c103d0b6048faad38a130ab',
+      commit_path: '/gitlab-org/gitlab-foss/commit/23433d4d8b20d7e45c103d0b6048faad38a130ab',
     },
-    retry_path: '/gitlab-org/gitlab-ce/pipelines/129/retry',
-    cancel_path: '/gitlab-org/gitlab-ce/pipelines/129/cancel',
+    retry_path: '/gitlab-org/gitlab-foss/pipelines/129/retry',
+    cancel_path: '/gitlab-org/gitlab-foss/pipelines/129/cancel',
     created_at: '2017-05-24T14:46:20.090Z',
     updated_at: '2017-05-24T14:46:29.906Z',
   },
@@ -60,7 +60,7 @@ export default {
     {
       id: 132,
       active: true,
-      path: '/gitlab-org/gitlab-ce/pipelines/132',
+      path: '/gitlab-org/gitlab-foss/pipelines/132',
       project: {
         name: 'GitLabCE',
       },
@@ -71,7 +71,7 @@ export default {
           label: 'running',
           group: 'running',
           has_details: true,
-          details_path: '/gitlab-org/gitlab-ce/pipelines/132',
+          details_path: '/gitlab-org/gitlab-foss/pipelines/132',
           favicon:
             '/assets/ci_favicons/dev/favicon_status_running-c3ad2fc53ea6079c174e5b6c1351ff349e99ec3af5a5622fb77b0fe53ea279c1.ico',
         },
@@ -86,7 +86,7 @@ export default {
       },
       ref: {
         name: 'crowd',
-        path: '/gitlab-org/gitlab-ce/commits/crowd',
+        path: '/gitlab-org/gitlab-foss/commits/crowd',
         tag: false,
         branch: true,
       },
@@ -107,18 +107,18 @@ export default {
         author_gravatar_url:
           'http://www.gravatar.com/avatar/35df4b155ec66a3127d53459941cf8a2?s=80&d=identicon',
         commit_url:
-          'http://localhost:3000/gitlab-org/gitlab-ce/commit/b9d58c4cecd06be74c3cc32ccfb522b31544ab2e',
-        commit_path: '/gitlab-org/gitlab-ce/commit/b9d58c4cecd06be74c3cc32ccfb522b31544ab2e',
+          'http://localhost:3000/gitlab-org/gitlab-foss/commit/b9d58c4cecd06be74c3cc32ccfb522b31544ab2e',
+        commit_path: '/gitlab-org/gitlab-foss/commit/b9d58c4cecd06be74c3cc32ccfb522b31544ab2e',
       },
-      retry_path: '/gitlab-org/gitlab-ce/pipelines/132/retry',
-      cancel_path: '/gitlab-org/gitlab-ce/pipelines/132/cancel',
+      retry_path: '/gitlab-org/gitlab-foss/pipelines/132/retry',
+      cancel_path: '/gitlab-org/gitlab-foss/pipelines/132/cancel',
       created_at: '2017-05-24T14:46:24.644Z',
       updated_at: '2017-05-24T14:48:55.226Z',
     },
     {
       id: 133,
       active: true,
-      path: '/gitlab-org/gitlab-ce/pipelines/133',
+      path: '/gitlab-org/gitlab-foss/pipelines/133',
       project: {
         name: 'GitLabCE',
       },
@@ -129,7 +129,7 @@ export default {
           label: 'running',
           group: 'running',
           has_details: true,
-          details_path: '/gitlab-org/gitlab-ce/pipelines/133',
+          details_path: '/gitlab-org/gitlab-foss/pipelines/133',
           favicon:
             '/assets/ci_favicons/dev/favicon_status_running-c3ad2fc53ea6079c174e5b6c1351ff349e99ec3af5a5622fb77b0fe53ea279c1.ico',
         },
@@ -144,7 +144,7 @@ export default {
       },
       ref: {
         name: 'crowd',
-        path: '/gitlab-org/gitlab-ce/commits/crowd',
+        path: '/gitlab-org/gitlab-foss/commits/crowd',
         tag: false,
         branch: true,
       },
@@ -165,18 +165,18 @@ export default {
         author_gravatar_url:
           'http://www.gravatar.com/avatar/35df4b155ec66a3127d53459941cf8a2?s=80&d=identicon',
         commit_url:
-          'http://localhost:3000/gitlab-org/gitlab-ce/commit/b6bd4856a33df3d144be66c4ed1f1396009bb08b',
-        commit_path: '/gitlab-org/gitlab-ce/commit/b6bd4856a33df3d144be66c4ed1f1396009bb08b',
+          'http://localhost:3000/gitlab-org/gitlab-foss/commit/b6bd4856a33df3d144be66c4ed1f1396009bb08b',
+        commit_path: '/gitlab-org/gitlab-foss/commit/b6bd4856a33df3d144be66c4ed1f1396009bb08b',
       },
-      retry_path: '/gitlab-org/gitlab-ce/pipelines/133/retry',
-      cancel_path: '/gitlab-org/gitlab-ce/pipelines/133/cancel',
+      retry_path: '/gitlab-org/gitlab-foss/pipelines/133/retry',
+      cancel_path: '/gitlab-org/gitlab-foss/pipelines/133/cancel',
       created_at: '2017-05-24T14:46:24.648Z',
       updated_at: '2017-05-24T14:48:59.673Z',
     },
     {
       id: 130,
       active: true,
-      path: '/gitlab-org/gitlab-ce/pipelines/130',
+      path: '/gitlab-org/gitlab-foss/pipelines/130',
       project: {
         name: 'GitLabCE',
       },
@@ -187,7 +187,7 @@ export default {
           label: 'running',
           group: 'running',
           has_details: true,
-          details_path: '/gitlab-org/gitlab-ce/pipelines/130',
+          details_path: '/gitlab-org/gitlab-foss/pipelines/130',
           favicon:
             '/assets/ci_favicons/dev/favicon_status_running-c3ad2fc53ea6079c174e5b6c1351ff349e99ec3af5a5622fb77b0fe53ea279c1.ico',
         },
@@ -202,7 +202,7 @@ export default {
       },
       ref: {
         name: 'crowd',
-        path: '/gitlab-org/gitlab-ce/commits/crowd',
+        path: '/gitlab-org/gitlab-foss/commits/crowd',
         tag: false,
         branch: true,
       },
@@ -222,18 +222,18 @@ export default {
         author_gravatar_url:
           'http://www.gravatar.com/avatar/cd08930e69fa5ad1a669206e7bafe476?s=80&d=identicon',
         commit_url:
-          'http://localhost:3000/gitlab-org/gitlab-ce/commit/6d7ced4a2311eeff037c5575cca1868a6d3f586f',
-        commit_path: '/gitlab-org/gitlab-ce/commit/6d7ced4a2311eeff037c5575cca1868a6d3f586f',
+          'http://localhost:3000/gitlab-org/gitlab-foss/commit/6d7ced4a2311eeff037c5575cca1868a6d3f586f',
+        commit_path: '/gitlab-org/gitlab-foss/commit/6d7ced4a2311eeff037c5575cca1868a6d3f586f',
       },
-      retry_path: '/gitlab-org/gitlab-ce/pipelines/130/retry',
-      cancel_path: '/gitlab-org/gitlab-ce/pipelines/130/cancel',
+      retry_path: '/gitlab-org/gitlab-foss/pipelines/130/retry',
+      cancel_path: '/gitlab-org/gitlab-foss/pipelines/130/cancel',
       created_at: '2017-05-24T14:46:24.630Z',
       updated_at: '2017-05-24T14:49:45.091Z',
     },
     {
       id: 131,
       active: true,
-      path: '/gitlab-org/gitlab-ce/pipelines/132',
+      path: '/gitlab-org/gitlab-foss/pipelines/132',
       project: {
         name: 'GitLabCE',
       },
@@ -244,7 +244,7 @@ export default {
           label: 'running',
           group: 'running',
           has_details: true,
-          details_path: '/gitlab-org/gitlab-ce/pipelines/132',
+          details_path: '/gitlab-org/gitlab-foss/pipelines/132',
           favicon:
             '/assets/ci_favicons/dev/favicon_status_running-c3ad2fc53ea6079c174e5b6c1351ff349e99ec3af5a5622fb77b0fe53ea279c1.ico',
         },
@@ -259,7 +259,7 @@ export default {
       },
       ref: {
         name: 'crowd',
-        path: '/gitlab-org/gitlab-ce/commits/crowd',
+        path: '/gitlab-org/gitlab-foss/commits/crowd',
         tag: false,
         branch: true,
       },
@@ -280,18 +280,18 @@ export default {
         author_gravatar_url:
           'http://www.gravatar.com/avatar/35df4b155ec66a3127d53459941cf8a2?s=80&d=identicon',
         commit_url:
-          'http://localhost:3000/gitlab-org/gitlab-ce/commit/b9d58c4cecd06be74c3cc32ccfb522b31544ab2e',
-        commit_path: '/gitlab-org/gitlab-ce/commit/b9d58c4cecd06be74c3cc32ccfb522b31544ab2e',
+          'http://localhost:3000/gitlab-org/gitlab-foss/commit/b9d58c4cecd06be74c3cc32ccfb522b31544ab2e',
+        commit_path: '/gitlab-org/gitlab-foss/commit/b9d58c4cecd06be74c3cc32ccfb522b31544ab2e',
       },
-      retry_path: '/gitlab-org/gitlab-ce/pipelines/132/retry',
-      cancel_path: '/gitlab-org/gitlab-ce/pipelines/132/cancel',
+      retry_path: '/gitlab-org/gitlab-foss/pipelines/132/retry',
+      cancel_path: '/gitlab-org/gitlab-foss/pipelines/132/cancel',
       created_at: '2017-05-24T14:46:24.644Z',
       updated_at: '2017-05-24T14:48:55.226Z',
     },
     {
       id: 134,
       active: true,
-      path: '/gitlab-org/gitlab-ce/pipelines/133',
+      path: '/gitlab-org/gitlab-foss/pipelines/133',
       project: {
         name: 'GitLabCE',
       },
@@ -302,7 +302,7 @@ export default {
           label: 'running',
           group: 'running',
           has_details: true,
-          details_path: '/gitlab-org/gitlab-ce/pipelines/133',
+          details_path: '/gitlab-org/gitlab-foss/pipelines/133',
           favicon:
             '/assets/ci_favicons/dev/favicon_status_running-c3ad2fc53ea6079c174e5b6c1351ff349e99ec3af5a5622fb77b0fe53ea279c1.ico',
         },
@@ -317,7 +317,7 @@ export default {
       },
       ref: {
         name: 'crowd',
-        path: '/gitlab-org/gitlab-ce/commits/crowd',
+        path: '/gitlab-org/gitlab-foss/commits/crowd',
         tag: false,
         branch: true,
       },
@@ -338,18 +338,18 @@ export default {
         author_gravatar_url:
           'http://www.gravatar.com/avatar/35df4b155ec66a3127d53459941cf8a2?s=80&d=identicon',
         commit_url:
-          'http://localhost:3000/gitlab-org/gitlab-ce/commit/b6bd4856a33df3d144be66c4ed1f1396009bb08b',
-        commit_path: '/gitlab-org/gitlab-ce/commit/b6bd4856a33df3d144be66c4ed1f1396009bb08b',
+          'http://localhost:3000/gitlab-org/gitlab-foss/commit/b6bd4856a33df3d144be66c4ed1f1396009bb08b',
+        commit_path: '/gitlab-org/gitlab-foss/commit/b6bd4856a33df3d144be66c4ed1f1396009bb08b',
       },
-      retry_path: '/gitlab-org/gitlab-ce/pipelines/133/retry',
-      cancel_path: '/gitlab-org/gitlab-ce/pipelines/133/cancel',
+      retry_path: '/gitlab-org/gitlab-foss/pipelines/133/retry',
+      cancel_path: '/gitlab-org/gitlab-foss/pipelines/133/cancel',
       created_at: '2017-05-24T14:46:24.648Z',
       updated_at: '2017-05-24T14:48:59.673Z',
     },
     {
       id: 135,
       active: true,
-      path: '/gitlab-org/gitlab-ce/pipelines/130',
+      path: '/gitlab-org/gitlab-foss/pipelines/130',
       project: {
         name: 'GitLabCE',
       },
@@ -360,7 +360,7 @@ export default {
           label: 'running',
           group: 'running',
           has_details: true,
-          details_path: '/gitlab-org/gitlab-ce/pipelines/130',
+          details_path: '/gitlab-org/gitlab-foss/pipelines/130',
           favicon:
             '/assets/ci_favicons/dev/favicon_status_running-c3ad2fc53ea6079c174e5b6c1351ff349e99ec3af5a5622fb77b0fe53ea279c1.ico',
         },
@@ -375,7 +375,7 @@ export default {
       },
       ref: {
         name: 'crowd',
-        path: '/gitlab-org/gitlab-ce/commits/crowd',
+        path: '/gitlab-org/gitlab-foss/commits/crowd',
         tag: false,
         branch: true,
       },
@@ -395,11 +395,11 @@ export default {
         author_gravatar_url:
           'http://www.gravatar.com/avatar/cd08930e69fa5ad1a669206e7bafe476?s=80&d=identicon',
         commit_url:
-          'http://localhost:3000/gitlab-org/gitlab-ce/commit/6d7ced4a2311eeff037c5575cca1868a6d3f586f',
-        commit_path: '/gitlab-org/gitlab-ce/commit/6d7ced4a2311eeff037c5575cca1868a6d3f586f',
+          'http://localhost:3000/gitlab-org/gitlab-foss/commit/6d7ced4a2311eeff037c5575cca1868a6d3f586f',
+        commit_path: '/gitlab-org/gitlab-foss/commit/6d7ced4a2311eeff037c5575cca1868a6d3f586f',
       },
-      retry_path: '/gitlab-org/gitlab-ce/pipelines/130/retry',
-      cancel_path: '/gitlab-org/gitlab-ce/pipelines/130/cancel',
+      retry_path: '/gitlab-org/gitlab-foss/pipelines/130/retry',
+      cancel_path: '/gitlab-org/gitlab-foss/pipelines/130/cancel',
       created_at: '2017-05-24T14:46:24.630Z',
       updated_at: '2017-05-24T14:49:45.091Z',
     },

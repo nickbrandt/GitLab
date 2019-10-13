@@ -99,10 +99,14 @@ export default {
       required: false,
       default: true,
     },
+    fieldName: {
+      type: String,
+      required: false,
+      default: () => _.uniqueId('dateType_'),
+    },
   },
   data() {
     return {
-      fieldName: _.uniqueId('dateType_'),
       editing: false,
     };
   },
@@ -171,8 +175,8 @@ export default {
       this.editing = false;
       this.$emit('toggleDateType', true, true);
     },
-    toggleDatePicker(e) {
-      this.editing = !this.editing;
+    startEditing(e) {
+      this.editing = true;
       e.stopPropagation();
     },
     newDateSelected(date = null) {
@@ -199,14 +203,15 @@ export default {
         <icon
           v-popover="popoverOptions"
           name="question-o"
-          css-classes="help-icon append-right-5"
-          tab-index="0"
+          class="help-icon append-right-5"
+          tabindex="0"
         />
         <gl-button
           v-show="canUpdate && !editing"
+          ref="editButton"
           variant="link"
           class="btn-sidebar-action"
-          @click="toggleDatePicker"
+          @click="startEditing"
         >
           {{ __('Edit') }}
         </gl-button>
@@ -220,7 +225,7 @@ export default {
     <div class="value">
       <div
         :class="{ 'is-option-selected': selectedDateIsFixed, 'd-flex': !editing }"
-        class="value-type-fixed"
+        class="value-type-fixed text-secondary"
       >
         <input
           v-if="canUpdate && !editing"
@@ -237,19 +242,20 @@ export default {
           @newDateSelected="newDateSelected"
           @hidePicker="stopEditing"
         />
-        <span v-else class="d-flex value-content">
+        <span v-else class="d-flex value-content prepend-left-2">
           <template v-if="dateFixed">
             <span>{{ dateFixedWords }}</span>
             <icon
               v-if="isDateInvalid && selectedDateIsFixed"
               v-popover="dateInvalidPopoverOptions"
               name="warning"
-              css-classes="date-warning-icon append-right-5 prepend-left-5"
-              tab-index="0"
+              class="date-warning-icon append-right-5 prepend-left-5"
+              tabindex="0"
             />
             <span v-if="selectedAndEditable" class="no-value d-flex">
               &nbsp;&ndash;&nbsp;
               <gl-button
+                ref="removeButton"
                 variant="link"
                 class="btn-sidebar-date-remove"
                 @click="newDateSelected(null)"
@@ -265,7 +271,7 @@ export default {
         v-tooltip
         :title="dateFromMilestonesTooltip"
         :class="{ 'is-option-selected': !selectedDateIsFixed }"
-        class="value-type-dynamic d-flex prepend-top-10"
+        class="value-type-dynamic text-secondary d-flex prepend-top-10"
         data-placement="bottom"
         data-html="true"
       >
@@ -277,13 +283,13 @@ export default {
           @click="toggleDateType(false)"
         />
         <span class="prepend-left-5">{{ __('From milestones:') }}</span>
-        <span class="value-content">{{ dateFromMilestonesWords }}</span>
+        <span class="value-content prepend-left-2">{{ dateFromMilestonesWords }}</span>
         <icon
           v-if="isDateInvalid && !selectedDateIsFixed"
           v-popover="dateInvalidPopoverOptions"
           name="warning"
-          css-classes="date-warning-icon prepend-left-5"
-          tab-index="0"
+          class="date-warning-icon prepend-left-5"
+          tabindex="0"
         />
       </abbr>
     </div>

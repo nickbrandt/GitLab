@@ -66,7 +66,7 @@ module EE
       end
 
       def whitelist_query_limiting_ee
-        ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ee/issues/4794')
+        ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/4794')
       end
     end
   end

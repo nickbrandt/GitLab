@@ -3,11 +3,7 @@ import { mapActions, mapState } from 'vuex';
 import { GlButton, GlDropdown, GlDropdownItem, GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import { DEPENDENCY_LIST_TYPES } from '../store/constants';
-import {
-  SORT_FIELDS,
-  SORT_FIELDS_WITH_SEVERITY,
-  SORT_ORDER,
-} from '../store/modules/list/constants';
+import { SORT_FIELDS, SORT_ORDER } from '../store/modules/list/constants';
 
 export default {
   name: 'DependenciesActions',
@@ -20,12 +16,6 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  inject: {
-    dependencyListVulnerabilities: {
-      from: 'dependencyListVulnerabilities',
-      default: false,
-    },
-  },
   props: {
     namespace: {
       type: String,
@@ -36,7 +26,7 @@ export default {
   },
   data() {
     return {
-      sortFields: this.dependencyListVulnerabilities ? SORT_FIELDS_WITH_SEVERITY : SORT_FIELDS,
+      sortFields: SORT_FIELDS,
     };
   },
   computed: {

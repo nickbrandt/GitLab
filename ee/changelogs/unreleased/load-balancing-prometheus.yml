@@ -1,5 +1,0 @@
----
-title: 'DB Load Balancing: Log Prometheus current number of hosts and current index'
-merge_request: 15440
-author:
-type: changed

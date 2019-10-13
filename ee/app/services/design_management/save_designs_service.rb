@@ -17,10 +17,15 @@ module DesignManagement
       return error("Not allowed!") unless can_create_designs?
       return error("Only #{MAX_FILES} files are allowed simultaneously") if files.size > MAX_FILES
 
-      actions = build_actions
-      run_actions(actions)
+      repository.create_if_not_exists
 
-      success({ designs: actions.map(&:design) })
+      uploaded_designs = upload_designs!
+      skipped_designs = designs - uploaded_designs
+
+      # Create a Geo event so changes will be replicated to secondary node(s)
+      repository.log_geo_updated_event
+
+      success({ designs: uploaded_designs, skipped_designs: skipped_designs })
     rescue ::ActiveRecord::RecordInvalid => e
       error(e.message)
     end
@@ -28,29 +33,45 @@ module DesignManagement
     private
 
     attr_reader :files
-    attr_accessor :paths_in_repo
 
-    def build_actions
-      repository.create_if_not_exists
+    def upload_designs!
+      actions = build_actions
+      return [] if actions.empty?
 
-      designs = files.map do |file|
+      version = run_actions(actions)
+      ::DesignManagement::NewVersionWorker.perform_async(version.id)
+
+      actions.map(&:design)
+    end
+
+    # Returns `Design` instances that correspond with `files`.
+    # New `Design`s will be created where a file name does not match
+    # an existing `Design`
+    def designs
+      @designs ||= files.map do |file|
         collection.find_or_create_design!(filename: file.original_filename)
       end
+    end
 
-      # Needs to be called before any call to build_design_action
-      cache_existence(designs)
-
-      files.zip(designs).map do |(file, design)|
-        build_design_action(file, design)
+    def build_actions
+      files.zip(designs).flat_map do |(file, design)|
+        Array.wrap(build_design_action(file, design))
       end
     end
 
     def build_design_action(file, design)
-      action = new_file?(design) ? :create : :update
       content = file_content(file, design.full_path)
+      return if design_unchanged?(design, content)
+
+      action = new_file?(design) ? :create : :update
       on_success { ::Gitlab::UsageCounters::DesignsCounter.count(action) }
 
       DesignManagement::DesignAction.new(design, action, content)
+    end
+
+    # Returns true if the design file is the same as its latest version
+    def design_unchanged?(design, content)
+      content == existing_blobs[design]&.data
     end
 
     def commit_message
@@ -74,11 +95,7 @@ module DesignManagement
     end
 
     def new_file?(design)
-      design.new_design? && !on_disk?(design)
-    end
-
-    def on_disk?(design)
-      paths_in_repo === design.full_path
+      !existing_blobs[design]
     end
 
     def file_content(file, full_path)
@@ -86,9 +103,17 @@ module DesignManagement
       transformer.new_file(full_path, file.to_io).content
     end
 
-    def cache_existence(designs)
-      paths = designs.map(&:full_path)
-      self.paths_in_repo = repository.blobs_metadata(paths).map(&:path).to_set
+    # Returns the latest blobs for the designs as a Hash of `{ Design => Blob }`
+    def existing_blobs
+      @existing_blobs ||= begin
+        items = designs.map { |d| ['HEAD', d.full_path] }
+
+        repository.blobs_at(items).each_with_object({}) do |blob, h|
+          design = designs.find { |d| d.full_path == blob.path }
+
+          h[design] = blob
+        end
+      end
     end
   end
 end

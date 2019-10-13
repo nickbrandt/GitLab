@@ -14,7 +14,14 @@ module Gitlab
           return fail_before_transfer unless job_artifact.present?
 
           transfer = ::Gitlab::Geo::Replication::JobArtifactTransfer.new(job_artifact)
-          Result.from_transfer_result(transfer.download_from_primary)
+
+          result = if job_artifact.local_store?
+                     transfer.download_from_primary
+                   else
+                     transfer.stream_from_primary_to_object_storage
+                   end
+
+          Result.from_transfer_result(result)
         end
 
         private

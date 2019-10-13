@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "required": [
+    "status",
+    "job_path",
+    "generated_at"
+  ],
+  "properties": {
+    "status": {
+      "type": "string"
+    },
+    "job_path": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string"
+    }
+  }
+}

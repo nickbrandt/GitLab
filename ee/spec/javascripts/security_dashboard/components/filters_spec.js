@@ -10,7 +10,12 @@ describe('Filter component', () => {
 
   describe('severity', () => {
     beforeEach(() => {
-      vm = mountComponentWithStore(Component, { store });
+      vm = mountComponentWithStore(Component, {
+        store,
+        props: {
+          showHideDismissedToggle: true,
+        },
+      });
     });
 
     afterEach(() => {

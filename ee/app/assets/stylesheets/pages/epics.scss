@@ -1,5 +1,5 @@
 @include media-breakpoint-down(sm) {
-  .epics-other-filters .filter-dropdown-container {
+  .epics-other-filters {
     .epics-sort-btn i {
       position: absolute;
       top: 11px;
@@ -12,47 +12,40 @@
   }
 }
 
+.epic-discussion-separator {
+  border-color: $border-color;
+}
+
 .epic-sidebar {
-  .block.date {
-    .help-icon,
-    .date-warning-icon {
-      &:hover {
-        cursor: pointer;
-      }
+  .help-icon,
+  .date-warning-icon {
+    &:hover {
+      cursor: pointer;
     }
+  }
 
-    .help-icon {
-      color: $gl-text-color-secondary;
-    }
+  .help-icon {
+    color: $gl-text-color-secondary;
+  }
 
-    .btn-sidebar-action {
-      line-height: $gl-font-size;
-    }
+  .btn-sidebar-action {
+    line-height: $gl-font-size;
+  }
 
-    .btn-sidebar-date-remove {
-      height: $gl-font-size;
-      line-height: $gl-btn-horz-padding;
-    }
+  .btn-sidebar-date-remove {
+    height: $gl-font-size;
+    line-height: $gl-btn-horz-padding;
+  }
 
-    .date-warning-icon {
-      color: $orange-500;
-      margin-top: -1px;
-    }
+  .date-warning-icon {
+    color: $orange-500;
+    margin-top: -1px;
+  }
 
-    .value-type-fixed,
-    .value-type-dynamic {
-      color: $gl-text-color-secondary;
-
-      .value-content {
-        margin-left: 2px;
-      }
-
-      &.is-option-selected {
-        > span {
-          color: $gl-text-color;
-          font-weight: $gl-font-weight-bold;
-        }
-      }
+  .is-option-selected {
+    > span {
+      color: $gl-text-color;
+      font-weight: $gl-font-weight-bold;
     }
   }
 }

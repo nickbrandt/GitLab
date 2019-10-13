@@ -173,7 +173,8 @@ module API
 
         options = {
           with: params[:with_projects] ? Entities::GroupDetail : Entities::Group,
-          current_user: current_user
+          current_user: current_user,
+          user_can_admin_group: can?(current_user, :admin_group, group)
         }
 
         group, options = with_custom_attributes(group, options)
@@ -186,7 +187,7 @@ module API
         group = find_group!(params[:id])
         authorize! :admin_group, group
 
-        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/46285')
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/46285')
         destroy_conditionally!(group) do |group|
           ::Groups::DestroyService.new(group, current_user).async_execute
         end

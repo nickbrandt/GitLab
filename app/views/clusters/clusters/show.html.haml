@@ -3,6 +3,7 @@
 - breadcrumb_title @cluster.name
 - page_title _('Kubernetes Cluster')
 - manage_prometheus_path = edit_project_service_path(@cluster.project, 'prometheus') if @project
+- cluster_environments_path = clusterable.environments_cluster_path(@cluster)
 
 - expanded = expanded_by_default?
 
@@ -16,18 +17,21 @@
   install_jupyter_path: clusterable.install_applications_cluster_path(@cluster, :jupyter),
   install_knative_path: clusterable.install_applications_cluster_path(@cluster, :knative),
   update_knative_path: clusterable.update_applications_cluster_path(@cluster, :knative),
-  cluster_environments_path: clusterable.environments_cluster_path(@cluster),
+  cluster_environments_path: cluster_environments_path,
   toggle_status: @cluster.enabled? ? 'true': 'false',
   has_rbac: has_rbac_enabled?(@cluster) ? 'true': 'false',
   cluster_type: @cluster.cluster_type,
   cluster_status: @cluster.status_name,
   cluster_status_reason: @cluster.status_reason,
+  provider_type: @cluster.provider_type,
+  pre_installed_knative: @cluster.knative_pre_installed? ? 'true': 'false',
   help_path: help_page_path('user/project/clusters/index.md', anchor: 'installing-applications'),
   ingress_help_path: help_page_path('user/project/clusters/index.md', anchor: 'getting-the-external-endpoint'),
   ingress_dns_help_path: help_page_path('user/project/clusters/index.md', anchor: 'manually-determining-the-external-endpoint'),
   environments_help_path: help_page_path('ci/environments', anchor: 'defining-environments'),
   clusters_help_path: help_page_path('user/project/clusters/index.md', anchor: 'deploying-to-a-kubernetes-cluster'),
   deploy_boards_help_path: help_page_path('user/project/deploy_boards.html', anchor: 'enabling-deploy-boards'),
+  cloud_run_help_path: help_page_path('user/project/clusters/index.md', anchor: 'cloud-run-on-gke'),
   manage_prometheus_path: manage_prometheus_path,
   cluster_id: @cluster.id } }
 
@@ -37,7 +41,7 @@
   %h4= @cluster.name
   = render 'banner'
 
-  = render_if_exists 'clusters/clusters/group_cluster_environments', expanded: expanded
-
-  - unless Gitlab.ee?
+  - if cluster_environments_path.present?
+    = render_if_exists 'clusters/clusters/group_cluster_environments', expanded: expanded
+  - else
     = render 'configure', expanded: expanded

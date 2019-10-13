@@ -8,7 +8,7 @@ module Elastic
 
     def use_elasticsearch?
       # FIXME: check project.use_elasticsearch? for ProjectSnippets?
-      # see https://gitlab.com/gitlab-org/gitlab-ee/issues/11850
+      # see https://gitlab.com/gitlab-org/gitlab/issues/11850
       ::Gitlab::CurrentSettings.elasticsearch_indexing?
     end
 

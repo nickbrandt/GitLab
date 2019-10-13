@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Geo::LogCursor::Logger, :geo do
@@ -44,7 +46,7 @@ describe Gitlab::Geo::LogCursor::Logger, :geo do
     it 'logs to stdout' do
       message = 'this message should appear on stdout'
       Gitlab::Geo::Logger.extend(Gitlab::Geo::Logger::StdoutLogger)
-      # This is needed because otherwise https://gitlab.com/gitlab-org/gitlab-ee/blob/master/config/environments/test.rb#L52
+      # This is needed because otherwise https://gitlab.com/gitlab-org/gitlab/blob/master/config/environments/test.rb#L52
       # sets the default logging level to :fatal when running under CI
       allow(Rails.logger).to receive(:level).and_return(:info)
 

@@ -1,11 +1,13 @@
 <script>
 import { sprintf, __, n__ } from '~/locale';
 import { GlLink, GlAvatar } from '@gitlab/ui';
+import MetricColumn from './metric_column.vue';
 
 export default {
   components: {
     GlLink,
     GlAvatar,
+    MetricColumn,
   },
   props: {
     mergeRequest: {
@@ -37,10 +39,10 @@ export default {
     selectedMetric() {
       return this.mergeRequest[this.metricType];
     },
-    metricTimeUnit() {
-      return this.metricType === 'days_to_merge'
-        ? n__('day', 'days', this.selectedMetric)
-        : n__('Time|hr', 'Time|hrs', this.selectedMetric);
+  },
+  methods: {
+    isNumber(metric) {
+      return typeof metric === 'number';
     },
   },
 };
@@ -48,40 +50,36 @@ export default {
 <template>
   <div class="gl-responsive-table-row-layout gl-responsive-table-row">
     <div
-      class="table-section section-50 d-flex flex-row-reverse flex-md-row justify-content-between justify-content-md-start qa-mr-details"
+      class="table-section section-50 d-flex flex-row-reverse flex-md-row justify-content-between justify-content-md-start js-mr-details"
     >
-      <div>
+      <div class="d-flex mr-md-2">
         <gl-avatar :src="mergeRequest.author_avatar_url" :size="16" />
       </div>
-      <div class="mw-90p">
-        <h5 class="item-title mr-title my-0 mw-90p d-block str-truncated">
+      <div class="d-flex flex-column flex-grow mw-90p">
+        <h5 class="item-title mr-title my-0 d-block str-truncated">
           <gl-link :href="mergeRequest.merge_request_url" target="_blank">{{
             mergeRequest.title
           }}</gl-link>
         </h5>
-        <ul class="horizontal-list list-items-separated text-secondary">
+        <ul class="horizontal-list list-items-separated text-secondary mb-0">
           <li>{{ mrId }}</li>
-          <li>{{ commitCount }}</li>
-          <li>{{ locPerCommit }}</li>
-          <li>{{ filesTouched }}</li>
+          <li v-if="isNumber(mergeRequest.commits_count)" ref="commitCount">{{ commitCount }}</li>
+          <li v-if="isNumber(mergeRequest.loc_per_commit)" ref="locPerCommitCount">
+            {{ locPerCommit }}
+          </li>
+          <li v-if="isNumber(mergeRequest.files_touched)" ref="filesTouchedCount">
+            {{ filesTouched }}
+          </li>
         </ul>
       </div>
     </div>
-    <div class="table-section section-50 d-flex flex-row align-items-start qa-mr-metrics">
-      <div class="metric-col">
-        <span class="time">
-          {{ mergeRequest.time_to_merge }}
-          <span> {{ n__('Time|hr', 'Time|hrs', mergeRequest.time_to_merge) }} </span>
-        </span>
-        <span class="d-flex d-md-none text-secondary metric-label">{{ __('Time to merge') }}</span>
-      </div>
-      <div class="metric-col">
-        <span class="time">
-          {{ selectedMetric }}
-          <span> {{ metricTimeUnit }} </span>
-        </span>
-        <span class="d-flex d-md-none text-secondary metric-label">{{ metricLabel }}</span>
-      </div>
+    <div class="table-section section-50 d-flex flex-row align-items-start js-mr-metrics">
+      <metric-column
+        type="days_to_merge"
+        :value="mergeRequest.days_to_merge"
+        :label="__('Time to merge')"
+      />
+      <metric-column :type="metricType" :value="selectedMetric" :label="metricLabel" />
     </div>
   </div>
 </template>

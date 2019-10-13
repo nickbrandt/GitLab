@@ -14,7 +14,7 @@ describe GroupSaml::SignUpService do
 
     before do
       allow(Gitlab::Auth::GroupSaml::IdentityLinker)
-        .to receive(:new).with(new_user, session['oauth_data'], group.saml_provider, session)
+        .to receive(:new).with(new_user, session['oauth_data'], session, group.saml_provider)
               .and_return(linker_spy)
     end
 

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :gitlab_license, class: "Gitlab::License" do
     skip_create
 
     trait :trial do
-      block_changes_at nil
+      block_changes_at { nil }
       restrictions do
         { trial: true }
       end
@@ -14,7 +16,7 @@ FactoryBot.define do
     end
 
     transient do
-      plan License::STARTER_PLAN
+      plan { License::STARTER_PLAN }
     end
 
     starts_at { Date.today - 1.month }
@@ -40,9 +42,9 @@ FactoryBot.define do
 
   factory :license do
     transient do
-      plan nil
-      expired false
-      trial false
+      plan { nil }
+      expired { false }
+      trial { false }
     end
 
     data do

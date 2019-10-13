@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module AuditLogsHelper
-  def event_type_options
+  def entity_type_options
     [
       { id: '', text: 'All Events' },
       { id: 'Group', text: 'Group Events' },

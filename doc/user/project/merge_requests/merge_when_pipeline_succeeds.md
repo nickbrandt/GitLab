@@ -36,11 +36,19 @@ changes to be reviewed.
 ## Only allow merge requests to be merged if the pipeline succeeds
 
 You can prevent merge requests from being merged if their pipeline did not succeed
-or if there are threads to be resolved.
+or if there are threads to be resolved. This works for both:
 
-Navigate to your project's settings page and expand the **Merge requests** section.
-In the **Merge checks** subsection, select the **Pipelines must succeed** check
-box and hit **Save** for the changes to take effect.
+- GitLab CI/CD pipelines
+- Pipelines run from an [external CI integration](../integrations/project_services.md#services)
+
+As a result, [disabling GitLab CI/CD pipelines](../../../ci/enable_or_disable_ci.md)
+will not disable this feature, as it will still be possible to use pipelines from external
+CI providers with this feature. To enable it, you must:
+
+1. Navigate to your project's **Settings > General** page.
+1. Expand the **Merge requests** section.
+1. In the **Merge checks** subsection, select the **Pipelines must succeed** checkbox.
+1. Press **Save** for the changes to take effect.
 
 NOTE: **Note:** This setting also prevents merge requests from being merged if there is no pipeline.
 
@@ -55,7 +63,7 @@ merge request from the UI, until you make all relevant jobs pass.
 
 When this setting is enabled, a merge request is prevented from being merged if there is no pipeline. This may conflict with some use cases where [`only/except`](../../../ci/yaml/README.md#onlyexcept-advanced) rules are used and they don't generate any pipelines.
 
-Users that expect to be able to merge a merge request in this scenario should ensure that [there is always a pipeline](https://gitlab.com/gitlab-org/gitlab-ce/issues/54226) and that it's succesful.
+Users that expect to be able to merge a merge request in this scenario should ensure that [there is always a pipeline](https://gitlab.com/gitlab-org/gitlab-foss/issues/54226) and that it's succesful.
 
 For example, to that on merge requests there is always a passing job even though `only/except` rules may not generate any other jobs:
 

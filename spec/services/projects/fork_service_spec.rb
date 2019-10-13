@@ -50,10 +50,11 @@ describe Projects::ForkService do
           it { expect(to_project.star_count).to be_zero }
           it { expect(to_project.description).to eq(@from_project.description) }
           it { expect(to_project.avatar.file).to be_exists }
+          it { expect(to_project.ci_config_path).to eq(@from_project.ci_config_path) }
 
           # This test is here because we had a bug where the from-project lost its
           # avatar after being forked.
-          # https://gitlab.com/gitlab-org/gitlab-ce/issues/26158
+          # https://gitlab.com/gitlab-org/gitlab-foss/issues/26158
           it "after forking the from-project still has its avatar" do
             # If we do not fork the project first we cannot detect the bug.
             expect(to_project).to be_persisted
@@ -119,6 +120,7 @@ describe Projects::ForkService do
       context 'repository in legacy storage already exists' do
         let(:repository_storage) { 'default' }
         let(:repository_storage_path) { Gitlab.config.repositories.storages[repository_storage].legacy_disk_path }
+        let(:params) { { namespace: @to_user.namespace } }
 
         before do
           stub_application_setting(hashed_storage_enabled: false)
@@ -129,12 +131,21 @@ describe Projects::ForkService do
           gitlab_shell.remove_repository(repository_storage, "#{@to_user.namespace.full_path}/#{@from_project.path}")
         end
 
-        it 'does not allow creation' do
-          to_project = fork_project(@from_project, @to_user, namespace: @to_user.namespace)
+        subject { fork_project(@from_project, @to_user, params) }
 
-          expect(to_project).not_to be_persisted
-          expect(to_project.errors.messages).to have_key(:base)
-          expect(to_project.errors.messages[:base].first).to match('There is already a repository with that name on disk')
+        it 'does not allow creation' do
+          expect(subject).not_to be_persisted
+          expect(subject.errors.messages).to have_key(:base)
+          expect(subject.errors.messages[:base].first).to match('There is already a repository with that name on disk')
+        end
+
+        context 'when repository disk validation is explicitly skipped' do
+          let(:params) { super().merge(skip_disk_validation: true) }
+
+          it 'allows fork project creation' do
+            expect(subject).to be_persisted
+            expect(subject.errors.messages).to be_empty
+          end
         end
       end
 
@@ -205,7 +216,8 @@ describe Projects::ForkService do
         @project     = create(:project, :repository,
                               creator_id: @group_owner.id,
                               star_count: 777,
-                              description: 'Wow, such a cool project!')
+                              description: 'Wow, such a cool project!',
+                              ci_config_path: 'debian/salsa-ci.yml')
         @group = create(:group)
         @group.add_user(@group_owner, GroupMember::OWNER)
         @group.add_user(@developer,   GroupMember::DEVELOPER)
@@ -218,14 +230,15 @@ describe Projects::ForkService do
         it 'group owner successfully forks project into the group' do
           to_project = fork_project(@project, @group_owner, @opts)
 
-          expect(to_project).to             be_persisted
-          expect(to_project.errors).to      be_empty
-          expect(to_project.owner).to       eq(@group)
-          expect(to_project.namespace).to   eq(@group)
-          expect(to_project.name).to        eq(@project.name)
-          expect(to_project.path).to        eq(@project.path)
-          expect(to_project.description).to eq(@project.description)
-          expect(to_project.star_count).to  be_zero
+          expect(to_project).to                be_persisted
+          expect(to_project.errors).to         be_empty
+          expect(to_project.owner).to          eq(@group)
+          expect(to_project.namespace).to      eq(@group)
+          expect(to_project.name).to           eq(@project.name)
+          expect(to_project.path).to           eq(@project.path)
+          expect(to_project.description).to    eq(@project.description)
+          expect(to_project.ci_config_path).to eq(@project.ci_config_path)
+          expect(to_project.star_count).to     be_zero
         end
       end
 

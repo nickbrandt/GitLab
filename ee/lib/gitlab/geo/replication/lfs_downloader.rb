@@ -14,7 +14,14 @@ module Gitlab
           return fail_before_transfer unless lfs_object.present?
 
           transfer = ::Gitlab::Geo::Replication::LfsTransfer.new(lfs_object)
-          Result.from_transfer_result(transfer.download_from_primary)
+
+          result = if lfs_object.local_store?
+                     transfer.download_from_primary
+                   else
+                     transfer.stream_from_primary_to_object_storage
+                   end
+
+          Result.from_transfer_result(result)
         end
 
         private

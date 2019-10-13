@@ -19,6 +19,8 @@ import {
   mockInitialConfig,
   mockParentItem,
   mockQueryResponse,
+  mockEpicTreeReorderInput,
+  mockReorderMutationResponse,
   mockEpics,
   mockIssues,
   mockEpic1,
@@ -730,13 +732,13 @@ describe('RelatedItemTree', () => {
         });
       });
 
-      describe('toggleCreateItemForm', () => {
-        it('should set `state.showCreateItemForm` to true', done => {
+      describe('toggleCreateEpicForm', () => {
+        it('should set `state.showCreateEpicForm` to true', done => {
           testAction(
-            actions.toggleCreateItemForm,
+            actions.toggleCreateEpicForm,
             {},
             {},
-            [{ type: types.TOGGLE_CREATE_ITEM_FORM, payload: {} }],
+            [{ type: types.TOGGLE_CREATE_EPIC_FORM, payload: {} }],
             [],
             done,
           );
@@ -804,6 +806,9 @@ describe('RelatedItemTree', () => {
       describe('receiveAddItemSuccess', () => {
         it('should set `state.itemAddInProgress` to false and dispatches actions `setPendingReferences`, `setItemInputValue` and `toggleAddItemForm`', done => {
           state.epicsBeginAtIndex = 0;
+          state.actionType = ActionType.Epic;
+          state.isEpic = true;
+
           const mockEpicsWithoutPerm = mockEpics.map(item =>
             Object.assign({}, item, {
               pathIdSeparator: PathIdSeparator.Epic,
@@ -813,7 +818,7 @@ describe('RelatedItemTree', () => {
 
           testAction(
             actions.receiveAddItemSuccess,
-            { actionType: ActionType.Epic, rawItems: mockEpicsWithoutPerm },
+            { rawItems: mockEpicsWithoutPerm },
             state,
             [
               {
@@ -904,6 +909,7 @@ describe('RelatedItemTree', () => {
           state.actionType = ActionType.Epic;
           state.epicsEndpoint = '/foo/bar';
           state.pendingReferences = ['foo'];
+          state.isEpic = true;
 
           mock.onPost(state.epicsEndpoint).replyOnce(200, { issuables: [mockEpic1] });
 
@@ -918,7 +924,7 @@ describe('RelatedItemTree', () => {
               },
               {
                 type: 'receiveAddItemSuccess',
-                payload: { actionType: ActionType.Epic, rawItems: [mockEpic1] },
+                payload: { rawItems: [mockEpic1] },
               },
             ],
             done,
@@ -965,29 +971,39 @@ describe('RelatedItemTree', () => {
 
       describe('receiveCreateItemSuccess', () => {
         it('should set `state.itemCreateInProgress` to false', done => {
+          const createdEpic = Object.assign({}, mockEpics[0], {
+            id: `gid://gitlab/Epic/${mockEpics[0].id}`,
+            reference: `${mockEpics[0].group.fullPath}${mockEpics[0].reference}`,
+            pathIdSeparator: '&',
+          });
           state.epicsBeginAtIndex = 0;
+          state.parentItem = {
+            fullPath: createdEpic.group.fullPath,
+          };
+          state.actionType = ActionType.Epic;
+          state.isEpic = true;
 
           testAction(
             actions.receiveCreateItemSuccess,
-            { rawItem: mockEpic1, actionType: ActionType.Epic },
+            { rawItem: mockEpic1 },
             state,
             [
               {
                 type: types.RECEIVE_CREATE_ITEM_SUCCESS,
-                payload: { insertAt: 0, item: mockItems[0] },
+                payload: { insertAt: 0, item: createdEpic },
               },
             ],
             [
               {
                 type: 'setChildrenCount',
-                payload: { children: [mockItems[0]] },
+                payload: { children: [createdEpic] },
               },
               {
                 type: 'setItemChildrenFlags',
-                payload: { children: [mockItems[0]], isSubItem: false },
+                payload: { children: [createdEpic], isSubItem: false },
               },
               {
-                type: 'toggleCreateItemForm',
+                type: 'toggleCreateEpicForm',
                 payload: { actionType: ActionType.Epic, toggleState: false },
               },
             ],
@@ -1058,7 +1074,6 @@ describe('RelatedItemTree', () => {
               {
                 type: 'receiveCreateItemSuccess',
                 payload: {
-                  actionType: ActionType.Epic,
                   rawItem: Object.assign({}, mockEpic1, {
                     path: '',
                     state: ChildState.Open,
@@ -1085,6 +1100,161 @@ describe('RelatedItemTree', () => {
               },
               {
                 type: 'receiveCreateItemFailure',
+              },
+            ],
+            done,
+          );
+        });
+      });
+
+      describe('receiveReorderItemFailure', () => {
+        beforeEach(() => {
+          setFixtures('<div class="flash-container"></div>');
+        });
+
+        it('should revert reordered item back to its original position via REORDER_ITEM mutation', done => {
+          testAction(
+            actions.receiveReorderItemFailure,
+            {},
+            {},
+            [{ type: types.REORDER_ITEM, payload: {} }],
+            [],
+            done,
+          );
+        });
+
+        it('should show flash error with message "Something went wrong while ordering item."', () => {
+          const message = 'Something went wrong while ordering item.';
+          actions.receiveReorderItemFailure(
+            {
+              commit: () => {},
+            },
+            {
+              message,
+            },
+          );
+
+          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+            message,
+          );
+        });
+      });
+
+      describe('reorderItem', () => {
+        it('should perform REORDER_ITEM mutation before request and do nothing on request success', done => {
+          spyOn(epicUtils.gqClient, 'mutate').and.returnValue(
+            Promise.resolve({
+              data: mockReorderMutationResponse,
+            }),
+          );
+
+          testAction(
+            actions.reorderItem,
+            {
+              treeReorderMutation: mockEpicTreeReorderInput.moved,
+              parentItem: mockParentItem,
+              targetItem: mockItems[1],
+              oldIndex: 1,
+              newIndex: 0,
+            },
+            {},
+            [
+              {
+                type: types.REORDER_ITEM,
+                payload: {
+                  parentItem: mockParentItem,
+                  targetItem: mockItems[1],
+                  oldIndex: 1,
+                  newIndex: 0,
+                },
+              },
+            ],
+            [],
+            done,
+          );
+        });
+
+        it('should perform REORDER_ITEM mutation before request and dispatch `receiveReorderItemFailure` when request response has errors on request success', done => {
+          spyOn(epicUtils.gqClient, 'mutate').and.returnValue(
+            Promise.resolve({
+              data: {
+                epicTreeReorder: {
+                  ...mockReorderMutationResponse.epicTreeReorder,
+                  errors: [{ foo: 'bar' }],
+                },
+              },
+            }),
+          );
+
+          testAction(
+            actions.reorderItem,
+            {
+              treeReorderMutation: mockEpicTreeReorderInput.moved,
+              parentItem: mockParentItem,
+              targetItem: mockItems[1],
+              oldIndex: 1,
+              newIndex: 0,
+            },
+            {},
+            [
+              {
+                type: types.REORDER_ITEM,
+                payload: {
+                  parentItem: mockParentItem,
+                  targetItem: mockItems[1],
+                  oldIndex: 1,
+                  newIndex: 0,
+                },
+              },
+            ],
+            [
+              {
+                type: 'receiveReorderItemFailure',
+                payload: {
+                  parentItem: mockParentItem,
+                  targetItem: mockItems[1],
+                  oldIndex: 0,
+                  newIndex: 1,
+                },
+              },
+            ],
+            done,
+          );
+        });
+
+        it('should perform REORDER_ITEM mutation before request and dispatch `receiveReorderItemFailure` on request failure', done => {
+          spyOn(epicUtils.gqClient, 'mutate').and.returnValue(Promise.reject());
+
+          testAction(
+            actions.reorderItem,
+            {
+              treeReorderMutation: mockEpicTreeReorderInput.moved,
+              parentItem: mockParentItem,
+              targetItem: mockItems[1],
+              oldIndex: 1,
+              newIndex: 0,
+            },
+            {},
+            [
+              {
+                type: types.REORDER_ITEM,
+                payload: {
+                  parentItem: mockParentItem,
+                  targetItem: mockItems[1],
+                  oldIndex: 1,
+                  newIndex: 0,
+                },
+              },
+            ],
+            [
+              {
+                type: 'receiveReorderItemFailure',
+                payload: {
+                  parentItem: mockParentItem,
+                  targetItem: mockItems[1],
+                  oldIndex: 0,
+                  newIndex: 1,
+                },
               },
             ],
             done,

@@ -4,11 +4,16 @@ import initRoadmap from 'ee/roadmap/roadmap_bundle';
 
 export default class EpicTabs {
   constructor() {
+    this.epicTreesEnabled = gon.features && gon.features.epicTrees;
     this.wrapper = document.querySelector('.content-wrapper .container-fluid:not(.breadcrumbs)');
     this.epicTabs = this.wrapper.querySelector('.js-epic-tabs-container');
     this.discussionFilterContainer = this.epicTabs.querySelector('.js-discussion-filter-container');
 
-    this.treeTabLoaded = false;
+    if (this.epicTreesEnabled) {
+      initRelatedItemsTree();
+    }
+
+    this.treeTabLoaded = this.epicTreesEnabled;
     this.roadmapTabLoaded = false;
 
     this.bindEvents();
@@ -25,7 +30,7 @@ export default class EpicTabs {
   }
 
   onTreeShow() {
-    this.discussionFilterContainer.classList.add('hidden');
+    if (!this.epicTreesEnabled) this.discussionFilterContainer.classList.add('hidden');
     if (!this.treeTabLoaded) {
       initRelatedItemsTree();
       this.treeTabLoaded = true;
@@ -33,12 +38,12 @@ export default class EpicTabs {
   }
 
   onTreeHide() {
-    this.discussionFilterContainer.classList.remove('hidden');
+    if (!this.epicTreesEnabled) this.discussionFilterContainer.classList.remove('hidden');
   }
 
   onRoadmapShow() {
     this.wrapper.classList.remove('container-limited');
-    this.discussionFilterContainer.classList.add('hidden');
+    if (!this.epicTreesEnabled) this.discussionFilterContainer.classList.add('hidden');
     if (!this.roadmapTabLoaded) {
       initRoadmap();
       this.roadmapTabLoaded = true;
@@ -47,6 +52,6 @@ export default class EpicTabs {
 
   onRoadmapHide() {
     this.wrapper.classList.add('container-limited');
-    this.discussionFilterContainer.classList.remove('hidden');
+    if (!this.epicTreesEnabled) this.discussionFilterContainer.classList.remove('hidden');
   }
 }

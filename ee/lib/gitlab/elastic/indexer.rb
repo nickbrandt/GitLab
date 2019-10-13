@@ -11,12 +11,7 @@ module Gitlab
       Error = Class.new(StandardError)
 
       class << self
-        def experimental_indexer_present?
-          path = Gitlab.config.elasticsearch.indexer_path
-          path.present? && File.executable?(path)
-        end
-
-        def experimental_indexer_version
+        def indexer_version
           Rails.root.join('GITLAB_ELASTICSEARCH_INDEXER_VERSION').read.chomp
         end
       end
@@ -34,11 +29,9 @@ module Gitlab
           'RAILS_ENV'               => Rails.env
         }
 
-        if use_experimental_indexer?
-          @vars['GITALY_CONNECTION_INFO'] = {
-            storage: project.repository_storage
-          }.merge(Gitlab::GitalyClient.connection_data(project.repository_storage)).to_json
-        end
+        @vars['GITALY_CONNECTION_INFO'] = {
+          storage: project.repository_storage
+        }.merge(Gitlab::GitalyClient.connection_data(project.repository_storage)).to_json
 
         # Use the eager-loaded association if available.
         @index_status = project.index_status
@@ -70,30 +63,12 @@ module Gitlab
         wiki? ? project.wiki.repository : project.repository
       end
 
-      def path_to_indexer
-        if use_experimental_indexer?
-          Gitlab.config.elasticsearch.indexer_path
-        else
-          Rails.root.join('bin', 'elastic_repo_indexer').to_s
-        end
-      end
-
-      def use_experimental_indexer?
-        strong_memoize(:use_experimental_indexer) do
-          if wiki?
-            raise '`gitlab-elasticsearch-indexer` is required for indexing wikis' unless self.class.experimental_indexer_present?
-
-            true
-          else
-            Gitlab::CurrentSettings.elasticsearch_experimental_indexer? && self.class.experimental_indexer_present?
-          end
-        end
-      end
-
       def run_indexer!(to_sha)
         if index_status && !repository_contains_last_indexed_commit?
           repository.delete_index_for_commits_and_blobs(wiki: wiki?)
         end
+
+        path_to_indexer = Gitlab.config.elasticsearch.indexer_path
 
         command =
           if wiki?
@@ -128,12 +103,7 @@ module Gitlab
       end
 
       def repository_path
-        # Go indexer needs relative path while ruby indexer needs absolute one
-        if use_experimental_indexer?
-          "#{repository.disk_path}.git"
-        else
-          ::Gitlab::GitalyClient::StorageSettings.allow_disk_access { repository.path_to_repo }
-        end
+        "#{repository.disk_path}.git"
       end
 
       # rubocop: disable CodeReuse/ActiveRecord

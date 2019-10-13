@@ -8,9 +8,9 @@ module DesignManagement
     include ActiveModel::Validations
 
     EVENT_FOR_GITALY_ACTION = {
-      create: DesignManagement::DesignVersion.events[:creation],
-      update: DesignManagement::DesignVersion.events[:modification],
-      delete: DesignManagement::DesignVersion.events[:deletion]
+      create: DesignManagement::Action.events[:creation],
+      update: DesignManagement::Action.events[:modification],
+      delete: DesignManagement::Action.events[:deletion]
     }.freeze
 
     attr_reader :design, :action, :content

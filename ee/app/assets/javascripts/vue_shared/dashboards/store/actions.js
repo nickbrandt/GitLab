@@ -33,7 +33,7 @@ export const addProjectsToDashboard = ({ state, dispatch }) =>
     .catch(() => dispatch('receiveAddProjectsToDashboardError'));
 
 export const toggleSelectedProject = ({ commit, state }, project) => {
-  if (!_.findWhere(state.selectedProjects, { id: project.id })) {
+  if (!_.find(state.selectedProjects, { id: project.id })) {
     commit(types.ADD_SELECTED_PROJECT, project);
   } else {
     commit(types.REMOVE_SELECTED_PROJECT, project);
@@ -151,14 +151,13 @@ export const receiveRemoveProjectError = () => {
 export const setSearchQuery = ({ commit }, query) => commit(types.SET_SEARCH_QUERY, query);
 
 export const fetchSearchResults = ({ state, dispatch }) => {
+  const { searchQuery } = state;
   dispatch('requestSearchResults');
 
-  if (!state.searchQuery) {
-    dispatch('receiveSearchResultsError');
-  } else if (state.searchQuery.lengh < API_MINIMUM_QUERY_LENGTH) {
-    dispatch('receiveSearchResultsError', 'minimumQuery');
+  if (!searchQuery || searchQuery.length < API_MINIMUM_QUERY_LENGTH) {
+    dispatch('minimumQueryMessage');
   } else {
-    Api.projects(state.searchQuery, {})
+    Api.projects(searchQuery, {})
       .then(results => dispatch('receiveSearchResultsSuccess', results))
       .catch(() => dispatch('receiveSearchResultsError'));
   }
@@ -177,6 +176,10 @@ export const receiveSearchResultsError = ({ commit }) => {
 export const setProjectEndpoints = ({ commit }, endpoints) => {
   commit(types.SET_PROJECT_ENDPOINT_LIST, endpoints.list);
   commit(types.SET_PROJECT_ENDPOINT_ADD, endpoints.add);
+};
+
+export const minimumQueryMessage = ({ commit }) => {
+  commit(types.MINIMUM_QUERY_MESSAGE);
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

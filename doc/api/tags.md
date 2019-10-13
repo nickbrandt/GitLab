@@ -19,7 +19,7 @@ Parameters:
 | `sort` | string | no | Return tags sorted in `asc` or `desc` order. Default is `desc` |
 | `search` | string | no | Return list of tags matching the search criteria |
 
-> Support for `search` was [introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/54401) in GitLab 11.8.
+> Support for `search` was [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/54401) in GitLab 11.8.
 
 ```json
 [
@@ -115,6 +115,12 @@ Parameters:
 - `ref` (required) - Create tag using commit SHA, another tag name, or branch name.
 - `message` (optional) - Creates annotated tag.
 - `release_description` (optional) - Add release notes to the Git tag and store it in the GitLab database.
+
+```bash
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/5/repository/tags?tag_name=test&ref=master"
+```
+
+Example response:
 
 ```json
 {

@@ -7,7 +7,7 @@ description: How to add docs for new or enhanced GitLab features.
 At GitLab, developers contribute new or updated documentation along with their code, but product managers and technical writers also have essential roles in the process.
 
 - **Developers**: Author/update documentation in the same MR as their code, and
-  merge it by the feature freeze for the assigned milestone. Request technical writer
+  merge it in the assigned milestone. Request technical writer
   assistance if needed. Other developers typically act as reviewers.
 - **Product Managers** (PMs): In the issue for all new and enhanced features,
   confirm the documentation requirements, plus the mentioned feature description
@@ -40,7 +40,7 @@ interact with GitLab.
 NOTE: **Note:**
 When revamping documentation, if unrelated to the feature change, this should be submitted
 in its own MR (using the [documentation improvement workflow](improvement-workflow.md))
-so that we can ensure the more time-sensitive doc updates are merged with code by the freeze.
+so that we can ensure the more time-sensitive doc updates are merged sooner.
 
 ## Documentation requirements in feature issues
 
@@ -69,7 +69,7 @@ To follow a consistent workflow every month, documentation changes
 involve the Product Managers, the developer who shipped the feature,
 and the technical writer for the DevOps stage. Each role is described below.
 
-The Documentation items in the GitLab CE/EE [Feature Proposal issue template](https://gitlab.com/gitlab-org/gitlab-ce/raw/master/.gitlab/issue_templates/Feature%20proposal.md)
+The Documentation items in the GitLab CE/EE [Feature Proposal issue template](https://gitlab.com/gitlab-org/gitlab/raw/master/.gitlab/issue_templates/Feature%20proposal.md)
 and default merge request template will assist you with following this process.
 
 ### Product Manager role
@@ -77,7 +77,7 @@ and default merge request template will assist you with following this process.
 For issues requiring any new or updated documentation, the Product Manager (PM)
 must:
 
-- Add the `Documentation` label.
+- Add the ~documentation label.
 - Confirm or add the [documentation requirements](#documentation-requirements-in-feature-issues).
 - Ensure the issue contains any new or updated feature name, overview/description,
   and use cases, as required per the [documentation structure and template](structure.md), when applicable.
@@ -92,7 +92,7 @@ do the following:
 
 #### Authoring
 
-As a developer, if a ~feature issue also contains the ~Documentation label, you must ship the new or updated documentation with the code of the feature. The documentation is an essential part of the product.
+As a developer, if a ~feature issue also contains the ~documentation label, you must ship the new or updated documentation with the code of the feature. The documentation is an essential part of the product.
 Technical writers are happy to help, as requested and planned on an issue-by-issue basis.
 
 For feature issues requiring documentation, follow the process below unless otherwise agreed with the product manager and technical writer for a given issue:
@@ -112,7 +112,7 @@ For feature issues requiring documentation, follow the process below unless othe
   in your issue or MR, or write within `#docs` on the GitLab Slack.
 - If you are working on documentation in a separate MR, ensure that if the code is merged by the 17th, the docs are as well, per the [Engineering Workflow](https://about.gitlab.com/handbook/engineering/workflow/). If the docs are not ready, the PM can approve merging the code if the engineer and tech writer commit to get documentation merged by the 21st. Otherwise the feature is not considered complete, and should not be merged.
 - A policy for documenting feature-flagged
-  issues is forthcoming and you are welcome to join the [discussion](https://gitlab.com/gitlab-org/gitlab-ce/issues/56813).
+  issues is forthcoming and you are welcome to join the [discussion](https://gitlab.com/gitlab-org/gitlab-foss/issues/56813).
 
 #### Reviews and merging
 
@@ -131,10 +131,10 @@ All reviewers can help ensure accuracy, clarity, completeness, and adherence to 
        the maintainer can merge the current doc changes (if complete) and create a follow-up doc review issue.
      - The technical writer can also help decide what docs to merge before the freeze and whether to work on further changes in a follow up MR.
      - **To request a pre-merge technical writer review**, assign the writer listed for the applicable [DevOps stage](https://about.gitlab.com/handbook/product/categories/#devops-stages).
-     - **To request a post-merge technical writer review**, [create an issue for one using the Doc Review template](https://gitlab.com/gitlab-org/gitlab-ce/issues/new?issuable_template=Doc%20Review) and link it from the MR that makes the doc change.
+     - **To request a post-merge technical writer review**, [create an issue for one using the Doc Review template](https://gitlab.com/gitlab-org/gitlab-foss/issues/new?issuable_template=Doc%20Review) and link it from the MR that makes the doc change.
   1. **The maintainer** who is assigned to merge the MR, to verify clarity, completeness, and quality, to the best of their ability.
 
-- Upon merging, if a technical writer review has not been performed and there is not yet a linked issue for a follow-up review, the maintainer should [create an issue using the Doc Review template](https://gitlab.com/gitlab-org/gitlab-ce/issues/new?issuable_template=Doc%20Review), link it from the MR, and
+- Upon merging, if a technical writer review has not been performed and there is not yet a linked issue for a follow-up review, the maintainer should [create an issue using the Doc Review template](https://gitlab.com/gitlab-org/gitlab-foss/issues/new?issuable_template=Doc%20Review), link it from the MR, and
   mention the original MR author in the new issue. Alternatively, the maintainer can ask the MR author to create and link this issue before the MR is merged.
 
 - After merging, documentation changes are reviewed by:

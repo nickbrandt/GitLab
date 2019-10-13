@@ -42,6 +42,7 @@ describe('Issue card component', () => {
       assignees: [],
       reference_path: '#1',
       real_path: '/test/1',
+      weight: 1,
     });
 
     component = new Vue({
@@ -283,12 +284,6 @@ describe('Issue card component', () => {
           done();
         })
         .catch(done.fail);
-    });
-  });
-
-  describe('weights', () => {
-    it('not shows weight component', () => {
-      expect(component.$el.querySelector('.board-card-weight')).toBeNull();
     });
   });
 });

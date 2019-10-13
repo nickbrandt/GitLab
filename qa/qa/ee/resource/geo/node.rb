@@ -14,7 +14,7 @@ module QA
             QA::Page::Admin::Menu.perform(&:click_geo_menu_link)
             EE::Page::Admin::Geo::Nodes::Show.perform(&:new_node!)
 
-            EE::Page::Admin::Geo::Nodes::New.perform do |page|
+            EE::Page::Admin::Geo::Nodes::New.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
               raise ArgumentError if @name.nil? || @address.nil?
 
               page.set_node_name(@name)

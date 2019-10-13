@@ -1,6 +1,5 @@
 import Tracking from '~/tracking';
 import { getParameterValues } from '~/lib/utils/url_utility';
-import { parseBoolean } from '~/lib/utils/common_utils';
 import * as types from './mutation_types';
 
 export const setFilter = ({ commit }, payload) => {
@@ -26,11 +25,9 @@ export const lockFilter = ({ commit }, payload) => {
 };
 
 export const setHideDismissedToggleInitialState = ({ commit }) => {
-  const [urlParam] = getParameterValues('hide_dismissed');
-  if (typeof urlParam !== 'undefined') {
-    const parsedParam = parseBoolean(urlParam);
-    commit(types.SET_TOGGLE_VALUE, { key: 'hide_dismissed', value: parsedParam });
-  }
+  const [urlParam] = getParameterValues('scope');
+  const showDismissed = urlParam === 'all';
+  commit(types.SET_TOGGLE_VALUE, { key: 'hide_dismissed', value: !showDismissed });
 };
 
 export const setToggleValue = ({ commit }, { key, value }) => {
@@ -43,5 +40,5 @@ export const setToggleValue = ({ commit }, { key, value }) => {
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
-// This is no longer needed after gitlab-ce#52179 is merged
+// This is no longer needed after gitlab-foss#52179 is merged
 export default () => {};

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'EE > Projects > Settings > User manages approval rule settings' do
@@ -29,24 +31,6 @@ describe 'EE > Projects > Settings > User manages approval rule settings' do
 
     it 'shows approval settings' do
       expect(page).to have_selector('#js-merge-request-approval-settings')
-    end
-  end
-
-  context 'when `code_owner_approval_required` is available' do
-    let(:licensed_features) { { code_owner_approval_required: true } }
-
-    it_behaves_like 'dirty submit form', [{ form: '#js-merge-request-approval-settings', input: '#project_merge_requests_author_approval' }]
-
-    it 'allows the user to enforce code owner approval' do
-      within('.require-code-owner-approval') do
-        check('Require approval from code owners')
-      end
-
-      within('.merge-request-approval-settings-form') do
-        click_on('Save changes')
-      end
-
-      expect(project.reload.merge_requests_require_code_owner_approval?).to be_truthy
     end
   end
 

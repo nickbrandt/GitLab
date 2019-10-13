@@ -333,8 +333,8 @@ describe('Dashboard', () => {
     });
 
     it('shows a specific time window selected from the url params', done => {
-      const start = 1564439536;
-      const end = 1564441336;
+      const start = '2019-10-01T18:27:47.000Z';
+      const end = '2019-10-01T18:57:47.000Z';
       spyOnDependency(Dashboard, 'getTimeDiff').and.returnValue({
         start,
         end,
@@ -378,7 +378,7 @@ describe('Dashboard', () => {
     });
   });
 
-  // https://gitlab.com/gitlab-org/gitlab-ce/issues/66922
+  // https://gitlab.com/gitlab-org/gitlab-foss/issues/66922
   // eslint-disable-next-line jasmine/no-disabled-tests
   xdescribe('link to chart', () => {
     let wrapper;
@@ -527,7 +527,6 @@ describe('Dashboard', () => {
 
       component.$store.dispatch('monitoringDashboard/setFeatureFlags', {
         prometheusEndpoint: false,
-        multipleDashboardsEnabled: true,
       });
 
       component.$store.commit(

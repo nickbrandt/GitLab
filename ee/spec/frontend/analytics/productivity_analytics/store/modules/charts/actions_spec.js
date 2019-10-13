@@ -13,10 +13,10 @@ describe('Productivity analytics chart actions', () => {
   let mockedState;
   let mock;
 
-  const chartKey = 'main';
+  const chartKey = chartKeys.main;
   const globalParams = {
     group_id: 'gitlab-org',
-    project_id: 'gitlab-test',
+    project_id: 'gitlab-org/gitlab-test',
   };
 
   beforeEach(() => {
@@ -47,59 +47,64 @@ describe('Productivity analytics chart actions', () => {
   });
 
   describe('fetchChartData', () => {
-    describe('success', () => {
-      beforeEach(() => {
-        mock.onGet(mockedState.endpoint).replyOnce(200, mockHistogramData);
+    describe('when chart is enabled', () => {
+      describe('success', () => {
+        beforeEach(() => {
+          mock.onGet(mockedState.endpoint).replyOnce(200, mockHistogramData);
+        });
+
+        it('calls API with params', () => {
+          jest.spyOn(axios, 'get');
+
+          actions.fetchChartData(mockedContext, chartKey);
+
+          expect(axios.get).toHaveBeenCalledWith(mockedState.endpoint, { params: globalParams });
+        });
+
+        it('dispatches success with received data', done =>
+          testAction(
+            actions.fetchChartData,
+            chartKey,
+            mockedState,
+            [],
+            [
+              { type: 'requestChartData', payload: chartKey },
+              {
+                type: 'receiveChartDataSuccess',
+                payload: expect.objectContaining({ chartKey, data: mockHistogramData }),
+              },
+            ],
+            done,
+          ));
       });
 
-      it('calls API with params', () => {
-        jest.spyOn(axios, 'get');
+      describe('error', () => {
+        beforeEach(() => {
+          mock.onGet(mockedState.endpoint).replyOnce(500);
+        });
 
-        actions.fetchChartData(mockedContext, chartKey);
-
-        expect(axios.get).toHaveBeenCalledWith(mockedState.endpoint, { params: globalParams });
-      });
-
-      it('dispatches success with received data', done =>
-        testAction(
-          actions.fetchChartData,
-          chartKey,
-          mockedState,
-          [],
-          [
-            { type: 'requestChartData', payload: chartKey },
-            {
-              type: 'receiveChartDataSuccess',
-              payload: expect.objectContaining({ chartKey, data: mockHistogramData }),
-            },
-          ],
-          done,
-        ));
-    });
-
-    describe('error', () => {
-      beforeEach(() => {
-        mock.onGet(mockedState.endpoint).replyOnce(500, chartKey);
-      });
-
-      it('dispatches error', done => {
-        testAction(
-          actions.fetchChartData,
-          chartKey,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestChartData',
-              payload: chartKey,
-            },
-            {
-              type: 'receiveChartDataError',
-              payload: chartKey,
-            },
-          ],
-          done,
-        );
+        it('dispatches error', done => {
+          testAction(
+            actions.fetchChartData,
+            chartKey,
+            mockedState,
+            [],
+            [
+              {
+                type: 'requestChartData',
+                payload: chartKey,
+              },
+              {
+                type: 'receiveChartDataError',
+                payload: {
+                  chartKey,
+                  error: new Error('Request failed with status code 500'),
+                },
+              },
+            ],
+            done,
+          );
+        });
       });
     });
   });
@@ -114,6 +119,24 @@ describe('Productivity analytics chart actions', () => {
         [],
         done,
       );
+    });
+
+    describe('when chart is disabled', () => {
+      const disabledChartKey = chartKeys.scatterplot;
+      beforeEach(() => {
+        mock.onGet(mockedState.endpoint).replyOnce(200);
+        mockedState.charts[disabledChartKey].enabled = false;
+      });
+
+      it('does not dispatch the requestChartData action', done => {
+        testAction(actions.fetchChartData, disabledChartKey, mockedState, [], [], done);
+      });
+
+      it('does not call the API', () => {
+        actions.fetchChartData(mockedContext, disabledChartKey);
+        jest.spyOn(axios, 'get');
+        expect(axios.get).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -137,14 +160,18 @@ describe('Productivity analytics chart actions', () => {
 
   describe('receiveChartDataError', () => {
     it('should commit error', done => {
+      const error = { response: { status: 500 } };
       testAction(
         actions.receiveChartDataError,
-        chartKey,
+        { chartKey, error },
         mockedContext.state,
         [
           {
             type: types.RECEIVE_CHART_DATA_ERROR,
-            payload: chartKey,
+            payload: {
+              chartKey,
+              status: 500,
+            },
           },
         ],
         [],
@@ -153,15 +180,14 @@ describe('Productivity analytics chart actions', () => {
     });
   });
 
-  describe('fetchAllChartData', () => {
-    it('commits reset for the main chart and dispatches fetchChartData for all chart types', done => {
+  describe('fetchSecondaryChartData', () => {
+    it('dispatches fetchChartData for all chart types except for the main chart', done => {
       testAction(
-        actions.fetchAllChartData,
+        actions.fetchSecondaryChartData,
         null,
         mockedContext.state,
-        [{ type: types.RESET_CHART_DATA, payload: chartKeys.main }],
+        [],
         [
-          { type: 'fetchChartData', payload: chartKeys.main },
           { type: 'fetchChartData', payload: chartKeys.timeBasedHistogram },
           { type: 'fetchChartData', payload: chartKeys.commitBasedHistogram },
           { type: 'fetchChartData', payload: chartKeys.scatterplot },
@@ -186,19 +212,53 @@ describe('Productivity analytics chart actions', () => {
     });
   });
 
-  describe('chartItemClicked', () => {
-    const item = 5;
-    it('should commit selected chart item', done => {
+  describe('updateSelectedItems', () => {
+    describe('when skipReload is false (by default)', () => {
+      const item = 5;
+      it('should commit selected chart item and dispatch fetchSecondaryChartData and setPage', done => {
+        testAction(
+          actions.updateSelectedItems,
+          { chartKey, item },
+          mockedContext.state,
+          [{ type: types.UPDATE_SELECTED_CHART_ITEMS, payload: { chartKey, item } }],
+          [{ type: 'fetchSecondaryChartData' }, { type: 'table/setPage', payload: 0 }],
+          done,
+        );
+      });
+    });
+
+    describe('when skipReload is true', () => {
+      it('should commit selected chart and it should not dispatch any further actions', done => {
+        testAction(
+          actions.updateSelectedItems,
+          { chartKey, item: null, skipReload: true },
+          mockedContext.state,
+          [
+            {
+              type: types.UPDATE_SELECTED_CHART_ITEMS,
+              payload: { chartKey: chartKeys.main, item: null },
+            },
+          ],
+          [],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('setChartEnabled', () => {
+    it('should commit enabled state', done => {
       testAction(
-        actions.chartItemClicked,
-        { chartKey, item },
+        actions.setChartEnabled,
+        { chartKey: chartKeys.scatterplot, isEnabled: false },
         mockedContext.state,
-        [{ type: types.UPDATE_SELECTED_CHART_ITEMS, payload: { chartKey, item } }],
         [
-          { type: 'fetchChartData', payload: chartKeys.timeBasedHistogram },
-          { type: 'fetchChartData', payload: chartKeys.commitBasedHistogram },
-          { type: 'table/fetchMergeRequests', payload: null },
+          {
+            type: types.SET_CHART_ENABLED,
+            payload: { chartKey: chartKeys.scatterplot, isEnabled: false },
+          },
         ],
+        [],
         done,
       );
     });

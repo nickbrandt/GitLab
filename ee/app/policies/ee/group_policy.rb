@@ -49,6 +49,9 @@ module EE
         enable :admin_list
         enable :admin_board
         enable :read_prometheus
+        enable :view_code_analytics
+        enable :view_productivity_analytics
+        enable :view_type_of_work_charts
       end
 
       rule { maintainer }.policy do
@@ -66,8 +69,9 @@ module EE
       rule { can?(:read_group) & contribution_analytics_available }
         .enable :read_group_contribution_analytics
 
-      rule { reporter & cycle_analytics_available }
-        .enable :read_group_cycle_analytics
+      rule { reporter & cycle_analytics_available }.policy do
+        enable :read_group_cycle_analytics, :create_group_stage, :read_group_stage, :update_group_stage, :delete_group_stage
+      end
 
       rule { can?(:read_group) & dependency_proxy_available }
         .enable :read_dependency_proxy
@@ -131,8 +135,6 @@ module EE
       rule { ip_enforcement_prevents_access & ~owner }.policy do
         prevent :read_group
       end
-
-      rule { reporter }.enable :view_productivity_analytics
     end
 
     override :lookup_access_level!

@@ -5,9 +5,20 @@
 CAUTION: **Caution:**
 Serverless is currently in [alpha](https://about.gitlab.com/handbook/product/#alpha).
 
-Run serverless workloads on Kubernetes using [Knative](https://cloud.google.com/knative/).
-
 ## Overview
+
+Serverless architectures offer Operators and Developers the ability write highly scalable applications without provisioning a single server.
+
+GitLab supports several ways deploy Serverless applications in both Kubernetes Environments and also major cloud FAAS environments.
+
+Currently we support:
+
+- [Knative](#knative): Build Knative applications with Knative and gitlabktl on GKE
+- [AWS Lambda](aws.md): Create serverless applications via the Serverless Framework and GitLab CI
+
+## Knative
+
+Run serverless workloads on Kubernetes using [Knative](https://cloud.google.com/knative/).
 
 Knative extends Kubernetes to provide a set of middleware components that are useful to build modern, source-centric, container-based applications. Knative brings some significant benefits out of the box through its main components:
 
@@ -20,7 +31,7 @@ With GitLab Serverless, you can deploy both functions-as-a-service (FaaS) and se
 
 ## Prerequisites
 
-To run Knative on Gitlab, you will need:
+To run Knative on GitLab, you will need:
 
 1. **Existing GitLab project:** You will need a GitLab project to associate all resources. The simplest way to get started:
 
@@ -71,10 +82,10 @@ The minimum recommended cluster size to run Knative is 3-nodes, 6 vCPUs, and 22.
    For clusters created on GKE, see [GKE Cluster Access](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl),
    for other platforms [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 
-1. The ingress is now available at this address and will route incoming requests to the proper service based on the DNS
+1. The Ingress is now available at this address and will route incoming requests to the proper service based on the DNS
    name in the request. To support this, a wildcard DNS A record should be created for the desired domain name. For example,
    if your Knative base domain is `knative.info` then you need to create an A record or CNAME record with domain `*.knative.info`
-   pointing the ip address or hostname of the ingress.
+   pointing the ip address or hostname of the Ingress.
 
    ![dns entry](img/dns-entry.png)
 
@@ -84,7 +95,7 @@ on a given project but not both. The current implementation makes use of a `serv
 
 ## Using an existing installation of Knative
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/58941) in GitLab 12.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/58941) in GitLab 12.0.
 
 NOTE: **Note:**
 The "invocations" monitoring feature of GitLab serverless will not work when
@@ -102,7 +113,7 @@ You must do the following:
 1. Ensure GitLab can manage Knative:
    - For a non-GitLab managed cluster, ensure that the service account for the token
      provided can manage resources in the `serving.knative.dev` API group.
-   - For a GitLab managed cluster, if you added the cluster in [GitLab 12.1 or later](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/30235),
+   - For a GitLab managed cluster, if you added the cluster in [GitLab 12.1 or later](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/30235),
      then GitLab will already have the required access and you can proceed to the next step.
 
      Otherwise, you need to manually grant GitLab's service account the ability to manage

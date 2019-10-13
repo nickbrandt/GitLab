@@ -11,6 +11,7 @@ module ApprovalRuleLike
     DEFAULT_NAME_FOR_SECURITY_REPORT => :security
   }.freeze
   APPROVALS_REQUIRED_MAX = 100
+  ALL_MEMBERS = 'All Members'
 
   included do
     has_and_belongs_to_many :users

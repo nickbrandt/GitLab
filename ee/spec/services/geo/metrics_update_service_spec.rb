@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Geo::MetricsUpdateService, :geo, :prometheus do
@@ -70,7 +72,7 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
   # create *persistent* entries in the prometheus database that may cause other
   # specs to transiently fail.
   #
-  # Issue: https://gitlab.com/gitlab-org/gitlab-ce/issues/39968
+  # Issue: https://gitlab.com/gitlab-org/gitlab-foss/issues/39968
   before do
     allow(Gitlab::Metrics).to receive(:prometheus_metrics_enabled?).and_return(true)
   end

@@ -9,12 +9,16 @@ describe Gitlab::Ci::Config::External::Processor do
   set(:another_project) { create(:project, :repository) }
   set(:user) { create(:user) }
 
-  let(:expandset) { Set.new }
   let(:sha) { '12345' }
-  let(:processor) { described_class.new(values, project: project, sha: '12345', user: user, expandset: expandset) }
+  let(:context_params) { { project: project, sha: sha, user: user } }
+  let(:context) { Gitlab::Ci::Config::External::Context.new(**context_params) }
+  let(:processor) { described_class.new(values, context) }
 
   before do
     project.add_developer(user)
+
+    allow_any_instance_of(Gitlab::Ci::Config::External::Context)
+      .to receive(:check_execution_time!)
   end
 
   describe "#perform" do
@@ -56,7 +60,7 @@ describe Gitlab::Ci::Config::External::Processor do
     end
 
     context 'with a valid remote external file is defined' do
-      let(:remote_file) { 'https://gitlab.com/gitlab-org/gitlab-ce/blob/1234/.gitlab-ci-1.yml' }
+      let(:remote_file) { 'https://gitlab.com/gitlab-org/gitlab-foss/blob/1234/.gitlab-ci-1.yml' }
       let(:values) { { include: remote_file, image: 'ruby:2.2' } }
       let(:external_file_content) do
         <<-HEREDOC
@@ -118,7 +122,7 @@ describe Gitlab::Ci::Config::External::Processor do
     end
 
     context 'with multiple external files are defined' do
-      let(:remote_file) { 'https://gitlab.com/gitlab-org/gitlab-ce/blob/1234/.gitlab-ci-1.yml' }
+      let(:remote_file) { 'https://gitlab.com/gitlab-org/gitlab-foss/blob/1234/.gitlab-ci-1.yml' }
       let(:external_files) do
         [
           '/spec/fixtures/gitlab/ci/external_files/.gitlab-ci-template-1.yml',
@@ -178,7 +182,7 @@ describe Gitlab::Ci::Config::External::Processor do
     end
 
     context "when both external files and values defined the same key" do
-      let(:remote_file) { 'https://gitlab.com/gitlab-org/gitlab-ce/blob/1234/.gitlab-ci-1.yml' }
+      let(:remote_file) { 'https://gitlab.com/gitlab-org/gitlab-foss/blob/1234/.gitlab-ci-1.yml' }
       let(:values) do
         {
           include: remote_file,

@@ -177,11 +177,19 @@ sentry_dsn = "X"
 GitLab.com runs [Sidekiq][sidekiq] with arguments `--timeout=4 --concurrency=4`
 and the following environment variables:
 
-| Setting                                 | GitLab.com | Default   |
-|--------                                 |----------- |--------   |
-| `SIDEKIQ_MEMORY_KILLER_MAX_RSS`         | `1000000`  | `2000000` |
-| `SIDEKIQ_MEMORY_KILLER_SHUTDOWN_SIGNAL` | `SIGKILL`  | -         |
-| `SIDEKIQ_LOG_ARGUMENTS`                 | `1`        | -         |
+| Setting                                    | GitLab.com | Default   |
+|--------                                    |----------- |--------   |
+| `SIDEKIQ_DAEMON_MEMORY_KILLER`             | -          | -         |
+| `SIDEKIQ_MEMORY_KILLER_MAX_RSS`            | `2000000`  | `2000000` |
+| `SIDEKIQ_MEMORY_KILLER_HARD_LIMIT_RSS`     | -          | -         |
+| `SIDEKIQ_MEMORY_KILLER_CHECK_INTERVAL`     | -          | `3`       |
+| `SIDEKIQ_MEMORY_KILLER_GRACE_TIME`         | -          | `900`     |
+| `SIDEKIQ_MEMORY_KILLER_SHUTDOWN_WAIT`      | -          | `30`      |
+| `SIDEKIQ_LOG_ARGUMENTS`                    | `1`        | -         |
+
+NOTE: **Note:**
+The `SIDEKIQ_MEMORY_KILLER_MAX_RSS` setting is `16000000` on Sidekiq import
+nodes and Sidekiq export nodes.
 
 ## Cron jobs
 
@@ -308,9 +316,7 @@ This header is included in responses to blocked requests:
 Retry-After: 60
 ```
 
-Source:
-
-- Search for `rate_limit_requests_per_period`, `rate_limit_period`, and `rack_attack_protected_paths` in [GitLab.com's current Rails app settings](https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/files/gitlab-cookbooks/gitlab/attributes/default.rb).
+See [Protected Paths](../admin_area/settings/protected_paths.md) for more details.
 
 #### Git and container registry failed authentication ban
 
@@ -347,38 +353,38 @@ publicly available at [chef cookbooks](https://gitlab.com/gitlab-cookbooks).
 
 We use Elasticsearch, logstash, and Kibana for part of our monitoring solution:
 
-- [gitlab-cookbooks / gitlab-elk · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab-elk)
-- [gitlab-cookbooks / gitlab_elasticsearch · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab_elasticsearch)
+- [`gitlab-cookbooks` / `gitlab-elk` · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab-elk)
+- [`gitlab-cookbooks` / `gitlab_elasticsearch` · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab_elasticsearch)
 
 ### Prometheus
 
 Prometheus complete our monitoring stack:
 
-- [gitlab-cookbooks / gitlab-prometheus · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab-prometheus)
+- [`gitlab-cookbooks` / `gitlab-prometheus` · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab-prometheus)
 
 ### Grafana
 
 For the visualization of monitoring data:
 
-- [gitlab-cookbooks / gitlab-grafana · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab-grafana)
+- [`gitlab-cookbooks` / `gitlab-grafana` · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab-grafana)
 
 ### Sentry
 
 Open source error tracking:
 
-- [gitlab-cookbooks / gitlab-sentry · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab-sentry)
+- [`gitlab-cookbooks` / `gitlab-sentry` · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab-sentry)
 
 ### Consul
 
 Service discovery:
 
-- [gitlab-cookbooks / gitlab_consul · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab_consul)
+- [`gitlab-cookbooks` / `gitlab_consul` · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab_consul)
 
 ### Haproxy
 
 High Performance TCP/HTTP Load Balancer:
 
-- [gitlab-cookbooks / gitlab-haproxy · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab-haproxy)
+- [`gitlab-cookbooks` / `gitlab-haproxy` · GitLab](https://gitlab.com/gitlab-cookbooks/gitlab-haproxy)
 
 [autoscale mode]: https://docs.gitlab.com/runner/configuration/autoscale.html "How Autoscale works"
 [runners-post]: https://about.gitlab.com/2016/04/05/shared-runners/ "Shared Runners on GitLab.com"
@@ -398,4 +404,4 @@ On GitLab.com, projects, groups, and snippets created
 after July 2019 have the `Internal` visibility setting disabled.
 
 You can read more about the change in the
-[relevant issue](https://gitlab.com/gitlab-org/gitlab-ee/issues/12388).
+[relevant issue](https://gitlab.com/gitlab-org/gitlab/issues/12388).

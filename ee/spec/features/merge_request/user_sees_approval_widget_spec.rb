@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Merge request > User sees approval widget', :js do
@@ -20,7 +22,7 @@ describe 'Merge request > User sees approval widget', :js do
       visit project_merge_request_path(project, merge_request)
     end
 
-    # TODO: https://gitlab.com/gitlab-org/gitlab-ee/issues/9430
+    # TODO: https://gitlab.com/gitlab-org/gitlab/issues/9430
     xit 'does not show checking ability text' do
       expect(find('.js-mr-approvals')).not_to have_text('Checking ability to merge automatically')
       expect(find('.js-mr-approvals')).to have_selector('.approvals-body')
@@ -107,7 +109,11 @@ describe 'Merge request > User sees approval widget', :js do
         context 'when code owner approval is required' do
           before do
             stub_licensed_features(code_owner_approval_required: true, multiple_approval_rules: true)
+
             project.update!(merge_requests_require_code_owner_approval: true)
+
+            allow(ProtectedBranch)
+              .to receive(:branch_requires_code_owner_approval?).and_return(true)
           end
 
           it 'shows the code owner rule as required' do

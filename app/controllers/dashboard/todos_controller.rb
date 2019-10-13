@@ -78,13 +78,13 @@ class Dashboard::TodosController < Dashboard::ApplicationController
 
   def todos_counts
     {
-      count: number_with_delimiter(current_user.todos_pending_count),
-      done_count: number_with_delimiter(current_user.todos_done_count)
+      count: current_user.todos_pending_count,
+      done_count: current_user.todos_done_count
     }
   end
 
   def todos_page_count(todos)
-    if todo_params.except(:sort, :page).empty? # rubocop: disable CodeReuse/ActiveRecord
+    if todo_params.except(:sort, :page).empty?
       (current_user.todos_pending_count.to_f / todos.limit_value).ceil
     else
       todos.total_pages

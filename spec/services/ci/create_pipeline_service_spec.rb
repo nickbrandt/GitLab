@@ -71,6 +71,7 @@ describe Ci::CreatePipelineService do
         expect(Gitlab::Metrics).to receive(:counter)
           .with(:pipelines_created_total, "Counter of pipelines created")
           .and_call_original
+        allow(Gitlab::Metrics).to receive(:counter).and_call_original # allow other counters
 
         pipeline
       end
@@ -287,32 +288,6 @@ describe Ci::CreatePipelineService do
               expect(pipeline.builds.find_by(name: 'rspec').interruptible).to be_falsy
             end
           end
-
-          context 'not defined, but an environment is' do
-            before do
-              config = YAML.dump(rspec: { script: 'echo', environment: { name: "review/$CI_COMMIT_REF_NAME" } })
-              stub_ci_pipeline_yaml_file(config)
-            end
-
-            it 'is not cancelable' do
-              pipeline = execute_service
-
-              expect(pipeline.builds.find_by(name: 'rspec').interruptible).to be_nil
-            end
-          end
-
-          context 'overriding the environment definition' do
-            before do
-              config = YAML.dump(rspec: { script: 'echo', environment: { name: "review/$CI_COMMIT_REF_NAME" }, interruptible: true })
-              stub_ci_pipeline_yaml_file(config)
-            end
-
-            it 'is cancelable' do
-              pipeline = execute_service
-
-              expect(pipeline.builds.find_by(name: 'rspec').interruptible).to be_truthy
-            end
-          end
         end
 
         context 'interruptible builds' do
@@ -326,7 +301,8 @@ describe Ci::CreatePipelineService do
 
               build_1_1: {
                 stage: 'stage1',
-                script: 'echo'
+                script: 'echo',
+                interruptible: true
               },
               build_1_2: {
                 stage: 'stage1',
@@ -337,7 +313,8 @@ describe Ci::CreatePipelineService do
                 stage: 'stage2',
                 script: 'echo',
                 when: 'delayed',
-                start_in: '10 minutes'
+                start_in: '10 minutes',
+                interruptible: true
               },
               build_3_1: {
                 stage: 'stage3',
@@ -359,9 +336,9 @@ describe Ci::CreatePipelineService do
                 .pluck(:name, 'ci_builds_metadata.interruptible')
 
             expect(interruptible_status).to contain_exactly(
-              ['build_1_1', nil],
+              ['build_1_1', true],
               ['build_1_2', true],
-              ['build_2_1', nil],
+              ['build_2_1', true],
               ['build_3_1', false],
               ['build_4_1', nil]
             )
@@ -786,6 +763,22 @@ describe Ci::CreatePipelineService do
           expect(pipeline).to be_persisted
           expect(rspec_job.retries_max).to eq 2
           expect(rspec_job.retry_when).to eq ['runner_system_failure']
+        end
+      end
+    end
+
+    context 'with timeout' do
+      context 'when builds with custom timeouts are configured' do
+        before do
+          config = YAML.dump(rspec: { script: 'rspec', timeout: '2m 3s' })
+          stub_ci_pipeline_yaml_file(config)
+        end
+
+        it 'correctly creates builds with custom timeout value configured' do
+          pipeline = execute_service
+
+          expect(pipeline).to be_persisted
+          expect(pipeline.builds.find_by(name: 'rspec').options[:job_timeout]).to eq 123
         end
       end
     end

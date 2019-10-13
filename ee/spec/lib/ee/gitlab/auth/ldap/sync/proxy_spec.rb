@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'net/ldap/dn'
 
@@ -26,7 +28,7 @@ describe EE::Gitlab::Auth::LDAP::Sync::Proxy do
     end
 
     context 'with a valid LDAP group that contains ASCII-8BIT-encoded Unicode data' do
-      let(:username) { 'Méräy'.force_encoding('ASCII-8BIT') }
+      let(:username) { (+'Méräy').force_encoding('ASCII-8BIT') }
       let(:dns) { [user_dn(username)] }
 
       it 'return members DNs' do

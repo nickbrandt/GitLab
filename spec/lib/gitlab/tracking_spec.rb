@@ -20,8 +20,8 @@ describe Gitlab::Tracking do
         hostname: 'gitfoo.com',
         cookieDomain: '.gitfoo.com',
         appId: '_abc123_',
-        pageTrackingEnabled: true,
-        activityTrackingEnabled: true
+        formTracking: true,
+        linkClickTracking: true
       )
     end
 
@@ -33,8 +33,8 @@ describe Gitlab::Tracking do
       ).and_return(false)
 
       expect(subject.snowplow_options('_group_')).to include(
-        pageTrackingEnabled: false,
-        activityTrackingEnabled: false
+        formTracking: false,
+        linkClickTracking: false
       )
     end
   end
@@ -49,8 +49,8 @@ describe Gitlab::Tracking do
     it 'can track events' do
       tracker = double
 
-      expect(SnowplowTracker::Emitter).to receive(:new).with(
-        'gitfoo.com'
+      expect(SnowplowTracker::AsyncEmitter).to receive(:new).with(
+        'gitfoo.com', { protocol: 'https' }
       ).and_return('_emitter_')
 
       expect(SnowplowTracker::Tracker).to receive(:new).with(

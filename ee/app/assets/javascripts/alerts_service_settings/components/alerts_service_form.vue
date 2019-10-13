@@ -8,7 +8,7 @@ import { s__, __, sprintf } from '~/locale';
 import createFlash from '~/flash';
 
 export default {
-  COPY_TO_CLIPBOARD: __('Copy to clipboard'),
+  COPY_TO_CLIPBOARD: __('Copy'),
   RESET_KEY: __('Reset key'),
   components: {
     GlButton,
@@ -54,10 +54,6 @@ export default {
   },
   computed: {
     learnMoreDescription() {
-      if (!this.learnMoreUrl) {
-        return '';
-      }
-
       return sprintf(
         s__(
           'AlertService|%{linkStart}Learn more%{linkEnd} about configuring this endpoint to receive alerts.',
@@ -80,7 +76,21 @@ export default {
       return `${desc}${learnMoreDesc}`;
     },
   },
+  watch: {
+    activated() {
+      this.updateIcon();
+    },
+  },
   methods: {
+    updateIcon() {
+      return document.querySelectorAll('.js-service-active-status').forEach(icon => {
+        if (icon.dataset.value === this.activated.toString()) {
+          icon.classList.remove('d-none');
+        } else {
+          icon.classList.add('d-none');
+        }
+      });
+    },
     resetKey() {
       return axios
         .put(this.formPath, { service: { token: '' } })

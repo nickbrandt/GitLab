@@ -48,10 +48,9 @@ as appropriate.
 ## Set a global Git hook for all repositories
 
 To create a Git hook that applies to all of your repositories in
-your instance, set a global Git hook. Since all the repositories' `hooks`
-directories are symlinked to GitLab Shell's `hooks` directory, adding any hook
-to the GitLab Shell `hooks` directory will also apply it to all repositories. Follow
-the steps below to properly set up a custom hook for all repositories:
+your instance, set a global Git hook. Since GitLab will look inside the GitLab Shell
+`hooks` directory for global hooks, adding any hook there will apply it to all repositories.
+Follow the steps below to properly set up a custom hook for all repositories:
 
 1. On the GitLab server, navigate to the configured custom hook directory. The
    default is in the GitLab Shell directory. The GitLab Shell `hook` directory
@@ -123,5 +122,5 @@ exit 1
 [CI]: ../ci/README.md
 [hooks]: https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks#Server-Side-Hooks
 [webhooks]: ../user/project/integrations/webhooks.md
-[5073]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5073
+[5073]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/5073
 [93]: https://gitlab.com/gitlab-org/gitlab-shell/merge_requests/93

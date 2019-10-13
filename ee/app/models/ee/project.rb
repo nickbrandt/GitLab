@@ -20,6 +20,8 @@ module EE
       include EachBatch
       include InsightsFeature
       include Vulnerable
+      include DeprecatedApprovalsBeforeMerge
+      include UsageStatistics
 
       self.ignored_columns += %i[
         mirror_last_update_at
@@ -38,10 +40,13 @@ module EE
       has_one :project_registry, class_name: 'Geo::ProjectRegistry', inverse_of: :project
       has_one :push_rule, ->(project) { project&.feature_available?(:push_rules) ? all : none }
       has_one :index_status
+
       has_one :jenkins_service
       has_one :jenkins_deprecated_service
       has_one :github_service
       has_one :gitlab_slack_application_service
+      has_one :alerts_service
+
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
       has_one :incident_management_setting, inverse_of: :project, class_name: 'IncidentManagement::ProjectIncidentManagementSetting'
@@ -56,10 +61,15 @@ module EE
       has_many :audit_events, as: :entity
       has_many :designs, inverse_of: :project, class_name: 'DesignManagement::Design'
       has_many :path_locks
+
+      # the rationale behind vulnerabilities and vulnerability_findings can be found here:
+      # https://gitlab.com/gitlab-org/gitlab/issues/10252#terminology
+      has_many :vulnerabilities
       has_many :vulnerability_feedback, class_name: 'Vulnerabilities::Feedback'
-      has_many :vulnerabilities, class_name: 'Vulnerabilities::Occurrence'
+      has_many :vulnerability_findings, class_name: 'Vulnerabilities::Occurrence'
       has_many :vulnerability_identifiers, class_name: 'Vulnerabilities::Identifier'
       has_many :vulnerability_scanners, class_name: 'Vulnerabilities::Scanner'
+
       has_many :protected_environments
       has_many :software_license_policies, inverse_of: :project, class_name: 'SoftwareLicensePolicy'
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
@@ -101,10 +111,30 @@ module EE
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
       scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
       scope :requiring_code_owner_approval,
-            -> { where(merge_requests_require_code_owner_approval: true) }
+            -> { joins(:protected_branches).where(protected_branches: { code_owner_approval_required: true }) }
+      scope :with_active_services, -> { joins(:services).merge(::Service.active) }
+      scope :with_active_jira_services, -> { joins(:services).merge(::JiraService.active) }
+      scope :with_jira_dvcs_cloud, -> { joins(:feature_usage).merge(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: true)) }
+      scope :with_jira_dvcs_server, -> { joins(:feature_usage).merge(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false)) }
+      scope :service_desk_enabled, -> { where(service_desk_enabled: true) }
+      scope :github_imported, -> { where(import_type: 'github') }
+      scope :with_protected_branches, -> { joins(:protected_branches) }
+      scope :with_repositories_enabled, -> { joins(:project_feature).where(project_features: { repository_access_level: ::ProjectFeature::ENABLED }) }
 
       scope :with_security_reports_stored, -> { where('EXISTS (?)', ::Vulnerabilities::Occurrence.scoped_project.select(1)) }
       scope :with_security_reports, -> { where('EXISTS (?)', ::Ci::JobArtifact.security_reports.scoped_project.select(1)) }
+      scope :with_github_service_pipeline_events, -> { joins(:github_service).merge(GithubService.pipeline_hooks) }
+      scope :with_active_prometheus_service, -> { joins(:prometheus_service).merge(PrometheusService.active) }
+      scope :with_enabled_error_tracking, -> { joins(:error_tracking_setting).where(project_error_tracking_settings: { enabled: true }) }
+      scope :with_tracing_enabled, -> { joins(:tracing_setting) }
+      scope :with_packages, -> { joins(:packages) }
+      scope :mirrored_with_enabled_pipelines, -> do
+        joins(:project_feature).mirror.where(mirror_trigger_builds: true,
+                                             project_features: { builds_access_level: ::ProjectFeature::ENABLED })
+      end
+      scope :with_slack_service, -> { joins(:slack_service) }
+      scope :with_slack_slash_commands_service, -> { joins(:slack_slash_commands_service) }
+      scope :with_prometheus_service, -> { joins(:prometheus_service) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
@@ -125,6 +155,9 @@ module EE
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
       validates :approvals_before_merge, numericality: true, allow_blank: true
+
+      validates :pull_mirror_branch_prefix, length: { maximum: 50 }
+      validate :check_pull_mirror_branch_prefix
 
       with_options if: :mirror? do
         validates :import_url, presence: true
@@ -376,13 +409,14 @@ module EE
     end
 
     def merge_requests_require_code_owner_approval?
-      super && code_owner_approval_required_available?
+      code_owner_approval_required_available? &&
+        protected_branches.requiring_code_owner_approval.any?
     end
 
     def branch_requires_code_owner_approval?(branch_name)
       return false unless code_owner_approval_required_available?
 
-      protected_branches.requiring_code_owner_approval.matching(branch_name).any?
+      ::ProtectedBranch.branch_requires_code_owner_approval?(self, branch_name)
     end
 
     def require_password_to_approve
@@ -486,17 +520,11 @@ module EE
     override :disabled_services
     def disabled_services
       strong_memoize(:disabled_services) do
-        disabled_services = []
-
-        unless feature_available?(:jenkins_integration)
-          disabled_services.push('jenkins', 'jenkins_deprecated')
+        [].tap do |services|
+          services.push('jenkins', 'jenkins_deprecated') unless feature_available?(:jenkins_integration)
+          services.push('github') unless feature_available?(:github_project_service_integration)
+          services.push('alerts') unless alerts_service_available?
         end
-
-        unless feature_available?(:github_project_service_integration)
-          disabled_services.push('github')
-        end
-
-        disabled_services
       end
     end
 
@@ -536,6 +564,7 @@ module EE
       super
       repository.log_geo_updated_event
       wiki.repository.log_geo_updated_event
+      design_repository.log_geo_updated_event
     end
 
     override :import?
@@ -611,6 +640,11 @@ module EE
       @design_repository ||= DesignManagement::Repository.new(self)
     end
 
+    def alerts_service_available?
+      ::Feature.enabled?(:generic_alert_endpoint, self) &&
+        feature_available?(:incident_management)
+    end
+
     def package_already_taken?(package_name)
       namespace.root_ancestor.all_projects
         .joins(:packages)
@@ -656,6 +690,15 @@ module EE
 
     def validate_board_limit(board)
       # Board limits are disabled in EE, so this method is just a no-op.
+    end
+
+    def check_pull_mirror_branch_prefix
+      return if pull_mirror_branch_prefix.blank?
+      return unless pull_mirror_branch_prefix_changed?
+
+      unless ::Gitlab::GitRefValidator.validate("#{pull_mirror_branch_prefix}master")
+        errors.add(:pull_mirror_branch_prefix, _('Invalid Git ref'))
+      end
     end
   end
 end

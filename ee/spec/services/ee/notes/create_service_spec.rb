@@ -39,6 +39,17 @@ describe Notes::CreateService do
         expect(note.noteable).to eq(design)
       end
 
+      it 'sends a notification about this note' do
+        notifier = double
+        allow(::NotificationService).to receive(:new).and_return(notifier)
+
+        expect(notifier)
+          .to receive(:new_note)
+          .with have_attributes(noteable: design)
+
+        service.execute
+      end
+
       it 'correctly builds the position of the note' do
         note = service.execute
 

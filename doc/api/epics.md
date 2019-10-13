@@ -49,6 +49,8 @@ GET /groups/:id/epics?state=opened
 | `created_before`    | datetime         | no         | Return epics created on or before the given time                                                                            |
 | `updated_after`     | datetime         | no         | Return epics updated on or after the given time                                                                             |
 | `updated_before`    | datetime         | no         | Return epics updated on or before the given time                                                                            |
+| `include_ancestor_groups` | boolean    | no         | Include epics from the requested group's ancestors. Default is `false`                                                      |
+| `include_descendant_groups` | boolean  | no         | Include epics from the requested group's descendants. Default is `true`                                                     |
 
 ```bash
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics
@@ -65,7 +67,7 @@ Example response:
   "title": "Accusamus iste et ullam ratione voluptatem omnis debitis dolor est.",
   "description": "Molestias dolorem eos vitae expedita impedit necessitatibus quo voluptatum.",
   "state": "opened",
-  "web_edit_url": "http://localhost:3001/groups/test/-/epics/4",
+  "web_url": "http://localhost:3001/groups/test/-/epics/4",
   "reference": "&4",
   "author": {
     "id": 10,
@@ -86,6 +88,7 @@ Example response:
   "due_date_from_milestones": "2018-07-31",
   "created_at": "2018-07-17T13:36:22.770Z",
   "updated_at": "2018-07-18T12:22:05.239Z",
+  "closed_at": "2018-08-18T12:22:05.239Z",
   "labels": [],
   "upvotes": 4,
   "downvotes": 0
@@ -120,7 +123,7 @@ Example response:
   "title": "Ea cupiditate dolores ut vero consequatur quasi veniam voluptatem et non.",
   "description": "Molestias dolorem eos vitae expedita impedit necessitatibus quo voluptatum.",
   "state": "opened",
-  "web_edit_url": "http://localhost:3001/groups/test/-/epics/5",
+  "web_url": "http://localhost:3001/groups/test/-/epics/5",
   "reference": "&5",
   "author":{
     "id": 7,
@@ -141,6 +144,7 @@ Example response:
   "due_date_from_milestones": "2018-07-31",
   "created_at": "2018-07-17T13:36:22.770Z",
   "updated_at": "2018-07-18T12:22:05.239Z",
+  "closed_at": "2018-08-18T12:22:05.239Z",
   "labels": [],
   "upvotes": 4,
   "downvotes": 0
@@ -186,7 +190,7 @@ Example response:
   "title": "Epic",
   "description": "Epic description",
   "state": "opened",
-  "web_edit_url": "http://localhost:3001/groups/test/-/epics/6",
+  "web_url": "http://localhost:3001/groups/test/-/epics/5",
   "reference": "&6",
   "author": {
     "name" : "Alexandra Bashirian",
@@ -207,6 +211,7 @@ Example response:
   "due_date_from_milestones": "2018-07-31",
   "created_at": "2018-07-17T13:36:22.770Z",
   "updated_at": "2018-07-18T12:22:05.239Z",
+  "closed_at": "2018-08-18T12:22:05.239Z",
   "labels": [],
   "upvotes": 4,
   "downvotes": 0
@@ -253,7 +258,7 @@ Example response:
   "title": "New Title",
   "description": "Epic description",
   "state": "opened",
-  "web_edit_url": "http://localhost:3001/groups/test/-/epics/6",
+  "web_url": "http://localhost:3001/groups/test/-/epics/5",
   "reference": "&6",
   "author": {
     "name" : "Alexandra Bashirian",
@@ -274,6 +279,7 @@ Example response:
   "due_date_from_milestones": "2018-07-31",
   "created_at": "2018-07-17T13:36:22.770Z",
   "updated_at": "2018-07-18T12:22:05.239Z",
+  "closed_at": "2018-08-18T12:22:05.239Z",
   "labels": [],
   "upvotes": 4,
   "downvotes": 0
@@ -356,7 +362,8 @@ Example response:
     "start_date": null,
     "end_date": null,
     "created_at": "2018-01-21T06:21:13.165Z",
-    "updated_at": "2018-01-22T12:41:41.166Z"
+    "updated_at": "2018-01-22T12:41:41.166Z",
+    "closed_at": "2018-08-18T12:22:05.239Z"
   },
   "target_url": "https://gitlab.example.com/groups/epics/5",
   "body": "Vel voluptas atque dicta mollitia adipisci qui at.",
@@ -365,4 +372,4 @@ Example response:
 }
 ```
 
-[ee-6448]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6448
+[ee-6448]: https://gitlab.com/gitlab-org/gitlab/merge_requests/6448

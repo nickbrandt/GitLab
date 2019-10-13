@@ -6,9 +6,9 @@ class AddContainerRepositoryRegistry < ActiveRecord::Migration[5.0]
   def change
     create_table :container_repository_registry, id: :serial, force: :cascade do |t|
       t.integer :container_repository_id, null: false
-      t.string :state
+      t.string :state # rubocop:disable Migration/AddLimitToStringColumns
       t.integer :retry_count, default: 0
-      t.string :last_sync_failure
+      t.string :last_sync_failure # rubocop:disable Migration/AddLimitToStringColumns
       t.datetime :retry_at
       t.datetime :last_synced_at
       t.datetime :created_at, null: false

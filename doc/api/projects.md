@@ -55,8 +55,8 @@ GET /projects
 | `with_issues_enabled`         | boolean | no | Limit by enabled issues feature |
 | `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature |
 | `with_programming_language`   | string  | no | Limit by projects which use the given programming language |
-| `wiki_checksum_failed`        | boolean | no | **(PREMIUM)** Limit projects where the wiki checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
-| `repository_checksum_failed`  | boolean | no | **(PREMIUM)** Limit projects where the repository checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
+| `wiki_checksum_failed`        | boolean | no | **(PREMIUM)** Limit projects where the wiki checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
+| `repository_checksum_failed`  | boolean | no | **(PREMIUM)** Limit projects where the repository checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
 | `min_access_level`            | integer | no | Limit by current user minimal [access level](members.md) |
 
 When `simple=true` or the user is unauthenticated this returns something like:
@@ -809,16 +809,16 @@ If the project is a fork, and you provide a valid token to authenticate, the
       "description":"GitLab Community Edition",
       "name":"GitLab Community Edition",
       "name_with_namespace":"GitLab.org / GitLab Community Edition",
-      "path":"gitlab-ce",
-      "path_with_namespace":"gitlab-org/gitlab-ce",
+      "path":"gitlab-foss",
+      "path_with_namespace":"gitlab-org/gitlab-foss",
       "created_at":"2013-09-26T06:02:36.000Z",
       "default_branch":"master",
       "tag_list":[],
-      "ssh_url_to_repo":"git@gitlab.com:gitlab-org/gitlab-ce.git",
-      "http_url_to_repo":"https://gitlab.com/gitlab-org/gitlab-ce.git",
-      "web_url":"https://gitlab.com/gitlab-org/gitlab-ce",
+      "ssh_url_to_repo":"git@gitlab.com:gitlab-org/gitlab-foss.git",
+      "http_url_to_repo":"https://gitlab.com/gitlab-org/gitlab-foss.git",
+      "web_url":"https://gitlab.com/gitlab-org/gitlab-foss",
       "avatar_url":"https://assets.gitlab-static.net/uploads/-/system/project/avatar/13083/logo-extra-whitespace.png",
-      "license_url": "https://gitlab.com/gitlab-org/gitlab-ce/blob/master/LICENSE",
+      "license_url": "https://gitlab.com/gitlab-org/gitlab/blob/master/LICENSE",
       "license": {
         "key": "mit",
         "name": "MIT License",
@@ -931,9 +931,13 @@ POST /projects
 | `auto_devops_deploy_strategy` | string | no | Auto Deploy strategy (`continuous`, `manual` or `timed_incremental`) |
 | `repository_storage` | string | no | **(STARTER ONLY)** Which storage shard the repository is on. Available only to admins |
 | `approvals_before_merge` | integer | no | **(STARTER)** How many approvers should approve merge requests by default |
+| `external_authorization_classification_label` | string | no | **(PREMIUM)** The classification label for the project |
 | `mirror` | boolean | no | **(STARTER)** Enables pull mirroring in a project |
 | `mirror_trigger_builds` | boolean | no | **(STARTER)** Pull mirroring triggers builds |
 | `initialize_with_readme` | boolean | no | `false` by default |
+| `template_name` | string | no | When used without `use_custom_template`, name of a [built-in project template](../gitlab-basics/create-project.md#built-in-templates). When used with `use_custom_template`, name of a custom project template |
+| `use_custom_template` | boolean | no | **(PREMIUM)** Use either custom [instance](../user/admin_area/custom_project_templates.md) or [group](../user/group/custom_project_templates.md) (with `group_with_project_templates_id`) project template |
+| `group_with_project_templates_id` | integer | no | **(PREMIUM)** For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires `use_custom_template` to be true |
 
 NOTE: **Note:** If your HTTP repository is not publicly accessible,
 add authentication information to the URL: `https://username:password@gitlab.company.com/group/project.git`
@@ -991,6 +995,10 @@ POST /projects/user/:user_id
 | `external_authorization_classification_label` | string | no | **(PREMIUM)** The classification label for the project |
 | `mirror` | boolean | no | **(STARTER)** Enables pull mirroring in a project |
 | `mirror_trigger_builds` | boolean | no | **(STARTER)** Pull mirroring triggers builds |
+| `initialize_with_readme` | boolean | no | `false` by default |
+| `template_name` | string | no | When used without `use_custom_template`, name of a [built-in project template](../gitlab-basics/create-project.md#built-in-templates). When used with `use_custom_template`, name of a custom project template |
+| `use_custom_template` | boolean | no | **(PREMIUM)** Use either custom [instance](../user/admin_area/custom_project_templates.md) or [group](../user/group/custom_project_templates.md) (with `group_with_project_templates_id`) project template |
+| `group_with_project_templates_id` | integer | no | **(PREMIUM)** For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires `use_custom_template` to be true |
 
 NOTE: **Note:** If your HTTP repository is not publicly accessible,
 add authentication information to the URL: `https://username:password@gitlab.company.com/group/project.git`
@@ -2015,7 +2023,7 @@ Read more in the [Project members](members.md) documentation.
 
 ## Start the pull mirroring process for a Project **(STARTER)**
 
-> Introduced in [GitLab Starter](https://about.gitlab.com/pricing) 10.3.
+> Introduced in [GitLab Starter](https://about.gitlab.com/pricing/) 10.3.
 
 ```
 POST /projects/:id/mirror/pull
@@ -2059,4 +2067,4 @@ GET /projects/:id/snapshot
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `wiki`    | boolean | no | Whether to download the wiki, rather than project, repository |
 
-[ce-27427]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/27427
+[ce-27427]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/27427

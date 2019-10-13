@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :request_store, :clean_gitlab_redis_cache do
@@ -95,23 +97,18 @@ describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :r
       let(:project5_both_verified) { create(:repository_state, :repository_verified, :wiki_verified).project }
       let(:project6_both_verified) { create(:repository_state, :repository_verified, :wiki_verified).project }
 
-      # https://gitlab.com/gitlab-org/gitlab-ee/issues/12455
       it 'handles multiple batches of projects needing verification' do
         reg1 = create(:geo_project_registry, :synced, :repository_verification_outdated, project: project1_repo_verified)
         reg2 = create(:geo_project_registry, :synced, :repository_verification_outdated, project: project2_repo_verified)
 
-        expect(secondary_single_worker).to receive(:perform_async).with(reg1.id).once
+        expect(secondary_single_worker).to receive(:perform_async).with(reg1.id).once.and_call_original
+        expect(secondary_single_worker).to receive(:perform_async).with(reg2.id).once.and_call_original
 
-        subject.perform(shard_name)
-
-        reg1.update!(repository_verification_checksum_sha: project1_repo_verified.repository_state.repository_verification_checksum)
-
-        expect(secondary_single_worker).to receive(:perform_async).with(reg2.id).once
-
-        subject.perform(shard_name)
+        3.times do
+          Sidekiq::Testing.inline! { subject.perform(shard_name) }
+        end
       end
 
-      # https://gitlab.com/gitlab-org/gitlab-ee/issues/12455
       it 'handles multiple batches of projects needing verification, skipping failed repos' do
         reg1 = create(:geo_project_registry, :synced, :repository_verification_outdated, project: project1_repo_verified)
         reg2 = create(:geo_project_registry, :synced, :repository_verification_outdated, project: project2_repo_verified)
@@ -120,27 +117,14 @@ describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :r
         create(:geo_project_registry, :synced, :repository_verification_failed, :wiki_verification_failed, project: project5_both_verified)
         reg6 = create(:geo_project_registry, :synced, project: project6_both_verified)
 
-        expect(secondary_single_worker).to receive(:perform_async).with(reg1.id).once
+        expect(secondary_single_worker).to receive(:perform_async).with(reg1.id).once.and_call_original
+        expect(secondary_single_worker).to receive(:perform_async).with(reg2.id).once.and_call_original
+        expect(secondary_single_worker).to receive(:perform_async).with(reg4.id).once.and_call_original
+        expect(secondary_single_worker).to receive(:perform_async).with(reg6.id).once.and_call_original
 
-        subject.perform(shard_name)
-
-        reg1.update!(repository_verification_checksum_sha: project1_repo_verified.repository_state.repository_verification_checksum)
-
-        expect(secondary_single_worker).to receive(:perform_async).with(reg2.id).once
-
-        subject.perform(shard_name)
-
-        reg2.update!(repository_verification_checksum_sha: project2_repo_verified.repository_state.repository_verification_checksum)
-
-        expect(secondary_single_worker).to receive(:perform_async).with(reg4.id).once
-
-        subject.perform(shard_name)
-
-        reg4.update!(last_wiki_verification_failure: 'Failed!')
-
-        expect(secondary_single_worker).to receive(:perform_async).with(reg6.id).once
-
-        subject.perform(shard_name)
+        7.times do
+          Sidekiq::Testing.inline! { subject.perform(shard_name) }
+        end
       end
     end
 

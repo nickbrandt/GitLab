@@ -122,16 +122,19 @@ describe ProjectsController do
       end
 
       context 'when unlicensed' do
+        render_views
+
         before do
           stub_licensed_features(custom_project_templates: false)
+          project
+          project_template
         end
 
-        it 'creates the project from project template' do
-          post :create, params: { project: templates_params }
+        it 'does not create the project from project template' do
+          expect { post :create, params: { project: templates_params } }.not_to change { Project.count }
 
-          created_project = Project.find_by_path('foo')
-          expect(flash[:notice]).to eq "Project 'foo' was successfully created."
-          expect(created_project.repository.empty?).to be true
+          expect(response).to have_gitlab_http_status(200)
+          expect(response.body).to match(/Template name .* is unknown or invalid/)
         end
       end
     end

@@ -26,17 +26,17 @@ module Security
     private
 
     def executed?
-      pipeline.vulnerabilities.report_type(@report.type).any?
+      pipeline.vulnerability_findings.report_type(@report.type).any?
     end
 
     def create_all_vulnerabilities!
       @report.occurrences.each do |occurrence|
-        create_vulnerability(occurrence)
+        create_vulnerability_finding(occurrence)
       end
     end
 
-    def create_vulnerability(occurrence)
-      vulnerability = create_or_find_vulnerability_object(occurrence)
+    def create_vulnerability_finding(occurrence)
+      vulnerability = create_or_find_vulnerability_finding(occurrence)
 
       occurrence.identifiers.map do |identifier|
         create_vulnerability_identifier_object(vulnerability, identifier)
@@ -46,7 +46,7 @@ module Security
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def create_or_find_vulnerability_object(occurrence)
+    def create_or_find_vulnerability_finding(occurrence)
       find_params = {
         scanner: scanners_objects[occurrence.scanner.key],
         primary_identifier: identifiers_objects[occurrence.primary_identifier.key],
@@ -54,14 +54,15 @@ module Security
       }
 
       create_params = occurrence.to_hash
-        .except(:compare_key, :identifiers, :location, :scanner) # rubocop: disable CodeReuse/ActiveRecord
+        .except(:compare_key, :identifiers, :location, :scanner)
 
       begin
-        project.vulnerabilities
+        project
+          .vulnerability_findings
           .create_with(create_params)
           .find_or_create_by!(find_params)
       rescue ActiveRecord::RecordNotUnique
-        project.vulnerabilities.find_by!(find_params)
+        project.vulnerability_findings.find_by!(find_params)
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord

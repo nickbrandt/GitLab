@@ -1,6 +1,6 @@
 # Feature Flags **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/11845) in GitLab 11.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/11845) in GitLab 11.4.
 
 Feature flags allow you to ship a project in different flavors by
 dynamically toggling certain functionality.
@@ -55,7 +55,7 @@ and toggle the status for each [spec](#define-environment-specs).
 
 ## Define environment specs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8621) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/8621) in GitLab 11.8.
 
 In general, an application is deployed to multiple environments, such as
 production, staging and [review apps](../../../ci/review_apps/index.md).
@@ -83,7 +83,7 @@ feature in order to quickly assess which flag is enabled per environment.
 
 ## Rollout strategy
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8240) in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/8240) in GitLab 12.2.
 
 The selected rollout strategy affects which users will experience the feature enabled.
 
@@ -114,11 +114,13 @@ ID for the feature to be enabled. See the [Ruby example](#ruby-application-examp
 
 ## Target users
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8240) in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/8240) in GitLab 12.2.
 
 A feature flag may be enabled for a list of target users. It is implemented
 using the Unleash [`userWithId`](https://unleash.github.io/docs/activation_strategy#userwithid)
 activation strategy.
+
+The feature will always be enabled for all users in the list across all environments even if the matching environment spec **Status** is disabled.
 
 ![Feature flag target users](img/target_users_v12_2.png)
 
@@ -172,9 +174,9 @@ Official clients:
 
 Community contributed clients:
 
-- [stiano/unleash-client-dotnet](https://github.com/stiano/unleash-client-dotnet) (.Net Core)
-- [onybo/unleash-client-core](https://github.com/onybo/unleash-client-core) (.Net Core)
-- [aes/unleash-client-python](https://github.com/aes/unleash-client-python) (Python 3)
+- [Unleash FeatureToggle Client for .Net](https://github.com/stiano/unleash-client-dotnet)
+- [Unofficial .Net Core Unleash client](https://github.com/onybo/unleash-client-core)
+- [Unleash client for Python 3](https://github.com/aes/unleash-client-python)
 
 ### Golang application example
 

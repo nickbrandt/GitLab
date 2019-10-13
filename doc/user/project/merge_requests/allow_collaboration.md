@@ -4,7 +4,7 @@ type: reference, howto
 
 # Allow collaboration on merge requests across forks
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/17395) in GitLab 10.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17395) in GitLab 10.6.
 
 When a user opens a merge request from a fork, they are given the option to allow
 upstream members to collaborate with them on the source branch. This allows
@@ -52,7 +52,7 @@ Here's how the process would look like:
 
    ![Check out branch button](img/checkout_button.png)
 
-1. Use the copy to clipboard button to copy the first command and paste them
+1. Use the copy button to copy the first command and paste them
    in your terminal:
 
    ```sh

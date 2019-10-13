@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Geo::ContainerRepositoryRegistry, :geo do
-  set(:container_repository_registry) { create(:container_repository_registry) }
+  set(:registry) { create(:container_repository_registry) }
 
   describe 'relationships' do
     it { is_expected.to belong_to(:container_repository) }
@@ -20,55 +20,52 @@ describe Geo::ContainerRepositoryRegistry, :geo do
 
         result = described_class.repository_id_not_in([container_repository1_id, container_repository2_id])
 
-        expect(result).to match_ids([container_repository_registry])
+        expect(result).to match_ids([registry])
       end
     end
   end
 
-  describe '#start_sync!' do
-    it 'updates last_synced_at' do
-      expect { container_repository_registry.start_sync! }
-        .to change { container_repository_registry.reload.last_synced_at }
-    end
+  it_behaves_like 'a Geo registry' do
+    let(:registry) { create(:container_repository_registry) }
   end
 
   describe '#finish_sync!' do
+    let(:registry) { create(:container_repository_registry, :sync_started) }
+
     it 'finishes registry record' do
-      container_repository_registry = create(:container_repository_registry, :sync_started)
+      registry.finish_sync!
 
-      container_repository_registry.finish_sync!
-
-      expect(container_repository_registry.reload).to have_attributes(
+      expect(registry.reload).to have_attributes(
         retry_count: 0,
         retry_at: nil,
         last_sync_failure: nil,
         state: 'synced'
       )
     end
-  end
 
-  describe '#fail_sync!' do
-    it 'fails registry record' do
-      error = StandardError.new('Something is wrong')
+    context 'when a container sync was scheduled after the last sync began' do
+      before do
+        registry.update!(
+          state: 'pending',
+          retry_count: 2,
+          retry_at: 1.hour.ago,
+          last_sync_failure: 'error'
+        )
 
-      container_repository_registry.fail_sync!('Failed', error)
+        registry.finish_sync!
+      end
 
-      expect(container_repository_registry).to have_attributes(
-        retry_count: 1,
-        retry_at: be_present,
-        last_sync_failure: 'Failed: Something is wrong',
-        state: 'failed'
-      )
-    end
-  end
+      it 'does not reset state' do
+        expect(registry.reload.state).to eq 'pending'
+      end
 
-  describe '#repository_updated!' do
-    set(:container_repository_registry) { create(:container_repository_registry, :synced) }
-
-    it 'resets the state of the sync' do
-      container_repository_registry.repository_updated!
-
-      expect(container_repository_registry.pending?).to be true
+      it 'resets the other sync state fields' do
+        expect(registry.reload).to have_attributes(
+          retry_count: 0,
+          retry_at: nil,
+          last_sync_failure: nil
+        )
+      end
     end
   end
 end

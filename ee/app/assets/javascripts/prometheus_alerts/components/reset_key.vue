@@ -6,7 +6,7 @@ import { __, sprintf } from '~/locale';
 import createFlash from '~/flash';
 
 export default {
-  copyToClipboard: __('Copy to clipboard'),
+  copyToClipboard: __('Copy'),
   components: {
     GlButton,
     GlFormGroup,

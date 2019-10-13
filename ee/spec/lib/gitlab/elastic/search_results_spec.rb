@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Elastic::SearchResults, :elastic do
@@ -7,8 +8,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
   end
 
   let(:user) { create(:user) }
-  let(:project_1) { create(:project, :repository, :wiki_repo) }
-  let(:project_2) { create(:project, :repository, :wiki_repo) }
+  let(:project_1) { create(:project, :public, :repository, :wiki_repo) }
+  let(:project_2) { create(:project, :public, :repository, :wiki_repo) }
   let(:limit_project_ids) { [project_1.id] }
 
   describe 'counts' do
@@ -153,7 +154,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
     end
 
     it 'lists issue when search by a valid iid' do
-      results = described_class.new(user, '#2', limit_project_ids)
+      results = described_class.new(user, '#2', limit_project_ids, nil, false)
       issues = results.objects('issues')
 
       expect(issues).not_to include @issue_1
@@ -217,8 +218,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
   end
 
   describe 'confidential issues' do
-    let(:project_3) { create(:project) }
-    let(:project_4) { create(:project) }
+    let(:project_3) { create(:project, :public) }
+    let(:project_4) { create(:project, :public) }
     let(:limit_project_ids) { [project_1.id, project_2.id, project_3.id] }
     let(:author) { create(:user) }
     let(:assignee) { create(:user) }
@@ -317,8 +318,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
         expect(issues).to include @security_issue_2
         expect(issues).to include @security_issue_3
         expect(issues).to include @security_issue_4
-        expect(issues).not_to include @security_issue_5
-        expect(results.issues_count).to eq 5
+        expect(issues).to include @security_issue_5
+        expect(results.issues_count).to eq 6
       end
     end
 
@@ -402,8 +403,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
         expect(issues).not_to include @security_issue_2
         expect(issues).to include @security_issue_3
         expect(issues).to include @security_issue_4
-        expect(issues).not_to include @security_issue_5
-        expect(results.issues_count).to eq 3
+        expect(issues).to include @security_issue_5
+        expect(results.issues_count).to eq 4
       end
     end
   end
@@ -512,7 +513,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
   describe 'Blobs' do
     before do
-      project_1.repository.index_blobs
+      project_1.repository.index_commits_and_blobs
 
       Gitlab::Elastic::Helper.refresh_index
     end
@@ -537,7 +538,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
     it 'finds blobs from public projects only' do
       project_2 = create :project, :repository, :private
-      project_2.repository.index_blobs
+      project_2.repository.index_commits_and_blobs
+      project_2.add_reporter(user)
       Gitlab::Elastic::Helper.refresh_index
 
       results = described_class.new(user, 'def', [project_1.id])
@@ -565,7 +567,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
           message: 'added test file',
           branch_name: 'master')
 
-        project_1.repository.index_blobs
+        project_1.repository.index_commits_and_blobs
 
         Gitlab::Elastic::Helper.refresh_index
       end
@@ -612,7 +614,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
       before do
         project_1.repository.create_file(user, file_name, file_content, message: 'Some commit message', branch_name: 'master')
-        project_1.repository.index_blobs
+        project_1.repository.index_commits_and_blobs
         Gitlab::Elastic::Helper.refresh_index
       end
 
@@ -669,6 +671,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
       project_2 = create :project, :repository, :private, :wiki_repo
       project_2.wiki.create_page('index_page', 'term')
       project_2.wiki.index_wiki_blobs
+      project_2.add_guest(user)
       Gitlab::Elastic::Helper.refresh_index
 
       expect(results.wiki_blobs_count).to eq 1
@@ -705,6 +708,10 @@ describe Gitlab::Elastic::SearchResults, :elastic do
       context 'search by member' do
         let(:limit_project_ids) { [project_1.id] }
 
+        before do
+          project_1.add_guest(user)
+        end
+
         it { is_expected.not_to be_empty }
       end
 
@@ -718,8 +725,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
   describe 'Commits' do
     before do
-      project_1.repository.index_commits
-
+      project_1.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
     end
 
@@ -729,13 +735,14 @@ describe Gitlab::Elastic::SearchResults, :elastic do
       results = described_class.new(user, 'add', limit_project_ids)
       commits = results.objects('commits')
 
-      expect(commits.first.message).to include("Add")
+      expect(commits.first.message.downcase).to include("add")
       expect(results.commits_count).to eq 24
     end
 
     it 'finds commits from public projects only' do
       project_2 = create :project, :private, :repository
-      project_2.repository.index_commits
+      project_2.repository.index_commits_and_blobs
+      project_2.add_reporter(user)
       Gitlab::Elastic::Helper.refresh_index
 
       results = described_class.new(user, 'add', [project_1.id])
@@ -1002,7 +1009,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
             branch_name: 'master'
           )
 
-          project.repository.index_commits
+          project.repository.index_commits_and_blobs
         end
 
         Gitlab::Elastic::Helper.refresh_index
@@ -1034,7 +1041,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
             branch_name: 'master'
           )
 
-          project.repository.index_blobs
+          project.repository.index_commits_and_blobs
         end
 
         Gitlab::Elastic::Helper.refresh_index

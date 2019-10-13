@@ -1,5 +1,0 @@
----
-title: SCIM uses fallbacks when name.formatted not present
-merge_request: 14878
-author:
-type: fixed

@@ -1,5 +1,0 @@
----
-title: Fix visibility of link to dependency-list in project sidebar based on permissions
-merge_request: 15066
-author:
-type: fixed

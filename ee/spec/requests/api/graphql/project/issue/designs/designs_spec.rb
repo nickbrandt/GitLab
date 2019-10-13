@@ -231,7 +231,7 @@ describe "Getting designs related to an issue" do
         let(:version) { all_versions.last }
 
         before do
-          second_design.design_versions.create!(version: version, event: "modification")
+          second_design.actions.create!(version: version, event: "modification")
 
           post_graphql(query, current_user: current_user)
         end

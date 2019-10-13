@@ -6,6 +6,7 @@ module EE
 
     prepended do
       include Elastic::SnippetsSearch
+      include UsageStatistics
     end
   end
 end

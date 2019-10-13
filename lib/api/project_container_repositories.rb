@@ -75,7 +75,7 @@ module API
         render_api_error!(message, 400) unless obtain_new_cleanup_container_lease
 
         CleanupContainerRepositoryWorker.perform_async(current_user.id, repository.id,
-          declared_params.except(:repository_id)) # rubocop: disable CodeReuse/ActiveRecord
+          declared_params.except(:repository_id))
 
         status :accepted
       end
@@ -106,9 +106,15 @@ module API
         authorize_destroy_container_image!
         validate_tag!
 
-        tag.delete
+        result = ::Projects::ContainerRepository::DeleteTagsService
+          .new(repository.project, current_user, tags: [declared_params[:tag_name]])
+          .execute(repository)
 
-        status :ok
+        if result[:status] == :success
+          status :ok
+        else
+          status :bad_request
+        end
       end
     end
 

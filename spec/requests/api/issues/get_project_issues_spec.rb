@@ -283,11 +283,14 @@ describe API::Issues do
     end
 
     context 'with labeled issues' do
+      let(:issue2) { create :issue, project: project }
       let(:label_b) { create(:label, title: 'foo', project: project) }
       let(:label_c) { create(:label, title: 'bar', project: project) }
 
       before do
+        create(:label_link, label: label, target: issue2)
         create(:label_link, label: label_b, target: issue)
+        create(:label_link, label: label_b, target: issue2)
         create(:label_link, label: label_c, target: issue)
 
         get api('/issues', user), params: params
@@ -733,6 +736,8 @@ describe API::Issues do
         get_related_merge_requests(project.id, issue.iid)
 
         expect_paginated_array_response(related_mr.id)
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response.last).not_to have_key('subscribed')
       end
 
       it 'renders 404 if project is not visible' do

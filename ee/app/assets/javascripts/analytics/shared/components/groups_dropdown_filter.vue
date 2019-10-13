@@ -127,7 +127,7 @@ export default {
           :size="16"
           shape="rect"
           :alt="selectedGroup.name"
-          class="prepend-top-2"
+          class="d-inline-flex align-text-bottom"
         />
         {{ selectedGroupName }}
         <icon name="chevron-down" />

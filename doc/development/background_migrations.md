@@ -290,7 +290,9 @@ It is required to write tests for:
 - A cleanup migration.
 
 You can use the `:migration` RSpec tag when testing the migrations.
-See [README][migrations-readme].
+See the
+[Testing Rails migrations](testing_guide/testing_migrations_guide.md#testing-a-non-activerecordmigration-class)
+style guide.
 
 When you do that, keep in mind that `before` and `after` RSpec hooks are going
 to migrate you database down and up, which can result in other background
@@ -315,7 +317,7 @@ for more details.
    more pressure on DB than you expect (measure on staging,
    or ask someone to measure on production).
 
-[migrations-readme]: https://gitlab.com/gitlab-org/gitlab-ce/blob/master/spec/migrations/README.md
-[issue-rspec-hooks]: https://gitlab.com/gitlab-org/gitlab-ce/issues/35351
-[reliable-sidekiq]: https://gitlab.com/gitlab-org/gitlab-ce/issues/36791
+[migrations-readme]: https://gitlab.com/gitlab-org/gitlab/blob/master/spec/migrations/README.md
+[issue-rspec-hooks]: https://gitlab.com/gitlab-org/gitlab-foss/issues/35351
+[reliable-sidekiq]: https://gitlab.com/gitlab-org/gitlab-foss/issues/36791
 [import-export]: ../user/project/settings/import_export.md

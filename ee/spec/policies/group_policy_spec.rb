@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe GroupPolicy do
@@ -78,8 +80,7 @@ describe GroupPolicy do
 
     context 'with sso enforcement enabled' do
       let(:current_user) { guest }
-      let(:group) { create(:group, :private) }
-      let!(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
+      let_it_be(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
 
       context 'when the session has been set globally' do
         around do |example|
@@ -88,12 +89,18 @@ describe GroupPolicy do
           end
         end
 
-        before do
-          group.root_ancestor.reload
-        end
-
         it 'prevents access without a SAML session' do
           is_expected.not_to be_allowed(:read_group)
+        end
+
+        context 'as a group owner' do
+          before do
+            group.add_owner(current_user)
+          end
+
+          it 'prevents access without a SAML session' do
+            is_expected.not_to allow_action(:read_group)
+          end
         end
 
         it 'allows access with a SAML session' do
@@ -113,7 +120,6 @@ describe GroupPolicy do
 
   context 'with ip restriction' do
     let(:current_user) { developer }
-    let(:group) { create(:group, :public) }
 
     before do
       allow(Gitlab::IpAddressState).to receive(:current).and_return('192.168.0.2')
@@ -404,21 +410,39 @@ describe GroupPolicy do
     end
   end
 
-  describe 'view_productivity_analytics' do
+  shared_examples 'analytics policy' do |action|
+    shared_examples 'policy by role' do |role|
+      context role do
+        let(:current_user) { public_send(role) }
+
+        it 'is allowed' do
+          is_expected.to be_allowed(action)
+        end
+      end
+    end
+
     %w[admin owner maintainer developer reporter].each do |role|
-      context "for #{role}" do
-        let(:current_user) { public_send(role) }
-
-        it { is_expected.to be_allowed(:view_productivity_analytics) }
-      end
+      include_examples 'policy by role', role
     end
 
-    %w[guest].each do |role|
-      context "for #{role}" do
-        let(:current_user) { public_send(role) }
+    context 'guest' do
+      let(:current_user) { guest }
 
-        it { is_expected.to be_disallowed(:view_productivity_analytics) }
+      it 'is not allowed' do
+        is_expected.to be_disallowed(action)
       end
     end
+  end
+
+  describe 'view_code_analytics' do
+    include_examples 'analytics policy', :view_code_analytics
+  end
+
+  describe 'view_productivity_analytics' do
+    include_examples 'analytics policy', :view_productivity_analytics
+  end
+
+  describe 'view_type_of_work_charts' do
+    include_examples 'analytics policy', :view_type_of_work_charts
   end
 end

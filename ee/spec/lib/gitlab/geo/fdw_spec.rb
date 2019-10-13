@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Geo::Fdw, :geo do
@@ -147,6 +149,14 @@ describe Gitlab::Geo::Fdw, :geo do
       expect(described_class.gitlab_schema_tables_count).to eq(ActiveRecord::Schema.tables.count - 1)
 
       ActiveRecord::Base.connection.drop_table(:pg_gitlab_test)
+    end
+  end
+
+  describe '.expire_cache!' do
+    it 'calls Gitlab::Geo.expire_cache_keys!' do
+      expect(Gitlab::Geo).to receive(:expire_cache_keys!).with(Gitlab::Geo::Fdw::CACHE_KEYS)
+
+      described_class.expire_cache!
     end
   end
 

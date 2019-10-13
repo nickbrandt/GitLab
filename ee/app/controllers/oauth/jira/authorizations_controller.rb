@@ -2,7 +2,7 @@
 
 # This controller's role is to mimic and rewire the GitLab OAuth
 # flow routes for Jira DVCS integration.
-# See https://gitlab.com/gitlab-org/gitlab-ee/issues/2381
+# See https://gitlab.com/gitlab-org/gitlab/issues/2381
 #
 class Oauth::Jira::AuthorizationsController < ApplicationController
   skip_before_action :authenticate_user!

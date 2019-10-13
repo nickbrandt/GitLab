@@ -14,7 +14,7 @@
       = _('Elasticsearch integration. Elasticsearch AWS IAM.')
   .settings-content
 
-    = form_for @application_setting, url: admin_application_settings_path(anchor: 'js-elasticsearch-settings'), html: { class: 'fieldset-form' } do |f|
+    = form_for @application_setting, url: integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings'), html: { class: 'fieldset-form' } do |f|
       = form_errors(@application_setting)
 
       %fieldset
@@ -29,15 +29,6 @@
                 .form-text
                   = link_to _('Index all projects'), admin_elasticsearch_enqueue_index_path,
                       class: 'btn btn-success', method: :post
-
-          - missing = !Gitlab::Elastic::Indexer.experimental_indexer_present?
-          .form-group
-            .form-check
-              = f.check_box :elasticsearch_experimental_indexer, disabled: missing, class: 'form-check-input', data: { qa_selector: 'experimental_indexer_checkbox' }
-              = f.label :elasticsearch_experimental_indexer, class: 'form-check-label' do
-                Use the <a href="https://gitlab.com/gitlab-org/gitlab-elasticsearch-indexer">new repository indexer (beta)</a>
-                - if missing
-                  (not installed)
 
           .form-group
             .form-check

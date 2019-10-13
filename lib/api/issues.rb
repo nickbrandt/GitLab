@@ -9,28 +9,35 @@ module API
     before { authenticate_non_get! }
 
     helpers do
-      params :issues_stats_params do
+      params :negatable_issue_filter_params do
         optional :labels, type: Array[String], coerce_with: Validations::Types::LabelsList.coerce, desc: 'Comma-separated list of label names'
         optional :milestone, type: String, desc: 'Milestone title'
-        optional :milestone, type: String, desc: 'Return issues for a specific milestone'
         optional :iids, type: Array[Integer], desc: 'The IID array of issues'
         optional :search, type: String, desc: 'Search issues for text present in the title, description, or any combination of these'
         optional :in, type: String, desc: '`title`, `description`, or a string joining them with comma'
-        optional :created_after, type: DateTime, desc: 'Return issues created after the specified time'
-        optional :created_before, type: DateTime, desc: 'Return issues created before the specified time'
-        optional :updated_after, type: DateTime, desc: 'Return issues updated after the specified time'
-        optional :updated_before, type: DateTime, desc: 'Return issues updated before the specified time'
 
         optional :author_id, type: Integer, desc: 'Return issues which are authored by the user with the given ID'
         optional :author_username, type: String, desc: 'Return issues which are authored by the user with the given username'
         mutually_exclusive :author_id, :author_username
 
         optional :assignee_id, types: [Integer, String], integer_none_any: true,
-                               desc: 'Return issues which are assigned to the user with the given ID'
+                 desc: 'Return issues which are assigned to the user with the given ID'
         optional :assignee_username, type: Array[String], check_assignees_count: true,
-                                     coerce_with: Validations::CheckAssigneesCount.coerce,
-                                     desc: 'Return issues which are assigned to the user with the given username'
+                 coerce_with: Validations::CheckAssigneesCount.coerce,
+                 desc: 'Return issues which are assigned to the user with the given username'
         mutually_exclusive :assignee_id, :assignee_username
+      end
+
+      params :issues_stats_params do
+        use :negatable_issue_filter_params
+        optional :created_after, type: DateTime, desc: 'Return issues created after the specified time'
+        optional :created_before, type: DateTime, desc: 'Return issues created before the specified time'
+        optional :updated_after, type: DateTime, desc: 'Return issues updated after the specified time'
+        optional :updated_before, type: DateTime, desc: 'Return issues updated before the specified time'
+
+        optional :not, type: Hash do
+          use :negatable_issue_filter_params
+        end
 
         optional :scope, type: String, values: %w[created-by-me assigned-to-me created_by_me assigned_to_me all],
                          desc: 'Return issues for the given scope: `created_by_me`, `assigned_to_me` or `all`'
@@ -208,7 +215,7 @@ module API
         use :issue_params
       end
       post ':id/issues' do
-        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42320')
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42320')
 
         authorize! :create_issue, user_project
 
@@ -250,7 +257,7 @@ module API
       end
       # rubocop: disable CodeReuse/ActiveRecord
       put ':id/issues/:issue_iid' do
-        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42322')
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42322')
 
         issue = user_project.issues.find_by!(iid: params.delete(:issue_iid))
         authorize! :update_issue, issue
@@ -286,7 +293,7 @@ module API
       end
       # rubocop: disable CodeReuse/ActiveRecord
       post ':id/issues/:issue_iid/move' do
-        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42323')
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42323')
 
         issue = user_project.issues.find_by(iid: params[:issue_iid])
         not_found!('Issue') unless issue
@@ -336,7 +343,8 @@ module API
         present paginate(::Kaminari.paginate_array(merge_requests)),
           with: Entities::MergeRequest,
           current_user: current_user,
-          project: user_project
+          project: user_project,
+          include_subscribed: false
       end
 
       desc 'List merge requests closing issue' do

@@ -11,7 +11,7 @@ module Ci
     end
 
     def get_report(pipeline)
-      pipeline&.license_management_report
+      pipeline&.license_scanning_report
     end
   end
 end

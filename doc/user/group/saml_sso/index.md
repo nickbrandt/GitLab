@@ -30,14 +30,14 @@ SAML SSO for GitLab.com groups does not sync users between providers without usi
 
 SSO enforcement was:
 
-- [Introduced in GitLab 11.8](https://gitlab.com/gitlab-org/gitlab-ee/issues/5291).
-- [Improved upon in GitLab 11.11 with ongoing enforcement in the GitLab UI](https://gitlab.com/gitlab-org/gitlab-ee/issues/9255).
+- [Introduced in GitLab 11.8](https://gitlab.com/gitlab-org/gitlab/issues/5291).
+- [Improved upon in GitLab 11.11 with ongoing enforcement in the GitLab UI](https://gitlab.com/gitlab-org/gitlab/issues/9255).
 
 With this option enabled, users must use your group's GitLab single sign on URL to be added to the group or be added via SCIM. Users cannot be added manually, and may only access project/group resources via the UI by signing in through the SSO URL.
 
 However, users will not be prompted to log via SSO on each visit. GitLab will check whether a user has authenticated through the SSO link, and will only prompt the user to login via SSO if it has been longer than 7 days.
 
-We intend to add a similar SSO requirement for [Git and API activity](https://gitlab.com/gitlab-org/gitlab-ee/issues/9152) in the future.
+We intend to add a similar SSO requirement for [Git and API activity](https://gitlab.com/gitlab-org/gitlab/issues/9152) in the future.
 
 #### Group-managed accounts
 
@@ -64,7 +64,10 @@ GitLab.com uses the SAML NameID to identify users. The NameID element:
 
 - Is a required field in the SAML response.
 - Must be unique to each user.
-- Must be a persistent value that will never change, such as a unique ID or username. Email could also be used as the NameID, but only if it can be guaranteed to never change.
+- Must be a persistent value that will never change, such as a randomly generated unique user ID.
+- Is case sensitive. The NameID must match exactly on subsequent login attempts, so should not rely on user input that could change between upper and lower case.
+
+We strongly recommend against using Email as the NameID as it is hard to guarantee it will never change, for example when a person's name changes. Similarly usernames should be avoided if possible.
 
 ### Assertions
 
@@ -96,6 +99,8 @@ Once you've set up your identity provider to work with GitLab, you'll need to co
 ![Group SAML Settings for GitLab.com](img/group_saml_settings.png)
 
 ## Providers
+
+NOTE: **Note:** GitLab is unable to provide support for IdPs that are not listed here.
 
 | Provider | Documentation |
 |----------|---------------|
@@ -148,14 +153,41 @@ For example, to unlink the `MyOrg` account, the following **Disconnect** button 
 | Issuer | How GitLab identifies itself to the identity provider. Also known as a "Relying party trust identifier". |
 | Certificate fingerprint | Used to confirm that communications over SAML are secure by checking that the server is signing communications with the correct certificate. Also known as a certificate thumbprint. |
 
-<!-- ## Troubleshooting
+## Troubleshooting
 
-Include any troubleshooting steps that you can foresee. If you know beforehand what issues
-one might have when setting this up, or when something is changed, or on upgrading, it's
-important to describe those, too. Think of things that may go wrong and include them here.
-This is important to minimize requests for support, and to avoid doc comments with
-questions that you know someone might ask.
+### SAML debugging tools
 
-Each scenario can be a third-level heading, e.g. `### Getting error message X`.
-If you have none to add when creating a doc, leave this section in place
-but commented out to help encourage others to add to it in the future. -->
+SAML responses are base64 encoded, so we recommend the following browser plugins to decode them on the fly:
+
+- [SAML tracer for Firefox](https://addons.mozilla.org/en-US/firefox/addon/saml-tracer/)
+- [Chrome SAML Panel](https://chrome.google.com/webstore/detail/saml-chrome-panel/paijfdbeoenhembfhkhllainmocckace?hl=en)
+
+Specific attention should be paid to:
+
+- The [NameID](#nameid), which we use to identify which user is signing in. If the user has previously signed in, this [must match the value we have stored](#verifying-nameid).
+- The presence of a `X509Certificate`, which we require to verify the response signature.
+- The `SubjectConfirmation` and `Conditions`, which can cause errors if misconfigured.
+
+### Verifying NameID
+
+In troubleshooting the Group SAML setup, any authenticated user can use the API to verify the NameID GitLab already has linked to the user by visiting [https://gitlab.com/api/v4/user](https://gitlab.com/api/v4/user) and checking the `extern_uid` under identities.
+
+This can then be compared to the [NameID](#nameid) being sent by the Identity Provider by decoding the message with a [SAML debugging tool](#saml-debugging-tools). We require that these match in order to identify users.
+
+### Message: "SAML authentication failed: Extern uid has already been taken"
+
+This error suggests you are signed in as a GitLab user but have already linked your SAML identity to a different GitLab user. Sign out and then try to sign in again using the SSO SAML link, which should log you into GitLab with the linked user account.
+
+If you do not wish to use that GitLab user with the SAML login, you can [unlink the GitLab account from the group's SAML](#unlinking-accounts).
+
+### Message: "SAML authentication failed: User has already been taken"
+
+The user you are signed in with already has SAML linked to a different identity. This might mean you've attempted to link multiple SAML identities to the same user for a given Identity Provider. This could also be a symptom of the Identity Provider returning an inconsistent [NameID](#nameid).
+
+To change which identity you sign in with, you can [unlink the previous SAML identity](#unlinking-accounts) from this GitLab account.
+
+### Message: "SAML authentication failed: Extern uid has already been taken, User has already been taken"
+
+Getting both of these errors at the same time suggests the NameID capitalization provided by the Identity Provider didn't exactly match the previous value for that user.
+
+This can be prevented by configuring the [NameID](#nameid) to return a consistent value. Fixing this for an individual user involves [unlinking SAML in the GitLab account](#unlinking-accounts), although this will cause group membership and Todos to be lost.

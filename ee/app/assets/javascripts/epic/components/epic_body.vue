@@ -70,7 +70,7 @@ export default {
       :allow-auto-complete="false"
       :path-id-separator="$options.epicsPathIdSeparator"
       :title="__('Epics')"
-      :issuable-type="__('epic')"
+      issuable-type="epic"
       css-class="js-related-epics-block"
     />
     <related-items
@@ -80,7 +80,7 @@ export default {
       :can-reorder="canAdmin"
       :allow-auto-complete="false"
       :title="__('Issues')"
-      :issuable-type="__('issue')"
+      issuable-type="issue"
       css-class="js-related-issues-block"
       path-id-separator="#"
     />

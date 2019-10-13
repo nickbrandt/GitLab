@@ -18,9 +18,8 @@ export default [
     name: 'staging',
     lastDeployment: { id: '456' },
     rolloutStatus: {
-      instances: [
-        { status: 'running', pod_name: 'some pod', tooltip: 'success', track: '1', stable: true },
-      ],
+      status: 'loading',
+      instances: [],
     },
     updatedAt: '2019-01-13T12:25:24.098Z',
   },

@@ -82,6 +82,6 @@ class OperationsController < ApplicationController
   end
 
   def serialize_as_json_for_environments(projects)
-    DashboardEnvironmentsSerializer.new.represent(projects).as_json
+    DashboardEnvironmentsSerializer.new(current_user: current_user).represent(projects).as_json
   end
 end

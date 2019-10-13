@@ -30,6 +30,11 @@ export default {
       required: false,
       default: s__('CycleAnalytics|project dropdown filter'),
     },
+    queryParams: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -80,10 +85,13 @@ export default {
         ? this.selectedProjects.concat([selectedProject])
         : this.selectedProjects.filter(project => project.id !== selectedProject.id);
     },
+    singleSelectedProject(selectedObj, isMarking) {
+      return isMarking ? [selectedObj] : [];
+    },
     setSelectedProjects(selectedObj, isMarking) {
       this.selectedProjects = this.multiSelect
         ? this.getSelectedProjects(selectedObj, isMarking)
-        : [selectedObj];
+        : this.singleSelectedProject(selectedObj, isMarking);
     },
     onClick({ selectedObj, e, isMarking }) {
       e.preventDefault();
@@ -92,7 +100,7 @@ export default {
     },
     fetchData(term, callback) {
       this.loading = true;
-      return Api.groupProjects(this.groupId, term, {}, projects => {
+      return Api.groupProjects(this.groupId, term, this.queryParams, projects => {
         this.loading = false;
         callback(projects);
       });
@@ -137,7 +145,7 @@ export default {
           :size="16"
           shape="rect"
           :alt="selectedProjects[0].name"
-          class="prepend-top-2"
+          class="d-inline-flex align-text-bottom"
         />
         {{ selectedProjectsLabel }}
         <icon name="chevron-down" />

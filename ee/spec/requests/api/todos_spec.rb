@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::Todos do
@@ -34,6 +36,12 @@ describe API::Todos do
              note: create(:note, project: project, note: "I am note, hear me roar"))
     end
 
+    shared_examples 'an endpoint that responds with success' do
+      it do
+        expect(response.status).to eq(200)
+      end
+    end
+
     context 'when there is an Epic Todo' do
       let!(:epic_todo) { create_todo_for_new_epic }
 
@@ -41,9 +49,7 @@ describe API::Todos do
         get api('/todos', personal_access_token: pat)
       end
 
-      it 'responds without error' do
-        expect(response.status).to eq(200)
-      end
+      it_behaves_like 'an endpoint that responds with success'
 
       it 'avoids N+1 queries', :request_store do
         create_todo_for_new_epic
@@ -65,16 +71,43 @@ describe API::Todos do
     context 'when there is a Design Todo' do
       let!(:design_todo) { create_todo_for_mentioned_in_design }
 
-      before do
+      def api_request
         get api('/todos', personal_access_token: pat)
       end
 
-      it 'responds without error' do
-        expect(response.status).to eq(200)
+      context 'when the feature is enabled' do
+        before do
+          api_request
+        end
+
+        it_behaves_like 'an endpoint that responds with success'
+
+        it 'avoids N+1 queries', :request_store do
+          control = ActiveRecord::QueryRecorder.new { api_request }
+
+          create_todo_for_mentioned_in_design
+
+          expect { api_request }.not_to exceed_query_limit(control)
+        end
+
+        it 'includes the Design Todo in the response' do
+          expect(json_response).to include(
+            a_hash_including('id' => design_todo.id)
+          )
+        end
       end
 
-      it 'does not include the Design Todo in the response' do
-        expect(json_response).to be_empty
+      context 'when the feature is disabled' do
+        before do
+          stub_feature_flags(design_management_todos_api: false)
+          api_request
+        end
+
+        it_behaves_like 'an endpoint that responds with success'
+
+        it 'does not include the Design Todo in the response' do
+          expect(json_response).to be_empty
+        end
       end
     end
   end

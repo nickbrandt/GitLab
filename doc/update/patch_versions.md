@@ -6,7 +6,7 @@ comments: false
 
 ## Select Version to Install
 
-Make sure you view [this update guide](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/update/patch_versions.md) from the tag (version) of GitLab you would like to install.
+Make sure you view [this update guide](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/update/patch_versions.md) from the tag (version) of GitLab you would like to install.
 In most cases this should be the highest numbered production tag (without rc in it).
 You can select the tag in the version dropdown in the top left corner of GitLab (below the menu bar).
 
@@ -72,7 +72,7 @@ cd /home/git/gitlab
 sudo -u git -H bundle exec rake "gitlab:workhorse:install[/home/git/gitlab-workhorse]" RAILS_ENV=production
 ```
 
-### 5. Update gitaly to the corresponding version
+### 5. Update Gitaly to the corresponding version
 
 ```bash
 cd /home/git/gitlab
@@ -87,7 +87,7 @@ cd /home/git/gitlab-shell
 
 sudo -u git -H git fetch --all --tags
 sudo -u git -H git checkout v$(</home/git/gitlab/GITLAB_SHELL_VERSION) -b v$(</home/git/gitlab/GITLAB_SHELL_VERSION)
-sudo -u git -H sh -c 'if [ -x bin/compile ]; then bin/compile; fi'
+sudo -u git -H make build
 ```
 
 ### 7. Update GitLab Pages to the corresponding version (skip if not using pages)
@@ -102,7 +102,7 @@ sudo -u git -H make
 
 ### 8. Install/Update `gitlab-elasticsearch-indexer` (optional) **(STARTER ONLY)**
 
-If you're interested in using GitLab's new [elasticsearch repository indexer](../integration/elasticsearch.md#elasticsearch-repository-indexer-beta) (currently in beta)
+If you're interested in using GitLab's new [Elasticsearch repository indexer](../integration/elasticsearch.md#elasticsearch-repository-indexer-beta) (currently in beta)
 please follow the instructions on the document linked above and enable the
 indexer usage in the GitLab admin settings.
 

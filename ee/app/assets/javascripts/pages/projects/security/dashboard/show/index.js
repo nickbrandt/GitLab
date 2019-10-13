@@ -1,4 +1,6 @@
 import Vue from 'vue';
+import createRouter from 'ee/security_dashboard/store/router';
+import syncWithRouter from 'ee/security_dashboard/store/plugins/sync_with_router';
 import createStore from 'ee/security_dashboard/store';
 import SecurityReportApp from 'ee/vue_shared/security_reports/card_security_reports_app.vue';
 import { parseBoolean } from '~/lib/utils/common_utils';
@@ -31,8 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const parsedPipelineId = parseInt(pipelineId, 10);
   const parsedHasPipelineData = parseBoolean(hasPipelineData);
-
-  const store = createStore();
 
   let props = {
     hasPipelineData: parsedHasPipelineData,
@@ -72,9 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  const router = createRouter();
+  const store = createStore({ plugins: [syncWithRouter(router)] });
+
   return new Vue({
     el: securityTab,
     store,
+    router,
     components: {
       SecurityReportApp,
     },

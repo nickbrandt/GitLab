@@ -44,7 +44,7 @@ export default {
       <span class="mr-2 text">{{ title }}</span>
 
       <button ref="popoverTarget" type="button" class="btn-link information-target">
-        <icon name="information" css-classes="icon d-block" />
+        <icon name="information" class="icon d-block" />
       </button>
 
       <gl-popover

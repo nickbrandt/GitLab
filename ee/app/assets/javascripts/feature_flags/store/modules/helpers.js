@@ -106,7 +106,7 @@ export const mapFromScopesViewModel = params => {
  * property values will be used to override the default values.
  *
  */
-export const createNewEnvironmentScope = (overrides = {}) => {
+export const createNewEnvironmentScope = (overrides = {}, featureFlagPermissions = false) => {
   const defaultScope = {
     environmentScope: '',
     active: false,
@@ -121,7 +121,7 @@ export const createNewEnvironmentScope = (overrides = {}) => {
     ...overrides,
   };
 
-  if (gon && gon.features && gon.features.featureFlagPermissions) {
+  if (featureFlagPermissions) {
     newScope.canUpdate = true;
     newScope.protected = false;
   }

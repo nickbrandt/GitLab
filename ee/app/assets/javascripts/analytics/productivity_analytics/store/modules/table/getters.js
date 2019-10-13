@@ -1,25 +1,23 @@
-import httpStatus from '~/lib/utils/http_status';
-import { tableSortOrder } from './../../../constants';
+import { chartKeys, tableSortOrder, daysToMergeMetric } from '../../../constants';
 
 export const sortIcon = state => tableSortOrder[state.sortOrder].icon;
 
 export const sortTooltipTitle = state => tableSortOrder[state.sortOrder].title;
 
-export const sortFieldDropdownLabel = state => state.sortFields[state.sortField];
+export const sortFieldDropdownLabel = (state, _, rootState) =>
+  rootState.metricTypes.find(metric => metric.key === state.sortField).label;
 
-export const getColumnOptions = state =>
-  Object.keys(state.sortFields)
-    .filter(key => key !== 'time_to_merge')
-    .reduce((obj, key) => {
-      const result = { ...obj, [key]: state.sortFields[key] };
-      return result;
-    }, {});
+export const tableSortOptions = (_state, _getters, _rootState, rootGetters) => [
+  daysToMergeMetric,
+  ...rootGetters.getMetricTypes(chartKeys.timeBasedHistogram),
+];
 
-export const columnMetricLabel = (state, getters) => getters.getColumnOptions[state.columnMetric];
+export const columnMetricLabel = (state, _getters, _rootState, rootGetters) =>
+  rootGetters
+    .getMetricTypes(chartKeys.timeBasedHistogram)
+    .find(metric => metric.key === state.columnMetric).label;
 
 export const isSelectedSortField = state => sortField => state.sortField === sortField;
-
-export const hasNoAccessError = state => state.hasError === httpStatus.FORBIDDEN;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

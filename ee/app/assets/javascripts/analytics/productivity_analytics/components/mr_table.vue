@@ -22,7 +22,7 @@ export default {
       required: true,
     },
     columnOptions: {
-      type: Object,
+      type: Array,
       required: true,
     },
     metricType: {
@@ -36,7 +36,7 @@ export default {
   },
   computed: {
     metricDropdownLabel() {
-      return this.columnOptions[this.metricType];
+      return this.columnOptions.find(option => option.key === this.metricType).label;
     },
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
@@ -72,21 +72,21 @@ export default {
                 :text="metricDropdownLabel"
               >
                 <gl-dropdown-item
-                  v-for="(value, key) in columnOptions"
-                  :key="key"
+                  v-for="option in columnOptions"
+                  :key="option.key"
                   active-class="is-active"
                   class="w-100"
-                  @click="$emit('columnMetricChange', key)"
+                  @click="$emit('columnMetricChange', option.key)"
                 >
                   <span class="d-flex">
                     <icon
                       class="flex-shrink-0 append-right-4"
                       :class="{
-                        invisible: !isSelectedMetric(key),
+                        invisible: !isSelectedMetric(option.key),
                       }"
                       name="mobile-issue-close"
                     />
-                    {{ value }}
+                    {{ option.label }}
                   </span>
                 </gl-dropdown-item>
               </gl-dropdown>

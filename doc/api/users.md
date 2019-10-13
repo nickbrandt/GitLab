@@ -350,7 +350,7 @@ over `password`. In addition, `reset_password` and
 `force_random_password` can be used together.
 
 NOTE: **Note:**
-From [GitLab 12.1](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/29888/), `private_profile` will default to `false`.
+From [GitLab 12.1](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/29888/), `private_profile` will default to `false`.
 
 ```
 POST /users
@@ -393,20 +393,21 @@ PUT /users/:id
 
 Parameters:
 
-- `email`                          - Email
-- `username`                       - Username
-- `name`                           - Name
-- `password`                       - Password
-- `skype`                          - Skype ID
-- `linkedin`                       - LinkedIn
-- `twitter`                        - Twitter account
-- `website_url`                    - Website URL
-- `organization`                   - Organization name
-- `projects_limit`                 - Limit projects each user can create
-- `extern_uid`                     - External UID
-- `provider`                       - External provider name
+- `id` (required)                  - The ID of the user
+- `email` (optional)               - Email
+- `username` (optional)            - Username
+- `name` (optional)                - Name
+- `password` (optional)            - Password
+- `skype` (optional)               - Skype ID
+- `linkedin` (optional)            - LinkedIn
+- `twitter` (optional)             - Twitter account
+- `website_url` (optional)         - Website URL
+- `organization` (optional)        - Organization name
+- `projects_limit` (optional)      - Limit projects each user can create
+- `extern_uid` (optional)          - External UID
+- `provider` (optional)            - External provider name
 - `group_id_for_saml` (optional)   - ID of group where SAML has been configured
-- `bio`                            - User's biography
+- `bio` (optional)                 - User's biography
 - `location` (optional)            - User's location
 - `public_email` (optional)        - The public email of the user
 - `admin` (optional)               - User is admin - true or false (default)
@@ -419,7 +420,7 @@ Parameters:
 - `private_profile` (optional)     - User's profile is private - true or false (default)
 - `shared_runners_minutes_limit` (optional)       - Pipeline minutes quota for this user **(STARTER)**
 - `extra_shared_runners_minutes_limit` (optional) - Extra pipeline minutes quota for this user **(STARTER)**
-- `note` (optional) - Admin notes for this user **(STARTER)**
+- `note` (optional)                - Admin notes for this user **(STARTER)**
 
 On password update, user will be forced to change it upon next login.
 Note, at the moment this method does only return a `404` error,
@@ -595,7 +596,7 @@ PUT /user/status
 
 | Attribute | Type   | Required | Description |
 | --------- | ------ | -------- | ----------- |
-| `emoji`   | string | no     | The name of the emoji to use as status, if omitted `speech_balloon` is used. Emoji name can be one of the specified names in the [Gemojione index][gemojione-index]. |
+| `emoji`   | string | no     | The name of the emoji to use as status, if omitted `speech_balloon` is used. Emoji name can be one of the specified names in the [Gemojione index](https://github.com/bonusly/gemojione/blob/master/config/index.json). |
 | `message` | string | no     | The message to set as a status. It can also contain emoji codes. |
 
 When both parameters `emoji` and `message` are empty, the status will be cleared.
@@ -1320,7 +1321,7 @@ The activities that update the timestamp are:
 
 - Git HTTP/SSH activities (such as clone, push)
 - User logging in into GitLab
-- User visiting pages related to Dashboards, Projects, Issues and Merge Requests ([introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/54947) in GitLab 11.8)
+- User visiting pages related to Dashboards, Projects, Issues and Merge Requests ([introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/54947) in GitLab 11.8)
 
 By default, it shows the activity for all users in the last 6 months, but this can be
 amended by using the `from` parameter.
@@ -1362,5 +1363,3 @@ Example response:
 ```
 
 Please note that `last_activity_at` is deprecated, please use `last_activity_on`.
-
-[gemojione-index]: https://github.com/jonathanwiesel/gemojione/blob/master/config/index.json

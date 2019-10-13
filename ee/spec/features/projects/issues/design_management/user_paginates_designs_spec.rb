@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'User paginates issue designs', :js do
@@ -9,8 +11,7 @@ describe 'User paginates issue designs', :js do
   before do
     enable_design_management
 
-    create(:design, :with_file, issue: issue, filename: 'world.png')
-    create(:design, :with_file, issue: issue, filename: 'dk.png')
+    create_list(:design, 2, :with_file, issue: issue)
 
     visit project_issue_path(project, issue)
 

@@ -10,18 +10,17 @@ class GitlabDanger
     prettier
     eslint
     database
+    commit_messages
   ].freeze
 
   CI_ONLY_RULES ||= %w[
     metadata
     changelog
     specs
-    commit_messages
     roulette
     single_codebase
     gitlab_ui_wg
     ce_ee_vue_templates
-    only_documentation
   ].freeze
 
   MESSAGE_PREFIX = '==>'.freeze

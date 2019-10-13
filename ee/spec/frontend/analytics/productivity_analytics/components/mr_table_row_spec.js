@@ -1,5 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import MergeRequestTableRow from 'ee/analytics/productivity_analytics/components/mr_table_row.vue';
+import MetricColumn from 'ee/analytics/productivity_analytics/components/metric_column.vue';
 import { GlAvatar } from '@gitlab/ui';
 import { mockMergeRequests } from '../mock_data';
 
@@ -22,9 +23,9 @@ describe('MergeRequestTableRow component', () => {
     });
   };
 
-  const findMrDetails = () => wrapper.find('.qa-mr-details');
-  const findMrMetrics = () => wrapper.find('.qa-mr-metrics');
-  const findMetricColumns = () => findMrMetrics().findAll('.metric-col');
+  const findMrDetails = () => wrapper.find('.js-mr-details');
+  const findMrMetrics = () => wrapper.find('.js-mr-metrics');
+  const findMetricColumns = () => findMrMetrics().findAll(MetricColumn);
 
   afterEach(() => {
     wrapper.destroy();
@@ -59,17 +60,37 @@ describe('MergeRequestTableRow component', () => {
       expect(title.text()).toContain(defaultProps.mergeRequest.title);
     });
 
+    describe('metric list', () => {
+      it.each`
+        metric              | selector
+        ${'commits_count'}  | ${'commitCount'}
+        ${'loc_per_commit'} | ${'locPerCommitCount'}
+        ${'files_touched'}  | ${'filesTouchedCount'}
+      `("metric '$metric' won't be rendered if null", ({ metric, selector }) => {
+        // let's update our test data and set the metric to null
+        const props = {
+          ...defaultProps,
+          mergeRequest: {
+            ...defaultProps.mergeRequest,
+            [metric]: null,
+          },
+        };
+        factory(props);
+        expect(wrapper.find({ ref: selector }).exists()).toBe(false);
+      });
+    });
+
     describe('metric columns', () => {
       it('renders two metric columns', () => {
         expect(findMetricColumns().length).toBe(2);
       });
 
-      it('renders the "Time to merge" metric column', () => {
+      it('renders the "Time to merge" metric column with the "days_to_merge" metric', () => {
         expect(
           findMetricColumns()
             .at(0)
-            .text(),
-        ).toContain(defaultProps.mergeRequest.time_to_merge);
+            .props('value'),
+        ).toBe(defaultProps.mergeRequest.days_to_merge);
       });
     });
   });
@@ -126,34 +147,6 @@ describe('MergeRequestTableRow component', () => {
 
       it("returns the selected metric's key", () => {
         expect(wrapper.vm.selectedMetric).toBe(defaultProps.mergeRequest[defaultProps.metricType]);
-      });
-    });
-
-    describe('metricTimeUnit', () => {
-      describe('when metricType is "days_to_merge"', () => {
-        beforeEach(() => {
-          factory({
-            ...defaultProps,
-            metricType: 'days_to_merge',
-          });
-        });
-
-        it('returns "days"', () => {
-          expect(wrapper.vm.metricTimeUnit).toBe('days');
-        });
-      });
-
-      describe('when metricType is not "days_to_merge"', () => {
-        beforeEach(() => {
-          factory({
-            ...defaultProps,
-            metricType: 'time_to_last_commit',
-          });
-        });
-
-        it('returns "hrs"', () => {
-          expect(wrapper.vm.metricTimeUnit).toBe('hrs');
-        });
       });
     });
   });

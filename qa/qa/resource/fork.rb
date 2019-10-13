@@ -30,7 +30,7 @@ module QA
         Page::Main::Menu.perform(&:sign_out)
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform do |login|
-          login.sign_in_using_credentials(user)
+          login.sign_in_using_credentials(user: user)
         end
 
         upstream.project.visit!
@@ -41,7 +41,7 @@ module QA
           fork_new.choose_namespace(user.name)
         end
 
-        Page::Layout::Banner.perform do |page|
+        Page::Layout::Banner.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
           page.has_notice?('The project was successfully forked.')
         end
 

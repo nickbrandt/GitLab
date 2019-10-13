@@ -43,7 +43,7 @@ As an example, imagine a pipeline consisting of four stages, executed in the fol
 
 ## Visualizing pipelines
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5742) in GitLab 8.11.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/5742) in GitLab 8.11.
 
 Pipelines can be complex structures with many sequential and parallel jobs.
 
@@ -87,7 +87,7 @@ Stages in pipeline mini graphs are collapsible. Hover your mouse over them and c
 
 Job ordering depends on the type of pipeline graph. For [regular pipeline graphs](#regular-pipeline-graphs), jobs are sorted by name.
 
-For [pipeline mini graphs](#pipeline-mini-graphs) ([introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/9760)
+For [pipeline mini graphs](#pipeline-mini-graphs) ([introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/9760)
 in GitLab 9.0), jobs are sorted by severity and then by name.
 
 The order of severity is:
@@ -146,7 +146,7 @@ The union of A, B, and C is (1, 4) and (6, 7). Therefore, the total running time
 
 ### Expanding and collapsing job log sections
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/14664) in GitLab
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/14664) in GitLab
 > 12.0.
 
 Job logs are divided into sections that can be collapsed or expanded.
@@ -179,7 +179,7 @@ through the GitLab UI:
 
 ### Grouping jobs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/6242) in GitLab 8.12.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/6242) in GitLab 8.12.
 
 If you have many similar jobs, your [pipeline graph](#visualizing-pipelines) becomes long and hard
 to read.
@@ -204,7 +204,7 @@ the following (you can even use them interchangeably):
 - A colon (`:`).
 
 NOTE: **Note:**
-More specifically, it uses [this](https://gitlab.com/gitlab-org/gitlab-ce/blob/2f3dc314f42dbd79813e6251792853bc231e69dd/app/models/commit_status.rb#L99) regular expression: `\d+[\s:\/\\]+\d+\s*`.
+More specifically, it uses [this](https://gitlab.com/gitlab-org/gitlab/blob/2f3dc314f42dbd79813e6251792853bc231e69dd/app/models/commit_status.rb#L99) regular expression: `\d+[\s:\/\\]+\d+\s*`.
 
 #### How grouping works
 
@@ -291,7 +291,7 @@ Clicking on an individual job will show you its job trace, and allow you to:
 
 ### Seeing the failure reason for jobs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/17782) in GitLab 10.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17782) in GitLab 10.7.
 
 When a pipeline fails or is allowed to fail, there are several places where you
 can quickly check the reason it failed:
@@ -304,12 +304,12 @@ In each place, if you hover over the failed job you can see the reason it failed
 
 ![Pipeline detail](img/job_failure_reason.png)
 
-From [GitLab 10.8](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/17814),
+From [GitLab 10.8](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17814),
 you can also see the reason it failed on the Job detail page.
 
 ### Manual actions from pipeline graphs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7931) in GitLab 8.15.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/7931) in GitLab 8.15.
 
 Manual actions, configured using the [`when:manual`](yaml/README.md#whenmanual) parameter,
 allow you to require manual interaction before moving forward in the pipeline.
@@ -325,7 +325,7 @@ stage has a job with a manual action.
 
 ### Specifying variables when running manual jobs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/30485) in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/30485) in GitLab 12.2.
 
 When running manual jobs you can supply additional job specific variables.
 
@@ -339,7 +339,7 @@ environment variables.
 
 ### Delay a job in a pipeline graph
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/21767) in GitLab 11.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/21767) in GitLab 11.4.
 
 When you do not want to run a job immediately, you can use the [`when:delayed`](yaml/README.md#whendelayed) parameter to
 delay a job's execution for a certain period.
@@ -366,7 +366,7 @@ GitLab provides API endpoints to:
 
 ### Start multiple manual actions in a stage
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/27188) in GitLab 11.11.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/27188) in GitLab 11.11.
 
 Multiple manual actions in a single stage can be started at the same time using the "Play all manual" button.
 Once the user clicks this button, each individual manual action will be triggered and refreshed
@@ -405,3 +405,44 @@ branches, avoiding untrusted code to be executed on the protected runner and
 preserving deployment keys and other credentials from being unintentionally
 accessed. In order to ensure that jobs intended to be executed on protected
 runners will not use regular runners, they must be tagged accordingly.
+
+## Persistent pipeline refs
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/17043) in GitLab 12.4.
+
+Previously, you'd have encountered unexpected pipeline failures when you force-pushed
+a branch to its remote repository. To illustrate the problem, suppose you've had the current workflow:
+
+1. A user creates a feature branch named `example` and pushes it to a remote repository.
+1. A new pipeline starts running on the `example` branch.
+1. A user rebases the `example` branch on the latest `master` branch and force-pushes it to its remote repository.
+1. A new pipeline starts running on the `example` branch again, however,
+   the previous pipeline (2) fails because of `fatal: reference is not a tree:` error.
+
+This is because the previous pipeline cannot find a checkout-SHA (which associated with the pipeline record)
+from the `example` branch that the commit history has already been overwritten by the force-push.
+Similarly, [Pipelines for merged results](merge_request_pipelines/pipelines_for_merged_results/index.md)
+might have failed intermittently due to [the same reason](merge_request_pipelines/pipelines_for_merged_results/index.md#intermittently-pipelines-fail-by-fatal-reference-is-not-a-tree-error).
+
+As of GitLab 12.4, we've improved this behavior by persisting pipeline refs exclusively.
+To illustrate its life cycle:
+
+1. A pipeline is created on a feature branch named `example`.
+1. A persistent pipeline ref is created at `refs/pipelines/<pipeline-id>`,
+   which retains the checkout-SHA of the associated pipeline record.
+   This persistent ref stays intact during the pipeline execution,
+   even if the commit history of the `example` branch has been overwritten by force-push.
+1. GitLab Runner fetches the persistent pipeline ref and gets source code from the checkout-SHA.
+1. When the pipeline finished, its persistent ref is cleaned up in a background process.
+
+NOTE: **NOTE**: At this moment, this feature is off dy default and can be manually enabled
+by enabling `depend_on_persistent_pipeline_ref` feature flag, however, we'd remove this
+feature flag and make it enabled by deafult by the day we release 12.4 _if we don't find any issues_.
+If you'd be interested in manually turning on this behavior, please ask the administrator
+to execute the following commands in rails console.
+
+```shell
+> sudo gitlab-rails console                                        # Login to Rails console of GitLab instance.
+> project = Project.find_by_full_path('namespace/project-name')    # Get the project instance.
+> Feature.enable(:depend_on_persistent_pipeline_ref, project)      # Enable the feature flag.
+```

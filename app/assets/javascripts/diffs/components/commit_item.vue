@@ -17,7 +17,7 @@ import initUserPopovers from '../../user_popovers';
  *
  * This Component was cloned from a HAML view. For the time being they
  * coexist, but there is an issue to remove the duplication.
- * https://gitlab.com/gitlab-org/gitlab-ce/issues/51613
+ * https://gitlab.com/gitlab-org/gitlab-foss/issues/51613
  *
  */
 export default {
@@ -121,7 +121,7 @@ export default {
           <div class="label label-monospace monospace" v-text="commit.short_id"></div>
           <clipboard-button
             :text="commit.id"
-            :title="__('Copy commit SHA to clipboard')"
+            :title="__('Copy commit SHA')"
             class="btn btn-default"
           />
         </div>

@@ -4,7 +4,7 @@
 - push_rule = local_assigns.fetch(:push_rule)
 
 .form-check
-  = form.check_box :reject_unsigned_commits, class: "form-check-input", disabled: !can_change_push_rule?(form.object, :reject_unsigned_commits)
+  = form.check_box :reject_unsigned_commits, class: "form-check-input", disabled: !can_change_push_rule?(form.object, :reject_unsigned_commits), data: { qa_selector: 'reject_unsigned_commits_checkbox' }
   = form.label :reject_unsigned_commits, class: "label-bold form-check-label" do
     Reject unsigned commits
   %p.text-muted

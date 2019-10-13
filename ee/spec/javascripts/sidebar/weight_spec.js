@@ -3,6 +3,7 @@ import weight from 'ee/sidebar/components/weight/weight.vue';
 import eventHub from '~/sidebar/event_hub';
 import { ENTER_KEY_CODE } from '~/lib/utils/keycodes';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { mockTracking, triggerEvent } from 'spec/helpers/tracking_helper';
 
 const DEFAULT_PROPS = {
   weightNoneValue: 'None',
@@ -11,10 +12,8 @@ const DEFAULT_PROPS = {
 describe('Weight', function() {
   let vm;
   let Weight;
-  let statsSpy;
 
   beforeEach(() => {
-    statsSpy = spyOnDependency(weight, 'trackEvent');
     Weight = Vue.extend(weight);
   });
 
@@ -117,11 +116,12 @@ describe('Weight', function() {
       editable: true,
     });
 
-    vm.$el.querySelector('.js-weight-edit-link').click();
+    const spy = mockTracking('_category_', vm.$el, spyOn, afterEach);
+    triggerEvent('.js-weight-edit-link');
 
     vm.$nextTick()
       .then(() => {
-        expect(statsSpy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
       })
       .then(done)
       .catch(done.fail);

@@ -73,6 +73,22 @@ export default {
   },
   watch: {
     /**
+     * When Issue is created from Boards
+     * Issue ID is updated post-render
+     * so we need to watch it to update in state
+     */
+    issueId() {
+      this.setIssueId(this.issueId);
+    },
+    /**
+     * When Issues are selected within Boards
+     * `initialEpic` gets updated to reflect
+     * underlying selection.
+     */
+    initialEpic() {
+      this.setSelectedEpic(this.initialEpic);
+    },
+    /**
      * Initial Epic is loaded via separate Sidebar store
      * So we need to watch for updates before updating local store.
      */
@@ -93,6 +109,7 @@ export default {
   methods: {
     ...mapActions([
       'setInitialData',
+      'setIssueId',
       'setSearchQuery',
       'setSelectedEpic',
       'fetchEpics',

@@ -86,7 +86,7 @@ You can turn this off in the webhook settings in your GitLab projects.
 
 ## Branch filtering
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/20338) in GitLab 11.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/20338) in GitLab 11.3.
 
 Push events can be filtered by branch using a branch name or wildcard pattern
 to limit which push events are sent to your webhook endpoint. By default the
@@ -1251,8 +1251,8 @@ its description:
 ```
 
 It will appear in the webhook body as the below (assuming that GitLab is
-installed at gitlab.example.com, and the project is at
-example-group/example-project):
+installed at `gitlab.example.com`, and the project is at
+`example-group/example-project`):
 
 ```markdown
 ![image](https://gitlab.example.com/example-group/example-project/uploads/$sha/image.png)

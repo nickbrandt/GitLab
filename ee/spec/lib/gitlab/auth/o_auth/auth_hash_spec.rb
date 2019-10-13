@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Auth::OAuth::AuthHash do
@@ -36,6 +38,6 @@ describe Gitlab::Auth::OAuth::AuthHash do
   end
 
   def ascii(text)
-    text.force_encoding(Encoding::ASCII_8BIT)
+    text.dup.force_encoding(Encoding::ASCII_8BIT)
   end
 end

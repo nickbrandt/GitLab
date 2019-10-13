@@ -51,7 +51,6 @@ exports[`MergeRequestTable component matches the snapshot 1`] = `
                 >
                   <icon-stub
                     class="flex-shrink-0 append-right-4 invisible"
-                    cssclasses=""
                     name="mobile-issue-close"
                     size="16"
                   />
@@ -69,7 +68,6 @@ exports[`MergeRequestTable component matches the snapshot 1`] = `
                 >
                   <icon-stub
                     class="flex-shrink-0 append-right-4"
-                    cssclasses=""
                     name="mobile-issue-close"
                     size="16"
                   />
@@ -87,7 +85,6 @@ exports[`MergeRequestTable component matches the snapshot 1`] = `
                 >
                   <icon-stub
                     class="flex-shrink-0 append-right-4 invisible"
-                    cssclasses=""
                     name="mobile-issue-close"
                     size="16"
                   />

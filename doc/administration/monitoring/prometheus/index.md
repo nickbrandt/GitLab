@@ -21,7 +21,7 @@ Prometheus works by periodically connecting to data sources and collecting their
 performance metrics via the [various exporters](#bundled-software-metrics). To view
 and work with the monitoring data, you can either
 [connect directly to Prometheus](#viewing-performance-metrics) or utilize a
-dashboard tool like [Grafana].
+dashboard tool like [Grafana](https://grafana.com).
 
 ## Configuring Prometheus
 
@@ -97,9 +97,9 @@ To use an external Prometheus server:
 1. Set each bundled service's [exporter](#bundled-software-metrics) to listen on a network address, for example:
 
    ```ruby
-   gitlab_monitor['listen_address'] = '0.0.0.0'
+   gitlab_exporter['listen_address'] = '0.0.0.0'
    sidekiq['listen_address'] = '0.0.0.0'
-   gitlab_monitor['listen_port'] = '9168'
+   gitlab_exporter['listen_port'] = '9168'
    node_exporter['listen_address'] = '0.0.0.0:9100'
    redis_exporter['listen_address'] = '0.0.0.0:9121'
    postgres_exporter['listen_address'] = '0.0.0.0:9187'
@@ -114,7 +114,7 @@ To use an external Prometheus server:
     gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8', '192.168.0.1']
     ```
 
-1. To scrape nginx metrics, you'll also need to configure nginx to allow the Prometheus server
+1. To scrape NGINX metrics, you'll also need to configure NGINX to allow the Prometheus server
    IP. For example:
 
    ```ruby
@@ -163,17 +163,17 @@ To use an external Prometheus server:
      static_configs:
      - targets:
        - 1.1.1.1:8082
-   - job_name: gitlab_monitor_database
+   - job_name: gitlab_exporter_database
      metrics_path: "/database"
      static_configs:
      - targets:
        - 1.1.1.1:9168
-   - job_name: gitlab_monitor_sidekiq
+   - job_name: gitlab_exporter_sidekiq
      metrics_path: "/sidekiq"
      static_configs:
      - targets:
        - 1.1.1.1:9168
-   - job_name: gitlab_monitor_process
+   - job_name: gitlab_exporter_process
      metrics_path: "/process"
      static_configs:
      - targets:
@@ -199,8 +199,8 @@ having [NGINX proxy it][nginx-custom-config].
 
 The performance data collected by Prometheus can be viewed directly in the
 Prometheus console or through a compatible dashboard tool.
-The Prometheus interface provides a [flexible query language][prom-query] to work
-with the collected data where you can visualize their output.
+The Prometheus interface provides a [flexible query language](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+to work with the collected data where you can visualize their output.
 For a more fully featured dashboard, Grafana can be used and has
 [official support for Prometheus][prom-grafana].
 
@@ -263,18 +263,18 @@ The PgBouncer exporter allows you to measure various PgBouncer metrics.
 
 [➔ Read more about the PgBouncer exporter.](pgbouncer_exporter.md)
 
-### GitLab monitor exporter
+### GitLab exporter
 
-The GitLab monitor exporter allows you to measure various GitLab metrics, pulled from Redis and the database.
+The GitLab exporter allows you to measure various GitLab metrics, pulled from Redis and the database.
 
-[➔ Read more about the GitLab monitor exporter.](gitlab_monitor_exporter.md)
+[➔ Read more about the GitLab exporter.](gitlab_exporter.md)
 
 ## Configuring Prometheus to monitor Kubernetes
 
 > Introduced in GitLab 9.0.
 > Pod monitoring introduced in GitLab 9.4.
 
-If your GitLab server is running within Kubernetes, Prometheus will collect metrics from the Nodes and [annotated Pods](https://prometheus.io/docs/operating/configuration/#kubernetes_sd_config) in the cluster, including performance data on each container. This is particularly helpful if your CI/CD environments run in the same cluster, as you can use the [Prometheus project integration][prometheus integration] to monitor them.
+If your GitLab server is running within Kubernetes, Prometheus will collect metrics from the Nodes and [annotated Pods](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#kubernetes_sd_config) in the cluster, including performance data on each container. This is particularly helpful if your CI/CD environments run in the same cluster, as you can use the [Prometheus project integration][prometheus integration] to monitor them.
 
 To disable the monitoring of Kubernetes:
 
@@ -288,16 +288,11 @@ To disable the monitoring of Kubernetes:
 1. Save the file and [reconfigure GitLab][reconfigure] for the changes to
    take effect.
 
-[grafana]: https://grafana.net
 [hsts]: https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
 [multi-user-prometheus]: https://gitlab.com/gitlab-org/multi-user-prometheus
 [nginx-custom-config]: https://docs.gitlab.com/omnibus/settings/nginx.html#inserting-custom-nginx-settings-into-the-gitlab-server-block
 [prometheus]: https://prometheus.io
-[prom-exporters]: https://prometheus.io/docs/instrumenting/exporters/
-[prom-query]: https://prometheus.io/docs/querying/basics
 [prom-grafana]: https://prometheus.io/docs/visualization/grafana/
-[scrape-config]: https://prometheus.io/docs/operating/configuration/#%3Cscrape_config%3E
 [reconfigure]: ../../restart_gitlab.md#omnibus-gitlab-reconfigure
 [1261]: https://gitlab.com/gitlab-org/omnibus-gitlab/merge_requests/1261
 [prometheus integration]: ../../../user/project/integrations/prometheus.md
-[prometheus-cadvisor-metrics]: https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md

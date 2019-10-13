@@ -22,9 +22,9 @@ The project description also partially supports [standard markdown](../../markdo
 
 ### Sharing and permissions
 
-Set up your project's access, [visibility](../../../public_access/public_access.md), and enable [Container Registry](../container_registry.md) for your projects:
+Set up your project's access, [visibility](../../../public_access/public_access.md), and enable [Container Registry](../../packages/container_registry/index.md) for your projects:
 
-![projects sharing permissions](img/sharing_and_permissions_settings.png)
+![projects sharing permissions](img/sharing_and_permissions_settings_v12_3.png)
 
 If Issues are disabled, or you can't access Issues because you're not a project member, then Labels and Milestones
 links will be missing from the sidebar UI.

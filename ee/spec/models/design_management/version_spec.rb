@@ -3,8 +3,8 @@ require 'spec_helper'
 
 describe DesignManagement::Version do
   describe 'relations' do
-    it { is_expected.to have_many(:design_versions) }
-    it { is_expected.to have_many(:designs).through(:design_versions) }
+    it { is_expected.to have_many(:actions) }
+    it { is_expected.to have_many(:designs).through(:actions) }
 
     it 'constrains the designs relation correctly' do
       design = create(:design)
@@ -139,7 +139,7 @@ describe DesignManagement::Version do
       actions = as_actions(designs)
       expect do
         described_class.create_for_designs(actions, '') rescue nil
-      end.not_to change { DesignManagement::DesignVersion.count }
+      end.not_to change { DesignManagement::Action.count }
     end
 
     it "creates a version and links it to multiple designs" do
@@ -156,7 +156,7 @@ describe DesignManagement::Version do
 
       described_class.create_for_designs(actions, "abc")
 
-      expect(designs.map(&:most_recent_design_version)).to all(be_creation)
+      expect(designs.map(&:most_recent_action)).to all(be_creation)
     end
 
     it 'correctly associates the version with the issue' do
@@ -172,7 +172,7 @@ describe DesignManagement::Version do
 
       described_class.create_for_designs(actions, "abc")
 
-      expect(designs.map(&:most_recent_design_version)).to all(be_modification)
+      expect(designs.map(&:most_recent_action)).to all(be_modification)
     end
 
     it 'deletes designs when the git action was delete' do
@@ -191,7 +191,7 @@ describe DesignManagement::Version do
 
       described_class.create_for_designs(as_actions(designs, :create), "ghi")
 
-      expect(designs.map(&:most_recent_design_version)).to all(be_creation)
+      expect(designs.map(&:most_recent_action)).to all(be_creation)
       expect(designs).not_to include(be_deleted)
     end
 
@@ -202,6 +202,55 @@ describe DesignManagement::Version do
       expect do
         described_class.create_for_designs(actions, "after")
       end.to change { current_version_id(design_a) }
+    end
+  end
+
+  describe '#author' do
+    let(:author) { create(:user) }
+    subject(:version) { create(:design_version, :committed, author: author) }
+
+    it { is_expected.to have_attributes(author: author) }
+  end
+
+  describe '#designs_by_event' do
+    context 'there is a single design' do
+      set(:design) { create(:design) }
+
+      shared_examples :a_correctly_categorised_design do |kind, category|
+        let(:version) { create(:design_version, kind => [design]) }
+
+        it 'returns a hash with a single key and the single design in that bucket' do
+          expect(version.designs_by_event).to eq(category => [design])
+        end
+      end
+
+      it_behaves_like :a_correctly_categorised_design, :created_designs, 'creation'
+      it_behaves_like :a_correctly_categorised_design, :modified_designs, 'modification'
+      it_behaves_like :a_correctly_categorised_design, :deleted_designs, 'deletion'
+    end
+
+    context 'there are a bunch of different designs in a variety of states' do
+      let(:version) do
+        create(:design_version,
+               created_designs: create_list(:design, 3),
+               modified_designs: create_list(:design, 4),
+               deleted_designs: create_list(:design, 5))
+      end
+
+      it 'puts them in the right buckets' do
+        expect(version.designs_by_event).to match(
+          a_hash_including(
+            'creation' =>  have_attributes(size: 3),
+            'modification' => have_attributes(size: 4),
+            'deletion' => have_attributes(size: 5)
+          )
+        )
+      end
+
+      it 'does not suffer from N+1 queries' do
+        version.designs.map(&:id) # we don't care about the set-up queries
+        expect { version.designs_by_event }.not_to exceed_query_limit(2)
+      end
     end
   end
 end

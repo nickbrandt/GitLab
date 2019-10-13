@@ -81,7 +81,7 @@ export default {
             v-tooltip
             :name="nodeStatusIconName"
             :size="18"
-            :css-classes="nodeStatusIconClass"
+            :class="nodeStatusIconClass"
             :title="nodeStatusIconTooltip"
             data-container="body"
             data-placement="bottom"

@@ -8,8 +8,8 @@ Learn how to administer your self-managed GitLab instance.
 
 GitLab has two product distributions available through [different subscriptions](https://about.gitlab.com/pricing/):
 
-- The open source [GitLab Community Edition (CE)](https://gitlab.com/gitlab-org/gitlab-ce).
-- The open core [GitLab Enterprise Edition (EE)](https://gitlab.com/gitlab-org/gitlab-ee).
+- The open source [GitLab Community Edition (CE)](https://gitlab.com/gitlab-org/gitlab-foss).
+- The open core [GitLab Enterprise Edition (EE)](https://gitlab.com/gitlab-org/gitlab).
 
 You can [install either GitLab CE or GitLab EE](https://about.gitlab.com/install/ce-or-ee/).
 However, the features you'll have access to depend on the subscription you choose
@@ -97,7 +97,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 
 ### GitLab platform integrations
 
-- [Mattermost](https://docs.gitlab.com/omnibus/gitlab-mattermost/): Integrate with [Mattermost](https://about.mattermost.com/), an open source, private cloud workplace for web messaging.
+- [Mattermost](https://docs.gitlab.com/omnibus/gitlab-mattermost/): Integrate with [Mattermost](https://mattermost.com), an open source, private cloud workplace for web messaging.
 - [PlantUML](integration/plantuml.md): Create simple diagrams in AsciiDoc and Markdown documents
   created in snippets, wikis, and repos.
 - [Web terminals](integration/terminal.md): Provide terminal access to your applications deployed to Kubernetes from within GitLab's CI/CD [environments](../ci/environments.md#web-terminals).
@@ -128,13 +128,17 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 
 ## Project settings
 
-- [Container Registry](container_registry.md): Configure Container Registry with GitLab.
 - [Issue closing pattern](issue_closing_pattern.md): Customize how to close an issue from commit messages.
 - [Gitaly](gitaly/index.md): Configuring Gitaly, GitLab's Git repository storage service.
 - [Default labels](../user/admin_area/labels.md): Create labels that will be automatically added to every new project.
 - [Restrict the use of public or internal projects](../public_access/public_access.md#restricting-the-use-of-public-or-internal-projects): Restrict the use of visibility levels for users when they create a project or a snippet.
 - [Custom project templates](../user/admin_area/custom_project_templates.md): Configure a set of projects to be used as custom templates when creating a new project. **(PREMIUM ONLY)**
-- [Packages](packages.md): Enable GitLab to act as a Maven repository or NPM registry. **(PREMIUM ONLY)**
+
+## Package Registry administration
+
+- [Container Registry](packages/container_registry.md): Configure Container Registry with GitLab.
+- [Package Registry](packages/index.md): Enable GitLab to act as an NPM Registry and a Maven Repository. **(PREMIUM ONLY)**
+- [Dependency Proxy](packages/dependency_proxy.md): Configure the Dependency Proxy, a local proxy for frequently used upstream images/packages. **(PREMIUM ONLY)**
 
 ### Repository settings
 
@@ -189,7 +193,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Debugging tips](troubleshooting/debug.md): Tips to debug problems when things go wrong
 - [Log system](logs.md): Where to look for logs.
 - [Sidekiq Troubleshooting](troubleshooting/sidekiq.md): Debug when Sidekiq appears hung and is not processing jobs.
-- [Troubleshooting ElasticSearch](troubleshooting/elasticsearch.md)
+- [Troubleshooting Elasticsearch](troubleshooting/elasticsearch.md)
 
 ### Support Team Docs
 
@@ -209,7 +213,7 @@ who are aware of the risks.
 - [Useful Linux commands](troubleshooting/linux_cheat_sheet.md)
 - [Troubleshooting Kubernetes](troubleshooting/kubernetes_cheat_sheet.md)
 - [Guide to test environments](troubleshooting/test_environments.md) (for Support Engineers)
-- [GitLab rails console commands](troubleshooting/gitlab_rails_cheat_sheet.md) (for Support Engineers)
+- [GitLab Rails console commands](troubleshooting/gitlab_rails_cheat_sheet.md) (for Support Engineers)
 - Useful links:
   - [GitLab Developer Docs](../development/README.md)
   - [Repairing and recovering broken Git repositories](https://git.seveas.net/repairing-and-recovering-broken-git-repositories.html)

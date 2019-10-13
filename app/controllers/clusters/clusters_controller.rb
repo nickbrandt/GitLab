@@ -31,7 +31,7 @@ class Clusters::ClustersController < Clusters::BaseController
     # In EE (Premium) we can have any number, as multiple clusters are
     # supported, but the number of clusters are fairly low currently.
     #
-    # See https://gitlab.com/gitlab-org/gitlab-ce/issues/55260 also.
+    # See https://gitlab.com/gitlab-org/gitlab-foss/issues/55260 also.
     @clusters = Kaminari.paginate_array(clusters).page(params[:page]).per(20)
 
     @has_ancestor_clusters = finder.has_ancestor_clusters?
@@ -170,6 +170,7 @@ class Clusters::ClustersController < Clusters::BaseController
         :zone,
         :num_nodes,
         :machine_type,
+        :cloud_run,
         :legacy_abac
       ]).merge(
         provider_type: :gcp,

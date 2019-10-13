@@ -49,6 +49,38 @@ describe('EpicsSelect', () => {
       wrapper.destroy();
     });
 
+    describe('watchers', () => {
+      describe('issueId', () => {
+        it('should update `issueId` within state when prop is updated', () => {
+          wrapper.setProps({
+            issueId: 123,
+          });
+
+          expect(wrapper.vm.$store.state.issueId).toBe(123);
+        });
+      });
+
+      describe('initialEpic', () => {
+        it('should update `selectedEpic` within state when prop is updated', () => {
+          wrapper.setProps({
+            initialEpic: mockEpic2,
+          });
+
+          expect(wrapper.vm.$store.state.selectedEpic).toBe(mockEpic2);
+        });
+      });
+
+      describe('initialEpicLoading', () => {
+        it('should update `selectedEpic` within state when prop is updated', () => {
+          wrapper.setProps({
+            initialEpic: mockEpic2,
+          });
+
+          expect(wrapper.vm.$store.state.selectedEpic).toBe(mockEpic2);
+        });
+      });
+    });
+
     describe('methods', () => {
       describe('handleDropdownShown', () => {
         it('should call `fetchEpics` when `groupEpics` does not return any epics', done => {

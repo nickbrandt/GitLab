@@ -1,6 +1,6 @@
 # PlantUML & GitLab
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8537) in GitLab 8.16.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/8537) in GitLab 8.16.
 
 When [PlantUML](http://plantuml.com) integration is enabled and configured in
 GitLab we are able to create simple diagrams in AsciiDoc and Markdown documents
@@ -66,7 +66,13 @@ to the local PlantUML server `http://localhost:8080/plantuml`.
 To enable the redirection, add the following line in `/etc/gitlab/gitlab.rb`:
 
 ```ruby
-nginx['custom_gitlab_server_config'] = "location /-/plantuml { \n    proxy_cache off; \n    proxy_pass  http://127.0.0.1:8080; \n}\n"
+nginx['custom_gitlab_server_config'] = "location /-/plantuml/ { \n    proxy_cache off; \n    proxy_pass  http://127.0.0.1:8080/plantuml/; \n}\n"
+```
+
+To activate the changes, run the following command:
+
+```sh
+sudo gitlab-ctl reconfigure
 ```
 
 ## GitLab

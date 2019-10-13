@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe EpicsFinder do
@@ -12,7 +14,7 @@ describe EpicsFinder do
 
   describe '#execute' do
     def epics(params = {})
-      params[:group_id] = group.id
+      params[:group_id] ||= group.id
 
       described_class.new(search_user, params).execute
     end
@@ -113,11 +115,49 @@ describe EpicsFinder do
         context 'when subgroups are supported' do
           let(:subgroup) { create(:group, :private, parent: group) }
           let(:subgroup2) { create(:group, :private, parent: subgroup) }
-          let!(:subepic1) { create(:epic, group: subgroup) }
-          let!(:subepic2) { create(:epic, group: subgroup2) }
+          let!(:subgroup_epic) { create(:epic, group: subgroup) }
+          let!(:subgroup2_epic) { create(:epic, group: subgroup2) }
 
           it 'returns all epics that belong to the given group and its subgroups' do
-            expect(epics).to contain_exactly(epic1, epic2, epic3, subepic1, subepic2)
+            expect(epics).to contain_exactly(epic1, epic2, epic3, subgroup_epic, subgroup2_epic)
+          end
+
+          describe 'hierarchy params' do
+            let(:finder_params) { {} }
+
+            subject { epics(finder_params.merge(group_id: subgroup.id)) }
+
+            it 'excludes ancestor groups and includes descendant groups by default' do
+              is_expected.to contain_exactly(subgroup_epic, subgroup2_epic)
+            end
+
+            context 'when include_descendant_groups is false' do
+              context 'and include_ancestor_groups is false' do
+                let(:finder_params) { { include_descendant_groups: false, include_ancestor_groups: false } }
+
+                it { is_expected.to contain_exactly(subgroup_epic) }
+              end
+
+              context 'and include_ancestor_groups is true' do
+                let(:finder_params) { { include_descendant_groups: false, include_ancestor_groups: true } }
+
+                it { is_expected.to contain_exactly(subgroup_epic, epic1, epic2, epic3) }
+              end
+            end
+
+            context 'when include_descendant_groups is true' do
+              context 'and include_ancestor_groups is false' do
+                let(:finder_params) { { include_descendant_groups: true, include_ancestor_groups: false } }
+
+                it { is_expected.to contain_exactly(subgroup_epic, subgroup2_epic) }
+              end
+
+              context 'and include_ancestor_groups is true' do
+                let(:finder_params) { { include_descendant_groups: true, include_ancestor_groups: true } }
+
+                it { is_expected.to contain_exactly(subgroup_epic, subgroup2_epic, epic1, epic2, epic3) }
+              end
+            end
           end
 
           it 'does not execute more than 14 SQL queries' do

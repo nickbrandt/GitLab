@@ -35,7 +35,7 @@ module Emails
     def epic_thread_options(sender_id, recipient_id, reason)
       {
         from: sender(sender_id),
-        to: recipient(recipient_id, @epic.group),
+        to: User.find(recipient_id).notification_email_for(@epic.group),
         subject: subject("#{@epic.title} (#{@epic.to_reference})"),
         'X-GitLab-NotificationReason' => reason
       }

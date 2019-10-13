@@ -27,14 +27,19 @@ valid options are: added, fixed, changed, deprecated, removed, security, perform
 Community contributors and core team members are encouraged to add their name to
 the `author` field. GitLab team members **should not**.
 
-[changelog.md]: https://gitlab.com/gitlab-org/gitlab-ce/blob/master/CHANGELOG.md
-[unreleased]: https://gitlab.com/gitlab-org/gitlab-ce/tree/master/changelogs/
+[changelog.md]: https://gitlab.com/gitlab-org/gitlab/blob/master/CHANGELOG.md
+[unreleased]: https://gitlab.com/gitlab-org/gitlab-foss/tree/master/changelogs/
 [YAML]: https://en.wikipedia.org/wiki/YAML
 
 ## What warrants a changelog entry?
 
+- Any change that introduces a database migration **must** have a changelog entry.
 - Any user-facing change **should** have a changelog entry. Example: "GitLab now
   uses system fonts for all text."
+- Performance improvements **should** have a changelog entry.
+- _Any_ contribution from a community member, no matter how small, **may** have
+  a changelog entry regardless of these guidelines if the contributor wants one.
+  Example: "Fixed a typo on the search results page."
 - Any docs-only changes **should not** have a changelog entry.
 - Any change behind a feature flag **should not** have a changelog entry. The entry should be added [in the merge request removing the feature flags](feature_flags/development.md).
 - A fix for a regression introduced and then fixed in the same release (i.e.,
@@ -43,12 +48,6 @@ the `author` field. GitLab team members **should not**.
 - Any developer-facing change (e.g., refactoring, technical debt remediation,
   test suite changes) **should not** have a changelog entry. Example: "Reduce
   database records created during Cycle Analytics model spec."
-- _Any_ contribution from a community member, no matter how small, **may** have
-  a changelog entry regardless of these guidelines if the contributor wants one.
-  Example: "Fixed a typo on the search results page."
-- Performance improvements **should** have a changelog entry.
-- Any change that introduces a database migration **must** have a
-  changelog entry.
 
 ## Writing good changelog entries
 
@@ -102,6 +101,13 @@ Its simplest usage is to provide the value for `title`:
 bin/changelog 'Hey DZ, I added a feature to GitLab!'
 ```
 
+If you want to generate a changelog entry for GitLab EE, you will need to pass
+the `--ee` option:
+
+```text
+bin/changelog --ee 'Hey DZ, I added a feature to GitLab!'
+```
+
 At this point the script would ask you to select the category of the change (mapped to the `type` field in the entry):
 
 ```text
@@ -130,9 +136,6 @@ merge_request:
 author:
 type:
 ```
-
-If you're working on the GitLab EE repository, the entry will be added to
-`ee/changelogs/unreleased/` instead.
 
 ### Arguments
 
@@ -280,7 +283,7 @@ and then compiling the entries into the overall `CHANGELOG.md` file during the
 
 [boring solution]: https://about.gitlab.com/handbook/values/#boring-solutions
 [release managers]: https://gitlab.com/gitlab-org/release/docs/blob/master/quickstart/release-manager.md
-[started brainstorming]: https://gitlab.com/gitlab-org/gitlab-ce/issues/17826
+[started brainstorming]: https://gitlab.com/gitlab-org/gitlab-foss/issues/17826
 [release process]: https://gitlab.com/gitlab-org/release-tools
 
 ---

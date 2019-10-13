@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MetricColumn component on creation matches the snapshot 1`] = `
+<div
+  class="metric-col"
+>
+  <span
+    class="time"
+  >
+    
+      10
+      
+    <span>
+       hrs 
+    </span>
+  </span>
+   
+  <span
+    class="d-flex d-md-none text-secondary metric-label"
+  >
+    Time from first comment to last commit
+  </span>
+</div>
+`;

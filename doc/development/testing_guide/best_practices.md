@@ -51,7 +51,7 @@ bundle exec rspec spec/[path]/[to]/[spec].rb
   methods.
 - Use `context` to test branching logic.
 - Try to match the ordering of tests to the ordering within the class.
-- Try to follow the [Four-Phase Test][four-phase-test] pattern, using newlines
+- Try to follow the [Four-Phase Test](https://thoughtbot.com/blog/four-phase-test) pattern, using newlines
   to separate phases.
 - Use `Gitlab.config.gitlab.host` rather than hard coding `'localhost'`
 - Don't assert against the absolute value of a sequence-generated attribute (see
@@ -61,8 +61,6 @@ bundle exec rspec spec/[path]/[to]/[spec].rb
 - When using `evaluate_script("$('.js-foo').testSomething()")` (or `execute_script`) which acts on a given element,
   use a Capyabara matcher beforehand (e.g. `find('.js-foo')`) to ensure the element actually exists.
 - Use `focus: true` to isolate parts of the specs you want to run.
-
-[four-phase-test]: https://robots.thoughtbot.com/four-phase-test
 
 ### System / Feature tests
 
@@ -148,7 +146,7 @@ Add `screenshot_and_open_image` in a `:js` spec to screenshot what Capybara
 
 The HTML dumps created by this are missing CSS.
 This results in them looking very different from the actual application.
-There is a [small hack](https://gitlab.com/gitlab-org/gitlab-ce/snippets/1718469) to add CSS which makes debugging easier.
+There is a [small hack](https://gitlab.com/gitlab-org/gitlab-foss/snippets/1718469) to add CSS which makes debugging easier.
 
 ### Fast unit tests
 
@@ -185,7 +183,7 @@ instead of 30+ seconds in case of a regular `spec_helper`.
 ### `let` variables
 
 GitLab's RSpec suite has made extensive use of `let`(along with it strict, non-lazy
-version `let!`) variables to reduce duplication. However, this sometimes [comes at the cost of clarity][lets-not],
+version `let!`) variables to reduce duplication. However, this sometimes [comes at the cost of clarity](https://thoughtbot.com/blog/lets-not),
 so we need to set some guidelines for their use going forward:
 
 - `let!` variables are preferable to instance variables. `let` variables
@@ -204,9 +202,50 @@ so we need to set some guidelines for their use going forward:
   order is required, otherwise `let` will suffice. Remember that `let` is lazy and won't
   be evaluated until it is referenced.
 
-[lets-not]: https://robots.thoughtbot.com/lets-not
+### Common test setup
+
+In some cases, there is no need to recreate the same object for tests
+again for each example. For example, a project and a guest of that project
+is needed to test issues on the same project, one project and user will do for the entire file.
+This can be achieved by using
+[`let_it_be`](https://test-prof.evilmartians.io/#/let_it_be) variables and the
+[`before_all`](https://test-prof.evilmartians.io/#/before_all) hook
+from the [`test-prof` gem](https://rubygems.org/gems/test-prof).
+
+```
+let_it_be(:project) { create(:project) }
+let_it_be(:user) { create(:user) }
+
+before_all do
+  project.add_guest(user)
+end
+```
+
+This will result in only one `Project`, `User`, and `ProjectMember` created for this context.
+
+`let_it_be` and `before_all` are also available within nested contexts. Cleanup after the context
+is handled automatically using a transaction rollback.
+
+Note that if you modify an object defined inside a `let_it_be` block,
+then you will need to reload the object as needed, or specify the `reload`
+option to reload for every example.
+
+```
+let_it_be(:project, reload: true) { create(:project) }
+```
+
+You can also specify the `refind` option as well to completely load a
+new object.
+
+```
+let_it_be(:project, refind: true) { create(:project) }
+```
 
 ### `set` variables
+
+NOTE: **Note:**
+We are incrementally removing `set` in favour of `let_it_be`. See the
+[removal issue](https://gitlab.com/gitlab-org/gitlab/issues/27922).
 
 In some cases there is no need to recreate the same object for tests again for
 each example. For example, a project is needed to test issues on the same
@@ -532,16 +571,15 @@ GitLab uses [factory_bot] as a test fixture replacement.
 - There should be only one top-level factory definition per file.
 - FactoryBot methods are mixed in to all RSpec groups. This means you can (and
   should) call `create(...)` instead of `FactoryBot.create(...)`.
-- Make use of [traits] to clean up definitions and usages.
+- Make use of [traits](https://www.rubydoc.info/gems/factory_bot/file/GETTING_STARTED.md#Traits) to clean up definitions and usages.
 - When defining a factory, don't define attributes that are not required for the
   resulting record to pass validation.
 - When instantiating from a factory, don't supply attributes that aren't
   required by the test.
 - Factories don't have to be limited to `ActiveRecord` objects.
-  [See example](https://gitlab.com/gitlab-org/gitlab-ce/commit/0b8cefd3b2385a21cfed779bd659978c0402766d).
+  [See example](https://gitlab.com/gitlab-org/gitlab-foss/commit/0b8cefd3b2385a21cfed779bd659978c0402766d).
 
 [factory_bot]: https://github.com/thoughtbot/factory_bot
-[traits]: http://www.rubydoc.info/gems/factory_bot/file/GETTING_STARTED.md#Traits
 
 ### Fixtures
 

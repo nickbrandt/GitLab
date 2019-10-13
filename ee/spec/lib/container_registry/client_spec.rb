@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -119,6 +118,22 @@ describe ContainerRegistry::Client do
         .to_return(status: 404, body: "", headers: {})
 
       expect(client.blob_exists?('group/test', digest)).to eq(false)
+    end
+  end
+
+  describe '#repository_raw_manifest' do
+    let(:manifest) { '{schemaVersion: 2, layers:[]}' }
+
+    it 'GET "/v2/:name/manifests/:reference' do
+      stub_request(:get, 'http://registry/v2/group/test/manifests/my-tag')
+        .with(
+          headers: {
+            'Accept' => 'application/vnd.docker.distribution.manifest.v2+json, application/vnd.oci.image.manifest.v1+json',
+            'Authorization' => 'bearer 12345'
+          })
+        .to_return(status: 200, body: manifest, headers: {})
+
+      expect(client.repository_raw_manifest('group/test', 'my-tag')).to eq(manifest)
     end
   end
 end

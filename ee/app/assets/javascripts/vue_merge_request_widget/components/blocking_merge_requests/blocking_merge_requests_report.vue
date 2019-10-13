@@ -104,7 +104,7 @@ export default {
     issue-item-class="p-0"
   >
     <template v-slot:success>
-      {{ __('All cross-project dependencies have merged') }}
+      {{ __('All merge request dependencies have been merged') }}
       <span class="text-secondary">
         {{
           sprintf(__('(%{mrCount} merged)'), {

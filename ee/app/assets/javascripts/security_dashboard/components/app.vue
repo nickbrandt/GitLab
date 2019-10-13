@@ -25,11 +25,6 @@ export default {
       type: String,
       required: true,
     },
-    projectsEndpoint: {
-      type: String,
-      required: false,
-      default: null,
-    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -62,7 +57,6 @@ export default {
   },
   computed: {
     ...mapState('vulnerabilities', ['modal', 'pageInfo']),
-    ...mapState('projects', ['projects']),
     ...mapGetters('filters', ['activeFilters']),
     canCreateIssue() {
       const path = this.vulnerability.create_vulnerability_feedback_issue_path;
@@ -88,6 +82,9 @@ export default {
     shouldShowCountList() {
       return this.isLockedToProject && Boolean(this.vulnerabilitiesCountEndpoint);
     },
+    showHideDismissedToggle() {
+      return Boolean(gon.features && gon.features.hideDismissedVulnerabilities);
+    },
   },
   watch: {
     'pageInfo.total': 'emitVulnerabilitiesCountChanged',
@@ -100,15 +97,15 @@ export default {
       });
     }
     this.setPipelineId(this.pipelineId);
-    this.setHideDismissedToggleInitialState();
-    this.setProjectsEndpoint(this.projectsEndpoint);
+    if (this.showHideDismissedToggle) {
+      this.setHideDismissedToggleInitialState();
+    }
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
     this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
     this.fetchVulnerabilities({ ...this.activeFilters, page: this.pageInfo.page });
     this.fetchVulnerabilitiesCount(this.activeFilters);
     this.fetchVulnerabilitiesHistory(this.activeFilters);
-    this.fetchProjects();
   },
   methods: {
     ...mapActions('vulnerabilities', [
@@ -131,7 +128,6 @@ export default {
       'undoDismiss',
       'downloadPatch',
     ]),
-    ...mapActions('projects', ['setProjectsEndpoint', 'fetchProjects']),
     ...mapActions('filters', ['lockFilter', 'setHideDismissedToggleInitialState']),
     emitVulnerabilitiesCountChanged(count) {
       this.$emit('vulnerabilitiesCountChanged', count);
@@ -143,7 +139,7 @@ export default {
 <template>
   <section>
     <header>
-      <filters />
+      <filters :show-hide-dismissed-toggle="showHideDismissedToggle" />
     </header>
 
     <vulnerability-count-list v-if="shouldShowCountList" class="mb-0" />

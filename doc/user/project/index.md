@@ -60,9 +60,9 @@ When you create a project in GitLab, you'll have access to a large number of
 **GitLab CI/CD:**
 
 - [GitLab CI/CD](../../ci/README.md): GitLab's built-in [Continuous Integration, Delivery, and Deployment](https://about.gitlab.com/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab/) tool
-  - [Container Registry](container_registry.md): Build and push Docker
+  - [Container Registry](../packages/container_registry/index.md): Build and push Docker
   images out-of-the-box
-  - [Auto Deploy](../../ci/autodeploy/index.md): Configure GitLab CI/CD
+  - [Auto Deploy](../../topics/autodevops/index.md#auto-deploy): Configure GitLab CI/CD
   to automatically set up your app's deployment
   - [Enable and disable GitLab CI](../../ci/enable_or_disable_ci.md)
   - [Pipelines](../../ci/pipelines.md): Configure and visualize
@@ -95,8 +95,8 @@ When you create a project in GitLab, you'll have access to a large number of
 - [Releases](releases/index.md): a way to track deliverables in your project as snapshot in time of
   the source, build output, and other metadata or artifacts
   associated with a released version of your code.
-- [Maven packages](packages/maven_repository.md): your private Maven repository in GitLab. **(PREMIUM)**
-- [NPM packages](packages/npm_registry.md): your private NPM package registry in GitLab. **(PREMIUM)**
+- [Maven packages](../packages/maven_repository/index.md): your private Maven repository in GitLab. **(PREMIUM)**
+- [NPM packages](../packages/npm_registry/index.md): your private NPM package registry in GitLab. **(PREMIUM)**
 - [Code owners](code_owners.md): specify code owners for certain files **(STARTER)**
 - [License Compliance](../application_security/license_compliance/index.md): approve and blacklist licenses for projects. **(ULTIMATE)**
 - [Dependency List](../application_security/dependency_list/index.md): view project dependencies. **(ULTIMATE)**
@@ -129,7 +129,7 @@ Read through the documentation on [project settings](settings/index.md).
 
 - [Import a project](import/index.md) from:
   - [GitHub to GitLab](import/github.md)
-  - [BitBucket to GitLab](import/bitbucket.md)
+  - [Bitbucket to GitLab](import/bitbucket.md)
   - [Gitea to GitLab](import/gitea.md)
   - [FogBugz to GitLab](import/fogbugz.md)
 - [Export a project from GitLab](settings/import_export.md#exporting-a-project-and-its-data)
@@ -192,14 +192,14 @@ password <personal_access_token>
 
 ## Access project page with project ID
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/53671) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/53671) in GitLab 11.8.
 
 To quickly access a project from the GitLab UI using the project ID,
 visit the `/projects/:id` URL in your browser or other tool accessing the project.
 
 ## Project aliases **(PREMIUM ONLY)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/3264) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.1.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/3264) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.1.
 
 When migrating repositories to GitLab and they are being accessed by other systems,
 it's very useful to be able to access them using the same name especially when
@@ -214,10 +214,10 @@ A project alias can be only created via API and only by GitLab administrators.
 Follow the [Project Aliases API documentation](../../api/project_aliases.md) for
 more details.
 
-Once an alias has been created for a project (e.g., an alias `gitlab-ce` for the
-project `https://gitlab.com/gitlab-org/gitlab-ce`), the repository can be cloned
-using the alias (e.g `git clone git@gitlab.com:gitlab-ce.git` instead of
-`git clone git@gitlab.com:gitlab-org/gitlab-ce.git`).
+Once an alias has been created for a project (e.g., an alias `gitlab` for the
+project `https://gitlab.com/gitlab-org/gitlab`), the repository can be cloned
+using the alias (e.g `git clone git@gitlab.com:gitlab.git` instead of
+`git clone git@gitlab.com:gitlab-org/gitlab.git`).
 
 ## Project APIs
 

@@ -14,47 +14,41 @@ export const chartTypes = {
 
 export const metricTypes = [
   {
+    key: 'days_to_merge',
+    label: __('Days to merge'),
+    charts: [chartKeys.scatterplot],
+  },
+  {
     key: 'time_to_first_comment',
     label: __('Time from first commit until first comment'),
-    chart: chartKeys.timeBasedHistogram,
+    charts: [chartKeys.timeBasedHistogram, chartKeys.scatterplot],
   },
   {
     key: 'time_to_last_commit',
     label: __('Time from first comment to last commit'),
-    chart: chartKeys.timeBasedHistogram,
+    charts: [chartKeys.timeBasedHistogram, chartKeys.scatterplot],
   },
   {
     key: 'time_to_merge',
     label: __('Time from last commit to merge'),
-    chart: chartKeys.timeBasedHistogram,
+    charts: [chartKeys.timeBasedHistogram, chartKeys.scatterplot],
   },
   {
     key: 'commits_count',
     label: __('Number of commits per MR'),
-    chart: chartKeys.commitBasedHistogram,
+    charts: [chartKeys.commitBasedHistogram, chartKeys.scatterplot],
   },
   {
     key: 'loc_per_commit',
     label: __('Number of LOCs per commit'),
-    chart: chartKeys.commitBasedHistogram,
+    charts: [chartKeys.commitBasedHistogram, chartKeys.scatterplot],
   },
   {
     key: 'files_touched',
     label: __('Number of files touched'),
-    chart: chartKeys.commitBasedHistogram,
+    charts: [chartKeys.commitBasedHistogram, chartKeys.scatterplot],
   },
 ];
-
-export const tableSortFields = metricTypes.reduce(
-  (acc, curr) => {
-    const { key, label, chart } = curr;
-    if (chart === chartKeys.timeBasedHistogram) {
-      acc[key] = label;
-    }
-    return acc;
-  },
-  { days_to_merge: __('Days to merge') },
-);
 
 export const tableSortOrder = {
   asc: {
@@ -69,10 +63,12 @@ export const tableSortOrder = {
   },
 };
 
-export const timeToMergeMetric = 'time_to_merge';
+export const daysToMergeMetric = {
+  key: 'days_to_merge',
+  label: s__('ProductivityAnalytics|Days to merge'),
+};
 
 export const defaultMaxColumnChartItemsPerPage = 20;
-
 export const maxColumnChartItemsPerPage = {
   [chartKeys.main]: 40,
 };
@@ -83,10 +79,6 @@ export const dataZoomOptions = [
     bottom: 10,
     start: 0,
   },
-  {
-    type: 'inside',
-    start: 0,
-  },
 ];
 
 /**
@@ -94,4 +86,10 @@ export const dataZoomOptions = [
  */
 export const columnHighlightStyle = { color: '#418cd8', opacity: 0.8 };
 
+// The number of days which will be to the state's daysInPast
+// This is required to query historical data from the API to draw a 30 days rolling median line
+export const scatterPlotAddonQueryDays = 30;
+
 export const accessLevelReporter = 20;
+export const projectsPerPage = 50;
+export const defaultDaysInPast = 30;

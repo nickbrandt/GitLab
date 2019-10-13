@@ -62,7 +62,7 @@ module Gitlab
               project,
               User.support_bot,
               title: issue_title,
-              description: message,
+              description: message_including_reply,
               confidential: true,
               service_desk_reply_to: from_address
             ).execute

@@ -46,6 +46,21 @@ describe('EpicsSelect', () => {
         });
       });
 
+      describe('setIssueId', () => {
+        it('should set `issueId` on state', done => {
+          const issueId = mockIssue.id;
+
+          testAction(
+            actions.setIssueId,
+            issueId,
+            state,
+            [{ type: types.SET_ISSUE_ID, payload: issueId }],
+            [],
+            done,
+          );
+        });
+      });
+
       describe('setSearchQuery', () => {
         it('should set `searchQuery` param on state', done => {
           const searchQuery = 'foo';
@@ -184,7 +199,11 @@ describe('EpicsSelect', () => {
             dispatch: () => {},
           });
 
-          expect(Api.groupEpics).toHaveBeenCalledWith({ groupId: state.groupId });
+          expect(Api.groupEpics).toHaveBeenCalledWith({
+            groupId: state.groupId,
+            includeDescendantGroups: false,
+            includeAncestorGroups: true,
+          });
         });
       });
 

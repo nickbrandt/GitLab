@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/prefer-default-export
 export const makeDependency = (changes = {}) => ({
   name: 'left-pad',
   version: '0.0.3',
@@ -8,8 +9,4 @@ export const makeDependency = (changes = {}) => ({
   },
   licenses: [],
   ...changes,
-});
-
-export const provideEnabledFeatureFlag = () => ({
-  provide: { dependencyListVulnerabilities: true },
 });

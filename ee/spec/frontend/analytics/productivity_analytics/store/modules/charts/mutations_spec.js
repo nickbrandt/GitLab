@@ -34,17 +34,24 @@ describe('Productivity analytics chart mutations', () => {
       mutations[types.RECEIVE_CHART_DATA_SUCCESS](state, { chartKey, data: mockHistogramData });
 
       expect(state.charts[chartKey].isLoading).toBe(false);
-      expect(state.charts[chartKey].hasError).toBe(false);
+      expect(state.charts[chartKey].errorCode).toBe(null);
       expect(state.charts[chartKey].data).toEqual(mockHistogramData);
     });
   });
 
   describe(types.RECEIVE_CHART_DATA_ERROR, () => {
-    it('sets isError and clears data', () => {
-      mutations[types.RECEIVE_CHART_DATA_ERROR](state, chartKey);
+    const status = 500;
+    beforeEach(() => {
+      mutations[types.RECEIVE_CHART_DATA_ERROR](state, { chartKey, status });
+    });
 
+    it('sets errorCode to 500', () => {
       expect(state.charts[chartKey].isLoading).toBe(false);
-      expect(state.charts[chartKey].hasError).toBe(true);
+      expect(state.charts[chartKey].errorCode).toBe(status);
+    });
+
+    it('clears data', () => {
+      expect(state.charts[chartKey].isLoading).toBe(false);
       expect(state.charts[chartKey].data).toEqual({});
     });
   });
@@ -64,6 +71,12 @@ describe('Productivity analytics chart mutations', () => {
     chartKey = chartKeys.timeBasedHistogram;
     const item = 5;
 
+    it('sets the list of selected items to [] when the item is null', () => {
+      mutations[types.UPDATE_SELECTED_CHART_ITEMS](state, { chartKey, item: null });
+
+      expect(state.charts[chartKey].selected).toEqual([]);
+    });
+
     it('adds the item to the list of selected items when not included', () => {
       mutations[types.UPDATE_SELECTED_CHART_ITEMS](state, { chartKey, item });
 
@@ -76,6 +89,22 @@ describe('Productivity analytics chart mutations', () => {
       mutations[types.UPDATE_SELECTED_CHART_ITEMS](state, { chartKey, item });
 
       expect(state.charts[chartKey].selected).toEqual([]);
+    });
+  });
+
+  describe(types.SET_CHART_ENABLED, () => {
+    chartKey = chartKeys.scatterplot;
+
+    it('sets the enabled flag to true on the scatterplot chart', () => {
+      mutations[types.SET_CHART_ENABLED](state, { chartKey, isEnabled: true });
+
+      expect(state.charts[chartKey].enabled).toBe(true);
+    });
+
+    it('sets the enabled flag to false on the scatterplot chart', () => {
+      mutations[types.SET_CHART_ENABLED](state, { chartKey, isEnabled: false });
+
+      expect(state.charts[chartKey].enabled).toBe(false);
     });
   });
 });

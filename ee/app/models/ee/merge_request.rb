@@ -12,6 +12,8 @@ module EE
 
     prepended do
       include Elastic::ApplicationVersionedSearch
+      include DeprecatedApprovalsBeforeMerge
+      include UsageStatistics
 
       has_many :reviews, inverse_of: :merge_request
       has_many :approvals, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent

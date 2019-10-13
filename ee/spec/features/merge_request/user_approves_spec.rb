@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-# TODO: https://gitlab.com/gitlab-org/gitlab-ee/issues/9430
+# TODO: https://gitlab.com/gitlab-org/gitlab/issues/9430
 xdescribe 'Merge request > User approves', :js do
   let(:user) { create(:user) }
   let(:project) { create(:project, :public, :repository, approvals_before_merge: 1) }

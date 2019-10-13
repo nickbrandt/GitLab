@@ -19,9 +19,9 @@ export default {
 </script>
 
 <template>
-  <div class="line">
+  <div class="js-line log-line">
     <line-number :line-number="line.lineNumber" :path="path" />
-    <span v-for="(content, i) in line.content" :key="i" class="line-text" :class="content.style">{{
+    <span v-for="(content, i) in line.content" :key="i" :class="content.style">{{
       content.text
     }}</span>
   </div>

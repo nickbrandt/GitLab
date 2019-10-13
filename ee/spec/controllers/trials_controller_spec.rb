@@ -89,7 +89,7 @@ describe TrialsController do
     before do
       sign_in(user)
 
-      expect_any_instance_of(GitlabSubscriptions::ApplyTrialService).to receive(:execute) do
+      allow_any_instance_of(GitlabSubscriptions::ApplyTrialService).to receive(:execute) do
         { success: apply_trial_result }
       end
     end
@@ -102,15 +102,32 @@ describe TrialsController do
 
         expect(response).to redirect_to("/#{namespace.path}?trial=true")
       end
+
+      context 'with a new Group' do
+        it 'creates the Group' do
+          expect do
+            post :apply, params: { new_group_name: 'GitLab' }
+          end.to change { Group.count }.to(1)
+        end
+      end
     end
 
     context 'on failure' do
       let(:apply_trial_result) { false }
 
-      it 'redirects to new select namespaces for trials path' do
+      it 'renders the :select view' do
         post :apply, params: { namespace_id: namespace.id }
 
-        expect(response).to redirect_to(select_trials_path)
+        expect(response).to render_template(:select)
+      end
+
+      context 'with a new Group' do
+        it 'renders the :select view' do
+          post :apply, params: { new_group_name: 'admin' }
+
+          expect(response).to render_template(:select)
+          expect(Group.count).to eq(0)
+        end
       end
     end
   end

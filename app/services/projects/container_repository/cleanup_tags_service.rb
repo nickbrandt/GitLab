@@ -33,14 +33,14 @@ module Projects
       end
 
       def delete_tag_digest(digest, tags, other_tags)
-        # Issue: https://gitlab.com/gitlab-org/gitlab-ce/issues/21405
+        # Issue: https://gitlab.com/gitlab-org/gitlab-foss/issues/21405
         # we have to remove all tags due
         # to Docker Distribution bug unable
         # to delete single tag
         return unless tags.count == other_tags.count
 
         # delete all tags
-        tags.map(&:delete)
+        tags.map(&:unsafe_delete)
       end
 
       def group_by_digest(tags)

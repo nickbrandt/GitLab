@@ -10,9 +10,9 @@ module Projects
           return false unless valid_version?
           return false unless valid_alert_manager_token?(token)
 
+          persist_events
           send_alert_email if send_email?
           process_incident_issues if create_issue?
-          persist_events
 
           true
         end
@@ -35,7 +35,7 @@ module Projects
           # This is done in order to keep the old behavior of sending emails for
           # any project which does not have the new `incident_management` feature.
           # See point 3 in
-          # https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/9830#what-does-this-mr-do
+          # https://gitlab.com/gitlab-org/gitlab/merge_requests/9830#what-does-this-mr-do
           return firings.any? unless incident_management_available?
 
           incident_management_setting.send_email && firings.any?
@@ -129,7 +129,7 @@ module Projects
 
         def process_incident_issues
           firings.each do |alert|
-            IncidentManagement::ProcessAlertWorker
+            IncidentManagement::ProcessPrometheusAlertWorker
               .perform_async(project.id, alert.to_h)
           end
         end

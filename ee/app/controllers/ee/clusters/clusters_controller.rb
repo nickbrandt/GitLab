@@ -3,6 +3,7 @@
 module EE
   module Clusters
     module ClustersController
+      include MetricsDashboard
       extend ActiveSupport::Concern
 
       prepended do
@@ -27,7 +28,7 @@ module EE
 
       def prometheus_proxy
         result = ::Prometheus::ProxyService.new(
-          clusterable.clusterable,
+          cluster.cluster,
           proxy_method,
           proxy_path,
           proxy_params

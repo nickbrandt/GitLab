@@ -19,7 +19,14 @@ module Gitlab
           return missing_on_primary if upload.model.nil?
 
           transfer = ::Gitlab::Geo::Replication::FileTransfer.new(object_type.to_sym, upload)
-          Result.from_transfer_result(transfer.download_from_primary)
+
+          result = if upload.local?
+                     transfer.download_from_primary
+                   else
+                     transfer.stream_from_primary_to_object_storage
+                   end
+
+          Result.from_transfer_result(result)
         end
 
         private

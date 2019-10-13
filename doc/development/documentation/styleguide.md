@@ -124,8 +124,8 @@ Because we want documentation to be a SSOT, we should [organize by topic, not by
 
 ### Folder structure overview
 
-The documentation is separated by top-level audience folders [`user`](https://gitlab.com/gitlab-org/gitlab-ce/tree/master/doc/user),
-[`administration`](https://gitlab.com/gitlab-org/gitlab-ce/tree/master/doc/administration), and [`development`](https://gitlab.com/gitlab-org/gitlab-ce/tree/master/doc/development) (contributing) folders.
+The documentation is separated by top-level audience folders [`user`](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/doc/user),
+[`administration`](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/doc/administration), and [`development`](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/doc/development) (contributing) folders.
 
 Beyond that, we primarily follow the structure of the GitLab user interface or API.
 
@@ -216,11 +216,18 @@ Do not include the same information in multiple places. [Link to a SSOT instead.
 - Be clear, concise, and stick to the goal of the doc.
 - Write in US English.
 - Capitalize "G" and "L" in GitLab.
-- Use title case when referring to [features](https://about.gitlab.com/features/) or
-  [products](https://about.gitlab.com/pricing/) (e.g., GitLab Runner, Geo,
-  Issue Boards, GitLab Core, Git, Prometheus, Kubernetes, etc), and methods or methodologies
-  (e.g., Continuous Integration, Continuous Deployment, Scrum, Agile, etc). Note that
-  some features are also objects (e.g. "GitLab's Merge Requests support X." and "Create a new merge request for Z.").
+- Use title case when referring to:
+  - [GitLab Features](https://about.gitlab.com/features/). For example, Issue Board,
+    Geo, and Runner.
+  - GitLab [product tiers](https://about.gitlab.com/pricing/). For example, GitLab Core
+    and GitLab Ultimate.
+  - Third-party products. For example, Prometheus, Kubernetes, and Git.
+  - Methods or methodologies. For example, Continuous Integration, Continuous
+    Deployment, Scrum, and Agile.
+
+NOTE: **Note:**
+Some features are also objects. For example, "GitLab's Merge Requests support X." and
+"Create a new merge request for Z.".
 
 ## Text
 
@@ -239,27 +246,13 @@ Do not include the same information in multiple places. [Link to a SSOT instead.
   - List item 2
   ```
 
-### Tables overlapping the TOC
-
-By default, all tables have a width of 100% on docs.gitlab.com.
-In a few cases, the table will overlap the table of contents (ToC).
-For these cases, add an entry to the document's frontmatter to
-render them displaying block. This will make sure the table
-is displayed behind the ToC, scrolling horizontally:
-
-```md
----
-table_display_block: true
----
-```
-
-## Emphasis
+### Emphasis
 
 - Use double asterisks (`**`) to mark a word or text in bold (`**bold**`).
 - Use underscore (`_`) for text in italics (`_italic_`).
 - Use greater than (`>`) for blockquotes.
 
-## Punctuation
+### Punctuation
 
 Check the general punctuation rules for the GitLab documentation on the table below.
 Check specific punctuation rules for [lists](#lists) below.
@@ -273,6 +266,20 @@ Check specific punctuation rules for [lists](#lists) below.
 | Use serial commas ("Oxford commas") before the final 'and/or' in a list. | _You can create new issues, merge requests, and milestones._ |
 | Always add a space before and after dashes when using it in a sentence (for replacing a comma, for example). | _You should try this - or not._ |
 | Always use lowercase after a colon. | _Related Issues: a way to create a relationship between issues._ |
+
+### Placeholder text
+
+Often in examples, a writer will provide a command or configuration that is complete apart from
+a value specific to the reader.
+
+In these cases, use [`<` and `>`](https://en.wikipedia.org/wiki/Usage_message#Pattern) to call out
+where a reader must replace text with their own value.
+
+For example:
+
+```sh
+cp <your_source_directory> <your_destination_directory>
+```
 
 ## Lists
 
@@ -503,7 +510,7 @@ Instead:
 Example:
 
 ```md
-For more information, see the [confidential issue](../../user/project/issues/confidential_issues.md) `https://gitlab.com/gitlab-org/gitlab-ce/issues/<issue_number>`.
+For more information, see the [confidential issue](../../user/project/issues/confidential_issues.md) `https://gitlab.com/gitlab-org/gitlab-foss/issues/<issue_number>`.
 ```
 
 ## Navigation
@@ -526,7 +533,7 @@ To indicate the steps of navigation through the UI:
   number corresponding to the release milestone the image was added to,
   or corresponding to the release the screenshot was taken from, using the
   format `image_name_vX_Y.png`.
-  ([Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/61027) in GitLab 12.1.)
+  ([Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/61027) in GitLab 12.1.)
 - For example, for a screenshot taken from the pipelines page of
   GitLab 11.1, a valid name is `pipelines_v11_1.png`. If you're
   adding an illustration that does not include parts of the UI,
@@ -535,7 +542,7 @@ To indicate the steps of navigation through the UI:
   a valid name for an illustration is `devops_diagram_v11_1.png`.
 - Keep all file names in lower case.
 - Consider using PNG images instead of JPEG.
-- Compress all images with <https://tinypng.com/> or similar tool.
+- Compress all images with <https://pngquant.org/> or similar tool.
 - Compress gifs with <https://ezgif.com/optimize> or similar tool.
 - Images should be used (only when necessary) to _illustrate_ the description
   of a process, not to _replace_ it.
@@ -1100,7 +1107,7 @@ Rendered example:
 
 ### cURL Examples
 
-Below is a set of [cURL][] examples that you can use in the API documentation.
+Below is a set of [cURL](https://curl.haxx.se) examples that you can use in the API documentation.
 
 #### Simple cURL command
 
@@ -1172,8 +1179,7 @@ restrict the sign-up e-mail domains of a GitLab instance to `*.example.com` and
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" --data "domain_whitelist[]=*.example.com" --data "domain_whitelist[]=example.net" https://gitlab.example.com/api/v4/application/settings
 ```
 
-[cURL]: http://curl.haxx.se/ "cURL website"
 [single spaces]: http://www.slate.com/articles/technology/technology/2011/01/space_invaders.html
 [gfm]: ../../user/markdown.md#newlines "GitLab flavored markdown documentation"
-[ce-1242]: https://gitlab.com/gitlab-org/gitlab-ce/issues/1242
+[ce-1242]: https://gitlab.com/gitlab-org/gitlab-foss/issues/1242
 [doc-restart]: ../../administration/restart_gitlab.md "GitLab restart documentation"

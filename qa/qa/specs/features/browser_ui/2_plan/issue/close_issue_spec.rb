@@ -19,7 +19,7 @@ module QA
 
         # Initial commit should be pushed because
         # the very first commit to the project doesn't close the issue
-        # https://gitlab.com/gitlab-org/gitlab-ce/issues/38965
+        # https://gitlab.com/gitlab-org/gitlab-foss/issues/38965
         push_commit('Initial commit')
       end
 
@@ -39,6 +39,7 @@ module QA
         end
 
         Page::Project::Issue::Show.perform do |show|
+          show.select_all_activities_filter
           expect(show).to have_element(:reopen_issue_button)
           expect(show).to have_content("closed via commit #{commit_sha}")
         end

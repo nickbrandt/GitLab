@@ -11,7 +11,7 @@ module Ci
     end
 
     def get_report(pipeline)
-      Security::PipelineVulnerabilitiesFinder.new(pipeline: pipeline, params: { report_type: %w[sast] }).execute
+      Security::PipelineVulnerabilitiesFinder.new(pipeline: pipeline, params: { report_type: %w[sast], scope: 'all' }).execute
     end
   end
 end

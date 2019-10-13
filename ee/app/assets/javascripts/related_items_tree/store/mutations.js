@@ -121,14 +121,15 @@ export default {
   },
 
   [types.TOGGLE_ADD_ITEM_FORM](state, { actionType, toggleState }) {
-    state.actionType = actionType;
+    if (actionType) {
+      state.actionType = actionType;
+    }
     state.showAddItemForm = toggleState;
-    state.showCreateItemForm = false;
+    state.showCreateEpicForm = false;
   },
 
-  [types.TOGGLE_CREATE_ITEM_FORM](state, { actionType, toggleState }) {
-    state.actionType = actionType;
-    state.showCreateItemForm = toggleState;
+  [types.TOGGLE_CREATE_EPIC_FORM](state, { toggleState }) {
+    state.showCreateEpicForm = toggleState;
     state.showAddItemForm = false;
   },
 
@@ -172,5 +173,13 @@ export default {
   },
   [types.RECEIVE_CREATE_ITEM_FAILURE](state) {
     state.itemCreateInProgress = false;
+  },
+
+  [types.REORDER_ITEM](state, { parentItem, targetItem, oldIndex, newIndex }) {
+    // Remove from old position
+    state.children[parentItem.reference].splice(oldIndex, 1);
+
+    // Insert at new position
+    state.children[parentItem.reference].splice(newIndex, 0, targetItem);
   },
 };

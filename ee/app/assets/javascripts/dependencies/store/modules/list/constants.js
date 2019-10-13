@@ -3,10 +3,6 @@ import { __, s__ } from '~/locale';
 export const SORT_FIELDS = {
   name: s__('Dependencies|Component name'),
   packager: s__('Dependencies|Packager'),
-};
-
-export const SORT_FIELDS_WITH_SEVERITY = {
-  ...SORT_FIELDS,
   severity: s__('Vulnerability|Severity'),
 };
 

@@ -41,6 +41,8 @@ export default class Clusters {
       managePrometheusPath,
       clusterEnvironmentsPath,
       hasRbac,
+      providerType,
+      preInstalledKnative,
       clusterType,
       clusterStatus,
       clusterStatusReason,
@@ -50,6 +52,7 @@ export default class Clusters {
       environmentsHelpPath,
       clustersHelpPath,
       deployBoardsHelpPath,
+      cloudRunHelpPath,
       clusterId,
     } = document.querySelector('.js-edit-cluster-form').dataset;
 
@@ -65,10 +68,13 @@ export default class Clusters {
       environmentsHelpPath,
       clustersHelpPath,
       deployBoardsHelpPath,
+      cloudRunHelpPath,
     );
     this.store.setManagePrometheusPath(managePrometheusPath);
     this.store.updateStatus(clusterStatus);
     this.store.updateStatusReason(clusterStatusReason);
+    this.store.updateProviderType(providerType);
+    this.store.updatePreInstalledKnative(preInstalledKnative);
     this.store.updateRbac(hasRbac);
     this.service = new ClustersService({
       endpoint: statusPath,
@@ -111,15 +117,25 @@ export default class Clusters {
     this.initApplications(clusterType);
     this.initEnvironments();
 
-    if (clusterEnvironmentsPath) {
-      this.fetchEnvironments();
+    if (clusterEnvironmentsPath && this.environments) {
+      this.store.toggleFetchEnvironments(true);
+
+      this.initPolling(
+        'fetchClusterEnvironments',
+        data => this.handleClusterEnvironmentsSuccess(data),
+        () => this.handleEnvironmentsPollError(),
+      );
     }
 
     this.updateContainer(null, this.store.state.status, this.store.state.statusReason);
 
     this.addListeners();
     if (statusPath && !this.environments) {
-      this.initPolling();
+      this.initPolling(
+        'fetchClusterStatus',
+        data => this.handleClusterStatusSuccess(data),
+        () => this.handlePollError(),
+      );
     }
   }
 
@@ -143,6 +159,9 @@ export default class Clusters {
             ingressHelpPath: this.state.ingressHelpPath,
             managePrometheusPath: this.state.managePrometheusPath,
             ingressDnsHelpPath: this.state.ingressDnsHelpPath,
+            cloudRunHelpPath: this.state.cloudRunHelpPath,
+            providerType: this.state.providerType,
+            preInstalledKnative: this.state.preInstalledKnative,
             rbac: this.state.rbac,
           },
         });
@@ -179,16 +198,9 @@ export default class Clusters {
     });
   }
 
-  fetchEnvironments() {
-    this.store.toggleFetchEnvironments(true);
-
-    this.service
-      .fetchClusterEnvironments()
-      .then(data => {
-        this.store.toggleFetchEnvironments(false);
-        this.store.updateEnvironments(data.data);
-      })
-      .catch(() => Clusters.handleError());
+  handleClusterEnvironmentsSuccess(data) {
+    this.store.toggleFetchEnvironments(false);
+    this.store.updateEnvironments(data.data);
   }
 
   static initDismissableCallout() {
@@ -224,21 +236,16 @@ export default class Clusters {
     eventHub.$off('uninstallApplication');
   }
 
-  initPolling() {
+  initPolling(method, successCallback, errorCallback) {
     this.poll = new Poll({
       resource: this.service,
-      method: 'fetchData',
-      successCallback: data => this.handleSuccess(data),
-      errorCallback: () => Clusters.handleError(),
+      method,
+      successCallback,
+      errorCallback,
     });
 
     if (!Visibility.hidden()) {
       this.poll.makeRequest();
-    } else {
-      this.service
-        .fetchData()
-        .then(data => this.handleSuccess(data))
-        .catch(() => Clusters.handleError());
     }
 
     Visibility.change(() => {
@@ -250,11 +257,21 @@ export default class Clusters {
     });
   }
 
+  handlePollError() {
+    this.constructor.handleError();
+  }
+
+  handleEnvironmentsPollError() {
+    this.store.toggleFetchEnvironments(false);
+
+    this.handlePollError();
+  }
+
   static handleError() {
     Flash(s__('ClusterIntegration|Something went wrong on our end.'));
   }
 
-  handleSuccess(data) {
+  handleClusterStatusSuccess(data) {
     const prevStatus = this.store.state.status;
     const prevApplicationMap = Object.assign({}, this.store.state.applications);
 

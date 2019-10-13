@@ -123,4 +123,15 @@ describe ApprovalProjectRule do
       end
     end
   end
+
+  context 'any_approver rules' do
+    let(:project) { create(:project) }
+    let(:rule) { build(:approval_project_rule, project: project, rule_type: :any_approver) }
+
+    it 'creating more than one any_approver rule raises an error' do
+      create(:approval_project_rule, project: project, rule_type: :any_approver)
+
+      expect { rule.save }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+  end
 end

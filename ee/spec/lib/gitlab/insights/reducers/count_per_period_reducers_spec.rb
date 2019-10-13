@@ -5,15 +5,15 @@ require 'spec_helper'
 RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
   include_context 'Insights reducers context'
 
-  def find_issuables(project, opts)
-    Gitlab::Insights::Finders::IssuableFinder.new(project, nil, opts).find
+  def find_issuables(project, query)
+    Gitlab::Insights::Finders::IssuableFinder.new(project, nil, query: query).find
   end
 
   def reduce(issuable_relation, period, period_limit = 5, period_field = :created_at)
     described_class.reduce(issuable_relation, period: period, period_limit: period_limit, period_field: period_field)
   end
 
-  let(:opts) do
+  let(:query) do
     {
       state: 'opened',
       issuable_type: 'issue',
@@ -22,9 +22,9 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
       period_limit: 5
     }
   end
-  let(:issuable_relation) { find_issuables(project, opts) }
+  let(:issuable_relation) { find_issuables(project, query) }
 
-  subject { reduce(issuable_relation, opts[:group_by]) }
+  subject { reduce(issuable_relation, query[:group_by]) }
 
   let(:expected) do
     {
@@ -56,6 +56,6 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
     control_queries = ActiveRecord::QueryRecorder.new { subject }
     create(:labeled_issue, :opened, created_at: Time.utc(2019, 2, 5), labels: [label_bug], project: project)
 
-    expect { reduce(find_issuables(project, opts), opts[:group_by]) }.not_to exceed_query_limit(control_queries)
+    expect { reduce(find_issuables(project, query), query[:group_by]) }.not_to exceed_query_limit(control_queries)
   end
 end

@@ -6,6 +6,7 @@ module QA
   module Resource
     class Project < Base
       include Events::Project
+      include Members
 
       attr_writer :initialize_with_readme
       attr_writer :visibility
@@ -30,13 +31,13 @@ module QA
       end
 
       attribute :repository_ssh_location do
-        Page::Project::Show.perform do |page|
+        Page::Project::Show.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
           page.repository_clone_ssh_location
         end
       end
 
       attribute :repository_http_location do
-        Page::Project::Show.perform do |page|
+        Page::Project::Show.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
           page.repository_clone_http_location
         end
       end
@@ -59,7 +60,7 @@ module QA
           Page::Group::Show.perform(&:go_to_new_project)
         end
 
-        Page::Project::New.perform do |page|
+        Page::Project::New.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
           page.choose_test_namespace
           page.choose_name(@name)
           page.add_description(@description)
@@ -75,11 +76,6 @@ module QA
         super
       end
 
-      def add_member(user, access_level = '30')
-        # 30 = developer access
-        post Runtime::API::Request.new(api_client, api_members_path).url, { user_id: user.id, access_level: access_level }
-      end
-
       def api_get_path
         "/projects/#{CGI.escape(path_with_namespace)}"
       end
@@ -90,6 +86,10 @@ module QA
 
       def api_members_path
         "#{api_get_path}/members"
+      end
+
+      def api_runners_path
+        "#{api_get_path}/runners"
       end
 
       def api_post_path
@@ -110,6 +110,15 @@ module QA
         end
 
         post_body
+      end
+
+      def runners
+        response = get Runtime::API::Request.new(api_client, api_runners_path).url
+        parse_body(response)
+      end
+
+      def share_with_group(invitee, access_level = Resource::Members::AccessLevel::DEVELOPER)
+        post Runtime::API::Request.new(api_client, "/projects/#{id}/share").url, { group_id: invitee.id, group_access: access_level }
       end
 
       private

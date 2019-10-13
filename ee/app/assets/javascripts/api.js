@@ -7,7 +7,8 @@ export default {
   ldapGroupsPath: '/api/:version/ldap/:provider/groups.json',
   subscriptionPath: '/api/:version/namespaces/:id/gitlab_subscription',
   childEpicPath: '/api/:version/groups/:id/epics/:epic_iid/epics',
-  groupEpicsPath: '/api/:version/groups/:id/epics',
+  groupEpicsPath:
+    '/api/:version/groups/:id/epics?include_ancestor_groups=:includeAncestorGroups&include_descendant_groups=:includeDescendantGroups',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
 
   userSubscription(namespaceId) {
@@ -43,8 +44,11 @@ export default {
     });
   },
 
-  groupEpics({ groupId }) {
-    const url = Api.buildUrl(this.groupEpicsPath).replace(':id', groupId);
+  groupEpics({ groupId, includeAncestorGroups = false, includeDescendantGroups = true }) {
+    const url = Api.buildUrl(this.groupEpicsPath)
+      .replace(':id', groupId)
+      .replace(':includeAncestorGroups', includeAncestorGroups)
+      .replace(':includeDescendantGroups', includeDescendantGroups);
 
     return axios.get(url);
   },

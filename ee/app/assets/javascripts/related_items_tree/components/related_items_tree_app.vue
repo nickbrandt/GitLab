@@ -4,24 +4,23 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 
 import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
-import CreateItemForm from './create_item_form.vue';
+import CreateEpicForm from './create_epic_form.vue';
 import TreeItemRemoveModal from './tree_item_remove_modal.vue';
 
 import RelatedItemsTreeHeader from './related_items_tree_header.vue';
 import RelatedItemsTreeBody from './related_items_tree_body.vue';
 
-import { PathIdSeparator, ActionType, OVERFLOW_AFTER } from '../constants';
+import { PathIdSeparator, OVERFLOW_AFTER } from '../constants';
 
 export default {
   PathIdSeparator,
-  ActionType,
   OVERFLOW_AFTER,
   components: {
     GlLoadingIcon,
     RelatedItemsTreeHeader,
     RelatedItemsTreeBody,
     AddItemForm,
-    CreateItemForm,
+    CreateEpicForm,
     TreeItemRemoveModal,
   },
   computed: {
@@ -32,12 +31,12 @@ export default {
       'itemAddInProgress',
       'itemCreateInProgress',
       'showAddItemForm',
-      'showCreateItemForm',
+      'showCreateEpicForm',
       'autoCompleteEpics',
       'autoCompleteIssues',
       'pendingReferences',
       'itemInputValue',
-      'actionType',
+      'issuableType',
       'epicsEndpoint',
       'issuesEndpoint',
     ]),
@@ -55,7 +54,7 @@ export default {
     ...mapActions([
       'fetchItems',
       'toggleAddItemForm',
-      'toggleCreateItemForm',
+      'toggleCreateEpicForm',
       'setPendingReferences',
       'addPendingReferences',
       'removePendingReference',
@@ -84,18 +83,18 @@ export default {
         this.addItem();
       }
     },
-    handleCreateItemFormSubmit(newValue) {
+    handleCreateEpicFormSubmit(newValue) {
       this.createItem({
         itemTitle: newValue,
       });
     },
     handleAddItemFormCancel() {
-      this.toggleAddItemForm({ toggleState: false, actionType: this.actionType });
+      this.toggleAddItemForm({ toggleState: false });
       this.setPendingReferences([]);
       this.setItemInputValue('');
     },
-    handleCreateItemFormCancel() {
-      this.toggleCreateItemForm({ toggleState: false, actionType: this.actionType });
+    handleCreateEpicFormCancel() {
+      this.toggleCreateEpicForm({ toggleState: false });
       this.setItemInputValue('');
     },
   },
@@ -109,17 +108,21 @@ export default {
     </div>
     <div
       v-else
-      class="related-items-tree card card-slim mt-2"
+      class="related-items-tree card card-slim border-top-0"
       :class="{
         'disabled-content': disableContents,
         'overflow-auto': directChildren.length > $options.OVERFLOW_AFTER,
       }"
     >
       <related-items-tree-header :class="{ 'border-bottom-0': itemsFetchResultEmpty }" />
-      <div v-if="showAddItemForm || showCreateItemForm" class="card-body add-item-form-container">
+      <div
+        v-if="showAddItemForm || showCreateEpicForm"
+        class="card-body add-item-form-container"
+        :class="{ 'border-bottom-0': itemsFetchResultEmpty }"
+      >
         <add-item-form
           v-if="showAddItemForm"
-          :issuable-type="actionType"
+          :issuable-type="issuableType"
           :input-value="itemInputValue"
           :is-submitting="itemAddInProgress"
           :pending-references="pendingReferences"
@@ -131,11 +134,11 @@ export default {
           @addIssuableFormSubmit="handleAddItemFormSubmit"
           @addIssuableFormCancel="handleAddItemFormCancel"
         />
-        <create-item-form
-          v-if="showCreateItemForm"
+        <create-epic-form
+          v-if="showCreateEpicForm"
           :is-submitting="itemCreateInProgress"
-          @createItemFormSubmit="handleCreateItemFormSubmit"
-          @createItemFormCancel="handleCreateItemFormCancel"
+          @createEpicFormSubmit="handleCreateEpicFormSubmit"
+          @createEpicFormCancel="handleCreateEpicFormCancel"
         />
       </div>
       <related-items-tree-body

@@ -43,7 +43,7 @@ needed to compile the project:
   directories relative to the build directory** and specifying paths which don't
   comply to this rule trigger an unintuitive and illogical error message (an
   enhancement is discussed at
-  [https://gitlab.com/gitlab-org/gitlab-ce/issues/15530](https://gitlab.com/gitlab-org/gitlab-ce/issues/15530)
+  [https://gitlab.com/gitlab-org/gitlab-foss/issues/15530](https://gitlab.com/gitlab-org/gitlab-foss/issues/15530)
   ). Artifacts need to be uploaded to the GitLab instance (not only the GitLab
   runner) before the next stage job(s) can start, so you need to evaluate
   carefully whether your bandwidth allows you to profit from parallelization
@@ -202,12 +202,12 @@ For more fine tuning, read also about the
 
 The most common use case of cache is to preserve contents between subsequent
 runs of jobs for things like dependencies and commonly used libraries
-(Nodejs packages, PHP packages, rubygems, python libraries, etc.),
+(Nodejs packages, PHP packages, rubygems, Python libraries, etc.),
 so they don't have to be re-fetched from the public internet.
 
 NOTE: **Note:**
 For more examples, check out our [GitLab CI/CD
-templates](https://gitlab.com/gitlab-org/gitlab-ce/tree/master/lib/gitlab/ci/templates).
+templates](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates).
 
 ### Caching Nodejs dependencies
 
@@ -218,7 +218,7 @@ Nodejs modules are installed in `node_modules/` and are cached per-branch:
 
 ```yaml
 #
-# https://gitlab.com/gitlab-org/gitlab-ce/tree/master/lib/gitlab/ci/templates/Nodejs.gitlab-ci.yml
+# https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates/Nodejs.gitlab-ci.yml
 #
 image: node:latest
 
@@ -245,7 +245,7 @@ are cached per-branch:
 
 ```yaml
 #
-# https://gitlab.com/gitlab-org/gitlab-ce/tree/master/lib/gitlab/ci/templates/PHP.gitlab-ci.yml
+# https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates/PHP.gitlab-ci.yml
 #
 image: php:7.2
 
@@ -268,13 +268,13 @@ test:
 ### Caching Python dependencies
 
 Assuming your project is using [pip](https://pip.pypa.io/en/stable/) to install
-the python dependencies, the following example defines `cache` globally so that
+the Python dependencies, the following example defines `cache` globally so that
 all jobs inherit it. Python libraries are installed in a virtualenv under `venv/`,
 pip's cache is defined under `.cache/pip/` and both are cached per-branch:
 
 ```yaml
 #
-# https://gitlab.com/gitlab-org/gitlab-ce/tree/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
+# https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
 #
 image: python:latest
 
@@ -314,7 +314,7 @@ jobs inherit it. Gems are installed in `vendor/ruby/` and are cached per-branch:
 
 ```yaml
 #
-# https://gitlab.com/gitlab-org/gitlab-ce/tree/master/lib/gitlab/ci/templates/Ruby.gitlab-ci.yml
+# https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates/Ruby.gitlab-ci.yml
 #
 image: ruby:2.6
 
@@ -535,7 +535,7 @@ next run of the pipeline, the cache will be stored in a different location.
 
 ### Clearing the cache manually
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/41249) in GitLab 10.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/41249) in GitLab 10.4.
 
 If you want to avoid editing `.gitlab-ci.yml`, you can easily clear the cache
 via GitLab's UI:

@@ -75,7 +75,7 @@ export default {
         <icon
           v-if="hasState"
           v-tooltip
-          :css-classes="iconClass"
+          :class="iconClass"
           :name="iconName"
           :size="12"
           :title="stateTitle"

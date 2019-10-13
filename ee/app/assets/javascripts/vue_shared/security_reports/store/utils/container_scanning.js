@@ -9,7 +9,7 @@ import { enrichVulnerabilityWithFeedback } from '../utils';
   This file contains all functions for mapping container scanning vulnerabilities
   to match the representation that we are building in the backend:
 
-  https://gitlab.com/gitlab-org/gitlab-ee/blob/bbcd07475f0334/ee/lib/gitlab/ci/parsers/security/container_scanning.rb
+  https://gitlab.com/gitlab-org/gitlab/blob/bbcd07475f0334/ee/lib/gitlab/ci/parsers/security/container_scanning.rb
 
   All these function can hopefully be removed as soon as we retrieve the data from the backend.
  */
@@ -103,7 +103,7 @@ export const parseSastContainer = (issues = [], feedback = [], image) =>
 
     /*
      The following fields are copying the backend data structure, as can be found in:
-     https://gitlab.com/gitlab-org/gitlab-ee/blob/f8f5724bb47712df0a618ae0a447b69a6ef47c0c/ee/lib/gitlab/ci/parsers/security/container_scanning.rb#L42-72
+     https://gitlab.com/gitlab-org/gitlab/blob/f8f5724bb47712df0a618ae0a447b69a6ef47c0c/ee/lib/gitlab/ci/parsers/security/container_scanning.rb#L42-72
      */
     const parsed = {
       category: 'container_scanning',
@@ -156,9 +156,7 @@ export const parseSastContainer = (issues = [], feedback = [], image) =>
      before switching to the Backend implementation
      */
     const frontendOnly = {
-      project_fingerprint: sha1(
-        `${issue.namespace}:${issue.vulnerability}:${issue.featurename}:${issue.featureversion}`,
-      ),
+      project_fingerprint: sha1(issue.vulnerability),
       title: message,
       vulnerability: issue.vulnerability,
     };

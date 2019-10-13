@@ -66,15 +66,15 @@ module QA
           group = create_group_and_add_user_via_api(owner_user, 'Synched-engineering-group')
           signin_and_visit_group_as_user(owner_user, group)
 
-          EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
+          Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
-          EE::Page::Group::Settings::LDAPSync.perform do |page|
+          EE::Page::Group::Settings::LDAPSync.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.set_sync_method('LDAP Group cn')
             page.set_group_cn('Engineering')
             page.click_add_sync_button
           end
 
-          EE::Page::Group::Menu.perform(&:click_group_members_item)
+          Page::Group::Menu.perform(&:click_group_members_item)
         end
 
         it 'has LDAP users synced' do
@@ -116,14 +116,14 @@ module QA
           group = create_group_and_add_user_via_api(owner_user, 'Synched-human-resources-group')
           signin_and_visit_group_as_user(owner_user, group)
 
-          EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
+          Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
-          EE::Page::Group::Settings::LDAPSync.perform do |page|
+          EE::Page::Group::Settings::LDAPSync.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.set_user_filter('(&(objectClass=person)(cn=HR*))')
             page.click_add_sync_button
           end
 
-          EE::Page::Group::Menu.perform(&:click_group_members_item)
+          Page::Group::Menu.perform(&:click_group_members_item)
         end
 
         it 'has LDAP users synced' do
@@ -164,14 +164,14 @@ module QA
 
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform do |login_page|
-          login_page.sign_in_using_ldap_credentials(user)
+          login_page.sign_in_using_ldap_credentials(user: user)
         end
 
         group.visit!
       end
 
       def verify_users_synced(expected_users)
-        EE::Page::Group::Members.perform do |page|
+        EE::Page::Group::Members.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
           page.click_sync_now
           users_synchronised = page.retry_until(reload: true) do
             expected_users.map { |user| page.has_content?(user) }.all?

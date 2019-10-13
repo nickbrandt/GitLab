@@ -35,7 +35,7 @@ module API
 
         if response[:code] == :ok
           file = response[:file]
-          present_disk_file!(file.path, file.filename)
+          present_carrierwave_file!(file)
         else
           error! response, response.delete(:code)
         end

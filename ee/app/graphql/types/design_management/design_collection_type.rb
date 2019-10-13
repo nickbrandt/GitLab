@@ -7,8 +7,8 @@ module Types
 
       authorize :read_design
 
-      field :project, Types::ProjectType, null: false
-      field :issue, Types::IssueType, null: false
+      field :project, Types::ProjectType, null: false # rubocop:disable Graphql/Descriptions
+      field :issue, Types::IssueType, null: false # rubocop:disable Graphql/Descriptions
       field :designs,
             Types::DesignManagement::DesignType.connection_type,
             null: false,

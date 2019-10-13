@@ -59,7 +59,7 @@ Add directory structure for tree_helper spec
 
 This directory structure is needed for a testing the method flatten_tree(tree) in the TreeHelper module
 
-See [merge request #275](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/275#note_732774)
+See [merge request #275](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/275#note_732774)
 
 See merge request !2
 eos
@@ -92,7 +92,7 @@ eos
     )
   end
 
-  def sample_compare
+  def sample_compare(extra_changes = [])
     changes = [
       {
         line_code: 'a5cc2925ca8258af241be7e5b0381edf30266302_20_20',
@@ -102,7 +102,7 @@ eos
         line_code: '7445606fbf8f3683cd42bdc54b05d7a0bc2dfc44_4_6',
         file_path: '.gitmodules'
       }
-    ]
+    ] + extra_changes
 
     commits = %w(
       5937ac0a7beb003549fc5fd26fc247adbce4a52e

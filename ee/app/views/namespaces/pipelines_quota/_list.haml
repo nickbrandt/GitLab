@@ -3,6 +3,10 @@
 
 .pipeline-quota.container-fluid
   .row
+    .col-sm-6.offset-sm-6
+      = link_to s_('UsageQuota|Buy additional minutes'), EE::SUBSCRIPTIONS_PLANS_URL, target: '_blank', class: 'btn btn-inverted btn-success float-right' if ::Gitlab.com?
+
+  .row
     .col-sm-6
       %strong
         - last_reset = namespace.shared_runners_seconds_last_reset

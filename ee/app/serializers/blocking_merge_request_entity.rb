@@ -20,12 +20,21 @@ class BlockingMergeRequestEntity < Grape::Entity
     merge_request_path(blocking_mr)
   end
 
-  expose :head_pipeline, using: ::API::Entities::Pipeline
+  expose :head_pipeline,
+         if: -> (_, _) { can_read_head_pipeline? },
+         using: ::API::Entities::Pipeline
+
   expose :assignees, using: ::API::Entities::UserBasic
   expose :milestone, using: ::API::Entities::Milestone
   expose :created_at
   expose :merged_at
   expose :closed_at do |blocking_mr|
     blocking_mr.metrics.latest_closed_at
+  end
+
+  private
+
+  def can_read_head_pipeline?
+    can?(request.current_user, :read_pipeline, object.head_pipeline)
   end
 end

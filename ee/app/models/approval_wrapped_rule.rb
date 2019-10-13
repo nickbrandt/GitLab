@@ -92,16 +92,15 @@ class ApprovalWrappedRule
 
   def code_owner_approvals_required
     strong_memoize(:code_owner_approvals_required) do
-      next 0 unless merge_requests_require_code_owner_approval?
+      next 0 unless branch_requires_code_owner_approval?
 
       approvers.any? ? REQUIRED_APPROVALS_PER_CODE_OWNER_RULE : 0
     end
   end
 
-  def merge_requests_require_code_owner_approval?
+  def branch_requires_code_owner_approval?
     return false unless project.code_owner_approval_required_available?
 
-    project.merge_requests_require_code_owner_approval? ||
-      project.branch_requires_code_owner_approval?(merge_request.target_branch)
+    ProtectedBranch.branch_requires_code_owner_approval?(project, merge_request.target_branch)
   end
 end

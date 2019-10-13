@@ -3,10 +3,11 @@
 require 'spec_helper'
 
 describe BlockingMergeRequestEntity do
-  set(:merge_request) { create(:merge_request) }
-  set(:user) { create(:user) }
+  let(:merge_request) { create(:merge_request) }
+  let(:project) { merge_request.target_project }
+  let(:user) { create(:user) }
 
-  let(:web_url) { Gitlab::Routing.url_helpers.project_merge_request_path(merge_request.project, merge_request) }
+  let(:web_url) { Gitlab::Routing.url_helpers.project_merge_request_path(project, merge_request) }
   let(:request) { double('request', current_user: user) }
   let(:extra_options) { {} }
 
@@ -26,6 +27,26 @@ describe BlockingMergeRequestEntity do
       closed_at: merge_request.metrics.latest_closed_at,
       web_url: web_url
     )
+  end
+
+  describe '#head_pipeline' do
+    subject { entity.as_json[:head_pipeline] }
+
+    before do
+      merge_request.head_pipeline = create(:ci_pipeline, project: project)
+    end
+
+    context 'visible pipeline' do
+      before do
+        project.team.add_developer(user)
+      end
+
+      it { is_expected.to include(id: merge_request.head_pipeline.id) }
+    end
+
+    context 'hidden pipeline' do
+      it { is_expected.to be_nil }
+    end
   end
 
   describe '#reference' do

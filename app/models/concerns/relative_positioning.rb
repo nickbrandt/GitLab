@@ -127,6 +127,7 @@ module RelativePositioning
 
     if pos_after && (pos_after - pos_before) < 2
       before.move_sequence_after
+      pos_after = before.next_relative_position
     end
 
     self.relative_position = self.class.position_between(pos_before, pos_after)
@@ -138,6 +139,7 @@ module RelativePositioning
 
     if pos_before && (pos_after - pos_before) < 2
       after.move_sequence_before
+      pos_before = after.prev_relative_position
     end
 
     self.relative_position = self.class.position_between(pos_before, pos_after)
@@ -225,7 +227,7 @@ module RelativePositioning
   def calculate_relative_position(calculation)
     # When calculating across projects, this is much more efficient than
     # MAX(relative_position) without the GROUP BY, due to index usage:
-    # https://gitlab.com/gitlab-org/gitlab-ce/issues/54276#note_119340977
+    # https://gitlab.com/gitlab-org/gitlab-foss/issues/54276#note_119340977
     relation = scoped_items
                  .order(Gitlab::Database.nulls_last_order('position', 'DESC'))
                  .group(self.class.relative_positioning_parent_column)

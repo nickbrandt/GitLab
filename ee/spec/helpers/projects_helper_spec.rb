@@ -97,18 +97,24 @@ describe ProjectsHelper do
     end
   end
 
-  describe '#project_security_dashboard_config' do
+  shared_context 'project with owner and pipeline' do
     let(:user) { create(:user) }
     let(:group) { create(:group).tap { |g| g.add_owner(user) } }
-    let(:project) { create(:project, :repository, group: group) }
     let(:pipeline) do
       create(:ee_ci_pipeline,
-      :with_sast_report,
-      user: user,
-      project: project,
-      ref: project.default_branch,
-      sha: project.commit.sha)
+             :with_sast_report,
+             user: user,
+             project: project,
+             ref: project.default_branch,
+             sha: project.commit.sha)
     end
+    let(:project) { create(:project, :repository, group: group) }
+  end
+
+  describe '#project_security_dashboard_config' do
+    include_context 'project with owner and pipeline'
+
+    let(:project) { create(:project, :repository, group: group) }
 
     context 'project without pipeline' do
       subject { helper.project_security_dashboard_config(project, nil) }
@@ -126,6 +132,24 @@ describe ProjectsHelper do
         expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard/index'
         expect(subject[:has_pipeline_data]).to eq 'true'
       end
+    end
+  end
+
+  describe '#api_projects_vulnerability_findings_path' do
+    include_context 'project with owner and pipeline'
+
+    subject { helper.api_projects_vulnerability_findings_path(project, pipeline) }
+
+    context 'when Vulnerability Findings API enabled' do
+      it { is_expected.to include("projects/#{project.id}/vulnerability_findings") }
+    end
+
+    context 'when the Vulnerability Findings API is disabled' do
+      before do
+        stub_feature_flags(first_class_vulnerabilities: false)
+      end
+
+      it { is_expected.to include("projects/#{project.id}/vulnerabilities") }
     end
   end
 end

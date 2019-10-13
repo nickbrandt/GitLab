@@ -16,7 +16,7 @@ module EE
               for_metrics do |metric|
                 next unless metrics_with_alerts.include?(metric[:metric_id])
 
-                metric[:alert_path] = alert_path(metric[:metric_id], project, environment)
+                metric[:alert_path] = alert_path(metric[:metric_id], project, params[:environment])
               end
             end
 
@@ -25,7 +25,7 @@ module EE
             def metrics_with_alerts
               strong_memoize(:metrics_with_alerts) do
                 alerts = ::Projects::Prometheus::AlertsFinder
-                  .new(project: project, environment: environment)
+                  .new(project: project, environment: params[:environment])
                   .execute
 
                 Set.new(alerts.map(&:prometheus_metric_id))

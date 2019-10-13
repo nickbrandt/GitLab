@@ -22,7 +22,7 @@ export const isSameVulnerability = (vulnerability, other) => {
   // `location` (which is a superset of `location_fingerprint`) if the former
   // isn't present.
   //
-  // [1]: https://gitlab.com/gitlab-org/gitlab-ee/issues/7586
+  // [1]: https://gitlab.com/gitlab-org/gitlab/issues/7586
   let isLocationEqual = false;
   if (vulnerability.location_fingerprint && other.location_fingerprint) {
     isLocationEqual = vulnerability.location_fingerprint === other.location_fingerprint;

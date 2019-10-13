@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'label issues', :js do
@@ -30,8 +32,12 @@ describe 'label issues', :js do
       click_link 'Create group label'
       fill_in 'new_label_name', with: 'test label'
       first('.suggest-colors-dropdown a').click
-      click_button 'Create'
-      wait_for_requests
+
+      # We need to hover before clicking to trigger
+      # dropdown repositioning so that the click isn't flaky
+      create_button = find_button('Create')
+      create_button.hover
+      create_button.click
     end
 
     page.within '.labels' do

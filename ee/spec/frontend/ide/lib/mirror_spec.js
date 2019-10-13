@@ -124,6 +124,8 @@ describe('ee/ide/lib/mirror', () => {
         it('disconnects when connected again', () => {
           const result = connection
             .then(() => {
+              // https://gitlab.com/gitlab-org/gitlab/issues/33024
+              // eslint-disable-next-line promise/no-nesting
               mirror.connect(TEST_PATH).catch(() => {});
             })
             .then(() => {

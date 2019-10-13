@@ -12,7 +12,7 @@ describe EE::VersionCheckHelper do
       end
 
       it 'links to an ee-commit' do
-        expect(helper.link_to_version).to include('https://gitlab.com/gitlab-org/gitlab-ee/commits/deadbeef')
+        expect(helper.link_to_version).to include('https://gitlab.com/gitlab-org/gitlab/commits/deadbeef')
       end
     end
 
@@ -22,7 +22,7 @@ describe EE::VersionCheckHelper do
       end
 
       it 'links to an ee-tag' do
-        expect(helper.link_to_version).to include('https://gitlab.com/gitlab-org/gitlab-ee/-/tags/v8.0.2-ee')
+        expect(helper.link_to_version).to include('https://gitlab.com/gitlab-org/gitlab/-/tags/v8.0.2-ee')
       end
     end
   end

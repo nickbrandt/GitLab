@@ -1,0 +1,86 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MetricChart component template when isLoading is false and chart data is empty matches the snapshot 1`] = `
+<div>
+  <!---->
+   
+  <div
+    class="bs-callout bs-callout-info"
+  >
+    
+      There is no data available. Please change your selection.
+    
+  </div>
+</div>
+`;
+
+exports[`MetricChart component template when isLoading is false and chartData is not empty and metricTypes exist matches the snapshot 1`] = `
+<div>
+  <!---->
+   
+  <gldropdown-stub
+    class="mb-4 metric-dropdown"
+    menu-class="w-100 mw-100"
+    text="Please select a metric"
+    toggle-class="dropdown-menu-toggle w-100"
+  >
+    <gldropdownitem-stub
+      active-class="is-active"
+      class="w-100"
+    >
+      <span
+        class="d-flex"
+      >
+        <icon-stub
+          aria-label="Selected"
+          class="flex-shrink-0 append-right-4 invisible"
+          name="mobile-issue-close"
+          size="16"
+          title="Selected"
+        />
+        
+            Time from last commit to merge
+          
+      </span>
+    </gldropdownitem-stub>
+    <gldropdownitem-stub
+      active-class="is-active"
+      class="w-100"
+    >
+      <span
+        class="d-flex"
+      >
+        <icon-stub
+          aria-label="Selected"
+          class="flex-shrink-0 append-right-4 invisible"
+          name="mobile-issue-close"
+          size="16"
+          title="Selected"
+        />
+        
+            Time from first comment to last commit
+          
+      </span>
+    </gldropdownitem-stub>
+  </gldropdown-stub>
+   
+  <!---->
+   
+  <div>
+    mockChart
+  </div>
+</div>
+`;
+
+exports[`MetricChart component template when isLoading is true matches the snapshot 1`] = `
+<div>
+  <!---->
+   
+  <glloadingicon-stub
+    class="my-4 py-4"
+    color="orange"
+    label="Loading"
+    size="md"
+  />
+</div>
+`;

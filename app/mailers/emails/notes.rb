@@ -45,13 +45,17 @@ module Emails
     private
 
     def note_target_url_options
-      [@project || @group, @note.noteable, anchor: "note_#{@note.id}"]
+      [@project || @group, @note.noteable, note_target_url_query_params]
+    end
+
+    def note_target_url_query_params
+      { anchor: "note_#{@note.id}" }
     end
 
     def note_thread_options(recipient_id, reason)
       {
         from: sender(@note.author_id),
-        to: recipient(recipient_id, @project&.group || @group),
+        to: User.find(recipient_id).notification_email_for(@project&.group || @group),
         subject: subject("#{@note.noteable.title} (#{@note.noteable.reference_link_text})"),
         'X-GitLab-NotificationReason' => reason
       }

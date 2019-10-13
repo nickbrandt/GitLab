@@ -2,7 +2,7 @@
 
 module QA
   # Quarantined because relative URL isn't supported
-  # See https://gitlab.com/gitlab-org/gitlab-ee/issues/13833
+  # See https://gitlab.com/gitlab-org/gitlab/issues/13833
   context 'Create', :quarantine do
     describe 'Web IDE web terminal', :docker do
       before do
@@ -13,15 +13,17 @@ module QA
         Resource::Repository::Commit.fabricate_via_api! do |commit|
           commit.project = project
           commit.commit_message = 'Add .gitlab/.gitlab-webide.yml'
-          commit.files = [
-            {
+          commit.add_files(
+            [
+              {
                 file_path: '.gitlab/.gitlab-webide.yml',
                 content: <<~YAML
                   terminal:
                     script: sleep 60
                 YAML
-            }
-          ]
+              }
+            ]
+          )
         end
 
         @runner = Resource::Runner.fabricate_via_api! do |runner|

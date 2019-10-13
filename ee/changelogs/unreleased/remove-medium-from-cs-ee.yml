@@ -1,0 +1,5 @@
+---
+title: Remove hardcoded Medium confidence for Container Scanning vulnerabilities
+merge_request: 16395
+author:
+type: fixed

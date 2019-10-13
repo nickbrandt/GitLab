@@ -18,11 +18,7 @@ module EE
       def enqueue_elasticsearch_indexing
         return unless should_index_commits?
 
-        ::ElasticCommitIndexerWorker.perform_async(
-          project.id,
-          params[:oldrev],
-          params[:newrev]
-        )
+        project.repository.index_commits_and_blobs(from_rev: oldrev, to_rev: newrev)
       end
 
       def enqueue_update_external_pull_requests
@@ -32,7 +28,7 @@ module EE
         UpdateExternalPullRequestsWorker.perform_async(
           project.id,
           current_user.id,
-          params[:ref]
+          ref
         )
       end
 

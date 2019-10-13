@@ -24,6 +24,26 @@ RSpec.shared_examples 'Insights page' do
         expect(page).to have_content('Insights')
       end
 
+      context 'hash fragment navigation', :js do
+        let(:config) { entity.insights_config }
+        let(:non_default_tab_id) { config.keys.last }
+        let(:non_default_tab_title) { config[non_default_tab_id][:title] }
+        let(:hash_fragment) { "#/#{non_default_tab_id}" }
+        let(:route) { path + hash_fragment }
+
+        before do
+          visit route
+
+          wait_for_requests
+        end
+
+        it 'loads the correct page' do
+          page.within(".insights-container") do
+            expect(page).to have_content(non_default_tab_title)
+          end
+        end
+      end
+
       context 'when the feature flag is disabled globally' do
         before do
           stub_feature_flags(insights: false)

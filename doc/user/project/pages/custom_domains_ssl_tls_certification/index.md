@@ -67,10 +67,10 @@ Root domains (`example.com`) require:
 - A [DNS A record](dns_concepts.md#a-record) pointing your domain to the Pages server.
 - A [TXT record](dns_concepts.md#txt-record) to verify your domain's ownership.
 
-| From | DNS Record | To |
-| ---- | ---------- | -- |
-| example.com | A | 35.185.44.232 |
-| _gitlab-pages-verification-code.example.com | TXT | gitlab-pages-verification-code=00112233445566778899aabbccddeeff |
+| From                                          | DNS Record | To              |
+| --------------------------------------------- | ---------- | --------------- |
+| `example.com`                                 | A          | `35.185.44.232` |
+| `_gitlab-pages-verification-code.example.com` | TXT        | `gitlab-pages-verification-code=00112233445566778899aabbccddeeff` |
 
 For projects on GitLab.com, this IP is `35.185.44.232`.
 For projects living in other GitLab instances (CE or EE), please contact
@@ -95,10 +95,10 @@ Subdomains (`subdomain.example.com`) require:
 - A DNS [CNAME record](dns_concepts.md#cname-record) record pointing your subdomain to the Pages server.
 - A DNS [TXT record](dns_concepts.md#txt-record) to verify your domain's ownership.
 
-| From | DNS Record | To |
-| ---- | ---------- | -- |
-| subdomain.example.com | CNAME | namespace.gitlab.io |
-| _gitlab-pages-verification-code.subdomain.example.com | TXT | gitlab-pages-verification-code=00112233445566778899aabbccddeeff |
+| From                                                    | DNS Record | To                    |
+| ------------------------------------------------------- | ---------- | --------------------- |
+| `subdomain.example.com`                                 | CNAME      | `namespace.gitlab.io` |
+| `_gitlab-pages-verification-code.subdomain.example.com` | TXT        | `gitlab-pages-verification-code=00112233445566778899aabbccddeeff` |
 
 Note that, whether it's a user or a project website, the `CNAME`
 should point to your Pages domain (`namespace.gitlab.io`),
@@ -117,13 +117,13 @@ They require:
 - A DNS CNAME record for the subdomain.
 - A DNS TXT record for each.
 
-| From | DNS Record | To |
-| ---- | ---------- | -- |
-| example.com | A | 35.185.44.232 |
-| _gitlab-pages-verification-code.example.com | TXT | gitlab-pages-verification-code=00112233445566778899aabbccddeeff |
-|---+---|
-| www.example.com | CNAME | namespace.gitlab.io |
-| _gitlab-pages-verification-code.www.example.com | TXT | gitlab-pages-verification-code=00112233445566778899aabbccddeeff |
+| From                                              | DNS Record | To                     |
+| ------------------------------------------------- | ---------- | ---------------------- |
+| `example.com`                                     | A          | `35.185.44.232`        |
+| `_gitlab-pages-verification-code.example.com`     | TXT        | `gitlab-pages-verification-code=00112233445566778899aabbccddeeff` |
+|--------------------------------------------+--------------------------------------------|
+| `www.example.com`                                 | CNAME      | `namespace.gitlab.io`  |
+| `_gitlab-pages-verification-code.www.example.com` | TXT        | `gitlab-pages-verification-code=00112233445566778899aabbccddeeff` |
 
 If you're using CloudFlare, check
 [Redirecting `www.domain.com` to `domain.com` with Cloudflare](#redirecting-wwwdomaincom-to-domaincom-with-cloudflare).
@@ -249,7 +249,7 @@ Sublime Text, Atom, Dreamweaver, Brackets, etc).
 
 ## Force HTTPS for GitLab Pages websites
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/28857) in GitLab 10.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/28857) in GitLab 10.7.
 
 To make your website's visitors even more secure, you can choose to
 force HTTPS for GitLab Pages. By doing so, all attempts to visit your

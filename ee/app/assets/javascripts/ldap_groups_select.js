@@ -1,4 +1,4 @@
-/* eslint-disable prefer-arrow-callback, no-var, one-var, object-shorthand, consistent-return, no-unused-vars, func-names */
+/* eslint-disable no-var, one-var, consistent-return, func-names */
 
 import $ from 'jquery';
 import Api from 'ee/api';
@@ -14,17 +14,17 @@ export default function initLDAPGroupsSelect() {
   };
   import(/* webpackChunkName: 'select2' */ 'select2/select2')
     .then(() => {
-      $('.ajax-ldap-groups-select').each(function(i, select) {
-        return $(select).select2({
-          id: function(group) {
+      $('.ajax-ldap-groups-select').each((i, select) => {
+        $(select).select2({
+          id(group) {
             return group.cn;
           },
           placeholder: __('Search for a LDAP group'),
           minimumInputLength: 1,
-          query: function(query) {
+          query(query) {
             var provider;
             provider = $('#ldap_group_link_provider').val();
-            return Api.ldapGroups(query.term, provider, function(groups) {
+            return Api.ldapGroups(query.term, provider, groups => {
               var data;
               data = {
                 results: groups,
@@ -32,7 +32,7 @@ export default function initLDAPGroupsSelect() {
               return query.callback(data);
             });
           },
-          initSelection: function(element, callback) {
+          initSelection(element, callback) {
             var id;
             id = $(element).val();
             if (id !== '') {
@@ -44,7 +44,7 @@ export default function initLDAPGroupsSelect() {
           formatResult: ldapGroupResult,
           formatSelection: groupFormatSelection,
           dropdownCssClass: 'ajax-groups-dropdown',
-          formatNoMatches: function(nomatch) {
+          formatNoMatches() {
             return __('Match not found; try refining your search query.');
           },
         });
@@ -52,7 +52,7 @@ export default function initLDAPGroupsSelect() {
     })
     .catch(() => {});
 
-  return $('#ldap_group_link_provider').on('change', function() {
-    return $('.ajax-ldap-groups-select').select2('data', null);
+  $('#ldap_group_link_provider').on('change', () => {
+    $('.ajax-ldap-groups-select').select2('data', null);
   });
 }

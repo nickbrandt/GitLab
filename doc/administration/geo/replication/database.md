@@ -1,9 +1,6 @@
 # Geo database replication **(PREMIUM ONLY)**
 
 NOTE: **Note:**
-The following steps are for Omnibus installs only. Using Geo with source-based installs was **deprecated** in GitLab 11.5.
-
-NOTE: **Note:**
 If your GitLab installation uses external (not managed by Omnibus) PostgreSQL
 instances, the Omnibus roles will not be able to perform all necessary
 configuration steps. In this case,
@@ -46,7 +43,7 @@ The following guide assumes that:
 
 CAUTION: **Warning:**
 Geo works with streaming replication. Logical replication is not supported at this time.
-There is an [issue where support is being discussed](https://gitlab.com/gitlab-org/gitlab-ee/issues/7420).
+There is an [issue where support is being discussed](https://gitlab.com/gitlab-org/gitlab/issues/7420).
 
 ### Step 1. Configure the **primary** server
 
@@ -443,15 +440,15 @@ data before running `pg_basebackup`.
 
 The replication process is now complete.
 
-## PGBouncer support (optional)
+## PgBouncer support (optional)
 
-[PGBouncer](http://pgbouncer.github.io/) may be used with GitLab Geo to pool
-PostgreSQL connections. We recommend using PGBouncer if you use GitLab in a
+[PgBouncer](http://pgbouncer.github.io/) may be used with GitLab Geo to pool
+PostgreSQL connections. We recommend using PgBouncer if you use GitLab in a
 high-availability configuration with a cluster of nodes supporting a Geo
 **primary** node and another cluster of nodes supporting a Geo **secondary** node. For more
 information, see [High Availability with GitLab Omnibus](../../high_availability/database.md#high-availability-with-gitlab-omnibus-premium-only).
 
-For a Geo **secondary** node to work properly with PGBouncer in front of the database,
+For a Geo **secondary** node to work properly with PgBouncer in front of the database,
 it will need a separate read-only user to make [PostgreSQL FDW queries][FDW]
 work:
 

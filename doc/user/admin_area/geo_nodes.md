@@ -16,7 +16,7 @@ All Geo nodes have the following settings:
 | Setting | Description |
 | --------| ----------- |
 | Primary | This marks a Geo Node as **primary** node. There can be only one **primary** node; make sure that you first add the **primary** node and then all the others. |
-| Name    | The unique identifier for the Geo node. Must match the setting `gitlab_rails[geo_node_name]` in `/etc/gitlab/gitlab.rb`. The setting defaults to `external_url` with a trailing slash. |
+| Name    | The unique identifier for the Geo node. Must match the setting `gitlab_rails['geo_node_name']` in `/etc/gitlab/gitlab.rb`. The setting defaults to `external_url` with a trailing slash. |
 | URL     | The instance's user-facing URL. |
 
 The node you're reading from is indicated with a green `Current node` label, and
@@ -45,7 +45,7 @@ download them all at once, so GitLab places an upper limit on the concurrency of
 these operations.
 
 How long the backfill takes is a function of the maximum concurrency, but higher
-values place more strain on the **primary** node. From [GitLab 10.2](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3107),
+values place more strain on the **primary** node. From [GitLab 10.2](https://gitlab.com/gitlab-org/gitlab/merge_requests/3107),
 the limits are configurable. If your **primary** node has lots of surplus capacity,
 you can increase the values to complete backfill in a shorter time. If it's
 under heavy load and backfill is reducing its availability for normal requests,
@@ -71,7 +71,7 @@ terminated at the load balancer.
 
 In GitLab 11.11, **secondary** nodes can use identical external URLs as long as
 a unique `name` is set for each Geo node. The `gitlab.rb` setting
-`gitlab_rails[geo_node_name]` must:
+`gitlab_rails['geo_node_name']` must:
 
 - Be set for each GitLab instance that runs `unicorn`, `sidekiq`, or `geo_logcursor`.
 - Match a Geo node name.

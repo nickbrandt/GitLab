@@ -181,7 +181,7 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
     const parsed = {
       ...adaptDeprecatedIssueFormat(issue),
       category: 'dependency_scanning',
-      project_fingerprint: sha1(issue.cve || issue.message),
+      project_fingerprint: sha1(issue.cve),
       title: issue.message,
     };
 

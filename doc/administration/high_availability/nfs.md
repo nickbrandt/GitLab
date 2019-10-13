@@ -65,7 +65,7 @@ If the Rugged feature flag is explicitly set to either true or false, GitLab wil
 
 On some customer systems, we have seen NFS clients slow precipitously due to
 [excessive network traffic from numerous `TEST_STATEID` NFS
-messages](https://gitlab.com/gitlab-org/gitlab-ce/issues/52017). This is
+messages](https://gitlab.com/gitlab-org/gitlab-foss/issues/52017). This is
 likely due to a [Linux kernel
 bug](https://bugzilla.redhat.com/show_bug.cgi?id=1552203) that may be fixed in
 [more recent kernels with this
@@ -103,13 +103,12 @@ If you do choose to use EFS, avoid storing GitLab log files (e.g. those in `/var
 there because this will also affect performance. We recommend that the log files be
 stored on a local volume.
 
-For more details on another person's experience with EFS, see
-[Amazon's Elastic File System: Burst Credits](https://rawkode.com/2017/04/16/amazons-elastic-file-system-burst-credits/)
+For more details on another person's experience with EFS, see this [Commit Brooklyn 2019 video](https://youtu.be/K6OS8WodRBQ?t=313).
 
 ## Avoid using CephFS and GlusterFS
 
 GitLab strongly recommends against using CephFS and GlusterFS.
-These distributed file systems are not well-suited for GitLab's input/output access patterns because git uses many small files and access times and file locking times to propagate will make git activity very slow.
+These distributed file systems are not well-suited for GitLab's input/output access patterns because Git uses many small files and access times and file locking times to propagate will make Git activity very slow.
 
 ## Avoid using PostgreSQL with NFS
 
@@ -147,7 +146,7 @@ Note there are several options that you should consider using:
 
 ## A single NFS mount
 
-It's recommended to nest all gitlab data dirs within a mount, that allows automatic
+It's recommended to nest all GitLab data dirs within a mount, that allows automatic
 restore of backups without manually moving existing data.
 
 ```

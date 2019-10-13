@@ -44,6 +44,10 @@ module EE
         nav_tabs << :dependencies
       end
 
+      if can?(current_user, :read_licenses_list, project)
+        nav_tabs << :licenses
+      end
+
       if ::Gitlab.config.packages.enabled &&
           project.feature_available?(:packages) &&
           can?(current_user, :read_package, project)
@@ -79,7 +83,7 @@ module EE
     def project_permissions_panel_data(project)
       super.merge(
         packagesAvailable: ::Gitlab.config.packages.enabled && project.feature_available?(:packages),
-        packagesHelpPath: help_page_path('user/project/packages/maven_repository')
+        packagesHelpPath: help_page_path('user/packages/index')
       )
     end
 
@@ -138,6 +142,7 @@ module EE
       %w[
         projects/security/dashboard#show
         projects/dependencies#show
+        projects/licenses#show
       ]
     end
 
@@ -220,6 +225,10 @@ module EE
       end
     end
 
+    def any_project_nav_tab?(tabs)
+      tabs.any? { |tab| project_nav_tab?(tab) }
+    end
+
     def settings_operations_available?
       return true if super
 
@@ -234,6 +243,18 @@ module EE
     override :can_import_members?
     def can_import_members?
       super && !membership_locked?
+    end
+
+    def api_projects_vulnerability_findings_path(project, pipeline)
+      params = { id: project.id, params: { pipeline_id: pipeline.id, scope: 'dismissed' } }
+
+      path = if ::Feature.enabled?(:first_class_vulnerabilities)
+               api_v4_projects_vulnerability_findings_path(params)
+             else
+               api_v4_projects_vulnerabilities_path(params)
+             end
+
+      expose_path(path)
     end
   end
 end

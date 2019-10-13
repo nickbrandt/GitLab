@@ -1,0 +1,46 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object" ,
+    "additionalProperties": false,
+    "properties": {
+      "label": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "text_color": {
+            "type": "string"
+          }
+        }
+      },
+      "series": {
+        "type": "array",
+        "items": [
+          {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": [
+              {
+                "description": "Creation date represented as string with ISO 8601 date format (YYYY-MM-DD).",
+                "type": "string"
+              },
+              {
+                "description": "Number of issues or merge requests created at the given date.",
+                "type": "integer"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

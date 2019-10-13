@@ -20,10 +20,10 @@ module EE
 
           override :whitelisted_routes
           def whitelisted_routes
-            super || geo_node_update_route || geo_proxy_git_push_ssh_route
+            super || geo_node_update_route? || geo_proxy_git_push_ssh_route?
           end
 
-          def geo_node_update_route
+          def geo_node_update_route?
             # Calling route_hash may be expensive. Only do it if we think there's a possible match
             return false unless request.path.start_with?('/admin/geo/')
 
@@ -37,11 +37,12 @@ module EE
             end
           end
 
-          def geo_proxy_git_push_ssh_route
+          def geo_proxy_git_push_ssh_route?
             routes = ::Gitlab::Middleware::ReadOnly::API_VERSIONS.map do |version|
               %W(/api/v#{version}/geo/proxy_git_push_ssh/info_refs
                  /api/v#{version}/geo/proxy_git_push_ssh/push)
             end
+
             routes.flatten.include?(request.path)
           end
         end

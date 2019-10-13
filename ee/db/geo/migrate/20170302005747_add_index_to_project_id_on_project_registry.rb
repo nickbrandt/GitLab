@@ -10,6 +10,6 @@ class AddIndexToProjectIdOnProjectRegistry < ActiveRecord::Migration[4.2]
   end
 
   def down
-    remove_index :project_registry, :project_id
+    remove_concurrent_index :project_registry, :project_id
   end
 end

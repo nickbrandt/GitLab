@@ -58,7 +58,7 @@ describe('EpicBodyComponent', () => {
       expect(relatedEpicsEl.querySelector('.card-title').innerText.trim()).toContain('Epics');
       expect(relatedEpicsEl.querySelector('.js-related-issues-header-issue-count')).not.toBeNull();
       expect(relatedEpicsEl.querySelector('button.js-issue-count-badge-add-button')).not.toBeNull();
-      expect(relatedEpicsEl.querySelector('.related-items-list')).not.toBeNull();
+      expect(relatedEpicsEl.querySelector('.related-items-list')).toBeNull();
     });
 
     it('renders related issues list elements', () => {
@@ -71,7 +71,7 @@ describe('EpicBodyComponent', () => {
         relatedIssuesEl.querySelector('button.js-issue-count-badge-add-button'),
       ).not.toBeNull();
 
-      expect(relatedIssuesEl.querySelector('.related-items-list')).not.toBeNull();
+      expect(relatedIssuesEl.querySelector('.related-items-list')).toBeNull();
     });
   });
 });

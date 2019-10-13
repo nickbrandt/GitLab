@@ -14,6 +14,7 @@ describe SentNotificationsController do
     let(:sent_notification) { create(:sent_notification, project: nil, noteable: epic, recipient: user) }
 
     before do
+      stub_licensed_features(epics: true)
       sign_in(user)
       get(:unsubscribe, params: { id: sent_notification.reply_key })
     end

@@ -175,7 +175,6 @@ export default {
       'metricsWithData',
       'useDashboardEndpoint',
       'allDashboards',
-      'multipleDashboardsEnabled',
       'additionalPanelTypesEnabled',
     ]),
     firstDashboard() {
@@ -262,7 +261,7 @@ export default {
       return window.URL.createObjectURL(data);
     },
     // TODO: BEGIN, Duplicated code with panel_type until feature flag is removed
-    // Issue number: https://gitlab.com/gitlab-org/gitlab-ce/issues/63845
+    // Issue number: https://gitlab.com/gitlab-org/gitlab-foss/issues/63845
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};
       const metricIdsForChart = queries.map(q => q.metricId);
@@ -272,7 +271,7 @@ export default {
       return Object.values(this.getGraphAlerts(queries));
     },
     showToast() {
-      this.$toast.show(__('Link copied to clipboard'));
+      this.$toast.show(__('Link copied'));
     },
     // TODO: END
     generateLink(group, title, yLabel) {
@@ -318,7 +317,6 @@ export default {
       <div class="row">
         <template v-if="environmentsEndpoint">
           <gl-form-group
-            v-if="multipleDashboardsEnabled"
             :label="__('Dashboard')"
             label-size="sm"
             label-for="monitor-dashboards-dropdown"
@@ -456,6 +454,7 @@ export default {
           <panel-type
             v-for="(graphData, graphIndex) in groupData.metrics"
             :key="`panel-type-${graphIndex}`"
+            class="col-12 col-lg-6 pb-3"
             :clipboard-text="generateLink(groupData.group, graphData.title, graphData.y_label)"
             :graph-data="graphData"
             :dashboard-width="elWidth"
@@ -468,6 +467,7 @@ export default {
           <monitor-time-series-chart
             v-for="(graphData, graphIndex) in chartsWithData(groupData.metrics)"
             :key="graphIndex"
+            class="col-12 col-lg-6 pb-3"
             :graph-data="graphData"
             :deployment-data="deploymentData"
             :thresholds="getGraphAlertValues(graphData.queries)"
@@ -475,7 +475,10 @@ export default {
             :project-path="projectPath"
             group-id="monitor-time-series-chart"
           >
-            <div class="d-flex align-items-center">
+            <div
+              class="d-flex align-items-center"
+              :class="alertWidgetAvailable ? 'justify-content-between' : 'justify-content-end'"
+            >
               <alert-widget
                 v-if="alertWidgetAvailable && graphData"
                 :modal-id="`alert-modal-${index}-${graphIndex}`"
@@ -486,7 +489,7 @@ export default {
               />
               <gl-dropdown
                 v-gl-tooltip
-                class="mx-2"
+                class="ml-2 mr-3"
                 toggle-class="btn btn-transparent border-0"
                 :right="true"
                 :no-caret="true"

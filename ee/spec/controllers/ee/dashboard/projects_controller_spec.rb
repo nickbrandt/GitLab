@@ -37,7 +37,7 @@ describe Dashboard::ProjectsController do
           end
 
           it 'renders the welcome page if it has not dismissed onboarding' do
-            allow(controller).to receive(:cookies).and_return({ 'onboarding_dismissed' => 'false' })
+            cookies[:onboarding_dismissed] = 'false'
 
             get :index
 
@@ -45,7 +45,7 @@ describe Dashboard::ProjectsController do
           end
 
           it 'renders the index template if it has dismissed the onboarding' do
-            allow(controller).to receive(:cookies).and_return({ 'onboarding_dismissed' => 'true' })
+            cookies[:onboarding_dismissed] = 'true'
 
             get :index
 

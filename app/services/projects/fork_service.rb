@@ -27,7 +27,7 @@ module Projects
         # the database so they'll get cleaned up.
         #
         # TODO: refactor this to get the correct lfs objects when implementing
-        #       https://gitlab.com/gitlab-org/gitlab-ce/issues/39769
+        #       https://gitlab.com/gitlab-org/gitlab-foss/issues/39769
         fork_to_project.lfs_objects_projects.delete_all
 
         fork_to_project
@@ -43,6 +43,7 @@ module Projects
         shared_runners_enabled:    @project.shared_runners_enabled,
         namespace_id:              target_namespace.id,
         fork_network:              fork_network,
+        ci_config_path:            @project.ci_config_path,
         # We need to set ci_default_git_depth to 0 for the forked project when
         # @project.ci_default_git_depth is nil in order to keep the same behaviour
         # and not get ProjectCiCdSetting::DEFAULT_GIT_DEPTH set on create
@@ -51,7 +52,8 @@ module Projects
         # been instantiated to avoid ActiveRecord trying to create it when
         # initializing the project, as that would cause a foreign key constraint
         # exception.
-        relations_block:           -> (project) { build_fork_network_member(project) }
+        relations_block:           -> (project) { build_fork_network_member(project) },
+        skip_disk_validation:      skip_disk_validation
       }
 
       if @project.avatar.present? && @project.avatar.image?
@@ -108,6 +110,10 @@ module Projects
 
     def target_namespace
       @target_namespace ||= @params[:namespace] || current_user.namespace
+    end
+
+    def skip_disk_validation
+      @skip_disk_validation ||= @params[:skip_disk_validation] || false
     end
 
     def allowed_visibility_level

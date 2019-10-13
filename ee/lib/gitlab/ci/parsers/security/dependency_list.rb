@@ -22,8 +22,8 @@ module Gitlab
           end
 
           def parse_licenses!(json_data, report)
-            licenses = JSON.parse(json_data, symbolize_names: true)
-            licenses[:dependencies].each do |license|
+            license_report = ::Gitlab::Ci::Reports::LicenseScanning::Report.parse_from(json_data)
+            license_report.licenses.each do |license|
               report.apply_license(license)
             end
           end

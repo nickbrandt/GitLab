@@ -8,9 +8,9 @@ import Callout from '~/vue_shared/components/callout.vue';
 export default {
   modalTitle: s__('FeatureFlags|Configure feature flags'),
   apiUrlLabelText: s__('FeatureFlags|API URL'),
-  apiUrlCopyText: __('Copy URL to clipboard'),
+  apiUrlCopyText: __('Copy URL'),
   instanceIdLabelText: s__('FeatureFlags|Instance ID'),
-  instanceIdCopyText: __('Copy ID to clipboard'),
+  instanceIdCopyText: __('Copy ID'),
   regenerateInstanceIdTooltip: __('Regenerate instance ID'),
   instanceIdRegenerateError: __('Unable to generate new instance ID'),
   instanceIdRegenerateText: __(

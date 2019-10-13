@@ -88,6 +88,20 @@ describe ApprovalMergeRequestRule do
         expect(rule).not_to be_valid
       end
     end
+
+    context 'any_approver rules' do
+      let(:rule) { build(:approval_merge_request_rule, merge_request: merge_request, rule_type: :any_approver) }
+
+      it 'is valid' do
+        expect(rule).to be_valid
+      end
+
+      it 'creating more than one any_approver rule raises an error' do
+        create(:approval_merge_request_rule, merge_request: merge_request, rule_type: :any_approver)
+
+        expect { rule.save }.to raise_error(ActiveRecord::RecordNotUnique)
+      end
+    end
   end
 
   context 'scopes'  do
@@ -173,6 +187,13 @@ describe ApprovalMergeRequestRule do
 
     it 'returns false for code owner records' do
       subject = create(:code_owner_rule, merge_request: merge_request)
+
+      expect(subject.regular).to eq(false)
+      expect(subject.regular?).to eq(false)
+    end
+
+    it 'returns false for any approver records' do
+      subject = create(:approval_merge_request_rule, merge_request: merge_request, rule_type: :any_approver)
 
       expect(subject.regular).to eq(false)
       expect(subject.regular?).to eq(false)
@@ -300,7 +321,7 @@ describe ApprovalMergeRequestRule do
 
       context "when the latest license report violates the compliance policy" do
         let(:license) { create(:software_license, name: license_report.license_names[0]) }
-        let(:license_report) { open_pipeline.license_management_report }
+        let(:license_report) { open_pipeline.license_scanning_report }
 
         specify { expect(subject.approvals_required).to be(project_approval_rule.approvals_required) }
       end

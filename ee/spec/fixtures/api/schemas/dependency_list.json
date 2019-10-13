@@ -12,8 +12,7 @@
       }
     },
     "report": {
-      "status": { "type": "string" },
-      "job_path": { "type": "string" }
+      "$ref": "./report_list.json"
     }
   },
   "additionalProperties": false

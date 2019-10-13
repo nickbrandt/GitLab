@@ -18,7 +18,10 @@ module EE
       'epic_date_changed' => 'calendar',
       'weight' => 'weight',
       'relate_epic' => 'epic',
-      'unrelate_epic' => 'epic'
+      'unrelate_epic' => 'epic',
+      'design_added' => 'doc-image',
+      'design_modified' => 'doc-image',
+      'design_removed' => 'doc-image'
     }.freeze
 
     override :system_note_icon_name

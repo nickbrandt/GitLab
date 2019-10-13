@@ -77,16 +77,18 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resource :insights, only: [:show] do
+      resource :insights, only: [:show], trailing_slash: true do
         collection do
           post :query
         end
       end
 
       resource :dependencies, only: [:show]
+      resource :licenses, only: [:show]
 
       namespace :security do
         resources :dependencies, only: [:index]
+        resources :licenses, only: [:index]
         resources :vulnerabilities, only: [:index] do
           collection do
             get :summary

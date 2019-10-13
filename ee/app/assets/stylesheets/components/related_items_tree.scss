@@ -1,4 +1,7 @@
 .related-items-tree {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+
   .btn-create-epic {
     .dropdown-menu {
       top: 100%;
@@ -18,6 +21,15 @@
   }
 
   .tree-item {
+    &.tree-item-drag-active {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .item-body {
+      cursor: grab;
+    }
+
     .btn-tree-item-chevron {
       margin-bottom: $gl-padding-4;
       margin-right: $gl-padding-4;
@@ -43,9 +55,11 @@
   }
 }
 
-.related-items-tree-body > .tree-root {
-  padding-top: $gl-vert-padding;
-  padding-bottom: 0;
+.related-items-tree-body {
+  > .tree-root {
+    padding-top: $gl-vert-padding;
+    padding-bottom: 0;
+  }
 }
 
 .tree-root > .list-item:last-child .tree-root:last-child {

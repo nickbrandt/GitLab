@@ -4,6 +4,113 @@ require 'spec_helper'
 describe API::Internal::Base do
   include EE::GeoHelpers
 
+  set(:primary_node) { create(:geo_node, :primary) }
+  set(:secondary_node) { create(:geo_node) }
+
+  describe 'POST /internal/post_receive', :geo do
+    set(:user) { create(:user) }
+    let(:key) { create(:key, user: user) }
+    set(:project) { create(:project, :repository, :wiki_repo) }
+    let(:secret_token) { Gitlab::Shell.secret_token }
+    let(:gl_repository) { "project-#{project.id}" }
+    let(:reference_counter) { double('ReferenceCounter') }
+
+    let(:identifier) { 'key-123' }
+
+    let(:valid_params) do
+      {
+        gl_repository: gl_repository,
+        secret_token: secret_token,
+        identifier: identifier,
+        changes: changes,
+        push_options: {}
+      }
+    end
+
+    let(:branch_name) { 'feature' }
+
+    let(:changes) do
+      "#{Gitlab::Git::BLANK_SHA} 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/#{branch_name}"
+    end
+
+    let(:git_push_http) { double('GitPushHttp') }
+
+    before do
+      project.add_developer(user)
+      allow(described_class).to receive(:identify).and_return(user)
+      allow_any_instance_of(Gitlab::Identifier).to receive(:identify).and_return(user)
+      stub_current_geo_node(primary_node)
+    end
+
+    context 'when the push was redirected from a Geo secondary to the primary' do
+      before do
+        expect(Gitlab::Geo::GitPushHttp).to receive(:new).with(identifier, gl_repository).and_return(git_push_http)
+        expect(git_push_http).to receive(:fetch_referrer_node).and_return(secondary_node)
+      end
+
+      context 'when the secondary has a GeoNodeStatus' do
+        context 'when the GeoNodeStatus db_replication_lag_seconds is greater than 0' do
+          let!(:status) { create(:geo_node_status, geo_node: secondary_node, db_replication_lag_seconds: 17) }
+
+          it 'includes current Geo secondary lag in the output' do
+            post api('/internal/post_receive'), params: valid_params
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(json_response['messages']).to include({
+              'type' => 'basic',
+              'message' => "Current replication lag: 17 seconds"
+            })
+          end
+        end
+
+        context 'when the GeoNodeStatus db_replication_lag_seconds is 0' do
+          let!(:status) { create(:geo_node_status, geo_node: secondary_node, db_replication_lag_seconds: 0) }
+
+          it 'does not include current Geo secondary lag in the output' do
+            post api('/internal/post_receive'), params: valid_params
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
+          end
+        end
+
+        context 'when the GeoNodeStatus db_replication_lag_seconds is nil' do
+          let!(:status) { create(:geo_node_status, geo_node: secondary_node, db_replication_lag_seconds: nil) }
+
+          it 'does not include current Geo secondary lag in the output' do
+            post api('/internal/post_receive'), params: valid_params
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
+          end
+        end
+      end
+
+      context 'when the secondary does not have a GeoNodeStatus' do
+        it 'does not include current Geo secondary lag in the output' do
+          post api('/internal/post_receive'), params: valid_params
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
+        end
+      end
+    end
+
+    context 'when the push was not redirected from a Geo secondary to the primary' do
+      before do
+        expect(Gitlab::Geo::GitPushHttp).to receive(:new).with(identifier, gl_repository).and_return(git_push_http)
+        expect(git_push_http).to receive(:fetch_referrer_node).and_return(nil)
+      end
+
+      it 'does not include current Geo secondary lag in the output' do
+        post api('/internal/post_receive'), params: valid_params
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['messages']).not_to include({ 'message' => a_string_matching('replication lag'), 'type' => anything })
+      end
+    end
+  end
+
   describe "POST /internal/allowed" do
     set(:user) { create(:user) }
     set(:key) { create(:key, user: user) }
@@ -147,17 +254,14 @@ describe API::Internal::Base do
     end
   end
 
-  describe "POST /internal/lfs_authenticate" do
+  describe "POST /internal/lfs_authenticate", :geo do
     let(:user) { create(:user) }
     let(:project) { create(:project, :repository) }
     let(:secret_token) { Gitlab::Shell.secret_token }
 
     context 'for a secondary node' do
-      let!(:primary) { create(:geo_node, :primary) }
-      let!(:secondary) { create(:geo_node) }
-
       before do
-        stub_current_geo_node(secondary)
+        stub_current_geo_node(secondary_node)
         project.add_developer(user)
       end
 

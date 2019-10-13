@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require 'spec_helper'
@@ -60,6 +59,14 @@ describe Gitlab::UrlBlocker do
         it 'raises an error' do
           stub_env('RSPEC_ALLOW_INVALID_URLS', 'false')
 
+          expect { subject }.to raise_error(described_class::BlockedUrlError)
+        end
+      end
+
+      context 'when domain is too long' do
+        let(:import_url) { 'https://example' + 'a' * 1024 + '.com' }
+
+        it 'raises an error' do
           expect { subject }.to raise_error(described_class::BlockedUrlError)
         end
       end

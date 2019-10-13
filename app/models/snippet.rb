@@ -14,6 +14,7 @@ class Snippet < ApplicationRecord
   include Editable
   include Gitlab::SQL::Pattern
   include FromUnion
+  extend ::Gitlab::Utils::Override
 
   cache_markdown_field :title, pipeline: :single_line
   cache_markdown_field :description
@@ -22,7 +23,7 @@ class Snippet < ApplicationRecord
   redact_field :description
 
   # Aliases to make application_helper#edited_time_ago_with_tooltip helper work properly with snippets.
-  # See https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/10392/diffs#note_28719102
+  # See https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/10392/diffs#note_28719102
   alias_attribute :last_edited_at, :updated_at
   alias_attribute :last_edited_by, :updated_by
 
@@ -189,6 +190,12 @@ class Snippet < ApplicationRecord
   def check_for_spam?
     visibility_level_changed?(to: Snippet::PUBLIC) ||
       (public? && (title_changed? || content_changed?))
+  end
+
+  # snippers are the biggest sources of spam
+  override :allow_possible_spam?
+  def allow_possible_spam?
+    false
   end
 
   def spammable_entity_type

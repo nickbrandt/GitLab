@@ -3,6 +3,46 @@
 require 'spec_helper'
 
 describe TrialRegistrationsController do
+  describe '#new' do
+    let(:user) { create(:user) }
+
+    before do
+      allow(Gitlab).to receive(:com?).and_return(true)
+    end
+
+    context 'when feature is turned off' do
+      before do
+        stub_feature_flags(improved_trial_signup: false)
+      end
+
+      it 'redirects to subscription portal trial url' do
+        get :new
+
+        expect(response).to redirect_to("#{EE::SUBSCRIPTIONS_URL}/trials/new?gl_com=true")
+      end
+    end
+
+    context 'when customer is authenticated' do
+      before do
+        sign_in(user)
+      end
+
+      it 'redirects to the new trial page' do
+        get :new
+
+        expect(response).to redirect_to(new_trial_url)
+      end
+    end
+
+    context 'when customer is not authenticated' do
+      it 'renders the regular template' do
+        get :new
+
+        expect(response).to render_template(:new)
+      end
+    end
+  end
+
   describe '#create' do
     before do
       stub_feature_flags(invisible_captcha: false)
@@ -40,7 +80,7 @@ describe TrialRegistrationsController do
       it 'returns not found' do
         post :create, params: { user: user_params }
 
-        expect(response.status).to eq(404)
+        expect(response).to redirect_to("#{EE::SUBSCRIPTIONS_URL}/trials/new?gl_com=true")
       end
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require Rails.root.join('ee', 'db', 'geo', 'migrate', '20180510223634_set_resync_flag_for_retried_projects.rb')
 

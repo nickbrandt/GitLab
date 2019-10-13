@@ -141,9 +141,9 @@ for the issue. This will automatically enable if you participate in the issue in
 
 #### 14. Reference
 
-- A quick "copy to clipboard" button for that issue's reference, which looks like `foo/bar#xxx`,
-  where `foo` is the `username` or `groupname`, `bar` is the `project-name`, and
-  `xxx` is the issue number.
+- A quick "copy" button for that issue's reference, which looks like
+  `foo/bar#xxx`, where `foo` is the `username` or `groupname`, `bar` is the
+  `project-name`, and `xxx` is the issue number.
 
 #### 15. Edit
 
@@ -156,19 +156,6 @@ does not have permission to edit the issue.
 The plain text title and description of the issue fill the top center of the issue page.
 The description fully supports [GitLab Flavored Markdown](../../markdown.md#gitlab-flavored-markdown-gfm),
 allowing many formatting options.
-
-##### Zoom call links
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/62966) in GitLab 12.0.
-
-Including a link to a [Zoom](https://zoom.us) call in the description of an issue
-results in a **Join Zoom meeting** button at the top of the issue, just under the header.
-
-For example:
-
-![Link Zoom Call in Issue](img/link_zoom_call_in_issue.png)
-
-To remove the button, edit the description and remove the Zoom call link.
 
 #### 17. Mentions
 
@@ -259,3 +246,15 @@ Once you write a comment, you can:
 ![Comment or thread](img/comment-or-discussion.png)
 
 You can also close the issue from here, so you don't need to scroll to the top of the issue page.
+
+#### 26. Zoom Meetings
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/31103) in GitLab 12.3.
+
+You can attach and remove Zoom meetings to issues using the `/zoom` and `/remove_zoom` [quick actions](../quick_actions.md) as part of
+[GitLab Flavored Markdown](../../markdown.md#gitlab-flavored-markdown-gfm).
+
+Attaching a [Zoom](https://zoom.us) call an issue
+results in a **Join Zoom meeting** button at the top of the issue, just under the header.
+
+![Link Zoom Call in Issue](img/zoom-quickaction-button.png)

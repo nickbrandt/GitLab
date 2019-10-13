@@ -80,8 +80,8 @@ export default {
     :class="{
       'has-children': hasChildren,
       'item-expanded': childrenFlags[itemReference].itemExpanded,
-      'js-item-type-epic': item.type === $options.ChildType.Epic,
-      'js-item-type-issue': item.type === $options.ChildType.Issue,
+      'js-item-type-epic item-type-epic': item.type === $options.ChildType.Epic,
+      'js-item-type-issue item-type-issue': item.type === $options.ChildType.Issue,
     }"
   >
     <div class="list-item-body d-flex align-items-center">

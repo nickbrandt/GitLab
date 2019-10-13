@@ -82,7 +82,7 @@ git push -u origin master
 ## Configure the production server
 
 Before we begin setting up Envoy and GitLab CI/CD, let's quickly make sure the production server is ready for deployment.
-We have installed LEMP stack which stands for Linux, Nginx, MySQL and PHP on our Ubuntu 16.04.
+We have installed LEMP stack which stands for Linux, NGINX, MySQL and PHP on our Ubuntu 16.04.
 
 ### Create a new user
 
@@ -151,11 +151,11 @@ git clone git@gitlab.example.com:<USERNAME>/laravel-sample.git
 Answer **yes** if asked `Are you sure you want to continue connecting (yes/no)?`.
 It adds GitLab.com to the known hosts.
 
-### Configuring Nginx
+### Configuring NGINX
 
 Now, let's make sure our web server configuration points to the `current/public` rather than `public`.
 
-Open the default Nginx server block configuration file by typing:
+Open the default NGINX server block configuration file by typing:
 
 ```bash
 sudo nano /etc/nginx/sites-available/default
@@ -437,7 +437,7 @@ We used `docker-php-ext-install` (provided by the official PHP Docker image) to 
 
 #### Setting Up GitLab Container Registry
 
-Now that we have our `Dockerfile` let's build and push it to our [GitLab Container Registry](../../../user/project/container_registry.md).
+Now that we have our `Dockerfile` let's build and push it to our [GitLab Container Registry](../../../user/packages/container_registry/index.md).
 
 > The registry is the place to store and tag images for later use. Developers may want to maintain their own registry for private, company images, or for throw-away images used only in testing. Using GitLab Container Registry means you don't need to set up and administer yet another service or use a public registry.
 
@@ -445,7 +445,7 @@ On your GitLab project repository navigate to the **Registry** tab.
 
 ![container registry page empty image](img/container_registry_page_empty_image.png)
 
-You may need to [enable Container Registry](../../../user/project/container_registry.md#enable-the-container-registry-for-your-project) to your project to see this tab. You'll find it under your project's **Settings > General > Permissions**.
+You may need to [enable Container Registry](../../../user/packages/container_registry/index.md#enable-the-container-registry-for-your-project) to your project to see this tab. You'll find it under your project's **Settings > General > Permissions**.
 
 To start using Container Registry on our machine, we first need to login to the GitLab registry using our GitLab username and password:
 

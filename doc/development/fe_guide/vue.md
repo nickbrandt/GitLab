@@ -1,14 +1,14 @@
 # Vue
 
-To get started with Vue, read through [their documentation][vue-docs].
+To get started with Vue, read through [their documentation](https://vuejs.org/v2/guide/).
 
 ## Examples
 
 What is described in the following sections can be found in these examples:
 
-- web ide: <https://gitlab.com/gitlab-org/gitlab-ce/tree/master/app/assets/javascripts/ide/stores>
-- security products: <https://gitlab.com/gitlab-org/gitlab-ee/tree/master/ee/app/assets/javascripts/vue_shared/security_reports>
-- registry: <https://gitlab.com/gitlab-org/gitlab-ce/tree/master/app/assets/javascripts/registry/stores>
+- web ide: <https://gitlab.com/gitlab-org/gitlab-foss/tree/master/app/assets/javascripts/ide/stores>
+- security products: <https://gitlab.com/gitlab-org/gitlab/tree/master/ee/app/assets/javascripts/vue_shared/security_reports>
+- registry: <https://gitlab.com/gitlab-org/gitlab-foss/tree/master/app/assets/javascripts/registry/stores>
 
 ## Vue architecture
 
@@ -103,6 +103,51 @@ document.addEventListener('DOMContentLoaded', () => new Vue({
   },
 }));
 ```
+
+#### Accessing feature flags
+
+Use Vue's [provide/inject](https://vuejs.org/v2/api/#provide-inject) mechanism
+to make feature flags available to any descendant components in a Vue
+application. The `glFeatures` object is already provided in `commons/vue.js`, so
+only the mixin is required to utilize the flags:
+
+```javascript
+// An arbitrary descendant component
+
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+
+export default {
+  // ...
+  mixins: [glFeatureFlagsMixin()],
+  // ...
+  created() {
+    if (this.glFeatures.myFlag) {
+      // ...
+    }
+  },
+}
+```
+
+This approach has a few benefits:
+
+- Arbitrarily deeply nested components can opt-in and access the flag without
+  intermediate components being aware of it (c.f. passing the flag down via
+  props).
+- Good testability, since the flag can be provided to `mount`/`shallowMount`
+  from `vue-test-utils` as easily as a prop.
+
+  ```javascript
+  import { shallowMount } from '@vue/test-utils';
+
+  shallowMount(component, {
+    provide: {
+      glFeatures: { myFlag: true },
+    },
+  });
+  ```
+
+- No need to access a global variable, except in the application's
+  [entry point](#accessing-the-gl-object).
 
 ### A folder for Components
 
@@ -245,13 +290,12 @@ One should apply to be a Vue.js expert by opening an MR when the Merge Request's
 - Vuex code follows the [documented pattern](vuex.md#actions-pattern-request-and-receive-namespaces)
 - Knowledge about the existing Vue and Vuex applications and existing reusable components
 
-[vue-docs]: http://vuejs.org/guide/index.html
-[issue-boards]: https://gitlab.com/gitlab-org/gitlab-ce/tree/master/app/assets/javascripts/boards
-[environments-table]: https://gitlab.com/gitlab-org/gitlab-ce/tree/master/app/assets/javascripts/environments
+[issue-boards]: https://gitlab.com/gitlab-org/gitlab-foss/tree/master/app/assets/javascripts/boards
+[environments-table]: https://gitlab.com/gitlab-org/gitlab-foss/tree/master/app/assets/javascripts/environments
 [page_specific_javascript]: ./performance.md#page-specific-javascript
 [component-system]: https://vuejs.org/v2/guide/#Composing-with-Components
 [state-management]: https://vuejs.org/v2/guide/state-management.html#Simple-State-Management-from-Scratch
 [one-way-data-flow]: https://vuejs.org/v2/guide/components.html#One-Way-Data-Flow
 [vue-test]: https://vuejs.org/v2/guide/unit-testing.html
-[flux]: https://facebook.github.io/flux
+[flux]: https://facebook.github.io/flux/
 [axios]: https://github.com/axios/axios

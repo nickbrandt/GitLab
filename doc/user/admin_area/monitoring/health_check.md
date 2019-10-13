@@ -59,7 +59,7 @@ GitLab OK
 
 ## Readiness
 
-The readiness probe checks whether the Gitlab instance is ready to use. It checks the dependent services (Database, Redis, Gitaly etc.) and gives a status for each.
+The readiness probe checks whether the GitLab instance is ready to use. It checks the dependent services (Database, Redis, Gitaly etc.) and gives a status for each.
 
 ```text
 GET /-/readiness
@@ -102,6 +102,9 @@ Example response:
 
 ## Liveness
 
+DANGER: **Warning:**
+In Gitlab [12.4](https://about.gitlab.com/upcoming-releases/) the response body of the Liveness check will change to match the example below.
+
 The liveness probe checks whether the application server is alive. Unlike the [`health`](#health) check, this check hits the database.
 
 ```text
@@ -116,28 +119,11 @@ curl 'https://gitlab.example.com/-/liveness'
 
 Example response:
 
-On success, the endpoint will return a valid successful HTTP status code, and a response like below.
+On success, the endpoint will return a `200` HTTP status code, and a response like below.
 
 ```json
 {
-   "db_check":{
-      "status":"ok"
-   },
-   "redis_check":{
-      "status":"ok"
-   },
-   "cache_check":{
-      "status":"ok"
-   },
-   "queues_check":{
-      "status":"ok"
-   },
-   "shared_state_check":{
-      "status":"ok"
-   },
-   "gitaly_check":{
-      "status":"ok"
-   }
+   "status": "ok"
 }
 ```
 
@@ -172,8 +158,8 @@ Each scenario can be a third-level heading, e.g. `### Getting error message X`.
 If you have none to add when creating a doc, leave this section in place
 but commented out to help encourage others to add to it in the future. -->
 
-[ce-10416]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/10416
-[ce-3888]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/3888
+[ce-10416]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/10416
+[ce-3888]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/3888
 [pingdom]: https://www.pingdom.com
 [nagios-health]: https://nagios-plugins.org/doc/man/check_http.html
 [newrelic-health]: https://docs.newrelic.com/docs/alerts/alert-policies/downtime-alerts/availability-monitoring

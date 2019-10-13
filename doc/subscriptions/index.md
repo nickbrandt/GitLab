@@ -192,13 +192,15 @@ account:
 
 #### Change associated namespace
 
-With a linked GitLab.com account, go to the
-[**Subscriptions**](https://customers.gitlab.com/subscriptions) page to choose
-or change the namespace your subscription applies to.
+With a linked GitLab.com account:
 
-NOTE: **Note:**
-Please note that you need to be a group owner to associate a group to your
-subscription.
+1. Log in to the [GitLab Subscription Manager](https://customers.gitlab.com/customers/sign_in).
+1. Navigate to the **Manage Purchases** page.
+1. Click **Change linked group**.
+1. Select the desired group from the **This subscription is for** dropdown.
+1. Click **Proceed to checkout**.
+
+Subscription charges are calculated based on the total number of users in a group, including its subgroups and nested projects. If the total number of users exceeds the number of seats in your subscription, you will be charged for the additional users.
 
 ### Confirm or upgrade your subscription
 
@@ -247,6 +249,9 @@ In order to purchase additional minutes, you should follow these steps:
 
    ![Additional minutes](img/additional_minutes.png)
 
+   The **Additional minutes** displayed now includes the purchased additional CI minutes, plus any
+   minutes rolled over from last month.
+
 Be aware that:
 
 1. If you have purchased extra CI minutes before the purchase of a paid plan,
@@ -275,7 +280,7 @@ However, depending on the tier and feature, your data may become inaccessible.
 
 Please note that some features may not behave as expected if a graceful
 fallback is not currently implemented. For example,
-[environment specific variables not being passed](https://gitlab.com/gitlab-org/gitlab-ce/issues/52825).
+[environment specific variables not being passed](https://gitlab.com/gitlab-org/gitlab-foss/issues/52825).
 
 If you renew or upgrade, your data will again be accessible.
 
@@ -296,9 +301,9 @@ topics covering the use and administration of GitLab.
 We also encourage all users to search our project trackers for known issues and
 existing feature requests in:
 
-- [GitLab CE](https://gitlab.com/gitlab-org/gitlab-ce/issues/) for features
+- [GitLab CE](https://gitlab.com/gitlab-org/gitlab-foss/issues/) for features
   included in all tiers.
-- [GitLab EE](https://gitlab.com/gitlab-org/gitlab-ee/issues/) for paid-tier
+- [GitLab EE](https://gitlab.com/gitlab-org/gitlab/issues/) for paid-tier
   features.
 
 These issues are the best avenue for getting updates on specific product plans

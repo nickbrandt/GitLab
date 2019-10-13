@@ -5,18 +5,30 @@ module QA
     module Page
       module Group
         module Settings
-          class General < QA::Page::Base
-            include ::QA::Page::Component::Select2
-            include ::QA::Page::Settings::Common
+          module General
+            prepend ::QA::Page::Component::Select2
+            prepend ::QA::Page::Settings::Common
 
-            view 'ee/app/views/groups/_custom_project_templates_setting.html.haml' do
-              element :custom_project_template_select
-              element :custom_project_templates
-              element :save_changes_button
-            end
+            def self.included(base)
+              base.class_eval do
+                view 'ee/app/views/groups/_custom_project_templates_setting.html.haml' do
+                  element :custom_project_template_select
+                  element :custom_project_templates
+                  element :save_changes_button
+                end
 
-            view 'ee/app/views/groups/settings/_ip_restriction.html.haml' do
-              element :ip_restriction_field
+                view 'ee/app/views/groups/settings/_ip_restriction.html.haml' do
+                  element :ip_restriction_field
+                end
+
+                view 'ee/app/views/groups/_member_lock_setting.html.haml' do
+                  element :membership_lock_checkbox
+                end
+
+                view 'ee/app/views/shared/_repository_size_limit_setting.html.haml' do
+                  element :repository_size_limit_field
+                end
+              end
             end
 
             def current_custom_project_template
@@ -43,6 +55,22 @@ module QA
               find_element(:ip_restriction_field).send_keys([:command, 'a'], :backspace)
               find_element(:ip_restriction_field).set ip_address
               click_element :save_permissions_changes_button
+            end
+
+            def set_membership_lock_enabled
+              expand_section :permission_lfs_2fa_section
+              check_element :membership_lock_checkbox
+              click_element :save_permissions_changes_button
+            end
+
+            def set_membership_lock_disabled
+              expand_section :permission_lfs_2fa_section
+              uncheck_element :membership_lock_checkbox
+              click_element :save_permissions_changes_button
+            end
+
+            def set_repository_size_limit(limit)
+              find_element(:repository_size_limit_field).set limit
             end
           end
         end

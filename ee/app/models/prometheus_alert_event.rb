@@ -3,6 +3,7 @@
 class PrometheusAlertEvent < ApplicationRecord
   belongs_to :project, required: true, validate: true, inverse_of: :prometheus_alert_events
   belongs_to :prometheus_alert, required: true, validate: true, inverse_of: :prometheus_alert_events
+  has_and_belongs_to_many :related_issues, class_name: 'Issue', join_table: :issues_prometheus_alert_events
 
   validates :payload_key, uniqueness: { scope: :prometheus_alert_id }
 
@@ -61,6 +62,10 @@ class PrometheusAlertEvent < ApplicationRecord
 
   def self.find_or_initialize_by_payload_key(project, alert, payload_key)
     find_or_initialize_by(project: project, prometheus_alert: alert, payload_key: payload_key)
+  end
+
+  def self.find_by_payload_key(payload_key)
+    find_by(payload_key: payload_key)
   end
 
   def self.status_value_for(name)

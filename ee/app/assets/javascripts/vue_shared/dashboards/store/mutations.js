@@ -49,7 +49,7 @@ export default {
   [types.REQUEST_SEARCH_RESULTS](state) {
     // Flipping this property separately to allows the UI
     // to hide the "minimum query" message
-    // before the seach results arrive from the API
+    // before the search results arrive from the API
     Vue.set(state.messages, 'minimumQuery', false);
 
     state.searchCount += 1;
@@ -59,13 +59,23 @@ export default {
     Vue.set(state.messages, 'noResults', state.projectSearchResults.length === 0);
     Vue.set(state.messages, 'searchError', false);
     Vue.set(state.messages, 'minimumQuery', false);
-    state.searchCount -= 1;
+
+    state.searchCount = Math.max(0, state.searchCount - 1);
   },
   [types.RECEIVE_SEARCH_RESULTS_ERROR](state, message) {
     state.projectSearchResults = [];
     Vue.set(state.messages, 'noResults', false);
     Vue.set(state.messages, 'searchError', true);
     Vue.set(state.messages, 'minimumQuery', message === 'minimumQuery');
-    state.searchCount -= 1;
+
+    state.searchCount = Math.max(0, state.searchCount - 1);
+  },
+  [types.MINIMUM_QUERY_MESSAGE](state) {
+    state.projectSearchResults = [];
+    Vue.set(state.messages, 'noResults', false);
+    Vue.set(state.messages, 'minimumQuery', true);
+    Vue.set(state.messages, 'searchError', false);
+
+    state.searchCount = Math.max(0, state.searchCount - 1);
   },
 };

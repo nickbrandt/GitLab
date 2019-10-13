@@ -13,7 +13,7 @@ describe('Productivity analytics table actions', () => {
   let mock;
 
   const groupNamespace = 'gitlab-org';
-  const projectPath = 'gitlab-test';
+  const projectPath = 'gitlab-org/gitlab-test';
 
   const filterParams = {
     days_to_merge: [5],
@@ -56,9 +56,12 @@ describe('Productivity analytics table actions', () => {
       },
       rootGetters: {
         // eslint-disable-next-line no-useless-computed-key
-        ['filters/getCommonFilterParams']: {
-          group_id: groupNamespace,
-          project_id: projectPath,
+        ['filters/getCommonFilterParams']: () => {
+          const params = {
+            group_id: groupNamespace,
+            project_id: projectPath,
+          };
+          return params;
         },
       },
       state: getInitialState(),
@@ -197,12 +200,12 @@ describe('Productivity analytics table actions', () => {
         done,
       ));
 
-    it('should not dispatch setColumnMetric when metric is "time_to_merge"', done =>
+    it('should not dispatch setColumnMetric when metric is "days_to_merge"', done =>
       testAction(
         actions.setSortField,
-        'time_to_merge',
+        'days_to_merge',
         mockedContext.state,
-        [{ type: types.SET_SORT_FIELD, payload: 'time_to_merge' }],
+        [{ type: types.SET_SORT_FIELD, payload: 'days_to_merge' }],
         [{ type: 'fetchMergeRequests' }],
         done,
       ));
@@ -232,13 +235,13 @@ describe('Productivity analytics table actions', () => {
       ));
   });
 
-  describe('setMergeRequestsPage', () => {
-    it('should commit setMergeRequestsPage', done =>
+  describe('setPage', () => {
+    it('should commit setPage', done =>
       testAction(
-        actions.setMergeRequestsPage,
+        actions.setPage,
         2,
         mockedContext.state,
-        [{ type: types.SET_MERGE_REQUESTS_PAGE, payload: 2 }],
+        [{ type: types.SET_PAGE, payload: 2 }],
         [{ type: 'fetchMergeRequests' }],
         done,
       ));

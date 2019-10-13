@@ -45,7 +45,7 @@ describe "User creates a merge request", :js do
       expect(page).to have_css("img[alt=\"#{approver.name}\"]")
     end
 
-    # TODO: Fix https://gitlab.com/gitlab-org/gitlab-ee/issues/11527
+    # TODO: Fix https://gitlab.com/gitlab-org/gitlab/issues/11527
     # page.within(".suggested-approvers") do
     #   expect(page).to have_content(user2.name)
     # end

@@ -6,6 +6,15 @@ module QA
       let(:wiki_content) { 'This tests wiki pushes via HTTP to secondary.' }
       let(:push_content) { 'This is from the Geo wiki push to secondary!' }
       let(:project_name) { "geo-wiki-project-#{SecureRandom.hex(8)}" }
+      let(:git_push_http_path_prefix) { '/-/push_from_secondary' }
+
+      after do
+        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects) do
+          Page::Main::Menu.perform do |menu|
+            menu.sign_out if menu.has_personal_area?(wait: 0)
+          end
+        end
+      end
 
       context 'wiki commit' do
         it 'is redirected to the primary and ultimately replicated to the secondary' do
@@ -48,13 +57,35 @@ module QA
 
             Page::Project::Menu.perform(&:click_wiki)
 
-            # Perform a git push over HTTP at the secondary
-            Resource::Repository::WikiPush.fabricate! do |push|
+            # Grab the HTTP URI for the secondary node and store as 'secondary_location'
+            Page::Project::Wiki::Show.perform do |show|
+              show.wait_for_repository_replication
+              show.click_clone_repository
+            end
+
+            secondary_location = Page::Project::Wiki::GitAccess.perform do |git_access|
+              git_access.choose_repository_clone_http
+              git_access.repository_location
+            end
+
+            # Perform a git push over HTTP to the secondary node
+            push = Resource::Repository::WikiPush.fabricate! do |push|
               push.wiki = wiki
+              push.repository_http_uri = secondary_location.uri
               push.file_name = 'Home.md'
               push.file_content = push_content
               push.commit_message = 'Update Home.md'
             end
+
+            # Check that the git cli produces the 'warning: redirecting to..(primary node)' output
+            primary_uri = wiki.repository_http_location.uri
+
+            # The secondary inserts a special path prefix.
+            # See `Gitlab::Geo::GitPushHttp::PATH_PREFIX`.
+            path = File.join(git_push_http_path_prefix, '\d+', primary_uri.path)
+            absolute_path = primary_uri.to_s.sub(primary_uri.path, path)
+
+            expect(push.output).to match(/warning: redirecting to #{absolute_path}/)
 
             # Validate git push worked and new content is visible
             Page::Project::Menu.perform(&:click_wiki)

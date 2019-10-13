@@ -13,13 +13,13 @@ please submit a merge request to add an upcoming class, assign to
 
 ## Adding classes
 
-1. All training materials of any kind should be added to [GitLab CE](https://gitlab.com/gitlab-org/gitlab-ce/)
+1. All training materials of any kind should be added to [GitLab CE](https://gitlab.com/gitlab-org/gitlab-foss/)
    to ensure they are available to a broad audience (don't use any other repo or
    storage for training materials).
 1. Don't make materials that are needlessly specific to one group of people, try
    to keep the wording broad and inclusive (don't make things for only GitLab Inc.
    people, only interns, only customers, etc.).
-1. To allow people to contribute all content should be in git.
+1. To allow people to contribute all content should be in Git.
 1. The content can go in a subdirectory under `/doc/university/`.
 1. To make, view or modify the slides of the classes use [Deckset](http://www.decksetapp.com/)
    or [RevealJS](http://lab.hakim.se/reveal-js/). Do not use Powerpoint or Google

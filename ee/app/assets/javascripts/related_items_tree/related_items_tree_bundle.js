@@ -16,7 +16,7 @@ export default () => {
     return false;
   }
 
-  const { iid, fullPath, autoCompleteEpics, autoCompleteIssues } = el.dataset;
+  const { id, iid, fullPath, autoCompleteEpics, autoCompleteIssues } = el.dataset;
   const initialData = JSON.parse(el.dataset.initial);
 
   Vue.component('tree-root', TreeRoot);
@@ -29,6 +29,7 @@ export default () => {
     created() {
       this.setInitialParentItem({
         fullPath,
+        id,
         iid: Number(iid),
         title: initialData.initialTitleText,
         reference: `${initialData.fullPath}${initialData.issuableRef}`,

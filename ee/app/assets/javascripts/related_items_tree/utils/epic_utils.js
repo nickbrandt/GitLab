@@ -5,6 +5,18 @@ import { ChildType, PathIdSeparator } from '../constants';
 export const gqClient = createGqClient();
 
 /**
+ * Returns a numeric representation of item
+ * order in an array.
+ *
+ * This method is to be used as comparision
+ * function for Array.sort
+ *
+ * @param {cbject} childA
+ * @param {object} childB
+ */
+export const sortChildren = (childA, childB) => childA.relativePosition - childB.relativePosition;
+
+/**
  * Returns formatted child item to include additional
  * flags and properties to use while rendering tree.
  * @param {Object} item
@@ -21,13 +33,15 @@ export const formatChildItem = item =>
  * @param {Array} children
  */
 export const extractChildEpics = children =>
-  children.edges.map(({ node, epicNode = node }) =>
-    formatChildItem({
-      ...epicNode,
-      fullPath: epicNode.group.fullPath,
-      type: ChildType.Epic,
-    }),
-  );
+  children.edges
+    .map(({ node, epicNode = node }) =>
+      formatChildItem({
+        ...epicNode,
+        fullPath: epicNode.group.fullPath,
+        type: ChildType.Epic,
+      }),
+    )
+    .sort(sortChildren);
 
 /**
  * Returns formatted array of Assignees that doesn't contain
@@ -47,13 +61,15 @@ export const extractIssueAssignees = assignees =>
  * @param {Array} issues
  */
 export const extractChildIssues = issues =>
-  issues.edges.map(({ node, issueNode = node }) =>
-    formatChildItem({
-      ...issueNode,
-      type: ChildType.Issue,
-      assignees: extractIssueAssignees(issueNode.assignees),
-    }),
-  );
+  issues.edges
+    .map(({ node, issueNode = node }) =>
+      formatChildItem({
+        ...issueNode,
+        type: ChildType.Issue,
+        assignees: extractIssueAssignees(issueNode.assignees),
+      }),
+    )
+    .sort(sortChildren);
 
 /**
  * Parses Graph query response and updates

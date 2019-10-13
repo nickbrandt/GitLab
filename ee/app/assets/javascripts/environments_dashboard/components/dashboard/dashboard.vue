@@ -99,9 +99,6 @@ export default {
     addProjects() {
       this.addProjectsToDashboard();
     },
-    onModalShown() {
-      this.$refs.projectSelector.focusSearchInput();
-    },
     onModalHidden() {
       this.clearSearchResults();
     },
@@ -127,7 +124,6 @@ export default {
       :ok-title="$options.addProjectsModalSubmit"
       :ok-disabled="okDisabled"
       ok-variant="success"
-      @shown="onModalShown"
       @hidden="onModalHidden"
       @ok="onOk"
     >

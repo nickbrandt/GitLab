@@ -1,5 +1,0 @@
----
-title: Show proper error in SCIM create user endpoint
-merge_request: 15756
-author:
-type: fixed

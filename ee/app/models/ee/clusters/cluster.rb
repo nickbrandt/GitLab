@@ -7,6 +7,7 @@ module EE
 
       prepended do
         prepend HasEnvironmentScope
+        include UsageStatistics
 
         validate :unique_environment_scope
       end
@@ -23,6 +24,10 @@ module EE
         end
 
         true
+      end
+
+      def prometheus_adapter
+        application_prometheus
       end
     end
   end

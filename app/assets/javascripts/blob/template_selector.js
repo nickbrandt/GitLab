@@ -1,6 +1,7 @@
-/* eslint-disable class-methods-use-this, no-unused-vars */
+/* eslint-disable class-methods-use-this */
 
 import $ from 'jquery';
+import '~/gl_dropdown';
 
 export default class TemplateSelector {
   constructor({ dropdown, data, pattern, wrapper, editor, $input } = {}) {
@@ -26,9 +27,14 @@ export default class TemplateSelector {
       search: {
         fields: ['name'],
       },
-      clicked: options => this.fetchFileTemplate(options),
+      clicked: options => this.onDropdownClicked(options),
       text: item => item.name,
     });
+  }
+
+  // Subclasses can override this method to conditionally prevent fetching file templates
+  onDropdownClicked(options) {
+    this.fetchFileTemplate(options);
   }
 
   initAutosizeUpdateEvent() {
@@ -61,7 +67,7 @@ export default class TemplateSelector {
     return this.requestFile(item);
   }
 
-  requestFile(item) {
+  requestFile() {
     // This `requestFile` method is an abstract method that should
     // be added by all subclasses.
   }
@@ -78,6 +84,10 @@ export default class TemplateSelector {
     if (this.editor instanceof $) {
       this.editor.get(0).dispatchEvent(this.autosizeUpdateEvent);
     }
+  }
+
+  getEditorContent() {
+    return this.editor.getValue();
   }
 
   startLoadingSpinner() {

@@ -17,7 +17,7 @@ module Geo
       def perform(operation, range)
         # TODO: This is a temporary workaround for backward compatibility
         # to avoid jobs that have been already scheduled to fail.
-        # See https://gitlab.com/gitlab-org/gitlab-ee/issues/13318
+        # See https://gitlab.com/gitlab-org/gitlab/issues/13318
         if operation.to_sym == :recheck_repositories
           operation = :reverify_repositories
         end

@@ -4,7 +4,7 @@ FactoryBot.modify do
   factory :import_state do
     trait :mirror do
       transient do
-        mirror true
+        mirror { true }
         import_url { generate(:url) }
       end
 
@@ -32,7 +32,7 @@ FactoryBot.modify do
     end
 
     trait :hard_failed do
-      status :failed
+      status { :failed }
       retry_count { Gitlab::Mirror::MAX_RETRY + 1 }
       last_update_at { Time.now - 1.minute }
     end

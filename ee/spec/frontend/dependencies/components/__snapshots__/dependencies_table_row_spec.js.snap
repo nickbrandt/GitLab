@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DependenciesTableRow component given the dependencyListVulnerabilities flag is enabled when a dependency with no vulnerabilities is loaded matches the snapshot 1`] = `
+exports[`DependenciesTableRow component when a dependency with no vulnerabilities is loaded matches the snapshot 1`] = `
 <div
   class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
 >
@@ -25,7 +25,6 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
         >
           <icon-stub
             class="align-middle mr-1"
-            cssclasses=""
             name="check-circle"
             size="16"
           />
@@ -134,7 +133,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
 </div>
 `;
 
-exports[`DependenciesTableRow component given the dependencyListVulnerabilities flag is enabled when a dependency with vulnerabilities is loaded matches the snapshot 1`] = `
+exports[`DependenciesTableRow component when a dependency with vulnerabilities is loaded matches the snapshot 1`] = `
 <div
   class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
 >
@@ -160,7 +159,6 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
         >
           <icon-stub
             class="align-top text-secondary-700 d-none d-md-inline"
-            cssclasses=""
             name="arrow-down"
             size="16"
           />
@@ -270,148 +268,28 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
 </div>
 `;
 
-exports[`DependenciesTableRow component given the dependencyListVulnerabilities flag is enabled when loading matches the snapshot 1`] = `
-<div
-  class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
->
-  <glskeletonloading-stub
-    class="d-flex flex-column justify-content-center h-auto"
-    lines="1"
-  />
-   
-  <!---->
-</div>
-`;
-
-exports[`DependenciesTableRow component given the dependencyListVulnerabilities flag is enabled when passed no props matches the snapshot 1`] = `
-<div
-  class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
->
-  <glskeletonloading-stub
-    class="d-flex flex-column justify-content-center h-auto"
-    lines="1"
-  />
-   
-  <!---->
-</div>
-`;
-
-exports[`DependenciesTableRow component when a dependency is loaded matches the snapshot 1`] = `
-<div
-  class="gl-responsive-table-row p-2"
->
-  <div
-    class="table-section section-20 section-wrap pr-md-3"
-  >
-    <div
-      class="table-mobile-header"
-      role="rowheader"
-    >
-      Component
-    </div>
-     
-    <div
-      class="table-mobile-content"
-    >
-      left-pad
-    </div>
-  </div>
-   
-  <div
-    class="table-section section-10 pr-md-3"
-  >
-    <div
-      class="table-mobile-header"
-      role="rowheader"
-    >
-      Version
-    </div>
-     
-    <div
-      class="table-mobile-content"
-    >
-      0.0.3
-    </div>
-  </div>
-   
-  <div
-    class="table-section section-20 section-wrap pr-md-3"
-  >
-    <div
-      class="table-mobile-header"
-      role="rowheader"
-    >
-      Packager
-    </div>
-     
-    <div
-      class="table-mobile-content"
-    >
-      JavaScript (yarn)
-    </div>
-  </div>
-   
-  <div
-    class="table-section section-15 section-wrap pr-md-3"
-  >
-    <div
-      class="table-mobile-header"
-      role="rowheader"
-    >
-      Location
-    </div>
-     
-    <div
-      class="table-mobile-content"
-    >
-      <a
-        href="/a-group/a-project/blob/da39a3ee5e6b4b0d3255bfef95601890afd80709/yarn.lock"
-      >
-        yarn.lock
-      </a>
-    </div>
-  </div>
-   
-  <div
-    class="table-section section-15"
-  >
-    <div
-      class="table-mobile-header"
-      role="rowheader"
-    >
-      License
-    </div>
-     
-    <div
-      class="table-mobile-content"
-    >
-      <dependencylicenselinks-stub
-        licenses=""
-        title="left-pad"
-      />
-    </div>
-  </div>
-</div>
-`;
-
 exports[`DependenciesTableRow component when loading matches the snapshot 1`] = `
 <div
-  class="gl-responsive-table-row p-2"
+  class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
 >
   <glskeletonloading-stub
-    class="d-flex flex-column justify-content-center"
+    class="d-flex flex-column justify-content-center h-auto"
     lines="1"
   />
+   
+  <!---->
 </div>
 `;
 
 exports[`DependenciesTableRow component when passed no props matches the snapshot 1`] = `
 <div
-  class="gl-responsive-table-row p-2"
+  class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
 >
   <glskeletonloading-stub
-    class="d-flex flex-column justify-content-center"
+    class="d-flex flex-column justify-content-center h-auto"
     lines="1"
   />
+   
+  <!---->
 </div>
 `;

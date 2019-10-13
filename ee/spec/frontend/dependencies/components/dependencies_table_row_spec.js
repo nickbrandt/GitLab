@@ -2,7 +2,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import DependenciesTableRow from 'ee/dependencies/components/dependencies_table_row.vue';
 import DependencyVulnerability from 'ee/dependencies/components/dependency_vulnerability.vue';
 import { MAX_DISPLAYED_VULNERABILITIES_PER_DEPENDENCY } from 'ee/dependencies/components/constants';
-import { makeDependency, provideEnabledFeatureFlag } from './utils';
+import { makeDependency } from './utils';
 import mockDataVulnerabilities from '../../../javascripts/security_dashboard/store/vulnerabilities/data/mock_data_vulnerabilities.json';
 
 describe('DependenciesTableRow component', () => {
@@ -66,12 +66,12 @@ describe('DependenciesTableRow component', () => {
     });
   });
 
-  describe('when a dependency is loaded', () => {
+  describe('when a dependency with no vulnerabilities is loaded', () => {
     beforeEach(() => {
       factory({
         propsData: {
           isLoading: false,
-          dependency: makeDependency(),
+          dependency: makeDependency({ vulnerabilities: [] }),
         },
       });
     });
@@ -81,123 +81,78 @@ describe('DependenciesTableRow component', () => {
     });
   });
 
-  describe('given the dependencyListVulnerabilities flag is enabled', () => {
-    describe('when passed no props', () => {
-      beforeEach(() => {
-        factory(provideEnabledFeatureFlag());
-      });
-
-      it('matches the snapshot', () => {
-        expect(wrapper.element).toMatchSnapshot();
-      });
-    });
-
-    describe('when loading', () => {
-      beforeEach(() => {
-        factory({
-          ...provideEnabledFeatureFlag(),
-          propsData: {
-            isLoading: true,
-          },
-        });
-      });
-
-      it('matches the snapshot', () => {
-        expect(wrapper.element).toMatchSnapshot();
+  describe('when a dependency with vulnerabilities is loaded', () => {
+    beforeEach(() => {
+      factory({
+        propsData: {
+          isLoading: false,
+          dependency: makeDependency({ vulnerabilities: mockDataVulnerabilities }),
+        },
       });
     });
 
-    describe('when a dependency with no vulnerabilities is loaded', () => {
-      beforeEach(() => {
-        factory({
-          ...provideEnabledFeatureFlag(),
-          propsData: {
-            isLoading: false,
-            dependency: makeDependency({ vulnerabilities: [] }),
-          },
-        });
-      });
-
-      it('matches the snapshot', () => {
-        expect(wrapper.element).toMatchSnapshot();
-      });
+    it('matches the snapshot', () => {
+      expect(wrapper.element).toMatchSnapshot();
     });
 
-    describe('when a dependency with vulnerabilities is loaded', () => {
-      beforeEach(() => {
-        factory({
-          ...provideEnabledFeatureFlag(),
-          propsData: {
-            isLoading: false,
-            dependency: makeDependency({ vulnerabilities: mockDataVulnerabilities }),
-          },
-        });
+    describe('when the list of vulnerabilities is expanded', () => {
+      beforeEach(clickToggle);
+
+      it('renders each vulnerability', () => {
+        expectVulnerabilitiesExpanded(mockDataVulnerabilities);
       });
 
-      it('matches the snapshot', () => {
-        expect(wrapper.element).toMatchSnapshot();
-      });
-
-      describe('when the list of vulnerabilities is expanded', () => {
+      describe('when clicking the toggle ', () => {
         beforeEach(clickToggle);
 
-        it('renders each vulnerability', () => {
-          expectVulnerabilitiesExpanded(mockDataVulnerabilities);
-        });
+        it('closes the list of vulnerabilities', expectVulnerabilitiesCollapsed);
+      });
 
-        describe('when clicking the toggle ', () => {
-          beforeEach(clickToggle);
-
-          it('closes the list of vulnerabilities', expectVulnerabilitiesCollapsed);
-        });
-
-        describe('when the dependency prop changes', () => {
-          beforeEach(() => {
-            wrapper.setProps({
-              dependency: makeDependency({ vulnerabilities: mockDataVulnerabilities }),
-            });
-
-            return wrapper.vm.$nextTick();
+      describe('when the dependency prop changes', () => {
+        beforeEach(() => {
+          wrapper.setProps({
+            dependency: makeDependency({ vulnerabilities: mockDataVulnerabilities }),
           });
 
-          it('closes the list of vulnerabilities', expectVulnerabilitiesCollapsed);
+          return wrapper.vm.$nextTick();
         });
 
-        describe('when the isLoading prop changes', () => {
-          beforeEach(() => {
-            wrapper.setProps({
-              isLoading: true,
-            });
+        it('closes the list of vulnerabilities', expectVulnerabilitiesCollapsed);
+      });
 
-            return wrapper.vm.$nextTick();
+      describe('when the isLoading prop changes', () => {
+        beforeEach(() => {
+          wrapper.setProps({
+            isLoading: true,
           });
 
-          it('closes the list of vulnerabilities', expectVulnerabilitiesCollapsed);
+          return wrapper.vm.$nextTick();
         });
+
+        it('closes the list of vulnerabilities', expectVulnerabilitiesCollapsed);
       });
     });
+  });
 
-    describe('when a dependency with a huge number vulnerabilities is loaded and expanded', () => {
-      beforeEach(() => {
-        const hugeNumberOfVulnerabilities = Array(1 + MAX_DISPLAYED_VULNERABILITIES_PER_DEPENDENCY)
-          .fill(null)
-          .map((_, id) => ({ id }));
+  describe('when a dependency with a huge number vulnerabilities is loaded and expanded', () => {
+    beforeEach(() => {
+      const hugeNumberOfVulnerabilities = Array(1 + MAX_DISPLAYED_VULNERABILITIES_PER_DEPENDENCY)
+        .fill(null)
+        .map((_, id) => ({ id }));
 
-        factory({
-          ...provideEnabledFeatureFlag(),
-          propsData: {
-            isLoading: false,
-            dependency: makeDependency({ vulnerabilities: hugeNumberOfVulnerabilities }),
-          },
-        });
-
-        return clickToggle();
+      factory({
+        propsData: {
+          isLoading: false,
+          dependency: makeDependency({ vulnerabilities: hugeNumberOfVulnerabilities }),
+        },
       });
 
-      it('does not render all of them', () => {
-        expect(findVulnerabilities().length).toBe(MAX_DISPLAYED_VULNERABILITIES_PER_DEPENDENCY);
-        expect(findExcessMessage().isVisible()).toBe(true);
-      });
+      return clickToggle();
+    });
+
+    it('does not render all of them', () => {
+      expect(findVulnerabilities().length).toBe(MAX_DISPLAYED_VULNERABILITIES_PER_DEPENDENCY);
+      expect(findExcessMessage().isVisible()).toBe(true);
     });
   });
 });

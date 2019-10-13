@@ -82,7 +82,10 @@ module Elastic
         {
           query: {
             bool: {
-              filter: [{ term: { iid: iid } }]
+              filter: [
+                { term: { iid: iid } },
+                { term: { type: self.es_type } }
+              ]
             }
           }
         }
@@ -128,7 +131,7 @@ module Elastic
         # anonymous users.
         # Pick private, internal and public projects the user is a member of.
         # Pick all private projects for admins & auditors.
-        conditions = [pick_projects_by_membership(project_ids, features)]
+        conditions = [pick_projects_by_membership(project_ids, user, features)]
 
         if public_and_internal_projects
           # Skip internal projects for anonymous and external users.
@@ -152,15 +155,28 @@ module Elastic
       # Admins & auditors are given access to all private projects. Access to
       # internal or public projects where the project feature is private is not
       # granted here.
-      def pick_projects_by_membership(project_ids, features = nil)
-        condition =
+      def pick_projects_by_membership(project_ids, user, features = nil)
+        if features.nil?
           if project_ids == :any
-            { term: { visibility_level: Project::PRIVATE } }
+            return { term: { visibility_level: Project::PRIVATE } }
           else
-            { terms: { id: project_ids } }
+            return { terms: { id: project_ids } }
           end
+        end
 
-        limit_by_feature(condition, features, include_members_only: true)
+        Array(features).map do |feature|
+          condition =
+            if project_ids == :any
+              { term: { visibility_level: Project::PRIVATE } }
+            else
+              { terms: { id: filter_ids_by_feature(project_ids, user, feature) } }
+            end
+
+          limit =
+            { terms: { "#{feature}_access_level" => [::ProjectFeature::ENABLED, ::ProjectFeature::PRIVATE] } }
+
+          { bool: { filter: [condition, limit] } }
+        end
       end
 
       # Grant access to projects of the specified visibility level to the user.
@@ -197,6 +213,13 @@ module Elastic
 
           { bool: { filter: [condition, limit] } }
         end
+      end
+
+      def filter_ids_by_feature(project_ids, user, feature)
+        Project
+          .id_in(project_ids)
+          .filter_by_feature_visibility(feature, user)
+          .pluck_primary_key
       end
     end
   end

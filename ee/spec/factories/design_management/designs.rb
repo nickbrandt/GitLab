@@ -11,7 +11,7 @@ FactoryBot.define do
         project = design.project
         repository = project.design_repository
         repository.create_if_not_exists
-        dv_table_name = DesignManagement::DesignVersion.table_name
+        dv_table_name = DesignManagement::Action.table_name
         updates = [0, evaluator.versions_count - (evaluator.deleted ? 2 : 1)].max
 
         run_action = ->(action) do
@@ -38,7 +38,7 @@ FactoryBot.define do
       with_file
 
       transient do
-        file Gitlab::Git::LfsPointerFile.new('').pointer
+        file { Gitlab::Git::LfsPointerFile.new('').pointer }
       end
     end
 
@@ -46,8 +46,8 @@ FactoryBot.define do
     # want to pay for gitlay calls.
     trait :with_versions do
       transient do
-        deleted false
-        versions_count 1
+        deleted { false }
+        versions_count { 1 }
         sequence(:file) { |n| "some-file-content-#{n}" }
       end
 
@@ -67,9 +67,9 @@ FactoryBot.define do
     # with correctly made commits in the repository and files that can be retrieved.
     trait :with_file do
       transient do
-        deleted false
-        versions_count 1
-        file File.join(Rails.root, 'spec/fixtures/dk.png')
+        deleted { false }
+        versions_count { 1 }
+        file { File.join(Rails.root, 'spec/fixtures/dk.png') }
       end
 
       after :create do |design, evaluator|

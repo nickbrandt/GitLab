@@ -41,9 +41,14 @@ describe Projects::Prometheus::AlertPresenter do
 
     context 'without default payload' do
       it do
-        is_expected.to include('## Summary')
-        is_expected.to include('* starts_at:')
-        is_expected.not_to include('* full_query:')
+        is_expected.to eq(
+          <<~MARKDOWN.chomp
+            #### Summary
+
+            **starts_at:** #{presenter.starts_at}
+
+          MARKDOWN
+        )
       end
     end
 
@@ -53,8 +58,17 @@ describe Projects::Prometheus::AlertPresenter do
       end
 
       it do
-        is_expected.to include('* foo: value1')
-        is_expected.to include('* bar: value2')
+        is_expected.to eq(
+          <<~MARKDOWN.chomp
+            #### Summary
+
+            **starts_at:** #{presenter.starts_at}
+
+            #### Alert Details
+
+            **foo:** value1  \n**bar:** value2
+          MARKDOWN
+        )
       end
     end
 
@@ -63,7 +77,16 @@ describe Projects::Prometheus::AlertPresenter do
         payload['generatorURL'] = 'http://host?g0.expr=query'
       end
 
-      it { is_expected.to include('* full_query: `query`') }
+      it do
+        is_expected.to eq(
+          <<~MARKDOWN.chomp
+            #### Summary
+
+            **starts_at:** #{presenter.starts_at}  \n**full_query:** `query`
+
+          MARKDOWN
+        )
+      end
     end
   end
 

@@ -5,7 +5,7 @@ last_update: 2019-07-03
 
 # Pipelines for Merged Results **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7380) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.10.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7380) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.10.
 
 It's possible for your source and target branches to diverge, which can result
 in the scenario that source branch's pipeline was green, the target's pipeline was green,
@@ -42,10 +42,10 @@ Pipelines for merged results require a [GitLab Runner][runner] 11.9 or newer.
 In addition, pipelines for merged results have the following limitations:
 
 - Forking/cross-repo workflows are not currently supported. To follow progress,
-  see [#11934](https://gitlab.com/gitlab-org/gitlab-ee/issues/11934).
+  see [#11934](https://gitlab.com/gitlab-org/gitlab/issues/11934).
 - This feature is not available for
   [fast forward merges](../../../user/project/merge_requests/fast_forward_merge.md) yet.
-  To follow progress, see [#58226](https://gitlab.com/gitlab-org/gitlab-ce/issues/58226).
+  To follow progress, see [#58226](https://gitlab.com/gitlab-org/gitlab-foss/issues/58226).
 
 ## Enabling Pipelines for Merged Results
 
@@ -63,7 +63,7 @@ otherwise pipelines for merged results won't run and your merge requests will be
 
 ## Automatic pipeline cancelation
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/12996) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12996) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.3.
 
 GitLab CI can detect the presence of redundant pipelines,
 and will cancel them automatically in order to conserve CI resources.
@@ -92,6 +92,17 @@ To check these feature flag values, please ask administrator to execute the foll
 > Feature.enabled?(:ci_use_merge_request_ref)       # Check if it's enabled or not.
 > Feature.enable(:ci_use_merge_request_ref)         # Enable the feature flag.
 ```
+
+### Intermittently pipelines fail by `fatal: reference is not a tree:` error
+
+Since pipelines for merged results are a run on a merge ref of a merge request
+(`refs/merge-requests/<iid>/merge`), the git-reference could be overwritten at an
+unexpected timing, for example, when a source or target branch is advanced.
+In this case, the pipeline fails because of `fatal: reference is not a tree:` error,
+which indicates that the checkout-SHA is not found in the merge ref.
+
+This behavior was improved at GitLab 12.4 by introducing [Persistent pipeline refs](../../pipelines.md#persistent-pipeline-refs).
+You should be able to create pipelines at any timings without concerning the error.
 
 ## Using Merge Trains **(PREMIUM)**
 

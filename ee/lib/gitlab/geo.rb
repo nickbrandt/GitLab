@@ -98,9 +98,13 @@ module Gitlab
     end
 
     def self.expire_cache!
-      CACHE_KEYS.each do |raw_key|
-        l1_cache.expire(raw_key)
-        l2_cache.expire(raw_key)
+      expire_cache_keys!(CACHE_KEYS)
+    end
+
+    def self.expire_cache_keys!(keys)
+      keys.each do |key|
+        l1_cache.expire(key)
+        l2_cache.expire(key)
       end
 
       true

@@ -1,0 +1,5 @@
+---
+title: Make name an optional parameter of releases
+merge_request: 16647
+author:
+type: changed

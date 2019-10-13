@@ -144,21 +144,19 @@ refresh_service.execute(oldrev, newrev, ref)
 
 ## Do not `rescue Exception`
 
-See ["Why is it bad style to `rescue Exception => e` in Ruby?"][Exception].
+See ["Why is it bad style to `rescue Exception => e` in Ruby?"](https://stackoverflow.com/questions/10048173/why-is-it-bad-style-to-rescue-exception-e-in-ruby).
 
 _**Note:** This rule is [enforced automatically by
-Rubocop](https://gitlab.com/gitlab-org/gitlab-ce/blob/8-4-stable/.rubocop.yml#L911-914)._
-
-[Exception]: http://stackoverflow.com/q/10048173/223897
+Rubocop](https://gitlab.com/gitlab-org/gitlab/blob/8-4-stable/.rubocop.yml#L911-914)._
 
 ## Do not use inline JavaScript in views
 
 Using the inline `:javascript` Haml filters comes with a
 performance overhead. Using inline JavaScript is not a good way to structure your code and should be avoided.
 
-_**Note:** We've [removed these two filters](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/config/initializers/hamlit.rb)
+_**Note:** We've [removed these two filters](https://gitlab.com/gitlab-org/gitlab/blob/master/config/initializers/hamlit.rb)
 in an initializer._
 
 ### Further reading
 
-- Stack Overflow: [Why you should not write inline JavaScript](http://programmers.stackexchange.com/questions/86589/why-should-i-avoid-inline-scripting)
+- Stack Overflow: [Why you should not write inline JavaScript](https://softwareengineering.stackexchange.com/questions/86589/why-should-i-avoid-inline-scripting)

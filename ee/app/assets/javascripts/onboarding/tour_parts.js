@@ -8,7 +8,7 @@ const GUIDED_GITLAB_TOUR = [
       {
         text: sprintf(
           s__(
-            'UserOnboardingTour|Welcome to the project overview of the %{emphasisStart}%{projectName}%{emphasisEnd} project. This is the project that we uese to work on GitLab. At first, a project seems like a simple repository, but at GitLab, a project is so much more.%{lineBreak}%{lineBreak}You can create projects for hosting your codebase, use it as an issue tracker, collaboreate on code, and continuously build, test, and deploy your app with built-in GitLab CI/CD.',
+            'UserOnboardingTour|Welcome to the project overview of the %{emphasisStart}%{projectName}%{emphasisEnd} project. This is the project that we use to work on GitLab. At first, a project seems like a simple repository, but at GitLab, a project is so much more.%{lineBreak}%{lineBreak}You can create projects for hosting your codebase, use it as an issue tracker, collaborate on code, and continuously build, test, and deploy your app with built-in GitLab CI/CD.',
           ),
           {
             emphasisStart: '<strong>',
@@ -41,7 +41,7 @@ const GUIDED_GITLAB_TOUR = [
       {
         text: sprintf(
           s__(
-            "UserOnboardingTour|This is the repository for the %{emphasisStart}%{projectName}%{emphasisEnd} project. All our code is stored here. Feel free to explore around and take a closer look at folders and files.%{lineBreak}%{lineBreak}Above the file structure, you can see the latest commit, who the author is and the status of the CI/CD pipeline.%{lineBreak}%{lineBreak}If you scroll down, below the file strcture, you'll find the Readme of this project. This is defined in the README.md file at the root of the repository.",
+            "UserOnboardingTour|This is the repository for the %{emphasisStart}%{projectName}%{emphasisEnd} project. All our code is stored here. Feel free to explore and take a closer look at folders and files.%{lineBreak}%{lineBreak}Above the file structure you can see the latest commit, who the author is and the status of the CI/CD pipeline.%{lineBreak}%{lineBreak}If you scroll down below the file structure, you'll find the Readme of this project. This is defined in the README.md file at the root of the repository.",
           ),
           {
             emphasisStart: '<strong>',
@@ -119,7 +119,7 @@ const GUIDED_GITLAB_TOUR = [
       {
         text: sprintf(
           s__(
-            "UserOnboardingTour|Here's an overview of branches in the %{emphasisStart}%{projectName}%{emphasisEnd} project. They're split into Active and Stale.%{lineBreak}%{lineBreak}From here, you can create a new merge request, from a branch or compare the branch to any other branch in the project. By default, it will compare it to the master branch.",
+            "UserOnboardingTour|Here's an overview of branches in the %{emphasisStart}%{projectName}%{emphasisEnd} project. They're split into Active and Stale.%{lineBreak}%{lineBreak}From here, you can create a new merge request from a branch, or compare the branch to any other branch in the project. By default, it will compare it to the master branch.",
           ),
           {
             emphasisStart: '<strong>',
@@ -177,7 +177,7 @@ const GUIDED_GITLAB_TOUR = [
       {
         text: sprintf(
           s__(
-            'UserOnboardingTour|Issues are great for communicating and keeping track of progess in GitLab. These are all issues that are open in the %{emphasisStart}%{projectName}%{emphasisEnd}.%{lineBreak}%{lineBreak}You can help us improve GitLab by contributing work to issues that are labeled <span class="badge color-label accept-mr-label">Accepting merge requests</span>.%{lineBreak}%{lineBreak}This list can be filtered by labels, milestones, assignees, authors... We\'ll show you how it looks like when the list is filtered by a label.',
+            'UserOnboardingTour|Issues are great for communicating and keeping track of progress in GitLab. These are all issues that are open in the %{emphasisStart}%{projectName}%{emphasisEnd}.%{lineBreak}%{lineBreak}You can help us improve GitLab by contributing work to issues that are labeled <span class="badge color-label accept-mr-label">Accepting merge requests</span>.%{lineBreak}%{lineBreak}This list can be filtered by labels, milestones, assignees, authors... We\'ll show you how it looks when the list is filtered by a label.',
           ),
           {
             emphasisStart: '<strong>',
@@ -275,7 +275,7 @@ const GUIDED_GITLAB_TOUR = [
       {
         text: sprintf(
           s__(
-            "UserOnboardingTour|The structure of this page is very similar to the onfe of issues. Status, description, discussion and the sidebar are all here.%{lineBreak}%{lineBreak}But take a look below the description and you'll notice that there's more information about the merge request, the CI/CD pipeline and the options for approving it.%{lineBreak}%{lineBreak}Below, alongside the discussion you can also see more information about commits in this merge request, the status of pipelines and review all changes that were made.",
+            "UserOnboardingTour|The structure of this page is very similar to issues. Status, description, discussion and the sidebar are all here.%{lineBreak}%{lineBreak}But take a look below the description and you'll notice that there's more information about the merge request, the CI/CD pipeline and the options for approving it.%{lineBreak}%{lineBreak}Alongside the discussion you can also see more information about commits in this merge request, the status of pipelines and review all changes that were made.",
           ),
           {
             lineBreak: '</br>',
@@ -289,7 +289,7 @@ const GUIDED_GITLAB_TOUR = [
       selector: '#js-onboarding-pipelines-link',
       text: sprintf(
         s__(
-          "UserOnboardingTour|That's it for merge requests. Now for the finla part of this guided tour - the %{emphasisStart}CI/CD%{emphasisEnd}.",
+          "UserOnboardingTour|That's it for merge requests. Now for the final part of this guided tour - the %{emphasisStart}CI/CD%{emphasisEnd}.",
         ),
         {
           emphasisStart: '<strong>',
@@ -401,7 +401,7 @@ const CREATE_PROJECT_TOUR = [
       {
         text: sprintf(
           s__(
-            "UserOnboardingTour|Here you can create a project from scratch, start with a template or import a repository from other platforms. Whatever you choose, we'll guide you through the process.%{lineBreak}%{lineBreak}Choose a way to create a project and click on %{emphasisStart}Create Project%{emphasisEnd} to progress to the next step.",
+            "UserOnboardingTour|Here you can create a project from scratch, start with a template or import a repository from other platforms. Whatever you choose, we'll guide you through the process.%{lineBreak}%{lineBreak}Fill in your new project information and click on %{emphasisStart}Create Project%{emphasisEnd} to progress to the next step.",
           ),
           {
             emphasisStart: '<strong>',
@@ -421,7 +421,7 @@ const CREATE_PROJECT_TOUR = [
       {
         text: sprintf(
           s__(
-            'UserOnboardingTour|Sweet! Your project was created is is ready to be used.%{lineBreak}%{lineBreak}You can start adding files to the repository or clone it. One last thing we want to show you is how to invite your colleagues to your new project.',
+            'UserOnboardingTour|Sweet! Your project was created and is ready to be used.%{lineBreak}%{lineBreak}You can start adding files to the repository or clone it. One last thing we want to show you is how to invite your colleagues to your new project.',
           ),
           {
             lineBreak: '</br>',

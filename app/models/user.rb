@@ -235,6 +235,7 @@ class User < ApplicationRecord
   delegate :timezone, :timezone=, to: :user_preference
   delegate :time_display_relative, :time_display_relative=, to: :user_preference
   delegate :time_format_in_24h, :time_format_in_24h=, to: :user_preference
+  delegate :show_whitespace_in_diffs, :show_whitespace_in_diffs=, to: :user_preference
 
   accepts_nested_attributes_for :user_preference, update_only: true
 
@@ -266,6 +267,16 @@ class User < ApplicationRecord
         BLOCKED_MESSAGE
       end
     end
+
+    # rubocop: disable CodeReuse/ServiceClass
+    # Ideally we should not call a service object here but user.block
+    # is also bcalled by Users::MigrateToGhostUserService which references
+    # this state transition object in order to do a rollback.
+    # For this reason the tradeoff is to disable this cop.
+    after_transition any => :blocked do |user|
+      Ci::CancelUserPipelinesService.new.execute(user)
+    end
+    # rubocop: enable CodeReuse/ServiceClass
   end
 
   # Scopes
@@ -433,6 +444,7 @@ class User < ApplicationRecord
     #
     # Returns an ActiveRecord::Relation.
     def search(query)
+      query = query&.delete_prefix('@')
       return none if query.blank?
 
       query = query.downcase
@@ -1516,6 +1528,10 @@ class User < ApplicationRecord
 
   def pending_todo_for(target)
     todos.find_by(target: target, state: :pending)
+  end
+
+  def password_expired?
+    !!(password_expires_at && password_expires_at < Time.now)
   end
 
   # @deprecated

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Project > Members > Invite group and members', :js do
@@ -151,7 +153,7 @@ describe 'Project > Members > Invite group and members', :js do
         end
 
         # This behaviour should be changed to disable sharing with members as well
-        # See: https://gitlab.com/gitlab-org/gitlab-ce/issues/42093
+        # See: https://gitlab.com/gitlab-org/gitlab-foss/issues/42093
         it_behaves_like 'the project cannot be shared with groups'
 
         context 'when the subgroup has "Share with group lock" and membership lock disabled (parent overridden)' do
@@ -163,7 +165,7 @@ describe 'Project > Members > Invite group and members', :js do
         end
 
         # This behaviour should be changed to disable sharing with members as well
-        # See: https://gitlab.com/gitlab-org/gitlab-ce/issues/42093
+        # See: https://gitlab.com/gitlab-org/gitlab-foss/issues/42093
         context 'when the subgroup has membership lock enabled (parent overridden)' do
           before do
             subgroup.update_column(:membership_lock, true)

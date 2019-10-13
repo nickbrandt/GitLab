@@ -4,6 +4,7 @@ module Gitlab
   module Ci
     class Trace
       include ::Gitlab::ExclusiveLeaseHelpers
+      include Checksummable
 
       LOCK_TTL = 10.minutes
       LOCK_RETRIES = 2
@@ -188,12 +189,12 @@ module Gitlab
       def create_build_trace!(job, path)
         File.open(path) do |stream|
           # TODO: Set `file_format: :raw` after we've cleaned up legacy traces migration
-          # https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/20307
+          # https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/20307
           job.create_job_artifacts_trace!(
             project: job.project,
             file_type: :trace,
             file: stream,
-            file_sha256: Digest::SHA256.file(path).hexdigest)
+            file_sha256: self.class.hexdigest(path))
         end
       end
 

@@ -8,6 +8,7 @@ module EE
       prepended do
         mount_mutation ::Mutations::DesignManagement::Upload, calls_gitaly: true
         mount_mutation ::Mutations::DesignManagement::Delete, calls_gitaly: true
+        mount_mutation ::Mutations::EpicTree::Reorder
       end
     end
   end

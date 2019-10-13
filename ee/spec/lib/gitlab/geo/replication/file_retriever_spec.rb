@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Geo::Replication::FileRetriever, :geo do
@@ -6,10 +8,6 @@ describe Gitlab::Geo::Replication::FileRetriever, :geo do
 
     context 'when the upload exists' do
       let(:retriever) { described_class.new(upload.id, message) }
-
-      before do
-        expect(Upload).to receive(:find_by).with(id: upload.id).and_return(upload)
-      end
 
       context 'when the upload has a file' do
         before do
@@ -22,7 +20,7 @@ describe Gitlab::Geo::Replication::FileRetriever, :geo do
 
           it 'returns the file in a success hash' do
             expect(subject).to include(code: :ok, message: 'Success')
-            expect(subject[:file].file).to eq(upload.absolute_path)
+            expect(subject[:file].file.path).to eq(upload.absolute_path)
           end
         end
 
@@ -72,19 +70,19 @@ describe Gitlab::Geo::Replication::FileRetriever, :geo do
   describe '#execute' do
     context 'user avatar' do
       it_behaves_like "returns necessary params for sending a file from an API endpoint" do
-        let(:upload) { create(:upload, model: build(:user)) }
+        let(:upload) { create(:upload, model: create(:user)) }
       end
     end
 
     context 'group avatar' do
       it_behaves_like "returns necessary params for sending a file from an API endpoint" do
-        let(:upload) { create(:upload, model: build(:group)) }
+        let(:upload) { create(:upload, model: create(:group)) }
       end
     end
 
     context 'project avatar' do
       it_behaves_like "returns necessary params for sending a file from an API endpoint" do
-        let(:upload) { create(:upload, model: build(:project)) }
+        let(:upload) { create(:upload, model: create(:project)) }
       end
     end
 

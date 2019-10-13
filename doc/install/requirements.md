@@ -35,7 +35,7 @@ Please see the [installation from source guide](installation.md) and the [instal
 ### Microsoft Windows
 
 GitLab is developed for Linux-based operating systems.
-It does **not** run on Microsoft Windows, and we have no plans to support it in the near future. For the latest development status view this [issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/46567).
+It does **not** run on Microsoft Windows, and we have no plans to support it in the near future. For the latest development status view this [issue](https://gitlab.com/gitlab-org/gitlab-foss/issues/46567).
 Please consider using a virtual machine to run GitLab.
 
 ## Ruby versions
@@ -69,7 +69,7 @@ This is the recommended minimum hardware for a handful of example GitLab user ba
 - 4 cores supports up to 500 users
 - 8 cores supports up to 1,000 users
 - 32 cores supports up to 5,000 users
-- More users? Run it high-availability on [multiple application servers](https://about.gitlab.com/high-availability/)
+- More users? Run it high-availability on [multiple application servers](https://about.gitlab.com/solutions/high-availability/)
 
 ### Memory
 
@@ -86,7 +86,7 @@ errors during usage.
 - 16GB RAM supports up to 500 users
 - 32GB RAM supports up to 1,000 users
 - 128GB RAM supports up to 5,000 users
-- More users? Run it high-availability on [multiple application servers](https://about.gitlab.com/high-availability/)
+- More users? Run it high-availability on [multiple application servers](https://about.gitlab.com/solutions/high-availability/)
 
 We recommend having at least [2GB of swap on your server](https://askubuntu.com/a/505344/310789), even if you currently have
 enough available RAM. Having swap will help reduce the chance of errors occurring
@@ -139,7 +139,7 @@ If you are using [GitLab Geo](../development/geo.md):
 - The
   [tracking database](../development/geo.md#using-the-tracking-database)
   requires the
-  [postgres_fdw](https://www.postgresql.org/docs/9.6/static/postgres-fdw.html)
+  [postgres_fdw](https://www.postgresql.org/docs/9.6/postgres-fdw.html)
   extension.
 
 ```
@@ -148,13 +148,13 @@ CREATE EXTENSION postgres_fdw;
 
 ## Unicorn Workers
 
-For most instances we recommend using: (CPU cores * 1.5) + 1 = unicorn workers.
-For example a node with 4 cores would have 7 unicorn workers.
+For most instances we recommend using: (CPU cores * 1.5) + 1 = Unicorn workers.
+For example a node with 4 cores would have 7 Unicorn workers.
 
-For all machines that have 2GB and up we recommend a minimum of three unicorn workers.
+For all machines that have 2GB and up we recommend a minimum of three Unicorn workers.
 If you have a 1GB machine we recommend to configure only two Unicorn workers to prevent excessive swapping.
 
-As long as you have enough available CPU and memory capacity, it's okay to increase the number of unicorn workers and this will usually help to reduce the response time of the applications and increase the ability to handle parallel requests.
+As long as you have enough available CPU and memory capacity, it's okay to increase the number of Unicorn workers and this will usually help to reduce the response time of the applications and increase the ability to handle parallel requests.
 
 To change the Unicorn workers when you have the Omnibus package (which defaults to the recommendation above) please see [the Unicorn settings in the Omnibus GitLab documentation](https://docs.gitlab.com/omnibus/settings/unicorn.html).
 

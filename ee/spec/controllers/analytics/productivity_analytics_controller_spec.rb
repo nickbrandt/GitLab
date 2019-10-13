@@ -43,7 +43,7 @@ describe Analytics::ProductivityAnalyticsController do
 
       subject
 
-      expect(response).to have_gitlab_http_status(404)
+      expect(response).to have_gitlab_http_status(403)
     end
 
     it 'authorizes for ability to view analytics' do

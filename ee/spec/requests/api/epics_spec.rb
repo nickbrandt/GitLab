@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::Epics do
@@ -63,6 +65,7 @@ describe API::Epics do
 
   describe 'GET /groups/:id/epics' do
     let(:url) { "/groups/#{group.path}/epics" }
+    let(:params) { { include_descendant_groups: true } }
 
     it_behaves_like 'error requests'
 
@@ -70,7 +73,7 @@ describe API::Epics do
       before do
         stub_licensed_features(epics: true)
 
-        get api(url, user)
+        get api(url, user), params: params
       end
 
       it 'returns 200 status' do
@@ -85,15 +88,19 @@ describe API::Epics do
         epic
         # Avoid polluting queries with inserts for personal access token
         pat = create(:personal_access_token, user: user)
+        subgroup_1 = create(:group, parent: group)
+        subgroup_2 = create(:group, parent: subgroup_1)
+        create(:epic, group: subgroup_1)
+        create(:epic, group: subgroup_2)
 
         control = ActiveRecord::QueryRecorder.new(skip_cached: false) do
-          get api(url, personal_access_token: pat)
-        end
+          get api(url, personal_access_token: pat), params: params
+        end.count
 
         label_2 = create(:label)
         create_list(:labeled_epic, 2, group: group, labels: [label_2])
 
-        expect { get api(url, personal_access_token: pat) }.not_to exceed_all_query_limit(control)
+        expect { get api(url, personal_access_token: pat), params: params }.not_to exceed_all_query_limit(control)
         expect(response).to have_gitlab_http_status(200)
       end
     end
@@ -330,6 +337,33 @@ describe API::Epics do
       end
     end
 
+    context 'with hierarchy params' do
+      let(:subgroup) { create(:group, parent: group) }
+      let(:subgroup2) { create(:group, parent: subgroup) }
+      let!(:subgroup_epic) { create(:epic, group: subgroup) }
+      let!(:subgroup2_epic) { create(:epic, group: subgroup2) }
+
+      let(:url) { "/groups/#{subgroup.id}/epics" }
+
+      before do
+        stub_licensed_features(epics: true)
+
+        epic
+      end
+
+      it 'excludes descendant group epics' do
+        get api(url), params: { include_descendant_groups: false }
+
+        expect_paginated_array_response(subgroup_epic.id)
+      end
+
+      it 'includes ancestor group epics' do
+        get api(url), params: { include_ancestor_groups: true }
+
+        expect_paginated_array_response([epic.id, subgroup2_epic.id, subgroup_epic.id])
+      end
+    end
+
     context 'with pagination params' do
       let(:page) { 1 }
       let(:per_page) { 2 }
@@ -386,6 +420,15 @@ describe API::Epics do
         get api(url)
 
         expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
+      end
+
+      it 'exposes closed_at attribute' do
+        epic.close
+
+        get api(url)
+
+        expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
+        expect(json_response['closed_at']).to be_present
       end
 
       it_behaves_like 'can admin epics'

@@ -1,7 +1,6 @@
 <script>
-import { __ } from '~/locale';
-import { mapState } from 'vuex';
-import { GlLink, GlButton } from '@gitlab/ui';
+import { s__, __ } from '~/locale';
+import { GlLink, GlButton, GlTooltip } from '@gitlab/ui';
 import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
 import dateFormat from 'dateformat';
 import { debounceByAnimationFrame, roundOffFloat } from '~/lib/utils/common_utils';
@@ -17,6 +16,7 @@ export default {
   components: {
     GlAreaChart,
     GlLineChart,
+    GlTooltip,
     GlButton,
     GlChartSeriesLabel,
     GlLink,
@@ -43,11 +43,6 @@ export default {
       required: false,
       default: '',
     },
-    showBorder: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
     singleEmbed: {
       type: Boolean,
       required: false,
@@ -57,6 +52,16 @@ export default {
       type: Array,
       required: false,
       default: () => [],
+    },
+    legendAverageText: {
+      type: String,
+      required: false,
+      default: s__('Metrics|Avg'),
+    },
+    legendMaxText: {
+      type: String,
+      required: false,
+      default: s__('Metrics|Max'),
     },
   },
   data() {
@@ -68,6 +73,7 @@ export default {
         isDeployment: false,
         sha: '',
       },
+      showTitleTooltip: false,
       width: 0,
       height: chartHeight,
       svgs: {},
@@ -75,7 +81,6 @@ export default {
     };
   },
   computed: {
-    ...mapState('monitoringDashboard', ['exportMetricsToCsvEnabled']),
     chartData() {
       // Transforms & supplements query data to render appropriate labels & styles
       // Input: [{ queryAttributes1 }, { queryAttributes2 }]
@@ -129,7 +134,7 @@ export default {
           },
         },
         series: this.scatterSeries,
-        dataZoom: this.dataZoomConfig,
+        dataZoom: [this.dataZoomConfig],
       };
     },
     dataZoomConfig() {
@@ -195,21 +200,15 @@ export default {
     yAxisLabel() {
       return `${this.graphData.y_label}`;
     },
-    csvText() {
-      const chartData = this.chartData[0].data;
-      const header = `timestamp,${this.graphData.y_label}\r\n`; // eslint-disable-line @gitlab/i18n/no-non-i18n-strings
-      return chartData.reduce((csv, data) => {
-        const row = data.join(',');
-        return `${csv}${row}\r\n`;
-      }, header);
-    },
-    downloadLink() {
-      const data = new Blob([this.csvText], { type: 'text/plain' });
-      return window.URL.createObjectURL(data);
-    },
   },
   watch: {
     containerWidth: 'onResize',
+  },
+  mounted() {
+    const graphTitleEl = this.$refs.graphTitle;
+    if (graphTitleEl && graphTitleEl.scrollWidth > graphTitleEl.offsetWidth) {
+      this.showTitleTooltip = true;
+    }
   },
   beforeDestroy() {
     window.removeEventListener('resize', debouncedResize);
@@ -272,71 +271,65 @@ export default {
 </script>
 
 <template>
-  <div
-    class="prometheus-graph col-12"
-    :class="[showBorder ? 'p-2' : 'p-0', { 'col-lg-6': !singleEmbed }]"
-  >
-    <div :class="{ 'prometheus-graph-embed w-100 p-3': showBorder }">
-      <div class="prometheus-graph-header">
-        <h5 class="prometheus-graph-title js-graph-title">{{ graphData.title }}</h5>
-        <gl-button
-          v-if="exportMetricsToCsvEnabled"
-          :href="downloadLink"
-          :title="__('Download CSV')"
-          :aria-label="__('Download CSV')"
-          style="margin-left: 200px;"
-          download="chart_metrics.csv"
-        >
-          {{ __('Download CSV') }}
-        </gl-button>
-        <div class="prometheus-graph-widgets js-graph-widgets">
-          <slot></slot>
-        </div>
-      </div>
-
-      <component
-        :is="glChartComponent"
-        ref="chart"
-        v-bind="$attrs"
-        :data="chartData"
-        :option="chartOptions"
-        :format-tooltip-text="formatTooltipText"
-        :thresholds="thresholds"
-        :width="width"
-        :height="height"
-        @updated="onChartUpdated"
+  <div class="prometheus-graph">
+    <div class="prometheus-graph-header">
+      <h5
+        ref="graphTitle"
+        class="prometheus-graph-title js-graph-title text-truncate append-right-8"
       >
-        <template v-if="tooltip.isDeployment">
-          <template slot="tooltipTitle">
-            {{ __('Deployed') }}
-          </template>
-          <div slot="tooltipContent" class="d-flex align-items-center">
-            <icon name="commit" class="mr-2" />
-            <gl-link :href="tooltip.commitUrl">{{ tooltip.sha }}</gl-link>
+        {{ graphData.title }}
+      </h5>
+      <gl-tooltip :target="() => $refs.graphTitle" :disabled="!showTitleTooltip">
+        {{ graphData.title }}
+      </gl-tooltip>
+      <div class="prometheus-graph-widgets js-graph-widgets flex-fill">
+        <slot></slot>
+      </div>
+    </div>
+    <component
+      :is="glChartComponent"
+      ref="chart"
+      v-bind="$attrs"
+      :data="chartData"
+      :option="chartOptions"
+      :format-tooltip-text="formatTooltipText"
+      :thresholds="thresholds"
+      :width="width"
+      :height="height"
+      :average-text="legendAverageText"
+      :max-text="legendMaxText"
+      @updated="onChartUpdated"
+    >
+      <template v-if="tooltip.isDeployment">
+        <template slot="tooltipTitle">
+          {{ __('Deployed') }}
+        </template>
+        <div slot="tooltipContent" class="d-flex align-items-center">
+          <icon name="commit" class="mr-2" />
+          <gl-link :href="tooltip.commitUrl">{{ tooltip.sha }}</gl-link>
+        </div>
+      </template>
+      <template v-else>
+        <template slot="tooltipTitle">
+          <div class="text-nowrap">
+            {{ tooltip.title }}
           </div>
         </template>
-        <template v-else>
-          <template slot="tooltipTitle">
-            <div class="text-nowrap">
-              {{ tooltip.title }}
+        <template slot="tooltipContent">
+          <div
+            v-for="(content, key) in tooltip.content"
+            :key="key"
+            class="d-flex justify-content-between"
+          >
+            <gl-chart-series-label :color="isMultiSeries ? content.color : ''">
+              {{ content.name }}
+            </gl-chart-series-label>
+            <div class="prepend-left-32">
+              {{ content.value }}
             </div>
-          </template>
-          <template slot="tooltipContent">
-            <div
-              v-for="(content, key) in tooltip.content"
-              :key="key"
-              class="d-flex justify-content-between"
-            >
-              <gl-chart-series-label :color="isMultiSeries ? content.color : ''">
-                {{ content.name }}
-              </gl-chart-series-label>
-              <div class="prepend-left-32">
-                {{ content.value }}
-              </div>
-            </div>
-          </template>
+          </div>
         </template>
-      </component>
-    </div>
+      </template>
+    </component>
   </div>
 </template>

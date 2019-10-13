@@ -6,8 +6,10 @@ exports[`Design management list item component hides comment count 1`] = `
   to="[object Object]"
 >
   <div
-    class="card-body p-0 d-flex align-items-center overflow-hidden"
+    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
   >
+    <!---->
+     
     <img
       alt="test"
       class="block ml-auto mr-auto mw-100 mh-100 design-img"
@@ -23,6 +25,190 @@ exports[`Design management list item component hides comment count 1`] = `
     >
       <span
         class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
+      >
+        test
+      </span>
+       
+      <span
+        class="str-truncated-100"
+      >
+        
+        Updated 
+        <timeago-stub
+          cssclass=""
+          time="01-01-2019"
+          tooltipplacement="bottom"
+        />
+      </span>
+    </div>
+     
+    <!---->
+  </div>
+</router-link-stub>
+`;
+
+exports[`Design management list item component renders item with correct status icon for creation event 1`] = `
+<router-link-stub
+  class="card cursor-pointer text-plain js-design-list-item design-list-item"
+  to="[object Object]"
+>
+  <div
+    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+  >
+    <div
+      class="design-event position-absolute"
+    >
+      <span
+        aria-label="Added in this version"
+        title="Added in this version"
+      >
+        <icon-stub
+          class="text-success-500"
+          name="file-addition-solid"
+          size="18"
+        />
+      </span>
+    </div>
+     
+    <img
+      alt="test"
+      class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      src="http://via.placeholder.com/300"
+    />
+  </div>
+   
+  <div
+    class="card-footer d-flex w-100"
+  >
+    <div
+      class="d-flex flex-column str-truncated-100"
+    >
+      <span
+        class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
+      >
+        test
+      </span>
+       
+      <span
+        class="str-truncated-100"
+      >
+        
+        Updated 
+        <timeago-stub
+          cssclass=""
+          time="01-01-2019"
+          tooltipplacement="bottom"
+        />
+      </span>
+    </div>
+     
+    <!---->
+  </div>
+</router-link-stub>
+`;
+
+exports[`Design management list item component renders item with correct status icon for deletion event 1`] = `
+<router-link-stub
+  class="card cursor-pointer text-plain js-design-list-item design-list-item"
+  to="[object Object]"
+>
+  <div
+    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+  >
+    <div
+      class="design-event position-absolute"
+    >
+      <span
+        aria-label="Deleted in this version"
+        title="Deleted in this version"
+      >
+        <icon-stub
+          class="text-danger-500"
+          name="file-deletion-solid"
+          size="18"
+        />
+      </span>
+    </div>
+     
+    <img
+      alt="test"
+      class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      src="http://via.placeholder.com/300"
+    />
+  </div>
+   
+  <div
+    class="card-footer d-flex w-100"
+  >
+    <div
+      class="d-flex flex-column str-truncated-100"
+    >
+      <span
+        class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
+      >
+        test
+      </span>
+       
+      <span
+        class="str-truncated-100"
+      >
+        
+        Updated 
+        <timeago-stub
+          cssclass=""
+          time="01-01-2019"
+          tooltipplacement="bottom"
+        />
+      </span>
+    </div>
+     
+    <!---->
+  </div>
+</router-link-stub>
+`;
+
+exports[`Design management list item component renders item with correct status icon for modification event 1`] = `
+<router-link-stub
+  class="card cursor-pointer text-plain js-design-list-item design-list-item"
+  to="[object Object]"
+>
+  <div
+    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+  >
+    <div
+      class="design-event position-absolute"
+    >
+      <span
+        aria-label="Modified in this version"
+        title="Modified in this version"
+      >
+        <icon-stub
+          class="text-primary-500"
+          name="file-modified-solid"
+          size="18"
+        />
+      </span>
+    </div>
+     
+    <img
+      alt="test"
+      class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      src="http://via.placeholder.com/300"
+    />
+  </div>
+   
+  <div
+    class="card-footer d-flex w-100"
+  >
+    <div
+      class="d-flex flex-column str-truncated-100"
+    >
+      <span
+        class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
       >
         test
       </span>
@@ -51,8 +237,10 @@ exports[`Design management list item component renders item with multiple commen
   to="[object Object]"
 >
   <div
-    class="card-body p-0 d-flex align-items-center overflow-hidden"
+    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
   >
+    <!---->
+     
     <img
       alt="test"
       class="block ml-auto mr-auto mw-100 mh-100 design-img"
@@ -68,6 +256,7 @@ exports[`Design management list item component renders item with multiple commen
     >
       <span
         class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
       >
         test
       </span>
@@ -90,7 +279,6 @@ exports[`Design management list item component renders item with multiple commen
     >
       <icon-stub
         class="ml-1"
-        cssclasses=""
         name="comments"
         size="16"
       />
@@ -108,14 +296,16 @@ exports[`Design management list item component renders item with multiple commen
 </router-link-stub>
 `;
 
-exports[`Design management list item component renders item with single comment 1`] = `
+exports[`Design management list item component renders item with no status icon for none event 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
 >
   <div
-    class="card-body p-0 d-flex align-items-center overflow-hidden"
+    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
   >
+    <!---->
+     
     <img
       alt="test"
       class="block ml-auto mr-auto mw-100 mh-100 design-img"
@@ -131,6 +321,55 @@ exports[`Design management list item component renders item with single comment 
     >
       <span
         class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
+      >
+        test
+      </span>
+       
+      <span
+        class="str-truncated-100"
+      >
+        
+        Updated 
+        <timeago-stub
+          cssclass=""
+          time="01-01-2019"
+          tooltipplacement="bottom"
+        />
+      </span>
+    </div>
+     
+    <!---->
+  </div>
+</router-link-stub>
+`;
+
+exports[`Design management list item component renders item with single comment 1`] = `
+<router-link-stub
+  class="card cursor-pointer text-plain js-design-list-item design-list-item"
+  to="[object Object]"
+>
+  <div
+    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+  >
+    <!---->
+     
+    <img
+      alt="test"
+      class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      src="http://via.placeholder.com/300"
+    />
+  </div>
+   
+  <div
+    class="card-footer d-flex w-100"
+  >
+    <div
+      class="d-flex flex-column str-truncated-100"
+    >
+      <span
+        class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
       >
         test
       </span>
@@ -153,7 +392,6 @@ exports[`Design management list item component renders item with single comment 
     >
       <icon-stub
         class="ml-1"
-        cssclasses=""
         name="comments"
         size="16"
       />

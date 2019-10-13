@@ -9,8 +9,7 @@ describe Repository, :elastic do
 
   def index!(project)
     Sidekiq::Testing.inline! do
-      project.repository.index_blobs
-      project.repository.index_commits
+      project.repository.index_commits_and_blobs
 
       Gitlab::Elastic::Helper.refresh_index
     end
@@ -32,21 +31,6 @@ describe Repository, :elastic do
     expect(project.repository.search('def | popen filename:test')[:blobs][:total_count]).to eq(1)
     expect(project.repository.search('def | popen path:ruby')[:blobs][:total_count]).to eq(4)
     expect(project.repository.search('def | popen extension:md')[:blobs][:total_count]).to eq(1)
-  end
-
-  it 'can delete blobs' do
-    project = create :project, :repository
-    blob = project.repository.blob_at('b83d6e391c22777fca1ed3012fce84f633d7fed0', 'files/ruby/popen.rb')
-
-    expect(project.repository.delete_blob(blob)[:delete]).not_to be_empty
-  end
-
-  it 'can return the index as a json' do
-    project = create :project, :repository
-    index = project.repository.as_indexed_json
-
-    expect(index[:blobs]).not_to be_empty
-    expect(index[:commits]).not_to be_empty
   end
 
   def search_and_check!(on, query, type:, per: 1000)
@@ -84,9 +68,8 @@ describe Repository, :elastic do
     let(:results) { Repository.find_commits_by_message_with_elastic('initial') }
 
     before do
-      project.repository.index_commits
-      project1.repository.index_commits
-
+      project.repository.index_commits_and_blobs
+      project1.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
     end
 
@@ -126,8 +109,7 @@ describe Repository, :elastic do
     it "returns commits" do
       project = create :project, :repository
 
-      project.repository.index_commits
-
+      Gitlab::Elastic::Indexer.new(project).run
       Gitlab::Elastic::Helper.refresh_index
 
       expect(project.repository.find_commits_by_message_with_elastic('initial').first).to be_a(Commit)

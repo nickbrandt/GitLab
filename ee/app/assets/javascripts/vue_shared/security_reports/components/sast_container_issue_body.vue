@@ -5,6 +5,7 @@
  */
 import ReportLink from '~/reports/components/report_link.vue';
 import ModalOpenName from '~/reports/components/modal_open_name.vue';
+import { humanize } from '~/lib/utils/text_utility';
 
 export default {
   name: 'SastContainerIssueBody',
@@ -23,14 +24,19 @@ export default {
       required: true,
     },
   },
+  computed: {
+    severity() {
+      return this.issue.severity ? humanize(this.issue.severity) : null;
+    },
+  },
 };
 </script>
 <template>
   <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
     <div class="report-block-list-issue-description-text">
-      <template v-if="issue.severity"
-        >{{ issue.severity }}:</template
-      >
+      <template v-if="severity">
+        {{ severity }}:
+      </template>
 
       <modal-open-name :issue="issue" :status="status" />
     </div>

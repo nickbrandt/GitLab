@@ -80,9 +80,6 @@ export default {
     addProjects() {
       this.addProjectsToDashboard();
     },
-    onModalShown() {
-      this.$refs.projectSelector.focusSearchInput();
-    },
     onCancel() {
       this.clearSearchResults();
     },
@@ -110,7 +107,6 @@ export default {
       :ok-title="s__('OperationsDashboard|Add projects')"
       :ok-disabled="okDisabled"
       ok-variant="success"
-      @shown="onModalShown"
       @cancel="onCancel"
       @ok="onOk"
     >

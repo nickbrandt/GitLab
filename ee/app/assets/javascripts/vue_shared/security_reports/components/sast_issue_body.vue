@@ -5,6 +5,7 @@
  */
 import ReportLink from '~/reports/components/report_link.vue';
 import ModalOpenName from '~/reports/components/modal_open_name.vue';
+import { humanize } from '~/lib/utils/text_utility';
 
 export default {
   name: 'SastIssueBody',
@@ -25,24 +26,29 @@ export default {
       required: true,
     },
   },
+
+  computed: {
+    title() {
+      const { severity, confidence, priority } = this.issue;
+
+      if (severity) {
+        if (confidence) {
+          return `${humanize(severity)} (${humanize(confidence)})`;
+        }
+        return humanize(severity);
+      } else if (confidence) {
+        return `(${humanize(confidence)})`;
+      }
+
+      return priority;
+    },
+  },
 };
 </script>
 <template>
   <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
     <div class="report-block-list-issue-description-text">
-      <template v-if="issue.severity && issue.confidence">
-        {{ issue.severity }} ({{ issue.confidence }}):
-      </template>
-      <template v-else-if="issue.severity">
-        {{ issue.severity }}:
-      </template>
-      <template v-else-if="issue.confidence">
-        ({{ issue.confidence }}):
-      </template>
-      <template v-else-if="issue.priority"
-        >{{ issue.priority }}:</template
-      >
-
+      {{ title }}:
       <modal-open-name :issue="issue" :status="status" />
     </div>
 

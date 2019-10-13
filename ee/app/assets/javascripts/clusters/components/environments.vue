@@ -85,6 +85,7 @@ export default {
   },
   methods: {
     hasInstances: rolloutStatus => rolloutStatus.instances && rolloutStatus.instances.length,
+    isLoadingRollout: rolloutStatus => rolloutStatus.status === 'loading',
   },
 };
 </script>
@@ -127,7 +128,14 @@ export default {
       </template>
 
       <template slot="rolloutStatus" slot-scope="row">
-        <div v-if="hasInstances(row.item.rolloutStatus)" class="d-flex flex-wrap flex-row">
+        <!-- Loading Rollout -->
+        <gl-loading-icon
+          v-if="isLoadingRollout(row.item.rolloutStatus)"
+          class="d-inline-flex mt-1"
+        />
+
+        <!-- Rollout Instances -->
+        <div v-else-if="hasInstances(row.item.rolloutStatus)" class="d-flex flex-wrap flex-row">
           <template v-for="(instance, i) in row.item.rolloutStatus.instances">
             <deployment-instance
               :key="i"

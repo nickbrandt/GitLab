@@ -2,11 +2,11 @@
 import _ from 'underscore';
 import { s__, sprintf } from '~/locale';
 import { mapActions, mapState } from 'vuex';
-import GlModal from '~/vue_shared/components/gl_modal.vue';
+import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 
 export default {
   name: 'LicenseDeleteConfirmationModal',
-  components: { GlModal },
+  components: { GlModal: DeprecatedModal2 },
   computed: {
     ...mapState(['currentLicenseInModal']),
     confirmationText() {

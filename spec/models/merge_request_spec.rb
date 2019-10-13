@@ -650,8 +650,34 @@ describe MergeRequest do
     end
   end
 
-  describe '#preload_discussions_diff_highlight' do
+  describe '#discussions_diffs' do
     let(:merge_request) { create(:merge_request) }
+
+    shared_examples 'discussions diffs collection' do
+      it 'initializes Gitlab::DiscussionsDiff::FileCollection with correct data' do
+        note_diff_file = diff_note.note_diff_file
+
+        expect(Gitlab::DiscussionsDiff::FileCollection)
+          .to receive(:new)
+          .with([note_diff_file])
+          .and_call_original
+
+        result = merge_request.discussions_diffs
+
+        expect(result).to be_a(Gitlab::DiscussionsDiff::FileCollection)
+      end
+
+      it 'eager loads relations' do
+        result = merge_request.discussions_diffs
+
+        recorder = ActiveRecord::QueryRecorder.new do
+          result.first.diff_note
+          result.first.diff_note.project
+        end
+
+        expect(recorder.count).to be_zero
+      end
+    end
 
     context 'with commit diff note' do
       let(:other_merge_request) { create(:merge_request) }
@@ -664,40 +690,15 @@ describe MergeRequest do
         create(:diff_note_on_commit, project: other_merge_request.project)
       end
 
-      it 'preloads diff highlighting' do
-        expect_next_instance_of(Gitlab::DiscussionsDiff::FileCollection) do |collection|
-          note_diff_file = diff_note.note_diff_file
-
-          expect(collection)
-            .to receive(:load_highlight)
-            .with([note_diff_file.id]).and_call_original
-        end
-
-        merge_request.preload_discussions_diff_highlight
-      end
+      it_behaves_like 'discussions diffs collection'
     end
 
     context 'with merge request diff note' do
-      let!(:unresolved_diff_note) do
+      let!(:diff_note) do
         create(:diff_note_on_merge_request, project: merge_request.project, noteable: merge_request)
       end
 
-      let!(:resolved_diff_note) do
-        create(:diff_note_on_merge_request, :resolved, project: merge_request.project, noteable: merge_request)
-      end
-
-      it 'preloads diff highlighting' do
-        expect_next_instance_of(Gitlab::DiscussionsDiff::FileCollection) do |collection|
-          note_diff_file = unresolved_diff_note.note_diff_file
-
-          expect(collection)
-            .to receive(:load_highlight)
-            .with([note_diff_file.id])
-            .and_call_original
-        end
-
-        merge_request.preload_discussions_diff_highlight
-      end
+      it_behaves_like 'discussions diffs collection'
     end
   end
 
@@ -3255,5 +3256,39 @@ describe MergeRequest do
         subject
       end
     end
+  end
+
+  describe '.with_open_merge_when_pipeline_succeeds' do
+    let!(:project) { create(:project) }
+    let!(:fork) { fork_project(project) }
+    let!(:merge_request1) do
+      create(:merge_request,
+             :merge_when_pipeline_succeeds,
+             target_project: project,
+             target_branch: 'master',
+             source_project: project,
+             source_branch: 'feature-1')
+    end
+
+    let!(:merge_request2) do
+      create(:merge_request,
+             :merge_when_pipeline_succeeds,
+             target_project: project,
+             target_branch: 'master',
+             source_project: fork,
+             source_branch: 'fork-feature-1')
+    end
+
+    let!(:merge_request4) do
+      create(:merge_request,
+             target_project: project,
+             target_branch: 'master',
+             source_project: fork,
+             source_branch: 'fork-feature-2')
+    end
+
+    let(:query) { described_class.with_open_merge_when_pipeline_succeeds }
+
+    it { expect(query).to contain_exactly(merge_request1, merge_request2) }
   end
 end

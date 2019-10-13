@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import _ from 'underscore';
 import axios from '~/lib/utils/axios_utils';
 import Flash from '~/flash';
@@ -13,6 +12,7 @@ export default class ProtectedBranchEdit {
     this.$wrap = options.$wrap;
     this.$allowedToMergeDropdown = this.$wrap.find('.js-allowed-to-merge');
     this.$allowedToPushDropdown = this.$wrap.find('.js-allowed-to-push');
+    this.$codeOwnerToggle = this.$wrap.find('.js-code-owner-toggle');
 
     this.$wraps[ACCESS_LEVELS.MERGE] = this.$allowedToMergeDropdown.closest(
       `.${ACCESS_LEVELS.MERGE}-container`,
@@ -22,6 +22,35 @@ export default class ProtectedBranchEdit {
     );
 
     this.buildDropdowns();
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    this.$codeOwnerToggle.on('click', this.onCodeOwnerToggleClick.bind(this));
+  }
+
+  onCodeOwnerToggleClick() {
+    this.$codeOwnerToggle.toggleClass('is-checked');
+    this.$codeOwnerToggle.prop('disabled', true);
+
+    const formData = {
+      code_owner_approval_required: this.$codeOwnerToggle.hasClass('is-checked'),
+    };
+
+    this.updateCodeOwnerApproval(formData);
+  }
+
+  updateCodeOwnerApproval(formData) {
+    axios
+      .patch(this.$wrap.data('url'), {
+        protected_branch: formData,
+      })
+      .then(() => {
+        this.$codeOwnerToggle.prop('disabled', false);
+      })
+      .catch(() => {
+        Flash(__('Failed to update branch!'));
+      });
   }
 
   buildDropdowns() {
@@ -85,7 +114,7 @@ export default class ProtectedBranchEdit {
       .catch(() => {
         this.$allowedToMergeDropdown.enable();
         this.$allowedToPushDropdown.enable();
-        Flash(__('Failed to update branch!'), null, $('.js-protected-branches-list'));
+        Flash(__('Failed to update branch!'));
       });
   }
 
@@ -95,7 +124,7 @@ export default class ProtectedBranchEdit {
         // Do this only for users for now
         // get the current data for selected items
         const selectedItems = this[dropdownName].getSelectedItems();
-        const currentSelectedItem = _.findWhere(selectedItems, {
+        const currentSelectedItem = _.find(selectedItems, {
           user_id: currentItem.user_id,
         });
 

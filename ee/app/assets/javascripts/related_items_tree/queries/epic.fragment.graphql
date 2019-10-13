@@ -3,6 +3,7 @@ fragment BaseEpic on Epic {
   iid
   title
   webPath
+  relativePosition
   userPermissions {
     adminEpic
     createEpic

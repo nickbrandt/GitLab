@@ -43,6 +43,7 @@ describe PostReceive do
 
       before do
         allow_any_instance_of(Gitlab::GitPostReceive).to receive(:identify).and_return(empty_project.owner)
+        # Need to mock here so we can expect calls on project
         allow(Gitlab::GlRepository).to receive(:parse).and_return([empty_project, Gitlab::GlRepository::PROJECT])
       end
 
@@ -60,6 +61,16 @@ describe PostReceive do
       end
     end
 
+    shared_examples 'not updating remote mirrors' do
+      it 'does not schedule an update' do
+        expect(project).not_to receive(:has_remote_mirror?)
+        expect(project).not_to receive(:mark_stuck_remote_mirrors_as_failed!)
+        expect(project).not_to receive(:update_remote_mirrors)
+
+        perform
+      end
+    end
+
     context 'empty changes' do
       it "does not call any PushService but runs after project hooks" do
         expect(Git::BranchPushService).not_to receive(:new)
@@ -68,6 +79,8 @@ describe PostReceive do
 
         perform(changes: "")
       end
+
+      it_behaves_like 'not updating remote mirrors'
     end
 
     context 'unidentified user' do
@@ -87,6 +100,16 @@ describe PostReceive do
         allow(Gitlab::GlRepository).to receive(:parse).and_return([project, Gitlab::GlRepository::PROJECT])
       end
 
+      shared_examples 'updating remote mirrors' do
+        it 'schedules an update if the project had mirrors' do
+          expect(project).to receive(:has_remote_mirror?).and_return(true)
+          expect(project).to receive(:mark_stuck_remote_mirrors_as_failed!)
+          expect(project).to receive(:update_remote_mirrors)
+
+          perform
+        end
+      end
+
       context "branches" do
         let(:changes) do
           <<~EOF
@@ -102,7 +125,7 @@ describe PostReceive do
         end
 
         it 'expires the status cache' do
-          expect(project).to receive(:empty_repo?).and_return(true)
+          expect(project.repository).to receive(:empty?).and_return(true)
           expect(project.repository).to receive(:expire_status_cache)
 
           perform
@@ -124,6 +147,8 @@ describe PostReceive do
 
           perform
         end
+
+        it_behaves_like 'updating remote mirrors'
 
         context 'with a default branch' do
           let(:changes) do
@@ -190,6 +215,8 @@ describe PostReceive do
 
           perform
         end
+
+        it_behaves_like 'updating remote mirrors'
       end
 
       context "merge-requests" do
@@ -201,6 +228,8 @@ describe PostReceive do
 
           perform
         end
+
+        it_behaves_like 'not updating remote mirrors'
       end
 
       context "gitlab-ci.yml" do
@@ -300,6 +329,11 @@ describe PostReceive do
   describe '#process_wiki_changes' do
     let(:gl_repository) { "wiki-#{project.id}" }
 
+    before do
+      # Need to mock here so we can expect calls on project
+      allow(Gitlab::GlRepository).to receive(:parse).and_return([project, Gitlab::GlRepository::WIKI])
+    end
+
     it 'updates project activity' do
       # Force Project#set_timestamps_for_create to initialize timestamps
       project
@@ -312,6 +346,28 @@ describe PostReceive do
           project.reload
         end.to change(project, :last_activity_at)
            .and change(project, :last_repository_updated_at)
+      end
+    end
+
+    context "branches" do
+      let(:changes) do
+        <<~EOF
+            123456 789012 refs/heads/tést1
+            123456 789012 refs/heads/tést2
+        EOF
+      end
+
+      it 'expires the branches cache' do
+        expect(project.wiki.repository).to receive(:expire_branches_cache).once
+
+        perform
+      end
+
+      it 'expires the status cache' do
+        expect(project.wiki.repository).to receive(:empty?).and_return(true)
+        expect(project.wiki.repository).to receive(:expire_status_cache)
+
+        perform
       end
     end
   end

@@ -11,7 +11,7 @@ Registry on the **primary** node, you can use the same storage for a **secondary
 Docker Registry as well. For more information, read the
 [Load balancing considerations](https://docs.docker.com/registry/deploying/#load-balancing-considerations)
 when deploying the Registry, and how to set up the storage driver for GitLab's
-integrated [Container Registry](../../container_registry.md#container-registry-storage-driver).
+integrated [Container Registry](../../packages/container_registry.md#container-registry-storage-driver).
 
 ## Replicating Docker Registry
 
@@ -63,6 +63,11 @@ We need to make Docker Registry send notification events to the
    notification secret in `registry.notification_secret` section of
    `/etc/gitlab/gitlab.rb` file.
 
+   NOTE: **Note:**
+   If you use GitLab HA, you will also have to specify
+   the notification secret in `registry.notification_secret` section of
+   `/etc/gitlab/gitlab.rb` file for every web node.
+
 1. Reconfigure the **primary** node for the change to take effect:
 
    ```sh
@@ -94,10 +99,8 @@ generate a short-lived JWT that is pull-only-capable to access the
 1. Edit `/etc/gitlab/gitlab.rb`:
 
    ```ruby
-   gitlab_rails['registry_replication'] = {
-     enabled: true,
-     primary_api_url: 'http://primary.example.com:5000/' # internal address to the primary registry, will be used by GitLab to directly communicate with primary registry API
-   }
+   gitlab_rails['geo_registry_replication_enabled'] = true
+   gitlab_rails['geo_registry_replication_primary_api_url'] = 'http://primary.example.com:5000/' # internal address to the primary registry, will be used by GitLab to directly communicate with primary registry API
    ```
 
 1. Reconfigure the **secondary** node for the change to take effect:

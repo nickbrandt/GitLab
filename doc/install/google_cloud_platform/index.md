@@ -72,7 +72,7 @@ By default, Google assigns an ephemeral IP to your instance. It is strongly
 recommended to assign a static IP if you are going to use GitLab in production
 and use a domain name as we'll see below.
 
-Read Google's documentation on how to [promote an ephemeral IP address][ip].
+Read Google's documentation on how to [promote an ephemeral IP address](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address#promote_ephemeral_ip).
 
 ### Using a domain name
 
@@ -130,12 +130,10 @@ Kerberos, etc. Here are some documents you might be interested in reading:
 - [Omnibus GitLab documentation](https://docs.gitlab.com/omnibus/)
 - [Integration documentation](../../integration/README.md)
 - [GitLab Pages configuration](../../administration/pages/index.md)
-- [GitLab Container Registry configuration](../../administration/container_registry.md)
+- [GitLab Container Registry configuration](../../administration/packages/container_registry.md)
 
 [freetrial]: https://console.cloud.google.com/freetrial "GCP free trial"
-[ip]: https://cloud.google.com/compute/docs/configure-instance-ip-addresses#promote_ephemeral_ip "Configuring an Instance's IP Addresses"
 [gcp]: https://cloud.google.com/ "Google Cloud Platform"
-[launcher]: https://cloud.google.com/launcher/ "Google Cloud Launcher home page"
 [req]: ../requirements.md "GitLab hardware and software requirements"
 [ssh]: https://cloud.google.com/compute/docs/instances/connecting-to-instance "Connecting to Linux Instances"
 [omni-smtp]: https://docs.gitlab.com/omnibus/settings/smtp.html#smtp-settings "Omnibus GitLab SMTP settings"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'shared/issuable/_approvals.html.haml' do
@@ -16,6 +18,7 @@ describe 'shared/issuable/_approvals.html.haml' do
     allow(MergeRequestApproverPresenter).to receive(:new).and_return(approver_presenter)
     assign(:project, project)
     assign(:target_project, project)
+    assign(:mr_presenter, merge_request.present(current_user: user))
   end
 
   context 'has no approvers' do

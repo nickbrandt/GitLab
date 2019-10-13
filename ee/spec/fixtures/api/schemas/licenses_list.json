@@ -1,0 +1,40 @@
+{
+  "type": "object",
+  "required": [
+    "licenses",
+    "report"
+  ],
+  "properties": {
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "url",
+          "components"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "components": {
+            "type": "array",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "report": {
+      "$ref": "./report_list.json"
+    }
+  },
+  "additionalProperties": false
+}

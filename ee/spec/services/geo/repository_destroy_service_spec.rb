@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Geo::RepositoryDestroyService do
@@ -35,11 +37,11 @@ describe Geo::RepositoryDestroyService do
       it 'removes the repository from disk' do
         project.delete
 
-        expect(project.gitlab_shell.exists?(project.repository_storage, "#{project.disk_path}.git")).to be_truthy
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, "#{project.disk_path}.git")).to be_truthy
 
         service.execute
 
-        expect(project.gitlab_shell.exists?(project.repository_storage, "#{project.disk_path}.git")).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, "#{project.disk_path}.git")).to be_falsey
       end
 
       it 'cleans up deleted repositories' do
@@ -73,11 +75,11 @@ describe Geo::RepositoryDestroyService do
       it 'removes the repository from disk' do
         project.delete
 
-        expect(project.gitlab_shell.exists?(project.repository_storage, "#{project.disk_path}.git")).to be_truthy
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, "#{project.disk_path}.git")).to be_truthy
 
         service.execute
 
-        expect(project.gitlab_shell.exists?(project.repository_storage, "#{project.disk_path}.git")).to be_falsey
+        expect(project.gitlab_shell.repository_exists?(project.repository_storage, "#{project.disk_path}.git")).to be_falsey
       end
 
       it 'cleans up deleted repositories' do

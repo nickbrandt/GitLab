@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Edit group settings', :js do
@@ -25,6 +27,8 @@ describe 'Edit group settings', :js do
 
       it 'adds new LDAP synchronization', :js do
         page.within('form#new_ldap_group_link') do
+          choose('sync_method_group')
+
           select2 'my-group-cn', from: '#ldap_group_link_cn'
           select 'Developer', from: 'ldap_group_link_group_access'
 
@@ -43,7 +47,6 @@ describe 'Edit group settings', :js do
       end
 
       it 'shows the LDAP group section' do
-        choose('sync_method_filter') # choose filter first, as group's the default
         choose('sync_method_group')
 
         expect(page).to have_content("Synchronize #{group.name}'s members with this LDAP group")

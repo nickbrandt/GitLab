@@ -22,7 +22,7 @@ GitLab offers a [continuous integration][ci] service. If you
 and configure your GitLab project to use a [Runner], then each commit or
 push triggers your CI [pipeline].
 
-The `.gitlab-ci.yml` file tells the GitLab runner what to do. By default it runs
+The `.gitlab-ci.yml` file tells the GitLab Runner what to do. By default it runs
 a pipeline with three [stages]: `build`, `test`, and `deploy`. You don't need to
 use all three stages; stages with no jobs are simply ignored.
 
@@ -43,7 +43,7 @@ So in brief, the steps needed to have a working CI can be summed up to:
 1. Configure a Runner
 
 From there on, on every push to your Git repository, the Runner will
-automagically start the pipeline and the pipeline will appear under the
+automatically start the pipeline and the pipeline will appear under the
 project's **Pipelines** page.
 
 ---
@@ -126,7 +126,7 @@ a "CI Lint" button to go to this page under **CI/CD ➔ Pipelines** and
 **Pipelines ➔ Jobs** in your project.
 
 For more information and a complete `.gitlab-ci.yml` syntax, please read
-[the reference documentation on .gitlab-ci.yml](../yaml/README.md).
+[the reference documentation on `.gitlab-ci.yml`](../yaml/README.md).
 
 ### Push `.gitlab-ci.yml` to GitLab
 

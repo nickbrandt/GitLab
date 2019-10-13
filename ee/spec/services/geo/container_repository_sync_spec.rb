@@ -10,6 +10,11 @@ describe Geo::ContainerRepositorySync, :geo do
     create(:container_repository, name: 'my_image', project: project)
   end
 
+  # Break symbol will be removed if JSON encode/decode operation happens
+  # so we use this to prove that it does not happen and we preserve original
+  # human readable JSON
+  let(:manifest) { "{\"schemaVersion\":2,\n\"layers\":[]}" }
+
   before do
     stub_container_registry_config(enabled: true,
                                    api_url: 'http://registry.gitlab',
@@ -52,12 +57,30 @@ describe Geo::ContainerRepositorySync, :geo do
           'Authorization' => 'bearer token'
         })
       .to_return(status: 200, body: "", headers: { 'docker-content-digest' => 'sha256:aaaaa' })
+
+    stub_request(:get, "http://primary.registry.gitlab/v2/group/test/my_image/manifests/tag-to-sync")
+      .with(
+        headers: {
+          'Accept' => 'application/vnd.docker.distribution.manifest.v2+json, application/vnd.oci.image.manifest.v1+json',
+          'Authorization' => 'bearer pull-token'
+        })
+      .to_return(status: 200, body: manifest, headers: {})
+
+    stub_request(:put, "http://registry.gitlab/v2/group/test/my_image/manifests/tag-to-sync")
+      .with(
+        body: manifest,
+        headers: {
+          'Accept' => 'application/vnd.docker.distribution.manifest.v2+json, application/vnd.oci.image.manifest.v1+json',
+          'Authorization' => 'bearer token',
+          'Content-Type' => 'application/json'
+        })
+      .to_return(status: 200, body: "", headers: {})
   end
 
   describe 'execute' do
     it 'determines list of tags to sync and to remove correctly' do
       expect(container_repository).to receive(:delete_tag_by_digest).with('sha256:aaaaa')
-      expect_any_instance_of(described_class).to receive(:sync_tag)
+      expect_any_instance_of(described_class).to receive(:sync_tag).with('tag-to-sync').and_call_original
 
       described_class.new(container_repository).execute
     end

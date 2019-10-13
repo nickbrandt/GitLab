@@ -2,4 +2,4 @@
 - return unless presenter.approvers.any?
 
 %p
-  Approvers: #{render_items_list(presenter.approvers_left.map(&:name))}
+  Approvers: #{render_items_list(presenter.suggested_approvers.map(&:name))}

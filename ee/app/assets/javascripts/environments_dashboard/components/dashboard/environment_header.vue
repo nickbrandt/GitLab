@@ -59,16 +59,16 @@ export default {
       >
         <span class="js-environment-name bold"> {{ environment.name }}</span>
       </gl-link>
-      <gl-badge v-if="environment.children" :pill="true" class="dashboard-card-icon">{{
-        environment.children.length
+      <gl-badge v-if="environment.within_folder" :pill="true" class="dashboard-card-icon">{{
+        environment.size
       }}</gl-badge>
     </div>
     <icon
-      v-if="environment.children"
+      v-if="environment.within_folder"
       v-gl-tooltip
       :title="$options.tooltips.information"
       name="information"
-      css-classes="dashboard-card-icon"
+      class="dashboard-card-icon"
     />
     <review-app-link
       v-else-if="environment.external_url"

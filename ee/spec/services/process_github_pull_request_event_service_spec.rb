@@ -9,7 +9,7 @@ describe ProcessGithubPullRequestEventService do
   let(:params) do
     {
       pull_request: {
-        id: 123,
+        number: 123,
         head: {
           ref: source_branch,
           sha: source_sha,

@@ -29,20 +29,13 @@ module Routable
     #
     # Usage:
     #
-    #     Klass.find_by_full_path('gitlab-org/gitlab-ce')
+    #     Klass.find_by_full_path('gitlab-org/gitlab-foss')
     #
     # Returns a single object, or nil.
     def find_by_full_path(path, follow_redirects: false)
-      routable_calls_counter.increment(method: 'find_by_full_path')
-
-      if Feature.enabled?(:routable_two_step_lookup)
-        # Case sensitive match first (it's cheaper and the usual case)
-        # If we didn't have an exact match, we perform a case insensitive search
-        found = includes(:route).find_by(routes: { path: path }) || where_full_path_in([path]).take
-      else
-        order_sql = Arel.sql("(CASE WHEN routes.path = #{connection.quote(path)} THEN 0 ELSE 1 END)")
-        found = where_full_path_in([path]).reorder(order_sql).take
-      end
+      # Case sensitive match first (it's cheaper and the usual case)
+      # If we didn't have an exact match, we perform a case insensitive search
+      found = includes(:route).find_by(routes: { path: path }) || where_full_path_in([path]).take
 
       return found if found
 
@@ -55,24 +48,24 @@ module Routable
     #
     # Usage:
     #
-    #     Klass.where_full_path_in(%w{gitlab-org/gitlab-ce gitlab-org/gitlab-ee})
+    #     Klass.where_full_path_in(%w{gitlab-org/gitlab-foss gitlab-org/gitlab})
     #
     # Returns an ActiveRecord::Relation.
-    def where_full_path_in(paths)
+    def where_full_path_in(paths, use_includes: true)
       return none if paths.empty?
-
-      routable_calls_counter.increment(method: 'where_full_path_in')
 
       wheres = paths.map do |path|
         "(LOWER(routes.path) = LOWER(#{connection.quote(path)}))"
       end
 
-      includes(:route).where(wheres.join(' OR ')).references(:routes)
-    end
+      route =
+        if use_includes
+          includes(:route).references(:routes)
+        else
+          joins(:route)
+        end
 
-    # Temporary instrumentation of method calls
-    def routable_calls_counter
-      @routable_calls_counter ||= Gitlab::Metrics.counter(:gitlab_routable_calls_total, 'Number of calls to Routable by method')
+      route.where(wheres.join(' OR '))
     end
   end
 

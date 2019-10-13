@@ -1,6 +1,6 @@
 # SCIM API **(SILVER ONLY)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/9388) in [GitLab Silver](https://about.gitlab.com/pricing/) 11.10.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/9388) in [GitLab Silver](https://about.gitlab.com/pricing/) 11.10.
 
 The SCIM API implements the [the RFC7644 protocol](https://tools.ietf.org/html/rfc7644).
 
@@ -24,6 +24,11 @@ Parameters:
 |:----------|:--------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------|
 | `filter`   | string  | yes     | A [filter](#available-filters) expression. |
 | `group_path` | string | yes    | Full path to the group. |
+| `startIndex` | integer | no    | The 1-based index indicating where to start returning results from. A value of less than one will be interpreted as 1. |
+| `count` | integer | no    | Desired maximum number of query results. |
+
+NOTE: **Note:**
+Pagination follows the [SCIM spec](https://tools.ietf.org/html/rfc7644#section-3.4.2.4) rather than GitLab pagination as used elsewhere. If records change between requests it is possible for a page to either be missing records that have moved to a different page or repeat records from a previous request.
 
 Example request:
 

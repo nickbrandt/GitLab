@@ -2,7 +2,7 @@
 
 > [Introduced][ce-2640] in GitLab 8.5
 
-[ce-2640]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/2640
+[ce-2640]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/2640
 
 ## Registration and authentication tokens
 
@@ -184,8 +184,8 @@ Example response:
             "id": 1,
             "name": "GitLab Community Edition",
             "name_with_namespace": "GitLab.org / GitLab Community Edition",
-            "path": "gitlab-ce",
-            "path_with_namespace": "gitlab-org/gitlab-ce"
+            "path": "gitlab-foss",
+            "path_with_namespace": "gitlab-org/gitlab-foss"
         }
     ],
     "token": "205086a8e3b9a2b818ffac9b89d102",
@@ -243,8 +243,8 @@ Example response:
             "id": 1,
             "name": "GitLab Community Edition",
             "name_with_namespace": "GitLab.org / GitLab Community Edition",
-            "path": "gitlab-ce",
-            "path_with_namespace": "gitlab-org/gitlab-ce"
+            "path": "gitlab-foss",
+            "path_with_namespace": "gitlab-org/gitlab-foss"
         }
     ],
     "token": "205086a8e3b9a2b818ffac9b89d102",
@@ -279,7 +279,7 @@ curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://git
 
 ## List runner's jobs
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/15432) in GitLab 10.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/15432) in GitLab 10.3.
 
 List jobs that are being processed or were processed by specified Runner.
 

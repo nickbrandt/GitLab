@@ -9,7 +9,7 @@ describe "uploading designs" do
   let(:current_user) { create(:user) }
   let(:issue) { create(:issue) }
   let(:project) { issue.project }
-  let(:files) { [fixture_file_upload('spec/fixtures/dk.png')] }
+  let(:files) { [fixture_file_upload("spec/fixtures/dk.png")] }
   let(:variables) { {} }
 
   let(:mutation) do
@@ -35,7 +35,7 @@ describe "uploading designs" do
     expect(graphql_errors).to be_present
   end
 
-  it 'succeeds (backward compatibility)' do
+  it "succeeds (backward compatibility)" do
     post_graphql_mutation(mutation, current_user: current_user)
 
     expect(graphql_errors).not_to be_present
@@ -57,8 +57,21 @@ describe "uploading designs" do
     post_graphql_mutation(mutation, current_user: current_user)
 
     expect(mutation_response).to include(
-      'designs' => a_collection_containing_exactly(
-        a_hash_including('filename' => 'dk.png')
+      "designs" => a_collection_containing_exactly(
+        a_hash_including("filename" => "dk.png")
+      )
+    )
+  end
+
+  it "can respond with skipped designs" do
+    2.times do
+      post_graphql_mutation(mutation, current_user: current_user)
+      files.each(&:rewind)
+    end
+
+    expect(mutation_response).to include(
+      "skippedDesigns" => a_collection_containing_exactly(
+        a_hash_including("filename" => "dk.png")
       )
     )
   end

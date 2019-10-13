@@ -4,6 +4,7 @@ import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper
 import eventHub from 'ee/onboarding/onboarding_helper/event_hub';
 import createStore from 'ee/onboarding/onboarding_helper/store';
 import actionPopoverUtils from 'ee/onboarding/onboarding_helper/action_popover_utils';
+import Tracking from '~/tracking';
 import { mockTourData } from '../mock_data';
 
 describe('User onboarding helper app', () => {
@@ -228,18 +229,6 @@ describe('User onboarding helper app', () => {
         expect(vm.showExitTourContent).toHaveBeenCalledWith(true);
       });
 
-      it('quits the tour', () => {
-        spyOn(vm, 'handleExitTour');
-
-        const button = {
-          exitTour: true,
-        };
-
-        vm.handleClickPopoverButton(button);
-
-        expect(vm.handleExitTour).toHaveBeenCalled();
-      });
-
       it('sets dismissPopover to true when true/undefined on button config', () => {
         let button = {
           dismissPopover: true,
@@ -306,6 +295,32 @@ describe('User onboarding helper app', () => {
       });
     });
 
+    describe('handleFeedbackButton', () => {
+      beforeEach(() => {
+        spyOn(Tracking, 'event');
+        spyOn(vm.$store, 'dispatch');
+      });
+
+      it('tracks feedback and shows the exit tour content', () => {
+        vm.handleFeedbackButton({ feedbackResult: 1 });
+
+        expect(Tracking.event).toHaveBeenCalledWith('onboarding', 'click_link', {
+          label: 'feedback',
+          property: 'feedback_result',
+          value: 1,
+        });
+
+        expect(vm.$store.dispatch).toHaveBeenCalledWith('setExitTour', true);
+      });
+
+      it('shows the exit tour content but does not track feedback', () => {
+        vm.handleFeedbackButton({ feedbackResult: null });
+
+        expect(Tracking.event).not.toHaveBeenCalledWith();
+        expect(vm.$store.dispatch).toHaveBeenCalledWith('setExitTour', true);
+      });
+    });
+
     describe('showExitTourContent', () => {
       it('sets the "dismissPopover" prop to false', () => {
         vm.showExitTourContent(true);
@@ -338,19 +353,19 @@ describe('User onboarding helper app', () => {
       });
     });
 
-    describe('handleExitTour', () => {
-      it('calls the "hideActionPopover" method', () => {
-        spyOn(vm, 'hideActionPopover');
+    describe('handleExitTourButton', () => {
+      it('emits the "onboardingHelper.hideActionPopover" event', () => {
+        spyOn(eventHub, '$emit');
 
-        vm.handleExitTour();
+        vm.handleExitTourButton();
 
-        expect(vm.hideActionPopover).toHaveBeenCalled();
+        expect(eventHub.$emit).toHaveBeenCalledWith('onboardingHelper.hideActionPopover');
       });
 
       it('calls the "setDismissed" method with true', () => {
         spyOn(vm.$store, 'dispatch');
 
-        vm.handleExitTour();
+        vm.handleExitTourButton();
 
         expect(vm.$store.dispatch).toHaveBeenCalledWith('setDismissed', true);
       });
@@ -358,7 +373,7 @@ describe('User onboarding helper app', () => {
       it('emits the "onboardingHelper.destroyActionPopover" event', () => {
         spyOn(eventHub, '$emit');
 
-        vm.handleExitTour();
+        vm.handleExitTourButton();
 
         expect(eventHub.$emit).toHaveBeenCalledWith('onboardingHelper.destroyActionPopover');
       });

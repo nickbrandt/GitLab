@@ -27,7 +27,7 @@ class Packages::PackageFile < ApplicationRecord
 
   def log_geo_deleted_event
     # Keep empty for now. Should be addressed in future
-    # by https://gitlab.com/gitlab-org/gitlab-ee/issues/7891
+    # by https://gitlab.com/gitlab-org/gitlab/issues/7891
   end
 
   def download_path

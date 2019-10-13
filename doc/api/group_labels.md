@@ -1,6 +1,6 @@
 # Group Labels API
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/21368) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/21368) in GitLab 11.8.
 
 This API supports managing of [group labels](../user/project/labels.md#project-labels-and-group-labels). It allows to list, create, update, and delete group labels. Furthermore, users can subscribe and unsubscribe to and from group labels.
 
@@ -15,7 +15,8 @@ GET /groups/:id/labels
 | Attribute     | Type           | Required | Description                                                                                                                                                                  |
 | ---------     | ----           | -------- | -----------                                                                                                                                                                  |
 | `id`          | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user.                                                               |
-| `with_counts` | boolean        | no       | Whether or not to include issue and merge request counts. Defaults to `false`. _([Introduced in GitLab 12.2](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/31543))_ |
+| `with_counts` | boolean        | no       | Whether or not to include issue and merge request counts. Defaults to `false`. _([Introduced in GitLab 12.2](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/31543))_ |
+| `include_ancestor_groups` | boolean | no | Include ancestor groups. Defaults to `true`. |
 
 ```bash
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/labels?with_counts=true
@@ -48,6 +49,40 @@ Example response:
     "subscribed": false
   }
 ]
+```
+
+## Get a single group label
+
+Get a single label for a given group.
+
+```
+GET /groups/:id/labels/:label_id
+```
+
+| Attribute     | Type           | Required | Description                                                                                                                                                                  |
+| ---------     | ----           | -------- | -----------                                                                                                                                                                  |
+| `id`          | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user.                                                               |
+| `label_id` | integer or string | yes | The ID or title of a group's label. |
+| `include_ancestor_groups` | boolean | no | Include ancestor groups. Defaults to `true`. |
+
+```bash
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/labels/bug
+```
+
+Example response:
+
+```json
+{
+  "id": 7,
+  "name": "bug",
+  "color": "#FF0000",
+  "text_color" : "#FFFFFF",
+  "description": null,
+  "open_issues_count": 0,
+  "closed_issues_count": 0,
+  "open_merge_requests_count": 0,
+  "subscribed": false
+}
 ```
 
 ## Create a new group label
@@ -90,19 +125,19 @@ Example response:
 Updates an existing group label. At least one parameter is required, to update the group label.
 
 ```
-PUT /groups/:id/labels
+PUT /groups/:id/labels/:label_id
 ```
 
 | Attribute     | Type    | Required | Description                  |
 | ------------- | ------- | -------- | ---------------------------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user |
-| `name`        | string  | yes      | The name of the label        |
+| `label_id` | integer or string | yes | The ID or title of a group's label. |
 | `new_name`    | string  | no      | The new name of the label        |
 | `color`       | string  | no      | The color of the label given in 6-digit hex notation with leading '#' sign (e.g. #FFAABB) or one of the [CSS color names](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#Color_keywords) |
 | `description` | string  | no       | The description of the label. |
 
 ```bash
-curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" --header "Content-Type: application/json" --data '{"name": "Feature Proposal", "new_name": "Feature Idea" }' https://gitlab.example.com/api/v4/groups/5/labels
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" --header "Content-Type: application/json" --data '{"new_name": "Feature Idea" }' https://gitlab.example.com/api/v4/groups/5/labels/Feature%20Proposal
 ```
 
 Example response:
@@ -121,22 +156,26 @@ Example response:
 }
 ```
 
+NOTE: **Note:** An older endpoint `PUT /groups/:id/labels` with `name` in the params is still available, but deprecated.
+
 ## Delete a group label
 
 Deletes a group label with a given name.
 
 ```
-DELETE /groups/:id/labels
+DELETE /groups/:id/labels/:label_id
 ```
 
 | Attribute | Type    | Required | Description           |
 | --------- | ------- | -------- | --------------------- |
 | `id`      | integer/string    | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user |
-| `name`    | string  | yes      | The name of the label. |
+| `label_id` | integer or string | yes | The ID or title of a group's label. |
 
 ```bash
-curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/labels?name=bug
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/labels/bug
 ```
+
+NOTE: **Note:** An older endpoint `DELETE /groups/:id/labels` with `name` in the params is still available, but deprecated.
 
 ## Subscribe to a group label
 

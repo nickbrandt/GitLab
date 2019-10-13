@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import Api from '~/api';
 import store from './store';
 import FilterDropdowns from './components/filter_dropdowns.vue';
-import TimeFrameDropdown from './components/timeframe_dropdown.vue';
+import DateRange from './components/daterange.vue';
 import ProductivityAnalyticsApp from './components/app.vue';
 import FilteredSearchProductivityAnalytics from './filtered_search_productivity_analytics';
+import { getLabelsEndpoint, getMilestonesEndpoint } from './utils';
 
 export default () => {
   const container = document.getElementById('js-productivity-analytics');
@@ -25,13 +25,13 @@ export default () => {
     el: groupProjectSelectContainer,
     store,
     methods: {
-      onGroupSelected(namespacePath) {
-        this.initFilteredSearch(namespacePath);
+      onGroupSelected({ groupNamespace, groupId }) {
+        this.initFilteredSearch({ groupNamespace, groupId });
       },
-      onProjectSelected({ namespacePath, project }) {
-        this.initFilteredSearch(namespacePath, project);
+      onProjectSelected({ groupNamespace, groupId, projectNamespace, projectId }) {
+        this.initFilteredSearch({ groupNamespace, groupId, projectNamespace, projectId });
       },
-      initFilteredSearch(namespacePath, project = '') {
+      initFilteredSearch({ groupNamespace, groupId, projectNamespace = '', projectId = null }) {
         // let's unbind attached event handlers first and reset the template
         if (filterManager) {
           filterManager.cleanup();
@@ -41,35 +41,19 @@ export default () => {
         searchBarContainer.classList.remove('hide');
 
         const filteredSearchInput = searchBarContainer.querySelector('.filtered-search');
-        const labelsEndpoint = this.getLabelsEndpoint(namespacePath, project);
-        const milestonesEndpoint = this.getMilestonesEndpoint(namespacePath, project);
+        const labelsEndpoint = getLabelsEndpoint(groupNamespace, projectNamespace);
+        const milestonesEndpoint = getMilestonesEndpoint(groupNamespace, projectNamespace);
 
-        filteredSearchInput.setAttribute('data-group-id', namespacePath);
+        filteredSearchInput.setAttribute('data-group-id', groupId);
 
-        if (project) {
-          filteredSearchInput.setAttribute('data-project-id', project);
+        if (projectId) {
+          filteredSearchInput.setAttribute('data-project-id', projectId);
         }
 
         filteredSearchInput.setAttribute('data-labels-endpoint', labelsEndpoint);
         filteredSearchInput.setAttribute('data-milestones-endpoint', milestonesEndpoint);
         filterManager = new FilteredSearchProductivityAnalytics({ isGroup: false });
         filterManager.setup();
-      },
-      getLabelsEndpoint(namespacePath, projectPath) {
-        if (projectPath) {
-          return Api.buildUrl(Api.projectLabelsPath)
-            .replace(':namespace_path', namespacePath)
-            .replace(':project_path', projectPath);
-        }
-
-        return Api.buildUrl(Api.groupLabelsPath).replace(':namespace_path', namespacePath);
-      },
-      getMilestonesEndpoint(namespacePath, projectPath) {
-        if (projectPath) {
-          return `/${namespacePath}/${projectPath}/-/milestones`;
-        }
-
-        return `/groups/${namespacePath}/-/milestones`;
       },
     },
     render(h) {
@@ -87,7 +71,7 @@ export default () => {
     el: timeframeContainer,
     store,
     render(h) {
-      return h(TimeFrameDropdown, {});
+      return h(DateRange, {});
     },
   });
 

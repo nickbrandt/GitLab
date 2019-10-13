@@ -40,8 +40,6 @@ module EE
       has_many :approvals,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
       has_many :approvers,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
 
-      has_many :developer_groups, -> { where(members: { access_level: ::Gitlab::Access::DEVELOPER }) }, through: :group_members, source: :group
-
       has_many :users_ops_dashboard_projects
       has_many :ops_dashboard_projects, through: :users_ops_dashboard_projects, source: :project
 
@@ -184,12 +182,20 @@ module EE
       email_opted_in_source_id == EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM ? 'GitLab.com' : ''
     end
 
-    def available_custom_project_templates(search: nil, subgroup_id: nil)
+    def available_custom_project_templates(search: nil, subgroup_id: nil, project_id: nil)
       templates = ::Gitlab::CurrentSettings.available_custom_project_templates(subgroup_id)
+
+      params = {}
+
+      if project_id
+        templates = templates.where(id: project_id)
+      else
+        params = { search: search, sort: 'name_asc' }
+      end
 
       ::ProjectsFinder.new(current_user: self,
                            project_ids_relation: templates,
-                           params: { search: search, sort: 'name_asc' })
+                           params: params)
                       .execute
     end
 

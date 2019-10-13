@@ -23,7 +23,7 @@ describe 'User creates a merge request with blocking MRs', :js do
 
       visit(project_new_merge_request_path(project, merge_request: mr_params))
 
-      fill_in 'Cross-project dependencies', with: other_mr.to_reference(full: true)
+      fill_in 'Merge request dependencies', with: other_mr.to_reference(full: true)
       click_button('Submit merge request')
 
       expect(page).to have_content('Depends on 1 merge request')
@@ -38,7 +38,7 @@ describe 'User creates a merge request with blocking MRs', :js do
     it 'does not show blocking MRs controls' do
       visit(project_new_merge_request_path(project, merge_request: mr_params))
 
-      expect(page).not_to have_content('Cross-project dependencies')
+      expect(page).not_to have_content('Merge request dependencies')
     end
   end
 end

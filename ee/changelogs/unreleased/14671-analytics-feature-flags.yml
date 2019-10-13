@@ -1,5 +1,0 @@
----
-title: Eliminating `analytics` feature flag and introduce separate feature flags for Analytics features.
-merge_request: 16102
-author:
-type: changed

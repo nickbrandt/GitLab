@@ -6,6 +6,11 @@
   overflow-y: scroll;
 }
 
+.design-list-item .design-event {
+  top: $gl-padding;
+  right: $gl-padding;
+}
+
 .image-notes {
   overflow-y: scroll;
   padding: 0 $gl-padding;

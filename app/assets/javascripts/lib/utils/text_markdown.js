@@ -1,4 +1,4 @@
-/* eslint-disable func-names, no-var, no-param-reassign, one-var, operator-assignment, no-else-return, prefer-template, prefer-arrow-callback, consistent-return, no-unused-vars */
+/* eslint-disable func-names, no-var, no-param-reassign, one-var, operator-assignment, no-else-return, consistent-return */
 import $ from 'jquery';
 import { insertText } from '~/lib/utils/common_utils';
 
@@ -157,7 +157,7 @@ export function insertMarkdownText({
   if (tag === LINK_TAG_PATTERN) {
     if (URL) {
       try {
-        const ignoredUrl = new URL(selected);
+        new URL(selected); // eslint-disable-line no-new
         // valid url
         tag = '[text]({text})';
         select = 'text';
@@ -218,7 +218,7 @@ export function insertMarkdownText({
         : blockTagText(text, textArea, blockTag, selected);
     } else {
       textToInsert = selectedSplit
-        .map(function(val) {
+        .map(val => {
           if (tag.indexOf(textPlaceholder) > -1) {
             return tag.replace(textPlaceholder, val);
           }
@@ -237,7 +237,7 @@ export function insertMarkdownText({
   }
 
   if (removedFirstNewLine) {
-    textToInsert = '\n' + textToInsert;
+    textToInsert = `\n${textToInsert}`;
   }
 
   if (removedLastNewLine) {
@@ -301,7 +301,7 @@ export function addMarkdownListeners(form) {
 export function addEditorMarkdownListeners(editor) {
   $('.js-md')
     .off('click')
-    .on('click', function(e) {
+    .on('click', e => {
       const { mdTag, mdBlock, mdPrepend, mdSelect } = $(e.currentTarget).data();
 
       insertMarkdownText({

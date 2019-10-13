@@ -18,7 +18,7 @@ module EE
       private
 
       # FIXME: Loading the path locks from the database is an N+1 problem
-      # https://gitlab.com/gitlab-org/gitlab-ee/issues/7481
+      # https://gitlab.com/gitlab-org/gitlab/issues/7481
       def fill_path_locks!(entries)
         entries.each do |entry|
           path = entry_path(entry)

@@ -61,6 +61,31 @@ describe('ProjectsDropdownFilter component', () => {
   const findDropdownItems = () => findDropdown().findAll('a');
   const findDropdownButton = () => findDropdown().find('button');
 
+  describe('queryParams are applied when fetching data', () => {
+    beforeEach(() => {
+      createComponent({
+        queryParams: {
+          per_page: 50,
+          with_shared: false,
+          order_by: 'last_activity_at',
+        },
+      });
+
+      openDropdown();
+
+      return wrapper.vm.$nextTick();
+    });
+
+    it('applies the correct queryParams when making an api call', () => {
+      expect(Api.groupProjects).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(String),
+        expect.objectContaining({ per_page: 50, with_shared: false, order_by: 'last_activity_at' }),
+        expect.any(Function),
+      );
+    });
+  });
+
   describe('when multiSelect is false', () => {
     beforeEach(() => {
       createComponent({ multiSelect: false });
@@ -137,6 +162,23 @@ describe('ProjectsDropdownFilter component', () => {
           {
             name: 'selected',
             args: [[projects[1]]],
+          },
+        ]);
+      });
+
+      it('selection should be emptied when a project is deselected', () => {
+        const project = findDropdownItems().at(0);
+        project.trigger('click');
+        project.trigger('click');
+
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'selected',
+            args: [[projects[0]]],
+          },
+          {
+            name: 'selected',
+            args: [[]],
           },
         ]);
       });

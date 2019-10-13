@@ -17,6 +17,8 @@ module EE
       }.with_indifferent_access.freeze
 
       prepended do
+        include UsageStatistics
+
         after_save :stick_build_if_status_changed
         delegate :service_specification, to: :runner_session, allow_nil: true
 
@@ -39,7 +41,7 @@ module EE
       def log_geo_deleted_event
         # It is not needed to generate a Geo deleted event
         # since Legacy Artifacts are migrated to multi-build artifacts
-        # See https://gitlab.com/gitlab-org/gitlab-ce/issues/46652
+        # See https://gitlab.com/gitlab-org/gitlab-foss/issues/46652
       end
 
       def has_artifact?(name)
@@ -59,16 +61,16 @@ module EE
         end
       end
 
-      def collect_license_management_reports!(license_management_report)
+      def collect_license_scanning_reports!(license_scanning_report)
         each_report(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES) do |file_type, blob|
           next if ::Feature.disabled?(:parse_license_management_reports, default_enabled: true)
 
           next unless project.feature_available?(:license_management)
 
-          ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, license_management_report)
+          ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, license_scanning_report)
         end
 
-        license_management_report
+        license_scanning_report
       end
 
       def collect_dependency_list_reports!(dependency_list_report)

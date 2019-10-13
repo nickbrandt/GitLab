@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Issues::MoveService do
@@ -24,6 +26,45 @@ describe Issues::MoveService do
         # actually get to the `after_commit` hook that queues these jobs.
         expect { move_service.execute(old_issue, new_project) }
           .not_to raise_error # Sidekiq::Worker::EnqueueFromTransactionError
+      end
+    end
+  end
+
+  describe '#rewrite_related_issues' do
+    let(:user) { create(:user) }
+    let(:admin) { create(:admin) }
+    let(:authorized_project) { create(:project) }
+    let(:authorized_project2) { create(:project) }
+    let(:unauthorized_project) { create(:project) }
+
+    let(:authorized_issue_b) { create(:issue, project: authorized_project) }
+    let(:authorized_issue_c) { create(:issue, project: authorized_project2) }
+    let(:authorized_issue_d) { create(:issue, project: authorized_project2) }
+    let(:unauthorized_issue) { create(:issue, project: unauthorized_project) }
+
+    let!(:issue_link_a) { create(:issue_link, source: old_issue, target: authorized_issue_b) }
+    let!(:issue_link_b) { create(:issue_link, source: old_issue, target: unauthorized_issue) }
+    let!(:issue_link_c) { create(:issue_link, source: old_issue, target: authorized_issue_c) }
+    let!(:issue_link_d) { create(:issue_link, source: authorized_issue_d, target: old_issue) }
+
+    before do
+      stub_licensed_features(related_issues: true)
+      authorized_project.add_developer(user)
+      authorized_project2.add_developer(user)
+    end
+
+    context 'multiple related issues' do
+      it 'moves all related issues and retains permissions' do
+        new_issue = move_service.execute(old_issue, new_project)
+
+        expect(new_issue.related_issues(admin))
+          .to match_array([authorized_issue_b, authorized_issue_c, authorized_issue_d, unauthorized_issue])
+
+        expect(new_issue.related_issues(user))
+          .to match_array([authorized_issue_b, authorized_issue_c, authorized_issue_d])
+
+        expect(authorized_issue_d.related_issues(user))
+          .to match_array([new_issue])
       end
     end
   end

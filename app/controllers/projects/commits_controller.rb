@@ -72,11 +72,11 @@ class Projects::CommitsController < Projects::ApplicationController
         @repository.commits(@ref, path: @path, limit: @limit, offset: @offset)
       end
 
-    @commits = @commits.with_pipeline_status
+    @commits = @commits.with_latest_pipeline(@ref)
     @commits = set_commits_for_rendering(@commits)
   end
 
   def whitelist_query_limiting
-    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42330')
+    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42330')
   end
 end

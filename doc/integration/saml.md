@@ -111,7 +111,7 @@ in your SAML IdP:
 1. Change the values of `idp_cert_fingerprint`, `idp_sso_target_url`,
    `name_identifier_format` to match your IdP. If a fingerprint is used it must
    be a SHA1 fingerprint; check
-   [the omniauth-saml documentation](https://github.com/omniauth/omniauth-saml)
+   [the OmniAuth SAML documentation](https://github.com/omniauth/omniauth-saml)
    for more details on these options.
 
 1. Change the value of `issuer` to a unique name, which will identify the application
@@ -133,7 +133,7 @@ https://gitlab.example.com/users/auth/saml/metadata
 At a minimum the IdP *must* provide a claim containing the user's email address, using
 claim name `email` or `mail`. The email will be used to automatically generate the GitLab
 username. GitLab will also use claims with name `name`, `first_name`, `last_name`
-(see [the omniauth-saml gem](https://github.com/omniauth/omniauth-saml/blob/master/lib/omniauth/strategies/saml.rb)
+(see [the OmniAuth SAML gem](https://github.com/omniauth/omniauth-saml/blob/master/lib/omniauth/strategies/saml.rb)
 for supported claims).
 
 On the sign in page there should now be a SAML button below the regular sign in form.
@@ -370,7 +370,7 @@ This setting should only be used to map attributes that are part of the
 OmniAuth info hash schema.
 
 `attribute_statements` is used to map Attribute Names in a SAMLResponse to entries
-in the OmniAuth [info hash](https://github.com/intridea/omniauth/wiki/Auth-Hash-Schema#schema-10-and-later).
+in the OmniAuth [info hash](https://github.com/omniauth/omniauth/wiki/Auth-Hash-Schema#schema-10-and-later).
 
 For example, if your SAMLResponse contains an Attribute called 'EmailAddress',
 specify `{ email: ['EmailAddress'] }` to map the Attribute to the
@@ -414,7 +414,7 @@ args: {
 
 ### `uid_attribute`
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/43806) in GitLab 10.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17734) in GitLab 10.7.
 
 By default, the `uid` is set as the `name_id` in the SAML response. If you'd like to designate a unique attribute for the `uid`, you can set the `uid_attribute`. In the example below, the value of `uid` attribute in the SAML response is set as the `uid_attribute`.
 
@@ -458,7 +458,7 @@ installations from source. Restart Unicorn using the `sudo gitlab-ctl restart un
 command on Omnibus installations and `sudo service gitlab restart` on installations
 from source.
 
-You may also find the [SSO Tracer](https://addons.mozilla.org/en-US/firefox/addon/sso-tracer)
+You may also find the [SSO Tracer](https://addons.mozilla.org/en-US/firefox/addon/sso-tracer/)
 (Firefox) and [SAML Chrome Panel](https://chrome.google.com/webstore/detail/saml-chrome-panel/paijfdbeoenhembfhkhllainmocckace)
 (Chrome) browser extensions useful in your debugging.
 

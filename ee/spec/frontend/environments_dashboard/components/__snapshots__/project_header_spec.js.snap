@@ -59,7 +59,6 @@ exports[`Project Header matches the snapshot 1`] = `
     >
       <icon-stub
         class="text-secondary"
-        cssclasses=""
         name="ellipsis_v"
         size="16"
       />

@@ -1,4 +1,4 @@
-/* eslint-disable func-names, one-var, no-var, prefer-rest-params, vars-on-top, prefer-arrow-callback, consistent-return, object-shorthand, no-shadow, no-unused-vars, no-else-return, no-self-compare, prefer-template, no-unused-expressions, yoda, prefer-spread, camelcase, no-param-reassign */
+/* eslint-disable func-names, one-var, no-var, prefer-rest-params, vars-on-top, consistent-return, no-shadow, no-else-return, no-self-compare, no-unused-expressions, yoda, prefer-spread, camelcase, no-param-reassign */
 /* global Issuable */
 /* global emitSidebarEvent */
 
@@ -7,6 +7,7 @@ import _ from 'underscore';
 import axios from './lib/utils/axios_utils';
 import { s__, __, sprintf } from './locale';
 import ModalStore from './boards/stores/modal_store';
+import { parseBoolean } from './lib/utils/common_utils';
 
 // TODO: remove eventHub hack after code splitting refactor
 window.emitSidebarEvent = window.emitSidebarEvent || $.noop;
@@ -248,20 +249,16 @@ function UsersSelect(currentUser, els, options = {}) {
           })}</span> <% } %>`,
         );
         return $dropdown.glDropdown({
-          showMenuAbove: showMenuAbove,
-          data: function(term, callback) {
-            return _this.users(
-              term,
-              options,
-              function(users) {
-                // GitLabDropdownFilter returns this.instance
-                // GitLabDropdownRemote returns this.options.instance
-                const glDropdown = this.instance || this.options.instance;
-                glDropdown.options.processData(term, users, callback);
-              }.bind(this),
-            );
+          showMenuAbove,
+          data(term, callback) {
+            return _this.users(term, options, users => {
+              // GitLabDropdownFilter returns this.instance
+              // GitLabDropdownRemote returns this.options.instance
+              const glDropdown = this.instance || this.options.instance;
+              glDropdown.options.processData(term, users, callback);
+            });
           },
-          processData: function(term, data, callback) {
+          processData(term, data, callback) {
             let users = data;
 
             // Only show assigned user list when there is no search term
@@ -279,12 +276,13 @@ function UsersSelect(currentUser, els, options = {}) {
                 })
                 .map(input => {
                   const userId = parseInt(input.value, 10);
-                  const { avatarUrl, avatar_url, name, username } = input.dataset;
+                  const { avatarUrl, avatar_url, name, username, canMerge } = input.dataset;
                   return {
                     avatar_url: avatarUrl || avatar_url,
                     id: userId,
                     name,
                     username,
+                    can_merge: parseBoolean(canMerge),
                   };
                 });
 
@@ -326,7 +324,7 @@ function UsersSelect(currentUser, els, options = {}) {
                 }
                 anyUser = {
                   beforeDivider: true,
-                  name: name,
+                  name,
                   id: null,
                 };
                 users.unshift(anyUser);
@@ -376,7 +374,7 @@ function UsersSelect(currentUser, els, options = {}) {
           },
           selectable: true,
           fieldName: $dropdown.data('fieldName'),
-          toggleLabel: function(selected, el, glDropdown) {
+          toggleLabel(selected, el, glDropdown) {
             const inputValue = glDropdown.filterInput.val();
 
             if (this.multiSelect && inputValue === '') {
@@ -404,8 +402,8 @@ function UsersSelect(currentUser, els, options = {}) {
               return defaultLabel;
             }
           },
-          defaultLabel: defaultLabel,
-          hidden: function(e) {
+          defaultLabel,
+          hidden() {
             if ($dropdown.hasClass('js-multiselect')) {
               emitSidebarEvent('sidebar.saveAssignees');
             }
@@ -422,7 +420,7 @@ function UsersSelect(currentUser, els, options = {}) {
           },
           multiSelect: $dropdown.hasClass('js-multiselect'),
           inputMeta: $dropdown.data('inputMeta'),
-          clicked: function(options) {
+          clicked(options) {
             const { $el, e, isMarking } = options;
             const user = options.selectedObj;
 
@@ -432,8 +430,7 @@ function UsersSelect(currentUser, els, options = {}) {
               const isActive = $el.hasClass('is-active');
               const previouslySelected = $dropdown
                 .closest('.selectbox')
-                /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
-                .find("input[name='" + $dropdown.data('fieldName') + "'][value!=0]");
+                .find(`input[name='${$dropdown.data('fieldName')}'][value!=0]`);
 
               // Enables support for limiting the number of users selected
               // Automatically removes the first on the list if more users are selected
@@ -442,7 +439,6 @@ function UsersSelect(currentUser, els, options = {}) {
               if (user.beforeDivider && user.name.toLowerCase() === 'unassigned') {
                 // Unassigned selected
                 previouslySelected.each((index, element) => {
-                  const id = parseInt(element.value, 10);
                   element.remove();
                 });
                 emitSidebarEvent('sidebar.removeAllAssignees');
@@ -453,7 +449,7 @@ function UsersSelect(currentUser, els, options = {}) {
                 // Remove unassigned selection (if it was previously selected)
                 const unassignedSelected = $dropdown
                   .closest('.selectbox')
-                  .find("input[name='" + $dropdown.data('fieldName') + "'][value=0]");
+                  .find(`input[name='${$dropdown.data('fieldName')}'][value=0]`);
 
                 if (unassignedSelected) {
                   unassignedSelected.remove();
@@ -507,7 +503,7 @@ function UsersSelect(currentUser, els, options = {}) {
             } else if (!$dropdown.hasClass('js-multiselect')) {
               selected = $dropdown
                 .closest('.selectbox')
-                .find("input[name='" + $dropdown.data('fieldName') + "']")
+                .find(`input[name='${$dropdown.data('fieldName')}']`)
                 .val();
               return assignTo(selected);
             }
@@ -523,10 +519,10 @@ function UsersSelect(currentUser, els, options = {}) {
               $dropdown.dropdown('toggle');
             }
           },
-          id: function(user) {
+          id(user) {
             return user.id;
           },
-          opened: function(e) {
+          opened(e) {
             const $el = $(e.currentTarget);
             const selected = getSelected();
             if ($dropdown.hasClass('js-issue-board-sidebar') && selected.length === 0) {
@@ -547,9 +543,9 @@ function UsersSelect(currentUser, els, options = {}) {
             }
           },
           updateLabel: $dropdown.data('dropdownTitle'),
-          renderRow: function(user) {
-            var avatar, img, listClosingTags, listWithName, listWithUserName, username;
-            username = user.username ? '@' + user.username : '';
+          renderRow(user) {
+            var avatar, img, username;
+            username = user.username ? `@${user.username}` : '';
             avatar = user.avatar_url ? user.avatar_url : gon.default_avatar_url;
 
             let selected = false;
@@ -560,7 +556,7 @@ function UsersSelect(currentUser, els, options = {}) {
               const { fieldName } = this;
               const field = $dropdown
                 .closest('.selectbox')
-                .find("input[name='" + fieldName + "'][value='" + user.id + "']");
+                .find(`input[name='${fieldName}'][value='${user.id}']`);
 
               if (field.length) {
                 selected = true;
@@ -576,7 +572,7 @@ function UsersSelect(currentUser, els, options = {}) {
               )}</a></li>`;
             } else {
               // 0 margin, because it's now handled by a wrapper
-              img = "<img src='" + avatar + "' class='avatar avatar-inline m-0' width='32' />";
+              img = `<img src='${avatar}' class='avatar avatar-inline m-0' width='32' />`;
             }
 
             return _this.renderRow(options.issuableType, user, selected, username, img);
@@ -606,8 +602,8 @@ function UsersSelect(currentUser, els, options = {}) {
               placeholder: __('Search for a user'),
               multiple: $(select).hasClass('multiselect'),
               minimumInputLength: 0,
-              query: function(query) {
-                return _this.users(query.term, options, function(users) {
+              query(query) {
+                return _this.users(query.term, options, users => {
                   var anyUser, data, emailUser, index, len, name, nullUser, obj, ref;
                   data = {
                     results: users,
@@ -639,7 +635,7 @@ function UsersSelect(currentUser, els, options = {}) {
                         name = s__('UsersSelect|Any User');
                       }
                       anyUser = {
-                        name: name,
+                        name,
                         id: null,
                       };
                       data.results.unshift(anyUser);
@@ -662,24 +658,24 @@ function UsersSelect(currentUser, els, options = {}) {
                   return query.callback(data);
                 });
               },
-              initSelection: function() {
+              initSelection() {
                 var args;
                 args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
                 return _this.initSelection.apply(_this, args);
               },
-              formatResult: function() {
+              formatResult() {
                 var args;
                 args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
                 return _this.formatResult.apply(_this, args);
               },
-              formatSelection: function() {
+              formatSelection() {
                 var args;
                 args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
                 return _this.formatSelection.apply(_this, args);
               },
               dropdownCssClass: 'ajax-users-dropdown',
               // we do not want to escape markup since we are displaying html in results
-              escapeMarkup: function(m) {
+              escapeMarkup(m) {
                 return m;
               },
             });
@@ -720,7 +716,7 @@ UsersSelect.prototype.formatResult = function(user) {
           ${_.escape(user.name)}
         </div>
         <div class='user-username dropdown-menu-user-username text-secondary'>
-          ${!user.invite ? '@' + _.escape(user.username) : ''}
+          ${!user.invite ? `@${_.escape(user.username)}` : ''}
         </div>
       </div>
     </div>

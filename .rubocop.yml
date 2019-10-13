@@ -51,7 +51,6 @@ Style/FrozenStringLiteralComment:
     - 'danger/**/*'
     - 'db/**/*'
     - 'ee/db/**/*'
-    - 'ee/spec/**/*'
     - 'ee/lib/tasks/**/*'
     - 'lib/tasks/**/*'
     - 'qa/**/*'
@@ -218,6 +217,12 @@ ActiveRecordAssociationReload:
     - 'spec/**/*'
     - 'ee/spec/**/*'
 
+Naming/PredicateName:
+  Enabled: true
+  Exclude:
+    - 'spec/**/*'
+    - 'ee/spec/**/*'
+
 RSpec/FactoriesInMigrationSpecs:
   Enabled: true
   Include:
@@ -275,8 +280,15 @@ RSpec/BeSuccessMatcher:
     - 'ee/spec/support/shared_examples/controllers/**/*'
     - 'spec/support/controllers/**/*'
     - 'ee/spec/support/controllers/**/*'
+
 Scalability/FileUploads:
   Enabled: true
   Include:
     - 'lib/api/**/*.rb'
     - 'ee/lib/api/**/*.rb'
+
+Graphql/Descriptions:
+  Enabled: true
+  Include:
+    - 'app/graphql/**/*'
+    - 'ee/app/graphql/**/*'

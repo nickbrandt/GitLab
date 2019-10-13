@@ -1,4 +1,4 @@
-/* eslint-disable func-names, prefer-arrow-callback, no-unused-vars, consistent-return, camelcase, class-methods-use-this */
+/* eslint-disable func-names, consistent-return, camelcase, class-methods-use-this */
 
 // Zen Mode (full screen) textarea
 //
@@ -39,11 +39,11 @@ export default class ZenMode {
   constructor() {
     this.active_backdrop = null;
     this.active_textarea = null;
-    $(document).on('click', '.js-zen-enter', function(e) {
+    $(document).on('click', '.js-zen-enter', e => {
       e.preventDefault();
       return $(e.currentTarget).trigger('zen_mode:enter');
     });
-    $(document).on('click', '.js-zen-leave', function(e) {
+    $(document).on('click', '.js-zen-leave', e => {
       e.preventDefault();
       return $(e.currentTarget).trigger('zen_mode:leave');
     });
@@ -62,12 +62,12 @@ export default class ZenMode {
     $(document).on(
       'zen_mode:leave',
       (function(_this) {
-        return function(e) {
+        return function() {
           return _this.exit();
         };
       })(this),
     );
-    $(document).on('keydown', function(e) {
+    $(document).on('keydown', e => {
       // Esc
       if (e.keyCode === 27) {
         e.preventDefault();

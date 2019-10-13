@@ -1,5 +1,0 @@
----
-title: Added a migration which fixes discussions for existing promoted epics.
-merge_request: 14708
-author:
-type: fixed

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe Geo::WikiSyncService do
@@ -32,6 +34,8 @@ RSpec.describe Geo::WikiSyncService do
         .and_return(true)
     end
 
+    include_context 'lease handling'
+
     it 'fetches wiki repository with JWT credentials' do
       expect(repository).to receive(:with_config).with("http.#{url_to_repo}.extraHeader" => anything).and_call_original
       expect(repository).to receive(:fetch_as_mirror)
@@ -41,24 +45,10 @@ RSpec.describe Geo::WikiSyncService do
       subject.execute
     end
 
-    it 'releases lease' do
-      expect_to_cancel_exclusive_lease(lease_key, lease_uuid)
-
-      subject.execute
-    end
-
     it 'voids the failure message when it succeeds after an error' do
       registry = create(:geo_project_registry, project: project, last_wiki_sync_failure: 'error')
 
       expect { subject.execute }.to change { registry.reload.last_wiki_sync_failure }.to(nil)
-    end
-
-    it 'does not fetch wiki repository if cannot obtain a lease' do
-      stub_exclusive_lease_taken(lease_key)
-
-      expect(repository).not_to receive(:fetch_as_mirror)
-
-      subject.execute
     end
 
     it 'rescues exception when Gitlab::Shell::Error is raised' do
@@ -239,6 +229,11 @@ RSpec.describe Geo::WikiSyncService do
 
     it_behaves_like 'sync retries use the snapshot RPC' do
       let(:repository) { project.wiki.repository }
+      let(:retry_count) { Geo::ProjectRegistry::RETRIES_BEFORE_REDOWNLOAD }
+
+      def registry_with_retry_count(retries)
+        create(:geo_project_registry, project: project, repository_retry_count: retries, wiki_retry_count: retries)
+      end
     end
   end
 end

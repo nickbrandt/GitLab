@@ -4,7 +4,7 @@ type: reference, howto
 
 # Code Quality **(STARTER)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1984) in [GitLab Starter](https://about.gitlab.com/pricing/) 9.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/1984) in [GitLab Starter](https://about.gitlab.com/pricing/) 9.3.
 
 With the help of [GitLab CI/CD](../../../ci/README.md), you can analyze your
 source code quality using GitLab Code Quality.
@@ -65,6 +65,13 @@ will scan your source code for code quality issues. The report will be saved as 
 [Code Quality report artifact](../../../ci/yaml/README.md#artifactsreportscodequality-starter)
 that you can later download and analyze. Due to implementation limitations we always
 take the latest Code Quality artifact available.
+
+The included `code_quality` job is running in the `test` stage, so it needs to be included in your CI config, like so:
+
+```yaml
+stages:
+  - test
+```
 
 TIP: **Tip:**
 This information will be automatically extracted and shown right in the merge request widget.

@@ -39,6 +39,10 @@ module QA
 
               view 'ee/app/assets/javascripts/vue_shared/security_reports/grouped_security_reports_app.vue' do
                 element :vulnerability_report_grouped
+                element :sast_scan_report
+                element :dependency_scan_report
+                element :container_scan_report
+                element :dast_scan_report
               end
 
               view 'app/assets/javascripts/reports/components/report_section.vue' do
@@ -129,15 +133,38 @@ module QA
               finished_loading?
               has_element?(:vulnerability_report_grouped, wait: 1)
             end
+            find_element(:vulnerability_report_grouped).has_no_content?("is loading")
           end
 
-          def has_detected_vulnerability_count_of?(expected)
+          def has_total_vulnerability_count_of?(expected)
             # Match text cut off in order to find both "1 vulnerability" and "X vulnerabilities"
-            find_element(:vulnerability_report_grouped).has_content?("detected #{expected} vulnerabilit")
+            find_element(:vulnerability_report_grouped).has_content?(/Security scanning detected #{expected}( new)? vulnerabilit/)
+          end
+
+          def has_sast_vulnerability_count_of?(expected)
+            find_element(:sast_scan_report).has_content?(/SAST detected #{expected}( new)? vulnerabilit/)
+          end
+
+          def has_dependency_vulnerability_count_of?(expected)
+            find_element(:dependency_scan_report).has_content?(/Dependency scanning detected #{expected}( new)? vulnerabilit/)
+          end
+
+          def has_container_vulnerability_count_of?(expected)
+            find_element(:container_scan_report).has_content?(/Container scanning detected #{expected}( new)? vulnerabilit/)
+          end
+
+          def has_dast_vulnerability_count_of?(expected)
+            find_element(:dast_scan_report).has_content?(/DAST detected #{expected}( new)? vulnerabilit/)
           end
 
           def num_approvals_required
             approvals_content.match(/Requires (\d+) more approvals/)[1].to_i
+          end
+
+          def merge_via_merge_train
+            raise ElementNotFound, "Not ready to merge" unless ready_to_merge?
+
+            click_element(:merge_button, text: "Start merge train")
           end
 
           private

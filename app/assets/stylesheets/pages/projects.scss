@@ -877,11 +877,16 @@ pre.light-well {
   flex-direction: column;
 
   // Disable Flexbox for admin page
-  &.admin-projects {
+  &.admin-projects,
+  &.group-settings-projects {
     display: block;
 
     .project-row {
       display: block;
+
+      .description > p {
+        margin-bottom: 0;
+      }
     }
   }
 
@@ -889,11 +894,7 @@ pre.light-well {
     @include basic-list-stats;
     display: flex;
     align-items: center;
-    padding: $gl-padding 0;
-
-    @include media-breakpoint-up(lg) {
-      padding: $gl-padding 0;
-    }
+    padding: $gl-padding-12 0;
 
     &.no-description {
       @include media-breakpoint-up(sm) {
@@ -909,7 +910,7 @@ pre.light-well {
   }
 
   h2 {
-    font-size: $gl-font-size-large;
+    font-size: $gl-font-size;
     font-weight: $gl-font-weight-bold;
     margin-bottom: 0;
 
@@ -951,6 +952,7 @@ pre.light-well {
 
     .description {
       line-height: 1.5;
+      color: $gl-text-color-secondary;
     }
 
     @include media-breakpoint-down(md) {
@@ -995,6 +997,14 @@ pre.light-well {
       @include media-breakpoint-down(xs) {
         &:first-child {
           margin-left: 0;
+        }
+      }
+    }
+
+    &:not(.with-pipeline-status) {
+      .icon-wrapper:first-of-type {
+        @include media-breakpoint-up(lg) {
+          margin-left: $gl-padding-32;
         }
       }
     }
@@ -1096,7 +1106,6 @@ pre.light-well {
     &:not(.explore) {
       .forks {
         display: none;
-
       }
     }
 

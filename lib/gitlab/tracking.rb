@@ -6,6 +6,17 @@ module Gitlab
   module Tracking
     SNOWPLOW_NAMESPACE = 'gl'
 
+    module ControllerConcern
+      extend ActiveSupport::Concern
+
+      protected
+
+      def track_event(action = action_name, **args)
+        category = args.delete(:category) || self.class.name
+        Gitlab::Tracking.event(category, action.to_s, **args)
+      end
+    end
+
     class << self
       def enabled?
         Gitlab::CurrentSettings.snowplow_enabled?
@@ -24,8 +35,8 @@ module Gitlab
           hostname: Gitlab::CurrentSettings.snowplow_collector_hostname,
           cookie_domain: Gitlab::CurrentSettings.snowplow_cookie_domain,
           app_id: Gitlab::CurrentSettings.snowplow_site_id,
-          page_tracking_enabled: additional_features,
-          activity_tracking_enabled: additional_features
+          form_tracking: additional_features,
+          link_click_tracking: additional_features
         }.transform_keys! { |key| key.to_s.camelize(:lower).to_sym }
       end
 
@@ -33,7 +44,7 @@ module Gitlab
 
       def snowplow
         @snowplow ||= SnowplowTracker::Tracker.new(
-          SnowplowTracker::Emitter.new(Gitlab::CurrentSettings.snowplow_collector_hostname),
+          SnowplowTracker::AsyncEmitter.new(Gitlab::CurrentSettings.snowplow_collector_hostname, protocol: 'https'),
           SnowplowTracker::Subject.new,
           SNOWPLOW_NAMESPACE,
           Gitlab::CurrentSettings.snowplow_site_id

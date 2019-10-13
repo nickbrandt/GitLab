@@ -8,10 +8,11 @@ exports[`Design management list component renders list 1`] = `
     class="col-md-6 col-lg-4 mb-3"
   >
     <design-stub
-      commentscount="2"
+      event="NONE"
       id="1"
       image="test"
       name="test"
+      notescount="2"
       updatedat="01-01-2019"
     />
   </li>
@@ -19,10 +20,11 @@ exports[`Design management list component renders list 1`] = `
     class="col-md-6 col-lg-4 mb-3"
   >
     <design-stub
-      commentscount="2"
+      event="NONE"
       id="2"
       image="test"
       name="test"
+      notescount="2"
       updatedat="01-01-2019"
     />
   </li>

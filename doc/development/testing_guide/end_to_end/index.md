@@ -7,24 +7,6 @@ as expected across the entire software stack and architecture, including
 integration of all micro-services and components that are supposed to work
 together.
 
-## Branch naming
-
-If your contribution contains **only** changes under the
-[`qa/` folder](https://gitlab.com/gitlab-org/gitlab-ce/tree/master/qa), you can
-speed up the CI process by following some branch naming conventions. You have
-three choices:
-
-| Branch name           | Valid example                |
-|:----------------------|:-----------------------------|
-| Starting with `qa/`   | `qa/new-oauth-login-test`     |
-| Starting with `qa-`   | `qa-new-oauth-login-test`     |
-| Ending in `-qa`       | `123-new-oauth-login-test-qa` |
-
-If your branch name matches any of the above, it will run only the QA-related
-jobs.
-If it does not, the whole application test suite will run (including QA-related
-jobs).
-
 ## How do we test GitLab?
 
 We use [Omnibus GitLab][omnibus-gitlab] to build GitLab packages and then we
@@ -34,14 +16,14 @@ a black-box testing framework for the API and the UI.
 ### Testing nightly builds
 
 We run scheduled pipeline each night to test nightly builds created by Omnibus.
-You can find these nightly pipelines at [gitlab-org/quality/nightly/pipelines][quality-nightly-pipelines].
-Results are reported in the `#qa-nightly` Slack channel.
+You can find these nightly pipelines at `https://gitlab.com/gitlab-org/quality/nightly/pipelines`
+(need Developer access permissions). Results are reported in the `#qa-nightly` Slack channel.
 
 ### Testing staging
 
 We run scheduled pipeline each night to test staging.
-You can find these nightly pipelines at [gitlab-org/quality/staging/pipelines][quality-staging-pipelines].
-Results are reported in the `#qa-staging` Slack channel.
+You can find these nightly pipelines at `https://gitlab.com/gitlab-org/quality/staging/pipelines`
+(need developer access permissions). Results are reported in the `#qa-staging` Slack channel.
 
 ### Testing code in merge requests
 
@@ -70,7 +52,7 @@ graph LR
     A1 -.->|1. Triggers an omnibus-gitlab pipeline and wait for it to be done| A2
     B2[`Trigger-qa` stage<br>`Trigger:qa-test` job] -.->|2. Triggers a gitlab-qa pipeline and wait for it to be done| A3
 
-subgraph "gitlab-ce/ee pipeline"
+subgraph "gitlab-foss/gitlab pipeline"
     A1[`test` stage<br>`package-and-qa-manual` job]
     end
 
@@ -130,7 +112,7 @@ of the test scenarios you can run via the orchestrator](https://gitlab.com/gitla
 
 On the other hand, if you would like to run against a local development GitLab
 environment, you can use the [GitLab Development Kit (GDK)](https://gitlab.com/gitlab-org/gitlab-development-kit/).
-Please refer to the instructions in the [QA README](https://gitlab.com/gitlab-org/gitlab-ce/tree/master/qa/README.md#how-can-i-use-it)
+Please refer to the instructions in the [QA README](https://gitlab.com/gitlab-org/gitlab/tree/master/qa/README.md#how-can-i-use-it)
 and the section below.
 
 ## How do I write tests?
@@ -153,22 +135,18 @@ Continued reading:
 
 You can ask question in the `#quality` channel on Slack (GitLab internal) or
 you can find an issue you would like to work on in
-[the `gitlab-ce` issue tracker][gitlab-ce-issues],
-[the `gitlab-ee` issue tracker][gitlab-ce-issues], or
+[the `gitlab` issue tracker][gitlab-issues], or
 [the `gitlab-qa` issue tracker][gitlab-qa-issues].
 
 [omnibus-gitlab]: https://gitlab.com/gitlab-org/omnibus-gitlab
 [gitlab-qa]: https://gitlab.com/gitlab-org/gitlab-qa
 [gitlab-qa-readme]: https://gitlab.com/gitlab-org/gitlab-qa/tree/master/README.md
-[quality-nightly-pipelines]: https://gitlab.com/gitlab-org/quality/nightly/pipelines
-[quality-staging-pipelines]: https://gitlab.com/gitlab-org/quality/staging/pipelines
 [review-apps]: ../review_apps.md
 [gitlab-qa-architecture]: https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/architecture.md
 [gitlab-qa-issues]: https://gitlab.com/gitlab-org/gitlab-qa/issues?label_name%5B%5D=new+scenario
-[gitlab-ce-issues]: https://gitlab.com/gitlab-org/gitlab-ce/issues?label_name[]=QA&label_name[]=test
-[gitlab-ee-issues]: https://gitlab.com/gitlab-org/gitlab-ee/issues?label_name[]=QA&label_name[]=test
+[gitlab-issues]: https://gitlab.com/gitlab-org/gitlab/issues?label_name[]=QA&label_name[]=test
 [test environment orchestration scenarios]: https://gitlab.com/gitlab-org/gitlab-qa/tree/master/lib/gitlab/qa/scenario
-[instance-level scenarios]: https://gitlab.com/gitlab-org/gitlab-ce/tree/master/qa/qa/specs/features
-[Page objects documentation]: https://gitlab.com/gitlab-org/gitlab-ce/tree/master/qa/qa/page/README.md
-[instance-qa-readme]: https://gitlab.com/gitlab-org/gitlab-ce/tree/master/qa/README.md
-[instance-qa-examples]: https://gitlab.com/gitlab-org/gitlab-ce/tree/master/qa/qa
+[instance-level scenarios]: https://gitlab.com/gitlab-org/gitlab-foss/tree/master/qa/qa/specs/features
+[Page objects documentation]: https://gitlab.com/gitlab-org/gitlab/tree/master/qa/qa/page/README.md
+[instance-qa-readme]: https://gitlab.com/gitlab-org/gitlab/tree/master/qa/README.md
+[instance-qa-examples]: https://gitlab.com/gitlab-org/gitlab-foss/tree/master/qa/qa

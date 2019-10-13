@@ -1,5 +1,11 @@
 resources :projects, only: [:index, :new, :create]
 
+Gitlab.ee do
+  scope "/-/push_from_secondary/:geo_node_id" do
+    draw :git_http
+  end
+end
+
 draw :git_http
 
 get '/projects/:id' => 'projects#resolve'
@@ -30,6 +36,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Use this scope for all new project routes.
       scope '-' do
         get 'archive/*id', constraints: { format: Gitlab::PathRegex.archive_formats_regex, id: /.+?/ }, to: 'repositories#archive', as: 'archive'
+
+        resources :artifacts, only: [:index, :destroy]
 
         resources :jobs, only: [:index, :show], constraints: { id: /\d+/ } do
           collection do
@@ -189,6 +197,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           defaults: { format: 'json' },
           constraints: { key: %r{[^/]+}, template_type: %r{issue|merge_request}, format: 'json' }
 
+      get '/description_templates/names/:template_type',
+          to: 'templates#names',
+          as: :template_names,
+          defaults: { format: 'json' },
+          constraints: { template_type: %r{issue|merge_request}, format: 'json' }
+
       resources :commit, only: [:show], constraints: { id: /\h{7,40}/ } do
         member do
           get :branches
@@ -233,8 +247,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resources :merge_requests, concerns: :awardable, except: [:new, :create], constraints: { id: /\d+/ } do
+      resources :merge_requests, concerns: :awardable, except: [:new, :create, :show], constraints: { id: /\d+/ } do
         member do
+          get :show # Insert this first to ensure redirections using merge_requests#show match this route
           get :commit_change_content
           post :merge
           post :cancel_auto_merge
@@ -372,6 +387,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :builds
           get :failures
           get :status
+          get :test_report
 
           Gitlab.ee do
             get :security
@@ -512,7 +528,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :discussions, format: :json
 
           Gitlab.ee do
-            get 'designs(/*vueroute)', to: 'issues#show', as: :designs, format: false
+            get 'designs(/*vueroute)', to: 'issues#designs', as: :designs, format: false
           end
         end
 

@@ -49,7 +49,7 @@ export default {
       }
     },
     handleDeleteRepository() {
-      this.deleteItem(this.repo)
+      return this.deleteItem(this.repo)
         .then(() => {
           createFlash(__('This container registry has been scheduled for deletion.'), 'notice');
           this.fetchRepos();
@@ -67,7 +67,8 @@ export default {
   <div class="container-image">
     <div class="container-image-head">
       <gl-button class="js-toggle-repo btn-link align-baseline" @click="toggleRepo">
-        <icon :name="iconName" /> {{ repo.name }}
+        <icon :name="iconName" />
+        {{ repo.name }}
       </gl-button>
 
       <clipboard-button
@@ -84,6 +85,8 @@ export default {
           v-gl-modal="modalId"
           :title="s__('ContainerRegistry|Remove repository')"
           :aria-label="s__('ContainerRegistry|Remove repository')"
+          data-track-event="click_button"
+          data-track-label="registry_repository_delete"
           class="js-remove-repo btn-inverted"
           variant="danger"
         >

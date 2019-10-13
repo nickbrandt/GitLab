@@ -60,7 +60,10 @@ describe 'Merge request > User sets approval rules', :js do
         wait_for_requests
 
         tr = page.find(:css, 'tr', text: private_rule.name)
-        expect(tr).to have_selector('.js-approvers a.user-avatar-link')
+        td = tr.find(:css, '.js-approvers')
+
+        # The approver granted by the private group is not visible
+        expect(td).to have_text('None')
       end
     end
   end

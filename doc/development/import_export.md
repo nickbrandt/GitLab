@@ -31,7 +31,9 @@ Read through the current performance problems using the Import/Export below.
 Out of memory (OOM) errors are normally caused by the [Sidekiq Memory Killer](../administration/operations/sidekiq_memory_killer.md):
 
 ```bash
-SIDEKIQ_MEMORY_KILLER_MAX_RSS = 2GB in GitLab.com
+SIDEKIQ_MEMORY_KILLER_MAX_RSS = 2000000
+SIDEKIQ_MEMORY_KILLER_HARD_LIMIT_RSS = 3000000
+SIDEKIQ_MEMORY_KILLER_GRACE_TIME = 900
 ```
 
 An import status `started`, and the following sidekiq logs will signal a memory issue:
@@ -77,11 +79,11 @@ Marked stuck import jobs as failed. JIDs: xyz
 
 | Problem | Possible solutions |
 | -------- | -------- |
-| [Slow JSON](https://gitlab.com/gitlab-org/gitlab-ce/issues/54084) loading/dumping models from the database | [split the worker](https://gitlab.com/gitlab-org/gitlab-ce/issues/54085) |
+| [Slow JSON](https://gitlab.com/gitlab-org/gitlab-foss/issues/54084) loading/dumping models from the database | [split the worker](https://gitlab.com/gitlab-org/gitlab-foss/issues/54085) |
 | | Batch export
 | | Optimize SQL
 | | Move away from `ActiveRecord` callbacks (difficult)
-| High memory usage (see also some [analysis](https://gitlab.com/gitlab-org/gitlab-ce/issues/35389) | DB Commit sweet spot that uses less memory |
+| High memory usage (see also some [analysis](https://gitlab.com/gitlab-org/gitlab-foss/issues/35389) | DB Commit sweet spot that uses less memory |
 | | [Netflix Fast JSON API](https://github.com/Netflix/fast_jsonapi) may help |
 | | Batch reading/writing to disk and any SQL
 
@@ -96,7 +98,8 @@ importing big projects, using a foreground import:
 ## Security
 
 The Import/Export feature is constantly updated (adding new things to export), however
-the code hasn't been refactored in a long time. We should perform a [code audit](https://gitlab.com/gitlab-org/gitlab-ce/issues/42135)
+the code hasn't been refactored in a long time. We should perform a code audit (see
+[confidential issue](../user/project/issues/confidential_issues.md) `https://gitlab.com/gitlab-org/gitlab/issues/20720`).
 to make sure its dynamic nature does not increase the number of security concerns.
 
 ### Security in the code
@@ -309,7 +312,7 @@ module Gitlab
     class Importer
       def execute
         if import_file && check_version! && restorers.all?(&:restore) && overwrite_project
-          project_tree.restored_project
+          project
         else
           raise Projects::ImportService::Error.new(@shared.errors.join(', '))
         end

@@ -8,6 +8,13 @@ module EE
         extend ::Gitlab::Utils::Override
 
         prepended do
+          params :optional_create_project_params_ee do
+            optional :use_custom_template, type: Grape::API::Boolean, desc: "Use custom template"
+            given :use_custom_template do
+              optional :group_with_project_templates_id, type: Integer, desc: "Group ID that serves as the template source"
+            end
+          end
+
           params :optional_project_params_ee do
             optional :repository_storage, type: String, desc: 'Which storage shard the repository is on. Available only to admins'
             optional :approvals_before_merge, type: Integer, desc: 'How many approvers should approve merge request by default'
@@ -38,7 +45,7 @@ module EE
           # `API::Helpers::ProjectsHelpers`.
           #
           # Likely this is related to
-          # https://gitlab.com/gitlab-org/gitlab-ce/issues/50911.
+          # https://gitlab.com/gitlab-org/gitlab-foss/issues/50911.
           def update_params_at_least_one_of
             super.concat [
               :approvals_before_merge,

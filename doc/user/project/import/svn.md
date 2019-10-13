@@ -97,11 +97,11 @@ subgit import $GIT_REPO_PATH
 ### SubGit licensing
 
 Running SubGit in a mirror mode requires a
-[registration](https://subgit.com/pricing/). Registration is free for open
+[registration](https://subgit.com/pricing). Registration is free for open
 source, academic and startup projects.
 
 We're currently working on deeper GitLab/SubGit integration. You may track our
-progress at [this issue](https://gitlab.com/gitlab-org/gitlab-ee/issues/990).
+progress at [this issue](https://gitlab.com/gitlab-org/gitlab/issues/990).
 
 ### SubGit support
 

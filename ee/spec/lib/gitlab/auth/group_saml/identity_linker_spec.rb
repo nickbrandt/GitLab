@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Auth::GroupSaml::IdentityLinker do
@@ -10,7 +12,7 @@ describe Gitlab::Auth::GroupSaml::IdentityLinker do
   let(:saml_provider) { create(:saml_provider) }
   let(:session) { {} }
 
-  subject { described_class.new(user, oauth, saml_provider, session) }
+  subject { described_class.new(user, oauth, session, saml_provider) }
 
   context 'linked identity exists' do
     let!(:identity) { user.identities.create!(provider: provider, extern_uid: uid, saml_provider: saml_provider) }
@@ -35,7 +37,7 @@ describe Gitlab::Auth::GroupSaml::IdentityLinker do
   context 'identity needs to be created' do
     context 'with identity provider initiated request' do
       it 'attempting to link accounts raises an exception' do
-        expect { subject.link }.to raise_error(Gitlab::Auth::GroupSaml::IdentityLinker::UnverifiedRequest)
+        expect { subject.link }.to raise_error(Gitlab::Auth::Saml::IdentityLinker::UnverifiedRequest)
       end
     end
 

@@ -142,7 +142,7 @@ describe DesignManagement::DeleteDesignsService do
           end
 
           it 'associates the new version with all the designs' do
-            current_versions = deleted_designs.map { |d| d.most_recent_design_version.version }
+            current_versions = deleted_designs.map { |d| d.most_recent_action.version }
             expect(current_versions).to all(eq version)
           end
 
@@ -151,7 +151,7 @@ describe DesignManagement::DeleteDesignsService do
           end
 
           it 'marks all deleted designs with the same deletion version' do
-            expect(deleted_designs.map { |d| d.most_recent_design_version.version_id }.uniq)
+            expect(deleted_designs.map { |d| d.most_recent_action.version_id }.uniq)
               .to have_attributes(size: 1)
           end
         end

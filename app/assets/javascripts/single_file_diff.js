@@ -1,11 +1,11 @@
-/* eslint-disable func-names, prefer-arrow-callback, consistent-return, */
+/* eslint-disable consistent-return */
 
 import $ from 'jquery';
 import { __ } from './locale';
 import axios from './lib/utils/axios_utils';
 import createFlash from './flash';
 import FilesCommentButton from './files_comment_button';
-import imageDiffHelper from './image_diff/helpers/index';
+import initImageDiffHelper from './image_diff/helpers/init_image_diff';
 import syntaxHighlight from './syntax_highlight';
 
 const WRAPPER = '<div class="diff-content"></div>';
@@ -40,12 +40,9 @@ export default class SingleFileDiff {
       this.$toggleIcon.addClass('fa-caret-down');
     }
 
-    $('.js-file-title, .click-to-expand', this.file).on(
-      'click',
-      function(e) {
-        this.toggleDiff($(e.target));
-      }.bind(this),
-    );
+    $('.js-file-title, .click-to-expand', this.file).on('click', e => {
+      this.toggleDiff($(e.target));
+    });
   }
 
   toggleDiff($target, cb) {
@@ -101,7 +98,7 @@ export default class SingleFileDiff {
         FilesCommentButton.init($file);
 
         const canCreateNote = $file.closest('.files').is('[data-can-create-note]');
-        imageDiffHelper.initImageDiff($file[0], canCreateNote);
+        initImageDiffHelper.initImageDiff($file[0], canCreateNote);
 
         if (cb) cb();
       })

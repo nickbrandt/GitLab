@@ -140,7 +140,8 @@ module Gitlab
         request = Gitaly::CountCommitsRequest.new(
           repository: @gitaly_repo,
           revision: encode_binary(ref),
-          all: !!options[:all]
+          all: !!options[:all],
+          first_parent: !!options[:first_parent]
         )
         request.after = Google::Protobuf::Timestamp.new(seconds: options[:after].to_i) if options[:after].present?
         request.before = Google::Protobuf::Timestamp.new(seconds: options[:before].to_i) if options[:before].present?
@@ -254,7 +255,7 @@ module Gitlab
 
       def languages(ref = nil)
         request = Gitaly::CommitLanguagesRequest.new(repository: @gitaly_repo, revision: ref || '')
-        response = GitalyClient.call(@repository.storage, :commit_service, :commit_languages, request)
+        response = GitalyClient.call(@repository.storage, :commit_service, :commit_languages, request, timeout: GitalyClient.long_timeout)
 
         response.languages.map { |l| { value: l.share.round(2), label: l.name, color: l.color, highlight: l.color } }
       end
@@ -325,6 +326,7 @@ module Gitlab
           follow:       options[:follow],
           skip_merges:  options[:skip_merges],
           all:          !!options[:all],
+          first_parent: !!options[:first_parent],
           disable_walk: true # This option is deprecated. The 'walk' implementation is being removed.
         )
         request.after    = GitalyClient.timestamp(options[:after]) if options[:after]
@@ -360,7 +362,7 @@ module Gitlab
 
       def extract_signature(commit_id)
         request = Gitaly::ExtractCommitSignatureRequest.new(repository: @gitaly_repo, commit_id: commit_id)
-        response = GitalyClient.call(@repository.storage, :commit_service, :extract_commit_signature, request)
+        response = GitalyClient.call(@repository.storage, :commit_service, :extract_commit_signature, request, timeout: GitalyClient.fast_timeout)
 
         signature = +''.b
         signed_text = +''.b

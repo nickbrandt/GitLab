@@ -47,7 +47,7 @@ describe Explore::OnboardingController do
       end
 
       it_behaves_like 'when the feature is enabled' do
-        let(:project) { create(:project, path: 'gitlab-ce', namespace: user.namespace) }
+        let(:project) { create(:project, path: 'gitlab-foss', namespace: user.namespace) }
       end
     end
   end

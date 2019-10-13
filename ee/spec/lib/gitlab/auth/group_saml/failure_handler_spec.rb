@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Auth::GroupSaml::FailureHandler do
@@ -15,7 +17,10 @@ describe Gitlab::Auth::GroupSaml::FailureHandler do
     params = {
       'omniauth.error.strategy' => strategy,
       'devise.mapping' => Devise.mappings[:user],
-      'warden' => warden
+      'warden' => warden,
+      'action_dispatch.key_generator' => ActiveSupport::KeyGenerator.new('b2efbaccbdb9548217eebc73a896db73'), # necessary for setting signed cookies in lib/gitlab/experimentation.rb
+      'action_dispatch.signed_cookie_salt' => 'a4fb52b0ccb302eaef92bda18fedf5c3', # necessary for setting signed cookies in lib/gitlab/experimentation.rb
+      'action_dispatch.cookies_rotations' => OpenStruct.new(signed: []) # necessary for setting signed cookies in lib/gitlab/experimentation.rb
     }
     Rack::MockRequest.env_for(path, params)
   end

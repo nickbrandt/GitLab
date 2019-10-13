@@ -34,14 +34,18 @@ Example of response
     "status": "pending",
     "ref": "new-pipeline",
     "sha": "a91957a858320c0e17f3a0eca7cfacbff50ea29a",
-    "web_url": "https://example.com/foo/bar/pipelines/47"
+    "web_url": "https://example.com/foo/bar/pipelines/47",
+    "created_at": "2016-08-11T11:28:34.085Z",
+    "updated_at": "2016-08-11T11:32:35.169Z",
   },
   {
     "id": 48,
     "status": "pending",
     "ref": "new-pipeline",
     "sha": "eb94b618fb5865b26e80fdd8ae531b7a63ad851a",
-    "web_url": "https://example.com/foo/bar/pipelines/48"
+    "web_url": "https://example.com/foo/bar/pipelines/48",
+    "created_at": "2016-08-12T10:06:04.561Z",
+    "updated_at": "2016-08-12T10:09:56.223Z",
   }
 ]
 ```
@@ -268,7 +272,7 @@ Response:
 
 ## Delete a pipeline
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22988) in GitLab 11.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22988) in GitLab 11.6.
 
 ```
 DELETE /projects/:id/pipelines/:pipeline_id
@@ -283,5 +287,5 @@ DELETE /projects/:id/pipelines/:pipeline_id
 curl --header "PRIVATE-TOKEN: <your_access_token>" --request "DELETE" "https://gitlab.example.com/api/v4/projects/1/pipelines/46"
 ```
 
-[ce-5837]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5837
-[ce-7209]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7209
+[ce-5837]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/5837
+[ce-7209]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/7209

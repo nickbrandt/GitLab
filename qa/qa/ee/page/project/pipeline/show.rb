@@ -5,14 +5,18 @@ module QA::EE::Page
     module Show
       def self.prepended(page)
         page.module_eval do
-          view 'ee/app/views/projects/pipelines/_tabs_holder.html.haml' do
-            element :security_tab
-            element :security_counter
+          view 'ee/app/assets/javascripts/pipelines/components/graph/linked_pipeline.vue' do
+            element :linked_pipeline_button
           end
 
           view 'ee/app/assets/javascripts/security_dashboard/components/filter.vue' do
             element :filter_dropdown, ':data-qa-selector="qaSelector"' # rubocop:disable QA/ElementWithPattern
             element :filter_dropdown_content
+          end
+
+          view 'ee/app/views/projects/pipelines/_tabs_holder.html.haml' do
+            element :security_tab
+            element :security_counter
           end
         end
       end

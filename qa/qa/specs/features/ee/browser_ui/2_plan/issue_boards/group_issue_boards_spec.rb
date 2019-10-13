@@ -25,7 +25,7 @@ module QA
         Page::Dashboard::Groups.perform do |groups|
           groups.click_group(group.path)
         end
-        EE::Page::Group::Menu.perform(&:go_to_issue_boards)
+        Page::Group::Menu.perform(&:go_to_issue_boards)
       end
 
       it 'shows multiple group boards in the boards dropdown menu' do

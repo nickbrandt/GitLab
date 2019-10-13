@@ -58,7 +58,7 @@ module MigrationsHelpers
     # super: no superclass method `elasticsearch_indexing' for #<ApplicationSetting:0x00007f85628508d8>
     # attr_encrypted also expects ActiveRecord attribute methods to be
     # defined, or it will override the accessors:
-    # https://gitlab.com/gitlab-org/gitlab-ee/issues/8234#note_113976421
+    # https://gitlab.com/gitlab-org/gitlab/issues/8234#note_113976421
     [ApplicationSetting, SystemHook].each do |model|
       model.define_attribute_methods
     end
@@ -131,6 +131,41 @@ module MigrationsHelpers
     migration_context.up do |migration|
       migration.name == described_class.name
     end
+  end
+
+  class ReversibleMigrationTest
+    attr_reader :before_up, :after_up
+
+    def initialize
+      @before_up = -> {}
+      @after_up = -> {}
+    end
+
+    def before(expectations)
+      @before_up = expectations
+
+      self
+    end
+
+    def after(expectations)
+      @after_up = expectations
+
+      self
+    end
+  end
+
+  def reversible_migration(&block)
+    tests = yield(ReversibleMigrationTest.new)
+
+    tests.before_up.call
+
+    migrate!
+
+    tests.after_up.call
+
+    schema_migrate_down!
+
+    tests.before_up.call
   end
 end
 

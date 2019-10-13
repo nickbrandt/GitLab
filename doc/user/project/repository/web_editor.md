@@ -117,7 +117,7 @@ the description field will automatically display the [issue closing pattern](../
 merge request is merged.
 
 [project-services-doc]: ../integrations/project_services.md
-[auto-deploy-doc]: ../../../ci/autodeploy/index.md
+[auto-deploy-doc]: ../../../topics/autodevops/index.md#auto-deploy
 
 ### Create a new branch from a project's dashboard
 
@@ -172,7 +172,7 @@ If you'd prefer _not_ to use your primary email address for commits created
 through the web editor, you can choose to use another of your linked email
 addresses from the **User Settings > Edit Profile** page.
 
-[ce-2808]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/2808
+[ce-2808]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/2808
 
 <!-- ## Troubleshooting
 

@@ -111,6 +111,13 @@ export default {
     qaClass() {
       return issuableQaClassMap[this.issuableType];
     },
+    validIssueWeight() {
+      if (this.issue) {
+        return this.issue.weight >= 0;
+      }
+
+      return false;
+    },
   },
   mounted() {
     if (this.canReorder) {
@@ -188,6 +195,7 @@ export default {
               class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default"
               :aria-label="__('Add an issue')"
               data-placement="top"
+              data-qa-selector="related_issues_plus_button"
               @click="$emit('toggleAddRelatedIssuesForm', $event)"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
@@ -217,10 +225,8 @@ export default {
         />
       </div>
       <div
-        :class="{
-          collapsed: !shouldShowTokenBody,
-          'sortable-container': canReorder,
-        }"
+        v-if="shouldShowTokenBody"
+        :class="{ 'sortable-container': canReorder }"
         class="related-issues-token-body"
       >
         <div v-if="isFetching" class="related-issues-loading-icon qa-related-issues-loading-icon">
@@ -261,7 +267,7 @@ export default {
               class="qa-related-issuable-item"
               @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
             >
-              <span v-if="issue.weight" slot="weight" class="order-md-1">
+              <span v-if="validIssueWeight" slot="weight" class="order-md-1">
                 <issue-weight
                   :weight="issue.weight"
                   class="item-weight d-flex align-items-center"

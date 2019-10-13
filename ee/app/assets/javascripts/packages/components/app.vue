@@ -6,6 +6,7 @@ import {
   GlTooltipDirective,
   GlLink,
   GlEmptyState,
+  GlTable,
 } from '@gitlab/ui';
 import _ from 'underscore';
 import PackageInformation from './information.vue';
@@ -13,7 +14,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { formatDate } from '~/lib/utils/datetime_utility';
-import { s__, sprintf } from '~/locale';
+import { __, s__, sprintf } from '~/locale';
 import PackageType from '../constants';
 
 export default {
@@ -23,6 +24,7 @@ export default {
     GlEmptyState,
     GlLink,
     GlModal,
+    GlTable,
     Icon,
     PackageInformation,
   },
@@ -126,6 +128,14 @@ export default {
           return null;
       }
     },
+    filesTableRows() {
+      return this.files.map(x => ({
+        name: x.file_name,
+        downloadPath: x.download_path,
+        size: this.formatSize(x.size),
+        created: x.created_at,
+      }));
+    },
   },
   methods: {
     formatSize(size) {
@@ -138,6 +148,22 @@ export default {
   i18n: {
     deleteModalTitle: s__(`PackageRegistry|Delete Package Version`),
   },
+  filesTableHeaderFields: [
+    {
+      key: 'name',
+      label: __('Name'),
+      tdClass: 'd-flex align-items-center',
+    },
+    {
+      key: 'size',
+      label: __('Size'),
+    },
+    {
+      key: 'created',
+      label: __('Created'),
+      class: 'text-right',
+    },
+  ],
 };
 </script>
 
@@ -171,38 +197,27 @@ export default {
       />
     </div>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>{{ __('Name') }}</th>
-          <th>{{ __('Size') }}</th>
-          <th>
-            <span class="pull-right">{{ __('Created') }}</span>
-          </th>
-        </tr>
-      </thead>
+    <gl-table
+      :fields="$options.filesTableHeaderFields"
+      :items="filesTableRows"
+      tbody-tr-class="js-file-row"
+    >
+      <template #name="items">
+        <icon name="doc-code" class="space-right" />
+        <gl-link :href="items.item.downloadPath" class="js-file-download">{{
+          items.item.name
+        }}</gl-link>
+      </template>
 
-      <tbody>
-        <tr v-for="file in files" :key="file.id" class="js-file-row">
-          <td class="d-flex align-items-center">
-            <icon name="doc-code" class="space-right" /><gl-link
-              :href="file.download_path"
-              class="js-file-download"
-              >{{ file.file_name }}</gl-link
-            >
-          </td>
-          <td>{{ formatSize(file.size) }}</td>
-          <td>
-            <span v-gl-tooltip class="pull-right" :title="tooltipTitle(file.created_at)">{{
-              timeFormated(file.created_at)
-            }}</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <template #created="items">
+        <span v-gl-tooltip :title="tooltipTitle(items.item.created)">{{
+          timeFormated(items.item.created)
+        }}</span>
+      </template>
+    </gl-table>
 
     <gl-modal ref="deleteModal" class="js-delete-modal" modal-id="delete-modal">
-      <template v-slot:modal-title>{{ $options.i18n.deleteModalTitle }}</template>
+      <template #modal-title>{{ $options.i18n.deleteModalTitle }}</template>
       <p v-html="deleteModalDescription"></p>
 
       <div slot="modal-footer" class="w-100">

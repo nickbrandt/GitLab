@@ -3,12 +3,12 @@
 FactoryBot.modify do
   factory :protected_branch do
     transient do
-      authorize_user_to_push nil
-      authorize_user_to_merge nil
-      authorize_user_to_unprotect nil
-      authorize_group_to_push nil
-      authorize_group_to_merge nil
-      authorize_group_to_unprotect nil
+      authorize_user_to_push { nil }
+      authorize_user_to_merge { nil }
+      authorize_user_to_unprotect { nil }
+      authorize_group_to_push { nil }
+      authorize_group_to_merge { nil }
+      authorize_group_to_unprotect { nil }
     end
 
     after(:build) do |protected_branch, evaluator|

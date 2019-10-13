@@ -6,19 +6,21 @@ module Gitlab
       # Relations which cannot be saved at project level (and have a group assigned)
       GROUP_MODELS = [GroupLabel, Milestone].freeze
 
+      attr_reader :user
+      attr_reader :shared
+      attr_reader :project
+
       def initialize(user:, shared:, project:)
         @path = File.join(shared.export_path, 'project.json')
         @user = user
         @shared = shared
         @project = project
-        @project_id = project.id
         @saved = true
       end
 
       def restore
         begin
-          json = IO.read(@path)
-          @tree_hash = ActiveSupport::JSON.decode(json)
+          @tree_hash = read_tree_hash
         rescue => e
           Rails.logger.error("Import/Export error: #{e.message}") # rubocop:disable Gitlab/RailsLogger
           raise Gitlab::ImportExport::Error.new('Incorrect JSON format')
@@ -30,26 +32,36 @@ module Gitlab
 
         ActiveRecord::Base.uncached do
           ActiveRecord::Base.no_touching do
+            update_project_params
             create_relations
           end
         end
+
+        # ensure that we have latest version of the restore
+        @project.reload # rubocop:disable Cop/ActiveRecordAssociationReload
+
+        true
       rescue => e
         @shared.error(e)
         false
       end
 
-      def restored_project
-        return @project unless @tree_hash
-
-        @restored_project ||= restore_project
-      end
-
       private
+
+      def read_tree_hash
+        json = IO.read(@path)
+        ActiveSupport::JSON.decode(json)
+      end
 
       def members_mapper
         @members_mapper ||= Gitlab::ImportExport::MembersMapper.new(exported_members: @project_members,
                                                                     user: @user,
-                                                                    project: restored_project)
+                                                                    project: @project)
+      end
+
+      # A Hash of the imported merge request ID -> imported ID.
+      def merge_requests_mapping
+        @merge_requests_mapping ||= {}
       end
 
       # Loops through the tree of models defined in import_export.yml and
@@ -78,10 +90,25 @@ module Gitlab
 
         remove_group_models(relation_hash) if relation_hash.is_a?(Array)
 
-        @saved = false unless restored_project.append_or_update_attribute(relation_key, relation_hash)
+        @saved = false unless @project.append_or_update_attribute(relation_key, relation_hash)
 
-        # Restore the project again, extra query that skips holding the AR objects in memory
-        @restored_project = Project.find(@project_id)
+        save_id_mappings(relation_key, relation_hash_batch, relation_hash)
+
+        @project.reset
+      end
+
+      # Older, serialized CI pipeline exports may only have a
+      # merge_request_id and not the full hash of the merge request. To
+      # import these pipelines, we need to preserve the mapping between
+      # the old and new the merge request ID.
+      def save_id_mappings(relation_key, relation_hash_batch, relation_hash)
+        return unless relation_key == 'merge_requests'
+
+        relation_hash = Array(relation_hash)
+
+        Array(relation_hash_batch).each_with_index do |raw_data, index|
+          merge_requests_mapping[raw_data['id']] = relation_hash[index]['id']
+        end
       end
 
       # Remove project models that became group models as we found them at group level.
@@ -93,6 +120,10 @@ module Gitlab
         end
       end
 
+      def remove_feature_dependent_sub_relations!(_relation_item)
+        # no-op
+      end
+
       def project_relations_without_project_members
         # We remove `project_members` as they are deserialized separately
         project_relations.except(:project_members)
@@ -102,12 +133,10 @@ module Gitlab
         reader.attributes_finder.find_relations_tree(:project)
       end
 
-      def restore_project
+      def update_project_params
         Gitlab::Timeless.timeless(@project) do
           @project.update(project_params)
         end
-
-        @project
       end
 
       def project_params
@@ -159,17 +188,10 @@ module Gitlab
         return if tree_hash[relation_key].blank?
 
         tree_array = [tree_hash[relation_key]].flatten
-        null_iid_pipelines = []
 
         # Avoid keeping a possible heavy object in memory once we are done with it
-        while relation_item = (tree_array.shift || null_iid_pipelines.shift)
-          if nil_iid_pipeline?(relation_key, relation_item) && tree_array.any?
-            # Move pipelines with NULL IIDs to the end
-            # so they don't clash with existing IIDs.
-            null_iid_pipelines << relation_item
-
-            next
-          end
+        while relation_item = tree_array.shift
+          remove_feature_dependent_sub_relations!(relation_item)
 
           # The transaction at this level is less speedy than one single transaction
           # But we can't have it in the upper level or GC won't get rid of the AR objects
@@ -216,8 +238,9 @@ module Gitlab
             relation_sym: relation_key.to_sym,
             relation_hash: relation_hash,
             members_mapper: members_mapper,
+            merge_requests_mapping: merge_requests_mapping,
             user: @user,
-            project: @restored_project,
+            project: @project,
             excluded_keys: excluded_keys_for_relation(relation_key))
         end.compact
 
@@ -231,10 +254,8 @@ module Gitlab
       def excluded_keys_for_relation(relation)
         reader.attributes_finder.find_excluded_keys(relation)
       end
-
-      def nil_iid_pipeline?(relation_key, relation_item)
-        relation_key == 'ci_pipelines' && relation_item['iid'].nil?
-      end
     end
   end
 end
+
+Gitlab::ImportExport::ProjectTreeRestorer.prepend_if_ee('::EE::Gitlab::ImportExport::ProjectTreeRestorer')

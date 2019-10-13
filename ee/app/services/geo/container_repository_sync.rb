@@ -4,9 +4,7 @@ require 'tempfile'
 
 module Geo
   class ContainerRepositorySync
-    include ExclusiveLeaseGuard
-
-    LEASE_TIMEOUT = 1.hour.freeze
+    include Gitlab::Utils::StrongMemoize
 
     attr_reader :name, :container_repository
 
@@ -16,28 +14,25 @@ module Geo
     end
 
     def execute
-      try_obtain_lease do
-        # It makes sense to do this sequentially because in most cases images
-        # share some layers so it can save IO ops.
-        tags_to_sync.each do |tag|
-          sync_tag(tag[:name])
-        end
-
-        tags_to_remove.each do |tag|
-          container_repository.delete_tag_by_digest(tag[:digest])
-        end
-
-        true
+      tags_to_sync.each do |tag|
+        sync_tag(tag[:name])
       end
+
+      tags_to_remove.each do |tag|
+        container_repository.delete_tag_by_digest(tag[:digest])
+      end
+
+      true
     end
 
     private
 
     def sync_tag(tag)
       file = nil
-      manifest = client.repository_manifest(name, tag)
+      manifest = client.repository_raw_manifest(name, tag)
+      manifest_parsed = JSON.parse(manifest)
 
-      list_blobs(manifest).each do |digest|
+      list_blobs(manifest_parsed).each do |digest|
         next if container_repository.blob_exists?(digest)
 
         file = client.pull_blob(name, digest)
@@ -45,7 +40,7 @@ module Geo
         file.unlink
       end
 
-      container_repository.push_manifest(tag, manifest, manifest['mediaType'])
+      container_repository.push_manifest(tag, manifest, manifest_parsed['mediaType'])
     ensure
       file.try(:unlink)
     end
@@ -85,20 +80,14 @@ module Geo
       secondary_tags - primary_tags
     end
 
-    def lease_key
-      @lease_key ||= "#{self.class.name}:#{name}"
-    end
-
-    def lease_timeout
-      LEASE_TIMEOUT
-    end
-
     # The client for primary registry
     def client
-      ContainerRegistry::Client.new(
-        Gitlab.config.geo.registry_replication.primary_api_url,
-        token: ::Auth::ContainerRegistryAuthenticationService.pull_access_token(name)
-      )
+      strong_memoize(:client) do
+        ContainerRegistry::Client.new(
+          Gitlab.config.geo.registry_replication.primary_api_url,
+          token: ::Auth::ContainerRegistryAuthenticationService.pull_access_token(name)
+        )
+      end
     end
   end
 end

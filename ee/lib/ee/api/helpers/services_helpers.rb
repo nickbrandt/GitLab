@@ -12,6 +12,7 @@ module EE
           override :services
           def services
             super.merge(
+              'alerts' => [],
               'github' => [
                 {
                   required: true,
@@ -24,6 +25,12 @@ module EE
                   name: :repository_url,
                   type: String,
                   desc: "GitHub repository URL"
+                },
+                {
+                  required: false,
+                  name: :static_context,
+                  type: ::API::Services::Boolean,
+                  desc: 'Append instance name instead of branch to status check name'
                 }
               ],
               'jenkins' => [
@@ -81,6 +88,7 @@ module EE
               ::GithubService,
               ::JenkinsService,
               ::JenkinsDeprecatedService,
+              ::AlertsService,
               *super
             ]
           end

@@ -2,6 +2,7 @@ import { n__, sprintf } from '~/locale';
 import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 
+const toLowerCase = name => name.toLowerCase();
 /**
  *
  * Converts the snake case in license objects to camel case
@@ -32,8 +33,8 @@ export const normalizeLicense = license => {
  *
  */
 export const byLicenseNameComparator = (a, b) => {
-  const x = (a.name || '').toLowerCase();
-  const y = (b.name || '').toLowerCase();
+  const x = toLowerCase(a.name || '');
+  const y = toLowerCase(b.name || '');
   if (x === y) {
     return 0;
   }
@@ -49,11 +50,14 @@ export const getIssueStatusFromLicenseStatus = approvalStatus => {
   return STATUS_NEUTRAL;
 };
 
+const caseInsensitiveMatch = (name, otherName) => toLowerCase(name) === toLowerCase(otherName);
 const getLicenseStatusByName = (managedLicenses = [], licenseName) =>
-  managedLicenses.find(license => license.name === licenseName) || {};
+  managedLicenses.find(license => caseInsensitiveMatch(license.name, licenseName)) || {};
 
 const getDependenciesByLicenseName = (dependencies = [], licenseName) =>
-  dependencies.filter(dependencyItem => dependencyItem.license.name === licenseName);
+  dependencies.filter(dependencyItem =>
+    caseInsensitiveMatch(dependencyItem.license.name, licenseName),
+  );
 
 /**
  *
@@ -87,41 +91,33 @@ export const parseLicenseReportMetrics = (headMetrics, baseMetrics, managedLicen
   const baseLicenses = baseMetrics.licenses || [];
   const managedLicenseList = managedLicenses || [];
 
-  if (headLicenses.length > 0 && headDependencies.length > 0) {
-    const report = [];
-    const knownLicenses = baseLicenses.map(license => license.name);
+  if (!headLicenses.length && !headDependencies.length) return [];
 
-    headLicenses.forEach(license => {
-      const { name, count } = license;
+  const knownLicenses = baseLicenses.map(license => toLowerCase(license.name));
+  const identityMap = license => knownLicenses.includes(toLowerCase(license.name));
+  const mapper = license => {
+    const { name, count } = license;
+    const { id, approvalStatus } = getLicenseStatusByName(managedLicenseList, name);
+    const dependencies = getDependenciesByLicenseName(headDependencies, name);
+    const url =
+      (dependencies && dependencies[0] && dependencies[0].license && dependencies[0].license.url) ||
+      '';
 
-      if (!knownLicenses.includes(name)) {
-        const { id, approvalStatus } = getLicenseStatusByName(managedLicenseList, name);
+    return {
+      name,
+      count,
+      url,
+      packages: dependencies.map(dependencyItem => dependencyItem.dependency),
+      status: getIssueStatusFromLicenseStatus(approvalStatus),
+      approvalStatus,
+      id,
+    };
+  };
 
-        const dependencies = getDependenciesByLicenseName(headDependencies, name);
-
-        const url =
-          (dependencies &&
-            dependencies[0] &&
-            dependencies[0].license &&
-            dependencies[0].license.url) ||
-          '';
-
-        report.push({
-          name,
-          count,
-          url,
-          packages: dependencies.map(dependencyItem => dependencyItem.dependency),
-          status: getIssueStatusFromLicenseStatus(approvalStatus),
-          approvalStatus,
-          id,
-        });
-      }
-    });
-
-    return report.sort(byLicenseNameComparator);
-  }
-
-  return [];
+  return headLicenses
+    .filter(license => !identityMap(license))
+    .map(mapper)
+    .sort(byLicenseNameComparator);
 };
 
 export const getPackagesString = (packages, truncate, maxPackages) => {

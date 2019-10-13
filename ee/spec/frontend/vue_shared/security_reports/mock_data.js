@@ -1,3 +1,6 @@
+const libTiffCveFingerprint = 'e503c23a7776dd5e2c35ac63c8cce6b6468be9ba';
+const libTiffCveFingerprint2 = '29af456d1107381bc2511646e2ae488ddfe9a8ed';
+
 export const baseIssues = [
   {
     categories: ['Security'],
@@ -697,7 +700,7 @@ export const parsedSastContainerBaseStore = [
         value: 'CVE-2014-8130',
       },
     ],
-    project_fingerprint: '20a19f706d82cec1c04d1c9a8858e89b142d602f',
+    project_fingerprint: 'e1f22cd89e3c306541d7c804b29255b5cc275d6d',
     title: 'CVE-2014-8130',
     vulnerability: 'CVE-2014-8130',
   },
@@ -780,7 +783,7 @@ export const dockerNewIssues = [
         url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16232',
       },
     ],
-    project_fingerprint: '4e010f6d292364a42c6bb05dbd2cc788c2e5e408',
+    project_fingerprint: libTiffCveFingerprint,
     title: 'CVE-2017-16232',
     vulnerability: 'CVE-2017-16232',
   },
@@ -804,7 +807,7 @@ export const dockerOnlyHeadParsed = [
         url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-12944',
       },
     ],
-    project_fingerprint: '0693a82ef93c5e9d98c23a35ddcd8ed2cbd047d9',
+    project_fingerprint: libTiffCveFingerprint2,
     title: 'CVE-2017-12944',
     vulnerability: 'CVE-2017-12944',
   },
@@ -825,7 +828,7 @@ export const dockerOnlyHeadParsed = [
         url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16232',
       },
     ],
-    project_fingerprint: '4e010f6d292364a42c6bb05dbd2cc788c2e5e408',
+    project_fingerprint: libTiffCveFingerprint,
     title: 'CVE-2017-16232',
     vulnerability: 'CVE-2017-16232',
   },
@@ -1466,7 +1469,7 @@ export const containerScanningFeedbacks = [
     category: 'container_scanning',
     feedback_type: 'dismissal',
     branch: 'try_new_container_scanning',
-    project_fingerprint: '0693a82ef93c5e9d98c23a35ddcd8ed2cbd047d9',
+    project_fingerprint: libTiffCveFingerprint2,
   },
   {
     id: 4,
@@ -1477,6 +1480,6 @@ export const containerScanningFeedbacks = [
     category: 'container_scanning',
     feedback_type: 'issue',
     branch: 'try_new_container_scanning',
-    project_fingerprint: '0693a82ef93c5e9d98c23a35ddcd8ed2cbd047d9',
+    project_fingerprint: libTiffCveFingerprint2,
   },
 ];

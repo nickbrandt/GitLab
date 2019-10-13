@@ -100,7 +100,7 @@ the Git repository's config file. This section is formatted as follows:
 
 ```
 [gitlab]
-  fullpath = gitlab-org/gitlab-ce
+  fullpath = gitlab-org/gitlab
 ```
 
 However, existing repositories were not migrated to include this path.
@@ -122,14 +122,14 @@ Bare repositories are **not** importable by GitLab 10.4 and later when all the f
 - Its ancestor namespaces were not renamed or transferred in GitLab 10.4 and later.
 
 There is an [open issue to add a migration to make all bare repositories
-importable](https://gitlab.com/gitlab-org/gitlab-ce/issues/41776).
+importable](https://gitlab.com/gitlab-org/gitlab-foss/issues/41776).
 
 Until then, you may wish to manually migrate repositories yourself. You can use
 [Rails console](https://docs.gitlab.com/omnibus/maintenance/#starting-a-rails-console-session)
 to do so. In a Rails console session, run the following to migrate a project:
 
 ```
-project = Project.find_by_full_path('gitlab-org/gitlab-ce')
+project = Project.find_by_full_path('gitlab-org/gitlab')
 project.write_repository_config
 ```
 

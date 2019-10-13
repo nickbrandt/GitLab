@@ -7,17 +7,17 @@ module EE
 
       prepended do
         %i[epics].each do |feature|
-          field "#{feature}_enabled", GraphQL::BOOLEAN_TYPE, null: true, resolve: -> (group, args, ctx) do
+          field "#{feature}_enabled", GraphQL::BOOLEAN_TYPE, null: true, resolve: -> (group, args, ctx) do # rubocop:disable Graphql/Descriptions
             group.feature_available?(feature)
           end
         end
 
-        field :epic,
+        field :epic, # rubocop:disable Graphql/Descriptions
               ::Types::EpicType,
               null: true,
               resolver: ::Resolvers::EpicResolver.single
 
-        field :epics,
+        field :epics, # rubocop:disable Graphql/Descriptions
               ::Types::EpicType.connection_type,
               null: true,
               resolver: ::Resolvers::EpicResolver

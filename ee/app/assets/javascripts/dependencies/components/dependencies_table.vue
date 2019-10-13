@@ -7,12 +7,6 @@ export default {
   components: {
     DependenciesTableRow,
   },
-  inject: {
-    dependencyListVulnerabilities: {
-      from: 'dependencyListVulnerabilities',
-      default: false,
-    },
-  },
   props: {
     dependencies: {
       type: Array,
@@ -25,16 +19,13 @@ export default {
   },
   data() {
     const tableSections = [
+      { className: 'section-20', label: s__('Dependencies|Status') },
       { className: 'section-20', label: s__('Dependencies|Component') },
       { className: 'section-10', label: s__('Dependencies|Version') },
       { className: 'section-20', label: s__('Dependencies|Packager') },
       { className: 'section-15', label: s__('Dependencies|Location') },
       { className: 'section-15', label: s__('Dependencies|License') },
     ];
-
-    if (this.dependencyListVulnerabilities) {
-      tableSections.unshift({ className: 'section-20', label: s__('Dependencies|Status') });
-    }
 
     return { tableSections };
   },

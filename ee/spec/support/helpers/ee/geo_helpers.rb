@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module GeoHelpers
     # Actually sets the specified node to be the current one, so it works on new

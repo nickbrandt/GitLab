@@ -13,12 +13,14 @@ module QA
           element :navbar, required: true
           element :user_avatar, required: true
           element :user_menu, required: true
+          element :stop_impersonation_link
         end
 
         view 'app/views/layouts/nav/_dashboard.html.haml' do
           element :admin_area_link
           element :projects_dropdown, required: true
           element :groups_dropdown, required: true
+          element :more_dropdown, required: true
           element :snippets_link
         end
 
@@ -51,8 +53,19 @@ module QA
           end
         end
 
+        def go_to_snippets
+          within_top_menu do
+            click_element :more_dropdown
+            click_element :snippets_link
+          end
+        end
+
         def click_admin_area
           within_top_menu { click_element :admin_area_link }
+        end
+
+        def signed_in?
+          has_personal_area?(wait: 0)
         end
 
         def sign_out
@@ -62,7 +75,7 @@ module QA
         end
 
         def sign_out_if_signed_in
-          sign_out if has_personal_area?(wait: 0)
+          sign_out if signed_in?
         end
 
         def click_settings_link
@@ -75,10 +88,6 @@ module QA
           end
         end
 
-        def click_snippets_link
-          click_element :snippets_link
-        end
-
         def search_for(term)
           fill_element :search_term_field, "#{term}\n"
         end
@@ -89,6 +98,14 @@ module QA
 
         def has_admin_area_link?(wait: Capybara.default_max_wait_time)
           has_element?(:admin_area_link, wait: wait)
+        end
+
+        def has_no_admin_area_link?(wait: Capybara.default_max_wait_time)
+          has_no_element?(:admin_area_link, wait: wait)
+        end
+
+        def click_stop_impersonation_link
+          click_element(:stop_impersonation_link)
         end
 
         private

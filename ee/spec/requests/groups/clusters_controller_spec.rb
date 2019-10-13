@@ -30,7 +30,7 @@ describe Groups::ClustersController do
       create_list(:deployment, 2, :success, cluster: cluster)
 
       # TODO remove this leeway when we refactor away from deployment_platform
-      # (https://gitlab.com/gitlab-org/gitlab-ee/issues/13635)
+      # (https://gitlab.com/gitlab-org/gitlab/issues/13635)
       leeway = 5
       expect { go }.not_to exceed_all_query_limit(control_count + leeway)
     end

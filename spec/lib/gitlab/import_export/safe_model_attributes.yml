@@ -19,6 +19,7 @@ Issue:
 - closed_by_id
 - due_date
 - moved_to_id
+- duplicated_to_id
 - lock_version
 - milestone_id
 - weight
@@ -716,6 +717,7 @@ List:
 - updated_at
 - milestone_id
 - user_id
+- max_issue_count
 ExternalPullRequest:
 - id
 - created_at
@@ -729,3 +731,18 @@ ExternalPullRequest:
 - target_repository
 - source_sha
 - target_sha
+DesignManagement::Design:
+- id
+- project_id
+- issue_id
+- filename
+DesignManagement::Action:
+- design_id
+- event
+- version_id
+DesignManagement::Version:
+- id
+- created_at
+- sha
+- issue_id
+- user_id

@@ -7,22 +7,15 @@ import { addListType } from './store/utils';
 export default () => {
   const el = document.querySelector('#js-dependencies-app');
   const { endpoint, emptyStateSvgPath, documentationPath } = el.dataset;
-  const { dependencyListVulnerabilities = false } = gon.features || {};
 
   const store = createStore();
-
-  if (dependencyListVulnerabilities) {
-    addListType(store, DEPENDENCY_LIST_TYPES.vulnerable);
-  }
+  addListType(store, DEPENDENCY_LIST_TYPES.vulnerable);
 
   return new Vue({
     el,
     store,
     components: {
       DependenciesApp,
-    },
-    provide: {
-      dependencyListVulnerabilities,
     },
     render(createElement) {
       return createElement(DependenciesApp, {

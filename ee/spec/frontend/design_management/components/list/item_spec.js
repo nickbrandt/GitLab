@@ -9,7 +9,7 @@ const router = new VueRouter();
 describe('Design management list item component', () => {
   let wrapper;
 
-  function createComponent(commentsCount = 1) {
+  function createComponent(notesCount = 1, event = 'NONE') {
     wrapper = shallowMount(Item, {
       sync: false,
       localVue,
@@ -18,7 +18,8 @@ describe('Design management list item component', () => {
         id: 1,
         name: 'test',
         image: 'http://via.placeholder.com/300',
-        commentsCount,
+        event,
+        notesCount,
         updatedAt: '01-01-2019',
       },
       stubs: ['router-link'],
@@ -43,6 +44,30 @@ describe('Design management list item component', () => {
 
   it('hides comment count', () => {
     createComponent(0);
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('renders item with correct status icon for modification event', () => {
+    createComponent(0, 'MODIFICATION');
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('renders item with correct status icon for deletion event', () => {
+    createComponent(0, 'DELETION');
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('renders item with correct status icon for creation event', () => {
+    createComponent(0, 'CREATION');
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('renders item with no status icon for none event', () => {
+    createComponent(0, 'NONE');
 
     expect(wrapper.element).toMatchSnapshot();
   });

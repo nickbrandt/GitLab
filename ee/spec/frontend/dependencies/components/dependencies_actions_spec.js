@@ -3,17 +3,10 @@ import { GlDropdownItem } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/dependencies/store';
 import { DEPENDENCY_LIST_TYPES } from 'ee/dependencies/store/constants';
-import {
-  SORT_FIELDS,
-  SORT_FIELDS_WITH_SEVERITY,
-} from 'ee/dependencies/store/modules/list/constants';
+import { SORT_FIELDS } from 'ee/dependencies/store/modules/list/constants';
 import DependenciesActions from 'ee/dependencies/components/dependencies_actions.vue';
 
-describe.each`
-  context                         | isFeatureFlagEnabled | sortFields
-  ${''}                           | ${false}             | ${SORT_FIELDS}
-  ${' with feature flag enabled'} | ${true}              | ${SORT_FIELDS_WITH_SEVERITY}
-`('DependenciesActions component$context', ({ isFeatureFlagEnabled, sortFields }) => {
+describe('DependenciesActions component', () => {
   let store;
   let wrapper;
   const { namespace } = DEPENDENCY_LIST_TYPES.all;
@@ -36,7 +29,6 @@ describe.each`
   beforeEach(() => {
     factory({
       propsData: { namespace },
-      provide: { dependencyListVulnerabilities: isFeatureFlagEnabled },
     });
     store.state[namespace].endpoint = `${TEST_HOST}/dependencies`;
     return wrapper.vm.$nextTick();
@@ -61,7 +53,7 @@ describe.each`
 
     expect(store.dispatch.mock.calls).toEqual(
       expect.arrayContaining(
-        Object.keys(sortFields).map(field => [`${namespace}/setSortField`, field]),
+        Object.keys(SORT_FIELDS).map(field => [`${namespace}/setSortField`, field]),
       ),
     );
   });

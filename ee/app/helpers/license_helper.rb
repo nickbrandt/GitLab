@@ -18,6 +18,10 @@ module LicenseHelper
     HistoricalData.max_historical_user_count
   end
 
+  def current_active_user_count
+    License.current&.current_active_users_count || 0
+  end
+
   def license_message(signed_in: signed_in?, is_admin: current_user&.admin?)
     return unless current_license
     return unless signed_in

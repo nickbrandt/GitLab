@@ -17,7 +17,7 @@ export const mockParentItem = {
 };
 
 export const mockEpic1 = {
-  id: '4',
+  id: 'gid://gitlab/Epic/4',
   iid: '4',
   title: 'Quo ea ipsa enim perferendis at omnis officia.',
   state: 'opened',
@@ -38,7 +38,7 @@ export const mockEpic1 = {
 };
 
 export const mockEpic2 = {
-  id: '3',
+  id: 'gid://gitlab/Epic/3',
   iid: '3',
   title: 'A nisi mollitia explicabo quam soluta dolor hic.',
   state: 'closed',
@@ -60,6 +60,7 @@ export const mockEpic2 = {
 
 export const mockIssue1 = {
   iid: '8',
+  epicIssueId: 'gid://gitlab/EpicIssue/3',
   title: 'Nostrum cum mollitia quia recusandae fugit deleniti voluptatem delectus.',
   closedAt: null,
   state: 'opened',
@@ -92,6 +93,7 @@ export const mockIssue1 = {
 
 export const mockIssue2 = {
   iid: '33',
+  epicIssueId: 'gid://gitlab/EpicIssue/4',
   title: 'Dismiss Cipher with no integrity',
   closedAt: null,
   state: 'opened',
@@ -157,5 +159,21 @@ export const mockQueryResponse = {
         },
       },
     },
+  },
+};
+
+export const mockReorderMutationResponse = {
+  epicTreeReorder: {
+    clientMutationId: null,
+    errors: [],
+    __typename: 'EpicTreeReorderPayload',
+  },
+};
+
+export const mockEpicTreeReorderInput = {
+  baseEpicId: 'gid://gitlab/Epic/1',
+  moved: {
+    id: 'gid://gitlab/Epic/2',
+    moveAfterId: 'gid://gitlab/Epic/3',
   },
 };

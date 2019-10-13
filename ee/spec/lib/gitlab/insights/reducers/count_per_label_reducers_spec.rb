@@ -5,15 +5,15 @@ require 'spec_helper'
 RSpec.describe Gitlab::Insights::Reducers::CountPerLabelReducer do
   include_context 'Insights reducers context'
 
-  def find_issuables(project, opts)
-    Gitlab::Insights::Finders::IssuableFinder.new(project, nil, opts).find
+  def find_issuables(project, query)
+    Gitlab::Insights::Finders::IssuableFinder.new(project, nil, query: query).find
   end
 
   def reduce(issuable_relation, labels)
     described_class.reduce(issuable_relation, labels: labels)
   end
 
-  let(:opts) do
+  let(:query) do
     {
       state: 'opened',
       issuable_type: 'issue',
@@ -23,9 +23,9 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerLabelReducer do
       period_limit: 5
     }
   end
-  let(:issuable_relation) { find_issuables(project, opts) }
+  let(:issuable_relation) { find_issuables(project, query) }
 
-  subject { reduce(issuable_relation, opts[:collection_labels]) }
+  subject { reduce(issuable_relation, query[:collection_labels]) }
 
   let(:expected) do
     {
@@ -47,6 +47,6 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerLabelReducer do
     control_queries = ActiveRecord::QueryRecorder.new { subject }
     create(:labeled_issue, :opened, labels: [label_bug], project: project)
 
-    expect { reduce(find_issuables(project, opts), opts[:collection_labels]) }.not_to exceed_query_limit(control_queries)
+    expect { reduce(find_issuables(project, query), query[:collection_labels]) }.not_to exceed_query_limit(control_queries)
   end
 end

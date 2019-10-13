@@ -8,9 +8,12 @@ class DashboardEnvironmentsProjectEntity < Grape::Entity
   expose :avatar_url
   expose :web_url
 
-  expose :remove_path do |project_object|
-    remove_operations_project_path(project_id: project_object.id)
+  expose :remove_path do |project|
+    remove_operations_project_path(project_id: project.id)
   end
 
   expose :namespace, using: API::Entities::NamespaceBasic
+  expose :environments, using: DashboardEnvironmentsFolderEntity do |_project, options|
+    options[:folders]
+  end
 end

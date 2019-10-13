@@ -616,7 +616,7 @@ describe User do
     end
 
     describe '#update_notification_email' do
-      # Regression: https://gitlab.com/gitlab-org/gitlab-ce/issues/22846
+      # Regression: https://gitlab.com/gitlab-org/gitlab-foss/issues/22846
       context 'when changing :email' do
         let(:user) { create(:user) }
         let(:new_email) { 'new-email@example.com' }
@@ -1097,10 +1097,26 @@ describe User do
   describe 'blocking user' do
     let(:user) { create(:user, name: 'John Smith') }
 
-    it "blocks user" do
+    it 'blocks user' do
       user.block
 
       expect(user.blocked?).to be_truthy
+    end
+
+    context 'when user has running CI pipelines' do
+      let(:service) { double }
+
+      before do
+        pipeline = create(:ci_pipeline, :running, user: user)
+        create(:ci_build, :running, pipeline: pipeline)
+      end
+
+      it 'cancels all running pipelines and related jobs' do
+        expect(Ci::CancelUserPipelinesService).to receive(:new).and_return(service)
+        expect(service).to receive(:execute).with(user)
+
+        user.block
+      end
     end
   end
 
@@ -1411,8 +1427,16 @@ describe User do
         expect(described_class.search(user.username)).to eq([user, user2])
       end
 
+      it 'returns users with a matching username starting with a @' do
+        expect(described_class.search("@#{user.username}")).to eq([user, user2])
+      end
+
       it 'returns users with a partially matching username' do
         expect(described_class.search(user.username[0..2])).to eq([user, user2])
+      end
+
+      it 'returns users with a partially matching username starting with @' do
+        expect(described_class.search("@#{user.username[0..2]}")).to eq([user, user2])
       end
 
       it 'returns users with a matching username regardless of the casing' do
@@ -3613,6 +3637,36 @@ describe User do
         create(:notification_setting, user: user, source: group, notification_email: group_notification_email)
 
         is_expected.to eq(group_notification_email)
+      end
+    end
+  end
+
+  describe '#password_expired?' do
+    let(:user) { build(:user, password_expires_at: password_expires_at) }
+
+    subject { user.password_expired? }
+
+    context 'when password_expires_at is not set' do
+      let(:password_expires_at) {}
+
+      it 'returns false' do
+        is_expected.to be_falsey
+      end
+    end
+
+    context 'when password_expires_at is in the past' do
+      let(:password_expires_at) { 1.minute.ago }
+
+      it 'returns true' do
+        is_expected.to be_truthy
+      end
+    end
+
+    context 'when password_expires_at is in the future' do
+      let(:password_expires_at) { 1.minute.from_now }
+
+      it 'returns false' do
+        is_expected.to be_falsey
       end
     end
   end

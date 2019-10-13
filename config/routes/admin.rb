@@ -21,6 +21,10 @@ namespace :admin do
     end
   end
 
+  resource :session, only: [:new, :create] do
+    get 'destroy', action: :destroy, as: :destroy
+  end
+
   resource :impersonation, only: :destroy
 
   resources :abuse_reports, only: [:index, :destroy]
@@ -110,7 +114,7 @@ namespace :admin do
     put :reset_registration_token
     put :reset_health_check_token
     put :clear_repository_check_states
-    match :integrations, :repository, :templates, :ci_cd, :reporting, :metrics_and_profiling, :network, :geo, :preferences, via: [:get, :patch]
+    match :general, :integrations, :repository, :ci_cd, :reporting, :metrics_and_profiling, :network, :preferences, via: [:get, :patch]
     get :lets_encrypt_terms_of_service
   end
 

@@ -197,17 +197,17 @@ function download_chart() {
 
 function deploy() {
   local name="$CI_ENVIRONMENT_SLUG"
+  local edition="${GITLAB_EDITION-ce}"
   echoinfo "Deploying ${name}..." true
 
   IMAGE_REPOSITORY="registry.gitlab.com/gitlab-org/build/cng-mirror"
-  IMAGE_VERSION="${CI_PROJECT_NAME#gitlab-}"
-  gitlab_migrations_image_repository="${IMAGE_REPOSITORY}/gitlab-rails-${IMAGE_VERSION}"
-  gitlab_sidekiq_image_repository="${IMAGE_REPOSITORY}/gitlab-sidekiq-${IMAGE_VERSION}"
-  gitlab_unicorn_image_repository="${IMAGE_REPOSITORY}/gitlab-unicorn-${IMAGE_VERSION}"
-  gitlab_task_runner_image_repository="${IMAGE_REPOSITORY}/gitlab-task-runner-${IMAGE_VERSION}"
+  gitlab_migrations_image_repository="${IMAGE_REPOSITORY}/gitlab-rails-${edition}"
+  gitlab_sidekiq_image_repository="${IMAGE_REPOSITORY}/gitlab-sidekiq-${edition}"
+  gitlab_unicorn_image_repository="${IMAGE_REPOSITORY}/gitlab-unicorn-${edition}"
+  gitlab_task_runner_image_repository="${IMAGE_REPOSITORY}/gitlab-task-runner-${edition}"
   gitlab_gitaly_image_repository="${IMAGE_REPOSITORY}/gitaly"
   gitlab_shell_image_repository="${IMAGE_REPOSITORY}/gitlab-shell"
-  gitlab_workhorse_image_repository="${IMAGE_REPOSITORY}/gitlab-workhorse-${IMAGE_VERSION}"
+  gitlab_workhorse_image_repository="${IMAGE_REPOSITORY}/gitlab-workhorse-${edition}"
 
   create_application_secret
 
@@ -255,25 +255,13 @@ EOF
 }
 
 function display_deployment_debug() {
-  kubectl get pods -n "$KUBE_NAMESPACE" -lrelease=${CI_ENVIRONMENT_SLUG}
+  # Get all pods that are not ready (this will return completed pods for minio and migrations jobs)
+  echoinfo "Unready Pods for release ${CI_ENVIRONMENT_SLUG}"
+  kubectl get pods -n "$KUBE_NAMESPACE" -lrelease=${CI_ENVIRONMENT_SLUG} --field-selector=status.phase!=Running
 
-  migrations_pod=$(get_pod "migrations");
-  if [ -z "${migrations_pod}" ]; then
-    echoerr "Migrations pod not found."
-  else
-    echoinfo "Logs tail of the ${migrations_pod} pod..."
-
-    kubectl logs -n "$KUBE_NAMESPACE" "${migrations_pod}" | sed "s/${REVIEW_APPS_ROOT_PASSWORD}/[REDACTED]/g"
-  fi
-
-  unicorn_pod=$(get_pod "unicorn");
-  if [ -z "${unicorn_pod}" ]; then
-    echoerr "Unicorn pod not found."
-  else
-    echoinfo "Logs tail of the ${unicorn_pod} pod..."
-
-    kubectl logs -n "$KUBE_NAMESPACE" -c unicorn "${unicorn_pod}" | sed "s/${REVIEW_APPS_ROOT_PASSWORD}/[REDACTED]/g"
-  fi
+  # Get all non-completed jobs
+  echoinfo "Unsuccessful Jobs for release ${CI_ENVIRONMENT_SLUG}"
+  kubectl get jobs -n "$KUBE_NAMESPACE" -lrelease=${CI_ENVIRONMENT_SLUG} --field-selector=status.successful!=1
 }
 
 function add_license() {

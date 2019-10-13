@@ -1,11 +1,11 @@
 <script>
 import $ from 'jquery';
 import { __, s__ } from '~/locale';
+import Tracking from '~/tracking';
 import eventHub from '~/sidebar/event_hub';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
 import { GlLoadingIcon } from '@gitlab/ui';
-import { trackEvent } from 'ee/event_tracking/issue_sidebar';
 
 export default {
   components: {
@@ -15,6 +15,7 @@ export default {
   directives: {
     tooltip,
   },
+  mixins: [Tracking.mixin({ label: 'right_sidebar' })],
   props: {
     fetching: {
       type: Boolean,
@@ -105,7 +106,7 @@ export default {
     onEditClick(shouldShowEditField = true) {
       this.showEditField(shouldShowEditField);
 
-      trackEvent('click_edit_button', 'weight');
+      this.track('click_edit_button', { property: 'weight' });
     },
     showEditField(bool = true) {
       this.shouldShowEditField = bool;
@@ -165,6 +166,7 @@ export default {
       <a
         v-if="editable"
         class="float-right js-weight-edit-link"
+        data-qa-selector="edit_weight_link"
         href="#"
         @click="onEditClick(!shouldShowEditField)"
         >{{ __('Edit') }}</a
@@ -175,6 +177,7 @@ export default {
         ref="editableField"
         :value="weight"
         class="form-control"
+        data-qa-selector="weight_input_field"
         type="text"
         :placeholder="__('Enter a number')"
         @blur="onSubmit"
@@ -192,12 +195,18 @@ export default {
         }}</strong>
         <span v-if="editable">
           -
-          <a class="btn-default-hover-link js-weight-remove-link" href="#" @click="removeWeight">{{
-            __('remove weight')
-          }}</a>
+          <a
+            class="btn-default-hover-link js-weight-remove-link"
+            data-qa-selector="remove_weight_link"
+            href="#"
+            @click="removeWeight"
+            >{{ __('remove weight') }}</a
+          >
         </span>
       </span>
-      <span v-else class="no-value">{{ noValueLabel }}</span>
+      <span v-else class="no-value" data-qa-selector="weight_no_value_content">{{
+        noValueLabel
+      }}</span>
     </div>
   </div>
 </template>

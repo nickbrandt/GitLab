@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
@@ -99,6 +101,6 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
   end
 
   def result(success, shard)
-    Gitlab::HealthChecks::Result.new(success, nil, { shard: shard })
+    Gitlab::HealthChecks::Result.new('gitaly_check', success, nil, { shard: shard })
   end
 end

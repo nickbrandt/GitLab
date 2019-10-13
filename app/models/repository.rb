@@ -6,6 +6,7 @@ class Repository
   REF_MERGE_REQUEST = 'merge-requests'
   REF_KEEP_AROUND = 'keep-around'
   REF_ENVIRONMENTS = 'environments'
+  REF_PIPELINES = 'pipelines'
 
   ARCHIVE_CACHE_TIME = 60 # Cache archives referred to by a (mutable) ref for 1 minute
   ARCHIVE_CACHE_TIME_IMMUTABLE = 3600 # Cache archives referred to by an immutable reference for 1 hour
@@ -16,7 +17,7 @@ class Repository
     replace
     #{REF_ENVIRONMENTS}
     #{REF_KEEP_AROUND}
-    #{REF_ENVIRONMENTS}
+    #{REF_PIPELINES}
   ].freeze
 
   include Gitlab::RepositoryCacheAdapter
@@ -133,18 +134,28 @@ class Repository
     end
   end
 
-  def commits(ref = nil, path: nil, limit: nil, offset: nil, skip_merges: false, after: nil, before: nil, all: nil)
+  # the opts are:
+  #  - :path
+  #  - :limit
+  #  - :offset
+  #  - :skip_merges
+  #  - :after
+  #  - :before
+  #  - :all
+  #  - :first_parent
+  def commits(ref = nil, opts = {})
     options = {
       repo: raw_repository,
       ref: ref,
-      path: path,
-      limit: limit,
-      offset: offset,
-      after: after,
-      before: before,
-      follow: Array(path).length == 1,
-      skip_merges: skip_merges,
-      all: all
+      path: opts[:path],
+      follow: Array(opts[:path]).length == 1,
+      limit: opts[:limit],
+      offset: opts[:offset],
+      skip_merges: !!opts[:skip_merges],
+      after: opts[:after],
+      before: opts[:before],
+      all: !!opts[:all],
+      first_parent: !!opts[:first_parent]
     }
 
     commits = Gitlab::Git::Commit.where(options)
@@ -239,13 +250,13 @@ class Repository
   def branch_exists?(branch_name)
     return false unless raw_repository
 
-    branch_names.include?(branch_name)
+    branch_names_include?(branch_name)
   end
 
   def tag_exists?(tag_name)
     return false unless raw_repository
 
-    tag_names.include?(tag_name)
+    tag_names_include?(tag_name)
   end
 
   def ref_exists?(ref)
@@ -260,28 +271,8 @@ class Repository
     raw_repository.languages(root_ref)
   end
 
-  # Makes sure a commit is kept around when Git garbage collection runs.
-  # Git GC will delete commits from the repository that are no longer in any
-  # branches or tags, but we want to keep some of these commits around, for
-  # example if they have comments or CI builds.
-  #
-  # For Geo's sake, pass in multiple shas rather than calling it multiple times,
-  # to avoid unnecessary syncing.
   def keep_around(*shas)
-    shas.each do |sha|
-      next unless sha.present? && commit_by(oid: sha)
-
-      next if kept_around?(sha)
-
-      # This will still fail if the file is corrupted (e.g. 0 bytes)
-      raw_repository.write_ref(keep_around_ref_name(sha), sha)
-    rescue Gitlab::Git::CommandError => ex
-      Rails.logger.error "Unable to create keep-around reference for repository #{disk_path}: #{ex}" # rubocop:disable Gitlab/RailsLogger
-    end
-  end
-
-  def kept_around?(sha)
-    ref_exists?(keep_around_ref_name(sha))
+    Gitlab::Git::KeepAround.execute(self, shas)
   end
 
   def archive_metadata(ref, storage_path, format = "tar.gz", append_sha:, path: nil)
@@ -569,18 +560,18 @@ class Repository
   end
 
   delegate :branch_names, to: :raw_repository
-  cache_method :branch_names, fallback: []
+  cache_method_as_redis_set :branch_names, fallback: []
 
   delegate :tag_names, to: :raw_repository
-  cache_method :tag_names, fallback: []
+  cache_method_as_redis_set :tag_names, fallback: []
 
   delegate :branch_count, :tag_count, :has_visible_content?, to: :raw_repository
   cache_method :branch_count, fallback: 0
   cache_method :tag_count, fallback: 0
-  cache_method :has_visible_content?, fallback: false
+  cache_method_asymmetrically :has_visible_content?
 
   def avatar
-    # n+1: https://gitlab.com/gitlab-org/gitlab-ce/issues/38327
+    # n+1: https://gitlab.com/gitlab-org/gitlab-foss/issues/38327
     Gitlab::GitalyClient.allow_n_plus_1_calls do
       if tree = file_on_head(:avatar)
         tree.path
@@ -1108,6 +1099,8 @@ class Repository
 
     raw.create_repository
     after_create
+
+    true
   end
 
   def blobs_metadata(paths, ref = 'HEAD')
@@ -1119,7 +1112,7 @@ class Repository
   private
 
   # TODO Generice finder, later split this on finders by Ref or Oid
-  # gitlab-org/gitlab-ce#39239
+  # https://gitlab.com/gitlab-org/gitlab-foss/issues/39239
   def find_commit(oid_or_ref)
     commit = if oid_or_ref.is_a?(Gitlab::Git::Commit)
                oid_or_ref
@@ -1155,10 +1148,6 @@ class Repository
         Time.now
       end
     end
-  end
-
-  def keep_around_ref_name(sha)
-    "refs/#{REF_KEEP_AROUND}/#{sha}"
   end
 
   def repository_event(event, tags = {})

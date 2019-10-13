@@ -15,7 +15,7 @@ module Clusters
         def set_initial_status
           return unless not_installable?
 
-          self.status = 'installable' if cluster&.application_helm_available?
+          self.status = status_states[:installable] if cluster&.application_helm_available?
         end
 
         def can_uninstall?
@@ -30,6 +30,10 @@ module Clusters
 
         def self.application_name
           self.to_s.demodulize.underscore
+        end
+
+        def self.association_name
+          :"application_#{application_name}"
         end
 
         def name
@@ -60,3 +64,5 @@ module Clusters
     end
   end
 end
+
+Clusters::Concerns::ApplicationCore.prepend_if_ee('EE::Clusters::Concerns::ApplicationCore')

@@ -27,6 +27,69 @@ describe('project component', () => {
     wrapper.destroy();
   });
 
+  describe('with unlicensed project', () => {
+    let project;
+
+    describe('can upgrade project group', () => {
+      beforeEach(() => {
+        project = {
+          ...mockOneProject,
+          upgrade_required: true,
+          upgrade_path: '/upgrade',
+        };
+        wrapper = shallowMount(ProjectComponent, {
+          sync: false,
+          store,
+          localVue,
+          propsData: { project },
+        });
+      });
+
+      it('shows project title', () => {
+        const header = wrapper.find(ProjectHeader);
+
+        expect(header.props('project')).toEqual(project);
+      });
+
+      it('styles card with gray background', () => {
+        expect(wrapper.find('.dashboard-card-body.bg-secondary').exists()).toBe(true);
+      });
+
+      it('shows upgrade license text', () => {
+        expect(wrapper.find('.dashboard-card-body').html()).toContain(wrapper.vm.unlicensedMessage);
+        expect(wrapper.vm.unlicensedMessage).toContain('upgrade its group plan to Silver');
+      });
+
+      it('hides commit info', () => {
+        expect(wrapper).not.toContain(Commit);
+      });
+    });
+
+    describe('cannot upgrade project group', () => {
+      beforeEach(() => {
+        project = {
+          ...mockOneProject,
+          upgrade_required: true,
+          upgrade_path: '',
+        };
+        wrapper = shallowMount(ProjectComponent, {
+          sync: false,
+          store,
+          localVue,
+          propsData: { project },
+        });
+      });
+
+      it('shows upgrade license text', () => {
+        expect(wrapper.find('.dashboard-card-body').html()).toContain(wrapper.vm.unlicensedMessage);
+        expect(wrapper.vm.unlicensedMessage).not.toContain('upgrade its group plan to Silver');
+        expect(wrapper.vm.unlicensedMessage).toContain(
+          `contact an owner of group ${project.namespace.name}`,
+        );
+      });
+    });
+  });
+
   describe('wrapped components', () => {
     describe('project header', () => {
       it('binds project', () => {

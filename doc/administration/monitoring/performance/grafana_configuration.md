@@ -32,14 +32,14 @@ in the top bar.
 Fill in the configuration details for the InfluxDB data source. Save and
 Test Connection to ensure the configuration is correct.
 
-- **Name**: InfluxDB
+- **Name**: `InfluxDB`
 - **Default**: Checked
-- **Type**: InfluxDB 0.9.x (Even if you're using InfluxDB 0.10.x)
+- **Type**: `InfluxDB 0.9.x` (Even if you're using InfluxDB 0.10.x)
 - **Url**: `https://localhost:8086` (Or the remote URL if you've installed InfluxDB
   on a separate server)
-- **Access**: proxy
-- **Database**: gitlab
-- **User**: admin (Or the username configured when setting up InfluxDB)
+- **Access**: `proxy`
+- **Database**: `gitlab`
+- **User**: `admin` (Or the username configured when setting up InfluxDB)
 - **Password**: The password configured when you set up InfluxDB
 
 ![Grafana data source configurations](img/grafana_data_source_configuration.png)
@@ -105,7 +105,7 @@ repository for more information on this process.
 
 ## Integration with GitLab UI
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/61005) in GitLab 12.1.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/61005) in GitLab 12.1.
 
 If you have set up Grafana, you can enable a link to access it easily from the sidebar:
 

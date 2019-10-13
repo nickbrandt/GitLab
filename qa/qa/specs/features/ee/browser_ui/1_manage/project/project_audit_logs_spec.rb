@@ -38,7 +38,7 @@ module QA
           @project.visit!
 
           Page::Project::Menu.perform(&:go_to_members_settings)
-          Page::Project::Settings::Members.perform do |page|
+          Page::Project::Settings::Members.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.add_member(user.username)
           end
         end
@@ -70,7 +70,7 @@ module QA
           Page::Project::Settings::Main.perform do |settings|
             # Change visibility from public to internal
             settings.expand_visibility_project_features_permissions do |page|
-              page.set_project_visibility "internal"
+              page.set_project_visibility "Internal"
             end
           end
         end

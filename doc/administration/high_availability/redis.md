@@ -64,7 +64,7 @@ Omnibus:
    prometheus['enable'] = false
    alertmanager['enable'] = false
    pgbouncer_exporter['enable'] = false
-   gitlab_monitor['enable'] = false
+   gitlab_exporter['enable'] = false
    gitaly['enable'] = false
 
    redis['bind'] = '0.0.0.0'
@@ -397,7 +397,7 @@ The prerequisites for a HA Redis setup are the following:
 
 1. [Reconfigure Omnibus GitLab][reconfigure] for the changes to take effect.
 
-> Note: You can specify multiple roles like sentinel and redis as:
+> Note: You can specify multiple roles like sentinel and Redis as:
 > `roles ['redis_sentinel_role', 'redis_master_role']`. Read more about high
 > availability roles at <https://docs.gitlab.com/omnibus/roles/>.
 
@@ -446,7 +446,7 @@ The prerequisites for a HA Redis setup are the following:
 1. [Reconfigure Omnibus GitLab][reconfigure] for the changes to take effect.
 1. Go through the steps again for all the other slave nodes.
 
-> Note: You can specify multiple roles like sentinel and redis as:
+> Note: You can specify multiple roles like sentinel and Redis as:
 > `roles ['redis_sentinel_role', 'redis_slave_role']`. Read more about high
 > availability roles at <https://docs.gitlab.com/omnibus/roles/>.
 
@@ -628,7 +628,7 @@ single-machine install, to rotate the **Master** to one of the new nodes.
 
 Make the required changes in configuration and restart the new nodes again.
 
-To disable redis in the single install, edit `/etc/gitlab/gitlab.rb`:
+To disable Redis in the single install, edit `/etc/gitlab/gitlab.rb`:
 
 ```ruby
 redis['enable'] = false
@@ -902,7 +902,7 @@ You can check if everything is correct by connecting to each server using
 /opt/gitlab/embedded/bin/redis-cli -h <redis-host-or-ip> -a '<redis-password>' info replication
 ```
 
-When connected to a `master` redis, you will see the number of connected
+When connected to a `master` Redis, you will see the number of connected
 `slaves`, and a list of each with connection details:
 
 ```
@@ -948,7 +948,7 @@ to [this issue][gh-531].
 You must make sure you are defining the same value in `redis['master_name']`
 and `redis['master_pasword']` as you defined for your sentinel node.
 
-The way the redis connector `redis-rb` works with sentinel is a bit
+The way the Redis connector `redis-rb` works with sentinel is a bit
 non-intuitive. We try to hide the complexity in omnibus, but it still requires
 a few extra configs.
 
@@ -1016,7 +1016,7 @@ Read more on High Availability:
 1. [Configure the GitLab application servers](gitlab.md)
 1. [Configure the load balancers](load_balancer.md)
 
-[ce-1877]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/1877
+[ce-1877]: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/1877
 [restart]: ../restart_gitlab.md#installations-from-source
 [reconfigure]: ../restart_gitlab.md#omnibus-gitlab-reconfigure
 [gh-531]: https://github.com/redis/redis-rb/issues/531
@@ -1027,4 +1027,4 @@ Read more on High Availability:
 [source]: ../../install/installation.md
 [ce]: https://about.gitlab.com/downloads
 [ee]: https://about.gitlab.com/downloads-ee
-[it]: https://gitlab.com/gitlab-org/gitlab-ce/uploads/c4cc8cd353604bd80315f9384035ff9e/The_Internet_IT_Crowd.png
+[it]: https://gitlab.com/gitlab-org/gitlab-foss/uploads/c4cc8cd353604bd80315f9384035ff9e/The_Internet_IT_Crowd.png

@@ -47,9 +47,9 @@ feature flag once the feature has reached general availability.
 You'd still want to use an explicit `Feature.enabled?` check if your new feature
 isn't gated by a License or Plan.
 
-[project-fa]: https://gitlab.com/gitlab-org/gitlab-ee/blob/4cc1c62918aa4c31750cb21dfb1a6c3492d71080/app/models/project_feature.rb#L63-68
-[namespace-fa]: https://gitlab.com/gitlab-org/gitlab-ee/blob/4cc1c62918aa4c31750cb21dfb1a6c3492d71080/ee/app/models/ee/namespace.rb#L71-85
-[license-fa]: https://gitlab.com/gitlab-org/gitlab-ee/blob/4cc1c62918aa4c31750cb21dfb1a6c3492d71080/ee/app/models/license.rb#L293-300
+[project-fa]: https://gitlab.com/gitlab-org/gitlab/blob/4cc1c62918aa4c31750cb21dfb1a6c3492d71080/app/models/project_feature.rb#L63-68
+[namespace-fa]: https://gitlab.com/gitlab-org/gitlab/blob/4cc1c62918aa4c31750cb21dfb1a6c3492d71080/ee/app/models/ee/namespace.rb#L71-85
+[license-fa]: https://gitlab.com/gitlab-org/gitlab/blob/4cc1c62918aa4c31750cb21dfb1a6c3492d71080/ee/app/models/license.rb#L293-300
 
 An important side-effect of the implicit feature flags mentioned above is that
 unless the feature is explicitly disabled or limited to a percentage of users,
@@ -108,6 +108,9 @@ if ( gon.features.vimBindings ) {
 
 The name of the feature flag in JavaScript will always be camelCased, meaning
 that checking for `gon.features.vim_bindings` would not work.
+
+See the [Vue guide](../fe_guide/vue.md#accessing-feature-flags) for details about
+how to access feature flags in a Vue component.
 
 ### Specs
 

@@ -95,10 +95,6 @@ module EE
       ::Geo::RepositoryUpdatedService.new(self).execute
     end
 
-    def geo_updated_event_source
-      repo_type.wiki? ? Geo::RepositoryUpdatedEvent::WIKI : Geo::RepositoryUpdatedEvent::REPOSITORY
-    end
-
     def code_owners_blob(ref: 'HEAD')
       possible_code_owner_blobs = ::Gitlab::CodeOwners::FILE_PATHS.map { |path| [ref, path] }
       blobs_at(possible_code_owner_blobs).compact.first

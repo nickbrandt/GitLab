@@ -351,6 +351,7 @@ export default {
           :status-icon="sastStatusIcon"
           :popover-options="sastPopover"
           class="js-sast-widget"
+          data-qa-selector="sast_scan_report"
         />
 
         <issues-list
@@ -369,6 +370,7 @@ export default {
           :status-icon="dependencyScanningStatusIcon"
           :popover-options="dependencyScanningPopover"
           class="js-dependency-scanning-widget"
+          data-qa-selector="dependency_scan_report"
         />
 
         <issues-list
@@ -386,6 +388,7 @@ export default {
           :status-icon="sastContainerStatusIcon"
           :popover-options="sastContainerPopover"
           class="js-sast-container"
+          data-qa-selector="container_scan_report"
         />
 
         <issues-list
@@ -403,6 +406,7 @@ export default {
           :status-icon="dastStatusIcon"
           :popover-options="dastPopover"
           class="js-dast-widget"
+          data-qa-selector="dast_scan_report"
         />
 
         <issues-list

@@ -184,10 +184,10 @@ module ApplicationSettingsHelper
       :disabled_oauth_sign_in_sources,
       :domain_blacklist,
       :domain_blacklist_enabled,
-      # TODO Remove domain_blacklist_raw in APIv5 (See https://gitlab.com/gitlab-org/gitlab-ce/issues/67204)
+      # TODO Remove domain_blacklist_raw in APIv5 (See https://gitlab.com/gitlab-org/gitlab-foss/issues/67204)
       :domain_blacklist_raw,
       :domain_whitelist,
-      # TODO Remove domain_whitelist_raw in APIv5 (See https://gitlab.com/gitlab-org/gitlab-ce/issues/67204)
+      # TODO Remove domain_whitelist_raw in APIv5 (See https://gitlab.com/gitlab-org/gitlab-foss/issues/67204)
       :domain_whitelist_raw,
       :outbound_local_requests_whitelist_raw,
       :dsa_key_restriction,
@@ -265,6 +265,10 @@ module ApplicationSettingsHelper
       :throttle_unauthenticated_enabled,
       :throttle_unauthenticated_period_in_seconds,
       :throttle_unauthenticated_requests_per_period,
+      :throttle_protected_paths_enabled,
+      :throttle_protected_paths_period_in_seconds,
+      :throttle_protected_paths_requests_per_period,
+      :protected_paths_raw,
       :time_tracking_limit_to_hours,
       :two_factor_grace_period,
       :unique_ips_limit_enabled,
@@ -307,6 +311,10 @@ module ApplicationSettingsHelper
 
   def instance_clusters_enabled?
     can?(current_user, :read_cluster, Clusters::Instance.new)
+  end
+
+  def omnibus_protected_paths_throttle?
+    Rack::Attack.throttles.key?('protected paths')
   end
 end
 

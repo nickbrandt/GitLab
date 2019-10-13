@@ -212,7 +212,7 @@ export default {
           <issue-due-date v-if="issue.dueDate" :date="issue.dueDate" />
           <issue-time-estimate v-if="issue.timeEstimate" :estimate="issue.timeEstimate" />
           <issue-card-weight
-            v-if="issue.weight"
+            v-if="validIssueWeight"
             :weight="issue.weight"
             @click="filterByWeight(issue.weight)"
           />

@@ -10,7 +10,6 @@ module EE
           extend ::Gitlab::Utils::Override
 
           override :filter_attributes_using_license
-          # rubocop: disable CodeReuse/ActiveRecord
           def filter_attributes_using_license(attrs)
             unless ::License.feature_available?(:repository_mirrors)
               attrs = attrs.except(*::EE::ApplicationSettingsHelper.repository_mirror_attributes)
@@ -30,7 +29,6 @@ module EE
 
             attrs
           end
-          # rubocop: enable CodeReuse/ActiveRecord
         end
       end
     end

@@ -163,6 +163,28 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
       subject
     end
+
+    context 'with a group cluster' do
+      let(:cluster) { create(:cluster, :group) }
+
+      before do
+        create(:deployment, :success, environment: environment, cluster: cluster)
+      end
+
+      it 'expires the environments path for the group cluster' do
+        expect_next_instance_of(Gitlab::EtagCaching::Store) do |store|
+          expect(store).to receive(:touch)
+            .with(::Gitlab::Routing.url_helpers.project_environments_path(project, format: :json))
+            .and_call_original
+
+          expect(store).to receive(:touch)
+            .with(::Gitlab::Routing.url_helpers.environments_group_cluster_path(cluster.group, cluster))
+            .and_call_original
+        end
+
+        subject
+      end
+    end
   end
 
   describe '#rollout_status' do

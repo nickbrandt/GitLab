@@ -27,9 +27,9 @@ module QA
         def fabricate!
           group.visit!
 
-          QA::EE::Page::Group::Menu.perform(&:click_group_epics_link)
+          QA::Page::Group::Menu.perform(&:click_group_epics_link)
 
-          QA::EE::Page::Group::Epic::Index.perform do |page|
+          QA::EE::Page::Group::Epic::Index.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.click_new_epic
             page.set_title(@title)
             page.create_new_epic
@@ -37,12 +37,6 @@ module QA
               page.has_text?(@title)
             end
           end
-        end
-
-        def resource_web_url(resource)
-          super
-        rescue ResourceURLMissingError
-          "#{group.web_url}/-/epics/#{iid}"
         end
 
         def api_get_path

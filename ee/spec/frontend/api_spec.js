@@ -88,7 +88,7 @@ describe('Api', () => {
   describe('groupEpics', () => {
     it('calls `axios.get` using param `groupId`', done => {
       const groupId = 2;
-      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/epics`;
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/epics?include_ancestor_groups=false&include_descendant_groups=true`;
 
       mock.onGet(expectedUrl).reply(200, mockEpics);
 

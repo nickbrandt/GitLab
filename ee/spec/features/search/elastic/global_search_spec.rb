@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Global elastic search', :elastic do
@@ -105,7 +107,7 @@ describe 'Global elastic search', :elastic do
     let(:project_2) { create(:project, :repository, :wiki_repo) }
 
     before do
-      project.repository.index_blobs
+      project.repository.index_commits_and_blobs
 
       Gitlab::Elastic::Helper.refresh_index
     end
@@ -131,7 +133,7 @@ describe 'Global elastic search', :elastic do
         message: 'supercalifragilisticexpialidocious',
         branch_name: 'master')
 
-      project_2.repository.index_blobs
+      project_2.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
       project_2.destroy
 
@@ -165,7 +167,7 @@ describe 'Global elastic search', :elastic do
 
   describe 'I search through the commits' do
     before do
-      project.repository.index_commits
+      project.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
     end
 

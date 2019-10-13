@@ -1,6 +1,8 @@
 include:
   template: Dependency-Scanning.gitlab-ci.yml
   template: Container-Scanning.gitlab-ci.yml
+  template: SAST.gitlab-ci.yml
+  template: DAST.gitlab-ci.yml
 
 dependency_scanning:
   tags:
@@ -29,8 +31,20 @@ sast:
   tags:
     - qa
     - test
+  only: null # Template defaults to feature branches only
   script:
     - echo "Skipped"
   artifacts:
     reports:
       sast: gl-sast-report.json
+
+dast:
+  tags:
+    - qa
+    - test
+  only: null # Template defaults to feature branches only
+  script:
+    - echo "Skipped"
+  artifacts:
+    reports:
+      dast: gl-dast-report.json

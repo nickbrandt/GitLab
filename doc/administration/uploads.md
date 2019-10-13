@@ -48,7 +48,7 @@ _The uploads are stored by default in
 > **Notes:**
 >
 > - [Introduced][ee-3867] in [GitLab Premium][eep] 10.5.
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/17358) in [GitLab Core][ce] 10.7.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17358) in [GitLab Core](https://about.gitlab.com/pricing/) 10.7.
 > - Since version 11.1, we support direct_upload to S3.
 
 If you don't want to use the local disk where GitLab is installed to store the
@@ -81,7 +81,7 @@ The connection settings match those provided by [Fog](https://github.com/fog), a
 | `enable_signature_v4_streaming` | Set to true to enable HTTP chunked transfers with [AWS v4 signatures](https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-streaming.html). Oracle Cloud S3 needs this to be false | true |
 | `region` | AWS region | us-east-1 |
 | `host` | S3 compatible host for when not using AWS, e.g. `localhost` or `storage.example.com` | s3.amazonaws.com |
-| `endpoint` | Can be used when configuring an S3 compatible service such as [Minio](https://www.minio.io), by entering a URL such as `http://127.0.0.1:9000` | (optional) |
+| `endpoint` | Can be used when configuring an S3 compatible service such as [MinIO](https://min.io), by entering a URL such as `http://127.0.0.1:9000` | (optional) |
 | `path_style` | Set to true to use `host/bucket_name/object` style paths instead of `bucket_name.host/object`. Leave as false for AWS S3 | false |
 | `use_iam_profile` | Set to true to use IAM profile instead of access keys | false
 
@@ -165,7 +165,7 @@ The connection settings match those provided by [Fog](https://github.com/fog), a
 |---------|-------------|---------|
 | `provider` | Always `OpenStack` for compatible hosts | OpenStack |
 | `openstack_username` | OpenStack username | |
-| `openstack_api_key` | OpenStack api key  | |
+| `openstack_api_key` | OpenStack API key  | |
 | `openstack_temp_url_key` | OpenStack key for generating temporary urls | |
 | `openstack_auth_url` | OpenStack authentication endpont | |
 | `openstack_region` | OpenStack region | |
@@ -228,6 +228,5 @@ _The uploads are stored by default in
 
 [reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
 [restart gitlab]: restart_gitlab.md#installations-from-source "How to restart GitLab"
-[eep]: https://about.gitlab.com/gitlab-ee/ "GitLab Premium"
-[ce]: https://about.gitlab.com/gitlab-ce/ "GitLab Community Edition"
-[ee-3867]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3867
+[eep]: https://about.gitlab.com/pricing/ "GitLab Premium"
+[ee-3867]: https://gitlab.com/gitlab-org/gitlab/merge_requests/3867

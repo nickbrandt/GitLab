@@ -1,4 +1,0 @@
-title: "LDAP group sync: check parent group membership and improve performance"
-merge_request: 13435
-author: Alex Lossent
-type: fixed

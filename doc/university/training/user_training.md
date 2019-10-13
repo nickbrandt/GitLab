@@ -140,7 +140,7 @@ Modified files that have been marked to go in the next commit.
 1. Stage the file.
 1. Commit.
 1. Push the commit to the remote.
-1. View the git log.
+1. View the Git log.
 
 ## Commands (committing)
 
@@ -214,7 +214,7 @@ Create your first merge request:
 Review the Thoughtbot code-review guide for suggestions to follow when reviewing merge requests:
 <https://github.com/thoughtbot/guides/tree/master/code-review>.
 
-See GitLab merge requests for examples: <https://gitlab.com/gitlab-org/gitlab-ce/merge_requests>.
+See GitLab merge requests for examples: <https://gitlab.com/gitlab-org/gitlab-foss/merge_requests>.
 
 ## Explore GitLab projects
 

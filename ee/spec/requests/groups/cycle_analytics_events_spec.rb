@@ -24,6 +24,40 @@ describe 'cycle analytics events' do
       login_as(user)
     end
 
+    context 'when date range parameters are given' do
+      it 'filter by `created_after`' do
+        params = { cycle_analytics: { created_after: issue.created_at - 5.days } }
+
+        get group_cycle_analytics_issue_path(group, params: params, format: :json)
+
+        expect(json_response['events']).not_to be_empty
+      end
+
+      it 'filters by `created_after` where no events should be found' do
+        params = { cycle_analytics: { created_after: issue.created_at + 5.days } }
+
+        get group_cycle_analytics_issue_path(group, params: params, format: :json)
+
+        expect(json_response['events']).to be_empty
+      end
+
+      it 'filter by `created_after` and `created_before`' do
+        params = { cycle_analytics: { created_after: issue.created_at - 5.days, created_before: issue.created_at + 5.days } }
+
+        get group_cycle_analytics_issue_path(group, params: params, format: :json)
+
+        expect(json_response['events']).not_to be_empty
+      end
+
+      it 'raises error when date cannot be parsed' do
+        params = { cycle_analytics: { created_after: 'invalid' } }
+
+        expect do
+          get group_cycle_analytics_issue_path(group, params: params, format: :json)
+        end.to raise_error(ArgumentError)
+      end
+    end
+
     it 'lists the issue events' do
       get group_cycle_analytics_issue_path(group, format: :json)
 

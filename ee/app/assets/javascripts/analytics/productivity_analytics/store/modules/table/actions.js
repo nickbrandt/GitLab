@@ -1,7 +1,7 @@
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
-import { timeToMergeMetric } from '../../../constants';
+import { daysToMergeMetric } from '../../../constants';
 
 export const fetchMergeRequests = ({ dispatch, state, rootState, rootGetters }) => {
   dispatch('requestMergeRequests');
@@ -9,7 +9,7 @@ export const fetchMergeRequests = ({ dispatch, state, rootState, rootGetters }) 
   const { sortField, sortOrder, pageInfo } = state;
 
   const params = {
-    ...rootGetters['filters/getCommonFilterParams'],
+    ...rootGetters['filters/getCommonFilterParams'](),
     days_to_merge: rootState.charts.charts.main.selected,
     sort: `${sortField}_${sortOrder}`,
     page: pageInfo ? pageInfo.page : null,
@@ -41,8 +41,8 @@ export const receiveMergeRequestsError = ({ commit }, { response }) => {
 export const setSortField = ({ commit, dispatch }, data) => {
   commit(types.SET_SORT_FIELD, data);
 
-  // let's make sure we update the column that we sort on (except for 'time_to_merge')
-  if (data !== timeToMergeMetric) {
+  // let's make sure we update the column that we sort on (except for 'days_to_merge')
+  if (data !== daysToMergeMetric.key) {
     dispatch('setColumnMetric', data);
   }
 
@@ -57,8 +57,8 @@ export const toggleSortOrder = ({ commit, dispatch }) => {
 
 export const setColumnMetric = ({ commit }, data) => commit(types.SET_COLUMN_METRIC, data);
 
-export const setMergeRequestsPage = ({ commit, dispatch }, data) => {
-  commit(types.SET_MERGE_REQUESTS_PAGE, data);
+export const setPage = ({ commit, dispatch }, data) => {
+  commit(types.SET_PAGE, data);
 
   dispatch('fetchMergeRequests');
 };

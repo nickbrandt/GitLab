@@ -36,6 +36,7 @@ class License < ApplicationRecord
     scoped_issue_board
     usage_quotas
     visual_review_app
+    wip_limits
   ].freeze
 
   EEP_FEATURES = EES_FEATURES + %i[
@@ -91,6 +92,7 @@ class License < ApplicationRecord
     scoped_labels
     service_desk
     smartcard_auth
+    type_of_work_analytics
     unprotection_restrictions
   ]
   EEP_FEATURES.freeze
@@ -105,6 +107,7 @@ class License < ApplicationRecord
     group_ip_restriction
     incident_management
     insights
+    licenses_list
     license_management
     pod_logs
     prometheus_alerts

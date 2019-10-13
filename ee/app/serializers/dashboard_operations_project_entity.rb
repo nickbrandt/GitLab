@@ -1,31 +1,33 @@
 # frozen_string_literal: true
 
 class DashboardOperationsProjectEntity < Grape::Entity
+  include Gitlab::Utils::StrongMemoize
   include RequestAwareEntity
 
   expose :project, merge: true, using: API::Entities::BasicProjectDetails
 
-  expose :remove_path do |dashboard_project_object|
-    remove_operations_project_path(project_id: dashboard_project_object.project.id)
+  expose :remove_path do |_|
+    remove_operations_project_path(project_id: project.id)
   end
 
-  expose :last_pipeline, if: -> (*) { last_pipeline } do |_, options|
+  expose :upgrade_required
+  expose :upgrade_path, if: -> (*) { upgrade_required && user_can_upgrade? } do |_|
+    project&.group ? group_billings_path(project.group) : profile_billings_path
+  end
+
+  expose :last_pipeline, if: -> (*) { !upgrade_required && last_pipeline } do |_, options|
     PipelineDetailsEntity.represent(last_pipeline, options.merge(request: new_request))
   end
 
-  expose :last_deployment, if: -> (*) { last_deployment? } do |dashboard_project_object, options|
-    DeploymentEntity.represent(dashboard_project_object.last_deployment,
-                               options.merge(request: new_request))
+  expose :last_deployment, if: -> (*) { !upgrade_required && last_deployment } do |_, options|
+    DeploymentEntity.represent(last_deployment, options.merge(request: new_request))
   end
 
-  expose :alert_count
-  expose :alert_path, if: -> (*) { last_deployment? } do |dashboard_project_object|
-    project = dashboard_project_object.project
-    environment = dashboard_project_object.last_deployment.environment
-
-    metrics_project_environment_path(project, environment)
+  expose :alert_count, if: -> (*) { !upgrade_required }
+  expose :alert_path, if: -> (*) { !upgrade_required && last_deployment } do |_|
+    metrics_project_environment_path(project, last_deployment.environment)
   end
-  expose :last_alert, using: PrometheusAlertEntity, if: -> (*) { last_alert? }
+  expose :last_alert, using: PrometheusAlertEntity, if: -> (*) { !upgrade_required && last_alert? }
 
   private
 
@@ -33,20 +35,38 @@ class DashboardOperationsProjectEntity < Grape::Entity
 
   def new_request
     EntityRequest.new(
-      current_user: request.current_user,
-      project: dashboard_project.project
+      current_user: current_user,
+      project: project
     )
   end
 
-  def last_pipeline
-    dashboard_project.project.last_pipeline
+  def upgrade_required
+    strong_memoize(:upgrade_required) do
+      !project.feature_available?(:operations_dashboard)
+    end
   end
 
-  def last_deployment?
+  def user_can_upgrade?
+    can?(current_user, :admin_namespace, project&.namespace)
+  end
+
+  def last_pipeline
+    project.last_pipeline
+  end
+
+  def last_deployment
     dashboard_project.last_deployment
   end
 
   def last_alert?
     dashboard_project.last_alert
+  end
+
+  def current_user
+    request.current_user
+  end
+
+  def project
+    dashboard_project.project
   end
 end

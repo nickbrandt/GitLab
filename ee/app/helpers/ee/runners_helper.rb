@@ -4,7 +4,7 @@ module EE
     def ci_usage_warning_message(namespace, project)
       message = [ci_usage_base_message(namespace)]
 
-      return unless message
+      return unless message.any?
 
       if ::Gitlab.com? && can?(current_user, :admin_project, project)
         message << purchase_shared_runner_minutes_link

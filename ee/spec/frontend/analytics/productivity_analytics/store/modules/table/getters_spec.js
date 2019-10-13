@@ -5,6 +5,12 @@ import { tableSortOrder } from 'ee/analytics/productivity_analytics/constants';
 describe('Productivity analytics table getters', () => {
   let state;
 
+  const metricTypes = [
+    { key: 'time_to_first_comment', label: 'Time from first commit until first comment' },
+    { key: 'time_to_last_commit', label: 'Time from first comment to last commit' },
+    { key: 'time_to_merge', label: 'Time from last commit to merge' },
+  ];
+
   beforeEach(() => {
     state = createState();
   });
@@ -47,38 +53,27 @@ describe('Productivity analytics table getters', () => {
 
   describe('sortFieldDropdownLabel', () => {
     it('returns the correct label for the current sort field', () => {
-      state.sortField = 'time_to_last_commit';
-
-      expect(getters.sortFieldDropdownLabel(state)).toBe('Time from first comment to last commit');
-    });
-  });
-
-  describe('getColumnOptions', () => {
-    it('returns an object of key/value pairs with the available column options', () => {
-      state.sortFields = {
-        time_to_first_comment: 'Time from first commit until first comment',
-        time_to_last_commit: 'Time from first comment to last commit',
-        time_to_merge: 'Time from last commit to merge',
-        days_to_merge: 'Days to merge',
+      const rootState = {
+        metricTypes,
       };
 
-      expect(getters.getColumnOptions(state)).toEqual({
-        days_to_merge: 'Days to merge',
-        time_to_first_comment: 'Time from first commit until first comment',
-        time_to_last_commit: 'Time from first comment to last commit',
-      });
+      state.sortField = 'time_to_last_commit';
+
+      expect(getters.sortFieldDropdownLabel(state, null, rootState)).toBe(
+        'Time from first comment to last commit',
+      );
     });
   });
 
-  describe('hasNoAccessError', () => {
-    it('returns true if "hasError" is set to 403', () => {
-      state.hasError = 403;
-      expect(getters.hasNoAccessError(state)).toEqual(true);
-    });
+  describe('tableSortOptions', () => {
+    it('returns the metricTypes from the timeBasedHistogram and adds "Days to merge"', () => {
+      const rootGetters = {
+        getMetricTypes: () => metricTypes,
+      };
 
-    it('returns false if "hasError" is not set to 403', () => {
-      state.hasError = false;
-      expect(getters.hasNoAccessError(state)).toEqual(false);
+      const expected = [{ key: 'days_to_merge', label: 'Days to merge' }, ...metricTypes];
+
+      expect(getters.tableSortOptions(null, null, null, rootGetters)).toEqual(expected);
     });
   });
 });

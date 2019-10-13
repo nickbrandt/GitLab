@@ -8,7 +8,8 @@ class ApprovalProjectRule < ApplicationRecord
   enum rule_type: {
     regular: 0,
     code_owner: 1, # currently unused
-    report_approver: 2
+    report_approver: 2,
+    any_approver: 3
   }
 
   alias_method :code_owner, :code_owner?

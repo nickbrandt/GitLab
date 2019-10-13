@@ -1,30 +1,15 @@
-.review-schedules-only:
-  only:
-    refs:
-      - schedules@gitlab-org/gitlab-ce
-      - schedules@gitlab-org/gitlab-ee
-    kubernetes: active
-    variables:
-      - $REVIEW_APP_CLEANUP
+.except-deploys:
   except:
     refs:
-      - tags
-      - /(^docs[\/-].+|.+-docs$)/
-
-.review-base:
-  extends:
-    - .default-tags
-    - .default-retry
-    - .review-only
-  image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-charts-build-base
-  dependencies: []
-  before_script:
-    - source scripts/utils.sh
+      - /^[\d-]+-stable(-ee)?$/
+      - /^\d+-\d+-auto-deploy-\d+$/
 
 .review-docker:
   extends:
     - .default-tags
     - .default-retry
+    - .default-only
+    - .except-deploys
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-qa-alpine
   services:
     - docker:19.03.0-dind
@@ -34,24 +19,48 @@
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://docker:2375
-    LATEST_QA_IMAGE: "gitlab/${CI_PROJECT_NAME}-qa:nightly"
-    QA_IMAGE: "${CI_REGISTRY}/${CI_PROJECT_PATH}/gitlab/${CI_PROJECT_NAME}-qa:${CI_COMMIT_REF_SLUG}"
+    GITLAB_EDITION: "ce"
 
 build-qa-image:
   extends:
     - .review-docker
-    - .except-docs
+    - .only-code-qa-changes
   only:
-    refs:
-      - branches@gitlab-org/gitlab-ce
-      - branches@gitlab-org/gitlab-ee
-  stage: test
+    variables:
+      - $CI_SERVER_HOST == "gitlab.com" && $CI_PROJECT_NAMESPACE == "gitlab-org"
+  stage: prepare
   script:
-    - time docker build --cache-from ${LATEST_QA_IMAGE} --tag ${QA_IMAGE} --file ./qa/Dockerfile ./
+    - '[[ ! -d "ee/" ]] || export GITLAB_EDITION="ee"'
+    - export QA_IMAGE="${CI_REGISTRY}/${CI_PROJECT_PATH}/gitlab/gitlab-${GITLAB_EDITION}-qa:${CI_COMMIT_REF_SLUG}"
+    - time docker build --cache-from gitlab/gitlab-${GITLAB_EDITION}-qa:nightly --tag ${QA_IMAGE} --file ./qa/Dockerfile ./
     - echo "${CI_JOB_TOKEN}" | docker login --username gitlab-ci-token --password-stdin ${CI_REGISTRY}
     - time docker push ${QA_IMAGE}
 
+schedule:review-cleanup:
+  extends:
+    - .default-tags
+    - .default-retry
+    - .default-only
+    - .only-code-qa-changes
+    - .only-review-schedules
+    - .except-deploys
+  stage: prepare
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-charts-build-base
+  allow_failure: true
+  environment:
+    name: review/auto-cleanup
+    action: stop
+  before_script:
+    - source scripts/utils.sh
+    - install_gitlab_gem
+  script:
+    - ruby -rrubygems scripts/review_apps/automated_cleanup.rb
+
 .review-build-cng-base:
+  extends:
+    - .default-only
+    - .only-code-qa-changes
+    - .except-deploys
   image: ruby:2.6-alpine
   stage: review-prepare
   before_script:
@@ -65,28 +74,37 @@ build-qa-image:
 review-build-cng:
   extends:
     - .review-build-cng-base
-    - .review-only
+    - .only-review
   needs: ["gitlab:assets:compile pull-cache"]
 
 schedule:review-build-cng:
   extends:
     - .review-build-cng-base
-    - .review-schedules-only
+    - .only-review-schedules
   needs: ["gitlab:assets:compile"]
 
 .review-deploy-base:
-  extends: .review-base
-  allow_failure: true
+  extends:
+    - .default-tags
+    - .default-retry
+    - .default-only
+    - .only-code-qa-changes
+    - .except-deploys
   stage: review
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-charts-build-base
+  dependencies: []
+  allow_failure: true
   variables:
     HOST_SUFFIX: "${CI_ENVIRONMENT_SLUG}"
     DOMAIN: "-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}"
     GITLAB_HELM_CHART_REF: "master"
+    GITLAB_EDITION: "ce"
   environment:
     name: review/${CI_COMMIT_REF_NAME}
     url: https://gitlab-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}
     on_stop: review-stop
   before_script:
+    - '[[ ! -d "ee/" ]] || export GITLAB_EDITION="ee"'
     - export GITLAB_SHELL_VERSION=$(<GITLAB_SHELL_VERSION)
     - export GITALY_VERSION=$(<GITALY_SERVER_VERSION)
     - export GITLAB_WORKHORSE_VERSION=$(<GITLAB_WORKHORSE_VERSION)
@@ -110,12 +128,13 @@ schedule:review-build-cng:
 review-deploy:
   extends:
     - .review-deploy-base
+    - .only-review
   needs: ["review-build-cng"]
 
 schedule:review-deploy:
   extends:
     - .review-deploy-base
-    - .review-schedules-only
+    - .only-review-schedules
   needs: ["schedule:review-build-cng"]
 
 review-stop:
@@ -150,8 +169,10 @@ review-cleanup-failed-deployment:
 .review-qa-base:
   extends:
     - .review-docker
-    - .review-only
+    - .only-review
+    - .only-code-qa-changes
   stage: qa
+  allow_failure: true
   variables:
     QA_ARTIFACTS_DIR: "${CI_PROJECT_DIR}/qa"
     QA_CAN_TEST_GIT_PROTOCOL_V2: "false"
@@ -162,6 +183,7 @@ review-cleanup-failed-deployment:
     GITLAB_ADMIN_PASSWORD: "${REVIEW_APPS_ROOT_PASSWORD}"
     GITHUB_ACCESS_TOKEN: "${REVIEW_APPS_QA_GITHUB_ACCESS_TOKEN}"
     EE_LICENSE: "${REVIEW_APPS_EE_LICENSE}"
+  needs: ["review-deploy"]
   dependencies: ["review-deploy"]
   artifacts:
     paths:
@@ -169,6 +191,8 @@ review-cleanup-failed-deployment:
     expire_in: 7 days
     when: always
   before_script:
+    - '[[ ! -d "ee/" ]] || export GITLAB_EDITION="ee"'
+    - export QA_IMAGE="${CI_REGISTRY}/${CI_PROJECT_PATH}/gitlab/gitlab-${GITLAB_EDITION}-qa:${CI_COMMIT_REF_SLUG}"
     - export CI_ENVIRONMENT_URL="$(cat review_app_url.txt)"
     - echo "${CI_ENVIRONMENT_URL}"
     - echo "${QA_IMAGE}"
@@ -178,24 +202,76 @@ review-cleanup-failed-deployment:
 
 review-qa-smoke:
   extends: .review-qa-base
-  allow_failure: true
   script:
     - gitlab-qa Test::Instance::Smoke "${QA_IMAGE}" "${CI_ENVIRONMENT_URL}"
 
 review-qa-all:
   extends: .review-qa-base
-  allow_failure: true
   when: manual
   parallel: 5
   script:
-    - export KNAPSACK_REPORT_PATH=knapsack/${CI_PROJECT_NAME}/review-qa-all_master_report.json
+    - export KNAPSACK_REPORT_PATH=knapsack/master_report.json
     - export KNAPSACK_TEST_FILE_PATTERN=qa/specs/features/**/*_spec.rb
     - gitlab-qa Test::Instance::Any "${QA_IMAGE}" "${CI_ENVIRONMENT_URL}" -- --format RspecJunitFormatter --out tmp/rspec-${CI_JOB_ID}.xml --format html --out tmp/rspec.htm --color --format documentation
+
+.review-performance-base:
+  extends:
+    - .review-docker
+    - .only-code-qa-changes
+  stage: qa
+  allow_failure: true
+  before_script:
+    - export CI_ENVIRONMENT_URL="$(cat review_app_url.txt)"
+    - echo "${CI_ENVIRONMENT_URL}"
+    - mkdir -p gitlab-exporter
+    - wget -O ./gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/master/index.js
+    - mkdir -p sitespeed-results
+  script:
+    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:6.3.1 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results "${CI_ENVIRONMENT_URL}"
+  after_script:
+    - mv sitespeed-results/data/performance.json performance.json
+  artifacts:
+    paths:
+      - sitespeed-results/
+    reports:
+      performance: performance.json
+
+review-performance:
+  extends:
+    - .review-performance-base
+    - .only-review
+  needs: ["review-deploy"]
+  dependencies: ["review-deploy"]
+  before_script:
+    - export CI_ENVIRONMENT_URL="$(cat review_app_url.txt)"
+    - echo "${CI_ENVIRONMENT_URL}"
+    - mkdir -p gitlab-exporter
+    - wget -O ./gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/master/index.js
+    - mkdir -p sitespeed-results
+  script:
+    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:6.3.1 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results "${CI_ENVIRONMENT_URL}"
+  after_script:
+    - mv sitespeed-results/data/performance.json performance.json
+  artifacts:
+    paths:
+      - sitespeed-results/
+    reports:
+      performance: performance.json
+
+schedule:review-performance:
+  extends:
+    - .review-performance-base
+    - .only-review-schedules
+  needs: ["schedule:review-deploy"]
+  dependencies: ["schedule:review-deploy"]
 
 parallel-spec-reports:
   extends:
     - .default-tags
-    - .except-docs
+    - .default-only
+    - .only-code-qa-changes
+    - .only-review
+    - .except-deploys
   image: ruby:2.6-alpine
   stage: post-test
   dependencies: ["review-qa-all"]
@@ -220,51 +296,12 @@ parallel-spec-reports:
     - '[[ -f $NEW_PARALLEL_SPECS_REPORT ]] || echo "{}" > ${NEW_PARALLEL_SPECS_REPORT}'
     - scripts/merge-html-reports ${NEW_PARALLEL_SPECS_REPORT} ${BASE_ARTIFACT_URL}${ARTIFACT_DIRS} qa/gitlab-qa-run-*/**/rspec.htm
 
-review-performance:
-  extends: .review-qa-base
-  allow_failure: true
-  before_script:
-    - export CI_ENVIRONMENT_URL="$(cat review_app_url.txt)"
-    - echo "${CI_ENVIRONMENT_URL}"
-    - mkdir -p gitlab-exporter
-    - wget -O ./gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/master/index.js
-    - mkdir -p sitespeed-results
-  script:
-    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:6.3.1 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results "${CI_ENVIRONMENT_URL}"
-  after_script:
-    - mv sitespeed-results/data/performance.json performance.json
-  artifacts:
-    paths:
-      - sitespeed-results/
-    reports:
-      performance: performance.json
-
-schedule:review-performance:
-  extends:
-    - review-performance
-    - .review-schedules-only
-  dependencies: ["schedule:review-deploy"]
-
-schedule:review-cleanup:
-  extends:
-    - .review-base
-    - .review-schedules-only
-  stage: build
-  allow_failure: true
-  environment:
-    name: review/auto-cleanup
-    action: stop
-  before_script:
-    - source scripts/utils.sh
-    - install_gitlab_gem
-  script:
-    - ruby -rrubygems scripts/review_apps/automated_cleanup.rb
-
 danger-review:
   extends:
     - .default-tags
     - .default-retry
     - .default-cache
+    - .default-only
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:danger
   stage: test
   dependencies: []
@@ -274,10 +311,9 @@ danger-review:
   except:
     refs:
       - master
-      - /^\d+-\d+-auto-deploy-\d+$/
-      - /^[\d-]+-stable(-ee)?$/
-      - /^ce-to-ee-.*/
-      - /.*-stable(-ee)?-prepare-.*/
+    variables:
+      - $CI_COMMIT_REF_NAME =~ /^\d+-\d+-auto-deploy-\d+$/
+      - $CI_COMMIT_REF_NAME =~ /^[\d-]+-stable(-ee)?$/
   script:
     - git version
     - node --version

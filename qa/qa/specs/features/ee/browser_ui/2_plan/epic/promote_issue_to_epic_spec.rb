@@ -37,7 +37,7 @@ module QA
         end
 
         group.visit!
-        QA::EE::Page::Group::Menu.perform(&:click_group_epics_link)
+        Page::Group::Menu.perform(&:click_group_epics_link)
         QA::EE::Page::Group::Epic::Index.perform do |index|
           index.click_first_epic(QA::EE::Page::Group::Epic::Show)
         end

@@ -2,7 +2,7 @@
 - is_group_type = @cluster.cluster_type.in? 'group_type'
 - is_creating = @cluster.status_name.in? %i/scheduled creating/
 
-- if is_group_type && !is_creating && Feature.enabled?(:view_group_cluster_deployments)
+- if is_group_type && !is_creating
   .js-toggle-container
     %ul.nav-links.mobile-separator.nav.nav-tabs{ role: 'tablist' }
       %li.nav-item{ role: 'presentation' }
@@ -10,7 +10,7 @@
           %span= _('Configuration')
       %li.nav-item{ role: 'presentation' }
         %a.nav-link{ class: active_when(!is_configure_active), href: clusterable.cluster_path(@cluster.id, params: {tab: 'environments'}), id: 'group-cluster-environments-tab' }
-          %span= _('Environments')
+          %span.js-cluster-nav-environments= _('Environments')
 
     .tab-content
       - if is_configure_active

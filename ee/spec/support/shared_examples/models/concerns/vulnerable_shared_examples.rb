@@ -37,7 +37,7 @@ shared_examples_for Vulnerable do
 
       # TODO: This should actually fail and we must scope vulns
       # per branch as soon as we store them for other branches
-      # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
+      # Dependent on https://gitlab.com/gitlab-org/gitlab/issues/9524
       it 'includes vulnerabilities from all branches' do
         is_expected.to contain_exactly(branch_vuln)
       end
@@ -59,7 +59,7 @@ shared_examples_for Vulnerable do
 
       # TODO: This should actually fail and we must scope vulns
       # per branch as soon as we store them for other branches
-      # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
+      # Dependent on https://gitlab.com/gitlab-org/gitlab/issues/9524
       it 'includes vulnerabilities from all branches' do
         is_expected.to contain_exactly(branch_vuln)
       end
@@ -79,7 +79,7 @@ shared_examples_for Vulnerable do
 
       # TODO: This should actually fail and we must scope vulns
       # per branch as soon as we store them for other branches
-      # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
+      # Dependent on https://gitlab.com/gitlab-org/gitlab/issues/9524
       it 'includes vulnerabilities from all branches' do
         is_expected.to contain_exactly(old_vuln, new_vuln, new_vuln, branch_vuln)
       end

@@ -64,7 +64,7 @@ module Ci
     # `ci_builds` creation. We can look up a relevant `environment` through
     # `deployment` relation today. This is much more efficient than expanding
     # environment name with variables.
-    # (See more https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22380)
+    # (See more https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22380)
     #
     # However, we have to still expand environment name if it's a stop action,
     # because `deployment` persists information for start action only.
@@ -88,7 +88,11 @@ module Ci
     validates :coverage, numericality: true, allow_blank: true
     validates :ref, presence: true
 
-    scope :not_interruptible, -> { joins(:metadata).where(ci_builds_metadata: { interruptible: false }) }
+    scope :not_interruptible, -> do
+      joins(:metadata).where('ci_builds_metadata.id NOT IN (?)',
+        Ci::BuildMetadata.scoped_build.with_interruptible.select(:id))
+    end
+
     scope :unstarted, ->() { where(runner_id: nil) }
     scope :ignore_failures, ->() { where(allow_failure: false) }
     scope :with_artifacts_archive, ->() do
@@ -114,8 +118,6 @@ module Ci
 
     scope :eager_load_job_artifacts, -> { includes(:job_artifacts) }
 
-    scope :with_artifacts_stored_locally, -> { with_existing_job_artifacts(Ci::JobArtifact.archive.with_files_stored_locally) }
-    scope :with_archived_trace_stored_locally, -> { with_existing_job_artifacts(Ci::JobArtifact.trace.with_files_stored_locally) }
     scope :with_artifacts_not_expired, ->() { with_artifacts_archive.where('artifacts_expire_at IS NULL OR artifacts_expire_at > ?', Time.now) }
     scope :with_expired_artifacts, ->() { with_artifacts_archive.where('artifacts_expire_at < ?', Time.now) }
     scope :last_month, ->() { where('created_at > ?', Date.today - 1.month) }
@@ -232,6 +234,7 @@ module Ci
       end
 
       after_transition pending: :running do |build|
+        build.pipeline.persistent_ref.create
         build.deployment&.run
 
         build.run_after_commit do

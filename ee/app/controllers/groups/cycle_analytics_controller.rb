@@ -16,12 +16,6 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
 
   private
 
-  def cycle_analytics_params
-    return {} unless params[:cycle_analytics].present?
-
-    params[:cycle_analytics].permit(:start_date, project_ids: [])
-  end
-
   def cycle_analytics_json
     {
       summary: cycle_analytics_stats.summary,
@@ -31,11 +25,11 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
   end
 
   def cycle_analytics_stats
-    @cycle_analytics_stats ||= ::CycleAnalytics::GroupLevel.new(group: group, options: options(cycle_analytics_params))
+    @cycle_analytics_stats ||= ::CycleAnalytics::GroupLevel.new(group: group, options: options(cycle_analytics_group_params))
   end
 
   def whitelist_query_limiting
-    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42671')
+    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42671')
   end
 
   def authorize_group_cycle_analytics!

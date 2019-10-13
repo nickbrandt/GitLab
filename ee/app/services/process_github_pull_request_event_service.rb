@@ -20,8 +20,11 @@ class ProcessGithubPullRequestEventService < ::BaseService
     # and the pipeline is created for all newly pushed branches.
     # At that point we will be able to reference it back if a pull request
     # was created.
-    ExternalPullRequest.create_or_update_from_params(params) do |pr|
-      ExternalPullRequests::CreatePipelineService.new(project, current_user).execute(pr)
+    ExternalPullRequest.create_or_update_from_params(params).tap do |pull_request|
+      if pull_request.errors.empty?
+        ExternalPullRequests::CreatePipelineService.new(project, current_user)
+          .execute(pull_request)
+      end
     end
   end
 
@@ -30,7 +33,7 @@ class ProcessGithubPullRequestEventService < ::BaseService
   def params_from_webhook(params)
     {
       project_id: project.id,
-      pull_request_iid: params.dig(:pull_request, :id),
+      pull_request_iid: params.dig(:pull_request, :number),
       source_branch: params.dig(:pull_request, :head, :ref),
       source_sha: params.dig(:pull_request, :head, :sha),
       source_repository: params.dig(:pull_request, :head, :repo, :full_name),

@@ -61,7 +61,10 @@ export default {
       if (this.initialEpic) {
         return false;
       } else if (this.sidebarStore.isFetching) {
-        return this.sidebarStore.isFetching.epic;
+        // We need to cast `epic` into boolean as when
+        // new issue is created from board, `isFetching`
+        // does not contain `epic` within it.
+        return Boolean(this.sidebarStore.isFetching.epic);
       }
       return false;
     },

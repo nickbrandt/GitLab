@@ -4,7 +4,7 @@ type: reference
 
 # Multi-project pipelines **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/2121) in
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/2121) in
 [GitLab Premium 9.3](https://about.gitlab.com/2017/06/22/gitlab-9-3-released/#multi-project-pipeline-graphs).
 
 When you set up [GitLab CI/CD](README.md) across multiple projects, you can visualize
@@ -51,7 +51,7 @@ outbound connections for upstream and downstream pipeline dependencies.
 
 ## Creating multi-project pipelines from `.gitlab-ci.yml`
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/8997) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
 
 ### Triggering a downstream pipeline using a bridge job
 
@@ -90,7 +90,7 @@ CAUTION: **Caution:**
 `staging` will succeed as soon as a downstream pipeline gets created.
 GitLab does not support status attribution yet, however adding first-class
 `trigger` configuration syntax is ground work for implementing
-[status attribution](https://gitlab.com/gitlab-org/gitlab-ce/issues/39640).
+[status attribution](https://gitlab.com/gitlab-org/gitlab-foss/issues/39640).
 
 NOTE: **Note:**
 Bridge jobs do not support every configuration entry that a user can use
@@ -115,8 +115,11 @@ staging:
     branch: stable-11-2
 ```
 
-Use a `project` keyword to specify full path to a downstream project. Use
-a `branch` keyword to specify a branch name.
+Use:
+
+- The `project` keyword to specify the full path to a downstream project.
+- The `branch` keyword to specify the name of a branch in the project specified by `project`.
+  Variable expansion is supported.
 
 GitLab will use a commit that is currently on the HEAD of the branch when
 creating a downstream pipeline.
@@ -178,7 +181,7 @@ the ones defined in the upstream project will take precedence.
 
 ### Mirroring status from triggered pipeline
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/11238) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/11238) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.3.
 
 You can mirror the pipeline status from the triggered pipeline to the source
 bridge job by using `strategy: depend`. For example:

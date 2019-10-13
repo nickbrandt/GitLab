@@ -55,12 +55,6 @@ describe Gitlab::UsageData do
       ))
     end
 
-    it do
-      is_expected.to include(design_management_designs_create: a_kind_of(Integer),
-                             design_management_designs_update: a_kind_of(Integer),
-                             design_management_designs_delete: a_kind_of(Integer))
-    end
-
     it 'gathers usage counts' do
       expect(count_data[:boards]).to eq(1)
       expect(count_data[:projects]).to eq(3)
@@ -87,6 +81,9 @@ describe Gitlab::UsageData do
         projects_with_prometheus_alerts
         projects_with_tracing_enabled
         sast_jobs
+        design_management_designs_create
+        design_management_designs_update
+        design_management_designs_delete
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
@@ -98,6 +95,10 @@ describe Gitlab::UsageData do
       expect(count_data.keys).to include(:epics_deepest_relationship_level)
     end
 
+    it 'has integer value for epic relationship level' do
+      expect(count_data[:epics_deepest_relationship_level]).to be_a_kind_of(Integer)
+    end
+
     it 'gathers security products usage data' do
       expect(count_data[:container_scanning_jobs]).to eq(1)
       expect(count_data[:dast_jobs]).to eq(1)
@@ -106,11 +107,9 @@ describe Gitlab::UsageData do
       expect(count_data[:sast_jobs]).to eq(1)
     end
 
-    it 'gathers group overview preferences usage data' do
-      expect(subject[:counts][:user_preferences]).to eq(
-        group_overview_details: User.active.count - 2, # we have exactly 2 active users with security dashboard set
-        group_overview_security_dashboard: 2
-      )
+    it 'gathers group overview preferences usage data', :aggregate_failures do
+      expect(subject[:counts][:user_preferences_group_overview_details]).to eq(User.active.count - 2) # we have exactly 2 active users with security dashboard set
+      expect(subject[:counts][:user_preferences_group_overview_security_dashboard]).to eq 2
     end
   end
 
@@ -195,9 +194,15 @@ describe Gitlab::UsageData do
 
   describe 'code owner approval required' do
     before do
-      create(:project, :archived, :requiring_code_owner_approval)
-      create(:project, :requiring_code_owner_approval, pending_delete: true)
-      create(:project, :requiring_code_owner_approval)
+      create(:protected_branch, code_owner_approval_required: true)
+
+      create(:protected_branch,
+        code_owner_approval_required: true,
+        project: create(:project, :archived))
+
+      create(:protected_branch,
+        code_owner_approval_required: true,
+        project: create(:project, pending_delete: true))
     end
 
     it 'counts the projects actively requiring code owner approval' do
@@ -220,14 +225,14 @@ describe Gitlab::UsageData do
 
     it 'gathers data on operations dashboard' do
       expect(subject.keys).to include(*%i(
-        default_dashboard
-        users_with_projects_added
+        operations_dashboard_default_dashboard
+        operations_dashboard_users_with_projects_added
       ))
     end
 
-    it 'bases counts on active users' do
-      expect(subject[:default_dashboard]).to eq(1)
-      expect(subject[:users_with_projects_added]).to eq(2)
+    it 'bases counts on active users', :aggregate_failures do
+      expect(subject[:operations_dashboard_default_dashboard]).to eq(1)
+      expect(subject[:operations_dashboard_users_with_projects_added]).to eq(2)
     end
   end
 
@@ -237,6 +242,7 @@ describe Gitlab::UsageData do
     subject { described_class.data.dig(:counts, :incident_issues) }
 
     before do
+      ::User.support_bot # create the support bot user beforehand, because otherwise it is created when gathering usage data.
       create(:issue, project: project) # non incident issue
     end
 

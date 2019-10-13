@@ -62,8 +62,8 @@ file and ask your manager to review and merge.
 
 ```yaml
 projects:
-  gitlab-ee: reviewer go
-  gitlab-ce: reviewer go
+  gitlab: reviewer go
+  gitlab-foss: reviewer go
 ```
 
 ## Code style and format
@@ -85,7 +85,7 @@ go lint:
     - golint -set_exit_status $(go list ./... | grep -v "vendor/")
 ```
 
-Once [recursive includes](https://gitlab.com/gitlab-org/gitlab-ce/issues/56836)
+Once [recursive includes](https://gitlab.com/gitlab-org/gitlab-foss/issues/56836)
 become available, you will be able to share job templates like this
 [analyzer](https://gitlab.com/gitlab-org/security-products/ci-templates/raw/master/includes-dev/analyzer.yml).
 

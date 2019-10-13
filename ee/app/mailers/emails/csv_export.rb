@@ -10,7 +10,7 @@ module Emails
 
       filename = "#{project.full_path.parameterize}_issues_#{Date.today.iso8601}.csv"
       attachments[filename] = { content: csv_data, mime_type: 'text/csv' }
-      mail(to: recipient(user.id, @project.group), subject: subject("Exported issues")) do |format|
+      mail(to: user.notification_email_for(@project.group), subject: subject("Exported issues")) do |format|
         format.html { render layout: 'mailer' }
         format.text { render layout: 'mailer' }
       end

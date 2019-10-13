@@ -3,8 +3,8 @@
 FactoryBot.define do
   factory :ee_ci_job_artifact, class: ::Ci::JobArtifact, parent: :ci_job_artifact do
     trait :sast do
-      file_type :sast
-      file_format :raw
+      file_type { :sast }
+      file_format { :raw }
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
@@ -13,8 +13,8 @@ FactoryBot.define do
     end
 
     trait :sast_feature_branch do
-      file_format :raw
-      file_type :sast
+      file_format { :raw }
+      file_type { :sast }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -23,8 +23,8 @@ FactoryBot.define do
     end
 
     trait :sast_deprecated do
-      file_type :sast
-      file_format :raw
+      file_type { :sast }
+      file_format { :raw }
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
@@ -33,8 +33,8 @@ FactoryBot.define do
     end
 
     trait :sast_with_corrupted_data do
-      file_type :sast
-      file_format :raw
+      file_type { :sast }
+      file_format { :raw }
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
@@ -43,8 +43,8 @@ FactoryBot.define do
     end
 
     trait :license_management do
-      file_type :license_management
-      file_format :raw
+      file_type { :license_management }
+      file_format { :raw }
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
@@ -53,8 +53,8 @@ FactoryBot.define do
     end
 
     trait :license_management_feature_branch do
-      file_type :license_management
-      file_format :raw
+      file_type { :license_management }
+      file_format { :raw }
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
@@ -63,8 +63,8 @@ FactoryBot.define do
     end
 
     trait :corrupted_license_management_report do
-      file_type :license_management
-      file_format :raw
+      file_type { :license_management }
+      file_format { :raw }
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
@@ -73,8 +73,8 @@ FactoryBot.define do
     end
 
     trait :performance do
-      file_format :raw
-      file_type :performance
+      file_format { :raw }
+      file_type { :performance }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -83,8 +83,8 @@ FactoryBot.define do
     end
 
     trait :license_management do
-      file_format :raw
-      file_type :license_management
+      file_format { :raw }
+      file_type { :license_management }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -93,8 +93,8 @@ FactoryBot.define do
     end
 
     trait :dependency_scanning do
-      file_format :raw
-      file_type :dependency_scanning
+      file_format { :raw }
+      file_type { :dependency_scanning }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -103,8 +103,8 @@ FactoryBot.define do
     end
 
     trait :dependency_scanning_remediation do
-      file_format :raw
-      file_type :dependency_scanning
+      file_format { :raw }
+      file_type { :dependency_scanning }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -113,8 +113,8 @@ FactoryBot.define do
     end
 
     trait :dependency_scanning_deprecated do
-      file_format :raw
-      file_type :dependency_scanning
+      file_format { :raw }
+      file_type { :dependency_scanning }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -123,8 +123,8 @@ FactoryBot.define do
     end
 
     trait :dependency_scanning_feature_branch do
-      file_format :raw
-      file_type :dependency_scanning
+      file_format { :raw }
+      file_type { :dependency_scanning }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -133,8 +133,8 @@ FactoryBot.define do
     end
 
     trait :corrupted_dependency_scanning_report do
-      file_format :raw
-      file_type :dependency_scanning
+      file_format { :raw }
+      file_type { :dependency_scanning }
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
@@ -143,8 +143,8 @@ FactoryBot.define do
     end
 
     trait :container_scanning do
-      file_format :raw
-      file_type :container_scanning
+      file_format { :raw }
+      file_type { :container_scanning }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -153,8 +153,8 @@ FactoryBot.define do
     end
 
     trait :container_scanning_feature_branch do
-      file_format :raw
-      file_type :container_scanning
+      file_format { :raw }
+      file_type { :container_scanning }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -163,8 +163,8 @@ FactoryBot.define do
     end
 
     trait :corrupted_container_scanning_report do
-      file_format :raw
-      file_type :container_scanning
+      file_format { :raw }
+      file_type { :container_scanning }
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
@@ -173,8 +173,8 @@ FactoryBot.define do
     end
 
     trait :dast do
-      file_format :raw
-      file_type :dast
+      file_format { :raw }
+      file_type { :dast }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -183,8 +183,8 @@ FactoryBot.define do
     end
 
     trait :metrics do
-      file_format :gzip
-      file_type :metrics
+      file_format { :gzip }
+      file_type { :metrics }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -193,8 +193,8 @@ FactoryBot.define do
     end
 
     trait :metrics_alternate do
-      file_format :gzip
-      file_type :metrics
+      file_format { :gzip }
+      file_type { :metrics }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
@@ -203,8 +203,8 @@ FactoryBot.define do
     end
 
     trait :dependency_list do
-      file_format :raw
-      file_type :dependency_scanning
+      file_format { :raw }
+      file_type { :dependency_scanning }
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(

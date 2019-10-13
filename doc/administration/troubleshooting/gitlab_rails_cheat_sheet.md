@@ -4,7 +4,7 @@ type: reference
 
 # GitLab Rails Console Cheat Sheet
 
-This is the GitLab Support Team's collection of information regarding the GitLab rails
+This is the GitLab Support Team's collection of information regarding the GitLab Rails
 console, for use while troubleshooting. It is listed here for transparency,
 and it may be useful for users with experience with these tools. If you are currently
 having an issue with GitLab, it is highly recommended that you check your
@@ -426,7 +426,7 @@ user.skip_reconfirmation!
 ### Get an admin token
 
 ```ruby
-# Get the first admin's first access token (no longer works on 11.9+. see: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22743)
+# Get the first admin's first access token (no longer works on 11.9+. see: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22743)
 User.where(admin:true).first.personal_access_tokens.first.token
 
 # Get the first admin's private token (no longer works on 10.2+)
@@ -556,6 +556,14 @@ parent.members_with_descendants.count
 GroupDestroyWorker.perform_async(group_id, user_id)
 ```
 
+### Modify group project creation
+
+```ruby
+# Project creation levels: 0 - No one, 1 - Maintainers, 2 - Developers + Maintainers
+group = Group.find_by_path_or_name('group-name')
+group.project_creation_level=0
+```
+
 ## LDAP
 
 ### LDAP commands in the rails console
@@ -605,7 +613,7 @@ adapter = Gitlab::Auth::LDAP::Adapter.new('ldapmain') # If `main` is the LDAP pr
 user = Gitlab::Auth::LDAP::Person.find_by_uid('<username>',adapter)
 
 # Query the LDAP server directly (10.6+)
-## For an example, see https://gitlab.com/gitlab-org/gitlab-ee/blob/master/ee/lib/ee/gitlab/auth/ldap/adapter.rb
+## For an example, see https://gitlab.com/gitlab-org/gitlab/blob/master/ee/lib/ee/gitlab/auth/ldap/adapter.rb
 adapter = Gitlab::Auth::LDAP::Adapter.new('ldapmain')
 options = {
     # the :base is required
@@ -652,7 +660,7 @@ LdapSyncWorker.new.perform
 
 ### Remove redirecting routes
 
-See <https://gitlab.com/gitlab-org/gitlab-ce/issues/41758#note_54828133>.
+See <https://gitlab.com/gitlab-org/gitlab-foss/issues/41758#note_54828133>.
 
 ```ruby
 path = 'foo'
@@ -680,6 +688,15 @@ u = User.find_by_username('')
 MergeRequests::PostMergeService.new(p, u).execute(m)
 ```
 
+### Delete a merge request
+
+```ruby
+u = User.find_by_username('<username>')
+p = Project.find_by_full_path('<group>/<project>')
+m = p.merge_requests.find_by(iid: <IID>)
+Issuable::DestroyService.new(m.project, u).execute(m)
+```
+
 ### Rebase manually
 
 ```ruby
@@ -693,7 +710,8 @@ MergeRequests::RebaseService.new(m.target_project, u).execute(m)
 
 ### Cancel stuck pending pipelines
 
-See <https://gitlab.com/gitlab-com/support-forum/issues/2449#note_41929707>.
+For more information, see the [confidential issue](../../user/project/issues/confidential_issues.md)
+`https://gitlab.com/gitlab-com/support-forum/issues/2449#note_41929707`.
 
 ```ruby
 Ci::Pipeline.where(project_id: p.id).where(status: 'pending').count
@@ -715,13 +733,15 @@ Namespace.find_by_full_path("user/proj").namespace_statistics.update(shared_runn
 project = Project.find_by_full_path('')
 builds_with_artifacts =  project.builds.with_artifacts_archive
 
-# Prior to 10.6 the above line would be:
-# builds_with_artifacts = project.builds.with_artifacts
-
 # Instance-wide:
-builds_with_artifacts = Ci::Build.with_artifacts
+builds_with_artifacts = Ci::Build.with_artifacts_archive
+
+# Prior to 10.6 the above lines would be:
+# builds_with_artifacts =  project.builds.with_artifacts
+# builds_with_artifacts = Ci::Build.with_artifacts
 
 ### CLEAR THEM OUT
+# Note that this will also erase artifacts that developers marked to "Keep"
 builds_to_clear = builds_with_artifacts.where("finished_at < ?", 1.week.ago)
 builds_to_clear.each do |build|
   build.artifacts_expire_at = Time.now
@@ -731,7 +751,7 @@ end
 
 ### Find reason failure (for when build trace is empty) (Introduced in 10.3.0)
 
-See <https://gitlab.com/gitlab-org/gitlab-ce/issues/41111>.
+See <https://gitlab.com/gitlab-org/gitlab-foss/issues/41111>.
 
 ```ruby
 build = Ci::Build.find(78420)
@@ -784,7 +804,7 @@ License.current.plan
 
 ### Check if a project feature is available on the instance
 
-Features listed in <https://gitlab.com/gitlab-org/gitlab-ee/blob/master/ee/app/models/license.rb>.
+Features listed in <https://gitlab.com/gitlab-org/gitlab/blob/master/ee/app/models/license.rb>.
 
 ```ruby
 License.current.feature_available?(:jira_dev_panel_integration)
@@ -792,7 +812,7 @@ License.current.feature_available?(:jira_dev_panel_integration)
 
 ### Check if a project feature is available in a project
 
-Features listed in <https://gitlab.com/gitlab-org/gitlab-ee/blob/master/ee/app/models/license.rb>.
+Features listed in <https://gitlab.com/gitlab-org/gitlab/blob/master/ee/app/models/license.rb>.
 
 ```ruby
 p = Project.find_by_full_path('<group>/<project>')
@@ -812,7 +832,7 @@ License.current # check to make sure it applied
 
 From [Zendesk ticket #91083](https://gitlab.zendesk.com/agent/tickets/91083) (internal)
 
-### Poll unicorn requests by seconds
+### Poll Unicorn requests by seconds
 
 ```ruby
 require 'rubygems'
@@ -888,13 +908,13 @@ See <https://github.com/mperham/sidekiq/wiki/Signals#ttin>.
 
 ## Redis
 
-### Connect to redis (omnibus)
+### Connect to Redis (omnibus)
 
 ```sh
 /opt/gitlab/embedded/bin/redis-cli -s /var/opt/gitlab/redis/redis.socket
 ```
 
-### Connect to redis (HA)
+### Connect to Redis (HA)
 
 ```sh
 /opt/gitlab/embedded/bin/redis-cli -h <host ip> -a <password>

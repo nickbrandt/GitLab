@@ -1,6 +1,7 @@
-/* eslint-disable func-names, object-shorthand, no-else-return, prefer-template, prefer-arrow-callback */
+/* eslint-disable no-else-return */
 
 import $ from 'jquery';
+import '~/gl_dropdown';
 import Api from './api';
 import { mergeUrlParams } from './lib/utils/url_utility';
 import { parseBoolean } from '~/lib/utils/common_utils';
@@ -18,16 +19,16 @@ export default class NamespaceSelect {
       search: {
         fields: ['path'],
       },
-      fieldName: fieldName,
-      toggleLabel: function(selected) {
+      fieldName,
+      toggleLabel(selected) {
         if (selected.id == null) {
           return selected.text;
         } else {
-          return selected.kind + ': ' + selected.full_path;
+          return `${selected.kind}: ${selected.full_path}`;
         }
       },
-      data: function(term, dataCallback) {
-        return Api.namespaces(term, function(namespaces) {
+      data(term, dataCallback) {
+        return Api.namespaces(term, namespaces => {
           if (isFilter) {
             const anyNamespace = {
               text: __('Any namespace'),
@@ -39,11 +40,11 @@ export default class NamespaceSelect {
           return dataCallback(namespaces);
         });
       },
-      text: function(namespace) {
+      text(namespace) {
         if (namespace.id == null) {
           return namespace.text;
         } else {
-          return namespace.kind + ': ' + namespace.full_path;
+          return `${namespace.kind}: ${namespace.full_path}`;
         }
       },
       renderRow: this.renderRow,

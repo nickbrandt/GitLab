@@ -21,7 +21,8 @@
         "avatar_url",
         "remove_path",
         "web_url",
-        "namespace"
+        "namespace",
+        "environments"
       ],
       "additionalProperties": false,
       "properties": {
@@ -30,7 +31,8 @@
         "avatar_url": { "type": ["string", "null"] },
         "remove_path": { "type": "string" },
         "web_url": { "type": "string" },
-        "namespace": { "$ref": "#/definitions/namespace" }
+        "namespace": { "$ref": "#/definitions/namespace" },
+        "environments": { "type": "array", "items": { "$ref": "#/definitions/environment" } }
       }
     },
     "namespace": {
@@ -46,6 +48,26 @@
         "name": { "type": "string" },
         "avatar_url": { "type": ["string", "null"] },
         "full_path": { "type": "string" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "size",
+        "within_folder",
+        "external_url",
+        "environment_path"
+      ],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "size": { "type": "integer" },
+        "within_folder": { "type": "boolean" },
+        "external_url": { "type": "string" },
+        "environment_path": { "type": "string" },
+        "last_deployment": { "$ref": "../../../../../../../spec/fixtures/api/schemas/deployment.json" }
       }
     }
   }
