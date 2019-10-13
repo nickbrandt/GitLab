@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_29_180827) do
+ActiveRecord::Schema.define(version: 2019_10_13_100213) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -277,7 +277,6 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
     t.boolean "pseudonymizer_enabled", default: false, null: false
     t.boolean "hide_third_party_offers", default: false, null: false
     t.boolean "snowplow_enabled", default: false, null: false
-    t.string "snowplow_collector_hostname"
     t.string "snowplow_site_id"
     t.string "snowplow_cookie_domain"
     t.boolean "instance_statistics_visibility_private", default: false, null: false
@@ -309,19 +308,20 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
     t.boolean "lock_memberships_to_ldap", default: false, null: false
     t.boolean "time_tracking_limit_to_hours", default: false, null: false
     t.string "grafana_url", default: "/-/grafana", null: false
-    t.boolean "login_recaptcha_protection_enabled", default: false, null: false
     t.string "outbound_local_requests_whitelist", limit: 255, default: [], null: false, array: true
-    t.integer "raw_blob_request_limit", default: 300, null: false
-    t.boolean "allow_local_requests_from_web_hooks_and_services", default: false, null: false
-    t.boolean "allow_local_requests_from_system_hooks", default: true, null: false
-    t.bigint "instance_administration_project_id"
     t.boolean "asset_proxy_enabled", default: false, null: false
     t.string "asset_proxy_url"
     t.text "asset_proxy_whitelist"
     t.text "encrypted_asset_proxy_secret_key"
     t.string "encrypted_asset_proxy_secret_key_iv"
+    t.integer "raw_blob_request_limit", default: 300, null: false
+    t.boolean "login_recaptcha_protection_enabled", default: false, null: false
     t.string "static_objects_external_storage_url", limit: 255
     t.string "static_objects_external_storage_auth_token", limit: 255
+    t.bigint "instance_administration_project_id"
+    t.boolean "allow_local_requests_from_web_hooks_and_services", default: false, null: false
+    t.boolean "allow_local_requests_from_system_hooks", default: true, null: false
+    t.string "snowplow_collector_hostname"
     t.boolean "throttle_protected_paths_enabled", default: true, null: false
     t.integer "throttle_protected_paths_requests_per_period", default: 10, null: false
     t.integer "throttle_protected_paths_period_in_seconds", default: 60, null: false
@@ -350,9 +350,9 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
     t.integer "report_type", limit: 2
     t.index ["merge_request_id", "code_owner", "name"], name: "approval_rule_name_index_for_code_owners", unique: true, where: "(code_owner = true)"
     t.index ["merge_request_id", "code_owner"], name: "index_approval_merge_request_rules_1"
-    t.index ["merge_request_id", "name"], name: "index_approval_rule_name_for_code_owners_rule_type", unique: true, where: "(rule_type = 2)"
+    t.index ["merge_request_id", "rule_type", "name"], name: "index_approval_rule_name_for_code_owners_rule_type", unique: true, where: "(rule_type = 2)"
     t.index ["merge_request_id", "rule_type"], name: "any_approver_merge_request_rule_type_unique_index", unique: true, where: "(rule_type = 4)"
-    t.index ["merge_request_id"], name: "index_approval_rules_code_owners_rule_type", where: "(rule_type = 2)"
+    t.index ["merge_request_id", "rule_type"], name: "index_approval_rules_code_owners_rule_type", where: "(rule_type = 2)"
   end
 
   create_table "approval_merge_request_rules_approved_approvers", force: :cascade do |t|
@@ -664,9 +664,9 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
     t.integer "project_id", null: false
     t.integer "timeout"
     t.integer "timeout_source", default: 1, null: false
-    t.boolean "interruptible"
     t.jsonb "config_options"
     t.jsonb "config_variables"
+    t.boolean "interruptible"
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id", unique: true
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id_and_interruptible", where: "(interruptible = true)"
     t.index ["project_id"], name: "index_ci_builds_metadata_on_project_id"
@@ -1581,9 +1581,9 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
     t.string "internal_url"
     t.string "name", null: false
     t.integer "container_repositories_max_capacity", default: 10, null: false
+    t.boolean "sync_object_storage", default: false, null: false
     t.datetime_with_timezone "created_at"
     t.datetime_with_timezone "updated_at"
-    t.boolean "sync_object_storage", default: false, null: false
     t.index ["access_key"], name: "index_geo_nodes_on_access_key"
     t.index ["name"], name: "index_geo_nodes_on_name", unique: true
     t.index ["primary"], name: "index_geo_nodes_on_primary"
@@ -2209,6 +2209,7 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
     t.boolean "allow_maintainer_to_push"
     t.integer "state_id", limit: 2
     t.string "rebase_jid"
+    t.string "squash_commit_sha"
     t.index ["assignee_id"], name: "index_merge_requests_on_assignee_id"
     t.index ["author_id"], name: "index_merge_requests_on_author_id"
     t.index ["created_at"], name: "index_merge_requests_on_created_at"
@@ -2639,7 +2640,7 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
     t.string "title"
     t.integer "active_pipelines_limit"
     t.integer "pipeline_size_limit"
-    t.integer "active_jobs_limit", default: 0
+    t.integer "active_jobs_limit", default: 0, null: false
     t.index ["name"], name: "index_plans_on_name"
   end
 
@@ -3669,9 +3670,9 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
     t.integer "group_view"
     t.integer "managing_group_id"
     t.integer "bot_type", limit: 2
+    t.string "static_object_token", limit: 255
     t.string "first_name", limit: 255
     t.string "last_name", limit: 255
-    t.string "static_object_token", limit: 255
     t.index "lower((name)::text)", name: "index_on_users_name_lower"
     t.index ["accepted_term_id"], name: "index_users_on_accepted_term_id"
     t.index ["admin"], name: "index_users_on_admin"
@@ -3723,24 +3724,24 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
     t.bigint "author_id", null: false
     t.bigint "updated_by_id"
     t.bigint "last_edited_by_id"
-    t.date "start_date"
-    t.date "due_date"
+    t.bigint "start_date_sourcing_milestone_id"
+    t.bigint "due_date_sourcing_milestone_id"
+    t.bigint "closed_by_id"
     t.datetime_with_timezone "last_edited_at"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.datetime_with_timezone "closed_at"
+    t.date "start_date"
+    t.date "due_date"
+    t.integer "state", limit: 2, default: 1, null: false
+    t.integer "severity", limit: 2, null: false
+    t.integer "confidence", limit: 2, null: false
+    t.boolean "severity_overridden", default: false
+    t.boolean "confidence_overridden", default: false
     t.string "title", limit: 255, null: false
     t.text "title_html", null: false
     t.text "description"
     t.text "description_html"
-    t.bigint "start_date_sourcing_milestone_id"
-    t.bigint "due_date_sourcing_milestone_id"
-    t.bigint "closed_by_id"
-    t.datetime_with_timezone "closed_at"
-    t.integer "state", limit: 2, default: 1, null: false
-    t.integer "severity", limit: 2, null: false
-    t.boolean "severity_overridden", default: false
-    t.integer "confidence", limit: 2, null: false
-    t.boolean "confidence_overridden", default: false
     t.index ["author_id"], name: "index_vulnerabilities_on_author_id"
     t.index ["closed_by_id"], name: "index_vulnerabilities_on_closed_by_id"
     t.index ["due_date_sourcing_milestone_id"], name: "index_vulnerabilities_on_due_date_sourcing_milestone_id"
@@ -4000,8 +4001,8 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
   add_foreign_key "design_management_designs", "issues", on_delete: :cascade
   add_foreign_key "design_management_designs", "projects", on_delete: :cascade
-  add_foreign_key "design_management_designs_versions", "design_management_designs", column: "design_id", name: "fk_03c671965c", on_delete: :cascade
-  add_foreign_key "design_management_designs_versions", "design_management_versions", column: "version_id", name: "fk_f4d25ba00c", on_delete: :cascade
+  add_foreign_key "design_management_designs_versions", "design_management_designs", column: "design_id", on_delete: :cascade
+  add_foreign_key "design_management_designs_versions", "design_management_versions", column: "version_id", on_delete: :cascade
   add_foreign_key "design_management_versions", "issues", on_delete: :cascade
   add_foreign_key "design_management_versions", "users", name: "fk_ee16b939e5", on_delete: :nullify
   add_foreign_key "draft_notes", "merge_requests", on_delete: :cascade
