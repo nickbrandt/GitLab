@@ -332,6 +332,8 @@ receivers:
   ...
 ```
 
+In order for GitLab to associate your alerts with an [environment](../../ci/environments), you need to configure a `environmentname` label on the alerts you set up in Prometheus.
+
 ### Taking action on incidents **(ULTIMATE)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/4925) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.11.
