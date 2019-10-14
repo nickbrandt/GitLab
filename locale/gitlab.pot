@@ -4843,6 +4843,9 @@ msgstr ""
 msgid "Customize your pipeline configuration, view your pipeline status and coverage report."
 msgstr ""
 
+msgid "Customize your pipeline configuration."
+msgstr ""
+
 msgid "Cycle Analytics"
 msgstr ""
 
@@ -8225,6 +8228,9 @@ msgstr ""
 msgid "GroupSettings|New runners registration token has been generated!"
 msgstr ""
 
+msgid "GroupSettings|Pipeline settings was updated for the group"
+msgstr ""
+
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
 msgstr ""
 
@@ -8235,6 +8241,9 @@ msgid "GroupSettings|The Auto DevOps pipeline will run if no alternative CI conf
 msgstr ""
 
 msgid "GroupSettings|There was a problem updating Auto DevOps pipeline: %{error_messages}."
+msgstr ""
+
+msgid "GroupSettings|There was a problem updating the pipeline settings: %{error_messages}."
 msgstr ""
 
 msgid "GroupSettings|This setting is applied on %{ancestor_group} and has been overridden on this subgroup."
