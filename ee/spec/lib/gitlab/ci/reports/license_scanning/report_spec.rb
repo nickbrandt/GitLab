@@ -7,38 +7,91 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
 
   describe '#violates?' do
     let(:project) { create(:project) }
-    let(:mit_license) { build(:software_license, :mit) }
-    let(:apache_license) { build(:software_license, :apache_2_0) }
 
-    context 'when a blacklisted license is found in the report' do
-      let(:mit_blacklist) { build(:software_license_policy, :blacklist, software_license: mit_license) }
+    context "when checking for violations using v1 license scan report" do
+      subject { build(:license_scan_report) }
+
+      let(:mit_license) { build(:software_license, :mit, spdx_identifier: nil) }
+      let(:apache_license) { build(:software_license, :apache_2_0, spdx_identifier: nil) }
 
       before do
-        project.software_license_policies << mit_blacklist
+        subject
+          .add_license(id: nil, name: 'MIT')
+          .add_dependency('rails')
       end
 
-      it { expect(subject.violates?(project.software_license_policies)).to be(true) }
+      context 'when a blacklisted license is found in the report' do
+        let(:mit_blacklist) { build(:software_license_policy, :blacklist, software_license: mit_license) }
+
+        before do
+          project.software_license_policies << mit_blacklist
+        end
+
+        specify { expect(subject.violates?(project.software_license_policies)).to be(true) }
+      end
+
+      context 'when a blacklisted license is discovered with a different casing for the name' do
+        let(:mit_blacklist) { build(:software_license_policy, :blacklist, software_license: mit_license) }
+
+        before do
+          mit_license.update!(name: 'mit')
+          project.software_license_policies << mit_blacklist
+        end
+
+        specify { expect(subject.violates?(project.software_license_policies)).to be(true) }
+      end
+
+      context 'when none of the licenses discovered in the report violate the blacklist policy' do
+        let(:apache_blacklist) { build(:software_license_policy, :blacklist, software_license: apache_license) }
+
+        before do
+          project.software_license_policies << apache_blacklist
+        end
+
+        specify { expect(subject.violates?(project.software_license_policies)).to be(false) }
+      end
     end
 
-    context 'when a blacklisted license is discovered with a different casing for the name' do
-      let(:mit_blacklist) { build(:software_license_policy, :blacklist, software_license: mit_license) }
+    context "when checking for violations using the v2 license scan reports" do
+      subject { build(:license_scan_report) }
 
-      before do
-        mit_license.update!(name: 'mit')
-        project.software_license_policies << mit_blacklist
+      context "when a blacklisted license with a SPDX identifier is also in the report" do
+        let(:mit_spdx_id) { 'MIT' }
+        let(:mit_license) { build(:software_license, :mit, spdx_identifier: mit_spdx_id) }
+        let(:mit_policy) { build(:software_license_policy, :blacklist, software_license: mit_license) }
+
+        before do
+          subject.add_license(id: mit_spdx_id, name: 'MIT License')
+          project.software_license_policies << mit_policy
+        end
+
+        specify { expect(subject.violates?(project.software_license_policies)).to be(true) }
       end
 
-      it { expect(subject.violates?(project.software_license_policies)).to be(true) }
-    end
+      context "when a blacklisted license does not have an SPDX identifier because it was provided by an end user" do
+        let(:custom_license) { build(:software_license, name: 'custom', spdx_identifier: nil) }
+        let(:custom_policy) { build(:software_license_policy, :blacklist, software_license: custom_license) }
 
-    context 'when none of the licenses discovered in the report violate the blacklist policy' do
-      let(:apache_blacklist) { build(:software_license_policy, :blacklist, software_license: apache_license) }
+        before do
+          subject.add_license(id: nil, name: 'Custom')
+          project.software_license_policies << custom_policy
+        end
 
-      before do
-        project.software_license_policies << apache_blacklist
+        specify { expect(subject.violates?(project.software_license_policies)).to be(true) }
       end
 
-      it { expect(subject.violates?(project.software_license_policies)).to be(false) }
+      context "when none of the licenses discovered match any of the blacklisted software policies" do
+        let(:apache_license) { build(:software_license, :apache_2_0, spdx_identifier: 'Apache-2.0') }
+        let(:apache_policy) { build(:software_license_policy, :blacklist, software_license: apache_license) }
+
+        before do
+          subject.add_license(id: nil, name: 'Custom')
+          subject.add_license(id: 'MIT', name: 'MIT License')
+          project.software_license_policies << apache_policy
+        end
+
+        specify { expect(subject.violates?(project.software_license_policies)).to be(false) }
+      end
     end
   end
 

@@ -38,5 +38,9 @@ class SoftwareLicensePolicy < ApplicationRecord
     with_license.where(SoftwareLicense.arel_table[:name].lower.in(Array(license_name).map(&:downcase)))
   end
 
+  scope :by_spdx, -> (spdx_identifier) do
+    with_license.where(software_licenses: { spdx_identifier: spdx_identifier })
+  end
+
   delegate :name, to: :software_license
 end
