@@ -106,24 +106,5 @@ describe 'Multi Select Issue', :js do
         expect(find('.board-card:nth-child(5)')).to have_content(issue4.title)
       end
     end
-
-    it 'adds label when issues are moved to different card', :js do
-      page.within(all('.js-board-list')[1]) do
-        expect(find('.board-card:nth-child(1)')).not_to have_content(label2.title)
-        expect(find('.board-card:nth-child(2)')).not_to have_content(label2.title)
-      end
-
-      multi_select('.board-card:nth-child(1)')
-      multi_select('.board-card:nth-child(2)')
-
-      drag(list_from_index: 1, list_to_index: 2)
-
-      wait_for_requests
-
-      page.within(all('.js-board-list')[2]) do
-        expect(find('.board-card:nth-child(1)')).to have_content(label2.title)
-        expect(find('.board-card:nth-child(2)')).to have_content(label2.title)
-      end
-    end
   end
 end
