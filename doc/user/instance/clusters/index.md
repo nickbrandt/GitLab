@@ -23,4 +23,6 @@ match the [environment selector](../../../ci/environments.md#scoping-environment
 
 ## Cluster environments **(PREMIUM)**
 
-Please see the documentation for [cluster environments](../../clusters/environments.md).
+For a consolidated view of which CI [environments](../../../ci/environments.md)
+are deployed to the Kubernetes cluster, see the documentation for
+[cluster environments](../../clusters/environments.md).
