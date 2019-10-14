@@ -40,7 +40,7 @@
             = _('If any job surpasses this timeout threshold, it will be marked as failed. Human readable time input language is accepted like "1 hour". Values without specification represent seconds.')
             = link_to icon('question-circle'), help_page_path('user/project/pipelines/settings', anchor: 'timeout'), target: '_blank'
 
-        - if current_user.admin?
+        - if can?(current_user, :update_max_artifacts_size, @project)
           %hr
           .form-group
             = f.label :max_artifacts_size, _('Maximum artifacts size (MB)'), class: 'label-bold'

@@ -57,7 +57,7 @@ module Projects
           auto_devops_attributes: [:id, :domain, :enabled, :deploy_strategy],
           ci_cd_settings_attributes: [:default_git_depth]
         ].tap do |list|
-          list << :max_artifacts_size if current_user.admin?
+          list << :max_artifacts_size if can?(current_user, :update_max_artifacts_size, project)
         end
       end
 

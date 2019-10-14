@@ -6,7 +6,7 @@
 
 -# Given we only have one field in this form which is also admin-only,
 -# we don't want to show an empty section to non-admin users,
-- if current_user.admin?
+- if can?(current_user, :update_max_artifacts_size, @group)
   %section.settings#js-general-pipeline-settings.no-animate{ class: ('expanded' if general_expanded) }
     .settings-header
       %h4

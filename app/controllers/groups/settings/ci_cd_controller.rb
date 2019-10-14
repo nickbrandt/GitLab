@@ -4,8 +4,8 @@ module Groups
   module Settings
     class CiCdController < Groups::ApplicationController
       skip_cross_project_access_check :show
-      before_action :authorize_admin_group!, except: [:update]
-      before_action :authorize_admin!, only: [:update]
+      before_action :authorize_admin_group!
+      before_action :authorize_update_max_artifacts_size!, only: [:update]
 
       def show
         define_ci_variables
@@ -51,8 +51,8 @@ module Groups
         return render_404 unless can?(current_user, :admin_group, group)
       end
 
-      def authorize_admin!
-        return render_404 unless current_user&.admin?
+      def authorize_update_max_artifacts_size!
+        return render_404 unless can?(current_user, :update_max_artifacts_size, group)
       end
 
       def auto_devops_params
