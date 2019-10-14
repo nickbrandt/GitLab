@@ -102,7 +102,7 @@ These common definitions are:
   `docker.elastic.co/elasticsearch/elasticsearch:5.6.12` services.
 - `.only-ee`: Only creates a job for the `gitlab` project.
 - `.only-ee-as-if-foss`: Same as `.only-ee` but simulate the FOSS project by
-  setting the `IS_GITLAB_EE='0'` environment variable.
+  setting the `FOSS_ONLY='1'` environment variable.
 
 ## Changes detection
 
