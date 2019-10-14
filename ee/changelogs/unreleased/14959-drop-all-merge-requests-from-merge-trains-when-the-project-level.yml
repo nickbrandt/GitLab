@@ -1,0 +1,5 @@
+---
+title: Drop all merge requests from merge trains when the project-level setting is disabled
+merge_request: 17774
+author:
+type: added

@@ -29,6 +29,7 @@ module EE
 
         if result[:status] == :success
           cleanup_approvers(project) if should_remove_old_approvers
+          refresh_merge_trains(project)
 
           log_audit_events
 
@@ -64,6 +65,14 @@ module EE
 
       def sync_wiki_on_enable
         ::Geo::RepositoryUpdatedService.new(project.wiki.repository).execute
+      end
+
+      def refresh_merge_trains(project)
+        return unless project.merge_pipelines_were_disabled?
+
+        MergeTrain.first_in_trains(project).each do |merge_request|
+          AutoMergeProcessWorker.perform_async(merge_request.id)
+        end
       end
     end
   end
