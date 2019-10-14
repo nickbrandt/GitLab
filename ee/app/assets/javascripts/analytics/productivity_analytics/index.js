@@ -1,7 +1,10 @@
 import Vue from 'vue';
+import { mapState, mapActions } from 'vuex';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
+import { defaultDaysInPast } from './constants';
 import store from './store';
 import FilterDropdowns from './components/filter_dropdowns.vue';
-import DateRange from './components/daterange.vue';
+import DateRange from '../shared/components/daterange.vue';
 import ProductivityAnalyticsApp from './components/app.vue';
 import FilteredSearchProductivityAnalytics from './filtered_search_productivity_analytics';
 import { getLabelsEndpoint, getMilestonesEndpoint } from './utils';
@@ -17,6 +20,10 @@ export default () => {
   const appContainer = container.querySelector('.js-productivity-analytics-app-container');
 
   const { endpoint, emptyStateSvgPath, noAccessSvgPath } = appContainer.dataset;
+
+  const now = new Date(Date.now());
+  const defaultStartDate = new Date(getDateInPast(now, defaultDaysInPast));
+  const defaultEndDate = now;
 
   let filterManager;
 
@@ -70,8 +77,31 @@ export default () => {
   new Vue({
     el: timeframeContainer,
     store,
+    computed: {
+      ...mapState('filters', ['groupNamespace', 'startDate', 'endDate']),
+    },
+    mounted() {
+      // let's not fetch data since we might not have a groupNamespace selected yet
+      // this just populates the store with the initial data and waits for a groupNamespace to be set
+      this.setDateRange({ startDate: defaultStartDate, endDate: defaultEndDate, skipFetch: true });
+    },
+    methods: {
+      ...mapActions('filters', ['setDateRange']),
+      onDateRangeChange({ startDate, endDate }) {
+        this.setDateRange({ startDate, endDate });
+      },
+    },
     render(h) {
-      return h(DateRange, {});
+      return h(DateRange, {
+        props: {
+          show: this.groupNamespace !== null,
+          startDate: defaultStartDate,
+          endDate: defaultEndDate,
+        },
+        on: {
+          change: this.onDateRangeChange,
+        },
+      });
     },
   });
 

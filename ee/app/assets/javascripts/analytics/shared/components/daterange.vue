@@ -1,43 +1,42 @@
 <script>
-import { mapState, mapActions } from 'vuex';
 import { GlDaterangePicker } from '@gitlab/ui';
-import { getDateInPast } from '~/lib/utils/datetime_utility';
-import { defaultDaysInPast } from '../constants';
 
 export default {
   components: {
     GlDaterangePicker,
   },
+  props: {
+    show: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    startDate: {
+      type: Date,
+      required: false,
+      default: null,
+    },
+    endDate: {
+      type: Date,
+      required: false,
+      default: null,
+    },
+  },
   computed: {
-    ...mapState('filters', ['groupNamespace', 'startDate', 'endDate']),
     dateRange: {
       get() {
         return { startDate: this.startDate, endDate: this.endDate };
       },
       set({ startDate, endDate }) {
-        this.setDateRange({ startDate, endDate });
+        this.$emit('change', { startDate, endDate });
       },
-    },
-  },
-  mounted() {
-    this.initDateRange();
-  },
-  methods: {
-    ...mapActions('filters', ['setDateRange']),
-    initDateRange() {
-      const endDate = new Date(Date.now());
-      const startDate = new Date(getDateInPast(endDate, defaultDaysInPast));
-
-      // let's not fetch data since we might not have a groupNamespace selected yet
-      // this just populates the store with the initial data and waits for a groupNamespace to be set
-      this.setDateRange({ skipFetch: true, startDate, endDate });
     },
   },
 };
 </script>
 <template>
   <div
-    v-if="groupNamespace"
+    v-if="show"
     class="daterange-container d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-end"
   >
     <gl-daterange-picker
