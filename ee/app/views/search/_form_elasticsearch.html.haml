@@ -1,4 +1,4 @@
 - if search_service.use_elasticsearch?
-  .form-text.text-muted.mt-lg-0.ml-lg-2
+  .form-text.text-muted{ **local_assigns.fetch(:attrs, {}) }
     = link_to _('Advanced search functionality'), help_page_path('user/search/advanced_search_syntax.md'), target: '_blank'
     = _('is enabled.')
