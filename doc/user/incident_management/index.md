@@ -39,7 +39,7 @@ Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
 
 Incident Management features can be enabled and disabled via your project's **Settings > Operations > Incidents**.
 
-![Incident Management Settings](../../../ee/img/incident_management_settings.png)
+![Incident Management Settings](img/incident_management_settings.png)
 
 ### Auto-creation
 
