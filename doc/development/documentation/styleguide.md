@@ -1065,6 +1065,10 @@ When documenting feature flags for a feature, it's important that users know:
 - That administrative access is required to make a feature flag change.
 - What to ask for when requesting a change to a feature flag's state.
 
+NOTE: **Note:**
+The [Product Manager for the relevant group](https://about.gitlab.com/handbook/product/categories/#devops-stages)
+must review and approve product documentation involving feature flags.
+
 The following is sample text for adding feature flag documentation for a feature:
 
 ````md
