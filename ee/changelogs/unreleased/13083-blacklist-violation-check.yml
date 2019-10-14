@@ -1,0 +1,5 @@
+---
+title: Check for software license violations using SPDX identifiers
+merge_request: 18300
+author:
+type: changed
