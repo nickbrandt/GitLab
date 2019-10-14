@@ -21,20 +21,19 @@ Prometheus alerts can be setup in both GitLab-managed Prometheus installs and se
 
 Documentation for each method can be found here:
 
-- [GitLab-managed Prometheus](../project/integrations/prometheus.html#setting-up-alerts-for-prometheus-metrics-ultimate)
-- [Self-managed Prometheus](../project/integrations/prometheus.html#external-prometheus-instances)
+- [GitLab-managed Prometheus](../project/integrations/prometheus#setting-up-alerts-for-prometheus-metrics-ultimate)
+- [Self-managed Prometheus](../project/integrations/prometheus#external-prometheus-instances)
 
 ### Alert Endpoint
 
-This generic alert endpoint allows you to send GitLab alert notifications via a Webhook.
+GitLab can accept alerts from any source via a generic webhook receiver. When you set up the generic alerts integration, a unique endpoint will
+be created which can receive a payload in JSON format.
 
-Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
+More information on setting this up, including how to customize the payload [can be found here](../project/integrations/generic_alerts).
 
 ### Recovery Alerts
 
-GitLab can automatically close Issues that have been automatically created when we receive notification that the alert is resolved.
-
-Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
+Coming soon: GitLab can automatically close Issues that have been automatically created when we receive notification that the alert is resolved.
 
 ## Configuring Incidents
 
