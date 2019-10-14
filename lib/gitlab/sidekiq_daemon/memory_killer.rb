@@ -20,6 +20,7 @@ module Gitlab
       # Developer/admin should always set `memory_killer_max_memory_growth_kb` explicitly
       # In case not set, default to 300M. This is for extra-safe.
       DEFAULT_MAX_MEMORY_GROWTH_KB = 300_000
+
       # Phases of memory killer
       PHASE = {
         running: 1,
@@ -40,11 +41,24 @@ module Gitlab
 
       def init_metrics
         {
-          sidekiq_current_rss:    ::Gitlab::Metrics.gauge(:sidekiq_current_rss, 'Current RSS of Sidekiq Worker'),
+          sidekiq_current_rss:                  ::Gitlab::Metrics.gauge(:sidekiq_current_rss, 'Current RSS of Sidekiq Worker'),
           sidekiq_memory_killer_soft_limit_rss: ::Gitlab::Metrics.gauge(:sidekiq_memory_killer_soft_limit_rss, 'Current soft_limit_rss of Sidekiq Worker'),
           sidekiq_memory_killer_hard_limit_rss: ::Gitlab::Metrics.gauge(:sidekiq_memory_killer_hard_limit_rss, 'Current hard_limit_rss of Sidekiq Worker'),
-          sidekiq_memory_killer_phase:  ::Gitlab::Metrics.gauge(:sidekiq_memory_killer_phase, 'Current phase of Sidekiq Worker')
+          sidekiq_memory_killer_phase:          ::Gitlab::Metrics.gauge(:sidekiq_memory_killer_phase, 'Current phase of Sidekiq Worker')
         }
+      end
+
+      def refresh_state(phase)
+        @phase = PHASE.fetch(phase)
+        @current_rss = get_rss
+        @soft_limit_rss = get_soft_limit_rss
+        @hard_limit_rss = get_hard_limit_rss
+
+        # track the current state as prometheus gauges
+        @metrics[:sidekiq_memory_killer_phase].set({}, @phase)
+        @metrics[:sidekiq_current_rss].set({}, @current_rss)
+        @metrics[:sidekiq_memory_killer_soft_limit_rss].set({}, @soft_limit_rss)
+        @metrics[:sidekiq_memory_killer_hard_limit_rss].set({}, @hard_limit_rss)
       end
 
       def run_thread
@@ -95,62 +109,53 @@ module Gitlab
         # Tell Sidekiq to stop fetching new jobs
         # We first SIGNAL and then wait given time
         # We also monitor a number of running jobs and allow to restart early
-        update_metrics(PHASE[:stop_fetching_new_jobs], get_rss, get_soft_limit_rss, get_hard_limit_rss)
+        refresh_state(:stop_fetching_new_jobs)
         signal_and_wait(SHUTDOWN_TIMEOUT_SECONDS, 'SIGTSTP', 'stop fetching new jobs')
         return unless enabled?
 
         # Tell sidekiq to restart itself
         # Keep extra safe to wait `Sidekiq.options[:timeout] + 2` seconds before SIGKILL
-        update_metrics(PHASE[:shutting_down], get_rss, get_soft_limit_rss, get_hard_limit_rss)
+        refresh_state(:shutting_down)
         signal_and_wait(Sidekiq.options[:timeout] + 2, 'SIGTERM', 'gracefully shut down')
         return unless enabled?
 
         # Ideally we should never reach this condition
         # Wait for Sidekiq to shutdown gracefully, and kill it if it didn't
         # Kill the whole pgroup, so we can be sure no children are left behind
-        update_metrics(PHASE[:killing_sidekiq], get_rss, get_soft_limit_rss, get_hard_limit_rss)
+        refresh_state(:killing_sidekiq)
         signal_pgroup('SIGKILL', 'die')
       end
 
       def rss_within_range?
-        phase = PHASE[:running]
-        current_rss = nil
-        soft_limit_rss = nil
-        hard_limit_rss = nil
+        refresh_state(:running)
+
         deadline = Gitlab::Metrics::System.monotonic_time + GRACE_BALLOON_SECONDS.seconds
         loop do
           return true unless enabled?
 
-          current_rss = get_rss
-          soft_limit_rss = get_soft_limit_rss
-          hard_limit_rss = get_hard_limit_rss
-
-          update_metrics(phase, current_rss, soft_limit_rss, hard_limit_rss)
-
           # RSS go above hard limit should trigger forcible shutdown right away
-          break if current_rss > hard_limit_rss
+          break if @current_rss > @hard_limit_rss
 
           # RSS go below the soft limit
-          return true if current_rss < soft_limit_rss
-
-          phase = PHASE[:above_soft_limit]
+          return true if @current_rss < @soft_limit_rss
 
           # RSS did not go below the soft limit within deadline, restart
           break if Gitlab::Metrics::System.monotonic_time > deadline
 
           sleep(CHECK_INTERVAL_SECONDS)
+
+          refresh_state(:above_soft_limit)
         end
 
-        log_rss_out_of_range(current_rss, hard_limit_rss, soft_limit_rss)
+        # There are two chances to break from loop:
+        #   - above hard limit, or
+        #   - above soft limit after deadline
+        # When `above hard limit`, it immediately go to `stop_fetching_new_jobs`
+        # So ignore `above hard limit` and always set `above_soft_limit` here
+        refresh_state(:above_soft_limit)
+        log_rss_out_of_range(@current_rss, @hard_limit_rss, @soft_limit_rss)
 
         false
-      end
-
-      def update_metrics(phase, current_rss, soft_limit_rss, hard_limit_rss)
-        @metrics[:sidekiq_memory_killer_phase].set({}, phase)
-        @metrics[:sidekiq_current_rss].set({}, current_rss)
-        @metrics[:sidekiq_memory_killer_soft_limit_rss].set({}, soft_limit_rss)
-        @metrics[:sidekiq_memory_killer_hard_limit_rss].set({}, hard_limit_rss)
       end
 
       def log_rss_out_of_range(current_rss, hard_limit_rss, soft_limit_rss)

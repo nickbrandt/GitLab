@@ -41,9 +41,6 @@ Sidekiq.configure_server do |config|
     # after all workers have forked, but I don't know how at this point.
     ::Prometheus::Client.reinitialize_on_pid_change(force: true)
 
-    # temporary solution before fix https://gitlab.com/gitlab-org/gitlab/issues/33125
-    ::Prometheus::Client.reinitialize_on_pid_change(force: true)
-
     Gitlab::Metrics::Exporter::SidekiqExporter.instance.start
   end
 end
