@@ -41,27 +41,38 @@ describe 'Trial Capture Lead', :js do
       end
     end
 
-    context 'enters invalid company information' do
+    context 'enters company information' do
       before do
         fill_in 'company_name', with: 'GitLab'
         select2 '1-99', from: '#company_size'
-        # to trigger validation error
-        # skip filling phone number
-        # fill_in 'phone_number', with: '+1234567890'
         fill_in 'number_of_users', with: '1'
         select2 'US', from: '#country_select'
-
-        click_button 'Continue'
       end
 
-      it 'shows validation error' do
-        message = page.find('#phone_number').native.attribute('validationMessage')
+      context 'without phone number' do
+        it 'shows validation error' do
+          fill_in 'number_of_users', with: '1'
 
-        expect(message).to eq('Please fill out this field.')
+          click_button 'Continue'
+
+          message = page.find('#phone_number').native.attribute('validationMessage')
+
+          expect(message).to eq('Please fill out this field.')
+          expect(current_path).to eq(new_trial_path)
+        end
       end
 
-      it 'does not proceeds to the next step' do
-        expect(current_path).to eq(new_trial_path)
+      context 'and enters negative number to the number of users field' do
+        it 'shows validation error' do
+          fill_in 'number_of_users', with: '-1'
+
+          click_button 'Continue'
+
+          message = page.find('#number_of_users').native.attribute('validationMessage')
+
+          expect(message).to eq('Value must be greater than or equal to 1.')
+          expect(current_path).to eq(new_trial_path)
+        end
       end
     end
   end
