@@ -20,6 +20,8 @@ describe('Deployment component', () => {
       external_url_formatted: 'gitlab',
       deployed_at: '2017-03-22T22:44:42.258Z',
       deployed_at_formatted: 'Mar 22, 2017 10:44pm',
+      deployment_manual_actions: [],
+      status: 'manual',
       changes: [
         {
           path: 'index.html',
@@ -44,8 +46,9 @@ describe('Deployment component', () => {
   });
 
   describe('', () => {
-    beforeEach(() => {
+    beforeEach((done) => {
       vm = mountComponent(Component, { deployment: { ...deploymentMockData }, showMetrics: true });
+      Vue.nextTick(done);
     });
 
     describe('deployTimeago', () => {

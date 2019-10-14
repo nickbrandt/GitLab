@@ -45,6 +45,9 @@ export default {
       }),
     },
   },
+  mounted() {
+    console.log('IS CURRENT', this.isCurrent)
+  },
   computed: {
     computedDeploymentStatus() {
       if (this.deployment.status === 'created') {
