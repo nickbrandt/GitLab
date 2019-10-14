@@ -50,7 +50,10 @@ GitLab issues can automatically be created as a result of an alert notification.
 You can create your own [issue templates](../project/description_templates.md#creating-issue-templates)
 that can be [used within Incident Management](../project/integrations/prometheus.md#taking-action-on-incidents-ultimate).
 
-To select your Issue Template for use within Incident Management, head to Project -> Settings -> Operations -> Incidents and select it under **Issue Template**.
+To select your issue template for use within Incident Management:
+
+1. Visit your project's **Settings > Operations > Incidents**.
+1. Select the template from the **Issue Template** dropdown.
 
 More information on these settings, and how to configure them can be found [here](../project/integrations/prometheus.md#taking-action-on-incidents-ultimate).
 
