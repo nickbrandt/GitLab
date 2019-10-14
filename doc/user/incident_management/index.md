@@ -16,26 +16,26 @@ GitLab offers solutions for handling incidents in your applications and services
 GitLab can react to the alerts that your applications and services may be
 triggering by automatically creating issues, and alerting developers via email.
 
-### Prometheus Alerts
+### Prometheus alerts
 
 Prometheus alerts can be set up in both:
 
 - [GitLab-managed Prometheus](../project/integrations/prometheus.md#setting-up-alerts-for-prometheus-metrics-ultimate) and
 - [Self-managed Prometheus](../project/integrations/prometheus.md#external-prometheus-instances) installations.
 
-### Alert Endpoint
+### Alert endpoint
 
 This generic alert endpoint allows you to send GitLab alert notifications via a Webhook.
 
 Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
 
-### Recovery Alerts
+### Recovery alerts
 
 GitLab can automatically close issues that have been automatically created when you receive notification that the alert is resolved.
 
 Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
 
-## Configuring Incidents
+## Configuring incidents
 
 Incident Management features can be enabled and disabled via your project's **Settings > Operations > Incidents**.
 
@@ -79,14 +79,8 @@ Learn how to embed [Grafana hosted metric charts](./project/integrations/prometh
 
 Slack slash commands allow you to control GitLab and view content right inside Slack, without having to leave it.
 
-### Setting it up
+Learn how to [set up Slack slash commands](../project/integrations/slack_slash_commands.md) and how to [use them](../../integration/slash_commands.md).
 
-To setup Slack slash commands with GitLab, see [this guide](../project/integrations/slack_slash_commands.md).
-
-### Slash commands
-
-Examples of Slash commands and how to use them can be [found here](../../integration/slash_commands.md).
-
-## Zoom in Issues
+## Zoom in issues
 
 Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
