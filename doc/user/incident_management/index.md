@@ -18,12 +18,10 @@ triggering by automatically creating issues, and alerting developers via email.
 
 ### Prometheus Alerts
 
-Prometheus alerts can be setup in both GitLab-managed Prometheus installs and self-managed Prometheus installs.
+Prometheus alerts can be set up in both:
 
-Documentation for each method can be found here:
-
-- [GitLab-managed Prometheus](../project/integrations/prometheus.html#setting-up-alerts-for-prometheus-metrics-ultimate)
-- [Self-managed Prometheus](../project/integrations/prometheus.html#external-prometheus-instances)
+- [GitLab-managed Prometheus](../project/integrations/prometheus.md#setting-up-alerts-for-prometheus-metrics-ultimate) and
+- [Self-managed Prometheus](../project/integrations/prometheus.md#external-prometheus-instances) installations.
 
 ### Alert Endpoint
 
