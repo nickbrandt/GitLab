@@ -43,7 +43,7 @@ Incident Management features can be enabled and disabled via your project's **Se
 
 ### Auto-creation
 
-GitLab Issues can automatically be created as a result of an Alert notification. An Issue created this way will contain error information to help you further debug the error.
+GitLab issues can automatically be created as a result of an alert notification. An issue created this way will contain error information to help you further debug the error.
 
 ### Issue templates
 
