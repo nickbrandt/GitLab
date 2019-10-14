@@ -74,7 +74,7 @@ module QA
 
       it 'creates a multi-project pipeline' do
         Page::MergeRequest::Show.perform do |show|
-          pipeline_passed = Support::Retrier.retry_until do
+          pipeline_passed = show.retry_until(reload: true) do
             show.has_content?(/Pipeline #\d+ passed/)
           end
 
