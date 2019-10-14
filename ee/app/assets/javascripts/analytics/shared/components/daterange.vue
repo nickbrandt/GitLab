@@ -21,6 +21,11 @@ export default {
       required: false,
       default: null,
     },
+    minDate: {
+      type: Date,
+      rerquired: false,
+      default: null,
+    },
   },
   computed: {
     dateRange: {
@@ -42,6 +47,7 @@ export default {
     <gl-daterange-picker
       v-model="dateRange"
       class="d-flex flex-column flex-lg-row"
+      :default-min-date="minDate"
       :default-start-date="startDate"
       :default-end-date="endDate"
       theme="animate-picker"
