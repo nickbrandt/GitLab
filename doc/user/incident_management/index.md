@@ -40,6 +40,8 @@ Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
 
 Incident Management features can be easily enabled & disabled via the Project settings page. Head to Project -> Settings -> Operations -> Incidents.
 
+![Incident Management Settings](img/incident_management_settings.png)
+
 ### Auto-creation
 
 GitLab Issues can automatically be created as a result of an Alert notification. An Issue created this way will contain error information to help you further debug the error.
@@ -50,6 +52,8 @@ You can create your own Issue Templates than can be used within Incident Managem
 To read how to create your own templates visit the [*Creating Issue Templates page*](../project/description_templates.md#creating-issue-templates).
 
 To select your Issue Template for use within Incident Management, head to Project -> Settings -> Operations -> Incidents and select it under **Issue Template**.
+
+More information on these settings, and how to configure them can be found [here](../project/integrations/prometheus.md#taking-action-on-incidents-ultimate).
 
 ## Embedded metrics
 
