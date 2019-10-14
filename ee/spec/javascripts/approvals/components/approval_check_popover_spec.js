@@ -2,15 +2,18 @@ import Vue from 'vue';
 import { mount, createLocalVue } from '@vue/test-utils';
 import { GlPopover } from '@gitlab/ui';
 import { TEST_HOST } from 'spec/test_constants';
-import component from 'ee/approvals/components/vulnerability_check_popover.vue';
+import component from 'ee/approvals/components/approval_check_popover.vue';
 
-describe('Vulnerability Check Popover', () => {
+describe('Approval Check Popover', () => {
   let wrapper;
 
   beforeEach(() => {
     const localVue = createLocalVue();
     wrapper = mount(component, {
       localVue,
+      propsData: {
+        title: 'Title',
+      },
       sync: false,
     });
   });
