@@ -4,6 +4,7 @@ import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
 import { __ } from '~/locale';
 import timeagoMixin from '../../vue_shared/mixins/timeago';
 import MemoryUsage from './memory_usage.vue';
+import { MANUAL_DEPLOY, WILL_DEPLOY, RUNNING, SUCCESS, FAILED, CANCELED } from './constants';
 
 export default {
   name: 'DeploymentInfo',
@@ -30,12 +31,12 @@ export default {
     },
   },
   deployedTextMap: {
-    manual_deploy:  __('Can deploy manually to'),
-    will_deploy: __('Will deploy to'),
-    running: __('Deploying to'),
-    success: __('Deployed to'),
-    failed: __('Failed to deploy to'),
-    canceled: __('Canceled deploy to'),
+    [MANUAL_DEPLOY]:  __('Can deploy manually to'),
+    [WILL_DEPLOY]: __('Will deploy to'),
+    [RUNNING]: __('Deploying to'),
+    [SUCCESS]: __('Deployed to'),
+    [FAILED]: __('Failed to deploy to'),
+    [CANCELED]: __('Canceled deploy to'),
   },
   computed: {
     deployTimeago() {

@@ -5,6 +5,7 @@ import DeploymentViewButton from './deployment_view_button.vue';
 import DeploymentManualButton from './deployment_manual_button.vue';
 import DeploymentRedeployButton from './deployment_redeploy_button.vue';
 import DeploymentStopButton from './deployment_stop_button.vue';
+import { MANUAL_DEPLOY, WILL_DEPLOY, CREATED, RUNNING, SUCCESS } from './constants';
 
 export default {
   // name: 'Deployment' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
@@ -45,13 +46,10 @@ export default {
       }),
     },
   },
-  mounted() {
-    console.log('IS CURRENT', this.isCurrent)
-  },
   computed: {
     computedDeploymentStatus() {
-      if (this.deployment.status === 'created') {
-        return this.deployment.isManual ? 'manual_deploy' : 'will_deploy';
+      if (this.deployment.status === CREATED) {
+        return this.deployment.isManual ? MANUAL_DEPLOY : WILL_DEPLOY;
       }
       return this.deployment.status;
     },
@@ -62,13 +60,13 @@ export default {
       return Boolean(!this.isCurrent && this.deployment.deployed_at);
     },
     isCurrent() {
-      return this.computedDeploymentStatus === 'success';
+      return this.computedDeploymentStatus === SUCCESS;
     },
     isManual() {
       return Boolean(this.deployment.deployment_manual_actions.length > 0);
     },
     isDeployInProgress() {
-      return this.deployment.status === 'running';
+      return this.deployment.status === RUNNING;
     },
     isRedeployable() {
       return this.isManual;
