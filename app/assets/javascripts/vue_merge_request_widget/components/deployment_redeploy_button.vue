@@ -23,6 +23,11 @@ export default {
       required: true,
     }
   },
+  computed: {
+    redeployButtonText() {
+      return __('Re-deploy to environment');
+    }
+  },
   methods: {
     handleRedeploy() {
       console.log('redeploy was clicked', this.retryPath);
@@ -35,7 +40,7 @@ export default {
 <template>
   <loading-button
     v-gl-tooltip
-    :title="__('Re-deploy to environment')"
+    :title="redeployButtonText"
     :loading="isDeployInProgress"
     :disabled="isDeployInProgress"
     container-class="btn btn-default btn-retry btn-sm"

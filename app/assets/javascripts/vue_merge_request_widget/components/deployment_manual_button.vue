@@ -23,19 +23,23 @@ export default {
       required: true,
     }
   },
+  computed: {
+    deployButtonText() {
+      return __('Deploy manually');
+    }
+  },
   methods: {
     handleManualDeploy() {
       console.log('manual deploy was clicked', this.playPath);
     }
   },
-
 }
 </script>
 
 <template>
   <loading-button
     v-gl-tooltip
-    :title="__('Deploy manually')"
+    :title="deployButtonText"
     :loading="isDeployInProgress"
     :disabled="isDeployInProgress"
     container-class="btn btn-default btn-retry btn-sm"

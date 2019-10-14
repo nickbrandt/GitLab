@@ -1,6 +1,5 @@
 <script>
 import { GlTooltipDirective } from '@gitlab/ui';
-import { __ } from '~/locale';
 import DeploymentInfo from './deployment_info.vue';
 import DeploymentViewButton from './deployment_view_button.vue';
 import DeploymentManualButton from './deployment_manual_button.vue';
@@ -93,8 +92,8 @@ export default {
           <deployment-info
             :computed-deployment-status="computedDeploymentStatus"
             :deployment="deployment"
-            :show-metrics="showMetrics">
-          </deployment-info>
+            :show-metrics="showMetrics"
+          />
           <div>
             <!-- if manual deploy, show deploy -->
             <deployment-manual-button
