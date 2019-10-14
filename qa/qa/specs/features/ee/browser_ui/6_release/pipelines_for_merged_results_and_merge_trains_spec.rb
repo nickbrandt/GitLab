@@ -44,7 +44,7 @@ module QA
       end
 
       after(:context) do
-        Service::Runner.new(@executor).remove!
+        Service::DockerRun::GitlabRunner.new(@executor).remove!
       end
 
       it 'creates a pipeline with merged results' do
