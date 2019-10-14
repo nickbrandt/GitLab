@@ -2,10 +2,12 @@
 
 module QA
   context 'Create' do
-    describe 'Pull mirror a repository over HTTP' do
+    # Use Admin credentials as a workaround for a permissions bug
+    # See https://gitlab.com/gitlab-org/gitlab/issues/13769
+    describe 'Pull mirror a repository over HTTP', :requires_admin do
       it 'configures and syncs a (pull) mirrored repository with password auth' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
 
         source = Resource::Repository::ProjectPush.fabricate! do |project_push|
           project_push.project_name = 'pull-mirror-source-project'
@@ -14,7 +16,7 @@ module QA
           project_push.commit_message = 'Add README.md'
         end
         source_project_uri = source.project.repository_http_location.uri
-        source_project_uri.user = Runtime::User.username
+        source_project_uri.user = CGI.escape(Runtime::User.admin_username)
 
         target_project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'pull-mirror-target-project'
@@ -28,7 +30,7 @@ module QA
             mirror_settings.repository_url = source_project_uri
             mirror_settings.mirror_direction = 'Pull'
             mirror_settings.authentication_method = 'Password'
-            mirror_settings.password = Runtime::User.password
+            mirror_settings.password = Runtime::User.admin_password
             mirror_settings.mirror_repository
             mirror_settings.update source_project_uri
           end
