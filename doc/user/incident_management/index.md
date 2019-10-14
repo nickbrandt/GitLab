@@ -53,7 +53,7 @@ To select your Issue Template for use within Incident Management, head to Projec
 
 ### Embedded metrics
 
-Metrics can be embedded anywhere where GitLab Markdown is used. This issues issues, merge requests and comments.
+Metrics can be embedded anywhere where GitLab Markdown is used, for example, descriptions and comments on issues and merge requests. 
 
 #### GitLab hosted metrics
 
