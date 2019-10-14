@@ -64,4 +64,27 @@ describe ProjectCiCdSetting do
       it { is_expected.to be_falsy }
     end
   end
+
+  describe '#merge_pipelines_were_disabled?' do
+    subject { project.merge_pipelines_were_disabled? }
+
+    let(:project) { create(:project) }
+
+    before do
+      stub_licensed_features(merge_pipelines: true, merge_trains: true)
+      project.update(merge_pipelines_enabled: true)
+    end
+
+    context 'when merge pipelines option is disabled' do
+      before do
+        project.update(merge_pipelines_enabled: false)
+      end
+
+      it { is_expected.to be true }
+    end
+
+    context 'when merge pipelines option is intact' do
+      it { is_expected.to be false }
+    end
+  end
 end
