@@ -1,5 +1,8 @@
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { newDate, parsePikadayDate } from '~/lib/utils/datetime_utility';
+import createGqClient from '~/lib/graphql';
+
+export const gqClient = createGqClient();
 
 /**
  * Updates provided `epic` object with necessary props
@@ -71,10 +74,12 @@ export const processEpicDates = (epic, timeframeStartDate, timeframeEndDate) => 
  */
 export const formatEpicDetails = (rawEpic, timeframeStartDate, timeframeEndDate) => {
   const epicItem = convertObjectPropsToCamelCase(rawEpic);
+  const rawStartDate = rawEpic.start_date || rawEpic.startDate;
+  const rawEndDate = rawEpic.end_date || rawEpic.dueDate;
 
-  if (rawEpic.start_date) {
+  if (rawStartDate) {
     // If startDate is present
-    const startDate = parsePikadayDate(rawEpic.start_date);
+    const startDate = parsePikadayDate(rawStartDate);
     epicItem.startDate = startDate;
     epicItem.originalStartDate = startDate;
   } else {
@@ -82,9 +87,9 @@ export const formatEpicDetails = (rawEpic, timeframeStartDate, timeframeEndDate)
     epicItem.startDateUndefined = true;
   }
 
-  if (rawEpic.end_date) {
+  if (rawEndDate) {
     // If endDate is present
-    const endDate = parsePikadayDate(rawEpic.end_date);
+    const endDate = parsePikadayDate(rawEndDate);
     epicItem.endDate = endDate;
     epicItem.originalEndDate = endDate;
   } else {
@@ -96,3 +101,19 @@ export const formatEpicDetails = (rawEpic, timeframeStartDate, timeframeEndDate)
 
   return epicItem;
 };
+
+/**
+ * Returns array of epics extracted from GraphQL response
+ * discarding the `edges`->`node` nesting
+ *
+ * @param {Object} group
+ */
+export const extractGroupEpics = edges =>
+  edges.map(({ node, epicNode = node }) => ({
+    ...epicNode,
+    // We can get rid of below two lines
+    // by updating `epic_item_details.vue`
+    // once we move to GraphQL permanently.
+    groupName: epicNode.group.name,
+    groupFullName: epicNode.group.fullName,
+  }));

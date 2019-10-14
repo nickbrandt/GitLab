@@ -39,6 +39,8 @@
         %section.col-md-12
           #js-roadmap{ data: { epics_path: group_epics_path(@group, parent_id: @epic.id, format: :json),
             group_id: @group.id,
+            iid: @epic.iid,
+            full_path: @group.full_path,
             empty_state_illustration: image_path('illustrations/epics/roadmap.svg'),
             has_filters_applied: 'false',
             new_epic_endpoint: group_epics_path(@group),
@@ -88,6 +90,8 @@
         %section.col-md-12
           #js-roadmap{ data: { epics_path: group_epics_path(@group, parent_id: @epic.id, format: :json),
             group_id: @group.id,
+            iid: @epic.iid,
+            full_path: @group.full_path,
             empty_state_illustration: image_path('illustrations/epics/roadmap.svg'),
             has_filters_applied: 'false',
             new_epic_endpoint: group_epics_path(@group),

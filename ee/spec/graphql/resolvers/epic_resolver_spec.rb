@@ -102,6 +102,80 @@ describe Resolvers::EpicResolver do
         end
       end
 
+      context 'with search' do
+        let!(:epic1) { create(:epic, group: group, title: 'first created', description: 'description') }
+        let!(:epic2) { create(:epic, group: group, title: 'second created', description: 'text 1') }
+        let!(:epic3) { create(:epic, group: group, title: 'third', description: 'text 2') }
+
+        it 'filters epics by title' do
+          epics = resolve_epics(search: 'created')
+
+          expect(epics).to match_array([epic1, epic2])
+        end
+
+        it 'filters epics by description' do
+          epics = resolve_epics(search: 'text')
+
+          expect(epics).to match_array([epic2, epic3])
+        end
+      end
+
+      context 'with author_username' do
+        it 'filters epics by author' do
+          user = create(:user)
+          epic = create(:epic, group: group, author: user )
+          create(:epic, group: group)
+
+          epics = resolve_epics(author_username: user.username)
+
+          expect(epics).to match_array([epic])
+        end
+      end
+
+      context 'with label_name' do
+        it 'filters epics by labels' do
+          label_1 = create(:group_label, group: group)
+          label_2 = create(:group_label, group: group)
+          epic_1 = create(:labeled_epic, group: group, labels: [label_1, label_2])
+          create(:labeled_epic, group: group, labels: [label_1])
+          create(:labeled_epic, group: group)
+
+          epics = resolve_epics(label_name: [label_1.title, label_2.title])
+
+          expect(epics).to match_array([epic_1])
+        end
+      end
+
+      context 'with sort' do
+        let!(:epic1) { create(:epic, group: group, title: 'first created', description: 'description', start_date: 10.days.ago, end_date: 10.days.from_now) }
+        let!(:epic2) { create(:epic, group: group, title: 'second created', description: 'text 1', start_date: 20.days.ago, end_date: 20.days.from_now) }
+        let!(:epic3) { create(:epic, group: group, title: 'third', description: 'text 2', start_date: 30.days.ago, end_date: 30.days.from_now) }
+
+        it 'orders epics by start date in descending order' do
+          epics = resolve_epics(sort: 'start_date_desc')
+
+          expect(epics).to eq([epic1, epic2, epic3])
+        end
+
+        it 'orders epics by start date in ascending order' do
+          epics = resolve_epics(sort: 'start_date_asc')
+
+          expect(epics).to eq([epic3, epic2, epic1])
+        end
+
+        it 'orders epics by end date in descending order' do
+          epics = resolve_epics(sort: 'end_date_desc')
+
+          expect(epics).to eq([epic3, epic2, epic1])
+        end
+
+        it 'orders epics by end date in ascending order' do
+          epics = resolve_epics(sort: 'end_date_asc')
+
+          expect(epics).to eq([epic1, epic2, epic3])
+        end
+      end
+
       context 'with subgroups' do
         let(:sub_group) { create(:group, parent: group) }
         let(:iids)      { [epic1, epic2].map(&:iid) }
