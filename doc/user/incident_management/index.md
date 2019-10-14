@@ -53,20 +53,20 @@ To select your Issue Template for use within Incident Management, head to Projec
 
 ### Embedded metrics
 
-Metrics can be embedded anywhere where GitLab Markdown is used, for example, descriptions and comments on issues and merge requests. 
+Metrics can be embedded anywhere where GitLab Markdown is used, for example, descriptions and comments on issues and merge requests.
 
 #### GitLab hosted metrics
 
 GitLab hosted metrics can be embedded by following [these instructions](../project/integrations/prometheus.md#embedding-metric-charts-within-gitlab-flavored-markdown).
-Note: This means that GitLab metrics can be [embedded in issue templates](#metrics-in-issue-tempaltes). 
-
-#### Grafana metrics
-
-Grafana hosted metrics metrics can be embedded in issues by following [these instructions](../project/integrations/prometheus.md#embedding-live-grafana-charts).
+Note: This means that GitLab metrics can be [embedded in issue templates](#metrics-in-issue-tempaltes).
 
 #### Metrics in issue templates
 
 Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
+
+#### Grafana metrics
+
+Grafana hosted metrics metrics can be embedded in issues by following [these instructions](../project/integrations/prometheus.md#embedding-live-grafana-charts).
 
 ### Slack integration
 
