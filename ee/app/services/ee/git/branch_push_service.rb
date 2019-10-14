@@ -9,6 +9,7 @@ module EE
       def execute
         enqueue_elasticsearch_indexing
         enqueue_update_external_pull_requests
+        enqueue_analytics_worker
 
         super
       end
@@ -40,6 +41,13 @@ module EE
         ::Gitlab::Redis::SharedState.with do |redis|
           !redis.sismember(:elastic_projects_indexing, project.id)
         end
+      end
+
+      def enqueue_analytics_worker
+        return unless default_branch?
+        return unless ::Feature.enabled?(:analytics_push_worker)
+
+        Analytics::PushWorker.perform_async(project.id, oldrev, newrev)
       end
     end
   end

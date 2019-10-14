@@ -76,3 +76,6 @@
 - repository_update_mirror
 - repository_push_audit_event
 - epics:epics_update_epics_dates
+
+- analytics:analytics_push
+- analytics:analytics_code_analytics_commit

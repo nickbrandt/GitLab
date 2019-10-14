@@ -118,6 +118,30 @@ describe Git::BranchPushService do
       end
     end
 
+    context 'Analytics' do
+      context 'when default branch and feature flag is enabled' do
+        before do
+          stub_feature_flags(analytics_push_worker: true)
+        end
+
+        it 'enqueues Analytics::PushWorer' do
+          expect(Analytics::PushWorker).to receive(:perform_async).with(project.id, oldrev, newrev)
+
+          subject.execute
+        end
+      end
+
+      context 'when it is not a default branch' do
+        let(:ref) { 'refs/heads/other' }
+
+        it 'does not enqueue Analytics::PushWorer' do
+          expect(Analytics::PushWorker).not_to receive(:perform_async).with(project.id, oldrev, newrev)
+
+          subject.execute
+        end
+      end
+    end
+
     context 'External pull requests' do
       it 'runs UpdateExternalPullRequestsWorker' do
         expect(UpdateExternalPullRequestsWorker).to receive(:perform_async).with(project.id, user.id, ref)
