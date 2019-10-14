@@ -4026,6 +4026,9 @@ msgstr ""
 msgid "Code owners"
 msgstr ""
 
+msgid "CodeAnalytics|Max files"
+msgstr ""
+
 msgid "CodeOwner|Pattern"
 msgstr ""
 
