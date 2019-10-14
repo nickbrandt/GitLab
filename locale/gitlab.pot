@@ -5781,6 +5781,9 @@ msgstr ""
 msgid "Edit stage"
 msgstr ""
 
+msgid "Edit this release"
+msgstr ""
+
 msgid "Edit wiki page"
 msgstr ""
 
