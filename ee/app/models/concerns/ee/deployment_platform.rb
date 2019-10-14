@@ -8,7 +8,8 @@ module EE
     def find_platform_kubernetes_with_cte(environment)
       return super unless environment && feature_available?(:multiple_clusters)
 
-      ::Clusters::ClustersHierarchy.new(self).base_and_ancestors
+      ::Clusters::ClustersHierarchy.new(self, include_management_project: cluster_management_project_enabled?)
+        .base_and_ancestors
         .enabled
         .on_environment(environment, relevant_only: true)
         .first&.platform_kubernetes
