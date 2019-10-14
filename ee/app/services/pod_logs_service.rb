@@ -1,11 +1,22 @@
 # frozen_string_literal: true
 
 class PodLogsService < ::BaseService
+  include Stepable
+
   attr_reader :environment
 
   K8S_NAME_MAX_LENGTH = 253
 
   PARAMS = %w(pod_name container_name).freeze
+
+  SUCCESS_RETURN_KEYS = [:status, :logs].freeze
+
+  steps :check_param_lengths,
+    :check_deployment_platform,
+    :check_pod_name,
+    :pod_logs,
+    :split_logs,
+    :filter_return_keys
 
   def initialize(environment, params: {})
     @environment = environment
@@ -13,6 +24,12 @@ class PodLogsService < ::BaseService
   end
 
   def execute
+    execute_steps
+  end
+
+  private
+
+  def check_param_lengths(_result)
     pod_name = params['pod_name'].presence
     container_name = params['container_name'].presence
 
@@ -24,34 +41,54 @@ class PodLogsService < ::BaseService
         ' %{max_length} chars' % { max_length: K8S_NAME_MAX_LENGTH }))
     end
 
-    unless environment.deployment_platform
-      return error('No deployment platform')
-    end
-
-    # If pod_name is not received as parameter, get the pod logs of the first
-    # pod of this environment.
-    pod_name ||= environment.pod_names&.first
-
-    pod_logs(pod_name, container_name)
+    success(pod_name: pod_name, container_name: container_name)
   end
 
-  private
+  def check_deployment_platform(result)
+    unless environment.deployment_platform
+      return error(_('No deployment platform available'))
+    end
 
-  def pod_logs(pod_name, container_name)
-    result = environment.deployment_platform.read_pod_logs(
-      pod_name,
+    success(result)
+  end
+
+  def check_pod_name(result)
+    # If pod_name is not received as parameter, get the pod logs of the first
+    # pod of this environment.
+    result[:pod_name] ||= environment.pod_names&.first
+
+    unless result[:pod_name]
+      return error(_('No pods available'))
+    end
+
+    success(result)
+  end
+
+  def pod_logs(result)
+    response = environment.deployment_platform.read_pod_logs(
+      result[:pod_name],
       namespace,
-      container: container_name
+      container: result[:container_name]
     )
 
-    return unless result
+    return { status: :processing } unless response
 
-    if result[:status] == :error
-      error(result[:error])
+    result[:logs] = response[:logs]
+
+    if response[:status] == :error
+      error(response[:error])
     else
-      logs = split_by_newline(result[:logs])
-      success(logs: logs)
+      success(result)
     end
+  end
+
+  def split_logs(result)
+    logs = split_by_newline(result[:logs])
+    success(logs: logs)
+  end
+
+  def filter_return_keys(result)
+    result.slice(*SUCCESS_RETURN_KEYS)
   end
 
   def filter_params(params)

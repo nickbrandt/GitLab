@@ -170,8 +170,8 @@ describe Projects::EnvironmentsController do
         it_behaves_like 'resource not found', 'Pod not found'
       end
 
-      context 'when service returns nil' do
-        let(:service_result) { nil }
+      context 'when service returns status processing' do
+        let(:service_result) { { status: :processing } }
 
         it 'renders accepted' do
           get :logs, params: environment_params(pod_name: pod_name, format: :json)
