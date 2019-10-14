@@ -13,7 +13,8 @@ GitLab offers solutions for handling incidents in your applications and services
 
 ## Alerting
 
-You can let GitLab know of alerts that may be triggering in your applications and services. GitLab can react to these by automatically creating Issues, and alerting developers via Email.
+GitLab can react to the alerts that your applications and services may be
+triggering by automatically creating issues, and alerting developers via email.
 
 ### Prometheus Alerts
 
