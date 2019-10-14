@@ -10758,9 +10758,6 @@ msgstr ""
 msgid "No deployments found"
 msgstr ""
 
-msgid "No details available"
-msgstr ""
-
 msgid "No due date"
 msgstr ""
 
