@@ -31,7 +31,7 @@ Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
 
 ### Recovery Alerts
 
-GitLab can automatically close Issues that have been automatically created when we receive notification that the alert is resolved.
+GitLab can automatically close issues that have been automatically created when you receive notification that the alert is resolved.
 
 Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
 
