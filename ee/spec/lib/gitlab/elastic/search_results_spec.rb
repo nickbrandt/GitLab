@@ -235,7 +235,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
     it 'redacts commit comments when user is a guest on a private project' do
       project_1.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
       project_1.add_guest(user)
-      note_on_commit = create(
+      create(
         :note_on_commit,
         project: project_1,
         note: 'foo note on commit'
@@ -245,13 +245,9 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
       results = described_class.new(user, 'foo', limit_project_ids)
 
-      expect(results.send(:logger))
-        .to receive(:error)
-        .with(hash_including(message: "redacted_search_results", filtered: array_including([
-          { class_name: "Note", id: note_on_commit.id, ability: :read_note }
-      ])))
+      expect(results.send(:logger)).not_to receive(:error)
 
-      expect(results.notes_count).to eq(3) # 3 because redacting only happens when we instantiate the results
+      expect(results.notes_count).to eq(2)
       expect(results.objects('notes')).to match_array([@note_1, @note_2])
     end
   end
