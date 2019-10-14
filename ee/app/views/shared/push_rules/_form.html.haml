@@ -55,7 +55,7 @@
 
 .form-group
   = f.label :author_email_regex, "Commit author's email", class: "label-bold"
-  = f.text_field :author_email_regex, class: "form-control", placeholder: 'Example: @my-company.com$', data: { qa_selector: 'author_email_field' }
+  = f.text_field :author_email_regex, class: "form-control", placeholder: _('Example: @sub\.company\.com$'), data: { qa_selector: 'author_email_field' }
   .form-text.text-muted
     All commit author's email must match this
     = link_to 'regular expression', 'https://github.com/google/re2/wiki/Syntax'
