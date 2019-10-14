@@ -115,6 +115,7 @@ from a commit or MR by extending from the following CI definitions:
 - `.only-qa-changes`: Allows a job to only be created upon QA-related changes.
 - `.only-docs-changes`: Allows a job to only be created upon docs-related changes.
 - `.only-code-qa-changes`: Allows a job to only be created upon code-related or QA-related changes.
+- `.only-graphql-changes`: Allows a job to only be created upon graphql-related changes.
 
 **See <https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab/ci/global.gitlab-ci.yml>
 for the list of exact patterns.**
@@ -173,6 +174,7 @@ subgraph "`test` stage"
     O -.-> |depends on| B;
     O -.-> |depends on| C;
     downtime_check --> |needs and depends on| A;
+    graphql-docs-verify --> |needs| A;
     end
 
 subgraph "`review-prepare` stage"

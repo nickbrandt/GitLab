@@ -71,6 +71,12 @@
       - "doc/**/*"
       - ".markdownlint.json"
 
+.only-graphql-changes:
+  only:
+    changes:
+      - "{,ee/}app/graphql/**/*"
+      - "{,ee/}lib/gitlab/graphql/**/*"
+
 .only-code-qa-changes:
   only:
     changes:
