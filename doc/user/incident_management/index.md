@@ -57,7 +57,7 @@ Metrics can be embedded anywhere where GitLab Markdown is used, for example, des
 
 #### GitLab hosted metrics
 
-You can embed metrics that are served by GitLab by following [these instructions](../project/integrations/prometheus.md#embedding-metric-charts-within-gitlab-flavored-markdown).
+GitLab hosted metrics can be embedded by following [these instructions](../project/integrations/prometheus.md#embedding-metric-charts-within-gitlab-flavored-markdown).
 Note: This means that GitLab metrics can be [embedded in issue templates](#metrics-in-issue-tempaltes). 
 
 #### Grafana metrics
