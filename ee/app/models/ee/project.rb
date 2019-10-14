@@ -668,6 +668,12 @@ module EE
       marked_for_deletion_at.present?
     end
 
+    def has_packages?(package_type)
+      return false unless feature_available?(:packages)
+
+      packages.where(package_type: package_type).exists?
+    end
+
     private
 
     def set_override_pull_mirror_available
