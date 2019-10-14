@@ -62,7 +62,7 @@ Note: This means that GitLab metrics can be [embedded in issue templates](#metri
 
 #### Grafana metrics
 
-You can embed externally hosted Grafana metrics into GitLab issues by following [these instructions](../project/integrations/prometheus.md#embedding-live-grafana-charts).
+Grafana hosted metrics metrics can be embedded in issues by following [these instructions](../project/integrations/prometheus.md#embedding-live-grafana-charts).
 
 #### Metrics in issue templates
 
