@@ -151,6 +151,7 @@ describe Groups::ClustersController do
     end
 
     it 'expires etag cache to force reload environments list' do
+      stub_licensed_features(cluster_deployments: true)
       expect_next_instance_of(Gitlab::EtagCaching::Store) do |store|
         expect(store).to receive(:touch)
           .with(environments_group_cluster_path(cluster.group, cluster))

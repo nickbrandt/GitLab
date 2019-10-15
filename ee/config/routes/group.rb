@@ -31,12 +31,6 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
 
-    resources :clusters, only: [] do
-      member do
-        get :environments, format: :json
-      end
-    end
-
     resource :ldap, only: [] do
       member do
         put :sync

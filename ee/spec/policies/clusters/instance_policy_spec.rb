@@ -4,25 +4,21 @@ require 'spec_helper'
 
 describe Clusters::InstancePolicy do
   let(:user) { create(:admin) }
-  let(:policy) { described_class.new(user, Clusters::Instance.new) }
+  subject { described_class.new(user, Clusters::Instance.new) }
 
-  describe 'rules' do
-    context 'when admin' do
-      it { expect(policy).to be_allowed :read_cluster }
-      it { expect(policy).to be_allowed :add_cluster }
-      it { expect(policy).to be_allowed :create_cluster }
-      it { expect(policy).to be_allowed :update_cluster }
-      it { expect(policy).to be_allowed :admin_cluster }
+  context 'when cluster deployments is available' do
+    before do
+      stub_licensed_features(cluster_deployments: true)
     end
 
-    context 'when not admin' do
-      let(:user) { create(:user) }
+    it { is_expected.to be_allowed(:read_cluster_environments) }
+  end
 
-      it { expect(policy).to be_disallowed :read_cluster }
-      it { expect(policy).to be_disallowed :add_cluster }
-      it { expect(policy).to be_disallowed :create_cluster }
-      it { expect(policy).to be_disallowed :update_cluster }
-      it { expect(policy).to be_disallowed :admin_cluster }
+  context 'when cluster deployments is not available' do
+    before do
+      stub_licensed_features(cluster_deployments: false)
     end
+
+    it { is_expected.not_to be_allowed(:read_cluster_environments) }
   end
 end
