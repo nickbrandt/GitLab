@@ -1,3 +1,7 @@
+---
+disqus_identifier: 'https://docs.gitlab.com/ee/workflow/lfs/manage_large_binaries_with_git_lfs.html'
+---
+
 # Git LFS
 
 Managing large files such as audio, video and graphics files has always been one

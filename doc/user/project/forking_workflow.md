@@ -1,3 +1,7 @@
+---
+disqus_identifier: 'https://docs.gitlab.com/ee/workflow/forking_workflow.html'
+---
+
 # Project forking workflow
 
 Forking a project to your own namespace is useful if you have no write

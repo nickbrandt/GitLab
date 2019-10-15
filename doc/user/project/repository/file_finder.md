@@ -1,3 +1,7 @@
+---
+disqus_identifier: 'https://docs.gitlab.com/ee/workflow/file_finder.html'
+---
+
 # File finder
 
 > [Introduced][gh-9889] in GitLab 8.4.

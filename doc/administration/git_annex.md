@@ -1,3 +1,7 @@
+---
+disqus_identifier: 'https://docs.gitlab.com/ee/workflow/git_annex.html'
+---
+
 # Git annex
 
 > **Warning:** GitLab has [completely
