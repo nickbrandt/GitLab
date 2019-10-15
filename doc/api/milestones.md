@@ -42,7 +42,11 @@ Example Response:
     "start_date": "2013-11-10",
     "state": "active",
     "updated_at": "2013-10-02T09:24:18Z",
-    "created_at": "2013-10-02T09:24:18Z"
+    "created_at": "2013-10-02T09:24:18Z",
+    "issue_stats": {
+      "open": 12,
+      "closed": 76
+    }
   }
 ]
 ```

@@ -585,6 +585,11 @@ module API
       expose :web_url do |milestone, _options|
         Gitlab::UrlBuilder.build(milestone)
       end
+
+      expose :issue_stats do
+        expose(:open) { |milestone| milestone.issues.opened.count }
+        expose(:closed) { |milestone| milestone.issues.closed.count }
+      end
     end
 
     class IssueBasic < IssuableEntity
