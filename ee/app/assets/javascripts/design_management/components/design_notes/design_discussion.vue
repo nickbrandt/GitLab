@@ -80,6 +80,7 @@ export default {
               __typename: 'NoteEdge',
               node: createNote.note,
             });
+            data.design.notesCount += 1;
             store.writeQuery({ query: getDesignQuery, data });
           },
         })

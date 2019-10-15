@@ -106,7 +106,7 @@ describe('Design overlay component', () => {
       },
     });
 
-    wrapper.vm.$nextTick(() => {
+    return wrapper.vm.$nextTick().then(() => {
       expect(findFirstBadge().attributes().style).toBe('left: 20px; top: 30px;');
     });
   });

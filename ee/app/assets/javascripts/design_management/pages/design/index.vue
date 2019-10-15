@@ -9,6 +9,7 @@ import DesignImage from '../../components/image.vue';
 import DesignOverlay from '../../components/design_overlay.vue';
 import DesignDiscussion from '../../components/design_notes/design_discussion.vue';
 import DesignReplyForm from '../../components/design_notes/design_reply_form.vue';
+import DesignDestroyer from '../../components/design_destroyer.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
 import { extractDiscussions } from '../../utils/design_management_utils';
@@ -18,6 +19,7 @@ export default {
     DesignImage,
     DesignOverlay,
     DesignDiscussion,
+    DesignDestroyer,
     Toolbar,
     DesignReplyForm,
     GlLoadingIcon,
@@ -142,6 +144,7 @@ export default {
               },
             };
             data.design.discussions.edges.push(newDiscussion);
+            data.design.notesCount += 1;
             store.writeQuery({ query: getDesignQuery, data });
           },
         })
@@ -193,12 +196,25 @@ export default {
     <gl-loading-icon v-if="isLoading" size="xl" class="align-self-center" />
     <template v-else>
       <div class="d-flex flex-column w-100">
-        <toolbar
-          :id="id"
-          :name="design.filename"
-          :updated-at="design.updatedAt"
-          :updated-by="design.updatedBy"
-        />
+        <design-destroyer
+          :filenames="[design.filename]"
+          :project-path="projectPath"
+          :iid="issueIid"
+          @done="$router.push({ name: 'designs' })"
+          @error="$router.push({ name: 'designs' })"
+        >
+          <template v-slot="{ mutate, loading, error }">
+            <toolbar
+              :id="id"
+              :is-deleting="loading"
+              :name="design.filename"
+              :updated-at="design.updatedAt"
+              :updated-by="design.updatedBy"
+              :is-latest-version="isLatestVersion"
+              @delete="mutate()"
+            />
+          </template>
+        </design-destroyer>
         <div class="d-flex flex-column w-100 h-100 mh-100 position-relative">
           <design-image
             :image="design.image"

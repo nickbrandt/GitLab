@@ -11,6 +11,12 @@
   right: $gl-padding;
 }
 
+.design-checkbox {
+  position: absolute;
+  top: $gl-padding;
+  left: 30px;
+}
+
 .image-notes {
   overflow-y: scroll;
   padding: 0 $gl-padding;
