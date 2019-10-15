@@ -164,31 +164,36 @@ describe('Deployment Info', () => {
   describe('metrics', () => {
     describe('with showMetrics enabled', () => {
 
-      factory({
-        propsData: {
-          computedDeploymentStatus: SUCCESS,
-          deployment: deploymentMockData,
-          showMetrics: true
-        }
-      });
+      beforeEach(() => {
+        factory({
+          propsData: {
+            computedDeploymentStatus: SUCCESS,
+            deployment: deploymentMockData,
+            showMetrics: true
+          }
+        });
+      })
 
       fit('shows metrics', () => {
-        expect(wrapper.contains(MemoryUsage)).toBe(true);
+        console.log(wrapper.vm.showMemoryUsage);
+        expect(wrapper.find(MemoryUsage).exists()).toBe(true);
       });
     });
 
     describe('with showMetrics disabled', () => {
-      factory({
-        propsData: {
-          computedDeploymentStatus: SUCCESS,
-          deployment: deploymentMockData,
-          showMetrics: false
-        }
-      });
+      beforeEach(() => {
+        factory({
+          propsData: {
+            computedDeploymentStatus: SUCCESS,
+            deployment: deploymentMockData,
+            showMetrics: false
+          }
+        });
+      })
 
       fit('hides metrics', () => {
-        console.log(wrapper.vm.showMetrics);
-        expect(wrapper.contains(MemoryUsage)).toBe(false);
+        console.log(wrapper.vm.showMemoryUsage);
+        expect(wrapper.find(MemoryUsage).exists()).toBe(false);
       });
     });
   })
