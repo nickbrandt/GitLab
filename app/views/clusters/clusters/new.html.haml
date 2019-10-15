@@ -16,7 +16,13 @@
     %ul.nav-links.nav-tabs.gitlab-tabs.nav{ role: 'tablist' }
       %li.nav-item{ role: 'presentation' }
         %a.nav-link{ href: '#create-cluster-pane', id: 'create-cluster-tab', class: active_when(active_tab == 'create'), data: { toggle: 'tab' }, role: 'tab' }
-          %span Create new Cluster on GKE
+          %span
+            - if @gke_selected
+              = create_on_gke_tab_label
+            - elsif @eks_selected
+              = create_on_eks_tab_label
+            - else
+              = create_new_cluster_label
       %li.nav-item{ role: 'presentation' }
         %a.nav-link{ href: '#add-cluster-pane', id: 'add-cluster-tab', class: active_when(active_tab == 'add'), data: { toggle: 'tab' }, role: 'tab' }
           %span Add existing cluster

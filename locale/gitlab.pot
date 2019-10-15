@@ -3528,6 +3528,15 @@ msgstr ""
 msgid "ClusterIntegration|Create cluster on"
 msgstr ""
 
+msgid "ClusterIntegration|Create new Cluster"
+msgstr ""
+
+msgid "ClusterIntegration|Create new Cluster on EKS"
+msgstr ""
+
+msgid "ClusterIntegration|Create new Cluster on GKE"
+msgstr ""
+
 msgid "ClusterIntegration|Did you know?"
 msgstr ""
 
