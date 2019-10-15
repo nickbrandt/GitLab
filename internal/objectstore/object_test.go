@@ -18,10 +18,12 @@ import (
 
 const testTimeout = 10 * time.Second
 
-func testObjectUploadNoErrors(t *testing.T, useDeleteURL bool, contentType string) {
+type osFactory func() (*test.ObjectstoreStub, *httptest.Server)
+
+func testObjectUploadNoErrors(t *testing.T, startObjectStore osFactory, useDeleteURL bool, contentType string) {
 	assert := assert.New(t)
 
-	osStub, ts := test.StartObjectStore()
+	osStub, ts := startObjectStore()
 	defer ts.Close()
 
 	objectURL := ts.URL + test.ObjectPath
@@ -77,9 +79,26 @@ func testObjectUploadNoErrors(t *testing.T, useDeleteURL bool, contentType strin
 }
 
 func TestObjectUpload(t *testing.T) {
-	t.Run("with delete URL", func(t *testing.T) { testObjectUploadNoErrors(t, true, "application/octet-stream") })
-	t.Run("without delete URL", func(t *testing.T) { testObjectUploadNoErrors(t, false, "application/octet-stream") })
-	t.Run("with custom content type", func(t *testing.T) { testObjectUploadNoErrors(t, false, "image/jpeg") })
+	t.Run("with delete URL", func(t *testing.T) {
+		testObjectUploadNoErrors(t, test.StartObjectStore, true, "application/octet-stream")
+	})
+	t.Run("without delete URL", func(t *testing.T) {
+		testObjectUploadNoErrors(t, test.StartObjectStore, false, "application/octet-stream")
+	})
+	t.Run("with custom content type", func(t *testing.T) {
+		testObjectUploadNoErrors(t, test.StartObjectStore, false, "image/jpeg")
+	})
+	t.Run("with upcase ETAG", func(t *testing.T) {
+		factory := func() (*test.ObjectstoreStub, *httptest.Server) {
+			md5s := map[string]string{
+				test.ObjectPath: strings.ToUpper(test.ObjectMD5),
+			}
+
+			return test.StartObjectStoreWithCustomMD5(md5s)
+		}
+
+		testObjectUploadNoErrors(t, factory, false, "application/octet-stream")
+	})
 }
 
 func TestObjectUpload404(t *testing.T) {

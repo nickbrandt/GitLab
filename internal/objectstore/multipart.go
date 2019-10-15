@@ -155,11 +155,8 @@ func (m *Multipart) complete(cmu *CompleteMultipartUpload) error {
 	}
 
 	m.extractETag(result.ETag)
-	if err := m.verifyETag(cmu); err != nil {
-		return fmt.Errorf("ETag verification failure: %v", err)
-	}
 
-	return nil
+	return m.verifyETag(cmu)
 }
 
 func (m *Multipart) verifyETag(cmu *CompleteMultipartUpload) error {
@@ -167,11 +164,8 @@ func (m *Multipart) verifyETag(cmu *CompleteMultipartUpload) error {
 	if err != nil {
 		return err
 	}
-	if expectedChecksum != m.etag {
-		return fmt.Errorf("got %q expected %q", m.etag, expectedChecksum)
-	}
 
-	return nil
+	return compareMD5(expectedChecksum, m.etag)
 }
 
 func (m *Multipart) readAndUploadOnePart(partURL string, putHeaders map[string]string, src io.Reader, partNumber int) (*completeMultipartUploadPart, error) {

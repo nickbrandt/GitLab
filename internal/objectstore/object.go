@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"gitlab.com/gitlab-org/labkit/correlation"
@@ -124,10 +125,7 @@ func newObject(ctx context.Context, putURL, deleteURL string, putHeaders map[str
 		}
 
 		o.extractETag(resp.Header.Get("ETag"))
-		if o.etag != o.md5Sum() {
-			o.uploadError = fmt.Errorf("ETag mismatch. expected %q got %q", o.md5Sum(), o.etag)
-			return
-		}
+		o.uploadError = compareMD5(o.md5Sum(), o.etag)
 	}()
 
 	return o, nil
@@ -135,4 +133,12 @@ func newObject(ctx context.Context, putURL, deleteURL string, putHeaders map[str
 
 func (o *Object) delete() {
 	o.syncAndDelete(o.DeleteURL)
+}
+
+func compareMD5(local, remote string) error {
+	if !strings.EqualFold(local, remote) {
+		return fmt.Errorf("ETag mismatch. expected %q got %q", local, remote)
+	}
+
+	return nil
 }
