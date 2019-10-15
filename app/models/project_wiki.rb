@@ -54,10 +54,7 @@ class ProjectWiki
   end
 
   def http_url_to_repo
-    root_url = Gitlab::CurrentSettings.custom_http_clone_url_root.presence ||
-                 Gitlab.config.gitlab.url
-
-    "#{root_url}/#{full_path}.git"
+    @project.http_url_to_repo.sub(%r{git\z}, 'wiki.git')
   end
 
   def wiki_base_path
