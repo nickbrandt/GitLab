@@ -23,11 +23,11 @@ module Analytics
         raise TopFilesLimitError if file_count > MAX_FILE_COUNT
 
         joins(:analytics_repository_file)
-          .select(files_table[:file_path])
+          .select(files_table[:id], files_table[:file_path])
           .where(project_id: project.id)
           .where(arel_table[:committed_date].gteq(from))
           .where(arel_table[:committed_date].lteq(to))
-          .group(files_table[:file_path])
+          .group(files_table[:id], files_table[:file_path])
           .order(arel_table[:commit_count].sum)
           .limit(file_count)
           .sum(arel_table[:commit_count])

@@ -22,14 +22,18 @@ describe Analytics::CodeAnalyticsFinder do
 
     subject { described_class.new(params).execute }
 
+    def find_file_count(result, file_path)
+      result.find { |r| r.repository_file.file_path.eql?(file_path) }
+    end
+
     context 'with no commits in the given date range' do
       before do
         params[:from] = 5.years.ago
         params[:to] = 4.years.ago
       end
 
-      it 'returns empty hash' do
-        expect(subject).to eq({})
+      it 'returns empty array' do
+        expect(subject).to eq([])
       end
     end
 
@@ -40,11 +44,11 @@ describe Analytics::CodeAnalyticsFinder do
       end
 
       it 'sums up the gemfile commits' do
-        expect(subject[gemfile.file_path]).to eq(3)
+        expect(find_file_count(subject, gemfile.file_path).count).to eq(3)
       end
 
       it 'includes the user model commit' do
-        expect(subject[user_model.file_path]).to eq(5)
+        expect(find_file_count(subject, user_model.file_path).count).to eq(5)
       end
 
       it 'verifies that the out of range record is persisted' do
@@ -53,11 +57,13 @@ describe Analytics::CodeAnalyticsFinder do
       end
 
       it 'does not include items outside of the date range' do
-        expect(subject).not_to have_key(app_controller.file_path)
+        expect(find_file_count(subject, app_controller.file_path)).to be_nil
       end
 
       it 'orders the results by commit count' do
-        expect(subject.keys).to eq([gemfile.file_path, user_model.file_path])
+        result_file_paths = subject.map { |item| item.repository_file.file_path }
+
+        expect(result_file_paths).to eq([gemfile.file_path, user_model.file_path])
       end
 
       context 'when `file_count` is given' do
