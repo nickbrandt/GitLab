@@ -5445,6 +5445,9 @@ msgstr ""
 msgid "DesignManagement|An error occurred while loading designs. Please try again."
 msgstr ""
 
+msgid "DesignManagement|Are you sure you want to delete the selected designs?"
+msgstr ""
+
 msgid "DesignManagement|Could not add a new comment. Please try again"
 msgstr ""
 
@@ -5452,6 +5455,18 @@ msgid "DesignManagement|Could not create new discussion, please try again."
 msgstr ""
 
 msgid "DesignManagement|Could not find design, please try again."
+msgstr ""
+
+msgid "DesignManagement|Delete"
+msgstr ""
+
+msgid "DesignManagement|Delete designs confirmation"
+msgstr ""
+
+msgid "DesignManagement|Delete selected"
+msgstr ""
+
+msgid "DesignManagement|Deselect all"
 msgstr ""
 
 msgid "DesignManagement|Error uploading a new design. Please try again"
@@ -5472,6 +5487,9 @@ msgstr ""
 msgid "DesignManagement|Requested design version does not exist. Showing latest version instead"
 msgstr ""
 
+msgid "DesignManagement|Select all"
+msgstr ""
+
 msgid "DesignManagement|The maximum number of designs allowed to be uploaded is %{upload_limit}. Please try again."
 msgstr ""
 
@@ -5479,6 +5497,9 @@ msgid "DesignManagement|The one place for your designs"
 msgstr ""
 
 msgid "DesignManagement|Upload and view the latest designs for this issue. Consistent and easy to find, so everyone is up to date."
+msgstr ""
+
+msgid "DesignManagement|We could not delete design(s). Please try again."
 msgstr ""
 
 msgid "Designs"

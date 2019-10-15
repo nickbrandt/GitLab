@@ -32,5 +32,16 @@ exports[`Design management toolbar component renders design and updated data 1`]
     class="ml-auto"
     id="1"
   />
+   
+  <deletebutton-stub
+    buttonclass=""
+    buttonvariant="danger"
+    hasselecteddesigns="true"
+  >
+    <icon-stub
+      name="remove"
+      size="18"
+    />
+  </deletebutton-stub>
 </header>
 `;
