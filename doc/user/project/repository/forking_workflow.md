@@ -7,7 +7,7 @@ disqus_identifier: 'https://docs.gitlab.com/ee/workflow/forking_workflow.html'
 Forking a project to your own namespace is useful if you have no write
 access to the project you want to contribute to. If you do have write
 access or can request it, we recommend working together in the same
-repository since it is simpler. See our [GitLab Flow](../../workflow/gitlab_flow.md)
+repository since it is simpler. See our [GitLab Flow](../../../workflow/gitlab_flow.md)
 document more information about using branches to work together.
 
 ## Creating a fork
@@ -34,7 +34,7 @@ Forking a project is in most cases a two-step process.
    ![Path taken error](img/forking_workflow_path_taken_error.png)
 
 After the forking is done, you can start working on the newly created
-repository. There, you will have full [Owner](../permissions.md)
+repository. There, you will have full [Owner](../../permissions.md)
 access, so you can set it up as you please.
 
 ## Merging upstream
@@ -42,7 +42,7 @@ access, so you can set it up as you please.
 Once you are ready to send your code back to the main project, you need
 to create a merge request. Choose your forked project's main branch as
 the source and the original project's main branch as the destination and
-create the [merge request](merge_requests/index.md).
+create the [merge request](../merge_requests/index.md).
 
 ![Selecting branches](img/forking_workflow_branch_select.png)
 
