@@ -8282,6 +8282,9 @@ msgstr ""
 msgid "GroupSettings|New runners registration token has been generated!"
 msgstr ""
 
+msgid "GroupSettings|Pipeline settings was updated for the group"
+msgstr ""
+
 msgid "GroupSettings|Please choose a group path with no special characters."
 msgstr ""
 
