@@ -4,14 +4,15 @@ module Banzai
   module ReferenceParser
     class MentionedUsersByGroupParser < BaseParser
       GROUP_ATTR = 'data-group'
-      self.reference_type = :user
 
-      def references_relation
-        Group
-      end
+      self.reference_type = :user
 
       def self.data_attribute
         @data_attribute ||= GROUP_ATTR
+      end
+
+      def references_relation
+        Group
       end
 
       def nodes_visible_to_user(user, nodes)
