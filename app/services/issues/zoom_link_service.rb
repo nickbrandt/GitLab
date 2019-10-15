@@ -6,30 +6,31 @@ module Issues
       super(issue.project, user)
 
       @issue = issue
+      @added_meeting = fetch_added_meeting
     end
 
     def add_link(link)
       if can_add_link? && (link = parse_link(link))
-        success(_('Zoom meeting added'), append_to_description(link))
+        success(_('Zoom meeting added'), create_zoom_meeting(link))
       else
         error(_('Failed to add a Zoom meeting'))
       end
     end
 
-    def can_add_link?
-      can? && !link_in_issue_description?
-    end
-
     def remove_link
       if can_remove_link?
-        success(_('Zoom meeting removed'), remove_from_description)
+        success(_('Zoom meeting removed'), remove_zoom_meeting)
       else
         error(_('Failed to remove a Zoom meeting'))
       end
     end
 
+    def can_add_link?
+      can? && !@added_meeting
+    end
+
     def can_remove_link?
-      can? && link_in_issue_description?
+      can? && @added_meeting
     end
 
     def parse_link(link)
@@ -40,40 +41,37 @@ module Issues
 
     attr_reader :issue
 
-    def issue_description
-      issue.description || ''
+    def fetch_added_meeting
+      ZoomMeeting.where(issue: @issue).added_to_issue.first
     end
 
-    def success(message, description)
-      ServiceResponse
-        .success(message: message, payload: { description: description })
+    def create_zoom_meeting(link)
+      meeting = ZoomMeeting.create(
+        issue: @issue,
+        project: @issue.project,
+        issue_status: :added,
+        url: link
+      )
+      issue.zoom_meetings
+    end
+
+    def remove_zoom_meeting
+      @added_meeting.issue_status = :removed
+      @added_meeting.save
+      issue.zoom_meetings
+    end
+
+    def success(message, zoom_meetings)
+      ServiceResponse.success(
+        message: message,
+        payload: { zoom_meetings: zoom_meetings }
+      )
     end
 
     def error(message)
       ServiceResponse.error(message: message)
     end
 
-    def append_to_description(link)
-      "#{issue_description}\n\n#{link}"
-    end
-
-    def remove_from_description
-      link = parse_link(issue_description)
-      return issue_description unless link
-
-      issue_description.delete_suffix(link).rstrip
-    end
-
-    def link_in_issue_description?
-      link = extract_link_from_issue_description
-      return unless link
-
-      Gitlab::ZoomLinkExtractor.new(link).match?
-    end
-
-    def extract_link_from_issue_description
-      issue_description[/(\S+)\z/, 1]
-    end
 
     def can?
       current_user.can?(:update_issue, project)

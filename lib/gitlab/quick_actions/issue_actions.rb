@@ -174,16 +174,17 @@ module Gitlab
         params '<Zoom URL>'
         types Issue
         condition do
-          zoom_link_service.can_add_link?
+          @zoom_service = zoom_link_service
+          @zoom_service.can_add_link?
         end
         parse_params do |link|
-          zoom_link_service.parse_link(link)
+          @zoom_service.parse_link(link)
         end
         command :zoom do |link|
-          result = zoom_link_service.add_link(link)
+          result = @zoom_service.add_link(link)
 
           if result.success?
-            @updates[:description] = result.payload[:description]
+            @updates[:zoom_meetings] = result.payload[:zoom_meetings]
           end
 
           @execution_message[:zoom] = result.message
@@ -194,13 +195,14 @@ module Gitlab
         execution_message _('Zoom meeting removed')
         types Issue
         condition do
-          zoom_link_service.can_remove_link?
+          @zoom_service = zoom_link_service
+          @zoom_service.can_remove_link?
         end
         command :remove_zoom do
-          result = zoom_link_service.remove_link
+          result = @zoom_service.remove_link
 
           if result.success?
-            @updates[:description] = result.payload[:description]
+            @updates[:zoom_meetings] = result.payload[:zoom_meetings]
           end
 
           @execution_message[:remove_zoom] = result.message
