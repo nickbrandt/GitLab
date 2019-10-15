@@ -21,7 +21,7 @@ describe('Deployment component', () => {
       deployed_at: '2017-03-22T22:44:42.258Z',
       deployed_at_formatted: 'Mar 22, 2017 10:44pm',
       deployment_manual_actions: [],
-      status: 'manual',
+      status: 'success',
       changes: [
         {
           path: 'index.html',
@@ -51,14 +51,6 @@ describe('Deployment component', () => {
       Vue.nextTick(done);
     });
 
-    describe('deployTimeago', () => {
-      it('return formatted date', () => {
-        const readable = getTimeago().format(deploymentMockData.deployed_at);
-
-        expect(vm.deployTimeago).toEqual(readable);
-      });
-    });
-
     describe('hasExternalUrls', () => {
       it('should return true', () => {
         expect(vm.hasExternalUrls).toEqual(true);
@@ -74,81 +66,6 @@ describe('Deployment component', () => {
         vm.deployment.external_url = null;
 
         expect(vm.hasExternalUrls).toEqual(false);
-      });
-    });
-
-    describe('hasDeploymentTime', () => {
-      it('should return true', () => {
-        expect(vm.hasDeploymentTime).toEqual(true);
-      });
-
-      it('should return false when deployment has no deployed_at', () => {
-        vm.deployment.deployed_at = null;
-
-        expect(vm.hasDeploymentTime).toEqual(false);
-      });
-
-      it('should return false when deployment has no deployed_at_formatted', () => {
-        vm.deployment.deployed_at_formatted = null;
-
-        expect(vm.hasDeploymentTime).toEqual(false);
-      });
-    });
-
-    describe('hasDeploymentMeta', () => {
-      it('should return true', () => {
-        expect(vm.hasDeploymentMeta).toEqual(true);
-      });
-
-      it('should return false when deployment has no url', () => {
-        vm.deployment.url = null;
-
-        expect(vm.hasDeploymentMeta).toEqual(false);
-      });
-
-      it('should return false when deployment has no name', () => {
-        vm.deployment.name = null;
-
-        expect(vm.hasDeploymentMeta).toEqual(false);
-      });
-    });
-
-    describe('stopEnvironment', () => {
-      const url = '/foo/bar';
-      const returnPromise = () =>
-        new Promise(resolve => {
-          resolve({
-            data: {
-              redirect_url: url,
-            },
-          });
-        });
-      const mockStopEnvironment = () => {
-        vm.stopEnvironment(deploymentMockData);
-        return vm;
-      };
-
-      it('should show a confirm dialog and call service.stopEnvironment when confirmed', done => {
-        spyOn(window, 'confirm').and.returnValue(true);
-        spyOn(MRWidgetService, 'stopEnvironment').and.returnValue(returnPromise(true));
-        const visitUrl = spyOnDependency(deploymentComponent, 'visitUrl').and.returnValue(true);
-        vm = mockStopEnvironment();
-
-        expect(window.confirm).toHaveBeenCalled();
-        expect(MRWidgetService.stopEnvironment).toHaveBeenCalledWith(deploymentMockData.stop_url);
-        setTimeout(() => {
-          expect(visitUrl).toHaveBeenCalledWith(url);
-          done();
-        }, 333);
-      });
-
-      it('should show a confirm dialog but should not work if the dialog is rejected', () => {
-        spyOn(window, 'confirm').and.returnValue(false);
-        spyOn(MRWidgetService, 'stopEnvironment').and.returnValue(returnPromise(false));
-        vm = mockStopEnvironment();
-
-        expect(window.confirm).toHaveBeenCalled();
-        expect(MRWidgetService.stopEnvironment).not.toHaveBeenCalled();
       });
     });
 
@@ -170,10 +87,6 @@ describe('Deployment component', () => {
 
     it('renders stop button', () => {
       expect(vm.$el.querySelector('.btn')).not.toBeNull();
-    });
-
-    it('renders deployment time', () => {
-      expect(vm.$el.querySelector('.js-deploy-time').innerText).toContain(vm.deployTimeago);
     });
 
     it('renders metrics component', () => {
@@ -308,7 +221,7 @@ describe('Deployment component', () => {
 
       it('renders information about canceled deployment', () => {
         expect(vm.$el.querySelector('.js-deployment-info').textContent).toContain(
-          'Failed to deploy to',
+          'Canceled deploy to',
         );
       });
     });
