@@ -1,9 +1,9 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { getTimeago } from '~/lib/utils/datetime_utility';
 import DeploymentInfo from '~/vue_merge_request_widget/components/deployment_info.vue';
-import MemoryUsage from '~/vue_merge_request_widget/components/deployment_info.vue';
+import MemoryUsage from '~/vue_merge_request_widget/components/memory_usage.vue';
 
-import { SUCCESS } from '~/vue_merge_request_widget/components/constants';
+import { MANUAL_DEPLOY, WILL_DEPLOY, RUNNING, SUCCESS, FAILED, CANCELED } from '~/vue_merge_request_widget/components/constants';
 
 const deploymentMockData = {
       id: 15,
@@ -174,8 +174,7 @@ describe('Deployment Info', () => {
         });
       })
 
-      fit('shows metrics', () => {
-        console.log(wrapper.vm.showMemoryUsage);
+      it('shows metrics', () => {
         expect(wrapper.find(MemoryUsage).exists()).toBe(true);
       });
     });
@@ -191,13 +190,38 @@ describe('Deployment Info', () => {
         });
       })
 
-      fit('hides metrics', () => {
-        console.log(wrapper.vm.showMemoryUsage);
+      it('hides metrics', () => {
         expect(wrapper.find(MemoryUsage).exists()).toBe(false);
       });
     });
-  })
+  });
 
-  // add status text and button combinations, using maybe some cool iteration protocol
+  fdescribe('status message', () => {
+    describe.each`
+      computedStatus   | message
+      ${MANUAL_DEPLOY} | ${'Can deploy manually to'}
+      ${WILL_DEPLOY}   | ${'Will deploy to'}
+      ${RUNNING}       | ${'Deploying to'}
+      ${SUCCESS}       | ${'Deployed to'}
+      ${FAILED}        | ${'Failed to deploy to'}
+      ${CANCELED}      | ${'Canceled deploy to'}
+    `('$computedStatus', ({computedStatus, message}) => {
+      beforeEach(() => {
+          factory({
+            propsData: {
+              computedDeploymentStatus: computedStatus,
+              deployment: deploymentMockData,
+              showMetrics: false
+            }
+          });
+        });
+
+      it(`renders ${message}`, () => {
+        expect(wrapper.find('.js-deployment-info').text()).toContain(message);
+      });
+    });
+
+  });
+
 
 });
