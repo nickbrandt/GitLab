@@ -1,3 +1,7 @@
+---
+disqus_identifier: 'https://docs.gitlab.com/ee/workflow/issue_weight.html'
+---
+
 # Issue weight **(STARTER)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/76) in [GitLab Starter](https://about.gitlab.com/pricing/) 8.3.

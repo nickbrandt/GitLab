@@ -1,3 +1,7 @@
+---
+disqus_identifier: 'https://docs.gitlab.com/ee/workflow/notifications.html'
+---
+
 # GitLab Notification Emails
 
 GitLab has a notification system in place to notify a user of events that are important for the workflow.

@@ -19,6 +19,8 @@ associated with a released version of your code.
 At the moment, you can create Release entries via the [Releases API](../../../api/releases/index.md);
 we recommend doing this as one of the last steps in your CI/CD release pipeline.
 
+If desired, it is still possible to [add release notes to Git tags](releases.md).
+
 ## Getting started with Releases
 
 Start by giving a [description](#release-description) to the Release and

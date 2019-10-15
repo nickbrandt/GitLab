@@ -1,3 +1,7 @@
+---
+disqus_identifier: 'https://docs.gitlab.com/ee/workflow/gitlab_flow.html'
+---
+
 # Introduction to GitLab Flow
 
 ![GitLab Flow](img/gitlab_flow.png)

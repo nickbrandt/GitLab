@@ -9,7 +9,6 @@ comments: false
 - [Cycle Analytics](../user/project/cycle_analytics.md)
 - [Description templates](../user/project/description_templates.md)
 - [Feature branch workflow](workflow.md)
-- [GitLab Flow](../topics/gitlab_flow.md)
 - [Groups](../user/group/index.md)
 - Issues - The GitLab Issue Tracker is an advanced and complete tool for
   tracking the evolution of a new idea or the process of solving a problem.
@@ -21,8 +20,6 @@ comments: false
 - [File finder](file_finder.md)
 - [File lock](../user/project/file_lock.md) **(PREMIUM)**
 - [Labels](../user/project/labels.md)
-- [Issue weight](../user/project/issues/issue_weight.md) **(STARTER)**
-- [Notification emails](../user/profile/notifications.md)
 - [Projects](../user/project/index.md)
 - [Project forking workflow](forking_workflow.md)
 - [Project users](../user/project/members/index.md)
@@ -32,7 +29,6 @@ comments: false
 - [Sharing projects with groups](../user/project/members/share_project_with_groups.md)
 - [Time tracking](time_tracking.md)
 - [Web Editor](../user/project/repository/web_editor.md)
-- [Releases](../user/project/releases/index.md#add-release-notes-to-git-tags)
 - [Milestones](../user/project/milestones/index.md)
 - [Merge Requests](../user/project/merge_requests/index.md)
   - [Authorization for merge requests](../user/project/merge_requests/authorization_for_merge_requests.md)
@@ -45,7 +41,6 @@ comments: false
   - ["Work In Progress" merge requests](../user/project/merge_requests/work_in_progress_merge_requests.md)
   - [Fast-forward merge requests](../user/project/merge_requests/fast_forward_merge.md)
   - [Merge request approvals](../user/project/merge_requests/merge_request_approvals.md) **(STARTER)**
-- [Repository mirroring](../user/project/repository/repository_mirroring.md) **(STARTER)**
 - [Service Desk](../user/project/service_desk.md) **(PREMIUM)**
 - [Manage large binaries with Git LFS](lfs/manage_large_binaries_with_git_lfs.md)
 - [Importing from SVN, GitHub, Bitbucket, etc](importing/README.md)
