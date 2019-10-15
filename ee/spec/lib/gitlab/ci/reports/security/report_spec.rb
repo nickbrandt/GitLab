@@ -125,8 +125,9 @@ describe Gitlab::Ci::Reports::Security::Report do
 
     let(:commit_sha) { Digest::SHA1.hexdigest(SecureRandom.uuid) }
 
-    %w[unknown Unknown high High critical Critical].each do |severity|
-      context "when the sast report has a #{severity} severity vulnerability" do
+    context "when the sast report has an unsafe vulnerability" do
+      where(severity: %w[unknown Unknown high High critical Critical])
+      with_them do
         let(:occurrence) { build(:ci_reports_security_occurrence, severity: severity) }
 
         before do
@@ -134,12 +135,13 @@ describe Gitlab::Ci::Reports::Security::Report do
         end
 
         it { expect(subject.unsafe_severity?).to be(true) }
-        it { expect(subject.safe?).to be(false) }
+        it { expect(subject).not_to be_safe }
       end
     end
 
-    %w[medium Medium low Low].each do |severity|
-      context "when the sast report has a #{severity} severity vulnerability" do
+    context "when the sast report has a medium to low severity vulnerability" do
+      where(severity: %w[medium Medium low Low])
+      with_them do
         let(:occurrence) { build(:ci_reports_security_occurrence, severity: severity) }
 
         before do
@@ -147,7 +149,7 @@ describe Gitlab::Ci::Reports::Security::Report do
         end
 
         it { expect(subject.unsafe_severity?).to be(false) }
-        it { expect(subject.safe?).to be(true) }
+        it { expect(subject).to be_safe }
       end
     end
 
@@ -159,7 +161,7 @@ describe Gitlab::Ci::Reports::Security::Report do
       end
 
       it { expect(subject.unsafe_severity?).to be(false) }
-      it { expect(subject.safe?).to be(true) }
+      it { expect(subject).to be_safe }
     end
 
     context "when the sast report has a vulnerability with a blank severity" do
@@ -170,12 +172,12 @@ describe Gitlab::Ci::Reports::Security::Report do
       end
 
       it { expect(subject.unsafe_severity?).to be(false) }
-      it { expect(subject.safe?).to be(true) }
+      it { expect(subject).to be_safe }
     end
 
     context "when the sast report has zero vulnerabilities" do
       it { expect(subject.unsafe_severity?).to be(false) }
-      it { expect(subject.safe?).to be(true) }
+      it { expect(subject).to be_safe }
     end
   end
 end

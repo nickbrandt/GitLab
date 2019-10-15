@@ -19,9 +19,7 @@ module Gitlab
           end
 
           def violates_default_policy?
-            reports.values.any? do |report|
-              report.unsafe_severity?
-            end
+            reports.values.any? { |report| !report.safe? }
           end
         end
       end
