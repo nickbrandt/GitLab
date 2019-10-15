@@ -9,12 +9,12 @@ describe Analytics::AnalyticsController do
 
   before do
     sign_in(user)
+    disable_all_analytics_feature_flags
   end
 
   describe 'GET index' do
     describe 'redirects to the first enabled analytics page' do
       it 'redirects to cycle analytics' do
-        disable_all_analytics_feature_flags
         stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
 
         get :index
@@ -23,18 +23,23 @@ describe Analytics::AnalyticsController do
       end
 
       it 'redirects to productivity analytics' do
-        disable_all_analytics_feature_flags
         stub_feature_flags(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => true)
 
         get :index
 
         expect(response).to redirect_to(analytics_productivity_analytics_path)
       end
+
+      it 'redirects to code analytics' do
+        stub_feature_flags(Gitlab::Analytics::CODE_ANALYTICS_FEATURE_FLAG => true)
+
+        get :index
+
+        expect(response).to redirect_to(analytics_code_analytics_path)
+      end
     end
 
     it 'renders 404 all the analytics feature flags are disabled' do
-      disable_all_analytics_feature_flags
-
       get :index
 
       expect(response).to have_gitlab_http_status(404)

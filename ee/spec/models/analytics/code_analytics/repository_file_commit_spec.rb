@@ -22,7 +22,7 @@ describe Analytics::CodeAnalytics::RepositoryFileCommit do
       let!(:file_commit1) { create(:analytics_repository_file_commit, { project: project, analytics_repository_file: file, committed_date: 1.day.ago, commit_count: 2 }) }
       let!(:file_commit2) { create(:analytics_repository_file_commit, { project: project, analytics_repository_file: file, committed_date: 2.days.ago, commit_count: 2 }) }
 
-      it { expect(subject[file.file_path]).to eq(4) }
+      it { expect(subject[[file.id, file.file_path]]).to eq(4) }
     end
 
     context 'when the `file_count` is higher than allowed' do
