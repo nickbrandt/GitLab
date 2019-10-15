@@ -758,6 +758,71 @@ describe('vulnerability dismissal', () => {
         );
       });
     });
+
+    describe('with dismissed vulnerabilities hidden', () => {
+      beforeEach(() => {
+        state = {
+          ...initialState(),
+          filters: {
+            hideDismissed: true,
+          },
+        };
+        mock
+          .onPost(vulnerability.create_vulnerability_feedback_dismissal_path)
+          .replyOnce(200, data);
+      });
+
+      it('should show the dismissal toast message and refresh vulnerabilities', done => {
+        spyOn(Vue.toasted, 'show').and.callThrough();
+
+        const checkToastMessage = () => {
+          const [message, options] = Vue.toasted.show.calls.argsFor(0);
+
+          expect(Vue.toasted.show).toHaveBeenCalledTimes(1);
+          expect(message).toContain('Turn off the hide dismissed toggle to view');
+          expect(options.action.length).toBe(2);
+          done();
+        };
+
+        testAction(
+          actions.dismissVulnerability,
+          { vulnerability, comment },
+          state,
+          [],
+          [
+            { type: 'requestDismissVulnerability' },
+            { type: 'closeDismissalCommentBox' },
+            {
+              type: 'receiveDismissVulnerabilitySuccess',
+              payload: { data, vulnerability },
+            },
+            { type: 'fetchVulnerabilities', payload: { page: 1 } },
+          ],
+          checkToastMessage,
+        );
+      });
+
+      it('should load the previous page if there is no more vulnerabiliy on the current one and page > 1', () => {
+        state.vulnerabilities = [mockDataVulnerabilities[0]];
+        state.pageInfo.page = 3;
+
+        testAction(
+          actions.dismissVulnerability,
+          { vulnerability, comment },
+          state,
+          [],
+          [
+            { type: 'requestDismissVulnerability' },
+            { type: 'closeDismissalCommentBox' },
+            {
+              type: 'receiveDismissVulnerabilitySuccess',
+              payload: { data, vulnerability },
+            },
+            { type: 'fetchVulnerabilities', payload: { page: 2 } },
+          ],
+        );
+      });
+    });
   });
 
   describe('receiveDismissVulnerabilitySuccess', () => {

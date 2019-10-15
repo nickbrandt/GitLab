@@ -32,10 +32,10 @@ export const activeFilters = state => {
     acc[filter.id] = [...Array.from(filter.selection)].filter(id => !isBaseFilterOption(id));
     return acc;
   }, {});
-  // hide_dismissed is hardcoded as it currently is an edge-case, more info in the MR:
+  // hideDismissed is hardcoded as it currently is an edge-case, more info in the MR:
   // https://gitlab.com/gitlab-org/gitlab/merge_requests/15333#note_208301144
   if (gon.features && gon.features.hideDismissedVulnerabilities) {
-    filters.scope = state.hide_dismissed ? 'dismissed' : 'all';
+    filters.scope = state.hideDismissed ? 'dismissed' : 'all';
   }
   return filters;
 };
