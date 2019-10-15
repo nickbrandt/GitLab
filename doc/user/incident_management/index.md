@@ -72,7 +72,7 @@ Documentation [coming soon](https://gitlab.com/gitlab-org/gitlab/issues/30832).
 
 ### Grafana metrics
 
-Learn how to embed [Grafana hosted metric charts](./project/integrations/prometheus.md#embedding-live-grafana-charts).
+Learn how to embed [Grafana hosted metric charts](../project/integrations/prometheus.md#embedding-live-grafana-charts).
 
 ## Slack integration
 
