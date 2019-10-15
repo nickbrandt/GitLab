@@ -95,5 +95,11 @@ FactoryBot.define do
         build.job_artifacts << create(:ee_ci_job_artifact, :corrupted_license_management_report, job: build)
       end
     end
+
+    trait :low_severity_dast_report do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :low_severity_dast_report, job: build)
+      end
+    end
   end
 end
