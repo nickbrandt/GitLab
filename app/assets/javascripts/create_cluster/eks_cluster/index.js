@@ -13,16 +13,21 @@ export default () =>
       CreateEksCluster,
     },
     data() {
-      const { gitlabManagedClusterHelpPath } = document.querySelector(this.$options.el).dataset;
+      const {
+        gitlabManagedClusterHelpPath,
+        kubernetesIntegrationHelpPath,
+      } = document.querySelector(this.$options.el).dataset;
 
       return {
         gitlabManagedClusterHelpPath,
+        kubernetesIntegrationHelpPath,
       };
     },
     render(createElement) {
       return createElement('create-eks-cluster', {
         props: {
           gitlabManagedClusterHelpPath: this.gitlabManagedClusterHelpPath,
+          kubernetesIntegrationHelpPath: this.kubernetesIntegrationHelpPath,
         },
       });
     },

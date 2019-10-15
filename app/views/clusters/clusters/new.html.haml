@@ -2,7 +2,9 @@
 - page_title _('Kubernetes Cluster')
 - create_eks_enabled = Feature.enabled?(:create_eks_clusters)
 - active_tab = local_assigns.fetch(:active_tab, 'create')
-- link_end = '<a/>'.html_safe
+- create_on_gke_tab_label = s_('ClusterIntegration|Create new Cluster on GKE')
+- create_on_eks_tab_label = s_('ClusterIntegration|Create new Cluster on EKS')
+- create_new_cluster_label = s_('ClusterIntegration|Create new Cluster')
 = javascript_include_tag 'https://apis.google.com/js/api.js'
 
 = render_gcp_signup_offer

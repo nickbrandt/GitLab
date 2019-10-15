@@ -3540,6 +3540,9 @@ msgstr ""
 msgid "ClusterIntegration|Enable this setting if using role-based access control (RBAC)."
 msgstr ""
 
+msgid "ClusterIntegration|Enter the details for your Amazon EKS Kubernetes cluster"
+msgstr ""
+
 msgid "ClusterIntegration|Enter the details for your Kubernetes cluster"
 msgstr ""
 
@@ -3801,7 +3804,7 @@ msgstr ""
 msgid "ClusterIntegration|RBAC-enabled cluster"
 msgstr ""
 
-msgid "ClusterIntegration|Read our %{link_to_help_page} on Kubernetes cluster integration."
+msgid "ClusterIntegration|Read our %{link_start}help page%{link_end} on Kubernetes cluster integration."
 msgstr ""
 
 msgid "ClusterIntegration|Region"
@@ -4015,9 +4018,6 @@ msgid "ClusterIntegration|access to Google Kubernetes Engine"
 msgstr ""
 
 msgid "ClusterIntegration|documentation"
-msgstr ""
-
-msgid "ClusterIntegration|help page"
 msgstr ""
 
 msgid "ClusterIntegration|installed via %{installed_via}"

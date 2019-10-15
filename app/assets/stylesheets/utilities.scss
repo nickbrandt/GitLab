@@ -21,3 +21,7 @@
 .border-style-solid { border-style: solid; }
 .border-color-blue-300 { border-color: $blue-300; }
 .border-color-default { border-color: $border-color; }
+
+.gl-w-13 { width: $grid-size * 12; }
+.gl-h-13 { height: $grid-size * 12; }
+
