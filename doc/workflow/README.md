@@ -18,13 +18,13 @@ comments: false
   - [Due date for issues](../user/project/issues/due_dates.md)
 - [Issue Board](../user/project/issue_board.md)
 - [Keyboard shortcuts](shortcuts.md)
-- [File finder](file_finder.md)
+- [File finder](../user/project/repository/file_finder.md)
 - [File lock](../user/project/file_lock.md) **(PREMIUM)**
 - [Labels](../user/project/labels.md)
 - [Issue weight](issue_weight.md) **(STARTER)**
 - [Notification emails](notifications.md)
 - [Projects](../user/project/index.md)
-- [Project forking workflow](forking_workflow.md)
+- [Project forking workflow](../user/project/forking_workflow.md)
 - [Project users](../user/project/members/index.md)
 - [Protected branches](../user/project/protected_branches.md)
 - [Protected tags](../user/project/protected_tags.md)
@@ -47,7 +47,7 @@ comments: false
   - [Merge request approvals](../user/project/merge_requests/merge_request_approvals.md) **(STARTER)**
 - [Repository mirroring](repository_mirroring.md) **(STARTER)**
 - [Service Desk](../user/project/service_desk.md) **(PREMIUM)**
-- [Manage large binaries with Git LFS](lfs/manage_large_binaries_with_git_lfs.md)
+- [Manage large binaries with Git LFS](../administration/lfs/manage_large_binaries_with_git_lfs.md)
 - [Importing from SVN, GitHub, Bitbucket, etc](importing/README.md)
 - [Todos](todos.md)
 - [Snippets](../user/snippets.md)

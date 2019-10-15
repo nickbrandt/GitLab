@@ -55,7 +55,7 @@ To get started with the command line, please read through the
 
 ### Find files
 
-Use GitLab's [file finder](../../../workflow/file_finder.md) to search for files in a repository.
+Use GitLab's [file finder](file_finder.md) to search for files in a repository.
 
 ### Supported markup languages and extensions
 
