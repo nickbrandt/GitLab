@@ -12,7 +12,14 @@
     "updated_at": { "type": "string" },
     "start_date": { "type": ["date", "null"] },
     "due_date": { "type": ["date", "null"] },
-    "web_url": { "type": "string" }
+    "web_url": { "type": "string" },
+    "issue_stats": {
+      "type": "object",
+      "properties": {
+        "open": { "type": "integer" },
+        "closed": { "type": "integer" }
+      }
+    }
   },
   "additionalProperties": false
 }
