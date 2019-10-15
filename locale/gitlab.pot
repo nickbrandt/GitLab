@@ -13088,10 +13088,10 @@ msgstr ""
 msgid "ProtectedBranch|Allowed to push:"
 msgstr ""
 
-msgid "ProtectedBranch|Code owner approval"
+msgid "ProtectedBranch|Branch"
 msgstr ""
 
-msgid "ProtectedBranch|Last commit"
+msgid "ProtectedBranch|Code owner approval"
 msgstr ""
 
 msgid "ProtectedBranch|Protect"
