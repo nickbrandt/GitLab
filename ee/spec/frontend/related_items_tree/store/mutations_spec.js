@@ -364,15 +364,15 @@ describe('RelatedItemsTree', () => {
       });
 
       describe(types.TOGGLE_ADD_ITEM_FORM, () => {
-        it('should set value of `actionType`, `showAddItemForm` as it is and `showCreateEpicForm` as false on state', () => {
+        it('should set value of `issuableType`, `showAddItemForm` as it is and `showCreateEpicForm` as false on state', () => {
           const data = {
-            actionType: 'Epic',
+            issuableType: 'Epic',
             toggleState: true,
           };
 
           mutations[types.TOGGLE_ADD_ITEM_FORM](state, data);
 
-          expect(state.actionType).toBe(data.actionType);
+          expect(state.issuableType).toBe(data.issuableType);
           expect(state.showAddItemForm).toBe(data.toggleState);
           expect(state.showCreateEpicForm).toBe(false);
         });

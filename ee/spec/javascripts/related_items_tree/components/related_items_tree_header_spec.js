@@ -6,7 +6,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import DroplabDropdownButton from '~/vue_shared/components/droplab_dropdown_button.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
-import { ActionType } from 'ee/related_items_tree/constants';
+import { issuableTypesMap } from 'ee/related_issues/constants';
 
 import { mockParentItem, mockQueryResponse } from '../mock_data';
 
@@ -54,18 +54,18 @@ describe('RelatedItemsTree', () => {
 
     describe('methods', () => {
       describe('handleActionClick', () => {
-        const actionType = ActionType.Epic;
+        const issuableType = issuableTypesMap.Epic;
 
         it('calls `toggleAddItemForm` action when provided `id` param as value `0`', () => {
           spyOn(wrapper.vm, 'toggleAddItemForm');
 
           wrapper.vm.handleActionClick({
             id: 0,
-            actionType,
+            issuableType,
           });
 
           expect(wrapper.vm.toggleAddItemForm).toHaveBeenCalledWith({
-            actionType,
+            issuableType,
             toggleState: true,
           });
         });

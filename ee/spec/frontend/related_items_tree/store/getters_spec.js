@@ -3,7 +3,7 @@ import * as getters from 'ee/related_items_tree/store/getters';
 import createDefaultState from 'ee/related_items_tree/store/state';
 
 import { issuableTypesMap } from 'ee/related_issues/constants';
-import { ChildType, ActionType } from 'ee/related_items_tree/constants';
+import { ChildType } from 'ee/related_items_tree/constants';
 
 import {
   mockEpic1,
@@ -110,12 +110,12 @@ describe('RelatedItemsTree', () => {
       });
 
       describe('itemAutoCompleteSources', () => {
-        it('returns autoCompleteSources value when `actionType` is set to `Epic` and `autoCompleteEpics` is true', () => {
+        it('returns autoCompleteSources value when `issuableType` is set to `Epic` and `autoCompleteEpics` is true', () => {
           const mockGetter = {
             autoCompleteSources: 'foo',
             isEpic: true,
           };
-          state.actionType = ActionType.Epic;
+          state.issuableType = issuableTypesMap.Epic;
           state.autoCompleteEpics = true;
 
           expect(getters.itemAutoCompleteSources(state, mockGetter)).toBe('foo');
@@ -127,11 +127,11 @@ describe('RelatedItemsTree', () => {
           );
         });
 
-        it('returns autoCompleteSources value when `actionType` is set to `Issues` and `autoCompleteIssues` is true', () => {
+        it('returns autoCompleteSources value when `issuableType` is set to `Issue` and `autoCompleteIssues` is true', () => {
           const mockGetter = {
             autoCompleteSources: 'foo',
           };
-          state.actionType = ActionType.Issue;
+          state.issuableType = issuableTypesMap.Issue;
           state.autoCompleteIssues = true;
 
           expect(getters.itemAutoCompleteSources(state, mockGetter)).toBe('foo');
@@ -141,17 +141,6 @@ describe('RelatedItemsTree', () => {
           expect(getters.itemAutoCompleteSources(state, mockGetter)).toEqual(
             expect.objectContaining({}),
           );
-        });
-      });
-
-      describe('issuableType', () => {
-        it.each`
-          actionType          | expectedValue
-          ${null}             | ${null}
-          ${ActionType.Epic}  | ${issuableTypesMap.EPIC}
-          ${ActionType.Issue} | ${issuableTypesMap.ISSUE}
-        `('for $actionType returns $expectedValue', ({ actionType, expectedValue }) => {
-          expect(getters.issuableType({ actionType })).toBe(expectedValue);
         });
       });
 
@@ -167,13 +156,16 @@ describe('RelatedItemsTree', () => {
 
       describe('isEpic', () => {
         it.each`
-          actionType          | expectedValue
-          ${null}             | ${false}
-          ${ActionType.Issue} | ${false}
-          ${ActionType.Epic}  | ${true}
-        `('for actionType = $actionType is $expectedValue', ({ actionType, expectedValue }) => {
-          expect(getters.isEpic({ actionType })).toBe(expectedValue);
-        });
+          issuableType              | expectedValue
+          ${null}                   | ${false}
+          ${issuableTypesMap.ISSUE} | ${false}
+          ${issuableTypesMap.EPIC}  | ${true}
+        `(
+          'for issuableType = issuableType is $expectedValue',
+          ({ issuableType, expectedValue }) => {
+            expect(getters.isEpic({ issuableType })).toBe(expectedValue);
+          },
+        );
       });
     });
   });
