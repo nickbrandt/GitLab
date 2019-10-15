@@ -33,6 +33,8 @@ class TodosFinder
   end
 
   def execute
+    return Todo.none if current_user.nil?
+
     items = current_user.todos
     items = by_action_id(items)
     items = by_action(items)
