@@ -329,13 +329,13 @@ describe 'Issue Boards', :js do
         find('.dropdown-menu-close-icon').click
 
         page.within('.value') do
-          expect(page).to have_selector('.badge', count: 3)
+          expect(page).to have_selector('.scoped-label-wrapper', count: 1)
           expect(page).not_to have_content(scoped_label_1.title)
           expect(page).to have_content(scoped_label_2.title)
         end
       end
 
-      expect(card).to have_selector('.badge', count: 3)
+      expect(card).to have_selector('.scoped-label-wrapper', count: 1)
       expect(card).not_to have_content(scoped_label_1.title)
       expect(card).to have_content(scoped_label_2.title)
     end
