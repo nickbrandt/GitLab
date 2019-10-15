@@ -35,9 +35,6 @@ export default {
       }),
     },
   },
-  mounted() {
-    console.log('IS CURRENT', this.isCurrent)
-  },
   computed: {
     deploymentExternalUrl() {
       if (this.deployment.changes && this.deployment.changes.length === 1) {
@@ -64,7 +61,7 @@ export default {
     >
       <template slot="mainAction" slot-scope="slotProps">
         <review-app-link
-          :is-curent="isCurrent"
+          :is-current="isCurrent"
           :link="deploymentExternalUrl"
           :css-class="`deploy-link js-deploy-url inline ${slotProps.className}`"
         />
