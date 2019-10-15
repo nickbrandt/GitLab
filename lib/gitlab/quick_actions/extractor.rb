@@ -109,7 +109,7 @@ module Gitlab
                 [ ]
                 (?<arg>[^\n]*)
               )?
-              (?:\n|$)
+              (?:\s*\n|$)
             )
         }mix
       end
