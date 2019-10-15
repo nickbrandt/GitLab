@@ -20,8 +20,10 @@ export default {
 };
 </script>
 <template>
-  <eks-cluster-configuration-form
-    :gitlab-managed-cluster-help-path="gitlabManagedClusterHelpPath"
-    :kubernetes-integration-help-path="kubernetesIntegrationHelpPath"
-  />
+  <div class="js-create-eks-cluster">
+    <eks-cluster-configuration-form
+      :gitlab-managed-cluster-help-path="gitlabManagedClusterHelpPath"
+      :kubernetes-integration-help-path="kubernetesIntegrationHelpPath"
+    />
+  </div>
 </template>
