@@ -8,11 +8,10 @@ import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import DroplabDropdownButton from '~/vue_shared/components/droplab_dropdown_button.vue';
 
-import { EpicDropdownActions, ActionType } from '../constants';
+import { EpicDropdownActions } from '../constants';
 
 export default {
   EpicDropdownActions,
-  ActionType,
   components: {
     Icon,
     GlButton,
@@ -33,10 +32,10 @@ export default {
   },
   methods: {
     ...mapActions(['toggleAddItemForm', 'toggleCreateEpicForm']),
-    handleActionClick({ id, actionType }) {
+    handleActionClick({ id, issuableType }) {
       if (id === 0) {
         this.toggleAddItemForm({
-          actionType,
+          issuableType,
           toggleState: true,
         });
       } else {
@@ -80,7 +79,7 @@ export default {
           :class="headerItems[1].qaClass"
           class="ml-1 js-add-issues-button"
           size="sm"
-          @click="handleActionClick({ id: 0, actionType: 'issue' })"
+          @click="handleActionClick({ id: 0, issuableType: 'issue' })"
           >{{ __('Add an issue') }}</gl-button
         >
       </template>

@@ -120,10 +120,11 @@ export default {
     state.childrenFlags[item.reference].itemRemoveInProgress = false;
   },
 
-  [types.TOGGLE_ADD_ITEM_FORM](state, { actionType, toggleState }) {
-    if (actionType) {
-      state.actionType = actionType;
+  [types.TOGGLE_ADD_ITEM_FORM](state, { issuableType, toggleState }) {
+    if (issuableType) {
+      state.issuableType = issuableType;
     }
+
     state.showAddItemForm = toggleState;
     state.showCreateEpicForm = false;
   },
