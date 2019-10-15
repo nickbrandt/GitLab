@@ -109,7 +109,7 @@ from which you can select **Create new label**.
 
 #### 9. Weight **(STARTER)**
 
-[Assign a weight](../../../workflow/issue_weight.md) to an issue.
+[Assign a weight](issue_weight.md) to an issue.
 Larger values are used to indicate more effort is required to complete the issue. Only
 positive values or zero are allowed.
 

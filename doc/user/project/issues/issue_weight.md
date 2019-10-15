@@ -18,4 +18,4 @@ in the issues page next to a distinctive balance scale icon.
 
 As an added bonus, you can see the total sum of all issues on the milestone page.
 
-![issue page](/img/issue_weight.png)
+![issue page](img/issue_weight.png)

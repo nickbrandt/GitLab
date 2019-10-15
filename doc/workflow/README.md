@@ -32,7 +32,7 @@ comments: false
 - [Sharing projects with groups](../user/project/members/share_project_with_groups.md)
 - [Time tracking](time_tracking.md)
 - [Web Editor](../user/project/repository/web_editor.md)
-- [Releases](../user/project/releases/releases.md)
+- [Releases](../user/project/releases/index.md#add-release-notes-to-git-tags)
 - [Milestones](../user/project/milestones/index.md)
 - [Merge Requests](../user/project/merge_requests/index.md)
   - [Authorization for merge requests](../user/project/merge_requests/authorization_for_merge_requests.md)
