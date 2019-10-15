@@ -37,7 +37,7 @@ export default {
         <gl-toggle-vuex
           class="d-block mt-1 js-toggle"
           store-module="filters"
-          state-property="hide_dismissed"
+          state-property="hideDismissed"
           set-action="setToggleValue"
         />
       </div>

@@ -154,7 +154,7 @@ export const dismissVulnerability = (
 ) => {
   const page = state.pageInfo && state.pageInfo.page ? state.pageInfo.page : 1;
   const dismissedVulnerabilitiesHidden = Boolean(
-    rootState.filters && rootState.filters.hide_dismissed,
+    rootState.filters && rootState.filters.hideDismissed,
   );
   dispatch('requestDismissVulnerability');
 
