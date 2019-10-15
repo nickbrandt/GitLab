@@ -1,0 +1,6 @@
+---
+title: Adds Generic alerts integration that accepts alerts from any source via a generic
+  webhook receiver.
+merge_request:
+author:
+type: added
