@@ -55,7 +55,6 @@ To select your issue template for use within Incident Management:
 1. Visit your project's **Settings > Operations > Incidents**.
 1. Select the template from the **Issue Template** dropdown.
 
-
 ## Embedded metrics
 
 Metrics can be embedded anywhere where GitLab Markdown is used, for example, descriptions and comments on issues and merge requests.
