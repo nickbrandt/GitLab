@@ -132,7 +132,7 @@ allow_next_instance_of(Project) do |project|
 end
 ```
 
-If we also want to initialized the instance with some particular arguments, we
+If we also want to initialize the instance with some particular arguments, we
 could also pass it like:
 
 ```ruby
