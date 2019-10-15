@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Evidence < ApplicationRecord
-  belongs_to :release, optional: false
+  belongs_to :release
 
   before_validation :generate_summary
 

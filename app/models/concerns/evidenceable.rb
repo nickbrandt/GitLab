@@ -8,12 +8,12 @@ module Evidenceable
 
     # Overridden in Release, Milestone and Issue
     def latest_evidences
-      raise "Please implement 'latest_evidences' in the targeted class."
+      raise NotImplementedError, "Please implement 'latest_evidences' in the targeted class."
     end
 
     # Overridden in Release, Milestone and Issue
     def impacted_releases
-      raise "Please implement 'impacted_releases' in the targeted class."
+      raise NotImplementedError, "Please implement 'impacted_releases' in the targeted class."
     end
 
     def evidence_summary_keys

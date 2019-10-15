@@ -9,7 +9,7 @@ describe Evidence do
   let(:summary_json) { described_class.last.summary.to_json }
 
   describe 'associations' do
-    it { is_expected.to belong_to(:release).required }
+    it { is_expected.to belong_to(:release) }
   end
 
   describe '#sha' do
