@@ -161,32 +161,22 @@ describe SystemNoteService do
   end
 
   describe '.approve_mr' do
-    let(:noteable) { create(:merge_request, source_project: project) }
-    subject { described_class.approve_mr(noteable, author) }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'approved' }
-    end
-
-    context 'when merge request approved' do
-      it 'sets the note text' do
-        expect(subject.note).to eq "approved this merge request"
+    it 'calls MergeRequestsService' do
+      expect_next_instance_of(::SystemNotes::MergeRequestsService) do |service|
+        expect(service).to receive(:approve_mr)
       end
+
+      described_class.approve_mr(noteable, author)
     end
   end
 
   describe '.unapprove_mr' do
-    let(:noteable) { create(:merge_request, source_project: project) }
-    subject { described_class.unapprove_mr(noteable, author) }
-
-    it_behaves_like 'a system note', exclude_project: true do
-      let(:action) { 'unapproved' }
-    end
-
-    context 'when merge request approved' do
-      it 'sets the note text' do
-        expect(subject.note).to eq "unapproved this merge request"
+    it 'calls MergeRequestsService' do
+      expect_next_instance_of(::SystemNotes::MergeRequestsService) do |service|
+        expect(service).to receive(:unapprove_mr)
       end
+
+      described_class.unapprove_mr(noteable, author)
     end
   end
 
