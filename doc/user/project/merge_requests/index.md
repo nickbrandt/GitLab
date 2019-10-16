@@ -28,8 +28,8 @@ With GitLab merge requests, you can:
 - Assign a [milestone](../../project/milestones/index.md) and track the development of a broader implementation
 - Organize your issues and merge requests consistently throughout the project with [labels](../../project/labels.md)
 - Add a time estimation and the time spent with that merge request with [Time Tracking](../time_tracking.md#time-tracking)
-- [Resolve merge conflicts from the UI](#resolve-conflicts)
-- Enable [fast-forward merge requests](#fast-forward-merge-requests)
+- [Resolve merge conflicts from the UI](resolve_conflicts.md)
+- Enable [fast-forward merge requests](fast_forward_merge.md)
 - Enable [semi-linear history merge requests](#semi-linear-history-merge-requests) as another security layer to guarantee the pipeline is passing in the target branch
 - [Create new merge requests by email](#create-new-merge-requests-by-email)
 - [Allow collaboration](allow_collaboration.md) so members of the target project can push directly to the fork
@@ -46,15 +46,15 @@ With **[GitLab Enterprise Edition](https://about.gitlab.com/pricing/)**, you can
 - Analyze your running web applications for vulnerabilities with [Dynamic Application Security Testing](../../application_security/dast/index.md) **(ULTIMATE)**
 - Analyze your dependencies for vulnerabilities with [Dependency Scanning](../../application_security/dependency_scanning/index.md) **(ULTIMATE)**
 - Analyze your Docker images for vulnerabilities with [Container Scanning](../../application_security/container_scanning/index.md) **(ULTIMATE)**
-- Determine the performance impact of changes with [Browser Performance Testing](#browser-performance-testing-premium) **(PREMIUM)**
-- Specify merge order dependencies with [Merge Request Dependencies](#merge-request-dependencies-premium) **(PREMIUM)**
+- Determine the performance impact of changes with [Browser Performance Testing](browser_performance_testing.md) **(PREMIUM)**
+- Specify merge order dependencies with [Merge Request Dependencies](merge_request_dependencies.md) **(PREMIUM)**
 
 ### Working with merge requests
 
 With GitLab merge requests, you can:
 
-| Feature                                                                                                             | Version                                                                 | Tier     | Description                                                                                                                                                                                               |
-|---------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Feature                                                                                                             | Version                                                                 | Tier     | Description |
+|---------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|----------|-------------|
 | [View project merge requests](#view-project-merge-requests)                                                         |                                                                         |          |                                                                                                                                                                                                           |
 | [View group merge requests](#view-group-merge-requests)                                                             |                                                                         |          |                                                                                                                                                                                                           |
 | [Deleting the source branch](#deleting-the-source-branch)                                                           |                                                                         |          | Select the "Delete source branch when merge request accepted" option and the source branch will be deleted when the merge request is merged.                                                              |
@@ -105,8 +105,8 @@ A. Consider you are a software developer working in a team:
 1. You work on the implementation optimizing code with [Code Quality reports](code_quality.md) **(STARTER)**
 1. You verify your changes with [JUnit test reports](../../../ci/junit_test_reports.md) in GitLab CI/CD
 1. You avoid using dependencies whose license is not compatible with your project with [License Compliance reports](../../application_security/license_compliance/index.md) **(ULTIMATE)**
-1. You request the [approval](#merge-request-approvals-starter) from your manager
-1. Your manager pushes a commit with their final review, [approves the merge request](merge_request_approvals.md), and set it to [merge when pipeline succeeds](#merge-when-pipeline-succeeds) (Merge Request Approvals are available in GitLab Starter)
+1. You request the [approval](merge_request_approvals.md) from your manager
+1. Your manager pushes a commit with their final review, [approves the merge request](merge_request_approvals.md), and set it to [merge when pipeline succeeds](merge_when_pipeline_succeeds.md) (Merge Request Approvals are available in GitLab Starter)
 1. Your changes get deployed to production with [manual actions](../../../ci/yaml/README.md#whenmanual) for GitLab CI/CD
 1. Your implementations were successfully shipped to your customer
 
@@ -118,7 +118,7 @@ B. Consider you're a web developer writing a webpage for your company's website:
 1. You request your web designers for their implementation
 1. You request the [approval](merge_request_approvals.md) from your manager **(STARTER)**
 1. Once approved, your merge request is [squashed and merged](squash_and_merge.md), and [deployed to staging with GitLab Pages](https://about.gitlab.com/blog/2016/08/26/ci-deployment-and-environments/)
-1. Your production team [cherry picks](#cherry-pick-changes) the merge commit into production
+1. Your production team [cherry picks](cherry_pick_changes.md) the merge commit into production
 
 ## View project merge requests
 
