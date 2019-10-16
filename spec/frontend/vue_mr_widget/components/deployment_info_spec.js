@@ -2,7 +2,6 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { getTimeago } from '~/lib/utils/datetime_utility';
 import DeploymentInfo from '~/vue_merge_request_widget/components/deployment_info.vue';
 import MemoryUsage from '~/vue_merge_request_widget/components/memory_usage.vue';
-
 import { MANUAL_DEPLOY, WILL_DEPLOY, RUNNING, SUCCESS, FAILED, CANCELED } from '~/vue_merge_request_widget/components/constants';
 
 const deploymentMockData = {
@@ -33,8 +32,6 @@ const deploymentMockData = {
         },
       ],
     };
-
-
 
 describe('Deployment Info', () => {
 
@@ -90,7 +87,7 @@ describe('Deployment Info', () => {
       });
     });
 
-    describe('when deployment does has no deployed_at', () => {
+    describe('when deployment has no deployed_at', () => {
       it('should return false', () => {
 
         factory({
@@ -106,8 +103,7 @@ describe('Deployment Info', () => {
       });
     });
 
-
-    describe('when deployment does has no deployed_at_formatted', () => {
+    describe('when deployment has no deployed_at_formatted', () => {
       it('should return false', () => {
 
         factory({
@@ -196,7 +192,7 @@ describe('Deployment Info', () => {
     });
   });
 
-  fdescribe('status message', () => {
+  describe('status message', () => {
     describe.each`
       computedStatus   | message
       ${MANUAL_DEPLOY} | ${'Can deploy manually to'}
@@ -220,7 +216,6 @@ describe('Deployment Info', () => {
         expect(wrapper.find('.js-deployment-info').text()).toContain(message);
       });
     });
-
   });
 
 

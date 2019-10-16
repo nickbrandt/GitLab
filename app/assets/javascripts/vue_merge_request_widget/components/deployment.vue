@@ -5,7 +5,7 @@ import DeploymentViewButton from './deployment_view_button.vue';
 import DeploymentManualButton from './deployment_manual_button.vue';
 import DeploymentRedeployButton from './deployment_redeploy_button.vue';
 import DeploymentStopButton from './deployment_stop_button.vue';
-import { MANUAL_DEPLOY, WILL_DEPLOY, CREATED, RUNNING, SUCCESS } from './constants';
+import { MANUAL_DEPLOY, WILL_DEPLOY, CREATED, RUNNING, SUCCESS, FAILED } from './constants';
 
 export default {
   // name: 'Deployment' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
@@ -47,9 +47,12 @@ export default {
     },
   },
   computed: {
+    canBeManuallyDeployed() {
+      return this.isManual && this.computedDeploymentStatus === MANUAL_DEPLOY;
+    },
     computedDeploymentStatus() {
       if (this.deployment.status === CREATED) {
-        return this.deployment.isManual ? MANUAL_DEPLOY : WILL_DEPLOY;
+        return this.isManual ? MANUAL_DEPLOY : WILL_DEPLOY;
       }
       return this.deployment.status;
     },
@@ -69,8 +72,8 @@ export default {
       return this.deployment.status === RUNNING;
     },
     isRedeployable() {
-      return this.isManual;
-      // return this.isManual && this.deployment.status === 'failed';
+      // return this.isManual;
+      return this.isManual && this.deployment.status === FAILED;
     },
     playPath() {
       return this.isManual ? this.deployment.deployment_manual_actions[0].play_path : '' ;
@@ -98,7 +101,7 @@ export default {
           <div>
             <!-- if manual deploy, show deploy -->
             <deployment-manual-button
-              v-if="isManual"
+              v-if="canBeManuallyDeployed"
               :is-deploy-in-progress="isDeployInProgress"
               :play-path="playPath"
             />
