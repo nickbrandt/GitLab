@@ -3066,6 +3066,9 @@ msgstr ""
 msgid "Choose a type..."
 msgstr ""
 
+msgid "Choose an existing tag, or create a new one"
+msgstr ""
+
 msgid "Choose any color."
 msgstr ""
 
@@ -5785,6 +5788,9 @@ msgid "Edit Password"
 msgstr ""
 
 msgid "Edit Pipeline Schedule %{id}"
+msgstr ""
+
+msgid "Edit Release"
 msgstr ""
 
 msgid "Edit Snippet"
@@ -13480,10 +13486,25 @@ msgstr ""
 msgid "Release"
 msgstr ""
 
+msgid "Release notes"
+msgstr ""
+
+msgid "Release title"
+msgstr ""
+
 msgid "Releases"
 msgstr ""
 
+msgid "Releases are based on Git tags. We recommend naming tags that fit within semantic versioning, for example %{codeStart}v1.0%{codeEnd}, %{codeStart}v2.0-pre%{codeEnd}."
+msgstr ""
+
 msgid "Releases mark specific points in a project's development history, communicate information about the type of change, and deliver on prepared, often compiled, versions of the software to be reused elsewhere. Currently, releases can only be created through the API."
+msgstr ""
+
+msgid "Release|Something went wrong while getting the release details"
+msgstr ""
+
+msgid "Release|Something went wrong while saving the release details"
 msgstr ""
 
 msgid "Remember me"
@@ -15965,6 +15986,9 @@ msgid "Tag"
 msgstr ""
 
 msgid "Tag list:"
+msgstr ""
+
+msgid "Tag name"
 msgstr ""
 
 msgid "Tag this commit."
@@ -18705,6 +18729,9 @@ msgid "Write access allowed"
 msgstr ""
 
 msgid "Write milestone description..."
+msgstr ""
+
+msgid "Write your release notes or drag your files here…"
 msgstr ""
 
 msgid "Wrong extern UID provided. Make sure Auth0 is configured correctly."
