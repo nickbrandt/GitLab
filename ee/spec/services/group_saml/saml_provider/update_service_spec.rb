@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe GroupSaml::SamlProvider::UpdateService do
   subject(:service) { described_class.new(nil, saml_provider, params: params) }
+
   let(:params) do
     {
       sso_url: 'https://test',

@@ -309,6 +309,7 @@ describe ApprovalMergeRequestRule do
 
     context "when the rule is a `#{ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT}` rule" do
       subject { create(:report_approver_rule, :requires_approval, :license_management, merge_request: open_merge_request) }
+
       let(:open_merge_request) { create(:merge_request, :opened, target_project: project, source_project: project) }
       let!(:project_approval_rule) { create(:approval_project_rule, :requires_approval, :license_management, project: project) }
       let(:project) { create(:project) }

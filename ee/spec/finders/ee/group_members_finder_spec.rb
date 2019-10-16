@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe GroupMembersFinder do
   subject(:finder) { described_class.new(group) }
+
   let(:group) { create :group }
 
   let(:non_owner_access_level) { Gitlab::Access.options.values.sample }

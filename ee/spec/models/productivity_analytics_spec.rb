@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe ProductivityAnalytics do
   subject(:analytics) { described_class.new(merge_requests: MergeRequest.all, sort: custom_sort) }
+
   let(:custom_sort) { nil }
 
   let(:long_mr) do

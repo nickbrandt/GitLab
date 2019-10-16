@@ -7,6 +7,7 @@ describe Geo::ProjectHousekeepingService do
   include ::EE::GeoHelpers
 
   subject(:service) { described_class.new(project) }
+
   set(:project) { create(:project, :repository) }
   let(:registry) { service.registry }
 

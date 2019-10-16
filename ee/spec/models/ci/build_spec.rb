@@ -334,6 +334,7 @@ describe Ci::Build do
 
   describe '#retryable?' do
     subject { build.retryable? }
+
     let(:pipeline) { merge_request.all_pipelines.last }
     let!(:build) { create(:ci_build, :canceled, pipeline: pipeline) }
 

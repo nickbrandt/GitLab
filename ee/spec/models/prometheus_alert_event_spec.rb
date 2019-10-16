@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe PrometheusAlertEvent do
   subject { build(:prometheus_alert_event) }
+
   let(:alert) { subject.prometheus_alert }
 
   describe 'associations' do

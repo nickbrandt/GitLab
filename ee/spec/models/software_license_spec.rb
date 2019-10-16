@@ -13,6 +13,7 @@ describe SoftwareLicense do
 
   describe '.create_policy_for!' do
     subject { described_class }
+
     let(:project) { create(:project) }
 
     context 'when a software license with a given name has already been created' do

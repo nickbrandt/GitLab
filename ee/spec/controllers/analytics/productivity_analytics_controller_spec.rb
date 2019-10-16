@@ -66,6 +66,7 @@ describe Analytics::ProductivityAnalyticsController do
 
   describe 'GET show.json' do
     subject { get :show, format: :json, params: params }
+
     let(:params) { {} }
 
     let(:analytics_mock) { instance_double('ProductivityAnalytics') }
