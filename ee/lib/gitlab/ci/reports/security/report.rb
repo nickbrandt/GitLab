@@ -59,7 +59,7 @@ module Gitlab
 
           def safe?
             severities = occurrences.map(&:severity).compact.map(&:downcase)
-            (severities & UNSAFE_SEVERITIES).size.zero?
+            (severities & UNSAFE_SEVERITIES).empty?
           end
         end
       end

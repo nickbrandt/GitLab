@@ -39,7 +39,6 @@ describe Gitlab::Ci::Reports::Security::Reports do
   describe "#violates_default_policy?" do
     subject { described_class.new(commit_sha) }
 
-    let(:commit_sha) { Digest::SHA1.hexdigest(SecureRandom.uuid) }
     let(:low_severity) { build(:ci_reports_security_occurrence, severity: 'low') }
     let(:high_severity) { build(:ci_reports_security_occurrence, severity: 'high') }
 

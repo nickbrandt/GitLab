@@ -6,7 +6,7 @@ describe Gitlab::Ci::Parsers::Security::Sast do
   describe '#parse!' do
     subject(:parser) { described_class.new }
 
-    let(:commit_sha) { Digest::SHA1.hexdigest(SecureRandom.uuid) }
+    let(:commit_sha) { "d8978e74745e18ce44d88814004d4255ac6a65bb" }
 
     context "when parsing valid reports" do
       where(report_format: %i(sast sast_deprecated))
