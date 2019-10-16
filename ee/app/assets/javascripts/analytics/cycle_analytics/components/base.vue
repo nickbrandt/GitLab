@@ -100,6 +100,8 @@ export default {
       'showCustomStageForm',
       'setDateRange',
       'createCustomStage',
+      'updateStage',
+      'deleteStage',
     ]),
     onGroupSelect(group) {
       this.setCycleAnalyticsDataEndpoint(group.full_path);
@@ -127,6 +129,12 @@ export default {
     },
     onCreateCustomStage(data) {
       this.createCustomStage(data);
+    },
+    onUpdateStage(data) {
+      this.updateStage(data);
+    },
+    onRemoveStage(id) {
+      this.deleteStage(id);
     },
   },
   groupsQueryParams: {
@@ -225,6 +233,8 @@ export default {
             @selectStage="onStageSelect"
             @showAddStageForm="onShowAddStageForm"
             @submit="onCreateCustomStage"
+            @hideStage="onUpdateStage"
+            @removeStage="onRemoveStage"
           />
         </div>
       </div>

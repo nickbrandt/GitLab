@@ -192,3 +192,47 @@ export const createCustomStage = ({ dispatch, state }, data) => {
     .then(response => dispatch('receiveCreateCustomStageSuccess', response))
     .catch(error => dispatch('receiveCreateCustomStageError', { error, data }));
 };
+
+export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
+export const receiveUpdateStageSuccess = ({ commit, dispatch }) => {
+  commit(types.RECEIVE_UPDATE_STAGE_SUCCESS);
+  createFlash(__(`Stage data updated`), 'notice');
+
+  dispatch('fetchGroupStagesAndEvents');
+};
+
+export const receiveUpdateStageError = ({ commit }) => {
+  commit(types.RECEIVE_UPDATE_STAGE_ERROR);
+  createFlash(__('There was a problem saving your custom stage, please try again'));
+};
+
+export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
+  const {
+    selectedGroup: { fullPath },
+  } = state;
+
+  const endpoint = `/-/analytics/cycle_analytics/stages/${id}?group_id=${fullPath}`;
+  dispatch('requestUpdateStage');
+
+  axios
+    .put(endpoint, { ...rest })
+    .then(response => dispatch('receiveUpdateStageSuccess', response))
+    .catch(error => dispatch('receiveUpdateStageError', error));
+};
+
+export const deleteStage = ({ dispatch, state }, stageId) => {
+  const {
+    selectedGroup: { fullPath },
+  } = state;
+  const endpoint = `/-/analytics/cycle_analytics/stages/${stageId}?group_id=${fullPath}`;
+
+  axios
+    .delete(endpoint)
+    .then(() => {
+      createFlash(__(`Stage removed`), 'notice');
+      dispatch('fetchGroupStagesAndEvents');
+    })
+    .catch(() => {
+      createFlash(__('There was an error removing your custom stage, please try again'));
+    });
+};

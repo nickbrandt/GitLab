@@ -126,4 +126,7 @@ export default {
   [types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE](state) {
     state.isSavingCustomStage = false;
   },
+  [types.REQUEST_UPDATE_STAGE](state) {},
+  [types.RECEIVE_UPDATE_STAGE_ERROR](state, error) {},
+  [types.RECEIVE_UPDATE_STAGE_SUCCESS](state) {},
 };
