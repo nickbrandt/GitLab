@@ -1553,6 +1553,14 @@ describe QuickActions::InterpretService do
       expect(text).to eq("test #{described_class::SHRUG}\n/close")
     end
 
+    it 'preserves leading whitespace ' do
+      content = " - list\n\n/close\n\ntest\n\n"
+
+      text, _ = service.execute(content, issue)
+
+      expect(text).to eq(" - list\n\ntest")
+    end
+
     context '/create_merge_request command' do
       let(:branch_name) { '1-feature' }
       let(:content) { "/create_merge_request #{branch_name}" }
