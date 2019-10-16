@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-shared_examples 'forbids access to vulnerability-like endpoint in expected cases' do
+shared_examples 'forbids access to project vulnerabilities endpoint in expected cases' do
   context 'with authorized user without read permissions' do
     before do
       project.add_reporter(user)

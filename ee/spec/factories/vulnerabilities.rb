@@ -17,5 +17,15 @@ FactoryBot.define do
       state { :closed }
       closed_at { Time.now }
     end
+
+    trait :with_findings do
+      after(:build) do |vulnerability|
+        vulnerability.findings = build_list(
+          :vulnerabilities_occurrence,
+          2,
+          vulnerability: vulnerability,
+          project: vulnerability.project)
+      end
+    end
   end
 end

@@ -11,6 +11,7 @@ describe Vulnerabilities::Occurrence do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:primary_identifier).class_name('Vulnerabilities::Identifier') }
     it { is_expected.to belong_to(:scanner).class_name('Vulnerabilities::Scanner') }
+    it { is_expected.to belong_to(:vulnerability).inverse_of(:findings) }
     it { is_expected.to have_many(:pipelines).class_name('Ci::Pipeline') }
     it { is_expected.to have_many(:occurrence_pipelines).class_name('Vulnerabilities::OccurrencePipeline') }
     it { is_expected.to have_many(:identifiers).class_name('Vulnerabilities::Identifier') }

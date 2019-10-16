@@ -18,6 +18,7 @@ module Vulnerabilities
     belongs_to :project
     belongs_to :scanner, class_name: 'Vulnerabilities::Scanner'
     belongs_to :primary_identifier, class_name: 'Vulnerabilities::Identifier', inverse_of: :primary_occurrences
+    belongs_to :vulnerability, inverse_of: :findings
 
     has_many :occurrence_identifiers, class_name: 'Vulnerabilities::OccurrenceIdentifier'
     has_many :identifiers, through: :occurrence_identifiers, class_name: 'Vulnerabilities::Identifier'
