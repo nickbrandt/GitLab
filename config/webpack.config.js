@@ -118,22 +118,6 @@ module.exports = [modern_config, legacy_config]
 function getBaseConfig (type) {
   const isLegacy = type === 'legacy'
 
-  const presets = [
-    [
-      '@babel/preset-env',
-      {
-        modules: false,
-        targets: isLegacy
-        ? {
-          ie: '11'
-        }
-        : {
-          esmodules: true
-        },
-      },
-    ],
-  ];
-
   const base_config = {
     mode: IS_PRODUCTION ? 'production' : 'development',
   
@@ -150,7 +134,7 @@ function getBaseConfig (type) {
     },
   
     resolve: {
-      extensions: isLegacy ? ['.js', '.gql', '.graphql'] : ['*', '.mjs', '.js', '.vue', '.gql', '.graphql'],
+      extensions: ['.js', '.gql', '.graphql'],
       alias,
     },
   
@@ -164,7 +148,6 @@ function getBaseConfig (type) {
           loader: 'babel-loader',
           options: {
             cacheDirectory: path.join(CACHE_PATH, 'babel-loader'),
-            presets
           },
         },
         {
@@ -305,7 +288,7 @@ function getBaseConfig (type) {
       }),
   
       new webpack.NormalModuleReplacementPlugin(/^ee_component\/(.*)\.vue/, function(resource) {
-        if (Object.keys(module.exports.resolve.alias).indexOf('ee') >= 0) {
+        if (IS_EE) {
           resource.request = resource.request.replace(/^ee_component/, 'ee');
         } else {
           resource.request = path.join(
@@ -358,41 +341,6 @@ function getBaseConfig (type) {
           });
         },
       },
-<<<<<<< HEAD
-    },
-
-    // enable HMR only in webpack-dev-server
-    DEV_SERVER_LIVERELOAD && new webpack.HotModuleReplacementPlugin(),
-
-    // optionally generate webpack bundle analysis
-    WEBPACK_REPORT &&
-      new BundleAnalyzerPlugin({
-        analyzerMode: 'static',
-        generateStatsFile: true,
-        openAnalyzer: false,
-        reportFilename: path.join(ROOT_PATH, 'webpack-report/index.html'),
-        statsFilename: path.join(ROOT_PATH, 'webpack-report/stats.json'),
-        statsOptions: {
-          source: false,
-        },
-      }),
-
-    new webpack.DefinePlugin({
-      // This one is used to define window.gon.ee and other things properly in tests:
-      'process.env.IS_EE': JSON.stringify(IS_EE),
-      // This one is used to check against "EE" properly in application code
-      IS_EE: IS_EE ? 'window.gon && window.gon.ee' : JSON.stringify(false),
-    }),
-  ].filter(Boolean),
-
-  devServer: {
-    host: DEV_SERVER_HOST,
-    port: DEV_SERVER_PORT,
-    disableHostCheck: true,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': '*',
-=======
   
       // output the in-memory heap size upon compilation and exit
       WEBPACK_MEMORY_TEST && {
@@ -450,7 +398,6 @@ function getBaseConfig (type) {
       stats: 'errors-only',
       hot: DEV_SERVER_LIVERELOAD,
       inline: DEV_SERVER_LIVERELOAD,
->>>>>>> generate seperate modern/legacy webpack configs
     },
   
     devtool: NO_SOURCEMAPS ? false : devtool,
