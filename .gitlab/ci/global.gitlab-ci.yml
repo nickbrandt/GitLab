@@ -153,4 +153,4 @@
 .only-ee-as-if-foss:
   extends: .only-ee
   variables:
-    IS_GITLAB_EE: '0'
+    FOSS_ONLY: '1'
