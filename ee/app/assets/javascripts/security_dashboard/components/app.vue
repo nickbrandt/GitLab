@@ -6,6 +6,7 @@ import Filters from './filters.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityChart from './vulnerability_chart.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
+import VulnerabilitySeverityList from './vulnerability_severity_list.vue';
 
 export default {
   name: 'SecurityDashboardApp',
@@ -15,6 +16,7 @@ export default {
     SecurityDashboardTable,
     VulnerabilityChart,
     VulnerabilityCountList,
+    VulnerabilitySeverityList,
   },
   props: {
     dashboardDocumentation: {
@@ -141,6 +143,15 @@ export default {
     <header>
       <filters :show-hide-dismissed-toggle="showHideDismissedToggle" />
     </header>
+
+    <vulnerability-severity-list
+      v-if="!isLockedToProject"
+      :help-url="vulnerabilityFeedbackHelpPath"
+      :projects="projects"
+    />
+
+    <filters />
+    <vulnerability-count-list :class="{ 'mb-0': isLockedToProject }" />
 
     <vulnerability-count-list v-if="shouldShowCountList" class="mb-0" />
 
