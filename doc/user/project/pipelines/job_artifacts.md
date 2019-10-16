@@ -65,7 +65,7 @@ The archive browser shows the name and the actual file size of each file in the
 archive. If your artifacts contained directories, then you are also able to
 browse inside them.
 
-Below you can see how browsing looks like. In this case we have browsed inside
+Below you can see what browsing looks like. In this case we have browsed inside
 the archive and at this point there is one directory, a couple files, and
 one HTML file that you can view directly online when
 [GitLab Pages](../../../administration/pages/index.md) is enabled (opens in a new tab).
