@@ -13,6 +13,7 @@ module EE
       include Vulnerable
       include TokenAuthenticatable
       include InsightsFeature
+      include HasTimelogsReport
 
       add_authentication_token_field :saml_discovery_token, unique: false, token_generator: -> { Devise.friendly_token(8) }
 

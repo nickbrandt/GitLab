@@ -49,6 +49,10 @@ module EE
         @subject.saml_provider&.enabled?
       end
 
+      condition(:group_timelogs_available) do
+        @subject.feature_available?(:group_timelogs)
+      end
+
       rule { reporter }.policy do
         enable :admin_list
         enable :admin_board
@@ -56,6 +60,7 @@ module EE
         enable :view_code_analytics
         enable :view_productivity_analytics
         enable :view_type_of_work_charts
+        enable :read_group_timelogs
       end
 
       rule { maintainer }.policy do
@@ -143,6 +148,8 @@ module EE
       rule { owner & group_saml_enabled }.policy do
         enable :read_group_saml_identity
       end
+
+      rule { ~group_timelogs_available }.prevent :read_group_timelogs
     end
 
     override :lookup_access_level!
