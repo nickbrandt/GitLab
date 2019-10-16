@@ -55,14 +55,36 @@ describe Git::ProcessRefChangesService do
         stub_application_setting(push_event_hooks_limit: push_event_hooks_limit)
       end
 
-      it "calls #{push_service_class} with execute_project_hooks set to false" do
-        expect(push_service_class)
-          .to receive(:new)
-          .with(project, project.owner, hash_including(execute_project_hooks: false))
-          .exactly(changes.count).times
-          .and_return(service)
+      context 'git_push_execute_all_project_hooks is disabled' do
+        before do
+          stub_feature_flags(git_push_execute_all_project_hooks: false)
+        end
 
-        subject.execute
+        it "calls #{push_service_class} with execute_project_hooks set to false" do
+          expect(push_service_class)
+            .to receive(:new)
+            .with(project, project.owner, hash_including(execute_project_hooks: false))
+            .exactly(changes.count).times
+            .and_return(service)
+
+          subject.execute
+        end
+      end
+
+      context 'git_push_execute_all_project_hooks is enabled' do
+        before do
+          stub_feature_flags(git_push_execute_all_project_hooks: true)
+        end
+
+        it "calls #{push_service_class} with execute_project_hooks set to true" do
+          expect(push_service_class)
+            .to receive(:new)
+            .with(project, project.owner, hash_including(execute_project_hooks: true))
+            .exactly(changes.count).times
+            .and_return(service)
+
+          subject.execute
+        end
       end
     end
 

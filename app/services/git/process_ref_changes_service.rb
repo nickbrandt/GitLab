@@ -15,10 +15,9 @@ module Git
 
     def process_changes_by_action(ref_type, changes)
       changes_by_action = group_changes_by_action(changes)
-      execute_project_hooks = changes.size <= Gitlab::CurrentSettings.push_event_hooks_limit
 
       changes_by_action.each do |_, changes|
-        process_changes(ref_type, changes, execute_project_hooks: execute_project_hooks) if changes.any?
+        process_changes(ref_type, changes, execute_project_hooks: execute_project_hooks?(changes)) if changes.any?
       end
     end
 
@@ -33,6 +32,10 @@ module Git
       return :removed if Gitlab::Git.blank_ref?(change[:newrev])
 
       :pushed
+    end
+
+    def execute_project_hooks?(changes)
+      (changes.size <= Gitlab::CurrentSettings.push_event_hooks_limit) || Feature.enabled?(:git_push_execute_all_project_hooks, project)
     end
 
     def process_changes(ref_type, changes, execute_project_hooks: true)
