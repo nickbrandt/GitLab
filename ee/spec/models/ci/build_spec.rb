@@ -15,8 +15,6 @@ describe Ci::Build do
 
   let(:job) { create(:ci_build, pipeline: pipeline) }
 
-  it { is_expected.to have_many(:sourced_pipelines) }
-
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
 

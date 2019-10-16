@@ -77,10 +77,6 @@ module EE
       has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'
       has_many :merge_trains, foreign_key: 'target_project_id', inverse_of: :target_project
 
-      has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
-
-      has_many :source_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :project_id
-
       has_many :webide_pipelines, -> { webide_source }, class_name: 'Ci::Pipeline', inverse_of: :project
 
       has_many :prometheus_alerts, inverse_of: :project
