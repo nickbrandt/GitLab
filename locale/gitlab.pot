@@ -5409,6 +5409,27 @@ msgstr ""
 msgid "Deploying to"
 msgstr ""
 
+msgid "Deployment|API"
+msgstr ""
+
+msgid "Deployment|This deployment was created using the API"
+msgstr ""
+
+msgid "Deployment|canceled"
+msgstr ""
+
+msgid "Deployment|created"
+msgstr ""
+
+msgid "Deployment|failed"
+msgstr ""
+
+msgid "Deployment|running"
+msgstr ""
+
+msgid "Deployment|success"
+msgstr ""
+
 msgid "Deprioritize label"
 msgstr ""
 

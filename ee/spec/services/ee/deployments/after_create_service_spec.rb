@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe UpdateDeploymentService do
+describe Deployments::AfterCreateService do
   include ::EE::GeoHelpers
 
   let(:primary) { create(:geo_node, :primary) }
