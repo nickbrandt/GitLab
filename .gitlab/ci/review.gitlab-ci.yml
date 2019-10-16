@@ -81,7 +81,7 @@ schedule:review-build-cng:
   extends:
     - .review-build-cng-base
     - .only-review-schedules
-  needs: ["gitlab:assets:compile"]
+  needs: ["gitlab:assets:compile pull-cache"]
 
 .review-deploy-base:
   extends:
