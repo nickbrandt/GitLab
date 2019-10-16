@@ -150,7 +150,11 @@ describe Clusters::Platforms::Kubernetes do
       end
     end
 
-    shared_examples 'k8s responses' do
+    context 'with reactive cache' do
+      before do
+        synchronous_reactive_cache(service)
+      end
+
       context 'when kubernetes responds with valid logs' do
         before do
           stub_kubeclient_logs(pod_name, namespace, container: container)
@@ -201,34 +205,6 @@ describe Clusters::Platforms::Kubernetes do
 
         it_behaves_like 'resource not found error', 'Pod not found'
       end
-    end
-
-    context 'without pod_logs_reactive_cache feature flag' do
-      before do
-        stub_feature_flags(pod_logs_reactive_cache: false)
-      end
-
-      it_behaves_like 'k8s responses'
-
-      context 'when container name is not specified' do
-        subject { service.read_pod_logs(pod_name, namespace) }
-
-        before do
-          stub_kubeclient_logs(pod_name, namespace, container: nil)
-        end
-
-        include_examples 'successful log request'
-      end
-    end
-
-    context 'with pod_logs_reactive_cache feature flag' do
-      before do
-        stub_feature_flags(pod_logs_reactive_cache: true)
-
-        synchronous_reactive_cache(service)
-      end
-
-      it_behaves_like 'k8s responses'
 
       context 'when container name is not specified' do
         subject { service.read_pod_logs(pod_name, namespace) }
@@ -245,10 +221,6 @@ describe Clusters::Platforms::Kubernetes do
     context 'with caching', :use_clean_rails_memory_store_caching do
       let(:opts) do
         ['get_pod_log', { 'pod_name' => pod_name, 'namespace' => namespace, 'container' => container }]
-      end
-
-      before do
-        stub_feature_flags(pod_logs_reactive_cache: true)
       end
 
       context 'result is cacheable' do
