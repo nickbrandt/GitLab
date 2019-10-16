@@ -5751,6 +5751,9 @@ msgstr ""
 msgid "Dockerfile"
 msgstr ""
 
+msgid "Documentation"
+msgstr ""
+
 msgid "Documentation for popular identity providers"
 msgstr ""
 
