@@ -639,8 +639,7 @@ module EE
     end
 
     def alerts_service_available?
-      ::Feature.enabled?(:generic_alert_endpoint, self) &&
-        feature_available?(:incident_management)
+      feature_available?(:incident_management)
     end
 
     def package_already_taken?(package_name)

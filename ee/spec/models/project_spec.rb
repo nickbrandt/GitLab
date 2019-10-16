@@ -1135,20 +1135,6 @@ describe Project do
         it { is_expected.to include(*disabled_services) }
       end
     end
-
-    context 'when incident_management is available' do
-      before do
-        stub_licensed_features(incident_management: true)
-      end
-
-      context 'when feature flag generic_alert_endpoint is disabled' do
-        before do
-          stub_feature_flags(generic_alert_endpoint: false)
-        end
-
-        it { is_expected.to include('alerts') }
-      end
-    end
   end
 
   describe '#pull_mirror_available?' do
