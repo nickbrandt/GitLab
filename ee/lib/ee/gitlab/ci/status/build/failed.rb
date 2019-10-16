@@ -9,7 +9,7 @@ module EE
             extend ActiveSupport::Concern
 
             prepended do
-              EE_REASONS = const_get(:REASONS).merge(
+              EE_REASONS = const_get(:REASONS, false).merge(
                 protected_environment_failure: 'protected environment failure',
                 invalid_bridge_trigger: 'downstream pipeline trigger definition is invalid',
                 downstream_bridge_project_not_found: 'downstream project could not be found',

@@ -9,7 +9,7 @@ module Elastic
     def initialize(target)
       super(target)
 
-      config = version_namespace.const_get('Config')
+      config = version_namespace.const_get('Config', false)
 
       @index_name = config.index_name
       @document_type = config.document_type
