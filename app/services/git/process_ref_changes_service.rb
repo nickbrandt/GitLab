@@ -38,7 +38,7 @@ module Git
       (changes.size <= Gitlab::CurrentSettings.push_event_hooks_limit) || Feature.enabled?(:git_push_execute_all_project_hooks, project)
     end
 
-    def process_changes(ref_type, changes, execute_project_hooks: true)
+    def process_changes(ref_type, changes, execute_project_hooks:)
       push_service_class = push_service_class_for(ref_type)
 
       changes.each do |change|
