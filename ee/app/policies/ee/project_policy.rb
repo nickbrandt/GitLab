@@ -102,6 +102,11 @@ module EE
         prevent :read_project
       end
 
+      rule { visual_review_bot }.policy do
+        prevent :read_note
+        enable :create_note
+      end
+
       rule { license_block }.policy do
         prevent :create_issue
         prevent :create_merge_request_in
@@ -287,6 +292,7 @@ module EE
       return ::Gitlab::Access::NO_ACCESS if needs_new_sso_session?
       return ::Gitlab::Access::REPORTER if alert_bot?
       return ::Gitlab::Access::GUEST if support_bot? && service_desk_enabled?
+      return ::Gitlab::Access::NO_ACCESS if visual_review_bot?
 
       super
     end
