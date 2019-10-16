@@ -422,6 +422,12 @@ describe API::Epics do
         expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
       end
 
+      it 'exposes subscribed field' do
+        get api(url, epic.author)
+
+        expect(json_response['subscribed']).to eq(true)
+      end
+
       it 'exposes closed_at attribute' do
         epic.close
 
