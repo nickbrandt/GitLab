@@ -81,7 +81,6 @@ export default {
           <div class="mb-3">
             <gl-button
               :disabled="!hasProjectsSelected"
-              new-style
               variant="success"
               @click="addProjectsAndClearSearchResults"
             >

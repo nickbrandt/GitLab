@@ -94,7 +94,6 @@ export default {
       <h2 class="page-title">{{ s__('SecurityDashboard|Security Dashboard') }}</h2>
       <gl-button
         v-if="isInitialized"
-        new-style
         class="page-title-controls js-project-selector-toggle"
         :variant="toggleButtonProps.variant"
         @click="toggleProjectSelector"
@@ -125,7 +124,7 @@ export default {
             >.
           </template>
           <template #actions>
-            <gl-button new-style variant="success" @click="toggleProjectSelector">
+            <gl-button variant="success" @click="toggleProjectSelector">
               {{ s__('SecurityDashboard|Add projects') }}
             </gl-button>
           </template>
