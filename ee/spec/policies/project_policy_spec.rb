@@ -965,6 +965,14 @@ describe ProjectPolicy do
     end
   end
 
+  context 'visual review bot' do
+    let(:current_user) { User.visual_review_bot }
+
+    it { expect_allowed(:create_note) }
+    it { expect_disallowed(:read_note) }
+    it { expect_disallowed(:resolve_note) }
+  end
+
   context 'commit_committer_check is not enabled by the current license' do
     before do
       stub_licensed_features(commit_committer_check: false)
