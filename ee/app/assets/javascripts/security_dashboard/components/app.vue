@@ -81,6 +81,9 @@ export default {
     shouldShowChart() {
       return Boolean(this.vulnerabilitiesHistoryEndpoint);
     },
+    shouldShowSeverityList() {
+      return !this.isLockedToProject;
+    },
     shouldShowCountList() {
       return this.isLockedToProject && Boolean(this.vulnerabilitiesCountEndpoint);
     },
@@ -144,15 +147,6 @@ export default {
       <filters :show-hide-dismissed-toggle="showHideDismissedToggle" />
     </header>
 
-    <vulnerability-severity-list
-      v-if="!isLockedToProject"
-      :help-url="vulnerabilityFeedbackHelpPath"
-      :projects="projects"
-    />
-
-    <filters />
-    <vulnerability-count-list :class="{ 'mb-0': isLockedToProject }" />
-
     <vulnerability-count-list v-if="shouldShowCountList" class="mb-0" />
 
     <div class="row mt-4">
@@ -163,8 +157,13 @@ export default {
         />
       </article>
 
-      <aside v-if="shouldShowChart" class="col-xl-5">
-        <vulnerability-chart />
+      <aside class="col-xl-5">
+        <div v-if="shouldShowChart">
+          <vulnerability-chart />
+        </div>
+        <div v-if="shouldShowSeverityList" class="mt-4">
+          <vulnerability-severity-list :help-url="vulnerabilityFeedbackHelpPath" :projects="[]" />
+        </div>
       </aside>
     </div>
 
