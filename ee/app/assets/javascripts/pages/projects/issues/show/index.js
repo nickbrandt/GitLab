@@ -5,7 +5,9 @@ import UserCallout from '~/user_callout';
 
 document.addEventListener('DOMContentLoaded', () => {
   initShow();
-  initSidebarBundle();
+  if (gon.features && !gon.features.vueIssuableSidebar) {
+    initSidebarBundle();
+  }
   initRelatedIssues();
 
   if (document.getElementById('js-design-management')) {
