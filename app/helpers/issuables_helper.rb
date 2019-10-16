@@ -281,7 +281,7 @@ module IssuablesHelper
     }
 
     data[:hasClosingMergeRequest] = issuable.merge_requests_count(current_user) != 0 if issuable.is_a?(Issue)
-    data[:zoomMeetingUrl] = issuable&.zoom_meetings.added_to_issue.first&.url
+    data[:zoomMeetingUrl] = ZoomMeeting.canonical_meeting_url(issuable)
 
     if parent.is_a?(Group)
       data[:groupPath] = parent.path

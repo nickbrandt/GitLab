@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
 class ZoomNotesService
-  def initialize(issue, project, current_user, old_description: nil)
+  def initialize(issue, project, current_user, old_zoom_meetings: nil)
     @issue = issue
     @project = project
     @current_user = current_user
-    @old_description = old_description
+    @old_zoom_meetings = old_zoom_meetings
   end
 
   def execute
-    return if @issue.description == @old_description
+    return if @issue.zoom_meetings == @zoom_meetings
 
     if zoom_link_added?
       zoom_link_added_notification
-    elsif zoom_link_removed?
+    else
       zoom_link_removed_notification
     end
   end
@@ -21,15 +21,7 @@ class ZoomNotesService
   private
 
   def zoom_link_added?
-    has_zoom_link?(@issue.description) && !has_zoom_link?(@old_description)
-  end
-
-  def zoom_link_removed?
-    !has_zoom_link?(@issue.description) && has_zoom_link?(@old_description)
-  end
-
-  def has_zoom_link?(text)
-    Gitlab::ZoomLinkExtractor.new(text).match?
+    ZoomMeeting.canonical_meeting_url(@issue)
   end
 
   def zoom_link_added_notification

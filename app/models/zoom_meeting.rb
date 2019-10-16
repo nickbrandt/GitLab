@@ -14,4 +14,14 @@ class ZoomMeeting < ApplicationRecord
 
   scope :added_to_issue, -> { where(issue_status: :added) }
   scope :removed_from_issue, -> { where(issue_status: :removed) }
+
+  class << self
+    def canonical_meeting_url(issue)
+      canonical_meeting(issue)&.url
+    end
+
+    def canonical_meeting(issue)
+      issue&.zoom_meetings&.added_to_issue&.first
+    end
+  end
 end
