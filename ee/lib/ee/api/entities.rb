@@ -843,6 +843,23 @@ module EE
           Ability.allowed?(user, :read_project_security_dashboard, project)
         end
       end
+
+      class FeatureFlag < Grape::Entity
+        class Scope < Grape::Entity
+          expose :id
+          expose :active
+          expose :environment_scope
+          expose :strategies
+          expose :created_at
+          expose :updated_at
+        end
+
+        expose :name
+        expose :description
+        expose :created_at
+        expose :updated_at
+        expose :scopes, using: Scope
+      end
     end
   end
 end

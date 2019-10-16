@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module FeatureFlagHelpers
-  def create_flag(project, name, active, description: nil)
+  def create_flag(project, name, active = true, description: nil)
     create(:operations_feature_flag, name: name, active: active,
                                      description: description, project: project)
   end
 
-  def create_scope(feature_flag, environment_scope, active, strategies = [{ name: "default", parameters: {} }])
+  def create_scope(feature_flag, environment_scope, active = true, strategies = [{ name: "default", parameters: {} }])
     create(:operations_feature_flag_scope,
       feature_flag: feature_flag,
       environment_scope: environment_scope,
