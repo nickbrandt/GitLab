@@ -137,7 +137,7 @@ describe Ci::Build do
           expect(security_reports.get_report('sast').occurrences.size).to eq(33)
           expect(security_reports.get_report('dependency_scanning').occurrences.size).to eq(4)
           expect(security_reports.get_report('container_scanning').occurrences.size).to eq(8)
-          expect(security_reports.get_report('dast').occurrences.size).to eq(20)
+          expect(security_reports.get_report('dast').occurrences.size).to eq(2)
         end
       end
 

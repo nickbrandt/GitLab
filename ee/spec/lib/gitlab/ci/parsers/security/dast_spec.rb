@@ -18,8 +18,8 @@ describe Gitlab::Ci::Parsers::Security::Dast do
     end
 
     it 'parses all identifiers and occurrences' do
-      expect(report.occurrences.length).to eq(24)
-      expect(report.identifiers.length).to eq(15)
+      expect(report.occurrences.length).to eq(2)
+      expect(report.identifiers.length).to eq(3)
       expect(report.scanners.length).to eq(1)
     end
 
@@ -28,9 +28,10 @@ describe Gitlab::Ci::Parsers::Security::Dast do
 
       expect(location).to be_a(::Gitlab::Ci::Reports::Security::Locations::Dast)
       expect(location).to have_attributes(
-        hostname: 'http://goat:8080',
+        hostname: 'http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io',
         method_name: 'GET',
-        path: '/WebGoat/login?error'
+        param: 'X-Content-Type-Options',
+        path: ''
       )
     end
 
@@ -39,8 +40,8 @@ describe Gitlab::Ci::Parsers::Security::Dast do
 
       where(:attribute, :value) do
         :report_type | 'dast'
-        :severity | 'info'
-        :confidence | 'low'
+        :severity | 'low'
+        :confidence | 'medium'
       end
 
       with_them do
