@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Ci::Build do
-  set(:group) { create(:group, :access_requestable, plan: :bronze_plan) }
+  set(:group) { create(:group, plan: :bronze_plan) }
   let(:project) { create(:project, :repository, group: group) }
 
   let(:pipeline) do

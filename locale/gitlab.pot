@@ -1413,10 +1413,7 @@ msgstr ""
 msgid "Allow users to register any application to use GitLab as an OAuth provider"
 msgstr ""
 
-msgid "Allow users to request access"
-msgstr ""
-
-msgid "Allow users to request access if visibility is public or internal."
+msgid "Allow users to request access (if visibility is public or internal)"
 msgstr ""
 
 msgid "Allowed email domain restriction only permitted for top-level groups"
