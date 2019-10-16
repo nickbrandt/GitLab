@@ -1,16 +1,11 @@
 - page_title "Billing"
 - current_plan = subscription_plan_info(@plans_data, @group.actual_plan_name)
-- support_link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: EE::CUSTOMER_SUPPORT_URL }
-- support_link_end   = '</a>'.html_safe
 
 - if @top_most_group
   - top_most_group_plan = subscription_plan_info(@plans_data, @top_most_group.actual_plan_name)
   = render 'shared/billings/billing_plan_header', namespace: @group, plan: top_most_group_plan, parent_group: @top_most_group
 - else
-  = render 'shared/billings/billing_plan_header', namespace: @group, plan: current_plan
+  = render 'shared/billings/billing_plans', plans_data: @plans_data, namespace: @group
+
 
   #js-billing-plans{ data: subscription_plan_data_attributes(@group, current_plan) }
-
-- if @group.actual_plan
-  .center
-    = s_('BillingPlans|If you would like to downgrade your plan please contact %{support_link_start}Customer Support%{support_link_end}.').html_safe % { support_link_start: support_link_start, support_link_end: support_link_end }
