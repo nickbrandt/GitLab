@@ -12,7 +12,6 @@ describe Security::MergeReportsService, '#execute' do
   let(:identifier_2_primary) { build(:ci_reports_security_identifier, external_id: 'VULN-2', external_type: 'scanner-2') }
   let(:identifier_2_cve) { build(:ci_reports_security_identifier, external_id: 'CVE-2019-456', external_type: 'cve') }
   let(:identifier_cwe) { build(:ci_reports_security_identifier, external_id: '789', external_type: 'cwe') }
-  let(:identifier_wasc) { build(:ci_reports_security_identifier, external_id: '13', external_type: 'wasc') }
 
   let(:occurrence_id_1) do
     build(:ci_reports_security_occurrence,
@@ -64,23 +63,7 @@ describe Security::MergeReportsService, '#execute' do
          )
   end
 
-  let(:occurrence_wasc_1) do
-    build(:ci_reports_security_occurrence,
-          identifiers: [identifier_wasc],
-          scanner: scanner_1,
-          severity: :medium
-         )
-  end
-
-  let(:occurrence_wasc_2) do
-    build(:ci_reports_security_occurrence,
-          identifiers: [identifier_wasc],
-          scanner: scanner_2,
-          severity: :critical
-         )
-  end
-
-  let(:report_1_occurrences) { [occurrence_id_1, occurrence_id_2_loc_1, occurrence_cwe_2, occurrence_wasc_1] }
+  let(:report_1_occurrences) { [occurrence_id_1, occurrence_id_2_loc_1, occurrence_cwe_2] }
 
   let(:report_1) do
     build(
@@ -91,13 +74,11 @@ describe Security::MergeReportsService, '#execute' do
     )
   end
 
-  let(:report_2_occurrences) { [occurrence_id_2_loc_2, occurrence_wasc_2] }
-
   let(:report_2) do
     build(
       :ci_reports_security_report,
       scanners: [scanner_2],
-      occurrences: report_2_occurrences,
+      occurrences: [occurrence_id_2_loc_2],
       identifiers: occurrence_id_2_loc_2.identifiers
     )
   end
@@ -128,23 +109,14 @@ describe Security::MergeReportsService, '#execute' do
         identifier_1_cve,
         identifier_2_primary,
         identifier_2_cve,
-        identifier_cwe,
-        identifier_wasc
+        identifier_cwe
       )
     )
   end
 
-  it 'deduplicates (except cwe and wasc) and sorts the vulnerabilities by severity (desc) then by compare key' do
+  it 'deduplicates and sorts the vulnerabilities by severity (desc) then by compare key' do
     expect(subject.occurrences).to(
-      eq([
-          occurrence_cwe_2,
-          occurrence_wasc_2,
-          occurrence_cwe_1,
-          occurrence_id_2_loc_2,
-          occurrence_id_2_loc_1,
-          occurrence_wasc_1,
-          occurrence_id_1
-      ])
+      eq([occurrence_cwe_2, occurrence_cwe_1, occurrence_id_2_loc_2, occurrence_id_2_loc_1, occurrence_id_1])
     )
   end
 end
