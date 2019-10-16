@@ -54,7 +54,9 @@ module API
       get ':id/(-/)epics/:epic_iid' do
         authorize_can_read!
 
-        present epic, with: EE::API::Entities::Epic, user: current_user
+        present epic, options, user: current_user,
+                               with: EE::API::Entities::Epic,
+                               include_subscribed: true
       end
 
       desc 'Create a new epic' do

@@ -323,6 +323,15 @@ module EE
           end
         end
 
+        # Calculating the value of subscribed field triggers Markdown
+        # processing. We can't do that for multiple epics
+        # requests in a single API request.
+        expose :subscribed, if: -> (_, options) { options.fetch(:include_subscribed, false) } do |epic, options|
+          user = options[:user]
+
+          user.present? ? epic.subscribed?(user) : false
+        end
+
         def web_url
           ::Gitlab::Routing.url_helpers.group_epic_url(object.group, object)
         end
