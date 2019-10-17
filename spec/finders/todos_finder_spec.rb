@@ -16,6 +16,10 @@ describe TodosFinder do
     end
 
     describe '#execute' do
+      it 'returns no todos if user is nil' do
+        expect(described_class.new(nil, {}).execute).to be_empty
+      end
+
       context 'filtering' do
         let!(:todo1) { create(:todo, user: user, project: project, target: issue) }
         let!(:todo2) { create(:todo, user: user, group: group, target: merge_request) }
