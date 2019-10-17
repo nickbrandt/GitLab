@@ -3,6 +3,7 @@ export default () => ({
   parentItem: {},
   epicsEndpoint: '',
   issuesEndpoint: '',
+  userSignedIn: false,
 
   children: {},
   childrenFlags: {},
