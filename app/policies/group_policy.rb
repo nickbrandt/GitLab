@@ -83,6 +83,7 @@ class GroupPolicy < BasePolicy
     enable :create_projects
     enable :admin_pipeline
     enable :admin_build
+    enable :admin_container_image
     enable :read_cluster
     enable :add_cluster
     enable :create_cluster
