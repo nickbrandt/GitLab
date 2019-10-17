@@ -11,16 +11,18 @@ import IssueActionsSplitButton from 'ee/related_items_tree/components/issue_acti
 
 import { mockInitialConfig, mockParentItem } from '../mock_data';
 
+const localVue = createLocalVue();
+
 const createComponent = () => {
   const store = createDefaultStore();
-  const localVue = createLocalVue();
 
   store.dispatch('setInitialConfig', mockInitialConfig);
   store.dispatch('setInitialParentItem', mockParentItem);
 
-  return shallowMount(RelatedItemsTreeApp, {
+  return shallowMount(localVue.extend(RelatedItemsTreeApp), {
     localVue,
     store,
+    sync: false,
   });
 };
 

@@ -4,11 +4,12 @@ import { GlPopover, GlLink } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import component from 'ee/approvals/components/approval_check_popover.vue';
 
+const localVue = createLocalVue();
+
 describe('Approval Check Popover', () => {
   let wrapper;
 
   beforeEach(() => {
-    const localVue = createLocalVue();
     wrapper = shallowMount(component, {
       localVue,
       propsData: {

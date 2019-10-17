@@ -1,5 +1,7 @@
 import component from 'ee/onboarding/onboarding_helper/components/tour_parts_list.vue';
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+
+const localVue = createLocalVue();
 
 describe('User onboarding tour parts list', () => {
   let wrapper;
@@ -18,7 +20,7 @@ describe('User onboarding tour parts list', () => {
   let tourItems;
 
   function createComponent(propsData) {
-    wrapper = shallowMount(component, { propsData });
+    wrapper = shallowMount(localVue.extend(component), { propsData, localVue, sync: false });
   }
 
   beforeEach(() => {

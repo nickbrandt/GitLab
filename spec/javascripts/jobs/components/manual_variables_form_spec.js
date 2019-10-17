@@ -1,6 +1,8 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 import Form from '~/jobs/components/manual_variables_form.vue';
+
+const localVue = createLocalVue();
 
 describe('Manual Variables Form', () => {
   let wrapper;
@@ -14,8 +16,10 @@ describe('Manual Variables Form', () => {
   };
 
   const factory = (props = {}) => {
-    wrapper = shallowMount(Form, {
+    wrapper = shallowMount(localVue.extend(Form), {
       propsData: props,
+      localVue,
+      sync: false,
     });
   };
 

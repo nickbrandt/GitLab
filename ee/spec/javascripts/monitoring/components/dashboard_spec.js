@@ -14,12 +14,25 @@ import propsData from 'spec/monitoring/components/dashboard_spec';
 import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
 import * as types from '~/monitoring/stores/mutation_types';
 
+const localVue = createLocalVue();
+
 describe('Dashboard', () => {
   let Component;
   let mock;
   let store;
   let vm;
-  const localVue = createLocalVue();
+
+  const createComponent = (props = {}) => {
+    vm = shallowMount(localVue.extend(Component), {
+      propsData: {
+        ...propsData,
+        ...props,
+      },
+      store,
+      sync: false,
+      localVue,
+    });
+  };
 
   beforeEach(() => {
     setFixtures(`
@@ -60,16 +73,12 @@ describe('Dashboard', () => {
   describe('add custom metrics', () => {
     describe('when not available', () => {
       beforeEach(() => {
-        vm = shallowMount(Component, {
-          propsData: {
-            ...propsData,
-            customMetricsAvailable: false,
-            customMetricsPath: '/endpoint',
-            hasMetrics: true,
-            prometheusAlertsAvailable: true,
-            alertsEndpoint: '/endpoint',
-          },
-          store,
+        createComponent({
+          customMetricsAvailable: false,
+          customMetricsPath: '/endpoint',
+          hasMetrics: true,
+          prometheusAlertsAvailable: true,
+          alertsEndpoint: '/endpoint',
         });
       });
 
@@ -83,16 +92,12 @@ describe('Dashboard', () => {
 
     describe('when available', () => {
       beforeEach(() => {
-        vm = shallowMount(Component, {
-          propsData: {
-            ...propsData,
-            customMetricsAvailable: true,
-            customMetricsPath: '/endpoint',
-            hasMetrics: true,
-            prometheusAlertsAvailable: true,
-            alertsEndpoint: '/endpoint',
-          },
-          store,
+        createComponent({
+          customMetricsAvailable: true,
+          customMetricsPath: '/endpoint',
+          hasMetrics: true,
+          prometheusAlertsAvailable: true,
+          alertsEndpoint: '/endpoint',
         });
 
         setupComponentStore(vm);

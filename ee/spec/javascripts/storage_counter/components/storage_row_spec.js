@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import StorageRow from 'ee/storage_counter/components/storage_row.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 
@@ -7,13 +7,16 @@ const data = {
   name: 'LFS Package',
   value: 1293346,
 };
+const localVue = createLocalVue();
 
 function factory({ name, value }) {
-  wrapper = shallowMount(StorageRow, {
+  wrapper = shallowMount(localVue.extend(StorageRow), {
     propsData: {
       name,
       value,
     },
+    localVue,
+    sync: false,
   });
 }
 

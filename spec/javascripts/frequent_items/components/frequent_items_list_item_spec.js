@@ -1,13 +1,12 @@
-import Vue from 'vue';
 import frequentItemsListItemComponent from '~/frequent_items/components/frequent_items_list_item.vue';
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { trimText } from 'spec/helpers/text_helper';
 import { mockProject } from '../mock_data'; // can also use 'mockGroup', but not useful to test here
 
-const createComponent = () => {
-  const Component = Vue.extend(frequentItemsListItemComponent);
+const localVue = createLocalVue();
 
-  return shallowMount(Component, {
+const createComponent = () =>
+  shallowMount(localVue.extend(frequentItemsListItemComponent), {
     propsData: {
       itemId: mockProject.id,
       itemName: mockProject.name,
@@ -15,8 +14,9 @@ const createComponent = () => {
       webUrl: mockProject.webUrl,
       avatarUrl: mockProject.avatarUrl,
     },
+    sync: false,
+    localVue,
   });
-};
 
 describe('FrequentItemsListItemComponent', () => {
   let wrapper;

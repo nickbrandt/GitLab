@@ -5,6 +5,8 @@ import { createStore } from 'ee/batch_comments/stores';
 import '~/behaviors/markdown/render_gfm';
 import { createDraft } from '../mock_data';
 
+const localVue = createLocalVue();
+
 describe('Batch comments draft note component', () => {
   let wrapper;
   let draft;
@@ -14,8 +16,7 @@ describe('Batch comments draft note component', () => {
 
     draft = createDraft();
 
-    const localVue = createLocalVue();
-    wrapper = shallowMount(DraftNote, {
+    wrapper = shallowMount(localVue.extend(DraftNote), {
       store,
       propsData: { draft },
       sync: false,

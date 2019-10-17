@@ -14,14 +14,17 @@ describe('project component', () => {
   const ProjectComponent = localVue.extend(Project);
   let wrapper;
 
-  beforeEach(() => {
+  const createComponent = (props = {}) => {
     wrapper = shallowMount(ProjectComponent, {
       sync: false,
       store,
       localVue,
-      propsData: { project: mockOneProject },
+      propsData: {
+        project: mockOneProject,
+        ...props,
+      },
     });
-  });
+  };
 
   afterEach(() => {
     wrapper.destroy();
@@ -32,16 +35,12 @@ describe('project component', () => {
 
     describe('can upgrade project group', () => {
       beforeEach(() => {
-        project = {
-          ...mockOneProject,
-          upgrade_required: true,
-          upgrade_path: '/upgrade',
-        };
-        wrapper = shallowMount(ProjectComponent, {
-          sync: false,
-          store,
-          localVue,
-          propsData: { project },
+        createComponent({
+          project: {
+            ...mockOneProject,
+            upgrade_required: true,
+            upgrade_path: '/upgrade',
+          },
         });
       });
 
@@ -67,16 +66,12 @@ describe('project component', () => {
 
     describe('cannot upgrade project group', () => {
       beforeEach(() => {
-        project = {
-          ...mockOneProject,
-          upgrade_required: true,
-          upgrade_path: '',
-        };
-        wrapper = shallowMount(ProjectComponent, {
-          sync: false,
-          store,
-          localVue,
-          propsData: { project },
+        createComponent({
+          project: {
+            ...mockOneProject,
+            upgrade_required: true,
+            upgrade_path: '',
+          },
         });
       });
 
@@ -91,6 +86,10 @@ describe('project component', () => {
   });
 
   describe('wrapped components', () => {
+    beforeEach(() => {
+      createComponent();
+    });
+
     describe('project header', () => {
       it('binds project', () => {
         const header = wrapper.find(ProjectHeader);
