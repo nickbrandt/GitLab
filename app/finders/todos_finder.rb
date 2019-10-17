@@ -180,11 +180,9 @@ class TodosFinder
   end
 
   def by_group(items)
-    if group?
-      items.for_group_and_descendants(group)
-    else
-      items
-    end
+    return items unless group?
+
+    items.for_group_ids_and_descendants(params[:group_id])
   end
 
   def by_state(items)
