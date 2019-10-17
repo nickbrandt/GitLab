@@ -102,6 +102,11 @@ module EE
         prevent :read_project
       end
 
+      rule { visual_review_bot }.policy do
+        prevent :read_note
+        enable :create_note
+      end
+
       rule { license_block }.policy do
         prevent :create_issue
         prevent :create_merge_request_in
@@ -146,10 +151,12 @@ module EE
 
       rule { can?(:developer_access) }.policy do
         enable :read_project_security_dashboard
+        enable :dismiss_vulnerability
       end
 
       rule { security_dashboard_feature_disabled }.policy do
         prevent :read_project_security_dashboard
+        prevent :dismiss_vulnerability
       end
 
       rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
@@ -194,6 +201,7 @@ module EE
         enable :read_deployment
         enable :read_pages
         enable :read_project_security_dashboard
+        enable :dismiss_vulnerability
       end
 
       rule { auditor & ~guest }.policy do
@@ -284,6 +292,7 @@ module EE
       return ::Gitlab::Access::NO_ACCESS if needs_new_sso_session?
       return ::Gitlab::Access::REPORTER if alert_bot?
       return ::Gitlab::Access::GUEST if support_bot? && service_desk_enabled?
+      return ::Gitlab::Access::NO_ACCESS if visual_review_bot?
 
       super
     end

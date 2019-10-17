@@ -1,0 +1,5 @@
+---
+title: Restrict number of users input to positive numbers
+merge_request: 18381
+author:
+type: fixed

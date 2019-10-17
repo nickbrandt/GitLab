@@ -30,7 +30,7 @@ describe ProjectPolicy do
       %i[read_issue_link read_software_license_policy]
     end
     let(:additional_reporter_permissions) { [:admin_issue_link] }
-    let(:additional_developer_permissions) { %i[admin_vulnerability_feedback read_project_security_dashboard read_feature_flag] }
+    let(:additional_developer_permissions) { %i[admin_vulnerability_feedback read_project_security_dashboard read_feature_flag dismiss_vulnerability] }
     let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches admin_feature_flags_client] }
     let(:auditor_permissions) do
       %i[
@@ -43,6 +43,7 @@ describe ProjectPolicy do
         create_merge_request_in award_emoji
         read_project_security_dashboard
         read_vulnerability_feedback read_software_license_policy
+        dismiss_vulnerability
       ]
     end
 
@@ -466,16 +467,30 @@ describe ProjectPolicy do
     end
   end
 
+  shared_context 'when security dashboard feature is not available' do
+    before do
+      stub_licensed_features(security_dashboard: false)
+    end
+  end
+
   describe 'read_project_security_dashboard' do
     context 'with developer' do
       let(:current_user) { developer }
 
-      context 'when security dashboard features is not available' do
-        before do
-          stub_licensed_features(security_dashboard: false)
-        end
+      include_context 'when security dashboard feature is not available'
 
-        it { is_expected.to be_disallowed(:read_project_security_dashboard) }
+      it { is_expected.to be_disallowed(:read_project_security_dashboard) }
+    end
+  end
+
+  describe 'vulnerability permissions' do
+    describe 'dismiss_vulnerability' do
+      context 'with developer' do
+        let(:current_user) { developer }
+
+        include_context 'when security dashboard feature is not available'
+
+        it { is_expected.to be_disallowed(:dismiss_vulnerability) }
       end
     end
   end
@@ -963,6 +978,14 @@ describe ProjectPolicy do
         it { expect_allowed(:guest_access, :create_note, :read_issue) }
       end
     end
+  end
+
+  context 'visual review bot' do
+    let(:current_user) { User.visual_review_bot }
+
+    it { expect_allowed(:create_note) }
+    it { expect_disallowed(:read_note) }
+    it { expect_disallowed(:resolve_note) }
   end
 
   context 'commit_committer_check is not enabled by the current license' do

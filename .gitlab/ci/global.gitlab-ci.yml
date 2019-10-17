@@ -71,6 +71,12 @@
       - "doc/**/*"
       - ".markdownlint.json"
 
+.only-graphql-changes:
+  only:
+    changes:
+      - "{,ee/}app/graphql/**/*"
+      - "{,ee/}lib/gitlab/graphql/**/*"
+
 .only-code-qa-changes:
   only:
     changes:
@@ -123,7 +129,7 @@
     - name: redis:alpine
 
 .use-pg10:
-  image: "dev.gitlab.org:5005/gitlab/gitlab-build-images:ruby-2.6.3-golang-1.11-git-2.22-chrome-73.0-node-12.x-yarn-1.16-postgresql-10-graphicsmagick-1.3.33"
+  image: "registry.gitlab.com/gitlab-org/gitlab-build-images:ruby-2.6.3-golang-1.11-git-2.22-chrome-73.0-node-12.x-yarn-1.16-postgresql-10-graphicsmagick-1.3.33"
   services:
     - name: postgres:10.9
       command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
@@ -137,7 +143,7 @@
     - name: docker.elastic.co/elasticsearch/elasticsearch:5.6.12
 
 .use-pg10-ee:
-  image: "dev.gitlab.org:5005/gitlab/gitlab-build-images:ruby-2.6.3-golang-1.11-git-2.22-chrome-73.0-node-12.x-yarn-1.16-postgresql-10-graphicsmagick-1.3.33"
+  image: "registry.gitlab.com/gitlab-org/gitlab-build-images:ruby-2.6.3-golang-1.11-git-2.22-chrome-73.0-node-12.x-yarn-1.16-postgresql-10-graphicsmagick-1.3.33"
   services:
     - name: postgres:10.9
       command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
@@ -153,4 +159,4 @@
 .only-ee-as-if-foss:
   extends: .only-ee
   variables:
-    IS_GITLAB_EE: '0'
+    FOSS_ONLY: '1'

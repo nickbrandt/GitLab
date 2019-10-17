@@ -70,6 +70,37 @@ describe Note do
         is_expected.to be_valid
       end
     end
+
+    describe 'max notes limit' do
+      let_it_be(:noteable) { create(:issue) }
+      let_it_be(:existing_note) { create(:note, project: noteable.project, noteable: noteable) }
+
+      before do
+        stub_const('Noteable::MAX_NOTES_LIMIT', 1)
+      end
+
+      context 'when creating a system note' do
+        subject { build(:system_note, project: noteable.project, noteable: noteable) }
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'when creating a user note' do
+        subject { build(:note, project: noteable.project, noteable: noteable) }
+
+        it { is_expected.not_to be_valid }
+      end
+
+      context 'when updating an existing note on a noteable that already exceeds the limit' do
+        subject { existing_note }
+
+        before do
+          create(:system_note, project: noteable.project, noteable: noteable)
+        end
+
+        it { is_expected.to be_valid }
+      end
+    end
   end
 
   describe "Commit notes" do
@@ -948,6 +979,57 @@ describe Note do
       note = create(:note_on_personal_snippet)
 
       expect(note.parent).to be_nil
+    end
+  end
+
+  describe 'scopes' do
+    let_it_be(:note1) { create(:note, note: 'Test 345') }
+    let_it_be(:note2) { create(:note, note: 'Test 789') }
+
+    describe '#for_note_or_capitalized_note' do
+      it 'returns the expected matching note' do
+        notes = described_class.for_note_or_capitalized_note('Test 345')
+
+        expect(notes.count).to eq(1)
+        expect(notes.first.id).to eq(note1.id)
+      end
+
+      it 'returns the expected capitalized note' do
+        notes = described_class.for_note_or_capitalized_note('test 345')
+
+        expect(notes.count).to eq(1)
+        expect(notes.first.id).to eq(note1.id)
+      end
+
+      it 'does not support pattern matching' do
+        notes = described_class.for_note_or_capitalized_note('test%')
+
+        expect(notes.count).to eq(0)
+      end
+    end
+
+    describe '#like_note_or_capitalized_note' do
+      it 'returns the expected matching note' do
+        notes = described_class.like_note_or_capitalized_note('Test 345')
+
+        expect(notes.count).to eq(1)
+        expect(notes.first.id).to eq(note1.id)
+      end
+
+      it 'returns the expected capitalized note' do
+        notes = described_class.like_note_or_capitalized_note('test 345')
+
+        expect(notes.count).to eq(1)
+        expect(notes.first.id).to eq(note1.id)
+      end
+
+      it 'supports pattern matching' do
+        notes = described_class.like_note_or_capitalized_note('test%')
+
+        expect(notes.count).to eq(2)
+        expect(notes.first.id).to eq(note1.id)
+        expect(notes.second.id).to eq(note2.id)
+      end
     end
   end
 end

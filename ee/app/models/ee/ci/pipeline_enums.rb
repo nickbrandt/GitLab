@@ -19,7 +19,7 @@ module EE
 
         override :sources
         def sources
-          super.merge(pipeline: 7, webide: 9)
+          super.merge(webide: 9)
         end
 
         override :config_sources

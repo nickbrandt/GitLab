@@ -4,7 +4,7 @@ require('spec_helper')
 
 describe Projects::ProjectMembersController do
   let(:user) { create(:user) }
-  let(:project) { create(:project, :public, :access_requestable, namespace: namespace) }
+  let(:project) { create(:project, :public, namespace: namespace) }
   let(:namespace) { create :group }
 
   describe 'POST apply_import' do

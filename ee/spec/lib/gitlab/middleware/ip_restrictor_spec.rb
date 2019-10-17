@@ -38,7 +38,7 @@ describe Gitlab::Middleware::IpRestrictor do
         allow(env).to receive(:[]).with('PATH_INFO').and_return('/api/v4/internal/allowed')
       end
 
-      it 'calls ip address state to set the address' do
+      it 'does not call ip address state to set the address' do
         expect(::Gitlab::IpAddressState).not_to receive(:with)
         expect(app).to receive(:call)
 

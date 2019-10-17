@@ -666,7 +666,7 @@ build:
 
 CAUTION: **Warning:**
 There are some points to be aware of when
-[using this feature with new branches or tags *without* pipelines for merge requests](using-onlychanges-without-pipelines-for-merge-requests).
+[using this feature with new branches or tags *without* pipelines for merge requests](#using-onlychanges-without-pipelines-for-merge-requests).
 
 ##### Using `only:changes` with pipelines for merge requests
 
@@ -755,7 +755,7 @@ the status of other builds:
 job:
   script: "echo Hello, Rules!"
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH == "master"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       when: always
     - if: '$VAR =~ /pattern/'
       when: manual
@@ -781,11 +781,11 @@ evaluated should be conjoined into a single expression using `&&` or `||`. For e
 job:
   script: "echo Hello, Rules!"
   rules:
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH =~ /^feature/ && $CI_MERGE_REQUEST_TARGET_BRANCH == "master"' # This rule will be evaluated
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature/ && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"' # This rule will be evaluated
       when: always
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH =~ /^feature/' # This rule will only be evaluated if the target branch is not "master"
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature/' # This rule will only be evaluated if the target branch is not "master"
       when: manual
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH' # If neither of the first two match but the simple presence does, we set to "on_success" by default
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME' # If neither of the first two match but the simple presence does, we set to "on_success" by default
 ```
 
 If none of the provided rules match, the job will be set to `when:never`, and
@@ -1086,12 +1086,52 @@ Manual actions are considered to be write actions, so permissions for
 [protected branches](../../user/project/protected_branches.md) are used when
 a user wants to trigger an action. In other words, in order to trigger a manual
 action assigned to a branch that the pipeline is running for, the user needs to
-have the ability to merge to this branch.
+have the ability to merge to this branch. It is possible to use protected environments
+to more strictly [protect manual deployments](#protecting-manual-jobs-premium) from being
+run by unauthorized users.
 
 NOTE: **Note:**
 Using `when:manual` and `trigger` together results in the error `jobs:#{job-name} when
 should be on_success, on_failure or always`, because `when:manual` prevents triggers
 being used.
+
+##### Protecting manual jobs **(PREMIUM)**
+
+It's possible to use [protected environments](../environments/protected_environments.md)
+to define a precise list of users authorized to run a manual job. By allowing only
+users associated with a protected environment to trigger manual jobs, it is possible
+to implement some special use cases, such as:
+
+- More precisely limiting who can deploy to an environment.
+- Enabling a pipeline to be blocked until an approved user "approves" it.
+
+To do this, you must:
+
+1. Add an `environment` to the job. For example:
+
+   ```yaml
+   deploy_prod:
+     stage: deploy
+     script:
+       - echo "Deploy to production server"
+     environment:
+       name: production
+       url: https://example.com
+     when: manual
+     only:
+       - master
+   ```
+
+1. In the [protected environments settings](../environments/protected_environments.md#protecting-environments),
+   select the environment (`production` in the example above) and add the users, roles or groups
+   that are authorized to trigger the manual job to the **Allowed to Deploy** list. Only those in
+   this list will be able to trigger this manual job, as well as GitLab administrators
+   who are always able to use protected environments.
+
+Additionally, if a manual job is defined as blocking by adding `allow_failure: false`,
+the next stages of the pipeline will not run until the manual job is triggered. This
+can be used as a way to have a defined list of users allowed to "approve" later pipeline
+stages by triggering the blocking manual job.
 
 #### `when:delayed`
 
@@ -3309,13 +3349,8 @@ all updated Merge Requests will have a pipeline created when using
 If your commit message contains `[ci skip]` or `[skip ci]`, using any
 capitalization, the commit will be created but the pipeline will be skipped.
 
-Alternatively, one can pass the `ci.skip` [Git push option][push-option] if
-using Git 2.10 or newer:
-
-```sh
-git push --push-option=ci.skip    # using git 2.10+
-git push -o ci.skip               # using git 2.18+
-```
+Alternatively, one can pass the `ci.skip` [Git push option](../../user/project/push_options.md#push-options-for-gitlab-cicd)
+if using Git 2.10 or newer.
 
 <!-- ## Troubleshooting
 

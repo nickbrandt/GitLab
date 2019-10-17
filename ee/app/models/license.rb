@@ -48,6 +48,7 @@ class License < ApplicationRecord
     board_milestone_lists
     ci_cd_projects
     cluster_deployments
+    code_analytics
     code_owner_approval_required
     commit_committer_check
     cross_project_pipelines

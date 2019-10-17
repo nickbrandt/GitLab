@@ -19,6 +19,7 @@ describe 'Epic show', :js do
   end
 
   let(:epic) { create(:epic, group: group, title: epic_title, description: markdown, author: user) }
+  let!(:not_child) { create(:epic, group: group, title: 'not child epic', description: markdown, author: user, start_date: 50.days.ago, end_date: 10.days.ago) }
   let!(:child_epic_a) { create(:epic, group: group, title: 'Child epic A', description: markdown, parent: epic, start_date: 50.days.ago, end_date: 10.days.ago) }
   let!(:child_epic_b) { create(:epic, group: group, title: 'Child epic B', description: markdown, parent: epic, start_date: 100.days.ago, end_date: 20.days.ago) }
 
@@ -85,6 +86,7 @@ describe 'Epic show', :js do
         expect(page).to have_selector('.roadmap-container .roadmap-shell')
 
         page.within('.roadmap-shell .epics-list-section') do
+          expect(page).not_to have_content(not_child.title)
           expect(find('.epics-list-item:nth-child(1) .epic-title a')).to have_content('Child epic B')
           expect(find('.epics-list-item:nth-child(2) .epic-title a')).to have_content('Child epic A')
         end

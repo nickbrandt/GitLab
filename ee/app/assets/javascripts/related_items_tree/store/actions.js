@@ -7,12 +7,13 @@ import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import {
   addRelatedIssueErrorMap,
+  issuableTypesMap,
   pathIndeterminateErrorMap,
   relatedIssuesRemoveErrorMap,
 } from 'ee/related_issues/constants';
 
 import { processQueryResponse, formatChildItem, gqClient } from '../utils/epic_utils';
-import { ActionType, ChildType, ChildState } from '../constants';
+import { ChildType, ChildState } from '../constants';
 
 import epicChildren from '../queries/epicChildren.query.graphql';
 import epicChildReorder from '../queries/epicChildReorder.mutation.graphql';
@@ -214,10 +215,11 @@ export const receiveRemoveItemSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_REMOVE_ITEM_SUCCESS, data);
 export const receiveRemoveItemFailure = ({ commit }, { item, status }) => {
   commit(types.RECEIVE_REMOVE_ITEM_FAILURE, item);
+  const issuableType = issuableTypesMap[item.type.toUpperCase()];
   flash(
     status === httpStatusCodes.NOT_FOUND
-      ? pathIndeterminateErrorMap[ActionType[item.type]]
-      : relatedIssuesRemoveErrorMap[ActionType[item.type]],
+      ? pathIndeterminateErrorMap[issuableType]
+      : relatedIssuesRemoveErrorMap[issuableType],
   );
 };
 export const removeItem = ({ dispatch }, { parentItem, item }) => {
@@ -256,7 +258,7 @@ export const removePendingReference = ({ commit }, data) =>
 export const setItemInputValue = ({ commit }, data) => commit(types.SET_ITEM_INPUT_VALUE, data);
 
 export const requestAddItem = ({ commit }) => commit(types.REQUEST_ADD_ITEM);
-export const receiveAddItemSuccess = ({ dispatch, commit, getters, state }, { rawItems }) => {
+export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { rawItems }) => {
   const items = rawItems.map(item =>
     formatChildItem({
       ...convertObjectPropsToCamelCase(item, { deep: !getters.isEpic }),
@@ -279,15 +281,12 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters, state }, { ra
 
   dispatch('setPendingReferences', []);
   dispatch('setItemInputValue', '');
-  dispatch('toggleAddItemForm', {
-    actionType: state.actionType,
-    toggleState: false,
-  });
+  dispatch('toggleAddItemForm', { toggleState: false });
 };
 export const receiveAddItemFailure = ({ commit, state }, data = {}) => {
   commit(types.RECEIVE_ADD_ITEM_FAILURE);
 
-  let errorMessage = addRelatedIssueErrorMap[state.actionType];
+  let errorMessage = addRelatedIssueErrorMap[state.issuableType];
   if (data.message) {
     errorMessage = data.message;
   }
@@ -336,10 +335,7 @@ export const receiveCreateItemSuccess = ({ state, commit, dispatch, getters }, {
     isSubItem: false,
   });
 
-  dispatch('toggleCreateEpicForm', {
-    actionType: state.actionType,
-    toggleState: false,
-  });
+  dispatch('toggleCreateEpicForm', { toggleState: false });
 };
 export const receiveCreateItemFailure = ({ commit }) => {
   commit(types.RECEIVE_CREATE_ITEM_FAILURE);

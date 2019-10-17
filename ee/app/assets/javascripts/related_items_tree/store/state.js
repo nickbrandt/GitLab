@@ -10,7 +10,7 @@ export default () => ({
   issuesCount: 0,
 
   // Add Item Form Data
-  actionType: '',
+  issuableType: null,
   itemInputValue: '',
   pendingReferences: [],
   itemAutoCompleteSources: {},

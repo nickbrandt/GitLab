@@ -42,7 +42,8 @@
     "closed_at": { "type": ["string", "null"] },
     "web_edit_url": { "type":  "string" },
     "web_url": { "type":  "string" },
-    "reference": { "type":  "string" }
+    "reference": { "type":  "string" },
+    "subscribed": { "type": ["boolean", "null"] }
   },
   "required": [
     "id", "iid", "group_id", "title"

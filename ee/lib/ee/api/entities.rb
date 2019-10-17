@@ -323,6 +323,15 @@ module EE
           end
         end
 
+        # Calculating the value of subscribed field triggers Markdown
+        # processing. We can't do that for multiple epics
+        # requests in a single API request.
+        expose :subscribed, if: -> (_, options) { options.fetch(:include_subscribed, false) } do |epic, options|
+          user = options[:user]
+
+          user.present? ? epic.subscribed?(user) : false
+        end
+
         def web_url
           ::Gitlab::Routing.url_helpers.group_epic_url(object.group, object)
         end
@@ -833,6 +842,23 @@ module EE
         def can_read_vulnerabilities?(user, project)
           Ability.allowed?(user, :read_project_security_dashboard, project)
         end
+      end
+
+      class FeatureFlag < Grape::Entity
+        class Scope < Grape::Entity
+          expose :id
+          expose :active
+          expose :environment_scope
+          expose :strategies
+          expose :created_at
+          expose :updated_at
+        end
+
+        expose :name
+        expose :description
+        expose :created_at
+        expose :updated_at
+        expose :scopes, using: Scope
       end
     end
   end

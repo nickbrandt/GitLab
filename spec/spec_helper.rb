@@ -90,7 +90,7 @@ RSpec.configure do |config|
   config.include StubFeatureFlags
   config.include StubGitlabCalls
   config.include StubGitlabData
-  config.include ExpectNextInstanceOf
+  config.include NextInstanceOf
   config.include TestEnv
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::Test::IntegrationHelpers, type: :feature
@@ -152,6 +152,17 @@ RSpec.configure do |config|
     # (ie. ApplicationSetting#auto_devops_enabled)
     allow(Feature).to receive(:enabled?)
       .with(:force_autodevops_on_by_default, anything)
+      .and_return(false)
+
+    # The following can be removed once Vue Issuable Sidebar
+    # is feature-complete and can be made default in place
+    # of older sidebar.
+    # See https://gitlab.com/groups/gitlab-org/-/epics/1863
+    allow(Feature).to receive(:enabled?)
+      .with(:vue_issuable_sidebar, anything)
+      .and_return(false)
+    allow(Feature).to receive(:enabled?)
+      .with(:vue_issuable_epic_sidebar, anything)
       .and_return(false)
 
     # Stub these calls due to being expensive operations

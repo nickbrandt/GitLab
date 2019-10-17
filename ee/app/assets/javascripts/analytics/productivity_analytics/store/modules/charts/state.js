@@ -39,6 +39,7 @@ export default () => ({
       errorCode: null,
       enabled: true,
       data: {},
+      transformedData: [],
       selected: [],
       params: {
         chartType: chartTypes.scatterplot,

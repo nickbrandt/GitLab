@@ -6,12 +6,7 @@
 %p.center
   = _('You can apply your Trial to your Personal account or create a New Group.')
 
-- if show_trial_errors?(@namespace, @trial_result)
-  .flash-container
-    .flash-alert.text-center
-      = _('We have found the following errors:')
-      .flash-text
-        = trial_errors(@namespace, @trial_result)
+= render 'errors'
 
 = form_tag apply_trials_path, method: :post do
   .form-group

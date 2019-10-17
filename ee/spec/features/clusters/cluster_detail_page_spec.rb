@@ -46,4 +46,16 @@ describe 'Clusterable > Show page' do
       expect(page).to have_selector('.js-cluster-nav-environments', text: 'Environments')
     end
   end
+
+  context 'when clusterable is an instance' do
+    let(:current_user) { create(:admin) }
+    let(:cluster_path) { admin_cluster_path(cluster) }
+    let(:cluster) { create(:cluster, :provided_by_gcp, :instance) }
+
+    it 'shows the environments tab' do
+      visit cluster_path
+
+      expect(page).to have_selector('.js-cluster-nav-environments', text: 'Environments')
+    end
+  end
 end

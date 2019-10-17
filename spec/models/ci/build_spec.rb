@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Ci::Build do
   set(:user) { create(:user) }
-  set(:group) { create(:group, :access_requestable) }
+  set(:group) { create(:group) }
   set(:project) { create(:project, :repository, group: group) }
 
   set(:pipeline) do
@@ -19,17 +19,24 @@ describe Ci::Build do
   it { is_expected.to belong_to(:runner) }
   it { is_expected.to belong_to(:trigger_request) }
   it { is_expected.to belong_to(:erased_by) }
+
   it { is_expected.to have_many(:trace_sections) }
   it { is_expected.to have_many(:needs) }
+  it { is_expected.to have_many(:sourced_pipelines) }
+  it { is_expected.to have_many(:job_variables) }
+
   it { is_expected.to have_one(:deployment) }
   it { is_expected.to have_one(:runner_session) }
-  it { is_expected.to have_many(:job_variables) }
+
   it { is_expected.to validate_presence_of(:ref) }
+
   it { is_expected.to respond_to(:has_trace?) }
   it { is_expected.to respond_to(:trace) }
+
   it { is_expected.to delegate_method(:merge_request_event?).to(:pipeline) }
   it { is_expected.to delegate_method(:merge_request_ref?).to(:pipeline) }
   it { is_expected.to delegate_method(:legacy_detached_merge_request_pipeline?).to(:pipeline) }
+
   it { is_expected.to include_module(Ci::PipelineDelegator) }
 
   describe 'associations' do
@@ -957,7 +964,7 @@ describe Ci::Build do
   end
 
   describe 'state transition as a deployable' do
-    let!(:build) { create(:ci_build, :start_review_app) }
+    let!(:build) { create(:ci_build, :with_deployment, :start_review_app) }
     let(:deployment) { build.deployment }
     let(:environment) { deployment.environment }
 
@@ -1043,20 +1050,6 @@ describe Ci::Build do
   end
 
   describe 'deployment' do
-    describe '#has_deployment?' do
-      subject { build.has_deployment? }
-
-      context 'when build has a deployment' do
-        let!(:deployment) { create(:deployment, deployable: build) }
-
-        it { is_expected.to be_truthy }
-      end
-
-      context 'when build does not have a deployment' do
-        it { is_expected.to be_falsy }
-      end
-    end
-
     describe '#outdated_deployment?' do
       subject { build.outdated_deployment? }
 
@@ -1955,7 +1948,7 @@ describe Ci::Build do
     end
 
     context 'when build has a start environment' do
-      let(:build) { create(:ci_build, :deploy_to_production, pipeline: pipeline) }
+      let(:build) { create(:ci_build, :with_deployment, :deploy_to_production, pipeline: pipeline) }
 
       it 'does not expand environment name' do
         expect(build).not_to receive(:expanded_environment_name)
@@ -2210,6 +2203,7 @@ describe Ci::Build do
           { key: 'CI_BUILD_STAGE', value: 'test', public: true, masked: false },
           { key: 'CI_PROJECT_ID', value: project.id.to_s, public: true, masked: false },
           { key: 'CI_PROJECT_NAME', value: project.path, public: true, masked: false },
+          { key: 'CI_PROJECT_TITLE', value: project.title, public: true, masked: false },
           { key: 'CI_PROJECT_PATH', value: project.full_path, public: true, masked: false },
           { key: 'CI_PROJECT_PATH_SLUG', value: project.full_path_slug, public: true, masked: false },
           { key: 'CI_PROJECT_NAMESPACE', value: project.namespace.full_path, public: true, masked: false },

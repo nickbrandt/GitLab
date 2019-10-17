@@ -457,7 +457,11 @@ export const pollUntilComplete = endpoint =>
     const eTagPoll = new Poll({
       resource: {
         getReports(url) {
-          return axios.get(url);
+          return axios.get(url, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
         },
       },
       data: endpoint,

@@ -68,7 +68,7 @@ class Project < ApplicationRecord
     :snippets_access_level, :builds_access_level, :repository_access_level,
     to: :project_feature, allow_nil: true
 
-  delegate :base_dir, :disk_path, :ensure_storage_path_exists, to: :storage
+  delegate :base_dir, :disk_path, to: :storage
 
   delegate :scheduled?, :started?, :in_progress?,
     :failed?, :finished?,
@@ -122,8 +122,6 @@ class Project < ApplicationRecord
   # Storage specific hooks
   after_initialize :use_hashed_storage
   after_create :check_repository_absence!
-  after_create :ensure_storage_path_exists
-  after_save :ensure_storage_path_exists, if: :saved_change_to_namespace_id?
 
   acts_as_ordered_taggable
 
@@ -247,6 +245,7 @@ class Project < ApplicationRecord
   has_one :cluster_project, class_name: 'Clusters::Project'
   has_many :clusters, through: :cluster_project, class_name: 'Clusters::Cluster'
   has_many :kubernetes_namespaces, class_name: 'Clusters::KubernetesNamespace'
+  has_many :management_clusters, class_name: 'Clusters::Cluster', foreign_key: :management_project_id, inverse_of: :management_project
 
   has_many :prometheus_metrics
 
@@ -282,7 +281,7 @@ class Project < ApplicationRecord
   has_many :variables, class_name: 'Ci::Variable'
   has_many :triggers, class_name: 'Ci::Trigger'
   has_many :environments
-  has_many :deployments, -> { success }
+  has_many :deployments
   has_many :pipeline_schedules, class_name: 'Ci::PipelineSchedule'
   has_many :project_deploy_tokens
   has_many :deploy_tokens, through: :project_deploy_tokens
@@ -297,6 +296,9 @@ class Project < ApplicationRecord
   has_many :cycle_analytics_stages, class_name: 'Analytics::CycleAnalytics::ProjectStage'
 
   has_many :external_pull_requests, inverse_of: :project
+
+  has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
+  has_many :source_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :project_id
 
   has_one :pages_metadatum, class_name: 'ProjectPagesMetadatum', inverse_of: :project
 
@@ -1850,6 +1852,7 @@ class Project < ApplicationRecord
     Gitlab::Ci::Variables::Collection.new
       .append(key: 'CI_PROJECT_ID', value: id.to_s)
       .append(key: 'CI_PROJECT_NAME', value: path)
+      .append(key: 'CI_PROJECT_TITLE', value: title)
       .append(key: 'CI_PROJECT_PATH', value: full_path)
       .append(key: 'CI_PROJECT_PATH_SLUG', value: full_path_slug)
       .append(key: 'CI_PROJECT_NAMESPACE', value: namespace.full_path)
@@ -2255,6 +2258,16 @@ class Project < ApplicationRecord
     setting = closest_namespace_setting(name) if setting.nil?
     setting = app_settings_for(name) if setting.nil?
     setting
+  end
+
+  def drop_visibility_level!
+    if group && group.visibility_level < visibility_level
+      self.visibility_level = group.visibility_level
+    end
+
+    if Gitlab::CurrentSettings.restricted_visibility_levels.include?(visibility_level)
+      self.visibility_level = Gitlab::VisibilityLevel::PRIVATE
+    end
   end
 
   private

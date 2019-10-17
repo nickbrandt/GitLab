@@ -27,17 +27,13 @@ module EE
         end
 
         def read_pod_logs(pod_name, namespace, container: nil)
-          if ::Feature.enabled?(:pod_logs_reactive_cache)
-            with_reactive_cache(
-              'get_pod_log',
-              'pod_name' => pod_name,
-              'namespace' => namespace,
-              'container' => container
-            ) do |result|
-              result
-            end
-          else
-            pod_logs(pod_name, namespace, container: container)
+          with_reactive_cache(
+            'get_pod_log',
+            'pod_name' => pod_name,
+            'namespace' => namespace,
+            'container' => container
+          ) do |result|
+            result
           end
         end
 
@@ -59,13 +55,11 @@ module EE
         private
 
         def pod_logs(pod_name, namespace, container: nil)
-          handle_exceptions(_('Pod not found')) do
-            logs = kubeclient.get_pod_log(
-              pod_name, namespace, container: container, tail_lines: LOGS_LIMIT
-            ).body
+          logs = kubeclient.get_pod_log(
+            pod_name, namespace, container: container, tail_lines: LOGS_LIMIT
+          ).body
 
-            { logs: logs, status: :success }
-          end
+          { logs: logs, status: :success }
         end
 
         def handle_exceptions(resource_not_found_error_message, &block)

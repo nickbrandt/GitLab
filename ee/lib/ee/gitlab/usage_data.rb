@@ -10,7 +10,7 @@ module EE
 
         override :usage_data_counters
         def usage_data_counters
-          super + [::Gitlab::UsageCounters::DesignsCounter]
+          super + [::Gitlab::UsageCounters::DesignsCounter, ::Gitlab::UsageDataCounters::LicensesList]
         end
 
         override :uncached_data
@@ -131,7 +131,6 @@ module EE
                                          ldap_group_links: count(::LdapGroupLink),
                                          ldap_keys: count(::LDAPKey),
                                          ldap_users: count(::User.ldap),
-                                         operations_dashboard: operations_dashboard_usage,
                                          pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
                                          projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
                                          projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),

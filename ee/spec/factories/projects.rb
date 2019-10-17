@@ -82,8 +82,18 @@ FactoryBot.modify do
       service_desk_enabled { nil }
     end
 
+    trait(:service_desk_enabled) do
+      service_desk_enabled { true }
+    end
+
     trait :github_imported do
       import_type { 'github' }
+    end
+
+    trait :with_vulnerabilities do
+      after(:create) do |project|
+        create_list(:vulnerability, 2, :opened, project: project)
+      end
     end
   end
 end

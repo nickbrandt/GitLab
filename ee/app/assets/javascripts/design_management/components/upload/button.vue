@@ -36,7 +36,7 @@ export default {
         )
       "
       :disabled="isSaving"
-      variant="primary"
+      variant="success"
       @click="openFileUpload"
     >
       {{ s__('DesignManagement|Add designs') }}

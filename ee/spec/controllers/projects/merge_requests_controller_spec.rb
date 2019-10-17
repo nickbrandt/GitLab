@@ -709,7 +709,7 @@ describe Projects::MergeRequestsController do
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
-        .with(::Ci::CompareLicenseManagementReportsService, project.users.first).and_return(comparison_status)
+        .with(::Ci::CompareLicenseScanningReportsService, project.users.first).and_return(comparison_status)
     end
 
     context 'when comparison is being processed' do
@@ -746,7 +746,7 @@ describe Projects::MergeRequestsController do
     end
 
     context 'when user created corrupted test reports' do
-      let(:comparison_status) { { status: :error, status_reason: 'Failed to parse license management reports' } }
+      let(:comparison_status) { { status: :error, status_reason: 'Failed to parse license scanning reports' } }
 
       it 'does not send polling interval' do
         expect(::Gitlab::PollingInterval).not_to receive(:set_header)
@@ -758,7 +758,7 @@ describe Projects::MergeRequestsController do
         subject
 
         expect(response).to have_gitlab_http_status(:bad_request)
-        expect(json_response).to eq({ 'status_reason' => 'Failed to parse license management reports' })
+        expect(json_response).to eq({ 'status_reason' => 'Failed to parse license scanning reports' })
       end
     end
 

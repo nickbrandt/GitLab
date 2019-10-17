@@ -10,7 +10,7 @@ class FeatureFlagsFinder
     @params = params
   end
 
-  def execute
+  def execute(preload: true)
     unless Ability.allowed?(current_user, :read_feature_flag, project)
       return Operations::FeatureFlag.none
     end
@@ -19,6 +19,7 @@ class FeatureFlagsFinder
     items = by_scope(items)
     items = for_list(items)
 
+    items = items.preload_relations if preload
     items.ordered
   end
 

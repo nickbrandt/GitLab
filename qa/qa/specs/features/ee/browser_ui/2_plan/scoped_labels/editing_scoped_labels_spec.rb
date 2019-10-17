@@ -44,6 +44,8 @@ module QA
             new_label_different_scope_multi_colon
           ])
 
+          show.select_all_activities_filter
+
           initial_labels = "#{initial_label} #{initial_label_multi_colon}"
           new_labels = "#{new_label_same_scope} #{new_label_same_scope_multi_colon} #{new_label_different_scope_multi_colon} #{new_label_different_scope}"
 

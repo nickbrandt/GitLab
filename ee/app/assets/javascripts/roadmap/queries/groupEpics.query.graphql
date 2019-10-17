@@ -1,0 +1,39 @@
+query groupEpics(
+  $fullPath: ID!
+  $state: EpicState
+  $sort: EpicSort
+  $startDate: Time
+  $dueDate: Time
+  $labelName: [String!] = []
+  $authorUsername: String = ""
+  $search: String = ""
+) {
+  group(fullPath: $fullPath) {
+    id
+    name
+    epics(
+      state: $state
+      sort: $sort
+      startDate: $startDate
+      endDate: $dueDate
+      labelName: $labelName
+      authorUsername: $authorUsername
+      search: $search
+    ) {
+      edges {
+        node {
+          id
+          title
+          state
+          webUrl
+          startDate
+          dueDate
+          group {
+            name
+            fullName
+          }
+        }
+      }
+    }
+  }
+}

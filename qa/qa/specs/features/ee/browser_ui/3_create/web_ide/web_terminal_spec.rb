@@ -49,7 +49,7 @@ module QA
 
       after do
         # Remove the runner even if the test fails
-        Service::Runner.new(@runner.name).remove! if @runner
+        Service::DockerRun::GitlabRunner.new(@runner.name).remove! if @runner
       end
 
       it 'user starts the web terminal' do

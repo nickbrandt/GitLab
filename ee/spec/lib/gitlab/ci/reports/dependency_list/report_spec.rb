@@ -20,7 +20,7 @@ describe Gitlab::Ci::Reports::DependencyList::Report do
   describe '#apply_license' do
     subject { report.dependencies.last[:licenses].size }
 
-    let(:license) { build(:ci_reports_license_management_report, :mit).licenses.first }
+    let(:license) { build(:ci_reports_license_scanning_report, :mit).licenses.first }
 
     before do
       license.add_dependency(name_of_dependency_with_license)

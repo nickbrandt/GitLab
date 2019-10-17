@@ -323,6 +323,38 @@ describe API::V3::Github do
       it 'returns an array of projects belonging to group with github format' do
         expect_project_under_namespace([parent_group_project, child_group_project], group.parent, user)
       end
+
+      context 'when namespace license checks are enabled' do
+        before do
+          enable_namespace_license_check!
+        end
+
+        context 'when the root group does not have the correct license' do
+          it 'returns not found' do
+            jira_get v3_api("/users/#{group.parent.path}/repos", user)
+
+            expect(response).to have_gitlab_http_status(404)
+          end
+        end
+
+        context 'when the root group has the correct license' do
+          before do
+            create(:gitlab_subscription, :gold, namespace: group.parent)
+          end
+
+          it 'avoids N+1 queries' do
+            jira_get v3_api("/users/#{group.parent.path}/repos", user)
+
+            control = ActiveRecord::QueryRecorder.new { jira_get v3_api("/users/#{group.parent.path}/repos", user) }
+
+            new_group = create(:group, parent: group.parent)
+            create(:project, :repository, group: new_group, creator: user)
+
+            expect { jira_get v3_api("/users/#{group.parent.path}/repos", user) }.not_to exceed_query_limit(control)
+            expect(response).to have_gitlab_http_status(200)
+          end
+        end
+      end
     end
 
     context 'user namespace' do

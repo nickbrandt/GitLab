@@ -1,0 +1,19 @@
+= form_for @application_setting, url: network_admin_application_settings_path(anchor: 'js-incident-management-settings'), html: { class: 'fieldset-form' } do |f|
+  = form_errors(@application_setting)
+
+  %fieldset
+    .form-group
+      .form-check
+        = f.check_box :throttle_incident_management_notification_enabled, class: 'form-check-input', data: { qa_selector: 'throttle_unauthenticated_checkbox' }
+        = f.label :throttle_incident_management_notification_enabled, class: 'form-check-label' do
+          = _('Enable Incident Management inbound alert limit')
+        %span.form-text.text-muted
+          = _('Helps reduce alert volume (e.g. if creating too many issues)')
+    .form-group
+      = f.label :throttle_incident_management_notification_period_in_seconds, 'Max requests per period per project', class: 'label-bold'
+      = f.number_field :throttle_incident_management_notification_period_in_seconds, class: 'form-control'
+    .form-group
+      = f.label :throttle_incident_management_notification_per_period, 'Rate limit period in seconds', class: 'label-bold'
+      = f.number_field :throttle_incident_management_notification_per_period, class: 'form-control'
+
+  = f.submit 'Save changes', class: "btn btn-success"

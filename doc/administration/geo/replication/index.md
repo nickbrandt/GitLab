@@ -63,7 +63,7 @@ Keep in mind that:
   - Get user data for logins (API).
   - Replicate repositories, LFS Objects, and Attachments (HTTPS + JWT).
 - Since GitLab Premium 10.0, the **primary** node no longer talks to **secondary** nodes to notify for changes (API).
-- Pushing directly to a **secondary** node (for both HTTP and SSH, including Git LFS) was [introduced](https://about.gitlab.com/2018/09/22/gitlab-11-3-released/) in [GitLab Premium](https://about.gitlab.com/pricing/#self-managed) 11.3.
+- Pushing directly to a **secondary** node (for both HTTP and SSH, including Git LFS) was [introduced](https://about.gitlab.com/blog/2018/09/22/gitlab-11-3-released/) in [GitLab Premium](https://about.gitlab.com/pricing/#self-managed) 11.3.
 - There are [limitations](#current-limitations) in the current implementation.
 
 ### Architecture
@@ -108,7 +108,7 @@ The following are required to run Geo:
   [fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md))
   The following operating systems are known to ship with a current version of OpenSSH:
   - [CentOS](https://www.centos.org) 7.4+
-  - [Ubuntu](https://www.ubuntu.com) 16.04+
+  - [Ubuntu](https://ubuntu.com) 16.04+
 - PostgreSQL 9.6+ with [FDW](https://www.postgresql.org/docs/9.6/postgres-fdw.html) support and [Streaming Replication](https://wiki.postgresql.org/wiki/Streaming_Replication)
 - Git 2.9+
 - All nodes must run the same GitLab version.
@@ -281,8 +281,8 @@ You can keep track of the progress to include the missing items in:
 | [Container Registry](../../packages/container_registry.md) | Yes | No |
 | [NPM Registry](../../../user/packages/npm_registry/index.md) | No | No |
 | [Maven Packages](../../../user/packages/maven_repository/index.md) | No | No |
+| [Conan Packages](../../../user/packages/conan_repository/index.md) | No | No |
 | [External merge request diffs](../../merge_request_diffs.md) | No, if they are on-disk | No |
-| Content in object storage ([track progress](https://gitlab.com/groups/gitlab-org/-/epics/1526)) | No | No |
 
 1. The integrity can be verified manually using [Integrity Check Rake Task](../../raketasks/check.md) on both nodes and comparing the output between them.
 

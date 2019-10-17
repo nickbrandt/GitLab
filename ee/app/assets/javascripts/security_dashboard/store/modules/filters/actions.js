@@ -27,7 +27,7 @@ export const lockFilter = ({ commit }, payload) => {
 export const setHideDismissedToggleInitialState = ({ commit }) => {
   const [urlParam] = getParameterValues('scope');
   const showDismissed = urlParam === 'all';
-  commit(types.SET_TOGGLE_VALUE, { key: 'hide_dismissed', value: !showDismissed });
+  commit(types.SET_TOGGLE_VALUE, { key: 'hideDismissed', value: !showDismissed });
 };
 
 export const setToggleValue = ({ commit }, { key, value }) => {

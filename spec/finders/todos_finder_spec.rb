@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe TodosFinder do
@@ -34,6 +36,65 @@ describe TodosFinder do
           todos = finder.new(user, { type: 'Issue' }).execute
 
           expect(todos).to match_array([todo1])
+        end
+
+        context 'when filtering for actions' do
+          let!(:todo1) { create(:todo, user: user, project: project, target: issue, action: Todo::ASSIGNED) }
+          let!(:todo2) { create(:todo, user: user, group: group, target: merge_request, action: Todo::DIRECTLY_ADDRESSED) }
+
+          context 'by action ids' do
+            it 'returns the expected todos' do
+              todos = finder.new(user, { action_id: Todo::DIRECTLY_ADDRESSED }).execute
+
+              expect(todos).to match_array([todo2])
+            end
+
+            context 'multiple actions' do
+              it 'returns the expected todos' do
+                todos = finder.new(user, { action_id: [Todo::DIRECTLY_ADDRESSED, Todo::ASSIGNED] }).execute
+
+                expect(todos).to match_array([todo2, todo1])
+              end
+            end
+          end
+
+          context 'by action names' do
+            it 'returns the expected todos' do
+              todos = finder.new(user, { action: :directly_addressed }).execute
+
+              expect(todos).to match_array([todo2])
+            end
+
+            context 'multiple actions' do
+              it 'returns the expected todos' do
+                todos = finder.new(user, { action: [:directly_addressed, :assigned] }).execute
+
+                expect(todos).to match_array([todo2, todo1])
+              end
+            end
+          end
+        end
+
+        context 'when filtering by author' do
+          let(:author1) { create(:user) }
+          let(:author2) { create(:user) }
+
+          let!(:todo1) { create(:todo, user: user, author: author1) }
+          let!(:todo2) { create(:todo, user: user, author: author2) }
+
+          it 'returns correct todos when filtering by an author' do
+            todos = finder.new(user, { author_id: author1.id }).execute
+
+            expect(todos).to match_array([todo1])
+          end
+
+          context 'querying for multiple authors' do
+            it 'returns the correct todo items' do
+              todos = finder.new(user, { author_id: [author2.id, author1.id] }).execute
+
+              expect(todos).to match_array([todo2, todo1])
+            end
+          end
         end
 
         context 'with subgroups' do

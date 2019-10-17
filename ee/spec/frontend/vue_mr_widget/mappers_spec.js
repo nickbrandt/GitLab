@@ -1,5 +1,9 @@
 import { mapApprovalsResponse } from 'ee/vue_merge_request_widget/mappers';
-import { RULE_TYPE_REGULAR, RULE_TYPE_CODE_OWNER } from 'ee/approvals/constants';
+import {
+  RULE_TYPE_REGULAR,
+  RULE_TYPE_CODE_OWNER,
+  RULE_TYPE_REPORT_APPROVER,
+} from 'ee/approvals/constants';
 
 describe('EE MR Widget mappers', () => {
   let data;
@@ -26,6 +30,21 @@ describe('EE MR Widget mappers', () => {
         expect(result).toEqual(
           jasmine.objectContaining({
             approvalRuleNamesLeft: ['Lorem', 'Ipsum'],
+          }),
+        );
+      });
+
+      it('approvalRuleNamesLeft includes report approvers', () => {
+        data.approval_rules_left.push(
+          { name: 'License-Check', rule_type: RULE_TYPE_REPORT_APPROVER },
+          { name: 'Vulnerability-Check', rule_type: RULE_TYPE_REPORT_APPROVER },
+        );
+
+        const result = mapApprovalsResponse(data);
+
+        expect(result).toEqual(
+          jasmine.objectContaining({
+            approvalRuleNamesLeft: ['Lorem', 'Ipsum', 'License-Check', 'Vulnerability-Check'],
           }),
         );
       });

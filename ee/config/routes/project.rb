@@ -89,7 +89,17 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       namespace :security do
         resources :dependencies, only: [:index]
         resources :licenses, only: [:index]
+        # We have to define both legacy and new routes for Vulnerability Findings
+        # because they are loaded upon application initialization and preloaded by
+        # web server.
+        # TODO: remove this comment and `resources :vulnerabilities` when applicable
+        # see https://gitlab.com/gitlab-org/gitlab/issues/33488
         resources :vulnerabilities, only: [:index] do
+          collection do
+            get :summary
+          end
+        end
+        resources :vulnerability_findings, only: [:index] do
           collection do
             get :summary
           end

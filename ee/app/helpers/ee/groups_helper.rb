@@ -53,6 +53,37 @@ module EE
       @group.dependency_proxy_feature_available?
     end
 
+    def group_path_params(group)
+      { group_id: group }
+    end
+
+    def group_vulnerabilities_endpoint_path(group)
+      params = group_path_params(group)
+      if ::Feature.enabled?(:vulnerability_findings_api)
+        group_security_vulnerability_findings_path(params)
+      else
+        group_security_vulnerabilities_path(params)
+      end
+    end
+
+    def group_vulnerabilities_summary_endpoint_path(group)
+      params = group_path_params(group)
+      if ::Feature.enabled?(:vulnerability_findings_api)
+        summary_group_security_vulnerability_findings_path(params)
+      else
+        summary_group_security_vulnerabilities_path(params)
+      end
+    end
+
+    def group_vulnerabilities_history_endpoint_path(group)
+      params = group_path_params(group)
+      if ::Feature.enabled?(:vulnerability_findings_api)
+        history_group_security_vulnerability_findings_path(params)
+      else
+        history_group_security_vulnerabilities_path(params)
+      end
+    end
+
     private
 
     def get_group_sidebar_links

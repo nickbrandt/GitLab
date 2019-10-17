@@ -23,6 +23,12 @@ describe Projects::Security::LicensesController do
           stub_licensed_features(licenses_list: true, license_management: true)
         end
 
+        it 'counts usage of the feature' do
+          expect(::Gitlab::UsageDataCounters::LicensesList).to receive(:count).with(:views)
+
+          get_licenses
+        end
+
         context 'with existing report' do
           let!(:pipeline) { create(:ee_ci_pipeline, :with_license_management_report, project: project) }
 

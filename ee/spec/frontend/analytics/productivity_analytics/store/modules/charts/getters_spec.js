@@ -8,7 +8,7 @@ import {
   scatterPlotAddonQueryDays,
 } from 'ee/analytics/productivity_analytics/constants';
 import { getScatterPlotData, getMedianLineData } from 'ee/analytics/productivity_analytics/utils';
-import { mockHistogramData, mockScatterplotData } from '../../../mock_data';
+import { mockHistogramData } from '../../../mock_data';
 
 jest.mock('ee/analytics/productivity_analytics/utils');
 
@@ -17,6 +17,10 @@ describe('Productivity analytics chart getters', () => {
 
   const groupNamespace = 'gitlab-org';
   const projectPath = 'gitlab-org/gitlab-test';
+  const transformedData = [
+    [{ merged_at: '2019-09-01T00:00:000Z', metric: 10 }],
+    [{ merged_at: '2019-09-02T00:00:000Z', metric: 20 }],
+  ];
 
   beforeEach(() => {
     state = createState();
@@ -54,33 +58,42 @@ describe('Productivity analytics chart getters', () => {
 
   describe('getScatterPlotMainData', () => {
     it('calls getScatterPlotData with the raw scatterplot data and the date in past', () => {
-      state.charts.scatterplot.data = mockScatterplotData;
+      state.charts.scatterplot.transformedData = transformedData;
 
       const rootState = {
         filters: {
-          startDate: '2019-07-16',
+          startDate: '2019-09-01',
+          endDate: '2019-09-05',
         },
       };
 
       getters.getScatterPlotMainData(state, null, rootState);
 
-      expect(getScatterPlotData).toHaveBeenCalledWith(mockScatterplotData, '2019-07-16');
+      expect(getScatterPlotData).toHaveBeenCalledWith(
+        transformedData,
+        new Date(rootState.filters.startDate),
+        new Date(rootState.filters.endDate),
+      );
     });
   });
 
   describe('getScatterPlotMedianData', () => {
     it('calls getMedianLineData with the raw scatterplot data, the getScatterPlotMainData getter and the an additional days offset', () => {
-      state.charts.scatterplot.data = mockScatterplotData;
+      state.charts.scatterplot.transformedData = transformedData;
 
-      const mockGetters = {
-        getScatterPlotMainData: jest.fn(),
+      const rootState = {
+        filters: {
+          startDate: '2019-09-01',
+          endDate: '2019-09-05',
+        },
       };
 
-      getters.getScatterPlotMedianData(state, mockGetters);
+      getters.getScatterPlotMedianData(state, null, rootState);
 
       expect(getMedianLineData).toHaveBeenCalledWith(
-        mockScatterplotData,
-        mockGetters.getScatterPlotMainData,
+        transformedData,
+        new Date(rootState.filters.startDate),
+        new Date(rootState.filters.endDate),
         scatterPlotAddonQueryDays,
       );
     });

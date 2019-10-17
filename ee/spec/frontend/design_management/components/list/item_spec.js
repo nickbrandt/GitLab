@@ -16,7 +16,7 @@ describe('Design management list item component', () => {
       router,
       propsData: {
         id: 1,
-        name: 'test',
+        filename: 'test',
         image: 'http://via.placeholder.com/300',
         event,
         notesCount,

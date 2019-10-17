@@ -172,7 +172,6 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
 
     let(:group) do
       create(:group_with_ldap_group_link,
-             :access_requestable,
              cn: 'ldap_group1',
              group_access: ::Gitlab::Access::DEVELOPER)
     end
@@ -388,7 +387,7 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
       end
 
       context 'when user has a pending access request in a parent group' do
-        let(:parent_group) { create(:group, :access_requestable) }
+        let(:parent_group) { create(:group) }
         let(:ldap_group1) { ldap_group_entry(user_dn(user.username)) }
         let(:access_requester) { parent_group.request_access(user) }
         before do
@@ -578,7 +577,6 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
     describe '#update_permissions' do
       let(:group) do
         create(:group_with_ldap_group_filter_link,
-               :access_requestable,
                group_access: ::Gitlab::Access::DEVELOPER)
       end
       let(:sync_group) { described_class.new(group, proxy(adapter)) }

@@ -14,9 +14,9 @@
         %tr.d-none.d-sm-table-row
           %th.w-25= s_('CodeOwner|Pattern')
           %th= _('Members')
-      %tbody.qa-approver-list
+      %tbody{ data: { qa_selector: "approver_list" } }
         - code_owner_rules.each do |code_owner_approval_rule|
-          %tr.qa-approver
+          %tr{ data: { qa_selector: "approver" } }
             %td.monospace= code_owner_approval_rule.name
             %td.d-none.d-sm-table-cell
               - code_owner_approval_rule.approvers.each do |approver|

@@ -32,6 +32,7 @@ export default {
       tooltipContent: '',
       chartOption: {
         xAxis: {
+          type: 'time',
           axisLabel: {
             formatter: date => dateFormat(date, dateFormats.defaultDate),
           },
@@ -67,9 +68,9 @@ export default {
   },
   methods: {
     renderTooltip({ data }) {
-      const [xValue, yValue] = data;
-      this.tooltipTitle = yValue;
-      this.tooltipContent = dateFormat(xValue, dateFormats.defaultDateTime);
+      const [, metric, dateTime] = data;
+      this.tooltipTitle = metric;
+      this.tooltipContent = dateFormat(dateTime, dateFormats.defaultDateTime);
     },
   },
 };

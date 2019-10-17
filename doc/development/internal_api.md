@@ -47,6 +47,7 @@ POST /internal/allowed
 | `protocol` | string | yes     | SSH when called from GitLab-shell, HTTP or SSH when called from Gitaly |
 | `action`   | string | yes     | Git command being run (`git-upload-pack`, `git-receive-pack`, `git-upload-archive`) |
 | `changes`  | string | yes     | `<oldrev> <newrev> <refname>` when called from Gitaly, The magic string `_any` when called from GitLab Shell |
+| `check_ip` | string | no     | Ip adress from which call to GitLab Shell was made |
 
 Example request:
 
@@ -115,16 +116,6 @@ curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded token>" --da
 
 - GitLab-shell
 
-## Get merge requests for a ref [NOT USED]
-
-```
-GET /internal/merge_request_urls
-```
-
-**Deprecated**: This used to be called from GitLab shell to fetch the
-merge requests for a change to output them after a push, but this is
-now handled in the `/internal/post_receive` call.
-
 ## Authorized Keys Check
 
 This endpoint is called by the GitLab-shell authorized keys
@@ -169,7 +160,6 @@ discovers the user associated with an SSH key.
 |:----------|:-------|:---------|:------------|
 | `key_id` | integer | no | The id of the SSH key used as found in the authorized-keys file or through the `/authorized_keys` check |
 | `username` | string | no | Username of the user being looked up, used by GitLab-shell when authenticating using a certificate |
-| `user_id` | integer | no | **Deprecated** User_id of the user being looked up |
 
 ```
 GET /internal/discover
@@ -225,17 +215,6 @@ Example response:
 
 - GitLab Geo
 - GitLab-shell's `bin/check`
-
-## Broadcast message(s) [NOT USED]
-
-```
-GET /internal/broadcast_message
-GET /internal/broadcast_messages
-```
-
-**Deprecated:** This used to be used by GitLab-shell to print out broadcast
-messages. But this is now included in the `post_receive` call. Other
-clients can use the public BroadcastMessages API.
 
 ## Get new 2FA recovery codes using an SSH key
 

@@ -82,6 +82,11 @@ describe('ProductivityApp component', () => {
 
     describe('with a group being selected', () => {
       beforeEach(() => {
+        wrapper.vm.$store.dispatch('filters/setDateRange', {
+          skipFetch: true,
+          startDate: new Date('2019-09-01'),
+          endDate: new Date('2019-09-02'),
+        });
         wrapper.vm.$store.dispatch('filters/setGroupNamespace', 'gitlab-org');
         mock.onGet(wrapper.vm.$store.state.endpoint).replyOnce(200);
       });
@@ -277,9 +282,13 @@ describe('ProductivityApp component', () => {
                       wrapper.vm.$store.dispatch('charts/receiveChartDataSuccess', {
                         chartKey: chartKeys.scatterplot,
                         data: {
-                          1: { metric: 2, merged_at: '2019-07-01T07:06:23.193Z' },
-                          2: { metric: 3, merged_at: '2019-07-05T08:27:42.411Z' },
+                          1: { metric: 2, merged_at: '2019-09-01T07:06:23.193Z' },
+                          2: { metric: 3, merged_at: '2019-09-05T08:27:42.411Z' },
                         },
+                        transformedData: [
+                          [{ metric: 2, merged_at: '2019-09-01T07:06:23.193Z' }],
+                          [{ metric: 3, merged_at: '2019-09-05T08:27:42.411Z' }],
+                        ],
                       });
                     });
 

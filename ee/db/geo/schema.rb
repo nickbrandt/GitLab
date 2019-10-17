@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_23_111102) do
+ActiveRecord::Schema.define(version: 2019_10_07_122326) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,7 +38,7 @@ ActiveRecord::Schema.define(version: 2019_09_23_111102) do
     t.datetime "retry_at"
     t.datetime "last_synced_at"
     t.datetime "created_at", null: false
-    t.index ["project_id"], name: "index_design_registry_on_project_id"
+    t.index ["project_id"], name: "index_design_registry_on_project_id", unique: true
     t.index ["retry_at"], name: "index_design_registry_on_retry_at"
     t.index ["state"], name: "index_design_registry_on_state"
   end

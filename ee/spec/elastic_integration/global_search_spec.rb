@@ -159,7 +159,7 @@ describe 'GlobalSearch', :elastic do
 
   # access_level can be :disabled, :enabled or :private
   def feature_settings(access_level)
-    Hash[features.collect { |k| ["#{k}_access_level", ProjectFeature.const_get(access_level.to_s.upcase)] }]
+    Hash[features.collect { |k| ["#{k}_access_level", ProjectFeature.const_get(access_level.to_s.upcase, false)] }]
   end
 
   def expect_no_items_to_be_found(user)

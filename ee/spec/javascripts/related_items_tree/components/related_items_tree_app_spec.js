@@ -4,7 +4,7 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import RelatedItemsTreeApp from 'ee/related_items_tree/components/related_items_tree_app.vue';
 import RelatedItemsTreeHeader from 'ee/related_items_tree/components/related_items_tree_header.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
-import { ActionType } from 'ee/related_items_tree/constants';
+import { issuableTypesMap } from 'ee/related_issues/constants';
 
 import { mockInitialConfig, mockParentItem } from '../mock_data';
 
@@ -119,7 +119,7 @@ describe('RelatedItemsTreeApp', () => {
     });
 
     describe('handleAddItemFormCancel', () => {
-      it('calls `toggleAddItemForm` actions with params `toggleState` as true and `actionType` as `ActionType.Epic`', () => {
+      it('calls `toggleAddItemForm` actions with params `toggleState` as `false`', () => {
         spyOn(wrapper.vm, 'toggleAddItemForm');
 
         wrapper.vm.handleAddItemFormCancel();
@@ -145,10 +145,12 @@ describe('RelatedItemsTreeApp', () => {
     });
 
     describe('handleCreateEpicFormCancel', () => {
-      it('calls `toggleCreateEpicForm` actions with params `toggleState` and `actionType`', () => {
+      it('calls `toggleCreateEpicForm` actions with params `toggleState`', () => {
         spyOn(wrapper.vm, 'toggleCreateEpicForm');
 
         wrapper.vm.handleCreateEpicFormCancel();
+
+        expect(wrapper.vm.toggleCreateEpicForm).toHaveBeenCalledWith({ toggleState: false });
       });
 
       it('calls `setItemInputValue` action with empty string', () => {
@@ -208,7 +210,7 @@ describe('RelatedItemsTreeApp', () => {
     it('renders item add/create form container element', done => {
       wrapper.vm.$store.dispatch('toggleAddItemForm', {
         toggleState: true,
-        actionType: ActionType.Epic,
+        issuableType: issuableTypesMap.Epic,
       });
 
       wrapper.vm.$nextTick(() => {

@@ -64,7 +64,7 @@ class JiraService < IssueTrackerService
     url = URI.parse(client_url)
 
     {
-      username: username,
+      username: username&.strip,
       password: password,
       site: URI.join(url, '/').to_s, # Intended to find the root
       context_path: url.path,
@@ -122,9 +122,13 @@ class JiraService < IssueTrackerService
   end
 
   alias_method :original_url, :url
-
   def url
-    original_url&.chomp('/')
+    original_url&.delete_suffix('/')
+  end
+
+  alias_method :original_api_url, :api_url
+  def api_url
+    original_api_url&.delete_suffix('/')
   end
 
   def execute(push)

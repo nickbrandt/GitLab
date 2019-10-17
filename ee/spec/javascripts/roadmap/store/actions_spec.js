@@ -5,8 +5,10 @@ import * as types from 'ee/roadmap/store/mutation_types';
 
 import defaultState from 'ee/roadmap/store/state';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
-import { formatEpicDetails } from 'ee/roadmap/utils/epic_utils';
+import * as epicUtils from 'ee/roadmap/utils/epic_utils';
 import { PRESET_TYPES, EXTEND_AS } from 'ee/roadmap/constants';
+import groupEpics from 'ee/roadmap/queries/groupEpics.query.graphql';
+import epicChildEpics from 'ee/roadmap/queries/epicChildEpics.query.graphql';
 
 import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
@@ -22,6 +24,8 @@ import {
   mockRawEpic,
   mockFormattedEpic,
   mockSortedBy,
+  mockGroupEpicsQueryResponse,
+  mockEpicChildEpicsQueryResponse,
 } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
@@ -73,6 +77,73 @@ describe('Roadmap Vuex Actions', () => {
         [],
         done,
       );
+    });
+  });
+
+  describe('fetchGroupEpics', () => {
+    let mockState;
+    let expectedVariables;
+
+    beforeEach(() => {
+      mockState = {
+        fullPath: 'gitlab-org',
+        epicsState: 'all',
+        sortedBy: 'start_date_asc',
+        presetType: PRESET_TYPES.MONTHS,
+        filterParams: {},
+        timeframe: mockTimeframeMonths,
+      };
+
+      expectedVariables = {
+        fullPath: 'gitlab-org',
+        state: mockState.epicsState,
+        sort: mockState.sortedBy,
+        startDate: '2017-11-1',
+        dueDate: '2018-6-30',
+      };
+    });
+
+    it('should fetch Group Epics using GraphQL client when epicIid is not present in state', done => {
+      spyOn(epicUtils.gqClient, 'query').and.returnValue(
+        Promise.resolve({
+          data: mockGroupEpicsQueryResponse.data,
+        }),
+      );
+
+      actions
+        .fetchGroupEpics(mockState)
+        .then(() => {
+          expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
+            query: groupEpics,
+            variables: expectedVariables,
+          });
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('should fetch child Epics of an Epic using GraphQL client when epicIid is present in state', done => {
+      spyOn(epicUtils.gqClient, 'query').and.returnValue(
+        Promise.resolve({
+          data: mockEpicChildEpicsQueryResponse.data,
+        }),
+      );
+
+      mockState.epicIid = '1';
+
+      actions
+        .fetchGroupEpics(mockState)
+        .then(() => {
+          expect(epicUtils.gqClient.query).toHaveBeenCalledWith({
+            query: epicChildEpics,
+            variables: {
+              iid: '1',
+              ...expectedVariables,
+            },
+          });
+        })
+        .then(done)
+        .catch(done.fail);
     });
   });
 
@@ -315,7 +386,7 @@ describe('Roadmap Vuex Actions', () => {
   describe('refreshEpicDates', () => {
     it('Should update epics after refreshing epic dates to match with updated timeframe', done => {
       const epics = rawEpics.map(epic =>
-        formatEpicDetails(epic, state.timeframeStartDate, state.timeframeEndDate),
+        epicUtils.formatEpicDetails(epic, state.timeframeStartDate, state.timeframeEndDate),
       );
 
       testAction(

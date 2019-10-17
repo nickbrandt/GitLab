@@ -33,6 +33,17 @@ describe SoftwareLicensePolicy do
     end
   end
 
+  describe ".by_spdx" do
+    let_it_be(:mit) { create(:software_license, :mit) }
+    let_it_be(:mit_policy) { create(:software_license_policy, software_license: mit) }
+    let_it_be(:apache) { create(:software_license, :apache_2_0) }
+    let_it_be(:apache_policy) { create(:software_license_policy, software_license: apache) }
+
+    it { expect(described_class.by_spdx(mit.spdx_identifier)).to match_array([mit_policy]) }
+    it { expect(described_class.by_spdx([mit.spdx_identifier, apache.spdx_identifier])).to match_array([mit_policy, apache_policy]) }
+    it { expect(described_class.by_spdx(SecureRandom.uuid)).to be_empty }
+  end
+
   describe "#name" do
     specify { expect(subject.name).to eql(subject.software_license.name) }
   end

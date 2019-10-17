@@ -252,6 +252,54 @@ describe API::Internal::Base do
         end
       end
     end
+
+    context 'ip restriction' do
+      let_it_be(:group) { create(:group)}
+      let_it_be(:project) { create(:project, :repository, namespace: group) }
+      let(:params) do
+        {
+          key_id: key.id,
+          project: project.full_path,
+          gl_repository: "project-#{project.id}",
+          action: 'git-upload-pack',
+          secret_token: secret_token,
+          protocol: 'ssh'
+        }
+      end
+      let(:allowed_ip) { '150.168.0.1' }
+
+      before do
+        create(:ip_restriction, group: group, range: allowed_ip)
+        stub_licensed_features(group_ip_restriction: true)
+
+        project.add_developer(user)
+      end
+
+      context 'with or without check_ip parameter' do
+        using RSpec::Parameterized::TableSyntax
+
+        where(:check_ip_present, :ip, :status) do
+          false | nil           | 200
+          true  | '150.168.0.1' | 200
+          true  | '150.168.0.2' | 404
+        end
+
+        with_them do
+          subject do
+            post(
+              api('/internal/allowed'),
+              params: check_ip_present ? params.merge(check_ip: ip) : params
+            )
+          end
+
+          it 'modifies access' do
+            subject
+
+            expect(response).to have_gitlab_http_status(status)
+          end
+        end
+      end
+    end
   end
 
   describe "POST /internal/lfs_authenticate", :geo do

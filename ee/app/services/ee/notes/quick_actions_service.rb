@@ -7,7 +7,7 @@ module EE
       include ::Gitlab::Utils::StrongMemoize
 
       prepended do
-        EE_UPDATE_SERVICES = const_get(:UPDATE_SERVICES).merge(
+        EE_UPDATE_SERVICES = const_get(:UPDATE_SERVICES, false).merge(
           'Epic' => Epics::UpdateService
         ).freeze
         EE::Notes::QuickActionsService.private_constant :EE_UPDATE_SERVICES

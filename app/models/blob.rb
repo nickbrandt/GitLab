@@ -32,6 +32,7 @@ class Blob < SimpleDelegator
     BlobViewer::Balsamiq,
 
     BlobViewer::Video,
+    BlobViewer::Audio,
 
     BlobViewer::PDF,
 
@@ -177,6 +178,10 @@ class Blob < SimpleDelegator
 
   def video?
     UploaderHelper::SAFE_VIDEO_EXT.include?(extension)
+  end
+
+  def audio?
+    UploaderHelper::SAFE_AUDIO_EXT.include?(extension)
   end
 
   def readable_text?

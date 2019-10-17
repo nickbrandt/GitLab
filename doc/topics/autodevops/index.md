@@ -77,7 +77,7 @@ As Auto DevOps relies on many different components, it's good to have a basic
 knowledge of the following:
 
 - [Kubernetes](https://kubernetes.io/docs/home/)
-- [Helm](https://docs.helm.sh/)
+- [Helm](https://helm.sh/docs/)
 - [Docker](https://docs.docker.com)
 - [GitLab Runner](https://docs.gitlab.com/runner/)
 - [Prometheus](https://prometheus.io/docs/introduction/overview/)
@@ -85,7 +85,7 @@ knowledge of the following:
 Auto DevOps provides great defaults for all the stages; you can, however,
 [customize](#customizing) almost everything to your needs.
 
-For an overview on the creation of Auto DevOps, read the blog post [From 2/3 of the Self-Hosted Git Market, to the Next-Generation CI System, to Auto DevOps](https://about.gitlab.com/2017/06/29/whats-next-for-gitlab-ci/).
+For an overview on the creation of Auto DevOps, read the blog post [From 2/3 of the Self-Hosted Git Market, to the Next-Generation CI System, to Auto DevOps](https://about.gitlab.com/blog/2017/06/29/whats-next-for-gitlab-ci/).
 
 NOTE: **Note**
 Kubernetes clusters can [be used without](../../user/project/clusters/index.md)
@@ -98,7 +98,7 @@ To make full use of Auto DevOps, you will need:
 - **GitLab Runner** (for all stages)
 
   Your Runner needs to be configured to be able to run Docker. Generally this
-  means using the either the [Docker](https://docs.gitlab.com/runner/executors/docker.html)
+  means using either the [Docker](https://docs.gitlab.com/runner/executors/docker.html)
   or [Kubernetes](https://docs.gitlab.com/runner/executors/kubernetes.html) executors, with
   [privileged mode enabled](https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode).
 
@@ -124,7 +124,7 @@ To make full use of Auto DevOps, you will need:
   - A [Kubernetes cluster][kubernetes-clusters] for the project.
   - A load balancer. You can use NGINX Ingress by deploying it to your
     Kubernetes cluster by either:
-    - Using the [`nginx-ingress`](https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress) Helm chart.
+    - Using the [`nginx-ingress`](https://github.com/helm/charts/tree/master/stable/nginx-ingress) Helm chart.
     - Installing the Ingress [GitLab Managed App](../../user/clusters/applications.md#ingress).
 - **Prometheus** (for Auto Monitoring)
 
@@ -172,7 +172,7 @@ and `1.2.3.4` is the IP address of your load balancer; generally NGINX
 ([see requirements](#requirements)). How to set up the DNS record is beyond
 the scope of this document; you should check with your DNS provider.
 
-Alternatively you can use free public services like [nip.io](http://nip.io)
+Alternatively you can use free public services like [nip.io](https://nip.io)
 which provide automatic wildcard DNS without any configuration. Just set the
 Auto DevOps base domain to `1.2.3.4.nip.io`.
 
@@ -1169,13 +1169,13 @@ This configuration is deprecated and will be removed in the future.
 TIP: **Tip:**
 You can also set this inside your [project's settings](#deployment-strategy).
 
-This configuration based on
+This configuration is based on
 [incremental rollout to production](#incremental-rollout-to-production-premium).
 
 Everything behaves the same way, except:
 
 - It's enabled by setting the `INCREMENTAL_ROLLOUT_MODE` variable to `timed`.
-- Instead of the standard `production` job, the following jobs with a 5 minute delay between each are created:
+- Instead of the standard `production` job, the following jobs are created with a 5 minute delay between each :
   1. `timed rollout 10%`
   1. `timed rollout 25%`
   1. `timed rollout 50%`

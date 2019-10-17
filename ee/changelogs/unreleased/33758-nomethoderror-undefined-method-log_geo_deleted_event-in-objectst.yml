@@ -1,0 +1,5 @@
+---
+title: Fix undefined method log_geo_deleted_event for MergeRequestDiff
+merge_request: 18405
+author:
+type: fixed

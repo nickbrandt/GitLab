@@ -1,61 +1,84 @@
 import EC2 from 'aws-sdk/clients/ec2';
+import IAM from 'aws-sdk/clients/iam';
 
-export const fetchRegions = () =>
-  new Promise((resolve, reject) => {
-    const ec2 = new EC2();
+export const fetchRoles = () => {
+  const iam = new IAM();
 
-    ec2
-      .describeRegions()
-      .on('success', ({ data: { Regions: regions } }) => {
-        const transformedRegions = regions.map(({ RegionName: name }) => ({ name }));
+  return iam
+    .listRoles()
+    .promise()
+    .then(({ Roles: roles }) => roles.map(({ RoleName: name }) => ({ name })));
+};
 
-        resolve(transformedRegions);
-      })
-      .on('error', error => {
-        reject(error);
-      })
-      .send();
-  });
+export const fetchKeyPairs = () => {
+  const ec2 = new EC2();
 
-export const fetchVpcs = () =>
-  new Promise((resolve, reject) => {
-    const ec2 = new EC2();
+  return ec2
+    .describeKeyPairs()
+    .promise()
+    .then(({ KeyPairs: keyPairs }) => keyPairs.map(({ RegionName: name }) => ({ name })));
+};
 
-    ec2
-      .describeVpcs()
-      .on('success', ({ data: { Vpcs: vpcs } }) => {
-        const transformedVpcs = vpcs.map(({ VpcId: id }) => ({ id, name: id }));
+export const fetchRegions = () => {
+  const ec2 = new EC2();
 
-        resolve(transformedVpcs);
-      })
-      .on('error', error => {
-        reject(error);
-      })
-      .send();
-  });
+  return ec2
+    .describeRegions()
+    .promise()
+    .then(({ Regions: regions }) =>
+      regions.map(({ RegionName: name }) => ({
+        name,
+        value: name,
+      })),
+    );
+};
 
-export const fetchSubnets = ({ vpc }) =>
-  new Promise((resolve, reject) => {
-    const ec2 = new EC2();
+export const fetchVpcs = () => {
+  const ec2 = new EC2();
 
-    ec2
-      .describeSubnets({
-        Filters: [
-          {
-            Name: 'vpc-id',
-            Values: [vpc.id],
-          },
-        ],
-      })
-      .on('success', ({ data: { Subnets: subnets } }) => {
-        const transformedSubnets = subnets.map(({ SubnetId: id }) => ({ id, name: id }));
+  return ec2
+    .describeVpcs()
+    .promise()
+    .then(({ Vpcs: vpcs }) =>
+      vpcs.map(({ VpcId: id }) => ({
+        value: id,
+        name: id,
+      })),
+    );
+};
 
-        resolve(transformedSubnets);
-      })
-      .on('error', error => {
-        reject(error);
-      })
-      .send();
-  });
+export const fetchSubnets = ({ vpc }) => {
+  const ec2 = new EC2();
+
+  return ec2
+    .describeSubnets({
+      Filters: [
+        {
+          Name: 'vpc-id',
+          Values: [vpc],
+        },
+      ],
+    })
+    .promise()
+    .then(({ Subnets: subnets }) => subnets.map(({ SubnetId: id }) => ({ id, name: id })));
+};
+
+export const fetchSecurityGroups = ({ vpc }) => {
+  const ec2 = new EC2();
+
+  return ec2
+    .describeSecurityGroups({
+      Filters: [
+        {
+          Name: 'vpc-id',
+          Values: [vpc],
+        },
+      ],
+    })
+    .promise()
+    .then(({ SecurityGroups: securityGroups }) =>
+      securityGroups.map(({ GroupName: name, GroupId: value }) => ({ name, value })),
+    );
+};
 
 export default () => {};

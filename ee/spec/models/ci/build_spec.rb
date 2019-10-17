@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Ci::Build do
-  set(:group) { create(:group, :access_requestable, plan: :bronze_plan) }
+  set(:group) { create(:group, plan: :bronze_plan) }
   let(:project) { create(:project, :repository, group: group) }
 
   let(:pipeline) do
@@ -14,8 +14,6 @@ describe Ci::Build do
   end
 
   let(:job) { create(:ci_build, pipeline: pipeline) }
-
-  it { is_expected.to have_many(:sourced_pipelines) }
 
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
@@ -191,8 +189,8 @@ describe Ci::Build do
           expect { subject }.not_to raise_error
 
           expect(license_scanning_report.licenses.count).to eq(4)
-          expect(license_scanning_report.found_licenses['MIT'].name).to eq('MIT')
-          expect(license_scanning_report.found_licenses['MIT'].dependencies.count).to eq(52)
+          expect(license_scanning_report.licenses.map(&:name)).to contain_exactly("Apache 2.0", "MIT", "New BSD", "unknown")
+          expect(license_scanning_report.licenses.find { |x| x.name == 'MIT' }.dependencies.count).to eq(52)
         end
       end
 
@@ -331,6 +329,24 @@ describe Ci::Build do
           expect(metrics_report.metrics.count).to eq(0)
         end
       end
+    end
+  end
+
+  describe '#retryable?' do
+    subject { build.retryable? }
+    let(:pipeline) { merge_request.all_pipelines.last }
+    let!(:build) { create(:ci_build, :canceled, pipeline: pipeline) }
+
+    context 'with pipeline for merged results' do
+      let(:merge_request) { create(:merge_request, :with_merge_request_pipeline) }
+
+      it { is_expected.to be true }
+    end
+
+    context 'with pipeline for merge train' do
+      let(:merge_request) { create(:merge_request, :on_train, :with_merge_train_pipeline) }
+
+      it { is_expected.to be false }
     end
   end
 end

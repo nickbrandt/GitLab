@@ -13,6 +13,7 @@ module EE
         # triggering a page load.
         before_action only: [:show, :builds, :failures, :security, :licenses] do
           push_frontend_feature_flag(:pipeline_report_api, default_enabled: true)
+          push_frontend_feature_flag(:parsed_license_report)
         end
       end
 
@@ -31,7 +32,7 @@ module EE
           if report_exists
             format.html { render_show }
             format.json do
-              data = LicenseManagementReportsSerializer.new(project: project, current_user: current_user).represent(pipeline&.license_scanning_report&.licenses)
+              data = LicenseScanningReportsSerializer.new(project: project, current_user: current_user).represent(pipeline&.license_scanning_report&.licenses)
               render json: data, status: :ok
             end
           else
@@ -39,11 +40,6 @@ module EE
             format.json { head :not_found }
           end
         end
-      end
-
-      override :show_represent_params
-      def show_represent_params
-        super.merge(expanded: params[:expanded].to_a.map(&:to_i))
       end
     end
   end

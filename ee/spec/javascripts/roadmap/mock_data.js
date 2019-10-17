@@ -305,3 +305,58 @@ export const mockUnsortedEpics = [
     endDate: new Date(2015, 7, 15),
   },
 ];
+
+export const mockGroupEpicsQueryResponse = {
+  data: {
+    group: {
+      id: 'gid://gitlab/Group/2',
+      name: 'Gitlab Org',
+      epics: {
+        edges: [
+          {
+            node: {
+              id: 'gid://gitlab/Epic/40',
+              title: 'Marketing epic',
+              startDate: '2017-12-25',
+              dueDate: '2018-03-09',
+              webUrl: '/groups/gitlab-org/marketing/-/epics/1',
+              group: {
+                name: 'Gitlab Org',
+                fullName: 'Gitlab Org',
+              },
+            },
+          },
+          {
+            node: {
+              id: 'gid://gitlab/Epic/41',
+              title: 'Another marketing',
+              startDate: '2017-12-26',
+              dueDate: '2018-03-10',
+              webUrl: '/groups/gitlab-org/marketing/-/epics/2',
+              group: {
+                name: 'Gitlab Org',
+                fullName: 'Gitlab Org',
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+};
+
+export const mockEpicChildEpicsQueryResponse = {
+  data: {
+    group: {
+      id: 'gid://gitlab/Group/2',
+      name: 'Gitlab Org',
+      epic: {
+        id: 'gid://gitlab/Epic/1',
+        title: 'Error omnis quos consequatur',
+        children: {
+          edges: mockGroupEpicsQueryResponse.data.group.epics.edges,
+        },
+      },
+    },
+  },
+};

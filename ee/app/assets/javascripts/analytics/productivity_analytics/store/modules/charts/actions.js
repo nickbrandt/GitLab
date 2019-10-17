@@ -1,6 +1,8 @@
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
-import { chartKeys } from '../../../constants';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
+import { chartKeys, scatterPlotAddonQueryDays } from '../../../constants';
+import { transformScatterData } from '../../../utils';
 
 /**
  * Fetches data for all charts except for the main chart
@@ -27,14 +29,28 @@ export const fetchChartData = ({ dispatch, getters, state, rootState }, chartKey
       .get(rootState.endpoint, { params })
       .then(response => {
         const { data } = response;
-        dispatch('receiveChartDataSuccess', { chartKey, data });
+
+        if (chartKey === chartKeys.scatterplot) {
+          const transformedData = transformScatterData(
+            data,
+            new Date(getDateInPast(rootState.filters.startDate, scatterPlotAddonQueryDays)),
+            new Date(rootState.filters.endDate),
+          );
+
+          dispatch('receiveChartDataSuccess', { chartKey, data, transformedData });
+        } else {
+          dispatch('receiveChartDataSuccess', { chartKey, data });
+        }
       })
       .catch(error => dispatch('receiveChartDataError', { chartKey, error }));
   }
 };
 
-export const receiveChartDataSuccess = ({ commit }, { chartKey, data = {} }) => {
-  commit(types.RECEIVE_CHART_DATA_SUCCESS, { chartKey, data });
+export const receiveChartDataSuccess = (
+  { commit },
+  { chartKey, data = {}, transformedData = null },
+) => {
+  commit(types.RECEIVE_CHART_DATA_SUCCESS, { chartKey, data, transformedData });
 };
 
 export const receiveChartDataError = ({ commit }, { chartKey, error }) => {

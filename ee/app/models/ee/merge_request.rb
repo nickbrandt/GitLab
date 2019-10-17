@@ -106,6 +106,18 @@ module EE
       hidden.count
     end
 
+    override :note_positions_for_paths
+    def note_positions_for_paths(file_paths, user = nil)
+      return super unless user
+
+      positions = draft_notes
+        .authored_by(user)
+        .positions
+        .select { |pos| file_paths.include?(pos.file_path) }
+
+      super.concat(positions)
+    end
+
     def participant_approvers
       strong_memoize(:participant_approvers) do
         next [] unless approval_needed?
@@ -159,7 +171,7 @@ module EE
         return { status: :error, status_reason: 'This merge request does not have license management reports' }
       end
 
-      compare_reports(::Ci::CompareLicenseManagementReportsService, current_user)
+      compare_reports(::Ci::CompareLicenseScanningReportsService, current_user)
     end
 
     def has_metrics_reports?

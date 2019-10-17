@@ -75,17 +75,17 @@ describe('filters actions', () => {
   describe('setHideDismissedToggleInitialState', () => {
     [
       {
-        description: 'should set hide_dismissed to true if scope param is not present',
+        description: 'should set hideDismissed to true if scope param is not present',
         returnValue: [],
         hideDismissedValue: true,
       },
       {
-        description: 'should set hide_dismissed to false if scope param is "all"',
+        description: 'should set hideDismissed to false if scope param is "all"',
         returnValue: ['all'],
         hideDismissedValue: false,
       },
       {
-        description: 'should set hide_dismissed to true if scope param is "dismissed"',
+        description: 'should set hideDismissed to true if scope param is "dismissed"',
         returnValue: ['dismissed'],
         hideDismissedValue: true,
       },
@@ -101,7 +101,7 @@ describe('filters actions', () => {
             {
               type: types.SET_TOGGLE_VALUE,
               payload: {
-                key: 'hide_dismissed',
+                key: 'hideDismissed',
                 value: testCase.hideDismissedValue,
               },
             },

@@ -1,18 +1,16 @@
 # frozen_string_literal: true
 
 class Groups::Security::VulnerabilitiesController < Groups::ApplicationController
+  include VulnerabilitiesApiFeatureGate # must come first
   include SecurityDashboardsPermissions
-  include VulnerabilitiesActions
+  include VulnerabilityFindingsActions
+  include VulnerabilityFindingsHistory
 
   alias_method :vulnerable, :group
 
-  def history
-    history_count = Gitlab::Vulnerabilities::History.new(group, filter_params).vulnerabilities_counter
+  private
 
-    respond_to do |format|
-      format.json do
-        render json: history_count
-      end
-    end
+  def vulnerabilities_action_enabled?
+    Feature.disabled?(:vulnerability_findings_api)
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_13_100213) do
+ActiveRecord::Schema.define(version: 2019_10_16_072826) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -91,6 +91,15 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
     t.date "snapshot_date", null: false
     t.index ["programming_language_id", "project_id", "snapshot_date"], name: "analytics_repository_languages_unique_index", unique: true
     t.index ["project_id"], name: "analytics_repository_languages_on_project_id"
+  end
+
+  create_table "analytics_repository_file_commits", force: :cascade do |t|
+    t.bigint "analytics_repository_file_id", null: false
+    t.bigint "project_id", null: false
+    t.date "committed_date", null: false
+    t.integer "commit_count", limit: 2, null: false
+    t.index ["analytics_repository_file_id"], name: "index_analytics_repository_file_commits_file_id"
+    t.index ["project_id", "committed_date", "analytics_repository_file_id"], name: "index_file_commits_on_committed_date_file_id_and_project_id", unique: true
   end
 
   create_table "analytics_repository_file_edits", force: :cascade do |t|
@@ -326,6 +335,10 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
     t.integer "throttle_protected_paths_requests_per_period", default: 10, null: false
     t.integer "throttle_protected_paths_period_in_seconds", default: 60, null: false
     t.string "protected_paths", limit: 255, default: ["/users/password", "/users/sign_in", "/api/v3/session.json", "/api/v3/session", "/api/v4/session.json", "/api/v4/session", "/users", "/users/confirmation", "/unsubscribes/", "/import/github/personal_access_token"], array: true
+    t.boolean "throttle_incident_management_notification_enabled", default: false, null: false
+    t.integer "throttle_incident_management_notification_period_in_seconds", default: 3600
+    t.integer "throttle_incident_management_notification_per_period", default: 3600
+    t.integer "push_event_hooks_limit", default: 3, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id"
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id"
     t.index ["instance_administration_project_id"], name: "index_applicationsettings_on_instance_administration_project_id"
@@ -452,6 +465,15 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
     t.datetime "updated_at"
     t.index ["awardable_type", "awardable_id"], name: "index_award_emoji_on_awardable_type_and_awardable_id"
     t.index ["user_id", "name"], name: "index_award_emoji_on_user_id_and_name"
+  end
+
+  create_table "aws_roles", primary_key: "user_id", id: :integer, default: nil, force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.string "role_arn", limit: 2048, null: false
+    t.string "role_external_id", limit: 64, null: false
+    t.index ["role_external_id"], name: "index_aws_roles_on_role_external_id", unique: true
+    t.index ["user_id"], name: "index_aws_roles_on_user_id", unique: true
   end
 
   create_table "badges", id: :serial, force: :cascade do |t|
@@ -894,7 +916,7 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
     t.datetime "updated_at"
     t.integer "commit_id"
     t.index ["commit_id"], name: "index_ci_trigger_requests_on_commit_id"
-    t.index ["trigger_id"], name: "index_ci_trigger_requests_on_trigger_id"
+    t.index ["trigger_id", "id"], name: "index_ci_trigger_requests_on_trigger_id_and_id", order: { id: :desc }
   end
 
   create_table "ci_triggers", id: :serial, force: :cascade do |t|
@@ -955,6 +977,30 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
     t.index ["project_id"], name: "index_cluster_projects_on_project_id"
   end
 
+  create_table "cluster_providers_aws", force: :cascade do |t|
+    t.bigint "cluster_id", null: false
+    t.integer "created_by_user_id"
+    t.integer "num_nodes", null: false
+    t.integer "status", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.string "key_name", limit: 255, null: false
+    t.string "role_arn", limit: 2048, null: false
+    t.string "region", limit: 255, null: false
+    t.string "vpc_id", limit: 255, null: false
+    t.string "subnet_ids", limit: 255, default: [], null: false, array: true
+    t.string "security_group_id", limit: 255, null: false
+    t.string "instance_type", limit: 255, null: false
+    t.string "access_key_id", limit: 255
+    t.string "encrypted_secret_access_key_iv", limit: 255
+    t.text "encrypted_secret_access_key"
+    t.text "session_token"
+    t.text "status_reason"
+    t.index ["cluster_id", "status"], name: "index_cluster_providers_aws_on_cluster_id_and_status"
+    t.index ["cluster_id"], name: "index_cluster_providers_aws_on_cluster_id", unique: true
+    t.index ["created_by_user_id"], name: "index_cluster_providers_aws_on_created_by_user_id"
+  end
+
   create_table "cluster_providers_gcp", id: :serial, force: :cascade do |t|
     t.integer "cluster_id", null: false
     t.integer "status"
@@ -988,7 +1034,9 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
     t.string "domain"
     t.boolean "managed", default: true, null: false
     t.boolean "namespace_per_environment", default: true, null: false
+    t.integer "management_project_id"
     t.index ["enabled"], name: "index_clusters_on_enabled"
+    t.index ["management_project_id"], name: "index_clusters_on_management_project_id", where: "(management_project_id IS NOT NULL)"
     t.index ["user_id"], name: "index_clusters_on_user_id"
   end
 
@@ -1813,6 +1861,7 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
     t.datetime "first_added_to_board_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["issue_id", "first_mentioned_in_commit_at", "first_associated_with_milestone_at", "first_added_to_board_at"], name: "index_issue_metrics_on_issue_id_and_timestamps"
     t.index ["issue_id"], name: "index_issue_metrics"
   end
 
@@ -2224,6 +2273,7 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
     t.index ["source_project_id", "source_branch"], name: "index_merge_requests_on_source_project_id_and_source_branch"
     t.index ["state", "merge_status"], name: "index_merge_requests_on_state_and_merge_status", where: "(((state)::text = 'opened'::text) AND ((merge_status)::text = 'can_be_merged'::text))"
     t.index ["target_branch"], name: "index_merge_requests_on_target_branch"
+    t.index ["target_project_id", "created_at"], name: "index_merge_requests_target_project_id_created_at"
     t.index ["target_project_id", "iid"], name: "index_merge_requests_on_target_project_id_and_iid", unique: true
     t.index ["target_project_id", "iid"], name: "index_merge_requests_on_target_project_id_and_iid_opened", where: "((state)::text = 'opened'::text)"
     t.index ["target_project_id", "merge_commit_sha", "id"], name: "index_merge_requests_on_tp_id_and_merge_commit_sha_and_id"
@@ -2318,7 +2368,7 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
     t.boolean "membership_lock", default: false
     t.boolean "share_with_group_lock", default: false
     t.integer "visibility_level", default: 20, null: false
-    t.boolean "request_access_enabled", default: false, null: false
+    t.boolean "request_access_enabled", default: true, null: false
     t.string "ldap_sync_status", default: "ready", null: false
     t.string "ldap_sync_error"
     t.datetime "ldap_sync_last_update_at"
@@ -2907,7 +2957,7 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
     t.boolean "has_external_issue_tracker"
     t.string "repository_storage", default: "default", null: false
     t.boolean "repository_read_only"
-    t.boolean "request_access_enabled", default: false, null: false
+    t.boolean "request_access_enabled", default: true, null: false
     t.boolean "has_external_wiki"
     t.string "ci_config_path"
     t.boolean "lfs_enabled"
@@ -3892,6 +3942,8 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
   add_foreign_key "analytics_cycle_analytics_project_stages", "projects", on_delete: :cascade
   add_foreign_key "analytics_language_trend_repository_languages", "programming_languages", on_delete: :cascade
   add_foreign_key "analytics_language_trend_repository_languages", "projects", on_delete: :cascade
+  add_foreign_key "analytics_repository_file_commits", "analytics_repository_files", on_delete: :cascade
+  add_foreign_key "analytics_repository_file_commits", "projects", on_delete: :cascade
   add_foreign_key "analytics_repository_file_edits", "analytics_repository_files", on_delete: :cascade
   add_foreign_key "analytics_repository_file_edits", "projects", on_delete: :cascade
   add_foreign_key "analytics_repository_files", "projects", on_delete: :cascade
@@ -3915,6 +3967,7 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
   add_foreign_key "approval_project_rules_users", "users", on_delete: :cascade
   add_foreign_key "approvals", "merge_requests", name: "fk_310d714958", on_delete: :cascade
   add_foreign_key "approver_groups", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "aws_roles", "users", on_delete: :cascade
   add_foreign_key "badges", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "badges", "projects", on_delete: :cascade
   add_foreign_key "board_assignees", "boards", on_delete: :cascade
@@ -3978,7 +4031,10 @@ ActiveRecord::Schema.define(version: 2019_10_13_100213) do
   add_foreign_key "cluster_platforms_kubernetes", "clusters", on_delete: :cascade
   add_foreign_key "cluster_projects", "clusters", on_delete: :cascade
   add_foreign_key "cluster_projects", "projects", on_delete: :cascade
+  add_foreign_key "cluster_providers_aws", "clusters", on_delete: :cascade
+  add_foreign_key "cluster_providers_aws", "users", column: "created_by_user_id", on_delete: :nullify
   add_foreign_key "cluster_providers_gcp", "clusters", on_delete: :cascade
+  add_foreign_key "clusters", "projects", column: "management_project_id", name: "fk_f05c5e5a42", on_delete: :nullify
   add_foreign_key "clusters", "users", on_delete: :nullify
   add_foreign_key "clusters_applications_cert_managers", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_helm", "clusters", on_delete: :cascade

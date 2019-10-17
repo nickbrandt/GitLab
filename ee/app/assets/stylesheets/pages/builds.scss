@@ -8,14 +8,7 @@
   }
 
   .top-bar {
-    @include build-trace-top-bar(48px);
-    display: flex;
-
-    .truncated-info {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    @include build-trace-top-bar($gl-line-height * 5);
 
     .dropdown-menu-toggle {
       width: 200px;

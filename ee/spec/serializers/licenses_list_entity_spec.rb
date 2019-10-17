@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe LicensesListEntity do
-  let(:report) { build(:ci_reports_license_management_report, :mit) }
+  let(:report) { build(:ci_reports_license_scanning_report, :mit) }
 
   it_behaves_like 'report list' do
     let(:name) { :licenses }

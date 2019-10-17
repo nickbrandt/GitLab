@@ -30,6 +30,10 @@ FactoryBot.define do
       end
     end
 
+    trait :management_project do
+      management_project factory: :project
+    end
+
     trait :namespace_per_environment_disabled do
       namespace_per_environment { false }
     end
@@ -46,6 +50,14 @@ FactoryBot.define do
       platform_type { :kubernetes }
 
       provider_gcp factory: [:cluster_provider_gcp, :created]
+      platform_kubernetes factory: [:cluster_platform_kubernetes, :configured]
+    end
+
+    trait :provided_by_aws do
+      provider_type { :aws }
+      platform_type { :kubernetes }
+
+      provider_aws factory: [:cluster_provider_aws, :created]
       platform_kubernetes factory: [:cluster_platform_kubernetes, :configured]
     end
 

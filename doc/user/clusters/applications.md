@@ -62,7 +62,7 @@ can lead to confusion during deployments.
 > - Introduced in GitLab 10.2 for project-level clusters.
 > - Introduced in GitLab 11.6 for group-level clusters.
 
-[Helm](https://docs.helm.sh/) is a package manager for Kubernetes and is
+[Helm](https://helm.sh/docs/) is a package manager for Kubernetes and is
 required to install all the other applications. It is installed in its
 own pod inside the cluster which can run the `helm` CLI in a safe
 environment.
@@ -91,6 +91,11 @@ file. Prior to GitLab 12.3,
 the [stable/cert-manager](https://github.com/helm/charts/tree/master/stable/cert-manager)
 chart was used.
 
+NOTE: **Note:**
+If you have installed cert-manager prior to GitLab 12.3, Let's Encrypt will
+[block requests from older versions of cert-manager](https://community.letsencrypt.org/t/blocking-old-cert-manager-versions/98753).
+To resolve this, uninstall cert-manager (consider [backing up any additional configuration](https://docs.cert-manager.io/en/latest/tasks/backup-restore-crds.html)), then install cert-manager again.
+
 ### GitLab Runner
 
 > - Introduced in GitLab 10.6 for project-level clusters.
@@ -109,7 +114,7 @@ NOTE: **Note:**
 The [`runner/gitlab-runner`](https://gitlab.com/gitlab-org/charts/gitlab-runner)
 chart is used to install this application with a
 [`values.yaml`](https://gitlab.com/gitlab-org/gitlab/blob/master/vendor/runner/values.yaml)
-file.
+file. Customizing installation by modifying this file is not supported.
 
 ### Ingress
 
@@ -127,13 +132,17 @@ chart is used to install this application with a
 [`values.yaml`](https://gitlab.com/gitlab-org/gitlab/blob/master/vendor/ingress/values.yaml)
 file.
 
-#### Modsecurity Application Firewall
+#### Web Application Firewall (ModSecurity)
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/65192) in GitLab 12.3 (enabled using `ingress_modsecurity` [feature flag](../../development/feature_flags/development.md#enabling-a-feature-flag-in-development)).
 
-GitLab supports
+Out of the box, GitLab provides you real-time security monitoring with
 [`modsecurity`](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#modsecurity)
-to check requests against [OWASP's Core Rule Set](https://www.modsecurity.org/CRS/Documentation/).
+
+Modsecurity is a toolkit for real-time web application monitoring, logging,
+and access control. With GitLab's offering, the [OWASP's Core Rule Set](https://www.modsecurity.org/CRS/Documentation/), which provides generic attack detection capabilities,
+is automatically applied.
+
 This feature:
 
 - Runs in "Detection-only mode" unless configured otherwise.
@@ -174,7 +183,7 @@ higher](../permissions.md) access to the associated project or group.
 We use a [custom Jupyter
 image](https://gitlab.com/gitlab-org/jupyterhub-user-image/blob/master/Dockerfile)
 that installs additional useful packages on top of the base Jupyter. You
-will also see ready-to-use DevOps Runbooks built with Nurtch's [Rubix library](https://github.com/amit1rrr/rubix).
+will also see ready-to-use DevOps Runbooks built with Nurtch's [Rubix library](https://github.com/Nurtch/rubix).
 
 More information on
 creating executable runbooks can be found in [our Runbooks
@@ -221,7 +230,7 @@ You can clone repositories from the files tab in Jupyter:
 > - Introduced in GitLab 11.5 for project-level clusters.
 > - Introduced in GitLab 12.3 for group- and instance-level clusters.
 
-[Knative](https://cloud.google.com/knative) provides a platform to
+[Knative](https://cloud.google.com/knative/) provides a platform to
 create, deploy, and manage serverless workloads from a Kubernetes
 cluster. It is used in conjunction with, and includes
 [Istio](https://istio.io) to provide an external IP address for all

@@ -1,5 +1,5 @@
 import { issuableTypesMap } from 'ee/related_issues/constants';
-import { ChildType, ActionType, PathIdSeparator } from '../constants';
+import { ChildType, PathIdSeparator } from '../constants';
 
 export const autoCompleteSources = () => gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources;
 
@@ -33,22 +33,10 @@ export const itemAutoCompleteSources = (state, getters) => {
   return state.autoCompleteIssues ? getters.autoCompleteSources : {};
 };
 
-export const issuableType = state => {
-  if (state.actionType === ActionType.Epic) {
-    return issuableTypesMap.EPIC;
-  }
-
-  if (state.actionType === ActionType.Issue) {
-    return issuableTypesMap.ISSUE;
-  }
-
-  return null;
-};
-
 export const itemPathIdSeparator = (state, getters) =>
   getters.isEpic ? PathIdSeparator.Epic : PathIdSeparator.Issue;
 
-export const isEpic = state => state.actionType === ActionType.Epic;
+export const isEpic = state => state.issuableType === issuableTypesMap.EPIC;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

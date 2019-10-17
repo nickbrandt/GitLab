@@ -32,6 +32,11 @@ export default {
       required: false,
       default: false,
     },
+    securityApprovalsHelpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     isCollapsed() {
@@ -76,7 +81,10 @@ export default {
       </template>
     </div>
     <div v-if="!isCollapsed && approvalRules.length" class="border-top">
-      <approvals-list :approval-rules="approvalRules" />
+      <approvals-list
+        :approval-rules="approvalRules"
+        :security-approvals-help-page-path="securityApprovalsHelpPagePath"
+      />
     </div>
   </div>
 </template>

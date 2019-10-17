@@ -149,14 +149,40 @@ export const receiveCreateIssueError = ({ commit }, { flashError }) => {
 };
 
 export const dismissVulnerability = (
-  { dispatch, state },
+  { dispatch, state, rootState },
   { vulnerability, flashError, comment },
 ) => {
+  const page = state.pageInfo && state.pageInfo.page ? state.pageInfo.page : 1;
+  const dismissedVulnerabilitiesHidden = Boolean(
+    rootState.filters && rootState.filters.hideDismissed,
+  );
   dispatch('requestDismissVulnerability');
 
-  const toastMsg = sprintf(s__("Security Reports|Dismissed '%{vulnerabilityName}'"), {
-    vulnerabilityName: vulnerability.name,
-  });
+  const toastMsg = sprintf(
+    dismissedVulnerabilitiesHidden
+      ? s__(
+          "Security Reports|Dismissed '%{vulnerabilityName}'. Turn off the hide dismissed toggle to view.",
+        )
+      : s__("Security Reports|Dismissed '%{vulnerabilityName}'"),
+    {
+      vulnerabilityName: vulnerability.name,
+    },
+  );
+  const toastOptions = dismissedVulnerabilitiesHidden
+    ? {
+        action: {
+          text: s__('Security Reports|Undo dismiss'),
+          onClick: (e, toastObject) => {
+            if (vulnerability.dismissal_feedback) {
+              dispatch('undoDismiss', { vulnerability })
+                .then(() => dispatch('fetchVulnerabilities', { page }))
+                .catch(() => {});
+              toastObject.goAway(0);
+            }
+          },
+        },
+      }
+    : {};
 
   axios
     .post(vulnerability.create_vulnerability_feedback_dismissal_path, {
@@ -175,7 +201,14 @@ export const dismissVulnerability = (
     .then(({ data }) => {
       dispatch('closeDismissalCommentBox');
       dispatch('receiveDismissVulnerabilitySuccess', { vulnerability, data });
-      toast(toastMsg);
+      if (dismissedVulnerabilitiesHidden) {
+        dispatch('fetchVulnerabilities', {
+          // If we just dismissed the last vulnerability on the active page,
+          // we load the previous page if any
+          page: state.vulnerabilities.length === 1 && page > 1 ? page - 1 : page,
+        });
+      }
+      toast(toastMsg, toastOptions);
     })
     .catch(() => {
       dispatch('receiveDismissVulnerabilityError', { flashError });
@@ -298,7 +331,7 @@ export const undoDismiss = ({ dispatch }, { vulnerability, flashError }) => {
 
   dispatch('requestUndoDismiss');
 
-  axios
+  return axios
     .delete(destroy_vulnerability_feedback_dismissal_path)
     .then(() => {
       dispatch('receiveUndoDismissSuccess', { vulnerability });

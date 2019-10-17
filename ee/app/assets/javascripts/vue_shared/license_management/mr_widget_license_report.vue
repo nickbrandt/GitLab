@@ -44,6 +44,11 @@ export default {
       type: String,
       required: true,
     },
+    licensesApiPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
     canManageLicenses: {
       type: Boolean,
       required: true,
@@ -79,20 +84,30 @@ export default {
     },
   },
   mounted() {
-    const { headPath, basePath, apiUrl, canManageLicenses } = this;
+    const { headPath, basePath, apiUrl, canManageLicenses, licensesApiPath } = this;
 
     this.setAPISettings({
       apiUrlManageLicenses: apiUrl,
       headPath,
       basePath,
       canManageLicenses,
+      licensesApiPath,
     });
 
-    this.loadLicenseReport();
-    this.loadManagedLicenses();
+    if (gon.features && gon.features.parsedLicenseReport) {
+      this.loadParsedLicenseReport();
+    } else {
+      this.loadLicenseReport();
+      this.loadManagedLicenses();
+    }
   },
   methods: {
-    ...mapActions(['setAPISettings', 'loadManagedLicenses', 'loadLicenseReport']),
+    ...mapActions([
+      'setAPISettings',
+      'loadManagedLicenses',
+      'loadLicenseReport',
+      'loadParsedLicenseReport',
+    ]),
   },
 };
 </script>

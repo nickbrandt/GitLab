@@ -5,12 +5,12 @@ require 'spec_helper'
 describe Gitlab::UsageData do
   describe '#data' do
     # using Array.new to create a different creator User for each of the projects
-    let(:projects) { Array.new(3) { create(:project, creator: create(:user, group_view: :security_dashboard)) } }
+    let_it_be(:projects) { Array.new(3) { create(:project, :repository, creator: create(:user, group_view: :security_dashboard)) } }
     let(:count_data) { subject[:counts] }
 
-    let!(:board) { create(:board, project: projects[0]) }
+    let_it_be(:board) { create(:board, project: projects[0]) }
 
-    before do
+    before_all do
       projects.last.creator.block # to get at least one non-active User
 
       pipeline = create(:ci_pipeline, project: projects[0])
@@ -55,7 +55,7 @@ describe Gitlab::UsageData do
       ))
     end
 
-    it 'gathers usage counts' do
+    it 'gathers usage counts', :aggregate_failures do
       expect(count_data[:boards]).to eq(1)
       expect(count_data[:projects]).to eq(3)
 
@@ -65,13 +65,16 @@ describe Gitlab::UsageData do
         dependency_list_usages_total
         dependency_scanning_jobs
         epics
+        epics_deepest_relationship_level
         feature_flags
         geo_nodes
         ldap_group_links
         ldap_keys
         ldap_users
         license_management_jobs
-        operations_dashboard
+        licenses_list_views
+        operations_dashboard_default_dashboard
+        operations_dashboard_users_with_projects_added
         pod_logs_usages_total
         projects_jira_dvcs_cloud_active
         projects_jira_dvcs_server_active
@@ -84,6 +87,8 @@ describe Gitlab::UsageData do
         design_management_designs_create
         design_management_designs_update
         design_management_designs_delete
+        user_preferences_group_overview_details
+        user_preferences_group_overview_security_dashboard
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
@@ -91,12 +96,12 @@ describe Gitlab::UsageData do
       expect(count_data[:feature_flags]).to eq(1)
     end
 
-    it 'gathers deepest epic relationship level' do
-      expect(count_data.keys).to include(:epics_deepest_relationship_level)
-    end
-
     it 'has integer value for epic relationship level' do
       expect(count_data[:epics_deepest_relationship_level]).to be_a_kind_of(Integer)
+    end
+
+    it 'has integer values for all counts' do
+      expect(count_data.values).to all(be_a_kind_of(Integer))
     end
 
     it 'gathers security products usage data' do
@@ -157,10 +162,6 @@ describe Gitlab::UsageData do
   describe '.service_desk_counts' do
     subject { described_class.service_desk_counts }
 
-    before do
-      Project.update_all(service_desk_enabled: true)
-    end
-
     context 'when Service Desk is disabled' do
       it 'returns an empty hash' do
         stub_licensed_features(service_desk: false)
@@ -178,7 +179,7 @@ describe Gitlab::UsageData do
     end
 
     context 'when Service Desk is enabled' do
-      let(:project) { create(:project) }
+      let(:project) { create(:project, :service_desk_enabled) }
 
       it 'gathers Service Desk data' do
         create_list(:issue, 2, confidential: true, author: User.support_bot, project: project)
@@ -213,7 +214,7 @@ describe Gitlab::UsageData do
   describe '#operations_dashboard_usage' do
     subject { described_class.operations_dashboard_usage }
 
-    before do
+    before_all do
       blocked_user = create(:user, :blocked, dashboard: 'operations')
       user_with_ops_dashboard = create(:user, dashboard: 'operations')
 

@@ -34,6 +34,12 @@ Sidekiq.configure_server do |config|
   config.on(:startup) do
     # webserver metrics are cleaned up in config.ru: `warmup` block
     Prometheus::CleanupMultiprocDirService.new.execute
+    # In production, sidekiq is run in a multi-process setup where processes might interfere
+    # with each other cleaning up and reinitializing prometheus database files, which is why
+    # we're re-doing the work every time here.
+    # A cleaner solution would be to run the cleanup pre-fork, and the initialization once
+    # after all workers have forked, but I don't know how at this point.
+    ::Prometheus::Client.reinitialize_on_pid_change(force: true)
 
     Gitlab::Metrics::Exporter::SidekiqExporter.instance.start
   end
@@ -64,9 +70,18 @@ if defined?(::Unicorn) || defined?(::Puma)
     Gitlab::Metrics::Exporter::WebExporter.instance.start
   end
 
+  Gitlab::Cluster::LifecycleEvents.on_before_phased_restart do
+    # We need to ensure that before we re-exec server
+    # we do stop the exporter
+    Gitlab::Metrics::Exporter::WebExporter.instance.stop
+  end
+
   Gitlab::Cluster::LifecycleEvents.on_before_master_restart do
     # We need to ensure that before we re-exec server
     # we do stop the exporter
+    #
+    # We do it again, for being extra safe,
+    # but it should not be needed
     Gitlab::Metrics::Exporter::WebExporter.instance.stop
   end
 
@@ -75,7 +90,6 @@ if defined?(::Unicorn) || defined?(::Puma)
     # but this does not happen for Ruby fork
     #
     # This does stop server, as it is running on master.
-    # However, ensures that we close the TCPSocket.
     Gitlab::Metrics::Exporter::WebExporter.instance.stop
   end
 end

@@ -4,125 +4,41 @@ require 'spec_helper'
 
 describe Groups::Security::VulnerabilitiesController do
   let(:group) { create(:group) }
+  let(:params) { { group_id: group } }
   let(:user) { create(:user) }
 
-  it_behaves_like VulnerabilitiesActions do
+  # when new Vulnerability Findings API is enabled this controller is not,
+  # its actions are "moved" Groups::Security::VulnerabilityFindingsController
+
+  it_behaves_like 'VulnerabilityFindingsActions disabled' do
     let(:vulnerable) { group }
-    let(:vulnerable_params) { { group_id: group } }
+    let(:vulnerable_params) { params }
   end
 
-  it_behaves_like SecurityDashboardsPermissions do
+  it_behaves_like 'SecurityDashboardsPermissions disabled' do
     let(:vulnerable) { group }
-    let(:security_dashboard_action) { get :index, params: { group_id: group }, format: :json }
+    let(:security_dashboard_action) { get :index, params: params, format: :json }
   end
 
-  before do
-    sign_in(user)
-    stub_licensed_features(security_dashboard: true)
-    group.add_developer(user)
-  end
+  it_behaves_like 'disabled group vulnerability findings controller'
 
-  describe 'GET index.json' do
-    it 'returns vulnerabilities for all projects in the group' do
-      # create projects for the group
-      2.times do
-        project = create(:project, namespace: group)
-        pipeline = create(:ci_pipeline, :success, project: project)
-
-        create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
-      end
-
-      # create an ungrouped project to ensure we don't include it
-      project = create(:project)
-      pipeline = create(:ci_pipeline, :success, project: project)
-      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
-
-      get :index, params: { group_id: group }, format: :json
-
-      expect(json_response.count).to be(2)
-    end
-  end
-
-  describe 'GET history.json' do
-    let(:params) { { group_id: group } }
-    let(:project) { create(:project, namespace: group) }
-    let(:pipeline) { create(:ci_pipeline, :success, project: project) }
-
-    subject { get :history, params: params, format: :json }
-
+  context 'when new Vulnerability Findings API is disabled' do
     before do
-      travel_to(Time.zone.parse('2018-11-10')) do
-        create(:vulnerabilities_occurrence,
-                pipelines: [pipeline],
-                project: project,
-                report_type: :sast,
-                severity: :critical)
-
-        create(:vulnerabilities_occurrence,
-                pipelines: [pipeline],
-                project: project,
-                report_type: :dependency_scanning,
-                severity: :low)
-      end
-
-      travel_to(Time.zone.parse('2018-11-12')) do
-        create(:vulnerabilities_occurrence,
-                pipelines: [pipeline],
-                project: project,
-                report_type: :sast,
-                severity: :critical)
-
-        create(:vulnerabilities_occurrence,
-                pipelines: [pipeline],
-                project: project,
-                report_type: :dependency_scanning,
-                severity: :low)
-      end
+      stub_feature_flags(vulnerability_findings_api: false)
     end
 
-    it 'returns vulnerability history within last 90 days' do
-      travel_to(Time.zone.parse('2019-02-11')) do
-        subject
-      end
+    # when new Vulnerability Findings API is disabled, we fall back to this controller
 
-      expect(response).to have_gitlab_http_status(200)
-      expect(json_response['total']).to eq({ '2018-11-12' => 2 })
-      expect(json_response['critical']).to eq({ '2018-11-12' => 1 })
-      expect(json_response['low']).to eq({ '2018-11-12' => 1 })
-      expect(response).to match_response_schema('vulnerabilities/history', dir: 'ee')
+    it_behaves_like VulnerabilityFindingsActions do
+      let(:vulnerable) { group }
+      let(:vulnerable_params) { params }
     end
 
-    it 'returns empty history if there are no vulnerabilities within last 90 days' do
-      travel_to(Time.zone.parse('2019-02-13')) do
-        subject
-      end
-
-      expect(json_response).to eq({
-        "undefined" => {},
-        "info" => {},
-        "unknown" => {},
-        "low" => {},
-        "medium" => {},
-        "high" => {},
-        "critical" => {},
-        "total" => {}
-      })
+    it_behaves_like SecurityDashboardsPermissions do
+      let(:vulnerable) { group }
+      let(:security_dashboard_action) { get :index, params: params, format: :json }
     end
 
-    context 'with a report type filter' do
-      let(:params) { { group_id: group, report_type: %w[sast] } }
-
-      before do
-        travel_to(Time.zone.parse('2019-02-11')) do
-          subject
-        end
-      end
-
-      it 'returns filtered history if filters are enabled' do
-        expect(json_response['total']).to eq({ '2018-11-12' => 1 })
-        expect(json_response['critical']).to eq({ '2018-11-12' => 1 })
-        expect(json_response['low']).to eq({})
-      end
-    end
+    it_behaves_like 'group vulnerability findings controller'
   end
 end

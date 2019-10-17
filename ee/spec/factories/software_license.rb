@@ -5,11 +5,13 @@ FactoryBot.define do
     sequence(:name) { |n| "SOFTWARE-LICENSE-2.7/example_#{n}" }
 
     trait :mit do
+      spdx_identifier { 'MIT' }
       name { 'MIT' }
     end
 
     trait :apache_2_0 do
-      name { 'Apache 2.0' }
+      spdx_identifier { 'Apache-2.0' }
+      name { 'Apache 2.0 License' }
     end
   end
 end

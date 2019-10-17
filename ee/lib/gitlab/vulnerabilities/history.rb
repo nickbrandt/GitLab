@@ -14,17 +14,17 @@ module Gitlab
         @filters = filters
       end
 
-      def vulnerabilities_counter
+      def findings_counter
         return cached_vulnerability_history if use_vulnerability_cache?
 
-        vulnerabilities = found_vulnerabilities.count_by_day_and_severity(HISTORY_RANGE)
-        ::Vulnerabilities::HistorySerializer.new.represent(vulnerabilities)
+        findings = vulnerability_findings.count_by_day_and_severity(HISTORY_RANGE)
+        ::Vulnerabilities::HistorySerializer.new.represent(findings)
       end
 
       private
 
-      def found_vulnerabilities
-        ::Security::VulnerabilitiesFinder.new(group, params: filters).execute(:all)
+      def vulnerability_findings
+        ::Security::VulnerabilityFindingsFinder.new(group, params: filters).execute(:all)
       end
 
       def cached_vulnerability_history

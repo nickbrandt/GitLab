@@ -259,6 +259,10 @@ class Group < Namespace
     members_with_parents.maintainers.exists?(user_id: user)
   end
 
+  def has_container_repositories?
+    container_repositories.exists?
+  end
+
   # @deprecated
   alias_method :has_master?, :has_maintainer?
 
@@ -434,6 +438,10 @@ class Group < Namespace
 
   def access_request_approvers_to_be_notified
     members.owners.order_recent_sign_in.limit(ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT)
+  end
+
+  def supports_events?
+    false
   end
 
   private

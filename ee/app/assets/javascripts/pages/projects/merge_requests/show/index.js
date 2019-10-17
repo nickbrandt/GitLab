@@ -5,7 +5,9 @@ import { initReviewBar } from 'ee/batch_comments';
 
 document.addEventListener('DOMContentLoaded', () => {
   initShow();
-  initSidebarBundle();
+  if (gon.features && !gon.features.vueIssuableSidebar) {
+    initSidebarBundle();
+  }
   initMrNotes();
   initReviewBar();
 });

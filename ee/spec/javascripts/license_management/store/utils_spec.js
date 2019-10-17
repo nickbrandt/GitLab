@@ -4,6 +4,7 @@ import {
   normalizeLicense,
   getPackagesString,
   getIssueStatusFromLicenseStatus,
+  convertToOldReportFormat,
 } from 'ee/vue_shared/license_management/store/utils';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
@@ -162,6 +163,42 @@ describe('utils', () => {
 
     it('returns NEUTRAL status for undefined', () => {
       expect(getIssueStatusFromLicenseStatus()).toBe(STATUS_NEUTRAL);
+    });
+  });
+
+  describe('convertToOldReportFormat', () => {
+    const rawLicense = {
+      name: 'license',
+      classification: {
+        id: 1,
+        approval_status: LICENSE_APPROVAL_STATUS.APPROVED,
+      },
+      dependencies: [{ id: 1 }, { id: 2 }, { id: 3 }],
+    };
+    let parsedLicense;
+
+    beforeEach(() => {
+      parsedLicense = convertToOldReportFormat(rawLicense);
+    });
+
+    it('should get the approval status', () => {
+      expect(parsedLicense.approvalStatus).toEqual(rawLicense.classification.approval_status);
+    });
+
+    it('should get the packages', () => {
+      expect(parsedLicense.packages).toEqual(rawLicense.dependencies);
+    });
+
+    it('should get the id', () => {
+      expect(parsedLicense.id).toEqual(rawLicense.classification.id);
+    });
+
+    it('should get the status', () => {
+      expect(parsedLicense.status).toEqual(STATUS_SUCCESS);
+    });
+
+    it('should retain the license name', () => {
+      expect(parsedLicense.name).toEqual(rawLicense.name);
     });
   });
 });
