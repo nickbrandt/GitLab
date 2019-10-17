@@ -250,4 +250,40 @@ describe 'Issue Boards', :js do
       end
     end
   end
+
+  context 'scoped labels' do
+    let!(:scoped_label_1) { create(:label, project: project, name: 'Scoped::Label1') }
+    let!(:scoped_label_2) { create(:label, project: project, name: 'Scoped::Label2') }
+  
+    before do
+      stub_licensed_features(scoped_labels: true)
+    end
+    
+    it 'removes existing scoped label' do
+      click_card(card)
+
+      page.within('.labels') do
+        click_link 'Edit'
+
+        wait_for_requests
+
+        click_link scoped_label_1.title
+        click_link scoped_label_2.title
+
+        wait_for_requests
+
+        find('.dropdown-menu-close-icon').click
+
+        page.within('.value') do
+          expect(page).to have_selector('.scoped-label-wrapper', count: 1)
+          expect(page).not_to have_content(scoped_label_1.title)
+          expect(page).to have_content(scoped_label_2.title)
+        end
+      end
+
+      expect(card).to have_selector('.scoped-label-wrapper', count: 1)
+      expect(card).not_to have_content(scoped_label_1.title)
+      expect(card).to have_content(scoped_label_2.title)
+    end
+  end
 end
