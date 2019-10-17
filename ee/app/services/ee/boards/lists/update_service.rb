@@ -16,7 +16,7 @@ module EE
         end
 
         def max_issue_count?(list)
-          params.has_key?(:max_issue_count) && list.board.parent.feature_available?(:wip_limits)
+          params.has_key?(:max_issue_count) && list.board.resource_parent.feature_available?(:wip_limits)
         end
 
         def update_max_issue_count(list)

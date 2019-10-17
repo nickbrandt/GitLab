@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 shared_examples 'multiple issue boards show' do
-  let!(:board1) { create(:board, parent: parent, name: 'b') }
-  let!(:board2) { create(:board, parent: parent, name: 'a') }
+  let!(:board1) { create(:board, resource_parent: parent, name: 'b') }
+  let!(:board2) { create(:board, resource_parent: parent, name: 'a') }
 
   context 'when multiple issue boards is enabled' do
     it 'lets user view board1' do
