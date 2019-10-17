@@ -28,6 +28,7 @@ class Release < ApplicationRecord
 
   scope :sorted, -> { order(released_at: :desc) }
   scope :with_project_and_namespace, -> { includes(project: :namespace) }
+  scope :with_milestones_and_issues, -> { preload(milestones: :issues) }
 
   delegate :repository, to: :project
 

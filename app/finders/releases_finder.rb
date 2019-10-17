@@ -9,6 +9,6 @@ class ReleasesFinder
   def execute
     return Release.none unless Ability.allowed?(@current_user, :read_release, @project)
 
-    @project.releases.sorted
+    @project.releases.with_milestones_and_issues.sorted
   end
 end
