@@ -736,6 +736,14 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `flatPath` | String! |  |
 | `webUrl` | String |  |
 
+### UpdateEpicPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `epic` | Epic | The epic after mutation |
+
 ### UpdateNotePayload
 
 | Name  | Type  | Description |
