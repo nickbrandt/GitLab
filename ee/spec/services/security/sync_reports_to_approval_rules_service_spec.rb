@@ -35,7 +35,7 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
 
       context 'when only low-severity vulnerabilities are present' do
         before do
-          create(:ee_ci_build, :success, :dast, name: 'dast_job', pipeline: pipeline, project: project)
+          create(:ee_ci_build, :success, :low_severity_dast_report, name: 'dast_job', pipeline: pipeline, project: project)
         end
 
         it 'lowers approvals_required count to zero' do
@@ -56,10 +56,6 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
         end
 
         it "won't change approvals_required count" do
-          expect(
-            pipeline.security_reports.reports.values.all?(&:unsafe_severity?)
-          ).to be false
-
           expect { subject }
             .not_to change { report_approver_rule.reload.approvals_required }
         end
@@ -119,7 +115,7 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
 
       context 'when only low-severity vulnerabilities are present' do
         before do
-          create(:ee_ci_build, :success, :dast, name: 'dast_job', pipeline: pipeline, project: project)
+          create(:ee_ci_build, :success, :low_severity_dast_report, name: 'dast_job', pipeline: pipeline, project: project)
         end
 
         it 'lowers approvals_required count to zero' do
