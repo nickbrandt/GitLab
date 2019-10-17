@@ -107,10 +107,10 @@ nginx-ingress:
     replicaCount: 2
     resources:
       requests:
-        cpu: 50m
+        cpu: 100m
         memory: 250M
       limits:
-        cpu: 100m
+        cpu: 200m
         memory: 500M
     minAvailable: 1
     service:
