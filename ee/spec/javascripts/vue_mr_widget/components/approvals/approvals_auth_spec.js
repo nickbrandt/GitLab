@@ -23,6 +23,7 @@ describe('Approval auth component', () => {
         ...props,
         modalId: 'testid',
       },
+      sync: false,
       localVue,
     });
   };

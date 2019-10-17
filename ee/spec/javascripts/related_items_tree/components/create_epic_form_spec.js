@@ -5,15 +5,14 @@ import CreateEpicForm from 'ee/related_items_tree/components/create_epic_form.vu
 
 const localVue = createLocalVue();
 
-const createComponent = (isSubmitting = false) => {
-  return mount(localVue.extend(CreateEpicForm), {
+const createComponent = (isSubmitting = false) =>
+  mount(localVue.extend(CreateEpicForm), {
     localVue,
     propsData: {
       isSubmitting,
     },
     sync: false,
   });
-};
 
 describe('RelatedItemsTree', () => {
   describe('CreateEpicForm', () => {

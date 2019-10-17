@@ -6,6 +6,7 @@ const localVue = createLocalVue();
 
 describe('Manual Variables Form', () => {
   let wrapper;
+
   const requiredProps = {
     action: {
       path: '/play',
@@ -27,8 +28,15 @@ describe('Manual Variables Form', () => {
     factory(requiredProps);
   });
 
-  afterEach(() => {
-    wrapper.destroy();
+  afterEach(done => {
+    // The component has a `nextTick` callback after some events so we need
+    // to wait for those to finish before destroying.
+    setImmediate(() => {
+      wrapper.destroy();
+      wrapper = null;
+
+      done();
+    });
   });
 
   it('renders empty form with correct placeholders', () => {
@@ -75,7 +83,7 @@ describe('Manual Variables Form', () => {
   });
 
   describe('when deleting a variable', () => {
-    it('removes the variable row', () => {
+    beforeEach(done => {
       wrapper.vm.variables = [
         {
           key: 'new key',
@@ -84,6 +92,10 @@ describe('Manual Variables Form', () => {
         },
       ];
 
+      wrapper.vm.$nextTick(done);
+    });
+
+    it('removes the variable row', () => {
       wrapper.find(GlButton).vm.$emit('click');
 
       expect(wrapper.vm.variables.length).toBe(0);

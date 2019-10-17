@@ -35,13 +35,13 @@ describe('project component', () => {
 
     describe('can upgrade project group', () => {
       beforeEach(() => {
-        createComponent({
-          project: {
-            ...mockOneProject,
-            upgrade_required: true,
-            upgrade_path: '/upgrade',
-          },
-        });
+        project = {
+          ...mockOneProject,
+          upgrade_required: true,
+          upgrade_path: '/upgrade',
+        };
+
+        createComponent({ project });
       });
 
       it('shows project title', () => {
@@ -66,13 +66,13 @@ describe('project component', () => {
 
     describe('cannot upgrade project group', () => {
       beforeEach(() => {
-        createComponent({
-          project: {
-            ...mockOneProject,
-            upgrade_required: true,
-            upgrade_path: '',
-          },
-        });
+        project = {
+          ...mockOneProject,
+          upgrade_required: true,
+          upgrade_path: '',
+        };
+
+        createComponent({ project });
       });
 
       it('shows upgrade license text', () => {

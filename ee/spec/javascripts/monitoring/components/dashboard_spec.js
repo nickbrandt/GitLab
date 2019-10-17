@@ -82,16 +82,13 @@ describe('Dashboard', () => {
         });
       });
 
-      it('does not render add button on the dashboard', done => {
-        setTimeout(() => {
-          expect(vm.element.querySelector('.js-add-metric-button')).toBe(null);
-          done();
-        });
+      it('does not render add button on the dashboard', () => {
+        expect(vm.element.querySelector('.js-add-metric-button')).toBe(null);
       });
     });
 
     describe('when available', () => {
-      beforeEach(() => {
+      beforeEach(done => {
         createComponent({
           customMetricsAvailable: true,
           customMetricsPath: '/endpoint',
@@ -101,16 +98,12 @@ describe('Dashboard', () => {
         });
 
         setupComponentStore(vm);
+
+        vm.vm.$nextTick(done);
       });
 
-      it('renders add button on the dashboard', done => {
-        localVue.nextTick(() => {
-          expect(vm.element.querySelector('.js-add-metric-button').innerText).toContain(
-            'Add metric',
-          );
-
-          done();
-        });
+      it('renders add button on the dashboard', () => {
+        expect(vm.element.querySelector('.js-add-metric-button').innerText).toContain('Add metric');
       });
 
       it('uses modal for custom metrics form', () => {

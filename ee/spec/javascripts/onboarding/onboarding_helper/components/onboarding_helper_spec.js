@@ -127,10 +127,16 @@ describe('User onboarding tour parts list', () => {
 
   describe('watch', () => {
     describe('watch initialShow', () => {
-      it('sets showPopover to true if initialShow is true', () => {
+      it('sets showPopover to true if initialShow is true', done => {
         wrapper.setProps({ initialShow: true });
 
-        expect(wrapper.vm.showPopover).toBe(true);
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            expect(wrapper.vm.showPopover).toBe(true);
+          })
+          .then(done)
+          .catch(done.fail);
       });
     });
 
@@ -316,7 +322,7 @@ describe('User onboarding tour parts list', () => {
       expect(wrapper.find('.qa-toggle-btn').exists()).toBe(true);
     });
 
-    it('renders the proper toggle button icons', () => {
+    it('renders the proper toggle button icons', done => {
       const btn = wrapper.find('.qa-toggle-btn');
       const icon = btn.find(Icon);
 
@@ -324,7 +330,13 @@ describe('User onboarding tour parts list', () => {
 
       wrapper.vm.expanded = true;
 
-      expect(icon.props('name')).toEqual('close');
+      wrapper.vm
+        .$nextTick()
+        .then(() => {
+          expect(icon.props('name')).toEqual('close');
+        })
+        .then(done)
+        .catch(done.fail);
     });
 
     it('renders the tour parts list if there are tour titles', () => {

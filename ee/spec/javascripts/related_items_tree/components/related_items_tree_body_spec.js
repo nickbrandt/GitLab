@@ -6,8 +6,8 @@ import { mockParentItem } from '../mock_data';
 
 const localVue = createLocalVue();
 
-const createComponent = (parentItem = mockParentItem, children = []) => {
-  return shallowMount(localVue.extend(RelatedItemsBody), {
+const createComponent = (parentItem = mockParentItem, children = []) =>
+  shallowMount(localVue.extend(RelatedItemsBody), {
     localVue,
     stubs: {
       'tree-root': true,
@@ -18,7 +18,6 @@ const createComponent = (parentItem = mockParentItem, children = []) => {
     },
     sync: false,
   });
-};
 
 describe('RelatedItemsTree', () => {
   describe('RelatedTreeBody', () => {
