@@ -4367,9 +4367,6 @@ msgstr ""
 msgid "ContainerRegistry|Last Updated"
 msgstr ""
 
-msgid "ContainerRegistry|No tags in Container Registry for this container image."
-msgstr ""
-
 msgid "ContainerRegistry|Quick Start"
 msgstr ""
 
@@ -4393,10 +4390,16 @@ msgstr ""
 msgid "ContainerRegistry|Tag ID"
 msgstr ""
 
+msgid "ContainerRegistry|The last tag related to this image was recently removed. This empty image and any associated data will be automatically removed as part of the regular Garbage Collection process. If you have any questions, contact your administrator."
+msgstr ""
+
 msgid "ContainerRegistry|There are no container images available in this group"
 msgstr ""
 
 msgid "ContainerRegistry|There are no container images stored for this project"
+msgstr ""
+
+msgid "ContainerRegistry|This image has no active tags"
 msgstr ""
 
 msgid "ContainerRegistry|We are having trouble connecting to Docker, which could be due to an issue with your project name or path. %{docLinkStart}More Information%{docLinkEnd}"
