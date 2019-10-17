@@ -1,0 +1,5 @@
+---
+title: Expose subscribed attribute for Epics in GraphQL
+merge_request: 18607
+author:
+type: added

@@ -58,6 +58,12 @@ module Types
       argument :full, GraphQL::BOOLEAN_TYPE, required: false, default_value: false # rubocop:disable Graphql/Descriptions
     end
 
+    field :subscribed, GraphQL::BOOLEAN_TYPE,
+      method: :subscribed?,
+      null: false,
+      complexity: 5,
+      description: 'Boolean flag for whether the currently logged in user is subscribed to this epic'
+
     field :issues, # rubocop:disable Graphql/Descriptions
           Types::EpicIssueType.connection_type,
           null: true,
