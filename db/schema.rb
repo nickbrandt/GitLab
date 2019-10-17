@@ -2794,6 +2794,19 @@ ActiveRecord::Schema.define(version: 2019_10_16_220135) do
     t.index ["project_id", "deploy_token_id"], name: "index_project_deploy_tokens_on_project_id_and_deploy_token_id", unique: true
   end
 
+  create_table "project_design_states", id: :serial, force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.binary "verification_checksum"
+    t.string "last_verification_failure"
+    t.datetime_with_timezone "retry_at"
+    t.integer "retry_count"
+    t.datetime_with_timezone "last_verification_ran_at"
+    t.index ["last_verification_failure"], name: "idx_design_states_on_failure_partial", where: "(last_verification_failure IS NOT NULL)"
+    t.index ["project_id", "last_verification_ran_at"], name: "idx_design_states_on_last_verification_ran_at", where: "((verification_checksum IS NOT NULL) AND (last_verification_failure IS NULL))"
+    t.index ["project_id"], name: "idx_design_states_outdated_checksums", where: "((verification_checksum IS NULL) AND (last_verification_failure IS NULL))"
+    t.index ["project_id"], name: "index_project_design_states_on_project_id", unique: true
+  end
+
   create_table "project_error_tracking_settings", primary_key: "project_id", id: :integer, default: nil, force: :cascade do |t|
     t.boolean "enabled", default: false, null: false
     t.string "api_url"

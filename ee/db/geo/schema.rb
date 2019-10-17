@@ -38,9 +38,23 @@ ActiveRecord::Schema.define(version: 2019_10_07_122326) do
     t.datetime "retry_at"
     t.datetime "last_synced_at"
     t.datetime "created_at", null: false
-    t.index ["project_id"], name: "index_design_registry_on_project_id", unique: true
+    t.string "last_verification_failure"
+    t.binary "verification_checksum_sha"
+    t.boolean "checksum_mismatch", default: false, null: false
+    t.boolean "last_check_failed"
+    t.integer "verification_retry_count"
+    t.binary "verification_checksum_mismatched"
+    t.datetime_with_timezone "last_check_at"
+    t.datetime_with_timezone "last_verification_ran_at"
+    t.index ["project_id"], name: "idx_checksum_mismatch", where: "(checksum_mismatch = true)"
+    t.index ["project_id"], name: "idx_design_registry_checksums_and_failure_partial", where: "((verification_checksum_sha IS NULL) AND (last_verification_failure IS NULL))"
+    t.index ["project_id"], name: "idx_design_registry_failure_partial", where: "(last_verification_failure IS NOT NULL)"
+    t.index ["project_id"], name: "index_design_registry_on_project_id"
     t.index ["retry_at"], name: "index_design_registry_on_retry_at"
+    t.index ["retry_count"], name: "idx_design_registry_failed_partial", where: "((retry_count > 0) OR (last_verification_failure IS NOT NULL) OR checksum_mismatch)"
+    t.index ["retry_count"], name: "idx_design_registry_pending_partial", where: "((retry_count = 0) AND (((state)::text = 'pending'::text) OR ((verification_checksum_sha IS NULL) AND (last_verification_failure IS NULL))))"
     t.index ["state"], name: "index_design_registry_on_state"
+    t.index ["verification_checksum_sha"], name: "idx_design_registry_checksum_sha_partial", where: "(verification_checksum_sha IS NULL)"
   end
 
   create_table "event_log_states", primary_key: "event_id", force: :cascade do |t|
