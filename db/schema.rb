@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_29_180827) do
+ActiveRecord::Schema.define(version: 2019_10_13_100213) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -2209,6 +2209,7 @@ ActiveRecord::Schema.define(version: 2019_09_29_180827) do
     t.boolean "allow_maintainer_to_push"
     t.integer "state_id", limit: 2
     t.string "rebase_jid"
+    t.string "squash_commit_sha"
     t.index ["assignee_id"], name: "index_merge_requests_on_assignee_id"
     t.index ["author_id"], name: "index_merge_requests_on_author_id"
     t.index ["created_at"], name: "index_merge_requests_on_created_at"
