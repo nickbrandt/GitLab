@@ -16,7 +16,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::Dast do
 
   describe '#format_vulnerability' do
     let(:instance) { file_vulnerability['instances'][1] }
-    let(:hostname) { 'http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io' }
+    let(:hostname) { 'http://goat:8080' }
     let(:sanitized_desc) { file_vulnerability['desc'].gsub('<p>', '').gsub('</p>', '') }
     let(:sanitized_solution) { file_vulnerability['solution'].gsub('<p>', '').gsub('</p>', '') }
     let(:version) { parsed_report['@version'] }
@@ -25,38 +25,38 @@ describe Gitlab::Ci::Parsers::Security::Formatters::Dast do
       data = formatter.format(instance, hostname)
 
       expect(data['category']).to eq('dast')
-      expect(data['message']).to eq('X-Content-Type-Options Header Missing')
+      expect(data['message']).to eq('Anti CSRF Tokens Scanner')
       expect(data['description']).to eq(sanitized_desc)
-      expect(data['cve']).to eq('10021')
-      expect(data['severity']).to eq('low')
+      expect(data['cve']).to eq('20012')
+      expect(data['severity']).to eq('high')
       expect(data['confidence']).to eq('medium')
       expect(data['solution']).to eq(sanitized_solution)
       expect(data['scanner']).to eq({ 'id' => 'zaproxy', 'name' => 'ZAProxy' })
-      expect(data['links']).to eq([{ 'url' => 'http://msdn.microsoft.com/en-us/library/ie/gg622941%28v=vs.85%29.aspx' },
-                                   { 'url' => 'https://www.owasp.org/index.php/List_of_useful_HTTP_headers' }])
+      expect(data['links']).to eq([{ 'url' => 'http://projects.webappsec.org/Cross-Site-Request-Forgery' },
+                                   { 'url' => 'http://cwe.mitre.org/data/definitions/352.html' }])
       expect(data['identifiers'][0]).to eq({
                                              'type'  => 'ZAProxy_PluginId',
-                                             'name'  => 'X-Content-Type-Options Header Missing',
-                                             'value' => '10021',
+                                             'name'  => 'Anti CSRF Tokens Scanner',
+                                             'value' => '20012',
                                              'url'   => "https://github.com/zaproxy/zaproxy/blob/w2019-01-14/docs/scanners.md"
                                            })
       expect(data['identifiers'][1]).to eq({
                                              'type'  => 'CWE',
-                                             'name'  => "CWE-16",
-                                             'value' => '16',
-                                             'url'   => "https://cwe.mitre.org/data/definitions/16.html"
+                                             'name'  => "CWE-352",
+                                             'value' => '352',
+                                             'url'   => "https://cwe.mitre.org/data/definitions/352.html"
                                            })
       expect(data['identifiers'][2]).to eq({
                                              'type'  => 'WASC',
-                                             'name'  => "WASC-15",
-                                             'value' => '15',
+                                             'name'  => "WASC-9",
+                                             'value' => '9',
                                              'url'   => "http://projects.webappsec.org/w/page/13246974/Threat%20Classification%20Reference%20Grid"
                                            })
       expect(data['location']).to eq({
-                                       'param' => 'X-Content-Type-Options',
+                                       'param' => nil,
                                        'method' => 'GET',
                                        'hostname' => hostname,
-                                       'path' => '/'
+                                       'path' => '/WebGoat/login'
                                      })
     end
   end
