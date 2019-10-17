@@ -1067,7 +1067,7 @@ When documenting feature flags for a feature, it's important that users know:
 
 NOTE: **Note:**
 The [Product Manager for the relevant group](https://about.gitlab.com/handbook/product/categories/#devops-stages)
-must review and approve product documentation involving feature flags.
+must review and approve the addition or removal of any mentions of using feature flags before the doc change is merged.
 
 The following is sample text for adding feature flag documentation for a feature:
 
