@@ -933,8 +933,8 @@ module API
     end
 
     class PushEventPayload < Grape::Entity
-      expose :commit_count, :action, :ref_type, :commit_from, :commit_to
-      expose :ref, :commit_title
+      expose :commit_count, :action, :ref_type, :commit_from, :commit_to, :ref,
+             :commit_title, :ref_count
     end
 
     class Event < Grape::Entity
