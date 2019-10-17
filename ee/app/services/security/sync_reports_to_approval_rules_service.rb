@@ -38,6 +38,8 @@ module Security
 
     def sync_vulnerability_rules
       reports = pipeline.security_reports
+      # If we have some reports, then we want to sync them early;
+      # If we don't have reports, then we should wait until pipeline stops.
       return if reports.empty? && !pipeline.complete?
       return if reports.violates_default_policy?
 
