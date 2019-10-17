@@ -1,5 +1,7 @@
 # Merge Request Performance Guidelines
 
+Each new introduced merge request **must be performant by default**.
+
 To ensure a merge request does not negatively impact performance of GitLab
 _every_ merge request **must** adhere to the guidelines outlined in this
 document. There are no exceptions to this rule unless specifically discussed
@@ -43,6 +45,74 @@ Sometimes it's hard to assess the impact of a merge request. In this case you
 should ask one of the merge request reviewers to review your changes. You can
 find a list of these reviewers at <https://about.gitlab.com/company/team/>. A reviewer
 in turn can request a performance specialist to review the changes.
+
+## Think out of the box
+
+Everyone has their own perception how the new feature is gonna be used.
+Always think how users gonna be using the feature instead. Usually,
+users test our features in a very unconventional way,
+like by brute forcing or abusing edge conditions that we have.
+
+Example:
+
+You assume that your milestone can have only 1-3 releases
+attached. Consider how this feature will work if user mistakenly
+puts 1000 milestones in the release:
+
+1. Will this page explode?
+1. Will it load or timeout?
+1. What is the easiest way to fix it?
+1. Maybe it is acceptable to limit and just show a few, but ignore rest?
+1. Maybe show an indicator that you have 1000+ more?
+
+## Data set
+
+The data set that will be processed by merge request should be known
+and documented. One of the examples is the feature processing files.
+The feature should clearly document what expected data set is for
+this feature to process, and what problems it might cause.
+
+One examples would be a filtering of files from git repository.
+Your feature requests a list of all files from the repository
+and perform search for the set of files. As an author you should
+understand the:
+
+1. What repositories are going to be supported?
+1. How long it will take for big repositories like Linux kernel?
+1. Is there something that we can make to do differently to not
+   process big data set?
+1. Should we build some fail-safe mechanism to contain computation
+   complexity, usually it is better to degredate the service for
+   single user instead of all users.
+
+## Query plans and database structure
+
+Each changed query should have a comment with attached query plan
+that is executed against **staging** environment.
+
+The query plan can answer the questions whether we need additional
+indexes, or whether we perform expensive filtering (ex. using sequential scans).
+
+Each query plan should be run against substantional size of data set.
+For example if you look for issues with specific condition,
+you should consider validating the query against
+small number (a few hundred) and big number (100_000) of issues.
+See how the query will behave if the result will be a few
+and a few thousand.
+
+This is needed as we have users using GitLab for very big projects and
+in a very unconventional way. Even, if it seems that it is unlikely
+that such big data set will be used, it is still plausible that one
+of our customers will have the problem with the feature.
+
+Understanding ahead of time how it is gonna behave at scale even if we accept it,
+is the desired outcome. We should always have a plan or understanding what it takes
+to optimise feature to magnitude of higher usage patterns.
+
+Every database structure should be optimised and sometimes even over-described
+to be prepared to be easily extended. The hardest part after some point is
+data migration. Migrating milion of rows will always be troublesome and
+can have negative impact on application.
 
 ## Query Counts
 
@@ -172,3 +242,107 @@ Caching data per transaction can be done using
 `Gitlab::SafeRequestStore` to avoid having to remember to check
 `RequestStore.active?`). Caching data in Redis can be done using [Rails' caching
 system](https://guides.rubyonrails.org/caching_with_rails.html).
+
+## Pagination
+
+Each feature that renders a list of items as a table needs to include the pagination.
+
+Three pagination styles are proposed:
+
+1. Page number: user go to specific page, like 1. User sees the next page number,
+   and the total number of pages,
+1. Page number, but without count: user goes to a specific page, like 1.
+   User sees the next page number,
+1. Next only: user can only go to next page, as we do not know how many pages
+   are available,
+1. Infinite pagination: user scrolls the page and next items are loaded, this is ideal,
+   as it has exact same benefits as `Next only`.
+
+The choice of pagination style should be based on the size of data set:
+
+1. Page number: is default, and likely acceptable for all pages with moderate
+   amount of data, like 10000 rows. Example: list of merge requests,
+1. Page number without count: is to be used for pages that we expect to present
+   more than 10000 rows,as at this point it is expensive to calculate a number
+   of pages, as we need to iterate all entries. Example: list of pipelines,
+1. Next only / Infinite pagination: is to be used for pages that we cannot calculate
+   number of pages, or we expect to have over 50000 rows, in such case user
+   can go only to next page. Example: list of jobs.
+
+Reasons for the following consideration:
+
+1. It is very inefficient to calculate amount of objects that pass the filtering,
+   this operation usually can take seconds, and can timeout,
+1. It is very inefficent to get entries for page at higher ordinals, like 1000.
+   The database has to sort and iterate all previous items, and this operation usually
+   can result in exponential complexity put on database.
+
+## Badge counters
+
+The counters should always be truncated. It means that we do not want to present
+exact number over some threshold. The reason for that is for the cases where we want
+to calculate exact number of items, we effectively need to filter each of them for
+the purpose of knowing exact number of items matching.
+
+From ~UX perspective it is often acceptable to see that you have over 1000+ pipelines,
+instead of that you have 40000+ pipelines, but at a tradeoff of loading page for 2s longer.
+
+Example of such pattern is the list of pipelines and jobs. We truncate numbers to `1000+`,
+but we show an accurate number of running pipelines, which is the most interesting information.
+
+There's an for example a helper method that can be used for that purpose `NumbersHelper.limited_counter_with_delimiter`
+that accepts an upper limit of counting rows.
+
+## Application/misuse limits
+
+Every new feature should have an safe usage quotas introduced.
+The quota should be optimised to a level that we consider the feature to
+be performant and useable for the user, but **not limiting**.
+
+**We want the features to be fully useable for the users.**
+**However, we want to ensure that the feature will continue to perform well if used at limit**
+**and it will not cause availability issues.**
+
+The intent is to provide a safe usage pattern for the features,
+as our implementation decisions are optimised for the given data set.
+Our feature limits should reflect the optimisations that we introduced.
+
+The intent of quotas could be different:
+
+1. We want to provide higher quotas for higher tiers of features:
+   we want to provide on GitLab.com more capabilities for different tiers,
+1. We want to prevent misuse of the features: someone accidentially creates
+   10000 deploy tokens, because of broken API script,
+1. We want to prevent abuse of the features: someone purposely creates
+   a 10000 pipelines to take an advantage from the system.
+
+Consider that always is better start with the some kind of limitation,
+instead of later introducing a breaking change that would result some
+of the workflows to break.
+
+Examples:
+
+1. Pipeline Schedules: It is very unlikely that user will want to create
+   more than 50 schedules.
+   In such cases it is rather expected that this is either misuse
+   or abuse of the feature. Lack of the upper limit can result
+   in service degredation as system will try to process all schedules
+   assigned the the project.
+
+1. GitLab CI includes: We started with the limit of maximum of 50 nested includes.
+   We did understand that performance of the feature was acceptable at that level.
+   We received a request from the community that the limit is to small.
+   We had a time to understand the customer requirement, and implement additional
+   fail-safe mechanism (time-based one) to increase the limit 100, and if needed increase it
+   further without negative impact on availability of the feature and GitLab.
+
+## Usage of feature flags
+
+Each feature that has performance critical elements or has a know performance deficiency
+should come with feature flag to disable it.
+
+The feature flag makes our team more happy, because they can monitor the system and
+quickly react without our users noticing the problem.
+
+Know performance deficiencies should be addressed right away after we merge initial
+changes.
