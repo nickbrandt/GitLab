@@ -19,6 +19,10 @@ export default {
       type: Array,
       required: true,
     },
+    showLoadingIndicator: {
+      type: Boolean,
+      required: true,
+    },
   },
   methods: {
     projectRemoved(project) {
@@ -31,10 +35,11 @@ export default {
 <template>
   <section>
     <div>
-      <h3 class="h5 text-secondary border-bottom mb-3 pb-2">
+      <h4 class="h5 font-weight-bold text-secondary border-bottom mb-3 pb-2">
         {{ s__('SecurityDashboard|Projects added') }}
-        <gl-badge>{{ projects.length }}</gl-badge>
-      </h3>
+        <gl-badge pill class="font-weight-bold">{{ projects.length }}</gl-badge>
+        <gl-loading-icon v-if="showLoadingIndicator" size="sm" class="float-right" />
+      </h4>
       <ul v-if="projects.length" class="list-unstyled">
         <li
           v-for="project in projects"

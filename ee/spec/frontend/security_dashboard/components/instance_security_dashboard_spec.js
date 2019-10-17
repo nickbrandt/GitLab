@@ -3,6 +3,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import InstanceSecurityDashboard from 'ee/security_dashboard/components/instance_security_dashboard.vue';
 import SecurityDashboard from 'ee/security_dashboard/components/app.vue';
+import ProjectManager from 'ee/security_dashboard/components/project_manager.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -10,7 +11,8 @@ localVue.use(Vuex);
 const dashboardDocumentation = '/help/docs';
 const emptyStateSvgPath = '/svgs/empty.svg';
 const emptyDashboardStateSvgPath = '/svgs/empty-dash.svg';
-const projectsEndpoint = '/projects';
+const projectAddEndpoint = '/projects/add';
+const projectListEndpoint = '/projects/list';
 const vulnerabilitiesEndpoint = '/vulnerabilities';
 const vulnerabilitiesCountEndpoint = '/vulnerabilities_summary';
 const vulnerabilitiesHistoryEndpoint = '/vulnerabilities_history';
@@ -24,11 +26,11 @@ describe('Instance Security Dashboard component', () => {
   const factory = ({ projects = [] } = {}) => {
     store = new Vuex.Store({
       modules: {
-        projects: {
+        projectSelector: {
           namespaced: true,
           actions: {
             fetchProjects() {},
-            setProjectsEndpoint() {},
+            setProjectEndpoints() {},
           },
           state: {
             projects,
@@ -53,7 +55,8 @@ describe('Instance Security Dashboard component', () => {
         dashboardDocumentation,
         emptyStateSvgPath,
         emptyDashboardStateSvgPath,
-        projectsEndpoint,
+        projectAddEndpoint,
+        projectListEndpoint,
         vulnerabilitiesEndpoint,
         vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
@@ -85,6 +88,7 @@ describe('Instance Security Dashboard component', () => {
     expect(wrapper.find(GlEmptyState).exists()).toBe(false);
     expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
     expect(wrapper.find(SecurityDashboard).exists()).toBe(false);
+    expect(wrapper.find(ProjectManager).exists()).toBe(true);
   };
 
   afterEach(() => {
@@ -98,8 +102,14 @@ describe('Instance Security Dashboard component', () => {
 
     it('dispatches the expected actions', () => {
       expect(store.dispatch.mock.calls).toEqual([
-        ['projects/setProjectsEndpoint', projectsEndpoint],
-        ['projects/fetchProjects', undefined],
+        [
+          'projectSelector/setProjectEndpoints',
+          {
+            add: projectAddEndpoint,
+            list: projectListEndpoint,
+          },
+        ],
+        ['projectSelector/fetchProjects', undefined],
       ]);
     });
 
@@ -108,6 +118,7 @@ describe('Instance Security Dashboard component', () => {
       expect(wrapper.find(GlEmptyState).exists()).toBe(false);
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
       expect(wrapper.find(SecurityDashboard).exists()).toBe(false);
+      expect(wrapper.find(ProjectManager).exists()).toBe(false);
     });
   });
 
@@ -121,6 +132,7 @@ describe('Instance Security Dashboard component', () => {
       expect(findProjectSelectorToggleButton().exists()).toBe(true);
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
       expect(wrapper.find(SecurityDashboard).exists()).toBe(false);
+      expect(wrapper.find(ProjectManager).exists()).toBe(false);
 
       expectComponentWithProps(GlEmptyState, {
         svgPath: emptyStateSvgPath,
@@ -146,6 +158,7 @@ describe('Instance Security Dashboard component', () => {
       expect(findProjectSelectorToggleButton().exists()).toBe(true);
       expect(wrapper.find(GlEmptyState).exists()).toBe(false);
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
+      expect(wrapper.find(ProjectManager).exists()).toBe(false);
 
       expectComponentWithProps(SecurityDashboard, {
         dashboardDocumentation,

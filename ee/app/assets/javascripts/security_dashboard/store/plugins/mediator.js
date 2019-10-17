@@ -7,7 +7,7 @@ export default store => {
     store.dispatch('vulnerabilities/fetchVulnerabilitiesHistory', payload);
   };
 
-  store.subscribe(({ type }) => {
+  store.subscribe(({ type, payload }) => {
     switch (type) {
       // SET_ALL_FILTERS mutations are triggered by navigation events, in such case we
       // want to preserve the page number that was set in the sync_with_router plugin
@@ -21,7 +21,9 @@ export default store => {
       // in that case we want to reset the page number
       case `filters/${filtersMutationTypes.SET_FILTER}`:
       case `filters/${filtersMutationTypes.SET_TOGGLE_VALUE}`: {
-        refreshVulnerabilities(store.getters['filters/activeFilters']);
+        if (!payload.lazy) {
+          refreshVulnerabilities(store.getters['filters/activeFilters']);
+        }
         break;
       }
       default:
