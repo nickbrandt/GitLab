@@ -254,13 +254,16 @@ describe 'Issue Boards', :js do
   context 'scoped labels' do
     let!(:scoped_label_1) { create(:label, project: project, name: 'Scoped::Label1') }
     let!(:scoped_label_2) { create(:label, project: project, name: 'Scoped::Label2') }
-  
+
     before do
       stub_licensed_features(scoped_labels: true)
+
+      visit project_board_path(project, board)
+      wait_for_requests
     end
-    
+
     it 'removes existing scoped label' do
-      click_card(card)
+      click_card(card1)
 
       page.within('.labels') do
         click_link 'Edit'
@@ -281,9 +284,9 @@ describe 'Issue Boards', :js do
         end
       end
 
-      expect(card).to have_selector('.scoped-label-wrapper', count: 1)
-      expect(card).not_to have_content(scoped_label_1.title)
-      expect(card).to have_content(scoped_label_2.title)
+      expect(card1).to have_selector('.scoped-label-wrapper', count: 1)
+      expect(card1).not_to have_content(scoped_label_1.title)
+      expect(card1).to have_content(scoped_label_2.title)
     end
   end
 end
