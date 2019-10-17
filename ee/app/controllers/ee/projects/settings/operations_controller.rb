@@ -64,7 +64,7 @@ module EE
           end
 
           if incident_management_available?
-            permitted_params[:incident_management_setting_attributes] = [:create_issue, :send_email, :issue_template_key]
+            permitted_params[:incident_management_setting_attributes] = ::Gitlab::Tracking::IncidentManagement.tracking_keys.keys
           end
 
           permitted_params
@@ -80,6 +80,17 @@ module EE
             format.json do
               render_update_json_response(result)
             end
+          end
+        end
+
+        override :track_events
+        def track_events(result)
+          super
+
+          if result[:status] == :success
+            ::Gitlab::Tracking::IncidentManagement.track_from_params(
+              update_params[:incident_management_setting_attributes]
+            )
           end
         end
       end
