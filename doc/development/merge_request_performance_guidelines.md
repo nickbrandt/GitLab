@@ -1,9 +1,9 @@
 # Merge Request Performance Guidelines
 
-Each new introduced merge request **must be performant by default**.
+Each new introduced merge request **should be performant by default**.
 
 To ensure a merge request does not negatively impact performance of GitLab
-_every_ merge request **must** adhere to the guidelines outlined in this
+_every_ merge request **should** adhere to the guidelines outlined in this
 document. There are no exceptions to this rule unless specifically discussed
 with and agreed upon by backend maintainers and performance specialists.
 
@@ -13,6 +13,15 @@ the following guides:
 
 - [Performance Guidelines](performance.md)
 - [What requires downtime?](what_requires_downtime.md)
+
+## Definition
+
+The term `SHOULD` per the [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) means:
+
+> This word, or the adjective "RECOMMENDED", mean that there
+> may exist valid reasons in particular circumstances to ignore a
+> particular item, but the full implications must be understood and
+> carefully weighed before choosing a different course.
 
 ## Impact Analysis
 
@@ -46,49 +55,36 @@ should ask one of the merge request reviewers to review your changes. You can
 find a list of these reviewers at <https://about.gitlab.com/company/team/>. A reviewer
 in turn can request a performance specialist to review the changes.
 
-## Think out of the box
+## Think outside of the box
 
-Everyone has their own perception how the new feature is gonna be used.
-Always think how users gonna be using the feature instead. Usually,
+Everyone has their own perception how the new feature is going to be used.
+Always think how users going to be using the feature instead. Usually,
 users test our features in a very unconventional way,
 like by brute forcing or abusing edge conditions that we have.
-
-Example:
-
-You assume that your milestone can have only 1-3 releases
-attached. Consider how this feature will work if user mistakenly
-puts 1000 milestones in the release:
-
-1. Will this page explode?
-1. Will it load or timeout?
-1. What is the easiest way to fix it?
-1. Maybe it is acceptable to limit and just show a few, but ignore rest?
-1. Maybe show an indicator that you have 1000+ more?
 
 ## Data set
 
 The data set that will be processed by merge request should be known
-and documented. One of the examples is the feature processing files.
-The feature should clearly document what expected data set is for
-this feature to process, and what problems it might cause.
+and documented.  The feature should clearly document what expected
+data set is for this feature to process, and what problems it might cause.
 
-One examples would be a filtering of files from git repository.
-Your feature requests a list of all files from the repository
-and perform search for the set of files. As an author you should
-understand the:
+If you would think about the following example that puts
+a strong emphasis of data set being processed.
+The problem is simple: you want to filter a list of files from
+some git repository. Your feature requests a list of all files
+from the repository and perform search for the set of files.
+As an author you should in context of that problem consider
+the following:
 
 1. What repositories are going to be supported?
 1. How long it will take for big repositories like Linux kernel?
 1. Is there something that we can make to do differently to not
    process big data set?
-1. Should we build some fail-safe mechanism to contain computation
-   complexity, usually it is better to degredate the service for
-   single user instead of all users.
+1. Should we build some fail-safe mechanism to contain
+   computation complexity? Usually it is better to degrade
+   the service for asingle user instead of all users.
 
 ## Query plans and database structure
-
-Each changed query should have a comment with attached query plan
-that is executed against **staging** environment.
 
 The query plan can answer the questions whether we need additional
 indexes, or whether we perform expensive filtering (ex. using sequential scans).
@@ -105,7 +101,7 @@ in a very unconventional way. Even, if it seems that it is unlikely
 that such big data set will be used, it is still plausible that one
 of our customers will have the problem with the feature.
 
-Understanding ahead of time how it is gonna behave at scale even if we accept it,
+Understanding ahead of time how it is going to behave at scale even if we accept it,
 is the desired outcome. We should always have a plan or understanding what it takes
 to optimise feature to magnitude of higher usage patterns.
 
@@ -113,6 +109,9 @@ Every database structure should be optimised and sometimes even over-described
 to be prepared to be easily extended. The hardest part after some point is
 data migration. Migrating milion of rows will always be troublesome and
 can have negative impact on application.
+
+To better understand the how to help with the query plan reviews
+read this section [How to prepare the merge request for a database review](https://docs.gitlab.com/ee/development/database_review.html#how-to-prepare-the-merge-request-for-a-database-review).
 
 ## Query Counts
 
@@ -247,29 +246,23 @@ system](https://guides.rubyonrails.org/caching_with_rails.html).
 
 Each feature that renders a list of items as a table needs to include the pagination.
 
-Three pagination styles are proposed:
+A different styles of paginations are proposed:
 
-1. Page number: user go to specific page, like 1. User sees the next page number,
-   and the total number of pages,
-1. Page number, but without count: user goes to a specific page, like 1.
-   User sees the next page number,
-1. Next only: user can only go to next page, as we do not know how many pages
+1. Offset-based pagination: user go to specific page, like 1. User sees the next page number,
+   and the total number of pages. This style is well supported by all components of GitLab,
+1. Offset-based pagination, but without the count: user goes to a specific page, like 1.
+   User sees only the next page number, but does not see the total amount of pages
+1. Next page using keyset-based pagination: user can only go to next page, as we do not know how many pages
    are available,
-1. Infinite pagination: user scrolls the page and next items are loaded, this is ideal,
+1. Infinite pagination using keyset-based pagination: user scrolls the page and next items are loaded, this is ideal,
    as it has exact same benefits as `Next only`.
 
-The choice of pagination style should be based on the size of data set:
+The ultimately scalable solution for pagination is to use Keyset-based pagination.
+However, we don't have support for that at GitLab at that moment. You
+can follow the progress looking at [API: Keyset Pagination
+](https://gitlab.com/groups/gitlab-org/-/epics/2039).
 
-1. Page number: is default, and likely acceptable for all pages with moderate
-   amount of data, like 10000 rows. Example: list of merge requests,
-1. Page number without count: is to be used for pages that we expect to present
-   more than 10000 rows,as at this point it is expensive to calculate a number
-   of pages, as we need to iterate all entries. Example: list of pipelines,
-1. Next only / Infinite pagination: is to be used for pages that we cannot calculate
-   number of pages, or we expect to have over 50000 rows, in such case user
-   can go only to next page. Example: list of jobs.
-
-Reasons for the following consideration:
+Take into consideration the following when c:
 
 1. It is very inefficient to calculate amount of objects that pass the filtering,
    this operation usually can take seconds, and can timeout,
@@ -292,6 +285,9 @@ but we show an accurate number of running pipelines, which is the most interesti
 
 There's an for example a helper method that can be used for that purpose `NumbersHelper.limited_counter_with_delimiter`
 that accepts an upper limit of counting rows.
+
+In some cases it is desired that badge counters are loaded asynchronously.
+This can speeds-up initial page load and aid to overall better user-experience.
 
 ## Application/misuse limits
 
@@ -346,3 +342,6 @@ quickly react without our users noticing the problem.
 
 Know performance deficiencies should be addressed right away after we merge initial
 changes.
+
+To read more about when and how feature flags should be used is well
+described in [Feature flags in GitLab development](https://docs.gitlab.com/ee/development/feature_flags/process.html#feature-flags-in-gitlab-development).
