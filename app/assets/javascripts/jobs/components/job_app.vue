@@ -6,6 +6,7 @@ import { isScrolledToBottom } from '~/lib/utils/scroll_utils';
 import { polyfillSticky } from '~/lib/utils/sticky';
 import bp from '~/breakpoints';
 import CiHeader from '~/vue_shared/components/header_ci_component.vue';
+import Callout from '~/vue_shared/components/callout.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import createStore from '../store';
 import EmptyState from './empty_state.vue';
@@ -24,6 +25,7 @@ export default {
   store: createStore(),
   components: {
     CiHeader,
+    Callout,
     EmptyState,
     EnvironmentsBlock,
     ErasedBlock,
@@ -237,11 +239,9 @@ export default {
             />
           </div>
 
-          <div
-            v-if="shouldRenderCalloutMessage && !hasUnmetPrerequisitesFailure"
-            class="bs-callout bs-callout-danger"
-            v-html="job.callout_message"
-          ></div>
+          <callout v-if="shouldRenderCalloutMessage && !hasUnmetPrerequisitesFailure">
+            <div v-html="job.callout_message"></div>
+          </callout>
         </header>
         <!-- EO Header Section -->
 
