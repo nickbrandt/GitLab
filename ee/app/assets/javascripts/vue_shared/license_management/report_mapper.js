@@ -52,11 +52,9 @@ class V2Report {
   }
 
   static createLicenseMap(licenses) {
-    const reducer = (memo, item) => {
-      memo[item.id] = { name: item.name, url: item.url }; // eslint-disable-line no-param-reassign
-      return memo;
-    };
-    return licenses.reduce(reducer, {});
+    const identityMap = {};
+    licenses.forEach(item => (identityMap[item.id] = { name: item.name, url: item.url }));
+    return identityMap;
   }
 }
 
@@ -71,7 +69,7 @@ export default class ReportMapper {
   }
 
   mapFrom(reportArtifact) {
-    const majorVersion = ReportMapper.majorVersion(reportArtifact);
+    const majorVersion = ReportMapper.majorVersionFor(reportArtifact);
     return this.mapperFor(majorVersion)(reportArtifact);
   }
 
@@ -79,7 +77,12 @@ export default class ReportMapper {
     return this.mappers[majorVersion];
   }
 
-  static majorVersion(report) {
-    return report && report.version ? report.version.split('.')[0] : DEFAULT_VERSION;
+  static majorVersionFor(report) {
+    if (report && report.version) {
+      const [majorVersion] = report.version.split('.');
+      return majorVersion;
+    }
+
+    return DEFAULT_VERSION;
   }
 }
