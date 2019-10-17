@@ -15,7 +15,7 @@ module Elastic
 
       record.__elasticsearch__.client = client
 
-      import(record, record.class.nested?, indexing)
+      import(record, indexing)
 
       initial_index_project(record) if record.class == Project && indexing
 
@@ -65,12 +65,12 @@ module Elastic
       raise ImportError.new(errors.inspect)
     end
 
-    def import(record, nested, indexing)
+    def import(record, indexing)
       operation = indexing ? 'index_document' : 'update_document'
       response = nil
 
       IMPORT_RETRY_COUNT.times do
-        response = if nested
+        response = if record.es_parent
                      record.__elasticsearch__.__send__ operation, routing: record.es_parent # rubocop:disable GitlabSecurity/PublicSend
                    else
                      record.__elasticsearch__.__send__ operation # rubocop:disable GitlabSecurity/PublicSend
