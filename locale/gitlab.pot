@@ -15050,6 +15050,9 @@ msgstr ""
 msgid "Show file browser"
 msgstr ""
 
+msgid "Show labels"
+msgstr ""
+
 msgid "Show latest version"
 msgstr ""
 

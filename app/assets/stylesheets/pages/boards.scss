@@ -545,3 +545,17 @@
 .board-issue-path.js-show-tooltip {
   cursor: help;
 }
+
+.boards-labels-toggle-wrapper {
+  display: flex;
+  align-items: center;
+
+  label {
+    font-weight: $gl-font-weight-normal;
+    margin-bottom: 0;
+  }
+
+  @include media-breakpoint-down(sm) {
+    margin-bottom: 10px;
+  }
+}
