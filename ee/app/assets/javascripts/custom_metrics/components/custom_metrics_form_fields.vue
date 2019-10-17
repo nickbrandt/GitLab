@@ -1,11 +1,42 @@
 <script>
-import { GlFormInput, GlButton, GlLink, GlFormGroup, GlFormRadioGroup } from '@gitlab/ui';
+import {
+  GlFormInput,
+  GlButton,
+  GlLink,
+  GlFormGroup,
+  GlFormRadioGroup,
+  GlLoadingIcon,
+} from '@gitlab/ui';
 import { debounce } from 'underscore';
-import axios from '~/lib/utils/axios_utils';
 import { __, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import csrf from '~/lib/utils/csrf';
+import axios from '~/lib/utils/axios_utils';
+import statusCodes from '~/lib/utils/http_status';
+import { backOff } from '~/lib/utils/common_utils';
 import { queryTypes, formDataValidator } from '../constants';
+
+const MAX_REQUESTS = 4;
+
+function backOffRequest(makeRequestCallback) {
+  let requestsCount = 0;
+  return backOff((next, stop) => {
+    makeRequestCallback()
+      .then(resp => {
+        if (resp.status === statusCodes.OK) {
+          stop(resp);
+        } else {
+          requestsCount += 1;
+          if (requestsCount < MAX_REQUESTS) {
+            next();
+          } else {
+            stop(resp);
+          }
+        }
+      })
+      .catch(stop);
+  });
+}
 
 export default {
   components: {
@@ -14,6 +45,7 @@ export default {
     GlLink,
     GlFormGroup,
     GlFormRadioGroup,
+    GlLoadingIcon,
     Icon,
   },
   props: {
@@ -49,6 +81,7 @@ export default {
 
     return {
       queryIsValid: null,
+      queryValidateInFlight: false,
       ...this.formData,
       group,
     };
@@ -82,26 +115,39 @@ export default {
   },
   methods: {
     requestValidation() {
-      return axios.post(this.validateQueryPath, {
-        query: this.query,
-      });
+      return backOffRequest(() =>
+        axios.post(this.validateQueryPath, {
+          query: this.query,
+        }),
+      );
+    },
+    setFormState(isValid, inFlight, message) {
+      this.queryIsValid = isValid;
+      this.queryValidateInFlight = inFlight;
+      this.errorMessage = message;
     },
     validateQuery() {
+      if (!this.query) {
+        this.setFormState(null, false, '');
+        return;
+      }
+      this.setFormState(null, true, '');
       this.requestValidation()
         .then(res => {
           const response = res.data;
           const { valid, error } = response.query;
-
           if (response.success) {
-            this.errorMessage = valid ? '' : error;
-            this.queryIsValid = valid;
+            this.setFormState(valid, false, valid ? '' : error);
           } else {
             throw new Error(__('There was an error trying to validate your query'));
           }
         })
         .catch(() => {
-          this.errorMessage = s__('Metrics|There was an error trying to validate your query');
-          this.queryIsValid = false;
+          this.setFormState(
+            false,
+            false,
+            s__('Metrics|There was an error trying to validate your query'),
+          );
         });
     },
     debouncedValidateQuery: debounce(function checkQuery() {
@@ -150,7 +196,7 @@ export default {
     >
       <gl-form-input
         id="prometheus_metric_query"
-        v-model="query"
+        v-model.trim="query"
         name="prometheus_metric[query]"
         class="form-control"
         :placeholder="s__('Metrics|e.g. rate(http_requests_total[5m])')"
@@ -158,12 +204,16 @@ export default {
         :state="queryIsValid"
         @input="debouncedValidateQuery"
       />
-      <slot name="valid-feedback">
+      <span v-if="queryValidateInFlight" class="form-text text-muted">
+        <gl-loading-icon :inline="true" class="mr-1 align-middle" />
+        {{ s__('Metrics|Validating query') }}
+      </span>
+      <slot v-if="!queryValidateInFlight" name="valid-feedback">
         <span class="form-text cgreen">
           {{ validQueryMsg }}
         </span>
       </slot>
-      <slot name="invalid-feedback">
+      <slot v-if="!queryValidateInFlight" name="invalid-feedback">
         <span class="form-text cred">
           {{ invalidQueryMsg }}
         </span>

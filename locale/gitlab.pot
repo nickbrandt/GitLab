@@ -10819,6 +10819,9 @@ msgstr ""
 msgid "Metrics|Used if the query returns a single series. If it returns multiple series, their legend labels will be picked up from the response."
 msgstr ""
 
+msgid "Metrics|Validating query"
+msgstr ""
+
 msgid "Metrics|Y-axis label"
 msgstr ""
 
