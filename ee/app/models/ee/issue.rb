@@ -27,6 +27,7 @@ module EE
         end
       end
 
+      has_and_belongs_to_many :self_managed_prometheus_alert_events, join_table: :issues_self_managed_prometheus_alert_events
       has_and_belongs_to_many :prometheus_alert_events, join_table: :issues_prometheus_alert_events
       has_many :prometheus_alerts, through: :prometheus_alert_events
 

@@ -15,6 +15,12 @@ module Gitlab
         end
       end
 
+      def metric_id
+        strong_memoize(:metric_id) do
+          payload&.dig('labels', 'gitlab_alert_id')
+        end
+      end
+
       def title
         strong_memoize(:title) do
           gitlab_alert&.title || parse_title_from_payload
@@ -28,7 +34,9 @@ module Gitlab
       end
 
       def environment
-        gitlab_alert&.environment
+        strong_memoize(:environment) do
+          gitlab_alert&.environment || parse_environment_from_payload
+        end
       end
 
       def annotations
@@ -40,6 +48,18 @@ module Gitlab
       def starts_at
         strong_memoize(:starts_at) do
           parse_datetime_from_payload('startsAt')
+        end
+      end
+
+      def starts_at_raw
+        strong_memoize(:starts_at_raw) do
+          payload&.dig('startsAt')
+        end
+      end
+
+      def ends_at
+        strong_memoize(:ends_at) do
+          parse_datetime_from_payload('endsAt')
         end
       end
 
@@ -55,8 +75,18 @@ module Gitlab
         end
       end
 
+      def status
+        strong_memoize(:status) do
+          payload&.dig('status')
+        end
+      end
+
+      def gitlab_managed?
+        metric_id.present?
+      end
+
       def valid?
-        project && title && starts_at
+        payload.respond_to?(:dig) && project && title && starts_at
       end
 
       def present
@@ -65,8 +95,17 @@ module Gitlab
 
       private
 
+      def parse_environment_from_payload
+        environment_name = payload&.dig('labels', 'gitlab_environment_name')
+
+        return unless environment_name
+
+        EnvironmentsFinder.new(project, nil, { name: environment_name })
+          .find
+          &.first
+      end
+
       def parse_gitlab_alert_from_payload
-        metric_id = payload&.dig('labels', 'gitlab_alert_id')
         return unless metric_id
 
         Projects::Prometheus::AlertsFinder

@@ -46,6 +46,7 @@ describe Issue do
     it { is_expected.to have_many(:designs) }
     it { is_expected.to have_many(:design_versions) }
     it { is_expected.to have_and_belong_to_many(:prometheus_alert_events) }
+    it { is_expected.to have_and_belong_to_many(:self_managed_prometheus_alert_events) }
     it { is_expected.to have_many(:prometheus_alerts) }
 
     describe 'versions.most_recent' do
