@@ -47,8 +47,8 @@ A database **reviewer**'s role is to:
   reassign MR to the database **maintainer** suggested by Reviewer
   Roulette.
   - Currently we have a critical shortage of database maintainers.  If the database **reviewer** cannot find an available database **maintainer** then:
-  - Assign the MR to a second database **reviewer** for further review
-  - Once satisfied with the review process, and if the database **maintainer** is still not available, reassign to a backend **maintainer**
+  - Assign the MR to a second database **reviewer** for further review.
+  - Once satisfied with the review process, and if the database **maintainer** is still not available, reassign to a backend **maintainer**.
 
 A database **maintainer**'s role is to:
 
