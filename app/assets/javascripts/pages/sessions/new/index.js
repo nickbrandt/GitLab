@@ -21,9 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // redirected to sign-in after attempting to access a protected URL that included a fragment.
   preserveUrlFragment(window.location.hash);
 
-  const tab = document.querySelector(".new-session-tabs a[href='#register-pane']");
-  const { category, action, ...data } = gon.tracking_data;
-  tab.addEventListener('click', () => {
-    Tracking.event(category, action, data);
-  });
+  if (gon.tracking_data) {
+    const tab = document.querySelector(".new-session-tabs a[href='#register-pane']");
+    const { category, action, ...data } = gon.tracking_data;
+    tab.addEventListener('click', () => {
+      Tracking.event(category, action, data);
+    });
+  }
 });

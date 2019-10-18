@@ -36,9 +36,9 @@ describe SessionsController do
     end
 
     describe 'tracking data' do
-      context 'with the experimental signup flow enabled' do
+      context 'when the user is part of the experimental group' do
         before do
-          stub_experiment(signup_flow: true)
+          stub_experiment_for_user(signup_flow: true)
         end
 
         it 'doesn\'t pass tracking parameters to the frontend' do
@@ -47,9 +47,10 @@ describe SessionsController do
         end
       end
 
-      context 'with the experimental signup flow disabled' do
+      context 'with the experimental signup flow enabled and the user is part of the control group' do
         before do
-          stub_experiment(signup_flow: false)
+          stub_experiment(signup_flow: true)
+          stub_experiment_for_user(signup_flow: false)
           allow_any_instance_of(described_class).to receive(:experimentation_subject_id).and_return('uuid')
         end
 

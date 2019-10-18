@@ -12,9 +12,10 @@ describe RegistrationsController do
   describe '#new' do
     subject { get :new }
 
-    context 'with the experimental signup flow enabled' do
+    context 'with the experimental signup flow enabled and the user is part of the experimental group' do
       before do
         stub_experiment(signup_flow: true)
+        stub_experiment_for_user(signup_flow: true)
       end
 
       it 'tracks the event with the right parameters' do
@@ -33,9 +34,10 @@ describe RegistrationsController do
       end
     end
 
-    context 'with the experimental signup flow disabled' do
+    context 'with the experimental signup flow enabled and the user is part of the control group' do
       before do
-        stub_experiment(signup_flow: false)
+        stub_experiment(signup_flow: true)
+        stub_experiment_for_user(signup_flow: false)
       end
 
       it 'does not track the event' do
@@ -258,30 +260,34 @@ describe RegistrationsController do
       end
     end
 
-    context 'with the experimental signup flow disabled' do
-      before do
-        stub_experiment(signup_flow: false)
+    describe 'tracking data' do
+      context 'with the experimental signup flow enabled and the user is part of the control group' do
+        before do
+          stub_experiment(signup_flow: true)
+          stub_experiment_for_user(signup_flow: false)
+        end
+
+        it 'tracks the event with the right parameters' do
+          expect(Gitlab::Tracking).to receive(:event).with(
+            'Growth::Acquisition::Experiment::SignUpFlow',
+            'end',
+            label: anything,
+            property: 'control_group'
+          )
+          post :create, params: user_params
+        end
       end
 
-      it 'tracks the event with the right parameters' do
-        expect(Gitlab::Tracking).to receive(:event).with(
-          'Growth::Acquisition::Experiment::SignUpFlow',
-          'end',
-          label: anything,
-          property: 'control_group'
-        )
-        post :create, params: user_params
-      end
-    end
+      context 'with the experimental signup flow enabled and the user is part of the experimental group' do
+        before do
+          stub_experiment(signup_flow: true)
+          stub_experiment_for_user(signup_flow: true)
+        end
 
-    context 'with the experimental signup flow enabled' do
-      before do
-        stub_experiment(signup_flow: true)
-      end
-
-      it 'does not track the event' do
-        expect(Gitlab::Tracking).not_to receive(:event)
-        post :create, params: user_params
+        it 'does not track the event' do
+          expect(Gitlab::Tracking).not_to receive(:event)
+          post :create, params: user_params
+        end
       end
     end
 
@@ -376,6 +382,7 @@ describe RegistrationsController do
   describe '#update_role' do
     before do
       stub_experiment(signup_flow: true)
+      stub_experiment_for_user(signup_flow: true)
       sign_in(create(:user))
     end
 

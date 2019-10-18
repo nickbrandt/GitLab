@@ -21,7 +21,8 @@ module Gitlab
 
     # Controller concern that checks if an experimentation_subject_id cookie is present and sets it if absent.
     # Used for A/B testing of experimental features. Exposes the `experiment_enabled?(experiment_name)` method
-    # to controllers and views.
+    # to controllers and views. It returns true when the experiment is enabled and the user is selected as part
+    # of the experimental group.
     #
     module ControllerConcern
       extend ActiveSupport::Concern
@@ -42,15 +43,19 @@ module Gitlab
       end
 
       def experiment_enabled?(experiment_key)
-        Experimentation.enabled?(experiment_key, experimentation_subject_index)
+        Experimentation.enabled_for_user?(experiment_key, experimentation_subject_index)
       end
 
       def track_experiment_event(experiment_key, action)
+        return unless Experimentation.enabled?(experiment_key)
+
         tracking_data = experimentation_tracking_data(experiment_key, action)
         ::Gitlab::Tracking.event(tracking_data.delete(:category), tracking_data.delete(:action), tracking_data)
       end
 
       def frontend_experimentation_tracking_data(experiment_key, action)
+        return unless Experimentation.enabled?(experiment_key)
+
         tracking_data = experimentation_tracking_data(experiment_key, action)
         gon.push(tracking_data: tracking_data)
       end
@@ -81,6 +86,8 @@ module Gitlab
       end
 
       def tracking_group(experiment_key)
+        return unless Experimentation.enabled?(experiment_key)
+
         experiment_enabled?(experiment_key) ? 'experimental_group' : 'control_group'
       end
     end
@@ -90,14 +97,16 @@ module Gitlab
         Experiment.new(EXPERIMENTS[key].merge(key: key))
       end
 
-      def enabled?(experiment_key, experimentation_subject_index)
+      def enabled?(experiment_key)
         return false unless EXPERIMENTS.key?(experiment_key)
 
         experiment = experiment(experiment_key)
+        experiment.feature_toggle_enabled? && experiment.enabled_for_environment?
+      end
 
-        experiment.feature_toggle_enabled? &&
-          experiment.enabled_for_environment? &&
-          experiment.enabled_for_experimentation_subject?(experimentation_subject_index)
+      def enabled_for_user?(experiment_key, experimentation_subject_index)
+        enabled?(experiment_key) &&
+          experiment(experiment_key).enabled_for_experimentation_subject?(experimentation_subject_index)
       end
     end
 
