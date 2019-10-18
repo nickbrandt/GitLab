@@ -25,10 +25,8 @@ issues:
 - epic
 - designs
 - design_versions
-- description_versions
 - prometheus_alerts
 - prometheus_alert_events
-- self_managed_prometheus_alert_events
 events:
 - author
 - project
@@ -83,7 +81,6 @@ releases:
 - links
 - milestone_releases
 - milestones
-- evidence
 links:
 - release
 project_members:
@@ -133,7 +130,6 @@ merge_requests:
 - blocks_as_blockee
 - blocking_merge_requests
 - blocked_merge_requests
-- description_versions
 external_pull_requests:
 - project
 merge_request_diff:
@@ -404,7 +400,6 @@ project:
 - operations_feature_flags_client
 - prometheus_alerts
 - prometheus_alert_events
-- self_managed_prometheus_alert_events
 - software_license_policies
 - project_registry
 - packages
@@ -422,6 +417,7 @@ project:
 - alerts_service
 - grafana_integration
 - remove_source_branch_after_merge
+- deleting_user
 award_emoji:
 - awardable
 - user
@@ -479,8 +475,6 @@ prometheus_alerts:
 - prometheus_alert_events
 prometheus_alert_events:
 - project
-self_managed_prometheus_alert_events:
-- project
 epic_issues:
 - issue
 - epic
@@ -513,8 +507,6 @@ lists:
 - list_user_preferences
 milestone_releases:
 - milestone
-- release
-evidences:
 - release
 design: &design
 - issue

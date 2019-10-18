@@ -147,6 +147,8 @@ excluded_attributes:
     - :emails_disabled
     - :max_pages_size
     - :max_artifacts_size
+    - :marked_for_deletion_at
+    - :marked_for_deletion_by_id
   namespaces:
     - :runners_token
     - :runners_token_encrypted
