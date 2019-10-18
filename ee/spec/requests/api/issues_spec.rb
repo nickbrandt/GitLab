@@ -42,7 +42,7 @@ describe API::Issues, :mailer do
       it 'contains epic_iid in response' do
         subject
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:success)
         expect(epic_issue_response_for(epic_issue)['epic_iid']).to eq(epic.iid)
       end
     end
@@ -55,9 +55,54 @@ describe API::Issues, :mailer do
       it 'does not contain epic_iid in response' do
         subject
 
-        expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(:success)
         expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
       end
+    end
+  end
+
+  shared_examples 'sets epic_iid' do
+    context 'with epics feature' do
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      it 'sets epic on issue' do
+        subject
+
+        expect(epic_issue.epic).to eq(epic)
+      end
+    end
+
+    context 'without epics feature' do
+      before do
+        stub_licensed_features(epics: false)
+      end
+
+      it 'does not set epic on issue' do
+        subject
+
+        expect(epic_issue.epic).not_to eq(epic)
+      end
+    end
+  end
+
+  shared_examples 'ignores epic_iid' do
+    before do
+      stub_licensed_features(epics: true)
+    end
+
+    it 'does not contain epic_iid in response' do
+      subject
+
+      expect(response).to have_gitlab_http_status(:success)
+      expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
+    end
+
+    it 'does not set epic on issue' do
+      subject
+
+      expect(epic_issue.epic).not_to eq(epic)
     end
   end
 
@@ -221,6 +266,28 @@ describe API::Issues, :mailer do
       expect(json_response['assignee']['name']).to eq(user2.name)
       expect(json_response['assignees'].first['name']).to eq(user2.name)
     end
+
+    context 'with epic parameter' do
+      let(:epic_issue) { Issue.last }
+      let(:params) { { title: 'issue with epic', epic_iid: epic.iid } }
+
+      context 'for a group project' do
+        subject { post api("/projects/#{group_project.id}/issues", user), params: params }
+
+        before do
+          group.add_owner(user)
+        end
+
+        include_examples 'exposes epic_iid'
+        include_examples 'sets epic_iid'
+      end
+
+      context 'for a user project' do
+        subject { post api("/projects/#{project.id}/issues", user), params: params }
+
+        include_examples 'ignores epic_iid'
+      end
+    end
   end
 
   describe 'PUT /projects/:id/issues/:issue_id to update weight' do
@@ -268,6 +335,29 @@ describe API::Issues, :mailer do
         expect(json_response['weight']).to be_nil
         expect(issue.reload.read_attribute(:weight)).to be_nil
       end
+    end
+  end
+
+  describe 'PUT /projects/:id/issues/:issue_id to update epic' do
+    context 'for a group project' do
+      let!(:epic_issue) { create(:issue, project: group_project) }
+
+      subject { put api("/projects/#{group_project.id}/issues/#{epic_issue.iid}", user), params: { epic_iid: epic.iid } }
+
+      before do
+        group.add_owner(user)
+      end
+
+      include_examples 'exposes epic_iid'
+      include_examples 'sets epic_iid'
+    end
+
+    context 'for a user project' do
+      let!(:epic_issue) { create(:issue, project: project) }
+
+      subject { put api("/projects/#{project.id}/issues/#{epic_issue.iid}", user), params: { epic_iid: epic.iid } }
+
+      include_examples 'ignores epic_iid'
     end
   end
 
