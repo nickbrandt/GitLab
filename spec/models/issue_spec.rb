@@ -138,7 +138,10 @@ describe Issue do
     end
 
     it 'changes the state to closed' do
-      expect { issue.close }.to change { issue.state }.from('opened').to('closed')
+      open_state = described_class.available_states[:opened]
+      closed_state = described_class.available_states[:closed]
+
+      expect { issue.close }.to change { issue.state_id }.from(open_state).to(closed_state)
     end
   end
 
@@ -155,7 +158,7 @@ describe Issue do
     end
 
     it 'changes the state to opened' do
-      expect { issue.reopen }.to change { issue.state }.from('closed').to('opened')
+      expect { issue.reopen }.to change { issue.state_id }.from(described_class.available_states[:closed]).to(described_class.available_states[:opened])
     end
   end
 
