@@ -521,12 +521,6 @@ describe Gitlab::Git::Commit, :seed_helper do
 
       it_behaves_like 'extracting commit signature'
     end
-
-    describe '.extract_signature' do
-      subject { described_class.extract_signature(repository, commit_id) }
-
-      it_behaves_like 'extracting commit signature'
-    end
   end
 
   skip 'move this test to gitaly-ruby' do
