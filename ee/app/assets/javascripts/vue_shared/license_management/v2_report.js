@@ -32,23 +32,19 @@ export default class V2Report {
     if (matchingLicense) matchingLicense.count += 1;
   }
 
-  mapFromDependency(dependency) {
-    const combinedLicense = this.combine(dependency.licenses, license => {
+  mapFromDependency({ name, description, url, licenses }) {
+    const combinedLicense = this.combine(licenses, license => {
       this.incrementCountFor(license.name);
     });
 
     return {
       license: combinedLicense,
-      dependency: {
-        name: dependency.name,
-        url: dependency.url,
-        description: dependency.description,
-      },
+      dependency: { name, url, description },
     };
   }
 
-  static mapFromLicense(license) {
-    return { name: license.name, count: 0 };
+  static mapFromLicense({ name, url = '', count = 0 }) {
+    return { name, url, count };
   }
 
   static createLicenseMap(licenses) {

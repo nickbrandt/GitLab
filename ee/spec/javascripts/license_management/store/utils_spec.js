@@ -9,6 +9,7 @@ import {
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import {
+  Builder,
   approvedLicense,
   blacklistedLicense,
   licenseHeadIssues,
@@ -65,31 +66,18 @@ describe('utils', () => {
 
     it('compares a v2 report with a v2 report', () => {
       const policies = [{ id: 100, name: 'BSD License', approvalStatus: 'blacklisted' }];
-      const baseReport = {
-        version: '2.0',
-        licenses: [{ id: 'MIT', name: 'MIT License', url: 'https://opensource.org/licenses/MIT' }],
-        dependencies: [
-          { name: 'x', url: 'https://www.example.com/x', licenses: ['MIT'], description: 'X' },
-        ],
-      };
+      const baseReport = Builder.forV2()
+        .addLicense({ id: 'MIT', name: 'MIT License' })
+        .addDependency({ name: 'x', licenses: ['MIT'] })
+        .build();
 
-      const headReport = {
-        version: '2.0',
-        licenses: [
-          { id: 'MIT', name: 'MIT License', url: 'https://opensource.org/licenses/MIT' },
-          { id: 'BSD', name: 'BSD License', url: 'https://opensource.org/licenses/BSD' },
-        ],
-        dependencies: [
-          { name: 'x', url: 'https://www.example.com/x', licenses: ['MIT'], description: 'X' },
-          { name: 'y', url: 'https://www.example.com/y', licenses: ['BSD'], description: 'Y' },
-          {
-            name: 'z',
-            url: 'https://www.example.com/z',
-            licenses: ['BSD', 'MIT'],
-            description: 'Z',
-          },
-        ],
-      };
+      const headReport = Builder.forV2()
+        .addLicense({ id: 'MIT', name: 'MIT License' })
+        .addLicense({ id: 'BSD', name: 'BSD License' })
+        .addDependency({ name: 'x', licenses: ['MIT'] })
+        .addDependency({ name: 'y', licenses: ['BSD'] })
+        .addDependency({ name: 'z', licenses: ['BSD', 'MIT'] })
+        .build();
 
       const result = parseLicenseReportMetrics(headReport, baseReport, policies);
 
@@ -101,43 +89,29 @@ describe('utils', () => {
           count: 2,
           status: 'failed',
           name: 'BSD License',
-          packages: [{ name: 'y', url: 'https://www.example.com/y', description: 'Y' }],
+          url: 'https://opensource.org/licenses/BSD',
+          packages: [{ name: 'y', url: 'https://www.example.org/y', description: 'Y' }],
         }),
       );
     });
 
     it('compares a v1 report with a v2 report', () => {
       const policies = [{ id: 101, name: 'BSD License', approvalStatus: 'blacklisted' }];
-      const baseReport = {
-        licenses: [{ name: 'MIT License', url: 'https://opensource.org/licenses/MIT' }],
-        dependencies: [
-          {
-            license: {
-              name: 'MIT License',
-              url: 'https://opensource.org/licenses/MIT',
-            },
-            dependency: { name: 'x', url: 'https://www.example.com/x', description: 'X' },
-          },
-        ],
-      };
+      const baseReport = Builder.forV1()
+        .addLicense({ name: 'MIT License' })
+        .addDependency({
+          name: 'x',
+          license: { name: 'MIT License', url: 'https://opensource.org/licenses/MIT' },
+        })
+        .build();
 
-      const headReport = {
-        version: '2.0',
-        licenses: [
-          { id: 'MIT', name: 'MIT License', url: 'https://opensource.org/licenses/MIT' },
-          { id: 'BSD', name: 'BSD License', url: 'https://opensource.org/licenses/BSD' },
-        ],
-        dependencies: [
-          { name: 'x', url: 'https://www.example.com/x', licenses: ['MIT'], description: 'X' },
-          { name: 'y', url: 'https://www.example.com/y', licenses: ['BSD'], description: 'Y' },
-          {
-            name: 'z',
-            url: 'https://www.example.com/z',
-            licenses: ['BSD', 'MIT'],
-            description: 'Z',
-          },
-        ],
-      };
+      const headReport = Builder.forV2()
+        .addLicense({ id: 'MIT', name: 'MIT License' })
+        .addLicense({ id: 'BSD', name: 'BSD License' })
+        .addDependency({ name: 'x', licenses: ['MIT'] })
+        .addDependency({ name: 'y', licenses: ['BSD'] })
+        .addDependency({ name: 'z', licenses: ['BSD', 'MIT'] })
+        .build();
 
       const result = parseLicenseReportMetrics(headReport, baseReport, policies);
 
@@ -149,7 +123,8 @@ describe('utils', () => {
           count: 2,
           status: 'failed',
           name: 'BSD License',
-          packages: [{ name: 'y', url: 'https://www.example.com/y', description: 'Y' }],
+          url: 'https://opensource.org/licenses/BSD',
+          packages: [{ name: 'y', url: 'https://www.example.org/y', description: 'Y' }],
         }),
       );
     });
