@@ -10,6 +10,11 @@ describe 'Group Cycle Analytics', :js do
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
   let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr.source_branch, sha: mr.source_branch_sha, head_pipeline_of: mr) }
 
+  # let(:persisted_stages) { group.cycle_analytics_stages }
+  # let(:customized_stages) { group.cycle_analytics_stages.where(custom: true) }
+  # let(:default_stages) { Gitlab::Analytics::CycleAnalytics::DefaultStages.all }
+  # let(:expected_stage_count) { default_stages.count + customized_stages.count }
+
   3.times do |i|
     let!("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
   end
@@ -33,9 +38,7 @@ describe 'Group Cycle Analytics', :js do
 
   context 'displays correct fields after group selection' do
     before do
-      dropdown = page.find('.dropdown-groups')
-      dropdown.click
-      dropdown.find('a').click
+      select_group
     end
 
     it 'hides the empty state' do
@@ -216,6 +219,10 @@ describe 'Group Cycle Analytics', :js do
   describe 'Customizable cycle analytics', :js do
     let(:button_class) { '.js-add-stage-button' }
 
+    def select_dropdown_option(name, elem = "option", index = 1)
+      page.find("select[name='#{name}']").all(elem)[index].select_option
+    end
+
     context 'enabled' do
       before do
         select_group
@@ -311,6 +318,61 @@ describe 'Group Cycle Analytics', :js do
 
               expect(page.find('.flash-alert')).to have_text("'#{name}' stage already exists")
             end
+          end
+        end
+      end
+
+      context 'Stage table' do
+        custom_stage = "Cool beans"
+        let(:params) { { name: custom_stage, start_event_identifier: :merge_request_created, end_event_identifier: :merge_request_merged } } 
+        let(:first_default_stage){ page.find('.stage-nav-item-cell', text: "Issue").ancestor(".stage-nav-item") }
+        let(:first_custom_stage){ page.find('.stage-nav-item-cell', text: custom_stage).ancestor(".stage-nav-item") }
+
+        def create_custom_stage
+          Analytics::CycleAnalytics::Stages::CreateService.new(parent: group, params: params, current_user: user).execute
+        end
+
+        # TODO: convert to table driven test
+        context 'default stages' do
+          before do
+            select_group
+
+            first_default_stage.find(".more-actions-toggle").click
+          end
+
+          it 'can be hidden' do
+            expect(first_default_stage.find('.more-actions-dropdown')).to have_text "Hide stage"
+          end
+
+          it 'can not be edited' do
+            expect(first_default_stage.find('.more-actions-dropdown')).not_to have_text "Edit stage"
+          end
+
+          it 'can not be removed' do
+            expect(first_default_stage.find('.more-actions-dropdown')).not_to have_text "Remove stage"
+          end
+        end
+
+        context 'custom stages' do
+          before do
+            create_custom_stage
+            select_group
+
+            expect(page).to have_text custom_stage
+
+            first_custom_stage.find(".more-actions-toggle").click
+          end
+
+          it 'can not be hidden' do
+            expect(first_custom_stage.find('.more-actions-dropdown')).not_to have_text "Hide stage"
+          end
+
+          it 'can be edited' do
+            expect(first_custom_stage.find('.more-actions-dropdown')).to have_text "Edit stage"
+          end
+
+          it 'can be removed' do
+            expect(first_custom_stage.find('.more-actions-dropdown')).to have_text "Remove stage"        
           end
         end
       end

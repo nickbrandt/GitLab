@@ -23,6 +23,9 @@ const groupLabelsEndpoint = `/groups/${groupPath}/-/labels`;
 const flashErrorMessage = 'There was an error while fetching cycle analytics data.';
 const selectedGroup = { fullPath: groupPath };
 
+const stageEndpoint = ({ stageId, groupId }) =>
+  `/-/analytics/cycle_analytics/stages/${stageId}?group_id=${groupId}`;
+
 describe('Cycle analytics actions', () => {
   let state;
   let mock;
@@ -494,8 +497,78 @@ describe('Cycle analytics actions', () => {
           },
           {},
         );
+      });
 
-        shouldFlashAnError();
+      shouldFlashAnError();
+    });
+  });
+
+  describe('updateStage', () => {
+    const stageId = 'cool-stage';
+    const payload = { hidden: true };
+
+    beforeEach(() => {
+      mock.onPut(stageEndpoint({ stageId, groupId: groupPath }), payload).replyOnce(200, payload);
+      state = { selectedGroup: { full_path: groupPath } };
+    });
+
+    it('dispatches receiveUpdateStageSuccess with put request response data', done => {
+      testAction(
+        actions.updateStage,
+        {
+          id: stageId,
+          ...payload,
+        },
+        state,
+        [],
+        [
+          { type: 'requestUpdateStage' },
+          {
+            type: 'receiveUpdateStageSuccess',
+            payload,
+          },
+        ],
+        done,
+      );
+    });
+
+    describe('with a failed request', () => {
+      beforeEach(() => {
+        setFixtures('<div class="flash-container"></div>');
+        mock = new MockAdapter(axios);
+        mock.onPut(stageEndpoint({ stageId, groupId: groupPath })).replyOnce(404);
+      });
+
+      it('dispatches receiveUpdateStageError', done => {
+        testAction(
+          actions.updateStage,
+          {
+            id: stageId,
+            ...payload,
+          },
+          state,
+          [],
+          [
+            { type: 'requestUpdateStage' },
+            {
+              type: 'receiveUpdateStageError',
+              payload: error,
+            },
+          ],
+          done,
+        );
+      });
+
+      it('flashes an error message', done => {
+        actions.receiveUpdateStageError(
+          {
+            commit: () => {},
+            state,
+          },
+          {},
+        );
+        shouldFlashAnError('There was a problem saving your custom stage, please try again');
+        done();
       });
     });
   });
