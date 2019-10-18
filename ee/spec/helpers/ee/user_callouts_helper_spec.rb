@@ -55,6 +55,7 @@ describe EE::UserCalloutsHelper do
 
   describe '.show_enable_hashed_storage_warning?' do
     subject { helper.show_enable_hashed_storage_warning? }
+
     let(:user) { create(:user) }
 
     context 'when hashed storage is disabled' do
@@ -87,6 +88,7 @@ describe EE::UserCalloutsHelper do
 
   describe '.show_migrate_hashed_storage_warning?' do
     subject { helper.show_migrate_hashed_storage_warning? }
+
     let(:user) { create(:user) }
 
     context 'when hashed storage is disabled' do

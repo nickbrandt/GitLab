@@ -277,6 +277,7 @@ describe Issue do
 
       context 'checking destination project also' do
         subject { issue.can_move?(user, to_project) }
+
         let(:to_project) { create(:project) }
 
         context 'destination project allowed' do

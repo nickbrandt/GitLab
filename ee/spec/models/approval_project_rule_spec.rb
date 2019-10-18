@@ -80,6 +80,7 @@ describe ApprovalProjectRule do
     ApprovalProjectRule::REPORT_TYPES_BY_DEFAULT_NAME.each do |name, value|
       context "when the project rule is for a `#{name}`" do
         subject { create(:approval_project_rule, value, :requires_approval, project: project) }
+
         let!(:result) { subject.apply_report_approver_rules_to(merge_request) }
 
         specify { expect(merge_request.reload.approval_rules).to match_array([result]) }

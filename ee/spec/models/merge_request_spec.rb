@@ -162,6 +162,7 @@ describe MergeRequest do
 
   describe '#has_license_management_reports?' do
     subject { merge_request.has_license_management_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -183,6 +184,7 @@ describe MergeRequest do
 
   describe '#has_dependency_scanning_reports?' do
     subject { merge_request.has_dependency_scanning_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -204,6 +206,7 @@ describe MergeRequest do
 
   describe '#has_container_scanning_reports?' do
     subject { merge_request.has_container_scanning_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -225,6 +228,7 @@ describe MergeRequest do
 
   describe '#has_sast_reports?' do
     subject { merge_request.has_sast_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -246,6 +250,7 @@ describe MergeRequest do
 
   describe '#has_metrics_reports?' do
     subject { merge_request.has_metrics_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do

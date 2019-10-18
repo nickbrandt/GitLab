@@ -15,6 +15,7 @@ describe Projects::ProjectMembersController do
         source_project_id: another_project.id
       })
     end
+
     let(:another_project) { create(:project, :private) }
     let(:member) { create(:user) }
 
@@ -53,6 +54,7 @@ describe Projects::ProjectMembersController do
         project_id: project
       }
     end
+
     let(:access_level) { nil }
 
     before do

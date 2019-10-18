@@ -2115,6 +2115,7 @@ describe Project do
   describe '#allowed_to_share_with_group?' do
     context 'for group related project' do
       subject(:project) { build_stubbed(:project, namespace: group, group: group) }
+
       let(:group) { build_stubbed :group }
 
       context 'with lock_memberships_to_ldap application setting enabled' do
@@ -2128,6 +2129,7 @@ describe Project do
 
     context 'personal project' do
       subject(:project) { build_stubbed(:project, namespace: namespace) }
+
       let(:namespace) { build_stubbed :namespace }
 
       context 'with lock_memberships_to_ldap application setting enabled' do

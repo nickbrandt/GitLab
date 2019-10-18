@@ -86,6 +86,7 @@ describe ApprovalRules::CreateService do
     ApprovalProjectRule::REPORT_TYPES_BY_DEFAULT_NAME.keys.each do |rule_name|
       context "when the rule name is `#{rule_name}`" do
         subject { described_class.new(target, user, { name: rule_name, approvals_required: 1 }) }
+
         let(:result) { subject.execute }
 
         specify { expect(result[:status]).to eq(:success) }

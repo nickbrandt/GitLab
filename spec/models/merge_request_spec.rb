@@ -541,6 +541,7 @@ describe MergeRequest do
 
     context 'with diffs' do
       subject { create(:merge_request, :with_diffs) }
+
       it 'returns the sha of the source branch last commit' do
         expect(subject.source_branch_sha).to eq(last_branch_commit.sha)
       end
@@ -548,6 +549,7 @@ describe MergeRequest do
 
     context 'without diffs' do
       subject { create(:merge_request, :without_diffs) }
+
       it 'returns the sha of the source branch last commit' do
         expect(subject.source_branch_sha).to eq(last_branch_commit.sha)
       end
@@ -570,6 +572,7 @@ describe MergeRequest do
 
     context 'when the merge request is being created' do
       subject { build(:merge_request, source_branch: nil, compare_commits: []) }
+
       it 'returns nil' do
         expect(subject.source_branch_sha).to be_nil
       end
@@ -2495,6 +2498,7 @@ describe MergeRequest do
   describe "#diff_refs" do
     context "with diffs" do
       subject { create(:merge_request, :with_diffs) }
+
       let(:expected_diff_refs) do
         Gitlab::Diff::DiffRefs.new(
           base_sha:  subject.merge_request_diff.base_commit_sha,
@@ -2840,6 +2844,7 @@ describe MergeRequest do
 
   describe '#merge_request_diff_for' do
     subject { create(:merge_request, importing: true) }
+
     let!(:merge_request_diff1) { subject.merge_request_diffs.create(head_commit_sha: '6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9') }
     let!(:merge_request_diff2) { subject.merge_request_diffs.create(head_commit_sha: nil) }
     let!(:merge_request_diff3) { subject.merge_request_diffs.create(head_commit_sha: '5937ac0a7beb003549fc5fd26fc247adbce4a52e') }
@@ -2870,6 +2875,7 @@ describe MergeRequest do
 
   describe '#version_params_for' do
     subject { create(:merge_request, importing: true) }
+
     let(:project) { subject.project }
     let!(:merge_request_diff1) { subject.merge_request_diffs.create(head_commit_sha: '6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9') }
     let!(:merge_request_diff2) { subject.merge_request_diffs.create(head_commit_sha: nil) }

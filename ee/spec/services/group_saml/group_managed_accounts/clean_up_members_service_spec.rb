@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe GroupSaml::GroupManagedAccounts::CleanUpMembersService do
   subject(:service) { described_class.new(current_user, group) }
+
   let(:group) { Group.new }
   let(:current_user) { instance_double('User') }
   let(:destroy_member_service_spy) { spy('Members::DestroyService') }
