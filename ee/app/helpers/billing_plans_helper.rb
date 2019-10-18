@@ -66,4 +66,8 @@ module BillingPlansHelper
     root = namespace.has_parent? ? namespace.root_ancestor : namespace
     root.trial_active?
   end
+
+  def namespace_for_user?(namespace)
+    namespace == current_user.namespace
+  end
 end
