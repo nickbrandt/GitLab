@@ -25,6 +25,7 @@ module Issuable
   include UpdatedAtFilterable
   include IssuableStates
   include ClosedAtFilterable
+  include VersionedDescription
 
   TITLE_LENGTH_MAX = 255
   TITLE_HTML_LENGTH_MAX = 800
