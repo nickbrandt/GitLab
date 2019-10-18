@@ -32,24 +32,24 @@ describe DependencyEntity do
       end
 
       context 'with reporter' do
-        let(:dependency_info) { build(:dependency, :with_licenses) }
-
         before do
           project.add_reporter(user)
         end
 
-        it { is_expected.to eq(dependency_info) }
+        it 'includes license info and not vulnerabilities' do
+          is_expected.to eq(dependency.except(:vulnerabilities))
+        end
       end
     end
 
     context 'when all required features are unavailable' do
-      let(:dependency_info) { build(:dependency).except(:licenses) }
-
       before do
         project.add_developer(user)
       end
 
-      it { is_expected.to eq(dependency_info) }
+      it 'does not include licenses and vulnerabilities' do
+        is_expected.to eq(dependency.except(:vulnerabilities, :licenses))
+      end
     end
   end
 end

@@ -26,6 +26,9 @@
             "properties": {
               "name": {
                 "type": "string"
+              },
+              "blob_path": {
+                "type": "string"
               }
             }
           }
