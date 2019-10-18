@@ -82,7 +82,6 @@ module EE
 
       has_many :prometheus_alerts, inverse_of: :project
       has_many :prometheus_alert_events, inverse_of: :project
-      has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
@@ -642,7 +641,8 @@ module EE
     end
 
     def alerts_service_available?
-      feature_available?(:incident_management)
+      ::Feature.enabled?(:generic_alert_endpoint, self) &&
+        feature_available?(:incident_management)
     end
 
     def alerts_service_activated?
@@ -662,6 +662,7 @@ module EE
         ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
     end
 
+<<<<<<< HEAD
     def marked_for_deletion?
       return false unless feature_available?(:marking_project_for_deletion)
 
@@ -674,6 +675,8 @@ module EE
       packages.where(package_type: package_type).exists?
     end
 
+=======
+>>>>>>> Add attributes to import specs
     private
 
     def set_override_pull_mirror_available
