@@ -106,7 +106,7 @@ export default {
       'setDateRange',
     ]),
     onGroupSelect(group) {
-      this.setCycleAnalyticsDataEndpoint(group.path);
+      this.setCycleAnalyticsDataEndpoint(group.full_path);
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
     },
