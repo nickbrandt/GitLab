@@ -47,11 +47,12 @@ A database **reviewer**'s role is to:
   reassign MR to the database **maintainer** suggested by Reviewer
   Roulette.
 
-### When there are no Database Maintainers available
+#### When there are no database maintainers available
 
-- Currently we have a critical shortage of database maintainers.  If the database **reviewer** cannot find an available database **maintainer** then:
-  - Assign the MR for a second review  by a **database trainee maintainer** for further review.
-  - Once satisfied with the review process, and if the database **maintainer** is still not available, skip the database maintainer approval step and reassign to a backend **maintainer** to merge.
+Currently we have a [critical shortage of database maintainers](https://gitlab.com/gitlab-org/gitlab/issues/29717). Until we are able to increase the number of database maintainers to support the volume of reviews, we have implemented this temporary solution. If the database **reviewer** cannot find an available database **maintainer** then:
+
+- Assign the MR for a second review by a **database trainee maintainer** for further review.
+- Once satisfied with the review process, and if the database **maintainer** is still not available, skip the database maintainer approval step and assign the merge request to a backend maintainer for final review and approval.
 
 A database **maintainer**'s role is to:
 
