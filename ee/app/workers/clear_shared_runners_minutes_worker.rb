@@ -6,6 +6,8 @@ class ClearSharedRunnersMinutesWorker
   include ApplicationWorker
   include CronjobQueue
 
+  feature_category :continuous_integration
+
   def perform
     return unless try_obtain_lease
 

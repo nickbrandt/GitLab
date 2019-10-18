@@ -3,6 +3,8 @@
 class ElasticBatchProjectIndexerWorker
   include ApplicationWorker
 
+  feature_category :search
+
   # Batch indexing is a generally a onetime option, so give finer control over
   # queuing and concurrency
 

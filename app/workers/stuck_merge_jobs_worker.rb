@@ -4,6 +4,8 @@ class StuckMergeJobsWorker
   include ApplicationWorker
   include CronjobQueue
 
+  feature_category :source_code_management
+
   def self.logger
     Rails.logger # rubocop:disable Gitlab/RailsLogger
   end

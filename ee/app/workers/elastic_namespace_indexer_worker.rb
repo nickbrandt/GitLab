@@ -3,6 +3,7 @@
 class ElasticNamespaceIndexerWorker
   include ApplicationWorker
 
+  feature_category :search
   sidekiq_options retry: 2
 
   def perform(namespace_id, operation)

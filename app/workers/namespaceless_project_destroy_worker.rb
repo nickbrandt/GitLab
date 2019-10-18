@@ -10,6 +10,8 @@ class NamespacelessProjectDestroyWorker
   include ApplicationWorker
   include ExceptionBacktrace
 
+  feature_category :authentication_and_authorization
+
   def perform(project_id)
     begin
       project = Project.unscoped.find(project_id)
