@@ -286,7 +286,7 @@ class Project < ApplicationRecord
   has_many :variables, class_name: 'Ci::Variable'
   has_many :triggers, class_name: 'Ci::Trigger'
   has_many :environments
-  has_many :deployments
+  has_many :deployments, -> { success }
   has_many :pipeline_schedules, class_name: 'Ci::PipelineSchedule'
   has_many :project_deploy_tokens
   has_many :deploy_tokens, through: :project_deploy_tokens
@@ -1041,8 +1041,8 @@ class Project < ApplicationRecord
     end
   end
 
-  def web_url(only_path: nil)
-    Gitlab::Routing.url_helpers.project_url(self, only_path: only_path)
+  def web_url
+    Gitlab::Routing.url_helpers.project_url(self)
   end
 
   def readme_url
@@ -1321,18 +1321,7 @@ class Project < ApplicationRecord
   end
 
   def http_url_to_repo
-    custom_root = Gitlab::CurrentSettings.custom_http_clone_url_root
-
-    project_url = if custom_root.present?
-                    Gitlab::Utils.append_path(
-                      custom_root,
-                      web_url(only_path: true)
-                    )
-                  else
-                    web_url
-                  end
-
-    "#{project_url}.git"
+    "#{web_url}.git"
   end
 
   # Is overridden in EE
