@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { TEST_HOST } from 'helpers/test_constants';
 
-import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
+import SecurityDashboard from 'ee/security_dashboard/components/security_dashboard.vue';
 import Filters from 'ee/security_dashboard/components/filters.vue';
 import SecurityDashboardTable from 'ee/security_dashboard/components/security_dashboard_table.vue';
 import VulnerabilityChart from 'ee/security_dashboard/components/vulnerability_chart.vue';
@@ -24,7 +24,7 @@ jest.mock('~/lib/utils/url_utility', () => ({
   getParameterValues: jest.fn().mockReturnValue([]),
 }));
 
-describe('Security Dashboard app', () => {
+describe('Security Dashboard component', () => {
   let wrapper;
   let mock;
   let lockFilterSpy;
@@ -39,7 +39,7 @@ describe('Security Dashboard app', () => {
 
   const createComponent = props => {
     store = createStore();
-    wrapper = shallowMount(SecurityDashboardApp, {
+    wrapper = shallowMount(SecurityDashboard, {
       store,
       methods: {
         lockFilter: lockFilterSpy,

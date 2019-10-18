@@ -10,7 +10,7 @@ import VulnerabilitySeverity from './vulnerability_severity.vue';
 import LoadingError from './loading_error.vue';
 
 export default {
-  name: 'SecurityDashboardApp',
+  name: 'SecurityDashboard',
   components: {
     Filters,
     IssueModal,

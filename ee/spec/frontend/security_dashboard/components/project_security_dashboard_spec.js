@@ -3,7 +3,7 @@ import { GlEmptyState } from '@gitlab/ui';
 import MockAdapter from 'axios-mock-adapter';
 import { TEST_HOST } from 'helpers/test_constants';
 
-import CardSecurityDashboardApp from 'ee/vue_shared/security_reports/card_security_reports_app.vue';
+import ProjectSecurityDashboard from 'ee/security_dashboard/components/project_security_dashboard.vue';
 import createStore from 'ee/security_dashboard/store';
 import { trimText } from 'helpers/text_helper';
 import axios from '~/lib/utils/axios_utils';
@@ -11,7 +11,7 @@ import axios from '~/lib/utils/axios_utils';
 const vulnerabilitiesEndpoint = `${TEST_HOST}/vulnerabilities`;
 const vulnerabilitiesSummaryEndpoint = `${TEST_HOST}/vulnerabilities_summary`;
 
-describe('Card security reports app', () => {
+describe('Project Security Dashboard component', () => {
   let wrapper;
   let mock;
 
@@ -19,7 +19,7 @@ describe('Card security reports app', () => {
   runDate.setDate(runDate.getDate() - 7);
 
   const createComponent = props => {
-    wrapper = mount(CardSecurityDashboardApp, {
+    wrapper = mount(ProjectSecurityDashboard, {
       store: createStore(),
       stubs: ['security-dashboard-table'],
       propsData: {
@@ -88,12 +88,12 @@ describe('Card security reports app', () => {
 
     it('renders branch and commit information', () => {
       const revInformation = wrapper.find('.card-header .js-security-dashboard-right');
-      expect(revInformation.html()).toMatchSnapshot();
+      expect(revInformation.element).toMatchSnapshot();
     });
   });
 
   describe('Dashboard renders properly', () => {
-    const findDashboard = () => wrapper.find(CardSecurityDashboardApp);
+    const findDashboard = () => wrapper.find(ProjectSecurityDashboard);
 
     it('renders security dashboard', () => {
       const dashboard = findDashboard();
