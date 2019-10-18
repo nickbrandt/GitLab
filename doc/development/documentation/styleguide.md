@@ -1072,7 +1072,7 @@ must review and approve the addition or removal of any mentions of using feature
 The following is sample text for adding feature flag documentation for a feature:
 
 ````md
-### Disabling feature
+### Disabling the feature
 
 This feature comes with the `:feature_flag` feature flag enabled by default. However, in some cases
 this feature is incompatible with old configuration. To turn off the feature while configuration is
