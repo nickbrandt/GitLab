@@ -57,6 +57,7 @@ module Types
     field :reference, GraphQL::STRING_TYPE, null: false, method: :epic_reference do # rubocop:disable Graphql/Descriptions
       argument :full, GraphQL::BOOLEAN_TYPE, required: false, default_value: false # rubocop:disable Graphql/Descriptions
     end
+    field :participants, Types::UserType.connection_type, null: true, complexity: 5, description: 'List of participants for the epic'
 
     field :subscribed, GraphQL::BOOLEAN_TYPE,
       method: :subscribed?,
