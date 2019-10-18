@@ -50,8 +50,8 @@ describe Ci::CompareLicenseScanningReportsService do
     end
 
     context 'when head pipeline has corrupted license scanning reports' do
-      let!(:base_pipeline) { create(:ee_ci_pipeline, :with_corrupted_license_management_report, project: project) }
-      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_corrupted_license_management_report, project: project) }
+      let!(:base_pipeline) { create(:ee_ci_pipeline, :with_corrupted_license_scanning_report, project: project) }
+      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_corrupted_license_scanning_report, project: project) }
 
       it 'returns status and error message' do
         expect(subject[:status]).to eq(:error)

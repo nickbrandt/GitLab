@@ -6,8 +6,14 @@ describe EE::Ci::JobArtifact do
   describe '.license_scanning_reports' do
     subject { Ci::JobArtifact.license_scanning_reports }
 
-    context 'when there is a license management report' do
-      let!(:artifact) { create(:ee_ci_job_artifact, :license_management) }
+    context 'when there is a license scanning report' do
+      let!(:artifact) { create(:ee_ci_job_artifact, :license_scanning) }
+
+      it { is_expected.to eq([artifact]) }
+    end
+
+    context 'when there is a deprecated license management report' do
+      let!(:artifact) { create(:ee_ci_job_artifact, :license_management_deprecated) }
 
       it { is_expected.to eq([artifact]) }
     end

@@ -42,7 +42,7 @@ FactoryBot.define do
       end
     end
 
-    trait :license_management do
+    trait :license_management_deprecated do
       file_type { :license_management }
       file_format { :raw }
 
@@ -52,8 +52,18 @@ FactoryBot.define do
       end
     end
 
-    trait :license_management_feature_branch do
-      file_type { :license_management }
+    trait :license_scanning do
+      file_type { :license_scanning }
+      file_format { :raw }
+
+      after(:build) do |artifact, evaluator|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-license-management-report.json'), 'application/json')
+      end
+    end
+
+    trait :license_scanning_feature_branch do
+      file_type { :license_scanning }
       file_format { :raw }
 
       after(:build) do |artifact, evaluator|
@@ -62,8 +72,8 @@ FactoryBot.define do
       end
     end
 
-    trait :corrupted_license_management_report do
-      file_type { :license_management }
+    trait :corrupted_license_scanning_report do
+      file_type { :license_scanning }
       file_format { :raw }
 
       after(:build) do |artifact, evaluator|

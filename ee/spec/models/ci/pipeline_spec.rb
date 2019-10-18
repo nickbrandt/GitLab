@@ -247,8 +247,8 @@ describe Ci::Pipeline do
       let!(:build_2) { create(:ci_build, :success, name: 'license_management2', pipeline: pipeline, project: project) }
 
       before do
-        create(:ee_ci_job_artifact, :license_management, job: build_1, project: project)
-        create(:ee_ci_job_artifact, :license_management_feature_branch, job: build_2, project: project)
+        create(:ee_ci_job_artifact, :license_scanning, job: build_1, project: project)
+        create(:ee_ci_job_artifact, :license_scanning_feature_branch, job: build_2, project: project)
       end
 
       it 'returns a license scanning report with collected data' do
@@ -284,7 +284,7 @@ describe Ci::Pipeline do
       let!(:build) { create(:ci_build, :success, name: 'dependency_list', pipeline: pipeline, project: project) }
       let!(:artifact) { create(:ee_ci_job_artifact, :dependency_list, job: build, project: project) }
       let!(:build2) { create(:ci_build, :success, name: 'license_management', pipeline: pipeline, project: project) }
-      let!(:artifact2) { create(:ee_ci_job_artifact, :license_management, job: build, project: project) }
+      let!(:artifact2) { create(:ee_ci_job_artifact, :license_scanning, job: build, project: project) }
 
       it 'returns a dependency list report with collected data' do
         expect(subject.dependencies.count).to eq(21)

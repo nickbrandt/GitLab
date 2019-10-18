@@ -182,7 +182,7 @@ describe Ci::Build do
     context 'when build has a license management report' do
       context 'when there is a license scanning report' do
         before do
-          create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
+          create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project)
         end
 
         it 'parses blobs and add the results to the report' do
@@ -196,7 +196,7 @@ describe Ci::Build do
 
       context 'when there is a corrupted license management report' do
         before do
-          create(:ee_ci_job_artifact, :corrupted_license_management_report, job: job, project: job.project)
+          create(:ee_ci_job_artifact, :corrupted_license_scanning_report, job: job, project: job.project)
         end
 
         it 'raises an error' do
@@ -207,7 +207,7 @@ describe Ci::Build do
       context 'when Feature flag is disabled for License Scanning reports parsing' do
         before do
           stub_feature_flags(parse_license_management_reports: false)
-          create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
+          create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project)
         end
 
         it 'does NOT parse license scanning report' do
@@ -220,7 +220,7 @@ describe Ci::Build do
       context 'when the license management feature is disabled' do
         before do
           stub_licensed_features(license_management: false)
-          create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
+          create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project)
         end
 
         it 'does NOT parse license scanning report' do
@@ -265,7 +265,7 @@ describe Ci::Build do
   end
 
   describe '#collect_licenses_for_dependency_list!' do
-    let!(:lm_artifact) { create(:ee_ci_job_artifact, :license_management, job: job, project: job.project) }
+    let!(:lm_artifact) { create(:ee_ci_job_artifact, :license_scanning, job: job, project: job.project) }
     let(:dependency_list_report) { Gitlab::Ci::Reports::DependencyList::Report.new }
     let(:dependency) { build(:dependency, :nokogiri) }
 
