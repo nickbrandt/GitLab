@@ -343,6 +343,7 @@ ActiveRecord::Schema.define(version: 2019_10_17_045817) do
     t.string "custom_http_clone_url_root", limit: 511
     t.boolean "pendo_enabled", default: false, null: false
     t.string "pendo_url", limit: 255
+    t.integer "deletion_adjourned_period", default: 7, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id"
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id"
     t.index ["instance_administration_project_id"], name: "index_applicationsettings_on_instance_administration_project_id"

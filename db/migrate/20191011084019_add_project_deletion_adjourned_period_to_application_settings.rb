@@ -8,6 +8,6 @@ class AddProjectDeletionAdjournedPeriodToApplicationSettings < ActiveRecord::Mig
   DOWNTIME = false
 
   def change
-    add_column :application_settings, :project_deletion_adjourned_period, :integer, default: 7, null: false
+    add_column :application_settings, :deletion_adjourned_period, :integer, default: 7, null: false
   end
 end
