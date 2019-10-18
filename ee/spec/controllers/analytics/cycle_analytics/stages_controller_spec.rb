@@ -3,11 +3,9 @@
 require 'spec_helper'
 
 describe Analytics::CycleAnalytics::StagesController do
-  let(:user) { create(:user) }
-  let(:group) { create(:group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group, refind: true) { create(:group) }
   let(:params) { { group_id: group.full_path } }
-
-  subject { get :index, params: params }
 
   before do
     stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
@@ -17,86 +15,148 @@ describe Analytics::CycleAnalytics::StagesController do
     sign_in(user)
   end
 
-  it 'succeeds' do
-    subject
+  describe 'GET `index`' do
+    subject { get :index, params: params }
 
-    expect(response).to be_successful
-    expect(response).to match_response_schema('analytics/cycle_analytics/stages', dir: 'ee')
+    it 'succeeds' do
+      subject
+
+      expect(response).to be_successful
+      expect(response).to match_response_schema('analytics/cycle_analytics/stages', dir: 'ee')
+    end
+
+    it 'returns correct start events' do
+      subject
+
+      response_start_events = json_response['stages'].map { |s| s['start_event_identifier'] }
+      start_events = Gitlab::Analytics::CycleAnalytics::DefaultStages.all.map { |s| s['start_event_identifier'] }
+
+      expect(response_start_events).to eq(start_events)
+    end
+
+    it 'returns correct event names' do
+      subject
+
+      response_event_names = json_response['events'].map { |s| s['name'] }
+      event_names = Gitlab::Analytics::CycleAnalytics::StageEvents.events.map(&:name)
+
+      expect(response_event_names).to eq(event_names)
+    end
+
+    it 'succeeds for subgroups' do
+      subgroup = create(:group, parent: group)
+      params[:group_id] = subgroup.full_path
+
+      subject
+
+      expect(response).to be_successful
+    end
+
+    it 'renders `forbidden` based on the response of the service object' do
+      expect_any_instance_of(Analytics::CycleAnalytics::Stages::ListService).to receive(:can?).and_return(false)
+
+      subject
+
+      expect(response).to have_gitlab_http_status(:forbidden)
+    end
+
+    include_examples 'group permission check on the controller level'
   end
 
-  it 'returns correct start events' do
-    subject
+  describe 'POST `create`' do
+    subject { post :create, params: params }
 
-    response_start_events = json_response['stages'].map { |s| s['start_event_identifier'] }
-    start_events = Gitlab::Analytics::CycleAnalytics::DefaultStages.all.map { |s| s['start_event_identifier'] }
+    include_examples 'group permission check on the controller level'
 
-    expect(response_start_events).to eq(start_events)
+    context 'when valid parameters are given' do
+      before do
+        params.merge!({
+          name: 'my new stage',
+          start_event_identifier: :merge_request_created,
+          end_event_identifier: :merge_request_merged
+        })
+      end
+
+      it 'creates the stage' do
+        subject
+
+        expect(response).to be_successful
+        expect(response).to match_response_schema('analytics/cycle_analytics/stage', dir: 'ee')
+      end
+    end
+
+    include_context 'when invalid stage parameters are given'
   end
 
-  it 'returns correct event names' do
-    subject
+  describe 'PUT `update`' do
+    let(:stage) { create(:cycle_analytics_group_stage, parent: group) }
+    subject { put :update, params: params.merge(id: stage.id) }
 
-    response_event_names = json_response['events'].map { |s| s['name'] }
-    event_names = Gitlab::Analytics::CycleAnalytics::StageEvents.events.map(&:name)
+    include_examples 'group permission check on the controller level'
 
-    expect(response_event_names).to eq(event_names)
+    context 'when valid parameters are given' do
+      before do
+        params.merge!({
+          name: 'my updated stage',
+          start_event_identifier: :merge_request_created,
+          end_event_identifier: :merge_request_merged
+        })
+      end
+
+      it 'succeeds' do
+        subject
+
+        expect(response).to be_successful
+        expect(response).to match_response_schema('analytics/cycle_analytics/stage', dir: 'ee')
+      end
+
+      it 'updates the name attribute' do
+        subject
+
+        stage.reload
+
+        expect(stage.name).to eq(params[:name])
+      end
+    end
+
+    include_context 'when invalid stage parameters are given'
   end
 
-  it 'succeeds for subgroups' do
-    subgroup = create(:group, parent: group)
-    params[:group_id] = subgroup.full_path
+  describe 'DELETE `destroy`' do
+    let(:stage) { create(:cycle_analytics_group_stage, parent: group) }
 
-    subject
+    subject { delete :destroy, params: params }
 
-    expect(response).to be_successful
-  end
+    before do
+      params[:id] = stage.id
+    end
 
-  it 'renders 404 when group_id is not provided' do
-    params[:group_id] = nil
+    include_examples 'group permission check on the controller level'
 
-    subject
+    context 'when persisted stage id is passed' do
+      it 'succeeds' do
+        subject
 
-    expect(response).to have_gitlab_http_status(:not_found)
-  end
+        expect(response).to be_successful
+      end
 
-  it 'renders 404 when group is missing' do
-    params[:group_id] = 'missing_group'
+      it 'deletes the record' do
+        subject
 
-    subject
+        expect(group.reload.cycle_analytics_stages.find_by(id: stage.id)).to be_nil
+      end
+    end
 
-    expect(response).to have_gitlab_http_status(:not_found)
-  end
+    context 'when default stage id is passed' do
+      before do
+        params[:id] = Gitlab::Analytics::CycleAnalytics::DefaultStages.names.first
+      end
 
-  it 'renders 404 when feature flag is disabled' do
-    stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => false)
+      it 'fails with `forbidden` response' do
+        subject
 
-    subject
-
-    expect(response).to have_gitlab_http_status(:not_found)
-  end
-
-  it 'renders 403 when user has no reporter access' do
-    GroupMember.where(user: user).delete_all
-    group.add_guest(user)
-
-    subject
-
-    expect(response).to have_gitlab_http_status(:forbidden)
-  end
-
-  it 'renders 403 when feature is not available for the group' do
-    stub_licensed_features(cycle_analytics_for_groups: false)
-
-    subject
-
-    expect(response).to have_gitlab_http_status(:forbidden)
-  end
-
-  it 'renders 403 based on the response of the service object' do
-    expect_any_instance_of(Analytics::CycleAnalytics::Stages::ListService).to receive(:can?).and_return(false)
-
-    subject
-
-    expect(response).to have_gitlab_http_status(:forbidden)
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+    end
   end
 end
