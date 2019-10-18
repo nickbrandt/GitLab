@@ -61,6 +61,16 @@ describe Vulnerabilities::Occurrence do
     end
   end
 
+  context 'order' do
+    let!(:occurrence1) { create(:vulnerabilities_occurrence, confidence: described_class::CONFIDENCE_LEVELS[:high], severity:   described_class::SEVERITY_LEVELS[:high]) }
+    let!(:occurrence2) { create(:vulnerabilities_occurrence, confidence: described_class::CONFIDENCE_LEVELS[:medium], severity: described_class::SEVERITY_LEVELS[:critical]) }
+    let!(:occurrence3) { create(:vulnerabilities_occurrence, confidence: described_class::CONFIDENCE_LEVELS[:high], severity:   described_class::SEVERITY_LEVELS[:critical]) }
+
+    it 'orders by severity and confidence' do
+      expect(described_class.all.ordered).to eq([occurrence3, occurrence2, occurrence1])
+    end
+  end
+
   describe '.report_type' do
     let(:report_type) { :sast }
 

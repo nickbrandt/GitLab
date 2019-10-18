@@ -24,7 +24,11 @@ module Security
     end
 
     def execute
-      pipeline_reports&.each_with_object([]) do |(type, report), occurrences|
+      reports = pipeline_reports
+
+      return [] if reports.nil?
+
+      occurrences = reports.each_with_object([]) do |(type, report), occurrences|
         next unless requested_type?(type)
 
         raise ParseError, 'JSON parsing failed' if report.error.is_a?(Gitlab::Ci::Parsers::Security::Common::SecurityReportParserError)
@@ -34,6 +38,8 @@ module Security
 
         occurrences.concat(filtered_occurrences)
       end
+
+      occurrences.sort_by { |x| [x.severity, x.confidence] }
     end
 
     private
