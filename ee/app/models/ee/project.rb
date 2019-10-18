@@ -641,7 +641,8 @@ module EE
     end
 
     def alerts_service_available?
-      feature_available?(:incident_management)
+      ::Feature.enabled?(:generic_alert_endpoint, self) &&
+        feature_available?(:incident_management)
     end
 
     def alerts_service_activated?
