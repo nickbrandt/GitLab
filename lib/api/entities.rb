@@ -587,14 +587,8 @@ module API
       end
 
       expose :issue_stats do
-        expose(:opened) { |_| issue_counts['opened'] }
-        expose(:closed) { |_| issue_counts['closed'] }
-      end
-
-      private
-
-      def issue_counts
-        @issue_counts ||= object.count_issues_by_state(options[:current_user])
+        expose(:opened) { |milestone, options| milestone.opened_issues_count(options[:current_user]) }
+        expose(:closed) { |milestone, options| milestone.closed_issues_count(options[:current_user]) }
       end
     end
 

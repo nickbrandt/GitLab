@@ -1,14 +1,20 @@
 # frozen_string_literal: true
 
 module Milestoneish
+  ISSUE_TOTAL_KEY = 'total'.freeze
+
   def total_issues_count(user)
-    count_issues_by_state(user).values.sum
+    cached_issues_count_for(user, ISSUE_TOTAL_KEY)
   end
 
   def closed_issues_count(user)
     closed_state_id = Issue.available_states[:closed]
+    cached_issues_count_for(user, closed_state_id)
+  end
 
-    count_issues_by_state(user)[closed_state_id].to_i
+  def opened_issues_count(user)
+    opened_state_id = Issue.available_states[:opened]
+    cached_issues_count_for(user, opened_state_id)
   end
 
   def complete?(user)
@@ -123,6 +129,10 @@ module Milestoneish
     end
   end
 
+  def clear_issue_counts
+    issue_count_cache_state_key.values.each { |state| Rails.cache.delete(issue_count_cache_key_for(state)) }
+  end
+
   private
 
   def memoize_per_user(user, method_name)
@@ -133,9 +143,24 @@ module Milestoneish
     @memoized_users ||= Hash.new { |h, k| h[k] = {} }
   end
 
+  def cached_issues_count_for(user, state)
+    Rails.cache.fetch(issue_count_cache_key_for(state)) do
+      counts = count_issues_by_state(user)
+      state == 'total' ? counts.values.sum : counts[state].to_i
+    end
+  end
+
+  def issue_count_cache_key_for(state)
+    "milestone_#{id}_issue_#{state}_count_key"
+  end
+
   # override in a class that includes this module to get a faster query
   # from IssuesFinder
   def issues_finder_params
     {}
+  end
+
+  def issue_count_cache_state_key
+    Issue.available_states.keys + Array(ISSUE_TOTAL_KEY)
   end
 end

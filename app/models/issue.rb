@@ -92,6 +92,13 @@ class Issue < ApplicationRecord
       issue.closed_at = nil
       issue.closed_by = nil
     end
+
+    after_transition do |issue, transition|
+      milestone = issue.milestone
+      next unless milestone
+
+      issue.milestone.clear_issue_counts
+    end
   end
 
   # Alias to state machine .with_state_id method
