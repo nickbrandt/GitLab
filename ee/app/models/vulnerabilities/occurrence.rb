@@ -77,7 +77,7 @@ module Vulnerabilities
     validates :raw_metadata, presence: true
 
     scope :report_type, -> (type) { where(report_type: report_types[type]) }
-    scope :ordered, -> { order("severity desc", :id) }
+    scope :ordered, -> { order(severity: :desc, confidence: :desc, id: :asc) }
 
     scope :by_report_types, -> (values) { where(report_type: values) }
     scope :by_projects, -> (values) { where(project_id: values) }

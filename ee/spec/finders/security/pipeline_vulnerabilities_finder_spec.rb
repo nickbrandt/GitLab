@@ -52,6 +52,20 @@ describe Security::PipelineVulnerabilitiesFinder do
 
     subject { described_class.new(pipeline: pipeline, params: params).execute }
 
+    context 'by order' do
+      let(:params) { { report_type: %w[sast] } }
+      let!(:occurrence1) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:high],   severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:high]) }
+      let!(:occurrence2) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:medium], severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:critical]) }
+      let!(:occurrence3) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:high],   severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:critical]) }
+      let!(:res) { [occurrence3, occurrence2, occurrence1] }
+
+      it 'orders by severity and confidence' do
+        allow_any_instance_of(described_class).to receive(:filter).and_return(res)
+
+        expect(subject).to eq([occurrence3, occurrence2, occurrence1])
+      end
+    end
+
     context 'by report type' do
       context 'when sast' do
         let(:params) { { report_type: %w[sast] } }
