@@ -71,14 +71,15 @@ Example response:
 ```
 
 Users on GitLab [Premium or Ultimate](https://about.gitlab.com/pricing/) may also see
-the `file_template_project_id` or the `geo_node_allowed_ips` parameters:
+the `file_template_project_id`, `deletion_adjourned_period` or the `geo_node_allowed_ips` parameters:
 
 ```json
 {
    "id" : 1,
    "signup_enabled" : true,
    "file_template_project_id": 1,
-   "geo_node_allowed_ips": "0.0.0.0/0, ::/0"
+   "geo_node_allowed_ips": "0.0.0.0/0, ::/0",
+   "deletion_adjourned_period": 7,
    ...
 }
 ```
@@ -160,6 +161,7 @@ these parameters:
 - `file_template_project_id`
 - `geo_node_allowed_ips`
 - `geo_status_timeout`
+- `deletion_adjourned_period`
 
 Example responses: **(PREMIUM ONLY)**
 
@@ -284,12 +286,11 @@ are listed in the descriptions of the relevant settings.
 | `plantuml_enabled`                       | boolean          | no                                   | (**If enabled, requires:** `plantuml_url`) Enable PlantUML integration. Default is `false`. |
 | `plantuml_url`                           | string           | required by: `plantuml_enabled`      | The PlantUML instance URL for integration. |
 | `polling_interval_multiplier`            | decimal          | no                                   | Interval multiplier used by endpoints that perform polling. Set to `0` to disable polling. |
+| `deletion_adjourned_period`      | integer          | no                                   | **(PREMIUM)** How many days after marking project for deletion it is actually removed. Value between 0 and 7.
 | `project_export_enabled`                 | boolean          | no                                   | Enable project export. |
 | `prometheus_metrics_enabled`             | boolean          | no                                   | Enable Prometheus metrics. |
 | `protected_ci_variables`                 | boolean          | no                                   | Environment variables are protected by default. |
 | `pseudonymizer_enabled`                  | boolean          | no                                   | **(PREMIUM)** When enabled, GitLab will run a background job that will produce pseudonymized CSVs of the GitLab database that will be uploaded to your configured object storage directory.
-| `push_event_hooks_limit`                 | integer          | no                                   | Number of changes (branches or tags) in a single push to determine whether webhooks and services will be fired or not. Webhooks and services won't be submitted if it surpasses that value. |
-| `push_event_activities_limit`            | integer          | no                                   | Number of changes (branches or tags) in a single push to determine whether individual push events or bulk push events will be created. [Bulk push events will be created](../user/admin_area/settings/push_event_activities_limit.md) if it surpasses that value. |
 | `recaptcha_enabled`                      | boolean          | no                                   | (**If enabled, requires:** `recaptcha_private_key` and `recaptcha_site_key`) Enable reCAPTCHA. |
 | `recaptcha_private_key`                  | string           | required by: `recaptcha_enabled`     | Private key for reCAPTCHA. |
 | `recaptcha_site_key`                     | string           | required by: `recaptcha_enabled`     | Site key for reCAPTCHA. |

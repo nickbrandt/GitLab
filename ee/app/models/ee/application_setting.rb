@@ -39,6 +39,10 @@ module EE
                 presence: true,
                 numericality: { only_integer: true, greater_than: 0 }
 
+      validates :project_deletion_adjourned_period,
+                presence: true,
+                numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 7 }
+
       validates :elasticsearch_replicas,
                 presence: true,
                 numericality: { only_integer: true, greater_than: 0 }
@@ -80,6 +84,7 @@ module EE
           mirror_capacity_threshold: Settings.gitlab['mirror_capacity_threshold'],
           mirror_max_capacity: Settings.gitlab['mirror_max_capacity'],
           mirror_max_delay: Settings.gitlab['mirror_max_delay'],
+          project_deletion_adjourned_period: 7,
           pseudonymizer_enabled: false,
           repository_size_limit: 0,
           slack_app_enabled: false,
