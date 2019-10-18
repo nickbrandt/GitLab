@@ -303,4 +303,27 @@ describe Milestone, 'Milestoneish' do
       expect(milestone.human_total_issue_time_spent).to be_nil
     end
   end
+
+  it_behaves_like 'milestone_issue_counts' do
+    let(:state) { 'total' }
+  end
+
+  it_behaves_like 'milestone_issue_counts' do
+    let(:state) { 'closed' }
+  end
+
+  it_behaves_like 'milestone_issue_counts' do
+    let(:state) { 'opened' }
+  end
+
+  describe '#clear_issue_count' do
+    before do
+      issue.reopen
+    end
+    it 'gets the milestone issue count cache deleted' do
+      expect(milestone).to receive(:clear_issue_counts)
+
+      issue.close
+    end
+  end
 end

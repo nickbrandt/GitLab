@@ -69,6 +69,9 @@ class Issue < ApplicationRecord
   after_commit :expire_etag_cache
   after_save :ensure_metrics, unless: :imported?
 
+  after_create :clear_milestone_issue_counts
+  after_destroy :clear_milestone_issue_counts
+
   attr_spammable :title, spam_title: true
   attr_spammable :description, spam_description: true
 
@@ -93,12 +96,7 @@ class Issue < ApplicationRecord
       issue.closed_by = nil
     end
 
-    after_transition do |issue, transition|
-      milestone = issue.milestone
-      next unless milestone
-
-      issue.milestone.clear_issue_counts
-    end
+    after_transition { |issue, _| issue.clear_milestone_issue_counts }
   end
 
   # Alias to state machine .with_state_id method
@@ -282,6 +280,10 @@ class Issue < ApplicationRecord
 
   def labels_hook_attrs
     labels.map(&:hook_attrs)
+  end
+
+  def clear_milestone_issue_counts
+    milestone&.clear_issue_counts
   end
 
   private
