@@ -71,7 +71,7 @@ Example response:
             "start_date":"2019-07-30T12:00:00.256Z",
             "web_url":"https://gitlab.example.com/root/awesome-app/-/milestones/1",
             "issue_stats": {
-               "open": 12,
+               "opened": 12,
                "closed": 76
             }
          },
@@ -88,7 +88,7 @@ Example response:
             "start_date":"2019-07-30T12:00:00.256Z",
             "web_url":"https://gitlab.example.com/root/awesome-app/-/milestones/2",
             "issue_stats": {
-               "open": 3,
+               "opened": 3,
                "closed": 21
             }
          }
@@ -257,7 +257,7 @@ Example response:
          "start_date":"2019-07-30T12:00:00.256Z",
          "web_url":"https://gitlab.example.com/root/awesome-app/-/milestones/1",
          "issue_stats": {
-            "open": 12,
+            "opened": 12,
             "closed": 76
          }
        },
@@ -274,7 +274,7 @@ Example response:
          "start_date":"2019-07-30T12:00:00.256Z",
          "web_url":"https://gitlab.example.com/root/awesome-app/-/milestones/2",
          "issue_stats": {
-            "open": 3,
+            "opened": 3,
             "closed": 21
          }
        }
@@ -385,7 +385,7 @@ Example response:
          "start_date":"2019-07-30T12:00:00.256Z",
          "web_url":"https://gitlab.example.com/root/awesome-app/-/milestones/1",
          "issue_stats": {
-            "open": 13,
+            "opened": 13,
             "closed": 76
          }
        },
@@ -402,7 +402,7 @@ Example response:
          "start_date":"2019-07-30T12:00:00.256Z",
          "web_url":"https://gitlab.example.com/root/awesome-app/-/milestones/2",
          "issue_stats": {
-            "open": 3,
+            "opened": 3,
             "closed": 21
          }
        }
@@ -512,7 +512,7 @@ Example response:
          "start_date":"2019-09-05T12:00:00.256Z",
          "web_url":"https://gitlab.example.com/root/awesome-app/-/milestones/3",
          "issue_stats": {
-            "open": 11,
+            "opened": 11,
             "closed": 78
          }
       }

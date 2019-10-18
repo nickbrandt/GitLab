@@ -44,7 +44,7 @@ Example Response:
     "updated_at": "2013-10-02T09:24:18Z",
     "created_at": "2013-10-02T09:24:18Z",
     "issue_stats": {
-      "open": 12,
+      "opened": 12,
       "closed": 76
     }
   }

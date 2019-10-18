@@ -16,7 +16,7 @@
     "issue_stats": {
       "required": ["open", "closed"],
       "properties": {
-        "open": { "type": "integer" },
+        "opened": { "type": "integer" },
         "closed": { "type": "integer" }
       }
     }

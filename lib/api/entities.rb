@@ -587,7 +587,7 @@ module API
       end
 
       expose :issue_stats do
-        expose(:open) { |_| issue_counts['opened'] }
+        expose(:opened) { |_| issue_counts['opened'] }
         expose(:closed) { |_| issue_counts['closed'] }
       end
 
