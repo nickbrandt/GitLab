@@ -8,6 +8,7 @@ class ElasticFullIndexWorker
   include ApplicationWorker
 
   sidekiq_options retry: 2
+  feature_category :search
 
   def perform(start_id, end_id)
     return true unless Gitlab::CurrentSettings.elasticsearch_indexing?

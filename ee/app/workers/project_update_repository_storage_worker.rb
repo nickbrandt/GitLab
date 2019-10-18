@@ -3,6 +3,8 @@
 class ProjectUpdateRepositoryStorageWorker
   include ApplicationWorker
 
+  feature_category :source_code_management
+
   def perform(project_id, new_repository_storage_key)
     project = Project.find(project_id)
 

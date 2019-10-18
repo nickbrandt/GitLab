@@ -4,6 +4,8 @@ class UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker
   include ApplicationWorker
   include CronjobQueue
 
+  feature_category :license_compliance
+
   # rubocop: disable CodeReuse/ActiveRecord
   def perform
     return if ::Gitlab::Database.read_only?

@@ -4,6 +4,8 @@ class CreateGithubWebhookWorker
   include ApplicationWorker
   include GrapePathHelpers::NamedRouteMatcher
 
+  feature_category :integrations
+
   attr_reader :project
 
   def perform(project_id)
