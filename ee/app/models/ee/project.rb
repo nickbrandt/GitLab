@@ -90,7 +90,6 @@ module EE
 
       has_many :prometheus_alerts, inverse_of: :project
       has_many :prometheus_alert_events, inverse_of: :project
-      has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
@@ -650,7 +649,8 @@ module EE
     end
 
     def alerts_service_available?
-      feature_available?(:incident_management)
+      ::Feature.enabled?(:generic_alert_endpoint, self) &&
+        feature_available?(:incident_management)
     end
 
     def alerts_service_activated?
