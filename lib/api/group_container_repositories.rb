@@ -37,7 +37,7 @@ module API
       delete ':id/registry/repositories/tags', requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
         authorize_admin_container_image!
 
-        message = 'This request has already been made. You can run this at most once an hour for a given container repository and a given group'
+        message = 'This request has already been made. You can run this at most once an hour for a given group'
         render_api_error!(message, 400) unless obtain_new_cleanup_container_lease
 
         repositories = ContainerRepositoriesFinder.new(
