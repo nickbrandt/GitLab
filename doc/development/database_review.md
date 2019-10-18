@@ -48,8 +48,9 @@ A database **reviewer**'s role is to:
   Roulette.
 
 ### When there are no Database Maintainers available
+
   - Currently we have a critical shortage of database maintainers.  If the database **reviewer** cannot find an available database **maintainer** then:
-    - Assign the MR to a second review  by a **database trainee maintainer** for further review.
+    - Assign the MR for a second review  by a **database trainee maintainer** for further review.
     - Once satisfied with the review process, and if the database **maintainer** is still not available, skip the database maintainer approval step and reassign to a backend **maintainer** to merge.
 
 A database **maintainer**'s role is to:
