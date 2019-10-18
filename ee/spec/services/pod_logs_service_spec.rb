@@ -79,7 +79,7 @@ describe PodLogsService do
     end
 
     context 'without deployment platform' do
-      it_behaves_like 'error', 'No deployment platform'
+      it_behaves_like 'error', 'No deployment platform available'
     end
 
     context 'with deployment platform' do
@@ -137,6 +137,18 @@ describe PodLogsService do
 
           subject.execute
         end
+
+        context 'when there are no pods' do
+          before do
+            allow_any_instance_of(Gitlab::Kubernetes::RolloutStatus).to receive(:instances)
+              .and_return([])
+          end
+
+          it 'returns error' do
+            expect(result[:status]).to eq(:error)
+            expect(result[:message]).to eq('No pods available')
+          end
+        end
       end
 
       context 'when error is returned' do
@@ -152,8 +164,8 @@ describe PodLogsService do
             .and_return(nil)
         end
 
-        it 'returns nil' do
-          expect(result).to eq(nil)
+        it 'returns processing' do
+          expect(result).to eq(status: :processing, last_step: :pod_logs)
         end
       end
     end
