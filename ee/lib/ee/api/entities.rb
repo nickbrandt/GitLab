@@ -147,7 +147,7 @@ module EE
           expose :name
           expose :group, using: ::API::Entities::BasicGroupDetails
 
-          with_options if: ->(board, _) { board.parent.feature_available?(:scoped_issue_board) } do
+          with_options if: ->(board, _) { board.resource_parent.feature_available?(:scoped_issue_board) } do
             expose :milestone do |board|
               if board.milestone.is_a?(Milestone)
                 ::API::Entities::Milestone.represent(board.milestone)
@@ -168,7 +168,7 @@ module EE
         prepended do
           expose :milestone, using: ::API::Entities::Milestone, if: -> (entity, _) { entity.milestone? }
           expose :user, as: :assignee, using: ::API::Entities::UserSafe, if: -> (entity, _) { entity.assignee? }
-          expose :max_issue_count, if: -> (list, _) { list.board.parent.feature_available?(:wip_limits) }
+          expose :max_issue_count, if: -> (list, _) { list.board.resource_parent.feature_available?(:wip_limits) }
         end
       end
 
