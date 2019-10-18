@@ -2,7 +2,18 @@
 require 'spec_helper'
 
 describe Gitlab::UrlBlocker do
+  include StubRequests
+
   describe '#validate!' do
+    shared_examples 'validates URI and hostname' do
+      it 'runs the url validations' do
+        uri, hostname = subject
+
+        expect(uri).to eq(Addressable::URI.parse(expected_uri))
+        expect(hostname).to eq(expected_hostname)
+      end
+    end
+
     context 'when URI is nil' do
       let(:import_url) { nil }
 
@@ -39,7 +50,7 @@ describe Gitlab::UrlBlocker do
         let(:import_url) { '//example.org/path' }
 
         it 'raises and error' do
-          expect { subject }.to raise_error(described_class::BlockedUrlError)
+          expect { described_class.validate!(import_url) }.to raise_error(described_class::BlockedUrlError)
         end
       end
     end
