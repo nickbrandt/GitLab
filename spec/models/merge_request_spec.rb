@@ -470,7 +470,7 @@ describe MergeRequest do
       commit = double('commit1', safe_message: "Fixes #{issue.to_reference}")
 
       allow(subject).to receive(:commits).and_return([commit])
-      allow(subject).to receive(:state).and_return("closed")
+      allow(subject).to receive(:state_id).and_return(described_class.available_states[:closed])
 
       expect { subject.cache_merge_request_closes_issues!(subject.author) }.not_to change(subject.merge_requests_closing_issues, :count)
     end
@@ -479,7 +479,7 @@ describe MergeRequest do
       issue  = create :issue, project: subject.project
       commit = double('commit1', safe_message: "Fixes #{issue.to_reference}")
       allow(subject).to receive(:commits).and_return([commit])
-      allow(subject).to receive(:state).and_return("merged")
+      allow(subject).to receive(:state_id).and_return(described_class.available_states[:merged])
 
       expect { subject.cache_merge_request_closes_issues!(subject.author) }.not_to change(subject.merge_requests_closing_issues, :count)
     end
@@ -2075,7 +2075,7 @@ describe MergeRequest do
     end
 
     it 'refuses to enqueue a job if the MR is not open' do
-      merge_request.update_column(:state, 'foo')
+      merge_request.update_column(:state_id, 5)
 
       expect(RebaseWorker).not_to receive(:perform_async)
 
@@ -2571,32 +2571,32 @@ describe MergeRequest do
 
   describe '#merge_ongoing?' do
     it 'returns true when the merge request is locked' do
-      merge_request = build_stubbed(:merge_request, state: :locked)
+      merge_request = build_stubbed(:merge_request, state_id: described_class.available_states[:locked])
 
       expect(merge_request.merge_ongoing?).to be(true)
     end
 
     it 'returns true when merge_id, MR is not merged and it has no running job' do
-      merge_request = build_stubbed(:merge_request, state: :open, merge_jid: 'foo')
+      merge_request = build_stubbed(:merge_request, state_id: described_class.available_states[:opened], merge_jid: 'foo')
       allow(Gitlab::SidekiqStatus).to receive(:running?).with('foo') { true }
 
       expect(merge_request.merge_ongoing?).to be(true)
     end
 
     it 'returns false when merge_jid is nil' do
-      merge_request = build_stubbed(:merge_request, state: :open, merge_jid: nil)
+      merge_request = build_stubbed(:merge_request, state_id: described_class.available_states[:opened], merge_jid: nil)
 
       expect(merge_request.merge_ongoing?).to be(false)
     end
 
     it 'returns false if MR is merged' do
-      merge_request = build_stubbed(:merge_request, state: :merged, merge_jid: 'foo')
+      merge_request = build_stubbed(:merge_request, state_id: described_class.available_states[:merged], merge_jid: 'foo')
 
       expect(merge_request.merge_ongoing?).to be(false)
     end
 
     it 'returns false if there is no merge job running' do
-      merge_request = build_stubbed(:merge_request, state: :open, merge_jid: 'foo')
+      merge_request = build_stubbed(:merge_request, state_id: described_class.available_states[:opened], merge_jid: 'foo')
       allow(Gitlab::SidekiqStatus).to receive(:running?).with('foo') { false }
 
       expect(merge_request.merge_ongoing?).to be(false)
@@ -2730,7 +2730,7 @@ describe MergeRequest do
 
       context 'closed MR' do
         before do
-          merge_request.update_attribute(:state, :closed)
+          merge_request.update_attribute(:state_id, described_class.available_states[:closed])
         end
 
         it 'is not mergeable' do

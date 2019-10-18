@@ -108,12 +108,12 @@ describe Issue, :elastic do
       'description',
       'created_at',
       'updated_at',
-      'state',
       'project_id',
       'author_id',
       'confidential'
     ).merge({
       'type' => issue.es_type,
+      'state' => issue.state,
       'join_field' => {
         'name' => issue.es_type,
         'parent' => issue.es_parent

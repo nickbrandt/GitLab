@@ -15,7 +15,11 @@ module EE
       include RelativePositioning
       include UsageStatistics
 
-      enum state_id: { opened: 1, closed: 2 }
+      enum state_id: {
+        opened: ::Epic.available_states[:opened],
+        closed: ::Epic.available_states[:closed]
+      }
+
       alias_attribute :state, :state_id
 
       belongs_to :closed_by, class_name: 'User'

@@ -33,7 +33,7 @@ class StuckMergeJobsWorker
   def apply_current_state!(completed_jids, completed_ids)
     merge_requests = MergeRequest.where(id: completed_ids)
 
-    merge_requests.where.not(merge_commit_sha: nil).update_all(state: :merged)
+    merge_requests.where.not(merge_commit_sha: nil).update_all(state_id: MergeRequest.available_states[:merged])
 
     merge_requests_to_reopen = merge_requests.where(merge_commit_sha: nil)
 
