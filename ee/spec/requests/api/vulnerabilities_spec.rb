@@ -111,6 +111,16 @@ describe API::Vulnerabilities do
           expect(response).to have_gitlab_http_status(403)
         end
       end
+
+      context 'if a vulnerability is already dismissed' do
+        let(:vulnerability) { create(:vulnerability, :closed, project: project) }
+
+        it 'responds with 304 Not Modified' do
+          subject
+
+          expect(response).to have_gitlab_http_status(304)
+        end
+      end
     end
 
     context 'when user does not have permissions to create a dismissal feedback' do

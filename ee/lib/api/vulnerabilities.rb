@@ -44,6 +44,8 @@ module API
       post ':id/dismiss' do
         if Feature.enabled?(:first_class_vulnerabilities)
           vulnerability = find_and_authorize_vulnerability!(:dismiss_vulnerability)
+          break not_modified! if vulnerability.closed?
+
           vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
           render_vulnerability(vulnerability)
         else
