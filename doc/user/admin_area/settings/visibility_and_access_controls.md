@@ -159,7 +159,7 @@ To specify a custom Git clone URL for HTTP(S):
 1. Click on **Save changes**.
 
 NOTE: **Note:**
-SSH clone URLs can be customized in `gitlab.rb` by setting `gitlab_rails["gitlab_ssh_host"]` and
+SSH clone URLs can be customized in `gitlab.rb` by setting `gitlab_rails['gitlab_ssh_host']` and
 other related settings.
 
 ## RSA, DSA, ECDSA, ED25519 SSH keys
