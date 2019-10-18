@@ -267,7 +267,7 @@ describe Ci::Build do
   describe '#collect_licenses_for_dependency_list!' do
     let!(:lm_artifact) { create(:ee_ci_job_artifact, :license_management, job: job, project: job.project) }
     let(:dependency_list_report) { Gitlab::Ci::Reports::DependencyList::Report.new }
-    let(:dependency) { build(:dependency) }
+    let(:dependency) { build(:dependency, :nokogiri) }
 
     subject { job.collect_licenses_for_dependency_list!(dependency_list_report) }
 
