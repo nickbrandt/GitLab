@@ -423,6 +423,14 @@ describe Issue do
       issue = create(:issue, title: 'testing-issue', confidential: true)
       expect(issue.to_branch_name).to match /confidential-issue\z/
     end
+
+    context 'issue title longer than 100 characters' do
+      let(:issue) { create(:issue, iid: 999, title: 'Lorem ipsum dolor sit amet consectetur adipiscing elit Mauris sit amet ipsum id lacus fringilla convallis') }
+
+      it "truncates title part of branch name to 100 characters" do
+        expect(issue.to_branch_name).to eq("999-lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-mauris-sit-amet-ipsum-id-lacus-fringilla")
+      end
+    end
   end
 
   describe '#can_be_worked_on?' do

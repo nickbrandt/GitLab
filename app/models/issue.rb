@@ -206,7 +206,7 @@ class Issue < ApplicationRecord
     if self.confidential?
       "#{iid}-confidential-issue"
     else
-      "#{iid}-#{title.parameterize}"
+      "#{iid}-#{title.parameterize}"[0, 99]
     end
   end
 
