@@ -72,7 +72,7 @@ export default {
           :href="slotProps.result.external_url"
           target="_blank"
           rel="noopener noreferrer nofollow"
-          class="menu-item"
+          class="js-deploy-url-menu-item menu-item"
         >
           <strong class="str-truncated-100 append-bottom-0 d-block">
             {{ slotProps.result.path }}
