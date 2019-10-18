@@ -8,8 +8,8 @@ module Analytics
       expose :description
       expose :id
       expose :custom
-      expose :start_event_identifier, if: :custom?
-      expose :end_event_identifier, if: :custom?
+      expose :start_event_identifier, if: -> (s) { s.custom? }
+      expose :end_event_identifier, if: -> (s) { s.custom? }
 
       def id
         object.id || object.name
