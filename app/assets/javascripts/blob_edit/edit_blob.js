@@ -94,14 +94,15 @@ export default class EditBlob {
   initBlobContentLinkClickability() {
     this.editor.renderer.on('afterRender', () => {
       document.querySelectorAll('.ace_text-layer .ace_line > *').forEach(token => {
-        if (token.getAttribute('data-linkified') || !token.textContent.includes('http')) return;
+        if (token.dataset.linkified || !token.textContent.includes('http')) return;
 
         // eslint-disable-next-line no-param-reassign
         token.innerHTML = token.innerHTML.replace(
           blobLinkRegex,
           '<a target="_blank" href="$&">$&</a>',
         );
-        token.setAttribute('data-linkified', 'true');
+        // eslint-disable-next-line no-param-reassign
+        token.dataset.linkified = true;
       });
     });
   }

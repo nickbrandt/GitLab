@@ -76,9 +76,9 @@ describe('Blob viewer', () => {
     asyncClick()
       .then(() => asyncClick())
       .then(() => {
-        expect(
-          document.querySelector('.blob-viewer[data-type="simple"]').getAttribute('data-loaded'),
-        ).toBe('true');
+        expect(document.querySelector('.blob-viewer[data-type="simple"]').dataset.loaded).toBe(
+          'true',
+        );
 
         done();
       })
@@ -100,9 +100,7 @@ describe('Blob viewer', () => {
     });
 
     it('has tooltip when disabled', () => {
-      expect(copyButton.getAttribute('data-original-title')).toBe(
-        'Switch to the source to copy the file contents',
-      );
+      expect(copyButton.dataset.title).toBe('Switch to the source to copy the file contents');
     });
 
     it('is blurred when clicked and disabled', () => {
@@ -136,7 +134,7 @@ describe('Blob viewer', () => {
       document.querySelector('.js-blob-viewer-switch-btn[data-viewer="simple"]').click();
 
       setTimeout(() => {
-        expect(copyButton.getAttribute('data-original-title')).toBe('Copy file contents');
+        expect(copyButton.dataset.title).toBe('Copy file contents');
 
         done();
       });

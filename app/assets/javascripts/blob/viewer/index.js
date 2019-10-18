@@ -79,7 +79,7 @@ export default class BlobViewer {
 
   switchToInitialViewer() {
     const initialViewer = this.$fileHolder[0].querySelector('.blob-viewer:not(.hidden)');
-    let initialViewerName = initialViewer.getAttribute('data-type');
+    let initialViewerName = initialViewer.dataset.type;
 
     if (this.switcher && window.location.hash.indexOf('#L') === 0) {
       initialViewerName = SIMPLE_VIEWER_NAME;
@@ -105,14 +105,15 @@ export default class BlobViewer {
   }
 
   static linkifyURLs(viewer) {
-    if (viewer.getAttribute('data-linkified')) return;
+    if (viewer.dataset.linkified) return;
 
     document.querySelectorAll('.js-blob-content .code .line').forEach(line => {
       // eslint-disable-next-line no-param-reassign
       line.innerHTML = line.innerHTML.replace(blobLinkRegex, '<a href="$&">$&</a>');
     });
 
-    viewer.setAttribute('data-linkified', 'true');
+    // eslint-disable-next-line no-param-reassign
+    viewer.dataset.linkified = true;
   }
 
   switchViewHandler(e) {
@@ -120,25 +121,19 @@ export default class BlobViewer {
 
     e.preventDefault();
 
-    this.switchToViewer(target.getAttribute('data-viewer'));
+    this.switchToViewer(target.dataset.viewer);
   }
 
   toggleCopyButtonState() {
     if (!this.copySourceBtn) return;
-    if (this.simpleViewer.getAttribute('data-loaded')) {
-      this.copySourceBtn.setAttribute('title', __('Copy file contents'));
+    if (this.simpleViewer.dataset.loaded) {
+      this.copySourceBtn.dataset.title = __('Copy file contents');
       this.copySourceBtn.classList.remove('disabled');
     } else if (this.activeViewer === this.simpleViewer) {
-      this.copySourceBtn.setAttribute(
-        'title',
-        __('Wait for the file to load to copy its contents'),
-      );
+      this.copySourceBtn.dataset.title = __('Wait for the file to load to copy its contents');
       this.copySourceBtn.classList.add('disabled');
     } else {
-      this.copySourceBtn.setAttribute(
-        'title',
-        __('Switch to the source to copy the file contents'),
-      );
+      this.copySourceBtn.dataset.title = __('Switch to the source to copy the file contents');
       this.copySourceBtn.classList.add('disabled');
     }
 
@@ -187,17 +182,17 @@ export default class BlobViewer {
 
   static loadViewer(viewerParam) {
     const viewer = viewerParam;
-    const url = viewer.getAttribute('data-url');
+    const { url, loaded, loading } = viewer.dataset;
 
-    if (!url || viewer.getAttribute('data-loaded') || viewer.getAttribute('data-loading')) {
+    if (!url || loaded || loading) {
       return Promise.resolve(viewer);
     }
 
-    viewer.setAttribute('data-loading', 'true');
+    viewer.dataset.loading = true;
 
     return axios.get(url).then(({ data }) => {
       viewer.innerHTML = data.html;
-      viewer.setAttribute('data-loaded', 'true');
+      viewer.dataset.loaded = true;
 
       return viewer;
     });
