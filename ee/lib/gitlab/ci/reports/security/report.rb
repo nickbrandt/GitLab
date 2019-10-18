@@ -54,7 +54,12 @@ module Gitlab
           end
 
           def unsafe_severity?
-            occurrences.any? { |occurrence| UNSAFE_SEVERITIES.include?(occurrence.severity) }
+            !safe?
+          end
+
+          def safe?
+            severities = occurrences.map(&:severity).compact.map(&:downcase)
+            (severities & UNSAFE_SEVERITIES).empty?
           end
         end
       end
