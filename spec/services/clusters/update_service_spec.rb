@@ -92,7 +92,7 @@ describe Clusters::UpdateService do
     end
 
     context 'when params includes :management_project_id' do
-      let(:management_project) { create(:project) }
+      let(:management_project) { create(:project, namespace: cluster.first_project.namespace) }
 
       context 'management_project is non-existent' do
         let(:params) do
@@ -122,6 +122,21 @@ describe Clusters::UpdateService do
           is_expected.to eq(true)
 
           expect(cluster.management_project).to eq(management_project)
+        end
+
+        context 'manangement_project is outside of the namespace scope' do
+          before do
+            management_project.update(group: create(:group))
+          end
+
+          it 'does not update management_project_id' do
+            is_expected.to eq(false)
+
+            expect(cluster.errors[:management_project_id]).to include('Project does not exist or you don\'t have permission to perform this action')
+
+            cluster.reload
+            expect(cluster.management_project_id).to be_nil
+          end
         end
       end
 

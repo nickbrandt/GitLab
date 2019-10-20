@@ -293,7 +293,7 @@ describe API::GroupClusters do
 
     let(:domain) { 'new-domain.com' }
     let(:platform_kubernetes_attributes) { {} }
-    let(:management_project) { create(:project) }
+    let(:management_project) { create(:project, group: group) }
     let(:management_project_id) { management_project.id }
 
     let(:cluster) do

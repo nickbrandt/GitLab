@@ -281,7 +281,7 @@ describe API::ProjectClusters do
     let(:api_url) { 'https://kubernetes.example.com' }
     let(:namespace) { 'new-namespace' }
     let(:platform_kubernetes_attributes) { { namespace: namespace } }
-    let(:management_project) { create(:project) }
+    let(:management_project) { create(:project, namespace: project.namespace) }
     let(:management_project_id) { management_project.id }
 
     let(:update_params) do
