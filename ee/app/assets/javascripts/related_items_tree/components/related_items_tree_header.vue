@@ -1,7 +1,7 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 
-import { GlButton, GlTooltipDirective } from '@gitlab/ui';
+import { GlButton, GlTooltip } from '@gitlab/ui';
 
 import { sprintf, s__ } from '~/locale';
 
@@ -15,20 +15,12 @@ export default {
   components: {
     Icon,
     GlButton,
+    GlTooltip,
     DroplabDropdownButton,
-  },
-  directives: {
-    GlTooltip: GlTooltipDirective,
   },
   computed: {
     ...mapGetters(['headerItems']),
     ...mapState(['parentItem']),
-    badgeTooltip() {
-      return sprintf(s__('Epics|%{epicsCount} epics and %{issuesCount} issues'), {
-        epicsCount: this.headerItems[0].count,
-        issuesCount: this.headerItems[1].count,
-      });
-    },
   },
   methods: {
     ...mapActions(['toggleAddItemForm', 'toggleCreateEpicForm']),
@@ -49,11 +41,31 @@ export default {
 <template>
   <div class="card-header d-flex px-2">
     <div class="d-inline-flex flex-grow-1 lh-100 align-middle">
-      <div
-        v-gl-tooltip.hover:tooltipcontainer.bottom
-        class="issue-count-badge"
-        :title="badgeTooltip"
-      >
+      <gl-tooltip :target="() => $refs.countBadge">
+        <p class="font-weight-bold m-0">
+          {{ __('Epics') }} &#8226;
+          <span class="text-secondary-400 font-weight-normal"
+            >{{
+              sprintf(__('%{openEpics} open, %{closedEpics} closed'), {
+                openEpics: headerItems[0].count.open,
+                closedEpics: headerItems[0].count.closed,
+              })
+            }}
+          </span>
+        </p>
+        <p class="font-weight-bold m-0">
+          {{ __('Issues') }} &#8226;
+          <span class="text-secondary-400 font-weight-normal"
+            >{{
+              sprintf(__('%{openIssues} open, %{closedIssues} closed'), {
+                openIssues: headerItems[1].count.open,
+                closedIssues: headerItems[1].count.closed,
+              })
+            }}
+          </span>
+        </p>
+      </gl-tooltip>
+      <div ref="countBadge" class="issue-count-badge">
         <span
           v-for="(item, index) in headerItems"
           :key="index"
@@ -61,7 +73,7 @@ export default {
           class="d-inline-flex align-items-center"
         >
           <icon :size="16" :name="item.iconName" class="text-secondary mr-1" />
-          {{ item.count }}
+          {{ item.count.total }}
         </span>
       </div>
     </div>
