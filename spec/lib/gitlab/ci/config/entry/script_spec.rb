@@ -72,13 +72,30 @@ describe Gitlab::Ci::Config::Entry::Script do
       end
     end
 
-    context 'when entry value is not correct' do
+    context 'when entry value is string' do
       let(:config) { 'ls' }
 
       describe '#errors' do
         it 'saves errors' do
           expect(entry.errors)
-            .to include 'script config should be an array of strings and arrays of strings'
+            .to include 'script config should be an array of strings and arrays of strings or string'
+        end
+      end
+
+      describe '#valid?' do
+        it 'is not valid' do
+          expect(entry).not_to be_valid
+        end
+      end
+    end
+
+    context 'when entry value is multi-level nested array' do
+      let(:config) { [['ls', ['echo 1']], 'pwd'] }
+
+      describe '#errors' do
+        it 'saves errors' do
+          expect(entry.errors)
+            .to include 'script config should be an array of strings and arrays of strings or string'
         end
       end
 

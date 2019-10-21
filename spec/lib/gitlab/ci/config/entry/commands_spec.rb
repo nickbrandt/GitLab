@@ -81,13 +81,30 @@ describe Gitlab::Ci::Config::Entry::Commands do
     end
   end
 
-  context 'when entry value is not valid' do
+  context 'when entry value is integer' do
     let(:config) { 1 }
 
     describe '#errors' do
       it 'saves errors' do
         expect(entry.errors)
-          .to include 'commands config should be an array of strings and arrays of strings'
+          .to include 'commands config should be an array of strings and arrays of strings or string'
+      end
+    end
+  end
+
+  context 'when entry value is multi-level nested array' do
+    let(:config) { [['ls', ['echo 1']], 'pwd'] }
+
+    describe '#errors' do
+      it 'saves errors' do
+        expect(entry.errors)
+          .to include 'commands config should be an array of strings and arrays of strings or string'
+      end
+    end
+
+    describe '#valid?' do
+      it 'is not valid' do
+        expect(entry).not_to be_valid
       end
     end
   end

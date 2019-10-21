@@ -11,7 +11,16 @@ module Gitlab
           include ::Gitlab::Config::Entry::Validatable
 
           validations do
-            validates :config, array_of_strings_or_arrays_of_strings: true
+            validate do
+              unless config.is_a?(String) ||
+                  (config.is_a?(Array) && config.all? { |element| element.is_a?(String) || validate_array_of_strings?(element) })
+                errors.add(:config, 'should be an array of strings and arrays of strings or string')
+              end
+            end
+
+            def validate_array_of_strings?(value)
+              value.is_a?(Array) && value.all? { |element| element.is_a?(String) }
+            end
           end
 
           def value
