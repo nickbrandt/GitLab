@@ -3,6 +3,7 @@
 # See http://doc.gitlab.com/ce/development/migration_style_guide.html
 # for more information on how to write migrations for GitLab.
 
+# TODO: remove this migration after execution on gitlab.com https://gitlab.com/gitlab-org/gitlab/issues/34018
 class ScheduleFixGitlabComPagesAccessLevel < ActiveRecord::Migration[5.2]
   include Gitlab::Database::MigrationHelpers
 
