@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 
-import { GlBadge, GlButton } from '@gitlab/ui';
+import { GlBadge, GlButton, GlLoadingIcon } from '@gitlab/ui';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 
 import ProjectList from 'ee/security_dashboard/components/project_list.vue';
@@ -14,12 +14,13 @@ const generateMockProjects = (projectsCount, mockProject = {}) =>
 describe('Project List component', () => {
   let wrapper;
 
-  const factory = ({ projects = [], stubs = {} } = {}) => {
+  const factory = ({ projects = [], stubs = {}, showLoadingIndicator = false } = {}) => {
     wrapper = shallowMount(ProjectList, {
       stubs,
       localVue,
       propsData: {
         projects,
+        showLoadingIndicator,
       },
       sync: false,
     });
@@ -37,6 +38,18 @@ describe('Project List component', () => {
     expect(wrapper.text()).toContain(
       'Select a project to add by using the project search field above.',
     );
+  });
+
+  it('does not show a loading indicator when showLoadingIndicator = false', () => {
+    factory();
+
+    expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
+  });
+
+  it('shows a loading indicator when showLoadingIndicator = true', () => {
+    factory({ showLoadingIndicator: true });
+
+    expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
   });
 
   it.each([0, 1, 2])(

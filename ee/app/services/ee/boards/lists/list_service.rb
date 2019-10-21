@@ -25,7 +25,7 @@ module EE
         private
 
         def list_type_features_availability(board)
-          parent = board.parent
+          parent = board.resource_parent
 
           LICENSED_LIST_TYPES.each_with_object({}) do |list_type, hash|
             list_type_key = ::List.list_types[list_type]

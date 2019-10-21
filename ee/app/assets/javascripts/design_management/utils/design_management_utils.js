@@ -1,3 +1,6 @@
+import { s__ } from '~/locale';
+import createFlash from '~/flash';
+
 /**
  * Returns formatted array that doesn't contain
  * `edges`->`node` nesting
@@ -29,3 +32,50 @@ export const extractDiscussions = discussions =>
 
 export const extractCurrentDiscussion = (discussions, id) =>
   discussions.edges.find(({ node }) => node.id === id);
+
+const deleteDesignsFromStore = (store, query, selectedDesigns) => {
+  const data = store.readQuery(query);
+
+  const changedDesigns = data.project.issue.designs.designs.edges.filter(
+    ({ node }) => !selectedDesigns.includes(node.filename),
+  );
+  data.project.issue.designs.designs.edges = [...changedDesigns];
+
+  store.writeQuery({
+    ...query,
+    data,
+  });
+};
+
+const addNewVersionToStore = (store, query, version) => {
+  if (!version) return;
+
+  const data = store.readQuery(query);
+  const newEdge = { node: version, __typename: 'DesignVersionEdge' };
+
+  data.project.issue.designs.versions.edges = [
+    newEdge,
+    ...data.project.issue.designs.versions.edges,
+  ];
+
+  store.writeQuery({
+    ...query,
+    data,
+  });
+};
+
+export const onDesignDeletionError = e => {
+  createFlash(s__('DesignManagement|We could not delete design(s). Please try again.'));
+  throw e;
+};
+
+export const updateStoreAfterDesignsDelete = (store, data, query, designs) => {
+  if (data.errors) {
+    onDesignDeletionError(new Error(data.errors));
+  } else {
+    deleteDesignsFromStore(store, query, designs);
+    addNewVersionToStore(store, query, data.version);
+  }
+};
+
+export const findVersionId = id => id.match('::Version/(.+$)')[1];

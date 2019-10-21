@@ -49,6 +49,26 @@ describe Gitlab::Ci::Parsers::Security::DependencyScanning do
       end
     end
 
+    context "when parsing a vulnerability with a missing location" do
+      let(:report_hash) { JSON.parse(fixture_file('security_reports/master/gl-sast-report.json', dir: 'ee'), symbolize_names: true) }
+
+      before do
+        report_hash[:vulnerabilities][0][:location] = nil
+      end
+
+      it { expect { parser.parse!(report_hash.to_json, report) }.not_to raise_error }
+    end
+
+    context "when parsing a vulnerability with a missing cve" do
+      let(:report_hash) { JSON.parse(fixture_file('security_reports/master/gl-sast-report.json', dir: 'ee'), symbolize_names: true) }
+
+      before do
+        report_hash[:vulnerabilities][0][:cve] = nil
+      end
+
+      it { expect { parser.parse!(report_hash.to_json, report) }.not_to raise_error }
+    end
+
     context "when vulnerabilities have remediations" do
       let(:artifact) { create(:ee_ci_job_artifact, :dependency_scanning_remediation) }
 

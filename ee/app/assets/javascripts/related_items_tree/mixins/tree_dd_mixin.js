@@ -1,14 +1,26 @@
+import Draggable from 'vuedraggable';
+
 import defaultSortableConfig from '~/sortable/sortable_config';
 import { ChildType, idProp, relativePositions } from '../constants';
 
 export default {
   computed: {
-    dragOptions() {
-      return {
+    treeRootWrapper() {
+      return this.userSignedIn ? Draggable : 'ul';
+    },
+    treeRootOptions() {
+      const options = {
         ...defaultSortableConfig,
         fallbackOnBody: false,
         group: this.parentItem.reference,
+        tag: 'ul',
+        'ghost-class': 'tree-item-drag-active',
+        'data-parent-reference': this.parentItem.reference,
+        value: this.children,
+        move: this.handleDragOnMove,
       };
+
+      return this.userSignedIn ? options : {};
     },
   },
   methods: {

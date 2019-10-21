@@ -2,20 +2,12 @@
 
 .mb-2= render_billings_gold_trial(current_user, parent_group || namespace)
 
-- if show_trial_banner?(parent_group || namespace)
-  .user-callout
-    .alert.bordered-box.landing.justify-content-start.pl-md-8
-      %button{ type:"button", class:"btn btn-default close", "data-dismiss":"alert", "aria-label": _("Close") }
-        = sprite_icon('close', size: 16)
-      .svg-container
-        = custom_icon('trial_activated_banner')
-      .user-callout-copy
-        %h4
-          = s_("BillingPlans|Congratulations, your new trial is activated")
+- if namespace_for_user?(namespace)
+  = render_if_exists 'trials/banner', namespace: namespace
 
 .billing-plan-header.content-block.center
   .billing-plan-logo
-    - if namespace == current_user.namespace
+    - if namespace_for_user?(namespace)
       .avatar-container.s96.home-panel-avatar.append-right-default.float-none.mx-auto.mb-4.mt-1
         = user_avatar_without_link(user: current_user, class: 'mb-3', size: 96)
     - elsif @group.avatar_url.present?
@@ -25,11 +17,10 @@
         = group_icon(@group, class: 'avatar avatar-tile s96', width: 96, height: 96, alt: @group.name)
 
   %h4
-    - plan_link = plan.about_page_href ? link_to(plan.code.titleize, plan.about_page_href) : plan.name
-    - if namespace == current_user.namespace
-      = s_("BillingPlans|@%{user_name} you are currently using the %{plan_link} plan.").html_safe % { user_name: current_user.username, plan_link: plan_link }
+    - if namespace_for_user?(namespace)
+      = s_("BillingPlans|@%{user_name} you are currently using the %{plan_name} plan.").html_safe % { user_name: current_user.username, plan_name: plan.code.titleize }
     - else
-      = s_("BillingPlans|%{group_name} is currently using the %{plan_link} plan.").html_safe % { group_name: namespace.full_name, plan_link: plan_link }
+      = s_("BillingPlans|%{group_name} is currently using the %{plan_name} plan.").html_safe % { group_name: namespace.full_name, plan_name: plan.code.titleize }
 
   - if parent_group
     %p= s_("BillingPlans|This group uses the plan associated with its parent group.")

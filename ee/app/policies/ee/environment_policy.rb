@@ -9,6 +9,8 @@ module EE
       rule { ~deployable_by_user }.policy do
         prevent :stop_environment
         prevent :create_environment_terminal
+        prevent :create_deployment
+        prevent :update_deployment
       end
 
       private

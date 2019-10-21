@@ -3,6 +3,22 @@
 require 'spec_helper'
 
 describe Security::PipelineVulnerabilitiesFinder do
+  class NoDeduplicationMergeReportsService
+    def initialize(*source_reports)
+      @source_reports = source_reports
+    end
+
+    def execute
+      @source_reports.last
+    end
+  end
+
+  def disable_deduplication
+    allow(::Security::MergeReportsService).to receive(:new) do |*args|
+      NoDeduplicationMergeReportsService.new(*args)
+    end
+  end
+
   describe '#execute' do
     set(:project) { create(:project, :repository) }
     set(:pipeline) { create(:ci_pipeline, :success, project: project) }
@@ -18,15 +34,37 @@ describe Security::PipelineVulnerabilitiesFinder do
     set(:artifact_sast) { create(:ee_ci_job_artifact, :sast, job: build_sast, project: project) }
 
     let(:cs_count) { read_fixture(artifact_cs)['unapproved'].count }
-    let(:dast_count) { read_fixture(artifact_dast)['site'].first['alerts'].first['instances'].count }
     let(:ds_count) { read_fixture(artifact_ds)['vulnerabilities'].count }
     let(:sast_count) { read_fixture(artifact_sast)['vulnerabilities'].count }
+    let(:dast_count) do
+      read_fixture(artifact_dast)['site'].sum do |site|
+        site['alerts'].sum do |alert|
+          alert['instances'].size
+        end
+      end
+    end
 
     before do
       stub_licensed_features(sast: true, dependency_scanning: true, container_scanning: true, dast: true)
+      # Stub out deduplication, if not done the expectations will vary based on the fixtures (which may/may not have duplicates)
+      disable_deduplication
     end
 
     subject { described_class.new(pipeline: pipeline, params: params).execute }
+
+    context 'by order' do
+      let(:params) { { report_type: %w[sast] } }
+      let!(:occurrence1) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:high],   severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:high]) }
+      let!(:occurrence2) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:medium], severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:critical]) }
+      let!(:occurrence3) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:high],   severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:critical]) }
+      let!(:res) { [occurrence3, occurrence2, occurrence1] }
+
+      it 'orders by severity and confidence' do
+        allow_any_instance_of(described_class).to receive(:filter).and_return(res)
+
+        expect(subject).to eq([occurrence3, occurrence2, occurrence1])
+      end
+    end
 
     context 'by report type' do
       context 'when sast' do
@@ -121,7 +159,7 @@ describe Security::PipelineVulnerabilitiesFinder do
         subject { described_class.new(pipeline: pipeline).execute }
 
         it 'returns all vulnerability severity levels' do
-          expect(subject.map(&:severity).uniq).to match_array %w[undefined unknown low medium high critical]
+          expect(subject.map(&:severity).uniq).to match_array %w[undefined unknown low medium high critical info]
         end
       end
 
@@ -159,7 +197,7 @@ describe Security::PipelineVulnerabilitiesFinder do
         it 'filters by all params' do
           expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count
           expect(subject.map(&:confidence).uniq).to match_array %w[undefined unknown low medium high]
-          expect(subject.map(&:severity).uniq).to match_array %w[undefined unknown low medium high critical]
+          expect(subject.map(&:severity).uniq).to match_array %w[undefined unknown low medium high critical info]
         end
       end
 

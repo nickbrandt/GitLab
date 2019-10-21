@@ -72,19 +72,42 @@ describe ProjectCiCdSetting do
 
     before do
       stub_licensed_features(merge_pipelines: true, merge_trains: true)
-      project.update(merge_pipelines_enabled: true)
     end
 
-    context 'when merge pipelines option is disabled' do
+    context 'when merge pipelines option was enabled' do
+      before do
+        project.update(merge_pipelines_enabled: true)
+      end
+
+      context 'when merge pipelines option is disabled' do
+        before do
+          project.update(merge_pipelines_enabled: false)
+        end
+
+        it { is_expected.to be true }
+      end
+
+      context 'when merge pipelines option is intact' do
+        it { is_expected.to be false }
+      end
+    end
+
+    context 'when merge pipelines option was disabled' do
       before do
         project.update(merge_pipelines_enabled: false)
       end
 
-      it { is_expected.to be true }
-    end
+      context 'when merge pipelines option is disabled' do
+        before do
+          project.update(merge_pipelines_enabled: true)
+        end
 
-    context 'when merge pipelines option is intact' do
-      it { is_expected.to be false }
+        it { is_expected.to be false }
+      end
+
+      context 'when merge pipelines option is intact' do
+        it { is_expected.to be false }
+      end
     end
   end
 end

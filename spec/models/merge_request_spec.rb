@@ -470,7 +470,7 @@ describe MergeRequest do
       commit = double('commit1', safe_message: "Fixes #{issue.to_reference}")
 
       allow(subject).to receive(:commits).and_return([commit])
-      allow(subject).to receive(:state).and_return("closed")
+      allow(subject).to receive(:state_id).and_return(described_class.available_states[:closed])
 
       expect { subject.cache_merge_request_closes_issues!(subject.author) }.not_to change(subject.merge_requests_closing_issues, :count)
     end
@@ -479,7 +479,7 @@ describe MergeRequest do
       issue  = create :issue, project: subject.project
       commit = double('commit1', safe_message: "Fixes #{issue.to_reference}")
       allow(subject).to receive(:commits).and_return([commit])
-      allow(subject).to receive(:state).and_return("merged")
+      allow(subject).to receive(:state_id).and_return(described_class.available_states[:merged])
 
       expect { subject.cache_merge_request_closes_issues!(subject.author) }.not_to change(subject.merge_requests_closing_issues, :count)
     end
@@ -541,6 +541,7 @@ describe MergeRequest do
 
     context 'with diffs' do
       subject { create(:merge_request, :with_diffs) }
+
       it 'returns the sha of the source branch last commit' do
         expect(subject.source_branch_sha).to eq(last_branch_commit.sha)
       end
@@ -548,6 +549,7 @@ describe MergeRequest do
 
     context 'without diffs' do
       subject { create(:merge_request, :without_diffs) }
+
       it 'returns the sha of the source branch last commit' do
         expect(subject.source_branch_sha).to eq(last_branch_commit.sha)
       end
@@ -570,6 +572,7 @@ describe MergeRequest do
 
     context 'when the merge request is being created' do
       subject { build(:merge_request, source_branch: nil, compare_commits: []) }
+
       it 'returns nil' do
         expect(subject.source_branch_sha).to be_nil
       end
@@ -1671,6 +1674,63 @@ describe MergeRequest do
     end
   end
 
+  describe '#find_exposed_artifacts' do
+    let(:project) { create(:project, :repository) }
+    let(:merge_request) { create(:merge_request, :with_test_reports, source_project: project) }
+    let(:pipeline) { merge_request.head_pipeline }
+
+    subject { merge_request.find_exposed_artifacts }
+
+    context 'when head pipeline has exposed artifacts' do
+      let!(:job) do
+        create(:ci_build, options: { artifacts: { expose_as: 'artifact', paths: ['ci_artifacts.txt'] } }, pipeline: pipeline)
+      end
+
+      let!(:artifacts_metadata) { create(:ci_job_artifact, :metadata, job: job) }
+
+      context 'when reactive cache worker is parsing results asynchronously' do
+        it 'returns status' do
+          expect(subject[:status]).to eq(:parsing)
+        end
+      end
+
+      context 'when reactive cache worker is inline' do
+        before do
+          synchronous_reactive_cache(merge_request)
+        end
+
+        it 'returns status and data' do
+          expect(subject[:status]).to eq(:parsed)
+        end
+
+        context 'when an error occurrs' do
+          before do
+            expect_next_instance_of(Ci::FindExposedArtifactsService) do |service|
+              expect(service).to receive(:for_pipeline)
+                .and_raise(StandardError.new)
+            end
+          end
+
+          it 'returns an error message' do
+            expect(subject[:status]).to eq(:error)
+          end
+        end
+
+        context 'when cached results is not latest' do
+          before do
+            allow_next_instance_of(Ci::GenerateExposedArtifactsReportService) do |service|
+              allow(service).to receive(:latest?).and_return(false)
+            end
+          end
+
+          it 'raises and InvalidateReactiveCache error' do
+            expect { subject }.to raise_error(ReactiveCaching::InvalidateReactiveCache)
+          end
+        end
+      end
+    end
+  end
+
   describe '#compare_test_reports' do
     subject { merge_request.compare_test_reports }
 
@@ -2072,7 +2132,7 @@ describe MergeRequest do
     end
 
     it 'refuses to enqueue a job if the MR is not open' do
-      merge_request.update_column(:state, 'foo')
+      merge_request.update_column(:state_id, 5)
 
       expect(RebaseWorker).not_to receive(:perform_async)
 
@@ -2495,6 +2555,7 @@ describe MergeRequest do
   describe "#diff_refs" do
     context "with diffs" do
       subject { create(:merge_request, :with_diffs) }
+
       let(:expected_diff_refs) do
         Gitlab::Diff::DiffRefs.new(
           base_sha:  subject.merge_request_diff.base_commit_sha,
@@ -2567,32 +2628,32 @@ describe MergeRequest do
 
   describe '#merge_ongoing?' do
     it 'returns true when the merge request is locked' do
-      merge_request = build_stubbed(:merge_request, state: :locked)
+      merge_request = build_stubbed(:merge_request, state_id: described_class.available_states[:locked])
 
       expect(merge_request.merge_ongoing?).to be(true)
     end
 
     it 'returns true when merge_id, MR is not merged and it has no running job' do
-      merge_request = build_stubbed(:merge_request, state: :open, merge_jid: 'foo')
+      merge_request = build_stubbed(:merge_request, state_id: described_class.available_states[:opened], merge_jid: 'foo')
       allow(Gitlab::SidekiqStatus).to receive(:running?).with('foo') { true }
 
       expect(merge_request.merge_ongoing?).to be(true)
     end
 
     it 'returns false when merge_jid is nil' do
-      merge_request = build_stubbed(:merge_request, state: :open, merge_jid: nil)
+      merge_request = build_stubbed(:merge_request, state_id: described_class.available_states[:opened], merge_jid: nil)
 
       expect(merge_request.merge_ongoing?).to be(false)
     end
 
     it 'returns false if MR is merged' do
-      merge_request = build_stubbed(:merge_request, state: :merged, merge_jid: 'foo')
+      merge_request = build_stubbed(:merge_request, state_id: described_class.available_states[:merged], merge_jid: 'foo')
 
       expect(merge_request.merge_ongoing?).to be(false)
     end
 
     it 'returns false if there is no merge job running' do
-      merge_request = build_stubbed(:merge_request, state: :open, merge_jid: 'foo')
+      merge_request = build_stubbed(:merge_request, state_id: described_class.available_states[:opened], merge_jid: 'foo')
       allow(Gitlab::SidekiqStatus).to receive(:running?).with('foo') { false }
 
       expect(merge_request.merge_ongoing?).to be(false)
@@ -2726,7 +2787,7 @@ describe MergeRequest do
 
       context 'closed MR' do
         before do
-          merge_request.update_attribute(:state, :closed)
+          merge_request.update_attribute(:state_id, described_class.available_states[:closed])
         end
 
         it 'is not mergeable' do
@@ -2840,6 +2901,7 @@ describe MergeRequest do
 
   describe '#merge_request_diff_for' do
     subject { create(:merge_request, importing: true) }
+
     let!(:merge_request_diff1) { subject.merge_request_diffs.create(head_commit_sha: '6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9') }
     let!(:merge_request_diff2) { subject.merge_request_diffs.create(head_commit_sha: nil) }
     let!(:merge_request_diff3) { subject.merge_request_diffs.create(head_commit_sha: '5937ac0a7beb003549fc5fd26fc247adbce4a52e') }
@@ -2870,6 +2932,7 @@ describe MergeRequest do
 
   describe '#version_params_for' do
     subject { create(:merge_request, importing: true) }
+
     let(:project) { subject.project }
     let!(:merge_request_diff1) { subject.merge_request_diffs.create(head_commit_sha: '6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9') }
     let!(:merge_request_diff2) { subject.merge_request_diffs.create(head_commit_sha: nil) }
@@ -3331,4 +3394,6 @@ describe MergeRequest do
 
     it { expect(query).to contain_exactly(merge_request1, merge_request2) }
   end
+
+  it_behaves_like 'versioned description'
 end

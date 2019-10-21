@@ -2,6 +2,7 @@
 import { mapActions, mapState } from 'vuex';
 import { GlButton, GlEmptyState, GlLink, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import ProjectManager from './project_manager.vue';
 import SecurityDashboard from './app.vue';
 
 export default {
@@ -11,6 +12,7 @@ export default {
     GlEmptyState,
     GlLink,
     GlLoadingIcon,
+    ProjectManager,
     SecurityDashboard,
   },
   props: {
@@ -26,7 +28,11 @@ export default {
       type: String,
       required: true,
     },
-    projectsEndpoint: {
+    projectAddEndpoint: {
+      type: String,
+      required: true,
+    },
+    projectListEndpoint: {
       type: String,
       required: true,
     },
@@ -54,7 +60,7 @@ export default {
     };
   },
   computed: {
-    ...mapState('projects', ['projects']),
+    ...mapState('projectSelector', ['projects']),
     toggleButtonProps() {
       return this.showProjectSelector
         ? {
@@ -71,7 +77,10 @@ export default {
     },
   },
   created() {
-    this.setProjectsEndpoint(this.projectsEndpoint);
+    this.setProjectEndpoints({
+      add: this.projectAddEndpoint,
+      list: this.projectListEndpoint,
+    });
     this.fetchProjects()
       // Failure to fetch projects will be handled in the store, so do nothing here.
       .catch(() => {})
@@ -80,7 +89,7 @@ export default {
       });
   },
   methods: {
-    ...mapActions('projects', ['setProjectsEndpoint', 'fetchProjects']),
+    ...mapActions('projectSelector', ['setProjectEndpoints', 'fetchProjects']),
     toggleProjectSelector() {
       this.showProjectSelector = !this.showProjectSelector;
     },
@@ -94,7 +103,6 @@ export default {
       <h2 class="page-title">{{ s__('SecurityDashboard|Security Dashboard') }}</h2>
       <gl-button
         v-if="isInitialized"
-        new-style
         class="page-title-controls js-project-selector-toggle"
         :variant="toggleButtonProps.variant"
         @click="toggleProjectSelector"
@@ -103,9 +111,7 @@ export default {
     </header>
 
     <template v-if="isInitialized">
-      <section v-if="showProjectSelector" class="js-dashboard-project-selector">
-        <h3>{{ s__('SecurityDashboard|Add or remove projects from your dashboard') }}</h3>
-      </section>
+      <project-manager v-if="showProjectSelector" />
 
       <template v-else>
         <gl-empty-state
@@ -125,7 +131,7 @@ export default {
             >.
           </template>
           <template #actions>
-            <gl-button new-style variant="success" @click="toggleProjectSelector">
+            <gl-button variant="success" @click="toggleProjectSelector">
               {{ s__('SecurityDashboard|Add projects') }}
             </gl-button>
           </template>
@@ -143,6 +149,6 @@ export default {
       </template>
     </template>
 
-    <gl-loading-icon v-else size="md" />
+    <gl-loading-icon v-else size="md" class="mt-4" />
   </article>
 </template>

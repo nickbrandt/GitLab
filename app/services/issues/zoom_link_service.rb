@@ -43,9 +43,19 @@ module Issues
 
     def fetch_added_meeting
       ZoomMeeting.canonical_meeting(@issue)
+    def issue_description
+      issue.description || ''
     end
 
-    def create_zoom_meeting(link)
+    def track_meeting_added_event
+      ::Gitlab::Tracking.event('IncidentManagement::ZoomIntegration', 'add_zoom_meeting', label: 'Issue ID', value: issue.id)
+    end
+
+    def track_meeting_removed_event
+      ::Gitlab::Tracking.event('IncidentManagement::ZoomIntegration', 'remove_zoom_meeting', label: 'Issue ID', value: issue.id)
+    end
+
+    def add_zoom_meeting(link)
       ZoomMeeting.create(
         issue: @issue,
         project: @issue.project,

@@ -20,17 +20,12 @@ module Projects
 
       delegate :alerts_service, to: :project
 
-      def generic_alert_endpoint_enabled?
-        Feature.enabled?(:generic_alert_endpoint, project)
-      end
-
       def incident_management_available?
         project.feature_available?(:incident_management)
       end
 
       def alerts_service_activated?
         incident_management_available? &&
-          generic_alert_endpoint_enabled? &&
           alerts_service.try(:active?)
       end
 

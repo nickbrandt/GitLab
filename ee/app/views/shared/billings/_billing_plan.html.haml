@@ -1,41 +1,38 @@
-.card{ class: ('current' if current_plan?(plan)) }
-  .card-header.bg-info.text-white
-    = plan.name
+- purchase_link = plan.purchase_link
+- is_current_plan = purchase_link.action == 'current_plan'
 
-  .card-body
-    .price-per-month
-      .append-right-5
-        = number_to_plan_currency(plan.price_per_month)
+.col-md-6.col-lg-3
+  .card.mb-5{ class: ("card-active" if is_current_plan) }
+    .card-header.font-weight-bold.p-3
+      = plan.name
+      - if is_current_plan
+        .pull-right.text-muted
+          = _("Current Plan")
 
-      %ul.billing-conditions
-        %li= s_("BillingPlans|per user")
-        %li= s_("BillingPlans|monthly")
-    .price-per-year
-      - if plan.price_per_year > 0
+    .card-body
+      .price-per-month
+        .append-right-5
+          = number_to_plan_currency(plan.price_per_month)
+
+        %ul.conditions.p-0.my-auto
+          %li= s_("BillingPlans|per user")
+          %li= s_("BillingPlans|monthly")
+      .price-per-year.text-left{ class: ("invisible" unless plan.price_per_year.positive?) }
         - price_per_year = number_to_plan_currency(plan.price_per_year)
-        = s_("BillingPlans|paid annually at %{price_per_year}") % { price_per_year: price_per_year }
+        = s_("BillingPlans|billed annually at %{price_per_year}") % { price_per_year: price_per_year }
 
-    %ul.feature-list.bordered-list
-      - plan.features.each do |feature|
-        %li
-          - if feature.highlight
-            %strong= feature.title
-          - else
+      %hr.mt-3.mb-3
+
+      %ul.unstyled-list
+        - plan_feature_short_list(plan).each do |feature|
+          %li.p-0{ class: ("font-weight-bold" if feature.highlight) }
             = feature.title
-      %li
-        - if plan.about_page_href
-          = link_to s_("BillingPlans|See all %{plan_name} features") % { plan_name: plan.name }, plan.about_page_href
-
-    - purchase_link = plan.purchase_link
+        %li.p-0.pt-3
+          - if plan.about_page_href
+            = link_to s_("BillingPlans|See all %{plan_name} features") % { plan_name: plan.name }, EE::SUBSCRIPTIONS_COMPARISON_URL
 
     - if purchase_link
-      .plan-action
-        - href = purchase_link.href&.concat("&gl_namespace_id=#{namespace.id}")
-
-        - case purchase_link.action
-        - when 'downgrade'
-          = plan_purchase_link(href, s_("BillingPlans|Downgrade"))
-        - when 'current_plan'
-          = plan_purchase_link(href, s_("BillingPlans|Current plan"))
-        - when 'upgrade'
-          = plan_purchase_link(href, s_("BillingPlans|Upgrade"))
+      .card-footer.p-3
+        .pull-right{ class: ("invisible" unless purchase_link.action == 'upgrade' || is_current_plan) }
+          - upgrade_button_class = "disabled" if is_current_plan
+          = link_to s_('BillingPlan|Upgrade'), plan_purchase_or_upgrade_url(namespace, plan, current_plan), class: "btn btn-success #{upgrade_button_class}"

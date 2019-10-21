@@ -147,7 +147,7 @@ module EE
           expose :name
           expose :group, using: ::API::Entities::BasicGroupDetails
 
-          with_options if: ->(board, _) { board.parent.feature_available?(:scoped_issue_board) } do
+          with_options if: ->(board, _) { board.resource_parent.feature_available?(:scoped_issue_board) } do
             expose :milestone do |board|
               if board.milestone.is_a?(Milestone)
                 ::API::Entities::Milestone.represent(board.milestone)
@@ -168,7 +168,7 @@ module EE
         prepended do
           expose :milestone, using: ::API::Entities::Milestone, if: -> (entity, _) { entity.milestone? }
           expose :user, as: :assignee, using: ::API::Entities::UserSafe, if: -> (entity, _) { entity.assignee? }
-          expose :max_issue_count, if: -> (list, _) { list.board.parent.feature_available?(:wip_limits) }
+          expose :max_issue_count, if: -> (list, _) { list.board.resource_parent.feature_available?(:wip_limits) }
         end
       end
 
@@ -321,6 +321,15 @@ module EE
           else
             epic.downvotes
           end
+        end
+
+        # Calculating the value of subscribed field triggers Markdown
+        # processing. We can't do that for multiple epics
+        # requests in a single API request.
+        expose :subscribed, if: -> (_, options) { options.fetch(:include_subscribed, false) } do |epic, options|
+          user = options[:user]
+
+          user.present? ? epic.subscribed?(user) : false
         end
 
         def web_url
@@ -562,7 +571,7 @@ module EE
         expose :repos_max_capacity
         expose :verification_max_capacity
         expose :container_repositories_max_capacity
-        expose :sync_object_storage, if: ->(geo_node, _) { ::Feature.enabled?(:geo_object_storage_replication) && geo_node.secondary? }
+        expose :sync_object_storage, if: ->(geo_node, _) { geo_node.secondary? }
 
         # Retained for backwards compatibility. Remove in API v5
         expose :clone_protocol do |_record, _options|
@@ -833,6 +842,23 @@ module EE
         def can_read_vulnerabilities?(user, project)
           Ability.allowed?(user, :read_project_security_dashboard, project)
         end
+      end
+
+      class FeatureFlag < Grape::Entity
+        class Scope < Grape::Entity
+          expose :id
+          expose :active
+          expose :environment_scope
+          expose :strategies
+          expose :created_at
+          expose :updated_at
+        end
+
+        expose :name
+        expose :description
+        expose :created_at
+        expose :updated_at
+        expose :scopes, using: Scope
       end
     end
   end

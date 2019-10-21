@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Ci::Build do
-  set(:group) { create(:group, :access_requestable, plan: :bronze_plan) }
+  set(:group) { create(:group, plan: :bronze_plan) }
   let(:project) { create(:project, :repository, group: group) }
 
   let(:pipeline) do
@@ -14,8 +14,6 @@ describe Ci::Build do
   end
 
   let(:job) { create(:ci_build, pipeline: pipeline) }
-
-  it { is_expected.to have_many(:sourced_pipelines) }
 
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
@@ -139,7 +137,7 @@ describe Ci::Build do
           expect(security_reports.get_report('sast').occurrences.size).to eq(33)
           expect(security_reports.get_report('dependency_scanning').occurrences.size).to eq(4)
           expect(security_reports.get_report('container_scanning').occurrences.size).to eq(8)
-          expect(security_reports.get_report('dast').occurrences.size).to eq(2)
+          expect(security_reports.get_report('dast').occurrences.size).to eq(20)
         end
       end
 
@@ -269,7 +267,7 @@ describe Ci::Build do
   describe '#collect_licenses_for_dependency_list!' do
     let!(:lm_artifact) { create(:ee_ci_job_artifact, :license_management, job: job, project: job.project) }
     let(:dependency_list_report) { Gitlab::Ci::Reports::DependencyList::Report.new }
-    let(:dependency) { build(:dependency) }
+    let(:dependency) { build(:dependency, :nokogiri) }
 
     subject { job.collect_licenses_for_dependency_list!(dependency_list_report) }
 
@@ -336,6 +334,7 @@ describe Ci::Build do
 
   describe '#retryable?' do
     subject { build.retryable? }
+
     let(:pipeline) { merge_request.all_pipelines.last }
     let!(:build) { create(:ci_build, :canceled, pipeline: pipeline) }
 

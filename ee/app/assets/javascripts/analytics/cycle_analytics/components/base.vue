@@ -39,14 +39,6 @@ export default {
     return {
       multiProjectSelect: true,
       dateOptions: [7, 30, 90],
-      groupsQueryParams: {
-        min_access_level: featureAccessLevel.EVERYONE,
-      },
-      projectsQueryParams: {
-        per_page: PROJECTS_PER_PAGE,
-        with_shared: false,
-        order_by: 'last_activity_at',
-      },
     };
   },
   computed: {
@@ -106,7 +98,7 @@ export default {
       'setDateRange',
     ]),
     onGroupSelect(group) {
-      this.setCycleAnalyticsDataEndpoint(group.path);
+      this.setCycleAnalyticsDataEndpoint(group.full_path);
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
     },
@@ -130,6 +122,14 @@ export default {
       this.setDateRange({ skipFetch: true, startDate, endDate });
     },
   },
+  groupsQueryParams: {
+    min_access_level: featureAccessLevel.EVERYONE,
+  },
+  projectsQueryParams: {
+    per_page: PROJECTS_PER_PAGE,
+    with_shared: false,
+    order_by: 'last_activity_at',
+  },
 };
 </script>
 
@@ -144,7 +144,7 @@ export default {
       >
         <groups-dropdown-filter
           class="js-groups-dropdown-filter dropdown-select"
-          :query-params="groupsQueryParams"
+          :query-params="$options.groupsQueryParams"
           @selected="onGroupSelect"
         />
         <projects-dropdown-filter
@@ -152,7 +152,7 @@ export default {
           :key="selectedGroup.id"
           class="js-projects-dropdown-filter ml-md-1 mt-1 mt-md-0 dropdown-select"
           :group-id="selectedGroup.id"
-          :query-params="projectsQueryParams"
+          :query-params="$options.projectsQueryParams"
           :multi-select="multiProjectSelect"
           @selected="onProjectsSelect"
         />

@@ -98,6 +98,16 @@ describe 'Pipeline', :js do
       end
     end
 
+    it 'shows links to the related merge requests' do
+      visit_pipeline
+
+      within '.related-merge-request-info' do
+        pipeline.all_merge_requests.map do |merge_request|
+          expect(page).to have_link(project_merge_request_path(project, merge_request))
+        end
+      end
+    end
+
     it_behaves_like 'showing user status' do
       let(:user_with_status) { pipeline.user }
 
@@ -768,10 +778,10 @@ describe 'Pipeline', :js do
         expect(page).to have_content(failed_build.stage)
       end
 
-      it 'does not show trace' do
+      it 'does not show log' do
         subject
 
-        expect(page).to have_content('No job trace')
+        expect(page).to have_content('No job log')
       end
     end
 

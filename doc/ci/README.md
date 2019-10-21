@@ -85,7 +85,7 @@ GitLab CI/CD supports numerous configuration options:
 | [Job artifacts](../user/project/pipelines/job_artifacts.md) | Output, use, and reuse job artifacts. |
 | [Cache dependencies](caching/index.md) | Cache your dependencies for a faster execution. |
 | [Schedule pipelines](../user/project/pipelines/schedules.md) | Schedule pipelines to run as often as you need. |
-| [Custom path for `.gitlab-ci.yml`](../user/project/pipelines/settings.md#custom-ci-config-path) | Define a custom path for the CI/CD configuration file. |
+| [Custom path for `.gitlab-ci.yml`](../user/project/pipelines/settings.md#custom-ci-configuration-path) | Define a custom path for the CI/CD configuration file. |
 | [Git submodules for CI/CD](git_submodules.md) | Configure jobs for using Git submodules.|
 | [SSH keys for CI/CD](ssh_keys/README.md) | Using SSH keys in your CI pipelines. |
 | [Pipelines triggers](triggers/README.md) | Trigger pipelines through the API. |
@@ -161,9 +161,9 @@ See also:
 The following articles explain reasons to use GitLab CI/CD
 for your CI/CD infrastructure:
 
-- [Why we chose GitLab CI for our CI/CD solution](https://about.gitlab.com/2016/10/17/gitlab-ci-oohlala/)
-- [Building our web-app on GitLab CI](https://about.gitlab.com/2016/07/22/building-our-web-app-on-gitlab-ci/)
-- [5 Teams that made the switch to GitLab CI/CD](https://about.gitlab.com/2019/04/25/5-teams-that-made-the-switch-to-gitlab-ci-cd/)
+- [Why we chose GitLab CI for our CI/CD solution](https://about.gitlab.com/blog/2016/10/17/gitlab-ci-oohlala/)
+- [Building our web-app on GitLab CI](https://about.gitlab.com/blog/2016/07/22/building-our-web-app-on-gitlab-ci/)
+- [5 Teams that made the switch to GitLab CI/CD](https://about.gitlab.com/blog/2019/04/25/5-teams-that-made-the-switch-to-gitlab-ci-cd/)
 
 See also the [Why CI/CD?](https://docs.google.com/presentation/d/1OGgk2Tcxbpl7DJaIOzCX4Vqg3dlwfELC3u2jEeCBbDk) presentation.
 

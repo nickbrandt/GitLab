@@ -99,7 +99,7 @@ description: 'Learn how to contribute to GitLab.'
 - [Post deployment migrations](post_deployment_migrations.md)
 - [Background migrations](background_migrations.md)
 - [Swapping tables](swapping_tables.md)
-- [Deleting exiting migrations](deleting_migrations.md)
+- [Deleting migrations](deleting_migrations.md)
 
 ### Best practices
 
@@ -150,6 +150,10 @@ description: 'Learn how to contribute to GitLab.'
 - [Introduction](event_tracking/index.md)
 - [Frontend tracking guide](event_tracking/frontend.md)
 - [Backend tracking guide](event_tracking/backend.md)
+
+## Experiment Guide
+
+- [Introduction](experiment_guide/index.md)
 
 ## Build guides
 

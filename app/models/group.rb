@@ -259,6 +259,10 @@ class Group < Namespace
     members_with_parents.maintainers.exists?(user_id: user)
   end
 
+  def has_container_repositories?
+    container_repositories.exists?
+  end
+
   # @deprecated
   alias_method :has_master?, :has_maintainer?
 
@@ -468,6 +472,12 @@ class Group < Namespace
     return if visibility_level_allowed_by_sub_groups?
 
     errors.add(:visibility_level, "#{visibility} is not allowed since there are sub-groups with higher visibility.")
+  end
+
+  def self.groups_including_descendants_by(group_ids)
+    Gitlab::ObjectHierarchy
+      .new(Group.where(id: group_ids))
+      .base_and_descendants
   end
 end
 

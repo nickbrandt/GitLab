@@ -28,6 +28,12 @@ module QA
                 view 'ee/app/views/shared/_repository_size_limit_setting.html.haml' do
                   element :repository_size_limit_field
                 end
+
+                view 'ee/app/views/groups/_templates_setting.html.haml' do
+                  element :file_template_repository_dropdown
+                  element :file_template_repositories
+                  element :save_changes_button
+                end
               end
             end
 
@@ -71,6 +77,25 @@ module QA
 
             def set_repository_size_limit(limit)
               find_element(:repository_size_limit_field).set limit
+            end
+
+            def current_file_template_repository
+              expand_section(:file_template_repositories)
+
+              within_element(:file_template_repository_dropdown) do
+                current_selection
+              end
+            end
+
+            def choose_file_template_repository(path)
+              expand_section(:file_template_repositories)
+
+              within_element(:file_template_repository_dropdown) do
+                clear_current_selection_if_present
+              end
+              click_element :file_template_repository_dropdown
+              search_and_select(path)
+              click_element :save_changes_button
             end
           end
         end

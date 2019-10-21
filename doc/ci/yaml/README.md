@@ -242,10 +242,10 @@ For more information, see see [Available settings for `services`](../docker/usin
 
 `before_script` is used to define the command that should be run before all
 jobs, including deploy jobs, but after the restoration of [artifacts](#artifacts).
-This can be an array or a multi-line string.
+This must be an an array.
 
 `after_script` is used to define the command that will be run after all
-jobs, including failed ones. This has to be an array or a multi-line string.
+jobs, including failed ones. This must be an an array.
 
 Scripts specified in `before_script` are:
 
@@ -318,6 +318,17 @@ There are also two edge cases worth mentioning:
    `test` and `deploy` are allowed to be used as job's stage by default.
 1. If a job doesn't specify a `stage`, the job is assigned the `test` stage.
 
+#### `.pre` and `.post`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/31441) in GitLab 12.4.
+
+The following stages are available to every pipeline:
+
+- `.pre`, which is guaranteed to always be the first stage in a pipeline.
+- `.post`, which is guaranteed to always be the last stage in a pipeline.
+
+User-defined stages are executed after `.pre` and before `.post`.
+
 ### `stage`
 
 `stage` is defined per-job and relies on [`stages`](#stages) which is defined
@@ -329,6 +340,10 @@ stages:
   - build
   - test
   - deploy
+
+job 0:
+  stage: .pre
+  script: make something useful before build stage
 
 job 1:
   stage: build
@@ -345,6 +360,10 @@ job 3:
 job 4:
   stage: deploy
   script: make deploy
+
+job 5:
+  stage: .post
+  script: make something useful at the end of pipeline
 ```
 
 #### Using your own Runners
@@ -1086,12 +1105,52 @@ Manual actions are considered to be write actions, so permissions for
 [protected branches](../../user/project/protected_branches.md) are used when
 a user wants to trigger an action. In other words, in order to trigger a manual
 action assigned to a branch that the pipeline is running for, the user needs to
-have the ability to merge to this branch.
+have the ability to merge to this branch. It is possible to use protected environments
+to more strictly [protect manual deployments](#protecting-manual-jobs-premium) from being
+run by unauthorized users.
 
 NOTE: **Note:**
 Using `when:manual` and `trigger` together results in the error `jobs:#{job-name} when
 should be on_success, on_failure or always`, because `when:manual` prevents triggers
 being used.
+
+##### Protecting manual jobs **(PREMIUM)**
+
+It's possible to use [protected environments](../environments/protected_environments.md)
+to define a precise list of users authorized to run a manual job. By allowing only
+users associated with a protected environment to trigger manual jobs, it is possible
+to implement some special use cases, such as:
+
+- More precisely limiting who can deploy to an environment.
+- Enabling a pipeline to be blocked until an approved user "approves" it.
+
+To do this, you must:
+
+1. Add an `environment` to the job. For example:
+
+   ```yaml
+   deploy_prod:
+     stage: deploy
+     script:
+       - echo "Deploy to production server"
+     environment:
+       name: production
+       url: https://example.com
+     when: manual
+     only:
+       - master
+   ```
+
+1. In the [protected environments settings](../environments/protected_environments.md#protecting-environments),
+   select the environment (`production` in the example above) and add the users, roles or groups
+   that are authorized to trigger the manual job to the **Allowed to Deploy** list. Only those in
+   this list will be able to trigger this manual job, as well as GitLab administrators
+   who are always able to use protected environments.
+
+Additionally, if a manual job is defined as blocking by adding `allow_failure: false`,
+the next stages of the pipeline will not run until the manual job is triggered. This
+can be used as a way to have a defined list of users allowed to "approve" later pipeline
+stages by triggering the blocking manual job.
 
 #### `when:delayed`
 

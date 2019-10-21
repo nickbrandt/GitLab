@@ -35,13 +35,17 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
     end
   end
 
+  def subscribed?
+    epic.subscribed?(current_user)
+  end
+
   private
 
   def initial_data
     {
       labels: epic.labels,
       participants: participants,
-      subscribed: epic.subscribed?(current_user)
+      subscribed: subscribed?
     }
   end
 

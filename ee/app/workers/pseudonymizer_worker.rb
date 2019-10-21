@@ -4,6 +4,8 @@ class PseudonymizerWorker
   include ApplicationWorker
   include CronjobQueue
 
+  feature_category :integrations
+
   def perform
     return unless Gitlab::CurrentSettings.pseudonymizer_enabled?
 

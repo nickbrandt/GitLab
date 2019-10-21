@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "message": { 
+      "type": "string" 
+    },
+    "errors": { 
+      "type": "object",
+      "additionalProperties" : {
+        "type" : "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": ["message", "errors"],
+  "additionalProperties": false
+}

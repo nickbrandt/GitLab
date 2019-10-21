@@ -20,13 +20,20 @@ describe FeatureFlagsFinder do
   end
 
   describe '#execute' do
-    subject { finder.execute }
+    subject { finder.execute(args) }
 
     let!(:feature_flag_1) { create(:operations_feature_flag, name: 'flag-a', project: project) }
     let!(:feature_flag_2) { create(:operations_feature_flag, name: 'flag-b', project: project) }
+    let(:args) { {} }
 
     it 'returns feature flags ordered by name' do
       is_expected.to eq([feature_flag_1, feature_flag_2])
+    end
+
+    it 'preloads relations by default' do
+      expect(Operations::FeatureFlag).to receive(:preload_relations).and_call_original
+
+      subject
     end
 
     context 'when user is a reporter' do
@@ -55,6 +62,16 @@ describe FeatureFlagsFinder do
         it 'returns inactive feature flag' do
           is_expected.to eq([feature_flag_2])
         end
+      end
+    end
+
+    context 'when preload option is false' do
+      let(:args) { { preload: false } }
+
+      it 'does not preload relations' do
+        expect(Operations::FeatureFlag).not_to receive(:preload_relations)
+
+        subject
       end
     end
 

@@ -10,10 +10,6 @@ describe Ci::Pipeline do
     create(:ci_empty_pipeline, status: :created, project: project)
   end
 
-  it { is_expected.to have_one(:source_pipeline) }
-  it { is_expected.to have_many(:sourced_pipelines) }
-  it { is_expected.to have_one(:triggered_by_pipeline) }
-  it { is_expected.to have_many(:triggered_pipelines) }
   it { is_expected.to have_many(:downstream_bridges) }
   it { is_expected.to have_many(:job_artifacts).through(:builds) }
   it { is_expected.to have_many(:vulnerability_findings).through(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::Occurrence') }
@@ -530,6 +526,7 @@ describe Ci::Pipeline do
 
   describe '#retryable?' do
     subject { pipeline.retryable? }
+
     let(:pipeline) { merge_request.all_pipelines.last }
     let!(:build) { create(:ci_build, :canceled, pipeline: pipeline) }
 

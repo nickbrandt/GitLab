@@ -21,6 +21,7 @@ module QA
           project_push.commit_message = 'Add .gitlab-ci.yml'
           project_push.file_content = <<~EOF
             test:
+              tags: ["qa"]
               script: echo 'OK'
               only:
               - merge_requests

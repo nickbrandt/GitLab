@@ -88,6 +88,7 @@ RSpec.configure do |config|
   config.include FixtureHelpers
   config.include GitlabRoutingHelper
   config.include StubFeatureFlags
+  config.include StubExperiments
   config.include StubGitlabCalls
   config.include StubGitlabData
   config.include NextInstanceOf
@@ -152,6 +153,17 @@ RSpec.configure do |config|
     # (ie. ApplicationSetting#auto_devops_enabled)
     allow(Feature).to receive(:enabled?)
       .with(:force_autodevops_on_by_default, anything)
+      .and_return(false)
+
+    # The following can be removed once Vue Issuable Sidebar
+    # is feature-complete and can be made default in place
+    # of older sidebar.
+    # See https://gitlab.com/groups/gitlab-org/-/epics/1863
+    allow(Feature).to receive(:enabled?)
+      .with(:vue_issuable_sidebar, anything)
+      .and_return(false)
+    allow(Feature).to receive(:enabled?)
+      .with(:vue_issuable_epic_sidebar, anything)
       .and_return(false)
 
     # Stub these calls due to being expensive operations
@@ -367,3 +379,6 @@ end
 
 # Prevent Rugged from picking up local developer gitconfig.
 Rugged::Settings['search_path_global'] = Rails.root.join('tmp/tests').to_s
+
+# Disable timestamp checks for invisible_captcha
+InvisibleCaptcha.timestamp_enabled = false

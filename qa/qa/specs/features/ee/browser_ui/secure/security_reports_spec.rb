@@ -5,14 +5,14 @@ require 'pathname'
 module QA
   context 'Secure', :docker do
     let(:number_of_dependencies_in_fixture) { 1309 }
-    let(:total_vuln_count) { 52 }
+    let(:total_vuln_count) { 54 }
     let(:dependency_scan_vuln_count) { 4 }
     let(:dependency_scan_example_vuln) { 'jQuery before 3.4.0' }
     let(:container_scan_vuln_count) { 8 }
     let(:container_scan_example_vuln) { 'CVE-2017-18269 in glibc' }
     let(:sast_scan_vuln_count) { 33 }
     let(:sast_scan_example_vuln) { 'Cipher with no integrity' }
-    let(:dast_scan_vuln_count) { 7 }
+    let(:dast_scan_vuln_count) { 9 }
     let(:dast_scan_example_vuln) { 'Cookie Without SameSite Attribute' }
 
     describe 'Security Reports' do
@@ -101,7 +101,7 @@ module QA
           end
 
           filter_report_and_perform(dashboard, "DAST") do
-            expect(dashboard).to have_low_vulnerability_count_of 6
+            expect(dashboard).to have_low_vulnerability_count_of 8
           end
         end
       end

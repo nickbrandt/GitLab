@@ -60,7 +60,7 @@ describe 'Billing plan pages', :feature do
 
       it 'displays correct plan actions' do
         expected_actions = plans_data.map { |data| data.fetch(:purchase_link).fetch(:action) }
-        plan_actions = page.all('.billing-plans .card .plan-action')
+        plan_actions = page.all('.billing-plans .card .card-footer')
         expect(plan_actions.length).to eq(expected_actions.length)
 
         expected_actions.each_with_index do |expected_action, index|
@@ -68,13 +68,13 @@ describe 'Billing plan pages', :feature do
 
           case expected_action
           when 'downgrade'
-            expect(action).to have_content('Downgrade')
-            expect(action).to have_css('.disabled')
+            expect(action).not_to have_link('Upgrade')
+            expect(action).not_to have_css('.disabled')
           when 'current_plan'
-            expect(action).to have_content('Current plan')
+            expect(action).to have_link('Upgrade')
             expect(action).to have_css('.disabled')
           when 'upgrade'
-            expect(action).to have_content('Upgrade')
+            expect(action).to have_link('Upgrade')
             expect(action).not_to have_css('.disabled')
           end
         end
@@ -100,7 +100,7 @@ describe 'Billing plan pages', :feature do
         end
 
         page.within('.content') do
-          expect(page).to have_link('Upgrade plan', href: external_upgrade_url(namespace, bronze_plan))
+          expect(page).to have_link('Upgrade', href: external_upgrade_url(namespace, bronze_plan))
           expect(page).to have_content('downgrade your plan')
           expect(page).to have_link('Customer Support', href: EE::CUSTOMER_SUPPORT_URL)
         end
@@ -126,7 +126,6 @@ describe 'Billing plan pages', :feature do
         end
 
         page.within('.content') do
-          expect(page).not_to have_link('Upgrade plan')
           expect(page).to have_content('downgrade your plan')
           expect(page).to have_link('Customer Support', href: EE::CUSTOMER_SUPPORT_URL)
         end
@@ -162,8 +161,8 @@ describe 'Billing plan pages', :feature do
           end
         end
 
-        it 'does not display the billing plans table' do
-          expect(page).not_to have_css('.billing-plans')
+        it 'does display the billing plans table' do
+          expect(page).to have_css('.billing-plans')
         end
 
         it 'displays subscription table', :js do

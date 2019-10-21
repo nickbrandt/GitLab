@@ -6,14 +6,9 @@
   = render 'shared/billings/billing_plan_header', namespace: namespace, plan: current_plan
 
 - unless namespace.gold_plan?
-  - if namespace.upgradable?
-    .gl-p-4.center
-      = link_to s_('BillingPlan|Upgrade plan'), plan_upgrade_url(namespace, current_plan), class: 'btn btn-success'
-
-  - else
-    .billing-plans
-      - plans_data.each do |plan|
-        = render 'shared/billings/billing_plan', namespace: namespace, plan: plan
+  .billing-plans.mt-5.row
+    - plans_data.each do |plan|
+      = render 'shared/billings/billing_plan', namespace: namespace, plan: plan, current_plan: current_plan
 
 - if namespace.actual_plan
   .center

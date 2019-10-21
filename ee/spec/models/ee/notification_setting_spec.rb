@@ -12,6 +12,7 @@ describe NotificationSetting do
       it 'appends EE specific events' do
         expect(subject).to eq(
           [
+            :new_release,
             :new_note,
             :new_issue,
             :reopen_issue,
@@ -38,6 +39,7 @@ describe NotificationSetting do
       it 'returns CE list' do
         expect(subject).to eq(
           [
+            :new_release,
             :new_note,
             :new_issue,
             :reopen_issue,
@@ -63,6 +65,7 @@ describe NotificationSetting do
       it 'appends EE specific events' do
         expect(subject).to eq(
           [
+            :new_release,
             :new_note,
             :new_issue,
             :reopen_issue,

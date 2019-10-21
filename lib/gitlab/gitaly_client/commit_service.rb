@@ -298,18 +298,6 @@ module Gitlab
         Gitlab::SafeRequestStore[key] = commit
       end
 
-      # rubocop: disable CodeReuse/ActiveRecord
-      def patch(revision)
-        request = Gitaly::CommitPatchRequest.new(
-          repository: @gitaly_repo,
-          revision: encode_binary(revision)
-        )
-        response = GitalyClient.call(@repository.storage, :diff_service, :commit_patch, request, timeout: GitalyClient.medium_timeout)
-
-        response.sum(&:data)
-      end
-      # rubocop: enable CodeReuse/ActiveRecord
-
       def commit_stats(revision)
         request = Gitaly::CommitStatsRequest.new(
           repository: @gitaly_repo,
@@ -358,25 +346,6 @@ module Gitlab
         response.flat_map do |msg|
           msg.shas.map { |sha| EncodingHelper.encode!(sha) }
         end
-      end
-
-      def extract_signature(commit_id)
-        request = Gitaly::ExtractCommitSignatureRequest.new(repository: @gitaly_repo, commit_id: commit_id)
-        response = GitalyClient.call(@repository.storage, :commit_service, :extract_commit_signature, request, timeout: GitalyClient.fast_timeout)
-
-        signature = +''.b
-        signed_text = +''.b
-
-        response.each do |message|
-          signature << message.signature
-          signed_text << message.signed_text
-        end
-
-        return if signature.blank? && signed_text.blank?
-
-        [signature, signed_text]
-      rescue GRPC::InvalidArgument => ex
-        raise ArgumentError, ex
       end
 
       def get_commit_signatures(commit_ids)

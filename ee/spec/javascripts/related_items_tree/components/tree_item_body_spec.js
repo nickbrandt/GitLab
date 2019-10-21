@@ -14,7 +14,7 @@ import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { ChildType, ChildState } from 'ee/related_items_tree/constants';
 
-import { mockParentItem, mockQueryResponse, mockIssue1 } from '../mock_data';
+import { mockParentItem, mockInitialConfig, mockQueryResponse, mockIssue1 } from '../mock_data';
 
 const mockItem = Object.assign({}, mockIssue1, {
   type: ChildType.Issue,
@@ -28,6 +28,7 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
   store.dispatch('setInitialParentItem', mockParentItem);
+  store.dispatch('setInitialConfig', mockInitialConfig);
   store.dispatch('setItemChildren', {
     parentItem: mockParentItem,
     isSubItem: false,
@@ -284,6 +285,10 @@ describe('RelatedItemsTree', () => {
     });
 
     describe('template', () => {
+      it('renders item body element without class `item-logged-out` when user is signed in', () => {
+        expect(wrapper.find('.item-body').classes()).not.toContain('item-logged-out');
+      });
+
       it('renders item state icon for large screens', () => {
         const statusIcon = wrapper.findAll(Icon).at(0);
 

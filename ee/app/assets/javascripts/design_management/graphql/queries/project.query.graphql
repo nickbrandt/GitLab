@@ -1,4 +1,5 @@
 #import "../fragments/designList.fragment.graphql"
+#import "../fragments/version.fragment.graphql"
 
 query project($fullPath: ID!, $iid: String!, $atVersion: ID) {
   project(fullPath: $fullPath) {
@@ -15,8 +16,7 @@ query project($fullPath: ID!, $iid: String!, $atVersion: ID) {
         versions {
           edges {
             node {
-              id
-              sha
+              ...VersionListItem
             }
           }
         }

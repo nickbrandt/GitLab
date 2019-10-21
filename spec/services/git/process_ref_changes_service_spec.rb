@@ -13,6 +13,12 @@ describe Git::ProcessRefChangesService do
     let(:service) { double(execute: true) }
     let(:git_changes) { double(branch_changes: [], tag_changes: []) }
 
+    def multiple_changes(change, count)
+      Array.new(count).map.with_index do |n, index|
+        { index: index, oldrev: change[:oldrev], newrev: change[:newrev], ref: "#{change[:ref]}#{n}" }
+      end
+    end
+
     let(:changes) do
       [
         { index: 0, oldrev: Gitlab::Git::BLANK_SHA, newrev: '789012', ref: "#{ref_prefix}/create" },
@@ -28,10 +34,92 @@ describe Git::ProcessRefChangesService do
     it "calls #{push_service_class}" do
       expect(push_service_class)
         .to receive(:new)
+        .with(project, project.owner, hash_including(execute_project_hooks: true, create_push_event: true))
         .exactly(changes.count).times
         .and_return(service)
 
       subject.execute
+    end
+
+    context 'changes exceed push_event_hooks_limit' do
+      let(:push_event_hooks_limit) { 3 }
+
+      let(:changes) do
+        multiple_changes(
+          { oldrev: '123456', newrev: '789012', ref: "#{ref_prefix}/test" },
+          push_event_hooks_limit + 1
+        )
+      end
+
+      before do
+        stub_application_setting(push_event_hooks_limit: push_event_hooks_limit)
+      end
+
+      context 'git_push_execute_all_project_hooks is disabled' do
+        before do
+          stub_feature_flags(git_push_execute_all_project_hooks: false)
+        end
+
+        it "calls #{push_service_class} with execute_project_hooks set to false" do
+          expect(push_service_class)
+            .to receive(:new)
+            .with(project, project.owner, hash_including(execute_project_hooks: false))
+            .exactly(changes.count).times
+            .and_return(service)
+
+          subject.execute
+        end
+      end
+
+      context 'git_push_execute_all_project_hooks is enabled' do
+        before do
+          stub_feature_flags(git_push_execute_all_project_hooks: true)
+        end
+
+        it "calls #{push_service_class} with execute_project_hooks set to true" do
+          expect(push_service_class)
+            .to receive(:new)
+            .with(project, project.owner, hash_including(execute_project_hooks: true))
+            .exactly(changes.count).times
+            .and_return(service)
+
+          subject.execute
+        end
+      end
+    end
+
+    context 'changes exceed push_event_activities_limit per action' do
+      let(:push_event_activities_limit) { 3 }
+
+      let(:changes) do
+        [
+          { oldrev: Gitlab::Git::BLANK_SHA, newrev: '789012', ref: "#{ref_prefix}/create" },
+          { oldrev: '123456', newrev: '789012', ref: "#{ref_prefix}/update" },
+          { oldrev: '123456', newrev: Gitlab::Git::BLANK_SHA, ref: "#{ref_prefix}/delete" }
+        ].map do |change|
+          multiple_changes(change, push_event_activities_limit + 1)
+        end.flatten
+      end
+
+      before do
+        stub_application_setting(push_event_activities_limit: push_event_activities_limit)
+      end
+
+      it "calls #{push_service_class} with create_push_event set to false" do
+        expect(push_service_class)
+          .to receive(:new)
+          .with(project, project.owner, hash_including(create_push_event: false))
+          .exactly(changes.count).times
+          .and_return(service)
+
+        subject.execute
+      end
+
+      it 'creates events per action' do
+        allow(push_service_class).to receive(:new).and_return(service)
+
+        expect { subject.execute }.to change { Event.count }.by(3)
+      end
     end
 
     context 'pipeline creation' do

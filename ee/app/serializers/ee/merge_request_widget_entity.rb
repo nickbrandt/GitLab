@@ -159,7 +159,7 @@ module EE
         visible_mrs = object.visible_blocking_merge_requests(current_user)
         visible_mrs_by_state = visible_mrs
           .map { |mr| represent_blocking_mr(mr) }
-          .group_by { |blocking_mr| blocking_mr.object.state_name }
+          .group_by { |blocking_mr| blocking_mr.object.state_id_name }
 
         {
           total_count: visible_mrs.count + hidden_blocking_count,

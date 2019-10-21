@@ -422,6 +422,12 @@ describe API::Epics do
         expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
       end
 
+      it 'exposes subscribed field' do
+        get api(url, epic.author)
+
+        expect(json_response['subscribed']).to eq(true)
+      end
+
       it 'exposes closed_at attribute' do
         epic.close
 
@@ -485,6 +491,7 @@ describe API::Epics do
           expect(epic.description).to eq('epic description')
           expect(epic.start_date_fixed).to eq(nil)
           expect(epic.start_date_is_fixed).to be_falsey
+          expect(epic.due_date).to eq(Date.new(2018, 7, 17))
           expect(epic.due_date_fixed).to eq(Date.new(2018, 7, 17))
           expect(epic.due_date_is_fixed).to eq(true)
           expect(epic.labels.first.title).to eq('label1')

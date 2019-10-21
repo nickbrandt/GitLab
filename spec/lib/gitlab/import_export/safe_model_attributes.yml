@@ -47,6 +47,7 @@ PushEventPayload:
 - commit_to
 - ref
 - commit_title
+- ref_count
 Note:
 - id
 - note
@@ -126,6 +127,12 @@ Release:
 - created_at
 - updated_at
 - released_at
+Evidence:
+- id
+- release_id
+- summary
+- created_at
+- updated_at
 Releases::Link:
 - id
 - release_id

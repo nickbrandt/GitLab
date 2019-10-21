@@ -12,16 +12,19 @@ import {
   GlTooltipDirective,
 } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
+import createFlash from '~/flash';
 import Icon from '~/vue_shared/components/icon.vue';
-import { getParameterValues, mergeUrlParams } from '~/lib/utils/url_utility';
+import { getParameterValues, mergeUrlParams, redirectTo } from '~/lib/utils/url_utility';
 import invalidUrl from '~/lib/utils/invalid_url';
 import PanelType from 'ee_else_ce/monitoring/components/panel_type.vue';
+import DateTimePicker from './date_time_picker/date_time_picker.vue';
 import MonitorTimeSeriesChart from './charts/time_series.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
-import { sidebarAnimationDuration, timeWindows } from '../constants';
-import { getTimeDiff, getTimeWindow } from '../utils';
+import { sidebarAnimationDuration } from '../constants';
+import TrackEventDirective from '~/vue_shared/directives/track_event';
+import { getTimeDiff, isValidDate, downloadCSVOptions, generateLinkToChartOptions } from '../utils';
 
 let sidebarMutationObserver;
 
@@ -39,10 +42,12 @@ export default {
     GlDropdownItem,
     GlFormGroup,
     GlModal,
+    DateTimePicker,
   },
   directives: {
     GlModal: GlModalDirective,
     GlTooltip: GlTooltipDirective,
+    TrackEvent: TrackEventDirective,
   },
   props: {
     externalDashboardUrl: {
@@ -163,10 +168,8 @@ export default {
     return {
       state: 'gettingStarted',
       elWidth: 0,
-      selectedTimeWindow: '',
-      selectedTimeWindowKey: '',
       formIsValid: null,
-      timeWindows: {},
+      selectedTimeWindow: {},
       isRearrangingPanels: false,
     };
   },
@@ -229,11 +232,13 @@ export default {
         end,
       };
 
-      this.timeWindows = timeWindows;
-      this.selectedTimeWindowKey = getTimeWindow(range);
-      this.selectedTimeWindow = this.timeWindows[this.selectedTimeWindowKey];
+      this.selectedTimeWindow = range;
 
-      this.fetchData(range);
+      if (!isValidDate(start) || !isValidDate(end)) {
+        this.showInvalidDateError();
+      } else {
+        this.fetchData(range);
+      }
 
       sidebarMutationObserver = new MutationObserver(this.onSidebarMutation);
       sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
@@ -290,6 +295,9 @@ export default {
       // See https://gitlab.com/gitlab-org/gitlab/issues/27835
       metrics.splice(graphIndex, 1);
     },
+    showInvalidDateError() {
+      createFlash(s__('Metrics|Link contains an invalid time window.'));
+    },
     generateLink(group, title, yLabel) {
       const dashboard = this.currentDashboard || this.firstDashboard.path;
       const params = _.pick({ dashboard, group, title, y_label: yLabel }, value => value != null);
@@ -312,16 +320,14 @@ export default {
     submitCustomMetricsForm() {
       this.$refs.customMetricsForm.submit();
     },
-    activeTimeWindow(key) {
-      return this.timeWindows[key] === this.selectedTimeWindow;
-    },
-    setTimeWindowParameter(key) {
-      const { start, end } = getTimeDiff(key);
-      return `?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
-    },
     groupHasData(group) {
       return this.chartsWithData(group.metrics).length > 0;
     },
+    onDateTimePickerApply(timeWindowUrlParams) {
+      return redirectTo(mergeUrlParams(timeWindowUrlParams, window.location.href));
+    },
+    downloadCSVOptions,
+    generateLinkToChartOptions,
   },
   addMetric: {
     title: s__('Metrics|Add metric'),
@@ -332,14 +338,14 @@ export default {
 
 <template>
   <div class="prometheus-graphs">
-    <div class="gl-p-3 pb-0 border-bottom bg-gray-light">
+    <div class="prometheus-graphs-header gl-p-3 pb-0 border-bottom bg-gray-light">
       <div class="row">
         <template v-if="environmentsEndpoint">
           <gl-form-group
             :label="__('Dashboard')"
             label-size="sm"
             label-for="monitor-dashboards-dropdown"
-            class="col-sm-12 col-md-4 col-lg-2"
+            class="col-sm-12 col-md-6 col-lg-2"
           >
             <gl-dropdown
               id="monitor-dashboards-dropdown"
@@ -362,7 +368,7 @@ export default {
             :label="s__('Metrics|Environment')"
             label-size="sm"
             label-for="monitor-environments-dropdown"
-            class="col-sm-6 col-md-4 col-lg-2"
+            class="col-sm-6 col-md-6 col-lg-2"
           >
             <gl-dropdown
               id="monitor-environments-dropdown"
@@ -387,36 +393,24 @@ export default {
             :label="s__('Metrics|Show last')"
             label-size="sm"
             label-for="monitor-time-window-dropdown"
-            class="col-sm-6 col-md-4 col-lg-2"
+            class="col-sm-6 col-md-6 col-lg-4"
           >
-            <gl-dropdown
-              id="monitor-time-window-dropdown"
-              class="mb-0 d-flex js-time-window-dropdown"
-              toggle-class="dropdown-menu-toggle"
-              :text="selectedTimeWindow"
-            >
-              <gl-dropdown-item
-                v-for="(value, key) in timeWindows"
-                :key="key"
-                :active="activeTimeWindow(key)"
-                :href="setTimeWindowParameter(key)"
-                active-class="active"
-                >{{ value }}</gl-dropdown-item
-              >
-            </gl-dropdown>
+            <date-time-picker
+              :selected-time-window="selectedTimeWindow"
+              @onApply="onDateTimePickerApply"
+            />
           </gl-form-group>
         </template>
 
         <gl-form-group
           v-if="addingMetricsAvailable || showRearrangePanelsBtn || externalDashboardUrl.length"
           label-for="prometheus-graphs-dropdown-buttons"
-          class="dropdown-buttons col-lg d-lg-flex align-items-end"
+          class="dropdown-buttons col-md d-md-flex col-lg d-lg-flex align-items-end"
         >
           <div id="prometheus-graphs-dropdown-buttons">
             <gl-button
               v-if="showRearrangePanelsBtn"
               :pressed="isRearrangingPanels"
-              new-style
               variant="default"
               class="mr-2 mt-1 js-rearrange-button"
               @click="toggleRearrangingPanels"
@@ -426,7 +420,6 @@ export default {
             <gl-button
               v-if="addingMetricsAvailable"
               v-gl-modal="$options.addMetric.modalId"
-              new-style
               variant="outline-success"
               class="mr-2 mt-1 js-add-metric-button"
             >
@@ -554,10 +547,19 @@ export default {
                 <template slot="button-content">
                   <icon name="ellipsis_v" class="text-secondary" />
                 </template>
-                <gl-dropdown-item :href="downloadCsv(graphData)" download="chart_metrics.csv">
+                <gl-dropdown-item
+                  v-track-event="downloadCSVOptions(graphData.title)"
+                  :href="downloadCsv(graphData)"
+                  download="chart_metrics.csv"
+                >
                   {{ __('Download CSV') }}
                 </gl-dropdown-item>
                 <gl-dropdown-item
+                  v-track-event="
+                    generateLinkToChartOptions(
+                      generateLink(groupData.group, graphData.title, graphData.y_label),
+                    )
+                  "
                   class="js-chart-link"
                   :data-clipboard-text="
                     generateLink(groupData.group, graphData.title, graphData.y_label)

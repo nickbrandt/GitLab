@@ -99,6 +99,32 @@ describe SystemNoteService do
       end
     end
 
+    describe 'icons' do
+      where(:action) do
+        [
+          [:creation],
+          [:modification],
+          [:deletion]
+        ]
+      end
+
+      with_them do
+        before do
+          version.actions.update_all(event: action)
+        end
+
+        subject(:metadata) do
+          described_class.design_version_added(version)
+            .first.system_note_metadata
+        end
+
+        it 'has a valid action' do
+          expect(EE::SystemNoteHelper::EE_ICON_NAMES_BY_ACTION)
+            .to include(metadata.action)
+        end
+      end
+    end
+
     context 'it succeeds' do
       where(:action, :icon, :human_description) do
         [

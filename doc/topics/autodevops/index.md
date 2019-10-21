@@ -85,7 +85,7 @@ knowledge of the following:
 Auto DevOps provides great defaults for all the stages; you can, however,
 [customize](#customizing) almost everything to your needs.
 
-For an overview on the creation of Auto DevOps, read the blog post [From 2/3 of the Self-Hosted Git Market, to the Next-Generation CI System, to Auto DevOps](https://about.gitlab.com/2017/06/29/whats-next-for-gitlab-ci/).
+For an overview on the creation of Auto DevOps, read the blog post [From 2/3 of the Self-Hosted Git Market, to the Next-Generation CI System, to Auto DevOps](https://about.gitlab.com/blog/2017/06/29/whats-next-for-gitlab-ci/).
 
 NOTE: **Note**
 Kubernetes clusters can [be used without](../../user/project/clusters/index.md)
@@ -98,7 +98,7 @@ To make full use of Auto DevOps, you will need:
 - **GitLab Runner** (for all stages)
 
   Your Runner needs to be configured to be able to run Docker. Generally this
-  means using the either the [Docker](https://docs.gitlab.com/runner/executors/docker.html)
+  means using either the [Docker](https://docs.gitlab.com/runner/executors/docker.html)
   or [Kubernetes](https://docs.gitlab.com/runner/executors/kubernetes.html) executors, with
   [privileged mode enabled](https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode).
 
@@ -487,6 +487,9 @@ in the first place, and thus not realize that it needs to re-apply the old confi
 
 > Introduced in [GitLab Ultimate][ee] 10.4.
 
+This is an optional step, since it requires a [review app](#auto-review-apps).
+If that requirement is not met, the job will be silently skipped.
+
 Dynamic Application Security Testing (DAST) uses the
 popular open source tool [OWASP ZAProxy](https://github.com/zaproxy/zaproxy)
 to perform an analysis on the current code and checks for potential security
@@ -497,6 +500,29 @@ later download and check out.
 
 Any security warnings are also shown in the merge request widget. Read how
 [DAST works](../../user/application_security/dast/index.md).
+
+On your default branch, DAST scans an app deployed specifically for that purpose.
+The app is deleted after DAST has run.
+
+On feature branches, DAST scans the [review app](#auto-review-apps).
+
+#### Overriding the DAST target
+
+To use a custom target instead of the auto-deployed review apps,
+set a `DAST_WEBSITE` environment variable to the URL for DAST to scan.
+
+NOTE: **Note:**
+If [DAST Full Scan](../../user/application_security/dast/index.md#full-scan) is enabled, it is strongly advised **not**
+to set `DAST_WEBSITE` to any staging or production environment. DAST Full Scan
+actively attacks the target, which can take down the application and lead to
+data loss or corruption.
+
+#### Disabling Auto DAST
+
+DAST can be disabled:
+
+- On all branches by setting the `DAST_DISABLED` environment variable to `"true"`.
+- Only on the default branch by setting the `DAST_DISABLED_FOR_DEFAULT_BRANCH` environment variable to `"true"`.
 
 ### Auto Browser Performance Testing **(PREMIUM)**
 
@@ -1169,13 +1195,13 @@ This configuration is deprecated and will be removed in the future.
 TIP: **Tip:**
 You can also set this inside your [project's settings](#deployment-strategy).
 
-This configuration based on
+This configuration is based on
 [incremental rollout to production](#incremental-rollout-to-production-premium).
 
 Everything behaves the same way, except:
 
 - It's enabled by setting the `INCREMENTAL_ROLLOUT_MODE` variable to `timed`.
-- Instead of the standard `production` job, the following jobs with a 5 minute delay between each are created:
+- Instead of the standard `production` job, the following jobs are created with a 5 minute delay between each :
   1. `timed rollout 10%`
   1. `timed rollout 25%`
   1. `timed rollout 50%`

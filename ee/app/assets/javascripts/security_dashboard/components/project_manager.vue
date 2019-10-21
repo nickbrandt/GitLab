@@ -1,36 +1,27 @@
 <script>
-import { mapState, mapActions } from 'vuex';
-import { GlBadge, GlButton, GlLoadingIcon } from '@gitlab/ui';
-
-import Icon from '~/vue_shared/components/icon.vue';
+import { mapState, mapActions, mapGetters } from 'vuex';
+import { GlButton } from '@gitlab/ui';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
-
 import ProjectList from './project_list.vue';
 
 export default {
   components: {
-    GlBadge,
     GlButton,
-    GlLoadingIcon,
-    Icon,
     ProjectList,
     ProjectSelector,
   },
   computed: {
     ...mapState('projectSelector', [
       'projects',
-      'isAddingProjects',
       'selectedProjects',
       'projectSearchResults',
-      'searchCount',
       'messages',
     ]),
-    isSearchingProjects() {
-      return this.searchCount > 0;
-    },
-    hasProjectsSelected() {
-      return this.selectedProjects.length > 0;
-    },
+    ...mapGetters('projectSelector', [
+      'canAddProjects',
+      'isSearchingProjects',
+      'isUpdatingProjects',
+    ]),
   },
   methods: {
     ...mapActions('projectSelector', [
@@ -41,10 +32,6 @@ export default {
       'setSearchQuery',
       'removeProject',
     ]),
-    addProjectsAndClearSearchResults() {
-      this.addProjects();
-      this.clearSearchResults();
-    },
     searched(query) {
       this.setSearchQuery(query);
       this.fetchSearchResults();
@@ -63,9 +50,9 @@ export default {
   <section class="container">
     <div class="row justify-content-center mt-md-4">
       <div class="col col-lg-7">
-        <h2 class="h5 border-bottom mb-4 pb-3">
+        <h3 class="text-3 font-weight-bold border-bottom mb-4 pb-3">
           {{ s__('SecurityDashboard|Add or remove projects from your dashboard') }}
-        </h2>
+        </h3>
         <div class="d-flex flex-column flex-md-row">
           <project-selector
             class="flex-grow mr-md-2"
@@ -79,12 +66,7 @@ export default {
             @projectClicked="projectClicked"
           />
           <div class="mb-3">
-            <gl-button
-              :disabled="!hasProjectsSelected"
-              new-style
-              variant="success"
-              @click="addProjectsAndClearSearchResults"
-            >
+            <gl-button :disabled="!canAddProjects" variant="success" @click="addProjects">
               {{ s__('SecurityDashboard|Add projects') }}
             </gl-button>
           </div>
@@ -92,8 +74,12 @@ export default {
       </div>
     </div>
     <div class="row justify-content-center mt-md-3">
-      <project-list :projects="projects" class="col col-lg-7" @projectRemoved="projectRemoved" />
-      <gl-loading-icon v-if="isAddingProjects" size="sm" />
+      <project-list
+        :projects="projects"
+        :show-loading-indicator="isUpdatingProjects"
+        class="col col-lg-7"
+        @projectRemoved="projectRemoved"
+      />
     </div>
   </section>
 </template>

@@ -68,11 +68,10 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 
 #### Customizing GitLab's appearance
 
-- [Header logo](../customization/branded_page_and_email_header.md): Change the logo on all pages and email headers.
-- [Favicon](../customization/favicon.md): Change the default favicon to your own logo.
-- [Branded login page](../customization/branded_login_page.md): Customize the login page with your own logo, title, and description.
-- [Welcome message](../customization/welcome_message.md): Add a custom welcome message to the sign-in page.
-- ["New Project" page](../customization/new_project_page.md): Customize the text to be displayed on the page that opens whenever your users create a new project.
+- [Header logo](../user/admin_area/appearance.md#navigation-bar): Change the logo on all pages and email headers.
+- [Favicon](../user/admin_area/appearance.md#favicon): Change the default favicon to your own logo.
+- [Branded login page](../user/admin_area/appearance.md#sign-in--sign-up-pages): Customize the login page with your own logo, title, and description.
+- ["New Project" page](../user/admin_area/appearance.md#new-project-pages): Customize the text to be displayed on the page that opens whenever your users create a new project.
 - [Additional custom email text](../user/admin_area/settings/email.md#custom-additional-text-premium-only): Add additional custom text to emails sent from GitLab. **(PREMIUM ONLY)**
 
 ### Maintaining GitLab
@@ -105,7 +104,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 ## User settings and permissions
 
 - [Creating users](../user/profile/account/create_accounts.md): Create users manually or through authentication integrations.
-- [Libravatar](../customization/libravatar.md): Use Libravatar instead of Gravatar for user avatars.
+- [Libravatar](libravatar.md): Use Libravatar instead of Gravatar for user avatars.
 - [Sign-up restrictions](../user/admin_area/settings/sign_up_restrictions.md): block email addresses of specific domains, or whitelist only specific domains.
 - [Access restrictions](../user/admin_area/settings/visibility_and_access_controls.md#enabled-git-access-protocols): Define which Git access protocols can be used to talk to GitLab (SSH, HTTP, HTTPS).
 - [Authentication and Authorization](auth/README.md): Configure external authentication with LDAP, SAML, CAS and additional providers.
@@ -154,7 +153,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Enable/disable GitLab CI/CD](../ci/enable_or_disable_ci.md#site-wide-admin-setting): Enable or disable GitLab CI/CD for your instance.
 - [GitLab CI/CD admin settings](../user/admin_area/settings/continuous_integration.md): Enable or disable Auto DevOps site-wide and define the artifacts' max size and expiration time.
 - [Job artifacts](job_artifacts.md): Enable, disable, and configure job artifacts (a set of files and directories which are outputted by a job when it completes successfully).
-- [Job traces](job_traces.md): Information about the job traces (logs).
+- [Job logs](job_logs.md): Information about the job logs.
 - [Register Shared and specific Runners](../ci/runners/README.md#registering-a-shared-runner): Learn how to register and configure Shared and specific Runners to your own instance.
 - [Shared Runners pipelines quota](../user/admin_area/settings/continuous_integration.md#shared-runners-pipeline-minutes-quota-starter-only): Limit the usage of pipeline minutes for Shared Runners. **(STARTER ONLY)**
 - [Enable/disable Auto DevOps](../topics/autodevops/index.md#enablingdisabling-auto-devops): Enable or disable Auto DevOps for your instance.

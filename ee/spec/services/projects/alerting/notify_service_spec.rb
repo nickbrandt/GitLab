@@ -54,48 +54,34 @@ describe Projects::Alerting::NotifyService do
         stub_licensed_features(incident_management: true)
       end
 
-      context 'with Generic Alert Endpoint feature enabled' do
-        before do
-          stub_feature_flags(generic_alert_endpoint: true)
-        end
+      context 'with activated Alerts Service' do
+        let!(:alerts_service) { create(:alerts_service, project: project) }
 
-        context 'with activated Alerts Service' do
-          let!(:alerts_service) { create(:alerts_service, project: project) }
+        context 'with valid token' do
+          let(:token) { alerts_service.token }
 
-          context 'with valid token' do
-            let(:token) { alerts_service.token }
-
-            context 'with a valid payload' do
-              it_behaves_like 'processes incident issues', 1
-            end
-
-            context 'with an invalid payload' do
-              before do
-                allow(Gitlab::Alerting::NotificationPayloadParser)
-                  .to receive(:call)
-                  .and_raise(Gitlab::Alerting::NotificationPayloadParser::BadPayloadError)
-              end
-
-              it_behaves_like 'does not process incident issues', http_status: 400
-            end
+          context 'with a valid payload' do
+            it_behaves_like 'processes incident issues', 1
           end
 
-          context 'with invalid token' do
-            it_behaves_like 'does not process incident issues', http_status: 401
+          context 'with an invalid payload' do
+            before do
+              allow(Gitlab::Alerting::NotificationPayloadParser)
+                .to receive(:call)
+                .and_raise(Gitlab::Alerting::NotificationPayloadParser::BadPayloadError)
+            end
+
+            it_behaves_like 'does not process incident issues', http_status: 400
           end
         end
 
-        context 'with deactivated Alerts Service' do
-          let!(:alerts_service) { create(:alerts_service, :inactive, project: project) }
-
-          it_behaves_like 'does not process incident issues', http_status: 403
+        context 'with invalid token' do
+          it_behaves_like 'does not process incident issues', http_status: 401
         end
       end
 
-      context 'with Generic Alert Endpoint feature disabled' do
-        before do
-          stub_feature_flags(generic_alert_endpoint: false)
-        end
+      context 'with deactivated Alerts Service' do
+        let!(:alerts_service) { create(:alerts_service, :inactive, project: project) }
 
         it_behaves_like 'does not process incident issues', http_status: 403
       end

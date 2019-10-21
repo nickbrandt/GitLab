@@ -1,0 +1,5 @@
+---
+title: Fix deduplication of WASC vulnerabilities in the Security dashboard
+merge_request: 17778
+author:
+type: fixed

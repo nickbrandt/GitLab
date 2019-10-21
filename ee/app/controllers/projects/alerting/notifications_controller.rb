@@ -9,7 +9,6 @@ module Projects
       skip_before_action :project
 
       prepend_before_action :repository, :project_without_auth
-      before_action :check_generic_alert_endpoint_feature_flag!
 
       def create
         token = extract_alert_manager_token(request)
@@ -23,10 +22,6 @@ module Projects
       def project_without_auth
         @project ||= Project
           .find_by_full_path("#{params[:namespace_id]}/#{params[:project_id]}")
-      end
-
-      def check_generic_alert_endpoint_feature_flag!
-        render_404 unless Feature.enabled?(:generic_alert_endpoint, @project)
       end
 
       def extract_alert_manager_token(request)

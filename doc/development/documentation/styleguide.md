@@ -492,18 +492,49 @@ For other punctuation rules, please refer to the
 
 - Use inline link markdown markup `[Text](https://example.com)`.
   It's easier to read, review, and maintain. **Do not** use `[Text][identifier]`.
-- To link to internal documentation, use relative links, not full URLs. Use `../` to
-  navigate to high-level directories, and always add the file name `file.md` at the
-  end of the link with the `.md` extension, not `.html`.
-  Example: instead of `[text](../../merge_requests/)`, use
-  `[text](../../merge_requests/index.md)` or, `[text](../../ci/README.md)`, or,
-  for anchor links, `[text](../../ci/README.md#examples)`.
-  Using the markdown extension is necessary for the [`/help`](index.md#gitlab-help)
-  section of GitLab.
-- To link from CE to EE-only documentation, use the EE-only doc full URL.
+
 - Use [meaningful anchor texts](https://www.futurehosting.com/blog/links-should-have-meaningful-anchor-text-heres-why/).
   E.g., instead of writing something like `Read more about GitLab Issue Boards [here](LINK)`,
   write `Read more about [GitLab Issue Boards](LINK)`.
+
+### Links to internal documentation
+
+- To link to internal documentation, use relative links, not full URLs.
+  Use `../` to navigate to high-level directories. Links should not refer to root.
+
+  Don't:
+
+  ```md
+  [Geo Troubleshooting](https://docs.gitlab.com/ee/administration/geo/replication/troubleshooting.html)
+  [Geo Troubleshooting](/ee/administration/geo/replication/troubleshooting.md)
+  ```
+
+  Do:
+
+  ```md
+  [Geo Troubleshooting](../../geo/replication/troubleshooting.md)
+  ```
+
+- Always add the file name `file.md` at the end of the link with the `.md` extension, not `.html`.
+
+  Don't:
+
+  ```md
+  [merge requests](../../merge_requests/)
+  [issues](../../issues/tags.html)
+  [issue tags](../../issues/tags.html#stages)
+  ```
+
+  Do:
+
+  ```md
+  [merge requests](../../merge_requests/index.md)
+  [issues](../../issues/tags.md)
+  [issue tags](../../issues/tags.md#stages)
+  ```
+
+- Using the markdown extension is necessary for the [`/help`](index.md#gitlab-help)
+  section of GitLab.
 
 ### Links requiring permissions
 
@@ -1019,6 +1050,38 @@ In this case:
   correctly.
 - Different highlighting languages are used for each config in the code block.
 - The [GitLab Restart](#gitlab-restart) section is used to explain a required restart/reconfigure of GitLab.
+
+## Feature flags
+
+Sometimes features are shipped with feature flags, either:
+
+- On by default, but providing the option to turn the feature off.
+- Off by default, but providing the option to turn the feature on.
+
+When documenting feature flags for a feature, it's important that users know:
+
+- Why a feature flag is necessary. Some of the reasons are
+  [outlined in the handbook](https://about.gitlab.com/handbook/product/#alpha-beta-ga).
+- That administrative access is required to make a feature flag change.
+- What to ask for when requesting a change to a feature flag's state.
+
+NOTE: **Note:**
+The [Product Manager for the relevant group](https://about.gitlab.com/handbook/product/categories/#devops-stages)
+must review and approve the addition or removal of any mentions of using feature flags before the doc change is merged.
+
+The following is sample text for adding feature flag documentation for a feature:
+
+````md
+### Disabling the feature
+
+This feature comes with the `:feature_flag` feature flag enabled by default. However, in some cases
+this feature is incompatible with old configuration. To turn off the feature while configuration is
+migrated, ask a GitLab administrator with Rails console access to run the following command:
+
+```ruby
+Feature.disable(:feature_flag)
+```
+````
 
 ## API
 

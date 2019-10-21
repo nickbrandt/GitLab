@@ -40,6 +40,12 @@ describe Issues::ZoomLinkService do
         expect(result.payload[:zoom_meetings].map(&:url))
           .to include(zoom_link)
       end
+
+      it 'tracks the add event' do
+        expect(Gitlab::Tracking).to receive(:event)
+          .with('IncidentManagement::ZoomIntegration', 'add_zoom_meeting', label: 'Issue ID', value: issue.id)
+        result
+      end
     end
 
     shared_examples 'cannot add meeting' do
@@ -116,6 +122,13 @@ describe Issues::ZoomLinkService do
 
       context 'removes the link' do
         include_examples 'can remove meeting'
+      end
+
+      it 'tracks the remove event' do
+        expect(Gitlab::Tracking).to receive(:event)
+          .with('IncidentManagement::ZoomIntegration', 'remove_zoom_meeting', label: 'Issue ID', value: issue.id)
+
+        result
       end
 
       context 'with insufficient permissions' do

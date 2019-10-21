@@ -1,0 +1,5 @@
+---
+title: Add default empty values to prevent parser errors from approving the Vulnerability-Check rule
+merge_request: 18423
+author:
+type: fixed

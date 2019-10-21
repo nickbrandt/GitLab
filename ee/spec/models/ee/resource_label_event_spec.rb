@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe ResourceLabelEvent, type: :model do
   subject { build(:resource_label_event) }
+
   let(:epic) { create(:epic) }
 
   describe 'validations' do

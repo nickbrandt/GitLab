@@ -175,7 +175,7 @@ describe('Security Dashboard app', () => {
     `('$description', ({ getParameterValuesReturnValue, expected }) => {
       getParameterValues.mockImplementation(() => getParameterValuesReturnValue);
       createComponent();
-      expect(wrapper.vm.$store.state.filters.hide_dismissed).toBe(expected);
+      expect(wrapper.vm.$store.state.filters.hideDismissed).toBe(expected);
     });
   });
 });

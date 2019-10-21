@@ -32,7 +32,7 @@ module EE
       )
 
       designs_project_issue_path(
-        todo.parent,
+        todo.resource_parent,
         design.issue,
         path_options
       )

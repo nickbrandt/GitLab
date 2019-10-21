@@ -7,6 +7,8 @@ module Geo
     include ::Gitlab::Utils::StrongMemoize
     include ::Gitlab::Geo::LogHelpers
 
+    feature_category :geo_replication
+
     LEASE_TIMEOUT = 5.minutes
 
     def perform

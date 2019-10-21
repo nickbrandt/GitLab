@@ -198,6 +198,11 @@ separately:
 
 These reference architecture examples rely on the general rule that approximately 2 requests per second (RPS) of load is generated for every 100 users.
 
+The specifications here were performance tested against a specific coded
+workload. Your exact needs may be more, depending on your workload. Your
+workload is influenced by factors such as - but not limited to - how active your
+users are, how much automation you use, mirroring, and repo/change size.
+
 ### 10,000 User Configuration
 
 - **Supported Users (approximate):** 10,000
@@ -211,33 +216,39 @@ environment that supports about 10,000 users. The specifications below are a
 representation of the work so far. The specifications may be adjusted in the
 future based on additional testing and iteration.
 
-NOTE: **Note:** The specifications here were performance tested against a
-specific coded workload. Your exact needs may be more, depending on your
-workload. Your workload is influenced by factors such as - but not limited to -
-how active your users are, how much automation you use, mirroring, and
-repo/change size.
-
-- 3 PostgreSQL - 4 CPU, 16GiB memory per node
-- 1 PgBouncer - 2 CPU, 4GiB memory
-- 2 Redis - 2 CPU, 8GiB memory per node
-- 3 Consul/Sentinel - 2 CPU, 2GiB memory per node
-- 4 Sidekiq - 4 CPU, 16GiB memory per node
-- 5 GitLab application nodes - 16 CPU, 64GiB memory per node
-- 1 Gitaly - 16 CPU, 64GiB memory
-- 1 Monitoring node - 2 CPU, 8GiB memory, 100GiB local storage
+| Service                       | Configuration           | GCP type       |
+| ------------------------------|-------------------------|----------------|
+| 3 GitLab Rails <br> - Puma workers on each node set to 90% of available CPUs with 16 threads | 32 vCPU, 28.8GB Memory | n1-highcpu-32 |
+| 3 PostgreSQL                  | 4 vCPU, 15GB Memory     | n1-standard-4  |
+| 1 PgBouncer                   | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
+| X Gitaly[^1] <br> - Gitaly Ruby workers on each node set to 90% of available CPUs with 16 threads | 16 vCPU, 60GB Memory   | n1-standard-16 |
+| 3 Redis Cache + Sentinel <br> - Cache maxmemory set to 90% of available memory | 4 vCPU, 15GB Memory | n1-standard-4 |
+| 3 Redis Persistent + Sentinel | 4 vCPU, 15GB Memory     | n1-standard-4  |
+| 4 Sidekiq                     | 4 vCPU, 15GB Memory     | n1-standard-4  |
+| 3 Consul                      | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
+| 1 NFS Server                  | 16 vCPU, 14.4GB Memory  | n1-highcpu-16  |
+| 1 Monitoring node             | 4 CPU, 3.6GB Memory     | n1-highcpu-4   |
+| 1 Load Balancing node[^2] .   | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
 
 ### 25,000 User Configuration
 
 - **Supported Users (approximate):** 25,000
 - **RPS:** 500 requests per second
-- **Status:** Work-in-progress
-- **Related Issue:** See the [related issue](https://gitlab.com/gitlab-org/quality/performance/issues/57) for more information.
+- **Known Issues:** The slow API endpoints that were discovered during testing
+  the 10,000 user architecture also affect the 25,000 user architecture. For
+  details, see the related issues list in
+  [this issue](https://gitlab.com/gitlab-org/gitlab-foss/issues/64335).
 
-The Support and Quality teams are in the process of building and performance
-testing an environment that will support around 25,000 users. The specifications
-below are a work-in-progress representation of the work so far. The Quality team
-will be certifying this environment in late 2019. The specifications may be
-adjusted prior to certification based on performance testing.
+The GitLab Support and Quality teams built, performance tested, and validated an
+environment that supports around 25,000 users. The specifications below are a
+representation of the work so far. The specifications may be adjusted in the
+future based on additional testing and iteration.
+
+NOTE: **Note:** The specifications here were performance tested against a
+specific coded workload. Your exact needs may be more, depending on your
+workload. Your workload is influenced by factors such as - but not limited to -
+how active your users are, how much automation you use, mirroring, and
+repo/change size.
 
 | Service                       | Configuration           | GCP type       |
 | ------------------------------|-------------------------|----------------|
@@ -249,7 +260,7 @@ adjusted prior to certification based on performance testing.
 | 3 Redis Persistent + Sentinel | 4 vCPU, 15GB Memory     | n1-standard-4  |
 | 4 Sidekiq                     | 4 vCPU, 15GB Memory     | n1-standard-4  |
 | 3 Consul                      | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
-| 1 NFS Server                  | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
+| 1 NFS Server                  | 16 vCPU, 14.4GB Memory  | n1-highcpu-16  |
 | 1 Monitoring node             | 4 CPU, 3.6GB Memory     | n1-highcpu-4   |
 | 1 Load Balancing node[^2] .   | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
 
@@ -277,15 +288,15 @@ testing.
 | 3 Redis Persistent + Sentinel | 4 vCPU, 15GB Memory     | n1-standard-4  |
 | 4 Sidekiq                     | 4 vCPU, 15GB Memory     | n1-standard-4  |
 | 3 Consul                      | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
-| 1 NFS Server                  | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
+| 1 NFS Server                  | 16 vCPU, 14.4GB Memory  | n1-highcpu-16  |
 | 1 Monitoring node             | 4 CPU, 3.6GB Memory     | n1-highcpu-4   |
 | 1 Load Balancing node[^2] .   | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
 
 [^1]: Gitaly node requirements are dependent on customer data. We recommend 2
-      nodes as an absolute minimum for performance at the 25,000 user scale and
-      4 nodes as an absolute minimum at the 50,000 user scale, but additional
-      nodes should be considered in conjunction with a review of project counts
-      and sizes.
+      nodes as an absolute minimum for performance at the 10,000 and 25,000 user
+      scale and 4 nodes as an absolute minimum at the 50,000 user scale, but
+      additional nodes should be considered in conjunction with a review of
+      project counts and sizes.
 
 [^2]: HAProxy is the only tested and recommended load balancer. Additional
       options may be supported in the future.

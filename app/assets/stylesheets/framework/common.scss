@@ -440,6 +440,7 @@ img.emoji {
 .flex-no-shrink { flex-shrink: 0; }
 .ws-initial { white-space: initial; }
 .ws-normal { white-space: normal; }
+.ws-pre-wrap { white-space: pre-wrap; }
 .overflow-auto { overflow: auto; }
 
 .d-flex-center {
@@ -559,3 +560,6 @@ img.emoji {
     }
   }
 }
+
+.gl-font-size-small { font-size: $gl-font-size-small; }
+.gl-line-height-24 { line-height: $gl-line-height-24; }

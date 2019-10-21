@@ -34,5 +34,5 @@ export default () => ({
       selection: new Set([BASE_FILTERS.project_id.id]),
     },
   ],
-  hide_dismissed: true,
+  hideDismissed: true,
 });

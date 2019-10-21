@@ -9,7 +9,6 @@ describe 'Trial Select Namespace', :js do
   let(:user) { create(:user) }
 
   before do
-    stub_feature_flags(invisible_captcha: false)
     stub_feature_flags(improved_trial_signup: true)
     allow(Gitlab).to receive(:com?).and_return(true).at_least(:once)
     sign_in(user)
@@ -84,13 +83,14 @@ describe 'Trial Select Namespace', :js do
           click_button 'Start your free trial'
 
           message = page.find('#new_group_name').native.attribute('validationMessage')
+
           expect(message).to eq('Please fill out this field.')
           expect(current_path).to eq(select_trials_path)
         end
       end
     end
 
-    context 'selects an existing user' do
+    context 'selects an existing group' do
       before do
         visit select_trials_path
         wait_for_all_requests
@@ -98,20 +98,42 @@ describe 'Trial Select Namespace', :js do
         select2 user.namespace.id, from: '#namespace_id'
       end
 
-      it 'does not show the new group name input' do
-        expect(page).not_to have_field('New Group Name')
-      end
-
-      it 'applies trial and redirects to dashboard' do
-        expect_any_instance_of(GitlabSubscriptions::ApplyTrialService).to receive(:execute) do
-          { success: true }
+      context 'without trial plan' do
+        it 'does not show the new group name input' do
+          expect(page).not_to have_field('New Group Name')
         end
 
-        click_button 'Start your free trial'
+        it 'applies trial and redirects to dashboard' do
+          expect_any_instance_of(GitlabSubscriptions::ApplyTrialService).to receive(:execute) do
+            { success: true }
+          end
 
-        wait_for_requests
+          click_button 'Start your free trial'
 
-        expect(current_path).to eq("/#{user.namespace.path}")
+          wait_for_requests
+
+          expect(current_path).to eq("/#{user.namespace.path}")
+        end
+      end
+
+      context 'with trial plan' do
+        let!(:error_message) { 'Validation failed: Gl namespace can have only one trial' }
+
+        it 'shows validation error' do
+          expect_any_instance_of(GitlabSubscriptions::ApplyTrialService).to receive(:execute) do
+            { success: false, errors: error_message }
+          end
+
+          click_button 'Start your free trial'
+
+          expect(find('.flash-text')).to have_text(error_message)
+          expect(current_path).to eq(apply_trials_path)
+
+          # new group name should be functional
+          select2 '0', from: '#namespace_id'
+
+          expect(page).to have_field('New Group Name')
+        end
       end
     end
   end

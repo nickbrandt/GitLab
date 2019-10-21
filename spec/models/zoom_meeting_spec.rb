@@ -24,6 +24,7 @@ describe ZoomMeeting do
     describe '.added_to_issue' do
       it 'gets only added meetings' do
         meetings_added = described_class.added_to_issue.pluck(:id)
+
         expect(meetings_added).to include(added_meeting.id)
         expect(meetings_added).not_to include(removed_meeting.id)
       end
@@ -31,6 +32,7 @@ describe ZoomMeeting do
     describe '.removed_from_issue' do
       it 'gets only removed meetings' do
         meetings_removed = described_class.removed_from_issue.pluck(:id)
+
         expect(meetings_removed).to include(removed_meeting.id)
         expect(meetings_removed).not_to include(added_meeting.id)
       end

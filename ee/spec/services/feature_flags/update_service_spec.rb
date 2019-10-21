@@ -4,11 +4,20 @@ require 'spec_helper'
 
 describe FeatureFlags::UpdateService do
   let(:project) { create(:project) }
-  let(:user) { create(:user) }
-  let(:feature_flag) { create(:operations_feature_flag) }
+  let(:developer) { create(:user) }
+  let(:reporter) { create(:user) }
+  let(:user) { developer }
+  let(:feature_flag) { create(:operations_feature_flag, project: project) }
+
+  before do
+    stub_licensed_features(feature_flags: true)
+    project.add_developer(developer)
+    project.add_reporter(reporter)
+  end
 
   describe '#execute' do
     subject { described_class.new(project, user, params).execute(feature_flag) }
+
     let(:params) { { name: 'new_name' } }
     let(:audit_event_message) do
       AuditEvent.last.present.action
@@ -42,6 +51,15 @@ describe FeatureFlags::UpdateService do
 
       it 'does not create audit event' do
         expect { subject }.not_to change { AuditEvent.count }
+      end
+    end
+
+    context 'when user is reporter' do
+      let(:user) { reporter }
+
+      it 'returns error status' do
+        expect(subject[:status]).to eq(:error)
+        expect(subject[:message]).to eq('Access Denied')
       end
     end
 

@@ -19,18 +19,12 @@ module EE
         has_many :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
         has_many :vulnerability_findings, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
 
-        has_one :source_pipeline, class_name: "::Ci::Sources::Pipeline", inverse_of: :pipeline
-        has_many :sourced_pipelines, class_name: "::Ci::Sources::Pipeline", foreign_key: :source_pipeline_id
-
-        has_one :triggered_by_pipeline, through: :source_pipeline, source: :source_pipeline
-        has_one :source_job, through: :source_pipeline, source: :source_job
-        has_one :source_bridge, through: :source_pipeline, source: :source_bridge
-        has_many :triggered_pipelines, through: :sourced_pipelines, source: :pipeline
-
         has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
         has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
 
         has_many :downstream_bridges, class_name: '::Ci::Bridge', foreign_key: :upstream_pipeline_id
+
+        has_one :source_bridge, through: :source_pipeline, source: :source_bridge
 
         # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_legacy_security_reports, -> do

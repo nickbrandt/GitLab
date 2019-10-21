@@ -24,7 +24,7 @@ class Note < ApplicationRecord
 
     class << self
       def values
-        constants.map {|const| self.const_get(const)}
+        constants.map {|const| self.const_get(const, false)}
       end
 
       def value?(val)
@@ -144,6 +144,9 @@ class Note < ApplicationRecord
              project: [:project_members, :namespace, { group: [:group_members] }])
   end
   scope :with_metadata, -> { includes(:system_note_metadata) }
+
+  scope :for_note_or_capitalized_note, ->(text) { where(note: [text, text.capitalize]) }
+  scope :like_note_or_capitalized_note, ->(text) { where('(note LIKE ? OR note LIKE ?)', text, text.capitalize) }
 
   after_initialize :ensure_discussion_id
   before_validation :nullify_blank_type, :nullify_blank_line_code
@@ -480,10 +483,9 @@ class Note < ApplicationRecord
     Upload.find_by(model: self, path: paths)
   end
 
-  def parent
+  def resource_parent
     project
   end
-  alias_method :resource_parent, :parent
 
   private
 

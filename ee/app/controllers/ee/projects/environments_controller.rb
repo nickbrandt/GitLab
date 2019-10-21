@@ -20,7 +20,7 @@ module EE
 
             result = PodLogsService.new(environment, params: params.permit!).execute
 
-            if result.nil?
+            if result[:status] == :processing
               head :accepted
             elsif result[:status] == :success
               render json: {

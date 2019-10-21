@@ -9,7 +9,7 @@ module EE
             extend ActiveSupport::Concern
 
             prepended do
-              EE_TYPES = const_get(:TYPES) + [::EE::Gitlab::Ci::Config::Entry::Bridge]
+              EE_TYPES = const_get(:TYPES, false) + [::EE::Gitlab::Ci::Config::Entry::Bridge]
             end
 
             class_methods do

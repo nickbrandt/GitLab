@@ -99,8 +99,16 @@ module Gitlab
           @approver_group_ids ||= ApproverGroup.where(target_type: 'MergeRequest', target_id: id).joins(:group).pluck(distinct(:group_id))
         end
 
+        def merged_state_id
+          3
+        end
+
+        def closed_state_id
+          2
+        end
+
         def sync_code_owners_with_approvers
-          return if state == 'merged' || state == 'closed'
+          return if state_id == merged_state_id || state == closed_state_id
 
           Gitlab::GitalyClient.allow_n_plus_1_calls do
             gl_merge_request = ::MergeRequest.find(id)

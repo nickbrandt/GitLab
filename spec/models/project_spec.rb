@@ -101,6 +101,8 @@ describe Project do
     it { is_expected.to have_many(:deploy_tokens).through(:project_deploy_tokens) }
     it { is_expected.to have_many(:cycle_analytics_stages) }
     it { is_expected.to have_many(:external_pull_requests) }
+    it { is_expected.to have_many(:sourced_pipelines) }
+    it { is_expected.to have_many(:source_pipelines) }
 
     it 'has an inverse relationship with merge requests' do
       expect(described_class.reflect_on_association(:merge_requests).has_inverse?).to eq(:target_project)
@@ -151,7 +153,7 @@ describe Project do
     end
 
     describe '#members & #requesters' do
-      let(:project) { create(:project, :public, :access_requestable) }
+      let(:project) { create(:project, :public) }
       let(:requester) { create(:user) }
       let(:developer) { create(:user) }
       before do
@@ -629,8 +631,38 @@ describe Project do
   describe "#web_url" do
     let(:project) { create(:project, path: "somewhere") }
 
-    it 'returns the full web URL for this repo' do
-      expect(project.web_url).to eq("#{Gitlab.config.gitlab.url}/#{project.namespace.full_path}/somewhere")
+    context 'when given the only_path option' do
+      subject { project.web_url(only_path: only_path) }
+
+      context 'when only_path is false' do
+        let(:only_path) { false }
+
+        it 'returns the full web URL for this repo' do
+          expect(subject).to eq("#{Gitlab.config.gitlab.url}/#{project.namespace.full_path}/somewhere")
+        end
+      end
+
+      context 'when only_path is true' do
+        let(:only_path) { true }
+
+        it 'returns the relative web URL for this repo' do
+          expect(subject).to eq("/#{project.namespace.full_path}/somewhere")
+        end
+      end
+
+      context 'when only_path is nil' do
+        let(:only_path) { nil }
+
+        it 'returns the full web URL for this repo' do
+          expect(subject).to eq("#{Gitlab.config.gitlab.url}/#{project.namespace.full_path}/somewhere")
+        end
+      end
+    end
+
+    context 'when not given the only_path option' do
+      it 'returns the full web URL for this repo' do
+        expect(project.web_url).to eq("#{Gitlab.config.gitlab.url}/#{project.namespace.full_path}/somewhere")
+      end
     end
   end
 
@@ -3224,20 +3256,78 @@ describe Project do
   describe '#http_url_to_repo' do
     let(:project) { create(:project) }
 
-    it 'returns the url to the repo without a username' do
-      expect(project.http_url_to_repo).to eq("#{project.web_url}.git")
-      expect(project.http_url_to_repo).not_to include('@')
+    context 'when a custom HTTP clone URL root is not set' do
+      it 'returns the url to the repo without a username' do
+        expect(project.http_url_to_repo).to eq("#{project.web_url}.git")
+        expect(project.http_url_to_repo).not_to include('@')
+      end
+    end
+
+    context 'when a custom HTTP clone URL root is set' do
+      before do
+        stub_application_setting(custom_http_clone_url_root: custom_http_clone_url_root)
+      end
+
+      context 'when custom HTTP clone URL root has a relative URL root' do
+        context 'when custom HTTP clone URL root ends with a slash' do
+          let(:custom_http_clone_url_root) { 'https://git.example.com:51234/mygitlab/' }
+
+          it 'returns the url to the repo, with the root replaced with the custom one' do
+            expect(project.http_url_to_repo).to eq("https://git.example.com:51234/mygitlab/#{project.full_path}.git")
+          end
+        end
+
+        context 'when custom HTTP clone URL root does not end with a slash' do
+          let(:custom_http_clone_url_root) { 'https://git.example.com:51234/mygitlab' }
+
+          it 'returns the url to the repo, with the root replaced with the custom one' do
+            expect(project.http_url_to_repo).to eq("https://git.example.com:51234/mygitlab/#{project.full_path}.git")
+          end
+        end
+      end
+
+      context 'when custom HTTP clone URL root does not have a relative URL root' do
+        context 'when custom HTTP clone URL root ends with a slash' do
+          let(:custom_http_clone_url_root) { 'https://git.example.com:51234/' }
+
+          it 'returns the url to the repo, with the root replaced with the custom one' do
+            expect(project.http_url_to_repo).to eq("https://git.example.com:51234/#{project.full_path}.git")
+          end
+        end
+
+        context 'when custom HTTP clone URL root does not end with a slash' do
+          let(:custom_http_clone_url_root) { 'https://git.example.com:51234' }
+
+          it 'returns the url to the repo, with the root replaced with the custom one' do
+            expect(project.http_url_to_repo).to eq("https://git.example.com:51234/#{project.full_path}.git")
+          end
+        end
+      end
     end
   end
 
   describe '#lfs_http_url_to_repo' do
     let(:project) { create(:project) }
 
-    it 'returns the url to the repo without a username' do
-      lfs_http_url_to_repo = project.lfs_http_url_to_repo('operation_that_doesnt_matter')
+    context 'when a custom HTTP clone URL root is not set' do
+      it 'returns the url to the repo without a username' do
+        lfs_http_url_to_repo = project.lfs_http_url_to_repo('operation_that_doesnt_matter')
 
-      expect(lfs_http_url_to_repo).to eq("#{project.web_url}.git")
-      expect(lfs_http_url_to_repo).not_to include('@')
+        expect(lfs_http_url_to_repo).to eq("#{project.web_url}.git")
+        expect(lfs_http_url_to_repo).not_to include('@')
+      end
+    end
+
+    context 'when a custom HTTP clone URL root is set' do
+      before do
+        stub_application_setting(custom_http_clone_url_root: 'https://git.example.com:51234')
+      end
+
+      it 'returns the url to the repo, with the root replaced with the custom one' do
+        lfs_http_url_to_repo = project.lfs_http_url_to_repo('operation_that_doesnt_matter')
+
+        expect(lfs_http_url_to_repo).to eq("https://git.example.com:51234/#{project.full_path}.git")
+      end
     end
   end
 
@@ -4924,6 +5014,7 @@ describe Project do
 
   describe '#git_objects_poolable?' do
     subject { project }
+
     context 'when not using hashed storage' do
       let(:project) { create(:project, :legacy_storage, :public, :repository) }
 

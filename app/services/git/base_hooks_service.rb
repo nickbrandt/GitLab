@@ -48,6 +48,8 @@ module Git
     # Push events in the activity feed only show information for the
     # last commit.
     def create_events
+      return unless params.fetch(:create_push_event, true)
+
       EventCreateService.new.push(project, current_user, event_push_data)
     end
 
@@ -62,6 +64,8 @@ module Git
     end
 
     def execute_project_hooks
+      return unless params.fetch(:execute_project_hooks, true)
+
       # Creating push_data invokes one CommitDelta RPC per commit. Only
       # build this data if we actually need it.
       project.execute_hooks(push_data, hook_name) if project.has_active_hooks?(hook_name)

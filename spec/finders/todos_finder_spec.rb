@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe TodosFinder do
@@ -14,6 +16,10 @@ describe TodosFinder do
     end
 
     describe '#execute' do
+      it 'returns no todos if user is nil' do
+        expect(described_class.new(nil, {}).execute).to be_empty
+      end
+
       context 'filtering' do
         let!(:todo1) { create(:todo, user: user, project: project, target: issue) }
         let!(:todo2) { create(:todo, user: user, group: group, target: merge_request) }
@@ -30,10 +36,18 @@ describe TodosFinder do
           expect(todos).to match_array([todo1, todo2])
         end
 
-        it 'returns correct todos when filtered by a type' do
-          todos = finder.new(user, { type: 'Issue' }).execute
+        context 'when filtering by type' do
+          it 'returns correct todos when filtered by a type' do
+            todos = finder.new(user, { type: 'Issue' }).execute
 
-          expect(todos).to match_array([todo1])
+            expect(todos).to match_array([todo1])
+          end
+
+          it 'returns the correct todos when filtering for multiple types' do
+            todos = finder.new(user, { type: %w[Issue MergeRequest] }).execute
+
+            expect(todos).to match_array([todo1, todo2])
+          end
         end
 
         context 'when filtering for actions' do
@@ -47,12 +61,10 @@ describe TodosFinder do
               expect(todos).to match_array([todo2])
             end
 
-            context 'multiple actions' do
-              it 'returns the expected todos' do
-                todos = finder.new(user, { action_id: [Todo::DIRECTLY_ADDRESSED, Todo::ASSIGNED] }).execute
+            it 'returns the expected todos when filtering for multiple action ids' do
+              todos = finder.new(user, { action_id: [Todo::DIRECTLY_ADDRESSED, Todo::ASSIGNED] }).execute
 
-                expect(todos).to match_array([todo2, todo1])
-              end
+              expect(todos).to match_array([todo2, todo1])
             end
           end
 
@@ -63,12 +75,10 @@ describe TodosFinder do
               expect(todos).to match_array([todo2])
             end
 
-            context 'multiple actions' do
-              it 'returns the expected todos' do
-                todos = finder.new(user, { action: [:directly_addressed, :assigned] }).execute
+            it 'returns the expected todos when filtering for multiple action names' do
+              todos = finder.new(user, { action: [:directly_addressed, :assigned] }).execute
 
-                expect(todos).to match_array([todo2, todo1])
-              end
+              expect(todos).to match_array([todo2, todo1])
             end
           end
         end
@@ -95,14 +105,39 @@ describe TodosFinder do
           end
         end
 
-        context 'with subgroups' do
-          let(:subgroup) { create(:group, parent: group) }
-          let!(:todo3) { create(:todo, user: user, group: subgroup, target: issue) }
+        context 'by groups' do
+          context 'with subgroups' do
+            let(:subgroup) { create(:group, parent: group) }
+            let!(:todo3) { create(:todo, user: user, group: subgroup, target: issue) }
 
-          it 'returns todos from subgroups when filtered by a group' do
-            todos = finder.new(user, { group_id: group.id }).execute
+            it 'returns todos from subgroups when filtered by a group' do
+              todos = finder.new(user, { group_id: group.id }).execute
 
-            expect(todos).to match_array([todo1, todo2, todo3])
+              expect(todos).to match_array([todo1, todo2, todo3])
+            end
+          end
+
+          context 'filtering for multiple groups' do
+            let_it_be(:group2) { create(:group) }
+            let_it_be(:group3) { create(:group) }
+
+            let!(:todo1) { create(:todo, user: user, project: project, target: issue) }
+            let!(:todo2) { create(:todo, user: user, group: group, target: merge_request) }
+            let!(:todo3) { create(:todo, user: user, group: group2, target: merge_request) }
+
+            let(:subgroup1) { create(:group, parent: group) }
+            let!(:todo4) { create(:todo, user: user, group: subgroup1, target: issue) }
+
+            let(:subgroup2) { create(:group, parent: group2) }
+            let!(:todo5) { create(:todo, user: user, group: subgroup2, target: issue) }
+
+            let!(:todo6) { create(:todo, user: user, group: group3, target: issue) }
+
+            it 'returns the expected groups' do
+              todos = finder.new(user, { group_id: [group.id, group2.id] }).execute
+
+              expect(todos).to match_array([todo1, todo2, todo3, todo4, todo5])
+            end
           end
         end
       end

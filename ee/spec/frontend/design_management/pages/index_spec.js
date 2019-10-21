@@ -1,8 +1,8 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 import Index from 'ee/design_management/pages/index.vue';
-import UploadForm from 'ee/design_management/components/upload/form.vue';
 import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesign.mutation.graphql';
+import DesignDestroyer from 'ee/design_management/components/design_destroyer.vue';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
@@ -16,11 +16,50 @@ const router = new VueRouter({
   ],
 });
 
+const mockDesigns = [
+  {
+    id: 'design-1',
+    image: 'design-1-image',
+    filename: 'design-1-name',
+    event: 'NONE',
+    notesCount: 0,
+  },
+  {
+    id: 'design-2',
+    image: 'design-2-image',
+    filename: 'design-2-name',
+    event: 'NONE',
+    notesCount: 1,
+  },
+  {
+    id: 'design-3',
+    image: 'design-3-image',
+    filename: 'design-3-name',
+    event: 'NONE',
+    notesCount: 0,
+  },
+];
+
+const mockVersion = {
+  node: {
+    id: 'gid://gitlab/DesignManagement::Version/1',
+  },
+};
+
 describe('Design management index page', () => {
   let mutate;
-  let vm;
+  let wrapper;
 
-  function createComponent(loading = false, designs = []) {
+  const findDesignCheckboxes = () => wrapper.findAll('.design-checkbox');
+  const findSelectAllButton = () => wrapper.find('.js-select-all');
+  const findDeleteButton = () => wrapper.find('deletebutton-stub');
+
+  function createComponent({
+    loading = false,
+    designs = [],
+    allVersions = [],
+    createDesign = true,
+  } = {}) {
     mutate = jest.fn(() => Promise.resolve());
     const $apollo = {
       queries: {
@@ -34,64 +73,65 @@ describe('Design management index page', () => {
       mutate,
     };
 
-    vm = shallowMount(Index, {
+    wrapper = shallowMount(Index, {
+      sync: false,
       mocks: { $apollo },
-      stubs: ['router-view'],
       localVue,
       router,
+      stubs: { DesignDestroyer },
     });
 
-    vm.setData({
+    wrapper.setData({
       designs,
+      allVersions,
+      issueIid: '1',
       permissions: {
-        createDesign: true,
+        createDesign,
       },
     });
   }
 
   afterEach(() => {
-    vm.destroy();
+    wrapper.destroy();
   });
 
   describe('designs', () => {
     it('renders loading icon', () => {
-      createComponent(true);
+      createComponent({ loading: true });
 
-      expect(vm.element).toMatchSnapshot();
+      expect(wrapper.element).toMatchSnapshot();
     });
 
     it('renders error', () => {
       createComponent();
 
-      vm.setData({ error: true });
+      wrapper.setData({ error: true });
 
-      expect(vm.element).toMatchSnapshot();
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.element).toMatchSnapshot();
+      });
     });
 
     it('renders empty text', () => {
       createComponent();
 
-      expect(vm.element).toMatchSnapshot();
+      expect(wrapper.element).toMatchSnapshot();
     });
 
-    it('renders designs list', () => {
-      createComponent(false, ['design']);
+    it('renders designs list and header with upload button', () => {
+      createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
 
-      expect(vm.element).toMatchSnapshot();
-    });
-  });
-
-  describe('upload form', () => {
-    it('hides upload form', () => {
-      createComponent();
-
-      expect(vm.find(UploadForm).exists()).toBe(false);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.element).toMatchSnapshot();
+      });
     });
 
-    it('renders upload form', () => {
-      createComponent(false, ['design']);
+    it('does not render toolbar when there is no permission', () => {
+      createComponent({ designs: mockDesigns, allVersions: [mockVersion], createDesign: false });
 
-      expect(vm.find(UploadForm).exists()).toBe(true);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.element).toMatchSnapshot();
+      });
     });
   });
 
@@ -99,7 +139,7 @@ describe('Design management index page', () => {
     it('calls apollo mutate', () => {
       createComponent();
 
-      return vm.vm
+      return wrapper.vm
         .onUploadDesign([
           {
             name: 'test',
@@ -114,7 +154,7 @@ describe('Design management index page', () => {
             variables: {
               files: [{ name: 'test' }],
               projectPath: '',
-              iid: null,
+              iid: '1',
             },
             update: expect.anything(),
             optimisticResponse: {
@@ -128,6 +168,8 @@ describe('Design management index page', () => {
                     image: '',
                     filename: 'test',
                     fullPath: '',
+                    event: 'NONE',
+                    notesCount: 0,
                     diffRefs: {
                       __typename: 'DiffRefs',
                       baseSha: '',
@@ -154,15 +196,9 @@ describe('Design management index page', () => {
     });
 
     it('does not call apollo mutate if createDesign is false', () => {
-      createComponent();
+      createComponent({ createDesign: false });
 
-      vm.setData({
-        permissions: {
-          createDesign: false,
-        },
-      });
-
-      vm.vm.onUploadDesign([]);
+      wrapper.vm.onUploadDesign([]);
 
       expect(mutate).not.toHaveBeenCalled();
     });
@@ -170,17 +206,96 @@ describe('Design management index page', () => {
     it('sets isSaving', () => {
       createComponent();
 
-      const uploadDesign = vm.vm.onUploadDesign([
+      const uploadDesign = wrapper.vm.onUploadDesign([
         {
           name: 'test',
         },
       ]);
 
-      expect(vm.vm.isSaving).toBe(true);
+      expect(wrapper.vm.isSaving).toBe(true);
 
       return uploadDesign.then(() => {
-        expect(vm.vm.isSaving).toBe(false);
+        expect(wrapper.vm.isSaving).toBe(false);
       });
+    });
+  });
+
+  describe('on latest version', () => {
+    beforeEach(() => {
+      createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
+    });
+
+    it('renders design checkboxes', () => {
+      expect(findDesignCheckboxes().length).toBe(mockDesigns.length);
+    });
+
+    it('renders a button with Select all text', () => {
+      expect(findSelectAllButton().exists()).toBe(true);
+      expect(findSelectAllButton().text()).toBe('Select all');
+    });
+
+    it('adds two designs to selected designs when their checkboxes are checked', () => {
+      findDesignCheckboxes()
+        .at(0)
+        .trigger('click');
+      findDesignCheckboxes()
+        .at(1)
+        .trigger('click');
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findDeleteButton().exists()).toBe(true);
+        expect(findSelectAllButton().text()).toBe('Deselect all');
+        findDeleteButton().vm.$emit('deleteSelectedDesigns');
+        const [{ variables }] = mutate.mock.calls[0];
+        expect(variables.filenames).toStrictEqual([
+          mockDesigns[0].filename,
+          mockDesigns[1].filename,
+        ]);
+      });
+    });
+
+    it('adds all designs to selected designs when Select All button is clicked', () => {
+      findSelectAllButton().vm.$emit('click');
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findDeleteButton().props().hasSelectedDesigns).toBe(true);
+        expect(findSelectAllButton().text()).toBe('Deselect all');
+        expect(wrapper.vm.selectedDesigns).toEqual(mockDesigns.map(design => design.filename));
+      });
+    });
+
+    it('removes all designs from selected designs when at least one design was selected', () => {
+      findDesignCheckboxes()
+        .at(0)
+        .trigger('click');
+      findSelectAllButton().vm.$emit('click');
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findDeleteButton().props().hasSelectedDesigns).toBe(false);
+        expect(findSelectAllButton().text()).toBe('Select all');
+        expect(wrapper.vm.selectedDesigns).toEqual([]);
+      });
+    });
+  });
+
+  describe('on non-latest version', () => {
+    beforeEach(() => {
+      createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
+
+      router.replace({
+        name: 'designs',
+        query: {
+          version: '2',
+        },
+      });
+    });
+
+    it('does not render design checkboxes', () => {
+      expect(findDesignCheckboxes().length).toBe(0);
+    });
+
+    it('does not render Select All button', () => {
+      expect(findSelectAllButton().exists()).toBe(false);
     });
   });
 });

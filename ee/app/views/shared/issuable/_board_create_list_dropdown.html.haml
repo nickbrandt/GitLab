@@ -1,5 +1,5 @@
-- assignee_lists_available = board.parent.feature_available?(:board_assignee_lists)
-- milestone_lists_available = board.parent.feature_available?(:board_milestone_lists)
+- assignee_lists_available = board.resource_parent.feature_available?(:board_assignee_lists)
+- milestone_lists_available = board.resource_parent.feature_available?(:board_milestone_lists)
 
 - if assignee_lists_available || milestone_lists_available
   .dropdown.boards-add-list.prepend-left-10#js-add-list
@@ -24,7 +24,7 @@
       .tab-content
         #tab-labels.tab-pane.tab-pane-labels.active.js-tab-container-labels{ role: 'tabpanel' }
           = render partial: "shared/issuable/label_page_default", locals: { show_title: false, show_footer: true, show_create: true, show_boards_content: true, content_title: _('Label lists show all issues with the selected label.') }
-          - if can?(current_user, :admin_label, board.parent)
+          - if can?(current_user, :admin_label, board.resource_parent)
             = render partial: "shared/issuable/label_page_create", locals: { show_close: false }
 
         - if assignee_lists_available

@@ -6,6 +6,8 @@ module Geo
     include ExclusiveLeaseGuard
     include CronjobQueue
 
+    feature_category :geo_replication
+
     LEASE_TIMEOUT = 5.minutes
 
     def perform

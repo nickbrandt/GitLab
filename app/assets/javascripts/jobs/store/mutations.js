@@ -19,14 +19,14 @@ export default {
     state.isSidebarOpen = true;
   },
 
-  [types.RECEIVE_TRACE_SUCCESS](state, log) {
+  [types.RECEIVE_TRACE_SUCCESS](state, log = {}) {
     if (log.state) {
       state.traceState = log.state;
     }
 
     if (log.append) {
       if (isNewJobLogActive()) {
-        state.trace = updateIncrementalTrace(log.lines, state.trace);
+        state.trace = log.lines ? updateIncrementalTrace(log.lines, state.trace) : state.trace;
       } else {
         state.trace += log.html;
       }
@@ -35,9 +35,9 @@ export default {
       // When the job still does not have a trace
       // the trace response will not have a defined
       // html or size. We keep the old value otherwise these
-      // will be set to `undefined`
+      // will be set to `null`
       if (isNewJobLogActive()) {
-        state.trace = logLinesParser(log.lines) || state.trace;
+        state.trace = log.lines ? logLinesParser(log.lines) : state.trace;
       } else {
         state.trace = log.html || state.trace;
       }

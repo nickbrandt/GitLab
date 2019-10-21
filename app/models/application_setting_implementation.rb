@@ -82,6 +82,8 @@ module ApplicationSettingImplementation
         polling_interval_multiplier: 1,
         project_export_enabled: true,
         protected_ci_variables: false,
+        push_event_hooks_limit: 3,
+        push_event_activities_limit: 3,
         raw_blob_request_limit: 300,
         recaptcha_enabled: false,
         login_recaptcha_protection_enabled: false,
@@ -126,7 +128,8 @@ module ApplicationSettingImplementation
         snowplow_collector_hostname: nil,
         snowplow_cookie_domain: nil,
         snowplow_enabled: false,
-        snowplow_site_id: nil
+        snowplow_site_id: nil,
+        custom_http_clone_url_root: nil
       }
     end
 

@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Group do
-  let!(:group) { create(:group, :access_requestable) }
+  let!(:group) { create(:group) }
 
   describe 'associations' do
     it { is_expected.to have_many :projects }
@@ -331,7 +331,7 @@ describe Group do
   end
 
   describe '#avatar_url' do
-    let!(:group) { create(:group, :access_requestable, :with_avatar) }
+    let!(:group) { create(:group, :with_avatar) }
     let(:user) { create(:user) }
 
     context 'when avatar file is uploaded' do
@@ -1040,6 +1040,23 @@ describe Group do
       active_owners_in_recent_sign_in_desc_order = group.members_and_requesters.where(id: active_owners).order_recent_sign_in.limit(10)
 
       expect(group.access_request_approvers_to_be_notified).to eq(active_owners_in_recent_sign_in_desc_order)
+    end
+  end
+
+  describe '.groups_including_descendants_by' do
+    it 'returns the expected groups for a group and its descendants' do
+      parent_group1 = create(:group)
+      child_group1 = create(:group, parent: parent_group1)
+      child_group2 = create(:group, parent: parent_group1)
+
+      parent_group2 = create(:group)
+      child_group3 = create(:group, parent: parent_group2)
+
+      create(:group)
+
+      groups = described_class.groups_including_descendants_by([parent_group2.id, parent_group1.id])
+
+      expect(groups).to contain_exactly(parent_group1, parent_group2, child_group1, child_group2, child_group3)
     end
   end
 end

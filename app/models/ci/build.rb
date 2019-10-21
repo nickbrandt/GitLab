@@ -42,6 +42,7 @@ module Ci
 
     has_many :job_artifacts, class_name: 'Ci::JobArtifact', foreign_key: :job_id, dependent: :destroy, inverse_of: :job # rubocop:disable Cop/ActiveRecordDependent
     has_many :job_variables, class_name: 'Ci::JobVariable', foreign_key: :job_id
+    has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_job_id
 
     Ci::JobArtifact.file_types.each do |key, value|
       has_one :"job_artifacts_#{key}", -> { where(file_type: value) }, class_name: 'Ci::JobArtifact', inverse_of: :job, foreign_key: :job_id
@@ -116,6 +117,11 @@ module Ci
     end
 
     scope :eager_load_job_artifacts, -> { includes(:job_artifacts) }
+
+    scope :with_exposed_artifacts, -> do
+      joins(:metadata).merge(Ci::BuildMetadata.with_exposed_artifacts)
+        .includes(:metadata, :job_artifacts_metadata)
+    end
 
     scope :with_artifacts_not_expired, ->() { with_artifacts_archive.where('artifacts_expire_at IS NULL OR artifacts_expire_at > ?', Time.now) }
     scope :with_expired_artifacts, ->() { with_artifacts_archive.where('artifacts_expire_at < ?', Time.now) }
@@ -594,6 +600,14 @@ module Ci
       update_column(:trace, nil)
     end
 
+    def artifacts_expose_as
+      options.dig(:artifacts, :expose_as)
+    end
+
+    def artifacts_paths
+      options.dig(:artifacts, :paths)
+    end
+
     def needs_touch?
       Time.now - updated_at > 15.minutes.to_i
     end
@@ -751,6 +765,10 @@ module Ci
       return false if erased?
 
       true
+    end
+
+    def invalid_dependencies
+      dependencies.reject(&:valid_dependency?)
     end
 
     def runner_required_feature_names
