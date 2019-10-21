@@ -1,6 +1,6 @@
 - return unless @group.feature_available?(:custom_file_templates_for_namespace)
 
-%section.settings.no-animate#js-templates{ class: ('expanded' if expanded) }
+%section.settings.no-animate#js-templates{ class: ('expanded' if expanded), data: { qa_selector: 'file_template_repositories' } }
   .settings-header
     %h4
       = _('Templates')
@@ -18,6 +18,6 @@
             .form-text.text-muted
               = _('Select a template repository')
               = link_to icon('question-circle'), help_page_path('user/group/index.md', anchor: 'group-file-templates-premium'), target: '_blank'
-          = project_select_tag('group[file_template_project_id]', class: 'project-item-select hidden-filter-value', toggle_class: 'js-project-search js-project-filter js-filter-submit', dropdown_class: 'dropdown-menu-selectable dropdown-menu-project js-filter-submit',
+          = project_select_tag('group[file_template_project_id]', class: 'project-item-select hidden-filter-value qa-file-template-repository-dropdown', toggle_class: 'js-project-search js-project-filter js-filter-submit', dropdown_class: 'dropdown-menu-selectable dropdown-menu-project js-filter-submit',
             placeholder: _('Search projects'), idAttribute: 'id', data: { order_by: 'last_activity_at', idattribute: 'id', simple_filter: true, allow_clear: true }, value: @group.checked_file_template_project_id)
-      = f.submit _('Save changes'), class: "btn btn-success"
+      = f.submit _('Save changes'), class: "btn btn-success", data: { qa_selector: 'save_changes_button' }
