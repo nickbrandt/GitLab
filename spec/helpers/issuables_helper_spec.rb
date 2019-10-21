@@ -230,7 +230,9 @@ describe IssuablesHelper do
       end
 
       context 'with "added" zoom meeting' do
-        before { create(:zoom_meeting, issue: issue) }
+        before do
+          create(:zoom_meeting, issue: issue)
+        end
 
         shared_examples 'sets zoomMeetingUrl to canonical meeting url' do
           specify do

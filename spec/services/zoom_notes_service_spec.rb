@@ -4,13 +4,15 @@ require 'spec_helper'
 
 describe ZoomNotesService do
   describe '#execute' do
-    let(:issue) { OpenStruct.new(description: description) }
+    let(:issue) { OpenStruct.new(zoom_meetings: zoom_meetings) }
     let(:project) { Object.new }
     let(:user) { Object.new }
-    let(:description) { 'an issue description' }
-    let(:old_description) { nil }
+    let(:added_zoom_meeting) { OpenStruct.new(issue_status: ZoomMeeting.issue_statuses[:added]) }
+    let(:removed_zoom_meeting) { OpenStruct.new(issue_status: ZoomMeeting.issue_statuses[:removed]) }
+    let(:old_zoom_meetings) { [] }
+    let(:zoom_meetings) { [] }
 
-    subject { described_class.new(issue, project, user, old_description: old_description) }
+    subject { described_class.new(issue, project, user, old_zoom_meetings: old_zoom_meetings) }
 
     shared_examples 'no notifications' do
       it "doesn't create notifications" do
@@ -21,30 +23,23 @@ describe ZoomNotesService do
       end
     end
 
-    it_behaves_like 'no notifications'
+    context 'when zoom_meetings == old_zoom_meetings' do
+      context 'when both are empty' do
+        it_behaves_like 'no notifications'
+      end
 
-    context 'when the zoom link exists in both description and old_description' do
-      let(:description) { 'a changed issue description https://zoom.us/j/123' }
-      let(:old_description) { 'an issue description https://zoom.us/j/123' }
+      context 'when both are removed' do
+        let(:old_zoom_meetings) { [removed_zoom_meeting] }
+        let(:zoom_meetings) { old_zoom_meetings }
 
-      it_behaves_like 'no notifications'
+        it_behaves_like 'no notifications'
+      end
     end
 
-    context "when the zoom link doesn't exist in both description and old_description" do
-      let(:description) { 'a changed issue description' }
-      let(:old_description) { 'an issue description' }
 
-      it_behaves_like 'no notifications'
-    end
-
-    context 'when description == old_description' do
-      let(:old_description) { 'an issue description' }
-
-      it_behaves_like 'no notifications'
-    end
-
-    context 'when the description contains a zoom link and old_description is nil' do
-      let(:description) { 'a changed issue description https://zoom.us/j/123' }
+    context 'when old_zoom_meetings is empty and zoom_meetings contains an added zoom_meeting' do
+      let(:old_zoom_meetings) { [] }
+      let(:zoom_meetings) { [added_zoom_meeting] }
 
       it 'creates a zoom_link_added notification' do
         expect(SystemNoteService).to receive(:zoom_link_added).with(issue, project, user)
@@ -54,9 +49,9 @@ describe ZoomNotesService do
       end
     end
 
-    context 'when the zoom link has been added to the description' do
-      let(:description) { 'a changed issue description https://zoom.us/j/123' }
-      let(:old_description) { 'an issue description' }
+    context 'when the zoom link has been added' do
+      let(:old_zoom_meetings) { [removed_zoom_meeting] }
+      let(:zoom_meetings) { [removed_zoom_meeting, added_zoom_meeting] }
 
       it 'creates a zoom_link_added notification' do
         expect(SystemNoteService).to receive(:zoom_link_added).with(issue, project, user)
@@ -66,9 +61,9 @@ describe ZoomNotesService do
       end
     end
 
-    context 'when the zoom link has been removed from the description' do
-      let(:description) { 'a changed issue description' }
-      let(:old_description) { 'an issue description https://zoom.us/j/123' }
+    context 'when the zoom link has been removed from zoom_meetings' do
+      let(:old_zoom_meetings) { [added_zoom_meeting] }
+      let(:zoom_meetings) { [removed_zoom_meeting] }
 
       it 'creates a zoom_link_removed notification' do
         expect(SystemNoteService).not_to receive(:zoom_link_added).with(issue, project, user)

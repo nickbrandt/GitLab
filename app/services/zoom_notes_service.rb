@@ -9,7 +9,7 @@ class ZoomNotesService
   end
 
   def execute
-    return if @issue.zoom_meetings == @zoom_meetings
+    return if @issue.zoom_meetings == @old_zoom_meetings
 
     if zoom_link_added?
       zoom_link_added_notification
@@ -21,7 +21,10 @@ class ZoomNotesService
   private
 
   def zoom_link_added?
-    ZoomMeeting.canonical_meeting_url(@issue)
+    meetings = @issue.zoom_meetings.select do |z|
+      z.issue_status == ZoomMeeting.issue_statuses[:added]
+    end
+    !meetings.empty?
   end
 
   def zoom_link_added_notification
