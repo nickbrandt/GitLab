@@ -7,9 +7,19 @@ describe('Pagination component', () => {
 
   const mountComponent = props => {
     wrapper = shallowMount(TablePagination, {
+      sync: false,
       propsData: props,
     });
   };
+
+  const findFirstButtonLink = () => wrapper.find('.js-first-button .page-link');
+  const findPreviousButton = () => wrapper.find('.js-previous-button');
+  const findPreviousButtonLink = () => wrapper.find('.js-previous-button .page-link');
+  const findNextButton = () => wrapper.find('.js-next-button');
+  const findNextButtonLink = () => wrapper.find('.js-next-button .page-link');
+  const findLastButtonLink = () => wrapper.find('.js-last-button .page-link');
+  const findPages = () => wrapper.findAll('.page');
+  const findSeparator = () => wrapper.find('.separator');
 
   beforeEach(() => {
     spy = jest.fn();
@@ -50,8 +60,8 @@ describe('Pagination component', () => {
           change: spy,
         });
 
-        expect(wrapper.find('.js-previous-button').classes()).toContain('disabled');
-        wrapper.find('.js-previous-button .page-link').trigger('click');
+        expect(findPreviousButton().classes()).toContain('disabled');
+        findPreviousButtonLink().trigger('click');
         expect(spy).not.toHaveBeenCalled();
       });
 
@@ -67,8 +77,8 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        expect(wrapper.find('.js-previous-button').classes()).toContain('disabled');
-        wrapper.find('.js-previous-button .page-link').trigger('click');
+        expect(findPreviousButton().classes()).toContain('disabled');
+        findPreviousButtonLink().trigger('click');
         expect(spy).not.toHaveBeenCalled();
       });
 
@@ -84,7 +94,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        wrapper.find('.js-previous-button .page-link').trigger('click');
+        findPreviousButtonLink().trigger('click');
         expect(spy).toHaveBeenCalledWith(1);
       });
 
@@ -100,7 +110,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        wrapper.find('.js-previous-button .page-link').trigger('click');
+        findPreviousButtonLink().trigger('click');
         expect(spy).toHaveBeenCalledWith(1);
       });
     });
@@ -118,7 +128,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        const button = wrapper.find('.js-first-button .page-link');
+        const button = findFirstButtonLink();
         expect(button.text().trim()).toEqual('« First');
         button.trigger('click');
         expect(spy).toHaveBeenCalledWith(1);
@@ -136,7 +146,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        const button = wrapper.find('.js-first-button .page-link');
+        const button = findFirstButtonLink();
         expect(button.text().trim()).toEqual('« First');
         button.trigger('click');
         expect(spy).toHaveBeenCalledWith(1);
@@ -156,7 +166,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        const button = wrapper.find('.js-last-button .page-link');
+        const button = findLastButtonLink();
         expect(button.text().trim()).toEqual('Last »');
         button.trigger('click');
         expect(spy).toHaveBeenCalledWith(5);
@@ -174,7 +184,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        expect(wrapper.find('.js-last-button .page-link').exists()).toBe(false);
+        expect(findLastButtonLink().exists()).toBe(false);
       });
     });
 
@@ -192,12 +202,11 @@ describe('Pagination component', () => {
           change: spy,
         });
         expect(
-          wrapper
-            .find('.js-next-button')
+          findNextButton()
             .text()
             .trim(),
         ).toEqual('Next ›');
-        wrapper.find('.js-next-button .page-link').trigger('click');
+        findNextButtonLink().trigger('click');
         expect(spy).not.toHaveBeenCalled();
       });
 
@@ -214,12 +223,11 @@ describe('Pagination component', () => {
           change: spy,
         });
         expect(
-          wrapper
-            .find('.js-next-button')
+          findNextButton()
             .text()
             .trim(),
         ).toEqual('Next ›');
-        wrapper.find('.js-next-button .page-link').trigger('click');
+        findNextButtonLink().trigger('click');
         expect(spy).not.toHaveBeenCalled();
       });
 
@@ -235,7 +243,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        wrapper.find('.js-next-button .page-link').trigger('click');
+        findNextButtonLink().trigger('click');
         expect(spy).toHaveBeenCalledWith(4);
       });
 
@@ -251,7 +259,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        wrapper.find('.js-next-button .page-link').trigger('click');
+        findNextButtonLink().trigger('click');
         expect(spy).toHaveBeenCalledWith(4);
       });
     });
@@ -269,7 +277,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        expect(wrapper.vm.$el.querySelectorAll('.page').length).toEqual(5);
+        expect(findPages().length).toEqual(5);
       });
 
       it('should not render any page', () => {
@@ -284,7 +292,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        expect(wrapper.vm.$el.querySelectorAll('.page').length).toEqual(0);
+        expect(findPages().length).toEqual(0);
       });
     });
 
@@ -302,8 +310,7 @@ describe('Pagination component', () => {
           change: spy,
         });
         expect(
-          wrapper
-            .find('.separator')
+          findSeparator()
             .text()
             .trim(),
         ).toEqual('...');
@@ -321,7 +328,7 @@ describe('Pagination component', () => {
           },
           change: spy,
         });
-        expect(wrapper.find('.separator').exists()).toBe(false);
+        expect(findSeparator().exists()).toBe(false);
       });
     });
   });
