@@ -117,8 +117,8 @@ When [configuring your identify provider](#configuring-your-identity-provider), 
 
 ### OneLogin setup notes
 
-NOTE: **Note:**
-The GitLab app listed in the directory is for self-managed GitLab instances. Please use a generic SAML Test Connector.
+The GitLab app listed in the OneLogin app catalog is for self-managed GitLab instances.
+For GitLab.com, use a generic SAML Test Connector such as the SAML Test Connector (Advanced).
 
 | GitLab Setting | OneLogin Field |
 |--------------|----------------|
