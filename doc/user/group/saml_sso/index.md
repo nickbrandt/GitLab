@@ -115,6 +115,17 @@ NOTE: **Note:** GitLab is unable to provide support for IdPs that are not listed
 
 When [configuring your identify provider](#configuring-your-identity-provider), please consider the notes below for specific providers to help avoid common issues and as a guide for terminology used.
 
+### Okta setup notes
+
+| GitLab Setting | Okta Field |
+|--------------|----------------|
+| Identifier | Audience URI |
+| Assertion consumer service URL | Single sign on URL |
+
+Under Okta's **Single sign on URL** field, check the option **Use this for Recipient URL and Destination URL**.
+
+Set attribute statements according to the [assertions table](#assertions).
+
 ### OneLogin setup notes
 
 The GitLab app listed in the OneLogin app catalog is for self-managed GitLab instances.
