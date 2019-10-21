@@ -12,8 +12,6 @@ class DropMergeRequestsRequireCodeOwnerApprovalFromProjects < ActiveRecord::Migr
 
   def up
     remove_column :projects, :merge_requests_require_code_owner_approval, :boolean
-
-    remove_concurrent_index_by_name(:projects, "projects_requiring_code_owner_approval")
   end
 
   def down
