@@ -3834,24 +3834,24 @@ ActiveRecord::Schema.define(version: 2019_10_16_220135) do
     t.bigint "author_id", null: false
     t.bigint "updated_by_id"
     t.bigint "last_edited_by_id"
-    t.date "start_date"
-    t.date "due_date"
+    t.bigint "start_date_sourcing_milestone_id"
+    t.bigint "due_date_sourcing_milestone_id"
+    t.bigint "closed_by_id"
     t.datetime_with_timezone "last_edited_at"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.datetime_with_timezone "closed_at"
+    t.date "start_date"
+    t.date "due_date"
+    t.integer "state", limit: 2, default: 1, null: false
+    t.integer "severity", limit: 2, null: false
+    t.integer "confidence", limit: 2, null: false
+    t.boolean "severity_overridden", default: false
+    t.boolean "confidence_overridden", default: false
     t.string "title", limit: 255, null: false
     t.text "title_html", null: false
     t.text "description"
     t.text "description_html"
-    t.bigint "start_date_sourcing_milestone_id"
-    t.bigint "due_date_sourcing_milestone_id"
-    t.bigint "closed_by_id"
-    t.datetime_with_timezone "closed_at"
-    t.integer "state", limit: 2, default: 1, null: false
-    t.integer "severity", limit: 2, null: false
-    t.boolean "severity_overridden", default: false
-    t.integer "confidence", limit: 2, null: false
-    t.boolean "confidence_overridden", default: false
     t.index ["author_id"], name: "index_vulnerabilities_on_author_id"
     t.index ["closed_by_id"], name: "index_vulnerabilities_on_closed_by_id"
     t.index ["due_date_sourcing_milestone_id"], name: "index_vulnerabilities_on_due_date_sourcing_milestone_id"

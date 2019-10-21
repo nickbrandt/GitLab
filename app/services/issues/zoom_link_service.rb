@@ -11,7 +11,7 @@ module Issues
 
     def add_link(link)
       if can_add_link? && (link = parse_link(link))
-        success(_('Zoom meeting added'), create_zoom_meeting(link))
+        success(_('Zoom meeting added'), add_zoom_meeting(link))
       else
         error(_('Failed to add a Zoom meeting'))
       end
@@ -43,8 +43,6 @@ module Issues
 
     def fetch_added_meeting
       ZoomMeeting.canonical_meeting(@issue)
-    def issue_description
-      issue.description || ''
     end
 
     def track_meeting_added_event
