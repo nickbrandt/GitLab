@@ -360,6 +360,19 @@ module Gitlab
               expect(subject[:options][:before_script]).to eq(["local script"])
             end
           end
+
+          context 'when script is array of arrays of strings' do
+            let(:config) do
+              {
+                before_script: [["global script", "echo 1"], ["ls"], "pwd"],
+                test: { script: ["script"] }
+              }
+            end
+
+            it "return commands with scripts concencaced" do
+              expect(subject[:options][:before_script]).to eq(["global script", "echo 1", "ls", "pwd"])
+            end
+          end
         end
 
         describe "script" do
@@ -425,6 +438,19 @@ module Gitlab
 
             it "return after_script in options" do
               expect(subject[:options][:after_script]).to eq(["local after_script"])
+            end
+          end
+
+          context 'when script is array of arrays of strings' do
+            let(:config) do
+              {
+                after_script: [["global script", "echo 1"], ["ls"], "pwd"],
+                test: { script: ["script"] }
+              }
+            end
+
+            it "return commands with scripts concencaced" do
+              expect(subject[:options][:after_script]).to eq(["global script", "echo 1", "ls", "pwd"])
             end
           end
         end
