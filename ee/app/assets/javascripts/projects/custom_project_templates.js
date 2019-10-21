@@ -54,8 +54,8 @@ const bindEvents = () => {
   }
 
   function chooseTemplate() {
-    const value = $(this).val();
     const subgroupId = $(this).data('subgroup-id');
+    const templateName = $(this).data('template-name');
 
     if (subgroupId) {
       $subgroupWithTemplatesIdInput.val(subgroupId);
@@ -70,7 +70,7 @@ const bindEvents = () => {
     $projectFieldsForm.addClass('selected');
     $selectedIcon.empty();
 
-    $selectedTemplateText.text(value);
+    $selectedTemplateText.text(templateName);
 
     $(this)
       .parents('.template-option')
