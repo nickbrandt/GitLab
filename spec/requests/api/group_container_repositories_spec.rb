@@ -15,6 +15,14 @@ describe API::GroupContainerRepositories do
   let_it_be(:root_repository) { create(:container_repository, :root, project: project) }
   let_it_be(:test_repository) { create(:container_repository, project: project) }
 
+  let(:users) do
+    {
+      anonymous: nil,
+      guest: guest,
+      reporter: reporter
+    }
+  end
+
   let(:api_user) { reporter }
 
   before do
