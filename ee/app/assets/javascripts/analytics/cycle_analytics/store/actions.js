@@ -83,6 +83,16 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
 
+export const hideCustomStageForm = ({ commit }) => commit(types.HIDE_CUSTOM_STAGE_FORM);
+export const showCustomStageForm = ({ commit }) => commit(types.SHOW_CUSTOM_STAGE_FORM);
+
+export const editCustomStage = ({ commit, dispatch }, initData = {}) => {
+  commit(types.EDIT_CUSTOM_STAGE, initData);
+  if (initData.id) {
+    dispatch('setSelectedStageId', initData.id);
+  }
+};
+
 export const requestSummaryData = ({ commit }) => commit(types.REQUEST_SUMMARY_DATA);
 
 export const receiveSummaryDataError = ({ commit }, error) => {
@@ -111,9 +121,6 @@ export const fetchSummaryData = ({ state, dispatch, getters }) => {
 
 export const requestGroupStagesAndEvents = ({ commit }) =>
   commit(types.REQUEST_GROUP_STAGES_AND_EVENTS);
-
-export const hideCustomStageForm = ({ commit }) => commit(types.HIDE_CUSTOM_STAGE_FORM);
-export const showCustomStageForm = ({ commit }) => commit(types.SHOW_CUSTOM_STAGE_FORM);
 
 export const receiveGroupLabelsSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_GROUP_LABELS_SUCCESS, data);
@@ -197,7 +204,6 @@ export const createCustomStage = ({ dispatch, state }, data) => {
   const {
     selectedGroup: { fullPath },
   } = state;
-
   dispatch('requestCreateCustomStage');
 
   return Api.cycleAnalyticsCreateStage(fullPath, data)
@@ -249,7 +255,7 @@ export const receiveUpdateStageSuccess = ({ commit, dispatch }) => {
   commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
   createFlash(__(`Stage data updated`), 'notice');
 
-  dispatch('fetchCycleAnalyticsData');
+  dispatch('fetchGroupStagesAndEvents');
 };
 
 export const receiveUpdateStageError = ({ commit }) => {

@@ -25,7 +25,8 @@ export default {
   },
   [types.REQUEST_CYCLE_ANALYTICS_DATA](state) {
     state.isLoading = true;
-    state.isAddingCustomStage = false;
+    state.isCreatingCustomStage = false;
+    state.isEditingCustomStage = false;
   },
   [types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS](state) {
     state.errorCode = null;
@@ -75,8 +76,34 @@ export default {
       labelIds: [],
     };
   },
+  [types.SHOW_CUSTOM_STAGE_FORM](state) {
+    state.isCreatingCustomStage = true;
+    state.customStageFormInitData = {};
+  },
+  [types.EDIT_CUSTOM_STAGE](state, initData) {
+    console.log('EDIT_CUSTOM_STAGE::initData', initData);
+    const {
+      title: name,
+      startEventIdentifier,
+      endEventIdentifier,
+      startEventLabelId,
+      endEventLabelId,
+    } = initData;
+
+    state.isEditingCustomStage = true;
+    state.customStageFormInitData = {
+      ...state.customStageFormInitData,
+      name,
+      startEventIdentifier,
+      endEventIdentifier,
+      startEventLabelId,
+      endEventLabelId,
+    };
+  },
   [types.HIDE_CUSTOM_STAGE_FORM](state) {
-    state.isAddingCustomStage = false;
+    state.isEditingCustomStage = false;
+    state.isCreatingCustomStage = false;
+    state.customStageFormInitData = {};
   },
   [types.SHOW_CUSTOM_STAGE_FORM](state) {
     state.isAddingCustomStage = true;

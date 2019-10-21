@@ -55,8 +55,9 @@ export default {
       'isLoadingChartData',
       'isLoadingDurationChart',
       'isEmptyStage',
-      'isAddingCustomStage',
       'isSavingCustomStage',
+      'isCreatingCustomStage',
+      'isEditingCustomStage',
       'selectedGroup',
       'selectedStageId',
       'stages',
@@ -68,6 +69,7 @@ export default {
       'startDate',
       'endDate',
       'tasksByType',
+      'customStageFormInitData',
     ]),
     ...mapGetters([
       'currentStage',
@@ -117,11 +119,12 @@ export default {
       'showCustomStageForm',
       'setDateRange',
       'fetchTasksByTypeData',
+      'updateSelectedDurationChartStages',
       'createCustomStage',
       'updateStage',
       'removeStage',
-      'updateSelectedDurationChartStages',
       'setFeatureFlags',
+      'editCustomStage',
     ]),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
@@ -139,6 +142,9 @@ export default {
     },
     onShowAddStageForm() {
       this.showCustomStageForm();
+    },
+    onShowEditStageForm(initData = {}) {
+      this.editCustomStage(initData);
     },
     initDateRange() {
       const endDate = new Date(Date.now());
@@ -243,15 +249,18 @@ export default {
             :stages="stages"
             :is-loading="isLoadingStage"
             :is-empty-stage="isEmptyStage"
-            :is-adding-custom-stage="isAddingCustomStage"
             :is-saving-custom-stage="isSavingCustomStage"
+            :is-creating-custom-stage="isCreatingCustomStage"
+            :is-editing-custom-stage="isEditingCustomStage"
             :current-stage-events="currentStageEvents"
             :custom-stage-form-events="customStageFormEvents"
             :labels="labels"
             :no-data-svg-path="noDataSvgPath"
             :no-access-svg-path="noAccessSvgPath"
             :can-edit-stages="hasCustomizableCycleAnalytics"
+            :custom-stage-form-init-data="customStageFormInitData"
             @selectStage="onStageSelect"
+            @editStage="onShowEditStageForm"
             @showAddStageForm="onShowAddStageForm"
             @submit="onCreateCustomStage"
             @hideStage="onUpdateStage"

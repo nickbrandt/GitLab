@@ -5196,6 +5196,12 @@ msgstr ""
 msgid "CustomCycleAnalytics|Add stage"
 msgstr ""
 
+msgid "CustomCycleAnalytics|Edit stage"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Editing stage"
+msgstr ""
+
 msgid "CustomCycleAnalytics|Enter a name for the stage"
 msgstr ""
 

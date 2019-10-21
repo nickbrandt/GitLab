@@ -41,7 +41,11 @@ export default {
       type: Boolean,
       required: true,
     },
-    isAddingCustomStage: {
+    isCreatingCustomStage: {
+      type: Boolean,
+      required: true,
+    },
+    isEditingCustomStage: {
       type: Boolean,
       required: true,
     },
@@ -72,6 +76,11 @@ export default {
     canEditStages: {
       type: Boolean,
       required: true,
+    },
+    customStageFormInitData: {
+      type: Object,
+      required: false,
+      default: () => ({}),
     },
   },
   computed: {
@@ -147,12 +156,13 @@ export default {
               :key="`ca-stage-title-${stage.title}`"
               :title="stage.title"
               :value="stage.value"
-              :is-active="!isAddingCustomStage && stage.id === currentStage.id"
+              :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
               :can-edit="canEditStages"
               :is-default-stage="!stage.custom"
               @select="$emit('selectStage', stage)"
               @remove="removeStage(stage.id)"
               @hide="hideStage(stage.id)"
+              @edit="$emit(STAGE_ACTIONS.EDIT, stageData)"
             />
             <add-stage-button
               v-if="canEditStages"
@@ -164,11 +174,14 @@ export default {
         <div class="section stage-events">
           <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
           <custom-stage-form
-            v-else-if="isAddingCustomStage"
+            v-else-if="isCreatingCustomStage || isEditingCustomStage"
             :events="customStageFormEvents"
             :labels="labels"
             :is-saving-custom-stage="isSavingCustomStage"
+            :initial-fields="customStageFormInitData"
+            :is-editing-custom-stage="isEditingCustomStage"
             @submit="$emit('submit', $event)"
+            @saveStage="saveStage"
           />
           <template v-else>
             <stage-event-list
