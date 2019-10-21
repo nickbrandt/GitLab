@@ -1,12 +1,20 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 
+import Draggable from 'vuedraggable';
+
 import TreeRoot from 'ee/related_items_tree/components/tree_root.vue';
 
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 
-import { mockQueryResponse, mockParentItem, mockEpic1, mockIssue1 } from '../mock_data';
+import {
+  mockQueryResponse,
+  mockInitialConfig,
+  mockParentItem,
+  mockEpic1,
+  mockIssue1,
+} from '../mock_data';
 
 const { epic } = mockQueryResponse.data.group;
 
@@ -20,6 +28,7 @@ const createComponent = ({
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
   store.dispatch('setInitialParentItem', mockParentItem);
+  store.dispatch('setInitialConfig', mockInitialConfig);
   store.dispatch('setItemChildrenFlags', {
     isSubItem: false,
     children,
@@ -78,9 +87,24 @@ describe('RelatedItemsTree', () => {
         });
 
         describe('computed', () => {
-          describe('dragOptions', () => {
-            it('should return object containing Vue.Draggable config extended from `defaultSortableConfig`', () => {
-              expect(wrapper.vm.dragOptions).toEqual(
+          describe('treeRootWrapper', () => {
+            it('should return Draggable reference when userSignedIn prop is true', () => {
+              expect(wrapper.vm.treeRootWrapper).toBe(Draggable);
+            });
+
+            it('should return string "ul" when userSignedIn prop is false', () => {
+              wrapper.vm.$store.dispatch('setInitialConfig', {
+                ...mockInitialConfig,
+                userSignedIn: false,
+              });
+
+              expect(wrapper.vm.treeRootWrapper).toBe('ul');
+            });
+          });
+
+          describe('treeRootOptions', () => {
+            it('should return object containing Vue.Draggable config extended from `defaultSortableConfig` when userSignedIn prop is true', () => {
+              expect(wrapper.vm.treeRootOptions).toEqual(
                 jasmine.objectContaining({
                   animation: 200,
                   forceFallback: true,
@@ -88,8 +112,22 @@ describe('RelatedItemsTree', () => {
                   fallbackOnBody: false,
                   ghostClass: 'is-ghost',
                   group: mockParentItem.reference,
+                  tag: 'ul',
+                  'ghost-class': 'tree-item-drag-active',
+                  'data-parent-reference': mockParentItem.reference,
+                  value: wrapper.vm.children,
+                  move: wrapper.vm.handleDragOnMove,
                 }),
               );
+            });
+
+            it('should return an empty object when userSignedIn prop is false', () => {
+              wrapper.vm.$store.dispatch('setInitialConfig', {
+                ...mockInitialConfig,
+                userSignedIn: false,
+              });
+
+              expect(wrapper.vm.treeRootOptions).toEqual(jasmine.objectContaining({}));
             });
           });
         });

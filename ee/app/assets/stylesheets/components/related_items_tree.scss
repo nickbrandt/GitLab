@@ -28,6 +28,11 @@
 
     .item-body {
       cursor: grab;
+
+      &.item-logged-out {
+        cursor: default;
+        min-height: $grid-size * 5;
+      }
     }
 
     .btn-tree-item-chevron {
