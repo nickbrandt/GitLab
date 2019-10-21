@@ -86,8 +86,9 @@ module Gitlab
 
           new_access_level = project.public? ? ProjectFeature::ENABLED : ProjectFeature::PUBLIC
 
-          project.project_feature.update_column(:pages_access_level, new_access_level)
+          next if project.project_feature.pages_access_level == new_access_level
 
+          project.project_feature.update_column(:pages_access_level, new_access_level)
         rescue => e
           Gitlab::Sentry.track_exception(e, extra: { project_id: project.id })
         end
