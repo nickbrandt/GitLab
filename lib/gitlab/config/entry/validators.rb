@@ -206,6 +206,16 @@ module Gitlab
           end
         end
 
+        class ArrayOfStringsOrArraysOfStringsValidator < ActiveModel::EachValidator
+          include LegacyValidationHelpers
+
+          def validate_each(record, attribute, value)
+            unless value.is_a?(Array) && value.all? { |element| element.is_a?(String) || validate_array_of_strings(element) }
+              record.errors.add(attribute, 'should be an array of strings and arrays of strings')
+            end
+          end
+        end
+
         class ArrayOfStringsOrRegexpsWithFallbackValidator < ArrayOfStringsOrRegexpsValidator
           protected
 

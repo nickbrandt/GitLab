@@ -363,14 +363,28 @@ module Gitlab
         end
 
         describe "script" do
-          let(:config) do
-            {
-              test: { script: ["script"] }
-            }
+          context 'when script is array of strings' do
+            let(:config) do
+              {
+                test: { script: ["script"] }
+              }
+            end
+
+            it "return commands with scripts concencaced" do
+              expect(subject[:options][:script]).to eq(["script"])
+            end
           end
 
-          it "return commands with scripts concencaced" do
-            expect(subject[:options][:script]).to eq(["script"])
+          context 'when script is array of arrays of strings' do
+            let(:config) do
+              {
+                test: { script: [["script"], ["echo 1"], "ls"] }
+              }
+            end
+
+            it "return commands with scripts concencaced" do
+              expect(subject[:options][:script]).to eq(["script", "echo 1", "ls"])
+            end
           end
         end
 
