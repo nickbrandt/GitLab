@@ -1515,6 +1515,9 @@ msgstr ""
 msgid "An error occurred while fetching environments."
 msgstr ""
 
+msgid "An error occurred while fetching exposed artifacts."
+msgstr ""
+
 msgid "An error occurred while fetching folder content."
 msgstr ""
 
