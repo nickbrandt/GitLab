@@ -9,50 +9,6 @@ describe ScheduleFixGitlabComPagesAccessLevel, :migration, :sidekiq, schema: 201
   ProjectClass = ::Gitlab::BackgroundMigration::FixGitlabComPagesAccessLevel::Project
   FeatureClass = ::Gitlab::BackgroundMigration::FixGitlabComPagesAccessLevel::ProjectFeature
 
-  class UpdatePagesConfigurationService
-    attr_reader :project
-
-    def initialize(project)
-      @project = project
-    end
-
-    def execute
-      update_file(pages_config_file, pages_config_json)
-    end
-
-    def update_file(file, data)
-      temp_file = "#{file}.#{SecureRandom.hex(16)}"
-      File.open(temp_file, 'w') do |f|
-        f.write(data)
-      end
-      FileUtils.move(temp_file, file, force: true)
-    ensure
-      # In case if the updating fails
-      FileUtils.remove(temp_file, force: true)
-    end
-
-    def pages_config_json
-      pages_config.to_json
-    end
-
-    def pages_config
-      {
-        domains: [],
-        https_only: project.pages_https_only?,
-        id: project.id,
-        access_control: !project.public_pages?
-      }
-    end
-
-    def pages_path
-      @pages_path ||= project.pages_path
-    end
-
-    def pages_config_file
-      File.join(pages_path, 'config.json')
-    end
-  end
-
   let(:namespaces_table) { table(:namespaces) }
 
   let(:subgroup) do
@@ -168,7 +124,7 @@ describe ScheduleFixGitlabComPagesAccessLevel, :migration, :sidekiq, schema: 201
 
       # write config.json
       allow(project).to receive(:public_pages?).and_return(!ac_is_enabled_in_config)
-      UpdatePagesConfigurationService.new(project).execute
+      Projects::UpdatePagesConfigurationService.new(project).execute
     end
 
     project.update!(visibility_level: visibility_level)
