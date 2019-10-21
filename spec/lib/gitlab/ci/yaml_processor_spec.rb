@@ -1587,28 +1587,42 @@ module Gitlab
           config = YAML.dump({ before_script: "bundle update", rspec: { script: "test" } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "before_script config should be an array of strings")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "before_script config should be an array of strings and arrays of strings")
         end
 
         it "returns errors if job before_script parameter is not an array of strings" do
           config = YAML.dump({ rspec: { script: "test", before_script: [10, "test"] } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:before_script config should be an array of strings")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:before_script config should be an array of strings and arrays of strings")
+        end
+
+        it "returns errors if job before_script parameter is multi-level nested array of strings" do
+          config = YAML.dump({ rspec: { script: "test", before_script: [["ls", ["pwd"]], "test"] } })
+          expect do
+            Gitlab::Ci::YamlProcessor.new(config)
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:before_script config should be an array of strings and arrays of strings")
         end
 
         it "returns errors if after_script parameter is invalid" do
           config = YAML.dump({ after_script: "bundle update", rspec: { script: "test" } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "after_script config should be an array of strings")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "after_script config should be an array of strings and arrays of strings")
         end
 
         it "returns errors if job after_script parameter is not an array of strings" do
           config = YAML.dump({ rspec: { script: "test", after_script: [10, "test"] } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:after_script config should be an array of strings")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:after_script config should be an array of strings and arrays of strings")
+        end
+
+        it "returns errors if job after_script parameter is multi-level nested array of strings" do
+          config = YAML.dump({ rspec: { script: "test", after_script: [["ls", ["pwd"]], "test"] } })
+          expect do
+            Gitlab::Ci::YamlProcessor.new(config)
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:after_script config should be an array of strings and arrays of strings")
         end
 
         it "returns errors if image parameter is invalid" do

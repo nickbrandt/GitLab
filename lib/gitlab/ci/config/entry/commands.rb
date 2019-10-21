@@ -14,7 +14,7 @@ module Gitlab
             validate do
               unless config.is_a?(String) ||
                   (config.is_a?(Array) && config.all? { |element| element.is_a?(String) || validate_array_of_strings?(element) })
-                errors.add(:config, 'should be an array of strings and arrays of strings or string')
+                errors.add(:config, 'should be a string or an array of strings and arrays of strings')
               end
             end
 

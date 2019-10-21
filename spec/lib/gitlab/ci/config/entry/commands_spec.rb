@@ -87,7 +87,7 @@ describe Gitlab::Ci::Config::Entry::Commands do
     describe '#errors' do
       it 'saves errors' do
         expect(entry.errors)
-          .to include 'commands config should be an array of strings and arrays of strings or string'
+          .to include 'commands config should be a string or an array of strings and arrays of strings'
       end
     end
   end
@@ -98,7 +98,7 @@ describe Gitlab::Ci::Config::Entry::Commands do
     describe '#errors' do
       it 'saves errors' do
         expect(entry.errors)
-          .to include 'commands config should be an array of strings and arrays of strings or string'
+          .to include 'commands config should be a string or an array of strings and arrays of strings'
       end
     end
 
