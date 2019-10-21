@@ -5,15 +5,15 @@ require 'spec_helper'
 describe API::GroupContainerRepositories do
   include ExclusiveLeaseHelpers
 
-  set(:group) { create(:group, :private) }
-  set(:project) { create(:project, :private, group: group) }
-  set(:maintainer) { create(:user) }
-  set(:developer) { create(:user) }
+  let_it_be(:group) { create(:group, :private) }
+  let_it_be(:project) { create(:project, :private, group: group) }
+  let(:maintainer) { create(:user) }
+  let(:developer) { create(:user) }
   let(:reporter) { create(:user) }
   let(:guest) { create(:user) }
 
-  let(:root_repository) { create(:container_repository, :root, project: project) }
-  let(:test_repository) { create(:container_repository, project: project) }
+  let_it_be(:root_repository) { create(:container_repository, :root, project: project) }
+  let_it_be(:test_repository) { create(:container_repository, project: project) }
 
   let(:users) do
     {
@@ -33,9 +33,6 @@ describe API::GroupContainerRepositories do
 
     stub_feature_flags(container_registry_api: true)
     stub_container_registry_config(enabled: true)
-
-    root_repository
-    test_repository
   end
 
   describe 'GET /groups/:id/registry/repositories' do
@@ -128,21 +125,7 @@ describe API::GroupContainerRepositories do
           expect(response).to have_gitlab_http_status(:accepted)
         end
 
-        context 'called multiple times in one hour', :clean_gitlab_redis_shared_state do
-          it 'returns 400 with an error message' do
-            stub_exclusive_lease_taken(lease_key, timeout: 1.hour)
-            subject
-
-            expect(response).to have_gitlab_http_status(400)
-            expect(response.body).to include('This request has already been made.')
-          end
-
-          it 'executes service only for the first time' do
-            expect(CleanupContainerRepositoryWorker).to receive(:perform_async).exactly(2).times
-
-            2.times { subject }
-          end
-        end
+        it_behaves_like 'schedules cleanup of tags repository with lease', 2
       end
     end
   end

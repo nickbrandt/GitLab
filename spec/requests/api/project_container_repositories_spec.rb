@@ -150,21 +150,7 @@ describe API::ProjectContainerRepositories do
           expect(response).to have_gitlab_http_status(:accepted)
         end
 
-        context 'called multiple times in one hour', :clean_gitlab_redis_shared_state do
-          it 'returns 400 with an error message' do
-            stub_exclusive_lease_taken(lease_key, timeout: 1.hour)
-            subject
-
-            expect(response).to have_gitlab_http_status(400)
-            expect(response.body).to include('This request has already been made.')
-          end
-
-          it 'executes service only for the first time' do
-            expect(CleanupContainerRepositoryWorker).to receive(:perform_async).once
-
-            2.times { subject }
-          end
-        end
+        it_behaves_like 'schedules cleanup of tags repository with lease', 1
       end
     end
   end
