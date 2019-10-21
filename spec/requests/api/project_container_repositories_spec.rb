@@ -4,13 +4,13 @@ describe API::ProjectContainerRepositories do
   include ExclusiveLeaseHelpers
 
   set(:project) { create(:project, :private) }
-  set(:maintainer) { create(:user) }
-  set(:developer) { create(:user) }
-  set(:reporter) { create(:user) }
-  set(:guest) { create(:user) }
+  let(:maintainer) { create(:user) }
+  let(:developer) { create(:user) }
+  let(:reporter) { create(:user) }
+  let(:guest) { create(:user) }
 
-  let(:root_repository) { create(:container_repository, :root, project: project) }
-  let(:test_repository) { create(:container_repository, project: project) }
+  let_it_be(:root_repository) { create(:container_repository, :root, project: project) }
+  let_it_be(:test_repository) { create(:container_repository, project: project) }
 
   let(:users) do
     {
