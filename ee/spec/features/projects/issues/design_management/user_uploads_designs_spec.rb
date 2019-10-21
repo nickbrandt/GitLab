@@ -24,7 +24,7 @@ describe 'User uploads new design', :js do
       wait_for_requests
     end
 
-    it 'uploads design' do
+    it 'uploads designs' do
       attach_file(:design_file, logo_fixture, make_visible: true)
 
       expect(page).to have_selector('.js-design-list-item', count: 1)
@@ -32,6 +32,10 @@ describe 'User uploads new design', :js do
       within first('#designs-tab .card') do
         expect(page).to have_content('dk.png')
       end
+
+      attach_file(:design_file, gif_fixture, make_visible: true)
+
+      expect(page).to have_selector('.js-design-list-item', count: 2)
     end
   end
 
@@ -47,5 +51,9 @@ describe 'User uploads new design', :js do
 
   def logo_fixture
     Rails.root.join('spec', 'fixtures', 'dk.png')
+  end
+
+  def gif_fixture
+    Rails.root.join('spec', 'fixtures', 'banana_sample.gif')
   end
 end
