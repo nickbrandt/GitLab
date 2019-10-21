@@ -686,10 +686,6 @@ module EE
       end
     end
 
-    def validate_board_limit(board)
-      # Board limits are disabled in EE, so this method is just a no-op.
-    end
-
     def check_pull_mirror_branch_prefix
       return if pull_mirror_branch_prefix.blank?
       return unless pull_mirror_branch_prefix_changed?
