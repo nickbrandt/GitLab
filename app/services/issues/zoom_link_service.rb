@@ -30,7 +30,7 @@ module Issues
     end
 
     def can_remove_link?
-      can? && @added_meeting
+      can? && !!@added_meeting
     end
 
     def parse_link(link)
@@ -42,11 +42,11 @@ module Issues
     attr_reader :issue
 
     def fetch_added_meeting
-      ZoomMeeting.where(issue: @issue).added_to_issue.first
+      ZoomMeeting.canonical_meeting(@issue)
     end
 
     def create_zoom_meeting(link)
-      meeting = ZoomMeeting.create(
+      ZoomMeeting.create(
         issue: @issue,
         project: @issue.project,
         issue_status: :added,
@@ -71,7 +71,6 @@ module Issues
     def error(message)
       ServiceResponse.error(message: message)
     end
-
 
     def can?
       current_user.can?(:update_issue, project)

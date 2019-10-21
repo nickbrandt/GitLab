@@ -66,7 +66,6 @@ module Issuable
     has_many :label_links, as: :target, dependent: :destroy, inverse_of: :target # rubocop:disable Cop/ActiveRecordDependent
     has_many :labels, through: :label_links
     has_many :todos, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
-    has_many :zoom_meetings
 
     has_one :metrics
 
