@@ -1,6 +1,6 @@
 <script>
 import _ from 'underscore';
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapMutations, mapState } from 'vuex';
 import VueDraggable from 'vuedraggable';
 import {
   GlButton,
@@ -17,6 +17,9 @@ import Icon from '~/vue_shared/components/icon.vue';
 import { getParameterValues, mergeUrlParams, redirectTo } from '~/lib/utils/url_utility';
 import invalidUrl from '~/lib/utils/invalid_url';
 import PanelType from 'ee_else_ce/monitoring/components/panel_type.vue';
+
+import { SET_PANEL_GROUP_PANELS } from '../stores/mutation_types';
+
 import DateTimePicker from './date_time_picker/date_time_picker.vue';
 import MonitorTimeSeriesChart from './charts/time_series.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
@@ -161,7 +164,7 @@ export default {
     rearrangePanelsAvailable: {
       type: Boolean,
       required: false,
-      default: false,
+      default: true,
     },
   },
   data() {
@@ -177,8 +180,9 @@ export default {
     canAddMetrics() {
       return this.customMetricsAvailable && this.customMetricsPath.length;
     },
+
     ...mapState('monitoringDashboard', [
-      'groups',
+      'dashboard',
       'emptyState',
       'showEmptyState',
       'environments',
@@ -202,7 +206,7 @@ export default {
     },
     alertWidgetAvailable() {
       return IS_EE && this.prometheusAlertsAvailable && this.alertsEndpoint;
-    },
+    }
   },
   created() {
     this.setEndpoints({
@@ -255,6 +259,8 @@ export default {
       'setEndpoints',
       'setDashboardEnabled',
     ]),
+    // TODO Switch to actions for consistency
+    ...mapMutations('monitoringDashboard', [SET_PANEL_GROUP_PANELS]),
     chartsWithData(charts) {
       if (!this.useDashboardEndpoint) {
         return charts;
@@ -328,6 +334,15 @@ export default {
     },
     downloadCSVOptions,
     generateLinkToChartOptions,
+
+    updateMetricsOrder(key, metrics) {
+      console.log('updateMetricsOrder');
+      console.log(metrics.map(metric => metric.title));
+      this[SET_PANEL_GROUP_PANELS]({
+        key,
+        metrics,
+      });
+    },
   },
   addMetric: {
     title: s__('Metrics|Add metric'),
@@ -468,7 +483,7 @@ export default {
 
     <div v-if="!showEmptyState">
       <graph-group
-        v-for="(groupData, index) in groups"
+        v-for="(groupData, index) in dashboard.panel_groups"
         :key="`${groupData.group}.${groupData.priority}`"
         :name="groupData.group"
         :show-panels="showPanels"
@@ -476,14 +491,23 @@ export default {
       >
         <template v-if="additionalPanelTypesEnabled">
           <vue-draggable
+            :value="groupData.metrics"
+            group="metrics-dashboard"
+            :component-data="{ attrs: { class: 'row mx-0 w-100' } }"
+            :disabled="!isRearrangingPanels"
+            @input="updateMetricsOrder(groupData.key, groupData.metrics)"
+          >
+          <!-- TODO Original vue-draggable -->
+          <!-- <vue-draggable
             :list="groupData.metrics"
             group="metrics-dashboard"
             :component-data="{ attrs: { class: 'row mx-0 w-100' } }"
             :disabled="!isRearrangingPanels"
-          >
+          > -->
+            <!-- TODO Find another key -->
             <div
               v-for="(graphData, graphIndex) in groupData.metrics"
-              :key="`panel-type-${graphIndex}`"
+              :key="`panel-type-${graphData}-${graphData.title}`"
               class="col-12 col-lg-6 px-2 mb-2 draggable"
               :class="{ 'draggable-enabled': isRearrangingPanels }"
             >

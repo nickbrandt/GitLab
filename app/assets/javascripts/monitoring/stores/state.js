@@ -12,7 +12,11 @@ export default () => ({
   emptyState: 'gettingStarted',
   showEmptyState: true,
   showErrorBanner: true,
-  groups: [],
+  // groups stores all the dashboard!
+  // TODO Create an "original dashboard" data structure
+  dashboard: {
+    panel_groups: [],
+  },
   deploymentData: [],
   environments: [],
   metricsWithData: [],

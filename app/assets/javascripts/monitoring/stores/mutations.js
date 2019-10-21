@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
+import { slugify } from '~/lib/utils/text_utility.js';
 import { normalizeMetrics, sortMetrics, normalizeMetric, normalizeQueryResult } from './utils';
 
 const normalizePanel = panel => panel.metrics.map(normalizeMetric);
@@ -10,10 +11,11 @@ export default {
     state.showEmptyState = true;
   },
   [types.RECEIVE_METRICS_DATA_SUCCESS](state, groupData) {
-    state.groups = groupData.map(group => {
-      let { metrics = [], panels = [] } = group;
+    state.dashboard.panel_groups = groupData.map(panelGroup => {
+      let { metrics = [], panels = [] } = panelGroup;
 
       // each panel has metric information that needs to be normalized
+
       panels = panels.map(panel => ({
         ...panel,
         metrics: normalizePanel(panel),
@@ -30,13 +32,15 @@ export default {
       }
 
       return {
-        ...group,
+        ...panelGroup,
         panels,
+        // TODO Try to find another unique factor
+        key: slugify((panelGroup.group || '').trim()),
         metrics: normalizeMetrics(sortMetrics(metrics)),
       };
     });
 
-    if (!state.groups.length) {
+    if (!state.dashboard.panel_groups.length) {
       state.emptyState = 'noData';
     } else {
       state.showEmptyState = false;
@@ -65,7 +69,7 @@ export default {
 
     state.showEmptyState = false;
 
-    state.groups.forEach(group => {
+    state.dashboard.panel_groups.forEach(group => {
       group.metrics.forEach(metric => {
         metric.queries.forEach(query => {
           if (query.metric_id === metricId) {
@@ -104,5 +108,11 @@ export default {
   },
   [types.SET_SHOW_ERROR_BANNER](state, enabled) {
     state.showErrorBanner = enabled;
+  },
+  [types.SET_PANEL_GROUP_PANELS](state, payload) {
+    const panelGroup = state.dashboard.panel_groups.find(pg => payload.key === pg.key);
+    console.log(panelGroup.metrics.map(metric => metric.title));
+    console.log(payload.metrics.map(metric => metric.title));
+    panelGroup.metrics = payload.metrics;
   },
 };

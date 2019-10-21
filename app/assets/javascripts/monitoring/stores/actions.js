@@ -166,7 +166,7 @@ export const fetchPrometheusMetrics = ({ state, commit, dispatch }, params) => {
   commit(types.REQUEST_METRICS_DATA);
 
   const promises = [];
-  state.groups.forEach(group => {
+  state.dashboard.panel_groups.forEach(group => {
     group.panels.forEach(panel => {
       panel.metrics.forEach(metric => {
         promises.push(dispatch('fetchPrometheusMetric', { metric, params }));
