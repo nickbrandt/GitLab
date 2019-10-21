@@ -10,6 +10,8 @@ describe ScheduleFixGitlabComPagesAccessLevel, :migration, :sidekiq, schema: 201
   FeatureClass = ::Gitlab::BackgroundMigration::FixGitlabComPagesAccessLevel::ProjectFeature
 
   let(:namespaces_table) { table(:namespaces) }
+  let(:projects_table) { table(:projects) }
+  let(:features_table) { table(:project_features) }
 
   let(:subgroup) do
     root_group = namespaces_table.create(path: "group", name: "group")
@@ -106,29 +108,32 @@ describe ScheduleFixGitlabComPagesAccessLevel, :migration, :sidekiq, schema: 201
       perform_enqueued_jobs do
         project = create_project(visibility_level, pages_access_level, pages_deployed, ac_is_enabled_in_config)
 
-        expect(project.reload.project_feature.pages_access_level).to eq(pages_access_level)
+        expect(features_table.find_by(project_id: project.id).pages_access_level).to eq(pages_access_level)
 
         migrate!
 
-        expect(project.reload.project_feature.pages_access_level).to eq(result_pages_access_level)
+        expect(features_table.find_by(project_id: project.id).pages_access_level).to eq(result_pages_access_level)
       end
     end
   end
 
   def create_project(visibility_level, pages_access_level, pages_deployed, ac_is_enabled_in_config, path = 'project')
-    project = ProjectClass.create!(path: path, visibility_level: visibility_level,
+    project = projects_table.create!(path: path, visibility_level: visibility_level,
                                      namespace_id: subgroup.id)
 
     if pages_deployed
-      FileUtils.mkdir_p(project.public_pages_path)
+      FileUtils.mkdir_p(ProjectClass.find(project.id).public_pages_path)
 
       # write config.json
       allow(project).to receive(:public_pages?).and_return(!ac_is_enabled_in_config)
+      allow(project).to receive(:pages_domains).and_return([])
+      allow(project).to receive(:project_id).and_return(project.id)
+      allow(project).to receive(:pages_path).and_return(ProjectClass.find(project.id).pages_path)
       Projects::UpdatePagesConfigurationService.new(project).execute
     end
 
     project.update!(visibility_level: visibility_level)
-    FeatureClass.create!(project: project, pages_access_level: pages_access_level)
+    features_table.create!(project_id: project.id, pages_access_level: pages_access_level)
 
     project
   end
