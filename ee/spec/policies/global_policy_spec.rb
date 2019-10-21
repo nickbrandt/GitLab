@@ -11,11 +11,19 @@ describe GlobalPolicy do
   subject { described_class.new(current_user, [user]) }
 
   describe 'reading operations dashboard' do
-    before do
-      stub_licensed_features(operations_dashboard: true)
-    end
+    context 'when licensed' do
+      before do
+        stub_licensed_features(operations_dashboard: true)
+      end
 
-    it { is_expected.to be_allowed(:read_operations_dashboard) }
+      it { is_expected.to be_allowed(:read_operations_dashboard) }
+
+      context 'and the user is not logged in' do
+        let(:current_user) { nil }
+
+        it { is_expected.not_to be_allowed(:read_operations_dashboard) }
+      end
+    end
 
     context 'when unlicensed' do
       before do
