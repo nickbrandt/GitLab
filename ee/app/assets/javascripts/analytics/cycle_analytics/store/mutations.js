@@ -129,4 +129,7 @@ export default {
   [types.REQUEST_UPDATE_STAGE](state) {},
   [types.RECEIVE_UPDATE_STAGE_ERROR](state, error) {},
   [types.RECEIVE_UPDATE_STAGE_SUCCESS](state) {},
+  [types.REQUEST_DELETE_STAGE](state) {},
+  [types.RECEIVE_DELETE_STAGE_ERROR](state, error) {},
+  [types.RECEIVE_DELETE_STAGE_SUCCESS](state) {},
 };

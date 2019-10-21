@@ -208,7 +208,7 @@ export const receiveUpdateStageError = ({ commit }) => {
 
 export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
   const {
-    selectedGroup: { full_path: fullPath },
+    selectedGroup: { fullPath },
   } = state;
 
   const endpoint = `/-/analytics/cycle_analytics/stages/${id}?group_id=${fullPath}`;
@@ -234,7 +234,7 @@ export const receiveDeleteStageError = ({ commit }) => {
 
 export const deleteStage = ({ dispatch, state }, stageId) => {
   const {
-    selectedGroup: { full_path: fullPath },
+    selectedGroup: { fullPath },
   } = state;
   const endpoint = `/-/analytics/cycle_analytics/stages/${stageId}?group_id=${fullPath}`;
   dispatch('requestDeleteStage');

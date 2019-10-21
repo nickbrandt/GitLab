@@ -10,11 +10,6 @@ describe 'Group Cycle Analytics', :js do
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
   let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr.source_branch, sha: mr.source_branch_sha, head_pipeline_of: mr) }
 
-  # let(:persisted_stages) { group.cycle_analytics_stages }
-  # let(:customized_stages) { group.cycle_analytics_stages.where(custom: true) }
-  # let(:default_stages) { Gitlab::Analytics::CycleAnalytics::DefaultStages.all }
-  # let(:expected_stage_count) { default_stages.count + customized_stages.count }
-
   3.times do |i|
     let!("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
   end
@@ -332,7 +327,6 @@ describe 'Group Cycle Analytics', :js do
           Analytics::CycleAnalytics::Stages::CreateService.new(parent: group, params: params, current_user: user).execute
         end
 
-        # TODO: convert to table driven test
         context 'default stages' do
           before do
             select_group
@@ -350,6 +344,14 @@ describe 'Group Cycle Analytics', :js do
 
           it 'can not be removed' do
             expect(first_default_stage.find('.more-actions-dropdown')).not_to have_text "Remove stage"
+          end
+
+          it 'will not appear in the stage table after being hidden' do
+            expect(page).to have_selector('.stage-nav-item-cell', text: "Issue")
+            first_default_stage.find('.more-actions-dropdown').click
+
+            expect(page.find('.flash-notice')).to have_text 'Stage data updated'
+            expect(page).not_to have_selector('.stage-nav-item-cell', text: "Issue")
           end
         end
 
@@ -373,6 +375,14 @@ describe 'Group Cycle Analytics', :js do
 
           it 'can be removed' do
             expect(first_custom_stage.find('.more-actions-dropdown')).to have_text "Remove stage"        
+          end
+
+          it 'will not appear in the stage table after being removed' do
+            expect(page).to have_selector('.stage-nav-item-cell', text: custom_stage)
+            first_custom_stage.find('.more-actions-dropdown').click
+
+            expect(page.find('.flash-notice')).to have_text 'Stage removed'
+            expect(page).not_to have_selector('.stage-nav-item-cell', text: custom_stage)
           end
         end
       end
