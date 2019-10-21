@@ -11,6 +11,8 @@ module Projects
     end
 
     def execute
+      update_access_control_settings_if_needed
+
       if file_equals?(pages_config_file, pages_config_json)
         return success(reload: false)
       end
@@ -100,6 +102,23 @@ module Projects
       end
     rescue
       nil
+    end
+
+    # The default for pages access settings is private,
+    # but if access control is disabled on the instance level
+    # pages will be available without access control.
+    # If access control is then enabled on the isntance level,
+    # these sites will suddenly become private.
+    # To avoid this situation we change the project setting to public
+    # when we deploy pages site
+    def update_access_control_settings_if_needed
+      return if Gitlab.config.pages.access_control
+
+      # only fix PRIVATE pages sites
+      return unless project.pages_access_level == ProjectFeature::PRIVATE
+
+      new_access_level = project.public? ? ProjectFeature::ENABLED : ProjectFeature::PUBLIC
+      project.update_column(:pages_access_level, new_access_level)
     end
   end
 end
