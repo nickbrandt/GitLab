@@ -30,7 +30,7 @@ describe('Cycle analytics actions', () => {
   let state;
   let mock;
 
-  function shouldFlashAnError(msg = flashErrorMessage) {
+  function shouldFlashAMessage(msg = flashErrorMessage) {
     expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(msg);
   }
 
@@ -172,7 +172,7 @@ describe('Cycle analytics actions', () => {
         commit: () => {},
       });
 
-      shouldFlashAnError('There was an error fetching data for the selected stage');
+      shouldFlashAMessage('There was an error fetching data for the selected stage');
     });
   });
 
@@ -225,7 +225,7 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         });
 
-        shouldFlashAnError('There was an error fetching label data for the selected group');
+        shouldFlashAMessage('There was an error fetching label data for the selected group');
       });
     });
   });
@@ -298,7 +298,7 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         })
         .then(() => {
-          shouldFlashAnError('There was an error while fetching cycle analytics summary data.');
+          shouldFlashAMessage('There was an error while fetching cycle analytics summary data.');
           done();
         })
         .catch(done.fail);
@@ -324,7 +324,7 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         })
         .then(() => {
-          shouldFlashAnError('There was an error fetching cycle analytics stages.');
+          shouldFlashAMessage('There was an error fetching cycle analytics stages.');
           done();
         })
         .catch(done.fail);
@@ -389,7 +389,7 @@ describe('Cycle analytics actions', () => {
           {},
         );
 
-        shouldFlashAnError();
+        shouldFlashAMessage();
       });
     });
   });
@@ -442,7 +442,7 @@ describe('Cycle analytics actions', () => {
         { response },
       );
 
-      shouldFlashAnError();
+      shouldFlashAMessage();
     });
   });
 
@@ -499,7 +499,7 @@ describe('Cycle analytics actions', () => {
         );
       });
 
-      shouldFlashAnError();
+      shouldFlashAMessage();
     });
   });
 
@@ -567,9 +567,108 @@ describe('Cycle analytics actions', () => {
           },
           {},
         );
-        shouldFlashAnError('There was a problem saving your custom stage, please try again');
+
+        shouldFlashAMessage('There was a problem saving your custom stage, please try again');
         done();
       });
+    });
+  });
+
+  describe('deleteStage', () => {
+    const stageId = 'cool-stage';
+
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+      mock.onDelete(stageEndpoint({ stageId, groupId: groupPath })).replyOnce(200);
+      state = { selectedGroup: { full_path: groupPath } };
+    });
+
+    it('dispatches receiveDeleteStageSuccess with put request response data', done => {
+      testAction(
+        actions.deleteStage,
+        stageId,
+        state,
+        [],
+        [
+          { type: 'requestDeleteStage' },
+          {
+            type: 'receiveDeleteStageSuccess',
+          },
+        ],
+        done,
+      );
+    });
+
+    describe('with a failed request', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        mock.onDelete(stageEndpoint({ stageId, groupId: groupPath })).replyOnce(404);
+      });
+
+      it('dispatches receiveUpdateStageError', done => {
+        testAction(
+          actions.deleteStage,
+          stageId,
+          state,
+          [],
+          [
+            { type: 'requestDeleteStage' },
+            {
+              type: 'receiveDeleteStageError',
+              payload: error,
+            },
+          ],
+          done,
+        );
+      });
+
+      it('flashes an error message', done => {
+        actions.receiveDeleteStageError(
+          {
+            commit: () => {},
+            state,
+          },
+          {},
+        );
+
+        shouldFlashAMessage('There was an error removing your custom stage, please try again');
+        done();
+      });
+    });
+  });
+
+  describe('receiveDeleteStageSuccess', () => {
+    const stageId = 'cool-stage';
+
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+      mock.onDelete(stageEndpoint({ stageId, groupId: groupPath })).replyOnce(200);
+      state = { selectedGroup: { full_path: groupPath } };
+    });
+
+    it('dispatches fetchCycleAnalyticsData', done => {
+      testAction(
+        actions.receiveDeleteStageSuccess,
+        stageId,
+        state,
+        [{ type: 'RECEIVE_DELETE_STAGE_SUCCESS' }],
+        [{ type: 'fetchCycleAnalyticsData' }],
+        done,
+      );
+    });
+
+    it('flashes a success message', done => {
+      actions.receiveDeleteStageSuccess(
+        {
+          dispatch: () => {},
+          commit: () => {},
+          state,
+        },
+        {},
+      );
+
+      shouldFlashAMessage('Stage removed');
+      done();
     });
   });
 });

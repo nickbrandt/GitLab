@@ -220,19 +220,27 @@ export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
     .catch(error => dispatch('receiveUpdateStageError', error));
 };
 
+export const requestDeleteStage = ({ commit }) => commit(types.REQUEST_DELETE_STAGE);
+export const receiveDeleteStageSuccess = ({ commit, dispatch }) => {
+  commit(types.RECEIVE_DELETE_STAGE_SUCCESS);
+  createFlash(__('Stage removed'), 'notice');
+  dispatch('fetchCycleAnalyticsData');
+};
+
+export const receiveDeleteStageError = ({ commit }) => {
+  commit(types.RECEIVE_DELETE_STAGE_ERROR);
+  createFlash(__('There was an error removing your custom stage, please try again'));
+};
+
 export const deleteStage = ({ dispatch, state }, stageId) => {
   const {
     selectedGroup: { full_path: fullPath },
   } = state;
   const endpoint = `/-/analytics/cycle_analytics/stages/${stageId}?group_id=${fullPath}`;
+  dispatch('requestDeleteStage');
 
   return axios
     .delete(endpoint)
-    .then(() => {
-      createFlash(__(`Stage removed`), 'notice');
-      dispatch('fetchCycleAnalyticsData');
-    })
-    .catch(() => {
-      createFlash(__('There was an error removing your custom stage, please try again'));
-    });
+    .then(() => dispatch('receiveDeleteStageSuccess'))
+    .catch(error => dispatch('receiveDeleteStageError', error));
 };
