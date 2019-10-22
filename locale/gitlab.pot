@@ -6075,6 +6075,9 @@ msgstr ""
 msgid "Enable or disable version check and usage ping."
 msgstr ""
 
+msgid "Enable pendo tracking"
+msgstr ""
+
 msgid "Enable protected paths rate limit"
 msgstr ""
 
@@ -11664,6 +11667,12 @@ msgid "Paused Runners don't accept new jobs"
 msgstr ""
 
 msgid "Pending"
+msgstr ""
+
+msgid "Pendo"
+msgstr ""
+
+msgid "Pendo endpoint"
 msgstr ""
 
 msgid "People without permission will never get a notification and won't be able to comment."
