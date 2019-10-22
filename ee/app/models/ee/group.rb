@@ -234,7 +234,7 @@ module EE
 
     override :supports_events?
     def supports_events?
-      ::Feature.enabled?(:group_events) && feature_available?(:epics)
+      feature_available?(:epics)
     end
 
     private
