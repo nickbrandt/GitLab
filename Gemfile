@@ -8,7 +8,7 @@ gem 'bootsnap', '~> 1.4'
 gem 'nakayoshi_fork', '~> 0.0.4'
 
 # Responders respond_to and respond_with
-gem 'responders', '~> 2.0'
+gem 'responders', '~> 3.0'
 
 gem 'sprockets', '~> 3.7.0'
 
