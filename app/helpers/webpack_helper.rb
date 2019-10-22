@@ -37,24 +37,6 @@ module WebpackHelper
     return chunks, legacyChunks
   end
 
-  def legacy_webpack_controller_bundle_tags
-    chunks = []
-
-    action = case controller.action_name
-             when 'create' then 'new'
-             when 'update' then 'edit'
-             else controller.action_name
-             end
-
-    route = [*controller.controller_path.split('/'), action].compact
-
-    legacyChunks = chunks.map do |chunk|
-      chunk.sub('.mjs', '.js')
-    end
-
-    return chunks, legacyChunks
-  end
-
   def webpack_entrypoint_paths(source, extension: nil, exclude_duplicates: true)
     return "" unless source.present?
 

@@ -10,8 +10,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname, '..');
 const CACHE_PATH = process.env.WEBPACK_CACHE_PATH || path.join(ROOT_PATH, 'tmp/cache');
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
-const IS_DEV_SERVER = process.env.WEBPACK_DEV_SERVER === 'true';
+const IS_PRODUCTION = true // process.env.NODE_ENV === 'production';
+const IS_DEV_SERVER = process.argv.join(' ').indexOf('webpack-dev-server') !== -1;
 const IS_EE = require('./helpers/is_ee_env');
 const DEV_SERVER_HOST = process.env.DEV_SERVER_HOST || 'localhost';
 const DEV_SERVER_PORT = parseInt(process.env.DEV_SERVER_PORT, 10) || 3808;
