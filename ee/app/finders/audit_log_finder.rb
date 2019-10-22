@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class LogFinder
+class AuditLogFinder
   include CreatedAtFilter
   VALID_ENTITY_TYPES = %w[Project User Group].freeze
 
