@@ -31,7 +31,7 @@ exports[`Environment matchs the snapshot 1`] = `
       </div>
        
       <div
-        class="col-10 col-sm-6 pr-0 pl-5 align-self-center align-middle ci-table"
+        class="col-10 col-sm-7 pr-0 pl-5 align-self-center align-middle ci-table"
       >
         <div
           class="branch-commit"
@@ -54,6 +54,7 @@ exports[`Environment matchs the snapshot 1`] = `
         </div>
          
         <commit-stub
+          author="[object Object]"
           commitref="[object Object]"
           commiturl="https://22878.qa-tunnel.gitlab.info/root/minimal-ruby-app/commit/63492726c2264a0277141d6a6573c3d22ecd7de3"
           shortsha="63492726"
@@ -64,7 +65,7 @@ exports[`Environment matchs the snapshot 1`] = `
       </div>
        
       <div
-        class="col-sm-5 pl-0 text-right align-self-center d-none d-sm-block"
+        class="col-sm-4 mt-0 pl-5 pl-sm-0 offset-1 offset-sm-0 text-sm-right align-self-center col-12 d-sm-block"
       >
         <timeago-stub
           time="2019-02-20T16:15:40.122Z"
