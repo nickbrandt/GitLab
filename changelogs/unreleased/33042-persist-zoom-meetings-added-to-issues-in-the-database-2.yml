@@ -1,0 +1,6 @@
+---
+title: Move zoom urls on issues added and removed by the zoom quick action commands
+  out of the issue discription and into a zoom meetings table
+merge_request:
+author:
+type: changed
