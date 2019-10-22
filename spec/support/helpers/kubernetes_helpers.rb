@@ -442,35 +442,6 @@ module KubernetesHelpers
     }
   end
 
-  def kube_service_full(name: "kubetest", namespace: "kube-ns", domain: "example.com")
-    {
-      "metadata" => {
-        "creationTimestamp" => "2018-11-21T06:16:33Z",
-        "name" => name,
-        "namespace" => namespace,
-        "selfLink" => "/apis/serving.knative.dev/v1alpha1/namespaces/#{namespace}/services/#{name}",
-        "annotation" => {
-          "description" => "This is a test description"
-        }
-      },
-      "spec" => {
-        "generation" => 2,
-        "build" => {
-          "template" => "go-1.10.3"
-        }
-      },
-      "status" => {
-        "url" => "http://#{name}.#{namespace}.#{domain}",
-        "address" => {
-          "url" => "#{name}.#{namespace}.svc.cluster.local"
-        },
-        "latestCreatedRevisionName" => "#{name}-00002",
-        "latestReadyRevisionName" => "#{name}-00002",
-        "observedGeneration" => 2
-      }
-    }
-  end
-
   def kube_terminals(service, pod)
     pod_name = pod['metadata']['name']
     pod_namespace = pod['metadata']['namespace']
