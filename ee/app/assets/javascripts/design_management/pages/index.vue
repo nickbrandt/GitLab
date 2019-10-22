@@ -83,7 +83,7 @@ export default {
     onUploadDesign(files) {
       if (!this.canCreateDesign) return null;
 
-      if (files.length >= MAXIMUM_FILE_UPLOAD_LIMIT) {
+      if (files.length > MAXIMUM_FILE_UPLOAD_LIMIT) {
         createFlash(
           sprintf(
             s__(
