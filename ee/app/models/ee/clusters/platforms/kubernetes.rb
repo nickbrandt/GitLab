@@ -40,11 +40,11 @@ module EE
         def calculate_reactive_cache(request, opts)
           case request
           when 'get_pod_log'
-            handle_exceptions(_('Pod not found')) do
-              container = opts['container']
-              pod_name = opts['pod_name']
-              namespace = opts['namespace']
+            container = opts['container']
+            pod_name = opts['pod_name']
+            namespace = opts['namespace']
 
+            handle_exceptions(_('Pod not found'), pod_name: pod_name, container_name: container) do
               container ||= container_names_of(pod_name, namespace).first
 
               pod_logs(pod_name, namespace, container: container)
@@ -59,13 +59,21 @@ module EE
             pod_name, namespace, container: container, tail_lines: LOGS_LIMIT
           ).body
 
-          { logs: logs, status: :success }
+          {
+            logs: logs,
+            status: :success,
+            pod_name: pod_name,
+            container_name: container
+          }
         end
 
-        def handle_exceptions(resource_not_found_error_message, &block)
+        def handle_exceptions(resource_not_found_error_message, opts, &block)
           yield
         rescue Kubeclient::ResourceNotFoundError
-          { error: resource_not_found_error_message, status: :error }
+          {
+            error: resource_not_found_error_message,
+            status: :error
+          }.merge(opts)
         rescue Kubeclient::HttpError => e
           ::Gitlab::Sentry.track_acceptable_exception(e)
 
@@ -74,7 +82,7 @@ module EE
               error_code: e.error_code
             },
             status: :error
-          }
+          }.merge(opts)
         end
 
         def container_names_of(pod_name, namespace)

@@ -147,6 +147,15 @@ describe Clusters::Platforms::Kubernetes do
       it do
         expect(subject[:logs]).to eq("\"Log 1\\nLog 2\\nLog 3\"")
         expect(subject[:status]).to eq(:success)
+        expect(subject[:pod_name]).to eq(pod_name)
+        expect(subject[:container_name]).to eq(container)
+      end
+    end
+
+    shared_examples 'returns pod_name and container_name' do
+      it do
+        expect(subject[:pod_name]).to eq(pod_name)
+        expect(subject[:container_name]).to eq(container)
       end
     end
 
@@ -185,6 +194,8 @@ describe Clusters::Platforms::Kubernetes do
         end
 
         it_behaves_like 'kubernetes API error', 500
+
+        it_behaves_like 'returns pod_name and container_name'
       end
 
       context 'when container does not exist' do
@@ -196,6 +207,8 @@ describe Clusters::Platforms::Kubernetes do
         end
 
         it_behaves_like 'kubernetes API error', 400
+
+        it_behaves_like 'returns pod_name and container_name'
       end
 
       context 'when kubernetes responds with 404s' do
@@ -204,14 +217,18 @@ describe Clusters::Platforms::Kubernetes do
         end
 
         it_behaves_like 'resource not found error', 'Pod not found'
+
+        it_behaves_like 'returns pod_name and container_name'
       end
 
       context 'when container name is not specified' do
+        let(:container) { 'container-0' }
+
         subject { service.read_pod_logs(pod_name, namespace) }
 
         before do
           stub_kubeclient_pod_details(pod_name, namespace)
-          stub_kubeclient_logs(pod_name, namespace, container: 'container-0')
+          stub_kubeclient_logs(pod_name, namespace, container: container)
         end
 
         include_examples 'successful log request'
