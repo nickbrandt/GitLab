@@ -151,12 +151,30 @@ describe API::Projects do
         expect(json_response).to have_key 'packages_enabled'
       end
 
-      it 'not exposed when the feature is available' do
+      it 'not exposed when the feature is not available' do
         stub_licensed_features(packages: false)
 
         get api("/projects/#{project.id}", user)
 
         expect(json_response).not_to have_key 'packages_enabled'
+      end
+    end
+
+    describe 'marked_for_deletion attribute' do
+      it 'exposed when the feature is available' do
+        stub_licensed_features(marking_project_for_deletion: true)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).to have_key 'marked_for_deletion_at'
+      end
+
+      it 'not exposed when the feature is not available' do
+        stub_licensed_features(marking_project_for_deletion: false)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).not_to have_key 'marked_for_deletion_at'
       end
     end
 
@@ -516,6 +534,74 @@ describe API::Projects do
           expect(response).to have_gitlab_http_status(200)
           expect(json_response['approvals_before_merge']).to eq(3)
         end
+      end
+    end
+  end
+
+  describe 'POST /projects/:id/restore' do
+    context 'on premium tier' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: true)
+      end
+
+      it 'restores project' do
+        ::Projects::UpdateService.new(project, user, archived: true, marked_for_deletion_at: 1.day.ago, deleting_user: user).execute
+
+        post api("/projects/#{project.id}/restore", user)
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(json_response['archived']).to be_falsey
+        expect(json_response['marked_for_deletion_at']).to be_falsey
+      end
+    end
+
+    context 'on lower tier' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: false)
+      end
+
+      it 'restores project' do
+        post api("/projects/#{project.id}/restore", user)
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  describe 'DELETE /projects/:id' do
+    context 'when project is on premium tier' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: true)
+      end
+
+      it 'marks project for deletion' do
+        delete api("/projects/#{project.id}", user)
+
+        expect(response).to have_gitlab_http_status(202)
+        expect(project.reload.marked_for_deletion?).to be_truthy
+      end
+
+      context 'when instance setting is set to 0 days' do
+        it 'deletes project right away' do
+          allow(Gitlab::CurrentSettings).to receive(:project_deletion_adjourned_period).and_return(0)
+          delete api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(202)
+          expect(Project.all).to be_empty
+        end
+      end
+    end
+
+    context 'when project is on lower tier' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: false)
+      end
+
+      it 'marks project for deletion' do
+        delete api("/projects/#{project.id}", user)
+
+        expect(response).to have_gitlab_http_status(202)
+        expect(Project.all).to be_empty
       end
     end
   end
