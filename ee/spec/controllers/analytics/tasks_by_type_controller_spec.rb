@@ -5,23 +5,34 @@ require 'spec_helper'
 describe Analytics::TasksByTypeController do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
-  let(:params) { { group_id: group.full_path, label_ids: [1, 2], created_after: '2018-01-01' } }
-  let(:subject) { get :show, params: params }
+  let(:label) { create(:group_label, group: group) }
+  let(:params) { { group_id: group.full_path, label_ids: [label.id], created_after: 10.days.ago, subject: 'Issue' } }
+  let!(:issue) { create(:labeled_issue, created_at: 5.days.ago, project: create(:project, group: group), labels: [label]) }
+  subject { get :show, params: params }
 
   before do
     stub_licensed_features(type_of_work_analytics: true)
     stub_feature_flags(Gitlab::Analytics::TASKS_BY_TYPE_CHART_FEATURE_FLAG => true)
 
     group.add_reporter(user)
-
     sign_in(user)
   end
 
-  it 'succeeds' do
-    subject
+  context 'when valid parameters are given' do
+    it 'succeeds' do
+      subject
 
-    expect(response).to be_successful
-    expect(response).to match_response_schema('analytics/tasks_by_type', dir: 'ee')
+      expect(response).to be_successful
+      expect(response).to match_response_schema('analytics/tasks_by_type', dir: 'ee')
+    end
+
+    it 'returns valid count' do
+      subject
+
+      date, count = json_response.first["series"].first
+      expect(Date.parse(date)).to eq(issue.created_at.to_date)
+      expect(count).to eq(1)
+    end
   end
 
   context 'when user access level is lower than reporter' do
