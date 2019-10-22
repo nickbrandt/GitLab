@@ -62,10 +62,6 @@ FactoryBot.modify do
       last_repository_updated_at { rand(1.year).seconds.ago }
     end
 
-    trait :requiring_code_owner_approval do
-      merge_requests_require_code_owner_approval { true }
-    end
-
     trait :jira_dvcs_cloud do
       before(:create) do |project|
         create(:project_feature_usage, :dvcs_cloud, project: project)
