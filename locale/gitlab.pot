@@ -5146,6 +5146,9 @@ msgstr ""
 msgid "Default classification label"
 msgstr ""
 
+msgid "Default deletion adjourned period"
+msgstr ""
+
 msgid "Default description template for issues"
 msgstr ""
 
@@ -8752,6 +8755,9 @@ msgid "Housekeeping, export, path, transfer, remove, archive."
 msgstr ""
 
 msgid "How it works"
+msgstr ""
+
+msgid "How many days need to pass between marking project for deletion and actual removing it."
 msgstr ""
 
 msgid "How many replicas each Elasticsearch shard has."
