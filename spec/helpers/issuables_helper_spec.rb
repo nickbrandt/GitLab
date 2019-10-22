@@ -252,7 +252,6 @@ describe IssuablesHelper do
           it_behaves_like 'sets zoomMeetingUrl to canonical meeting url'
         end
       end
-
     end
   end
 

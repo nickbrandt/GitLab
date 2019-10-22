@@ -6,7 +6,7 @@ module Issues
       super(issue.project, user)
 
       @issue = issue
-      @added_meeting = fetch_added_meeting
+      @added_meeting = ZoomMeeting.canonical_meeting(@issue)
     end
 
     def add_link(link)
@@ -40,10 +40,6 @@ module Issues
     private
 
     attr_reader :issue
-
-    def fetch_added_meeting
-      ZoomMeeting.canonical_meeting(@issue)
-    end
 
     def track_meeting_added_event
       ::Gitlab::Tracking.event('IncidentManagement::ZoomIntegration', 'add_zoom_meeting', label: 'Issue ID', value: issue.id)

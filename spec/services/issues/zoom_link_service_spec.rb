@@ -35,7 +35,7 @@ describe Issues::ZoomLinkService do
 
   describe '#add_link' do
     shared_examples 'can add meeting' do
-      it 'appends the link zoom_meetings' do
+      it 'appends the new meeting to zoom_meetings' do
         expect(result).to be_success
         expect(result.payload[:zoom_meetings].map(&:url))
           .to include(zoom_link)
@@ -60,7 +60,7 @@ describe Issues::ZoomLinkService do
     context 'without existing Zoom meeting' do
       include_examples 'can add meeting'
 
-      context 'with invalid Zoom meeting' do
+      context 'with invalid Zoom url' do
         let(:zoom_link) { 'https://not-zoom.link' }
 
         include_examples 'cannot add meeting'
@@ -81,8 +81,7 @@ describe Issues::ZoomLinkService do
   describe '#can_add_link?' do
     subject { service.can_add_link? }
 
-    context 'without Zoom link' do
-
+    context 'without "added" zoom meeting' do
       it { is_expected.to eq(true) }
 
       context 'with insufficient permissions' do
@@ -110,10 +109,10 @@ describe Issues::ZoomLinkService do
     shared_examples 'can remove meeting' do
       it 'can remove the meeting' do
         expect(result).to be_success
-        expect(result.payload[:zoom_meetings].filter { |z| z.issue_status == 1 })
+        expect(result.payload[:zoom_meetings].filter { |z| z.issue_status == "added" })
         .to be_empty
       end
-      
+
       it 'tracks the remove event' do
         expect(Gitlab::Tracking).to receive(:event)
         .with('IncidentManagement::ZoomIntegration', 'remove_zoom_meeting', label: 'Issue ID', value: issue.id)

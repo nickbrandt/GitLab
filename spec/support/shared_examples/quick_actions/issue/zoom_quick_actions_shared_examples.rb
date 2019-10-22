@@ -14,24 +14,22 @@ shared_examples 'zoom quick actions' do
 
         expect(page).not_to have_content('Zoom meeting added')
         expect(page).not_to have_content('Failed to add a Zoom meeting')
-        expect(issue.reload.zoom_meetings[0].url).not_to eq(zoom_link)
+        expect(ZoomMeeting.canonical_meeting_url(issue.reload)).not_to eq(zoom_link)
       end
     end
 
     shared_examples 'success' do
-
       it 'adds a Zoom link' do
         add_note("/zoom #{zoom_link}")
 
         wait_for_requests
 
         expect(page).to have_content('Zoom meeting added')
-        expect(issue.reload.zoom_meetings[0].url).to eq(zoom_link)
+        expect(ZoomMeeting.canonical_meeting_url(issue.reload)).to eq(zoom_link)
       end
     end
 
     context 'without zoom_meetings' do
-
       include_examples 'success'
 
       it 'cannot add invalid zoom link' do
@@ -70,7 +68,7 @@ shared_examples 'zoom quick actions' do
 
         expect(page).not_to have_content('Zoom meeting removed')
         expect(page).not_to have_content('Failed to remove a Zoom meeting')
-        expect(issue.reload.zoom_meetings.filter { |z| z.issue_status == ZoomMeeting.issue_statuses[:added] }).to be_empty
+        expect(ZoomMeeting.canonical_meeting_url(issue.reload)).to be_nil
       end
     end
 
@@ -83,7 +81,7 @@ shared_examples 'zoom quick actions' do
         wait_for_requests
 
         expect(page).to have_content('Zoom meeting removed')
-        expect(issue.reload.zoom_meetings.filter { |z| z.issue_status == ZoomMeeting.issue_statuses[:added] }).to be_empty
+        expect(ZoomMeeting.canonical_meeting_url(issue.reload)).to be_nil
       end
     end
   end
