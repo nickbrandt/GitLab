@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 describe API::ConanPackages do
-  let_it_be(:package) { create(:conan_package) }
+  let(:package) { create(:conan_package) }
   let_it_be(:personal_access_token) { create(:personal_access_token) }
   let_it_be(:user) { personal_access_token.user }
   let(:project) { package.project }
@@ -442,68 +442,108 @@ describe API::ConanPackages do
   context 'file endpoints' do
     let(:jwt) { build_jwt(personal_access_token) }
     let(:headers) { build_auth_headers(jwt.encoded) }
-    let(:package_file_tgz) { package.package_files.find_by(file_type: 'tgz') }
-    let(:metadata) { package_file_tgz.conan_file_metadatum }
+    let(:recipe_path) { package.conan_recipe_path }
 
-    describe 'GET /api/v4/packages/conan/v1/files/:package_name/package_version/:package_username/:package_channel/
-:recipe_revision/export/:file_name' do
-      let(:recipe_path) { package.conan_recipe_path }
+    shared_examples 'denies download with no token' do
+      context 'with no private token' do
+        let(:headers) { {} }
 
-      subject do
-        get api("/packages/conan/v1/files/#{recipe_path}/#{metadata.recipe_revision}/export/#{file_name}"),
-            headers: headers
-      end
-
-      context 'invalid file' do
-        let(:file_name) { 'badfile.txt' }
-
-        it 'returns 404 not found' do
+        it 'returns 400' do
           subject
 
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-
-      context 'valid file' do
-        let(:file_name) { package_file_tgz.file_name }
-
-        it 'returns forbidden' do
-          subject
-
-          expect(response).to have_gitlab_http_status(:not_found)
+          expect(response).to have_gitlab_http_status(401)
         end
       end
     end
 
+    shared_examples 'a public project with packages' do
+      it 'returns the file' do
+        subject
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
+    end
+
+    shared_examples 'an internal project with packages' do
+      before do
+        project.team.truncate
+        project.update!(visibility_level: Gitlab::VisibilityLevel::INTERNAL)
+      end
+
+      it_behaves_like 'denies download with no token'
+
+      it 'returns the file' do
+        subject
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
+    end
+
+    shared_examples 'a private project with packages' do
+      before do
+        project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+      end
+
+      it_behaves_like 'denies download with no token'
+
+      it 'returns the file' do
+        subject
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
+
+      it 'denies download when not enough permissions' do
+        project.add_guest(user)
+
+        subject
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    shared_examples 'a project is not found' do
+      let(:recipe_path) { 'not/package/for/project' }
+
+      it 'returns forbidden' do
+        subject
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
     describe 'GET /api/v4/packages/conan/v1/files/:package_name/package_version/:package_username/:package_channel/
-:recipe_revision/package/:conan_package_reference/:package_revision/:file_name' do
-      let(:recipe_path) { package.conan_recipe_path }
+:recipe_revision/export/:file_name' do
+      let(:recipe_file) { package.package_files.find_by(file_name: 'conanfile.py') }
+      let(:metadata) { recipe_file.conan_file_metadatum }
 
       subject do
-        get api("/packages/conan/v1/files/#{recipe_path}/#{metadata.recipe_revision}/package/" \
-              "#{metadata.conan_package_reference}/#{metadata.package_revision}/#{file_name}"),
+        get api("/packages/conan/v1/files/#{recipe_path}/#{metadata.recipe_revision}/export/#{recipe_file.file_name}"),
             headers: headers
       end
 
-      context 'invalid file' do
-        let(:file_name) { 'badfile.txt' }
+      it_behaves_like 'a public project with packages'
+      it_behaves_like 'an internal project with packages'
+      it_behaves_like 'a private project with packages'
+      it_behaves_like 'a project is not found'
+    end
 
-        it 'returns 404 not found' do
-          subject
+    describe 'GET /api/v4/packages/conan/v1/files/:package_name/package_version/:package_username/:package_channel/
+:recipe_revision/package/:conan_package_reference/:package_revision/:file_name' do
+      let(:package_file) { package.package_files.find_by(file_name: 'conaninfo.txt') }
+      let(:metadata) { package_file.conan_file_metadatum }
 
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
+      subject do
+        get api("/packages/conan/v1/files/#{recipe_path}/#{metadata.recipe_revision}/package/#{metadata.conan_package_reference}/#{metadata.package_revision}/#{package_file.file_name}"),
+            headers: headers
       end
 
-      context 'valid file' do
-        let(:file_name) { package_file_tgz.file_name }
-
-        it 'returns forbidden' do
-          subject
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
+      it_behaves_like 'a public project with packages'
+      it_behaves_like 'an internal project with packages'
+      it_behaves_like 'a private project with packages'
+      it_behaves_like 'a project is not found'
     end
   end
 

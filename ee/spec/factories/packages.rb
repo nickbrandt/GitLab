@@ -62,8 +62,8 @@ FactoryBot.define do
           create :conan_file_metadatum, :recipe_file, package_file: package_file
         end
 
-        file { fixture_file_upload('ee/spec/fixtures/conan/recipe_conanfile.py') }
-        file_name { 'recipe_conanfile.py' }
+        file { fixture_file_upload('ee/spec/fixtures/conan/recipe_files/conanfile.py') }
+        file_name { 'conanfile.py' }
         file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
         file_md5 { '12345abcde' }
         file_type { 'py' }
@@ -75,8 +75,8 @@ FactoryBot.define do
           create :conan_file_metadatum, :recipe_file, package_file: package_file
         end
 
-        file { fixture_file_upload('ee/spec/fixtures/conan/recipe_conanmanifest.txt') }
-        file_name { 'recipe_conanmanifest.txt' }
+        file { fixture_file_upload('ee/spec/fixtures/conan/recipe_files/conanmanifest.txt') }
+        file_name { 'conanmanifest.txt' }
         file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
         file_md5 { '12345abcde' }
         file_type { 'txt' }
@@ -88,8 +88,8 @@ FactoryBot.define do
           create :conan_file_metadatum, :package_file, package_file: package_file
         end
 
-        file { fixture_file_upload('ee/spec/fixtures/conan/package_conanmanifest.txt') }
-        file_name { 'package_conanmanifest.txt' }
+        file { fixture_file_upload('ee/spec/fixtures/conan/package_files/conanmanifest.txt') }
+        file_name { 'conanmanifest.txt' }
         file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
         file_md5 { '12345abcde' }
         file_type { 'txt' }
@@ -101,8 +101,8 @@ FactoryBot.define do
           create :conan_file_metadatum, :package_file, package_file: package_file
         end
 
-        file { fixture_file_upload('ee/spec/fixtures/conan/package_conaninfo.txt') }
-        file_name { 'package_conaninfo.txt' }
+        file { fixture_file_upload('ee/spec/fixtures/conan/package_files/conaninfo.txt') }
+        file_name { 'conaninfo.txt' }
         file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
         file_md5 { '12345abcde' }
         file_type { 'txt' }
@@ -114,7 +114,7 @@ FactoryBot.define do
           create :conan_file_metadatum, :package_file, package_file: package_file
         end
 
-        file { fixture_file_upload('ee/spec/fixtures/conan/conan_package.tgz') }
+        file { fixture_file_upload('ee/spec/fixtures/conan/package_files/conan_package.tgz') }
         file_name { 'conan_package.tgz' }
         file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
         file_md5 { '12345abcde' }

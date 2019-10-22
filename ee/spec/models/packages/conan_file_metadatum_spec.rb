@@ -10,8 +10,8 @@ RSpec.describe Packages::ConanFileMetadatum, type: :model do
   describe 'validations' do
     let(:package_file) do
       create(:package_file,
-             file: fixture_file_upload('ee/spec/fixtures/conan/recipe_conanfile.py'),
-             file_name: 'recipe_conanfile.py')
+             file: fixture_file_upload('ee/spec/fixtures/conan/recipe_files/conanfile.py'),
+             file_name: 'conanfile.py')
     end
 
     it { is_expected.to validate_presence_of(:package_file) }
