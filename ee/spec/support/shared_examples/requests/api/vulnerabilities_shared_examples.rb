@@ -108,7 +108,9 @@ shared_examples 'getting list of vulnerability findings' do
         get api(project_vulnerabilities_path, user), params: { report_type: 'dependency_scanning' }
       end.count
 
-      expect { get api(project_vulnerabilities_path, user) }.not_to exceed_query_limit(control_count)
+      # Threshold is required for the extra query performed in Security::PipelineVulnerabilitiesFinder to load
+      # the Vulnerabilities providing computed states for the associated Vulnerability::Occurrences
+      expect { get api(project_vulnerabilities_path, user) }.not_to exceed_query_limit(control_count).with_threshold(1)
     end
 
     describe 'filtering' do

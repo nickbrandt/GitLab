@@ -61,13 +61,16 @@ describe API::Vulnerabilities do
       end
 
       it 'dismisses a vulnerability and its associated findings' do
-        subject
+        Timecop.freeze do
+          subject
 
-        expect(response).to have_gitlab_http_status(201)
-        expect(response).to match_response_schema('vulnerability', dir: 'ee')
+          expect(response).to have_gitlab_http_status(201)
+          expect(response).to match_response_schema('vulnerability', dir: 'ee')
 
-        expect(vulnerability.reload).to be_closed
-        expect(vulnerability.findings).to all have_vulnerability_dismissal_feedback
+          expect(vulnerability.reload).to(
+            have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.zone.now)))
+          expect(vulnerability.findings).to all have_vulnerability_dismissal_feedback
+        end
       end
 
       context 'when there is a dismissal error' do
@@ -124,6 +127,81 @@ describe API::Vulnerabilities do
     end
 
     context 'when user does not have permissions to create a dismissal feedback' do
+      before do
+        project.add_reporter(user)
+      end
+
+      it 'responds with 403 Forbidden' do
+        subject
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'when first-class vulnerabilities feature is disabled' do
+      before do
+        stub_feature_flags(first_class_vulnerabilities: false)
+      end
+
+      it 'responds with 404 Not Found' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  describe "POST /vulnerabilities:id/resolve" do
+    before do
+      create_list(:vulnerabilities_finding, 2, vulnerability: vulnerability)
+    end
+
+    let(:vulnerability) { project.vulnerabilities.first }
+
+    subject { post api("/vulnerabilities/#{vulnerability.id}/resolve", user) }
+
+    context 'with an authorized user with proper permissions' do
+      before do
+        project.add_developer(user)
+      end
+
+      it 'resolves a vulnerability and its associated findings' do
+        Timecop.freeze do
+          subject
+
+          expect(response).to have_gitlab_http_status(201)
+          expect(response).to match_response_schema('vulnerability', dir: 'ee')
+
+          expect(vulnerability.reload).to(
+            have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.zone.now)))
+          expect(vulnerability.findings).to all have_attributes(state: 'resolved')
+        end
+      end
+
+      context 'when the vulnerability is already resolved' do
+        let(:vulnerability) { create(:vulnerability, :closed, project: project) }
+
+        it 'responds with 304 Not Modified response' do
+          subject
+
+          expect(response).to have_gitlab_http_status(304)
+        end
+      end
+
+      context 'and when security dashboard feature is not available' do
+        before do
+          stub_licensed_features(security_dashboard: false)
+        end
+
+        it 'responds with 403 Forbidden' do
+          subject
+
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+    end
+
+    context 'when user does not have permissions to resolve a vulnerability' do
       before do
         project.add_reporter(user)
       end

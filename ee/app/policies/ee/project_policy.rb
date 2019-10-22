@@ -151,11 +151,13 @@ module EE
 
       rule { can?(:developer_access) }.policy do
         enable :read_project_security_dashboard
+        enable :resolve_vulnerability
         enable :dismiss_vulnerability
       end
 
       rule { security_dashboard_feature_disabled }.policy do
         prevent :read_project_security_dashboard
+        prevent :resolve_vulnerability
         prevent :dismiss_vulnerability
       end
 
@@ -201,6 +203,7 @@ module EE
         enable :read_deployment
         enable :read_pages
         enable :read_project_security_dashboard
+        enable :resolve_vulnerability
         enable :dismiss_vulnerability
       end
 

@@ -218,6 +218,54 @@ describe Security::PipelineVulnerabilitiesFinder do
       end
     end
 
+    context 'when matching vulnerability records exist' do
+      before do
+        create(:vulnerabilities_finding,
+               :confirmed,
+               project: project,
+               report_type: 'sast',
+               project_fingerprint: confirmed_fingerprint)
+        create(:vulnerabilities_finding,
+               :resolved,
+               project: project,
+               report_type: 'sast',
+               project_fingerprint: resolved_fingerprint)
+        create(:vulnerabilities_finding,
+               :dismissed,
+               project: project,
+               report_type: 'sast',
+               project_fingerprint: dismissed_fingerprint)
+      end
+
+      let(:confirmed_fingerprint) do
+        Digest::SHA1.hexdigest(
+          'python/hardcoded/hardcoded-tmp.py:52865813c884a507be1f152d654245af34aba8a391626d01f1ab6d3f52ec8779:B108')
+      end
+
+      let(:resolved_fingerprint) do
+        Digest::SHA1.hexdigest(
+          'groovy/src/main/java/com/gitlab/security_products/tests/App.groovy:47:PREDICTABLE_RANDOM')
+      end
+
+      let(:dismissed_fingerprint) do
+        Digest::SHA1.hexdigest(
+          'groovy/src/main/java/com/gitlab/security_products/tests/App.groovy:41:PREDICTABLE_RANDOM')
+      end
+
+      subject { described_class.new(pipeline: pipeline, params: { report_type: %w[sast], scope: 'all' }).execute }
+
+      it 'assigns vulnerability records to findings providing them with computed state' do
+        confirmed = subject.find { |f| f.project_fingerprint == confirmed_fingerprint }
+        resolved = subject.find { |f| f.project_fingerprint == resolved_fingerprint }
+        dismissed = subject.find { |f| f.project_fingerprint == dismissed_fingerprint }
+
+        expect(confirmed.state).to eq 'confirmed'
+        expect(resolved.state).to eq 'resolved'
+        expect(dismissed.state).to eq 'dismissed'
+        expect(subject - [confirmed, resolved, dismissed]).to all have_attributes(state: 'new')
+      end
+    end
+
     def read_fixture(fixture)
       JSON.parse(File.read(fixture.file.path))
     end

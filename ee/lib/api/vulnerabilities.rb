@@ -38,6 +38,21 @@ module API
       requires :id, type: String, desc: 'The ID of a vulnerability'
     end
     resource :vulnerabilities do
+      desc 'Resolve a vulnerability' do
+        success VulnerabilityEntity
+      end
+      post ':id/resolve' do
+        if Feature.enabled?(:first_class_vulnerabilities)
+          vulnerability = find_and_authorize_vulnerability!(:resolve_vulnerability)
+          break not_modified! if vulnerability.closed?
+
+          vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
+          render_vulnerability(vulnerability)
+        else
+          not_found!
+        end
+      end
+
       desc 'Dismiss a vulnerability' do
         success VulnerabilityEntity
       end
@@ -61,7 +76,7 @@ module API
       params do
         # These params have no effect for Vulnerabilities API but are required to support falling back to
         # responding with Vulnerability Findings when :first_class_vulnerabilities feature is disabled.
-        # TODO: remove usage of :vulnerability_findings_params when feature flag is removed
+        # TODO: replace :vulnerability_findings_params with just :pagination when feature flag is removed
         # https://gitlab.com/gitlab-org/gitlab/issues/33488
         use :vulnerability_findings_params
       end
