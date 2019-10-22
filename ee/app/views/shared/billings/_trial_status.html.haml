@@ -1,6 +1,7 @@
 - faq_link          = link_to s_("BillingPlans|frequently asked questions"), "https://about.gitlab.com/gitlab-com/#faq"
 - pricing_page_link = link_to s_("BillingPlans|Pricing page"), "https://about.gitlab.com/pricing"
 - features_link     = link_to s_("BillingPlans|features"), "https://about.gitlab.com/features"
+- learn_more_text = s_("BillingPlans|Learn more about each plan by reading our %{faq_link}.").html_safe % { faq_link: faq_link }
 
 - if namespace.eligible_for_trial?
   = s_("BillingPlans|Learn more about each plan by reading our %{faq_link}, or start a free 30-day trial of GitLab.com Gold.").html_safe % { faq_link: faq_link }
