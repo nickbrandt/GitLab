@@ -226,13 +226,9 @@ describe Issues::UpdateService, :mailer do
       end
     end
 
-    context 'blah' do
-      before do
-        let(:zoom_meeting) { create(:zoom_meeting, issue: issue) }
-      end
-      it 'creates zoom_link_added system note when a zoom link is added to the description' do
-        update_issue(zoom_meetings: [zoom_meeting])
-
+    context 'when zoom meetings is changed' do
+      it 'creates zoom_link_added system note when a zoom link is added' do
+        update_issue(zoom_meetings: [create(:zoom_meeting, issue: issue)])
         note = find_note('added a Zoom call')
 
         expect(note).not_to be_nil

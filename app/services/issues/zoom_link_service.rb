@@ -60,12 +60,14 @@ module Issues
         issue_status: :added,
         url: link
       )
+      track_meeting_added_event
       issue.zoom_meetings
     end
 
     def remove_zoom_meeting
       @added_meeting.issue_status = :removed
       @added_meeting.save
+      track_meeting_removed_event
       issue.zoom_meetings
     end
 

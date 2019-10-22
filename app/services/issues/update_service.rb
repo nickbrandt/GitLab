@@ -62,8 +62,7 @@ module Issues
         notification_service.async.new_mentions_in_issue(issue, added_mentions, current_user)
       end
 
-      old_zoom_meetings = old_associations.fetch(:zoom_meetings, [])
-      ZoomNotesService.new(issue, project, current_user, old_zoom_meetings).execute
+      ZoomNotesService.new(issue, project, current_user, old_associations).execute
     end
 
     def handle_task_changes(issuable)

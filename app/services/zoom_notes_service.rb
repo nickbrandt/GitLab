@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class ZoomNotesService
-  def initialize(issue, project, current_user, old_zoom_meetings)
+  def initialize(issue, project, current_user, old_associations)
     @issue = issue
     @project = project
     @current_user = current_user
-    @old_zoom_meetings = old_zoom_meetings
+    @old_zoom_meetings = old_associations ? old_associations.fetch(:zoom_meetings, []) : []
   end
 
   def execute
@@ -21,9 +21,7 @@ class ZoomNotesService
   private
 
   def zoom_link_added?
-    meetings = @issue.zoom_meetings.select do |z|
-      z.issue_status == ZoomMeeting.issue_statuses[:added]
-    end
+    meetings = @issue.zoom_meetings.select { |z| z.issue_status == "added" }
     !meetings.empty?
   end
 
