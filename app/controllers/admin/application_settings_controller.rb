@@ -74,6 +74,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
 
   def application_setting_params
     params[:application_setting] ||= {}
+    params[:application_setting].delete(:elasticsearch_aws_secret_access_key) if params[:application_setting][:elasticsearch_aws_secret_access_key] == 'true'
 
     if params[:application_setting].key?(:enabled_oauth_sign_in_sources)
       enabled_oauth_sign_in_sources = params[:application_setting].delete(:enabled_oauth_sign_in_sources)

@@ -92,8 +92,8 @@
               AWS Access Key.  Only required if not using role instance credentials
 
           .form-group
-            = f.label :elasticsearch_aws_secret_access_key, 'AWS Secret Access Key', class: 'label-bold'
-            = f.password_field :elasticsearch_aws_secret_access_key, value: @application_setting.elasticsearch_aws_secret_access_key, class: 'form-control'
+            = f.label :elasticsearch_aws_secret_access_key, _('AWS Secret Access Key'), class: 'label-bold'
+            = f.password_field :elasticsearch_aws_secret_access_key, value: @application_setting.elasticsearch_aws_secret_access_key.present? ? true : nil, class: 'form-control'
             .form-text.text-muted
               AWS Secret Access Key.  Only required if not using role instance credentials
 
