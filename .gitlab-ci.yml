@@ -3,7 +3,8 @@ include:
 
 dependency_scanning:
   variables:
-   DS_ANALYZER_IMAGES: "registry.gitlab.com/gitlab-org/security-products/analyzers/gemnasium:14630-use-gemnasium-db,registry.gitlab.com/gitlab-org/security-products/analyzers/gemnasium-maven:14630-use-gemnasium-db,registry.gitlab.com/gitlab-org/security-products/analyzers/gemnasium-python:14630-use-gemnasium-db"
+    DS_DEFAULT_ANALYZERS: ""
+    DS_ANALYZER_IMAGES: "registry.gitlab.com/gitlab-org/security-products/analyzers/gemnasium:14630-use-gemnasium-db,registry.gitlab.com/gitlab-org/security-products/analyzers/gemnasium-maven:14630-use-gemnasium-db,registry.gitlab.com/gitlab-org/security-products/analyzers/gemnasium-python:14630-use-gemnasium-db"
   artifacts:
     paths:
       - gl-dependency-scanning-report.json
