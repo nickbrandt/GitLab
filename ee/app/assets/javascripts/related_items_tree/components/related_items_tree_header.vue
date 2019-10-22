@@ -75,13 +75,16 @@ export default {
           size="sm"
           @onActionClick="handleActionClick"
         />
-        <gl-button
-          :class="headerItems[1].qaClass"
-          class="ml-1 js-add-issues-button"
-          size="sm"
-          @click="handleActionClick({ id: 0, issuableType: 'issue' })"
-          >{{ __('Add an issue') }}</gl-button
-        >
+
+        <slot name="issueActions">
+          <gl-button
+            :class="headerItems[1].qaClass"
+            class="ml-1 js-add-issues-button"
+            size="sm"
+            @click="handleActionClick({ id: 0, issuableType: 'issue' })"
+            >{{ __('Add an issue') }}</gl-button
+          >
+        </slot>
       </template>
     </div>
   </div>
