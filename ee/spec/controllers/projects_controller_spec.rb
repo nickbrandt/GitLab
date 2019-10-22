@@ -394,4 +394,74 @@ describe ProjectsController do
       end
     end
   end
+
+  describe 'DELETE #destroy' do
+    let(:admin) { create(:admin) }
+    before do
+      controller.instance_variable_set(:@project, project)
+      sign_in(admin)
+    end
+
+    context 'on premium tier' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: true)
+      end
+
+      it 'marks project for deletion' do
+        delete :destroy, params: { namespace_id: project.namespace, id: project }
+
+        expect(project.reload.marked_for_deletion?).to be_truthy
+        expect(response).to have_gitlab_http_status(302)
+        expect(response).to redirect_to(project_path(project))
+      end
+
+      context 'when instance setting is set to 0 days' do
+        it 'deletes project right away' do
+          allow(Gitlab::CurrentSettings).to receive(:project_deletion_adjourned_period).and_return(0)
+          orig_id = project.id
+
+          delete :destroy, params: { namespace_id: project.namespace, id: project }
+
+          expect(project.marked_for_deletion?).to be_falsey
+          expect { Project.find(orig_id) }.to raise_error(ActiveRecord::RecordNotFound)
+          expect(response).to have_gitlab_http_status(302)
+          expect(response).to redirect_to(dashboard_projects_path)
+        end
+      end
+    end
+
+    context 'on starter tier' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: false)
+      end
+
+      it 'deletes project right away' do
+        orig_id = project.id
+
+        delete :destroy, params: { namespace_id: project.namespace, id: project }
+
+        expect(project.marked_for_deletion?).to be_falsey
+        expect { Project.find(orig_id) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect(response).to have_gitlab_http_status(302)
+        expect(response).to redirect_to(dashboard_projects_path)
+      end
+    end
+  end
+
+  describe 'POST #restore' do
+    let(:admin) { create(:admin) }
+    before do
+      controller.instance_variable_set(:@project, project)
+      sign_in(admin)
+    end
+
+    it 'restores project deletion' do
+      post :restore, params: { namespace_id: project.namespace, id: project }
+
+      expect(project.reload.marked_for_deletion_at).to be_nil
+      expect(project.reload.archived).to be_falsey
+      expect(response).to have_gitlab_http_status(302)
+      expect(response).to redirect_to(edit_project_path(project))
+    end
+  end
 end

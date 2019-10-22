@@ -643,6 +643,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         get :activity
         get :refs
         put :new_issuable_address
+        Gitlab.ee do
+          post :restore
+        end
       end
     end
   end

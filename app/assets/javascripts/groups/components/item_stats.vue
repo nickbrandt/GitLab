@@ -34,6 +34,9 @@ export default {
     isProject() {
       return this.item.type === ITEM_TYPE.PROJECT;
     },
+    isProjectPendingRemoval() {
+      return this.item.type === ITEM_TYPE.PROJECT && this.item.pendingRemoval;
+    },
     isGroup() {
       return this.item.type === ITEM_TYPE.GROUP;
     },
@@ -70,6 +73,9 @@ export default {
       css-class="project-stars"
       icon-name="star"
     />
+    <div v-if="isProjectPendingRemoval">
+      <span class="d-flex icon-wrapper badge badge-warning">{{ __('pending removal') }}</span>
+    </div>
     <div v-if="isProject" class="last-updated">
       <time-ago-tooltip :time="item.updatedAt" tooltip-placement="bottom" />
     </div>

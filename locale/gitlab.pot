@@ -4882,9 +4882,6 @@ msgstr ""
 msgid "Custom CI configuration path"
 msgstr ""
 
-msgid "Custom Git clone URL for HTTP(S)"
-msgstr ""
-
 msgid "Custom hostname (for private commit emails)"
 msgstr ""
 
@@ -5238,6 +5235,9 @@ msgid "Deleting the license failed. The license was not found."
 msgstr ""
 
 msgid "Deleting the license failed. You are not permitted to perform this action."
+msgstr ""
+
+msgid "Deletion pending. This project will be removed on %{date}. Repository and other project resources are read-only."
 msgstr ""
 
 msgid "Denied authorization of chat nickname %{user_name}."
@@ -11396,6 +11396,9 @@ msgstr ""
 msgid "Only Project Members"
 msgstr ""
 
+msgid "Only active this projects shows up in the search and on the dashboard."
+msgstr ""
+
 msgid "Only admins"
 msgstr ""
 
@@ -12668,6 +12671,9 @@ msgstr ""
 msgid "Project '%{project_name}' is in the process of being deleted."
 msgstr ""
 
+msgid "Project '%{project_name}' is restored."
+msgstr ""
+
 msgid "Project '%{project_name}' queued for deletion."
 msgstr ""
 
@@ -12675,6 +12681,9 @@ msgid "Project '%{project_name}' was successfully created."
 msgstr ""
 
 msgid "Project '%{project_name}' was successfully updated."
+msgstr ""
+
+msgid "Project '%{project_name}' will be deleted on %{date}"
 msgstr ""
 
 msgid "Project Badges"
@@ -13810,6 +13819,12 @@ msgstr ""
 msgid "Removes time estimate."
 msgstr ""
 
+msgid "Removing a project places it into a read-only state until %{date}, at which point the project will be permanantly removed."
+msgstr ""
+
+msgid "Removing a project places it into a read-only statestate until %{date}, at which point the project will be permanantly removed. Are you ABSOLUTELY sure?"
+msgstr ""
+
 msgid "Removing group will cause all child projects and resources to be removed."
 msgstr ""
 
@@ -13853,9 +13868,6 @@ msgid "Replace all label(s)"
 msgstr ""
 
 msgid "Replaced all labels with %{label_references} %{label_text}."
-msgstr ""
-
-msgid "Replaces the clone URL root."
 msgstr ""
 
 msgid "Reply by email"
@@ -14100,6 +14112,12 @@ msgid "Response metrics (NGINX)"
 msgstr ""
 
 msgid "Restart Terminal"
+msgstr ""
+
+msgid "Restore project"
+msgstr ""
+
+msgid "Restoring the project will prevent the project from being removed on this date and restore people's ability to make changes to it."
 msgstr ""
 
 msgid "Restrict access by IP address"
@@ -16524,6 +16542,9 @@ msgstr ""
 msgid "The remote repository is being updated..."
 msgstr ""
 
+msgid "The repository can be commited to, and issues, comments and other entities can be created."
+msgstr ""
+
 msgid "The repository for this project does not exist."
 msgstr ""
 
@@ -16993,6 +17014,9 @@ msgid "This project does not have a wiki homepage yet"
 msgstr ""
 
 msgid "This project does not have billing enabled. To create a cluster, <a href=%{linkToBilling} target=\"_blank\" rel=\"noopener noreferrer\">enable billing <i class=\"fa fa-external-link\" aria-hidden=\"true\"></i></a> and try again."
+msgstr ""
+
+msgid "This project will be removed on %{date}"
 msgstr ""
 
 msgid "This repository"
@@ -17804,6 +17828,9 @@ msgid "Unsubscribes from this %{quick_action_target}."
 msgstr ""
 
 msgid "Until"
+msgstr ""
+
+msgid "Until that time, the project can be restored."
 msgstr ""
 
 msgid "Unverified"
@@ -20360,6 +20387,9 @@ msgid "password"
 msgstr ""
 
 msgid "pending comment"
+msgstr ""
+
+msgid "pending removal"
 msgstr ""
 
 msgid "pipeline"
