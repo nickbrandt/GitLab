@@ -229,9 +229,9 @@ describe('Kubernetes Logs', () => {
       mock = new MockAdapter(axios);
       mock.onGet(mockDataset.environmentsPath).reply(200, { environments: mockEnvironmentData });
       // Simulate reactive cache, 2 tries needed
-      mock.onGet(`${mockDataset.logsEndpoint}`, { pod_name: podMockData[1] }).replyOnce(202);
+      mock.onGet(mockDataset.logsEndpoint, { pod_name: podMockData[1] }).replyOnce(202);
       mock
-        .onGet(`${mockDataset.logsEndpoint}`, { pod_name: podMockData[1] })
+        .onGet(mockDataset.logsEndpoint, { pod_name: podMockData[1] })
         .reply(200, { logs: logMockData, pods: podMockData });
     });
 
