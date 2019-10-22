@@ -8,8 +8,8 @@ module Gitlab
       # Tooling for signing and verifying data with SMIME
       class Signer
         def self.sign(cert:, key:, data:)
-          signed_data = PKCS7.sign(cert, key, data, nil, PKCS7::DETACHED)
-          PKCS7.write_smime(signed_data)
+          signed_data = OpenSSL::PKCS7.sign(cert, key, data, nil, OpenSSL::PKCS7::DETACHED)
+          OpenSSL::PKCS7.write_smime(signed_data)
         end
 
         # return nil if data cannot be verified, otherwise the signed content data
