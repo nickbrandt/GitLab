@@ -31,6 +31,8 @@ class Vulnerabilities::OccurrenceEntity < Grape::Entity
     expose :solution
   end
 
+  expose :state
+
   expose :blob_path do |occurrence|
     occurrence.present.blob_path
   end
