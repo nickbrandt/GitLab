@@ -1,5 +1,0 @@
----
-title: Change Prometheus Alert details list from bulleted to description list
-merge_request: 18116
-author: Vitali Tatarintev
-type: changed
