@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ZoomNotesService
-  def initialize(issue, project, current_user, old_zoom_meetings: nil)
+  def initialize(issue, project, current_user, old_zoom_meetings)
     @issue = issue
     @project = project
     @current_user = current_user

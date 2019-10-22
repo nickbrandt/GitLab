@@ -12,7 +12,7 @@ describe ZoomNotesService do
     let(:old_zoom_meetings) { [] }
     let(:zoom_meetings) { [] }
 
-    subject { described_class.new(issue, project, user, old_zoom_meetings: old_zoom_meetings) }
+    subject { described_class.new(issue, project, user, old_zoom_meetings) }
 
     shared_examples 'no notifications' do
       it "doesn't create notifications" do
