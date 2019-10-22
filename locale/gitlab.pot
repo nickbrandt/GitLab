@@ -2964,7 +2964,7 @@ msgstr ""
 msgid "Chat"
 msgstr ""
 
-msgid "ChatMessage|%{project_link}: Pipeline %{pipeline_link} of %{ref_type} %{branch_link} by %{user_combined_name} %{humanized_status} in %{duration}"
+msgid "ChatMessage|%{project_link}: Pipeline %{pipeline_link} of %{ref_type} %{ref_link} by %{user_combined_name} %{humanized_status} in %{duration}"
 msgstr ""
 
 msgid "ChatMessage|Branch"
@@ -2985,7 +2985,7 @@ msgstr ""
 msgid "ChatMessage|Pipeline #%{pipeline_id} %{humanized_status} in %{duration}"
 msgstr ""
 
-msgid "ChatMessage|Pipeline %{pipeline_link} of %{ref_type} %{branch_link} by %{user_combined_name} %{humanized_status}"
+msgid "ChatMessage|Pipeline %{pipeline_link} of %{ref_type} %{ref_link} by %{user_combined_name} %{humanized_status}"
 msgstr ""
 
 msgid "ChatMessage|Tag"
