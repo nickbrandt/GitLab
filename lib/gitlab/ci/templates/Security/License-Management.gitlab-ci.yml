@@ -1,5 +1,6 @@
+include:
+  - template: License-Scanning.gitlab-ci.yml
+
 license_management:
-  include:
-    - template: License-Scanning.gitlab-ci.yml
   before_script:
     - echo 'The `license_management` job has been renamed to `license_scanning`.'
