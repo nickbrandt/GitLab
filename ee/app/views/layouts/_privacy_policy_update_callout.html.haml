@@ -1,7 +1,0 @@
-- privacy_policy_link = link_to('https://about.gitlab.com/privacy', 'https://about.gitlab.com/privacy', class: 'deferred-link', target: '_blank', rel: 'noopener noreferrer')
-- if show_privacy_policy_update?
-  %div{ class:"#{(container_class unless fluid_layout)} #{@content_class}" }
-    .bs-callout.js-privacy-policy-update.alert.alert-block.alert-dismissable.prepend-top-default.append-bottom-default{ role: 'alert', data: { feature_id: UserCalloutsHelper::PRIVACY_POLICY_UPDATE, dismiss_endpoint: user_callouts_path, defer_links: "true" } }
-      %button.close.js-close{ type: "button" }
-        = sprite_icon("close", size: 16)
-      %p= _('Our Privacy Policy has changed, please visit %{privacy_policy_link} to review these changes.').html_safe % { privacy_policy_link: privacy_policy_link }

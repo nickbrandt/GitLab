@@ -6,9 +6,6 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
-      before_action do
-        push_frontend_feature_flag(:privacy_policy_update_callout)
-      end
       around_action :set_current_ip_address
     end
 

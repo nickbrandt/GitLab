@@ -14,8 +14,7 @@ module EE
           geo_enable_hashed_storage: 5,
           geo_migrate_hashed_storage: 6,
           canary_deployment: 7,
-          gold_trial_billings: 8,
-          privacy_policy_update_13665: 10 # Privacy Policy Update: https://gitlab.com/gitlab-org/gitlab/issues/13665
+          gold_trial_billings: 8
         )
       end
     end
