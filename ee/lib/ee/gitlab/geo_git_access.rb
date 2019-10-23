@@ -21,7 +21,7 @@ module EE
       override :check_for_console_messages
       def check_for_console_messages(cmd)
         super.push(
-          *current_replication_lag_message(cmd)
+          *current_replication_lag_message
         )
       end
 
@@ -32,18 +32,6 @@ module EE
       end
 
       private
-
-      def current_replication_lag_message(cmd)
-        return unless upload_pack?(cmd) # git fetch / pull
-        return unless ::Gitlab::Database.read_only?
-        return unless current_replication_lag > 0
-
-        "Current replication lag: #{current_replication_lag} seconds"
-      end
-
-      def current_replication_lag
-        @current_replication_lag ||= ::Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
-      end
 
       def custom_action_for?(cmd)
         return unless receive_pack?(cmd) # git push
@@ -58,13 +46,21 @@ module EE
         payload = {
           'action' => 'geo_proxy_to_primary',
           'data' => {
-            'info_message' => proxying_to_primary_message,
             'api_endpoints' => custom_action_api_endpoints,
             'primary_repo' => primary_http_repo_url
           }
         }
 
-        ::Gitlab::GitAccessResult::CustomAction.new(payload, 'Attempting to proxy to primary.')
+        ::Gitlab::GitAccessResult::CustomAction.new(payload, messages)
+      end
+
+      def messages
+        messages = proxying_to_primary_message
+        lag_message = current_replication_lag_message
+
+        return messages unless lag_message
+
+        messages + ['', lag_message]
       end
 
       def push_to_read_only_message
@@ -95,7 +91,30 @@ module EE
       end
 
       def proxying_to_primary_message
-        "You're pushing to a Geo secondary.\nWe'll help you by proxying this request to the primary: #{primary_ssh_url_to_repo}"
+        # This is formatted like this to fit into the console 'box', e.g.
+        #
+        # remote:
+        # remote: You're pushing to a Geo secondary! We'll help you by proxying this
+        # remote: request to the primary:
+        # remote:
+        # remote:   ssh://<user>@<host>:<port>/<group>/<repo>.git
+        # remote:
+        <<~STR.split("\n")
+          You're pushing to a Geo secondary! We'll help you by proxying this
+          request to the primary:
+
+            #{primary_ssh_url_to_repo}
+        STR
+      end
+
+      def current_replication_lag_message
+        return if ::Gitlab::Database.read_write? || current_replication_lag.zero?
+
+        "Current replication lag: #{current_replication_lag} seconds"
+      end
+
+      def current_replication_lag
+        @current_replication_lag ||= ::Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
       end
 
       def custom_action_api_endpoints
