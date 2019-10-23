@@ -62,6 +62,12 @@ export default {
           itemValueType: VALUE_TYPE.GRAPH,
         },
         {
+          itemTitle: s__('GeoNodes|Design repositories'),
+          itemValue: this.nodeDetails.designRepositories,
+          itemValueType: VALUE_TYPE.GRAPH,
+          featureDisabled: !gon.features.enableGeoDesignSync,
+        },
+        {
           itemTitle: s__('GeoNodes|Data replication lag'),
           itemValue: this.dbReplicationLag(),
           itemValueType: VALUE_TYPE.PLAIN,
@@ -146,6 +152,7 @@ export default {
         :item-value-stale-tooltip="statusInfoStaleMessage"
         :custom-type="nodeDetailItem.customType"
         :event-type-log-status="nodeDetailItem.eventTypeLogStatus"
+        :feature-disabled="nodeDetailItem.featureDisabled"
       />
     </div>
   </div>
