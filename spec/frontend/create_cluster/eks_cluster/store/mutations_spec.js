@@ -12,6 +12,8 @@ import {
   REQUEST_CREATE_ROLE,
   CREATE_ROLE_SUCCESS,
   CREATE_ROLE_ERROR,
+  REQUEST_CREATE_CLUSTER,
+  CREATE_CLUSTER_ERROR,
   SIGN_OUT,
 } from '~/create_cluster/eks_cluster/store/mutation_types';
 import createState from '~/create_cluster/eks_cluster/store/state';
@@ -117,6 +119,36 @@ describe('Create EKS cluster store mutations', () => {
 
     it('sets hasCredentials to false', () => {
       expect(state.hasCredentials).toBe(false);
+    });
+  });
+
+  describe(`mutation ${REQUEST_CREATE_CLUSTER}`, () => {
+    beforeEach(() => {
+      mutations[REQUEST_CREATE_CLUSTER](state);
+    });
+
+    it('sets isCreatingCluster to true', () => {
+      expect(state.isCreatingCluster).toBe(true);
+    });
+
+    it('sets createClusterError to null', () => {
+      expect(state.createClusterError).toBe(null);
+    });
+  });
+
+  describe(`mutation ${CREATE_CLUSTER_ERROR}`, () => {
+    const error = new Error();
+
+    beforeEach(() => {
+      mutations[CREATE_CLUSTER_ERROR](state, { error });
+    });
+
+    it('sets isCreatingRole to false', () => {
+      expect(state.isCreatingCluster).toBe(false);
+    });
+
+    it('sets createRoleError to the error object', () => {
+      expect(state.createClusterError).toBe(error);
     });
   });
 

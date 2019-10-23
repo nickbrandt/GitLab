@@ -40,6 +40,44 @@ export const createRoleError = ({ commit }, payload) => {
   commit(types.CREATE_ROLE_ERROR, payload);
 };
 
+export const createCluster = ({ dispatch, state }) => {
+    dispatch('requestCreateCluster');
+    
+    return axios
+    .post(state.createClusterPath, {
+          name: state.clusterName,
+          environment_scope: state.environmentScope,
+          managed: state.gitlabManagedCluster,
+          provider_aws_attributes: {
+          region: state.selectedRegion,
+          vpc_id: state.selectedVpc,
+          subnet_ids: state.selectedSubnet,
+          role_arn: state.selectedRole,
+          key_name: state.selectedKeyPair,
+          security_group_id: state.selectedSecurityGroup,
+          instance_type: state.selectedInstanceType,
+          num_nodes: state.nodeCount,
+          },
+          })
+    .then(({ headers: { location } }) => dispatch('createClusterSuccess', location))
+    .catch(({ response: { data } }) => {
+           dispatch('createClusterError', data);
+           });
+};
+
+export const requestCreateCluster = ({ commit }) => {
+    commit(types.REQUEST_CREATE_CLUSTER);
+};
+
+export const createClusterSuccess = (_, location) => {
+    window.location.assign(location);
+};
+
+export const createClusterError = ({ commit }, error) => {
+    commit(types.CREATE_CLUSTER_ERROR, error);
+    createFlash(getErrorMessage(error));
+},
+
 export const setRegion = ({ commit }, payload) => {
   commit(types.SET_REGION, payload);
 };

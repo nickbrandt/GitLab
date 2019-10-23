@@ -6,6 +6,7 @@ import { GlFormInput, GlFormCheckbox, GlLink } from '@gitlab/ui';
 import ClusterFormDropdown from './cluster_form_dropdown.vue';
 import RegionDropdown from './region_dropdown.vue';
 import { KUBERNETES_VERSIONS } from '../constants';
+import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 const { mapState: mapRolesState, mapActions: mapRolesActions } = createNamespacedHelpers('roles');
 const { mapState: mapRegionsState, mapActions: mapRegionsActions } = createNamespacedHelpers(
@@ -29,6 +30,7 @@ export default {
     RegionDropdown,
     GlFormInput,
     GlFormCheckbox,
+    LoadingButton,
   },
   props: {
     gitlabManagedClusterHelpPath: {
@@ -52,6 +54,7 @@ export default {
       'selectedRole',
       'selectedSecurityGroup',
       'gitlabManagedCluster',
+      'isCreatingCluster',
     ]),
     ...mapRolesState({
       roles: 'items',
@@ -97,6 +100,25 @@ export default {
     },
     securityGroupDropdownDisabled() {
       return !this.selectedVpc;
+    },
+    createClusterButtonDisabled() {
+      return (
+        !this.clusterName ||
+        !this.environmentScope ||
+        !this.kubernetesVersion ||
+        !this.selectedRegion ||
+        !this.selectedKeyPair ||
+        !this.selectedVpc ||
+        !this.selectedSubnet ||
+        !this.selectedRole ||
+        !this.selectedSecurityGroup ||
+        this.isCreatingCluster
+      );
+    },
+    createClusterButtonLabel() {
+      return this.isCreatingCluster
+        ? __('ClusterIntegration|Creating Kubernetes cluster')
+        : s__('ClusterIntegration|Create Kubernetes cluster');
     },
     kubernetesIntegrationHelpText() {
       const escapedUrl = _.escape(this.kubernetesIntegrationHelpPath);
@@ -198,6 +220,7 @@ export default {
   },
   methods: {
     ...mapActions([
+      'createCluster',
       'signOut',
       'setClusterName',
       'setEnvironmentScope',
@@ -237,7 +260,7 @@ export default {
     <div class="gl-mb-5" v-html="kubernetesIntegrationHelpText"></div>
     <div class="gl-mb-5">
       <button class="btn btn-link js-sign-out" @click="signOut()">
-        {{s__('ClusterIntegration|Select a different AWS account')}}
+        {{ s__('ClusterIntegration|Select a different AWS account') }}
       </button>
     </div>
     <div class="form-group">
@@ -395,6 +418,15 @@ export default {
         >{{ s__('ClusterIntegration|GitLab-managed cluster') }}</gl-form-checkbox
       >
       <p class="form-text text-muted" v-html="gitlabManagedHelpText"></p>
+    </div>
+    <div class="form-group">
+      <loading-button
+        class="js-create-cluster"
+        :disabled="createClusterButtonDisabled"
+        :loading="isCreatingCluster"
+        :label="createClusterButtonLabel"
+        @click="createCluster()"
+      />
     </div>
   </form>
 </template>

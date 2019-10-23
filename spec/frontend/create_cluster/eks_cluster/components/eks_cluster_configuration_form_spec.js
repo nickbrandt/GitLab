@@ -33,6 +33,7 @@ describe('EksClusterConfigurationForm', () => {
     state = eksClusterFormState();
     actions = {
       signOut: jest.fn(),
+      createCluster: jest.fn(),
       setClusterName: jest.fn(),
       setEnvironmentScope: jest.fn(),
       setKubernetesVersion: jest.fn(),
@@ -133,7 +134,19 @@ describe('EksClusterConfigurationForm', () => {
     vm.destroy();
   });
 
+  const setAllConfigurationFields = () => {
+    state.clusterName = 'cluster name';
+    state.environmentScope = '*';
+    state.selectedRegion = 'region';
+    state.selectedRole = 'role';
+    state.selectedKeyPair = 'key pair';
+    state.selectedVpc = 'vpc';
+    state.selectedSubnet = 'subnet';
+    state.selectedSecurityGroup = 'group';
+  };
+
   const findSignOutButton = () => vm.find('.js-sign-out');
+  const findCreateClusterButton = () => vm.find('.js-create-cluster');
   const findClusterNameInput = () => vm.find('[id=eks-cluster-name]');
   const findEnvironmentScopeInput = () => vm.find('[id=eks-environment-scope]');
   const findKubernetesVersionDropdown = () => vm.find('[field-id="eks-kubernetes-version"]');
@@ -155,7 +168,7 @@ describe('EksClusterConfigurationForm', () => {
     });
   });
 
-  it('dispatches sign out action when sign out button is clicked', () => {
+  it('dispatches signOut action when sign out button is clicked', () => {
     findSignOutButton().trigger('click');
     expect(actions.signOut).toHaveBeenCalled();
   });
@@ -459,6 +472,48 @@ describe('EksClusterConfigurationForm', () => {
         { securityGroup },
         undefined,
       );
+    });
+  });
+
+  describe('when a cluster configuration fields are set', () => {
+    beforeEach(() => {
+      setAllConfigurationFields();
+    });
+
+    it('enables create cluster button', () => {
+      expect(findCreateClusterButton().props('disabled')).toBe(false);
+    });
+  });
+
+  describe('when at least one cluster configuration field is not set', () => {
+    beforeEach(() => {
+      setAllConfigurationFields();
+      state.clusterName = '';
+    });
+
+    it('disables create cluster button', () => {
+      expect(findCreateClusterButton().props('disabled')).toBe(true);
+    });
+  });
+
+  describe('when isCreatingCluster', () => {
+    beforeEach(() => {
+      setAllConfigurationFields();
+      state.isCreatingCluster = true;
+    });
+
+    it('sets create cluster button as loading', () => {
+      expect(findCreateClusterButton().props('loading')).toBe(true);
+    });
+  });
+
+  describe('clicking create cluster button', () => {
+    beforeEach(() => {
+      findCreateClusterButton().vm.$emit('click');
+    });
+
+    it('dispatches createCluster action', () => {
+      expect(actions.createCluster).toHaveBeenCalled();
     });
   });
 });

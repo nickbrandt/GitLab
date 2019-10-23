@@ -16,6 +16,8 @@ import {
   REQUEST_CREATE_ROLE,
   CREATE_ROLE_SUCCESS,
   CREATE_ROLE_ERROR,
+  REQUEST_CREATE_CLUSTER,
+  CREATE_CLUSTER_ERROR,
   SIGN_OUT,
 } from '~/create_cluster/eks_cluster/store/mutation_types';
 import axios from '~/lib/utils/axios_utils';
@@ -34,23 +36,27 @@ describe('EKS Cluster Store Actions', () => {
   let gitlabManagedCluster;
   let mock;
   let state;
+  let newClusterUrl;
 
   beforeEach(() => {
     clusterName = 'my cluster';
     environmentScope = 'production';
     kubernetesVersion = '11.1';
-    region = { name: 'regions-1' };
-    vpc = { name: 'vpc-1' };
-    subnet = { name: 'subnet-1' };
-    role = { name: 'role-1' };
-    keyPair = { name: 'key-pair-1' };
-    securityGroup = { name: 'default group' };
+    region = 'regions-1';
+    vpc = 'vpc-1';
+    subnet = 'subnet-1';
+    role = 'role-1';
+    keyPair = 'key-pair-1';
+    securityGroup = 'default group';
     gitlabManagedCluster = true;
+
+    newClusterUrl = '/clusters/1';
 
     state = {
       ...createState(),
       createRolePath: '/clusters/roles/',
       signOutPath: '/aws/signout',
+      createClusterPath: '/clusters/',
     };
   });
 
@@ -149,6 +155,112 @@ describe('EKS Cluster Store Actions', () => {
       };
 
       testAction(actions.createRoleError, payload, state, [{ type: CREATE_ROLE_ERROR, payload }]);
+    });
+  });
+
+  describe('createCluster', () => {
+    let requestPayload;
+    let state;
+
+    beforeEach(() => {
+      requestPayload = {
+        cluster_name: clusterName,
+        environment_scope: environmentScope,
+        managed: gitlabManagedCluster,
+        provider_aws_attributes: {
+          region,
+          vpc_id: vpc,
+          subnet_ids: subnet,
+          role_arn: role,
+          key_name: keyPair,
+          security_group_id: securityGroup,
+          instance_type: instanceType,
+          num_nodes: nodeCount,
+        },
+      };
+      state = Object.assign(createState(), {
+        clusterName,
+        environmentScope,
+        kubernetesVersion,
+        selectedRegion: region,
+        selectedVpc: vpc,
+        selectedSubnet: subnet,
+        selectedRole: role,
+        selectedKeyPair: keyPair,
+        selectedSecurityGroup: securityGroup,
+        gitlabManagedCluster,
+      });
+    });
+
+    describe('when request succeeds', () => {
+      beforeEach(() => {
+        mock.onPost(state.createClusterPath, requestPayload).reply(201, null, {
+          location: '/clusters/1',
+        });
+      });
+
+      it('dispatches createClusterSuccess action', () =>
+        testAction(
+          actions.createCluster,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestCreateCluster' },
+            { type: 'createClusterSuccess', payload: newClusterUrl },
+          ],
+        ));
+    });
+
+    describe('when request fails', () => {
+      let response;
+
+      beforeEach(() => {
+        response = 'Request failed with status code 400';
+        mock.onPost(state.createClusterPath, requestPayload).reply(400, response);
+      });
+
+      it('dispatches createRoleError action', () =>
+        testAction(
+          actions.createCluster,
+          null,
+          state,
+          [],
+          [{ type: 'requestCreateCluster' }, { type: 'createClusterError', payload: response }],
+        ));
+    });
+  });
+
+  describe('requestCreateCluster', () => {
+    it('commits requestCreateCluster mutation', () => {
+      testAction(actions.requestCreateCluster, null, createState(), [
+        { type: REQUEST_CREATE_CLUSTER },
+      ]);
+    });
+  });
+
+  describe('createClusterSuccess', () => {
+    beforeEach(() => {
+      jest.spyOn(window.location, 'assign').mockImplementation(() => {});
+    });
+    afterEach(() => {
+      window.location.assign.mockRestore();
+    });
+
+    it('redirects to the new cluster URL', () => {
+      actions.createClusterSuccess(null, newClusterUrl);
+
+      expect(window.location.assign).toHaveBeenCalledWith(newClusterUrl);
+    });
+  });
+
+  describe('createClusterError', () => {
+    it('commits createClusterError mutation', () => {
+      const payload = { base: ['Create cluster failed'] };
+
+      testAction(actions.createClusterError, payload, createState(), [
+        { type: CREATE_CLUSTER_ERROR, payload },
+      ]);
     });
   });
 

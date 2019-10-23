@@ -46,6 +46,14 @@ export default {
     state.createRoleError = error;
     state.hasCredentials = false;
   },
+  [types.REQUEST_CREATE_CLUSTER](state) {
+    state.isCreatingCluster = true;
+    state.createClusterError = null;
+  },
+  [types.CREATE_CLUSTER_ERROR](state, { error }) {
+    state.isCreatingCluster = false;
+    state.createClusterError = error;
+  },
   [types.SIGN_OUT](state) {
     state.hasCredentials = false;
   },
