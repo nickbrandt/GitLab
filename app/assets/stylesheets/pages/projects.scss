@@ -237,10 +237,6 @@
 }
 
 .project-repo-buttons {
-  .notifications-btn {
-    @include btn-xs;
-  }
-
   .btn {
     &:last-child {
       margin-left: 0;
