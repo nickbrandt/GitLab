@@ -3,17 +3,19 @@
 class Burndown
   include Gitlab::Utils::StrongMemoize
 
-  attr_reader :start_date, :due_date, :end_date, :accurate, :milestone, :current_user
+  attr_reader :issues, :start_date, :end_date, :due_date, :accurate
   alias_method :accurate?, :accurate
 
-  def initialize(milestone, current_user)
-    @milestone = milestone
-    @current_user = current_user
-    @start_date = @milestone.start_date
-    @due_date = @milestone.due_date
-    @end_date = @milestone.due_date
-    @end_date = Date.today if @end_date.present? && @end_date > Date.today
+  def initialize(issues, start_date, due_date)
+    @start_date = start_date
+    @due_date = due_date
+    @end_date = if due_date.blank? || due_date > Date.today
+                  Date.today
+                else
+                  due_date
+                end
 
+    @issues = filter_issues_created_before(@end_date, issues)
     @accurate = true
   end
 
@@ -36,7 +38,7 @@ class Burndown
   # If all closed issues have no closed events, mark burndown chart as containing legacy data
   def legacy_data?
     strong_memoize(:legacy_data) do
-      closed_events = milestone_issues.select(&:closed?)
+      closed_events = issues.select(&:closed?)
       closed_events.any? && !Event.closed.where(target: closed_events, action: Event::CLOSED).exists?
     end
   end
@@ -44,7 +46,7 @@ class Burndown
   private
 
   def burndown_events
-    milestone_issues
+    issues
       .map { |issue| burndown_events_for(issue) }
       .flatten
   end
@@ -57,22 +59,12 @@ class Burndown
     ].compact
   end
 
-  def milestone_issues
-    return [] unless valid?
-
-    strong_memoize(:milestone_issues) do
-      @milestone
-        .issues_visible_to_user(current_user)
-        .where('issues.created_at <= ?', end_date.end_of_day)
-    end
-  end
-
   def milestone_events_per_issue
     return [] unless valid?
 
     strong_memoize(:milestone_events_per_issue) do
       Event
-        .where(target: milestone_issues, action: [Event::CLOSED, Event::REOPENED])
+        .where(target: issues, action: [Event::CLOSED, Event::REOPENED])
         .where('created_at <= ?', end_date.end_of_day)
         .order(:created_at)
         .group_by(&:target_id)
@@ -112,10 +104,16 @@ class Burndown
     # Mark burndown chart as inaccurate
     @accurate = false
 
-    build_burndown_event(milestone.start_date.beginning_of_day, issue.weight, 'closed')
+    build_burndown_event(start_date.beginning_of_day, issue.weight, 'closed')
   end
 
   def build_burndown_event(created_at, issue_weight, action)
     { created_at: created_at, weight: issue_weight, action: action }
+  end
+
+  def filter_issues_created_before(date, issues)
+    return [] unless valid?
+
+    issues.where('issues.created_at <= ?', date.end_of_day)
   end
 end

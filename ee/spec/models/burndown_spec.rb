@@ -18,7 +18,7 @@ describe Burndown do
       end
     end
 
-    subject { described_class.new(milestone, user).as_json }
+    subject { described_class.new(milestone.issues_visible_to_user(user), milestone.start_date, milestone.due_date).as_json }
 
     it 'generates an array of issues with date, issue weight and action' do
       expect(subject).to match_array([
@@ -39,7 +39,7 @@ describe Burndown do
 
       subject do
         project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
-        described_class.new(milestone, non_member).as_json.each { |event| event[:created_at] = event[:created_at].to_date }
+        described_class.new(milestone.issues_visible_to_user(non_member), milestone.start_date, milestone.due_date).as_json.each { |event| event[:created_at] = event[:created_at].to_date }
       end
 
       it 'does not include confidential issues for users who are not project members' do
@@ -74,15 +74,16 @@ describe Burndown do
     end
 
     it "sets attribute accurate to true" do
-      burndown = described_class.new(milestone, user)
+      burndown = described_class.new(milestone.issues_visible_to_user(user), milestone.start_date, milestone.due_date)
 
       expect(burndown).to be_accurate
     end
 
     it "is accurate with no issues" do
-      burndown = described_class.new(create(:milestone), user)
+      new_milestone = create(:milestone)
+      burndown = described_class.new(new_milestone.issues_visible_to_user(user), new_milestone.start_date, new_milestone.due_date)
 
-      burndown.milestone.project.add_master(user)
+      new_milestone.project.add_master(user)
 
       expect(burndown).to be_accurate
     end
@@ -94,7 +95,7 @@ describe Burndown do
       end
 
       it "sets attribute empty to false" do
-        burndown = described_class.new(milestone, user)
+        burndown = described_class.new(milestone.issues_visible_to_user(user), milestone.start_date, milestone.due_date)
 
         expect(burndown).not_to be_empty
       end
@@ -128,7 +129,7 @@ describe Burndown do
       end
 
       it "sets attribute empty to true" do
-        burndown = described_class.new(milestone, user)
+        burndown = described_class.new(milestone.issues_visible_to_user(user), milestone.start_date, milestone.due_date)
 
         expect(burndown).to be_empty
       end
@@ -137,7 +138,7 @@ describe Burndown do
     context "when one but not all closed issues does not have a closed event" do
       it "sets attribute accurate to false" do
         Event.where(target: milestone.issues.closed.first, action: Event::CLOSED).destroy_all # rubocop: disable DestroyAll
-        burndown = described_class.new(milestone, user)
+        burndown = described_class.new(milestone.issues_visible_to_user(user), milestone.start_date, milestone.due_date)
 
         aggregate_failures do
           expect(burndown).not_to be_empty
