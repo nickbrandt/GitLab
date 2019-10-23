@@ -10,7 +10,7 @@ export default {
   ...actionsCE,
 
   toggleShowLabels({ commit }) {
-    commit(types.TOGGLE_SHOW_LABELS);
+    commit(types.TOGGLE_LABELS);
   },
 
   fetchAllBoards: () => {

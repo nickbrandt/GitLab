@@ -9,19 +9,12 @@ const expectNotImplemented = action => {
 };
 
 describe('toggleShowLabels', () => {
-  it('should commit mutation TOGGLE_SHOW_LABELS', done => {
+  it('should commit mutation TOGGLE_LABELS', done => {
     const state = {
       isShowingLabels: true,
     };
 
-    testAction(
-      actions.toggleShowLabels,
-      null,
-      state,
-      [{ type: types.TOGGLE_SHOW_LABELS }],
-      [],
-      done,
-    );
+    testAction(actions.toggleShowLabels, null, state, [{ type: types.TOGGLE_LABELS }], [], done);
   });
 });
 

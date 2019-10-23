@@ -1,3 +1,3 @@
 export default {
-  getSnowplowLabelToggleState: state => (state.isShowingLabels ? 'on' : 'off'),
+  getLabelToggleState: state => (state.isShowingLabels ? 'on' : 'off'),
 };

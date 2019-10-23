@@ -7,17 +7,21 @@ import store from '~/boards/stores';
 
 export default () =>
   new Vue({
-    el: document.getElementById('boards-labels-toggle'),
+    el: document.getElementById('js-board-labels-toggle'),
     components: {
       GlToggle,
     },
     store,
-    data: {
-      toggleLabel: __('Show labels'),
-    },
     computed: {
       ...mapState(['isShowingLabels']),
-      ...mapGetters(['getSnowplowLabelToggleState']),
+      ...mapGetters(['getLabelToggleState']),
+
+      toggleOnLabel() {
+        return __('Showing all labels');
+      },
+      toggleOffLabel() {
+        return __('Hiding all labels');
+      },
     },
     methods: {
       ...mapActions(['toggleShowLabels']),
@@ -27,21 +31,21 @@ export default () =>
 
         Tracking.event(document.body.dataset.page, 'toggle', {
           label: 'show_labels',
-          property: this.getSnowplowLabelToggleState,
+          property: this.getLabelToggleState,
         });
       },
     },
     template: `
-      <div class="boards-labels-toggle-wrapper prepend-left-10">
-        <span id="boards-labels-toggle-text">
-          {{toggleLabel}}
+      <div class="board-labels-toggle-wrapper d-flex align-items-center prepend-left-10">
+        <span id="board-labels-toggle-text">
+          {{ __('Show labels') }}
         </span>
         <gl-toggle
           :value="isShowingLabels"
           class="prepend-left-10"
-          label-on="Showing all labels"
-          label-off="Hiding all labels"
-          aria-describedby="boards-labels-toggle-text"
+          :label-on="toggleOnLabel"
+          :label-off="toggleOffLabel"
+          aria-describedby="board-labels-toggle-text"
           data-qa-selector="show_labels_toggle"
           @change="onToggle"
         />

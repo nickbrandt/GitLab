@@ -6,7 +6,7 @@ const notImplemented = () => {
 };
 
 export default {
-  [mutationTypes.TOGGLE_SHOW_LABELS]: state => {
+  [mutationTypes.TOGGLE_LABELS]: state => {
     Object.assign(state, {
       isShowingLabels: !state.isShowingLabels,
     });

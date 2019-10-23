@@ -546,9 +546,12 @@
   cursor: help;
 }
 
-.boards-labels-toggle-wrapper {
-  display: flex;
-  align-items: center;
+.board-labels-toggle-wrapper {
+  /**
+   * Make the wrapper the same height as a button so it aligns properly when the
+   * filtered-search-box input element increases in size on Linux smaller breakpoints
+   */
+  height: 34px;
 
   label {
     font-weight: $gl-font-weight-normal;

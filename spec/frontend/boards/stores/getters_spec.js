@@ -1,13 +1,13 @@
 import getters from '~/boards/stores/getters';
 
 describe('Boards - Getters', () => {
-  describe('getSnowplowLabelToggleState', () => {
+  describe('getLabelToggleState', () => {
     it('should return "on" when isShowingLabels is true', () => {
       const state = {
         isShowingLabels: true,
       };
 
-      expect(getters.getSnowplowLabelToggleState(state)).toBe('on');
+      expect(getters.getLabelToggleState(state)).toBe('on');
     });
 
     it('should return "off" when isShowingLabels is false', () => {
@@ -15,7 +15,7 @@ describe('Boards - Getters', () => {
         isShowingLabels: false,
       };
 
-      expect(getters.getSnowplowLabelToggleState(state)).toBe('off');
+      expect(getters.getLabelToggleState(state)).toBe('off');
     });
   });
 });

@@ -6,13 +6,13 @@ const expectNotImplemented = action => {
   });
 };
 
-describe('TOGGLE_SHOW_LABELS', () => {
+describe('TOGGLE_LABELS', () => {
   it('toggles isShowingLabels from true to false', () => {
     const state = {
       isShowingLabels: true,
     };
 
-    mutations.TOGGLE_SHOW_LABELS(state);
+    mutations.TOGGLE_LABELS(state);
 
     expect(state.isShowingLabels).toBe(false);
   });
@@ -22,7 +22,7 @@ describe('TOGGLE_SHOW_LABELS', () => {
       isShowingLabels: false,
     };
 
-    mutations.TOGGLE_SHOW_LABELS(state);
+    mutations.TOGGLE_LABELS(state);
 
     expect(state.isShowingLabels).toBe(true);
   });
