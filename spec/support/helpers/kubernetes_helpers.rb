@@ -511,25 +511,58 @@ module KubernetesHelpers
   end
 
   # noinspection RubyStringKeysInHashInspection
-  def knative_05_service(name: "kubetest", namespace: "default", domain: "example.com")
-    {
-      "metadata" => {
-        "creationTimestamp" => "2018-11-21T06:16:33Z",
-        "name" => name,
-        "namespace" => namespace,
-        "selfLink" => "/apis/serving.knative.dev/v1alpha1/namespaces/#{namespace}/services/#{name}"
-      },
+  def knative_05_service(name: 'kubetest', namespace: 'default', domain: 'example.com', description: 'a knative service', environment: 'production')
+    { "apiVersion" => "serving.knative.dev/v1alpha1",
+      "kind" => "Service",
+      "metadata" =>
+        { "annotations" =>
+            { "serving.knative.dev/creator" => "system:serviceaccount:#{namespace}:#{namespace}-service-account",
+              "serving.knative.dev/lastModifier" => "system:serviceaccount:#{namespace}:#{namespace}-service-account" },
+          "creationTimestamp" => "2019-10-22T21:19:19Z",
+          "generation" => 1,
+          "labels" => { "service" => name },
+          "name" => name,
+          "namespace" => namespace,
+          "resourceVersion" => "330390",
+          "selfLink" => "/apis/serving.knative.dev/v1alpha1/namespaces/#{namespace}/services/#{name}",
+          "uid" => "9c710da6-f511-11e9-9ba0-42010a800161" },
       "spec" => {
-        "generation" => 2
+        "runLatest" => {
+          "configuration" => {
+            "revisionTemplate" => {
+              "metadata" => {
+                "annotations" => { "Description" => description },
+                "creationTimestamp" => "2019-10-22T21:19:19Z",
+                "labels" => { "service" => name }
+              },
+              "spec" => {
+                "container" => {
+                  "env" => [{ "name" => "timestamp", "value" => "2019-10-22 21:19:19" }],
+                  "image" => "image_name",
+                  "name" => "",
+                  "resources" => { "requests" => { "cpu" => "400m" } }
+                },
+                "timeoutSeconds" => 300
+              }
+            }
+          }
+        }
       },
-      "status" => {
-        "domain" => "#{name}.#{namespace}.#{domain}",
-        "domainInternal" => "#{name}.#{namespace}.svc.cluster.local",
-        "latestCreatedRevisionName" => "#{name}-00002",
-        "latestReadyRevisionName" => "#{name}-00002",
-        "observedGeneration" => 2
-      }
-    }
+      "status" =>
+        { "address" => { "hostname" => "#{name}.#{namespace}.svc.cluster.local" },
+          "conditions" =>
+            [{ "lastTransitionTime" => "2019-10-22T21:20:24Z", "status" => "True", "type" => "ConfigurationsReady" },
+             { "lastTransitionTime" => "2019-10-22T21:20:24Z", "status" => "True", "type" => "Ready" },
+             { "lastTransitionTime" => "2019-10-22T21:20:24Z", "status" => "True", "type" => "RoutesReady" }],
+          "domain" => "#{name}.#{namespace}.#{domain}",
+          "domainInternal" => "#{name}.#{namespace}.svc.cluster.local",
+          "latestCreatedRevisionName" => "#{name}-58qgr",
+          "latestReadyRevisionName" => "#{name}-58qgr",
+          "observedGeneration" => 1,
+          "traffic" => [{ "percent" => 100, "revisionName" => "#{name}-58qgr" }] },
+      "environment_scope" => environment,
+      "cluster_id" => 8,
+      "podcount" => 0 }
   end
 
   def kube_terminals(service, pod)
