@@ -78,6 +78,8 @@ module Gitlab
             in_review_folder: count(::Environment.in_review_folder),
             groups: count(Group),
             issues: count(Issue),
+            issues_with_associated_zoom_link: count(ZoomMeeting.added_to_issue),
+            issues_using_zoom_quick_actions: count(Issue.with_zoom_meetings),
             keys: count(Key),
             label_lists: count(List.label),
             lfs_objects: count(LfsObject),
