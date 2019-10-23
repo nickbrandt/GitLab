@@ -9,6 +9,9 @@ module EE
         before_action :authorize_read_pod_logs!, only: [:logs]
         before_action :environment_ee, only: [:logs]
         before_action :authorize_create_environment_terminal!, only: [:terminal]
+        before_action do
+          push_frontend_feature_flag(:environment_logs_use_vue_ui)
+        end
       end
 
       def logs
