@@ -125,15 +125,11 @@ module EE
     #
     # Returns the created Note object
     def approve_mr(noteable, user)
-      body = "approved this merge request"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'approved'))
+      ::SystemNotes::MergeRequestsService.new(noteable: noteable, project: noteable.project, author: user).approve_mr
     end
 
     def unapprove_mr(noteable, user)
-      body = "unapproved this merge request"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'unapproved'))
+      ::SystemNotes::MergeRequestsService.new(noteable: noteable, project: noteable.project, author: user).unapprove_mr
     end
 
     # Called when the weight of a Noteable is changed
