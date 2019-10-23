@@ -8,20 +8,15 @@ module EpicIssues
     def relate_issuables(referenced_issue)
       link = EpicIssue.find_or_initialize_by(issue: referenced_issue)
 
-      affected_epics = [issuable]
-
-      if link.persisted?
-        affected_epics << link.epic
-        params = { issue_moved: true, original_epic: link.epic }
-      else
-        params = {}
-      end
+      params = if link.persisted?
+                 { issue_moved: true, original_epic: link.epic }
+               else
+                 {}
+               end
 
       link.epic = issuable
       link.move_to_start
       link.save!
-
-      affected_epics.each(&:update_start_and_due_dates)
 
       yield params
     end
@@ -41,6 +36,10 @@ module EpicIssues
 
     def extractor_context
       { group: issuable.group }
+    end
+
+    def affected_epics(issues)
+      [issuable, Epic.in_issues(issues)].flatten.uniq
     end
 
     def linkable_issuables(issues)

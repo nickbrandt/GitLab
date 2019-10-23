@@ -6,19 +6,15 @@ module EE
       extend ::Gitlab::Utils::Override
 
       override :execute
-      # rubocop: disable CodeReuse/ActiveRecord
       def execute(milestone)
         super
 
         if saved_change_to_dates?(milestone)
-          ::Epic.update_start_and_due_dates(
-            ::Epic.joins(:issues).where(issues: { milestone_id: milestone.id })
-          )
+          Epics::UpdateDatesService.new(::Epic.in_milestone(milestone.id)).execute
         end
 
         milestone
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
       private
 

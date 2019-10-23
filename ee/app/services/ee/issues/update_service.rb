@@ -11,7 +11,7 @@ module EE
         result = super
 
         if issue.previous_changes.include?(:milestone_id) && issue.epic
-          issue.epic.update_start_and_due_dates
+          Epics::UpdateDatesService.new([issue.epic]).execute
         end
 
         result

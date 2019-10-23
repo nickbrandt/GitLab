@@ -86,7 +86,7 @@ exports[`SidebarDatePicker renders expected template 1`] = `
       <span
         class="prepend-left-5"
       >
-        From milestones:
+        Inherited:
       </span>
        
       <span
