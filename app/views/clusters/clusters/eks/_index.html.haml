@@ -7,4 +7,5 @@
     'account-id' => Gitlab::CurrentSettings.eks_account_id,
     'external-id' => @aws_role.role_external_id,
     'kubernetes-integration-help-path' => help_page_path('user/project/clusters/index'),
+    'external-link-icon' => icon('external-link'),
     'has-credentials' => @aws_role.role_arn.present? } }

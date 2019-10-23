@@ -25,6 +25,10 @@ export default {
       type: String,
       required: true,
     },
+    externalLinkIcon: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapState(['hasCredentials']),
@@ -42,6 +46,7 @@ export default {
       v-else
       :create-role-arn-help-path="createRoleArnHelpPath"
       :account-and-external-ids-help-path="accountAndExternalIdsHelpPath"
+      :external-link-icon="externalLinkIcon"
     />
   </div>
 </template>
