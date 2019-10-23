@@ -35,7 +35,7 @@ describe 'Environment > Pod Logs', :js do
   end
 
   context 'with logs', :use_clean_rails_memory_store_caching do
-    it "shows pod logs" do
+    it "shows pod logs", :sidekiq_might_not_need_inline do
       visit logs_project_environment_path(environment.project, environment, pod_name: pod_name)
 
       wait_for_requests

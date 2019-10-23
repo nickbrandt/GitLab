@@ -62,7 +62,7 @@ describe Repository, :elastic do
     search_and_check!(project.repository, '-foo', type: :commit)
   end
 
-  describe 'class method find_commits_by_message_with_elastic' do
+  describe 'class method find_commits_by_message_with_elastic', :sidekiq_might_not_need_inline do
     let(:project) { create :project, :repository }
     let(:project1) { create :project, :repository }
     let(:results) { Repository.find_commits_by_message_with_elastic('initial') }

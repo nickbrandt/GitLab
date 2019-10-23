@@ -16,7 +16,7 @@ describe Milestone, :elastic do
     end
   end
 
-  it "searches milestones" do
+  it "searches milestones", :sidekiq_might_not_need_inline do
     project = create :project
 
     Sidekiq::Testing.inline! do

@@ -40,7 +40,7 @@ describe API::Search do
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
     end
 
-    context 'for wiki_blobs scope' do
+    context 'for wiki_blobs scope', :sidekiq_might_not_need_inline do
       before do
         wiki = create(:project_wiki, project: project)
         create(:wiki_page, wiki: wiki, attrs: { title: 'home', content: "Awesome page" })
@@ -54,7 +54,7 @@ describe API::Search do
       it_behaves_like 'response is correct', schema: 'public_api/v4/blobs'
     end
 
-    context 'for commits scope' do
+    context 'for commits scope', :sidekiq_might_not_need_inline do
       before do
         repo_project.repository.index_commits_and_blobs
         Gitlab::Elastic::Helper.refresh_index
@@ -65,7 +65,7 @@ describe API::Search do
       it_behaves_like 'response is correct', schema: 'public_api/v4/commits_details', size: 2
     end
 
-    context 'for blobs scope' do
+    context 'for blobs scope', :sidekiq_might_not_need_inline do
       before do
         repo_project.repository.index_commits_and_blobs
         Gitlab::Elastic::Helper.refresh_index

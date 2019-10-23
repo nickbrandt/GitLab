@@ -81,7 +81,7 @@ describe Projects::DestroyService do
       end
       let!(:async) { true }
 
-      it 'destroys them' do
+      it 'destroys them', :sidekiq_might_not_need_inline do
         expect(RemoteMirror.count).to eq(0)
       end
     end
@@ -102,7 +102,7 @@ describe Projects::DestroyService do
       end
       let!(:async) { true }
 
-      it 'destroys project and export' do
+      it 'destroys project and export', :sidekiq_might_not_need_inline do
         expect { destroy_project(project_with_export, user) }.to change(ImportExportUpload, :count).by(-1)
 
         expect(Project.all).not_to include(project_with_export)
@@ -153,7 +153,7 @@ describe Projects::DestroyService do
     end
   end
 
-  context 'with async_execute' do
+  context 'with async_execute', :sidekiq_might_not_need_inline do
     let(:async) { true }
 
     context 'async delete of project with private issue visibility' do

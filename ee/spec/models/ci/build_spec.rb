@@ -48,7 +48,7 @@ describe Ci::Build do
     let(:job) { create(:ci_build, :running, pipeline: pipeline) }
 
     %w(success drop cancel).each do |event|
-      it "for event #{event}" do
+      it "for event #{event}", :sidekiq_might_not_need_inline do
         expect(UpdateBuildMinutesService)
           .to receive(:new).and_call_original
 

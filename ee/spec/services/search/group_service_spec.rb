@@ -50,7 +50,7 @@ describe Search::GroupService, :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    context 'finding projects by name' do
+    context 'finding projects by name', :sidekiq_might_not_need_inline do
       subject { results.objects('projects') }
 
       context 'in parent group' do

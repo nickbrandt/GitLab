@@ -59,7 +59,7 @@ describe SearchHelper do
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
     end
 
-    it "returns parsed result" do
+    it "returns parsed result", :sidekiq_might_not_need_inline do
       project = create :project, :repository
 
       project.repository.index_commits_and_blobs
@@ -96,7 +96,7 @@ describe SearchHelper do
       )[:blobs][:results]
     end
 
-    it 'returns all projects in the result page without causing an N+1' do
+    it 'returns all projects in the result page without causing an N+1', :sidekiq_might_not_need_inline do
       control_count = ActiveRecord::QueryRecorder.new { blob_projects(es_blob_search) }.count
 
       projects = create_list :project, 3, :repository, :public
