@@ -262,6 +262,7 @@ end
 In EE, the implementation `ee/app/models/ee/users.rb` would be:
 
 ```ruby
+override :internal?
 def internal?
   super || bot?
 end
