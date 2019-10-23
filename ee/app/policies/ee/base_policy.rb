@@ -20,7 +20,7 @@ module EE
       with_scope :global
       condition(:license_block) { License.block_changes? }
 
-      rule { auditor }.enable :full_private_access
+      rule { auditor }.enable :read_all_resources
     end
   end
 end

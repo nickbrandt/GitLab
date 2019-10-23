@@ -21,9 +21,9 @@ describe BasePolicy, :do_not_mock_admin_mode do
     end
   end
 
-  describe 'full private access' do
+  describe 'read all resources' do
     it 'allows auditors' do
-      is_expected.to be_allowed(:full_private_access)
+      is_expected.to be_allowed(:read_all_resources)
     end
   end
 end

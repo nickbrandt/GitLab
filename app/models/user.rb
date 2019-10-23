@@ -1454,7 +1454,7 @@ class User < ApplicationRecord
   # Does the user have access to all private groups & projects?
   # Overridden in EE to also check auditor?
   def full_private_access?
-    can?(:full_private_access)
+    can?(:read_all_resources)
   end
 
   def update_two_factor_requirement

@@ -36,11 +36,11 @@ class BasePolicy < DeclarativePolicy::Base
     ::Gitlab::ExternalAuthorization.perform_check?
   end
 
-  rule { external_authorization_enabled & ~can?(:full_private_access) }.policy do
+  rule { external_authorization_enabled & ~can?(:read_all_resources) }.policy do
     prevent :read_cross_project
   end
 
-  rule { admin }.enable :full_private_access
+  rule { admin }.enable :read_all_resources
 
   rule { default }.enable :read_cross_project
 end
