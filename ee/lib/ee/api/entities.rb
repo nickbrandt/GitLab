@@ -649,6 +649,13 @@ module EE
           number_to_percentage(node.container_repositories_synced_in_percentage, precision: 2)
         end
 
+        expose :design_repositories_count
+        expose :design_repositories_synced_count
+        expose :design_repositories_failed_count
+        expose :design_repositories_synced_in_percentage do |node|
+          number_to_percentage(node.design_repositories_synced_in_percentage, precision: 2)
+        end
+
         expose :projects_count
 
         expose :repositories_failed_count
