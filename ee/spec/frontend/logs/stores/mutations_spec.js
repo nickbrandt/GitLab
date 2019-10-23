@@ -2,13 +2,7 @@ import mutations from 'ee/logs/stores/mutations';
 import * as types from 'ee/logs/stores/mutation_types';
 
 import logsPageState from 'ee/logs/stores/state';
-import {
-  mockLogsEndpoint,
-  mockEnvironments,
-  mockPods,
-  mockPodName,
-  mockLines,
-} from '../mock_data';
+import { mockLogsEndpoint, mockEnvironments, mockPods, mockPodName, mockLines } from '../mock_data';
 
 describe('Logs Store Mutations', () => {
   let state;
