@@ -1642,6 +1642,9 @@ DELETE /projects/:id
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
+On premium or higher tiers this endpoint marks project for deletion - actual removal happens
+after number of days specified in instance settings, default number of days is 7.
+
 ## Restore project marked for deletion **(PREMIUM)**
 
 Restores project marked for deletion.
