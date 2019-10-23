@@ -1,6 +1,5 @@
-import Vue from 'vue';
 import featureFlagsTableComponent from 'ee/feature_flags/components/feature_flags_table.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { trimText } from 'spec/helpers/text_helper';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
@@ -8,164 +7,179 @@ import {
   DEFAULT_PERCENT_ROLLOUT,
 } from 'ee/feature_flags/constants';
 
+const localVue = createLocalVue();
+
 describe('Feature flag table', () => {
   let Component;
-  let vm;
+  let wrapper;
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   describe('with an active scope and a standard rollout strategy', () => {
     beforeEach(() => {
-      Component = Vue.extend(featureFlagsTableComponent);
+      Component = localVue.extend(featureFlagsTableComponent);
 
-      vm = mountComponent(Component, {
-        featureFlags: [
-          {
-            id: 1,
-            active: true,
-            name: 'flag name',
-            description: 'flag description',
-            destroy_path: 'destroy/path',
-            edit_path: 'edit/path',
-            scopes: [
-              {
-                id: 1,
-                active: true,
-                environmentScope: 'scope',
-                canUpdate: true,
-                protected: false,
-                rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
-                rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-                shouldBeDestroyed: false,
-              },
-            ],
-          },
-        ],
-        csrfToken: 'fakeToken',
+      wrapper = shallowMount(Component, {
+        localVue,
+        provide: { glFeatures: { featureFlagIID: true } },
+        propsData: {
+          featureFlags: [
+            {
+              id: 1,
+              iid: 1,
+              active: true,
+              name: 'flag name',
+              description: 'flag description',
+              destroy_path: 'destroy/path',
+              edit_path: 'edit/path',
+              scopes: [
+                {
+                  id: 1,
+                  active: true,
+                  environmentScope: 'scope',
+                  canUpdate: true,
+                  protected: false,
+                  rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+                  rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
+                  shouldBeDestroyed: false,
+                },
+              ],
+            },
+          ],
+          csrfToken: 'fakeToken',
+        },
       });
     });
 
     it('Should render a table', () => {
-      expect(vm.$el.getAttribute('class')).toContain('table-holder');
+      expect(wrapper.classes('table-holder')).toBe(true);
     });
 
     it('Should render rows', () => {
-      expect(vm.$el.querySelector('.gl-responsive-table-row')).not.toBeNull();
+      expect(wrapper.find('.gl-responsive-table-row').exists()).toBe(true);
+    });
+
+    it('should render an ID column', () => {
+      expect(wrapper.find('.js-feature-flag-id').exists()).toBe(true);
+      expect(trimText(wrapper.find('.js-feature-flag-id').text())).toEqual('^1');
     });
 
     it('Should render a status column', () => {
-      expect(vm.$el.querySelector('.js-feature-flag-status')).not.toBeNull();
-      expect(trimText(vm.$el.querySelector('.js-feature-flag-status').textContent)).toEqual(
-        'Active',
-      );
+      expect(wrapper.find('.js-feature-flag-status').exists()).toBe(true);
+      expect(trimText(wrapper.find('.js-feature-flag-status').text())).toEqual('Active');
     });
 
     it('Should render a feature flag column', () => {
-      expect(vm.$el.querySelector('.js-feature-flag-title')).not.toBeNull();
-      expect(trimText(vm.$el.querySelector('.feature-flag-name').textContent)).toEqual('flag name');
-      expect(trimText(vm.$el.querySelector('.feature-flag-description').textContent)).toEqual(
+      expect(wrapper.find('.js-feature-flag-title').exists()).toBe(true);
+      expect(trimText(wrapper.find('.feature-flag-name').text())).toEqual('flag name');
+
+      expect(trimText(wrapper.find('.feature-flag-description').text())).toEqual(
         'flag description',
       );
     });
 
     it('should render an environments specs column', () => {
-      const envColumn = vm.$el.querySelector('.js-feature-flag-environments');
+      const envColumn = wrapper.find('.js-feature-flag-environments');
 
       expect(envColumn).toBeDefined();
-      expect(trimText(envColumn.textContent)).toBe('scope');
+      expect(trimText(envColumn.text())).toBe('scope');
     });
 
     it('should render an environments specs badge with active class', () => {
-      const envColumn = vm.$el.querySelector('.js-feature-flag-environments');
+      const envColumn = wrapper.find('.js-feature-flag-environments');
 
-      expect(trimText(envColumn.querySelector('.badge-active').textContent)).toBe('scope');
+      expect(trimText(envColumn.find('.badge-active').text())).toBe('scope');
     });
 
     it('should render an actions column', () => {
-      expect(vm.$el.querySelector('.table-action-buttons')).not.toBeNull();
-      expect(vm.$el.querySelector('.js-feature-flag-delete-button')).not.toBeNull();
-      expect(vm.$el.querySelector('.js-feature-flag-edit-button')).not.toBeNull();
-      expect(vm.$el.querySelector('.js-feature-flag-edit-button').getAttribute('href')).toEqual(
-        'edit/path',
-      );
+      expect(wrapper.find('.table-action-buttons').exists()).toBe(true);
+      expect(wrapper.find('.js-feature-flag-delete-button').exists()).toBe(true);
+      expect(wrapper.find('.js-feature-flag-edit-button').exists()).toBe(true);
+      expect(wrapper.find('.js-feature-flag-edit-button').attributes('href')).toEqual('edit/path');
     });
   });
 
   describe('with an active scope and a percentage rollout strategy', () => {
     beforeEach(() => {
-      Component = Vue.extend(featureFlagsTableComponent);
+      Component = localVue.extend(featureFlagsTableComponent);
 
-      vm = mountComponent(Component, {
-        featureFlags: [
-          {
-            id: 1,
-            active: true,
-            name: 'flag name',
-            description: 'flag description',
-            destroy_path: 'destroy/path',
-            edit_path: 'edit/path',
-            scopes: [
-              {
-                id: 1,
-                active: true,
-                environmentScope: 'scope',
-                canUpdate: true,
-                protected: false,
-                rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-                rolloutPercentage: '54',
-                shouldBeDestroyed: false,
-              },
-            ],
-          },
-        ],
-        csrfToken: 'fakeToken',
+      wrapper = shallowMount(Component, {
+        localVue,
+        propsData: {
+          featureFlags: [
+            {
+              id: 1,
+              active: true,
+              name: 'flag name',
+              description: 'flag description',
+              destroy_path: 'destroy/path',
+              edit_path: 'edit/path',
+              scopes: [
+                {
+                  id: 1,
+                  active: true,
+                  environmentScope: 'scope',
+                  canUpdate: true,
+                  protected: false,
+                  rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+                  rolloutPercentage: '54',
+                  shouldBeDestroyed: false,
+                },
+              ],
+            },
+          ],
+          csrfToken: 'fakeToken',
+        },
       });
     });
 
     it('should render an environments specs badge with percentage', () => {
-      const envColumn = vm.$el.querySelector('.js-feature-flag-environments');
+      const envColumn = wrapper.find('.js-feature-flag-environments');
 
-      expect(trimText(envColumn.querySelector('.badge').textContent)).toBe('scope: 54%');
+      expect(trimText(envColumn.find('.badge').text())).toBe('scope: 54%');
     });
   });
 
   describe('with an inactive scope', () => {
     beforeEach(() => {
-      Component = Vue.extend(featureFlagsTableComponent);
+      Component = localVue.extend(featureFlagsTableComponent);
 
-      vm = mountComponent(Component, {
-        featureFlags: [
-          {
-            id: 1,
-            active: true,
-            name: 'flag name',
-            description: 'flag description',
-            destroy_path: 'destroy/path',
-            edit_path: 'edit/path',
-            scopes: [
-              {
-                id: 1,
-                active: false,
-                environmentScope: 'scope',
-                canUpdate: true,
-                protected: false,
-                rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
-                rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-                shouldBeDestroyed: false,
-              },
-            ],
-          },
-        ],
-        csrfToken: 'fakeToken',
+      wrapper = shallowMount(Component, {
+        localVue,
+        propsData: {
+          featureFlags: [
+            {
+              id: 1,
+              active: true,
+              name: 'flag name',
+              description: 'flag description',
+              destroy_path: 'destroy/path',
+              edit_path: 'edit/path',
+              scopes: [
+                {
+                  id: 1,
+                  active: false,
+                  environmentScope: 'scope',
+                  canUpdate: true,
+                  protected: false,
+                  rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+                  rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
+                  shouldBeDestroyed: false,
+                },
+              ],
+            },
+          ],
+          csrfToken: 'fakeToken',
+        },
       });
     });
 
     it('should render an environments specs badge with inactive class', () => {
-      const envColumn = vm.$el.querySelector('.js-feature-flag-environments');
+      const envColumn = wrapper.find('.js-feature-flag-environments');
 
-      expect(trimText(envColumn.querySelector('.badge-inactive').textContent)).toBe('scope');
+      expect(trimText(envColumn.find('.badge-inactive').text())).toBe('scope');
     });
   });
 });

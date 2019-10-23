@@ -28,6 +28,11 @@ describe('Edit feature flag form', () => {
         path: '/feature_flags',
         environmentsEndpoint: 'environments.json',
       },
+      provide: {
+        glFeatures: {
+          featureFlagIID: true,
+        },
+      },
       store,
       sync: false,
     });
@@ -38,6 +43,7 @@ describe('Edit feature flag form', () => {
 
     mock.onGet(`${TEST_HOST}/feature_flags.json'`).replyOnce(200, {
       id: 21,
+      iid: 5,
       active: false,
       created_at: '2019-01-17T17:27:39.778Z',
       updated_at: '2019-01-17T17:27:39.778Z',
@@ -64,6 +70,14 @@ describe('Edit feature flag form', () => {
     mock.restore();
   });
 
+  it('should display the iid', done => {
+    setTimeout(() => {
+      expect(wrapper.find('h3').text()).toContain('^5');
+
+      done();
+    });
+  });
+
   describe('with error', () => {
     it('should render the error', done => {
       setTimeout(() => {
@@ -81,7 +95,7 @@ describe('Edit feature flag form', () => {
   describe('without error', () => {
     it('renders form title', done => {
       setTimeout(() => {
-        expect(wrapper.text()).toContain('Edit feature_flag');
+        expect(wrapper.text()).toContain('^5 feature_flag');
         done();
       }, 0);
     });

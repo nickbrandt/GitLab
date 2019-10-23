@@ -2,6 +2,7 @@
 import { GlLoadingIcon } from '@gitlab/ui';
 import { createNamespacedHelpers } from 'vuex';
 import { sprintf, s__ } from '~/locale';
+import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import store from '../store/index';
 import FeatureFlagForm from './form.vue';
 
@@ -13,6 +14,7 @@ export default {
     GlLoadingIcon,
     FeatureFlagForm,
   },
+  mixins: [glFeatureFlagMixin()],
   props: {
     endpoint: {
       type: String,
@@ -28,9 +30,14 @@ export default {
     },
   },
   computed: {
-    ...mapState(['error', 'name', 'description', 'scopes', 'isLoading', 'hasError']),
+    ...mapState(['error', 'name', 'description', 'scopes', 'isLoading', 'hasError', 'iid']),
     title() {
-      return sprintf(s__('Edit %{name}'), { name: this.name });
+      return this.hasFeatureFlagsIID
+        ? `^${this.iid} ${this.name}`
+        : sprintf(s__('Edit %{name}'), { name: this.name });
+    },
+    hasFeatureFlagsIID() {
+      return this.glFeatures.featureFlagIID && this.iid;
     },
   },
   created() {
