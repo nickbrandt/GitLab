@@ -296,6 +296,7 @@ class SessionsController < Devise::SessionsController
   end
 
   def frontend_tracking_data
+    # We want tracking data pushed to the frontend when the user is _in_ the control group
     frontend_experimentation_tracking_data(:signup_flow, 'start') unless experiment_enabled?(:signup_flow)
   end
 end

@@ -47,17 +47,15 @@ module Gitlab
       end
 
       def track_experiment_event(experiment_key, action)
-        return unless Experimentation.enabled?(experiment_key)
-
-        tracking_data = experimentation_tracking_data(experiment_key, action)
-        ::Gitlab::Tracking.event(tracking_data.delete(:category), tracking_data.delete(:action), tracking_data)
+        track_experiment_event_for(experiment_key, action) do |tracking_data|
+          ::Gitlab::Tracking.event(tracking_data.delete(:category), tracking_data.delete(:action), tracking_data)
+        end
       end
 
       def frontend_experimentation_tracking_data(experiment_key, action)
-        return unless Experimentation.enabled?(experiment_key)
-
-        tracking_data = experimentation_tracking_data(experiment_key, action)
-        gon.push(tracking_data: tracking_data)
+        track_experiment_event_for(experiment_key, action) do |tracking_data|
+          gon.push(tracking_data: tracking_data)
+        end
       end
 
       private
@@ -70,6 +68,12 @@ module Gitlab
         return if experimentation_subject_id.blank?
 
         experimentation_subject_id.delete('-').hex % 100
+      end
+
+      def track_experiment_event_for(experiment_key, action)
+        return unless Experimentation.enabled?(experiment_key)
+
+        yield experimentation_tracking_data(experiment_key, action)
       end
 
       def experimentation_tracking_data(experiment_key, action)
