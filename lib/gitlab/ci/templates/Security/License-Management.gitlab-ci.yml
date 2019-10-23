@@ -1,0 +1,4 @@
+license_management:
+  include:
+    - template: Security/License-Management.gitlab-ci.yml
+

@@ -7,7 +7,7 @@
 variables:
   LICENSE_MANAGEMENT_SETUP_CMD: ''  # If needed, specify a command to setup your environment with a custom package manager.
 
-license_management:
+license_scanning:
   stage: test
   image:
     name: "registry.gitlab.com/gitlab-org/security-products/license-management:$CI_SERVER_VERSION_MAJOR-$CI_SERVER_VERSION_MINOR-stable"
@@ -19,7 +19,7 @@ license_management:
     - /run.sh analyze .
   artifacts:
     reports:
-      license_management: gl-license-management-report.json
+      license_scanning: gl-license-management-report.json
   dependencies: []
   only:
     refs:
