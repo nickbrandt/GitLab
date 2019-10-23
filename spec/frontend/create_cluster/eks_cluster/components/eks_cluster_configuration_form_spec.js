@@ -4,7 +4,6 @@ import Vue from 'vue';
 import { GlFormCheckbox } from '@gitlab/ui';
 
 import EksClusterConfigurationForm from '~/create_cluster/eks_cluster/components/eks_cluster_configuration_form.vue';
-import RegionDropdown from '~/create_cluster/eks_cluster/components/region_dropdown.vue';
 import eksClusterFormState from '~/create_cluster/eks_cluster/store/state';
 import clusterDropdownStoreState from '~/create_cluster/eks_cluster/store/cluster_dropdown/state';
 
@@ -124,6 +123,7 @@ describe('EksClusterConfigurationForm', () => {
       propsData: {
         gitlabManagedClusterHelpPath: '',
         kubernetesIntegrationHelpPath: '',
+        externalLinkIcon: '',
       },
     });
   });
@@ -135,7 +135,7 @@ describe('EksClusterConfigurationForm', () => {
   const findClusterNameInput = () => vm.find('[id=eks-cluster-name]');
   const findEnvironmentScopeInput = () => vm.find('[id=eks-environment-scope]');
   const findKubernetesVersionDropdown = () => vm.find('[field-id="eks-kubernetes-version"]');
-  const findRegionDropdown = () => vm.find(RegionDropdown);
+  const findRegionDropdown = () => vm.find('[field-id="eks-region"]');
   const findKeyPairDropdown = () => vm.find('[field-id="eks-key-pair"]');
   const findVpcDropdown = () => vm.find('[field-id="eks-vpc"]');
   const findSubnetDropdown = () => vm.find('[field-id="eks-subnet"]');
@@ -180,11 +180,13 @@ describe('EksClusterConfigurationForm', () => {
   });
 
   it('sets regions to RegionDropdown regions property', () => {
-    expect(findRegionDropdown().props('regions')).toBe(regionsState.items);
+    expect(findRegionDropdown().props('items')).toBe(regionsState.items);
   });
 
   it('sets loadingRegionsError to RegionDropdown error property', () => {
-    expect(findRegionDropdown().props('error')).toBe(regionsState.loadingItemsError);
+    regionsState.loadingItemsError = new Error();
+
+    expect(findRegionDropdown().props('hasErrors')).toEqual(true);
   });
 
   it('disables KeyPairDropdown when no region is selected', () => {
