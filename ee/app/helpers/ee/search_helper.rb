@@ -35,11 +35,11 @@ module EE
     end
 
     override :search_blob_title
-    def search_blob_title(project, file_name)
+    def search_blob_title(project, path)
       if @project
-        file_name
+        path
       else
-        (project.full_name + ': ' + content_tag(:i, file_name)).html_safe
+        (project.full_name + ': ' + content_tag(:i, path)).html_safe
       end
     end
 
