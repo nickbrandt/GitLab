@@ -77,7 +77,7 @@ export default {
       </template>
       <template v-if="helpContent.exitTour">
         <gl-button class="btn btn-sm btn-primary mr-2" @click="callExitTour">
-          {{ s__("UserOnboardingTour|Close 'Learn GitLab'") }}
+          {{ helpContent.buttonText }}
         </gl-button>
       </template>
       <template v-if="helpContent.feedbackButtons">
