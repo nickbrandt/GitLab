@@ -139,7 +139,7 @@ describe Projects::Serverless::FunctionsController do
         include_examples 'GET #show with valid data'
       end
 
-      context 'on Knative 0.6 or 0.7' do
+      context 'on Knative 0.6' do
         before do
           stub_kubeclient_service_pods
           stub_reactive_cache(knative_services_finder,
@@ -148,6 +148,14 @@ describe Projects::Serverless::FunctionsController do
               pods: kube_knative_pods_body(cluster.project.name, namespace.namespace)["items"]
             },
             *knative_services_finder.cache_args)
+        end
+
+        include_examples 'GET #show with valid data'
+      end
+
+      context 'on Knative 0.7' do
+        before do
+          prepare_knative_stubs('0.7.0', namespace: namespace.namespace, name: cluster.project.name)
         end
 
         include_examples 'GET #show with valid data'
@@ -207,7 +215,7 @@ describe Projects::Serverless::FunctionsController do
       include_examples 'GET #index with data'
     end
 
-    context 'on Knative 0.6 or 0.7' do
+    context 'on Knative 0.6' do
       before do
         stub_kubeclient_service_pods
         stub_reactive_cache(knative_services_finder,
@@ -220,5 +228,29 @@ describe Projects::Serverless::FunctionsController do
 
       include_examples 'GET #index with data'
     end
+
+    context 'on Knative 0.7' do
+      before do
+        prepare_knative_stubs('0.7.0', namespace: namespace.namespace, name: cluster.project.name)
+      end
+
+      include_examples 'GET #index with data'
+    end
+  end
+
+  def prepare_knative_stubs(version, options)
+    knative_service =
+      case version
+      when '0.7.0'
+        knative_07_service(options)
+      end
+
+    stub_kubeclient_service_pods
+    stub_reactive_cache(knative_services_finder,
+                        {
+                          services: [knative_service],
+                          pods: kube_knative_pods_body(cluster.project.name, namespace.namespace)["items"]
+                        },
+                        *knative_services_finder.cache_args)
   end
 end
