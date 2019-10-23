@@ -95,9 +95,9 @@ configure production cluster:
     name: production
 ```
 
-## Disabling this feature
+## Enabling this feature
 
-This feature is enabled by default. To disable this feature, disable the
+This feature is disabled by default. To enable this feature, enable the
 feature flag `:cluster_management_project`.
 
 To check if the feature flag is enabled on your GitLab instance,
