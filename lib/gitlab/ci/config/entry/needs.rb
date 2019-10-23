@@ -22,7 +22,7 @@ module Gitlab
             validate on: :composed do
               extra_keys = value.keys - opt(:allowed_needs)
               if extra_keys.any?
-                errors.add(:config, "uses #{extra_keys.join(', ')} type(s)")
+                errors.add(:config, "uses invalid types: #{extra_keys.join(', ')}")
               end
             end
           end

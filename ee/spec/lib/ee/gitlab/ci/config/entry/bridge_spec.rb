@@ -199,7 +199,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#errors' do
         it 'returns an error about too many bridge needs' do
-          expect(subject.errors).to contain_exactly('bridge config should contain exactly one bridge need')
+          expect(subject.errors).to contain_exactly('bridge config should contain at most one bridge need')
         end
       end
     end

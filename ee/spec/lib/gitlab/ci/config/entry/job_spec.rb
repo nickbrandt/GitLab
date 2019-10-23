@@ -23,7 +23,7 @@ describe Gitlab::Ci::Config::Entry::Job do
 
           it 'returns error about invalid needs type' do
             expect(entry).not_to be_valid
-            expect(entry.errors).to contain_exactly('needs config uses bridge type(s)')
+            expect(entry.errors).to contain_exactly('needs config uses invalid types: bridge')
           end
         end
       end

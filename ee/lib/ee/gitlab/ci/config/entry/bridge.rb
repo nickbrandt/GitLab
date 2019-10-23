@@ -38,10 +38,9 @@ module EE
 
               validate on: :composed do
                 next unless bridge_needs.present?
+                next if bridge_needs.one?
 
-                unless bridge_needs.one?
-                  errors.add(:config, 'should contain exactly one bridge need')
-                end
+                errors.add(:config, 'should contain at most one bridge need')
               end
             end
 
