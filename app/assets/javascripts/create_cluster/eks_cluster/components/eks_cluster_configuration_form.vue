@@ -4,7 +4,6 @@ import { sprintf, s__ } from '~/locale';
 import _ from 'underscore';
 import { GlFormInput, GlFormCheckbox } from '@gitlab/ui';
 import ClusterFormDropdown from './cluster_form_dropdown.vue';
-import RegionDropdown from './region_dropdown.vue';
 import { KUBERNETES_VERSIONS } from '../constants';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
@@ -31,7 +30,6 @@ const {
 export default {
   components: {
     ClusterFormDropdown,
-    RegionDropdown,
     GlFormInput,
     GlFormCheckbox,
     LoadingButton,
@@ -42,6 +40,10 @@ export default {
       required: true,
     },
     kubernetesIntegrationHelpPath: {
+      type: String,
+      required: true,
+    },
+    externalLinkIcon: {
       type: String,
       required: true,
     },
@@ -150,11 +152,26 @@ export default {
     roleDropdownHelpText() {
       return sprintf(
         s__(
-          'ClusterIntegration|Select the IAM Role to allow Amazon EKS and the Kubernetes control plane to manage AWS resources on your behalf. To use a new role name, first create one on %{startLink}Amazon Web Services%{endLink}.',
+          'ClusterIntegration|Select the IAM Role to allow Amazon EKS and the Kubernetes control plane to manage AWS resources on your behalf. To use a new role name, first create one on %{startLink}Amazon Web Services %{externalLinkIcon} %{endLink}.',
         ),
         {
           startLink:
             '<a href="https://console.aws.amazon.com/iam/home?#roles" target="_blank" rel="noopener noreferrer">',
+          externalLinkIcon: this.externalLinkIcon,
+          endLink: '</a>',
+        },
+        false,
+      );
+    },
+    regionsDropdownHelpText() {
+      return sprintf(
+        s__(
+          'ClusterIntegration|Learn more about %{startLink}Regions %{externalLinkIcon}%{endLink}.',
+        ),
+        {
+          startLink:
+            '<a href="https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/" target="_blank" rel="noopener noreferrer">',
+          externalLinkIcon: this.externalLinkIcon,
           endLink: '</a>',
         },
         false,
@@ -163,11 +180,12 @@ export default {
     keyPairDropdownHelpText() {
       return sprintf(
         s__(
-          'ClusterIntegration|Select the key pair name that will be used to create EC2 nodes. To use a new key pair name, first create one on %{startLink}Amazon Web Services%{endLink}.',
+          'ClusterIntegration|Select the key pair name that will be used to create EC2 nodes. To use a new key pair name, first create one on %{startLink}Amazon Web Services %{externalLinkIcon} %{endLink}.',
         ),
         {
           startLink:
             '<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair" target="_blank" rel="noopener noreferrer">',
+          externalLinkIcon: this.externalLinkIcon,
           endLink: '</a>',
         },
         false,
@@ -176,11 +194,12 @@ export default {
     vpcDropdownHelpText() {
       return sprintf(
         s__(
-          'ClusterIntegration|Select a VPC to use for your EKS Cluster resources. To use a new VPC, first create one on %{startLink}Amazon Web Services%{endLink}.',
+          'ClusterIntegration|Select a VPC to use for your EKS Cluster resources. To use a new VPC, first create one on %{startLink}Amazon Web Services %{externalLinkIcon} %{endLink}.',
         ),
         {
           startLink:
             '<a href="https://console.aws.amazon.com/vpc/home?#vpc" target="_blank" rel="noopener noreferrer">',
+          externalLinkIcon: this.externalLinkIcon,
           endLink: '</a>',
         },
         false,
@@ -189,11 +208,12 @@ export default {
     subnetDropdownHelpText() {
       return sprintf(
         s__(
-          'ClusterIntegration|Choose the %{startLink}subnets%{endLink} in your VPC where your worker nodes will run.',
+          'ClusterIntegration|Choose the %{startLink}subnets %{externalLinkIcon} %{endLink} in your VPC where your worker nodes will run.',
         ),
         {
           startLink:
             '<a href="https://console.aws.amazon.com/vpc/home?#subnets" target="_blank" rel="noopener noreferrer">',
+          externalLinkIcon: this.externalLinkIcon,
           endLink: '</a>',
         },
         false,
@@ -202,11 +222,12 @@ export default {
     securityGroupDropdownHelpText() {
       return sprintf(
         s__(
-          'ClusterIntegration|Choose the %{startLink}security groups%{endLink} to apply to the EKS-managed Elastic Network Interfaces that are created in your worker node subnets.',
+          'ClusterIntegration|Choose the %{startLink}security groups %{externalLinkIcon} %{endLink} to apply to the EKS-managed Elastic Network Interfaces that are created in your worker node subnets.',
         ),
         {
           startLink:
             '<a href="https://console.aws.amazon.com/vpc/home?#securityGroups" target="_blank" rel="noopener noreferrer">',
+          externalLinkIcon: this.externalLinkIcon,
           endLink: '</a>',
         },
         false,
@@ -354,13 +375,21 @@ export default {
     </div>
     <div class="form-group">
       <label class="label-bold" for="eks-role">{{ s__('ClusterIntegration|Region') }}</label>
-      <region-dropdown
-        :value="selectedRegion"
-        :regions="regions"
-        :error="loadingRegionsError"
+      <cluster-form-dropdown
+        field-id="eks-region"
+        field-name="eks-region"
+        :input="selectedRegion"
+        :items="regions"
         :loading="isLoadingRegions"
+        :loading-text="s__('ClusterIntegration|Loading Regions')"
+        :placeholder="s__('ClusterIntergation|Select a region')"
+        :search-field-placeholder="s__('ClusterIntegration|Search regions')"
+        :empty-text="s__('ClusterIntegration|No region found')"
+        :has-errors="Boolean(loadingRegionsError)"
+        :error-message="s__('ClusterIntegration|Could not load regions from your AWS account')"
         @input="setRegionAndFetchVpcsAndKeyPairs($event)"
       />
+      <p class="form-text text-muted" v-html="regionsDropdownHelpText"></p>
     </div>
     <div class="form-group">
       <label class="label-bold" for="eks-key-pair">{{
