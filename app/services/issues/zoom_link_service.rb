@@ -61,8 +61,7 @@ module Issues
     end
 
     def remove_zoom_meeting
-      @added_meeting.issue_status = :removed
-      @added_meeting.save
+      @added_meeting.update(issue_status: :removed)
       track_meeting_removed_event
       issue.zoom_meetings
     end

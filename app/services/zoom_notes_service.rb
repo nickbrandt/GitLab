@@ -21,8 +21,7 @@ class ZoomNotesService
   private
 
   def zoom_link_added?
-    meetings = @issue.zoom_meetings.select { |z| z.issue_status == "added" }
-    !meetings.empty?
+    @issue.zoom_meetings.any? { |z| z.issue_status == "added" }
   end
 
   def zoom_link_added_notification
