@@ -65,6 +65,7 @@ class Issue < ApplicationRecord
 
   scope :public_only, -> { where(confidential: false) }
   scope :confidential_only, -> { where(confidential: true) }
+  scope :with_zoom_meetings, -> { joins(:zoom_meetings) }
 
   after_commit :expire_etag_cache
   after_save :ensure_metrics, unless: :imported?
