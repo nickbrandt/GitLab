@@ -321,7 +321,7 @@ describe Epics::UpdateDatesService do
             expect(epic.due_date_sourcing_epic).to be_nil
           end
 
-          context "when epic dates are propagated upwards" do
+          context "when epic dates are propagated upwards", :sidekiq_inline do
             let(:top_level_parent_epic) { create(:epic, group: group) }
             let(:parent_epic) { create(:epic, group: group, parent: top_level_parent_epic) }
 
