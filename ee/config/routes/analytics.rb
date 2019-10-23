@@ -2,6 +2,7 @@
 
 namespace :analytics do
   root to: 'analytics#index'
+  get 'operations' => 'analytics#operations'
 
   constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG)) do
     resource :productivity_analytics, only: :show
