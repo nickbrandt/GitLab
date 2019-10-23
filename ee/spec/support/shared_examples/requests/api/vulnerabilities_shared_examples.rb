@@ -127,7 +127,7 @@ shared_examples 'getting list of vulnerability findings' do
 
         # occurrences are implicitly sorted by Security::MergeReportsService,
         # occurrences order differs from what is present in fixture file
-        expect(json_response.first['name']).to eq 'Consider possible security implications associated with Popen module.'
+        expect(json_response.first['name']).to eq 'ECB mode is insecure'
       end
 
       it 'returns vulnerabilities with dependency_scanning report_type' do

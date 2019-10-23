@@ -41,7 +41,7 @@ module Security
         occurrences.concat(filtered_occurrences)
       end
 
-      occurrences.sort_by { |x| [x.severity, x.confidence] }
+      occurrences.sort_by { |x| [-x.severity_value, -x.confidence_value] }
     end
 
     private

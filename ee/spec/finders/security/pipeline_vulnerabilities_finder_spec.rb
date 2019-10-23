@@ -54,15 +54,24 @@ describe Security::PipelineVulnerabilitiesFinder do
 
     context 'by order' do
       let(:params) { { report_type: %w[sast] } }
-      let!(:occurrence1) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:high],   severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:high]) }
-      let!(:occurrence2) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:medium], severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:critical]) }
-      let!(:occurrence3) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:high],   severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:critical]) }
-      let!(:res) { [occurrence3, occurrence2, occurrence1] }
+      let!(:high_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :high) }
+      let!(:critical_medium) { build(:vulnerabilities_occurrence, confidence: :medium, severity: :critical) }
+      let!(:critical_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :critical) }
+      let!(:unknown_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :unknown) }
+      let!(:unknown_medium) { build(:vulnerabilities_occurrence, confidence: :medium, severity: :unknown) }
+      let!(:unknown_low) { build(:vulnerabilities_occurrence, confidence: :low, severity: :unknown) }
 
       it 'orders by severity and confidence' do
-        allow_any_instance_of(described_class).to receive(:filter).and_return(res)
+        allow_any_instance_of(described_class).to receive(:filter).and_return([
+               unknown_low,
+               unknown_medium,
+               critical_high,
+               unknown_high,
+               critical_medium,
+               high_high
+        ])
 
-        expect(subject).to eq([occurrence3, occurrence2, occurrence1])
+        expect(subject).to eq([critical_high, critical_medium, high_high, unknown_high, unknown_medium, unknown_low])
       end
     end
 
