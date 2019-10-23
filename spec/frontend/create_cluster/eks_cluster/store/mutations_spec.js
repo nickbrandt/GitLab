@@ -12,6 +12,7 @@ import {
   REQUEST_CREATE_ROLE,
   CREATE_ROLE_SUCCESS,
   CREATE_ROLE_ERROR,
+  SIGN_OUT,
 } from '~/create_cluster/eks_cluster/store/mutation_types';
 import createState from '~/create_cluster/eks_cluster/store/state';
 import mutations from '~/create_cluster/eks_cluster/store/mutations';
@@ -112,6 +113,17 @@ describe('Create EKS cluster store mutations', () => {
 
     it('sets createRoleError to the error object', () => {
       expect(state.createRoleError).toBe(error);
+    });
+
+    it('sets hasCredentials to false', () => {
+      expect(state.hasCredentials).toBe(false);
+    });
+  });
+
+  describe(`mutation ${SIGN_OUT}`, () => {
+    beforeEach(() => {
+      state.hasCredentials = true;
+      mutations[SIGN_OUT](state);
     });
 
     it('sets hasCredentials to false', () => {

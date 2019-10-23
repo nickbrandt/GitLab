@@ -16,6 +16,7 @@ import {
   REQUEST_CREATE_ROLE,
   CREATE_ROLE_SUCCESS,
   CREATE_ROLE_ERROR,
+  SIGN_OUT,
 } from '~/create_cluster/eks_cluster/store/mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
@@ -49,6 +50,7 @@ describe('EKS Cluster Store Actions', () => {
     state = {
       ...createState(),
       createRolePath: '/clusters/roles/',
+      signOutPath: '/aws/signout',
     };
   });
 
@@ -147,6 +149,16 @@ describe('EKS Cluster Store Actions', () => {
       };
 
       testAction(actions.createRoleError, payload, state, [{ type: CREATE_ROLE_ERROR, payload }]);
+    });
+  });
+
+  describe('signOut', () => {
+    beforeEach(() => {
+      mock.onDelete(apiPaths.signOutPath).reply(201);
+    });
+
+    it('commits signOut mutation', () => {
+      testAction(actions.signOut, null, createState(), [{ type: SIGN_OUT }]);
     });
   });
 });

@@ -1,5 +1,8 @@
 import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
+import createFlash from '~/flash';
+
+const getErrorMessage = data => data.base[0];
 
 export const setClusterName = ({ commit }, payload) => {
   commit(types.SET_CLUSTER_NAME, payload);
@@ -63,4 +66,11 @@ export const setSecurityGroup = ({ commit }, payload) => {
 
 export const setGitlabManagedCluster = ({ commit }, payload) => {
   commit(types.SET_GITLAB_MANAGED_CLUSTER, payload);
+};
+
+export const signOut = ({ commit, state: { signOutPath }) => {
+    return axios
+    .delete(signOutPath)
+    .then(() => commit(types.SIGN_OUT))
+    .catch(({ response: { data } }) => createFlash(getErrorMessage(data)));
 };

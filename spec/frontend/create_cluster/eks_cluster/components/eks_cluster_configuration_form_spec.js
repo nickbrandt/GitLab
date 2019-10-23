@@ -32,6 +32,7 @@ describe('EksClusterConfigurationForm', () => {
   beforeEach(() => {
     state = eksClusterFormState();
     actions = {
+      signOut: jest.fn(),
       setClusterName: jest.fn(),
       setEnvironmentScope: jest.fn(),
       setKubernetesVersion: jest.fn(),
@@ -132,6 +133,7 @@ describe('EksClusterConfigurationForm', () => {
     vm.destroy();
   });
 
+  const findSignOutButton = () => vm.find('.js-sign-out');
   const findClusterNameInput = () => vm.find('[id=eks-cluster-name]');
   const findEnvironmentScopeInput = () => vm.find('[id=eks-environment-scope]');
   const findKubernetesVersionDropdown = () => vm.find('[field-id="eks-kubernetes-version"]');
@@ -151,6 +153,11 @@ describe('EksClusterConfigurationForm', () => {
     it('fetches available roles', () => {
       expect(rolesActions.fetchItems).toHaveBeenCalled();
     });
+  });
+
+  it('dispatches sign out action when sign out button is clicked', () => {
+    findSignOutButton().trigger('click');
+    expect(actions.signOut).toHaveBeenCalled();
   });
 
   it('sets isLoadingRoles to RoleDropdown loading property', () => {

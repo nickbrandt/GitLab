@@ -46,4 +46,7 @@ export default {
     state.createRoleError = error;
     state.hasCredentials = false;
   },
+  [types.SIGN_OUT](state) {
+    state.hasCredentials = false;
+  },
 };
