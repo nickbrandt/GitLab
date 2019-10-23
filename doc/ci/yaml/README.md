@@ -2330,7 +2330,7 @@ trigger_job:
     strategy: depend
 ```
 
-It is possible to mirror the status from a upstream pipeline:
+It is possible to mirror the status from an upstream pipeline:
 
 ```
 upstream_bridge:
