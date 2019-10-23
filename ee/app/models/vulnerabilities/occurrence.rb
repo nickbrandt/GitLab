@@ -221,6 +221,14 @@ module Vulnerabilities
       report_type.hash ^ location.hash ^ first_fingerprint.hash
     end
 
+    def severity_value
+      self.class.severities[self.severity]
+    end
+
+    def confidence_value
+      self.class.confidences[self.confidence]
+    end
+
     protected
 
     def first_fingerprint
