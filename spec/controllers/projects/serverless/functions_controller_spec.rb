@@ -121,39 +121,23 @@ describe Projects::Serverless::FunctionsController do
         end
       end
 
-      context 'on Knative 0.5' do
+      context 'on Knative 0.5.0' do
         before do
-          stub_kubeclient_service_pods
-          stub_reactive_cache(knative_services_finder,
-                              {
-                                services: kube_knative_services_body(
-                                  legacy_knative: true,
-                                  namespace: namespace.namespace,
-                                  name: cluster.project.name
-                                )["items"],
-                                pods: kube_knative_pods_body(cluster.project.name, namespace.namespace)["items"]
-                              },
-                              *knative_services_finder.cache_args)
+          prepare_knative_stubs('0.5.0', namespace: namespace.namespace, name: cluster.project.name)
         end
 
         include_examples 'GET #show with valid data'
       end
 
-      context 'on Knative 0.6' do
+      context 'on Knative 0.6.0' do
         before do
-          stub_kubeclient_service_pods
-          stub_reactive_cache(knative_services_finder,
-            {
-              services: kube_knative_services_body(namespace: namespace.namespace, name: cluster.project.name)["items"],
-              pods: kube_knative_pods_body(cluster.project.name, namespace.namespace)["items"]
-            },
-            *knative_services_finder.cache_args)
+          prepare_knative_stubs('0.6.0', namespace: namespace.namespace, name: cluster.project.name)
         end
 
         include_examples 'GET #show with valid data'
       end
 
-      context 'on Knative 0.7' do
+      context 'on Knative 0.7.0' do
         before do
           prepare_knative_stubs('0.7.0', namespace: namespace.namespace, name: cluster.project.name)
         end
@@ -197,39 +181,23 @@ describe Projects::Serverless::FunctionsController do
       end
     end
 
-    context 'on Knative 0.5' do
+    context 'on Knative 0.5.0' do
       before do
-        stub_kubeclient_service_pods
-        stub_reactive_cache(knative_services_finder,
-                            {
-                              services: kube_knative_services_body(
-                                legacy_knative: true,
-                                namespace: namespace.namespace,
-                                name: cluster.project.name
-                              )["items"],
-                              pods: kube_knative_pods_body(cluster.project.name, namespace.namespace)["items"]
-                            },
-                            *knative_services_finder.cache_args)
+        prepare_knative_stubs('0.5.0', namespace: namespace.namespace, name: cluster.project.name)
       end
 
       include_examples 'GET #index with data'
     end
 
-    context 'on Knative 0.6' do
+    context 'on Knative 0.6.0' do
       before do
-        stub_kubeclient_service_pods
-        stub_reactive_cache(knative_services_finder,
-          {
-            services: kube_knative_services_body(namespace: namespace.namespace, name: cluster.project.name)["items"],
-            pods: kube_knative_pods_body(cluster.project.name, namespace.namespace)["items"]
-          },
-          *knative_services_finder.cache_args)
+        prepare_knative_stubs('0.6.0', namespace: namespace.namespace, name: cluster.project.name)
       end
 
       include_examples 'GET #index with data'
     end
 
-    context 'on Knative 0.7' do
+    context 'on Knative 0.7.0' do
       before do
         prepare_knative_stubs('0.7.0', namespace: namespace.namespace, name: cluster.project.name)
       end
@@ -243,6 +211,10 @@ describe Projects::Serverless::FunctionsController do
       case version
       when '0.7.0'
         knative_07_service(options)
+      when '0.6.0'
+        knative_06_service(options)
+      when '0.5.0'
+        knative_05_service(options)
       end
 
     stub_kubeclient_service_pods

@@ -322,7 +322,7 @@ module KubernetesHelpers
   def kube_knative_services_body(legacy_knative: false, **options)
     {
       "kind" => "List",
-      "items" => [legacy_knative ? knative_05_service(options) : kube_service(options)]
+      "items" => [legacy_knative ? knative_05_service(options) : knative_06_service(options)]
     }
   end
 
@@ -398,7 +398,8 @@ module KubernetesHelpers
     }
   end
 
-  def kube_service(name: "kubetest", namespace: "default", domain: "example.com")
+  # noinspection RubyStringKeysInHashInspection
+  def knative_06_service(name: "kubetest", namespace: "default", domain: "example.com")
     {
       "metadata" => {
         "creationTimestamp" => "2018-11-21T06:16:33Z",
@@ -474,6 +475,7 @@ module KubernetesHelpers
       "podcount" => 0 }
   end
 
+  # noinspection RubyStringKeysInHashInspection
   def knative_05_service(name: "kubetest", namespace: "default", domain: "example.com")
     {
       "metadata" => {
