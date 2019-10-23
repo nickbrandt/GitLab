@@ -3,10 +3,10 @@ import { GlButton } from '@gitlab/ui';
 
 import RelatedItemsTreeHeader from 'ee/related_items_tree/components/related_items_tree_header.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import DroplabDropdownButton from '~/vue_shared/components/droplab_dropdown_button.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { issuableTypesMap } from 'ee/related_issues/constants';
+import EpicActionsSplitButton from 'ee/related_items_tree/components/epic_actions_split_button.vue';
 
 import { mockParentItem, mockQueryResponse } from '../mock_data';
 
@@ -37,6 +37,9 @@ describe('RelatedItemsTree', () => {
   describe('RelatedItemsTreeHeader', () => {
     let wrapper;
 
+    const findAddIssuesButton = () => wrapper.find(GlButton);
+    const findEpicsSplitButton = () => wrapper.find(EpicActionsSplitButton);
+
     afterEach(() => {
       wrapper.destroy();
     });
@@ -53,34 +56,89 @@ describe('RelatedItemsTree', () => {
       });
     });
 
-    describe('methods', () => {
+    describe('epic actions split button', () => {
       beforeEach(() => {
         wrapper = createComponent();
       });
 
-      describe('handleActionClick', () => {
-        const issuableType = issuableTypesMap.Epic;
+      describe('showAddEpicForm event', () => {
+        let toggleAddItemForm;
 
-        it('calls `toggleAddItemForm` action when provided `id` param as value `0`', () => {
-          spyOn(wrapper.vm, 'toggleAddItemForm');
-
-          wrapper.vm.handleActionClick({
-            id: 0,
-            issuableType,
-          });
-
-          expect(wrapper.vm.toggleAddItemForm).toHaveBeenCalledWith({
-            issuableType,
-            toggleState: true,
+        beforeEach(() => {
+          toggleAddItemForm = jasmine.createSpy();
+          wrapper.vm.$store.hotUpdate({
+            actions: {
+              toggleAddItemForm,
+            },
           });
         });
 
-        it('calls `toggleCreateEpicForm` action when provided `id` param value is not `0`', () => {
-          spyOn(wrapper.vm, 'toggleCreateEpicForm');
+        it('dispatches toggleAddItemForm action', () => {
+          findEpicsSplitButton().vm.$emit('showAddEpicForm');
 
-          wrapper.vm.handleActionClick({ id: 1 });
+          expect(toggleAddItemForm).toHaveBeenCalled();
 
-          expect(wrapper.vm.toggleCreateEpicForm).toHaveBeenCalledWith({ toggleState: true });
+          const payload = toggleAddItemForm.calls.mostRecent().args[1];
+
+          expect(payload).toEqual({
+            issuableType: issuableTypesMap.EPIC,
+            toggleState: true,
+          });
+        });
+      });
+
+      describe('showCreateEpicForm event', () => {
+        let toggleCreateEpicForm;
+
+        beforeEach(() => {
+          toggleCreateEpicForm = jasmine.createSpy();
+          wrapper.vm.$store.hotUpdate({
+            actions: {
+              toggleCreateEpicForm,
+            },
+          });
+        });
+
+        it('dispatches toggleCreateEpicForm action', () => {
+          findEpicsSplitButton().vm.$emit('showCreateEpicForm');
+
+          expect(toggleCreateEpicForm).toHaveBeenCalled();
+
+          const payload = toggleCreateEpicForm.calls.mostRecent().args[1];
+
+          expect(payload).toEqual({ toggleState: true });
+        });
+      });
+    });
+
+    describe('add issues button', () => {
+      beforeEach(() => {
+        wrapper = createComponent();
+      });
+
+      describe('click event', () => {
+        let toggleAddItemForm;
+
+        beforeEach(() => {
+          toggleAddItemForm = jasmine.createSpy();
+          wrapper.vm.$store.hotUpdate({
+            actions: {
+              toggleAddItemForm,
+            },
+          });
+        });
+
+        it('dispatches toggleAddItemForm action', () => {
+          findAddIssuesButton().vm.$emit('click');
+
+          expect(toggleAddItemForm).toHaveBeenCalled();
+
+          const payload = toggleAddItemForm.calls.mostRecent().args[1];
+
+          expect(payload).toEqual({
+            issuableType: issuableTypesMap.ISSUE,
+            toggleState: true,
+          });
         });
       });
     });
@@ -115,11 +173,11 @@ describe('RelatedItemsTree', () => {
       });
 
       it('renders `Add an epic` dropdown button', () => {
-        expect(wrapper.find(DroplabDropdownButton).isVisible()).toBe(true);
+        expect(findEpicsSplitButton().isVisible()).toBe(true);
       });
 
       it('renders `Add an issue` dropdown button', () => {
-        const addIssueBtn = wrapper.find(GlButton);
+        const addIssueBtn = findAddIssuesButton();
 
         expect(addIssueBtn.isVisible()).toBe(true);
         expect(addIssueBtn.text()).toBe('Add an issue');
@@ -131,7 +189,7 @@ describe('RelatedItemsTree', () => {
         it('defaults to button', () => {
           wrapper = createComponent();
 
-          expect(wrapper.find(GlButton).exists()).toBe(true);
+          expect(findAddIssuesButton().exists()).toBe(true);
         });
 
         it('uses provided slot content', () => {
@@ -145,7 +203,7 @@ describe('RelatedItemsTree', () => {
             },
           });
 
-          expect(wrapper.find(GlButton).exists()).toBe(false);
+          expect(findAddIssuesButton().exists()).toBe(false);
           expect(wrapper.find(issueActions).exists()).toBe(true);
         });
       });
