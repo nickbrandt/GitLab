@@ -448,16 +448,16 @@ end
 # Gitaly GRPC protocol definitions
 gem 'gitaly', '~> 1.65.0'
 
-gem 'grpc', '~> 1.19.0'
+gem 'grpc', '~> 1.24.0'
 
-gem 'google-protobuf', '~> 3.7.1'
+gem 'google-protobuf', '~> 3.8.0'
 
 gem 'toml-rb', '~> 1.0.0', require: false
 
 # Feature toggles
-gem 'flipper', '~> 0.13.0'
-gem 'flipper-active_record', '~> 0.13.0'
-gem 'flipper-active_support_cache_store', '~> 0.13.0'
+gem 'flipper', '~> 0.17.1'
+gem 'flipper-active_record', '~> 0.17.1'
+gem 'flipper-active_support_cache_store', '~> 0.17.1'
 gem 'unleash', '~> 0.1.5'
 
 # Structured logging
@@ -469,3 +469,5 @@ gem 'gitlab-net-dns', '~> 0.9.1'
 
 # Countries list
 gem 'countries', '~> 3.0'
+
+gem 'retriable', '~> 3.1.2'

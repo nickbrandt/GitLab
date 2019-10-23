@@ -6,5 +6,6 @@ module GeoQueue
 
   included do
     queue_namespace :geo
+    feature_category :geo_replication
   end
 end

@@ -9,6 +9,7 @@ import {
   setHelpContentIndex,
   switchTourPart,
   setTourFeedback,
+  setDntExitTour,
   setExitTour,
   setDismissed,
 } from 'ee/onboarding/onboarding_helper/store/actions';
@@ -150,6 +151,21 @@ describe('User onboarding helper store actions', () => {
         tourFeedback,
         state,
         [{ type: types.SET_FEEDBACK, payload: tourFeedback }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setDntExitTour', () => {
+    it(`commits ${types.SET_DNT_EXIT_TOUR} mutation`, done => {
+      const dntExitTour = true;
+
+      testAction(
+        setDntExitTour,
+        dntExitTour,
+        state,
+        [{ type: types.SET_DNT_EXIT_TOUR, payload: dntExitTour }],
         [],
         done,
       );

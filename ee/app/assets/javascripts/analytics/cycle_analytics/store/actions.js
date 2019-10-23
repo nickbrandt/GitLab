@@ -1,11 +1,18 @@
 import dateFormat from 'dateformat';
 import axios from '~/lib/utils/axios_utils';
-import createFlash from '~/flash';
+import createFlash, { hideFlash } from '~/flash';
 import { __ } from '~/locale';
 import Api from '~/api';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { dateFormats } from '../../shared/constants';
+
+const removeError = () => {
+  const flashEl = document.querySelector('.flash-alert');
+  if (flashEl) {
+    hideFlash(flashEl);
+  }
+};
 
 export const setCycleAnalyticsDataEndpoint = ({ commit }, groupPath) =>
   commit(types.SET_CYCLE_ANALYTICS_DATA_ENDPOINT, groupPath);
@@ -58,6 +65,8 @@ export const receiveCycleAnalyticsDataSuccess = ({ state, commit, dispatch }, da
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS, data);
   const { stages = [] } = state;
   if (stages && stages.length) {
+    removeError();
+
     const { slug } = stages[0];
     dispatch('setStageDataEndpoint', slug);
     dispatch('fetchStageData');

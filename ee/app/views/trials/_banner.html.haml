@@ -1,0 +1,11 @@
+- return unless show_trial_banner?(namespace)
+.user-callout
+  .alert.bordered-box.landing.justify-content-start.pl-md-8
+    %button{ type:"button", class:"btn btn-default close", "data-dismiss":"alert", "aria-label": _("Close") }
+      = sprite_icon('close', size: 16)
+    .svg-container
+      = custom_icon('trial_activated_banner')
+    .user-callout-copy
+      %h4
+        = s_("BillingPlans|Congratulations, your new trial is activated")
+

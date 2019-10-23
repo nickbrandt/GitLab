@@ -12,4 +12,5 @@ export default () => ({
   createdProjectPath: '',
   exitTour: false,
   tourFeedback: false,
+  dntExitTour: false,
 });

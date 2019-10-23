@@ -14,7 +14,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
     )
   end
   scope :for_unmerged_merge_requests, -> (merge_requests = nil) do
-    query = joins(:merge_request).where.not(merge_requests: { state: 'merged' })
+    query = joins(:merge_request).where.not(merge_requests: { state_id: MergeRequest.available_states[:merged] })
 
     if merge_requests
       query.where(merge_request_id: merge_requests)

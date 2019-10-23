@@ -1,5 +1,0 @@
----
-title: Fix burndown negative count edge case
-merge_request: 18053
-author:
-type: fixed

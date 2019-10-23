@@ -1,5 +1,0 @@
----
-title: Reduce excessive GC on pull mirrors
-merge_request: 17931
-author:
-type: performance

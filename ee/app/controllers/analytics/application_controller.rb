@@ -8,7 +8,7 @@ class Analytics::ApplicationController < ApplicationController
   private
 
   def self.check_feature_flag(flag, *args)
-    before_action(*args) { render_404 unless Feature.enabled?(flag) }
+    before_action(*args) { render_404 unless Feature.enabled?(flag, default_enabled: Gitlab::Analytics.feature_enabled_by_default?(flag)) }
   end
 
   def self.increment_usage_counter(counter_klass, counter, *args)

@@ -62,6 +62,9 @@ msgstr ""
 msgid " or references (e.g. path/to/project!merge_request_id)"
 msgstr ""
 
+msgid "\"%{path}\" did not exist on \"%{ref}\""
+msgstr ""
+
 msgid "%d comment"
 msgid_plural "%d comments"
 msgstr[0] ""
@@ -250,6 +253,9 @@ msgstr ""
 msgid "%{firstLabel} +%{labelCount} more"
 msgstr ""
 
+msgid "%{from} to %{to}"
+msgstr ""
+
 msgid "%{gitlab_ci_yml} not found in this commit"
 msgstr ""
 
@@ -403,6 +409,9 @@ msgid "%{value} ms"
 msgstr ""
 
 msgid "%{verb} %{time_spent_value} spent time."
+msgstr ""
+
+msgid "&middot;"
 msgstr ""
 
 msgid "'%{level}' is not a valid visibility level"
@@ -683,7 +692,7 @@ msgstr ""
 msgid "A ready-to-go template for use with iOS Swift apps."
 msgstr ""
 
-msgid "A regular expression that will be used to find the test coverage output in the job trace. Leave blank to disable"
+msgid "A regular expression that will be used to find the test coverage output in the job log. Leave blank to disable"
 msgstr ""
 
 msgid "A secure token that identifies an external storage request."
@@ -917,6 +926,9 @@ msgid "Add additional text to appear in all email communications. %{character_li
 msgstr ""
 
 msgid "Add an SSH key"
+msgstr ""
+
+msgid "Add an existing issue to the epic."
 msgstr ""
 
 msgid "Add an issue"
@@ -1512,6 +1524,9 @@ msgstr ""
 msgid "An error occurred while fetching environments."
 msgstr ""
 
+msgid "An error occurred while fetching exposed artifacts."
+msgstr ""
+
 msgid "An error occurred while fetching folder content."
 msgstr ""
 
@@ -1774,6 +1789,9 @@ msgid "Applications"
 msgstr ""
 
 msgid "Applied"
+msgstr ""
+
+msgid "Apply"
 msgstr ""
 
 msgid "Apply a label"
@@ -2400,6 +2418,9 @@ msgstr ""
 msgid "BillingPlans|Learn more about each plan by reading our %{faq_link}, or start a free 30-day trial of GitLab.com Gold."
 msgstr ""
 
+msgid "BillingPlans|Learn more about each plan by reading our %{faq_link}."
+msgstr ""
+
 msgid "BillingPlans|Learn more about each plan by visiting our %{pricing_page_link}."
 msgstr ""
 
@@ -2952,7 +2973,7 @@ msgstr ""
 msgid "Chat"
 msgstr ""
 
-msgid "ChatMessage|%{project_link}: Pipeline %{pipeline_link} of %{ref_type} %{branch_link} by %{user_combined_name} %{humanized_status} in %{duration}"
+msgid "ChatMessage|%{project_link}: Pipeline %{pipeline_link} of %{ref_type} %{ref_link} by %{user_combined_name} %{humanized_status} in %{duration}"
 msgstr ""
 
 msgid "ChatMessage|Branch"
@@ -2973,7 +2994,7 @@ msgstr ""
 msgid "ChatMessage|Pipeline #%{pipeline_id} %{humanized_status} in %{duration}"
 msgstr ""
 
-msgid "ChatMessage|Pipeline %{pipeline_link} of %{ref_type} %{branch_link} by %{user_combined_name} %{humanized_status}"
+msgid "ChatMessage|Pipeline %{pipeline_link} of %{ref_type} %{ref_link} by %{user_combined_name} %{humanized_status}"
 msgstr ""
 
 msgid "ChatMessage|Tag"
@@ -3495,6 +3516,9 @@ msgstr ""
 msgid "ClusterIntegration|Copy Jupyter Hostname"
 msgstr ""
 
+msgid "ClusterIntegration|Copy Kibana Hostname"
+msgstr ""
+
 msgid "ClusterIntegration|Copy Knative Endpoint"
 msgstr ""
 
@@ -3538,6 +3562,9 @@ msgid "ClusterIntegration|Create new Cluster on GKE"
 msgstr ""
 
 msgid "ClusterIntegration|Did you know?"
+msgstr ""
+
+msgid "ClusterIntegration|Elastic Stack"
 msgstr ""
 
 msgid "ClusterIntegration|Enable Cloud Run on GKE (beta)"
@@ -3658,6 +3685,9 @@ msgid "ClusterIntegration|JupyterHub, a multi-user Hub, spawns, manages, and pro
 msgstr ""
 
 msgid "ClusterIntegration|Key pair name"
+msgstr ""
+
+msgid "ClusterIntegration|Kibana Hostname"
 msgstr ""
 
 msgid "ClusterIntegration|Knative"
@@ -3961,6 +3991,9 @@ msgid "ClusterIntegration|The associated load balancer and IP will be deleted an
 msgstr ""
 
 msgid "ClusterIntegration|The associated private key will be deleted and cannot be restored."
+msgstr ""
+
+msgid "ClusterIntegration|The elastic stack collects logs from all pods in your cluster"
 msgstr ""
 
 msgid "ClusterIntegration|The endpoint is in the process of being assigned. Please check your Kubernetes cluster or Quotas on Google Kubernetes Engine if it takes a long time."
@@ -4660,10 +4693,16 @@ msgstr ""
 msgid "Create a new issue"
 msgstr ""
 
+msgid "Create a new issue and add it to the epic."
+msgstr ""
+
 msgid "Create a new repository"
 msgstr ""
 
 msgid "Create a personal access token on your account to pull or push via %{protocol}."
+msgstr ""
+
+msgid "Create an issue"
 msgstr ""
 
 msgid "Create an issue. Issues are created for each alert triggered."
@@ -4853,6 +4892,9 @@ msgid "Custom project templates"
 msgstr ""
 
 msgid "Custom project templates have not been set up for groups that you are a member of. They are enabled from a group’s settings page. Contact your group’s Owner or Maintainer to setup custom project templates."
+msgstr ""
+
+msgid "Custom range"
 msgstr ""
 
 msgid "CustomCycleAnalytics|Add a stage"
@@ -6036,6 +6078,9 @@ msgstr ""
 msgid "Enable or disable version check and usage ping."
 msgstr ""
 
+msgid "Enable pendo tracking"
+msgstr ""
+
 msgid "Enable protected paths rate limit"
 msgstr ""
 
@@ -6090,13 +6135,13 @@ msgstr ""
 msgid "Ensure your %{linkStart}environment is part of the deploy stage%{linkEnd} of your CI pipeline to track deployments to your cluster."
 msgstr ""
 
+msgid "Enter Admin Mode"
+msgstr ""
+
 msgid "Enter IP address range"
 msgstr ""
 
 msgid "Enter a number"
-msgstr ""
-
-msgid "Enter admin mode"
 msgstr ""
 
 msgid "Enter at least three characters to search"
@@ -6831,6 +6876,9 @@ msgstr ""
 msgid "Failed to deploy to"
 msgstr ""
 
+msgid "Failed to enqueue the rebase operation, possibly due to a long-lived transaction. Try again later."
+msgstr ""
+
 msgid "Failed to get ref."
 msgstr ""
 
@@ -7331,6 +7379,9 @@ msgstr ""
 msgid "Format"
 msgstr ""
 
+msgid "Format: %{dateFormat}"
+msgstr ""
+
 msgid "Forward external support email address to"
 msgstr ""
 
@@ -7374,9 +7425,6 @@ msgid "From issue creation until deploy to production"
 msgstr ""
 
 msgid "From merge request merge until deploy to production"
-msgstr ""
-
-msgid "From milestones:"
 msgstr ""
 
 msgid "From the Kubernetes cluster details view, install Runner from the applications list"
@@ -7829,6 +7877,9 @@ msgstr ""
 msgid "Get started with performance monitoring"
 msgstr ""
 
+msgid "Get started!"
+msgstr ""
+
 msgid "Getting started with releases"
 msgstr ""
 
@@ -7905,6 +7956,9 @@ msgid "GitLab restart is required to apply changes"
 msgstr ""
 
 msgid "GitLab single sign on URL"
+msgstr ""
+
+msgid "GitLab uses %{jaeger_link} to monitor distributed systems."
 msgstr ""
 
 msgid "GitLab will run a background job that will produce pseudonymized CSVs of the GitLab database that will be uploaded to your configured object storage directory."
@@ -8908,6 +8962,9 @@ msgstr ""
 msgid "In order to gather accurate feature usage data, it can take 1 to 2 weeks to see your index."
 msgstr ""
 
+msgid "In order to tailor your experience with GitLab<br>we would like to know a bit more about you."
+msgstr ""
+
 msgid "In the next step, you'll be able to select the projects you want to import."
 msgstr ""
 
@@ -8960,6 +9017,9 @@ msgid "Inform users without uploaded SSH keys that they can't push over SSH unti
 msgstr ""
 
 msgid "Information about additional Pages templates and how to install them can be found in our %{pages_getting_started_guide}."
+msgstr ""
+
+msgid "Inherited:"
 msgstr ""
 
 msgid "Inline"
@@ -9321,7 +9381,7 @@ msgstr ""
 msgid "Job is stuck. Check runners."
 msgstr ""
 
-msgid "Job traces and artifacts"
+msgid "Job logs and artifacts"
 msgstr ""
 
 msgid "Job was retried"
@@ -9662,7 +9722,7 @@ msgstr ""
 msgid "Leave"
 msgstr ""
 
-msgid "Leave admin mode"
+msgid "Leave Admin Mode"
 msgstr ""
 
 msgid "Leave edit mode? All unsaved changes will be lost."
@@ -10415,6 +10475,9 @@ msgstr ""
 msgid "Metrics|Legend label (optional)"
 msgstr ""
 
+msgid "Metrics|Link contains an invalid time window."
+msgstr ""
+
 msgid "Metrics|Max"
 msgstr ""
 
@@ -10696,6 +10759,9 @@ msgstr ""
 msgid "Name has already been taken"
 msgstr ""
 
+msgid "Name is too long (maximum is %{max_length} characters)."
+msgstr ""
+
 msgid "Name new label"
 msgstr ""
 
@@ -10935,6 +11001,9 @@ msgstr ""
 msgid "No data to display"
 msgstr ""
 
+msgid "No deployment platform available"
+msgstr ""
+
 msgid "No deployments found"
 msgstr ""
 
@@ -10965,7 +11034,7 @@ msgstr ""
 msgid "No issues for the selected time period."
 msgstr ""
 
-msgid "No job trace"
+msgid "No job log"
 msgstr ""
 
 msgid "No jobs to show"
@@ -10999,6 +11068,9 @@ msgid "No other labels with such name or description"
 msgstr ""
 
 msgid "No parent group"
+msgstr ""
+
+msgid "No pods available"
 msgstr ""
 
 msgid "No preview for this file type"
@@ -11453,9 +11525,6 @@ msgstr ""
 msgid "Other visibility settings have been disabled by the administrator."
 msgstr ""
 
-msgid "Our Privacy Policy has changed, please visit %{privacy_policy_link} to review these changes."
-msgstr ""
-
 msgid "Outbound requests"
 msgstr ""
 
@@ -11601,6 +11670,12 @@ msgid "Paused Runners don't accept new jobs"
 msgstr ""
 
 msgid "Pending"
+msgstr ""
+
+msgid "Pendo"
+msgstr ""
+
+msgid "Pendo endpoint"
 msgstr ""
 
 msgid "People without permission will never get a notification and won't be able to comment."
@@ -13382,6 +13457,9 @@ msgstr ""
 msgid "Quick actions can be used in the issues description and comment boxes."
 msgstr ""
 
+msgid "Quick range"
+msgstr ""
+
 msgid "README"
 msgstr ""
 
@@ -13492,7 +13570,7 @@ msgstr ""
 msgid "Register and see your runners for this project."
 msgstr ""
 
-msgid "Register for GitLab.com"
+msgid "Register for GitLab"
 msgstr ""
 
 msgid "Register now"
@@ -14069,6 +14147,9 @@ msgid "RightSidebar|deleting the"
 msgstr ""
 
 msgid "Roadmap"
+msgstr ""
+
+msgid "Role"
 msgstr ""
 
 msgid "Rollback"
@@ -16219,6 +16300,9 @@ msgstr ""
 msgid "The \"%{group_path}\" group allows you to sign in with your Single Sign-On Account"
 msgstr ""
 
+msgid "The \"Require approval from CODEOWNERS\" setting was moved to %{banner_link_start}Protected Branches%{banner_link_end}"
+msgstr ""
+
 msgid "The %{type} contains the following error:"
 msgid_plural "The %{type} contains the following errors:"
 msgstr[0] ""
@@ -17156,6 +17240,9 @@ msgid "Title:"
 msgstr ""
 
 msgid "Titles and Filenames"
+msgstr ""
+
+msgid "To"
 msgstr ""
 
 msgid "To %{link_to_help} of your domain, add the above key to a TXT record within to your DNS configuration."
@@ -18097,6 +18184,9 @@ msgstr ""
 msgid "UserOnboardingTour|Take a look. Here's a nifty menu for quickly creating issues, merge requests, snippets, projects and groups. Click on it and select \"New project\" from the \"GitLab\" section to get started."
 msgstr ""
 
+msgid "UserOnboardingTour|Thanks for taking the guided tour. Remember, if you want to go through it again, you can start %{emphasisStart}Learn GitLab%{emphasisEnd} in the help menu on the top right."
+msgstr ""
+
 msgid "UserOnboardingTour|Thanks for the feedback! %{thumbsUp}"
 msgstr ""
 
@@ -18351,7 +18441,7 @@ msgstr ""
 msgid "View job"
 msgstr ""
 
-msgid "View job trace"
+msgid "View job log"
 msgstr ""
 
 msgid "View jobs"
@@ -18623,7 +18713,10 @@ msgstr ""
 msgid "Wiki pages"
 msgstr ""
 
-msgid "Wiki was successfully updated."
+msgid "Wiki was successfully created"
+msgstr ""
+
+msgid "Wiki was successfully updated"
 msgstr ""
 
 msgid "WikiClone|Clone your wiki"
@@ -18639,6 +18732,18 @@ msgid "WikiClone|It is recommended to install %{markdown} so that GFM features r
 msgstr ""
 
 msgid "WikiClone|Start Gollum and edit locally"
+msgstr ""
+
+msgid "WikiDirEmpty|A wiki is where you can store all the details about your project. This can include why you've created it, its principles, how to use it, and so on."
+msgstr ""
+
+msgid "WikiDirEmpty|Create a page"
+msgstr ""
+
+msgid "WikiDirEmpty|Create a page in this directory"
+msgstr ""
+
+msgid "WikiDirEmpty|This directory has no wiki pages"
 msgstr ""
 
 msgid "WikiEditPageTip|Tip: You can move this page by adding the path to the beginning of the title."
@@ -18659,6 +18764,9 @@ msgstr ""
 msgid "WikiEmpty|A wiki is where you can store all the details about your project. This can include why you've created it, its principles, how to use it, and so on."
 msgstr ""
 
+msgid "WikiEmpty|Create this page"
+msgstr ""
+
 msgid "WikiEmpty|Create your first page"
 msgstr ""
 
@@ -18666,6 +18774,9 @@ msgid "WikiEmpty|Suggest wiki improvement"
 msgstr ""
 
 msgid "WikiEmpty|The wiki lets you write documentation for your project"
+msgstr ""
+
+msgid "WikiEmpty|This page does not exist"
 msgstr ""
 
 msgid "WikiEmpty|This project has no wiki pages"
@@ -18722,6 +18833,9 @@ msgstr ""
 msgid "WikiPage|Write your content or drag files here…"
 msgstr ""
 
+msgid "Wiki|Contents"
+msgstr ""
+
 msgid "Wiki|Create New Page"
 msgstr ""
 
@@ -18732,6 +18846,9 @@ msgid "Wiki|Created date"
 msgstr ""
 
 msgid "Wiki|Edit Page"
+msgstr ""
+
+msgid "Wiki|Hide folder contents"
 msgstr ""
 
 msgid "Wiki|More Pages"
@@ -18752,10 +18869,13 @@ msgstr ""
 msgid "Wiki|Pages"
 msgstr ""
 
-msgid "Wiki|Title"
+msgid "Wiki|Show files separately"
 msgstr ""
 
-msgid "Wiki|Wiki Pages"
+msgid "Wiki|Show folder contents"
+msgstr ""
+
+msgid "Wiki|Title"
 msgstr ""
 
 msgid "Will deploy to"
@@ -19251,6 +19371,9 @@ msgid "Your new SCIM token"
 msgstr ""
 
 msgid "Your new personal access token has been created."
+msgstr ""
+
+msgid "Your password isn't required to view this page. If a password or any other personal details are requested, please contact your administrator to report abuse."
 msgstr ""
 
 msgid "Your password reset token has expired."

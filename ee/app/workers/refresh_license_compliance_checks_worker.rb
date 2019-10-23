@@ -3,6 +3,8 @@
 class RefreshLicenseComplianceChecksWorker
   include ApplicationWorker
 
+  feature_category :license_compliance
+
   def perform(project_id)
     project = Project.find(project_id)
     project_approval_rule = project

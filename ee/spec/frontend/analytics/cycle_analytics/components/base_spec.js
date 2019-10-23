@@ -120,7 +120,7 @@ describe('Cycle Analytics component', () => {
       it('displays the groups filter', () => {
         expect(wrapper.find(GroupsDropdownFilter).exists()).toBe(true);
         expect(wrapper.find(GroupsDropdownFilter).props('queryParams')).toEqual(
-          wrapper.vm.groupsQueryParams,
+          wrapper.vm.$options.groupsQueryParams,
         );
       });
 
@@ -156,7 +156,7 @@ describe('Cycle Analytics component', () => {
 
           expect(wrapper.find(ProjectsDropdownFilter).props()).toEqual(
             expect.objectContaining({
-              queryParams: wrapper.vm.projectsQueryParams,
+              queryParams: wrapper.vm.$options.projectsQueryParams,
               groupId: mockData.group.id,
               multiSelect: wrapper.vm.multiProjectSelect,
             }),

@@ -10,7 +10,7 @@ namespace :analytics do
   constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG)) do
     resource :cycle_analytics, only: :show
     namespace :cycle_analytics do
-      resources :stages, only: [:index]
+      resources :stages, only: [:index, :create, :update, :destroy]
     end
   end
 

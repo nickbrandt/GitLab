@@ -48,7 +48,7 @@ describe Ci::Build do
     let(:job) { create(:ci_build, :running, pipeline: pipeline) }
 
     %w(success drop cancel).each do |event|
-      it "for event #{event}" do
+      it "for event #{event}", :sidekiq_might_not_need_inline do
         expect(UpdateBuildMinutesService)
           .to receive(:new).and_call_original
 
@@ -267,7 +267,7 @@ describe Ci::Build do
   describe '#collect_licenses_for_dependency_list!' do
     let!(:lm_artifact) { create(:ee_ci_job_artifact, :license_management, job: job, project: job.project) }
     let(:dependency_list_report) { Gitlab::Ci::Reports::DependencyList::Report.new }
-    let(:dependency) { build(:dependency) }
+    let(:dependency) { build(:dependency, :nokogiri) }
 
     subject { job.collect_licenses_for_dependency_list!(dependency_list_report) }
 
@@ -334,6 +334,7 @@ describe Ci::Build do
 
   describe '#retryable?' do
     subject { build.retryable? }
+
     let(:pipeline) { merge_request.all_pipelines.last }
     let!(:build) { create(:ci_build, :canceled, pipeline: pipeline) }
 

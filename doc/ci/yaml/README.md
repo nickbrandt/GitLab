@@ -106,7 +106,7 @@ The following table lists available parameters for jobs:
 | [`when`](#when)                                    | When to run job. Also available: `when:manual` and `when:delayed`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | [`environment`](#environment)                      | Name of an environment to which the job deploys. Also available: `environment:name`, `environment:url`, `environment:on_stop`, and `environment:action`.                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | [`cache`](#cache)                                  | List of files that should be cached between subsequent runs. Also available: `cache:paths`, `cache:key`, `cache:untracked`, and `cache:policy`.                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| [`artifacts`](#artifacts)                          | List of files and directories to attach to a job on success. Also available: `artifacts:paths`, `artifacts:name`, `artifacts:untracked`, `artifacts:when`, `artifacts:expire_in`, `artifacts:reports`, and `artifacts:reports:junit`.<br><br>In GitLab [Enterprise Edition](https://about.gitlab.com/pricing/), these are available: `artifacts:reports:codequality`, `artifacts:reports:sast`, `artifacts:reports:dependency_scanning`, `artifacts:reports:container_scanning`, `artifacts:reports:dast`, `artifacts:reports:license_management`, `artifacts:reports:performance` and `artifacts:reports:metrics`. |
+| [`artifacts`](#artifacts)                          | List of files and directories to attach to a job on success. Also available: `artifacts:paths`, `artifacts:expose_as`, `artifacts:name`, `artifacts:untracked`, `artifacts:when`, `artifacts:expire_in`, `artifacts:reports`, and `artifacts:reports:junit`.<br><br>In GitLab [Enterprise Edition](https://about.gitlab.com/pricing/), these are available: `artifacts:reports:codequality`, `artifacts:reports:sast`, `artifacts:reports:dependency_scanning`, `artifacts:reports:container_scanning`, `artifacts:reports:dast`, `artifacts:reports:license_management`, `artifacts:reports:performance` and `artifacts:reports:metrics`. |
 | [`dependencies`](#dependencies)                    | Restrict which artifacts are passed to a specific job by providing a list of jobs to fetch artifacts from.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | [`coverage`](#coverage)                            | Code coverage settings for a given job.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | [`retry`](#retry)                                  | When and how many times a job can be auto-retried in case of a failure.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
@@ -245,7 +245,7 @@ jobs, including deploy jobs, but after the restoration of [artifacts](#artifacts
 This must be an an array.
 
 `after_script` is used to define the command that will be run after all
-jobs, including failed ones. This has to be an array or a multi-line string.
+jobs, including failed ones. This must be an an array.
 
 Scripts specified in `before_script` are:
 
@@ -328,6 +328,37 @@ The following stages are available to every pipeline:
 - `.post`, which is guaranteed to always be the last stage in a pipeline.
 
 User-defined stages are executed after `.pre` and before `.post`.
+
+The order of `.pre` and `.post` cannot be changed, even if defined out of order in `.gitlab-ci.yml`.
+For example, the following are equivalent configuration:
+
+- Configured in order:
+
+  ```yml
+  stages:
+    - .pre
+    - a
+    - b
+    - .post
+  ```
+
+- Configured out of order:
+
+  ```yml
+  stages:
+    - a
+    - .pre
+    - b
+    - .post
+  ```
+
+- Not explicitly configured:
+
+  ```yml
+  stages:
+    - a
+    - b
+  ```
 
 ### `stage`
 
@@ -1596,6 +1627,47 @@ release-job:
     - tags
 ```
 
+#### `artifacts:expose_as`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/15018) in GitLab 12.5.
+
+The `expose_as` keyword can be used to expose [job artifacts](../../user/project/pipelines/job_artifacts.md)
+in the [merge request](../../user/project/merge_requests/index.md) UI.
+
+For example, to match a single file:
+
+```yml
+test:
+  script: [ 'echo 1' ]
+  artifacts:
+    expose_as: 'artifact 1'
+    paths: ['path/to/file.txt']
+```
+
+With this configuration, GitLab will add a link **artifact 1** to the relevant merge request
+that points to `file1.txt`.
+
+An example that will match an entire directory:
+
+```yml
+test:
+  script: [ 'echo 1' ]
+  artifacts:
+    expose_as: 'artifact 1'
+    paths: ['path/to/directory/']
+```
+
+Note the following:
+
+- A maximum of 10 job artifacts per merge request can be exposed.
+- Glob patterns are unsupported.
+- If a directory is specified, the link will be to the job [artifacts browser](../../user/project/pipelines/job_artifacts.md#browsing-artifacts) if there is more than
+  one file in the directory.
+- For exposed single file artifacts with `.html`, `.htm`, `.txt`, `.json`, `.xml`,
+  and `.log` extensions, if [GitLab Pages](../../administration/pages/index.md) is:
+  - Enabled, GitLab will automatically render the artifact.
+  - Not enabled, you will see the file in the artifacts browser.
+
 #### `artifacts:name`
 
 > Introduced in GitLab 8.6 and GitLab Runner v1.1.0.
@@ -2247,6 +2319,24 @@ staging:
   trigger:
     project: my/deployment
     branch: stable
+```
+
+It is possible to mirror the status from a triggered pipeline:
+
+```
+trigger_job:
+  trigger:
+    project: my/project
+    strategy: depend
+```
+
+It is possible to mirror the status from an upstream pipeline:
+
+```
+upstream_bridge:
+  stage: test
+  needs:
+    pipeline: other/project
 ```
 
 ### `interruptible`

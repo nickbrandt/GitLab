@@ -5,6 +5,7 @@ import userAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_ima
 import Icon from '~/vue_shared/components/icon.vue';
 import HelpContentPopover from './help_content_popover.vue';
 import TourPartsList from './tour_parts_list.vue';
+import Tracking from '~/tracking';
 
 export default {
   name: 'OnboardingHelper',
@@ -132,8 +133,12 @@ export default {
     restartStep() {
       this.$emit('restartStep');
     },
-    showFeedbackContent() {
-      this.$emit('showFeedbackContent', true);
+    beginExitTourProcess() {
+      if (Tracking.enabled()) {
+        this.$emit('showFeedbackContent', true);
+      } else {
+        this.$emit('showDntExitContent', true);
+      }
     },
     callStepContentButton(button) {
       this.$emit('clickStepContentButton', button);
@@ -216,7 +221,7 @@ export default {
           </gl-link>
         </li>
         <li>
-          <gl-link class="qa-exit-tour-link d-inline-flex" @click="showFeedbackContent">
+          <gl-link class="qa-exit-tour-link d-inline-flex" @click="beginExitTourProcess">
             <icon name="leave" class="mr-1" />
             <span>{{ s__("UserOnboardingTour|Exit 'Learn GitLab'") }}</span>
           </gl-link>

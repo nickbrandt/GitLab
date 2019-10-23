@@ -4,6 +4,7 @@ class ElasticIndexerWorker
   include Elasticsearch::Model::Client::ClassMethods
 
   sidekiq_options retry: 2
+  feature_category :search
 
   def perform(operation, class_name, record_id, es_id, options = {})
     return true unless Gitlab::CurrentSettings.elasticsearch_indexing?

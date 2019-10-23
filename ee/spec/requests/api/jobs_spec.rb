@@ -95,7 +95,7 @@ describe API::Jobs do
           end
 
           context 'when artifacts are stored locally' do
-            it 'returns specific job artifacts' do
+            it 'returns specific job artifacts', :sidekiq_might_not_need_inline do
               subject
 
               expect(response).to have_gitlab_http_status(200)

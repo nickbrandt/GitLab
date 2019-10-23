@@ -131,13 +131,14 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
   end
 
   context 'without reports' do
+    let(:pipeline) { create(:ci_pipeline, :running, project: project, merge_requests_as_head_pipeline: [merge_request]) }
+
     it "won't change approvals_required count" do
       expect { subject }
         .not_to change { report_approver_rule.reload.approvals_required }
     end
 
     context "license compliance policy" do
-      let(:pipeline) { create(:ee_ci_pipeline, :running, project: project, merge_requests_as_head_pipeline: [merge_request]) }
       let!(:software_license_policy) { create(:software_license_policy, :blacklist, project: project, software_license: blacklisted_license) }
       let!(:license_compliance_rule) { create(:report_approver_rule, :license_management, merge_request: merge_request, approvals_required: 1) }
       let!(:blacklisted_license) { create(:software_license) }

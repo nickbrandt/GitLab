@@ -5,12 +5,13 @@ import * as types from './mutation_types';
 export default {
   [types.SET_INITIAL_CONFIG](
     state,
-    { epicsEndpoint, issuesEndpoint, autoCompleteEpics, autoCompleteIssues },
+    { epicsEndpoint, issuesEndpoint, autoCompleteEpics, autoCompleteIssues, userSignedIn },
   ) {
     state.epicsEndpoint = epicsEndpoint;
     state.issuesEndpoint = issuesEndpoint;
     state.autoCompleteEpics = autoCompleteEpics;
     state.autoCompleteIssues = autoCompleteIssues;
+    state.userSignedIn = userSignedIn;
   },
 
   [types.SET_INITIAL_PARENT_ITEM](state, data) {

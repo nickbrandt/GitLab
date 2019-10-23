@@ -18,6 +18,7 @@ describe FeatureFlags::CreateService do
     subject do
       described_class.new(project, user, params).execute
     end
+
     let(:feature_flag) { subject[:feature_flag] }
 
     context 'when feature flag can not be created' do

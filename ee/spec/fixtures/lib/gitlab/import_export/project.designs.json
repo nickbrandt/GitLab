@@ -34,7 +34,6 @@
    "pages_https_only":false,
    "external_webhook_token":null,
    "merge_requests_author_approval":null,
-   "merge_requests_require_code_owner_approval":null,
    "merge_requests_disable_committers_approval":null,
    "require_password_to_approve":null,
    "labels":[

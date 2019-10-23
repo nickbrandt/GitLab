@@ -111,7 +111,7 @@ describe ProjectsController do
             stub_uploads_object_storage(FileUploader)
           end
 
-          it 'creates the project from project template' do
+          it 'creates the project from project template', :sidekiq_might_not_need_inline do
             post :create, params: { project: templates_params }
 
             created_project = Project.find_by_path('foo')

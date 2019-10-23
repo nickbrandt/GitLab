@@ -77,7 +77,7 @@ module Vulnerabilities
     validates :raw_metadata, presence: true
 
     scope :report_type, -> (type) { where(report_type: report_types[type]) }
-    scope :ordered, -> { order("severity desc", :id) }
+    scope :ordered, -> { order(severity: :desc, confidence: :desc, id: :asc) }
 
     scope :by_report_types, -> (values) { where(report_type: values) }
     scope :by_projects, -> (values) { where(project_id: values) }
@@ -112,6 +112,30 @@ module Vulnerabilities
     def self.counted_by_severity
       group(:severity).count.each_with_object({}) do |(severity, count), accum|
         accum[SEVERITY_LEVELS[severity]] = count
+      end
+    end
+
+    def self.with_vulnerabilities_for_state(project:, report_type:, project_fingerprints:)
+      Vulnerabilities::Occurrence
+        .joins(:vulnerability)
+        .where(
+          project: project,
+          report_type: report_type,
+          project_fingerprint: project_fingerprints
+        )
+        .select('report_type, vulnerability_id, project_fingerprint, raw_metadata, '\
+                'vulnerabilities.id, vulnerabilities.state') # fetching only required attributes
+    end
+
+    def state
+      return 'dismissed' if dismissal_feedback.present?
+
+      if vulnerability.nil?
+        'new'
+      elsif vulnerability.closed?
+        'resolved'
+      else
+        'confirmed'
       end
     end
 
@@ -195,6 +219,14 @@ module Vulnerabilities
     # Array.difference (-) method uses hash and eql? methods to do comparison
     def hash
       report_type.hash ^ location.hash ^ first_fingerprint.hash
+    end
+
+    def severity_value
+      self.class.severities[self.severity]
+    end
+
+    def confidence_value
+      self.class.confidences[self.confidence]
     end
 
     protected

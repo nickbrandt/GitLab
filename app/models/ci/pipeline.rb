@@ -217,6 +217,8 @@ module Ci
     scope :for_sha, -> (sha) { where(sha: sha) }
     scope :for_source_sha, -> (source_sha) { where(source_sha: source_sha) }
     scope :for_sha_or_source_sha, -> (sha) { for_sha(sha).or(for_source_sha(sha)) }
+    scope :for_ref, -> (ref) { where(ref: ref) }
+    scope :for_id, -> (id) { where(id: id) }
     scope :created_after, -> (time) { where('ci_pipelines.created_at > ?', time) }
 
     scope :triggered_by_merge_request, -> (merge_request) do
@@ -779,6 +781,10 @@ module Ci
           build.collect_test_reports!(test_reports)
         end
       end
+    end
+
+    def has_exposed_artifacts?
+      complete? && builds.latest.with_exposed_artifacts.exists?
     end
 
     def branch_updated?

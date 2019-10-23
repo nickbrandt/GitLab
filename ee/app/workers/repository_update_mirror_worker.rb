@@ -7,6 +7,8 @@ class RepositoryUpdateMirrorWorker
   include Gitlab::ShellAdapter
   include ProjectStartImport
 
+  feature_category :importers
+
   # Retry not necessary. It will try again at the next update interval.
   sidekiq_options retry: false, status_expiration: StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION
 

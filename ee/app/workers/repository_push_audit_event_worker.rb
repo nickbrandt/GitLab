@@ -3,6 +3,8 @@
 class RepositoryPushAuditEventWorker
   include ApplicationWorker
 
+  feature_category :authentication_and_authorization
+
   def perform(changes, project_id, user_id)
     project = Project.find(project_id)
     user = User.find(user_id)

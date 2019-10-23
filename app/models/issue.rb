@@ -71,7 +71,7 @@ class Issue < ApplicationRecord
   attr_spammable :title, spam_title: true
   attr_spammable :description, spam_description: true
 
-  state_machine :state, initial: :opened do
+  state_machine :state_id, initial: :opened do
     event :close do
       transition [:opened] => :closed
     end
@@ -80,8 +80,8 @@ class Issue < ApplicationRecord
       transition closed: :opened
     end
 
-    state :opened
-    state :closed
+    state :opened, value: Issue.available_states[:opened]
+    state :closed, value: Issue.available_states[:closed]
 
     before_transition any => :closed do |issue|
       issue.closed_at = issue.system_note_timestamp
@@ -91,6 +91,13 @@ class Issue < ApplicationRecord
       issue.closed_at = nil
       issue.closed_by = nil
     end
+  end
+
+  # Alias to state machine .with_state_id method
+  # This needs to be defined after the state machine block to avoid errors
+  class << self
+    alias_method :with_state, :with_state_id
+    alias_method :with_states, :with_state_ids
   end
 
   def self.relative_positioning_query_base(issue)
@@ -199,7 +206,16 @@ class Issue < ApplicationRecord
     if self.confidential?
       "#{iid}-confidential-issue"
     else
-      "#{iid}-#{title.parameterize}"
+      branch_name = "#{iid}-#{title.parameterize}"
+
+      if branch_name.length > 100
+        truncated_string = branch_name[0, 100]
+        # Delete everything dangling after the last hyphen so as not to risk
+        # existence of unintended words in the branch name due to mid-word split.
+        branch_name = truncated_string[0, truncated_string.rindex("-")]
+      end
+
+      branch_name
     end
   end
 
