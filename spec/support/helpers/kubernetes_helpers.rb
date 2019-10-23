@@ -399,31 +399,67 @@ module KubernetesHelpers
   end
 
   # noinspection RubyStringKeysInHashInspection
-  def knative_06_service(name: "kubetest", namespace: "default", domain: "example.com")
-    {
-      "metadata" => {
-        "creationTimestamp" => "2018-11-21T06:16:33Z",
-        "name" => name,
-        "namespace" => namespace,
-        "selfLink" => "/apis/serving.knative.dev/v1alpha1/namespaces/#{namespace}/services/#{name}"
-      },
+  def knative_06_service(name: 'kubetest', namespace: 'default', domain: 'example.com', description: 'a knative service', environment: 'production')
+    { "apiVersion" => "serving.knative.dev/v1alpha1",
+      "kind" => "Service",
+      "metadata" =>
+        { "annotations" =>
+            { "serving.knative.dev/creator" => "system:serviceaccount:#{namespace}:#{namespace}-service-account",
+              "serving.knative.dev/lastModifier" => "system:serviceaccount:#{namespace}:#{namespace}-service-account" },
+          "creationTimestamp" => "2019-10-22T21:19:20Z",
+          "generation" => 1,
+          "labels" => { "service" => name },
+          "name" => name,
+          "namespace" => namespace,
+          "resourceVersion" => "6042",
+          "selfLink" => "/apis/serving.knative.dev/v1alpha1/namespaces/#{namespace}/services/#{name}",
+          "uid" => "9c7f63d0-f511-11e9-8815-42010a80002f" },
       "spec" => {
-        "generation" => 2
+        "runLatest" => {
+          "configuration" => {
+            "revisionTemplate" => {
+              "metadata" => {
+                "annotations" => { "Description" => description },
+                "creationTimestamp" => "2019-10-22T21:19:20Z",
+                "labels" => { "service" => name }
+              },
+              "spec" => {
+                "container" => {
+                  "env" => [{ "name" => "timestamp", "value" => "2019-10-22 21:19:20" }],
+                  "image" => "image_name",
+                  "name" => "",
+                  "resources" => {}
+                },
+                "timeoutSeconds" => 300
+              }
+            }
+          }
+        }
       },
       "status" => {
-        "url" => "http://#{name}.#{namespace}.#{domain}",
         "address" => {
-          "url" => "#{name}.#{namespace}.svc.cluster.local"
+          "hostname" => "#{name}.#{namespace}.svc.cluster.local",
+          "url" => "http://#{name}.#{namespace}.svc.cluster.local"
         },
-        "latestCreatedRevisionName" => "#{name}-00002",
-        "latestReadyRevisionName" => "#{name}-00002",
-        "observedGeneration" => 2
-      }
-    }
+        "conditions" =>
+          [{ "lastTransitionTime" => "2019-10-22T21:20:25Z", "status" => "True", "type" => "ConfigurationsReady" },
+           { "lastTransitionTime" => "2019-10-22T21:20:25Z", "status" => "True", "type" => "Ready" },
+           { "lastTransitionTime" => "2019-10-22T21:20:25Z", "status" => "True", "type" => "RoutesReady" }],
+        "domain" => "#{name}.#{namespace}.#{domain}",
+        "domainInternal" => "#{name}.#{namespace}.svc.cluster.local",
+        "latestCreatedRevisionName" => "#{name}-bskx6",
+        "latestReadyRevisionName" => "#{name}-bskx6",
+        "observedGeneration" => 1,
+        "traffic" => [{ "latestRevision" => true, "percent" => 100, "revisionName" => "#{name}-bskx6" }],
+        "url" => "http://#{name}.#{namespace}.#{domain}"
+      },
+      "environment_scope" => environment,
+      "cluster_id" => 9,
+      "podcount" => 0 }
   end
 
   # noinspection RubyStringKeysInHashInspection
-  def knative_07_service(name: 'kubetest', namespace: 'default', domain: 'example.com', description: 'a knative service')
+  def knative_07_service(name: 'kubetest', namespace: 'default', domain: 'example.com', description: 'a knative service', environment: 'production')
     { "apiVersion" => "serving.knative.dev/v1alpha1",
       "kind" => "Service",
       "metadata" =>
@@ -438,27 +474,26 @@ module KubernetesHelpers
           "resourceVersion" => "289726",
           "selfLink" => "/apis/serving.knative.dev/v1alpha1/namespaces/#{namespace}/services/#{name}",
           "uid" => "988349fa-f511-11e9-9ea1-42010a80005e" },
-      "spec" =>
-        { "template" =>
-            { "metadata" =>
-                {
-                  "annotations" => { "Description" => description },
-                  "creationTimestamp" => "2019-10-22T21:19:12Z",
-                  "labels" => { "service" => name }
-                },
-              "spec" =>
-                {
-                  "containers" => [
-                    {
-                      "env" =>
-                        [{ "name" => "timestamp", "value" => "2019-10-22 21:19:12" }],
-                      "image" => "image_name",
-                      "name" => "user-container",
-                      "resources" => {}
-                    }
-                  ],
-                  "timeoutSeconds" => 300 } },
-          "traffic" => [{ "latestRevision" => true, "percent" => 100 }] },
+      "spec" => {
+        "template" => {
+          "metadata" => {
+            "annotations" => { "Description" => description },
+            "creationTimestamp" => "2019-10-22T21:19:12Z",
+            "labels" => { "service" => name }
+          },
+          "spec" => {
+            "containers" => [{
+                               "env" =>
+                                 [{ "name" => "timestamp", "value" => "2019-10-22 21:19:12" }],
+                               "image" => "image_name",
+                               "name" => "user-container",
+                               "resources" => {}
+                             }],
+            "timeoutSeconds" => 300
+          }
+        },
+        "traffic" => [{ "latestRevision" => true, "percent" => 100 }]
+      },
       "status" =>
         { "address" => { "url" => "http://#{name}.#{namespace}.svc.cluster.local" },
           "conditions" =>
@@ -470,7 +505,7 @@ module KubernetesHelpers
           "observedGeneration" => 1,
           "traffic" => [{ "latestRevision" => true, "percent" => 100, "revisionName" => "#{name}-92tsj" }],
           "url" => "http://#{name}.#{namespace}.#{domain}" },
-      "environment_scope" => "production",
+      "environment_scope" => environment,
       "cluster_id" => 5,
       "podcount" => 0 }
   end
