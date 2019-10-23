@@ -33,6 +33,7 @@ describe('ServiceCredentialsForm', () => {
       propsData: {
         accountAndExternalIdsHelpPath: '',
         createRoleArnHelpPath: '',
+        externalLinkIcon: '',
       },
       localVue,
       store,

@@ -15,6 +15,7 @@ export default el => {
     accountId,
     hasCredentials,
     createRolePath,
+    externalLinkIcon,
   } = el.dataset;
 
   return new Vue({
@@ -39,6 +40,7 @@ export default el => {
           kubernetesIntegrationHelpPath,
           accountAndExternalIdsHelpPath,
           createRoleArnHelpPath,
+          externalLinkIcon,
         },
       });
     },
