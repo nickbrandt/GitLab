@@ -12,13 +12,15 @@ module EpicLinks
 
     private
 
+    def affected_epics(epics)
+      [issuable, epics].flatten.uniq
+    end
+
     def relate_issuables(referenced_epic)
       affected_epics = [issuable]
       affected_epics << referenced_epic if referenced_epic.parent
 
       set_child_epic!(referenced_epic)
-
-      affected_epics.each(&:update_start_and_due_dates)
 
       yield
     end

@@ -112,12 +112,12 @@ describe('SidebarDatePicker', () => {
   it('returns full date string in words when `dateFromMilestones` is defined', () => {
     createComponent({ dateFromMilestones: new Date(2018, 0, 1) });
 
-    expect(wrapper.text()).toContain('From milestones: Jan 1, 2018');
+    expect(wrapper.text()).toContain('Inherited: Jan 1, 2018');
   });
 
   it('returns `None` when `dateFromMilestones` is not defined', () => {
     createComponent();
-    expect(wrapper.text()).toContain('From milestones: None');
+    expect(wrapper.text()).toContain('Inherited: None');
   });
 
   it('passes correct popover options to directive', () => {
