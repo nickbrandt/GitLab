@@ -44,7 +44,7 @@ module Clusters
     end
 
     def management_project_scope(cluster)
-      return Project.all if cluster.instance_type?
+      return ::Project.all if cluster.instance_type?
 
       group =
         if cluster.group_type?
