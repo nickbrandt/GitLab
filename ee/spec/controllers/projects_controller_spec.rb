@@ -417,7 +417,7 @@ describe ProjectsController do
 
       context 'when instance setting is set to 0 days' do
         it 'deletes project right away' do
-          allow(Gitlab::CurrentSettings).to receive(:project_deletion_adjourned_period).and_return(0)
+          allow(Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(0)
           orig_id = project.id
 
           delete :destroy, params: { namespace_id: project.namespace, id: project }

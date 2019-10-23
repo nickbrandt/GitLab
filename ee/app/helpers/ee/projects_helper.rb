@@ -123,7 +123,7 @@ module EE
     end
 
     def permanent_deletion_date(date)
-      (date + ::Gitlab::CurrentSettings.project_deletion_adjourned_period.days).strftime('%F')
+      (date + ::Gitlab::CurrentSettings.deletion_adjourned_period.days).strftime('%F')
     end
 
     # Given the current GitLab configuration, check whether the GitLab URL for Kerberos is going to be different than the HTTP URL
