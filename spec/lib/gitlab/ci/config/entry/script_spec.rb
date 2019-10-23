@@ -50,7 +50,7 @@ describe Gitlab::Ci::Config::Entry::Script do
       end
     end
 
-    context 'when entry config value is array of strings and arrays of strings' do
+    context 'when entry config value is array containing strings and arrays of strings' do
       let(:config) { ['ls', ['pwd', 'echo 1']] }
 
       describe '#value' do
@@ -78,7 +78,7 @@ describe Gitlab::Ci::Config::Entry::Script do
       describe '#errors' do
         it 'saves errors' do
           expect(entry.errors)
-            .to include 'script config should be an array of strings and arrays of strings'
+            .to include 'script config should be an array containing strings and arrays of strings'
         end
       end
 
@@ -95,7 +95,7 @@ describe Gitlab::Ci::Config::Entry::Script do
       describe '#errors' do
         it 'saves errors' do
           expect(entry.errors)
-            .to include 'script config should be an array of strings and arrays of strings'
+            .to include 'script config should be an array containing strings and arrays of strings'
         end
       end
 
