@@ -1642,6 +1642,18 @@ DELETE /projects/:id
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
+## Restore project marked for deletion **(PREMIUM)**
+
+Restores project marked for deletion.
+
+```
+POST /projects/:id/restore
+```
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
+
 ## Upload a file
 
 Uploads a file to the specified project to be used in an issue or merge request description, or a comment.
