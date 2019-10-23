@@ -32,11 +32,10 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
     super();
     this.options = $(container).data();
 
-    const { currentEnvironmentName, environmentsPath, logsPath, logsPage } = this.options;
+    const { currentEnvironmentName, environmentsPath, logsEndpoint } = this.options;
     this.environmentName = currentEnvironmentName;
     this.environmentsPath = environmentsPath;
-    this.logsPath = logsPath;
-    this.logsPage = logsPage;
+    this.logsEndpoint = logsEndpoint;
 
     [this.podName] = getParameterValues('pod_name');
     if (this.podName) {
@@ -95,7 +94,7 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
   }
 
   getLogs() {
-    return requestWithBackoff(this.logsPath, { pod_name: this.podName })
+    return requestWithBackoff(this.logsEndpoint, { pod_name: this.podName })
       .then(res => {
         const { logs, pods } = res.data;
         this.setupPodsDropdown(pods);
@@ -135,11 +134,9 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
     this.setupDropdown(
       this.$envDropdown,
       this.environmentName,
-      environments.map(({ name, id }) => ({ name, value: id })),
+      environments.map(({ name, logs_path }) => ({ name, value: logs_path })),
       el => {
-        const envId = el.currentTarget.value;
-        const envRegexp = /environments\/[0-9]+/gi;
-        const url = this.logsPage.replace(envRegexp, `environments/${envId}`);
+        const url = el.currentTarget.value;
         redirectTo(url);
       },
     );
