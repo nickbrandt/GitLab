@@ -1,6 +1,6 @@
 import Vue from 'vue';
+import { slugify } from '~/lib/utils/text_utility';
 import * as types from './mutation_types';
-import { slugify } from '~/lib/utils/text_utility.js';
 import { normalizeMetrics, sortMetrics, normalizeMetric, normalizeQueryResult } from './utils';
 
 const normalizePanel = panel => panel.metrics.map(normalizeMetric);
@@ -11,7 +11,7 @@ export default {
     state.showEmptyState = true;
   },
   [types.RECEIVE_METRICS_DATA_SUCCESS](state, groupData) {
-    state.dashboard.panel_groups = groupData.map(panelGroup => {
+    state.dashboard.panel_groups = groupData.map((panelGroup, i) => {
       let { metrics = [], panels = [] } = panelGroup;
 
       // each panel has metric information that needs to be normalized
@@ -34,8 +34,7 @@ export default {
       return {
         ...panelGroup,
         panels,
-        // TODO Try to find another unique factor
-        key: slugify((panelGroup.group || '').trim()),
+        key: `${slugify(panelGroup.group)}-${i}`,
         metrics: normalizeMetrics(sortMetrics(metrics)),
       };
     });
@@ -109,10 +108,8 @@ export default {
   [types.SET_SHOW_ERROR_BANNER](state, enabled) {
     state.showErrorBanner = enabled;
   },
-  [types.SET_PANEL_GROUP_PANELS](state, payload) {
+  [types.SET_PANEL_GROUP_METRICS](state, payload) {
     const panelGroup = state.dashboard.panel_groups.find(pg => payload.key === pg.key);
-    console.log(panelGroup.metrics.map(metric => metric.title));
-    console.log(payload.metrics.map(metric => metric.title));
     panelGroup.metrics = payload.metrics;
   },
 };

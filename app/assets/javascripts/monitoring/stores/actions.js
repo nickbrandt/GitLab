@@ -221,5 +221,15 @@ export const fetchEnvironmentsData = ({ state, dispatch }) => {
     });
 };
 
+/**
+ * Set a new array of metrics to a panel group
+ * @param {*} data An object containing
+ *   - `key` with a unique panel key
+ *   - `metrics` with the metrics array
+ */
+export const setPanelGroupMetrics = ({ commit }, data) => {
+  commit(types.SET_PANEL_GROUP_METRICS, data);
+};
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
