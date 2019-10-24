@@ -23,6 +23,7 @@ describe Gitlab::UsageData do
       create(:issue, project: projects[0])
       create(:zoom_meeting, project: projects[0], issue: projects[0].issues[0])
       create(:zoom_meeting, project: projects[0], issue: projects[0].issues[1], issue_status: :removed)
+      create(:zoom_meeting, project: projects[0], issue: projects[0].issues[1], issue_status: :removed)
       gcp_cluster = create(:cluster, :provided_by_gcp)
       create(:cluster, :provided_by_user)
       create(:cluster, :provided_by_user, :disabled)
