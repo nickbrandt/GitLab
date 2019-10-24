@@ -12,7 +12,7 @@ export default {
   },
   [types.RECEIVE_METRICS_DATA_SUCCESS](state, groupData) {
     state.dashboard.panel_groups = groupData.map((group, i) => {
-      const key = `${slugify(group.group)}-${i}`;
+      const key = `${slugify(group.group || 'default')}-${i}`;
       let { metrics = [], panels = [] } = group;
 
       // each panel has metric information that needs to be normalized

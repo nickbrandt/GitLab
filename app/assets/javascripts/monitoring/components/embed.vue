@@ -37,7 +37,7 @@ export default {
   computed: {
     ...mapState('monitoringDashboard', ['dashboard', 'metricsWithData']),
     charts() {
-      const groupWithMetrics = this.dashboard.groups.find(group =>
+      const groupWithMetrics = this.dashboard.panel_groups.find(group =>
         group.metrics.find(chart => this.chartHasData(chart)),
       ) || { metrics: [] };
 
