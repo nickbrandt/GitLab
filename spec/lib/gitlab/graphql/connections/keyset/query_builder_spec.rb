@@ -6,7 +6,7 @@ describe Gitlab::Graphql::Connections::Keyset::QueryBuilder do
   context 'when number of ordering fields is 0' do
     it 'raises an error' do
       expect { described_class.new(Issue.arel_table, [], {}, :after) }
-        .to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'No ordering scopes have been supplied')
+        .to raise_error(ArgumentError, 'No ordering scopes have been supplied')
     end
   end
 
@@ -24,7 +24,7 @@ describe Gitlab::Graphql::Connections::Keyset::QueryBuilder do
 
         it 'raises an error' do
           expect { builder.conditions }
-            .to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'Only one sortable scope and nil was supplied')
+            .to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'Before/after cursor invalid: `nil` was provided as only sortable value')
         end
       end
 

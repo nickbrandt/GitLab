@@ -22,34 +22,34 @@ describe Gitlab::Graphql::Connections::Keyset::Connection do
     let(:cursor)  { connection.cursor_from_node(project) }
 
     it 'returns an encoded ID' do
-      expect(decoded_cursor(cursor)).to eq({ 'id' => project.id.to_s })
+      expect(decoded_cursor(cursor)).to eq('id' => project.id.to_s)
     end
 
     context 'when an order is specified' do
       let(:nodes) { Project.order(:updated_at) }
 
       it 'returns the encoded value of the order' do
-        expect(decoded_cursor(cursor)).to include({ 'updated_at' => project.updated_at.to_s })
+        expect(decoded_cursor(cursor)).to include('updated_at' => project.updated_at.to_s)
       end
 
       it 'includes the :id even when not specified in the order' do
-        expect(decoded_cursor(cursor)).to include({ 'id' => project.id.to_s })
+        expect(decoded_cursor(cursor)).to include('id' => project.id.to_s)
       end
     end
 
-    context 'when multiple orders is specified' do
+    context 'when multiple orders are specified' do
       let(:nodes) { Project.order(:updated_at).order(:created_at) }
 
       it 'returns the encoded value of the order' do
-        expect(decoded_cursor(cursor)).to include({ 'updated_at' => project.updated_at.to_s })
+        expect(decoded_cursor(cursor)).to include('updated_at' => project.updated_at.to_s)
       end
     end
 
-    context 'when multiple orders with SQL is specified' do
+    context 'when multiple orders with SQL are specified' do
       let(:nodes) { Project.order(Arel.sql('projects.updated_at IS NULL')).order(:updated_at).order(:id) }
 
       it 'returns the encoded value of the order' do
-        expect(decoded_cursor(cursor)).to include({ 'updated_at' => project.updated_at.to_s })
+        expect(decoded_cursor(cursor)).to include('updated_at' => project.updated_at.to_s)
       end
     end
   end
@@ -285,5 +285,19 @@ describe Gitlab::Graphql::Connections::Keyset::Connection do
         expect(last_order_name).to eq sliced.primary_key
       end
     end
+
+    context 'when there is no primary key' do
+      let(:nodes) { NoPrimaryKey.all }
+
+      it 'raises an error' do
+        expect(NoPrimaryKey.primary_key).to be_nil
+        expect { subject.sliced_nodes }.to raise_error(ArgumentError, 'Relation must have a primary key')
+      end
+    end
+  end
+
+  class NoPrimaryKey < ActiveRecord::Base
+    self.table_name  = 'no_primary_key'
+    self.primary_key = nil
   end
 end

@@ -18,7 +18,7 @@ describe Gitlab::Graphql::Connections::Keyset::Conditions::NullCondition do
         )
         SQL
 
-        expect(condition.build).to eq expected_sql
+        expect(condition.build.squish).to eq expected_sql.squish
       end
     end
 
@@ -35,7 +35,7 @@ describe Gitlab::Graphql::Connections::Keyset::Conditions::NullCondition do
           OR ("issues"."relative_position" IS NOT NULL)
         SQL
 
-        expect(condition.build).to eq expected_sql
+        expect(condition.build.squish).to eq expected_sql.squish
       end
     end
   end

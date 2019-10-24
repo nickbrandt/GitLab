@@ -33,22 +33,22 @@ module Gitlab
 
           def self.validate_ordering(relation, order_list)
             if order_list.empty?
-              raise ::ArgumentError.new('A minimum of 1 ordering field is required')
+              raise ArgumentError.new('A minimum of 1 ordering field is required')
             end
 
             if order_list.count > 2
-              raise Gitlab::Graphql::Errors::ArgumentError.new('A maximum of 2 ordering fields are allowed')
+              raise ArgumentError.new('A maximum of 2 ordering fields are allowed')
             end
 
             # make sure the last ordering field is non-nullable
             attribute_name = order_list.last&.attribute_name
 
             if relation.columns_hash[attribute_name].null
-              raise Gitlab::Graphql::Errors::ArgumentError.new("Column `#{attribute_name}` must not allow NULL")
+              raise ArgumentError.new("Column `#{attribute_name}` must not allow NULL")
             end
 
             if order_list.last.attribute_name != relation.primary_key
-              raise Gitlab::Graphql::Errors::ArgumentError.new("Last ordering field must be the primary key, `#{relation.primary_key}`")
+              raise ArgumentError.new("Last ordering field must be the primary key, `#{relation.primary_key}`")
             end
           end
 

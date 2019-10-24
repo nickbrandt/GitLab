@@ -7,11 +7,7 @@ module Gitlab
         module Conditions
           class NullCondition < BaseCondition
             def build
-              conditions = []
-              conditions << first_attribute_condition
-              conditions << final_condition
-
-              assemble_conditions(conditions)
+              [first_attribute_condition, final_condition].join
             end
 
             private

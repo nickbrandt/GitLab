@@ -14,7 +14,7 @@ describe Gitlab::Graphql::Connections::Keyset::Conditions::NotNullCondition do
           ("issues"."id" > 500)
         SQL
 
-        expect(condition.build).to eq expected_sql
+        expect(condition.build.squish).to eq expected_sql.squish
       end
     end
 
@@ -32,7 +32,7 @@ describe Gitlab::Graphql::Connections::Keyset::Conditions::NotNullCondition do
           OR ("issues"."relative_position" IS NULL)
         SQL
 
-        expect(condition.build).to eq expected_sql
+        expect(condition.build.squish).to eq expected_sql.squish
       end
     end
 
@@ -49,7 +49,7 @@ describe Gitlab::Graphql::Connections::Keyset::Conditions::NotNullCondition do
           )
         SQL
 
-        expect(condition.build).to eq expected_sql
+        expect(condition.build.squish).to eq expected_sql.squish
       end
     end
   end

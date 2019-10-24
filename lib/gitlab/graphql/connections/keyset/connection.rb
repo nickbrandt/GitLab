@@ -2,7 +2,7 @@
 
 # Keyset::Connection provides cursor based pagination, to avoid using OFFSET.
 # It basically sorts / filters using WHERE sorting_value > cursor.
-# We do this for performance reasons (https://gitlab.com/gitlab-org/gitlab-ce/issues/45756),
+# We do this for performance reasons (https://gitlab.com/gitlab-org/gitlab-foss/issues/45756),
 # as well as for having stable pagination
 # https://graphql-ruby.org/pro/cursors.html#whats-the-difference
 # https://coderwall.com/p/lkcaag/pagination-you-re-probably-doing-it-wrong
@@ -82,6 +82,10 @@ module Gitlab
 
           def ordered_nodes
             strong_memoize(:order_nodes) do
+              unless nodes.primary_key.present?
+                raise ArgumentError.new('Relation must have a primary key')
+              end
+
               list = OrderInfo.build_order_list(nodes)
 
               # ensure there is a primary key ordering

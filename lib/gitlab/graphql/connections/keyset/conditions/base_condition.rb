@@ -18,10 +18,6 @@ module Gitlab
 
             attr_reader :arel_table, :names, :values, :operator, :before_or_after
 
-            def assemble_conditions(conditions)
-              conditions.join
-            end
-
             def table_condition(attribute, value, operator)
               case operator
               when '>'

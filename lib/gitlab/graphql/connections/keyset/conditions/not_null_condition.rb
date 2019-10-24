@@ -7,18 +7,16 @@ module Gitlab
         module Conditions
           class NotNullCondition < BaseCondition
             def build
-              conditions = []
-              conditions << first_attribute_condition
+              conditions = [first_attribute_condition]
 
               # If there is only one order field, we can assume it
               # does not contain NULLs, and don't need additional
               # conditions
               unless names.count == 1
-                conditions << second_attribute_condition
-                conditions << final_condition
+                conditions << [second_attribute_condition, final_condition]
               end
 
-              assemble_conditions(conditions)
+              conditions.join
             end
 
             private

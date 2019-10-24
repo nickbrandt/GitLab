@@ -27,7 +27,7 @@ describe Gitlab::Graphql::Connections::Keyset::OrderInfo do
 
       it 'raises an error' do
         expect { described_class.validate_ordering(relation, order_list) }
-          .to raise_error(::ArgumentError, 'A minimum of 1 ordering field is required')
+          .to raise_error(ArgumentError, 'A minimum of 1 ordering field is required')
       end
     end
 
@@ -36,7 +36,7 @@ describe Gitlab::Graphql::Connections::Keyset::OrderInfo do
 
       it 'raises an error' do
         expect { described_class.validate_ordering(relation, order_list) }
-          .to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'A maximum of 2 ordering fields are allowed')
+          .to raise_error(ArgumentError, 'A maximum of 2 ordering fields are allowed')
       end
     end
 
@@ -45,7 +45,7 @@ describe Gitlab::Graphql::Connections::Keyset::OrderInfo do
 
       it 'raises an error' do
         expect { described_class.validate_ordering(relation, order_list) }
-          .to raise_error(Gitlab::Graphql::Errors::ArgumentError, "Column `updated_at` must not allow NULL")
+          .to raise_error(ArgumentError, "Column `updated_at` must not allow NULL")
       end
     end
 
@@ -54,7 +54,7 @@ describe Gitlab::Graphql::Connections::Keyset::OrderInfo do
 
       it 'raises error if primary key is not last field' do
         expect { described_class.validate_ordering(relation, order_list) }
-          .to raise_error(Gitlab::Graphql::Errors::ArgumentError, "Last ordering field must be the primary key, `#{relation.primary_key}`")
+          .to raise_error(ArgumentError, "Last ordering field must be the primary key, `#{relation.primary_key}`")
       end
     end
   end

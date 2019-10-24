@@ -9,7 +9,7 @@ module Gitlab
             @arel_table, @order_list, @decoded_cursor, @before_or_after = arel_table, order_list, decoded_cursor, before_or_after
 
             if order_list.empty?
-              raise Gitlab::Graphql::Errors::ArgumentError.new('No ordering scopes have been supplied')
+              raise ArgumentError.new('No ordering scopes have been supplied')
             end
           end
 
@@ -44,12 +44,10 @@ module Gitlab
             attr_values = attr_names.map { |name| decoded_cursor[name] }
 
             if attr_names.count == 1 && attr_values.first.nil?
-              raise Gitlab::Graphql::Errors::ArgumentError.new('Only one sortable scope and nil was supplied')
+              raise Gitlab::Graphql::Errors::ArgumentError.new('Before/after cursor invalid: `nil` was provided as only sortable value')
             end
 
-            operators = comparison_operators
-
-            if attr_names.count == 1 || attr_values.first.presence
+            if attr_names.count == 1 || attr_values.first.present?
               Keyset::Conditions::NotNullCondition.new(arel_table, attr_names, attr_values, operators, before_or_after).build
             else
               Keyset::Conditions::NullCondition.new(arel_table, attr_names, attr_values, operators, before_or_after).build
@@ -60,7 +58,7 @@ module Gitlab
 
           attr_reader :arel_table, :order_list, :decoded_cursor, :before_or_after
 
-          def comparison_operators
+          def operators
             order_list.map { |field| field.operator_for(before_or_after) }
           end
         end
