@@ -1,0 +1,5 @@
+---
+title: Add migration to make public projects in private groups private
+merge_request: 19097
+author:
+type: fixed
