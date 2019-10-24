@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe Gitlab::SlashCommands::IssueComment do
   describe '#execute' do
-    let(:issue) { create(:issue, project: project) }
-    let(:project) { create(:project) }
+    let_it_be(:project) { create(:project) }
+    let_it_be(:issue) { create(:issue, project: project) }
     let(:user) { issue.author }
     let(:chat_name) { double(:chat_name, user: user) }
     let(:regex_match) { described_class.match("issue comment #{issue.iid}\nComment body") }
