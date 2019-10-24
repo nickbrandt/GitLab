@@ -42,7 +42,7 @@ export default () =>
         </span>
         <gl-toggle
           :value="isShowingLabels"
-          class="prepend-left-10"
+          class="prepend-left-10 mb-0"
           :label-on="toggleOnLabel"
           :label-off="toggleOffLabel"
           aria-describedby="board-labels-toggle-text"
