@@ -31,6 +31,16 @@ describe Projects::BoardsController do
     let(:parent) { project }
 
     it_behaves_like 'returns recently visited boards'
+
+    context 'unauthenticated' do
+      it 'returns a 302' do
+        sign_out(user)
+
+        list_boards(recent: true)
+
+        expect(response).to have_gitlab_http_status(302)
+      end
+    end
   end
 
   describe 'GET show' do
