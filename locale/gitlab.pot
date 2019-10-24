@@ -11875,9 +11875,6 @@ msgstr ""
 msgid "Package information"
 msgstr ""
 
-msgid "Package installation"
-msgstr ""
-
 msgid "Package was removed"
 msgstr ""
 
