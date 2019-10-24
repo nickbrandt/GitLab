@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 2019_10_26_124116) do
+=======
+ActiveRecord::Schema.define(version: 2019_10_24_134020) do
+>>>>>>> Add index on issue status for Zoom Meetings table
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -4041,6 +4045,7 @@ ActiveRecord::Schema.define(version: 2019_10_26_124116) do
     t.string "url", limit: 255
     t.index ["issue_id", "issue_status"], name: "index_zoom_meetings_on_issue_id_and_issue_status", unique: true, where: "(issue_status = 1)"
     t.index ["issue_id"], name: "index_zoom_meetings_on_issue_id"
+    t.index ["issue_status"], name: "index_zoom_meetings_on_issue_status"
     t.index ["project_id"], name: "index_zoom_meetings_on_project_id"
   end
 
