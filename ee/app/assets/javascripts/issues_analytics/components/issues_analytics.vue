@@ -1,7 +1,7 @@
 <script>
 import { s__ } from '~/locale';
 import { mapGetters, mapActions, mapState } from 'vuex';
-import { engineeringNotation, sum, average } from '@gitlab/ui/utils/number_utils';
+import { engineeringNotation, sum, average } from '@gitlab/ui/src/utils/number_utils';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { GlColumnChart, GlChartLegend } from '@gitlab/ui/charts';
 import { getMonthNames } from '~/lib/utils/datetime_utility';
