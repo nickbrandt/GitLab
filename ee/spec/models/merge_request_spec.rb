@@ -453,6 +453,18 @@ describe MergeRequest do
           subject
         end
 
+        context 'cache key includes sofware license policies' do
+          let!(:license_1) { create(:software_license_policy, project: project) }
+          let!(:license_2) { create(:software_license_policy, project: project) }
+
+          it 'returns key with license information' do
+            expect_any_instance_of(Ci::CompareLicenseScanningReportsService)
+                .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
+
+            expect(subject[:key]).to include(*[license_1.id, license_1.approval_status, license_2.id, license_2.approval_status])
+          end
+        end
+
         context 'when cached results is not latest' do
           before do
             allow_any_instance_of(Ci::CompareLicenseScanningReportsService)
