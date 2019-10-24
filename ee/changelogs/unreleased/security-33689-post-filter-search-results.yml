@@ -1,0 +1,5 @@
+---
+title: Redact search results based on Ability.allowed?
+merge_request:
+author:
+type: security
