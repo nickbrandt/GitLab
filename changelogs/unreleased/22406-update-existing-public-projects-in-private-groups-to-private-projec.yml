@@ -1,0 +1,5 @@
+---
+title: Fix visibility levels of projects to be not higher than their groups' level
+merge_request: 19097
+author:
+type: fixed
