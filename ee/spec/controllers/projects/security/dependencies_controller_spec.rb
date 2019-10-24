@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe Projects::Security::DependenciesController do
   describe 'GET index.json' do
-    set(:project) { create(:project, :repository, :private) }
-    set(:user) { create(:user) }
+    set(:developer) { create(:user) }
+    set(:guest) { create(:user) }
     let(:params) { { namespace_id: project.namespace, project_id: project } }
 
     before do
@@ -13,19 +13,26 @@ describe Projects::Security::DependenciesController do
     end
 
     context 'with authorized user' do
+      set(:project) { create(:project, :repository, :public) }
+
       before do
-        project.add_developer(user)
+        project.add_developer(developer)
+        project.add_guest(guest)
       end
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(dependency_list: true, license_management: true)
+          stub_licensed_features(dependency_list: true, license_management: true, security_dashboard: true)
         end
 
-        it 'counts usage of the feature' do
-          expect(::Gitlab::UsageCounters::DependencyList).to receive(:increment).with(project.id)
+        context 'when usage ping is collected' do
+          let(:user) { developer }
 
-          get :index, params: params, format: :json
+          it 'counts usage of the feature' do
+            expect(::Gitlab::UsageCounters::DependencyList).to receive(:increment).with(project.id)
+
+            get :index, params: params, format: :json
+          end
         end
 
         context 'with existing report' do
@@ -36,6 +43,8 @@ describe Projects::Security::DependenciesController do
           end
 
           context 'without pagination params' do
+            let(:user) { developer }
+
             it 'returns a hash with dependencies' do
               expect(json_response).to be_a(Hash)
               expect(json_response['dependencies'].length).to eq(21)
@@ -58,6 +67,8 @@ describe Projects::Security::DependenciesController do
 
           context 'with params' do
             context 'with sorting params' do
+              let(:user) { developer }
+
               context 'when sorted by packager' do
                 let(:params) do
                   {
@@ -105,12 +116,25 @@ describe Projects::Security::DependenciesController do
                 }
               end
 
-              it 'return vulnerable dependencies' do
-                expect(json_response['dependencies'].length).to eq(3)
+              context 'with authorized user to see vulnerabilities' do
+                let(:user) { developer }
+
+                it 'return vulnerable dependencies' do
+                  expect(json_response['dependencies'].length).to eq(3)
+                end
+              end
+
+              context 'without authorized user to see vulnerabilities' do
+                let(:user) { guest }
+
+                it 'return vulnerable dependencies' do
+                  expect(json_response['dependencies']).to be_empty
+                end
               end
             end
 
             context 'with pagination params' do
+              let(:user) { developer }
               let(:params) { { namespace_id: project.namespace, project_id: project, page: 2 } }
 
               it 'returns paginated list' do
@@ -122,6 +146,7 @@ describe Projects::Security::DependenciesController do
         end
 
         context 'with found license report' do
+          let(:user) { developer }
           let(:pipeline) { create(:ee_ci_pipeline, :with_dependency_list_report, project: project) }
           let(:license_build) { create(:ee_ci_build, :success, :license_management, pipeline: pipeline) }
 
@@ -138,7 +163,8 @@ describe Projects::Security::DependenciesController do
           end
         end
 
-        context 'without existing report' do
+        context 'with a report of the wrong type' do
+          let(:user) { developer }
           let!(:pipeline) { create(:ee_ci_pipeline, :with_sast_report, project: project) }
 
           before do
@@ -155,6 +181,7 @@ describe Projects::Security::DependenciesController do
         end
 
         context 'when report doesn\'t have dependency list' do
+          let(:user) { developer }
           let!(:pipeline) { create(:ee_ci_pipeline, :with_dependency_scanning_report, project: project) }
 
           before do
@@ -167,6 +194,7 @@ describe Projects::Security::DependenciesController do
         end
 
         context 'when job failed' do
+          let(:user) { developer }
           let!(:pipeline) { create(:ee_ci_pipeline, :success, project: project) }
           let!(:build) { create(:ee_ci_build, :dependency_list, :failed, :allowed_to_fail) }
 
@@ -183,6 +211,8 @@ describe Projects::Security::DependenciesController do
       end
 
       context 'when licensed feature is unavailable' do
+        let(:user) { developer }
+
         before do
           get :index, params: params, format: :json
         end
@@ -194,6 +224,9 @@ describe Projects::Security::DependenciesController do
     end
 
     context 'with unauthorized user' do
+      let(:project) { create(:project, :repository, :private) }
+      let(:user) { guest }
+
       before do
         stub_licensed_features(dependency_list: true)
         project.add_guest(user)
