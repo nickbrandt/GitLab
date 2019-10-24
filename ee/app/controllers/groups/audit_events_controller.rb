@@ -7,6 +7,6 @@ class Groups::AuditEventsController < Groups::ApplicationController
   layout 'group_settings'
 
   def index
-    @events = LogFinder.new(entity_type: group.class.name, entity_id: group.id).execute.page(params[:page])
+    @events = AuditLogFinder.new(entity_type: group.class.name, entity_id: group.id).execute.page(params[:page])
   end
 end

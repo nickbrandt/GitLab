@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe LogFinder do
+describe AuditLogFinder do
   describe '#execute' do
     set(:user_audit_event) { create(:user_audit_event, created_at: 3.days.ago) }
     set(:project_audit_event) { create(:project_audit_event, created_at: 2.days.ago) }
