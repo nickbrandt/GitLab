@@ -14,6 +14,7 @@ import {
 describe('License Report MR Widget', () => {
   const Component = Vue.extend(LicenseManagement);
   const apiUrl = `${TEST_HOST}/license_management`;
+  const securityApprovalsHelpPagePath = `${TEST_HOST}/path/to/security/approvals/help`;
   let vm;
 
   const defaultState = {
@@ -32,6 +33,9 @@ describe('License Report MR Widget', () => {
     licenseSummaryText() {
       return 'FOO';
     },
+    reportContainsBlacklistedLicense() {
+      return false;
+    },
   };
 
   const defaultProps = {
@@ -44,6 +48,7 @@ describe('License Report MR Widget', () => {
     licenseManagementSettingsPath: `${TEST_HOST}/lm_settings`,
     fullReportPath: `${TEST_HOST}/path/to/the/full/report`,
     apiUrl,
+    securityApprovalsHelpPagePath,
   };
 
   const defaultActions = {
@@ -256,6 +261,31 @@ describe('License Report MR Widget', () => {
       );
 
       expect(actions.loadParsedLicenseReport).not.toHaveBeenCalled();
+    });
+
+    describe('approval status', () => {
+      const findSecurityApprovalHelpLink = () =>
+        vm.$el.querySelector('.js-security-approval-help-link');
+
+      it('does not show a link to security approval help page if report does not contain blacklisted licenses', () => {
+        expect(findSecurityApprovalHelpLink()).toBeNull();
+      });
+
+      it('shows a link to security approval help page if report contains blacklisted licenses', () => {
+        const getters = {
+          ...defaultGetters,
+          reportContainsBlacklistedLicense() {
+            return true;
+          },
+        };
+        vm = mountComponent({ getters });
+        const securityApprovalHelpLink = findSecurityApprovalHelpLink();
+
+        expect(findSecurityApprovalHelpLink()).not.toBeNull();
+        expect(securityApprovalHelpLink.getAttribute('href')).toEqual(
+          securityApprovalsHelpPagePath,
+        );
+      });
     });
   });
 
