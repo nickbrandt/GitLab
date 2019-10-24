@@ -91,9 +91,22 @@ export const fetchSastContainerDiff = ({ state, dispatch }) => {
         enrichData: values[1].data,
       });
     })
-    .catch(() => {
-      dispatch('receiveSastContainerDiffError');
+    .catch(({ response }) => {
+      if (
+        response &&
+        response.data &&
+        response.data.status_reason ===
+          'This merge request does not have container scanning reports'
+      ) {
+        dispatch('noSastContainerReports');
+      } else {
+        dispatch('receiveSastContainerDiffError');
+      }
     });
+};
+
+export const noSastContainerReports = ({ commit }) => {
+  commit(types.RECIEVE_NO_SAST_CONTAINER_REPORTS);
 };
 
 export const fetchSastContainerReports = ({ state, dispatch }) => {

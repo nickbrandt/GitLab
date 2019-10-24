@@ -9,6 +9,7 @@ export const groupedSastContainerText = ({ sastContainer }) =>
     messages.CONTAINER_SCANNING,
     messages.CONTAINER_SCANNING_HAS_ERROR,
     messages.CONTAINER_SCANNING_IS_LOADING,
+    messages.CONTAINER_SCANNING_NO_REPORTS,
   );
 
 export const groupedDastText = ({ dast }) =>

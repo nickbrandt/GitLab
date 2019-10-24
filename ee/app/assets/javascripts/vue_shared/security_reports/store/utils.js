@@ -406,15 +406,25 @@ export const countIssues = ({ newIssues = [], resolvedIssues = [], allIssues = [
  * @param {String} loadingMessage The message to show if the report is still loading
  * @returns {String}
  */
-export const groupedReportText = (report, reportType, errorMessage, loadingMessage) => {
+export const groupedReportText = (
+  report,
+  reportType,
+  errorMessage,
+  loadingMessage,
+  noReportMessage,
+) => {
   const { paths } = report;
-
-  if (report.hasError) {
-    return errorMessage;
-  }
 
   if (report.isLoading) {
     return loadingMessage;
+  }
+
+  if (report.hasNoReport) {
+    return noReportMessage;
+  }
+
+  if (report.hasError) {
+    return errorMessage;
   }
 
   return groupedTextBuilder({

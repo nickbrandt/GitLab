@@ -2,6 +2,9 @@ import { s__, sprintf } from '~/locale';
 
 const TRANSLATION_IS_LOADING = s__('ciReport|%{reportType} is loading');
 const TRANSLATION_HAS_ERROR = s__('ciReport|%{reportType}: Loading resulted in an error');
+const TRANSLATION_NO_REPORT = s__(
+  'ciReport|This Merge Request does not have %{reportType} reports',
+);
 
 const SAST = s__('ciReport|SAST');
 const DAST = s__('ciReport|DAST');
@@ -23,6 +26,7 @@ export default {
     reportType: CONTAINER_SCANNING,
   }),
   CONTAINER_SCANNING_HAS_ERROR: sprintf(TRANSLATION_HAS_ERROR, { reportType: CONTAINER_SCANNING }),
+  CONTAINER_SCANNING_NO_REPORTS: sprintf(TRANSLATION_NO_REPORT, { reportType: CONTAINER_SCANNING }),
   DEPENDENCY_SCANNING_IS_LOADING: sprintf(TRANSLATION_IS_LOADING, {
     reportType: DEPENDENCY_SCANNING,
   }),

@@ -25,6 +25,7 @@ export default () => ({
 
     isLoading: false,
     hasError: false,
+    hasNoReport: false,
 
     newIssues: [],
     resolvedIssues: [],

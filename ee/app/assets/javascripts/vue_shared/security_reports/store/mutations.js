@@ -119,6 +119,11 @@ export default {
     Vue.set(state.sastContainer, 'hasError', true);
   },
 
+  [types.RECIEVE_NO_SAST_CONTAINER_REPORTS](state) {
+    Vue.set(state.sastContainer, 'isLoading', false);
+    Vue.set(state.sastContainer, 'hasNoReport', true);
+  },
+
   [types.RECEIVE_SAST_CONTAINER_ERROR](state) {
     Vue.set(state.sastContainer, 'isLoading', false);
     Vue.set(state.sastContainer, 'hasError', true);
