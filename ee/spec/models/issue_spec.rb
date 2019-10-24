@@ -14,31 +14,21 @@ describe Issue do
       context 'when issue title is "New: Incident"' do
         let(:issue) { build(:issue, project: project, title: 'New: Incident') }
 
-        context 'when incident management available' do
+        context 'when alerts service is active' do
           before do
-            stub_licensed_features(incident_management: true)
+            allow(project).to receive(:alerts_service_activated?).and_return(true)
           end
 
-          context 'when alerts service is active' do
-            let!(:alerts_service) { create(:alerts_service, project: project) }
+          it 'updates issue title with the IID' do
+            issue.save
 
-            it 'updates issue title with the IID' do
-              issue.save
-
-              expect(issue.reload.title).to eq("New: Incident #{issue.id}")
-            end
-          end
-
-          context 'when alerts service is not active' do
-            it 'does not change issue title' do
-              expect { issue.save }.not_to change { issue.title }
-            end
+            expect(issue.reload.title).to eq("New: Incident #{issue.id}")
           end
         end
 
-        context 'when incident management is not available' do
+        context 'when alerts service is not active' do
           before do
-            stub_licensed_features(incident_management: false)
+            allow(project).to receive(:alerts_service_activated?).and_return(false)
           end
 
           it 'does not change issue title' do

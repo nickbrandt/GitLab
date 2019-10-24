@@ -135,22 +135,13 @@ module EE
     private
 
     def update_generic_alert_issue_if_applicable
-      return unless has_default_generic_alert_title? && alerts_service_activated?
+      return unless has_default_generic_alert_title? && project.alerts_service_activated?
 
       update_column(:title, "#{title} #{id}")
     end
 
     def has_default_generic_alert_title?
       title == ::Gitlab::Alerting::NotificationPayloadParser::DEFAULT_TITLE
-    end
-
-    def incident_management_available?
-      project.feature_available?(:incident_management)
-    end
-
-    def alerts_service_activated?
-      incident_management_available? &&
-        project.alerts_service.try(:active?)
     end
   end
 end
