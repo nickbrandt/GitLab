@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { slugify } from '~/lib/utils/text_utility';
 import * as types from './mutation_types';
-import { normalizeMetrics, sortMetrics, normalizeMetric, normalizeQueryResult } from './utils';
+import { normalizeMetrics, normalizeMetric, normalizeQueryResult } from './utils';
 
 const normalizePanel = panel => panel.metrics.map(normalizeMetric);
 
@@ -11,8 +11,9 @@ export default {
     state.showEmptyState = true;
   },
   [types.RECEIVE_METRICS_DATA_SUCCESS](state, groupData) {
-    state.dashboard.panel_groups = groupData.map((panelGroup, i) => {
-      let { metrics = [], panels = [] } = panelGroup;
+    state.dashboard.panel_groups = groupData.map((group, i) => {
+      const key = `${slugify(group.group)}-${i}`;
+      let { metrics = [], panels = [] } = group;
 
       // each panel has metric information that needs to be normalized
 
@@ -32,10 +33,10 @@ export default {
       }
 
       return {
-        ...panelGroup,
+        ...group,
         panels,
-        key: `${slugify(panelGroup.group)}-${i}`,
-        metrics: normalizeMetrics(sortMetrics(metrics)),
+        key,
+        metrics: normalizeMetrics(metrics),
       };
     });
 
