@@ -319,10 +319,10 @@ module KubernetesHelpers
     }
   end
 
-  def kube_knative_services_body(legacy_knative: false, **options)
+  def kube_knative_services_body(**options)
     {
       "kind" => "List",
-      "items" => [legacy_knative ? knative_05_service(options) : knative_06_service(options)]
+      "items" => [knative_07_service(options)]
     }
   end
 
