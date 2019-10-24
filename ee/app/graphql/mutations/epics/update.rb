@@ -2,8 +2,7 @@
 
 module Mutations
   module Epics
-    class Update < BaseMutation
-      include Mutations::ResolvesGroup
+    class Update < Base
       prepend Mutations::SharedEpicArguments
 
       graphql_name 'UpdateEpic'
@@ -37,16 +36,6 @@ module Mutations
           epic: epic.reset,
           errors: errors_on_object(epic)
         }
-      end
-
-      private
-
-      def find_object(group_path:, iid:)
-        group = resolve_group(full_path: group_path)
-        resolver = Resolvers::EpicResolver
-          .single.new(object: group, context: context)
-
-        resolver.resolve(iid: iid)
       end
     end
   end
