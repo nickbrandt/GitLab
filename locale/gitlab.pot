@@ -18669,6 +18669,9 @@ msgstr ""
 msgid "Welcome to GitLab"
 msgstr ""
 
+msgid "Welcome to GitLab %{username}!"
+msgstr ""
+
 msgid "Welcome to the Guided GitLab Tour"
 msgstr ""
 
