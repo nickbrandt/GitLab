@@ -7,6 +7,56 @@ describe Issue do
 
   using RSpec::Parameterized::TableSyntax
 
+  context 'callbacks' do
+    describe '.after_create' do
+      set(:project) { create(:project) }
+
+      context 'when issue title is "New: Incident"' do
+        let(:issue) { build(:issue, project: project, title: 'New: Incident') }
+
+        context 'when incident management available' do
+          before do
+            stub_licensed_features(incident_management: true)
+          end
+
+          context 'when alerts service is active' do
+            let!(:alerts_service) { create(:alerts_service, project: project) }
+
+            it 'updates issue title with the IID' do
+              issue.save
+
+              expect(issue.reload.title).to eq("New: Incident #{issue.id}")
+            end
+          end
+
+          context 'when alerts service is not active' do
+            it 'does not change issue title' do
+              expect { issue.save }.not_to change { issue.title }
+            end
+          end
+        end
+
+        context 'when incident management is not available' do
+          before do
+            stub_licensed_features(incident_management: false)
+          end
+
+          it 'does not change issue title' do
+            expect { issue.save }.not_to change { issue.title }
+          end
+        end
+      end
+
+      context 'when issue title is not "New: Incident"' do
+        let(:issue) { build(:issue, project: project, title: 'Not New: Incident') }
+
+        it 'does not change issue title' do
+          expect { issue.save }.not_to change { issue.title }
+        end
+      end
+    end
+  end
+
   context 'scopes' do
     describe '.service_desk' do
       it 'returns the service desk issue' do

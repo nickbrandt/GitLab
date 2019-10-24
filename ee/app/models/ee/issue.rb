@@ -33,6 +33,8 @@ module EE
       has_many :prometheus_alerts, through: :prometheus_alert_events
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
+
+      after_create :update_generic_alert_issue_if_applicable
     end
 
     class_methods do
@@ -128,6 +130,27 @@ module EE
       def weight_options
         [WEIGHT_NONE] + WEIGHT_RANGE.to_a
       end
+    end
+
+    private
+
+    def update_generic_alert_issue_if_applicable
+      return unless has_default_generic_alert_title? && alerts_service_activated?
+
+      update_column(:title, "#{title} #{id}")
+    end
+
+    def has_default_generic_alert_title?
+      title == ::Gitlab::Alerting::NotificationPayloadParser::DEFAULT_TITLE
+    end
+
+    def incident_management_available?
+      project.feature_available?(:incident_management)
+    end
+
+    def alerts_service_activated?
+      incident_management_available? &&
+        project.alerts_service.try(:active?)
     end
   end
 end
