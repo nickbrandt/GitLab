@@ -28,6 +28,12 @@ describe Gitlab::SlashCommands::IssueComment do
           it 'creates a new comment' do
             expect { subject }.to change { issue.notes.count }.by(1)
           end
+
+          it 'a new comment has a correct body' do
+            subject
+
+            expect(issue.notes.last.note).to eq('Comment body')
+          end
         end
 
         context 'when comment body does not exist' do
