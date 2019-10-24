@@ -24,6 +24,13 @@ describe('Monitoring mutations', () => {
       groups = metricsGroupsAPIResponse.data;
     });
 
+    it('adds a key to the group', () => {
+      mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, groups);
+
+      expect(stateCopy.dashboard.panel_groups[0].key).toBe('kubernetes-0');
+      expect(stateCopy.dashboard.panel_groups[1].key).toBe('nginx-1');
+    });
+
     it('normalizes values', () => {
       mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, groups);
 
