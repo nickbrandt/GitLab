@@ -13,6 +13,7 @@ export const group = {
   id: 1,
   name: 'foo',
   path: 'foo',
+  full_path: 'foo',
   avatar_url: `${TEST_HOST}/images/home/nasa.svg`,
 };
 

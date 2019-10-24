@@ -45,7 +45,6 @@ export default {
     ...mapState([
       'isLoading',
       'isLoadingStage',
-      'isLoadingStageForm',
       'isEmptyStage',
       'isAddingCustomStage',
       'selectedGroup',
@@ -84,7 +83,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'fetchCustomStageFormData',
+      'fetchGroupLabels',
       'fetchCycleAnalyticsData',
       'fetchStageData',
       'setCycleAnalyticsDataEndpoint',
@@ -95,12 +94,14 @@ export default {
       'fetchStageData',
       'setSelectedStageName',
       'hideCustomStageForm',
+      'showCustomStageForm',
       'setDateRange',
     ]),
     onGroupSelect(group) {
       this.setCycleAnalyticsDataEndpoint(group.full_path);
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
+      this.fetchGroupLabels(this.currentGroupPath);
     },
     onProjectsSelect(projects) {
       const projectIds = projects.map(value => value.id);
@@ -114,7 +115,7 @@ export default {
       this.fetchStageData(this.currentStage.name);
     },
     onShowAddStageForm() {
-      this.fetchCustomStageFormData(this.currentGroupPath);
+      this.showCustomStageForm();
     },
     initDateRange() {
       const endDate = new Date(Date.now());
@@ -201,7 +202,7 @@ export default {
           class="js-stage-table"
           :current-stage="currentStage"
           :stages="stages"
-          :is-loading="isLoadingStage || isLoadingStageForm"
+          :is-loading="isLoadingStage"
           :is-empty-stage="isEmptyStage"
           :is-adding-custom-stage="isAddingCustomStage"
           :current-stage-events="currentStageEvents"
