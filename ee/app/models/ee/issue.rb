@@ -34,7 +34,7 @@ module EE
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
 
-      after_create :update_generic_alert_issue_if_applicable
+      after_create :update_generic_alert_title_if_applicable
     end
 
     class_methods do
@@ -134,14 +134,14 @@ module EE
 
     private
 
-    def update_generic_alert_issue_if_applicable
-      return unless has_default_generic_alert_title? && project.alerts_service_activated?
-
-      update_column(:title, "#{title} #{id}")
+    def update_generic_alert_title_if_applicable
+      update_column(:title, "#{title} #{id}") if generic_alert_with_default_title?
     end
 
-    def has_default_generic_alert_title?
-      title == ::Gitlab::Alerting::NotificationPayloadParser::DEFAULT_TITLE
+    def generic_alert_with_default_title?
+      title == ::Gitlab::Alerting::NotificationPayloadParser::DEFAULT_TITLE &&
+        project.alerts_service_activated? &&
+        author == ::User.alert_bot
     end
   end
 end

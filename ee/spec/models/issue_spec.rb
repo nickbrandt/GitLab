@@ -10,19 +10,30 @@ describe Issue do
   context 'callbacks' do
     describe '.after_create' do
       set(:project) { create(:project) }
+      let(:author) { User.alert_bot }
 
       context 'when issue title is "New: Incident"' do
-        let(:issue) { build(:issue, project: project, title: 'New: Incident') }
+        let(:issue) { build(:issue, project: project, author: author, title: 'New: Incident') }
 
         context 'when alerts service is active' do
           before do
             allow(project).to receive(:alerts_service_activated?).and_return(true)
           end
 
-          it 'updates issue title with the IID' do
-            issue.save
+          context 'when the author is Alert Bot' do
+            it 'updates issue title with the IID' do
+              issue.save
 
-            expect(issue.reload.title).to eq("New: Incident #{issue.id}")
+              expect(issue.reload.title).to eq("New: Incident #{issue.id}")
+            end
+          end
+
+          context 'when the author is not an Alert Bot' do
+            let(:author) { create(:user) }
+
+            it 'does not change issue title' do
+              expect { issue.save }.not_to change { issue.title }
+            end
           end
         end
 
