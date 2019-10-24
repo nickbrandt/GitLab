@@ -17,7 +17,7 @@ describe Projects::Prometheus::Alerts::UpdateService do
     {
       environment_id: alert.environment_id,
       prometheus_metric_id: alert.prometheus_metric_id,
-      operator: '=',
+      operator: '==',
       threshold: 2.0
     }
   end
