@@ -46,5 +46,9 @@ module Epics
     def saved_change_to_epic_dates?(epic)
       (epic.saved_changes.keys.map(&:to_sym) & EPIC_DATE_FIELDS).present?
     end
+
+    def after_update(epic)
+      epic.update_mentions!
+    end
   end
 end

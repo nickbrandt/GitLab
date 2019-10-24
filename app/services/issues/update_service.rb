@@ -21,6 +21,10 @@ module Issues
       spam_check(issue, current_user) unless skip_spam_check
     end
 
+    def after_update(issue)
+      issue.update_mentions!
+    end
+
     def handle_changes(issue, options)
       old_associations = options.fetch(:old_associations, {})
       old_labels = old_associations.fetch(:labels, [])

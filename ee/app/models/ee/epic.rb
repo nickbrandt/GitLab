@@ -51,6 +51,7 @@ module EE
 
       has_many :epic_issues
       has_many :issues, through: :epic_issues
+      has_many :user_mentions, class_name: "EpicUserMention"
 
       validates :group, presence: true
       validate :validate_parent, on: :create

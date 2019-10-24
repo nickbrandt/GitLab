@@ -103,6 +103,7 @@ module MergeRequests
     end
 
     def after_update(issuable)
+      issuable.update_mentions!
       issuable.cache_merge_request_closes_issues!(current_user)
     end
 

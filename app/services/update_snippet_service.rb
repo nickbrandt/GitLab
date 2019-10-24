@@ -25,8 +25,9 @@ class UpdateSnippetService < BaseService
     snippet.assign_attributes(params)
     spam_check(snippet, current_user)
 
-    snippet.save.tap do |succeeded|
-      Gitlab::UsageDataCounters::SnippetCounter.count(:update) if succeeded
+    if snippet.save
+      snippet.update_mentions!
+      Gitlab::UsageDataCounters::SnippetCounter.count(:update)
     end
   end
 end

@@ -33,6 +33,7 @@ issues:
 - zoom_meetings
 - vulnerability_links
 - related_vulnerabilities
+- user_mentions
 events:
 - author
 - project
@@ -81,6 +82,7 @@ snippets:
 - notes
 - award_emoji
 - user_agent_detail
+- user_mentions
 releases:
 - author
 - project
@@ -141,6 +143,7 @@ merge_requests:
 - description_versions
 - deployment_merge_requests
 - deployments
+- user_mentions
 external_pull_requests:
 - project
 merge_request_diff:

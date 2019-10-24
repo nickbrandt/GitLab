@@ -80,6 +80,25 @@ module Mentionable
     all_references(current_user).users
   end
 
+  def update_mentions!
+    return unless store_mentioned_users_to_db_enabled?
+
+    refs = all_references(self.author)
+
+    mention = user_mentions.find_or_initialize_by(note: nil)
+
+    mention.mentioned_users_ids = refs.mentioned_users.pluck(:id)
+    mention.mentioned_groups_ids = refs.mentioned_users_by_groups.pluck(:id)
+    mention.mentioned_projects_ids = refs.mentioned_users_by_projects.pluck(:id)
+
+    mention.save!
+  end
+
+  def store_mentioned_users_to_db_enabled?
+    return Feature.enabled?(:store_mentioned_users_to_db, self.project&.group) if self.respond_to?(:project)
+    return Feature.enabledd?(:store_mentioned_users_to_db, self.group) if self.respond_to?(:group)
+  end
+
   def directly_addressed_users(current_user = nil)
     all_references(current_user).directly_addressed_users
   end

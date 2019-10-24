@@ -21,10 +21,9 @@ module Notes
       end
 
       unless only_commands
+        note.update_mentions!
         note.create_new_cross_references!(current_user)
-
         update_todos(note, old_mentioned_users)
-
         update_suggestions(note)
       end
 

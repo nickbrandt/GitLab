@@ -22,6 +22,7 @@ class CreateSnippetService < BaseService
     spam_check(snippet, current_user)
 
     if snippet.save
+      snippet.update_mentions!
       UserAgentDetailService.new(snippet, @request).create
       Gitlab::UsageDataCounters::SnippetCounter.count(:create)
     end

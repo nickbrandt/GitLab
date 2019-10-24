@@ -19,6 +19,10 @@ module Epics
       end
     end
 
+    def after_create(epic)
+      epic.update_mentions!
+    end
+
     def whitelisted_epic_params
       result = params.slice(:title, :description, :label_ids, :parent_id)
 

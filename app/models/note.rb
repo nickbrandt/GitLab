@@ -302,6 +302,24 @@ class Note < ApplicationRecord
     nil
   end
 
+  def update_mentions!
+    return unless store_mentioned_users_to_db_enabled?
+    return unless noteable.respond_to?(:user_mentions)
+
+    refs = all_references(self.author)
+
+    mention = noteable.user_mentions.where(note: self).first_or_initialize
+    mention.mentioned_users_ids = refs.mentioned_users.presence&.pluck(:id)
+    mention.mentioned_groups_ids = refs.mentioned_users_by_groups.presence&.pluck(:id)
+    mention.mentioned_projects_ids = refs.mentioned_users_by_projects.presence&.pluck(:id)
+
+    if mention.has_mentions?
+      mention.save!
+    else
+      mention.destroy!
+    end
+  end
+
   # FIXME: Hack for polymorphic associations with STI
   #        For more information visit http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#label-Polymorphic+Associations
   def noteable_type=(noteable_type)
