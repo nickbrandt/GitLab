@@ -1,6 +1,6 @@
 # Vulnerabilities API **(ULTIMATE)**
 
-Every API call to vulnerabilities must be authenticated.
+Every API call to vulnerabilities must be [authenticated](README.md#authentication).
 
 Vulnerabilities are project-bound entities. If a user is not
 a member of a project to which the vulnerability belongs
@@ -157,9 +157,12 @@ Example response:
 
 Errors:
 
-_A Vulnerability Finding is already attached to a different Vulnerability_
+_A Vulnerability Finding is not found or already attached to a different Vulnerability_
 
-Occurs when a Finding chosen to create a Vulnerability from is already associated with a different Vulnerability.
+Occurs when a Finding chosen to create a Vulnerability from is not found or
+is already associated with a different Vulnerability.
+
+Status code: `400`
 
 Example response:
 
@@ -167,35 +170,7 @@ Example response:
 {
   "message": {
     "base": [
-      "already exists for specified finding(s)"
-    ]
-  }
-}
-```
-
-_Vulnerability Finding not found_
-
-Occurs when the specified `finding_id` is unknown.
-
-```json
-{
-  "message": {
-    "base": [
-      "finding to promote from is not found"
-    ]
-  }
-}
-```
-
-_Conflict: a Finding is being promoted by another user_
-
-Occurs when specified `finding_id` was locked by another user while promoting to a Vulnerability.
-
-```json
-{
-  "message": {
-    "base": [
-      "finding is being promoted to vulnerability by another user"
+      "finding is not found or is already attached to a vulnerability"
     ]
   }
 }

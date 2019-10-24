@@ -1,6 +1,6 @@
 # Vulnerabilities API **(ULTIMATE)**
 
-Every API call to vulnerabilities must be authenticated.
+Every API call to vulnerabilities must be [authenticated](README.md#authentication).
 
 Vulnerabilities are project-bound entities. If a user is not
 a member of a project to which vulnerability belongs
@@ -110,8 +110,8 @@ Example response:
 
 Dismisses a given vulnerability. Returns status code `304` if the vulnerability is already dismissed.
 
-If an authenticated user does not have a permission to
-[dismiss vulnerability](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
+If an authenticated user does not have permission to
+[dismiss vulnerabilities](../user/permissions_stub_first_class_vulnerabilities.md#project-members-permissions),
 this request will result in a `403` status code.
 
 ```
@@ -120,7 +120,7 @@ POST /vulnerabilities/:id/dismiss
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of a Vulnerability to dismiss |
+| `id` | integer/string | yes | The ID of a vulnerability to dismiss |
 
 ```bash
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/vulnerabilities/5/dismiss"
