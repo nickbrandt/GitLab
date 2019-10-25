@@ -2266,7 +2266,6 @@ describe Project do
     end
   end
 
-
   describe '#has_packages?' do
     let(:project) { create(:project, :public) }
 
