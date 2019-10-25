@@ -275,6 +275,21 @@ describe Security::PipelineVulnerabilitiesFinder do
       end
     end
 
+    context 'when being tested for sort stability' do
+      let(:params) { { report_type: %w[sast] } }
+
+      it 'maintains the order of the occurrences having the same severity and confidence' do
+        select_proc = proc { |o| o.severity == 'medium' && o.confidence == 'high' }
+        report_occurrences = pipeline.security_reports.reports['sast'].occurrences.select(&select_proc)
+
+        found_occurrences = subject.select(&select_proc)
+
+        found_occurrences.each_with_index do |found, i|
+          expect(found.metadata['cve']).to eq(report_occurrences[i].compare_key)
+        end
+      end
+    end
+
     def read_fixture(fixture)
       JSON.parse(File.read(fixture.file.path))
     end
