@@ -44,14 +44,6 @@ describe('RelatedItemsTree', () => {
       wrapper.destroy();
     });
 
-    describe('computed', () => {
-      describe('badgeTooltip', () => {
-        it('returns string containing epic count and issues count based on available direct children within state', () => {
-          expect(wrapper.vm.badgeTooltip).toBe('2 epics and 2 issues');
-        });
-      });
-    });
-
     describe('methods', () => {
       describe('handleActionClick', () => {
         const issuableType = issuableTypesMap.Epic;

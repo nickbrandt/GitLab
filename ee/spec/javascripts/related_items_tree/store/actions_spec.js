@@ -79,11 +79,16 @@ describe('RelatedItemTree', () => {
           testAction(
             actions.setChildrenCount,
             { children: mockChildren, isRemoved: false },
-            {},
+            state,
             [
               {
                 type: types.SET_CHILDREN_COUNT,
-                payload: { epicsCount: mockEpics.length, issuesCount: mockIssues.length },
+                payload: {
+                  childrenCounts: {
+                    epics: { closed: 1, opened: 1 },
+                    issues: { closed: 0, opened: 2 },
+                  },
+                },
               },
             ],
             [],
@@ -96,13 +101,27 @@ describe('RelatedItemTree', () => {
             actions.setChildrenCount,
             { children: mockChildren, isRemoved: true },
             {
-              epicsCount: mockEpics.length,
-              issuesCount: mockIssues.length,
+              ...state,
+              childrenCounts: {
+                epics: {
+                  closed: 1,
+                  opened: 1,
+                },
+                issues: {
+                  closed: 0,
+                  opened: 2,
+                },
+              },
             },
             [
               {
                 type: types.SET_CHILDREN_COUNT,
-                payload: { epicsCount: 0, issuesCount: 0 },
+                payload: {
+                  childrenCounts: {
+                    epics: { closed: 0, opened: 0 },
+                    issues: { closed: 0, opened: 0 },
+                  },
+                },
               },
             ],
             [],

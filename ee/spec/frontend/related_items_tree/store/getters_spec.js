@@ -75,13 +75,17 @@ describe('RelatedItemsTree', () => {
 
       describe('headerItems', () => {
         it('returns an item within array containing Epic iconName, count, qaClass & type props', () => {
-          state.epicsCount = 2;
+          state.childrenCounts.epics.opened = 2;
+          state.childrenCounts.epics.closed = 1;
           const epicHeaderItem = getters.headerItems(state)[0];
 
           expect(epicHeaderItem).toEqual(
             expect.objectContaining({
               iconName: 'epic',
-              count: 2,
+              count: expect.objectContaining({
+                opened: 2,
+                closed: 1,
+              }),
               qaClass: 'qa-add-epics-button',
               type: ChildType.Epic,
             }),
@@ -89,13 +93,17 @@ describe('RelatedItemsTree', () => {
         });
 
         it('returns an item within array containing Issue iconName, count, qaClass & type props', () => {
-          state.issuesCount = 2;
+          state.childrenCounts.issues.opened = 2;
+          state.childrenCounts.issues.closed = 1;
           const epicHeaderItem = getters.headerItems(state)[1];
 
           expect(epicHeaderItem).toEqual(
             expect.objectContaining({
               iconName: 'issues',
-              count: 2,
+              count: expect.objectContaining({
+                opened: 2,
+                closed: 1,
+              }),
               qaClass: 'qa-add-issues-button',
               type: ChildType.Issue,
             }),
