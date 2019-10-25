@@ -32,7 +32,7 @@ With GitLab merge requests, you can:
 
 While directly making changes to files in a branch of a repository is possible, it is not
 the common workflow. In most cases, a user will [create a merge request](creating_merge_requests.md),
-which is then reviewed, updated, approved and merged into the target branch. This is
+which is then [reviewed](reviewing_and_managing_merge_requests.md), updated, approved and merged into the target branch. This is
 especially true for merging changes from a feature branch into the master branch.
 
 [Creating merge requests](creating_merge_requests.md), as well as [reviewing and managing them](#reviewing-and-managing-merge-requests),
