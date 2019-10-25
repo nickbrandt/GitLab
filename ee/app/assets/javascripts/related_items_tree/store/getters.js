@@ -11,13 +11,13 @@ export const anyParentHasChildren = (state, getters) =>
 export const headerItems = state => [
   {
     iconName: 'epic',
-    count: state.epicsCount,
+    count: state.childrenCounts.epics,
     qaClass: 'qa-add-epics-button',
     type: ChildType.Epic,
   },
   {
     iconName: 'issues',
-    count: state.issuesCount,
+    count: state.childrenCounts.issues,
     qaClass: 'qa-add-issues-button',
     type: ChildType.Issue,
   },

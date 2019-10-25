@@ -26,19 +26,28 @@ export const setInitialParentItem = ({ commit }, data) =>
   commit(types.SET_INITIAL_PARENT_ITEM, data);
 
 export const setChildrenCount = ({ commit, state }, { children, isRemoved = false }) => {
-  const [epicsCount, issuesCount] = children.reduce(
-    (acc, item) => {
-      if (item.type === ChildType.Epic) {
-        acc[0] += isRemoved ? -1 : 1;
-      } else {
-        acc[1] += isRemoved ? -1 : 1;
-      }
-      return acc;
+  const childrenCounts = {
+    epics: {
+      opened: state.childrenCounts.epics.opened || 0,
+      closed: state.childrenCounts.epics.closed || 0,
     },
-    [state.epicsCount || 0, state.issuesCount || 0],
-  );
+    issues: {
+      opened: state.childrenCounts.issues.opened || 0,
+      closed: state.childrenCounts.issues.closed || 0,
+    },
+  };
 
-  commit(types.SET_CHILDREN_COUNT, { epicsCount, issuesCount });
+  children.forEach(child => {
+    if (child.type === ChildType.Epic) {
+      childrenCounts.epics[child.state] += isRemoved ? -1 : 1;
+    } else {
+      childrenCounts.issues[child.state] += isRemoved ? -1 : 1;
+    }
+  });
+
+  commit(types.SET_CHILDREN_COUNT, {
+    childrenCounts,
+  });
 };
 
 export const expandItem = ({ commit }, data) => commit(types.EXPAND_ITEM, data);

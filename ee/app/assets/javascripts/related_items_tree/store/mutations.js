@@ -18,9 +18,8 @@ export default {
     state.childrenFlags[state.parentItem.reference] = {};
   },
 
-  [types.SET_CHILDREN_COUNT](state, { epicsCount, issuesCount }) {
-    state.epicsCount = epicsCount;
-    state.issuesCount = issuesCount;
+  [types.SET_CHILDREN_COUNT](state, { childrenCounts }) {
+    state.childrenCounts = childrenCounts;
   },
 
   [types.SET_ITEM_CHILDREN](state, { parentItem, children, append }) {

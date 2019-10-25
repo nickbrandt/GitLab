@@ -6,8 +6,10 @@ export default () => ({
 
   children: {},
   childrenFlags: {},
-  epicsCount: 0,
-  issuesCount: 0,
+  childrenCounts: {
+    epics: {},
+    issues: {},
+  },
 
   // Add Item Form Data
   issuableType: null,

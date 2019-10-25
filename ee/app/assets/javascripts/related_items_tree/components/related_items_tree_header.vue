@@ -47,7 +47,7 @@ export default {
           <span class="text-secondary-400 font-weight-normal"
             >{{
               sprintf(__('%{openEpics} open, %{closedEpics} closed'), {
-                openEpics: headerItems[0].count.open,
+                openEpics: headerItems[0].count.opened,
                 closedEpics: headerItems[0].count.closed,
               })
             }}
@@ -58,7 +58,7 @@ export default {
           <span class="text-secondary-400 font-weight-normal"
             >{{
               sprintf(__('%{openIssues} open, %{closedIssues} closed'), {
-                openIssues: headerItems[1].count.open,
+                openIssues: headerItems[1].count.opened,
                 closedIssues: headerItems[1].count.closed,
               })
             }}
@@ -73,7 +73,7 @@ export default {
           class="d-inline-flex align-items-center"
         >
           <icon :size="16" :name="item.iconName" class="text-secondary mr-1" />
-          {{ item.count.total }}
+          {{ item.count.opened + item.count.closed }}
         </span>
       </div>
     </div>
