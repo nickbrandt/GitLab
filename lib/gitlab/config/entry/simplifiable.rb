@@ -4,7 +4,7 @@ module Gitlab
   module Config
     module Entry
       class Simplifiable < SimpleDelegator
-        EntryStrategy = Struct.new(:name, :condition)
+        EntryStrategy = Struct.new(:name, :klass, :condition)
 
         attr_reader :subject
 
@@ -25,7 +25,7 @@ module Gitlab
         end
 
         def self.strategy(name, **opts)
-          EntryStrategy.new(name, opts.fetch(:if)).tap do |strategy|
+          EntryStrategy.new(name, opts.dig(:class), opts.fetch(:if)).tap do |strategy|
             strategies.append(strategy)
           end
         end
@@ -36,7 +36,7 @@ module Gitlab
 
         def self.entry_class(strategy)
           if strategy.present?
-            self.const_get(strategy.name, false)
+            strategy.klass || self.const_get(strategy.name, false)
           else
             self::UnknownStrategy
           end

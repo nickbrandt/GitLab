@@ -1342,7 +1342,7 @@ module Gitlab
             expect(subject.builds.size).to eq(2)
             expect(subject.builds[0]).to eq(
               stage: "build",
-              stage_idx: 0,
+              stage_idx: 1,
               name: "build",
               options: {
                 script: ["test"]
@@ -1353,7 +1353,7 @@ module Gitlab
             )
             expect(subject.builds[1]).to eq(
               stage: "test",
-              stage_idx: 1,
+              stage_idx: 2,
               name: "bridge",
               options: {
                 bridge_needs: { pipeline: 'some/project' }
@@ -1372,7 +1372,7 @@ module Gitlab
             expect(subject.builds.size).to eq(2)
             expect(subject.builds[0]).to eq(
               stage: "build",
-              stage_idx: 0,
+              stage_idx: 1,
               name: "build",
               options: {
                 script: ["test"]
@@ -1383,7 +1383,7 @@ module Gitlab
             )
             expect(subject.builds[1]).to eq(
               stage: "test",
-              stage_idx: 1,
+              stage_idx: 2,
               name: "bridge",
               options: {
                 bridge_needs: { pipeline: 'some/project' }

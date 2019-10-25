@@ -9,7 +9,7 @@ module EE
             extend ActiveSupport::Concern
 
             prepended do
-              strategy :Bridge, if: -> (config) { config.is_a?(Hash) }
+              strategy :Bridge, class: EE::Gitlab::Ci::Config::Entry::Need::Bridge, if: -> (config) { config.is_a?(Hash) }
             end
 
             class Bridge < ::Gitlab::Config::Entry::Node
