@@ -219,4 +219,24 @@ describe 'Global elastic search', :elastic do
       expect(page).to have_content('Users 0')
     end
   end
+
+  describe 'When requesting basic search' do
+    it 'does not use Elasticsearch' do
+      create(:issue, project: project, title: 'project issue')
+
+      visit dashboard_projects_path
+
+      submit_search('project')
+
+      # Project won't be found since ES index is not up to date
+      expect(page).not_to have_content('Projects 1')
+
+      # Since there are no results you have the option to instead use basic
+      # search
+      click_link 'basic search'
+
+      # Project is found now that we are using basic search
+      expect(page).to have_content('Projects 1')
+    end
+  end
 end

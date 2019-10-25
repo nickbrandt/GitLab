@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Search
   module Elasticsearchable
     def use_elasticsearch?
