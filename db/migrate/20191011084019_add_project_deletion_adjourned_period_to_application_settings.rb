@@ -6,6 +6,6 @@ class AddProjectDeletionAdjournedPeriodToApplicationSettings < ActiveRecord::Mig
   DEFAULT_NUMBER_OF_DAYS_BEFORE_REMOVAL = 7
 
   def change
-    add_column :application_settings, :project_deletion_adjourned_period, :integer, default: 7, null: false
+    add_column :application_settings, :deletion_adjourned_period, :integer, default: 7, null: false
   end
 end
