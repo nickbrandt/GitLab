@@ -37,13 +37,18 @@ describe Issues::ZoomLinkService do
     shared_examples 'can add meeting' do
       it 'appends the new meeting to zoom_meetings' do
         expect(result).to be_success
-        expect(result.payload[:zoom_meetings].map(&:url))
-          .to include(zoom_link)
+        expect(ZoomMeeting.canonical_meeting_url(issue)).to eq(zoom_link)
       end
 
       it 'tracks the add event' do
         expect(Gitlab::Tracking).to receive(:event)
           .with('IncidentManagement::ZoomIntegration', 'add_zoom_meeting', label: 'Issue ID', value: issue.id)
+        result
+      end
+
+      it 'creates a zoom_link_added notification' do
+        expect(SystemNoteService).to receive(:zoom_link_added).with(issue, project, user)
+        expect(SystemNoteService).not_to receive(:zoom_link_removed)
         result
       end
     end
@@ -52,6 +57,12 @@ describe Issues::ZoomLinkService do
       it 'cannot add the meeting' do
         expect(result).to be_error
         expect(result.message).to eq('Failed to add a Zoom meeting')
+      end
+
+      it 'creates no notification' do
+        expect(SystemNoteService).not_to receive(:zoom_link_added)
+        expect(SystemNoteService).not_to receive(:zoom_link_removed)
+        result
       end
     end
 
@@ -74,6 +85,15 @@ describe Issues::ZoomLinkService do
 
     context 'with "added" Zoom meeting' do
       include_context '"added" Zoom meeting'
+      include_examples 'cannot add meeting'
+    end
+
+    context 'with "added" Zoom meeting and race condition' do
+      include_context '"added" Zoom meeting'
+      before do
+        allow(service).to receive(:can_add_link?).and_return(true)
+      end
+
       include_examples 'cannot add meeting'
     end
   end
@@ -104,13 +124,24 @@ describe Issues::ZoomLinkService do
         expect(result).to be_error
         expect(result.message).to eq('Failed to remove a Zoom meeting')
       end
+
+      it 'creates no notification' do
+        expect(SystemNoteService).not_to receive(:zoom_link_added)
+        expect(SystemNoteService).not_to receive(:zoom_link_removed)
+        result
+      end
     end
 
     shared_examples 'can remove meeting' do
+      it 'creates no notification' do
+        expect(SystemNoteService).not_to receive(:zoom_link_added).with(issue, project, user)
+        expect(SystemNoteService).to receive(:zoom_link_removed)
+        result
+      end
+
       it 'can remove the meeting' do
         expect(result).to be_success
-        expect(result.payload[:zoom_meetings].filter { |z| z.issue_status == "added" })
-        .to be_empty
+        expect(ZoomMeeting.canonical_meeting_url(issue)).to eq(nil)
       end
 
       it 'tracks the remove event' do

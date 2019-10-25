@@ -17,7 +17,7 @@ class ZoomMeeting < ApplicationRecord
   scope :canonical, -> (issue) { where(issue: issue).added_to_issue }
 
   def self.canonical_meeting(issue)
-    canonical(issue)&.first
+    canonical(issue)&.take
   end
 
   def self.canonical_meeting_url(issue)

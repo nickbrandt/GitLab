@@ -1,6 +1,5 @@
 ---
-title: Move zoom urls on issues added and removed by the zoom quick action commands
-  out of the issue discription and into a zoom meetings table
-merge_request:
+title: Store Zoom URLs in a table rather than in the issue description
+merge_request: 18620
 author:
 type: changed

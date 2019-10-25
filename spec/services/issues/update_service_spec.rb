@@ -222,15 +222,6 @@ describe Issues::UpdateService, :mailer do
       end
     end
 
-    context 'when zoom_meetings is changed' do
-      it 'creates zoom_link_added system note when a zoom link is added' do
-        update_issue(zoom_meetings: [create(:zoom_meeting, issue: issue)])
-        note = find_note('added a Zoom call')
-
-        expect(note.note).to eq('added a Zoom call to this issue')
-      end
-    end
-
     context 'when issue turns confidential' do
       let(:opts) do
         {

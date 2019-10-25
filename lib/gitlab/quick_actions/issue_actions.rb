@@ -182,11 +182,6 @@ module Gitlab
         end
         command :zoom do |link|
           result = @zoom_service.add_link(link)
-
-          if result.success?
-            @updates[:zoom_meetings] = result.payload[:zoom_meetings]
-          end
-
           @execution_message[:zoom] = result.message
         end
 
@@ -200,11 +195,6 @@ module Gitlab
         end
         command :remove_zoom do
           result = @zoom_service.remove_link
-
-          if result.success?
-            @updates[:zoom_meetings] = result.payload[:zoom_meetings]
-          end
-
           @execution_message[:remove_zoom] = result.message
         end
 

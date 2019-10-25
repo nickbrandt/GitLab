@@ -11,7 +11,12 @@ module Issues
 
     def add_link(link)
       if can_add_link? && (link = parse_link(link))
-        success(_('Zoom meeting added'), add_zoom_meeting(link))
+        begin
+          add_zoom_meeting(link)
+          success(_('Zoom meeting added'))
+        rescue ActiveRecord::RecordNotUnique
+          error(_('Failed to add a Zoom meeting'))
+        end
       else
         error(_('Failed to add a Zoom meeting'))
       end
@@ -19,18 +24,19 @@ module Issues
 
     def remove_link
       if can_remove_link?
-        success(_('Zoom meeting removed'), remove_zoom_meeting)
+        remove_zoom_meeting
+        success(_('Zoom meeting removed'))
       else
         error(_('Failed to remove a Zoom meeting'))
       end
     end
 
     def can_add_link?
-      can? && !@added_meeting
+      can_update_issue? && !@added_meeting
     end
 
     def can_remove_link?
-      can? && !!@added_meeting
+      can_update_issue? && !!@added_meeting
     end
 
     def parse_link(link)
@@ -57,28 +63,25 @@ module Issues
         url: link
       )
       track_meeting_added_event
-      issue.zoom_meetings
+      SystemNoteService.zoom_link_added(@issue, @project, current_user)
     end
 
     def remove_zoom_meeting
       @added_meeting.update(issue_status: :removed)
       track_meeting_removed_event
-      issue.zoom_meetings
+      SystemNoteService.zoom_link_removed(@issue, @project, current_user)
     end
 
-    def success(message, zoom_meetings)
-      ServiceResponse.success(
-        message: message,
-        payload: { zoom_meetings: zoom_meetings }
-      )
+    def success(message)
+      ServiceResponse.success(message: message)
     end
 
     def error(message)
       ServiceResponse.error(message: message)
     end
 
-    def can?
-      current_user.can?(:update_issue, project)
+    def can_update_issue?
+      can?(current_user, :update_issue, project)
     end
   end
 end

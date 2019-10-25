@@ -11,6 +11,7 @@ tree:
       - events:
         - :push_event_payload
     - issues:
+      - :zoom_meetings
       - events:
         - :push_event_payload
       - :timelogs
