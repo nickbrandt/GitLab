@@ -506,10 +506,10 @@ describe Projects::Settings::OperationsController do
         sign_out(user)
       end
 
-      it 'returns unauthorized status' do
+      it 'returns a redirect' do
         reset_alerting_token
 
-        expect(response).to have_gitlab_http_status(:unauthorized)
+        expect(response).to have_gitlab_http_status(:redirect)
       end
     end
 
