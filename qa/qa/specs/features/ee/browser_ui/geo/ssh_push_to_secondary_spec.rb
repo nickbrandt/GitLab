@@ -96,7 +96,7 @@ module QA
             # as ssh:// can appear depending on how GitLab is configured.
             ssh_uri = project.repository_ssh_location.git_uri.to_s.gsub(%r{ssh://}, '')
 
-            expect(push.output).to match(%r{GitLab: We'll help you by proxying this request to the primary: (?:ssh://)?#{ssh_uri}})
+            expect(push.output).to match(%r{We'll help you by proxying this.*request to the primary:.*#{ssh_uri}}m)
 
             # Validate git push worked and new content is visible
             Page::Project::Show.perform do |show|
@@ -188,7 +188,7 @@ module QA
             end
 
             ssh_uri = project.repository_ssh_location.git_uri.to_s.gsub(%r{ssh://}, '')
-            expect(push.output).to match(%r{GitLab: We'll help you by proxying this request to the primary: (?:ssh://)?#{ssh_uri}})
+            expect(push.output).to match(%r{We'll help you by proxying this.*request to the primary:.*#{ssh_uri}}m)
             expect(push.output).to match(/Locking support detected on remote "#{location.uri.to_s}"/)
 
             # Validate git push worked and new content is visible
