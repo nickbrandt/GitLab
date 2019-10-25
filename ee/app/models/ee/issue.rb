@@ -135,7 +135,7 @@ module EE
     private
 
     def update_generic_alert_title_if_applicable
-      update_attributes(title: "#{title} #{iid}") if generic_alert_with_default_title?
+      update(title: "#{title} #{iid}") if generic_alert_with_default_title?
     end
 
     def generic_alert_with_default_title?
