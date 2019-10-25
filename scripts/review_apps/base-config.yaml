@@ -46,10 +46,10 @@ gitlab:
   sidekiq:
     resources:
       requests:
-        cpu: 300m
+        cpu: 500m
         memory: 800M
       limits:
-        cpu: 400m
+        cpu: 1000m
         memory: 1.6G
   task-runner:
     resources:
