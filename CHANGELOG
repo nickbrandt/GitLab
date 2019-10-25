@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.15.0
+
+- Object store case insensitive ETag comparison !434
+- Upgrade gitaly to 1.68.0 !435
+
 v 8.14.0
 
 - Keep HTTP 1.0 cache headers from sendurl proxies !431
