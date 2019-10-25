@@ -3,7 +3,8 @@
 require 'pathname'
 
 module QA
-  context 'Secure', :docker do
+  # https://gitlab.com/gitlab-org/gitlab/issues/34900
+  context 'Secure', :docker, :quarantine  do
     let(:number_of_dependencies_in_fixture) { 1309 }
     let(:total_vuln_count) { 54 }
     let(:dependency_scan_vuln_count) { 4 }
