@@ -3,9 +3,7 @@
 namespace :analytics do
   root to: 'analytics#index'
 
-  constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG)) do
-    resource :productivity_analytics, only: :show
-  end
+  resource :productivity_analytics, only: :show, constraints: lambda { |req| Gitlab::Analytics.productivity_analytics_enabled? }
 
   constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG)) do
     resource :cycle_analytics, only: :show
