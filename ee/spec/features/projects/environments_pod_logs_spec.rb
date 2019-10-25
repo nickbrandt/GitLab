@@ -15,6 +15,7 @@ describe 'Environment > Pod Logs', :js do
 
   before do
     stub_licensed_features(pod_logs: true)
+    stub_feature_flags(environment_logs_use_vue_ui: false)
 
     create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
     create(:deployment, :success, environment: environment)

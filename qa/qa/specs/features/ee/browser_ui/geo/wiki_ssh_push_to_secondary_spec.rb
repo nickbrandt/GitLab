@@ -96,7 +96,7 @@ module QA
           # as ssh:// can appear depending on how GitLab is configured.
           ssh_uri = wiki.repository_ssh_location.git_uri.to_s.gsub(%r{ssh://}, '')
 
-          expect(push.output).to have_content(%r{GitLab: We'll help you by proxying this request to the primary: #{ssh_uri}})
+          expect(push.output).to match(%r{We'll help you by proxying this.*request to the primary:.*#{ssh_uri}}m)
 
           # Validate git push worked and new content is visible
           Page::Project::Menu.perform(&:click_wiki)

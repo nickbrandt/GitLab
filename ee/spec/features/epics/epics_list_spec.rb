@@ -48,6 +48,13 @@ describe 'epics list', :js do
       end
     end
 
+    it 'shows epic start and/or end dates when present' do
+      page.within('.issuable-list') do
+        expect(find("li[data-id='#{epic1.id}'] .issuable-info .issuable-dates")).to have_content("Until #{epic1.end_date.strftime('%b %d, %Y')}")
+        expect(find("li[data-id='#{epic2.id}'] .issuable-info .issuable-dates")).to have_content("From #{epic2.start_date.strftime('%b %d, %Y')}")
+      end
+    end
+
     it 'renders the filtered search bar correctly' do
       page.within('.content-wrapper .content') do
         expect(page).to have_css('.epics-filters')
