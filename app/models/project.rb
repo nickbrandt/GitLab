@@ -2286,10 +2286,6 @@ class Project < ApplicationRecord
     end
   end
 
-  def alerts_service_activated?
-    feature_available?(:incident_management) && alerts_service.try(:active?)
-  end
-
   private
 
   def closest_namespace_setting(name)
