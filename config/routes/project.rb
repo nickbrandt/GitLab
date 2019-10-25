@@ -517,6 +517,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       Gitlab.ee do
         namespace :security do
           resource :dashboard, only: [:show], controller: :dashboard
+
+          # @TODO - confirm the route
+          resources :configuration, only: [:index]
         end
 
         resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
