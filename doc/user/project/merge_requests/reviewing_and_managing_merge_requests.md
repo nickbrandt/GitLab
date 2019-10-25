@@ -2,28 +2,6 @@
 
 There are many ways to work with merge requests.
 
-| Feature                                                                                         | Tier    | Description                                                                                                                                              |
-|-------------------------------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Bulk editing merge requests](../../project/bulk_editing.md)                                    |         |                                                                                                                                                          |
-| [Cherry-pick changes](cherry_pick_changes.md)                                                   |         | Cherry-pick any commit in the UI by simply clicking the **Cherry-pick** button in a merged merge requests or a commit.                                   |
-| [Commenting on any file line in merge requests](#commenting-on-any-file-line-in-merge-requests) |         |                                                                                                                                                          |
-| [Fast-forward merge requests](fast_forward_merge.md)                                            |         | For a linear Git history and a way to accept merge requests without creating merge commits                                                               |
-| [Find the merge request that introduced a change](versions.md)                                  |         | When viewing the commit details page, GitLab will link to the merge request(s) containing that commit.                                                   |
-| [Live preview with Review Apps](#live-preview-with-review-apps)                                 |         |                                                                                                                                                          |
-| [Merge requests versions](versions.md)                                                          |         | Select and compare the different versions of merge request diffs                                                                                         |
-| [Merge when pipeline succeeds](merge_when_pipeline_succeeds.md)                                 |         | Set a merge request that looks ready to merge to merge automatically when CI pipeline succeeds.                                                          |
-| [Perform a Review](../../discussions/index.md#merge-request-reviews-premium)                    | Premium | Start a review in order to create multiple comments on a diff and publish them once you're ready.                                                        |
-| [Pipeline status in merge requests](#pipeline-status-in-merge-requests)                         |         |                                                                                                                                                          |
-| [Post-merge pipeline status](#post-merge-pipeline-status)                                       |         |                                                                                                                                                          |
-| [Resolve conflicts](resolve_conflicts.md)                                                       |         | GitLab can provide the option to resolve certain merge request conflicts in the GitLab UI.                                                               |
-| [Resolve threads in merge requests reviews](../../discussions/index.md)                         |         | Keep track of the progress during a code review by resolving comments.                                                                                   |
-| [Revert changes](revert_changes.md)                                                             |         | Revert changes from any commit from within a merge request.                                                                                              |
-| [Semi-linear history merge requests](#semi-linear-history-merge-requests)                       |         |                                                                                                                                                          |
-| [Suggest changes](../../discussions/index.md#suggest-changes)                                   |         | Add suggestions to change the content of merge requests directly into merge request threads, and easily apply them to the codebase directly from the UI. |
-| [View group merge requests](#view-group-merge-requests)                                         |         |                                                                                                                                                          |
-| [View project merge requests](#view-project-merge-requests)                                     |         |                                                                                                                                                          |
-| [Authorization for merge requests](#authorization-for-merge-requests)                           |         |                                                                                                                                                          |
-
 ## View project merge requests
 
 View all the merge requests within a project by navigating to **Project > Merge Requests**.
