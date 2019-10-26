@@ -235,9 +235,8 @@ describe Projects::Prometheus::Alerts::NotifyService do
         it 'does not send notification email', :sidekiq_might_not_need_inline do
           expect(project.feature_available?(:incident_management)).to eq(true)
 
-          expect_next_instance_of(NotificationService) do |service|
-            expect(service).not_to receive(:async)
-          end
+          expect_any_instance_of(NotificationService)
+            .not_to receive(:async)
 
           expect(subject).to eq(true)
         end
@@ -291,14 +290,14 @@ describe Projects::Prometheus::Alerts::NotifyService do
             setting.update!(create_issue: true)
           end
 
-          it_behaves_like 'processes incident issues', 1
+          it_behaves_like 'processes incident issues', 2
 
           context 'without firing alerts' do
             let(:payload_raw) do
               payload_for(firing: [], resolved: [alert_resolved])
             end
 
-            it_behaves_like 'does not process incident issues'
+            it_behaves_like 'processes incident issues', 1
           end
         end
 
