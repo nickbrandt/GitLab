@@ -16,6 +16,7 @@ module EE
 
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }
+      scope :order_created_at_desc, -> { reorder(created_at: :desc) }
       scope :service_desk, -> { where(author: ::User.support_bot) }
 
       has_one :epic_issue

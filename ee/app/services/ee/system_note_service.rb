@@ -242,6 +242,12 @@ module EE
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
     end
 
+    def auto_resolve_prometheus_alert(noteable, project, author)
+      body = 'automatically closed this issue because the alert resolved.'
+
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'closed'))
+    end
+
     private
 
     # We do not have a named route for DesignManagement::Version, instead
