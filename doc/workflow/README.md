@@ -7,7 +7,7 @@ comments: false
 - [Automatic issue closing](../user/project/issues/managing_issues.md#closing-issues-automatically)
 - [Cycle Analytics](../user/project/cycle_analytics.md)
 - [Description templates](../user/project/description_templates.md)
-- [Feature branch workflow](workflow.md)
+- [Feature branch workflow](../gitlab-basics/feature_branch_workflow.md)
 - [Groups](../user/group/index.md)
 - Issues - The GitLab Issue Tracker is an advanced and complete tool for
   tracking the evolution of a new idea or the process of solving a problem.
