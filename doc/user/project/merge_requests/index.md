@@ -1,5 +1,5 @@
 ---
-type: index, reference, concepts
+type: index, reference
 ---
 
 # Merge requests
@@ -32,8 +32,9 @@ With GitLab merge requests, you can:
 
 While directly making changes to files in a branch of a repository is possible, it is not
 the common workflow. In most cases, a user will [create a merge request](creating_merge_requests.md),
-which is then [reviewed](reviewing_and_managing_merge_requests.md), updated, approved and merged into the target branch. This is
-especially true for merging changes from a feature branch into the master branch.
+which is then [reviewed](reviewing_and_managing_merge_requests.md), updated, approved
+and merged into the target branch. This is especially true for merging changes from
+a feature branch into the master branch.
 
 [Creating merge requests](creating_merge_requests.md), as well as [reviewing and managing them](#reviewing-and-managing-merge-requests),
 is a fundamental part of working with GitLab.
@@ -55,7 +56,7 @@ A large number of features relate directly to the merge request creation process
 | [Merge Requests for Confidential Issues](../issues/confidential_issues.md#merge-requests-for-confidential-issues)                             | Create merge requests to resolve confidential issues for preventing leakage or early release of sensitive data through regular merge requests.                                             |
 | [Multiple assignees](creating_merge_requests.md#multiple-assignees-starter) **(STARTER)**                                                     | Have multiple assignees for merge requests to indicate everyone that is reviewing or accountable for it.                                                                                   |
 | [Security reports](../../application_security/index.md) **(ULTIMATE)**                                                                        | GitLab can scan and report any vulnerabilities found in your project.                                                                                                                      |
-| [Squash and merge](creating_merge_requests.md#squash-and-merge)                                                                               | Squash all changes present in a merge request into a single commit when merging, to allow for a neater commit history.                                                                     |
+| [Squash and merge](squash_and_merge.md)                                                                                                       | Squash all changes present in a merge request into a single commit when merging, to allow for a neater commit history.                                                                     |
 | [View changes between file versions](creating_merge_requests.md#view-changes-between-file-versions)                                           |                                                                                                                                                                                            |
 | [Work In Progress merge requests](work_in_progress_merge_requests.md)                                                                         | Prevent the merge request from being merged before it's ready                                                                                                                              |
 

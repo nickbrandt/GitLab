@@ -1,3 +1,7 @@
+---
+type: index, reference
+---
+
 # Reviewing and managing merge requests
 
 Merge requests are the primary method of making changes to files in a GitLab project.
