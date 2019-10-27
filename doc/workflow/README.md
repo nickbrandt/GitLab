@@ -2,7 +2,7 @@
 comments: false
 ---
 
-# Workflow
+# Workflow (Deprecated)
 
 - [Automatic issue closing](../user/project/issues/managing_issues.md#closing-issues-automatically)
 - [Cycle Analytics](../user/project/cycle_analytics.md)
