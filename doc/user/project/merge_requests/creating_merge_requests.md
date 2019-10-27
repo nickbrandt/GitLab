@@ -1,86 +1,64 @@
 # Creating merge requests
 
 Merge requests are the primary method of making changes to files in a GitLab project.
+Changes are proposed by creating and submitting a merge request, which is then
+[reviewed, and accepted (or rejected)](reviewing_and_managing_merge_requests.md),
+all within GitLab.
 
-| Feature                                                                                                             | Tier     | Description                                                                                                                                    |
-|---------------------------------------------------------------------------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Adding patches when creating a merge request via e-mail](#adding-patches-when-creating-a-merge-request-via-e-mail) |          |                                                                                                                                                |
-| [Allow collaboration on merge requests across forks](#allow-collaboration-on-merge-requests-across-forks)           |          |                                                                                                                                                |
-| [Create new merge requests by email](#create-new-merge-requests-by-email)                                           |          | Create new merge requests by sending an email to a user-specific email address.                                                                |
-| [Deleting the source branch](#deleting-the-source-branch)                                                           |          | Select the "Delete source branch when merge request accepted" option and the source branch will be deleted when the merge request is merged.   |
-| [Ignore whitespace changes in Merge Request diff view](#ignore-whitespace-changes-in-Merge-Request-diff-view)       |          |                                                                                                                                                |
-| [Incrementally expand merge request diffs](#incrementally-expand-merge-request-diffs)                               |          |                                                                                                                                                |
-| [Merge request approvals](merge_request_approvals.md)                                                               | Starter  | Set the number of necessary approvals and predefine a list of approvers that will need to approve every merge request in a project.            |
-| [Merge Request Dependencies](merge_request_dependencies.md)                                                         | Premium  | Specify that a merge request depends on other MRs.                                                                                             |
-| [Merge request diff file navigation](#merge-request-diff-file-navigation)                                           |          |                                                                                                                                                |
-| [Merge Requests for Confidential Issues](../issues/confidential_issues.md#merge-requests-for-confidential-issues)   |          | Create merge requests to resolve confidential issues for preventing leakage or early release of sensitive data through regular merge requests. |
-| [Multiple assignees](#multiple-assignees-starter)                                                                   | Starter  | Have multiple assignees for merge requests to indicate everyone that is reviewing or accountable for it.                                       |
-| [Security reports](../../application_security/index.md)                                                             | Ultimate | GitLab can scan and report any vulnerabilities found in your project.                                                                          |
-| [Squash and merge](#squash-and-merge)                                                                               |          | Squash all changes present in a merge request into a single commit when merging, to allow for a neater commit history.                         |
-| [Work In Progress merge requests](#work-in-progress-merge-requests)                                                 |          |                                                                                                                                                |
-| [Git push options](../push_options.md)                                                                              |          | Use Git push options to create or update merge requests when pushing changes to GitLab with Git, without needing to use the GitLab interface.  |
-| [View changes between file versions](#view-changes-between-file-versions)                                           |          |                                                                                                                                                |
+## Creating new merge requests
 
-## Deleting the source branch
+You can start creating a new merge request by clicking the **New merge request** button
+on the **Merge Requests** page in a project. Then you must choose a source project and
+branch with your changes, and the target project and branch where you want to merge
+the changes into. Click on **Compare branches and continue** to start filling in the
+merge request details.
 
-When creating a merge request, select the "Delete source branch when merge
-request accepted" option and the source branch will be deleted when the merge
-request is merged. To make this option enabled by default for all new merge
-requests, enable it in the [project's settings](../settings/index.md#merge-request-settings).
+When viewing the commits on a branch in **Repository > Commits**, you can click on
+the **Create merge request** button, and a new merge request will be started using
+the current branch as the source, and `master` in the current project as the target.
 
+If you have recently pushed changes to GitLab, the **Create merge request** button will
+also appear in the top right of the:
 
-This option is also visible in an existing merge request next to the merge
-request button and can be selected/deselected before merging. It's only visible
-to users with [Maintainer permissions](../../permissions.md) in the source project.
+- **Project** page.
+- **Repository > Files** page.
+- **Merge Requests** page.
 
-If the user viewing the merge request does not have the correct permissions to
-delete the source branch and the source branch is set for deletion, the merge
-request widget will show the "Deletes source branch" text.
+In this case, the merge request will use the most recent branch you pushed changes
+to as the source branch, and `master` in the current project as the target.
 
-![Delete source branch status](img/remove_source_branch_status.png)
+On the **New Merge Request** page, you can start by filling in the title and description
+for the merge request. If there are commits on the branch, the title will be pre-filled
+with the first line of the first commit message, and the description will be pre-filled with
+any additional lines in the commit message. The title is the only field that is mandatory
+in all cases.
 
-## Allow collaboration on merge requests across forks
+From here, you can also:
 
-When a user opens a merge request from a fork, they are given the option to allow
-upstream maintainers to collaborate with them on the source branch. This allows
-the maintainers of the upstream project to make small fixes or rebase branches
-before merging, reducing the back and forth of accepting community contributions.
+- Set the merge request as a [work in progress](work_in_progress_merge_requests.md).
+- Select an [assignee](#assignee).
+- Select a [milestone](../milestones/index.md).
+- Select [labels](../labels.md).
+- Add any [merge request dependencies](merge_request_dependencies.md). **(PREMIUM)**
+- Select [approval options](merge_request_approvals.md). **(STARTER)**
+- Verify the source and target branches are correct.
+- Enable the [delete source branch when merge request is accepted](#deleting-the-source-branch) option.
+- Enable the [squash commits when merge request is accepted](squash_and_merge.md) option.
 
-[Learn more about allowing upstream members to push to forks.](allow_collaboration.md)
+## Assignee
 
-## View changes between file versions
+Choose an assignee to designate someone as the person responsible for the first
+[review of the merge request](reviewing_and_managing_merge_requests.md). Open the
+drop down box to search for the user you wish to assign, and the merge request will be
+added to their [assigned merge request list](../../search/index.md#issues-and-merge-requests).
 
-The **Changes** tab of a merge request shows the changes to files between branches or
-commits. This view of changes to a file is also known as a **diff**. By default, the diff view
-compares the file in the merge request branch and the file in the target branch.
+### Multiple assignees **(STARTER)**
 
-The diff view includes the following:
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/2004) in [GitLab Starter 11.11](https://about.gitlab.com/pricing/).
 
-- The file's name and path.
-- The number of lines added and deleted.
-- Buttons for the following options:
-  - Toggle comments for this file; useful for inline reviews.
-  - Edit the file in the merge request's branch.
-  - Show full file, in case you want to look at the changes in context with the rest of the file.
-  - View file at the current commit.
-  - Preview the changes with [Review Apps](../../../ci/review_apps/index.md).
-- The changed lines, with the specific changes highlighted.
-
-![Example screenshot of a source code diff](img/merge_request_diff_v12_2.png)
-
-## Squash and merge
-
-GitLab allows you to squash all changes present in a merge request into a single
-commit when merging, to allow for a neater commit history.
-
-[Learn more about squash and merge.](squash_and_merge.md)
-
-## Multiple assignees **(STARTER)**
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/2004)
-in [GitLab Starter 11.11](https://about.gitlab.com/pricing/).
-
-Multiple people often review merge requests at the same time. GitLab allows you to have multiple assignees for merge requests to indicate everyone that is reviewing or accountable for it.
+Multiple people often review merge requests at the same time. GitLab allows you to
+have multiple assignees for merge requests to indicate everyone that is reviewing or
+accountable for it.
 
 ![multiple assignees for merge requests sidebar](img/multiple_assignees_for_merge_requests_sidebar.png)
 
@@ -96,6 +74,30 @@ It's also possible to manage multiple assignees:
 
 - When creating a merge request.
 - Using [quick actions](../quick_actions.md#quick-actions-for-issues-merge-requests-and-epics).
+
+## Deleting the source branch
+
+When creating a merge request, select the "Delete source branch when merge
+request accepted" option and the source branch will be deleted when the merge
+request is merged. To make this option enabled by default for all new merge
+requests, enable it in the [project's settings](../settings/index.md#merge-request-settings).
+
+This option is also visible in an existing merge request next to the merge
+request button and can be selected/deselected before merging. It's only visible
+to users with [Maintainer permissions](../../permissions.md) in the source project.
+
+If the user viewing the merge request does not have the correct permissions to
+delete the source branch and the source branch is set for deletion, the merge
+request widget will show the "Deletes source branch" text.
+
+![Delete source branch status](img/remove_source_branch_status.png)
+
+When a user opens a merge request from a fork, they are given the option to allow
+upstream maintainers to collaborate with them on the source branch. This allows
+the maintainers of the upstream project to make small fixes or rebase branches
+before merging, reducing the back and forth of accepting community contributions.
+
+[Learn more about allowing upstream members to push to forks.](allow_collaboration.md)
 
 ## Create new merge requests by email
 
@@ -140,15 +142,27 @@ apply the patches. The target branch can be specified using the
 [`/target_branch` quick action](../quick_actions.md). If the source
 branch already exists, the patches will be applied on top of it.
 
-## Work In Progress merge requests
+## View changes between file versions
 
-To prevent merge requests from accidentally being accepted before they're
-completely ready, GitLab blocks the "Accept" button for merge requests that
-have been marked as a **Work In Progress**.
+The **Changes** tab at the bottom of a merge request shows the changes to files between branches or
+commits. This view of changes to a file is also known as a **diff**. By default, the diff view
+compares the file in the merge request branch and the file in the target branch.
 
-[Learn more about setting a merge request as "Work In Progress".](work_in_progress_merge_requests.md)
+The diff view includes the following:
 
-## Merge request diff file navigation
+- The file's name and path.
+- The number of lines added and deleted.
+- Buttons for the following options:
+  - Toggle comments for this file; useful for inline reviews.
+  - Edit the file in the merge request's branch.
+  - Show full file, in case you want to look at the changes in context with the rest of the file.
+  - View file at the current commit.
+  - Preview the changes with [Review Apps](../../../ci/review_apps/index.md).
+- The changed lines, with the specific changes highlighted.
+
+![Example screenshot of a source code diff](img/merge_request_diff_v12_2.png)
+
+### Merge request diff file navigation
 
 When reviewing changes in the **Changes** tab the diff can be navigated using
 the file tree or file list. As you scroll through large diffs with many
@@ -157,7 +171,7 @@ list.
 
 ![Merge request diff file navigation](img/merge_request_diff_file_navigation.png)
 
-### Incrementally expand merge request diffs
+#### Incrementally expand merge request diffs
 
 By default, the diff shows only the parts of a file which are changed.
 To view more unchanged lines above or below a change click on the
@@ -166,7 +180,7 @@ to expand the entire file.
 
 ![Incrementally expand merge request diffs](img/incrementally_expand_merge_request_diffs_v12_2.png)
 
-## Ignore whitespace changes in Merge Request diff view
+### Ignore whitespace changes in Merge Request diff view
 
 If you click the **Hide whitespace changes** button, you can see the diff
 without whitespace changes (if there are any). This is also working when on a

@@ -1,6 +1,8 @@
-# Working with merge requests
+# Reviewing and managing merge requests
 
-There are many ways to work with merge requests.
+Merge requests are the primary method of making changes to files in a GitLab project.
+Changes are proposed by [creating and submitting a merge request](creating_merge_requests.md),
+which is then reviewed, and accepted (or rejected), all within GitLab.
 
 ## View project merge requests
 
