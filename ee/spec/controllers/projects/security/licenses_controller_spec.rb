@@ -70,13 +70,16 @@ describe Projects::Security::LicensesController do
         end
 
         context "when software policies are applied to some of the most recently detected licenses" do
-          let!(:raw_report) { fixture_file_upload(Rails.root.join('ee/spec/fixtures/security_reports/gl-license-management-report-v2.json'), 'application/json') }
-          let!(:pipeline) { create(:ee_ci_pipeline, :with_license_management_report, project: project) }
-          let!(:mit) { create(:software_license, :mit) }
-          let!(:mit_policy) { create(:software_license_policy, :denied, software_license: mit, project: project) }
+          let_it_be(:raw_report) { fixture_file_upload(Rails.root.join('ee/spec/fixtures/security_reports/gl-license-management-report-v2.json'), 'application/json') }
+          let_it_be(:mit) { create(:software_license, :mit) }
+          let_it_be(:mit_policy) { create(:software_license_policy, :denied, software_license: mit, project: project) }
+          let_it_be(:pipeline) do
+            create(:ee_ci_pipeline, :with_license_management_report, project: project).tap do |pipeline|
+              pipeline.job_artifacts.license_management.last.update!(file: raw_report)
+            end
+          end
 
           before do
-            pipeline.job_artifacts.license_management.last.update!(file: raw_report)
             get :index, params: { namespace_id: project.namespace, project_id: project }, format: :json
           end
 
@@ -97,7 +100,7 @@ describe Projects::Security::LicensesController do
               "spdx_identifier" => "MIT",
               "name" => mit.name,
               "url" => "http://spdx.org/licenses/MIT.json",
-              "classification" => "denied"
+              "classification" => "blacklisted"
             })
 
             expect(json_response.dig("licenses", 2)).to include({
@@ -143,6 +146,124 @@ describe Projects::Security::LicensesController do
 
       it 'returns 404' do
         expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  describe "POST #create" do
+    let(:project) { create(:project, :repository, :private) }
+    let(:mit_license) { create(:software_license, :mit) }
+    let(:default_params) do
+      {
+        namespace_id: project.namespace,
+        project_id: project,
+        software_license_policy: {
+          software_license_id: mit_license.id,
+          classification: 'approved'
+        }
+      }
+    end
+
+    context "when authenticated" do
+      let(:current_user) { create(:user) }
+
+      before do
+        stub_licensed_features(licenses_list: true, license_management: true)
+        sign_in(current_user)
+      end
+
+      context "when the current user is not a member of the project" do
+        before do
+          post :create, xhr: true, params: default_params
+        end
+
+        it { expect(response).to have_http_status(:not_found) }
+      end
+
+      context "when the current user is a member of the project but not authorized to create policies" do
+        before do
+          project.add_guest(current_user)
+
+          post :create, xhr: true, params: default_params
+        end
+
+        it { expect(response).to have_http_status(:not_found) }
+      end
+
+      context "when authorized as a maintainer" do
+        let(:json) { json_response.with_indifferent_access }
+
+        before do
+          project.add_maintainer(current_user)
+        end
+
+        context "when creating a policy for a software license by the software license database id" do
+          before do
+            post :create, xhr: true, params: default_params.merge({
+              software_license_policy: {
+                software_license_id: mit_license.id,
+                classification: 'blacklisted'
+              }
+            })
+          end
+
+          it { expect(response).to have_http_status(:created) }
+
+          it 'creates a new policy' do
+            expect(project.reload.software_license_policies.blacklisted.count).to be(1)
+            expect(project.reload.software_license_policies.blacklisted.last.software_license).to eq(mit_license)
+          end
+
+          it 'returns the proper JSON response' do
+            expect(json[:id]).to be_present
+            expect(json[:spdx_identifier]).to eq(mit_license.spdx_identifier)
+            expect(json[:classification]).to eq('blacklisted')
+            expect(json[:name]).to eq(mit_license.name)
+            expect(json[:url]).to be_nil
+            expect(json[:components]).to be_empty
+          end
+        end
+
+        context "when creating a policy for a software license by the software license SPDX identifier" do
+          before do
+            post :create, xhr: true, params: default_params.merge({
+              software_license_policy: {
+                spdx_identifier: mit_license.spdx_identifier,
+                classification: 'approved'
+              }
+            })
+          end
+
+          it { expect(response).to have_http_status(:created) }
+
+          it 'creates a new policy' do
+            expect(project.reload.software_license_policies.approved.count).to be(1)
+            expect(project.reload.software_license_policies.approved.last.software_license).to eq(mit_license)
+          end
+
+          it 'returns the proper JSON response' do
+            expect(json[:id]).to be_present
+            expect(json[:spdx_identifier]).to eq(mit_license.spdx_identifier)
+            expect(json[:classification]).to eq('approved')
+            expect(json[:name]).to eq(mit_license.name)
+            expect(json[:url]).to be_nil
+            expect(json[:components]).to be_empty
+          end
+        end
+
+        context "when the parameters are invalid" do
+          before do
+            post :create, xhr: true, params: default_params.merge({
+              software_license_policy: {
+                spdx_identifier: nil,
+                classification: 'approved'
+              }
+            })
+          end
+
+          it { expect(response).to have_http_status(:unprocessable_entity) }
+          it { expect(json).to eq({ 'errors' => { "software_license" => ["can't be blank"] } }) }
+        end
       end
     end
   end

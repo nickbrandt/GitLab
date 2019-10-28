@@ -5,7 +5,7 @@ module Gitlab
     module Reports
       module LicenseScanning
         class Report
-          delegate :empty?, :fetch, to: :found_licenses
+          delegate :empty?, :fetch, :[], to: :found_licenses
           attr_accessor :version
 
           def initialize(version: '1.0')

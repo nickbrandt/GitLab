@@ -10,16 +10,7 @@ module SCA
 
     def policies
       strong_memoize(:policies) do
-        configured_policies = project.software_license_policies.index_by { |policy| policy.software_license.canonical_id }
-        detected_licenses = license_scan_report.licenses.map do |reported_license|
-          policy = configured_policies[reported_license.canonical_id]
-          configured_policies.delete(reported_license.canonical_id) if policy
-          build_policy(reported_license, policy)
-        end
-        undetected_licenses = configured_policies.map do |id, policy|
-          build_policy(license_scan_report.fetch(id, nil), policy)
-        end
-        (detected_licenses + undetected_licenses).sort_by(&:name)
+        new_policies.merge(known_policies).sort.map(&:last)
       end
     end
 
@@ -31,9 +22,29 @@ module SCA
       end
     end
 
+    def report_for(policy)
+      build_policy(license_scan_report[policy.software_license.canonical_id], policy)
+    end
+
     private
 
     attr_reader :project
+
+    def known_policies
+      strong_memoize(:known_policies) do
+        project.software_license_policies.including_license.unreachable_limit.map do |policy|
+          [policy.software_license.canonical_id, report_for(policy)]
+        end.to_h
+      end
+    end
+
+    def new_policies
+      license_scan_report.licenses.map do |reported_license|
+        next if known_policies[reported_license.canonical_id]
+
+        [reported_license.canonical_id, build_policy(reported_license, nil)]
+      end.compact.to_h
+    end
 
     def pipeline
       strong_memoize(:pipeline) do

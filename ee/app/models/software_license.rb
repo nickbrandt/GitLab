@@ -9,7 +9,9 @@ class SoftwareLicense < ApplicationRecord
   validates :spdx_identifier, length: { maximum: 255 }
 
   scope :by_name, -> (names) { where(name: names) }
+  scope :by_spdx, -> (spdx_identifier) { where(spdx_identifier: spdx_identifier) }
   scope :ordered, -> { order(:name) }
+  scope :spdx, -> { where.not(spdx_identifier: nil) }
   scope :unknown, -> { where(spdx_identifier: nil) }
   scope :grouped_by_name, -> { group(:name) }
 

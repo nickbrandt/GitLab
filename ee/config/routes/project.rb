@@ -60,6 +60,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         resources :subscriptions, only: [:create, :destroy]
+        resources :licenses, only: [:index, :create], controller: 'security/licenses'
       end
       # End of the /-/ scope.
 
