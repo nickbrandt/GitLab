@@ -3,12 +3,12 @@
 class Clusters::ClustersController < Clusters::BaseController
   include RoutableActions
 
-  before_action :cluster, except: [:index, :new, :create_gcp, :create_user, :authorize_aws_role]
+  before_action :cluster, except: [:index, :new, :create_gcp, :create_user, :authorize_aws_role, :aws_proxy]
   before_action :generate_gcp_authorize_url, only: [:new]
   before_action :validate_gcp_token, only: [:new]
   before_action :gcp_cluster, only: [:new]
   before_action :user_cluster, only: [:new]
-  before_action :authorize_create_cluster!, only: [:new, :authorize_aws_role]
+  before_action :authorize_create_cluster!, only: [:new, :authorize_aws_role, :aws_proxy]
   before_action :authorize_update_cluster!, only: [:update]
   before_action :authorize_admin_cluster!, only: [:destroy]
   before_action :update_applications_status, only: [:cluster_status]
@@ -139,6 +139,15 @@ class Clusters::ClustersController < Clusters::BaseController
     role = current_user.build_aws_role(create_role_params)
 
     role.save ? respond_201 : respond_422
+  end
+
+  def aws_proxy
+    response = Clusters::Aws::ProxyService.new(
+      current_user.aws_role,
+      params: params
+    ).execute
+
+    render json: response.body, status: response.status
   end
 
   private

@@ -143,6 +143,10 @@ Rails.application.routes.draw do
         post :create_user
         post :create_gcp
         post :authorize_aws_role
+
+        scope :aws do
+          get 'api/:resource', to: 'clusters#aws_proxy', as: :aws_proxy
+        end
       end
 
       member do
