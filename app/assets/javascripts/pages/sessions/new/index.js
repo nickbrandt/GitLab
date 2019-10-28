@@ -22,12 +22,15 @@ document.addEventListener('DOMContentLoaded', () => {
   preserveUrlFragment(window.location.hash);
 });
 
-if (gon.tracking_data) {
-  const { category, action, ...data } = gon.tracking_data;
+export default function trackData() {
+  if (gon.tracking_data) {
+    const tab = document.querySelector(".new-session-tabs a[href='#register-pane']");
+    const { category, action, ...data } = gon.tracking_data;
 
-  $('#signin-container a[data-toggle="tab"]').on('shown.bs.tab', e => {
-    if (e.target.dataset.qaSelector === 'register_tab') {
+    tab.addEventListener('click', () => {
       Tracking.event(category, action, data);
-    }
-  });
+    });
+  }
 }
+
+trackData();
