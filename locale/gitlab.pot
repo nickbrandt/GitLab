@@ -12911,6 +12911,9 @@ msgstr ""
 msgid "ProjectSettings|Only signed commits can be pushed to this repository."
 msgstr ""
 
+msgid "ProjectSettings|Pages"
+msgstr ""
+
 msgid "ProjectSettings|Pipelines must succeed"
 msgstr ""
 
@@ -18897,6 +18900,9 @@ msgid "Wiki|Title"
 msgstr ""
 
 msgid "Will deploy to"
+msgstr ""
+
+msgid "With GitLab Pages you can host your static websites on GitLab"
 msgstr ""
 
 msgid "With contribution analytics you can have an overview for the activity of issues, merge requests and push events of your organization and its members."
