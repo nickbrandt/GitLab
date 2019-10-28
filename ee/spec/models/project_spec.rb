@@ -2232,13 +2232,9 @@ describe Project do
       end
 
       context 'when number of days is set to 0' do
-<<<<<<< HEAD
         it 'returns false' do
           stub_application_setting(deletion_adjourned_period: 0)
-=======
-        it 'returns true' do
-          allow(::Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(0)
->>>>>>> Add specs to model
+
           expect(project.adjourned_deletion?).to eq(false)
         end
       end
@@ -2257,8 +2253,12 @@ describe Project do
           stub_application_setting(deletion_adjourned_period: 1)
 =======
         it 'returns true' do
+<<<<<<< HEAD
           allow(::Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(1)
 >>>>>>> Add specs to model
+=======
+          stub_application_setting(deletion_adjourned_period: 1)
+>>>>>>> Refactor specs to use specs helper
 
           expect(project.adjourned_deletion?).to eq(false)
         end
@@ -2270,8 +2270,12 @@ describe Project do
           stub_application_setting(deletion_adjourned_period: 0)
 =======
         it 'returns true' do
+<<<<<<< HEAD
           allow(::Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(0)
 >>>>>>> Add specs to model
+=======
+          stub_application_setting(deletion_adjourned_period: 0)
+>>>>>>> Refactor specs to use specs helper
 
           expect(project.adjourned_deletion?).to eq(false)
         end
