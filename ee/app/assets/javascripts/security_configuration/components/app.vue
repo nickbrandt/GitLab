@@ -35,8 +35,7 @@ export default {
       </h2>
     </header>
     <section class="alert alert-primary mt-3">
-      Configuration status only applies to the default branch and is based on the latest pipeline
-      scan.
+      {{ __('Configuration status only applies to the default branch and is based on the latest pipeline scan.') }}
     </section>
     <section class="mt-4">
       <div class="gl-responsive-table-row table-row-header text-2 font-weight-bold px-2" role="row">
@@ -45,11 +44,12 @@ export default {
       </div>
       <div
         v-for="feature in features"
+        :key="feature.name"
         class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
       >
         <div class="d-md-flex align-items-center">
           <div class="table-section section-80 section-wrap pr-md-3">
-            <div role="rowheader" class="table-mobile-header">Feature</div>
+            <div role="rowheader" class="table-mobile-header">{{ __('Feature') }}</div>
             <div class="table-mobile-content">
               <div class="d-flex align-items-center justify-content-end justify-content-md-start">
                 <div class="text-2">
@@ -67,7 +67,7 @@ export default {
             </div>
           </div>
           <div class="table-section section-20 section-wrap pr-md-3">
-            <div role="rowheader" class="table-mobile-header">Status</div>
+            <div role="rowheader" class="table-mobile-header">{{ __('Status') }}</div>
             <div class="table-mobile-content">
               {{ feature.configured ? 'Configured' : 'Not yet' }}
             </div>
