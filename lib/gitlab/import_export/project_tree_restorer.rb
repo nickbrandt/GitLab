@@ -92,8 +92,6 @@ module Gitlab
       end
 
       def process_project_relation_item!(relation_key, relation_definition, data_hash)
-        remove_feature_dependent_sub_relations!(data_hash)
-
         relation_object = build_relation(relation_key, relation_definition, data_hash)
         return unless relation_object
         return if group_model?(relation_object)
