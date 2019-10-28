@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module SearchHelper
+  SEARCH_PERMITTED_PARAMS = [:search, :scope, :project_id, :group_id, :repository_ref, :snippets].freeze
+
   def search_autocomplete_opts(term)
     return unless current_user
 
@@ -194,16 +196,6 @@ module SearchHelper
 
   def search_result_sanitize(str)
     Sanitize.clean(str)
-  end
-
-  SEARCH_PERMITTED_PARAMS = [:search, :scope, :project_id, :group_id, :repository_ref, :snippets]
-
-  def revert_to_basic_search_filter_url
-    search_params = params
-      .permit(SEARCH_PERMITTED_PARAMS)
-      .merge(basic_search: true)
-
-    search_path(search_params)
   end
 
   def search_filter_link(scope, label, data: {}, search: {})

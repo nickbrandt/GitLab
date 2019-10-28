@@ -60,6 +60,14 @@ module EE
       end
     end
 
+    def revert_to_basic_search_filter_url
+      search_params = params
+        .permit(::SearchHelper::SEARCH_PERMITTED_PARAMS)
+        .merge(basic_search: true)
+
+      search_path(search_params)
+    end
+
     private
 
     def search_multiple_assignees?(type)
