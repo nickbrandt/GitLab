@@ -36,7 +36,15 @@ describe('Security Configuration App', () => {
     expect(getHelpLink().attributes('href')).toBe(helpPagePath);
   });
 
-  it('renders the full list of features', () => {
+  it('contains a link to the latest pipeline', () => {
+    const latestPipelinePath = 'http://foo';
+
+    createComponent({ latestPipelinePath });
+
+    expect(wrapper.find('.alert a').attributes('href')).toBe(latestPipelinePath);
+  });
+
+  it('displays a full list of given features', () => {
     const features = [{}, {}, {}];
 
     createComponent({ features });
@@ -44,7 +52,7 @@ describe('Security Configuration App', () => {
     expect(getFeatureConfigRows().length).toBe(features.length);
   });
 
-  it('renders a given features information', () => {
+  it('displays a given features information', () => {
     const name = 'foo';
     const description = 'bar';
     const link = 'http://baz';
@@ -61,7 +69,7 @@ describe('Security Configuration App', () => {
     configured | statusText
     ${true}    | ${'Configured'}
     ${false}   | ${'Not yet'}
-  `('renders a given features configuration status', ({ configured, statusText }) => {
+  `('displays a given features configuration status', ({ configured, statusText }) => {
     const features = [{ configured }];
 
     createComponent({ features });

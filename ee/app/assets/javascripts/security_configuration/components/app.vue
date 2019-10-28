@@ -1,4 +1,5 @@
 <script>
+import { s__, sprintf } from '~/locale';
 import { GlLink } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 
@@ -11,6 +12,11 @@ export default {
     helpPagePath: {
       type: String,
       required: true,
+    },
+    latestPipelinePath: {
+      type: String,
+      required: false,
+      default: '',
     },
     features: {
       type: Array,
@@ -35,7 +41,7 @@ export default {
       </h2>
     </header>
     <section class="alert alert-primary mt-3">
-      {{ __('Configuration status only applies to the default branch and is based on the latest pipeline scan.') }}
+      Configuration status only applies to the default branch and is based on the <a :href="latestPipelinePath">latest pipeline</a> scan.
     </section>
     <section class="mt-4">
       <div class="gl-responsive-table-row table-row-header text-2 font-weight-bold px-2" role="row">
