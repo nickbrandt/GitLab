@@ -58,7 +58,7 @@ module MarkupHelper
         next unless node.text? || node.name.match?('gl-emoji')
 
         node.replace(link_to(node.text, url, html_options)) if node.text?
-        node.replace(link_to(node.to_html.html_safe, url, html_options)) if node.name.match?('gl-emoji')
+        node.replace(link_to(node.to_html.html_safe, url, html_options)) if node.name == 'gl-emoji'
       end
     end
 
