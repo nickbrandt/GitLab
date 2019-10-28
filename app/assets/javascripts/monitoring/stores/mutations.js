@@ -3,23 +3,20 @@ import { slugify } from '~/lib/utils/text_utility';
 import * as types from './mutation_types';
 import { normalizeMetrics, normalizeMetric, normalizeQueryResult } from './utils';
 
-const normalizePanel = panel => panel.metrics.map(normalizeMetric);
-
 export default {
   [types.REQUEST_METRICS_DATA](state) {
     state.emptyState = 'loading';
     state.showEmptyState = true;
   },
-  [types.RECEIVE_METRICS_DATA_SUCCESS](state, groupData) {
-    state.dashboard.panel_groups = groupData.map((group, i) => {
+  [types.RECEIVE_METRICS_DATA_SUCCESS](state, dashboard) {
+    const groups = dashboard.panel_groups.map((group, i) => {
       const key = `${slugify(group.group || 'default')}-${i}`;
       let { metrics = [], panels = [] } = group;
 
       // each panel has metric information that needs to be normalized
-
       panels = panels.map(panel => ({
         ...panel,
-        metrics: normalizePanel(panel),
+        metrics: panel.metrics.map(normalizeMetric),
       }));
 
       // for backwards compatibility, and to limit Vue template changes:
@@ -39,6 +36,9 @@ export default {
         metrics: normalizeMetrics(metrics),
       };
     });
+
+    state.dashboard = {...dashboard, panel_groups: groups};
+    state.originalDashboard = JSON.parse(JSON.stringify(state.dashboard));
 
     if (!state.dashboard.panel_groups.length) {
       state.emptyState = 'noData';

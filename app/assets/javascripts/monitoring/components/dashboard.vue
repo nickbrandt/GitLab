@@ -1,6 +1,6 @@
 <script>
 import _ from 'underscore';
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import VueDraggable from 'vuedraggable';
 import {
   GlButton,
@@ -188,6 +188,7 @@ export default {
       'allDashboards',
       'additionalPanelTypesEnabled',
     ]),
+    ...mapGetters('monitoringDashboard', ['dashboardHasChanged']),
     firstDashboard() {
       return this.allDashboards[0] || {};
     },

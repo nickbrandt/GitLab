@@ -47,23 +47,34 @@ export const setShowErrorBanner = ({ commit }, enabled) => {
   commit(types.SET_SHOW_ERROR_BANNER, enabled);
 };
 
+/**
+ * Actions related to the APM dashboard at Operations/Metrics
+ */
 export const requestMetricsDashboard = ({ commit }) => {
   commit(types.REQUEST_METRICS_DATA);
 };
 export const receiveMetricsDashboardSuccess = ({ commit, dispatch }, { response, params }) => {
   commit(types.SET_ALL_DASHBOARDS, response.all_dashboards);
-  commit(types.RECEIVE_METRICS_DATA_SUCCESS, response.dashboard.panel_groups);
+  commit(types.RECEIVE_METRICS_DATA_SUCCESS, response.dashboard);
   dispatch('fetchPrometheusMetrics', params);
 };
 export const receiveMetricsDashboardFailure = ({ commit }, error) => {
   commit(types.RECEIVE_METRICS_DATA_FAILURE, error);
 };
 
+/**
+ * Actions related to the health dashboard at Operations/Kubernetes
+ */
 export const requestMetricsData = ({ commit }) => commit(types.REQUEST_METRICS_DATA);
-export const receiveMetricsDataSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_METRICS_DATA_SUCCESS, data);
-export const receiveMetricsDataFailure = ({ commit }, error) =>
+export const receiveMetricsDataSuccess = ({ commit }, data) => {
+  commit(types.RECEIVE_METRICS_DATA_SUCCESS, {
+    panel_groups: data,
+  });
+};
+export const receiveMetricsDataFailure = ({ commit }, error) => {
   commit(types.RECEIVE_METRICS_DATA_FAILURE, error);
+}
+
 export const receiveDeploymentsDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS, data);
 export const receiveDeploymentsDataFailure = ({ commit }) =>

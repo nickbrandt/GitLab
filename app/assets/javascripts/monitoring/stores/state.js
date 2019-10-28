@@ -12,6 +12,9 @@ export default () => ({
   emptyState: 'gettingStarted',
   showEmptyState: true,
   showErrorBanner: true,
+  originalDashboard: {
+    panel_groups: [],
+  },
   dashboard: {
     panel_groups: [],
   },
