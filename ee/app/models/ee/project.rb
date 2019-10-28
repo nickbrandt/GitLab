@@ -644,7 +644,7 @@ module EE
     end
 
     def alerts_service_activated?
-      alerts_service_available? && alerts_service.try(:active?)
+      alerts_service_available? && alerts_service&.active?
     end
 
     def package_already_taken?(package_name)

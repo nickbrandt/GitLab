@@ -22,9 +22,7 @@ describe Issue do
 
           context 'when the author is Alert Bot' do
             it 'updates issue title with the IID' do
-              issue.save
-
-              expect(issue.reload.title).to eq("New: Incident 503503")
+              expect { issue.save }.to change { issue.title }.to("New: Incident 503503")
             end
           end
 
