@@ -79,7 +79,7 @@ module Gitlab
             groups: count(Group),
             issues: count(Issue),
             issues_with_associated_zoom_link: count(ZoomMeeting.added_to_issue),
-            issues_using_zoom_quick_actions: count(Issue.with_zoom_meetings),
+            issues_using_zoom_quick_actions: count(ZoomMeeting.select(:issue_id).distinct),
             keys: count(Key),
             label_lists: count(List.label),
             lfs_objects: count(LfsObject),
