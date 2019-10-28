@@ -1,8 +1,8 @@
 <script>
 import { createNamespacedHelpers, mapState, mapActions } from 'vuex';
-import { sprintf, s__ } from '~/locale';
+import { sprintf, s__, __ } from '~/locale';
 import _ from 'underscore';
-import { GlFormInput, GlFormCheckbox, GlLink } from '@gitlab/ui';
+import { GlFormInput, GlFormCheckbox } from '@gitlab/ui';
 import ClusterFormDropdown from './cluster_form_dropdown.vue';
 import RegionDropdown from './region_dropdown.vue';
 import { KUBERNETES_VERSIONS } from '../constants';
@@ -246,8 +246,8 @@ export default {
     },
     setVpcAndFetchSubnets(vpc) {
       this.setVpc({ vpc });
-      this.fetchSubnets({ vpc });
-      this.fetchSecurityGroups({ vpc });
+      this.fetchSubnets({ vpc, region: this.selectedRegion });
+      this.fetchSecurityGroups({ vpc, region: this.selectedRegion });
     },
   },
 };
@@ -257,8 +257,8 @@ export default {
     <h2>
       {{ s__('ClusterIntegration|Enter the details for your Amazon EKS Kubernetes cluster') }}
     </h2>
-    <div class="gl-mb-5" v-html="kubernetesIntegrationHelpText"></div>
-    <div class="gl-mb-5">
+    <div class="mb-3" v-html="kubernetesIntegrationHelpText"></div>
+    <div class="mb-3">
       <button class="btn btn-link js-sign-out" @click="signOut()">
         {{ s__('ClusterIntegration|Select a different AWS account') }}
       </button>

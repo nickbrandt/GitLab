@@ -401,8 +401,10 @@ describe('EksClusterConfigurationForm', () => {
 
   describe('when vpc is selected', () => {
     const vpc = { name: 'vpc-1' };
+    const region = 'east-1';
 
     beforeEach(() => {
+      state.selectedRegion = region;
       findVpcDropdown().vm.$emit('input', vpc);
     });
 
@@ -411,13 +413,17 @@ describe('EksClusterConfigurationForm', () => {
     });
 
     it('dispatches fetchSubnets action', () => {
-      expect(subnetsActions.fetchItems).toHaveBeenCalledWith(expect.anything(), { vpc }, undefined);
+      expect(subnetsActions.fetchItems).toHaveBeenCalledWith(
+        expect.anything(),
+        { vpc, region },
+        undefined,
+      );
     });
 
     it('dispatches fetchSecurityGroups action', () => {
       expect(securityGroupsActions.fetchItems).toHaveBeenCalledWith(
         expect.anything(),
-        { vpc },
+        { vpc, region },
         undefined,
       );
     });
