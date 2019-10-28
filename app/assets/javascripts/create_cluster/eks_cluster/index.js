@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import CreateEksCluster from './components/create_eks_cluster.vue';
 import createStore from './store';
 
@@ -22,7 +23,7 @@ export default el => {
     el,
     store: createStore({
       initialState: {
-        hasCredentials,
+        hasCredentials: parseBoolean(hasCredentials),
         externalId,
         accountId,
       },
