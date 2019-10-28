@@ -13,6 +13,43 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      // @TODO - remove and pull into props
+      features: [
+        {
+          name: 'Static Application Security Testing (SAST)',
+          description: 'Analyze your source code for known vulnerabilities',
+          link: 'http://example.com',
+          configured: true,
+        },
+        {
+          name: 'Dynamic Application Security Testing (DAST)',
+          description: 'Analyze a review version of your web application',
+          link: 'http://example.com',
+          configured: false,
+        },
+        {
+          name: 'Container Scanning',
+          description: 'Check your Docker images for known vulnerabilities',
+          link: 'http://example.com',
+          configured: false,
+        },
+        {
+          name: 'Dependency Scanning',
+          description: 'Analyze your dependencies for known vulnerabilities',
+          link: 'http://example.com',
+          configured: true,
+        },
+        {
+          name: 'License Compliance',
+          description: 'Search your project dependencies for their licenses and apply policies',
+          link: 'http://example.com',
+          configured: true,
+        },
+      ],
+    };
+  },
 };
 </script>
 
@@ -35,23 +72,37 @@ export default {
       scan.
     </section>
     <section class="mt-4">
-      <div class="gl-responsive-table-row table-row-header text-2 px-2" role="row">
+      <div class="gl-responsive-table-row table-row-header text-2 font-weight-bold px-2" role="row">
         <div class="table-section section-80">{{ __('Secure features') }}</div>
         <div class="table-section section-20">{{ __('Status') }}</div>
       </div>
-      <div class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2">
-        <div class="d-md-flex align-items-baseline">
+      <div
+        v-for="feature in features"
+        class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
+      >
+        <div class="d-md-flex align-items-center">
           <div class="table-section section-80 section-wrap pr-md-3">
-            <div role="rowheader" class="table-mobile-header">Secure features</div>
+            <div role="rowheader" class="table-mobile-header">Feature</div>
             <div class="table-mobile-content">
-              <div>Static Application Security Testing (SAST)</div>
-              <div class="text-secondary">Analyze your source code for known vulnerabilities</div>
+              <div class="d-flex align-items-center justify-content-end justify-content-md-start">
+                <div class="text-2">
+                  {{ feature.name }}
+                </div>
+                <gl-link
+                  class="d-inline-flex ml-1"
+                  target="_blank"
+                  :href="feature.link"
+                  aria-label="@TODO"
+                  ><icon name="external-link"
+                /></gl-link>
+              </div>
+              <div class="text-secondary">{{ feature.description }}</div>
             </div>
           </div>
           <div class="table-section section-20 section-wrap pr-md-3">
             <div role="rowheader" class="table-mobile-header">Status</div>
             <div class="table-mobile-content">
-              Configured
+              {{ feature.configured ? 'Configured' : 'Not yet' }}
             </div>
           </div>
         </div>
