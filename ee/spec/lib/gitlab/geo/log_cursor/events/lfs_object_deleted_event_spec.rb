@@ -17,13 +17,13 @@ describe Gitlab::Geo::LogCursor::Events::LfsObjectDeletedEvent, :clean_gitlab_re
 
   describe '#process' do
     it 'does not create a tracking database entry' do
-      expect { subject.process }.not_to change(Geo::FileRegistry, :count)
+      expect { subject.process }.not_to change(Geo::LfsObjectRegistry, :count)
     end
 
     it 'removes the tracking database entry if exist' do
-      create(:geo_file_registry, :lfs, file_id: lfs_object.id)
+      create(:geo_lfs_object_registry, lfs_object_id: lfs_object.id)
 
-      expect { subject.process }.to change(Geo::FileRegistry.lfs_objects, :count).by(-1)
+      expect { subject.process }.to change(Geo::LfsObjectRegistry, :count).by(-1)
     end
 
     it 'schedules a Geo::FileRegistryRemovalWorker job' do

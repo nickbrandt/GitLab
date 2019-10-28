@@ -189,7 +189,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#attachments_failed_count' do
     it 'counts failed avatars, attachment, personal snippets and files' do
       # These two should be ignored
-      create(:geo_file_registry, :lfs, :with_file, :failed)
+      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
       create(:geo_file_registry, :with_file)
 
       create(:geo_file_registry, :with_file, :failed, file_type: :personal_file)
@@ -253,9 +253,9 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       create(:geo_file_registry, :failed)
       create(:geo_file_registry, :avatar)
       create(:geo_file_registry, file_type: :attachment)
-      create(:geo_file_registry, :lfs, :with_file, :failed)
+      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
 
-      create(:geo_file_registry, :lfs, :with_file)
+      create(:geo_lfs_object_registry, :with_lfs_object)
 
       expect(subject.lfs_objects_synced_count).to eq(1)
     end
@@ -267,9 +267,9 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       create(:geo_file_registry, :failed)
       create(:geo_file_registry, :avatar, missing_on_primary: true)
       create(:geo_file_registry, file_type: :attachment, missing_on_primary: true)
-      create(:geo_file_registry, :lfs, :with_file, :failed)
+      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
 
-      create(:geo_file_registry, :lfs, :with_file, missing_on_primary: true)
+      create(:geo_lfs_object_registry, :with_lfs_object, missing_on_primary: true)
 
       expect(subject.lfs_objects_synced_missing_on_primary_count).to eq(1)
     end
@@ -281,9 +281,9 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       create(:geo_file_registry, :failed)
       create(:geo_file_registry, :avatar, :failed)
       create(:geo_file_registry, :failed, file_type: :attachment)
-      create(:geo_file_registry, :lfs, :with_file)
+      create(:geo_lfs_object_registry, :with_lfs_object)
 
-      create(:geo_file_registry, :lfs, :with_file, :failed)
+      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
 
       expect(subject.lfs_objects_failed_count).to eq(1)
     end
@@ -304,14 +304,14 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
 
     it 'returns the right percentage with no group restrictions' do
-      create(:geo_file_registry, :lfs, file_id: lfs_object_project.lfs_object_id)
+      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_project.lfs_object_id)
 
       expect(subject.lfs_objects_synced_in_percentage).to be_within(0.0001).of(25)
     end
 
     it 'returns the right percentage with group restrictions' do
       secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-      create(:geo_file_registry, :lfs, file_id: lfs_object_project.lfs_object_id)
+      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_project.lfs_object_id)
 
       expect(subject.lfs_objects_synced_in_percentage).to be_within(0.0001).of(50)
     end
