@@ -213,8 +213,9 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
       it 'restores zoom meetings' do
         meetings = @project.issues.first.zoom_meetings
+
         expect(meetings.count).to eq(1)
-        expect(meetings.first.url).to eq("https://zoom.us/j/123456789")
+        expect(meetings.first.url).to eq('https://zoom.us/j/123456789')
       end
 
       context 'Merge requests' do
