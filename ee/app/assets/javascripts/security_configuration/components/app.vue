@@ -22,8 +22,8 @@ export default {
       <h2 class="settings-title">
         {{ __('Configure Security and Compliance') }}
         <gl-link
-          :href="helpPagePath"
           target="_blank"
+          :href="helpPagePath"
           :aria-label="__('Security configuration help link')"
         >
           <icon name="question" />
@@ -31,19 +31,31 @@ export default {
       </h2>
     </header>
     <section class="alert alert-primary mt-3">
-      Configuration status only applies to the default branch and is based on the latest pipeline scan.
+      Configuration status only applies to the default branch and is based on the latest pipeline
+      scan.
     </section>
     <section class="mt-4">
-      <h3 class="h5">{{ __('Secure features') }}</h3>
-      <dl>
-        <div>
-          <div>
-            <dt>Static Application Security Testing (SAST)</dt>
-            <dd>Analyze your source code for known vulnerabilities</dd>
+      <div class="gl-responsive-table-row table-row-header text-2 px-2" role="row">
+        <div class="table-section section-80">{{ __('Secure features') }}</div>
+        <div class="table-section section-20">{{ __('Status') }}</div>
+      </div>
+      <div class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2">
+        <div class="d-md-flex align-items-baseline">
+          <div class="table-section section-80 section-wrap pr-md-3">
+            <div role="rowheader" class="table-mobile-header">Secure features</div>
+            <div class="table-mobile-content">
+              <div>Static Application Security Testing (SAST)</div>
+              <div class="text-secondary">Analyze your source code for known vulnerabilities</div>
+            </div>
           </div>
-          <dd>Configured</dd>
+          <div class="table-section section-20 section-wrap pr-md-3">
+            <div role="rowheader" class="table-mobile-header">Status</div>
+            <div class="table-mobile-content">
+              Configured
+            </div>
+          </div>
         </div>
-      </dl>
+      </div>
     </section>
   </article>
 </template>
