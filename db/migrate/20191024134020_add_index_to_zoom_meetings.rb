@@ -12,6 +12,6 @@ class AddIndexToZoomMeetings < ActiveRecord::Migration[5.2]
   end
 
   def down
-    remove_index(:zoom_meetings, :issue_status) if index_exists?(:zoom_meetings, :issue_status)
+    remove_concurrent_index :zoom_meetings, :issue_status if index_exists?(:zoom_meetings, :issue_status)
   end
 end
