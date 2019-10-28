@@ -2190,14 +2190,14 @@ describe Project do
 
       context 'when number of days is set to more than 0' do
         it 'returns true' do
-          allow(::Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(1)
+          stub_application_setting(deletion_adjourned_period: 1)
           expect(project.adjourned_deletion?).to eq(true)
         end
       end
 
       context 'when number of days is set to 0' do
         it 'returns true' do
-          allow(::Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(0)
+          stub_application_setting(deletion_adjourned_period: 0)
           expect(project.adjourned_deletion?).to eq(false)
         end
       end
@@ -2212,7 +2212,7 @@ describe Project do
 
       context 'when number of days is set to more than 0' do
         it 'returns true' do
-          allow(::Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(1)
+          stub_application_setting(deletion_adjourned_period: 1)
 
           expect(project.adjourned_deletion?).to eq(false)
         end
@@ -2220,7 +2220,7 @@ describe Project do
 
       context 'when number of days is set to 0' do
         it 'returns true' do
-          allow(::Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(0)
+          stub_application_setting(deletion_adjourned_period: 0)
 
           expect(project.adjourned_deletion?).to eq(false)
         end
