@@ -85,7 +85,7 @@ describe 'New project' do
         end
       end
 
-      it 'creates CI/CD project from repo URL' do
+      it 'creates CI/CD project from repo URL', :sidekiq_might_not_need_inline do
         visit new_project_path
         find('#ci-cd-project-tab').click
 

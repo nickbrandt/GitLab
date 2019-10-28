@@ -99,20 +99,22 @@ export const fetchCycleAnalyticsData = ({ state, dispatch }) => {
 };
 
 export const hideCustomStageForm = ({ commit }) => commit(types.HIDE_CUSTOM_STAGE_FORM);
+export const showCustomStageForm = ({ commit }) => commit(types.SHOW_CUSTOM_STAGE_FORM);
 
-export const receiveCustomStageFormDataSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_CUSTOM_STAGE_FORM_DATA_SUCCESS, data);
-export const receiveCustomStageFormDataError = ({ commit }, error) => {
-  commit(types.RECEIVE_CUSTOM_STAGE_FORM_DATA_ERROR, error);
-  createFlash(__('There was an error fetching data for the form'));
+export const receiveGroupLabelsSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_GROUP_LABELS_SUCCESS, data);
+
+export const receiveGroupLabelsError = ({ commit }, error) => {
+  commit(types.RECEIVE_GROUP_LABELS_ERROR, error);
+  createFlash(__('There was an error fetching label data for the selected group'));
 };
-export const requestCustomStageFormData = ({ commit }) =>
-  commit(types.REQUEST_CUSTOM_STAGE_FORM_DATA);
 
-export const fetchCustomStageFormData = ({ dispatch }, groupPath) => {
-  dispatch('requestCustomStageFormData');
+export const requestGroupLabels = ({ commit }) => commit(types.REQUEST_GROUP_LABELS);
+
+export const fetchGroupLabels = ({ dispatch }, groupPath) => {
+  dispatch('requestGroupLabels');
 
   return Api.groupLabels(groupPath)
-    .then(data => dispatch('receiveCustomStageFormDataSuccess', data))
-    .catch(error => dispatch('receiveCustomStageFormDataError', error));
+    .then(data => dispatch('receiveGroupLabelsSuccess', data))
+    .catch(error => dispatch('receiveGroupLabelsError', error));
 };

@@ -49,13 +49,13 @@ describe 'Issues csv' do
     expect(page).to have_content "emailed to #{user.notification_email}"
   end
 
-  it 'includes a csv attachment' do
+  it 'includes a csv attachment', :sidekiq_might_not_need_inline do
     request_csv
 
     expect(attachment.content_type).to include('text/csv')
   end
 
-  it 'ignores pagination' do
+  it 'ignores pagination', :sidekiq_might_not_need_inline do
     create_list(:issue, 30, project: project, author: user)
 
     request_csv
@@ -63,13 +63,13 @@ describe 'Issues csv' do
     expect(csv.count).to eq 31
   end
 
-  it 'uses filters from issue index' do
+  it 'uses filters from issue index', :sidekiq_might_not_need_inline do
     request_csv(state: :closed)
 
     expect(csv.count).to eq 0
   end
 
-  it 'ignores sorting from issue index' do
+  it 'ignores sorting from issue index', :sidekiq_might_not_need_inline do
     issue2 = create(:labeled_issue, project: project, author: user, labels: [feature_label])
 
     request_csv(sort: :label_priority)
@@ -78,7 +78,7 @@ describe 'Issues csv' do
     expect(csv.map { |row| row['Issue ID'] }).to eq expected
   end
 
-  it 'uses array filters, such as label_name' do
+  it 'uses array filters, such as label_name', :sidekiq_might_not_need_inline do
     issue.update!(labels: [idea_label])
 
     request_csv("label_name[]" => 'Bug')

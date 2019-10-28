@@ -15,6 +15,7 @@ describe 'Environment > Pod Logs', :js do
 
   before do
     stub_licensed_features(pod_logs: true)
+    stub_feature_flags(environment_logs_use_vue_ui: false)
 
     create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
     create(:deployment, :success, environment: environment)
@@ -22,13 +23,20 @@ describe 'Environment > Pod Logs', :js do
     stub_kubeclient_pod_details(pod_name, environment.deployment_namespace)
     stub_kubeclient_logs(pod_name, environment.deployment_namespace, container: 'container-0')
 
-    allow_any_instance_of(EE::Environment).to receive(:pod_names).and_return(pod_names)
+    # rollout_status_instances = [{ pod_name: foo }, {pod_name: bar}]
+    rollout_status_instances = pod_names.collect { |name| { pod_name: name } }
+    rollout_status = instance_double(
+      ::Gitlab::Kubernetes::RolloutStatus, instances: rollout_status_instances
+    )
+
+    allow_any_instance_of(EE::Environment).to receive(:rollout_status_with_reactive_cache)
+      .and_return(rollout_status)
 
     sign_in(project.owner)
   end
 
   context 'with logs', :use_clean_rails_memory_store_caching do
-    it "shows pod logs" do
+    it "shows pod logs", :sidekiq_might_not_need_inline do
       visit logs_project_environment_path(environment.project, environment, pod_name: pod_name)
 
       wait_for_requests

@@ -198,16 +198,18 @@ describe Epics::UpdateService do
 
     context 'refresh epic dates' do
       context 'date fields are updated' do
-        it 'calls epic#update_start_and_due_dates' do
-          expect(epic).to receive(:update_start_and_due_dates)
+        it 'calls UpdateDatesService' do
+          expect(Epics::UpdateDatesService).to receive(:new).with([epic]).and_call_original
 
           update_epic(start_date_is_fixed: true, start_date_fixed: Date.today)
+          epic.reload
+          expect(epic.start_date).to eq(epic.start_date_fixed)
         end
       end
 
       context 'date fields are not updated' do
-        it 'does not call epic#update_start_and_due_dates' do
-          expect(epic).not_to receive(:update_start_and_due_dates)
+        it 'does not call UpdateDatesService' do
+          expect(Epics::UpdateDatesService).not_to receive(:new)
 
           update_epic(title: 'foo')
         end

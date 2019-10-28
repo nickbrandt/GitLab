@@ -34,10 +34,6 @@ describe 'shared/_clone_panel' do
       stub_current_geo_node(secondary)
     end
 
-    it 'renders Geo-specific instructions button' do
-      render 'shared/clone_panel', project: project
-
-      expect(rendered).to match /See Geo-specific instructions/
-    end
+    it_behaves_like 'has no geo-specific instructions'
   end
 end

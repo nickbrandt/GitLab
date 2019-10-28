@@ -43,7 +43,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 
 ### Configuring GitLab
 
-- [Adjust your instance's timezone](../workflow/timezone.md): Customize the default time zone of GitLab.
+- [Adjust your instance's timezone](timezone.md): Customize the default time zone of GitLab.
 - [System hooks](../system_hooks/system_hooks.md): Notifications when users, projects and keys are changed.
 - [Security](../security/README.md): Learn what you can do to further secure your GitLab instance.
 - [Usage statistics, version check, and usage ping](../user/admin_area/settings/usage_statistics.md): Enable or disable information about your instance to be sent to GitLab, Inc.
@@ -51,7 +51,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Polling](polling.md): Configure how often the GitLab UI polls for updates.
 - [GitLab Pages configuration](pages/index.md): Enable and configure GitLab Pages.
 - [GitLab Pages configuration for GitLab source installations](pages/source.md): Enable and configure GitLab Pages on [source installations](../install/installation.md#installation-from-source).
-- [Uploads configuration](uploads.md): Configure GitLab uploads storage.
+- [Uploads administration](uploads.md): Configure GitLab uploads storage.
 - [Environment variables](environment_variables.md): Supported environment variables that can be used to override their defaults values in order to configure GitLab.
 - [Plugins](plugins.md): With custom plugins, GitLab administrators can introduce custom integrations without modifying GitLab's source code.
 - [Enforcing Terms of Service](../user/admin_area/settings/terms.md)
@@ -161,9 +161,10 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 ## Git configuration options
 
 - [Custom Git hooks](custom_hooks.md): Custom Git hooks (on the filesystem) for when webhooks aren't enough.
-- [Git LFS configuration](../workflow/lfs/lfs_administration.md): Learn how to configure LFS for GitLab.
+- [Git LFS configuration](lfs/lfs_administration.md): Learn how to configure LFS for GitLab.
 - [Housekeeping](housekeeping.md): Keep your Git repositories tidy and fast.
 - [Configuring Git Protocol v2](git_protocol.md): Git protocol version 2 support.
+- [Manage large files with `git-annex` (Deprecated)](git_annex.md)
 
 ## Monitoring GitLab
 

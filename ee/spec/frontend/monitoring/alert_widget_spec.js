@@ -81,7 +81,7 @@ describe('AlertWidget', () => {
         expect(wrapper.find(GlLoadingIcon).isVisible()).toBe(true);
         expect(findWidgetForm().props('disabled')).toBe(true);
 
-        resolveReadAlert({ operator: '=', threshold: 42 });
+        resolveReadAlert({ operator: '==', threshold: 42 });
       })
       .then(() => waitForPromises())
       .then(() => {
@@ -123,7 +123,7 @@ describe('AlertWidget', () => {
           metricId,
         },
         'my/alert2.json': {
-          operator: '=',
+          operator: '==',
           threshold: 900,
           alert_path: 'my/alert2.json',
           metricId: '6',
@@ -163,7 +163,7 @@ describe('AlertWidget', () => {
 
   it('updates an alert with an appropriate handler', () => {
     const alertParams = { operator: '<', threshold: 4, alert_path: alertPath };
-    const newAlertParams = { operator: '=', threshold: 12 };
+    const newAlertParams = { operator: '==', threshold: 12 };
     mockReadAlert.mockResolvedValue(alertParams);
     mockUpdateAlert.mockResolvedValue({ ...alertParams, ...newAlertParams });
     createComponent({
@@ -171,7 +171,7 @@ describe('AlertWidget', () => {
       alertsToManage: {
         [alertPath]: {
           alert_path: alertPath,
-          operator: '=',
+          operator: '==',
           threshold: 12,
           metricId: '5',
         },

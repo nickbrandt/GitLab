@@ -19,24 +19,31 @@ module Gitlab
 
           def format_report(data)
             {
-              'vulnerabilities' => extract_vulnerabilities_from(data),
+              'vulnerabilities' => extract_vulnerabilities_from(Array.wrap(data['site'])),
               'version' => FORMAT_VERSION
             }
           end
 
-          def extract_vulnerabilities_from(data)
-            site = data['site'].first
-            results = []
+          # Log messages to be added here to track usage of legacy reports,
+          # parsing failures and any other scenarios: https://gitlab.com/gitlab-org/gitlab/issues/34668
+          def extract_vulnerabilities_from(sites = [])
+            return [] if sites.empty?
 
-            if site
-              host = site['@name']
+            vulnerabilities = []
 
-              site['alerts'].each do |vulnerability|
-                results += flatten_vulnerabilities(vulnerability, host)
+            sites.each do |site|
+              site_report = Hash(site)
+              next if site_report.blank?
+
+              # If host is blank for legacy reports
+              host = site_report['@name']
+
+              site_report['alerts'].each do |vulnerability|
+                vulnerabilities += flatten_vulnerabilities(vulnerability, host)
               end
             end
 
-            results
+            vulnerabilities
           end
 
           def flatten_vulnerabilities(vulnerability, host)

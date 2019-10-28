@@ -28,7 +28,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     it { expect(results.query).to eq('hello world') }
   end
 
-  describe "search" do
+  describe "search", :sidekiq_might_not_need_inline do
     it "returns correct amounts" do
       project = create :project, :public, :repository, :wiki_repo
       project1 = create :project, :public, :repository, :wiki_repo
@@ -140,7 +140,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     end
   end
 
-  describe 'confidential issues' do
+  describe 'confidential issues', :sidekiq_might_not_need_inline do
     let(:query) { 'issue' }
     let(:author) { create(:user) }
     let(:assignee) { create(:user) }

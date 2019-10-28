@@ -15,17 +15,5 @@ describe Projects::ImportExport::ExportService do
 
       service.execute
     end
-
-    context 'when the `export_designs` feature is disabled' do
-      before do
-        stub_feature_flags(export_designs: false)
-      end
-
-      it 'does not save the design repo' do
-        expect(Gitlab::ImportExport::DesignRepoSaver).not_to receive(:new)
-
-        service.execute
-      end
-    end
   end
 end

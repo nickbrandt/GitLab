@@ -73,7 +73,11 @@ describe('Environment', () => {
       });
 
       it('binds author', () => {
-        expect(commit.props('author')).toBe(environment.last_deployment.commit.author);
+        expect(commit.props('author')).toEqual({
+          avatar_url: environment.last_deployment.commit.author_gravatar_url,
+          path: `mailto:${environment.last_deployment.commit.author_email}`,
+          username: environment.last_deployment.commit.author_name,
+        });
       });
 
       it('binds tag', () => {

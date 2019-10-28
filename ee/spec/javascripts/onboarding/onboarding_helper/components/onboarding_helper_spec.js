@@ -3,6 +3,7 @@ import TourPartsList from 'ee/onboarding/onboarding_helper/components/tour_parts
 import Icon from '~/vue_shared/components/icon.vue';
 import { shallowMount } from '@vue/test-utils';
 import { GlProgressBar, GlLoadingIcon } from '@gitlab/ui';
+import Tracking from '~/tracking';
 
 describe('User onboarding tour parts list', () => {
   let wrapper;
@@ -222,9 +223,22 @@ describe('User onboarding tour parts list', () => {
       });
     });
 
-    describe('showExitTourContent', () => {
-      it('emits the "showExitTourContent" event when the "Exit Learn GitLab" link is clicked', () => {
-        wrapper.find('.qa-exit-tour-link').vm.$emit('click');
+    describe('beginExitTourProcess', () => {
+      const findExitTourLink = () => wrapper.find('.qa-exit-tour-link');
+
+      it('emits the "showDntExitContent" event when the "Exit Learn GitLab" link is clicked and tracking is not enabled', () => {
+        spyOn(Tracking, 'enabled').and.returnValue(false);
+
+        findExitTourLink().vm.$emit('click');
+
+        expect(wrapper.emitted('showDntExitContent')).toBeTruthy();
+        expect(Tracking.enabled).toHaveBeenCalled();
+      });
+
+      it('emits the "showFeedbackContent" event when the "Exit Learn GitLab" link is clicked and tracking is enabled', () => {
+        spyOn(Tracking, 'enabled').and.returnValue(true);
+
+        findExitTourLink().vm.$emit('click');
 
         expect(wrapper.emitted('showFeedbackContent')).toBeTruthy();
       });

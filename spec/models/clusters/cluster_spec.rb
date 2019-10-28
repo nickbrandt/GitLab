@@ -152,6 +152,16 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     end
   end
 
+  describe '.for_project_namespace' do
+    subject { described_class.for_project_namespace(namespace_id) }
+
+    let!(:cluster) { create(:cluster, :project) }
+    let!(:another_cluster) { create(:cluster, :project) }
+    let(:namespace_id) { cluster.first_project.namespace_id }
+
+    it { is_expected.to contain_exactly(cluster) }
+  end
+
   describe 'validations' do
     subject { cluster.valid? }
 
@@ -508,9 +518,10 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
       let!(:runner) { create(:clusters_applications_runner, cluster: cluster) }
       let!(:jupyter) { create(:clusters_applications_jupyter, cluster: cluster) }
       let!(:knative) { create(:clusters_applications_knative, cluster: cluster) }
+      let!(:elastic_stack) { create(:clusters_applications_elastic_stack, cluster: cluster) }
 
       it 'returns a list of created applications' do
-        is_expected.to contain_exactly(helm, ingress, cert_manager, prometheus, runner, jupyter, knative)
+        is_expected.to contain_exactly(helm, ingress, cert_manager, prometheus, runner, jupyter, knative, elastic_stack)
       end
     end
   end

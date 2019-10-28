@@ -74,7 +74,8 @@ describe Environment, :use_clean_rails_memory_store_caching do
       end
 
       it 'returns the pod_names' do
-        allow(environment).to receive(:rollout_status).and_return(rollout_status)
+        allow(environment).to receive(:rollout_status_with_reactive_cache)
+          .and_return(rollout_status)
 
         expect(environment.pod_names).to eq([pod_name])
       end

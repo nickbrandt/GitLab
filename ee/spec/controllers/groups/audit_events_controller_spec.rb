@@ -24,7 +24,7 @@ describe Groups::AuditEventsController do
         end
 
         it 'renders index with 200 status code' do
-          expect(LogFinder).to receive(:new).with(entity_type: ::Group.name, entity_id: group.id).and_call_original
+          expect(AuditLogFinder).to receive(:new).with(entity_type: ::Group.name, entity_id: group.id).and_call_original
 
           request
 

@@ -91,7 +91,11 @@ class GeoNodeStatus < ApplicationRecord
     container_repositories_count: 'Total number of syncable container repositories available on primary',
     container_repositories_synced_count: 'Number of syncable container repositories synced on secondary',
     container_repositories_failed_count: 'Number of syncable container repositories failed to sync on secondary',
-    container_repositories_registry_count: 'Number of container repositories in the registry'
+    container_repositories_registry_count: 'Number of container repositories in the registry',
+    design_repositories_count: 'Total number of syncable design repositories available on primary',
+    design_repositories_synced_count: 'Number of syncable design repositories synced on secondary',
+    design_repositories_failed_count: 'Number of syncable design repositories failed to sync on secondary',
+    design_repositories_registry_count: 'Number of design repositories in the registry'
   }.freeze
 
   EXPIRATION_IN_MINUTES = 5
@@ -240,6 +244,7 @@ class GeoNodeStatus < ApplicationRecord
   attr_in_percentage :attachments_synced,            :attachments_synced_count,            :attachments_count
   attr_in_percentage :replication_slots_used,        :replication_slots_used_count,        :replication_slots_count
   attr_in_percentage :container_repositories_synced, :container_repositories_synced_count, :container_repositories_count
+  attr_in_percentage :design_repositories_synced,    :design_repositories_synced_count,    :design_repositories_count
 
   def storage_shards_match?
     return true if geo_node.primary?
@@ -303,6 +308,7 @@ class GeoNodeStatus < ApplicationRecord
     load_job_artifacts_data
     load_attachments_data
     load_container_registry_data
+    load_designs_data
   end
 
   def load_lfs_objects_data
@@ -330,10 +336,17 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_container_registry_data
-    self.container_repositories_count = container_repository_finder.count_syncable
-    self.container_repositories_synced_count = container_repository_finder.count_synced
-    self.container_repositories_failed_count = container_repository_finder.count_failed
-    self.container_repositories_registry_count = container_repository_finder.count_registry
+    self.container_repositories_count = container_registry_finder.count_syncable
+    self.container_repositories_synced_count = container_registry_finder.count_synced
+    self.container_repositories_failed_count = container_registry_finder.count_failed
+    self.container_repositories_registry_count = container_registry_finder.count_registry
+  end
+
+  def load_designs_data
+    self.design_repositories_count = design_registry_finder.count_syncable
+    self.design_repositories_synced_count = design_registry_finder.count_synced
+    self.design_repositories_failed_count = design_registry_finder.count_failed
+    self.design_repositories_registry_count = design_registry_finder.count_registry
   end
 
   def load_repository_check_data
@@ -382,8 +395,12 @@ class GeoNodeStatus < ApplicationRecord
     @job_artifacts_finder ||= Geo::JobArtifactRegistryFinder.new(current_node_id: geo_node.id)
   end
 
-  def container_repository_finder
-    @container_repository_finder ||= Geo::ContainerRepositoryRegistryFinder.new(current_node_id: geo_node.id)
+  def container_registry_finder
+    @container_registry_finder ||= Geo::ContainerRepositoryRegistryFinder.new(current_node_id: geo_node.id)
+  end
+
+  def design_registry_finder
+    @design_registry_finder ||= Geo::DesignRegistryFinder.new(current_node_id: geo_node.id)
   end
 
   def registries_for_synced_projects(type)

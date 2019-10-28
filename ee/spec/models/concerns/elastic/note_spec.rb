@@ -36,7 +36,7 @@ describe Note, :elastic do
     end
   end
 
-  it "searches notes" do
+  it "searches notes", :sidekiq_might_not_need_inline do
     issue = create :issue
 
     Sidekiq::Testing.inline! do
@@ -135,7 +135,7 @@ describe Note, :elastic do
       expect(Note.elastic_search('term', options: options).total_count).to eq(0)
     end
 
-    it "finds note when user is authorized to see it" do
+    it "finds note when user is authorized to see it", :sidekiq_might_not_need_inline do
       user = create :user
       issue = create :issue, :confidential, author: user
 
@@ -150,7 +150,7 @@ describe Note, :elastic do
     end
 
     [:admin, :auditor].each do |user_type|
-      it "finds note for #{user_type}" do
+      it "finds note for #{user_type}", :sidekiq_might_not_need_inline do
         superuser = create(user_type)
         issue = create(:issue, :confidential, author: create(:user))
 
@@ -165,7 +165,7 @@ describe Note, :elastic do
       end
     end
 
-    it "return notes with matching content for project members" do
+    it "return notes with matching content for project members", :sidekiq_might_not_need_inline do
       user = create :user
       issue = create :issue, :confidential, author: user
 

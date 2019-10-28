@@ -54,15 +54,24 @@ describe Security::PipelineVulnerabilitiesFinder do
 
     context 'by order' do
       let(:params) { { report_type: %w[sast] } }
-      let!(:occurrence1) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:high],   severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:high]) }
-      let!(:occurrence2) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:medium], severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:critical]) }
-      let!(:occurrence3) { build(:vulnerabilities_occurrence, confidence: Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[:high],   severity: Vulnerabilities::Occurrence::SEVERITY_LEVELS[:critical]) }
-      let!(:res) { [occurrence3, occurrence2, occurrence1] }
+      let!(:high_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :high) }
+      let!(:critical_medium) { build(:vulnerabilities_occurrence, confidence: :medium, severity: :critical) }
+      let!(:critical_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :critical) }
+      let!(:unknown_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :unknown) }
+      let!(:unknown_medium) { build(:vulnerabilities_occurrence, confidence: :medium, severity: :unknown) }
+      let!(:unknown_low) { build(:vulnerabilities_occurrence, confidence: :low, severity: :unknown) }
 
       it 'orders by severity and confidence' do
-        allow_any_instance_of(described_class).to receive(:filter).and_return(res)
+        allow_any_instance_of(described_class).to receive(:filter).and_return([
+               unknown_low,
+               unknown_medium,
+               critical_high,
+               unknown_high,
+               critical_medium,
+               high_high
+        ])
 
-        expect(subject).to eq([occurrence3, occurrence2, occurrence1])
+        expect(subject).to eq([critical_high, critical_medium, high_high, unknown_high, unknown_medium, unknown_low])
       end
     end
 
@@ -215,6 +224,54 @@ describe Security::PipelineVulnerabilitiesFinder do
 
       it 'returns all report_types' do
         expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count
+      end
+    end
+
+    context 'when matching vulnerability records exist' do
+      before do
+        create(:vulnerabilities_finding,
+               :confirmed,
+               project: project,
+               report_type: 'sast',
+               project_fingerprint: confirmed_fingerprint)
+        create(:vulnerabilities_finding,
+               :resolved,
+               project: project,
+               report_type: 'sast',
+               project_fingerprint: resolved_fingerprint)
+        create(:vulnerabilities_finding,
+               :dismissed,
+               project: project,
+               report_type: 'sast',
+               project_fingerprint: dismissed_fingerprint)
+      end
+
+      let(:confirmed_fingerprint) do
+        Digest::SHA1.hexdigest(
+          'python/hardcoded/hardcoded-tmp.py:52865813c884a507be1f152d654245af34aba8a391626d01f1ab6d3f52ec8779:B108')
+      end
+
+      let(:resolved_fingerprint) do
+        Digest::SHA1.hexdigest(
+          'groovy/src/main/java/com/gitlab/security_products/tests/App.groovy:47:PREDICTABLE_RANDOM')
+      end
+
+      let(:dismissed_fingerprint) do
+        Digest::SHA1.hexdigest(
+          'groovy/src/main/java/com/gitlab/security_products/tests/App.groovy:41:PREDICTABLE_RANDOM')
+      end
+
+      subject { described_class.new(pipeline: pipeline, params: { report_type: %w[sast], scope: 'all' }).execute }
+
+      it 'assigns vulnerability records to findings providing them with computed state' do
+        confirmed = subject.find { |f| f.project_fingerprint == confirmed_fingerprint }
+        resolved = subject.find { |f| f.project_fingerprint == resolved_fingerprint }
+        dismissed = subject.find { |f| f.project_fingerprint == dismissed_fingerprint }
+
+        expect(confirmed.state).to eq 'confirmed'
+        expect(resolved.state).to eq 'resolved'
+        expect(dismissed.state).to eq 'dismissed'
+        expect(subject - [confirmed, resolved, dismissed]).to all have_attributes(state: 'new')
       end
     end
 

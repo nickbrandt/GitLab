@@ -259,9 +259,6 @@ gem 'loofah', '~> 2.2'
 # Working with license
 gem 'licensee', '~> 8.9'
 
-# Protect against bruteforcing
-gem 'rack-attack', '~> 4.4.1'
-
 # Ace editor
 gem 'ace-rails-ap', '~> 4.1.0'
 
@@ -292,6 +289,9 @@ gem 'request_store', '~> 1.3'
 gem 'base32', '~> 0.3.0'
 
 gem "gitlab-license", "~> 1.0"
+
+# Protect against bruteforcing
+gem 'rack-attack', '~> 6.2.0'
 
 # Sentry integration
 gem 'sentry-raven', '~> 2.9'
@@ -455,9 +455,9 @@ gem 'google-protobuf', '~> 3.8.0'
 gem 'toml-rb', '~> 1.0.0', require: false
 
 # Feature toggles
-gem 'flipper', '~> 0.13.0'
-gem 'flipper-active_record', '~> 0.13.0'
-gem 'flipper-active_support_cache_store', '~> 0.13.0'
+gem 'flipper', '~> 0.17.1'
+gem 'flipper-active_record', '~> 0.17.1'
+gem 'flipper-active_support_cache_store', '~> 0.17.1'
 gem 'unleash', '~> 0.1.5'
 
 # Structured logging
@@ -469,3 +469,5 @@ gem 'gitlab-net-dns', '~> 0.9.1'
 
 # Countries list
 gem 'countries', '~> 3.0'
+
+gem 'retriable', '~> 3.1.2'

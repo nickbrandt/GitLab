@@ -9,10 +9,11 @@ class PodLogsService < ::BaseService
 
   PARAMS = %w(pod_name container_name).freeze
 
-  SUCCESS_RETURN_KEYS = [:status, :logs].freeze
+  SUCCESS_RETURN_KEYS = [:status, :logs, :pod_name, :container_name, :pods].freeze
 
   steps :check_param_lengths,
     :check_deployment_platform,
+    :check_pod_names,
     :check_pod_name,
     :pod_logs,
     :split_logs,
@@ -52,10 +53,18 @@ class PodLogsService < ::BaseService
     success(result)
   end
 
+  def check_pod_names(result)
+    result[:pods] = environment.pod_names
+
+    return { status: :processing } unless result[:pods]
+
+    success(result)
+  end
+
   def check_pod_name(result)
     # If pod_name is not received as parameter, get the pod logs of the first
     # pod of this environment.
-    result[:pod_name] ||= environment.pod_names&.first
+    result[:pod_name] ||= result[:pods].first
 
     unless result[:pod_name]
       return error(_('No pods available'))
@@ -73,18 +82,18 @@ class PodLogsService < ::BaseService
 
     return { status: :processing } unless response
 
-    result[:logs] = response[:logs]
+    result.merge!(response.slice(:pod_name, :container_name, :logs))
 
     if response[:status] == :error
-      error(response[:error])
+      error(response[:error]).reverse_merge(result)
     else
       success(result)
     end
   end
 
   def split_logs(result)
-    logs = split_by_newline(result[:logs])
-    success(logs: logs)
+    result[:logs] = split_by_newline(result[:logs])
+    success(result)
   end
 
   def filter_return_keys(result)

@@ -18,7 +18,7 @@ describe MergeRequest, :elastic do
     end
   end
 
-  it "searches merge requests" do
+  it "searches merge requests", :sidekiq_might_not_need_inline do
     project = create :project, :public, :repository
 
     Sidekiq::Testing.inline! do
@@ -40,7 +40,7 @@ describe MergeRequest, :elastic do
     expect(described_class.elastic_search('term3', options: { project_ids: :any, public_and_internal_projects: true }).total_count).to eq(1)
   end
 
-  it "searches by iid and scopes to type: merge_request only" do
+  it "searches by iid and scopes to type: merge_request only", :sidekiq_might_not_need_inline do
     project = create :project, :public, :repository
     merge_request = nil
 

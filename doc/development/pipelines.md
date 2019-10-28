@@ -15,6 +15,8 @@ as much as possible.
 
 The current stages are:
 
+- `sync`: This stage is used to synchronize changes from gitlab-org/gitlab to
+  gitlab-org/gitlab-foss.
 - `prepare`: This stage includes jobs that prepare artifacts that are needed by
   jobs in subsequent stages.
 - `quick-test`: This stage includes test jobs that should run first and fail the
@@ -27,7 +29,6 @@ The current stages are:
 - `review`: This stage includes jobs that deploy the GitLab and Docs Review Apps.
 - `qa`: This stage includes jobs that perform QA tasks against the Review App
   that is deployed in the previous stage.
-- `notification`: This stage includes jobs that sends notifications about pipeline status.
 - `post-test`: This stage includes jobs that build reports or gather data from
   the previous stages' jobs (e.g. coverage, Knapsack metadata etc.).
 - `pages`: This stage includes a job that deploys the various reports as
@@ -201,11 +202,6 @@ subgraph "`qa` stage"
     review-performance -.-> |needs and depends on| G;
     X2["schedule:review-performance<br/>(master only)"] -.-> |needs and depends on| G2;
     dast -.-> |needs and depends on| G;
-    end
-
-subgraph "`notification` stage"
-    NOTIFICATION1["schedule:package-and-qa:notify-success<br>(on_success)"] -.-> |needs| P;
-    NOTIFICATION2["schedule:package-and-qa:notify-failure<br>(on_failure)"] -.-> |needs| P;
     end
 
 subgraph "`post-test` stage"

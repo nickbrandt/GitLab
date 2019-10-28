@@ -6,14 +6,14 @@ module Vulnerabilities
 
     FindingsDismissResult = Struct.new(:ok?, :finding, :message)
 
-    def initialize(current_user, vulnerability)
-      @current_user = current_user
+    def initialize(user, vulnerability)
+      @user = user
       @vulnerability = vulnerability
       @project = vulnerability.project
     end
 
     def execute
-      raise Gitlab::Access::AccessDeniedError unless can?(@current_user, :dismiss_vulnerability, @project)
+      raise Gitlab::Access::AccessDeniedError unless can?(@user, :dismiss_vulnerability, @project)
 
       @vulnerability.transaction do
         result = dismiss_findings
@@ -23,7 +23,7 @@ module Vulnerabilities
           raise ActiveRecord::Rollback
         end
 
-        @vulnerability.update(state: 'closed')
+        @vulnerability.update(state: :closed, closed_by: @user, closed_at: Time.zone.now)
       end
 
       @vulnerability
@@ -32,7 +32,7 @@ module Vulnerabilities
     private
 
     def feedback_service_for(finding)
-      VulnerabilityFeedback::CreateService.new(@project, @current_user, feedback_params_for(finding))
+      VulnerabilityFeedback::CreateService.new(@project, @user, feedback_params_for(finding))
     end
 
     def feedback_params_for(finding)

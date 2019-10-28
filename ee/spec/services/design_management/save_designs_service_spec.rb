@@ -271,7 +271,7 @@ describe DesignManagement::SaveDesignsService do
             expect { run_service }.to change { commit_count.call }.by(1)
           end
 
-          it 'only does 5 gitaly calls', :request_store do
+          it 'only does 5 gitaly calls', :request_store, :sidekiq_might_not_need_inline do
             service = described_class.new(project, user, issue: issue, files: files)
             # Some unrelated calls that are usually cached or happen only once
             service.__send__(:repository).create_if_not_exists

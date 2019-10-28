@@ -288,11 +288,13 @@ module EE
         expose :author, using: ::API::Entities::UserBasic
         expose :start_date
         expose :start_date_is_fixed?, as: :start_date_is_fixed, if: can_admin_epic
-        expose :start_date_fixed, :start_date_from_milestones, if: can_admin_epic
-        expose :end_date # @deprecated
+        expose :start_date_fixed, :start_date_from_inherited_source, if: can_admin_epic
+        expose :start_date_from_milestones, if: can_admin_epic # @deprecated in favor of start_date_from_inherited_source
+        expose :end_date # @deprecated in favor of due_date
         expose :end_date, as: :due_date
         expose :due_date_is_fixed?, as: :due_date_is_fixed, if: can_admin_epic
-        expose :due_date_fixed, :due_date_from_milestones, if: can_admin_epic
+        expose :due_date_fixed, :due_date_from_inherited_source, if: can_admin_epic
+        expose :due_date_from_milestones, if: can_admin_epic # @deprecated in favor of due_date_from_inherited_source
         expose :state
         expose :web_edit_url, if: can_admin_epic # @deprecated
         expose :web_url
@@ -645,6 +647,13 @@ module EE
         expose :container_repositories_failed_count
         expose :container_repositories_synced_in_percentage do |node|
           number_to_percentage(node.container_repositories_synced_in_percentage, precision: 2)
+        end
+
+        expose :design_repositories_count
+        expose :design_repositories_synced_count
+        expose :design_repositories_failed_count
+        expose :design_repositories_synced_in_percentage do |node|
+          number_to_percentage(node.design_repositories_synced_in_percentage, precision: 2)
         end
 
         expose :projects_count

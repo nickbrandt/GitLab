@@ -7,6 +7,10 @@ FactoryBot.define do
     last_synced_at { nil }
     state { :pending }
 
+    after(:create) do |registry, evaluator|
+      create(:design, project: registry.project)
+    end
+
     trait :synced do
       state { :synced }
       last_synced_at { 5.days.ago }

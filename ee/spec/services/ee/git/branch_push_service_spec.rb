@@ -60,7 +60,7 @@ describe Git::BranchPushService do
         subject.execute
       end
 
-      it "triggers indexer when push to default branch" do
+      it "triggers indexer when push to default branch", :sidekiq_might_not_need_inline do
         expect_any_instance_of(Gitlab::Elastic::Indexer).to receive(:run)
 
         subject.execute

@@ -21,6 +21,7 @@ describe('User onboarding help content popover', () => {
 
   const exitTourContent = {
     text: 'some help content',
+    buttonText: "Close 'Learn GitLab'",
     exitTour: true,
   };
 

@@ -20,10 +20,13 @@ describe Vulnerabilities::DismissService do
     end
 
     it 'dismisses a vulnerability and its associated findings' do
-      subject
+      Timecop.freeze do
+        subject
 
-      expect(vulnerability.reload).to be_closed
-      expect(vulnerability.findings).to all have_vulnerability_dismissal_feedback
+        expect(vulnerability.reload).to(
+          have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.zone.now)))
+        expect(vulnerability.findings).to all have_vulnerability_dismissal_feedback
+      end
     end
 
     context 'when there is a finding dismissal error' do

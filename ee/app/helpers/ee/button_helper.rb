@@ -44,15 +44,5 @@ module EE
           title: 'Get a Kerberos token for your<br>account with kinit.'
         }
     end
-
-    def geo_button(modal_target: nil)
-      data = { placement: 'bottom', container: 'body', toggle: 'modal', target: modal_target }
-      content_tag :button,
-                  sprite_icon('location-dot', size: 15),
-                  class: 'btn btn-geo has-tooltip',
-                  data: data,
-                  type: :button,
-                  title: 'See Geo-specific instructions'
-    end
   end
 end

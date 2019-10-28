@@ -169,7 +169,7 @@ describe 'Group Cycle Analytics', :js do
       { title: "Production", description: "From issue creation until deploy to production", events_count: 1, median: "5 days" }
     ]
 
-    it 'each stage will have median values' do
+    it 'each stage will have median values', :sidekiq_might_not_need_inline do
       stages = page.all(".stage-nav .stage-median").collect(&:text)
 
       stages.each_with_index do |median, index|
@@ -177,7 +177,7 @@ describe 'Group Cycle Analytics', :js do
       end
     end
 
-    it 'each stage will display the events description when selected' do
+    it 'each stage will display the events description when selected', :sidekiq_might_not_need_inline do
       dummy_stages.each do |stage|
         select_stage(stage[:title])
 
@@ -185,7 +185,7 @@ describe 'Group Cycle Analytics', :js do
       end
     end
 
-    it 'each stage with events will display the stage events list when selected' do
+    it 'each stage with events will display the stage events list when selected', :sidekiq_might_not_need_inline do
       dummy_stages.each do |stage|
         select_stage(stage[:title])
 

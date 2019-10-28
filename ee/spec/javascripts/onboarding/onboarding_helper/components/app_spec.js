@@ -29,11 +29,17 @@ describe('User onboarding helper app', () => {
     text: 'exit tour content',
     buttons: [{ text: 'OK', btnClass: 'btn-primary' }],
   };
+  const dntExitTourContent = {
+    text: 'dnt exit tour content',
+    buttonText: 'Got it',
+    exitTour: true,
+  };
 
   const defaultProps = {
     tourTitles,
     exitTourContent,
     feedbackContent,
+    dntExitTourContent,
     goldenTanukiSvgPath: 'illustrations/golden_tanuki.svg',
   };
 
@@ -82,6 +88,12 @@ describe('User onboarding helper app', () => {
         store.dispatch('setTourFeedback', true);
 
         expect(vm.helpContentData).toEqual(feedbackContent);
+      });
+
+      it('returns an object containing do not track exit content if dntExitTour is true', () => {
+        store.dispatch('setDntExitTour', true);
+
+        expect(vm.helpContentData).toEqual(dntExitTourContent);
       });
     });
 
@@ -350,6 +362,22 @@ describe('User onboarding helper app', () => {
         vm.handleFeedbackTourContent(true);
 
         expect(vm.$store.dispatch).toHaveBeenCalledWith('setTourFeedback', true);
+      });
+    });
+
+    describe('handleDntExitTourContent', () => {
+      it('sets the "dismissPopover" prop to false', () => {
+        vm.handleDntExitTourContent(true);
+
+        expect(vm.dismissPopover).toBeFalsy();
+      });
+
+      it('calls the "setDntExitTour" method', () => {
+        spyOn(vm.$store, 'dispatch');
+
+        vm.handleDntExitTourContent(true);
+
+        expect(vm.$store.dispatch).toHaveBeenCalledWith('setDntExitTour', true);
       });
     });
 

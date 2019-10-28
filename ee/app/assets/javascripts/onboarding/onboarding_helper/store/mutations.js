@@ -16,6 +16,9 @@ export default {
   [types.SET_FEEDBACK](state, payload) {
     state.tourFeedback = payload;
   },
+  [types.SET_DNT_EXIT_TOUR](state, payload) {
+    state.dntExitTour = payload;
+  },
   [types.SET_EXIT_TOUR](state, payload) {
     state.exitTour = payload;
   },

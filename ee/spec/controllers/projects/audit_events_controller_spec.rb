@@ -24,7 +24,7 @@ describe Projects::AuditEventsController do
         end
 
         it 'renders index with 200 status code' do
-          expect(LogFinder).to receive(:new).with(entity_type: ::Project.name, entity_id: project.id).and_call_original
+          expect(AuditLogFinder).to receive(:new).with(entity_type: ::Project.name, entity_id: project.id).and_call_original
 
           request
 

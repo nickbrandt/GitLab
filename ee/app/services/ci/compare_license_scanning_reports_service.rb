@@ -13,5 +13,11 @@ module Ci
     def get_report(pipeline)
       pipeline&.license_scanning_report
     end
+
+    private
+
+    def key(base_pipeline, head_pipeline)
+      super(base_pipeline, head_pipeline) + project.software_license_policies.workaround_cache_key
+    end
   end
 end

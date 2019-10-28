@@ -168,21 +168,21 @@ describe('Cycle analytics actions', () => {
     });
   });
 
-  describe('fetchCustomStageFormData', () => {
+  describe('fetchGroupLabels', () => {
     beforeEach(() => {
       mock.onGet(groupLabelsEndpoint).replyOnce(200, groupLabels);
     });
 
-    it('dispatches receiveCustomStageFormData if the request succeeds', done => {
+    it('dispatches receiveGroupLabels if the request succeeds', done => {
       testAction(
-        actions.fetchCustomStageFormData,
+        actions.fetchGroupLabels,
         groupPath,
         state,
         [],
         [
-          { type: 'requestCustomStageFormData' },
+          { type: 'requestGroupLabels' },
           {
-            type: 'receiveCustomStageFormDataSuccess',
+            type: 'receiveGroupLabelsSuccess',
             payload: groupLabels,
           },
         ],
@@ -190,16 +190,16 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    it('dispatches receiveCustomStageFormDataError if the request fails', done => {
+    it('dispatches receiveGroupLabelsError if the request fails', done => {
       testAction(
-        actions.fetchCustomStageFormData,
+        actions.fetchGroupLabels,
         'this-path-does-not-exist',
         state,
         [],
         [
-          { type: 'requestCustomStageFormData' },
+          { type: 'requestGroupLabels' },
           {
-            type: 'receiveCustomStageFormDataError',
+            type: 'receiveGroupLabelsError',
             payload: error,
           },
         ],
@@ -207,16 +207,16 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    describe('receiveCustomStageFormDataError', () => {
+    describe('receiveGroupLabelsError', () => {
       beforeEach(() => {
         setFixtures('<div class="flash-container"></div>');
       });
       it('flashes an error message if the request fails', () => {
-        actions.receiveCustomStageFormDataError({
+        actions.receiveGroupLabelsError({
           commit: () => {},
         });
 
-        shouldFlashAnError('There was an error fetching data for the form');
+        shouldFlashAnError('There was an error fetching label data for the selected group');
       });
     });
   });

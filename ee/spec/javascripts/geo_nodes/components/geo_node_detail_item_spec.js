@@ -117,5 +117,14 @@ describe('GeoNodeDetailItemComponent', () => {
       expect(vm.$el.querySelectorAll('.event-status-timestamp').length).not.toBe(0);
       vm.$destroy();
     });
+
+    it('does not render if featureDisabled is true', () => {
+      const vm = createComponent({
+        featureDisabled: true,
+      });
+
+      expect(vm.$el.innerHTML).toBeUndefined();
+      vm.$destroy();
+    });
   });
 });

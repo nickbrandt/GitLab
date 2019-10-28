@@ -115,6 +115,30 @@ module Vulnerabilities
       end
     end
 
+    def self.with_vulnerabilities_for_state(project:, report_type:, project_fingerprints:)
+      Vulnerabilities::Occurrence
+        .joins(:vulnerability)
+        .where(
+          project: project,
+          report_type: report_type,
+          project_fingerprint: project_fingerprints
+        )
+        .select('report_type, vulnerability_id, project_fingerprint, raw_metadata, '\
+                'vulnerabilities.id, vulnerabilities.state') # fetching only required attributes
+    end
+
+    def state
+      return 'dismissed' if dismissal_feedback.present?
+
+      if vulnerability.nil?
+        'new'
+      elsif vulnerability.closed?
+        'resolved'
+      else
+        'confirmed'
+      end
+    end
+
     def feedback(feedback_type:)
       params = {
         project_id: project_id,
@@ -195,6 +219,14 @@ module Vulnerabilities
     # Array.difference (-) method uses hash and eql? methods to do comparison
     def hash
       report_type.hash ^ location.hash ^ first_fingerprint.hash
+    end
+
+    def severity_value
+      self.class.severities[self.severity]
+    end
+
+    def confidence_value
+      self.class.confidences[self.confidence]
     end
 
     protected

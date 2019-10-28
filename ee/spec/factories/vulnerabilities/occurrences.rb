@@ -5,7 +5,7 @@ FactoryBot.define do
     Digest::SHA1.hexdigest("uuid-#{n}")[0..35]
   end
 
-  factory :vulnerabilities_occurrence, class: Vulnerabilities::Occurrence do
+  factory :vulnerabilities_occurrence, class: Vulnerabilities::Occurrence, aliases: [:vulnerabilities_finding] do
     name { 'Cipher with no integrity' }
     project
     sequence(:uuid) { generate(:vulnerability_occurrence_uuid) }
@@ -35,6 +35,28 @@ FactoryBot.define do
           }
         ]
       }.to_json
+    end
+
+    trait :confirmed do
+      after(:create) do |finding|
+        create(:vulnerability, :opened, project: finding.project, findings: [finding])
+      end
+    end
+
+    trait :resolved do
+      after(:create) do |finding|
+        create(:vulnerability, :closed, project: finding.project, findings: [finding])
+      end
+    end
+
+    trait :dismissed do
+      after(:create) do |finding|
+        create(:vulnerability, :closed, project: finding.project, findings: [finding])
+        create(:vulnerability_feedback,
+               :dismissal,
+               project: finding.project,
+               project_fingerprint: finding.project_fingerprint)
+      end
     end
   end
 end

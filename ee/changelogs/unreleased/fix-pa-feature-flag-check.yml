@@ -1,0 +1,5 @@
+---
+title: Fix feature flag check for productivity analytics
+merge_request: 19025
+author:
+type: fixed

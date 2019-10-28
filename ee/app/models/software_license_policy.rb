@@ -43,4 +43,8 @@ class SoftwareLicensePolicy < ApplicationRecord
   end
 
   delegate :name, to: :software_license
+
+  def self.workaround_cache_key
+    pluck(:id, :approval_status).flatten
+  end
 end

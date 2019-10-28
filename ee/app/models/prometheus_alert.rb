@@ -5,7 +5,7 @@ class PrometheusAlert < ApplicationRecord
 
   OPERATORS_MAP = {
     lt: "<",
-    eq: "=",
+    eq: "==",
     gt: ">"
   }.freeze
 

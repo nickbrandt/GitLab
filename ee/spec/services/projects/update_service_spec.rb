@@ -252,7 +252,7 @@ describe Projects::UpdateService, '#execute' do
     end
 
     context 'when merge pipelines option is disabled' do
-      it 'drops all merge request in the train' do
+      it 'drops all merge request in the train', :sidekiq_might_not_need_inline do
         expect do
           update_project(project, user, merge_pipelines_enabled: false)
         end.to change { MergeTrain.count }.from(2).to(0)
