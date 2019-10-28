@@ -34,6 +34,10 @@ describe('PackageInstallation', () => {
     });
   }
 
+  beforeEach(() => {
+    createComponent();
+  });
+
   afterEach(() => {
     if (wrapper) wrapper.destroy();
   });
