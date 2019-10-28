@@ -8,6 +8,7 @@ module EE
 
     prepended do
       has_many :prometheus_alerts, inverse_of: :environment
+      has_many :self_managed_prometheus_alert_events, inverse_of: :environment
       has_one :last_deployable, through: :last_deployment, source: 'deployable', source_type: 'CommitStatus'
       has_one :last_pipeline, through: :last_deployable, source: 'pipeline'
 

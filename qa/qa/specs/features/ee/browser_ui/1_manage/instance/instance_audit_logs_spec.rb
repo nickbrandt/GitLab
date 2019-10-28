@@ -5,6 +5,8 @@ module QA
   context 'Manage' do
     shared_examples 'instance audit event logs' do |expected_events|
       it 'logs audit events for UI operations' do
+        sign_in
+
         Page::Main::Menu.perform(&:click_admin_area)
         QA::Page::Admin::Menu.perform(&:go_to_monitoring_audit_logs)
         EE::Page::Admin::Monitoring::AuditLog.perform do |audit_log_page|
@@ -110,10 +112,9 @@ module QA
       end
 
       def sign_in
-        unless Page::Main::Menu.perform { |p| p.has_personal_area?(wait: 0) }
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_admin_credentials)
-        end
+        Page::Main::Menu.perform(&:sign_out_if_signed_in)
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
       end
     end
   end

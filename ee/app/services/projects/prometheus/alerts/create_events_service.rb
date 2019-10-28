@@ -20,22 +20,11 @@ module Projects
 
           return unless parsed_alert.valid?
 
-          event = if parsed_alert.gitlab_managed?
-                    build_managed_prometheus_alert_event(parsed_alert)
-                  else
-                    build_self_managed_prometheus_alert_event(parsed_alert)
-                  end
-
-          if event
-            result = case parsed_alert.status
-                     when 'firing'
-                       event.fire(parsed_alert.starts_at)
-                     when 'resolved'
-                       event.resolve(parsed_alert.ends_at)
-                     end
+          if parsed_alert.gitlab_managed?
+            create_managed_prometheus_alert_event(parsed_alert)
+          else
+            create_self_managed_prometheus_alert_event(parsed_alert)
           end
-
-          event if result
         end
 
         def alerts
@@ -49,24 +38,36 @@ module Projects
             .first
         end
 
-        def build_managed_prometheus_alert_event(parsed_alert)
+        def create_managed_prometheus_alert_event(parsed_alert)
           alert = find_alert(parsed_alert.metric_id)
-
-          return if alert.blank?
-
           payload_key = PrometheusAlertEvent.payload_key_for(parsed_alert.metric_id, parsed_alert.starts_at_raw)
 
-          PrometheusAlertEvent.find_or_initialize_by_payload_key(parsed_alert.project, alert, payload_key)
+          event = PrometheusAlertEvent.find_or_initialize_by_payload_key(parsed_alert.project, alert, payload_key)
+
+          set_status(parsed_alert, event)
         end
 
-        def build_self_managed_prometheus_alert_event(parsed_alert)
+        def create_self_managed_prometheus_alert_event(parsed_alert)
           payload_key = SelfManagedPrometheusAlertEvent.payload_key_for(parsed_alert.starts_at_raw, parsed_alert.title, parsed_alert.full_query)
 
-          SelfManagedPrometheusAlertEvent.find_or_initialize_by_payload_key(parsed_alert.project, payload_key) do |event|
+          event = SelfManagedPrometheusAlertEvent.find_or_initialize_by_payload_key(parsed_alert.project, payload_key) do |event|
             event.environment      = parsed_alert.environment
             event.title            = parsed_alert.title
             event.query_expression = parsed_alert.full_query
           end
+
+          set_status(parsed_alert, event)
+        end
+
+        def set_status(parsed_alert, event)
+          persisted = case parsed_alert.status
+                      when 'firing'
+                        event.fire(parsed_alert.starts_at)
+                      when 'resolved'
+                        event.resolve(parsed_alert.ends_at)
+                      end
+
+          event if persisted
         end
       end
     end

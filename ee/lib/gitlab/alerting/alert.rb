@@ -81,6 +81,14 @@ module Gitlab
         end
       end
 
+      def firing?
+        status == 'firing'
+      end
+
+      def resolved?
+        status == 'resolved'
+      end
+
       def gitlab_managed?
         metric_id.present?
       end

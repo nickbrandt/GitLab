@@ -6,6 +6,10 @@ const notImplemented = () => {
 };
 
 export default {
+  [mutationTypes.TOGGLE_LABELS]: state => {
+    state.isShowingLabels = !state.isShowingLabels;
+  },
+
   [mutationTypes.REQUEST_AVAILABLE_BOARDS]: () => {
     notImplemented();
   },
