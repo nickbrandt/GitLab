@@ -336,7 +336,7 @@ The following documentation relates to the DevOps **Monitor** stage:
 | [GitLab Prometheus](administration/monitoring/prometheus/index.md) **(CORE ONLY)**              | Configure the bundled Prometheus to collect various metrics from your GitLab instance.                                                   |
 | [Health check](user/admin_area/monitoring/health_check.md)                                      | GitLab provides liveness and readiness probes to indicate service health and reachability to required services.                          |
 | [Prometheus project integration](user/project/integrations/prometheus.md)                       | Configure the Prometheus integration per project and monitor your CI/CD environments.                                                    |
-| [Prometheus metrics](user/project/integrations/prometheus_library/index.md)                     | Let Prometheus collect metrics from various services, like Kubernetes, NGINX, NGINX ingress controller, HAProxy, and Amazon Cloud Watch. |
+| [Prometheus metrics](user/project/integrations/prometheus_library/index.md)                     | Let Prometheus collect metrics from various services, like Kubernetes, NGINX, NGINX Ingress controller, HAProxy, and Amazon Cloud Watch. |
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#overview">
@@ -393,7 +393,7 @@ Learn more about GitLab account management:
 | Topic                                                      | Description                                                                                                                |
 |:-----------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------|
 | [User account](user/profile/index.md)                      | Manage your account.                                                                                                       |
-| [Authentication](topics/authentication/index.md)           | Account security with two-factor authentication, set up your ssh keys, and deploy keys for secure access to your projects. |
+| [Authentication](topics/authentication/index.md)           | Account security with two-factor authentication, set up your SSH keys, and deploy keys for secure access to your projects. |
 | [Profile settings](user/profile/index.md#profile-settings) | Manage your profile settings, two factor authentication, and more.                                                         |
 | [User permissions](user/permissions.md)                    | Learn what each role in a project can do.                                                                                  |
 
