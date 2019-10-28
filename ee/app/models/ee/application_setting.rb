@@ -11,6 +11,7 @@ module EE
     prepended do
       EMAIL_ADDITIONAL_TEXT_CHARACTER_LIMIT = 10_000
       INSTANCE_REVIEW_MIN_USERS = 100
+      DEFAULT_NUMBER_OF_DAYS_BEFORE_REMOVAL = 7
 
       belongs_to :file_template_project, class_name: "Project"
 
@@ -84,7 +85,7 @@ module EE
           mirror_capacity_threshold: Settings.gitlab['mirror_capacity_threshold'],
           mirror_max_capacity: Settings.gitlab['mirror_max_capacity'],
           mirror_max_delay: Settings.gitlab['mirror_max_delay'],
-          deletion_adjourned_period: 7,
+          deletion_adjourned_period: DEFAULT_NUMBER_OF_DAYS_BEFORE_REMOVAL,
           pseudonymizer_enabled: false,
           repository_size_limit: 0,
           slack_app_enabled: false,
