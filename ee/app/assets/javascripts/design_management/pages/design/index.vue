@@ -51,6 +51,7 @@ export default {
         return {
           id: this.id,
           version: this.designsVersion,
+          fetchPolicy: 'network-only', // This appears to do nothing
         };
       },
       result({ data }) {
@@ -63,6 +64,7 @@ export default {
           this.$router.push({ name: 'designs' });
         }
       },
+      pollInterval: 500, // This also appears to do nothing
     },
   },
   computed: {
@@ -86,6 +88,12 @@ export default {
     },
   },
   mounted() {
+    // Re-fetch the data
+    debugger;
+    this.$apollo.queries.design.refetch().then((a, b, c) => {
+      // This is returning the cached data :(
+      console.log(a.data.design.discussions.edges[0].node.notes.edges);
+    });
     Mousetrap.bind('esc', this.closeDesign);
   },
   beforeDestroy() {
