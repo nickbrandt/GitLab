@@ -12,8 +12,6 @@ module EE::Projects::ImportExport::ExportService
   end
 
   def design_repo_saver
-    return unless Feature.enabled?(:export_designs, project, default_enabled: true)
-
     Gitlab::ImportExport::DesignRepoSaver.new(project: project, shared: shared)
   end
 end
