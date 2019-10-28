@@ -19,10 +19,16 @@ module QA
     describe 'Security Reports' do
       after do
         Service::DockerRun::GitlabRunner.new(@executor).remove!
+
+        Runtime::Feature.enable('job_log_json') if @job_log_json_flag_enabled
       end
 
       before do
         @executor = "qa-runner-#{Time.now.to_i}"
+
+        # Handle WIP Job Logs flag - https://gitlab.com/gitlab-org/gitlab/issues/31162
+        @job_log_json_flag_enabled = Runtime::Feature.enabled?('job_log_json')
+        Runtime::Feature.disable('job_log_json') if @job_log_json_flag_enabled
 
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)
