@@ -705,6 +705,67 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
   end
 
+  describe '#design_repositories_count' do
+    it 'counts all the designs' do
+      create(:design)
+      create(:design)
+
+      expect(subject.design_repositories_count).to eq(2)
+    end
+  end
+
+  describe '#design_repositories_synced_count' do
+    it 'counts synced repositories' do
+      create(:geo_design_registry, :synced)
+      create(:geo_design_registry, :sync_failed)
+
+      expect(subject.design_repositories_synced_count).to eq(1)
+    end
+  end
+
+  describe '#design_repositories_failed_count' do
+    it 'counts failed to sync repositories' do
+      create(:geo_design_registry, :sync_failed)
+      create(:geo_design_registry, :synced)
+
+      expect(subject.design_repositories_failed_count).to eq(1)
+    end
+  end
+
+  describe '#design_repositories_registry_count' do
+    it 'counts number of registries for repositories' do
+      create(:geo_design_registry, :sync_failed)
+      create(:geo_design_registry)
+      create(:geo_design_registry, :synced)
+
+      expect(subject.design_repositories_registry_count).to eq(3)
+    end
+  end
+
+  describe '#design_repositories_synced_in_percentage' do
+    it 'returns 0 when no objects are available' do
+      expect(subject.design_repositories_synced_in_percentage).to eq(0)
+    end
+
+    it 'returns the right percentage with no group restrictions' do
+      create(:geo_design_registry, :synced)
+      create(:geo_design_registry, :sync_failed)
+
+      expect(subject.design_repositories_synced_in_percentage).to be_within(0.0001).of(50)
+    end
+
+    it 'returns the right percentage with group restrictions' do
+      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+      create(:geo_design_registry, :synced, project: project_1)
+      create(:geo_design_registry, :sync_failed, project: project_2)
+      create(:geo_design_registry, :sync_failed, project: project_3)
+      create(:geo_design_registry, :sync_failed, project: project_4)
+
+      expect(subject.design_repositories_synced_in_percentage).to be_within(0.0001).of(50)
+    end
+  end
+
   describe '#repositories_verified_count' do
     before do
       stub_current_geo_node(secondary)

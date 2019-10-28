@@ -81,7 +81,7 @@ describe API::Search do
 
           expect(response).to have_gitlab_http_status(200)
           expect(json_response.size).to eq(1)
-          expect(json_response.first['filename']).to eq('PROCESS.md')
+          expect(json_response.first['path']).to eq('PROCESS.md')
         end
 
         it 'by path' do
@@ -90,7 +90,7 @@ describe API::Search do
           expect(response).to have_gitlab_http_status(200)
           expect(json_response.size).to eq(1)
           json_response.each do |file|
-            expect(file['filename']).to match(%r[/markdown/])
+            expect(file['path']).to match(%r[/markdown/])
           end
         end
 
@@ -100,7 +100,7 @@ describe API::Search do
           expect(response).to have_gitlab_http_status(200)
           expect(json_response.size).to eq(3)
           json_response.each do |file|
-            expect(file['filename']).to match(/\A.+\.md\z/)
+            expect(file['path']).to match(/\A.+\.md\z/)
           end
         end
       end

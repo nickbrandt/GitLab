@@ -11,7 +11,7 @@ export default {
   },
   computed: {
     message() {
-      return sprintf(s__('mrWidget|Added to the merge train at position %{mergeTrainPosition}'), {
+      return sprintf(s__('mrWidget|In the merge train at position %{mergeTrainPosition}'), {
         mergeTrainPosition: this.mergeTrainIndex + 1,
       });
     },

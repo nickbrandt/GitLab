@@ -71,6 +71,26 @@ describe Gitlab::Experimentation do
           controller.experiment_enabled?(:test_experiment)
         end
       end
+
+      describe 'URL parameter to force enable experiment' do
+        context 'is not present' do
+          # Disabled until https://gitlab.com/gitlab-org/gitlab/issues/34942 is solved properly
+          xit 'returns false' do
+            get :index, params: { force_experiment: :test_experiment2 }
+
+            expect(controller.experiment_enabled?(:test_experiment)).to be_falsey
+          end
+        end
+
+        context 'is present' do
+          # Disabled until https://gitlab.com/gitlab-org/gitlab/issues/34942 is solved properly
+          xit 'returns true' do
+            get :index, params: { force_experiment: :test_experiment }
+
+            expect(controller.experiment_enabled?(:test_experiment)).to be_truthy
+          end
+        end
+      end
     end
 
     describe '#track_experiment_event' do

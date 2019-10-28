@@ -988,6 +988,9 @@ msgstr ""
 msgid "Add reaction"
 msgstr ""
 
+msgid "Add request manually"
+msgstr ""
+
 msgid "Add to Slack"
 msgstr ""
 
@@ -1401,9 +1404,6 @@ msgstr ""
 msgid "Allow group owners to manage LDAP-related settings"
 msgstr ""
 
-msgid "Allow mirrors to be set up for projects"
-msgstr ""
-
 msgid "Allow only the selected protocols to be used for Git access."
 msgstr ""
 
@@ -1414,6 +1414,9 @@ msgid "Allow public access to pipelines and job details, including output logs a
 msgstr ""
 
 msgid "Allow rendering of PlantUML diagrams in Asciidoc documents."
+msgstr ""
+
+msgid "Allow repository mirroring to be configured by project maintainers"
 msgstr ""
 
 msgid "Allow requests to the local network from hooks and services."
@@ -4325,7 +4328,7 @@ msgstr ""
 msgid "Configure paths to be protected by Rack Attack. A web server restart is required after changing these settings."
 msgstr ""
 
-msgid "Configure push mirrors."
+msgid "Configure repository mirroring."
 msgstr ""
 
 msgid "Configure storage path settings."
@@ -4386,6 +4389,9 @@ msgid "Container Registry"
 msgstr ""
 
 msgid "Container registry images"
+msgstr ""
+
+msgid "Container registry is not enabled on this GitLab instance. Ask an administrator to enable it in order for AutoDevOps to work."
 msgstr ""
 
 msgid "ContainerRegistry|Container Registry"
@@ -7493,6 +7499,9 @@ msgstr ""
 msgid "GeoNodes|Data replication lag"
 msgstr ""
 
+msgid "GeoNodes|Design repositories"
+msgstr ""
+
 msgid "GeoNodes|Does not match the primary storage configuration"
 msgstr ""
 
@@ -8791,7 +8800,7 @@ msgstr ""
 msgid "If disabled, a diverged local branch will not be automatically updated with commits from its remote counterpart, to prevent local data loss. If the default branch (%{default_branch}) has diverged and cannot be updated, mirroring will fail. Other diverged branches are silently ignored."
 msgstr ""
 
-msgid "If disabled, only admins will be able to set up mirrors in projects."
+msgid "If disabled, only admins will be able to configure repository mirroring."
 msgstr ""
 
 msgid "If disabled, the access level will depend on the user's permissions in the project."
@@ -12701,6 +12710,9 @@ msgstr ""
 msgid "Project details"
 msgstr ""
 
+msgid "Project does not exist or you don't have permission to perform this action"
+msgstr ""
+
 msgid "Project export could not be deleted."
 msgstr ""
 
@@ -12857,7 +12869,13 @@ msgstr ""
 msgid "ProjectSettings|Customize your project badges."
 msgstr ""
 
+msgid "ProjectSettings|Enable 'Delete source branch' option by default"
+msgstr ""
+
 msgid "ProjectSettings|Every merge creates a merge commit"
+msgstr ""
+
+msgid "ProjectSettings|Existing merge requests and protected branches are not affected"
 msgstr ""
 
 msgid "ProjectSettings|Failed to protect the tag"
@@ -13936,7 +13954,7 @@ msgstr ""
 msgid "Repository maintenance"
 msgstr ""
 
-msgid "Repository mirror"
+msgid "Repository mirroring"
 msgstr ""
 
 msgid "Repository static objects"
@@ -16668,7 +16686,7 @@ msgstr ""
 msgid "There was an error fetching configuration for charts"
 msgstr ""
 
-msgid "There was an error fetching data for the form"
+msgid "There was an error fetching label data for the selected group"
 msgstr ""
 
 msgid "There was an error gathering the chart data"
@@ -17621,6 +17639,9 @@ msgid "URL"
 msgstr ""
 
 msgid "URL of the external storage that will serve the repository static objects (e.g. archives, blobs, ...)."
+msgstr ""
+
+msgid "URL or request ID"
 msgstr ""
 
 msgid "Unable to apply suggestions to a deleted line."
@@ -20028,9 +20049,6 @@ msgstr ""
 msgid "mrWidget|%{metricsLinkStart} Memory %{metricsLinkEnd} usage is %{emphasisStart} unchanged %{emphasisEnd} at %{memoryFrom}MB"
 msgstr ""
 
-msgid "mrWidget|Added to the merge train at position %{mergeTrainPosition}"
-msgstr ""
-
 msgid "mrWidget|Added to the merge train by"
 msgstr ""
 
@@ -20110,6 +20128,9 @@ msgid "mrWidget|If the %{branch} branch exists in your local repository, you can
 msgstr ""
 
 msgid "mrWidget|If the %{missingBranchName} branch exists in your local repository, you can merge this merge request manually using the command line"
+msgstr ""
+
+msgid "mrWidget|In the merge train at position %{mergeTrainPosition}"
 msgstr ""
 
 msgid "mrWidget|Loading deployment statistics"

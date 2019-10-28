@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_17_045817) do
+ActiveRecord::Schema.define(version: 2019_10_17_180026) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -599,7 +599,7 @@ ActiveRecord::Schema.define(version: 2019_10_17_045817) do
     t.index ["project_id", "name"], name: "index_ci_build_trace_section_names_on_project_id_and_name", unique: true
   end
 
-  create_table "ci_build_trace_sections", id: :serial, force: :cascade do |t|
+  create_table "ci_build_trace_sections", id: false, force: :cascade do |t|
     t.integer "project_id", null: false
     t.datetime "date_start", null: false
     t.datetime "date_end", null: false
@@ -1650,6 +1650,10 @@ ActiveRecord::Schema.define(version: 2019_10_17_045817) do
     t.integer "container_repositories_synced_count"
     t.integer "container_repositories_failed_count"
     t.integer "container_repositories_registry_count"
+    t.integer "design_repositories_count"
+    t.integer "design_repositories_synced_count"
+    t.integer "design_repositories_failed_count"
+    t.integer "design_repositories_registry_count"
     t.index ["geo_node_id"], name: "index_geo_node_statuses_on_geo_node_id", unique: true
   end
 
@@ -3054,6 +3058,7 @@ ActiveRecord::Schema.define(version: 2019_10_17_045817) do
     t.integer "max_pages_size"
     t.integer "max_artifacts_size"
     t.string "pull_mirror_branch_prefix", limit: 50
+    t.boolean "remove_source_branch_after_merge"
     t.index "lower((name)::text)", name: "index_projects_on_lower_name"
     t.index ["archived", "pending_delete", "merge_requests_require_code_owner_approval"], name: "projects_requiring_code_owner_approval", where: "((pending_delete = false) AND (archived = false) AND (merge_requests_require_code_owner_approval = true))"
     t.index ["created_at"], name: "index_projects_on_created_at"

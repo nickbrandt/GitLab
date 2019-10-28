@@ -16,6 +16,7 @@ describe('NodeDetailsSectionSync', () => {
   let vm;
 
   beforeEach(() => {
+    gon.features = gon.features || {};
     vm = createComponent();
   });
 

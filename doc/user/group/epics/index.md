@@ -10,7 +10,7 @@ Epics let you manage your portfolio of projects more efficiently and with less
 effort by tracking groups of issues that share a theme, across projects and
 milestones.
 
-![epics list view](img/epics_list_view_v12.3.png)
+![epics list view](img/epics_list_view_v12.5.png)
 
 ## Use cases
 
@@ -287,7 +287,7 @@ Once you wrote your comment, you can either:
 
 ## Notifications
 
-- [Receive notifications](../../../workflow/notifications.md) for epic events.
+- [Receive notifications](../../profile/notifications.md) for epic events.
 
 <!-- ## Troubleshooting
 

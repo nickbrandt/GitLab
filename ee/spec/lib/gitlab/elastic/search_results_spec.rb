@@ -100,7 +100,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
       expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
       expect(parsed).to have_attributes(
         id: nil,
-        filename: 'path/file.ext',
+        path: 'path/file.ext',
         basename: 'path/file',
         ref: 'sha',
         startline: 2,

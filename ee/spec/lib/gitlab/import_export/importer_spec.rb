@@ -29,17 +29,5 @@ describe Gitlab::ImportExport::Importer do
 
       importer.execute
     end
-
-    context 'when the `export_designs` feature is disabled' do
-      before do
-        stub_feature_flags(export_designs: false)
-      end
-
-      it 'does not restore the design repo' do
-        expect(Gitlab::ImportExport::DesignRepoRestorer).not_to receive(:new)
-
-        importer.execute
-      end
-    end
   end
 end

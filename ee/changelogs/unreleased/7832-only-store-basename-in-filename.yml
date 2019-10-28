@@ -1,0 +1,5 @@
+---
+title: Don't store full blob path in ES filename field
+merge_request: 18470
+author:
+type: fixed

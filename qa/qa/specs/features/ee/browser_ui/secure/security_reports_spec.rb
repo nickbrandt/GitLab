@@ -3,7 +3,8 @@
 require 'pathname'
 
 module QA
-  context 'Secure', :docker do
+  # https://gitlab.com/gitlab-org/gitlab/issues/34900
+  context 'Secure', :docker, :quarantine do
     let(:number_of_dependencies_in_fixture) { 1309 }
     let(:total_vuln_count) { 54 }
     let(:dependency_scan_vuln_count) { 4 }
@@ -18,10 +19,16 @@ module QA
     describe 'Security Reports' do
       after do
         Service::DockerRun::GitlabRunner.new(@executor).remove!
+
+        Runtime::Feature.enable('job_log_json') if @job_log_json_flag_enabled
       end
 
       before do
         @executor = "qa-runner-#{Time.now.to_i}"
+
+        # Handle WIP Job Logs flag - https://gitlab.com/gitlab-org/gitlab/issues/31162
+        @job_log_json_flag_enabled = Runtime::Feature.enabled?('job_log_json')
+        Runtime::Feature.disable('job_log_json') if @job_log_json_flag_enabled
 
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)

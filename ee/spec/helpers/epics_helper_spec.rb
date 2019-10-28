@@ -48,4 +48,46 @@ describe EpicsHelper, type: :helper do
       expect(epic_state_title(:some_other_state)).to eq('Some other state epics')
     end
   end
+
+  describe '#epic_timeframe' do
+    let(:epic) { build(:epic, start_date: start_date, end_date: end_date) }
+
+    subject { epic_timeframe(epic) }
+
+    context 'when both dates are from the same year' do
+      let(:start_date) { Date.new(2018, 7, 22) }
+      let(:end_date) { Date.new(2018, 8, 15) }
+
+      it 'returns start date with year omitted and end date with year' do
+        is_expected.to eq('Jul 22 – Aug 15, 2018')
+      end
+    end
+
+    context 'when both dates are from different years' do
+      let(:start_date) { Date.new(2018, 7, 22) }
+      let(:end_date) { Date.new(2019, 7, 22) }
+
+      it 'returns start date with year omitted and end date with year' do
+        is_expected.to eq('Jul 22, 2018 – Jul 22, 2019')
+      end
+    end
+
+    context 'when only start date is present' do
+      let(:start_date) { Date.new(2018, 7, 22) }
+      let(:end_date) { nil }
+
+      it 'returns start date with year' do
+        is_expected.to eq('From Jul 22, 2018')
+      end
+    end
+
+    context 'when only end date is present' do
+      let(:start_date) { nil }
+      let(:end_date) { Date.new(2018, 7, 22) }
+
+      it 'returns end date with year' do
+        is_expected.to eq('Until Jul 22, 2018')
+      end
+    end
+  end
 end

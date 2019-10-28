@@ -8,6 +8,7 @@ class PrometheusAlertEvent < ApplicationRecord
   has_and_belongs_to_many :related_issues, class_name: 'Issue', join_table: :issues_prometheus_alert_events
 
   validates :payload_key, uniqueness: { scope: :prometheus_alert_id }
+  validates :started_at, presence: true
 
   delegate :title, :prometheus_metric_id, to: :prometheus_alert
 

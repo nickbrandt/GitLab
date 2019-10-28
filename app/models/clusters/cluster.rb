@@ -9,8 +9,6 @@ module Clusters
 
     self.table_name = 'clusters'
 
-    PROJECT_ONLY_APPLICATIONS = {
-    }.freeze
     APPLICATIONS = {
       Applications::Helm.application_name => Applications::Helm,
       Applications::Ingress.application_name => Applications::Ingress,
@@ -20,7 +18,7 @@ module Clusters
       Applications::Jupyter.application_name => Applications::Jupyter,
       Applications::Knative.application_name => Applications::Knative,
       Applications::ElasticStack.application_name => Applications::ElasticStack
-    }.merge(PROJECT_ONLY_APPLICATIONS).freeze
+    }.freeze
     DEFAULT_ENVIRONMENT = '*'
     KUBE_INGRESS_BASE_DOMAIN = 'KUBE_INGRESS_BASE_DOMAIN'
 
@@ -116,6 +114,8 @@ module Clusters
     scope :managed, -> { where(managed: true) }
 
     scope :default_environment, -> { where(environment_scope: DEFAULT_ENVIRONMENT) }
+
+    scope :for_project_namespace, -> (namespace_id) { joins(:projects).where(projects: { namespace_id: namespace_id }) }
 
     def self.ancestor_clusters_for_clusterable(clusterable, hierarchy_order: :asc)
       return [] if clusterable.is_a?(Instance)

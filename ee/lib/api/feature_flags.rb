@@ -76,6 +76,44 @@ module API
           present feature_flag, with: EE::API::Entities::FeatureFlag
         end
 
+        desc 'Enable a strategy for a feature flag on an environment' do
+          success EE::API::Entities::FeatureFlag
+        end
+        params do
+          requires :environment_scope, type: String, desc: 'The environment scope of the feature flag'
+          requires :strategy,          type: JSON,   desc: 'The strategy to be enabled on the scope'
+        end
+        post :enable do
+          result = ::FeatureFlags::EnableService
+            .new(user_project, current_user, params).execute
+
+          if result[:status] == :success
+            status :ok
+            present result[:feature_flag], with: EE::API::Entities::FeatureFlag
+          else
+            render_api_error!(result[:message], result[:http_status])
+          end
+        end
+
+        desc 'Disable a strategy for a feature flag on an environment' do
+          success EE::API::Entities::FeatureFlag
+        end
+        params do
+          requires :environment_scope, type: String, desc: 'The environment scope of the feature flag'
+          requires :strategy,          type: JSON,   desc: 'The strategy to be disabled on the scope'
+        end
+        post :disable do
+          result = ::FeatureFlags::DisableService
+            .new(user_project, current_user, params).execute
+
+          if result[:status] == :success
+            status :ok
+            present result[:feature_flag], with: EE::API::Entities::FeatureFlag
+          else
+            render_api_error!(result[:message], result[:http_status])
+          end
+        end
+
         desc 'Delete a feature flag' do
           success EE::API::Entities::FeatureFlag
         end

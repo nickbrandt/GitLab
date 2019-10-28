@@ -26,14 +26,6 @@ export default {
   data() {
     return {
       multiProjectSelect: false,
-      groupsQueryParams: {
-        min_access_level: featureAccessLevel.EVERYONE,
-      },
-      projectsQueryParams: {
-        per_page: PROJECTS_PER_PAGE,
-        with_shared: false,
-        order_by: 'last_activity_at',
-      },
     };
   },
   computed: {
@@ -58,6 +50,14 @@ export default {
       this.setSelectedFileQuantity(fileQuantity);
     },
   },
+  groupsQueryParams: {
+    min_access_level: featureAccessLevel.EVERYONE,
+  },
+  projectsQueryParams: {
+    per_page: PROJECTS_PER_PAGE,
+    with_shared: false,
+    order_by: 'last_activity_at',
+  },
 };
 </script>
 
@@ -72,7 +72,7 @@ export default {
       >
         <groups-dropdown-filter
           class="dropdown-select"
-          :query-params="groupsQueryParams"
+          :query-params="$options.groupsQueryParams"
           @selected="onGroupSelect"
         />
         <projects-dropdown-filter
@@ -80,7 +80,7 @@ export default {
           :key="selectedGroup.id"
           class="ml-md-1 mt-1 mt-md-0 dropdown-select"
           :group-id="selectedGroup.id"
-          :query-params="projectsQueryParams"
+          :query-params="$options.projectsQueryParams"
           :multi-select="multiProjectSelect"
           @selected="onProjectSelect"
         />

@@ -4,8 +4,10 @@ module MergeTrains
     include ::Gitlab::ExclusiveLeaseHelpers
     include ::Gitlab::Utils::StrongMemoize
 
-    DEFAULT_MAX_CONCURRENCY = 4
-    ONE_AT_A_TIME_STRATEGY = 1
+    HIGH_CONCURRENCY = 20
+    MEDIUM_CONCURRENCY = 10
+    LOW_CONCURRENCY = 4
+    NO_CONCURRENCY = 1
 
     ##
     # merge_request ... A merge request pointer in a merge train.
@@ -68,9 +70,15 @@ module MergeTrains
     def max_concurrency
       strong_memoize(:max_concurrency) do
         if Feature.enabled?(:merge_trains_parallel_pipelines, project, default_enabled: true)
-          DEFAULT_MAX_CONCURRENCY
+          if Feature.enabled?(:merge_trains_high_concurrency, project)
+            HIGH_CONCURRENCY
+          elsif Feature.enabled?(:merge_trains_medium_concurrency, project)
+            MEDIUM_CONCURRENCY
+          else
+            LOW_CONCURRENCY
+          end
         else
-          ONE_AT_A_TIME_STRATEGY
+          NO_CONCURRENCY
         end
       end
     end

@@ -83,6 +83,10 @@ export const rawMockNodeDetails = {
   container_repositories_synced_count: 0,
   container_repositories_failed_count: 0,
   container_repositories_synced_in_percentage: '0.00%',
+  design_repositories_count: 0,
+  design_repositories_synced_count: 0,
+  design_repositories_failed_count: 0,
+  design_repositories_synced_in_percentage: '0.00%',
   repositories_failed_count: 0,
   repositories_synced_count: 12,
   repositories_synced_in_percentage: '100.00%',
@@ -189,6 +193,11 @@ export const mockNodeDetails = {
     failureCount: 0,
   },
   containerRepositories: {
+    totalCount: 0,
+    successCount: 0,
+    failureCount: 0,
+  },
+  designRepositories: {
     totalCount: 0,
     successCount: 0,
     failureCount: 0,

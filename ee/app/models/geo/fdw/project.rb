@@ -15,6 +15,7 @@ module Geo
       has_many :container_repositories, class_name: 'Geo::Fdw::ContainerRepository'
 
       belongs_to :namespace, class_name: 'Geo::Fdw::Namespace'
+      belongs_to :design_management_designs, class_name: 'Geo::Fdw::DesignManagementDesign'
 
       scope :outside_shards, -> (shard_names) { where.not(repository_storage: Array(shard_names)) }
 
@@ -76,6 +77,24 @@ module Geo
             arel_table
               .join(Geo::ProjectRegistry.arel_table, Arel::Nodes::InnerJoin)
               .on(arel_table[:id].eq(Geo::ProjectRegistry.arel_table[:project_id]))
+
+          joins(join_statement.join_sources)
+        end
+
+        def inner_join_design_registry
+          join_statement =
+            arel_table
+              .join(Geo::DesignRegistry.arel_table, Arel::Nodes::InnerJoin)
+              .on(arel_table[:id].eq(Geo::DesignRegistry.arel_table[:project_id]))
+
+          joins(join_statement.join_sources)
+        end
+
+        def inner_join_design_management
+          join_statement =
+            arel_table
+              .join(Geo::Fdw::DesignManagementDesign.arel_table, Arel::Nodes::InnerJoin)
+              .on(arel_table[:id].eq(Geo::Fdw::DesignManagementDesign.arel_table[:project_id]))
 
           joins(join_statement.join_sources)
         end
