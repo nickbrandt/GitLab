@@ -6,7 +6,7 @@ type: index, reference
 
 Merge requests are the primary method of making changes to files in a GitLab project.
 Changes are proposed by [creating and submitting a merge request](creating_merge_requests.md),
-which is then reviewed, and accepted (or rejected), all within GitLab.
+which is then reviewed, and accepted (or rejected).
 
 ## View project merge requests
 

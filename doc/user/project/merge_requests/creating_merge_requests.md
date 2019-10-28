@@ -175,7 +175,7 @@ list.
 
 ![Merge request diff file navigation](img/merge_request_diff_file_navigation.png)
 
-#### Incrementally expand merge request diffs
+### Incrementally expand merge request diffs
 
 By default, the diff shows only the parts of a file which are changed.
 To view more unchanged lines above or below a change click on the
