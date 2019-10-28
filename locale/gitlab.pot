@@ -14813,6 +14813,9 @@ msgstr ""
 msgid "Select user"
 msgstr ""
 
+msgid "Select your role"
+msgstr ""
+
 msgid "Selected levels cannot be used by non-admin users for groups, projects or snippets. If the public level is restricted, user profiles are only visible to logged in users."
 msgstr ""
 
