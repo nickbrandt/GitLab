@@ -7,7 +7,9 @@ class AddProjectDeletionAdjournedPeriodToApplicationSettings < ActiveRecord::Mig
   # Set this constant to true if this migration requires downtime.
   DOWNTIME = false
 
+  DEFAULT_NUMBER_OF_DAYS_BEFORE_REMOVAL = 7
+
   def change
-    add_column :application_settings, :deletion_adjourned_period, :integer, default: 7, null: false
+    add_column :application_settings, :deletion_adjourned_period, :integer, default: DEFAULT_NUMBER_OF_DAYS_BEFORE_REMOVAL, null: false
   end
 end
