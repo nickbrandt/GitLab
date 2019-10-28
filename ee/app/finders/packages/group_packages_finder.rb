@@ -30,6 +30,8 @@ module Packages
       ::Project
         .in_namespace(groups)
         .public_or_visible_to_user(current_user, Gitlab::Access::REPORTER)
+        .with_project_feature
+        .select { |project| Ability.allowed?(current_user, :read_package, project) }
     end
 
     def package_type
