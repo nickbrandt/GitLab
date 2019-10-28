@@ -23,7 +23,7 @@ export default {
 <template>
   <article>
     <header>
-      <h2 class="settings-title">
+      <h2>
         {{ __('Configure Security and Compliance') }}
         <gl-link
           target="_blank"
@@ -45,14 +45,14 @@ export default {
       <div
         v-for="feature in features"
         :key="feature.name"
-        class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
+        class="js-feature-config-row gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
       >
         <div class="d-md-flex align-items-center">
           <div class="table-section section-80 section-wrap pr-md-3">
             <div role="rowheader" class="table-mobile-header">{{ __('Feature') }}</div>
             <div class="table-mobile-content">
               <div class="d-flex align-items-center justify-content-end justify-content-md-start">
-                <div class="text-2">
+                <div class="js-feature-config-name text-2">
                   {{ feature.name }}
                 </div>
                 <gl-link
@@ -63,12 +63,12 @@ export default {
                   ><icon name="external-link"
                 /></gl-link>
               </div>
-              <div class="text-secondary">{{ feature.description }}</div>
+              <div class="js-feature-config-description text-secondary">{{ feature.description }}</div>
             </div>
           </div>
           <div class="table-section section-20 section-wrap pr-md-3">
             <div role="rowheader" class="table-mobile-header">{{ __('Status') }}</div>
-            <div class="table-mobile-content">
+            <div class="js-feature-config-status table-mobile-content">
               {{ feature.configured ? 'Configured' : 'Not yet' }}
             </div>
           </div>
