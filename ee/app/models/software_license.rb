@@ -19,4 +19,8 @@ class SoftwareLicense < ApplicationRecord
       software_license: safe_find_or_create_by!(name: name)
     )
   end
+
+  def canonical_id
+    spdx_identifier || name.downcase
+  end
 end
