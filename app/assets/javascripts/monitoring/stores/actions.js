@@ -34,6 +34,9 @@ export const setShowErrorBanner = ({ commit }, enabled) => {
   commit(types.SET_SHOW_ERROR_BANNER, enabled);
 };
 
+/**
+ * Actions related to the APM dashboard at Operations/Metrics
+ */
 export const requestMetricsDashboard = ({ commit }) => {
   commit(types.REQUEST_METRICS_DATA);
 };

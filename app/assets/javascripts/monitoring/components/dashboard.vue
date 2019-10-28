@@ -190,7 +190,7 @@ export default {
       'allDashboards',
       'additionalPanelTypesEnabled',
     ]),
-    ...mapGetters('monitoringDashboard', ['getMetricStates']),
+    ...mapGetters('monitoringDashboard', ['getMetricStates', 'dashboardHasChanged']),
     firstDashboard() {
       return this.environmentsEndpoint.length > 0 && this.allDashboards.length > 0
         ? this.allDashboards[0]

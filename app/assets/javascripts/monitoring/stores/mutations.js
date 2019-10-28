@@ -105,6 +105,8 @@ export default {
       }),
     };
 
+    state.originalDashboard = JSON.parse(JSON.stringify(state.dashboard));
+
     if (!state.dashboard.panel_groups.length) {
       state.emptyState = 'noData';
     }
