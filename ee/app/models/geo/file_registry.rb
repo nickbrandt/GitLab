@@ -6,16 +6,13 @@ class Geo::FileRegistry < Geo::BaseRegistry
   scope :attachments, -> { where(file_type: Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES) }
   scope :failed, -> { where(success: false).where.not(retry_count: nil) }
   scope :fresh, -> { order(created_at: :desc) }
-  scope :lfs_objects, -> { where(file_type: :lfs) }
   scope :never, -> { where(success: false, retry_count: nil) }
   scope :uploads, -> { where(file_type: Gitlab::Geo::Replication::UPLOAD_OBJECT_TYPE) }
 
   self.inheritance_column = 'file_type'
 
   def self.find_sti_class(file_type)
-    if file_type == 'lfs'
-      Geo::LfsObjectRegistry
-    elsif Gitlab::Geo::Replication.object_type_from_user_uploads?(file_type)
+    if Gitlab::Geo::Replication.object_type_from_user_uploads?(file_type)
       Geo::UploadRegistry
     end
   end

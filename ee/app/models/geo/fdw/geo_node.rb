@@ -39,7 +39,7 @@ module Geo
       end
 
       def lfs_object_registries
-        return Geo::FileRegistry.lfs_objects unless selective_sync?
+        return Geo::LfsObjectRegistry.all unless selective_sync?
 
         Gitlab::Geo::Fdw::LfsObjectRegistryQueryBuilder.new
           .for_lfs_objects(lfs_objects)
