@@ -47,8 +47,7 @@ export const fetchLogs = ({ commit, state }, podName) => {
   commit(types.REQUEST_PODS_DATA);
   commit(types.REQUEST_LOGS_DATA);
   return requestUntilData(state.logs.endpoint, { pod_name: podName })
-    .then(res => res.data)
-    .then(data => {
+    .then(({ data }) => {
       const { pods, logs } = data;
 
       // Set first pod as default, if none is set
