@@ -7,9 +7,7 @@ const notImplemented = () => {
 
 export default {
   [mutationTypes.TOGGLE_LABELS]: state => {
-    Object.assign(state, {
-      isShowingLabels: !state.isShowingLabels,
-    });
+    state.isShowingLabels = !state.isShowingLabels;
   },
 
   [mutationTypes.REQUEST_AVAILABLE_BOARDS]: () => {
