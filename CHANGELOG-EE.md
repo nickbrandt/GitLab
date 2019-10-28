@@ -1,5 +1,15 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.3.6
+
+### Security (4 changes)
+
+- Do not index system notes for issue update.
+- Redact search results based on Ability.allowed?.
+- Do not show private cross references in epic notes.
+- Filter out packages the user does'nt have permission to see at group level.
+
+
 ## 12.3.5
 
 - No changes.
