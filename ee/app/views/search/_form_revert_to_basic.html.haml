@@ -1,8 +1,5 @@
 - if search_service.use_elasticsearch?
-  - query_string = URI.parse(request.url).query
-  - query_params = Rack::Utils.parse_query(query_string)
-  - url = url_for :only_path => false, :params => query_params.merge(basic_search: 'true')
-  - begin_link = '<a href="%{url}">'.html_safe % { url: url }
+  - begin_link = '<a href="%{url}">'.html_safe % { url: revert_to_basic_search_filter_url }
   - end_link = '</a>'.html_safe
   %p.text-center
     = _('You can try again using %{begin_link}basic search%{end_link}').html_safe % { begin_link: begin_link, end_link: end_link }

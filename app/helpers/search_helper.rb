@@ -196,11 +196,21 @@ module SearchHelper
     Sanitize.clean(str)
   end
 
+  SEARCH_PERMITTED_PARAMS = [:search, :scope, :project_id, :group_id, :repository_ref, :snippets]
+
+  def revert_to_basic_search_filter_url
+    search_params = params
+      .permit(SEARCH_PERMITTED_PARAMS)
+      .merge(basic_search: true)
+
+    search_path(search_params)
+  end
+
   def search_filter_link(scope, label, data: {}, search: {})
     search_params = params
       .merge(search)
       .merge({ scope: scope })
-      .permit(:search, :scope, :project_id, :group_id, :repository_ref, :snippets)
+      .permit(SEARCH_PERMITTED_PARAMS)
 
     if @scope == scope
       li_class = 'active'
