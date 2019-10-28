@@ -25,6 +25,8 @@ module Packages
       ::Project
         .in_namespace(group.self_and_descendants.select(:id))
         .public_or_visible_to_user(current_user, Gitlab::Access::REPORTER)
+        .with_project_feature
+        .select { |project| Ability.allowed?(current_user, :read_package, project) }
     end
   end
 end
