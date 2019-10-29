@@ -243,9 +243,9 @@ describe Issue do
     let!(:board) { create(:board, group: group) }
     let(:project) { create(:project, namespace: group) }
     let(:project1) { create(:project, namespace: group) }
-    let(:issue) { create(:issue, project: project) }
-    let(:issue1) { create(:issue, project: project1) }
-    let(:new_issue) { create(:issue, project: project1) }
+    let(:issue) { build(:issue, project: project) }
+    let(:issue1) { build(:issue, project: project1) }
+    let(:new_issue) { build(:issue, project: project1, relative_position: nil) }
 
     before do
       [issue, issue1].each do |issue|
