@@ -36,10 +36,14 @@ module EE
 
       belongs_to :mirror_user, foreign_key: 'mirror_user_id', class_name: 'User'
 <<<<<<< HEAD
+<<<<<<< HEAD
       belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_user_id', class_name: 'User'
 =======
       belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_id', class_name: 'User'
 >>>>>>> Add attributes to import specs
+=======
+      belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_user_id', class_name: 'User'
+>>>>>>> Add cr remarks
 
       has_one :repository_state, class_name: 'ProjectRepositoryState', inverse_of: :project
       has_one :project_registry, class_name: 'Geo::ProjectRegistry', inverse_of: :project

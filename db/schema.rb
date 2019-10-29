@@ -4363,11 +4363,7 @@ ActiveRecord::Schema.define(version: 2019_10_29_191901) do
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
   add_foreign_key "project_tracing_settings", "projects", on_delete: :cascade
   add_foreign_key "projects", "pool_repositories", name: "fk_6e5c14658a", on_delete: :nullify
-<<<<<<< HEAD
   add_foreign_key "projects", "users", column: "marked_for_deletion_by_user_id", name: "fk_25d8780d11", on_delete: :nullify
-=======
-  add_foreign_key "projects", "users", column: "marked_for_deletion_by_id", name: "fk_25d8780d11", on_delete: :nullify
->>>>>>> Add db changes
   add_foreign_key "prometheus_alert_events", "projects", on_delete: :cascade
   add_foreign_key "prometheus_alert_events", "prometheus_alerts", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "environments", on_delete: :cascade

@@ -2270,10 +2270,6 @@ class Project < ApplicationRecord
     end
   end
 
-  def marked_for_deletion?
-    marked_for_deletion_at.present?
-  end
-
   private
 
   def closest_namespace_setting(name)
