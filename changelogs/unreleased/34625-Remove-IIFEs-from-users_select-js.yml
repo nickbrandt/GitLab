@@ -2,4 +2,4 @@
 title: Remove IIFEs from users_select.js
 merge_request:
 author: 
-type: removed
+type: deprecated
