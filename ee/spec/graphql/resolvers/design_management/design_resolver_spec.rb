@@ -36,7 +36,7 @@ describe Resolvers::DesignManagement::DesignResolver do
         second_version = create(:design_version)
         second_design = create(:design, issue: issue, versions: [second_version])
 
-        expect(resolve_designs(issue.design_collection, {}, current_user: current_user)).to eq([first_design, second_design])
+        expect(resolve_designs(issue.design_collection, {}, current_user: current_user)).to contain_exactly(first_design, second_design)
       end
     end
   end
