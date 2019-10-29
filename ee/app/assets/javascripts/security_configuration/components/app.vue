@@ -18,6 +18,10 @@ export default {
       type: String,
       required: true,
     },
+    autoDevOpsHelpPagePath: {
+      type: String,
+      required: true,
+    },
     latestPipelinePath: {
       type: String,
       required: false,
@@ -31,16 +35,22 @@ export default {
   computed: {
     autoDevOpsNotificationText() {
       const body =
-          'All security scans are enabled because %{linkStart}Auto DevOps%{linkEnd} is enabled on this project';
+        'All security scans are enabled because %{linkStart}Auto DevOps%{linkEnd} is enabled on this project';
       const linkStart = `<a href="foo">`;
       const linkEnd = '</a>';
 
       return sprintf(__(body), { linkStart, linkEnd }, false);
     },
-    notificationText() {
-      const body =
+    notificationContent() {
+      const bodyDefault =
         'Configuration status only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd} scan';
-      const linkStart = `<a href="${this.latestPipelinePath}">`;
+      const bodyAutoDevOpsEnabled =
+        'All security scans are enabled because %{linkStart}Auto DevOps%{linkEnd} is enabled on this project';
+
+      const body = this.autoDevOpsEnabled ? bodyAutoDevOpsEnabled : bodyDefault;
+      const helpPageLink = this.autoDevOpsEnabled ? this.autoDevOpsHelpPagePath : this.latestPipelinePath;
+
+      const linkStart = `<a href="${helpPageLink}" target="_blank" rel="noopener">`;
       const linkEnd = '</a>';
 
       return sprintf(__(body), { linkStart, linkEnd }, false);
@@ -65,7 +75,7 @@ export default {
     </header>
     <section
       class="js-security-configuration-notification alert alert-primary mt-4 mb-0"
-      v-html="autoDevOpsEnabled ? autoDevOpsNotificationText : notificationText"
+      v-html="notificationContent"
     ></section>
     <section class="mt-3">
       <div class="gl-responsive-table-row table-row-header text-2 font-weight-bold px-2" role="row">
