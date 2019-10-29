@@ -1,25 +1,43 @@
 import { shallowMount } from '@vue/test-utils';
+import AxiosMockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import { createStore } from '~/monitoring/stores';
 import { GlLink } from '@gitlab/ui';
 import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
-import { shallowWrapperContainsSlotText } from 'spec/helpers/vue_test_utils_helper';
+import { shallowWrapperContainsSlotText } from 'helpers/vue_test_utils_helper';
 import TimeSeries from '~/monitoring/components/charts/time_series.vue';
 import * as types from '~/monitoring/stores/mutation_types';
 import { TEST_HOST } from 'spec/test_constants';
-import MonitoringMock, { deploymentData, mockProjectPath } from '../mock_data';
+import MonitoringMock, {
+  deploymentData,
+  mockProjectPath,
+} from '../../../javascripts/monitoring/mock_data';
+import * as iconUtils from '~/lib/utils/icon_utils';
+
+const mockSvgPathContent = 'mockSvgPathContent';
+const mockSha = 'mockSha';
+const mockWidgets = 'mockWidgets';
+const projectPath = `${TEST_HOST}${mockProjectPath}`;
+const commitUrl = `${projectPath}/commit/${mockSha}`;
+
+jest.mock('~/lib/utils/icon_utils', () => ({
+  getSvgIconPathContent: jest.fn().mockImplementation(
+    () =>
+      new Promise(resolve => {
+        resolve(mockSvgPathContent);
+      }),
+  ),
+}));
 
 describe('Time series component', () => {
-  const mockSha = 'mockSha';
-  const mockWidgets = 'mockWidgets';
-  const mockSvgPathContent = 'mockSvgPathContent';
-  const projectPath = `${TEST_HOST}${mockProjectPath}`;
-  const commitUrl = `${projectPath}/commit/${mockSha}`;
+  let axiosMock;
   let mockGraphData;
   let makeTimeSeriesChart;
-  let spriteSpy;
   let store;
 
   beforeEach(() => {
+    axiosMock = new AxiosMockAdapter(axios);
+    axiosMock.onAny().reply(200);
     store = createStore();
     store.commit(`monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`, MonitoringMock.data);
     store.commit(`monitoringDashboard/${types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS}`, deploymentData);
@@ -27,6 +45,7 @@ describe('Time series component', () => {
 
     makeTimeSeriesChart = (graphData, type) =>
       shallowMount(TimeSeries, {
+        attachToDocument: true,
         propsData: {
           graphData: { ...graphData, type },
           deploymentData: store.state.monitoringDashboard.deploymentData,
@@ -38,10 +57,6 @@ describe('Time series component', () => {
         sync: false,
         store,
       });
-
-    spriteSpy = spyOnDependency(TimeSeries, 'getSvgIconPathContent').and.callFake(
-      () => new Promise(resolve => resolve(mockSvgPathContent)),
-    );
   });
 
   describe('general functions', () => {
@@ -147,7 +162,7 @@ describe('Time series component', () => {
         });
 
         it('gets svg path content', () => {
-          expect(spriteSpy).toHaveBeenCalledWith(mockSvgName);
+          expect(iconUtils.getSvgIconPathContent).toHaveBeenCalledWith(mockSvgName);
         });
 
         it('sets svg path content', () => {
@@ -171,7 +186,7 @@ describe('Time series component', () => {
         const mockWidth = 233;
 
         beforeEach(() => {
-          spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(() => ({
+          jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
             width: mockWidth,
           }));
           timeSeriesChart.vm.onResize();
@@ -227,7 +242,7 @@ describe('Time series component', () => {
               option: mockOption,
             });
 
-            expect(timeSeriesChart.vm.chartOptions).toEqual(jasmine.objectContaining(mockOption));
+            expect(timeSeriesChart.vm.chartOptions).toEqual(expect.objectContaining(mockOption));
           });
 
           it('additional series', () => {
