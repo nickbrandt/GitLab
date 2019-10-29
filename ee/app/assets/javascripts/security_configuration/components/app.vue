@@ -1,5 +1,5 @@
 <script>
-import { s__, sprintf } from '~/locale';
+import { __, sprintf } from '~/locale';
 import { GlLink } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 
@@ -21,7 +21,17 @@ export default {
     features: {
       type: Array,
       required: true,
-    }
+    },
+  },
+  computed: {
+    notificationText() {
+      const body =
+        'Configuration status only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd} scan.';
+      const linkStart = `<a href="${this.latestPipelinePath}">`;
+      const linkEnd = '</a>';
+
+      return sprintf(__(body), { linkStart, linkEnd }, false);
+    },
   },
 };
 </script>
@@ -40,10 +50,11 @@ export default {
         </gl-link>
       </h2>
     </header>
-    <section class="alert alert-primary mt-3">
-      Configuration status only applies to the default branch and is based on the <a :href="latestPipelinePath">latest pipeline</a> scan.
-    </section>
-    <section class="mt-4">
+    <section
+      class="js-security-configuration-notification alert alert-primary mt-4 mb-0"
+      v-html="notificationText"
+    ></section>
+    <section class="mt-3">
       <div class="gl-responsive-table-row table-row-header text-2 font-weight-bold px-2" role="row">
         <div class="table-section section-80">{{ __('Secure features') }}</div>
         <div class="table-section section-20">{{ __('Status') }}</div>
@@ -65,17 +76,19 @@ export default {
                   class="d-inline-flex ml-1"
                   target="_blank"
                   :href="feature.link"
-                  aria-label="@TODO"
+                  :aria-label="s__('SecurityConfiguration|Feature documentation')"
                   ><icon name="external-link"
                 /></gl-link>
               </div>
-              <div class="js-feature-config-description text-secondary">{{ feature.description }}</div>
+              <div class="js-feature-config-description text-secondary">
+                {{ feature.description }}
+              </div>
             </div>
           </div>
           <div class="table-section section-20 section-wrap pr-md-3">
             <div role="rowheader" class="table-mobile-header">{{ __('Status') }}</div>
             <div class="js-feature-config-status table-mobile-content">
-              {{ feature.configured ? 'Configured' : 'Not yet' }}
+              {{ feature.configured ? __('Configured') : __('Not yet') }}
             </div>
           </div>
         </div>

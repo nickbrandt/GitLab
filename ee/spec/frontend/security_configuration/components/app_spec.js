@@ -24,9 +24,12 @@ describe('Security Configuration App', () => {
   });
 
   const getHelpLink = () => wrapper.find('header').find(GlLink);
-  const getFeatureConfigRows = () => wrapper.findAll('.js-feature-config-row');
-  const getFirstFeatureConfigRow = () => getFeatureConfigRows().at(0);
-  const getFirstFeatureLink = () => getFirstFeatureConfigRow().find(GlLink);
+  const getAllFeatureConfigRows = () => wrapper.findAll('.js-feature-config-row');
+  const getFirstFeatureConfigRow = () => getAllFeatureConfigRows().at(0);
+  const getFeatureLink = () => getFirstFeatureConfigRow().find(GlLink);
+  const getFeatureConfigStatus = () => wrapper.find('.js-feature-config-status');
+  const getNotification = () => wrapper.find('.js-security-configuration-notification');
+  const getPipelinesLink = () => getNotification().find('a');
 
   it('contains a link to the given help page', () => {
     const helpPagePath = 'foo';
@@ -36,12 +39,13 @@ describe('Security Configuration App', () => {
     expect(getHelpLink().attributes('href')).toBe(helpPagePath);
   });
 
-  it('contains a link to the latest pipeline', () => {
+  it('displays a notification with a link to the latest pipeline', () => {
     const latestPipelinePath = 'http://foo';
 
     createComponent({ latestPipelinePath });
 
-    expect(wrapper.find('.alert a').attributes('href')).toBe(latestPipelinePath);
+    expect(getNotification().exists()).toBe(true);
+    expect(getPipelinesLink().attributes('href')).toBe(latestPipelinePath);
   });
 
   it('displays a full list of given features', () => {
@@ -49,7 +53,7 @@ describe('Security Configuration App', () => {
 
     createComponent({ features });
 
-    expect(getFeatureConfigRows().length).toBe(features.length);
+    expect(getAllFeatureConfigRows().length).toBe(features.length);
   });
 
   it('displays a given features information', () => {
@@ -62,7 +66,7 @@ describe('Security Configuration App', () => {
 
     expect(getFirstFeatureConfigRow().text()).toContain(name);
     expect(getFirstFeatureConfigRow().text()).toContain(description);
-    expect(getFirstFeatureLink().attributes('href')).toBe(link);
+    expect(getFeatureLink().attributes('href')).toBe(link);
   });
 
   it.each`
@@ -74,6 +78,6 @@ describe('Security Configuration App', () => {
 
     createComponent({ features });
 
-    expect(wrapper.find('.js-feature-config-status').text()).toBe(statusText);
+    expect(getFeatureConfigStatus().text()).toBe(statusText);
   });
 });
