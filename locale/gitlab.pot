@@ -8273,6 +8273,9 @@ msgstr ""
 msgid "Group name"
 msgstr ""
 
+msgid "Group overview"
+msgstr ""
+
 msgid "Group overview content"
 msgstr ""
 
@@ -12737,6 +12740,9 @@ msgstr ""
 msgid "Project name"
 msgstr ""
 
+msgid "Project overview"
+msgstr ""
+
 msgid "Project slug"
 msgstr ""
 
@@ -15845,6 +15851,9 @@ msgid "Storage:"
 msgstr ""
 
 msgid "StorageSize|Unknown"
+msgstr ""
+
+msgid "Subgroup overview"
 msgstr ""
 
 msgid "SubgroupCreationLevel|Allowed to create subgroups"
