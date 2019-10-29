@@ -5,12 +5,22 @@ module Gitlab
     module Connections
       module Keyset
         class OrderInfo
-          def initialize(order_value)
-            @order_value = order_value
-          end
+          attr_reader :attribute_name, :sort_direction
 
-          def attribute_name
-            order_value.expr.name
+          def initialize(order_value)
+            if order_value.is_a?(String)
+              tokens = order_value.downcase.split(' ')
+
+              unless tokens[-2..-1] == %w(nulls last) && tokens.count == 4
+                raise ArgumentError.new('Incorrect format for NULLS LAST')
+              end
+
+              @attribute_name = tokens.first
+              @sort_direction = tokens[1] == 'asc' ? :asc : :desc
+            else
+              @attribute_name = order_value.expr.name
+              @sort_direction = order_value.direction
+            end
           end
 
           def operator_for(before_or_after)
@@ -22,10 +32,11 @@ module Gitlab
             end
           end
 
-          # Only allow specific node types.  For example ignore String nodes
+          # Only allow specific node types
           def self.build_order_list(relation)
             order_list = relation.order_values.select do |value|
-              value.is_a?(Arel::Nodes::Ascending) || value.is_a?(Arel::Nodes::Descending)
+              value.is_a?(Arel::Nodes::Ascending) || value.is_a?(Arel::Nodes::Descending) ||
+                (value.is_a?(String) && value.downcase.end_with?('nulls last'))
             end
 
             order_list.map { |info| OrderInfo.new(info) }
@@ -50,14 +61,6 @@ module Gitlab
             if order_list.last.attribute_name != relation.primary_key
               raise ArgumentError.new("Last ordering field must be the primary key, `#{relation.primary_key}`")
             end
-          end
-
-          private
-
-          attr_reader :order_value
-
-          def sort_direction
-            order_value.direction
           end
         end
       end
