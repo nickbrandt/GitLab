@@ -46,7 +46,7 @@ module DesignManagement
       join = designs.join(actions)
         .on(actions[:design_id].eq(designs[:id]))
 
-      joins(join.join_sources).where(actions[:event].not_eq(deletion))
+      joins(join.join_sources).where(actions[:event].not_eq(deletion)).order(:id)
     end
 
     # Scope called by our REST API to avoid N+1 problems
