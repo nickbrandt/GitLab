@@ -1041,6 +1041,8 @@ ActiveRecord::Schema.define(version: 2019_10_26_041447) do
     t.boolean "managed", default: true, null: false
     t.boolean "namespace_per_environment", default: true, null: false
     t.integer "management_project_id"
+    t.integer "cleanup_status", limit: 2, default: 1, null: false
+    t.text "cleanup_status_reason"
     t.index ["enabled"], name: "index_clusters_on_enabled"
     t.index ["management_project_id"], name: "index_clusters_on_management_project_id", where: "(management_project_id IS NOT NULL)"
     t.index ["user_id"], name: "index_clusters_on_user_id"
