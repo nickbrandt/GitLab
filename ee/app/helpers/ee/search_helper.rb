@@ -3,6 +3,8 @@ module EE
   module SearchHelper
     extend ::Gitlab::Utils::Override
 
+    SWITCH_TO_BASIC_SEARCHABLE_TABS = %w[projects issues merge_requests milestones users].freeze
+
     override :search_filter_input_options
     def search_filter_input_options(type)
       options = super
@@ -66,6 +68,16 @@ module EE
         .merge(basic_search: true)
 
       search_path(search_params)
+    end
+
+    # Switching to basic search should only be possible for a subset of
+    # scopes. This method assumes you're already allowed to search within
+    # this scope but it's just here to determine if you can switch to basic
+    # search.
+    def switch_to_basic_searchable_tab?(scope)
+      return true if @project
+
+      scope.in?(SWITCH_TO_BASIC_SEARCHABLE_TABS)
     end
 
     private

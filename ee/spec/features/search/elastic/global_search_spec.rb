@@ -220,10 +220,8 @@ describe 'Global elastic search', :elastic do
     end
   end
 
-  describe 'When requesting basic search' do
-    it 'does not use Elasticsearch' do
-      create(:issue, project: project, title: 'project issue')
-
+  context 'when no results are returned' do
+    it 'allows basic search without Elasticsearch' do
       visit dashboard_projects_path
 
       submit_search('project')
@@ -237,6 +235,17 @@ describe 'Global elastic search', :elastic do
 
       # Project is found now that we are using basic search
       expect(page).to have_content('Projects 1')
+    end
+
+    context 'when performing Commits search' do
+      it 'does not allow basic search' do
+        visit dashboard_projects_path
+
+        submit_search('project')
+        select_search_scope('Commits')
+
+        expect(page).not_to have_link('basic search')
+      end
     end
   end
 end

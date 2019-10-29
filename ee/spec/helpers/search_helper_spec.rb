@@ -175,4 +175,27 @@ describe SearchHelper do
       it_behaves_like 'returns old message'
     end
   end
+
+  describe '#switch_to_basic_searchable_tab?' do
+    let(:scope) { 'commits' }
+    subject { switch_to_basic_searchable_tab?(scope) }
+
+    context 'when project scope' do
+      before do
+        @project = create(:project)
+      end
+
+      it { is_expected.to eq(true) }
+    end
+
+    context 'when commits tab' do
+      it { is_expected.to eq(false) }
+    end
+
+    context 'when issues tab' do
+      let(:scope) { 'issues' }
+
+      it { is_expected.to eq(true) }
+    end
+  end
 end
