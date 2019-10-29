@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_26_041447) do
+ActiveRecord::Schema.define(version: 2019_10_29_191901) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -1807,6 +1807,7 @@ ActiveRecord::Schema.define(version: 2019_10_26_041447) do
     t.string "encrypted_token", limit: 255, null: false
     t.string "encrypted_token_iv", limit: 255, null: false
     t.string "grafana_url", limit: 1024, null: false
+    t.boolean "enabled", default: false, null: false
     t.index ["project_id"], name: "index_grafana_integrations_on_project_id"
   end
 

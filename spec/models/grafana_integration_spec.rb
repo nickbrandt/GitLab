@@ -34,5 +34,18 @@ describe GrafanaIntegration do
         internal_url
       ).for(:grafana_url)
     end
+
+    it 'disallows non-booleans in enabled column' do
+      is_expected.not_to allow_value(
+        nil
+      ).for(:enabled)
+    end
+
+    it 'allows booleans in enabled column' do
+      is_expected.to allow_value(
+        true,
+        false
+      ).for(:enabled)
+    end
   end
 end
