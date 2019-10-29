@@ -18,7 +18,7 @@ describe Gitlab::SlashCommands::IssueComment do
 
         it 'does not allow the user to comment' do
           expect(subject[:response_type]).to be(:ephemeral)
-          expect(subject[:text]).to match("not found")
+          expect(subject[:text]).to match('not found')
           expect(issue.reload.notes.count).to be_zero
         end
       end
@@ -56,7 +56,7 @@ describe Gitlab::SlashCommands::IssueComment do
 
       it "returns not found" do
         expect(subject[:response_type]).to be(:ephemeral)
-        expect(subject[:text]).to match("not found")
+        expect(subject[:text]).to match('not found')
       end
     end
   end
