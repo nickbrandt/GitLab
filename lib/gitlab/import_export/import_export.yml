@@ -148,7 +148,7 @@ excluded_attributes:
     - :max_pages_size
     - :max_artifacts_size
     - :marked_for_deletion_at
-    - :marked_for_deletion_by_id
+    - :marked_for_deletion_by_user_id
   namespaces:
     - :runners_token
     - :runners_token_encrypted
