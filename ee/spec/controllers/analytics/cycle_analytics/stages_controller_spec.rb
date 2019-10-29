@@ -89,7 +89,7 @@ describe Analytics::CycleAnalytics::StagesController do
   end
 
   describe 'PUT `update`' do
-    let(:stage) { create(:cycle_analytics_group_stage, parent: group) }
+    let(:stage) { create(:cycle_analytics_group_stage, parent: group, relative_position: 15) }
     subject { put :update, params: params.merge(id: stage.id) }
 
     include_examples 'group permission check on the controller level'
@@ -116,6 +116,19 @@ describe Analytics::CycleAnalytics::StagesController do
         stage.reload
 
         expect(stage.name).to eq(params[:name])
+      end
+
+      context 'when positioning parameter is given' do
+        before do
+          params[:move_before_id] = create(:cycle_analytics_group_stage, parent: group, relative_position: 10).id
+        end
+
+        it 'moves the stage before the last place' do
+          subject
+
+          before_last = group.cycle_analytics_stages.ordered[-2]
+          expect(before_last.id).to eq(stage.id)
+        end
       end
     end
 

@@ -28,11 +28,12 @@ describe Analytics::CycleAnalytics::Stages::ListService do
   end
 
   context 'when there are persisted stages' do
-    let!(:stage1) { create(:cycle_analytics_group_stage, parent: group) }
-    let!(:stage2) { create(:cycle_analytics_group_stage, parent: group) }
+    let_it_be(:stage1) { create(:cycle_analytics_group_stage, parent: group, relative_position: 2) }
+    let_it_be(:stage2) { create(:cycle_analytics_group_stage, parent: group, relative_position: 3) }
+    let_it_be(:stage3) { create(:cycle_analytics_group_stage, parent: group, relative_position: 1) }
 
-    it 'returns the persisted stages' do
-      expect(stages).to contain_exactly(stage1, stage2)
+    it 'returns the persisted stages in order' do
+      expect(stages).to eq([stage3, stage1, stage2])
     end
   end
 end
