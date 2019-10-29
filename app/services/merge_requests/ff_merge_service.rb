@@ -15,6 +15,7 @@ module MergeRequests
                           source,
                           merge_request.target_branch,
                           merge_request: merge_request)
+      merge_request.update(in_progress_merge_commit_sha: nil)
     rescue Gitlab::Git::PreReceiveError => e
       raise MergeError, e.message
     rescue StandardError => e
@@ -23,8 +24,6 @@ module MergeRequests
       if merge_request.squash
         merge_request.update(squash_commit_sha: merge_request.in_progress_merge_commit_sha)
       end
-
-      merge_request.update(in_progress_merge_commit_sha: nil)
     end
   end
 end
