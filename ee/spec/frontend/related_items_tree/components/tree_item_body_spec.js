@@ -14,7 +14,12 @@ import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { ChildType, ChildState } from 'ee/related_items_tree/constants';
 
-import { mockParentItem, mockInitialConfig, mockQueryResponse, mockIssue1 } from '../mock_data';
+import {
+  mockParentItem,
+  mockInitialConfig,
+  mockQueryResponse,
+  mockIssue1,
+} from '../../../javascripts/related_items_tree/mock_data';
 
 const mockItem = Object.assign({}, mockIssue1, {
   type: ChildType.Issue,
@@ -272,7 +277,7 @@ describe('RelatedItemsTree', () => {
     describe('methods', () => {
       describe('handleRemoveClick', () => {
         it('calls `setRemoveItemModalProps` action with params `parentItem` and `item`', () => {
-          spyOn(wrapper.vm, 'setRemoveItemModalProps');
+          jest.spyOn(wrapper.vm, 'setRemoveItemModalProps');
 
           wrapper.vm.handleRemoveClick();
 

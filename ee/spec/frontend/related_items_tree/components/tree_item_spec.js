@@ -11,7 +11,11 @@ import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { ChildType } from 'ee/related_items_tree/constants';
 
-import { mockParentItem, mockQueryResponse, mockEpic1 } from '../mock_data';
+import {
+  mockParentItem,
+  mockQueryResponse,
+  mockEpic1,
+} from '../../../javascripts/related_items_tree/mock_data';
 
 const mockItem = Object.assign({}, mockEpic1, {
   type: ChildType.Epic,
@@ -114,7 +118,7 @@ describe('RelatedItemsTree', () => {
     describe('methods', () => {
       describe('handleChevronClick', () => {
         it('calls `toggleItem` action with `item` as a param', () => {
-          spyOn(wrapper.vm, 'toggleItem');
+          jest.spyOn(wrapper.vm, 'toggleItem');
 
           wrapper.vm.handleChevronClick();
 

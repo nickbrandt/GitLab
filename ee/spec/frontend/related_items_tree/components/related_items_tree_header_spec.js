@@ -8,7 +8,10 @@ import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { issuableTypesMap } from 'ee/related_issues/constants';
 import EpicActionsSplitButton from 'ee/related_items_tree/components/epic_actions_split_button.vue';
 
-import { mockParentItem, mockQueryResponse } from '../mock_data';
+import {
+  mockParentItem,
+  mockQueryResponse,
+} from '../../../javascripts/related_items_tree/mock_data';
 
 const createComponent = ({ slots } = {}) => {
   const store = createDefaultStore();
