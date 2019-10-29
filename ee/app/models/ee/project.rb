@@ -643,6 +643,10 @@ module EE
       feature_available?(:incident_management)
     end
 
+    def alerts_service_activated?
+      alerts_service_available? && alerts_service&.active?
+    end
+
     def package_already_taken?(package_name)
       namespace.root_ancestor.all_projects
         .joins(:packages)
