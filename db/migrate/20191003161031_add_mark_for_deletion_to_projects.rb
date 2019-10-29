@@ -9,6 +9,6 @@ class AddMarkForDeletionToProjects < ActiveRecord::Migration[5.2]
 
   def change
     add_column :projects, :marked_for_deletion_at, :date
-    add_column :projects, :marked_for_deletion_by_id, :integer
+    add_column :projects, :marked_for_deletion_by_user_id, :integer
   end
 end

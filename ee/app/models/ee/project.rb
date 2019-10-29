@@ -35,7 +35,7 @@ module EE
         if: ->(project) { project.mirror? && project.import_url_updated? }
 
       belongs_to :mirror_user, foreign_key: 'mirror_user_id', class_name: 'User'
-      belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_id', class_name: 'User'
+      belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_user_id', class_name: 'User'
 
       has_one :repository_state, class_name: 'ProjectRepositoryState', inverse_of: :project
       has_one :project_registry, class_name: 'Geo::ProjectRegistry', inverse_of: :project
@@ -656,6 +656,12 @@ module EE
     def adjourned_deletion?
       feature_available?(:marking_project_for_deletion) &&
         ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
+    end
+
+    def marked_for_deletion?
+      return false unless feature_available?(:marking_project_for_deletion)
+
+      marked_for_deletion_at.present?
     end
 
     private

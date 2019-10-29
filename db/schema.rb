@@ -3061,7 +3061,7 @@ ActiveRecord::Schema.define(version: 2019_10_17_180026) do
     t.string "pull_mirror_branch_prefix", limit: 50
     t.boolean "remove_source_branch_after_merge"
     t.date "marked_for_deletion_at"
-    t.integer "marked_for_deletion_by_id"
+    t.integer "marked_for_deletion_by_user_id"
     t.index "lower((name)::text)", name: "index_projects_on_lower_name"
     t.index ["archived", "pending_delete", "merge_requests_require_code_owner_approval"], name: "projects_requiring_code_owner_approval", where: "((pending_delete = false) AND (archived = false) AND (merge_requests_require_code_owner_approval = true))"
     t.index ["created_at"], name: "index_projects_on_created_at"
@@ -3074,7 +3074,7 @@ ActiveRecord::Schema.define(version: 2019_10_17_180026) do
     t.index ["last_repository_check_at"], name: "index_projects_on_last_repository_check_at", where: "(last_repository_check_at IS NOT NULL)"
     t.index ["last_repository_check_failed"], name: "index_projects_on_last_repository_check_failed"
     t.index ["last_repository_updated_at"], name: "index_projects_on_last_repository_updated_at"
-    t.index ["marked_for_deletion_by_id"], name: "index_projects_on_marked_for_deletion_by_id", where: "(marked_for_deletion_by_id IS NOT NULL)"
+    t.index ["marked_for_deletion_by_user_id"], name: "index_projects_on_marked_for_deletion_by_user_id", where: "(marked_for_deletion_by_user_id IS NOT NULL)"
     t.index ["mirror_last_successful_update_at"], name: "index_projects_on_mirror_last_successful_update_at"
     t.index ["mirror_user_id"], name: "index_projects_on_mirror_user_id"
     t.index ["name"], name: "index_projects_on_name_trigram", opclass: :gin_trgm_ops, using: :gin
@@ -4344,7 +4344,7 @@ ActiveRecord::Schema.define(version: 2019_10_17_180026) do
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
   add_foreign_key "project_tracing_settings", "projects", on_delete: :cascade
   add_foreign_key "projects", "pool_repositories", name: "fk_6e5c14658a", on_delete: :nullify
-  add_foreign_key "projects", "users", column: "marked_for_deletion_by_id", name: "fk_25d8780d11", on_delete: :nullify
+  add_foreign_key "projects", "users", column: "marked_for_deletion_by_user_id", name: "fk_25d8780d11", on_delete: :nullify
   add_foreign_key "prometheus_alert_events", "projects", on_delete: :cascade
   add_foreign_key "prometheus_alert_events", "prometheus_alerts", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "environments", on_delete: :cascade
