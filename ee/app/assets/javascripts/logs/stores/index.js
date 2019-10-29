@@ -14,7 +14,7 @@ export const createStore = () =>
         namespaced: true,
         actions,
         mutations,
-        state,
+        state: state(),
         getters,
       },
     },
