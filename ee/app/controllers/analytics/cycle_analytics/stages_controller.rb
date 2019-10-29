@@ -88,15 +88,15 @@ module Analytics
       end
 
       def create_service
-        Stages::CreateService.new(parent: @group, current_user: current_user, params: params.permit(:name, :start_event_identifier, :end_event_identifier))
+        Stages::CreateService.new(parent: @group, current_user: current_user, params: create_params)
       end
 
       def update_service
-        Stages::UpdateService.new(parent: @group, current_user: current_user, params: params.permit(:name, :start_event_identifier, :end_event_identifier, :id))
+        Stages::UpdateService.new(parent: @group, current_user: current_user, params: update_params)
       end
 
       def delete_service
-        Stages::DeleteService.new(parent: @group, current_user: current_user, params: params.permit(:id))
+        Stages::DeleteService.new(parent: @group, current_user: current_user, params: delete_params)
       end
 
       def render_stage_service_result(result)
@@ -106,6 +106,18 @@ module Analytics
         else
           render json: { message: result.message, errors: result.payload[:errors] }, status: result.http_status
         end
+      end
+
+      def update_params
+        params.permit(:name, :start_event_identifier, :end_event_identifier, :id, :move_after_id, :move_before_id)
+      end
+
+      def create_params
+        params.permit(:name, :start_event_identifier, :end_event_identifier)
+      end
+
+      def delete_params
+        params.permit(:id)
       end
     end
   end
