@@ -9,6 +9,11 @@ export default {
     Icon,
   },
   props: {
+    autoDevOpsEnabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     helpPagePath: {
       type: String,
       required: true,
@@ -24,9 +29,17 @@ export default {
     },
   },
   computed: {
+    autoDevOpsNotificationText() {
+      const body =
+          'All security scans are enabled because %{linkStart}Auto DevOps%{linkEnd} is enabled on this project';
+      const linkStart = `<a href="foo">`;
+      const linkEnd = '</a>';
+
+      return sprintf(__(body), { linkStart, linkEnd }, false);
+    },
     notificationText() {
       const body =
-        'Configuration status only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd} scan.';
+        'Configuration status only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd} scan';
       const linkStart = `<a href="${this.latestPipelinePath}">`;
       const linkEnd = '</a>';
 
@@ -52,7 +65,7 @@ export default {
     </header>
     <section
       class="js-security-configuration-notification alert alert-primary mt-4 mb-0"
-      v-html="notificationText"
+      v-html="autoDevOpsEnabled ? autoDevOpsNotificationText : notificationText"
     ></section>
     <section class="mt-3">
       <div class="gl-responsive-table-row table-row-header text-2 font-weight-bold px-2" role="row">

@@ -48,6 +48,13 @@ describe('Security Configuration App', () => {
     expect(getPipelinesLink().attributes('href')).toBe(latestPipelinePath);
   });
 
+  it('displays a notification with a link to the documentation if Auto DevOps is enabled', () => {
+    createComponent({ autoDevOpsEnabled: true });
+
+    expect(getNotification().exists()).toBe(true);
+    expect(getPipelinesLink().attributes('href')).toBe('foo');
+  });
+
   it('displays a full list of given features', () => {
     const features = [{}, {}, {}];
 
