@@ -12,10 +12,10 @@ all within GitLab.
 ## Creating new merge requests
 
 You can start creating a new merge request by clicking the **New merge request** button
-on the **Merge Requests** page in a project. Then you must choose a source project and
-branch with your changes, and the target project and branch where you want to merge
-the changes into. Click on **Compare branches and continue** to start filling in the
-merge request details.
+on the **Merge Requests** page in a project. Then you must choose the source project and
+branch that contain your changes, and the target project and branch where you want to merge
+the changes into. Click on **Compare branches and continue** to go to the next step
+and start filling in the merge request details.
 
 When viewing the commits on a branch in **Repository > Commits**, you can click on
 the **Create merge request** button, and a new merge request will be started using
@@ -32,10 +32,10 @@ In this case, the merge request will use the most recent branch you pushed chang
 to as the source branch, and `master` in the current project as the target.
 
 On the **New Merge Request** page, you can start by filling in the title and description
-for the merge request. If there are commits on the branch, the title will be pre-filled
-with the first line of the first commit message, and the description will be pre-filled with
-any additional lines in the commit message. The title is the only field that is mandatory
-in all cases.
+for the merge request. If there are are already commits on the branch, the title will
+be pre-filled with the first line of the first commit message, and the description will
+be pre-filled with any additional lines in the commit message. The title is the only
+field that is mandatory in all cases.
 
 From here, you can also:
 
@@ -111,7 +111,7 @@ it's available on GitLab.com._
 
 You can create a new merge request by sending an email to a user-specific email
 address. The address can be obtained on the merge requests page by clicking on
-a **Email a new merge request to this project** button.  The subject will be
+a **Email a new merge request to this project** button. The subject will be
 used as the source branch name for the new merge request and the target branch
 will be the default branch for the project. The message body (if not empty)
 will be used as the merge request description. You need
