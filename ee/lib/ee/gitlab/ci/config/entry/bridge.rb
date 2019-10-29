@@ -101,14 +101,14 @@ module EE
                 except: except_value }.compact
             end
 
+            def bridge_needs
+              needs_value[:bridge] if needs_value
+            end
+
             private
 
             def overwrite_entry(deps, key, current_entry)
               deps.default[key] unless current_entry.specified?
-            end
-
-            def bridge_needs
-              needs_value[:bridge] if needs_value
             end
           end
         end

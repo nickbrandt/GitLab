@@ -115,7 +115,8 @@ module Gitlab
 
           entry :needs, Entry::Needs,
             description: 'Needs configuration for this job.',
-            metadata: { allowed_needs: %i[job] }
+            metadata: { allowed_needs: %i[job] },
+            inherit: false
 
           entry :variables, Entry::Variables,
             description: 'Environment variables available for this job.',
