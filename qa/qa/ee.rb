@@ -109,8 +109,13 @@ module QA
           autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
           autoload :MirroringRepositories, 'qa/ee/page/project/settings/mirroring_repositories'
           autoload :MergeRequest, 'qa/ee/page/project/settings/merge_request'
+          autoload :Integrations, 'qa/ee/page/project/settings/integrations'
           autoload :Repository, 'qa/ee/page/project/settings/repository'
           autoload :PushRules, 'qa/ee/page/project/settings/push_rules'
+
+          module Services
+            autoload :Jenkins, 'qa/ee/page/project/settings/services/jenkins'
+          end
         end
 
         module Operations
