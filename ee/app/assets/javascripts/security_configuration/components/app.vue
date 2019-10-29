@@ -33,14 +33,6 @@ export default {
     },
   },
   computed: {
-    autoDevOpsNotificationText() {
-      const body =
-        'All security scans are enabled because %{linkStart}Auto DevOps%{linkEnd} is enabled on this project';
-      const linkStart = `<a href="foo">`;
-      const linkEnd = '</a>';
-
-      return sprintf(__(body), { linkStart, linkEnd }, false);
-    },
     notificationContent() {
       const bodyDefault =
         'Configuration status only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd} scan';
