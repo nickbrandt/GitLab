@@ -35,8 +35,7 @@ function UsersSelect(currentUser, els, options = {}) {
   }
 
   $els.each(
-    (function(_this) {
-      return function(i, dropdown) {
+    (i, dropdown) => {
         var options = {};
         var $block,
           $collapsedSidebar,
@@ -578,14 +577,12 @@ function UsersSelect(currentUser, els, options = {}) {
             return _this.renderRow(options.issuableType, user, selected, username, img);
           },
         });
-      };
-    })(this),
+    }
   );
   import(/* webpackChunkName: 'select2' */ 'select2/select2')
     .then(() => {
       $('.ajax-users-select').each(
-        (function(_this) {
-          return function(i, select) {
+        (i, select) => {
             var firstUser, showAnyUser, showEmailUser, showNullUser;
             var options = {};
             options.skipLdap = $(select).hasClass('skip_ldap');
@@ -679,8 +676,7 @@ function UsersSelect(currentUser, els, options = {}) {
                 return m;
               },
             });
-          };
-        })(this),
+        }
       );
     })
     .catch(() => {});
