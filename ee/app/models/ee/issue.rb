@@ -34,7 +34,7 @@ module EE
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
 
-      after_create :update_generic_alert_title_if_applicable
+      after_create :update_generic_alert_title, if: :generic_alert_with_default_title?
     end
 
     class_methods do
@@ -134,8 +134,8 @@ module EE
 
     private
 
-    def update_generic_alert_title_if_applicable
-      update(title: "#{title} #{iid}") if generic_alert_with_default_title?
+    def update_generic_alert_title
+      update(title: "#{title} #{iid}")
     end
 
     def generic_alert_with_default_title?
