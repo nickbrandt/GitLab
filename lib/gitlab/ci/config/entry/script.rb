@@ -15,7 +15,7 @@ module Gitlab
           end
 
           def value
-            config.flatten
+            config.flatten(1)
           end
         end
       end

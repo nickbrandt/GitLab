@@ -15,7 +15,7 @@ module Gitlab
           end
 
           def value
-            Array(@config).flatten
+            Array(@config).flatten(1)
           end
         end
       end
