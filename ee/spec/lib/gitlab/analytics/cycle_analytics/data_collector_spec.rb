@@ -51,7 +51,7 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
     end
 
     it 'loads serialized records' do
-      items = data_collector.records_fetcher.serialized_records
+      items = data_collector.serialized_records
       expect(items.size).to eq(3)
     end
 

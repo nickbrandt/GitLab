@@ -158,5 +158,53 @@ describe Analytics::CycleAnalytics::StagesController do
         expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
+
+    describe 'GET `median`' do
+      subject { get :median, params: params }
+
+      before do
+        params[:created_after] = '2019-01-01'
+        params[:created_before] = '2020-01-01'
+      end
+
+      it 'succeeds' do
+        subject
+
+        expect(response).to be_successful
+        expect(response).to match_response_schema('analytics/cycle_analytics/median', dir: 'ee')
+      end
+
+      context 'when params are invalid' do
+        before do
+          params[:created_before] = '2018-01-01'
+        end
+
+        it 'renders `unprocessable_entity`' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:unprocessable_entity)
+          expect(response).to match_response_schema('analytics/cycle_analytics/validation_error', dir: 'ee')
+        end
+      end
+
+      include_examples 'group permission check on the controller level'
+    end
+
+    describe 'GET `records`' do
+      subject { get :records, params: params }
+
+      before do
+        params[:created_after] = '2019-01-01'
+        params[:created_before] = '2020-01-01'
+      end
+
+      it 'succeeds' do
+        subject
+
+        expect(response).to be_successful
+      end
+
+      include_examples 'group permission check on the controller level'
+    end
   end
 end
