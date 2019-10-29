@@ -8210,6 +8210,24 @@ msgstr ""
 msgid "Grafana URL"
 msgstr ""
 
+msgid "GrafanaIntegration|API Token"
+msgstr ""
+
+msgid "GrafanaIntegration|Embed Grafana charts in GitLab issues."
+msgstr ""
+
+msgid "GrafanaIntegration|Enter the Grafana API Token."
+msgstr ""
+
+msgid "GrafanaIntegration|Enter the base URL of the Grafana instance."
+msgstr ""
+
+msgid "GrafanaIntegration|Grafana Authentication"
+msgstr ""
+
+msgid "GrafanaIntegration|Grafana URL"
+msgstr ""
+
 msgid "Grant access"
 msgstr ""
 
