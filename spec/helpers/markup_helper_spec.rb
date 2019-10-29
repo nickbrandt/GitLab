@@ -232,6 +232,12 @@ describe MarkupHelper do
       expect(doc.css('a')[0].attr('href')).to eq link
       expect(doc.css('a')[0].text).to eq 'This should finally fix '
     end
+
+    it "escapes HTML passed as an emoji" do
+      rendered = '<gl-emoji>&lt;div class="test"&gt;test&lt;/div&gt;</gl-emoji>'
+      expect(helper.link_to_html(rendered, '/foo'))
+        .to eq '<a href="/foo"><gl-emoji>&lt;div class="test"&gt;test&lt;/div&gt;</gl-emoji></a>'
+    end
   end
 
   describe '#render_wiki_content' do
