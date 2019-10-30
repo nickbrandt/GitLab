@@ -374,6 +374,34 @@ describe('EksClusterConfigurationForm', () => {
         undefined,
       );
     });
+
+    it('cleans selected vpc', () => {
+      expect(actions.setVpc).toHaveBeenCalledWith(expect.anything(), { vpc: null }, undefined);
+    });
+
+    it('cleans selected key pair', () => {
+      expect(actions.setKeyPair).toHaveBeenCalledWith(
+        expect.anything(),
+        { keyPair: null },
+        undefined,
+      );
+    });
+
+    it('cleans selected subnet', () => {
+      expect(actions.setSubnet).toHaveBeenCalledWith(
+        expect.anything(),
+        { subnet: null },
+        undefined,
+      );
+    });
+
+    it('cleans selected security group', () => {
+      expect(actions.setSecurityGroup).toHaveBeenCalledWith(
+        expect.anything(),
+        { securityGroup: null },
+        undefined,
+      );
+    });
   });
 
   it('dispatches setClusterName when cluster name input changes', () => {
@@ -435,6 +463,22 @@ describe('EksClusterConfigurationForm', () => {
 
     it('dispatches setVpc action', () => {
       expect(actions.setVpc).toHaveBeenCalledWith(expect.anything(), { vpc }, undefined);
+    });
+
+    it('cleans selected subnet', () => {
+      expect(actions.setSubnet).toHaveBeenCalledWith(
+        expect.anything(),
+        { subnet: null },
+        undefined,
+      );
+    });
+
+    it('cleans selected security group', () => {
+      expect(actions.setSecurityGroup).toHaveBeenCalledWith(
+        expect.anything(),
+        { securityGroup: null },
+        undefined,
+      );
     });
 
     it('dispatches fetchSubnets action', () => {

@@ -1,6 +1,6 @@
 <script>
 import { createNamespacedHelpers, mapState, mapActions } from 'vuex';
-import { sprintf, s__, __ } from '~/locale';
+import { sprintf, s__ } from '~/locale';
 import _ from 'underscore';
 import { GlFormInput, GlFormCheckbox } from '@gitlab/ui';
 import ClusterFormDropdown from './cluster_form_dropdown.vue';
@@ -272,11 +272,17 @@ export default {
     ...mapInstanceTypesActions({ fetchInstanceTypes: 'fetchItems' }),
     setRegionAndFetchVpcsAndKeyPairs(region) {
       this.setRegion({ region });
+      this.setVpc({ vpc: null });
+      this.setKeyPair({ keyPair: null });
+      this.setSubnet({ subnet: null });
+      this.setSecurityGroup({ securityGroup: null });
       this.fetchVpcs({ region });
       this.fetchKeyPairs({ region });
     },
     setVpcAndFetchSubnets(vpc) {
       this.setVpc({ vpc });
+      this.setSubnet({ subnet: null });
+      this.setSecurityGroup({ securityGroup: null });
       this.fetchSubnets({ vpc, region: this.selectedRegion });
       this.fetchSecurityGroups({ vpc, region: this.selectedRegion });
     },
@@ -333,7 +339,7 @@ export default {
       <cluster-form-dropdown
         field-id="eks-role"
         field-name="eks-role"
-        :input="selectedRole"
+        :value="selectedRole"
         :items="roles"
         :loading="isLoadingRoles"
         :loading-text="s__('ClusterIntegration|Loading IAM Roles')"
@@ -363,7 +369,7 @@ export default {
       <cluster-form-dropdown
         field-id="eks-key-pair"
         field-name="eks-key-pair"
-        :input="selectedKeyPair"
+        :value="selectedKeyPair"
         :items="keyPairs"
         :disabled="keyPairDropdownDisabled"
         :disabled-text="s__('ClusterIntegration|Select a region to choose a Key Pair')"
@@ -383,7 +389,7 @@ export default {
       <cluster-form-dropdown
         field-id="eks-vpc"
         field-name="eks-vpc"
-        :input="selectedVpc"
+        :value="selectedVpc"
         :items="vpcs"
         :loading="isLoadingVpcs"
         :disabled="vpcDropdownDisabled"
@@ -403,7 +409,7 @@ export default {
       <cluster-form-dropdown
         field-id="eks-subnet"
         field-name="eks-subnet"
-        :input="selectedSubnet"
+        :value="selectedSubnet"
         :items="subnets"
         :loading="isLoadingSubnets"
         :disabled="subnetDropdownDisabled"
@@ -425,7 +431,7 @@ export default {
       <cluster-form-dropdown
         field-id="eks-security-group"
         field-name="eks-security-group"
-        :input="selectedSecurityGroup"
+        :value="selectedSecurityGroup"
         :items="securityGroups"
         :loading="isLoadingSecurityGroups"
         :disabled="securityGroupDropdownDisabled"
@@ -449,7 +455,7 @@ export default {
       <cluster-form-dropdown
         field-id="eks-instance-type"
         field-name="eks-instance-type"
-        :input="selectedInstanceType"
+        :value="selectedInstanceType"
         :items="instanceTypes"
         :loading="isLoadingInstanceTypes"
         :loading-text="s__('ClusterIntegration|Loading instance types')"
