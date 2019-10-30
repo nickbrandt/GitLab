@@ -70,14 +70,13 @@ module EE
       search_path(search_params)
     end
 
-    # Switching to basic search should only be possible for a subset of
-    # scopes. This method assumes you're already allowed to search within
-    # this scope but it's just here to determine if you can switch to basic
-    # search.
-    def switch_to_basic_searchable_tab?(scope)
+    def show_switch_to_basic_search?(search_service)
+      return false unless ::Feature.enabled?(:switch_to_basic_search, default_enabled: false)
+      return false unless search_service.use_elasticsearch?
+
       return true if @project
 
-      scope.in?(SWITCH_TO_BASIC_SEARCHABLE_TABS)
+      search_service.scope.in?(SWITCH_TO_BASIC_SEARCHABLE_TABS)
     end
 
     private

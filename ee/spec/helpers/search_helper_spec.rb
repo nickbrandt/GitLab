@@ -176,9 +176,29 @@ describe SearchHelper do
     end
   end
 
-  describe '#switch_to_basic_searchable_tab?' do
+  describe '#show_switch_to_basic_search?' do
+    let(:use_elasticsearch) { true }
     let(:scope) { 'commits' }
-    subject { switch_to_basic_searchable_tab?(scope) }
+    let(:search_service) { instance_double(Search::GlobalService, use_elasticsearch?: use_elasticsearch, scope: scope) }
+    subject { show_switch_to_basic_search?(search_service) }
+
+    before do
+      stub_feature_flags(switch_to_basic_search: true)
+    end
+
+    context 'when :switch_to_basic_search feature is disabled' do
+      before do
+        stub_feature_flags(switch_to_basic_search: false)
+      end
+
+      it { is_expected.to eq(false) }
+    end
+
+    context 'when not currently using elasticsearch' do
+      let(:use_elasticsearch) { false }
+
+      it { is_expected.to eq(false) }
+    end
 
     context 'when project scope' do
       before do
