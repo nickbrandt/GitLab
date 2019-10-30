@@ -2,16 +2,15 @@
 
 require 'spec_helper'
 
-describe 'Updating an Epic' do
+describe 'Creating an Epic' do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }
   let_it_be(:group) { create(:group) }
-  let(:epic) { create(:epic, group: group, title: 'original title') }
 
   let(:attributes) do
     {
-      title: 'updated title',
+      title: 'title',
       description: 'some description',
       start_date_fixed: '2019-09-17',
       due_date_fixed: '2019-09-18',
@@ -21,13 +20,13 @@ describe 'Updating an Epic' do
   end
 
   let(:mutation) do
-    params = { group_path: group.full_path, iid: epic.iid.to_s }.merge(attributes)
+    params = { group_path: group.full_path }.merge(attributes)
 
-    graphql_mutation(:update_epic, params)
+    graphql_mutation(:create_epic, params)
   end
 
   def mutation_response
-    graphql_mutation_response(:update_epic)
+    graphql_mutation_response(:create_epic)
   end
 
   context 'when the user does not have permission' do
@@ -39,16 +38,14 @@ describe 'Updating an Epic' do
       errors: ['The resource that you are attempting to access does not exist '\
                'or you don\'t have permission to perform this action']
 
-    it 'does not update the epic' do
-      post_graphql_mutation(mutation, current_user: current_user)
-
-      expect(epic.reload.title).to eq('original title')
+    it 'does not create epic' do
+      expect { post_graphql_mutation(mutation, current_user: current_user) }.not_to change(Epic, :count)
     end
   end
 
   context 'when the user has permission' do
     before do
-      epic.group.add_developer(current_user)
+      group.add_reporter(current_user)
     end
 
     context 'when epics are disabled' do
@@ -66,38 +63,16 @@ describe 'Updating an Epic' do
         stub_licensed_features(epics: true)
       end
 
-      it 'updates the epic' do
+      it 'creates the epic' do
         post_graphql_mutation(mutation, current_user: current_user)
 
         epic_hash = mutation_response['epic']
-        expect(epic_hash['title']).to eq('updated title')
+        expect(epic_hash['title']).to eq('title')
         expect(epic_hash['description']).to eq('some description')
         expect(epic_hash['startDateFixed']).to eq('2019-09-17')
         expect(epic_hash['startDateIsFixed']).to eq(true)
         expect(epic_hash['dueDateFixed']).to eq('2019-09-18')
         expect(epic_hash['dueDateIsFixed']).to eq(true)
-      end
-
-      context 'when closing the epic' do
-        let(:attributes) { { state_event: 'CLOSE' } }
-
-        it 'closes open epic' do
-          post_graphql_mutation(mutation, current_user: current_user)
-
-          expect(epic.reload).to be_closed
-        end
-      end
-
-      context 'when reopening the epic' do
-        let(:attributes) { { state_event: 'REOPEN' } }
-
-        it 'allows epic to be reopend' do
-          epic.update!(state: 'closed')
-
-          post_graphql_mutation(mutation, current_user: current_user)
-
-          expect(epic.reload).to be_open
-        end
       end
 
       context 'when there are ActiveRecord validation errors' do
@@ -106,10 +81,8 @@ describe 'Updating an Epic' do
         it_behaves_like 'a mutation that returns errors in the response',
           errors: ["Title can't be blank"]
 
-        it 'does not update the epic' do
-          post_graphql_mutation(mutation, current_user: current_user)
-
-          expect(mutation_response['epic']['title']).to eq('original title')
+        it 'does not create the epic' do
+          expect { post_graphql_mutation(mutation, current_user: current_user) }.not_to change(Epic, :count)
         end
       end
 
@@ -118,6 +91,10 @@ describe 'Updating an Epic' do
 
         it_behaves_like 'a mutation that returns top-level errors',
           errors: ['The list of epic attributes is empty']
+
+        it 'does not create the epic' do
+          expect { post_graphql_mutation(mutation, current_user: current_user) }.not_to change(Epic, :count)
+        end
       end
     end
   end
