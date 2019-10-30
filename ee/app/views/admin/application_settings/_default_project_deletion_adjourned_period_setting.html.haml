@@ -6,4 +6,4 @@
   = f.label s_('Default deletion adjourned period'), class: 'label-bold'
   = f.select :deletion_adjourned_period, options_for_select(0..7, @application_setting.deletion_adjourned_period), {}, class: 'form-control'
   = f.label :deletion_adjourned_period, class: 'form-check-label' do
-    = _('How many days need to pass between marking project for deletion and actual removing it.')
+    = _('How many days need to pass between marking entity for deletion and actual removing it.')
