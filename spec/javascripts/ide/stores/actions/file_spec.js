@@ -404,6 +404,36 @@ describe('IDE store file actions', () => {
           })
           .catch(done.fail);
       });
+
+      it('does not call getBaseRawFileData for new files', done => {
+        spyOn(service, 'getBaseRawFileData');
+
+        tmpFile.mrChange = { new_file: true };
+
+        store
+          .dispatch('getRawFileData', { path: tmpFile.path })
+          .then(() => {
+            expect(service.getBaseRawFileData).not.toHaveBeenCalled();
+
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('does not call getBaseRawFileData for renamed files', done => {
+        spyOn(service, 'getBaseRawFileData');
+
+        tmpFile.mrChange = { renamed_file: true };
+
+        store
+          .dispatch('getRawFileData', { path: tmpFile.path })
+          .then(() => {
+            expect(service.getBaseRawFileData).not.toHaveBeenCalled();
+
+            done();
+          })
+          .catch(done.fail);
+      });
     });
 
     describe('return JSON', () => {

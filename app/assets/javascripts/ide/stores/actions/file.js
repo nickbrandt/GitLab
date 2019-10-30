@@ -105,7 +105,11 @@ export const getRawFileData = ({ state, commit, dispatch, getters }, { path }) =
       .getRawFileData(file)
       .then(raw => {
         if (!(file.tempFile && !file.prevPath)) commit(types.SET_FILE_RAW_DATA, { file, raw });
-        if (file.mrChange && file.mrChange.new_file === false) {
+        if (
+          file.mrChange && 
+          file.mrChange.new_file === false && 
+          file.mrChange.renamed_file === false
+        ) {
           const baseSha =
             (getters.currentMergeRequest && getters.currentMergeRequest.baseCommitSha) || '';
 
