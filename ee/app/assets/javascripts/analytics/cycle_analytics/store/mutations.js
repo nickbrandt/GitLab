@@ -127,54 +127,12 @@ export default {
     state.isSavingCustomStage = false;
   },
   [types.REQUEST_TASKS_BY_TYPE_DATA](state) {
-    //     [
-    //   {
-    //     "label": {
-    //       "id": 1,
-    //       "title": "label 1",
-    //       "color": "#428BCA",
-    //       "text_color": "#FFFFFF"
-    //     },
-    //     "series": [
-    //       [
-    //         "2018-01-01",
-    //         23
-    //       ],
-    //       [
-    //         "2018-01-02",
-    //         5
-    //       ]
-    //     ]
-    //   },
-    //   {
-    //     "label": {
-    //       "id": 2,
-    //       "title": "label 3",
-    //       "color": "#428BCA",
-    //       "text_color": "#FFFFFF"
-    //     },
-    //     "series": [
-    //       [
-    //         "2018-01-01",
-    //         3
-    //       ],
-    //       [
-    //         "2018-01-03",
-    //         10
-    //       ]
-    //     ]
-    //   }
-    // ]
-    // transforms the raw data into a dictionary
-    /*
-      {
-        labelId: {
-          issues: [],
-          merge_requests: []
-        }
-      }
-    */
+    state.isLoadingChartData = true;
   },
-  [types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR](state) {},
-  [types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state) {},
+  [types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR](state) {
+    state.isLoadingChartData = false;
+  },
+  [types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state) {
+    state.isLoadingChartData = false;
+  },
 };
