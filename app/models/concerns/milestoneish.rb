@@ -130,7 +130,7 @@ module Milestoneish
   end
 
   def clear_issue_counts
-    issue_count_cache_state_key.values.each { |state| Rails.cache.delete(issue_count_cache_key_for(state)) }
+    issue_count_cache_state_key.each { |state| Rails.cache.delete(issue_count_cache_key_for(state)) }
   end
 
   private
