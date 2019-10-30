@@ -5,6 +5,8 @@ module Geo
     include ApplicationWorker
     include CronjobQueue
 
+    feature_category :geo_replication
+
     def perform
       Gitlab::Geo::CronManager.new.execute
     end

@@ -25,7 +25,7 @@ describe Gitlab::HookData::IssueBuilder do
         moved_to_id
         project_id
         relative_position
-        state
+        state_id
         time_estimate
         title
         updated_at

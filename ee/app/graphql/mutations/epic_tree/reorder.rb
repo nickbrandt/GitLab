@@ -21,7 +21,7 @@ module Mutations
         params = args[:moved]
         moving_params = params.to_hash.slice(:adjacent_reference_id, :relative_position).merge(base_epic_id: args[:base_epic_id])
 
-        result = Epics::TreeReorderService.new(current_user, params[:id], moving_params).execute
+        result = ::Epics::TreeReorderService.new(current_user, params[:id], moving_params).execute
         errors = result[:status] == :error ? [result[:message]] : []
 
         { errors: errors }

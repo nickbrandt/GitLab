@@ -56,6 +56,7 @@ export default {
         'dashboard-card-body-warning': !this.hasPipelineFailed && this.hasPipelineErrors,
         'dashboard-card-body-failed': this.hasPipelineFailed,
         'bg-secondary': !this.hasPipelineFailed && !this.hasPipelineErrors,
+        'd-flex flex-column justify-content-center align-items-center': !this.deployable,
       };
     },
     user() {
@@ -86,6 +87,15 @@ export default {
             ref_url: this.lastDeployment.ref.ref_path,
           }
         : {};
+    },
+    commitAuthor() {
+      return (
+        this.commit.author || {
+          avatar_url: this.commit.author_gravatar_url,
+          path: `mailto:${_.escape(this.commit.author_email)}`,
+          username: this.commit.author_name,
+        }
+      );
     },
     finishedTime() {
       return this.deployable.updated_at;
@@ -127,7 +137,7 @@ export default {
           />
         </div>
 
-        <div class="col-10 col-sm-6 pr-0 pl-5 align-self-center align-middle ci-table">
+        <div class="col-10 col-sm-7 pr-0 pl-5 align-self-center align-middle ci-table">
           <div class="branch-commit">
             <icon name="work" />
             <gl-link v-gl-tooltip="jobTooltip" :href="deployable.build_path" class="str-truncated">
@@ -135,23 +145,29 @@ export default {
             </gl-link>
           </div>
           <commit
-            :tag="commitRef.tag"
+            :tag="lastDeployment.tag"
             :commit-ref="commitRef"
             :short-sha="commit.short_id"
             :commit-url="commit.commit_url"
             :title="commit.title"
-            :author="commit.author"
+            :author="commitAuthor"
             :show-branch="true"
           />
         </div>
 
-        <div class="col-sm-5 pl-0 text-right align-self-center d-none d-sm-block">
+        <div
+          class="col-sm-4 mt-0 pl-5 pl-sm-0 offset-1 offset-sm-0 text-sm-right align-self-center col-12 d-sm-block"
+        >
           <time-ago
             v-if="shouldShowTimeAgo"
             :time="finishedTime"
             :tooltip-text="$options.tooltips.timeAgo"
           />
-          <alerts :count="environment.alert_count" :last-alert="environment.last_alert" />
+          <alerts
+            v-if="environment.alert_count > 0"
+            :count="environment.alert_count"
+            :last-alert="environment.last_alert"
+          />
         </div>
 
         <div v-if="lastPipeline" class="col-12">
@@ -164,7 +180,7 @@ export default {
       </div>
 
       <div v-else class="h-100 d-flex justify-content-center align-items-center">
-        <div class="text-plain text-metric text-center bold w-75">
+        <div class="text-plain text-metric text-center bold">
           {{ $options.noDeploymentMessage }}
         </div>
       </div>

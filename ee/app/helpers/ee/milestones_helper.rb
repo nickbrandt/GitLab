@@ -3,7 +3,10 @@
 module EE
   module MilestonesHelper
     def burndown_chart(milestone)
-      Burndown.new(milestone, current_user) if milestone.supports_burndown_charts?
+      if milestone.supports_burndown_charts?
+        issues = milestone.issues_visible_to_user(current_user)
+        Burndown.new(issues, milestone.start_date, milestone.due_date)
+      end
     end
 
     def can_generate_chart?(milestone, burndown)
@@ -20,7 +23,7 @@ module EE
       return false if cookies['hide_burndown_message'].present?
       return false unless milestone.supports_burndown_charts?
 
-      warning.nil? && can?(current_user, :admin_milestone, milestone.parent)
+      warning.nil? && can?(current_user, :admin_milestone, milestone.resource_parent)
     end
 
     def data_warning_for(burndown)

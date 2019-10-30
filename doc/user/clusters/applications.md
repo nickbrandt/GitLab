@@ -7,7 +7,7 @@ These applications are needed for [Review Apps](../../ci/review_apps/index.md)
 and [deployments](../../ci/environments.md) when using [Auto DevOps](../../topics/autodevops/index.md).
 
 You can install them after you
-[create a cluster](../project/clusters/index.md#adding-and-removing-clusters).
+[create a cluster](../project/clusters/add_remove_clusters.md).
 
 ## Installing applications
 
@@ -82,19 +82,21 @@ certificates. Installing Cert-Manager on your cluster will issue a
 certificate by [Let's Encrypt](https://letsencrypt.org/) and ensure that
 certificates are valid and up-to-date.
 
-NOTE: **Note:**
-The
-[jetstack/cert-manager](https://github.com/jetstack/cert-manager)
-chart is used to install this application with a
-[`values.yaml`](https://gitlab.com/gitlab-org/gitlab/blob/master/vendor/cert_manager/values.yaml)
-file. Prior to GitLab 12.3,
-the [stable/cert-manager](https://github.com/helm/charts/tree/master/stable/cert-manager)
-chart was used.
+The chart used to install this application depends on the version of GitLab used. In:
 
-NOTE: **Note:**
-If you have installed cert-manager prior to GitLab 12.3, Let's Encrypt will
-[block requests from older versions of cert-manager](https://community.letsencrypt.org/t/blocking-old-cert-manager-versions/98753).
-To resolve this, uninstall cert-manager (consider [backing up any additional configuration](https://docs.cert-manager.io/en/latest/tasks/backup-restore-crds.html)), then install cert-manager again.
+- GitLab 12.3 and newer, the [jetstack/cert-manager](https://github.com/jetstack/cert-manager)
+  chart is used with a [`values.yaml`](https://gitlab.com/gitlab-org/gitlab/blob/master/vendor/cert_manager/values.yaml)
+  file.
+- GitLab 12.2 and older, the [stable/cert-manager](https://github.com/helm/charts/tree/master/stable/cert-manager)
+  chart was used.
+
+If you have installed Cert-Manager prior to GitLab 12.3, Let's Encrypt will
+[block requests from older versions of Cert-Manager](https://community.letsencrypt.org/t/blocking-old-cert-manager-versions/98753).
+
+To resolve this:
+
+1. Uninstall Cert-Manager (consider [backing up any additional configuration](https://docs.cert-manager.io/en/latest/tasks/backup-restore-crds.html)).
+1. Install Cert-Manager again.
 
 ### GitLab Runner
 
@@ -242,7 +244,7 @@ server to use the external IP address for that domain. For any
 application created and installed, they will be accessible as
 `<program_name>.<kubernetes_namespace>.<domain_name>`. This will require
 your Kubernetes cluster to have [RBAC
-enabled](../project/clusters/index.md#rbac-cluster-resources).
+enabled](../project/clusters/add_remove_clusters.md#rbac-cluster-resources).
 
 NOTE: **Note:**
 The [`knative/knative`](https://storage.googleapis.com/triggermesh-charts)
@@ -296,7 +298,7 @@ The applications below can be uninstalled.
 
 | Application | GitLab version | Notes |
 | ----------- | -------------- | ----- |
-| Cert-Manager | 12.2+         | The associated private key will be deleted and cannot be restored. Deployed applications will continue to use HTTPS, but certificates will not be renewed. Before uninstalling, you may wish to [back up your configuration](https://docs.cert-manager.io/en/latest/tasks/backup-restore-crds.html) or [revoke your certificates](https://letsencrypt.org/docs/revoking/) |
+| Cert-Manager | 12.2+         | The associated private key will be deleted and cannot be restored. Deployed applications will continue to use HTTPS, but certificates will not be renewed. Before uninstalling, you may wish to [back up your configuration](https://docs.cert-manager.io/en/latest/tasks/backup-restore-crds.html) or [revoke your certificates](https://letsencrypt.org/docs/revoking/). |
 | GitLab Runner  | 12.2+         | Any running pipelines will be canceled. |
 | Helm  | 12.2+         | The associated Tiller pod, the `gitlab-managed-apps` namespace, and all of its resources will be deleted and cannot be restored. |
 | Ingress  | 12.1+         | The associated load balancer and IP will be deleted and cannot be restored. Furthermore, it can only be uninstalled if JupyterHub is not installed. |

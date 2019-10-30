@@ -100,7 +100,6 @@ module TestEnv
 
     clean_test_path
 
-    # Set up GitLab shell for test instance
     setup_gitlab_shell
 
     setup_gitaly
@@ -145,10 +144,7 @@ module TestEnv
   end
 
   def setup_gitlab_shell
-    component_timed_setup('GitLab Shell',
-      install_dir: Gitlab.config.gitlab_shell.path,
-      version: Gitlab::Shell.version_required,
-      task: 'gitlab:shell:install')
+    FileUtils.mkdir_p(Gitlab.config.gitlab_shell.path)
   end
 
   def setup_gitaly
@@ -245,6 +241,22 @@ module TestEnv
     FileUtils.mkdir_p(target_repo_path)
     FileUtils.cp_r("#{File.expand_path(bare_repo)}/.", target_repo_path)
     FileUtils.chmod_R 0755, target_repo_path
+  end
+
+  def rm_storage_dir(storage, dir)
+    Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+      repos_path = Gitlab.config.repositories.storages[storage].legacy_disk_path
+      target_repo_refs_path = File.join(repos_path, dir)
+      FileUtils.remove_dir(target_repo_refs_path)
+    end
+  rescue Errno::ENOENT
+  end
+
+  def storage_dir_exists?(storage, dir)
+    Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+      repos_path = Gitlab.config.repositories.storages[storage].legacy_disk_path
+      File.exist?(File.join(repos_path, dir))
+    end
   end
 
   def create_bare_repository(path)

@@ -16,9 +16,9 @@ module Elastic
 
         if noteable.is_a?(Issue)
           data['issue'] = {
-            assignee_id: noteable.assignee_ids,
-            author_id: noteable.author_id,
-            confidential: noteable.confidential
+            'assignee_id' => noteable.assignee_ids,
+            'author_id' => noteable.author_id,
+            'confidential' => noteable.confidential
           }
         end
 

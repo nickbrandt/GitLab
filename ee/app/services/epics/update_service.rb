@@ -17,7 +17,7 @@ module Epics
       update_task_event(epic) || update(epic)
 
       if saved_change_to_epic_dates?(epic)
-        epic.update_start_and_due_dates
+        Epics::UpdateDatesService.new([epic]).execute
         epic.reset
       end
 

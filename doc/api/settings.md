@@ -257,7 +257,6 @@ are listed in the descriptions of the relevant settings.
 | `housekeeping_incremental_repack_period` | integer          | required by: `housekeeping_enabled`  | Number of Git pushes after which an incremental `git repack` is run. |
 | `html_emails_enabled`                    | boolean          | no                                   | Enable HTML emails. |
 | `import_sources`                         | array of strings | no                                   | Sources to allow project import from, possible values: `github`, `bitbucket`, `bitbucket_server`, `gitlab`, `google_code`, `fogbugz`, `git`, `gitlab_project`, `gitea`, `manifest`, and `phabricator`. |
-
 | `instance_statistics_visibility_private` | boolean          | no                                   | When set to `true` Instance statistics will only be available to admins. |
 | `local_markdown_version`                 | integer          | no                                   | Increase this value when any cached markdown should be invalidated. |
 | `max_artifacts_size`                     | integer          | no                                   | Maximum artifacts size in MB |
@@ -271,7 +270,7 @@ are listed in the descriptions of the relevant settings.
 | `metrics_port`                           | integer          | required by: `metrics_enabled`       | The UDP port to use for connecting to InfluxDB. |
 | `metrics_sample_interval`                | integer          | required by: `metrics_enabled`       | The sampling interval in seconds. |
 | `metrics_timeout`                        | integer          | required by: `metrics_enabled`       | The amount of seconds after which InfluxDB will time out. |
-| `mirror_available`                       | boolean          | no                                   | Allow mirrors to be set up for projects. If disabled, only admins will be able to set up mirrors in projects. |
+| `mirror_available`                       | boolean          | no                                   | Allow repository mirroring to configured by project Maintainers. If disabled, only Admins will be able to configure repository mirroring. |
 | `mirror_capacity_threshold`              | integer          | no                                   | **(PREMIUM)** Minimum capacity to be available before scheduling more mirrors preemptively |
 | `mirror_max_capacity`                    | integer          | no                                   | **(PREMIUM)** Maximum number of mirrors that can be synchronizing at the same time. |
 | `mirror_max_delay`                       | integer          | no                                   | **(PREMIUM)** Maximum time (in minutes) between updates that a mirror can have when scheduled to synchronize. |
@@ -290,6 +289,7 @@ are listed in the descriptions of the relevant settings.
 | `protected_ci_variables`                 | boolean          | no                                   | Environment variables are protected by default. |
 | `pseudonymizer_enabled`                  | boolean          | no                                   | **(PREMIUM)** When enabled, GitLab will run a background job that will produce pseudonymized CSVs of the GitLab database that will be uploaded to your configured object storage directory.
 | `push_event_hooks_limit`                 | integer          | no                                   | Number of changes (branches or tags) in a single push to determine whether webhooks and services will be fired or not. Webhooks and services won't be submitted if it surpasses that value. |
+| `push_event_activities_limit`            | integer          | no                                   | Number of changes (branches or tags) in a single push to determine whether individual push events or bulk push events will be created. [Bulk push events will be created](../user/admin_area/settings/push_event_activities_limit.md) if it surpasses that value. |
 | `recaptcha_enabled`                      | boolean          | no                                   | (**If enabled, requires:** `recaptcha_private_key` and `recaptcha_site_key`) Enable reCAPTCHA. |
 | `recaptcha_private_key`                  | string           | required by: `recaptcha_enabled`     | Private key for reCAPTCHA. |
 | `recaptcha_site_key`                     | string           | required by: `recaptcha_enabled`     | Site key for reCAPTCHA. |
@@ -316,6 +316,8 @@ are listed in the descriptions of the relevant settings.
 | `snowplow_cookie_domain`                 | string           | no                                   | The Snowplow cookie domain. (e.g. `.gitlab.com`) |
 | `snowplow_enabled`                       | boolean          | no                                   | Enable snowplow tracking. |
 | `snowplow_site_id`                       | string           | no                                   | The Snowplow site name / application id. (e.g. `gitlab`) |
+| `pendo_url`                              | string           | required by: `pendo_enabled`         | The Pendo endpoint url with js snippet. (e.g. `https://cdn.pendo.io/agent/static/your-api-key/pendo.js`) |
+| `pendo_enabled`                          | boolean          | no                                   | Enable pendo tracking. |
 | `terminal_max_session_time`              | integer          | no                                   | Maximum time for web terminal websocket connection (in seconds). Set to `0` for unlimited time. |
 | `terms`                                  | text             | required by: `enforce_terms`         | (**Required by:** `enforce_terms`) Markdown content for the ToS. |
 | `throttle_authenticated_api_enabled`     | boolean          | no                                   | (**If enabled, requires:** `throttle_authenticated_api_period_in_seconds` and `throttle_authenticated_api_requests_per_period`) Enable authenticated API request rate limit. Helps reduce request volume (e.g. from crawlers or abusive bots). |

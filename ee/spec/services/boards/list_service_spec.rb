@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe Boards::ListService do
   shared_examples 'boards list service' do
-    let(:service) { described_class.new(parent, double) }
-    let!(:boards) { create_list(:board, 3, parent: parent) }
+    let(:service) { described_class.new(resource_parent, double) }
+    let!(:boards) { create_list(:board, 3, resource_parent: resource_parent) }
 
     describe '#execute' do
       it 'returns all issue boards when multiple issue boards is enabled' do
@@ -25,11 +25,11 @@ describe Boards::ListService do
   end
 
   it_behaves_like 'boards list service' do
-    let(:parent) { create(:project, :empty_repo) }
+    let(:resource_parent) { create(:project, :empty_repo) }
   end
 
   it_behaves_like 'boards list service' do
-    let(:parent) { create(:group) }
+    let(:resource_parent) { create(:group) }
 
     it 'returns the first issue board when multiple issue boards is disabled' do
       stub_licensed_features(multiple_group_issue_boards: false)

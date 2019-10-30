@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # https://gitlab.com/gitlab-org/gitlab/issues/13360
-  context 'Plan', :skip do
+  context 'Plan' do
     describe 'Epics roadmap' do
       include Support::Dates
 

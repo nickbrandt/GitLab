@@ -13,6 +13,8 @@ import Icon from '~/vue_shared/components/icon.vue';
 import MonitorTimeSeriesChart from './charts/time_series.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
 import MonitorEmptyChart from './charts/empty_chart.vue';
+import TrackEventDirective from '~/vue_shared/directives/track_event';
+import { downloadCSVOptions, generateLinkToChartOptions } from '../utils';
 
 export default {
   components: {
@@ -27,6 +29,7 @@ export default {
   directives: {
     GlModal: GlModalDirective,
     GlTooltip: GlTooltipDirective,
+    TrackEvent: TrackEventDirective,
   },
   props: {
     clipboardText: {
@@ -35,10 +38,6 @@ export default {
     },
     graphData: {
       type: Object,
-      required: true,
-    },
-    dashboardWidth: {
-      type: Number,
       required: true,
     },
     index: {
@@ -84,6 +83,8 @@ export default {
     showToast() {
       this.$toast.show(__('Link copied'));
     },
+    downloadCSVOptions,
+    generateLinkToChartOptions,
   },
 };
 </script>
@@ -98,7 +99,6 @@ export default {
     :deployment-data="deploymentData"
     :project-path="projectPath"
     :thresholds="getGraphAlertValues(graphData.queries)"
-    :container-width="dashboardWidth"
     group-id="monitor-area-chart"
   >
     <div class="d-flex align-items-center">
@@ -121,13 +121,18 @@ export default {
         <template slot="button-content">
           <icon name="ellipsis_v" class="text-secondary" />
         </template>
-        <gl-dropdown-item :href="downloadCsv" download="chart_metrics.csv">
+        <gl-dropdown-item
+          v-track-event="downloadCSVOptions(graphData.title)"
+          :href="downloadCsv"
+          download="chart_metrics.csv"
+        >
           {{ __('Download CSV') }}
         </gl-dropdown-item>
         <gl-dropdown-item
+          v-track-event="generateLinkToChartOptions(clipboardText)"
           class="js-chart-link"
           :data-clipboard-text="clipboardText"
-          @click="showToast"
+          @click="showToast(clipboardText)"
         >
           {{ __('Generate link to chart') }}
         </gl-dropdown-item>

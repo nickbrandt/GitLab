@@ -40,13 +40,14 @@ future GitLab releases.**
 | `CI_COMMIT_TAG`                         | 9.0    | 0.5    | The commit tag name. Present only when building tags. |
 | `CI_COMMIT_TITLE`                       | 10.8   | all    | The title of the commit - the full first line of the message |
 | `CI_CONFIG_PATH`                        | 9.4    | 0.5    | The path to CI config file. Defaults to `.gitlab-ci.yml` |
-| `CI_DEBUG_TRACE`                        | all    | 1.7    | Whether [debug tracing](README.md#debug-tracing) is enabled |
+| `CI_DEBUG_TRACE`                        | all    | 1.7    | Whether [debug logging (tracing)](README.md#debug-logging) is enabled |
 | `CI_DEPLOY_PASSWORD`                    | 10.8   | all    | Authentication password of the [GitLab Deploy Token][gitlab-deploy-token], only present if the Project has one related.|
 | `CI_DEPLOY_USER`                        | 10.8   | all    | Authentication username of the [GitLab Deploy Token][gitlab-deploy-token], only present if the Project has one related.|
 | `CI_DISPOSABLE_ENVIRONMENT`             | all    | 10.1   | Marks that the job is executed in a disposable environment (something that is created only for this job and disposed of/destroyed after the execution - all executors except `shell` and `ssh`). If the environment is disposable, it is set to true, otherwise it is not defined at all. |
 | `CI_ENVIRONMENT_NAME`                   | 8.15   | all    | The name of the environment for this job. Only present if [`environment:name`](../yaml/README.md#environmentname) is set. |
 | `CI_ENVIRONMENT_SLUG`                   | 8.15   | all    | A simplified version of the environment name, suitable for inclusion in DNS, URLs, Kubernetes labels, etc. Only present if [`environment:name`](../yaml/README.md#environmentname) is set. |
 | `CI_ENVIRONMENT_URL`                    | 9.3    | all    | The URL of the environment for this job. Only present if [`environment:url`](../yaml/README.md#environmenturl) is set. |
+| `CI_DEFAULT_BRANCH`                     | 12.4   | all    | The name of the default branch for the project. |
 | `CI_JOB_ID`                             | 9.0    | all    | The unique id of the current job that GitLab CI uses internally |
 | `CI_JOB_MANUAL`                         | 8.12   | all    | The flag to indicate that job was manually started |
 | `CI_JOB_NAME`                           | 9.0    | 0.5    | The name of the job as defined in `.gitlab-ci.yml` |

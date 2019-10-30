@@ -118,6 +118,11 @@ module Ci
 
     scope :eager_load_job_artifacts, -> { includes(:job_artifacts) }
 
+    scope :with_exposed_artifacts, -> do
+      joins(:metadata).merge(Ci::BuildMetadata.with_exposed_artifacts)
+        .includes(:metadata, :job_artifacts_metadata)
+    end
+
     scope :with_artifacts_not_expired, ->() { with_artifacts_archive.where('artifacts_expire_at IS NULL OR artifacts_expire_at > ?', Time.now) }
     scope :with_expired_artifacts, ->() { with_artifacts_archive.where('artifacts_expire_at < ?', Time.now) }
     scope :last_month, ->() { where('created_at > ?', Date.today - 1.month) }
@@ -595,6 +600,14 @@ module Ci
       update_column(:trace, nil)
     end
 
+    def artifacts_expose_as
+      options.dig(:artifacts, :expose_as)
+    end
+
+    def artifacts_paths
+      options.dig(:artifacts, :paths)
+    end
+
     def needs_touch?
       Time.now - updated_at > 15.minutes.to_i
     end
@@ -752,6 +765,10 @@ module Ci
       return false if erased?
 
       true
+    end
+
+    def invalid_dependencies
+      dependencies.reject(&:valid_dependency?)
     end
 
     def runner_required_feature_names

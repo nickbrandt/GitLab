@@ -12,7 +12,7 @@ module Projects
 
           persist_events
           send_alert_email if send_email?
-          process_incident_issues if create_issue?
+          process_incident_issues if process_issues?
 
           true
         end
@@ -41,8 +41,7 @@ module Projects
           incident_management_setting.send_email && firings.any?
         end
 
-        def create_issue?
-          return unless firings.any?
+        def process_issues?
           return unless incident_management_available?
 
           incident_management_setting.create_issue?
@@ -128,7 +127,7 @@ module Projects
         end
 
         def process_incident_issues
-          firings.each do |alert|
+          alerts.each do |alert|
             IncidentManagement::ProcessPrometheusAlertWorker
               .perform_async(project.id, alert.to_h)
           end

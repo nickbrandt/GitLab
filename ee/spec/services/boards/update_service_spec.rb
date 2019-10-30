@@ -68,7 +68,7 @@ describe Boards::UpdateService, services: true do
 
     context '#set_labels' do
       def expect_label_assigned(user, board, input_labels, expected_labels)
-        service = described_class.new(board.parent, user, labels: input_labels.join(','))
+        service = described_class.new(board.resource_parent, user, labels: input_labels.join(','))
         service.execute(board)
 
         expect(board.reload.labels.map(&:title)).to contain_exactly(*expected_labels)
@@ -146,7 +146,7 @@ describe Boards::UpdateService, services: true do
             other_group_label = create(:group_label, title: 'other_group_label')
             label_ids = [group_label.id, label.id, other_project_label.id, other_group_label.id]
 
-            described_class.new(board.parent, user, label_ids: label_ids).execute(board)
+            described_class.new(board.resource_parent, user, label_ids: label_ids).execute(board)
 
             expect(board.reload.labels).to contain_exactly(group_label, label)
           end

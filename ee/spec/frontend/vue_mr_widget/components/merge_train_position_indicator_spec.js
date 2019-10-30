@@ -26,7 +26,7 @@ describe('MergeTrainPositionIndicator', () => {
       it('should return the message with the correct position (i.e., index + 1)', () => {
         factory({ mergeTrainIndex: 3 });
 
-        expect(vm.message).toBe('Added to the merge train at position 4');
+        expect(vm.message).toBe('In the merge train at position 4');
       });
     });
 
@@ -34,7 +34,7 @@ describe('MergeTrainPositionIndicator', () => {
       it('should render the correct message', () => {
         factory({ mergeTrainIndex: 3 });
 
-        expect(trimText(wrapper.text())).toBe('Added to the merge train at position 4');
+        expect(trimText(wrapper.text())).toBe('In the merge train at position 4');
       });
     });
   });

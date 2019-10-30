@@ -3,6 +3,8 @@
 class AdminEmailsWorker
   include ApplicationWorker
 
+  feature_category_not_owned!
+
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(recipient_id, subject, body)
     recipient_list(recipient_id).pluck(:id).uniq.each do |user_id|

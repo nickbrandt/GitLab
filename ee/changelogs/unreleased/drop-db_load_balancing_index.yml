@@ -1,5 +1,0 @@
----
-title: Remove db_load_balancing_index gauge metric
-merge_request: 17561
-author:
-type: removed

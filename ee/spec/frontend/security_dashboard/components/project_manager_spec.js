@@ -3,7 +3,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 
 import createDefaultState from 'ee/security_dashboard/store/modules/project_selector/state';
 
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import ProjectManager from 'ee/security_dashboard/components/project_manager.vue';
@@ -17,7 +17,12 @@ describe('Project Manager component', () => {
   let store;
   let wrapper;
 
-  const factory = ({ stateOverrides = {} } = {}) => {
+  const factory = ({
+    state = {},
+    canAddProjects = false,
+    isSearchingProjects = false,
+    isUpdatingProjects = false,
+  } = {}) => {
     storeOptions = {
       modules: {
         projectSelector: {
@@ -30,9 +35,14 @@ describe('Project Manager component', () => {
             toggleSelectedProject: jest.fn(),
             removeProject: jest.fn(),
           },
+          getters: {
+            canAddProjects: jest.fn().mockReturnValue(canAddProjects),
+            isSearchingProjects: jest.fn().mockReturnValue(isSearchingProjects),
+            isUpdatingProjects: jest.fn().mockReturnValue(isUpdatingProjects),
+          },
           state: {
             ...createDefaultState(),
-            ...stateOverrides,
+            ...state,
           },
         },
       },
@@ -51,7 +61,6 @@ describe('Project Manager component', () => {
   const getMockActionDispatchedPayload = actionName => getMockAction(actionName).mock.calls[0][1];
 
   const getAddProjectsButton = () => wrapper.find(GlButton);
-  const getLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const getProjectList = () => wrapper.find(ProjectList);
   const getProjectSelector = () => wrapper.find(ProjectSelector);
 
@@ -87,18 +96,11 @@ describe('Project Manager component', () => {
       expect(getAddProjectsButton().attributes('disabled')).toBe('true');
     });
 
-    it.each`
-      actionName              | payload
-      ${'addProjects'}        | ${undefined}
-      ${'clearSearchResults'} | ${undefined}
-    `(
-      'dispatches the correct actions when the add-projects button has been clicked',
-      ({ actionName, payload }) => {
-        getAddProjectsButton().vm.$emit('click');
+    it('dispatches the addProjects when the "Add projects" button has been clicked', () => {
+      getAddProjectsButton().vm.$emit('click');
 
-        expect(getMockActionDispatchedPayload(actionName)).toBe(payload);
-      },
-    );
+      expect(getMockAction('addProjects')).toHaveBeenCalled();
+    });
 
     it('contains a project-list component', () => {
       expect(getProjectList().exists()).toBe(true);
@@ -116,26 +118,26 @@ describe('Project Manager component', () => {
     });
   });
 
-  describe('given the state changes', () => {
+  describe('given the store state', () => {
     it.each`
-      state                                   | projectSelectorPropName            | expectedPropValue
-      ${{ searchCount: 1 }}                   | ${'showLoadingIndicator'}          | ${true}
-      ${{ selectedProjects: ['bar'] }}        | ${'selectedProjects'}              | ${['bar']}
-      ${{ projectSearchResults: ['foo'] }}    | ${'projectSearchResults'}          | ${['foo']}
-      ${{ messages: { noResults: true } }}    | ${'showNoResultsMessage'}          | ${true}
-      ${{ messages: { searchError: true } }}  | ${'showSearchErrorMessage'}        | ${true}
-      ${{ messages: { minimumQuery: true } }} | ${'showMinimumSearchQueryMessage'} | ${true}
+      config                                             | projectSelectorPropName            | expectedPropValue
+      ${{ isSearchingProjects: true }}                   | ${'showLoadingIndicator'}          | ${true}
+      ${{ state: { selectedProjects: ['bar'] } }}        | ${'selectedProjects'}              | ${['bar']}
+      ${{ state: { projectSearchResults: ['foo'] } }}    | ${'projectSearchResults'}          | ${['foo']}
+      ${{ state: { messages: { noResults: true } } }}    | ${'showNoResultsMessage'}          | ${true}
+      ${{ state: { messages: { searchError: true } } }}  | ${'showSearchErrorMessage'}        | ${true}
+      ${{ state: { messages: { minimumQuery: true } } }} | ${'showMinimumSearchQueryMessage'} | ${true}
     `(
-      'passes the correct prop-values to the project-selector',
-      ({ state, projectSelectorPropName, expectedPropValue }) => {
-        factory({ stateOverrides: state });
+      'passes $projectSelectorPropName = $expectedPropValue to the project-selector',
+      ({ config, projectSelectorPropName, expectedPropValue }) => {
+        factory(config);
 
         expect(getProjectSelector().props(projectSelectorPropName)).toEqual(expectedPropValue);
       },
     );
 
-    it('enables the add-projects button when at least one projects is selected', () => {
-      factory({ stateOverrides: { selectedProjects: [{}] } });
+    it('enables the add-projects button when projects can be added', () => {
+      factory({ canAddProjects: true });
 
       expect(getAddProjectsButton().attributes('disabled')).toBe(undefined);
     });
@@ -143,21 +145,18 @@ describe('Project Manager component', () => {
     it('passes the list of projects to the project-list component', () => {
       const projects = [{}];
 
-      factory({ stateOverrides: { projects } });
+      factory({ state: { projects } });
 
       expect(getProjectList().props('projects')).toBe(projects);
     });
 
-    it('toggles the loading icon when a project is being added', () => {
-      factory({ stateOverrides: { isAddingProjects: false } });
+    it.each([false, true])(
+      'passes showLoadingIndicator = %p to the project-list component',
+      isUpdatingProjects => {
+        factory({ isUpdatingProjects });
 
-      expect(getLoadingIcon().exists()).toBe(false);
-
-      store.state.projectSelector.isAddingProjects = true;
-
-      return wrapper.vm.$nextTick().then(() => {
-        expect(getLoadingIcon().exists()).toBe(true);
-      });
-    });
+        expect(getProjectList().props('showLoadingIndicator')).toBe(isUpdatingProjects);
+      },
+    );
   });
 });

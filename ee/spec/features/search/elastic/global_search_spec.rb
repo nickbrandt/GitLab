@@ -75,7 +75,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "has a pagination" do
+    it "has a pagination", :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('initial')
@@ -93,7 +93,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "has a pagination" do
+    it "has a pagination", :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('foo')
@@ -112,7 +112,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "finds files" do
+    it "finds files", :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('application.js')
@@ -153,7 +153,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "finds files" do
+    it "finds files", :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('term')
@@ -171,7 +171,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "finds commits" do
+    it "finds commits", :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('add')
@@ -181,7 +181,7 @@ describe 'Global elastic search', :elastic do
       expect(page).to have_selector('.project-namespace')
     end
 
-    it 'shows proper page 2 results' do
+    it 'shows proper page 2 results', :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('add')
@@ -207,7 +207,7 @@ describe 'Global elastic search', :elastic do
       submit_search('project')
     end
 
-    it 'displays result counts for all categories' do
+    it 'displays result counts for all categories', :sidekiq_might_not_need_inline do
       expect(page).to have_content('Projects 1')
       expect(page).to have_content('Issues 1')
       expect(page).to have_content('Merge requests 0')

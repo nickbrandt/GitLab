@@ -22,6 +22,9 @@ FactoryBot.define do
       container_repositories_count { 400 }
       container_repositories_failed_count { 3 }
       container_repositories_synced_count { 200 }
+      design_repositories_count { 400 }
+      design_repositories_failed_count { 3 }
+      design_repositories_synced_count { 200 }
       projects_count { 10 }
       repositories_synced_count { 5 }
       repositories_failed_count { 0 }

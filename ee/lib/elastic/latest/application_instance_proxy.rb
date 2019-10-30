@@ -20,13 +20,16 @@ module Elastic
       private
 
       def generic_attributes
-        {
-          'join_field' => {
+        attributes = { 'type' => es_type }
+
+        if es_parent
+          attributes['join_field'] = {
             'name' => es_type,
             'parent' => es_parent
-          },
-          'type' => es_type
-        }
+          }
+        end
+
+        attributes
       end
     end
   end

@@ -55,7 +55,7 @@ describe Gitlab::Ci::Parsers::Security::DependencyList do
 
   describe '#parse_licenses!' do
     let(:artifact) { create(:ee_ci_job_artifact, :license_management) }
-    let(:dependency_info) { build(:dependency, :with_vulnerabilities) }
+    let(:dependency_info) { build(:dependency, :nokogiri, :with_vulnerabilities) }
 
     before do
       report.add_dependency(dependency)

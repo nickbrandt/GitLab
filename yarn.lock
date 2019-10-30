@@ -990,15 +990,15 @@
   dependencies:
     vue-eslint-parser "^6.0.4"
 
-"@gitlab/svgs@^1.78.0":
-  version "1.78.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.78.0.tgz#469493bd6cdd254eb5d1271edeab22bbbee2f4c4"
-  integrity sha512-dBgEB/Q4FRD0NapmNrD86DF1FsV0uSgTx0UOJloHnGE2DNR2P1HQrCmLW2fX+QgN4P9CDAzdi2buVHuholofWw==
+"@gitlab/svgs@^1.79.0":
+  version "1.79.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.79.0.tgz#7e79666118d6adc0247bdb3b3b6b2b299aa5a439"
+  integrity sha512-0pTUviQqwyaKBOB6OL7Mmr2dQn/dGB03XslBMtL9lFZz1baB7d6xf+zxFU0GBAJUJan397IbBddE1jjUAQT8Fw==
 
-"@gitlab/ui@5.32.0":
-  version "5.32.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-5.32.0.tgz#21bb70b6c8b68bdcbb53ffebde80ff3cd93851c8"
-  integrity sha512-xTFz4/WbR1e6zj2xI2DULcAGicA6qidb9Reoa02V5snqWcQY+iHDup/XzgXmttTPCiBlqPIFo/CMhH4gSJWuPQ==
+"@gitlab/ui@7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-7.0.0.tgz#74ca106856a47e7793df0b7448cbf2903634709c"
+  integrity sha512-uiRV2VuGpWcCpj+d4M6VA8ItyLkTxfzGnaNbyX8UcswInAKjMMDO7KspF9DWlFDJVH5qzDguOSgons9NQJy53g==
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.2.1"
@@ -1008,6 +1008,7 @@
     highlight.js "^9.13.1"
     js-beautify "^1.8.8"
     lodash "^4.17.14"
+    resize-observer-polyfill "^1.5.1"
     url-search-params-polyfill "^5.0.0"
     vue "^2.6.10"
     vue-loader "^15.4.2"
@@ -10530,6 +10531,11 @@ requizzle@~0.2.1:
   integrity sha1-aUPDUwxNmn5G8c3dUcFY/GcM294=
   dependencies:
     underscore "~1.6.0"
+
+resize-observer-polyfill@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
+  integrity sha512-LwZrotdHOo12nQuZlHEmtuXdqGoOD0OhaxopaNFxWzInpEgaLWoVuAMbTzixuosCx2nEG58ngzW3vxdWoxIgdg==
 
 resolve-cwd@^2.0.0:
   version "2.0.0"

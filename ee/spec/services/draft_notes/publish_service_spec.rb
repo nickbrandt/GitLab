@@ -32,7 +32,7 @@ describe DraftNotes::PublishService do
       expect(DraftNote.count).to eq(1)
     end
 
-    it 'does not skip notification' do
+    it 'does not skip notification', :sidekiq_might_not_need_inline do
       expect(Notes::CreateService).to receive(:new).with(project, user, drafts.first.publish_params).and_call_original
       expect_next_instance_of(NotificationService) do |notification_service|
         expect(notification_service).to receive(:new_note)

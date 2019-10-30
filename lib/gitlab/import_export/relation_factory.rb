@@ -292,7 +292,13 @@ module Gitlab
 
             existing_object
           else
-            relation_class.new(parsed_relation_hash)
+            # Because of single-type inheritance, we need to be careful to use the `type` field
+            # See https://gitlab.com/gitlab-org/gitlab/issues/34860#note_235321497
+            inheritance_column = relation_class.try(:inheritance_column)
+            inheritance_attributes = parsed_relation_hash.slice(inheritance_column)
+            object = relation_class.new(inheritance_attributes)
+            object.assign_attributes(parsed_relation_hash)
+            object
           end
         end
       end

@@ -11,7 +11,7 @@ export default {
     state.endpoints.stageData = `${state.endpoints.cycleAnalyticsData}/events/${stageSlug}.json`;
   },
   [types.SET_SELECTED_GROUP](state, group) {
-    state.selectedGroup = group;
+    state.selectedGroup = convertObjectPropsToCamelCase(group, { deep: true });
     state.selectedProjectIds = [];
   },
   [types.SET_SELECTED_PROJECTS](state, projectIds) {
@@ -71,20 +71,19 @@ export default {
     state.isEmptyStage = true;
     state.isLoadingStage = false;
   },
-  [types.REQUEST_CUSTOM_STAGE_FORM_DATA](state) {
-    state.isAddingCustomStage = true;
-    state.isEmptyStage = false;
-    state.isLoadingStageForm = true;
+  [types.REQUEST_GROUP_LABELS](state) {
+    state.labels = [];
+  },
+  [types.RECEIVE_GROUP_LABELS_SUCCESS](state, data = []) {
+    state.labels = data.map(convertObjectPropsToCamelCase);
+  },
+  [types.RECEIVE_GROUP_LABELS_ERROR](state) {
+    state.labels = [];
   },
   [types.HIDE_CUSTOM_STAGE_FORM](state) {
     state.isAddingCustomStage = false;
   },
-  [types.RECEIVE_CUSTOM_STAGE_FORM_DATA_SUCCESS](state, data = []) {
-    state.labels = data.map(convertObjectPropsToCamelCase);
-    state.isLoadingStageForm = false;
-  },
-  [types.RECEIVE_CUSTOM_STAGE_FORM_DATA_ERROR](state) {
-    state.isLoadingStageForm = false;
-    state.labels = [];
+  [types.SHOW_CUSTOM_STAGE_FORM](state) {
+    state.isAddingCustomStage = true;
   },
 };

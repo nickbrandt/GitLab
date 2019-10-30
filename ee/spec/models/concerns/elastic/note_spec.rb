@@ -36,7 +36,7 @@ describe Note, :elastic do
     end
   end
 
-  it "searches notes" do
+  it "searches notes", :sidekiq_might_not_need_inline do
     issue = create :issue
 
     Sidekiq::Testing.inline! do
@@ -75,22 +75,32 @@ describe Note, :elastic do
   end
 
   it "returns json with all needed elements" do
-    note = create :note
+    assignee = create(:user)
+    issue = create(:issue, assignees: [assignee])
+    note = create(:note, noteable: issue, project: issue.project)
 
-    expected_hash_keys = %w(
-      id
-      note
-      project_id
-      noteable_type
-      noteable_id
-      created_at
-      updated_at
-      issue
-      join_field
-      type
-    )
+    expected_hash = note.attributes.extract!(
+      'id',
+      'note',
+      'project_id',
+      'noteable_type',
+      'noteable_id',
+      'created_at',
+      'updated_at'
+    ).merge({
+      'issue' => {
+        'assignee_id' => issue.assignee_ids,
+        'author_id' => issue.author_id,
+        'confidential' => issue.confidential
+      },
+      'type' => note.es_type,
+      'join_field' => {
+        'name' => note.es_type,
+        'parent' => note.es_parent
+      }
+    })
 
-    expect(note.__elasticsearch__.as_indexed_json.keys).to eq(expected_hash_keys)
+    expect(note.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 
   it "does not create ElasticIndexerWorker job for system messages" do
@@ -125,7 +135,7 @@ describe Note, :elastic do
       expect(Note.elastic_search('term', options: options).total_count).to eq(0)
     end
 
-    it "finds note when user is authorized to see it" do
+    it "finds note when user is authorized to see it", :sidekiq_might_not_need_inline do
       user = create :user
       issue = create :issue, :confidential, author: user
 
@@ -140,7 +150,7 @@ describe Note, :elastic do
     end
 
     [:admin, :auditor].each do |user_type|
-      it "finds note for #{user_type}" do
+      it "finds note for #{user_type}", :sidekiq_might_not_need_inline do
         superuser = create(user_type)
         issue = create(:issue, :confidential, author: create(:user))
 
@@ -155,7 +165,7 @@ describe Note, :elastic do
       end
     end
 
-    it "return notes with matching content for project members" do
+    it "return notes with matching content for project members", :sidekiq_might_not_need_inline do
       user = create :user
       issue = create :issue, :confidential, author: user
 

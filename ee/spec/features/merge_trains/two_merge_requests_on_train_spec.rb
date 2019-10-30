@@ -48,7 +48,7 @@ describe 'Two merge requests on a merge train' do
     merge_request_2.reload
   end
 
-  it 'creates a pipeline for merge request 1' do
+  it 'creates a pipeline for merge request 1', :sidekiq_might_not_need_inline do
     expect(merge_request_1.merge_train.pipeline).to be_merge_request_pipeline
     expect(merge_request_1.merge_train.pipeline.user).to eq(maintainer_1)
     expect(merge_request_1.merge_train.pipeline.ref).to eq(merge_request_1.train_ref_path)
@@ -56,7 +56,7 @@ describe 'Two merge requests on a merge train' do
       .to eq(project.repository.commit('refs/heads/master').sha)
   end
 
-  it 'creates a pipeline for merge request 2' do
+  it 'creates a pipeline for merge request 2', :sidekiq_might_not_need_inline do
     expect(merge_request_2.merge_train.pipeline).to be_merge_request_pipeline
     expect(merge_request_2.merge_train.pipeline.user).to eq(maintainer_2)
     expect(merge_request_2.merge_train.pipeline.ref).to eq(merge_request_2.train_ref_path)
@@ -70,7 +70,7 @@ describe 'Two merge requests on a merge train' do
   end
 
   shared_examples_for 'drops merge request 1 from the merge train' do
-    it 'drops merge request 1 from the merge train' do
+    it 'drops merge request 1 from the merge train', :sidekiq_might_not_need_inline do
       expect(merge_request_1).to be_opened
       expect(merge_request_1.merge_train).to be_nil
       expect(merge_request_1.notes.last.note).to eq(system_note)
@@ -78,7 +78,7 @@ describe 'Two merge requests on a merge train' do
   end
 
   shared_examples_for 'has an intact pipeline for merge request 2' do
-    it 'does not create a new pipeline for merge request 2' do
+    it 'does not create a new pipeline for merge request 2', :sidekiq_might_not_need_inline do
       expect(merge_request_2.all_pipelines.count).to eq(1)
     end
 
@@ -89,7 +89,7 @@ describe 'Two merge requests on a merge train' do
         merge_request_2.reload
       end
 
-      it 'merges merge request 2' do
+      it 'merges merge request 2', :sidekiq_might_not_need_inline do
         expect(merge_request_2).to be_merged
         expect(merge_request_2.metrics.merged_by).to eq(maintainer_2)
         expect(merge_request_2.merge_train).to be_nil
@@ -98,7 +98,7 @@ describe 'Two merge requests on a merge train' do
   end
 
   shared_examples_for 're-creates a pipeline for merge request 2' do
-    it 'has recreated pipeline' do
+    it 'has recreated pipeline', :sidekiq_might_not_need_inline do
       expect(merge_request_2.all_pipelines.count).to eq(2)
       expect(merge_request_2.merge_train.pipeline.target_sha)
         .to eq(target_branch_sha)
@@ -111,7 +111,7 @@ describe 'Two merge requests on a merge train' do
         merge_request_2.reload
       end
 
-      it 'merges merge request 2' do
+      it 'merges merge request 2', :sidekiq_might_not_need_inline do
         expect(merge_request_2).to be_merged
         expect(merge_request_2.metrics.merged_by).to eq(maintainer_2)
         expect(merge_request_2.merge_train).to be_nil
@@ -127,7 +127,7 @@ describe 'Two merge requests on a merge train' do
       merge_request_2.reload
     end
 
-    it 'merges merge request 1' do
+    it 'merges merge request 1', :sidekiq_might_not_need_inline do
       expect(merge_request_1).to be_merged
       expect(merge_request_1.metrics.merged_by).to eq(maintainer_1)
       expect(merge_request_1.merge_train).to be_nil
@@ -194,7 +194,7 @@ describe 'Two merge requests on a merge train' do
     end
   end
 
-  context 'when master got a new commit and pipeline for merge request 1 finished' do
+  context 'when master got a new commit and pipeline for merge request 1 finished', :sidekiq_might_not_need_inline do
     before do
       create_file_in_repo(project, 'master', 'master', 'test.txt', 'This is test')
 

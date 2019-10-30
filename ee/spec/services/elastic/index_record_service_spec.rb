@@ -78,8 +78,32 @@ describe Elastic::IndexRecordService, :elastic do
       end
       Gitlab::Elastic::Helper.refresh_index
 
-      ## All database objects + data from repository. The absolute value does not matter
-      expect(Elasticsearch::Model.search('*').total_count).to be > 40
+      # Fetch all child documents
+      children = Elasticsearch::Model.search(
+        size: 100,
+        query: {
+          has_parent: {
+            parent_type: 'project',
+            query: {
+              term: { id: project.id }
+            }
+          }
+        }
+      )
+
+      # The absolute value does not matter
+      expect(children.total_count).to be > 40
+
+      # Make sure all types are present
+      expect(children.pluck(:_source).pluck(:type).uniq).to contain_exactly(
+        'blob',
+        'commit',
+        'issue',
+        'merge_request',
+        'milestone',
+        'note',
+        'snippet'
+      )
     end
 
     it 'does not index records not associated with the project' do

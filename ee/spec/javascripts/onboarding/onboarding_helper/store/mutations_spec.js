@@ -24,6 +24,7 @@ describe('User onboarding helper store mutations', () => {
         createdProjectPath: '',
         exitTour: false,
         tourFeedback: false,
+        dntExitTour: false,
       };
 
       mutations[types.SET_INITIAL_DATA](state, initialData);
@@ -72,6 +73,14 @@ describe('User onboarding helper store mutations', () => {
       mutations[types.SET_FEEDBACK](state, true);
 
       expect(state.tourFeedback).toBeTruthy();
+    });
+  });
+
+  describe('SET_DNT_EXIT_TOUR', () => {
+    it('sets the dntExitTour property to true', () => {
+      mutations[types.SET_DNT_EXIT_TOUR](state, true);
+
+      expect(state.dntExitTour).toBeTruthy();
     });
   });
 

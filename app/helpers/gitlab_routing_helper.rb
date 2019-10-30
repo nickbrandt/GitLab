@@ -66,7 +66,7 @@ module GitlabRoutingHelper
   end
 
   def preview_markdown_path(parent, *args)
-    return group_preview_markdown_path(parent) if parent.is_a?(Group)
+    return group_preview_markdown_path(parent, *args) if parent.is_a?(Group)
 
     if @snippet.is_a?(PersonalSnippet)
       preview_markdown_snippets_path
@@ -76,10 +76,10 @@ module GitlabRoutingHelper
   end
 
   def edit_milestone_path(entity, *args)
-    if entity.parent.is_a?(Group)
-      edit_group_milestone_path(entity.parent, entity, *args)
+    if entity.resource_parent.is_a?(Group)
+      edit_group_milestone_path(entity.resource_parent, entity, *args)
     else
-      edit_project_milestone_path(entity.parent, entity, *args)
+      edit_project_milestone_path(entity.resource_parent, entity, *args)
     end
   end
 

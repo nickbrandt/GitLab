@@ -57,5 +57,21 @@ export const EXIT_TOUR_CONTENT = {
     },
     false,
   ),
+  buttonText: s__("UserOnboardingTour|Close 'Learn GitLab'"),
+  exitTour: true,
+};
+
+export const DNT_EXIT_TOUR_CONTENT = {
+  text: sprintf(
+    s__(
+      'UserOnboardingTour|Thanks for taking the guided tour. Remember, if you want to go through it again, you can start %{emphasisStart}Learn GitLab%{emphasisEnd} in the help menu on the top right.',
+    ),
+    {
+      emphasisStart: '<strong>',
+      emphasisEnd: '</strong>',
+    },
+    false,
+  ),
+  buttonText: s__('UserOnboardingTour|Got it'),
   exitTour: true,
 };

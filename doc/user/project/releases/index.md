@@ -65,6 +65,38 @@ project.
 
 ![Releases list](img/releases.png)
 
+## Notification for Releases
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/26001) in GitLab 12.4.
+
+You can be notified by email when a new Release is created for your project.
+
+To subscribe to these notifications, navigate to your **Project**'s landing page, then click on the
+bell icon. Choose **Custom** from the dropdown menu. The
+following modal window will be then displayed, from which you can select **New release** to complete your subscription to new Releases notifications.
+
+![Custom notification - New release](img/custom_notifications_new_release_v12_4.png)
+
+## Add release notes to Git tags
+
+You can add release notes to any Git tag using the notes feature. Release notes
+behave like any other markdown form in GitLab so you can write text and
+drag and drop files to it. Release notes are stored in GitLab's database.
+
+There are several ways to add release notes:
+
+- In the interface, when you create a new Git tag
+- In the interface, by adding a note to an existing Git tag
+- Using the GitLab API
+
+### New tag page with release notes text area
+
+![new_tag](img/new_tag.png)
+
+### Tags page with button to add or edit release notes for existing Git tag
+
+![tags](img/tags.png)
+
 <!-- ## Troubleshooting
 
 Include any troubleshooting steps that you can foresee. If you know beforehand what issues

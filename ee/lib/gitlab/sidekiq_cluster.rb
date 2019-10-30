@@ -64,14 +64,16 @@ module Gitlab
     # directory - The directory of the Rails application.
     #
     # Returns an Array containing the PIDs of the started processes.
-    def self.start(queues, env, directory = Dir.pwd, max_concurrency = 50, dryrun: false)
-      queues.map { |pair| start_sidekiq(pair, env, directory, max_concurrency, dryrun: dryrun) }
+    def self.start(queues, env: :development, directory: Dir.pwd, max_concurrency: 50, dryrun: false)
+      queues.map.with_index do |pair, index|
+        start_sidekiq(pair, env: env, directory: directory, max_concurrency: max_concurrency, worker_id: index, dryrun: dryrun)
+      end
     end
 
     # Starts a Sidekiq process that processes _only_ the given queues.
     #
     # Returns the PID of the started process.
-    def self.start_sidekiq(queues, env, directory = Dir.pwd, max_concurrency = 50, dryrun: false)
+    def self.start_sidekiq(queues, env:, directory:, max_concurrency:, worker_id:, dryrun:)
       counts = count_by_queue(queues)
 
       cmd = %w[bundle exec sidekiq]
@@ -90,7 +92,8 @@ module Gitlab
       end
 
       pid = Process.spawn(
-        { 'ENABLE_SIDEKIQ_CLUSTER' => '1' },
+        { 'ENABLE_SIDEKIQ_CLUSTER' => '1',
+          'SIDEKIQ_WORKER_ID' => worker_id.to_s },
         *cmd,
         pgroup: true,
         err: $stderr,

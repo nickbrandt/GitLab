@@ -76,6 +76,10 @@ class Project < ApplicationRecord
 
   delegate :no_import?, to: :import_state, allow_nil: true
 
+  # TODO: remove once GitLab 12.5 is released
+  # https://gitlab.com/gitlab-org/gitlab/issues/34638
+  self.ignored_columns += %i[merge_requests_require_code_owner_approval]
+
   default_value_for :archived, false
   default_value_for :resolve_outdated_diff_discussions, false
   default_value_for :container_registry_enabled, gitlab_config_features.container_registry
@@ -87,6 +91,7 @@ class Project < ApplicationRecord
   default_value_for :wiki_enabled, gitlab_config_features.wiki
   default_value_for :snippets_enabled, gitlab_config_features.snippets
   default_value_for :only_allow_merge_if_all_discussions_are_resolved, false
+  default_value_for :remove_source_branch_after_merge, true
 
   add_authentication_token_field :runners_token, encrypted: -> { Feature.enabled?(:projects_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
 
@@ -1036,8 +1041,8 @@ class Project < ApplicationRecord
     end
   end
 
-  def web_url
-    Gitlab::Routing.url_helpers.project_url(self)
+  def web_url(only_path: nil)
+    Gitlab::Routing.url_helpers.project_url(self, only_path: only_path)
   end
 
   def readme_url
@@ -1316,7 +1321,18 @@ class Project < ApplicationRecord
   end
 
   def http_url_to_repo
-    "#{web_url}.git"
+    custom_root = Gitlab::CurrentSettings.custom_http_clone_url_root
+
+    project_url = if custom_root.present?
+                    Gitlab::Utils.append_path(
+                      custom_root,
+                      web_url(only_path: true)
+                    )
+                  else
+                    web_url
+                  end
+
+    "#{project_url}.git"
   end
 
   # Is overridden in EE

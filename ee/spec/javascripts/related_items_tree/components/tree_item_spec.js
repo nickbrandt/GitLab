@@ -10,12 +10,13 @@ import TreeRoot from 'ee/related_items_tree/components/tree_root.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { ChildType } from 'ee/related_items_tree/constants';
+import { PathIdSeparator } from 'ee/related_issues/constants';
 
 import { mockParentItem, mockQueryResponse, mockEpic1 } from '../mock_data';
 
 const mockItem = Object.assign({}, mockEpic1, {
   type: ChildType.Epic,
-  pathIdSeparator: '&',
+  pathIdSeparator: PathIdSeparator.Epic,
 });
 
 const createComponent = (parentItem = mockParentItem, item = mockItem) => {

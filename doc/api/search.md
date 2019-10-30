@@ -300,6 +300,7 @@ Example response:
   {
     "basename": "home",
     "data": "hello\n\nand bye\n\nend",
+    "path": "home.md",
     "filename": "home.md",
     "id": null,
     "ref": "master",
@@ -308,6 +309,8 @@ Example response:
   }
 ]
 ```
+
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
 
 ### Scope: commits **(STARTER)**
 
@@ -368,6 +371,7 @@ Example response:
   {
     "basename": "README",
     "data": "```\n\n## Installation\n\nQuick start using the [pre-built",
+    "path": "README.md",
     "filename": "README.md",
     "id": null,
     "ref": "master",
@@ -376,6 +380,8 @@ Example response:
   }
 ]
 ```
+
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
 
 ### Scope: users
 
@@ -635,6 +641,7 @@ Example response:
   {
     "basename": "home",
     "data": "hello\n\nand bye\n\nend",
+    "path": "home.md",
     "filename": "home.md",
     "id": null,
     "ref": "master",
@@ -643,6 +650,8 @@ Example response:
   }
 ]
 ```
+
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
 
 ### Scope: commits **(STARTER)**
 
@@ -703,6 +712,7 @@ Example response:
   {
     "basename": "README",
     "data": "```\n\n## Installation\n\nQuick start using the [pre-built",
+    "path": "README.md",
     "filename": "README.md",
     "id": null,
     "ref": "master",
@@ -711,6 +721,8 @@ Example response:
   }
 ]
 ```
+
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
 
 ### Scope: users
 
@@ -984,6 +996,7 @@ Example response:
   {
     "basename": "home",
     "data": "hello\n\nand bye\n\nend",
+    "path": "home.md",
     "filename": "home.md",
     "id": null,
     "ref": "master",
@@ -992,6 +1005,8 @@ Example response:
   }
 ]
 ```
+
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
 
 ### Scope: commits
 
@@ -1054,6 +1069,7 @@ Example response:
   {
     "basename": "README",
     "data": "```\n\n## Installation\n\nQuick start using the [pre-built",
+    "path": "README.md",
     "filename": "README.md",
     "id": null,
     "ref": "master",
@@ -1062,6 +1078,8 @@ Example response:
   }
 ]
 ```
+
+**Note:** `filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path (see [this issue][gitlab-34521]).
 
 ### Scope: users
 
@@ -1085,3 +1103,4 @@ Example response:
 ```
 
 [ce-41763]: https://gitlab.com/gitlab-org/gitlab-foss/issues/41763
+[gitlab-34521]: https://gitlab.com/gitlab-org/gitlab/issues/34521

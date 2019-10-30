@@ -4,6 +4,7 @@ class ImportSoftwareLicensesWorker
   include ApplicationWorker
 
   queue_namespace :cronjob
+  feature_category :license_compliance
 
   def perform
     catalogue.each do |spdx_license|

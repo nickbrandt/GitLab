@@ -36,7 +36,8 @@ export const addProjects = ({ state, dispatch }) => {
       project_ids: state.selectedProjects.map(p => p.id),
     })
     .then(response => dispatch('receiveAddProjectsSuccess', response.data))
-    .catch(() => dispatch('receiveAddProjectsError'));
+    .catch(() => dispatch('receiveAddProjectsError'))
+    .finally(() => dispatch('clearSearchResults'));
 };
 
 export const requestAddProjects = ({ commit }) => {

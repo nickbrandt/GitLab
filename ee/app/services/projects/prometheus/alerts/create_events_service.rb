@@ -16,34 +16,15 @@ module Projects
         end
 
         def create_event(payload)
-          return unless payload.respond_to?(:dig)
+          parsed_alert = Gitlab::Alerting::Alert.new(project: project, payload: payload)
 
-          status = payload.dig('status')
-          return unless status
+          return unless parsed_alert.valid?
 
-          started_at = validate_date(payload['startsAt'])
-          return unless started_at
-
-          ended_at = validate_date(payload['endsAt'])
-          return unless ended_at
-
-          gitlab_alert_id = payload.dig('labels', 'gitlab_alert_id')
-          return unless gitlab_alert_id
-
-          alert = find_alert(gitlab_alert_id)
-          return unless alert
-
-          payload_key = PrometheusAlertEvent.payload_key_for(gitlab_alert_id, started_at)
-          event = PrometheusAlertEvent.find_or_initialize_by_payload_key(project, alert, payload_key)
-
-          result = case status
-                   when 'firing'
-                     event.fire(started_at)
-                   when 'resolved'
-                     event.resolve(ended_at)
-                   end
-
-          event if result
+          if parsed_alert.gitlab_managed?
+            create_managed_prometheus_alert_event(parsed_alert)
+          else
+            create_self_managed_prometheus_alert_event(parsed_alert)
+          end
         end
 
         def alerts
@@ -57,12 +38,36 @@ module Projects
             .first
         end
 
-        def validate_date(date)
-          return unless date
+        def create_managed_prometheus_alert_event(parsed_alert)
+          alert = find_alert(parsed_alert.metric_id)
+          payload_key = PrometheusAlertEvent.payload_key_for(parsed_alert.metric_id, parsed_alert.starts_at_raw)
 
-          Time.rfc3339(date)
-          date
-        rescue ArgumentError
+          event = PrometheusAlertEvent.find_or_initialize_by_payload_key(parsed_alert.project, alert, payload_key)
+
+          set_status(parsed_alert, event)
+        end
+
+        def create_self_managed_prometheus_alert_event(parsed_alert)
+          payload_key = SelfManagedPrometheusAlertEvent.payload_key_for(parsed_alert.starts_at_raw, parsed_alert.title, parsed_alert.full_query)
+
+          event = SelfManagedPrometheusAlertEvent.find_or_initialize_by_payload_key(parsed_alert.project, payload_key) do |event|
+            event.environment      = parsed_alert.environment
+            event.title            = parsed_alert.title
+            event.query_expression = parsed_alert.full_query
+          end
+
+          set_status(parsed_alert, event)
+        end
+
+        def set_status(parsed_alert, event)
+          persisted = case parsed_alert.status
+                      when 'firing'
+                        event.fire(parsed_alert.starts_at)
+                      when 'resolved'
+                        event.resolve(parsed_alert.ends_at)
+                      end
+
+          event if persisted
         end
       end
     end

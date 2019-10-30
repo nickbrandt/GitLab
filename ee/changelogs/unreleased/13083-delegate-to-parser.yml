@@ -1,5 +1,0 @@
----
-title: Decouple dependency list parser from v1.0 license scanning report
-merge_request: 18103
-author:
-type: fixed

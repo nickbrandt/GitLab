@@ -3,10 +3,6 @@
 module Elastic
   module Latest
     class MergeRequestClassProxy < ApplicationClassProxy
-      def nested?
-        true
-      end
-
       def elastic_search(query, options: {})
         query_hash =
           if query =~ /\!(\d+)\z/

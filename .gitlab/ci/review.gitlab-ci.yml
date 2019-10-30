@@ -1,7 +1,6 @@
 .except-deploys:
   except:
     refs:
-      - /^[\d-]+-stable(-ee)?$/
       - /^\d+-\d+-auto-deploy-\d+$/
 
 .review-docker:
@@ -36,14 +35,12 @@ build-qa-image:
     - echo "${CI_JOB_TOKEN}" | docker login --username gitlab-ci-token --password-stdin ${CI_REGISTRY}
     - time docker push ${QA_IMAGE}
 
-schedule:review-cleanup:
+.base-review-cleanup:
   extends:
     - .default-tags
     - .default-retry
     - .default-only
     - .only-code-qa-changes
-    - .only-review-schedules
-    - .except-deploys
   stage: prepare
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-charts-build-base
   allow_failure: true
@@ -55,6 +52,16 @@ schedule:review-cleanup:
     - install_gitlab_gem
   script:
     - ruby -rrubygems scripts/review_apps/automated_cleanup.rb
+
+schedule:review-cleanup:
+  extends:
+    - .base-review-cleanup
+    - .only-review-schedules
+
+manual:review-cleanup:
+  extends:
+    - .base-review-cleanup
+  when: manual
 
 .review-build-cng-base:
   extends:
@@ -97,7 +104,10 @@ schedule:review-build-cng:
   variables:
     HOST_SUFFIX: "${CI_ENVIRONMENT_SLUG}"
     DOMAIN: "-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}"
-    GITLAB_HELM_CHART_REF: "v2.3.7"
+    # v2.3.7 + some stability improvements not yet released:
+    # - sidekiq readinessProbe should be `pgrep -f sidekiq`: https://gitlab.com/gitlab-org/charts/gitlab/merge_requests/991
+    # - Allows livenessProbe and readinessProbe to be configured for unicorn: https://gitlab.com/gitlab-org/charts/gitlab/merge_requests/985
+    GITLAB_HELM_CHART_REF: "df7c52dc69df441909880b8f2fd15e938cdb2047"
     GITLAB_EDITION: "ce"
   environment:
     name: review/${CI_COMMIT_REF_NAME}

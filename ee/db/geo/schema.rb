@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_07_122326) do
+ActiveRecord::Schema.define(version: 2019_10_25_194337) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -75,6 +75,20 @@ ActiveRecord::Schema.define(version: 2019_10_07_122326) do
     t.index ["artifact_id"], name: "index_job_artifact_registry_on_artifact_id"
     t.index ["retry_at"], name: "index_job_artifact_registry_on_retry_at"
     t.index ["success"], name: "index_job_artifact_registry_on_success"
+  end
+
+  create_table "lfs_object_registry", force: :cascade do |t|
+    t.datetime_with_timezone "created_at"
+    t.datetime_with_timezone "retry_at"
+    t.bigint "bytes"
+    t.integer "lfs_object_id"
+    t.integer "retry_count"
+    t.boolean "missing_on_primary", default: false, null: false
+    t.boolean "success", default: false, null: false
+    t.binary "sha256"
+    t.index ["lfs_object_id"], name: "index_lfs_object_registry_on_lfs_object_id", unique: true
+    t.index ["retry_at"], name: "index_lfs_object_registry_on_retry_at"
+    t.index ["success"], name: "index_lfs_object_registry_on_success"
   end
 
   create_table "project_registry", id: :serial, force: :cascade do |t|

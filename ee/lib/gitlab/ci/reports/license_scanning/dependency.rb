@@ -5,6 +5,7 @@ module Gitlab
     module Reports
       module LicenseScanning
         class Dependency
+          attr_accessor :path
           attr_reader :name
 
           def initialize(name)

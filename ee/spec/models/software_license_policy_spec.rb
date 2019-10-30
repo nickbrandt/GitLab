@@ -15,6 +15,7 @@ describe SoftwareLicensePolicy do
 
   describe ".with_license_by_name" do
     subject { described_class }
+
     let!(:mit_policy) { create(:software_license_policy, software_license: mit) }
     let!(:mit) { create(:software_license, :mit) }
     let!(:apache_policy) { create(:software_license_policy, software_license: apache) }

@@ -29,7 +29,7 @@ describe Ci::ProcessPipelineService, '#execute' do
       stub_ci_pipeline_to_return_yaml_file
     end
 
-    it 'creates a downstream cross-project pipeline' do
+    it 'creates a downstream cross-project pipeline', :sidekiq_might_not_need_inline do
       pipeline.process!
 
       expect_statuses(%w[test pending], %w[cross created], %w[deploy created])

@@ -6,6 +6,28 @@ const expectNotImplemented = action => {
   });
 };
 
+describe('TOGGLE_LABELS', () => {
+  it('toggles isShowingLabels from true to false', () => {
+    const state = {
+      isShowingLabels: true,
+    };
+
+    mutations.TOGGLE_LABELS(state);
+
+    expect(state.isShowingLabels).toBe(false);
+  });
+
+  it('toggles isShowingLabels from false to true', () => {
+    const state = {
+      isShowingLabels: false,
+    };
+
+    mutations.TOGGLE_LABELS(state);
+
+    expect(state.isShowingLabels).toBe(true);
+  });
+});
+
 describe('REQUEST_AVAILABLE_BOARDS', () => {
   expectNotImplemented(mutations.REQUEST_AVAILABLE_BOARDS);
 });

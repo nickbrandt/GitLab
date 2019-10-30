@@ -487,6 +487,9 @@ in the first place, and thus not realize that it needs to re-apply the old confi
 
 > Introduced in [GitLab Ultimate][ee] 10.4.
 
+This is an optional step, since it requires a [review app](#auto-review-apps).
+If that requirement is not met, the job will be silently skipped.
+
 Dynamic Application Security Testing (DAST) uses the
 popular open source tool [OWASP ZAProxy](https://github.com/zaproxy/zaproxy)
 to perform an analysis on the current code and checks for potential security
@@ -497,6 +500,29 @@ later download and check out.
 
 Any security warnings are also shown in the merge request widget. Read how
 [DAST works](../../user/application_security/dast/index.md).
+
+On your default branch, DAST scans an app deployed specifically for that purpose.
+The app is deleted after DAST has run.
+
+On feature branches, DAST scans the [review app](#auto-review-apps).
+
+#### Overriding the DAST target
+
+To use a custom target instead of the auto-deployed review apps,
+set a `DAST_WEBSITE` environment variable to the URL for DAST to scan.
+
+NOTE: **Note:**
+If [DAST Full Scan](../../user/application_security/dast/index.md#full-scan) is enabled, it is strongly advised **not**
+to set `DAST_WEBSITE` to any staging or production environment. DAST Full Scan
+actively attacks the target, which can take down the application and lead to
+data loss or corruption.
+
+#### Disabling Auto DAST
+
+DAST can be disabled:
+
+- On all branches by setting the `DAST_DISABLED` environment variable to `"true"`.
+- Only on the default branch by setting the `DAST_DISABLED_FOR_DEFAULT_BRANCH` environment variable to `"true"`.
 
 ### Auto Browser Performance Testing **(PREMIUM)**
 
@@ -898,6 +924,7 @@ applications.
 | `AUTO_DEVOPS_CHART_REPOSITORY_NAME`     | From GitLab 11.11, used to set the name of the Helm repository. Defaults to `gitlab`. |
 | `AUTO_DEVOPS_CHART_REPOSITORY_USERNAME` | From GitLab 11.11, used to set a username to connect to the Helm repository. Defaults to no credentials. Also set `AUTO_DEVOPS_CHART_REPOSITORY_PASSWORD`. |
 | `AUTO_DEVOPS_CHART_REPOSITORY_PASSWORD` | From GitLab 11.11, used to set a password to connect to the Helm repository. Defaults to no credentials. Also set `AUTO_DEVOPS_CHART_REPOSITORY_USERNAME`. |
+| `AUTO_DEVOPS_MODSECURITY_SEC_RULE_ENGINE` | From GitLab 12.5, used in combination with [Modsecurity feature flag](../../user/clusters/applications.md#web-application-firewall-modsecurity) to toggle [Modsecurity's `SecRuleEngine`](https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-(v2.x)#SecRuleEngine) behavior. Defaults to `DetectionOnly`. |
 | `BUILDPACK_URL`                         | Buildpack's full URL. Can point to either Git repositories or a tarball URL. For Git repositories, it is possible to point to a specific `ref`. For example `https://github.com/heroku/heroku-buildpack-ruby.git#v142`. |
 | `CANARY_ENABLED`                        | From GitLab 11.0, used to define a [deploy policy for canary environments](#deploy-policy-for-canary-environments-premium). |
 | `CANARY_PRODUCTION_REPLICAS`            | Number of canary replicas to deploy for [Canary Deployments](../../user/project/canary_deployments.md) in the production environment. Takes precedence over `CANARY_REPLICAS`. Defaults to 1. |

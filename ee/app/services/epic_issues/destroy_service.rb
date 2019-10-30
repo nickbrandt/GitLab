@@ -4,7 +4,8 @@ module EpicIssues
   class DestroyService < IssuableLinks::DestroyService
     def execute
       result = super
-      link.epic.update_start_and_due_dates
+      Epics::UpdateDatesService.new([link.epic]).execute
+
       result
     end
 

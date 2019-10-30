@@ -17,7 +17,7 @@ module Analytics
         end
 
         def persisted_stages
-          parent.cycle_analytics_stages
+          parent.cycle_analytics_stages.ordered
         end
       end
     end

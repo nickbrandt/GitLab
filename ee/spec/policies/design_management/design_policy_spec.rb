@@ -94,6 +94,11 @@ describe DesignManagement::DesignPolicy do
     end
   end
 
+  shared_examples_for "read-only design abilities" do
+    it { is_expected.to be_allowed(:read_design) }
+    it { is_expected.to be_disallowed(:create_design, :destroy_design) }
+  end
+
   context "when the feature flag is off" do
     before do
       stub_licensed_features(design_management: true)
@@ -164,6 +169,20 @@ describe DesignManagement::DesignPolicy do
       end
     end
 
+    context "when the issue is locked" do
+      let(:current_user) { owner }
+      let(:issue) { create(:issue, :locked, project: project) }
+
+      it_behaves_like "read-only design abilities"
+    end
+
+    context "when the issue has moved" do
+      let(:current_user) { owner }
+      let(:issue) { create(:issue, project: project, moved_to: create(:issue)) }
+
+      it_behaves_like "read-only design abilities"
+    end
+
     context "when the project is archived" do
       let(:current_user) { owner }
 
@@ -171,10 +190,7 @@ describe DesignManagement::DesignPolicy do
         project.update!(archived: true)
       end
 
-      it "only allows reading designs" do
-        expect(design_policy).to be_allowed(:read_design)
-        expect(design_policy).to be_disallowed(:create_design, :destroy_design)
-      end
+      it_behaves_like "read-only design abilities"
     end
   end
 end

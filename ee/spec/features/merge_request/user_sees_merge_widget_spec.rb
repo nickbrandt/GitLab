@@ -70,7 +70,7 @@ describe 'Merge request > User sees merge widget', :js do
       let(:traits) { [:with_detached_merge_request_pipeline] }
       let(:options) { {} }
 
-      it 'shows a warning that fork project cannot create merge request pipelines' do
+      it 'shows a warning that fork project cannot create merge request pipelines', :sidekiq_might_not_need_inline do
         visit project_merge_request_path(project, merge_request)
 
         within('.warning_message') do

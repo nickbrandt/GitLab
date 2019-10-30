@@ -2,6 +2,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'helpers/test_constants';
+import createFlash from '~/flash';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import {
@@ -17,12 +18,13 @@ const stageData = { events: [] };
 const error = new Error('Request failed with status code 404');
 const groupPath = 'cool-group';
 const groupLabelsEndpoint = `/groups/${groupPath}/-/labels`;
+const flashErrorMessage = 'There was an error while fetching cycle analytics data.';
 
 describe('Cycle analytics actions', () => {
   let state;
   let mock;
 
-  function shouldFlashAnError(msg = 'There was an error while fetching cycle analytics data.') {
+  function shouldFlashAnError(msg = flashErrorMessage) {
     expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(msg);
   }
 
@@ -166,21 +168,21 @@ describe('Cycle analytics actions', () => {
     });
   });
 
-  describe('fetchCustomStageFormData', () => {
+  describe('fetchGroupLabels', () => {
     beforeEach(() => {
       mock.onGet(groupLabelsEndpoint).replyOnce(200, groupLabels);
     });
 
-    it('dispatches receiveCustomStageFormData if the request succeeds', done => {
+    it('dispatches receiveGroupLabels if the request succeeds', done => {
       testAction(
-        actions.fetchCustomStageFormData,
+        actions.fetchGroupLabels,
         groupPath,
         state,
         [],
         [
-          { type: 'requestCustomStageFormData' },
+          { type: 'requestGroupLabels' },
           {
-            type: 'receiveCustomStageFormDataSuccess',
+            type: 'receiveGroupLabelsSuccess',
             payload: groupLabels,
           },
         ],
@@ -188,16 +190,16 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    it('dispatches receiveCustomStageFormDataError if the request fails', done => {
+    it('dispatches receiveGroupLabelsError if the request fails', done => {
       testAction(
-        actions.fetchCustomStageFormData,
+        actions.fetchGroupLabels,
         'this-path-does-not-exist',
         state,
         [],
         [
-          { type: 'requestCustomStageFormData' },
+          { type: 'requestGroupLabels' },
           {
-            type: 'receiveCustomStageFormDataError',
+            type: 'receiveGroupLabelsError',
             payload: error,
           },
         ],
@@ -205,16 +207,16 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    describe('receiveCustomStageFormDataError', () => {
+    describe('receiveGroupLabelsError', () => {
       beforeEach(() => {
         setFixtures('<div class="flash-container"></div>');
       });
       it('flashes an error message if the request fails', () => {
-        actions.receiveCustomStageFormDataError({
+        actions.receiveGroupLabelsError({
           commit: () => {},
         });
 
-        shouldFlashAnError('There was an error fetching data for the form');
+        shouldFlashAnError('There was an error fetching label data for the selected group');
       });
     });
   });
@@ -301,6 +303,24 @@ describe('Cycle analytics actions', () => {
         [],
         done,
       );
+    });
+
+    it('removes an existing flash error if present', () => {
+      const commit = jest.fn();
+      const dispatch = jest.fn();
+      const stateWithStages = {
+        ...state,
+        stages,
+      };
+      createFlash(flashErrorMessage);
+
+      const flashAlert = document.querySelector('.flash-alert');
+
+      expect(flashAlert).toBeVisible();
+
+      actions.receiveCycleAnalyticsDataSuccess({ commit, dispatch, state: stateWithStages });
+
+      expect(flashAlert.style.opacity).toBe('0');
     });
 
     it("dispatches the 'setStageDataEndpoint' and 'fetchStageData' actions", done => {

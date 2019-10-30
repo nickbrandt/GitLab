@@ -9,24 +9,6 @@ class Analytics::TasksByTypeController < Analytics::ApplicationController
   before_action :validate_label_ids
   before_action :prepare_date_range
 
-  # Mocked data, this will be replaced with real implementation
-  class TasksByType
-    LabelCountResult = Struct.new(:label, :series)
-
-    def counts_by_labels
-      [
-        LabelCountResult.new(GroupLabel.new(id: 1, title: 'label 1'), [
-          ["2018-01-01", 23],
-          ["2018-01-02", 5]
-        ]),
-        LabelCountResult.new(GroupLabel.new(id: 2, title: 'label 3'), [
-          ["2018-01-01", 3],
-          ["2018-01-03", 10]
-        ])
-      ]
-    end
-  end
-
   def show
     render json: Analytics::TasksByTypeLabelEntity.represent(counts_by_labels)
   end
@@ -34,7 +16,13 @@ class Analytics::TasksByTypeController < Analytics::ApplicationController
   private
 
   def counts_by_labels
-    TasksByType.new.counts_by_labels
+    Gitlab::Analytics::TypeOfWork::TasksByType.new(group: @group, current_user: current_user, params: {
+      subject: params[:subject],
+      label_ids: Array(params[:label_ids]),
+      project_ids: Array(params[:project_ids]),
+      created_after: @created_after.to_time.utc.beginning_of_day,
+      created_before: @created_before.to_time.utc.end_of_day
+    }).counts_by_labels
   end
 
   def validate_label_ids

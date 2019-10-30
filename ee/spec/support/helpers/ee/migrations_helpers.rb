@@ -22,7 +22,7 @@ module EE
     override :migrations_paths
     def migrations_paths
       if geo_migration?
-        ::Gitlab::Geo::DatabaseTasks.geo_migrate_path
+        ::Gitlab::Geo::DatabaseTasks.geo_migrations_paths
       else
         super
       end

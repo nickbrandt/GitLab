@@ -5,7 +5,7 @@ class Admin::AuditLogsController < Admin::ApplicationController
   PER_PAGE = 25
 
   def index
-    @events = LogFinder.new(audit_logs_params).execute.page(params[:page]).per(PER_PAGE)
+    @events = AuditLogFinder.new(audit_logs_params).execute.page(params[:page]).per(PER_PAGE)
     @entity = case audit_logs_params[:entity_type]
               when 'User'
                 User.find_by_id(audit_logs_params[:entity_id])

@@ -211,6 +211,13 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         expect(CustomIssueTrackerService.first).not_to be_nil
       end
 
+      it 'restores zoom meetings' do
+        meetings = @project.issues.first.zoom_meetings
+
+        expect(meetings.count).to eq(1)
+        expect(meetings.first.url).to eq('https://zoom.us/j/123456789')
+      end
+
       context 'Merge requests' do
         it 'always has the new project as a target' do
           expect(MergeRequest.find_by_title('MR1').target_project).to eq(@project)
@@ -282,6 +289,10 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
         it 'correctly restores association between a pipeline and a job' do
           expect(CommitStatus.all).to all(have_attributes(pipeline_id: a_value > 0))
+        end
+
+        it 'restores a Hash for CommitStatus options' do
+          expect(CommitStatus.all.map(&:options).compact).to all(be_a(Hash))
         end
       end
     end
@@ -434,6 +445,11 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
                       labels: 0,
                       milestones: 0,
                       first_issue_labels: 1
+
+      it 'restores issue states' do
+        expect(project.issues.with_state(:closed).count).to eq(1)
+        expect(project.issues.with_state(:opened).count).to eq(1)
+      end
     end
 
     context 'with existing group models' do

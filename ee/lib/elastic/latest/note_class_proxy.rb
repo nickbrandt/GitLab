@@ -7,10 +7,6 @@ module Elastic
         'note'
       end
 
-      def nested?
-        true
-      end
-
       def elastic_search(query, options: {})
         options[:in] = ['note']
 

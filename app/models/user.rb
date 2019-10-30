@@ -59,7 +59,7 @@ class User < ApplicationRecord
   # Removed in GitLab 12.3. Keep until after 2019-09-22.
   self.ignored_columns += %i[support_bot]
 
-  MINIMUM_INACTIVE_DAYS = 14
+  MINIMUM_INACTIVE_DAYS = 180
 
   # Override Devise::Models::Trackable#update_tracked_fields!
   # to limit database writes to at most once every hour
@@ -230,6 +230,10 @@ class User < ApplicationRecord
   # User's Project preference
   # Note: When adding an option, it MUST go on the end of the array.
   enum project_view: [:readme, :activity, :files]
+
+  # User's role
+  # Note: When adding an option, it MUST go on the end of the array.
+  enum role: [:software_developer, :development_team_lead, :devops_engineer, :systems_administrator, :security_analyst, :data_analyst, :product_manager, :product_designer, :other], _suffix: true
 
   delegate :path, to: :namespace, allow_nil: true, prefix: true
   delegate :notes_filter_for, to: :user_preference
@@ -1317,14 +1321,27 @@ class User < ApplicationRecord
     notification_group&.notification_email_for(self) || notification_email
   end
 
-  def notification_settings_for(source)
+  def notification_settings_for(source, inherit: false)
     if notification_settings.loaded?
       notification_settings.find do |notification|
         notification.source_type == source.class.base_class.name &&
           notification.source_id == source.id
       end
     else
-      notification_settings.find_or_initialize_by(source: source)
+      notification_settings.find_or_initialize_by(source: source) do |ns|
+        next unless source.is_a?(Group) && inherit
+
+        # If we're here it means we're trying to create a NotificationSetting for a group that doesn't have one.
+        # Find the closest parent with a notification_setting that's not Global level, or that has an email set.
+        ancestor_ns = source
+                        .notification_settings(hierarchy_order: :asc)
+                        .where(user: self)
+                        .find_by('level != ? OR notification_email IS NOT NULL', NotificationSetting.levels[:global])
+        # Use it to seed the settings
+        ns.assign_attributes(ancestor_ns&.slice(*NotificationSetting.allowed_fields))
+        ns.source = source
+        ns.user = self
+      end
     end
   end
 
@@ -1557,6 +1574,20 @@ class User < ApplicationRecord
 
     [last_activity, last_sign_in].compact.max
   end
+
+  # Below is used for the signup_flow experiment. Should be removed
+  # when experiment finishes.
+  # See https://gitlab.com/gitlab-org/growth/engineering/issues/64
+  REQUIRES_ROLE_VALUE = 99
+
+  def role_required?
+    role_before_type_cast == REQUIRES_ROLE_VALUE
+  end
+
+  def set_role_required!
+    update_column(:role, REQUIRES_ROLE_VALUE)
+  end
+  # End of signup_flow experiment methods
 
   # @deprecated
   alias_method :owned_or_masters_groups, :owned_or_maintainers_groups

@@ -1,5 +1,4 @@
 import { s__ } from '~/locale';
-import { issuableTypesMap } from 'ee/related_issues/constants';
 
 export const ChildType = {
   // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
@@ -11,11 +10,6 @@ export const ChildType = {
 export const ChildState = {
   Open: 'opened',
   Closed: 'closed',
-};
-
-export const PathIdSeparator = {
-  Epic: '&',
-  Issue: '#',
 };
 
 export const idProp = {
@@ -42,21 +36,6 @@ export const RemoveItemModalProps = {
     ),
   },
 };
-
-export const EpicDropdownActions = [
-  {
-    id: 0,
-    issuableType: issuableTypesMap.EPIC,
-    title: s__('Epics|Add an epic'),
-    description: s__('Epics|Add an existing epic as a child epic.'),
-  },
-  {
-    id: 1,
-    issuableType: issuableTypesMap.EPIC,
-    title: s__('Epics|Create new epic'),
-    description: s__('Epics|Create an epic within this group and add it as a child epic.'),
-  },
-];
 
 export const OVERFLOW_AFTER = 5;
 

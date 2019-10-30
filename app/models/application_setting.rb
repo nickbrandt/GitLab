@@ -104,6 +104,11 @@ class ApplicationSetting < ApplicationRecord
             hostname: true,
             if: :snowplow_enabled
 
+  validates :pendo_url,
+            presence: true,
+            public_url: true,
+            if: :pendo_enabled
+
   validates :max_attachment_size,
             presence: true,
             numericality: { only_integer: true, greater_than: 0 }
@@ -215,6 +220,9 @@ class ApplicationSetting < ApplicationRecord
             allow_nil: false
 
   validates :push_event_hooks_limit,
+            numericality: { greater_than_or_equal_to: 0 }
+
+  validates :push_event_activities_limit,
             numericality: { greater_than_or_equal_to: 0 }
 
   SUPPORTED_KEY_TYPES.each do |type|

@@ -6,6 +6,7 @@ class ProjectImportScheduleWorker
   include ApplicationWorker
   prepend WaitableWorker
 
+  feature_category :importers
   sidekiq_options retry: false
 
   # rubocop: disable CodeReuse/ActiveRecord

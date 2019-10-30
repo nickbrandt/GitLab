@@ -19,7 +19,7 @@ describe ProjectImportState, type: :model do
     context 'with a mirrored project' do
       let(:import_state) { create(:import_state, :mirror) }
 
-      it 'calls RepositoryImportWorker and inserts in front of the mirror scheduler queue' do
+      it 'calls RepositoryImportWorker and inserts in front of the mirror scheduler queue', :sidekiq_might_not_need_inline do
         allow_any_instance_of(EE::Project).to receive(:repository_exists?).and_return(false, true)
         expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!)
         expect(RepositoryImportWorker).to receive(:perform_async).with(import_state.project_id).and_call_original

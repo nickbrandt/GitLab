@@ -4,6 +4,8 @@ class LdapSyncWorker
   include ApplicationWorker
   include CronjobQueue
 
+  feature_category :authentication_and_authorization
+
   # rubocop: disable CodeReuse/ActiveRecord
   # rubocop: disable Gitlab/RailsLogger
   def perform

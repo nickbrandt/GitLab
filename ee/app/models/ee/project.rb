@@ -81,6 +81,7 @@ module EE
 
       has_many :prometheus_alerts, inverse_of: :project
       has_many :prometheus_alert_events, inverse_of: :project
+      has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
@@ -642,6 +643,10 @@ module EE
       feature_available?(:incident_management)
     end
 
+    def alerts_service_activated?
+      alerts_service_available? && alerts_service&.active?
+    end
+
     def package_already_taken?(package_name)
       namespace.root_ancestor.all_projects
         .joins(:packages)
@@ -683,10 +688,6 @@ module EE
       else
         globally_available
       end
-    end
-
-    def validate_board_limit(board)
-      # Board limits are disabled in EE, so this method is just a no-op.
     end
 
     def check_pull_mirror_branch_prefix

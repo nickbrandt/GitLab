@@ -3,8 +3,8 @@
 module Geo
   class FileDownloadDispatchWorker
     class LfsObjectJobFinder < JobFinder
-      RESOURCE_ID_KEY = :file_id
-      EXCEPT_RESOURCE_IDS_KEY = :except_file_ids
+      RESOURCE_ID_KEY = :lfs_object_id
+      EXCEPT_RESOURCE_IDS_KEY = :except_ids
       FILE_SERVICE_OBJECT_TYPE = :lfs
 
       def registry_finder

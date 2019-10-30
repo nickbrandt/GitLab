@@ -13,7 +13,7 @@ shared_examples 'no results when the user cannot read cross project' do
     Gitlab::Elastic::Helper.refresh_index
   end
 
-  it 'returns the record if a single project was passed' do
+  it 'returns the record if a single project was passed', :sidekiq_might_not_need_inline do
     result = described_class.elastic_search(
       'test',
       options: {
@@ -25,7 +25,7 @@ shared_examples 'no results when the user cannot read cross project' do
     expect(result.records).to match_array [record1]
   end
 
-  it 'does not return anything when trying to search cross project' do
+  it 'does not return anything when trying to search cross project', :sidekiq_might_not_need_inline do
     result = described_class.elastic_search(
       'test',
       options: {

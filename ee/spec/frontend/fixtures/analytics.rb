@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe 'Analytics (JavaScript fixtures)' do
+describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   include JavaScriptFixturesHelpers
 
   let(:group) { create(:group)}

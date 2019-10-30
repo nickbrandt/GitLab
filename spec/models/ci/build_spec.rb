@@ -206,6 +206,35 @@ describe Ci::Build do
     end
   end
 
+  describe '.with_exposed_artifacts' do
+    subject { described_class.with_exposed_artifacts }
+
+    let!(:job1) { create(:ci_build) }
+    let!(:job2) { create(:ci_build, options: options) }
+    let!(:job3) { create(:ci_build) }
+
+    context 'when some jobs have exposed artifacs and some not' do
+      let(:options) { { artifacts: { expose_as: 'test', paths: ['test'] } } }
+
+      before do
+        job1.ensure_metadata.update!(has_exposed_artifacts: nil)
+        job3.ensure_metadata.update!(has_exposed_artifacts: false)
+      end
+
+      it 'selects only the jobs with exposed artifacts' do
+        is_expected.to eq([job2])
+      end
+    end
+
+    context 'when job does not expose artifacts' do
+      let(:options) { nil }
+
+      it 'returns an empty array' do
+        is_expected.to be_empty
+      end
+    end
+  end
+
   describe '.with_reports' do
     subject { described_class.with_reports(Ci::JobArtifact.test_reports) }
 
@@ -574,6 +603,7 @@ describe Ci::Build do
 
   describe '#artifacts_metadata?' do
     subject { build.artifacts_metadata? }
+
     context 'artifacts metadata does not exist' do
       it { is_expected.to be_falsy }
     end
@@ -586,6 +616,7 @@ describe Ci::Build do
 
   describe '#artifacts_expire_in' do
     subject { build.artifacts_expire_in }
+
     it { is_expected.to be_nil }
 
     context 'when artifacts_expire_at is specified' do
@@ -1265,6 +1296,7 @@ describe Ci::Build do
 
         describe '#erasable?' do
           subject { build.erasable? }
+
           it { is_expected.to be_truthy }
         end
 
@@ -1841,6 +1873,14 @@ describe Ci::Build do
         expect(build.metadata.read_attribute(:config_options)).to be_nil
       end
     end
+
+    context 'when options include artifacts:expose_as' do
+      let(:build) { create(:ci_build, options: { artifacts: { expose_as: 'test' } }) }
+
+      it 'saves the presence of expose_as into build metadata' do
+        expect(build.metadata).to have_exposed_artifacts
+      end
+    end
   end
 
   describe '#other_manual_actions' do
@@ -2195,6 +2235,7 @@ describe Ci::Build do
           { key: 'CI_COMMIT_REF_NAME', value: build.ref, public: true, masked: false },
           { key: 'CI_COMMIT_REF_SLUG', value: build.ref_slug, public: true, masked: false },
           { key: 'CI_NODE_TOTAL', value: '1', public: true, masked: false },
+          { key: 'CI_DEFAULT_BRANCH', value: project.default_branch, public: true, masked: false },
           { key: 'CI_BUILD_REF', value: build.sha, public: true, masked: false },
           { key: 'CI_BUILD_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
           { key: 'CI_BUILD_REF_NAME', value: build.ref, public: true, masked: false },
@@ -3916,6 +3957,16 @@ describe Ci::Build do
           expect(build.metadata.read_attribute(:config_options)).to be_nil
         end
       end
+    end
+  end
+
+  describe '#invalid_dependencies' do
+    let!(:pre_stage_job_valid) { create(:ci_build, :manual, pipeline: pipeline, name: 'test1', stage_idx: 0) }
+    let!(:pre_stage_job_invalid) { create(:ci_build, :success, :expired, pipeline: pipeline, name: 'test2', stage_idx: 1) }
+    let!(:job) { create(:ci_build, :pending, pipeline: pipeline, stage_idx: 2, options: { dependencies: %w(test1 test2) }) }
+
+    it 'returns invalid dependencies' do
+      expect(job.invalid_dependencies).to eq([pre_stage_job_invalid])
     end
   end
 end

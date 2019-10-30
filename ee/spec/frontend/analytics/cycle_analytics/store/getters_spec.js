@@ -92,11 +92,11 @@ describe('Cycle analytics getters', () => {
 
   describe('currentGroupPath', () => {
     describe('with selectedGroup set', () => {
-      it('returns the `full_path` value of the group', () => {
+      it('returns the `fullPath` value of the group', () => {
         const fullPath = 'cool-beans';
         state = {
           selectedGroup: {
-            full_path: fullPath,
+            fullPath,
           },
         };
 

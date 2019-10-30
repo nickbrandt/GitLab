@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Analytics::ProductivityCalculator do
   subject { described_class.new(merge_request) }
+
   let(:merge_request) { create(:merge_request_with_diff_notes, :merged, :with_diffs, created_at: 31.days.ago) }
 
   describe '#productivity_data' do

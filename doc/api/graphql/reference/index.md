@@ -211,6 +211,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `relativePosition` | Int | The relative position of the epic in the Epic tree |
 | `relationPath` | String |  |
 | `reference` | String! |  |
+| `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this epic |
 
 ### EpicIssue
 
@@ -434,8 +435,13 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `webUrl` | String |  |
 | `upvotes` | Int! |  |
 | `downvotes` | Int! |  |
-| `subscribed` | Boolean! |  |
 | `headPipeline` | Pipeline |  |
+| `milestone` | Milestone | The milestone this merge request is linked to |
+| `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this MR |
+| `discussionLocked` | Boolean! | Boolean flag determining if comments on the merge request are locked to members only |
+| `timeEstimate` | Int! | The time estimate for the merge request |
+| `totalTimeSpent` | Int! | Total time reported as spent on the merge request |
+| `reference` | String! | Internal merge request reference. Returned in shortened format by default |
 | `taskCompletionStatus` | TaskCompletionStatus! |  |
 
 ### MergeRequestPermissions
@@ -598,6 +604,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `requestAccessEnabled` | Boolean |  |
 | `onlyAllowMergeIfAllDiscussionsAreResolved` | Boolean |  |
 | `printingMergeRequestLinkEnabled` | Boolean |  |
+| `removeSourceBranchAfterMerge` | Boolean | Remove the source branch by default after merge |
 | `namespace` | Namespace |  |
 | `group` | Group |  |
 | `statistics` | ProjectStatistics |  |
@@ -710,6 +717,20 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `count` | Int! |  |
 | `completedCount` | Int! |  |
 
+### Todo
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `id` | ID! | Id of the todo |
+| `project` | Project | The project this todo is associated with |
+| `group` | Group | Group this todo is associated with |
+| `author` | User! | The owner of this todo |
+| `action` | TodoActionEnum! | Action of the todo |
+| `targetType` | TodoTargetEnum! | Target type of the todo |
+| `body` | String! | Body of the todo |
+| `state` | TodoStateEnum! | State of the todo |
+| `createdAt` | Time! | Timestamp this todo was created |
+
 ### ToggleAwardEmojiPayload
 
 | Name  | Type  | Description |
@@ -735,6 +756,14 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `path` | String! |  |
 | `flatPath` | String! |  |
 | `webUrl` | String |  |
+
+### UpdateEpicPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `epic` | Epic | The epic after mutation |
 
 ### UpdateNotePayload
 

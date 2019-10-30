@@ -33,16 +33,19 @@ module EE
       "Repositories within this group #{show_lfs} will be restricted to this maximum size. Can be overridden inside each project. 0 for unlimited. Leave empty to inherit the global value."
     end
 
+    override :group_packages_nav_link_paths
     def group_packages_nav_link_paths
       %w[
         groups/packages#index
         groups/dependency_proxies#show
+        groups/container_registries#index
       ]
     end
 
     def group_packages_nav?
       group_packages_list_nav? ||
-        group_dependency_proxy_nav?
+        group_dependency_proxy_nav? ||
+        group_container_registry_nav?
     end
 
     def group_packages_list_nav?

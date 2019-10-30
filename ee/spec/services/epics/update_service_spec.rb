@@ -136,6 +136,40 @@ describe Epics::UpdateService do
           expect(todo2.reload.state).to eq('pending')
         end
       end
+
+      context 'mentioning a group in epic description' do
+        let(:mentioned1) { create(:user) }
+        let(:mentioned2) { create(:user) }
+
+        before do
+          group.add_developer(mentioned1)
+          epic.update(description: "FYI: #{group.to_reference}")
+        end
+
+        context 'when the group is public' do
+          before do
+            group.update(visibility: Gitlab::VisibilityLevel::PUBLIC)
+          end
+
+          it 'creates todos for only newly mentioned users' do
+            expect do
+              update_epic(description: "FYI: #{mentioned1.to_reference} #{mentioned2.to_reference}")
+            end.to change { Todo.count }.by(1)
+          end
+        end
+
+        context 'when the group is private' do
+          before do
+            group.update(visibility: Gitlab::VisibilityLevel::PRIVATE)
+          end
+
+          it 'creates todos for only newly mentioned users that are group members' do
+            expect do
+              update_epic(description: "FYI: #{mentioned1.to_reference} #{mentioned2.to_reference}")
+            end.to not_change { Todo.count }
+          end
+        end
+      end
     end
 
     context 'when Epic has tasks' do
@@ -198,16 +232,18 @@ describe Epics::UpdateService do
 
     context 'refresh epic dates' do
       context 'date fields are updated' do
-        it 'calls epic#update_start_and_due_dates' do
-          expect(epic).to receive(:update_start_and_due_dates)
+        it 'calls UpdateDatesService' do
+          expect(Epics::UpdateDatesService).to receive(:new).with([epic]).and_call_original
 
           update_epic(start_date_is_fixed: true, start_date_fixed: Date.today)
+          epic.reload
+          expect(epic.start_date).to eq(epic.start_date_fixed)
         end
       end
 
       context 'date fields are not updated' do
-        it 'does not call epic#update_start_and_due_dates' do
-          expect(epic).not_to receive(:update_start_and_due_dates)
+        it 'does not call UpdateDatesService' do
+          expect(Epics::UpdateDatesService).not_to receive(:new)
 
           update_epic(title: 'foo')
         end

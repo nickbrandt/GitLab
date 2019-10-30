@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Approvable do
   subject(:merge_request) { create(:merge_request) }
+
   let(:project) { merge_request.project }
   let(:author) { merge_request.author }
 

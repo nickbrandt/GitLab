@@ -3,17 +3,20 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 
 import { GlLoadingIcon } from '@gitlab/ui';
 
+import { issuableTypesMap } from 'ee/related_issues/constants';
+
 import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
 import CreateEpicForm from './create_epic_form.vue';
+import CreateIssueForm from './create_issue_form.vue';
+import IssueActionsSplitButton from './issue_actions_split_button.vue';
 import TreeItemRemoveModal from './tree_item_remove_modal.vue';
 
 import RelatedItemsTreeHeader from './related_items_tree_header.vue';
 import RelatedItemsTreeBody from './related_items_tree_body.vue';
 
-import { PathIdSeparator, OVERFLOW_AFTER } from '../constants';
+import { OVERFLOW_AFTER } from '../constants';
 
 export default {
-  PathIdSeparator,
   OVERFLOW_AFTER,
   components: {
     GlLoadingIcon,
@@ -22,6 +25,13 @@ export default {
     AddItemForm,
     CreateEpicForm,
     TreeItemRemoveModal,
+    CreateIssueForm,
+    IssueActionsSplitButton,
+  },
+  data() {
+    return {
+      isCreateIssueFormVisible: false,
+    };
   },
   computed: {
     ...mapState([
@@ -43,6 +53,9 @@ export default {
     ...mapGetters(['itemAutoCompleteSources', 'itemPathIdSeparator', 'directChildren']),
     disableContents() {
       return this.itemAddInProgress || this.itemCreateInProgress;
+    },
+    createIssueEnabled() {
+      return gon.features && gon.features.epicNewIssue;
     },
   },
   mounted() {
@@ -97,6 +110,14 @@ export default {
       this.toggleCreateEpicForm({ toggleState: false });
       this.setItemInputValue('');
     },
+    showAddIssueForm() {
+      this.toggleAddItemForm({ toggleState: true, issuableType: issuableTypesMap.ISSUE });
+    },
+    showCreateIssueForm() {
+      this.toggleAddItemForm({ toggleState: false });
+      this.toggleCreateEpicForm({ toggleState: false });
+      this.isCreateIssueFormVisible = true;
+    },
   },
 };
 </script>
@@ -114,9 +135,17 @@ export default {
         'overflow-auto': directChildren.length > $options.OVERFLOW_AFTER,
       }"
     >
-      <related-items-tree-header :class="{ 'border-bottom-0': itemsFetchResultEmpty }" />
+      <related-items-tree-header :class="{ 'border-bottom-0': itemsFetchResultEmpty }">
+        <issue-actions-split-button
+          v-if="createIssueEnabled"
+          slot="issueActions"
+          class="ml-1"
+          @showAddIssueForm="showAddIssueForm"
+          @showCreateIssueForm="showCreateIssueForm"
+        />
+      </related-items-tree-header>
       <div
-        v-if="showAddItemForm || showCreateEpicForm"
+        v-if="showAddItemForm || showCreateEpicForm || isCreateIssueFormVisible"
         class="card-body add-item-form-container"
         :class="{ 'border-bottom-0': itemsFetchResultEmpty }"
       >
@@ -139,6 +168,10 @@ export default {
           :is-submitting="itemCreateInProgress"
           @createEpicFormSubmit="handleCreateEpicFormSubmit"
           @createEpicFormCancel="handleCreateEpicFormCancel"
+        />
+        <create-issue-form
+          v-if="isCreateIssueFormVisible && !showAddItemForm && !showCreateEpicForm"
+          @cancel="isCreateIssueFormVisible = false"
         />
       </div>
       <related-items-tree-body

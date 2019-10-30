@@ -39,21 +39,12 @@ export default {
     return {
       multiProjectSelect: true,
       dateOptions: [7, 30, 90],
-      groupsQueryParams: {
-        min_access_level: featureAccessLevel.EVERYONE,
-      },
-      projectsQueryParams: {
-        per_page: PROJECTS_PER_PAGE,
-        with_shared: false,
-        order_by: 'last_activity_at',
-      },
     };
   },
   computed: {
     ...mapState([
       'isLoading',
       'isLoadingStage',
-      'isLoadingStageForm',
       'isEmptyStage',
       'isAddingCustomStage',
       'selectedGroup',
@@ -92,7 +83,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'fetchCustomStageFormData',
+      'fetchGroupLabels',
       'fetchCycleAnalyticsData',
       'fetchStageData',
       'setCycleAnalyticsDataEndpoint',
@@ -103,12 +94,14 @@ export default {
       'fetchStageData',
       'setSelectedStageName',
       'hideCustomStageForm',
+      'showCustomStageForm',
       'setDateRange',
     ]),
     onGroupSelect(group) {
-      this.setCycleAnalyticsDataEndpoint(group.path);
+      this.setCycleAnalyticsDataEndpoint(group.full_path);
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
+      this.fetchGroupLabels(this.currentGroupPath);
     },
     onProjectsSelect(projects) {
       const projectIds = projects.map(value => value.id);
@@ -122,13 +115,21 @@ export default {
       this.fetchStageData(this.currentStage.name);
     },
     onShowAddStageForm() {
-      this.fetchCustomStageFormData(this.currentGroupPath);
+      this.showCustomStageForm();
     },
     initDateRange() {
       const endDate = new Date(Date.now());
       const startDate = new Date(getDateInPast(endDate, DEFAULT_DAYS_IN_PAST));
       this.setDateRange({ skipFetch: true, startDate, endDate });
     },
+  },
+  groupsQueryParams: {
+    min_access_level: featureAccessLevel.EVERYONE,
+  },
+  projectsQueryParams: {
+    per_page: PROJECTS_PER_PAGE,
+    with_shared: false,
+    order_by: 'last_activity_at',
   },
 };
 </script>
@@ -144,7 +145,7 @@ export default {
       >
         <groups-dropdown-filter
           class="js-groups-dropdown-filter dropdown-select"
-          :query-params="groupsQueryParams"
+          :query-params="$options.groupsQueryParams"
           @selected="onGroupSelect"
         />
         <projects-dropdown-filter
@@ -152,7 +153,7 @@ export default {
           :key="selectedGroup.id"
           class="js-projects-dropdown-filter ml-md-1 mt-1 mt-md-0 dropdown-select"
           :group-id="selectedGroup.id"
-          :query-params="projectsQueryParams"
+          :query-params="$options.projectsQueryParams"
           :multi-select="multiProjectSelect"
           @selected="onProjectsSelect"
         />
@@ -201,7 +202,7 @@ export default {
           class="js-stage-table"
           :current-stage="currentStage"
           :stages="stages"
-          :is-loading="isLoadingStage || isLoadingStageForm"
+          :is-loading="isLoadingStage"
           :is-empty-stage="isEmptyStage"
           :is-adding-custom-stage="isAddingCustomStage"
           :current-stage-events="currentStageEvents"

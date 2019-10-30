@@ -14,7 +14,7 @@ module API
         success EE::API::Entities::AuditEvent
       end
       params do
-        optional :entity_type, type: String, desc: 'Return list of audit events for the specified entity type', values: LogFinder::VALID_ENTITY_TYPES
+        optional :entity_type, type: String, desc: 'Return list of audit events for the specified entity type', values: AuditLogFinder::VALID_ENTITY_TYPES
         optional :entity_id, type: Integer
         given :entity_id do
           requires :entity_type, type: String
@@ -25,7 +25,7 @@ module API
         use :pagination
       end
       get do
-        audit_events = LogFinder.new(params).execute
+        audit_events = AuditLogFinder.new(params).execute
 
         present paginate(audit_events), with: EE::API::Entities::AuditEvent
       end

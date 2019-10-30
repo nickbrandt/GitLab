@@ -26,7 +26,7 @@ describe('Kubernetes Logs', () => {
 
       mock = new MockAdapter(axios);
       mock.onGet(mockDataset.environmentsPath).reply(200, { environments: mockEnvironmentData });
-      mock.onGet(mockDataset.logsPath).reply(200, { logs: logMockData, pods: podMockData });
+      mock.onGet(mockDataset.logsEndpoint).reply(200, { logs: logMockData, pods: podMockData });
     });
 
     afterEach(() => {
@@ -158,7 +158,7 @@ describe('Kubernetes Logs', () => {
 
     describe('shows an alert', () => {
       it('with an error', done => {
-        mock.onGet(mockDataset.logsPath).reply(400);
+        mock.onGet(mockDataset.logsEndpoint).reply(400);
 
         kubernetesLog = new KubernetesLogs(kubernetesLogContainer);
         kubernetesLog
@@ -173,7 +173,7 @@ describe('Kubernetes Logs', () => {
       it('with some explicit error', done => {
         const errorMsg = 'Some k8s error';
 
-        mock.onGet(mockDataset.logsPath).reply(400, {
+        mock.onGet(mockDataset.logsEndpoint).reply(400, {
           message: errorMsg,
         });
 
@@ -198,7 +198,7 @@ describe('Kubernetes Logs', () => {
       kubernetesLogContainer = document.querySelector('.js-kubernetes-logs');
 
       mock = new MockAdapter(axios);
-      mock.onGet(mockDataset.logsPath).reply(200, { logs: logMockData, pods: [hackyPodName] });
+      mock.onGet(mockDataset.logsEndpoint).reply(200, { logs: logMockData, pods: [hackyPodName] });
     });
 
     afterEach(() => {
@@ -229,9 +229,9 @@ describe('Kubernetes Logs', () => {
       mock = new MockAdapter(axios);
       mock.onGet(mockDataset.environmentsPath).reply(200, { environments: mockEnvironmentData });
       // Simulate reactive cache, 2 tries needed
-      mock.onGet(`${mockDataset.logsPath}`, { pod_name: podMockData[1] }).replyOnce(202);
+      mock.onGet(mockDataset.logsEndpoint, { pod_name: podMockData[1] }).replyOnce(202);
       mock
-        .onGet(`${mockDataset.logsPath}`, { pod_name: podMockData[1] })
+        .onGet(mockDataset.logsEndpoint, { pod_name: podMockData[1] })
         .reply(200, { logs: logMockData, pods: podMockData });
     });
 
@@ -243,7 +243,7 @@ describe('Kubernetes Logs', () => {
       kubernetesLog
         .getData()
         .then(() => {
-          const calls = mock.history.get.filter(r => r.url === mockDataset.logsPath);
+          const calls = mock.history.get.filter(r => r.url === mockDataset.logsEndpoint);
 
           // expect 2 tries
           expect(calls.length).toEqual(2);
@@ -278,7 +278,7 @@ describe('Kubernetes Logs', () => {
       kubernetesLog
         .getData()
         .then(() => {
-          const logsCall = mock.history.get.filter(call => call.url === mockDataset.logsPath);
+          const logsCall = mock.history.get.filter(call => call.url === mockDataset.logsEndpoint);
 
           expect(logsCall.length).toBe(1);
           expect(logsCall[0].params.pod_name).toEqual(podMockData[2]);

@@ -9,7 +9,6 @@ export default () => ({
 
   isLoading: false,
   isLoadingStage: false,
-  isLoadingStageForm: false,
 
   isEmptyStage: false,
   errorCode: null,

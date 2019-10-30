@@ -131,7 +131,7 @@ describe MergeRequest do
 
       context 'MR is merged' do
         before do
-          blocking_mr.update_columns(state: 'merged')
+          blocking_mr.update_columns(state_id: described_class.available_states[:merged])
         end
 
         it 'returns 0 by default' do
