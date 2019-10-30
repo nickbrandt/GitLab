@@ -423,5 +423,27 @@ describe('Cycle Analytics component', () => {
         );
       });
     });
+
+    it('will display an error if the fetchTasksByTypeData request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mock
+        .onGet('/groups/foo/-/labels')
+        .replyOnce(httpStatusCodes.OK, { response: { ...mockData.groupLabels } })
+        .onGet('/groups/foo/-/cycle_analytics')
+        .replyOnce(httpStatusCodes.OK, { response: { status: httpStatusCodes.OK } })
+        .onGet('/-/analytics/type_of_work/tasks_by_type')
+        .replyOnce(httpStatusCodes.BAD_REQUEST, {
+          response: { status: httpStatusCodes.BAD_REQUEST },
+        });
+
+      wrapper.vm.onGroupSelect(mockData.group);
+
+      return waitForPromises().then(() => {
+        expect(findFlashError().innerText.trim()).toEqual(
+          'There was an error fetching data for the chart',
+        );
+      });
+    });
   });
 });
