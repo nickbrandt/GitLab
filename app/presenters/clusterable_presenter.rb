@@ -45,6 +45,10 @@ class ClusterablePresenter < Gitlab::View::Presenter::Delegated
     polymorphic_path([clusterable, :clusters], action: :create_gcp)
   end
 
+  def create_aws_clusters_path
+    polymorphic_path([clusterable, :clusters], action: :create_aws)
+  end
+
   def cluster_status_cluster_path(cluster, params = {})
     raise NotImplementedError
   end

@@ -248,6 +248,69 @@ describe Admin::ClustersController do
     end
   end
 
+  describe 'POST #create_aws' do
+    let(:params) do
+      {
+        cluster: {
+          name: 'new-cluster',
+          provider_aws_attributes: {
+            key_name: 'key',
+            role_arn: 'arn:role',
+            region: 'region',
+            vpc_id: 'vpc',
+            instance_type: 'instance type',
+            num_nodes: 3,
+            security_group_id: 'security group',
+            subnet_ids: %w(subnet1 subnet2)
+          }
+        }
+      }
+    end
+
+    def post_create_aws
+      post :create_aws, params: params
+    end
+
+    it 'creates a new cluster' do
+      expect(ClusterProvisionWorker).to receive(:perform_async)
+      expect { post_create_aws }.to change { Clusters::Cluster.count }
+        .and change { Clusters::Providers::Aws.count }
+
+      cluster = Clusters::Cluster.instance_type.first
+
+      expect(response.status).to eq(201)
+      expect(response.location).to eq(admin_cluster_path(cluster))
+      expect(cluster).to be_aws
+      expect(cluster).to be_kubernetes
+    end
+
+    context 'params are invalid' do
+      let(:params) do
+        {
+          cluster: { name: '' }
+        }
+      end
+
+      it 'does not create a cluster' do
+        expect { post_create_aws }.not_to change { Clusters::Cluster.count }
+
+        expect(response.status).to eq(422)
+        expect(response.content_type).to eq('application/json')
+        expect(response.body).to include('is invalid')
+      end
+    end
+
+    describe 'security' do
+      before do
+        allow(WaitForClusterCreationWorker).to receive(:perform_in)
+      end
+
+      it { expect { post_create_aws }.to be_allowed_for(:admin) }
+      it { expect { post_create_aws }.to be_denied_for(:user) }
+      it { expect { post_create_aws }.to be_denied_for(:external) }
+    end
+  end
+
   describe 'POST #create_user' do
     let(:params) do
       {

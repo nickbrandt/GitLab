@@ -56,6 +56,7 @@ module Clusters
     has_many :kubernetes_namespaces
 
     accepts_nested_attributes_for :provider_gcp, update_only: true
+    accepts_nested_attributes_for :provider_aws, update_only: true
     accepts_nested_attributes_for :platform_kubernetes, update_only: true
 
     validates :name, cluster_name: true
@@ -259,7 +260,7 @@ module Clusters
     end
 
     def knative_pre_installed?
-      provider&.knative_pre_installed?
+      gcp? && provider&.knative_pre_installed?
     end
 
     private

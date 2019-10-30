@@ -38,6 +38,7 @@ module ClustersHelper
   end
 
   def has_rbac_enabled?(cluster)
+    return true if cluster.aws?
     return cluster.platform_kubernetes_rbac? if cluster.platform_kubernetes
 
     !cluster.provider.legacy_abac?
