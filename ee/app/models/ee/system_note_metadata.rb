@@ -14,7 +14,7 @@ module EE
     EE_TYPES_WITH_CROSS_REFERENCES = %w[
       relate unrelate
       epic_issue_added issue_added_to_epic epic_issue_removed issue_removed_from_epic
-      epic_issue_moved issue_changed_epic
+      epic_issue_moved issue_changed_epic relate_epic unrelate_epic
     ].freeze
 
     override :icon_types
