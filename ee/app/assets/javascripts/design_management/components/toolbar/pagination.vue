@@ -21,7 +21,7 @@ export default {
       return this.designs.length;
     },
     currentIndex() {
-      return this.designs.findIndex(design => design.filename === this.id);
+      return this.designs.findIndex(design => design.id === this.id);
     },
     paginationText() {
       return sprintf(s__('DesignManagement|%{current_design} of %{designs_count}'), {
