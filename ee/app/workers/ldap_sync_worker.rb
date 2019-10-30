@@ -5,6 +5,7 @@ class LdapSyncWorker
   include CronjobQueue
 
   feature_category :authentication_and_authorization
+  worker_has_external_dependencies!
 
   # rubocop: disable CodeReuse/ActiveRecord
   # rubocop: disable Gitlab/RailsLogger
