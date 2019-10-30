@@ -34,11 +34,13 @@ module Elastic
 
     private
 
+    # rubocop: disable CodeReuse/ActiveRecord
     def update_issue_notes(record, changed_fields)
       if changed_fields && (changed_fields & ISSUE_TRACKED_FIELDS).any?
-        import_association(Note, query: -> { where(noteable: record) })
+        import_association(Note, query: -> { searchable.where(noteable: record) })
       end
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     def initial_index_project(project)
       # Enqueue the repository indexing jobs immediately so they run in parallel
