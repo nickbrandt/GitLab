@@ -362,7 +362,7 @@ module ProjectsHelper
     @project.grafana_integration&.token
   end
 
-  def grafana_integration_enabled
+  def grafana_integration_enabled?
     @project.grafana_integration&.enabled?
   end
 

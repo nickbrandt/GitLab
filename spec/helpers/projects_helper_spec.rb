@@ -939,14 +939,14 @@ describe ProjectsHelper do
     end
   end
 
-  describe '#grafana_integration_enabled' do
+  describe '#grafana_integration_enabled?' do
     let(:project) { create(:project) }
 
     before do
       helper.instance_variable_set(:@project, project)
     end
 
-    subject { helper.grafana_integration_enabled }
+    subject { helper.grafana_integration_enabled? }
 
     it { is_expected.to eq(nil) }
 
