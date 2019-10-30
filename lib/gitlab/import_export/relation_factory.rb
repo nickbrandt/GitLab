@@ -277,7 +277,7 @@ module Gitlab
       end
 
       def setup_pipeline
-        @relation_hash.fetch('stages').each do |stage|
+        @relation_hash.fetch('stages', []).each do |stage|
           stage.statuses.each do |status|
             status.pipeline = imported_object
           end
