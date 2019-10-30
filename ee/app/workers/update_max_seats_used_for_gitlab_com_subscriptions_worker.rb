@@ -5,6 +5,7 @@ class UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker
   include CronjobQueue
 
   feature_category :license_compliance
+  worker_resource_boundary :cpu
 
   # rubocop: disable CodeReuse/ActiveRecord
   def perform
