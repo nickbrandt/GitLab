@@ -1,0 +1,29 @@
+#import "./designNote.fragment.graphql"
+#import "./diffRefs.fragment.graphql"
+
+fragment DesignItem on Design {
+  id
+  image
+  event
+  filename
+  fullPath
+  diffRefs {
+    ...DesignDiffRefs
+  }
+  notesCount
+  discussions {
+    edges {
+      node {
+        id
+        replyId
+        notes {
+          edges {
+            node {
+              ...DesignNote
+            }
+          }
+        }
+      }
+    }
+  }
+}

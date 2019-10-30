@@ -11,6 +11,7 @@ import DesignDiscussion from '../../components/design_notes/design_discussion.vu
 import DesignReplyForm from '../../components/design_notes/design_reply_form.vue';
 import DesignDestroyer from '../../components/design_destroyer.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
+import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
 import { extractDiscussions } from '../../utils/design_management_utils';
 
@@ -41,18 +42,30 @@ export default {
         height: 0,
       },
       projectPath: '',
+      issueId: '',
       isNoteSaving: false,
     };
   },
   apollo: {
+    appData: {
+      query: appDataQuery,
+      manual: true,
+      result({ data: { projectPath, issueIid } }) {
+        this.projectPath = projectPath;
+        this.issueIid = issueIid;
+      },
+    },
     design: {
       query: getDesignQuery,
       variables() {
         return {
-          id: this.id,
-          version: this.designsVersion,
+          fullPath: this.projectPath,
+          iid: this.issueIid,
+          designIds: [this.$route.params.id],
+          atVersion: this.designsVersion,
         };
       },
+      update: data => data.project.issue.designs.designs.edges[0].node,
       result({ data }) {
         if (!data) {
           createFlash(s__('DesignManagement|Could not find design, please try again.'));
