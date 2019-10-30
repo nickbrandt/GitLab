@@ -1,17 +1,17 @@
-- if can? current_user, :archive_project, project
+- if can? current_user, :archive_project, @project
   .sub-section
     %h4.warning-title
       - if @project.archived?
         = _('Unarchive project')
       - else
         = _('Archive project')
-    - if project.archived?
+    - if @project.archived?
       %p= _("Unarchiving the project will restore people's ability to make changes to it. The repository can be committed to, and issues, comments and other entities can be created. <strong>Once active this project shows up in the search and on the dashboard.</strong>").html_safe
-      = link_to _('Unarchive project'), unarchive_project_path(project),
+      = link_to _('Unarchive project'), unarchive_project_path(@project),
           data: { confirm: _("Are you sure that you want to unarchive this project?"), qa_selector: 'unarchive_project_link' },
           method: :post, class: "btn btn-success"
     - else
       %p= _("Archiving the project will make it entirely read-only. It is hidden from the dashboard and doesn't show up in searches. <strong>The repository cannot be committed to, and no issues, comments or other entities can be created.</strong>").html_safe
-      = link_to _('Archive project'), archive_project_path(project),
+      = link_to _('Archive project'), archive_project_path(@project),
           data: { confirm: _("Are you sure that you want to archive this project?"), qa_selector: 'archive_project_link' },
           method: :post, class: "btn btn-warning"

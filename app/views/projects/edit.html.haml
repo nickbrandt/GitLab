@@ -71,7 +71,7 @@
 
     = render 'export', project: @project
 
-    = render_if_exists 'projects/settings/archive', project: @project
+    = render_if_exists 'projects/settings/archive'
     .sub-section.rename-repository
       %h4.warning-title= _('Change path')
       = render 'projects/errors'
