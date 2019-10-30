@@ -30,6 +30,9 @@ module Clusters
         when 'key_pairs'
           ec2_client.describe_key_pairs
 
+        when 'instance_types'
+          instance_types
+
         when 'roles'
           iam_client.list_roles
 
@@ -73,6 +76,20 @@ module Clusters
             values: [vpc_id]
           }]
         }
+      end
+
+      def instance_types
+        {
+          instance_types: cluster_stack_instance_types.map { |type| Hash(instance_type_name: type) }
+        }
+      end
+
+      def cluster_stack_instance_types
+        YAML.safe_load(stack_template).dig('Parameters', 'NodeInstanceType', 'AllowedValues')
+      end
+
+      def stack_template
+        File.read(Rails.root.join('vendor', 'aws', 'cloudformation', 'eks_cluster.yaml'))
       end
 
       def ec2_client
