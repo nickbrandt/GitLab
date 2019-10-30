@@ -48,4 +48,22 @@ describe GrafanaIntegration do
       ).for(:enabled)
     end
   end
+
+  describe '.client' do
+    subject(:grafana_integration) { create(:grafana_integration) }
+
+    context 'with grafana integration disabled' do
+      it 'returns a grafana client' do
+        expect(grafana_integration.client).to be_an_instance_of(::Grafana::Client)
+      end
+    end
+
+    context 'with grafana integration enabled' do
+      it 'returns nil' do
+        grafana_integration.update(enabled: false)
+
+        expect(grafana_integration.client).to be(nil)
+      end
+    end
+  end
 end

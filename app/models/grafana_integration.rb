@@ -17,6 +17,8 @@ class GrafanaIntegration < ApplicationRecord
   validates :enabled, inclusion: { in: [true, false] }
 
   def client
-    @client ||= ::Grafana::Client.new(api_url: grafana_url.chomp('/'), token: token)
+    if enabled?
+      @client ||= ::Grafana::Client.new(api_url: grafana_url.chomp('/'), token: token)
+    end
   end
 end
