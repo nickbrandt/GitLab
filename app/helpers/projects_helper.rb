@@ -363,7 +363,7 @@ module ProjectsHelper
   end
 
   def grafana_integration_enabled
-    @project.grafana_integration&.enabled
+    @project.grafana_integration&.enabled?
   end
 
   private
