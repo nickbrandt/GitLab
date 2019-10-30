@@ -39,11 +39,8 @@ describe Gitlab::Analytics::CodeAnalytics::RecordInserter do
 
   it { expect(persisted_repository_file_commits.count).to eq(changed_files.count) }
 
-  it 'inserts a RepositoryFile record for `gemfile_lock`' do
+  it 'inserts missing RepositoryFile records' do
     expect(persisted_repository_files.find_by(file_path: gemfile_lock_path)).to be_present
-  end
-
-  it 'inserts a RepositoryFile record for `user_model_spec`' do
     expect(persisted_repository_files.find_by(file_path: user_model_spec_path)).to be_present
   end
 

@@ -6,6 +6,7 @@ module Analytics
       include ApplicationWorker
 
       queue_namespace :analytics
+      feature_category :code_analytics
 
       # rubocop: disable CodeReuse/ActiveRecord
       def perform(project_id, ref)

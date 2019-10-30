@@ -4,6 +4,8 @@ module Gitlab
   module Analytics
     module CodeAnalytics
       class RecordInserter
+        include ActiveRecord::ConnectionAdapters::Quoting
+
         BATCH_SIZE = 50
 
         attr_reader :project, :changed_files, :committed_date
@@ -32,7 +34,7 @@ module Gitlab
         # Insert new files, ignore when file is already in the DB
         def upsert_files_query(files)
           <<~SQL
-          INSERT INTO #{::Analytics::CodeAnalytics::RepositoryFile.table_name} (project_id, file_path)
+          INSERT INTO #{repository_file_table_name} (project_id, file_path)
           VALUES #{values_for_repository_file(files)}
           ON CONFLICT (project_id, file_path) DO NOTHING
           SQL
@@ -41,7 +43,7 @@ module Gitlab
         # Insert commit count with value `1` for the given date, increment the count if record already exists in the DB
         def increment_commit_count_query(files)
           <<~SQL
-          INSERT INTO #{::Analytics::CodeAnalytics::RepositoryFileCommit.table_name} (project_id, analytics_repository_file_id, committed_date, commit_count)
+          INSERT INTO #{repository_file_commit_table_name} (project_id, analytics_repository_file_id, committed_date, commit_count)
           #{select_repository_files(files)}
           ON CONFLICT (analytics_repository_file_id, committed_date, project_id) DO UPDATE
           SET commit_count = analytics_repository_file_commits.commit_count + 1
@@ -49,17 +51,25 @@ module Gitlab
         end
 
         def values_for_repository_file(files)
-          files.map { |file_path| " (#{project.id}, '#{file_path}')" }.join(',')
+          files.map { |file_path| " (#{quote(project.id)}, #{quote(file_path)})" }.join(',')
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
         def select_repository_files(files)
           ::Analytics::CodeAnalytics::RepositoryFile
             .where(project_id: project.id, file_path: files)
-            .select(Arel.sql("#{project.id}, id, '#{committed_date}', 1"))
+            .select(Arel.sql("#{quote(project.id)}, id, #{quote(committed_date)}, 1"))
             .to_sql
         end
         # rubocop: enable CodeReuse/ActiveRecord
+
+        def repository_file_table_name
+          quote_table_name(::Analytics::CodeAnalytics::RepositoryFile.table_name)
+        end
+
+        def repository_file_commit_table_name
+          quote_table_name(::Analytics::CodeAnalytics::RepositoryFileCommit.table_name)
+        end
       end
     end
   end
