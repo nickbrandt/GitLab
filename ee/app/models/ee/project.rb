@@ -658,15 +658,12 @@ module EE
         ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
     end
 
-<<<<<<< HEAD
     def marked_for_deletion?
       return false unless feature_available?(:marking_project_for_deletion)
 
       marked_for_deletion_at.present?
     end
 
-=======
->>>>>>> Add attributes to import specs
     private
 
     def set_override_pull_mirror_available
