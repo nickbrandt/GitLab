@@ -179,6 +179,10 @@ describe('Design management index page', () => {
                       startSha: '',
                       headSha: '',
                     },
+                    discussions: {
+                      __typename: 'DesignDiscussion',
+                      edges: [],
+                    },
                     versions: {
                       __typename: 'DesignVersionConnection',
                       edges: {

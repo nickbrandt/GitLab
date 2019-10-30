@@ -20,7 +20,7 @@ module API
       def valid_github_signature?
         request.body.rewind
 
-        token        = project.external_webhook_token
+        token        = project.external_webhook_token.to_s
         payload_body = request.body.read
         signature    = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), token, payload_body)
 
@@ -43,7 +43,7 @@ module API
       end
 
       def process_pull_request
-        external_pull_request = ProcessGithubPullRequestEventService.new(project, current_user).execute(params)
+        external_pull_request = ProcessGithubPullRequestEventService.new(project, mirror_user).execute(params)
 
         if external_pull_request
           render_validation_error!(external_pull_request)
@@ -53,9 +53,13 @@ module API
       end
 
       def start_pull_mirroring
-        result = StartPullMirroringService.new(project, current_user).execute
+        result = StartPullMirroringService.new(project, mirror_user).execute
 
         render_api_error!(result[:message], result[:http_status]) if result[:status] == :error
+      end
+
+      def mirror_user
+        current_user || project.mirror_user
       end
     end
 

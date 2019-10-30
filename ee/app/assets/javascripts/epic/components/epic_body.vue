@@ -1,6 +1,8 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 
+import { PathIdSeparator } from 'ee/related_issues/constants';
+
 import IssuableBody from '~/issue_show/components/app.vue';
 import IssuableSidebar from '~/issuable_sidebar/components/sidebar_app.vue';
 import RelatedItems from 'ee/related_issues/components/related_issues_root.vue';
@@ -8,7 +10,7 @@ import RelatedItems from 'ee/related_issues/components/related_issues_root.vue';
 import EpicSidebar from './epic_sidebar.vue';
 
 export default {
-  epicsPathIdSeparator: '&',
+  PathIdSeparator,
   components: {
     IssuableBody,
     IssuableSidebar,
@@ -78,7 +80,7 @@ export default {
       :can-admin="canAdmin"
       :can-reorder="canAdmin"
       :allow-auto-complete="false"
-      :path-id-separator="$options.epicsPathIdSeparator"
+      :path-id-separator="$options.PathIdSeparator.Epic"
       :title="__('Epics')"
       issuable-type="epic"
       css-class="js-related-epics-block"

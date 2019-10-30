@@ -4,6 +4,7 @@ class ExportCsvWorker
   include ApplicationWorker
 
   feature_category :issue_tracking
+  worker_resource_boundary :memory
 
   def perform(current_user_id, project_id, params)
     @current_user = User.find(current_user_id)

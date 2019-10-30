@@ -34,6 +34,7 @@ import {
   pathIndeterminateErrorMap,
   addRelatedIssueErrorMap,
   issuableTypesMap,
+  PathIdSeparator,
 } from '../constants';
 
 export default {
@@ -79,7 +80,7 @@ export default {
     pathIdSeparator: {
       type: String,
       required: false,
-      default: '#',
+      default: PathIdSeparator.Issue,
     },
     cssClass: {
       type: String,

@@ -5,16 +5,6 @@ require 'spec_helper'
 shared_examples 'returns recently visited boards' do
   let(:boards) { create_list(:board, 8, resource_parent: parent) }
 
-  context 'unauthenticated' do
-    it 'returns a 401' do
-      sign_out(user)
-
-      list_boards(recent: true)
-
-      expect(response).to have_gitlab_http_status(401)
-    end
-  end
-
   it 'returns last 4 visited boards' do
     [0, 2, 5, 3, 7, 1].each_with_index do |board_index, i|
       visit_board(boards[board_index], Time.now + i.minutes)

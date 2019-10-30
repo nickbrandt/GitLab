@@ -117,7 +117,7 @@ describe 'Updating an Epic' do
         let(:attributes) { {} }
 
         it_behaves_like 'a mutation that returns top-level errors',
-          errors: ['The list of attributes to update is empty']
+          errors: ['The list of epic attributes is empty']
       end
     end
   end

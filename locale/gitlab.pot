@@ -2421,9 +2421,6 @@ msgstr ""
 msgid "BillingPlans|Learn more about each plan by reading our %{faq_link}, or start a free 30-day trial of GitLab.com Gold."
 msgstr ""
 
-msgid "BillingPlans|Learn more about each plan by reading our %{faq_link}."
-msgstr ""
-
 msgid "BillingPlans|Learn more about each plan by visiting our %{pricing_page_link}."
 msgstr ""
 
@@ -2442,16 +2439,13 @@ msgstr ""
 msgid "BillingPlans|To manage the plan for this group, visit the billing section of %{parent_billing_page_link}."
 msgstr ""
 
-msgid "BillingPlans|Your GitLab.com trial expired on %{expiration_date}. %{learn_more_text}"
+msgid "BillingPlans|Your GitLab.com Gold trial expired on %{expiration_date}. You can restore access to the Gold features at any time by upgrading below."
 msgstr ""
 
-msgid "BillingPlans|Your GitLab.com trial will <strong>expire after %{expiration_date}</strong>. You can learn more about GitLab.com Gold by reading about our %{features_link}."
+msgid "BillingPlans|Your GitLab.com Gold trial will <strong>expire after %{expiration_date}</strong>. You can retain access to the Gold features by upgrading below."
 msgstr ""
 
 msgid "BillingPlans|billed annually at %{price_per_year}"
-msgstr ""
-
-msgid "BillingPlans|features"
 msgstr ""
 
 msgid "BillingPlans|frequently asked questions"
@@ -5634,9 +5628,6 @@ msgstr ""
 msgid "Disable"
 msgstr ""
 
-msgid "Disable email notifications"
-msgstr ""
-
 msgid "Disable for this project"
 msgstr ""
 
@@ -8210,6 +8201,24 @@ msgstr ""
 msgid "Grafana URL"
 msgstr ""
 
+msgid "GrafanaIntegration|API Token"
+msgstr ""
+
+msgid "GrafanaIntegration|Embed Grafana charts in GitLab issues."
+msgstr ""
+
+msgid "GrafanaIntegration|Enter the Grafana API Token."
+msgstr ""
+
+msgid "GrafanaIntegration|Enter the base URL of the Grafana instance."
+msgstr ""
+
+msgid "GrafanaIntegration|Grafana Authentication"
+msgstr ""
+
+msgid "GrafanaIntegration|Grafana URL"
+msgstr ""
+
 msgid "Grant access"
 msgstr ""
 
@@ -8271,6 +8280,9 @@ msgid "Group maintainers can register group runners in the %{link}"
 msgstr ""
 
 msgid "Group name"
+msgstr ""
+
+msgid "Group overview"
 msgstr ""
 
 msgid "Group overview content"
@@ -11187,9 +11199,6 @@ msgstr ""
 msgid "Note: Consider asking your GitLab administrator to configure %{github_integration_link}, which will allow login via GitHub and allow importing repositories without generating a Personal Access Token."
 msgstr ""
 
-msgid "Note: the container registry is always visible when a project is public"
-msgstr ""
-
 msgid "NoteForm|Note"
 msgstr ""
 
@@ -12737,6 +12746,9 @@ msgstr ""
 msgid "Project name"
 msgstr ""
 
+msgid "Project overview"
+msgstr ""
+
 msgid "Project slug"
 msgstr ""
 
@@ -12851,10 +12863,16 @@ msgstr ""
 msgid "ProjectSettings|All discussions must be resolved"
 msgstr ""
 
+msgid "ProjectSettings|Allow users to request access"
+msgstr ""
+
 msgid "ProjectSettings|Automatically resolve merge request diff discussions when they become outdated"
 msgstr ""
 
 msgid "ProjectSettings|Badges"
+msgstr ""
+
+msgid "ProjectSettings|Build, test, and deploy your changes"
 msgstr ""
 
 msgid "ProjectSettings|Choose your merge method, merge options, and merge checks."
@@ -12866,13 +12884,28 @@ msgstr ""
 msgid "ProjectSettings|Contact an admin to change this setting."
 msgstr ""
 
+msgid "ProjectSettings|Container registry"
+msgstr ""
+
 msgid "ProjectSettings|Customize your project badges."
+msgstr ""
+
+msgid "ProjectSettings|Disable email notifications"
 msgstr ""
 
 msgid "ProjectSettings|Enable 'Delete source branch' option by default"
 msgstr ""
 
 msgid "ProjectSettings|Every merge creates a merge commit"
+msgstr ""
+
+msgid "ProjectSettings|Every project can have its own space to store its Docker images"
+msgstr ""
+
+msgid "ProjectSettings|Every project can have its own space to store its packages"
+msgstr ""
+
+msgid "ProjectSettings|Everyone"
 msgstr ""
 
 msgid "ProjectSettings|Existing merge requests and protected branches are not affected"
@@ -12890,7 +12923,22 @@ msgstr ""
 msgid "ProjectSettings|Fast-forward merges only"
 msgstr ""
 
+msgid "ProjectSettings|Git Large File Storage"
+msgstr ""
+
+msgid "ProjectSettings|Internal"
+msgstr ""
+
+msgid "ProjectSettings|Issues"
+msgstr ""
+
 msgid "ProjectSettings|Learn more about badges."
+msgstr ""
+
+msgid "ProjectSettings|Lightweight issue tracking system for this project"
+msgstr ""
+
+msgid "ProjectSettings|Manages large files such as audio, video, and graphics files"
 msgstr ""
 
 msgid "ProjectSettings|Merge checks"
@@ -12911,13 +12959,28 @@ msgstr ""
 msgid "ProjectSettings|Merge pipelines will try to validate the post-merge result prior to merging"
 msgstr ""
 
+msgid "ProjectSettings|Merge requests"
+msgstr ""
+
 msgid "ProjectSettings|No merge commits are created"
+msgstr ""
+
+msgid "ProjectSettings|Note: the container registry is always visible when a project is public"
 msgstr ""
 
 msgid "ProjectSettings|Only signed commits can be pushed to this repository."
 msgstr ""
 
+msgid "ProjectSettings|Packages"
+msgstr ""
+
 msgid "ProjectSettings|Pages"
+msgstr ""
+
+msgid "ProjectSettings|Pages for project documentation"
+msgstr ""
+
+msgid "ProjectSettings|Pipelines"
 msgstr ""
 
 msgid "ProjectSettings|Pipelines must succeed"
@@ -12926,7 +12989,28 @@ msgstr ""
 msgid "ProjectSettings|Pipelines need to be configured to enable this feature."
 msgstr ""
 
+msgid "ProjectSettings|Private"
+msgstr ""
+
+msgid "ProjectSettings|Project visibility"
+msgstr ""
+
+msgid "ProjectSettings|Public"
+msgstr ""
+
+msgid "ProjectSettings|Repository"
+msgstr ""
+
+msgid "ProjectSettings|Share code pastes with others out of Git repository"
+msgstr ""
+
 msgid "ProjectSettings|Show link to create/view merge request when pushing from the command line"
+msgstr ""
+
+msgid "ProjectSettings|Snippets"
+msgstr ""
+
+msgid "ProjectSettings|Submit changes to be merged upstream"
 msgstr ""
 
 msgid "ProjectSettings|These checks must pass before merge requests can be merged"
@@ -12941,13 +13025,25 @@ msgstr ""
 msgid "ProjectSettings|This setting will be applied to all projects unless overridden by an admin."
 msgstr ""
 
+msgid "ProjectSettings|This setting will override user notification preferences for all project members."
+msgstr ""
+
 msgid "ProjectSettings|This will dictate the commit history when you merge a merge request"
 msgstr ""
 
 msgid "ProjectSettings|Users can only push commits to this repository that were committed with one of their own verified emails."
 msgstr ""
 
+msgid "ProjectSettings|View and edit files in this project"
+msgstr ""
+
 msgid "ProjectSettings|When conflicts arise the user is given the option to rebase"
+msgstr ""
+
+msgid "ProjectSettings|Wiki"
+msgstr ""
+
+msgid "ProjectSettings|With GitLab Pages you can host your static websites on GitLab"
 msgstr ""
 
 msgid "ProjectTemplates|.NET Core"
@@ -15847,6 +15943,9 @@ msgstr ""
 msgid "StorageSize|Unknown"
 msgstr ""
 
+msgid "Subgroup overview"
+msgstr ""
+
 msgid "SubgroupCreationLevel|Allowed to create subgroups"
 msgstr ""
 
@@ -15868,6 +15967,9 @@ msgstr ""
 msgid "Subkeys"
 msgstr ""
 
+msgid "Submit a review"
+msgstr ""
+
 msgid "Submit as spam"
 msgstr ""
 
@@ -15881,6 +15983,12 @@ msgid "Submit review"
 msgstr ""
 
 msgid "Submit search"
+msgstr ""
+
+msgid "Submit the current review."
+msgstr ""
+
+msgid "Submitted the current review."
 msgstr ""
 
 msgid "Subscribe"
@@ -16414,6 +16522,9 @@ msgid "The group and any public projects can be viewed without any authenticatio
 msgstr ""
 
 msgid "The group and its projects can only be viewed by members."
+msgstr ""
+
+msgid "The group has already been shared with this group"
 msgstr ""
 
 msgid "The group settings for %{group_links} require you to enable Two-Factor Authentication for your account. You can %{leave_group_links}."
@@ -17008,9 +17119,6 @@ msgid "This runner will only run on pipelines triggered on protected branches"
 msgstr ""
 
 msgid "This setting can be overridden in each project."
-msgstr ""
-
-msgid "This setting will override user notification preferences for all project members."
 msgstr ""
 
 msgid "This setting will update the hostname that is used to generate private commit emails. %{learn_more}"
@@ -18693,6 +18801,9 @@ msgstr ""
 msgid "Welcome to GitLab"
 msgstr ""
 
+msgid "Welcome to GitLab %{username}!"
+msgstr ""
+
 msgid "Welcome to the Guided GitLab Tour"
 msgstr ""
 
@@ -18906,9 +19017,6 @@ msgid "Wiki|Title"
 msgstr ""
 
 msgid "Will deploy to"
-msgstr ""
-
-msgid "With GitLab Pages you can host your static websites on GitLab"
 msgstr ""
 
 msgid "With contribution analytics you can have an overview for the activity of issues, merge requests and push events of your organization and its members."

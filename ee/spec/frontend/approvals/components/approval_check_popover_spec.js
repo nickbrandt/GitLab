@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { mount, createLocalVue } from '@vue/test-utils';
 import { GlPopover } from '@gitlab/ui';
-import { TEST_HOST } from 'spec/test_constants';
+import { TEST_HOST } from 'helpers/test_constants';
 import component from 'ee/approvals/components/approval_check_popover.vue';
 
 describe('Approval Check Popover', () => {
@@ -20,9 +20,10 @@ describe('Approval Check Popover', () => {
 
   describe('with a documentation link', () => {
     const documentationLink = `${TEST_HOST}/documentation`;
-
     beforeEach(done => {
-      wrapper.setProps({ documentationLink });
+      wrapper.setProps({
+        documentationLink,
+      });
       Vue.nextTick(done);
     });
 
