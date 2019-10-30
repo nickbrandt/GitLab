@@ -10,8 +10,36 @@ describe API::Vulnerabilities do
   let_it_be(:project) { create(:project, :with_vulnerabilities) }
   let_it_be(:user) { create(:user) }
 
-  describe "GET /projects/:id/vulnerabilities" do
+  shared_examples 'forbids actions on vulnerability in case of disabled features' do
+    context 'when "first-class vulnerabilities" feature is disabled' do
+      before do
+        stub_feature_flags(first_class_vulnerabilities: false)
+      end
+
+      it 'responds with "not found"' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    context 'when security dashboard feature is not available' do
+      before do
+        stub_licensed_features(security_dashboard: false)
+      end
+
+      it 'responds with 403 Forbidden' do
+        subject
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+  end
+
+  describe 'GET /projects/:id/vulnerabilities' do
     let(:project_vulnerabilities_path) { "/projects/#{project.id}/vulnerabilities" }
+
+    subject { get api(project_vulnerabilities_path, user) }
 
     context 'with an authorized user with proper permissions' do
       before do
@@ -19,7 +47,7 @@ describe API::Vulnerabilities do
       end
 
       it 'returns all vulnerabilities of a project' do
-        get api(project_vulnerabilities_path, user)
+        subject
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to include_pagination_headers
@@ -27,23 +55,22 @@ describe API::Vulnerabilities do
         expect(response.headers['X-Total']).to eq project.vulnerabilities.count.to_s
       end
 
-      it 'paginates the vulnerabilities according to the pagination params' do
-        get api("#{project_vulnerabilities_path}?page=2&per_page=1", user)
+      context 'with pagination' do
+        let(:project_vulnerabilities_path) { "#{super()}?page=2&per_page=1" }
 
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response.map { |v| v['id'] }).to contain_exactly(project.vulnerabilities.second.id)
-      end
+        it 'paginates the vulnerabilities according to the pagination params' do
+          subject
 
-      context 'when "first-class vulnerabilities" feature is disabled' do
-        before do
-          stub_feature_flags(first_class_vulnerabilities: false)
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response.map { |v| v['id'] }).to contain_exactly(project.vulnerabilities.second.id)
         end
-
-        it_behaves_like 'getting list of vulnerability findings'
       end
+
+      it_behaves_like 'forbids actions on vulnerability in case of disabled features'
     end
 
-    it_behaves_like 'forbids access to project vulnerabilities endpoint in expected cases'
+    it_behaves_like 'responds with "not found" when there is no access to the project'
+    it_behaves_like 'prevents working with vulnerabilities in case of insufficient privileges'
   end
 
   describe "POST /vulnerabilities:id/dismiss" do
@@ -103,18 +130,6 @@ describe API::Vulnerabilities do
         end
       end
 
-      context 'and when security dashboard feature is not available' do
-        before do
-          stub_licensed_features(security_dashboard: false)
-        end
-
-        it 'responds with 403 Forbidden' do
-          subject
-
-          expect(response).to have_gitlab_http_status(403)
-        end
-      end
-
       context 'if a vulnerability is already dismissed' do
         let(:vulnerability) { create(:vulnerability, :closed, project: project) }
 
@@ -124,31 +139,11 @@ describe API::Vulnerabilities do
           expect(response).to have_gitlab_http_status(304)
         end
       end
+
+      it_behaves_like 'forbids actions on vulnerability in case of disabled features'
     end
 
-    context 'when user does not have permissions to create a dismissal feedback' do
-      before do
-        project.add_reporter(user)
-      end
-
-      it 'responds with 403 Forbidden' do
-        subject
-
-        expect(response).to have_gitlab_http_status(403)
-      end
-    end
-
-    context 'when first-class vulnerabilities feature is disabled' do
-      before do
-        stub_feature_flags(first_class_vulnerabilities: false)
-      end
-
-      it 'responds with 404 Not Found' do
-        subject
-
-        expect(response).to have_gitlab_http_status(404)
-      end
-    end
+    it_behaves_like 'prevents working with vulnerabilities in case of insufficient privileges'
   end
 
   describe "POST /vulnerabilities:id/resolve" do
@@ -188,41 +183,9 @@ describe API::Vulnerabilities do
         end
       end
 
-      context 'and when security dashboard feature is not available' do
-        before do
-          stub_licensed_features(security_dashboard: false)
-        end
-
-        it 'responds with 403 Forbidden' do
-          subject
-
-          expect(response).to have_gitlab_http_status(403)
-        end
-      end
+      it_behaves_like 'forbids actions on vulnerability in case of disabled features'
     end
 
-    context 'when user does not have permissions to resolve a vulnerability' do
-      before do
-        project.add_reporter(user)
-      end
-
-      it 'responds with 403 Forbidden' do
-        subject
-
-        expect(response).to have_gitlab_http_status(403)
-      end
-    end
-
-    context 'when first-class vulnerabilities feature is disabled' do
-      before do
-        stub_feature_flags(first_class_vulnerabilities: false)
-      end
-
-      it 'responds with 404 Not Found' do
-        subject
-
-        expect(response).to have_gitlab_http_status(404)
-      end
-    end
+    it_behaves_like 'prevents working with vulnerabilities in case of insufficient privileges'
   end
 end

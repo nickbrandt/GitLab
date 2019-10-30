@@ -4,8 +4,6 @@ module API
   class Vulnerabilities < Grape::API
     include PaginationParams
 
-    helpers ::API::Helpers::VulnerabilityFindingsHelpers
-
     helpers do
       def vulnerabilities_by(project)
         Security::VulnerabilitiesFinder.new(project).execute
@@ -31,6 +29,8 @@ module API
     end
 
     before do
+      not_found! unless Feature.enabled?(:first_class_vulnerabilities)
+
       authenticate!
     end
 
@@ -42,30 +42,22 @@ module API
         success VulnerabilityEntity
       end
       post ':id/resolve' do
-        if Feature.enabled?(:first_class_vulnerabilities)
-          vulnerability = find_and_authorize_vulnerability!(:resolve_vulnerability)
-          break not_modified! if vulnerability.closed?
+        vulnerability = find_and_authorize_vulnerability!(:resolve_vulnerability)
+        break not_modified! if vulnerability.closed?
 
-          vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
-          render_vulnerability(vulnerability)
-        else
-          not_found!
-        end
+        vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
+        render_vulnerability(vulnerability)
       end
 
       desc 'Dismiss a vulnerability' do
         success VulnerabilityEntity
       end
       post ':id/dismiss' do
-        if Feature.enabled?(:first_class_vulnerabilities)
-          vulnerability = find_and_authorize_vulnerability!(:dismiss_vulnerability)
-          break not_modified! if vulnerability.closed?
+        vulnerability = find_and_authorize_vulnerability!(:dismiss_vulnerability)
+        break not_modified! if vulnerability.closed?
 
-          vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
-          render_vulnerability(vulnerability)
-        else
-          not_found!
-        end
+        vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
+        render_vulnerability(vulnerability)
       end
     end
 
@@ -73,28 +65,17 @@ module API
       requires :id, type: String, desc: 'The ID of a project'
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
-      params do
-        # These params have no effect for Vulnerabilities API but are required to support falling back to
-        # responding with Vulnerability Findings when :first_class_vulnerabilities feature is disabled.
-        # TODO: replace :vulnerability_findings_params with just :pagination when feature flag is removed
-        # https://gitlab.com/gitlab-org/gitlab/issues/33488
-        use :vulnerability_findings_params
-      end
       desc 'Get a list of project vulnerabilities' do
         success VulnerabilityEntity
       end
       get ':id/vulnerabilities' do
-        if Feature.enabled?(:first_class_vulnerabilities)
-          authorize! :read_project_security_dashboard, user_project
+        authorize! :read_project_security_dashboard, user_project
 
-          vulnerabilities = paginate(
-            vulnerabilities_by(user_project)
-          )
+        vulnerabilities = paginate(
+          vulnerabilities_by(user_project)
+        )
 
-          present vulnerabilities, with: VulnerabilityEntity
-        else
-          respond_with_vulnerability_findings
-        end
+        present vulnerabilities, with: VulnerabilityEntity
       end
     end
   end
