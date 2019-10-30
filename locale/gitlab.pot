@@ -16437,6 +16437,9 @@ msgstr ""
 msgid "The group and its projects can only be viewed by members."
 msgstr ""
 
+msgid "The group has already been shared with this group"
+msgstr ""
+
 msgid "The group settings for %{group_links} require you to enable Two-Factor Authentication for your account. You can %{leave_group_links}."
 msgstr ""
 
