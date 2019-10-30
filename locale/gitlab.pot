@@ -8692,7 +8692,7 @@ msgstr ""
 msgid "How it works"
 msgstr ""
 
-msgid "How many days need to pass between marking project for deletion and actual removing it."
+msgid "How many days need to pass between marking entity for deletion and actual removing it."
 msgstr ""
 
 msgid "How many replicas each Elasticsearch shard has."
