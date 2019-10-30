@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Create' do
+  # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/35152
+  context 'Create', :quarantine do
     describe 'Pull mirror a repository over SSH with a private key' do
       let(:source) do
         Resource::Repository::ProjectPush.fabricate! do |project_push|
