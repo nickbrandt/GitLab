@@ -12,8 +12,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
   let(:restored_project_json) { project_tree_restorer.restore }
 
   before do
-    allow(shared).to receive(:export_path).and_return('spec/fixtures/lib/gitlab/import_export/')
-    project_tree_restorer.instance_variable_set(:@path, 'ee/spec/fixtures/lib/gitlab/import_export/project.designs.json')
+    setup_import_export_config('designs', 'ee')
   end
 
   describe 'restoring design management data' do
