@@ -7,6 +7,7 @@ import {
   issuable4,
   issuable5,
 } from 'spec/vue_shared/components/issue/related_issuable_mock_data';
+import { PathIdSeparator } from 'ee/related_issues/constants';
 
 describe('RelatedIssuesBlock', () => {
   let RelatedIssuesBlock;
@@ -26,7 +27,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          pathIdSeparator: '#',
+          pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'issue',
         },
       }).$mount();
@@ -49,7 +50,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          pathIdSeparator: '#',
+          pathIdSeparator: PathIdSeparator.Issue,
           isFetching: true,
           issuableType: 'issue',
         },
@@ -69,7 +70,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          pathIdSeparator: '#',
+          pathIdSeparator: PathIdSeparator.Issue,
           canAdmin: true,
           issuableType: 'issue',
         },
@@ -85,7 +86,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          pathIdSeparator: '#',
+          pathIdSeparator: PathIdSeparator.Issue,
           isFormVisible: true,
           issuableType: 'issue',
         },
@@ -101,7 +102,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          pathIdSeparator: '#',
+          pathIdSeparator: PathIdSeparator.Issue,
           relatedIssues: [issuable1, issuable2],
           issuableType: 'issue',
         },
@@ -117,7 +118,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          pathIdSeparator: '#',
+          pathIdSeparator: PathIdSeparator.Issue,
           relatedIssues: [issuable1, issuable2, issuable3, issuable4, issuable5],
           issuableType: 'issue',
         },
@@ -167,7 +168,7 @@ describe('RelatedIssuesBlock', () => {
       it(`issuableType=${issuableType} is passed`, () => {
         vm = new RelatedIssuesBlock({
           propsData: {
-            pathIdSeparator: '#',
+            pathIdSeparator: PathIdSeparator.Issue,
             issuableType,
           },
         }).$mount();
@@ -183,7 +184,7 @@ describe('RelatedIssuesBlock', () => {
     it('issuableType is epic', () => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          pathIdSeparator: '#',
+          pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'issue',
         },
       }).$mount();
@@ -196,7 +197,7 @@ describe('RelatedIssuesBlock', () => {
     it('issuableType is issue', () => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          pathIdSeparator: '#',
+          pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'epic',
         },
       }).$mount();
@@ -217,7 +218,7 @@ describe('RelatedIssuesBlock', () => {
     it('issuableType is epic', () => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          pathIdSeparator: '#',
+          pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'epic',
           relatedIssues,
         },
@@ -233,7 +234,7 @@ describe('RelatedIssuesBlock', () => {
     it('issuableType is issue', () => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          pathIdSeparator: '#',
+          pathIdSeparator: PathIdSeparator.Issue,
           issuableType: 'issue',
           relatedIssues,
         },

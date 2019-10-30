@@ -14,10 +14,9 @@ import TreeItemRemoveModal from './tree_item_remove_modal.vue';
 import RelatedItemsTreeHeader from './related_items_tree_header.vue';
 import RelatedItemsTreeBody from './related_items_tree_body.vue';
 
-import { PathIdSeparator, OVERFLOW_AFTER } from '../constants';
+import { OVERFLOW_AFTER } from '../constants';
 
 export default {
-  PathIdSeparator,
   OVERFLOW_AFTER,
   components: {
     GlLoadingIcon,

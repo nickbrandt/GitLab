@@ -5,8 +5,8 @@ import * as actions from 'ee/related_items_tree/store/actions';
 import * as types from 'ee/related_items_tree/store/mutation_types';
 
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
-import { ChildType, ChildState, PathIdSeparator } from 'ee/related_items_tree/constants';
-import { issuableTypesMap } from 'ee/related_issues/constants';
+import { ChildType, ChildState } from 'ee/related_items_tree/constants';
+import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
 
 import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
@@ -970,7 +970,7 @@ describe('RelatedItemTree', () => {
           const createdEpic = Object.assign({}, mockEpics[0], {
             id: `gid://gitlab/Epic/${mockEpics[0].id}`,
             reference: `${mockEpics[0].group.fullPath}${mockEpics[0].reference}`,
-            pathIdSeparator: '&',
+            pathIdSeparator: PathIdSeparator.Epic,
           });
           state.epicsBeginAtIndex = 0;
           state.parentItem = {

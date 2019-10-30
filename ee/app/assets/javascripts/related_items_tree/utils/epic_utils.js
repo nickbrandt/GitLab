@@ -1,6 +1,7 @@
 import createGqClient from '~/lib/graphql';
 
-import { ChildType, PathIdSeparator } from '../constants';
+import { PathIdSeparator } from 'ee/related_issues/constants';
+import { ChildType } from '../constants';
 
 export const gqClient = createGqClient();
 
