@@ -128,7 +128,8 @@ module Gitlab
           omniauth_enabled: Gitlab::Auth.omniauth_enabled?,
           prometheus_metrics_enabled: Gitlab::Metrics.prometheus_metrics_enabled?,
           reply_by_email_enabled: Gitlab::IncomingEmail.enabled?,
-          signup_enabled: Gitlab::CurrentSettings.allow_signup?
+          signup_enabled: Gitlab::CurrentSettings.allow_signup?,
+          ingress_modsecurity_enabled: Feature.enabled?(:ingress_modsecurity)
         }
       end
 

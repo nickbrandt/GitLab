@@ -65,6 +65,7 @@ describe Gitlab::UsageData do
         avg_cycle_analytics
         influxdb_metrics_enabled
         prometheus_metrics_enabled
+        ingress_modsecurity_enabled
       ))
     end
 
@@ -235,6 +236,7 @@ describe Gitlab::UsageData do
       expect(subject[:container_registry_enabled]).to eq(Gitlab.config.registry.enabled)
       expect(subject[:dependency_proxy_enabled]).to eq(Gitlab.config.dependency_proxy.enabled)
       expect(subject[:gitlab_shared_runners_enabled]).to eq(Gitlab.config.gitlab_ci.shared_runners_enabled)
+      expect(subject[:ingress_modsecurity_enabled]).to eq(Feature.enabled?(:ingress_modsecurity))
     end
   end
 
