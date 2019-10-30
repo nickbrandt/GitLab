@@ -243,6 +243,12 @@ module EE
       feature_available?(:epics)
     end
 
+    def marked_for_deletion?
+      return false unless feature_available?(:adjourned_deletion_for_projects_and_groups)
+
+      marked_for_deletion_on.present?
+    end
+
     private
 
     def custom_project_templates_group_allowed
