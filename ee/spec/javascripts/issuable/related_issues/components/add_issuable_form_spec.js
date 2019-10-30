@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { PathIdSeparator } from 'ee/related_issues/constants';
 import addIssuableForm from 'ee/related_issues/components/add_issuable_form.vue';
 
 const issuable1 = {
@@ -19,7 +20,7 @@ const issuable2 = {
   state: 'opened',
 };
 
-const pathIdSeparator = '#';
+const pathIdSeparator = PathIdSeparator.Issue;
 
 describe('AddIssuableForm', () => {
   let AddIssuableForm;

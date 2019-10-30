@@ -1,5 +1,5 @@
-import { issuableTypesMap } from 'ee/related_issues/constants';
-import { ChildType, PathIdSeparator } from '../constants';
+import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
+import { ChildType } from '../constants';
 
 export const autoCompleteSources = () => gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources;
 
