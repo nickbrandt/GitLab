@@ -22,6 +22,8 @@ describe Project do
     it { is_expected.to delegate_method(:shared_runners_minutes_limit_enabled?).to(:shared_runners_limit_namespace) }
     it { is_expected.to delegate_method(:shared_runners_minutes_used?).to(:shared_runners_limit_namespace) }
 
+    it { is_expected.to belong_to(:deleting_user) }
+
     it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
     it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
     it { is_expected.to have_one(:alerting_setting).class_name('Alerting::ProjectAlertingSetting') }
@@ -2210,6 +2212,54 @@ describe Project do
       it 'returns true' do
         result = alt_project.package_already_taken?("@#{namespace.path}/foo")
         expect(result).to be true
+      end
+    end
+  end
+
+  describe '#adjourned_deletion?' do
+    context 'when marking for deletion feature is available' do
+      let(:project) { create(:project) }
+
+      before do
+        stub_licensed_features(marking_project_for_deletion: true)
+      end
+
+      context 'when number of days is set to more than 0' do
+        it 'returns true' do
+          stub_application_setting(deletion_adjourned_period: 1)
+          expect(project.adjourned_deletion?).to eq(true)
+        end
+      end
+
+      context 'when number of days is set to 0' do
+        it 'returns false' do
+          stub_application_setting(deletion_adjourned_period: 0)
+          expect(project.adjourned_deletion?).to eq(false)
+        end
+      end
+    end
+
+    context 'when marking for deletion feature is not available' do
+      let(:project) { create(:project) }
+
+      before do
+        stub_licensed_features(marking_project_for_deletion: false)
+      end
+
+      context 'when number of days is set to more than 0' do
+        it 'returns false' do
+          stub_application_setting(deletion_adjourned_period: 1)
+
+          expect(project.adjourned_deletion?).to eq(false)
+        end
+      end
+
+      context 'when number of days is set to 0' do
+        it 'returns false' do
+          stub_application_setting(deletion_adjourned_period: 0)
+
+          expect(project.adjourned_deletion?).to eq(false)
+        end
       end
     end
   end
