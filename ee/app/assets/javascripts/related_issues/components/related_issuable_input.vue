@@ -122,7 +122,10 @@ export default {
       // Avoid tokenizing partial input when clicking an autocomplete item
       if (!this.isAutoCompleteOpen) {
         const { value } = this.$refs.input;
-        this.$emit('addIssuableFormBlur', value);
+        // Avoid event emission when only pathIdSeparator has been typed
+        if (value !== this.pathIdSeparator) {
+          this.$emit('addIssuableFormBlur', value);
+        }
       }
     },
     onFocus() {
