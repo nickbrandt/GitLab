@@ -6,56 +6,59 @@ describe Users::SignupService do
   let(:user) { create(:user, setup_for_company: true) }
 
   describe '#execute' do
-    it 'updates the name attribute' do
-      result = update_user(user, name: 'New Name')
+    context 'when updating name' do
+      it 'updates the name attribute' do
+        result = update_user(user, name: 'New Name')
 
-      expect(result).to eq(status: :success)
-      expect(user.reload.name).to eq('New Name')
+        expect(result).to eq(status: :success)
+        expect(user.reload.name).to eq('New Name')
+      end
+
+      it 'returns an error result when name is missing' do
+        result = update_user(user, name: '')
+
+        expect(user.reload.name).not_to be_blank
+        expect(result[:status]).to eq(:error)
+        expect(result[:message]).to include("Name can't be blank")
+      end
     end
 
-    it 'updates the role attribute' do
-      result = update_user(user, role: 'development_team_lead')
+    context 'when updating role' do
+      it 'updates the role attribute' do
+        result = update_user(user, role: 'development_team_lead')
 
-      expect(result).to eq(status: :success)
-      expect(user.reload.role).to eq('development_team_lead')
+        expect(result).to eq(status: :success)
+        expect(user.reload.role).to eq('development_team_lead')
+      end
+
+      it 'returns an error result when role is missing' do
+        result = update_user(user, role: '')
+
+        expect(user.reload.role).not_to be_blank
+        expect(result[:status]).to eq(:error)
+        expect(result[:message]).to eq("Role can't be blank")
+      end
     end
 
-    it 'updates the setup_for_company attribute' do
-      result = update_user(user, setup_for_company: 'false')
+    context 'when updating setup_for_company' do
+      it 'updates the setup_for_company attribute' do
+        result = update_user(user, setup_for_company: 'false')
 
-      expect(result).to eq(status: :success)
-      expect(user.reload.setup_for_company).to be_falsey
-    end
+        expect(result).to eq(status: :success)
+        expect(user.reload.setup_for_company).to be(false)
+      end
 
-    it 'returns an error result when name is missing' do
-      result = {}
-      expect do
-        result = update_user(user, { name: '' })
-      end.not_to change { user.reload.name }
-      expect(result[:status]).to eq(:error)
-      expect(result[:message]).to eq('Please fill in your full name')
-    end
+      it 'returns an error result when setup_for_company is missing' do
+        result = update_user(user, setup_for_company: '')
 
-    it 'returns an error result when role is missing' do
-      result = {}
-      expect do
-        result = update_user(user, { role: '' })
-      end.not_to change { user.reload.role }
-      expect(result[:status]).to eq(:error)
-      expect(result[:message]).to eq('Please select your role')
-    end
-
-    it 'returns an error result when setup_for_company is missing' do
-      result = {}
-      expect do
-        result = update_user(user, { setup_for_company: '' })
-      end.not_to change { user.reload.setup_for_company }
-      expect(result[:status]).to eq(:error)
-      expect(result[:message]).to eq('Please answer "Are you setting up GitLab for a company?"')
+        expect(user.reload.setup_for_company).not_to be_blank
+        expect(result[:status]).to eq(:error)
+        expect(result[:message]).to eq("Setup for company can't be blank")
+      end
     end
 
     def update_user(user, opts)
-      described_class.new(user, opts.merge(user: user)).execute
+      described_class.new(user, opts).execute
     end
   end
 end

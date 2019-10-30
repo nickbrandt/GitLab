@@ -2,25 +2,19 @@
 
 module Users
   class SignupService < BaseService
-    attr_reader :user
-
     def initialize(current_user, params = {})
-      @current_user = current_user
-      @user = params.delete(:user)
+      @user = current_user
       @params = params.dup
     end
 
-    def execute(validate: true, &block)
-      yield(@user) if block_given?
-
+    def execute
       assign_attributes
-      custom_validations
+      inject_validators
 
-      if @user.errors.empty? && @user.save(validate: validate)
+      if @user.save
         success
       else
-        messages = @user.errors.full_messages + Array(@user.status&.errors&.full_messages)
-        error(messages.uniq.join('. '))
+        error(@user.errors.full_messages.join('. '))
       end
     end
 
@@ -30,10 +24,11 @@ module Users
       @user.assign_attributes(params) unless params.empty?
     end
 
-    def custom_validations
-      @user.errors.add(:base, 'Please fill in your full name') if @user.name.blank?
-      @user.errors.add(:base, 'Please select your role') if @user.role.blank?
-      @user.errors.add(:base, 'Please answer "Are you setting up GitLab for a company?"') if @user.setup_for_company.nil?
+    def inject_validators
+      class << @user
+        validates :role, presence: true
+        validates :setup_for_company, inclusion: { in: [true, false], message: :blank }
+      end
     end
   end
 end

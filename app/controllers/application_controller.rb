@@ -541,7 +541,7 @@ class ApplicationController < ActionController::Base
   # experiment is enabled for the current user.
   def required_signup_info
     return unless current_user
-    return unless current_user.role_required? || current_user.setup_for_company.nil?
+    return unless current_user.role_required?
     return unless experiment_enabled?(:signup_flow)
 
     store_location_for :user, request.fullpath

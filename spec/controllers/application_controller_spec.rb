@@ -832,9 +832,8 @@ describe ApplicationController do
       def index; end
     end
 
-    let(:user) { create(:user, setup_for_company: setup_for_company) }
+    let(:user) { create(:user) }
     let(:experiment_enabled) { true }
-    let(:setup_for_company) { true }
 
     before do
       stub_experiment_for_user(signup_flow: experiment_enabled)
@@ -850,18 +849,7 @@ describe ApplicationController do
       it { is_expected.to redirect_to users_sign_up_welcome_path }
     end
 
-    context 'experiment enabled and user without the setup_for_company attribute set' do
-      let(:setup_for_company) { nil }
-
-      before do
-        sign_in(user)
-        get :index
-      end
-
-      it { is_expected.to redirect_to users_sign_up_welcome_path }
-    end
-
-    context 'experiment enabled and user without a required role and with the setup_for_company attribute set' do
+    context 'experiment enabled and user without a required role' do
       before do
         sign_in(user)
         get :index
@@ -872,7 +860,6 @@ describe ApplicationController do
 
     context 'experiment disabled' do
       let(:experiment_enabled) { false }
-      let(:setup_for_company) { nil }
 
       before do
         user.set_role_required!
