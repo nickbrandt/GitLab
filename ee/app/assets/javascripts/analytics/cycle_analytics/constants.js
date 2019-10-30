@@ -30,5 +30,5 @@ export const EMPTY_STAGE_TEXT = {
   ),
 };
 
-export const TASKS_BY_TYPE_SUBJECT_ISSUE = 'issues';
-export const TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST = 'merge_requests';
+export const TASKS_BY_TYPE_SUBJECT_ISSUE = 'Issue';
+export const TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST = 'MergeRequest';

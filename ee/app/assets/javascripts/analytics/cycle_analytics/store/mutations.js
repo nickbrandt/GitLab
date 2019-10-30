@@ -60,12 +60,26 @@ export default {
   },
   [types.REQUEST_GROUP_LABELS](state) {
     state.labels = [];
+    state.tasksByType = {
+      ...state.tasksByType,
+      labelIds: [],
+    };
   },
   [types.RECEIVE_GROUP_LABELS_SUCCESS](state, data = []) {
+    const { tasksByType } = state;
     state.labels = data.map(convertObjectPropsToCamelCase);
+    state.tasksByType = {
+      ...tasksByType,
+      labelIds: data.map(({ id }) => id),
+    };
   },
   [types.RECEIVE_GROUP_LABELS_ERROR](state) {
+    const { tasksByType } = state;
     state.labels = [];
+    state.tasksByType = {
+      ...tasksByType,
+      labelIds: [],
+    };
   },
   [types.HIDE_CUSTOM_STAGE_FORM](state) {
     state.isAddingCustomStage = false;

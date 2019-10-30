@@ -429,9 +429,16 @@ describe('Cycle Analytics component', () => {
 
       mock
         .onGet('/groups/foo/-/labels')
-        .replyOnce(httpStatusCodes.OK, { response: { ...mockData.groupLabels } })
+        .replyOnce(httpStatusCodes.OK, [...mockData.groupLabels])
         .onGet('/groups/foo/-/cycle_analytics')
-        .replyOnce(httpStatusCodes.OK, { response: { status: httpStatusCodes.OK } })
+        .replyOnce(httpStatusCodes.OK, {
+          ...mockData.cycleAnalyticsData,
+          response: { status: httpStatusCodes.OK },
+        })
+        .onGet('/groups/foo/-/cycle_analytics/events/issue.json')
+        .replyOnce(httpStatusCodes.OK, {
+          response: { events: mockData.issueEvents },
+        })
         .onGet('/-/analytics/type_of_work/tasks_by_type')
         .replyOnce(httpStatusCodes.BAD_REQUEST, {
           response: { status: httpStatusCodes.BAD_REQUEST },

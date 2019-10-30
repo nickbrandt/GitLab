@@ -32,7 +32,10 @@ export const setDateRange = (
 
   if (skipFetch) return false;
 
-  return dispatch('fetchCycleAnalyticsData', { state, dispatch });
+  return Promise.all([
+    dispatch('fetchCycleAnalyticsData', { state, dispatch }),
+    dispatch('fetchTasksByTypeData'),
+  ]);
 };
 
 export const requestStageData = ({ commit }) => commit(types.REQUEST_STAGE_DATA);
@@ -208,23 +211,24 @@ export const receiveTasksByTypeDataError = ({ commit }, error) => {
 };
 export const requestTasksByTypeData = ({ commit }) => commit(types.REQUEST_TASKS_BY_TYPE_DATA);
 
-export const fetchTasksByTypeData = ({ dispatch, state }, groupPath) => {
+export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   const endpoint = '/-/analytics/type_of_work/tasks_by_type';
+  const { currentGroupPath } = getters;
   const {
     tasksByType: { labelIds, subject },
     selectedProjectIds,
-    timeFrameCreatedBefore,
-    timeFrameCreatedAfter,
+    startDate,
+    endDate,
   } = state;
 
   // dont request if we have no labels selected...for now
-  if (!labelIds.length) {
+  if (labelIds.length) {
     const params = {
-      group_id: groupPath,
-      label_ids: labelIds,
-      project_ids: selectedProjectIds,
-      created_before: timeFrameCreatedBefore,
-      created_after: timeFrameCreatedAfter,
+      group_id: currentGroupPath,
+      label_ids: `[${labelIds}]`,
+      project_ids: selectedProjectIds || [],
+      created_after: dateFormat(startDate, dateFormats.isoDate),
+      created_before: dateFormat(endDate, dateFormats.isoDate),
       subject,
     };
 
@@ -236,4 +240,5 @@ export const fetchTasksByTypeData = ({ dispatch, state }, groupPath) => {
       .then(data => dispatch('receiveTasksByTypeDataSuccess', data))
       .catch(error => dispatch('receiveTasksByTypeDataError', error));
   }
+  return Promise.resolve();
 };

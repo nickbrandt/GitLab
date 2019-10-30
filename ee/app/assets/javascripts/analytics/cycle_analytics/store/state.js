@@ -13,6 +13,7 @@ export default () => ({
 
   isLoading: false,
   isLoadingStage: false,
+  isLoadingChartData: false,
 
   isEmptyStage: false,
   errorCode: null,
@@ -35,6 +36,6 @@ export default () => ({
     subject: TASKS_BY_TYPE_SUBJECT_ISSUE, // issues | merge_requests, defaults to issues
     // list of selected labels for the tasks by type chart
     labelIds: [],
-    data: []
+    data: [],
   },
 });
