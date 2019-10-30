@@ -307,6 +307,7 @@ export default {
         :license-management-settings-path="mr.licenseManagement.license_management_settings_path"
         :base-path="mr.licenseManagement.base_path"
         :head-path="mr.licenseManagement.head_path"
+        :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
         report-section-class="mr-widget-border-top"
       />
       <grouped-test-reports-app
