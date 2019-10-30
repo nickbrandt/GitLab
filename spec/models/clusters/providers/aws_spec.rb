@@ -6,6 +6,7 @@ describe Clusters::Providers::Aws do
   it { is_expected.to belong_to(:cluster) }
   it { is_expected.to belong_to(:created_by_user) }
 
+  it { is_expected.to validate_presence_of(:created_by_user).on(:create) }
   it { is_expected.to validate_length_of(:key_name).is_at_least(1).is_at_most(255) }
   it { is_expected.to validate_length_of(:region).is_at_least(1).is_at_most(255) }
   it { is_expected.to validate_length_of(:instance_type).is_at_least(1).is_at_most(255) }
@@ -52,6 +53,33 @@ describe Clusters::Providers::Aws do
         let(:num_nodes) { 3 }
 
         it { is_expected.to be_truthy }
+      end
+    end
+  end
+
+  describe 'callbacks' do
+    describe '#set_created_by_user' do
+      let(:cluster) { create(:cluster) }
+      let(:provider) { build(:cluster_provider_aws, created_by_user: user, cluster: cluster) }
+
+      context 'created_by_user is blank' do
+        let(:user) { nil }
+
+        it 'saves the user from the cluster record' do
+          provider.save
+
+          expect(provider.created_by_user).to eq(provider.cluster.user)
+        end
+      end
+
+      context 'created_by_user is present' do
+        let(:user) { create(:user) }
+
+        it 'does not update the provider' do
+          provider.save
+
+          expect(provider.created_by_user).to eq(user)
+        end
       end
     end
   end

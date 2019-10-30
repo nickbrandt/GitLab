@@ -15,6 +15,8 @@ module Clusters
       default_value_for :num_nodes, 3
       default_value_for :instance_type, 'm5.large'
 
+      before_validation :set_created_by_user, on: :create
+
       attr_encrypted :secret_access_key,
         mode: :per_attribute_iv,
         key: Settings.attr_encrypted_db_key_base_truncated,
@@ -33,6 +35,7 @@ module Clusters
           greater_than: 0
         }
 
+      validates :created_by_user, presence: true, on: :create
       validates :key_name, :region, :instance_type, :security_group_id, length: { in: 1..255 }
       validates :subnet_ids, presence: true
 
@@ -54,6 +57,12 @@ module Clusters
         strong_memoize(:credentials) do
           ::Aws::Credentials.new(access_key_id, secret_access_key, session_token)
         end
+      end
+
+      private
+
+      def set_created_by_user
+        self.created_by_user ||= cluster&.user
       end
     end
   end
