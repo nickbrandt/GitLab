@@ -13,6 +13,8 @@ import {
   SET_ROLE,
   SET_SECURITY_GROUP,
   SET_GITLAB_MANAGED_CLUSTER,
+  SET_INSTANCE_TYPE,
+  SET_NODE_COUNT,
   REQUEST_CREATE_ROLE,
   CREATE_ROLE_SUCCESS,
   CREATE_ROLE_ERROR,
@@ -33,6 +35,8 @@ describe('EKS Cluster Store Actions', () => {
   let role;
   let keyPair;
   let securityGroup;
+  let instanceType;
+  let nodeCount;
   let gitlabManagedCluster;
   let mock;
   let state;
@@ -48,6 +52,8 @@ describe('EKS Cluster Store Actions', () => {
     role = 'role-1';
     keyPair = 'key-pair-1';
     securityGroup = 'default group';
+    instanceType = 'small-1';
+    nodeCount = '5';
     gitlabManagedCluster = true;
 
     newClusterUrl = '/clusters/1';
@@ -79,6 +85,8 @@ describe('EKS Cluster Store Actions', () => {
     ${'setVpc'}                  | ${SET_VPC}                    | ${{ vpc }}               | ${'vpc'}
     ${'setSubnet'}               | ${SET_SUBNET}                 | ${{ subnet }}            | ${'subnet'}
     ${'setSecurityGroup'}        | ${SET_SECURITY_GROUP}         | ${{ securityGroup }}     | ${'securityGroup'}
+    ${'setInstanceType'}         | ${SET_INSTANCE_TYPE}          | ${{ instanceType }}      | ${'instance type'}
+    ${'setNodeCount'}            | ${SET_NODE_COUNT}             | ${{ nodeCount }}         | ${'node count'}
     ${'setGitlabManagedCluster'} | ${SET_GITLAB_MANAGED_CLUSTER} | ${gitlabManagedCluster}  | ${'gitlab managed cluster'}
   `(`$action commits $mutation with $payloadDescription payload`, data => {
     const { action, mutation, payload } = data;
@@ -164,7 +172,7 @@ describe('EKS Cluster Store Actions', () => {
 
     beforeEach(() => {
       requestPayload = {
-        cluster_name: clusterName,
+        name: clusterName,
         environment_scope: environmentScope,
         managed: gitlabManagedCluster,
         provider_aws_attributes: {
@@ -188,6 +196,8 @@ describe('EKS Cluster Store Actions', () => {
         selectedRole: role,
         selectedKeyPair: keyPair,
         selectedSecurityGroup: securityGroup,
+        selectedInstanceType: instanceType,
+        nodeCount,
         gitlabManagedCluster,
       });
     });

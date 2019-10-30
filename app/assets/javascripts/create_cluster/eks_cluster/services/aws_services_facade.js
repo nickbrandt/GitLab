@@ -45,4 +45,14 @@ export default apiPaths => ({
         securityGroups.map(({ group_name: name, group_id: value }) => ({ name, value })),
       );
   },
+  fetchInstanceTypes() {
+    return axios
+      .get(apiPaths.getInstanceTypesPath)
+      .then(({ data: { instance_types: instanceTypes } }) =>
+        instanceTypes.map(({ instance_type_name }) => ({
+          name: instance_type_name,
+          value: instance_type_name,
+        })),
+      );
+  },
 });

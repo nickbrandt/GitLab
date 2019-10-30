@@ -106,6 +106,14 @@ export const setGitlabManagedCluster = ({ commit }, payload) => {
   commit(types.SET_GITLAB_MANAGED_CLUSTER, payload);
 };
 
+export const setInstanceType = ({ commit }, payload) => {
+    commit(types.SET_INSTANCE_TYPE, payload);
+};
+
+export const setNodeCount = ({ commit }, payload) => {
+    commit(types.SET_NODE_COUNT, payload);
+};
+
 export const signOut = ({ commit, state: { signOutPath }) => {
     return axios
     .delete(signOutPath)

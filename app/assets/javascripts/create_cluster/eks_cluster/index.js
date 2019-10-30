@@ -18,10 +18,12 @@ export default el => {
     getVpcsPath,
     getSubnetsPath,
     getSecurityGroupsPath,
+    getInstanceTypesPath,
     externalId,
     accountId,
     hasCredentials,
     createRolePath,
+    createClusterPath,
     externalLinkIcon,
   } = el.dataset;
 
@@ -33,12 +35,14 @@ export default el => {
         externalId,
         accountId,
         createRolePath,
+        createClusterPath,
         getRolesPath,
         getRegionsPath,
         getKeyPairsPath,
         getVpcsPath,
         getSubnetsPath,
         getSecurityGroupsPath,
+        getInstanceTypesPath,
       },
     }),
     components: {

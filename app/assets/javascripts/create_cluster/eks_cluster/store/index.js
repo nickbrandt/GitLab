@@ -41,6 +41,10 @@ const createStore = ({ initialState, apiPaths }) => {
         namespaced: true,
         ...clusterDropdownStore(awsServices.fetchSecurityGroups),
       },
+      instanceTypes: {
+        namespaced: true,
+        ...clusterDropdownStore(awsServices.fetchInstanceTypes),
+      },
     },
   });
 };

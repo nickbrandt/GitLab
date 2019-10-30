@@ -17,6 +17,7 @@ describe('awsServicesFacade', () => {
       getSecurityGroupsPath: '/clusters/aws/api/security_groups',
       getSubnetsPath: '/clusters/aws/api/subnets',
       getVpcsPath: '/clusters/aws/api/vpcs',
+      getInstanceTypesPath: '/clusters/aws/api/instance_types',
     };
     region = 'west-1';
     vpc = 'vpc-2';
@@ -128,6 +129,24 @@ describe('awsServicesFacade', () => {
       expect(awsServices.fetchSecurityGroups({ region, vpc })).resolves.toEqual(
         securityGroupsOutput,
       );
+    });
+  });
+
+  describe('when fetchInstanceTypes succeeds', () => {
+    let instanceTypes;
+    let instanceTypesOutput;
+
+    beforeEach(() => {
+      instanceTypes = [{ instance_type_name: 't2.small' }, { instance_type_name: 't2.medium' }];
+      instanceTypesOutput = instanceTypes.map(({ instance_type_name }) => ({
+        name: instance_type_name,
+        value: instance_type_name,
+      }));
+      axiosMock.onGet(apiPaths.getInstanceTypesPath).reply(200, { instance_types: instanceTypes });
+    });
+
+    it(`return list of instance types where each item has a name and value`, () => {
+      expect(awsServices.fetchInstanceTypes()).resolves.toEqual(instanceTypesOutput);
     });
   });
 });

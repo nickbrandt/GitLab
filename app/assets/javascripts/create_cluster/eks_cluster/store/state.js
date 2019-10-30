@@ -21,6 +21,8 @@ export default () => ({
   selectedVpc: '',
   selectedSubnet: '',
   selectedSecurityGroup: '',
+  selectedInstanceType: '',
+  nodeCount: '3',
 
   isCreatingCluster: false,
   createClusterError: false,

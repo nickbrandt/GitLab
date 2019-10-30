@@ -23,6 +23,10 @@ const {
   mapState: mapSecurityGroupsState,
   mapActions: mapSecurityGroupsActions,
 } = createNamespacedHelpers('securityGroups');
+const {
+  mapState: mapInstanceTypesState,
+  mapActions: mapInstanceTypesActions,
+} = createNamespacedHelpers('instanceTypes');
 
 export default {
   components: {
@@ -53,6 +57,8 @@ export default {
       'selectedSubnet',
       'selectedRole',
       'selectedSecurityGroup',
+      'selectedInstanceType',
+      'nodeCount',
       'gitlabManagedCluster',
       'isCreatingCluster',
     ]),
@@ -86,6 +92,11 @@ export default {
       isLoadingSecurityGroups: 'isLoadingItems',
       loadingSecurityGroupsError: 'loadingItemsError',
     }),
+    ...mapInstanceTypesState({
+      instanceTypes: 'items',
+      isLoadingInstanceTypes: 'isLoadingItems',
+      loadingInstanceTypesError: 'loadingItemsError',
+    }),
     kubernetesVersions() {
       return KUBERNETES_VERSIONS;
     },
@@ -112,12 +123,14 @@ export default {
         !this.selectedSubnet ||
         !this.selectedRole ||
         !this.selectedSecurityGroup ||
+        !this.selectedInstanceType ||
+        !this.nodeCount ||
         this.isCreatingCluster
       );
     },
     createClusterButtonLabel() {
       return this.isCreatingCluster
-        ? __('ClusterIntegration|Creating Kubernetes cluster')
+        ? s__('ClusterIntegration|Creating Kubernetes cluster')
         : s__('ClusterIntegration|Create Kubernetes cluster');
     },
     kubernetesIntegrationHelpText() {
@@ -199,6 +212,20 @@ export default {
         false,
       );
     },
+    instanceTypesDropdownHelpText() {
+      return sprintf(
+        s__(
+          'ClusterIntegration|Choose the worker node %{startLink}instance type %{externalLinkIcon} %{endLink}.',
+        ),
+        {
+          startLink:
+            '<a href="https://aws.amazon.com/ec2/instance-types" target="_blank" rel="noopener noreferrer">',
+          externalLinkIcon: this.externalLinkIcon,
+          endLink: '</a>',
+        },
+        false,
+      );
+    },
     gitlabManagedHelpText() {
       const escapedUrl = _.escape(this.gitlabManagedClusterHelpPath);
 
@@ -217,6 +244,7 @@ export default {
   mounted() {
     this.fetchRegions();
     this.fetchRoles();
+    this.fetchInstanceTypes();
   },
   methods: {
     ...mapActions([
@@ -231,6 +259,8 @@ export default {
       'setRole',
       'setKeyPair',
       'setSecurityGroup',
+      'setInstanceType',
+      'setNodeCount',
       'setGitlabManagedCluster',
     ]),
     ...mapRegionsActions({ fetchRegions: 'fetchItems' }),
@@ -239,6 +269,7 @@ export default {
     ...mapRolesActions({ fetchRoles: 'fetchItems' }),
     ...mapKeyPairsActions({ fetchKeyPairs: 'fetchItems' }),
     ...mapSecurityGroupsActions({ fetchSecurityGroups: 'fetchItems' }),
+    ...mapInstanceTypesActions({ fetchInstanceTypes: 'fetchItems' }),
     setRegionAndFetchVpcsAndKeyPairs(region) {
       this.setRegion({ region });
       this.fetchVpcs({ region });
@@ -410,6 +441,39 @@ export default {
         @input="setSecurityGroup({ securityGroup: $event })"
       />
       <p class="form-text text-muted" v-html="securityGroupDropdownHelpText"></p>
+    </div>
+    <div class="form-group">
+      <label class="label-bold" for="eks-instance-type">{{
+        s__('ClusterIntegration|Instance type')
+      }}</label>
+      <cluster-form-dropdown
+        field-id="eks-instance-type"
+        field-name="eks-instance-type"
+        :input="selectedInstanceType"
+        :items="instanceTypes"
+        :loading="isLoadingInstanceTypes"
+        :loading-text="s__('ClusterIntegration|Loading instance types')"
+        :placeholder="s__('ClusterIntergation|Select an instance type')"
+        :search-field-placeholder="s__('ClusterIntegration|Search instance types')"
+        :empty-text="s__('ClusterIntegration|No instance type found')"
+        :has-errors="Boolean(loadingInstanceTypesError)"
+        :error-message="s__('ClusterIntegration|Could not load instance types')"
+        @input="setInstanceType({ instanceType: $event })"
+      />
+      <p class="form-text text-muted" v-html="instanceTypesDropdownHelpText"></p>
+    </div>
+    <div class="form-group">
+      <label class="label-bold" for="eks-node-count">{{
+        s__('ClusterIntegration|Number of nodes')
+      }}</label>
+      <gl-form-input
+        id="eks-node-count"
+        type="number"
+        min="1"
+        step="1"
+        :value="nodeCount"
+        @input="setNodeCount({ nodeCount: $event })"
+      />
     </div>
     <div class="form-group">
       <gl-form-checkbox
