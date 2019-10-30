@@ -2258,7 +2258,7 @@ ActiveRecord::Schema.define(version: 2019_10_16_072826) do
     t.boolean "allow_maintainer_to_push"
     t.integer "state_id", limit: 2
     t.string "rebase_jid"
-    t.string "squash_commit_sha"
+    t.binary "squash_commit_sha"
     t.index ["assignee_id"], name: "index_merge_requests_on_assignee_id"
     t.index ["author_id"], name: "index_merge_requests_on_author_id"
     t.index ["created_at"], name: "index_merge_requests_on_created_at"
