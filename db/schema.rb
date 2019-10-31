@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 2019_10_26_124116) do
-=======
-ActiveRecord::Schema.define(version: 2019_10_24_134020) do
->>>>>>> Add index on issue status for Zoom Meetings table
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
