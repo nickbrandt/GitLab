@@ -147,7 +147,3 @@ There are two main ways to have a merge request flow with GitLab:
 1. Working with forks of an authoritative project
 
 [Learn more about the authorization for merge requests.](authorization_for_merge_requests.md)
-
-## Checkout merge requests locally
-
-WIP (To be deleted before merge. Not deleted yet to speed up pipeline)
