@@ -264,7 +264,7 @@
                         dismiss_endpoint: user_callouts_path } }
                 - if show_cluster_hint
                   .feature-highlight-popover-content
-                    = image_tag 'illustrations/cluster_popover.svg', class: 'feature-highlight-illustration'
+                    = image_tag 'illustrations/cluster_popover.svg', class: 'feature-highlight-illustration', lazy: false, alt: _('Kubernetes popover')
                     .feature-highlight-popover-sub-content
                       %p= _('Allows you to add and manage Kubernetes clusters.')
                       %p

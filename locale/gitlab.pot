@@ -9543,6 +9543,9 @@ msgstr ""
 msgid "Kubernetes error: %{error_code}"
 msgstr ""
 
+msgid "Kubernetes popover"
+msgstr ""
+
 msgid "LDAP"
 msgstr ""
 
