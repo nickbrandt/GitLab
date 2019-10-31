@@ -7,7 +7,6 @@ describe 'admin/application_settings/_elasticsearch_form' do
 
   before do
     assign(:application_setting, application_setting)
-    allow(view).to receive(:can?) { true }
     allow(view).to receive(:current_user) { admin }
     allow(view).to receive(:expanded) { true }
   end
@@ -15,7 +14,7 @@ describe 'admin/application_settings/_elasticsearch_form' do
   context 'when elasticsearch_aws_secret_access_key is not set' do
     let(:application_setting) { build(:application_setting) }
 
-    it 'does not set value of input field' do
+    it 'has field with "AWS Secret Access Key" label and no value' do
       render
       expect(rendered).to have_field('AWS Secret Access Key', type: 'password')
     end
@@ -24,9 +23,9 @@ describe 'admin/application_settings/_elasticsearch_form' do
   context 'when elasticsearch_aws_secret_access_key is set' do
     let(:application_setting) { build(:application_setting, elasticsearch_aws_secret_access_key: 'elasticsearch_aws_secret_access_key') }
 
-    it 'sets value of input field to "true" instead of actual value' do
+    it 'has field with "Enter new AWS Secret Access Key" label and no value' do
       render
-      expect(rendered).to have_field('AWS Secret Access Key', type: 'password', with: 'true')
+      expect(rendered).to have_field('Enter new AWS Secret Access Key', type: 'password')
     end
   end
 end

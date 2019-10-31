@@ -50,11 +50,11 @@ describe Admin::ApplicationSettingsController do
       expect(ApplicationSetting.current.elasticsearch_url).to contain_exactly(settings[:elasticsearch_url])
     end
 
-    context 'elasticsearch_aws_secret_access_key setting has previous value (and set to "true" in view)' do
+    context 'elasticsearch_aws_secret_access_key setting is blank' do
       let(:settings) do
         {
           elasticsearch_aws_access_key: 'elasticsearch_aws_access_key',
-          elasticsearch_aws_secret_access_key: 'true'
+          elasticsearch_aws_secret_access_key: ''
         }
       end
 

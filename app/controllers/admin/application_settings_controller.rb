@@ -74,7 +74,6 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
 
   def application_setting_params
     params[:application_setting] ||= {}
-    params[:application_setting].delete(:elasticsearch_aws_secret_access_key) if params[:application_setting][:elasticsearch_aws_secret_access_key] == 'true'
 
     if params[:application_setting].key?(:enabled_oauth_sign_in_sources)
       enabled_oauth_sign_in_sources = params[:application_setting].delete(:enabled_oauth_sign_in_sources)
@@ -87,6 +86,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
 
     params[:application_setting][:import_sources]&.delete("")
     params[:application_setting][:restricted_visibility_levels]&.delete("")
+    params[:application_setting].delete(:elasticsearch_aws_secret_access_key) if params[:application_setting][:elasticsearch_aws_secret_access_key].blank?
     # TODO Remove domain_blacklist_raw in APIv5 (See https://gitlab.com/gitlab-org/gitlab-foss/issues/67204)
     params.delete(:domain_blacklist_raw) if params[:domain_blacklist_file]
     params.delete(:domain_blacklist_raw) if params[:domain_blacklist]
