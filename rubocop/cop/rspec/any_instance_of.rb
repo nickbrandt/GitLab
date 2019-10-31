@@ -49,9 +49,9 @@ module RuboCop
 
         def autocorrect(node)
           if expect_any_instance_of?(node)
-            replacement = replacement_expect_any_instance_of(node)
+            replacement = replacement_any_instance_of(node, 'expect')
           elsif allow_any_instance_of?(node)
-            replacement = replacement_allow_any_instance_of(node)
+            replacement = replacement_any_instance_of(node, 'allow')
           end
 
           lambda do |corrector|
@@ -61,17 +61,10 @@ module RuboCop
 
         private
 
-        def replacement_expect_any_instance_of(node)
-          replacement = node.receiver.source.sub('expect_any_instance_of', 'expect_next_instance_of')
+        def replacement_any_instance_of(node, rspec_prefix)
+          replacement = node.receiver.source.sub("#{rspec_prefix}_any_instance_of", "#{rspec_prefix}_next_instance_of")
           replacement << " do |instance|\n"
-          replacement << "  expect(instance).#{node.method_name} #{node.children.last.source}\n"
-          replacement << 'end'
-        end
-
-        def replacement_allow_any_instance_of(node)
-          replacement = node.receiver.source.sub('allow_any_instance_of', 'allow_next_instance_of')
-          replacement << " do |instance|\n"
-          replacement << "  allow(instance).#{node.method_name} #{node.children.last.source}\n"
+          replacement << "  #{rspec_prefix}(instance).#{node.method_name} #{node.children.last.source}\n"
           replacement << 'end'
         end
       end
