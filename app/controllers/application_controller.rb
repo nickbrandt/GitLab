@@ -95,11 +95,11 @@ class ApplicationController < ActionController::Base
   end
 
   def route_not_found
-    if current_user
-      not_found
-    else
-      authenticate_user!
-    end
+    # We need to call #authenticate_user! here because sometimes this is called from another action
+    # and not from our wildcard fallback route
+    authenticate_user!
+
+    not_found
   end
 
   def render(*args)
