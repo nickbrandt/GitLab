@@ -34,6 +34,56 @@ succeeded, the target branch build will also succeed after merging.
 Navigate to a project's settings, select the **Merge commit with semi-linear history**
 option under **Merge Requests: Merge method** and save your changes.
 
+## View changes between file versions
+
+The **Changes** tab at the bottom of a merge request shows the changes to files between branches or
+commits. This view of changes to a file is also known as a **diff**. By default, the diff view
+compares the file in the merge request branch and the file in the target branch.
+
+The diff view includes the following:
+
+- The file's name and path.
+- The number of lines added and deleted.
+- Buttons for the following options:
+  - Toggle comments for this file; useful for inline reviews.
+  - Edit the file in the merge request's branch.
+  - Show full file, in case you want to look at the changes in context with the rest of the file.
+  - View file at the current commit.
+  - Preview the changes with [Review Apps](../../../ci/review_apps/index.md).
+- The changed lines, with the specific changes highlighted.
+
+![Example screenshot of a source code diff](img/merge_request_diff_v12_2.png)
+
+### Merge request diff file navigation
+
+When reviewing changes in the **Changes** tab the diff can be navigated using
+the file tree or file list. As you scroll through large diffs with many
+changes, you can quickly jump to any changed file using the file tree or file
+list.
+
+![Merge request diff file navigation](img/merge_request_diff_file_navigation.png)
+
+### Incrementally expand merge request diffs
+
+By default, the diff shows only the parts of a file which are changed.
+To view more unchanged lines above or below a change click on the
+**Expand up** or **Expand down** icons. You can also click on **Show all lines**
+to expand the entire file.
+
+![Incrementally expand merge request diffs](img/incrementally_expand_merge_request_diffs_v12_2.png)
+
+### Ignore whitespace changes in Merge Request diff view
+
+If you click the **Hide whitespace changes** button, you can see the diff
+without whitespace changes (if there are any). This is also working when on a
+specific commit page.
+
+![MR diff](img/merge_request_diff.png)
+
+>**Tip:**
+You can append `?w=1` while on the diffs page of a merge request to ignore any
+whitespace changes.
+
 ## Commenting on any file line in merge requests
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/13950) in GitLab 11.5.

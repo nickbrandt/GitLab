@@ -31,6 +31,8 @@ also appear in the top right of the:
 In this case, the merge request will use the most recent branch you pushed changes
 to as the source branch, and `master` in the current project as the target.
 
+## Workflow for new merge requests
+
 On the **New Merge Request** page, you can start by filling in the title and description
 for the merge request. If there are are already commits on the branch, the title will
 be pre-filled with the first line of the first commit message, and the description will
@@ -40,7 +42,7 @@ field that is mandatory in all cases.
 From here, you can also:
 
 - Set the merge request as a [work in progress](work_in_progress_merge_requests.md).
-- Select an [assignee](#assignee).
+- Select the [assignee](#assignee), or [assignees](#multiple-assignees-starter). **(STARTER)**
 - Select a [milestone](../milestones/index.md).
 - Select [labels](../labels.md).
 - Add any [merge request dependencies](merge_request_dependencies.md). **(PREMIUM)**
@@ -48,6 +50,19 @@ From here, you can also:
 - Verify the source and target branches are correct.
 - Enable the [delete source branch when merge request is accepted](#deleting-the-source-branch) option.
 - Enable the [squash commits when merge request is accepted](squash_and_merge.md) option.
+- If the merge request is from a fork, enable [Allow collaboration on merge requests across forks](allow_collaboration.md).
+
+Many of these can be set when pushing changes from the command line, with
+[Git push options](../push_options.md).
+
+### Merge requests to close issues
+
+If the merge request is being created to resolve an issue, you can add a note in the
+description which will set it to [automatically close the issue](../issues/managing_issues.md#closing-issues-automatically)
+when merged.
+
+If the issue is [confidential](../issues/confidential_issues.md), you may want to
+use an alternative workflow for [merge requests for confidential issues](../issues/confidential_issues.md#merge-requests-for-confidential-issues).
 
 ## Assignee
 
@@ -145,53 +160,3 @@ created from the repository's HEAD or the specified target branch to
 apply the patches. The target branch can be specified using the
 [`/target_branch` quick action](../quick_actions.md). If the source
 branch already exists, the patches will be applied on top of it.
-
-## View changes between file versions
-
-The **Changes** tab at the bottom of a merge request shows the changes to files between branches or
-commits. This view of changes to a file is also known as a **diff**. By default, the diff view
-compares the file in the merge request branch and the file in the target branch.
-
-The diff view includes the following:
-
-- The file's name and path.
-- The number of lines added and deleted.
-- Buttons for the following options:
-  - Toggle comments for this file; useful for inline reviews.
-  - Edit the file in the merge request's branch.
-  - Show full file, in case you want to look at the changes in context with the rest of the file.
-  - View file at the current commit.
-  - Preview the changes with [Review Apps](../../../ci/review_apps/index.md).
-- The changed lines, with the specific changes highlighted.
-
-![Example screenshot of a source code diff](img/merge_request_diff_v12_2.png)
-
-### Merge request diff file navigation
-
-When reviewing changes in the **Changes** tab the diff can be navigated using
-the file tree or file list. As you scroll through large diffs with many
-changes, you can quickly jump to any changed file using the file tree or file
-list.
-
-![Merge request diff file navigation](img/merge_request_diff_file_navigation.png)
-
-### Incrementally expand merge request diffs
-
-By default, the diff shows only the parts of a file which are changed.
-To view more unchanged lines above or below a change click on the
-**Expand up** or **Expand down** icons. You can also click on **Show all lines**
-to expand the entire file.
-
-![Incrementally expand merge request diffs](img/incrementally_expand_merge_request_diffs_v12_2.png)
-
-### Ignore whitespace changes in Merge Request diff view
-
-If you click the **Hide whitespace changes** button, you can see the diff
-without whitespace changes (if there are any). This is also working when on a
-specific commit page.
-
-![MR diff](img/merge_request_diff.png)
-
->**Tip:**
-You can append `?w=1` while on the diffs page of a merge request to ignore any
-whitespace changes.
