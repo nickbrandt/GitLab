@@ -69,5 +69,11 @@ module Types
           Types::EpicIssueType.connection_type,
           null: true,
           resolver: Resolvers::EpicIssuesResolver
+
+    field :descendant_counts, Types::EpicDescendantCountType, null: true, complexity: 10,
+      description: 'Number of open and closed descendant epics and issues',
+      resolve: -> (epic, args, ctx) do
+        Epics::DescendantCountService.new(epic, ctx[:current_user])
+      end
   end
 end
