@@ -4042,6 +4042,7 @@ ActiveRecord::Schema.define(version: 2019_10_26_124116) do
     t.string "url", limit: 255
     t.index ["issue_id", "issue_status"], name: "index_zoom_meetings_on_issue_id_and_issue_status", unique: true, where: "(issue_status = 1)"
     t.index ["issue_id"], name: "index_zoom_meetings_on_issue_id"
+    t.index ["issue_status"], name: "index_zoom_meetings_on_issue_status"
     t.index ["project_id"], name: "index_zoom_meetings_on_project_id"
   end
 
