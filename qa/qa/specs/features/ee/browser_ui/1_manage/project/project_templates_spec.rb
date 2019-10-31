@@ -16,17 +16,14 @@ module QA
             }
         ]
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
-
         @template_container_group_name = "instance-template-container-group-#{SecureRandom.hex(8)}"
 
-        template_container_group = QA::Resource::Group.fabricate! do |group|
+        template_container_group = QA::Resource::Group.fabricate_via_api! do |group|
           group.path = @template_container_group_name
           group.description = 'Instance template container group'
         end
 
-        @template_project = Resource::Project.fabricate! do |project|
+        @template_project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'template-project-1'
           project.group = template_container_group
         end
@@ -36,14 +33,13 @@ module QA
           push.files = @files
           push.commit_message = 'Add test files'
         end
+
+        Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
 
       context 'built-in' do
         before do
-          # Log out if already logged in
-          Page::Main::Menu.perform do |menu|
-            menu.sign_out if menu.has_personal_area?(wait: 0)
-          end
+          Page::Main::Menu.perform(&:sign_out_if_signed_in)
 
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_admin_credentials)
@@ -76,10 +72,7 @@ module QA
       # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/61
       context 'instance level', :quarantine do
         before do
-          # Log out if already logged in
-          Page::Main::Menu.perform do |menu|
-            menu.sign_out if menu.has_personal_area?(wait: 0)
-          end
+          Page::Main::Menu.perform(&:sign_out_if_signed_in)
 
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_admin_credentials)
@@ -126,9 +119,7 @@ module QA
         before do
           # Log out if already logged in. This is necessary because
           # a previous test might have logged in as admin
-          Page::Main::Menu.perform do |menu|
-            menu.sign_out if menu.has_personal_area?(wait: 0)
-          end
+          Page::Main::Menu.perform(&:sign_out_if_signed_in)
 
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_credentials)
