@@ -72,10 +72,10 @@ describe Projects::ManagedLicensesController do
     context 'with no logged in user' do
       let(:user) { unlogged_user }
 
-      it 'returns a redirect' do
+      it 'returns an unauthorized status' do
         subject
 
-        expect(response).to have_gitlab_http_status(:redirect)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -122,10 +122,10 @@ describe Projects::ManagedLicensesController do
     context 'with no logged in user' do
       let(:user) { unlogged_user }
 
-      it 'returns a redirect' do
+      it 'returns an unauthorized status' do
         subject
 
-        expect(response).to have_gitlab_http_status(:redirect)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -235,10 +235,10 @@ describe Projects::ManagedLicensesController do
         new_software_license_policy_attributes
       end
 
-      it 'returns a redirect' do
+      it 'returns an unauthorized status' do
         expect { subject }.not_to change { project.software_license_policies.count }
 
-        expect(response).to have_gitlab_http_status(:redirect)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -347,10 +347,10 @@ describe Projects::ManagedLicensesController do
         new_software_license_policy_attributes
       end
 
-      it 'returns a redirect' do
+      it 'returns an unauthorized status' do
         expect { subject }.not_to change { project.software_license_policies.count }
 
-        expect(response).to have_gitlab_http_status(:redirect)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -452,10 +452,10 @@ describe Projects::ManagedLicensesController do
         new_software_license_policy_attributes
       end
 
-      it 'returns a redirect' do
+      it 'returns an unauthorized status' do
         expect { subject }.not_to change { project.software_license_policies.count }
 
-        expect(response).to have_gitlab_http_status(:redirect)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 

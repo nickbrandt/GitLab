@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
   include Gitlab::Tracking::ControllerConcern
   include Gitlab::Experimentation::ControllerConcern
 
-  before_action :authenticate_user!, except: [:route_not_found]
+  before_action :authenticate_user!
   before_action :enforce_terms!, if: :should_enforce_terms?
   before_action :validate_user_service_ticket!
   before_action :check_password_expiration
@@ -98,9 +98,7 @@ class ApplicationController < ActionController::Base
     if current_user
       not_found
     else
-      store_location_for(:user, request.fullpath) unless request.xhr?
-
-      redirect_to new_user_session_path, alert: I18n.t('devise.failure.unauthenticated')
+      authenticate_user!
     end
   end
 

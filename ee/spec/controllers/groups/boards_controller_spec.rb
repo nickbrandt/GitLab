@@ -56,16 +56,6 @@ describe Groups::BoardsController do
     let(:parent) { group }
 
     it_behaves_like 'returns recently visited boards'
-
-    context 'unauthenticated' do
-      it 'returns a 401' do
-        sign_out(user)
-
-        list_boards(recent: true)
-
-        expect(response).to have_gitlab_http_status(401)
-      end
-    end
   end
 
   describe 'GET show' do
