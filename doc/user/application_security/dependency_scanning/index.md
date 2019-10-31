@@ -161,11 +161,11 @@ using environment variables.
 
 Individual analyzers can be customized with specific settings.
 
-| Environment variable                    | Description | Example usage |
-| --------------------------------------- | ----------- | ------------- |
-| `PIP_INDEX_URL`                         | Base URL of Python Package Index (default `https://pypi.org/simple`). | |
-| `PIP_EXTRA_INDEX_URL`                   | Array of [extra URLs](https://pip.pypa.io/en/stable/reference/pip_install/#cmdoption-extra-index-url) of package indexes to use in addition to `PIP_INDEX_URL`. Comma separated. | |
-| `RETIRE_JS_VERBOSE`                     | Toggle verbose mode for retire.js analyzer (set to `true` to enable). | |
+| Environment variable                    | Analyzer            | Description  |
+| --------------------------------------- | ------------------- | ------------ |
+| `PIP_INDEX_URL`                         | gemnasium-python    | Base URL of Python Package Index (default `https://pypi.org/simple`). |
+| `PIP_EXTRA_INDEX_URL`                   | gemnasium-python    | Array of [extra URLs](https://pip.pypa.io/en/stable/reference/pip_install/#cmdoption-extra-index-url) of package indexes to use in addition to `PIP_INDEX_URL`. Comma separated. |
+| `RETIRE_JS_VERBOSE`                     | retire.js           | Toggle verbose mode for retire.js analyzer (set to `true` to enable). |
 
 ## Interacting with the vulnerabilities
 
