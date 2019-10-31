@@ -438,6 +438,7 @@ export default {
       <cluster-form-dropdown
         field-id="eks-subnet"
         field-name="eks-subnet"
+        multiple
         :value="selectedSubnet"
         :items="subnets"
         :loading="isLoadingSubnets"

@@ -46,19 +46,37 @@ describe('ClusterFormDropdown', () => {
     });
 
     it('sets selected value to dropdown hidden input', () => {
-      expect(vm.find(DropdownHiddenInput).props('value')).toEqual(secondItem.value);
+      expect(vm.find(DropdownHiddenInput).props('value')).toEqual(secondItem.value.toString());
+    });
+  });
+
+  describe('when multiple items are selected', () => {
+    beforeEach(() => {
+      vm.setProps({ items, multiple: true });
+      vm.findAll('.js-dropdown-item')
+        .at(0)
+        .trigger('click');
+      vm.findAll('.js-dropdown-item')
+        .at(1)
+        .trigger('click');
+    });
+
+    it('displays selected items labels', () => {
+      expect(vm.find(DropdownButton).props('toggleText')).toEqual(
+        `${firstItem.name}, ${secondItem.name}`,
+      );
     });
   });
 
   describe('when an item is selected and has a custom label property', () => {
     it('displays selected item custom label', () => {
       const labelProperty = 'customLabel';
-      const selectedItem = { [labelProperty]: 'Name' };
+      const selectedItems = [{ [labelProperty]: 'Name' }];
 
       vm.setProps({ labelProperty });
-      vm.setData({ selectedItem });
+      vm.setData({ selectedItems });
 
-      expect(vm.find(DropdownButton).props('toggleText')).toEqual(selectedItem[labelProperty]);
+      expect(vm.find(DropdownButton).props('toggleText')).toEqual(selectedItems[0][labelProperty]);
     });
   });
 

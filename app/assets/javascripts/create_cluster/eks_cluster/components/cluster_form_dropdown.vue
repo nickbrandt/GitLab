@@ -2,14 +2,20 @@
 import DropdownSearchInput from '~/vue_shared/components/dropdown/dropdown_search_input.vue';
 import DropdownHiddenInput from '~/vue_shared/components/dropdown/dropdown_hidden_input.vue';
 import DropdownButton from '~/vue_shared/components/dropdown/dropdown_button.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
-const findItem = (items, valueProp, value) => items.find(item => item[valueProp] === value);
+const toArray = value => (Array.isArray(value) ? value : [value]);
+const matchItem = (valueProp, item, value) => item[valueProp] === value;
+const findItems = (valueProp, items, values) =>
+  items.filter(item => values.some(value => matchItem(valueProp, item, value)));
+const itemsProp = (items, prop) => items.map(item => item[prop]);
 
 export default {
   components: {
     DropdownButton,
     DropdownSearchInput,
     DropdownHiddenInput,
+    Icon,
   },
   props: {
     fieldName: {
@@ -28,7 +34,7 @@ export default {
       default: '',
     },
     value: {
-      type: [Object, String],
+      type: [Object, Array, String],
       required: false,
       default: () => null,
     },
@@ -72,6 +78,11 @@ export default {
       required: false,
       default: false,
     },
+    multiple: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     errorMessage: {
       type: String,
       required: false,
@@ -95,7 +106,7 @@ export default {
   },
   data() {
     return {
-      selectedItem: findItem(this.items, this.value),
+      selectedItems: this.updateSelectedItems(),
       searchQuery: '',
     };
   },
@@ -109,11 +120,11 @@ export default {
         return this.disabledText;
       }
 
-      if (!this.selectedItem) {
+      if (!this.selectedItems.length) {
         return this.placeholder;
       }
 
-      return this.selectedItemLabel;
+      return this.selectedItemsLabels;
     },
     results() {
       if (!this.items) {
@@ -122,22 +133,43 @@ export default {
 
       return this.items.filter(this.searchFn(this.searchQuery));
     },
-    selectedItemLabel() {
-      return this.selectedItem && this.selectedItem[this.labelProperty];
+    selectedItemsLabels() {
+      return itemsProp(this.selectedItems, this.labelProperty).join(', ');
     },
-    selectedItemValue() {
-      return (this.selectedItem && this.selectedItem[this.valueProperty]) || '';
+    selectedItemsValues() {
+      return itemsProp(this.selectedItems, this.valueProperty).join(', ');
     },
   },
   watch: {
-    value(value) {
-      this.selectedItem = findItem(this.items, this.valueProperty, value);
+    value() {
+      this.selectedItems = this.updateSelectedItems();
+    },
+    items() {
+      this.selectedItems = this.updateSelectedItems();
     },
   },
   methods: {
+    updateSelectedItems() {
+      return findItems(this.valueProperty, this.getItemsOrEmptyList(), toArray(this.value));
+    },
+    getItemsOrEmptyList() {
+      return this.items || [];
+    },
     select(item) {
-      this.selectedItem = item;
+      this.selectedItems = [item];
       this.$emit('input', item[this.valueProperty]);
+    },
+    selectMultiple(item) {
+      if (this.isSelected(item)) {
+        this.selectedItems.splice(this.selectedItems.indexOf(item), 1);
+      } else {
+        this.selectedItems.push(item);
+      }
+
+      this.$emit('input', itemsProp(this.selectedItems, this.valueProperty));
+    },
+    isSelected(item) {
+      return this.selectedItems.includes(item);
     },
   },
 };
@@ -146,7 +178,7 @@ export default {
 <template>
   <div>
     <div class="js-gcp-machine-type-dropdown dropdown">
-      <dropdown-hidden-input :name="fieldName" :value="selectedItemValue" />
+      <dropdown-hidden-input :name="fieldName" :value="selectedItemsValues" />
       <dropdown-button
         :class="{ 'border-danger': hasErrors }"
         :is-disabled="disabled"
@@ -158,15 +190,23 @@ export default {
         <div class="dropdown-content">
           <ul>
             <li v-if="!results.length">
-              <span class="js-empty-text menu-item">
-                {{ emptyText }}
-              </span>
+              <span class="js-empty-text menu-item">{{ emptyText }}</span>
             </li>
             <li v-for="item in results" :key="item.id">
-              <button class="js-dropdown-item" type="button" @click.prevent="select(item)">
-                <slot name="item" :item="item">
-                  {{ item.name }}
-                </slot>
+              <button
+                v-if="multiple"
+                class="js-dropdown-item d-flex align-items-center"
+                type="button"
+                @click.stop.prevent="selectMultiple(item)"
+              >
+                <icon
+                  :class="[{ invisible: !isSelected(item) }, 'mr-1']"
+                  name="mobile-issue-close"
+                />
+                <slot name="item" :item="item">{{ item.name }}</slot>
+              </button>
+              <button v-else class="js-dropdown-item" type="button" @click.prevent="select(item)">
+                <slot name="item" :item="item">{{ item.name }}</slot>
               </button>
             </li>
           </ul>
@@ -182,8 +222,7 @@ export default {
           'text-muted': !hasErrors,
         },
       ]"
+      >{{ errorMessage }}</span
     >
-      {{ errorMessage }}
-    </span>
   </div>
 </template>
