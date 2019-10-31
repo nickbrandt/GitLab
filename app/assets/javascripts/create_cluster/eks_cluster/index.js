@@ -24,6 +24,7 @@ export default el => {
     hasCredentials,
     createRolePath,
     createClusterPath,
+    signOutPath,
     externalLinkIcon,
   } = el.dataset;
 
@@ -36,6 +37,7 @@ export default el => {
         accountId,
         createRolePath,
         createClusterPath,
+        signOutPath,
         getRolesPath,
         getRegionsPath,
         getKeyPairsPath,
