@@ -6,16 +6,16 @@ describe Resolvers::IssuesResolver do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }
-  let(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
 
   context "with a project" do
     describe '#resolve' do
       describe 'sorting' do
         context 'when sorting by weight' do
-          let!(:weight_issue1) { create(:issue, project: project, weight: 5) }
-          let!(:weight_issue2) { create(:issue, project: project, weight: nil) }
-          let!(:weight_issue3) { create(:issue, project: project, weight: 1) }
-          let!(:weight_issue4) { create(:issue, project: project, weight: nil) }
+          let_it_be(:weight_issue1) { create(:issue, project: project, weight: 5) }
+          let_it_be(:weight_issue2) { create(:issue, project: project, weight: nil) }
+          let_it_be(:weight_issue3) { create(:issue, project: project, weight: 1) }
+          let_it_be(:weight_issue4) { create(:issue, project: project, weight: nil) }
 
           before do
             project.add_developer(current_user)
