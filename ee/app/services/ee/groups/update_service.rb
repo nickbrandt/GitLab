@@ -12,6 +12,8 @@ module EE
           return false if group.errors.present?
         end
 
+        return false unless valid_path_change_with_npm_packages?
+
         handle_changes
 
         remove_insight_if_insight_project_absent
@@ -106,6 +108,19 @@ module EE
         if allowed_domain_params[:domain]&.blank?
           allowed_domain_params[:_destroy] = 1
         end
+      end
+
+      def valid_path_change_with_npm_packages?
+        return true unless group.packages_feature_available?
+        return true if !group.has_parent? && group.path == params[:path]
+
+        npm_packages = Packages::GroupPackagesFinder.new(current_user, group, package_type: :npm).execute
+        if npm_packages.exists?
+          group.errors.add(:path, s_('GroupSettings|cannot change when group contains projects with NPM packages'))
+          return
+        end
+
+        true
       end
 
       def allowed_domain_params
