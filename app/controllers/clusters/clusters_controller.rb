@@ -125,7 +125,7 @@ class Clusters::ClustersController < Clusters::BaseController
       .present(current_user: current_user)
 
     if @aws_cluster.persisted?
-      redirect_to @aws_cluster.show_path
+      head :created, location: @aws_cluster.show_path
     else
       render status: :unprocessable_entity, json: @aws_cluster.errors
     end
