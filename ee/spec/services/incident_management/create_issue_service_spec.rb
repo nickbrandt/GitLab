@@ -41,7 +41,7 @@ describe IncidentManagement::CreateIssueService do
 
         expect(issue.author).to eq(user)
         expect(issue.title).to eq(alert_title)
-        expect(issue.description).to include(alert_presenter.issue_summary_markdown)
+        expect(issue.description).to include(alert_presenter.issue_summary_markdown.strip)
         expect(separator_count(issue.description)).to eq 0
       end
     end
@@ -170,7 +170,7 @@ describe IncidentManagement::CreateIssueService do
         expect(issue.title).to include(gitlab_alert.environment.name)
         expect(issue.title).to include(query_title)
         expect(issue.title).to include('for 5 minutes')
-        expect(issue.description).to include(alert_presenter.issue_summary_markdown)
+        expect(issue.description).to include(alert_presenter.issue_summary_markdown.strip)
         expect(separator_count(issue.description)).to eq 0
       end
     end

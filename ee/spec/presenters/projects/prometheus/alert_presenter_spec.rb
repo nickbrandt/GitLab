@@ -56,7 +56,7 @@ describe Projects::Prometheus::AlertPresenter do
 
     context 'with annotations' do
       before do
-        payload['annotations'] = { 'foo' => 'value1', 'bar' => 'value2' }
+        payload['annotations'] = { 'title' => 'Alert Title', 'foo' => 'value1', 'bar' => 'value2' }
       end
 
       it do
@@ -120,7 +120,6 @@ describe Projects::Prometheus::AlertPresenter do
 
             #### Alert Details
 
-            **title:** The Generic Alert Title#{markdown_line_break}
             **description:** The Generic Alert Description
           MARKDOWN
         )
