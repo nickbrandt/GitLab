@@ -222,7 +222,7 @@ export default {
     securityGroupDropdownHelpText() {
       return sprintf(
         s__(
-          'ClusterIntegration|Choose the %{startLink}security groups %{externalLinkIcon} %{endLink} to apply to the EKS-managed Elastic Network Interfaces that are created in your worker node subnets.',
+          'ClusterIntegration|Choose the %{startLink}security group %{externalLinkIcon} %{endLink} to apply to the EKS-managed Elastic Network Interfaces that are created in your worker node subnets.',
         ),
         {
           startLink:
@@ -318,7 +318,7 @@ export default {
     <div class="mb-3" v-html="kubernetesIntegrationHelpText"></div>
     <div class="mb-3">
       <button class="btn btn-link js-sign-out" @click="signOut()">
-        {{ s__('ClusterIntegration|Select a different AWS account') }}
+        {{ s__('ClusterIntegration|Select a different AWS role') }}
       </button>
     </div>
     <div class="form-group">
@@ -434,7 +434,7 @@ export default {
       <p class="form-text text-muted" v-html="vpcDropdownHelpText"></p>
     </div>
     <div class="form-group">
-      <label class="label-bold" for="eks-role">{{ s__('ClusterIntegration|Subnet') }}</label>
+      <label class="label-bold" for="eks-role">{{ s__('ClusterIntegration|Subnets') }}</label>
       <cluster-form-dropdown
         field-id="eks-subnet"
         field-name="eks-subnet"
@@ -456,7 +456,7 @@ export default {
     </div>
     <div class="form-group">
       <label class="label-bold" for="eks-security-group">{{
-        s__('ClusterIntegration|Security groups')
+        s__('ClusterIntegration|Security group')
       }}</label>
       <cluster-form-dropdown
         field-id="eks-security-group"
