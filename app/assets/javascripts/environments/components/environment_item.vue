@@ -1,7 +1,7 @@
 <script>
 /* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { __, sprintf } from '~/locale';
-import Timeago from 'timeago.js';
+import { format } from 'timeago.js';
 import _ from 'underscore';
 import { GlTooltipDirective } from '@gitlab/ui';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
@@ -22,7 +22,6 @@ import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
  *
  * Renders a table row for each environment.
  */
-const timeagoInstance = new Timeago();
 
 export default {
   components: {
@@ -121,7 +120,7 @@ export default {
      */
     deployedDate() {
       if (this.canShowDate) {
-        return timeagoInstance.format(this.model.last_deployment.deployed_at);
+        return format(this.model.last_deployment.deployed_at);
       }
       return '';
     },
