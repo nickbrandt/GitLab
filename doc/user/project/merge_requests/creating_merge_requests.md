@@ -17,9 +17,9 @@ branch that contain your changes, and the target project and branch where you wa
 the changes into. Click on **Compare branches and continue** to go to the next step
 and start filling in the merge request details.
 
-When viewing the commits on a branch in **Repository > Commits**, you can click on
-the **Create merge request** button, and a new merge request will be started using
-the current branch as the source, and `master` in the current project as the target.
+When viewing the commits on a branch other than master in **Repository > Commits**, you
+can click on the **Create merge request** button, and a new merge request will be started
+using the current branch as the source, and `master` in the current project as the target.
 
 If you have recently pushed changes to GitLab, the **Create merge request** button will
 also appear in the top right of the:
@@ -62,7 +62,8 @@ description which will set it to [automatically close the issue](../issues/manag
 when merged.
 
 If the issue is [confidential](../issues/confidential_issues.md), you may want to
-use an alternative workflow for [merge requests for confidential issues](../issues/confidential_issues.md#merge-requests-for-confidential-issues).
+use a different workflow for [merge requests for confidential issues](../issues/confidential_issues.md#merge-requests-for-confidential-issues),
+to prevent confidential information from being exposed.
 
 ## Assignee
 
@@ -110,13 +111,6 @@ delete the source branch and the source branch is set for deletion, the merge
 request widget will show the "Deletes source branch" text.
 
 ![Delete source branch status](img/remove_source_branch_status.png)
-
-When a user opens a merge request from a fork, they are given the option to allow
-upstream maintainers to collaborate with them on the source branch. This allows
-the maintainers of the upstream project to make small fixes or rebase branches
-before merging, reducing the back and forth of accepting community contributions.
-
-[Learn more about allowing upstream members to push to forks.](allow_collaboration.md)
 
 ## Create new merge requests by email
 

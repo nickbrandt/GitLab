@@ -17,7 +17,7 @@ and you can use the tabs available to quickly filter by open and closed. You can
 
 ![Project merge requests list view](img/project_merge_requests_list_view.png)
 
-## View group merge requests
+## View merge requests for all projects in a group
 
 View merge requests in all projects in the group, including all projects of all descendant subgroups of the group. Navigate to **Group > Merge Requests** to view these merge requests. This view also has the open and closed merge requests tabs.
 
@@ -36,9 +36,10 @@ option under **Merge Requests: Merge method** and save your changes.
 
 ## View changes between file versions
 
-The **Changes** tab at the bottom of a merge request shows the changes to files between branches or
-commits. This view of changes to a file is also known as a **diff**. By default, the diff view
-compares the file in the merge request branch and the file in the target branch.
+The **Changes** tab, below the main merge request details and next to the discussion tab,
+shows the changes to files between branches or commits. This view of changes to a
+file is also known as a **diff**. By default, the diff view compares the file in the
+merge request branch and the file in the target branch.
 
 The diff view includes the following:
 
