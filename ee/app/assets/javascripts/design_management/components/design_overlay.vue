@@ -54,7 +54,7 @@ export default {
     <button
       type="button"
       class="btn-transparent position-absolute image-diff-overlay-add-comment w-100 h-100 js-add-image-diff-note-button"
-      data-qa-selector="design_image"
+      data-qa-selector="design_image_button"
       @click="clickedImage($event.offsetX, $event.offsetY)"
     ></button>
     <button

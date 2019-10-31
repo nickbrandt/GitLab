@@ -80,7 +80,12 @@ export default {
           <icon :name="icon.name" :size="18" :class="icon.classes" />
         </span>
       </div>
-      <img :src="image" :alt="filename" class="block ml-auto mr-auto mw-100 mh-100 design-img" />
+      <img
+        :src="image"
+        :alt="filename"
+        class="block ml-auto mr-auto mw-100 mh-100 design-img"
+        data-qa-selector="design_image"
+      />
     </div>
     <div class="card-footer d-flex w-100">
       <div class="d-flex flex-column str-truncated-100">
