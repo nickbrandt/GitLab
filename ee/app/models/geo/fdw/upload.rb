@@ -11,13 +11,12 @@ module Geo
       self.primary_key = :id
       self.table_name = Gitlab::Geo::Fdw.foreign_table_name('uploads')
 
-      has_one :registry, class_name: 'Geo::FileRegistry', foreign_key: :file_id
+      has_one :registry, class_name: 'Geo::UploadRegistry', foreign_key: :file_id
 
       class << self
         def for_model(model)
           inner_join_file_registry
             .where(model_id: model.id, model_type: model.class.name)
-            .merge(Geo::FileRegistry.uploads)
         end
 
         def inner_join_file_registry
@@ -42,14 +41,14 @@ module Geo
         private
 
         def file_registry_table
-          Geo::FileRegistry.arel_table
+          Geo::UploadRegistry.arel_table
         end
 
         def left_outer_join_file_registry
           join_statement =
             arel_table
               .join(file_registry_table, Arel::Nodes::OuterJoin)
-              .on(arel_table[:id].eq(file_registry_table[:file_id]).and(file_registry_table[:file_type].in(Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES)))
+              .on(arel_table[:id].eq(file_registry_table[:file_id]))
 
           joins(join_statement.join_sources)
         end

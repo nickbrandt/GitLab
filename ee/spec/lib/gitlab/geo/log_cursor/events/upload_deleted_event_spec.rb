@@ -23,13 +23,13 @@ describe Gitlab::Geo::LogCursor::Events::UploadDeletedEvent, :clean_gitlab_redis
       let(:upload) { upload_deleted_event.upload }
 
       it 'does not create a tracking database entry' do
-        expect { subject.process }.not_to change(Geo::FileRegistry, :count)
+        expect { subject.process }.not_to change(Geo::UploadRegistry, :count)
       end
 
       it 'removes the tracking database entry if exist' do
-        create(:geo_file_registry, :avatar, file_id: upload.id)
+        create(:geo_upload_registry, :avatar, file_id: upload.id)
 
-        expect { subject.process }.to change(Geo::FileRegistry.attachments, :count).by(-1)
+        expect { subject.process }.to change(Geo::UploadRegistry, :count).by(-1)
       end
     end
   end

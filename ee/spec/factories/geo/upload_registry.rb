@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :geo_file_registry, class: Geo::FileRegistry do
+  factory :geo_upload_registry, class: Geo::UploadRegistry do
     sequence(:file_id)
     file_type { :file }
     success { true }
@@ -13,8 +13,6 @@ FactoryBot.define do
     trait(:personal_file) { file_type { :personal_file } }
     trait(:favicon) { file_type { :favicon } }
     trait(:import_export) { file_type { :import_export } }
-
-    factory :geo_upload_registry, class: Geo::UploadRegistry
 
     trait :failed do
       success { false }

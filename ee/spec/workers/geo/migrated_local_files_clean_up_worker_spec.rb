@@ -57,12 +57,12 @@ describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw do
     let(:favicon_upload) { create(:upload, :favicon_upload) }
 
     before do
-      create(:geo_file_registry, :avatar, file_id: avatar_upload.id)
-      create(:geo_file_registry, :personal_file, file_id: personal_snippet_upload.id)
-      create(:geo_file_registry, :file, file_id: issuable_upload.id)
-      create(:geo_file_registry, :namespace_file, file_id: namespace_upload.id)
-      create(:geo_file_registry, :attachment, file_id: attachment_upload.id)
-      create(:geo_file_registry, :favicon, file_id: favicon_upload.id)
+      create(:geo_upload_registry, :avatar, file_id: avatar_upload.id)
+      create(:geo_upload_registry, :personal_file, file_id: personal_snippet_upload.id)
+      create(:geo_upload_registry, :file, file_id: issuable_upload.id)
+      create(:geo_upload_registry, :namespace_file, file_id: namespace_upload.id)
+      create(:geo_upload_registry, :attachment, file_id: attachment_upload.id)
+      create(:geo_upload_registry, :favicon, file_id: favicon_upload.id)
     end
 
     it 'schedules nothing for attachments stored locally' do
@@ -160,7 +160,7 @@ describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw do
     end
 
     it 'does not perform Geo::FileRegistryRemovalWorker when the backoff time is set' do
-      create(:geo_file_registry, :avatar)
+      create(:geo_upload_registry, :avatar)
 
       expect(Rails.cache).to receive(:read).with(cache_key).and_return(true)
 
