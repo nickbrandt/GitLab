@@ -509,7 +509,7 @@ describe('Cycle analytics actions', () => {
 
     beforeEach(() => {
       mock.onPut(stageEndpoint({ stageId, groupId: groupPath }), payload).replyOnce(200, payload);
-      state = { selectedGroup: { full_path: groupPath } };
+      state = { selectedGroup: { fullPath: groupPath } };
     });
 
     it('dispatches receiveUpdateStageSuccess with put request response data', done => {
@@ -580,7 +580,7 @@ describe('Cycle analytics actions', () => {
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
       mock.onDelete(stageEndpoint({ stageId, groupId: groupPath })).replyOnce(200);
-      state = { selectedGroup: { full_path: groupPath } };
+      state = { selectedGroup: { fullPath: groupPath } };
     });
 
     it('dispatches receiveDeleteStageSuccess with put request response data', done => {
@@ -643,7 +643,7 @@ describe('Cycle analytics actions', () => {
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
       mock.onDelete(stageEndpoint({ stageId, groupId: groupPath })).replyOnce(200);
-      state = { selectedGroup: { full_path: groupPath } };
+      state = { selectedGroup: { fullPath: groupPath } };
     });
 
     it('dispatches fetchCycleAnalyticsData', done => {

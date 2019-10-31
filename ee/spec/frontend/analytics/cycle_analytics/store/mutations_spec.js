@@ -47,6 +47,12 @@ describe('Cycle analytics mutations', () => {
     ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'customStageFormEvents'} | ${[]}
     ${types.REQUEST_CREATE_CUSTOM_STAGE}           | ${'isSavingCustomStage'}   | ${true}
     ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}   | ${false}
+    ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}             | ${true}
+    ${types.RECEIVE_UPDATE_STAGE_ERROR}            | ${'isLoading'}             | ${false}
+    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'isLoading'}             | ${false}
+    ${types.REQUEST_DELETE_STAGE}                  | ${'isLoading'}             | ${true}
+    ${types.RECEIVE_DELETE_STAGE_ERROR}            | ${'isLoading'}             | ${false}
+    ${types.RECEIVE_DELETE_STAGE_SUCCESS}          | ${'isLoading'}             | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 
@@ -180,6 +186,24 @@ describe('Cycle analytics mutations', () => {
         { slug: 'issue', value: '1 day ago' },
         { slug: 'test', value: null },
       ]);
+    });
+
+    // NOTE: This will fail until we merge https://gitlab.com/gitlab-org/gitlab/merge_requests/18514
+    describe.skip('with hidden stages', () => {
+      const mockStages = customizableStagesAndEvents.stages;
+
+      beforeEach(() => {
+        mockStages[0].hidden = true;
+
+        mutations[types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS](state, {
+          ...customizableStagesAndEvents.events,
+          stages: mockStages,
+        });
+      });
+
+      it('will only return stages where hidden is not set to true', () => {
+        expect(state.stages.map(({ id }) => id)).not.toContain(mockStages[0].id);
+      });
     });
   });
 

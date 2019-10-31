@@ -347,11 +347,13 @@ describe 'Group Cycle Analytics', :js do
           end
 
           it 'will not appear in the stage table after being hidden' do
-            expect(page).to have_selector('.stage-nav-item-cell', text: "Issue")
-            first_default_stage.find('.more-actions-dropdown').click
+            nav = page.find('.stage-nav')
+            expect(nav).to have_text("Issue")
+
+            click_button "Hide stage"
 
             expect(page.find('.flash-notice')).to have_text 'Stage data updated'
-            expect(page).not_to have_selector('.stage-nav-item-cell', text: "Issue")
+            expect(nav).not_to have_text("Issue")
           end
         end
 
@@ -378,11 +380,13 @@ describe 'Group Cycle Analytics', :js do
           end
 
           it 'will not appear in the stage table after being removed' do
-            expect(page).to have_selector('.stage-nav-item-cell', text: custom_stage)
-            first_custom_stage.find('.more-actions-dropdown').click
+            nav = page.find('.stage-nav')
+            expect(nav).to have_text(custom_stage)
+
+            click_button "Remove stage"
 
             expect(page.find('.flash-notice')).to have_text 'Stage removed'
-            expect(page).not_to have_selector('.stage-nav-item-cell', text: custom_stage)
+            expect(nav).not_to have_text(custom_stage)
           end
         end
       end
