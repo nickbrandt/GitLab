@@ -61,6 +61,7 @@ module EE
       scope :for_ids, -> (ids) { where(id: ids) }
       scope :in_parents, -> (parent_ids) { where(parent_id: parent_ids) }
       scope :inc_group, -> { includes(:group) }
+      scope :in_selected_groups, -> (groups) { where(group_id: groups) }
       scope :in_milestone, -> (milestone_id) { joins(:issues).where(issues: { milestone_id: milestone_id }) }
       scope :in_issues, -> (issues) { joins(:epic_issues).where(epic_issues: { issue_id: issues }).distinct }
       scope :has_parent, -> { where.not(parent_id: nil) }
@@ -92,6 +93,9 @@ module EE
       scope :with_api_entity_associations, -> { preload(:author, :labels, group: :route) }
       scope :start_date_inherited, -> { where(start_date_is_fixed: [nil, false]) }
       scope :due_date_inherited, -> { where(due_date_is_fixed: [nil, false]) }
+
+      scope :counts_by_state, -> { group(:state_id).count }
+      scope :id_not_in, ->(ids) { where.not(id: ids) }
 
       MAX_HIERARCHY_DEPTH = 5
 
@@ -274,6 +278,10 @@ module EE
 
     def descendants
       hierarchy.descendants
+    end
+
+    def base_and_descendants
+      hierarchy.base_and_descendants
     end
 
     def has_ancestor?(epic)
