@@ -283,6 +283,9 @@ describe Gitlab::Elastic::Indexer do
 
   def elasticsearch_config
     config = Gitlab::CurrentSettings.elasticsearch_config.dup
-    config.merge!(transform_tables: Elastic::Latest::GitInstanceProxy::GITALY_TRANSFORM_TABLES)
+    config.merge!(
+      transform_tables: Elastic::Latest::GitInstanceProxy::GITALY_TRANSFORM_TABLES,
+      index_name: 'gitlab-test'
+    )
   end
 end

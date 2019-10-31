@@ -108,6 +108,7 @@ module Gitlab
       def elasticsearch_config(target)
         config = Gitlab::CurrentSettings.elasticsearch_config.dup
         config[:transform_tables] = target.real_class::GITALY_TRANSFORM_TABLES
+        config[:index_name] = target.index_name
         config.to_json
       end
 
