@@ -80,7 +80,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id)
         create(:geo_lfs_object_registry, lfs_object_id: lfs_object_3.id)
         create(:geo_lfs_object_registry, lfs_object_id: lfs_object_4.id)
-        create(:geo_file_registry, :avatar)
+        create(:geo_upload_registry, :avatar)
 
         allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
 

@@ -11,7 +11,7 @@ describe Geo::FilesExpireService, :geo, :geo_fdw do
   describe '#execute' do
     let(:file_uploader) { build(:file_uploader, project: project) }
     let!(:upload) { Upload.find_by(path: file_uploader.upload_path) }
-    let!(:file_registry) { create(:geo_file_registry, file_id: upload.id) }
+    let!(:upload_registry) { create(:geo_upload_registry, file_id: upload.id) }
 
     before do
       project.update(path: "#{project.path}_renamed")
@@ -31,12 +31,12 @@ describe Geo::FilesExpireService, :geo, :geo_fdw do
         expect(File.exist?(file_path)).to be_falsey
       end
 
-      it 'removes file_registry associates with upload' do
-        expect(file_registry.success).to be_truthy
+      it 'removes upload_registry associates with upload' do
+        expect(upload_registry.success).to be_truthy
 
         subject.execute
 
-        expect { file_registry.reload }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { upload_registry.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 

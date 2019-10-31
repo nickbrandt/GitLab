@@ -2,9 +2,9 @@
 
 module Geo
   # This class is responsible for:
-  #   * Finding the appropriate Downloader class for a FileRegistry record
+  #   * Finding the appropriate Downloader class for a UploadRegistry record
   #   * Executing the Downloader
-  #   * Marking the FileRegistry record as synced or needing retry
+  #   * Marking the UploadRegistry record as synced or needing retry
   class FileDownloadService < BaseFileService
     include Gitlab::Utils::StrongMemoize
 
@@ -63,7 +63,7 @@ module Geo
         elsif lfs?
           Geo::LfsObjectRegistry.find_or_initialize_by(lfs_object_id: object_db_id)
         else
-          Geo::FileRegistry.find_or_initialize_by(file_type: object_type, file_id: object_db_id)
+          Geo::UploadRegistry.find_or_initialize_by(file_type: object_type, file_id: object_db_id)
         end
       end
     end

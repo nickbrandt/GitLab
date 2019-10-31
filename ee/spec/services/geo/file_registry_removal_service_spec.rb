@@ -22,10 +22,10 @@ describe Geo::FileRegistryRemovalService do
     end
 
     shared_examples 'removes' do
-      subject(:service) { described_class.new(file_registry.file_type, file_registry.file_id) }
+      subject(:service) { described_class.new(registry.file_type, registry.file_id) }
 
       before do
-        stub_exclusive_lease("file_registry_removal_service:#{file_registry.file_type}:#{file_registry.file_id}",
+        stub_exclusive_lease("file_registry_removal_service:#{registry.file_type}:#{registry.file_id}",
           timeout: Geo::FileRegistryRemovalService::LEASE_TIMEOUT)
       end
 
@@ -38,7 +38,7 @@ describe Geo::FileRegistryRemovalService do
       it 'registry when file was deleted successfully' do
         expect do
           service.execute
-        end.to change(Geo::FileRegistry, :count).by(-1)
+        end.to change(Geo::UploadRegistry, :count).by(-1)
       end
     end
 
@@ -140,7 +140,7 @@ describe Geo::FileRegistryRemovalService do
 
     context 'with avatar' do
       let!(:upload) { create(:user, :with_avatar).avatar.upload }
-      let!(:file_registry) { create(:geo_file_registry, :avatar, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :avatar, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
@@ -157,7 +157,7 @@ describe Geo::FileRegistryRemovalService do
 
     context 'with attachment' do
       let!(:upload) { create(:note, :with_attachment).attachment.upload }
-      let!(:file_registry) { create(:geo_file_registry, :attachment, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :attachment, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
@@ -174,7 +174,7 @@ describe Geo::FileRegistryRemovalService do
 
     context 'with file' do
       let!(:upload) { create(:user, :with_avatar).avatar.upload }
-      let!(:file_registry) { create(:geo_file_registry, :avatar, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :avatar, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
@@ -197,7 +197,7 @@ describe Geo::FileRegistryRemovalService do
         Upload.find_by(model: group, uploader: NamespaceFileUploader.name)
       end
 
-      let!(:file_registry) { create(:geo_file_registry, :namespace_file, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :namespace_file, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
@@ -219,7 +219,7 @@ describe Geo::FileRegistryRemovalService do
         PersonalFileUploader.new(snippet).store!(file)
         Upload.find_by(model: snippet, uploader: PersonalFileUploader.name)
       end
-      let!(:file_registry) { create(:geo_file_registry, :personal_file, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :personal_file, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
@@ -241,7 +241,7 @@ describe Geo::FileRegistryRemovalService do
         FaviconUploader.new(appearance).store!(file)
         Upload.find_by(model: appearance, uploader: FaviconUploader.name)
       end
-      let!(:file_registry) { create(:geo_file_registry, :favicon, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :favicon, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
