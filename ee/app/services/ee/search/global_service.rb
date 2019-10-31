@@ -5,6 +5,7 @@ module EE
     module GlobalService
       extend ::Gitlab::Utils::Override
       include ::Gitlab::Utils::StrongMemoize
+      include ::Search::Elasticsearchable
 
       override :execute
       def execute
@@ -19,8 +20,8 @@ module EE
         )
       end
 
-      def use_elasticsearch?
-        ::Gitlab::CurrentSettings.search_using_elasticsearch?(scope: nil)
+      def elasticsearchable_scope
+        nil
       end
 
       def elastic_projects

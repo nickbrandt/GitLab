@@ -221,4 +221,33 @@ describe 'Global elastic search', :elastic do
       expect(page).to have_content('Users 0')
     end
   end
+
+  context 'when no results are returned' do
+    it 'allows basic search without Elasticsearch' do
+      visit dashboard_projects_path
+
+      submit_search('project')
+
+      # Project won't be found since ES index is not up to date
+      expect(page).not_to have_content('Projects 1')
+
+      # Since there are no results you have the option to instead use basic
+      # search
+      click_link 'basic search'
+
+      # Project is found now that we are using basic search
+      expect(page).to have_content('Projects 1')
+    end
+
+    context 'when performing Commits search' do
+      it 'does not allow basic search' do
+        visit dashboard_projects_path
+
+        submit_search('project')
+        select_search_scope('Commits')
+
+        expect(page).not_to have_link('basic search')
+      end
+    end
+  end
 end
