@@ -27,6 +27,7 @@ module EE
 
                 retry_optimistic_lock(pipeline) do
                   pipeline.drop!(:job_activity_limit_exceeded)
+                  limit.log_error!(project_id: project.id, plan: project.namespace.actual_plan_name)
                 end
               end
 
