@@ -7,6 +7,8 @@ module Geo
 
       belongs_to :lfs_object, class_name: 'Geo::Fdw::LfsObject', inverse_of: :projects
       belongs_to :project, class_name: 'Geo::Fdw::Project', inverse_of: :lfs_objects
+
+      scope :project_id_in, ->(ids) { joins(:project).merge(Geo::Fdw::Project.id_in(ids)) }
     end
   end
 end

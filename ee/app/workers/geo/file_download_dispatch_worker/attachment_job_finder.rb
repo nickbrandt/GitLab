@@ -15,7 +15,7 @@ module Geo
       # rubocop: disable CodeReuse/ActiveRecord
       def convert_resource_relation_to_job_args(relation)
         relation.pluck(:id, :uploader)
-                .map { |id, uploader| [uploader.sub(/Uploader\z/, '').underscore, id] }
+                .map! { |id, uploader| [uploader.sub(/Uploader\z/, '').underscore, id] }
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
