@@ -64,7 +64,7 @@ like by brute forcing or abusing edge conditions that we have.
 
 ## Data set
 
-The data set that will be processed by merge request should be known
+The data set that will be processed by the merge request should be known
 and documented.  The feature should clearly document what expected
 data set is for this feature to process, and what problems it might cause.
 
@@ -78,11 +78,11 @@ the following:
 
 1. What repositories are going to be supported?
 1. How long it will take for big repositories like Linux kernel?
-1. Is there something that we can make to do differently to not
-   process big data set?
+1. Is there something that we can do differently to not process such a
+   big data set?
 1. Should we build some fail-safe mechanism to contain
-   computation complexity? Usually it is better to degrade
-   the service for asingle user instead of all users.
+   computational complexity? Usually it is better to degrade
+   the service for a single user instead of all users.
 
 ## Query plans and database structure
 
@@ -244,11 +244,11 @@ system](https://guides.rubyonrails.org/caching_with_rails.html).
 
 ## Pagination
 
-Each feature that renders a list of items as a table needs to include the pagination.
+Each feature that renders a list of items as a table needs to include pagination.
 
-A different styles of paginations are proposed:
+The main styles of pagination are:
 
-1. Offset-based pagination: user go to specific page, like 1. User sees the next page number,
+1. Offset-based pagination: user goes to a specific page, like 1. User sees the next page number,
    and the total number of pages. This style is well supported by all components of GitLab,
 1. Offset-based pagination, but without the count: user goes to a specific page, like 1.
    User sees only the next page number, but does not see the total amount of pages
@@ -262,44 +262,44 @@ However, we don't have support for that at GitLab at that moment. You
 can follow the progress looking at [API: Keyset Pagination
 ](https://gitlab.com/groups/gitlab-org/-/epics/2039).
 
-Take into consideration the following when c:
+Take into consideration the following when choosing a pagination strategy:
 
 1. It is very inefficient to calculate amount of objects that pass the filtering,
-   this operation usually can take seconds, and can timeout,
+   this operation usually can take seconds, and can time out,
 1. It is very inefficent to get entries for page at higher ordinals, like 1000.
    The database has to sort and iterate all previous items, and this operation usually
    can result in exponential complexity put on database.
 
 ## Badge counters
 
-The counters should always be truncated. It means that we do not want to present
-exact number over some threshold. The reason for that is for the cases where we want
+Counters should always be truncated. It means that we do not want to present
+the exact number over some threshold. The reason for that is for the cases where we want
 to calculate exact number of items, we effectively need to filter each of them for
-the purpose of knowing exact number of items matching.
+the purpose of knowing the exact number of items matching.
 
 From ~UX perspective it is often acceptable to see that you have over 1000+ pipelines,
 instead of that you have 40000+ pipelines, but at a tradeoff of loading page for 2s longer.
 
-Example of such pattern is the list of pipelines and jobs. We truncate numbers to `1000+`,
+An example of this pattern is the list of pipelines and jobs. We truncate numbers to `1000+`,
 but we show an accurate number of running pipelines, which is the most interesting information.
 
-There's an for example a helper method that can be used for that purpose `NumbersHelper.limited_counter_with_delimiter`
+There's a helper method that can be used for that purpose - `NumbersHelper.limited_counter_with_delimiter` -
 that accepts an upper limit of counting rows.
 
 In some cases it is desired that badge counters are loaded asynchronously.
-This can speeds-up initial page load and aid to overall better user-experience.
+This can speed up the initial page load and give a better user experience overall.
 
 ## Application/misuse limits
 
-Every new feature should have an safe usage quotas introduced.
+Every new feature should have safe usage quotas introduced.
 The quota should be optimised to a level that we consider the feature to
-be performant and useable for the user, but **not limiting**.
+be performant and usable for the user, but **not limiting**.
 
-**We want the features to be fully useable for the users.**
-**However, we want to ensure that the feature will continue to perform well if used at limit**
+**We want the features to be fully usable for the users.**
+**However, we want to ensure that the feature will continue to perform well if used at its limit**
 **and it will not cause availability issues.**
 
-The intent is to provide a safe usage pattern for the features,
+The intent is to provide a safe usage pattern for the feature,
 as our implementation decisions are optimised for the given data set.
 Our feature limits should reflect the optimisations that we introduced.
 
@@ -307,14 +307,14 @@ The intent of quotas could be different:
 
 1. We want to provide higher quotas for higher tiers of features:
    we want to provide on GitLab.com more capabilities for different tiers,
-1. We want to prevent misuse of the features: someone accidentially creates
-   10000 deploy tokens, because of broken API script,
-1. We want to prevent abuse of the features: someone purposely creates
-   a 10000 pipelines to take an advantage from the system.
+1. We want to prevent misuse of the feature: someone accidentially creates
+   10000 deploy tokens, because of a broken API script,
+1. We want to prevent abuse of the feature: someone purposely creates
+   a 10000 pipelines to take advantage of the system.
 
-Consider that always is better start with the some kind of limitation,
-instead of later introducing a breaking change that would result some
-of the workflows to break.
+Consider that it is always better to start with some kind of limitation,
+instead of later introducing a breaking change that would result in some
+workflows breaking.
 
 Examples:
 
@@ -322,13 +322,13 @@ Examples:
    more than 50 schedules.
    In such cases it is rather expected that this is either misuse
    or abuse of the feature. Lack of the upper limit can result
-   in service degredation as system will try to process all schedules
+   in service degredation as the system will try to process all schedules
    assigned the the project.
 
 1. GitLab CI includes: We started with the limit of maximum of 50 nested includes.
-   We did understand that performance of the feature was acceptable at that level.
-   We received a request from the community that the limit is to small.
-   We had a time to understand the customer requirement, and implement additional
+   We understood that performance of the feature was acceptable at that level.
+   We received a request from the community that the limit is too small.
+   We had a time to understand the customer requirement, and implement an additional
    fail-safe mechanism (time-based one) to increase the limit 100, and if needed increase it
    further without negative impact on availability of the feature and GitLab.
 
@@ -340,8 +340,8 @@ should come with feature flag to disable it.
 The feature flag makes our team more happy, because they can monitor the system and
 quickly react without our users noticing the problem.
 
-Know performance deficiencies should be addressed right away after we merge initial
+Performance deficiencies should be addressed right away after we merge initial
 changes.
 
-To read more about when and how feature flags should be used is well
-described in [Feature flags in GitLab development](https://docs.gitlab.com/ee/development/feature_flags/process.html#feature-flags-in-gitlab-development).
+Read moar about when and how feature flags should be used in
+[Feature flags in GitLab development](https://docs.gitlab.com/ee/development/feature_flags/process.html#feature-flags-in-gitlab-development).
