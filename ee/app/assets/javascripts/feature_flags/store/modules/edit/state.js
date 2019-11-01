@@ -9,4 +9,5 @@ export default () => ({
   scopes: [],
   isLoading: false,
   hasError: false,
+  iid: null,
 });
