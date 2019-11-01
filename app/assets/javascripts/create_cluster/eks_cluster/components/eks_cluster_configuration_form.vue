@@ -156,7 +156,7 @@ export default {
         ),
         {
           startLink:
-            '<a href="https://console.aws.amazon.com/iam/home?#roles" target="_blank" rel="noopener noreferrer">',
+            '<a href="https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html#role-create" target="_blank" rel="noopener noreferrer">',
           externalLinkIcon: this.externalLinkIcon,
           endLink: '</a>',
         },
@@ -198,7 +198,7 @@ export default {
         ),
         {
           startLink:
-            '<a href="https://console.aws.amazon.com/vpc/home?#vpc" target="_blank" rel="noopener noreferrer">',
+            '<a href="https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html#vpc-create" target="_blank" rel="noopener noreferrer">',
           externalLinkIcon: this.externalLinkIcon,
           endLink: '</a>',
         },
@@ -521,7 +521,7 @@ export default {
     </div>
     <div class="form-group">
       <loading-button
-        class="js-create-cluster"
+        class="js-create-cluster btn-success"
         :disabled="createClusterButtonDisabled"
         :loading="isCreatingCluster"
         :label="createClusterButtonLabel"
