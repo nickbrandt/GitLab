@@ -126,6 +126,10 @@ module QA
             expand_vulnerability_report
             click_vulnerability(name)
             click_element :resolve_split_button
+
+            wait(reload: false) do
+              has_no_element?(:resolve_split_button)
+            end
           end
 
           def has_vulnerability_report?(timeout: 60)
