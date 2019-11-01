@@ -18,6 +18,7 @@ module Gitlab
       GITALY_INTERNAL_URL = 'ssh://gitaly/internal.git'
       GITLAB_PROJECTS_TIMEOUT = Gitlab.config.gitlab_shell.git_timeout
       EMPTY_REPOSITORY_CHECKSUM = '0000000000000000000000000000000000000000'
+      REF_REMOVAL_UPDATE_REV = '0' * 40
 
       NoRepository = Class.new(StandardError)
       InvalidRepository = Class.new(StandardError)
@@ -636,10 +637,9 @@ module Gitlab
       end
 
       # Delete the specified branch from the repository
+      # Note: No Git hooks are executed for this action
       def delete_branch(branch_name)
-        wrapped_gitaly_errors do
-          gitaly_ref_client.delete_branch(branch_name)
-        end
+        write_ref(branch_name, REF_REMOVAL_UPDATE_REV)
       rescue CommandError => e
         raise DeleteBranchError, e
       end
@@ -651,14 +651,13 @@ module Gitlab
       end
 
       # Create a new branch named **ref+ based on **stat_point+, HEAD by default
+      # Note: No Git hooks are executed for this action
       #
       # Examples:
       #   create_branch("feature")
       #   create_branch("other-feature", "master")
       def create_branch(ref, start_point = "HEAD")
-        wrapped_gitaly_errors do
-          gitaly_ref_client.create_branch(ref, start_point)
-        end
+        write_ref(ref, start_point)
       end
 
       # If `mirror_refmap` is present the remote is set as mirror with that mapping

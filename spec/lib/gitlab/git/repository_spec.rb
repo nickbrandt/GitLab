@@ -420,55 +420,6 @@ describe Gitlab::Git::Repository, :seed_helper do
     end
   end
 
-  describe "#delete_branch" do
-    let(:repository) { mutable_repository }
-
-    after do
-      ensure_seeds
-    end
-
-    it "removes the branch from the repo" do
-      branch_name = "to-be-deleted-soon"
-
-      repository.create_branch(branch_name)
-      expect(repository_rugged.branches[branch_name]).not_to be_nil
-
-      repository.delete_branch(branch_name)
-      expect(repository_rugged.branches[branch_name]).to be_nil
-    end
-
-    context "when branch does not exist" do
-      it "raises a DeleteBranchError exception" do
-        expect { repository.delete_branch("this-branch-does-not-exist") }.to raise_error(Gitlab::Git::Repository::DeleteBranchError)
-      end
-    end
-  end
-
-  describe "#create_branch" do
-    let(:repository) { mutable_repository }
-
-    after do
-      ensure_seeds
-    end
-
-    it "creates a new branch" do
-      expect(repository.create_branch('new_branch', 'master')).not_to be_nil
-    end
-
-    it "creates a new branch with the right name" do
-      expect(repository.create_branch('another_branch', 'master').name).to eq('another_branch')
-    end
-
-    it "fails if we create an existing branch" do
-      repository.create_branch('duplicated_branch', 'master')
-      expect {repository.create_branch('duplicated_branch', 'master')}.to raise_error("Branch duplicated_branch already exists")
-    end
-
-    it "fails if we create a branch from a non existing ref" do
-      expect {repository.create_branch('branch_based_in_wrong_ref', 'master_2_the_revenge')}.to raise_error("Invalid reference master_2_the_revenge")
-    end
-  end
-
   describe '#delete_refs' do
     let(:repository) { mutable_repository }
 
