@@ -9954,6 +9954,9 @@ msgstr ""
 msgid "Loading contribution stats for group members"
 msgstr ""
 
+msgid "Loading files, directories, and submodules in the path %{path} for commit reference %{ref}"
+msgstr ""
+
 msgid "Loading functions timed out. Please reload the page to try again."
 msgstr ""
 
