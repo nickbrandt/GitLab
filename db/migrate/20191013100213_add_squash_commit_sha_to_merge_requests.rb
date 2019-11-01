@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class AddSquashCommitShaToMergeRequests < ActiveRecord::Migration[5.2]
-
   DOWNTIME = false
 
   def change
