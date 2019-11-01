@@ -19,6 +19,7 @@ module EE
         mount ::API::EpicLinks
         mount ::API::Epics
         mount ::API::FeatureFlags
+        mount ::API::FeatureFlagScopes
         mount ::API::ContainerRegistryEvent
         mount ::API::Geo
         mount ::API::GeoNodes
