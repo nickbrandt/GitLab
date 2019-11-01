@@ -20,7 +20,7 @@ module Clusters
       end
 
       def execute
-        conditions = -> { merge(::Environment.available).where(key: ADO_MODSEC_KEY).distinct }
+        conditions = -> { merge(::Environment.available).where(key: ADO_MODSEC_KEY) }
 
         ci_pipeline_var_enabled =
           ::Ci::PipelineVariable
@@ -36,9 +36,11 @@ module Clusters
               ::Ci::Variable.where.not(
                 project_id: ci_pipeline_var_enabled.select('ci_pipelines.project_id')
               )
-            )
+            ).select('DISTINCT environments.id, ci_variables.*')
 
-        sum_modsec_config_counts(ci_pipeline_var_enabled)
+        sum_modsec_config_counts(
+          ci_pipeline_var_enabled.select('DISTINCT environments.id, ci_pipeline_variables.*')
+        )
         sum_modsec_config_counts(ci_var_enabled)
 
         {
@@ -51,7 +53,7 @@ module Clusters
 
       # These are encrypted so we must decrypt and count in memory
       def sum_modsec_config_counts(dataset)
-        dataset.each do |var|
+        dataset.find_each do |var|
           case var.value
           when "On" then @blocking_count += 1
           when "Off" then @disabled_count += 1

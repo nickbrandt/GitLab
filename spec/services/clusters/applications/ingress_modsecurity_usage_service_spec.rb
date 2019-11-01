@@ -82,5 +82,53 @@ describe Clusters::Applications::IngressModsecurityUsageService do
         expect(subject[:ingress_modsecurity_disabled]).to eq(0)
       end
     end
+
+    context 'when a project has multiple environments' do
+      let(:modsec_values) { { key: ADO_MODSEC_KEY, value: "On" } }
+
+      let!(:env1) { project_with_pipeline_var.environments.first }
+      let!(:env2) { create(:environment, project: project_with_pipeline_var) }
+
+      let!(:pipeline_with_2_deployments) do
+        create(:ci_pipeline, :with_job, project: project_with_ci_var).tap do |pip|
+          pip.builds << build(:ci_build, pipeline: pip, project: project_with_pipeline_var)
+        end
+      end
+
+      let!(:deployment1) do
+        create(
+          :deployment,
+          environment: env1,
+          project: project_with_pipeline_var,
+          deployable: pipeline_with_2_deployments.builds.first
+        )
+      end
+      let!(:deployment2) do
+        create(
+          :deployment,
+          environment: env2,
+          project: project_with_pipeline_var,
+          deployable: pipeline_with_2_deployments.builds.last
+        )
+      end
+
+      context 'when set as ci variable' do
+        let!(:ci_variable) { create(:ci_variable, project: project_with_pipeline_var, **modsec_values) }
+
+        it 'gathers variable data' do
+          expect(subject[:ingress_modsecurity_blocking]).to eq(2)
+          expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+        end
+      end
+
+      context 'when set as pipeline variable' do
+        let!(:pipeline_variable) { create(:ci_pipeline_variable, pipeline: pipeline_with_2_deployments, **modsec_values) }
+
+        it 'gathers variable data' do
+          expect(subject[:ingress_modsecurity_blocking]).to eq(2)
+          expect(subject[:ingress_modsecurity_disabled]).to eq(0)
+        end
+      end
+    end
   end
 end
