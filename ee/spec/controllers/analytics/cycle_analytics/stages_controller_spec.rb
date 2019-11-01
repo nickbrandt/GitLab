@@ -187,18 +187,7 @@ describe Analytics::CycleAnalytics::StagesController do
         expect(response).to match_response_schema('analytics/cycle_analytics/median', dir: 'ee')
       end
 
-      context 'when params are invalid' do
-        before do
-          params[:created_before] = '2018-01-01'
-        end
-
-        it 'renders `unprocessable_entity`' do
-          subject
-
-          expect(response).to have_gitlab_http_status(:unprocessable_entity)
-          expect(response).to match_response_schema('analytics/cycle_analytics/validation_error', dir: 'ee')
-        end
-      end
+      include_examples 'date parameter examples'
 
       include_examples 'group permission check on the controller level'
     end
@@ -216,6 +205,8 @@ describe Analytics::CycleAnalytics::StagesController do
 
         expect(response).to be_successful
       end
+
+      include_examples 'date parameter examples'
 
       include_examples 'group permission check on the controller level'
     end

@@ -14,6 +14,7 @@ namespace :analytics do
           get :records
         end
       end
+      resource :summary, controller: :summary, only: [:show]
     end
   end
 
