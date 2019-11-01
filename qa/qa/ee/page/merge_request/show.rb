@@ -5,6 +5,8 @@ module QA
     module Page
       module MergeRequest
         module Show
+          include Page::Component::LicenseManagement
+
           def self.prepended(page)
             page.module_eval do
               view 'app/assets/javascripts/vue_merge_request_widget/components/states/sha_mismatch.vue' do
@@ -112,6 +114,28 @@ module QA
 
           def unresolve_review_discussion
             check_element :unresolve_review_discussion_checkbox
+          end
+
+          def expand_license_report
+            within_element(:license_report_widget) do
+              click_element(:expand_report_button)
+            end
+          end
+
+          def license_report_expanded?
+            within_element(:license_report_widget) do
+              has_element?(:expand_report_button, text: "Collapse")
+            end
+          end
+
+          def approve_license_with_mr(name)
+            expand_license_report unless license_report_expanded?
+            approve_license(name)
+          end
+
+          def blacklist_license_with_mr(name)
+            expand_license_report unless license_report_expanded?
+            blacklist_license(name)
           end
 
           def expand_vulnerability_report
