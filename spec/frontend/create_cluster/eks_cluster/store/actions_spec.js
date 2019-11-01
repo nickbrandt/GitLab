@@ -168,7 +168,6 @@ describe('EKS Cluster Store Actions', () => {
 
   describe('createCluster', () => {
     let requestPayload;
-    let state;
 
     beforeEach(() => {
       requestPayload = {
@@ -243,9 +242,7 @@ describe('EKS Cluster Store Actions', () => {
 
   describe('requestCreateCluster', () => {
     it('commits requestCreateCluster mutation', () => {
-      testAction(actions.requestCreateCluster, null, createState(), [
-        { type: REQUEST_CREATE_CLUSTER },
-      ]);
+      testAction(actions.requestCreateCluster, null, state, [{ type: REQUEST_CREATE_CLUSTER }]);
     });
   });
 
@@ -268,7 +265,7 @@ describe('EKS Cluster Store Actions', () => {
     it('commits createClusterError mutation', () => {
       const payload = { base: ['Create cluster failed'] };
 
-      testAction(actions.createClusterError, payload, createState(), [
+      testAction(actions.createClusterError, payload, state, [
         { type: CREATE_CLUSTER_ERROR, payload },
       ]);
     });

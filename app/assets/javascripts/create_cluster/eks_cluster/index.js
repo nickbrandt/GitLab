@@ -38,6 +38,8 @@ export default el => {
         createRolePath,
         createClusterPath,
         signOutPath,
+      },
+      apiPaths: {
         getRolesPath,
         getRegionsPath,
         getKeyPairsPath,
