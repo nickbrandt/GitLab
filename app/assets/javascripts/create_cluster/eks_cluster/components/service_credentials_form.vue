@@ -46,7 +46,7 @@ export default {
 
       return sprintf(
         s__(
-          'ClusterIntegration|Create a provision role on %{startAwsLink}Amazon Web Services %{externalLinkIcon} %{endLink} using the account and external ID above. %{startMoreInfoLink}More information%{endLink}',
+          'ClusterIntegration|Create a provision role on %{startAwsLink}Amazon Web Services %{externalLinkIcon}%{endLink} using the account and external ID above. %{startMoreInfoLink}More information%{endLink}',
         ),
         {
           startAwsLink:
@@ -63,7 +63,7 @@ export default {
 
       return sprintf(
         s__(
-          'ClusterIntegration|The Amazon Resource Name (ARN) associated with your role. If you do not have a provision role, first create one on  %{startAwsLink}Amazon Web Services %{externalLinkIcon} %{endLink} using the above account and external IDs. %{startMoreInfoLink}More information%{endLink}',
+          'ClusterIntegration|The Amazon Resource Name (ARN) associated with your role. If you do not have a provision role, first create one on  %{startAwsLink}Amazon Web Services %{externalLinkIcon}%{endLink} using the above account and external IDs. %{startMoreInfoLink}More information%{endLink}',
         ),
         {
           startAwsLink:
@@ -78,16 +78,11 @@ export default {
   },
   methods: {
     ...mapActions(['createRole']),
-    handleAuthenticate() {
-      const { roleArn, externalId } = this;
-
-      this.createRole({ roleArn, externalId });
-    },
   },
 };
 </script>
 <template>
-  <form name="service-credentials-form">
+  <form name="service-credentials-form" @submit.prevent="createRole({ roleArn, externalId })">
     <h2>{{ s__('ClusterIntegration|Authenticate with Amazon Web Services') }}</h2>
     <p>
       {{
@@ -137,10 +132,10 @@ export default {
     </div>
     <loading-button
       class="js-submit-service-credentials"
+      type="submit"
       :disabled="submitButtonDisabled"
       :loading="isCreatingRole"
       :label="submitButtonLabel"
-      @click="handleAuthenticate($event)"
     />
   </form>
 </template>

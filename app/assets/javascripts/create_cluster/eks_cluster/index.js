@@ -26,8 +26,6 @@ export default el => {
         hasCredentials: parseBoolean(hasCredentials),
         externalId,
         accountId,
-      },
-      apiPaths: {
         createRolePath,
       },
     }),

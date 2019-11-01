@@ -1,6 +1,8 @@
 import { KUBERNETES_VERSIONS } from '../constants';
 
 export default () => ({
+  createRolePath: null,
+
   isCreatingRole: false,
   roleCreated: false,
   createRoleError: false,

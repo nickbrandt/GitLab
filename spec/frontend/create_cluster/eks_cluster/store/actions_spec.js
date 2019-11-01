@@ -1,7 +1,7 @@
 import testAction from 'helpers/vuex_action_helper';
 
 import createState from '~/create_cluster/eks_cluster/store/state';
-import actionsFactory from '~/create_cluster/eks_cluster/store/actions';
+import * as actions from '~/create_cluster/eks_cluster/store/actions';
 import {
   SET_CLUSTER_NAME,
   SET_ENVIRONMENT_SCOPE,
@@ -31,9 +31,8 @@ describe('EKS Cluster Store Actions', () => {
   let keyPair;
   let securityGroup;
   let gitlabManagedCluster;
-  let actions;
-  let apiPaths;
   let mock;
+  let state;
 
   beforeEach(() => {
     clusterName = 'my cluster';
@@ -47,11 +46,10 @@ describe('EKS Cluster Store Actions', () => {
     securityGroup = { name: 'default group' };
     gitlabManagedCluster = true;
 
-    apiPaths = {
+    state = {
+      ...createState(),
       createRolePath: '/clusters/roles/',
     };
-
-    actions = actionsFactory(apiPaths);
   });
 
   beforeEach(() => {
@@ -77,7 +75,7 @@ describe('EKS Cluster Store Actions', () => {
   `(`$action commits $mutation with $payloadDescription payload`, data => {
     const { action, mutation, payload } = data;
 
-    testAction(actions[action], payload, createState(), [{ type: mutation, payload }]);
+    testAction(actions[action], payload, state, [{ type: mutation, payload }]);
   });
 
   describe('createRole', () => {
@@ -89,7 +87,7 @@ describe('EKS Cluster Store Actions', () => {
     describe('when request succeeds', () => {
       beforeEach(() => {
         mock
-          .onPost(apiPaths.createRolePath, {
+          .onPost(state.createRolePath, {
             role_arn: payload.roleArn,
             role_external_id: payload.externalId,
           })
@@ -100,7 +98,7 @@ describe('EKS Cluster Store Actions', () => {
         testAction(
           actions.createRole,
           payload,
-          createState(),
+          state,
           [],
           [{ type: 'requestCreateRole' }, { type: 'createRoleSuccess' }],
         ));
@@ -112,7 +110,7 @@ describe('EKS Cluster Store Actions', () => {
       beforeEach(() => {
         error = new Error('Request failed with status code 400');
         mock
-          .onPost(apiPaths.createRolePath, {
+          .onPost(state.createRolePath, {
             role_arn: payload.roleArn,
             role_external_id: payload.externalId,
           })
@@ -123,7 +121,7 @@ describe('EKS Cluster Store Actions', () => {
         testAction(
           actions.createRole,
           payload,
-          createState(),
+          state,
           [],
           [{ type: 'requestCreateRole' }, { type: 'createRoleError', payload: { error } }],
         ));
@@ -132,13 +130,13 @@ describe('EKS Cluster Store Actions', () => {
 
   describe('requestCreateRole', () => {
     it('commits requestCreaterole mutation', () => {
-      testAction(actions.requestCreateRole, null, createState(), [{ type: REQUEST_CREATE_ROLE }]);
+      testAction(actions.requestCreateRole, null, state, [{ type: REQUEST_CREATE_ROLE }]);
     });
   });
 
   describe('createRoleSuccess', () => {
     it('commits createRoleSuccess mutation', () => {
-      testAction(actions.createRoleSuccess, null, createState(), [{ type: CREATE_ROLE_SUCCESS }]);
+      testAction(actions.createRoleSuccess, null, state, [{ type: CREATE_ROLE_SUCCESS }]);
     });
   });
 
@@ -148,9 +146,7 @@ describe('EKS Cluster Store Actions', () => {
         error: new Error(),
       };
 
-      testAction(actions.createRoleError, payload, createState(), [
-        { type: CREATE_ROLE_ERROR, payload },
-      ]);
+      testAction(actions.createRoleError, payload, state, [{ type: CREATE_ROLE_ERROR, payload }]);
     });
   });
 });

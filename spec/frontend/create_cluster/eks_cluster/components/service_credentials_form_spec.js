@@ -47,6 +47,7 @@ describe('ServiceCredentialsForm', () => {
   const findCopyExternalIdButton = () => vm.find('.js-copy-external-id-button');
   const findInvalidCredentials = () => vm.find('.js-invalid-credentials');
   const findSubmitButton = () => vm.find(LoadingButton);
+  const findForm = () => vm.find('form[name="service-credentials-form"]');
 
   it('displays provided account id', () => {
     expect(findAccountIdInput().attributes('value')).toBe(accountId);
@@ -74,8 +75,8 @@ describe('ServiceCredentialsForm', () => {
     expect(findSubmitButton().attributes('disabled')).toBeFalsy();
   });
 
-  it('dispatches authenticate action when submit button is clicked', () => {
-    findSubmitButton().vm.$emit('click');
+  it('dispatches createRole action when form is submitted', () => {
+    findForm().trigger('submit');
 
     expect(createRoleAction).toHaveBeenCalled();
   });
