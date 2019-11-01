@@ -23,24 +23,17 @@ module EE
               validates :name, presence: true
               validates :name, type: Symbol
 
+              validate do
+                unless trigger.present? || needs.present?
+                  errors.add(:config, 'should contain either a trigger or a needs:pipeline')
+                end
+              end
+
               with_options allow_nil: true do
                 validates :when,
                   inclusion: { in: %w[on_success on_failure always],
                                message: 'should be on_success, on_failure or always' }
                 validates :extends, type: String
-              end
-
-              validate on: :composed do
-                unless trigger.present? || bridge_needs.present?
-                  errors.add(:config, 'should contain either a trigger or a needs:pipeline')
-                end
-              end
-
-              validate on: :composed do
-                next unless bridge_needs.present?
-                next if bridge_needs.one?
-
-                errors.add(:config, 'should contain at most one bridge need')
               end
             end
 
@@ -48,10 +41,9 @@ module EE
               description: 'CI/CD Bridge downstream trigger definition.',
               inherit: false
 
-            entry :needs, ::Gitlab::Ci::Config::Entry::Needs,
+            entry :needs, ::EE::Gitlab::Ci::Config::Entry::Needs,
               description: 'CI/CD Bridge needs dependency definition.',
-              inherit: false,
-              metadata: { allowed_needs: %i[bridge job] }
+              inherit: false
 
             entry :stage, ::Gitlab::Ci::Config::Entry::Stage,
               description: 'Pipeline stage this job will be executed into.',
@@ -99,10 +91,6 @@ module EE
                 variables: (variables_value if variables_defined?),
                 only: only_value,
                 except: except_value }.compact
-            end
-
-            def bridge_needs
-              needs_value[:bridge] if needs_value
             end
 
             private
