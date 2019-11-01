@@ -317,7 +317,7 @@ export default {
     </h2>
     <div class="mb-3" v-html="kubernetesIntegrationHelpText"></div>
     <div class="mb-3">
-      <button class="btn btn-link js-sign-out" @click="signOut()">
+      <button class="btn btn-link js-sign-out" @click.prevent="signOut()">
         {{ s__('ClusterIntegration|Select a different AWS role') }}
       </button>
     </div>

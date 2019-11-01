@@ -276,11 +276,11 @@ describe('EKS Cluster Store Actions', () => {
 
   describe('signOut', () => {
     beforeEach(() => {
-      mock.onDelete(apiPaths.signOutPath).reply(201);
+      mock.onDelete(state.signOutPath).reply(200, null);
     });
 
     it('commits signOut mutation', () => {
-      testAction(actions.signOut, null, createState(), [{ type: SIGN_OUT }]);
+      testAction(actions.signOut, null, state, [{ type: SIGN_OUT }]);
     });
   });
 });

@@ -42,7 +42,7 @@ export const createRoleError = ({ commit }, payload) => {
 
 export const createCluster = ({ dispatch, state }) => {
     dispatch('requestCreateCluster');
-    
+
     return axios
     .post(state.createClusterPath, {
           name: state.clusterName,
@@ -76,7 +76,7 @@ export const createClusterSuccess = (_, location) => {
 export const createClusterError = ({ commit }, error) => {
     commit(types.CREATE_CLUSTER_ERROR, error);
     createFlash(getErrorMessage(error));
-},
+};
 
 export const setRegion = ({ commit }, payload) => {
   commit(types.SET_REGION, payload);
@@ -114,9 +114,8 @@ export const setNodeCount = ({ commit }, payload) => {
     commit(types.SET_NODE_COUNT, payload);
 };
 
-export const signOut = ({ commit, state: { signOutPath }) => {
-    return axios
+export const signOut = ({ commit, state: { signOutPath } }) =>
+  axios
     .delete(signOutPath)
     .then(() => commit(types.SIGN_OUT))
     .catch(({ response: { data } }) => createFlash(getErrorMessage(data)));
-};
