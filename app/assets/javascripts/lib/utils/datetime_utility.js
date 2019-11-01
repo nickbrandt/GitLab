@@ -156,13 +156,14 @@ const memoizedLocale = () => {
 timeago.register(timeagoLanguageCode, memoizedLocale());
 timeago.register(`${timeagoLanguageCode}-remaining`, memoizedLocaleRemaining());
 
+export const getTimeago = () => timeago;
+
 /**
  * For the given elements, sets a tooltip with a formatted date.
  * @param {JQuery} $timeagoEls
  * @param {Boolean} setTimeago
  */
 export const localTimeAgo = ($timeagoEls, setTimeago = true) => {
-
   $timeagoEls.each((i, el) => {
     $(el).text(timeago.format($(el).attr('datetime'), timeagoLanguageCode));
   });
@@ -196,9 +197,7 @@ export const timeFor = (time, expiredLabel) => {
   if (new Date(time) < new Date()) {
     return expiredLabel || s__('Timeago|Past due');
   }
-  return timeago
-    .format(time, `${timeagoLanguageCode}-remaining`)
-    .trim();
+  return timeago.format(time, `${timeagoLanguageCode}-remaining`).trim();
 };
 
 export const getDayDifference = (a, b) => {
