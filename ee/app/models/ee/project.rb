@@ -35,6 +35,7 @@ module EE
         if: ->(project) { project.mirror? && project.import_url_updated? }
 
       belongs_to :mirror_user, foreign_key: 'mirror_user_id', class_name: 'User'
+      belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_user_id', class_name: 'User'
 
       has_one :repository_state, class_name: 'ProjectRepositoryState', inverse_of: :project
       has_one :project_registry, class_name: 'Geo::ProjectRegistry', inverse_of: :project
@@ -132,6 +133,7 @@ module EE
       scope :with_slack_service, -> { joins(:slack_service) }
       scope :with_slack_slash_commands_service, -> { joins(:slack_slash_commands_service) }
       scope :with_prometheus_service, -> { joins(:prometheus_service) }
+      scope :aimed_for_deletion, -> (date) { where('marked_for_deletion_at <= ?', date).without_deleted }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
@@ -653,6 +655,23 @@ module EE
         .where.not(id: id)
         .merge(Packages::Package.with_name(package_name))
         .exists?
+    end
+
+    def adjourned_deletion?
+      feature_available?(:marking_project_for_deletion) &&
+        ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
+    end
+
+    def marked_for_deletion?
+      return false unless feature_available?(:marking_project_for_deletion)
+
+      marked_for_deletion_at.present?
+    end
+
+    def has_packages?(package_type)
+      return false unless feature_available?(:packages)
+
+      packages.where(package_type: package_type).exists?
     end
 
     private

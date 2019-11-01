@@ -5,6 +5,8 @@ module Ci
     include ::ApplicationWorker
     include ::PipelineQueue
 
+    worker_resource_boundary :cpu
+
     def perform(bridge_id)
       ::Ci::Bridge.find_by_id(bridge_id).try do |bridge|
         ::Ci::CreateCrossProjectPipelineService

@@ -9,6 +9,7 @@ module QA
       module Test
         class Geo < QA::Scenario::Template
           include QA::Scenario::Bootable
+          include QA::Scenario::SharedAttributes
 
           tags :geo
 

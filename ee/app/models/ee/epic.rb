@@ -12,9 +12,9 @@ module EE
       include Referable
       include Awardable
       include LabelEventable
-      include RelativePositioning
       include UsageStatistics
       include FromUnion
+      include EpicTreeSorting
 
       enum state_id: {
         opened: ::Epic.available_states[:opened],
@@ -175,14 +175,6 @@ module EE
 
       def parent_class
         ::Group
-      end
-
-      def relative_positioning_query_base(epic)
-        in_parents(epic.parent_ids)
-      end
-
-      def relative_positioning_parent_column
-        :parent_id
       end
 
       # Return the deepest relation level for an epic.

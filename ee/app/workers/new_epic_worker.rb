@@ -5,6 +5,7 @@ class NewEpicWorker
   include NewIssuable
 
   feature_category :agile_portfolio_management
+  worker_resource_boundary :cpu
 
   def perform(epic_id, user_id)
     return unless objects_found?(epic_id, user_id)

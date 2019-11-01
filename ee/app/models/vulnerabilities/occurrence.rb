@@ -139,6 +139,33 @@ module Vulnerabilities
       end
     end
 
+    def self.undismissed
+      where(
+        "NOT EXISTS (?)",
+        Feedback.select(1)
+        .where("ENCODE(#{table_name}.project_fingerprint, 'HEX') = vulnerability_feedback.project_fingerprint") # rubocop:disable GitlabSecurity/SqlInjection
+        .for_dismissal
+      )
+    end
+
+    def self.batch_count_by_project_and_severity(project_id, severity)
+      BatchLoader.for(project_id: project_id, severity: severity).batch(default_value: 0) do |items, loader|
+        project_ids = items.map { |i| i[:project_id] }.uniq
+        severities = items.map { |i| i[:severity] }.uniq
+
+        counts = undismissed
+          .by_severities(severities)
+          .by_projects(project_ids)
+          .group(:project_id, :severity)
+          .count
+
+        counts.each do |(found_project_id, found_severity), count|
+          loader_key = { project_id: found_project_id, severity: found_severity }
+          loader.call(loader_key, count)
+        end
+      end
+    end
+
     def feedback(feedback_type:)
       params = {
         project_id: project_id,

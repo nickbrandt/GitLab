@@ -16,7 +16,7 @@ describe Search::GroupService, :elastic do
 
   it_behaves_like 'EE search service shared examples', ::Gitlab::GroupSearchResults, ::Gitlab::Elastic::GroupSearchResults do
     let(:scope) { create(:group) }
-    let(:service) { described_class.new(user, scope, search: '*') }
+    let(:service) { described_class.new(user, scope, params) }
   end
 
   describe 'group search' do

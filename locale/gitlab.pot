@@ -411,9 +411,6 @@ msgstr ""
 msgid "%{verb} %{time_spent_value} spent time."
 msgstr ""
 
-msgid "&middot;"
-msgstr ""
-
 msgid "'%{level}' is not a valid visibility level"
 msgstr ""
 
@@ -2898,6 +2895,9 @@ msgstr ""
 msgid "Change assignee(s)."
 msgstr ""
 
+msgid "Change branches"
+msgstr ""
+
 msgid "Change label"
 msgstr ""
 
@@ -3585,7 +3585,13 @@ msgstr ""
 msgid "ClusterIntegration|Every new Google Cloud Platform (GCP) account receives $300 in credit upon %{sign_up_link}. In partnership with Google, GitLab is able to offer an additional $200 for both new and existing GCP accounts to get started with GitLab's Google Kubernetes Engine Integration."
 msgstr ""
 
+msgid "ClusterIntegration|Failed to configure EKS provider: %{message}"
+msgstr ""
+
 msgid "ClusterIntegration|Failed to configure Google Kubernetes Engine Cluster: %{message}"
+msgstr ""
+
+msgid "ClusterIntegration|Failed to fetch CloudFormation stack: %{message}"
 msgstr ""
 
 msgid "ClusterIntegration|Failed to request to Google Cloud Platform: %{message}"
@@ -4798,6 +4804,12 @@ msgstr ""
 msgid "Created a branch and a merge request to resolve this issue."
 msgstr ""
 
+msgid "Created after"
+msgstr ""
+
+msgid "Created before"
+msgstr ""
+
 msgid "Created branch '%{branch_name}' and a merge request to resolve this issue."
 msgstr ""
 
@@ -5626,9 +5638,6 @@ msgid "Directory name"
 msgstr ""
 
 msgid "Disable"
-msgstr ""
-
-msgid "Disable email notifications"
 msgstr ""
 
 msgid "Disable for this project"
@@ -7400,6 +7409,9 @@ msgstr ""
 msgid "From %{providerTitle}"
 msgstr ""
 
+msgid "From %{source_title} into"
+msgstr ""
+
 msgid "From Bitbucket"
 msgstr ""
 
@@ -8075,7 +8087,7 @@ msgstr ""
 msgid "Go back"
 msgstr ""
 
-msgid "Go back (while searching for files"
+msgid "Go back (while searching for files)"
 msgstr ""
 
 msgid "Go back to %{startTag}Open issues%{endTag} and select some issues to add to your board."
@@ -8495,6 +8507,9 @@ msgstr ""
 msgid "GroupSettings|cannot be disabled when the parent group \"Share with group lock\" is enabled, except by the owner of the parent group"
 msgstr ""
 
+msgid "GroupSettings|cannot change when group contains projects with NPM packages"
+msgstr ""
+
 msgid "GroupSettings|remove the share with group lock from %{ancestor_group_name}"
 msgstr ""
 
@@ -8836,6 +8851,9 @@ msgstr ""
 msgid "If your HTTP repository is not publicly accessible, add your credentials."
 msgstr ""
 
+msgid "Iglu registry URL (optional)"
+msgstr ""
+
 msgid "ImageDiffViewer|2-up"
 msgstr ""
 
@@ -9145,6 +9163,9 @@ msgid "Invalid URL"
 msgstr ""
 
 msgid "Invalid date"
+msgstr ""
+
+msgid "Invalid date format. Please use UTC format as YYYY-MM-DD"
 msgstr ""
 
 msgid "Invalid feature"
@@ -9528,6 +9549,9 @@ msgstr ""
 msgid "Kubernetes error: %{error_code}"
 msgstr ""
 
+msgid "Kubernetes popover"
+msgstr ""
+
 msgid "LDAP"
 msgstr ""
 
@@ -9817,8 +9841,18 @@ msgid_plural "LicenseCompliance|License Compliance detected %d licenses for the 
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "LicenseCompliance|License Compliance detected %d license for the source branch only; approval required"
+msgid_plural "LicenseCompliance|License Compliance detected %d licenses for the source branch only; approval required"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "LicenseCompliance|License Compliance detected %d new license"
 msgid_plural "LicenseCompliance|License Compliance detected %d new licenses"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "LicenseCompliance|License Compliance detected %d new license; approval required"
+msgid_plural "LicenseCompliance|License Compliance detected %d new licenses; approval required"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -10278,6 +10312,9 @@ msgid "Merge immediately"
 msgstr ""
 
 msgid "Merge in progress"
+msgstr ""
+
+msgid "Merge options"
 msgstr ""
 
 msgid "Merge request"
@@ -11200,9 +11237,6 @@ msgid "Note: Consider asking your GitLab administrator to configure %{github_int
 msgstr ""
 
 msgid "Note: Consider asking your GitLab administrator to configure %{github_integration_link}, which will allow login via GitHub and allow importing repositories without generating a Personal Access Token."
-msgstr ""
-
-msgid "Note: the container registry is always visible when a project is public"
 msgstr ""
 
 msgid "NoteForm|Note"
@@ -12869,10 +12903,16 @@ msgstr ""
 msgid "ProjectSettings|All discussions must be resolved"
 msgstr ""
 
+msgid "ProjectSettings|Allow users to request access"
+msgstr ""
+
 msgid "ProjectSettings|Automatically resolve merge request diff discussions when they become outdated"
 msgstr ""
 
 msgid "ProjectSettings|Badges"
+msgstr ""
+
+msgid "ProjectSettings|Build, test, and deploy your changes"
 msgstr ""
 
 msgid "ProjectSettings|Choose your merge method, merge options, and merge checks."
@@ -12884,13 +12924,28 @@ msgstr ""
 msgid "ProjectSettings|Contact an admin to change this setting."
 msgstr ""
 
+msgid "ProjectSettings|Container registry"
+msgstr ""
+
 msgid "ProjectSettings|Customize your project badges."
+msgstr ""
+
+msgid "ProjectSettings|Disable email notifications"
 msgstr ""
 
 msgid "ProjectSettings|Enable 'Delete source branch' option by default"
 msgstr ""
 
 msgid "ProjectSettings|Every merge creates a merge commit"
+msgstr ""
+
+msgid "ProjectSettings|Every project can have its own space to store its Docker images"
+msgstr ""
+
+msgid "ProjectSettings|Every project can have its own space to store its packages"
+msgstr ""
+
+msgid "ProjectSettings|Everyone"
 msgstr ""
 
 msgid "ProjectSettings|Existing merge requests and protected branches are not affected"
@@ -12908,7 +12963,22 @@ msgstr ""
 msgid "ProjectSettings|Fast-forward merges only"
 msgstr ""
 
+msgid "ProjectSettings|Git Large File Storage"
+msgstr ""
+
+msgid "ProjectSettings|Internal"
+msgstr ""
+
+msgid "ProjectSettings|Issues"
+msgstr ""
+
 msgid "ProjectSettings|Learn more about badges."
+msgstr ""
+
+msgid "ProjectSettings|Lightweight issue tracking system for this project"
+msgstr ""
+
+msgid "ProjectSettings|Manages large files such as audio, video, and graphics files"
 msgstr ""
 
 msgid "ProjectSettings|Merge checks"
@@ -12929,13 +12999,28 @@ msgstr ""
 msgid "ProjectSettings|Merge pipelines will try to validate the post-merge result prior to merging"
 msgstr ""
 
+msgid "ProjectSettings|Merge requests"
+msgstr ""
+
 msgid "ProjectSettings|No merge commits are created"
+msgstr ""
+
+msgid "ProjectSettings|Note: the container registry is always visible when a project is public"
 msgstr ""
 
 msgid "ProjectSettings|Only signed commits can be pushed to this repository."
 msgstr ""
 
+msgid "ProjectSettings|Packages"
+msgstr ""
+
 msgid "ProjectSettings|Pages"
+msgstr ""
+
+msgid "ProjectSettings|Pages for project documentation"
+msgstr ""
+
+msgid "ProjectSettings|Pipelines"
 msgstr ""
 
 msgid "ProjectSettings|Pipelines must succeed"
@@ -12944,7 +13029,28 @@ msgstr ""
 msgid "ProjectSettings|Pipelines need to be configured to enable this feature."
 msgstr ""
 
+msgid "ProjectSettings|Private"
+msgstr ""
+
+msgid "ProjectSettings|Project visibility"
+msgstr ""
+
+msgid "ProjectSettings|Public"
+msgstr ""
+
+msgid "ProjectSettings|Repository"
+msgstr ""
+
+msgid "ProjectSettings|Share code pastes with others out of Git repository"
+msgstr ""
+
 msgid "ProjectSettings|Show link to create/view merge request when pushing from the command line"
+msgstr ""
+
+msgid "ProjectSettings|Snippets"
+msgstr ""
+
+msgid "ProjectSettings|Submit changes to be merged upstream"
 msgstr ""
 
 msgid "ProjectSettings|These checks must pass before merge requests can be merged"
@@ -12959,13 +13065,25 @@ msgstr ""
 msgid "ProjectSettings|This setting will be applied to all projects unless overridden by an admin."
 msgstr ""
 
+msgid "ProjectSettings|This setting will override user notification preferences for all project members."
+msgstr ""
+
 msgid "ProjectSettings|This will dictate the commit history when you merge a merge request"
 msgstr ""
 
 msgid "ProjectSettings|Users can only push commits to this repository that were committed with one of their own verified emails."
 msgstr ""
 
+msgid "ProjectSettings|View and edit files in this project"
+msgstr ""
+
 msgid "ProjectSettings|When conflicts arise the user is given the option to rebase"
+msgstr ""
+
+msgid "ProjectSettings|Wiki"
+msgstr ""
+
+msgid "ProjectSettings|With GitLab Pages you can host your static websites on GitLab"
 msgstr ""
 
 msgid "ProjectTemplates|.NET Core"
@@ -14783,6 +14901,9 @@ msgstr ""
 msgid "Select an existing Kubernetes cluster or create a new one"
 msgstr ""
 
+msgid "Select branch"
+msgstr ""
+
 msgid "Select branch/tag"
 msgstr ""
 
@@ -15889,6 +16010,9 @@ msgstr ""
 msgid "Subkeys"
 msgstr ""
 
+msgid "Submit a review"
+msgstr ""
+
 msgid "Submit as spam"
 msgstr ""
 
@@ -15902,6 +16026,12 @@ msgid "Submit review"
 msgstr ""
 
 msgid "Submit search"
+msgstr ""
+
+msgid "Submit the current review."
+msgstr ""
+
+msgid "Submitted the current review."
 msgstr ""
 
 msgid "Subscribe"
@@ -16435,6 +16565,9 @@ msgid "The group and any public projects can be viewed without any authenticatio
 msgstr ""
 
 msgid "The group and its projects can only be viewed by members."
+msgstr ""
+
+msgid "The group has already been shared with this group"
 msgstr ""
 
 msgid "The group settings for %{group_links} require you to enable Two-Factor Authentication for your account. You can %{leave_group_links}."
@@ -17031,9 +17164,6 @@ msgstr ""
 msgid "This setting can be overridden in each project."
 msgstr ""
 
-msgid "This setting will override user notification preferences for all project members."
-msgstr ""
-
 msgid "This setting will update the hostname that is used to generate private commit emails. %{learn_more}"
 msgstr ""
 
@@ -17536,6 +17666,9 @@ msgstr ""
 msgid "TransferGroup|Database is not supported."
 msgstr ""
 
+msgid "TransferGroup|Group contains projects with NPM packages."
+msgstr ""
+
 msgid "TransferGroup|Group is already a root group."
 msgstr ""
 
@@ -17561,6 +17694,9 @@ msgid "TransferProject|Project cannot be transferred, because tags are present i
 msgstr ""
 
 msgid "TransferProject|Project with same name or path in target namespace already exists"
+msgstr ""
+
+msgid "TransferProject|Root namespace can't be updated if project has NPM packages"
 msgstr ""
 
 msgid "TransferProject|Transfer failed, please contact an admin."
@@ -18714,6 +18850,9 @@ msgstr ""
 msgid "Welcome to GitLab"
 msgstr ""
 
+msgid "Welcome to GitLab %{username}!"
+msgstr ""
+
 msgid "Welcome to the Guided GitLab Tour"
 msgstr ""
 
@@ -18761,10 +18900,7 @@ msgstr ""
 msgid "Wiki pages"
 msgstr ""
 
-msgid "Wiki was successfully created"
-msgstr ""
-
-msgid "Wiki was successfully updated"
+msgid "Wiki was successfully updated."
 msgstr ""
 
 msgid "WikiClone|Clone your wiki"
@@ -18780,18 +18916,6 @@ msgid "WikiClone|It is recommended to install %{markdown} so that GFM features r
 msgstr ""
 
 msgid "WikiClone|Start Gollum and edit locally"
-msgstr ""
-
-msgid "WikiDirEmpty|A wiki is where you can store all the details about your project. This can include why you've created it, its principles, how to use it, and so on."
-msgstr ""
-
-msgid "WikiDirEmpty|Create a page"
-msgstr ""
-
-msgid "WikiDirEmpty|Create a page in this directory"
-msgstr ""
-
-msgid "WikiDirEmpty|This directory has no wiki pages"
 msgstr ""
 
 msgid "WikiEditPageTip|Tip: You can move this page by adding the path to the beginning of the title."
@@ -18812,9 +18936,6 @@ msgstr ""
 msgid "WikiEmpty|A wiki is where you can store all the details about your project. This can include why you've created it, its principles, how to use it, and so on."
 msgstr ""
 
-msgid "WikiEmpty|Create this page"
-msgstr ""
-
 msgid "WikiEmpty|Create your first page"
 msgstr ""
 
@@ -18822,9 +18943,6 @@ msgid "WikiEmpty|Suggest wiki improvement"
 msgstr ""
 
 msgid "WikiEmpty|The wiki lets you write documentation for your project"
-msgstr ""
-
-msgid "WikiEmpty|This page does not exist"
 msgstr ""
 
 msgid "WikiEmpty|This project has no wiki pages"
@@ -18881,9 +18999,6 @@ msgstr ""
 msgid "WikiPage|Write your content or drag files here…"
 msgstr ""
 
-msgid "Wiki|Contents"
-msgstr ""
-
 msgid "Wiki|Create New Page"
 msgstr ""
 
@@ -18894,9 +19009,6 @@ msgid "Wiki|Created date"
 msgstr ""
 
 msgid "Wiki|Edit Page"
-msgstr ""
-
-msgid "Wiki|Hide folder contents"
 msgstr ""
 
 msgid "Wiki|More Pages"
@@ -18917,19 +19029,13 @@ msgstr ""
 msgid "Wiki|Pages"
 msgstr ""
 
-msgid "Wiki|Show files separately"
-msgstr ""
-
-msgid "Wiki|Show folder contents"
-msgstr ""
-
 msgid "Wiki|Title"
 msgstr ""
 
-msgid "Will deploy to"
+msgid "Wiki|Wiki Pages"
 msgstr ""
 
-msgid "With GitLab Pages you can host your static websites on GitLab"
+msgid "Will deploy to"
 msgstr ""
 
 msgid "With contribution analytics you can have an overview for the activity of issues, merge requests and push events of your organization and its members."
@@ -19098,6 +19204,9 @@ msgid "You can specify notification level per group or per project."
 msgstr ""
 
 msgid "You can test your .gitlab-ci.yml in %{linkStart}CI Lint%{linkEnd}."
+msgstr ""
+
+msgid "You can try again using %{begin_link}basic search%{end_link}"
 msgstr ""
 
 msgid "You cannot access the raw file. Please wait a minute."

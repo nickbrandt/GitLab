@@ -614,11 +614,11 @@ class Project < ApplicationRecord
       joins(:namespace).where(namespaces: { type: 'Group' }).select(:namespace_id)
     end
 
-    # Returns ids of projects with milestones available for given user
+    # Returns ids of projects with issuables available for given user
     #
-    # Used on queries to find milestones which user can see
-    # For example: Milestone.where(project_id: ids_with_milestone_available_for(user))
-    def ids_with_milestone_available_for(user)
+    # Used on queries to find milestones or labels which user can see
+    # For example: Milestone.where(project_id: ids_with_issuables_available_for(user))
+    def ids_with_issuables_available_for(user)
       with_issues_enabled = with_issues_available_for_user(user).select(:id)
       with_merge_requests_enabled = with_merge_requests_available_for_user(user).select(:id)
 
@@ -1263,6 +1263,10 @@ class Project < ApplicationRecord
     else
       namespace.try(:owner)
     end
+  end
+
+  def to_ability_name
+    model_name.singular
   end
 
   # rubocop: disable CodeReuse/ServiceClass
@@ -1960,27 +1964,6 @@ class Project < ApplicationRecord
     return [] unless auto_devops_enabled?
 
     (auto_devops || build_auto_devops)&.predefined_variables
-  end
-
-  def append_or_update_attribute(name, value)
-    if Project.reflect_on_association(name).try(:macro) == :has_many
-      # if this is 1-to-N relation, update the parent object
-      value.each do |item|
-        item.update!(
-          Project.reflect_on_association(name).foreign_key => id)
-      end
-
-      # force to drop relation cache
-      public_send(name).reset # rubocop:disable GitlabSecurity/PublicSend
-
-      # succeeded
-      true
-    else
-      # if this is another relation or attribute, update just object
-      update_attribute(name, value)
-    end
-  rescue ActiveRecord::RecordInvalid => e
-    raise e, "Failed to set #{name}: #{e.message}"
   end
 
   # Tries to set repository as read_only, checking for existing Git transfers in progress beforehand

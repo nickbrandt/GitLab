@@ -1,3 +1,7 @@
+import { anomalyMockGraphData as importedAnomalyMockGraphData } from '../../frontend/monitoring/mock_data';
+
+export const anomalyMockGraphData = importedAnomalyMockGraphData;
+
 export const mockApiEndpoint = `${gl.TEST_HOST}/monitoring/mock`;
 
 export const mockProjectPath = '/frontend-fixtures/environments-project';
@@ -975,7 +979,7 @@ export const graphDataPrometheusQuery = {
 
 export const graphDataPrometheusQueryRange = {
   title: 'Super Chart A1',
-  type: 'area',
+  type: 'area-chart',
   weight: 2,
   metrics: [
     {
@@ -1004,6 +1008,85 @@ export const graphDataPrometheusQueryRange = {
         {
           metric: {},
           values: [[1495700554.925, '8.0390625'], [1495700614.925, '8.0390625']],
+        },
+      ],
+    },
+  ],
+};
+
+export const graphDataPrometheusQueryRangeMultiTrack = {
+  title: 'Super Chart A3',
+  type: 'heatmap',
+  weight: 3,
+  x_label: 'Status Code',
+  y_label: 'Time',
+  metrics: [],
+  queries: [
+    {
+      metricId: '1',
+      id: 'response_metrics_nginx_ingress_throughput_status_code',
+      query_range:
+        'sum(rate(nginx_upstream_responses_total{upstream=~"%{kube_namespace}-%{ci_environment_slug}-.*"}[60m])) by (status_code)',
+      unit: 'req / sec',
+      label: 'Status Code',
+      metric_id: 1,
+      prometheus_endpoint_path:
+        '/root/rails_nodb/environments/3/prometheus/api/v1/query_range?query=sum%28rate%28nginx_upstream_responses_total%7Bupstream%3D~%22%25%7Bkube_namespace%7D-%25%7Bci_environment_slug%7D-.%2A%22%7D%5B2m%5D%29%29+by+%28status_code%29',
+      result: [
+        {
+          metric: { status_code: '1xx' },
+          values: [
+            ['2019-08-30T15:00:00.000Z', 0],
+            ['2019-08-30T16:00:00.000Z', 2],
+            ['2019-08-30T17:00:00.000Z', 0],
+            ['2019-08-30T18:00:00.000Z', 0],
+            ['2019-08-30T19:00:00.000Z', 0],
+            ['2019-08-30T20:00:00.000Z', 3],
+          ],
+        },
+        {
+          metric: { status_code: '2xx' },
+          values: [
+            ['2019-08-30T15:00:00.000Z', 1],
+            ['2019-08-30T16:00:00.000Z', 3],
+            ['2019-08-30T17:00:00.000Z', 6],
+            ['2019-08-30T18:00:00.000Z', 10],
+            ['2019-08-30T19:00:00.000Z', 8],
+            ['2019-08-30T20:00:00.000Z', 6],
+          ],
+        },
+        {
+          metric: { status_code: '3xx' },
+          values: [
+            ['2019-08-30T15:00:00.000Z', 1],
+            ['2019-08-30T16:00:00.000Z', 2],
+            ['2019-08-30T17:00:00.000Z', 3],
+            ['2019-08-30T18:00:00.000Z', 3],
+            ['2019-08-30T19:00:00.000Z', 2],
+            ['2019-08-30T20:00:00.000Z', 1],
+          ],
+        },
+        {
+          metric: { status_code: '4xx' },
+          values: [
+            ['2019-08-30T15:00:00.000Z', 2],
+            ['2019-08-30T16:00:00.000Z', 0],
+            ['2019-08-30T17:00:00.000Z', 0],
+            ['2019-08-30T18:00:00.000Z', 2],
+            ['2019-08-30T19:00:00.000Z', 0],
+            ['2019-08-30T20:00:00.000Z', 2],
+          ],
+        },
+        {
+          metric: { status_code: '5xx' },
+          values: [
+            ['2019-08-30T15:00:00.000Z', 0],
+            ['2019-08-30T16:00:00.000Z', 1],
+            ['2019-08-30T17:00:00.000Z', 0],
+            ['2019-08-30T18:00:00.000Z', 0],
+            ['2019-08-30T19:00:00.000Z', 0],
+            ['2019-08-30T20:00:00.000Z', 2],
+          ],
         },
       ],
     },

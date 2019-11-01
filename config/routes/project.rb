@@ -179,7 +179,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        resources :releases, only: [:index]
+        resources :releases, only: [:index, :edit], param: :tag, constraints: { tag: %r{[^/]+} }
         resources :starrers, only: [:index]
         resources :forks, only: [:index, :new, :create]
         resources :group_links, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
@@ -187,9 +187,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resource :import, only: [:new, :create, :show]
         resource :avatar, only: [:show, :destroy]
 
-        get 'grafana/proxy/:datasource_id/*proxy_path',
-            to: 'grafana_api#proxy',
-            as: :grafana_api
+        scope :grafana, as: :grafana_api do
+          get 'proxy/:datasource_id/*proxy_path', to: 'grafana_api#proxy'
+          get :metrics_dashboard, to: 'grafana_api#metrics_dashboard'
+        end
       end
       # End of the /-/ scope.
 
@@ -616,7 +617,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
 
       # Since both wiki and repository routing contains wildcard characters
-      # its preferable to keep them below all other project routes
+      # its preferable to keep it below all other project routes
       draw :wiki
       draw :repository
 

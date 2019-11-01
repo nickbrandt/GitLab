@@ -485,6 +485,22 @@ describe OperationsController do
           expect(deployable_json['id']).to eq(ci_build.id)
           expect(deployable_json['build_path']).to eq(project_job_path(project, ci_build))
         end
+
+        it 'returns a failed deployment' do
+          environment = create(:environment, project: project)
+          deployment = create(:deployment, :failed, project: project, environment: environment)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+          environment_json = project_json['environments'].first
+          last_deployment_json = environment_json['last_deployment']
+
+          expect(last_deployment_json['id']).to eq(deployment.id)
+        end
       end
     end
   end

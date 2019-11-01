@@ -21,17 +21,18 @@ module QA
               end
 
               view 'ee/app/assets/javascripts/design_management/components/design_overlay.vue' do
-                element :design_image
+                element :design_image_button
               end
 
               view 'ee/app/assets/javascripts/design_management/components/list/item.vue' do
                 element :design_file_name
+                element :design_image
               end
             end
           end
 
           def add_annotation(note)
-            click_element(:design_image)
+            click_element(:design_image_button)
             fill_element(:note_textarea, note)
             click_element(:save_comment_button)
 
@@ -52,8 +53,12 @@ module QA
 
             filename = ::File.basename(design_file_path)
 
-            found = wait(reload: false) do
-              has_element?(:design_file_name, text: filename)
+            found = wait(reload: false, interval: 1) do
+              image = find_element(:design_image)
+
+              has_element?(:design_file_name, text: filename) &&
+                image["complete"] &&
+                image["naturalWidth"].to_i > 0
             end
 
             raise ElementNotFound, %Q(Attempted to attach design "#{filename}" but it did not appear) unless found

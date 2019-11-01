@@ -5,6 +5,7 @@ class LdapAllGroupsSyncWorker
   include CronjobQueue
 
   feature_category :authentication_and_authorization
+  worker_has_external_dependencies!
 
   def perform
     return unless Gitlab::Auth::LDAP::Config.group_sync_enabled?

@@ -15,8 +15,7 @@ describe Metrics::Dashboard::ClusterDashboardService, :use_clean_rails_memory_st
   end
 
   describe 'get_dashboard' do
-    let(:dashboard_path) { described_class::CLUSTER_DASHBOARD_PATH }
-    let(:service_params) { [project, user, { cluster: cluster, cluster_type: :project, dashboard_path: dashboard_path }] }
+    let(:service_params) { [project, user, { cluster: cluster, cluster_type: :project }] }
     let(:service_call) { described_class.new(*service_params).get_dashboard }
 
     it_behaves_like 'valid dashboard service response'

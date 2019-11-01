@@ -130,7 +130,9 @@ module EE
       end
 
       def downstream_variables
-        scoped_variables.to_runner_variables.yield_self do |all_variables|
+        variables = scoped_variables.concat(pipeline.persisted_variables)
+
+        variables.to_runner_variables.yield_self do |all_variables|
           yaml_variables.to_a.map do |hash|
             { key: hash[:key], value: ::ExpandVariables.expand(hash[:value], all_variables) }
           end

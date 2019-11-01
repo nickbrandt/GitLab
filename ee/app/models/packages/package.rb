@@ -23,6 +23,7 @@ class Packages::Package < ApplicationRecord
   scope :with_name, ->(name) { where(name: name) }
   scope :with_name_like, ->(name) { where(arel_table[:name].matches(name)) }
   scope :with_version, ->(version) { where(version: version) }
+  scope :with_package_type, ->(package_type) { where(package_type: package_type) }
   scope :has_version, -> { where.not(version: nil) }
   scope :preload_files, -> { preload(:package_files) }
   scope :last_of_each_version, -> { where(id: all.select('MAX(id) AS id').group(:version)) }
