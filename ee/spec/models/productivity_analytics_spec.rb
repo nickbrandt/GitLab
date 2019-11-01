@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe ProductivityAnalytics do
   describe 'metrics data' do
-    subject(:analytics) { described_class.new(merge_requests: finder_mrs, sort: custom_sort) }
+    let(:analytics) { described_class.new(merge_requests: finder_mrs, sort: custom_sort) }
 
     let(:finder_mrs) { ProductivityAnalyticsFinder.new(create(:admin), finder_options).execute }
     let(:finder_options) { { state: 'merged' } }
@@ -127,68 +127,25 @@ describe ProductivityAnalytics do
     end
 
     describe '#histogram_data' do
-      subject { analytics.histogram_data(type: metric) }
+      subject(:histogram_data) { analytics.histogram_data(type: metric) }
 
-      context 'days_to_merge metric' do
-        let(:metric) { 'days_to_merge' }
+      using RSpec::Parameterized::TableSyntax
 
-        it 'returns aggregated data per days to merge from MR creation date' do
-          expect(subject).to eq(3 => 2, 14 => 1, 30 => 1)
-        end
+      where(:metric, :expected_result) do
+        'days_to_merge' | { 3 => 2, 14 => 1, 30 => 1 }
+        'time_to_first_comment' | { 0 => 3, 24 => 1 }
+        'time_to_last_commit' | { 13 * 24 => 1, 29 * 24 => 1, 2 * 24 => 2 }
+        'time_to_merge' | { 24 => 3, 0 => 1 }
+        'commits_count' | { 1 => 2, 5 => 1, 20 => 1 }
+        'loc_per_commit' | { 15 => 1, 16 => 1, 14 => 1, 5 => 1 }
+        'files_touched' | { 15 => 1, 3 => 2, 1 => 1 }
+        'something_invalid' | nil
       end
 
-      context 'time_to_first_comment metric' do
-        let(:metric) { 'time_to_first_comment' }
-
-        it 'returns aggregated data per hours from MR creation to first comment' do
-          expect(subject).to eq(0 => 3, 24 => 1)
+      with_them do
+        it 'calculates correctly' do
+          expect(analytics.histogram_data(type: metric)).to eq(expected_result)
         end
-      end
-
-      context 'time_to_last_commit metric' do
-        let(:metric) { 'time_to_last_commit' }
-
-        it 'returns aggregated data per hours from first comment to last commit' do
-          expect(subject).to eq(13 * 24 => 1, 29 * 24 => 1, 2 * 24 => 2)
-        end
-      end
-
-      context 'time_to_merge metric' do
-        let(:metric) { 'time_to_merge' }
-
-        it 'returns aggregated data per hours from last commit to merge' do
-          expect(subject).to eq(24 => 3, 0 => 1)
-        end
-      end
-
-      context 'commits_count metric' do
-        let(:metric) { 'commits_count' }
-
-        it 'returns aggregated data per number of commits' do
-          expect(subject).to eq(1 => 2, 5 => 1, 20 => 1)
-        end
-      end
-
-      context 'loc_per_commit metric' do
-        let(:metric) { 'loc_per_commit' }
-
-        it 'returns aggregated data per number of LoC/commits_count' do
-          expect(subject).to eq(15 => 1, 16 => 1, 14 => 1, 5 => 1)
-        end
-      end
-
-      context 'files_touched metric' do
-        let(:metric) { 'files_touched' }
-
-        it 'returns aggregated data per number of modified files' do
-          expect(subject).to eq(15 => 1, 3 => 2, 1 => 1)
-        end
-      end
-
-      context 'for invalid metric' do
-        let(:metric) { 'something_invalid' }
-
-        it { is_expected.to eq nil }
       end
 
       context 'for multiple labeled mrs' do
@@ -196,17 +153,17 @@ describe ProductivityAnalytics do
         let(:metric) { 'days_to_merge' }
 
         it 'returns aggregated data' do
-          expect(subject).to eq(3 => 2, 30 => 1)
+          expect(analytics.histogram_data(type: 'days_to_merge')).to eq(3 => 2, 30 => 1)
         end
       end
     end
 
     # Test coverage depends on #histogram_data tests. We want to avoid duplication here, so test only for 1 metric.
     describe '#scatterplot_data' do
-      subject { analytics.scatterplot_data(type: 'days_to_merge') }
+      subject(:scatterplot_data) { analytics.scatterplot_data(type: 'days_to_merge') }
 
       it 'returns metric values for each MR' do
-        expect(subject).to match(
+        expect(scatterplot_data).to match(
           short_mr.id => { metric: 3, merged_at: be_like_time(short_mr.merged_at) },
           short_mr_2.id => { metric: 3, merged_at: be_like_time(short_mr_2.merged_at) },
           medium_mr.id => { metric: 14, merged_at: be_like_time(medium_mr.merged_at) },
@@ -216,7 +173,7 @@ describe ProductivityAnalytics do
     end
 
     describe '#merge_requests_extended' do
-      subject { analytics.merge_requests_extended }
+      subject(:merge_requests) { analytics.merge_requests_extended }
 
       it 'returns MRs data with all the metrics calculated' do
         expected_data = {
@@ -227,7 +184,7 @@ describe ProductivityAnalytics do
         }
 
         expected_data.each do |mr_id, expected_attributes|
-          expect(subject.detect { |mr| mr.id == mr_id }.attributes).to include(expected_attributes)
+          expect(merge_requests.detect { |mr| mr.id == mr_id }.attributes).to include(expected_attributes)
         end
       end
 
@@ -235,14 +192,14 @@ describe ProductivityAnalytics do
         let(:custom_sort) { 'loc_per_commit_asc' }
 
         it 'reorders MRs according to custom sorting' do
-          expect(subject).to eq [short_mr_2, short_mr, long_mr, medium_mr]
+          expect(merge_requests).to eq [short_mr_2, short_mr, long_mr, medium_mr]
         end
 
         context 'with unknown sorting' do
           let(:custom_sort) { 'weird_stuff' }
 
           it 'sorts by id desc' do
-            expect(subject).to eq [short_mr_2, short_mr, medium_mr, long_mr]
+            expect(merge_requests).to eq [short_mr_2, short_mr, medium_mr, long_mr]
           end
         end
       end
@@ -258,7 +215,7 @@ describe ProductivityAnalytics do
           }
 
           expected_data.each do |mr_id, expected_attributes|
-            expect(subject.detect { |mr| mr.id == mr_id }.attributes).to include(expected_attributes)
+            expect(merge_requests.detect { |mr| mr.id == mr_id }.attributes).to include(expected_attributes)
           end
         end
       end

@@ -73,6 +73,6 @@ class ProductivityAnalytics
   end
 
   def default_sorting
-    {id: :desc}
+    { id: :desc }
   end
 end
