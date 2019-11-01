@@ -22,6 +22,10 @@ module EE
         ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap?
       end
 
+      condition(:owner_locked_memberships_to_ldap) do
+        @subject.lock_memberships_to_ldap?
+      end
+
       condition(:memberships_locked_to_ldap, scope: :global) do
         ::Gitlab::CurrentSettings.lock_memberships_to_ldap?
       end

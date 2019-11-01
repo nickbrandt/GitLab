@@ -1,0 +1,104 @@
+== 20191101091011 AddLockMembershipToLdapToGroups: migrating ==================
+-- transaction_open?()
+   -> 0.0000s
+-- execute("SET statement_timeout TO 0")
+   -> 0.0002s
+-- transaction()
+-- add_column(:namespaces, :lock_membership_to_ldap, :boolean, {:default=>nil})
+   -> 0.0058s
+-- change_column_default(:namespaces, :lock_membership_to_ldap, true)
+   -> 0.0089s
+   -> 0.0169s
+-- columns(:namespaces)
+   -> 0.0019s
+-- transaction_open?()
+   -> 0.0000s
+-- exec_query("SELECT COUNT(*) AS count FROM \"namespaces\"")
+   -> 0.0014s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" ORDER BY \"namespaces\".\"id\" ASC LIMIT 1")
+   -> 0.0010s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 1 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                            
+   -> 0.0004s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 1 AND \"namespaces\".\"id\" < 4")
+   -> 0.0029s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 4 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                            
+   -> 0.0004s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 4 AND \"namespaces\".\"id\" < 7")
+   -> 0.0011s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 7 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                            
+   -> 0.0004s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 7 AND \"namespaces\".\"id\" < 10")
+   -> 0.0008s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 10 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0004s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 10 AND \"namespaces\".\"id\" < 13")                                                                                                                                        
+   -> 0.0007s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 13 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0004s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 13 AND \"namespaces\".\"id\" < 16")                                                                                                                                        
+   -> 0.0009s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 16 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0004s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 16 AND \"namespaces\".\"id\" < 19")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 19 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0003s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 19 AND \"namespaces\".\"id\" < 22")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 22 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0003s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 22 AND \"namespaces\".\"id\" < 25")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 25 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0006s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 25 AND \"namespaces\".\"id\" < 28")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 28 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0003s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 28 AND \"namespaces\".\"id\" < 31")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 31 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0003s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 31 AND \"namespaces\".\"id\" < 34")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 34 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0006s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 34 AND \"namespaces\".\"id\" < 37")                                                                                                                                        
+   -> 0.0009s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 37 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0004s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 37 AND \"namespaces\".\"id\" < 40")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 40 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0004s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 40 AND \"namespaces\".\"id\" < 43")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 43 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0006s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 43 AND \"namespaces\".\"id\" < 46")                                                                                                                                        
+   -> 0.0011s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 46 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0003s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 46 AND \"namespaces\".\"id\" < 49")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 49 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0003s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 49 AND \"namespaces\".\"id\" < 52")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 52 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0005s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 52 AND \"namespaces\".\"id\" < 55")                                                                                                                                        
+   -> 0.0006s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 55 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0003s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 55 AND \"namespaces\".\"id\" < 58")                                                                                                                                        
+   -> 0.0005s
+-- exec_query("SELECT  \"namespaces\".\"id\" FROM \"namespaces\" WHERE \"namespaces\".\"id\" >= 58 ORDER BY \"namespaces\".\"id\" ASC LIMIT 1 OFFSET 3")                                                                                                                           
+   -> 0.0003s
+-- execute("UPDATE \"namespaces\" SET \"lock_membership_to_ldap\" = TRUE WHERE \"namespaces\".\"id\" >= 58")
+   -> 0.0004s
+-- change_column_null(:namespaces, :lock_membership_to_ldap, false)
+   -> 0.0008s
+-- execute("RESET ALL")
+   -> 0.0002s
+== 20191101091011 AddLockMembershipToLdapToGroups: migrated (0.4795s) =========

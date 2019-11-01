@@ -1,0 +1,11 @@
+%section.ldap-group-links
+  = form_for(group, url: group_ldap_settings_url(group), method: :update) do |f|
+    .form-holder
+      - if ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap
+        .form-group.row
+          .col-sm-10
+            .form-check
+              = check_box_tag :lock_membership_to_ldap, :group, true, class: 'form-check-input'
+              = label_tag :lock_membership_to_ldap, class: 'form-check-label' do
+                = _('Lock membership of this group to LDAP')
+            = f.submit _('Save'), class: 'btn btn-success qa-save'
