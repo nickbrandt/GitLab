@@ -62,20 +62,6 @@ describe ProductivityAnalyticsFinder do
         end
       end
 
-      context 'with merged_at_after specified as days-range' do
-        let(:search_params) do
-          {
-            merged_at_after: '11days'
-          }
-        end
-
-        it 'returns all MRs with merged date later than Xdays ago' do
-          long_mr
-          short_mr
-          expect(subject.execute).to match_array([long_mr])
-        end
-      end
-
       context 'with merged_at_after and merged_at_before specified' do
         let(:search_params) do
           {
