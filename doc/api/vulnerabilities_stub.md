@@ -85,7 +85,7 @@ Example response:
   "id": 2,
   "title": "Predictable pseudorandom number generator",
   "description": null,
-  "state": "closed",
+  "state": "resolved",
   "severity": "medium",
   "confidence": "medium",
   "report_type": "sast",
