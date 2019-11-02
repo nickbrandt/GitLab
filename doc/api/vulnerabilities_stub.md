@@ -38,6 +38,7 @@ Example response:
   "state": "opened",
   "severity": "medium",
   "confidence": "medium",
+  "report_type": "sast",
   "project": {
     "id": 32,
     "name": "security-reports",
@@ -87,6 +88,7 @@ Example response:
   "state": "closed",
   "severity": "medium",
   "confidence": "medium",
+  "report_type": "sast",
   "project": {
     "id": 32,
     "name": "security-reports",
@@ -136,6 +138,7 @@ Example response:
   "state": "closed",
   "severity": "medium",
   "confidence": "medium",
+  "report_type": "sast",
   "project": {
     "id": 32,
     "name": "security-reports",
