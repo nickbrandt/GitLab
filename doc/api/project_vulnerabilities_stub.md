@@ -105,7 +105,7 @@ If an authenticated user does not have a permission to
 this request will result in a `403` status code.
 
 ```
-POST /projects/:id/vulnerabilities
+POST /projects/:id/vulnerabilities?finding_id=<your_finding_id>
 ```
 
 | Attribute           | Type             | Required   | Description                                                                                                                  |
