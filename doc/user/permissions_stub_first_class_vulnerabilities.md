@@ -100,6 +100,7 @@ The following table depicts the various user permission levels in a project.
 | View vulnerability findings in Dependency list **(ULTIMATE)** |    |     | ✓           | ✓        | ✓      |
 | Create issue from vulnerability finding **(ULTIMATE)** |    |            | ✓           | ✓        | ✓      |
 | Dismiss vulnerability finding **(ULTIMATE)**      |         |            | ✓           | ✓        | ✓      |
+| View vulnerability **(ULTIMATE)**                 |         |            | ✓           | ✓        | ✓      |
 | Create vulnerability from vulnerability finding **(ULTIMATE)** |   |     | ✓           | ✓        | ✓      |
 | Resolve vulnerability **(ULTIMATE)**              |         |            | ✓           | ✓        | ✓      |
 | Dismiss vulnerability **(ULTIMATE)**              |         |            | ✓           | ✓        | ✓      |
