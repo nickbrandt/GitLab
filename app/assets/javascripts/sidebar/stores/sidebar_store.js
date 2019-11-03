@@ -29,6 +29,7 @@ export default class SidebarStore {
     this.isLockDialogOpen = false;
     this.participants = [];
     this.project_emails_disabled = false;
+    this.subscribe_disabled_description = '';
     this.subscribed = null;
 
     SidebarStore.singleton = this;
@@ -55,7 +56,7 @@ export default class SidebarStore {
 
   setSubscriptionsData(data) {
     this.project_emails_disabled = data.project_emails_disabled || false;
-    this.subscribe_disabled_description = data.subscribe_disabled_description; 
+    this.subscribe_disabled_description = data.subscribe_disabled_description;
     this.isFetching.subscriptions = false;
     this.subscribed = data.subscribed || false;
   }

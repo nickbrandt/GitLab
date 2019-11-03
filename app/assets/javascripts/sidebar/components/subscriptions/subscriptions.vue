@@ -52,22 +52,22 @@ export default {
       return this.subscribed === null;
     },
     notificationIcon() {
-      if(this.project_emails_disabled) {
+      if (this.project_emails_disabled) {
         return ICON_OFF;
       }
       return this.subscribed ? ICON_ON : ICON_OFF;
     },
     notificationTooltip() {
-      if(this.project_emails_disabled) {
+      if (this.project_emails_disabled) {
         return this.subscribe_disabled_description;
       }
       return this.subscribed ? LABEL_ON : LABEL_OFF;
     },
     notificationText() {
-      if(this.project_emails_disabled) {
+      if (this.project_emails_disabled) {
         return this.subscribe_disabled_description;
       }
-      return "Notifications"
+      return 'Notifications';
     },
   },
   methods: {
