@@ -1,0 +1,5 @@
+---
+title: Refactor disabled sidebar notifications to Vue
+merge_request: !19532
+author: minghuan lei
+type: deprecated
