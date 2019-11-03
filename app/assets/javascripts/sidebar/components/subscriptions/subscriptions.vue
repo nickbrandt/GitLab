@@ -26,6 +26,16 @@ export default {
       required: false,
       default: false,
     },
+    project_emails_disabled: {
+      type: Boolean,
+      required: false,
+      default: null,
+    },
+    subscribe_disabled_description: {
+      type: String,
+      required: false,
+      default: '',
+    },
     subscribed: {
       type: Boolean,
       required: false,
@@ -42,10 +52,22 @@ export default {
       return this.subscribed === null;
     },
     notificationIcon() {
+      if(this.project_emails_disabled) {
+        return ICON_OFF;
+      }
       return this.subscribed ? ICON_ON : ICON_OFF;
     },
     notificationTooltip() {
+      if(this.project_emails_disabled) {
+        return this.subscribe_disabled_description;
+      }
       return this.subscribed ? LABEL_ON : LABEL_OFF;
+    },
+    notificationText() {
+      if(this.project_emails_disabled) {
+        return this.subscribe_disabled_description;
+      }
+      return "Notifications"
     },
   },
   methods: {
@@ -96,8 +118,9 @@ export default {
         class="sidebar-item-icon is-active"
       />
     </span>
-    <span class="issuable-header-text hide-collapsed float-left"> {{ __('Notifications') }} </span>
+    <span class="issuable-header-text hide-collapsed float-left"> {{ __(notificationText) }} </span>
     <toggle-button
+      v-if="this.project_emails_disabled != true"
       ref="toggleButton"
       :is-loading="showLoadingState"
       :value="subscribed"
