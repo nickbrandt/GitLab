@@ -12,7 +12,6 @@ module QA
               end
 
               view 'ee/app/assets/javascripts/approvals/components/rule_form.vue' do
-                element :add_member_button
                 element :approvals_required_field
                 element :member_select_field
                 element :rule_name_field
@@ -29,11 +28,9 @@ module QA
 
                   rule.key?(:users) && rule[:users].each do |user|
                     select_user_member user.username
-                    click_element :add_member_button
                   end
                   rule.key?(:groups) && rule[:groups].each do |group|
                     select_group_member group.name
-                    click_element :add_member_button
                   end
 
                   click_approvers_modal_ok_button

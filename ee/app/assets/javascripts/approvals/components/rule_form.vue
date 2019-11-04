@@ -127,16 +127,13 @@ export default {
       };
     },
   },
+  watch: {
+    approversToAdd(value) {
+      this.approvers.push(value[0]);
+    },
+  },
   methods: {
     ...mapActions(['putFallbackRule', 'postRule', 'putRule', 'deleteRule']),
-    addSelection() {
-      if (!this.approversToAdd.length) {
-        return;
-      }
-
-      this.approvers = this.approversToAdd.concat(this.approvers);
-      this.approversToAdd = [];
-    },
     /**
      * Validate and submit the form based on what type it is.
      * - Fallback rule?
@@ -273,14 +270,6 @@ export default {
           />
           <div class="invalid-feedback">{{ validation.approvers }}</div>
         </div>
-        <gl-button
-          variant="success"
-          class="btn-inverted prepend-left-8"
-          data-qa-selector="add_member_button"
-          @click="addSelection"
-        >
-          {{ __('Add') }}
-        </gl-button>
       </div>
     </div>
     <div class="bordered-box overflow-auto h-12em">
