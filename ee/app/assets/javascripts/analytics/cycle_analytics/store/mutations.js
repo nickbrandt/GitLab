@@ -146,7 +146,11 @@ export default {
   [types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR](state) {
     state.isLoadingChartData = false;
   },
-  [types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state) {
+  [types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, data) {
     state.isLoadingChartData = false;
+    state.tasksByType = {
+      ...state.tasksByType,
+      data,
+    };
   },
 };

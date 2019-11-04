@@ -234,7 +234,6 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
 
     dispatch('requestTasksByTypeData');
 
-    // TODO: move to service / api
     return axios
       .get(endpoint, { params })
       .then(data => dispatch('receiveTasksByTypeDataSuccess', data))

@@ -117,7 +117,10 @@ export default {
           // https://gitlab.com/gitlab-org/gitlab/merge_requests/18514
           this.fetchTasksByTypeData();
         })
-        .catch(() => createFlash(__('There was an error fetching data for the chart')));
+        .catch(err => {
+          createFlash(__('There was an error fetching data for the chart'));
+          throw err;
+        });
     },
     onProjectsSelect(projects) {
       const projectIds = projects.map(value => value.id);

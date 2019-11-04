@@ -33,8 +33,7 @@ export default () => ({
 
   customStageFormEvents: [],
   tasksByType: {
-    subject: TASKS_BY_TYPE_SUBJECT_ISSUE, // issues | merge_requests, defaults to issues
-    // list of selected labels for the tasks by type chart
+    subject: TASKS_BY_TYPE_SUBJECT_ISSUE,
     labelIds: [],
     data: [],
   },
