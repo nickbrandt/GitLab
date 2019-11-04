@@ -1,16 +1,13 @@
 #import "./designNote.fragment.graphql"
+#import "./designList.fragment.graphql"
 #import "./diffRefs.fragment.graphql"
 
 fragment DesignItem on Design {
-  id
-  image
-  event
-  filename
+  ...DesignListItem
   fullPath
   diffRefs {
     ...DesignDiffRefs
   }
-  notesCount
   discussions {
     edges {
       node {

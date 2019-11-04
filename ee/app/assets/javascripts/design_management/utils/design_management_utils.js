@@ -103,4 +103,4 @@ export const updateStoreAfterDesignsDelete = (store, data, query, designs) => {
 
 export const findVersionId = id => id.match('::Version/(.+$)')[1];
 
-export const extractDesign = designs => designs.edges[0].node;
+export const extractDesign = data => data.project.issue.designs.designs.edges[0].node;

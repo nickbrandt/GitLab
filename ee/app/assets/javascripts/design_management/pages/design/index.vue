@@ -58,14 +58,9 @@ export default {
     design: {
       query: getDesignQuery,
       variables() {
-        return {
-          fullPath: this.projectPath,
-          iid: this.issueIid,
-          designIds: [this.$route.params.id],
-          atVersion: this.designsVersion,
-        };
+        return this.designVariables;
       },
-      update: data => extractDesign(data.project.issue.designs.designs),
+      update: data => extractDesign(data),
       result({ data }) {
         if (!data) {
           createFlash(s__('DesignManagement|Could not find design, please try again.'));
@@ -161,7 +156,7 @@ export default {
                 },
               },
             };
-            const design = extractDesign(data.project.issue.designs.designs);
+            const design = extractDesign(data);
             design.discussions.edges = [...design.discussions.edges, newDiscussion];
             design.notesCount += 1;
             store.writeQuery({ query: getDesignQuery, data });

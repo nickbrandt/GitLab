@@ -8,7 +8,7 @@ import createNoteMutation from '../../graphql/mutations/createNote.mutation.grap
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import DesignNote from './design_note.vue';
 import DesignReplyForm from './design_reply_form.vue';
-import { extractCurrentDiscussion } from '../../utils/design_management_utils';
+import { extractCurrentDiscussion, extractDesign } from '../../utils/design_management_utils';
 
 export default {
   components: {
@@ -53,6 +53,14 @@ export default {
         noteableId: this.noteableId,
         body: this.discussionComment,
         discussionId: this.discussion.id,
+      };
+    },
+    designVariables() {
+      return {
+        fullPath: this.projectPath,
+        iid: this.issueIid,
+        designIds: [this.$route.params.id],
+        atVersion: this.designsVersion,
       };
     },
   },
