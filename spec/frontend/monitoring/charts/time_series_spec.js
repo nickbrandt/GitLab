@@ -1,6 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import AxiosMockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import { createStore } from '~/monitoring/stores';
 import { GlLink } from '@gitlab/ui';
 import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
@@ -30,14 +28,11 @@ jest.mock('~/lib/utils/icon_utils', () => ({
 }));
 
 describe('Time series component', () => {
-  let axiosMock;
   let mockGraphData;
   let makeTimeSeriesChart;
   let store;
 
   beforeEach(() => {
-    axiosMock = new AxiosMockAdapter(axios);
-    axiosMock.onAny().reply(200);
     store = createStore();
     store.commit(`monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`, MonitoringMock.data);
     store.commit(`monitoringDashboard/${types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS}`, deploymentData);
