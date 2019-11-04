@@ -259,6 +259,10 @@ module EE
       trial? && trial_ends_on.present? && trial_ends_on >= Date.today
     end
 
+    def never_had_trial?
+      trial_ends_on.nil?
+    end
+
     def trial_expired?
       trial_ends_on.present? &&
         trial_ends_on < Date.today &&

@@ -235,6 +235,13 @@ module EE
         .any?
     end
 
+    def any_namespace_without_trial?
+      ::Namespace
+        .from("(#{namespace_union(:trial_ends_on)}) #{::Namespace.table_name}")
+        .where(trial_ends_on: nil)
+        .any?
+    end
+
     def any_namespace_with_gold?
       ::Namespace
         .includes(:plan)
