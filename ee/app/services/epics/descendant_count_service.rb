@@ -44,20 +44,9 @@ module Epics
     def accessible_epics
       strong_memoize(:epics) do
         epics = epic.base_and_descendants
-        groups = groups_user_can_read_epics(epics)
+        groups = Epic.groups_user_can_read_epics(epics, current_user)
         epics.in_selected_groups(groups)
       end
     end
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def groups_user_can_read_epics(epics)
-      groups = Group.where(id: epics.select(:group_id))
-      groups = Gitlab::GroupPlansPreloader.new.preload(groups)
-
-      DeclarativePolicy.user_scope do
-        groups.select { |g| Ability.allowed?(current_user, :read_epic, g) }
-      end
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
