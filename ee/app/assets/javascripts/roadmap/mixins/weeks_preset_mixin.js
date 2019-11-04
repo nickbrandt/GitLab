@@ -11,8 +11,8 @@ export default {
       lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 6);
 
       return (
-        this.epic.startDate.getTime() >= firstDayOfWeek.getTime() &&
-        this.epic.startDate.getTime() <= lastDayOfWeek.getTime()
+        this.epicStartDateValues.time >= firstDayOfWeek.getTime() &&
+        this.epicStartDateValues.time <= lastDayOfWeek.getTime()
       );
     },
     /**
@@ -26,9 +26,9 @@ export default {
     /**
      * Check if current epic ends within current week (timeline cell)
      */
-    isTimeframeUnderEndDateForWeek(timeframeItem, epicEndDate) {
+    isTimeframeUnderEndDateForWeek(timeframeItem) {
       const lastDayOfWeek = this.getLastDayOfWeek(timeframeItem);
-      return epicEndDate.getTime() <= lastDayOfWeek.getTime();
+      return this.epicEndDateValues.time <= lastDayOfWeek.getTime();
     },
     /**
      * Return timeline bar width for current week (timeline cell) based on
@@ -55,8 +55,8 @@ export default {
      */
     getTimelineBarStartOffsetForWeeks() {
       const daysInWeek = 7;
-      const dayWidth = this.getCellWidth() / daysInWeek;
-      const startDate = this.epic.startDate.getDay() + 1;
+      const dayWidth = this.$options.cellWidth / daysInWeek;
+      const startDate = this.epicStartDateValues.day + 1;
       const firstDayOfWeek = this.timeframeItem.getDay() + 1;
 
       if (
@@ -98,24 +98,24 @@ export default {
       let timelineBarWidth = 0;
 
       const indexOfCurrentWeek = this.timeframe.indexOf(this.timeframeItem);
-      const cellWidth = this.getCellWidth();
-      const epicStartDate = this.epic.startDate;
-      const epicEndDate = this.epic.endDate;
+      const { cellWidth } = this.$options;
+      const epicStartDate = this.epicStartDateValues;
+      const epicEndDate = this.epicEndDateValues;
 
       for (let i = indexOfCurrentWeek; i < this.timeframe.length; i += 1) {
         if (i === indexOfCurrentWeek) {
-          if (this.isTimeframeUnderEndDateForWeek(this.timeframe[i], epicEndDate)) {
+          if (this.isTimeframeUnderEndDateForWeek(this.timeframe[i])) {
             timelineBarWidth += this.getBarWidthForSingleWeek(
               cellWidth,
-              epicEndDate.getDay() - epicStartDate.getDay() + 1,
+              epicEndDate.day - epicStartDate.day + 1,
             );
             break;
           } else {
-            const date = epicStartDate.getDay() === 0 ? 7 : 7 - epicStartDate.getDay();
+            const date = epicStartDate.day === 0 ? 7 : 7 - epicStartDate.day;
             timelineBarWidth += this.getBarWidthForSingleWeek(cellWidth, date);
           }
-        } else if (this.isTimeframeUnderEndDateForWeek(this.timeframe[i], epicEndDate)) {
-          timelineBarWidth += this.getBarWidthForSingleWeek(cellWidth, epicEndDate.getDay() + 1);
+        } else if (this.isTimeframeUnderEndDateForWeek(this.timeframe[i])) {
+          timelineBarWidth += this.getBarWidthForSingleWeek(cellWidth, epicEndDate.day + 1);
           break;
         } else {
           timelineBarWidth += this.getBarWidthForSingleWeek(cellWidth, 7);

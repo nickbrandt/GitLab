@@ -1,9 +1,7 @@
 <script>
 import eventHub from '../event_hub';
 
-import { PRESET_TYPES } from '../constants';
-
-import SectionMixin from '../mixins/section_mixin';
+import { EPIC_DETAILS_CELL_WIDTH, TIMELINE_CELL_MIN_WIDTH, PRESET_TYPES } from '../constants';
 
 import QuartersHeaderItem from './preset_quarters/quarters_header_item.vue';
 import MonthsHeaderItem from './preset_months/months_header_item.vue';
@@ -15,7 +13,6 @@ export default {
     MonthsHeaderItem,
     WeeksHeaderItem,
   },
-  mixins: [SectionMixin],
   props: {
     presetType: {
       type: String,
@@ -27,14 +24,6 @@ export default {
     },
     timeframe: {
       type: Array,
-      required: true,
-    },
-    shellWidth: {
-      type: Number,
-      required: true,
-    },
-    listScrollable: {
-      type: Boolean,
       required: true,
     },
   },
@@ -53,6 +42,11 @@ export default {
         return 'weeks-header-item';
       }
       return '';
+    },
+    sectionContainerStyles() {
+      return {
+        width: `${EPIC_DETAILS_CELL_WIDTH + TIMELINE_CELL_MIN_WIDTH * this.timeframe.length}px`,
+      };
     },
   },
   mounted() {
@@ -84,7 +78,6 @@ export default {
       :timeframe-index="index"
       :timeframe-item="timeframeItem"
       :timeframe="timeframe"
-      :item-width="sectionItemWidth"
     />
   </div>
 </template>

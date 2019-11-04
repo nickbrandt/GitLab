@@ -9,6 +9,7 @@ export default () => ({
   // Data
   epicIid: '',
   epics: [],
+  visibleEpics: [],
   epicIds: [],
   currentGroupId: -1,
   fullPath: '',
@@ -16,6 +17,7 @@ export default () => ({
   extendedTimeframe: [],
   presetType: '',
   sortedBy: '',
+  bufferSize: 0,
 
   // UI Flags
   defaultInnerHeight: 0,
