@@ -47,6 +47,14 @@ const deleteDesignsFromStore = (store, query, selectedDesigns) => {
   });
 };
 
+/**
+ * Adds a new version of designs to store
+ *
+ * @param {Object} store
+ * @param {Object} query
+ * @param {Object} version
+ */
+
 const addNewVersionToStore = (store, query, version) => {
   if (!version) return;
 
@@ -64,10 +72,25 @@ const addNewVersionToStore = (store, query, version) => {
   });
 };
 
-export const onDesignDeletionError = e => {
+/**
+ * Throws an error on design deletion
+ *
+ * @param {Object} error
+ */
+
+export const onDesignDeletionError = error => {
   createFlash(s__('DesignManagement|We could not delete design(s). Please try again.'));
-  throw e;
+  throw error;
 };
+
+/**
+ * Updates a store after design deletion
+ *
+ * @param {Object} store
+ * @param {Object} data
+ * @param {Object} query
+ * @param {Array} designs
+ */
 
 export const updateStoreAfterDesignsDelete = (store, data, query, designs) => {
   if (data.errors) {
@@ -79,3 +102,5 @@ export const updateStoreAfterDesignsDelete = (store, data, query, designs) => {
 };
 
 export const findVersionId = id => id.match('::Version/(.+$)')[1];
+
+export const extractDesign = designs => designs.edges[0].node;

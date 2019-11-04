@@ -13,7 +13,7 @@ import DesignDestroyer from '../../components/design_destroyer.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
-import { extractDiscussions } from '../../utils/design_management_utils';
+import { extractDiscussions, extractDesign } from '../../utils/design_management_utils';
 
 export default {
   components: {
@@ -65,7 +65,7 @@ export default {
           atVersion: this.designsVersion,
         };
       },
-      update: data => data.project.issue.designs.designs.edges[0].node,
+      update: data => extractDesign(data.project.issue.designs.designs),
       result({ data }) {
         if (!data) {
           createFlash(s__('DesignManagement|Could not find design, please try again.'));
@@ -96,6 +96,14 @@ export default {
     },
     renderDiscussions() {
       return this.discussions.length || this.annotationCoordinates;
+    },
+    designVariables() {
+      return {
+        fullPath: this.projectPath,
+        iid: this.issueIid,
+        designIds: [this.$route.params.id],
+        atVersion: this.designsVersion,
+      };
     },
   },
   mounted() {
@@ -132,12 +140,7 @@ export default {
           update: (store, { data: { createImageDiffNote } }) => {
             const data = store.readQuery({
               query: getDesignQuery,
-              variables: {
-                fullPath: this.projectPath,
-                iid: this.issueIid,
-                designIds: [this.$route.params.id],
-                atVersion: this.designsVersion,
-              },
+              variables: this.designVariables,
             });
             const newDiscussion = {
               __typename: 'DiscussionEdge',
@@ -158,8 +161,8 @@ export default {
                 },
               },
             };
-            const design = data.project.issue.designs.designs.edges[0].node;
-            design.discussions.edges.push(newDiscussion);
+            const design = extractDesign(data.project.issue.designs.designs);
+            design.discussions.edges = [...design.discussions.edges, newDiscussion];
             design.notesCount += 1;
             store.writeQuery({ query: getDesignQuery, data });
           },
