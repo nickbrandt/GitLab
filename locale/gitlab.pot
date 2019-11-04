@@ -210,6 +210,11 @@ msgstr ""
 msgid "%{count} more assignees"
 msgstr ""
 
+msgid "%{count} more release"
+msgid_plural "%{count} more releases"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%{count} of %{required} approvals from %{name}"
 msgstr ""
 
@@ -13803,7 +13808,9 @@ msgid "Related merge requests"
 msgstr ""
 
 msgid "Release"
-msgstr ""
+msgid_plural "Releases"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Release notes"
 msgstr ""
