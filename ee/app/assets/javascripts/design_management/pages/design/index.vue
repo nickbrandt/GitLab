@@ -133,8 +133,10 @@ export default {
             const data = store.readQuery({
               query: getDesignQuery,
               variables: {
-                id: this.id,
-                version: this.designsVersion,
+                fullPath: this.projectPath,
+                iid: this.issueIid,
+                designIds: [this.$route.params.id],
+                atVersion: this.designsVersion,
               },
             });
             const newDiscussion = {
@@ -156,8 +158,9 @@ export default {
                 },
               },
             };
-            data.design.discussions.edges.push(newDiscussion);
-            data.design.notesCount += 1;
+            const design = data.project.issue.designs.designs.edges[0].node;
+            design.discussions.edges.push(newDiscussion);
+            design.notesCount += 1;
             store.writeQuery({ query: getDesignQuery, data });
           },
         })
