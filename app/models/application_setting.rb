@@ -280,15 +280,15 @@ class ApplicationSetting < ApplicationRecord
   validates :eks_account_id,
             format: { with: Gitlab::Regex.aws_account_id_regex,
                       message: Gitlab::Regex.aws_account_id_message },
-            if: -> (setting) { setting.eks_integration_enabled? }
+            if: :eks_integration_enabled?
 
   validates :eks_access_key_id,
             length: { in: 16..128 },
-            if: -> (setting) { setting.eks_integration_enabled? }
+            if: :eks_integration_enabled?
 
   validates :eks_secret_access_key,
             presence: true,
-            if: -> (setting) { setting.eks_integration_enabled? }
+            if: :eks_integration_enabled?
 
   validates_with X509CertificateCredentialsValidator,
                  certificate: :external_auth_client_cert,

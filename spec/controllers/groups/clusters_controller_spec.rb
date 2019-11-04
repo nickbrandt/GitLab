@@ -85,7 +85,7 @@ describe Groups::ClustersController do
   end
 
   describe 'GET new' do
-    def go(provider: 'gke')
+    def go(provider: 'gcp')
       get :new, params: { group_id: group, provider: provider }
     end
 

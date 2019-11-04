@@ -43,14 +43,11 @@ class Clusters::ClustersController < Clusters::BaseController
   def new
     return unless Feature.enabled?(:create_eks_clusters)
 
-    if params[:provider] == 'eks'
-      @eks_selected = true
+    if params[:provider] == 'aws'
       @aws_role = current_user.aws_role || Aws::Role.new
       @aws_role.ensure_role_external_id!
 
-    elsif params[:provider] == 'gke'
-      @gke_selected = true
-
+    elsif params[:provider] == 'gcp'
       redirect_to @authorize_url if @authorize_url && !@valid_gcp_token
     end
   end

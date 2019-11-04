@@ -79,7 +79,7 @@ describe Projects::ClustersController do
   end
 
   describe 'GET new' do
-    def go(provider: 'gke')
+    def go(provider: 'gcp')
       get :new, params: {
         namespace_id: project.namespace,
         project_id: project,

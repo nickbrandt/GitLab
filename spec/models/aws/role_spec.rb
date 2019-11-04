@@ -33,7 +33,7 @@ describe Aws::Role do
   end
 
   describe 'callbacks' do
-    describe '#ensure_role_external_id' do
+    describe '#ensure_role_external_id!' do
       subject { role.validate }
 
       context 'for a new record' do

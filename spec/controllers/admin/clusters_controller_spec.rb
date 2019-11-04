@@ -73,7 +73,7 @@ describe Admin::ClustersController do
   end
 
   describe 'GET #new' do
-    def get_new(provider: 'gke')
+    def get_new(provider: 'gcp')
       get :new, params: { provider: provider }
     end
 
