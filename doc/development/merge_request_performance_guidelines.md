@@ -23,6 +23,10 @@ The term `SHOULD` per the [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) means
 > particular item, but the full implications must be understood and
 > carefully weighed before choosing a different course.
 
+Ideally, each of these tradeoffs should be documented
+in the separate issues, labelled accordingly and linked
+to original issue and epic.
+
 ## Impact Analysis
 
 **Summary:** think about the impact your merge request may have on performance
@@ -58,14 +62,14 @@ in turn can request a performance specialist to review the changes.
 ## Think outside of the box
 
 Everyone has their own perception how the new feature is going to be used.
-Always think how users going to be using the feature instead. Usually,
+Always consider how users might be using the feature instead. Usually,
 users test our features in a very unconventional way,
 like by brute forcing or abusing edge conditions that we have.
 
 ## Data set
 
 The data set that will be processed by the merge request should be known
-and documented.  The feature should clearly document what expected
+and documented. The feature should clearly document what the expected
 data set is for this feature to process, and what problems it might cause.
 
 If you would think about the following example that puts
@@ -87,12 +91,12 @@ the following:
 ## Query plans and database structure
 
 The query plan can answer the questions whether we need additional
-indexes, or whether we perform expensive filtering (ex. using sequential scans).
+indexes, or whether we perform expensive filtering (i.e. using sequential scans).
 
 Each query plan should be run against substantional size of data set.
-For example if you look for issues with specific condition,
+For example if you look for issues with specific conditions,
 you should consider validating the query against
-small number (a few hundred) and big number (100_000) of issues.
+a small number (a few hundred) and a big number (100_000) of issues.
 See how the query will behave if the result will be a few
 and a few thousand.
 
@@ -103,15 +107,15 @@ of our customers will have the problem with the feature.
 
 Understanding ahead of time how it is going to behave at scale even if we accept it,
 is the desired outcome. We should always have a plan or understanding what it takes
-to optimise feature to magnitude of higher usage patterns.
+to optimise feature to the magnitude of higher usage patterns.
 
 Every database structure should be optimised and sometimes even over-described
 to be prepared to be easily extended. The hardest part after some point is
-data migration. Migrating milion of rows will always be troublesome and
+data migration. Migrating millions of rows will always be troublesome and
 can have negative impact on application.
 
-To better understand the how to help with the query plan reviews
-read this section [How to prepare the merge request for a database review](https://docs.gitlab.com/ee/development/database_review.html#how-to-prepare-the-merge-request-for-a-database-review).
+To better understand how to get help with the query plan reviews
+read this section on [how to prepare the merge request for a database review](https://docs.gitlab.com/ee/development/database_review.html#how-to-prepare-the-merge-request-for-a-database-review).
 
 ## Query Counts
 
@@ -249,13 +253,13 @@ Each feature that renders a list of items as a table needs to include pagination
 The main styles of pagination are:
 
 1. Offset-based pagination: user goes to a specific page, like 1. User sees the next page number,
-   and the total number of pages. This style is well supported by all components of GitLab,
+   and the total number of pages. This style is well supported by all components of GitLab.
 1. Offset-based pagination, but without the count: user goes to a specific page, like 1.
-   User sees only the next page number, but does not see the total amount of pages
+   User sees only the next page number, but does not see the total amount of pages.
 1. Next page using keyset-based pagination: user can only go to next page, as we do not know how many pages
-   are available,
-1. Infinite pagination using keyset-based pagination: user scrolls the page and next items are loaded, this is ideal,
-   as it has exact same benefits as `Next only`.
+   are available.
+1. Infinite scrolling pagination: user scrolls the page and next items are loaded asynchronously. This is ideal,
+   as it has exact same benefits as the previous one.
 
 The ultimately scalable solution for pagination is to use Keyset-based pagination.
 However, we don't have support for that at GitLab at that moment. You
@@ -268,7 +272,7 @@ Take into consideration the following when choosing a pagination strategy:
    this operation usually can take seconds, and can time out,
 1. It is very inefficent to get entries for page at higher ordinals, like 1000.
    The database has to sort and iterate all previous items, and this operation usually
-   can result in exponential complexity put on database.
+   can result in substantial load put on database.
 
 ## Badge counters
 
@@ -299,6 +303,10 @@ be performant and usable for the user, but **not limiting**.
 **However, we want to ensure that the feature will continue to perform well if used at its limit**
 **and it will not cause availability issues.**
 
+Consider that it is always better to start with some kind of limitation,
+instead of later introducing a breaking change that would result in some
+workflows breaking.
+
 The intent is to provide a safe usage pattern for the feature,
 as our implementation decisions are optimised for the given data set.
 Our feature limits should reflect the optimisations that we introduced.
@@ -311,10 +319,6 @@ The intent of quotas could be different:
    10000 deploy tokens, because of a broken API script,
 1. We want to prevent abuse of the feature: someone purposely creates
    a 10000 pipelines to take advantage of the system.
-
-Consider that it is always better to start with some kind of limitation,
-instead of later introducing a breaking change that would result in some
-workflows breaking.
 
 Examples:
 
@@ -334,8 +338,8 @@ Examples:
 
 ## Usage of feature flags
 
-Each feature that has performance critical elements or has a know performance deficiency
-should come with feature flag to disable it.
+Each feature that has performance critical elements or has a known performance deficiency
+needs to come with feature flag to disable it.
 
 The feature flag makes our team more happy, because they can monitor the system and
 quickly react without our users noticing the problem.
@@ -343,5 +347,5 @@ quickly react without our users noticing the problem.
 Performance deficiencies should be addressed right away after we merge initial
 changes.
 
-Read moar about when and how feature flags should be used in
+Read more about when and how feature flags should be used in
 [Feature flags in GitLab development](https://docs.gitlab.com/ee/development/feature_flags/process.html#feature-flags-in-gitlab-development).
