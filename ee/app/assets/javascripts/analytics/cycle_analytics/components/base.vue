@@ -119,7 +119,7 @@ export default {
     },
     initDateRange() {
       const endDate = new Date(Date.now());
-      const startDate = new Date(getDateInPast(endDate, DEFAULT_DAYS_IN_PAST));
+      const startDate = getDateInPast(endDate, DEFAULT_DAYS_IN_PAST);
       this.setDateRange({ skipFetch: true, startDate, endDate });
     },
   },
