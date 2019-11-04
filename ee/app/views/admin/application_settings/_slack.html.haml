@@ -1,5 +1,6 @@
 - return unless Gitlab.dev_env_or_com?
 
+- expanded = integration_expanded?('slack_app_')
 %section.settings.as-slack.no-animate#js-slack-settings{ class: ('expanded' if expanded) }
   .settings-header
     %h4
@@ -11,7 +12,7 @@
   .settings-content
 
     = form_for @application_setting, url: integrations_admin_application_settings_path(anchor: 'js-slack-settings'), html: { class: 'fieldset-form' } do |f|
-      = form_errors(@application_setting)
+      = form_errors(@application_setting) if expanded
 
       %fieldset
         .form-group
@@ -20,7 +21,7 @@
             = f.label :slack_app_enabled, class: 'form-check-label' do
               Enable Slack application
             .form-text.text-muted
-              This option is only available on GitLab.com
+              = _('This option is only available on GitLab.com')
         .form-group
           = f.label :slack_app_id, 'APP_ID', class: 'label-bold'
           = f.text_field :slack_app_id, class: 'form-control'
@@ -31,5 +32,5 @@
           = f.label :slack_app_verification_token, 'Verification token', class: 'label-bold'
           = f.text_field :slack_app_verification_token, class: 'form-control'
 
-      = f.submit 'Save changes', class: "btn btn-success"
+      = f.submit _('Save changes'), class: "btn btn-success"
 
