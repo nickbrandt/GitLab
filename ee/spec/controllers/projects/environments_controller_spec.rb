@@ -92,7 +92,7 @@ describe Projects::EnvironmentsController do
 
     shared_examples 'resource not found' do |message|
       it 'returns 400' do
-        get :logs, params: environment_params(pod_name: pod_name, format: :json)
+        get :k8s_pod_logs, params: environment_params(pod_name: pod_name, format: :json)
 
         expect(response).to have_gitlab_http_status(:bad_request)
         expect(json_response['message']).to eq(message)
@@ -114,7 +114,7 @@ describe Projects::EnvironmentsController do
       end
     end
 
-    context 'when using HTML format' do
+    context 'when licensed' do
       it 'renders logs template' do
         get :logs, params: environment_params(pod_name: pod_name)
 
@@ -142,7 +142,7 @@ describe Projects::EnvironmentsController do
       end
 
       it 'returns the logs for a specific pod' do
-        get :logs, params: environment_params(pod_name: pod_name, format: :json)
+        get :k8s_pod_logs, params: environment_params(pod_name: pod_name, format: :json)
 
         expect(response).to have_gitlab_http_status(:success)
         expect(json_response["logs"]).to match_array(["Log 1", "Log 2", "Log 3"])
@@ -155,7 +155,7 @@ describe Projects::EnvironmentsController do
       it 'registers a usage of the endpoint' do
         expect(::Gitlab::UsageCounters::PodLogs).to receive(:increment).with(project.id)
 
-        get :logs, params: environment_params(pod_name: pod_name, format: :json)
+        get :k8s_pod_logs, params: environment_params(pod_name: pod_name, format: :json)
       end
 
       context 'when kubernetes API returns error' do
@@ -170,7 +170,7 @@ describe Projects::EnvironmentsController do
         end
 
         it 'returns bad request' do
-          get :logs, params: environment_params(pod_name: pod_name, format: :json)
+          get :k8s_pod_logs, params: environment_params(pod_name: pod_name, format: :json)
 
           expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response["logs"]).to eq(nil)
@@ -204,7 +204,7 @@ describe Projects::EnvironmentsController do
         end
 
         it 'returns the error without pods, pod_name and container_name' do
-          get :logs, params: environment_params(pod_name: pod_name, format: :json)
+          get :k8s_pod_logs, params: environment_params(pod_name: pod_name, format: :json)
 
           expect(response).to have_gitlab_http_status(:bad_request)
           expect(json_response['message']).to eq('No deployment platform')
@@ -216,7 +216,7 @@ describe Projects::EnvironmentsController do
         let(:service_result) { { status: :processing } }
 
         it 'renders accepted' do
-          get :logs, params: environment_params(pod_name: pod_name, format: :json)
+          get :k8s_pod_logs, params: environment_params(pod_name: pod_name, format: :json)
 
           expect(response).to have_gitlab_http_status(:accepted)
         end
