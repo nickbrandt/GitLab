@@ -22,8 +22,6 @@ describe 'Merge request > User edits MR with approval rules', :js do
     wait_for_requests
     find(".select2-result-label .#{type}-result", text: name).click
     close_select2 members_selector
-
-    find("#{modal_id} button", text: 'Add', exact_text: true).click
   end
 
   before do
