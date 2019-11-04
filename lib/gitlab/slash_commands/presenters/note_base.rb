@@ -33,7 +33,7 @@ module Gitlab
         def fields
           [
             {
-              title: "Comment",
+              title: 'Comment',
               value: resource.note
             }
           ]

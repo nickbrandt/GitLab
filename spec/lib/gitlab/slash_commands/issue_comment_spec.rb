@@ -3,17 +3,18 @@
 require 'spec_helper'
 
 describe Gitlab::SlashCommands::IssueComment do
+  let_it_be(:project) { create(:project) }
+  let_it_be(:issue) { create(:issue, project: project) }
+  let(:user) { issue.author }
+
   describe '#execute' do
-    let_it_be(:project) { create(:project) }
-    let_it_be(:issue) { create(:issue, project: project) }
-    let(:user) { issue.author }
     let(:chat_name) { double(:chat_name, user: user) }
     let(:regex_match) { described_class.match("issue comment #{issue.iid}\nComment body") }
 
     subject { described_class.new(project, chat_name).execute(regex_match) }
 
     context 'when the issue exists' do
-      context 'when the user does not have premission' do
+      context 'when the user does not have permission' do
         let(:chat_name) { double(:chat_name, user: create(:user)) }
 
         it 'does not allow the user to comment' do
@@ -54,7 +55,7 @@ describe Gitlab::SlashCommands::IssueComment do
     context 'the issue does not exist' do
       let(:regex_match) { described_class.match("issue comment 2343242\nComment body") }
 
-      it "returns not found" do
+      it 'returns not found' do
         expect(subject[:response_type]).to be(:ephemeral)
         expect(subject[:text]).to match('not found')
       end
@@ -92,6 +93,26 @@ describe Gitlab::SlashCommands::IssueComment do
       it 'does not match' do
         is_expected.to be_nil
       end
+    end
+  end
+
+  describe '.allowed?' do
+    subject { described_class.allowed?(issue, user) }
+
+    before do
+      allow(Ability).to receive(:allowed?).with(user, :create_note, issue).and_return(is_allowed)
+    end
+
+    context 'when the user can create a note' do
+      let(:is_allowed) { true }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when the user cannot create a note' do
+      let(:is_allowed) { false }
+
+      it { is_expected.to be_falsey }
     end
   end
 end

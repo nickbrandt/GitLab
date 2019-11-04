@@ -11,6 +11,10 @@ module Gitlab
         'issue comment <id> *`⇧ Shift`*+*`↵ Enter`* <comment>'
       end
 
+      def self.allowed?(issue, user)
+        can?(user, :create_note, issue)
+      end
+
       def execute(match)
         note_body = match[:note_body].to_s.strip
         issue = find_by_iid(match[:iid])
