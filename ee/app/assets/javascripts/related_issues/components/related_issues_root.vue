@@ -149,11 +149,11 @@ export default {
             // Close the form on submission
             this.isFormVisible = false;
           })
-          .catch(res => {
+          .catch(({ response }) => {
             this.isSubmitting = false;
             let errorMessage = addRelatedIssueErrorMap[this.issuableType];
-            if (res.data && res.data.message) {
-              errorMessage = res.data.message;
+            if (response && response.data && response.data.message) {
+              errorMessage = response.data.message;
             }
             Flash(errorMessage);
           });
