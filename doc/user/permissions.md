@@ -103,6 +103,7 @@ The following table depicts the various user permission levels in a project.
 | Apply code change suggestions                     |         |            | ✓           | ✓        | ✓      |
 | Create and edit wiki pages                        |         |            | ✓           | ✓        | ✓      |
 | Rewrite/remove Git tags                           |         |            | ✓           | ✓        | ✓      |
+| Manage Feature Flags **(PREMIUM)**                |         |            | ✓           | ✓        | ✓      |
 | Use environment terminals                         |         |            |             | ✓        | ✓      |
 | Run Web IDE's Interactive Web Terminals **(ULTIMATE ONLY)** |     |      |             | ✓        | ✓      |
 | Add new team members                              |         |            |             | ✓        | ✓      |
