@@ -162,4 +162,54 @@ describe('Api', () => {
         .catch(done.fail);
     });
   });
+
+  describe('getPodLogs', () => {
+    const projectFullPath = 'root/test-project';
+    const environmentId = 2;
+    const podName = 'pod';
+    const containerName = 'container';
+
+    const lastUrl = () => mock.history.get[0].url;
+
+    beforeEach(() => {
+      mock.onAny().reply(200);
+    });
+
+    afterEach(() => {
+      mock.reset();
+    });
+
+    it('calls `axios.get` with pod_name and container_name', done => {
+      const expectedUrl = `${dummyUrlRoot}/${projectFullPath}/environments/${environmentId}/pods/${podName}/containers/${containerName}/logs.json`;
+
+      Api.getPodLogs({ projectFullPath, environmentId, podName, containerName })
+        .then(() => {
+          expect(expectedUrl).toBe(lastUrl());
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('calls `axios.get` without pod_name and container_name', done => {
+      const expectedUrl = `${dummyUrlRoot}/${projectFullPath}/environments/${environmentId}/pods/containers/logs.json`;
+
+      Api.getPodLogs({ projectFullPath, environmentId })
+        .then(() => {
+          expect(expectedUrl).toBe(lastUrl());
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('calls `axios.get` with pod_name', done => {
+      const expectedUrl = `${dummyUrlRoot}/${projectFullPath}/environments/${environmentId}/pods/${podName}/containers/logs.json`;
+
+      Api.getPodLogs({ projectFullPath, environmentId, podName })
+        .then(() => {
+          expect(expectedUrl).toBe(lastUrl());
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+  });
 });

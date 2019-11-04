@@ -10,6 +10,11 @@ export default {
   groupEpicsPath:
     '/api/:version/groups/:id/epics?include_ancestor_groups=:includeAncestorGroups&include_descendant_groups=:includeDescendantGroups',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
+  podLogsPath: '/:project_full_path/environments/:environment_id/pods/containers/logs.json',
+  podLogsPathWithPod:
+    '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/logs.json',
+  podLogsPathWithPodContainer:
+    '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/:container_name/logs.json',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -69,5 +74,26 @@ export default {
       .replace(':issue_id', epicIssueId);
 
     return axios.delete(url);
+  },
+
+  getPodLogs({ projectFullPath, environmentId, podName, containerName }) {
+    let logPath = this.podLogsPath;
+    if (podName && containerName) {
+      logPath = this.podLogsPathWithPodContainer;
+    } else if (podName) {
+      logPath = this.podLogsPathWithPod;
+    }
+
+    let url = this.buildUrl(logPath)
+      .replace(':project_full_path', projectFullPath)
+      .replace(':environment_id', environmentId);
+
+    if (podName) {
+      url = url.replace(':pod_name', podName);
+    }
+    if (containerName) {
+      url = url.replace(':container_name', containerName);
+    }
+    return axios.get(url);
   },
 };
