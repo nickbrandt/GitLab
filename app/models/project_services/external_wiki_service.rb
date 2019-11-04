@@ -25,9 +25,8 @@ class ExternalWikiService < Service
 
   def execute(_data)
     @response = Gitlab::HTTP.get(properties['external_wiki_url'], verify: true) rescue nil
-    if @response != 200
-      nil
-    end
+
+    @response if @reponse == 200
   end
 
   def self.supported_events
