@@ -20,7 +20,10 @@ describe('Panel Type component', () => {
 
   beforeEach(() => {
     axiosMock = new AxiosMockAdapter(axios);
-    axiosMock.onAny().reply(200);
+  });
+
+  afterEach(() => {
+    axiosMock.reset();
   });
 
   describe('When no graphData is available', () => {
