@@ -163,7 +163,7 @@ export const getMedianLineData = (data, startDate, endDate, daysOffset) => {
       medianData = transformedData.slice(startIndex, i);
       flattenedData = _.flatten(medianData);
       if (flattenedData.length) {
-        d = getDateInPast(endDate, len - i);
+        d = getDateInPast(endDate, len - i).toISOString();
         result.push([dateFormat(d, dateFormats.isoDate), median(flattenedData)]);
       }
     }
