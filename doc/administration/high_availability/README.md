@@ -198,6 +198,7 @@ separately:
 
 The Support and Quality departments built, performance tested, and validated
 environments that support:
+
 1. [About 10,000 users.](#10000-user-configuration)
 1. [About 25,000 users.](#25000-user-configuration)
 1. [About 50,000 users.](#50000-user-configuration)
@@ -221,7 +222,6 @@ discovered. For details, see the related issues list in
 - **Supported Users (approximate):** 10,000
 - **RPS:** 200 requests per second
 
-
 | Service                       | Configuration           | GCP type       |
 | ------------------------------|-------------------------|----------------|
 | 3 GitLab Rails <br> - Puma workers on each node set to 90% of available CPUs with 16 threads | 32 vCPU, 28.8GB Memory | n1-highcpu-32 |
@@ -241,7 +241,6 @@ discovered. For details, see the related issues list in
 - **Supported Users (approximate):** 25,000
 - **RPS:** 500 requests per second
 
-
 | Service                       | Configuration           | GCP type       |
 | ------------------------------|-------------------------|----------------|
 | 7 GitLab Rails <br> - Puma workers on each node set to 90% of available CPUs with 16 threads | 32 vCPU, 28.8GB Memory | n1-highcpu-32 |
@@ -260,7 +259,6 @@ discovered. For details, see the related issues list in
 
 - **Supported Users (approximate):** 50,000
 - **RPS:** 1,000 requests per second
-
 
 | Service                       | Configuration           | GCP type       |
 | ------------------------------|-------------------------|----------------|
