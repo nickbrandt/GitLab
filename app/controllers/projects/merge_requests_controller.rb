@@ -90,7 +90,10 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     # Get commits from repository
     # or from cache if already merged
     @commits =
-      set_commits_for_rendering(@merge_request.commits.with_latest_pipeline)
+      set_commits_for_rendering(
+        @merge_request.recent_commits.with_latest_pipeline(@merge_request.source_branch),
+          commits_count: @merge_request.commits_count
+      )
 
     render json: { html: view_to_html_string('projects/merge_requests/_commits') }
   end
