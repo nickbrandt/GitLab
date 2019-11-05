@@ -9,14 +9,7 @@ module Gitlab
 
           def initialize(order_value)
             if order_value.is_a?(String)
-              tokens = order_value.downcase.split(' ')
-
-              unless tokens[-2..-1] == %w(nulls last) && tokens.count == 4
-                raise ArgumentError.new('Incorrect format for NULLS LAST')
-              end
-
-              @attribute_name = tokens.first
-              @sort_direction = tokens[1] == 'asc' ? :asc : :desc
+              @attribute_name, @sort_direction = extract_nulls_last_order(order_value)
             else
               @attribute_name = order_value.expr.name
               @sort_direction = order_value.direction
@@ -35,8 +28,7 @@ module Gitlab
           # Only allow specific node types
           def self.build_order_list(relation)
             order_list = relation.order_values.select do |value|
-              value.is_a?(Arel::Nodes::Ascending) || value.is_a?(Arel::Nodes::Descending) ||
-                (value.is_a?(String) && value.downcase.end_with?('nulls last'))
+              supported_order_value?(value)
             end
 
             order_list.map { |info| OrderInfo.new(info) }
@@ -61,6 +53,23 @@ module Gitlab
             if order_list.last.attribute_name != relation.primary_key
               raise ArgumentError.new("Last ordering field must be the primary key, `#{relation.primary_key}`")
             end
+          end
+
+          def self.supported_order_value?(order_value)
+            return true if order_value.is_a?(Arel::Nodes::Ascending) || order_value.is_a?(Arel::Nodes::Descending)
+            return false unless order_value.is_a?(String)
+
+            tokens = order_value.downcase.split
+
+            tokens.last(2) == %w(nulls last) && tokens.count == 4
+          end
+
+          private
+
+          def extract_nulls_last_order(order_value)
+            tokens = order_value.downcase.split
+
+            [tokens.first, (tokens[1] == 'asc' ? :asc : :desc)]
           end
         end
       end

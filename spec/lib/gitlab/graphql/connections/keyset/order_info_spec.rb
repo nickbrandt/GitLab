@@ -33,8 +33,8 @@ describe Gitlab::Graphql::Connections::Keyset::OrderInfo do
     context 'when order contains invalid formatted NULLS LAST ' do
       let(:relation) { Project.order(Arel.sql('projects.updated_at created_at Asc Nulls Last')).order(:id) }
 
-      it 'raises an error' do
-        expect { order_list }.to raise_error(ArgumentError, 'Incorrect format for NULLS LAST')
+      it 'ignores the SQL order' do
+        expect(order_list.count).to eq 1
       end
     end
   end
