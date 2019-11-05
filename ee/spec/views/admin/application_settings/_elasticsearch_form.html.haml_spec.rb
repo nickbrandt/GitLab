@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe 'admin/application_settings/_elasticsearch_form' do
   set(:admin) { create(:admin) }
+  let(:page) { Capybara::Node::Simple.new(rendered) }
 
   before do
     assign(:application_setting, application_setting)
@@ -17,6 +18,7 @@ describe 'admin/application_settings/_elasticsearch_form' do
     it 'has field with "AWS Secret Access Key" label and no value' do
       render
       expect(rendered).to have_field('AWS Secret Access Key', type: 'password')
+      expect(page.find_field('AWS Secret Access Key').value).to be_blank
     end
   end
 
@@ -26,6 +28,7 @@ describe 'admin/application_settings/_elasticsearch_form' do
     it 'has field with "Enter new AWS Secret Access Key" label and no value' do
       render
       expect(rendered).to have_field('Enter new AWS Secret Access Key', type: 'password')
+      expect(page.find_field('Enter new AWS Secret Access Key').value).to be_blank
     end
   end
 end
