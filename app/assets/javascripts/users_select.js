@@ -248,15 +248,15 @@ function UsersSelect(currentUser, els, options = {}) {
     );
     return $dropdown.glDropdown({
       showMenuAbove,
-      data(term, callback) {
-        return this.users(term, options, users => {
+      data: (term, callback) => {
+        this.users(term, options, users => {
           // GitLabDropdownFilter returns this.instance
           // GitLabDropdownRemote returns this.options.instance
           const glDropdown = this.instance || this.options.instance;
           glDropdown.options.processData(term, users, callback);
         });
       },
-      processData(term, data, callback) {
+      processData: (term, data, callback) => {
         let users = data;
 
         // Only show assigned user list when there is no search term
