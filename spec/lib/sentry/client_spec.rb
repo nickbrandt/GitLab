@@ -192,6 +192,14 @@ describe Sentry::Client do
       end
     end
 
+    context 'sentry api response too large' do
+      it 'raises exception' do
+        allow(client).to receive(:valid_size?).and_return(false)
+
+        expect { subject }.to raise_error(Sentry::Client::ResponseTooBigError, "Sentry API response is too big. Limit is #{Gitlab::Utils::DeepSize.human_default_max_size}.")
+      end
+    end
+
     it_behaves_like 'maps exceptions'
   end
 
