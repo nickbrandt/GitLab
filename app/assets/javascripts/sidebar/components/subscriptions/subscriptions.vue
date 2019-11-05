@@ -65,9 +65,9 @@ export default {
     },
     notificationText() {
       if (this.project_emails_disabled) {
-        return this.subscribe_disabled_description;
+        return __(this.subscribe_disabled_description);
       }
-      return 'Notifications';
+      return __('Notifications');
     },
   },
   methods: {
@@ -118,9 +118,9 @@ export default {
         class="sidebar-item-icon is-active"
       />
     </span>
-    <span class="issuable-header-text hide-collapsed float-left"> {{ __(notificationText) }} </span>
+    <span class="issuable-header-text hide-collapsed float-left"> {{ notificationText }} </span>
     <toggle-button
-      v-if="this.project_emails_disabled != true"
+      v-if="project_emails_disabled != true"
       ref="toggleButton"
       :is-loading="showLoadingState"
       :value="subscribed"
