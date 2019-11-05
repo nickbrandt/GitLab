@@ -26,12 +26,12 @@ export default {
       required: false,
       default: false,
     },
-    project_emails_disabled: {
+    projectEmailsDisabled: {
       type: Boolean,
       required: false,
       default: null,
     },
-    subscribe_disabled_description: {
+    subscribeDisabledDescription: {
       type: String,
       required: false,
       default: '',
@@ -52,20 +52,20 @@ export default {
       return this.subscribed === null;
     },
     notificationIcon() {
-      if (this.project_emails_disabled) {
+      if (this.projectEmailsDisabled) {
         return ICON_OFF;
       }
       return this.subscribed ? ICON_ON : ICON_OFF;
     },
     notificationTooltip() {
-      if (this.project_emails_disabled) {
-        return this.subscribe_disabled_description;
+      if (this.projectEmailsDisabled) {
+        return this.subscribeDisabledDescription;
       }
       return this.subscribed ? LABEL_ON : LABEL_OFF;
     },
     notificationText() {
-      if (this.project_emails_disabled) {
-        return __(this.subscribe_disabled_description);
+      if (this.projectEmailsDisabled) {
+        return __(this.subscribeDisabledDescription);
       }
       return __('Notifications');
     },
@@ -120,7 +120,7 @@ export default {
     </span>
     <span class="issuable-header-text hide-collapsed float-left"> {{ notificationText }} </span>
     <toggle-button
-      v-if="project_emails_disabled != true"
+      v-if="projectEmailsDisabled != true"
       ref="toggleButton"
       :is-loading="showLoadingState"
       :value="subscribed"
