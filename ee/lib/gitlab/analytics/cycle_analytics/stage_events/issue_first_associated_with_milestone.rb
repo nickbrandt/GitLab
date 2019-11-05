@@ -4,21 +4,21 @@ module Gitlab
   module Analytics
     module CycleAnalytics
       module StageEvents
-        class MergeRequestCreated < StageEvent
+        class IssueFirstAssociatedWithMilestone < MetricsBasedStageEvent
           def self.name
-            s_("CycleAnalyticsEvent|Merge request created")
+            s_("CycleAnalyticsEvent|Issue first associated with a milestone")
           end
 
           def self.identifier
-            :merge_request_created
+            :issue_first_associated_with_milestone
           end
 
           def object_type
-            MergeRequest
+            Issue
           end
 
           def timestamp_projection
-            mr_table[:created_at]
+            issue_metrics_table[:first_associated_with_milestone_at]
           end
         end
       end

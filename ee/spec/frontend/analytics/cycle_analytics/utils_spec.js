@@ -11,7 +11,6 @@ import {
   labelStartEvent,
   labelStopEvent,
   customStageStartEvents as startEvents,
-  customStageStopEvents as stopEvents,
 } from './mock_data';
 
 const labelEvents = [labelStartEvent, labelStopEvent].map(i => i.identifier);
@@ -23,9 +22,11 @@ describe('Cycle analytics utils', () => {
     });
 
     it('will return false for input that is not a start event', () => {
-      [stopEvents[0], {}, [], null, undefined].forEach(ev => {
-        expect(isStartEvent(ev)).toEqual(false);
-      });
+      [{ identifier: 'fake-event', canBeStartEvent: false }, {}, [], null, undefined].forEach(
+        ev => {
+          expect(isStartEvent(ev)).toEqual(false);
+        },
+      );
     });
   });
 
