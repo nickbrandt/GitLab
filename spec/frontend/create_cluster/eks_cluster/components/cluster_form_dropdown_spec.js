@@ -3,7 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import ClusterFormDropdown from '~/create_cluster/eks_cluster/components/cluster_form_dropdown.vue';
 import DropdownButton from '~/vue_shared/components/dropdown/dropdown_button.vue';
 import DropdownSearchInput from '~/vue_shared/components/dropdown/dropdown_search_input.vue';
-import DropdownHiddenInput from '~/vue_shared/components/dropdown/dropdown_hidden_input.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
 describe('ClusterFormDropdown', () => {
   let vm;
@@ -41,18 +41,16 @@ describe('ClusterFormDropdown', () => {
         .trigger('click');
     });
 
-    it('displays selected item label', () => {
-      expect(vm.find(DropdownButton).props('toggleText')).toEqual(secondItem.name);
-    });
-
-    it('sets selected value to dropdown hidden input', () => {
-      expect(vm.find(DropdownHiddenInput).props('value')).toEqual(secondItem.value.toString());
+    it('emits input event with selected item', () => {
+      expect(vm.emitted('input')[0]).toEqual([secondItem.value]);
     });
   });
 
   describe('when multiple items are selected', () => {
+    const value = [];
+
     beforeEach(() => {
-      vm.setProps({ items, multiple: true });
+      vm.setProps({ items, multiple: true, value });
       vm.findAll('.js-dropdown-item')
         .at(0)
         .trigger('click');
@@ -61,22 +59,32 @@ describe('ClusterFormDropdown', () => {
         .trigger('click');
     });
 
-    it('displays selected items labels', () => {
-      expect(vm.find(DropdownButton).props('toggleText')).toEqual(
-        `${firstItem.name}, ${secondItem.name}`,
-      );
+    it('emits input event with an array of selected items', () => {
+      expect(vm.emitted('input')[0]).toEqual([[firstItem.value, secondItem.value]]);
+    });
+  });
+
+  describe('when multiple items can be selected', () => {
+    beforeEach(() => {
+      vm.setProps({ items, multiple: true, value: firstItem.value });
+    });
+
+    it('displays a checked icon next to the item', () => {
+      expect(vm.find(Icon).is('.invisible')).toBe(false);
+      expect(vm.find(Icon).props('name')).toBe('mobile-issue-close');
     });
   });
 
   describe('when an item is selected and has a custom label property', () => {
     it('displays selected item custom label', () => {
       const labelProperty = 'customLabel';
-      const selectedItems = [{ [labelProperty]: 'Name' }];
+      const label = 'Name';
+      const currentValue = 1;
+      const customLabelItems = [{ [labelProperty]: label, value: currentValue }];
 
-      vm.setProps({ labelProperty });
-      vm.setData({ selectedItems });
+      vm.setProps({ labelProperty, items: customLabelItems, value: currentValue });
 
-      expect(vm.find(DropdownButton).props('toggleText')).toEqual(selectedItems[0][labelProperty]);
+      expect(vm.find(DropdownButton).props('toggleText')).toEqual(label);
     });
   });
 

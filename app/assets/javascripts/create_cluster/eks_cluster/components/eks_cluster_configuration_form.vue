@@ -378,7 +378,7 @@ export default {
       <cluster-form-dropdown
         field-id="eks-region"
         field-name="eks-region"
-        :input="selectedRegion"
+        :value="selectedRegion"
         :items="regions"
         :loading="isLoadingRegions"
         :loading-text="s__('ClusterIntegration|Loading Regions')"

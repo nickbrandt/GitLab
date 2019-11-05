@@ -571,7 +571,7 @@ describe('EksClusterConfigurationForm', () => {
   it('dispatches setNodeCount when node count input changes', () => {
     const nodeCount = 5;
 
-    findNodeCountInput().vm.$emit('input', 5);
+    findNodeCountInput().vm.$emit('input', nodeCount);
 
     expect(actions.setNodeCount).toHaveBeenCalledWith(expect.anything(), { nodeCount }, undefined);
   });

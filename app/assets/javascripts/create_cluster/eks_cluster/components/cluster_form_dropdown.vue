@@ -9,6 +9,8 @@ const matchItem = (valueProp, item, value) => item[valueProp] === value;
 const findItems = (valueProp, items, values) =>
   items.filter(item => values.some(value => matchItem(valueProp, item, value)));
 const itemsProp = (items, prop) => items.map(item => item[prop]);
+const defaultSearchFn = (searchQuery, labelProp) => item =>
+  item[labelProp].toLowerCase().indexOf(searchQuery) > -1;
 
 export default {
   components: {
@@ -101,12 +103,11 @@ export default {
     searchFn: {
       type: Function,
       required: false,
-      default: searchQuery => item => item.name.toLowerCase().indexOf(searchQuery) > -1,
+      default: defaultSearchFn,
     },
   },
   data() {
     return {
-      selectedItems: this.updateSelectedItems(),
       searchQuery: '',
     };
   },
@@ -131,7 +132,10 @@ export default {
         return [];
       }
 
-      return this.items.filter(this.searchFn(this.searchQuery));
+      return this.items.filter(this.searchFn(this.searchQuery, this.labelProperty));
+    },
+    selectedItems() {
+      return findItems(this.valueProperty, this.getItemsOrEmptyList(), toArray(this.value));
     },
     selectedItemsLabels() {
       return itemsProp(this.selectedItems, this.labelProperty).join(', ');
@@ -140,33 +144,25 @@ export default {
       return itemsProp(this.selectedItems, this.valueProperty).join(', ');
     },
   },
-  watch: {
-    value() {
-      this.selectedItems = this.updateSelectedItems();
-    },
-    items() {
-      this.selectedItems = this.updateSelectedItems();
-    },
-  },
   methods: {
-    updateSelectedItems() {
-      return findItems(this.valueProperty, this.getItemsOrEmptyList(), toArray(this.value));
-    },
     getItemsOrEmptyList() {
       return this.items || [];
     },
-    select(item) {
-      this.selectedItems = [item];
+    selectSingle(item) {
       this.$emit('input', item[this.valueProperty]);
     },
     selectMultiple(item) {
-      if (this.isSelected(item)) {
-        this.selectedItems.splice(this.selectedItems.indexOf(item), 1);
+      const value = toArray(this.value);
+      const itemValue = item[this.valueProperty];
+      const itemValueIndex = value.indexOf(itemValue);
+
+      if (itemValueIndex > -1) {
+        value.splice(itemValueIndex, 1);
       } else {
-        this.selectedItems.push(item);
+        value.push(itemValue);
       }
 
-      this.$emit('input', itemsProp(this.selectedItems, this.valueProperty));
+      this.$emit('input', value);
     },
     isSelected(item) {
       return this.selectedItems.includes(item);
@@ -205,7 +201,12 @@ export default {
                 />
                 <slot name="item" :item="item">{{ item.name }}</slot>
               </button>
-              <button v-else class="js-dropdown-item" type="button" @click.prevent="select(item)">
+              <button
+                v-else
+                class="js-dropdown-item"
+                type="button"
+                @click.prevent="selectSingle(item)"
+              >
                 <slot name="item" :item="item">{{ item.name }}</slot>
               </button>
             </li>
