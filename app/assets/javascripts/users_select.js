@@ -593,8 +593,8 @@ function UsersSelect(currentUser, els, options = {}) {
           placeholder: __('Search for a user'),
           multiple: $(select).hasClass('multiselect'),
           minimumInputLength: 0,
-          query(query) {
-            return this.users(query.term, options, users => {
+          query: query => {
+            this.users(query.term, options, users => {
               var anyUser, data, emailUser, index, len, name, nullUser, obj, ref;
               data = {
                 results: users,
@@ -645,17 +645,17 @@ function UsersSelect(currentUser, els, options = {}) {
               return query.callback(data);
             });
           },
-          initSelection() {
+          initSelection: () => {
             var args;
             args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
             return this.initSelection.apply(this, args);
           },
-          formatResult() {
+          formatResult: () => {
             var args;
             args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
             return this.formatResult.apply(this, args);
           },
-          formatSelection() {
+          formatSelection: () => {
             var args;
             args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
             return this.formatSelection.apply(this, args);
