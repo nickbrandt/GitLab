@@ -1517,6 +1517,9 @@ msgstr ""
 msgid "An error occurred when updating the issue weight"
 msgstr ""
 
+msgid "An error occurred while checking group path"
+msgstr ""
+
 msgid "An error occurred while deleting the approvers group"
 msgstr ""
 
@@ -1677,6 +1680,9 @@ msgid "An error occurred while updating approvers"
 msgstr ""
 
 msgid "An error occurred while updating the comment"
+msgstr ""
+
+msgid "An error occurred while validating group path"
 msgstr ""
 
 msgid "An error occurred while validating username"
@@ -3057,6 +3063,9 @@ msgid "Checking approval status"
 msgstr ""
 
 msgid "Checking branch availability..."
+msgstr ""
+
+msgid "Checking group path availability..."
 msgstr ""
 
 msgid "Checking username availability..."
@@ -8357,6 +8366,12 @@ msgid "Group overview"
 msgstr ""
 
 msgid "Group overview content"
+msgstr ""
+
+msgid "Group path is already taken. Suggestions: "
+msgstr ""
+
+msgid "Group path is available."
 msgstr ""
 
 msgid "Group pipeline minutes were successfully reset."
