@@ -2,10 +2,16 @@
 require 'spec_helper'
 
 describe API::ConanPackages do
+  let_it_be(:package) { create(:conan_package) }
+  let_it_be(:personal_access_token) { create(:personal_access_token) }
+  let_it_be(:user) { personal_access_token.user }
+  let(:project) { package.project }
+
   let(:base_secret) { SecureRandom.base64(64) }
-  let(:personal_access_token) { create(:personal_access_token) }
+  let(:auth_token) { personal_access_token.token }
+
   let(:headers) do
-    { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('foo', personal_access_token.token) }
+    { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('foo', auth_token) }
   end
 
   let(:jwt_secret) do
@@ -17,19 +23,9 @@ describe API::ConanPackages do
   end
 
   before do
+    project.add_developer(user)
     stub_licensed_features(packages: true)
     allow(Settings).to receive(:attr_encrypted_db_key_base).and_return(base_secret)
-  end
-
-  def build_jwt(personal_access_token, secret: jwt_secret, user_id: nil)
-    JSONWebToken::HMACToken.new(secret).tap do |jwt|
-      jwt['pat'] = personal_access_token.id
-      jwt['u'] = user_id || personal_access_token.user_id
-    end
-  end
-
-  def build_auth_headers(token)
-    { 'HTTP_AUTHORIZATION' => "Bearer #{token}" }
   end
 
   describe 'GET /api/v4/packages/conan/v1/ping' do
@@ -99,53 +95,66 @@ describe API::ConanPackages do
   end
 
   describe 'GET /api/v4/packages/conan/v1/conans/search' do
-    let(:project) { create(:project, :public) }
-    let(:package) { create(:conan_package, project: project) }
-
     before do
+      project.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+
       get api('/packages/conan/v1/conans/search'), headers: headers, params: params
     end
 
-    subject { JSON.parse(response.body)['results'] }
+    subject { json_response['results'] }
 
     context 'returns packages with a matching name' do
-      let(:params) { { q: package.name } }
+      let(:params) { { q: package.conan_recipe } }
 
-      it { is_expected.to contain_exactly(package.name) }
+      it { is_expected.to contain_exactly(package.conan_recipe) }
     end
 
     context 'returns packages using a * wildcard' do
-      let(:params) {{ q: "#{package.name[0, 3]}*" }}
+      let(:params) { { q: "#{package.name[0, 3]}*" } }
 
-      it { is_expected.to contain_exactly(package.name) }
+      it { is_expected.to contain_exactly(package.conan_recipe) }
     end
 
     context 'does not return non-matching packages' do
-      let(:params) {{ q: "foo" }}
+      let(:params) { { q: "foo" } }
 
       it { is_expected.to be_blank }
     end
   end
 
   describe 'GET /api/v4/packages/conan/v1/users/authenticate' do
-    it 'responds with 401 Unauthorized when invalid token is provided' do
-      headers = { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('foo', 'wrong-token') }
-      get api('/packages/conan/v1/users/authenticate'), headers: headers
+    subject { get api('/packages/conan/v1/users/authenticate'), headers: headers }
 
-      expect(response).to have_gitlab_http_status(401)
+    context 'when using invalid token' do
+      let(:auth_token) { 'invalid_token' }
+
+      it 'responds with 401' do
+        subject
+
+        expect(response).to have_gitlab_http_status(401)
+      end
     end
 
-    it 'responds with 200 OK and JWT when valid access token is provided' do
-      get api('/packages/conan/v1/users/authenticate'), headers: headers
+    context 'when valid JWT access token is provided' do
+      it 'responds with 200' do
+        subject
 
-      expect(response).to have_gitlab_http_status(200)
+        expect(response).to have_gitlab_http_status(200)
+      end
 
-      payload = JSONWebToken::HMACToken.decode(response.body, jwt_secret).first
-      expect(payload['pat']).to eq(personal_access_token.id)
-      expect(payload['u']).to eq(personal_access_token.user_id)
+      it 'token has valid validity time' do
+        Timecop.freeze do
+          subject
 
-      duration = payload['exp'] - payload['iat']
-      expect(duration).to eq(1.hour)
+          payload = JSONWebToken::HMACToken.decode(
+            response.body, jwt_secret).first
+          expect(payload['pat']).to eq(personal_access_token.id)
+          expect(payload['u']).to eq(personal_access_token.user_id)
+
+          duration = payload['exp'] - payload['iat']
+          expect(duration).to eq(1.hour)
+        end
+      end
     end
   end
 
@@ -163,9 +172,10 @@ describe API::ConanPackages do
     end
   end
 
-  shared_examples 'rejected invalid recipe' do
-    context 'with invalid recipe url' do
-      let(:recipe) { '../../foo++../..' }
+  shared_examples 'rejects invalid recipe' do
+    context 'with invalid recipe path' do
+      let(:recipe_path) { '../../foo++../..' }
+
       it 'returns 400' do
         subject
 
@@ -174,103 +184,295 @@ describe API::ConanPackages do
     end
   end
 
+  shared_examples 'rejects recipe for invalid project' do
+    context 'with invalid recipe path' do
+      let(:recipe_path) { 'aa/bb/not-existing-project/ccc' }
+
+      it 'returns forbidden' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+    end
+  end
+
+  shared_examples 'rejects recipe for not found package' do
+    context 'with invalid recipe path' do
+      let(:recipe_path) do
+        'aa/bb/%{project}/ccc' % { project: ::Packages::ConanMetadatum.package_username_from(full_path: project.full_path) }
+      end
+
+      it 'returns not found' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+  end
+
+  shared_examples 'empty recipe for not found package' do
+    context 'with invalid recipe url' do
+      let(:recipe_path) do
+        'aa/bb/%{project}/ccc' % { project: ::Packages::ConanMetadatum.package_username_from(full_path: project.full_path) }
+      end
+
+      it 'returns not found' do
+        allow(ConanPackagePresenter).to receive(:new)
+          .with(
+            'aa/bb@%{project}/ccc' % { project: ::Packages::ConanMetadatum.package_username_from(full_path: project.full_path) },
+            user,
+            project
+          ).and_return(presenter)
+        allow(presenter).to receive(:recipe_snapshot) { {} }
+        allow(presenter).to receive(:package_snapshot) { {} }
+
+        subject
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response.body).to eq("{}")
+      end
+    end
+  end
+
   context 'recipe endpoints' do
     let(:jwt) { build_jwt(personal_access_token) }
     let(:headers) { build_auth_headers(jwt.encoded) }
-    let(:recipe) { 'my-package-name/1.0/username/channel' }
+    let(:package_id) { '123456789' }
+    let(:presenter) { double('ConanPackagePresenter') }
 
-    describe 'GET /api/v4/packages/conan/v1/conans/*recipe' do
-      subject { get api("/packages/conan/v1/conans/#{recipe}"), headers: headers }
+    before do
+      allow(ConanPackagePresenter).to receive(:new)
+        .with(package.conan_recipe, user, package.project)
+        .and_return(presenter)
+    end
 
-      it_behaves_like 'rejected invalid recipe'
+    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel' do
+      let(:recipe_path) { package.conan_recipe_path }
 
-      it 'responds with an empty response' do
-        subject
+      subject { get api("/packages/conan/v1/conans/#{recipe_path}"), headers: headers }
 
-        expect(response.body).to be {}
+      it_behaves_like 'rejects invalid recipe'
+      it_behaves_like 'rejects recipe for invalid project'
+      it_behaves_like 'empty recipe for not found package'
+
+      context 'with existing package' do
+        it 'returns a hash of files with their md5 hashes' do
+          expected_response = {
+            'conanfile.py'      => 'md5hash1',
+            'conanmanifest.txt' => 'md5hash2'
+          }
+
+          allow(presenter).to receive(:recipe_snapshot) { expected_response }
+
+          subject
+
+          expect(json_response).to eq(expected_response)
+        end
       end
     end
 
-    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/digest' do
-      subject { get api("/packages/conan/v1/conans/#{recipe}/digest"), headers: headers }
+    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/packages/:package_id' do
+      let(:recipe_path) { package.conan_recipe_path }
 
-      it_behaves_like 'rejected invalid recipe'
+      subject { get api("/packages/conan/v1/conans/#{recipe_path}/packages/#{package_id}"), headers: headers }
 
-      it 'responds with a 404' do
-        subject
+      it_behaves_like 'rejects invalid recipe'
+      it_behaves_like 'rejects recipe for invalid project'
+      it_behaves_like 'empty recipe for not found package'
 
-        expect(response).to have_gitlab_http_status(404)
+      context 'with existing package' do
+        it 'returns a hash of md5 values for the files' do
+          expected_response = {
+            'conaninfo.txt'     => "md5hash1",
+            'conanmanifest.txt' => "md5hash2",
+            'conan_package.tgz' => "md5hash3"
+          }
+
+          allow(presenter).to receive(:package_snapshot) { expected_response }
+
+          subject
+
+          expect(json_response).to eq(expected_response)
+        end
       end
     end
 
-    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/upload_urls' do
+    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/digest' do
+      subject { get api("/packages/conan/v1/conans/#{recipe_path}/digest"), headers: headers }
+
+      it_behaves_like 'rejects invalid recipe'
+      it_behaves_like 'rejects recipe for invalid project'
+
+      context 'with existing package' do
+        let(:recipe_path) { package.conan_recipe_path }
+
+        it 'returns the download urls for each package file' do
+          expected_response = {
+            'conanfile.py'      => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanfile.py",
+            'conanmanifest.txt' => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanmanifest.txt"
+          }
+
+          allow(presenter).to receive(:recipe_urls) { expected_response }
+
+          subject
+
+          expect(json_response).to eq(expected_response)
+        end
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/packages/:package_id/digest' do
+      subject { get api("/packages/conan/v1/conans/#{recipe_path}/packages/#{package_id}/digest"), headers: headers }
+
+      it_behaves_like 'rejects invalid recipe'
+      it_behaves_like 'rejects recipe for invalid project'
+
+      context 'with existing package' do
+        let(:recipe_path) { package.conan_recipe_path }
+
+        it 'returns the download urls for the files' do
+          expected_response = {
+            'conaninfo.txt'     => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conaninfo.txt",
+            'conanmanifest.txt' => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conanmanifest.txt",
+            'conan_package.tgz' => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conan_package.tgz"
+          }
+
+          allow(presenter).to receive(:package_urls) { expected_response }
+
+          subject
+
+          expect(json_response).to eq(expected_response)
+        end
+      end
+    end
+
+    describe 'POST /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/upload_urls' do
+      let(:recipe_path) { package.conan_recipe_path }
+
       let(:params) do
         { "conanfile.py": 24,
           "conanmanifext.txt": 123 }
       end
-      subject { post api("/packages/conan/v1/conans/#{recipe}/upload_urls"), params: params, headers: headers }
 
-      it_behaves_like 'rejected invalid recipe'
+      subject { post api("/packages/conan/v1/conans/#{recipe_path}/upload_urls"), params: params, headers: headers }
+
+      it_behaves_like 'rejects invalid recipe'
 
       it 'returns a set of upload urls for the files requested' do
         subject
 
         expected_response = {
-          'conanfile.py':      "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/-/0/export/conanfile.py",
-          'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/-/0/export/conanmanifest.txt"
+          'conanfile.py':      "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanfile.py",
+          'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanmanifest.txt"
         }
 
-        expect(response.body).to eq expected_response.to_json
+        expect(response.body).to eq(expected_response.to_json)
       end
     end
 
-    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/packages/:package_id' do
-      subject { get api("/packages/conan/v1/conans/#{recipe}/packages/123456789"), headers: headers }
+    describe 'POST /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/packages/:package_id/upload_urls' do
+      let(:recipe_path) { package.conan_recipe_path }
 
-      it_behaves_like 'rejected invalid recipe'
-
-      it 'responds with an empty response' do
-        subject
-
-        expect(response.body).to be {}
-      end
-    end
-
-    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/packages/:package_id/digest' do
-      subject { get api("/packages/conan/v1/conans/#{recipe}/packages/123456789/digest"), headers: headers }
-
-      it_behaves_like 'rejected invalid recipe'
-
-      it 'responds with a 404' do
-        subject
-
-        expect(response).to have_gitlab_http_status(404)
-      end
-    end
-
-    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/packages/:package_id/upload_urls' do
       let(:params) do
         { "conaninfo.txt": 24,
           "conanmanifext.txt": 123,
           "conan_package.tgz": 523 }
       end
 
-      context 'valid recipe' do
-        subject { post api("/packages/conan/v1/conans/#{recipe}/packages/123456789/upload_urls"), params: params, headers: headers }
+      subject { post api("/packages/conan/v1/conans/#{recipe_path}/packages/123456789/upload_urls"), params: params, headers: headers }
 
-        it_behaves_like 'rejected invalid recipe'
+      it_behaves_like 'rejects invalid recipe'
 
-        it 'returns a set of upload urls for the files requested' do
-          expected_response = {
-            'conaninfo.txt':     "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/-/0/package/123456789/0/conaninfo.txt",
-            'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/-/0/package/123456789/0/conanmanifest.txt",
-            'conan_package.tgz': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/-/0/package/123456789/0/conan_package.tgz"
-          }
+      it 'returns a set of upload urls for the files requested' do
+        expected_response = {
+          'conaninfo.txt':     "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conaninfo.txt",
+          'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conanmanifest.txt",
+          'conan_package.tgz': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conan_package.tgz"
+        }
+
+        subject
+
+        expect(response.body).to eq(expected_response.to_json)
+      end
+    end
+  end
+
+  context 'file endpoints' do
+    let(:jwt) { build_jwt(personal_access_token) }
+    let(:headers) { build_auth_headers(jwt.encoded) }
+    let(:package_file_tgz) { package.package_files.find_by(file_type: 'tgz') }
+    let(:metadata) { package_file_tgz.conan_file_metadatum }
+
+    describe 'GET /api/v4/packages/conan/v1/files/:package_name/package_version/:package_username/:package_channel/
+:recipe_revision/export/:file_name' do
+      let(:recipe_path) { package.conan_recipe_path }
+
+      subject do
+        get api("/packages/conan/v1/files/#{recipe_path}/#{metadata.recipe_revision}/export/#{file_name}"),
+            headers: headers
+      end
+
+      context 'invalid file' do
+        let(:file_name) { 'badfile.txt' }
+
+        it 'returns 404 not found' do
           subject
 
-          expect(response.body).to eq expected_response.to_json
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+
+      context 'valid file' do
+        let(:file_name) { package_file_tgz.file_name }
+
+        it 'returns forbidden' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
     end
+
+    describe 'GET /api/v4/packages/conan/v1/files/:package_name/package_version/:package_username/:package_channel/
+:recipe_revision/package/:conan_package_reference/:package_revision/:file_name' do
+      let(:recipe_path) { package.conan_recipe_path }
+
+      subject do
+        get api("/packages/conan/v1/files/#{recipe_path}/#{metadata.recipe_revision}/package/" \
+              "#{metadata.conan_package_reference}/#{metadata.package_revision}/#{file_name}"),
+            headers: headers
+      end
+
+      context 'invalid file' do
+        let(:file_name) { 'badfile.txt' }
+
+        it 'returns 404 not found' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+
+      context 'valid file' do
+        let(:file_name) { package_file_tgz.file_name }
+
+        it 'returns forbidden' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+    end
+  end
+
+  def build_jwt(personal_access_token, secret: jwt_secret, user_id: nil)
+    JSONWebToken::HMACToken.new(secret).tap do |jwt|
+      jwt['pat'] = personal_access_token.id
+      jwt['u'] = user_id || personal_access_token.user_id
+    end
+  end
+
+  def build_auth_headers(token)
+    { 'HTTP_AUTHORIZATION' => "Bearer #{token}" }
   end
 end

@@ -808,6 +808,28 @@ module EE
         end
       end
 
+      module ConanPackage
+        class ConanPackageManifest < Grape::Entity
+          expose :package_urls, merge: true
+        end
+
+        class ConanPackageSnapshot < Grape::Entity
+          expose :package_snapshot, merge: true
+        end
+
+        class ConanRecipeManifest < Grape::Entity
+          expose :recipe_urls, merge: true
+        end
+
+        class ConanRecipeSnapshot < Grape::Entity
+          expose :recipe_snapshot, merge: true
+        end
+
+        class ConanUploadUrls < Grape::Entity
+          expose :upload_urls, merge: true
+        end
+      end
+
       class NpmPackage < Grape::Entity
         expose :name
         expose :versions
