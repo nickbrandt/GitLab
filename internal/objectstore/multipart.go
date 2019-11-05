@@ -156,16 +156,7 @@ func (m *Multipart) complete(cmu *CompleteMultipartUpload) error {
 
 	m.extractETag(result.ETag)
 
-	return m.verifyETag(cmu)
-}
-
-func (m *Multipart) verifyETag(cmu *CompleteMultipartUpload) error {
-	expectedChecksum, err := cmu.BuildMultipartUploadETag()
-	if err != nil {
-		return err
-	}
-
-	return compareMD5(expectedChecksum, m.etag)
+	return nil
 }
 
 func (m *Multipart) readAndUploadOnePart(partURL string, putHeaders map[string]string, src io.Reader, partNumber int) (*completeMultipartUploadPart, error) {

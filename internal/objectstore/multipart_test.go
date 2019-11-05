@@ -2,7 +2,6 @@ package objectstore_test
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -36,12 +35,10 @@ func TestMultipartUploadWithUpcaseETags(t *testing.T) {
 
 		// POST with CompleteMultipartUpload request
 		if r.Method == "POST" {
-			expectedETag := "6e6b164c392b04bfbb82368179d9ade2-1"
-			completeBody := fmt.Sprintf(`<CompleteMultipartUploadResult>
-                                                       <Bucket>test-bucket</Bucket>
-			                               <ETag>%s</ETag>
-  	                                             </CompleteMultipartUploadResult>`,
-				strings.ToUpper(expectedETag))
+			completeBody := `<CompleteMultipartUploadResult>
+			                   <Bucket>test-bucket</Bucket>
+			                   <ETag>No Longer Checked</ETag>
+			                 </CompleteMultipartUploadResult>`
 			postCnt++
 
 			w.Write([]byte(completeBody))
