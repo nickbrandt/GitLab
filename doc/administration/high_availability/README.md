@@ -196,32 +196,38 @@ separately:
 
 ## Reference Architecture Examples
 
-These reference architecture examples rely on the general rule that approximately 2 requests per second (RPS) of load is generated for every 100 users.
+The Support and Quality departments built, performance tested, and validated
+environments that support:
+1. [About 10,000 users.](#10000-user-configuration)
+1. [About 25,000 users.](#25000-user-configuration)
+1. [About 50,000 users.](#50000-user-configuration)
+
+The specifications below are a representation of the work so far. These may be
+adjusted in the future based on additional testing and iteration.
 
 The specifications here were performance tested against a specific coded
-workload. Your exact needs may be more, depending on your workload. Your
-workload is influenced by factors such as - but not limited to - how active your
-users are, how much automation you use, mirroring, and repo/change size.
+workload. These reference architecture examples rely on the general rule that
+approximately 2 requests per second (RPS) of load is generated for every 100
+users. Your exact needs may be more, depending on your workload. Your workload
+is influenced by factors such as - but not limited to - how active your users
+are, how much automation you use, mirroring, and repo/change size.
+
+While validating the reference architectures, slow API endpoints were
+discovered. For details, see the related issues list in
+[this issue](https://gitlab.com/gitlab-org/quality/performance/issues/125).
 
 ### 10,000 User Configuration
 
 - **Supported Users (approximate):** 10,000
 - **RPS:** 200 requests per second
-- **Known Issues:** While validating the reference architecture, slow API endpoints
-  were discovered. For details, see the related issues list in
-  [this issue](https://gitlab.com/gitlab-org/gitlab-foss/issues/64335).
 
-The Support and Quality teams built, performance tested, and validated an
-environment that supports about 10,000 users. The specifications below are a
-representation of the work so far. The specifications may be adjusted in the
-future based on additional testing and iteration.
 
 | Service                       | Configuration           | GCP type       |
 | ------------------------------|-------------------------|----------------|
 | 3 GitLab Rails <br> - Puma workers on each node set to 90% of available CPUs with 16 threads | 32 vCPU, 28.8GB Memory | n1-highcpu-32 |
 | 3 PostgreSQL                  | 4 vCPU, 15GB Memory     | n1-standard-4  |
 | 1 PgBouncer                   | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
-| X Gitaly[^1] <br> - Gitaly Ruby workers on each node set to 90% of available CPUs with 16 threads | 16 vCPU, 60GB Memory   | n1-standard-16 |
+| X Gitaly[^1] <br> - Gitaly Ruby workers on each node set to 90% of available CPUs with 16 threads | 16 vCPU, 60GB Memory | n1-standard-16 |
 | 3 Redis Cache + Sentinel <br> - Cache maxmemory set to 90% of available memory | 4 vCPU, 15GB Memory | n1-standard-4 |
 | 3 Redis Persistent + Sentinel | 4 vCPU, 15GB Memory     | n1-standard-4  |
 | 4 Sidekiq                     | 4 vCPU, 15GB Memory     | n1-standard-4  |
@@ -234,28 +240,14 @@ future based on additional testing and iteration.
 
 - **Supported Users (approximate):** 25,000
 - **RPS:** 500 requests per second
-- **Known Issues:** The slow API endpoints that were discovered during testing
-  the 10,000 user architecture also affect the 25,000 user architecture. For
-  details, see the related issues list in
-  [this issue](https://gitlab.com/gitlab-org/gitlab-foss/issues/64335).
 
-The GitLab Support and Quality teams built, performance tested, and validated an
-environment that supports around 25,000 users. The specifications below are a
-representation of the work so far. The specifications may be adjusted in the
-future based on additional testing and iteration.
-
-NOTE: **Note:** The specifications here were performance tested against a
-specific coded workload. Your exact needs may be more, depending on your
-workload. Your workload is influenced by factors such as - but not limited to -
-how active your users are, how much automation you use, mirroring, and
-repo/change size.
 
 | Service                       | Configuration           | GCP type       |
 | ------------------------------|-------------------------|----------------|
 | 7 GitLab Rails <br> - Puma workers on each node set to 90% of available CPUs with 16 threads | 32 vCPU, 28.8GB Memory | n1-highcpu-32 |
 | 3 PostgreSQL                  | 8 vCPU, 30GB Memory     | n1-standard-8  |
 | 1 PgBouncer                   | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
-| X Gitaly[^1] <br> - Gitaly Ruby workers on each node set to 90% of available CPUs with 16 threads | 32 vCPU, 120GB Memory   | n1-standard-32 |
+| X Gitaly[^1] <br> - Gitaly Ruby workers on each node set to 90% of available CPUs with 16 threads | 32 vCPU, 120GB Memory | n1-standard-32 |
 | 3 Redis Cache + Sentinel <br> - Cache maxmemory set to 90% of available memory | 4 vCPU, 15GB Memory | n1-standard-4 |
 | 3 Redis Persistent + Sentinel | 4 vCPU, 15GB Memory     | n1-standard-4  |
 | 4 Sidekiq                     | 4 vCPU, 15GB Memory     | n1-standard-4  |
@@ -268,29 +260,22 @@ repo/change size.
 
 - **Supported Users (approximate):** 50,000
 - **RPS:** 1,000 requests per second
-- **Status:** Work-in-progress
-- **Related Issue:** See the [related issue](https://gitlab.com/gitlab-org/quality/performance/issues/66) for more information.
 
-The Support and Quality teams are in the process of building and performance
-testing an environment that will support around 50,000 users. The specifications
-below are a very rough work-in-progress representation of the work so far. The
-Quality team will be certifying this environment in late 2019. The
-specifications may be adjusted prior to certification based on performance
-testing.
 
 | Service                       | Configuration           | GCP type       |
 | ------------------------------|-------------------------|----------------|
 | 15 GitLab Rails <br> - Puma workers on each node set to 90% of available CPUs with 16 threads | 32 vCPU, 28.8GB Memory | n1-highcpu-32 |
 | 3 PostgreSQL                  | 8 vCPU, 30GB Memory     | n1-standard-8  |
-| 1 PgBouncer                   | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
-| X Gitaly[^1] <br> - Gitaly Ruby workers on each node set to 90% of available CPUs with 16 threads | 64 vCPU, 240GB Memory   | n1-standard-64 |
+| 3 PgBouncer                   | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
+| X Gitaly[^1] <br> - Gitaly Ruby workers on each node set to 90% of available CPUs with 16 threads | 64 vCPU, 240GB Memory | n1-standard-64 |
 | 3 Redis Cache + Sentinel <br> - Cache maxmemory set to 90% of available memory | 4 vCPU, 15GB Memory | n1-standard-4 |
 | 3 Redis Persistent + Sentinel | 4 vCPU, 15GB Memory     | n1-standard-4  |
 | 4 Sidekiq                     | 4 vCPU, 15GB Memory     | n1-standard-4  |
 | 3 Consul                      | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
-| 1 NFS Server                  | 16 vCPU, 14.4GB Memory  | n1-highcpu-16  |
+| 1 NFS Server                  | 4 vCPU, 3.6GB Memory    | n1-highcpu-4   |
 | 1 Monitoring node             | 4 CPU, 3.6GB Memory     | n1-highcpu-4   |
-| 1 Load Balancing node[^2] .   | 2 vCPU, 1.8GB Memory    | n1-highcpu-2   |
+| 1 External Load Balancing node[^2] . | 2 vCPU, 1.8GB Memory | n1-highcpu-2 |
+| 1 Internal Load Balancing node[^2] . | 8 vCPU, 7.2GB Memory | n1-highcpu-8 |
 
 [^1]: Gitaly node requirements are dependent on customer data. We recommend 2
       nodes as an absolute minimum for performance at the 10,000 and 25,000 user
