@@ -5,7 +5,9 @@ module EE
     def lock_file_link(project = @project, path = @path, html_options: {})
       return unless project.feature_available?(:file_locks)
       return unless current_user
-      return if path.blank?
+      # Always render the link if `vue_file_list` is enabled, the link will be hidden
+      # by the vue app if the path was blank
+      return if path.blank? && !vue_file_list_enabled?
 
       path_lock = project.find_path_lock(path, downstream: true)
 

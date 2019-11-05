@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe API::MergeRequests do
@@ -775,6 +777,8 @@ describe API::MergeRequests do
       expect(json_response['merge_error']).to eq(merge_request.merge_error)
       expect(json_response['user']['can_merge']).to be_truthy
       expect(json_response).not_to include('rebase_in_progress')
+      expect(json_response['has_conflicts']).to be_falsy
+      expect(json_response['blocking_discussions_resolved']).to be_truthy
     end
 
     it 'exposes description and title html when render_html is true' do
@@ -921,7 +925,7 @@ describe API::MergeRequests do
                allow_collaboration: true)
       end
 
-      it 'includes the `allow_collaboration` field' do
+      it 'includes the `allow_collaboration` field', :sidekiq_might_not_need_inline do
         get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}", user)
 
         expect(json_response['allow_collaboration']).to be_truthy
@@ -1406,7 +1410,7 @@ describe API::MergeRequests do
         expect(response).to have_gitlab_http_status(400)
       end
 
-      it 'allows setting `allow_collaboration`' do
+      it 'allows setting `allow_collaboration`', :sidekiq_might_not_need_inline do
         post api("/projects/#{forked_project.id}/merge_requests", user2),
              params: { title: 'Test merge_request', source_branch: "feature_conflict", target_branch: "master", author: user2, target_project_id: project.id, allow_collaboration: true }
         expect(response).to have_gitlab_http_status(201)
@@ -1438,7 +1442,7 @@ describe API::MergeRequests do
         end
       end
 
-      it "returns 201 when target_branch is specified and for the same project" do
+      it "returns 201 when target_branch is specified and for the same project", :sidekiq_might_not_need_inline do
         post api("/projects/#{forked_project.id}/merge_requests", user2),
         params: { title: 'Test merge_request', target_branch: 'master', source_branch: 'markdown', author: user2, target_project_id: forked_project.id }
         expect(response).to have_gitlab_http_status(201)
@@ -1736,6 +1740,38 @@ describe API::MergeRequests do
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['state']).to eq('closed')
         expect(json_response['force_remove_source_branch']).to be_truthy
+      end
+
+      context 'with a merge request across forks' do
+        let(:fork_owner) { create(:user) }
+        let(:source_project) { fork_project(project, fork_owner) }
+        let(:target_project) { project }
+
+        let(:merge_request) do
+          create(:merge_request,
+                 source_project: source_project,
+                 target_project: target_project,
+                 source_branch: 'fixes',
+                 merge_params: { 'force_remove_source_branch' => false })
+        end
+
+        it 'is true for an authorized user' do
+          put api("/projects/#{target_project.id}/merge_requests/#{merge_request.iid}", fork_owner), params: { state_event: 'close', remove_source_branch: true }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['state']).to eq('closed')
+          expect(json_response['force_remove_source_branch']).to be true
+        end
+
+        it 'is false for an unauthorized user' do
+          expect do
+            put api("/projects/#{target_project.id}/merge_requests/#{merge_request.iid}", target_project.owner), params: { state_event: 'close', remove_source_branch: true }
+          end.not_to change { merge_request.reload.merge_params }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['state']).to eq('closed')
+          expect(json_response['force_remove_source_branch']).to be false
+        end
       end
     end
 
@@ -2119,6 +2155,16 @@ describe API::MergeRequests do
       end
 
       expect(response).to have_gitlab_http_status(409)
+    end
+
+    it "returns 409 if rebase can't lock the row" do
+      allow_any_instance_of(MergeRequest).to receive(:with_lock).and_raise(ActiveRecord::LockWaitTimeout)
+      expect(RebaseWorker).not_to receive(:perform_async)
+
+      put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/rebase", user)
+
+      expect(response).to have_gitlab_http_status(409)
+      expect(json_response['message']).to eq(MergeRequest::REBASE_LOCK_MESSAGE)
     end
   end
 

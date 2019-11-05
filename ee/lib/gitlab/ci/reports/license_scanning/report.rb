@@ -33,6 +33,28 @@ module Gitlab
             found_licenses[license.canonical_id] ||= license
           end
 
+          def by_license_name(name)
+            licenses.find { |license| license.name == name }
+          end
+
+          def merge_dependencies_info!(dependencies_with_licenses)
+            return if found_licenses.empty?
+
+            found_licenses.values.each do |license|
+              matched_dependencies = dependencies_with_licenses.select do |dependency|
+                dependency[:licenses].map { |l| l[:name] }.include?(license.name)
+              end
+
+              matched_dependencies.each do |dependency|
+                license_dependency = license.dependencies.find { |l_dependency| l_dependency.name == dependency[:name] }
+
+                next unless license_dependency
+
+                license_dependency.path = dependency.dig(:location, :blob_path)
+              end
+            end
+          end
+
           def violates?(software_license_policies)
             policies_with_matching_license_name = software_license_policies.blacklisted.with_license_by_name(license_names)
             policies_with_matching_spdx_id = software_license_policies.blacklisted.by_spdx(licenses.map(&:id).compact)

@@ -57,4 +57,41 @@ describe Gitlab::Ci::Reports::DependencyList::Report do
       end
     end
   end
+
+  describe '#dependencies_with_licenses' do
+    subject { report.dependencies_with_licenses }
+
+    context 'with found dependencies' do
+      let(:plain_dependency) { build :dependency }
+
+      before do
+        report.add_dependency(plain_dependency)
+      end
+
+      context 'with existing license' do
+        let(:dependency) { build :dependency, :with_licenses }
+
+        before do
+          report.add_dependency(dependency)
+        end
+
+        it 'returns only dependency with license' do
+          expect(subject.size).to eq(1)
+          expect(subject.first).to eq(dependency)
+        end
+      end
+
+      context 'without existing license' do
+        it 'returns empty array' do
+          expect(subject).to be_empty
+        end
+      end
+    end
+
+    context 'without found dependencies' do
+      it 'returns empty array' do
+        expect(subject).to be_empty
+      end
+    end
+  end
 end

@@ -132,6 +132,17 @@ describe('getters', () => {
           'License Compliance detected 2 new licenses',
         );
       });
+
+      it('should be `License Compliance detected 2 new licenses; approval required`, if the report has two elements and including some blacklisted', () => {
+        const mockGetters = {
+          licenseReport: [licenseReportMock[0], licenseReportMock[0]],
+          reportContainsBlacklistedLicense: true,
+        };
+
+        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
+          'License Compliance detected 2 new licenses; approval required',
+        );
+      });
     });
 
     describe('when there are no licences on the BASE', () => {
@@ -162,6 +173,38 @@ describe('getters', () => {
           'License Compliance detected 2 licenses for the source branch only',
         );
       });
+
+      it('should be `License Compliance detected 2 licenses for the source branch only; approval required` with two new licences including some blacklisted', () => {
+        const mockGetters = {
+          licenseReport: [licenseReportMock[0], licenseReportMock[0]],
+          reportContainsBlacklistedLicense: true,
+        };
+
+        expect(getters.licenseSummaryText(state, mockGetters)).toBe(
+          'License Compliance detected 2 licenses for the source branch only; approval required',
+        );
+      });
+    });
+  });
+
+  describe('reportContainsBlacklistedLicense', () => {
+    it('should be false if the report does not contain blacklisted licenses', () => {
+      const mockGetters = {
+        licenseReport: [licenseReportMock[0], licenseReportMock[0]],
+      };
+
+      expect(getters.reportContainsBlacklistedLicense(state, mockGetters)).toBe(false);
+    });
+
+    it('should be true if the report contains blacklisted licenses', () => {
+      const mockGetters = {
+        licenseReport: [
+          licenseReportMock[0],
+          { ...licenseReportMock[0], approvalStatus: 'blacklisted' },
+        ],
+      };
+
+      expect(getters.reportContainsBlacklistedLicense(state, mockGetters)).toBe(true);
     });
   });
 });

@@ -34,6 +34,7 @@ import {
   pathIndeterminateErrorMap,
   addRelatedIssueErrorMap,
   issuableTypesMap,
+  PathIdSeparator,
 } from '../constants';
 
 export default {
@@ -79,7 +80,7 @@ export default {
     pathIdSeparator: {
       type: String,
       required: false,
-      default: '#',
+      default: PathIdSeparator.Issue,
     },
     cssClass: {
       type: String,
@@ -148,11 +149,11 @@ export default {
             // Close the form on submission
             this.isFormVisible = false;
           })
-          .catch(res => {
+          .catch(({ response }) => {
             this.isSubmitting = false;
             let errorMessage = addRelatedIssueErrorMap[this.issuableType];
-            if (res.data && res.data.message) {
-              errorMessage = res.data.message;
+            if (response && response.data && response.data.message) {
+              errorMessage = response.data.message;
             }
             Flash(errorMessage);
           });

@@ -110,6 +110,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     namespace :security do
       resource :dashboard, only: [:show], controller: :dashboard
+      resources :vulnerable_projects, only: [:index]
       # We have to define both legacy and new routes for Vulnerability Findings
       # because they are loaded upon application initialization and preloaded by
       # web server.

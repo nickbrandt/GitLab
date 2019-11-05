@@ -7,6 +7,7 @@ describe Analytics::CycleAnalytics::Stages::UpdateService do
   let_it_be(:user, refind: true) { create(:user) }
   let(:default_stages) { Gitlab::Analytics::CycleAnalytics::DefaultStages.all }
   let(:params) { {} }
+  let(:persisted_stages) { group.reload.cycle_analytics_stages.ordered }
 
   subject { described_class.new(parent: group, params: params, current_user: user).execute }
 
@@ -41,8 +42,6 @@ describe Analytics::CycleAnalytics::Stages::UpdateService do
     end
 
     context 'when the first update happens on a default stage' do
-      let(:persisted_stages) { group.reload.cycle_analytics_stages }
-
       it { expect(subject).to be_success }
 
       it 'persists all default stages' do
@@ -110,6 +109,65 @@ describe Analytics::CycleAnalytics::Stages::UpdateService do
       it { expect(subject).to be_error }
       it { expect(subject.http_status).to eq(:unprocessable_entity) }
       it { expect(subject.payload[:errors].keys).to eq([:name]) }
+    end
+  end
+
+  context 'when positioning a stage' do
+    let!(:first_stage) { create(:cycle_analytics_group_stage, group: group, relative_position: 10) }
+    let!(:middle_stage) { create(:cycle_analytics_group_stage, group: group, relative_position: 11) }
+    let!(:last_stage) { create(:cycle_analytics_group_stage, group: group, relative_position: 12) }
+
+    context 'when moving the stage down' do
+      before do
+        params[:id] = first_stage.id
+        params[:move_after_id] = last_stage.id
+      end
+
+      it 'changes the stage positions correctly' do
+        subject
+
+        expect(persisted_stages.last(3)).to eq([middle_stage, last_stage, first_stage])
+      end
+    end
+
+    context 'when moving the stage to the middle' do
+      before do
+        params[:id] = last_stage.id
+        params[:move_before_id] = middle_stage.id
+      end
+
+      it 'changes the stage positions correctly' do
+        subject
+
+        expect(persisted_stages.last(3)).to eq([first_stage, last_stage, middle_stage])
+      end
+    end
+
+    context 'when bogus `move_before_id` is given' do
+      before do
+        params[:id] = last_stage.id
+        params[:move_before_id] = -1
+      end
+
+      it { expect { subject }.to raise_error(ActiveRecord::RecordNotFound) }
+    end
+
+    context 'when bogus `move_after_id` is given' do
+      before do
+        params[:id] = last_stage.id
+        params[:move_after_id] = -1
+      end
+
+      it { expect { subject }.to raise_error(ActiveRecord::RecordNotFound) }
+    end
+
+    context 'when `move_before_id` points to a stage within a different group' do
+      before do
+        params[:id] = last_stage.id
+        params[:move_before_id] = create(:cycle_analytics_group_stage, group: create(:group)).id
+      end
+
+      it { expect { subject }.to raise_error(ActiveRecord::RecordNotFound) }
     end
   end
 end

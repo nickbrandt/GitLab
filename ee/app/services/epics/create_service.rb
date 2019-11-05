@@ -20,7 +20,17 @@ module Epics
     end
 
     def whitelisted_epic_params
-      params.slice(:title, :description, :start_date, :end_date, :milestone, :label_ids, :parent_id)
+      result = params.slice(:title, :description, :label_ids, :parent_id)
+
+      if params[:start_date_fixed] && params[:start_date_is_fixed]
+        result[:start_date] = params[:start_date_fixed]
+      end
+
+      if params[:due_date_fixed] && params[:due_date_is_fixed]
+        result[:end_date] = params[:due_date_fixed]
+      end
+
+      result
     end
   end
 end

@@ -79,6 +79,11 @@ export default {
       required: false,
       default: false,
     },
+    featureDisabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     hasHelpInfo() {
@@ -121,9 +126,9 @@ export default {
 </script>
 
 <template>
-  <div class="prepend-top-15 prepend-left-10 node-detail-item">
+  <div v-if="!featureDisabled" class="prepend-top-15 prepend-left-10 node-detail-item">
     <div class="node-detail-title">
-      <span> {{ itemTitle }} </span>
+      <span>{{ itemTitle }}</span>
       <icon
         v-if="hasHelpInfo"
         v-popover="popoverConfig"

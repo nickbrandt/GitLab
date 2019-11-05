@@ -23,6 +23,10 @@ module Gitlab
               dependency[:licenses].push(name: license.name, url: license.url)
             end
           end
+
+          def dependencies_with_licenses
+            dependencies.select { |dependency| dependency[:licenses].any? }
+          end
         end
       end
     end

@@ -183,7 +183,7 @@ sudo make prefix=/usr/local install
 # When editing config/gitlab.yml (Step 5), change the git -> bin_path to /usr/local/bin/git
 ```
 
-For the [Custom Favicon](../customization/favicon.md) to work, GraphicsMagick
+For the [Custom Favicon](../user/admin_area/appearance.md#favicon) to work, GraphicsMagick
 needs to be installed.
 
 ```sh
@@ -448,7 +448,7 @@ sudo -u git -H mkdir -p public/uploads/
 # now that files in public/uploads are served by gitlab-workhorse
 sudo chmod 0700 public/uploads
 
-# Change the permissions of the directory where CI job traces are stored
+# Change the permissions of the directory where CI job logs are stored
 sudo chmod -R u+rwX builds/
 
 # Change the permissions of the directory where CI artifacts are stored

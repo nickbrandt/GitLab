@@ -17,6 +17,7 @@ export default {
 
     state.name = response.name;
     state.description = response.description;
+    state.iid = response.iid;
     state.scopes = mapToScopesViewModel(response.scopes);
   },
   [types.RECEIVE_FEATURE_FLAG_ERROR](state) {

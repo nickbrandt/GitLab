@@ -23,6 +23,13 @@ describe PrometheusAlert do
     end
   end
 
+  describe 'operators' do
+    it 'contains the correct equality operator' do
+      expect(described_class::OPERATORS_MAP.values).to include('==')
+      expect(described_class::OPERATORS_MAP.values).not_to include('=')
+    end
+  end
+
   describe 'associations' do
     it { is_expected.to belong_to(:project).required }
     it { is_expected.to belong_to(:environment).required }

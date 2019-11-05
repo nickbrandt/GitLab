@@ -3,11 +3,11 @@
 module ApplicationSettingsHelper
   extend self
 
-  delegate  :allow_signup?,
-            :gravatar_enabled?,
-            :password_authentication_enabled_for_web?,
-            :akismet_enabled?,
-            to: :'Gitlab::CurrentSettings.current_application_settings'
+  delegate :allow_signup?,
+           :gravatar_enabled?,
+           :password_authentication_enabled_for_web?,
+           :akismet_enabled?,
+           to: :'Gitlab::CurrentSettings.current_application_settings'
 
   def user_oauth_applications?
     Gitlab::CurrentSettings.user_oauth_applications
@@ -290,7 +290,12 @@ module ApplicationSettingsHelper
       :snowplow_cookie_domain,
       :snowplow_enabled,
       :snowplow_site_id,
-      :push_event_hooks_limit
+      :snowplow_iglu_registry_url,
+      :push_event_hooks_limit,
+      :push_event_activities_limit,
+      :custom_http_clone_url_root,
+      :pendo_enabled,
+      :pendo_url
     ]
   end
 
@@ -308,6 +313,10 @@ module ApplicationSettingsHelper
 
   def expanded_by_default?
     Rails.env.test?
+  end
+
+  def integration_expanded?(substring)
+    @application_setting.errors.any? { |k| k.to_s.start_with?(substring) }
   end
 
   def instance_clusters_enabled?

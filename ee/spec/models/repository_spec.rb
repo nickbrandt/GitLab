@@ -83,7 +83,7 @@ describe Repository do
     end
 
     describe "class method find_commits_by_message_with_elastic" do
-      it "returns commits" do
+      it "returns commits", :sidekiq_might_not_need_inline do
         project = create :project, :repository
         project1 = create :project, :repository
 
@@ -99,7 +99,7 @@ describe Repository do
     end
 
     describe "find_commits_by_message_with_elastic" do
-      it "returns commits" do
+      it "returns commits", :sidekiq_might_not_need_inline do
         project = create :project, :repository
 
         project.repository.index_commits_and_blobs

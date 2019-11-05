@@ -9,6 +9,9 @@ module EE
         mount_mutation ::Mutations::DesignManagement::Upload, calls_gitaly: true
         mount_mutation ::Mutations::DesignManagement::Delete, calls_gitaly: true
         mount_mutation ::Mutations::EpicTree::Reorder
+        mount_mutation ::Mutations::Epics::Update
+        mount_mutation ::Mutations::Epics::Create
+        mount_mutation ::Mutations::Epics::SetSubscription
       end
     end
   end

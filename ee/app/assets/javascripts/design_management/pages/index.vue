@@ -83,7 +83,7 @@ export default {
     onUploadDesign(files) {
       if (!this.canCreateDesign) return null;
 
-      if (files.length >= MAXIMUM_FILE_UPLOAD_LIMIT) {
+      if (files.length > MAXIMUM_FILE_UPLOAD_LIMIT) {
         createFlash(
           sprintf(
             s__(
@@ -113,6 +113,10 @@ export default {
           baseSha: '',
           startSha: '',
           headSha: '',
+        },
+        discussions: {
+          __typename: 'DesignDiscussion',
+          edges: [],
         },
         versions: {
           __typename: 'DesignVersionConnection',

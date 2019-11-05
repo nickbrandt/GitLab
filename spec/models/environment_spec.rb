@@ -259,7 +259,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
     let(:head_commit)   { project.commit }
     let(:commit)        { project.commit.parent }
 
-    it 'returns deployment id for the environment' do
+    it 'returns deployment id for the environment', :sidekiq_might_not_need_inline do
       expect(environment.first_deployment_for(commit.id)).to eq deployment1
     end
 
@@ -267,7 +267,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
       expect(environment.first_deployment_for(head_commit.id)).to eq nil
     end
 
-    it 'returns a UTF-8 ref' do
+    it 'returns a UTF-8 ref', :sidekiq_might_not_need_inline do
       expect(environment.first_deployment_for(commit.id).ref).to be_utf8
     end
   end
@@ -515,6 +515,48 @@ describe Environment, :use_clean_rails_memory_store_caching do
     end
   end
 
+  describe '#last_visible_deployment' do
+    subject { environment.last_visible_deployment }
+
+    before do
+      allow_any_instance_of(Deployment).to receive(:create_ref)
+    end
+
+    context 'when there is an old deployment record' do
+      let!(:previous_deployment) { create(:deployment, :success, environment: environment) }
+
+      context 'when there is a deployment record with created status' do
+        let!(:deployment) { create(:deployment, environment: environment) }
+
+        it { is_expected.to eq(previous_deployment) }
+      end
+
+      context 'when there is a deployment record with running status' do
+        let!(:deployment) { create(:deployment, :running, environment: environment) }
+
+        it { is_expected.to eq(deployment) }
+      end
+
+      context 'when there is a deployment record with success status' do
+        let!(:deployment) { create(:deployment, :success, environment: environment) }
+
+        it { is_expected.to eq(deployment) }
+      end
+
+      context 'when there is a deployment record with failed status' do
+        let!(:deployment) { create(:deployment, :failed, environment: environment) }
+
+        it { is_expected.to eq(deployment) }
+      end
+
+      context 'when there is a deployment record with canceled status' do
+        let!(:deployment) { create(:deployment, :canceled, environment: environment) }
+
+        it { is_expected.to eq(deployment) }
+      end
+    end
+  end
+
   describe '#has_terminals?' do
     subject { environment.has_terminals? }
 
@@ -722,6 +764,51 @@ describe Environment, :use_clean_rails_memory_store_caching do
       before do
         allow(environment).to receive(:has_metrics?).and_return(false)
       end
+
+      it { is_expected.to be_nil }
+    end
+  end
+
+  describe '#prometheus_status' do
+    context 'when a cluster is present' do
+      context 'when a deployment platform is present' do
+        let(:cluster) { create(:cluster, :provided_by_user, :project) }
+        let(:environment) { create(:environment, project: cluster.project) }
+
+        subject { environment.prometheus_status }
+
+        context 'when the prometheus application status is :updating' do
+          let!(:prometheus) { create(:clusters_applications_prometheus, :updating, cluster: cluster) }
+
+          it { is_expected.to eq(:updating) }
+        end
+
+        context 'when the prometheus application state is :updated' do
+          let!(:prometheus) { create(:clusters_applications_prometheus, :updated, cluster: cluster) }
+
+          it { is_expected.to eq(:updated) }
+        end
+
+        context 'when the prometheus application is not installed' do
+          it { is_expected.to be_nil }
+        end
+      end
+
+      context 'when a deployment platform is not present' do
+        let(:cluster) { create(:cluster, :project) }
+        let(:environment) { create(:environment, project: cluster.project) }
+
+        subject { environment.prometheus_status }
+
+        it { is_expected.to be_nil }
+      end
+    end
+
+    context 'when a cluster is not present' do
+      let(:project) { create(:project, :stubbed_repository) }
+      let(:environment) { create(:environment, project: project) }
+
+      subject { environment.prometheus_status }
 
       it { is_expected.to be_nil }
     end

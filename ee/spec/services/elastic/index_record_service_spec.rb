@@ -78,8 +78,32 @@ describe Elastic::IndexRecordService, :elastic do
       end
       Gitlab::Elastic::Helper.refresh_index
 
-      ## All database objects + data from repository. The absolute value does not matter
-      expect(Elasticsearch::Model.search('*').total_count).to be > 40
+      # Fetch all child documents
+      children = Elasticsearch::Model.search(
+        size: 100,
+        query: {
+          has_parent: {
+            parent_type: 'project',
+            query: {
+              term: { id: project.id }
+            }
+          }
+        }
+      )
+
+      # The absolute value does not matter
+      expect(children.total_count).to be > 40
+
+      # Make sure all types are present
+      expect(children.pluck(:_source).pluck(:type).uniq).to contain_exactly(
+        'blob',
+        'commit',
+        'issue',
+        'merge_request',
+        'milestone',
+        'note',
+        'snippet'
+      )
     end
 
     it 'does not index records not associated with the project' do
@@ -295,5 +319,51 @@ describe Elastic::IndexRecordService, :elastic do
     end
 
     expect(Project.elastic_search('project_1').present?).to eq(false)
+  end
+
+  context 'when updating an Issue' do
+    context 'when changing the confidential value' do
+      it 'updates issue notes excluding system notes' do
+        issue = nil
+        Sidekiq::Testing.disable! do
+          issue = create(:issue, confidential: false)
+          subject.execute(issue.project, true)
+          subject.execute(issue, false)
+          create(:note, note: 'the_normal_note', noteable: issue, project: issue.project)
+          create(:note, note: 'the_system_note', system: true, noteable: issue, project: issue.project)
+        end
+
+        options = { project_ids: [issue.project.id] }
+
+        Sidekiq::Testing.inline! do
+          expect(subject.execute(issue, false, 'changed_fields' => ['confidential'])).to eq(true)
+          Gitlab::Elastic::Helper.refresh_index
+        end
+
+        expect(Note.elastic_search('the_normal_note', options: options).present?).to eq(true)
+        expect(Note.elastic_search('the_system_note', options: options).present?).to eq(false)
+      end
+    end
+
+    context 'when changing the title' do
+      it 'does not update issue notes' do
+        issue = nil
+        Sidekiq::Testing.disable! do
+          issue = create(:issue, confidential: false)
+          subject.execute(issue.project, true)
+          subject.execute(issue, false)
+          create(:note, note: 'the_normal_note', noteable: issue, project: issue.project)
+        end
+
+        options = { project_ids: [issue.project.id] }
+
+        Sidekiq::Testing.inline! do
+          expect(subject.execute(issue, false, 'changed_fields' => ['title'])).to eq(true)
+          Gitlab::Elastic::Helper.refresh_index
+        end
+
+        expect(Note.elastic_search('the_normal_note', options: options).present?).to eq(false)
+      end
+    end
   end
 end

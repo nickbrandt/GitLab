@@ -38,9 +38,12 @@ module Gitlab
 
       IMPORTED_OBJECT_MAX_RETRIES = 5.freeze
 
-      EXISTING_OBJECT_CHECK = %i[milestone milestones label labels project_label project_labels group_label group_labels project_feature merge_request].freeze
+      EXISTING_OBJECT_CHECK = %i[milestone milestones label labels project_label project_labels group_label group_labels project_feature merge_request ProjectCiCdSetting].freeze
 
       TOKEN_RESET_MODELS = %i[Project Namespace Ci::Trigger Ci::Build Ci::Runner ProjectHook].freeze
+
+      # This represents all relations that have unique key on `project_id`
+      UNIQUE_RELATIONS = %i[project_feature ProjectCiCdSetting].freeze
 
       def self.create(*args)
         new(*args).create
@@ -274,7 +277,7 @@ module Gitlab
       end
 
       def setup_pipeline
-        @relation_hash.fetch('stages').each do |stage|
+        @relation_hash.fetch('stages', []).each do |stage|
           stage.statuses.each do |status|
             status.pipeline = imported_object
           end
@@ -292,7 +295,13 @@ module Gitlab
 
             existing_object
           else
-            relation_class.new(parsed_relation_hash)
+            # Because of single-type inheritance, we need to be careful to use the `type` field
+            # See https://gitlab.com/gitlab-org/gitlab/issues/34860#note_235321497
+            inheritance_column = relation_class.try(:inheritance_column)
+            inheritance_attributes = parsed_relation_hash.slice(inheritance_column)
+            object = relation_class.new(inheritance_attributes)
+            object.assign_attributes(parsed_relation_hash)
+            object
           end
         end
       end
@@ -318,7 +327,8 @@ module Gitlab
       end
 
       def find_or_create_object!
-        return relation_class.find_or_create_by(project_id: @project.id) if @relation_name == :project_feature
+        return relation_class.find_or_create_by(project_id: @project.id) if UNIQUE_RELATIONS.include?(@relation_name)
+
         return find_or_create_merge_request! if @relation_name == :merge_request
 
         # Can't use IDs as validation exists calling `group` or `project` attributes

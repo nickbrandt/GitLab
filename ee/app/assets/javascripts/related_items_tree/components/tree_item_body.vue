@@ -42,7 +42,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(['childrenFlags']),
+    ...mapState(['childrenFlags', 'userSignedIn']),
     itemReference() {
       return this.item.reference;
     },
@@ -88,6 +88,9 @@ export default {
         this.childrenFlags[this.itemReference].itemRemoveInProgress
       );
     },
+    showEmptySpacer() {
+      return !this.parentItem.userPermissions.adminEpic && this.userSignedIn;
+    },
   },
   methods: {
     ...mapActions(['setRemoveItemModalProps']),
@@ -105,7 +108,10 @@ export default {
 
 <template>
   <div class="card card-slim sortable-row flex-grow-1">
-    <div class="item-body card-body d-flex align-items-center p-2 p-xl-1 pl-xl-3">
+    <div
+      class="item-body card-body d-flex align-items-center p-2 pl-xl-3"
+      :class="{ 'p-xl-1': userSignedIn, 'item-logged-out pt-xl-2 pb-xl-2': !userSignedIn }"
+    >
       <div class="item-contents d-flex align-items-center flex-wrap flex-grow-1 flex-xl-nowrap">
         <div class="item-title d-flex align-items-center mb-1 mb-xl-0">
           <icon
@@ -158,30 +164,30 @@ export default {
             >{{ item.pathIdSeparator }}{{ itemId }}
           </div>
           <div
-            class="item-meta-child d-flex align-items-center order-0 flex-wrap mr-md-1 ml-md-auto ml-xl-2 flex-xl-nowrap"
+            class="item-meta-child d-flex align-items-center order-0 flex-wrap mr-md-1 ml-md-auto ml-xl-2 mt-2 mt-md-0 flex-xl-nowrap"
           >
             <item-milestone
               v-if="hasMilestone"
               :milestone="item.milestone"
-              class="d-flex align-items-center item-milestone"
+              class="d-flex align-items-center item-milestone mr-2 mr-md-0"
             />
             <item-due-date
               v-if="item.dueDate"
               :date="item.dueDate"
               tooltip-placement="top"
-              css-class="item-due-date d-flex align-items-center ml-2 mr-0"
+              css-class="item-due-date d-flex align-items-center ml-0 mr-2 ml-md-2 ml-sm-0 mr-sm-0"
             />
             <item-weight
               v-if="item.weight"
               :weight="item.weight"
-              class="item-weight d-flex align-items-center ml-2 mr-0"
+              class="item-weight d-flex align-items-center ml-2 mr-0 ml-md-2"
               tag-name="span"
             />
           </div>
           <item-assignees
             v-if="hasAssignees"
             :assignees="item.assignees"
-            class="item-assignees d-inline-flex align-items-center align-self-end ml-auto ml-md-0 mb-md-0 order-2 flex-xl-grow-0 mt-xl-0 mr-xl-1"
+            class="item-assignees d-inline-flex align-items-center align-self-end ml-0 ml-md-2 mt-2 mt-md-0 mt-xl-0 mr-xl-1 mb-md-0 order-2 flex-xl-grow-0"
           />
         </div>
         <gl-button
@@ -195,7 +201,7 @@ export default {
         >
           <icon :size="16" name="close" class="btn-item-remove-icon" />
         </gl-button>
-        <span v-if="!parentItem.userPermissions.adminEpic" class="p-3"></span>
+        <span v-if="showEmptySpacer" class="p-3"></span>
       </div>
     </div>
   </div>

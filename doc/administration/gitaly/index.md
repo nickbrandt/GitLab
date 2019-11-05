@@ -86,7 +86,8 @@ Below we describe how to configure two Gitaly servers one at
 `gitaly1.internal` and the other at `gitaly2.internal`
 with secret token `abc123secret`. We assume
 your GitLab installation has three repository storages: `default`,
-`storage1` and `storage2`.
+`storage1` and `storage2`. You can use as little as just one server with one
+repository storage if desired.
 
 ### 1. Installation
 
@@ -129,7 +130,7 @@ Configure a token on the instance that runs the GitLab Rails application.
 Next, on the Gitaly servers, you need to configure storage paths, enable
 the network listener and configure the token.
 
-NOTE: **Note:** if you want to reduce the risk of downtime when you enable
+NOTE: **Note:** If you want to reduce the risk of downtime when you enable
 authentication you can temporarily disable enforcement, see [the
 documentation on configuring Gitaly
 authentication](https://gitlab.com/gitlab-org/gitaly/blob/master/doc/configuration/README.md#authentication)
@@ -140,11 +141,6 @@ the GitLab Shell secret must be the same between the other GitLab servers and
 the Gitaly server. The easiest way to accomplish this is to copy `/etc/gitlab/gitlab-secrets.json`
 from an existing GitLab server to the Gitaly server. Without this shared secret,
 Git operations in GitLab will result in an API error.
-
-NOTE: **Note:**
-In most or all cases, the storage paths below end in `/repositories` which is
-not the case with `path` in `git_data_dirs` of Omnibus GitLab installations.
-Check the directory layout on your Gitaly server to be sure.
 
 **For Omnibus GitLab**
 
@@ -177,39 +173,40 @@ Check the directory layout on your Gitaly server to be sure.
    # Don't forget to copy `/etc/gitlab/gitlab-secrets.json` from web server to Gitaly server.
    gitlab_rails['internal_api_url'] = 'https://gitlab.example.com'
 
-   # Make Gitaly accept connections on all network interfaces. You must use
-   # firewalls to restrict access to this address/port.
-   gitaly['listen_addr'] = "0.0.0.0:8075"
+   # Authentication token to ensure only authorized servers can communicate with
+   # Gitaly server
    gitaly['auth_token'] = 'abc123secret'
 
-   # To use TLS for Gitaly you need to add
-   gitaly['tls_listen_addr'] = "0.0.0.0:9999"
-   gitaly['certificate_path'] = "path/to/cert.pem"
-   gitaly['key_path'] = "path/to/key.pem"
+   # Make Gitaly accept connections on all network interfaces. You must use
+   # firewalls to restrict access to this address/port.
+   # Comment out following line if you only want to support TLS connections
+   gitaly['listen_addr'] = "0.0.0.0:8075"
    ```
 
 1. Append the following to `/etc/gitlab/gitlab.rb` for each respective server:
 
-   For `gitaly1.internal`:
+   On `gitaly1.internal`:
 
    ```
-   gitaly['storage'] = [
-     { 'name' => 'default' },
-     { 'name' => 'storage1' },
-   ]
+   git_data_dirs({
+     'default' => {
+       'path' => '/var/opt/gitlab/git-data'
+     },
+     'storage1' => {
+       'path' => '/mnt/gitlab/git-data'
+     },
+   })
    ```
 
-   For `gitaly2.internal`:
+   On `gitaly2.internal`:
 
    ```
-   gitaly['storage'] = [
-     { 'name' => 'storage2' },
-   ]
+   git_data_dirs({
+     'storage2' => {
+       'path' => '/srv/gitlab/git-data'
+     },
+   })
    ```
-
-   NOTE: **Note:**
-   In some cases, you'll have to set `path` for `gitaly['storage']` in the
-   format `'path' => '/mnt/gitlab/<storage name>/repositories'`.
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
@@ -219,38 +216,37 @@ Check the directory layout on your Gitaly server to be sure.
 
    ```toml
    listen_addr = '0.0.0.0:8075'
-   tls_listen_addr = '0.0.0.0:9999'
-
-   [tls]
-   certificate_path = /path/to/cert.pem
-   key_path = /path/to/key.pem
 
    [auth]
    token = 'abc123secret'
+
+   [logging]
+   format = 'json'
+   level = 'info'
+   dir = '/var/log/gitaly'
    ```
 
 1. Append the following to `/home/git/gitaly/config.toml` for each respective server:
 
-   For `gitaly1.internal`:
+   On `gitaly1.internal`:
 
    ```toml
    [[storage]]
    name = 'default'
+   path = '/var/opt/gitlab/git-data/repositories'
 
    [[storage]]
    name = 'storage1'
+   path = '/mnt/gitlab/git-data/repositories'
    ```
 
-   For `gitaly2.internal`:
+   On `gitaly2.internal`:
 
    ```toml
    [[storage]]
    name = 'storage2'
+   path = '/srv/gitlab/git-data/repositories'
    ```
-
-   NOTE: **Note:**
-   In some cases, you'll have to set `path` for each `[[storage]]` in the
-   format `path = '/mnt/gitlab/<storage name>/repositories'`.
 
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source).
 
@@ -332,6 +328,8 @@ When you tail the Gitaly logs on your Gitaly server you should see requests
 coming in. One sure way to trigger a Gitaly request is to clone a repository
 from your GitLab server over HTTP.
 
+DANGER: **Danger:** If you have [custom server-side Git hooks](../custom_hooks.md#custom-server-side-git-hooks) configured, either per repository or globally, you must move these to the Gitaly node. If you have multiple Gitaly nodes, copy your custom hook(s) to all nodes.
+
 ### Disabling the Gitaly service in a cluster environment
 
 If you are running Gitaly [as a remote
@@ -369,11 +367,12 @@ To disable Gitaly on a client node:
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/22602) in GitLab 11.8.
 
 Gitaly supports TLS encryption. To be able to communicate
-with a Gitaly instance that listens for secure connections you will need to use `tls://` url
+with a Gitaly instance that listens for secure connections you will need to use `tls://` URL
 scheme in the `gitaly_address` of the corresponding storage entry in the GitLab configuration.
 
 You will need to bring your own certificates as this isn't provided automatically.
-The certificate to be used needs to be installed on all Gitaly nodes and on all
+The certificate to be used needs to be installed on all Gitaly nodes, and the
+certificate (or CA of certificate) on all
 client nodes that communicate with it following the procedure described in
 [GitLab custom certificate configuration](https://docs.gitlab.com/omnibus/settings/ssl.html#install-custom-public-certificates).
 
@@ -395,7 +394,7 @@ To configure Gitaly with TLS:
 
 **For Omnibus GitLab**
 
-1. On the client nodes, edit `/etc/gitlab/gitlab.rb`:
+1. On the client node(s), edit `/etc/gitlab/gitlab.rb` as follows:
 
    ```ruby
    git_data_dirs({
@@ -407,20 +406,38 @@ To configure Gitaly with TLS:
    gitlab_rails['gitaly_token'] = 'abc123secret'
    ```
 
-1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
-1. On the Gitaly server nodes, edit `/etc/gitlab/gitlab.rb`:
+1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on client node(s).
+1. Create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
+
+   ```sh
+   sudo mkdir -p /etc/gitlab/ssl
+   sudo chmod 700 /etc/gitlab/ssl
+   sudo cp key.pem cert.pem /etc/gitlab/ssl/
+   ```
+
+1. On the Gitaly server node(s), edit `/etc/gitlab/gitlab.rb` and add:
+
+   <!--
+   updates to following example must also be made at
+   https://gitlab.com/gitlab-org/charts/gitlab/blob/master/doc/advanced/external-gitaly/external-omnibus-gitaly.md#configure-omnibus-gitlab
+   -->
 
    ```ruby
    gitaly['tls_listen_addr'] = "0.0.0.0:9999"
-   gitaly['certificate_path'] = "path/to/cert.pem"
-   gitaly['key_path'] = "path/to/key.pem"
+   gitaly['certificate_path'] = "/etc/gitlab/ssl/cert.pem"
+   gitaly['key_path'] = "/etc/gitlab/ssl/key.pem"
    ```
 
-1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
+1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on Gitaly server node(s).
+1. (Optional) After [verifying that all Gitaly traffic is being served over TLS](#observe-type-of-gitaly-connections),
+   you can improve security by disabling non-TLS connections by commenting out
+   or deleting `gitaly['listen_addr']` in `/etc/gitlab/gitlab.rb`, saving the file,
+   and [reconfiguring GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure)
+   on Gitaly server node(s).
 
 **For installations from source**
 
-1. On the client nodes, edit `/home/git/gitlab/config/gitlab.yml`:
+1. On the client node(s), edit `/home/git/gitlab/config/gitlab.yml` as follows:
 
    ```yaml
    gitlab:
@@ -445,18 +462,33 @@ To configure Gitaly with TLS:
    data will be stored in this folder. This will no longer be necessary after
    [this issue](https://gitlab.com/gitlab-org/gitaly/issues/1282) is resolved.
 
-1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source).
-1. On the Gitaly server nodes, edit `/home/git/gitaly/config.toml`:
+1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) on client node(s).
+1. Create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
+
+   ```sh
+   sudo mkdir -p /etc/gitlab/ssl
+   sudo chmod 700 /etc/gitlab/ssl
+   sudo cp key.pem cert.pem /etc/gitlab/ssl/
+   ```
+
+1. On the Gitaly server node(s), edit `/home/git/gitaly/config.toml` and add:
 
    ```toml
    tls_listen_addr = '0.0.0.0:9999'
 
    [tls]
-   certificate_path = '/path/to/cert.pem'
-   key_path = '/path/to/key.pem'
+   certificate_path = '/etc/gitlab/ssl/cert.pem'
+   key_path = '/etc/gitlab/ssl/key.pem'
    ```
 
-1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source).
+1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) on Gitaly server node(s).
+1. (Optional) After [verifying that all Gitaly traffic is being served over TLS](#observe-type-of-gitaly-connections),
+   you can improve security by disabling non-TLS connections by commenting out
+   or deleting `listen_addr` in `/home/git/gitaly/config.toml`, saving the file,
+   and [restarting GitLab](../restart_gitlab.md#installations-from-source)
+   on Gitaly server node(s).
+
+### Observe type of Gitaly connections
 
 To observe what type of connections are actually being used in a
 production environment you can use the following Prometheus query:
@@ -520,8 +552,8 @@ a few things that you need to do:
 1. Configure [database lookup of SSH keys](../operations/fast_ssh_key_lookup.md)
    to eliminate the need for a shared authorized_keys file.
 1. Configure [object storage for job artifacts](../job_artifacts.md#using-object-storage)
-   including [live tracing](../job_traces.md#new-live-trace-architecture).
-1. Configure [object storage for LFS objects](../../workflow/lfs/lfs_administration.md#storing-lfs-objects-in-remote-object-storage).
+   including [incremental logging](../job_logs.md#new-incremental-logging-architecture).
+1. Configure [object storage for LFS objects](../lfs/lfs_administration.md#storing-lfs-objects-in-remote-object-storage).
 1. Configure [object storage for uploads](../uploads.md#using-object-storage-core-only).
 
 NOTE: **Note:**

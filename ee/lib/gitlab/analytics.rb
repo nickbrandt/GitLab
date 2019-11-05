@@ -15,8 +15,13 @@ module Gitlab
       TASKS_BY_TYPE_CHART_FEATURE_FLAG
     ].freeze
 
+    FEATURE_FLAG_DEFAULTS = {
+      PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => true,
+      CYCLE_ANALYTICS_FEATURE_FLAG => true
+    }.freeze
+
     def self.any_features_enabled?
-      FEATURE_FLAGS.any? { |flag| Feature.enabled?(flag) }
+      FEATURE_FLAGS.any? { |flag| Feature.enabled?(flag, default_enabled: feature_enabled_by_default?(flag)) }
     end
 
     def self.code_analytics_enabled?
@@ -24,11 +29,19 @@ module Gitlab
     end
 
     def self.cycle_analytics_enabled?
-      Feature.enabled?(CYCLE_ANALYTICS_FEATURE_FLAG)
+      feature_enabled?(CYCLE_ANALYTICS_FEATURE_FLAG)
     end
 
     def self.productivity_analytics_enabled?
-      Feature.enabled?(PRODUCTIVITY_ANALYTICS_FEATURE_FLAG)
+      feature_enabled?(PRODUCTIVITY_ANALYTICS_FEATURE_FLAG)
+    end
+
+    def self.feature_enabled_by_default?(flag)
+      !!FEATURE_FLAG_DEFAULTS[flag]
+    end
+
+    def self.feature_enabled?(feature)
+      Feature.enabled?(feature, default_enabled: feature_enabled_by_default?(feature))
     end
   end
 end

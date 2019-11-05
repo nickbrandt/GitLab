@@ -631,8 +631,38 @@ describe Project do
   describe "#web_url" do
     let(:project) { create(:project, path: "somewhere") }
 
-    it 'returns the full web URL for this repo' do
-      expect(project.web_url).to eq("#{Gitlab.config.gitlab.url}/#{project.namespace.full_path}/somewhere")
+    context 'when given the only_path option' do
+      subject { project.web_url(only_path: only_path) }
+
+      context 'when only_path is false' do
+        let(:only_path) { false }
+
+        it 'returns the full web URL for this repo' do
+          expect(subject).to eq("#{Gitlab.config.gitlab.url}/#{project.namespace.full_path}/somewhere")
+        end
+      end
+
+      context 'when only_path is true' do
+        let(:only_path) { true }
+
+        it 'returns the relative web URL for this repo' do
+          expect(subject).to eq("/#{project.namespace.full_path}/somewhere")
+        end
+      end
+
+      context 'when only_path is nil' do
+        let(:only_path) { nil }
+
+        it 'returns the full web URL for this repo' do
+          expect(subject).to eq("#{Gitlab.config.gitlab.url}/#{project.namespace.full_path}/somewhere")
+        end
+      end
+    end
+
+    context 'when not given the only_path option' do
+      it 'returns the full web URL for this repo' do
+        expect(project.web_url).to eq("#{Gitlab.config.gitlab.url}/#{project.namespace.full_path}/somewhere")
+      end
     end
   end
 
@@ -3226,20 +3256,78 @@ describe Project do
   describe '#http_url_to_repo' do
     let(:project) { create(:project) }
 
-    it 'returns the url to the repo without a username' do
-      expect(project.http_url_to_repo).to eq("#{project.web_url}.git")
-      expect(project.http_url_to_repo).not_to include('@')
+    context 'when a custom HTTP clone URL root is not set' do
+      it 'returns the url to the repo without a username' do
+        expect(project.http_url_to_repo).to eq("#{project.web_url}.git")
+        expect(project.http_url_to_repo).not_to include('@')
+      end
+    end
+
+    context 'when a custom HTTP clone URL root is set' do
+      before do
+        stub_application_setting(custom_http_clone_url_root: custom_http_clone_url_root)
+      end
+
+      context 'when custom HTTP clone URL root has a relative URL root' do
+        context 'when custom HTTP clone URL root ends with a slash' do
+          let(:custom_http_clone_url_root) { 'https://git.example.com:51234/mygitlab/' }
+
+          it 'returns the url to the repo, with the root replaced with the custom one' do
+            expect(project.http_url_to_repo).to eq("https://git.example.com:51234/mygitlab/#{project.full_path}.git")
+          end
+        end
+
+        context 'when custom HTTP clone URL root does not end with a slash' do
+          let(:custom_http_clone_url_root) { 'https://git.example.com:51234/mygitlab' }
+
+          it 'returns the url to the repo, with the root replaced with the custom one' do
+            expect(project.http_url_to_repo).to eq("https://git.example.com:51234/mygitlab/#{project.full_path}.git")
+          end
+        end
+      end
+
+      context 'when custom HTTP clone URL root does not have a relative URL root' do
+        context 'when custom HTTP clone URL root ends with a slash' do
+          let(:custom_http_clone_url_root) { 'https://git.example.com:51234/' }
+
+          it 'returns the url to the repo, with the root replaced with the custom one' do
+            expect(project.http_url_to_repo).to eq("https://git.example.com:51234/#{project.full_path}.git")
+          end
+        end
+
+        context 'when custom HTTP clone URL root does not end with a slash' do
+          let(:custom_http_clone_url_root) { 'https://git.example.com:51234' }
+
+          it 'returns the url to the repo, with the root replaced with the custom one' do
+            expect(project.http_url_to_repo).to eq("https://git.example.com:51234/#{project.full_path}.git")
+          end
+        end
+      end
     end
   end
 
   describe '#lfs_http_url_to_repo' do
     let(:project) { create(:project) }
 
-    it 'returns the url to the repo without a username' do
-      lfs_http_url_to_repo = project.lfs_http_url_to_repo('operation_that_doesnt_matter')
+    context 'when a custom HTTP clone URL root is not set' do
+      it 'returns the url to the repo without a username' do
+        lfs_http_url_to_repo = project.lfs_http_url_to_repo('operation_that_doesnt_matter')
 
-      expect(lfs_http_url_to_repo).to eq("#{project.web_url}.git")
-      expect(lfs_http_url_to_repo).not_to include('@')
+        expect(lfs_http_url_to_repo).to eq("#{project.web_url}.git")
+        expect(lfs_http_url_to_repo).not_to include('@')
+      end
+    end
+
+    context 'when a custom HTTP clone URL root is set' do
+      before do
+        stub_application_setting(custom_http_clone_url_root: 'https://git.example.com:51234')
+      end
+
+      it 'returns the url to the repo, with the root replaced with the custom one' do
+        lfs_http_url_to_repo = project.lfs_http_url_to_repo('operation_that_doesnt_matter')
+
+        expect(lfs_http_url_to_repo).to eq("https://git.example.com:51234/#{project.full_path}.git")
+      end
     end
   end
 
@@ -3251,22 +3339,6 @@ describe Project do
 
     it 'hase a loaded pipeline status' do
       expect(project.pipeline_status).to be_loaded
-    end
-  end
-
-  describe '#append_or_update_attribute' do
-    let(:project) { create(:project) }
-
-    it 'shows full error updating an invalid MR' do
-      expect { project.append_or_update_attribute(:merge_requests, [create(:merge_request)]) }
-        .to raise_error(ActiveRecord::RecordInvalid, /Failed to set merge_requests:/)
-    end
-
-    it 'updates the project successfully' do
-      merge_request = create(:merge_request, target_project: project, source_project: project)
-
-      expect { project.append_or_update_attribute(:merge_requests, [merge_request]) }
-        .not_to raise_error
     end
   end
 
@@ -3328,7 +3400,7 @@ describe Project do
     end
   end
 
-  describe '.ids_with_milestone_available_for' do
+  describe '.ids_with_issuables_available_for' do
     let!(:user) { create(:user) }
 
     it 'returns project ids with milestones available for user' do
@@ -3338,7 +3410,7 @@ describe Project do
       project_4 = create(:project, :public)
       project_4.project_feature.update(issues_access_level: ProjectFeature::PRIVATE, merge_requests_access_level: ProjectFeature::PRIVATE )
 
-      project_ids = described_class.ids_with_milestone_available_for(user).pluck(:id)
+      project_ids = described_class.ids_with_issuables_available_for(user).pluck(:id)
 
       expect(project_ids).to include(project_2.id, project_3.id)
       expect(project_ids).not_to include(project_1.id, project_4.id)
@@ -4196,22 +4268,25 @@ describe Project do
 
   describe '#check_repository_path_availability' do
     let(:project) { build(:project, :repository, :legacy_storage) }
-    subject { project.check_repository_path_availability }
 
     context 'when the repository already exists' do
       let(:project) { create(:project, :repository, :legacy_storage) }
 
-      it { is_expected.to be_falsey }
+      it 'returns false when repository already exists' do
+        expect(project.check_repository_path_availability).to be_falsey
+      end
     end
 
     context 'when the repository does not exist' do
-      it { is_expected.to be_truthy }
+      it 'returns false when repository already exists' do
+        expect(project.check_repository_path_availability).to be_truthy
+      end
 
       it 'skips gitlab-shell exists?' do
         project.skip_disk_validation = true
 
         expect(project.gitlab_shell).not_to receive(:repository_exists?)
-        is_expected.to be_truthy
+        expect(project.check_repository_path_availability).to be_truthy
       end
     end
   end
@@ -4350,6 +4425,14 @@ describe Project do
       project = create(:project_empty_repo)
 
       expect { project.write_repository_config }.not_to raise_error
+    end
+  end
+
+  describe '#to_ability_name' do
+    it 'returns project' do
+      project = build(:project_empty_repo)
+
+      expect(project.to_ability_name).to eq('project')
     end
   end
 
@@ -4535,7 +4618,7 @@ describe Project do
     end
 
     describe '#any_branch_allows_collaboration?' do
-      it 'allows access when there are merge requests open allowing collaboration' do
+      it 'allows access when there are merge requests open allowing collaboration', :sidekiq_might_not_need_inline do
         expect(project.any_branch_allows_collaboration?(user))
           .to be_truthy
       end
@@ -4549,7 +4632,7 @@ describe Project do
     end
 
     describe '#branch_allows_collaboration?' do
-      it 'allows access if the user can merge the merge request' do
+      it 'allows access if the user can merge the merge request', :sidekiq_might_not_need_inline do
         expect(project.branch_allows_collaboration?(user, 'awesome-feature-1'))
           .to be_truthy
       end
@@ -4926,6 +5009,7 @@ describe Project do
 
   describe '#git_objects_poolable?' do
     subject { project }
+
     context 'when not using hashed storage' do
       let(:project) { create(:project, :legacy_storage, :public, :repository) }
 

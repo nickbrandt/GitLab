@@ -44,6 +44,7 @@ describe('Feature flags Edit Module Mutations', () => {
       name: '*',
       description: 'All environments',
       scopes: [{ id: 1 }],
+      iid: 5,
     };
 
     beforeEach(() => {
@@ -68,6 +69,10 @@ describe('Feature flags Edit Module Mutations', () => {
 
     it('should set scope with the provided one', () => {
       expect(stateCopy.scope).toEqual(data.scope);
+    });
+
+    it('should set the iid to the provided one', () => {
+      expect(stateCopy.iid).toEqual(data.iid);
     });
   });
 

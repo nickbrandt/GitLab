@@ -33,6 +33,8 @@ class TodosFinder
   end
 
   def execute
+    return Todo.none if current_user.nil?
+
     items = current_user.todos
     items = by_action_id(items)
     items = by_action(items)
@@ -180,19 +182,15 @@ class TodosFinder
   end
 
   def by_group(items)
-    if group?
-      items.for_group_and_descendants(group)
-    else
-      items
-    end
+    return items unless group?
+
+    items.for_group_ids_and_descendants(params[:group_id])
   end
 
   def by_state(items)
-    if params[:state].to_s == 'done'
-      items.done
-    else
-      items.pending
-    end
+    return items.pending if params[:state].blank?
+
+    items.with_states(params[:state])
   end
 
   def by_type(items)

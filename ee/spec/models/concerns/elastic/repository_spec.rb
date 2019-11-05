@@ -28,8 +28,16 @@ describe Repository, :elastic do
     project = create :project, :repository
     index!(project)
 
+    # Finds custom-highlighting/test.gitlab-custom
     expect(project.repository.search('def | popen filename:test')[:blobs][:total_count]).to eq(1)
+
+    # Should not find anything, since filename doesn't match on path
+    expect(project.repository.search('def | popen filename:files')[:blobs][:total_count]).to eq(0)
+
+    # Finds files/ruby/popen.rb, files/markdown/ruby-style-guide.md, files/ruby/regex.rb, files/ruby/version_info.rb
     expect(project.repository.search('def | popen path:ruby')[:blobs][:total_count]).to eq(4)
+
+    # Finds files/markdown/ruby-style-guide.md
     expect(project.repository.search('def | popen extension:md')[:blobs][:total_count]).to eq(1)
   end
 
@@ -62,7 +70,7 @@ describe Repository, :elastic do
     search_and_check!(project.repository, '-foo', type: :commit)
   end
 
-  describe 'class method find_commits_by_message_with_elastic' do
+  describe 'class method find_commits_by_message_with_elastic', :sidekiq_might_not_need_inline do
     let(:project) { create :project, :repository }
     let(:project1) { create :project, :repository }
     let(:results) { Repository.find_commits_by_message_with_elastic('initial') }

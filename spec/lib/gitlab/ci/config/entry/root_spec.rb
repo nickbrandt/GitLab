@@ -12,6 +12,11 @@ describe Gitlab::Ci::Config::Entry::Root do
 
     context 'when filtering all the entry/node names' do
       it 'contains the expected node names' do
+        # No inheritable fields should be added to the `Root`
+        #
+        # Inheritable configuration can only be added to `default:`
+        #
+        # The purpose of `Root` is have only globally defined configuration.
         expect(described_class.nodes.keys)
           .to match_array(%i[before_script image services
                              after_script variables cache
@@ -215,7 +220,7 @@ describe Gitlab::Ci::Config::Entry::Root do
 
       describe '#stages_value' do
         it 'returns an array of root stages' do
-          expect(root.stages_value).to eq %w[build test deploy]
+          expect(root.stages_value).to eq %w[.pre build test deploy .post]
         end
       end
 
@@ -293,7 +298,7 @@ describe Gitlab::Ci::Config::Entry::Root do
       describe '#errors' do
         it 'reports errors from child nodes' do
           expect(root.errors)
-            .to include 'before_script config should be an array of strings'
+            .to include 'before_script config should be an array containing strings and arrays of strings'
         end
       end
     end

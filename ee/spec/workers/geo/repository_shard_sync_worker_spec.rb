@@ -101,7 +101,7 @@ describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cac
     end
 
     context 'multiple shards' do
-      it 'uses two loops to schedule jobs' do
+      it 'uses two loops to schedule jobs', :sidekiq_might_not_need_inline do
         expect(subject).to receive(:schedule_jobs).twice.and_call_original
 
         Gitlab::ShardHealthCache.update([shard_name, 'shard2', 'shard3', 'shard4', 'shard5'])

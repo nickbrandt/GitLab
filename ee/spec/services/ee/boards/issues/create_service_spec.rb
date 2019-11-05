@@ -10,7 +10,7 @@ describe Boards::Issues::CreateService do
     let(:label)   { create(:label, project: project, name: 'in-progress') }
 
     subject(:service) do
-      described_class.new(board.parent, project, user, board_id: board.id, list_id: list.id, title: 'New issue')
+      described_class.new(board.resource_parent, project, user, board_id: board.id, list_id: list.id, title: 'New issue')
     end
 
     before do

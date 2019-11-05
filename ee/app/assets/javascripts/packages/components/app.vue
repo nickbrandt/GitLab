@@ -184,11 +184,12 @@ export default {
         v-gl-modal="'delete-modal'"
         class="js-delete-button"
         variant="danger"
+        data-qa-selector="delete_button"
         >{{ __('Delete') }}</gl-button
       >
     </div>
 
-    <div class="row prepend-top-default">
+    <div class="row prepend-top-default" data-qa-selector="package_information_content">
       <package-information :type="packageEntity.package_type" :information="packageInformation" />
       <package-information
         v-if="packageMetadata"
@@ -223,9 +224,13 @@ export default {
       <div slot="modal-footer" class="w-100">
         <div class="float-right">
           <gl-button @click="cancelDelete()">{{ __('Cancel') }}</gl-button>
-          <gl-button data-method="delete" :to="destroyPath" variant="danger">{{
-            __('Delete')
-          }}</gl-button>
+          <gl-button
+            data-method="delete"
+            :to="destroyPath"
+            variant="danger"
+            data-qa-selector="delete_modal_button"
+            >{{ __('Delete') }}</gl-button
+          >
         </div>
       </div>
     </gl-modal>

@@ -118,6 +118,10 @@ module EE
       ip_restrictions.map(&:range).join(",")
     end
 
+    def vulnerable_projects
+      projects.where("EXISTS(?)", ::Vulnerabilities::Occurrence.select(1).undismissed.where('vulnerability_occurrences.project_id = projects.id'))
+    end
+
     def human_ldap_access
       ::Gitlab::Access.options_with_owner.key(ldap_access)
     end
@@ -234,7 +238,7 @@ module EE
 
     override :supports_events?
     def supports_events?
-      ::Feature.enabled?(:group_events) && feature_available?(:epics)
+      feature_available?(:epics)
     end
 
     private

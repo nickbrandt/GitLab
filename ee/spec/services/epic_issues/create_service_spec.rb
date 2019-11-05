@@ -25,7 +25,7 @@ describe EpicIssues::CreateService do
       let(:created_link) { EpicIssue.find_by!(issue_id: issue.id) }
 
       it 'creates a new relationship and updates epic' do
-        expect(epic).to receive(:update_start_and_due_dates)
+        expect(Epics::UpdateDatesService).to receive(:new).with([epic]).and_call_original
         expect { subject }.to change(EpicIssue, :count).by(1)
 
         expect(created_link).to have_attributes(epic: epic)
@@ -262,13 +262,11 @@ describe EpicIssues::CreateService do
         end
 
         it 'updates both old and new epic milestone dates' do
+          expect(Epics::UpdateDatesService).to receive(:new).with([another_epic, issue.epic]).and_call_original
           allow(EpicIssue).to receive(:find_or_initialize_by).with(issue: issue).and_wrap_original { |m, *args|
             existing_epic_issue = m.call(*args)
-            expect(existing_epic_issue.epic).to receive(:update_start_and_due_dates)
             existing_epic_issue
           }
-
-          expect(another_epic).to receive(:update_start_and_due_dates)
 
           subject
         end

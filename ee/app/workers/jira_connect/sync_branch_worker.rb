@@ -5,6 +5,7 @@ module JiraConnect
     include ApplicationWorker
 
     queue_namespace :jira_connect
+    feature_category :integrations
 
     def perform(project_id, branch_name, commit_shas)
       project = Project.find_by_id(project_id)

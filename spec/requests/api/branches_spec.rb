@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::Branches do
@@ -602,7 +604,7 @@ describe API::Branches do
       post api(route, user), params: { branch: 'new_design3', ref: 'foo' }
 
       expect(response).to have_gitlab_http_status(400)
-      expect(json_response['message']).to eq('Invalid reference name')
+      expect(json_response['message']).to eq('Invalid reference name: new_design3')
     end
   end
 

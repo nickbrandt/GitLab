@@ -3,7 +3,12 @@
 # Worker for updating any project specific caches.
 class ProjectCacheWorker
   include ApplicationWorker
+
+  latency_sensitive_worker!
+
   LEASE_TIMEOUT = 15.minutes.to_i
+
+  feature_category :source_code_management
 
   # project_id - The ID of the project for which to flush the cache.
   # files - An Array containing extra types of files to refresh such as

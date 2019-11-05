@@ -5,7 +5,7 @@ module Geo
     # Counts all existing registries independent
     # of any change on filters / selective sync
     def count_registry
-      Geo::FileRegistry.lfs_objects.count
+      Geo::LfsObjectRegistry.count
     end
 
     def count_syncable
@@ -33,47 +33,47 @@ module Geo
 
     # Find limited amount of non replicated lfs objects.
     #
-    # You can pass a list with `except_file_ids:` so you can exclude items you
+    # You can pass a list with `except_ids:` so you can exclude items you
     # already scheduled but haven't finished and aren't persisted to the database yet
     #
     # @param [Integer] batch_size used to limit the results returned
-    # @param [Array<Integer>] except_file_ids ids that will be ignored from the query
+    # @param [Array<Integer>] except_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
-    def find_unsynced(batch_size:, except_file_ids: [])
+    def find_unsynced(batch_size:, except_ids: [])
       lfs_objects
         .missing_file_registry
-        .id_not_in(except_file_ids)
+        .id_not_in(except_ids)
         .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
     # rubocop:disable CodeReuse/ActiveRecord
-    def find_migrated_local(batch_size:, except_file_ids: [])
+    def find_migrated_local(batch_size:, except_ids: [])
       all_lfs_objects
-        .inner_join_file_registry
+        .inner_join_lfs_object_registry
         .with_files_stored_remotely
-        .id_not_in(except_file_ids)
+        .id_not_in(except_ids)
         .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
     # rubocop:disable CodeReuse/ActiveRecord
-    def find_retryable_failed_registries(batch_size:, except_file_ids: [])
+    def find_retryable_failed_registries(batch_size:, except_ids: [])
       registries_for_lfs_objects
-        .merge(Geo::FileRegistry.failed)
-        .merge(Geo::FileRegistry.retry_due)
-        .file_id_not_in(except_file_ids)
+        .merge(Geo::LfsObjectRegistry.failed)
+        .merge(Geo::LfsObjectRegistry.retry_due)
+        .lfs_object_id_not_in(except_ids)
         .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
     # rubocop:disable CodeReuse/ActiveRecord
-    def find_retryable_synced_missing_on_primary_registries(batch_size:, except_file_ids: [])
+    def find_retryable_synced_missing_on_primary_registries(batch_size:, except_ids: [])
       registries_for_lfs_objects
         .synced
         .missing_on_primary
         .retry_due
-        .file_id_not_in(except_file_ids)
+        .lfs_object_id_not_in(except_ids)
         .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord

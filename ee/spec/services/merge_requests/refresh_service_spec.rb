@@ -81,7 +81,7 @@ describe MergeRequests::RefreshService do
       end
 
       context 'open fork merge request' do
-        it 'resets approvals' do
+        it 'resets approvals', :sidekiq_might_not_need_inline do
           refresh
 
           expect(@merge_request.approvals).not_to be_empty
@@ -94,7 +94,7 @@ describe MergeRequests::RefreshService do
           @fork_merge_request.close!
         end
 
-        it 'resets approvals' do
+        it 'resets approvals', :sidekiq_might_not_need_inline do
           refresh
 
           expect(@merge_request.approvals).not_to be_empty
@@ -110,7 +110,7 @@ describe MergeRequests::RefreshService do
           reload_mrs
         end
 
-        it 'does not reset approvals' do
+        it 'does not reset approvals', :sidekiq_might_not_need_inline do
           expect(@merge_request.approvals).not_to be_empty
           expect(@fork_merge_request.approvals).not_to be_empty
         end

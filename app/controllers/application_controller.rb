@@ -12,11 +12,12 @@ class ApplicationController < ActionController::Base
   include EnforcesTwoFactorAuthentication
   include WithPerformanceBar
   include SessionlessAuthentication
+  include SessionsHelper
   include ConfirmEmailWarning
   include Gitlab::Tracking::ControllerConcern
   include Gitlab::Experimentation::ControllerConcern
 
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: [:route_not_found]
   before_action :enforce_terms!, if: :should_enforce_terms?
   before_action :validate_user_service_ticket!
   before_action :check_password_expiration
@@ -29,12 +30,13 @@ class ApplicationController < ActionController::Base
   before_action :active_user_check, unless: :devise_controller?
   before_action :set_usage_stats_consent_flag
   before_action :check_impersonation_availability
+  before_action :require_role
 
   around_action :set_locale
   around_action :set_session_storage
 
   after_action :set_page_title_header, if: :json_request?
-  after_action :limit_unauthenticated_session_times
+  after_action :limit_session_time, if: -> { !current_user }
 
   protect_from_forgery with: :exception, prepend: true
 
@@ -96,26 +98,10 @@ class ApplicationController < ActionController::Base
     if current_user
       not_found
     else
-      authenticate_user!
+      store_location_for(:user, request.fullpath) unless request.xhr?
+
+      redirect_to new_user_session_path, alert: I18n.t('devise.failure.unauthenticated')
     end
-  end
-
-  # By default, all sessions are given the same expiration time configured in
-  # the session store (e.g. 1 week). However, unauthenticated users can
-  # generate a lot of sessions, primarily for CSRF verification. It makes
-  # sense to reduce the TTL for unauthenticated to something much lower than
-  # the default (e.g. 1 hour) to limit Redis memory. In addition, Rails
-  # creates a new session after login, so the short TTL doesn't even need to
-  # be extended.
-  def limit_unauthenticated_session_times
-    return if current_user
-
-    # Rack sets this header, but not all tests may have it: https://github.com/rack/rack/blob/fdcd03a3c5a1c51d1f96fc97f9dfa1a9deac0c77/lib/rack/session/abstract/id.rb#L251-L259
-    return unless request.env['rack.session.options']
-
-    # This works because Rack uses these options every time a request is handled:
-    # https://github.com/rack/rack/blob/fdcd03a3c5a1c51d1f96fc97f9dfa1a9deac0c77/lib/rack/session/abstract/id.rb#L342
-    request.env['rack.session.options'][:expire_after] = Settings.gitlab['unauthenticated_session_expire_delay']
   end
 
   def render(*args)
@@ -546,6 +532,16 @@ class ApplicationController < ActionController::Base
 
   def current_user_mode
     @current_user_mode ||= Gitlab::Auth::CurrentUserMode.new(current_user)
+  end
+
+  # A user requires a role when they are part of the experimental signup flow (executed by the Growth team). Users
+  # are redirected to the welcome page when their role is required and the experiment is enabled for the current user.
+  def require_role
+    return unless current_user && current_user.role_required? && experiment_enabled?(:signup_flow)
+
+    store_location_for :user, request.fullpath
+
+    redirect_to users_sign_up_welcome_path
   end
 end
 

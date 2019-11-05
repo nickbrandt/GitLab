@@ -154,7 +154,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
           .and_return(merge_request)
       end
 
-      it 'does not serialize builds in exposed stages' do
+      it 'does not serialize builds in exposed stages', :sidekiq_might_not_need_inline do
         get_show_json
 
         json_response.dig('pipeline', 'details', 'stages').tap do |stages|
@@ -183,7 +183,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
         context 'job is cancelable' do
           let(:job) { create(:ci_build, :running, pipeline: pipeline) }
 
-          it 'cancel_path is present with correct redirect' do
+          it 'cancel_path is present with correct redirect', :sidekiq_might_not_need_inline do
             expect(response).to have_gitlab_http_status(:ok)
             expect(response).to match_response_schema('job/job_details')
             expect(json_response['cancel_path']).to include(CGI.escape(json_response['build_path']))
@@ -193,7 +193,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
         context 'with web terminal' do
           let(:job) { create(:ci_build, :running, :with_runner_session, pipeline: pipeline) }
 
-          it 'exposes the terminal path' do
+          it 'exposes the terminal path', :sidekiq_might_not_need_inline do
             expect(response).to have_gitlab_http_status(:ok)
             expect(response).to match_response_schema('job/job_details')
             expect(json_response['terminal_path']).to match(%r{/terminal})
@@ -268,7 +268,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
           project.add_maintainer(user) # Need to be a maintianer to view cluster.path
         end
 
-        it 'exposes the deployment information' do
+        it 'exposes the deployment information', :sidekiq_might_not_need_inline do
           get_show_json
 
           expect(response).to have_gitlab_http_status(:ok)
@@ -292,7 +292,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
             sign_in(user)
           end
 
-          it 'user can edit runner' do
+          it 'user can edit runner', :sidekiq_might_not_need_inline do
             get_show_json
 
             expect(response).to have_gitlab_http_status(:ok)
@@ -312,7 +312,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
             sign_in(user)
           end
 
-          it 'user can not edit runner' do
+          it 'user can not edit runner', :sidekiq_might_not_need_inline do
             get_show_json
 
             expect(response).to have_gitlab_http_status(:ok)
@@ -331,7 +331,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
             sign_in(user)
           end
 
-          it 'user can not edit runner' do
+          it 'user can not edit runner', :sidekiq_might_not_need_inline do
             get_show_json
 
             expect(response).to have_gitlab_http_status(:ok)
@@ -412,7 +412,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
       context 'when job has trace' do
         let(:job) { create(:ci_build, :running, :trace_live, pipeline: pipeline) }
 
-        it "has_trace is true" do
+        it "has_trace is true", :sidekiq_might_not_need_inline do
           get_show_json
 
           expect(response).to match_response_schema('job/job_details')
@@ -458,7 +458,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
           create(:ci_pipeline_variable, pipeline: pipeline, key: :TRIGGER_KEY_1, value: 'TRIGGER_VALUE_1')
         end
 
-        context 'user is a maintainer' do
+        context 'user is a maintainer', :sidekiq_might_not_need_inline do
           before do
             project.add_maintainer(user)
 
@@ -527,6 +527,113 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
 
   describe 'GET trace.json' do
     before do
+      stub_feature_flags(job_log_json: true)
+      get_trace
+    end
+
+    context 'when job has a trace artifact' do
+      let(:job) { create(:ci_build, :trace_artifact, pipeline: pipeline) }
+
+      it 'returns a trace' do
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('job/build_trace')
+        expect(json_response['id']).to eq job.id
+        expect(json_response['status']).to eq job.status
+        expect(json_response['state']).to be_present
+        expect(json_response['append']).not_to be_nil
+        expect(json_response['truncated']).not_to be_nil
+        expect(json_response['size']).to be_present
+        expect(json_response['total']).to be_present
+        expect(json_response['lines'].count).to be_positive
+      end
+    end
+
+    context 'when job has a trace' do
+      let(:job) { create(:ci_build, :trace_live, pipeline: pipeline) }
+
+      it 'returns a trace' do
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('job/build_trace')
+        expect(json_response['id']).to eq job.id
+        expect(json_response['status']).to eq job.status
+        expect(json_response['lines']).to eq [{ 'content' => [{ 'text' => 'BUILD TRACE' }], 'offset' => 0 }]
+      end
+    end
+
+    context 'when job has no traces' do
+      let(:job) { create(:ci_build, pipeline: pipeline) }
+
+      it 'returns no traces' do
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('job/build_trace')
+        expect(json_response['id']).to eq job.id
+        expect(json_response['status']).to eq job.status
+        expect(json_response['lines']).to be_nil
+      end
+    end
+
+    context 'when job has a trace with ANSI sequence and Unicode' do
+      let(:job) { create(:ci_build, :unicode_trace_live, pipeline: pipeline) }
+
+      it 'returns a trace with Unicode' do
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('job/build_trace')
+        expect(json_response['id']).to eq job.id
+        expect(json_response['status']).to eq job.status
+        expect(json_response['lines'].flat_map {|l| l['content'].map { |c| c['text'] } }).to include("ヾ(´༎ຶД༎ຶ`)ﾉ")
+      end
+    end
+
+    context 'when trace artifact is in ObjectStorage' do
+      let(:url) { 'http://object-storage/trace' }
+      let(:file_path) { expand_fixture_path('trace/sample_trace') }
+      let!(:job) { create(:ci_build, :success, :trace_artifact, pipeline: pipeline) }
+
+      before do
+        allow_any_instance_of(JobArtifactUploader).to receive(:file_storage?) { false }
+        allow_any_instance_of(JobArtifactUploader).to receive(:url) { url }
+        allow_any_instance_of(JobArtifactUploader).to receive(:size) { File.size(file_path) }
+      end
+
+      context 'when there are no network issues' do
+        before do
+          stub_remote_url_206(url, file_path)
+
+          get_trace
+        end
+
+        it 'returns a trace' do
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response['id']).to eq job.id
+          expect(json_response['status']).to eq job.status
+          expect(json_response['lines'].count).to be_positive
+        end
+      end
+
+      context 'when there is a network issue' do
+        before do
+          stub_remote_url_500(url)
+        end
+
+        it 'returns a trace' do
+          expect { get_trace }.to raise_error(Gitlab::HttpIO::FailedToGetChunkError)
+        end
+      end
+    end
+
+    def get_trace
+      get :trace,
+        params: {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: job.id
+        },
+        format: :json
+    end
+  end
+
+  describe 'GET legacy trace.json' do
+    before do
       get_trace
     end
 
@@ -537,6 +644,11 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['id']).to eq job.id
         expect(json_response['status']).to eq job.status
+        expect(json_response['state']).to be_present
+        expect(json_response['append']).not_to be_nil
+        expect(json_response['truncated']).not_to be_nil
+        expect(json_response['size']).to be_present
+        expect(json_response['total']).to be_present
         expect(json_response['html']).to eq(job.trace.html)
       end
     end
@@ -612,12 +724,13 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
     end
 
     def get_trace
-      get :trace, params: {
-                    namespace_id: project.namespace,
-                    project_id: project,
-                    id: job.id
-                  },
-                  format: :json
+      get :trace,
+        params: {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: job.id
+        },
+        format: :json
     end
   end
 

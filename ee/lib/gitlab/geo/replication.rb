@@ -4,7 +4,6 @@ module Gitlab
   module Geo
     module Replication
       USER_UPLOADS_OBJECT_TYPES = %i[attachment avatar file import_export namespace_file personal_file favicon].freeze
-      UPLOAD_OBJECT_TYPE = :file
       FILE_NOT_FOUND_GEO_CODE = 'FILE_NOT_FOUND'.freeze
 
       def self.object_type_from_user_uploads?(object_type)

@@ -85,7 +85,7 @@ GitLab CI/CD supports numerous configuration options:
 | [Job artifacts](../user/project/pipelines/job_artifacts.md) | Output, use, and reuse job artifacts. |
 | [Cache dependencies](caching/index.md) | Cache your dependencies for a faster execution. |
 | [Schedule pipelines](../user/project/pipelines/schedules.md) | Schedule pipelines to run as often as you need. |
-| [Custom path for `.gitlab-ci.yml`](../user/project/pipelines/settings.md#custom-ci-config-path) | Define a custom path for the CI/CD configuration file. |
+| [Custom path for `.gitlab-ci.yml`](../user/project/pipelines/settings.md#custom-ci-configuration-path) | Define a custom path for the CI/CD configuration file. |
 | [Git submodules for CI/CD](git_submodules.md) | Configure jobs for using Git submodules.|
 | [SSH keys for CI/CD](ssh_keys/README.md) | Using SSH keys in your CI pipelines. |
 | [Pipelines triggers](triggers/README.md) | Trigger pipelines through the API. |
@@ -132,7 +132,7 @@ Its feature set is listed on the table below according to DevOps stages.
 | [Container Scanning](../user/application_security/container_scanning/index.md) **(ULTIMATE)** | Check your Docker containers for known vulnerabilities.|
 | [Dependency Scanning](../user/application_security/dependency_scanning/index.md) **(ULTIMATE)** | Analyze your dependencies for known vulnerabilities. |
 | [License Compliance](../user/application_security/license_compliance/index.md) **(ULTIMATE)** | Search your project dependencies for their licenses. |
-| [Security Test reports](../user/project/merge_requests/index.md#security-reports-ultimate) **(ULTIMATE)** | Check for app vulnerabilities. |
+| [Security Test reports](../user/application_security/index.md) **(ULTIMATE)** | Check for app vulnerabilities. |
 
 ## Examples
 

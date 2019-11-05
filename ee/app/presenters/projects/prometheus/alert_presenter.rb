@@ -3,7 +3,7 @@
 module Projects
   module Prometheus
     class AlertPresenter < Gitlab::View::Presenter::Delegated
-      RESERVED_ANNOTATIONS = %w(gitlab_incident_markdown).freeze
+      RESERVED_ANNOTATIONS = %w(gitlab_incident_markdown title).freeze
       GENERIC_ALERT_SUMMARY_ANNOTATIONS = %w(monitoring_tool service hosts).freeze
       MARKDOWN_LINE_BREAK = "  \n".freeze
 

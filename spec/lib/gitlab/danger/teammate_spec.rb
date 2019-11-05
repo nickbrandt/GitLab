@@ -8,6 +8,7 @@ require 'gitlab/danger/teammate'
 
 describe Gitlab::Danger::Teammate do
   subject { described_class.new(options.stringify_keys) }
+
   let(:options) { { username: 'luigi', projects: projects, role: role } }
   let(:projects) { { project => capabilities } }
   let(:role) { 'Engineer, Manage' }
@@ -29,7 +30,7 @@ describe Gitlab::Danger::Teammate do
       expect(subject.maintainer?(project, :frontend, labels)).to be_truthy
     end
 
-    context 'when labels contain Create and the category is test' do
+    context 'when labels contain devops::create and the category is test' do
       let(:labels) { ['devops::create'] }
 
       context 'when role is Test Automation Engineer, Create' do
@@ -77,6 +78,22 @@ describe Gitlab::Danger::Teammate do
 
         it '#maintainer? returns false' do
           expect(subject.maintainer?(project, :engineering_productivity, labels)).to be_falsey
+        end
+
+        context 'when capabilities include maintainer backend' do
+          let(:capabilities) { ['maintainer backend'] }
+
+          it '#maintainer? returns true' do
+            expect(subject.maintainer?(project, :engineering_productivity, labels)).to be_truthy
+          end
+        end
+
+        context 'when capabilities include trainee_maintainer backend' do
+          let(:capabilities) { ['trainee_maintainer backend'] }
+
+          it '#traintainer? returns true' do
+            expect(subject.traintainer?(project, :engineering_productivity, labels)).to be_truthy
+          end
         end
       end
     end

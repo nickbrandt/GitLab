@@ -138,7 +138,10 @@ describe Issue do
     end
 
     it 'changes the state to closed' do
-      expect { issue.close }.to change { issue.state }.from('opened').to('closed')
+      open_state = described_class.available_states[:opened]
+      closed_state = described_class.available_states[:closed]
+
+      expect { issue.close }.to change { issue.state_id }.from(open_state).to(closed_state)
     end
   end
 
@@ -155,7 +158,7 @@ describe Issue do
     end
 
     it 'changes the state to opened' do
-      expect { issue.reopen }.to change { issue.state }.from('closed').to('opened')
+      expect { issue.reopen }.to change { issue.state_id }.from(described_class.available_states[:closed]).to(described_class.available_states[:opened])
     end
   end
 
@@ -277,6 +280,7 @@ describe Issue do
 
       context 'checking destination project also' do
         subject { issue.can_move?(user, to_project) }
+
         let(:to_project) { create(:project) }
 
         context 'destination project allowed' do
@@ -418,6 +422,19 @@ describe Issue do
     it "does not contain the issue title if confidential" do
       issue = create(:issue, title: 'testing-issue', confidential: true)
       expect(issue.to_branch_name).to match /confidential-issue\z/
+    end
+
+    context 'issue title longer than 100 characters' do
+      let(:issue) { create(:issue, iid: 999, title: 'Lorem ipsum dolor sit amet consectetur adipiscing elit Mauris sit amet ipsum id lacus custom fringilla convallis') }
+
+      it "truncates branch name to at most 100 characters" do
+        expect(issue.to_branch_name.length).to be <= 100
+      end
+
+      it "truncates dangling parts of the branch name" do
+        # 100 characters would've got us "999-lorem...lacus-custom-fri".
+        expect(issue.to_branch_name).to eq("999-lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-mauris-sit-amet-ipsum-id-lacus-custom")
+      end
     end
   end
 
@@ -899,4 +916,6 @@ describe Issue do
       let(:default_params) { { project: project } }
     end
   end
+
+  it_behaves_like 'versioned description'
 end

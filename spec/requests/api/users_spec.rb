@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::Users do
@@ -633,51 +635,6 @@ describe API::Users do
     end
   end
 
-  describe "GET /users/sign_up" do
-    context 'when experimental_separate_sign_up_flow is active' do
-      before do
-        stub_feature_flags(experimental_separate_sign_up_flow: true)
-      end
-
-      context 'on gitlab.com' do
-        before do
-          allow(::Gitlab).to receive(:com?).and_return(true)
-        end
-
-        it "shows sign up page" do
-          get "/users/sign_up"
-          expect(response).to have_gitlab_http_status(200)
-          expect(response).to render_template(:new)
-        end
-      end
-
-      context 'not on gitlab.com' do
-        before do
-          allow(::Gitlab).to receive(:com?).and_return(false)
-        end
-
-        it "redirects to sign in page" do
-          get "/users/sign_up"
-          expect(response).to have_gitlab_http_status(302)
-          expect(response).to redirect_to(new_user_session_path(anchor: 'register-pane'))
-        end
-      end
-    end
-
-    context 'when experimental_separate_sign_up_flow is not active' do
-      before do
-        allow(::Gitlab).to receive(:com?).and_return(true)
-        stub_feature_flags(experimental_separate_sign_up_flow: false)
-      end
-
-      it "redirects to sign in page" do
-        get "/users/sign_up"
-        expect(response).to have_gitlab_http_status(302)
-        expect(response).to redirect_to(new_user_session_path(anchor: 'register-pane'))
-      end
-    end
-  end
-
   describe "PUT /users/:id" do
     let!(:admin_user) { create(:admin) }
 
@@ -1296,7 +1253,7 @@ describe API::Users do
       admin
     end
 
-    it "deletes user" do
+    it "deletes user", :sidekiq_might_not_need_inline do
       perform_enqueued_jobs { delete api("/users/#{user.id}", admin) }
 
       expect(response).to have_gitlab_http_status(204)
@@ -1331,7 +1288,7 @@ describe API::Users do
     end
 
     context "hard delete disabled" do
-      it "moves contributions to the ghost user" do
+      it "moves contributions to the ghost user", :sidekiq_might_not_need_inline do
         perform_enqueued_jobs { delete api("/users/#{user.id}", admin) }
 
         expect(response).to have_gitlab_http_status(204)
@@ -1341,7 +1298,7 @@ describe API::Users do
     end
 
     context "hard delete enabled" do
-      it "removes contributions" do
+      it "removes contributions", :sidekiq_might_not_need_inline do
         perform_enqueued_jobs { delete api("/users/#{user.id}?hard_delete=true", admin) }
 
         expect(response).to have_gitlab_http_status(204)

@@ -35,6 +35,7 @@ module EE
         if: ->(project) { project.mirror? && project.import_url_updated? }
 
       belongs_to :mirror_user, foreign_key: 'mirror_user_id', class_name: 'User'
+      belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_user_id', class_name: 'User'
 
       has_one :repository_state, class_name: 'ProjectRepositoryState', inverse_of: :project
       has_one :project_registry, class_name: 'Geo::ProjectRegistry', inverse_of: :project
@@ -81,6 +82,7 @@ module EE
 
       has_many :prometheus_alerts, inverse_of: :project
       has_many :prometheus_alert_events, inverse_of: :project
+      has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
@@ -131,6 +133,7 @@ module EE
       scope :with_slack_service, -> { joins(:slack_service) }
       scope :with_slack_slash_commands_service, -> { joins(:slack_slash_commands_service) }
       scope :with_prometheus_service, -> { joins(:prometheus_service) }
+      scope :aimed_for_deletion, -> (date) { where('marked_for_deletion_at <= ?', date).without_deleted }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
@@ -642,12 +645,33 @@ module EE
       feature_available?(:incident_management)
     end
 
+    def alerts_service_activated?
+      alerts_service_available? && alerts_service&.active?
+    end
+
     def package_already_taken?(package_name)
       namespace.root_ancestor.all_projects
         .joins(:packages)
         .where.not(id: id)
         .merge(Packages::Package.with_name(package_name))
         .exists?
+    end
+
+    def adjourned_deletion?
+      feature_available?(:marking_project_for_deletion) &&
+        ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
+    end
+
+    def marked_for_deletion?
+      return false unless feature_available?(:marking_project_for_deletion)
+
+      marked_for_deletion_at.present?
+    end
+
+    def has_packages?(package_type)
+      return false unless feature_available?(:packages)
+
+      packages.where(package_type: package_type).exists?
     end
 
     private
@@ -683,10 +707,6 @@ module EE
       else
         globally_available
       end
-    end
-
-    def validate_board_limit(board)
-      # Board limits are disabled in EE, so this method is just a no-op.
     end
 
     def check_pull_mirror_branch_prefix

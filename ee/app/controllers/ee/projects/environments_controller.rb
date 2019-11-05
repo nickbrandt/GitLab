@@ -6,36 +6,34 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
-        before_action :authorize_read_pod_logs!, only: [:logs]
-        before_action :environment_ee, only: [:logs]
+        before_action :authorize_read_pod_logs!, only: [:k8s_pod_logs, :logs]
+        before_action :environment_ee, only: [:k8s_pod_logs, :logs]
         before_action :authorize_create_environment_terminal!, only: [:terminal]
+        before_action do
+          push_frontend_feature_flag(:environment_logs_use_vue_ui)
+        end
       end
 
-      def logs
+      def k8s_pod_logs
         respond_to do |format|
-          format.html
           format.json do
             ::Gitlab::UsageCounters::PodLogs.increment(project.id)
             ::Gitlab::PollingInterval.set_header(response, interval: 3_000)
 
             result = PodLogsService.new(environment, params: params.permit!).execute
 
-            if result.nil?
+            if result[:status] == :processing
               head :accepted
             elsif result[:status] == :success
-              render json: {
-                pods: environment.pod_names,
-                logs: result[:logs],
-                message: result[:message]
-              }
+              render json: result
             else
-              render status: :bad_request, json: {
-                pods: environment.pod_names,
-                message: result[:message]
-              }
+              render status: :bad_request, json: result
             end
           end
         end
+      end
+
+      def logs
       end
 
       private

@@ -12,8 +12,15 @@ describe LicenseEntity do
       {
         name:       'MIT',
         url:        'https://opensource.org/licenses/mit',
-        components: [{ name: 'rails' }]
+        components: [{
+                       name:     'rails',
+                       blob_path: 'some_path'
+                     }]
       }
+    end
+
+    before do
+      license.dependencies.first.path = 'some_path'
     end
 
     it { is_expected.to eq(assert_license) }

@@ -16,11 +16,10 @@ describe Groups::ScimOauthController do
     allow(Devise).to receive(:omniauth_providers).and_return(providers)
   end
 
-  context 'when the feature is enabled' do
+  context 'when the feature is configured' do
     before do
       stub_saml_config(enabled: true)
       stub_licensed_features(group_saml: true)
-      stub_feature_flags(group_scim: true)
     end
 
     describe 'GET #show' do

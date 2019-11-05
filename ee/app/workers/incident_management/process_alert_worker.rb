@@ -5,6 +5,7 @@ module IncidentManagement
     include ApplicationWorker
 
     queue_namespace :incident_management
+    feature_category :incident_management
 
     def perform(project_id, alert)
       project = find_project(project_id)

@@ -62,6 +62,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       delete :leave, on: :collection
     end
 
+    resources :group_links, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
+
     resources :uploads, only: [:create] do
       collection do
         get ":secret/:filename", action: :show, as: :show, constraints: { filename: %r{[^/]+} }
@@ -77,6 +79,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         post :pause
       end
     end
+
+    resources :container_registries, only: [:index], controller: 'registry/repositories'
   end
 
   scope(path: '*id',

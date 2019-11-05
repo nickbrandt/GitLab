@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe "Private Project Pages Access" do
@@ -27,6 +29,7 @@ describe "Private Project Pages Access" do
   describe "Project should be private" do
     describe '#private?' do
       subject { project.private? }
+
       it { is_expected.to be_truthy }
     end
   end

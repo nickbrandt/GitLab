@@ -45,7 +45,7 @@ describe 'Merge request > User sets approvers', :js do
       visit project_new_merge_request_path(forked_project, merge_request: { target_branch: 'master', source_branch: 'feature' })
     end
 
-    it 'allows setting other users as approvers but does not allow setting the current user as an approver, and filters non members from approvers list' do
+    it 'allows setting other users as approvers but does not allow setting the current user as an approver, and filters non members from approvers list', :sidekiq_might_not_need_inline do
       open_modal
       open_approver_select
 
@@ -84,7 +84,6 @@ describe 'Merge request > User sets approvers', :js do
 
         find('.select2-results .user-result', text: group.name).click
         close_approver_select
-        click_button 'Add'
         click_button 'Update approval rule'
 
         click_on("Submit merge request")
@@ -151,7 +150,6 @@ describe 'Merge request > User sets approvers', :js do
 
         find('.select2-results .user-result', text: group.name).click
         close_approver_select
-        click_button 'Add'
         click_button 'Update approval rule'
 
         click_on("Save changes")

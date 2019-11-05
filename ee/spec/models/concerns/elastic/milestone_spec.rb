@@ -16,7 +16,7 @@ describe Milestone, :elastic do
     end
   end
 
-  it "searches milestones" do
+  it "searches milestones", :sidekiq_might_not_need_inline do
     project = create :project
 
     Sidekiq::Testing.inline! do
@@ -48,11 +48,11 @@ describe Milestone, :elastic do
       'created_at',
       'updated_at'
     ).merge({
+      'type' => milestone.es_type,
       'join_field' => {
         'name' => milestone.es_type,
         'parent' => milestone.es_parent
-      },
-      'type' => milestone.es_type
+      }
     })
 
     expect(milestone.__elasticsearch__.as_indexed_json).to eq(expected_hash)

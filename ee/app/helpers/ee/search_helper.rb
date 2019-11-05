@@ -3,6 +3,8 @@ module EE
   module SearchHelper
     extend ::Gitlab::Utils::Override
 
+    SWITCH_TO_BASIC_SEARCHABLE_TABS = %w[projects issues merge_requests milestones users].freeze
+
     override :search_filter_input_options
     def search_filter_input_options(type)
       options = super
@@ -35,11 +37,11 @@ module EE
     end
 
     override :search_blob_title
-    def search_blob_title(project, file_name)
+    def search_blob_title(project, path)
       if @project
-        file_name
+        path
       else
-        (project.full_name + ': ' + content_tag(:i, file_name)).html_safe
+        (project.full_name + ': ' + content_tag(:i, path)).html_safe
       end
     end
 
@@ -58,6 +60,23 @@ module EE
       else
         s_("SearchResults|Showing %{count} %{scope} for \"%{term}\" in your personal and project snippets")
       end
+    end
+
+    def revert_to_basic_search_filter_url
+      search_params = params
+        .permit(::SearchHelper::SEARCH_PERMITTED_PARAMS)
+        .merge(basic_search: true)
+
+      search_path(search_params)
+    end
+
+    def show_switch_to_basic_search?(search_service)
+      return false unless ::Feature.enabled?(:switch_to_basic_search, default_enabled: false)
+      return false unless search_service.use_elasticsearch?
+
+      return true if @project
+
+      search_service.scope.in?(SWITCH_TO_BASIC_SEARCHABLE_TABS)
     end
 
     private

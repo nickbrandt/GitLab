@@ -4,6 +4,8 @@ module DesignManagement
   class NewVersionWorker
     include ApplicationWorker
 
+    feature_category :design_management
+
     def perform(version_id)
       version = DesignManagement::Version.find(version_id)
 

@@ -53,7 +53,7 @@ describe MergeTrains::RefreshMergeRequestService do
     shared_examples_for 'cancels and recreates a pipeline for the merge train' do
       let(:previous_ref) { 'refs/heads/master' }
 
-      it do
+      it 'cancels and recreates a pipeline for the merge train', :sidekiq_might_not_need_inline do
         expect_next_instance_of(MergeTrains::CreatePipelineService, project, maintainer) do |pipeline_service|
           allow(pipeline_service).to receive(:execute) { { status: :success, pipeline: create(:ci_pipeline) } }
           expect(pipeline_service).to receive(:execute).with(merge_request, previous_ref)

@@ -19,7 +19,11 @@ describe Gitlab::UsageData do
       create(:service, project: projects[2], type: 'SlackService', active: true)
       create(:project_error_tracking_setting, project: projects[0])
       create(:project_error_tracking_setting, project: projects[1], enabled: false)
-
+      create_list(:issue, 4, project: projects[0])
+      create(:zoom_meeting, project: projects[0], issue: projects[0].issues[0], issue_status: :added)
+      create_list(:zoom_meeting, 2, project: projects[0], issue: projects[0].issues[1], issue_status: :removed)
+      create(:zoom_meeting, project: projects[0], issue: projects[0].issues[2], issue_status: :added)
+      create_list(:zoom_meeting, 2, project: projects[0], issue: projects[0].issues[2], issue_status: :removed)
       gcp_cluster = create(:cluster, :provided_by_gcp)
       create(:cluster, :provided_by_user)
       create(:cluster, :provided_by_user, :disabled)
@@ -32,6 +36,7 @@ describe Gitlab::UsageData do
       create(:clusters_applications_prometheus, :installed, cluster: gcp_cluster)
       create(:clusters_applications_runner, :installed, cluster: gcp_cluster)
       create(:clusters_applications_knative, :installed, cluster: gcp_cluster)
+      create(:clusters_applications_elastic_stack, :installed, cluster: gcp_cluster)
 
       ProjectFeature.first.update_attribute('repository_access_level', 0)
     end
@@ -120,9 +125,12 @@ describe Gitlab::UsageData do
         clusters_applications_prometheus
         clusters_applications_runner
         clusters_applications_knative
+        clusters_applications_elastic_stack
         in_review_folder
         groups
         issues
+        issues_with_associated_zoom_link
+        issues_using_zoom_quick_actions
         keys
         label_lists
         labels
@@ -174,6 +182,8 @@ describe Gitlab::UsageData do
       expect(count_data[:projects_slack_slash_active]).to eq(1)
       expect(count_data[:projects_with_repositories_enabled]).to eq(3)
       expect(count_data[:projects_with_error_tracking_enabled]).to eq(1)
+      expect(count_data[:issues_with_associated_zoom_link]).to eq(2)
+      expect(count_data[:issues_using_zoom_quick_actions]).to eq(3)
 
       expect(count_data[:clusters_enabled]).to eq(7)
       expect(count_data[:project_clusters_enabled]).to eq(6)
@@ -190,6 +200,7 @@ describe Gitlab::UsageData do
       expect(count_data[:clusters_applications_prometheus]).to eq(1)
       expect(count_data[:clusters_applications_runner]).to eq(1)
       expect(count_data[:clusters_applications_knative]).to eq(1)
+      expect(count_data[:clusters_applications_elastic_stack]).to eq(1)
     end
 
     it 'works when queries time out' do

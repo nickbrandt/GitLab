@@ -1,4 +1,5 @@
-import { secondsIn, timeWindowsKeyNames } from './constants';
+import dateformat from 'dateformat';
+import { secondsIn, dateTimePickerRegex, dateFormats } from './constants';
 
 const secondsToMilliseconds = seconds => seconds * 1000;
 
@@ -19,7 +20,49 @@ export const getTimeWindow = ({ start, end }) =>
       return timeRange;
     }
     return acc;
-  }, timeWindowsKeyNames.eightHours);
+  }, null);
+
+export const isDateTimePickerInputValid = val => dateTimePickerRegex.test(val);
+
+export const truncateZerosInDateTime = datetime => datetime.replace(' 00:00:00', '');
+
+/**
+ * The URL params start and end need to be validated
+ * before passing them down to other components.
+ *
+ * @param {string} dateString
+ */
+export const isValidDate = dateString => {
+  try {
+    // dateformat throws error that can be caught.
+    // This is better than using `new Date()`
+    if (dateString && dateString.trim()) {
+      dateformat(dateString, 'isoDateTime');
+      return true;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+};
+
+/**
+ * Convert the input in Time picker component to ISO date.
+ *
+ * @param {string} val
+ * @returns {string}
+ */
+export const stringToISODate = val =>
+  dateformat(new Date(val.replace(/-/g, '/')), dateFormats.dateTimePicker.ISODate, true);
+
+/**
+ * Convert the ISO date received from the URL to string
+ * for the Time picker component.
+ *
+ * @param {Date} date
+ * @returns {string}
+ */
+export const ISODateToString = date => dateformat(date, dateFormats.dateTimePicker.stringDate);
 
 /**
  * This method is used to validate if the graph data format for a chart component
@@ -42,6 +85,65 @@ export const graphDataValidatorForValues = (isValues, graphData) => {
       }
       return false;
     }).length === graphData.queries.length
+  );
+};
+
+/* eslint-disable @gitlab/i18n/no-non-i18n-strings */
+/**
+ * Checks that element that triggered event is located on cluster health check dashboard
+ * @param {HTMLElement}  element to check against
+ * @returns {boolean}
+ */
+const isClusterHealthBoard = () => (document.body.dataset.page || '').includes(':clusters:show');
+
+/**
+ * Tracks snowplow event when user generates link to metric chart
+ * @param {String}  chart link that will be sent as a property for the event
+ * @return {Object} config object for event tracking
+ */
+export const generateLinkToChartOptions = chartLink => {
+  const isCLusterHealthBoard = isClusterHealthBoard();
+
+  const category = isCLusterHealthBoard
+    ? 'Cluster Monitoring'
+    : 'Incident Management::Embedded metrics';
+  const action = isCLusterHealthBoard
+    ? 'generate_link_to_cluster_metric_chart'
+    : 'generate_link_to_metrics_chart';
+
+  return { category, action, label: 'Chart link', property: chartLink };
+};
+
+/**
+ * Tracks snowplow event when user downloads CSV of cluster metric
+ * @param {String}  chart title that will be sent as a property for the event
+ */
+export const downloadCSVOptions = title => {
+  const isCLusterHealthBoard = isClusterHealthBoard();
+
+  const category = isCLusterHealthBoard
+    ? 'Cluster Monitoring'
+    : 'Incident Management::Embedded metrics';
+  const action = isCLusterHealthBoard
+    ? 'download_csv_of_cluster_metric_chart'
+    : 'download_csv_of_metrics_dashboard_chart';
+
+  return { category, action, label: 'Chart title', property: title };
+};
+
+/**
+ * This function validates the graph data contains exactly 3 queries plus
+ * value validations from graphDataValidatorForValues.
+ * @param {Object} isValues
+ * @param {Object} graphData  the graph data response from a prometheus request
+ * @returns {boolean} true if the data is valid
+ */
+export const graphDataValidatorForAnomalyValues = graphData => {
+  const anomalySeriesCount = 3; // metric, upper, lower
+  return (
+    graphData.queries &&
+    graphData.queries.length === anomalySeriesCount &&
+    graphDataValidatorForValues(false, graphData)
   );
 };
 

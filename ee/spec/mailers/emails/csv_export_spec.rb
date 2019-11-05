@@ -18,6 +18,7 @@ describe Emails::CsvExport do
     let(:empty_project) { create(:project, path: 'myproject') }
     let(:export_status) { { truncated: false, rows_expected: 3, rows_written: 3 } }
     subject { Notify.issues_csv_email(user, empty_project, "dummy content", export_status) }
+
     let(:attachment) { subject.attachments.first }
 
     it 'attachment has csv mime type' do

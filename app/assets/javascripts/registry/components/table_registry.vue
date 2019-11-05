@@ -1,5 +1,5 @@
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import {
   GlButton,
   GlFormCheckbox,
@@ -35,9 +35,15 @@ export default {
       type: Object,
       required: true,
     },
+    canDeleteRepo: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
   },
   data() {
     return {
+      selectedItems: [],
       itemsToBeDeleted: [],
       modalId: `confirm-image-deletion-modal-${this.repo.id}`,
       selectAllChecked: false,
@@ -45,6 +51,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['isDeleteDisabled']),
     bulkDeletePath() {
       return this.repo.tagsPath ? this.repo.tagsPath.replace('?format=json', '/bulk_destroy') : '';
     },
@@ -90,6 +97,7 @@ export default {
     },
     deleteSingleItem(index) {
       this.setModalDescription(index);
+      this.itemsToBeDeleted = [index];
 
       this.$refs.deleteModal.$refs.modal.$once('ok', () => {
         this.removeModalEvents();
@@ -97,9 +105,10 @@ export default {
       });
     },
     deleteMultipleItems() {
-      if (this.itemsToBeDeleted.length === 1) {
+      this.itemsToBeDeleted = [...this.selectedItems];
+      if (this.selectedItems.length === 1) {
         this.setModalDescription(this.itemsToBeDeleted[0]);
-      } else if (this.itemsToBeDeleted.length > 1) {
+      } else if (this.selectedItems.length > 1) {
         this.setModalDescription();
       }
 
@@ -109,6 +118,7 @@ export default {
       });
     },
     handleSingleDelete(itemToDelete) {
+      this.itemsToBeDeleted = [];
       this.deleteItem(itemToDelete)
         .then(() => this.fetchList({ repo: this.repo }))
         .catch(() => this.showError(errorMessagesTypes.DELETE_REGISTRY));
@@ -116,6 +126,7 @@ export default {
     handleMultipleDelete() {
       const { itemsToBeDeleted } = this;
       this.itemsToBeDeleted = [];
+      this.selectedItems = [];
 
       if (this.bulkDeletePath) {
         this.multiDeleteItems({
@@ -144,26 +155,29 @@ export default {
       }
     },
     selectAll() {
-      this.itemsToBeDeleted = this.repo.list.map((x, index) => index);
+      this.selectedItems = this.repo.list.map((x, index) => index);
       this.selectAllChecked = true;
     },
     deselectAll() {
-      this.itemsToBeDeleted = [];
+      this.selectedItems = [];
       this.selectAllChecked = false;
     },
-    updateItemsToBeDeleted(index) {
-      const delIndex = this.itemsToBeDeleted.findIndex(x => x === index);
+    updateselectedItems(index) {
+      const delIndex = this.selectedItems.findIndex(x => x === index);
 
       if (delIndex > -1) {
-        this.itemsToBeDeleted.splice(delIndex, 1);
+        this.selectedItems.splice(delIndex, 1);
         this.selectAllChecked = false;
       } else {
-        this.itemsToBeDeleted.push(index);
+        this.selectedItems.push(index);
 
-        if (this.itemsToBeDeleted.length === this.repo.list.length) {
+        if (this.selectedItems.length === this.repo.list.length) {
           this.selectAllChecked = true;
         }
       }
+    },
+    canDeleteRow(item) {
+      return item && item.canDelete && !this.isDeleteDisabled;
     },
   },
 };
@@ -175,7 +189,7 @@ export default {
         <tr>
           <th>
             <gl-form-checkbox
-              v-if="repo.canDelete"
+              v-if="canDeleteRepo"
               class="js-select-all-checkbox"
               :checked="selectAllChecked"
               @change="onSelectAllChange"
@@ -187,10 +201,10 @@ export default {
           <th>{{ s__('ContainerRegistry|Last Updated') }}</th>
           <th>
             <gl-button
-              v-if="repo.canDelete"
+              v-if="canDeleteRepo"
               v-gl-tooltip
               v-gl-modal="modalId"
-              :disabled="!itemsToBeDeleted || itemsToBeDeleted.length === 0"
+              :disabled="!selectedItems || selectedItems.length === 0"
               class="js-delete-registry float-right"
               data-track-event="click_button"
               data-track-label="bulk_registry_tag_delete"
@@ -208,10 +222,10 @@ export default {
         <tr v-for="(item, index) in repo.list" :key="item.tag" class="registry-image-row">
           <td class="check">
             <gl-form-checkbox
-              v-if="item.canDelete"
+              v-if="canDeleteRow(item)"
               class="js-select-checkbox"
-              :checked="itemsToBeDeleted && itemsToBeDeleted.includes(index)"
-              @change="updateItemsToBeDeleted(index)"
+              :checked="selectedItems && selectedItems.includes(index)"
+              @change="updateselectedItems(index)"
             />
           </td>
           <td class="monospace">
@@ -244,7 +258,7 @@ export default {
 
           <td class="content action-buttons">
             <gl-button
-              v-if="item.canDelete"
+              v-if="canDeleteRow(item)"
               v-gl-modal="modalId"
               :title="s__('ContainerRegistry|Remove tag')"
               :aria-label="s__('ContainerRegistry|Remove tag')"

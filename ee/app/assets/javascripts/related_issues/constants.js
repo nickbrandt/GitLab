@@ -59,3 +59,8 @@ export const issuableQaClassMap = {
   [issuableTypesMap.ISSUE]: 'qa-add-issues-button',
   [issuableTypesMap.EPIC]: 'qa-add-epics-button',
 };
+
+export const PathIdSeparator = {
+  Epic: '&',
+  Issue: '#',
+};

@@ -59,7 +59,7 @@ describe SearchHelper do
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
     end
 
-    it "returns parsed result" do
+    it "returns parsed result", :sidekiq_might_not_need_inline do
       project = create :project, :repository
 
       project.repository.index_commits_and_blobs
@@ -74,7 +74,7 @@ describe SearchHelper do
       parsed_result = helper.parse_search_result(result)
 
       expect(parsed_result.ref). to eq('b83d6e391c22777fca1ed3012fce84f633d7fed0')
-      expect(parsed_result.filename).to eq('files/ruby/popen.rb')
+      expect(parsed_result.path).to eq('files/ruby/popen.rb')
       expect(parsed_result.startline).to eq(2)
       expect(parsed_result.data).to include("Popen")
     end
@@ -96,7 +96,7 @@ describe SearchHelper do
       )[:blobs][:results]
     end
 
-    it 'returns all projects in the result page without causing an N+1' do
+    it 'returns all projects in the result page without causing an N+1', :sidekiq_might_not_need_inline do
       control_count = ActiveRecord::QueryRecorder.new { blob_projects(es_blob_search) }.count
 
       projects = create_list :project, 3, :repository, :public
@@ -173,6 +173,49 @@ describe SearchHelper do
       let(:show_snippets) { nil }
 
       it_behaves_like 'returns old message'
+    end
+  end
+
+  describe '#show_switch_to_basic_search?' do
+    let(:use_elasticsearch) { true }
+    let(:scope) { 'commits' }
+    let(:search_service) { instance_double(Search::GlobalService, use_elasticsearch?: use_elasticsearch, scope: scope) }
+    subject { show_switch_to_basic_search?(search_service) }
+
+    before do
+      stub_feature_flags(switch_to_basic_search: true)
+    end
+
+    context 'when :switch_to_basic_search feature is disabled' do
+      before do
+        stub_feature_flags(switch_to_basic_search: false)
+      end
+
+      it { is_expected.to eq(false) }
+    end
+
+    context 'when not currently using elasticsearch' do
+      let(:use_elasticsearch) { false }
+
+      it { is_expected.to eq(false) }
+    end
+
+    context 'when project scope' do
+      before do
+        @project = create(:project)
+      end
+
+      it { is_expected.to eq(true) }
+    end
+
+    context 'when commits tab' do
+      it { is_expected.to eq(false) }
+    end
+
+    context 'when issues tab' do
+      let(:scope) { 'issues' }
+
+      it { is_expected.to eq(true) }
     end
   end
 end

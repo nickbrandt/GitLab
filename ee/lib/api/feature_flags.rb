@@ -18,6 +18,7 @@ module API
     resource 'projects/:id', requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       resource :feature_flags do
         desc 'Get all feature flags of a project' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
           success EE::API::Entities::FeatureFlag
         end
         params do
@@ -34,6 +35,7 @@ module API
         end
 
         desc 'Create a new feature flag' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
           success EE::API::Entities::FeatureFlag
         end
         params do
@@ -68,6 +70,7 @@ module API
       end
       resource 'feature_flags/:name', requirements: FEATURE_FLAG_ENDPOINT_REQUIREMENTS do
         desc 'Get a feature flag of a project' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
           success EE::API::Entities::FeatureFlag
         end
         get do
@@ -76,7 +79,48 @@ module API
           present feature_flag, with: EE::API::Entities::FeatureFlag
         end
 
+        desc 'Enable a strategy for a feature flag on an environment' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
+          success EE::API::Entities::FeatureFlag
+        end
+        params do
+          requires :environment_scope, type: String, desc: 'The environment scope of the feature flag'
+          requires :strategy,          type: JSON,   desc: 'The strategy to be enabled on the scope'
+        end
+        post :enable do
+          result = ::FeatureFlags::EnableService
+            .new(user_project, current_user, params).execute
+
+          if result[:status] == :success
+            status :ok
+            present result[:feature_flag], with: EE::API::Entities::FeatureFlag
+          else
+            render_api_error!(result[:message], result[:http_status])
+          end
+        end
+
+        desc 'Disable a strategy for a feature flag on an environment' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
+          success EE::API::Entities::FeatureFlag
+        end
+        params do
+          requires :environment_scope, type: String, desc: 'The environment scope of the feature flag'
+          requires :strategy,          type: JSON,   desc: 'The strategy to be disabled on the scope'
+        end
+        post :disable do
+          result = ::FeatureFlags::DisableService
+            .new(user_project, current_user, params).execute
+
+          if result[:status] == :success
+            status :ok
+            present result[:feature_flag], with: EE::API::Entities::FeatureFlag
+          else
+            render_api_error!(result[:message], result[:http_status])
+          end
+        end
+
         desc 'Delete a feature flag' do
+          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
           success EE::API::Entities::FeatureFlag
         end
         delete do

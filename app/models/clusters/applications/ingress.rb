@@ -40,7 +40,7 @@ module Clusters
       end
 
       def allowed_to_uninstall?
-        external_ip_or_hostname? && application_jupyter_nil_or_installable?
+        external_ip_or_hostname? && application_jupyter_nil_or_installable? && application_elastic_stack_nil_or_installable?
       end
 
       def install_command
@@ -78,10 +78,40 @@ module Clusters
           "controller" => {
             "config" => {
               "enable-modsecurity" => "true",
-              "enable-owasp-modsecurity-crs" => "true"
-            }
+              "enable-owasp-modsecurity-crs" => "true",
+              "modsecurity.conf" => modsecurity_config_content
+            },
+            "extraVolumeMounts" => [
+              {
+                "name" => "modsecurity-template-volume",
+                "mountPath" => "/etc/nginx/modsecurity/modsecurity.conf",
+                "subPath" => "modsecurity.conf"
+              }
+            ],
+            "extraVolumes" => [
+              {
+                "name" => "modsecurity-template-volume",
+                "configMap" => {
+                  "name" => "ingress-nginx-ingress-controller",
+                  "items" => [
+                    {
+                      "key" => "modsecurity.conf",
+                      "path" => "modsecurity.conf"
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
+      end
+
+      def modsecurity_config_content
+        File.read(modsecurity_config_file_path)
+      end
+
+      def modsecurity_config_file_path
+        Rails.root.join('vendor', 'ingress', 'modsecurity.conf')
       end
 
       def content_values
@@ -90,6 +120,10 @@ module Clusters
 
       def application_jupyter_nil_or_installable?
         cluster.application_jupyter.nil? || cluster.application_jupyter&.installable?
+      end
+
+      def application_elastic_stack_nil_or_installable?
+        cluster.application_elastic_stack.nil? || cluster.application_elastic_stack&.installable?
       end
     end
   end

@@ -102,6 +102,7 @@ module API
       optional :project_export_enabled, type: Boolean, desc: 'Enable project export'
       optional :prometheus_metrics_enabled, type: Boolean, desc: 'Enable Prometheus metrics'
       optional :push_event_hooks_limit, type: Integer, desc: "Number of changes (branches or tags) in a single push to determine whether webhooks and services will be fired or not. Webhooks and services won't be submitted if it surpasses that value."
+      optional :push_event_activities_limit, type: Integer, desc: 'Number of changes (branches or tags) in a single push to determine whether individual push events or bulk push event will be created. Bulk push event will be created if it surpasses that value.'
       optional :recaptcha_enabled, type: Boolean, desc: 'Helps prevent bots from creating accounts'
       given recaptcha_enabled: ->(val) { val } do
         requires :recaptcha_site_key, type: String, desc: 'Generate site key at http://www.google.com/recaptcha'
@@ -134,10 +135,15 @@ module API
       optional :local_markdown_version, type: Integer, desc: 'Local markdown version, increase this value when any cached markdown should be invalidated'
       optional :allow_local_requests_from_hooks_and_services, type: Boolean, desc: 'Deprecated: Use :allow_local_requests_from_web_hooks_and_services instead. Allow requests to the local network from hooks and services.' # support legacy names, can be removed in v5
       optional :snowplow_enabled, type: Grape::API::Boolean, desc: 'Enable Snowplow tracking'
+      optional :snowplow_iglu_registry_url, type: String, desc: 'The Snowplow base Iglu Schema Registry URL to use for custom context and self describing events'
       given snowplow_enabled: ->(val) { val } do
         requires :snowplow_collector_hostname, type: String, desc: 'The Snowplow collector hostname'
         optional :snowplow_cookie_domain, type: String, desc: 'The Snowplow cookie domain'
         optional :snowplow_site_id, type: String, desc: 'The Snowplow site name / application ic'
+      end
+      optional :pendo_enabled, type: Grape::API::Boolean, desc: 'Enable Pendo tracking'
+      given pendo_enabled: ->(val) { val } do
+        requires :pendo_url, type: String, desc: 'The Pendo url endpoint'
       end
 
       ApplicationSetting::SUPPORTED_KEY_TYPES.each do |type|

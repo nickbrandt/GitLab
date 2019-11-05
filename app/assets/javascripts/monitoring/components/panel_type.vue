@@ -11,13 +11,17 @@ import {
 } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import MonitorTimeSeriesChart from './charts/time_series.vue';
+import MonitorAnomalyChart from './charts/anomaly.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
+import MonitorHeatmapChart from './charts/heatmap.vue';
 import MonitorEmptyChart from './charts/empty_chart.vue';
+import TrackEventDirective from '~/vue_shared/directives/track_event';
+import { downloadCSVOptions, generateLinkToChartOptions } from '../utils';
 
 export default {
   components: {
     MonitorSingleStatChart,
-    MonitorTimeSeriesChart,
+    MonitorHeatmapChart,
     MonitorEmptyChart,
     Icon,
     GlDropdown,
@@ -27,6 +31,7 @@ export default {
   directives: {
     GlModal: GlModalDirective,
     GlTooltip: GlTooltipDirective,
+    TrackEvent: TrackEventDirective,
   },
   props: {
     clipboardText: {
@@ -35,10 +40,6 @@ export default {
     },
     graphData: {
       type: Object,
-      required: true,
-    },
-    dashboardWidth: {
-      type: Number,
       required: true,
     },
     index: {
@@ -68,6 +69,12 @@ export default {
       const data = new Blob([this.csvText], { type: 'text/plain' });
       return window.URL.createObjectURL(data);
     },
+    monitorChartComponent() {
+      if (this.isPanelType('anomaly-chart')) {
+        return MonitorAnomalyChart;
+      }
+      return MonitorTimeSeriesChart;
+    },
   },
   methods: {
     getGraphAlerts(queries) {
@@ -84,6 +91,8 @@ export default {
     showToast() {
       this.$toast.show(__('Link copied'));
     },
+    downloadCSVOptions,
+    generateLinkToChartOptions,
   },
 };
 </script>
@@ -92,14 +101,19 @@ export default {
     v-if="isPanelType('single-stat') && graphDataHasMetrics"
     :graph-data="graphData"
   />
-  <monitor-time-series-chart
+  <monitor-heatmap-chart
+    v-else-if="isPanelType('heatmap') && graphDataHasMetrics"
+    :graph-data="graphData"
+    :container-width="dashboardWidth"
+  />
+  <component
+    :is="monitorChartComponent"
     v-else-if="graphDataHasMetrics"
     :graph-data="graphData"
     :deployment-data="deploymentData"
     :project-path="projectPath"
     :thresholds="getGraphAlertValues(graphData.queries)"
-    :container-width="dashboardWidth"
-    group-id="monitor-area-chart"
+    group-id="panel-type-chart"
   >
     <div class="d-flex align-items-center">
       <alert-widget
@@ -121,13 +135,18 @@ export default {
         <template slot="button-content">
           <icon name="ellipsis_v" class="text-secondary" />
         </template>
-        <gl-dropdown-item :href="downloadCsv" download="chart_metrics.csv">
+        <gl-dropdown-item
+          v-track-event="downloadCSVOptions(graphData.title)"
+          :href="downloadCsv"
+          download="chart_metrics.csv"
+        >
           {{ __('Download CSV') }}
         </gl-dropdown-item>
         <gl-dropdown-item
+          v-track-event="generateLinkToChartOptions(clipboardText)"
           class="js-chart-link"
           :data-clipboard-text="clipboardText"
-          @click="showToast"
+          @click="showToast(clipboardText)"
         >
           {{ __('Generate link to chart') }}
         </gl-dropdown-item>
@@ -136,6 +155,6 @@ export default {
         </gl-dropdown-item>
       </gl-dropdown>
     </div>
-  </monitor-time-series-chart>
+  </component>
   <monitor-empty-chart v-else :graph-title="graphData.title" />
 </template>

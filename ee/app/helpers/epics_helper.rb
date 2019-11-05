@@ -27,4 +27,19 @@ module EpicsHelper
 
     _("%{state} epics") % { state: (titles[state.to_s] || state.to_s.humanize) }
   end
+
+  def epic_timeframe(epic)
+    short_format = '%b %d'
+    long_format = '%b %d, %Y'
+
+    if epic.start_date.present? && epic.end_date.present?
+      start_date_format = epic.start_date.year == epic.end_date.year ? short_format : long_format
+
+      "#{epic.start_date.strftime(start_date_format)} – #{epic.end_date.strftime(long_format)}"
+    elsif epic.start_date.present?
+      s_('GroupRoadmap|From %{dateWord}') % { dateWord: epic.start_date.strftime(long_format) }
+    elsif epic.end_date.present?
+      s_("GroupRoadmap|Until %{dateWord}") % { dateWord: epic.end_date.strftime(long_format) }
+    end
+  end
 end

@@ -22,10 +22,10 @@ describe Geo::FileRegistryRemovalService do
     end
 
     shared_examples 'removes' do
-      subject(:service) { described_class.new(file_registry.file_type, file_registry.file_id) }
+      subject(:service) { described_class.new(registry.file_type, registry.file_id) }
 
       before do
-        stub_exclusive_lease("file_registry_removal_service:#{file_registry.file_type}:#{file_registry.file_id}",
+        stub_exclusive_lease("file_registry_removal_service:#{registry.file_type}:#{registry.file_id}",
           timeout: Geo::FileRegistryRemovalService::LEASE_TIMEOUT)
       end
 
@@ -38,7 +38,7 @@ describe Geo::FileRegistryRemovalService do
       it 'registry when file was deleted successfully' do
         expect do
           service.execute
-        end.to change(Geo::FileRegistry, :count).by(-1)
+        end.to change(Geo::UploadRegistry, :count).by(-1)
       end
     end
 
@@ -63,12 +63,33 @@ describe Geo::FileRegistryRemovalService do
       end
     end
 
+    shared_examples 'removes LFS object' do
+      subject(:service) { described_class.new('lfs', registry.lfs_object_id) }
+
+      before do
+        stub_exclusive_lease("file_registry_removal_service:lfs:#{registry.lfs_object_id}",
+          timeout: Geo::FileRegistryRemovalService::LEASE_TIMEOUT)
+      end
+
+      it 'file from disk' do
+        expect do
+          service.execute
+        end.to change { File.exist?(file_path) }.from(true).to(false)
+      end
+
+      it 'registry when file was deleted successfully' do
+        expect do
+          service.execute
+        end.to change(Geo::LfsObjectRegistry, :count).by(-1)
+      end
+    end
+
     context 'with LFS object' do
       let!(:lfs_object) { create(:lfs_object, :with_file) }
-      let!(:file_registry) { create(:geo_file_registry, :lfs, file_id: lfs_object.id) }
+      let!(:registry) { create(:geo_lfs_object_registry, lfs_object_id: lfs_object.id) }
       let!(:file_path) { lfs_object.file.path }
 
-      it_behaves_like 'removes'
+      it_behaves_like 'removes LFS object'
 
       context 'migrated to object storage' do
         before do
@@ -76,7 +97,7 @@ describe Geo::FileRegistryRemovalService do
           lfs_object.update_column(:file_store, LfsObjectUploader::Store::REMOTE)
         end
 
-        it_behaves_like 'removes'
+        it_behaves_like 'removes LFS object'
       end
 
       context 'no lfs_object record' do
@@ -84,8 +105,8 @@ describe Geo::FileRegistryRemovalService do
           lfs_object.delete
         end
 
-        it_behaves_like 'removes' do
-          subject(:service) { described_class.new(file_registry.file_type, file_registry.file_id, file_path) }
+        it_behaves_like 'removes LFS object' do
+          subject(:service) { described_class.new('lfs', registry.lfs_object_id, file_path) }
         end
       end
     end
@@ -119,7 +140,7 @@ describe Geo::FileRegistryRemovalService do
 
     context 'with avatar' do
       let!(:upload) { create(:user, :with_avatar).avatar.upload }
-      let!(:file_registry) { create(:geo_file_registry, :avatar, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :avatar, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
@@ -136,7 +157,7 @@ describe Geo::FileRegistryRemovalService do
 
     context 'with attachment' do
       let!(:upload) { create(:note, :with_attachment).attachment.upload }
-      let!(:file_registry) { create(:geo_file_registry, :attachment, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :attachment, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
@@ -153,7 +174,7 @@ describe Geo::FileRegistryRemovalService do
 
     context 'with file' do
       let!(:upload) { create(:user, :with_avatar).avatar.upload }
-      let!(:file_registry) { create(:geo_file_registry, :avatar, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :avatar, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
@@ -176,7 +197,7 @@ describe Geo::FileRegistryRemovalService do
         Upload.find_by(model: group, uploader: NamespaceFileUploader.name)
       end
 
-      let!(:file_registry) { create(:geo_file_registry, :namespace_file, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :namespace_file, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
@@ -198,7 +219,7 @@ describe Geo::FileRegistryRemovalService do
         PersonalFileUploader.new(snippet).store!(file)
         Upload.find_by(model: snippet, uploader: PersonalFileUploader.name)
       end
-      let!(:file_registry) { create(:geo_file_registry, :personal_file, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :personal_file, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
@@ -220,7 +241,7 @@ describe Geo::FileRegistryRemovalService do
         FaviconUploader.new(appearance).store!(file)
         Upload.find_by(model: appearance, uploader: FaviconUploader.name)
       end
-      let!(:file_registry) { create(:geo_file_registry, :favicon, file_id: upload.id) }
+      let!(:registry) { create(:geo_upload_registry, :favicon, file_id: upload.id) }
       let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'

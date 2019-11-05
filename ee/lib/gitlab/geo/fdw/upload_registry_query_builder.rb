@@ -16,7 +16,6 @@ module Gitlab
           reflect(
             query
               .joins(fdw_inner_join_uploads)
-              .merge(::Geo::FileRegistry.uploads)
               .where(
                 fdw_upload_table[:model_id].eq(model.id)
                   .and(fdw_upload_table[:model_type].eq(model.class.name))
@@ -28,11 +27,11 @@ module Gitlab
         private
 
         def base
-          ::Geo::FileRegistry.select(file_registry_table[Arel.star])
+          ::Geo::UploadRegistry.select(file_registry_table[Arel.star])
         end
 
         def file_registry_table
-          ::Geo::FileRegistry.arel_table
+          ::Geo::UploadRegistry.arel_table
         end
 
         def fdw_upload_table

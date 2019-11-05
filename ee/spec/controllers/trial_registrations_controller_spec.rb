@@ -45,7 +45,6 @@ describe TrialRegistrationsController do
 
   describe '#create' do
     before do
-      stub_feature_flags(invisible_captcha: false)
       stub_application_setting(send_user_confirmation_email: true)
     end
 

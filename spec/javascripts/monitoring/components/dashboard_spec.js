@@ -4,7 +4,6 @@ import { GlToast } from '@gitlab/ui';
 import VueDraggable from 'vuedraggable';
 import MockAdapter from 'axios-mock-adapter';
 import Dashboard from '~/monitoring/components/dashboard.vue';
-import { timeWindows, timeWindowsKeyNames } from '~/monitoring/constants';
 import * as types from '~/monitoring/stores/mutation_types';
 import { createStore } from '~/monitoring/stores';
 import axios from '~/lib/utils/axios_utils';
@@ -35,6 +34,12 @@ const propsData = {
   customMetricsAvailable: false,
   customMetricsPath: '',
   validateQueryPath: '',
+};
+
+const resetSpy = spy => {
+  if (spy) {
+    spy.calls.reset();
+  }
 };
 
 export default propsData;
@@ -96,8 +101,13 @@ describe('Dashboard', () => {
   });
 
   describe('requests information to the server', () => {
+    let spy;
     beforeEach(() => {
       mock.onGet(mockApiEndpoint).reply(200, metricsGroupsAPIResponse);
+    });
+
+    afterEach(() => {
+      resetSpy(spy);
     });
 
     it('shows up a loading state', done => {
@@ -272,7 +282,7 @@ describe('Dashboard', () => {
       });
     });
 
-    it('renders the time window dropdown with a set of options', done => {
+    it('renders the datetimepicker dropdown', done => {
       component = new DashboardComponent({
         el: document.querySelector('.prometheus-graphs'),
         propsData: {
@@ -282,17 +292,9 @@ describe('Dashboard', () => {
         },
         store,
       });
-      const numberOfTimeWindows = Object.keys(timeWindows).length;
 
       setTimeout(() => {
-        const timeWindowDropdown = component.$el.querySelector('.js-time-window-dropdown');
-        const timeWindowDropdownEls = component.$el.querySelectorAll(
-          '.js-time-window-dropdown .dropdown-item',
-        );
-
-        expect(timeWindowDropdown).not.toBeNull();
-        expect(timeWindowDropdownEls.length).toEqual(numberOfTimeWindows);
-
+        expect(component.$el.querySelector('.js-time-window-dropdown')).not.toBeNull();
         done();
       });
     });
@@ -355,7 +357,7 @@ describe('Dashboard', () => {
       });
     });
 
-    it('defaults to the eight hours time window for non valid url parameters', done => {
+    it('shows an error message if invalid url parameters are passed', done => {
       spyOnDependency(Dashboard, 'getParameterValues').and.returnValue([
         '<script>alert("XSS")</script>',
       ]);
@@ -366,9 +368,11 @@ describe('Dashboard', () => {
         store,
       });
 
-      Vue.nextTick(() => {
-        expect(component.selectedTimeWindowKey).toEqual(timeWindowsKeyNames.eightHours);
+      spy = spyOn(component, 'showInvalidDateError');
+      component.$mount();
 
+      component.$nextTick(() => {
+        expect(component.showInvalidDateError).toHaveBeenCalled();
         done();
       });
     });
@@ -438,6 +442,28 @@ describe('Dashboard', () => {
           expect(findEnabledDraggables()).toEqual(findDraggables());
         });
 
+        it('metrics can be swapped', done => {
+          const firstDraggable = findDraggables().at(0);
+          const mockMetrics = [...metricsGroupsAPIResponse.data[0].metrics];
+          const value = () => firstDraggable.props('value');
+
+          expect(value().length).toBe(mockMetrics.length);
+          value().forEach((metric, i) => {
+            expect(metric.title).toBe(mockMetrics[i].title);
+          });
+
+          // swap two elements and `input` them
+          [mockMetrics[0], mockMetrics[1]] = [mockMetrics[1], mockMetrics[0]];
+          firstDraggable.vm.$emit('input', mockMetrics);
+
+          firstDraggable.vm.$nextTick(() => {
+            value().forEach((metric, i) => {
+              expect(metric.title).toBe(mockMetrics[i].title);
+            });
+            done();
+          });
+        });
+
         it('shows a remove button, which removes a panel', done => {
           expect(findFirstDraggableRemoveButton().isEmpty()).toBe(false);
 
@@ -445,8 +471,6 @@ describe('Dashboard', () => {
           findFirstDraggableRemoveButton().trigger('click');
 
           wrapper.vm.$nextTick(() => {
-            // At present graphs will not be removed in backend
-            // See https://gitlab.com/gitlab-org/gitlab/issues/27835
             expect(findDraggablePanels().length).toEqual(expectedPanelCount - 1);
             done();
           });
@@ -535,42 +559,67 @@ describe('Dashboard', () => {
     });
   });
 
-  describe('when the window resizes', () => {
+  describe('responds to window resizes', () => {
+    let promPanel;
+    let promGroup;
+    let panelToggle;
+    let chart;
     beforeEach(() => {
       mock.onGet(mockApiEndpoint).reply(200, metricsGroupsAPIResponse);
-      jasmine.clock().install();
-    });
 
-    afterEach(() => {
-      jasmine.clock().uninstall();
-    });
-
-    it('sets elWidth to page width when the sidebar is resized', done => {
       component = new DashboardComponent({
         el: document.querySelector('.prometheus-graphs'),
         propsData: {
           ...propsData,
           hasMetrics: true,
-          showPanels: false,
+          showPanels: true,
         },
         store,
       });
 
-      expect(component.elWidth).toEqual(0);
+      component.$store.dispatch('monitoringDashboard/setFeatureFlags', {
+        prometheusEndpoint: false,
+      });
 
-      const pageLayoutEl = document.querySelector('.layout-page');
-      pageLayoutEl.classList.add('page-with-icon-sidebar');
+      component.$store.commit(
+        `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
+        environmentData,
+      );
 
-      Vue.nextTick()
-        .then(() => {
-          jasmine.clock().tick(1000);
-          return Vue.nextTick();
-        })
-        .then(() => {
-          expect(component.elWidth).toEqual(pageLayoutEl.clientWidth);
-          done();
-        })
-        .catch(done.fail);
+      component.$store.commit(
+        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+        singleGroupResponse,
+      );
+
+      component.$store.commit(
+        `monitoringDashboard/${types.SET_ALL_DASHBOARDS}`,
+        dashboardGitResponse,
+      );
+
+      return Vue.nextTick().then(() => {
+        promPanel = component.$el.querySelector('.prometheus-panel');
+        promGroup = promPanel.querySelector('.prometheus-graph-group');
+        panelToggle = promPanel.querySelector('.js-graph-group-toggle');
+        chart = promGroup.querySelector('.position-relative svg');
+      });
+    });
+
+    it('setting chart size to zero when panel group is hidden', () => {
+      expect(promGroup.style.display).toBe('');
+      expect(chart.clientWidth).toBeGreaterThan(0);
+
+      panelToggle.click();
+      return Vue.nextTick().then(() => {
+        expect(promGroup.style.display).toBe('none');
+        expect(chart.clientWidth).toBe(0);
+        promPanel.style.width = '500px';
+      });
+    });
+
+    it('expanding chart panel group after resize displays chart', () => {
+      panelToggle.click();
+
+      expect(chart.clientWidth).toBeGreaterThan(0);
     });
   });
 
@@ -657,7 +706,9 @@ describe('Dashboard', () => {
         `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
         MonitoringMock.data,
       );
-      [mockGraphData] = component.$store.state.monitoringDashboard.groups[0].metrics;
+      [
+        mockGraphData,
+      ] = component.$store.state.monitoringDashboard.dashboard.panel_groups[0].metrics;
     });
 
     describe('csvText', () => {

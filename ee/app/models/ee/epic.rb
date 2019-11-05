@@ -12,10 +12,15 @@ module EE
       include Referable
       include Awardable
       include LabelEventable
-      include RelativePositioning
       include UsageStatistics
+      include FromUnion
+      include EpicTreeSorting
 
-      enum state_id: { opened: 1, closed: 2 }
+      enum state_id: {
+        opened: ::Epic.available_states[:opened],
+        closed: ::Epic.available_states[:closed]
+      }
+
       alias_attribute :state, :state_id
 
       belongs_to :closed_by, class_name: 'User'
@@ -36,6 +41,8 @@ module EE
       belongs_to :group
       belongs_to :start_date_sourcing_milestone, class_name: 'Milestone'
       belongs_to :due_date_sourcing_milestone, class_name: 'Milestone'
+      belongs_to :start_date_sourcing_epic, class_name: 'Epic'
+      belongs_to :due_date_sourcing_epic, class_name: 'Epic'
       belongs_to :parent, class_name: "Epic"
       has_many :children, class_name: "Epic", foreign_key: :parent_id
       has_many :events, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
@@ -51,8 +58,12 @@ module EE
       alias_attribute :parent_ids, :parent_id
       alias_method :issuing_parent, :group
 
+      scope :for_ids, -> (ids) { where(id: ids) }
       scope :in_parents, -> (parent_ids) { where(parent_id: parent_ids) }
       scope :inc_group, -> { includes(:group) }
+      scope :in_milestone, -> (milestone_id) { joins(:issues).where(issues: { milestone_id: milestone_id }) }
+      scope :in_issues, -> (issues) { joins(:epic_issues).where(epic_issues: { issue_id: issues }).distinct }
+      scope :has_parent, -> { where.not(parent_id: nil) }
 
       scope :order_start_or_end_date_asc, -> do
         reorder("COALESCE(start_date, end_date) ASC NULLS FIRST")
@@ -79,11 +90,30 @@ module EE
       end
 
       scope :with_api_entity_associations, -> { preload(:author, :labels, group: :route) }
+      scope :start_date_inherited, -> { where(start_date_is_fixed: [nil, false]) }
+      scope :due_date_inherited, -> { where(due_date_is_fixed: [nil, false]) }
 
       MAX_HIERARCHY_DEPTH = 5
 
       def etag_caching_enabled?
         true
+      end
+
+      before_save :set_fixed_start_date, if: :start_date_is_fixed?
+      before_save :set_fixed_due_date, if: :due_date_is_fixed?
+
+      private
+
+      def set_fixed_start_date
+        self.start_date = start_date_fixed
+        self.start_date_sourcing_milestone = nil
+        self.due_date_sourcing_epic = nil
+      end
+
+      def set_fixed_due_date
+        self.end_date = due_date_fixed
+        self.due_date_sourcing_milestone = nil
+        self.due_date_sourcing_epic = nil
       end
     end
 
@@ -147,14 +177,6 @@ module EE
         ::Group
       end
 
-      def relative_positioning_query_base(epic)
-        in_parents(epic.parent_ids)
-      end
-
-      def relative_positioning_parent_column
-        :parent_id
-      end
-
       # Return the deepest relation level for an epic.
       # Example 1:
       # epic1 - parent: nil
@@ -168,45 +190,6 @@ module EE
       # Returns: 2
       def deepest_relationship_level
         ::Gitlab::ObjectHierarchy.new(self.where(parent_id: nil)).max_descendants_depth
-      end
-
-      def update_start_and_due_dates(epics)
-        self.where(id: epics).update_all(
-          [
-            %{
-              start_date = CASE WHEN start_date_is_fixed = true THEN start_date_fixed ELSE (?) END,
-              start_date_sourcing_milestone_id = (?),
-              end_date = CASE WHEN due_date_is_fixed = true THEN due_date_fixed ELSE (?) END,
-              due_date_sourcing_milestone_id = (?)
-            },
-            start_date_milestone_query.select(:start_date),
-            start_date_milestone_query.select(:id),
-            due_date_milestone_query.select(:due_date),
-            due_date_milestone_query.select(:id)
-          ]
-        )
-      end
-
-      private
-
-      def start_date_milestone_query
-        source_milestones_query
-          .where.not(start_date: nil)
-          .order(:start_date, :id)
-          .limit(1)
-      end
-
-      def due_date_milestone_query
-        source_milestones_query
-          .where.not(due_date: nil)
-          .order(due_date: :desc, id: :desc)
-          .limit(1)
-      end
-
-      def source_milestones_query
-        ::Milestone
-          .joins(issues: :epic_issue)
-          .where('epic_issues.epic_id = epics.id')
       end
     end
 
@@ -243,16 +226,28 @@ module EE
     # Needed to use EntityDateHelper#remaining_days_in_words
     alias_attribute(:due_date, :end_date)
 
-    def update_start_and_due_dates
-      self.class.update_start_and_due_dates([self])
-    end
-
     def start_date_from_milestones
       start_date_is_fixed? ? start_date_sourcing_milestone&.start_date : start_date
     end
 
     def due_date_from_milestones
       due_date_is_fixed? ? due_date_sourcing_milestone&.due_date : due_date
+    end
+
+    def start_date_from_inherited_source
+      start_date_sourcing_milestone&.start_date || start_date_sourcing_epic&.start_date
+    end
+
+    def due_date_from_inherited_source
+      due_date_sourcing_milestone&.due_date || due_date_sourcing_epic&.end_date
+    end
+
+    def start_date_from_inherited_source_title
+      start_date_sourcing_milestone&.title || start_date_sourcing_epic&.title
+    end
+
+    def due_date_from_inherited_source_title
+      due_date_sourcing_milestone&.title || due_date_sourcing_epic&.title
     end
 
     def to_reference(from = nil, full: false)

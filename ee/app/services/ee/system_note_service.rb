@@ -125,15 +125,11 @@ module EE
     #
     # Returns the created Note object
     def approve_mr(noteable, user)
-      body = "approved this merge request"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'approved'))
+      ::SystemNotes::MergeRequestsService.new(noteable: noteable, project: noteable.project, author: user).approve_mr
     end
 
     def unapprove_mr(noteable, user)
-      body = "unapproved this merge request"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'unapproved'))
+      ::SystemNotes::MergeRequestsService.new(noteable: noteable, project: noteable.project, author: user).unapprove_mr
     end
 
     # Called when the weight of a Noteable is changed
@@ -244,6 +240,12 @@ module EE
       # TODO: Abort message should be sent by the system, not a particular user.
       # See https://gitlab.com/gitlab-org/gitlab-foss/issues/63187.
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+    end
+
+    def auto_resolve_prometheus_alert(noteable, project, author)
+      body = 'automatically closed this issue because the alert resolved.'
+
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'closed'))
     end
 
     private

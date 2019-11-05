@@ -43,8 +43,10 @@ describe 'Global elastic search', :elastic do
       let(:object) { :project }
       let(:creation_args) { { namespace: user.namespace } }
       let(:path) { search_path(search: 'project*', scope: 'projects') }
-      # Each Project requires 4 extra queries: one for each "count" (forks, open MRs, open Issues) and one for access level
-      let(:query_count_multiplier) { 4 }
+      # Each Project requires 5 extra queries: one for each "count" (forks,
+      # open MRs, open Issues) and twice for access level. This should be fixed
+      # per https://gitlab.com/gitlab-org/gitlab/issues/34457
+      let(:query_count_multiplier) { 5 }
 
       it_behaves_like 'an efficient database result'
     end
@@ -75,7 +77,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "has a pagination" do
+    it "has a pagination", :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('initial')
@@ -93,7 +95,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "has a pagination" do
+    it "has a pagination", :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('foo')
@@ -112,7 +114,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "finds files" do
+    it "finds files", :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('application.js')
@@ -153,7 +155,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "finds files" do
+    it "finds files", :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('term')
@@ -171,7 +173,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "finds commits" do
+    it "finds commits", :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('add')
@@ -181,7 +183,7 @@ describe 'Global elastic search', :elastic do
       expect(page).to have_selector('.project-namespace')
     end
 
-    it 'shows proper page 2 results' do
+    it 'shows proper page 2 results', :sidekiq_might_not_need_inline do
       visit dashboard_projects_path
 
       submit_search('add')
@@ -207,7 +209,7 @@ describe 'Global elastic search', :elastic do
       submit_search('project')
     end
 
-    it 'displays result counts for all categories' do
+    it 'displays result counts for all categories', :sidekiq_might_not_need_inline do
       expect(page).to have_content('Projects 1')
       expect(page).to have_content('Issues 1')
       expect(page).to have_content('Merge requests 0')
@@ -217,6 +219,35 @@ describe 'Global elastic search', :elastic do
       expect(page).to have_content('Commits 0')
       expect(page).to have_content('Wiki 0')
       expect(page).to have_content('Users 0')
+    end
+  end
+
+  context 'when no results are returned' do
+    it 'allows basic search without Elasticsearch' do
+      visit dashboard_projects_path
+
+      submit_search('project')
+
+      # Project won't be found since ES index is not up to date
+      expect(page).not_to have_content('Projects 1')
+
+      # Since there are no results you have the option to instead use basic
+      # search
+      click_link 'basic search'
+
+      # Project is found now that we are using basic search
+      expect(page).to have_content('Projects 1')
+    end
+
+    context 'when performing Commits search' do
+      it 'does not allow basic search' do
+        visit dashboard_projects_path
+
+        submit_search('project')
+        select_search_scope('Commits')
+
+        expect(page).not_to have_link('basic search')
+      end
     end
   end
 end

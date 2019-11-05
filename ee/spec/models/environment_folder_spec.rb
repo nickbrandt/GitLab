@@ -58,5 +58,30 @@ describe EnvironmentFolder do
 
       expect(environment_folder.last_environment).to eq(environment)
     end
+
+    it 'preloads only relevant ci_builds' do
+      project = create(:project)
+
+      ci_build_a = create(:ci_build, project: project)
+      ci_build_b = create(:ci_build, project: project)
+      ci_build_c = create(:ci_build, project: project)
+
+      environment_a = create(:environment, project: project)
+      environment_b = create(:environment, project: project)
+
+      create(:deployment, :success, project: project, environment: environment_a, deployable: ci_build_a)
+      create(:deployment, :success, project: project, environment: environment_a, deployable: ci_build_b)
+      create(:deployment, :success, project: project, environment: environment_b, deployable: ci_build_c)
+
+      expect(CommitStatus).to receive(:instantiate)
+        .with(a_hash_including("id" => ci_build_b.id), anything)
+        .and_call_original
+
+      expect(CommitStatus).to receive(:instantiate)
+        .with(a_hash_including("id" => ci_build_c.id), anything)
+        .and_call_original
+
+      described_class.find_for_projects([project])
+    end
   end
 end

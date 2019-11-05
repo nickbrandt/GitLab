@@ -40,7 +40,7 @@ FactoryBot.define do
     end
 
     trait :merged do
-      state { :merged }
+      state_id { MergeRequest.available_states[:merged] }
     end
 
     trait :merged_target do
@@ -57,7 +57,7 @@ FactoryBot.define do
     end
 
     trait :closed do
-      state { :closed }
+      state_id { MergeRequest.available_states[:closed] }
     end
 
     trait :closed_last_month do
@@ -69,7 +69,7 @@ FactoryBot.define do
     end
 
     trait :opened do
-      state { :opened }
+      state_id { MergeRequest.available_states[:opened] }
     end
 
     trait :invalid do
@@ -78,7 +78,7 @@ FactoryBot.define do
     end
 
     trait :locked do
-      state { :locked }
+      state_id { MergeRequest.available_states[:locked] }
     end
 
     trait :simple do
@@ -114,6 +114,18 @@ FactoryBot.define do
           :ci_pipeline,
           :success,
           :with_test_reports,
+          project: merge_request.source_project,
+          ref: merge_request.source_branch,
+          sha: merge_request.diff_head_sha)
+      end
+    end
+
+    trait :with_exposed_artifacts do
+      after(:build) do |merge_request|
+        merge_request.head_pipeline = build(
+          :ci_pipeline,
+          :success,
+          :with_exposed_artifacts,
           project: merge_request.source_project,
           ref: merge_request.source_branch,
           sha: merge_request.diff_head_sha)
@@ -184,6 +196,10 @@ FactoryBot.define do
       unless [target_project, source_project].all?(&:repository_exists?)
         allow(merge_request).to receive(:fetch_ref!)
       end
+    end
+
+    after(:build) do |merge_request, evaluator|
+      merge_request.state_id = MergeRequest.available_states[evaluator.state]
     end
 
     after(:create) do |merge_request, evaluator|

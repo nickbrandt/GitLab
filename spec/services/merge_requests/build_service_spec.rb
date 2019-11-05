@@ -80,15 +80,46 @@ describe MergeRequests::BuildService do
     end
 
     it 'does not assign force_remove_source_branch' do
-      expect(merge_request.force_remove_source_branch?).to be_falsey
+      expect(merge_request.force_remove_source_branch?).to be_truthy
     end
 
-    context 'with force_remove_source_branch parameter' do
+    context 'with force_remove_source_branch parameter when the user is authorized' do
       let(:mr_params) { params.merge(force_remove_source_branch: '1') }
+      let(:source_project) { fork_project(project, user) }
       let(:merge_request) { described_class.new(project, user, mr_params).execute }
 
       it 'assigns force_remove_source_branch' do
         expect(merge_request.force_remove_source_branch?).to be_truthy
+      end
+
+      context 'with project setting remove_source_branch_after_merge false' do
+        before do
+          project.remove_source_branch_after_merge = false
+        end
+
+        it 'assigns force_remove_source_branch' do
+          expect(merge_request.force_remove_source_branch?).to be_truthy
+        end
+      end
+    end
+
+    context 'with project setting remove_source_branch_after_merge true' do
+      before do
+        project.remove_source_branch_after_merge = true
+      end
+
+      it 'assigns force_remove_source_branch' do
+        expect(merge_request.force_remove_source_branch?).to be_truthy
+      end
+
+      context 'with force_remove_source_branch parameter false' do
+        before do
+          params[:force_remove_source_branch] = '0'
+        end
+
+        it 'does not assign force_remove_source_branch' do
+          expect(merge_request.force_remove_source_branch?).to be(false)
+        end
       end
     end
 
@@ -130,7 +161,7 @@ describe MergeRequests::BuildService do
             let!(:project) { fork_project(target_project, user, namespace: user.namespace, repository: true) }
             let(:source_project) { project }
 
-            it 'creates compare object with target branch as default branch' do
+            it 'creates compare object with target branch as default branch', :sidekiq_might_not_need_inline do
               expect(merge_request.compare).to be_present
               expect(merge_request.target_branch).to eq(project.default_branch)
             end

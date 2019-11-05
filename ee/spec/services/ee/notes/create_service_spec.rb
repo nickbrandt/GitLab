@@ -39,7 +39,7 @@ describe Notes::CreateService do
         expect(note.noteable).to eq(design)
       end
 
-      it 'sends a notification about this note' do
+      it 'sends a notification about this note', :sidekiq_might_not_need_inline do
         notifier = double
         allow(::NotificationService).to receive(:new).and_return(notifier)
 

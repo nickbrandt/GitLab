@@ -3,10 +3,6 @@
 module Elastic
   module Latest
     class IssueClassProxy < ApplicationClassProxy
-      def nested?
-        true
-      end
-
       def elastic_search(query, options: {})
         query_hash =
           if query =~ /#(\d+)\z/

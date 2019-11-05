@@ -147,7 +147,7 @@ module EE
           expose :name
           expose :group, using: ::API::Entities::BasicGroupDetails
 
-          with_options if: ->(board, _) { board.parent.feature_available?(:scoped_issue_board) } do
+          with_options if: ->(board, _) { board.resource_parent.feature_available?(:scoped_issue_board) } do
             expose :milestone do |board|
               if board.milestone.is_a?(Milestone)
                 ::API::Entities::Milestone.represent(board.milestone)
@@ -168,7 +168,7 @@ module EE
         prepended do
           expose :milestone, using: ::API::Entities::Milestone, if: -> (entity, _) { entity.milestone? }
           expose :user, as: :assignee, using: ::API::Entities::UserSafe, if: -> (entity, _) { entity.assignee? }
-          expose :max_issue_count, if: -> (list, _) { list.board.parent.feature_available?(:wip_limits) }
+          expose :max_issue_count, if: -> (list, _) { list.board.resource_parent.feature_available?(:wip_limits) }
         end
       end
 
@@ -288,11 +288,13 @@ module EE
         expose :author, using: ::API::Entities::UserBasic
         expose :start_date
         expose :start_date_is_fixed?, as: :start_date_is_fixed, if: can_admin_epic
-        expose :start_date_fixed, :start_date_from_milestones, if: can_admin_epic
-        expose :end_date # @deprecated
+        expose :start_date_fixed, :start_date_from_inherited_source, if: can_admin_epic
+        expose :start_date_from_milestones, if: can_admin_epic # @deprecated in favor of start_date_from_inherited_source
+        expose :end_date # @deprecated in favor of due_date
         expose :end_date, as: :due_date
         expose :due_date_is_fixed?, as: :due_date_is_fixed, if: can_admin_epic
-        expose :due_date_fixed, :due_date_from_milestones, if: can_admin_epic
+        expose :due_date_fixed, :due_date_from_inherited_source, if: can_admin_epic
+        expose :due_date_from_milestones, if: can_admin_epic # @deprecated in favor of due_date_from_inherited_source
         expose :state
         expose :web_edit_url, if: can_admin_epic # @deprecated
         expose :web_url
@@ -571,7 +573,7 @@ module EE
         expose :repos_max_capacity
         expose :verification_max_capacity
         expose :container_repositories_max_capacity
-        expose :sync_object_storage, if: ->(geo_node, _) { ::Feature.enabled?(:geo_object_storage_replication) && geo_node.secondary? }
+        expose :sync_object_storage, if: ->(geo_node, _) { geo_node.secondary? }
 
         # Retained for backwards compatibility. Remove in API v5
         expose :clone_protocol do |_record, _options|
@@ -645,6 +647,13 @@ module EE
         expose :container_repositories_failed_count
         expose :container_repositories_synced_in_percentage do |node|
           number_to_percentage(node.container_repositories_synced_in_percentage, precision: 2)
+        end
+
+        expose :design_repositories_count
+        expose :design_repositories_synced_count
+        expose :design_repositories_failed_count
+        expose :design_repositories_synced_in_percentage do |node|
+          number_to_percentage(node.design_repositories_synced_in_percentage, precision: 2)
         end
 
         expose :projects_count
@@ -852,6 +861,10 @@ module EE
           expose :strategies
           expose :created_at
           expose :updated_at
+        end
+
+        class DetailedScope < Scope
+          expose :name
         end
 
         expose :name

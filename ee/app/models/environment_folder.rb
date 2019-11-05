@@ -15,7 +15,7 @@ class EnvironmentFolder
 
     environments_by_id = environments
       .id_in(folder_data.map { |(env_id, _)| env_id })
-      .includes(:project, last_deployment: [:project, deployable: :user])
+      .includes(:project, last_visible_deployment: [:project, deployable: :user])
       .index_by(&:id)
 
     folders = folder_data.map do |(environment_id, count)|

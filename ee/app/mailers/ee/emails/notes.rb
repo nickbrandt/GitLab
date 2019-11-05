@@ -16,7 +16,7 @@ module EE
 
         design = @note.noteable
         @target_url = ::Gitlab::Routing.url_helpers.designs_project_issue_url(
-          @note.parent,
+          @note.resource_parent,
           design.issue,
           note_target_url_query_params.merge(vueroute: design.filename)
         )

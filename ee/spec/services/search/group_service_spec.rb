@@ -16,7 +16,7 @@ describe Search::GroupService, :elastic do
 
   it_behaves_like 'EE search service shared examples', ::Gitlab::GroupSearchResults, ::Gitlab::Elastic::GroupSearchResults do
     let(:scope) { create(:group) }
-    let(:service) { described_class.new(user, scope, search: '*') }
+    let(:service) { described_class.new(user, scope, params) }
   end
 
   describe 'group search' do
@@ -50,7 +50,7 @@ describe Search::GroupService, :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    context 'finding projects by name' do
+    context 'finding projects by name', :sidekiq_might_not_need_inline do
       subject { results.objects('projects') }
 
       context 'in parent group' do

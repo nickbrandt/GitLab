@@ -7,7 +7,6 @@ class Groups::ScimOauthController < Groups::ApplicationController
   before_action :authorize_manage_saml!
   before_action :check_group_saml_available!
   before_action :check_group_saml_configured
-  before_action :check_group_scim_enabled
 
   def show
     scim_token = ScimOauthAccessToken.find_by_group_id(@group.id)
@@ -44,10 +43,4 @@ class Groups::ScimOauthController < Groups::ApplicationController
     end
   end
   # rubocop: enable CodeReuse/ActiveRecord
-
-  private
-
-  def check_group_scim_enabled
-    route_not_found unless Feature.enabled?(:group_scim, @group)
-  end
 end

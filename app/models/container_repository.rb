@@ -11,6 +11,7 @@ class ContainerRepository < ApplicationRecord
   delegate :client, to: :registry
 
   scope :ordered, -> { order(:name) }
+  scope :with_api_entity_associations, -> { preload(project: [:route, { namespace: :route }]) }
 
   # rubocop: disable CodeReuse/ServiceClass
   def registry

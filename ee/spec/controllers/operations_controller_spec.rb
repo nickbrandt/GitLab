@@ -34,6 +34,15 @@ describe OperationsController do
       expect(response).to render_template(:index)
     end
 
+    it 'renders regardless of the environments_dashboard feature flag' do
+      stub_feature_flags(environments_dashboard: { enabled: false, thing: user })
+
+      get :index
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(response).to render_template(:index)
+    end
+
     context 'with an anonymous user' do
       before do
         sign_out(user)
@@ -51,6 +60,24 @@ describe OperationsController do
     it_behaves_like 'unlicensed', :get, :environments
 
     it 'renders the view' do
+      get :environments
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(response).to render_template(:environments)
+    end
+
+    it 'returns a 404 when the feature is disabled' do
+      stub_feature_flags(environments_dashboard: { enabled: false, thing: user })
+
+      get :environments
+
+      expect(response).to have_gitlab_http_status(:not_found)
+    end
+
+    it 'renders the view when the feature is disabled for a different user' do
+      other_user = create(:user)
+      stub_feature_flags(environments_dashboard: { enabled: false, thing: other_user })
+
       get :environments
 
       expect(response).to have_gitlab_http_status(:ok)
@@ -136,6 +163,17 @@ describe OperationsController do
         expect(expected_project['alert_count']).to eq(firing_alert_events.size)
         expect(expected_project['alert_path']).to eq(alert_path)
         expect(expected_project['last_alert']['id']).to eq(last_firing_alert.id)
+      end
+
+      it 'returns a list of added projects regardless of the environments_dashboard feature flag' do
+        stub_feature_flags(environments_dashboard: { enabled: false, thing: user })
+
+        get :list
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('dashboard/operations/list', dir: 'ee')
+        expect(json_response['projects'].size).to eq(1)
+        expect(expected_project['id']).to eq(project.id)
       end
 
       context 'without sufficient access level' do
@@ -224,6 +262,30 @@ describe OperationsController do
         before do
           project.add_developer(user)
           user.update!(ops_dashboard_projects: [project])
+        end
+
+        it 'returns a 404 when the feature is disabled' do
+          stub_feature_flags(environments_dashboard: { enabled: false, thing: user })
+          environment = create(:environment, project: project)
+          ci_build = create(:ci_build, project: project)
+          create(:deployment, :success, project: project, environment: environment, deployable: ci_build)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+
+        it 'returns a project when the feature is disabled for another user' do
+          other_user = create(:user)
+          stub_feature_flags(environments_dashboard: { enabled: false, thing: other_user })
+          environment = create(:environment, project: project)
+          ci_build = create(:ci_build, project: project)
+          create(:deployment, :success, project: project, environment: environment, deployable: ci_build)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
         end
 
         it 'returns a project without an environment' do
@@ -423,6 +485,22 @@ describe OperationsController do
           expect(deployable_json['id']).to eq(ci_build.id)
           expect(deployable_json['build_path']).to eq(project_job_path(project, ci_build))
         end
+
+        it 'returns a failed deployment' do
+          environment = create(:environment, project: project)
+          deployment = create(:deployment, :failed, project: project, environment: environment)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+          environment_json = project_json['environments'].first
+          last_deployment_json = environment_json['last_deployment']
+
+          expect(last_deployment_json['id']).to eq(deployment.id)
+        end
       end
     end
   end
@@ -450,6 +528,16 @@ describe OperationsController do
 
         user.reload
         expect(user.ops_dashboard_projects).to contain_exactly(project_a, project_b)
+      end
+
+      it 'adds projects to the dashboard regardless of the environments_dashboard feature flag' do
+        stub_feature_flags(environments_dashboard: { enabled: false, thing: user })
+
+        post :create, params: { project_ids: [project_a.id, project_b.id.to_s] }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response).to match_schema('dashboard/operations/add', dir: 'ee')
+        expect(json_response['added']).to contain_exactly(project_a.id, project_b.id)
       end
 
       it 'cannot add a project twice' do
@@ -530,7 +618,17 @@ describe OperationsController do
         expect(response).to have_gitlab_http_status(200)
 
         user.reload
-        expect(user.ops_dashboard_projects).not_to eq([project])
+        expect(user.ops_dashboard_projects).to eq([])
+      end
+
+      it 'removes a project regardless of the environments_dashboard feature flag' do
+        stub_feature_flags(environments_dashboard: { enabled: false, thing: user })
+
+        delete :destroy, params: { project_id: project.id }
+
+        expect(response).to have_gitlab_http_status(200)
+        user.reload
+        expect(user.ops_dashboard_projects).to eq([])
       end
     end
 

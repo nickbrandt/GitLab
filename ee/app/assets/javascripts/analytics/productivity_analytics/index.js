@@ -22,7 +22,7 @@ export default () => {
   const { endpoint, emptyStateSvgPath, noAccessSvgPath } = appContainer.dataset;
 
   const now = new Date(Date.now());
-  const defaultStartDate = new Date(getDateInPast(now, defaultDaysInPast));
+  const defaultStartDate = getDateInPast(now, defaultDaysInPast);
   const defaultEndDate = now;
 
   let filterManager;

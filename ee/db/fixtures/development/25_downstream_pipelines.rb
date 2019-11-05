@@ -9,6 +9,10 @@ Gitlab::Seeder.quiet do
         .where.not(project: project)
         .order('random()').first
 
+      # If the number of created projects is 1 (i.e. env['SIZE'] == 1),
+      # a target pipeline becomes nil.
+      next unless target_pipeline
+
       # link to source pipeline
       pipeline.sourced_pipelines.create!(
         source_job: pipeline.builds.all.sample,

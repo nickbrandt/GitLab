@@ -98,7 +98,7 @@ describe MergeRequests::UpdateService, :mailer do
           )
       end
 
-      it 'sends email to user2 about assign of new merge request and email to user3 about merge request unassignment' do
+      it 'sends email to user2 about assign of new merge request and email to user3 about merge request unassignment', :sidekiq_might_not_need_inline do
         deliveries = ActionMailer::Base.deliveries
         email = deliveries.last
         recipients = deliveries.last(2).flat_map(&:to)
@@ -181,7 +181,7 @@ describe MergeRequests::UpdateService, :mailer do
           end
         end
 
-        it 'merges the MR' do
+        it 'merges the MR', :sidekiq_might_not_need_inline do
           expect(@merge_request).to be_valid
           expect(@merge_request.state).to eq('merged')
           expect(@merge_request.merge_error).to be_nil
@@ -202,7 +202,7 @@ describe MergeRequests::UpdateService, :mailer do
           end
         end
 
-        it 'merges the MR' do
+        it 'merges the MR', :sidekiq_might_not_need_inline do
           expect(@merge_request).to be_valid
           expect(@merge_request.state).to eq('merged')
         end
@@ -332,7 +332,7 @@ describe MergeRequests::UpdateService, :mailer do
 
         it_behaves_like 'system notes for milestones'
 
-        it 'sends notifications for subscribers of changed milestone' do
+        it 'sends notifications for subscribers of changed milestone', :sidekiq_might_not_need_inline do
           merge_request.milestone = create(:milestone, project: project)
 
           merge_request.save
@@ -364,7 +364,7 @@ describe MergeRequests::UpdateService, :mailer do
 
         it_behaves_like 'system notes for milestones'
 
-        it 'sends notifications for subscribers of changed milestone' do
+        it 'sends notifications for subscribers of changed milestone', :sidekiq_might_not_need_inline do
           perform_enqueued_jobs do
             update_merge_request(milestone: create(:milestone, project: project))
           end
@@ -431,7 +431,7 @@ describe MergeRequests::UpdateService, :mailer do
         project.add_developer(subscriber)
       end
 
-      it 'sends notifications for subscribers of newly added labels' do
+      it 'sends notifications for subscribers of newly added labels', :sidekiq_might_not_need_inline do
         opts = { label_ids: [label.id] }
 
         perform_enqueued_jobs do
@@ -644,6 +644,30 @@ describe MergeRequests::UpdateService, :mailer do
 
         expect(merge_request.title).to eq('Updated title')
         expect(merge_request.allow_collaboration).to be_truthy
+      end
+    end
+
+    context 'updating `force_remove_source_branch`' do
+      let(:target_project) { create(:project, :repository, :public) }
+      let(:source_project) { fork_project(target_project, nil, repository: true) }
+      let(:user) { target_project.owner }
+      let(:merge_request) do
+        create(:merge_request,
+               source_project: source_project,
+               source_branch: 'fixes',
+               target_project: target_project)
+      end
+
+      it "cannot be done by members of the target project when they don't have access" do
+        expect { update_merge_request(force_remove_source_branch: true) }
+          .not_to change { merge_request.reload.force_remove_source_branch? }.from(nil)
+      end
+
+      it 'can be done by members of the target project if they can push to the source project' do
+        source_project.add_developer(user)
+
+        expect { update_merge_request(force_remove_source_branch: true) }
+          .to change { merge_request.reload.force_remove_source_branch? }.from(nil).to(true)
       end
     end
   end

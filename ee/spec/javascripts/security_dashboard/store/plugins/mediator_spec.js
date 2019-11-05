@@ -6,11 +6,10 @@ describe('mediator', () => {
 
   beforeEach(() => {
     store = createStore();
+    spyOn(store, 'dispatch');
   });
 
   it('triggers fetching vulnerabilities after one filter changes', () => {
-    spyOn(store, 'dispatch');
-
     const activeFilters = store.getters['filters/activeFilters'];
 
     store.commit(`filters/${filtersMutationTypes.SET_FILTER}`, {});
@@ -32,9 +31,13 @@ describe('mediator', () => {
     );
   });
 
-  it('triggers fetching vulnerabilities after filters change', () => {
-    spyOn(store, 'dispatch');
+  it('does not fetch vulnerabilities after one filter changes with lazy = true', () => {
+    store.commit(`filters/${filtersMutationTypes.SET_FILTER}`, { lazy: true });
 
+    expect(store.dispatch).not.toHaveBeenCalled();
+  });
+
+  it('triggers fetching vulnerabilities after filters change', () => {
     const payload = {
       ...store.getters['filters/activeFilters'],
       page: store.state.vulnerabilities.pageInfo.page,
@@ -57,8 +60,6 @@ describe('mediator', () => {
   });
 
   it('triggers fetching vulnerabilities after "Hide dismissed" toggle changes', () => {
-    spyOn(store, 'dispatch');
-
     const activeFilters = store.getters['filters/activeFilters'];
 
     store.commit(`filters/${filtersMutationTypes.SET_TOGGLE_VALUE}`, {});
@@ -78,5 +79,11 @@ describe('mediator', () => {
       'vulnerabilities/fetchVulnerabilitiesHistory',
       activeFilters,
     );
+  });
+
+  it('does not fetch vulnerabilities after "Hide dismissed" toggle changes with lazy = true', () => {
+    store.commit(`filters/${filtersMutationTypes.SET_TOGGLE_VALUE}`, { lazy: true });
+
+    expect(store.dispatch).not.toHaveBeenCalled();
   });
 });

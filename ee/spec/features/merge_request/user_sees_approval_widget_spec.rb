@@ -110,8 +110,6 @@ describe 'Merge request > User sees approval widget', :js do
           before do
             stub_licensed_features(code_owner_approval_required: true, multiple_approval_rules: true)
 
-            project.update!(merge_requests_require_code_owner_approval: true)
-
             allow(ProtectedBranch)
               .to receive(:branch_requires_code_owner_approval?).and_return(true)
           end

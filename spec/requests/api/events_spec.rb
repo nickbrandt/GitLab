@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::Events do
@@ -122,6 +124,7 @@ describe API::Events do
           expect(payload_hash['action']).to eq(payload.action)
           expect(payload_hash['ref_type']).to eq(payload.ref_type)
           expect(payload_hash['commit_to']).to eq(payload.commit_to)
+          expect(payload_hash['ref_count']).to eq(payload.ref_count)
         end
       end
 

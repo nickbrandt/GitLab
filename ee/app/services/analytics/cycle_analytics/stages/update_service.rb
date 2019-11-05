@@ -17,6 +17,7 @@ module Analytics
             persist_default_stages!
 
             @stage = find_stage
+            handle_position_change
             @stage.assign_attributes(filtered_params)
 
             raise ActiveRecord::Rollback unless @stage.valid?
@@ -53,6 +54,19 @@ module Analytics
           end
         end
         # rubocop: enable CodeReuse/ActiveRecord
+
+        def handle_position_change
+          move_before_id = params.delete(:move_before_id)
+          move_after_id = params.delete(:move_after_id)
+
+          if move_before_id
+            before_stage = @stage.find_with_same_parent!(move_before_id)
+            @stage.move_before(before_stage)
+          elsif move_after_id
+            after_stage = @stage.find_with_same_parent!(move_after_id)
+            @stage.move_after(after_stage)
+          end
+        end
       end
     end
   end

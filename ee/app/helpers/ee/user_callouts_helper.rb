@@ -9,9 +9,6 @@ module EE
     CANARY_DEPLOYMENT = 'canary_deployment'
     GOLD_TRIAL = 'gold_trial'
     GOLD_TRIAL_BILLINGS = 'gold_trial_billings'
-    # Privacy Policy Update: https://gitlab.com/gitlab-org/gitlab/issues/13665
-    LATEST_PRIVACY_POLICY_UPDATE = '13665'
-    PRIVACY_POLICY_UPDATE = "privacy_policy_update_#{LATEST_PRIVACY_POLICY_UPDATE}"
 
     def show_canary_deployment_callout?(project)
       !user_dismissed?(CANARY_DEPLOYMENT) &&
@@ -63,10 +60,6 @@ module EE
       return unless show_gold_trial?(user, GOLD_TRIAL_BILLINGS)
 
       render 'shared/gold_trial_callout_content', is_dismissable: !namespace.free_plan?, callout: GOLD_TRIAL_BILLINGS
-    end
-
-    def show_privacy_policy_update?
-      ::Feature.enabled?(:privacy_policy_update_callout) && !user_dismissed?(PRIVACY_POLICY_UPDATE)
     end
 
     private

@@ -3,10 +3,6 @@
 module Elastic
   module Latest
     class MilestoneClassProxy < ApplicationClassProxy
-      def nested?
-        true
-      end
-
       def elastic_search(query, options: {})
         options[:in] = %w(title^2 description)
 

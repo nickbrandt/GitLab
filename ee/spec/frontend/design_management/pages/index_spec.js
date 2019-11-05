@@ -1,4 +1,5 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
+import createFlash from '~/flash';
 import VueRouter from 'vue-router';
 import Index from 'ee/design_management/pages/index.vue';
 import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesign.mutation.graphql';
@@ -15,6 +16,8 @@ const router = new VueRouter({
     },
   ],
 });
+
+jest.mock('~/flash.js');
 
 const mockDesigns = [
   {
@@ -176,6 +179,10 @@ describe('Design management index page', () => {
                       startSha: '',
                       headSha: '',
                     },
+                    discussions: {
+                      __typename: 'DesignDiscussion',
+                      edges: [],
+                    },
                     versions: {
                       __typename: 'DesignVersionConnection',
                       edges: {
@@ -216,6 +223,30 @@ describe('Design management index page', () => {
 
       return uploadDesign.then(() => {
         expect(wrapper.vm.isSaving).toBe(false);
+      });
+    });
+
+    describe('upload count limit', () => {
+      const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
+
+      afterEach(() => {
+        createFlash.mockReset();
+      });
+
+      it('doesn not warn when the max files are uploaded', () => {
+        createComponent();
+
+        wrapper.vm.onUploadDesign(new Array(MAXIMUM_FILE_UPLOAD_LIMIT).fill(mockDesigns[0]));
+
+        expect(createFlash).not.toHaveBeenCalled();
+      });
+
+      it('warns when too many files are uploaded', () => {
+        createComponent();
+
+        wrapper.vm.onUploadDesign(new Array(MAXIMUM_FILE_UPLOAD_LIMIT + 1).fill(mockDesigns[0]));
+
+        expect(createFlash).toHaveBeenCalled();
       });
     });
   });

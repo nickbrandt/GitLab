@@ -3,6 +3,7 @@ export const mockInitialConfig = {
   issuesEndpoint: 'http://test.host',
   autoCompleteEpics: true,
   autoCompleteIssues: false,
+  userSignedIn: true,
 };
 
 export const mockParentItem = {

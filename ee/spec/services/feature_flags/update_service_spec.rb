@@ -17,6 +17,7 @@ describe FeatureFlags::UpdateService do
 
   describe '#execute' do
     subject { described_class.new(project, user, params).execute(feature_flag) }
+
     let(:params) { { name: 'new_name' } }
     let(:audit_event_message) do
       AuditEvent.last.present.action

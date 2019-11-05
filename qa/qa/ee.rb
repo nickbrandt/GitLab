@@ -85,6 +85,7 @@ module QA
         autoload :Menu, 'qa/ee/page/project/menu'
 
         module SubMenus
+          autoload :Packages, 'qa/ee/page/project/sub_menus/packages'
           autoload :SecurityCompliance, 'qa/ee/page/project/sub_menus/security_compliance'
           autoload :Repository, 'qa/ee/page/project/sub_menus/repository'
           autoload :Settings, 'qa/ee/page/project/sub_menus/settings'
@@ -108,14 +109,24 @@ module QA
           autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
           autoload :MirroringRepositories, 'qa/ee/page/project/settings/mirroring_repositories'
           autoload :MergeRequest, 'qa/ee/page/project/settings/merge_request'
+          autoload :Integrations, 'qa/ee/page/project/settings/integrations'
           autoload :Repository, 'qa/ee/page/project/settings/repository'
           autoload :PushRules, 'qa/ee/page/project/settings/push_rules'
+
+          module Services
+            autoload :Jenkins, 'qa/ee/page/project/settings/services/jenkins'
+          end
         end
 
         module Operations
           module Kubernetes
             autoload :Show, 'qa/ee/page/project/operations/kubernetes/show'
           end
+        end
+
+        module Packages
+          autoload :Index, 'qa/ee/page/project/packages/index'
+          autoload :Show, 'qa/ee/page/project/packages/show'
         end
 
         module Pipeline

@@ -1,12 +1,20 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 
+import Draggable from 'vuedraggable';
+
 import TreeRoot from 'ee/related_items_tree/components/tree_root.vue';
 
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 
-import { mockQueryResponse, mockParentItem, mockEpic1, mockIssue1 } from '../mock_data';
+import {
+  mockQueryResponse,
+  mockInitialConfig,
+  mockParentItem,
+  mockEpic1,
+  mockIssue1,
+} from '../mock_data';
 
 const { epic } = mockQueryResponse.data.group;
 
@@ -20,6 +28,7 @@ const createComponent = ({
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
   store.dispatch('setInitialParentItem', mockParentItem);
+  store.dispatch('setInitialConfig', mockInitialConfig);
   store.dispatch('setItemChildrenFlags', {
     isSubItem: false,
     children,
@@ -78,9 +87,24 @@ describe('RelatedItemsTree', () => {
         });
 
         describe('computed', () => {
-          describe('dragOptions', () => {
-            it('should return object containing Vue.Draggable config extended from `defaultSortableConfig`', () => {
-              expect(wrapper.vm.dragOptions).toEqual(
+          describe('treeRootWrapper', () => {
+            it('should return Draggable reference when userSignedIn prop is true', () => {
+              expect(wrapper.vm.treeRootWrapper).toBe(Draggable);
+            });
+
+            it('should return string "ul" when userSignedIn prop is false', () => {
+              wrapper.vm.$store.dispatch('setInitialConfig', {
+                ...mockInitialConfig,
+                userSignedIn: false,
+              });
+
+              expect(wrapper.vm.treeRootWrapper).toBe('ul');
+            });
+          });
+
+          describe('treeRootOptions', () => {
+            it('should return object containing Vue.Draggable config extended from `defaultSortableConfig` when userSignedIn prop is true', () => {
+              expect(wrapper.vm.treeRootOptions).toEqual(
                 jasmine.objectContaining({
                   animation: 200,
                   forceFallback: true,
@@ -88,82 +112,132 @@ describe('RelatedItemsTree', () => {
                   fallbackOnBody: false,
                   ghostClass: 'is-ghost',
                   group: mockParentItem.reference,
+                  tag: 'ul',
+                  'ghost-class': 'tree-item-drag-active',
+                  'data-parent-reference': mockParentItem.reference,
+                  value: wrapper.vm.children,
                 }),
               );
+            });
+
+            it('should return an empty object when userSignedIn prop is false', () => {
+              wrapper.vm.$store.dispatch('setInitialConfig', {
+                ...mockInitialConfig,
+                userSignedIn: false,
+              });
+
+              expect(wrapper.vm.treeRootOptions).toEqual(jasmine.objectContaining({}));
             });
           });
         });
 
         describe('methods', () => {
+          describe('getItemId', () => {
+            it('returns value of `id` prop when item is an Epic', () => {
+              expect(wrapper.vm.getItemId(wrapper.vm.children[0])).toBe(mockEpic1.id);
+            });
+
+            it('returns value of `epicIssueId` prop when item is an Issue', () => {
+              expect(wrapper.vm.getItemId(wrapper.vm.children[2])).toBe(mockIssue1.epicIssueId);
+            });
+          });
+
           describe('getTreeReorderMutation', () => {
-            it('returns an object containing `id`, `adjacentReferenceId` & `relativePosition` when newIndex param is 0 and targetItem is Epic', () => {
-              const targetItem = wrapper.vm.children[1]; // 2nd Epic position
-              const newIndex = 0; // We're moving targetItem to top of Epics list & Epics begin at 0
+            it('returns an object containing ID of targetItem', () => {
+              const targetItemEpic = wrapper.vm.children[0];
+              const targetItemIssue = wrapper.vm.children[2];
+              const newIndex = 0;
 
-              const treeReorderMutation = wrapper.vm.getTreeReorderMutation({
-                targetItem,
-                newIndex,
-              });
-
-              expect(treeReorderMutation).toEqual(
+              expect(
+                wrapper.vm.getTreeReorderMutation({
+                  targetItem: targetItemEpic,
+                  newIndex,
+                }),
+              ).toEqual(
                 jasmine.objectContaining({
-                  id: targetItem.id,
-                  adjacentReferenceId: mockEpic1.id,
-                  relativePosition: 'after',
+                  id: mockEpic1.id,
+                }),
+              );
+
+              expect(
+                wrapper.vm.getTreeReorderMutation({
+                  targetItem: targetItemIssue,
+                  newIndex,
+                }),
+              ).toEqual(
+                jasmine.objectContaining({
+                  id: mockIssue1.epicIssueId,
                 }),
               );
             });
 
-            it('returns an object containing `id`, `adjacentReferenceId` & `relativePosition` when newIndex param is 1 and targetItem is Epic', () => {
+            it('returns an object containing `adjacentReferenceId` of children item at provided `newIndex`', () => {
               const targetItem = wrapper.vm.children[0];
-              const newIndex = 1;
 
-              const treeReorderMutation = wrapper.vm.getTreeReorderMutation({
-                targetItem,
-                newIndex,
-              });
-
-              expect(treeReorderMutation).toEqual(
+              expect(
+                wrapper.vm.getTreeReorderMutation({
+                  targetItem,
+                  newIndex: 0,
+                }),
+              ).toEqual(
                 jasmine.objectContaining({
-                  id: targetItem.id,
                   adjacentReferenceId: mockEpic1.id,
-                  relativePosition: 'before',
+                }),
+              );
+
+              expect(
+                wrapper.vm.getTreeReorderMutation({
+                  targetItem,
+                  newIndex: 2,
+                }),
+              ).toEqual(
+                jasmine.objectContaining({
+                  adjacentReferenceId: mockIssue1.epicIssueId,
                 }),
               );
             });
 
-            it('returns an object containing `id`, `adjacentReferenceId` & `relativePosition` when newIndex param is 0 and targetItem is Issue', () => {
-              const targetItem = wrapper.vm.children[3]; // 2nd Issue position
-              const newIndex = 2; // We're moving targetItem to top of Issues list & Issues begin at 2
+            it('returns object containing `relativePosition` containing `after` when `newIndex` param is 0', () => {
+              const targetItem = wrapper.vm.children[0];
 
-              const treeReorderMutation = wrapper.vm.getTreeReorderMutation({
-                targetItem,
-                newIndex,
-              });
-
-              expect(treeReorderMutation).toEqual(
+              expect(
+                wrapper.vm.getTreeReorderMutation({
+                  targetItem,
+                  newIndex: 0,
+                }),
+              ).toEqual(
                 jasmine.objectContaining({
-                  id: targetItem.epicIssueId,
-                  adjacentReferenceId: mockIssue1.epicIssueId,
                   relativePosition: 'after',
                 }),
               );
             });
 
-            it('returns an object containing `id`, `adjacentReferenceId` & `relativePosition` when newIndex param is 1 and targetItem is Issue', () => {
-              const targetItem = wrapper.vm.children[2];
-              const newIndex = 3; // Here 3 is first issue of the list, hence spec descripton says `newIndex` as 1.
+            it('returns object containing `relativePosition` containing `before` when `newIndex` param is last item index', () => {
+              const targetItem = wrapper.vm.children[0];
 
-              const treeReorderMutation = wrapper.vm.getTreeReorderMutation({
-                targetItem,
-                newIndex,
-              });
-
-              expect(treeReorderMutation).toEqual(
+              expect(
+                wrapper.vm.getTreeReorderMutation({
+                  targetItem,
+                  newIndex: wrapper.vm.children.length - 1,
+                }),
+              ).toEqual(
                 jasmine.objectContaining({
-                  id: targetItem.epicIssueId,
-                  adjacentReferenceId: mockIssue1.epicIssueId,
                   relativePosition: 'before',
+                }),
+              );
+            });
+
+            it('returns object containing `relativePosition` containing `after` when `newIndex` param neither `0` nor last item index', () => {
+              const targetItem = wrapper.vm.children[0];
+
+              expect(
+                wrapper.vm.getTreeReorderMutation({
+                  targetItem,
+                  newIndex: 2,
+                }),
+              ).toEqual(
+                jasmine.objectContaining({
+                  relativePosition: 'after',
                 }),
               );
             });
@@ -176,58 +250,6 @@ describe('RelatedItemsTree', () => {
               wrapper.vm.handleDragOnStart();
 
               expect(document.body.classList.contains('is-dragging')).toBe(true);
-            });
-          });
-
-          describe('handleDragOnMove', () => {
-            let dragged;
-            let related;
-            let mockEvent;
-
-            beforeEach(() => {
-              dragged = document.createElement('li');
-              related = document.createElement('li');
-              mockEvent = {
-                dragged,
-                related,
-              };
-            });
-
-            it('returns `true` when an epic is reordered within epics list', () => {
-              dragged.classList.add('js-item-type-epic');
-              related.classList.add('js-item-type-epic');
-
-              expect(wrapper.vm.handleDragOnMove(mockEvent)).toBe(true);
-            });
-
-            it('returns `true` when an issue is reordered within issues list', () => {
-              dragged.classList.add('js-item-type-issue');
-              related.classList.add('js-item-type-issue');
-
-              expect(wrapper.vm.handleDragOnMove(mockEvent)).toBe(true);
-            });
-
-            it('returns `false` when an issue is reordered within epics list', () => {
-              dragged.classList.add('js-item-type-issue');
-              related.classList.add('js-item-type-epic');
-
-              expect(wrapper.vm.handleDragOnMove(mockEvent)).toBe(false);
-            });
-
-            it('returns `false` when an epic is reordered within issues list', () => {
-              dragged.classList.add('js-item-type-epic');
-              related.classList.add('js-item-type-issue');
-
-              expect(wrapper.vm.handleDragOnMove(mockEvent)).toBe(false);
-            });
-
-            it('adds class `no-drop` to body element when reordering is not allowed', () => {
-              dragged.classList.add('js-item-type-epic');
-              related.classList.add('js-item-type-issue');
-
-              wrapper.vm.handleDragOnMove(mockEvent);
-
-              expect(document.body.classList.contains('no-drop')).toBe(true);
             });
           });
 

@@ -7,9 +7,9 @@ describe Admin::Geo::UploadsController, :geo do
 
   set(:admin) { create(:admin) }
   set(:secondary) { create(:geo_node) }
-  set(:synced_registry) { create(:geo_file_registry, :with_file, :attachment, success: true) }
-  set(:failed_registry) { create(:geo_file_registry, :failed) }
-  set(:never_registry) { create(:geo_file_registry, :failed, retry_count: nil) }
+  set(:synced_registry) { create(:geo_upload_registry, :with_file, :attachment, success: true) }
+  set(:failed_registry) { create(:geo_upload_registry, :failed) }
+  set(:never_registry) { create(:geo_upload_registry, :failed, retry_count: nil) }
 
   def css_id(registry)
     "#upload-#{registry.id}-header"
@@ -91,10 +91,10 @@ describe Admin::Geo::UploadsController, :geo do
   end
 
   describe '#destroy' do
-    subject { delete :destroy, params: { id: upload_registry } }
+    subject { delete :destroy, params: { id: registry } }
 
     it_behaves_like 'license required' do
-      let(:upload_registry) { create(:geo_file_registry) }
+      let(:registry) { create(:geo_upload_registry) }
     end
 
     context 'with a valid license' do
@@ -103,24 +103,24 @@ describe Admin::Geo::UploadsController, :geo do
       end
 
       context 'with an orphaned registry' do
-        let(:upload_registry) { create(:geo_file_registry, success: true) }
+        let(:registry) { create(:geo_upload_registry, success: true) }
 
         it 'removes the registry' do
-          upload_registry.update_column(:file_id, -1)
+          registry.update_column(:file_id, -1)
 
           expect(subject).to redirect_to(admin_geo_uploads_path)
           expect(flash[:notice]).to include('was successfully removed')
-          expect { Geo::UploadRegistry.find(upload_registry.id) }.to raise_error(ActiveRecord::RecordNotFound)
+          expect { Geo::UploadRegistry.find(registry.id) }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
 
       context 'with a regular registry' do
-        let(:upload_registry) { create(:geo_file_registry, :avatar, :with_file, success: true) }
+        let(:registry) { create(:geo_upload_registry, :avatar, :with_file, success: true) }
 
         it 'does not delete the registry and gives an error' do
           expect(subject).to redirect_to(admin_geo_uploads_path)
           expect(flash[:alert]).to include('Could not remove tracking entry')
-          expect { Geo::UploadRegistry.find(upload_registry.id) }.not_to raise_error
+          expect { Geo::UploadRegistry.find(registry.id) }.not_to raise_error
         end
       end
     end

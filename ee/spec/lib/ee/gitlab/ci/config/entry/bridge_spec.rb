@@ -3,6 +3,20 @@
 require 'spec_helper'
 
 describe EE::Gitlab::Ci::Config::Entry::Bridge do
+  subject { described_class.new(config, name: :my_bridge) }
+
+  it_behaves_like 'with inheritable CI config' do
+    let(:inheritable_key) { 'default' }
+    let(:inheritable_class) { Gitlab::Ci::Config::Entry::Default }
+
+    # These are entries defined in Default
+    # that we know that we don't want to inherit
+    # as they do not have sense in context of Bridge
+    let(:ignored_inheritable_columns) do
+      %i[before_script after_script image services cache]
+    end
+  end
+
   describe '.matching?' do
     subject { described_class.matching?(name, config) }
 
@@ -42,8 +56,6 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
   end
 
   describe '.new' do
-    subject { described_class.new(config, name: :my_bridge) }
-
     before do
       subject.compose!
     end

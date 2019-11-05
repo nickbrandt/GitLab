@@ -32,7 +32,7 @@ const SUBMIT_BUTTON_CLASS = {
 
 const OPERATORS = {
   greaterThan: '>',
-  equalTo: '=',
+  equalTo: '==',
   lessThan: '<',
 };
 

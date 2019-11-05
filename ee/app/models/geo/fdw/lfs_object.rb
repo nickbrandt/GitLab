@@ -17,49 +17,45 @@ module Geo
 
       class << self
         def failed
-          inner_join_file_registry
-            .merge(Geo::FileRegistry.failed)
+          inner_join_lfs_object_registry
+            .merge(Geo::LfsObjectRegistry.failed)
         end
 
-        def inner_join_file_registry
+        def inner_join_lfs_object_registry
           join_statement =
             arel_table
-              .join(file_registry_table, Arel::Nodes::InnerJoin)
-              .on(arel_table[:id].eq(file_registry_table[:file_id]))
+              .join(lfs_object_registry_table, Arel::Nodes::InnerJoin)
+              .on(arel_table[:id].eq(lfs_object_registry_table[:lfs_object_id]))
 
           joins(join_statement.join_sources)
-            .merge(Geo::FileRegistry.lfs_objects)
         end
 
         def missing_file_registry
-          left_outer_join_file_registry
-            .where(file_registry_table[:id].eq(nil))
+          left_outer_join_lfs_object_registry
+            .where(lfs_object_registry_table[:id].eq(nil))
         end
 
         def missing_on_primary
-          inner_join_file_registry
-            .merge(Geo::FileRegistry.synced.missing_on_primary)
+          inner_join_lfs_object_registry
+            .merge(Geo::LfsObjectRegistry.synced.missing_on_primary)
         end
 
         def synced
-          inner_join_file_registry
-            .merge(Geo::FileRegistry.synced)
+          inner_join_lfs_object_registry
+            .merge(Geo::LfsObjectRegistry.synced)
         end
 
         private
 
-        def file_registry_table
-          Geo::FileRegistry.arel_table
+        def lfs_object_registry_table
+          Geo::LfsObjectRegistry.arel_table
         end
 
-        def left_outer_join_file_registry
+        def left_outer_join_lfs_object_registry
           join_statement =
             arel_table
-              .join(file_registry_table, Arel::Nodes::OuterJoin)
-              .on(
-                arel_table[:id].eq(file_registry_table[:file_id])
-                  .and(file_registry_table[:file_type].eq(:lfs))
-              )
+              .join(lfs_object_registry_table, Arel::Nodes::OuterJoin)
+              .on(arel_table[:id].eq(lfs_object_registry_table[:lfs_object_id]))
 
           joins(join_statement.join_sources)
         end

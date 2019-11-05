@@ -37,6 +37,10 @@ export const setExitTour = ({ commit }, exitTour) => {
   commit(types.SET_EXIT_TOUR, exitTour);
 };
 
+export const setDntExitTour = ({ commit }, dntExitTour) => {
+  commit(types.SET_DNT_EXIT_TOUR, dntExitTour);
+};
+
 export const setDismissed = ({ commit }, dismissed) => {
   commit(types.SET_DISMISSED, dismissed);
 

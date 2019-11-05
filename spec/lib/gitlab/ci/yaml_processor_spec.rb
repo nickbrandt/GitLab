@@ -26,7 +26,7 @@ module Gitlab
           it 'returns valid build attributes' do
             expect(subject).to eq({
               stage: "test",
-              stage_idx: 1,
+              stage_idx: 2,
               name: "rspec",
               options: {
                 before_script: ["pwd"],
@@ -56,7 +56,7 @@ module Gitlab
           it 'returns valid build attributes' do
             expect(subject).to eq({
               stage: 'test',
-              stage_idx: 1,
+              stage_idx: 2,
               name: 'rspec',
               options: { script: ['rspec'] },
               rules: [
@@ -209,13 +209,16 @@ module Gitlab
         end
 
         let(:attributes) do
-          [{ name: "build",
+          [{ name: ".pre",
              index: 0,
              builds: [] },
-           { name: "test",
+           { name: "build",
              index: 1,
+             builds: [] },
+           { name: "test",
+             index: 2,
              builds:
-               [{ stage_idx: 1,
+               [{ stage_idx: 2,
                   stage: "test",
                   name: "rspec",
                   allow_failure: false,
@@ -225,9 +228,9 @@ module Gitlab
                   only: { refs: ["branches"] },
                   except: {} }] },
            { name: "deploy",
-             index: 2,
+             index: 3,
              builds:
-               [{ stage_idx: 2,
+               [{ stage_idx: 3,
                   stage: "deploy",
                   name: "prod",
                   allow_failure: false,
@@ -235,7 +238,10 @@ module Gitlab
                   yaml_variables: [],
                   options: { script: ["cap prod"] },
                   only: { refs: ["tags"] },
-                  except: {} }] }]
+                  except: {} }] },
+           { name: ".post",
+             index: 4,
+             builds: [] }]
         end
 
         it 'returns stages seed attributes' do
@@ -324,7 +330,7 @@ module Gitlab
               }
             end
 
-            it "return commands with scripts concencaced" do
+            it "return commands with scripts concatenated" do
               expect(subject[:options][:before_script]).to eq(["global script"])
             end
           end
@@ -337,7 +343,7 @@ module Gitlab
               }
             end
 
-            it "return commands with scripts concencaced" do
+            it "return commands with scripts concatenated" do
               expect(subject[:options][:before_script]).to eq(["global script"])
             end
           end
@@ -350,21 +356,48 @@ module Gitlab
               }
             end
 
-            it "return commands with scripts concencaced" do
+            it "return commands with scripts concatenated" do
               expect(subject[:options][:before_script]).to eq(["local script"])
+            end
+          end
+
+          context 'when script is array of arrays of strings' do
+            let(:config) do
+              {
+                before_script: [["global script", "echo 1"], ["ls"], "pwd"],
+                test: { script: ["script"] }
+              }
+            end
+
+            it "return commands with scripts concatenated" do
+              expect(subject[:options][:before_script]).to eq(["global script", "echo 1", "ls", "pwd"])
             end
           end
         end
 
         describe "script" do
-          let(:config) do
-            {
-              test: { script: ["script"] }
-            }
+          context 'when script is array of strings' do
+            let(:config) do
+              {
+                test: { script: ["script"] }
+              }
+            end
+
+            it "return commands with scripts concatenated" do
+              expect(subject[:options][:script]).to eq(["script"])
+            end
           end
 
-          it "return commands with scripts concencaced" do
-            expect(subject[:options][:script]).to eq(["script"])
+          context 'when script is array of arrays of strings' do
+            let(:config) do
+              {
+                test: { script: [["script"], ["echo 1"], "ls"] }
+              }
+            end
+
+            it "return commands with scripts concatenated" do
+              expect(subject[:options][:script]).to eq(["script", "echo 1", "ls"])
+            end
           end
         end
 
@@ -407,6 +440,19 @@ module Gitlab
               expect(subject[:options][:after_script]).to eq(["local after_script"])
             end
           end
+
+          context 'when script is array of arrays of strings' do
+            let(:config) do
+              {
+                after_script: [["global script", "echo 1"], ["ls"], "pwd"],
+                test: { script: ["script"] }
+              }
+            end
+
+            it "return after_script in options" do
+              expect(subject[:options][:after_script]).to eq(["global script", "echo 1", "ls", "pwd"])
+            end
+          end
         end
       end
 
@@ -425,7 +471,7 @@ module Gitlab
             expect(config_processor.stage_builds_attributes("test").size).to eq(1)
             expect(config_processor.stage_builds_attributes("test").first).to eq({
               stage: "test",
-              stage_idx: 1,
+              stage_idx: 2,
               name: "rspec",
               options: {
                 before_script: ["pwd"],
@@ -456,7 +502,7 @@ module Gitlab
             expect(config_processor.stage_builds_attributes("test").size).to eq(1)
             expect(config_processor.stage_builds_attributes("test").first).to eq({
               stage: "test",
-              stage_idx: 1,
+              stage_idx: 2,
               name: "rspec",
               options: {
                 before_script: ["pwd"],
@@ -485,7 +531,7 @@ module Gitlab
             expect(config_processor.stage_builds_attributes("test").size).to eq(1)
             expect(config_processor.stage_builds_attributes("test").first).to eq({
               stage: "test",
-              stage_idx: 1,
+              stage_idx: 2,
               name: "rspec",
               options: {
                 before_script: ["pwd"],
@@ -510,7 +556,7 @@ module Gitlab
             expect(config_processor.stage_builds_attributes("test").size).to eq(1)
             expect(config_processor.stage_builds_attributes("test").first).to eq({
               stage: "test",
-              stage_idx: 1,
+              stage_idx: 2,
               name: "rspec",
               options: {
                 before_script: ["pwd"],
@@ -964,6 +1010,7 @@ module Gitlab
                                rspec:         {
                                  artifacts: {
                                    paths: ["logs/", "binaries/"],
+                                   expose_as: "Exposed artifacts",
                                    untracked: true,
                                    name: "custom_name",
                                    expire_in: "7d"
@@ -977,7 +1024,7 @@ module Gitlab
           expect(config_processor.stage_builds_attributes("test").size).to eq(1)
           expect(config_processor.stage_builds_attributes("test").first).to eq({
             stage: "test",
-            stage_idx: 1,
+            stage_idx: 2,
             name: "rspec",
             options: {
               before_script: ["pwd"],
@@ -987,6 +1034,7 @@ module Gitlab
               artifacts: {
                 name: "custom_name",
                 paths: ["logs/", "binaries/"],
+                expose_as: "Exposed artifacts",
                 untracked: true,
                 expire_in: "7d"
               }
@@ -1272,7 +1320,7 @@ module Gitlab
             expect(subject.builds.size).to eq(5)
             expect(subject.builds[0]).to eq(
               stage: "build",
-              stage_idx: 0,
+              stage_idx: 1,
               name: "build1",
               options: {
                 script: ["test"]
@@ -1283,7 +1331,7 @@ module Gitlab
             )
             expect(subject.builds[2]).to eq(
               stage: "test",
-              stage_idx: 1,
+              stage_idx: 2,
               name: "test1",
               options: {
                 script: ["test"],
@@ -1398,7 +1446,7 @@ module Gitlab
             expect(subject.size).to eq(1)
             expect(subject.first).to eq({
               stage: "test",
-              stage_idx: 1,
+              stage_idx: 2,
               name: "normal_job",
               options: {
                 script: ["test"]
@@ -1442,7 +1490,7 @@ module Gitlab
             expect(subject.size).to eq(2)
             expect(subject.first).to eq({
               stage: "build",
-              stage_idx: 0,
+              stage_idx: 1,
               name: "job1",
               options: {
                 script: ["execute-script-for-job"]
@@ -1453,7 +1501,7 @@ module Gitlab
             })
             expect(subject.second).to eq({
               stage: "build",
-              stage_idx: 0,
+              stage_idx: 1,
               name: "job2",
               options: {
                 script: ["execute-script-for-job"]
@@ -1539,28 +1587,42 @@ module Gitlab
           config = YAML.dump({ before_script: "bundle update", rspec: { script: "test" } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "before_script config should be an array of strings")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "before_script config should be an array containing strings and arrays of strings")
         end
 
         it "returns errors if job before_script parameter is not an array of strings" do
           config = YAML.dump({ rspec: { script: "test", before_script: [10, "test"] } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:before_script config should be an array of strings")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:before_script config should be an array containing strings and arrays of strings")
+        end
+
+        it "returns errors if job before_script parameter is multi-level nested array of strings" do
+          config = YAML.dump({ rspec: { script: "test", before_script: [["ls", ["pwd"]], "test"] } })
+          expect do
+            Gitlab::Ci::YamlProcessor.new(config)
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:before_script config should be an array containing strings and arrays of strings")
         end
 
         it "returns errors if after_script parameter is invalid" do
           config = YAML.dump({ after_script: "bundle update", rspec: { script: "test" } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "after_script config should be an array of strings")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "after_script config should be an array containing strings and arrays of strings")
         end
 
         it "returns errors if job after_script parameter is not an array of strings" do
           config = YAML.dump({ rspec: { script: "test", after_script: [10, "test"] } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:after_script config should be an array of strings")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:after_script config should be an array containing strings and arrays of strings")
+        end
+
+        it "returns errors if job after_script parameter is multi-level nested array of strings" do
+          config = YAML.dump({ rspec: { script: "test", after_script: [["ls", ["pwd"]], "test"] } })
+          expect do
+            Gitlab::Ci::YamlProcessor.new(config)
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:after_script config should be an array containing strings and arrays of strings")
         end
 
         it "returns errors if image parameter is invalid" do
@@ -1665,14 +1727,14 @@ module Gitlab
           config = YAML.dump({ rspec: { script: "test", type: "acceptance" } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "rspec job: stage parameter should be build, test, deploy")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "rspec job: stage parameter should be .pre, build, test, deploy, .post")
         end
 
         it "returns errors if job stage is not a defined stage" do
           config = YAML.dump({ types: %w(build test), rspec: { script: "test", type: "acceptance" } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "rspec job: stage parameter should be build, test")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "rspec job: stage parameter should be .pre, build, test, .post")
         end
 
         it "returns errors if stages is not an array" do

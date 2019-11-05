@@ -56,7 +56,7 @@ Style/FrozenStringLiteralComment:
     - 'qa/**/*'
     - 'rubocop/**/*'
     - 'scripts/**/*'
-    - 'spec/**/*'
+    - 'spec/lib/gitlab/**/*'
 
 RSpec/FilePath:
   Exclude:

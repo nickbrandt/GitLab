@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 shared_examples 'languages and percentages JSON response' do
@@ -15,7 +17,7 @@ shared_examples 'languages and percentages JSON response' do
   end
 
   context "when the languages haven't been detected yet" do
-    it 'returns expected language values' do
+    it 'returns expected language values', :sidekiq_might_not_need_inline do
       get api("/projects/#{project.id}/languages", user)
 
       expect(response).to have_gitlab_http_status(:ok)
@@ -606,6 +608,7 @@ describe API::Projects do
         merge_requests_enabled: false,
         wiki_enabled: false,
         resolve_outdated_diff_discussions: false,
+        remove_source_branch_after_merge: true,
         only_allow_merge_if_pipeline_succeeds: false,
         request_access_enabled: true,
         only_allow_merge_if_all_discussions_are_resolved: false,
@@ -720,6 +723,22 @@ describe API::Projects do
       post api('/projects', user), params: project
 
       expect(json_response['resolve_outdated_diff_discussions']).to be_truthy
+    end
+
+    it 'sets a project as not removing source branches' do
+      project = attributes_for(:project, remove_source_branch_after_merge: false)
+
+      post api('/projects', user), params: project
+
+      expect(json_response['remove_source_branch_after_merge']).to be_falsey
+    end
+
+    it 'sets a project as removing source branches' do
+      project = attributes_for(:project, remove_source_branch_after_merge: true)
+
+      post api('/projects', user), params: project
+
+      expect(json_response['remove_source_branch_after_merge']).to be_truthy
     end
 
     it 'sets a project as allowing merge even if build fails' do
@@ -980,6 +999,22 @@ describe API::Projects do
       expect(json_response['resolve_outdated_diff_discussions']).to be_truthy
     end
 
+    it 'sets a project as not removing source branches' do
+      project = attributes_for(:project, remove_source_branch_after_merge: false)
+
+      post api("/projects/user/#{user.id}", admin), params: project
+
+      expect(json_response['remove_source_branch_after_merge']).to be_falsey
+    end
+
+    it 'sets a project as removing source branches' do
+      project = attributes_for(:project, remove_source_branch_after_merge: true)
+
+      post api("/projects/user/#{user.id}", admin), params: project
+
+      expect(json_response['remove_source_branch_after_merge']).to be_truthy
+    end
+
     it 'sets a project as allowing merge even if build fails' do
       project = attributes_for(:project, only_allow_merge_if_pipeline_succeeds: false)
       post api("/projects/user/#{user.id}", admin), params: project
@@ -1157,6 +1192,7 @@ describe API::Projects do
         expect(json_response['wiki_access_level']).to be_present
         expect(json_response['builds_access_level']).to be_present
         expect(json_response['resolve_outdated_diff_discussions']).to eq(project.resolve_outdated_diff_discussions)
+        expect(json_response['remove_source_branch_after_merge']).to be_truthy
         expect(json_response['container_registry_enabled']).to be_present
         expect(json_response['created_at']).to be_present
         expect(json_response['last_activity_at']).to be_present
@@ -2646,6 +2682,22 @@ describe API::Projects do
         put api("/projects/#{project.id}/transfer", user)
 
         expect(response).to have_gitlab_http_status(400)
+      end
+    end
+
+    context 'when authenticated as developer' do
+      before do
+        group.add_developer(user)
+      end
+
+      context 'target namespace allows developers to create projects' do
+        let(:group) { create(:group, project_creation_level: ::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS) }
+
+        it 'fails transferring the project to the target namespace' do
+          put api("/projects/#{project.id}/transfer", user), params: { namespace: group.id }
+
+          expect(response).to have_gitlab_http_status(400)
+        end
       end
     end
   end

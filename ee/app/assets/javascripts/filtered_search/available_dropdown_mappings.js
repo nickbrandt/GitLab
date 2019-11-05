@@ -9,6 +9,7 @@ export default class AvailableDropdownMappings {
     runnerTagsEndpoint,
     labelsEndpoint,
     milestonesEndpoint,
+    releasesEndpoint,
     groupsOnly,
     includeAncestorGroups,
     includeDescendantGroups,
@@ -17,6 +18,7 @@ export default class AvailableDropdownMappings {
     this.runnerTagsEndpoint = runnerTagsEndpoint;
     this.labelsEndpoint = labelsEndpoint;
     this.milestonesEndpoint = milestonesEndpoint;
+    this.releasesEndpoint = releasesEndpoint;
     this.groupsOnly = groupsOnly;
     this.includeAncestorGroups = includeAncestorGroups;
     this.includeDescendantGroups = includeDescendantGroups;
@@ -26,6 +28,7 @@ export default class AvailableDropdownMappings {
       runnerTagsEndpoint,
       labelsEndpoint,
       milestonesEndpoint,
+      releasesEndpoint,
       groupsOnly,
       includeAncestorGroups,
       includeDescendantGroups,

@@ -162,6 +162,7 @@ describe MergeRequest do
 
   describe '#has_license_management_reports?' do
     subject { merge_request.has_license_management_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -183,6 +184,7 @@ describe MergeRequest do
 
   describe '#has_dependency_scanning_reports?' do
     subject { merge_request.has_dependency_scanning_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -204,6 +206,7 @@ describe MergeRequest do
 
   describe '#has_container_scanning_reports?' do
     subject { merge_request.has_container_scanning_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -225,6 +228,7 @@ describe MergeRequest do
 
   describe '#has_sast_reports?' do
     subject { merge_request.has_sast_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -246,6 +250,7 @@ describe MergeRequest do
 
   describe '#has_metrics_reports?' do
     subject { merge_request.has_metrics_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -446,6 +451,18 @@ describe MergeRequest do
               .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
 
           subject
+        end
+
+        context 'cache key includes sofware license policies' do
+          let!(:license_1) { create(:software_license_policy, project: project) }
+          let!(:license_2) { create(:software_license_policy, project: project) }
+
+          it 'returns key with license information' do
+            expect_any_instance_of(Ci::CompareLicenseScanningReportsService)
+                .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
+
+            expect(subject[:key]).to include(*[license_1.id, license_1.approval_status, license_2.id, license_2.approval_status])
+          end
         end
 
         context 'when cached results is not latest' do

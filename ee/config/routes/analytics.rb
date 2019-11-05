@@ -3,14 +3,18 @@
 namespace :analytics do
   root to: 'analytics#index'
 
-  constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG)) do
-    resource :productivity_analytics, only: :show
-  end
+  resource :productivity_analytics, only: :show, constraints: -> (req) { Gitlab::Analytics.productivity_analytics_enabled? }
 
-  constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG)) do
+  constraints(-> (req) { Gitlab::Analytics.cycle_analytics_enabled? }) do
     resource :cycle_analytics, only: :show
     namespace :cycle_analytics do
-      resources :stages, only: [:index]
+      resources :stages, only: [:index, :create, :update, :destroy] do
+        member do
+          get :median
+          get :records
+        end
+      end
+      resource :summary, controller: :summary, only: [:show]
     end
   end
 

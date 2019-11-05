@@ -28,7 +28,7 @@ module EE
 
     override :scoped?
     def scoped?
-      return super unless parent.feature_available?(:scoped_issue_board)
+      return super unless resource_parent.feature_available?(:scoped_issue_board)
 
       EMPTY_SCOPE_STATE.exclude?(milestone_id) ||
         EMPTY_SCOPE_STATE.exclude?(weight) ||
@@ -37,7 +37,7 @@ module EE
     end
 
     def milestone
-      return unless parent&.feature_available?(:scoped_issue_board)
+      return unless resource_parent&.feature_available?(:scoped_issue_board)
 
       case milestone_id
       when ::Milestone::Upcoming.id

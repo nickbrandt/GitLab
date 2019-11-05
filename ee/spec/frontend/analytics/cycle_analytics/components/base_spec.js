@@ -12,6 +12,7 @@ import SummaryTable from 'ee/analytics/cycle_analytics/components/summary_table.
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
 import 'bootstrap';
 import '~/gl_dropdown';
+import waitForPromises from 'helpers/wait_for_promises';
 import * as mockData from '../mock_data';
 
 const noDataSvgPath = 'path/to/no/data';
@@ -120,7 +121,7 @@ describe('Cycle Analytics component', () => {
       it('displays the groups filter', () => {
         expect(wrapper.find(GroupsDropdownFilter).exists()).toBe(true);
         expect(wrapper.find(GroupsDropdownFilter).props('queryParams')).toEqual(
-          wrapper.vm.groupsQueryParams,
+          wrapper.vm.$options.groupsQueryParams,
         );
       });
 
@@ -156,7 +157,7 @@ describe('Cycle Analytics component', () => {
 
           expect(wrapper.find(ProjectsDropdownFilter).props()).toEqual(
             expect.objectContaining({
-              queryParams: wrapper.vm.projectsQueryParams,
+              queryParams: wrapper.vm.$options.projectsQueryParams,
               groupId: mockData.group.id,
               multiSelect: wrapper.vm.multiProjectSelect,
             }),
@@ -290,6 +291,54 @@ describe('Cycle Analytics component', () => {
         it('will display the add stage button', () => {
           expect(wrapper.find('.js-add-stage-button').exists()).toBe(true);
         });
+      });
+    });
+  });
+
+  describe('with failed requests while loading', () => {
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+
+      mock = new MockAdapter(axios);
+      wrapper = createComponent();
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+      mock.restore();
+    });
+
+    const findFlashError = () => document.querySelector('.flash-container .flash-text');
+
+    it('will display an error if the fetchCycleAnalyticsData request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mock
+        .onGet('/groups/foo/-/labels')
+        .replyOnce(200, { response: { ...mockData.groupLabels } })
+        .onGet('/groups/foo/-/cycle_analytics')
+        .replyOnce(500, { response: { status: 500 } });
+
+      wrapper.vm.onGroupSelect(mockData.group);
+
+      return waitForPromises().then(() => {
+        expect(findFlashError().innerText.trim()).toEqual(
+          'There was an error while fetching cycle analytics data.',
+        );
+      });
+    });
+
+    it('will display an error if the fetchGroupLabels request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mock.onGet('/groups/foo/-/labels').replyOnce(404, { response: { status: 404 } });
+
+      wrapper.vm.onGroupSelect(mockData.group);
+
+      return waitForPromises().then(() => {
+        expect(findFlashError().innerText.trim()).toEqual(
+          'There was an error fetching label data for the selected group',
+        );
       });
     });
   });

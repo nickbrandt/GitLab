@@ -12,14 +12,6 @@ export default {
   data() {
     return {
       groupId: null,
-      groupsQueryParams: {
-        min_access_level: accessLevelReporter,
-      },
-      projectsQueryParams: {
-        per_page: projectsPerPage,
-        with_shared: false, // exclude forks
-        order_by: 'last_activity_at',
-      },
     };
   },
   computed: {
@@ -53,6 +45,14 @@ export default {
       });
     },
   },
+  groupsQueryParams: {
+    min_access_level: accessLevelReporter,
+  },
+  projectsQueryParams: {
+    per_page: projectsPerPage,
+    with_shared: false, // exclude forks
+    order_by: 'last_activity_at',
+  },
 };
 </script>
 
@@ -60,14 +60,14 @@ export default {
   <div class="dropdown-container d-flex flex-column flex-lg-row">
     <groups-dropdown-filter
       class="group-select"
-      :query-params="groupsQueryParams"
+      :query-params="$options.groupsQueryParams"
       @selected="onGroupSelected"
     />
     <projects-dropdown-filter
       v-if="showProjectsDropdownFilter"
       :key="groupId"
       class="project-select"
-      :query-params="projectsQueryParams"
+      :query-params="$options.projectsQueryParams"
       :group-id="groupId"
       @selected="onProjectsSelected"
     />

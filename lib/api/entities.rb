@@ -307,6 +307,7 @@ module API
       expose :only_allow_merge_if_pipeline_succeeds
       expose :request_access_enabled
       expose :only_allow_merge_if_all_discussions_are_resolved
+      expose :remove_source_branch_after_merge
       expose :printing_merge_request_link_enabled
       expose :merge_method
       expose :statistics, using: 'API::Entities::ProjectStatistics', if: -> (project, options) {
@@ -776,6 +777,10 @@ module API
       expose :squash
 
       expose :task_completion_status
+
+      expose :cannot_be_merged?, as: :has_conflicts
+
+      expose :mergeable_discussions_state?, as: :blocking_discussions_resolved
     end
 
     class MergeRequest < MergeRequestBasic
@@ -933,8 +938,8 @@ module API
     end
 
     class PushEventPayload < Grape::Entity
-      expose :commit_count, :action, :ref_type, :commit_from, :commit_to
-      expose :ref, :commit_title
+      expose :commit_count, :action, :ref_type, :commit_from, :commit_to, :ref,
+             :commit_title, :ref_count
     end
 
     class Event < Grape::Entity
@@ -988,11 +993,11 @@ module API
 
       def todo_target_url(todo)
         target_type = todo.target_type.underscore
-        target_url = "#{todo.parent.class.to_s.underscore}_#{target_type}_url"
+        target_url = "#{todo.resource_parent.class.to_s.underscore}_#{target_type}_url"
 
         Gitlab::Routing
           .url_helpers
-          .public_send(target_url, todo.parent, todo.target, anchor: todo_target_anchor(todo)) # rubocop:disable GitlabSecurity/PublicSend
+          .public_send(target_url, todo.resource_parent, todo.target, anchor: todo_target_anchor(todo)) # rubocop:disable GitlabSecurity/PublicSend
       end
 
       def todo_target_anchor(todo)
@@ -1290,6 +1295,8 @@ module API
     end
 
     class Release < Grape::Entity
+      include ::API::Helpers::Presentable
+
       expose :name
       expose :tag, as: :tag_name, if: ->(_, _) { can_download_code? }
       expose :description
@@ -1302,8 +1309,8 @@ module API
       expose :commit, using: Entities::Commit, if: ->(_, _) { can_download_code? }
       expose :upcoming_release?, as: :upcoming_release
       expose :milestones, using: Entities::Milestone, if: -> (release, _) { release.milestones.present? }
-      expose :commit_path, if: ->(_, _) { can_download_code? }
-      expose :tag_path, if: ->(_, _) { can_download_code? }
+      expose :commit_path, expose_nil: false
+      expose :tag_path, expose_nil: false
       expose :assets do
         expose :assets_count, as: :count do |release, _|
           assets_to_exclude = can_download_code? ? [] : [:sources]
@@ -1315,40 +1322,15 @@ module API
         end
       end
       expose :_links do
-        expose :merge_requests_url
-        expose :issues_url
+        expose :merge_requests_url, expose_nil: false
+        expose :issues_url, expose_nil: false
+        expose :edit_url, expose_nil: false
       end
 
       private
 
       def can_download_code?
         Ability.allowed?(options[:current_user], :download_code, object.project)
-      end
-
-      def commit_path
-        return unless object.commit
-
-        Gitlab::Routing.url_helpers.project_commit_path(project, object.commit.id)
-      end
-
-      def tag_path
-        Gitlab::Routing.url_helpers.project_tag_path(project, object.tag)
-      end
-
-      def merge_requests_url
-        Gitlab::Routing.url_helpers.project_merge_requests_url(project, params_for_issues_and_mrs)
-      end
-
-      def issues_url
-        Gitlab::Routing.url_helpers.project_issues_url(project, params_for_issues_and_mrs)
-      end
-
-      def params_for_issues_and_mrs
-        { scope: 'all', state: 'opened', release_tag: object.tag }
-      end
-
-      def project
-        @project ||= object.project
       end
     end
 
@@ -1733,7 +1715,12 @@ module API
     class Blob < Grape::Entity
       expose :basename
       expose :data
-      expose :filename
+      expose :path
+      # TODO: :filename was renamed to :path but both still return the full path,
+      # in the future we can only return the filename here without the leading
+      # directory path.
+      # https://gitlab.com/gitlab-org/gitlab/issues/34521
+      expose :filename, &:path
       expose :id
       expose :ref
       expose :startline
@@ -1809,6 +1796,7 @@ module API
       expose :user, using: Entities::UserBasic
       expose :platform_kubernetes, using: Entities::Platform::Kubernetes
       expose :provider_gcp, using: Entities::Provider::Gcp
+      expose :management_project, using: Entities::ProjectIdentity
     end
 
     class ClusterProject < Cluster

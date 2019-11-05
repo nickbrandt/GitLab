@@ -29,7 +29,7 @@ module Gitlab
 
           # map remediations to relevant vulnerabilities
           def collate_remediations(report_data)
-            return report_data["vulnerabilities"] unless report_data["remediations"]
+            return report_data["vulnerabilities"] || [] unless report_data["remediations"]
 
             report_data["vulnerabilities"].map do |vulnerability|
               # Grab the first available remediation.
@@ -49,8 +49,8 @@ module Gitlab
                 uuid: SecureRandom.uuid,
                 report_type: report.type,
                 name: data['message'],
-                compare_key: data['cve'],
-                location: create_location(data['location']),
+                compare_key: data['cve'] || '',
+                location: create_location(data['location'] || {}),
                 severity: parse_level(data['severity']),
                 confidence: parse_level(data['confidence']),
                 scanner: scanner,
