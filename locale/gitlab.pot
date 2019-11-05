@@ -3266,6 +3266,9 @@ msgstr ""
 msgid "CiVariable|Validation failed"
 msgstr ""
 
+msgid "Class"
+msgstr ""
+
 msgid "Classification Label (optional)"
 msgstr ""
 
@@ -5871,6 +5874,9 @@ msgid "Downvotes"
 msgstr ""
 
 msgid "Due date"
+msgstr ""
+
+msgid "Duration"
 msgstr ""
 
 msgid "During this process, you’ll be asked for URLs from GitLab’s side. Use the URLs shown below."
@@ -11738,6 +11744,9 @@ msgstr ""
 msgid "Part of merge request changes"
 msgstr ""
 
+msgid "Passed"
+msgstr ""
+
 msgid "Password"
 msgstr ""
 
@@ -15501,6 +15510,9 @@ msgstr ""
 msgid "Skip this for now"
 msgstr ""
 
+msgid "Skipped"
+msgstr ""
+
 msgid "Slack application"
 msgstr ""
 
@@ -16302,6 +16314,12 @@ msgstr ""
 msgid "Suggestions:"
 msgstr ""
 
+msgid "Suite"
+msgstr ""
+
+msgid "Summary"
+msgstr ""
+
 msgid "Sunday"
 msgstr ""
 
@@ -16528,6 +16546,39 @@ msgid "TestHooks|Ensure the project has notes."
 msgstr ""
 
 msgid "TestHooks|Ensure the wiki is enabled and has pages."
+msgstr ""
+
+msgid "TestReports|%{count} errors"
+msgstr ""
+
+msgid "TestReports|%{count} failures"
+msgstr ""
+
+msgid "TestReports|%{count} jobs"
+msgstr ""
+
+msgid "TestReports|%{rate}%{sign} success rate"
+msgstr ""
+
+msgid "TestReports|Test suites"
+msgstr ""
+
+msgid "TestReports|Tests"
+msgstr ""
+
+msgid "TestReports|There are no test cases to display."
+msgstr ""
+
+msgid "TestReports|There are no test suites to show."
+msgstr ""
+
+msgid "TestReports|There are no tests to show."
+msgstr ""
+
+msgid "TestReports|There was an error fetching the test reports."
+msgstr ""
+
+msgid "Tests"
 msgstr ""
 
 msgid "Thank you for signing up for your free trial! You will get additional instructions in your inbox shortly."
@@ -17713,6 +17764,9 @@ msgid "Total weight"
 msgstr ""
 
 msgid "Total: %{total}"
+msgstr ""
+
+msgid "Trace"
 msgstr ""
 
 msgid "Tracing"
