@@ -96,7 +96,7 @@ function UsersSelect(currentUser, els, options = {}) {
 
           // Save current selected user to the DOM
           const currentUserInfo = $dropdown.data('currentUserInfo') || {};
-          const currentUser = _this.currentUser || {};
+          const currentUser = this.currentUser || {};
           const fieldName = $dropdown.data('fieldName');
           const userName = currentUserInfo.name;
           const userId = currentUserInfo.id || currentUser.id;
@@ -202,7 +202,7 @@ function UsersSelect(currentUser, els, options = {}) {
 
         $block.on('click', '.js-assign-yourself', e => {
           e.preventDefault();
-          return assignTo(_this.currentUser.id);
+          return assignTo(this.currentUser.id);
         });
 
         assignTo = function(selected) {
@@ -250,7 +250,7 @@ function UsersSelect(currentUser, els, options = {}) {
         return $dropdown.glDropdown({
           showMenuAbove,
           data(term, callback) {
-            return _this.users(term, options, users => {
+            return this.users(term, options, users => {
               // GitLabDropdownFilter returns this.instance
               // GitLabDropdownRemote returns this.options.instance
               const glDropdown = this.instance || this.options.instance;
@@ -574,7 +574,7 @@ function UsersSelect(currentUser, els, options = {}) {
               img = `<img src='${avatar}' class='avatar avatar-inline m-0' width='32' />`;
             }
 
-            return _this.renderRow(options.issuableType, user, selected, username, img);
+            return this.renderRow(options.issuableType, user, selected, username, img);
           },
         });
     }
@@ -600,7 +600,7 @@ function UsersSelect(currentUser, els, options = {}) {
               multiple: $(select).hasClass('multiselect'),
               minimumInputLength: 0,
               query(query) {
-                return _this.users(query.term, options, users => {
+                return this.users(query.term, options, users => {
                   var anyUser, data, emailUser, index, len, name, nullUser, obj, ref;
                   data = {
                     results: users,
@@ -658,17 +658,17 @@ function UsersSelect(currentUser, els, options = {}) {
               initSelection() {
                 var args;
                 args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
-                return _this.initSelection.apply(_this, args);
+                return this.initSelection.apply(this, args);
               },
               formatResult() {
                 var args;
                 args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
-                return _this.formatResult.apply(_this, args);
+                return this.formatResult.apply(this, args);
               },
               formatSelection() {
                 var args;
                 args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
-                return _this.formatSelection.apply(_this, args);
+                return this.formatSelection.apply(this, args);
               },
               dropdownCssClass: 'ajax-users-dropdown',
               // we do not want to escape markup since we are displaying html in results
