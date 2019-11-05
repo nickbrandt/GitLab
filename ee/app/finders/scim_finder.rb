@@ -10,7 +10,7 @@ class ScimFinder
   def search(params)
     return Identity.none unless saml_provider&.enabled?
 
-    parsed_hash = EE::Gitlab::Scim::ParamsParser.new(params).result
-    Identity.where_group_saml_uid(saml_provider, parsed_hash[:extern_uid])
+    parser = EE::Gitlab::Scim::ParamsParser.new(params)
+    Identity.where_group_saml_uid(saml_provider, parser.filter_params[:extern_uid])
   end
 end
