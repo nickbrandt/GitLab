@@ -50,11 +50,6 @@ module SnippetsHelper
     link_to(icon('download'), reliable_raw_snippet_path(snippet, inline: false), target: '_blank', rel: 'noopener noreferrer', class: "btn btn-sm has-tooltip", title: 'Download', data: { container: 'body' })
   end
 
-  def shareable_snippets_link(snippet)
-    url = reliable_snippet_url(snippet)
-    link_to(url, url, id: 'shareable_link_url', title: 'Open')
-  end
-
   # Return the path of a snippets index for a user or for a project
   #
   # @returns String, path to snippet index

@@ -59,7 +59,7 @@ module VisibilityLevelHelper
         _("The snippet is visible only to me.")
       end
     when Gitlab::VisibilityLevel::SECRET
-      "The snippet can be accessed without any authentication, but is not searchable."
+      _("The snippet can be accessed without any authentication, but is not searchable.")
     when Gitlab::VisibilityLevel::INTERNAL
       _("The snippet is visible to any logged in user.")
     when Gitlab::VisibilityLevel::PUBLIC

@@ -16760,6 +16760,9 @@ msgstr ""
 msgid "The schedule time must be in the future!"
 msgstr ""
 
+msgid "The snippet can be accessed without any authentication, but is not searchable."
+msgstr ""
+
 msgid "The snippet can be accessed without any authentication."
 msgstr ""
 

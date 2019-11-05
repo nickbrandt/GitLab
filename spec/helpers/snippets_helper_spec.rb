@@ -54,28 +54,6 @@ describe SnippetsHelper do
     end
   end
 
-  describe '.shareable_snippets_link' do
-    context 'personal snippets' do
-      context 'public' do
-        it 'gives a full link' do
-          expect(reliable_snippet_url(public_personal_snippet)).to eq("http://test.host/snippets/#{public_personal_snippet.id}")
-        end
-      end
-
-      context 'secret' do
-        it 'gives a full link, including secret word' do
-          expect(reliable_snippet_url(secret_snippet)).to match(%r{http://test.host/snippets/#{secret_snippet.id}\?token=\w+})
-        end
-      end
-    end
-
-    context 'project snippets' do
-      it 'gives a full link' do
-        expect(reliable_snippet_url(public_project_snippet)).to eq("http://test.host/#{public_project_snippet.project.full_path}/snippets/#{public_project_snippet.id}")
-      end
-    end
-  end
-
   describe '.embedded_snippet_raw_button' do
     it 'gives view raw button of embedded snippets for project snippets' do
       @snippet = public_project_snippet
