@@ -1,5 +1,5 @@
 ---
-title: Add migration to make public projects in private groups private
+title: Fix visibility levels of projects to be not higher than their groups' level
 merge_request: 19097
 author:
 type: fixed
