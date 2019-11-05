@@ -4,13 +4,13 @@ module Gitlab
   module Analytics
     module CycleAnalytics
       module StageEvents
-        class MergeRequestCreated < StageEvent
+        class MergeRequestClosed < MetricsBasedStageEvent
           def self.name
-            s_("CycleAnalyticsEvent|Merge request created")
+            s_("CycleAnalyticsEvent|Merge request closed")
           end
 
           def self.identifier
-            :merge_request_created
+            :merge_request_closed
           end
 
           def object_type
@@ -18,7 +18,7 @@ module Gitlab
           end
 
           def timestamp_projection
-            mr_table[:created_at]
+            mr_metrics_table[:latest_closed_at]
           end
         end
       end

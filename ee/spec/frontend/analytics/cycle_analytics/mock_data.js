@@ -65,7 +65,13 @@ const { events: rawCustomStageEvents } = getJSONFixture('analytics/cycle_analyti
 const camelCasedStageEvents = rawCustomStageEvents.map(deepCamelCase);
 
 export const customStageStartEvents = camelCasedStageEvents.filter(ev => ev.canBeStartEvent);
-export const customStageStopEvents = camelCasedStageEvents.filter(ev => !ev.canBeStartEvent);
+
+// find get all the possible stop events
+const allowedEndEventIds = new Set(customStageStartEvents.flatMap(e => e.allowedEndEvents));
+
+export const customStageStopEvents = camelCasedStageEvents.filter(ev =>
+  allowedEndEventIds.has(ev.identifier),
+);
 
 // TODO: the shim below should be removed once we have label events seeding
 export const labelStartEvent = { ...customStageStartEvents[0], type: 'label' };
