@@ -1,6 +1,7 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Vue from 'vue';
+import httpStatusCodes from '~/lib/utils/http_status';
 import store from 'ee/analytics/cycle_analytics/store';
 import Component from 'ee/analytics/cycle_analytics/components/base.vue';
 import { GlEmptyState, GlDaterangePicker } from '@gitlab/ui';
@@ -41,8 +42,8 @@ function createComponent({ opts = {}, shallow = true, withStageSelected = false 
       ...mockData.group,
     });
 
-    comp.vm.$store.dispatch('receiveCycleAnalyticsDataSuccess', {
-      ...mockData.cycleAnalyticsData,
+    comp.vm.$store.dispatch('receiveGroupStagesAndEventsSuccess', {
+      ...mockData.customizableStagesAndEvents,
     });
 
     comp.vm.$store.dispatch('receiveStageDataSuccess', {
@@ -296,6 +297,40 @@ describe('Cycle Analytics component', () => {
   });
 
   describe('with failed requests while loading', () => {
+    const { full_path: groupId } = mockData.group;
+
+    function mockRequestCycleAnalyticsData(overrides = {}) {
+      const defaultStatus = 200;
+      const defaultRequests = {
+        fetchSummaryData: {
+          status: defaultStatus,
+          endpoint: `/groups/${groupId}/-/cycle_analytics`,
+          response: { ...mockData.cycleAnalyticsData },
+        },
+        fetchGroupStagesAndEvents: {
+          status: defaultStatus,
+          endpoint: `/-/analytics/cycle_analytics/stages?group_id=${groupId}`,
+          response: { ...mockData.customizableStagesAndEvents },
+        },
+        fetchGroupLabels: {
+          status: defaultStatus,
+          endpoint: `/groups/${groupId}/-/labels`,
+          response: { ...mockData.groupLabels },
+        },
+        fetchStageData: {
+          status: defaultStatus,
+          // default first stage is issue
+          endpoint: '/groups/foo/-/cycle_analytics/events/issue.json',
+          response: { ...mockData.issueEvents },
+        },
+        ...overrides,
+      };
+
+      Object.values(defaultRequests).forEach(({ endpoint, status, response }) => {
+        mock.onGet(endpoint).replyOnce(status, response);
+      });
+    }
+
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
 
@@ -310,20 +345,22 @@ describe('Cycle Analytics component', () => {
 
     const findFlashError = () => document.querySelector('.flash-container .flash-text');
 
-    it('will display an error if the fetchCycleAnalyticsData request fails', () => {
+    it('will display an error if the fetchSummaryData request fails', () => {
       expect(findFlashError()).toBeNull();
 
-      mock
-        .onGet('/groups/foo/-/labels')
-        .replyOnce(200, { response: { ...mockData.groupLabels } })
-        .onGet('/groups/foo/-/cycle_analytics')
-        .replyOnce(500, { response: { status: 500 } });
+      mockRequestCycleAnalyticsData({
+        fetchSummaryData: {
+          status: httpStatusCodes.NOT_FOUND,
+          endpoint: `/groups/${groupId}/-/cycle_analytics`,
+          response: { response: { status: httpStatusCodes.NOT_FOUND } },
+        },
+      });
 
       wrapper.vm.onGroupSelect(mockData.group);
 
       return waitForPromises().then(() => {
         expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error while fetching cycle analytics data.',
+          'There was an error while fetching cycle analytics summary data.',
         );
       });
     });
@@ -331,13 +368,58 @@ describe('Cycle Analytics component', () => {
     it('will display an error if the fetchGroupLabels request fails', () => {
       expect(findFlashError()).toBeNull();
 
-      mock.onGet('/groups/foo/-/labels').replyOnce(404, { response: { status: 404 } });
+      mockRequestCycleAnalyticsData({
+        fetchGroupLabels: {
+          status: httpStatusCodes.NOT_FOUND,
+          response: { response: { status: httpStatusCodes.NOT_FOUND } },
+        },
+      });
 
       wrapper.vm.onGroupSelect(mockData.group);
 
       return waitForPromises().then(() => {
         expect(findFlashError().innerText.trim()).toEqual(
           'There was an error fetching label data for the selected group',
+        );
+      });
+    });
+
+    it('will display an error if the fetchGroupStagesAndEvents request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({
+        fetchGroupStagesAndEvents: {
+          endPoint: '/-/analytics/cycle_analytics/stages',
+          status: httpStatusCodes.NOT_FOUND,
+          response: { response: { status: httpStatusCodes.NOT_FOUND } },
+        },
+      });
+
+      wrapper.vm.onGroupSelect(mockData.group);
+
+      return waitForPromises().then(() => {
+        expect(findFlashError().innerText.trim()).toEqual(
+          'There was an error fetching cycle analytics stages.',
+        );
+      });
+    });
+
+    it('will display an error if the fetchStageData request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({
+        fetchStageData: {
+          endPoint: `/groups/${groupId}/-/cycle_analytics/events/issue.json`,
+          status: httpStatusCodes.NOT_FOUND,
+          response: { response: { status: httpStatusCodes.NOT_FOUND } },
+        },
+      });
+
+      wrapper.vm.onGroupSelect(mockData.group);
+
+      return waitForPromises().then(() => {
+        expect(findFlashError().innerText.trim()).toEqual(
+          'There was an error fetching data for the selected stage',
         );
       });
     });

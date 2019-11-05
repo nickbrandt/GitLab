@@ -16967,6 +16967,12 @@ msgstr ""
 msgid "There was an error fetching configuration for charts"
 msgstr ""
 
+msgid "There was an error fetching cycle analytics stages."
+msgstr ""
+
+msgid "There was an error fetching data for the selected stage"
+msgstr ""
+
 msgid "There was an error fetching label data for the selected group"
 msgstr ""
 
@@ -17007,6 +17013,9 @@ msgid "There was an error when unsubscribing from this label."
 msgstr ""
 
 msgid "There was an error while fetching cycle analytics data."
+msgstr ""
+
+msgid "There was an error while fetching cycle analytics summary data."
 msgstr ""
 
 msgid "There was an error with the reCAPTCHA. Please solve the reCAPTCHA again."
