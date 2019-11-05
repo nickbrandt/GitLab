@@ -3,6 +3,7 @@ import _ from 'underscore';
 import { GlButton, GlLink, GlTooltipDirective, GlModalDirective, GlModal } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
+import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT } from '../constants';
 
 export default {
@@ -16,6 +17,7 @@ export default {
     GlModalDirective,
     GlTooltip: GlTooltipDirective,
   },
+  mixins: [glFeatureFlagMixin()],
   props: {
     csrfToken: {
       type: String,
@@ -34,7 +36,10 @@ export default {
   },
   computed: {
     permissions() {
-      return gon && gon.features && gon.features.featureFlagPermissions;
+      return this.glFeatures.featureFlagPermissions;
+    },
+    hasIIDs() {
+      return this.glFeatures.featureFlagIID;
     },
     modalTitle() {
       return sprintf(
@@ -95,19 +100,26 @@ export default {
 <template>
   <div class="table-holder js-feature-flag-table">
     <div class="gl-responsive-table-row table-row-header" role="row">
+      <div v-if="hasIIDs" class="table-section section-10">
+        {{ s__('FeatureFlags|ID') }}
+      </div>
       <div class="table-section section-10" role="columnheader">
         {{ s__('FeatureFlags|Status') }}
       </div>
       <div class="table-section section-20" role="columnheader">
         {{ s__('FeatureFlags|Feature Flag') }}
       </div>
-      <div class="table-section section-50" role="columnheader">
+      <div class="table-section section-40" role="columnheader">
         {{ s__('FeatureFlags|Environment Specs') }}
       </div>
     </div>
 
     <template v-for="featureFlag in featureFlags">
       <div :key="featureFlag.id" class="gl-responsive-table-row" role="row">
+        <div v-if="hasIIDs" class="table-section section-10" role="gridcell">
+          <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|ID') }}</div>
+          <div class="table-mobile-content js-feature-flag-id">^{{ featureFlag.iid }}</div>
+        </div>
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
           <div class="table-mobile-content js-feature-flag-status">
@@ -130,7 +142,7 @@ export default {
           </div>
         </div>
 
-        <div class="table-section section-50" role="gridcell">
+        <div class="table-section section-40" role="gridcell">
           <div class="table-mobile-header" role="rowheader">
             {{ s__('FeatureFlags|Environment Specs') }}
           </div>

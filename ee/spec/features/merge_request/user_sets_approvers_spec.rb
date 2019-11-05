@@ -84,7 +84,6 @@ describe 'Merge request > User sets approvers', :js do
 
         find('.select2-results .user-result', text: group.name).click
         close_approver_select
-        click_button 'Add'
         click_button 'Update approval rule'
 
         click_on("Submit merge request")
@@ -151,7 +150,6 @@ describe 'Merge request > User sets approvers', :js do
 
         find('.select2-results .user-result', text: group.name).click
         close_approver_select
-        click_button 'Add'
         click_button 'Update approval rule'
 
         click_on("Save changes")

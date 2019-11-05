@@ -27,10 +27,7 @@ export const getCommonFilterParams = state => chartKey => {
   // for the scatterplot we need to remove 30 days from the state's merged_at_after date
   const mergedAtAfterDate =
     chartKey && chartKey === chartKeys.scatterplot
-      ? dateFormat(
-          new Date(getDateInPast(new Date(startDate), scatterPlotAddonQueryDays)),
-          dateFormats.isoDate,
-        )
+      ? dateFormat(getDateInPast(startDate, scatterPlotAddonQueryDays), dateFormats.isoDate)
       : dateFormat(startDate, dateFormats.isoDate);
 
   return {

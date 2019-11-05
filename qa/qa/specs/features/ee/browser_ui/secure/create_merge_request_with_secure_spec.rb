@@ -30,6 +30,7 @@ module QA
         @project = Resource::Project.fabricate_via_api! do |p|
           p.name = Runtime::Env.auto_devops_project_name || 'project-with-secure'
           p.description = 'Project with Secure'
+          p.auto_devops_enabled = false
           p.initialize_with_readme = true
         end
 

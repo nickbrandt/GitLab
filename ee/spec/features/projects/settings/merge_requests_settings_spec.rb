@@ -31,7 +31,6 @@ describe 'Project settings > [EE] Merge Requests', :js do
 
     find('.user-result', text: user.name).click
     close_approver_select
-    click_button 'Add'
 
     expect(find('.content-list')).to have_content(user.name)
 
@@ -56,7 +55,6 @@ describe 'Project settings > [EE] Merge Requests', :js do
 
     find('.user-result', text: group.name).click
     close_approver_select
-    click_button 'Add'
 
     expect(find('.content-list')).to have_content(group.name)
 

@@ -281,12 +281,26 @@ describe Vulnerabilities::Occurrence do
   end
 
   describe '.undismissed' do
-    it 'returns occurrences that do not have a corresponding dismissal feedback' do
-      undismissed_occurrence = create(:vulnerabilities_occurrence)
-      dismissed_occurrence = create(:vulnerabilities_occurrence)
-      create(:vulnerability_feedback, project_fingerprint: dismissed_occurrence.project_fingerprint)
+    set(:project) { create(:project) }
+    set(:project2) { create(:project) }
+    let!(:finding1) { create(:vulnerabilities_occurrence, project: project) }
+    let!(:finding2) { create(:vulnerabilities_occurrence, project: project) }
+    let!(:finding3) { create(:vulnerabilities_occurrence, project: project2) }
 
-      expect(described_class.undismissed).to contain_exactly(undismissed_occurrence)
+    before do
+      create(
+        :vulnerability_feedback,
+        :dismissal,
+        project_fingerprint: finding1.project_fingerprint
+      )
+    end
+
+    it 'returns all non-dismissed occurrences' do
+      expect(described_class.undismissed).to contain_exactly(finding2, finding3)
+    end
+
+    it 'returns non-dismissed occurrences for project' do
+      expect(project2.vulnerability_findings.undismissed).to contain_exactly(finding3)
     end
   end
 

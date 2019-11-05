@@ -82,7 +82,7 @@ export default {
   },
   watch: {
     value(val) {
-      if (val.length === 0) {
+      if (val.length > 0) {
         this.clear();
       }
     },

@@ -77,3 +77,68 @@ shared_context 'when invalid stage parameters are given' do
     expect(response).to match_response_schema('analytics/cycle_analytics/validation_error', dir: 'ee')
   end
 end
+
+shared_examples 'date parameter examples' do
+  before do
+    params[:created_after] = '2019-01-01'
+    params[:created_before] = '2020-01-01'
+  end
+
+  context 'when valid parameters are given' do
+    it 'succeeds' do
+      subject
+
+      expect(response).to be_successful
+    end
+  end
+
+  shared_examples 'example for invalid parameter' do
+    it 'renders `unprocessable_entity`' do
+      subject
+
+      expect(response).to have_gitlab_http_status(:unprocessable_entity)
+      expect(response).to match_response_schema('analytics/cycle_analytics/validation_error', dir: 'ee')
+    end
+  end
+
+  context 'when `created_after` is missing' do
+    before do
+      params.delete(:created_after)
+    end
+
+    include_examples 'example for invalid parameter'
+  end
+
+  context 'when `created_after` is invalid' do
+    before do
+      params[:created_after] = 'not-a-date'
+    end
+
+    include_examples 'example for invalid parameter'
+  end
+
+  context 'when `created_before` is missing' do
+    before do
+      params.delete(:created_before)
+    end
+
+    include_examples 'example for invalid parameter'
+  end
+
+  context 'when `created_after` is invalid' do
+    before do
+      params[:created_before] = 'not-a-date'
+    end
+
+    include_examples 'example for invalid parameter'
+  end
+
+  context 'when `created_after` is later than `created_before`' do
+    before do
+      params[:created_after] = '2012-01-01'
+      params[:created_before] = '2010-01-01'
+    end
+
+    include_examples 'example for invalid parameter'
+  end
+end

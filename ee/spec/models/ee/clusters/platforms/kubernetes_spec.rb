@@ -135,13 +135,14 @@ describe Clusters::Platforms::Kubernetes do
   end
 
   describe '#read_pod_logs' do
+    let(:environment) { create(:environment) }
     let(:cluster) { create(:cluster, :project, platform_kubernetes: service) }
     let(:service) { create(:cluster_platform_kubernetes, :configured) }
     let(:pod_name) { 'pod-1' }
     let(:namespace) { 'app' }
     let(:container) { 'some-container' }
 
-    subject { service.read_pod_logs(pod_name, namespace, container: container) }
+    subject { service.read_pod_logs(environment.id, pod_name, namespace, container: container) }
 
     shared_examples 'successful log request' do
       it do
@@ -224,7 +225,7 @@ describe Clusters::Platforms::Kubernetes do
       context 'when container name is not specified' do
         let(:container) { 'container-0' }
 
-        subject { service.read_pod_logs(pod_name, namespace) }
+        subject { service.read_pod_logs(environment.id, pod_name, namespace) }
 
         before do
           stub_kubeclient_pod_details(pod_name, namespace)
@@ -237,7 +238,15 @@ describe Clusters::Platforms::Kubernetes do
 
     context 'with caching', :use_clean_rails_memory_store_caching do
       let(:opts) do
-        ['get_pod_log', { 'pod_name' => pod_name, 'namespace' => namespace, 'container' => container }]
+        [
+          'get_pod_log',
+          {
+            'environment_id' => environment.id,
+            'pod_name' => pod_name,
+            'namespace' => namespace,
+            'container' => container
+          }
+        ]
       end
 
       context 'result is cacheable' do
@@ -276,6 +285,37 @@ describe Clusters::Platforms::Kubernetes do
 
           expect(result).to eq(nil)
         end
+      end
+    end
+
+    context '#reactive_cache_updated' do
+      let(:opts) do
+        {
+          'environment_id' => environment.id,
+          'pod_name' => pod_name,
+          'namespace' => namespace,
+          'container' => container
+        }
+      end
+
+      subject { service.reactive_cache_updated('get_pod_log', opts) }
+
+      it 'expires k8s_pod_logs etag cache' do
+        expect_next_instance_of(Gitlab::EtagCaching::Store) do |store|
+          expect(store).to receive(:touch)
+            .with(
+              ::Gitlab::Routing.url_helpers.k8s_pod_logs_project_environment_path(
+                environment.project,
+                environment,
+                opts['pod_name'],
+                opts['container_name'],
+                format: :json
+              )
+            )
+            .and_call_original
+        end
+
+        subject
       end
     end
   end

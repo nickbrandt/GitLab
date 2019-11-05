@@ -2,7 +2,8 @@
 require 'securerandom'
 
 module QA
-  context 'Create', :docker do
+  # Issue: https://gitlab.com/gitlab-org/gitlab/issues/35370
+  context 'Create', :docker, :quarantine do
     describe 'Jenkins integration' do
       let(:project_name) { "project_with_jenkins_#{SecureRandom.hex(4)}" }
 
