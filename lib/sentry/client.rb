@@ -4,7 +4,7 @@ module Sentry
   class Client
     Error = Class.new(StandardError)
     MissingKeysError = Class.new(StandardError)
-    ResponseTooBigError = Class.new(StandardError)
+    ResponseInvalidSizeError = Class.new(StandardError)
 
     attr_accessor :url, :token
 
@@ -36,7 +36,7 @@ module Sentry
     def check_valid_size(issues)
       return if valid_size?(issues)
 
-      raise Client::ResponseTooBigError, "Sentry API response is too big. Limit is #{Gitlab::Utils::DeepSize.human_default_max_size}."
+      raise Client::ResponseInvalidSizeError, "Sentry API response is too big. Limit is #{Gitlab::Utils::DeepSize.human_default_max_size}."
     end
 
     def valid_size?(issues)
