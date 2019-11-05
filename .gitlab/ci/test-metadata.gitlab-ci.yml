@@ -1,7 +1,10 @@
 .tests-metadata-state:
-  extends:
-    - .default-only
-    - .only:changes-code-backstage
+  rules:
+    - <<: *if-master-stable-deploy-security-tag
+      when: on_success
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
   variables:
     TESTS_METADATA_S3_BUCKET: "gitlab-ce-cache"
   before_script:
@@ -47,16 +50,15 @@ flaky-examples-check:
   extends:
     - .default-tags
     - .default-retry
-    - .default-only
-    - .only:changes-code-backstage
+  rules:
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
   image: ruby:2.6-alpine
   stage: post-test
   variables:
     NEW_FLAKY_SPECS_REPORT: rspec_flaky/report-new.json
   allow_failure: true
-  only:
-    refs:
-      - merge_requests
   artifacts:
     expire_in: 30d
     paths:

@@ -6,9 +6,10 @@ cache gems:
     - .default-retry
     - .default-cache
     - .default-before_script
-    - .only:variables-canonical-dot-com
-    - .only:changes-code-backstage-qa
   stage: test
+  rules:
+    - <<: *if-canonical-dot-com-master-tag
+      when: on_success
   dependencies: ["setup-test-env"]
   needs: ["setup-test-env"]
   variables:
@@ -27,8 +28,12 @@ cache gems:
   extends:
     - .default-tags
     - .default-retry
-    - .default-only
-    - .only:changes-code-backstage
+  rules:
+    - <<: *if-master-stable-deploy-security-tag
+      when: on_success
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
   dependencies: []
 
 gitlab_git_test:
@@ -38,10 +43,8 @@ gitlab_git_test:
 
 no_ee_check:
   extends: .minimal-job
+  rules:
+    - <<: *if-master-stable-deploy-security-tag-foss
+      when: on_success
   script:
     - scripts/no-ee-check
-  only:
-    variables:
-      - $CI_PROJECT_NAME == "gitlab-foss"
-      - $CI_PROJECT_NAME == "gitlab-ce"  # Support former project name for forks/mirrors
-      - $CI_PROJECT_NAME == "gitlabhq"  # Support former project name for dev

@@ -8,11 +8,13 @@
 # override an included `only.refs`.
 # See https://gitlab.com/gitlab-org/gitlab/issues/31371.
 code_quality:
-  extends:
-    - .default-retry
-    - .default-only
-    - .only:changes-code-backstage
+  extends: .default-retry
   stage: test
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
   image: docker:stable
   allow_failure: true
   services:
@@ -49,11 +51,13 @@ code_quality:
 # Once https://gitlab.com/gitlab-org/gitlab/merge_requests/16487 will be deployed
 # to GitLab.com, we should be able to use the template and set SAST_DISABLE_DIND: "true".
 sast:
-  extends:
-    - .default-retry
-    - .default-only
-    - .only:changes-code-backstage-qa
+  extends: .default-retry
   stage: test
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-qa-patterns
+      when: on_success
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2
@@ -120,12 +124,6 @@ sast:
     reports:
       sast: gl-sast-report.json
   dependencies: []
-  only:
-    variables:
-      - $GITLAB_FEATURES =~ /\bsast\b/
-  except:
-    variables:
-      - $SAST_DISABLED
 
 # We need to duplicate this job's definition because it seems it's impossible to
 # override an included `only.refs`.
@@ -133,9 +131,12 @@ sast:
 dependency_scanning:
   extends:
     - .default-retry
-    - .default-only
-    - .only:changes-code-backstage-qa
   stage: test
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-qa-patterns
+      when: on_success
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2
@@ -183,12 +184,6 @@ dependency_scanning:
     reports:
       dependency_scanning: gl-dependency-scanning-report.json
   dependencies: []
-  only:
-    variables:
-      - $GITLAB_FEATURES =~ /\bdependency_scanning\b/
-  except:
-    variables:
-      - $DEPENDENCY_SCANNING_DISABLED
 
 # We need to duplicate this job's definition because it seems it's impossible to
 # override an included `only.refs`.
@@ -196,10 +191,12 @@ dependency_scanning:
 dast:
   extends:
     - .default-retry
-    - .default-only
-    - .only:changes-code-qa
     - .only-review
   stage: qa
+  rules:
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *code-qa-patterns
+      when: on_success
   needs: ["review-deploy"]
   dependencies: ["review-deploy"]
   before_script:
@@ -233,9 +230,3 @@ dast:
       - gl-dast-report.json
     reports:
       dast: gl-dast-report.json
-  only:
-    variables:
-      - $GITLAB_FEATURES =~ /\bdast\b/
-  except:
-    variables:
-      - $DAST_DISABLED

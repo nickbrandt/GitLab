@@ -4,10 +4,13 @@ lint-ci-gitlab:
   extends:
     - .default-tags
     - .default-retry
-    - .default-only
-  only:
-    changes:
-      - "**/*.yml"
+  rules:
+    - <<: *if-master-stable-deploy-security-tag
+      when: on_success
+    - <<: *if-merge_request
+      changes:
+        - "**/*.yml"
+      when: on_success
   image: sdesbure/yamllint:latest
   dependencies: []
   script:

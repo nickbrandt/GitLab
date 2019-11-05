@@ -2,11 +2,12 @@
   extends:
     - .default-tags
     - .default-retry
-    - .only:variables-canonical-dot-com
-    - .only:changes-docs
-  only:
-    refs:
-      - merge_requests
+  rules:
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *docs-patterns
+      when: on_success
+    - <<: *if-canonical-dot-com-merge_request
+      when: manual
   image: ruby:2.6-alpine
   stage: review
   dependencies: []
@@ -32,7 +33,6 @@ review-docs-deploy:
   extends: .review-docs
   script:
     - ./trigger-build-docs deploy
-  when: manual
 
 # Cleanup remote environment of gitlab-docs
 review-docs-cleanup:
@@ -42,14 +42,16 @@ review-docs-cleanup:
     action: stop
   script:
     - ./trigger-build-docs cleanup
-  when: manual
 
 docs lint:
   extends:
     - .default-tags
     - .default-retry
-    - .default-only
-    - .only:changes-docs
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *docs-patterns
+      when: on_success
   image: "registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-docs-lint"
   stage: test
   dependencies: []
@@ -69,14 +71,16 @@ docs lint:
 
 graphql-reference-verify:
   extends:
-    - .only-ee
     - .default-tags
     - .default-retry
     - .default-cache
-    - .default-only
     - .default-before_script
-    - .only:changes-code-backstage-qa
     - .use-pg9
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag-ee
+    - <<: *if-merge_request-ee
+      changes: *graphql-patterns
+      when: on_success
   stage: test
   needs: ["setup-test-env"]
   script:

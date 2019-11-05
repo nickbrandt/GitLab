@@ -8,7 +8,6 @@
     - .default-tags
     - .default-retry
     - .default-cache
-    - .default-only
     - .default-before_script
   variables:
     SETUP_DB: "false"
@@ -20,18 +19,24 @@
     - .default-tags
     - .default-retry
     - .default-cache
-    - .default-only
     - .default-before_script
-    - .only:changes-code-backstage
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
 
 .only-code-qa-rails-job-base:
   extends:
     - .default-tags
     - .default-retry
     - .default-cache
-    - .default-only
     - .default-before_script
-    - .only:changes-code-backstage-qa
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-qa-patterns
+      when: on_success
 
 setup-test-env:
   extends:
@@ -72,7 +77,9 @@ setup-test-env:
       junit: junit_rspec.xml
 
 .rspec-base-foss:
-  extends: [".rspec-base", ".only-ee-as-if-foss"]
+  extends:
+    - .rspec-base
+    - .as-if-foss
   needs: ["setup-test-env", "retrieve-tests-metadata", "compile-assets pull-cache foss"]
   dependencies: ["setup-test-env", "retrieve-tests-metadata", "compile-assets pull-cache foss"]
 
@@ -128,16 +135,22 @@ rspec system pg10:
   extends: .rspec-base-pg10
   parallel: 24
 
+.rspec-base-ee:
+  extends: .rspec-base
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag-ee
+    - <<: *if-merge_request-ee
+      changes: *code-backstage-patterns
+      when: on_success
+
 .rspec-ee-base-pg9:
   extends:
-    - .rspec-base
-    - .only-ee
+    - .rspec-base-ee
     - .use-pg9-ee
 
 .rspec-ee-base-pg10:
   extends:
-    - .rspec-base
-    - .only-ee
+    - .rspec-base-ee
     - .use-pg10-ee
 
 rspec-ee unit pg9:
@@ -171,9 +184,7 @@ rspec-ee system pg10:
   parallel: 5
 
 .rspec-ee-base-geo:
-  extends:
-    - .rspec-base
-    - .only-ee
+  extends: .rspec-base-ee
   script:
     - source scripts/rspec_helpers.sh
     - scripts/prepare_postgres_fdw.sh
@@ -210,9 +221,10 @@ rspec-ee system pg10 geo:
   extends: .rspec-ee-base-geo-pg10
 
 rspec quarantine pg9:
-  extends:
-    - .rspec-base-pg9
-    - .only-master
+  extends: .rspec-base-pg9
+  rules:
+    - <<: *if-master
+      when: on_success
   variables:
     RSPEC_OPTS: "--tag quarantine -- spec/"
   script:
@@ -221,9 +233,10 @@ rspec quarantine pg9:
   allow_failure: true
 
 rspec-ee quarantine pg9:
-  extends:
-    - rspec quarantine pg9
-    - .only-ee
+  extends: rspec quarantine pg9
+  rules:
+    - <<: *if-master-ee
+      when: on_success
   variables:
     RSPEC_OPTS: "--tag quarantine -- ee/spec/"
 
@@ -250,11 +263,12 @@ static-analysis:
     policy: pull-push
 
 downtime_check:
-  extends:
-    - .rake-exec
-    - .only:changes-code-backstage
-    - .except:refs-master-tags-stable-deploy
+  extends: .rake-exec
   stage: test
+  rules:
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
   needs: ["setup-test-env"]
   dependencies: ["setup-test-env"]
 
@@ -346,9 +360,12 @@ coverage:
       - tmp/memory_test/
 
 db:rollback geo:
-  extends:
-    - db:rollback
-    - .only-ee
+  extends: db:rollback
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag-ee
+    - <<: *if-merge_request-ee
+      changes: *code-patterns
+      when: on_success
   script:
     - bundle exec rake geo:db:migrate VERSION=20170627195211
     - bundle exec rake geo:db:migrate

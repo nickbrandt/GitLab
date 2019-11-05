@@ -2,7 +2,6 @@
   extends:
     - .default-tags
     - .default-retry
-    - .default-only
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-qa-alpine
   services:
     - docker:19.03.0-dind
@@ -18,9 +17,14 @@ build-qa-image:
   extends:
     - .review-docker
     - .only:variables-canonical-dot-com
-    - .except:refs-deploy
-    - .only:changes-code-qa
   stage: prepare
+  rules:
+    - <<: *if-canonical-dot-com-schedule
+      changes: *code-qa-patterns
+      when: on_success
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *code-qa-patterns
+      when: on_success
   script:
     - '[[ ! -d "ee/" ]] || export GITLAB_EDITION="ee"'
     - export QA_IMAGE="${CI_REGISTRY}/${CI_PROJECT_PATH}/gitlab/gitlab-${GITLAB_EDITION}-qa:${CI_COMMIT_REF_SLUG}"
@@ -28,12 +32,17 @@ build-qa-image:
     - echo "${CI_JOB_TOKEN}" | docker login --username gitlab-ci-token --password-stdin ${CI_REGISTRY}
     - time docker push ${QA_IMAGE}
 
-.base-review-cleanup:
+review-cleanup:
   extends:
     - .default-tags
     - .default-retry
-    - .default-only
   stage: prepare
+  rules:
+    - <<: *if-canonical-dot-com-schedule
+      when: on_success
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *code-qa-patterns
+      when: manual
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-charts-build-base
   allow_failure: true
   environment:
@@ -45,22 +54,10 @@ build-qa-image:
   script:
     - ruby -rrubygems scripts/review_apps/automated_cleanup.rb
 
-schedule:review-cleanup:
-  extends:
-    - .base-review-cleanup
-    - .only-review-schedules
-
-manual:review-cleanup:
-  extends:
-    - .base-review-cleanup
-    - .only:changes-code-qa
-  when: manual
-
 .review-build-cng-base:
   extends:
     - .default-tags
     - .default-retry
-    - .default-only
   image: ruby:2.6-alpine
   stage: review-prepare
   before_script:
@@ -74,21 +71,18 @@ manual:review-cleanup:
 review-build-cng:
   extends:
     - .review-build-cng-base
-    - .only-review
-    - .only:changes-code-qa
-  needs: ["gitlab:assets:compile pull-cache"]
-
-schedule:review-build-cng:
-  extends:
-    - .review-build-cng-base
-    - .only-review-schedules
+  rules:
+    - <<: *if-canonical-dot-com-schedule
+      when: on_success
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *code-qa-patterns
+      when: on_success
   needs: ["gitlab:assets:compile pull-cache"]
 
 .review-workflow-base:
   extends:
     - .default-tags
     - .default-retry
-    - .default-only
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-charts-build-base
   dependencies: []
   variables:
@@ -101,9 +95,15 @@ schedule:review-build-cng:
     url: https://gitlab-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}
     on_stop: review-stop
 
-.review-deploy-base:
+review-deploy:
   extends: .review-workflow-base
   stage: review
+  rules:
+    - <<: *if-canonical-dot-com-schedule
+      when: on_success
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *code-qa-patterns
+      when: on_success
   allow_failure: true
   before_script:
     - '[[ ! -d "ee/" ]] || export GITLAB_EDITION="ee"'
@@ -127,22 +127,8 @@ schedule:review-build-cng:
     expire_in: 2 days
     when: always
 
-review-deploy:
-  extends:
-    - .review-deploy-base
-    - .only-review
-    - .only:changes-code-qa
-
-schedule:review-deploy:
-  extends:
-    - .review-deploy-base
-    - .only-review-schedules
-
 .base-review-stop:
-  extends:
-    - .review-workflow-base
-    - .only-review
-    - .only:changes-code-qa
+  extends: .review-workflow-base
   environment:
     action: stop
   variables:
@@ -159,23 +145,37 @@ schedule:review-deploy:
 review-stop-failed-deployment:
   extends: .base-review-stop
   stage: prepare
+  rules:
+    - <<: *if-canonical-dot-com-schedule
+      when: on_success
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *code-qa-patterns
+      when: on_success
   script:
     - delete_failed_release
 
 review-stop:
   extends: .base-review-stop
   stage: review
-  when: manual
+  rules:
+    - <<: *if-canonical-dot-com-schedule
+      when: manual
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *code-qa-patterns
+      when: manual
   allow_failure: true
   script:
     - delete_release
 
 .review-qa-base:
-  extends:
-    - .review-docker
-    - .only-review
-    - .only:changes-code-qa
+  extends: .review-docker
   stage: qa
+  rules:
+    - <<: *if-canonical-dot-com-schedule
+      when: on_success
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *code-qa-patterns
+      when: on_success
   allow_failure: true
   variables:
     QA_ARTIFACTS_DIR: "${CI_PROJECT_DIR}/qa"
@@ -218,9 +218,15 @@ review-qa-all:
     - export KNAPSACK_TEST_FILE_PATTERN=qa/specs/features/**/*_spec.rb
     - gitlab-qa Test::Instance::Any "${QA_IMAGE}" "${CI_ENVIRONMENT_URL}" -- --format RspecJunitFormatter --out tmp/rspec-${CI_JOB_ID}.xml --format html --out tmp/rspec.htm --color --format documentation
 
-.review-performance-base:
+review-performance:
   extends: .review-docker
   stage: qa
+  rules:
+    - <<: *if-canonical-dot-com-schedule
+      when: on_success
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *code-qa-patterns
+      when: on_success
   allow_failure: true
   before_script:
     - export CI_ENVIRONMENT_URL="$(cat review_app_url.txt)"
@@ -237,12 +243,6 @@ review-qa-all:
       - sitespeed-results/
     reports:
       performance: performance.json
-
-review-performance:
-  extends:
-    - .review-performance-base
-    - .only-review
-    - .only:changes-code-qa
   needs: ["review-deploy"]
   dependencies: ["review-deploy"]
   before_script:
@@ -261,21 +261,16 @@ review-performance:
     reports:
       performance: performance.json
 
-schedule:review-performance:
-  extends:
-    - .review-performance-base
-    - .only-review-schedules
-  needs: ["schedule:review-deploy"]
-  dependencies: ["schedule:review-deploy"]
-
 parallel-spec-reports:
-  extends:
-    - .default-tags
-    - .default-only
-    - .only-review
-    - .only:changes-code-qa
+  extends: .default-tags
   image: ruby:2.6-alpine
   stage: post-test
+  rules:
+    - <<: *if-canonical-dot-com-schedule
+      when: on_success
+    - <<: *if-canonical-dot-com-merge_request
+      changes: *code-qa-patterns
+      when: on_success
   dependencies: ["review-qa-all"]
   variables:
     NEW_PARALLEL_SPECS_REPORT: qa/report-new.html
@@ -303,8 +298,9 @@ danger-review:
     - .default-tags
     - .default-retry
     - .default-cache
-    - .default-only
-    - .except:refs-master-tags-stable-deploy
+  rules:
+    - <<: *if-merge_request
+      when: on_success
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:danger
   stage: test
   dependencies: []

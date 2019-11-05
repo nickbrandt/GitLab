@@ -9,10 +9,8 @@
   extends:
     - .default-tags
     - .default-retry
-    - .default-only
     - .default-before_script
     - .assets-compile-cache
-    - .only:changes-code-backstage-qa
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:ruby-2.6.3-git-2.22-chrome-73.0-node-12.x-yarn-1.16-graphicsmagick-1.3.33-docker-19.03.1
   stage: test
   dependencies: ["setup-test-env"]
@@ -55,14 +53,19 @@
 
 gitlab:assets:compile pull-push-cache:
   extends: .gitlab:assets:compile-metadata
-  only:
-    refs:
-      - master
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master" && ($CI_SERVER_HOST == "gitlab.com" && $CI_PROJECT_NAMESPACE =~ /^gitlab-org($|\/)/ || $CI_SERVER_HOST == "dev.gitlab.org")'
+      when: on_success
   cache:
     policy: pull-push
 
 gitlab:assets:compile pull-cache:
   extends: .gitlab:assets:compile-metadata
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-qa-patterns
+      when: on_success
   cache:
     policy: pull
 
@@ -70,10 +73,8 @@ gitlab:assets:compile pull-cache:
   extends:
     - .default-tags
     - .default-retry
-    - .default-only
     - .default-before_script
     - .assets-compile-cache
-    - .only:changes-code-backstage-qa
     - .use-pg9
   stage: prepare
   script:
@@ -95,28 +96,42 @@ gitlab:assets:compile pull-cache:
 
 compile-assets pull-push-cache:
   extends: .compile-assets-metadata
-  only:
-    refs:
-      - master
+  rules:
+    - <<: *if-master
+      when: on_success
   cache:
     policy: pull-push
 
 compile-assets pull-push-cache foss:
-  extends: [".compile-assets-metadata", ".only-ee-as-if-foss"]
-  only:
-    refs:
-      - master
+  extends:
+    - .compile-assets-metadata
+    - .as-if-foss
+  rules:
+    - <<: *if-master-ee
+      when: on_success
   cache:
     policy: pull-push
     key: "assets-compile:v7:foss"
 
 compile-assets pull-cache:
   extends: .compile-assets-metadata
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-qa-patterns
+      when: on_success
   cache:
     policy: pull
 
 compile-assets pull-cache foss:
-  extends: [".compile-assets-metadata", ".only-ee-as-if-foss"]
+  extends:
+    - .compile-assets-metadata
+    - .as-if-foss
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag-ee
+    - <<: *if-merge_request-ee
+      changes: *code-backstage-qa-patterns
+      when: on_success
   cache:
     policy: pull
     key: "assets-compile:v7:foss"
@@ -126,9 +141,7 @@ compile-assets pull-cache foss:
     - .default-tags
     - .default-retry
     - .default-cache
-    - .default-only
     - .default-before_script
-    - .only:changes-code-backstage
     - .use-pg9
   stage: test
   needs: ["setup-test-env", "compile-assets pull-cache"]
@@ -148,6 +161,11 @@ compile-assets pull-cache foss:
 
 karma:
   extends: .karma-base
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
   coverage: '/^Statements *: (\d+\.\d+%)/'
   artifacts:
     name: coverage-javascript
@@ -161,9 +179,12 @@ karma:
       junit: junit_karma.xml
 
 karma-foss:
-  extends:
-    - .karma-base
-    - .only-ee-as-if-foss
+  extends: .karma-base
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag-ee
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
 
 .jest-base:
   extends: .only-code-frontend-job-base
@@ -181,6 +202,11 @@ karma-foss:
 
 jest:
   extends: .jest-base
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
   artifacts:
     name: coverage-frontend
     expire_in: 31d
@@ -193,9 +219,12 @@ jest:
       junit: junit_jest.xml
 
 jest-foss:
-  extends:
-    - .jest-base
-    - .only-ee-as-if-foss
+  extends: .jest-base
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag-ee
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
   cache:
     policy: pull
 
@@ -204,8 +233,6 @@ jest-foss:
     - .default-tags
     - .default-retry
     - .default-cache
-    - .default-only
-    - .only:changes-code-backstage
   stage: test
   dependencies: []
   cache:
@@ -222,24 +249,36 @@ jest-foss:
 qa-frontend-node:8:
   extends: .qa-frontend-node
   image: node:carbon
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
 
 qa-frontend-node:10:
   extends: .qa-frontend-node
   image: node:dubnium
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
 
 qa-frontend-node:latest:
   extends: .qa-frontend-node
   image: node:latest
   allow_failure: true
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
 
 webpack-dev-server:
   extends:
     - .default-tags
     - .default-retry
     - .default-cache
-    - .default-only
-    - .only:changes-code-backstage
   stage: test
+  rules:
+    - <<: *rules-master-stable-deploy-security-tag
+    - <<: *if-merge_request
+      changes: *code-backstage-patterns
+      when: on_success
   needs: ["setup-test-env", "compile-assets pull-cache"]
   dependencies: ["setup-test-env", "compile-assets pull-cache"]
   variables:
