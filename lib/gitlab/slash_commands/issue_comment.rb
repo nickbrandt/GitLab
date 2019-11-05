@@ -11,15 +11,12 @@ module Gitlab
         'issue comment <id> *`⇧ Shift`*+*`↵ Enter`* <comment>'
       end
 
-      def self.allowed?(issue, user)
-        can?(user, :create_note, issue)
-      end
-
       def execute(match)
         note_body = match[:note_body].to_s.strip
         issue = find_by_iid(match[:iid])
 
         return not_found unless issue
+        return access_denied unless can_create_note?(issue)
 
         note = create_note(issue: issue, note: note_body)
 
@@ -32,8 +29,16 @@ module Gitlab
 
       private
 
+      def can_create_note?(issue)
+        Ability.allowed?(current_user, :create_note, issue)
+      end
+
       def not_found
         Gitlab::SlashCommands::Presenters::Access.new.not_found
+      end
+
+      def access_denied
+        Gitlab::SlashCommands::Presenters::Access.new.generic_access_denied
       end
 
       def create_note(issue:, note:)
