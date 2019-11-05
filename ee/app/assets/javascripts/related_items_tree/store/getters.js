@@ -23,9 +23,6 @@ export const headerItems = state => [
   },
 ];
 
-export const issuesBeginAtIndex = (state, getters) =>
-  getters.directChildren.findIndex(item => item.type === ChildType.Issue);
-
 export const itemAutoCompleteSources = (state, getters) => {
   if (getters.isEpic) {
     return state.autoCompleteEpics ? getters.autoCompleteSources : {};

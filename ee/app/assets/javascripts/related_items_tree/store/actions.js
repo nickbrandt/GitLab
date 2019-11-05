@@ -286,7 +286,7 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { rawItems 
   });
 
   commit(types.RECEIVE_ADD_ITEM_SUCCESS, {
-    insertAt: getters.isEpic ? 0 : getters.issuesBeginAtIndex,
+    insertAt: 0,
     items,
   });
 
@@ -342,7 +342,7 @@ export const receiveCreateItemSuccess = ({ state, commit, dispatch, getters }, {
   });
 
   commit(types.RECEIVE_CREATE_ITEM_SUCCESS, {
-    insertAt: getters.issuesBeginAtIndex > 0 ? getters.issuesBeginAtIndex - 1 : 0,
+    insertAt: 0,
     item,
   });
 
