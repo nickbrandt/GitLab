@@ -44,6 +44,20 @@ bundle exec rspec
 bundle exec rspec spec/[path]/[to]/[spec].rb
 ```
 
+Use [guard](https://github.com/guard/guard) to continuously monitor for changes and only run matching tests:
+
+```sh
+bundle exec guard
+```
+
+When using spring and guard together, consider adjusting Guardfile:
+
+```ruby
+guard :rspec, cmd: "spring rspec" do
+  # ...
+end
+```
+
 ### General guidelines
 
 - Use a single, top-level `describe ClassName` block.
