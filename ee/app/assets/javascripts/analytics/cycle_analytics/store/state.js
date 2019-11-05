@@ -2,6 +2,8 @@ export default () => ({
   endpoints: {
     cycleAnalyticsData: null,
     stageData: null,
+    cycleAnalyticsStagesAndEvents: null,
+    summaryData: null,
   },
 
   startDate: null,
@@ -17,7 +19,7 @@ export default () => ({
 
   selectedGroup: null,
   selectedProjectIds: [],
-  selectedStageName: null,
+  selectedStageId: null,
 
   currentStageEvents: [],
 

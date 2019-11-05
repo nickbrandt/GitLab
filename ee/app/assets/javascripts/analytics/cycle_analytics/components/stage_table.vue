@@ -71,7 +71,7 @@ export default {
   },
   computed: {
     stageName() {
-      return this.currentStage ? this.currentStage.legend : __('Related Issues');
+      return this.currentStage ? this.currentStage.title : __('Related Issues');
     },
     shouldDisplayStage() {
       const { currentStageEvents = [], isLoading, isEmptyStage } = this;
@@ -138,8 +138,8 @@ export default {
               :key="`ca-stage-title-${stage.title}`"
               :title="stage.title"
               :value="stage.value"
-              :is-active="!isAddingCustomStage && stage.name === currentStage.name"
-              :is-user-allowed="stage.isUserAllowed"
+              :is-active="!isAddingCustomStage && stage.id === currentStage.id"
+              :is-default-stage="!stage.custom"
               @select="selectStage(stage)"
             />
             <add-stage-button
@@ -151,12 +151,6 @@ export default {
         </nav>
         <div class="section stage-events">
           <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
-          <gl-empty-state
-            v-else-if="currentStage && !currentStage.isUserAllowed"
-            :title="__('You need permission.')"
-            :description="__('Want to see the data? Please ask an administrator for access.')"
-            :svg-path="noAccessSvgPath"
-          />
           <custom-stage-form
             v-else-if="isAddingCustomStage"
             :events="customStageFormEvents"
