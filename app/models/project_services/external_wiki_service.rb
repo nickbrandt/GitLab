@@ -19,14 +19,19 @@ class ExternalWikiService < Service
 
   def fields
     [
-      { type: 'text', name: 'external_wiki_url', placeholder: s_('ExternalWikiService|The URL of the external Wiki'), required: true }
+      {
+        type: 'text',
+        name: 'external_wiki_url',
+        placeholder: s_('ExternalWikiService|The URL of the external Wiki'),
+        required: true
+      }
     ]
   end
 
   def execute(_data)
     @response = Gitlab::HTTP.get(properties['external_wiki_url'], verify: true) rescue nil
 
-    @response if @reponse == 200
+    @response.body if @response.code == 200
   end
 
   def self.supported_events
