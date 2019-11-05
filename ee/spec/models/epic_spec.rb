@@ -117,11 +117,26 @@ describe Epic do
     context 'with authorized user' do
       before do
         private_group.add_developer(user)
-        stub_licensed_features(epics: true)
       end
 
-      it 'returns epic groups user can access' do
-        expect(subject).to eq [private_group]
+      context 'with epics enabled' do
+        before do
+          stub_licensed_features(epics: true)
+        end
+
+        it 'returns epic groups user can access' do
+          expect(subject).to eq [private_group]
+        end
+      end
+
+      context 'with epics are disabled' do
+        before do
+          stub_licensed_features(epics: false)
+        end
+
+        it 'returns an empty list' do
+          expect(subject).to be_empty
+        end
       end
     end
   end
