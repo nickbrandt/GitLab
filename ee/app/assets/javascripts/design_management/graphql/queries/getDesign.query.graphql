@@ -1,6 +1,6 @@
 #import "../fragments/design.fragment.graphql"
 
-query project($fullPath: ID!, $iid: String!, $atVersion: ID, $designIds: [ID!]) {
+query getDesign($fullPath: ID!, $iid: String!, $atVersion: ID, $designIds: [ID!]) {
   project(fullPath: $fullPath) {
     id
     issue(iid: $iid) {
