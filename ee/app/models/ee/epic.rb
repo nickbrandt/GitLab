@@ -95,7 +95,6 @@ module EE
       scope :due_date_inherited, -> { where(due_date_is_fixed: [nil, false]) }
 
       scope :counts_by_state, -> { group(:state_id).count }
-      scope :excluding_ids, ->(ids) { where.not(id: ids) }
 
       MAX_HIERARCHY_DEPTH = 5
 

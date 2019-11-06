@@ -31,7 +31,7 @@ module Epics
 
     def epics_count
       strong_memoize(:epics_count) do
-        accessible_epics.excluding_ids([epic.id]).counts_by_state
+        accessible_epics.id_not_in(epic.id).counts_by_state
       end
     end
 

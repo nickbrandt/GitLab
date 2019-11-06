@@ -21,7 +21,7 @@ module EE
 
       scope :in_epics, ->(epics) do
         issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
-        where(id: issue_ids)
+        id_in(issue_ids)
       end
 
       has_one :epic_issue
