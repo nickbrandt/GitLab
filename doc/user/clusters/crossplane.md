@@ -25,7 +25,7 @@ Follow the steps to configure the installed cloud provider stack with a user acc
 
 We need to configure connectivity between the Postgres database and the GKE cluster. This can be configured by creating a [Private Service Connection](https://cloud.google.com/vpc/docs/configure-private-services-access)
 
-We can use crossplane to achieve this or by following the above link. 
+We can use crossplane to achieve this or by following the above link.
 
 - Create a GlobalAddress and Connection resources:
 
@@ -123,3 +123,15 @@ The Resource Classes allow you to define classes of service for a managed servic
 The autodevops pipeline can be run with the following options:
 a) `postgres.managed` set to true which will select a default resourceclass . The resourceclass needs to be marked with `resourceclass.crossplane.io/is-default-class: "true"`
 b) `postgres.managed` set to true with `postgres.managedClassSelector` providing the resource class to choose based on labels
+
+The autodevops pipeline should provision a PostgresqlInstance.
+
+Verify creation of the Postgres Instance
+
+```
+kubectl get postgresqlinstance
+```
+
+### Connect to the Postgres instance
+
+Follow the [guide](https://cloud.google.com/sql/docs/postgres/connect-kubernetes-engine) to connect to the Postgres database instance provisioned on CloudSQL
