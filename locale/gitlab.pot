@@ -887,9 +887,6 @@ msgid_plural "Add %d issues"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "Add %{link} code intelligence to your GitLab instance code views and pull requests."
-msgstr ""
-
 msgid "Add CHANGELOG"
 msgstr ""
 
@@ -6259,7 +6256,7 @@ msgstr ""
 msgid "Enable classification control using an external service"
 msgstr ""
 
-msgid "Enable code intelligence powered by %{link}."
+msgid "Enable code intelligence powered by %{link} on your GitLab instance's code views and merge requests."
 msgstr ""
 
 msgid "Enable error tracking"

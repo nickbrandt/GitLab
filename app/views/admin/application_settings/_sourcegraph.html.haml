@@ -8,7 +8,7 @@
     %button.btn.btn-default.js-settings-toggle{ type: 'button' }
       = expanded ? _('Collapse') : _('Expand')
     %p
-      = _('Enable code intelligence powered by %{link}.').html_safe % { link: link_to('Sourcegraph', 'https://sourcegraph.com', target: '_blank') }
+      = _('Enable code intelligence powered by %{link} on your GitLab instance\'s code views and merge requests.').html_safe % { link: link_to('Sourcegraph', 'https://sourcegraph.com/', target: '_blank') }
 
   .settings-content
     = form_for @application_setting, url: integrations_admin_application_settings_path(anchor: 'js-sourcegraph-settings'), html: { class: 'fieldset-form' } do |f|
@@ -19,6 +19,9 @@
           .form-check
             = f.check_box :sourcegraph_enabled, class: 'form-check-input'
             = f.label :sourcegraph_enabled, _('Enable Sourcegraph'), class: 'form-check-label'
+            = link_to icon('question-circle'),
+              help_page_path('integration/sourcegraph.md'),
+              target: '_blank'
         .form-group
           = f.label :sourcegraph_url, _('Sourcegraph URL'), class: 'label-bold'
           = f.text_field :sourcegraph_url, class: 'form-control', placeholder: 'e.g. https://sourcegraph.example.com'
