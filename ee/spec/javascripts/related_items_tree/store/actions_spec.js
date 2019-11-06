@@ -801,7 +801,6 @@ describe('RelatedItemTree', () => {
 
       describe('receiveAddItemSuccess', () => {
         it('should set `state.itemAddInProgress` to false and dispatches actions `setPendingReferences`, `setItemInputValue` and `toggleAddItemForm`', done => {
-          state.epicsBeginAtIndex = 0;
           state.issuableType = issuableTypesMap.EPIC;
           state.isEpic = true;
 
@@ -972,7 +971,6 @@ describe('RelatedItemTree', () => {
             reference: `${mockEpics[0].group.fullPath}${mockEpics[0].reference}`,
             pathIdSeparator: PathIdSeparator.Epic,
           });
-          state.epicsBeginAtIndex = 0;
           state.parentItem = {
             fullPath: createdEpic.group.fullPath,
           };
