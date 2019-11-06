@@ -52,6 +52,16 @@ describe Projects::UpdateMirrorService do
       expect(new_project.only_mirror_protected_branches).to be_falsey
     end
 
+    context 'when mirror user is blocked' do
+      before do
+        project.mirror_user.block
+      end
+
+      it 'fails and returns error status' do
+        expect(service.execute[:status]).to eq(:error)
+      end
+    end
+
     context "updating tags" do
       it "creates new tags" do
         stub_fetch_mirror(project)
