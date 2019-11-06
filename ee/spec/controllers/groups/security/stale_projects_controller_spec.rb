@@ -26,17 +26,19 @@ describe Groups::Security::StaleProjectsController do
         _ungrouped_project = create(:project)
         unconfigured_project = create(:project, namespace: group)
 
-        up_to_date_project = create(:project, namespace: group)
-        create(:ci_build, :dast, status: :success, finished_at: Time.current, project: up_to_date_project)
-        create(:ci_build, :sast, status: :success, finished_at: Time.current, project: up_to_date_project)
-        create(:ci_build, :container_scanning, status: :success, finished_at: Time.current, project: up_to_date_project)
-        create(:ci_build, :dependency_scanning, status: :success, finished_at: Time.current, project: up_to_date_project)
+        up_to_date_project = create(:project, :repository, namespace: group)
+        pipeline = create(:ci_pipeline, project: up_to_date_project, ref: up_to_date_project.default_branch, sha: up_to_date_project.commit.id)
+        create(:ci_build, :dast, status: :success, finished_at: Time.current, pipeline: pipeline)
+        create(:ci_build, :sast, status: :success, finished_at: Time.current, pipeline: pipeline)
+        create(:ci_build, :container_scanning, status: :success, finished_at: Time.current, pipeline: pipeline)
+        create(:ci_build, :dependency_scanning, status: :success, finished_at: Time.current, pipeline: pipeline)
 
-        out_of_date_project = create(:project, namespace: group)
-        create(:ci_build, :dast, status: :success, finished_at: Time.current - 6.days.ago, project: out_of_date_project)
-        create(:ci_build, :sast, status: :success, finished_at: Time.current - 13.days.ago, project: out_of_date_project)
-        create(:ci_build, :container_scanning, status: :success, finished_at: Time.current - 13.days.ago, project: out_of_date_project)
-        create(:ci_build, :dependency_scanning, status: :success, finished_at: Time.current - 13.days.ago, project: out_of_date_project)
+        out_of_date_project = create(:project, :repository, namespace: group)
+        pipeline = create(:ci_pipeline, project: out_of_date_project, ref: out_of_date_project.default_branch, sha: out_of_date_project.commit.id)
+        create(:ci_build, :dast, status: :success, finished_at: 6.days.ago, pipeline: pipeline)
+        create(:ci_build, :sast, status: :success, finished_at: 13.days.ago, pipeline: pipeline)
+        create(:ci_build, :container_scanning, status: :success, finished_at: 13.days.ago, pipeline: pipeline)
+        create(:ci_build, :dependency_scanning, status: :success, finished_at: 13.days.ago, pipeline: pipeline)
 
         subject
 
@@ -52,9 +54,9 @@ describe Groups::Security::StaleProjectsController do
           { 'scan_name' => 'container_scanning', 'days_since_last_scan' => 13 },
           { 'scan_name' => 'dependency_scanning', 'days_since_last_scan' => 13 }
         )
-        expect(unconfigured_project_data['unconfigured_scans']).to eq([
+        expect(unconfigured_project_data['unconfigured_scans']).to contain_exactly(
           'sast', 'dast', 'container_scanning', 'dependency_scanning'
-        ])
+        )
       end
     end
 

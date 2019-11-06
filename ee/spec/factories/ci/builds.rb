@@ -24,6 +24,7 @@ FactoryBot.define do
       trait report_type do
         after(:build) do |build|
           build.job_artifacts << build(:ee_ci_job_artifact, report_type, job: build)
+          build.metadata = build(:ci_builds_metadata, report_type, job: build, project: build.project)
         end
       end
     end
