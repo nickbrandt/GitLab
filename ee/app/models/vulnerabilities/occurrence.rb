@@ -25,6 +25,8 @@ module Vulnerabilities
     has_many :occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
     has_many :pipelines, through: :occurrence_pipelines, class_name: 'Ci::Pipeline'
 
+    attr_writer :sha
+
     CONFIDENCE_LEVELS = {
       undefined: 0,
       ignore: 1,
@@ -125,6 +127,11 @@ module Vulnerabilities
         )
         .select('report_type, vulnerability_id, project_fingerprint, raw_metadata, '\
                 'vulnerabilities.id, vulnerabilities.state') # fetching only required attributes
+    end
+
+    # sha can be sourced from a joined pipeline or set from the report
+    def sha
+      self[:sha] || @sha
     end
 
     def state

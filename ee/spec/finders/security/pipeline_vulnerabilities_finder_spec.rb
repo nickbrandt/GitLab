@@ -22,6 +22,7 @@ describe Security::PipelineVulnerabilitiesFinder do
   describe '#execute' do
     set(:project) { create(:project, :repository) }
     set(:pipeline) { create(:ci_pipeline, :success, project: project) }
+    let(:params) { {} }
 
     set(:build_cs) { create(:ci_build, :success, name: 'cs_job', pipeline: pipeline, project: project) }
     set(:build_dast) { create(:ci_build, :success, name: 'dast_job', pipeline: pipeline, project: project) }
@@ -51,6 +52,10 @@ describe Security::PipelineVulnerabilitiesFinder do
     end
 
     subject { described_class.new(pipeline: pipeline, params: params).execute }
+
+    it 'assigns commit sha to findings' do
+      expect(subject.map(&:sha).uniq).to eq [pipeline.sha]
+    end
 
     context 'by order' do
       let(:params) { { report_type: %w[sast] } }
