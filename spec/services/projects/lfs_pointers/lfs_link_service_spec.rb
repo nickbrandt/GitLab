@@ -48,5 +48,15 @@ describe Projects::LfsPointers::LfsLinkService do
       expect(project.all_lfs_objects.count).to eq 9
       expect(linked.size).to eq 7
     end
+
+    it 'only queries for the batch that will be processed', :aggregate_failures do
+      stub_const("#{described_class}::BATCH_SIZE", 1)
+      oids = %w(one two)
+
+      expect(LfsObject).to receive(:where).with(oid: %w(one)).once.and_call_original
+      expect(LfsObject).to receive(:where).with(oid: %w(two)).once.and_call_original
+
+      subject.execute(oids)
+    end
   end
 end

@@ -23,7 +23,9 @@ module Projects
         all_existing_objects = []
         iterations = 0
 
-        LfsObject.where(oid: oids).each_batch(of: BATCH_SIZE) do |existent_lfs_objects|
+        oids.each_slice(BATCH_SIZE) do |oids_batch|
+          existent_lfs_objects = LfsObject.where(oid: oids_batch)
+
           next unless existent_lfs_objects.any?
 
           iterations += 1
