@@ -188,8 +188,7 @@ describe('Cycle analytics mutations', () => {
       ]);
     });
 
-    // NOTE: This will fail until we merge https://gitlab.com/gitlab-org/gitlab/merge_requests/18514
-    describe.skip('with hidden stages', () => {
+    describe('with hidden stages', () => {
       const mockStages = customizableStagesAndEvents.stages;
 
       beforeEach(() => {
@@ -201,7 +200,7 @@ describe('Cycle analytics mutations', () => {
         });
       });
 
-      it('will only return stages where hidden is not set to true', () => {
+      it('will only return stages that are not hidden', () => {
         expect(state.stages.map(({ id }) => id)).not.toContain(mockStages[0].id);
       });
     });

@@ -319,9 +319,9 @@ describe 'Group Cycle Analytics', :js do
 
       context 'Stage table' do
         custom_stage = "Cool beans"
-        let(:params) { { name: custom_stage, start_event_identifier: :merge_request_created, end_event_identifier: :merge_request_merged } } 
-        let(:first_default_stage){ page.find('.stage-nav-item-cell', text: "Issue").ancestor(".stage-nav-item") }
-        let(:first_custom_stage){ page.find('.stage-nav-item-cell', text: custom_stage).ancestor(".stage-nav-item") }
+        let(:params) { { name: custom_stage, start_event_identifier: :merge_request_created, end_event_identifier: :merge_request_merged } }
+        let(:first_default_stage) { page.find('.stage-nav-item-cell', text: "Issue").ancestor(".stage-nav-item") }
+        let(:first_custom_stage) { page.find('.stage-nav-item-cell', text: custom_stage).ancestor(".stage-nav-item") }
 
         def create_custom_stage
           Analytics::CycleAnalytics::Stages::CreateService.new(parent: group, params: params, current_user: user).execute

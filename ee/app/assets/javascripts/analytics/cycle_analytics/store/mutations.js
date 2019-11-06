@@ -109,7 +109,7 @@ export default {
   },
   [types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS](state, data) {
     const { events = [], stages = [] } = data;
-    state.stages = transformRawStages(stages);
+    state.stages = transformRawStages(stages.filter(({ hidden = false }) => !hidden));
 
     state.customStageFormEvents = events.map(ev =>
       convertObjectPropsToCamelCase(ev, { deep: true }),
