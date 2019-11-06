@@ -25,6 +25,7 @@ describe RuboCop::Cop::RSpec::AnyInstanceOf do
 
     it 'registers an offence' do
       inspect_source(source)
+
       expect(cop.offenses.size).to eq(1)
     end
 
@@ -49,6 +50,7 @@ describe RuboCop::Cop::RSpec::AnyInstanceOf do
 
     it 'registers an offence' do
       inspect_source(source)
+
       expect(cop.offenses.size).to eq(1)
     end
 

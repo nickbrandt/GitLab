@@ -29,14 +29,10 @@ module RuboCop
         MESSAGE_ALLOW = 'Do not use `allow_any_instance_of` method, use `allow_next_instance_of` instead.'
 
         def_node_search :expect_any_instance_of?, <<~PATTERN
-          (send
-            (send nil? :expect_any_instance_of ...) _ ...
-          )
+          (send (send nil? :expect_any_instance_of ...) ...)
         PATTERN
         def_node_search :allow_any_instance_of?, <<~PATTERN
-          (send
-            (send nil? :allow_any_instance_of ...) _ ...
-          )
+          (send (send nil? :allow_any_instance_of ...) ...)
         PATTERN
 
         def on_send(node)
@@ -48,11 +44,12 @@ module RuboCop
         end
 
         def autocorrect(node)
-          if expect_any_instance_of?(node)
-            replacement = replacement_any_instance_of(node, 'expect')
-          elsif allow_any_instance_of?(node)
-            replacement = replacement_any_instance_of(node, 'allow')
-          end
+          replacement =
+            if expect_any_instance_of?(node)
+              replacement_any_instance_of(node, 'expect')
+            elsif allow_any_instance_of?(node)
+              replacement_any_instance_of(node, 'allow')
+            end
 
           lambda do |corrector|
             corrector.replace(node.loc.expression, replacement)
@@ -62,10 +59,18 @@ module RuboCop
         private
 
         def replacement_any_instance_of(node, rspec_prefix)
-          replacement = node.receiver.source.sub("#{rspec_prefix}_any_instance_of", "#{rspec_prefix}_next_instance_of")
-          replacement << " do |instance|\n"
-          replacement << "  #{rspec_prefix}(instance).#{node.method_name} #{node.children.last.source}\n"
-          replacement << 'end'
+          method_call =
+            node.receiver.source.sub(
+              "#{rspec_prefix}_any_instance_of",
+              "#{rspec_prefix}_next_instance_of")
+
+          block = <<~RUBY.chomp
+            do |instance|
+              #{rspec_prefix}(instance).#{node.method_name} #{node.children.last.source}
+            end
+          RUBY
+
+          "#{method_call} #{block}"
         end
       end
     end
