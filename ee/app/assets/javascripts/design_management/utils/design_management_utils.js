@@ -73,17 +73,6 @@ const addNewVersionToStore = (store, query, version) => {
 };
 
 /**
- * Throws an error on design deletion
- *
- * @param {Object} error
- */
-
-export const onDesignDeletionError = error => {
-  createFlash(s__('DesignManagement|We could not delete design(s). Please try again.'));
-  throw error;
-};
-
-/**
  * Updates a store after design deletion
  *
  * @param {Object} store
@@ -94,7 +83,8 @@ export const onDesignDeletionError = error => {
 
 export const updateStoreAfterDesignsDelete = (store, data, query, designs) => {
   if (data.errors) {
-    onDesignDeletionError(new Error(data.errors));
+    createFlash(s__('DesignManagement|We could not delete design(s). Please try again.'));
+    throw new Error(data.errors);
   } else {
     deleteDesignsFromStore(store, query, designs);
     addNewVersionToStore(store, query, data.version);
