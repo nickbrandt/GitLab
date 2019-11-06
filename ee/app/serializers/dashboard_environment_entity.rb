@@ -15,6 +15,10 @@ class DashboardEnvironmentEntity < Grape::Entity
     DeploymentEntity.represent(environment.last_visible_deployment, options.merge(request: request_with_project))
   end
 
+  expose :last_visible_pipeline, as: :last_pipeline, expose_nil: false do |environment|
+    PipelineDetailsEntity.represent(environment.last_visible_pipeline, options.merge(request: request_with_project))
+  end
+
   private
 
   alias_method :environment, :object

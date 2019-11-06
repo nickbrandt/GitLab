@@ -454,7 +454,7 @@ describe OperationsController do
 
         it 'returns the last deployment for an environment' do
           environment = create(:environment, project: project)
-          deployment = create(:deployment, project: project, environment: environment, status: :success)
+          deployment = create(:deployment, :success, project: project, environment: environment)
 
           get :environments_list
 
@@ -471,7 +471,7 @@ describe OperationsController do
         it "returns the last deployment's deployable" do
           environment = create(:environment, project: project)
           ci_build = create(:ci_build, project: project)
-          create(:deployment, project: project, environment: environment, deployable: ci_build, status: :success)
+          create(:deployment, :success, project: project, environment: environment, deployable: ci_build)
 
           get :environments_list
 
@@ -500,6 +500,51 @@ describe OperationsController do
           last_deployment_json = environment_json['last_deployment']
 
           expect(last_deployment_json['id']).to eq(deployment.id)
+        end
+
+        context 'with a pipeline' do
+          let(:project) { create(:project, :repository) }
+          let(:commit) { project.commit }
+          let(:environment) { create(:environment, project: project) }
+
+          before do
+            project.add_developer(user)
+            user.update!(ops_dashboard_projects: [project])
+          end
+
+          it 'returns the last pipeline for an environment' do
+            pipeline = create(:ci_pipeline, project: project, user: user, sha: commit.sha)
+            ci_build = create(:ci_build, project: project, pipeline: pipeline)
+            create(:deployment, :success, project: project, environment: environment, deployable: ci_build, sha: commit.sha)
+
+            get :environments_list
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+            project_json = json_response['projects'].first
+            environment_json = project_json['environments'].first
+            last_pipeline_json = environment_json['last_pipeline']
+
+            expect(last_pipeline_json['id']).to eq(pipeline.id)
+          end
+
+          it 'returns the last pipeline details' do
+            pipeline = create(:ci_pipeline, project: project, user: user, sha: commit.sha, status: :canceled)
+            ci_build = create(:ci_build, project: project, pipeline: pipeline)
+            create(:deployment, :canceled, project: project, environment: environment, deployable: ci_build, sha: commit.sha)
+
+            get :environments_list
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+            project_json = json_response['projects'].first
+            environment_json = project_json['environments'].first
+            last_pipeline_json = environment_json['last_pipeline']
+
+            expect(last_pipeline_json.dig('details', 'status', 'group')).to eq('canceled')
+          end
         end
       end
     end

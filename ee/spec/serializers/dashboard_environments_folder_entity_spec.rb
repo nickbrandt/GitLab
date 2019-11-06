@@ -14,7 +14,8 @@ describe DashboardEnvironmentsFolderEntity do
 
       result = described_class.new(environment_folder, request: request).as_json
 
-      expect(result.keys.sort).to eq([:environment_path, :external_url, :id, :last_deployment, :name, :size, :within_folder])
+      expect(result.keys.sort).to eq([:environment_path, :external_url, :id, :last_deployment,
+                                      :last_pipeline, :name, :size, :within_folder])
     end
   end
 end
