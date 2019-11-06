@@ -40,6 +40,7 @@ The following applications can be installed:
 - [GitLab Runner](#gitlab-runner)
 - [JupyterHub](#jupyterhub)
 - [Knative](#knative)
+- [Crossplane](#crossplane)
 
 With the exception of Knative, the applications will be installed in a dedicated
 namespace called `gitlab-managed-apps`.
@@ -265,6 +266,22 @@ chart is used to install this application with a
 [`values.yaml`](https://gitlab.com/gitlab-org/gitlab/blob/master/vendor/prometheus/values.yaml)
 file.
 
+### Crossplane
+
+> - Introduced in Gitlab 12.5 for project-level clusters.
+
+[Crossplane](https://crossplane.io/docs) is a multicloud control plane useful in management of applications and infrastructure across multiple clouds by extending the Kubernetes API using custom resources and controllers watching those custom resources. Crossplane allows provisioning and lifecycle management of infrastructure components across cloud providers in a uniform and simplistic manner abstracting away cloud provider specific configurations.
+
+Crossplane listed as a gitlab managed application, installs crossplane with a provider of choice on a kuberetes cluster attached to the project repository. Crossplane can then be used to provision infrastructure or managed applications such as postgresql(eg: CloudSQL from gcp or RDS from aws) and other [services](https://crossplane.io/docs/v0.4/services-guide.html) required by the application via the autodevops pipeline.
+
+For configuring crossplane on the cluster navigate to [Crossplane configuration with Gitlab](./crossplane.md)
+
+NOTE: **Note:**
+The [`alpha/crossplane`](https://charts.crossplane.io/alpha/)
+v0.4.0 chart is used to install this application with a
+[`values.yaml`](https://github.com/crossplaneio/crossplane/blob/master/cluster/charts/crossplane/values.yaml.tmpl)
+file.
+
 ## Upgrading applications
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/24789) in GitLab 11.8.
@@ -305,6 +322,7 @@ The applications below can be uninstalled.
 | JupyterHub  | 12.1+         | All data not committed to GitLab will be deleted and cannot be restored. |
 | Knative  | 12.1+         | The associated IP will be deleted and cannot be restored. |
 | Prometheus  | 11.11+         | All data will be deleted and cannot be restored. |
+| Crossplane  | 12.5+         | All data will be deleted and cannot be restored. |
 
 To uninstall an application:
 
