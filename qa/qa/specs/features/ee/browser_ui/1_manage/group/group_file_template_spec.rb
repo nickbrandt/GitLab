@@ -22,7 +22,13 @@ module QA
           type: '.gitlab-ci.yml',
           template: 'custom_gitlab-ci',
           file_path: 'gitlab-ci/custom_gitlab-ci.yml',
-          content: 'gitlab-ci template test'
+          content:
+            <<~CI
+              job:
+                script: echo "Skipped"
+                except:
+                  - master
+            CI
         },
         {
           type: 'LICENSE',
@@ -43,12 +49,13 @@ module QA
           project.group = @group
           project.name = 'group-file-template-project'
           project.description = 'Add group file templates'
+          project.auto_devops_enabled = false
           project.initialize_with_readme = true
         end
 
         Resource::Repository::Commit.fabricate_via_api! do |commit|
           commit.project = @file_template_project
-          commit.commit_message = 'Add CODEOWNERS and test files'
+          commit.commit_message = 'Add group file templates'
           commit.add_files(templates)
         end
 
@@ -56,6 +63,7 @@ module QA
           project.group = @group
           project.name = 'group-file-template-project-2'
           project.description = 'Add files for group file templates'
+          project.auto_devops_enabled = false
           project.initialize_with_readme = true
         end
 
