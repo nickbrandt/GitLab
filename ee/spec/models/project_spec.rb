@@ -1417,6 +1417,31 @@ describe Project do
     end
   end
 
+  describe '#latest_pipeline_with_reports' do
+    let(:project) { create(:project) }
+    let!(:pipeline_1) { create(:ee_ci_pipeline, :with_sast_report, project: project) }
+    let!(:pipeline_2) { create(:ee_ci_pipeline, :with_sast_report, project: project) }
+    let!(:pipeline_3) { create(:ee_ci_pipeline, :with_dependency_scanning_report, project: project) }
+
+    subject { project.latest_pipeline_with_reports(reports) }
+
+    context 'when reports are found' do
+      let(:reports) { ::Ci::JobArtifact.sast_reports }
+
+      it "returns the latest pipeline with reports of right type" do
+        is_expected.to eq(pipeline_2)
+      end
+    end
+
+    context 'when reports are not found' do
+      let(:reports) { ::Ci::JobArtifact.metrics_reports }
+
+      it 'returns nothing' do
+        is_expected.to be_nil
+      end
+    end
+  end
+
   describe '#protected_environment_by_name' do
     let(:project) { create(:project) }
 
