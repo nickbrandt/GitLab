@@ -141,4 +141,25 @@ RSpec.describe Release do
       end
     end
   end
+
+  describe '#evidence_sha' do
+    let!(:release) { create(:release) }
+
+    before do
+      CreateEvidenceWorker.new.perform(release.id)
+    end
+
+    context 'when a release was created before evidence collection existed' do
+      it 'is nil' do
+        allow(release).to receive(:evidence).and_return(nil)
+
+        expect(release.evidence_sha).to be_nil
+      end
+    end
+    context 'when a release was created with evidence collection' do
+      it 'returns the summary sha' do
+        expect(release.evidence_sha).to eq(release.evidence.summary_sha)
+      end
+    end
+  end
 end

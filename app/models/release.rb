@@ -73,6 +73,10 @@ class Release < ApplicationRecord
     self.read_attribute(:name) || tag
   end
 
+  def evidence_sha
+    evidence&.summary_sha
+  end
+
   private
 
   def actual_sha
