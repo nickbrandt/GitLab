@@ -137,11 +137,7 @@ describe Snippet, :elastic do
       'author_id',
       'visibility_level'
     ).merge({
-      'type' => snippet.es_type,
-      'join_field' => {
-        'name' => snippet.es_type,
-        'parent' => snippet.es_parent
-      }
+      'type' => snippet.es_type
     })
 
     expect(snippet.__elasticsearch__.as_indexed_json).to eq(expected_hash)
