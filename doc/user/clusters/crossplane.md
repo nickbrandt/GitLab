@@ -1,4 +1,6 @@
-### Introduction
+# Crossplane configuration guide
+
+## Introduction
 
 In order to allow crossplane to provision cloud services such as Postgres, it requires the cloud provider stack to be configured with a user account (eg: a service account in case of gcp, an iam user in case of aws)
 
@@ -14,13 +16,12 @@ export NETWORK_NAME=default # the network that your GKE cluster lives in.
 export SUBNETWORK_NAME=default # the subnetwork that your GKE cluster lives in.
 ```
 
-#### Configure Crossplane with the cloud provider
+### Configure Crossplane with the cloud provider
 
 Follow the steps to configure the installed cloud provider stack with a user account.
-https://crossplane.io/docs/v0.4/cloud-providers.html
+[Configure Providers](https://crossplane.io/docs/v0.4/cloud-providers.html)
 
-
-#### Configure Managed Service Access
+### Configure Managed Service Access
 
 We need to configure connectivity between the Postgres database and the GKE cluster. This can be configured by creating a [Private Service Connection](https://cloud.google.com/vpc/docs/configure-private-services-access)
 
@@ -70,11 +71,13 @@ kubectl apply -f network.yaml
 You can verify creation with the following command and output:
 
 Command
+
 ```
+
 kubectl describe connection.servicenetworking.gcp.crossplane.io gitlab-ad-connection
 ```
 
-#### Setup Resource classes
+### Setup Resource classes
 
 Resource classes are a way of defining a configuration for the required managed service. We will define the Postgres Resource class
 
@@ -108,15 +111,15 @@ EOF
 kubectl apply -f gcp-postgres-standard.yaml
 
 ```
+
 Verify creation of the Resource class
 
 ```
 kubectl get cloudsqlinstanceclasses
 ```
 
-The Resource Classes allow you to define classes of service for a managed service. We could create another `CloudSQLInstanceClass` which requests for a larger or a faster disk. It could also request for a specific version of the database. 
+The Resource Classes allow you to define classes of service for a managed service. We could create another `CloudSQLInstanceClass` which requests for a larger or a faster disk. It could also request for a specific version of the database.
 
-
-The autodevops pipeline can be run with the following options: 
+The autodevops pipeline can be run with the following options:
 a) `postgres.managed` set to true which will select a default resourceclass . The resourceclass needs to be marked with `resourceclass.crossplane.io/is-default-class: "true"`
-b) `postgres.managed` set to true with `postgres.managedClassSelector` providing the resource class to choose based on labels.
+b) `postgres.managed` set to true with `postgres.managedClassSelector` providing the resource class to choose based on labels
