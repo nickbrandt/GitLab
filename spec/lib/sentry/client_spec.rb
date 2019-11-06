@@ -196,7 +196,7 @@ describe Sentry::Client do
       it 'raises exception' do
         allow(client).to receive(:valid_size?).and_return(false)
 
-        expect { subject }.to raise_error(Sentry::Client::ResponseTooBigError, "Sentry API response is too big. Limit is #{Gitlab::Utils::DeepSize.human_default_max_size}.")
+        expect { subject }.to raise_error(Sentry::Client::ResponseInvalidSizeError, "Sentry API response is too big. Limit is #{Gitlab::Utils::DeepSize.human_default_max_size}.")
       end
     end
 
