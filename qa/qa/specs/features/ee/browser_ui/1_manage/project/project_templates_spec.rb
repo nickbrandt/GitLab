@@ -39,8 +39,6 @@ module QA
 
       context 'built-in' do
         before do
-          Page::Main::Menu.perform(&:sign_out_if_signed_in)
-
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_admin_credentials)
 
@@ -72,8 +70,6 @@ module QA
       # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/61
       context 'instance level', :quarantine do
         before do
-          Page::Main::Menu.perform(&:sign_out_if_signed_in)
-
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_admin_credentials)
 
@@ -117,10 +113,6 @@ module QA
 
       context 'group level' do
         before do
-          # Log out if already logged in. This is necessary because
-          # a previous test might have logged in as admin
-          Page::Main::Menu.perform(&:sign_out_if_signed_in)
-
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_credentials)
 
