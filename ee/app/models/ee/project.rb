@@ -196,6 +196,10 @@ module EE
         all_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
     end
 
+    def latest_pipeline_with_reports(reports)
+      all_pipelines.newest_first(ref: default_branch).with_reports(reports).take
+    end
+
     def environments_for_scope(scope)
       quoted_scope = ::Gitlab::SQL::Glob.q(scope)
 
