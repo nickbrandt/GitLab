@@ -3,79 +3,19 @@
 require 'spec_helper'
 require Rails.root.join('db', 'post_migrate', '20191024125120_update_existing_public_projects_in_private_groups_to_private_projects.rb')
 
-describe UpdateExistingPublicProjectsInPrivateGroupsToPrivateProjects, :migration do
-  let(:namespaces) { table(:namespaces) }
-  let(:projects) { table(:projects) }
-  let(:project) { projects.find_by_name(name) }
+describe UpdateExistingPublicProjectsInPrivateGroupsToPrivateProjects, :migration, :sidekiq do
+  let(:migration_class) { described_class::MIGRATION }
+  let(:migration_name)  { migration_class.to_s.demodulize }
 
-  context 'private visibility level' do
-    let(:name) { 'private-public' }
+  it 'correctly schedules background migrations' do
+    Sidekiq::Testing.fake! do
+      Timecop.freeze do
+        migrate!
 
-    it 'updates the project visibility' do
-      create_namespace(name, Gitlab::VisibilityLevel::PRIVATE)
-      create_project(name, Gitlab::VisibilityLevel::PUBLIC)
-
-      expect { migrate! }.to change { project.reload.visibility_level }.to(Gitlab::VisibilityLevel::PRIVATE)
+        expect(migration_name).to be_scheduled_migration(described_class::PRIVATE)
+        expect(migration_name).to be_scheduled_migration(described_class::INTERNAL)
+        expect(BackgroundMigrationWorker.jobs.size).to eq(2)
+      end
     end
-  end
-
-  context 'internal visibility level' do
-    let(:name) { 'internal-public' }
-
-    it 'updates the project visibility' do
-      create_namespace(name, Gitlab::VisibilityLevel::INTERNAL)
-      create_project(name, Gitlab::VisibilityLevel::PUBLIC)
-
-      expect { migrate! }.to change { project.reload.visibility_level }.to(Gitlab::VisibilityLevel::INTERNAL)
-    end
-  end
-
-  context 'public visibility level' do
-    let(:name) { 'public-public' }
-
-    it 'does not update the project visibility' do
-      create_namespace(name, Gitlab::VisibilityLevel::PUBLIC)
-      create_project(name, Gitlab::VisibilityLevel::PUBLIC)
-
-      expect { migrate! }.not_to change { project.reload.visibility_level }
-    end
-  end
-
-  context 'private project visibility level' do
-    let(:name) { 'public-private' }
-
-    it 'does not update the project visibility' do
-      create_namespace(name, Gitlab::VisibilityLevel::PUBLIC)
-      create_project(name, Gitlab::VisibilityLevel::PRIVATE)
-
-      expect { migrate! }.not_to change { project.reload.visibility_level }
-    end
-  end
-
-  context 'no namespace' do
-    let(:name) { 'no-namespace' }
-
-    it 'does not update the project visibility' do
-      create_namespace(name, Gitlab::VisibilityLevel::PRIVATE, type: nil)
-      create_project(name, Gitlab::VisibilityLevel::PUBLIC)
-
-      expect { migrate! }.not_to change { project.reload.visibility_level }
-    end
-  end
-
-  def create_namespace(name, visibility, options = {})
-    namespaces.create({
-                        name: name,
-                        path: name,
-                        type: 'Group',
-                        visibility_level: visibility
-                      }.merge(options))
-  end
-
-  def create_project(name, visibility)
-    projects.create!(namespace_id: namespaces.find_by_name(name).id,
-                     name: name,
-                     path: name,
-                     visibility_level: visibility)
   end
 end
