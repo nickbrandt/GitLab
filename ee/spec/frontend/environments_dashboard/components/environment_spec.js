@@ -116,6 +116,6 @@ describe('Environment', () => {
       propsData,
     });
 
-    expect(wrapper.text()).toContain('This environment has no deployments yet.');
+    expect(wrapper.text()).toContain('API');
   });
 });

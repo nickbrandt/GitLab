@@ -114,12 +114,9 @@ describe 'Admin updates EE-only settings' do
         click_button 'Save changes'
       end
 
-      wait_for_all_requests
-
       expect(current_settings.elasticsearch_limit_indexing).to be_truthy
       expect(ElasticsearchIndexedNamespace.exists?(namespace_id: namespace.id)).to be_truthy
       expect(ElasticsearchIndexedProject.exists?(project_id: project.id)).to be_truthy
-      expect(page).to have_content 'Application settings saved successfully'
     end
 
     it 'Allows removing all namespaces and projects', :aggregate_failures, :js do

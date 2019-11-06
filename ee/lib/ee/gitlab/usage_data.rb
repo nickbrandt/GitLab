@@ -192,6 +192,7 @@ module EE
             clusters_disabled: ::Clusters::Cluster.disabled.distinct_count_by(:user_id),
             clusters_enabled: ::Clusters::Cluster.enabled.distinct_count_by(:user_id),
             clusters_platforms_gke: ::Clusters::Cluster.gcp_installed.enabled.distinct_count_by(:user_id),
+            clusters_platforms_eks: ::Clusters::Cluster.aws_installed.enabled.distinct_count_by(:user_id),
             clusters_platforms_user: ::Clusters::Cluster.user_provided.enabled.distinct_count_by(:user_id),
             group_clusters_disabled: ::Clusters::Cluster.disabled.group_type.distinct_count_by(:user_id),
             group_clusters_enabled: ::Clusters::Cluster.enabled.group_type.distinct_count_by(:user_id),

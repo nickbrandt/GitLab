@@ -144,8 +144,8 @@ describe Issue do
 
     describe 'when a user cannot read cross project' do
       it 'only returns issues within the same project' do
-        expect(Ability).to receive(:allowed?).with(user, :read_cross_project)
-                               .and_return(false)
+        expect(Ability).to receive(:allowed?).with(user, :read_all_resources, :global).and_call_original
+        expect(Ability).to receive(:allowed?).with(user, :read_cross_project).and_return(false)
 
         expect(authorized_issue_a.related_issues(user))
             .to contain_exactly(authorized_issue_b)

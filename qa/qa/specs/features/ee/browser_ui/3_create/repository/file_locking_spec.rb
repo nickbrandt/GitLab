@@ -29,8 +29,7 @@ module QA
         end
       end
 
-      # Bug issue: https://gitlab.com/gitlab-org/gitlab/issues/35254
-      it 'locks a directory and tries to push as a second user', :quarantine do
+      it 'locks a directory and tries to push as a second user' do
         push branch: 'master', file: 'directory/file', as_user: @user_one
 
         sign_out_and_sign_in_as user: @user_one
