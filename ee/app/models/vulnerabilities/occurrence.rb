@@ -123,7 +123,7 @@ module Vulnerabilities
           report_type: report_type,
           project_fingerprint: project_fingerprints
         )
-        .select('report_type, vulnerability_id, project_fingerprint, raw_metadata, '\
+        .select('vulnerability_occurrences.report_type, vulnerability_id, project_fingerprint, raw_metadata, '\
                 'vulnerabilities.id, vulnerabilities.state') # fetching only required attributes
     end
 
