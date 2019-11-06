@@ -159,7 +159,16 @@ export default {
             const design = extractDesign(data);
             design.discussions.edges = [...design.discussions.edges, newDiscussion];
             design.notesCount += 1;
-            store.writeQuery({ query: getDesignQuery, data });
+            store.writeQuery({
+              query: getDesignQuery,
+              data: {
+                ...data,
+                design: {
+                  ...design,
+                  notesCount: design.notesCount + 1,
+                },
+              },
+            });
           },
         })
         .then(() => {
