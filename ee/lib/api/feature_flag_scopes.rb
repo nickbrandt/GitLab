@@ -45,6 +45,29 @@ module API
             present paginate(feature_flag.scopes), with: EE::API::Entities::FeatureFlag::Scope
           end
 
+          desc 'Create a scope of a feature flag' do
+            detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
+            success EE::API::Entities::FeatureFlag::Scope
+          end
+          params do
+            requires :environment_scope, type: String, desc: 'The environment scope of the scope'
+            requires :active, type: Boolean, desc: 'Active/inactive of the scope'
+            requires :strategies, type: JSON, desc: 'The strategies of the scope'
+          end
+          post do
+            authorize_update_feature_flag!
+
+            result = ::FeatureFlags::UpdateService
+              .new(user_project, current_user, scopes_attributes: [declared_params])
+              .execute(feature_flag)
+
+            if result[:status] == :success
+              present scope, with: EE::API::Entities::FeatureFlag::Scope
+            else
+              render_api_error!(result[:message], result[:http_status])
+            end
+          end
+
           params do
             requires :environment_scope, type: String, desc: 'URL-encoded environment scope'
           end
@@ -55,6 +78,33 @@ module API
             end
             get do
               present scope, with: EE::API::Entities::FeatureFlag::Scope
+            end
+
+            desc 'Update a scope of a feature flag' do
+              detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
+              success EE::API::Entities::FeatureFlag::Scope
+            end
+            params do
+              optional :active, type: Boolean, desc: 'Active/inactive of the scope'
+              optional :strategies, type: JSON, desc: 'The strategies of the scope'
+            end
+            put do
+              authorize_update_feature_flag!
+
+              scope_attributes = declared_params.merge(id: scope.id)
+
+              result = ::FeatureFlags::UpdateService
+                .new(user_project, current_user, scopes_attributes: [scope_attributes])
+                .execute(feature_flag)
+
+              if result[:status] == :success
+                updated_scope = result[:feature_flag].scopes
+                  .find { |scope| scope.environment_scope == params[:environment_scope] }
+
+                present updated_scope, with: EE::API::Entities::FeatureFlag::Scope
+              else
+                render_api_error!(result[:message], result[:http_status])
+              end
             end
 
             desc 'Delete a scope from a feature flag' do
