@@ -20,24 +20,27 @@ module Projects
 
       # rubocop: disable CodeReuse/ActiveRecord
       def link_existing_lfs_objects(oids)
-        all_existing_objects = []
+        linked_existing_objects = []
         iterations = 0
 
         oids.each_slice(BATCH_SIZE) do |oids_batch|
-          existent_lfs_objects = LfsObject.where(oid: oids_batch)
-
+          # Load all existing LFS Objects immediately so we don't issue an extra
+          # query for the `.any?`
+          existent_lfs_objects = LfsObject.where(oid: oids_batch).load
           next unless existent_lfs_objects.any?
 
+          rows = existent_lfs_objects
+                   .not_linked_to_project(project)
+                   .map { |existing_lfs_object| { project_id: project.id, lfs_object_id: existing_lfs_object.id } }
+          Gitlab::Database.bulk_insert(:lfs_objects_projects, rows)
           iterations += 1
-          not_linked_lfs_objects = existent_lfs_objects.where.not(id: project.all_lfs_objects)
-          project.all_lfs_objects << not_linked_lfs_objects
 
-          all_existing_objects += existent_lfs_objects.pluck(:oid)
+          linked_existing_objects += existent_lfs_objects.map(&:oid)
         end
 
-        log_lfs_link_results(all_existing_objects.count, iterations)
+        log_lfs_link_results(linked_existing_objects.count, iterations)
 
-        all_existing_objects
+        linked_existing_objects
       end
       # rubocop: enable CodeReuse/ActiveRecord
 

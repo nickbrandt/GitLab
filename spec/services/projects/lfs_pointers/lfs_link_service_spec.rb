@@ -28,7 +28,7 @@ describe Projects::LfsPointers::LfsLinkService do
     it 'returns linked oids' do
       linked = lfs_objects_project.map(&:lfs_object).map(&:oid) << new_lfs_object.oid
 
-      expect(subject.execute(new_oid_list.keys)).to eq linked
+      expect(subject.execute(new_oid_list.keys)).to contain_exactly(*linked)
     end
 
     it 'links in batches' do
@@ -57,6 +57,17 @@ describe Projects::LfsPointers::LfsLinkService do
       expect(LfsObject).to receive(:where).with(oid: %w(two)).once.and_call_original
 
       subject.execute(oids)
+    end
+
+    it 'only queries 3 times' do
+      # make sure that we don't count the queries in the setup
+      new_oid_list
+
+      # These are repeated for each batch of oids: maximum (MAX_OIDS / BATCH_SIZE) times
+      # 1. Load the batch of lfs object ids that we might know already
+      # 2. Load the objects that have not been linked to the project yet
+      # 3. Insert the lfs_objects_projects for that batch
+      expect { subject.execute(new_oid_list.keys) }.not_to exceed_query_limit(3)
     end
   end
 end
