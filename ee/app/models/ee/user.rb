@@ -42,6 +42,8 @@ module EE
 
       has_many :users_ops_dashboard_projects
       has_many :ops_dashboard_projects, through: :users_ops_dashboard_projects, source: :project
+      has_many :users_security_dashboard_projects
+      has_many :security_dashboard_projects, through: :users_security_dashboard_projects, source: :project
 
       has_many :group_saml_identities, -> { where.not(saml_provider_id: nil) }, source: :identities, class_name: "::Identity"
 
