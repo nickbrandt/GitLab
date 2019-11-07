@@ -336,9 +336,9 @@ describe Banzai::Filter::RelativeLinkFilter do
   end
 
   context 'with a valid ref' do
+    # force filter to use ref instead of commit
     let(:commit) { nil }
 
- # force filter to use ref instead of commit
     include_examples :valid_repository
   end
 
