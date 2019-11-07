@@ -32,15 +32,22 @@ module QA
         issue_1.visit!
 
         Page::Project::Issue::Show.perform do |show|
+          max_wait = 60
+          wait_interval = 1
+
           show.relate_issue(issue_2)
 
-          expect(show).to have_content("marked this issue as related to ##{issue_2.iid}")
-          expect(show.related_issuable_item).to have_content(issue_2.title)
+          show.wait(reload: false, max: max_wait, interval: wait_interval) do
+            expect(show).to have_content("marked this issue as related to ##{issue_2.iid}")
+            expect(show.related_issuable_item).to have_content(issue_2.title)
+          end
 
           show.click_remove_related_issue_button
 
-          expect(show).to have_content("removed the relation with ##{issue_2.iid}")
-          expect(show).not_to have_content(issue_2.title)
+          show.wait(reload: false, max: max_wait, interval: wait_interval) do
+            expect(show).to have_content("removed the relation with ##{issue_2.iid}")
+            expect(show).not_to have_content(issue_2.title)
+          end
         end
       end
     end
