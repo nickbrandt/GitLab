@@ -16,7 +16,7 @@ module Sentry
     def list_issues(issue_status:, limit:)
       issues = get_issues(issue_status: issue_status, limit: limit)
 
-      check_valid_size(issues)
+      validate_size(issues)
 
       handle_mapping_exceptions do
         map_to_errors(issues)
@@ -33,7 +33,7 @@ module Sentry
 
     private
 
-    def check_valid_size(issues)
+    def validate_size(issues)
       return if valid_size?(issues)
 
       raise Client::ResponseInvalidSizeError, "Sentry API response is too big. Limit is #{Gitlab::Utils::DeepSize.human_default_max_size}."

@@ -26,9 +26,7 @@ module Gitlab
       end
 
       def self.human_default_max_size
-        ActiveSupport::NumberHelper.number_to_human_size(
-          Gitlab::Utils::DeepSize::DEFAULT_MAX_SIZE
-        )
+        ActiveSupport::NumberHelper.number_to_human_size(DEFAULT_MAX_SIZE)
       end
 
       private
