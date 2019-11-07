@@ -2,17 +2,20 @@
 
 require 'spec_helper'
 
-describe API::Packages do
+describe API::ProjectPackages do
   let(:user) { create(:user) }
   let(:project) { create(:project, :public) }
-  let(:package) { create(:npm_package, project: project) }
-  let(:package_url) { "/projects/#{project.id}/packages/#{package.id}" }
-  let(:another_package) { create(:npm_package) }
+  let!(:package1) { create(:npm_package, project: project) }
+  let(:package_url) { "/projects/#{project.id}/packages/#{package1.id}" }
+  let!(:package2) { create(:npm_package, project: project) }
+  let!(:another_package) { create(:npm_package) }
   let(:no_package_url) { "/projects/#{project.id}/packages/0" }
   let(:wrong_package_url) { "/projects/#{project.id}/packages/#{another_package.id}" }
 
   describe 'GET /projects/:id/packages' do
     let(:url) { "/projects/#{project.id}/packages" }
+
+    subject { get api(url) }
 
     context 'packages feature enabled' do
       before do
@@ -20,63 +23,36 @@ describe API::Packages do
       end
 
       context 'project is public' do
-        it 'returns 200' do
-          get api(url)
-
-          expect(response).to have_gitlab_http_status(200)
-        end
+        it_behaves_like 'returns packages', :project, :no_type
       end
 
       context 'project is private' do
         let(:project) { create(:project, :private) }
 
-        it 'returns 404 for non authenticated user' do
-          get api(url)
-
-          expect(response).to have_gitlab_http_status(404)
+        context 'for unauthenticated user' do
+          it_behaves_like 'rejects packages access', :project, :no_type, :not_found
         end
 
-        it 'returns 404 for a user without access to the project' do
-          get api(no_package_url, user)
+        context 'for authenticated user' do
+          subject { get api(url, user) }
 
-          expect(response).to have_gitlab_http_status(404)
-        end
-
-        it 'returns 200 and valid response schema' do
-          project.add_maintainer(user)
-
-          get api(url, user)
-
-          expect(response).to have_gitlab_http_status(200)
-          expect(response).to match_response_schema('public_api/v4/packages/packages', dir: 'ee')
+          it_behaves_like 'returns packages', :project, :maintainer
+          it_behaves_like 'returns packages', :project, :developer
+          it_behaves_like 'returns packages', :project, :reporter
+          it_behaves_like 'rejects packages access', :project, :no_type, :not_found
+          it_behaves_like 'rejects packages access', :project, :guest, :forbidden
         end
       end
 
       context 'with pagination params' do
-        let(:per_page) { 2 }
-        let!(:package1) { create(:npm_package, project: project) }
-        let!(:package2) { create(:npm_package, project: project) }
         let!(:package3) { create(:maven_package, project: project) }
+        let!(:package4) { create(:maven_package, project: project) }
 
-        before do
-          project.add_maintainer(user)
-          stub_licensed_features(packages: true)
-        end
+        context 'with pagination params' do
+          let!(:package3) { create(:npm_package, project: project) }
+          let!(:package4) { create(:npm_package, project: project) }
 
-        context 'when viewing the first page' do
-          it 'returns first 2 packages' do
-            get api(url, user), params: { page: 1, per_page: per_page }
-
-            expect_paginated_array_response([package1.id, package2.id])
-          end
-        end
-
-        context 'viewing the second page' do
-          it 'returns the last package' do
-            get api(url, user), params: { page: 2, per_page: per_page }
-
-            expect_paginated_array_response([package3.id])
-          end
+          it_behaves_like 'returns paginated packages'
         end
       end
     end

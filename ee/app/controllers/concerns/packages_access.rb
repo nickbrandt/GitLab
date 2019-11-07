@@ -5,7 +5,7 @@ module PackagesAccess
 
   included do
     before_action :verify_packages_enabled!
-    before_action :authorize_read_package!
+    before_action :verify_read_package!
   end
 
   private
@@ -13,5 +13,9 @@ module PackagesAccess
   def verify_packages_enabled!
     render_404 unless Gitlab.config.packages.enabled &&
       project.feature_available?(:packages)
+  end
+
+  def verify_read_package!
+    authorize_read_package!(project)
   end
 end
