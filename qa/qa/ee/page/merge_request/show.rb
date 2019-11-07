@@ -113,7 +113,9 @@ module QA
           end
 
           def expand_vulnerability_report
-            click_element :expand_report_button
+            within_element :vulnerability_report_grouped do
+              click_element :expand_report_button
+            end
           end
 
           def click_vulnerability(name)
