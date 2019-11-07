@@ -53,7 +53,7 @@ describe('Design management pagination button component', () => {
 
       expect(wrapper.vm.designLink).toEqual({
         name: 'design',
-        params: { id: '2' },
+        params: { id: 'test' },
         query: { version: '1' },
       });
     });
