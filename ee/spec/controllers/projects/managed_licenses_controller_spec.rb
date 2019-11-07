@@ -41,7 +41,7 @@ describe Projects::ManagedLicensesController do
 
   describe 'GET #index' do
     subject do
-      allow(controller).to receive(:current_user).and_return(user)
+      sign_in(user) if user
 
       get :index, params: { namespace_id: project.namespace.to_param, project_id: project }, format: :json
     end
@@ -72,10 +72,10 @@ describe Projects::ManagedLicensesController do
     context 'with no logged in user' do
       let(:user) { unlogged_user }
 
-      it 'returns a redirect' do
+      it 'returns an unauthorized status' do
         subject
 
-        expect(response).to have_gitlab_http_status(:redirect)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -98,7 +98,7 @@ describe Projects::ManagedLicensesController do
 
   describe 'GET #show' do
     subject do
-      allow(controller).to receive(:current_user).and_return(user)
+      sign_in(user) if user
 
       get :show,
         params: {
@@ -122,10 +122,10 @@ describe Projects::ManagedLicensesController do
     context 'with no logged in user' do
       let(:user) { unlogged_user }
 
-      it 'returns a redirect' do
+      it 'returns an unauthorized status' do
         subject
 
-        expect(response).to have_gitlab_http_status(:redirect)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -151,7 +151,7 @@ describe Projects::ManagedLicensesController do
     let(:user) { dev_user }
 
     subject do
-      allow(controller).to receive(:current_user).and_return(user)
+      sign_in(user) if user
 
       get :show,
           params: {
@@ -189,7 +189,7 @@ describe Projects::ManagedLicensesController do
     end
 
     subject do
-      allow(controller).to receive(:current_user).and_return(user)
+      sign_in(user) if user
 
       post :create,
         params: {
@@ -235,10 +235,10 @@ describe Projects::ManagedLicensesController do
         new_software_license_policy_attributes
       end
 
-      it 'returns a redirect' do
+      it 'returns an unauthorized status' do
         expect { subject }.not_to change { project.software_license_policies.count }
 
-        expect(response).to have_gitlab_http_status(:redirect)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -300,7 +300,7 @@ describe Projects::ManagedLicensesController do
     end
 
     subject do
-      allow(controller).to receive(:current_user).and_return(user)
+      sign_in(user) if user
 
       patch :update,
         params: {
@@ -347,10 +347,10 @@ describe Projects::ManagedLicensesController do
         new_software_license_policy_attributes
       end
 
-      it 'returns a redirect' do
+      it 'returns an unauthorized status' do
         expect { subject }.not_to change { project.software_license_policies.count }
 
-        expect(response).to have_gitlab_http_status(:redirect)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
@@ -406,7 +406,7 @@ describe Projects::ManagedLicensesController do
     let(:id_to_destroy) { software_license_policy.id }
 
     subject do
-      allow(controller).to receive(:current_user).and_return(user)
+      sign_in(user) if user
 
       delete :destroy,
         params: {
@@ -452,10 +452,10 @@ describe Projects::ManagedLicensesController do
         new_software_license_policy_attributes
       end
 
-      it 'returns a redirect' do
+      it 'returns an unauthorized status' do
         expect { subject }.not_to change { project.software_license_policies.count }
 
-        expect(response).to have_gitlab_http_status(:redirect)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
