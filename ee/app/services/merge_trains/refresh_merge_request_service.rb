@@ -19,7 +19,7 @@ module MergeTrains
 
       success(pipeline_created: pipeline_created.present?)
     rescue ProcessError => e
-      drop(e)
+      abort(e)
     end
 
     private
@@ -159,9 +159,9 @@ module MergeTrains
       params[:require_recreate]
     end
 
-    def drop(error)
+    def abort(error)
       AutoMerge::MergeTrainService.new(project, merge_user)
-        .abort(merge_request, error.message)
+        .abort(merge_request, error.message, process_next: false)
 
       error(error.message)
     end
