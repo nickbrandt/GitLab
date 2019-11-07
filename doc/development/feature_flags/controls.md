@@ -31,7 +31,7 @@ For all production environment Chatops commands, use the `#production` channel.
 
 Regardless of the channel in which the Chatops command is ran, any feature flag change that affects GitLab.com will automatically be logged in an issue.
 
-Issue is created in the [gl-infra/feature-flag-log](https://gitlab.com/gitlab-com/gl-infra/feature-flag-log/issues?scope=all&utf8=%E2%9C%93&state=closed) project, and it will at minimum log the Slack handle of person taking the action of enabling a feature flag, time and the name of the flag being changed.
+The issue is created in the [gl-infra/feature-flag-log](https://gitlab.com/gitlab-com/gl-infra/feature-flag-log/issues?scope=all&utf8=%E2%9C%93&state=closed) project, and it will at minimum log the Slack handle of person enabling a feature flag, the time, and the name of the flag being changed.
 
 The issue is then also posted to GitLab Inc. internal [Grafana dashboard](https://dashboards.gitlab.net/) as an annotation marker to make the change even more visible.
 
