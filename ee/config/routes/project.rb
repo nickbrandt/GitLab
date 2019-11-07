@@ -74,6 +74,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :container_scanning_reports
           get :dependency_scanning_reports
           get :sast_reports
+          get :dast_reports
         end
       end
 
