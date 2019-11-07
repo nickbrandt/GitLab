@@ -234,10 +234,45 @@ describe API::ConanPackages do
     end
   end
 
+  shared_examples 'recipe download_urls' do
+    let(:recipe_path) { package.conan_recipe_path }
+
+    it 'returns the download_urls for the recipe files' do
+      expected_response = {
+        'conanfile.py'      => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanfile.py",
+        'conanmanifest.txt' => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanmanifest.txt"
+      }
+
+      allow(presenter).to receive(:recipe_urls) { expected_response }
+
+      subject
+
+      expect(json_response).to eq(expected_response)
+    end
+  end
+
+  shared_examples 'package download_urls' do
+    let(:recipe_path) { package.conan_recipe_path }
+
+    it 'returns the download_urls for the package files' do
+      expected_response = {
+        'conaninfo.txt'     => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conaninfo.txt",
+        'conanmanifest.txt' => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conanmanifest.txt",
+        'conan_package.tgz' => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conan_package.tgz"
+      }
+
+      allow(presenter).to receive(:package_urls) { expected_response }
+
+      subject
+
+      expect(json_response).to eq(expected_response)
+    end
+  end
+
   context 'recipe endpoints' do
     let(:jwt) { build_jwt(personal_access_token) }
     let(:headers) { build_auth_headers(jwt.encoded) }
-    let(:package_id) { '123456789' }
+    let(:conan_package_reference) { '123456789' }
     let(:presenter) { double('ConanPackagePresenter') }
 
     before do
@@ -271,10 +306,10 @@ describe API::ConanPackages do
       end
     end
 
-    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/packages/:package_id' do
+    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/packages/:conan_package_reference' do
       let(:recipe_path) { package.conan_recipe_path }
 
-      subject { get api("/packages/conan/v1/conans/#{recipe_path}/packages/#{package_id}"), headers: headers }
+      subject { get api("/packages/conan/v1/conans/#{recipe_path}/packages/#{conan_package_reference}"), headers: headers }
 
       it_behaves_like 'rejects invalid recipe'
       it_behaves_like 'rejects recipe for invalid project'
@@ -302,48 +337,31 @@ describe API::ConanPackages do
 
       it_behaves_like 'rejects invalid recipe'
       it_behaves_like 'rejects recipe for invalid project'
-
-      context 'with existing package' do
-        let(:recipe_path) { package.conan_recipe_path }
-
-        it 'returns the download urls for each package file' do
-          expected_response = {
-            'conanfile.py'      => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanfile.py",
-            'conanmanifest.txt' => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/export/conanmanifest.txt"
-          }
-
-          allow(presenter).to receive(:recipe_urls) { expected_response }
-
-          subject
-
-          expect(json_response).to eq(expected_response)
-        end
-      end
+      it_behaves_like 'recipe download_urls'
     end
 
-    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/packages/:package_id/digest' do
-      subject { get api("/packages/conan/v1/conans/#{recipe_path}/packages/#{package_id}/digest"), headers: headers }
+    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/packages/:conan_package_reference/download_urls' do
+      subject { get api("/packages/conan/v1/conans/#{recipe_path}/packages/#{conan_package_reference}/download_urls"), headers: headers }
 
       it_behaves_like 'rejects invalid recipe'
       it_behaves_like 'rejects recipe for invalid project'
+      it_behaves_like 'package download_urls'
+    end
 
-      context 'with existing package' do
-        let(:recipe_path) { package.conan_recipe_path }
+    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/download_urls' do
+      subject { get api("/packages/conan/v1/conans/#{recipe_path}/download_urls"), headers: headers }
 
-        it 'returns the download urls for the files' do
-          expected_response = {
-            'conaninfo.txt'     => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conaninfo.txt",
-            'conanmanifest.txt' => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conanmanifest.txt",
-            'conan_package.tgz' => "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{package.conan_recipe_path}/0/package/123456789/0/conan_package.tgz"
-          }
+      it_behaves_like 'rejects invalid recipe'
+      it_behaves_like 'rejects recipe for invalid project'
+      it_behaves_like 'recipe download_urls'
+    end
 
-          allow(presenter).to receive(:package_urls) { expected_response }
+    describe 'GET /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/packages/:conan_package_reference/digest' do
+      subject { get api("/packages/conan/v1/conans/#{recipe_path}/packages/#{conan_package_reference}/digest"), headers: headers }
 
-          subject
-
-          expect(json_response).to eq(expected_response)
-        end
-      end
+      it_behaves_like 'rejects invalid recipe'
+      it_behaves_like 'rejects recipe for invalid project'
+      it_behaves_like 'package download_urls'
     end
 
     describe 'POST /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/upload_urls' do
@@ -370,7 +388,7 @@ describe API::ConanPackages do
       end
     end
 
-    describe 'POST /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/packages/:package_id/upload_urls' do
+    describe 'POST /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel/packages/:conan_package_reference/upload_urls' do
       let(:recipe_path) { package.conan_recipe_path }
 
       let(:params) do
