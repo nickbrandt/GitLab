@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+# Conan Package Manager Client API
+#
+# These API endpoints are not consumed directly by users, so there is no documentation for the
+# individual endpoints. They are called by the Conan package manager client when users run commands
+# like `conan install` or `conan upload`. The usage of the GitLab Conan repository is documented here:
+# https://docs.gitlab.com/ee/user/packages/conan_repository/#installing-a-package
+#
+# Technical debt: https://gitlab.com/gitlab-org/gitlab/issues/35798
 module API
   class ConanPackages < Grape::API
     helpers ::API::Helpers::PackagesHelpers
@@ -108,26 +116,34 @@ module API
           detail 'This feature was introduced in GitLab 12.5'
         end
         get 'packages/:conan_package_reference/digest' do
-          authorize!(:read_package, project)
-
-          presenter = ConanPackagePresenter.new(recipe, current_user, project)
-
-          render_api_error!("No recipe manifest found", 404) if presenter.package_urls.empty?
-
-          present presenter, with: EE::API::Entities::ConanPackage::ConanPackageManifest
+          present_package_download_urls
         end
 
         desc 'Recipe Digest' do
           detail 'This feature was introduced in GitLab 12.5'
         end
         get 'digest' do
-          authorize!(:read_package, project)
+          present_recipe_download_urls
+        end
 
-          presenter = ConanPackagePresenter.new(recipe, current_user, project)
+        # Get the download urls
+        #
+        # returns the download urls for the existing recipe or package in the registry
+        #
+        # the manifest is a hash of { filename: url }
+        # where the url is the download url for the file
+        desc 'Package Download Urls' do
+          detail 'This feature was introduced in GitLab 12.5'
+        end
+        get 'packages/:conan_package_reference/download_urls' do
+          present_package_download_urls
+        end
 
-          render_api_error!("No recipe manifest found", 404) if presenter.recipe_urls.empty?
-
-          present presenter, with: EE::API::Entities::ConanPackage::ConanRecipeManifest
+        desc 'Recipe Download Urls' do
+          detail 'This feature was introduced in GitLab 12.5'
+        end
+        get 'download_urls' do
+          present_recipe_download_urls
         end
 
         # Get the upload urls
@@ -204,6 +220,26 @@ module API
     helpers do
       include Gitlab::Utils::StrongMemoize
       include ::API::Helpers::RelatedResourcesHelpers
+
+      def present_package_download_urls
+        authorize!(:read_package, project)
+
+        presenter = ConanPackagePresenter.new(recipe, current_user, project)
+
+        render_api_error!("No recipe manifest found", 404) if presenter.package_urls.empty?
+
+        present presenter, with: EE::API::Entities::ConanPackage::ConanPackageManifest
+      end
+
+      def present_recipe_download_urls
+        authorize!(:read_package, project)
+
+        presenter = ConanPackagePresenter.new(recipe, current_user, project)
+
+        render_api_error!("No recipe manifest found", 404) if presenter.recipe_urls.empty?
+
+        present presenter, with: EE::API::Entities::ConanPackage::ConanRecipeManifest
+      end
 
       def recipe_upload_urls(file_names)
         { upload_urls: Hash[
