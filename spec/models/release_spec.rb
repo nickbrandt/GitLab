@@ -72,6 +72,13 @@ RSpec.describe Release do
         expect(assets_count).to eq(1)
       end
     end
+
+    context 'when evidence is available' do
+      it 'counts this evidence', :sidekiq_inline do
+        evidence_count = release.assets_count - release.sources.count - release.links.count
+        expect(evidence_count).to eq(1)
+      end
+    end
   end
 
   describe '#sources' do
@@ -145,19 +152,15 @@ RSpec.describe Release do
   describe '#evidence_sha' do
     let!(:release) { create(:release) }
 
-    before do
-      CreateEvidenceWorker.new.perform(release.id)
-    end
-
     context 'when a release was created before evidence collection existed' do
-      it 'is nil' do
+      it 'is nil', :sidekiq_inline do
         allow(release).to receive(:evidence).and_return(nil)
 
         expect(release.evidence_sha).to be_nil
       end
     end
     context 'when a release was created with evidence collection' do
-      it 'returns the summary sha' do
+      it 'returns the summary sha', :sidekiq_inline do
         expect(release.evidence_sha).to eq(release.evidence.summary_sha)
       end
     end

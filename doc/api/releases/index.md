@@ -89,7 +89,7 @@ Example response:
       "tag_path":"/root/awesome-app/-/tags/v0.11.1",
       "evidence_sha":"760d6cdfb0879c3ffedec13af470e0f71cf52c6cde4d",
       "assets":{
-         "count":6,
+         "count":7,
          "sources":[
             {
                "format":"zip",
@@ -121,7 +121,8 @@ Example response:
                "url":"http://192.168.10.15:3000",
                "external":true
             }
-         ]
+         ],
+         "evidence_url":"https://gitlab.example.com/root/awesome-app/-/releases/v0.2/evidence.json"
       },
    },
    {
@@ -157,7 +158,7 @@ Example response:
       },
       "evidence_sha":"760d6cdfb0879c3ffedec13af470e0f71cf52c6cde4d",
       "assets":{
-         "count":4,
+         "count":5,
          "sources":[
             {
                "format":"zip",
@@ -178,7 +179,8 @@ Example response:
          ],
          "links":[
 
-         ]
+         ],
+         "evidence_url":"https://gitlab.example.com/root/awesome-app/-/releases/v0.1/evidence.json"
       },
    }
 ]
@@ -269,7 +271,7 @@ Example response:
    "tag_path":"/root/awesome-app/-/tags/v0.11.1",
    "evidence_sha":"760d6cdfb0879c3ffedec13af470e0f71cf52c6cde4d",
    "assets":{
-      "count":4,
+      "count":5,
       "sources":[
          {
             "format":"zip",
@@ -290,7 +292,8 @@ Example response:
       ],
       "links":[
 
-      ]
+      ],
+      "evidence_url":"https://gitlab.example.com/root/awesome-app/-/releases/v0.1/evidence.json"
    },
 }
 ```
@@ -390,7 +393,7 @@ Example response:
    "tag_path":"/root/awesome-app/-/tags/v0.11.1",
    "evidence_sha":"760d6cdfb0879c3ffedec13af470e0f71cf52c6cde4d",
    "assets":{
-      "count":5,
+      "count":6,
       "sources":[
          {
             "format":"zip",
@@ -416,7 +419,8 @@ Example response:
             "url":"https://google.com",
             "external":true
          }
-      ]
+      ],
+      "evidence_url":"https://gitlab.example.com/root/awesome-app/-/releases/v0.3/evidence.json"
    },
 }
 ```
@@ -497,7 +501,7 @@ Example response:
    "tag_path":"/root/awesome-app/-/tags/v0.11.1",
    "evidence_sha":"760d6cdfb0879c3ffedec13af470e0f71cf52c6cde4d",
    "assets":{
-      "count":4,
+      "count":5,
       "sources":[
          {
             "format":"zip",
@@ -518,7 +522,8 @@ Example response:
       ],
       "links":[
 
-      ]
+      ],
+      "evidence_url":"https://gitlab.example.com/root/awesome-app/-/releases/v0.1/evidence.json"
    },
 }
 ```
@@ -580,7 +585,7 @@ Example response:
    "tag_path":"/root/awesome-app/-/tags/v0.11.1",
    "evidence_sha":"760d6cdfb0879c3ffedec13af470e0f71cf52c6cde4d",
    "assets":{
-      "count":4,
+      "count":5,
       "sources":[
          {
             "format":"zip",
@@ -601,7 +606,8 @@ Example response:
       ],
       "links":[
 
-      ]
+      ],
+      "evidence_url":"https://gitlab.example.com/root/awesome-app/-/releases/v0.1/evidence.json"
    },
 }
 ```

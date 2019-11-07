@@ -182,15 +182,14 @@ describe Projects::ReleasesController do
 
     before do
       sign_in(user)
-      CreateEvidenceWorker.new.perform(release.id)
     end
 
-    it 'returns the correct evidence summary as a json' do
+    it 'returns the correct evidence summary as a json', :sidekiq_inline do
       subject
       expect(response.body).to eq(release.evidence.summary.to_json)
     end
 
-    context 'when the release was created before evidence existed' do
+    context 'when the release was created before evidence existed', :sidekiq_inline do
       it 'returns an empty json' do
         release.evidence.destroy
         subject

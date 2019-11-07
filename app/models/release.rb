@@ -55,8 +55,9 @@ class Release < ApplicationRecord
   def assets_count(except: [])
     links_count = links.count
     sources_count = except.include?(:sources) ? 0 : sources.count
+    count = links_count + sources_count
 
-    links_count + sources_count
+    evidence.present? ? count + 1 : count
   end
 
   def sources
