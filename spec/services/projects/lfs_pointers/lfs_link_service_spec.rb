@@ -16,6 +16,13 @@ describe Projects::LfsPointers::LfsLinkService do
   end
 
   describe '#execute' do
+    it 'raises an error when trying to link too many objects at once' do
+      oids = Array.new(described_class::MAX_OIDS) { |i| "oid-#{i}" }
+      oids << 'the straw'
+
+      expect { subject.execute(oids) }.to raise_error(described_class::TooManyOidsError)
+    end
+
     it 'links existing lfs objects to the project' do
       expect(project.all_lfs_objects.count).to eq 2
 
