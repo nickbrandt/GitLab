@@ -1,8 +1,6 @@
 <script>
 import { GlEmptyState, GlDaterangePicker, GlLoadingIcon } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { __ } from '~/locale';
-import createFlash from '~/flash';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -110,23 +108,11 @@ export default {
       this.setCycleAnalyticsDataEndpoint(group.full_path);
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
-      this.fetchGroupLabels(this.currentGroupPath)
-        .then(() => {
-          // TODO: Move this request into the `fetchCycleAnalyticsData` request, because we
-          // need to send the group labels, this request should fire after fetchGroupLablels is completed
-          // https://gitlab.com/gitlab-org/gitlab/merge_requests/18514
-          this.fetchTasksByTypeData();
-        })
-        .catch(err => {
-          createFlash(__('There was an error fetching data for the chart'));
-          throw err;
-        });
     },
     onProjectsSelect(projects) {
       const projectIds = projects.map(value => value.id);
       this.setSelectedProjects(projectIds);
       this.fetchCycleAnalyticsData();
-      this.fetchTasksByTypeData();
     },
     onStageSelect(stage) {
       this.hideCustomStageForm();

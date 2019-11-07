@@ -73,10 +73,12 @@ export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
 
 export const fetchCycleAnalyticsData = ({ dispatch }) => {
   removeError();
+
   return dispatch('requestCycleAnalyticsData')
-    .then(() => dispatch('fetchGroupLabels')) // fetch group label data
-    .then(() => dispatch('fetchGroupStagesAndEvents')) // fetch stage data
-    .then(() => dispatch('fetchSummaryData')) // fetch summary data and stage medians
+    .then(() => dispatch('fetchGroupLabels'))
+    .then(() => dispatch('fetchGroupStagesAndEvents'))
+    .then(() => dispatch('fetchSummaryData'))
+    .then(() => dispatch('fetchTasksByTypeData'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
@@ -213,22 +215,23 @@ export const requestTasksByTypeData = ({ commit }) => commit(types.REQUEST_TASKS
 
 export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   const endpoint = '/-/analytics/type_of_work/tasks_by_type';
-  const { currentGroupPath } = getters;
+  const {
+    currentGroupPath,
+    cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
+  } = getters;
+
   const {
     tasksByType: { labelIds, subject },
-    selectedProjectIds,
-    startDate,
-    endDate,
   } = state;
 
   // dont request if we have no labels selected...for now
   if (labelIds.length) {
     const params = {
       group_id: currentGroupPath,
-      label_ids: `[${labelIds}]`,
-      project_ids: selectedProjectIds || [],
-      created_after: dateFormat(startDate, dateFormats.isoDate),
-      created_before: dateFormat(endDate, dateFormats.isoDate),
+      label_ids: `[${labelIds.join(',')}]`,
+      created_after,
+      created_before,
+      project_ids,
       subject,
     };
 
