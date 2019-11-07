@@ -70,7 +70,7 @@ describe MetricsDashboard do
           context 'when a user can collaborate on project' do
             it 'includes edit_path only for project dashboards' do
               expect(json_response['all_dashboards'][0]['edit_path']).to be_nil
-              expect(json_response['all_dashboards'][1]['edit_path']).to eq('/namespace1/project1/blob/master/.gitlab/dashboards/test.yml')
+              expect(json_response['all_dashboards'][1]['edit_path']).to eq("/#{project.namespace.path}/#{project.name}/blob/master/.gitlab/dashboards/test.yml")
             end
           end
 
