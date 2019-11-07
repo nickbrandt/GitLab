@@ -8307,6 +8307,9 @@ msgstr ""
 msgid "GrafanaIntegration|API Token"
 msgstr ""
 
+msgid "GrafanaIntegration|Active"
+msgstr ""
+
 msgid "GrafanaIntegration|Embed Grafana charts in GitLab issues."
 msgstr ""
 
