@@ -84,8 +84,8 @@ module Security
 
         occurrence = Vulnerabilities::Occurrence.new(occurrence_hash)
         # assigning Vulnerabilities to Findings to enable the computed state
+        occurrence.location_fingerprint = report_occurrence.location.fingerprint
         occurrence.vulnerability = vulnerabilities[occurrence.project_fingerprint]
-
         occurrence.project = pipeline.project
         occurrence.sha = pipeline.sha
         occurrence.build_scanner(report_occurrence.scanner.to_hash)

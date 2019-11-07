@@ -246,13 +246,13 @@ module Vulnerabilities
 
     def eql?(other)
       other.report_type == report_type &&
-        other.location == location &&
+        other.location_fingerprint == location_fingerprint &&
         other.first_fingerprint == first_fingerprint
     end
 
     # Array.difference (-) method uses hash and eql? methods to do comparison
     def hash
-      report_type.hash ^ location.hash ^ first_fingerprint.hash
+      report_type.hash ^ location_fingerprint.hash ^ first_fingerprint.hash
     end
 
     def severity_value
