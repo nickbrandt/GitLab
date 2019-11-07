@@ -59,7 +59,7 @@ export default {
       return {
         fullPath: this.projectPath,
         iid: this.issueIid,
-        designIds: [this.$route.params.id],
+        filenames: [this.$route.params.id],
         atVersion: this.designsVersion,
       };
     },
@@ -73,15 +73,10 @@ export default {
     ) {
       const data = store.readQuery({
         query: getDesignQuery,
-        variables: {
-          id: this.designId,
-          version: this.designsVersion,
-        },
+        variables: this.designVariables,
       });
-      const currentDiscussion = extractCurrentDiscussion(
-        data.design.discussions,
-        this.discussion.id,
-      );
+      const design = extractDesign(data);
+      const currentDiscussion = extractCurrentDiscussion(design.discussions, this.discussion.id);
       currentDiscussion.node.notes.edges = [
         ...currentDiscussion.node.notes.edges,
         {
@@ -95,8 +90,8 @@ export default {
         data: {
           ...data,
           design: {
-            ...data.design,
-            notesCount: data.design.notesCount + 1,
+            ...design,
+            notesCount: design.notesCount + 1,
           },
         },
       });

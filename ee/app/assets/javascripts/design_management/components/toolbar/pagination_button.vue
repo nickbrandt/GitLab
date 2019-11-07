@@ -26,7 +26,7 @@ export default {
 
       return {
         name: 'design',
-        params: { id: this.design.id },
+        params: { id: this.design.filename },
         query: this.$route.query,
       };
     },

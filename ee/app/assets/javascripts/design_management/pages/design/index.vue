@@ -96,7 +96,7 @@ export default {
       return {
         fullPath: this.projectPath,
         iid: this.issueIid,
-        designIds: [this.$route.params.id],
+        filenames: [this.$route.params.id],
         atVersion: this.designsVersion,
       };
     },

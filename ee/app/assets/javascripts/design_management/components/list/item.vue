@@ -69,7 +69,7 @@ export default {
   <router-link
     :to="{
       name: 'design',
-      params: { id },
+      params: { id: filename },
       query: $route.query,
     }"
     class="card cursor-pointer text-plain js-design-list-item design-list-item"
