@@ -35,15 +35,23 @@ module MetricsDashboard
   def all_dashboards
     dashboards = dashboard_finder.find_all_paths(project_for_dashboard)
     dashboards.map do |dashboard|
-      dashboard[:edit_path] = edit_path(dashboard)
+      dashboard[:can_edit] = can_edit?(dashboard)
+      dashboard[:project_blob_path] = project_blob_path(dashboard)
       dashboard
     end
   end
 
-  def edit_path(dashboard)
+  def can_edit?(dashboard)
+    return false unless project_for_dashboard
+    return false if dashboard[:system_dashboard]
+    return false unless can_collaborate_with_project?(project_for_dashboard, ref: project_for_dashboard.default_branch)
+
+    true
+  end
+
+  def project_blob_path(dashboard)
     return unless project_for_dashboard
     return if dashboard[:system_dashboard]
-    return unless can_collaborate_with_project?(project_for_dashboard, ref: project_for_dashboard.default_branch)
 
     Gitlab::Routing.url_helpers.project_blob_path(project_for_dashboard, File.join(project_for_dashboard.default_branch, dashboard[:path]))
   end

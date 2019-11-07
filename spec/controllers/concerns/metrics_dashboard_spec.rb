@@ -67,10 +67,18 @@ describe MetricsDashboard do
         end
 
         context 'in all_dashboard list' do
+          let(:system_dashboard) { json_response['all_dashboards'][0] }
+          let(:project_dashboard) { json_response['all_dashboards'][1] }
+
+          it 'includes project_blob_path only for project dashboards' do
+            expect(system_dashboard['project_blob_path']).to be_nil
+            expect(project_dashboard['project_blob_path']).to eq("/#{project.namespace.path}/#{project.name}/blob/master/.gitlab/dashboards/test.yml")
+          end
+
           context 'when a user can collaborate on project' do
-            it 'includes edit_path only for project dashboards' do
-              expect(json_response['all_dashboards'][0]['edit_path']).to be_nil
-              expect(json_response['all_dashboards'][1]['edit_path']).to eq("/#{project.namespace.path}/#{project.name}/blob/master/.gitlab/dashboards/test.yml")
+            it 'sets can_edit to true for project dashboards' do
+              expect(system_dashboard['can_edit']).to eq(false)
+              expect(project_dashboard['can_edit']).to eq(true)
             end
           end
 
@@ -79,8 +87,9 @@ describe MetricsDashboard do
               allow(controller).to receive(:can_collaborate_with_project?).and_return(false)
             end
 
-            it 'does not include edit_path for project dashboards' do
-              expect(json_response['all_dashboards'][1]['edit_path']).to be_nil
+            it 'sets can_edit to false for project dashboards' do
+              expect(system_dashboard['can_edit']).to eq(false)
+              expect(project_dashboard['can_edit']).to eq(false)
             end
           end
         end
