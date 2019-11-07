@@ -13,7 +13,7 @@ import {
   mockInitialConfig,
   mockParentItem,
   mockEpic1,
-  mockIssue1,
+  mockIssue2,
 } from '../mock_data';
 
 const { epic } = mockQueryResponse.data.group;
@@ -138,7 +138,7 @@ describe('RelatedItemsTree', () => {
             });
 
             it('returns value of `epicIssueId` prop when item is an Issue', () => {
-              expect(wrapper.vm.getItemId(wrapper.vm.children[2])).toBe(mockIssue1.epicIssueId);
+              expect(wrapper.vm.getItemId(wrapper.vm.children[2])).toBe(mockIssue2.epicIssueId);
             });
           });
 
@@ -166,7 +166,7 @@ describe('RelatedItemsTree', () => {
                 }),
               ).toEqual(
                 jasmine.objectContaining({
-                  id: mockIssue1.epicIssueId,
+                  id: mockIssue2.epicIssueId,
                 }),
               );
             });
@@ -192,7 +192,7 @@ describe('RelatedItemsTree', () => {
                 }),
               ).toEqual(
                 jasmine.objectContaining({
-                  adjacentReferenceId: mockIssue1.epicIssueId,
+                  adjacentReferenceId: mockIssue2.epicIssueId,
                 }),
               );
             });

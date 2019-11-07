@@ -110,7 +110,11 @@ export default {
   <div class="card card-slim sortable-row flex-grow-1">
     <div
       class="item-body card-body d-flex align-items-center p-2 pl-xl-3"
-      :class="{ 'p-xl-1': userSignedIn, 'item-logged-out pt-xl-2 pb-xl-2': !userSignedIn }"
+      :class="{
+        'p-xl-1': userSignedIn,
+        'item-logged-out pt-xl-2 pb-xl-2': !userSignedIn,
+        'item-closed': isClosed,
+      }"
     >
       <div class="item-contents d-flex align-items-center flex-wrap flex-grow-1 flex-xl-nowrap">
         <div class="item-title d-flex align-items-center mb-1 mb-xl-0">

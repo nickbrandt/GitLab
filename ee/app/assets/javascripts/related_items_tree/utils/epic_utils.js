@@ -9,13 +9,26 @@ export const gqClient = createGqClient();
  * Returns a numeric representation of item
  * order in an array.
  *
- * This method is to be used as comparision
+ * This method is to be used as comparison
  * function for Array.sort
  *
- * @param {cbject} childA
- * @param {object} childB
+ * @param {Object} childA
+ * @param {Object} childB
  */
 export const sortChildren = (childA, childB) => childA.relativePosition - childB.relativePosition;
+
+/**
+ * Returns a numeric representation of item, by state,
+ * opened items first, closed items last
+ * Used to sort epics and issues
+ *
+ * This method is to be used as comparison
+ * function for Array.sort
+ *
+ * @param {Array} items
+ */
+const stateOrder = ['opened', 'closed'];
+export const sortByState = (a, b) => stateOrder.indexOf(a.state) - stateOrder.indexOf(b.state);
 
 /**
  * Returns formatted child item to include additional
@@ -76,4 +89,7 @@ export const extractChildIssues = issues =>
  * @param {Object} responseRoot
  */
 export const processQueryResponse = ({ epic }) =>
-  [].concat(extractChildEpics(epic.children), extractChildIssues(epic.issues)).sort(sortChildren);
+  []
+    .concat(extractChildEpics(epic.children), extractChildIssues(epic.issues))
+    .sort(sortChildren)
+    .sort(sortByState);
