@@ -3,9 +3,11 @@
 require 'spec_helper'
 
 describe MetricsDashboard do
+  include MetricsDashboardHelpers
+
   describe 'GET #metrics_dashboard' do
     let_it_be(:user) { create(:user) }
-    let_it_be(:project) { create(:project, :repository) }
+    let_it_be(:project) { project_with_dashboard('.gitlab/dashboards/test.yml') }
     let_it_be(:environment) { create(:environment, project: project) }
 
     before do
@@ -62,6 +64,25 @@ describe MetricsDashboard do
         it 'returns a dashboard in addition to the list of dashboards' do
           expect(json_response['dashboard']['dashboard']).to eq('Environment metrics')
           expect(json_response).to have_key('all_dashboards')
+        end
+
+        context 'in all_dashboard list' do
+          context 'when a user can collaborate on project' do
+            it 'includes edit_path only for project dashboards' do
+              expect(json_response['all_dashboards'][0]['edit_path']).to be_nil
+              expect(json_response['all_dashboards'][1]['edit_path']).to eq('/namespace1/project1/blob/master/.gitlab/dashboards/test.yml')
+            end
+          end
+
+          context 'when user does not have permissions to edit project dashboard' do
+            before do
+              allow(controller).to receive(:can_collaborate_with_project?).and_return(false)
+            end
+
+            it 'does not include edit_path for project dashboards' do
+              expect(json_response['all_dashboards'][1]['edit_path']).to be_nil
+            end
+          end
         end
       end
     end
