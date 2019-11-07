@@ -57,7 +57,7 @@ export default {
 <template>
   <div>
     <issue-status-icon :status="status" class="float-left append-right-default" />
-    <span class="js-license-name">{{ license.name }}</span>
+    <span class="js-license-name" data-qa-selector="license_name_content">{{ license.name }}</span>
     <div class="float-right">
       <div class="d-flex">
         <gl-dropdown
