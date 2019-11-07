@@ -79,3 +79,9 @@ describe 'Project elastic search', :js, :elastic do
     end
   end
 end
+
+describe 'Project elastic search redactions', :elastic do
+  it_behaves_like 'a redacted search results page' do
+    let(:search_path) { project_path(public_restricted_project) }
+  end
+end

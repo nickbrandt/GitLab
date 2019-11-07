@@ -220,3 +220,9 @@ describe 'Global elastic search', :elastic do
     end
   end
 end
+
+describe 'Global elastic search redactions', :elastic do
+  it_behaves_like 'a redacted search results page' do
+    let(:search_path) { explore_root_path }
+  end
+end
