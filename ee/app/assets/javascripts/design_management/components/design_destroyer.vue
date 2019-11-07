@@ -56,7 +56,7 @@ export default {
 </script>
 
 <template>
-  <ApolloMutation
+  <apollo-mutation
     v-slot="{ mutate, loading, error }"
     :mutation="$options.destroyDesignMutation"
     :variables="{
@@ -69,5 +69,5 @@ export default {
     v-on="$listeners"
   >
     <slot v-bind="{ mutate, loading, error }"></slot>
-  </ApolloMutation>
+  </apollo-mutation>
 </template>
