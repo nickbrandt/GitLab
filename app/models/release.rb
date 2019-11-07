@@ -77,6 +77,10 @@ class Release < ApplicationRecord
     evidence&.summary_sha
   end
 
+  def evidence_summary
+    evidence&.summary
+  end
+
   private
 
   def actual_sha
