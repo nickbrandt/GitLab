@@ -84,14 +84,14 @@ export default {
           node: createNote.note,
         },
       ];
-
+      design.notesCount += 1;
       store.writeQuery({
         query: getDesignQuery,
+        variables: this.designVariables,
         data: {
           ...data,
           design: {
             ...design,
-            notesCount: design.notesCount + 1,
           },
         },
       });
