@@ -21,7 +21,7 @@ export default {
           atVersion: null,
         };
       },
-      update: data => data.project.issue.designs.versions.edges,
+      update: data => data.project.issue.designCollection.versions.edges,
     },
   },
   computed: {
