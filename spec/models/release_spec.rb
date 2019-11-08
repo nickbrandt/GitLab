@@ -165,4 +165,21 @@ RSpec.describe Release do
       end
     end
   end
+
+  describe '#evidence_summary' do
+    let!(:release) { create(:release) }
+
+    context 'when a release was created before evidence collection existed' do
+      it 'is nil', :sidekiq_inline do
+        allow(release).to receive(:evidence).and_return(nil)
+
+        expect(release.evidence_summary).to be_nil
+      end
+    end
+    context 'when a release was created with evidence collection' do
+      it 'returns the summary', :sidekiq_inline do
+        expect(release.evidence_summary).to eq(release.evidence.summary)
+      end
+    end
+  end
 end
