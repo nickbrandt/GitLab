@@ -7,7 +7,7 @@ module QA
 
       it 'user promotes issue to an epic' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.act { sign_in_using_credentials }
+        Page::Main::Login.perform(&:sign_in_using_credentials)
 
         group = Resource::Group.fabricate_via_api!
 
