@@ -52,18 +52,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
       # End of the /-/ scope.
 
-      resources :path_locks, only: [:index, :destroy] do
-        collection do
-          post :toggle
-        end
-      end
-
-      namespace :prometheus do
-        resources :alerts, constraints: { id: /\d+/ }, only: [:index, :create, :show, :update, :destroy] do
-          post :notify, on: :collection
-        end
-      end
-
       post 'alerts/notify', to: 'alerting/notifications#create'
 
       resource :tracing, only: [:show]
@@ -79,22 +67,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resources :issues, only: [], constraints: { id: /\d+/ } do
-        member do
-          get 'designs(/*vueroute)', to: 'issues#designs', as: :designs, format: false
-        end
-
-        collection do
-          post :export_csv
-          get :service_desk
-        end
-
-        resources :issue_links, only: [:index, :create, :destroy], as: 'links', path: 'links'
-      end
-
-      get '/service_desk' => 'service_desk#show', as: :service_desk
-      put '/service_desk' => 'service_desk#update', as: :service_desk_refresh
-
       resources :merge_requests, only: [], constraints: { id: /\d+/ } do
         member do
           get :metrics_reports
@@ -103,13 +75,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :dependency_scanning_reports
           get :sast_reports
           get :dast_reports
-        end
-      end
-
-      resources :pipelines, only: [] do
-        member do
-          get :security
-          get :licenses
         end
       end
 
