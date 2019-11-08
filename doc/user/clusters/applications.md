@@ -278,7 +278,7 @@ For configuring crossplane on the cluster navigate to [Crossplane configuration 
 
 NOTE: **Note:**
 The [`alpha/crossplane`](https://charts.crossplane.io/alpha/)
-v0.4.0 chart is used to install this application with a
+v0.4.1 chart is used to install this application with a
 [`values.yaml`](https://github.com/crossplaneio/crossplane/blob/master/cluster/charts/crossplane/values.yaml.tmpl)
 file.
 
