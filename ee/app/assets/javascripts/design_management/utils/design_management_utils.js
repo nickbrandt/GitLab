@@ -54,7 +54,6 @@ const deleteDesignsFromStore = (store, query, selectedDesigns) => {
  * @param {Object} query
  * @param {Object} version
  */
-
 const addNewVersionToStore = (store, query, version) => {
   if (!version) return;
 
