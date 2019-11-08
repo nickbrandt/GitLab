@@ -14,6 +14,19 @@ module EE
         end
       end
 
+      def logs_redirect
+        environment = project.default_environment
+
+        if environment
+          redirect_to logs_project_environment_path(project, environment)
+        else
+          render :empty_logs
+        end
+      end
+
+      def logs
+      end
+
       def k8s_pod_logs
         respond_to do |format|
           format.json do
@@ -31,9 +44,6 @@ module EE
             end
           end
         end
-      end
-
-      def logs
       end
 
       private

@@ -441,6 +441,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :metrics, action: :metrics_redirect
           get :folder, path: 'folders/*id', constraints: { format: /(html|json)/ }
           get :search
+
+          Gitlab.ee do
+            get :logs, action: :logs_redirect
+          end
         end
 
         resources :deployments, only: [:index] do
