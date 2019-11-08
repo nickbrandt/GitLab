@@ -13,7 +13,7 @@ module Geo
         belongs_to :project, class_name: 'Geo::Fdw::Project', inverse_of: :job_artifacts
 
         scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
-        scope :project_id_in, ->(ids) { joins(:project).merge(Geo::Fdw::Project.id_in(ids)) }
+        scope :project_id_in, ->(ids) { where(project_id: ids) }
 
         class << self
           def inner_join_job_artifact_registry
