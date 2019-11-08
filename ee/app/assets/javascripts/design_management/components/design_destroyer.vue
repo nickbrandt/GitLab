@@ -35,7 +35,7 @@ export default {
   methods: {
     onError(...args) {
       createFlash(s__('DesignManagement|We could not delete design(s). Please try again.'));
-      throw new Error(...args);
+      throw new Error('We could not delete design(s). Please try again.');
     },
     updateStoreAfterDelete(
       store,
