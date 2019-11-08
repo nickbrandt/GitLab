@@ -43,6 +43,7 @@ module EE
       has_many :cycle_analytics_stages, class_name: 'Analytics::CycleAnalytics::GroupStage'
 
       belongs_to :file_template_project, class_name: "Project"
+      belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_user_id', class_name: 'User'
 
       # Use +checked_file_template_project+ instead, which implements important
       # visibility checks
@@ -52,6 +53,8 @@ module EE
                 numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
       validate :custom_project_templates_group_allowed, if: :custom_project_templates_group_id_changed?
+
+      scope :aimed_for_deletion, -> (date) { where('marked_for_deletion_at <= ?', date) }
 
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })
