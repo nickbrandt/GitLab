@@ -34,8 +34,13 @@ export default {
   },
   methods: {
     onError(...args) {
-      createFlash(s__('DesignManagement|We could not delete design(s). Please try again.'));
-      throw new Error('We could not delete design(s). Please try again.');
+      const design = this.filenames.length > 1 ? 'designs' : 'a design';
+      createFlash(
+        sprintf(s__('DesignManagement|We could not delete %{design}. Please try again.'), {
+          design,
+        }),
+      );
+      throw new Error(args);
     },
     updateStoreAfterDelete(
       store,
