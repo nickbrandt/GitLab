@@ -79,6 +79,8 @@ module QA
 
           def click_approve
             click_element :approve_button
+
+            find_element :approve_button, text: "Revoke approval"
           end
 
           def start_review
