@@ -1,4 +1,6 @@
+- return unless Gitlab::Sourcegraph.feature_available?
 - expanded = integration_expanded?('sourcegraph_')
+
 %section.settings.as-sourcegraph.no-animate#js-sourcegraph-settings{ class: ('expanded' if expanded) }
   .settings-header
     %h4
@@ -19,7 +21,12 @@
             = f.label :sourcegraph_enabled, _('Enable Sourcegraph'), class: 'form-check-label'
         .form-group
           = f.label :sourcegraph_url, _('Sourcegraph URL'), class: 'label-bold'
-          = f.text_field :sourcegraph_url, class: 'form-control', placeholder: 'https://example.sourcegraph.com'
+          = f.text_field :sourcegraph_url, class: 'form-control', placeholder: 'e.g. https://sourcegraph.example.com'
           .form-text.text-muted
-            = _('Add %{link} code intelligence to your GitLab instance code views and pull requests.').html_safe % { link: link_to('Sourcegraph', 'https://sourcegraph.com/', target: '_blank') }
+            = _('Add %{link} code intelligence to your GitLab instance code views and merge requests.').html_safe % { link: link_to('Sourcegraph', 'https://sourcegraph.com/', target: '_blank') }
+        .form-group
+          = f.label :sourcegraph_public_only, _('Scope'), class: 'label-bold'
+          = f.select :sourcegraph_public_only, [[_('All projects'), false], [_('Public projects only'), true]], {}, class: 'form-control'
+          .form-text.text-muted
+            = _('Configure which projects should allow requests to Sourcegraph.')
       = f.submit _('Save changes'), class: 'btn btn-success'

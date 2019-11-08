@@ -4,10 +4,12 @@ class Projects::ApplicationController < ApplicationController
   include CookiesHelper
   include RoutableActions
   include ChecksCollaboration
+  include SourcegraphGon
 
   skip_before_action :authenticate_user!
   before_action :project
   before_action :repository
+  before_action :push_sourcegraph_gon
   layout 'project'
 
   helper_method :repository, :can_collaborate_with_project?, :user_access

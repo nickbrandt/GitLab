@@ -32,9 +32,6 @@ module Gitlab
       gon.first_day_of_week      = current_user&.first_day_of_week || Gitlab::CurrentSettings.first_day_of_week
       gon.ee                     = Gitlab.ee?
 
-      gon.sourcegraph_enabled    = Gitlab::CurrentSettings.sourcegraph_enabled
-      gon.sourcegraph_url        = Gitlab::CurrentSettings.sourcegraph_url
-
       if current_user
         gon.current_user_id = current_user.id
         gon.current_username = current_user.username

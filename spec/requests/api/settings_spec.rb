@@ -46,6 +46,7 @@ describe API::Settings, 'Settings' do
         storages = Gitlab.config.repositories.storages
                      .merge({ 'custom' => 'tmp/tests/custom_repositories' })
         allow(Gitlab.config.repositories).to receive(:storages).and_return(storages)
+        Feature.get(:sourcegraph).enable
       end
 
       it "updates application settings" do
@@ -60,6 +61,7 @@ describe API::Settings, 'Settings' do
             plantuml_url: 'http://plantuml.example.com',
             sourcegraph_enabled: true,
             sourcegraph_url: 'https://sourcegraph.com',
+            sourcegraph_public_only: false,
             default_snippet_visibility: 'internal',
             restricted_visibility_levels: ['public'],
             default_artifacts_expire_in: '2 days',
@@ -94,6 +96,7 @@ describe API::Settings, 'Settings' do
         expect(json_response['plantuml_url']).to eq('http://plantuml.example.com')
         expect(json_response['sourcegraph_enabled']).to be_truthy
         expect(json_response['sourcegraph_url']).to eq('https://sourcegraph.com')
+        expect(json_response['sourcegraph_public_only']).to eq(false)
         expect(json_response['default_snippet_visibility']).to eq('internal')
         expect(json_response['restricted_visibility_levels']).to eq(['public'])
         expect(json_response['default_artifacts_expire_in']).to eq('2 days')

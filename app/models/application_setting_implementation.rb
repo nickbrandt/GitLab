@@ -104,6 +104,7 @@ module ApplicationSettingImplementation
         signup_enabled: Settings.gitlab['signup_enabled'],
         sourcegraph_enabled: false,
         sourcegraph_url: nil,
+        sourcegraph_public_only: true,
         terminal_max_session_time: 0,
         throttle_authenticated_api_enabled: false,
         throttle_authenticated_api_period_in_seconds: 3600,

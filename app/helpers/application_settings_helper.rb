@@ -261,6 +261,7 @@ module ApplicationSettingsHelper
       :signup_enabled,
       :sourcegraph_enabled,
       :sourcegraph_url,
+      :sourcegraph_public_only,
       :terminal_max_session_time,
       :terms,
       :throttle_authenticated_api_enabled,
