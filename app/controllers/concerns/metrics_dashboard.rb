@@ -34,26 +34,23 @@ module MetricsDashboard
 
   def all_dashboards
     dashboards = dashboard_finder.find_all_paths(project_for_dashboard)
-    dashboards.map do |dashboard|
-      dashboard[:can_edit] = can_edit?(dashboard)
-      dashboard[:project_blob_path] = project_blob_path(dashboard)
-      dashboard
+    dashboards.each do |dashboard|
+      dashboard[:can_edit] = false
+      dashboard[:project_blob_path] = nil
+
+      if project_for_dashboard && !dashboard[:system_dashboard]
+        dashboard[:can_edit] = can_edit?(dashboard)
+        dashboard[:project_blob_path] = dashboard_project_blob_path(dashboard)
+      end
     end
   end
 
-  def can_edit?(dashboard)
-    return false unless project_for_dashboard
-    return false if dashboard[:system_dashboard]
-    return false unless can_collaborate_with_project?(project_for_dashboard, ref: project_for_dashboard.default_branch)
-
-    true
+  def dashboard_project_blob_path(dashboard)
+    project_blob_path(project_for_dashboard, File.join(project_for_dashboard.default_branch, dashboard[:path]))
   end
 
-  def project_blob_path(dashboard)
-    return unless project_for_dashboard
-    return if dashboard[:system_dashboard]
-
-    Gitlab::Routing.url_helpers.project_blob_path(project_for_dashboard, File.join(project_for_dashboard.default_branch, dashboard[:path]))
+  def can_edit?(dashboard)
+    can_collaborate_with_project?(project_for_dashboard, ref: project_for_dashboard.default_branch)
   end
 
   # Override in class to provide arguments to the finder.

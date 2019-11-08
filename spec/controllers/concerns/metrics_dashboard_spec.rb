@@ -67,29 +67,31 @@ describe MetricsDashboard do
         end
 
         context 'in all_dashboard list' do
-          let(:system_dashboard) { json_response['all_dashboards'][0] }
-          let(:project_dashboard) { json_response['all_dashboards'][1] }
+          let(:system_dashboard) { json_response['all_dashboards'].find { |dashboard| dashboard["system_dashboard"] == true } }
+          let(:project_dashboard) { json_response['all_dashboards'].find { |dashboard| dashboard["system_dashboard"] == false } }
 
           it 'includes project_blob_path only for project dashboards' do
             expect(system_dashboard['project_blob_path']).to be_nil
             expect(project_dashboard['project_blob_path']).to eq("/#{project.namespace.path}/#{project.name}/blob/master/.gitlab/dashboards/test.yml")
           end
 
-          context 'when a user can collaborate on project' do
-            it 'sets can_edit to true for project dashboards' do
-              expect(system_dashboard['can_edit']).to eq(false)
-              expect(project_dashboard['can_edit']).to eq(true)
-            end
-          end
+          describe 'project permissions' do
+            using RSpec::Parameterized::TableSyntax
 
-          context 'when user does not have permissions to edit project dashboard' do
-            before do
-              allow(controller).to receive(:can_collaborate_with_project?).and_return(false)
+            where(:can_collaborate, :system_can_edit, :project_can_edit) do
+              false | false | false
+              true  | false | true
             end
 
-            it 'sets can_edit to false for project dashboards' do
-              expect(system_dashboard['can_edit']).to eq(false)
-              expect(project_dashboard['can_edit']).to eq(false)
+            with_them do
+              before do
+                allow(controller).to receive(:can_collaborate_with_project?).and_return(can_collaborate)
+              end
+
+              it "sets can_edit appropriately" do
+                expect(system_dashboard["can_edit"]).to eq(system_can_edit)
+                expect(project_dashboard["can_edit"]).to eq(project_can_edit)
+              end
             end
           end
         end
