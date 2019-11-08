@@ -16,10 +16,13 @@ module SCA
     private
 
     def classify(policy)
-      return 'allowed' if policy&.approved?
-      return 'denied' if policy&.blacklisted?
-
-      'unclassified'
+      if policy&.approved?
+        'allowed'
+      elsif policy&.blacklisted?
+        'denied'
+      else
+        'unclassified'
+      end
     end
   end
 end

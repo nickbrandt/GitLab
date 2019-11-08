@@ -81,24 +81,33 @@ describe Projects::Security::LicensesController do
           end
 
           it { expect(response).to have_http_status(:ok) }
-          it { expect(json_response["licenses"].count).to be(3) }
-          it { expect(json_response.dig("licenses", 0, "id")).to be_nil }
-          it { expect(json_response.dig("licenses", 0, "spdx_identifier")).to eq("BSD-3-Clause") }
-          it { expect(json_response.dig("licenses", 0, "name")).to eql("BSD 3-Clause \"New\" or \"Revised\" License") }
-          it { expect(json_response.dig("licenses", 0, "url")).to eql("http://spdx.org/licenses/BSD-3-Clause.json") }
-          it { expect(json_response.dig("licenses", 0, "classification")).to eql("unclassified") }
 
-          it { expect(json_response.dig("licenses", 1, "id")).to eql(mit_policy.id) }
-          it { expect(json_response.dig("licenses", 1, "spdx_identifier")).to eq("MIT") }
-          it { expect(json_response.dig("licenses", 1, "name")).to eql(mit.name) }
-          it { expect(json_response.dig("licenses", 1, "url")).to eql("http://spdx.org/licenses/MIT.json") }
-          it { expect(json_response.dig("licenses", 1, "classification")).to eql("denied") }
+          it 'generates the proper JSON response' do
+            expect(json_response["licenses"].count).to be(3)
+            expect(json_response.dig("licenses", 0)).to include({
+              "id" => nil,
+              "spdx_identifier" => "BSD-3-Clause",
+              "name" => "BSD 3-Clause \"New\" or \"Revised\" License",
+              "url" => "http://spdx.org/licenses/BSD-3-Clause.json",
+              "classification" => "unclassified"
+            })
 
-          it { expect(json_response.dig("licenses", 2, "id")).to be_nil }
-          it { expect(json_response.dig("licenses", 2, "spdx_identifier")).to be_nil }
-          it { expect(json_response.dig("licenses", 2, "name")).to eql("unknown") }
-          it { expect(json_response.dig("licenses", 2, "url")).to eql("") }
-          it { expect(json_response.dig("licenses", 2, "classification")).to eql("unclassified") }
+            expect(json_response.dig("licenses", 1)).to include({
+              "id" => mit_policy.id,
+              "spdx_identifier" => "MIT",
+              "name" => mit.name,
+              "url" => "http://spdx.org/licenses/MIT.json",
+              "classification" => "denied"
+            })
+
+            expect(json_response.dig("licenses", 2)).to include({
+              "id" => nil,
+              "spdx_identifier" => nil,
+              "name" => "unknown",
+              "url" => "",
+              "classification" => "unclassified"
+            })
+          end
         end
 
         context 'without existing report' do

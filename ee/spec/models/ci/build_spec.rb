@@ -352,11 +352,11 @@ describe Ci::Build do
   end
 
   describe ".license_scan" do
-    subject { described_class.license_scan }
+    it 'returns only license artifacts' do
+      create(:ci_build, job_artifacts: [create(:ci_job_artifact, :zip)])
+      build_with_license_scan = create(:ci_build, job_artifacts: [create(:ci_job_artifact, file_type: :license_management, file_format: :raw)])
 
-    let!(:build_with_zip) { create(:ci_build, job_artifacts: [create(:ci_job_artifact, :zip)]) }
-    let!(:build_with_license_scan) { create(:ci_build, job_artifacts: [create(:ci_job_artifact, file_type: :license_management, file_format: :raw)]) }
-
-    it { expect(subject).to contain_exactly(build_with_license_scan) }
+      expect(described_class.license_scan).to contain_exactly(build_with_license_scan)
+    end
   end
 end

@@ -2,7 +2,7 @@
 
 module SCA
   class LicenseCompliance
-    include ::Gitlab::Utils:: StrongMemoize
+    include ::Gitlab::Utils::StrongMemoize
 
     def initialize(project)
       @project = project
@@ -10,8 +10,16 @@ module SCA
 
     def policies
       strong_memoize(:policies) do
-        configured_policies = software_license_policies.index_by { |policy| policy.software_license.canonical_id }
-        combine_licenses_from(configured_policies).sort_by(&:name)
+        configured_policies = project.software_license_policies.index_by { |policy| policy.software_license.canonical_id }
+        detected_licenses = license_scan_report.licenses.map do |reported_license|
+          policy = configured_policies[reported_license.canonical_id]
+          configured_policies.delete(reported_license.canonical_id) if policy
+          build_policy(reported_license, policy)
+        end
+        undetected_licenses = configured_policies.map do |id, policy|
+          build_policy(license_scan_report.fetch(id, nil), policy)
+        end
+        (detected_licenses + undetected_licenses).sort_by(&:name)
       end
     end
 
@@ -26,23 +34,10 @@ module SCA
     private
 
     attr_reader :project
-    delegate :all_pipelines, :default_branch, :software_license_policies, to: :project
-
-    def combine_licenses_from(configured_policies)
-      detected_licenses = license_scan_report.licenses.map do |reported_license|
-        policy = configured_policies[reported_license.canonical_id]
-        configured_policies.delete(reported_license.canonical_id) if policy
-        build_policy(reported_license, policy)
-      end
-      undetected_licenses = configured_policies.map do |id, policy|
-        build_policy(license_scan_report.fetch(id, nil), policy)
-      end
-      detected_licenses + undetected_licenses
-    end
 
     def pipeline
       strong_memoize(:pipeline) do
-        all_pipelines.latest_successful_for_ref(default_branch)
+        project.all_pipelines.latest_successful_for_ref(project.default_branch)
       end
     end
 
@@ -53,9 +48,9 @@ module SCA
         pipeline.license_scanning_report.tap do |report|
           report.apply_details_from!(dependency_list_report)
         end
+      rescue ::Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning::LicenseScanningParserError
+        empty_report
       end
-    rescue ::Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning::LicenseScanningParserError
-      empty_report
     end
 
     def dependency_list_report

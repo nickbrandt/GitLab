@@ -6,7 +6,7 @@ FactoryBot.define do
 
     trait :rails do
       name { 'rails' }
-      path { './vendor/bundle/ruby/2.6.0/gems/rails-5.2.3/README.md' }
+      path { '.' }
     end
   end
 end
