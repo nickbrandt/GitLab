@@ -539,6 +539,7 @@ module EE
           :starts_at,
           :expires_at,
           :historical_max,
+          :maximum_user_count,
           :licensee,
           :add_ons
 

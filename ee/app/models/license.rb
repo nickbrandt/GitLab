@@ -417,6 +417,10 @@ class License < ApplicationRecord
     HistoricalData.max_historical_user_count(license: self, from: from, to: to)
   end
 
+  def maximum_user_count
+    [historical_max, current_active_users_count].max
+  end
+
   def historical_max_with_default_period
     @historical_max_with_default_period ||=
       historical_max
