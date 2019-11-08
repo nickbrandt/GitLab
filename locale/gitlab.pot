@@ -9679,7 +9679,7 @@ msgstr ""
 msgid "Kubernetes cluster creation time exceeds timeout; %{timeout}"
 msgstr ""
 
-msgid "Kubernetes cluster integration was not removed."
+msgid "Kubernetes cluster integration and resources are being removed."
 msgstr ""
 
 msgid "Kubernetes cluster integration was successfully removed."
