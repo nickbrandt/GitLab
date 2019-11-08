@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe ProductivityAnalytics do
   describe 'metrics data' do
-    let(:analytics) { described_class.new(merge_requests: finder_mrs, sort: custom_sort) }
+    subject(:analytics) { described_class.new(merge_requests: finder_mrs, sort: custom_sort) }
 
     let(:finder_mrs) { ProductivityAnalyticsFinder.new(create(:admin), finder_options).execute }
     let(:finder_options) { { state: 'merged' } }
@@ -219,6 +219,19 @@ describe ProductivityAnalytics do
           end
         end
       end
+    end
+  end
+
+  describe '.start_date' do
+    subject(:start_date) { described_class.start_date }
+
+    let(:application_setting) do
+      instance_double('ApplicationSetting', productivity_analytics_start_date: 'mocked-start-date')
+    end
+
+    it 'delegates to ApplicationSetting' do
+      allow(ApplicationSetting).to receive('current').and_return(application_setting)
+      expect(start_date).to eq 'mocked-start-date'
     end
   end
 end

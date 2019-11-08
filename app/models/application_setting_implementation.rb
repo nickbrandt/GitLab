@@ -136,7 +136,8 @@ module ApplicationSettingImplementation
         snowplow_iglu_registry_url: nil,
         custom_http_clone_url_root: nil,
         pendo_enabled: false,
-        pendo_url: nil
+        pendo_url: nil,
+        productivity_analytics_start_date: Time.now
       }
     end
 
