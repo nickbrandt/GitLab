@@ -1,5 +1,5 @@
 <script>
-import { s__ } from '~/locale';
+import { s__, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import { ApolloMutation } from 'vue-apollo';
 import projectQuery from '../graphql/queries/project.query.graphql';
@@ -40,7 +40,6 @@ export default {
           design,
         }),
       );
-      throw new Error(args);
     },
     updateStoreAfterDelete(
       store,
