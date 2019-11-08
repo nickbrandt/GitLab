@@ -1798,6 +1798,9 @@ msgstr ""
 msgid "Any user"
 msgstr ""
 
+msgid "App ID"
+msgstr ""
+
 msgid "Appearance"
 msgstr ""
 
@@ -15597,9 +15600,6 @@ msgid "Similar issues"
 msgstr ""
 
 msgid "Single or combined queries"
-msgstr ""
-
-msgid "Site ID"
 msgstr ""
 
 msgid "Size"
