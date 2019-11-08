@@ -18,7 +18,6 @@ module Gitlab
       GITALY_INTERNAL_URL = 'ssh://gitaly/internal.git'
       GITLAB_PROJECTS_TIMEOUT = Gitlab.config.gitlab_shell.git_timeout
       EMPTY_REPOSITORY_CHECKSUM = '0000000000000000000000000000000000000000'
-      REF_REMOVAL_UPDATE_REV = '0' * 40
 
       NoRepository = Class.new(StandardError)
       InvalidRepository = Class.new(StandardError)
@@ -639,7 +638,7 @@ module Gitlab
       # Delete the specified branch from the repository
       # Note: No Git hooks are executed for this action
       def delete_branch(branch_name)
-        write_ref(branch_name, REF_REMOVAL_UPDATE_REV)
+        write_ref(branch_name, Gitlab::Git::BLANK_SHA)
       rescue CommandError => e
         raise DeleteBranchError, e
       end
