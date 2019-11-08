@@ -7,7 +7,11 @@ class AddIndexToProjectsOnMarkedForDeletion < ActiveRecord::Migration[5.2]
 
   disable_ddl_transaction!
 
-  def change
+  def up
     add_concurrent_index :projects, :marked_for_deletion_at, where: 'marked_for_deletion_at IS NOT NULL'
+  end
+
+  def down
+    remove_concurrent_index :projects, :marked_for_deletion_at
   end
 end
