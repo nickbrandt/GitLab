@@ -63,7 +63,7 @@ describe API::Vulnerabilities do
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to include_pagination_headers
-        expect(response).to match_response_schema('vulnerability_list', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/vulnerabilities', dir: 'ee')
         expect(response.headers['X-Total']).to eq project.vulnerabilities.count.to_s
       end
 
@@ -134,7 +134,7 @@ describe API::Vulnerabilities do
           dismiss_vulnerability
 
           expect(response).to have_gitlab_http_status(201)
-          expect(response).to match_response_schema('vulnerability', dir: 'ee')
+          expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
 
           expect(vulnerability.reload).to(
             have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.zone.now)))
@@ -208,7 +208,7 @@ describe API::Vulnerabilities do
           resolve_vulnerability
 
           expect(response).to have_gitlab_http_status(201)
-          expect(response).to match_response_schema('vulnerability', dir: 'ee')
+          expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
 
           expect(vulnerability.reload).to(
             have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.zone.now)))

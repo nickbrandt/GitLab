@@ -26,7 +26,7 @@ module API
 
       def render_vulnerability(vulnerability)
         if vulnerability.valid?
-          present vulnerability, with: VulnerabilityEntity
+          present vulnerability, with: EE::API::Entities::Vulnerability
         else
           render_validation_error!(vulnerability)
         end
@@ -53,7 +53,7 @@ module API
       end
 
       desc 'Resolve a vulnerability' do
-        success VulnerabilityEntity
+        success EE::API::Entities::Vulnerability
       end
       post ':id/resolve' do
         vulnerability = find_and_authorize_vulnerability!(:resolve_vulnerability)
@@ -64,7 +64,7 @@ module API
       end
 
       desc 'Dismiss a vulnerability' do
-        success VulnerabilityEntity
+        success EE::API::Entities::Vulnerability
       end
       post ':id/dismiss' do
         vulnerability = find_and_authorize_vulnerability!(:dismiss_vulnerability)
@@ -80,7 +80,7 @@ module API
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get a list of project vulnerabilities' do
-        success VulnerabilityEntity
+        success EE::API::Entities::Vulnerability
       end
       get ':id/vulnerabilities' do
         authorize! :read_project_security_dashboard, user_project
@@ -89,7 +89,7 @@ module API
           vulnerabilities_by(user_project)
         )
 
-        present vulnerabilities, with: VulnerabilityEntity
+        present vulnerabilities, with: EE::API::Entities::Vulnerability
       end
     end
   end
