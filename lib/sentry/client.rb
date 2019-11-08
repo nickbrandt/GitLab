@@ -34,7 +34,7 @@ module Sentry
     private
 
     def validate_size(issues)
-      return if valid_size?(issues)
+      return if Gitlab::Utils::DeepSize.new(issues).valid?
 
       raise Client::ResponseInvalidSizeError, "Sentry API response is too big. Limit is #{Gitlab::Utils::DeepSize.human_default_max_size}."
     end
@@ -101,7 +101,7 @@ module Sentry
         raise_error "Sentry response status code: #{response.code}"
       end
 
-      response
+      response.parsed_response
     end
 
     def raise_error(message)
