@@ -626,6 +626,27 @@ describe License do
     end
   end
 
+  describe '#maximum_user_count' do
+    using RSpec::Parameterized::TableSyntax
+
+    subject { license.maximum_user_count }
+
+    where(:current_active_users_count, :historical_max, :expected) do
+      100 | 50  | 100
+      50  | 100 | 100
+      50  | 50  | 50
+    end
+
+    with_them do
+      before do
+        allow(license).to receive(:current_active_users_count) { current_active_users_count }
+        allow(license).to receive(:historical_max) { historical_max }
+      end
+
+      it { is_expected.to eq(expected) }
+    end
+  end
+
   def set_restrictions(opts)
     gl_license.restrictions = {
       active_user_count: opts[:restricted_user_count],

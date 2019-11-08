@@ -539,6 +539,7 @@ module EE
           :starts_at,
           :expires_at,
           :historical_max,
+          :maximum_user_count,
           :licensee,
           :add_ons
 
@@ -894,6 +895,32 @@ module EE
         expose :created_at
         expose :updated_at
         expose :scopes, using: Scope
+      end
+
+      class Vulnerability < Grape::Entity
+        expose :id
+        expose :title
+        expose :description
+
+        expose :state
+        expose :severity
+        expose :confidence
+        expose :report_type
+
+        expose :project, using: ::API::Entities::ProjectIdentity
+
+        expose :author_id
+        expose :updated_by_id
+        expose :last_edited_by_id
+        expose :closed_by_id
+
+        expose :start_date
+        expose :due_date
+
+        expose :created_at
+        expose :updated_at
+        expose :last_edited_at
+        expose :closed_at
       end
     end
   end
