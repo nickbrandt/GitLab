@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::ImportExport::GroupProjectObjectBuilder do
   let(:project) do
-    create(:project,
+    create(:project, :repository,
            :builds_disabled,
            :issues_disabled,
            name: 'project',
@@ -12,7 +12,7 @@ describe Gitlab::ImportExport::GroupProjectObjectBuilder do
 
   context 'labels' do
     it 'finds the right group label' do
-      group_label = create(:group_label, 'name': 'group label', 'group': project.group)
+      group_label = create(:group_label, name: 'group label', group: project.group)
 
       expect(described_class.build(Label,
                                   'title' => 'group label',
@@ -32,7 +32,7 @@ describe Gitlab::ImportExport::GroupProjectObjectBuilder do
 
   context 'milestones' do
     it 'finds the right group milestone' do
-      milestone = create(:milestone, 'name' => 'group milestone', 'group' => project.group)
+      milestone = create(:milestone, name: 'group milestone', group: project.group)
 
       expect(described_class.build(Milestone,
                                   'title' => 'group milestone',
@@ -47,6 +47,32 @@ describe Gitlab::ImportExport::GroupProjectObjectBuilder do
                                        'group' => project.group)
 
       expect(milestone.persisted?).to be true
+    end
+  end
+
+  context 'merge_request' do
+    it 'finds the right merge_request' do
+      merge_request = create(:merge_request, title: 'MergeRequest', iid: 7, target_project: project, source_project: project)
+      expect(described_class.build(MergeRequest,
+                                   'title' => 'MergeRequest',
+                                   'project' => project,
+                                   'source_project_id' => project.id,
+                                   'source_branch' => 'SourceBranch',
+                                   'iid' => 7,
+                                   'target_branch' => 'TargetBranch',
+                                   'author' => project.creator)).to eq(merge_request)
+    end
+
+    it 'creates a new merge_request' do
+      merge_request = described_class.build(MergeRequest,
+                                            'title' => 'MergeRequest',
+                                            'project' => project,
+                                            'iid' => 8,
+                                            'source_project' => project,
+                                            'source_branch' => 'SourceBranch',
+                                            'target_branch' => 'TargetBranch',
+                                            'author' => project.creator)
+      expect(merge_request.persisted?).to be true
     end
   end
 end

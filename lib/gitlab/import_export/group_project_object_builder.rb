@@ -104,6 +104,10 @@ module Gitlab
         klass == Milestone
       end
 
+      def merge_request?
+        klass == MergeRequest
+      end
+
       def project_column
         if @original_klass.reflect_on_association(:project) || label?
           :project_id
@@ -133,7 +137,7 @@ module Gitlab
 
       # Returns Arel clause for a particular model or `nil`.
       def where_clause_for_klass
-        # no-op
+        return attrs_to_arel(attributes.slice('iid')) if merge_request?
       end
     end
   end
