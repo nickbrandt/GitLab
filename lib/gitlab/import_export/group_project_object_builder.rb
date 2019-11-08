@@ -19,6 +19,7 @@ module Gitlab
       end
 
       def initialize(klass, attributes)
+        @original_klass = klass
         @klass = klass < Label ? Label : klass
         @attributes = attributes
         @group = @attributes['group']
@@ -53,7 +54,7 @@ module Gitlab
       # or, if group is present:
       # `"{table_name}"."project_id" = {project.id} OR "{table_name}"."group_id" = {group.id}`
       def where_clause_base
-        clause = table[:project_id].eq(project.id)
+        clause = table[project_column].eq(project.id)
         clause = clause.or(table[:group_id].eq(group.id)) if group
 
         clause
@@ -101,6 +102,14 @@ module Gitlab
 
       def milestone?
         klass == Milestone
+      end
+
+      def project_column
+        if @original_klass.reflect_on_association(:project) || label?
+          :project_id
+        elsif klass.reflect_on_association(:target_project)
+          :target_project_id
+        end
       end
 
       # If an existing group milestone used the IID
