@@ -36,10 +36,10 @@ export const extractCurrentDiscussion = (discussions, id) =>
 const deleteDesignsFromStore = (store, query, selectedDesigns) => {
   const data = store.readQuery(query);
 
-  const changedDesigns = data.project.issue.designs.designs.edges.filter(
+  const changedDesigns = data.project.issue.designCollection.designs.edges.filter(
     ({ node }) => !selectedDesigns.includes(node.filename),
   );
-  data.project.issue.designs.designs.edges = [...changedDesigns];
+  data.project.issue.designCollection.designs.edges = [...changedDesigns];
 
   store.writeQuery({
     ...query,
@@ -53,9 +53,9 @@ const addNewVersionToStore = (store, query, version) => {
   const data = store.readQuery(query);
   const newEdge = { node: version, __typename: 'DesignVersionEdge' };
 
-  data.project.issue.designs.versions.edges = [
+  data.project.issue.designCollection.versions.edges = [
     newEdge,
-    ...data.project.issue.designs.versions.edges,
+    ...data.project.issue.designCollection.versions.edges,
   ];
 
   store.writeQuery({
