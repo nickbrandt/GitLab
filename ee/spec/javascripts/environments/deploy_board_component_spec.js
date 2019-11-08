@@ -110,4 +110,24 @@ describe('Deploy Board', () => {
       );
     });
   });
+
+  describe('has legend component', () => {
+    beforeEach(done => {
+      wrapper = createComponent({
+        isLoading: false,
+        isEmpty: false,
+        logsPath: environment.log_path,
+        hasLegacyAppLabel: true,
+        deployBoardData: deployBoardMockData,
+      });
+      wrapper.vm.$nextTick(done);
+    });
+
+    it('with all the possible statuses', () => {
+      const deployBoardLegend = wrapper.find('.deploy-board-legend');
+
+      expect(deployBoardLegend).toBeDefined();
+      expect(deployBoardLegend.findAll('a').length).toBe(6);
+    });
+  });
 });

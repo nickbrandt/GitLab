@@ -16963,6 +16963,9 @@ msgstr ""
 msgid "Subtracts"
 msgstr ""
 
+msgid "Succeeded"
+msgstr ""
+
 msgid "Successfully activated"
 msgstr ""
 

@@ -10,10 +10,11 @@
  * [Mockup](https://gitlab.com/gitlab-org/gitlab-foss/uploads/2f655655c0eadf655d0ae7467b53002a/environments__deploy-graphic.png)
  */
 import _ from 'underscore';
-import { n__, s__, sprintf } from '~/locale';
+import { GlLoadingIcon, GlLink } from '@gitlab/ui';
+import { __, n__, s__, sprintf } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
-import { GlLoadingIcon, GlLink } from '@gitlab/ui';
+import STATUS_MAP from '../constants';
 
 export default {
   components: {
@@ -93,6 +94,16 @@ export default {
     deployBoardSvg() {
       return deployBoardSvg;
     },
+    statuses() {
+      return {
+        ...STATUS_MAP,
+        transparent: {
+          class: 'transparent',
+          text: __('Canary'),
+          stable: false,
+        },
+      };
+    },
   },
 };
 </script>
@@ -107,56 +118,68 @@ export default {
         </gl-link>
       </div>
 
-      <div v-if="canRenderDeployBoard" class="deploy-board-information">
-        <section class="deploy-board-status">
-          <span v-tooltip :title="instanceIsCompletedText">
-            <span ref="percentage" class="text-center text-plain gl-font-size-large"
-              >{{ deployBoardData.completion }}%</span
+      <div v-if="canRenderDeployBoard" class="deploy-board-information p-3">
+        <div class="deploy-board-information">
+          <section class="deploy-board-status">
+            <span v-tooltip :title="instanceIsCompletedText">
+              <span ref="percentage" class="text-center text-plain gl-font-size-large"
+                >{{ deployBoardData.completion }}%</span
+              >
+              <span class="text text-center text-secondary">{{ __('Complete') }}</span>
+            </span>
+          </section>
+
+          <section class="deploy-board-instances">
+            <span class="deploy-board-instances-text text-secondary">
+              {{ instanceTitle }} ({{ instanceCount }})
+            </span>
+
+            <div class="deploy-board-instances-container d-flex flex-wrap flex-row">
+              <template v-for="(instance, i) in deployBoardData.instances">
+                <instance-component
+                  :key="i"
+                  :status="instance.status"
+                  :tooltip-text="instance.tooltip"
+                  :pod-name="instance.pod_name"
+                  :logs-path="logsPath"
+                  :stable="instance.stable"
+                />
+              </template>
+            </div>
+            <div class="deploy-board-legend d-flex mt-3">
+              <div
+                v-for="status in statuses"
+                :key="status.text"
+                class="d-flex justify-content-center align-items-center mr-3"
+              >
+                <instance-component :status="status.class" :stable="status.stable" />
+                <span class="legend-text ml-2">{{ status.text }}</span>
+              </div>
+            </div>
+          </section>
+
+          <section
+            v-if="deployBoardData.rollback_url || deployBoardData.abort_url"
+            class="deploy-board-actions"
+          >
+            <a
+              v-if="deployBoardData.rollback_url"
+              :href="deployBoardData.rollback_url"
+              class="btn"
+              data-method="post"
+              rel="nofollow"
+              >{{ __('Rollback') }}</a
             >
-            <span class="text text-center text-secondary">{{ __('Complete') }}</span>
-          </span>
-        </section>
-
-        <section class="deploy-board-instances">
-          <span class="deploy-board-instances-text text-secondary">
-            {{ instanceTitle }} ({{ instanceCount }})
-          </span>
-
-          <div class="deploy-board-instances-container d-flex flex-wrap flex-row">
-            <template v-for="(instance, i) in deployBoardData.instances">
-              <instance-component
-                :key="i"
-                :status="instance.status"
-                :tooltip-text="instance.tooltip"
-                :pod-name="instance.pod_name"
-                :logs-path="logsPath"
-                :stable="instance.stable"
-              />
-            </template>
-          </div>
-        </section>
-
-        <section
-          v-if="deployBoardData.rollback_url || deployBoardData.abort_url"
-          class="deploy-board-actions"
-        >
-          <a
-            v-if="deployBoardData.rollback_url"
-            :href="deployBoardData.rollback_url"
-            class="btn"
-            data-method="post"
-            rel="nofollow"
-            >{{ __('Rollback') }}</a
-          >
-          <a
-            v-if="deployBoardData.abort_url"
-            :href="deployBoardData.abort_url"
-            class="btn btn-red btn-inverted"
-            data-method="post"
-            rel="nofollow"
-            >{{ __('Abort') }}</a
-          >
-        </section>
+            <a
+              v-if="deployBoardData.abort_url"
+              :href="deployBoardData.abort_url"
+              class="btn btn-red btn-inverted"
+              data-method="post"
+              rel="nofollow"
+              >{{ __('Abort') }}</a
+            >
+          </section>
+        </div>
       </div>
 
       <div v-if="canRenderEmptyState" class="deploy-board-empty">

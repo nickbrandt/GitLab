@@ -52,20 +52,26 @@ export default {
 
     logsPath: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
   },
 
   computed: {
+    isLink() {
+      return Boolean(this.logsPath || this.podName);
+    },
+
     cssClass() {
       return {
         [`deployment-instance-${this.status}`]: true,
         'deployment-instance-canary': !this.stable,
+        link: this.isLink,
       };
     },
 
     computedLogPath() {
-      return `${this.logsPath}?pod_name=${this.podName}`;
+      return this.isLink ? `${this.logsPath}?pod_name=${this.podName}` : null;
     },
   },
 };
@@ -74,7 +80,7 @@ export default {
   <a
     v-tooltip
     :class="cssClass"
-    :data-title="tooltipText"
+    :title="tooltipText"
     :href="computedLogPath"
     class="deployment-instance d-flex justify-content-center align-items-center"
     data-placement="top"
