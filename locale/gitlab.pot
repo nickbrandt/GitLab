@@ -11285,7 +11285,7 @@ msgstr ""
 msgid "No preview for this file type"
 msgstr ""
 
-msgid "No prioritised labels with such name or description"
+msgid "No prioritized labels with such name or description"
 msgstr ""
 
 msgid "No public groups"
