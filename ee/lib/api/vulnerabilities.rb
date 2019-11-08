@@ -13,14 +13,9 @@ module API
         Vulnerability.with_findings.find(params[:id])
       end
 
-      def authorize_vulnerability!(vulnerability, action)
-        authorize! action, vulnerability.project
-        vulnerability
-      end
-
       def find_and_authorize_vulnerability!(action)
         find_vulnerability!.tap do |vulnerability|
-          authorize_vulnerability!(vulnerability, action)
+          authorize! action, vulnerability.project
         end
       end
 
@@ -43,15 +38,6 @@ module API
       requires :id, type: String, desc: 'The ID of a vulnerability'
     end
     resource :vulnerabilities do
-      desc 'Get a vulnerability' do
-        success VulnerabilityEntity
-      end
-      get ':id' do
-        vulnerability = Vulnerability.find(params[:id])
-        authorize_vulnerability!(vulnerability, :read_project_security_dashboard)
-        render_vulnerability(vulnerability)
-      end
-
       desc 'Resolve a vulnerability' do
         success EE::API::Entities::Vulnerability
       end

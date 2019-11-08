@@ -1,20 +1,14 @@
 # frozen_string_literal: true
 
-shared_examples 'prevents working with vulnerabilities in case of insufficient access level' do
-  it 'responds 403 Forbidden when accessed by reporter' do
-    project.add_reporter(user)
+shared_examples 'prevents working with vulnerabilities in case of insufficient privileges' do
+  context 'with lesser access level than required' do
+    it 'responds with 403 Forbidden' do
+      project.add_reporter(user)
 
-    subject
+      subject
 
-    expect(response).to have_gitlab_http_status(403)
-  end
-
-  it 'responds 403 Forbidden when accessed by guest' do
-    project.add_guest(user)
-
-    subject
-
-    expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(403)
+    end
   end
 end
 
