@@ -185,6 +185,7 @@ excluded_attributes:
     - :moved_to_id
     - :state_id
     - :duplicated_to_id
+    - :promoted_to_epic_id
   merge_request:
     - :milestone_id
     - :ref_fetched
@@ -222,6 +223,8 @@ excluded_attributes:
     - :upstream_pipeline_id
     - :resource_group_id
     - :waiting_for_resource_at
+  sentry_issue:
+    - :issue_id
   push_event_payload:
     - :event_id
   project_badges:
@@ -262,6 +265,8 @@ excluded_attributes:
     - :issue_id
   zoom_meetings:
     - :issue_id
+  design:
+    - :issue_id
   designs:
     - :issue_id
   design_versions:
@@ -287,7 +292,20 @@ excluded_attributes:
     - :pipeline_id
   merge_access_levels:
     - :protected_branch_id
-
+  push_access_levels:
+    - :protected_branch_id
+  unprotect_access_levels:
+    - :protected_branch_id
+  create_access_levels:
+    - :protected_tag_id
+  deploy_access_levels:
+    - :protected_environment_id
+  boards:
+    - :milestone_id
+  lists:
+    - :board_id
+    - :label_id
+    - :milestone_id
 methods:
   notes:
     - :type

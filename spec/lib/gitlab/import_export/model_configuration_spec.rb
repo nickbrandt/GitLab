@@ -11,7 +11,7 @@ describe 'Import/Export model configuration' do
   let(:all_models_yml) { 'spec/lib/gitlab/import_export/all_models.yml' }
   let(:all_models_hash) { YAML.load_file(all_models_yml) }
   let(:current_models) { setup_models }
-  let(:model_names) { relation_names }
+  let(:model_names) { project_relation_names }
 
   it 'has no new models' do
     model_names.each do |model_name|

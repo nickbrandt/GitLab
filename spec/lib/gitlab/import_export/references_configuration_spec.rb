@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 # Part of the test security suite for the Import/Export feature
@@ -7,20 +9,26 @@ require 'spec_helper'
 # or to be blacklisted by using the import_export.yml configuration file.
 # Likewise, new models added to import_export.yml, will need to be added with their correspondent relations
 # to this spec.
-describe 'Import/Export references configuration' do
+describe 'Import/Export Project configuration' do
   include ConfigurationHelper
 
-  it 'has no prohibited keys' do
-    relation_names.each do |relation_name|
-      relation_class = relation_class_for_name(relation_name)
-      relation_attributes = relation_class.new.attributes.keys - relation_class.encrypted_attributes.keys.map(&:to_s)
-      current_attributes = parsed_attributes(relation_name, relation_attributes)
+  where(:relation_path, :relation_name) do
+    project_relation_paths.map {|a| [a.join("."), a.last]}
+  end
 
-      prohibited_keys = current_attributes.select do |attribute|
-        prohibited_key?(attribute) || !relation_class.attribute_method?(attribute)
+  with_them do
+    next if params[:relation_name] == "author"
+
+    context "where relation #{params[:relation_path]}" do
+      it 'does not have prohibited keys' do
+        relation_class = relation_class_for_name(relation_name)
+        relation_attributes = relation_class.new.attributes.keys - relation_class.encrypted_attributes.keys.map(&:to_s)
+        current_attributes = parsed_attributes(relation_name, relation_attributes)
+        prohibited_keys = current_attributes.select do |attribute|
+          prohibited_key?(attribute) || !relation_class.attribute_method?(attribute)
+        end
+        expect(prohibited_keys).to be_empty, failure_message(relation_class.to_s, prohibited_keys)
       end
-
-      expect(prohibited_keys).to be_empty, failure_message(relation_class.to_s, prohibited_keys)
     end
   end
 
