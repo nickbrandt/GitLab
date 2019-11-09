@@ -45,4 +45,12 @@ describe ErrorTracking::ListIssuesService do
     include_examples 'error tracking service unauthorized user'
     include_examples 'error tracking service disabled'
   end
+
+  describe '#external_url' do
+    it 'calls the project setting sentry_external_url' do
+      expect(error_tracking_setting).to receive(:sentry_external_url)
+
+      subject.external_url
+    end
+  end
 end
