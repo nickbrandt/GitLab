@@ -48,9 +48,9 @@ describe ErrorTracking::ListIssuesService do
 
   describe '#external_url' do
     it 'calls the project setting sentry_external_url' do
-      expect(error_tracking_setting).to receive(:sentry_external_url)
+      expect(error_tracking_setting).to receive(:sentry_external_url).and_return(sentry_url)
 
-      subject.external_url
+      expect(subject.external_url).to eql sentry_url
     end
   end
 end
