@@ -76,6 +76,25 @@ describe Projects::EnvironmentsController do
     end
   end
 
+  describe 'GET #logs_redirect' do
+    let(:project) { create(:project) }
+
+    it 'redirects to environment if it exists' do
+      environment = create(:environment, name: 'production', project: project)
+
+      get :logs_redirect, params: { namespace_id: project.namespace, project_id: project }
+
+      expect(response).to redirect_to(logs_project_environment_path(project, environment))
+    end
+
+    it 'renders empty logs page if no environment exists' do
+      get :logs_redirect, params: { namespace_id: project.namespace, project_id: project }
+
+      expect(response).to be_ok
+      expect(response).to render_template 'empty_logs'
+    end
+  end
+
   describe 'GET logs' do
     let(:pod_name) { "foo" }
 

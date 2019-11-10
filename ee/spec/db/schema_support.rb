@@ -7,7 +7,7 @@ module EE
 
       prepended do
         EE_IGNORED_FK_COLUMNS = {
-          application_settings: %w[slack_app_id snowplow_site_id],
+          application_settings: %w[slack_app_id snowplow_app_id],
           approvals: %w[user_id],
           approver_groups: %w[target_id],
           approvers: %w[target_id user_id],

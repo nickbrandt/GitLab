@@ -37,10 +37,22 @@ class ProductivityAnalyticsFinder < MergeRequestsFinder
     return items unless params[:merged_at_after] || params[:merged_at_before]
 
     items = items.joins(:metrics)
-    items = items.where(metrics_table[:merged_at].gteq(params[:merged_at_after])) if params[:merged_at_after]
-    items = items.where(metrics_table[:merged_at].lteq(params[:merged_at_before])) if params[:merged_at_before]
+    items = items.where(metrics_table[:merged_at].gteq(merged_at_between[:from])) if merged_at_between[:from]
+    items = items.where(metrics_table[:merged_at].lteq(merged_at_between[:to])) if merged_at_between[:to]
 
     items
   end
   # rubocop: enable CodeReuse/ActiveRecord
+
+  def merged_at_between
+    @merged_at_between ||= begin
+      boundaries = { from: params[:merged_at_after], to: params[:merged_at_before] }
+
+      if ProductivityAnalytics.start_date && ProductivityAnalytics.start_date > boundaries[:from]
+        boundaries[:from] = ProductivityAnalytics.start_date
+      end
+
+      boundaries
+    end
+  end
 end

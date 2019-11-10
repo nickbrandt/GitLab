@@ -1798,6 +1798,9 @@ msgstr ""
 msgid "Any user"
 msgstr ""
 
+msgid "App ID"
+msgstr ""
+
 msgid "Appearance"
 msgstr ""
 
@@ -1945,6 +1948,9 @@ msgid "Archived projects"
 msgstr ""
 
 msgid "Archiving the project will make it entirely read-only. It is hidden from the dashboard and doesn't show up in searches. <strong>The repository cannot be committed to, and no issues, comments or other entities can be created.</strong>"
+msgstr ""
+
+msgid "Are you setting up GitLab for a company?"
 msgstr ""
 
 msgid "Are you sure that you want to archive this project?"
@@ -6403,10 +6409,16 @@ msgstr ""
 msgid "Environments|Job"
 msgstr ""
 
+msgid "Environments|Learn about environments"
+msgstr ""
+
 msgid "Environments|Learn more about stopping environments"
 msgstr ""
 
 msgid "Environments|New environment"
+msgstr ""
+
+msgid "Environments|No deployed environments"
 msgstr ""
 
 msgid "Environments|No deployments yet"
@@ -6575,6 +6587,9 @@ msgid "Epics|start"
 msgstr ""
 
 msgid "Error"
+msgstr ""
+
+msgid "Error Details"
 msgstr ""
 
 msgid "Error Tracking"
@@ -9143,7 +9158,7 @@ msgstr ""
 msgid "In order to gather accurate feature usage data, it can take 1 to 2 weeks to see your index."
 msgstr ""
 
-msgid "In order to tailor your experience with GitLab<br>we would like to know a bit more about you."
+msgid "In order to tailor your experience with GitLab we<br>would like to know a bit more about you."
 msgstr ""
 
 msgid "In the next step, you'll be able to select the projects you want to import."
@@ -10174,6 +10189,9 @@ msgstr ""
 msgid "Logs"
 msgstr ""
 
+msgid "Logs|To see the pod logs, deploy your code to an environment."
+msgstr ""
+
 msgid "MD5"
 msgstr ""
 
@@ -10675,9 +10693,6 @@ msgstr ""
 msgid "Metrics|Label of the y-axis (usually the unit). The x-axis always represents time."
 msgstr ""
 
-msgid "Metrics|Learn about environments"
-msgstr ""
-
 msgid "Metrics|Legend label (optional)"
 msgstr ""
 
@@ -10691,9 +10706,6 @@ msgid "Metrics|Must be a valid PromQL query."
 msgstr ""
 
 msgid "Metrics|New metric"
-msgstr ""
-
-msgid "Metrics|No deployed environments"
 msgstr ""
 
 msgid "Metrics|PromQL query is valid"
@@ -12350,6 +12362,9 @@ msgid "Please wait while we connect to your repository. Refresh at will."
 msgstr ""
 
 msgid "Please wait while we import the repository for you. Refresh at will."
+msgstr ""
+
+msgid "Pod logs"
 msgstr ""
 
 msgid "Pod not found"
@@ -15594,9 +15609,6 @@ msgid "Similar issues"
 msgstr ""
 
 msgid "Single or combined queries"
-msgstr ""
-
-msgid "Site ID"
 msgstr ""
 
 msgid "Size"
@@ -19090,7 +19102,7 @@ msgstr ""
 msgid "Welcome to GitLab"
 msgstr ""
 
-msgid "Welcome to GitLab %{username}!"
+msgid "Welcome to GitLab @%{username}!"
 msgstr ""
 
 msgid "Welcome to the Guided GitLab Tour"

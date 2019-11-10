@@ -16,6 +16,10 @@ class ProductivityAnalytics
   METRIC_TYPES = METRIC_COLUMNS.keys.freeze
   DEFAULT_TYPE = 'days_to_merge'.freeze
 
+  def self.start_date
+    ApplicationSetting.current&.productivity_analytics_start_date
+  end
+
   def initialize(merge_requests:, sort: nil)
     @merge_requests = merge_requests.joins(:metrics)
     @sort = sort

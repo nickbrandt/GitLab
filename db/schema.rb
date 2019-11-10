@@ -287,7 +287,6 @@ ActiveRecord::Schema.define(version: 2019_11_05_094625) do
     t.boolean "hide_third_party_offers", default: false, null: false
     t.boolean "snowplow_enabled", default: false, null: false
     t.string "snowplow_collector_hostname"
-    t.string "snowplow_site_id"
     t.string "snowplow_cookie_domain"
     t.boolean "instance_statistics_visibility_private", default: false, null: false
     t.boolean "web_ide_clientside_preview_enabled", default: false, null: false
@@ -350,6 +349,8 @@ ActiveRecord::Schema.define(version: 2019_11_05_094625) do
     t.string "eks_access_key_id", limit: 128
     t.string "encrypted_eks_secret_access_key_iv", limit: 255
     t.text "encrypted_eks_secret_access_key"
+    t.string "snowplow_app_id"
+    t.datetime_with_timezone "productivity_analytics_start_date"
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id"
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id"
     t.index ["instance_administration_project_id"], name: "index_applicationsettings_on_instance_administration_project_id"
@@ -2491,11 +2492,15 @@ ActiveRecord::Schema.define(version: 2019_11_05_094625) do
     t.boolean "emails_disabled"
     t.integer "max_pages_size"
     t.integer "max_artifacts_size"
+    t.date "marked_for_deletion_at"
+    t.integer "marked_for_deletion_by_user_id"
     t.index ["created_at"], name: "index_namespaces_on_created_at"
     t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)"
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id"
     t.index ["ldap_sync_last_successful_update_at"], name: "index_namespaces_on_ldap_sync_last_successful_update_at"
     t.index ["ldap_sync_last_update_at"], name: "index_namespaces_on_ldap_sync_last_update_at"
+    t.index ["marked_for_deletion_at"], name: "index_namespaces_on_marked_for_deletion_at", where: "(marked_for_deletion_at IS NOT NULL)"
+    t.index ["marked_for_deletion_by_user_id"], name: "index_namespaces_on_marked_for_deletion_by_user_id", where: "(marked_for_deletion_by_user_id IS NOT NULL)"
     t.index ["name", "parent_id"], name: "index_namespaces_on_name_and_parent_id", unique: true
     t.index ["name"], name: "index_namespaces_on_name_trigram", opclass: :gin_trgm_ops, using: :gin
     t.index ["owner_id"], name: "index_namespaces_on_owner_id"
@@ -3754,6 +3759,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_094625) do
     t.boolean "time_format_in_24h"
     t.string "projects_sort", limit: 64
     t.boolean "show_whitespace_in_diffs", default: true, null: false
+    t.boolean "setup_for_company"
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true
   end
 
@@ -4361,6 +4367,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_094625) do
   add_foreign_key "namespaces", "namespaces", column: "custom_project_templates_group_id", name: "fk_e7a0b20a6b", on_delete: :nullify
   add_foreign_key "namespaces", "plans", name: "fk_fdd12e5b80", on_delete: :nullify
   add_foreign_key "namespaces", "projects", column: "file_template_project_id", name: "fk_319256d87a", on_delete: :nullify
+  add_foreign_key "namespaces", "users", column: "marked_for_deletion_by_user_id", name: "fk_9ff61b4c22", on_delete: :nullify
   add_foreign_key "note_diff_files", "notes", column: "diff_note_id", on_delete: :cascade
   add_foreign_key "notes", "projects", name: "fk_99e097b079", on_delete: :cascade
   add_foreign_key "notes", "reviews", name: "fk_2e82291620", on_delete: :nullify
