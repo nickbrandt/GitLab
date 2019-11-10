@@ -134,6 +134,12 @@ module API
           },
           {
             required: false,
+            name: :confidential_note_events,
+            type: Boolean,
+            desc: 'Enable notifications for confidential_note_events'
+          },
+          {
+            required: false,
             name: :tag_push_events,
             type: Boolean,
             desc: 'Enable notifications for tag_push_events'
