@@ -217,8 +217,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       it 'has award emoji for a snippet' do
         award_emoji = @project.snippets.first.award_emoji
 
-        expect(award_emoji.count).to eq(2)
-        expect(award_emoji.map(&:name)).to match_array(%w[thumbsup coffee])
+        expect(award_emoji.map(&:name)).to contain_exactly('thumbsup', 'coffee')
       end
 
       it 'restores the correct service' do
