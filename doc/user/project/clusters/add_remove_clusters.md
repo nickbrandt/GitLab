@@ -281,6 +281,19 @@ To add an existing Kubernetes cluster to your project:
         kubectl apply -f gitlab-admin-service-account.yaml
         ```
 
+        You will need the `container.clusterRoleBindings.create` permission
+        to create cluster-level roles. If you do not have this permission,
+        you can alternatively enable Basic Authentication and then run the
+        `kubectl apply` command as an admin:
+
+        ```bash
+        kubectl apply -f gitlab-admin-service-account.yaml --username=admin --password=<password>
+        ```
+
+        NOTE: **Note:**
+        Basic Authentication can be turned on and the password credentials
+        can be obtained using the Google Cloud Console.
+
         Output:
 
         ```bash
