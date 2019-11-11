@@ -38,7 +38,7 @@ describe DesignManagement::DesignsFinder do
         end
 
         it 'returns the designs' do
-          is_expected.to contain_exactly(design2, design1)
+          is_expected.to contain_exactly(design1, design2)
         end
 
         context 'when argument is the ids of designs' do
@@ -48,15 +48,16 @@ describe DesignManagement::DesignsFinder do
         end
 
         context 'when argument is the filenames of designs' do
-          let(:params) { { filenames: [design1.filename] } }
+          let(:params) { { filenames: [design2.filename] } }
 
-          it { is_expected.to eq([design1]) }
+          it { is_expected.to eq([design2]) }
         end
 
         describe 'returning designs that existed at a particular given version' do
+          set(:design3) { create(:design, :with_file, issue: issue, versions_count: 1) }
           let(:all_versions) { issue.design_collection.versions.ordered }
           let(:first_version) { all_versions.last }
-          let(:second_version) { all_versions.first }
+          let(:second_version) { all_versions.second }
 
           context 'when argument is the first version' do
             let(:params) { { visible_at_version: first_version } }
@@ -67,35 +68,7 @@ describe DesignManagement::DesignsFinder do
           context 'when argument is the second version' do
             let(:params) { { visible_at_version: second_version } }
 
-            it { is_expected.to contain_exactly(design2, design1) }
-          end
-
-          context 'when arguments are version and ids' do
-            context 'when design is absent at version' do
-              let(:params) { { visible_at_version: first_version, ids: [design2.id] } }
-
-              it { is_expected.to eq([]) }
-            end
-
-            context 'when design is present at version' do
-              let(:params) { { visible_at_version: second_version, ids: [design2.id] } }
-
-              it { is_expected.to eq([design2]) }
-            end
-          end
-
-          context 'when arguments are version and filenames' do
-            context 'when design is absent at version' do
-              let(:params) { { visible_at_version: first_version, filenames: [design2.filename] } }
-
-              it { is_expected.to eq([]) }
-            end
-
-            context 'when design is present at version' do
-              let(:params) { { visible_at_version: second_version, filenames: [design2.filename] } }
-
-              it { is_expected.to eq([design2]) }
-            end
+            it { is_expected.to contain_exactly(design1, design2) }
           end
         end
       end
