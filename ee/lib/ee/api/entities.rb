@@ -109,9 +109,12 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
-          expose :epic_iid,
-                 if: -> (issue, options) { ::Ability.allowed?(options[:current_user], :read_epic, issue.project&.group) } do |issue|
-            issue.epic&.iid
+          with_options if: -> (issue, options) { ::Ability.allowed?(options[:current_user], :read_epic, issue.project&.group) } do
+            expose :epic_iid do |issue|
+              issue.epic&.iid
+            end
+
+            expose :epic, using: EpicBaseEntity
           end
         end
       end
