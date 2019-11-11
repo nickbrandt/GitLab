@@ -17,7 +17,6 @@ describe Group do
     # the presence check works, but since this is a private method that
     # method can't be called with a public_send.
     it { is_expected.to belong_to(:file_template_project).class_name('Project').without_validating_presence }
-    it { is_expected.to belong_to(:deleting_user).class_name('User').with_foreign_key(:marked_for_deletion_by_user_id) }
     it { is_expected.to have_many(:dependency_proxy_blobs) }
     it { is_expected.to have_many(:cycle_analytics_stages) }
     it { is_expected.to have_many(:ip_restrictions) }
@@ -46,22 +45,6 @@ describe Group do
         expect { group.checked_file_template_project }.not_to exceed_query_limit(0)
 
         expect(group.checked_file_template_project).to be_present
-      end
-    end
-
-    describe '.aimed_for_deletion' do
-      let!(:date) { 10.days.ago }
-
-      subject(:relation) { described_class.aimed_for_deletion(date) }
-
-      it 'only includes groups that are marked for deletion on or before the specified date' do
-        group_not_marked_for_deletion = create(:group, marked_for_deletion_at: nil)
-        group_marked_for_deletion_after_specified_date = create(:group, marked_for_deletion_at: date + 2.days)
-        group_marked_for_deletion_before_specified_date = create(:group, marked_for_deletion_at: date - 2.days)
-        group_marked_for_deletion_on_specified_date = create(:group, marked_for_deletion_at: date)
-
-        expect(subject).to include(group_marked_for_deletion_before_specified_date, group_marked_for_deletion_on_specified_date)
-        expect(subject).not_to include(group_marked_for_deletion_after_specified_date, group_not_marked_for_deletion)
       end
     end
   end
