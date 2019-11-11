@@ -13,7 +13,8 @@ module Gitlab
         Issue.class_eval { include EachBatch } unless Issue < EachBatch
 
         count = 0
-        Issue.each_batch do |issue_batch|
+
+        Issue.eager_load(project: :grafana_integration).each_batch do |issue_batch|
           embed_count_per_batch = issue_batch.map do |issue|
             has_grafana_url?(issue)
           end.count(&:itself)
