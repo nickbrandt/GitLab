@@ -209,6 +209,7 @@ export default {
         v-if="packageMetadata"
         :heading="packageMetadataTitle"
         :information="packageMetadata"
+        :show-copy="true"
       />
       <package-installation
         v-else
