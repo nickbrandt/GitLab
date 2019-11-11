@@ -145,6 +145,8 @@ github.com/uber/jaeger-lib v1.5.0 h1:OHbgr8l656Ub3Fw5k9SWnBfIEwvoHQ+W2y+Aa9D1Uyo
 github.com/uber/jaeger-lib v1.5.0/go.mod h1:ComeNDZlWwrWnDv8aPp0Ba6+uUTzImX/AauajbLI56U=
 gitlab.com/gitlab-org/gitaly v1.68.0 h1:VlcJs1+PrhW7lqJUU7Fh1q8FMJujmbbivdfde/cwB98=
 gitlab.com/gitlab-org/gitaly v1.68.0/go.mod h1:/pCsB918Zu5wFchZ9hLYin9WkJ2yQqdVNz0zlv5HbXg=
+gitlab.com/gitlab-org/gitaly v1.71.0 h1:95jm3O2F1RLOmb1/T8JvIqrYUcbzGmHwkXcfJVlx/44=
+gitlab.com/gitlab-org/gitaly v1.71.0/go.mod h1:KbQEHVw+5OiobW3xy//PG74WHOWPzZJCCFhRmC4qGyE=
 gitlab.com/gitlab-org/labkit v0.0.0-20190221122536-0c3fc7cdd57c/go.mod h1:rYhLgfrbEcyfinG+R3EvKu6bZSsmwQqcXzLfHWSfUKM=
 gitlab.com/gitlab-org/labkit v0.0.0-20190731061835-905271af7abb h1:paYDdLtAfGc2s/P22izk93RsLURQl91RM9H3fh/RQ5o=
 gitlab.com/gitlab-org/labkit v0.0.0-20190731061835-905271af7abb/go.mod h1:gp7jA4Mxynii53zIEvaZcz/1cHlLdkiAbMWRUTiWO4M=
