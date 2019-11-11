@@ -24,5 +24,16 @@ module Geo
     def self.source_for(repository)
       REPOSITORY_TYPE_MAP[repository.repo_type]
     end
+
+    def consumer_klass_name
+      klass =
+        if design?
+          ::Gitlab::Geo::LogCursor::Events::DesignRepositoryUpdatedEvent
+        else
+          self.class
+        end
+
+      klass.name.demodulize
+    end
   end
 end
