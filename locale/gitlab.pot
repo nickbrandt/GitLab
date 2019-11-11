@@ -7407,6 +7407,9 @@ msgstr ""
 msgid "Filter by two-factor authentication"
 msgstr ""
 
+msgid "Filter by user"
+msgstr ""
+
 msgid "Filter projects"
 msgstr ""
 
