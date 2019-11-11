@@ -5,7 +5,6 @@ require 'spec_helper'
 describe Gitlab::GrafanaEmbedUsageData do
   describe '#issue_count', :use_clean_rails_memory_store_caching do
     subject do
-      described_class.write_issue_count
       described_class.issue_count
     end
 

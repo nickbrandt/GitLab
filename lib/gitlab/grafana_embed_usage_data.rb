@@ -4,13 +4,7 @@ module Gitlab
   class GrafanaEmbedUsageData
     class << self
       def issue_count
-        Rails.cache.read(:grafana_embed_issue_count)
-      end
-
-      def write_issue_count
-        count = get_embed_count
-        Rails.cache.write(:grafana_embed_issue_count, count)
-        count
+        get_embed_count
       end
 
       private
