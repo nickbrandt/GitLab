@@ -77,12 +77,12 @@ describe('User Popover Component', () => {
 
   describe('job data', () => {
     it('should show only bio if no organization is available', () => {
-      const testProps = Object.assign({}, DEFAULT_PROPS);
-      testProps.user.bio = 'Engineer';
+      const user = { ...DEFAULT_PROPS.user, bio: 'Engineer' };
 
       wrapper = shallowMount(UserPopover, {
         propsData: {
-          ...testProps,
+          ...DEFAULT_PROPS,
+          user,
           target: document.querySelector('.js-user-link'),
         },
         sync: false,
@@ -92,12 +92,12 @@ describe('User Popover Component', () => {
     });
 
     it('should show only organization if no bio is available', () => {
-      const testProps = Object.assign({}, DEFAULT_PROPS);
-      testProps.user.organization = 'GitLab';
+      const user = { ...DEFAULT_PROPS.user, organization: 'GitLab' };
 
       wrapper = shallowMount(UserPopover, {
         propsData: {
-          ...testProps,
+          ...DEFAULT_PROPS,
+          user,
           target: document.querySelector('.js-user-link'),
         },
         sync: false,
@@ -107,13 +107,12 @@ describe('User Popover Component', () => {
     });
 
     it('should display bio and organization in separate lines', () => {
-      const testProps = Object.assign({}, DEFAULT_PROPS);
-      testProps.user.bio = 'Engineer';
-      testProps.user.organization = 'GitLab';
+      const user = { ...DEFAULT_PROPS.user, bio: 'Engineer', organization: 'GitLab' };
 
       wrapper = shallowMount(UserPopover, {
         propsData: {
           ...DEFAULT_PROPS,
+          user,
           target: document.querySelector('.js-user-link'),
         },
         sync: false,
@@ -124,13 +123,16 @@ describe('User Popover Component', () => {
     });
 
     it('should not encode special characters in bio and organization', () => {
-      const testProps = Object.assign({}, DEFAULT_PROPS);
-      testProps.user.bio = 'Manager & Team Lead';
-      testProps.user.organization = 'Me & my <funky> Company';
+      const user = {
+        ...DEFAULT_PROPS.user,
+        bio: 'Manager & Team Lead',
+        organization: 'Me & my <funky> Company',
+      };
 
       wrapper = shallowMount(UserPopover, {
         propsData: {
           ...DEFAULT_PROPS,
+          user,
           target: document.querySelector('.js-user-link'),
         },
         sync: false,
@@ -153,35 +155,69 @@ describe('User Popover Component', () => {
 
   describe('status data', () => {
     it('should show only message', () => {
-      const testProps = Object.assign({}, DEFAULT_PROPS);
-      testProps.user.status = { message_html: 'Hello World' };
+      const user = { ...DEFAULT_PROPS.user, status: { message_html: 'Hello World' } };
 
       wrapper = shallowMount(UserPopover, {
         propsData: {
           ...DEFAULT_PROPS,
+          user,
           target: document.querySelector('.js-user-link'),
         },
         sync: false,
       });
 
+      expect(wrapper.find('.js-user-status').exists()).toBe(true);
       expect(wrapper.text()).toContain('Hello World');
     });
 
     it('should show message and emoji', () => {
-      const testProps = Object.assign({}, DEFAULT_PROPS);
-      testProps.user.status = { emoji: 'basketball_player', message_html: 'Hello World' };
+      const user = {
+        ...DEFAULT_PROPS.user,
+        status: { emoji: 'basketball_player', message_html: 'Hello World' },
+      };
 
       wrapper = shallowMount(UserPopover, {
         propsData: {
           ...DEFAULT_PROPS,
+          user,
           target: document.querySelector('.js-user-link'),
-          status: { emoji: 'basketball_player', message_html: 'Hello World' },
         },
         sync: false,
       });
 
+      expect(wrapper.find('.js-user-status').exists()).toBe(true);
       expect(wrapper.text()).toContain('Hello World');
       expect(wrapper.html()).toContain('<gl-emoji data-name="basketball_player"');
+    });
+
+    it('hides the div when status is null', () => {
+      const user = { ...DEFAULT_PROPS.user, status: null };
+
+      wrapper = shallowMount(UserPopover, {
+        propsData: {
+          ...DEFAULT_PROPS,
+          user,
+          target: document.querySelector('.js-user-link'),
+        },
+        sync: false,
+      });
+
+      expect(wrapper.find('.js-user-status').exists()).toBe(false);
+    });
+
+    it('hides the div when status is empty', () => {
+      const user = { ...DEFAULT_PROPS.user, status: { emoji: '', message_html: '' } };
+
+      wrapper = shallowMount(UserPopover, {
+        propsData: {
+          ...DEFAULT_PROPS,
+          user,
+          target: document.querySelector('.js-user-link'),
+        },
+        sync: false,
+      });
+
+      expect(wrapper.find('.js-user-status').exists()).toBe(false);
     });
   });
 });
