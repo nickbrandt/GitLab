@@ -66,7 +66,7 @@ module EE
       scope :has_parent, -> { where.not(parent_id: nil) }
 
       scope :order_start_or_end_date_asc, -> do
-        reorder("COALESCE(start_date, end_date) ASC NULLS FIRST")
+        reorder(Arel.sql("COALESCE(start_date, end_date) ASC NULLS FIRST"))
       end
 
       scope :order_start_date_asc, -> do
