@@ -5,6 +5,7 @@ import { mockProjectData } from '../mock_data';
 
 describe('mutations', () => {
   const projects = mockProjectData(3);
+  const projectIds = projects.map(p => p.id);
   const mockEndpoint = 'https://mock-endpoint';
   let localState;
 
@@ -29,11 +30,37 @@ describe('mutations', () => {
   });
 
   describe('SET_PROJECTS', () => {
+    beforeEach(() => {
+      localState.projectEndpoints.list = 'listEndpoint';
+    });
+
     it('sets projects', () => {
+      spyOn(window.localStorage, 'setItem');
+
       mutations[types.SET_PROJECTS](localState, projects);
 
       expect(localState.projects).toEqual(projects);
       expect(localState.isLoadingProjects).toEqual(false);
+    });
+
+    it('stores project IDs in localstorage', () => {
+      const saveToLocalStorage = spyOn(window.localStorage, 'setItem');
+
+      mutations[types.SET_PROJECTS](localState, projects);
+
+      expect(saveToLocalStorage).toHaveBeenCalledWith('listEndpoint', projectIds);
+    });
+
+    it('shows warning Alert if localStorage not available', () => {
+      spyOn(window.localStorage, 'setItem').and.throwError('QUOTA_EXCEEDED_ERR: DOM Exception 22');
+      const createFlash = spyOnDependency(mutations, 'createFlash');
+
+      mutations[types.SET_PROJECTS](localState, projects);
+
+      expect(createFlash).toHaveBeenCalledWith(
+        'Project order will not be saved as local storage is not available.',
+        'warning',
+      );
     });
   });
 
@@ -84,12 +111,53 @@ describe('mutations', () => {
   });
 
   describe('RECEIVE_PROJECTS_SUCCESS', () => {
+    const projectListEndpoint = 'projectListEndpoint';
+    let saveToLocalStorage;
+
+    beforeEach(() => {
+      localState.projectEndpoints.list = projectListEndpoint;
+      saveToLocalStorage = spyOn(window.localStorage, 'setItem');
+    });
+
     it('sets the project list and clears the loading status', () => {
       mutations[types.RECEIVE_PROJECTS_SUCCESS](localState, projects);
 
       expect(localState.projects).toEqual(projects);
-
       expect(localState.isLoadingProjects).toBe(false);
+    });
+
+    it('saves projects to localStorage', () => {
+      mutations[types.RECEIVE_PROJECTS_SUCCESS](localState, projects);
+
+      expect(saveToLocalStorage).toHaveBeenCalledWith(projectListEndpoint, projectIds);
+    });
+
+    it('orders the projects from localstorage', () => {
+      spyOn(window.localStorage, 'getItem').and.callFake(key => {
+        if (key === projectListEndpoint) {
+          return '2,0,1';
+        }
+        return null;
+      });
+      const expectedOrder = [projects[2], projects[0], projects[1]];
+
+      mutations[types.RECEIVE_PROJECTS_SUCCESS](localState, projects);
+
+      expect(localState.projects).toEqual(expectedOrder);
+    });
+
+    it('places unsorted projects after sorted ones', () => {
+      spyOn(window.localStorage, 'getItem').and.callFake(key => {
+        if (key === projectListEndpoint) {
+          return '1,2';
+        }
+        return null;
+      });
+      const expectedOrder = [projects[1], projects[2], projects[0]];
+
+      mutations[types.RECEIVE_PROJECTS_SUCCESS](localState, projects);
+
+      expect(localState.projects).toEqual(expectedOrder);
     });
   });
 

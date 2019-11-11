@@ -182,5 +182,9 @@ export const minimumQueryMessage = ({ commit }) => {
   commit(types.MINIMUM_QUERY_MESSAGE);
 };
 
+export const setProjects = ({ commit }, projects) => {
+  commit(types.SET_PROJECTS, projects);
+};
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
