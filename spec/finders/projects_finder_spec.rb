@@ -58,6 +58,22 @@ describe ProjectsFinder, :do_not_mock_admin_mode do
       it { is_expected.to eq([internal_project]) }
     end
 
+    describe 'with id_after' do
+      context 'only returns projects with a project id greater than given' do
+        let(:params) { { id_after: internal_project.id }}
+
+        it { is_expected.to eq([public_project]) }
+      end
+    end
+
+    describe 'with id_before' do
+      context 'only returns projects with a project id less than given' do
+        let(:params) { { id_before: public_project.id }}
+
+        it { is_expected.to eq([internal_project]) }
+      end
+    end
+
     describe 'filter by visibility_level' do
       before do
         private_project.add_maintainer(user)
