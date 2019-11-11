@@ -84,6 +84,7 @@ module Gitlab
             issues: count(Issue),
             issues_with_associated_zoom_link: count(ZoomMeeting.added_to_issue),
             issues_using_zoom_quick_actions: count(ZoomMeeting.select(:issue_id).distinct),
+            issues_with_embeded_grafana_charts: Gitlab::GrafanaEmbedUsageData.count_issues,
             keys: count(Key),
             label_lists: count(List.label),
             lfs_objects: count(LfsObject),

@@ -18,6 +18,9 @@ class GitlabUsagePingWorker
     # Splay the request over a minute to avoid thundering herd problems.
     sleep(rand(0.0..60.0).round(3))
 
+    # Cache to decouple long running work from the http request context
+    Gitlab::GrafanaEmbedUsageData.write_issue_count
+
     SubmitUsagePingService.new.execute
   end
 
