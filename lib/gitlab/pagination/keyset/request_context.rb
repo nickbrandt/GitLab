@@ -6,7 +6,8 @@ module Gitlab
       class RequestContext
         attr_reader :request
 
-        REQUEST_PARAM = :id_after
+        DEFAULT_SORT_DIRECTION = :asc
+        TIE_BREAKER = { id: :desc }.freeze
 
         def initialize(request)
           @request = request
@@ -14,25 +15,51 @@ module Gitlab
 
         # extracts Paging information from request parameters
         def page
-          last_value = request.params[REQUEST_PARAM]
-
-          Page.new(last_value, per_page: request.params[:per_page], is_first_page: !last_value.nil?)
+          Page.new(order_by: order_by, per_page: params[:per_page])
         end
 
-        def apply_headers(paged_relation)
-          next_page = paged_relation.next_page
-          links = pagination_links(next_page)
-
-          request.header('Links', links.join(', '))
+        def apply_headers(next_page)
+          request.header('Links', pagination_links(next_page))
         end
 
         private
 
-        def pagination_links(next_page)
-          [].tap do |links|
-            links << %(<#{page_href}>; rel="first")
-            links << %(<#{page_href(next_page)}>; rel="next") unless next_page.empty?
+        def order_by
+          return TIE_BREAKER.dup unless params[:order_by]
+
+          order_by = { params[:order_by]&.to_sym => params[:sort]&.to_sym || DEFAULT_SORT_DIRECTION }
+
+          # Order by an additional unique key, we use the primary key here
+          order_by = order_by.merge(TIE_BREAKER) unless order_by[:id]
+
+          order_by
+        end
+
+        def lower_bounds_params(page)
+          page.lower_bounds.each_with_object({}) do |(column, value), params|
+            filter = filter_with_comparator(page, column)
+            params[filter] = value
           end
+        end
+
+        def filter_with_comparator(page, column)
+          direction = page.order_by[column]
+
+          if direction&.to_sym == :desc
+            "#{column}_before"
+          else
+            "#{column}_after"
+          end
+        end
+
+        def params
+          @params ||= request.params
+        end
+
+        def pagination_links(next_page)
+          return if next_page.end_reached?
+
+          %(<#{page_href(next_page)}>; rel="next")
         end
 
         def base_request_uri
@@ -43,14 +70,10 @@ module Gitlab
         end
 
         def query_params_for(page)
-          if page && !page.empty?
-            request.params.merge(REQUEST_PARAM => page.last_value)
-          else
-            request.params.except(REQUEST_PARAM)
-          end
+          request.params.merge(lower_bounds_params(page))
         end
 
-        def page_href(page = nil)
+        def page_href(page)
           base_request_uri.tap do |uri|
             uri.query = query_params_for(page).to_query
           end.to_s

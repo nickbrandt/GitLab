@@ -3,30 +3,40 @@
 module Gitlab
   module Pagination
     module Keyset
+      # A Page models the pagination information for a particular page of the collection
       class Page
+        # Default and maximum size of records for a page
         DEFAULT_PAGE_SIZE = 20
 
-        attr_reader :last_value, :column
+        attr_accessor :lower_bounds, :end_reached
+        attr_reader :order_by
 
-        def initialize(last_value, column: :id, per_page: DEFAULT_PAGE_SIZE, is_first_page: false)
-          @last_value = last_value
-          @column = column
-          @per_page = per_page || DEFAULT_PAGE_SIZE
-          @is_first_page = is_first_page
+        def initialize(order_by: {}, lower_bounds: nil, per_page: DEFAULT_PAGE_SIZE, end_reached: false)
+          @order_by = order_by
+          @lower_bounds = lower_bounds
+          @per_page = per_page
+          @end_reached = end_reached
         end
 
+        # Number of records to return per page
         def per_page
           return DEFAULT_PAGE_SIZE if @per_page <= 0
 
           [@per_page, DEFAULT_PAGE_SIZE].min
         end
 
-        def empty?
-          last_value.nil? && !first_page?
+        # Determine whether this page indicates the end of the collection
+        def end_reached?
+          @end_reached
         end
 
-        def first_page?
-          @is_first_page
+        # Construct a Page for the next page
+        # Uses identical order_by/per_page information for the next page
+        def next(lower_bounds, end_reached)
+          dup.tap do |next_page|
+            next_page.lower_bounds = lower_bounds
+            next_page.end_reached = end_reached
+          end
         end
       end
     end

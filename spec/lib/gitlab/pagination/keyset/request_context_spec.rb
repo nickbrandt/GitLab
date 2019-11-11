@@ -4,59 +4,73 @@ require 'spec_helper'
 
 describe Gitlab::Pagination::Keyset::RequestContext do
   let(:request) { double('request', params: params) }
-  let(:params) { { id_after: 5, per_page: 10 } }
 
   describe '#page' do
     subject { described_class.new(request).page }
 
-    it 'extracts last_value information' do
-      page = subject
+    let(:params) { { order_by: :id } }
 
-      expect(page.last_value).to eq(params[:id_after])
-    end
+    context 'with only order_by given' do
+      let(:params) { { order_by: :id } }
 
-    it 'extracts per_page information' do
-      page = subject
-
-      expect(page.per_page).to eq(params[:per_page])
-    end
-
-    context 'with no id_after value present' do
-      let(:params) { { id_after: 5, per_page: 10 } }
-
-      it 'indicates this is the first page' do
+      it 'extracts order_by/sorting information' do
         page = subject
 
-        expect(page.first_page?).to be_truthy
+        expect(page.order_by).to eq(id: :asc)
+      end
+    end
+
+    context 'with order_by and sort given' do
+      let(:params) { { order_by: :created_at, sort: :desc } }
+
+      it 'extracts order_by/sorting information and adds tie breaker' do
+        page = subject
+
+        expect(page.order_by).to eq(created_at: :desc, id: :desc)
+      end
+    end
+
+    context 'with no order_by information given' do
+      let(:params) { {} }
+
+      it 'defaults to tie breaker' do
+        page = subject
+
+        expect(page.order_by).to eq({ id: :desc })
+      end
+    end
+
+    context 'with per_page params given' do
+      let(:params) { { per_page: 10 } }
+
+      it 'extracts per_page information' do
+        page = subject
+
+        expect(page.per_page).to eq(params[:per_page])
       end
     end
   end
 
   describe '#apply_headers' do
-    let(:paged_relation) { double('paged relation', next_page: next_page) }
     let(:request) { double('request', url: "http://#{Gitlab.config.gitlab.host}/api/v4/projects?foo=bar") }
     let(:params) { { foo: 'bar' } }
     let(:request_context) { double('request context', params: params, request: request) }
-    let(:next_page) { double('next page', last_value: 42, empty?: false) }
+    let(:next_page) { double('next page', order_by: { id: :asc }, lower_bounds: { id: 42 }, end_reached?: false) }
 
-    subject { described_class.new(request_context).apply_headers(paged_relation) }
+    subject { described_class.new(request_context).apply_headers(next_page) }
 
-    it 'sets Links header with a link to the first page' do
+    it 'sets Links header with same host/path as the original request' do
       orig_uri = URI.parse(request_context.request.url)
 
       expect(request_context).to receive(:header) do |name, header|
         expect(name).to eq('Links')
 
-        first_link, _ = /<([^>]+)>; rel="first"/.match(header).captures
+        first_link, _ = /<([^>]+)>; rel="next"/.match(header).captures
 
-        URI.parse(first_link).tap do |uri|
-          expect(uri.host).to eq(orig_uri.host)
-          expect(uri.path).to eq(orig_uri.path)
+        uri = URI.parse(first_link)
 
-          query = CGI.parse(uri.query)
-          expect(query.except('id_after')).to eq(CGI.parse(orig_uri.query).except("id_after"))
-          expect(query['id_after']).to be_empty
-        end
+        expect(uri.host).to eq(orig_uri.host)
+        expect(uri.path).to eq(orig_uri.path)
       end
 
       subject
@@ -70,17 +84,34 @@ describe Gitlab::Pagination::Keyset::RequestContext do
 
         first_link, _ = /<([^>]+)>; rel="next"/.match(header).captures
 
-        URI.parse(first_link).tap do |uri|
-          expect(uri.host).to eq(orig_uri.host)
-          expect(uri.path).to eq(orig_uri.path)
+        query = CGI.parse(URI.parse(first_link).query)
 
-          query = CGI.parse(uri.query)
-          expect(query.except('id_after')).to eq(CGI.parse(orig_uri.query).except("id_after"))
-          expect(query['id_after']).to eq(["42"])
-        end
+        expect(query.except('id_after')).to eq(CGI.parse(orig_uri.query).except('id_after'))
+        expect(query['id_after']).to eq(['42'])
       end
 
       subject
+    end
+
+    context 'with descending order' do
+      let(:next_page) { double('next page', order_by: { id: :desc }, lower_bounds: { id: 42 }, end_reached?: false) }
+
+      it 'sets Links header with a link to the next page' do
+        orig_uri = URI.parse(request_context.request.url)
+
+        expect(request_context).to receive(:header) do |name, header|
+          expect(name).to eq('Links')
+
+          first_link, _ = /<([^>]+)>; rel="next"/.match(header).captures
+
+          query = CGI.parse(URI.parse(first_link).query)
+
+          expect(query.except('id_before')).to eq(CGI.parse(orig_uri.query).except('id_before'))
+          expect(query['id_before']).to eq(['42'])
+        end
+
+        subject
+      end
     end
   end
 end

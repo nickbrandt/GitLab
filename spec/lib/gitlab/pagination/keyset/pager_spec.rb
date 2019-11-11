@@ -3,54 +3,40 @@
 require 'spec_helper'
 
 describe Gitlab::Pagination::Keyset::Pager do
-  let(:relation) { Project.all }
-  let(:request) { double('request', page: page) }
-  let(:page) { double('page', per_page: 20, column: :id, last_value: 10) }
+  let(:relation) { Project.all.order(id: :asc) }
+  let(:request) { double('request', page: page, apply_headers: nil) }
+  let(:page) { double('page', per_page: 20, order_by: { id: :asc }, lower_bounds: nil, next: nil) }
+  let(:next_page) { double('next page') }
+
+  before_all do
+    create_list(:project, 5)
+  end
 
   describe '#paginate' do
     subject { described_class.new(request).paginate(relation) }
 
     it 'applies a limit' do
-      allow(relation).to receive(:order).and_return(relation)
       expect(relation).to receive(:limit).with(page.per_page).and_call_original
 
       subject
     end
 
-    it 'sorts by pagination order' do
-      allow(relation).to receive(:limit).and_return(relation)
-      expect(relation).to receive(:reorder).with(page.column => :asc).and_call_original
-
-      subject
-    end
-
-    context 'without paging information' do
-      let(:page) { double('page', per_page: 20, column: :id, last_value: nil) }
-
-      it 'considers this the first page and does not apply any filter' do
-        allow(relation).to receive(:limit).and_return(relation)
-
-        expect(relation).not_to receive(:where)
-
+    it 'loads the result relation only once' do
+      expect do
         subject
-      end
+      end.not_to exceed_query_limit(1)
     end
 
-    it 'applies a filter based on the paging information' do
-      allow(relation).to receive(:limit).and_return(relation)
-      allow(relation).to receive(:order).and_return(relation)
-
-      expect(relation).to receive(:where).with('id > ?', 10).and_call_original
+    it 'passes information about next page to request' do
+      lower_bounds = relation.last.slice(:id)
+      expect(page).to receive(:next).with(lower_bounds, false).and_return(next_page)
+      expect(request).to receive(:apply_headers).with(next_page)
 
       subject
     end
 
-    it 'adds limit, order,where to the query' do
-      expect(subject.relation).to eq(Project.where('id > ?', page.last_value).limit(page.per_page).order(id: :asc))
-    end
-
-    it 'passes through the page information' do
-      expect(subject.page).to eq(page)
+    it 'returns the limited relation' do
+      expect(subject).to eq(relation.limit(20))
     end
   end
 end
