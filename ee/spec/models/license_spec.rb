@@ -647,6 +647,67 @@ describe License do
     end
   end
 
+  describe 'Trial Licenses' do
+    before do
+      ApplicationSetting.create_from_defaults
+      stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
+    end
+
+    describe 'Update trial setting' do
+      context 'when the license is not trial' do
+        before do
+          gl_license.restrictions = { trial: false }
+          gl_license.expires_at = Date.tomorrow
+        end
+
+        it 'returns nil' do
+          updated = license.update_trial_setting
+          expect(updated).to be_nil
+          expect(ApplicationSetting.current.license_trial_ends_on).to be_nil
+        end
+      end
+
+      context 'when the license is the very first trial' do
+        let(:tomorrow) { Date.tomorrow }
+        before do
+          gl_license.restrictions = { trial: true }
+          gl_license.expires_at = tomorrow
+        end
+
+        it 'is eligible for trial' do
+          expect(described_class.eligible_for_trial?).to be_truthy
+        end
+
+        it 'updates the trial setting' do
+          updated = license.update_trial_setting
+
+          expect(updated).to be_truthy
+          expect(described_class.eligible_for_trial?).to be_falsey
+          expect(ApplicationSetting.current.license_trial_ends_on).to eq(tomorrow)
+        end
+      end
+
+      context 'when the license is a repeated trial' do
+        let(:yesterday) { Date.yesterday }
+        before do
+          gl_license.restrictions = { trial: true }
+          gl_license.expires_at = Date.tomorrow
+          ApplicationSetting.current.update license_trial_ends_on: yesterday
+        end
+
+        it 'does not update existing trial setting' do
+          updated = license.update_trial_setting
+          expect(updated).to be_falsey
+          expect(ApplicationSetting.current.license_trial_ends_on).to eq(yesterday)
+        end
+
+        it 'is not eligible for trial' do
+          expect(described_class.eligible_for_trial?).to be_falsey
+        end
+      end
+    end
+  end
+
   def set_restrictions(opts)
     gl_license.restrictions = {
       active_user_count: opts[:restricted_user_count],

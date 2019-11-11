@@ -262,6 +262,14 @@ class License < ApplicationRecord
     def global_feature?(feature)
       GLOBAL_FEATURES.include?(feature)
     end
+
+    def eligible_for_trial?
+      Gitlab::CurrentSettings.license_trial_ends_on.nil?
+    end
+
+    def trial_ends_on
+      Gitlab::CurrentSettings.license_trial_ends_on
+    end
   end
 
   def data_filename
@@ -424,6 +432,17 @@ class License < ApplicationRecord
   def historical_max_with_default_period
     @historical_max_with_default_period ||=
       historical_max
+  end
+
+  def update_trial_setting
+    return unless license.restrictions[:trial]
+    return if license.expires_at.nil?
+
+    settings = ApplicationSetting.current
+    return if settings.nil?
+    return if settings.license_trial_ends_on.present?
+
+    settings.update license_trial_ends_on: license.expires_at
   end
 
   private

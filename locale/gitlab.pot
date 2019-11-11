@@ -10103,6 +10103,27 @@ msgstr ""
 msgid "Licenses"
 msgstr ""
 
+msgid "License|Buy license"
+msgstr ""
+
+msgid "License|License"
+msgstr ""
+
+msgid "License|You can restore access to the Gold features at any time by upgrading."
+msgstr ""
+
+msgid "License|You can start a free trial of GitLab Ultimate without any obligation or payment details."
+msgstr ""
+
+msgid "License|You do not have a license."
+msgstr ""
+
+msgid "License|Your License"
+msgstr ""
+
+msgid "License|Your free trial of GitLab Ultimate expired on %{trial_ends_on}."
+msgstr ""
+
 msgid "Limit display of time tracking units to hours."
 msgstr ""
 
