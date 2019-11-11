@@ -6,7 +6,8 @@ describe Namespace do
   include EE::GeoHelpers
 
   let!(:namespace) { create(:namespace) }
-  let!(:free_plan) { create(:free_plan) }
+  let(:default_plan) { create(:default_plan) }
+  let(:free_plan) { create(:free_plan) }
   let!(:bronze_plan) { create(:bronze_plan) }
   let!(:silver_plan) { create(:silver_plan) }
   let!(:gold_plan) { create(:gold_plan) }
@@ -676,9 +677,31 @@ describe Namespace do
     end
 
     context 'when namespace does not have a subscription associated' do
-      it 'generates a subscription with the Free plan' do
-        expect(namespace.actual_plan).to eq(free_plan)
+      it 'generates a subscription without a plan' do
+        expect(namespace.actual_plan).to be_nil
         expect(namespace.gitlab_subscription).to be_present
+      end
+
+      context 'when free plan does exist' do
+        before do
+          free_plan
+        end
+
+        it 'generates a subscription' do
+          expect(namespace.actual_plan).to eq(free_plan)
+          expect(namespace.gitlab_subscription).to be_present
+        end
+      end
+
+      context 'when default plan does exist' do
+        before do
+          default_plan
+        end
+
+        it 'generates a subscription' do
+          expect(namespace.actual_plan).to eq(default_plan)
+          expect(namespace.gitlab_subscription).to be_present
+        end
       end
     end
   end

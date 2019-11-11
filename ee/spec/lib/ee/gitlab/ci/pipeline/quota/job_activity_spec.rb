@@ -3,10 +3,8 @@
 require 'spec_helper'
 
 describe EE::Gitlab::Ci::Pipeline::Quota::JobActivity do
-  set(:namespace) { create(:namespace) }
-  set(:project) { create(:project, namespace: namespace) }
-
-  let(:active_jobs_limit) { 0 }
+  let_it_be(:namespace, refind: true) { create(:namespace) }
+  let_it_be(:project, refind: true) { create(:project, namespace: namespace) }
   let(:gold_plan) { create(:gold_plan, active_jobs_limit: active_jobs_limit) }
 
   let(:limit) { described_class.new(namespace, project) }
@@ -25,6 +23,8 @@ describe EE::Gitlab::Ci::Pipeline::Quota::JobActivity do
     end
 
     context 'when limit is not enabled' do
+      let(:active_jobs_limit) { 0 }
+
       it 'is not enabled' do
         expect(limit).not_to be_enabled
       end

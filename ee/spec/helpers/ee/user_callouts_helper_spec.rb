@@ -219,7 +219,7 @@ describe EE::UserCalloutsHelper do
   describe '#render_billings_gold_trial' do
     using RSpec::Parameterized::TableSyntax
 
-    set(:namespace) { create(:namespace) }
+    let(:namespace) { create(:namespace) }
     set(:free_plan) { create(:free_plan) }
     set(:silver_plan) { create(:silver_plan) }
     set(:gold_plan) { create(:gold_plan) }

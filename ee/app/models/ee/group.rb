@@ -224,7 +224,7 @@ module EE
     # for billing purposes.
     override :billable_members_count
     def billable_members_count(requested_hosted_plan = nil)
-      if [actual_plan_name, requested_hosted_plan].include?(Namespace::GOLD_PLAN)
+      if [actual_plan_name, requested_hosted_plan].include?(Plan::GOLD)
         users_with_descendants.excluding_guests.count
       else
         users_with_descendants.count

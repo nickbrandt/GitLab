@@ -10,22 +10,15 @@ module EE
     extend ::Gitlab::Utils::Override
     include ::Gitlab::Utils::StrongMemoize
 
-    FREE_PLAN = 'free'.freeze
-
-    BRONZE_PLAN = 'bronze'.freeze
-    SILVER_PLAN = 'silver'.freeze
-    GOLD_PLAN = 'gold'.freeze
-    EARLY_ADOPTER_PLAN = 'early_adopter'.freeze
-
     NAMESPACE_PLANS_TO_LICENSE_PLANS = {
-      BRONZE_PLAN        => License::STARTER_PLAN,
-      SILVER_PLAN        => License::PREMIUM_PLAN,
-      GOLD_PLAN          => License::ULTIMATE_PLAN,
-      EARLY_ADOPTER_PLAN => License::EARLY_ADOPTER_PLAN
+      Plan::BRONZE        => License::STARTER_PLAN,
+      Plan::SILVER        => License::PREMIUM_PLAN,
+      Plan::GOLD          => License::ULTIMATE_PLAN,
+      Plan::EARLY_ADOPTER => License::EARLY_ADOPTER_PLAN
     }.freeze
 
     LICENSE_PLANS_TO_NAMESPACE_PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.invert.freeze
-    PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.keys.freeze
+    PLANS = (NAMESPACE_PLANS_TO_LICENSE_PLANS.keys + [Plan::FREE]).freeze
 
     CI_USAGE_ALERT_LEVELS = [30, 5].freeze
 
@@ -148,13 +141,15 @@ module EE
     end
 
     def actual_plan
-      subscription = find_or_create_subscription
+      strong_memoize(:actual_plan) do
+        subscription = find_or_create_subscription
 
-      subscription&.hosted_plan
+        subscription&.hosted_plan || Plan.free || Plan.default
+      end
     end
 
     def actual_plan_name
-      actual_plan&.name || FREE_PLAN
+      actual_plan&.name || Plan::FREE
     end
 
     def actual_size_limit
@@ -252,7 +247,7 @@ module EE
       ::Gitlab.com? &&
         parent_id.nil? &&
         trial_ends_on.blank? &&
-        [EARLY_ADOPTER_PLAN, FREE_PLAN].include?(actual_plan_name)
+        [Plan::EARLY_ADOPTER, Plan::FREE].include?(actual_plan_name)
     end
 
     def trial_active?
@@ -266,7 +261,7 @@ module EE
     def trial_expired?
       trial_ends_on.present? &&
         trial_ends_on < Date.today &&
-        actual_plan_name == FREE_PLAN
+        actual_plan_name == Plan::FREE
     end
 
     # A namespace may not have a file template project
@@ -286,23 +281,23 @@ module EE
     end
 
     def free_plan?
-      actual_plan_name == FREE_PLAN
+      actual_plan_name == Plan::FREE
     end
 
     def early_adopter_plan?
-      actual_plan_name == EARLY_ADOPTER_PLAN
+      actual_plan_name == Plan::EARLY_ADOPTER
     end
 
     def bronze_plan?
-      actual_plan_name == BRONZE_PLAN
+      actual_plan_name == Plan::BRONZE
     end
 
     def silver_plan?
-      actual_plan_name == SILVER_PLAN
+      actual_plan_name == Plan::SILVER
     end
 
     def gold_plan?
-      actual_plan_name == GOLD_PLAN
+      actual_plan_name == Plan::GOLD
     end
 
     def use_elasticsearch?
