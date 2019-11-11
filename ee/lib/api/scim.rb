@@ -95,8 +95,6 @@ module API
           detail 'This feature was introduced in GitLab 11.10.'
         end
         get do
-          scim_error!(message: 'Missing filter params') unless params[:filter]
-
           group = find_and_authenticate_group!(params[:group])
 
           results = ScimFinder.new(group).search(params)
@@ -106,6 +104,8 @@ module API
 
           result_set = { resources: response_page, total_results: results.count, items_per_page: per_page(params[:count]), start_index: params[:startIndex] }
           present result_set, with: ::EE::Gitlab::Scim::Users
+        rescue ScimFinder::UnsupportedFilter
+          scim_error!(message: 'Unsupported Filter')
         end
 
         desc 'Get a SAML user' do
