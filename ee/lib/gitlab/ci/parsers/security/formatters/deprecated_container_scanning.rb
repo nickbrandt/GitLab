@@ -1,17 +1,19 @@
 # frozen_string_literal: true
 
+# TODO: remove this class when we no longer need to support legacy
+# clair-scanner data. See https://gitlab.com/gitlab-org/gitlab/issues/35442
 module Gitlab
   module Ci
     module Parsers
       module Security
         module Formatters
-          class ContainerScanning
+          class DeprecatedContainerScanning
             def initialize(image)
               @image = image
             end
 
             def format(vulnerability)
-              formatted_vulnerability = FormattedContainerScanningVulnerability.new(vulnerability)
+              formatted_vulnerability = DeprecatedFormattedContainerScanningVulnerability.new(vulnerability)
 
               {
                 'category' => 'container_scanning',

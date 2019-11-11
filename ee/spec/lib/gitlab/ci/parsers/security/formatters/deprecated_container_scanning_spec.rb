@@ -2,19 +2,19 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::Security::Formatters::ContainerScanning do
-  let(:raw_report) do
-    JSON.parse!(
-      File.read(
-        Rails.root.join('ee/spec/fixtures/security_reports/master/gl-container-scanning-report.json')
-      )
-    )
-  end
-
+describe Gitlab::Ci::Parsers::Security::Formatters::DeprecatedContainerScanning do
   let(:vulnerability) { raw_report['vulnerabilities'].first }
 
   describe '#format' do
-    it 'format ZAP vulnerability into the 1.3 format' do
+    let(:raw_report) do
+      JSON.parse!(
+        File.read(
+          Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-container-scanning-report.json')
+        )
+      )
+    end
+
+    it 'formats the vulnerability into the 1.3 format' do
       formatter = described_class.new('image_name')
 
       expect(formatter.format(vulnerability)).to eq( {

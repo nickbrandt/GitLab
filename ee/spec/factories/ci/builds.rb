@@ -72,6 +72,12 @@ FactoryBot.define do
       end
     end
 
+    trait :deprecated_container_scanning_report do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :deprecated_container_scanning_report, job: build)
+      end
+    end
+
     trait :dependency_scanning_feature_branch do
       after(:build) do |build|
         build.job_artifacts << create(:ee_ci_job_artifact, :dependency_scanning_feature_branch, job: build)
