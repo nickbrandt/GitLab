@@ -14,16 +14,18 @@ function deploy_exists() {
 }
 
 function previous_deploy_failed() {
-  local deploy="${1}"
+  local namespace="${1}"
+  local deploy="${2}"
+
   echoinfo "Checking for previous deployment of ${deploy}" true
 
-  helm status "${deploy}" >/dev/null 2>&1
+  helm status --tiller-namespace "${namespace}" "${deploy}" >/dev/null 2>&1
   local status=$?
 
   # if `status` is `0`, deployment exists, has a status
   if [ $status -eq 0 ]; then
     echoinfo "Previous deployment found, checking status..."
-    deployment_status=$(helm status "${deploy}" | grep ^STATUS | cut -d' ' -f2)
+    deployment_status=$(helm status --tiller-namespace "${namespace}" "${deploy}" | grep ^STATUS | cut -d' ' -f2)
     echoinfo "Previous deployment state: ${deployment_status}"
     if [[ "$deployment_status" == "FAILED" || "$deployment_status" == "PENDING_UPGRADE" || "$deployment_status" == "PENDING_INSTALL" ]]; then
       status=0;
@@ -37,16 +39,17 @@ function previous_deploy_failed() {
 }
 
 function delete_release() {
-  if [ -z "$CI_ENVIRONMENT_SLUG" ]; then
+  local namespace="${KUBE_NAMESPACE}"
+  local deploy="${CI_ENVIRONMENT_SLUG}"
+
+  if [ -z "$deploy" ]; then
     echoerr "No release given, aborting the delete!"
     return
   fi
 
-  local name="$CI_ENVIRONMENT_SLUG"
+  echoinfo "Deleting release '$deploy'..." true
 
-  echoinfo "Deleting release '$name'..." true
-
-  helm delete --purge "$name"
+  helm delete --purge --tiller-namespace "${namespace}" "$deploy"
 }
 
 function delete_failed_release() {
@@ -59,7 +62,7 @@ function delete_failed_release() {
     echoinfo "No Review App with ${CI_ENVIRONMENT_SLUG} is currently deployed."
   else
     # Cleanup and previous installs, as FAILED and PENDING_UPGRADE will cause errors with `upgrade`
-    if previous_deploy_failed "$CI_ENVIRONMENT_SLUG" ; then
+    if previous_deploy_failed "${KUBE_NAMESPACE}" "$CI_ENVIRONMENT_SLUG" ; then
       echoinfo "Review App deployment in bad state, cleaning up $CI_ENVIRONMENT_SLUG"
       delete_release
     else
@@ -147,7 +150,7 @@ function install_external_dns() {
   domain=$(echo "${REVIEW_APPS_DOMAIN}" | awk -F. '{printf "%s.%s", $(NF-1), $NF}')
   echoinfo "Installing external DNS for domain ${domain}..." true
 
-  if ! deploy_exists "${KUBE_NAMESPACE}" "${release_name}" || previous_deploy_failed "${release_name}" ; then
+  if ! deploy_exists "${KUBE_NAMESPACE}" "${release_name}" || previous_deploy_failed "${KUBE_NAMESPACE}" "${release_name}" ; then
     echoinfo "Installing external-dns Helm chart"
     helm repo update
     # Default requested: CPU => 0, memory => 0
