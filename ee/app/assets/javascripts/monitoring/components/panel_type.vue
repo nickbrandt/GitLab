@@ -20,6 +20,11 @@ export default {
       required: false,
       default: false,
     },
+    groupId: {
+      type: String,
+      required: false,
+      default: 'panel-type-chart',
+    },
   },
   data() {
     return {
