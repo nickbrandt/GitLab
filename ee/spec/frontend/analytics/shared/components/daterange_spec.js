@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Daterange from 'ee/analytics/shared/components/daterange.vue';
 import { GlDaterangePicker } from '@gitlab/ui';
 
@@ -11,7 +11,7 @@ describe('Daterange component', () => {
   let wrapper;
 
   const factory = (props = defaultProps) => {
-    wrapper = shallowMount(Daterange, {
+    wrapper = mount(Daterange, {
       propsData: {
         ...defaultProps,
         ...props,
@@ -41,6 +41,28 @@ describe('Daterange component', () => {
       it('renders the daterange picker', () => {
         factory({ show: true });
         expect(findDaterangePicker().exists()).toBe(true);
+      });
+    });
+
+    describe('with a minDate being set', () => {
+      it('emits the change event with the minDate when the user enters a start date before the minDate', () => {
+        const startDate = new Date('2019-09-01');
+        const endDate = new Date('2019-09-30');
+        const minDate = new Date('2019-06-01');
+
+        factory({ show: true, startDate, endDate, minDate });
+
+        const input = findDaterangePicker().find('input');
+
+        input.setValue('2019-01-01');
+        input.trigger('change');
+
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'change',
+            args: [{ startDate: minDate, endDate }],
+          },
+        ]);
       });
     });
   });
