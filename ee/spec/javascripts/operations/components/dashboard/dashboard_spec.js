@@ -95,9 +95,9 @@ describe('dashboard component', () => {
   describe('wrapped components', () => {
     describe('dashboard project component', () => {
       const projectCount = 1;
-      const projects = mockProjectData(projectCount);
 
       beforeEach(() => {
+        const projects = mockProjectData(projectCount);
         store.state.projects = projects;
         wrapper = mountComponent();
       });
@@ -109,16 +109,25 @@ describe('dashboard component', () => {
       });
 
       it('passes each project to the dashboard project component', () => {
-        const [oneProject] = projects;
+        const [oneProject] = store.state.projects;
         const projectComponent = wrapper.find(Project);
 
         expect(projectComponent.props().project).toEqual(oneProject);
       });
 
+      it('dispatches setProjects when projects changes', () => {
+        const dispatch = spyOn(wrapper.vm.$store, 'dispatch');
+        const projects = mockProjectData(3);
+
+        wrapper.vm.projects = projects;
+
+        expect(dispatch).toHaveBeenCalledWith('setProjects', projects);
+      });
+
       describe('when a project is removed', () => {
         it('immediately requests the project list again', done => {
           mockAxios.reset();
-          mockAxios.onDelete(projects[0].remove_path).reply(200);
+          mockAxios.onDelete(store.state.projects[0].remove_path).reply(200);
           mockAxios.onGet(mockListEndpoint).replyOnce(200, { projects: [] });
 
           wrapper.find('button.js-remove-button').vm.$emit('click');
