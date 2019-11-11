@@ -47,6 +47,7 @@ function createComponent(props = {}, shallow = false) {
       'gl-loading-icon': true,
     },
     sync: false,
+    attachToDocument: true,
   });
 }
 
