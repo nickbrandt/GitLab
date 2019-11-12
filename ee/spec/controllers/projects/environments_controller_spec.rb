@@ -282,6 +282,31 @@ describe Projects::EnvironmentsController do
     end
   end
 
+  describe 'POST #cancel_auto_stop' do
+    subject { post :cancel_auto_stop, params: params }
+
+    let(:params) { environment_params }
+
+    context 'when environment is set as auto-stop' do
+      let(:environment) { create(:environment, :will_auto_stop, name: 'staging', project: project) }
+
+      it_behaves_like 'successful response for #cancel_auto_stop'
+
+      context 'when the environment is protected' do
+        before do
+          stub_licensed_features(protected_environments: true)
+          create(:protected_environment, name: 'staging', project: project)
+        end
+
+        it 'shows NOT Found' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+    end
+  end
+
   def environment_params(opts = {})
     opts.reverse_merge(namespace_id: project.namespace,
                        project_id: project,
