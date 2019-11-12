@@ -19,7 +19,6 @@ module Gitlab
       end
 
       def initialize(klass, attributes)
-        @original_klass = klass
         @klass = klass < Label ? Label : klass
         @attributes = attributes
         @group = @attributes['group']
