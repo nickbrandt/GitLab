@@ -698,6 +698,27 @@ workers:
     terminationGracePeriodSeconds: 60
 ```
 
+#### Running commands in the container
+
+Applications built with [Auto Build](#auto-build) using Herokuish, the default
+unless you have [a custom Dockerfile](#auto-build-using-a-dockerfile), may require
+commands to be wrapped as follows:
+
+```shell
+/bin/herokuish procfile exec $COMMAND
+```
+
+This might be neccessary, for example, when:
+
+- Attaching using `kubectl exec`.
+- Using GitLab's [Web Terminal](../../ci/environments.md#web-terminals).
+
+For example, to start a Rails console from the application root directory, run:
+
+```sh
+/bin/herokuish procfile exec bin/rails c
+```
+
 ### Auto Monitoring
 
 Once your application is deployed, Auto Monitoring makes it possible to monitor
