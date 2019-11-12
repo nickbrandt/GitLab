@@ -3016,6 +3016,9 @@ msgstr ""
 msgid "Changes won't take place until the index is %{link_start}recreated%{link_end}."
 msgstr ""
 
+msgid "Changing a Release tag is only supported via Releases API. %{linkStart}More information%{linkEnd}"
+msgstr ""
+
 msgid "Changing group path can have unintended side effects."
 msgstr ""
 
@@ -3140,9 +3143,6 @@ msgid "Choose a template..."
 msgstr ""
 
 msgid "Choose a type..."
-msgstr ""
-
-msgid "Choose an existing tag, or create a new one"
 msgstr ""
 
 msgid "Choose any color."
