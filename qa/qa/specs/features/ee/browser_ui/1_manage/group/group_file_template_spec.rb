@@ -39,7 +39,7 @@ module QA
       ]
 
       before(:all) do
-        login
+        Flow::Login.sign_in_as_admin
 
         @group = Resource::Group.fabricate_via_api! do |group|
           group.path = 'template-group'
@@ -71,16 +71,15 @@ module QA
       end
 
       after(:all) do
-        login unless Page::Main::Menu.perform(&:signed_in?)
-
-        remove_group_file_template_if_set
-
-        Page::Main::Menu.perform(&:sign_out)
+        Flow::Login.while_signed_in_as_admin do
+          remove_group_file_template_if_set
+        end
       end
 
       templates.each do |template|
         it "creates file via custom #{template[:type]} file template" do
-          login
+          Flow::Login.sign_in_as_admin
+
           set_file_template_if_not_already_set
 
           @project.visit!
@@ -99,11 +98,6 @@ module QA
           expect(page).to have_content('Add new file')
           expect(page).to have_content(template[:content])
         end
-      end
-
-      def login
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
       end
 
       def set_file_template_if_not_already_set
