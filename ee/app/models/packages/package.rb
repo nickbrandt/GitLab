@@ -28,6 +28,11 @@ class Packages::Package < ApplicationRecord
   scope :with_name_like, ->(name) { where(arel_table[:name].matches(name)) }
   scope :with_version, ->(version) { where(version: version) }
   scope :with_package_type, ->(package_type) { where(package_type: package_type) }
+
+  scope :with_conan_channel, ->(package_channel) do
+    joins(:conan_metadatum).where(packages_conan_metadata: { package_channel: package_channel })
+  end
+
   scope :has_version, -> { where.not(version: nil) }
   scope :preload_files, -> { preload(:package_files) }
   scope :last_of_each_version, -> { where(id: all.select('MAX(id) AS id').group(:version)) }

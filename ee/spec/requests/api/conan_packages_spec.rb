@@ -413,6 +413,30 @@ describe API::ConanPackages do
         expect(response.body).to eq(expected_response.to_json)
       end
     end
+
+    describe 'DELETE /api/v4/packages/conan/v1/conans/:package_name/package_version/:package_username/:package_channel' do
+      let(:recipe_path) { package.conan_recipe_path }
+
+      subject { delete api("/packages/conan/v1/conans/#{recipe_path}"), headers: headers}
+
+      it_behaves_like 'rejects invalid recipe'
+
+      it 'returns unauthorized for users without valid permission' do
+        subject
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+
+      context 'with delete permissions' do
+        before do
+          project.add_maintainer(user)
+        end
+
+        it 'deletes a package' do
+          expect { subject }.to change { Packages::Package.count }.from(2).to(1)
+        end
+      end
+    end
   end
 
   context 'file endpoints' do
