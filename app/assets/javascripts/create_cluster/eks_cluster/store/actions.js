@@ -2,7 +2,11 @@ import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 
-const getErrorMessage = data => data.base[0];
+const getErrorMessage = data => {
+  const errorKey = Object.keys(data)[0];
+
+  return data[errorKey][0];
+};
 
 export const setClusterName = ({ commit }, payload) => {
   commit(types.SET_CLUSTER_NAME, payload);

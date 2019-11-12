@@ -24,6 +24,9 @@ import {
 } from '~/create_cluster/eks_cluster/store/mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
+import createFlash from '~/flash';
+
+jest.mock('~/flash');
 
 describe('EKS Cluster Store Actions', () => {
   let clusterName;
@@ -262,12 +265,20 @@ describe('EKS Cluster Store Actions', () => {
   });
 
   describe('createClusterError', () => {
-    it('commits createClusterError mutation', () => {
-      const payload = { base: ['Create cluster failed'] };
+    let payload;
 
+    beforeEach(() => {
+      payload = { name: ['Create cluster failed'] };
+    });
+
+    it('commits createClusterError mutation', () => {
       testAction(actions.createClusterError, payload, state, [
         { type: CREATE_CLUSTER_ERROR, payload },
       ]);
+    });
+
+    it('creates a flash that displays the create cluster error', () => {
+      expect(createFlash).toHaveBeenCalledWith(payload.name[0]);
     });
   });
 
