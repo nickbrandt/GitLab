@@ -207,14 +207,24 @@ module EE
     end
 
     def available_subgroups_with_custom_project_templates(group_id = nil)
-      groups = GroupsWithTemplatesFinder.new(group_id).execute
+      found_groups = GroupsWithTemplatesFinder.new(group_id).execute
 
-      GroupsFinder.new(self, min_access_level: ::Gitlab::Access::DEVELOPER)
-                  .execute
-                  .where(id: groups.select(:custom_project_templates_group_id))
-                  .includes(:projects)
-                  .reorder(nil)
-                  .distinct
+      if ::Feature.enabled?(:optimized_groups_with_templates_finder)
+        GroupsFinder.new(self, min_access_level: ::Gitlab::Access::DEVELOPER)
+          .execute
+          .where(id: found_groups.select(:custom_project_templates_group_id))
+          .preload(:projects)
+          .joins(:projects)
+          .reorder(nil)
+          .distinct
+      else
+        GroupsFinder.new(self, min_access_level: ::Gitlab::Access::DEVELOPER)
+          .execute
+          .where(id: found_groups.select(:custom_project_templates_group_id))
+          .includes(:projects)
+          .reorder(nil)
+          .distinct
+      end
     end
 
     def roadmap_layout
