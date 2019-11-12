@@ -112,7 +112,7 @@ To make full use of Auto DevOps, you will need:
      NOTE: **Note:**
      If you are using your own Ingress instead of the one provided by GitLab's managed
      apps, ensure you are running at least version 0.9.0 of NGINX Ingress and
-     [enable Prometheus metrics](https://github.com/kubernetes/ingress-nginx/blob/master/docs/examples/customization/custom-vts-metrics-prometheus/nginx-vts-metrics-conf.yaml)
+     [enable Prometheus metrics](https://github.com/helm/charts/tree/master/stable/nginx-ingress#prometheus-metrics)
      in order for the response metrics to appear. You will also have to
      [annotate](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
      the NGINX Ingress deployment to be scraped by Prometheus using
