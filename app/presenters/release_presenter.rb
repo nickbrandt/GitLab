@@ -37,7 +37,7 @@ class ReleasePresenter < Gitlab::View::Presenter::Delegated
     edit_project_release_url(project, release)
   end
 
-  def evidence_url
+  def evidence_file_path
     return unless release_evidence_available?
 
     evidence_project_release_url(project, tag, format: :json)

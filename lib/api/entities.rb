@@ -1325,7 +1325,7 @@ module API
         expose :links, using: Entities::Releases::Link do |release, options|
           release.links.sorted
         end
-        expose :evidence_url, expose_nil: false
+        expose :evidence_file_path, expose_nil: false
       end
       expose :_links do
         expose :merge_requests_url, expose_nil: false

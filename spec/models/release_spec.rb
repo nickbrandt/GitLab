@@ -72,13 +72,6 @@ RSpec.describe Release do
         expect(assets_count).to eq(1)
       end
     end
-
-    context 'when evidence is available' do
-      it 'counts this evidence', :sidekiq_inline do
-        evidence_count = release.assets_count - release.sources.count - release.links.count
-        expect(evidence_count).to eq(1)
-      end
-    end
   end
 
   describe '#sources' do
