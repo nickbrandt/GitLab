@@ -4964,7 +4964,7 @@ msgstr ""
 msgid "CurrentUser|Settings"
 msgstr ""
 
-msgid "CurrentUser|Start a trial"
+msgid "CurrentUser|Start a Gold trial"
 msgstr ""
 
 msgid "Custom CI configuration path"
