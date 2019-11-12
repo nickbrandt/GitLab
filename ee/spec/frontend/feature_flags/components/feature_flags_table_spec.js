@@ -1,6 +1,6 @@
-import featureFlagsTableComponent from 'ee/feature_flags/components/feature_flags_table.vue';
+import FeatureFlagsTable from 'ee/feature_flags/components/feature_flags_table.vue';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { trimText } from 'spec/helpers/text_helper';
+import { trimText } from 'helpers/text_helper';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
@@ -9,47 +9,59 @@ import {
 
 const localVue = createLocalVue();
 
+const getDefaultProps = () => ({
+  featureFlags: [
+    {
+      id: 1,
+      active: true,
+      name: 'flag name',
+      description: 'flag description',
+      destroy_path: 'destroy/path',
+      edit_path: 'edit/path',
+      scopes: [
+        {
+          id: 1,
+          active: true,
+          environmentScope: 'scope',
+          canUpdate: true,
+          protected: false,
+          rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+          rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
+          shouldBeDestroyed: false,
+        },
+      ],
+    },
+  ],
+  csrfToken: 'fakeToken',
+});
+
 describe('Feature flag table', () => {
-  let Component;
   let wrapper;
+  let props;
+
+  const createWrapper = (propsData, opts = {}) => {
+    wrapper = shallowMount(FeatureFlagsTable, {
+      propsData,
+      sync: false,
+      localVue,
+      ...opts,
+    });
+  };
+
+  beforeEach(() => {
+    props = getDefaultProps();
+  });
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('with an active scope and a standard rollout strategy', () => {
     beforeEach(() => {
-      Component = localVue.extend(featureFlagsTableComponent);
-
-      wrapper = shallowMount(Component, {
-        localVue,
+      props.featureFlags[0].iid = 1;
+      createWrapper(props, {
         provide: { glFeatures: { featureFlagIID: true } },
-        propsData: {
-          featureFlags: [
-            {
-              id: 1,
-              iid: 1,
-              active: true,
-              name: 'flag name',
-              description: 'flag description',
-              destroy_path: 'destroy/path',
-              edit_path: 'edit/path',
-              scopes: [
-                {
-                  id: 1,
-                  active: true,
-                  environmentScope: 'scope',
-                  canUpdate: true,
-                  protected: false,
-                  rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
-                  rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-                  shouldBeDestroyed: false,
-                },
-              ],
-            },
-          ],
-          csrfToken: 'fakeToken',
-        },
       });
     });
 
@@ -103,36 +115,9 @@ describe('Feature flag table', () => {
 
   describe('with an active scope and a percentage rollout strategy', () => {
     beforeEach(() => {
-      Component = localVue.extend(featureFlagsTableComponent);
-
-      wrapper = shallowMount(Component, {
-        localVue,
-        propsData: {
-          featureFlags: [
-            {
-              id: 1,
-              active: true,
-              name: 'flag name',
-              description: 'flag description',
-              destroy_path: 'destroy/path',
-              edit_path: 'edit/path',
-              scopes: [
-                {
-                  id: 1,
-                  active: true,
-                  environmentScope: 'scope',
-                  canUpdate: true,
-                  protected: false,
-                  rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-                  rolloutPercentage: '54',
-                  shouldBeDestroyed: false,
-                },
-              ],
-            },
-          ],
-          csrfToken: 'fakeToken',
-        },
-      });
+      props.featureFlags[0].scopes[0].rolloutStrategy = ROLLOUT_STRATEGY_PERCENT_ROLLOUT;
+      props.featureFlags[0].scopes[0].rolloutPercentage = '54';
+      createWrapper(props);
     });
 
     it('should render an environments specs badge with percentage', () => {
@@ -144,36 +129,8 @@ describe('Feature flag table', () => {
 
   describe('with an inactive scope', () => {
     beforeEach(() => {
-      Component = localVue.extend(featureFlagsTableComponent);
-
-      wrapper = shallowMount(Component, {
-        localVue,
-        propsData: {
-          featureFlags: [
-            {
-              id: 1,
-              active: true,
-              name: 'flag name',
-              description: 'flag description',
-              destroy_path: 'destroy/path',
-              edit_path: 'edit/path',
-              scopes: [
-                {
-                  id: 1,
-                  active: false,
-                  environmentScope: 'scope',
-                  canUpdate: true,
-                  protected: false,
-                  rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
-                  rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-                  shouldBeDestroyed: false,
-                },
-              ],
-            },
-          ],
-          csrfToken: 'fakeToken',
-        },
-      });
+      props.featureFlags[0].scopes[0].active = false;
+      createWrapper(props);
     });
 
     it('should render an environments specs badge with inactive class', () => {
