@@ -3138,7 +3138,7 @@ ActiveRecord::Schema.define(version: 2019_11_12_221821) do
     t.index ["runners_token"], name: "index_projects_on_runners_token"
     t.index ["runners_token_encrypted"], name: "index_projects_on_runners_token_encrypted"
     t.index ["star_count"], name: "index_projects_on_star_count"
-    t.index ["visibility_level"], name: "index_projects_on_visibility_level"
+    t.index ["visibility_level", "created_at", "id"], name: "index_projects_on_visibility_level_and_created_at_and_id"
   end
 
   create_table "prometheus_alert_events", force: :cascade do |t|
