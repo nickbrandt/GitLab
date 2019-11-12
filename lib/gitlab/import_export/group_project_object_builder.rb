@@ -50,11 +50,11 @@ module Gitlab
         ].compact
       end
 
-      # Returns Arel clause `"{table_name}"."project_id" = {project.id}`
+      # Returns Arel clause `"{table_name}"."project_id" = {project.id}` if project is present
       # or, if group is present:
       # `"{table_name}"."project_id" = {project.id} OR "{table_name}"."group_id" = {group.id}`
       def where_clause_base
-        clause = table[project_column].eq(project.id)
+        clause = table[:project_id].eq(project.id) if project
         clause = clause.or(table[:group_id].eq(group.id)) if group
 
         clause
@@ -106,14 +106,6 @@ module Gitlab
 
       def merge_request?
         klass == MergeRequest
-      end
-
-      def project_column
-        if @original_klass.reflect_on_association(:project) || label?
-          :project_id
-        elsif klass.reflect_on_association(:target_project)
-          :target_project_id
-        end
       end
 
       # If an existing group milestone used the IID

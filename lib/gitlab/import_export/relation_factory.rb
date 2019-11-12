@@ -332,15 +332,11 @@ module Gitlab
         # Can't use IDs as validation exists calling `group` or `project` attributes
         finder_hash = parsed_relation_hash.tap do |hash|
           hash['group'] = @project.group if relation_class.attribute_method?('group_id')
-          hash['project'] = @project if reflect_on_project_association?
+          hash['project'] = @project if relation_class.reflect_on_association(:project)
           hash.delete('project_id')
         end
 
         GroupProjectObjectBuilder.build(relation_class, finder_hash)
-      end
-
-      def reflect_on_project_association?
-        relation_class.reflect_on_association(:project) || relation_class.reflect_on_association(:target_project)
       end
     end
   end

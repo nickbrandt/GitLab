@@ -55,23 +55,23 @@ describe Gitlab::ImportExport::GroupProjectObjectBuilder do
       merge_request = create(:merge_request, title: 'MergeRequest', iid: 7, target_project: project, source_project: project)
       expect(described_class.build(MergeRequest,
                                    'title' => 'MergeRequest',
-                                   'project' => project,
                                    'source_project_id' => project.id,
+                                   'target_project_id' => project.id,
                                    'source_branch' => 'SourceBranch',
                                    'iid' => 7,
                                    'target_branch' => 'TargetBranch',
-                                   'author' => project.creator)).to eq(merge_request)
+                                   'author_id' => project.creator.id)).to eq(merge_request)
     end
 
     it 'creates a new merge_request' do
       merge_request = described_class.build(MergeRequest,
                                             'title' => 'MergeRequest',
-                                            'project' => project,
                                             'iid' => 8,
-                                            'source_project' => project,
+                                            'source_project_id' => project.id,
+                                            'target_project_id' => project.id,
                                             'source_branch' => 'SourceBranch',
                                             'target_branch' => 'TargetBranch',
-                                            'author' => project.creator)
+                                            'author_id' => project.creator.id)
       expect(merge_request.persisted?).to be true
     end
   end
