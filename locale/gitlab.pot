@@ -10660,10 +10660,10 @@ msgstr ""
 msgid "MergeRequests|started a thread on %{linkStart}the diff%{linkEnd}"
 msgstr ""
 
-msgid "MergeRequests|started a thread on an outdated change in commit %{linkStart}%{commitId}%{linkEnd}"
+msgid "MergeRequests|started a thread on an outdated change in commit %{linkStart}%{commitDisplay}%{linkEnd}"
 msgstr ""
 
-msgid "MergeRequests|started a thread on commit %{linkStart}%{commitId}%{linkEnd}"
+msgid "MergeRequests|started a thread on commit %{linkStart}%{commitDisplay}%{linkEnd}"
 msgstr ""
 
 msgid "MergeRequest| %{paragraphStart}changed the description %{descriptionChangedTimes} times %{timeDifferenceMinutes}%{paragraphEnd}"
