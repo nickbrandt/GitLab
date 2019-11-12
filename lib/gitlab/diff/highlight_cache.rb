@@ -3,10 +3,6 @@
 module Gitlab
   module Diff
     class HighlightCache
-      # TODO: copied from lib/gitlab/discussions_diff/highlight_cache.rb
-      #   extract into shared module?
-      #
-      VERSION = 1
       EXPIRATION = 1.week
 
       delegate :diffable, to: :@diff_collection
@@ -115,20 +111,6 @@ module Gitlab
 
       def cacheable?(diff_file)
         diffable.present? && diff_file.text? && diff_file.diffable?
-      end
-
-      # TODO: copied from lib/gitlab/discussions_diff/highlight_cache.rb
-      #   extract into shared module?
-      #
-      def cache_key_for(raw_key)
-        "#{cache_key_prefix}:#{raw_key}"
-      end
-
-      # TODO: copied from lib/gitlab/discussions_diff/highlight_cache.rb
-      #   extract into shared module?
-      #
-      def cache_key_prefix
-        "#{Redis::Cache::CACHE_NAMESPACE}:#{VERSION}:diff-highlight"
       end
     end
   end
