@@ -34,19 +34,22 @@ module MetricsDashboard
 
   def all_dashboards
     dashboards = dashboard_finder.find_all_paths(project_for_dashboard)
-    dashboards.each do |dashboard|
-      dashboard[:can_edit] = false
-      dashboard[:project_blob_path] = nil
-
-      if project_for_dashboard && !dashboard[:system_dashboard]
-        dashboard[:can_edit] = can_edit?(dashboard)
-        dashboard[:project_blob_path] = dashboard_project_blob_path(dashboard)
-      end
+    dashboards.map do |dashboard|
+      amend_dashboard(dashboard)
     end
   end
 
+  def amend_dashboard(dashboard)
+    project_dashboard = project_for_dashboard && !dashboard[:system_dashboard]
+
+    dashboard[:can_edit] = project_dashboard ? can_edit?(dashboard) : false
+    dashboard[:project_blob_path] = project_dashboard ? dashboard_project_blob_path(dashboard) : nil
+
+    dashboard
+  end
+
   def dashboard_project_blob_path(dashboard)
-    project_blob_path(project_for_dashboard, File.join(project_for_dashboard.default_branch, dashboard[:path]))
+    project_blob_path(project_for_dashboard, File.join(project_for_dashboard.default_branch, dashboard.fetch(:path, "")))
   end
 
   def can_edit?(dashboard)
