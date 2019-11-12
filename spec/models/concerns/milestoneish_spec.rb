@@ -247,6 +247,22 @@ describe Milestone, 'Milestoneish' do
     end
   end
 
+  describe '.preload_issues_by_state' do
+    let(:preloaded_milestone) do
+      Milestone.where(id: milestone.id)
+        .preload_issue_counts(admin)
+        .first
+    end
+
+    it 'counts confidential issues for admin' do
+      preloaded_milestone
+      expect do
+        expect(preloaded_milestone.closed_issues_count(admin)).to eq 6
+        expect(preloaded_milestone.total_issues_count(admin)).to eq 9
+      end.to make_queries_matching(/.*/, 0)
+    end
+  end
+
   describe '#remaining_days' do
     it 'shows 0 if no due date' do
       milestone = build_stubbed(:milestone)

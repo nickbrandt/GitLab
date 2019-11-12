@@ -1,6 +1,31 @@
 # frozen_string_literal: true
 
 module Milestoneish
+  extend ActiveSupport::Concern
+
+  included do
+    def self.preload_issue_counts(user)
+      milestoneish_ids = find_each.map(&:milestoneish_id)
+      issues = IssuesFinder.new(user, {})
+        .execute.preload(:assignees).where(milestone_id: milestoneish_ids)
+
+      counts = issues.reorder(nil).group(:milestone_id, :state_id).count
+
+      milestones_hash = Hash.new { |h, k| h[k] = {} }
+
+      counts.each do |(milestone_id, state_id), count|
+        milestones_hash[milestone_id][state_id] = count
+      end
+
+      find_each.map do |milestone|
+        milestone.memoize_per_user(user, :count_issues_by_state) do
+          milestones_hash[milestone.milestoneish_id]
+        end
+        milestone
+      end
+    end
+  end
+
   def total_issues_count(user)
     count_issues_by_state(user).values.sum
   end
@@ -127,11 +152,11 @@ module Milestoneish
     end
   end
 
-  private
-
   def memoize_per_user(user, method_name)
     memoized_users[method_name][user&.id] ||= yield
   end
+
+  private
 
   def memoized_users
     @memoized_users ||= Hash.new { |h, k| h[k] = {} }
