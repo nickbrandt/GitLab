@@ -179,6 +179,15 @@ module API
 
           present upload_urls, with: EE::API::Entities::ConanPackage::ConanUploadUrls
         end
+
+        desc 'Delete Package' do
+          detail 'This feature was introduced in GitLab 12.5'
+        end
+        delete do
+          authorize!(:destroy_package, project)
+
+          package.destroy
+        end
       end
 
       params do
@@ -293,6 +302,17 @@ module API
         strong_memoize(:project) do
           full_path = ::Packages::ConanMetadatum.full_path_from(package_username: params[:package_username])
           Project.find_by_full_path(full_path)
+        end
+      end
+
+      def package
+        strong_memoize(:package) do
+          project.packages
+            .with_name(params[:package_name])
+            .with_version(params[:package_version])
+            .with_conan_channel(params[:package_channel])
+            .order_created
+            .last
         end
       end
 
