@@ -2,8 +2,40 @@
 
 require 'spec_helper'
 
-describe Gitlab::Diff::HighlightCache do
+describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
   let(:merge_request) { create(:merge_request_with_diffs) }
+  let(:diff_hash) do
+    { ".gitignore-false-false-false" =>
+      [{ line_code: nil, rich_text: nil, text: "@@ -17,3 +17,4 @@ rerun.txt", type: "match", index: 0, old_pos: 17, new_pos: 17 },
+       { line_code: "a5cc2925ca8258af241be7e5b0381edf30266302_17_17",
+        rich_text: " <span id=\"LC17\" class=\"line\" lang=\"plaintext\">pickle-email-*.html</span>\n",
+        text: " pickle-email-*.html",
+        type: nil,
+        index: 1,
+        old_pos: 17,
+        new_pos: 17 },
+       { line_code: "a5cc2925ca8258af241be7e5b0381edf30266302_18_18",
+        rich_text: " <span id=\"LC18\" class=\"line\" lang=\"plaintext\">.project</span>\n",
+        text: " .project",
+        type: nil,
+        index: 2,
+        old_pos: 18,
+        new_pos: 18 },
+       { line_code: "a5cc2925ca8258af241be7e5b0381edf30266302_19_19",
+        rich_text: " <span id=\"LC19\" class=\"line\" lang=\"plaintext\">config/initializers/secret_token.rb</span>\n",
+        text: " config/initializers/secret_token.rb",
+        type: nil,
+        index: 3,
+        old_pos: 19,
+        new_pos: 19 },
+       { line_code: "a5cc2925ca8258af241be7e5b0381edf30266302_20_20",
+        rich_text: "+<span id=\"LC20\" class=\"line\" lang=\"plaintext\">.DS_Store</span>",
+        text: "+.DS_Store",
+        type: "new",
+        index: 4,
+        old_pos: 20,
+        new_pos: 20 }] }
+  end
 
   subject(:cache) { described_class.new(merge_request.diffs, backend: backend) }
 
@@ -48,13 +80,67 @@ describe Gitlab::Diff::HighlightCache do
   describe '#write_if_empty' do
     let(:backend) { double('backend', read: {}).as_null_object }
 
+    context 'when :redis_diff_caching is enabled' do
+      before do
+        expect(cache.diffable.project)
+          .to receive(:feature_available?)
+          .with(:redis_diff_caching).and_return(true)
+      end
+
+      it 'submits a single write action to the redis cache when invoked multiple times' do
+        expect(cache).to receive(:write_to_redis_hash).once
+
+        2.times { cache.write_if_empty }
+      end
+    end
+
     it 'submits a single writing to the cache' do
-      cache.write_if_empty
-      cache.write_if_empty
+      2.times { cache.write_if_empty }
 
       expect(backend).to have_received(:write).with(cache.key,
                                                     hash_including('CHANGELOG-false-false-false'),
                                                     expires_in: 1.week).once
+    end
+  end
+
+  describe '#write_to_redis_hash' do
+    let(:backend) { Rails.cache }
+
+    it 'creates or updates a Redis hash' do
+      expect { cache.write_to_redis_hash(diff_hash) }
+        .to change { Gitlab::Redis::Cache.with { |r| r.hgetall(cache.diffable.cache_key) } }
+    end
+  end
+
+  describe '#read_entire_redis_hash' do
+    let(:backend) { Rails.cache }
+    let(:cache_key) { cache.diffable.cache_key }
+
+    before do
+      cache.write_to_redis_hash(diff_hash)
+    end
+
+    it 'returns the entire contents of a Redis hash as JSON' do
+      result = cache.read_entire_redis_hash(cache_key)
+
+      expect(result.values.first).to eq(diff_hash.values.first.to_json)
+    end
+  end
+
+  describe '#read_single_entry_from_redis_hash' do
+    let(:backend) { Rails.cache }
+    let(:cache_key) { cache.diffable.cache_key }
+
+    before do
+      cache.write_to_redis_hash(diff_hash)
+    end
+
+    it 'returns highlighted diff content for a single file as JSON' do
+      diff_hash.each do |file_path, value|
+        found = cache.read_single_entry_from_redis_hash(cache_key, file_path)
+
+        expect(found).to eq(value.to_json)
+      end
     end
   end
 

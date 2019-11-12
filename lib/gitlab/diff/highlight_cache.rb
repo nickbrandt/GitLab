@@ -3,6 +3,12 @@
 module Gitlab
   module Diff
     class HighlightCache
+      # TODO: copied from lib/gitlab/discussions_diff/highlight_cache.rb
+      #   extract into shared module?
+      #
+      VERSION = 1
+      EXPIRATION = 1.week
+
       delegate :diffable, to: :@diff_collection
       delegate :diff_options, to: :@diff_collection
 
@@ -35,7 +41,54 @@ module Gitlab
           cached_content[diff_file_id] = diff_file.highlighted_diff_lines.map(&:to_hash)
         end
 
-        cache.write(key, cached_content, expires_in: 1.week)
+        if diffable.project.feature_available?(:redis_diff_caching)
+          write_to_redis_hash(cached_content)
+        else
+          cache.write(key, cached_content, expires_in: 1.week)
+        end
+      end
+
+      # Given a hash of:
+      #   { "file/to/cache" =>
+      #   [ { line_code: "a5cc2925ca8258af241be7e5b0381edf30266302_19_19",
+      #       rich_text: " <span id=\"LC19\" class=\"line\" lang=\"plaintext\">config/initializers/secret_token.rb</span>\n",
+      #       text: " config/initializers/secret_token.rb",
+      #       type: nil,
+      #       index: 3,
+      #       old_pos: 19,
+      #       new_pos: 19 }
+      #   ] }
+      #
+      #   ...it will write/update a Redis hash (HSET)
+      #
+      def write_to_redis_hash(hash)
+        key = diffable.cache_key
+
+        if key
+          Redis::Cache.with do |redis|
+            redis.multi do |multi|
+              hash.each do |diff_file_id, highlighted_diff_lines_hash|
+                multi.hset(key, diff_file_id, highlighted_diff_lines_hash.to_json)
+
+                # HSETs have to have their expiration date manually updated
+                #
+                multi.expire(key, EXPIRATION)
+              end
+            end
+          end
+        end
+      end
+
+      def read_entire_redis_hash(key)
+        Redis::Cache.with do |redis|
+          redis.hgetall(key)
+        end
+      end
+
+      def read_single_entry_from_redis_hash(key, diff_file_id)
+        Redis::Cache.with do |redis|
+          redis.hget(key, diff_file_id)
+        end
       end
 
       def clear
@@ -62,6 +115,20 @@ module Gitlab
 
       def cacheable?(diff_file)
         diffable.present? && diff_file.text? && diff_file.diffable?
+      end
+
+      # TODO: copied from lib/gitlab/discussions_diff/highlight_cache.rb
+      #   extract into shared module?
+      #
+      def cache_key_for(raw_key)
+        "#{cache_key_prefix}:#{raw_key}"
+      end
+
+      # TODO: copied from lib/gitlab/discussions_diff/highlight_cache.rb
+      #   extract into shared module?
+      #
+      def cache_key_prefix
+        "#{Redis::Cache::CACHE_NAMESPACE}:#{VERSION}:diff-highlight"
       end
     end
   end
