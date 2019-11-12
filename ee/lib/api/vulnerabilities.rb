@@ -19,6 +19,14 @@ module API
         end
       end
 
+      def authorize_can_read!
+        authorize! :read_project_security_dashboard, user_project
+      end
+
+      def authorize_can_create!
+        authorize! :create_vulnerability, user_project
+      end
+
       def render_vulnerability(vulnerability)
         if vulnerability.valid?
           present vulnerability, with: EE::API::Entities::Vulnerability
@@ -68,14 +76,37 @@ module API
       desc 'Get a list of project vulnerabilities' do
         success EE::API::Entities::Vulnerability
       end
+      params do
+        use :pagination
+      end
       get ':id/vulnerabilities' do
-        authorize! :read_project_security_dashboard, user_project
+        authorize_can_read!
 
         vulnerabilities = paginate(
           vulnerabilities_by(user_project)
         )
 
         present vulnerabilities, with: EE::API::Entities::Vulnerability
+      end
+
+      desc 'Create a new Vulnerability (from a confirmed Finding)' do
+        success EE::API::Entities::Vulnerability
+      end
+      params do
+        requires :finding_id, type: Integer, desc: 'The id of confirmed vulnerability finding'
+      end
+      post ':id/vulnerabilities' do
+        authorize_can_create!
+
+        vulnerability = ::Vulnerabilities::CreateService.new(
+          user_project, current_user, finding_id: params[:finding_id]
+        ).execute
+
+        if vulnerability.persisted?
+          present vulnerability, with: EE::API::Entities::Vulnerability
+        else
+          render_validation_error!(vulnerability)
+        end
       end
     end
   end
