@@ -186,16 +186,47 @@ describe('License store actions', () => {
   });
 
   describe('receiveSetLicenseApproval', () => {
-    it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadManagedLicenses', done => {
-      testAction(
-        actions.receiveSetLicenseApproval,
-        null,
-        state,
-        [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
-        [{ type: 'loadManagedLicenses' }],
-      )
-        .then(done)
-        .catch(done.fail);
+    gon.features = gon.features || {};
+    const { parsedLicenseReport } = gon.features;
+
+    afterEach(() => {
+      gon.features.parsedLicenseReport = parsedLicenseReport;
+    });
+
+    describe('with the parsedLicenseReport feature flag enabled', () => {
+      beforeEach(() => {
+        gon.features.parsedLicenseReport = true;
+      });
+
+      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadParsedLicenseReport', done => {
+        testAction(
+          actions.receiveSetLicenseApproval,
+          null,
+          state,
+          [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
+          [{ type: 'loadParsedLicenseReport' }],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('with the parsedLicenseReport feature flag disabled', () => {
+      beforeEach(() => {
+        gon.features.parsedLicenseReport = false;
+      });
+
+      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadManagedLicenses', done => {
+        testAction(
+          actions.receiveSetLicenseApproval,
+          null,
+          state,
+          [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
+          [{ type: 'loadManagedLicenses' }],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
     });
   });
 
