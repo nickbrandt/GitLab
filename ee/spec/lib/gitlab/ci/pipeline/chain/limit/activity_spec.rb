@@ -21,7 +21,8 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
 
   context 'when active pipelines limit is exceeded' do
     before do
-      gold_plan = create(:gold_plan, active_pipelines_limit: 1)
+      gold_plan = create(:gold_plan)
+      create(:plan_limits, plan: gold_plan, ci_active_pipelines: 1)
       create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
 
       create(:ci_pipeline, project: project, status: 'pending')
@@ -63,6 +64,12 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
   end
 
   context 'when pipeline activity limit is not exceeded' do
+    before do
+      gold_plan = create(:gold_plan)
+      create(:plan_limits, plan: gold_plan, ci_active_pipelines: 100)
+      create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+    end
+
     it 'does not break the chain' do
       subject
 

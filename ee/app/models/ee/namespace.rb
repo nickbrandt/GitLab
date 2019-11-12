@@ -148,6 +148,13 @@ module EE
       end
     end
 
+    def actual_limits
+      # We default to PlanLimits.new otherwise a lot of specs would fail
+      # On production each plan should already have associated limits record
+      # https://gitlab.com/gitlab-org/gitlab/issues/36037
+      actual_plan&.limits || PlanLimits.new
+    end
+
     def actual_plan_name
       actual_plan&.name || Plan::FREE
     end
@@ -206,20 +213,6 @@ module EE
       else
         super
       end
-    end
-
-    # TODO, CI/CD Quotas feature check
-    #
-    def max_active_pipelines
-      actual_plan&.active_pipelines_limit.to_i
-    end
-
-    def max_pipeline_size
-      actual_plan&.pipeline_size_limit.to_i
-    end
-
-    def max_active_jobs
-      actual_plan&.active_jobs_limit.to_i
     end
 
     def memoized_plans=(plans)
