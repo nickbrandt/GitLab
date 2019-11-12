@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UserMention < ApplicationRecord
+  include FromUnion
+
   self.abstract_class = true
 
   scope :user_ids, -> { select("unnest(mentioned_users_ids)").distinct }
@@ -22,6 +24,16 @@ class UserMention < ApplicationRecord
   end
 
   def has_mentions?
-    self.mentioned_users_ids.present? || self.mentioned_groups_ids.present? || self.mentioned_projects_ids.present?
+    mentioned_ids_present? && mentions_exist?
+  end
+
+  private
+
+  def mentioned_ids_present?
+    mentioned_users_ids.present? || mentioned_groups_ids.present? || mentioned_projects_ids.present?
+  end
+
+  def mentions_exist?
+    (self.mentioned_users.exists? || self.mentioned_groups.exists? || self.mentioned_projects.exists?)
   end
 end

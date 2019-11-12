@@ -70,6 +70,8 @@ class Snippet < ApplicationRecord
   scope :inc_author, -> { includes(:author) }
   scope :inc_relations_for_view, -> { includes(author: :status) }
 
+  attr_mentionable :description
+
   participant :author
   participant :notes_with_associations
 

@@ -48,7 +48,7 @@ module Epics
     end
 
     def after_update(epic)
-      epic.update_mentions!
+      epic.store_mentions!
     end
   end
 end

@@ -26,7 +26,7 @@ class UpdateSnippetService < BaseService
     spam_check(snippet, current_user)
 
     if snippet.save
-      snippet.update_mentions!
+      snippet.store_mentions!
       Gitlab::UsageDataCounters::SnippetCounter.count(:update)
     end
   end

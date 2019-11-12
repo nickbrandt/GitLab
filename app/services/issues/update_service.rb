@@ -22,7 +22,7 @@ module Issues
     end
 
     def after_update(issue)
-      issue.update_mentions!
+      issue.store_mentions!
     end
 
     def handle_changes(issue, options)

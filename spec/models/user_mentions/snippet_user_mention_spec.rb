@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe EpicUserMention do
+describe SnippetUserMention do
   describe 'associations' do
-    it { is_expected.to belong_to(:epic) }
+    it { is_expected.to belong_to(:snippet) }
     it { is_expected.to belong_to(:note) }
   end
 

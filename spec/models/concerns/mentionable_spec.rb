@@ -166,6 +166,11 @@ describe Issue, "Mentionable" do
       create(:issue, project: project, description: description, author: author)
     end
   end
+
+  describe '#store_mentions!' do
+    it_behaves_like 'mentions in descritpion', :issue
+    it_behaves_like 'mentions in notes', :issue
+  end
 end
 
 describe Commit, 'Mentionable' do
@@ -220,5 +225,23 @@ describe Commit, 'Mentionable' do
         expect(commit.matches_cross_reference_regex?).to be_truthy
       end
     end
+  end
+
+  describe '#store_mentions!' do
+    it_behaves_like 'mentions in notes', :commit
+  end
+end
+
+describe MergeRequest, 'Mentionable' do
+  describe '#store_mentions!' do
+    it_behaves_like 'mentions in descritpion', :merge_request
+    it_behaves_like 'mentions in notes', :merge_request
+  end
+end
+
+describe Snippet, 'Mentionable' do
+  describe '#store_mentions!' do
+    it_behaves_like 'mentions in descritpion', :project_snippet
+    it_behaves_like 'mentions in notes', :project_snippet
   end
 end

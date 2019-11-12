@@ -16,6 +16,7 @@ describe Epic do
     it { is_expected.to belong_to(:parent) }
     it { is_expected.to have_many(:epic_issues) }
     it { is_expected.to have_many(:children) }
+    it { is_expected.to have_many(:user_mentions).class_name("EpicUserMention") }
   end
 
   describe 'validations' do

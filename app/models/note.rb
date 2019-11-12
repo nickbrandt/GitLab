@@ -302,24 +302,6 @@ class Note < ApplicationRecord
     nil
   end
 
-  def update_mentions!
-    return unless store_mentioned_users_to_db_enabled?
-    return unless noteable.respond_to?(:user_mentions)
-
-    refs = all_references(self.author)
-
-    mention = noteable.user_mentions.where(note: self).first_or_initialize
-    mention.mentioned_users_ids = refs.mentioned_users.presence&.pluck(:id)
-    mention.mentioned_groups_ids = refs.mentioned_users_by_groups.presence&.pluck(:id)
-    mention.mentioned_projects_ids = refs.mentioned_users_by_projects.presence&.pluck(:id)
-
-    if mention.has_mentions?
-      mention.save!
-    else
-      mention.destroy!
-    end
-  end
-
   # FIXME: Hack for polymorphic associations with STI
   #        For more information visit http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#label-Polymorphic+Associations
   def noteable_type=(noteable_type)
@@ -573,6 +555,34 @@ class Note < ApplicationRecord
     return unless noteable
 
     errors.add(:base, _('Maximum number of comments exceeded')) if noteable.notes.count >= Noteable::MAX_NOTES_LIMIT
+  end
+
+  def current_user_mention
+    noteable.user_mentions.where(note: self).first_or_initialize
+  end
+
+  def can_store_mentions?
+    store_mentioned_users_to_db_enabled? && noteable.respond_to?(:user_mentions)
+  end
+
+  def referenced_users
+    User.where(id: user_mentions.select("unnest(mentioned_users_ids)").distinct )
+  end
+
+  def referenced_projects
+    Project.where(id: user_mentions.select("unnest(mentioned_projects_ids)").distinct )
+  end
+
+  def referenced_project_users
+    User.joins(:project_members).where(members: { source_id: referenced_projects }).distinct
+  end
+
+  def referenced_groups
+    Group.where(id: user_mentions.select("unnest(mentioned_groups_ids)").distinct )
+  end
+
+  def referenced_group_users
+    User.joins(:group_members).where(members: { source_id: referenced_groups }).distinct
   end
 end
 

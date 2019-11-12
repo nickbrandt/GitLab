@@ -20,7 +20,7 @@ module Epics
     end
 
     def after_create(epic)
-      epic.update_mentions!
+      epic.store_mentions!
     end
 
     def whitelisted_epic_params

@@ -38,7 +38,7 @@ module Notes
           note.discussion.convert_to_discussion!(save: true)
         end
 
-        note.update_mentions!
+        note.store_mentions!
         todo_service.new_note(note, current_user)
         clear_noteable_diffs_cache(note)
         Suggestions::CreateService.new(note).execute

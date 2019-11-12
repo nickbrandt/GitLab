@@ -80,23 +80,41 @@ module Mentionable
     all_references(current_user).users
   end
 
-  def update_mentions!
-    return unless store_mentioned_users_to_db_enabled?
+  def store_mentions!
+    return unless can_store_mentions?
 
     refs = all_references(self.author)
 
-    mention = user_mentions.find_or_initialize_by(note: nil)
+    mention = current_user_mention
+    mention.mentioned_users_ids = refs.mentioned_users&.pluck(:id)
+    mention.mentioned_groups_ids = refs.mentioned_users_by_groups&.pluck(:id)
+    mention.mentioned_projects_ids = refs.mentioned_users_by_projects&.pluck(:id)
 
-    mention.mentioned_users_ids = refs.mentioned_users.pluck(:id)
-    mention.mentioned_groups_ids = refs.mentioned_users_by_groups.pluck(:id)
-    mention.mentioned_projects_ids = refs.mentioned_users_by_projects.pluck(:id)
-
-    mention.save!
+    if mention.has_mentions?
+      mention.save!
+    else
+      mention.destroy!
+    end
   end
 
-  def store_mentioned_users_to_db_enabled?
-    return Feature.enabled?(:store_mentioned_users_to_db, self.project&.group) if self.respond_to?(:project)
-    return Feature.enabledd?(:store_mentioned_users_to_db, self.group) if self.respond_to?(:group)
+  def referenced_users
+    User.where(id: user_mentions.select("unnest(mentioned_users_ids)").distinct )
+  end
+
+  def referenced_projects
+    Project.where(id: user_mentions.select("unnest(mentioned_projects_ids)").distinct )
+  end
+
+  def referenced_project_users
+    User.joins(:project_members).where(members: { source_id: referenced_projects }).distinct
+  end
+
+  def referenced_groups
+    Group.where(id: user_mentions.select("unnest(mentioned_groups_ids)").distinct )
+  end
+
+  def referenced_group_users
+    User.joins(:group_members).where(members: { source_id: referenced_groups }).distinct
   end
 
   def directly_addressed_users(current_user = nil)
@@ -189,6 +207,19 @@ module Mentionable
 
   def mentionable_params
     {}
+  end
+
+  def can_store_mentions?
+    store_mentioned_users_to_db_enabled? && respond_to?(:user_mentions)
+  end
+
+  def store_mentioned_users_to_db_enabled?
+    return Feature.enabled?(:store_mentioned_users_to_db, self.project&.group) if self.respond_to?(:project)
+    return Feature.enabled?(:store_mentioned_users_to_db, self.group) if self.respond_to?(:group)
+  end
+
+  def current_user_mention
+    user_mentions.find_or_initialize_by(note: nil)
   end
 end
 

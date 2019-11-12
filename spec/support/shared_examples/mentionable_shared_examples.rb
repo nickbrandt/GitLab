@@ -195,3 +195,73 @@ shared_examples 'an editable mentionable' do
     subject.create_new_cross_references!(author)
   end
 end
+
+shared_examples_for 'mentions in descritpion' do |mentionable_type|
+  describe 'when store_mentioned_users_to_db feature disabled' do
+    before do
+      stub_feature_flags(store_mentioned_users_to_db: false)
+      mentionable.store_mentions!
+    end
+
+    context 'when mentionable description contains mentions' do
+      let(:user) { create(:user) }
+      let(:mentionable) { create(mentionable_type, description: "#{user.to_reference} some description") }
+
+      it 'stores no mentions' do
+        expect(mentionable.user_mentions.count).to eq 0
+      end
+    end
+  end
+
+  describe 'when store_mentioned_users_to_db feature enabled' do
+    before do
+      stub_feature_flags(store_mentioned_users_to_db: true)
+      mentionable.store_mentions!
+    end
+
+    context 'when mentionable description has no mentions' do
+      let(:mentionable) { create(mentionable_type, description: "just some description") }
+
+      it 'stores no mentions' do
+        expect(mentionable.user_mentions.count).to eq 0
+      end
+    end
+
+    context 'when mentionable description contains mentions' do
+      let(:user) { create(:user) }
+      let(:group) { create(:group) }
+
+      let(:mentionable_desc) { "#{user.to_reference} some description #{group.to_reference(full: true)} and @all" }
+      let(:mentionable) { create(mentionable_type, description: mentionable_desc) }
+
+      it 'stores mentions' do
+        expect(mentionable.user_mentions.count).to eq 1
+        expect(mentionable.referenced_users).to eq [user]
+        expect(mentionable.referenced_projects).to eq [mentionable.project].compact
+        expect(mentionable.referenced_groups).to eq [group]
+      end
+    end
+  end
+end
+
+shared_examples_for 'mentions in notes' do |mentionable_type|
+  context 'when mentionable notes contain mentions' do
+    let(:user) { create(:user) }
+    let(:group) { create(:group) }
+
+    let(:note_desc) { "#{user.to_reference} and #{group.to_reference(full: true)} and @all" }
+    let!(:note) { create("note_on_#{mentionable_type}".to_sym, note: note_desc ) }
+    let!(:mentionable) { note.noteable }
+
+    before do
+      note.store_mentions!
+    end
+
+    it 'returns all mentionable mentions' do
+      expect(mentionable.user_mentions.count).to eq 1
+      expect(mentionable.referenced_users).to eq [user]
+      expect(mentionable.referenced_projects).to eq [mentionable.project].compact
+      expect(mentionable.referenced_groups).to eq [group]
+    end
+  end
+end
