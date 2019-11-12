@@ -8,9 +8,9 @@ module Gitlab
 
         def present
           if @resource.confidential?
-            ephemeral_response(close_issue)
+            ephemeral_response(response_message)
           else
-            in_channel_response(close_issue)
+            in_channel_response(response_message)
           end
         end
 
@@ -20,30 +20,12 @@ module Gitlab
 
         private
 
-        def close_issue
-          {
-            attachments: [
-              {
-                title:        "#{@resource.title} · #{@resource.to_reference}",
-                title_link:   resource_url,
-                author_name:  author.name,
-                author_icon:  author.avatar_url,
-                fallback:     "Closed issue #{@resource.to_reference}: #{@resource.title}",
-                pretext:      pretext,
-                color:        color(@resource),
-                fields:       fields,
-                mrkdwn_in: [
-                  :title,
-                  :pretext,
-                  :fields
-                ]
-              }
-            ]
-          }
+        def fallback
+          "Closed issue #{issue.to_reference}: #{issue.title}"
         end
 
         def pretext
-          "I closed an issue on #{author_profile_link}'s behalf: *#{@resource.to_reference}* in #{project_link}"
+          "I closed an issue on #{author_profile_link}'s behalf: *#{issue.to_reference}* in #{project_link}"
         end
       end
     end

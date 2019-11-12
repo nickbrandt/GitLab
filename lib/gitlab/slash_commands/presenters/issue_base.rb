@@ -45,6 +45,8 @@ module Gitlab
         private
 
         attr_reader :resource
+
+        alias_method :issue, :resource
       end
     end
   end

@@ -6,7 +6,7 @@ module Gitlab
       module NoteBase
         GREEN = '#38ae67'
 
-        def color
+        def color(_)
           GREEN
         end
 

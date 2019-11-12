@@ -8,35 +8,16 @@ module Gitlab
 
         def present
           if @resource.confidential?
-            ephemeral_response(show_issue)
+            ephemeral_response(response_message)
           else
-            in_channel_response(show_issue)
+            in_channel_response(response_message)
           end
         end
 
         private
 
-        def show_issue
-          {
-            attachments: [
-              {
-                title:        "#{@resource.title} · #{@resource.to_reference}",
-                title_link:   resource_url,
-                author_name:  author.name,
-                author_icon:  author.avatar_url,
-                fallback:     "Issue #{@resource.to_reference}: #{@resource.title}",
-                pretext:      pretext,
-                text:         text,
-                color:        color(@resource),
-                fields:       fields,
-                mrkdwn_in: [
-                  :pretext,
-                  :text,
-                  :fields
-                ]
-              }
-            ]
-          }
+        def fallback
+          "Issue #{@resource.to_reference}: #{@resource.title}"
         end
 
         def text
