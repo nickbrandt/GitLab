@@ -53,7 +53,6 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
                              fallback_diff_refs: diffs.fallback_diff_refs)
     end
 
-
     it 'does not calculate highlighting when reading from cache' do
       cache.write_if_empty
       cache.decorate(diff_file)
