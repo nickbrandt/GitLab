@@ -82,9 +82,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
     context 'when :redis_diff_caching is enabled' do
       before do
-        expect(cache.diffable.project)
-          .to receive(:feature_available?)
-          .with(:redis_diff_caching).and_return(true)
+        expect(Feature).to receive(:enabled?).with(:redis_diff_caching).and_return(true)
       end
 
       it 'submits a single write action to the redis cache when invoked multiple times' do
@@ -94,12 +92,19 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
       end
     end
 
-    it 'submits a single writing to the cache' do
-      2.times { cache.write_if_empty }
+    context 'when :redis_diff_caching is not enabled' do
+      before do
+        expect(Feature).to receive(:enabled?).with(:redis_diff_caching).and_return(false)
+      end
 
-      expect(backend).to have_received(:write).with(cache.key,
-                                                    hash_including('CHANGELOG-false-false-false'),
-                                                    expires_in: 1.week).once
+      it 'submits a single writing to the cache' do
+        2.times { cache.write_if_empty }
+
+        expect(backend)
+          .to have_received(:write)
+          .with(cache.key, hash_including('CHANGELOG-false-false-false'), expires_in: 1.week)
+          .once
+      end
     end
   end
 

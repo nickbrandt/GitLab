@@ -37,7 +37,7 @@ module Gitlab
           cached_content[diff_file_id] = diff_file.highlighted_diff_lines.map(&:to_hash)
         end
 
-        if diffable.project.feature_available?(:redis_diff_caching, current_user)
+        if Feature.enabled?(:redis_diff_caching)
           write_to_redis_hash(cached_content)
         else
           cache.write(key, cached_content, expires_in: 1.week)
