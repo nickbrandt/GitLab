@@ -15,6 +15,8 @@ export default {
     '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/logs.json',
   podLogsPathWithPodContainer:
     '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/:container_name/logs.json',
+  projectPackagesPath: '/api/:version/projects/:id/packages',
+  projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -95,5 +97,26 @@ export default {
       url = url.replace(':container_name', containerName);
     }
     return axios.get(url);
+  },
+
+  projectPackages(id) {
+    const url = Api.buildUrl(this.projectPackagesPath).replace(':id', id);
+    return axios.get(url);
+  },
+
+  buildProjectPackageUrl(projectId, packageId) {
+    return Api.buildUrl(this.projectPackagePath)
+      .replace(':id', projectId)
+      .replace(':package_id', packageId);
+  },
+
+  projectPackage(projectId, packageId) {
+    const url = this.buildProjectPackageUrl(projectId, packageId);
+    return axios.get(url);
+  },
+
+  deleteProjectPackage(projectId, packageId) {
+    const url = this.buildProjectPackageUrl(projectId, packageId);
+    return axios.delete(url);
   },
 };
