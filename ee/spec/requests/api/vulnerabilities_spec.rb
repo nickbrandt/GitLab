@@ -7,8 +7,8 @@ describe API::Vulnerabilities do
     stub_licensed_features(security_dashboard: true)
   end
 
-  let_it_be(:project) { create(:project, :with_vulnerabilities) }
   let_it_be(:user) { create(:user) }
+  let(:project_vulnerabilities_path) { "/projects/#{project.id}/vulnerabilities" }
 
   shared_examples 'forbids actions on vulnerability in case of disabled features' do
     context 'when "first-class vulnerabilities" feature is disabled' do
@@ -37,7 +37,7 @@ describe API::Vulnerabilities do
   end
 
   describe 'GET /projects/:id/vulnerabilities' do
-    let(:project_vulnerabilities_path) { "/projects/#{project.id}/vulnerabilities" }
+    let_it_be(:project) { create(:project, :with_vulnerabilities) }
 
     subject { get api(project_vulnerabilities_path, user) }
 
@@ -70,7 +70,79 @@ describe API::Vulnerabilities do
     end
 
     it_behaves_like 'responds with "not found" when there is no access to the project'
-    it_behaves_like 'prevents working with vulnerabilities in case of insufficient privileges'
+    it_behaves_like 'prevents working with vulnerabilities in case of insufficient access level'
+  end
+
+  describe 'POST /projects/:id/vulnerabilities' do
+    let_it_be(:project) { create(:project) }
+    let(:finding) { create(:vulnerabilities_occurrence, project: project) }
+    let(:finding_id) { finding.id }
+    let(:expected_error_messages) { { 'base' => ['finding is not found or is already attached to a vulnerability'] } }
+
+    subject do
+      post api(project_vulnerabilities_path, user), params: { finding_id: finding_id }
+    end
+
+    context 'with an authorized user with proper permissions' do
+      before do
+        project.add_developer(user)
+      end
+
+      it 'creates a vulnerability from finding and attaches it to the vulnerability' do
+        expect { subject }.to change { project.vulnerabilities.count }.by(1)
+        expect(project.vulnerabilities.last).to(
+          have_attributes(
+            author: user,
+            title: finding.name,
+            state: 'opened',
+            severity: finding.severity,
+            severity_overridden: false,
+            confidence: finding.confidence,
+            confidence_overridden: false,
+            report_type: finding.report_type
+          ))
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
+      end
+
+      context 'when finding id is unknown' do
+        let(:finding_id) { 0 }
+
+        it 'responds with expected error' do
+          subject
+
+          expect(response).to have_gitlab_http_status(400)
+          expect(json_response['message']).to eq(expected_error_messages)
+        end
+      end
+
+      context 'when a vulnerability already exists for a specific finding' do
+        before do
+          create(:vulnerability, findings: [finding], project: finding.project)
+        end
+
+        it 'rejects creation of a new vulnerability from this finding' do
+          subject
+
+          expect(response).to have_gitlab_http_status(400)
+          expect(json_response['message']).to eq(expected_error_messages)
+        end
+      end
+
+      it_behaves_like 'forbids actions on vulnerability in case of disabled features'
+    end
+
+    it_behaves_like 'responds with "not found" when there is no access to the project'
+    it_behaves_like 'prevents working with vulnerabilities in case of insufficient access level'
+  end
+
+  shared_examples 'prevents working with vulnerabilities for anonymous users' do
+    it do
+      subject
+
+      expect(response).to have_gitlab_http_status(403)
+    end
   end
 
   describe "POST /vulnerabilities:id/dismiss" do
@@ -78,6 +150,7 @@ describe API::Vulnerabilities do
       create_list(:vulnerabilities_occurrence, 2, vulnerability: vulnerability, project: vulnerability.project)
     end
 
+    let_it_be(:project) { create(:project, :with_vulnerabilities) }
     let(:vulnerability) { project.vulnerabilities.first }
 
     subject { post api("/vulnerabilities/#{vulnerability.id}/dismiss", user) }
@@ -143,7 +216,8 @@ describe API::Vulnerabilities do
       it_behaves_like 'forbids actions on vulnerability in case of disabled features'
     end
 
-    it_behaves_like 'prevents working with vulnerabilities in case of insufficient privileges'
+    it_behaves_like 'prevents working with vulnerabilities in case of insufficient access level'
+    it_behaves_like 'prevents working with vulnerabilities for anonymous users'
   end
 
   describe "POST /vulnerabilities:id/resolve" do
@@ -151,6 +225,7 @@ describe API::Vulnerabilities do
       create_list(:vulnerabilities_finding, 2, vulnerability: vulnerability)
     end
 
+    let_it_be(:project) { create(:project, :with_vulnerabilities) }
     let(:vulnerability) { project.vulnerabilities.first }
 
     subject { post api("/vulnerabilities/#{vulnerability.id}/resolve", user) }
@@ -186,6 +261,7 @@ describe API::Vulnerabilities do
       it_behaves_like 'forbids actions on vulnerability in case of disabled features'
     end
 
-    it_behaves_like 'prevents working with vulnerabilities in case of insufficient privileges'
+    it_behaves_like 'prevents working with vulnerabilities in case of insufficient access level'
+    it_behaves_like 'prevents working with vulnerabilities for anonymous users'
   end
 end
