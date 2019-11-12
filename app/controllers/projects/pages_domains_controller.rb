@@ -42,7 +42,7 @@ class Projects::PagesDomainsController < Projects::ApplicationController
   def update
     if @domain.update(update_params)
       redirect_to project_pages_path(@project),
-        status: 302,
+        status: :found,
         notice: 'Domain was updated'
     else
       render 'edit'
@@ -55,7 +55,7 @@ class Projects::PagesDomainsController < Projects::ApplicationController
     respond_to do |format|
       format.html do
         redirect_to project_pages_path(@project),
-                    status: 302,
+                    status: :found,
                     notice: 'Domain was removed'
       end
       format.js

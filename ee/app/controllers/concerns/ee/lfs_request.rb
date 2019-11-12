@@ -25,7 +25,7 @@ module EE
           documentation_url: help_url
         },
         content_type: ::LfsRequest::CONTENT_TYPE,
-        status: 406
+        status: :not_acceptable
       )
     end
 
