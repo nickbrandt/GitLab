@@ -51,6 +51,7 @@ export default {
       'projectSearchResults',
       'searchCount',
       'messages',
+      'pageInfo',
     ]),
     projects: {
       get() {
@@ -76,6 +77,7 @@ export default {
   },
   methods: {
     ...mapActions([
+      'fetchNextPage',
       'fetchSearchResults',
       'addProjectsToDashboard',
       'fetchProjects',
@@ -126,8 +128,10 @@ export default {
         :show-loading-indicator="isSearchingProjects"
         :show-minimum-search-query-message="messages.minimumQuery"
         :show-search-error-message="messages.searchError"
+        :total-results="pageInfo.totalResults"
         @searched="searched"
         @projectClicked="projectClicked"
+        @bottomReached="fetchNextPage"
       />
     </gl-modal>
 
