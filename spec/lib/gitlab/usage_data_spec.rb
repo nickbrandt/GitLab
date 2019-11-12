@@ -53,7 +53,7 @@ describe Gitlab::UsageData do
       create(:grafana_integration, project: projects[1], enabled: true)
       create(:grafana_integration, project: projects[2], enabled: false)
 
-      allow(Gitlab::GrafanaEmbedUsageData).to receive(:issue_count) { 2 }
+      allow(Gitlab::GrafanaEmbedUsageData).to receive(:issue_count).and_return(2)
 
       ProjectFeature.first.update_attribute('repository_access_level', 0)
     end
