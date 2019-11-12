@@ -49,8 +49,8 @@ module Clusters
 
         create_or_update_knative_serving_role
         create_or_update_knative_serving_role_binding
-        create_or_update_crossplane_serving_role
-        create_or_update_crossplane_serving_role_binding
+        create_or_update_crossplane_database_role
+        create_or_update_crossplane_database_role_binding
       end
 
       private
@@ -80,12 +80,12 @@ module Clusters
         kubeclient.update_role_binding(knative_serving_role_binding_resource)
       end
 
-      def create_or_update_crossplane_serving_role
-        kubeclient.update_role(crossplane_serving_role_resource)
+      def create_or_update_crossplane_database_role
+        kubeclient.update_role(crossplane_database_role_resource)
       end
 
-      def create_or_update_crossplane_serving_role_binding
-        kubeclient.update_role_binding(crossplane_serving_role_binding_resource)
+      def create_or_update_crossplane_database_role_binding
+        kubeclient.update_role_binding(crossplane_database_role_binding_resource)
       end
 
       def service_account_resource
@@ -145,7 +145,7 @@ module Clusters
         ).generate
       end
 
-      def crossplane_serving_role_resource
+      def crossplane_database_role_resource
         Gitlab::Kubernetes::Role.new(
             name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_NAME,
             namespace: service_account_namespace,
@@ -157,7 +157,7 @@ module Clusters
         ).generate
       end
 
-      def crossplane_serving_role_binding_resource
+      def crossplane_database_role_binding_resource
         Gitlab::Kubernetes::RoleBinding.new(
             name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_BINDING_NAME,
             role_name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_NAME,
