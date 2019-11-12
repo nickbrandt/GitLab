@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Plan < ApplicationRecord
+  # Remove these in version >= 12.6
+  self.ignored_columns += %i[active_pipelines_limit pipeline_size_limit active_jobs_limit]
+
   DEFAULT = 'default'.freeze
   FREE = 'free'.freeze
   BRONZE = 'bronze'.freeze
@@ -15,6 +18,7 @@ class Plan < ApplicationRecord
 
   has_many :namespaces
   has_many :hosted_subscriptions, class_name: 'GitlabSubscription', foreign_key: 'hosted_plan_id'
+  has_one :limits, class_name: 'PlanLimits'
 
   def self.default
     Gitlab::SafeRequestStore[:plan_default] ||= find_by(name: DEFAULT)

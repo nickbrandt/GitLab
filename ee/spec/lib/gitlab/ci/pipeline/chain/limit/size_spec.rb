@@ -23,7 +23,8 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
 
   context 'when pipeline size limit is exceeded' do
     before do
-      gold_plan = create(:gold_plan, pipeline_size_limit: 1)
+      gold_plan = create(:gold_plan)
+      create(:plan_limits, plan: gold_plan, ci_pipeline_size: 1)
       create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
     end
 
@@ -104,6 +105,12 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
   end
 
   context 'when pipeline size limit is not exceeded' do
+    before do
+      gold_plan = create(:gold_plan)
+      create(:plan_limits, plan: gold_plan, ci_pipeline_size: 100)
+      create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+    end
+
     it 'does not break the chain' do
       subject
 
