@@ -36,12 +36,12 @@ module QA
       # In case of an address that is a symbol we will try to guess address
       # based on `Runtime::Scenario#something_address`.
       #
-      def visit(address, page_class, &block)
-        Browser::Session.new(address, page_class).perform(&block)
+      def visit(address, page_class, skip_elements_validation: false, &block)
+        Browser::Session.new(address, page_class, skip_elements_validation: skip_elements_validation).perform(&block)
       end
 
-      def self.visit(address, page_class, &block)
-        new.visit(address, page_class, &block)
+      def self.visit(address, page_class, skip_elements_validation: false, &block)
+        new.visit(address, page_class, skip_elements_validation: skip_elements_validation, &block)
       end
 
       def self.configure!
@@ -140,9 +140,10 @@ module QA
 
         attr_reader :page_class
 
-        def initialize(instance, page_class)
+        def initialize(instance, page_class, skip_elements_validation: false)
           @session_address = Runtime::Address.new(instance, page_class)
           @page_class = page_class
+          @skip_elements_validation = skip_elements_validation
         end
 
         def url
@@ -152,7 +153,7 @@ module QA
         def perform(&block)
           visit(url)
 
-          page_class.validate_elements_present!
+          page_class.validate_elements_present! unless @skip_elements_validation
 
           if QA::Runtime::Env.qa_cookies
             browser = Capybara.current_session.driver.browser
