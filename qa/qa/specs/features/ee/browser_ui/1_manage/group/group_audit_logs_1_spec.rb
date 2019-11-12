@@ -37,7 +37,7 @@ module QA
         it_behaves_like 'group audit event logs', ["Add group"]
       end
 
-      context 'Change repository size limit' do
+      context 'Change repository size limit', :requires_admin do
         before do
           sign_in(as_admin: true)
           @group.visit!

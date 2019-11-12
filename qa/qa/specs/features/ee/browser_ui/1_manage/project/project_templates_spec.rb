@@ -37,7 +37,7 @@ module QA
         Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
 
-      context 'built-in' do
+      context 'built-in', :requires_admin do
         before do
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_admin_credentials)
@@ -68,7 +68,7 @@ module QA
       end
 
       # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/61
-      context 'instance level', :quarantine do
+      context 'instance level', :quarantine, :requires_admin do
         before do
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_admin_credentials)
