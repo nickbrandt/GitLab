@@ -4,6 +4,8 @@ module Projects
   module Prometheus
     module Alerts
       class NotifyService < BaseService
+        BadPayloadError = Class.new(StandardError)
+
         include Gitlab::Utils::StrongMemoize
 
         def execute(token)
@@ -15,9 +17,17 @@ module Projects
           process_incident_issues if process_issues?
 
           true
+        rescue BadPayloadError
+          false
         end
 
         private
+
+        def payload
+          raise BadPayloadError, 'The payload is too big' unless Gitlab::Utils::DeepSize.new(params).valid?
+
+          params
+        end
 
         def incident_management_available?
           project.feature_available?(:incident_management)
@@ -56,11 +66,11 @@ module Projects
         end
 
         def alerts
-          params['alerts']
+          payload['alerts']
         end
 
         def valid_version?
-          params['version'] == '4'
+          payload['version'] == '4'
         end
 
         def valid_alert_manager_token?(token)
@@ -134,7 +144,7 @@ module Projects
         end
 
         def persist_events
-          CreateEventsService.new(project, nil, params).execute
+          CreateEventsService.new(project, nil, payload).execute
         end
       end
     end
