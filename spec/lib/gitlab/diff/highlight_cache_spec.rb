@@ -53,6 +53,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
                              fallback_diff_refs: diffs.fallback_diff_refs)
     end
 
+
     it 'does not calculate highlighting when reading from cache' do
       cache.write_if_empty
       cache.decorate(diff_file)
@@ -69,11 +70,18 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
       expect(diff_file.highlighted_diff_lines.size).to be > 5
     end
 
-    it 'submits a single reading from the cache' do
-      cache.decorate(diff_file)
-      cache.decorate(diff_file)
+    context 'when :redis_diff_caching is not enabled' do
+      before do
+        expect(Feature).to receive(:enabled?).with(:redis_diff_caching).and_return(false)
+      end
 
-      expect(backend).to have_received(:read).with(cache.key).once
+      it 'submits a single reading from the cache' do
+        expect(Feature).to receive(:enabled?).with(:redis_diff_caching).at_least(:once).and_return(false)
+
+        2.times { cache.decorate(diff_file) }
+
+        expect(backend).to have_received(:read).with(cache.key).once
+      end
     end
   end
 
@@ -94,7 +102,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
     context 'when :redis_diff_caching is not enabled' do
       before do
-        expect(Feature).to receive(:enabled?).with(:redis_diff_caching).and_return(false)
+        expect(Feature).to receive(:enabled?).with(:redis_diff_caching).at_least(:once).and_return(false)
       end
 
       it 'submits a single writing to the cache' do
@@ -126,7 +134,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
     end
 
     it 'returns the entire contents of a Redis hash as JSON' do
-      result = cache.read_entire_redis_hash(cache_key)
+      result = cache.read_entire_redis_hash
 
       expect(result.values.first).to eq(diff_hash.values.first.to_json)
     end
@@ -142,7 +150,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
     it 'returns highlighted diff content for a single file as JSON' do
       diff_hash.each do |file_path, value|
-        found = cache.read_single_entry_from_redis_hash(cache_key, file_path)
+        found = cache.read_single_entry_from_redis_hash(file_path)
 
         expect(found).to eq(value.to_json)
       end

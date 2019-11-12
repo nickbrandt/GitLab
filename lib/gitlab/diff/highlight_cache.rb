@@ -11,6 +11,7 @@ module Gitlab
       def initialize(diff_collection, backend: Rails.cache)
         @backend = backend
         @diff_collection = diff_collection
+        @redis_key = diffable.cache_key if Feature.enabled?(:redis_diff_caching)
       end
 
       # - Reads from cache
@@ -58,32 +59,30 @@ module Gitlab
       #   ...it will write/update a Redis hash (HSET)
       #
       def write_to_redis_hash(hash)
-        key = diffable.cache_key
+        return unless @redis_key
 
-        if key
-          Redis::Cache.with do |redis|
-            redis.multi do |multi|
-              hash.each do |diff_file_id, highlighted_diff_lines_hash|
-                multi.hset(key, diff_file_id, highlighted_diff_lines_hash.to_json)
+        Redis::Cache.with do |redis|
+          redis.multi do |multi|
+            hash.each do |diff_file_id, highlighted_diff_lines_hash|
+              multi.hset(@redis_key, diff_file_id, highlighted_diff_lines_hash.to_json)
 
-                # HSETs have to have their expiration date manually updated
-                #
-                multi.expire(key, EXPIRATION)
-              end
+              # HSETs have to have their expiration date manually updated
+              #
+              multi.expire(@redis_key, EXPIRATION)
             end
           end
         end
       end
 
-      def read_entire_redis_hash(key)
+      def read_entire_redis_hash
         Redis::Cache.with do |redis|
-          redis.hgetall(key)
+          redis.hgetall(@redis_key)
         end
       end
 
-      def read_single_entry_from_redis_hash(key, diff_file_id)
+      def read_single_entry_from_redis_hash(diff_file_id)
         Redis::Cache.with do |redis|
-          redis.hget(key, diff_file_id)
+          redis.hget(@redis_key, diff_file_id)
         end
       end
 
@@ -106,7 +105,15 @@ module Gitlab
       end
 
       def cached_content
-        @cached_content ||= cache.read(key) || {}
+        @cached_content ||= populate_cached_content || {}
+      end
+
+      def populate_cached_content
+        if Feature.enabled?(:redis_diff_caching)
+          read_entire_redis_hash
+        else
+          cache.read(key)
+        end
       end
 
       def cacheable?(diff_file)
