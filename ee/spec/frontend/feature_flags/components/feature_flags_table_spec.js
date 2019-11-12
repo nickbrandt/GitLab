@@ -9,8 +9,35 @@ import {
 
 const localVue = createLocalVue();
 
+const getDefaultProps = () => ({
+  featureFlags: [
+    {
+      id: 1,
+      active: true,
+      name: 'flag name',
+      description: 'flag description',
+      destroy_path: 'destroy/path',
+      edit_path: 'edit/path',
+      scopes: [
+        {
+          id: 1,
+          active: true,
+          environmentScope: 'scope',
+          canUpdate: true,
+          protected: false,
+          rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+          rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
+          shouldBeDestroyed: false,
+        },
+      ],
+    },
+  ],
+  csrfToken: 'fakeToken',
+});
+
 describe('Feature flag table', () => {
   let wrapper;
+  let props;
 
   const createWrapper = (propsData, opts = {}) => {
     wrapper = shallowMount(FeatureFlagsTable, {
@@ -21,6 +48,10 @@ describe('Feature flag table', () => {
     });
   };
 
+  beforeEach(() => {
+    props = getDefaultProps();
+  });
+
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
@@ -28,37 +59,10 @@ describe('Feature flag table', () => {
 
   describe('with an active scope and a standard rollout strategy', () => {
     beforeEach(() => {
-      createWrapper(
-        {
-          featureFlags: [
-            {
-              id: 1,
-              iid: 1,
-              active: true,
-              name: 'flag name',
-              description: 'flag description',
-              destroy_path: 'destroy/path',
-              edit_path: 'edit/path',
-              scopes: [
-                {
-                  id: 1,
-                  active: true,
-                  environmentScope: 'scope',
-                  canUpdate: true,
-                  protected: false,
-                  rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
-                  rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-                  shouldBeDestroyed: false,
-                },
-              ],
-            },
-          ],
-          csrfToken: 'fakeToken',
-        },
-        {
-          provide: { glFeatures: { featureFlagIID: true } },
-        },
-      );
+      props.featureFlags[0].iid = 1;
+      createWrapper(props, {
+        provide: { glFeatures: { featureFlagIID: true } },
+      });
     });
 
     it('Should render a table', () => {
@@ -111,31 +115,9 @@ describe('Feature flag table', () => {
 
   describe('with an active scope and a percentage rollout strategy', () => {
     beforeEach(() => {
-      createWrapper({
-        featureFlags: [
-          {
-            id: 1,
-            active: true,
-            name: 'flag name',
-            description: 'flag description',
-            destroy_path: 'destroy/path',
-            edit_path: 'edit/path',
-            scopes: [
-              {
-                id: 1,
-                active: true,
-                environmentScope: 'scope',
-                canUpdate: true,
-                protected: false,
-                rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-                rolloutPercentage: '54',
-                shouldBeDestroyed: false,
-              },
-            ],
-          },
-        ],
-        csrfToken: 'fakeToken',
-      });
+      props.featureFlags[0].scopes[0].rolloutStrategy = ROLLOUT_STRATEGY_PERCENT_ROLLOUT;
+      props.featureFlags[0].scopes[0].rolloutPercentage = '54';
+      createWrapper(props);
     });
 
     it('should render an environments specs badge with percentage', () => {
@@ -147,31 +129,8 @@ describe('Feature flag table', () => {
 
   describe('with an inactive scope', () => {
     beforeEach(() => {
-      createWrapper({
-        featureFlags: [
-          {
-            id: 1,
-            active: true,
-            name: 'flag name',
-            description: 'flag description',
-            destroy_path: 'destroy/path',
-            edit_path: 'edit/path',
-            scopes: [
-              {
-                id: 1,
-                active: false,
-                environmentScope: 'scope',
-                canUpdate: true,
-                protected: false,
-                rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
-                rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-                shouldBeDestroyed: false,
-              },
-            ],
-          },
-        ],
-        csrfToken: 'fakeToken',
-      });
+      props.featureFlags[0].scopes[0].active = false;
+      createWrapper(props);
     });
 
     it('should render an environments specs badge with inactive class', () => {
