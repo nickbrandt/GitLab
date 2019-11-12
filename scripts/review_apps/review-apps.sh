@@ -1,5 +1,4 @@
 [[ "$TRACE" ]] && set -x
-export TILLER_NAMESPACE="$KUBE_NAMESPACE"
 
 function deploy_exists() {
   local namespace="${1}"
@@ -49,7 +48,7 @@ function delete_release() {
 
   echoinfo "Deleting release '$deploy'..." true
 
-  helm delete --purge --tiller-namespace "${namespace}" "$deploy"
+  helm delete --purge --tiller-namespace "${namespace}" "${deploy}"
 }
 
 function delete_failed_release() {
@@ -120,6 +119,7 @@ function ensure_namespace() {
 }
 
 function install_tiller() {
+  local TILLER_NAMESPACE="$KUBE_NAMESPACE"
   echoinfo "Checking deployment/tiller-deploy status in the ${TILLER_NAMESPACE} namespace..." true
 
   echoinfo "Initiating the Helm client..."
@@ -134,11 +134,12 @@ function install_tiller() {
     --override "spec.template.spec.tolerations[0].key"="dedicated" \
     --override "spec.template.spec.tolerations[0].operator"="Equal" \
     --override "spec.template.spec.tolerations[0].value"="helm" \
-    --override "spec.template.spec.tolerations[0].effect"="NoSchedule"
+    --override "spec.template.spec.tolerations[0].effect"="NoSchedule" \
+    --tiller-namespace "${TILLER_NAMESPACE}"
 
   kubectl rollout status -n "$TILLER_NAMESPACE" -w "deployment/tiller-deploy"
 
-  if ! helm version --debug; then
+  if ! helm version --debug --tiller-namespace "${TILLER_NAMESPACE}"; then
     echo "Failed to init Tiller."
     return 1
   fi
