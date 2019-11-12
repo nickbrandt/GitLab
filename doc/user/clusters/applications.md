@@ -268,17 +268,17 @@ file.
 
 ### Crossplane
 
-> - Introduced in Gitlab 12.5 for project-level clusters.
+> - Introduced in GitLab 12.5 for project-level clusters.
 
-[Crossplane](https://crossplane.io/docs) is a multicloud control plane useful in management of applications and infrastructure across multiple clouds by extending the Kubernetes API using custom resources and controllers watching those custom resources. Crossplane allows provisioning and lifecycle management of infrastructure components across cloud providers in a uniform and simplistic manner abstracting away cloud provider specific configurations.
+[Crossplane](https://crossplane.io/docs) is a multicloud control plane useful in management of applications and infrastructure across multiple clouds by extending the Kubernetes API using custom resources and controllers watching those custom resources. Crossplane allows provisioning and lifecycle management of infrastructure components across cloud providers in a uniform manner abstracting away cloud provider specific configurations.
 
-Crossplane listed as a gitlab managed application, installs crossplane with a provider of choice on a kuberetes cluster attached to the project repository. Crossplane can then be used to provision infrastructure or managed applications such as postgresql(eg: CloudSQL from gcp or RDS from aws) and other [services](https://crossplane.io/docs/v0.4/services-guide.html) required by the application via the autodevops pipeline.
+The Crossplane GitLab managed application installs Crossplane with a provider of choice on a kubernetes cluster attached to the project repository. Crossplane can then be used to provision infrastructure or managed applications such as postgresql (e.g.: CloudSQL from GCP or RDS from AWS) and other [services](https://crossplane.io/docs/v0.4/services-guide.html) required by the application via the Auto DevOps pipeline.
 
-For configuring crossplane on the cluster navigate to [Crossplane configuration with Gitlab](./crossplane.md)
+For configuring Crossplane on the cluster navigate to [Crossplane configuration with GitLab](./crossplane.md)
 
 NOTE: **Note:**
 The [`alpha/crossplane`](https://charts.crossplane.io/alpha/)
-v0.4.0 chart is used to install this application with a
+v0.4.1 chart is used to install this application with a
 [`values.yaml`](https://github.com/crossplaneio/crossplane/blob/master/cluster/charts/crossplane/values.yaml.tmpl)
 file.
 
