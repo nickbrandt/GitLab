@@ -342,8 +342,6 @@ ActiveRecord::Schema.define(version: 2019_11_12_115317) do
     t.integer "push_event_hooks_limit", default: 3, null: false
     t.integer "push_event_activities_limit", default: 3, null: false
     t.string "custom_http_clone_url_root", limit: 511
-    t.boolean "pendo_enabled", default: false, null: false
-    t.string "pendo_url", limit: 255
     t.integer "deletion_adjourned_period", default: 7, null: false
     t.date "license_trial_ends_on"
     t.boolean "eks_integration_enabled", default: false, null: false
