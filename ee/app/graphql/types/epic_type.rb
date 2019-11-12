@@ -46,6 +46,8 @@ module Types
           ::Types::EpicType.connection_type,
           null: true,
           resolver: ::Resolvers::EpicResolver
+    field :labels, Types::LabelType.connection_type, null: true,
+          description: 'Labels assigned to the epic'
 
     field :has_children, GraphQL::BOOLEAN_TYPE, null: false, method: :has_children? # rubocop:disable Graphql/Descriptions
     field :has_issues, GraphQL::BOOLEAN_TYPE, null: false, method: :has_issues? # rubocop:disable Graphql/Descriptions
