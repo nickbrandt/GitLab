@@ -51,6 +51,8 @@ describe('EnvironmentLogs', () => {
 
   const initWrapper = () => {
     wrapper = shallowMount(EnvironmentLogsComponent, {
+      attachToDocument: true,
+      sync: false,
       propsData,
       store,
       methods: {
