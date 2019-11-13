@@ -5,16 +5,16 @@ import { isScrolledToBottom, scrollDown, toggleDisableButton } from '~/lib/utils
 import httpStatusCodes from '~/lib/utils/http_status';
 import LogOutputBehaviours from '~/lib/utils/logoutput_behaviours';
 import flash from '~/flash';
-import { __, s__, sprintf } from '~/locale';
+import { s__, sprintf } from '~/locale';
 import _ from 'underscore';
 import { backOff } from '~/lib/utils/common_utils';
 import Api from 'ee/api';
 
 const TWO_MINUTES = 120000;
 
-const requestWithBackoff = (projectFullPath, environmentId, podName, containerName) =>
+const requestWithBackoff = (projectPath, environmentId, podName, containerName) =>
   backOff((next, stop) => {
-    Api.getPodLogs({ projectFullPath, environmentId, podName, containerName })
+    Api.getPodLogs({ projectPath, environmentId, podName, containerName })
       .then(res => {
         if (!res.data) {
           next();
@@ -128,7 +128,7 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
             );
           }
         } else {
-          flash(__('Environments|An error occurred while fetching the logs'));
+          flash(s__('Environments|An error occurred while fetching the logs'));
         }
       })
       .finally(() => {

@@ -1,7 +1,6 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlDropdown, GlDropdownItem, GlFormGroup, GlButton, GlTooltipDirective } from '@gitlab/ui';
-import flash from '~/flash';
 import {
   canScroll,
   isScrolledToTop,
@@ -10,7 +9,6 @@ import {
   scrollUp,
 } from '~/lib/utils/scroll_utils';
 import Icon from '~/vue_shared/components/icon.vue';
-import { __ } from '~/locale';
 
 export default {
   components: {
@@ -24,6 +22,14 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   props: {
+    environmentId: {
+      type: String,
+      required: true,
+    },
+    projectFullPath: {
+      type: String,
+      required: true,
+    },
     currentEnvironmentName: {
       type: String,
       required: false,
@@ -35,11 +41,6 @@ export default {
       default: null,
     },
     environmentsPath: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    logsEndpoint: {
       type: String,
       required: false,
       default: '',
@@ -73,24 +74,19 @@ export default {
     window.addEventListener('scroll', this.updateScrollState);
   },
   mounted() {
-    this.fetchEnvironments(this.environmentsPath);
+    this.setInitData({
+      projectPath: this.projectFullPath,
+      environmentId: this.environmentId,
+      podName: this.currentPodName,
+    });
 
-    this.setLogsEndpoint(this.logsEndpoint)
-      .then(() => {
-        this.fetchLogs(this.currentPodName);
-      })
-      .catch(() => {
-        flash(__('Something went wrong on our end. Please try again!'));
-      });
+    this.fetchEnvironments(this.environmentsPath);
   },
   destroyed() {
     window.removeEventListener('scroll', this.updateScrollState);
   },
   methods: {
-    ...mapActions('environmentLogs', ['setLogsEndpoint', 'fetchEnvironments', 'fetchLogs']),
-    showPod(podName) {
-      this.fetchLogs(podName);
-    },
+    ...mapActions('environmentLogs', ['setInitData', 'showPodLogs', 'fetchEnvironments']),
     updateScrollState() {
       this.scrollToTopEnabled = canScroll() && !isScrolledToTop();
       this.scrollToBottomEnabled = canScroll() && !isScrolledToBottom();
@@ -136,7 +132,7 @@ export default {
         >
           <gl-dropdown
             id="pods-dropdown"
-            :text="pods.current"
+            :text="pods.current || s__('Environments|No pods to display')"
             :disabled="logs.isLoading"
             class="d-flex js-pods-dropdown"
             toggle-class="dropdown-menu-toggle"
@@ -144,7 +140,7 @@ export default {
             <gl-dropdown-item
               v-for="podName in pods.options"
               :key="podName"
-              @click="showPod(podName)"
+              @click="showPodLogs(podName)"
             >
               {{ podName }}
             </gl-dropdown-item>
@@ -188,7 +184,7 @@ export default {
           class="ml-1 px-2 js-refresh-log"
           :title="__('Refresh')"
           :aria-label="__('Refresh')"
-          @click="showPod(pods.current)"
+          @click="showPodLogs(pods.current)"
         >
           <icon name="retry" />
         </gl-button>

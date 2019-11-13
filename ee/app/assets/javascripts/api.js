@@ -78,7 +78,17 @@ export default {
     return axios.delete(url);
   },
 
-  getPodLogs({ projectFullPath, environmentId, podName, containerName }) {
+  /**
+   * Returns pods logs for an environment with an optional pod and container
+   *
+   * @param {Object} params
+   * @param {string} param.projectFullPath - Path of the project, in format `/<namespace>/<project-key>`
+   * @param {number} param.environmentId - Id of the environment
+   * @param {string=} params.podName - Pod name, if not set the backend assumes a default one
+   * @param {string=} params.containerName - Container name, if not set the backend assumes a default one
+   * @returns {Promise} Axios promise for the result of a GET request of logs
+   */
+  getPodLogs({ projectPath, environmentId, podName, containerName }) {
     let logPath = this.podLogsPath;
     if (podName && containerName) {
       logPath = this.podLogsPathWithPodContainer;
@@ -87,7 +97,7 @@ export default {
     }
 
     let url = this.buildUrl(logPath)
-      .replace(':project_full_path', projectFullPath)
+      .replace(':project_full_path', projectPath)
       .replace(':environment_id', environmentId);
 
     if (podName) {

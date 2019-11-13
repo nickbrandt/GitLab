@@ -164,7 +164,7 @@ describe('Api', () => {
   });
 
   describe('getPodLogs', () => {
-    const projectFullPath = 'root/test-project';
+    const projectPath = 'root/test-project';
     const environmentId = 2;
     const podName = 'pod';
     const containerName = 'container';
@@ -180,9 +180,9 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` with pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectFullPath}/environments/${environmentId}/pods/${podName}/containers/${containerName}/logs.json`;
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/${podName}/containers/${containerName}/logs.json`;
 
-      Api.getPodLogs({ projectFullPath, environmentId, podName, containerName })
+      Api.getPodLogs({ projectPath, environmentId, podName, containerName })
         .then(() => {
           expect(expectedUrl).toBe(lastUrl());
         })
@@ -191,9 +191,9 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` without pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectFullPath}/environments/${environmentId}/pods/containers/logs.json`;
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/containers/logs.json`;
 
-      Api.getPodLogs({ projectFullPath, environmentId })
+      Api.getPodLogs({ projectPath, environmentId })
         .then(() => {
           expect(expectedUrl).toBe(lastUrl());
         })
@@ -202,9 +202,9 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` with pod_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectFullPath}/environments/${environmentId}/pods/${podName}/containers/logs.json`;
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/${podName}/containers/logs.json`;
 
-      Api.getPodLogs({ projectFullPath, environmentId, podName })
+      Api.getPodLogs({ projectPath, environmentId, podName })
         .then(() => {
           expect(expectedUrl).toBe(lastUrl());
         })
