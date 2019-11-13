@@ -1,6 +1,5 @@
 import _ from 'underscore';
 import { createLocalVue, mount } from '@vue/test-utils';
-import { GlFormCheckbox, GlFormTextarea } from '@gitlab/ui';
 import Form from 'ee/feature_flags/components/form.vue';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
@@ -102,8 +101,6 @@ describe('feature flag form', () => {
             protected: false,
             rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
             rolloutPercentage: '54',
-            rolloutUserIds: '123',
-            shouldIncludeUserIds: true,
           },
           {
             id: 2,
@@ -113,8 +110,6 @@ describe('feature flag form', () => {
             protected: true,
             rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
             rolloutPercentage: '54',
-            rolloutUserIds: '123',
-            shouldIncludeUserIds: true,
           },
         ],
       });
@@ -127,16 +122,6 @@ describe('feature flag form', () => {
 
       it('renders empty row to add a new scope', () => {
         expect(wrapper.find('.js-add-new-scope').exists()).toEqual(true);
-      });
-
-      it('renders the user id checkbox', () => {
-        expect(wrapper.find(GlFormCheckbox).exists()).toBe(true);
-      });
-
-      it('renders the user id text area', () => {
-        expect(wrapper.find(GlFormTextarea).exists()).toBe(true);
-
-        expect(wrapper.find(GlFormTextarea).vm.value).toBe('123');
       });
 
       describe('update scope', () => {
@@ -262,7 +247,7 @@ describe('feature flag form', () => {
               active: false,
               rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
               rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-              rolloutUserIds: '',
+              rolloutUserIds: [],
             },
           ],
         });
@@ -316,7 +301,7 @@ describe('feature flag form', () => {
                 protected: true,
                 rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
                 rolloutPercentage: '55',
-                rolloutUserIds: '',
+                rolloutUserIds: [],
               },
               {
                 id: jasmine.any(String),
@@ -326,7 +311,7 @@ describe('feature flag form', () => {
                 protected: false,
                 rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
                 rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-                rolloutUserIds: '',
+                rolloutUserIds: [],
               },
               {
                 id: jasmine.any(String),
@@ -336,13 +321,96 @@ describe('feature flag form', () => {
                 protected: false,
                 rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
                 rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-                rolloutUserIds: '',
+                rolloutUserIds: [],
               },
             ]);
           })
           .then(done)
           .catch(done.fail);
       });
+    });
+  });
+
+  describe('updateUserIds', () => {
+    beforeEach(() => {
+      factory({
+        ...requiredProps,
+        name: 'feature_flag_1',
+        description: 'this is a feature flag',
+        scopes: [
+          {
+            environment_scope: 'production',
+            can_update: true,
+            protected: true,
+            active: false,
+          },
+          {
+            environment_scope: 'staging',
+            can_update: true,
+            protected: true,
+            active: false,
+          },
+        ],
+      });
+    });
+
+    it('should set the user ids on all scopes', () => {
+      wrapper.vm.updateUserIds(['123', '456']);
+      wrapper.vm.formScopes.forEach(s => {
+        expect(s.rolloutUserIds).toEqual(['123', '456']);
+      });
+    });
+  });
+
+  describe('userIds', () => {
+    it('should get the user ids from the first scope with them', () => {
+      factory({
+        ...requiredProps,
+        name: 'feature_flag_1',
+        description: 'this is a feature flag',
+        scopes: [
+          {
+            environment_scope: 'production',
+            can_update: true,
+            protected: true,
+            active: false,
+            rolloutUserIds: ['123', '456'],
+          },
+          {
+            environment_scope: 'staging',
+            can_update: true,
+            protected: true,
+            active: false,
+            rolloutUserIds: ['123', '456'],
+          },
+        ],
+      });
+
+      expect(wrapper.vm.userIds).toEqual(['123', '456']);
+    });
+
+    it('should return an empty array if there are no user IDs set', () => {
+      factory({
+        ...requiredProps,
+        name: 'feature_flag_1',
+        description: 'this is a feature flag',
+        scopes: [
+          {
+            environment_scope: 'production',
+            can_update: true,
+            protected: true,
+            active: false,
+          },
+          {
+            environment_scope: 'staging',
+            can_update: true,
+            protected: true,
+            active: false,
+          },
+        ],
+      });
+
+      expect(wrapper.vm.userIds).toEqual([]);
     });
   });
 });
