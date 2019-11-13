@@ -18256,6 +18256,9 @@ msgstr ""
 msgid "This project does not have billing enabled. To create a cluster, <a href=%{linkToBilling} target=\"_blank\" rel=\"noopener noreferrer\">enable billing <i class=\"fa fa-external-link\" aria-hidden=\"true\"></i></a> and try again."
 msgstr ""
 
+msgid "This project is archived and cannot be commented on."
+msgstr ""
+
 msgid "This project path either does not exist or is private."
 msgstr ""
 
