@@ -1552,6 +1552,16 @@ describe ApprovalState do
             end
           end
 
+          context 'when an approver does not have access to the merge request' do
+            before do
+              project.members.find_by(user_id: developer.id).destroy
+            end
+
+            it 'the user cannot approver' do
+              expect(subject.can_approve?(developer)).to be_falsey
+            end
+          end
+
           context 'when all approvals received' do
             it 'allows anyone with write access except for author to approve the MR' do
               create(:approval, user: approver, merge_request: merge_request)

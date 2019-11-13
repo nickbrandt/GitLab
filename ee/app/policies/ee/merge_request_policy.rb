@@ -11,7 +11,10 @@ module EE
       end
 
       rule { ~can_override_approvers }.prevent :update_approvers
-      rule { can?(:update_merge_request) }.enable :update_approvers
+      rule { can?(:update_merge_request) }.policy do
+        enable :update_approvers
+        enable :approve_merge_request
+      end
     end
   end
 end
