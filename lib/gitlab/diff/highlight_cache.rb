@@ -103,14 +103,14 @@ module Gitlab
       end
 
       def cached_content
-        @cached_content ||= populate_cached_content || {}
+        @cached_content ||= populate_cached_content
       end
 
       def populate_cached_content
         if Feature.enabled?(:redis_diff_caching)
-          read_entire_redis_hash
+          read_entire_redis_hash.transform_values! { |v| v.present? ? JSON.parse(v, symbolize_names: true) : nil }
         else
-          cache.read(key)
+          cache.read(key) || {}
         end
       end
 
