@@ -7,10 +7,7 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
   set(:project) { create(:project, :repository, namespace: namespace) }
   set(:user) { create(:user) }
 
-  let(:pipeline) do
-    build(:ci_pipeline_with_one_job, project: project,
-                                     ref: 'master')
-  end
+  let(:pipeline) { build(:ci_pipeline, project: project) }
 
   let(:command) do
     double('command', project: project,
@@ -26,13 +23,10 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
       gold_plan = create(:gold_plan)
       create(:plan_limits, plan: gold_plan, ci_pipeline_size: 1)
       create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
-    end
-
-    let(:pipeline) do
-      config = { rspec: { script: 'rspec' },
-                 spinach: { script: 'spinach' } }
-
-      create(:ci_pipeline, project: project, config: config)
+      stub_ci_pipeline_yaml_file(YAML.dump({
+        rspec: { script: 'rspec' },
+        spinach: { script: 'spinach' }
+      }))
     end
 
     context 'when saving incomplete pipelines' do
