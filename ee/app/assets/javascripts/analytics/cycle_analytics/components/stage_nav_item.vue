@@ -17,10 +17,6 @@ export default {
       default: false,
       required: false,
     },
-    isUserAllowed: {
-      type: Boolean,
-      required: true,
-    },
     title: {
       type: String,
       required: true,
@@ -41,7 +37,7 @@ export default {
       return this.value && this.value.length > 0;
     },
     editable() {
-      return this.isUserAllowed && this.canEdit;
+      return this.canEdit;
     },
   },
 };
@@ -54,13 +50,8 @@ export default {
         {{ title }}
       </div>
       <div class="stage-nav-item-cell stage-median mr-4">
-        <template v-if="isUserAllowed">
-          <span v-if="hasValue">{{ value }}</span>
-          <span v-else class="stage-empty">{{ __('Not enough data') }}</span>
-        </template>
-        <template v-else>
-          <span class="not-available">{{ __('Not available') }}</span>
-        </template>
+        <span v-if="hasValue">{{ value }}</span>
+        <span v-else class="stage-empty">{{ __('Not enough data') }}</span>
       </div>
       <template v-slot:dropdown-options>
         <template v-if="isDefaultStage">

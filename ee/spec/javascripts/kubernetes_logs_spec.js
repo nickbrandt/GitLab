@@ -11,6 +11,7 @@ describe('Kubernetes Logs', () => {
   let kubernetesLog;
   let mock;
   let mockFlash;
+  let podLogsAPIPath;
 
   preloadFixtures(fixtureTemplate);
 
@@ -24,9 +25,11 @@ describe('Kubernetes Logs', () => {
 
       mockDataset = kubernetesLogContainer.dataset;
 
+      podLogsAPIPath = `/${mockDataset.projectFullPath}/environments/${mockDataset.environmentId}/pods/containers/logs.json`;
+
       mock = new MockAdapter(axios);
       mock.onGet(mockDataset.environmentsPath).reply(200, { environments: mockEnvironmentData });
-      mock.onGet(mockDataset.logsEndpoint).reply(200, { logs: logMockData, pods: podMockData });
+      mock.onGet(podLogsAPIPath).reply(200, { logs: logMockData, pods: podMockData });
     });
 
     afterEach(() => {
@@ -158,7 +161,7 @@ describe('Kubernetes Logs', () => {
 
     describe('shows an alert', () => {
       it('with an error', done => {
-        mock.onGet(mockDataset.logsEndpoint).reply(400);
+        mock.onGet(podLogsAPIPath).reply(400);
 
         kubernetesLog = new KubernetesLogs(kubernetesLogContainer);
         kubernetesLog
@@ -173,7 +176,7 @@ describe('Kubernetes Logs', () => {
       it('with some explicit error', done => {
         const errorMsg = 'Some k8s error';
 
-        mock.onGet(mockDataset.logsEndpoint).reply(400, {
+        mock.onGet(podLogsAPIPath).reply(400, {
           message: errorMsg,
         });
 
@@ -198,7 +201,7 @@ describe('Kubernetes Logs', () => {
       kubernetesLogContainer = document.querySelector('.js-kubernetes-logs');
 
       mock = new MockAdapter(axios);
-      mock.onGet(mockDataset.logsEndpoint).reply(200, { logs: logMockData, pods: [hackyPodName] });
+      mock.onGet(podLogsAPIPath).reply(200, { logs: logMockData, pods: [hackyPodName] });
     });
 
     afterEach(() => {
@@ -226,13 +229,15 @@ describe('Kubernetes Logs', () => {
 
       mockDataset = kubernetesLogContainer.dataset;
 
+      podLogsAPIPath = `/${mockDataset.projectFullPath}/environments/${
+        mockDataset.environmentId
+      }/pods/${podMockData[1]}/containers/logs.json`;
+
       mock = new MockAdapter(axios);
       mock.onGet(mockDataset.environmentsPath).reply(200, { environments: mockEnvironmentData });
       // Simulate reactive cache, 2 tries needed
-      mock.onGet(mockDataset.logsEndpoint, { pod_name: podMockData[1] }).replyOnce(202);
-      mock
-        .onGet(mockDataset.logsEndpoint, { pod_name: podMockData[1] })
-        .reply(200, { logs: logMockData, pods: podMockData });
+      mock.onGet(podLogsAPIPath).replyOnce(202);
+      mock.onGet(podLogsAPIPath).reply(200, { logs: logMockData, pods: podMockData });
     });
 
     it('queries the pod log data polling for reactive cache', done => {
@@ -243,12 +248,10 @@ describe('Kubernetes Logs', () => {
       kubernetesLog
         .getData()
         .then(() => {
-          const calls = mock.history.get.filter(r => r.url === mockDataset.logsEndpoint);
+          const calls = mock.history.get.filter(r => r.url === podLogsAPIPath);
 
           // expect 2 tries
           expect(calls.length).toEqual(2);
-          expect(calls[0].params).toEqual({ pod_name: podMockData[1] });
-          expect(calls[1].params).toEqual({ pod_name: podMockData[1] });
 
           expect(document.querySelector('.js-build-output').textContent).toContain(
             logMockData[0].trim(),
@@ -270,6 +273,10 @@ describe('Kubernetes Logs', () => {
       spyOnDependency(KubernetesLogs, 'getParameterValues').and.callFake(() => [podMockData[2]]);
       kubernetesLogContainer = document.querySelector('.js-kubernetes-logs');
 
+      podLogsAPIPath = `/${mockDataset.projectFullPath}/environments/${
+        mockDataset.environmentId
+      }/pods/${podMockData[2]}/containers/logs.json`;
+
       mock = new MockAdapter(axios);
     });
 
@@ -278,10 +285,9 @@ describe('Kubernetes Logs', () => {
       kubernetesLog
         .getData()
         .then(() => {
-          const logsCall = mock.history.get.filter(call => call.url === mockDataset.logsEndpoint);
+          const logsCall = mock.history.get.filter(call => call.url === podLogsAPIPath);
 
           expect(logsCall.length).toBe(1);
-          expect(logsCall[0].params.pod_name).toEqual(podMockData[2]);
           done();
         })
         .catch(done.fail);

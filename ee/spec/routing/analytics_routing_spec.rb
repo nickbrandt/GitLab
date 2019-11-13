@@ -25,6 +25,14 @@ describe 'Analytics' do
       end
     end
 
+    context 'cycle_analytics feature flag is enabled by default' do
+      it 'succeeds' do
+        expect(Gitlab::Analytics).to receive(:cycle_analytics_enabled?).and_call_original
+
+        expect(get('/-/analytics/cycle_analytics')).to route_to('analytics/cycle_analytics#show')
+      end
+    end
+
     context 'productivity_analytics feature flag is disabled' do
       before do
         stub_feature_flags(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => false)

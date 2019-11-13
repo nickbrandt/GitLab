@@ -33,7 +33,7 @@ describe API::Issues, :mailer do
     project.add_reporter(user)
   end
 
-  shared_examples 'exposes epic_iid' do
+  shared_examples 'exposes epic' do
     context 'with epics feature' do
       before do
         stub_licensed_features(epics: true)
@@ -44,6 +44,17 @@ describe API::Issues, :mailer do
 
         expect(response).to have_gitlab_http_status(:success)
         expect(epic_issue_response_for(epic_issue)['epic_iid']).to eq(epic.iid)
+      end
+
+      it 'contains epic in response' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:success)
+        expect(epic_issue_response_for(epic_issue)['epic']).to eq({ "id" => epic.id,
+                                                                    "iid" => epic.iid,
+                                                                    "group_id" => epic.group_id,
+                                                                    "title" => epic.title,
+                                                                    "url" => group_epic_path(epic.group, epic) })
       end
     end
 
@@ -57,6 +68,13 @@ describe API::Issues, :mailer do
 
         expect(response).to have_gitlab_http_status(:success)
         expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
+      end
+
+      it 'does not contain epic_iid in response' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:success)
+        expect(epic_issue_response_for(epic_issue)).not_to have_key('epic')
       end
     end
   end
@@ -175,7 +193,7 @@ describe API::Issues, :mailer do
       end
     end
 
-    include_examples 'exposes epic_iid' do
+    include_examples 'exposes epic' do
       let!(:epic_issue) { create(:issue, project: group_project, epic: epic) }
     end
   end
@@ -221,7 +239,7 @@ describe API::Issues, :mailer do
 
       subject { get api("/projects/#{group_project.id}/issues", user) }
 
-      include_examples 'exposes epic_iid'
+      include_examples 'exposes epic'
     end
   end
 
@@ -248,7 +266,7 @@ describe API::Issues, :mailer do
 
       subject { get api("/projects/#{group_project.id}/issues/#{epic_issue.iid}", user) }
 
-      include_examples 'exposes epic_iid'
+      include_examples 'exposes epic'
     end
   end
 
@@ -278,7 +296,7 @@ describe API::Issues, :mailer do
           group.add_owner(user)
         end
 
-        include_examples 'exposes epic_iid'
+        include_examples 'exposes epic'
         include_examples 'sets epic_iid'
       end
 
@@ -348,7 +366,7 @@ describe API::Issues, :mailer do
         group.add_owner(user)
       end
 
-      include_examples 'exposes epic_iid'
+      include_examples 'exposes epic'
       include_examples 'sets epic_iid'
     end
 

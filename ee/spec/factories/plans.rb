@@ -3,8 +3,8 @@
 # EE-only
 FactoryBot.define do
   factory :plan do
-    factory :free_plan do
-      name { EE::Namespace::FREE_PLAN }
+    factory :default_plan do
+      name { Plan::DEFAULT }
       title { name.titleize }
     end
 

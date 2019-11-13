@@ -34,7 +34,8 @@ module EE
       {
         "current-environment-name": environment.name,
         "environments-path": project_environments_path(project, format: :json),
-        "logs-endpoint": logs_project_environment_path(project, environment, format: :json)
+        "project-full-path": project.full_path,
+        "environment-id": environment.id
       }
     end
 

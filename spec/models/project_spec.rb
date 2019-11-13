@@ -3342,22 +3342,6 @@ describe Project do
     end
   end
 
-  describe '#append_or_update_attribute' do
-    let(:project) { create(:project) }
-
-    it 'shows full error updating an invalid MR' do
-      expect { project.append_or_update_attribute(:merge_requests, [create(:merge_request)]) }
-        .to raise_error(ActiveRecord::RecordInvalid, /Failed to set merge_requests:/)
-    end
-
-    it 'updates the project successfully' do
-      merge_request = create(:merge_request, target_project: project, source_project: project)
-
-      expect { project.append_or_update_attribute(:merge_requests, [merge_request]) }
-        .not_to raise_error
-    end
-  end
-
   describe '#update' do
     let(:project) { create(:project) }
 
@@ -3416,7 +3400,7 @@ describe Project do
     end
   end
 
-  describe '.ids_with_milestone_available_for' do
+  describe '.ids_with_issuables_available_for' do
     let!(:user) { create(:user) }
 
     it 'returns project ids with milestones available for user' do
@@ -3426,7 +3410,7 @@ describe Project do
       project_4 = create(:project, :public)
       project_4.project_feature.update(issues_access_level: ProjectFeature::PRIVATE, merge_requests_access_level: ProjectFeature::PRIVATE )
 
-      project_ids = described_class.ids_with_milestone_available_for(user).pluck(:id)
+      project_ids = described_class.ids_with_issuables_available_for(user).pluck(:id)
 
       expect(project_ids).to include(project_2.id, project_3.id)
       expect(project_ids).not_to include(project_1.id, project_4.id)
@@ -4441,6 +4425,14 @@ describe Project do
       project = create(:project_empty_repo)
 
       expect { project.write_repository_config }.not_to raise_error
+    end
+  end
+
+  describe '#to_ability_name' do
+    it 'returns project' do
+      project = build(:project_empty_repo)
+
+      expect(project.to_ability_name).to eq('project')
     end
   end
 

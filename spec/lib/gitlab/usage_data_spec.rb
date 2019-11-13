@@ -19,13 +19,24 @@ describe Gitlab::UsageData do
       create(:service, project: projects[2], type: 'SlackService', active: true)
       create(:project_error_tracking_setting, project: projects[0])
       create(:project_error_tracking_setting, project: projects[1], enabled: false)
+      create_list(:issue, 4, project: projects[0])
+      create(:zoom_meeting, project: projects[0], issue: projects[0].issues[0], issue_status: :added)
+      create_list(:zoom_meeting, 2, project: projects[0], issue: projects[0].issues[1], issue_status: :removed)
+      create(:zoom_meeting, project: projects[0], issue: projects[0].issues[2], issue_status: :added)
+      create_list(:zoom_meeting, 2, project: projects[0], issue: projects[0].issues[2], issue_status: :removed)
 
-      gcp_cluster = create(:cluster, :provided_by_gcp)
-      create(:cluster, :provided_by_user)
-      create(:cluster, :provided_by_user, :disabled)
+      # Enabled clusters
+      gcp_cluster = create(:cluster_provider_gcp, :created).cluster
+      create(:cluster_provider_aws, :created)
+      create(:cluster_platform_kubernetes)
       create(:cluster, :group)
+
+      # Disabled clusters
+      create(:cluster, :disabled)
       create(:cluster, :group, :disabled)
       create(:cluster, :group, :disabled)
+
+      # Applications
       create(:clusters_applications_helm, :installed, cluster: gcp_cluster)
       create(:clusters_applications_ingress, :installed, cluster: gcp_cluster)
       create(:clusters_applications_cert_manager, :installed, cluster: gcp_cluster)
@@ -65,6 +76,7 @@ describe Gitlab::UsageData do
         avg_cycle_analytics
         influxdb_metrics_enabled
         prometheus_metrics_enabled
+        web_ide_clientside_preview_enabled
       ))
     end
 
@@ -82,6 +94,7 @@ describe Gitlab::UsageData do
         web_ide_views
         web_ide_commits
         web_ide_merge_requests
+        web_ide_previews
         navbar_searches
         cycle_analytics_views
         productivity_analytics_views
@@ -113,6 +126,7 @@ describe Gitlab::UsageData do
         clusters_disabled
         project_clusters_disabled
         group_clusters_disabled
+        clusters_platforms_eks
         clusters_platforms_gke
         clusters_platforms_user
         clusters_applications_helm
@@ -125,6 +139,8 @@ describe Gitlab::UsageData do
         in_review_folder
         groups
         issues
+        issues_with_associated_zoom_link
+        issues_using_zoom_quick_actions
         keys
         label_lists
         labels
@@ -176,14 +192,17 @@ describe Gitlab::UsageData do
       expect(count_data[:projects_slack_slash_active]).to eq(1)
       expect(count_data[:projects_with_repositories_enabled]).to eq(3)
       expect(count_data[:projects_with_error_tracking_enabled]).to eq(1)
+      expect(count_data[:issues_with_associated_zoom_link]).to eq(2)
+      expect(count_data[:issues_using_zoom_quick_actions]).to eq(3)
 
-      expect(count_data[:clusters_enabled]).to eq(7)
-      expect(count_data[:project_clusters_enabled]).to eq(6)
+      expect(count_data[:clusters_enabled]).to eq(4)
+      expect(count_data[:project_clusters_enabled]).to eq(3)
       expect(count_data[:group_clusters_enabled]).to eq(1)
       expect(count_data[:clusters_disabled]).to eq(3)
       expect(count_data[:project_clusters_disabled]).to eq(1)
       expect(count_data[:group_clusters_disabled]).to eq(2)
       expect(count_data[:group_clusters_enabled]).to eq(1)
+      expect(count_data[:clusters_platforms_eks]).to eq(1)
       expect(count_data[:clusters_platforms_gke]).to eq(1)
       expect(count_data[:clusters_platforms_user]).to eq(1)
       expect(count_data[:clusters_applications_helm]).to eq(1)
@@ -235,6 +254,7 @@ describe Gitlab::UsageData do
       expect(subject[:container_registry_enabled]).to eq(Gitlab.config.registry.enabled)
       expect(subject[:dependency_proxy_enabled]).to eq(Gitlab.config.dependency_proxy.enabled)
       expect(subject[:gitlab_shared_runners_enabled]).to eq(Gitlab.config.gitlab_ci.shared_runners_enabled)
+      expect(subject[:web_ide_clientside_preview_enabled]).to eq(Gitlab::CurrentSettings.web_ide_clientside_preview_enabled?)
     end
   end
 

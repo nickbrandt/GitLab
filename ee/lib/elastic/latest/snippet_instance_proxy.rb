@@ -30,6 +30,12 @@ module Elastic
 
         data.merge(generic_attributes)
       end
+
+      # TODO: Reenable support for public/internal project snippets
+      # https://gitlab.com/gitlab-org/gitlab/issues/2358
+      def es_parent
+        nil
+      end
     end
   end
 end

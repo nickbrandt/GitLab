@@ -30,6 +30,7 @@ describe RegistrationsController do
 
       it 'renders new template and sets the resource variable' do
         expect(subject).to render_template(:new)
+        expect(response).to have_gitlab_http_status(200)
         expect(assigns(:resource)).to be_a(User)
       end
     end
@@ -47,6 +48,7 @@ describe RegistrationsController do
 
       it 'renders new template and sets the resource variable' do
         subject
+        expect(response).to have_gitlab_http_status(302)
         expect(response).to redirect_to(new_user_session_path(anchor: 'register-pane'))
       end
     end
@@ -379,7 +381,7 @@ describe RegistrationsController do
     end
   end
 
-  describe '#update_role' do
+  describe '#update_registration' do
     before do
       stub_experiment(signup_flow: true)
       stub_experiment_for_user(signup_flow: true)
@@ -393,7 +395,7 @@ describe RegistrationsController do
         label: anything,
         property: 'experimental_group'
       )
-      patch :update_role, params: { user: { name: 'New name', role: 'software_developer' } }
+      patch :update_registration, params: { user: { name: 'New name', role: 'software_developer', setup_for_company: 'false' } }
     end
   end
 end

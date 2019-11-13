@@ -339,6 +339,7 @@ project:
 - triggers
 - pipeline_schedules
 - environments
+- unfoldered_environments
 - deployments
 - project_feature
 - auto_devops
@@ -423,6 +424,7 @@ project:
 - alerts_service
 - grafana_integration
 - remove_source_branch_after_merge
+- deleting_user
 award_emoji:
 - awardable
 - user

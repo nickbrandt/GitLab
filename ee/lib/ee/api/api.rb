@@ -19,8 +19,10 @@ module EE
         mount ::API::EpicLinks
         mount ::API::Epics
         mount ::API::FeatureFlags
+        mount ::API::FeatureFlagScopes
         mount ::API::ContainerRegistryEvent
         mount ::API::Geo
+        mount ::API::GeoReplication
         mount ::API::GeoNodes
         mount ::API::IssueLinks
         mount ::API::Ldap
@@ -31,7 +33,8 @@ module EE
         mount ::API::ConanPackages
         mount ::API::MavenPackages
         mount ::API::NpmPackages
-        mount ::API::Packages
+        mount ::API::ProjectPackages
+        mount ::API::GroupPackages
         mount ::API::PackageFiles
         mount ::API::Scim
         mount ::API::ManagedLicenses

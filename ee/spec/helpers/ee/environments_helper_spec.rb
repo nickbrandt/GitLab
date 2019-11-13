@@ -41,9 +41,10 @@ describe EnvironmentsHelper do
       )
     end
 
-    it 'returns logs parameters data' do
+    it 'returns parameters for forming the pod logs API URL' do
       expect(subject).to include(
-        "logs-endpoint": logs_project_environment_path(project, environment, format: :json)
+        "project-full-path": project.full_path,
+        "environment-id": environment.id
       )
     end
   end

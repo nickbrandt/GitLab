@@ -89,6 +89,10 @@ your GitLab installation has three repository storages: `default`,
 `storage1` and `storage2`. You can use as little as just one server with one
 repository storage if desired.
 
+Note: **Note:** The token referred to throughout the Gitaly documentation is
+just an arbitrary password selected by the administrator. It is unrelated to
+tokens created for the GitLab API or other similar web API tokens.
+
 ### 1. Installation
 
 First install Gitaly on each Gitaly server using either
@@ -328,6 +332,8 @@ When you tail the Gitaly logs on your Gitaly server you should see requests
 coming in. One sure way to trigger a Gitaly request is to clone a repository
 from your GitLab server over HTTP.
 
+DANGER: **Danger:** If you have [custom server-side Git hooks](../custom_hooks.md#custom-server-side-git-hooks) configured, either per repository or globally, you must move these to the Gitaly node. If you have multiple Gitaly nodes, copy your custom hook(s) to all nodes.
+
 ### Disabling the Gitaly service in a cluster environment
 
 If you are running Gitaly [as a remote
@@ -405,11 +411,11 @@ To configure Gitaly with TLS:
    ```
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on client node(s).
-1. Create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
+1. On the Gitaly server, create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
 
    ```sh
    sudo mkdir -p /etc/gitlab/ssl
-   sudo chmod 700 /etc/gitlab/ssl
+   sudo chmod 755 /etc/gitlab/ssl
    sudo cp key.pem cert.pem /etc/gitlab/ssl/
    ```
 

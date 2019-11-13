@@ -135,6 +135,7 @@ The following job parameters can be defined inside a `default:` block:
 - [`before_script`](#before_script-and-after_script)
 - [`after_script`](#before_script-and-after_script)
 - [`cache`](#cache)
+- [`interruptible`](#interruptible)
 
 In the following example, the `ruby:2.5` image is set as the default for all
 jobs except the `rspec 2.6` job, which uses the `ruby:2.6` image:
@@ -259,34 +260,26 @@ For more information, see see [Available settings for `services`](../docker/usin
 
 > Introduced in GitLab 8.7 and requires GitLab Runner v1.2.
 
-`before_script` is used to define the command that should be run before all
-jobs, including deploy jobs, but after the restoration of [artifacts](#artifacts).
+`before_script` is used to define a command that should be run before each
+job, including deploy jobs, but after the restoration of any [artifacts](#artifacts).
 This must be an an array.
 
-`after_script` is used to define the command that will be run after all
-jobs, including failed ones. This must be an an array.
+Scripts specified in `before_script` are concatenated with any scripts specified
+in the main [`script`](#script), and executed together in a single shell.
 
-Scripts specified in `before_script` are:
+`after_script` is used to define the command that will be run after each
+job, including failed ones. This must be an an array.
 
-- Concatenated with scripts specified in the main `script`. Job-level
-  `before_script` definition override global-level `before_script` definition
-  when concatenated with `script` definition.
-- Executed together with main `script` script as one script in a single shell
-  context.
-
-Scripts specified in `after_script`:
+Scripts specified in `after_script` are executed in a new shell, separate from any
+`before_script` or `script` scripts. As a result, they:
 
 - Have a current working directory set back to the default.
-- Are executed in a shell context separated from `before_script` and `script`
-  scripts.
-- Because of separated context, cannot see changes done by scripts defined
-  in `before_script` or `script` scripts, either:
-  - In shell. For example, command aliases and variables exported in `script`
-    scripts.
-  - Outside of the working tree (depending on the Runner executor). For example,
-    software installed by a `before_script` or `script` scripts.
+- Have no access to changes done by scripts defined in `before_script` or `script`, including:
+  - Command aliases and variables exported in `script` scripts.
+  - Changes outside of the working tree (depending on the Runner executor), like
+    software installed by a `before_script` or `script` script.
 
-It's possible to overwrite the globally defined `before_script` and `after_script`
+It's possible to overwrite a globally defined `before_script` or `after_script`
 if you set it per-job:
 
 ```yaml
@@ -455,6 +448,9 @@ Jobs will run on your own Runners in parallel only if:
 - The Runner's `concurrent` setting has been changed.
 
 ### `only`/`except` (basic)
+
+NOTE: **Note:**
+These parameters will soon be [deprecated](https://gitlab.com/gitlab-org/gitlab/issues/27449) in favor of [`rules`](#rules) as it offers a more powerful syntax.
 
 `only` and `except` are two parameters that set a job policy to limit when
 jobs are created:
@@ -1003,12 +999,11 @@ docker build:
       when: delayed
       start_in: '3 hours'
     - when: on_success # Otherwise include the job and set to run normally
-
 ```
 
 Additional job configuration may be added to rules in the future. If something
 useful isn't available, please
-[open an issue](https://www.gitlab.com/gitlab-org/gitlab/issues).
+[open an issue](https://gitlab.com/gitlab-org/gitlab/issues).
 
 ### `tags`
 

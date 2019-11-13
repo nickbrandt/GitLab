@@ -218,148 +218,11 @@ differentiate the new cluster with the rest.
 
 ## Installing applications
 
-GitLab can install and manage some applications in your project-level
-cluster. For more information on installing, upgrading, uninstalling,
-and troubleshooting applications for your project cluster, see
+GitLab can install and manage some applications like Helm, GitLab Runner, Ingress,
+Prometheus, etc., in your project-level cluster. For more information on
+installing, upgrading, uninstalling, and troubleshooting applications for
+your project cluster, see
 [GitLab Managed Apps](../../clusters/applications.md).
-
-### Getting the external endpoint
-
-NOTE: **Note:**
-With the following procedure, a load balancer must be installed in your cluster
-to obtain the endpoint. You can use either
-[Ingress](#installing-applications), or Knative's own load balancer
-([Istio](https://istio.io)) if using [Knative](#installing-applications).
-
-In order to publish your web application, you first need to find the endpoint which will be either an IP
-address or a hostname associated with your load balancer.
-
-#### Automatically determining the external endpoint
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/17052) in GitLab 10.6.
-
-After you install [Ingress or Knative](#installing-applications), GitLab attempts to determine the external endpoint
-and it should be available within a few minutes. If the endpoint doesn't appear
-and your cluster runs on Google Kubernetes Engine:
-
-1. Check your [Kubernetes cluster on Google Kubernetes Engine](https://console.cloud.google.com/kubernetes) to ensure there are no errors on its nodes.
-1. Ensure you have enough [Quotas](https://console.cloud.google.com/iam-admin/quotas) on Google Kubernetes Engine. For more information, see [Resource Quotas](https://cloud.google.com/compute/quotas).
-1. Check [Google Cloud's Status](https://status.cloud.google.com/) to ensure they are not having any disruptions.
-
-If GitLab is still unable to determine the endpoint of your Ingress or Knative application, you can
-manually determine it by following the steps below.
-
-#### Manually determining the external endpoint
-
-If the cluster is on GKE, click the **Google Kubernetes Engine** link in the
-**Advanced settings**, or go directly to the
-[Google Kubernetes Engine dashboard](https://console.cloud.google.com/kubernetes/)
-and select the proper project and cluster. Then click **Connect** and execute
-the `gcloud` command in a local terminal or using the **Cloud Shell**.
-
-If the cluster is not on GKE, follow the specific instructions for your
-Kubernetes provider to configure `kubectl` with the right credentials.
-The output of the following examples will show the external endpoint of your
-cluster. This information can then be used to set up DNS entries and forwarding
-rules that allow external access to your deployed applications.
-
-If you installed the Ingress [via the **Applications**](#installing-applications),
-run the following command:
-
-```bash
-kubectl get service --namespace=gitlab-managed-apps ingress-nginx-ingress-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-```
-
-Some Kubernetes clusters return a hostname instead, like [Amazon EKS](https://aws.amazon.com/eks/). For these platforms, run:
-
-```bash
-kubectl get service --namespace=gitlab-managed-apps ingress-nginx-ingress-controller -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
-```
-
-For Istio/Knative, the command will be different:
-
-```bash
-kubectl get svc --namespace=istio-system knative-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip} '
-```
-
-Otherwise, you can list the IP addresses of all load balancers:
-
-```bash
-kubectl get svc --all-namespaces -o jsonpath='{range.items[?(@.status.loadBalancer.ingress)]}{.status.loadBalancer.ingress[*].ip} '
-```
-
-#### Using a static IP
-
-By default, an ephemeral external IP address is associated to the cluster's load
-balancer. If you associate the ephemeral IP with your DNS and the IP changes,
-your apps will not be able to be reached, and you'd have to change the DNS
-record again. In order to avoid that, you should change it into a static
-reserved IP.
-
-Read how to [promote an ephemeral external IP address in GKE](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address#promote_ephemeral_ip).
-
-#### Pointing your DNS at the external endpoint
-
-Once you've set up the external endpoint, you should associate it with a [wildcard DNS
-record](https://en.wikipedia.org/wiki/Wildcard_DNS_record) such as `*.example.com.`
-in order to be able to reach your apps. If your external endpoint is an IP address,
-use an A record. If your external endpoint is a hostname, use a CNAME record.
-
-#### Deploy services to the cluster
-
-GitLab supports one-click deployment of helpful services to the cluster, many of
-which support Auto DevOps. Back on the Kubernetes cluster screen in GitLab, a
-list of applications is now available to deploy.
-
-First, install Helm Tiller, a package manager for Kubernetes. This enables
-deployment of the other applications.
-
-![Deploy Apps](img/deploy_apps.png)
-
-##### Deploying NGINX Ingress (optional)
-
-Next, if you would like the deployed app to be reachable on the internet, deploy
-the Ingress. Note that this will also cause an
-[Elastic Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/)
-to be created, which will incur additional AWS costs.
-
-Once installed, you may see a `?` for "Ingress IP Address". This is because the
-created ELB is available at a DNS name, not an IP address. To get the DNS name,
-run:
-
-```sh
-kubectl get service ingress-nginx-ingress-controller -n gitlab-managed-apps -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"
-```
-
-Note that you may see a trailing `%` on some Kubernetes versions, **do not include it**.
-
-The Ingress is now available at this address and will route incoming requests to
-the proper service based on the DNS name in the request. To support this, a
-wildcard DNS CNAME record should be created for the desired domain name. For example,
-`*.myekscluster.com` would point to the Ingress hostname obtained earlier.
-
-![Create DNS](img/create_dns.png)
-
-##### Deploying the GitLab Runner (optional)
-
-If the project is on GitLab.com, free shared Runners are available and you do
-not have to deploy one. If a project specific Runner is desired, or there are no
-shared Runners, it is easy to deploy one.
-
-Simply click on the **Install** button for the GitLab Runner. It is important to
-note that the Runner deployed is set as **privileged**, which means it essentially
-has root access to the underlying machine. This is required to build docker images,
-and so is on by default.
-
-##### Deploying Prometheus (optional)
-
-GitLab is able to monitor applications automatically, utilizing
-[Prometheus](../integrations/prometheus.html). Kubernetes container CPU and
-memory metrics are automatically collected, and response metrics are retrieved
-from NGINX Ingress as well.
-
-To enable monitoring, simply install Prometheus into the cluster with the
-**Install** button.
 
 ## Deploying to a Kubernetes cluster
 
@@ -384,7 +247,7 @@ GitLab CI/CD build environment.
 | -------- | ----------- |
 | `KUBE_URL` | Equal to the API URL. |
 | `KUBE_TOKEN` | The Kubernetes token of the [environment service account](add_remove_clusters.md#access-controls). |
-| `KUBE_NAMESPACE` | The Kubernetes namespace is auto-generated if not specified. The default value is `<project_name>-<project_id>-<environment>`. You can overwrite it to use different one if needed, otherwise the `KUBE_NAMESPACE` variable will receive the default value. |
+| `KUBE_NAMESPACE` | The namespace associated with the project's deployment service account. In the format `<project_name>-<project_id>-<environment>`. For GitLab-managed clusters, a matching namespace is automatically created by GitLab in the cluster. |
 | `KUBE_CA_PEM_FILE` | Path to a file containing PEM data. Only present if a custom CA bundle was specified. |
 | `KUBE_CA_PEM` | (**deprecated**) Raw PEM data. Only if a custom CA bundle was specified. |
 | `KUBECONFIG` | Path to a file containing `kubeconfig` for this deployment. CA bundle would be embedded if specified. This config also embeds the same token defined in `KUBE_TOKEN` so you likely will only need this variable. This variable name is also automatically picked up by `kubectl` so you won't actually need to reference it explicitly if using `kubectl`. |
@@ -396,6 +259,16 @@ service account of the cluster integration.
 
 NOTE: **Note:**
 If your cluster was created before GitLab 12.2, default `KUBE_NAMESPACE` will be set to `<project_name>-<project_id>`.
+
+When deploying a custom namespace:
+
+- The custom namespace must exist in your cluster.
+- The project's deployment service account must have permission to deploy to the namespace.
+- `KUBECONFIG` must be updated to use the custom namespace instead of the GitLab-provided default (this is [not automatic](https://gitlab.com/gitlab-org/gitlab/issues/31519)).
+- If deploying with Auto DevOps, you must *also* override `KUBE_NAMESPACE` with the custom namespace.
+
+CAUTION: **Caution:**
+GitLab does not save custom namespaces in the database. So while deployments work with custom namespaces, GitLab's integration for already-deployed environments will not pick up the customized values. For example, [Deploy Boards](../deploy_boards.md) will not work as intended for those deployments. For more information, see the [related issue](https://gitlab.com/gitlab-org/gitlab/issues/27630).
 
 ### Troubleshooting
 

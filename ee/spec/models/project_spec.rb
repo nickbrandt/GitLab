@@ -22,6 +22,8 @@ describe Project do
     it { is_expected.to delegate_method(:shared_runners_minutes_limit_enabled?).to(:shared_runners_limit_namespace) }
     it { is_expected.to delegate_method(:shared_runners_minutes_used?).to(:shared_runners_limit_namespace) }
 
+    it { is_expected.to belong_to(:deleting_user) }
+
     it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
     it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
     it { is_expected.to have_one(:alerting_setting).class_name('Alerting::ProjectAlertingSetting') }
@@ -1415,6 +1417,31 @@ describe Project do
     end
   end
 
+  describe '#latest_pipeline_with_reports' do
+    let(:project) { create(:project) }
+    let!(:pipeline_1) { create(:ee_ci_pipeline, :with_sast_report, project: project) }
+    let!(:pipeline_2) { create(:ee_ci_pipeline, :with_sast_report, project: project) }
+    let!(:pipeline_3) { create(:ee_ci_pipeline, :with_dependency_scanning_report, project: project) }
+
+    subject { project.latest_pipeline_with_reports(reports) }
+
+    context 'when reports are found' do
+      let(:reports) { ::Ci::JobArtifact.sast_reports }
+
+      it "returns the latest pipeline with reports of right type" do
+        is_expected.to eq(pipeline_2)
+      end
+    end
+
+    context 'when reports are not found' do
+      let(:reports) { ::Ci::JobArtifact.metrics_reports }
+
+      it 'returns nothing' do
+        is_expected.to be_nil
+      end
+    end
+  end
+
   describe '#protected_environment_by_name' do
     let(:project) { create(:project) }
 
@@ -1702,7 +1729,8 @@ describe Project do
     end
 
     context 'when there is access token' do
-      let!(:instance) { create(:operations_feature_flags_client, project: project, token: 'token') }
+      let(:token_encrypted) { Gitlab::CryptoHelper.aes256_gcm_encrypt('token') }
+      let!(:instance) { create(:operations_feature_flags_client, project: project, token_encrypted: token_encrypted) }
 
       it "provides an existing one" do
         is_expected.to eq('token')
@@ -1872,27 +1900,29 @@ describe Project do
     end
   end
 
-  describe "#design_management_enabled?" do
+  describe '#design_management_enabled?' do
     let(:project) { build(:project) }
 
-    where(
-      feature_enabled: [false, true],
-      license_enabled: [false, true],
-      lfs_enabled: [false, true]
-    )
+    where(:feature_enabled, :license_enabled, :lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
+      false | false | false | false | false | false
+      true  | false | false | false | false | false
+      true  | true  | false | false | false | false
+      true  | true  | true  | false | false | true
+      true  | true  | true  | false | true  | false
+      true  | true  | true  | true  | false | true
+      true  | true  | true  | true  | true  | true
+    end
 
     with_them do
       before do
         stub_licensed_features(design_management: license_enabled)
-        stub_feature_flags(design_management_flag: feature_enabled)
+        stub_feature_flags(design_management_flag: feature_enabled, design_management_require_hashed_storage: hash_storage_required)
         expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
+        allow(project).to receive(:hashed_storage?).with(:repository).and_return(hashed_storage_enabled)
       end
 
-      # Design management is only available if all dependencies are enabled
-      let(:expected) { feature_enabled && license_enabled && lfs_enabled }
-
-      it "knows if design management is available" do
-        expect(project.design_management_enabled?).to be(expected)
+      it do
+        expect(project.design_management_enabled?).to be(expectation)
       end
     end
   end
@@ -2210,6 +2240,111 @@ describe Project do
       it 'returns true' do
         result = alt_project.package_already_taken?("@#{namespace.path}/foo")
         expect(result).to be true
+      end
+    end
+  end
+
+  describe '#adjourned_deletion?' do
+    context 'when marking for deletion feature is available' do
+      let(:project) { create(:project) }
+
+      before do
+        stub_licensed_features(marking_project_for_deletion: true)
+      end
+
+      context 'when number of days is set to more than 0' do
+        it 'returns true' do
+          stub_application_setting(deletion_adjourned_period: 1)
+          expect(project.adjourned_deletion?).to eq(true)
+        end
+      end
+
+      context 'when number of days is set to 0' do
+        it 'returns false' do
+          stub_application_setting(deletion_adjourned_period: 0)
+          expect(project.adjourned_deletion?).to eq(false)
+        end
+      end
+    end
+
+    context 'when marking for deletion feature is not available' do
+      let(:project) { create(:project) }
+
+      before do
+        stub_licensed_features(marking_project_for_deletion: false)
+      end
+
+      context 'when number of days is set to more than 0' do
+        it 'returns false' do
+          stub_application_setting(deletion_adjourned_period: 1)
+
+          expect(project.adjourned_deletion?).to eq(false)
+        end
+      end
+
+      context 'when number of days is set to 0' do
+        it 'returns false' do
+          stub_application_setting(deletion_adjourned_period: 0)
+
+          expect(project.adjourned_deletion?).to eq(false)
+        end
+      end
+    end
+  end
+
+  describe '#has_packages?' do
+    let(:project) { create(:project, :public) }
+
+    subject { project.has_packages?(package_type) }
+
+    shared_examples 'returning true examples' do
+      let!(:package) { create("#{package_type}_package", project: project) }
+
+      it { is_expected.to be true }
+    end
+
+    shared_examples 'returning false examples' do
+      it { is_expected.to be false }
+    end
+
+    context 'with packages disabled' do
+      before do
+        stub_licensed_features(packages: false)
+      end
+
+      it_behaves_like 'returning false examples' do
+        let!(:package) { create(:maven_package, project: project) }
+        let(:package_type) { :maven }
+      end
+    end
+
+    context 'with packages enabled' do
+      before do
+        stub_licensed_features(packages: true)
+      end
+
+      context 'with maven packages' do
+        it_behaves_like 'returning true examples' do
+          let(:package_type) { :maven }
+        end
+      end
+
+      context 'with npm packages' do
+        it_behaves_like 'returning true examples' do
+          let(:package_type) { :npm }
+        end
+      end
+
+      context 'with conan packages' do
+        it_behaves_like 'returning true examples' do
+          let(:package_type) { :conan }
+        end
+      end
+
+      context 'with no package type' do
+        it_behaves_like 'returning false examples' do
+          let(:package_type) { nil }
+        end
       end
     end
   end

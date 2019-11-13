@@ -14,6 +14,7 @@ export function normalizeData(data) {
     commitPath: d.commit_path,
     fileName: d.file_name,
     type: d.type,
+    lockLabel: d.lock_label,
     __typename: 'LogTreeCommit',
   }));
 }
@@ -37,7 +38,7 @@ export function fetchLogsTree(client, path, offset, resolver = null) {
   const { ref } = client.readQuery({ query: getRef });
 
   fetchpromise = axios
-    .get(`${gon.gitlab_url}/${projectPath}/refs/${ref}/logs_tree${path ? `/${path}` : ''}`, {
+    .get(`${gon.gitlab_url}/${projectPath}/refs/${ref}/logs_tree/${path.replace(/^\//, '')}`, {
       params: { format: 'json', offset },
     })
     .then(({ data, headers }) => {

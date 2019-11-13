@@ -259,16 +259,34 @@ export const setItemInputValue = ({ commit }, data) => commit(types.SET_ITEM_INP
 
 export const requestAddItem = ({ commit }) => commit(types.REQUEST_ADD_ITEM);
 export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { rawItems }) => {
-  const items = rawItems.map(item =>
-    formatChildItem({
-      ...convertObjectPropsToCamelCase(item, { deep: !getters.isEpic }),
+  const items = rawItems.map(item => {
+    // This is needed since Rails API to add Epic/Issue
+    // doesn't return global ID string.
+    // We can remove this change once add epic/issue
+    // action is moved to GraphQL.
+    // See https://gitlab.com/gitlab-org/gitlab/issues/34529
+    const globalItemId = {};
+    if (getters.isEpic) {
+      globalItemId.id = !`${item.id}`.includes('gid://') ? `gid://gitlab/Epic/${item.id}` : item.id;
+    } else {
+      globalItemId.epicIssueId = !`${item.epic_issue_id}`.includes('gid://')
+        ? `gid://gitlab/EpicIssue/${item.epic_issue_id}`
+        : item.epic_issue_id;
+    }
+
+    return formatChildItem({
+      ...convertObjectPropsToCamelCase(item, {
+        deep: !getters.isEpic,
+        dropKeys: ['id', 'epic_issue_id'],
+      }),
+      ...globalItemId,
       type: getters.isEpic ? ChildType.Epic : ChildType.Issue,
       userPermissions: getters.isEpic ? { adminEpic: item.can_admin } : {},
-    }),
-  );
+    });
+  });
 
   commit(types.RECEIVE_ADD_ITEM_SUCCESS, {
-    insertAt: getters.isEpic ? 0 : getters.issuesBeginAtIndex,
+    insertAt: 0,
     items,
   });
 
@@ -324,7 +342,7 @@ export const receiveCreateItemSuccess = ({ state, commit, dispatch, getters }, {
   });
 
   commit(types.RECEIVE_CREATE_ITEM_SUCCESS, {
-    insertAt: getters.issuesBeginAtIndex > 0 ? getters.issuesBeginAtIndex - 1 : 0,
+    insertAt: 0,
     item,
   });
 

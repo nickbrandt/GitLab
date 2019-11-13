@@ -2,7 +2,6 @@
 import { mapState, mapActions } from 'vuex';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 
-import { ChildType } from '../constants';
 import TreeDragAndDropMixin from '../mixins/tree_dd_mixin';
 
 export default {
@@ -28,9 +27,6 @@ export default {
   },
   computed: {
     ...mapState(['childrenFlags', 'userSignedIn']),
-    currentItemIssuesBeginAtIndex() {
-      return this.children.findIndex(item => item.type === ChildType.Issue);
-    },
     hasMoreChildren() {
       const flags = this.childrenFlags[this.parentItem.reference];
 

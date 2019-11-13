@@ -2,7 +2,14 @@ import mutations from 'ee/logs/stores/mutations';
 import * as types from 'ee/logs/stores/mutation_types';
 
 import logsPageState from 'ee/logs/stores/state';
-import { mockLogsEndpoint, mockEnvironments, mockPods, mockPodName, mockLines } from '../mock_data';
+import {
+  mockProjectPath,
+  mockEnvId,
+  mockEnvironments,
+  mockPods,
+  mockPodName,
+  mockLines,
+} from '../mock_data';
 
 describe('Logs Store Mutations', () => {
   let state;
@@ -17,17 +24,14 @@ describe('Logs Store Mutations', () => {
     });
   });
 
-  describe('SET_LOGS_ENDPOINT', () => {
+  describe('SET_PROJECT_ENVIRONMENT', () => {
     it('sets the logs json endpoint', () => {
-      mutations[types.SET_LOGS_ENDPOINT](state, mockLogsEndpoint);
-      expect(state.logs.endpoint).toEqual(mockLogsEndpoint);
-    });
-  });
-
-  describe('SET_CURRENT_POD_NAME', () => {
-    it('sets current pod name', () => {
-      mutations[types.SET_CURRENT_POD_NAME](state, mockPodName);
-      expect(state.pods.current).toEqual(mockPodName);
+      mutations[types.SET_PROJECT_ENVIRONMENT](state, {
+        projectPath: mockProjectPath,
+        environmentId: mockEnvId,
+      });
+      expect(state.projectPath).toEqual(mockProjectPath);
+      expect(state.environments.current).toEqual(mockEnvId);
     });
   });
 
@@ -57,6 +61,7 @@ describe('Logs Store Mutations', () => {
       expect(state.environments).toEqual({
         options: [],
         isLoading: false,
+        current: null,
       });
     });
   });
@@ -103,6 +108,13 @@ describe('Logs Store Mutations', () => {
     });
   });
 
+  describe('SET_CURRENT_POD_NAME', () => {
+    it('set current pod name', () => {
+      mutations[types.SET_CURRENT_POD_NAME](state, mockPodName);
+
+      expect(state.pods.current).toEqual(mockPodName);
+    });
+  });
   describe('REQUEST_PODS_DATA', () => {
     it('receives log data error and stops loading', () => {
       mutations[types.REQUEST_PODS_DATA](state);

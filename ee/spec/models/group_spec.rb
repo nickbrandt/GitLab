@@ -142,6 +142,47 @@ describe Group do
     end
   end
 
+  describe '#vulnerable_projects' do
+    it "fetches the group's projects that have vulnerabilities" do
+      vulnerable_project = create(:project, namespace: group)
+      _safe_project = create(:project, namespace: group)
+      create(:vulnerabilities_occurrence, project: vulnerable_project)
+
+      vulnerable_projects = group.vulnerable_projects
+
+      expect(vulnerable_projects.count).to be(1)
+      expect(vulnerable_projects.first).to eq(vulnerable_project)
+    end
+
+    it 'does not include projects that only have dismissed vulnerabilities' do
+      project = create(:project, namespace: group)
+      vulnerability = create(:vulnerabilities_occurrence, project: project)
+      create(
+        :vulnerability_feedback,
+        project_fingerprint: vulnerability.project_fingerprint,
+        feedback_type: :dismissal
+      )
+
+      vulnerable_projects = group.vulnerable_projects
+
+      expect(vulnerable_projects).to be_empty
+    end
+
+    it 'only uses 1 query' do
+      project_one = create(:project, namespace: group)
+      project_two = create(:project, namespace: group)
+      create(:vulnerabilities_occurrence, project: project_one)
+      dismissed_vulnerability = create(:vulnerabilities_occurrence, project: project_two)
+      create(
+        :vulnerability_feedback,
+        project_fingerprint: dismissed_vulnerability.project_fingerprint,
+        feedback_type: :dismissal
+      )
+
+      expect { group.vulnerable_projects }.not_to exceed_query_limit(1)
+    end
+  end
+
   describe '#mark_ldap_sync_as_failed' do
     it 'sets the state to failed' do
       group.start_ldap_sync

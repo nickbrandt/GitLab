@@ -8,12 +8,17 @@ class Packages::PackageFile < ApplicationRecord
 
   belongs_to :package
 
+  has_one :conan_file_metadatum, inverse_of: :package_file
+
+  accepts_nested_attributes_for :conan_file_metadatum
+
   validates :package, presence: true
   validates :file, presence: true
   validates :file_name, presence: true
 
   scope :recent, -> { order(id: :desc) }
   scope :with_files_stored_locally, -> { where(file_store: ::Packages::PackageFileUploader::Store::LOCAL) }
+  scope :with_conan_file_metadata, -> { includes(:conan_file_metadatum) }
 
   mount_uploader :file, Packages::PackageFileUploader
 

@@ -283,6 +283,16 @@ describe MergeRequest do
     end
   end
 
+  describe '.by_merge_commit_sha' do
+    it 'returns merge requests that match the given merge commit' do
+      mr = create(:merge_request, :merged, merge_commit_sha: '123abc')
+
+      create(:merge_request, :merged, merge_commit_sha: '123def')
+
+      expect(described_class.by_merge_commit_sha('123abc')).to eq([mr])
+    end
+  end
+
   describe '.in_projects' do
     it 'returns the merge requests for a set of projects' do
       expect(described_class.in_projects(Project.all)).to eq([subject])
@@ -2164,6 +2174,50 @@ describe MergeRequest do
       expect(subject).to receive(:can_be_merged?) { true }
 
       expect(subject.mergeable?).to be_truthy
+    end
+  end
+
+  describe '#check_mergeability' do
+    let(:mergeability_service) { double }
+
+    before do
+      allow(MergeRequests::MergeabilityCheckService).to receive(:new) do
+        mergeability_service
+      end
+    end
+
+    context 'if the merge status is unchecked' do
+      before do
+        subject.mark_as_unchecked!
+      end
+
+      it 'executes MergeabilityCheckService' do
+        expect(mergeability_service).to receive(:execute)
+
+        subject.check_mergeability
+      end
+    end
+
+    context 'if the merge status is checked' do
+      context 'and feature flag is enabled' do
+        it 'executes MergeabilityCheckService' do
+          expect(mergeability_service).not_to receive(:execute)
+
+          subject.check_mergeability
+        end
+      end
+
+      context 'and feature flag is disabled' do
+        before do
+          stub_feature_flags(merge_requests_conditional_mergeability_check: false)
+        end
+
+        it 'does not execute MergeabilityCheckService' do
+          expect(mergeability_service).to receive(:execute)
+
+          subject.check_mergeability
+        end
+      end
     end
   end
 

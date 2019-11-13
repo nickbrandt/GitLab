@@ -184,6 +184,22 @@ describe('RelatedIssuesRoot', () => {
           done();
         });
       });
+
+      it('displays a message from the backend upon error', done => {
+        const input = '#123';
+        const message = 'error';
+
+        mock.onAny().reply(409, { message });
+        document.body.innerHTML += '<div class="flash-container"></div>';
+
+        vm.onPendingFormSubmit(input);
+
+        setTimeout(() => {
+          expect(document.querySelector('.flash-text').innerText.trim()).toContain(message);
+          document.querySelector('.flash-container').remove();
+          done();
+        });
+      });
     });
 
     describe('onPendingFormCancel', () => {

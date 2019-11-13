@@ -55,9 +55,9 @@ class Issue < ApplicationRecord
   scope :due_between, ->(from_date, to_date) { where('issues.due_date >= ?', from_date).where('issues.due_date <= ?', to_date) }
   scope :due_tomorrow, -> { where(due_date: Date.tomorrow) }
 
-  scope :order_due_date_asc, -> { reorder('issues.due_date IS NULL, issues.due_date ASC') }
-  scope :order_due_date_desc, -> { reorder('issues.due_date IS NULL, issues.due_date DESC') }
-  scope :order_closest_future_date, -> { reorder('CASE WHEN issues.due_date >= CURRENT_DATE THEN 0 ELSE 1 END ASC, ABS(CURRENT_DATE - issues.due_date) ASC') }
+  scope :order_due_date_asc, -> { reorder(::Gitlab::Database.nulls_last_order('due_date', 'ASC')) }
+  scope :order_due_date_desc, -> { reorder(::Gitlab::Database.nulls_last_order('due_date', 'DESC')) }
+  scope :order_closest_future_date, -> { reorder(Arel.sql('CASE WHEN issues.due_date >= CURRENT_DATE THEN 0 ELSE 1 END ASC, ABS(CURRENT_DATE - issues.due_date) ASC')) }
   scope :order_relative_position_asc, -> { reorder(::Gitlab::Database.nulls_last_order('relative_position', 'ASC')) }
 
   scope :preload_associations, -> { preload(:labels, project: :namespace) }
@@ -138,8 +138,8 @@ class Issue < ApplicationRecord
   def self.sort_by_attribute(method, excluded_labels: [])
     case method.to_s
     when 'closest_future_date', 'closest_future_date_asc' then order_closest_future_date
-    when 'due_date', 'due_date_asc'                       then order_due_date_asc
-    when 'due_date_desc'                                  then order_due_date_desc
+    when 'due_date', 'due_date_asc'                       then order_due_date_asc.with_order_id_desc
+    when 'due_date_desc'                                  then order_due_date_desc.with_order_id_desc
     when 'relative_position', 'relative_position_asc'     then order_relative_position_asc.with_order_id_desc
     else
       super

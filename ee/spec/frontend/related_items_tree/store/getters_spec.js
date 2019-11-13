@@ -5,12 +5,7 @@ import createDefaultState from 'ee/related_items_tree/store/state';
 import { issuableTypesMap } from 'ee/related_issues/constants';
 import { ChildType } from 'ee/related_items_tree/constants';
 
-import {
-  mockEpic1,
-  mockEpic2,
-  mockIssue1,
-  mockIssue2,
-} from '../../../javascripts/related_items_tree/mock_data';
+import { mockEpic1, mockEpic2 } from '../../../javascripts/related_items_tree/mock_data';
 
 window.gl = window.gl || {};
 
@@ -19,18 +14,10 @@ describe('RelatedItemsTree', () => {
     describe('getters', () => {
       const { GfmAutoComplete } = gl;
       let state;
-      let mockGetters;
 
       beforeAll(() => {
         gl.GfmAutoComplete = {
           dataSources: 'foo/bar',
-        };
-
-        mockGetters = {
-          directChildren: [mockEpic1, mockEpic2, mockIssue1, mockIssue2].map(item => ({
-            ...item,
-            type: item.reference.indexOf('&') > -1 ? ChildType.Epic : ChildType.Issue,
-          })),
         };
       });
 
@@ -100,12 +87,6 @@ describe('RelatedItemsTree', () => {
               type: ChildType.Issue,
             }),
           );
-        });
-      });
-
-      describe('issuesBeginAtIndex', () => {
-        it('returns number representing index at which Issues begin in direct children array', () => {
-          expect(getters.issuesBeginAtIndex(state, mockGetters)).toBe(2);
         });
       });
 

@@ -261,6 +261,10 @@ class Milestone < ApplicationRecord
     group || project
   end
 
+  def to_ability_name
+    model_name.singular
+  end
+
   def group_milestone?
     group_id.present?
   end
@@ -326,6 +330,6 @@ class Milestone < ApplicationRecord
   end
 
   def issues_finder_params
-    { project_id: project_id }
+    { project_id: project_id, group_id: group_id }.compact
   end
 end

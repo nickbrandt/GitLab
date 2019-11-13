@@ -178,7 +178,8 @@ describe API::Settings, 'Settings' do
           snowplow_collector_hostname: "snowplow.example.com",
           snowplow_cookie_domain: ".example.com",
           snowplow_enabled: true,
-          snowplow_site_id: "site_id"
+          snowplow_app_id: "app_id",
+          snowplow_iglu_registry_url: 'https://example.com'
         }
       end
 
@@ -222,26 +223,39 @@ describe API::Settings, 'Settings' do
       end
     end
 
-    context "pendo tracking settings" do
+    context 'EKS integration settings' do
+      let(:attribute_names) { settings.keys.map(&:to_s) }
+      let(:sensitive_attributes) { %w(eks_secret_access_key) }
+      let(:exposed_attributes) { attribute_names - sensitive_attributes }
+
       let(:settings) do
         {
-          pendo_url: "https://pendo.example.com",
-          pendo_enabled: true
+          eks_integration_enabled: true,
+          eks_account_id: '123456789012',
+          eks_access_key_id: 'access-key-id-12',
+          eks_secret_access_key: 'secret-access-key'
         }
       end
 
-      let(:attribute_names) { settings.keys.map(&:to_s) }
-
-      it "includes the attributes in the API" do
+      it 'includes attributes in the API' do
         get api("/application/settings", admin)
 
         expect(response).to have_gitlab_http_status(200)
-        attribute_names.each do |attribute|
+        exposed_attributes.each do |attribute|
           expect(json_response.keys).to include(attribute)
         end
       end
 
-      it "allows updating the settings" do
+      it 'does not include sensitive attributes in the API' do
+        get api("/application/settings", admin)
+
+        expect(response).to have_gitlab_http_status(200)
+        sensitive_attributes.each do |attribute|
+          expect(json_response.keys).not_to include(attribute)
+        end
+      end
+
+      it 'allows updating the settings' do
         put api("/application/settings", admin), params: settings
 
         expect(response).to have_gitlab_http_status(200)
@@ -250,22 +264,16 @@ describe API::Settings, 'Settings' do
         end
       end
 
-      context "missing pendo_url value when pendo_enabled is true" do
-        it "returns a blank parameter error message" do
-          put api("/application/settings", admin), params: { pendo_enabled: true }
+      context 'EKS integration is enabled but params are blank' do
+        let(:settings) { Hash[eks_integration_enabled: true] }
+
+        it 'does not update the settings' do
+          put api("/application/settings", admin), params: settings
 
           expect(response).to have_gitlab_http_status(400)
-          expect(json_response["error"]).to eq("pendo_url is missing")
-        end
-
-        it "handles validation errors" do
-          put api("/application/settings", admin), params: settings.merge({
-                                                                            pendo_url: nil
-                                                                          })
-
-          expect(response).to have_gitlab_http_status(400)
-          message = json_response["message"]
-          expect(message["pendo_url"]).to include("can't be blank")
+          expect(json_response['error']).to include('eks_account_id is missing')
+          expect(json_response['error']).to include('eks_access_key_id is missing')
+          expect(json_response['error']).to include('eks_secret_access_key is missing')
         end
       end
     end

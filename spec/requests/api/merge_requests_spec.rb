@@ -1637,6 +1637,21 @@ describe API::MergeRequests do
         expect(source_repository.branch_exists?(source_branch)).to be_falsy
       end
     end
+
+    context "performing a ff-merge with squash" do
+      let(:merge_request) { create(:merge_request, :rebased, source_project: project, squash: true) }
+
+      before do
+        project.update(merge_requests_ff_only_enabled: true)
+      end
+
+      it "records the squash commit SHA and returns it in the response" do
+        put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['squash_commit_sha'].length).to eq(40)
+      end
+    end
   end
 
   describe "GET /projects/:id/merge_requests/:merge_request_iid/merge_ref", :clean_gitlab_redis_shared_state do
@@ -1740,6 +1755,38 @@ describe API::MergeRequests do
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['state']).to eq('closed')
         expect(json_response['force_remove_source_branch']).to be_truthy
+      end
+
+      context 'with a merge request across forks' do
+        let(:fork_owner) { create(:user) }
+        let(:source_project) { fork_project(project, fork_owner) }
+        let(:target_project) { project }
+
+        let(:merge_request) do
+          create(:merge_request,
+                 source_project: source_project,
+                 target_project: target_project,
+                 source_branch: 'fixes',
+                 merge_params: { 'force_remove_source_branch' => false })
+        end
+
+        it 'is true for an authorized user' do
+          put api("/projects/#{target_project.id}/merge_requests/#{merge_request.iid}", fork_owner), params: { state_event: 'close', remove_source_branch: true }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['state']).to eq('closed')
+          expect(json_response['force_remove_source_branch']).to be true
+        end
+
+        it 'is false for an unauthorized user' do
+          expect do
+            put api("/projects/#{target_project.id}/merge_requests/#{merge_request.iid}", target_project.owner), params: { state_event: 'close', remove_source_branch: true }
+          end.not_to change { merge_request.reload.merge_params }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['state']).to eq('closed')
+          expect(json_response['force_remove_source_branch']).to be false
+        end
       end
     end
 

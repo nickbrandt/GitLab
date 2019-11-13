@@ -7,6 +7,8 @@ module EE
       # Abstract base class for CI/CD Quotas
       #
       class Limit
+        LimitExceededError = Class.new(StandardError)
+
         def initialize(_context, _resource)
         end
 
@@ -20,6 +22,13 @@ module EE
 
         def message
           raise NotImplementedError
+        end
+
+        def log_error!(extra_context = {})
+          error = LimitExceededError.new(message)
+          # TODO: change this to Gitlab::Sentry.log_exception(error, extra_context)
+          # https://gitlab.com/gitlab-org/gitlab/issues/32906
+          ::Gitlab::Sentry.track_acceptable_exception(error, extra: extra_context)
         end
       end
     end

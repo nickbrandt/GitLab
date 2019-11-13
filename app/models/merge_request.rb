@@ -16,6 +16,9 @@ class MergeRequest < ApplicationRecord
   include ReactiveCaching
   include FromUnion
   include DeprecatedAssignee
+  include ShaAttribute
+
+  sha_attribute :squash_commit_sha
 
   self.reactive_cache_key = ->(model) { [model.project.id, model.iid] }
   self.reactive_cache_refresh_interval = 10.minutes
@@ -69,6 +72,14 @@ class MergeRequest < ApplicationRecord
   has_many :merge_request_assignees
   has_many :assignees, class_name: "User", through: :merge_request_assignees
 
+  KNOWN_MERGE_PARAMS = [
+    :auto_merge_strategy,
+    :should_remove_source_branch,
+    :force_remove_source_branch,
+    :commit_message,
+    :squash_commit_message,
+    :sha
+  ].freeze
   serialize :merge_params, Hash # rubocop:disable Cop/ActiveRecordSerialize
 
   after_create :ensure_merge_request_diff
@@ -193,6 +204,9 @@ class MergeRequest < ApplicationRecord
   scope :from_source_branches, ->(branches) { where(source_branch: branches) }
   scope :by_commit_sha, ->(sha) do
     where('EXISTS (?)', MergeRequestDiff.select(1).where('merge_requests.latest_merge_request_diff_id = merge_request_diffs.id').by_commit_sha(sha)).reorder(nil)
+  end
+  scope :by_merge_commit_sha, -> (sha) do
+    where(merge_commit_sha: sha)
   end
   scope :join_project, -> { joins(:target_project) }
   scope :references_project, -> { references(:target_project) }
@@ -782,6 +796,8 @@ class MergeRequest < ApplicationRecord
   end
 
   def check_mergeability
+    return if Feature.enabled?(:merge_requests_conditional_mergeability_check, default_enabled: true) && !recheck_merge_status?
+
     MergeRequests::MergeabilityCheckService.new(self).execute(retry_lease: false)
   end
   # rubocop: enable CodeReuse/ServiceClass

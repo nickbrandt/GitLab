@@ -14,9 +14,9 @@ describe Dashboard::Environments::ListService do
       project.add_developer(user)
       user.update!(ops_dashboard_projects: [project])
 
-      projects_with_folders = described_class.new(user).execute
+      projects_with_environments = described_class.new(user).execute
 
-      expect(projects_with_folders).to eq({ project => [] })
+      expect(projects_with_environments).to eq([project])
     end
 
     context 'when unlicensed' do
@@ -24,15 +24,15 @@ describe Dashboard::Environments::ListService do
         stub_licensed_features(operations_dashboard: false)
       end
 
-      it 'returns an empty hash' do
+      it 'returns an empty array' do
         user = create(:user)
         project = create(:project)
         project.add_developer(user)
         user.update!(ops_dashboard_projects: [project])
 
-        projects_with_folders = described_class.new(user).execute
+        projects_with_environments = described_class.new(user).execute
 
-        expect(projects_with_folders).to eq({})
+        expect(projects_with_environments).to eq([])
       end
     end
   end

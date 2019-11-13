@@ -139,7 +139,7 @@ GitLab supports a limited set of [CI variables](../../../ci/variables/README.htm
 - CI_ENVIRONMENT_SLUG
 - KUBE_NAMESPACE
 
-To specify a variable in a query, enclose it in curly braces with a leading percent. For example: `%{ci_environment_slug}`.
+To specify a variable in a query, enclose it in quotation marks with curly braces with a leading percent. For example: `"%{ci_environment_slug}"`.
 
 ### Defining custom dashboards per project
 
@@ -211,11 +211,11 @@ The following tables outline the details of expected properties.
 
 | Property | Type | Required | Description |
 | ------ | ------ | ------ | ------- |
-| `type` | enum | no, defaults to `area-chart` | Specifies the chart type to use, can be `area-chart` or `line-chart` |
+| `type` | enum | no, defaults to `area-chart` | Specifies the chart type to use, can be: `area-chart`, `line-chart` or `anomaly-chart`. |
 | `title` | string | yes | Heading for the panel. |
 | `y_label` | string | no, but highly encouraged | Y-Axis label for the panel. |
 | `weight` | number | no, defaults to order in file | Order to appear within the grouping. Lower number means higher priority, which will be higher on the page. Numbers do not need to be consecutive. |
-| `metrics` | array | yes | The metrics which should be displayed in the panel. |
+| `metrics` | array | yes | The metrics which should be displayed in the panel. Any number of metrics can be displayed when `type` is `area-chart` or `line-chart`, whereas only 3 can be displayed when `type` is `anomaly-chart`. |
 
 **Metrics (`metrics`) properties:**
 
@@ -231,20 +231,20 @@ The following tables outline the details of expected properties.
 
 The below panel types are supported in monitoring dashboards.
 
-##### Area
+##### Area or Line Chart
 
-To add an area panel type to a dashboard, look at the following sample dashboard file:
+To add an area chart panel type to a dashboard, look at the following sample dashboard file:
 
 ```yaml
 dashboard: 'Dashboard Title'
 panel_groups:
   - group: 'Group Title'
     panels:
-      - type: area-chart
-        title: "Chart Title"
+      - type: area-chart # or line-chart
+        title: 'Area Chart Title'
         y_label: "Y-Axis"
         metrics:
-          - id: 10
+          - id: area_http_requests_total
             query_range: 'http_requests_total'
             label: "Metric of Ages"
             unit: "count"
@@ -255,9 +255,51 @@ Note the following properties:
 | Property | Type | Required | Description |
 | ------ | ------ | ------ | ------ |
 | type | string | no | Type of panel to be rendered. Optional for area panel types |
-| query_range | yes | required | For area panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
+| query_range | string | required | For area panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
 
 ![area panel type](img/prometheus_dashboard_area_panel_type.png)
+
+##### Anomaly chart
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/16530) in GitLab 12.5.
+
+To add an anomaly chart panel type to a dashboard, add add a panel with *exactly* 3 metrics.
+
+The first metric represents the current state, and the second and third metrics represent the upper and lower limit respectively:
+
+```yaml
+dashboard: 'Dashboard Title'
+panel_groups:
+  - group: 'Group Title'
+    panels:
+      - type: anomaly-chart
+        title: "Chart Title"
+        y_label: "Y-Axis"
+        metrics:
+          - id: anomaly_requests_normal
+            query_range: 'http_requests_total'
+            label: "# of Requests"
+            unit: "count"
+        metrics:
+          - id: anomaly_requests_upper_limit
+            query_range: 10000
+            label: "Max # of requests"
+            unit: "count"
+        metrics:
+          - id: anomaly_requests_lower_limit
+            query_range: 2000
+            label: "Min # of requests"
+            unit: "count"
+```
+
+Note the following properties:
+
+| Property | Type | Required | Description |
+| ------ | ------ | ------ | ------ |
+| type | string | required | Must be `anomaly-chart` for anomaly panel types |
+| query_range | yes | required | For anomaly panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) in every metric. |
+
+![anomaly panel type](img/prometheus_dashboard_anomaly_panel_type.png)
 
 ##### Single Stat
 
@@ -285,6 +327,35 @@ Note the following properties:
 | query | string | yes | For single stat panel types, you must use an [instant query](https://prometheus.io/docs/prometheus/latest/querying/api/#instant-queries) |
 
 ![single stat panel type](img/prometheus_dashboard_single_stat_panel_type.png)
+
+##### Heatmaps
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/30581) in GitLab 12.5.
+
+To add a heatmap panel type to a dashboard, look at the following sample dashboard file:
+
+```yaml
+dashboard: 'Dashboard Title'
+panel_groups:
+  - group: 'Group Title'
+    panels:
+      - title: "Heatmap"
+        type: "heatmap"
+        metrics:
+        - id: 10
+          query: 'sum(rate(nginx_upstream_responses_total{upstream=~"%{kube_namespace}-%{ci_environment_slug}-.*"}[60m])) by (status_code)'
+          unit: req/sec
+          label: "Status code"
+```
+
+Note the following properties:
+
+| Property | Type | Required | Description |
+| ------ | ------ | ------ | ------ |
+| type | string | yes | Type of panel to be rendered. For heatmap panel types, set to `heatmap` |
+| query_range | yes | yes | For area panel types, you must use a [range query](https://prometheus.io/docs/prometheus/latest/querying/api/#range-queries) |
+
+![heatmap panel type](img/heatmap_panel_type.png)
 
 ### Downloading data as CSV
 

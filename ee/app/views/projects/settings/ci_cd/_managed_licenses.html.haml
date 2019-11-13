@@ -1,7 +1,7 @@
 - return unless @project.feature_available?(:license_management)
 - expanded = expanded_by_default?
 
-%section.settings.no-animate#js-license-management{ class: ('expanded' if expanded) }
+%section.settings.no-animate#js-license-management{ class: ('expanded' if expanded), data: { qa_selector: 'license_compliance_settings_content' } }
   .settings-header
     %h4
       = s_('LicenseCompliance|License Compliance')

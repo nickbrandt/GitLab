@@ -192,10 +192,12 @@ export default {
 </script>
 
 <template>
-  <div class="design-detail fixed-top w-100 position-bottom-0 d-sm-flex justify-content-center">
+  <div
+    class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
+  >
     <gl-loading-icon v-if="isLoading" size="xl" class="align-self-center" />
     <template v-else>
-      <div class="d-flex flex-column w-100">
+      <div class="d-flex overflow-hidden flex-lg-grow-1 flex-column">
         <design-destroyer
           :filenames="[design.filename]"
           :project-path="projectPath"
@@ -215,7 +217,7 @@ export default {
             />
           </template>
         </design-destroyer>
-        <div class="d-flex flex-column w-100 h-100 mh-100 position-relative">
+        <div class="d-flex flex-column h-100 mh-100 position-relative">
           <design-image
             :image="design.image"
             :name="design.filename"

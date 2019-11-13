@@ -64,7 +64,7 @@ describe Geo::FileDownloadService do
 
     context 'with uploads' do
       let!(:registry_entry) do
-        create(:geo_file_registry, :avatar, success: false, file_id: file.id, retry_count: 31)
+        create(:geo_upload_registry, :avatar, success: false, file_id: file.id, retry_count: 31)
       end
 
       let(:file) { create(:upload) }
@@ -76,7 +76,7 @@ describe Geo::FileDownloadService do
 
   shared_examples_for 'a service that handles orphaned uploads' do |file_type|
     let(:download_service) { described_class.new(file_type, file.id) }
-    let(:registry) { Geo::FileRegistry }
+    let(:registry) { Geo::UploadRegistry }
 
     before do
       stub_exclusive_lease("file_download_service:#{file_type}:#{file.id}",
@@ -106,7 +106,7 @@ describe Geo::FileDownloadService do
       when 'lfs'
         Geo::LfsObjectRegistry
       else
-        Geo::FileRegistry
+        Geo::UploadRegistry
       end
     end
 
@@ -239,7 +239,7 @@ describe Geo::FileDownloadService do
         when 'lfs'
           create(:geo_lfs_object_registry, success: false, lfs_object_id: file.id, retry_count: 3, retry_at: 1.hour.ago)
         else
-          create(:geo_file_registry, file_type.to_sym, success: false, file_id: file.id, retry_count: 3, retry_at: 1.hour.ago)
+          create(:geo_upload_registry, file_type.to_sym, success: false, file_id: file.id, retry_count: 3, retry_at: 1.hour.ago)
         end
       end
 

@@ -4,6 +4,7 @@ module EE
   module Search
     module ProjectService
       extend ::Gitlab::Utils::Override
+      include ::Search::Elasticsearchable
 
       override :execute
       def execute
@@ -17,9 +18,8 @@ module EE
         )
       end
 
-      # This method is used in the top-level SearchService, so cannot be in-lined into #execute
-      def use_elasticsearch?
-        ::Gitlab::CurrentSettings.search_using_elasticsearch?(scope: project)
+      def elasticsearchable_scope
+        project
       end
     end
   end

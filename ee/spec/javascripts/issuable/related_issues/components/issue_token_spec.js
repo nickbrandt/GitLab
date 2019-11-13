@@ -1,11 +1,12 @@
 import Vue from 'vue';
+import { PathIdSeparator } from 'ee/related_issues/constants';
 import issueToken from 'ee/related_issues/components/issue_token.vue';
 
 describe('IssueToken', () => {
   const idKey = 200;
   const displayReference = 'foo/bar#123';
   const title = 'some title';
-  const pathIdSeparator = '#';
+  const pathIdSeparator = PathIdSeparator.Issue;
   const eventNamespace = 'pendingIssuable';
   let IssueToken;
   let vm;

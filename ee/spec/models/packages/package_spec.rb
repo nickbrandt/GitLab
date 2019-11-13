@@ -99,5 +99,15 @@ RSpec.describe Packages::Package, type: :model do
         is_expected.to match_array([package2, package3])
       end
     end
+
+    describe '.with_conan_channel' do
+      let!(:package) { create(:conan_package) }
+
+      subject { described_class.with_conan_channel('stable') }
+
+      it 'includes only packages with specified version' do
+        is_expected.to match_array([package])
+      end
+    end
   end
 end

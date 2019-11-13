@@ -162,4 +162,113 @@ describe('Api', () => {
         .catch(done.fail);
     });
   });
+
+  describe('getPodLogs', () => {
+    const projectPath = 'root/test-project';
+    const environmentId = 2;
+    const podName = 'pod';
+    const containerName = 'container';
+
+    const lastUrl = () => mock.history.get[0].url;
+
+    beforeEach(() => {
+      mock.onAny().reply(200);
+    });
+
+    afterEach(() => {
+      mock.reset();
+    });
+
+    it('calls `axios.get` with pod_name and container_name', done => {
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/${podName}/containers/${containerName}/logs.json`;
+
+      Api.getPodLogs({ projectPath, environmentId, podName, containerName })
+        .then(() => {
+          expect(expectedUrl).toBe(lastUrl());
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('calls `axios.get` without pod_name and container_name', done => {
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/containers/logs.json`;
+
+      Api.getPodLogs({ projectPath, environmentId })
+        .then(() => {
+          expect(expectedUrl).toBe(lastUrl());
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('calls `axios.get` with pod_name', done => {
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/${podName}/containers/logs.json`;
+
+      Api.getPodLogs({ projectPath, environmentId, podName })
+        .then(() => {
+          expect(expectedUrl).toBe(lastUrl());
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('packages', () => {
+    const projectId = 'project_a';
+    const packageId = 'package_b';
+
+    describe('projectPackages', () => {
+      it('fetch all project packages', () => {
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/projects/${projectId}/packages`;
+        const apiResponse = [{ id: 1, name: 'foo' }];
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).replyOnce(200, apiResponse);
+
+        return Api.projectPackages(projectId).then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl);
+        });
+      });
+    });
+
+    describe('buildProjectPackageUrl', () => {
+      it('returns the right url', () => {
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/projects/${projectId}/packages/${packageId}`;
+        const url = Api.buildProjectPackageUrl(projectId, packageId);
+        expect(url).toEqual(expectedUrl);
+      });
+    });
+
+    describe('projectPackage', () => {
+      it('fetch package details', () => {
+        const expectedUrl = `foo`;
+        const apiResponse = { id: 1, name: 'foo' };
+
+        jest.spyOn(Api, 'buildProjectPackageUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).replyOnce(200, apiResponse);
+
+        return Api.projectPackage(projectId, packageId).then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl);
+        });
+      });
+    });
+
+    describe('deleteProjectPackage', () => {
+      it('delete a package', () => {
+        const expectedUrl = `foo`;
+        const apiResponse = true;
+
+        jest.spyOn(Api, 'buildProjectPackageUrl').mockReturnValue(expectedUrl);
+        jest.spyOn(axios, 'delete');
+        mock.onDelete(expectedUrl).replyOnce(200, apiResponse);
+
+        return Api.deleteProjectPackage(projectId, packageId).then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.delete).toHaveBeenCalledWith(expectedUrl);
+        });
+      });
+    });
+  });
 });

@@ -5,13 +5,14 @@ module Operations
     include TokenAuthenticatable
 
     self.table_name = 'operations_feature_flags_clients'
+    self.ignored_columns += %i[token]
 
     belongs_to :project
 
     validates :project, presence: true
     validates :token, presence: true
 
-    add_authentication_token_field :token, encrypted: :optional
+    add_authentication_token_field :token, encrypted: :required
 
     before_validation :ensure_token!
 

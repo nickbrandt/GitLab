@@ -106,7 +106,7 @@ describe 'Updating an epic tree' do
           end
         end
 
-        context 'when moving an epic fails' do
+        context 'when moving an epic fails due to another parent' do
           let(:epic2) { create(:epic, relative_position: 20) }
 
           it_behaves_like 'a mutation that does not update the tree'
@@ -114,7 +114,7 @@ describe 'Updating an epic tree' do
           it 'returns the error message' do
             post_graphql_mutation(mutation, current_user: current_user)
 
-            expect(mutation_response['errors']).to eq(['Epic not found for given params'])
+            expect(mutation_response['errors']).to eq(['Both objects have to belong to the same parent epic.'])
           end
         end
       end
@@ -138,7 +138,7 @@ describe 'Updating an epic tree' do
         end
       end
 
-      context 'when moving an issue fails' do
+      context 'when moving an issue fails due to another parent' do
         let(:epic_issue2) { create(:epic_issue, relative_position: 20) }
 
         before do
@@ -151,7 +151,7 @@ describe 'Updating an epic tree' do
         it 'returns the error message' do
           post_graphql_mutation(mutation, current_user: current_user)
 
-          expect(mutation_response['errors']).to eq(['Epic issue not found for given params'])
+          expect(mutation_response['errors']).to eq(['Both objects have to belong to the same parent epic.'])
         end
       end
     end

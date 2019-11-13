@@ -33,7 +33,7 @@ export const fetchChartData = ({ dispatch, getters, state, rootState }, chartKey
         if (chartKey === chartKeys.scatterplot) {
           const transformedData = transformScatterData(
             data,
-            new Date(getDateInPast(rootState.filters.startDate, scatterPlotAddonQueryDays)),
+            getDateInPast(rootState.filters.startDate, scatterPlotAddonQueryDays),
             new Date(rootState.filters.endDate),
           );
 

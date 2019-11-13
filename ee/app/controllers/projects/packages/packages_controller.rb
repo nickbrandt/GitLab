@@ -2,7 +2,7 @@
 
 module Projects
   module Packages
-    class PackagesController < ApplicationController
+    class PackagesController < Projects::ApplicationController
       include PackagesAccess
       include SortingHelper
 

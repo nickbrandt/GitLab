@@ -1,5 +1,5 @@
-import { issuableTypesMap } from 'ee/related_issues/constants';
-import { ChildType, PathIdSeparator } from '../constants';
+import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
+import { ChildType } from '../constants';
 
 export const autoCompleteSources = () => gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources;
 
@@ -22,9 +22,6 @@ export const headerItems = state => [
     type: ChildType.Issue,
   },
 ];
-
-export const issuesBeginAtIndex = (state, getters) =>
-  getters.directChildren.findIndex(item => item.type === ChildType.Issue);
 
 export const itemAutoCompleteSources = (state, getters) => {
   if (getters.isEpic) {

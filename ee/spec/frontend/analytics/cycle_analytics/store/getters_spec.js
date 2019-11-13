@@ -1,14 +1,15 @@
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
-import { allowedStages as stages } from '../mock_data';
+import { allowedStages as stages, startDate, endDate } from '../mock_data';
 
 let state = null;
+const selectedProjectIds = [5, 8, 11];
 
 describe('Cycle analytics getters', () => {
   describe('with default state', () => {
     beforeEach(() => {
       state = {
         stages: [],
-        selectedStageName: null,
+        selectedStageId: null,
       };
     });
 
@@ -33,7 +34,7 @@ describe('Cycle analytics getters', () => {
     beforeEach(() => {
       state = {
         stages,
-        selectedStageName: null,
+        selectedStageId: null,
       };
     });
 
@@ -58,7 +59,7 @@ describe('Cycle analytics getters', () => {
     beforeEach(() => {
       state = {
         stages,
-        selectedStageName: stages[2].name,
+        selectedStageId: stages[2].id,
       };
     });
 
@@ -109,6 +110,29 @@ describe('Cycle analytics getters', () => {
         state = { selectedGroup: value };
         expect(getters.currentGroupPath(state)).toEqual(null);
       });
+    });
+  });
+
+  describe('cycleAnalyticsRequestParams', () => {
+    beforeEach(() => {
+      const fullPath = 'cool-beans';
+      state = {
+        selectedGroup: {
+          fullPath,
+        },
+        startDate,
+        endDate,
+        selectedProjectIds,
+      };
+    });
+
+    it.each`
+      param               | value
+      ${'created_after'}  | ${'2018-12-15'}
+      ${'created_before'} | ${'2019-01-14'}
+      ${'project_ids'}    | ${[5, 8, 11]}
+    `('should return the $param with value $value', ({ param, value }) => {
+      expect(getters.cycleAnalyticsRequestParams(state)).toMatchObject({ [param]: value });
     });
   });
 });

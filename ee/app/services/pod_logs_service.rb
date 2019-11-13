@@ -75,6 +75,7 @@ class PodLogsService < ::BaseService
 
   def pod_logs(result)
     response = environment.deployment_platform.read_pod_logs(
+      environment.id,
       result[:pod_name],
       namespace,
       container: result[:container_name]

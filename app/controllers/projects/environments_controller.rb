@@ -133,7 +133,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
     if environment
       redirect_to environment_metrics_path(environment)
     else
-      render :empty
+      render :empty_metrics
     end
   end
 
@@ -199,8 +199,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
 
   def metrics_dashboard_params
     params
-      .permit(:embedded, :group, :title, :y_label)
-      .to_h.symbolize_keys
+      .permit(:embedded, :group, :title, :y_label, :dashboard_path, :environment)
       .merge(dashboard_path: params[:dashboard], environment: environment)
   end
 

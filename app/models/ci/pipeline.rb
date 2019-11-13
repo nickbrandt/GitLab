@@ -405,7 +405,7 @@ module Ci
         .where('stage=sg.stage').failed_but_allowed.to_sql
 
       stages_with_statuses = CommitStatus.from(stages_query, :sg)
-        .pluck('sg.stage', status_sql, "(#{warnings_sql})")
+        .pluck('sg.stage', Arel.sql(status_sql), Arel.sql("(#{warnings_sql})"))
 
       stages_with_statuses.map do |stage|
         Ci::LegacyStage.new(self, Hash[%i[name status warnings].zip(stage)])
@@ -607,8 +607,14 @@ module Ci
       rescue Gitlab::Ci::YamlProcessor::ValidationError => e
         self.yaml_errors = e.message
         nil
-      rescue
-        self.yaml_errors = 'Undefined error'
+      rescue => ex
+        self.yaml_errors = "Undefined error (#{Labkit::Correlation::CorrelationId.current_id})"
+
+        Gitlab::Sentry.track_acceptable_exception(ex, extra: {
+          project_id: project.id,
+          sha: sha,
+          ci_yaml_file: ci_yaml_file_path
+        })
         nil
       end
     end

@@ -7,7 +7,7 @@ import { s__, __ } from '../../locale';
 
 const MAX_REQUESTS = 3;
 
-function backOffRequest(makeRequestCallback) {
+export function backOffRequest(makeRequestCallback) {
   let requestCounter = 0;
   return backOff((next, stop) => {
     makeRequestCallback()
@@ -111,8 +111,7 @@ export const fetchDashboard = ({ state, dispatch }, params) => {
     params.dashboard = state.currentDashboard;
   }
 
-  return axios
-    .get(state.dashboardEndpoint, { params })
+  return backOffRequest(() => axios.get(state.dashboardEndpoint, { params }))
     .then(resp => resp.data)
     .then(response => {
       dispatch('receiveMetricsDashboardSuccess', { response, params });
@@ -166,7 +165,7 @@ export const fetchPrometheusMetrics = ({ state, commit, dispatch }, params) => {
   commit(types.REQUEST_METRICS_DATA);
 
   const promises = [];
-  state.groups.forEach(group => {
+  state.dashboard.panel_groups.forEach(group => {
     group.panels.forEach(panel => {
       panel.metrics.forEach(metric => {
         promises.push(dispatch('fetchPrometheusMetric', { metric, params }));
@@ -219,6 +218,16 @@ export const fetchEnvironmentsData = ({ state, dispatch }) => {
       dispatch('receiveEnvironmentsDataFailure');
       createFlash(s__('Metrics|There was an error getting environments information.'));
     });
+};
+
+/**
+ * Set a new array of metrics to a panel group
+ * @param {*} data An object containing
+ *   - `key` with a unique panel key
+ *   - `metrics` with the metrics array
+ */
+export const setPanelGroupMetrics = ({ commit }, data) => {
+  commit(types.SET_PANEL_GROUP_METRICS, data);
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

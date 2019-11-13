@@ -79,6 +79,8 @@ module QA
 
           def click_approve
             click_element :approve_button
+
+            find_element :approve_button, text: "Revoke approval"
           end
 
           def start_review
@@ -113,7 +115,9 @@ module QA
           end
 
           def expand_vulnerability_report
-            click_element :expand_report_button
+            within_element :vulnerability_report_grouped do
+              click_element :expand_report_button
+            end
           end
 
           def click_vulnerability(name)
@@ -126,6 +130,10 @@ module QA
             expand_vulnerability_report
             click_vulnerability(name)
             click_element :resolve_split_button
+
+            wait(reload: false) do
+              has_no_element?(:resolve_split_button)
+            end
           end
 
           def has_vulnerability_report?(timeout: 60)

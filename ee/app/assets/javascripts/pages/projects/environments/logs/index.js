@@ -1,4 +1,4 @@
-import logsBundle from 'ee/logs/logs_bundle';
+import logsBundle from 'ee/logs';
 import KubernetesLogs from '../../../../kubernetes_logs';
 
 if (gon.features.environmentLogsUseVueUi) {

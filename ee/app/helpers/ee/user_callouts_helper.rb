@@ -50,13 +50,15 @@ module EE
     def render_dashboard_gold_trial(user)
       return unless show_gold_trial?(user, GOLD_TRIAL) &&
           user_default_dashboard?(user) &&
-          has_no_trial_or_gold_plan?(user)
+          has_no_trial_or_gold_plan?(user) &&
+          has_some_namespaces_with_no_trials?(user)
 
       render 'shared/gold_trial_callout_content'
     end
 
     def render_billings_gold_trial(user, namespace)
       return if namespace.gold_plan?
+      return unless namespace.never_had_trial?
       return unless show_gold_trial?(user, GOLD_TRIAL_BILLINGS)
 
       render 'shared/gold_trial_callout_content', is_dismissable: !namespace.free_plan?, callout: GOLD_TRIAL_BILLINGS
@@ -106,6 +108,10 @@ module EE
       return false if user.any_namespace_with_gold?
 
       !user.any_namespace_with_trial?
+    end
+
+    def has_some_namespaces_with_no_trials?(user)
+      user&.any_namespace_without_trial?
     end
   end
 end

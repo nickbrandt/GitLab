@@ -5,16 +5,16 @@ import { isScrolledToBottom, scrollDown, toggleDisableButton } from '~/lib/utils
 import httpStatusCodes from '~/lib/utils/http_status';
 import LogOutputBehaviours from '~/lib/utils/logoutput_behaviours';
 import flash from '~/flash';
-import { __, s__, sprintf } from '~/locale';
+import { s__, sprintf } from '~/locale';
 import _ from 'underscore';
 import { backOff } from '~/lib/utils/common_utils';
+import Api from 'ee/api';
 
-const requestWithBackoff = (url, params) =>
+const TWO_MINUTES = 120000;
+
+const requestWithBackoff = (projectPath, environmentId, podName, containerName) =>
   backOff((next, stop) => {
-    axios
-      .get(url, {
-        params,
-      })
+    Api.getPodLogs({ projectPath, environmentId, podName, containerName })
       .then(res => {
         if (!res.data) {
           next();
@@ -25,17 +25,23 @@ const requestWithBackoff = (url, params) =>
       .catch(err => {
         stop(err);
       });
-  });
+  }, TWO_MINUTES);
 
 export default class KubernetesPodLogs extends LogOutputBehaviours {
   constructor(container) {
     super();
     this.options = $(container).data();
 
-    const { currentEnvironmentName, environmentsPath, logsEndpoint } = this.options;
+    const {
+      currentEnvironmentName,
+      environmentsPath,
+      projectFullPath,
+      environmentId,
+    } = this.options;
     this.environmentName = currentEnvironmentName;
     this.environmentsPath = environmentsPath;
-    this.logsEndpoint = logsEndpoint;
+    this.projectFullPath = projectFullPath;
+    this.environmentId = environmentId;
 
     [this.podName] = getParameterValues('pod_name');
     if (this.podName) {
@@ -94,7 +100,7 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
   }
 
   getLogs() {
-    return requestWithBackoff(this.logsEndpoint, { pod_name: this.podName })
+    return requestWithBackoff(this.projectFullPath, this.environmentId, this.podName)
       .then(res => {
         const { logs, pods } = res.data;
         this.setupPodsDropdown(pods);
@@ -122,7 +128,7 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
             );
           }
         } else {
-          flash(__('Environments|An error occurred while fetching the logs'));
+          flash(s__('Environments|An error occurred while fetching the logs'));
         }
       })
       .finally(() => {

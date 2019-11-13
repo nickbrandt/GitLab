@@ -5,7 +5,7 @@ module Geo
     # Counts all existing registries independent
     # of any change on filters / selective sync
     def count_registry
-      Geo::FileRegistry.attachments.count
+      Geo::UploadRegistry.count
     end
 
     def count_syncable
@@ -13,17 +13,17 @@ module Geo
     end
 
     def count_synced
-      registries_for_attachments.merge(Geo::FileRegistry.synced).count
+      registries_for_attachments.merge(Geo::UploadRegistry.synced).count
     end
 
     def count_failed
-      registries_for_attachments.merge(Geo::FileRegistry.failed).count
+      registries_for_attachments.merge(Geo::UploadRegistry.failed).count
     end
 
     def count_synced_missing_on_primary
       registries_for_attachments
-        .merge(Geo::FileRegistry.synced)
-        .merge(Geo::FileRegistry.missing_on_primary)
+        .merge(Geo::UploadRegistry.synced)
+        .merge(Geo::UploadRegistry.missing_on_primary)
         .count
     end
 
@@ -47,7 +47,7 @@ module Geo
     # rubocop: disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_file_ids: [])
       attachments
-        .missing_file_registry
+        .missing_registry
         .id_not_in(except_file_ids)
         .limit(batch_size)
     end
@@ -56,9 +56,8 @@ module Geo
     # rubocop: disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_file_ids: [])
       all_attachments
-        .inner_join_file_registry
+        .inner_join_registry
         .with_files_stored_remotely
-        .merge(Geo::FileRegistry.attachments)
         .id_not_in(except_file_ids)
         .limit(batch_size)
     end
@@ -66,8 +65,7 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_retryable_failed_registries(batch_size:, except_file_ids: [])
-      Geo::FileRegistry
-        .attachments
+      Geo::UploadRegistry
         .failed
         .retry_due
         .file_id_not_in(except_file_ids)
@@ -77,8 +75,7 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_retryable_synced_missing_on_primary_registries(batch_size:, except_file_ids: [])
-      Geo::FileRegistry
-        .attachments
+      Geo::UploadRegistry
         .synced
         .missing_on_primary
         .retry_due
@@ -98,7 +95,7 @@ module Geo
     end
 
     def registries_for_attachments
-      attachments.inner_join_file_registry.merge(Geo::FileRegistry.attachments)
+      attachments.inner_join_registry
     end
   end
 end

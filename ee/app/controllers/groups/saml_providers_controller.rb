@@ -7,9 +7,6 @@ class Groups::SamlProvidersController < Groups::ApplicationController
   before_action :authorize_manage_saml!
   before_action :check_group_saml_available!
   before_action :check_group_saml_configured
-  before_action do
-    push_frontend_feature_flag(:group_scim)
-  end
 
   def show
     @saml_provider = @group.saml_provider || @group.build_saml_provider

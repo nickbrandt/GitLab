@@ -179,7 +179,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        resources :releases, only: [:index]
+        resources :releases, only: [:index, :edit], param: :tag, constraints: { tag: %r{[^/]+} }
         resources :starrers, only: [:index]
         resources :forks, only: [:index, :new, :create]
         resources :group_links, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
@@ -187,9 +187,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resource :import, only: [:new, :create, :show]
         resource :avatar, only: [:show, :destroy]
 
-        get 'grafana/proxy/:datasource_id/*proxy_path',
-            to: 'grafana_api#proxy',
-            as: :grafana_api
+        scope :grafana, as: :grafana_api do
+          get 'proxy/:datasource_id/*proxy_path', to: 'grafana_api#proxy'
+          get :metrics_dashboard, to: 'grafana_api#metrics_dashboard'
+        end
       end
       # End of the /-/ scope.
 
@@ -432,6 +433,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
           Gitlab.ee do
             get :logs
+            get '/pods/(:pod_name)/containers/(:container_name)/logs', to: 'environments#k8s_pod_logs', as: :k8s_pod_logs
           end
         end
 
@@ -439,6 +441,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :metrics, action: :metrics_redirect
           get :folder, path: 'folders/*id', constraints: { format: /(html|json)/ }
           get :search
+
+          Gitlab.ee do
+            get :logs, action: :logs_redirect
+          end
         end
 
         resources :deployments, only: [:index] do
@@ -611,12 +617,22 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resources :error_tracking, only: [:index], controller: :error_tracking do
         collection do
+          get ':issue_id/details',
+              to: 'error_tracking#details',
+              as: 'details'
+          get ':issue_id/stack_trace',
+              to: 'error_tracking#stack_trace',
+              as: 'stack_trace'
           post :list_projects
         end
       end
 
+      scope :usage_ping, controller: :usage_ping do
+        post :web_ide_clientside_preview
+      end
+
       # Since both wiki and repository routing contains wildcard characters
-      # its preferable to keep them below all other project routes
+      # its preferable to keep it below all other project routes
       draw :wiki
       draw :repository
 
@@ -650,7 +666,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
   # Legacy routes.
   # Introduced in 12.0.
-  # Should be removed after 12.1
+  # Should be removed with https://gitlab.com/gitlab-org/gitlab/issues/28848.
   scope(path: '*namespace_id',
         as: :namespace,
         namespace_id: Gitlab::PathRegex.full_namespace_route_regex) do

@@ -8,6 +8,7 @@ FactoryBot.define do
     title_html { "<h2>#{title}</h2>" }
     severity { :high }
     confidence { :medium }
+    report_type { :sast }
 
     trait :opened do
       state { :opened }
@@ -24,6 +25,7 @@ FactoryBot.define do
           :vulnerabilities_occurrence,
           2,
           vulnerability: vulnerability,
+          report_type: vulnerability.report_type,
           project: vulnerability.project)
       end
     end

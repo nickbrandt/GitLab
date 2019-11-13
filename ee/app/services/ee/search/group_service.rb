@@ -5,9 +5,9 @@ module EE
     module GroupService
       extend ::Gitlab::Utils::Override
 
-      override :use_elasticsearch?
-      def use_elasticsearch?
-        ::Gitlab::CurrentSettings.search_using_elasticsearch?(scope: group)
+      override :elasticsearchable_scope
+      def elasticsearchable_scope
+        group
       end
 
       override :elastic_projects

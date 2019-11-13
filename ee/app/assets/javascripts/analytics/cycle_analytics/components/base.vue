@@ -1,5 +1,5 @@
 <script>
-import { GlEmptyState, GlDaterangePicker } from '@gitlab/ui';
+import { GlEmptyState, GlDaterangePicker, GlLoadingIcon } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
@@ -14,6 +14,7 @@ export default {
   name: 'CycleAnalytics',
   components: {
     GlEmptyState,
+    GlLoadingIcon,
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
     SummaryTable,
@@ -49,7 +50,7 @@ export default {
       'isAddingCustomStage',
       'selectedGroup',
       'selectedProjectIds',
-      'selectedStageName',
+      'selectedStageId',
       'stages',
       'summary',
       'labels',
@@ -83,7 +84,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'fetchGroupLabels',
+      'fetchCustomStageFormData',
       'fetchCycleAnalyticsData',
       'fetchStageData',
       'setCycleAnalyticsDataEndpoint',
@@ -92,7 +93,7 @@ export default {
       'setSelectedProjects',
       'setSelectedTimeframe',
       'fetchStageData',
-      'setSelectedStageName',
+      'setSelectedStageId',
       'hideCustomStageForm',
       'showCustomStageForm',
       'setDateRange',
@@ -101,7 +102,6 @@ export default {
       this.setCycleAnalyticsDataEndpoint(group.full_path);
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
-      this.fetchGroupLabels(this.currentGroupPath);
     },
     onProjectsSelect(projects) {
       const projectIds = projects.map(value => value.id);
@@ -110,7 +110,7 @@ export default {
     },
     onStageSelect(stage) {
       this.hideCustomStageForm();
-      this.setSelectedStageName(stage.name);
+      this.setSelectedStageId(stage.id);
       this.setStageDataEndpoint(this.currentStage.slug);
       this.fetchStageData(this.currentStage.name);
     },
@@ -119,7 +119,7 @@ export default {
     },
     initDateRange() {
       const endDate = new Date(Date.now());
-      const startDate = new Date(getDateInPast(endDate, DEFAULT_DAYS_IN_PAST));
+      const startDate = getDateInPast(endDate, DEFAULT_DAYS_IN_PAST);
       this.setDateRange({ skipFetch: true, startDate, endDate });
     },
   },
@@ -196,24 +196,29 @@ export default {
         "
       />
       <div v-else-if="!errorCode">
-        <summary-table class="js-summary-table" :items="summary" />
-        <stage-table
-          v-if="currentStage"
-          class="js-stage-table"
-          :current-stage="currentStage"
-          :stages="stages"
-          :is-loading="isLoadingStage"
-          :is-empty-stage="isEmptyStage"
-          :is-adding-custom-stage="isAddingCustomStage"
-          :current-stage-events="currentStageEvents"
-          :custom-stage-form-events="customStageFormEvents"
-          :labels="labels"
-          :no-data-svg-path="noDataSvgPath"
-          :no-access-svg-path="noAccessSvgPath"
-          :can-edit-stages="hasCustomizableCycleAnalytics"
-          @selectStage="onStageSelect"
-          @showAddStageForm="onShowAddStageForm"
-        />
+        <div v-if="isLoading">
+          <gl-loading-icon class="mt-4" size="md" />
+        </div>
+        <div v-else>
+          <summary-table class="js-summary-table" :items="summary" />
+          <stage-table
+            v-if="currentStage"
+            class="js-stage-table"
+            :current-stage="currentStage"
+            :stages="stages"
+            :is-loading="isLoadingStage"
+            :is-empty-stage="isEmptyStage"
+            :is-adding-custom-stage="isAddingCustomStage"
+            :current-stage-events="currentStageEvents"
+            :custom-stage-form-events="customStageFormEvents"
+            :labels="labels"
+            :no-data-svg-path="noDataSvgPath"
+            :no-access-svg-path="noAccessSvgPath"
+            :can-edit-stages="hasCustomizableCycleAnalytics"
+            @selectStage="onStageSelect"
+            @showAddStageForm="onShowAddStageForm"
+          />
+        </div>
       </div>
     </div>
   </div>

@@ -442,6 +442,28 @@ describe('Dashboard', () => {
           expect(findEnabledDraggables()).toEqual(findDraggables());
         });
 
+        it('metrics can be swapped', done => {
+          const firstDraggable = findDraggables().at(0);
+          const mockMetrics = [...metricsGroupsAPIResponse.data[0].metrics];
+          const value = () => firstDraggable.props('value');
+
+          expect(value().length).toBe(mockMetrics.length);
+          value().forEach((metric, i) => {
+            expect(metric.title).toBe(mockMetrics[i].title);
+          });
+
+          // swap two elements and `input` them
+          [mockMetrics[0], mockMetrics[1]] = [mockMetrics[1], mockMetrics[0]];
+          firstDraggable.vm.$emit('input', mockMetrics);
+
+          firstDraggable.vm.$nextTick(() => {
+            value().forEach((metric, i) => {
+              expect(metric.title).toBe(mockMetrics[i].title);
+            });
+            done();
+          });
+        });
+
         it('shows a remove button, which removes a panel', done => {
           expect(findFirstDraggableRemoveButton().isEmpty()).toBe(false);
 
@@ -449,8 +471,6 @@ describe('Dashboard', () => {
           findFirstDraggableRemoveButton().trigger('click');
 
           wrapper.vm.$nextTick(() => {
-            // At present graphs will not be removed in backend
-            // See https://gitlab.com/gitlab-org/gitlab/issues/27835
             expect(findDraggablePanels().length).toEqual(expectedPanelCount - 1);
             done();
           });
@@ -603,6 +623,49 @@ describe('Dashboard', () => {
     });
   });
 
+  describe('dashboard edit link', () => {
+    let wrapper;
+    const findEditLink = () => wrapper.find('.js-edit-link');
+
+    beforeEach(done => {
+      mock.onGet(mockApiEndpoint).reply(200, metricsGroupsAPIResponse);
+
+      wrapper = shallowMount(DashboardComponent, {
+        localVue,
+        sync: false,
+        attachToDocument: true,
+        propsData: { ...propsData, hasMetrics: true },
+        store,
+      });
+
+      wrapper.vm.$store.commit(
+        `monitoringDashboard/${types.SET_ALL_DASHBOARDS}`,
+        dashboardGitResponse,
+      );
+      wrapper.vm.$nextTick(done);
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+
+    it('is not present for the default dashboard', () => {
+      expect(findEditLink().exists()).toBe(false);
+    });
+
+    it('is present for a custom dashboard, and links to its edit_path', done => {
+      const dashboard = dashboardGitResponse[1]; // non-default dashboard
+      const currentDashboard = dashboard.path;
+
+      wrapper.setProps({ currentDashboard });
+      wrapper.vm.$nextTick(() => {
+        expect(findEditLink().exists()).toBe(true);
+        expect(findEditLink().attributes('href')).toBe(dashboard.project_blob_path);
+        done();
+      });
+    });
+  });
+
   describe('external dashboard link', () => {
     beforeEach(() => {
       mock.onGet(mockApiEndpoint).reply(200, metricsGroupsAPIResponse);
@@ -686,7 +749,9 @@ describe('Dashboard', () => {
         `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
         MonitoringMock.data,
       );
-      [mockGraphData] = component.$store.state.monitoringDashboard.groups[0].metrics;
+      [
+        mockGraphData,
+      ] = component.$store.state.monitoringDashboard.dashboard.panel_groups[0].metrics;
     });
 
     describe('csvText', () => {
