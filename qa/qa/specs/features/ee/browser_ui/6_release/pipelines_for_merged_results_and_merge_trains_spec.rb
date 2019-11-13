@@ -64,7 +64,11 @@ module QA
         end.visit!
 
         Page::MergeRequest::Show.perform do |show|
-          expect(show).to have_pipeline_status(/Merged result pipeline #\d+ passed/)
+          pipeline_passed = Support::Retrier.retry_until(max_attempts: 5, sleep_interval: 5) do
+            show.has_pipeline_status?(/Merged result pipeline #\d+ passed/)
+          end
+
+          expect(pipeline_passed).to be_truthy, "Expected the merged result pipeline to pass."
 
           # The default option is to merge via merge train,
           # but that will be covered by another test
@@ -96,12 +100,16 @@ module QA
         end.visit!
 
         Page::MergeRequest::Show.perform do |show|
-          expect(show).to have_pipeline_status(/Merged result pipeline #\d+ passed/)
+          pipeline_passed = Support::Retrier.retry_until(max_attempts: 5, sleep_interval: 5) do
+            show.has_pipeline_status?(/Merged result pipeline #\d+ passed/)
+          end
+
+          expect(pipeline_passed).to be_truthy, "Expected the merged result pipeline to pass."
 
           show.merge_via_merge_train
         end
 
-        expect(page).to have_content('Added to the merge train')
+        expect(page).to have_content('Added to the merge train', wait: 60)
         expect(page).to have_content('The changes will be merged into master')
 
         # It's faster to refresh the page than to wait for the UI to
