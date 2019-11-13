@@ -88,7 +88,7 @@ describe Notes::CreateService do
       end
 
       it 'clears noteable diff cache when it was unfolded for the note position' do
-        expect_any_instance_of(Gitlab::Diff::HighlightCache).to receive(:clear)
+        expect_any_instance_of(Gitlab::Diff::DeprecatedHighlightCache).to receive(:clear)
 
         described_class.new(project_with_repo, user, new_opts).execute
       end

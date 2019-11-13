@@ -11,7 +11,7 @@ module Gitlab
       def initialize(diff_collection, backend: Rails.cache)
         @backend = backend
         @diff_collection = diff_collection
-        @redis_key = "highlighted-diff-files:#{diffable.cache_key}" if Feature.enabled?(:redis_diff_caching)
+        @redis_key = "highlighted-diff-files:#{diffable.cache_key}"
       end
 
       # - Reads from cache
@@ -38,11 +38,7 @@ module Gitlab
           cached_content[diff_file_id] = diff_file.highlighted_diff_lines.map(&:to_hash)
         end
 
-        if Feature.enabled?(:redis_diff_caching)
-          write_to_redis_hash(cached_content)
-        else
-          cache.write(key, cached_content, expires_in: 1.week)
-        end
+        write_to_redis_hash(cached_content)
       end
 
       # Given a hash of:
@@ -85,11 +81,9 @@ module Gitlab
       end
 
       def clear
-        cache.delete(key)
-      end
-
-      def key
-        [diffable, 'highlighted-diff-files', Gitlab::Diff::Line::SERIALIZE_KEYS, diff_options]
+        Redis::Cache.with do |redis|
+          redis.del(@redis_key)
+        end
       end
 
       private
@@ -98,20 +92,12 @@ module Gitlab
         cached_content[diff_file.file_identifier]
       end
 
-      def cache
-        @backend
-      end
-
       def cached_content
         @cached_content ||= populate_cached_content
       end
 
       def populate_cached_content
-        if Feature.enabled?(:redis_diff_caching)
-          read_entire_redis_hash.transform_values! { |v| v.present? ? JSON.parse(v, symbolize_names: true) : nil }
-        else
-          cache.read(key) || {}
-        end
+        read_entire_redis_hash.transform_values! { |v| v.present? ? JSON.parse(v, symbolize_names: true) : nil }
       end
 
       def cacheable?(diff_file)

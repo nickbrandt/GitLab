@@ -33,7 +33,8 @@ module Gitlab
         private
 
         def cache
-          @cache ||= Gitlab::Diff::HighlightCache.new(self)
+          # if Feature.enabled?(:redis_diff_caching)
+          @cache ||= Gitlab::Diff::DeprecatedHighlightCache.new(self)
         end
       end
     end

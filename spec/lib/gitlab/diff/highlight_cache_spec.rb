@@ -37,6 +37,8 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
         new_pos: 20 }] }
   end
 
+  let(:cache_key) { cache.instance_variable_get(:@redis_key) }
+
   subject(:cache) { described_class.new(merge_request.diffs, backend: backend) }
 
   describe '#decorate' do
@@ -68,56 +70,22 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
       expect(diff_file.highlighted_diff_lines.size).to be > 5
     end
-
-    context 'when :redis_diff_caching is not enabled' do
-      before do
-        expect(Feature).to receive(:enabled?).with(:redis_diff_caching).and_return(false)
-      end
-
-      it 'submits a single reading from the cache' do
-        expect(Feature).to receive(:enabled?).with(:redis_diff_caching).at_least(:once).and_return(false)
-
-        2.times { cache.decorate(diff_file) }
-
-        expect(backend).to have_received(:read).with(cache.key).once
-      end
-    end
   end
 
   describe '#write_if_empty' do
     let(:backend) { double('backend', read: {}).as_null_object }
 
     context 'when :redis_diff_caching is enabled' do
-      before do
-        expect(Feature).to receive(:enabled?).with(:redis_diff_caching).and_return(true)
-      end
-
       it 'submits a single write action to the redis cache when invoked multiple times' do
         expect(cache).to receive(:write_to_redis_hash).once
 
         2.times { cache.write_if_empty }
       end
     end
-
-    context 'when :redis_diff_caching is not enabled' do
-      before do
-        expect(Feature).to receive(:enabled?).with(:redis_diff_caching).at_least(:once).and_return(false)
-      end
-
-      it 'submits a single writing to the cache' do
-        2.times { cache.write_if_empty }
-
-        expect(backend)
-          .to have_received(:write)
-          .with(cache.key, hash_including('CHANGELOG-false-false-false'), expires_in: 1.week)
-          .once
-      end
-    end
   end
 
   describe '#write_to_redis_hash' do
     let(:backend) { Rails.cache }
-    let(:cache_key) { cache.diffable.cache_key }
 
     it 'creates or updates a Redis hash' do
       expect { cache.write_to_redis_hash(diff_hash) }
@@ -127,7 +95,6 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
   describe '#read_entire_redis_hash' do
     let(:backend) { Rails.cache }
-    let(:cache_key) { cache.diffable.cache_key }
 
     before do
       cache.write_to_redis_hash(diff_hash)
@@ -142,7 +109,6 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
   describe '#read_single_entry_from_redis_hash' do
     let(:backend) { Rails.cache }
-    let(:cache_key) { cache.diffable.cache_key }
 
     before do
       cache.write_to_redis_hash(diff_hash)
@@ -161,9 +127,9 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
     let(:backend) { double('backend').as_null_object }
 
     it 'clears cache' do
-      cache.clear
+      expect_any_instance_of(Redis).to receive(:del).with(cache_key)
 
-      expect(backend).to have_received(:delete).with(cache.key)
+      cache.clear
     end
   end
 end
