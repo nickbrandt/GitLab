@@ -29,10 +29,6 @@ class ClusterablePresenter < Gitlab::View::Presenter::Delegated
     new_polymorphic_path([clusterable, :cluster], options)
   end
 
-  def aws_api_proxy_path(resource)
-    polymorphic_path([clusterable, :clusters], action: :aws_proxy, resource: resource)
-  end
-
   def authorize_aws_role_path
     polymorphic_path([clusterable, :clusters], action: :authorize_aws_role)
   end

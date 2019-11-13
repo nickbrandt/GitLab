@@ -72,11 +72,6 @@ class InstanceClusterablePresenter < ClusterablePresenter
     revoke_aws_role_admin_clusters_path
   end
 
-  override :aws_api_proxy_path
-  def aws_api_proxy_path(resource)
-    aws_proxy_admin_clusters_path(resource: resource)
-  end
-
   override :empty_state_help_text
   def empty_state_help_text
     s_('ClusterIntegration|Adding an integration will share the cluster across all projects.')

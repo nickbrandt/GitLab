@@ -444,10 +444,15 @@ describe Projects::ClustersController do
       post :authorize_aws_role, params: params.merge(namespace_id: project.namespace, project_id: project)
     end
 
+    before do
+      allow(Clusters::Aws::FetchCredentialsService).to receive(:new)
+        .and_return(double(execute: double))
+    end
+
     it 'creates an Aws::Role record' do
       expect { go }.to change { Aws::Role.count }
 
-      expect(response.status).to eq 201
+      expect(response.status).to eq 200
 
       role = Aws::Role.last
       expect(role.user).to eq user
