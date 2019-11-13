@@ -17,6 +17,8 @@ import { backOff } from '~/lib/utils/common_utils';
 import { queryTypes, formDataValidator } from '../constants';
 
 const MAX_REQUESTS = 4;
+const axiosCancelToken = axios.CancelToken;
+let cancelTokenSource;
 
 function backOffRequest(makeRequestCallback) {
   let requestsCount = 0;
@@ -34,7 +36,10 @@ function backOffRequest(makeRequestCallback) {
           }
         }
       })
-      .catch(stop);
+      // If the request is cancelled by axios
+      // then consider it as noop so that its not
+      // caught by subsequent catches
+      .catch(thrown => (axios.isCancel(thrown) ? undefined : stop(thrown)));
   });
 }
 
@@ -114,11 +119,17 @@ export default {
     }
   },
   methods: {
-    requestValidation() {
+    requestValidation(query, cancelToken) {
       return backOffRequest(() =>
-        axios.post(this.validateQueryPath, {
-          query: this.query,
-        }),
+        axios.post(
+          this.validateQueryPath,
+          {
+            query,
+          },
+          {
+            cancelToken,
+          },
+        ),
       );
     },
     setFormState(isValid, inFlight, message) {
@@ -132,7 +143,15 @@ export default {
         return;
       }
       this.setFormState(null, true, '');
-      this.requestValidation()
+      // cancel previously dispatched backoff request
+      if (cancelTokenSource) {
+        cancelTokenSource.cancel();
+      }
+      // Creating a new token for each request because
+      // if a single token is used it can cancel existing requests
+      // as well.
+      cancelTokenSource = axiosCancelToken.source();
+      this.requestValidation(this.query, cancelTokenSource.token)
         .then(res => {
           const response = res.data;
           const { valid, error } = response.query;
