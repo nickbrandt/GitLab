@@ -16145,7 +16145,7 @@ msgstr ""
 msgid "Start a %{new_merge_request} with these changes"
 msgstr ""
 
-msgid "Start a Free Trial"
+msgid "Start a Free Gold Trial"
 msgstr ""
 
 msgid "Start a new discussion..."
