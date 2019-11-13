@@ -853,35 +853,6 @@ describe Issuable do
     end
   end
 
-  # Testing the release related scopes with the following setup:
-  # - release_1
-  #   - milestone_1
-  #     - issue_1
-  #     - issue_2
-  #   - milestone_2
-  #     - issue_3
-  #
-  # - release_2
-  #   - milestone_2
-  #     - issue_3
-  #   - milestone_3
-  #     - (no issue)
-  #
-  # - release_3
-  #   - milestone_4
-  #     - issue_4
-  #   - milestone_5
-  #     - issue_4
-  #
-  # - release_4
-  #   - milestone_3
-  #     - (no issue)
-  #
-  # - milestone_6 (no release)
-  #   - issue_5
-  #
-  # - issue_6 (no milestone, no release)
-
   describe 'release scopes' do
     let_it_be(:project) { create(:project) }
 
@@ -890,34 +861,21 @@ describe Issuable do
     let_it_be(:release_3) { create(:release, tag: 'v3.0', project: project) }
     let_it_be(:release_4) { create(:release, tag: 'v4.0', project: project) }
 
-    let_it_be(:milestone_1) { create(:milestone, title: 'm1', project: project) }
-    let_it_be(:milestone_2) { create(:milestone, title: 'm2', project: project) }
-    let_it_be(:milestone_3) { create(:milestone, title: 'm3', project: project) }
-    let_it_be(:milestone_4) { create(:milestone, title: 'm4', project: project) }
-    let_it_be(:milestone_5) { create(:milestone, title: 'm5', project: project) }
+    let_it_be(:milestone_1) { create(:milestone, releases: [release_1], title: 'm1', project: project) }
+    let_it_be(:milestone_2) { create(:milestone, releases: [release_1, release_2], title: 'm2', project: project) }
+    let_it_be(:milestone_3) { create(:milestone, releases: [release_2, release_4], title: 'm3', project: project) }
+    let_it_be(:milestone_4) { create(:milestone, releases: [release_3], title: 'm4', project: project) }
+    let_it_be(:milestone_5) { create(:milestone, releases: [release_3], title: 'm5', project: project) }
     let_it_be(:milestone_6) { create(:milestone, title: 'm6', project: project) }
 
-    let_it_be(:issue_1) { create(:issue, project: project) }
-    let_it_be(:issue_2) { create(:issue, project: project) }
-    let_it_be(:issue_3) { create(:issue, project: project) }
-    let_it_be(:issue_4) { create(:issue, project: project) }
-    let_it_be(:issue_5) { create(:issue, project: project) }
+    let_it_be(:issue_1) { create(:issue, milestone: milestone_1, project: project) }
+    let_it_be(:issue_2) { create(:issue, milestone: milestone_1, project: project) }
+    let_it_be(:issue_3) { create(:issue, milestone: milestone_2, project: project) }
+    let_it_be(:issue_4) { create(:issue, milestone: milestone_5, project: project) }
+    let_it_be(:issue_5) { create(:issue, milestone: milestone_6, project: project) }
     let_it_be(:issue_6) { create(:issue, project: project) }
 
     let_it_be(:items) { Issue.all }
-
-    before(:all) do
-      milestone_1.issues = [issue_1, issue_2]
-      milestone_2.issues = [issue_3]
-      milestone_4.issues = [issue_4]
-      milestone_5.issues = [issue_4]
-      milestone_6.issues = [issue_5]
-
-      release_1.milestones = [milestone_1, milestone_2]
-      release_2.milestones = [milestone_2, milestone_3]
-      release_3.milestones = [milestone_4, milestone_5]
-      release_4.milestones = [milestone_3]
-    end
 
     describe '#without_release' do
       it 'returns the issues not tied to any milestone and the ones tied to milestone with no release' do
@@ -954,19 +912,13 @@ describe Issuable do
         end
       end
 
-      context 'when an issue is tied to multiple milestones under the same release' do
-        it 'returns this issue only once' do
-          expect(items.with_release('v3.0')).to contain_exactly(issue_4)
-        end
-      end
-
       context 'when there is no issue under a specific release' do
         it 'returns no issue' do
           expect(items.with_release('v4.0')).to be_empty
         end
       end
 
-      context 'when a non-existant release tag is passed in' do
+      context 'when a non-existent release tag is passed in' do
         it 'returns no issue' do
           expect(items.with_release('v999.0')).to be_empty
         end

@@ -124,18 +124,16 @@ module Issuable
     scope :order_milestone_due_asc,  -> { left_joins_milestones.reorder(Arel.sql('milestones.due_date IS NULL, milestones.id IS NULL, milestones.due_date ASC')) }
 
     scope :without_release, -> do
-      joins("LEFT OUTER JOIN milestones AS ms ON #{table_name}.milestone_id = ms.id
-             LEFT OUTER JOIN milestone_releases AS ms_rl ON ms.id = ms_rl.milestone_id"
-           ).where('ms_rl.release_id IS NULL')
+      left_joins_milestones
+        .joins("LEFT OUTER JOIN milestone_releases ON milestones.id = milestone_releases.milestone_id")
+        .where('milestone_releases.release_id IS NULL')
     end
 
     scope :left_joins_milestones_joins_releases, -> do
-      joins("LEFT OUTER JOIN milestones AS ms
-              JOIN milestone_releases
-                JOIN releases ON milestone_releases.release_id = releases.id
-              ON ms.id = milestone_releases.milestone_id
-            ON #{table_name}.milestone_id = ms.id"
-           ).where('milestone_releases.release_id IS NOT NULL').distinct
+      left_joins_milestones
+        .joins("JOIN milestone_releases ON milestones.id = milestone_releases.milestone_id
+                JOIN releases ON milestone_releases.release_id = releases.id")
+        .where('milestone_releases.release_id IS NOT NULL').distinct
     end
 
     scope :without_label, -> { joins("LEFT OUTER JOIN label_links ON label_links.target_type = '#{name}' AND label_links.target_id = #{table_name}.id").where(label_links: { id: nil }) }

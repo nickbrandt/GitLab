@@ -578,17 +578,15 @@ class IssuableFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   def by_release(items)
-    if releases?
-      items = if filter_by_no_release?
-                items.without_release
-              elsif filter_by_any_release?
-                items.any_release
-              else
-                items.with_release(params[:release_tag])
-              end
-    end
+    return items unless releases?
 
-    items
+    if filter_by_no_release?
+      items.without_release
+    elsif filter_by_any_release?
+      items.any_release
+    else
+      items.with_release(params[:release_tag])
+    end
   end
 
   def filter_by_no_milestone?
