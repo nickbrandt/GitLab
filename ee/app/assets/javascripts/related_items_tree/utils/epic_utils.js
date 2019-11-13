@@ -31,6 +31,14 @@ const stateOrder = ['opened', 'closed'];
 export const sortByState = (a, b) => stateOrder.indexOf(a.state) - stateOrder.indexOf(b.state);
 
 /**
+ * Returns sorted array, using sortChildren and sortByState
+ * Used to sort epics and issues
+ *
+ * @param {Array} items
+ */
+export const applySorts = array => array.sort(sortChildren).sort(sortByState);
+
+/**
  * Returns formatted child item to include additional
  * flags and properties to use while rendering tree.
  * @param {Object} item
@@ -85,11 +93,9 @@ export const extractChildIssues = issues =>
  * Parses Graph query response and updates
  * children array to include issues within it
  * and then sorts everything based on `relativePosition`
+ * and state
  *
  * @param {Object} responseRoot
  */
 export const processQueryResponse = ({ epic }) =>
-  []
-    .concat(extractChildEpics(epic.children), extractChildIssues(epic.issues))
-    .sort(sortChildren)
-    .sort(sortByState);
+  applySorts([...extractChildEpics(epic.children), ...extractChildIssues(epic.issues)]);
