@@ -32,10 +32,7 @@ export const setDateRange = (
 
   if (skipFetch) return false;
 
-  return Promise.all([
-    dispatch('fetchCycleAnalyticsData', { state, dispatch }),
-    dispatch('fetchTasksByTypeData'),
-  ]);
+  return dispatch('fetchCycleAnalyticsData', { state, dispatch });
 };
 
 export const requestStageData = ({ commit }) => commit(types.REQUEST_STAGE_DATA);
@@ -207,6 +204,7 @@ export const receiveTasksByTypeError = ({ commit }, error) => {
 
 export const receiveTasksByTypeDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data);
+
 export const receiveTasksByTypeDataError = ({ commit }, error) => {
   commit(types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR, error);
   createFlash(__('There was an error fetching data for the chart'));

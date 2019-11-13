@@ -79,10 +79,7 @@ describe('Cycle analytics actions', () => {
         { startDate, endDate },
         state,
         [{ type: types.SET_DATE_RANGE, payload: { startDate, endDate } }],
-        [
-          { type: 'fetchCycleAnalyticsData', payload: { dispatch, state } },
-          { type: 'fetchTasksByTypeData' },
-        ],
+        [{ type: 'fetchCycleAnalyticsData', payload: { dispatch, state } }],
         done,
       );
     });

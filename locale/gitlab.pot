@@ -17419,10 +17419,10 @@ msgstr ""
 msgid "There was an error fetching cycle analytics stages."
 msgstr ""
 
-msgid "There was an error fetching data for the selected stage"
+msgid "There was an error fetching data for the chart"
 msgstr ""
 
-msgid "There was an error fetching data for the chart"
+msgid "There was an error fetching data for the form"
 msgstr ""
 
 msgid "There was an error fetching data for the selected stage"
