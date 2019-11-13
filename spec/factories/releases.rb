@@ -14,5 +14,11 @@ FactoryBot.define do
       sha { nil }
       author { nil }
     end
+
+    trait :with_evidence do
+      after(:create) do |release, _|
+        CreateEvidenceWorker.new.perform(release.id)
+      end
+    end
   end
 end

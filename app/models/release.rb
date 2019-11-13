@@ -78,7 +78,7 @@ class Release < ApplicationRecord
   end
 
   def evidence_summary
-    evidence&.summary
+    evidence&.summary || {}
   end
 
   private

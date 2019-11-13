@@ -167,7 +167,7 @@ describe Projects::ReleasesController do
   end
 
   describe 'GET #evidence' do
-    let!(:release) { create(:release, project: project) }
+    let!(:release) { create(:release, :with_evidence, project: project) }
     let(:tag) { CGI.escape(release.tag) }
     let(:format) { :json }
 
@@ -184,12 +184,12 @@ describe Projects::ReleasesController do
       sign_in(user)
     end
 
-    it 'returns the correct evidence summary as a json', :sidekiq_inline do
+    it 'returns the correct evidence summary as a json' do
       subject
       expect(response.body).to eq(release.evidence.summary.to_json)
     end
 
-    context 'when the release was created before evidence existed', :sidekiq_inline do
+    context 'when the release was created before evidence existed' do
       it 'returns an empty json' do
         release.evidence.destroy
         subject

@@ -21,10 +21,9 @@ class Projects::ReleasesController < Projects::ApplicationController
   end
 
   def evidence
-    summary = release.evidence_summary || {}
     respond_to do |format|
       format.json do
-        render json: summary
+        render json: release.evidence_summary
       end
     end
   end

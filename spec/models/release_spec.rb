@@ -53,6 +53,12 @@ RSpec.describe Release do
     end
   end
 
+  describe 'callbacks' do
+    it 'creates a new Evidence object on after_commit', :sidekiq_inline do
+      expect { release }.to change(Evidence, :count).by(1)
+    end
+  end
+
   describe '#assets_count' do
     subject { release.assets_count }
 
@@ -92,20 +98,22 @@ RSpec.describe Release do
     end
   end
 
-  describe 'evidence', :sidekiq_might_not_need_inline do
+  describe 'evidence' do
+    let(:release_with_evidence) { create(:release, :with_evidence, project: project) }
+
     describe '#create_evidence!' do
       context 'when a release is created' do
         it 'creates one Evidence object too' do
-          expect { release }.to change(Evidence, :count).by(1)
+          expect { release_with_evidence }.to change(Evidence, :count).by(1)
         end
       end
     end
 
     context 'when a release is deleted' do
       it 'also deletes the associated evidence' do
-        release = create(:release)
+        release_with_evidence
 
-        expect { release.destroy }.to change(Evidence, :count).by(-1)
+        expect { release_with_evidence.destroy }.to change(Evidence, :count).by(-1)
       end
     end
   end
@@ -143,34 +151,34 @@ RSpec.describe Release do
   end
 
   describe '#evidence_sha' do
-    let!(:release) { create(:release) }
+    let!(:release) { create(:release, :with_evidence) }
 
     context 'when a release was created before evidence collection existed' do
-      it 'is nil', :sidekiq_inline do
+      it 'is nil' do
         allow(release).to receive(:evidence).and_return(nil)
 
         expect(release.evidence_sha).to be_nil
       end
     end
     context 'when a release was created with evidence collection' do
-      it 'returns the summary sha', :sidekiq_inline do
+      it 'returns the summary sha' do
         expect(release.evidence_sha).to eq(release.evidence.summary_sha)
       end
     end
   end
 
   describe '#evidence_summary' do
-    let!(:release) { create(:release) }
+    let!(:release) { create(:release, :with_evidence) }
 
     context 'when a release was created before evidence collection existed' do
-      it 'is nil', :sidekiq_inline do
+      it 'returns an empty hash' do
         allow(release).to receive(:evidence).and_return(nil)
 
-        expect(release.evidence_summary).to be_nil
+        expect(release.evidence_summary).to eq({})
       end
     end
     context 'when a release was created with evidence collection' do
-      it 'returns the summary', :sidekiq_inline do
+      it 'returns the summary' do
         expect(release.evidence_summary).to eq(release.evidence.summary)
       end
     end
