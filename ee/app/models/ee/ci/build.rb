@@ -21,6 +21,8 @@ module EE
 
         after_save :stick_build_if_status_changed
         delegate :service_specification, to: :runner_session, allow_nil: true
+
+        scope :license_scan, -> { joins(:job_artifacts).merge(::Ci::JobArtifact.license_management) }
       end
 
       def shared_runners_minutes_limit_enabled?
