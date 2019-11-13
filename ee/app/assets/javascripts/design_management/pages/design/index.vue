@@ -60,6 +60,7 @@ export default {
       variables() {
         return this.designVariables;
       },
+      fetchPolicy: 'network-only',
       update: data => extractDesign(data),
       result({ data }) {
         if (!data) {
