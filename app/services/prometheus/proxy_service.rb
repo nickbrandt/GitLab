@@ -5,7 +5,7 @@ module Prometheus
     include ReactiveCaching
     include Gitlab::Utils::StrongMemoize
 
-    self.reactive_cache_key = ->(service) { service.cache_key }
+    self.reactive_cache_key = ->(service) { [] }
     self.reactive_cache_lease_timeout = 30.seconds
     self.reactive_cache_refresh_interval = 30.seconds
     self.reactive_cache_lifetime = 1.minute
