@@ -167,12 +167,13 @@ class GfmAutoComplete {
       alias: 'users',
       displayTpl(value) {
         let tmpl = GfmAutoComplete.Loading.template;
-        const { avatarTag, username, title } = value;
+        const { avatarTag, username, title, icon } = value;
         if (username != null) {
           tmpl = GfmAutoComplete.Members.templateFunction({
             avatarTag,
             username,
             title,
+            icon,
           });
         }
         return tmpl;
@@ -192,7 +193,7 @@ class GfmAutoComplete {
               return m;
             }
             title = m.name;
-            if (m.count) {
+            if (m.count && !m.mentioningsDisabled) {
               title += ` (${m.count})`;
             }
 
@@ -203,12 +204,14 @@ class GfmAutoComplete {
             const rectAvatarClass = m.type === GROUP_TYPE ? 'rect-avatar' : '';
             const imgAvatar = `<img src="${m.avatar_url}" alt="${m.username}" class="avatar ${rectAvatarClass} avatar-inline center s26"/>`;
             const txtAvatar = `<div class="avatar ${rectAvatarClass} center avatar-inline s26">${autoCompleteAvatar}</div>`;
+            const avatarIcon = m.mentioningsDisabled ? '<i class="fa fa-bell-slash"></i>' : '';
 
             return {
               username: m.username,
               avatarTag: autoCompleteAvatar.length === 1 ? txtAvatar : imgAvatar,
               title: sanitize(title),
               search: sanitize(`${m.username} ${m.name}`),
+              icon: avatarIcon,
             };
           });
         },
@@ -624,8 +627,8 @@ GfmAutoComplete.Emoji = {
 };
 // Team Members
 GfmAutoComplete.Members = {
-  templateFunction({ avatarTag, username, title }) {
-    return `<li>${avatarTag} ${username} <small>${_.escape(title)}</small></li>`;
+  templateFunction({ avatarTag, username, title, icon }) {
+    return `<li>${avatarTag} ${username} <small>${_.escape(title)}</small> ${icon}</li>`;
   },
 };
 GfmAutoComplete.Labels = {

@@ -298,6 +298,41 @@ describe('GfmAutoComplete', () => {
     });
   });
 
+  describe('Members.templateFunction', () => {
+    it('should return html with avatarTag and username', () => {
+      expect(
+        GfmAutoComplete.Members.templateFunction({
+          avatarTag: 'IMG',
+          username: 'my-group',
+          title: '',
+          icon: '',
+        }),
+      ).toBe('<li>IMG my-group <small></small> </li>');
+    });
+
+    it('should add icon if icon is set', () => {
+      expect(
+        GfmAutoComplete.Members.templateFunction({
+          avatarTag: 'IMG',
+          username: 'my-group',
+          title: '',
+          icon: '<i class="icon"/>',
+        }),
+      ).toBe('<li>IMG my-group <small></small> <i class="icon"/></li>');
+    });
+
+    it('should add escaped title if title is set', () => {
+      expect(
+        GfmAutoComplete.Members.templateFunction({
+          avatarTag: 'IMG',
+          username: 'my-group',
+          title: 'MyGroup+',
+          icon: '<i class="icon"/>',
+        }),
+      ).toBe('<li>IMG my-group <small>MyGroup+</small> <i class="icon"/></li>');
+    });
+  });
+
   describe('labels', () => {
     const dataSources = {
       labels: `${TEST_HOST}/autocomplete_sources/labels`,
