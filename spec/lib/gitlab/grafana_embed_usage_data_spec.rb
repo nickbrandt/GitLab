@@ -4,9 +4,7 @@ require 'spec_helper'
 
 describe Gitlab::GrafanaEmbedUsageData do
   describe '#issue_count', :use_clean_rails_memory_store_caching do
-    subject do
-      described_class.issue_count
-    end
+    subject { described_class.issue_count }
 
     let(:project) { create(:project) }
     let(:description_with_embed) { "Some comment\n\nhttps://grafana.example.com/d/xvAk4q0Wk/go-processes?orgId=1&from=1573238522762&to=1573240322762&var-job=prometheus&var-interval=10m&panelId=1&fullscreen" }
@@ -20,7 +18,7 @@ describe Gitlab::GrafanaEmbedUsageData do
 
     context 'with project grafana integration enabled' do
       before do
-        create(:grafana_integration, project: project)
+        create(:grafana_integration, project: project, enabled: true)
       end
 
       context 'with valid and invalid embeds' do

@@ -4,13 +4,9 @@ module Gitlab
   class GrafanaEmbedUsageData
     class << self
       def issue_count
-        count = 0
-
-        Issue.with_project_grafana_integration.find_each do |issue|
-          count += has_grafana_url?(issue) ? 1 : 0
+        Issue.with_project_grafana_integration.find_each.count do |issue|
+          has_grafana_url?(issue)
         end
-
-        count
       end
 
       private
