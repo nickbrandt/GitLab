@@ -11,7 +11,7 @@ describe Gitlab::ImportExport::GroupProjectObjectBuilder do
   end
 
   context 'labels' do
-    it 'finds the right group label' do
+    it 'finds the existing group label' do
       group_label = create(:group_label, name: 'group label', group: project.group)
 
       expect(described_class.build(Label,
@@ -31,7 +31,7 @@ describe Gitlab::ImportExport::GroupProjectObjectBuilder do
   end
 
   context 'milestones' do
-    it 'finds the right group milestone' do
+    it 'finds the existing group milestone' do
       milestone = create(:milestone, name: 'group milestone', group: project.group)
 
       expect(described_class.build(Milestone,
@@ -51,7 +51,7 @@ describe Gitlab::ImportExport::GroupProjectObjectBuilder do
   end
 
   context 'merge_request' do
-    it 'finds the right merge_request' do
+    it 'finds the existing merge_request' do
       merge_request = create(:merge_request, title: 'MergeRequest', iid: 7, target_project: project, source_project: project)
       expect(described_class.build(MergeRequest,
                                    'title' => 'MergeRequest',
