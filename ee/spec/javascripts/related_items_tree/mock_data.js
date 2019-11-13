@@ -233,57 +233,6 @@ export const mockQueryResponse2 = {
   },
 };
 
-export const mockQueryResponse2 = {
-  data: {
-    group: {
-      id: 1,
-      path: 'gitlab-org',
-      fullPath: 'gitlab-org',
-      epic: {
-        id: 1,
-        iid: 1,
-        title: 'Foo bar',
-        webPath: '/groups/gitlab-org/-/epics/1',
-        userPermissions: {
-          adminEpic: true,
-          createEpic: true,
-        },
-        children: {
-          edges: [
-            {
-              node: mockEpic1,
-            },
-            {
-              node: mockEpic2,
-            },
-          ],
-          pageInfo: {
-            endCursor: 'abc',
-            hasNextPage: true,
-          },
-        },
-        issues: {
-          edges: [
-            {
-              node: mockIssue3,
-            },
-            {
-              node: mockIssue1,
-            },
-            {
-              node: mockIssue2,
-            },
-          ],
-          pageInfo: {
-            endCursor: 'def',
-            hasNextPage: true,
-          },
-        },
-      },
-    },
-  },
-};
-
 export const mockReorderMutationResponse = {
   epicTreeReorder: {
     clientMutationId: null,
