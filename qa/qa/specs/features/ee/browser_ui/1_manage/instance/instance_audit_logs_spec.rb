@@ -17,7 +17,7 @@ module QA
       end
     end
 
-    describe 'Instance audit logs' do
+    describe 'Instance audit logs', :requires_admin do
       context 'Failed sign in' do
         before do
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
