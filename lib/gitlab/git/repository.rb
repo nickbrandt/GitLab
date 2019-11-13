@@ -33,6 +33,7 @@ module Gitlab
         def initialize(error_code)
           super(self.class.name)
 
+          # The value coming from Gitaly is an uppercase String (e.g., "EMPTY")
           @error_code = error_code.downcase.to_sym
         end
       end
