@@ -50,6 +50,7 @@ module Gitlab
       end
 
       # Returns Arel clause `"{table_name}"."project_id" = {project.id}` if project is present
+      # For example: merge_request has :target_project_id, and we are searching by :iid
       # or, if group is present:
       # `"{table_name}"."project_id" = {project.id} OR "{table_name}"."group_id" = {group.id}`
       def where_clause_base
