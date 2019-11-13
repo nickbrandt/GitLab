@@ -137,6 +137,8 @@ module ReactiveCaching
             Rails.cache.write(key, new_value)
             reactive_cache_updated(*args) if new_value != old_value
           end
+        else
+          Rails.cache.delete(full_reactive_cache_key(*args))
         end
       end
     end
