@@ -19,7 +19,6 @@ describe Projects::SubscriptionsController do
     context 'when user is authorized' do
       before do
         project.add_maintainer(user)
-        upstream_project.add_developer(user)
       end
 
       context 'when feature is available' do
@@ -27,29 +26,77 @@ describe Projects::SubscriptionsController do
           stub_licensed_features(ci_project_subscriptions: true)
         end
 
-        context 'when project is public' do
-          it 'creates a new subscription' do
-            expect { post_create }.to change { project.upstream_project_subscriptions.count }.from(0).to(1)
+        context 'when user is developer in upstream project' do
+          before do
+            upstream_project.add_developer(user)
           end
 
-          it 'sets the flash' do
-            post_create
+          context 'when project is public' do
+            context 'when subscription count is below the limit' do
+              it 'creates a new subscription' do
+                expect { post_create }.to change { project.upstream_project_subscriptions.count }.from(0).to(1)
+              end
 
-            expect(response).to set_flash[:notice].to('Subscription successfully created.')
+              it 'sets the flash' do
+                post_create
+
+                expect(response).to set_flash[:notice].to('Subscription successfully created.')
+              end
+
+              it 'redirects to ci_cd settings' do
+                post_create
+
+                expect(response).to redirect_to project_settings_ci_cd_path(project)
+              end
+            end
+
+            context 'when subscription count is on the limit' do
+              before do
+                create_list(:ci_subscriptions_project, 2, downstream_project: project)
+              end
+
+              it 'does not create a new subscription' do
+                expect { post_create }.not_to change { project.upstream_project_subscriptions.count }.from(2)
+              end
+
+              it 'sets the flash' do
+                post_create
+
+                expect(response).to set_flash[:warning].to('Subscription limit reached.')
+              end
+
+              it 'redirects to ci_cd settings' do
+                post_create
+
+                expect(response).to redirect_to project_settings_ci_cd_path(project)
+              end
+            end
           end
 
-          it 'redirects to ci_cd settings' do
-            post_create
+          context 'when project is not public' do
+            before do
+              upstream_project.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+            end
 
-            expect(response).to redirect_to project_settings_ci_cd_path(project)
+            it 'does not create a new subscription' do
+              expect { post_create }.not_to change { project.upstream_project_subscriptions.count }.from(0)
+            end
+
+            it 'sets the flash' do
+              post_create
+
+              expect(response).to set_flash[:alert].to('Subscription creation failed because the specified project is not public.')
+            end
+
+            it 'redirects to ci_cd settings' do
+              post_create
+
+              expect(response).to redirect_to project_settings_ci_cd_path(project)
+            end
           end
         end
 
-        context 'when project is not public' do
-          before do
-            upstream_project.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
-          end
-
+        context 'when user is not developer in upstream project' do
           it 'does not create a new subscription' do
             expect { post_create }.not_to change { project.upstream_project_subscriptions.count }.from(0)
           end
@@ -57,7 +104,7 @@ describe Projects::SubscriptionsController do
           it 'sets the flash' do
             post_create
 
-            expect(response).to set_flash[:notice].to('This project path either does not exist or is private.')
+            expect(response).to set_flash[:warning].to('This project path either does not exist or you do not have access.')
           end
 
           it 'redirects to ci_cd settings' do

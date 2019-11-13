@@ -402,6 +402,13 @@
   :resource_boundary: :unknown
   :weight: 1
   :idempotent: 
+- :name: pipeline_default:ci_trigger_downstream_subscriptions
+  :feature_category: :continuous_integration
+  :has_external_dependencies: 
+  :urgency: :default
+  :resource_boundary: :cpu
+  :weight: 3
+  :idempotent: 
 - :name: security_scans:store_security_reports
   :feature_category: :static_application_security_testing
   :has_external_dependencies: 

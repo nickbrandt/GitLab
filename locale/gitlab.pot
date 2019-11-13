@@ -861,6 +861,9 @@ msgstr ""
 msgid "A secure token that identifies an external storage request."
 msgstr ""
 
+msgid "A subscription will trigger a new pipeline on the default branch of this project when a pipeline successfully completes for a new tag on the %{default_branch_docs} of the subscribed project."
+msgstr ""
+
 msgid "A user with write access to the source branch selected this option"
 msgstr ""
 
@@ -18807,7 +18810,13 @@ msgstr ""
 msgid "Subscription"
 msgstr ""
 
+msgid "Subscription creation failed because the specified project is not public."
+msgstr ""
+
 msgid "Subscription deletion failed."
+msgstr ""
+
+msgid "Subscription limit reached."
 msgstr ""
 
 msgid "Subscription successfully applied to \"%{group_name}\""
@@ -18889,9 +18898,6 @@ msgid "SubscriptionTable|Usage count is performed once a day at 12:00 PM."
 msgstr ""
 
 msgid "Subscriptions"
-msgstr ""
-
-msgid "Subscriptions allow successfully completed pipelines on the %{default_branch_docs} of the subscribed project to trigger a new pipeline on the default branch of this project."
 msgstr ""
 
 msgid "Subtracted"
@@ -19732,7 +19738,7 @@ msgstr ""
 msgid "There are no unstaged changes"
 msgstr ""
 
-msgid "There is a limit of 100 subscriptions from or to a project."
+msgid "There is a limit of 2 subscriptions from or to a project."
 msgstr ""
 
 msgid "There is already a repository with that name on disk"
@@ -20197,7 +20203,7 @@ msgstr ""
 msgid "This project is archived and cannot be commented on."
 msgstr ""
 
-msgid "This project path either does not exist or is private."
+msgid "This project path either does not exist or you do not have access."
 msgstr ""
 
 msgid "This project will be removed on %{date}"

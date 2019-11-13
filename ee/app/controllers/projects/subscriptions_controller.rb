@@ -4,17 +4,18 @@ class Projects::SubscriptionsController < Projects::ApplicationController
   include ::Gitlab::Utils::StrongMemoize
 
   before_action :authorize_admin_project!
-  before_action :authorize_read_upstream_project!, only: [:create]
   before_action :feature_ci_project_subscriptions!
+  before_action :authorize_upstream_project!, only: [:create]
+  before_action :check_subscription_count!, only: [:create]
 
   def create
     subscription = project.upstream_project_subscriptions.create(upstream_project: upstream_project)
 
-    flash[:notice] = if subscription.persisted?
-                       _('Subscription successfully created.')
-                     else
-                       _('This project path either does not exist or is private.')
-                     end
+    if subscription.persisted?
+      flash[:notice] = _('Subscription successfully created.')
+    else
+      flash[:alert] = _('Subscription creation failed because the specified project is not public.')
+    end
 
     redirect_to project_settings_ci_cd_path(project)
   end
@@ -41,11 +42,21 @@ class Projects::SubscriptionsController < Projects::ApplicationController
     project.upstream_project_subscriptions.find(params[:id])
   end
 
-  def authorize_read_upstream_project!
-    render_404 unless can?(current_user, :read_project, upstream_project)
-  end
-
   def feature_ci_project_subscriptions!
     render_404 unless project.feature_available?(:ci_project_subscriptions)
+  end
+
+  def authorize_upstream_project!
+    return if can?(current_user, :developer_access, upstream_project)
+
+    flash[:warning] = _('This project path either does not exist or you do not have access.')
+    redirect_to project_settings_ci_cd_path(project)
+  end
+
+  def check_subscription_count!
+    return if project.upstream_project_subscriptions.count < 2
+
+    flash[:warning] = _('Subscription limit reached.')
+    redirect_to project_settings_ci_cd_path(project)
   end
 end

@@ -385,6 +385,44 @@ describe Ci::Pipeline do
         pipeline.cancel!
       end
     end
+
+    context 'when pipeline project has downstream subscriptions' do
+      let(:pipeline) { create(:ci_empty_pipeline, project: create(:project, :public)) }
+
+      before do
+        pipeline.project.downstream_projects << create(:project)
+      end
+
+      context 'when pipeline runs on a tag' do
+        before do
+          pipeline.update(tag: true)
+        end
+
+        context 'when feature is not available' do
+          before do
+            stub_feature_flags(ci_project_subscriptions: false)
+          end
+
+          it 'does not schedule the trigger downstream subscriptions worker' do
+            expect(::Ci::TriggerDownstreamSubscriptionsWorker).not_to receive(:perform_async)
+
+            pipeline.succeed!
+          end
+        end
+
+        context 'when feature is available' do
+          before do
+            stub_feature_flags(ci_project_subscriptions: true)
+          end
+
+          it 'schedules the trigger downstream subscriptions worker' do
+            expect(::Ci::TriggerDownstreamSubscriptionsWorker).to receive(:perform_async)
+
+            pipeline.succeed!
+          end
+        end
+      end
+    end
   end
 
   describe '#latest_merge_request_pipeline?' do

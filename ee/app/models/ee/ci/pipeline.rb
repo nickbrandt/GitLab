@@ -65,7 +65,20 @@ module EE
               ::Ci::PipelineBridgeStatusWorker.perform_async(pipeline.id)
             end
           end
+
+          after_transition any => ::Ci::Pipeline.completed_statuses do |pipeline|
+            next unless pipeline.triggers_subscriptions?
+
+            pipeline.run_after_commit do
+              ::Ci::TriggerDownstreamSubscriptionsWorker.perform_async(pipeline.id)
+            end
+          end
         end
+      end
+
+      def triggers_subscriptions?
+        # Currently we trigger subscriptions only for tags.
+        tag? && project_has_subscriptions?
       end
 
       def retryable?
@@ -144,6 +157,12 @@ module EE
       end
 
       private
+
+      def project_has_subscriptions?
+        return false unless ::Feature.enabled?(:ci_project_subscriptions, project)
+
+        project.downstream_projects.any?
+      end
 
       def merge_train_ref?
         ::MergeRequest.merge_train_ref?(ref)
