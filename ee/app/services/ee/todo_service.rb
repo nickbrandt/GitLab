@@ -15,7 +15,14 @@ module EE
     override :new_issuable
     def new_issuable(issuable, author)
       if issuable.is_a?(MergeRequest)
-        create_approval_required_todos(issuable, issuable.overall_approvers(exclude_code_owners: true), author)
+        approvers = issuable.overall_approvers(exclude_code_owners: true)
+        issuable.project.team.max_member_access_for_user_ids(approvers.map(&:id))
+
+        approvers = approvers.select do |approver|
+          approver.can?(:approve_merge_request, issuable)
+        end
+
+        create_approval_required_todos(issuable, approvers, author)
       end
 
       super

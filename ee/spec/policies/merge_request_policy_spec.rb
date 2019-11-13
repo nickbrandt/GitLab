@@ -27,11 +27,11 @@ describe MergeRequestPolicy do
     forked_project.add_maintainer(fork_maintainer)
   end
 
-  context 'for a merge request within the same project' do
-    def policy_for(user)
-      described_class.new(user, merge_request)
-    end
+  def policy_for(user)
+    described_class.new(user, merge_request)
+  end
 
+  context 'for a merge request within the same project' do
     context 'when overwriting approvers is disabled on the project' do
       before do
         project.update!(disable_overriding_approvers_per_merge_request: true)
@@ -59,12 +59,22 @@ describe MergeRequestPolicy do
         expect(policy_for(fork_maintainer)).to be_disallowed(:update_approvers)
       end
     end
+
+    context 'allows project developers and above' do
+      it 'to approve the merge request' do
+        expect(policy_for(developer)).to be_allowed(:update_approvers)
+        expect(policy_for(maintainer)).to be_allowed(:update_approvers)
+
+        expect(policy_for(guest)).to be_disallowed(:update_approvers)
+        expect(policy_for(fork_guest)).to be_disallowed(:update_approvers)
+        expect(policy_for(fork_developer)).to be_disallowed(:update_approvers)
+        expect(policy_for(fork_maintainer)).to be_disallowed(:update_approvers)
+      end
+    end
   end
 
   context 'for a merge request from a fork' do
-    def policy_for(user)
-      described_class.new(user, fork_merge_request)
-    end
+    let(:merge_request) { fork_merge_request }
 
     context 'when overwriting approvers is disabled on the target project' do
       before do
@@ -100,6 +110,18 @@ describe MergeRequestPolicy do
 
     context 'when overwriting approvers is enabled on the target project' do
       it 'allows project developers and above, as well as the author, to update the approvers' do
+        expect(policy_for(developer)).to be_allowed(:update_approvers)
+        expect(policy_for(maintainer)).to be_allowed(:update_approvers)
+        expect(policy_for(fork_developer)).to be_allowed(:update_approvers)
+
+        expect(policy_for(guest)).to be_disallowed(:update_approvers)
+        expect(policy_for(fork_guest)).to be_disallowed(:update_approvers)
+        expect(policy_for(fork_maintainer)).to be_disallowed(:update_approvers)
+      end
+    end
+
+    context 'allows project developers and above' do
+      it 'to approve the merge requests' do
         expect(policy_for(developer)).to be_allowed(:update_approvers)
         expect(policy_for(maintainer)).to be_allowed(:update_approvers)
         expect(policy_for(fork_developer)).to be_allowed(:update_approvers)
