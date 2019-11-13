@@ -7,7 +7,7 @@ module Gitlab
         puma_options,
           puma_per_worker_max_memory_mb: 850,
           puma_master_max_memory_mb: 550,
-          puma_dev_max_memory_mb: 200
+          additional_puma_dev_max_memory_mb: 200
       )
         require 'puma_worker_killer'
 
@@ -23,7 +23,7 @@ module Gitlab
           # Additional memory is added when running in `development`
           config.ram = puma_master_max_memory_mb +
             (worker_count * puma_per_worker_max_memory_mb) +
-            (Rails.env.development? ? (1 + worker_count) * puma_dev_max_memory_mb : 0)
+            (Rails.env.development? ? (1 + worker_count) * additional_puma_dev_max_memory_mb : 0)
 
           config.frequency = 20 # seconds
 
