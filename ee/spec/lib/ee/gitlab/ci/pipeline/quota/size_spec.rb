@@ -14,22 +14,22 @@ describe EE::Gitlab::Ci::Pipeline::Quota::Size do
   subject { described_class.new(namespace, pipeline) }
 
   shared_context 'pipeline size limit exceeded' do
-    let(:pipeline) do
-      config = { rspec: { script: 'rspec' },
-                 spinach: { script: 'spinach' } }
-
-      build(:ci_pipeline, project: project, config: config)
-    end
-
     before do
+      config = YAML.dump({
+        rspec: { script: 'rspec' },
+        spinach: { script: 'spinach' }
+      })
+      stub_ci_pipeline_yaml_file(config)
       plan_limits.update!(ci_pipeline_size: 1)
     end
   end
 
   shared_context 'pipeline size limit not exceeded' do
-    let(:pipeline) { build(:ci_pipeline_with_one_job, project: project) }
-
     before do
+      config = YAML.dump({
+        rspec: { script: 'rspec' }
+      })
+      stub_ci_pipeline_yaml_file(config)
       plan_limits.update!(ci_pipeline_size: 2)
     end
   end

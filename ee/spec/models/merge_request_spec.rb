@@ -597,7 +597,7 @@ describe MergeRequest do
 
   describe '#mergeable_with_quick_action?' do
     def create_pipeline(status)
-      pipeline = create(:ci_pipeline_with_one_job,
+      pipeline = create(:ci_pipeline,
         project: project,
         ref:     merge_request.source_branch,
         sha:     merge_request.diff_head_sha,
