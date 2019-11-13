@@ -120,7 +120,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
     it 'creates or updates a Redis hash' do
       expect { cache.write_to_redis_hash(diff_hash) }
-        .to change { Gitlab::Redis::Cache.with { |r| r.hgetall(cache.diffable.cache_key) } }
+        .to change { Gitlab::Redis::Cache.with { |r| r.hgetall(cache.key.to_s) } }
     end
   end
 

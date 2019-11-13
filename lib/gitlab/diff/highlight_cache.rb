@@ -59,12 +59,10 @@ module Gitlab
       #   ...it will write/update a Redis hash (HSET)
       #
       def write_to_redis_hash(hash)
-        return unless @redis_key
-
         Redis::Cache.with do |redis|
           redis.multi do |multi|
             hash.each do |diff_file_id, highlighted_diff_lines_hash|
-              multi.hset(@redis_key, diff_file_id, highlighted_diff_lines_hash.to_json)
+              multi.hset(key.to_s, diff_file_id, highlighted_diff_lines_hash.to_json)
 
               # HSETs have to have their expiration date manually updated
               #
@@ -76,13 +74,13 @@ module Gitlab
 
       def read_entire_redis_hash
         Redis::Cache.with do |redis|
-          redis.hgetall(@redis_key)
+          redis.hgetall(key.to_s)
         end
       end
 
       def read_single_entry_from_redis_hash(diff_file_id)
         Redis::Cache.with do |redis|
-          redis.hget(@redis_key, diff_file_id)
+          redis.hget(key.to_s, diff_file_id)
         end
       end
 
