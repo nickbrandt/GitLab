@@ -11,14 +11,17 @@ export default () =>
       PackagesListApp,
     },
     data() {
-      const { dataset } = document.querySelector(this.$options.el);
+      const {
+        dataset: { projectId, groupId, emptyListIllustration, emptyListHelpUrl, canDestroyPackage },
+      } = document.querySelector(this.$options.el);
 
       return {
         packageListAttrs: {
-          projectId: dataset.projectId,
-          emptyListIllustration: dataset.emptyListIllustration,
-          emptyListHelpUrl: dataset.emptyListHelpUrl,
-          canDestroyPackage: dataset.canDestroyPackage,
+          projectId,
+          groupId,
+          emptyListIllustration,
+          emptyListHelpUrl,
+          canDestroyPackage,
         },
       };
     },
