@@ -147,23 +147,23 @@ module Clusters
 
       def crossplane_database_role_resource
         Gitlab::Kubernetes::Role.new(
-            name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_NAME,
-            namespace: service_account_namespace,
-            rules: [{
-                        apiGroups: %w(database.crossplane.io),
-                        resources: %w(postgresqlinstances),
-                        verbs: %w(get list create watch)
-                    }]
+          name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_NAME,
+          namespace: service_account_namespace,
+          rules: [{
+            apiGroups: %w(database.crossplane.io),
+            resources: %w(postgresqlinstances),
+            verbs: %w(get list create watch)
+          }]
         ).generate
       end
 
       def crossplane_database_role_binding_resource
         Gitlab::Kubernetes::RoleBinding.new(
-            name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_BINDING_NAME,
-            role_name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_NAME,
-            role_kind: :Role,
-            namespace: service_account_namespace,
-            service_account_name: service_account_name
+          name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_BINDING_NAME,
+          role_name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_NAME,
+          role_kind: :Role,
+          namespace: service_account_namespace,
+          service_account_name: service_account_name
         ).generate
       end
     end
