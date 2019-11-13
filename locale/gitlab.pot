@@ -4452,6 +4452,9 @@ msgstr ""
 msgid "Connect your external repositories, and CI/CD pipelines will run for new commits. A GitLab project will be created with only CI/CD features enabled."
 msgstr ""
 
+msgid "Connecting"
+msgstr ""
+
 msgid "Connecting to terminal sync service"
 msgstr ""
 
