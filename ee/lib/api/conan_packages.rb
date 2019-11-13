@@ -20,7 +20,7 @@ module API
     }.freeze
 
     FILE_NAME_REQUIREMENTS = {
-      file_name: Gitlab::Regex.conan_file_name_regex
+      file_name: API::NO_SLASH_URL_PART_REGEX
     }.freeze
 
     PACKAGE_COMPONENT_REGEX = Gitlab::Regex.conan_recipe_component_regex
@@ -197,7 +197,7 @@ module API
         requires :package_channel, type: String, regexp: PACKAGE_COMPONENT_REGEX, desc: 'Package channel'
         requires :recipe_revision, type: String, desc: 'Conan Recipe Revision'
       end
-      namespace 'files/:package_name/:package_version/:package_username/:package_channel/:recipe_revision' do
+      namespace 'files/:package_name/:package_version/:package_username/:package_channel/:recipe_revision', requirements: PACKAGE_REQUIREMENTS do
         before do
           authenticate_non_get!
         end
@@ -205,11 +205,13 @@ module API
         params do
           requires :file_name, type: String, desc: 'Package file name'
         end
-        desc 'Download recipe files' do
-          detail 'This feature was introduced in GitLab 12.5'
-        end
-        get 'export/:file_name' do
-          not_found!
+        namespace 'export/:file_name', requirements: FILE_NAME_REQUIREMENTS do
+          desc 'Download recipe files' do
+            detail 'This feature was introduced in GitLab 12.5'
+          end
+          get do
+            download_package_file(:recipe_file)
+          end
         end
 
         params do
@@ -217,11 +219,13 @@ module API
           requires :package_revision, type: String, desc: 'Conan Package Revision'
           requires :file_name, type: String, desc: 'Package file name'
         end
-        desc 'Download package files' do
-          detail 'This feature was introduced in GitLab 12.5'
-        end
-        get 'package/:conan_package_reference/:package_revision/:file_name' do
-          not_found!
+        namespace 'package/:conan_package_reference/:package_revision/:file_name', requirements: FILE_NAME_REQUIREMENTS do
+          desc 'Download package files' do
+            detail 'This feature was introduced in GitLab 12.5'
+          end
+          get do
+            download_package_file(:package_file)
+          end
         end
       end
     end
@@ -314,6 +318,15 @@ module API
             .order_created
             .last
         end
+      end
+
+      def download_package_file(file_type)
+        authorize!(:read_package, project)
+
+        package_file = ::Packages::PackageFileFinder
+          .new(package, "#{params[:file_name]}", conan_file_type: file_type).execute!
+
+        present_carrierwave_file!(package_file.file)
       end
 
       def find_personal_access_token

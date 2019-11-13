@@ -66,8 +66,12 @@ class ConanPackagePresenter
 
   def map_package_files
     package_files.to_a.map do |package_file|
-      [package_file.file_name, yield(package_file)]
-    end.to_h.compact
+      key = package_file.file_name
+      value = yield(package_file)
+      next unless key && value
+
+      [key, value]
+    end.compact.to_h
   end
 
   def package_files
