@@ -2,7 +2,7 @@ module SourcegraphGon
   extend ActiveSupport::Concern
 
   def push_sourcegraph_gon
-    return unless enabled?
+    return unless can?(current_user, :access_sourcegraph, sourcegraph_project)
 
     gon.push({
       sourcegraph_enabled: true,
@@ -10,20 +10,9 @@ module SourcegraphGon
     })
   end
 
-  private 
+  private
 
-  def enabled?
-    current_user&.sourcegraph_enabled && project_enabled?
-  end
-
-  def project_enabled?
-    return false unless project && Gitlab::Sourcegraph.feature_enabled?(project)
-    return project.public? if Gitlab::CurrentSettings.sourcegraph_public_only
-
-    true
-  end
-
-  def project
-    @target_project || @project  
+  def sourcegraph_project
+    @target_project || project
   end
 end

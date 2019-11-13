@@ -3,7 +3,8 @@
 require 'spec_helper'
 
 describe UserPreference do
-  let(:user_preference) { create(:user_preference) }
+  let_it_be(:user) { create(:user) }
+  let(:user_preference) { create(:user_preference, user: user) }
 
   describe '#set_notes_filter' do
     let(:issuable) { build_stubbed(:issue) }
@@ -77,6 +78,29 @@ describe UserPreference do
   describe '#timezone' do
     it 'returns server time as default' do
       expect(user_preference.timezone).to eq(Time.zone.tzinfo.name)
+    end
+  end
+
+  describe 'sourcegraph_enabled' do
+    let(:user_preference) { create(:user_preference, sourcegraph_enabled: true, user: user) }
+    let(:application_setting_sourcegraph_enabled) { true }
+
+    before do
+      stub_application_setting(sourcegraph_enabled: application_setting_sourcegraph_enabled)
+    end
+
+    context 'when sourcegraph_enabled application setting is enabled' do
+      it 'returns true' do
+        expect(user_preference.sourcegraph_enabled).to be_truthy
+      end
+    end
+
+    context 'when sourcegraph_enabled application setting is disabled' do
+      let(:application_setting_sourcegraph_enabled) { false }
+
+      it 'returns false' do
+        expect(user_preference.sourcegraph_enabled).to be_falsey
+      end
     end
   end
 end

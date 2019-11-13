@@ -495,6 +495,15 @@ describe ApplicationSetting do
         it { is_expected.not_to allow_value(nil).for(:static_objects_external_storage_auth_token) }
       end
     end
+
+    context 'sourcegraph settings' do
+      it 'is invalid if sourcegraph is enabled and no url is provided' do
+        allow(subject).to receive(:sourcegraph_enabled).and_return(true)
+
+        expect(subject.sourcegraph_url).to be_nil
+        is_expected.to be_invalid
+      end
+    end
   end
 
   context 'restrict creating duplicates' do
@@ -579,6 +588,30 @@ describe ApplicationSetting do
           .is_greater_than_or_equal_to(Gitlab::Git::Diff::DEFAULT_MAX_PATCH_BYTES)
           .is_less_than_or_equal_to(Gitlab::Git::Diff::MAX_PATCH_BYTES_UPPER_BOUND)
         end
+      end
+    end
+  end
+
+  context 'sourcegraph_enabled' do
+    let(:flag_value) { true }
+
+    before do
+      allow(Gitlab::Sourcegraph).to receive(:feature_available?).and_return(flag_value)
+
+      setting.sourcegraph_enabled = true
+    end
+
+    context 'when feature flag sourcegraph is enabled' do
+      it 'returns the stored value' do
+        expect(setting.sourcegraph_enabled).to be_truthy
+      end
+    end
+
+    context 'when feature flag sourcegraph is disabled' do
+      let(:flag_value) { false }
+
+      it 'returns false' do
+        expect(setting.sourcegraph_enabled).to be_falsey
       end
     end
   end
