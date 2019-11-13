@@ -33,8 +33,8 @@ export default {
   <div class="block subscriptions">
     <subscriptions
       :loading="store.isFetching.subscriptions"
-      :projectEmailsDisabled="store.projectEmailsDisabled"
-      :subscribeDisabledDescription="store.subscribeDisabledDescription"
+      :project-emails-disabled="store.projectEmailsDisabled"
+      :subscribe-disabled-description="store.subscribeDisabledDescription"
       :subscribed="store.subscribed"
       @toggleSubscription="onToggleSubscription"
     />
