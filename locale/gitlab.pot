@@ -6022,6 +6022,9 @@ msgstr ""
 msgid "Edit comment"
 msgstr ""
 
+msgid "Edit dashboard"
+msgstr ""
+
 msgid "Edit description"
 msgstr ""
 
