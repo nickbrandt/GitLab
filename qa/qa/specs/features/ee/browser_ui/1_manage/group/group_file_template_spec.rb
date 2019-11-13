@@ -2,7 +2,7 @@
 
 module QA
   context 'Manage' do
-    describe 'Group file templates' do
+    describe 'Group file templates', :requires_admin do
       include Support::Api
 
       templates = [
