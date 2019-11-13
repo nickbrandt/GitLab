@@ -11,12 +11,14 @@ import {
 import EnvironmentLogs from 'ee/logs/components/environment_logs.vue';
 import { createStore } from 'ee/logs/stores';
 import {
-  mockEnvironment,
+  mockProjectPath,
+  mockEnvId,
+  mockEnvName,
   mockEnvironments,
   mockPods,
-  mockEnvironmentsEndpoint,
   mockLines,
-  mockLogsEndpoint,
+  mockPodName,
+  mockEnvironmentsEndpoint,
 } from '../mock_data';
 
 jest.mock('~/lib/utils/scroll_utils');
@@ -28,13 +30,16 @@ describe('EnvironmentLogs', () => {
   let state;
 
   const propsData = {
-    currentEnvironmentName: mockEnvironment.name,
+    environmentId: mockEnvId,
+    projectFullPath: mockProjectPath,
+    currentEnvironmentName: mockEnvName,
     environmentsPath: mockEnvironmentsEndpoint,
-    logsEndpoint: mockLogsEndpoint,
   };
+
   const actionMocks = {
+    setInitData: jest.fn(),
+    showPodLogs: jest.fn(),
     fetchEnvironments: jest.fn(),
-    fetchLogs: jest.fn(),
   };
 
   const findEnvironmentsDropdown = () => wrapper.find('.js-environments-dropdown');
@@ -60,6 +65,12 @@ describe('EnvironmentLogs', () => {
     EnvironmentLogsComponent = Vue.extend(EnvironmentLogs);
   });
 
+  afterEach(() => {
+    actionMocks.setInitData.mockReset();
+    actionMocks.showPodLogs.mockReset();
+    actionMocks.fetchEnvironments.mockReset();
+  });
+
   it('displays UI elements', () => {
     initWrapper();
 
@@ -76,17 +87,32 @@ describe('EnvironmentLogs', () => {
     expect(findLogTrace().isEmpty()).toBe(false);
   });
 
+  it('mounted inits data', () => {
+    initWrapper();
+
+    expect(actionMocks.setInitData).toHaveBeenCalledTimes(1);
+    expect(actionMocks.setInitData).toHaveBeenLastCalledWith({
+      environmentId: mockEnvId,
+      projectPath: mockProjectPath,
+      podName: null,
+    });
+
+    expect(actionMocks.fetchEnvironments).toHaveBeenCalledTimes(1);
+    expect(actionMocks.fetchEnvironments).toHaveBeenLastCalledWith(mockEnvironmentsEndpoint);
+
+    expect(findEnvironmentsDropdown().props('text')).toBe(mockEnvName);
+    expect(findPodsDropdown().props('text').length).toBeGreaterThan(0);
+  });
+
   describe('loading state', () => {
     beforeEach(() => {
-      actionMocks.fetchEnvironments.mockImplementation(() => {
-        state.environments.options = [];
-        state.environments.isLoading = true;
-      });
-      actionMocks.fetchLogs.mockImplementation(() => {
-        state.pods.options = [];
-        state.logs.lines = [];
-        state.logs.isLoading = true;
-      });
+      state.pods.options = [];
+
+      state.logs.lines = [];
+      state.logs.isLoading = true;
+
+      state.environments.options = [];
+      state.environments.isLoading = true;
 
       initWrapper();
     });
@@ -102,23 +128,33 @@ describe('EnvironmentLogs', () => {
     });
 
     it('shows a logs trace', () => {
-      const trace = findLogTrace();
-      expect(trace.text()).toBe('');
-      expect(trace.find('.js-build-loader-animation').isVisible()).toBe(true);
+      expect(findLogTrace().text()).toBe('');
+      expect(
+        findLogTrace()
+          .find('.js-build-loader-animation')
+          .isVisible(),
+      ).toBe(true);
     });
   });
 
   describe('state with data', () => {
     beforeEach(() => {
-      actionMocks.fetchEnvironments.mockImplementation(() => {
-        state.environments.options = mockEnvironments;
-      });
-      actionMocks.fetchLogs.mockImplementation(() => {
+      actionMocks.setInitData.mockImplementation(() => {
         state.pods.options = mockPods;
         [state.pods.current] = state.pods.options;
 
         state.logs.isComplete = false;
         state.logs.lines = mockLines;
+      });
+      actionMocks.showPodLogs.mockImplementation(podName => {
+        state.pods.options = mockPods;
+        [state.pods.current] = podName;
+
+        state.logs.isComplete = false;
+        state.logs.lines = mockLines;
+      });
+      actionMocks.fetchEnvironments.mockImplementation(() => {
+        state.environments.options = mockEnvironments;
       });
 
       initWrapper();
@@ -128,13 +164,15 @@ describe('EnvironmentLogs', () => {
       scrollDown.mockReset();
       scrollUp.mockReset();
 
+      actionMocks.setInitData.mockReset();
+      actionMocks.showPodLogs.mockReset();
       actionMocks.fetchEnvironments.mockReset();
-      actionMocks.fetchLogs.mockReset();
     });
 
     it('populates environments dropdown', () => {
       const items = findEnvironmentsDropdown().findAll(GlDropdownItem);
 
+      expect(findEnvironmentsDropdown().props('text')).toBe(mockEnvName);
       expect(items.length).toBe(mockEnvironments.length);
       mockEnvironments.forEach((env, i) => {
         const item = items.at(i);
@@ -147,6 +185,7 @@ describe('EnvironmentLogs', () => {
     it('populates pods dropdown', () => {
       const items = findPodsDropdown().findAll(GlDropdownItem);
 
+      expect(findPodsDropdown().props('text')).toBe(mockPodName);
       expect(items.length).toBe(mockPods.length);
       mockPods.forEach((pod, i) => {
         const item = items.at(i);
@@ -169,28 +208,26 @@ describe('EnvironmentLogs', () => {
         const items = findPodsDropdown().findAll(GlDropdownItem);
         const index = 2; // any pod
 
-        expect(actionMocks.fetchLogs).toHaveBeenCalledTimes(1);
-        expect(actionMocks.fetchLogs).toHaveBeenLastCalledWith(null);
+        expect(actionMocks.showPodLogs).toHaveBeenCalledTimes(0);
 
         items.at(index).vm.$emit('click');
 
-        expect(actionMocks.fetchLogs).toHaveBeenCalledTimes(2);
-        expect(actionMocks.fetchLogs).toHaveBeenLastCalledWith(mockPods[index]);
+        expect(actionMocks.showPodLogs).toHaveBeenCalledTimes(1);
+        expect(actionMocks.showPodLogs).toHaveBeenLastCalledWith(mockPods[index]);
       });
 
       it('refresh button, trace is refreshed', () => {
-        expect(actionMocks.fetchLogs).toHaveBeenCalledTimes(1);
-        expect(actionMocks.fetchLogs).toHaveBeenLastCalledWith(null);
+        expect(actionMocks.showPodLogs).toHaveBeenCalledTimes(0);
 
-        findRefreshLog().vm.$emit('click'); // works
+        findRefreshLog().vm.$emit('click');
 
-        expect(actionMocks.fetchLogs).toHaveBeenCalledTimes(2);
-        expect(actionMocks.fetchLogs).toHaveBeenLastCalledWith(mockPods[0]);
+        expect(actionMocks.showPodLogs).toHaveBeenCalledTimes(1);
+        expect(actionMocks.showPodLogs).toHaveBeenLastCalledWith(mockPodName);
       });
 
       describe('when scrolling actions are enabled', () => {
         beforeEach(done => {
-          // simulate being in the middle of a long page
+          // mock scrolled to the middle of a long page
           canScroll.mockReturnValue(true);
           isScrolledToBottom.mockReturnValue(false);
           isScrolledToTop.mockReturnValue(false);
@@ -215,13 +252,13 @@ describe('EnvironmentLogs', () => {
         it('click on "scroll to bottom" scrolls down', () => {
           expect(findScrollToBottom().is('[disabled]')).toBe(false);
           findScrollToBottom().vm.$emit('click');
-          expect(scrollDown).toHaveBeenCalledTimes(2); // plus one time when loaded
+          expect(scrollDown).toHaveBeenCalledTimes(2); // plus one time when trace was loaded
         });
       });
 
       describe('when scrolling actions are disabled', () => {
         beforeEach(() => {
-          // a short page, without a scrollbar
+          // mock a short page without a scrollbar
           canScroll.mockReturnValue(false);
           isScrolledToBottom.mockReturnValue(true);
           isScrolledToTop.mockReturnValue(true);

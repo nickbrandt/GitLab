@@ -1,12 +1,15 @@
-const makeMockLogsPath = id => `/root/autodevops-deploy/environments/${id}/logs`;
+export const mockProjectPath = 'root/autodevops-deploy';
+export const mockEnvName = 'production';
+export const mockEnvironmentsEndpoint = `${mockProjectPath}/environments.json`;
+export const mockEnvId = '99';
+
 const makeMockEnvironment = (id, name) => ({
   id,
-  logs_path: makeMockLogsPath(id),
+  logs_path: `${mockProjectPath}/environments/${id}/logs`,
   name,
 });
 
-export const mockEnvironment = makeMockEnvironment(99, 'production');
-export const mockEnvironmentsEndpoint = '/root/autodevops-deploy/environments.json';
+export const mockEnvironment = makeMockEnvironment(mockEnvId, mockEnvName);
 export const mockEnvironments = [
   mockEnvironment,
   makeMockEnvironment(101, 'staging'),
@@ -21,7 +24,6 @@ export const mockPods = [
   'production-764c58d697-ddddd',
 ];
 
-export const mockLogsEndpoint = `/root/autodevops-deploy/environments/${mockEnvironment.id}/logs.json`;
 export const mockLines = [
   '10.36.0.1 - - [16/Oct/2019:06:29:48 UTC] "GET / HTTP/1.1" 200 13',
   '- -> /',
