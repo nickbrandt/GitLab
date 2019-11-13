@@ -11,7 +11,13 @@ export default {
   props: {
     projectId: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
+    },
+    groupId: {
+      type: String,
+      required: false,
+      default: '',
     },
     canDestroyPackage: {
       type: Boolean,
