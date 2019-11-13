@@ -1,3 +1,4 @@
+- return unless can?(current_user, :read_pod_logs, @project)
 - return unless project_nav_tab?(:environments)
 
 = nav_link(controller: :environments, action: [:logs, :logs_redirect]) do
