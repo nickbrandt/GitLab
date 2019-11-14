@@ -13,7 +13,7 @@ module Gitlab
             .where(project_approval_rules_not_exists_clause)
             .where(id: from_id..to_id)
             .where('approvals_before_merge <> 0')
-            .select("id, LEAST(#{MAX_VALUE}, approvals_before_merge), created_at, updated_at, 4, '#{ApprovalRuleLike::ALL_MEMBERS}'")
+            .select("id, LEAST(#{MAX_VALUE}, approvals_before_merge), created_at, updated_at, #{ApprovalProjectRule.rule_types[:any_approver]}, '#{ApprovalRuleLike::ALL_MEMBERS}'")
             .to_sql
 
         execute("INSERT INTO approval_project_rules (project_id, approvals_required, created_at, updated_at, rule_type, name) #{select_sql}")
