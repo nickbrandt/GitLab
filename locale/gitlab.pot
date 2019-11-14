@@ -9650,6 +9650,9 @@ msgstr ""
 msgid "Issue"
 msgstr ""
 
+msgid "Issue %{issue_reference} has already been added to epic %{epic_reference}."
+msgstr ""
+
 msgid "Issue Boards"
 msgstr ""
 
