@@ -20,10 +20,6 @@ shared_examples_for 'has user mentions' do
       context 'when mentioned users do not exist' do
         subject { described_class.new(mentioned_users_ids: [last_id + 10, last_id + 15]) }
 
-        it "returns zero mentioned users" do
-          expect(subject.mentioned_users.count).to eq 0
-        end
-
         it 'returns false' do
           expect(subject.has_mentions?).to be false
         end
@@ -31,10 +27,6 @@ shared_examples_for 'has user mentions' do
 
       context 'when at least one mentioned user exists' do
         subject { described_class.new(mentioned_users_ids: [mentioned_user.id, last_id + 10, 3]) }
-
-        it "returns mentioned users" do
-          expect(subject.mentioned_users.count).to eq 1
-        end
 
         it 'returns true' do
           expect(subject.has_mentions?).to be true
@@ -49,10 +41,6 @@ shared_examples_for 'has user mentions' do
       context 'when mentioned projects do not exist' do
         subject { described_class.new(mentioned_projects_ids: [last_id + 10, last_id + 15]) }
 
-        it "returns zero mentioned projects" do
-          expect(subject.mentioned_projects.count).to eq 0
-        end
-
         it 'returns false' do
           expect(subject.has_mentions?).to be false
         end
@@ -60,10 +48,6 @@ shared_examples_for 'has user mentions' do
 
       context 'when mentioned projects exist' do
         subject { described_class.new(mentioned_projects_ids: [mentioned_project.id, last_id + 10]) }
-
-        it "returns mentioned projects" do
-          expect(subject.mentioned_projects.count).to eq 1
-        end
 
         it 'returns true' do
           expect(subject.has_mentions?).to be true
@@ -78,10 +62,6 @@ shared_examples_for 'has user mentions' do
       context 'when mentioned groups do not exist' do
         subject { described_class.new(mentioned_groups_ids: [last_id + 10, last_id + 15]) }
 
-        it "returns zero mentioned groups" do
-          expect(subject.mentioned_groups.count).to eq 0
-        end
-
         it 'returns false' do
           expect(subject.has_mentions?).to be false
         end
@@ -89,10 +69,6 @@ shared_examples_for 'has user mentions' do
 
       context 'when mentioned groups exist' do
         subject { described_class.new(mentioned_groups_ids: [mentioned_group.id, last_id + 10]) }
-
-        it "returns mentioned groups count" do
-          expect(subject.mentioned_groups.count).to eq 1
-        end
 
         it 'returns true' do
           expect(subject.has_mentions?).to be true

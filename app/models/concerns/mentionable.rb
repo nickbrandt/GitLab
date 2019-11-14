@@ -86,9 +86,9 @@ module Mentionable
     refs = all_references(self.author)
 
     mention = current_user_mention
-    mention.mentioned_users_ids = refs.mentioned_users&.pluck(:id)
-    mention.mentioned_groups_ids = refs.mentioned_users_by_groups&.pluck(:id)
-    mention.mentioned_projects_ids = refs.mentioned_users_by_projects&.pluck(:id)
+    mention.mentioned_users_ids = refs.mentioned_users&.pluck(:id).presence
+    mention.mentioned_groups_ids = refs.mentioned_users_by_groups&.pluck(:id).presence
+    mention.mentioned_projects_ids = refs.mentioned_users_by_projects&.pluck(:id).presence
 
     if mention.has_mentions?
       mention.save!
@@ -98,11 +98,11 @@ module Mentionable
   end
 
   def referenced_users
-    User.where(id: user_mentions.select("unnest(mentioned_users_ids)").distinct )
+    User.where(id: user_mentions.select("unnest(mentioned_users_ids)") )
   end
 
   def referenced_projects
-    Project.where(id: user_mentions.select("unnest(mentioned_projects_ids)").distinct )
+    Project.where(id: user_mentions.select("unnest(mentioned_projects_ids)") )
   end
 
   def referenced_project_users
@@ -110,7 +110,7 @@ module Mentionable
   end
 
   def referenced_groups
-    Group.where(id: user_mentions.select("unnest(mentioned_groups_ids)").distinct )
+    Group.where(id: user_mentions.select("unnest(mentioned_groups_ids)") )
   end
 
   def referenced_group_users

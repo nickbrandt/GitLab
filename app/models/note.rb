@@ -566,23 +566,15 @@ class Note < ApplicationRecord
   end
 
   def referenced_users
-    User.where(id: user_mentions.select("unnest(mentioned_users_ids)").distinct )
+    User.where(id: current_user_mention.mentioned_users_ids)
   end
 
   def referenced_projects
-    Project.where(id: user_mentions.select("unnest(mentioned_projects_ids)").distinct )
-  end
-
-  def referenced_project_users
-    User.joins(:project_members).where(members: { source_id: referenced_projects }).distinct
+    Project.where(id: current_user_mention.mentioned_projects_ids)
   end
 
   def referenced_groups
-    Group.where(id: user_mentions.select("unnest(mentioned_groups_ids)").distinct )
-  end
-
-  def referenced_group_users
-    User.joins(:group_members).where(members: { source_id: referenced_groups }).distinct
+    Group.where(id: current_user_mention.mentioned_groups_ids)
   end
 end
 
