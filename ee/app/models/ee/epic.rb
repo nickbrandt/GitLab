@@ -61,6 +61,7 @@ module EE
       scope :for_ids, -> (ids) { where(id: ids) }
       scope :in_parents, -> (parent_ids) { where(parent_id: parent_ids) }
       scope :inc_group, -> { includes(:group) }
+      scope :in_selected_groups, -> (groups) { where(group_id: groups) }
       scope :in_milestone, -> (milestone_id) { joins(:issues).where(issues: { milestone_id: milestone_id }) }
       scope :in_issues, -> (issues) { joins(:epic_issues).where(epic_issues: { issue_id: issues }).distinct }
       scope :has_parent, -> { where.not(parent_id: nil) }
@@ -92,6 +93,8 @@ module EE
       scope :with_api_entity_associations, -> { preload(:author, :labels, group: :route) }
       scope :start_date_inherited, -> { where(start_date_is_fixed: [nil, false]) }
       scope :due_date_inherited, -> { where(due_date_is_fixed: [nil, false]) }
+
+      scope :counts_by_state, -> { group(:state_id).count }
 
       MAX_HIERARCHY_DEPTH = 5
 
@@ -191,6 +194,15 @@ module EE
       def deepest_relationship_level
         ::Gitlab::ObjectHierarchy.new(self.where(parent_id: nil)).max_descendants_depth
       end
+
+      def groups_user_can_read_epics(epics, user)
+        groups = ::Group.where(id: epics.select(:group_id))
+        groups = ::Gitlab::GroupPlansPreloader.new.preload(groups)
+
+        DeclarativePolicy.user_scope do
+          groups.select { |g| Ability.allowed?(user, :read_epic, g) }
+        end
+      end
     end
 
     def resource_parent
@@ -274,6 +286,10 @@ module EE
 
     def descendants
       hierarchy.descendants
+    end
+
+    def base_and_descendants
+      hierarchy.base_and_descendants
     end
 
     def has_ancestor?(epic)
