@@ -90,6 +90,10 @@ module EE
         attrs << %i[merge_pipelines_enabled]
       end
 
+      if can?(current_user, :update_max_pages_size)
+        attrs << %i[max_pages_size]
+      end
+
       if allow_mirror_params?
         attrs + mirror_params
       else
