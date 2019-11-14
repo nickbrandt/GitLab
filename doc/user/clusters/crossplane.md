@@ -14,7 +14,7 @@ We will use the GCP stack as an example in this guide. The instructions for AWS 
 
 First, we need to declare some environment variables with configuration that will be used throughout this guide:
 
-```
+```sh
 export PROJECT_ID=crossplane-playground # the project that all resources reside.
 export NETWORK_NAME=default # the network that your GKE cluster lives in.
 ```
