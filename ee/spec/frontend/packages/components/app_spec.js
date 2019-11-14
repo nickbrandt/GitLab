@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 import { GlModal } from '@gitlab/ui';
 import PackagesApp from 'ee/packages/components/app.vue';
 import PackageInformation from 'ee/packages/components/information.vue';
+import PackageInstallation from 'ee/packages/components/installation.vue';
 import { mavenPackage, mavenFiles, npmPackage, npmFiles } from '../mock_data';
 
 describe('PackagesApp', () => {
@@ -13,6 +14,8 @@ describe('PackagesApp', () => {
     canDelete: true,
     destroyPath: 'destroy-package-path',
     emptySvgPath: 'empty-illustration',
+    npmPath: 'foo',
+    npmHelpPath: 'foo',
   };
 
   function createComponent(props = {}) {
@@ -30,6 +33,7 @@ describe('PackagesApp', () => {
   const emptyState = () => wrapper.find('.js-package-empty-state');
   const allPackageInformation = () => wrapper.findAll(PackageInformation);
   const packageInformation = index => allPackageInformation().at(index);
+  const packageInstallation = () => wrapper.find(PackageInstallation);
   const allFileRows = () => wrapper.findAll('.js-file-row');
   const firstFileDownloadLink = () => wrapper.find('.js-file-download');
   const deleteButton = () => wrapper.find('.js-delete-button');
@@ -69,6 +73,21 @@ describe('PackagesApp', () => {
 
     expect(packageInformation(0)).toExist();
     expect(allPackageInformation().length).toBe(1);
+  });
+
+  it('renders package installation instructions for npm packages', () => {
+    createComponent({
+      packageEntity: npmPackage,
+      files: npmFiles,
+    });
+
+    expect(packageInstallation()).toExist();
+  });
+
+  it('does not render package installation instructions for non npm packages', () => {
+    createComponent();
+
+    expect(packageInstallation().exists()).toBe(false);
   });
 
   it('renders a single file for an npm package as they only contain one file', () => {

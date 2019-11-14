@@ -22,6 +22,8 @@ export default () =>
         canDelete,
         destroyPath: dataset.destroyPath,
         emptySvgPath: dataset.svgPath,
+        npmPath: dataset.npmPath,
+        npmHelpPath: dataset.npmHelpPath,
       };
     },
     render(createElement) {
@@ -32,6 +34,8 @@ export default () =>
           canDelete: this.canDelete,
           destroyPath: this.destroyPath,
           emptySvgPath: this.emptySvgPath,
+          npmPath: this.npmPath,
+          npmHelpPath: this.npmHelpPath,
         },
       });
     },
