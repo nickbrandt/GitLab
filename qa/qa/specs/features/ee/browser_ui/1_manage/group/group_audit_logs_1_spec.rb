@@ -72,13 +72,7 @@ module QA
           Page::Group::Menu.perform(&:click_group_members_item)
           Page::Group::SubMenus::Members.perform do |members_page|
             members_page.add_member(user.username)
-          end
-
-          Page::Group::SubMenus::Members.perform do |members_page|
             members_page.update_access_level(user.username, "Developer")
-          end
-
-          Page::Group::SubMenus::Members.perform do |members_page|
             members_page.remove_member(user.username)
           end
         end
