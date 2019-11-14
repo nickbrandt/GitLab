@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import PackageInstallation from 'ee/packages/components/installation.vue';
+import PackageInstallation from 'ee/packages/details/components/installation.vue';
 
 describe('PackageInstallation', () => {
   let wrapper;

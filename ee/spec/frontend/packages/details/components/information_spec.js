@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import PackageInformation from 'ee/packages/components/information.vue';
+import PackageInformation from 'ee/packages/details/components/information.vue';
 
 describe('PackageInformation', () => {
   let wrapper;
