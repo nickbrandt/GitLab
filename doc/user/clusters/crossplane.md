@@ -9,6 +9,9 @@ For this guide the pre-requisites are as follows:
 - Crossplane was previously installed as a [GitLab Managed App](./applications.md#crossplane) on the connected kubernetes cluster with a choice of the stack.
 
 We will use the GCP stack as an example in this guide. The instructions for AWS and Azure will be similar to this.
+
+> Note: Crossplane requires the kubernetes cluster to be VPC Native with Alias IPs enabled so that the IP address of the Pods are routable within the GCP network.
+
 First, we need to declare some environment variables with configuration that will be used throughout this guide:
 
 ```
@@ -51,6 +54,8 @@ EOF
 ### Configure Crossplane with the cloud provider
 
 Follow the steps to configure the installed cloud provider stack with a user account.
+> **Note: The Secret and the Provider resource referencing the Secret needs to be applied to the `gitlab-managed-apps` namespace in the guide. Make sure you change that while following the guide**
+
 [Configure Providers](https://crossplane.io/docs/v0.4/cloud-providers.html)
 
 ### Configure Managed Service Access
