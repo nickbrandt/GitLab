@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import CodeInstruction from 'ee/packages/components/code_instruction.vue';
+import CodeInstruction from 'ee/packages/details/components/code_instruction.vue';
 
 describe('Package code instruction', () => {
   let wrapper;

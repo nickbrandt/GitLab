@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils';
 import { GlModal } from '@gitlab/ui';
-import PackagesApp from 'ee/packages/components/app.vue';
-import PackageInformation from 'ee/packages/components/information.vue';
-import PackageInstallation from 'ee/packages/components/installation.vue';
-import { mavenPackage, mavenFiles, npmPackage, npmFiles } from '../mock_data';
+import PackagesApp from 'ee/packages/details/components/app.vue';
+import PackageInformation from 'ee/packages/details/components/information.vue';
+import PackageInstallation from 'ee/packages/details/components/installation.vue';
+import { mavenPackage, mavenFiles, npmPackage, npmFiles } from '../../mock_data';
 
 describe('PackagesApp', () => {
   let wrapper;
