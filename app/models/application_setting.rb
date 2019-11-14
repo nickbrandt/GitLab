@@ -347,8 +347,8 @@ class ApplicationSetting < ApplicationRecord
   end
   after_commit :expire_performance_bar_allowed_user_ids_cache, if: -> { previous_changes.key?('performance_bar_allowed_group_id') }
 
-  def sourcegraph_enabled
-    super && Gitlab::Sourcegraph.feature_available?
+  def sourcegraph_url_is_com?
+    !!(sourcegraph_url =~ /\Ahttps:\/\/(www\.)?sourcegraph\.com/)
   end
 
   def self.create_from_defaults

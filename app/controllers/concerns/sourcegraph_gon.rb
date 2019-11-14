@@ -1,18 +1,30 @@
+# frozen_string_literal: true
+
 module SourcegraphGon
   extend ActiveSupport::Concern
 
-  def push_sourcegraph_gon
-    return unless can?(current_user, :access_sourcegraph, sourcegraph_project)
-
-    gon.push({
-      sourcegraph_enabled: true,
-      sourcegraph_url: Gitlab::CurrentSettings.sourcegraph_url
-    })
+  included do
+    before_action :push_sourcegraph_gon, if: :html_request?
   end
 
   private
 
-  def sourcegraph_project
-    @target_project || project
+  def push_sourcegraph_gon
+    return unless sourcegraph_enabled?
+
+    gon.push({
+      sourcegraph: { url: Gitlab::CurrentSettings.sourcegraph_url }
+    })
+  end
+
+  def sourcegraph_enabled?
+    Gitlab::CurrentSettings.sourcegraph_enabled && sourcegraph_enabled_for_project? && current_user&.sourcegraph_enabled
+  end
+
+  def sourcegraph_enabled_for_project?
+    return false unless project && Gitlab::Sourcegraph.feature_enabled?(project)
+    return project.public? if Gitlab::CurrentSettings.sourcegraph_public_only
+
+    true
   end
 end

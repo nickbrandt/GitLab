@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe ApplicationSetting do
+  using RSpec::Parameterized::TableSyntax
+
   subject(:setting) { described_class.create_from_defaults }
 
   it { include(CacheableAttributes) }
@@ -592,26 +594,21 @@ describe ApplicationSetting do
     end
   end
 
-  context 'sourcegraph_enabled' do
-    let(:flag_value) { true }
-
-    before do
-      allow(Gitlab::Sourcegraph).to receive(:feature_available?).and_return(flag_value)
-
-      setting.sourcegraph_enabled = true
+  describe '#sourcegraph_url_is_com?' do
+    where(:url, :is_com) do
+      'https://sourcegraph.com' | true
+      'https://sourcegraph.com/' | true
+      'https://www.sourcegraph.com' | true
+      'shttps://www.sourcegraph.com' | false
+      'https://sourcegraph.example.com/' | false
+      'https://sourcegraph.org/' | false
     end
 
-    context 'when feature flag sourcegraph is enabled' do
-      it 'returns the stored value' do
-        expect(setting.sourcegraph_enabled).to be_truthy
-      end
-    end
+    with_them do
+      it 'matches the url with sourcegraph.com' do
+        setting.sourcegraph_url = url
 
-    context 'when feature flag sourcegraph is disabled' do
-      let(:flag_value) { false }
-
-      it 'returns false' do
-        expect(setting.sourcegraph_enabled).to be_falsey
+        expect(setting.sourcegraph_url_is_com?).to eq(is_com)
       end
     end
   end

@@ -461,26 +461,6 @@ class ProjectPolicy < BasePolicy
     prevent :create_pipeline
   end
 
-  condition(:user_sourcegraph_enabled?) do
-    @user&.sourcegraph_enabled
-  end
-
-  condition(:sourcegraph_feature_enabled?) do
-    Gitlab::CurrentSettings.sourcegraph_enabled && Gitlab::Sourcegraph.feature_enabled?(@subject)
-  end
-
-  condition(:sourcegraph_public_only?) do
-    public_project? && Gitlab::CurrentSettings.sourcegraph_public_only
-  end
-
-  condition(:sourcegraph_generally_available?) do
-    can?(:read_project) && !Gitlab::CurrentSettings.sourcegraph_public_only
-  end
-
-  rule do
-    (user_sourcegraph_enabled? & sourcegraph_feature_enabled? & (sourcegraph_public_only? | sourcegraph_generally_available?))
-  end.enable :access_sourcegraph
-
   private
 
   def team_member?

@@ -5,7 +5,7 @@ require 'spec_helper'
 describe 'profiles/preferences/show' do
   using RSpec::Parameterized::TableSyntax
 
-  let(:user) { create(:user) }
+  let_it_be(:user) { build(:user) }
 
   before do
     assign(:user, user)
@@ -24,7 +24,7 @@ describe 'profiles/preferences/show' do
     before do
       # Can't use stub_feature_flags because we use Feature.get to check if conditinally applied
       Feature.get(:sourcegraph).enable sourcegraph_feature
-      Gitlab::CurrentSettings.sourcegraph_enabled = sourcegraph_enabled
+      stub_application_setting(sourcegraph_enabled: sourcegraph_enabled)
     end
 
     context 'when not fully enabled' do
@@ -45,7 +45,7 @@ describe 'profiles/preferences/show' do
         it 'does not display sourcegraph field' do
           expect(rendered).not_to have_sourcegraph_field
         end
-        
+
         it 'does not display integrations settings' do
           expect(rendered).not_to have_integrations_section
         end

@@ -137,6 +137,7 @@ module API
       optional :signin_enabled, type: Boolean, desc: 'Flag indicating if password authentication is enabled for the web interface' # support legacy names, can be removed in v5
       optional :signup_enabled, type: Boolean, desc: 'Flag indicating if sign up is enabled'
       optional :sourcegraph_enabled, type: Boolean, desc: 'Enable Sourcegraph'
+      optional :sourcegraph_public_only, type: Boolean, desc: 'Only allow public projects to communicate with Sourcegraph'
       given sourcegraph_enabled: ->(val) { val } do
         requires :sourcegraph_url, type: String, desc: 'The configured Sourcegraph instance URL'
       end

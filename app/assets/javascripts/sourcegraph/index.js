@@ -11,9 +11,9 @@ function loadScript(path) {
  * code intelligence.
  */
 export default function initSourcegraph() {
-  const { sourcegraph_url: sourcegraphUrl, sourcegraph_enabled: sourcegraphEnabled } = gon;
+  const { url } = gon.sourcegraph || {};
 
-  if (!sourcegraphEnabled || !sourcegraphUrl) {
+  if (!url) {
     return;
   }
 
@@ -21,7 +21,7 @@ export default function initSourcegraph() {
   const scriptPath = new URL('scripts/integration.bundle.js', assetsUrl).href;
 
   window.SOURCEGRAPH_ASSETS_URL = assetsUrl.href;
-  window.SOURCEGRAPH_URL = sourcegraphUrl;
+  window.SOURCEGRAPH_URL = url;
   window.SOURCEGRAPH_INTEGRATION = 'gitlab-integration';
 
   loadScript(scriptPath);

@@ -3,53 +3,62 @@
 require 'spec_helper'
 
 describe SourcegraphHelper do
-  let(:application_setting) { true }
-  let(:public_only_setting) { true }
-  let(:feature_conditional) { false }
+  describe '#sourcegraph_url_message' do
+    let(:sourcegraph_url) { 'http://sourcegraph.example.com' }
 
-  subject { helper.sourcegraph_help_message }
-
-  before do
-    allow(Gitlab::CurrentSettings).to receive(:sourcegraph_enabled).and_return(application_setting)
-    allow(Gitlab::CurrentSettings).to receive(:sourcegraph_public_only).and_return(public_only_setting)
-    allow(Gitlab::Sourcegraph).to receive(:feature_conditional?).and_return(feature_conditional)
-  end
-
-  context '#sourcegraph_help_message' do
-    context 'when application setting sourcegraph_enabled is disabled' do
-      let(:application_setting) { false }
-
-      it { is_expected.to be_nil }
+    before do
+      allow(Gitlab::CurrentSettings).to receive(:sourcegraph_url).and_return(sourcegraph_url)
+      allow(Gitlab::CurrentSettings).to receive(:sourcegraph_url_is_com?).and_return(is_com)
     end
 
-    context 'when application setting sourcegraph_enabled is enabled' do
-      context 'when feature is conditional' do
-        let(:feature_conditional) { true }
+    subject { helper.sourcegraph_url_message }
 
-        it do
-          is_expected.to eq "This feature is experimental and has been limited to only certain projects."
-        end
+    context 'with .com sourcegraph url' do
+      let(:is_com) { true }
+
+      it { is_expected.to have_text('Uses Sourcegraph.com') }
+      it { is_expected.to have_link('Sourcegraph.com', href: sourcegraph_url) }
+    end
+
+    context 'with custom sourcegraph url' do
+      let(:is_com) { false }
+
+      it { is_expected.to have_text('Uses a custom Sourcegraph instance') }
+      it { is_expected.to have_link('Sourcegraph instance', href: sourcegraph_url) }
+
+      context 'with unsafe url' do
+        let(:sourcegraph_url) { '\" onload=\"alert(1);\"' }
+
+        it { is_expected.to have_link('Sourcegraph instance', href: sourcegraph_url) }
       end
+    end
+  end
 
-      context 'when feature is enabled globally' do
-        before do
-          stub_feature_flags(sourcegraph: true)
-        end
+  context '#sourcegraph_experimental_message' do
+    let(:feature_conditional) { false }
+    let(:public_only) { false }
 
-        context 'when only works with public projects' do
-          it do
-            is_expected.to eq "This feature is experimental and also limited to only public projects."
-          end
-        end
+    before do
+      allow(Gitlab::CurrentSettings).to receive(:sourcegraph_public_only).and_return(public_only)
+      allow(Gitlab::Sourcegraph).to receive(:feature_conditional?).and_return(feature_conditional)
+    end
 
-        context 'when it works with all projects' do
-          let(:public_only_setting) { false }
+    subject { helper.sourcegraph_experimental_message }
 
-          it do
-            is_expected.to eq "This feature is experimental."
-          end
-        end
-      end
+    context 'when not limited by feature or public only' do
+      it { is_expected.to eq "This feature is experimental." }
+    end
+
+    context 'when limited by feature' do
+      let(:feature_conditional) { true }
+
+      it { is_expected.to eq "This feature is experimental and currently limited to certain projects." }
+    end
+
+    context 'when limited by public only' do
+      let(:public_only) { true }
+
+      it { is_expected.to eq "This feature is experimental and limited to public projects." }
     end
   end
 end

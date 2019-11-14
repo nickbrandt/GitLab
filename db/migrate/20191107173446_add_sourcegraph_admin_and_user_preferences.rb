@@ -5,10 +5,8 @@ class AddSourcegraphAdminAndUserPreferences < ActiveRecord::Migration[5.2]
 
   DOWNTIME = false
 
-  disable_ddl_transaction!
-
   def up
-    add_column_with_default(:application_settings, :sourcegraph_public_only, :boolean, default: true)
+    add_column(:application_settings, :sourcegraph_public_only, :boolean, default: true, null: false)
     add_column(:user_preferences, :sourcegraph_enabled, :boolean)
   end
 

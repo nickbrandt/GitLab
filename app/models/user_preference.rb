@@ -24,10 +24,6 @@ class UserPreference < ApplicationRecord
     end
   end
 
-  def sourcegraph_enabled
-    super && Gitlab::CurrentSettings.sourcegraph_enabled
-  end
-
   def set_notes_filter(filter_id, issuable)
     # No need to update the column if the value is already set.
     if filter_id && NOTES_FILTERS.value?(filter_id)

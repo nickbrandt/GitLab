@@ -12,7 +12,7 @@ module Gitlab
         !feature.off?
       end
 
-      def feature_enabled?(thing = true)
+      def feature_enabled?(thing = nil)
         feature.enabled?(thing)
       end
 
