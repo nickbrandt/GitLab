@@ -352,6 +352,8 @@ describe Projects::Prometheus::Alerts::NotifyService do
       it 'does not process issues' do
         expect(IncidentManagement::ProcessPrometheusAlertWorker)
           .not_to receive(:perform_async)
+
+        subject
       end
     end
   end
