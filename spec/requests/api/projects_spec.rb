@@ -378,6 +378,14 @@ describe API::Projects do
         end
       end
 
+      context 'and using both id_after and id_before' do
+        it_behaves_like 'projects response' do
+          let(:filter) { { id_before: project2.id, id_after: public_project.id } }
+          let(:current_user) { user }
+          let(:projects) { [public_project, project, project2, project3].select { |p| p.id < project2.id && p.id > public_project.id } }
+        end
+      end
+
       context 'and membership=true' do
         it_behaves_like 'projects response' do
           let(:filter) { { membership: true } }
@@ -905,6 +913,19 @@ describe API::Projects do
         expect(response).to include_pagination_headers
         expect(json_response).to be_an Array
         expect(json_response.map { |project| project['id'] }).to contain_exactly(public_project.id, another_public_project.id)
+      end
+    end
+
+    context 'and using both id_before and id_after' do
+      let!(:more_projects) { create_list(:project, 5, :public, creator_id: user4.id, namespace: user4.namespace) }
+
+      it 'only returns projects with id matching the range' do
+        get api("/users/#{user4.id}/projects?id_after=#{more_projects.first.id}&id_before=#{more_projects.last.id}", user)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to include_pagination_headers
+        expect(json_response).to be_an Array
+        expect(json_response.map { |project| project['id'] }).to contain_exactly(*more_projects[1..-2].map(&:id))
       end
     end
 

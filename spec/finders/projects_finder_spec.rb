@@ -74,6 +74,15 @@ describe ProjectsFinder, :do_not_mock_admin_mode do
       end
     end
 
+    describe 'with both id_before and id_after' do
+      context 'only returns projects with a project id less than given' do
+        let!(:projects) { create_list(:project, 5, :public) }
+        let(:params) { { id_after: projects.first.id, id_before: projects.last.id }}
+
+        it { is_expected.to contain_exactly(*projects[1..-2]) }
+      end
+    end
+
     describe 'filter by visibility_level' do
       before do
         private_project.add_maintainer(user)
