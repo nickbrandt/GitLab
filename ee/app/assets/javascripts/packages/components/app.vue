@@ -10,6 +10,7 @@ import {
 } from '@gitlab/ui';
 import _ from 'underscore';
 import PackageInformation from './information.vue';
+import PackageInstallation from './installation.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -27,6 +28,7 @@ export default {
     GlTable,
     Icon,
     PackageInformation,
+    PackageInstallation,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -54,6 +56,14 @@ export default {
       required: true,
     },
     emptySvgPath: {
+      type: String,
+      required: true,
+    },
+    npmPath: {
+      type: String,
+      required: true,
+    },
+    npmHelpPath: {
       type: String,
       required: true,
     },
@@ -96,6 +106,10 @@ export default {
         {
           label: s__('Created on'),
           value: formatDate(this.packageEntity.created_at),
+        },
+        {
+          label: s__('Updated at'),
+          value: formatDate(this.packageEntity.updated_at),
         },
       ];
     },
@@ -195,6 +209,13 @@ export default {
         v-if="packageMetadata"
         :heading="packageMetadataTitle"
         :information="packageMetadata"
+      />
+      <package-installation
+        v-else
+        :type="packageEntity.package_type"
+        :name="packageEntity.name"
+        :registry-url="npmPath"
+        :help-url="npmHelpPath"
       />
     </div>
 
