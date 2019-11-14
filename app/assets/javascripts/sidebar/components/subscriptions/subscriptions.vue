@@ -29,7 +29,7 @@ export default {
     projectEmailsDisabled: {
       type: Boolean,
       required: false,
-      default: null,
+      default: false,
     },
     subscribeDisabledDescription: {
       type: String,
@@ -65,7 +65,7 @@ export default {
     },
     notificationText() {
       if (this.projectEmailsDisabled) {
-        return __(this.subscribeDisabledDescription);
+        return this.subscribeDisabledDescription;
       }
       return __('Notifications');
     },
@@ -120,7 +120,7 @@ export default {
     </span>
     <span class="issuable-header-text hide-collapsed float-left"> {{ notificationText }} </span>
     <toggle-button
-      v-if="projectEmailsDisabled != true"
+      v-if="!projectEmailsDisabled"
       ref="toggleButton"
       :is-loading="showLoadingState"
       :value="subscribed"

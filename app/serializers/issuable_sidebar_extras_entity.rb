@@ -13,7 +13,7 @@ class IssuableSidebarExtrasEntity < Grape::Entity
     issuable.project.emails_disabled?
   end
 
-  expose :subscribe_disabled_description do |issuable|
+  expose :subscribe_disabled_description do
     notification_description(:owner_disabled)
   end
 
