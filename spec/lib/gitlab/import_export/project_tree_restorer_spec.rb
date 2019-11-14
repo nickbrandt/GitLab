@@ -220,6 +220,10 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         expect(award_emoji.map(&:name)).to contain_exactly('thumbsup', 'coffee')
       end
 
+      it 'restores `ci_cd_settings` : `group_runners_enabled` setting' do
+        expect(@project.ci_cd_settings.group_runners_enabled?).to eq(false)
+      end
+
       it 'restores the correct service' do
         expect(CustomIssueTrackerService.first).not_to be_nil
       end
