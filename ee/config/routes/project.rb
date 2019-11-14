@@ -49,6 +49,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get '(*ref)', action: 'show', as: '', constraints: { ref: Gitlab::PathRegex.git_reference_regex }
           end
         end
+
+        resources :subscriptions, only: [:create, :destroy]
       end
       # End of the /-/ scope.
 
