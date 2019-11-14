@@ -21,7 +21,24 @@ module QA::EE
           end
 
           view 'ee/app/assets/javascripts/vue_shared/license_management/components/license_management_row.vue' do
+            element :license_compliance_row
             element :license_name_content
+          end
+
+          view 'app/assets/javascripts/reports/components/issue_status_icon.vue' do
+            element :icon_status, ':data-qa-selector="`status_${status}_icon`" ' # rubocop:disable QA/ElementWithPattern
+          end
+
+          def has_approved_license?(name)
+            within_element(:license_compliance_row, text: name) do
+              has_element?(:status_success_icon)
+            end
+          end
+
+          def has_denied_license?(name)
+            within_element(:license_compliance_row, text: name) do
+              has_element?(:status_failed_icon)
+            end
           end
 
           def approve_license(license)
@@ -31,9 +48,7 @@ module QA::EE
             click_element :approved_license_radio
             click_element :add_license_submit_button
 
-            within_element :license_compliance_list do
-              has_element?(:license_name_content, text: license)
-            end
+            has_approved_license? license
           end
 
           def deny_license(license)
@@ -43,9 +58,7 @@ module QA::EE
             click_element :blacklisted_license_radio
             click_element :add_license_submit_button
 
-            within_element :license_compliance_list do
-              has_element?(:license_name_content, text: license)
-            end
+            has_denied_license? license
           end
         end
       end

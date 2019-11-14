@@ -4,10 +4,43 @@ require 'pathname'
 
 module QA
   context 'Secure', :docker do
-    describe 'License Compliance' do
+    let(:approved_license_name) { "MIT" }
+    let(:denied_license_name) { "WTFPL" }
+
+    describe 'License Compliance settings page' do
+      before do
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        Page::Main::Login.perform(&:sign_in_using_credentials)
+
+        @project = Resource::Project.fabricate_via_api! do |project|
+          project.name = Runtime::Env.auto_devops_project_name || 'project-with-secure'
+          project.description = 'Project with Secure'
+        end
+
+        @project.visit!
+        Page::Project::Menu.perform(&:go_to_ci_cd_settings)
+        Page::Project::Settings::CICD.perform(&:expand_license_compliance)
+      end
+
+      it 'can approve a license in the settings page' do
+        QA::EE::Page::Project::Settings::LicenseCompliance.perform do |license_compliance|
+          license_compliance.approve_license approved_license_name
+
+          expect(license_compliance).to have_approved_license approved_license_name
+        end
+      end
+
+      it 'can deny a license in the settings page' do
+        QA::EE::Page::Project::Settings::LicenseCompliance.perform do |license_compliance|
+          license_compliance.deny_license denied_license_name
+
+          expect(license_compliance).to have_denied_license denied_license_name
+        end
+      end
+    end
+
+    describe 'License Compliance pipeline reports' do
       let(:number_of_licenses_in_fixture) { 2 }
-      let(:approved_license_name) { "MIT" }
-      let(:denied_license_name) { "WTFPL" }
 
       after do
         Service::DockerRun::GitlabRunner.new(@executor).remove!
