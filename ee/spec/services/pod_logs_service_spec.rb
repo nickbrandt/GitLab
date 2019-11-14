@@ -70,7 +70,7 @@ describe PodLogsService do
           .with(environment.id, response_pod_name, environment.deployment_namespace, container: container_name)
           .and_return({
             status: :success,
-            logs: "Log 1\nLog 2\nLog 3",
+            logs: ["Log 1", "Log 2", "Log 3"],
             pod_name: response_pod_name,
             container_name: container_name
           })
