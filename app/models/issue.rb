@@ -65,6 +65,8 @@ class Issue < ApplicationRecord
   scope :with_project_grafana_integration, -> { includes(project: :grafana_integration).where(projects: { grafana_integrations: { enabled: true } } ) }
   scope :with_api_entity_associations, -> { preload(:timelogs, :assignees, :author, :notes, :labels, project: [:route, { namespace: :route }] ) }
 
+  scope :grafana_embedded, -> { where(Issue.arel_table[:description_html].matches('%data-dashboard-url%'))
+
   scope :public_only, -> { where(confidential: false) }
   scope :confidential_only, -> { where(confidential: true) }
 
