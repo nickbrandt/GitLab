@@ -87,6 +87,7 @@ describe('Subscriptions', function() {
     expect(vm.$el.querySelector('span').getAttribute('data-original-title')).toBe(
       vm.subscribeDisabledDescription,
     );
+
     expect(vm.$el.querySelector('.issuable-header-text').textContent.trim()).toBe(
       vm.subscribeDisabledDescription,
     );
