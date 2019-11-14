@@ -25,7 +25,7 @@ export NETWORK_NAME=default # the network that your GKE cluster lives in.
 We need to manually grant GitLab's service account the ability to manage resources in the database.crossplane.io API group. The Aggregated ClusterRole allows us to do that
 First, save the following YAML as `crossplane-database-role.yaml`
 
-```
+```sh
 cat > crossplane-database-role.yaml <<EOF
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
