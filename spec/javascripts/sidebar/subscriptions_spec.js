@@ -76,4 +76,19 @@ describe('Subscriptions', function() {
 
     expect(vm.$emit).toHaveBeenCalledWith('toggleSidebar');
   });
+
+  it('notify component disabled when project_emails_disabled is set on', () => {
+    vm = mountComponent(Subscriptions, {
+      subscribed: true,
+      projectEmailsDisabled: true,
+      subscribeDisabledDescription: 'Notifications have been disabled',
+    });
+
+    expect(vm.$el.querySelector('span').getAttribute('data-original-title')).toBe(
+      vm.subscribeDisabledDescription,
+    );
+    expect(vm.$el.querySelector('.issuable-header-text').textContent.trim()).toBe(
+      vm.subscribeDisabledDescription,
+    );
+  });
 });
