@@ -42,7 +42,7 @@ export default {
             <clipboard-button
               v-if="showCopy"
               :text="item.value"
-              :title="__('Copy')"
+              :title="sprintf(__('Copy %{field}'), { field: item.label })"
               css-class="border-0 text-secondary py-0"
             />
           </div>

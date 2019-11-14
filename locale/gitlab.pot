@@ -4658,6 +4658,9 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
+msgid "Copy %{field}"
+msgstr ""
+
 msgid "Copy %{http_label} clone URL"
 msgstr ""
 
