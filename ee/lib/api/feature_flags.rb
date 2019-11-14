@@ -8,7 +8,6 @@ module API
         .merge(name: API::NO_SLASH_URL_PART_REGEX)
 
     before do
-      not_found! unless Feature.enabled?(:feature_flag_api, user_project)
       authorize_read_feature_flags!
     end
 
@@ -18,7 +17,7 @@ module API
     resource 'projects/:id', requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       resource :feature_flags do
         desc 'Get all feature flags of a project' do
-          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
+          detail 'This feature was introduced in GitLab 12.5'
           success EE::API::Entities::FeatureFlag
         end
         params do
@@ -35,7 +34,7 @@ module API
         end
 
         desc 'Create a new feature flag' do
-          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
+          detail 'This feature was introduced in GitLab 12.5'
           success EE::API::Entities::FeatureFlag
         end
         params do
@@ -70,7 +69,7 @@ module API
       end
       resource 'feature_flags/:name', requirements: FEATURE_FLAG_ENDPOINT_REQUIREMENTS do
         desc 'Get a feature flag of a project' do
-          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
+          detail 'This feature was introduced in GitLab 12.5'
           success EE::API::Entities::FeatureFlag
         end
         get do
@@ -80,7 +79,7 @@ module API
         end
 
         desc 'Enable a strategy for a feature flag on an environment' do
-          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
+          detail 'This feature was introduced in GitLab 12.5'
           success EE::API::Entities::FeatureFlag
         end
         params do
@@ -88,6 +87,8 @@ module API
           requires :strategy,          type: JSON,   desc: 'The strategy to be enabled on the scope'
         end
         post :enable do
+          not_found! unless Feature.enabled?(:feature_flag_api, user_project)
+
           result = ::FeatureFlags::EnableService
             .new(user_project, current_user, params).execute
 
@@ -108,6 +109,8 @@ module API
           requires :strategy,          type: JSON,   desc: 'The strategy to be disabled on the scope'
         end
         post :disable do
+          not_found! unless Feature.enabled?(:feature_flag_api, user_project)
+
           result = ::FeatureFlags::DisableService
             .new(user_project, current_user, params).execute
 
@@ -120,7 +123,7 @@ module API
         end
 
         desc 'Delete a feature flag' do
-          detail 'This feature is going to be introduced in GitLab 12.5 if `feature_flag_api` feature flag is removed'
+          detail 'This feature was introduced in GitLab 12.5'
           success EE::API::Entities::FeatureFlag
         end
         delete do
