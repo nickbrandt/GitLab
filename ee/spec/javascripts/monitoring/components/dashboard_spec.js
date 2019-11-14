@@ -1,13 +1,18 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import { GlModal, GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlModal } from '@gitlab/ui';
 import Dashboard from 'ee/monitoring/components/dashboard.vue';
 import { createStore } from '~/monitoring/stores';
 import axios from '~/lib/utils/axios_utils';
-import { metricsGroupsAPIResponse, mockApiEndpoint } from 'spec/monitoring/mock_data';
+import {
+  metricsGroupsAPIResponse,
+  mockApiEndpoint,
+  mockedQueryResultPayload,
+  environmentData,
+} from 'spec/monitoring/mock_data';
 import propsData from 'spec/monitoring/components/dashboard_spec';
-import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
 import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
+import * as types from '~/monitoring/stores/mutation_types';
 
 describe('Dashboard', () => {
   let Component;
@@ -37,76 +42,20 @@ describe('Dashboard', () => {
     mock.restore();
   });
 
-  describe('metrics with alert', () => {
-    describe('with license', () => {
-      beforeEach(() => {
-        vm = shallowMount(Component, {
-          propsData: {
-            ...propsData,
-            hasMetrics: true,
-            prometheusAlertsAvailable: true,
-            alertsEndpoint: '/endpoint',
-          },
-          store,
-        });
-      });
-
-      it('shows alert widget and dropdown item', done => {
-        setTimeout(() => {
-          expect(vm.find(AlertWidget).exists()).toBe(true);
-          expect(
-            vm
-              .findAll(GlDropdownItem)
-              .filter(i => i.text() === 'Alerts')
-              .exists(),
-          ).toBe(true);
-
-          done();
-        });
-      });
-
-      it('shows More actions dropdown on chart', done => {
-        setTimeout(() => {
-          expect(
-            vm
-              .findAll(GlDropdown)
-              .filter(d => d.attributes('data-original-title') === 'More actions')
-              .exists(),
-          ).toBe(true);
-
-          done();
-        });
-      });
-    });
-
-    describe('without license', () => {
-      beforeEach(() => {
-        vm = shallowMount(Component, {
-          propsData: {
-            ...propsData,
-            hasMetrics: true,
-            prometheusAlertsAvailable: false,
-            alertsEndpoint: '/endpoint',
-          },
-          store,
-        });
-      });
-
-      it('does not show alert widget', done => {
-        setTimeout(() => {
-          expect(vm.find(AlertWidget).exists()).toBe(false);
-          expect(
-            vm
-              .findAll(GlDropdownItem)
-              .filter(i => i.text() === 'Alerts')
-              .exists(),
-          ).toBe(false);
-
-          done();
-        });
-      });
-    });
-  });
+  function setupComponentStore(component) {
+    component.vm.$store.commit(
+      `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+      metricsGroupsAPIResponse,
+    );
+    component.vm.$store.commit(
+      `monitoringDashboard/${types.SET_QUERY_RESULT}`,
+      mockedQueryResultPayload,
+    );
+    component.vm.$store.commit(
+      `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
+      environmentData,
+    );
+  }
 
   describe('add custom metrics', () => {
     describe('when not available', () => {
@@ -133,7 +82,7 @@ describe('Dashboard', () => {
     });
 
     describe('when available', () => {
-      beforeEach(done => {
+      beforeEach(() => {
         vm = shallowMount(Component, {
           propsData: {
             ...propsData,
@@ -146,11 +95,17 @@ describe('Dashboard', () => {
           store,
         });
 
-        setTimeout(done);
+        setupComponentStore(vm);
       });
 
-      it('renders add button on the dashboard', () => {
-        expect(vm.element.querySelector('.js-add-metric-button').innerText).toContain('Add metric');
+      it('renders add button on the dashboard', done => {
+        localVue.nextTick(() => {
+          expect(vm.element.querySelector('.js-add-metric-button').innerText).toContain(
+            'Add metric',
+          );
+
+          done();
+        });
       });
 
       it('uses modal for custom metrics form', () => {

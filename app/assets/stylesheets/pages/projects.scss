@@ -270,8 +270,14 @@
   }
 
   .count-badge,
-  .btn {
+  .btn-xs {
     height: 24px;
+  }
+
+  .git-clone-holder {
+    .btn {
+      height: auto;
+    }
   }
 
   .dropdown-toggle,

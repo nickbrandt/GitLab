@@ -20,6 +20,7 @@ export default () => {
   const appContainer = container.querySelector('.js-productivity-analytics-app-container');
 
   const { endpoint, emptyStateSvgPath, noAccessSvgPath } = appContainer.dataset;
+  const { startDate: minDate } = timeframeContainer.dataset;
 
   const now = new Date(Date.now());
   const defaultStartDate = getDateInPast(now, defaultDaysInPast);
@@ -97,6 +98,7 @@ export default () => {
           show: this.groupNamespace !== null,
           startDate: defaultStartDate,
           endDate: defaultEndDate,
+          minDate: minDate ? new Date(minDate) : null,
         },
         on: {
           change: this.onDateRangeChange,

@@ -108,6 +108,25 @@ module Gitlab
 
             it { expect(subject[:interruptible]).to be_falsy }
           end
+
+          it "returns interruptible when overridden for job" do
+            config = YAML.dump({ default: { interruptible: true },
+                                 rspec: { script: "rspec" } })
+
+            config_processor = Gitlab::Ci::YamlProcessor.new(config)
+
+            expect(config_processor.stage_builds_attributes("test").size).to eq(1)
+            expect(config_processor.stage_builds_attributes("test").first).to eq({
+              stage: "test",
+              stage_idx: 2,
+              name: "rspec",
+              options: { script: ["rspec"] },
+              interruptible: true,
+              allow_failure: false,
+              when: "on_success",
+              yaml_variables: []
+            })
+          end
         end
 
         describe 'retry entry' do
@@ -931,7 +950,7 @@ module Gitlab
           config_processor = Gitlab::Ci::YamlProcessor.new(config)
 
           expect(config_processor.stage_builds_attributes("test").size).to eq(1)
-          expect(config_processor.stage_builds_attributes("test").first[:options][:cache]).to eq(
+          expect(config_processor.stage_builds_attributes("test").first[:cache]).to eq(
             paths: ["logs/", "binaries/"],
             untracked: true,
             key: 'key',
@@ -943,7 +962,7 @@ module Gitlab
           config = YAML.dump(
             {
               default: {
-                cache: { paths: ["logs/", "binaries/"], untracked: true, key: 'key' }
+                cache: { paths: ["logs/", "binaries/"], untracked: true, key: { files: ['file'] } }
               },
               rspec: {
                 script: "rspec"
@@ -953,29 +972,75 @@ module Gitlab
           config_processor = Gitlab::Ci::YamlProcessor.new(config)
 
           expect(config_processor.stage_builds_attributes("test").size).to eq(1)
-          expect(config_processor.stage_builds_attributes("test").first[:options][:cache]).to eq(
+          expect(config_processor.stage_builds_attributes("test").first[:cache]).to eq(
             paths: ["logs/", "binaries/"],
+            untracked: true,
+            key: { files: ['file'] },
+            policy: 'pull-push'
+          )
+        end
+
+        it 'returns cache key when defined in a job' do
+          config = YAML.dump({
+                               rspec: {
+                                 cache: { paths: ['logs/', 'binaries/'], untracked: true, key: 'key' },
+                                 script: 'rspec'
+                               }
+                             })
+
+          config_processor = Gitlab::Ci::YamlProcessor.new(config)
+
+          expect(config_processor.stage_builds_attributes('test').size).to eq(1)
+          expect(config_processor.stage_builds_attributes('test').first[:cache]).to eq(
+            paths: ['logs/', 'binaries/'],
             untracked: true,
             key: 'key',
             policy: 'pull-push'
           )
         end
 
-        it "returns cache when defined in a job" do
-          config = YAML.dump({
-                               rspec: {
-                                 cache: { paths: ["logs/", "binaries/"], untracked: true, key: 'key' },
-                                 script: "rspec"
-                               }
-                             })
+        it 'returns cache files' do
+          config = YAML.dump(
+            rspec: {
+              cache: {
+                paths: ['logs/', 'binaries/'],
+                untracked: true,
+                key: { files: ['file'] }
+              },
+              script: 'rspec'
+            }
+          )
 
           config_processor = Gitlab::Ci::YamlProcessor.new(config)
 
-          expect(config_processor.stage_builds_attributes("test").size).to eq(1)
-          expect(config_processor.stage_builds_attributes("test").first[:options][:cache]).to eq(
-            paths: ["logs/", "binaries/"],
+          expect(config_processor.stage_builds_attributes('test').size).to eq(1)
+          expect(config_processor.stage_builds_attributes('test').first[:cache]).to eq(
+            paths: ['logs/', 'binaries/'],
             untracked: true,
-            key: 'key',
+            key: { files: ['file'] },
+            policy: 'pull-push'
+          )
+        end
+
+        it 'returns cache files with prefix' do
+          config = YAML.dump(
+            rspec: {
+              cache: {
+                paths: ['logs/', 'binaries/'],
+                untracked: true,
+                key: { files: ['file'], prefix: 'prefix' }
+              },
+              script: 'rspec'
+            }
+          )
+
+          config_processor = Gitlab::Ci::YamlProcessor.new(config)
+
+          expect(config_processor.stage_builds_attributes('test').size).to eq(1)
+          expect(config_processor.stage_builds_attributes('test').first[:cache]).to eq(
+            paths: ['logs/', 'binaries/'],
+            untracked: true,
+            key: { files: ['file'], prefix: 'prefix' },
             policy: 'pull-push'
           )
         end
@@ -992,7 +1057,7 @@ module Gitlab
           config_processor = Gitlab::Ci::YamlProcessor.new(config)
 
           expect(config_processor.stage_builds_attributes("test").size).to eq(1)
-          expect(config_processor.stage_builds_attributes("test").first[:options][:cache]).to eq(
+          expect(config_processor.stage_builds_attributes("test").first[:cache]).to eq(
             paths: ["test/"],
             untracked: false,
             key: 'local',
@@ -1293,7 +1358,7 @@ module Gitlab
         end
       end
 
-      describe "Needs" do
+      describe "Job Needs" do
         let(:needs) { }
         let(:dependencies) { }
 
@@ -1301,6 +1366,7 @@ module Gitlab
           {
             build1: { stage: 'build', script: 'test' },
             build2: { stage: 'build', script: 'test' },
+            parallel: { stage: 'build', script: 'test', parallel: 2 },
             test1: { stage: 'test', script: 'test', needs: needs, dependencies: dependencies },
             test2: { stage: 'test', script: 'test' },
             deploy: { stage: 'test', script: 'test' }
@@ -1317,7 +1383,7 @@ module Gitlab
           let(:needs) { %w(build1 build2) }
 
           it "does create jobs with valid specification" do
-            expect(subject.builds.size).to eq(5)
+            expect(subject.builds.size).to eq(7)
             expect(subject.builds[0]).to eq(
               stage: "build",
               stage_idx: 1,
@@ -1329,16 +1395,11 @@ module Gitlab
               allow_failure: false,
               yaml_variables: []
             )
-            expect(subject.builds[2]).to eq(
+            expect(subject.builds[4]).to eq(
               stage: "test",
               stage_idx: 2,
               name: "test1",
-              options: {
-                script: ["test"],
-                # This does not make sense, there is a follow-up:
-                # https://gitlab.com/gitlab-org/gitlab-foss/issues/65569
-                bridge_needs: %w[build1 build2]
-              },
+              options: { script: ["test"] },
               needs_attributes: [
                 { name: "build1" },
                 { name: "build2" }
@@ -1350,10 +1411,25 @@ module Gitlab
           end
         end
 
-        context 'needs two builds defined as symbols' do
-          let(:needs) { [:build1, :build2] }
+        context 'needs parallel job' do
+          let(:needs) { %w(parallel) }
 
-          it { expect { subject }.not_to raise_error }
+          it "does create jobs with valid specification" do
+            expect(subject.builds.size).to eq(7)
+            expect(subject.builds[4]).to eq(
+              stage: "test",
+              stage_idx: 2,
+              name: "test1",
+              options: { script: ["test"] },
+              needs_attributes: [
+                { name: "parallel 1/2" },
+                { name: "parallel 2/2" }
+              ],
+              when: "on_success",
+              allow_failure: false,
+              yaml_variables: []
+            )
+          end
         end
 
         context 'undefined need' do
@@ -1832,14 +1908,42 @@ module Gitlab
           config = YAML.dump({ cache: { key: 1 }, rspec: { script: "test" } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "cache:key config should be a string or symbol")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "cache:key should be a hash, a string or a symbol")
         end
 
         it "returns errors if job cache:key is not an a string" do
           config = YAML.dump({ types: %w(build test), rspec: { script: "test", cache: { key: 1 } } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:cache:key config should be a string or symbol")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:cache:key should be a hash, a string or a symbol")
+        end
+
+        it 'returns errors if job cache:key:files is not an array of strings' do
+          config = YAML.dump({ types: %w(build test), rspec: { script: "test", cache: { key: { files: [1] } } } })
+          expect do
+            Gitlab::Ci::YamlProcessor.new(config)
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, 'jobs:rspec:cache:key:files config should be an array of strings')
+        end
+
+        it 'returns errors if job cache:key:files is an empty array' do
+          config = YAML.dump({ types: %w(build test), rspec: { script: "test", cache: { key: { files: [] } } } })
+          expect do
+            Gitlab::Ci::YamlProcessor.new(config)
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, 'jobs:rspec:cache:key:files config requires at least 1 item')
+        end
+
+        it 'returns errors if job defines only cache:key:prefix' do
+          config = YAML.dump({ types: %w(build test), rspec: { script: "test", cache: { key: { prefix: 'prefix-key' } } } })
+          expect do
+            Gitlab::Ci::YamlProcessor.new(config)
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, 'jobs:rspec:cache:key config missing required keys: files')
+        end
+
+        it 'returns errors if job cache:key:prefix is not an a string' do
+          config = YAML.dump({ types: %w(build test), rspec: { script: "test", cache: { key: { prefix: 1, files: ['file'] } } } })
+          expect do
+            Gitlab::Ci::YamlProcessor.new(config)
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, 'jobs:rspec:cache:key:prefix config should be a string or symbol')
         end
 
         it "returns errors if job cache:untracked is not an array of strings" do

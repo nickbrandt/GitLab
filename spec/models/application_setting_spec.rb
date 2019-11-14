@@ -82,28 +82,43 @@ describe ApplicationSetting do
       it { is_expected.to allow_value(nil).for(:snowplow_iglu_registry_url) }
     end
 
-    context 'when pendo is enabled' do
-      before do
-        setting.pendo_enabled = true
-      end
-
-      it { is_expected.not_to allow_value(nil).for(:pendo_url) }
-      it { is_expected.to allow_value(http).for(:pendo_url) }
-      it { is_expected.to allow_value(https).for(:pendo_url) }
-      it { is_expected.not_to allow_value(ftp).for(:pendo_url) }
-      it { is_expected.not_to allow_value('http://127.0.0.1').for(:pendo_url) }
-    end
-
-    context 'when pendo is not enabled' do
-      it { is_expected.to allow_value(nil).for(:pendo_url) }
-    end
-
     context "when user accepted let's encrypt terms of service" do
       before do
         setting.update(lets_encrypt_terms_of_service_accepted: true)
       end
 
       it { is_expected.not_to allow_value(nil).for(:lets_encrypt_notification_email) }
+    end
+
+    describe 'EKS integration' do
+      before do
+        setting.eks_integration_enabled = eks_enabled
+      end
+
+      context 'integration is disabled' do
+        let(:eks_enabled) { false }
+
+        it { is_expected.to allow_value(nil).for(:eks_account_id) }
+        it { is_expected.to allow_value(nil).for(:eks_access_key_id) }
+        it { is_expected.to allow_value(nil).for(:eks_secret_access_key) }
+      end
+
+      context 'integration is enabled' do
+        let(:eks_enabled) { true }
+
+        it { is_expected.to allow_value('123456789012').for(:eks_account_id) }
+        it { is_expected.not_to allow_value(nil).for(:eks_account_id) }
+        it { is_expected.not_to allow_value('123').for(:eks_account_id) }
+        it { is_expected.not_to allow_value('12345678901a').for(:eks_account_id) }
+
+        it { is_expected.to allow_value('access-key-id-12').for(:eks_access_key_id) }
+        it { is_expected.not_to allow_value('a' * 129).for(:eks_access_key_id) }
+        it { is_expected.not_to allow_value('short-key').for(:eks_access_key_id) }
+        it { is_expected.not_to allow_value(nil).for(:eks_access_key_id) }
+
+        it { is_expected.to allow_value('secret-access-key').for(:eks_secret_access_key) }
+        it { is_expected.not_to allow_value(nil).for(:eks_secret_access_key) }
+      end
     end
 
     describe 'default_artifacts_expire_in' do

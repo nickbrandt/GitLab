@@ -23,8 +23,8 @@ describe Gitlab::Ci::Config::Entry::Job do
 
       let(:result) do
         %i[before_script script stage type after_script cache
-           image services only except rules variables artifacts
-           environment coverage retry]
+           image services only except rules needs variables artifacts
+           environment coverage retry interruptible]
       end
 
       it { is_expected.to match_array result }
@@ -384,21 +384,6 @@ describe Gitlab::Ci::Config::Entry::Job do
       end
 
       context 'when has needs' do
-        context 'that are not a array of strings' do
-          let(:config) do
-            {
-              stage: 'test',
-              script: 'echo',
-              needs: 'build-job'
-            }
-          end
-
-          it 'returns error about invalid type' do
-            expect(entry).not_to be_valid
-            expect(entry.errors).to include 'job needs should be an array of strings'
-          end
-        end
-
         context 'when have dependencies that are not subset of needs' do
           let(:config) do
             {

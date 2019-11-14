@@ -6,6 +6,12 @@ class ApplicationSetting < ApplicationRecord
   include TokenAuthenticatable
   include ChronicDurationAttribute
 
+  # Only remove this >= %12.6 and >= 2019-12-01
+  self.ignored_columns += %i[
+      pendo_enabled
+      pendo_url
+    ]
+
   add_authentication_token_field :runners_registration_token, encrypted: -> { Feature.enabled?(:application_settings_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
   add_authentication_token_field :health_check_access_token
   add_authentication_token_field :static_objects_external_storage_auth_token
@@ -102,11 +108,6 @@ class ApplicationSetting < ApplicationRecord
             addressable_url: true,
             allow_blank: true,
             if: :snowplow_enabled
-
-  validates :pendo_url,
-            presence: true,
-            public_url: true,
-            if: :pendo_enabled
 
   validates :max_attachment_size,
             presence: true,
@@ -274,11 +275,33 @@ class ApplicationSetting < ApplicationRecord
             presence: true,
             if: :lets_encrypt_terms_of_service_accepted?
 
+  validates :eks_integration_enabled,
+            inclusion: { in: [true, false] }
+
+  validates :eks_account_id,
+            format: { with: Gitlab::Regex.aws_account_id_regex,
+                      message: Gitlab::Regex.aws_account_id_message },
+            if: :eks_integration_enabled?
+
+  validates :eks_access_key_id,
+            length: { in: 16..128 },
+            if: :eks_integration_enabled?
+
+  validates :eks_secret_access_key,
+            presence: true,
+            if: :eks_integration_enabled?
+
   validates_with X509CertificateCredentialsValidator,
                  certificate: :external_auth_client_cert,
                  pkey: :external_auth_client_key,
                  pass: :external_auth_client_key_pass,
                  if: -> (setting) { setting.external_auth_client_cert.present? }
+
+  validates :default_ci_config_path,
+    format: { without: %r{(\.{2}|\A/)},
+              message: N_('cannot include leading slash or directory traversal.') },
+    length: { maximum: 255 },
+    allow_blank: true
 
   attr_encrypted :asset_proxy_secret_key,
                  mode: :per_attribute_iv,
@@ -299,6 +322,12 @@ class ApplicationSetting < ApplicationRecord
                  encode: true
 
   attr_encrypted :lets_encrypt_private_key,
+                 mode: :per_attribute_iv,
+                 key: Settings.attr_encrypted_db_key_base_truncated,
+                 algorithm: 'aes-256-gcm',
+                 encode: true
+
+  attr_encrypted :eks_secret_access_key,
                  mode: :per_attribute_iv,
                  key: Settings.attr_encrypted_db_key_base_truncated,
                  algorithm: 'aes-256-gcm',

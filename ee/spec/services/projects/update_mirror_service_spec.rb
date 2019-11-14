@@ -72,6 +72,19 @@ describe Projects::UpdateMirrorService do
       end
     end
 
+    context 'when repository is in read-only mode' do
+      before do
+        project.update_attribute(:repository_read_only, true)
+      end
+
+      it 'does not run if repository is set to read-only' do
+        expect(service).not_to receive(:update_tags)
+        expect(service).not_to receive(:update_branches)
+
+        expect(service.execute).to be_truthy
+      end
+    end
+
     context 'when tags on mirror are modified' do
       let(:mirror_project) { create(:project, :repository)}
       let(:mirror_path) { File.join(TestEnv.repos_path, mirror_project.repository.relative_path) }

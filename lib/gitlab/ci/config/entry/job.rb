@@ -38,7 +38,6 @@ module Gitlab
             with_options allow_nil: true do
               validates :tags, array_of_strings: true
               validates :allow_failure, boolean: true
-              validates :interruptible, boolean: true
               validates :parallel, numericality: { only_integer: true,
                                                    greater_than_or_equal_to: 2,
                                                    less_than_or_equal_to: 50 }
@@ -50,7 +49,6 @@ module Gitlab
               validates :timeout, duration: { limit: ChronicDuration.output(Project::MAX_BUILD_TIMEOUT) }
 
               validates :dependencies, array_of_strings: true
-              validates :needs, array_of_strings: true
               validates :extends, array_of_strings_or_string: true
               validates :rules, array_of_hashes: true
             end
@@ -101,6 +99,10 @@ module Gitlab
             description: 'Services that will be used to execute this job.',
             inherit: true
 
+          entry :interruptible, Entry::Boolean,
+            description: 'Set jobs interruptible value.',
+            inherit: true
+
           entry :only, Entry::Policy,
             description: 'Refs policy this job will be executed for.',
             default: Entry::Policy::DEFAULT_ONLY,
@@ -112,6 +114,11 @@ module Gitlab
 
           entry :rules, Entry::Rules,
             description: 'List of evaluable Rules to determine job inclusion.',
+            inherit: false
+
+          entry :needs, Entry::Needs,
+            description: 'Needs configuration for this job.',
+            metadata: { allowed_needs: %i[job] },
             inherit: false
 
           entry :variables, Entry::Variables,

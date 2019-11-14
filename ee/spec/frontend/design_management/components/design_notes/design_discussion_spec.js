@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { ApolloMutation } from 'vue-apollo';
 import ReplyPlaceholder from '~/notes/components/discussion_reply_placeholder.vue';
 import DesignDiscussion from 'ee/design_management/components/design_notes/design_discussion.vue';
 import DesignNote from 'ee/design_management/components/design_notes/design_note.vue';
@@ -49,6 +50,7 @@ describe('Design discussions component', () => {
       },
       stubs: {
         ReplyPlaceholder,
+        ApolloMutation,
       },
       mocks: { $apollo },
     });
@@ -92,7 +94,7 @@ describe('Design discussions component', () => {
 
         expect(mutate).toHaveBeenCalledWith(mutationVariables);
 
-        return wrapper.vm.addDiscussionComment();
+        return mutate({ variables: mutationVariables });
       })
       .then(() => {
         expect(findReplyForm().exists()).toBe(false);

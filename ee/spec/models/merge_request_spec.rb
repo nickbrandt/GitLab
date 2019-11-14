@@ -248,6 +248,35 @@ describe MergeRequest do
     end
   end
 
+  describe '#has_dast_reports?' do
+    subject { merge_request.has_dast_reports? }
+
+    let(:project) { create(:project, :repository) }
+
+    before do
+      stub_licensed_features(dast: true)
+    end
+
+    context 'when head pipeline has dast reports' do
+      let(:merge_request) { create(:ee_merge_request, :with_dast_reports, source_project: project) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when pipeline ran for an older commit than the branch head' do
+      let(:pipeline) { create(:ci_empty_pipeline, sha: 'notlatestsha') }
+      let(:merge_request) { create(:ee_merge_request, source_project: project, head_pipeline: pipeline) }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when head pipeline does not have dast reports' do
+      let(:merge_request) { create(:ee_merge_request, source_project: project) }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
   describe '#has_metrics_reports?' do
     subject { merge_request.has_metrics_reports? }
 
@@ -568,7 +597,7 @@ describe MergeRequest do
 
   describe '#mergeable_with_quick_action?' do
     def create_pipeline(status)
-      pipeline = create(:ci_pipeline_with_one_job,
+      pipeline = create(:ci_pipeline,
         project: project,
         ref:     merge_request.source_branch,
         sha:     merge_request.diff_head_sha,

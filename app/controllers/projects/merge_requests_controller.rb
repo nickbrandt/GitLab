@@ -23,6 +23,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
   before_action do
     push_frontend_feature_flag(:vue_issuable_sidebar, @project.group)
+    push_frontend_feature_flag(:release_search_filter, @project)
   end
 
   around_action :allow_gitaly_ref_name_caching, only: [:index, :show, :discussions]
@@ -363,7 +364,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     when :error
       render json: { status_reason: report_comparison[:status_reason] }, status: :bad_request
     else
-      render json: { status_reason: 'Unknown error' }, status: :internal_server_error
+      raise "Failed to build comparison response as comparison yielded unknown status '#{report_comparison[:status]}'"
     end
   end
 

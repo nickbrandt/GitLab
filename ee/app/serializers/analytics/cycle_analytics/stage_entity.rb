@@ -4,6 +4,7 @@ module Analytics
   module CycleAnalytics
     class StageEntity < Grape::Entity
       expose :title
+      expose :hidden
       expose :legend
       expose :description
       expose :id

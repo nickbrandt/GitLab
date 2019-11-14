@@ -1,6 +1,8 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
+import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab, GlTabs, GlLink } from '@gitlab/ui';
+import { __, sprintf } from '~/locale';
+import Icon from '~/vue_shared/components/icon.vue';
 import DependenciesActions from './dependencies_actions.vue';
 import DependencyListIncompleteAlert from './dependency_list_incomplete_alert.vue';
 import DependencyListJobFailedAlert from './dependency_list_job_failed_alert.vue';
@@ -16,8 +18,10 @@ export default {
     GlLoadingIcon,
     GlTab,
     GlTabs,
+    GlLink,
     DependencyListIncompleteAlert,
     DependencyListJobFailedAlert,
+    Icon,
     PaginatedDependenciesTable,
   },
   props: {
@@ -43,6 +47,7 @@ export default {
   computed: {
     ...mapState(['currentList', 'listTypes']),
     ...mapGetters([
+      'generatedAtTimeAgo',
       'isInitialized',
       'isJobNotSetUp',
       'isJobFailed',
@@ -59,6 +64,18 @@ export default {
         const { namespace } = this.listTypes[index] || {};
         this.setCurrentList(namespace);
       },
+    },
+    subHeadingText() {
+      const { jobPath } = this.reportInfo;
+
+      const body = __(
+        'Displays dependencies and known vulnerabilities, based on the %{linkStart}latest pipeline%{linkEnd} scan',
+      );
+
+      const linkStart = jobPath ? `<a href="${jobPath}">` : '';
+      const linkEnd = jobPath ? '</a>' : '';
+
+      return sprintf(body, { linkStart, linkEnd }, false);
     },
   },
   created() {
@@ -97,7 +114,7 @@ export default {
     :primary-button-text="__('Learn more about the dependency list')"
   />
 
-  <div v-else>
+  <section v-else>
     <dependency-list-incomplete-alert
       v-if="isIncomplete && !isIncompleteAlertDismissed"
       @close="dismissIncompleteListAlert"
@@ -109,7 +126,24 @@ export default {
       @close="dismissJobFailedAlert"
     />
 
-    <h3 class="h5">{{ __('Dependencies') }}</h3>
+    <header class="my-3">
+      <h2 class="h4 mb-1">
+        {{ __('Dependencies') }}
+        <gl-link
+          target="_blank"
+          :href="documentationPath"
+          :aria-label="__('Dependencies help page link')"
+          ><icon name="question"
+        /></gl-link>
+      </h2>
+      <p class="mb-0">
+        <span v-html="subHeadingText"></span>
+        <span v-if="generatedAtTimeAgo"
+          ><span aria-hidden="true">&bull;</span>
+          <span class="text-secondary"> {{ generatedAtTimeAgo }}</span></span
+        >
+      </p>
+    </header>
 
     <gl-tabs v-model="currentListIndex" content-class="pt-0">
       <gl-tab
@@ -131,5 +165,5 @@ export default {
         </li>
       </template>
     </gl-tabs>
-  </div>
+  </section>
 </template>

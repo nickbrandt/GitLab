@@ -7,17 +7,17 @@ module Geo
     end
 
     def count_synced
-      registries_for_design_repositories
+      registries
         .merge(Geo::DesignRegistry.synced).count
     end
 
     def count_failed
-      registries_for_design_repositories
+      registries
         .merge(Geo::DesignRegistry.failed).count
     end
 
     def count_registry
-      registries_for_design_repositories.count
+      registries.count
     end
 
     private
@@ -26,7 +26,7 @@ module Geo
       current_node.projects.inner_join_design_management
     end
 
-    def registries_for_design_repositories
+    def registries
       designs_repositories
         .inner_join_design_registry
     end

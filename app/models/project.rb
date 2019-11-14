@@ -92,6 +92,7 @@ class Project < ApplicationRecord
   default_value_for :snippets_enabled, gitlab_config_features.snippets
   default_value_for :only_allow_merge_if_all_discussions_are_resolved, false
   default_value_for :remove_source_branch_after_merge, true
+  default_value_for(:ci_config_path) { Gitlab::CurrentSettings.default_ci_config_path }
 
   add_authentication_token_field :runners_token, encrypted: -> { Feature.enabled?(:projects_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
 
@@ -286,6 +287,7 @@ class Project < ApplicationRecord
   has_many :variables, class_name: 'Ci::Variable'
   has_many :triggers, class_name: 'Ci::Trigger'
   has_many :environments
+  has_many :environments_for_dashboard, -> { from(with_rank.unfoldered.available, :environments).where('rank <= 3') }, class_name: 'Environment'
   has_many :deployments
   has_many :pipeline_schedules, class_name: 'Ci::PipelineSchedule'
   has_many :project_deploy_tokens
@@ -395,6 +397,7 @@ class Project < ApplicationRecord
   scope :with_project_feature, -> { joins('LEFT JOIN project_features ON projects.id = project_features.project_id') }
   scope :with_statistics, -> { includes(:statistics) }
   scope :with_shared_runners, -> { where(shared_runners_enabled: true) }
+  scope :with_container_registry, -> { where(container_registry_enabled: true) }
   scope :inside_path, ->(path) do
     # We need routes alias rs for JOIN so it does not conflict with
     # includes(:route) which we use in ProjectsFinder.
@@ -659,6 +662,11 @@ class Project < ApplicationRecord
     else
       super.external
     end
+  end
+
+  def preload_protected_branches
+    preloader = ActiveRecord::Associations::Preloader.new
+    preloader.preload(self, protected_branches: [:push_access_levels, :merge_access_levels])
   end
 
   # returns all ancestor-groups upto but excluding the given namespace
@@ -1911,7 +1919,7 @@ class Project < ApplicationRecord
   end
 
   def default_environment
-    production_first = "(CASE WHEN name = 'production' THEN 0 ELSE 1 END), id ASC"
+    production_first = Arel.sql("(CASE WHEN name = 'production' THEN 0 ELSE 1 END), id ASC")
 
     environments
       .with_state(:available)

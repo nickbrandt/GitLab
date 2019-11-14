@@ -174,6 +174,29 @@ describe 'Two merge requests on a merge train' do
     end
   end
 
+  context 'when merge request 1 got a new commit' do
+    before do
+      oldrev = project.repository.commit('feature').sha
+      create_file_in_repo(project, 'refs/heads/feature', 'refs/heads/feature', 'test.txt', 'This is test')
+      newrev = project.repository.commit('feature').sha
+      MergeRequests::RefreshService.new(project, maintainer_1)
+        .execute(oldrev, newrev, 'refs/heads/feature')
+
+      merge_request_1.reload
+      merge_request_2.reload
+    end
+
+    it_behaves_like 'drops merge request 1 from the merge train' do
+      let(:system_note) do
+        'removed this merge request from the merge train because source branch was updated'
+      end
+    end
+
+    it_behaves_like 're-creates a pipeline for merge request 2' do
+      let(:target_branch_sha) { project.repository.commit('refs/heads/master').sha }
+    end
+  end
+
   context 'when merge request 1 is not mergeable' do
     before do
       merge_request_1.update!(title: merge_request_1.wip_title)

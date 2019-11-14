@@ -1089,6 +1089,20 @@ describe API::Commits do
         expect(json_response.first.keys).to include 'diff'
       end
 
+      context 'when hard limits are lower than the number of files' do
+        before do
+          allow(Commit).to receive(:max_diff_options).and_return(max_files: 1)
+        end
+
+        it 'respects the limit' do
+          get api(route, current_user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to include_pagination_headers
+          expect(json_response.size).to be <= 1
+        end
+      end
+
       context 'when ref does not exist' do
         let(:commit_id) { 'unknown' }
 
@@ -1362,6 +1376,12 @@ describe API::Commits do
         it_behaves_like '400 response' do
           let(:request) { post api(route, current_user), params: { branch: 'markdown' } }
         end
+
+        it 'includes an error_code in the response' do
+          post api(route, current_user), params: { branch: 'markdown' }
+
+          expect(json_response['error_code']).to eq 'empty'
+        end
       end
 
       context 'when ref contains a dot' do
@@ -1519,6 +1539,19 @@ describe API::Commits do
 
         it_behaves_like '400 response' do
           let(:request) { post api(route, current_user) }
+        end
+      end
+
+      context 'when commit is already reverted in the target branch' do
+        it 'includes an error_code in the response' do
+          # First one actually reverts
+          post api(route, current_user), params: { branch: 'markdown' }
+
+          # Second one is redundant and should be empty
+          post api(route, current_user), params: { branch: 'markdown' }
+
+          expect(response).to have_gitlab_http_status(400)
+          expect(json_response['error_code']).to eq 'empty'
         end
       end
     end

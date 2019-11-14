@@ -309,6 +309,13 @@ Gitlab.ee do
 end
 
 #
+# Unleash
+#
+Settings['feature_flags'] ||= Settingslogic.new({})
+Settings.feature_flags['unleash'] ||= Settingslogic.new({})
+Settings.feature_flags.unleash['enabled'] = false if Settings.feature_flags.unleash['enabled'].nil?
+
+#
 # External merge request diffs
 #
 Settings['external_diffs'] ||= Settingslogic.new({})
@@ -669,7 +676,12 @@ Settings.monitoring['web_exporter'] ||= Settingslogic.new({})
 Settings.monitoring.web_exporter['enabled'] ||= false
 Settings.monitoring.web_exporter['address'] ||= 'localhost'
 Settings.monitoring.web_exporter['port'] ||= 8083
-Settings.monitoring.web_exporter['blackout_seconds'] ||= 10
+
+#
+# Shutdown settings
+#
+Settings['shutdown'] ||= Settingslogic.new({})
+Settings.shutdown['blackout_seconds'] ||= 10
 
 #
 # Testing settings

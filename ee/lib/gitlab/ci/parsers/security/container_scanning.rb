@@ -9,32 +9,35 @@ module Gitlab
 
           DEPRECATED_REPORT_VERSION = "1.3".freeze
 
-          def parse!(json_data, report)
-            vulnerabilities = format_report(JSON.parse!(json_data))
+          def parse_report(json_data)
+            report = super
 
-            vulnerabilities.each do |vulnerability|
-              create_vulnerability(report, vulnerability, DEPRECATED_REPORT_VERSION)
-            end
-          rescue JSON::ParserError
-            raise SecurityReportParserError, 'JSON parsing failed'
-          rescue
-            raise SecurityReportParserError, "#{report.type} security report parsing failed"
+            return format_deprecated_report(report) if deprecated?(report)
+
+            report
           end
 
           private
 
-          # Transforms the Clair JSON report into the expected format
-          def format_report(data)
-            vulnerabilities = data['vulnerabilities']
+          # Transforms the clair-scanner JSON report into the expected format
+          # TODO: remove the following block when we no longer need to support legacy
+          # clair-scanner data. See https://gitlab.com/gitlab-org/gitlab/issues/35442
+          def format_deprecated_report(data)
             unapproved = data['unapproved']
-            formatter = Formatters::ContainerScanning.new(data['image'])
+            formatter = Formatters::DeprecatedContainerScanning.new(data['image'])
 
-            vulnerabilities.map do |vulnerability|
+            vulnerabilities = data['vulnerabilities'].map do |vulnerability|
               # We only report unapproved vulnerabilities
               next unless unapproved.include?(vulnerability['vulnerability'])
 
               formatter.format(vulnerability)
             end.compact
+
+            { "vulnerabilities" => vulnerabilities, "version" => DEPRECATED_REPORT_VERSION }
+          end
+
+          def deprecated?(data)
+            data['image']
           end
 
           def create_location(location_data)

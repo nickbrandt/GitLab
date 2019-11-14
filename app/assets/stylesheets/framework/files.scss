@@ -258,17 +258,6 @@
       }
     }
   }
-
-  .file-editor {
-    .ace_underline {
-      text-decoration: none;
-    }
-
-    .ace_line a {
-      pointer-events: auto;
-      color: inherit;
-    }
-  }
 }
 
 span.idiff {
@@ -385,6 +374,10 @@ span.idiff {
     line-height: 28px;
     display: inline-block;
     float: none;
+  }
+
+  .file-actions .ide-edit-button {
+    z-index: 2;
   }
 
   @include media-breakpoint-down(xs) {

@@ -36,7 +36,7 @@ module EE
         new_container_ids -= klass.target_ids
 
         # Add new containers
-        new_container_ids.each { |id| klass.create(klass.target_attr_name => id) }
+        new_container_ids.each { |id| klass.create!(klass.target_attr_name => id) }
       end
     end
   end

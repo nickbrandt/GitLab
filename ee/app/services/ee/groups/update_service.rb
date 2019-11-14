@@ -112,6 +112,7 @@ module EE
 
       def valid_path_change_with_npm_packages?
         return true unless group.packages_feature_available?
+        return true if params[:path].blank?
         return true if !group.has_parent? && group.path == params[:path]
 
         npm_packages = Packages::GroupPackagesFinder.new(current_user, group, package_type: :npm).execute

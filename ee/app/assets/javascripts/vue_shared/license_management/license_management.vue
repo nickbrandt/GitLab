@@ -66,12 +66,14 @@ export default {
       :empty-search-message="$options.emptySearchMessage"
       :empty-message="$options.emptyMessage"
       filter="name"
+      data-qa-selector="license_compliance_list"
     >
       <template #header>
         <gl-button
           class="js-open-form order-1"
           :disabled="formIsOpen"
           variant="success"
+          data-qa-selector="license_add_button"
           @click="openAddLicenseForm"
         >
           {{ s__('LicenseCompliance|Add a license') }}

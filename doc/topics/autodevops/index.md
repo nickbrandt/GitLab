@@ -99,7 +99,7 @@ To make full use of Auto DevOps, you will need:
 
   To enable deployments, you will need:
 
-  1. A [Kubernetes 1.5+ cluster](../../user/project/clusters/index.md) for the project. The easiest
+  1. A [Kubernetes 1.12+ cluster](../../user/project/clusters/index.md) for the project. The easiest
      way is to add a [new GKE cluster using the GitLab UI](../../user/project/clusters/add_remove_clusters.md#add-new-gke-cluster).
   1. NGINX Ingress. You can deploy it to your Kubernetes cluster by installing
      the [GitLab-managed app for Ingress](../../user/clusters/applications.md#ingress),
@@ -112,7 +112,7 @@ To make full use of Auto DevOps, you will need:
      NOTE: **Note:**
      If you are using your own Ingress instead of the one provided by GitLab's managed
      apps, ensure you are running at least version 0.9.0 of NGINX Ingress and
-     [enable Prometheus metrics](https://github.com/kubernetes/ingress-nginx/blob/master/docs/examples/customization/custom-vts-metrics-prometheus/nginx-vts-metrics-conf.yaml)
+     [enable Prometheus metrics](https://github.com/helm/charts/tree/master/stable/nginx-ingress#prometheus-metrics)
      in order for the response metrics to appear. You will also have to
      [annotate](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
      the NGINX Ingress deployment to be scraped by Prometheus using
@@ -696,6 +696,27 @@ workers:
     - sidekiqctl
     - quiet
     terminationGracePeriodSeconds: 60
+```
+
+#### Running commands in the container
+
+Applications built with [Auto Build](#auto-build) using Herokuish, the default
+unless you have [a custom Dockerfile](#auto-build-using-a-dockerfile), may require
+commands to be wrapped as follows:
+
+```shell
+/bin/herokuish procfile exec $COMMAND
+```
+
+This might be neccessary, for example, when:
+
+- Attaching using `kubectl exec`.
+- Using GitLab's [Web Terminal](../../ci/environments.md#web-terminals).
+
+For example, to start a Rails console from the application root directory, run:
+
+```sh
+/bin/herokuish procfile exec bin/rails c
 ```
 
 ### Auto Monitoring

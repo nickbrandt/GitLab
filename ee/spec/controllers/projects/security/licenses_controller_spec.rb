@@ -43,6 +43,17 @@ describe Projects::Security::LicensesController do
           it 'returns a hash with licenses' do
             expect(json_response).to be_a(Hash)
             expect(json_response['licenses'].length).to eq(4)
+            expect(json_response['licenses'][0]).to include({
+              'id' => nil,
+              'spdx_identifier' => nil,
+              'classification' => 'unclassified',
+              'name' => 'Apache 2.0',
+              'url' => 'http://www.apache.org/licenses/LICENSE-2.0.txt',
+              'components' => [{
+                "blob_path" => nil,
+                "name" => "thread_safe"
+              }]
+            })
           end
 
           it 'returns status ok' do
@@ -55,6 +66,47 @@ describe Projects::Security::LicensesController do
             it 'return only 1 license' do
               expect(json_response['licenses'].length).to eq(1)
             end
+          end
+        end
+
+        context "when software policies are applied to some of the most recently detected licenses" do
+          let!(:raw_report) { fixture_file_upload(Rails.root.join('ee/spec/fixtures/security_reports/gl-license-management-report-v2.json'), 'application/json') }
+          let!(:pipeline) { create(:ee_ci_pipeline, :with_license_management_report, project: project) }
+          let!(:mit) { create(:software_license, :mit) }
+          let!(:mit_policy) { create(:software_license_policy, :denied, software_license: mit, project: project) }
+
+          before do
+            pipeline.job_artifacts.license_management.last.update!(file: raw_report)
+            get :index, params: { namespace_id: project.namespace, project_id: project }, format: :json
+          end
+
+          it { expect(response).to have_http_status(:ok) }
+
+          it 'generates the proper JSON response' do
+            expect(json_response["licenses"].count).to be(3)
+            expect(json_response.dig("licenses", 0)).to include({
+              "id" => nil,
+              "spdx_identifier" => "BSD-3-Clause",
+              "name" => "BSD 3-Clause \"New\" or \"Revised\" License",
+              "url" => "http://spdx.org/licenses/BSD-3-Clause.json",
+              "classification" => "unclassified"
+            })
+
+            expect(json_response.dig("licenses", 1)).to include({
+              "id" => mit_policy.id,
+              "spdx_identifier" => "MIT",
+              "name" => mit.name,
+              "url" => "http://spdx.org/licenses/MIT.json",
+              "classification" => "denied"
+            })
+
+            expect(json_response.dig("licenses", 2)).to include({
+              "id" => nil,
+              "spdx_identifier" => nil,
+              "name" => "unknown",
+              "url" => "",
+              "classification" => "unclassified"
+            })
           end
         end
 

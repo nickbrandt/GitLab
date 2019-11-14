@@ -55,7 +55,7 @@ The following table depicts the various user permission levels in a project.
 | View project code                                 | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | Pull project code                                 | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | View GitLab Pages protected by [access control](project/pages/introduction.md#gitlab-pages-access-control-core) | ✓       | ✓          | ✓           | ✓        | ✓      |
-| View wiki pages                                   | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
+| View wiki pages                                   | ✓       | ✓          | ✓           | ✓        | ✓      |
 | See a list of jobs                                | ✓ (*3*) | ✓          | ✓           | ✓        | ✓      |
 | See a job log                                     | ✓ (*3*) | ✓          | ✓           | ✓        | ✓      |
 | Download and browse job artifacts                 | ✓ (*3*) | ✓          | ✓           | ✓        | ✓      |
@@ -83,7 +83,7 @@ The following table depicts the various user permission levels in a project.
 | Push to non-protected branches                    |         |            | ✓           | ✓        | ✓      |
 | Force push to non-protected branches              |         |            | ✓           | ✓        | ✓      |
 | Remove non-protected branches                     |         |            | ✓           | ✓        | ✓      |
-| Create new merge request                          |         |            | ✓           | ✓        | ✓      |
+| Create new merge request                          |         | ✓          | ✓           | ✓        | ✓      |
 | Assign merge requests                             |         |            | ✓           | ✓        | ✓      |
 | Label merge requests                              |         |            | ✓           | ✓        | ✓      |
 | Lock merge request threads                        |         |            | ✓           | ✓        | ✓      |
@@ -168,7 +168,7 @@ the [documentation on Cycle Analytics permissions](analytics/cycle_analytics.md#
 
 Developers and users with higher permission level can use all
 the functionality of the Issue Board, that is create/delete lists
-and drag issues around. Read though the
+and drag issues around. Read through the
 [documentation on Issue Boards permissions](project/issue_board.md#permissions)
 to learn more.
 

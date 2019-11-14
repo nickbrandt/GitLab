@@ -87,22 +87,22 @@ export default {
 </script>
 
 <template>
-  <header class="d-flex w-100 p-2 bg-white align-items-center js-design-header">
+  <header class="d-flex p-2 bg-white align-items-center js-design-header">
     <router-link
       :to="{
         name: 'designs',
         query: $route.query,
       }"
       :aria-label="s__('DesignManagement|Go back to designs')"
-      class="mr-3 text-plain"
+      class="mr-3 text-plain d-flex justify-content-center align-items-center"
     >
       <icon :size="18" name="close" />
     </router-link>
-    <div>
-      <h2 class="m-0">{{ name }}</h2>
+    <div class="overflow-hidden d-flex align-items-center">
+      <h2 class="m-0 str-truncated-100">{{ name }}</h2>
       <small v-if="updatedAt" class="text-secondary">{{ updatedText }}</small>
     </div>
-    <pagination :id="id" class="ml-auto" />
+    <pagination :id="id" class="ml-auto flex-shrink-0" />
     <delete-button
       v-if="isLatestVersion && canDeleteDesign"
       :is-deleting="isDeleting"

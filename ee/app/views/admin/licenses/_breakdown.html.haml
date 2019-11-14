@@ -6,9 +6,10 @@
 - else
   - licensed_users = 'Unlimited'
 
-- maximum_user_count = [max_historical_user_count, current_active_user_count].max
-- if restricted && maximum_user_count > restricted
-  - users_over_license = maximum_user_count - restricted
+- max_user_count = maximum_user_count
+
+- if restricted && max_user_count > restricted
+  - users_over_license = max_user_count - restricted
 - else
   - users_over_license = 0
 
@@ -37,7 +38,7 @@
         .well-segment.well-centered
           %h3.center
             Maximum Users:
-            = number_with_delimiter maximum_user_count
+            = number_with_delimiter max_user_count
           %hr
             This is the highest peak of users on your installation since the license started, and
             this is the minimum number you need to purchase when you renew your license.

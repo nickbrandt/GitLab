@@ -23,6 +23,8 @@ module Packages
       def search_results
         return [] if wildcard_query?
 
+        return search_for_single_package(sanitized_query) if params[:query].include?(RECIPE_SEPARATOR)
+
         search_packages(build_query)
       end
 
@@ -31,11 +33,9 @@ module Packages
       end
 
       def build_query
-        sanitized_query = sanitize_sql_like(params[:query].delete(WILDCARD))
         return "#{sanitized_query}%" if params[:query].end_with?(WILDCARD)
-        return sanitized_query if sanitized_query.include?(RECIPE_SEPARATOR)
 
-        "#{sanitized_query}/%"
+        sanitized_query
       end
 
       def feature_available?
@@ -43,7 +43,21 @@ module Packages
       end
 
       def search_packages(query)
-        Packages::ConanPackageFinder.new(query, current_user).execute.pluck_names
+        Packages::ConanPackageFinder.new(current_user, query: query).execute.map(&:conan_recipe)
+      end
+
+      def search_for_single_package(query)
+        name, version, username, _ = query.split(/[@\/]/)
+        full_path = Packages::ConanMetadatum.full_path_from(package_username: username)
+        project = Project.find_by_full_path(full_path)
+        return unless current_user.can?(:read_package, project)
+
+        result = project.packages.with_name(name).with_version(version).order_created.last
+        [result&.conan_recipe].compact
+      end
+
+      def sanitized_query
+        @sanitized_query ||= sanitize_sql_like(params[:query].delete(WILDCARD))
       end
     end
   end

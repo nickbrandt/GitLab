@@ -441,6 +441,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :metrics, action: :metrics_redirect
           get :folder, path: 'folders/*id', constraints: { format: /(html|json)/ }
           get :search
+
+          Gitlab.ee do
+            get :logs, action: :logs_redirect
+          end
         end
 
         resources :deployments, only: [:index] do
@@ -613,8 +617,18 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resources :error_tracking, only: [:index], controller: :error_tracking do
         collection do
+          get ':issue_id/details',
+              to: 'error_tracking#details',
+              as: 'details'
+          get ':issue_id/stack_trace',
+              to: 'error_tracking#stack_trace',
+              as: 'stack_trace'
           post :list_projects
         end
+      end
+
+      scope :usage_ping, controller: :usage_ping do
+        post :web_ide_clientside_preview
       end
 
       # Since both wiki and repository routing contains wildcard characters
@@ -652,7 +666,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
   # Legacy routes.
   # Introduced in 12.0.
-  # Should be removed after 12.1
+  # Should be removed with https://gitlab.com/gitlab-org/gitlab/issues/28848.
   scope(path: '*namespace_id',
         as: :namespace,
         namespace_id: Gitlab::PathRegex.full_namespace_route_regex) do

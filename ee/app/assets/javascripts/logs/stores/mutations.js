@@ -1,13 +1,13 @@
 import * as types from './mutation_types';
 
 export default {
-  [types.SET_LOGS_ENDPOINT](state, endpoint) {
-    state.logs.endpoint = endpoint;
-  },
-  [types.SET_CURRENT_POD_NAME](state, podName) {
-    state.pods.current = podName;
+  /** Project data */
+  [types.SET_PROJECT_ENVIRONMENT](state, { projectPath, environmentId }) {
+    state.projectPath = projectPath;
+    state.environments.current = environmentId;
   },
 
+  /** Environments data */
   [types.REQUEST_ENVIRONMENTS_DATA](state) {
     state.environments.options = [];
     state.environments.isLoading = true;
@@ -21,6 +21,7 @@ export default {
     state.environments.isLoading = false;
   },
 
+  /** Logs data */
   [types.REQUEST_LOGS_DATA](state) {
     state.logs.lines = [];
     state.logs.isLoading = true;
@@ -37,6 +38,10 @@ export default {
     state.logs.isComplete = true;
   },
 
+  /** Pods data */
+  [types.SET_CURRENT_POD_NAME](state, podName) {
+    state.pods.current = podName;
+  },
   [types.REQUEST_PODS_DATA](state) {
     state.pods.options = [];
   },

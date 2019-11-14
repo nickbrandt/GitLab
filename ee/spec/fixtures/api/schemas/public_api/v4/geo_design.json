@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "required" : [
+    "project_id",
+    "name",
+    "state",
+    "last_synced_at"
+  ],
+  "properties" : {
+    "project_id": { "type": "integer" },
+    "name": { "type": ["string"] },
+    "state": { "type": ["string"] },
+    "last_synced_at": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

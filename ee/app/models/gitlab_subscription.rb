@@ -49,7 +49,7 @@ class GitlabSubscription < ApplicationRecord
   end
 
   def plan_code=(code)
-    code ||= Namespace::FREE_PLAN
+    code ||= Plan::FREE
 
     self.hosted_plan = Plan.find_by(name: code)
   end

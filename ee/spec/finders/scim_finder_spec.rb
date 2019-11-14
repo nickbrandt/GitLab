@@ -30,12 +30,27 @@ describe ScimFinder do
 
       context 'with an eq filter' do
         let!(:identity) { create(:group_saml_identity, saml_provider: saml_provider) }
+        let!(:other_identity) { create(:group_saml_identity, saml_provider: saml_provider) }
 
         it 'allows identity lookup by id/externalId' do
           expect(finder.search(filter: "id eq #{identity.extern_uid}")).to be_a ActiveRecord::Relation
           expect(finder.search(filter: "id eq #{identity.extern_uid}").first).to eq identity
           expect(finder.search(filter: "externalId eq #{identity.extern_uid}").first).to eq identity
         end
+      end
+
+      it 'returns all related identities if there is no filter' do
+        create_list(:group_saml_identity, 2, saml_provider: saml_provider)
+
+        expect(finder.search({}).count).to eq 2
+      end
+
+      it 'raises an error if the filter is unsupported' do
+        expect { finder.search(filter: 'id ne 1').count }.to raise_error(ScimFinder::UnsupportedFilter)
+      end
+
+      it 'raises an error if the attribute path is unsupported' do
+        expect { finder.search(filter: 'userName eq "name"').count }.to raise_error(ScimFinder::UnsupportedFilter)
       end
     end
   end

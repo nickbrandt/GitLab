@@ -20,7 +20,7 @@ describe Projects::Security::DashboardController do
   end
 
   describe 'GET #show' do
-    let(:pipeline) { create(:ci_pipeline_without_jobs, sha: project.commit.id, project: project, user: user) }
+    let(:pipeline) { create(:ci_pipeline, sha: project.commit.id, project: project, user: user) }
 
     render_views
 

@@ -59,7 +59,7 @@ The following languages and dependency managers are supported.
 | Go ([Golang](https://golang.org/)) | not currently ([issue](https://gitlab.com/gitlab-org/gitlab/issues/7132 "Dependency Scanning for Go")) | not available |
 | PHP ([Composer](https://getcomposer.org/))  | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
 | Python ([pip](https://pip.pypa.io/en/stable/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
-| Python ([Pipfile](https://docs.pipenv.org/en/latest/basics/)) | not currently ([issue](https://gitlab.com/gitlab-org/gitlab/issues/11756 "Pipfile.lock support for Dependency Scanning"))| not available |
+| Python ([Pipfile](https://pipenv.kennethreitz.org/en/latest/basics/)) | not currently ([issue](https://gitlab.com/gitlab-org/gitlab/issues/11756 "Pipfile.lock support for Dependency Scanning"))| not available |
 | Python ([poetry](https://poetry.eustace.io/)) | not currently ([issue](https://gitlab.com/gitlab-org/gitlab/issues/7006 "Support Poetry in Dependency Scanning")) | not available |
 | Ruby ([gem](https://rubygems.org/)) | yes | [gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium), [bundler-audit](https://github.com/rubysec/bundler-audit) |
 
@@ -140,6 +140,33 @@ using environment variables.
 | `DS_RUN_ANALYZER_TIMEOUT`               | Time limit when running an analyzer. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, `h`. For example, `300ms`, `1.5h`, or `2h45m`. | |
 | `PIP_INDEX_URL`                         | Base URL of Python Package Index (default `https://pypi.org/simple`). | |
 | `PIP_EXTRA_INDEX_URL`                   | Array of [extra URLs](https://pip.pypa.io/en/stable/reference/pip_install/#cmdoption-extra-index-url) of package indexes to use in addition to `PIP_INDEX_URL`. Comma separated. | |
+| `MAVEN_CLI_OPTS`                        | List of command line arguments that will be passed to the maven analyzer during the project's build phase (see example for [using private repos](#using-private-maven-repos)). | |
+
+### Using private Maven repos
+
+If you have a private Maven repository which requires login credentials,
+you can use the `MAVEN_CLI_OPTS` environment variable to pass variables
+specified in your settings (e.g., username, password, etc.).
+
+For example, if you have a settings file in your project source (e.g., `mysettings.xml`)
+that looks like the following, you can specify the variables
+[by adding an entry under your project's settings](../../../ci/variables/README.md#via-the-ui),
+so that you don't have to expose your private data in `.gitlab-ci.yml` (e.g., adding
+`MAVEN_CLI_OPTS` with value `--settings mysettings.xml -Dprivate.username=foo -Dprivate.password=bar`).
+
+```xml
+<!-- mysettings.xml -->
+<settings>
+    ...
+    <servers>
+        <server>
+            <id>private_server</id>
+            <username>${private.username}</username>
+            <password>${private.password}</password>
+        </server>
+    </servers>
+</settings>
+```
 
 ## Interacting with the vulnerabilities
 

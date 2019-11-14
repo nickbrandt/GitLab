@@ -51,11 +51,17 @@ describe 'Group Cycle Analytics', :js do
     end
   end
 
+  def wait_for_stages_to_load
+    expect(page).to have_selector '.js-stage-table'
+  end
+
   # TODO: Followup should have tests for stub_licensed_features(cycle_analytics_for_groups: false)
   def select_group
     dropdown = page.find('.dropdown-groups')
     dropdown.click
     dropdown.find('a').click
+
+    wait_for_requests
   end
 
   def select_project
@@ -216,12 +222,7 @@ describe 'Group Cycle Analytics', :js do
         dropdown.click
         dropdown.find('a').click
 
-        # Make capybara wait until all the .stage-nav-item elements are rendered
-        # We should have NUMBER_OF_STAGES + 1 (button)
-        expect(page).to have_selector(
-          '.stage-nav-item',
-          count: Gitlab::Analytics::CycleAnalytics::DefaultStages.all.size + 1
-        )
+        wait_for_stages_to_load
       end
 
       context 'Add a stage button' do

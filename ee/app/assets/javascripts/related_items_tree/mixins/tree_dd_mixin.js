@@ -48,7 +48,7 @@ export default {
      * @param {number} object.newIndex new position of target item
      * @param {object} object.targetItem target item object
      */
-    getTreeReorderMutation({ newIndex, targetItem }) {
+    getTreeReorderMutation({ oldIndex, newIndex, targetItem }) {
       let relativePosition;
 
       // adjacentReference is always the item that's at the position
@@ -65,10 +65,14 @@ export default {
         // Adjacent reference will be the one which is currently at the bottom,
         // and it's relative position with respect to target's new position is `before`.
         relativePosition = relativePositions.Before;
-      } else {
+      } else if (oldIndex < newIndex) {
         // If newIndex is neither top nor bottom, it was moved somewhere in the middle.
         // Adjacent reference will be the one which currently at that position,
-        // and it's relative postion with respect to target's new position is `after`.
+
+        // when the item is moved down, the newIndex is before the adjacent reference.
+        relativePosition = relativePositions.Before;
+      } else {
+        // when the item is moved up, the newIndex is after the adjacent reference.
         relativePosition = relativePositions.After;
       }
 
@@ -106,7 +110,7 @@ export default {
       const targetItem = this.children[oldIndex];
 
       this.reorderItem({
-        treeReorderMutation: this.getTreeReorderMutation({ newIndex, targetItem }),
+        treeReorderMutation: this.getTreeReorderMutation({ oldIndex, newIndex, targetItem }),
         parentItem: this.parentItem,
         targetItem,
         oldIndex,
