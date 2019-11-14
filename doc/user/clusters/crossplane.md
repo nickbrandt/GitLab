@@ -17,6 +17,7 @@ First, we need to declare some environment variables with configuration that wil
 ```sh
 export PROJECT_ID=crossplane-playground # the project that all resources reside.
 export NETWORK_NAME=default # the network that your GKE cluster lives in.
+export REGION=us-central1 # the region where the GKE cluster lives in.
 ```
 
 ### Configure RBAC permissions
@@ -139,7 +140,7 @@ specTemplate:
   writeConnectionSecretsToNamespace: gitlab-managed-apps
   forProvider:
     databaseVersion: POSTGRES_9_6
-    region: us-west2
+    region: $REGION
     settings:
       tier: db-custom-1-3840
       dataDiskType: PD_SSD
@@ -161,7 +162,7 @@ specTemplate:
   writeConnectionSecretsToNamespace: gitlab-managed-apps
   forProvider:
     databaseVersion: POSTGRES_9_6
-    region: us-west2
+    region: $REGION
     settings:
       tier: db-custom-1-3840
       dataDiskType: PD_SSD
