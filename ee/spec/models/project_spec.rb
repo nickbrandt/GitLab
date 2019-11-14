@@ -38,6 +38,10 @@ describe Project do
     it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
     it { is_expected.to have_many(:packages).class_name('Packages::Package') }
     it { is_expected.to have_many(:package_files).class_name('Packages::PackageFile') }
+    it { is_expected.to have_many(:upstream_project_subscriptions) }
+    it { is_expected.to have_many(:upstream_projects) }
+    it { is_expected.to have_many(:downstream_project_subscriptions) }
+    it { is_expected.to have_many(:downstream_projects) }
 
     it { is_expected.to have_one(:github_service) }
     it { is_expected.to have_many(:project_aliases) }

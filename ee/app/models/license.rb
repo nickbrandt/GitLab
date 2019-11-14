@@ -96,6 +96,7 @@ class License < ApplicationRecord
     smartcard_auth
     type_of_work_analytics
     unprotection_restrictions
+    ci_project_subscriptions
   ]
   EEP_FEATURES.freeze
 
