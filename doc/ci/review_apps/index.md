@@ -163,6 +163,9 @@ that spawned the Review App.
 
 ### Configuring Visual Reviews
 
+Ensure that the `anonymous_visual_review_feedback` feature flag is enabled on
+your GitLab instance or project if you are self-hosting.
+
 The feedback form is served through a script you add to pages in your Review App.
 If you have [Developer permissions](../../user/permissions.md) to the project,
 you can access it by clicking the **Review** button in the **Pipeline** section
@@ -221,6 +224,17 @@ NOTE: **Note:**
 Future enhancements [are planned](https://gitlab.com/gitlab-org/gitlab/issues/11322)
 to make this process even easier.
 
+### Determining merge request ID
+
+The merge request ID can be automatically determined through the script tag
+via the data attribute `data-merge-request-id`.
+
+There are three ways to provide a merge request ID to a Visual Review app:
+
+- By hardcoding it in the script tag via the data attribute `data-merge-request-id`
+- Dynamically adding the `data-merge-request-id` value during build.
+- Supplying it manually through the visual review form.
+
 ### Using Visual Reviews
 
 After Visual Reviews has been [enabled](#configuring-visual-reviews) for the
@@ -231,24 +245,14 @@ the bottom-right corner.
 
 To use the feedback form:
 
-1. Create a [personal access token](../../user/profile/personal_access_tokens.md)
-   with the API scope selected.
-1. Paste the token into the feedback box when prompted. If you select **Remember me**,
-   your browser stores the token so that future visits to Review Apps at the same URL
-   will not require you to re-enter the token. To clear the token, click **Log out**.
 1. Make a comment on the visual review. You can make use of all the
    [Markdown annotations](../../user/markdown.md) that are also available in
    merge request comments.
+1. Submit your feedback anonymously or add your name.
 1. Finally, click **Send feedback**.
 
 After you make and submit a comment in the visual review box, it will appear
 automatically in the respective merge request.
-
-TIP: **Tip:**
-Because tokens must be entered on a per-domain basis and they can only be accessed
-once, different review apps will not remember your token. You can save the token
-to your password manager specifically for the purpose of Visual Reviews. This way,
-you will not need to create additional tokens for each merge request.
 
 ## Limitations
 
