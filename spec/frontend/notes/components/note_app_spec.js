@@ -54,7 +54,9 @@ describe('note_app', () => {
           components: {
             NotesApp,
           },
-          template: '<div class="js-vue-notes-event"><notes-app v-bind="$attrs" /></div>',
+          template: `<div class="js-vue-notes-event">
+            <notes-app ref="notesApp" v-bind="$attrs" />
+          </div>`,
         },
         {
           attachToDocument: true,
@@ -311,6 +313,22 @@ describe('note_app', () => {
         awardName: 'test',
         noteId: 1,
       });
+    });
+  });
+
+  describe('mounted', () => {
+    beforeEach(() => {
+      axiosMock.onAny().reply(mockData.getIndividualNoteResponse);
+      wrapper = mountComponent();
+      return waitForDiscussionsRequest();
+    });
+
+    it('should listen hashchange event', () => {
+      wrapper.vm.$refs.notesApp.handleHashChanged = jest.fn();
+      // jest.spyOn(wrapper.vm.$refs.notesApp, 'handleHashChanged');
+      window.dispatchEvent(new Event('hashchange'), '#foo');
+
+      expect(wrapper.vm.$refs.notesApp.handleHashChanged).toHaveBeenCalled();
     });
   });
 });
