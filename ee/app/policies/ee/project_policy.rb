@@ -151,16 +151,17 @@ module EE
 
       rule { can?(:developer_access) }.policy do
         enable :read_project_security_dashboard
-        enable :create_vulnerability
-        enable :resolve_vulnerability
-        enable :dismiss_vulnerability
       end
 
       rule { security_dashboard_feature_disabled }.policy do
         prevent :read_project_security_dashboard
-        prevent :create_vulnerability
-        prevent :resolve_vulnerability
-        prevent :dismiss_vulnerability
+      end
+
+      rule { can?(:read_project_security_dashboard) & can?(:developer_access) }.policy do
+        enable :read_vulnerability
+        enable :create_vulnerability
+        enable :resolve_vulnerability
+        enable :dismiss_vulnerability
       end
 
       rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
@@ -205,9 +206,10 @@ module EE
         enable :read_deployment
         enable :read_pages
         enable :read_project_security_dashboard
-        enable :create_vulnerability
-        enable :resolve_vulnerability
-        enable :dismiss_vulnerability
+      end
+
+      rule { auditor & can?(:read_project_security_dashboard) }.policy do
+        enable :read_vulnerability
       end
 
       rule { auditor & ~guest }.policy do
