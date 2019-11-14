@@ -29,10 +29,7 @@ export const mapToScopesViewModel = scopesFromRails =>
       strat => strat.name === ROLLOUT_STRATEGY_USER_ID,
     );
 
-    const rolloutUserIds = (fetchUserIdParams(userStrategy) || '')
-      .split(',')
-      .filter(id => id)
-      .join(', ');
+    const rolloutUserIds = (fetchUserIdParams(userStrategy) || '').split(',').filter(id => id);
 
     return {
       id: s.id,
@@ -46,7 +43,6 @@ export const mapToScopesViewModel = scopesFromRails =>
 
       // eslint-disable-next-line no-underscore-dangle
       shouldBeDestroyed: Boolean(s._destroy),
-      shouldIncludeUserIds: rolloutUserIds.length > 0,
     };
   });
 /**
@@ -63,8 +59,8 @@ export const mapFromScopesViewModel = params => {
     }
 
     const userIdParameters = {};
-    if (s.shouldIncludeUserIds || s.rolloutStrategy === ROLLOUT_STRATEGY_USER_ID) {
-      userIdParameters.userIds = (s.rolloutUserIds || '').replace(/, /g, ',');
+    if (Array.isArray(s.rolloutUserIds) && s.rolloutUserIds.length > 0) {
+      userIdParameters.userIds = s.rolloutUserIds.join(',');
     }
 
     // Strip out any internal IDs
@@ -117,7 +113,7 @@ export const createNewEnvironmentScope = (overrides = {}, featureFlagPermissions
     id: _.uniqueId(INTERNAL_ID_PREFIX),
     rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
     rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-    rolloutUserIds: '',
+    rolloutUserIds: [],
   };
 
   const newScope = {
