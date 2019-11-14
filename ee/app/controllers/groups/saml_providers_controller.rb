@@ -17,9 +17,11 @@ class Groups::SamlProvidersController < Groups::ApplicationController
   end
 
   def create
-    @saml_provider = @group.build_saml_provider(saml_provider_params)
+    create_service = GroupSaml::SamlProvider::CreateService.new(current_user, @group, params: saml_provider_params)
 
-    @saml_provider.save
+    create_service.execute
+
+    @saml_provider = create_service.saml_provider
 
     render :show
   end
