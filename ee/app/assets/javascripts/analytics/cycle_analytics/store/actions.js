@@ -195,14 +195,14 @@ export const createCustomStage = ({ dispatch, state }, data) => {
 
 export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
 export const receiveUpdateStageSuccess = ({ commit, dispatch }) => {
-  commit(types.RECEIVE_UPDATE_STAGE_SUCCESS);
+  commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
   createFlash(__(`Stage data updated`), 'notice');
 
   dispatch('fetchCycleAnalyticsData');
 };
 
 export const receiveUpdateStageError = ({ commit }) => {
-  commit(types.RECEIVE_UPDATE_STAGE_ERROR);
+  commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
   createFlash(__('There was a problem saving your custom stage, please try again'));
 };
 
@@ -220,27 +220,27 @@ export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
     .catch(error => dispatch('receiveUpdateStageError', error));
 };
 
-export const requestDeleteStage = ({ commit }) => commit(types.REQUEST_DELETE_STAGE);
-export const receiveDeleteStageSuccess = ({ commit, dispatch }) => {
-  commit(types.RECEIVE_DELETE_STAGE_SUCCESS);
+export const requestRemoveStage = ({ commit }) => commit(types.REQUEST_REMOVE_STAGE);
+export const receiveRemoveStageSuccess = ({ commit, dispatch }) => {
+  commit(types.RECEIVE_REMOVE_STAGE_RESPONSE);
   createFlash(__('Stage removed'), 'notice');
   dispatch('fetchCycleAnalyticsData');
 };
 
-export const receiveDeleteStageError = ({ commit }) => {
-  commit(types.RECEIVE_DELETE_STAGE_ERROR);
+export const receiveRemoveStageError = ({ commit }) => {
+  commit(types.RECEIVE_REMOVE_STAGE_RESPONSE);
   createFlash(__('There was an error removing your custom stage, please try again'));
 };
 
-export const deleteStage = ({ dispatch, state }, stageId) => {
+export const removeStage = ({ dispatch, state }, stageId) => {
   const {
     selectedGroup: { fullPath },
   } = state;
   const endpoint = `/-/analytics/cycle_analytics/stages/${stageId}?group_id=${fullPath}`;
-  dispatch('requestDeleteStage');
+  dispatch('requestRemoveStage');
 
   return axios
     .delete(endpoint)
-    .then(() => dispatch('receiveDeleteStageSuccess'))
-    .catch(error => dispatch('receiveDeleteStageError', error));
+    .then(() => dispatch('receiveRemoveStageSuccess'))
+    .catch(error => dispatch('receiveRemoveStageError', error));
 };

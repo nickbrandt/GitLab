@@ -327,11 +327,17 @@ describe 'Group Cycle Analytics', :js do
           Analytics::CycleAnalytics::Stages::CreateService.new(parent: group, params: params, current_user: user).execute
         end
 
+        def toggle_more_options(stage)
+          stage.hover
+
+          stage.find(".more-actions-toggle").click
+        end
+
         context 'default stages' do
           before do
             select_group
 
-            first_default_stage.find(".more-actions-toggle").click
+            toggle_more_options(first_default_stage)
           end
 
           it 'can be hidden' do
@@ -364,7 +370,7 @@ describe 'Group Cycle Analytics', :js do
 
             expect(page).to have_text custom_stage
 
-            first_custom_stage.find(".more-actions-toggle").click
+            toggle_more_options(first_custom_stage)
           end
 
           it 'can not be hidden' do

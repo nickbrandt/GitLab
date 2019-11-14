@@ -56,7 +56,7 @@ export default {
     handleSelectStage(e) {
       // we don't want to emit the select event when we click the more actions dropdown
       // But we should still trigger the event if we click anywhere else in the list item
-      if (!this.$refs.dropdown.contains(e.target)) {
+      if (this.$refs.dropdown && !this.$refs.dropdown.contains(e.target)) {
         this.$emit('select');
       }
     },

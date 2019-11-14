@@ -101,7 +101,7 @@ export default {
       'setDateRange',
       'createCustomStage',
       'updateStage',
-      'deleteStage',
+      'removeStage',
     ]),
     onGroupSelect(group) {
       this.setCycleAnalyticsDataEndpoint(group.full_path);
@@ -134,7 +134,7 @@ export default {
       this.updateStage(data);
     },
     onRemoveStage(id) {
-      this.deleteStage(id);
+      this.removeStage(id);
     },
   },
   groupsQueryParams: {

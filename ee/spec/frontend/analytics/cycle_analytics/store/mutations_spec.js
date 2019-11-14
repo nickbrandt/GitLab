@@ -48,11 +48,9 @@ describe('Cycle analytics mutations', () => {
     ${types.REQUEST_CREATE_CUSTOM_STAGE}           | ${'isSavingCustomStage'}   | ${true}
     ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}   | ${false}
     ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}             | ${true}
-    ${types.RECEIVE_UPDATE_STAGE_ERROR}            | ${'isLoading'}             | ${false}
-    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}          | ${'isLoading'}             | ${false}
-    ${types.REQUEST_DELETE_STAGE}                  | ${'isLoading'}             | ${true}
-    ${types.RECEIVE_DELETE_STAGE_ERROR}            | ${'isLoading'}             | ${false}
-    ${types.RECEIVE_DELETE_STAGE_SUCCESS}          | ${'isLoading'}             | ${false}
+    ${types.RECEIVE_UPDATE_STAGE_RESPONSE}         | ${'isLoading'}             | ${false}
+    ${types.REQUEST_REMOVE_STAGE}                  | ${'isLoading'}             | ${true}
+    ${types.RECEIVE_REMOVE_STAGE_RESPONSE}         | ${'isLoading'}             | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 

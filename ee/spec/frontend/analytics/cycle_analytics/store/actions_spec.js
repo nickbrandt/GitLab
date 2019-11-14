@@ -574,7 +574,7 @@ describe('Cycle analytics actions', () => {
     });
   });
 
-  describe('deleteStage', () => {
+  describe('removeStage', () => {
     const stageId = 'cool-stage';
 
     beforeEach(() => {
@@ -583,16 +583,16 @@ describe('Cycle analytics actions', () => {
       state = { selectedGroup: { fullPath: groupPath } };
     });
 
-    it('dispatches receiveDeleteStageSuccess with put request response data', done => {
+    it('dispatches receiveRemoveStageSuccess with put request response data', done => {
       testAction(
-        actions.deleteStage,
+        actions.removeStage,
         stageId,
         state,
         [],
         [
-          { type: 'requestDeleteStage' },
+          { type: 'requestRemoveStage' },
           {
-            type: 'receiveDeleteStageSuccess',
+            type: 'receiveRemoveStageSuccess',
           },
         ],
         done,
@@ -605,16 +605,16 @@ describe('Cycle analytics actions', () => {
         mock.onDelete(stageEndpoint({ stageId, groupId: groupPath })).replyOnce(404);
       });
 
-      it('dispatches receiveUpdateStageError', done => {
+      it('dispatches receiveRemoveStageError', done => {
         testAction(
-          actions.deleteStage,
+          actions.removeStage,
           stageId,
           state,
           [],
           [
-            { type: 'requestDeleteStage' },
+            { type: 'requestRemoveStage' },
             {
-              type: 'receiveDeleteStageError',
+              type: 'receiveRemoveStageError',
               payload: error,
             },
           ],
@@ -623,7 +623,7 @@ describe('Cycle analytics actions', () => {
       });
 
       it('flashes an error message', done => {
-        actions.receiveDeleteStageError(
+        actions.receiveRemoveStageError(
           {
             commit: () => {},
             state,
@@ -637,7 +637,7 @@ describe('Cycle analytics actions', () => {
     });
   });
 
-  describe('receiveDeleteStageSuccess', () => {
+  describe('receiveRemoveStageSuccess', () => {
     const stageId = 'cool-stage';
 
     beforeEach(() => {
@@ -648,17 +648,17 @@ describe('Cycle analytics actions', () => {
 
     it('dispatches fetchCycleAnalyticsData', done => {
       testAction(
-        actions.receiveDeleteStageSuccess,
+        actions.receiveRemoveStageSuccess,
         stageId,
         state,
-        [{ type: 'RECEIVE_DELETE_STAGE_SUCCESS' }],
+        [{ type: 'RECEIVE_REMOVE_STAGE_RESPONSE' }],
         [{ type: 'fetchCycleAnalyticsData' }],
         done,
       );
     });
 
     it('flashes a success message', done => {
-      actions.receiveDeleteStageSuccess(
+      actions.receiveRemoveStageSuccess(
         {
           dispatch: () => {},
           commit: () => {},

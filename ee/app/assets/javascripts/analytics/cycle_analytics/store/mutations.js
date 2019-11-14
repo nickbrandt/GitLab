@@ -129,19 +129,13 @@ export default {
   [types.REQUEST_UPDATE_STAGE](state) {
     state.isLoading = true;
   },
-  [types.RECEIVE_UPDATE_STAGE_ERROR](state) {
+  [types.RECEIVE_UPDATE_STAGE_RESPONSE](state) {
     state.isLoading = false;
   },
-  [types.RECEIVE_UPDATE_STAGE_SUCCESS](state) {
-    state.isLoading = false;
-  },
-  [types.REQUEST_DELETE_STAGE](state) {
+  [types.REQUEST_REMOVE_STAGE](state) {
     state.isLoading = true;
   },
-  [types.RECEIVE_DELETE_STAGE_ERROR](state) {
-    state.isLoading = false;
-  },
-  [types.RECEIVE_DELETE_STAGE_SUCCESS](state) {
+  [types.RECEIVE_REMOVE_STAGE_RESPONSE](state) {
     state.isLoading = false;
   },
 };
