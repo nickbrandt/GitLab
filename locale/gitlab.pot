@@ -12248,6 +12248,9 @@ msgstr ""
 msgid "Path:"
 msgstr ""
 
+msgid "Paths can contain wildcards, like */welcome"
+msgstr ""
+
 msgid "Pause"
 msgstr ""
 
@@ -17098,6 +17101,9 @@ msgid "TagsPage|protected"
 msgstr ""
 
 msgid "Target Branch"
+msgstr ""
+
+msgid "Target Path"
 msgstr ""
 
 msgid "Target branch"
