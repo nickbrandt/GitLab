@@ -20993,6 +20993,9 @@ msgstr ""
 msgid "started"
 msgstr ""
 
+msgid "started a discussion on %{design_link}"
+msgstr ""
+
 msgid "started on %{milestone_start_date}"
 msgstr ""
 

@@ -8,12 +8,12 @@ describe SystemNoteService do
   include RepoHelpers
   include DesignManagementTestHelpers
 
-  set(:group)    { create(:group) }
-  set(:project)  { create(:project, :repository, group: group) }
-  set(:author)   { create(:user) }
-  let(:noteable) { create(:issue, project: project) }
-  let(:issue)    { noteable }
-  let(:epic)     { create(:epic, group: group) }
+  let_it_be(:group)    { create(:group) }
+  let_it_be(:project)  { create(:project, :repository, group: group) }
+  let_it_be(:author)   { create(:user) }
+  let_it_be(:noteable) { create(:issue, project: project) }
+  let_it_be(:issue)    { noteable }
+  let_it_be(:epic)     { create(:epic, group: group) }
 
   describe '.relate_issue' do
     let(:noteable_ref) { double }
@@ -53,7 +53,6 @@ describe SystemNoteService do
     subject { described_class.design_version_added(version) }
 
     # default (valid) parameters:
-    set(:issue) { create(:issue) }
     let(:n_designs) { 3 }
     let(:designs) { create_list(:design, n_designs, issue: issue) }
     let(:user) { build(:user) }
@@ -140,7 +139,7 @@ describe SystemNoteService do
         end
 
         let(:anchor_tag) { %r{ <a[^>]*>#{link}</a>} }
-        let(:href) { described_class.send(:design_version_path, version) }
+        let(:href) { described_class.send(:designs_path, project, issue, { version: version.id }) }
         let(:link) { "#{n_designs} designs" }
 
         subject(:note) { described_class.design_version_added(version).first }
@@ -157,6 +156,32 @@ describe SystemNoteService do
             )
         end
       end
+    end
+  end
+
+  describe '.design_discussion_added' do
+    subject { described_class.design_discussion_added(discussion_note) }
+
+    let_it_be(:design) { create(:design, :with_file, issue: issue) }
+    let_it_be(:discussion_note) do
+      create(:diff_note_on_design, noteable: design, author: author, project: project)
+    end
+    let(:action) { 'designs_discussion_added' }
+
+    it_behaves_like 'a system note' do
+      let_it_be(:noteable) { discussion_note.noteable.issue }
+    end
+
+    it 'adds a new system note' do
+      expect { subject }.to change { Note.system.count }.by(1)
+    end
+
+    it 'has the correct note text' do
+      href = described_class.send(:designs_path, project, issue,
+        { vueroute: design.filename, anchor: ActionView::RecordIdentifier.dom_id(discussion_note) }
+      )
+
+      expect(subject.note).to eq("started a discussion on [#{design.filename}](#{href})")
     end
   end
 
