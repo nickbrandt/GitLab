@@ -69,8 +69,15 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      resources :issues, only: [], constraints: { id: /\d+/ } do
+        member do
+          get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
+        end
+      end
+
       resources :merge_requests, only: [], constraints: { id: /\d+/ } do
         member do
+          get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
           get :metrics_reports
           get :license_management_reports
           get :container_scanning_reports

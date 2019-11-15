@@ -8,6 +8,8 @@ module EE
       APPROVAL_RENDERING_ACTIONS = [:approve, :approvals, :unapprove].freeze
 
       prepended do
+        include DescriptionDiffActions
+
         before_action only: [:show] do
           push_frontend_feature_flag(:sast_merge_request_report_api, default_enabled: true)
           push_frontend_feature_flag(:dast_merge_request_report_api)

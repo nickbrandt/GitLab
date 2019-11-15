@@ -72,6 +72,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resources :billings, only: [:index]
     resources :epics, concerns: :awardable, constraints: { id: /\d+/ } do
       member do
+        get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
         get :discussions, format: :json
         get :realtime_changes
         post :toggle_subscription
