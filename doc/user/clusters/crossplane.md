@@ -67,7 +67,7 @@ We need to configure connectivity between the Postgres database and the GKE clus
 
 We can either use Crossplane to achieve this as demonstrated below or directly in the GCP console by following the above link.
 
-- Create a GlobalAddress and Connection resources:
+Create a GlobalAddress and Connection resources:
 
 ```sh
 cat > network.yaml <<EOF
