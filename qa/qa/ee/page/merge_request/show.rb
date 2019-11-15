@@ -154,11 +154,10 @@ module QA
             expand_vulnerability_report
             click_vulnerability(name)
 
-            previous_page=page.current_url
+            previous_page = page.current_url
             click_element :resolve_split_button
 
-            
-            wait(max:15,reload: false) do
+            wait(max: 15, reload: false) do
               page.current_url != previous_page
             end
           end
