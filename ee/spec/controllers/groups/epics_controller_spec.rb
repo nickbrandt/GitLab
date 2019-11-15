@@ -537,4 +537,11 @@ describe Groups::EpicsController do
       end
     end
   end
+
+  it_behaves_like DescriptionDiffActions do
+    let_it_be(:group)    { create(:group, :public) }
+    let_it_be(:issuable) { create(:epic, group: group) }
+
+    let(:base_params) { { group_id: group, id: issuable } }
+  end
 end

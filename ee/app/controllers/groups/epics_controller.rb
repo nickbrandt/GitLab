@@ -7,6 +7,7 @@ class Groups::EpicsController < Groups::ApplicationController
   include ToggleSubscriptionAction
   include RendersNotes
   include EpicsActions
+  include DescriptionDiffActions
 
   before_action :check_epics_available!
   before_action :epic, except: [:index, :create, :bulk_update]
