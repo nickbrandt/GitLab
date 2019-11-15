@@ -1934,7 +1934,7 @@ describe MergeRequest do
     context 'when the MR has been merged' do
       before do
         MergeRequests::MergeService
-          .new(subject.target_project, subject.author)
+          .new(subject.target_project, subject.author, { sha: subject.diff_head_sha })
           .execute(subject)
       end
 
