@@ -12,6 +12,7 @@ class AuditLogFinder
     audit_events = AuditEvent.order(id: :desc) # rubocop: disable CodeReuse/ActiveRecord
     audit_events = by_entity(audit_events)
     audit_events = by_created_at(audit_events)
+    audit_events = by_id(audit_events)
 
     audit_events
   end
@@ -30,6 +31,12 @@ class AuditLogFinder
     end
 
     audit_events
+  end
+
+  def by_id(audit_events)
+    return audit_events unless params[:id].present?
+
+    audit_events.find_by_id(params[:id])
   end
 
   def valid_entity_type?
