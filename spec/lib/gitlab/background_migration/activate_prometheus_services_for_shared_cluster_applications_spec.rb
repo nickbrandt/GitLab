@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedClusterApplications, :migration, schema: 2019_11_11_115431 do
+describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedClusterApplications, :migration, schema: 2019_11_11_115431 do
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
   let(:services) { table(:services) }

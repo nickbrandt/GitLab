@@ -4,7 +4,7 @@
 
 module Gitlab
   module BackgroundMigration
-    class CreateMissingPrometheusServicesForSharedClusterApplications
+    class ActivatePrometheusServicesForSharedClusterApplications
       include Gitlab::Database::MigrationHelpers
 
       module Migratable
