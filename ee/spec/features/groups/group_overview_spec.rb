@@ -45,7 +45,7 @@ describe 'Group overview', :js do
         page.within(find('aside')) do
           expect(page).to have_content 'Vulnerabilities over time'
           expect(page).to have_selector('.js-vulnerabilities-chart-time-info')
-          expect(page).to have_selector('.js-vulnerabilities-chart-line-chart')
+          expect(page).to have_selector('.js-vulnerabilities-chart-severity-level-breakdown')
         end
       end
     end
