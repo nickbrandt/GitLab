@@ -54,7 +54,7 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
       end
 
       it 'does not change them' do
-        expect { subject.perform }.not_to change { services.where(type: other_type).order(:id).map { |row| row.attributes } }
+        expect { subject.perform(start_id, stop_id) }.not_to change { services.where(type: other_type).order(:id).map { |row| row.attributes } }
       end
     end
 
@@ -66,13 +66,13 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
       end
 
       it 'does not change them' do
-        expect { subject.perform }.not_to change { services.order(:id).map { |row| row.attributes } }
+        expect { subject.perform(start_id, stop_id) }.not_to change { services.order(:id).map { |row| row.attributes } }
       end
     end
 
     shared_context 'prometheus integration services do not exist' do
       it 'creates missing services entries' do
-        subject.perform
+        subject.perform(start_id, stop_id)
 
         rows = services.order(:id).map { |row| row.attributes.slice(*columns).symbolize_keys }
 
@@ -87,7 +87,7 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
         end
 
         it 'does not change them' do
-          expect { subject.perform }.not_to change { services.order(:id).map { |row| row.attributes } }
+          expect { subject.perform(start_id, stop_id) }.not_to change { services.order(:id).map { |row| row.attributes } }
         end
       end
 
@@ -99,7 +99,7 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
         it 'sets active attribute to true' do
           rows_before = expected_rows(project_records).map { |row| row.merge(active: false) }
 
-          expect { subject.perform }
+          expect { subject.perform(start_id, stop_id) }
               .to change { services.order(:id).map { |row| row.attributes.slice(*columns).symbolize_keys } }
                       .from(rows_before).to(expected_rows(project_records))
         end
@@ -113,7 +113,7 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
       end
 
       it 'fixes data state' do
-        subject.perform
+        subject.perform(start_id, stop_id)
 
         rows = services.order(:project_id).map { |row| row.attributes.slice(*columns).symbolize_keys }
 
@@ -121,9 +121,9 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
       end
 
       it 'is idempotent' do
-        subject.perform
+        subject.perform(start_id, stop_id)
 
-        expect { subject.perform }.not_to change { services.order(:id).map { |row| row.attributes } }
+        expect { subject.perform(start_id, stop_id) }.not_to change { services.order(:id).map { |row| row.attributes } }
       end
     end
 
@@ -132,6 +132,8 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
       let(:project) { projects.create(namespace_id: namespace.id) }
       let(:cluster) { clusters.create(name: 'cluster', cluster_type: 2) }
       let!(:project_records) { [project] }
+      let(:start_id) { project.id }
+      let(:stop_id) { project.id }
 
       before do
         cluster_groups.create(group_id: namespace.id, cluster_id: cluster.id)
@@ -148,7 +150,9 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
         let(:project3) { projects.create(namespace_id: namespace.id) }
         let(:active_projects) { [project2] }
         let(:inactive_projects) { [project3] }
-        let(:project_records) { [project, project2, project3] }
+        let(:project_records) { [project, project2, project3].sort_by(&:id) }
+        let(:start_id) { project_records[0].id }
+        let(:stop_id) { project_records[-1].id }
 
         include_context 'prometheus integrations partially missing services and outdated'
       end
@@ -159,6 +163,8 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
       let(:project) { projects.create(namespace_id: namespace.id) }
       let(:cluster) { clusters.create(name: 'cluster', cluster_type: 1) }
       let!(:project_records) { [project] }
+      let(:start_id) { project.id }
+      let(:stop_id) { project.id }
 
       before do
         clusters_applications_prometheus.create(cluster_id: cluster.id, status: 3, version: '123')
@@ -174,7 +180,9 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
         let(:project3) { projects.create(namespace_id: namespace.id) }
         let(:active_projects) { [project2] }
         let(:inactive_projects) { [project3] }
-        let(:project_records) { [project, project2, project3] }
+        let(:project_records) { [project, project2, project3].sort_by(&:id) }
+        let(:start_id) { project_records[0].id }
+        let(:stop_id) { project_records[-1].id }
 
         include_context 'prometheus integrations partially missing services and outdated'
       end
@@ -188,6 +196,8 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
       let(:group_project) { projects.create(namespace_id: group.id) }
       let(:group_cluster) { clusters.create(name: 'cluster', cluster_type: 2) }
       let!(:project_records) { [project, group_project] }
+      let(:start_id) { project.id < group_project.id ? project.id : group_project.id }
+      let(:stop_id) { project.id > group_project.id ? project.id : group_project.id }
 
       before do
         clusters_applications_prometheus.create(cluster_id: cluster.id, status: 3, version: '123')
@@ -207,7 +217,9 @@ describe Gitlab::BackgroundMigration::CreateMissingPrometheusServicesForSharedCl
         let(:group_project3) { projects.create(namespace_id: group.id) }
         let(:active_projects) { [project2, group_project2] }
         let(:inactive_projects) { [project3, group_project3] }
-        let(:project_records) { [project, group_project, project2, group_project2, project3, group_project3] }
+        let(:project_records) { [project, group_project, project2, group_project2, project3, group_project3].sort_by(&:id) }
+        let(:start_id) { project_records[0].id }
+        let(:stop_id) { project_records[-1].id }
 
         include_context 'prometheus integrations partially missing services and outdated'
       end

@@ -7,12 +7,9 @@ module Gitlab
     class CreateMissingPrometheusServicesForSharedClusterApplications
       include Gitlab::Database::MigrationHelpers
 
-      BATCH_SIZE = 1_000
-
       module Migratable
         class Project < ActiveRecord::Base
           self.table_name = 'projects'
-          include EachBatch
 
           def self.with_group_clusters
             joins("INNER JOIN namespaces ON namespaces.id = projects.namespace_id ")
@@ -24,18 +21,17 @@ module Gitlab
 
           def self.with_missing_prometheus_services
             joins("LEFT JOIN services ON services.project_id = projects.id AND services.type = 'PrometheusService'")
-                .where("services.id IS NULL")
+              .where("services.id IS NULL")
           end
         end
 
         class Cluster < ActiveRecord::Base
           self.table_name = 'clusters'
-          include EachBatch
 
           def self.has_prometheus_application?
             joins("INNER JOIN clusters_applications_prometheus ON clusters_applications_prometheus.cluster_id = clusters.id
                    AND clusters_applications_prometheus.status IN (3,5)")
-                .where("clusters.cluster_type = 1").exists?
+              .where("clusters.cluster_type = 1").exists?
           end
         end
 
@@ -54,46 +50,50 @@ module Gitlab
         end
       end
 
-      def perform
-        ## group clusters
-        ### Reactivate existing services which weren't configured manually
-        Migratable::PrometheusService.inactive_with_group_clusters.update_all(active: true)
-
-        ### create missing entries
-        Migratable::Project.with_group_clusters.with_missing_prometheus_services.each_batch(of: BATCH_SIZE) do |projects_batch|
-          sql_values = sql_values_for(projects_batch)
-
-          insert_into_cluster_kubernetes_namespace(sql_values)
-        end
-
-        ## instance clusters
-        return unless Migratable::Cluster.has_prometheus_application?
-
-        ### Reactivate existing services which weren't configured manually
-        Migratable::PrometheusService
-          .joins("INNER JOIN projects ON projects.id = services.project_id")
-          .where("services.type = 'PrometheusService' AND services.active = FALSE AND services.properties = '{}'")
-          .update_all(active: true)
-
-        ### create missing entries
-        Migratable::Project.joins("LEFT JOIN services ON services.project_id = projects.id AND services.type = 'PrometheusService'")
-          .where("services.id IS NULL")
-            .each_batch(of: BATCH_SIZE) do |projects_batch|
-              sql_values = sql_values_for(projects_batch)
-
-              insert_into_cluster_kubernetes_namespace(sql_values)
-            end
+      def perform(start_id, stop_id)
+        migrate_group_clusters(start_id, stop_id)
+        migrate_instance_clusters(start_id, stop_id)
       end
 
       private
 
-      def sql_values_for(cluster_projects)
-        cluster_projects.map do |cluster_project|
-          values_for_cluster_project(cluster_project)
-        end
+      def migrate_instance_clusters(start_id, stop_id)
+        return unless Migratable::Cluster.has_prometheus_application?
+
+        ### Reactivate existing services which weren't configured manually
+        Migratable::PrometheusService
+            .joins("INNER JOIN projects ON projects.id = services.project_id")
+            .where("services.type = 'PrometheusService' AND services.active = FALSE AND services.properties = '{}'")
+            .where(projects: { id: start_id..stop_id })
+            .update_all(active: true)
+
+        ### create missing entries
+        sql_values = Migratable::Project
+                         .joins("LEFT JOIN services ON services.project_id = projects.id AND services.type = 'PrometheusService'")
+                         .where(services: { id: nil }, projects: { id: start_id..stop_id })
+                         .map(&method(:values_for_prometheus_service))
+
+        insert_into_services(sql_values)
       end
 
-      def values_for_cluster_project(project)
+      def migrate_group_clusters(start_id, stop_id)
+        ### Reactivate existing services which weren't configured manually
+        Migratable::PrometheusService
+            .inactive_with_group_clusters
+            .where(projects: { id: start_id..stop_id })
+            .update_all(active: true)
+
+        ### create missing entries
+        sql_values = Migratable::Project
+                         .with_group_clusters
+                         .with_missing_prometheus_services
+                         .where(projects: { id: start_id..stop_id })
+                         .map(&method(:values_for_prometheus_service))
+
+        insert_into_services(sql_values)
+      end
+
+      def values_for_prometheus_service(project)
         {
             project_id: project.id,
             active: true,
@@ -119,7 +119,7 @@ module Gitlab
         }
       end
 
-      def insert_into_cluster_kubernetes_namespace(rows)
+      def insert_into_services(rows)
         Gitlab::Database.bulk_insert(Migratable::PrometheusService.table_name,
                                      rows,
                                      disable_quote: [:created_at, :updated_at])
