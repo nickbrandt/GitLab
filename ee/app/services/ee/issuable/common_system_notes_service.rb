@@ -10,8 +10,10 @@ module EE
       def execute(_issuable, old_labels: [], is_update: true)
         super
 
-        handle_weight_change_note
-        handle_date_change_note if is_update
+        ActiveRecord::Base.no_touching do
+          handle_weight_change_note
+          handle_date_change_note if is_update
+        end
       end
 
       private
