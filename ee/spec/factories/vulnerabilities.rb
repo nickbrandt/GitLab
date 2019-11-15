@@ -14,9 +14,14 @@ FactoryBot.define do
       state { :opened }
     end
 
+    trait :resolved do
+      state { :resolved }
+      resolved_at { Time.current }
+    end
+
     trait :closed do
       state { :closed }
-      closed_at { Time.now }
+      closed_at { Time.current }
     end
 
     trait :with_findings do

@@ -286,7 +286,7 @@ describe Security::PipelineVulnerabilitiesFinder do
           expect(confirmed.state).to eq 'confirmed'
           expect(resolved.state).to eq 'resolved'
           expect(dismissed.state).to eq 'dismissed'
-          expect(subject - [confirmed, resolved, dismissed]).to all have_attributes(state: 'new')
+          expect(subject - [confirmed, resolved, dismissed]).to all have_attributes(state: 'opened')
         end
       end
 

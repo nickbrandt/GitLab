@@ -26,7 +26,7 @@ describe Vulnerabilities::ResolveService do
         resolve_vulnerability
 
         expect(vulnerability.reload).to(
-          have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.zone.now)))
+          have_attributes(state: 'resolved', resolved_by: user, resolved_at: be_like_time(Time.current)))
       end
     end
 
