@@ -267,6 +267,7 @@ export default {
             @done="onDesignDelete"
           >
             <delete-button
+              v-if="isLatestVersion"
               :is-deleting="loading"
               button-class="btn-danger btn-inverted mr-2"
               :has-selected-designs="hasSelectedDesigns"
