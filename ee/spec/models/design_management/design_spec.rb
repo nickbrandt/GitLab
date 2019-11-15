@@ -17,6 +17,7 @@ describe DesignManagement::Design do
     it { is_expected.to have_many(:actions) }
     it { is_expected.to have_many(:versions) }
     it { is_expected.to have_many(:notes).dependent(:delete_all) }
+    it { is_expected.to have_many(:user_mentions) }
   end
 
   describe 'validations' do

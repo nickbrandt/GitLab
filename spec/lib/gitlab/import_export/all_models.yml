@@ -541,6 +541,7 @@ design: &design
 - actions
 - versions
 - notes
+- user_mentions
 designs: *design
 actions:
 - design
