@@ -15,16 +15,20 @@ We will use the GCP stack as an example in this guide. The instructions for AWS 
 First, we need to declare some environment variables with configuration that will be used throughout this guide:
 
 ```sh
-export PROJECT_ID=crossplane-playground # the project that all resources reside.
-export NETWORK_NAME=default # the network that your GKE cluster lives in.
-export REGION=us-central1 # the region where the GKE cluster lives in.
+export PROJECT_ID=crossplane-playground # the GCP project where all resources reside.
+export NETWORK_NAME=default # the GCP network where your GKE is provisioned.
+export REGION=us-central1 # the GCP region where the GKE cluster is provisioned.
 ```
 
 ### Configure RBAC permissions
 
 - For a non-GitLab managed cluster(s), ensure that the service account for the token provided can manage resources in the `database.crossplane.io` API group.
-We need to manually grant GitLab's service account the ability to manage resources in the database.crossplane.io API group. The Aggregated ClusterRole allows us to do that.
-First, save the following YAML as `crossplane-database-role.yaml`
+Manually grant GitLab's service account the ability to manage resources in the
+`database.crossplane.io` API group. The Aggregated ClusterRole allows us to do that.
+​
+NOTE: **Note:**
+For a non-GitLab managed cluster, ensure that the service account for the token provided can manage resources in the `database.crossplane.io` API group.
+​1. Save the following YAML as `crossplane-database-role.yaml`:
 
 ```sh
 cat > crossplane-database-role.yaml <<EOF
@@ -50,23 +54,31 @@ rules:
 EOF
 ```
 
+Once the file is created, apply it with the following command in order to create the necessary role:
+
 ```sh
 kubectl apply -f crossplane-database-role.yaml
 ```
 
 ### Configure Crossplane with the cloud provider
 
-Follow the steps to configure the installed cloud provider stack with a user account.
-> **Note: The Secret and the Provider resource referencing the Secret needs to be applied to the `gitlab-managed-apps` namespace in the guide. Make sure you change that while following the guide**
+See [Configure Your Cloud Provider Account](https://crossplane.io/docs/v0.4/cloud-providers.html)
+to configure the installed cloud provider stack with a user account.
+
+Note that the Secret and the Provider resource referencing the Secret needs to be
+applied to the `gitlab-managed-apps` namespace in the guide. Make sure you change that
+while following the process.
 
 [Configure Providers](https://crossplane.io/docs/v0.4/cloud-providers.html)
 
 ### Configure Managed Service Access
 
-We need to configure connectivity between the Postgres database and the GKE cluster. This can be configured by creating a [Private Service Connection](https://cloud.google.com/vpc/docs/configure-private-services-access)
+We need to configure connectivity between the PostgreSQL database and the GKE cluster.
+This can done by either:
 
-We can either use Crossplane to achieve this as demonstrated below or directly in the GCP console by following the above link.
-
+- Using Crossplane as demonstrated below.
+- Directly in the GCP console by
+[configuring private services access](https://cloud.google.com/vpc/docs/configure-private-services-access).
 Create a GlobalAddress and Connection resources:
 
 ```sh
@@ -106,6 +118,8 @@ spec:
 EOF
 ```
 
+Apply the settings specified in the file with the following command:
+
 ```sh
 kubectl apply -f network.yaml
 ```
@@ -115,7 +129,6 @@ Verify that the status of both of these resources is ready and is synced.
 
 ```sh
 kubectl describe connection.servicenetworking.gcp.crossplane.io gitlab-ad-connection
-
 kubectl describe globaladdress.compute.gcp.crossplane.io gitlab-ad-globaladdress
 ```
 
@@ -176,12 +189,13 @@ specTemplate:
 EOF
 ```
 
+Apply the resource class configuration with the following command:
+
 ```sh
 kubectl apply -f gcp-postgres-standard.yaml
-
 ```
 
-Verify creation of the Resource class
+Verify creation of the Resource class with the following command:
 
 ```sh
 kubectl get cloudsqlinstanceclasses
@@ -193,11 +207,20 @@ The Resource Classes allow you to define classes of service for a managed servic
 
 The Auto DevOps pipeline can be run with the following options:
 
-1. `postgres.managed` set to true which will select a default resourceclass. The resourceclass needs to be marked with the annotation `resourceclass.crossplane.io/is-default-class: "true"` (As per the guide the CloudSQLInstanceClass `cloudsqlinstancepostgresql-standard-default` will be used to satisfy the claim )
+The Environment variables, `AUTO_DEVOPS_POSTGRES_MANAGED` and `AUTO_DEVOPS_POSTGRES_MANAGED_CLASS_SELECTOR` need to be set to provision PostgresQL using Crossplane
 
-1. `postgres.managed` set to true with `postgres.managedClassSelector` providing the resource class to choose based on labels. In this case the value of `postgres.managedClassSelector.matchLabels.gitlab-ad-demo="true"` will select the CloudSQLInstance class `cloudsqlinstancepostgresql-standard` to satisfy the claim request.
+Alertnatively, the following options can be overridden from the values for the helm chart.
 
-Alertnatively, the Environment variables `AUTO_DEVOPS_POSTGRES_MANAGED` and `AUTO_DEVOPS_POSTGRES_MANAGED_CLASS_SELECTOR` could also be used in the Auto DevOps pipeline.
+- `postgres.managed` set to true which will select a default resource class.
+     The resource class needs to be marked with the annotation
+     `resourceclass.crossplane.io/is-default-class: "true"`. The CloudSQLInstanceClass
+     `cloudsqlinstancepostgresql-standard-default` will be used to satisfy the claim.
+
+- `postgres.managed` set to `true` with `postgres.managedClassSelector`
+     providing the resource class to choose based on labels. In this case, the
+     value of `postgres.managedClassSelector.matchLabels.gitlab-ad-demo="true"`
+     will select the CloudSQLInstance class `cloudsqlinstancepostgresql-standard`
+     to satisfy the claim request.
 
 The Auto DevOps pipeline should provision a PostgresqlInstance when it runs succesfully.
 
@@ -216,7 +239,7 @@ staging-test8   Bound    CloudSQLInstanceClass   cloudsqlinstancepostgresql-stan
 
 The endpoint of the PostgreSQL instance, and the user credentials, are present in a secret called `app-postgres` within the same project namespace.
 
-Verify the secret with the database information is created.
+Verify the secret with the database information is created with the following command:
 
 ```sh
 kubectl describe secret app-postgres
@@ -248,7 +271,6 @@ password:                             27 bytes
 serverCACertificateCommonName:        98 bytes
 serverCACertificateInstance:          41 bytes
 serverCACertificateSha1Fingerprint:   40 bytes
-
 ```
 
 ### Connect to the PostgresQL instance
