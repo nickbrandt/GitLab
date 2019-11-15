@@ -58,6 +58,7 @@ class TrialsController < ApplicationController
     attrs[:skip_email_confirmation] = true
     attrs[:gitlab_com_trial] = true
     attrs[:provider] = 'gitlab'
+    attrs[:newsletter_segment] = current_user.email_opted_in
 
     attrs
   end
