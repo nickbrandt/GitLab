@@ -1,5 +1,6 @@
 import axios from '~/lib/utils/axios_utils';
 import { joinPaths } from '~/lib/utils/url_utility';
+import { escapeFileUrl } from '../stores/utils';
 import Api from '~/api';
 
 export default {
@@ -24,18 +25,25 @@ export default {
       .then(({ data }) => data);
   },
   getBaseRawFileData(file, sha) {
-    if (file.tempFile) {
-      return Promise.resolve(file.baseRaw);
-    }
+    if (file.tempFile || file.baseRaw) return Promise.resolve(file.baseRaw);
 
-    if (file.baseRaw) {
-      return Promise.resolve(file.baseRaw);
-    }
+    // if files are renamed, their base path has changed
+    const filePath =
+      file.mrChange && file.mrChange.renamed_file ? file.mrChange.old_path : file.path;
 
     return axios
-      .get(joinPaths(gon.relative_url_root || '/', file.projectId, 'raw', sha, file.path), {
-        transformResponse: [f => f],
-      })
+      .get(
+        joinPaths(
+          gon.relative_url_root || '/',
+          file.projectId,
+          'raw',
+          sha,
+          escapeFileUrl(filePath),
+        ),
+        {
+          transformResponse: [f => f],
+        },
+      )
       .then(({ data }) => data);
   },
   getProjectData(namespace, project) {
