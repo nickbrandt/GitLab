@@ -3,7 +3,14 @@
 Once Crossplane [is installed](applications.md#crossplane), it must be configured for
 use.
 
-## Introduction
+The process of configuring Crossplane includes:
+
+1. Configuring RBAC permissions.
+1. Configuring Crossplane with a cloud provider.
+1. Configure managed service access.
+1. Setting up Resource classes.
+1. Using Auto DevOps configuration options.
+1. Connect to the PostgreSQL instance.
 
 To allow Crossplane to provision cloud services such as PostgreSQL, the cloud provider
 stack must be configured with a user account. For example:
@@ -26,7 +33,7 @@ export NETWORK_NAME=default # the GCP network where your GKE is provisioned.
 export REGION=us-central1 # the GCP region where the GKE cluster is provisioned.
 ```
 
-### Configure RBAC permissions
+## Configure RBAC permissions
 
 - For a non-GitLab managed cluster(s), ensure that the service account for the token provided can manage resources in the `database.crossplane.io` API group.
 Manually grant GitLab's service account the ability to manage resources in the
@@ -66,7 +73,7 @@ Once the file is created, apply it with the following command in order to create
 kubectl apply -f crossplane-database-role.yaml
 ```
 
-### Configure Crossplane with a cloud provider
+## Configure Crossplane with a cloud provider
 
 See [Configure Your Cloud Provider Account](https://crossplane.io/docs/v0.4/cloud-providers.html)
 to configure the installed cloud provider stack with a user account.
@@ -77,7 +84,7 @@ while following the process.
 
 [Configure Providers](https://crossplane.io/docs/v0.4/cloud-providers.html)
 
-### Configure Managed Service Access
+## Configure Managed Service Access
 
 We need to configure connectivity between the PostgreSQL database and the GKE cluster.
 This can done by either:
@@ -138,7 +145,7 @@ kubectl describe connection.servicenetworking.gcp.crossplane.io gitlab-ad-connec
 kubectl describe globaladdress.compute.gcp.crossplane.io gitlab-ad-globaladdress
 ```
 
-### Setting up Resource classes
+## Setting up Resource classes
 
 Resource classes are a way of defining a configuration for the required managed service. We will define the Postgres Resource class
 
@@ -209,7 +216,7 @@ kubectl get cloudsqlinstanceclasses
 
 The Resource Classes allow you to define classes of service for a managed service. We could create another `CloudSQLInstanceClass` which requests for a larger or a faster disk. It could also request for a specific version of the database.
 
-### Auto DevOps Configuration Options
+## Auto DevOps Configuration Options
 
 The Auto DevOps pipeline can be run with the following options:
 
@@ -279,7 +286,7 @@ serverCACertificateInstance:          41 bytes
 serverCACertificateSha1Fingerprint:   40 bytes
 ```
 
-### Connect to the PostgresQL instance
+## Connect to the PostgresQL instance
 
 Follow this [GCP guide](https://cloud.google.com/sql/docs/postgres/connect-kubernetes-engine) if you
 would like to connect to the newly provisioned Postgres database instance on CloudSQL.
