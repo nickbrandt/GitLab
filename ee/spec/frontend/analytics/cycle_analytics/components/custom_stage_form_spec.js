@@ -33,13 +33,13 @@ describe('CustomStageForm', () => {
   let wrapper = null;
 
   const sel = {
-    name: '[name="add-stage-name"]',
-    startEvent: '[name="add-stage-start-event"]',
-    startEventLabel: '[name="add-stage-start-event-label"]',
-    stopEvent: '[name="add-stage-stop-event"]',
-    stopEventLabel: '[name="add-stage-stop-event-label"]',
-    submit: '.js-add-stage',
-    cancel: '.js-add-stage-cancel',
+    name: '[name="custom-stage-name"]',
+    startEvent: '[name="custom-stage-start-event"]',
+    startEventLabel: '[name="custom-stage-start-event-label"]',
+    stopEvent: '[name="custom-stage-stop-event"]',
+    stopEventLabel: '[name="custom-stage-stop-event-label"]',
+    submit: '.js-custom-stage-form-submit',
+    cancel: '.js-custom-stage-form-cancel',
     invalidFeedback: '.invalid-feedback',
   };
 
@@ -405,10 +405,10 @@ describe('CustomStageForm', () => {
           const res = [
             {
               name: 'Cool stage',
-              startEvent: startEv.identifier,
-              startEventLabel: null,
-              stopEvent: selectedStopEvent.attributes('value'),
-              stopEventLabel: null,
+              start_event_identifier: startEv.identifier,
+              start_event_label_id: null,
+              end_event_identifier: selectedStopEvent.attributes('value'),
+              end_event_label_id: null,
             },
           ];
 
@@ -597,11 +597,38 @@ describe('CustomStageForm', () => {
           Vue.nextTick(() => {
             const submitted = wrapper.emitted().submit[0];
             expect(submitted).not.toEqual([initData]);
-            expect(submitted).toEqual([{ ...initData, name: 'Cool updated form' }]);
+            expect(submitted).toEqual([
+              {
+                start_event_identifier: labelStartEvent.identifier,
+                start_event_label_id: groupLabels[0].id,
+                end_event_identifier: labelStopEvent.identifier,
+                end_event_label_id: groupLabels[1].id,
+                name: 'Cool updated form',
+              },
+            ]);
             done();
           });
         });
       });
+    });
+  });
+
+  it('does not have a loading icon', () => {
+    expect(wrapper.find(sel.submit).html()).toMatchSnapshot();
+  });
+
+  describe('isSavingCustomStage=true', () => {
+    beforeEach(() => {
+      wrapper = createComponent(
+        {
+          isSavingCustomStage: true,
+        },
+        false,
+      );
+    });
+
+    it('displays a loading icon', () => {
+      expect(wrapper.find(sel.submit).html()).toMatchSnapshot();
     });
   });
 });

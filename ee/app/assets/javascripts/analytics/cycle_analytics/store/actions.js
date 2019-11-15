@@ -157,3 +157,38 @@ export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
     .then(({ data }) => dispatch('receiveGroupStagesAndEventsSuccess', data))
     .catch(error => dispatch('receiveGroupStagesAndEventsError', error));
 };
+
+export const requestCreateCustomStage = ({ commit }) => commit(types.REQUEST_CREATE_CUSTOM_STAGE);
+export const receiveCreateCustomStageSuccess = ({ commit, dispatch }, { data: { title } }) => {
+  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE);
+  createFlash(__(`Your custom stage '${title}' was created`), 'notice');
+
+  return dispatch('fetchGroupStagesAndEvents').then(() => dispatch('fetchSummaryData'));
+};
+
+export const receiveCreateCustomStageError = ({ commit }, { error, data }) => {
+  commit(types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE);
+
+  const { name } = data;
+  const { status } = error;
+  const message =
+    status !== httpStatus.UNPROCESSABLE_ENTITY
+      ? __(`'${name}' stage already exists'`)
+      : __('There was a problem saving your custom stage, please try again');
+
+  createFlash(message);
+};
+
+export const createCustomStage = ({ dispatch, state }, data) => {
+  const {
+    selectedGroup: { fullPath },
+  } = state;
+
+  const endpoint = `/-/analytics/cycle_analytics/stages?group_id=${fullPath}`;
+  dispatch('requestCreateCustomStage');
+
+  axios
+    .post(endpoint, data)
+    .then(response => dispatch('receiveCreateCustomStageSuccess', response))
+    .catch(error => dispatch('receiveCreateCustomStageError', { error, data }));
+};

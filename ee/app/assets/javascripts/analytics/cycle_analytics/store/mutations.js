@@ -120,4 +120,10 @@ export default {
       state.selectedStageId = id;
     }
   },
+  [types.REQUEST_CREATE_CUSTOM_STAGE](state) {
+    state.isSavingCustomStage = true;
+  },
+  [types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE](state) {
+    state.isSavingCustomStage = false;
+  },
 };

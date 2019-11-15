@@ -48,6 +48,7 @@ export default {
       'isLoadingStage',
       'isEmptyStage',
       'isAddingCustomStage',
+      'isSavingCustomStage',
       'selectedGroup',
       'selectedProjectIds',
       'selectedStageId',
@@ -87,6 +88,7 @@ export default {
       'fetchCustomStageFormData',
       'fetchCycleAnalyticsData',
       'fetchStageData',
+      'fetchGroupStagesAndEvents',
       'setCycleAnalyticsDataEndpoint',
       'setStageDataEndpoint',
       'setSelectedGroup',
@@ -97,6 +99,7 @@ export default {
       'hideCustomStageForm',
       'showCustomStageForm',
       'setDateRange',
+      'createCustomStage',
     ]),
     onGroupSelect(group) {
       this.setCycleAnalyticsDataEndpoint(group.full_path);
@@ -121,6 +124,9 @@ export default {
       const endDate = new Date(Date.now());
       const startDate = getDateInPast(endDate, DEFAULT_DAYS_IN_PAST);
       this.setDateRange({ skipFetch: true, startDate, endDate });
+    },
+    onCreateCustomStage(data) {
+      this.createCustomStage(data);
     },
   },
   groupsQueryParams: {
@@ -209,6 +215,7 @@ export default {
             :is-loading="isLoadingStage"
             :is-empty-stage="isEmptyStage"
             :is-adding-custom-stage="isAddingCustomStage"
+            :is-saving-custom-stage="isSavingCustomStage"
             :current-stage-events="currentStageEvents"
             :custom-stage-form-events="customStageFormEvents"
             :labels="labels"
@@ -217,6 +224,7 @@ export default {
             :can-edit-stages="hasCustomizableCycleAnalytics"
             @selectStage="onStageSelect"
             @showAddStageForm="onShowAddStageForm"
+            @submit="onCreateCustomStage"
           />
         </div>
       </div>
