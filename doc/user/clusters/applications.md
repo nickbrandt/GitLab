@@ -408,11 +408,12 @@ The Crossplane GitLab-managed application:
   PostgreSQL (for example, CloudSQL from GCP or RDS from AWS) and other services
   required by the application via the Auto DevOps pipeline.
 
-For configuring Crossplane on the cluster navigate to [Crossplane configuration with GitLab](./crossplane.md).
+For information on configuring Crossplane installed on the cluster, see
+[Crossplane configuration](crossplane.md).
 
 NOTE: **Note:**
-The [`alpha/crossplane`](https://charts.crossplane.io/alpha/)
-v0.4.1 chart is used to install this application with a
+[`alpha/crossplane`](https://charts.crossplane.io/alpha/) chart v0.4.1 is used to
+install Crossplane using the
 [`values.yaml`](https://github.com/crossplaneio/crossplane/blob/master/cluster/charts/crossplane/values.yaml.tmpl)
 file.
 

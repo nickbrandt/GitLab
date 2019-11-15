@@ -1,16 +1,22 @@
-# Crossplane configuration guide
+# Crossplane configuration
+
+Once Crossplane [is installed](applications.md#crossplane), it must be configured for
+use.
 
 ## Introduction
 
-In order to allow Crossplane to provision cloud services such as Postgres, it requires the cloud provider stack to be configured with a user account (eg: a service account in case of GCP, an IAM user in case of AWS).
+To allow Crossplane to provision cloud services such as PostgreSQL, the cloud provider
+stack must be configured with a user account. For example:
 
-For this guide the pre-requisites are as follows:
+- A service account for GCP.
+- An IAM user for AWS.
 
-- Crossplane was previously installed as a [GitLab Managed App](./applications.md#crossplane) on the connected kubernetes cluster with a choice of the stack.
+Important notes:
 
-We will use the GCP stack as an example in this guide. The instructions for AWS and Azure will be similar to this.
-
-> Note: Crossplane requires the kubernetes cluster to be VPC Native with Alias IPs enabled so that the IP address of the Pods are routable within the GCP network.
+- This guide uses GCP as an example. However, the process for AWS and Azure will be
+similar.
+- Crossplane requires the Kubernetes cluster to be VPC native with Alias IPs enabled so
+that the IP address of the pods are routable within the GCP network.
 
 First, we need to declare some environment variables with configuration that will be used throughout this guide:
 
@@ -60,7 +66,7 @@ Once the file is created, apply it with the following command in order to create
 kubectl apply -f crossplane-database-role.yaml
 ```
 
-### Configure Crossplane with the cloud provider
+### Configure Crossplane with a cloud provider
 
 See [Configure Your Cloud Provider Account](https://crossplane.io/docs/v0.4/cloud-providers.html)
 to configure the installed cloud provider stack with a user account.
@@ -132,7 +138,7 @@ kubectl describe connection.servicenetworking.gcp.crossplane.io gitlab-ad-connec
 kubectl describe globaladdress.compute.gcp.crossplane.io gitlab-ad-globaladdress
 ```
 
-### Setup Resource classes
+### Setting up Resource classes
 
 Resource classes are a way of defining a configuration for the required managed service. We will define the Postgres Resource class
 
