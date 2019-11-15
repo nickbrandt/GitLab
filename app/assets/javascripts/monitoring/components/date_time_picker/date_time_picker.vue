@@ -55,6 +55,11 @@ export default {
       };
     },
   },
+  watch: {
+    selectedTimeWindow() {
+      this.verifyTimeRange();
+    },
+  },
   mounted() {
     this.verifyTimeRange();
   },
