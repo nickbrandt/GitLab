@@ -90,6 +90,10 @@ describe Packages::GroupPackagesFinder do
         end
 
         it 'returns group packages' do
+          package1 = create(:maven_package, project: project)
+          package2 = create(:maven_package, project: project)
+          create(:maven_package)
+
           expect(finder.execute).to match_array([package1, package2])
         end
       end
@@ -100,6 +104,9 @@ describe Packages::GroupPackagesFinder do
             builds_access_level: ProjectFeature::PRIVATE,
             merge_requests_access_level: ProjectFeature::PRIVATE,
             repository_access_level: ProjectFeature::PRIVATE)
+
+          create(:maven_package, project: project)
+          create(:maven_package)
         end
 
         it 'filters out the project if the user doesn\'t have permission' do
