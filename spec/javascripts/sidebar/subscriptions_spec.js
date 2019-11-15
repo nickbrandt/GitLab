@@ -77,19 +77,24 @@ describe('Subscriptions', function() {
     expect(vm.$emit).toHaveBeenCalledWith('toggleSidebar');
   });
 
-  it('notify component disabled when project_emails_disabled is set on', () => {
-    vm = mountComponent(Subscriptions, {
-      subscribed: true,
-      projectEmailsDisabled: true,
-      subscribeDisabledDescription: 'Notifications have been disabled',
+  describe('given project emails are disabled', () => {
+    const subscribeDisabledDescription = 'Notifications have been disabled';
+
+    beforeEach(() => {
+      vm = mountComponent(Subscriptions, {
+        subscribed: false,
+        projectEmailsDisabled: true,
+        subscribeDisabledDescription,
+      });
     });
 
-    expect(vm.$el.querySelector('span').getAttribute('data-original-title')).toBe(
-      vm.subscribeDisabledDescription,
-    );
+    it('sets the correct display text', () => {
+      expect(vm.$el.textContent).toContain(subscribeDisabledDescription);
+      expect(vm.$refs.tooltip.dataset.originalTitle).toBe(subscribeDisabledDescription);
+    });
 
-    expect(vm.$el.querySelector('.issuable-header-text').textContent.trim()).toBe(
-      vm.subscribeDisabledDescription,
-    );
+    it('does not render the toggle button', () => {
+      expect(vm.$refs.toggleButton).toBeUndefined();
+    });
   });
 });

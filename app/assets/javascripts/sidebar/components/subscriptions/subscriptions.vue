@@ -103,6 +103,7 @@ export default {
 <template>
   <div>
     <span
+      ref="tooltip"
       v-tooltip
       class="sidebar-collapsed-icon"
       :title="notificationTooltip"
