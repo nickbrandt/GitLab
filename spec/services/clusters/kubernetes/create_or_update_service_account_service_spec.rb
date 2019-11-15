@@ -174,6 +174,31 @@ describe Clusters::Kubernetes::CreateOrUpdateServiceAccountService do
         )
       end
 
+      it 'creates a role binding granting crossplane database permissions to the service account' do
+        subject
+
+        expect(WebMock).to have_requested(:put, api_url + "/apis/rbac.authorization.k8s.io/v1/namespaces/#{namespace}/rolebindings/#{Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_BINDING_NAME}").with(
+          body: hash_including(
+            metadata: {
+              name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_BINDING_NAME,
+              namespace: namespace
+            },
+            roleRef: {
+              apiGroup: 'rbac.authorization.k8s.io',
+              kind: 'Role',
+              name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_NAME
+            },
+            subjects: [
+              {
+                kind: 'ServiceAccount',
+                name: service_account_name,
+                namespace: namespace
+              }
+            ]
+          )
+        )
+      end
+
       it 'creates a role and role binding granting knative serving permissions to the service account' do
         subject
 
