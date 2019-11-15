@@ -74,23 +74,45 @@ export default {
         data.design.discussions,
         this.discussion.id,
       );
-      currentDiscussion.node.notes.edges = [
-        ...currentDiscussion.node.notes.edges,
-        {
-          __typename: 'NoteEdge',
-          node: createNote.note,
+
+      const updatedDiscussion = {
+        ...currentDiscussion,
+        node: {
+          ...currentDiscussion.node,
+          notes: {
+            ...currentDiscussion.node.notes,
+            edges: [
+              ...currentDiscussion.node.notes.edges,
+              { __typename: 'NoteEdge', node: createNote.note },
+            ],
+          },
         },
-      ];
+      };
+
+      const currentDiscussionIndex = data.design.discussions.edges.indexOf(currentDiscussion);
+
+      const payload = {
+        ...data,
+        design: {
+          ...data.design,
+          discussions: {
+            ...data.design.discussions,
+            edges: [
+              ...data.design.discussions.edges.slice(0, currentDiscussionIndex),
+              updatedDiscussion,
+              ...data.design.discussions.edges.slice(
+                currentDiscussionIndex + 1,
+                data.design.discussions.edges.length,
+              ),
+            ],
+          },
+          notesCount: data.design.notesCount + 1,
+        },
+      };
 
       store.writeQuery({
         query: getDesignQuery,
-        data: {
-          ...data,
-          design: {
-            ...data.design,
-            notesCount: data.design.notesCount + 1,
-          },
-        },
+        data: payload,
       });
     },
     onDone() {
