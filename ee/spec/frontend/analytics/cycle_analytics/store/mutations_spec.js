@@ -45,6 +45,8 @@ describe('Cycle analytics mutations', () => {
     ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'stages'}                | ${[]}
     ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'customStageFormEvents'} | ${[]}
     ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'customStageFormEvents'} | ${[]}
+    ${types.REQUEST_CREATE_CUSTOM_STAGE}           | ${'isSavingCustomStage'}   | ${true}
+    ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}   | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 

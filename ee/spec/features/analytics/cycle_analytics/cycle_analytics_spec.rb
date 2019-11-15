@@ -61,7 +61,7 @@ describe 'Group Cycle Analytics', :js do
     dropdown.click
     dropdown.find('a').click
 
-    wait_for_requests
+    wait_for_stages_to_load
   end
 
   def select_project
@@ -218,11 +218,7 @@ describe 'Group Cycle Analytics', :js do
 
     context 'enabled' do
       before do
-        dropdown = page.find('.dropdown-groups')
-        dropdown.click
-        dropdown.find('a').click
-
-        wait_for_stages_to_load
+        select_group
       end
 
       context 'Add a stage button' do
@@ -245,6 +241,77 @@ describe 'Group Cycle Analytics', :js do
           page.find(button_class).click
 
           expect(page).to have_text('New stage')
+        end
+      end
+
+      context 'Custom stage form' do
+        let(:show_form_button_class) { '.js-add-stage-button' }
+
+        def select_dropdown_option(name, elem = "option", index = 1)
+          page.find("select[name='#{name}']").all(elem)[index].select_option
+        end
+
+        before do
+          select_group
+
+          page.find(show_form_button_class).click
+          wait_for_requests
+        end
+
+        context 'with empty fields' do
+          it 'submit button is disabled by default' do
+            expect(page).to have_button('Add stage', disabled: true)
+          end
+        end
+
+        context 'with all required fields set' do
+          custom_stage_name = "cool beans"
+
+          before do
+            fill_in 'custom-stage-name', with: custom_stage_name
+            select_dropdown_option 'custom-stage-start-event'
+            select_dropdown_option 'custom-stage-stop-event'
+          end
+
+          it 'submit button is enabled' do
+            expect(page).to have_button('Add stage', disabled: false)
+          end
+
+          it 'submit button is disabled if the start event changes' do
+            select_dropdown_option 'custom-stage-start-event', 'option', 2
+
+            expect(page).to have_button('Add stage', disabled: true)
+          end
+
+          it 'an error message is displayed if the start event is changed' do
+            select_dropdown_option 'custom-stage-start-event', 'option', 2
+
+            expect(page).to have_text 'Start event changed, please select a valid stop event'
+          end
+
+          context 'submit button is clicked' do
+            it 'the custom stage is saved' do
+              click_button 'Add stage'
+
+              expect(page).to have_selector('.stage-nav-item', text: custom_stage_name)
+            end
+
+            it 'a confirmation message is displayed' do
+              name = 'cool beans number 2'
+              fill_in 'custom-stage-name', with: name
+              click_button 'Add stage'
+
+              expect(page.find('.flash-notice')).to have_text("Your custom stage '#{name}' was created")
+            end
+
+            it 'with a default name' do
+              name = 'issue'
+              fill_in 'custom-stage-name', with: name
+              click_button 'Add stage'
+
+              expect(page.find('.flash-alert')).to have_text("'#{name}' stage already exists")
+            end
+          end
         end
       end
     end

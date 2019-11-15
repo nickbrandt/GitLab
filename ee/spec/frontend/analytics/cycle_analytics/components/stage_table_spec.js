@@ -1,7 +1,13 @@
 import Vue from 'vue';
 import { shallowMount, mount } from '@vue/test-utils';
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
-import { issueEvents, issueStage, allowedStages, groupLabels } from '../mock_data';
+import {
+  issueEvents,
+  issueStage,
+  allowedStages,
+  groupLabels,
+  customStageEvents,
+} from '../mock_data';
 
 let wrapper = null;
 const $sel = {
@@ -30,10 +36,11 @@ function createComponent(props = {}, shallow = false) {
       isLoading: false,
       isEmptyStage: false,
       isAddingCustomStage: false,
+      isSavingCustomStage: false,
       noDataSvgPath,
       noAccessSvgPath,
       canEditStages: false,
-      customStageFormEvents: [],
+      customStageFormEvents: customStageEvents,
       ...props,
     },
     stubs: {

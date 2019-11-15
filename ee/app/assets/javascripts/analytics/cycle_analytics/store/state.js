@@ -16,6 +16,7 @@ export default () => ({
   errorCode: null,
 
   isAddingCustomStage: false,
+  isSavingCustomStage: false,
 
   selectedGroup: null,
   selectedProjectIds: [],
