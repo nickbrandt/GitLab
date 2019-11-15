@@ -58,9 +58,6 @@ export default {
   mounted() {
     this.verifyTimeRange();
   },
-  updated() {
-    this.verifyTimeRange();
-  },
   methods: {
     activeTimeWindow(key) {
       return this.timeWindows[key] === this.selectedTimeWindowText;
