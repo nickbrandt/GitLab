@@ -4,11 +4,13 @@ type: reference, how-to
 
 # Sourcegraph integration
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/16556) in GitLab 12.5.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/16556) in GitLab 12.5. Please note that this integration is [behind a feature flag](#enable-the-sourcegraph-feature-flag).
 
 [Sourcegraph](https://sourcegraph.com) provides code intelligence features, natively integrated into the GitLab UI.
 
-![Sourcegraph demo](img/sourcegraph_demo.png)
+For GitLab.com users, see [Sourcegraph for GitLab.com](#sourcegraph-for-gitlabcom).
+
+![Sourcegraph demo](img/sourcegraph_demo_v12_5.png)
 
 NOTE: **Note:**
 This feature requires user opt-in. After Sourcegraph has been enabled for your GitLab instance,
@@ -24,7 +26,7 @@ Before you can enable Sourcegraph code intelligence in GitLab you will need to:
 ### Enable the Sourcegraph feature flag
 
 NOTE: **Note:**
-If you are running a self-managed instance, the Sourcegraph feature will not be available
+If you are running a self-managed instance, the Sourcegraph integration will not be available
 unless the feature flag `sourcegraph` is enabled. This can be done from the Rails console
 by instance administrators.
 
@@ -39,7 +41,7 @@ cd /home/git/gitlab
 sudo -u git -H bin/rails console RAILS_ENV=production
 ```
 
-Then run to enable the feature flag:
+Then run the following command to enable the feature flag:
 
 ```
 Feature.enable(:sourcegraph)
@@ -70,7 +72,7 @@ You can skip this step if you already have your GitLab repositories searchable i
 1. Check **Enable Sourcegraph**.
 1. Set the Sourcegraph URL to your Sourcegraph instance, e.g., `https://sourcegraph.example.com`.
 
-![Sourcegraph admin settings](img/sourcegraph_admin.png)
+![Sourcegraph admin settings](img/sourcegraph_admin_v12_5.png)
 
 ## Enable Sourcegraph in user preferences
 
@@ -80,7 +82,7 @@ If a GitLab administrator has enabled Sourcegraph, you can enable this feature i
 1. Under **Integrations**, find the **Sourcegraph** section.
 1. Check **Enable Sourcegraph**.
 
-![Sourcegraph user preferences](img/sourcegraph_user_preferences.png)
+![Sourcegraph user preferences](img/sourcegraph_user_preferences_v12_5.png)
 
 ## Using Sourcegraph code intelligence
 
@@ -97,15 +99,15 @@ When visiting one of these views, you can now hover over a code reference to see
 - **Go to definition**, which navigates to the line of code where this reference was defined.
 - **Find references**, which navigates to the configured Sourcegraph instance, showing a list of references to the hilighted code.
 
-![Sourcegraph demo](img/sourcegraph_popover.png)
+![Sourcegraph demo](img/sourcegraph_popover_v12_5.png)
 
 ## Sourcegraph for GitLab.com
 
 Sourcegraph powered code intelligence will be incrementally rolled out on GitLab.com. It will eventually be
-available for all public projects, but for now, it is only available for some specific [`gitlab-org` projects](https://gitlab.com/gitlab-org/gitlab).
+available for all public projects, but for now, it is only available for some specific [`gitlab-org` projects](https://gitlab.com/gitlab-org/).
 
 If you have a private or internal project and would like integrated code intelligence, please consider
-setting up a self-hosted GitLab instance.
+setting up a self-managed GitLab instance.
 
 ## Sourcegraph and Privacy
 
