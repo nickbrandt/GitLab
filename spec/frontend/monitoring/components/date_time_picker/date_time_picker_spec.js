@@ -53,7 +53,7 @@ describe('DateTimePicker', () => {
 
   it('renders dropdown without a selectedTimeWindow set', done => {
     createComponent({
-      selectedTimeWindow: {}
+      selectedTimeWindow: {},
     });
     dateTimePicker.vm.$nextTick(() => {
       expect(dateTimePicker.findAll('input').length).toBe(2);
