@@ -253,4 +253,5 @@ serverCACertificateSha1Fingerprint:   40 bytes
 
 ### Connect to the PostgresQL instance
 
-Follow this [GCP guide](https://cloud.google.com/sql/docs/postgres/connect-kubernetes-engine) if you would like to connect to the newly provisioned Postgres database instance on CloudSQL
+Follow this [GCP guide](https://cloud.google.com/sql/docs/postgres/connect-kubernetes-engine) if you
+would like to connect to the newly provisioned Postgres database instance on CloudSQL.
