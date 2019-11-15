@@ -214,7 +214,7 @@ NAME            STATUS   CLASS-KIND              CLASS-NAME                     
 staging-test8   Bound    CloudSQLInstanceClass   cloudsqlinstancepostgresql-standard   CloudSQLInstance   xp-ad-demo-24-staging-staging-test8-jj55c   9m
 ```
 
-The endpoint of the PostgresQL instance, and the user credentials are present in a secret called `app-postgres` within the same project namespace.
+The endpoint of the PostgreSQL instance, and the user credentials, are present in a secret called `app-postgres` within the same project namespace.
 
 Verify the secret with the database information is created.
 
