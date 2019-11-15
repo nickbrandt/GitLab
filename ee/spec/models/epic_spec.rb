@@ -580,5 +580,21 @@ describe Epic do
     end
   end
 
+  describe '.related_issues' do
+    it 'returns epic issues ordered by relative position' do
+      epic1 = create(:epic, group: group)
+      epic2 = create(:epic, group: group)
+      issue1 = create(:issue, project: project)
+      issue2 = create(:issue, project: project)
+      create(:issue, project: project)
+      create(:epic_issue, epic: epic1, issue: issue1, relative_position: 5)
+      create(:epic_issue, epic: epic2, issue: issue2, relative_position: 2)
+
+      result = described_class.related_issues(ids: [epic1.id, epic2.id])
+
+      expect(result.pluck(:id)).to eq [issue2.id, issue1.id]
+    end
+  end
+
   it_behaves_like 'versioned description'
 end
