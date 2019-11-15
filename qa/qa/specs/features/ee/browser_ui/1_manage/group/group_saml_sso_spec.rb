@@ -63,14 +63,84 @@ module QA
       end
 
       context 'Enforced SSO' do
-        let(:user) { Resource::User.fabricate_via_api! }
+        let(:developer_user) { Resource::User.fabricate_via_api! }
+        let(:owner_user) { Resource::User.fabricate_via_api! }
 
         before do
           %w[enforced_sso enforced_sso_requires_session].each do |flag|
             Runtime::Feature.enable_and_verify(flag)
           end
 
-          @group.add_member(user)
+          @group.add_member(developer_user)
+        end
+
+        context 'Access' do
+          let(:project) do
+            Resource::Project.fabricate! do |project|
+              project.name = 'project-in-saml-enforced-group-for-access-test'
+              project.description = 'project in SAML enforced group for access test'
+              project.group = @group
+              project.initialize_with_readme = true
+              project.visibility = 'private'
+            end
+          end
+
+          let(:sub_group) do
+            Resource::Group.fabricate_via_api! do |group|
+              group.sandbox = @group
+              group.path = "saml-sub-group"
+            end
+          end
+
+          let(:sub_group_project) do
+            Resource::Project.fabricate! do |project|
+              project.name = 'sub-group-project-in-saml-enforced-group-for-access-test'
+              project.description = 'Sub Group project in SAML enforced group for access test'
+              project.group = @sub_group
+              project.initialize_with_readme = true
+              project.visibility = 'private'
+            end
+          end
+
+          shared_examples 'user access' do
+            it 'is not allowed without SSO' do
+              Page::Main::Menu.perform(&:sign_out_if_signed_in)
+              Page::Main::Login.perform do |login|
+                login.sign_in_using_credentials(user: user)
+              end
+
+              expected_single_signon_text = 'group allows you to sign in with your Single Sign-On Account'
+
+              @group.visit!
+
+              expect(page).to have_content(expected_single_signon_text)
+
+              sub_group.visit!
+
+              expect(page).to have_content(expected_single_signon_text)
+
+              project.visit!
+
+              expect(page).to have_content(expected_single_signon_text)
+
+              sub_group_project.visit!
+
+              expect(page).to have_content(expected_single_signon_text)
+            end
+          end
+
+          before do
+            @group.add_member(owner_user, Resource::Members::AccessLevel::OWNER)
+
+            setup_and_enable_enforce_sso
+          end
+
+          it_behaves_like 'user access' do
+            let(:user) { developer_user }
+          end
+          it_behaves_like 'user access' do
+            let(:user) { owner_user }
+          end
         end
 
         it 'user clones and pushes to project within a group using Git HTTP' do
@@ -78,7 +148,7 @@ module QA
 
           @project = Resource::Project.fabricate! do |project|
             project.name = 'project-in-saml-enforced-group'
-            project.description = 'project in SAML enforced gorup for git clone test'
+            project.description = 'project in SAML enforced group for git clone test'
             project.group = @group
             project.initialize_with_readme = true
           end
@@ -89,7 +159,7 @@ module QA
             Resource::Repository::ProjectPush.fabricate! do |project_push|
               project_push.project = @project
               project_push.branch_name = "new_branch"
-              project_push.user = user
+              project_push.user = developer_user
             end
           end.not_to raise_error
         end
@@ -104,7 +174,7 @@ module QA
           end
 
           it 'removes existing users from the group, forces existing users to create a new account and allows to leave group' do
-            expect(@group.list_members.map { |item| item["username"] }).not_to include(user.username)
+            expect(@group.list_members.map { |item| item["username"] }).not_to include(developer_user.username)
 
             visit_managed_group_url
 
@@ -152,7 +222,7 @@ module QA
 
         after do
           disable_enforce_sso_and_group_managed_account
-          remove_user_if_exists(user.email)
+          remove_user_if_exists(developer_user.email)
         end
       end
 
