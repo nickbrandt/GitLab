@@ -33,12 +33,16 @@ module Notes
         NewNoteWorker.perform_async(note.id)
       end
 
-      if !only_commands && note.save
+      note_saved = note.with_transaction_returning_status do
+        note.save
+        note.store_mentions!
+      end
+
+      if !only_commands && note_saved
         if note.part_of_discussion? && note.discussion.can_convert_to_discussion?
           note.discussion.convert_to_discussion!(save: true)
         end
 
-        note.store_mentions!
         todo_service.new_note(note, current_user)
         clear_noteable_diffs_cache(note)
         Suggestions::CreateService.new(note).execute

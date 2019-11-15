@@ -557,7 +557,7 @@ class Note < ApplicationRecord
     errors.add(:base, _('Maximum number of comments exceeded')) if noteable.notes.count >= Noteable::MAX_NOTES_LIMIT
   end
 
-  def current_user_mention
+  def model_user_mention
     noteable.user_mentions.where(note: self).first_or_initialize
   end
 
@@ -566,15 +566,15 @@ class Note < ApplicationRecord
   end
 
   def referenced_users
-    User.where(id: current_user_mention.mentioned_users_ids)
+    User.where(id: model_user_mention.mentioned_users_ids)
   end
 
   def referenced_projects
-    Project.where(id: current_user_mention.mentioned_projects_ids)
+    Project.where(id: model_user_mention.mentioned_projects_ids)
   end
 
   def referenced_groups
-    Group.where(id: current_user_mention.mentioned_groups_ids)
+    Group.where(id: model_user_mention.mentioned_groups_ids)
   end
 end
 

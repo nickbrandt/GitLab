@@ -22,7 +22,6 @@ module MergeRequests
     end
 
     def after_create(issuable)
-      issuable.store_mentions!
       todo_service.new_merge_request(issuable, current_user)
       issuable.cache_merge_request_closes_issues!(current_user)
       create_pipeline_for(issuable, current_user)

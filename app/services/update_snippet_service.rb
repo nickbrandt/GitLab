@@ -25,7 +25,12 @@ class UpdateSnippetService < BaseService
     snippet.assign_attributes(params)
     spam_check(snippet, current_user)
 
-    if snippet.save
+    snippet_saved = snippet.with_transaction_returning_status do
+      snippet.save
+      snippet.store_mentions!
+    end
+
+    if snippet_saved
       snippet.store_mentions!
       Gitlab::UsageDataCounters::SnippetCounter.count(:update)
     end

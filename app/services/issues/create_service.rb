@@ -26,7 +26,6 @@ module Issues
     end
 
     def after_create(issuable)
-      issuable.store_mentions!
       todo_service.new_issue(issuable, current_user)
       user_agent_detail_service.create
       resolve_discussions_with_issue(issuable)

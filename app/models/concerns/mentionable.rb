@@ -29,6 +29,15 @@ module Mentionable
     end
   end
 
+  # User mention that is parsed from model description rather then its related notes.
+  # Models that have a descriprion attribute like Issue, MergeEequest, Epic, Snippet may have such a user mention.
+  # Other mentionable models like Commit, DesignManagement::Design, will never have such record as those do not have
+  # a description attribute.
+
+  def model_user_mention
+    user_mentions.where(note_id: nil).first_or_initialize
+  end
+
   # Returns the text used as the body of a Note when this object is referenced
   #
   # By default this will be the class name and the result of calling
@@ -85,14 +94,14 @@ module Mentionable
 
     refs = all_references(self.author)
 
-    mention = current_user_mention
+    mention = model_user_mention
     mention.mentioned_users_ids = refs.mentioned_users&.pluck(:id).presence
     mention.mentioned_groups_ids = refs.mentioned_groups&.pluck(:id).presence
     mention.mentioned_projects_ids = refs.mentioned_projects&.pluck(:id).presence
 
     if mention.has_mentions?
       mention.save!
-    else
+    elsif mention.persisted?
       mention.destroy!
     end
   end
@@ -216,10 +225,6 @@ module Mentionable
   def store_mentioned_users_to_db_enabled?
     return Feature.enabled?(:store_mentioned_users_to_db, self.project&.group) if self.respond_to?(:project)
     return Feature.enabled?(:store_mentioned_users_to_db, self.group) if self.respond_to?(:group)
-  end
-
-  def current_user_mention
-    user_mentions.find_or_initialize_by(note: nil)
   end
 end
 

@@ -7,7 +7,12 @@ module Notes
 
       old_mentioned_users = note.mentioned_users(current_user).to_a
 
-      note.update(params.merge(updated_by: current_user))
+      note.assign_attributes(params.merge(updated_by: current_user))
+
+      note_saved = note.with_transaction_returning_status do
+        note.save
+        note.store_mentions!
+      end
 
       only_commands = false
 
@@ -20,8 +25,7 @@ module Notes
         note.note = content
       end
 
-      unless only_commands
-        note.store_mentions!
+      if !only_commands && note_saved
         note.create_new_cross_references!(current_user)
         update_todos(note, old_mentioned_users)
         update_suggestions(note)

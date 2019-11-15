@@ -20,7 +20,7 @@ describe Note, 'Mentionable' do
 
     it 'does not save mentions' do
       expect(note).to receive(:can_store_mentions?).and_return(false)
-      expect(note).not_to receive(:current_user_mention)
+      expect(note).not_to receive(:model_user_mention)
 
       note.store_mentions!
     end
