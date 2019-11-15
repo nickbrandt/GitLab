@@ -178,7 +178,7 @@ describe API::Vulnerabilities do
           expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
 
           expect(vulnerability.reload).to(
-            have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.zone.now)))
+            have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.current)))
           expect(vulnerability.findings).to all have_vulnerability_dismissal_feedback
         end
       end
@@ -262,13 +262,13 @@ describe API::Vulnerabilities do
           expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
 
           expect(vulnerability.reload).to(
-            have_attributes(state: 'closed', closed_by: user, closed_at: be_like_time(Time.zone.now)))
+            have_attributes(state: 'resolved', resolved_by: user, resolved_at: be_like_time(Time.current)))
           expect(vulnerability.findings).to all have_attributes(state: 'resolved')
         end
       end
 
       context 'when the vulnerability is already resolved' do
-        let(:vulnerability) { create(:vulnerability, :closed, project: project) }
+        let(:vulnerability) { create(:vulnerability, :resolved, project: project) }
 
         it 'responds with 304 Not Modified response' do
           resolve_vulnerability

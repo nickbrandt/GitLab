@@ -915,6 +915,7 @@ module EE
         expose :author_id
         expose :updated_by_id
         expose :last_edited_by_id
+        expose :resolved_by_id
         expose :closed_by_id
 
         expose :start_date
@@ -923,6 +924,7 @@ module EE
         expose :created_at
         expose :updated_at
         expose :last_edited_at
+        expose :resolved_at
         expose :closed_at
       end
     end

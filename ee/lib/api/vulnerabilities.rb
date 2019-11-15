@@ -43,7 +43,7 @@ module API
       end
       post ':id/resolve' do
         vulnerability = find_and_authorize_vulnerability!(:resolve_vulnerability)
-        break not_modified! if vulnerability.closed?
+        break not_modified! if vulnerability.resolved?
 
         vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
         render_vulnerability(vulnerability)

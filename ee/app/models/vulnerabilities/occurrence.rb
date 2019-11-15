@@ -138,9 +138,11 @@ module Vulnerabilities
       return 'dismissed' if dismissal_feedback.present?
 
       if vulnerability.nil?
-        'new'
-      elsif vulnerability.closed?
+        'opened'
+      elsif vulnerability.resolved?
         'resolved'
+      elsif vulnerability.closed? # fail-safe check for cases when dismissal feedback was lost or was not created
+        'dismissed'
       else
         'confirmed'
       end
