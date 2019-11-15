@@ -8,7 +8,7 @@ module EE
 
         override :find_user_from_sources
         def find_user_from_sources
-          find_user_from_access_token ||
+          find_user_from_bearer_token ||
             find_user_from_job_token ||
             find_user_from_warden
         end
