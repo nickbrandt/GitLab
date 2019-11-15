@@ -70,7 +70,7 @@ module MergeTrains
     def max_concurrency
       strong_memoize(:max_concurrency) do
         if Feature.enabled?(:merge_trains_parallel_pipelines, project, default_enabled: true)
-          if Feature.enabled?(:merge_trains_high_concurrency, project)
+          if Feature.enabled?(:merge_trains_high_concurrency, project, default_enabled: true)
             HIGH_CONCURRENCY
           elsif Feature.enabled?(:merge_trains_medium_concurrency, project)
             MEDIUM_CONCURRENCY
