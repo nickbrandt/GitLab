@@ -255,7 +255,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def merge_params_attributes
-    [:should_remove_source_branch, :commit_message, :squash_commit_message, :squash, :auto_merge_strategy]
+    MergeRequest::KNOWN_MERGE_PARAMS
   end
 
   def auto_merge_requested?
@@ -295,7 +295,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
     return :sha_mismatch if params[:sha] != @merge_request.diff_head_sha
 
-    @merge_request.update(merge_error: nil, squash: merge_params.fetch(:squash, false))
+    @merge_request.update(merge_error: nil, squash: params.fetch(:squash, false))
 
     if auto_merge_requested?
       if merge_request.auto_merge_enabled?
