@@ -29,25 +29,31 @@ module EE
           @metric = project.prometheus_metrics.new # rubocop:disable Gitlab/ModuleWithInstanceVariables
         end
 
-        # rubocop: disable CodeReuse/ActiveRecord
         def index
           respond_to do |format|
             format.json do
-              metrics = project.prometheus_metrics
+              metrics = ::PrometheusMetricsFinder.new(
+                project: project,
+                ordered: true
+              ).execute.to_a
+
               response = {}
               if metrics.any?
-                response[:metrics] = ::PrometheusMetricSerializer.new(project: project)
-                                       .represent(metrics.order(created_at: :asc))
+                response[:metrics] = ::PrometheusMetricSerializer
+                                       .new(project: project)
+                                       .represent(metrics)
               end
 
               render json: response
             end
           end
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         def create
-          @metric = project.prometheus_metrics.create(metrics_params) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+          @metric = project.prometheus_metrics.create( # rubocop:disable Gitlab/ModuleWithInstanceVariables
+            metrics_params.to_h.symbolize_keys
+          )
+
           if @metric.persisted? # rubocop:disable Gitlab/ModuleWithInstanceVariables
             redirect_to edit_project_service_path(project, ::PrometheusService),
                         notice: _('Metric was successfully added.')
@@ -57,8 +63,7 @@ module EE
         end
 
         def update
-          @metric = project.prometheus_metrics.find(params[:id]) # rubocop:disable Gitlab/ModuleWithInstanceVariables
-          @metric = update_metrics_service(@metric).execute # rubocop:disable Gitlab/ModuleWithInstanceVariables
+          @metric = update_metrics_service(prometheus_metric).execute # rubocop:disable Gitlab/ModuleWithInstanceVariables
 
           if @metric.persisted? # rubocop:disable Gitlab/ModuleWithInstanceVariables
             redirect_to edit_project_service_path(project, ::PrometheusService),
@@ -69,12 +74,11 @@ module EE
         end
 
         def edit
-          @metric = project.prometheus_metrics.find(params[:id]) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+          @metric = prometheus_metric # rubocop:disable Gitlab/ModuleWithInstanceVariables
         end
 
         def destroy
-          metric = project.prometheus_metrics.find(params[:id])
-          destroy_metrics_service(metric).execute
+          destroy_metrics_service(prometheus_metric).execute
 
           respond_to do |format|
             format.html do
@@ -90,6 +94,10 @@ module EE
 
         def check_custom_metrics_license!
           render_404 unless project.feature_available?(:custom_prometheus_metrics)
+        end
+
+        def prometheus_metric
+          @prometheus_metric ||= ::PrometheusMetricsFinder.new(id: params[:id]).execute.first
         end
 
         def update_metrics_service(metric)
