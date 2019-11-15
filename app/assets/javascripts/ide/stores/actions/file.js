@@ -4,7 +4,7 @@ import eventHub from '../../eventhub';
 import service from '../../services';
 import * as types from '../mutation_types';
 import router from '../../ide_router';
-import { setPageTitle, escapeFileUrl, addFinalNewlineIfNeeded } from '../utils';
+import { escapeFileUrl, addFinalNewlineIfNeeded, setPageTitleForFile } from '../utils';
 import { viewerTypes, stageKeys } from '../../constants';
 
 export const closeFile = ({ commit, state, dispatch }, file) => {
@@ -77,12 +77,7 @@ export const getFileData = (
   return service
     .getFileData(url)
     .then(({ data }) => {
-      // Replace sha in the title with the branch title
-      const title = [file.path, state.currentBranchId, state.currentProjectId, 'GitLab'].join(
-        ' · ',
-      );
-
-      setPageTitle(decodeURI(title));
+      setPageTitleForFile(state, file);
 
       if (data) commit(types.SET_FILE_DATA, { data, file });
       if (openFile) commit(types.TOGGLE_FILE_OPEN, path);
