@@ -87,8 +87,8 @@ module Mentionable
 
     mention = current_user_mention
     mention.mentioned_users_ids = refs.mentioned_users&.pluck(:id).presence
-    mention.mentioned_groups_ids = refs.mentioned_users_by_groups&.pluck(:id).presence
-    mention.mentioned_projects_ids = refs.mentioned_users_by_projects&.pluck(:id).presence
+    mention.mentioned_groups_ids = refs.mentioned_groups&.pluck(:id).presence
+    mention.mentioned_projects_ids = refs.mentioned_projects&.pluck(:id).presence
 
     if mention.has_mentions?
       mention.save!
