@@ -212,44 +212,75 @@ describe Gitlab::Database::MigrationHelpers do
         allow(model).to receive(:transaction_open?).and_return(false)
       end
 
-      it 'creates a concurrent foreign key and validates it' do
-        expect(model).to receive(:disable_statement_timeout).and_call_original
-        expect(model).to receive(:execute).with(/statement_timeout/)
-        expect(model).to receive(:execute).ordered.with(/NOT VALID/)
-        expect(model).to receive(:execute).ordered.with(/VALIDATE CONSTRAINT/)
-        expect(model).to receive(:execute).with(/RESET ALL/)
+      context 'when no custom key name is supplied' do
+        it 'creates a concurrent foreign key and validates it' do
+          expect(model).to receive(:disable_statement_timeout).and_call_original
+          expect(model).to receive(:execute).with(/statement_timeout/)
+          expect(model).to receive(:execute).ordered.with(/NOT VALID/)
+          expect(model).to receive(:execute).ordered.with(/VALIDATE CONSTRAINT/)
+          expect(model).to receive(:execute).with(/RESET ALL/)
 
-        model.add_concurrent_foreign_key(:projects, :users, column: :user_id)
+          model.add_concurrent_foreign_key(:projects, :users, column: :user_id)
+        end
+
+        it 'appends a valid ON DELETE statement' do
+          expect(model).to receive(:disable_statement_timeout).and_call_original
+          expect(model).to receive(:execute).with(/statement_timeout/)
+          expect(model).to receive(:execute).with(/ON DELETE SET NULL/)
+          expect(model).to receive(:execute).ordered.with(/VALIDATE CONSTRAINT/)
+          expect(model).to receive(:execute).with(/RESET ALL/)
+
+          model.add_concurrent_foreign_key(:projects, :users,
+                                           column: :user_id,
+                                           on_delete: :nullify)
+        end
+
+        it 'does not create a foreign key if it exists already' do
+          expect(model).to receive(:foreign_key_exists?).with(:projects, :users, column: :user_id).and_return(true)
+          expect(model).not_to receive(:execute).with(/ADD CONSTRAINT/)
+          expect(model).to receive(:execute).with(/VALIDATE CONSTRAINT/)
+
+          model.add_concurrent_foreign_key(:projects, :users, column: :user_id)
+        end
       end
 
-      it 'appends a valid ON DELETE statement' do
-        expect(model).to receive(:disable_statement_timeout).and_call_original
-        expect(model).to receive(:execute).with(/statement_timeout/)
-        expect(model).to receive(:execute).with(/ON DELETE SET NULL/)
-        expect(model).to receive(:execute).ordered.with(/VALIDATE CONSTRAINT/)
-        expect(model).to receive(:execute).with(/RESET ALL/)
+      context 'when a custom key name is supplied' do
+        context 'for creating a new foreign key for a column that does not presently exist' do
+          it 'creates a new foreign key' do
+            expect(model).to receive(:disable_statement_timeout).and_call_original
+            expect(model).to receive(:execute).with(/statement_timeout/)
+            expect(model).to receive(:execute).ordered.with(/NOT VALID/)
+            expect(model).to receive(:execute).ordered.with(/VALIDATE CONSTRAINT.+foo/)
+            expect(model).to receive(:execute).with(/RESET ALL/)
 
-        model.add_concurrent_foreign_key(:projects, :users,
-                                         column: :user_id,
-                                         on_delete: :nullify)
-      end
+            model.add_concurrent_foreign_key(:projects, :users, column: :user_id, name: :foo)
+          end
+        end
 
-      it 'does not create a foreign key if it exists already' do
-        expect(model).to receive(:foreign_key_exists?).with(:projects, :users, column: :user_id).and_return(true)
-        expect(model).not_to receive(:execute).with(/ADD CONSTRAINT/)
-        expect(model).to receive(:execute).with(/VALIDATE CONSTRAINT/)
+        context 'for creating a duplicate foreign key for a column that presently exists' do
+          context 'when the supplied key name is the same as the existing foreign key name' do
+            it 'does not create a new foreign key' do
+              expect(model).to receive(:foreign_key_exists?).with(:projects, :users, name: :foo).and_return(true)
 
-        model.add_concurrent_foreign_key(:projects, :users, column: :user_id)
-      end
+              expect(model).not_to receive(:execute).with(/ADD CONSTRAINT/)
+              expect(model).to receive(:execute).with(/VALIDATE CONSTRAINT/)
 
-      it 'allows the use of a custom key name' do
-        expect(model).to receive(:disable_statement_timeout).and_call_original
-        expect(model).to receive(:execute).with(/statement_timeout/)
-        expect(model).to receive(:execute).ordered.with(/NOT VALID/)
-        expect(model).to receive(:execute).ordered.with(/VALIDATE CONSTRAINT.+foo/)
-        expect(model).to receive(:execute).with(/RESET ALL/)
+              model.add_concurrent_foreign_key(:projects, :users, column: :user_id, name: :foo)
+            end
+          end
 
-        model.add_concurrent_foreign_key(:projects, :users, column: :user_id, name: :foo)
+          context 'when the supplied key name is different from the existing foreign key name' do
+            it 'creates a new foreign key' do
+              expect(model).to receive(:disable_statement_timeout).and_call_original
+              expect(model).to receive(:execute).with(/statement_timeout/)
+              expect(model).to receive(:execute).ordered.with(/NOT VALID/)
+              expect(model).to receive(:execute).ordered.with(/VALIDATE CONSTRAINT.+bar/)
+              expect(model).to receive(:execute).with(/RESET ALL/)
+
+              model.add_concurrent_foreign_key(:projects, :users, column: :user_id, name: :bar)
+            end
+          end
+        end
       end
     end
   end
@@ -266,12 +297,16 @@ describe Gitlab::Database::MigrationHelpers do
 
   describe '#foreign_key_exists?' do
     before do
-      key = ActiveRecord::ConnectionAdapters::ForeignKeyDefinition.new(:projects, :users, { column: :non_standard_id })
+      key = ActiveRecord::ConnectionAdapters::ForeignKeyDefinition.new(:projects, :users, { column: :non_standard_id, name: :fk_projects_users_non_standard_id })
       allow(model).to receive(:foreign_keys).with(:projects).and_return([key])
     end
 
     it 'finds existing foreign keys by column' do
       expect(model.foreign_key_exists?(:projects, :users, column: :non_standard_id)).to be_truthy
+    end
+
+    it 'finds existing foreign keys by name' do
+      expect(model.foreign_key_exists?(:projects, :users, name: :fk_projects_users_non_standard_id)).to be_truthy
     end
 
     it 'finds existing foreign keys by target table only' do
@@ -280,6 +315,10 @@ describe Gitlab::Database::MigrationHelpers do
 
     it 'compares by column name if given' do
       expect(model.foreign_key_exists?(:projects, :users, column: :user_id)).to be_falsey
+    end
+
+    it 'compares by foreign key name if given' do
+      expect(model.foreign_key_exists?(:projects, :users, name: :non_existent_foreign_key_name)).to be_falsey
     end
 
     it 'compares by target if no column given' do

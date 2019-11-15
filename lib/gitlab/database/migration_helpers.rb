@@ -164,19 +164,25 @@ module Gitlab
           raise 'add_concurrent_foreign_key can not be run inside a transaction'
         end
 
-        on_delete = 'SET NULL' if on_delete == :nullify
+        if name
+          key_name = name
+          foreign_key_exists = foreign_key_exists?(source, target, name: name)
+        else
+          key_name = concurrent_foreign_key_name(source, column)
+          foreign_key_exists = foreign_key_exists?(source, target, column: column)
+        end
 
-        key_name = name || concurrent_foreign_key_name(source, column)
-
-        unless foreign_key_exists?(source, target, column: column)
+        if foreign_key_exists
           Rails.logger.warn "Foreign key not created because it exists already " \
             "(this may be due to an aborted migration or similar): " \
             "source: #{source}, target: #{target}, column: #{column}"
-
+        else
           # Using NOT VALID allows us to create a key without immediately
           # validating it. This means we keep the ALTER TABLE lock only for a
           # short period of time. The key _is_ enforced for any newly created
           # data.
+          on_delete = 'SET NULL' if on_delete == :nullify
+
           execute <<-EOF.strip_heredoc
           ALTER TABLE #{source}
           ADD CONSTRAINT #{key_name}
@@ -198,10 +204,12 @@ module Gitlab
       end
       # rubocop:enable Gitlab/RailsLogger
 
-      def foreign_key_exists?(source, target = nil, column: nil)
+      def foreign_key_exists?(source, target = nil, column: nil, name: nil)
         foreign_keys(source).any? do |key|
           if column
             key.options[:column].to_s == column.to_s
+          elsif name
+            key.options[:name].to_s == name.to_s
           else
             key.to_table.to_s == target.to_s
           end
