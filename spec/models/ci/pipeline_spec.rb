@@ -1188,7 +1188,9 @@ describe Ci::Pipeline, :mailer do
                                       stage_idx: 0,
                                       status: 'success')
 
-                pipeline.process!
+                Ci::ProcessPipelineService
+                  .new(pipeline)
+                  .execute
               end
 
               it 'ignores the previous state' do
