@@ -109,7 +109,7 @@ module Analytics
       end
 
       def update_params
-        params.permit(:name, :start_event_identifier, :end_event_identifier, :id, :move_after_id, :move_before_id)
+        params.permit(:name, :start_event_identifier, :end_event_identifier, :id, :move_after_id, :move_before_id, :hidden)
       end
 
       def create_params

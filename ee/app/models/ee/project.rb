@@ -67,7 +67,11 @@ module EE
       # https://gitlab.com/gitlab-org/gitlab/issues/10252#terminology
       has_many :vulnerabilities
       has_many :vulnerability_feedback, class_name: 'Vulnerabilities::Feedback'
-      has_many :vulnerability_findings, class_name: 'Vulnerabilities::Occurrence'
+      has_many :vulnerability_findings, class_name: 'Vulnerabilities::Occurrence' do
+        def lock_for_confirmation!(id)
+          where(vulnerability_id: nil).lock.find(id)
+        end
+      end
       has_many :vulnerability_identifiers, class_name: 'Vulnerabilities::Identifier'
       has_many :vulnerability_scanners, class_name: 'Vulnerabilities::Scanner'
 
@@ -88,6 +92,11 @@ module EE
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
 
       has_many :project_aliases
+
+      has_many :upstream_project_subscriptions, class_name: 'Ci::Subscriptions::Project', foreign_key: :downstream_project_id, inverse_of: :downstream_project
+      has_many :upstream_projects, class_name: 'Project', through: :upstream_project_subscriptions, source: :upstream_project
+      has_many :downstream_project_subscriptions, class_name: 'Ci::Subscriptions::Project', foreign_key: :upstream_project_id, inverse_of: :upstream_project
+      has_many :downstream_projects, class_name: 'Project', through: :downstream_project_subscriptions, source: :downstream_project
 
       scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
 
@@ -194,6 +203,10 @@ module EE
     def latest_pipeline_with_security_reports
       all_pipelines.newest_first(ref: default_branch).with_reports(::Ci::JobArtifact.security_reports).first ||
         all_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
+    end
+
+    def latest_pipeline_with_reports(reports)
+      all_pipelines.newest_first(ref: default_branch).with_reports(reports).take
     end
 
     def environments_for_scope(scope)
@@ -626,13 +639,18 @@ module EE
       super.presence || build_feature_usage
     end
 
+    # LFS and hashed repository storage are required for using Design Management.
     def design_management_enabled?
-      # LFS is required for using Design Management
-      #
-      # Checking both feature availability on the license, as well as the feature
-      # flag, because we don't want to enable design_management by default on
-      # on prem installs yet.
       lfs_enabled? &&
+        # We will allow the hashed storage requirement to be disabled for
+        # a few releases until we are able to understand the impact of the
+        # hashed storage requirement for existing design management projects.
+        # See https://gitlab.com/gitlab-org/gitlab/issues/13428#note_238729038
+        (hashed_storage?(:repository) || ::Feature.disabled?(:design_management_require_hashed_storage, self, default_enabled: true)) &&
+        # Check both feature availability on the license, as well as the feature
+        # flag, because we don't want to enable design_management by default on
+        # on prem installs yet.
+        # See https://gitlab.com/gitlab-org/gitlab/issues/13709
         feature_available?(:design_management) &&
         ::Feature.enabled?(:design_management_flag, self, default_enabled: true)
     end

@@ -71,24 +71,15 @@ describe LicenseHelper do
     end
   end
 
-  describe '#max_historical_user_count' do
-    it 'returns the max historical user count' do
-      count = 5
-      expect(HistoricalData).to receive(:max_historical_user_count).and_return(count)
-
-      expect(max_historical_user_count).to eq(count)
-    end
-  end
-
-  describe '#current_active_user_count' do
+  describe '#maximum_user_count' do
     context 'when current license is set' do
-      it 'returns the current_active_users_count for the current license' do
+      it 'returns the maximum_user_count for the current license' do
         license = double
         allow(License).to receive(:current).and_return(license)
         count = 5
-        allow(license).to receive(:current_active_users_count).and_return(count)
+        allow(license).to receive(:maximum_user_count).and_return(count)
 
-        expect(current_active_user_count).to eq(count)
+        expect(maximum_user_count).to eq(count)
       end
     end
 
@@ -96,7 +87,7 @@ describe LicenseHelper do
       it 'returns 0' do
         allow(License).to receive(:current).and_return(nil)
 
-        expect(current_active_user_count).to eq(0)
+        expect(maximum_user_count).to eq(0)
       end
     end
   end

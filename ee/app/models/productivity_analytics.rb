@@ -16,6 +16,10 @@ class ProductivityAnalytics
   METRIC_TYPES = METRIC_COLUMNS.keys.freeze
   DEFAULT_TYPE = 'days_to_merge'.freeze
 
+  def self.start_date
+    ApplicationSetting.current&.productivity_analytics_start_date
+  end
+
   def initialize(merge_requests:, sort: nil)
     @merge_requests = merge_requests.joins(:metrics)
     @sort = sort
@@ -43,28 +47,36 @@ class ProductivityAnalytics
     end
     columns.unshift(MergeRequest.arel_table[Arel.star])
 
-    mrs = merge_requests.select(columns)
-    mrs = mrs.reorder(custom_sorting) if custom_sorting
-    mrs
+    MergeRequest.joins(:metrics).select(columns).where(id: merge_requests).order(sorting)
   end
 
   private
 
   def histogram_query(column)
-    merge_requests.except(:select).select("#{column} as metric, count(*) as mr_count").group(column).reorder(nil)
+    MergeRequest::Metrics.joins(:merge_request)
+      .where(merge_request_id: merge_requests)
+      .select("#{column} as metric, count(*) as mr_count")
+      .group(column)
   end
 
   def scatterplot_query(column)
-    merge_requests.except(:select).select("#{column} as metric, merge_requests.id, merge_request_metrics.merged_at").reorder("merge_request_metrics.merged_at ASC")
+    merge_requests
+      .except(:select)
+      .select("#{column} as metric, merge_requests.id, merge_request_metrics.merged_at")
+      .reorder("merge_request_metrics.merged_at ASC")
   end
 
-  def custom_sorting
-    return unless sort
+  def sorting
+    return default_sorting unless sort
 
     column, direction = sort.split(/_(asc|desc)$/i)
 
-    return unless column.in?(METRIC_TYPES)
+    return default_sorting unless column.in?(METRIC_TYPES)
 
     Arel.sql("#{column} #{direction}")
+  end
+
+  def default_sorting
+    { id: :desc }
   end
 end

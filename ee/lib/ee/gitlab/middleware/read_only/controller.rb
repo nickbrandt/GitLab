@@ -20,7 +20,7 @@ module EE
 
           override :whitelisted_routes
           def whitelisted_routes
-            super || geo_node_update_route? || geo_proxy_git_push_ssh_route?
+            super || geo_node_update_route? || geo_proxy_git_push_ssh_route? || geo_api_route?
           end
 
           def geo_node_update_route?
@@ -44,6 +44,12 @@ module EE
             end
 
             routes.flatten.include?(request.path)
+          end
+
+          def geo_api_route?
+            ::Gitlab::Middleware::ReadOnly::API_VERSIONS.any? do |version|
+              request.path.include?("/api/v#{version}/geo_replication")
+            end
           end
         end
       end

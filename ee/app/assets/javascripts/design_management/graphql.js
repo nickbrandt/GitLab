@@ -29,7 +29,7 @@ const defaultClient = createDefaultClient(
             },
           })
           .then(({ data }) => {
-            const edge = data.project.issue.designs.designs.edges.find(
+            const edge = data.project.issue.designCollection.designs.edges.find(
               ({ node }) => node.filename === id,
             );
             return edge.node;

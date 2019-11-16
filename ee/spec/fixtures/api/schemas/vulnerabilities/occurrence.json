@@ -55,6 +55,10 @@
       { "type": "null" },
       { "$ref": "../vulnerability_feedback.json" }
     ]},
+    "state" : {
+      "type": "string",
+      "enum": ["opened", "confirmed", "resolved", "dismissed"]
+    },
     "description": { "type": ["string", "null"] },
     "solution": { "type": ["string", "null"] },
     "location" : {

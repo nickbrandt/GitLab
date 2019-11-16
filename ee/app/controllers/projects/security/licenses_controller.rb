@@ -10,30 +10,24 @@ module Projects
           format.json do
             ::Gitlab::UsageDataCounters::LicensesList.count(:views)
 
-            render json: serializer.represent(licenses, build: report_service.build)
+            license_compliance = ::SCA::LicenseCompliance.new(project)
+            render json: serializer.represent(
+              pageable(license_compliance.policies),
+              build: license_compliance.latest_build_for_default_branch
+            )
           end
         end
       end
 
       private
 
-      def licenses
-        found_licenses = report_service.able_to_fetch? ? service.execute : []
-
-        ::Gitlab::ItemsCollection.new(found_licenses)
-      end
-
-      def report_service
-        @report_service ||= ::Security::ReportFetchService.new(project, ::Ci::JobArtifact.license_management_reports)
-      end
-
       def serializer
         ::LicensesListSerializer.new(project: project, user: current_user)
           .with_pagination(request, response)
       end
 
-      def service
-        ::Security::LicensesListService.new(pipeline: report_service.pipeline)
+      def pageable(items)
+        ::Gitlab::ItemsCollection.new(items)
       end
     end
   end

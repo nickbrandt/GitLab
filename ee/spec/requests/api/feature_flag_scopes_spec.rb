@@ -38,18 +38,6 @@ describe API::FeatureFlagScopes do
         expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
-
-    context 'when feature_flag_api feature flag is disabled' do
-      before do
-        stub_feature_flags(feature_flag_api: false)
-      end
-
-      it 'forbids the request' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
   end
 
   shared_examples_for 'not found' do
@@ -144,6 +132,56 @@ describe API::FeatureFlagScopes do
     end
   end
 
+  describe 'POST /projects/:id/feature_flags/:name/scopes' do
+    subject do
+      post api("/projects/#{project.id}/feature_flags/#{feature_flag.name}/scopes", user),
+           params: params
+    end
+
+    let(:params) do
+      {
+        environment_scope: 'staging',
+        active: true,
+        strategies: [{ name: 'userWithId', parameters: { 'userIds': 'a,b,c' } }].to_json
+      }
+    end
+
+    context 'when there is a corresponding feature flag' do
+      let!(:feature_flag) { create(:operations_feature_flag, project: project) }
+
+      it_behaves_like 'check user permission'
+
+      it 'creates a new scope' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:created)
+        expect(response).to match_response_schema('public_api/v4/feature_flag_scope', dir: 'ee')
+        expect(json_response['environment_scope']).to eq(params[:environment_scope])
+        expect(json_response['active']).to eq(params[:active])
+        expect(json_response['strategies']).to eq(JSON.parse(params[:strategies]))
+      end
+
+      context 'when the scope already exists' do
+        before do
+          create_scope(feature_flag, params[:environment_scope])
+        end
+
+        it 'returns error' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+          expect(json_response['message']).to include('Scopes environment scope (staging) has already been taken')
+        end
+      end
+    end
+
+    context 'when feature flag is not found' do
+      let(:feature_flag) { double(:feature_flag, name: 'test') }
+
+      it_behaves_like 'not found'
+    end
+  end
+
   describe 'GET /projects/:id/feature_flags/:name/scopes/:environment_scope' do
     subject do
       get api("/projects/#{project.id}/feature_flags/#{feature_flag.name}/scopes/#{environment_scope}",
@@ -185,6 +223,52 @@ describe API::FeatureFlagScopes do
     end
 
     context 'when there are no feature flags' do
+      let(:feature_flag) { double(:feature_flag, name: 'test') }
+      let(:scope) { double(:feature_flag_scope, environment_scope: 'prd') }
+
+      it_behaves_like 'not found'
+    end
+  end
+
+  describe 'PUT /projects/:id/feature_flags/:name/scopes/:environment_scope' do
+    subject do
+      put api("/projects/#{project.id}/feature_flags/#{feature_flag.name}/scopes/#{environment_scope}",
+              user), params: params
+    end
+
+    let(:environment_scope) { scope.environment_scope }
+
+    let(:params) do
+      {
+        active: true,
+        strategies: [{ name: 'userWithId', parameters: { 'userIds': 'a,b,c' } }].to_json
+      }
+    end
+
+    context 'when there is a corresponding feature flag' do
+      let!(:feature_flag) { create(:operations_feature_flag, project: project) }
+      let(:scope) { create_scope(feature_flag, 'staging', false, [{ name: "default", parameters: {} }]) }
+
+      it_behaves_like 'check user permission'
+
+      it 'returns the updated scope' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('public_api/v4/feature_flag_scope', dir: 'ee')
+        expect(json_response['id']).to eq(scope.id)
+        expect(json_response['active']).to eq(params[:active])
+        expect(json_response['strategies']).to eq(JSON.parse(params[:strategies]))
+      end
+
+      context 'when there are no corresponding feature flag scopes' do
+        let(:scope) { double(:feature_flag_scope, environment_scope: 'prd') }
+
+        it_behaves_like 'not found'
+      end
+    end
+
+    context 'when there are no corresponding feature flags' do
       let(:feature_flag) { double(:feature_flag, name: 'test') }
       let(:scope) { double(:feature_flag_scope, environment_scope: 'prd') }
 

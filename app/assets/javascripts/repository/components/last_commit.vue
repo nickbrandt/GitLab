@@ -38,7 +38,14 @@ export default {
           path: this.currentPath.replace(/^\//, ''),
         };
       },
-      update: data => data.project.repository.tree.lastCommit,
+      update: data => {
+        const pipelines = data.project.repository.tree.lastCommit.pipelines.edges;
+
+        return {
+          ...data.project.repository.tree.lastCommit,
+          pipeline: pipelines.length && pipelines[0].node,
+        };
+      },
       context: {
         isSingleRequest: true,
       },
@@ -61,7 +68,7 @@ export default {
   computed: {
     statusTitle() {
       return sprintf(s__('Commits|Commit: %{commitText}'), {
-        commitText: this.commit.latestPipeline.detailedStatus.text,
+        commitText: this.commit.pipeline.detailedStatus.text,
       });
     },
     isLoading() {
@@ -81,7 +88,7 @@ export default {
 
 <template>
   <div class="info-well d-none d-sm-flex project-last-commit commit p-3">
-    <gl-loading-icon v-if="isLoading" size="md" class="mx-auto" />
+    <gl-loading-icon v-if="isLoading" size="md" class="m-auto" />
     <template v-else>
       <user-avatar-link
         v-if="commit.author"
@@ -102,7 +109,7 @@ export default {
             class="text-expander"
             @click="toggleShowDescription"
           >
-            <icon name="ellipsis_h" />
+            <icon name="ellipsis_h" :size="10" />
           </gl-button>
           <div class="committer">
             <gl-link
@@ -117,7 +124,7 @@ export default {
           </div>
           <pre
             v-if="commit.description"
-            v-show="showDescription"
+            :class="{ 'd-block': showDescription }"
             class="commit-row-description append-bottom-8"
           >
             {{ commit.description }}
@@ -127,14 +134,14 @@ export default {
           <div v-if="commit.signatureHtml" v-html="commit.signatureHtml"></div>
           <div class="ci-status-link">
             <gl-link
-              v-if="commit.latestPipeline"
-              v-gl-tooltip
-              :href="commit.latestPipeline.detailedStatus.detailsPath"
+              v-if="commit.pipeline"
+              v-gl-tooltip.left
+              :href="commit.pipeline.detailedStatus.detailsPath"
               :title="statusTitle"
               class="js-commit-pipeline"
             >
               <ci-icon
-                :status="commit.latestPipeline.detailedStatus"
+                :status="commit.pipeline.detailedStatus"
                 :size="24"
                 :aria-label="statusTitle"
               />
@@ -155,3 +162,9 @@ export default {
     </template>
   </div>
 </template>
+
+<style scoped>
+.commit {
+  min-height: 4.75rem;
+}
+</style>

@@ -58,4 +58,14 @@ describe SoftwareLicense do
       it { expect(subject.ordered.pluck(:name)).to eql([apache_2.name, mit.name]) }
     end
   end
+
+  describe "#canonical_id" do
+    context "when an SPDX identifier is available" do
+      it { expect(build(:software_license, spdx_identifier: 'MIT').canonical_id).to eq('MIT') }
+    end
+
+    context "when an SPDX identifier is not available" do
+      it { expect(build(:software_license, name: 'MIT License', spdx_identifier: nil).canonical_id).to eq('mit license') }
+    end
+  end
 end

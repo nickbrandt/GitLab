@@ -3,8 +3,6 @@ export default () => ({
   endpoint: '',
   updateEndpoint: '',
 
-  epicLinksEndpoint: '',
-  issueLinksEndpoint: '',
   groupPath: '',
   markdownPreviewPath: '',
   labelsPath: '',

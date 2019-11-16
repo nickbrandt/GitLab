@@ -30,8 +30,11 @@ describe 'Merge request > Batch comments', :js do
     end
   end
 
+  it_behaves_like 'rendering a single diff version'
+
   context 'Feature is enabled' do
     before do
+      stub_feature_flags(single_mr_diff_view: false)
       stub_licensed_features(batch_comments: true)
 
       visit_diffs

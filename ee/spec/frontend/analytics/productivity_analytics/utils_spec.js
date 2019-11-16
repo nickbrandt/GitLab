@@ -1,6 +1,7 @@
 import {
   getLabelsEndpoint,
   getMilestonesEndpoint,
+  getDefaultStartDate,
   initDateArray,
   transformScatterData,
   getScatterPlotData,
@@ -32,6 +33,32 @@ describe('Productivity Analytics utils', () => {
       expect(getMilestonesEndpoint(namespacePath, projectWithNamespace)).toBe(
         '/gitlab-org/gitlab-test/-/milestones',
       );
+    });
+  });
+
+  describe('getDefaultStartDate', () => {
+    const realDateNow = Date.now;
+    const defaultDaysInPast = 10;
+
+    beforeAll(() => {
+      const today = jest.fn(() => new Date('2019-10-01'));
+      global.Date.now = today;
+    });
+
+    afterAll(() => {
+      global.Date.now = realDateNow;
+    });
+
+    it('returns the minDate when the computed date (today minus defaultDaysInPast) is before the minDate', () => {
+      const minDate = new Date('2019-09-30');
+
+      expect(getDefaultStartDate(minDate, defaultDaysInPast)).toEqual(minDate);
+    });
+
+    it('returns the computed date (today minus defaultDaysInPast) when this is after the minDate', () => {
+      const minDate = new Date('2019-09-01');
+
+      expect(getDefaultStartDate(minDate, defaultDaysInPast)).toEqual(new Date('2019-09-21'));
     });
   });
 

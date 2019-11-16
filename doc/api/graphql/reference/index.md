@@ -220,6 +220,16 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `relationPath` | String |  |
 | `reference` | String! |  |
 | `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this epic |
+| `descendantCounts` | EpicDescendantCount | Number of open and closed descendant epics and issues |
+
+### EpicDescendantCount
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `openedEpics` | Int | Number of opened sub-epics |
+| `closedEpics` | Int | Number of closed sub-epics |
+| `openedIssues` | Int | Number of opened epic issues |
+| `closedIssues` | Int | Number of closed epic issues |
 
 ### EpicIssue
 
@@ -400,6 +410,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
+| `id` | ID! | Label ID |
 | `description` | String | Description of the label (markdown rendered as HTML for caching) |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
 | `title` | String! | Content of the label |
@@ -473,7 +484,39 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `cherryPickOnCurrentMergeRequest` | Boolean! | Whether or not a user can perform `cherry_pick_on_current_merge_request` on this resource |
 | `revertOnCurrentMergeRequest` | Boolean! | Whether or not a user can perform `revert_on_current_merge_request` on this resource |
 
+### MergeRequestSetAssigneesPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
+### MergeRequestSetLabelsPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
+### MergeRequestSetLockedPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
 ### MergeRequestSetMilestonePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
+### MergeRequestSetSubscriptionPayload
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
@@ -755,6 +798,14 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `body` | String! | Body of the todo |
 | `state` | TodoStateEnum! | State of the todo |
 | `createdAt` | Time! | Timestamp this todo was created |
+
+### TodoMarkDonePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `todo` | Todo! | The requested todo |
 
 ### ToggleAwardEmojiPayload
 

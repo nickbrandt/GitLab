@@ -42,7 +42,7 @@ gem 'omniauth-shibboleth', '~> 1.3.0'
 gem 'omniauth-twitter', '~> 1.4'
 gem 'omniauth_crowd', '~> 2.2.0'
 gem 'omniauth-authentiq', '~> 0.3.3'
-gem 'omniauth_openid_connect', '~> 0.3.1'
+gem 'omniauth_openid_connect', '~> 0.3.3'
 gem "omniauth-ultraauth", '~> 0.0.2'
 gem 'omniauth-salesforce', '~> 1.0.5'
 gem 'rack-oauth2', '~> 1.9.3'
@@ -136,7 +136,7 @@ gem 'faraday_middleware-aws-signers-v4'
 
 # Markdown and HTML processing
 gem 'html-pipeline', '~> 2.8'
-gem 'deckar01-task_list', '2.2.0'
+gem 'deckar01-task_list', '2.2.1'
 gem 'gitlab-markup', '~> 1.7.0'
 gem 'github-markup', '~> 1.7.0', require: 'github/markup'
 gem 'commonmarker', '~> 0.17'
@@ -159,6 +159,7 @@ gem 'icalendar'
 
 # Diffs
 gem 'diffy', '~> 3.1.0'
+gem 'diff_match_patch', '~> 0.1.0'
 
 # Application server
 gem 'rack', '~> 2.0.7'
@@ -296,7 +297,7 @@ gem 'rack-attack', '~> 6.2.0'
 # Sentry integration
 gem 'sentry-raven', '~> 2.9'
 
-gem 'premailer-rails', '~> 1.9.7'
+gem 'premailer-rails', '~> 1.10.3'
 
 # LabKit: Tracing and Correlation
 gem 'gitlab-labkit', '~> 0.5'
@@ -449,7 +450,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC protocol definitions
-gem 'gitaly', '~> 1.65.0'
+gem 'gitaly', '~> 1.70.0'
 
 gem 'grpc', '~> 1.24.0'
 

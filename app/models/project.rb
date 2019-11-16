@@ -92,6 +92,7 @@ class Project < ApplicationRecord
   default_value_for :snippets_enabled, gitlab_config_features.snippets
   default_value_for :only_allow_merge_if_all_discussions_are_resolved, false
   default_value_for :remove_source_branch_after_merge, true
+  default_value_for(:ci_config_path) { Gitlab::CurrentSettings.default_ci_config_path }
 
   add_authentication_token_field :runners_token, encrypted: -> { Feature.enabled?(:projects_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
 
@@ -286,6 +287,7 @@ class Project < ApplicationRecord
   has_many :variables, class_name: 'Ci::Variable'
   has_many :triggers, class_name: 'Ci::Trigger'
   has_many :environments
+  has_many :environments_for_dashboard, -> { from(with_rank.unfoldered.available, :environments).where('rank <= 3') }, class_name: 'Environment'
   has_many :deployments
   has_many :pipeline_schedules, class_name: 'Ci::PipelineSchedule'
   has_many :project_deploy_tokens
@@ -461,13 +463,6 @@ class Project < ApplicationRecord
 
   # Used by Projects::CleanupService to hold a map of rewritten object IDs
   mount_uploader :bfg_object_map, AttachmentUploader
-
-  # Returns a project, if it is not about to be removed.
-  #
-  # id - The ID of the project to retrieve.
-  def self.find_without_deleted(id)
-    without_deleted.find_by_id(id)
-  end
 
   def self.eager_load_namespace_and_owner
     includes(namespace: :owner)
@@ -660,6 +655,11 @@ class Project < ApplicationRecord
     else
       super.external
     end
+  end
+
+  def preload_protected_branches
+    preloader = ActiveRecord::Associations::Preloader.new
+    preloader.preload(self, protected_branches: [:push_access_levels, :merge_access_levels])
   end
 
   # returns all ancestor-groups upto but excluding the given namespace
@@ -1912,7 +1912,7 @@ class Project < ApplicationRecord
   end
 
   def default_environment
-    production_first = "(CASE WHEN name = 'production' THEN 0 ELSE 1 END), id ASC"
+    production_first = Arel.sql("(CASE WHEN name = 'production' THEN 0 ELSE 1 END), id ASC")
 
     environments
       .with_state(:available)

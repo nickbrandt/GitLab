@@ -118,6 +118,20 @@ describe Analytics::CycleAnalytics::StagesController do
         expect(stage.name).to eq(params[:name])
       end
 
+      context 'hidden attribute' do
+        before do
+          params[:hidden] = true
+        end
+
+        it 'updates the hidden attribute' do
+          subject
+
+          stage.reload
+
+          expect(stage.hidden).to eq(true)
+        end
+      end
+
       context 'when positioning parameter is given' do
         before do
           params[:move_before_id] = create(:cycle_analytics_group_stage, parent: group, relative_position: 10).id

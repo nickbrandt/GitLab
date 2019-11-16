@@ -324,6 +324,14 @@ msgstr ""
 msgid "%{percent}%% complete"
 msgstr ""
 
+msgid "%{primary} (%{secondary})"
+msgstr ""
+
+msgid "%{releases} release"
+msgid_plural "%{releases} releases"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%{service_title} activated."
 msgstr ""
 
@@ -839,6 +847,9 @@ msgid "AccessTokens|reset it"
 msgstr ""
 
 msgid "Account"
+msgstr ""
+
+msgid "Account ID"
 msgstr ""
 
 msgid "Account and limit"
@@ -1388,6 +1399,9 @@ msgstr ""
 msgid "All groups and projects"
 msgstr ""
 
+msgid "All issues for this milestone are closed."
+msgstr ""
+
 msgid "All issues for this milestone are closed. You may close this milestone now."
 msgstr ""
 
@@ -1401,6 +1415,9 @@ msgid "All paths are relative to the GitLab URL. Do not include %{relative_url_l
 msgstr ""
 
 msgid "All projects"
+msgstr ""
+
+msgid "All security scans are enabled because %{linkStart}Auto DevOps%{linkEnd} is enabled on this project"
 msgstr ""
 
 msgid "All users"
@@ -1472,6 +1489,15 @@ msgstr ""
 msgid "Alternate support URL for help page and help dropdown"
 msgstr ""
 
+msgid "Amazon EKS"
+msgstr ""
+
+msgid "Amazon EKS integration allows you to provision EKS clusters from GitLab."
+msgstr ""
+
+msgid "Amazon authentication is not %{link_start}correctly configured%{link_end}. Ask your GitLab administrator if you want to use this service."
+msgstr ""
+
 msgid "Amount of time (in hours) that users are allowed to skip forced configuration of two-factor authentication"
 msgstr ""
 
@@ -1515,6 +1541,9 @@ msgid "An error occurred when trying to resolve a discussion. Please try again."
 msgstr ""
 
 msgid "An error occurred when updating the issue weight"
+msgstr ""
+
+msgid "An error occurred while checking group path"
 msgstr ""
 
 msgid "An error occurred while deleting the approvers group"
@@ -1619,6 +1648,9 @@ msgstr ""
 msgid "An error occurred while loading filenames"
 msgstr ""
 
+msgid "An error occurred while loading issues"
+msgstr ""
+
 msgid "An error occurred while loading the file"
 msgstr ""
 
@@ -1677,6 +1709,9 @@ msgid "An error occurred while updating approvers"
 msgstr ""
 
 msgid "An error occurred while updating the comment"
+msgstr ""
+
+msgid "An error occurred while validating group path"
 msgstr ""
 
 msgid "An error occurred while validating username"
@@ -1764,6 +1799,9 @@ msgid "Any namespace"
 msgstr ""
 
 msgid "Any user"
+msgstr ""
+
+msgid "App ID"
 msgstr ""
 
 msgid "Appearance"
@@ -1913,6 +1951,9 @@ msgid "Archived projects"
 msgstr ""
 
 msgid "Archiving the project will make it entirely read-only. It is hidden from the dashboard and doesn't show up in searches. <strong>The repository cannot be committed to, and no issues, comments or other entities can be created.</strong>"
+msgstr ""
+
+msgid "Are you setting up GitLab for a company?"
 msgstr ""
 
 msgid "Are you sure that you want to archive this project?"
@@ -2142,6 +2183,9 @@ msgid "Authenticate"
 msgstr ""
 
 msgid "Authenticate with GitHub"
+msgstr ""
+
+msgid "Authenticating"
 msgstr ""
 
 msgid "Authentication Log"
@@ -2900,9 +2944,6 @@ msgstr ""
 msgid "Certificate (PEM)"
 msgstr ""
 
-msgid "Change Weight"
-msgstr ""
-
 msgid "Change assignee"
 msgstr ""
 
@@ -2976,6 +3017,9 @@ msgid "Changes the title to \"%{title_param}\"."
 msgstr ""
 
 msgid "Changes won't take place until the index is %{link_start}recreated%{link_end}."
+msgstr ""
+
+msgid "Changing a Release tag is only supported via Releases API. %{linkStart}More information%{linkEnd}"
 msgstr ""
 
 msgid "Changing group path can have unintended side effects."
@@ -3059,6 +3103,9 @@ msgstr ""
 msgid "Checking branch availability..."
 msgstr ""
 
+msgid "Checking group path availability..."
+msgstr ""
+
 msgid "Checking username availability..."
 msgstr ""
 
@@ -3099,9 +3146,6 @@ msgid "Choose a template..."
 msgstr ""
 
 msgid "Choose a type..."
-msgstr ""
-
-msgid "Choose an existing tag, or create a new one"
 msgstr ""
 
 msgid "Choose any color."
@@ -3264,6 +3308,9 @@ msgid "CiVariable|Toggle protected"
 msgstr ""
 
 msgid "CiVariable|Validation failed"
+msgstr ""
+
+msgid "Class"
 msgstr ""
 
 msgid "Classification Label (optional)"
@@ -3479,6 +3526,12 @@ msgstr ""
 msgid "ClusterIntegration|Are you sure you want to remove this Kubernetes cluster's integration? This will not delete your actual Kubernetes cluster."
 msgstr ""
 
+msgid "ClusterIntegration|Authenticate with AWS"
+msgstr ""
+
+msgid "ClusterIntegration|Authenticate with Amazon Web Services"
+msgstr ""
+
 msgid "ClusterIntegration|Base domain"
 msgstr ""
 
@@ -3497,10 +3550,13 @@ msgstr ""
 msgid "ClusterIntegration|Choose a prefix to be used for your namespaces. Defaults to your project path."
 msgstr ""
 
-msgid "ClusterIntegration|Choose the %{startLink}security groups%{endLink} to apply to the EKS-managed Elastic Network Interfaces that are created in your worker node subnets."
+msgid "ClusterIntegration|Choose the %{startLink}security group %{externalLinkIcon} %{endLink} to apply to the EKS-managed Elastic Network Interfaces that are created in your worker node subnets."
 msgstr ""
 
-msgid "ClusterIntegration|Choose the %{startLink}subnets%{endLink} in your VPC where your worker nodes will run."
+msgid "ClusterIntegration|Choose the %{startLink}subnets %{externalLinkIcon} %{endLink} in your VPC where your worker nodes will run."
+msgstr ""
+
+msgid "ClusterIntegration|Choose the worker node %{startLink}instance type %{externalLinkIcon} %{endLink}."
 msgstr ""
 
 msgid "ClusterIntegration|Choose which applications to install on your Kubernetes cluster. Helm Tiller is required to install any of the following applications."
@@ -3557,6 +3613,9 @@ msgstr ""
 msgid "ClusterIntegration|Could not load VPCs for the selected region"
 msgstr ""
 
+msgid "ClusterIntegration|Could not load instance types"
+msgstr ""
+
 msgid "ClusterIntegration|Could not load regions from your AWS account"
 msgstr ""
 
@@ -3569,6 +3628,9 @@ msgstr ""
 msgid "ClusterIntegration|Create Kubernetes cluster"
 msgstr ""
 
+msgid "ClusterIntegration|Create a provision role on %{startAwsLink}Amazon Web Services %{externalLinkIcon}%{endLink} using the account and external ID above. %{startMoreInfoLink}More information%{endLink}"
+msgstr ""
+
 msgid "ClusterIntegration|Create cluster on"
 msgstr ""
 
@@ -3579,6 +3641,9 @@ msgid "ClusterIntegration|Create new Cluster on EKS"
 msgstr ""
 
 msgid "ClusterIntegration|Create new Cluster on GKE"
+msgstr ""
+
+msgid "ClusterIntegration|Creating Kubernetes cluster"
 msgstr ""
 
 msgid "ClusterIntegration|Did you know?"
@@ -3689,6 +3754,9 @@ msgstr ""
 msgid "ClusterIntegration|Instance cluster"
 msgstr ""
 
+msgid "ClusterIntegration|Instance type"
+msgstr ""
+
 msgid "ClusterIntegration|Integrate Kubernetes cluster automation"
 msgstr ""
 
@@ -3737,13 +3805,13 @@ msgstr ""
 msgid "ClusterIntegration|Kubernetes cluster details"
 msgstr ""
 
-msgid "ClusterIntegration|Kubernetes cluster is being created on Google Kubernetes Engine..."
+msgid "ClusterIntegration|Kubernetes cluster is being created..."
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster name"
 msgstr ""
 
-msgid "ClusterIntegration|Kubernetes cluster was successfully created on Google Kubernetes Engine."
+msgid "ClusterIntegration|Kubernetes cluster was successfully created."
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes clusters allow you to use review apps, deploy your applications, run your pipelines, and much more in an easy way."
@@ -3764,7 +3832,7 @@ msgstr ""
 msgid "ClusterIntegration|Learn more about %{help_link_start}zones%{help_link_end}."
 msgstr ""
 
-msgid "ClusterIntegration|Learn more about %{startLink}Regions%{endLink}."
+msgid "ClusterIntegration|Learn more about %{startLink}Regions %{externalLinkIcon}%{endLink}."
 msgstr ""
 
 msgid "ClusterIntegration|Learn more about Kubernetes"
@@ -3791,6 +3859,9 @@ msgstr ""
 msgid "ClusterIntegration|Loading VPCs"
 msgstr ""
 
+msgid "ClusterIntegration|Loading instance types"
+msgstr ""
+
 msgid "ClusterIntegration|Loading security groups"
 msgstr ""
 
@@ -3813,6 +3884,9 @@ msgid "ClusterIntegration|No Key Pairs found"
 msgstr ""
 
 msgid "ClusterIntegration|No VPCs found"
+msgstr ""
+
+msgid "ClusterIntegration|No instance type found"
 msgstr ""
 
 msgid "ClusterIntegration|No machine types matched your search"
@@ -3866,6 +3940,9 @@ msgstr ""
 msgid "ClusterIntegration|Prometheus is an open-source monitoring system with %{gitlabIntegrationLink} to monitor deployed applications."
 msgstr ""
 
+msgid "ClusterIntegration|Provision Role ARN"
+msgstr ""
+
 msgid "ClusterIntegration|RBAC-enabled cluster"
 msgstr ""
 
@@ -3908,6 +3985,9 @@ msgstr ""
 msgid "ClusterIntegration|Search VPCs"
 msgstr ""
 
+msgid "ClusterIntegration|Search instance types"
+msgstr ""
+
 msgid "ClusterIntegration|Search machine types"
 msgstr ""
 
@@ -3926,7 +4006,7 @@ msgstr ""
 msgid "ClusterIntegration|Search zones"
 msgstr ""
 
-msgid "ClusterIntegration|Security groups"
+msgid "ClusterIntegration|Security group"
 msgstr ""
 
 msgid "ClusterIntegration|See and edit the details for your Kubernetes cluster"
@@ -3938,7 +4018,10 @@ msgstr ""
 msgid "ClusterIntegration|Select a VPC to choose a subnet"
 msgstr ""
 
-msgid "ClusterIntegration|Select a VPC to use for your EKS Cluster resources. To use a new VPC, first create one on %{startLink}Amazon Web Services%{endLink}."
+msgid "ClusterIntegration|Select a VPC to use for your EKS Cluster resources. To use a new VPC, first create one on %{startLink}Amazon Web Services %{externalLinkIcon} %{endLink}."
+msgstr ""
+
+msgid "ClusterIntegration|Select a different AWS role"
 msgstr ""
 
 msgid "ClusterIntegration|Select a region to choose a Key Pair"
@@ -3959,10 +4042,10 @@ msgstr ""
 msgid "ClusterIntegration|Select project to choose zone"
 msgstr ""
 
-msgid "ClusterIntegration|Select the IAM Role to allow Amazon EKS and the Kubernetes control plane to manage AWS resources on your behalf. To use a new role name, first create one on %{startLink}Amazon Web Services%{endLink}."
+msgid "ClusterIntegration|Select the IAM Role to allow Amazon EKS and the Kubernetes control plane to manage AWS resources on your behalf. To use a new role name, first create one on %{startLink}Amazon Web Services %{externalLinkIcon} %{endLink}."
 msgstr ""
 
-msgid "ClusterIntegration|Select the key pair name that will be used to create EC2 nodes. To use a new key pair name, first create one on %{startLink}Amazon Web Services%{endLink}."
+msgid "ClusterIntegration|Select the key pair name that will be used to create EC2 nodes. To use a new key pair name, first create one on %{startLink}Amazon Web Services %{externalLinkIcon} %{endLink}."
 msgstr ""
 
 msgid "ClusterIntegration|Select zone"
@@ -3983,7 +4066,7 @@ msgstr ""
 msgid "ClusterIntegration|Something went wrong on our end."
 msgstr ""
 
-msgid "ClusterIntegration|Something went wrong while creating your Kubernetes cluster on Google Kubernetes Engine"
+msgid "ClusterIntegration|Something went wrong while creating your Kubernetes cluster"
 msgstr ""
 
 msgid "ClusterIntegration|Something went wrong while installing %{title}"
@@ -3998,7 +4081,10 @@ msgstr ""
 msgid "ClusterIntegration|Specifying a domain will allow you to use Auto Review Apps and Auto Deploy stages for %{auto_devops_start}Auto DevOps%{auto_devops_end}. The domain should have a wildcard DNS configured matching the domain."
 msgstr ""
 
-msgid "ClusterIntegration|Subnet"
+msgid "ClusterIntegration|Subnets"
+msgstr ""
+
+msgid "ClusterIntegration|The Amazon Resource Name (ARN) associated with your role. If you do not have a provision role, first create one on  %{startAwsLink}Amazon Web Services %{externalLinkIcon}%{endLink} using the above account and external IDs. %{startMoreInfoLink}More information%{endLink}"
 msgstr ""
 
 msgid "ClusterIntegration|The Kubernetes certificate used to authenticate to the cluster."
@@ -4070,6 +4156,9 @@ msgstr ""
 msgid "ClusterIntegration|You must first install Helm Tiller before installing the applications below"
 msgstr ""
 
+msgid "ClusterIntegration|You must grant access to your organization’s AWS resources in order to create a new EKS cluster. To grant access, create a provision role using the account and external ID below and provide us the ARN."
+msgstr ""
+
 msgid "ClusterIntegration|You must have an RBAC-enabled cluster to install Knative."
 msgstr ""
 
@@ -4110,6 +4199,9 @@ msgid "ClusterIntergation|Select a security group"
 msgstr ""
 
 msgid "ClusterIntergation|Select a subnet"
+msgstr ""
+
+msgid "ClusterIntergation|Select an instance type"
 msgstr ""
 
 msgid "ClusterIntergation|Select key pair"
@@ -4294,6 +4386,9 @@ msgstr ""
 msgid "Compare changes with the merge request target branch"
 msgstr ""
 
+msgid "Compare with previous version"
+msgstr ""
+
 msgid "CompareBranches|%{source_branch} and %{target_branch} are the same."
 msgstr ""
 
@@ -4331,6 +4426,9 @@ msgid "Configure Let's Encrypt"
 msgstr ""
 
 msgid "Configure Prometheus"
+msgstr ""
+
+msgid "Configure Security %{wordBreakOpportunity}and Compliance"
 msgstr ""
 
 msgid "Configure Tracing"
@@ -4388,6 +4486,9 @@ msgid "Connect repositories from GitHub"
 msgstr ""
 
 msgid "Connect your external repositories, and CI/CD pipelines will run for new commits. A GitLab project will be created with only CI/CD features enabled."
+msgstr ""
+
+msgid "Connecting"
 msgstr ""
 
 msgid "Connecting to terminal sync service"
@@ -4569,6 +4670,12 @@ msgstr ""
 msgid "Copy %{proxy_url}"
 msgstr ""
 
+msgid "Copy Account ID to clipboard"
+msgstr ""
+
+msgid "Copy External ID to clipboard"
+msgstr ""
+
 msgid "Copy ID"
 msgstr ""
 
@@ -4630,9 +4737,6 @@ msgid "Copy trigger token"
 msgstr ""
 
 msgid "Could not add admins as members"
-msgstr ""
-
-msgid "Could not add prometheus URL to whitelist"
 msgstr ""
 
 msgid "Could not authorize chat nickname. Try again!"
@@ -4893,10 +4997,16 @@ msgstr ""
 msgid "Current password"
 msgstr ""
 
+msgid "Current vulnerabilities count"
+msgstr ""
+
 msgid "CurrentUser|Profile"
 msgstr ""
 
 msgid "CurrentUser|Settings"
+msgstr ""
+
+msgid "CurrentUser|Start a Gold trial"
 msgstr ""
 
 msgid "Custom CI configuration path"
@@ -4995,13 +5105,40 @@ msgstr ""
 msgid "Cycle Analytics gives an overview of how much time it takes to go from idea to production in your project."
 msgstr ""
 
+msgid "CycleAnalyticsEvent|Issue closed"
+msgstr ""
+
 msgid "CycleAnalyticsEvent|Issue created"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Issue first added to a board"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Issue first associated with a milestone"
 msgstr ""
 
 msgid "CycleAnalyticsEvent|Issue first associated with a milestone or issue first added to a board"
 msgstr ""
 
 msgid "CycleAnalyticsEvent|Issue first mentioned in a commit"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Issue label was added"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Issue label was removed"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Issue last edited"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge Request label was added"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge Request label was removed"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request closed"
 msgstr ""
 
 msgid "CycleAnalyticsEvent|Merge request created"
@@ -5014,6 +5151,9 @@ msgid "CycleAnalyticsEvent|Merge request last build finish time"
 msgstr ""
 
 msgid "CycleAnalyticsEvent|Merge request last build start time"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request last edited"
 msgstr ""
 
 msgid "CycleAnalyticsEvent|Merge request merged"
@@ -5040,6 +5180,12 @@ msgstr ""
 msgid "CycleAnalyticsStage|Test"
 msgstr ""
 
+msgid "CycleAnalyticsStage|is not available for the selected group"
+msgstr ""
+
+msgid "CycleAnalyticsStage|should be under a group"
+msgstr ""
+
 msgid "CycleAnalytics|%{projectName}"
 msgid_plural "CycleAnalytics|%d projects selected"
 msgstr[0] ""
@@ -5057,6 +5203,9 @@ msgid "CycleAnalytics|Stages"
 msgstr ""
 
 msgid "CycleAnalytics|group dropdown filter"
+msgstr ""
+
+msgid "CycleAnalytics|not allowed for the given start event"
 msgstr ""
 
 msgid "CycleAnalytics|project dropdown filter"
@@ -5132,6 +5281,9 @@ msgid "Decline and sign out"
 msgstr ""
 
 msgid "Default Branch"
+msgstr ""
+
+msgid "Default CI configuration path"
 msgstr ""
 
 msgid "Default artifacts expiration"
@@ -5264,6 +5416,9 @@ msgid "Deny"
 msgstr ""
 
 msgid "Dependencies"
+msgstr ""
+
+msgid "Dependencies help page link"
 msgstr ""
 
 msgid "Dependencies|%d additional vulnerability not shown"
@@ -5531,6 +5686,9 @@ msgstr ""
 msgid "Descending"
 msgstr ""
 
+msgid "Describe the goal of the changes and what reviewers should be aware of."
+msgstr ""
+
 msgid "Description"
 msgstr ""
 
@@ -5640,6 +5798,9 @@ msgid "Diff content limits"
 msgstr ""
 
 msgid "Diff limits"
+msgstr ""
+
+msgid "Difference between start date and now"
 msgstr ""
 
 msgid "DiffsCompareBaseBranch|(base)"
@@ -5762,6 +5923,9 @@ msgstr ""
 msgid "Display name"
 msgstr ""
 
+msgid "Displays dependencies and known vulnerabilities, based on the %{linkStart}latest pipeline%{linkEnd} scan"
+msgstr ""
+
 msgid "Do not display offers from third parties within GitLab"
 msgstr ""
 
@@ -5858,6 +6022,9 @@ msgstr ""
 msgid "Due date"
 msgstr ""
 
+msgid "Duration"
+msgstr ""
+
 msgid "During this process, you’ll be asked for URLs from GitLab’s side. Use the URLs shown below."
 msgstr ""
 
@@ -5904,6 +6071,9 @@ msgid "Edit board"
 msgstr ""
 
 msgid "Edit comment"
+msgstr ""
+
+msgid "Edit dashboard"
 msgstr ""
 
 msgid "Edit description"
@@ -6113,9 +6283,6 @@ msgstr ""
 msgid "Enable or disable version check and usage ping."
 msgstr ""
 
-msgid "Enable pendo tracking"
-msgstr ""
-
 msgid "Enable protected paths rate limit"
 msgstr ""
 
@@ -6230,6 +6397,12 @@ msgstr ""
 msgid "Environment:"
 msgstr ""
 
+msgid "EnvironmentDashboard|API"
+msgstr ""
+
+msgid "EnvironmentDashboard|Created through the Deployment API"
+msgstr ""
+
 msgid "Environments"
 msgstr ""
 
@@ -6308,13 +6481,22 @@ msgstr ""
 msgid "Environments|Job"
 msgstr ""
 
+msgid "Environments|Learn about environments"
+msgstr ""
+
 msgid "Environments|Learn more about stopping environments"
 msgstr ""
 
 msgid "Environments|New environment"
 msgstr ""
 
+msgid "Environments|No deployed environments"
+msgstr ""
+
 msgid "Environments|No deployments yet"
+msgstr ""
+
+msgid "Environments|No pods to display"
 msgstr ""
 
 msgid "Environments|Note that this action will stop the environment, but it will %{emphasisStart}not%{emphasisEnd} have an effect on any existing deployment due to no “stop environment action” being defined in the %{ciConfigLinkStart}.gitlab-ci.yml%{ciConfigLinkEnd} file."
@@ -6482,6 +6664,9 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
+msgid "Error Details"
+msgstr ""
+
 msgid "Error Tracking"
 msgstr ""
 
@@ -6492,6 +6677,9 @@ msgid "Error creating epic"
 msgstr ""
 
 msgid "Error deleting  %{issuableType}"
+msgstr ""
+
+msgid "Error details"
 msgstr ""
 
 msgid "Error fetching diverging counts for branches. Please try again."
@@ -6815,6 +7003,9 @@ msgstr ""
 msgid "External Classification Policy Authorization"
 msgstr ""
 
+msgid "External ID"
+msgstr ""
+
 msgid "External URL"
 msgstr ""
 
@@ -6923,6 +7114,9 @@ msgstr ""
 msgid "Failed to load emoji list."
 msgstr ""
 
+msgid "Failed to load error details from Sentry."
+msgstr ""
+
 msgid "Failed to load errors from Sentry. Error message: %{errorMessage}"
 msgstr ""
 
@@ -6930,6 +7124,9 @@ msgid "Failed to load groups & users."
 msgstr ""
 
 msgid "Failed to load related branches"
+msgstr ""
+
+msgid "Failed to load stacktrace."
 msgstr ""
 
 msgid "Failed to mark this issue as a duplicate because referenced issue was not found."
@@ -7264,6 +7461,9 @@ msgstr ""
 msgid "Filter by two-factor authentication"
 msgstr ""
 
+msgid "Filter by user"
+msgstr ""
+
 msgid "Filter projects"
 msgstr ""
 
@@ -7319,6 +7519,9 @@ msgid "First day of the week"
 msgstr ""
 
 msgid "First name"
+msgstr ""
+
+msgid "First seen"
 msgstr ""
 
 msgid "Fixed date"
@@ -7525,7 +7728,13 @@ msgstr ""
 msgid "GeoNodeSyncStatus|Node is slow, overloaded, or it just recovered after an outage."
 msgstr ""
 
+msgid "GeoNodes|Attachments"
+msgstr ""
+
 msgid "GeoNodes|Checksummed"
+msgstr ""
+
+msgid "GeoNodes|Container repositories"
 msgstr ""
 
 msgid "GeoNodes|Data is out of date from %{timeago}"
@@ -7558,6 +7767,12 @@ msgstr ""
 msgid "GeoNodes|Internal URL"
 msgstr ""
 
+msgid "GeoNodes|Job artifacts"
+msgstr ""
+
+msgid "GeoNodes|LFS objects"
+msgstr ""
+
 msgid "GeoNodes|Last event ID processed by cursor"
 msgstr ""
 
@@ -7577,18 +7792,6 @@ msgid "GeoNodes|Learn more about Wiki verification"
 msgstr ""
 
 msgid "GeoNodes|Loading nodes"
-msgstr ""
-
-msgid "GeoNodes|Local LFS objects"
-msgstr ""
-
-msgid "GeoNodes|Local attachments"
-msgstr ""
-
-msgid "GeoNodes|Local container repositories"
-msgstr ""
-
-msgid "GeoNodes|Local job artifacts"
 msgstr ""
 
 msgid "GeoNodes|New node"
@@ -8014,6 +8217,9 @@ msgstr ""
 msgid "GitLabPages|%{domain} is not verified. To learn how to verify ownership, visit your %{link_start}domain details%{link_end}."
 msgstr ""
 
+msgid "GitLabPages|Access Control is enabled for this Pages website; only authorized users will be able to access it. To make your website publicly available, navigate to your project's %{strong_start}Settings > General > Visibility%{strong_end} and select %{strong_start}Everyone%{strong_end} in pages section. Read the %{link_start}documentation%{link_end} for more information."
+msgstr ""
+
 msgid "GitLabPages|Access pages"
 msgstr ""
 
@@ -8026,16 +8232,19 @@ msgstr ""
 msgid "GitLabPages|Configure pages"
 msgstr ""
 
-msgid "GitLabPages|Details"
+msgid "GitLabPages|Domains"
 msgstr ""
 
-msgid "GitLabPages|Domains"
+msgid "GitLabPages|Edit"
 msgstr ""
 
 msgid "GitLabPages|Expired"
 msgstr ""
 
 msgid "GitLabPages|Force HTTPS (requires valid certificates)"
+msgstr ""
+
+msgid "GitLabPages|GitLab Pages are disabled for this project. You can enable them on your project's %{strong_start}Settings > General > Visibility%{strong_end} page."
 msgstr ""
 
 msgid "GitLabPages|It may take up to 30 minutes before the site is available after the first deployment."
@@ -8254,6 +8463,9 @@ msgstr ""
 msgid "GrafanaIntegration|API Token"
 msgstr ""
 
+msgid "GrafanaIntegration|Active"
+msgstr ""
+
 msgid "GrafanaIntegration|Embed Grafana charts in GitLab issues."
 msgstr ""
 
@@ -8336,6 +8548,12 @@ msgid "Group overview"
 msgstr ""
 
 msgid "Group overview content"
+msgstr ""
+
+msgid "Group path is already taken. Suggestions: "
+msgstr ""
+
+msgid "Group path is available."
 msgstr ""
 
 msgid "Group pipeline minutes were successfully reset."
@@ -9036,7 +9254,7 @@ msgstr ""
 msgid "In order to gather accurate feature usage data, it can take 1 to 2 weeks to see your index."
 msgstr ""
 
-msgid "In order to tailor your experience with GitLab<br>we would like to know a bit more about you."
+msgid "In order to tailor your experience with GitLab we<br>would like to know a bit more about you."
 msgstr ""
 
 msgid "In the next step, you'll be able to select the projects you want to import."
@@ -9572,7 +9790,7 @@ msgstr ""
 msgid "Kubernetes cluster creation time exceeds timeout; %{timeout}"
 msgstr ""
 
-msgid "Kubernetes cluster integration was not removed."
+msgid "Kubernetes cluster integration and resources are being removed."
 msgstr ""
 
 msgid "Kubernetes cluster integration was successfully removed."
@@ -9945,6 +10163,27 @@ msgstr ""
 msgid "Licenses"
 msgstr ""
 
+msgid "License|Buy license"
+msgstr ""
+
+msgid "License|License"
+msgstr ""
+
+msgid "License|You can restore access to the Gold features at any time by upgrading."
+msgstr ""
+
+msgid "License|You can start a free trial of GitLab Ultimate without any obligation or payment details."
+msgstr ""
+
+msgid "License|You do not have a license."
+msgstr ""
+
+msgid "License|Your License"
+msgstr ""
+
+msgid "License|Your free trial of GitLab Ultimate expired on %{trial_ends_on}."
+msgstr ""
+
 msgid "Limit display of time tracking units to hours."
 msgstr ""
 
@@ -9993,6 +10232,9 @@ msgid "Live preview"
 msgstr ""
 
 msgid "Loading contribution stats for group members"
+msgstr ""
+
+msgid "Loading files, directories, and submodules in the path %{path} for commit reference %{ref}"
 msgstr ""
 
 msgid "Loading functions timed out. Please reload the page to try again."
@@ -10062,6 +10304,9 @@ msgid "Logo was successfully removed."
 msgstr ""
 
 msgid "Logs"
+msgstr ""
+
+msgid "Logs|To see the pod logs, deploy your code to an environment."
 msgstr ""
 
 msgid "MD5"
@@ -10466,13 +10711,10 @@ msgstr ""
 msgid "MergeRequests|started a thread on %{linkStart}the diff%{linkEnd}"
 msgstr ""
 
-msgid "MergeRequests|started a thread on an outdated change in commit %{linkStart}%{commitId}%{linkEnd}"
+msgid "MergeRequests|started a thread on an outdated change in commit %{linkStart}%{commitDisplay}%{linkEnd}"
 msgstr ""
 
-msgid "MergeRequests|started a thread on commit %{linkStart}%{commitId}%{linkEnd}"
-msgstr ""
-
-msgid "MergeRequest| %{paragraphStart}changed the description %{descriptionChangedTimes} times %{timeDifferenceMinutes}%{paragraphEnd}"
+msgid "MergeRequests|started a thread on commit %{linkStart}%{commitDisplay}%{linkEnd}"
 msgstr ""
 
 msgid "MergeRequest|Error dismissing suggestion popover. Please try again."
@@ -10565,9 +10807,6 @@ msgstr ""
 msgid "Metrics|Label of the y-axis (usually the unit). The x-axis always represents time."
 msgstr ""
 
-msgid "Metrics|Learn about environments"
-msgstr ""
-
 msgid "Metrics|Legend label (optional)"
 msgstr ""
 
@@ -10581,9 +10820,6 @@ msgid "Metrics|Must be a valid PromQL query."
 msgstr ""
 
 msgid "Metrics|New metric"
-msgstr ""
-
-msgid "Metrics|No deployed environments"
 msgstr ""
 
 msgid "Metrics|PromQL query is valid"
@@ -10616,9 +10852,6 @@ msgstr ""
 msgid "Metrics|Unexpected deployment data response from prometheus endpoint"
 msgstr ""
 
-msgid "Metrics|Unexpected metrics data response from prometheus endpoint"
-msgstr ""
-
 msgid "Metrics|Unit label"
 msgstr ""
 
@@ -10626,6 +10859,9 @@ msgid "Metrics|Used as a title for the chart"
 msgstr ""
 
 msgid "Metrics|Used if the query returns a single series. If it returns multiple series, their legend labels will be picked up from the response."
+msgstr ""
+
+msgid "Metrics|Validating query"
 msgstr ""
 
 msgid "Metrics|Y-axis label"
@@ -10877,6 +11113,9 @@ msgid "Naming, topics, avatar"
 msgstr ""
 
 msgid "Naming, visibility"
+msgstr ""
+
+msgid "Navigate to the project to close the milestone."
 msgstr ""
 
 msgid "Nav|Help"
@@ -11175,7 +11414,7 @@ msgstr ""
 msgid "No preview for this file type"
 msgstr ""
 
-msgid "No prioritised labels with such name or description"
+msgid "No prioritized labels with such name or description"
 msgstr ""
 
 msgid "No public groups"
@@ -11651,7 +11890,40 @@ msgstr ""
 msgid "Package was removed"
 msgstr ""
 
+msgid "PackageRegistry|Copy npm command"
+msgstr ""
+
+msgid "PackageRegistry|Copy npm setup command"
+msgstr ""
+
+msgid "PackageRegistry|Copy yarn command"
+msgstr ""
+
+msgid "PackageRegistry|Copy yarn setup command"
+msgstr ""
+
+msgid "PackageRegistry|Delete Package"
+msgstr ""
+
 msgid "PackageRegistry|Delete Package Version"
+msgstr ""
+
+msgid "PackageRegistry|Installation"
+msgstr ""
+
+msgid "PackageRegistry|Learn how to %{noPackagesLinkStart}publish and share your packages%{noPackagesLinkEnd} with GitLab."
+msgstr ""
+
+msgid "PackageRegistry|Package installation"
+msgstr ""
+
+msgid "PackageRegistry|Registry Setup"
+msgstr ""
+
+msgid "PackageRegistry|Remove package"
+msgstr ""
+
+msgid "PackageRegistry|There are no packages yet"
 msgstr ""
 
 msgid "PackageRegistry|There was a problem fetching the details for this package."
@@ -11660,7 +11932,19 @@ msgstr ""
 msgid "PackageRegistry|Unable to load package"
 msgstr ""
 
+msgid "PackageRegistry|You are about to delete <b>%{packageName}</b>, this operation is irreversible, are you sure?"
+msgstr ""
+
 msgid "PackageRegistry|You are about to delete version %{boldStart}%{version}%{boldEnd} of %{boldStart}%{name}%{boldEnd}. Are you sure?"
+msgstr ""
+
+msgid "PackageRegistry|You may also need to setup authentication using an auth token.  %{linkStart}See the documentation%{linkEnd} to find out more."
+msgstr ""
+
+msgid "PackageRegistry|npm"
+msgstr ""
+
+msgid "PackageRegistry|yarn"
 msgstr ""
 
 msgid "Packages"
@@ -11720,6 +12004,12 @@ msgstr ""
 msgid "Part of merge request changes"
 msgstr ""
 
+msgid "Participants"
+msgstr ""
+
+msgid "Passed"
+msgstr ""
+
 msgid "Password"
 msgstr ""
 
@@ -11772,12 +12062,6 @@ msgid "Paused Runners don't accept new jobs"
 msgstr ""
 
 msgid "Pending"
-msgstr ""
-
-msgid "Pendo"
-msgstr ""
-
-msgid "Pendo endpoint"
 msgstr ""
 
 msgid "People without permission will never get a notification and won't be able to comment."
@@ -12131,7 +12415,7 @@ msgstr ""
 msgid "Please check the configuration file to ensure that it is available and the YAML is valid"
 msgstr ""
 
-msgid "Please check your email (%{email}) to verify that you own this address. Didn't receive it? %{resend_link}. Wrong email address? %{update_link}."
+msgid "Please check your email (%{email}) to verify that you own this address and unlock the power of CI/CD. Didn't receive it? %{resend_link}. Wrong email address? %{update_link}."
 msgstr ""
 
 msgid "Please choose a group URL with no special characters."
@@ -12233,6 +12517,9 @@ msgstr ""
 msgid "Please wait while we import the repository for you. Refresh at will."
 msgstr ""
 
+msgid "Pod logs"
+msgstr ""
+
 msgid "Pod not found"
 msgstr ""
 
@@ -12254,6 +12541,9 @@ msgstr ""
 msgid "Preferences|Choose what content you want to see on a project’s overview page."
 msgstr ""
 
+msgid "Preferences|Customize integrations with third party services."
+msgstr ""
+
 msgid "Preferences|Customize the appearance of the application header and navigation sidebar."
 msgstr ""
 
@@ -12263,7 +12553,13 @@ msgstr ""
 msgid "Preferences|Display time in 24-hour format"
 msgstr ""
 
+msgid "Preferences|Enable integrated code intelligence on code views"
+msgstr ""
+
 msgid "Preferences|For example: 30 mins ago."
+msgstr ""
+
+msgid "Preferences|Integrations"
 msgstr ""
 
 msgid "Preferences|Layout width"
@@ -12276,6 +12572,9 @@ msgid "Preferences|Project overview content"
 msgstr ""
 
 msgid "Preferences|Show whitespace in diffs"
+msgstr ""
+
+msgid "Preferences|Sourcegraph"
 msgstr ""
 
 msgid "Preferences|Syntax highlighting theme"
@@ -12830,6 +13129,9 @@ msgstr ""
 msgid "Project name"
 msgstr ""
 
+msgid "Project order will not be saved as local storage is not available."
+msgstr ""
+
 msgid "Project overview"
 msgstr ""
 
@@ -13271,9 +13573,6 @@ msgstr ""
 msgid "ProjectsNew|Want to house several dependent projects under the same namespace? %{link_start}Create a group.%{link_end}"
 msgstr ""
 
-msgid "Prometheus listen_address in config/gitlab.yml is not a valid URI"
-msgstr ""
-
 msgid "PrometheusAlerts|%{count} alerts applied"
 msgstr ""
 
@@ -13421,10 +13720,22 @@ msgstr ""
 msgid "Promotions|Epics let you manage your portfolio of projects more efficiently and with less effort by tracking groups of issues that share a theme, across projects and milestones."
 msgstr ""
 
+msgid "Promotions|Learn more"
+msgstr ""
+
+msgid "Promotions|See the other features in the %{subscription_link_start}bronze plan%{subscription_link_end}"
+msgstr ""
+
 msgid "Promotions|This feature is locked."
 msgstr ""
 
 msgid "Promotions|Upgrade plan"
+msgstr ""
+
+msgid "Promotions|Weighting your issue"
+msgstr ""
+
+msgid "Promotions|When you have a lot of issues, it can be hard to get an overview. By adding a weight to your issues, you can get a better idea of the effort, cost, required time, or value of each, and so better manage them."
 msgstr ""
 
 msgid "Prompt users to upload SSH keys"
@@ -13768,12 +14079,6 @@ msgstr ""
 msgid "Register Universal Two-Factor (U2F) Device"
 msgstr ""
 
-msgid "Register and see your runners for this group."
-msgstr ""
-
-msgid "Register and see your runners for this project."
-msgstr ""
-
 msgid "Register for GitLab"
 msgstr ""
 
@@ -14056,6 +14361,9 @@ msgid "Repo by URL"
 msgstr ""
 
 msgid "Report abuse to admin"
+msgstr ""
+
+msgid "Reported %{timeAgo} by %{reportedBy}"
 msgstr ""
 
 msgid "Reporting"
@@ -14404,6 +14712,9 @@ msgid "Runners API"
 msgstr ""
 
 msgid "Runners activated for this project"
+msgstr ""
+
+msgid "Runners are processes that pick up and execute jobs for GitLab. Here you can register and see your Runners for this project."
 msgstr ""
 
 msgid "Runners can be placed on separate users, servers, and even on your local machine."
@@ -14824,7 +15135,28 @@ msgstr ""
 msgid "Security Reports|While it's rare to have no vulnerabilities for your group, it can happen. In any event, we ask that you please double check your settings to make sure you've set up your dashboard correctly."
 msgstr ""
 
+msgid "Security configuration help link"
+msgstr ""
+
 msgid "Security dashboard"
+msgstr ""
+
+msgid "SecurityConfiguration|Configured"
+msgstr ""
+
+msgid "SecurityConfiguration|Feature"
+msgstr ""
+
+msgid "SecurityConfiguration|Feature documentation"
+msgstr ""
+
+msgid "SecurityConfiguration|Not yet configured"
+msgstr ""
+
+msgid "SecurityConfiguration|Secure features"
+msgstr ""
+
+msgid "SecurityConfiguration|Status"
 msgstr ""
 
 msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
@@ -15032,6 +15364,9 @@ msgid "Send usage data"
 msgstr ""
 
 msgid "Sentry API URL"
+msgstr ""
+
+msgid "Sentry event"
 msgstr ""
 
 msgid "Sep"
@@ -15468,9 +15803,6 @@ msgstr ""
 msgid "Single or combined queries"
 msgstr ""
 
-msgid "Site ID"
-msgstr ""
-
 msgid "Size"
 msgstr ""
 
@@ -15484,6 +15816,9 @@ msgid "Skip Trial (Continue with Free Account)"
 msgstr ""
 
 msgid "Skip this for now"
+msgstr ""
+
+msgid "Skipped"
 msgstr ""
 
 msgid "Slack application"
@@ -15588,6 +15923,9 @@ msgstr ""
 msgid "Something went wrong while closing the %{issuable}. Please try again later"
 msgstr ""
 
+msgid "Something went wrong while deleting the package."
+msgstr ""
+
 msgid "Something went wrong while deleting the source branch. Please try again."
 msgstr ""
 
@@ -15603,6 +15941,9 @@ msgstr ""
 msgid "Something went wrong while fetching comments. Please try again."
 msgstr ""
 
+msgid "Something went wrong while fetching description changes. Please try again."
+msgstr ""
+
 msgid "Something went wrong while fetching group member contributions"
 msgstr ""
 
@@ -15616,6 +15957,12 @@ msgid "Something went wrong while fetching related merge requests."
 msgstr ""
 
 msgid "Something went wrong while fetching the environments for this merge request. Please try again."
+msgstr ""
+
+msgid "Something went wrong while fetching the package."
+msgstr ""
+
+msgid "Something went wrong while fetching the packages list."
 msgstr ""
 
 msgid "Something went wrong while fetching the projects."
@@ -15834,6 +16181,51 @@ msgstr ""
 msgid "Source project cannot be found."
 msgstr ""
 
+msgid "Sourcegraph"
+msgstr ""
+
+msgid "SourcegraphAdmin|Block on private and internal projects"
+msgstr ""
+
+msgid "SourcegraphAdmin|Configure the URL to a Sourcegraph instance which can read your GitLab projects."
+msgstr ""
+
+msgid "SourcegraphAdmin|Enable Sourcegraph"
+msgstr ""
+
+msgid "SourcegraphAdmin|Enable code intelligence powered by %{link_start}Sourcegraph%{link_end} on your GitLab instance's code views and merge requests."
+msgstr ""
+
+msgid "SourcegraphAdmin|If checked, only public projects will have code intelligence and communicate with Sourcegraph."
+msgstr ""
+
+msgid "SourcegraphAdmin|More information"
+msgstr ""
+
+msgid "SourcegraphAdmin|Save changes"
+msgstr ""
+
+msgid "SourcegraphAdmin|Sourcegraph URL"
+msgstr ""
+
+msgid "SourcegraphAdmin|e.g. https://sourcegraph.example.com"
+msgstr ""
+
+msgid "SourcegraphPreferences|This feature is experimental and currently limited to certain projects."
+msgstr ""
+
+msgid "SourcegraphPreferences|This feature is experimental and limited to public projects."
+msgstr ""
+
+msgid "SourcegraphPreferences|This feature is experimental."
+msgstr ""
+
+msgid "SourcegraphPreferences|Uses %{link_start}Sourcegraph.com%{link_end}."
+msgstr ""
+
+msgid "SourcegraphPreferences|Uses a custom %{link_start}Sourcegraph instance%{link_end}."
+msgstr ""
+
 msgid "Spam Logs"
 msgstr ""
 
@@ -15856,6 +16248,9 @@ msgid "Squash commit message"
 msgstr ""
 
 msgid "Squash commits"
+msgstr ""
+
+msgid "Stack trace"
 msgstr ""
 
 msgid "Stage"
@@ -15918,7 +16313,7 @@ msgstr ""
 msgid "Start a %{new_merge_request} with these changes"
 msgstr ""
 
-msgid "Start a Free Trial"
+msgid "Start a Free Gold Trial"
 msgstr ""
 
 msgid "Start a new discussion..."
@@ -16062,9 +16457,6 @@ msgstr ""
 msgid "Subkeys"
 msgstr ""
 
-msgid "Submit a review"
-msgstr ""
-
 msgid "Submit as spam"
 msgstr ""
 
@@ -16078,12 +16470,6 @@ msgid "Submit review"
 msgstr ""
 
 msgid "Submit search"
-msgstr ""
-
-msgid "Submit the current review."
-msgstr ""
-
-msgid "Submitted the current review."
 msgstr ""
 
 msgid "Subscribe"
@@ -16111,6 +16497,15 @@ msgid "Subscribes to this %{quick_action_target}."
 msgstr ""
 
 msgid "Subscription"
+msgstr ""
+
+msgid "Subscription deletion failed."
+msgstr ""
+
+msgid "Subscription successfully created."
+msgstr ""
+
+msgid "Subscription successfully deleted."
 msgstr ""
 
 msgid "SubscriptionTable|Billing"
@@ -16285,6 +16680,12 @@ msgid "SuggestedColors|Very pale orange"
 msgstr ""
 
 msgid "Suggestions:"
+msgstr ""
+
+msgid "Suite"
+msgstr ""
+
+msgid "Summary"
 msgstr ""
 
 msgid "Sunday"
@@ -16515,6 +16916,39 @@ msgstr ""
 msgid "TestHooks|Ensure the wiki is enabled and has pages."
 msgstr ""
 
+msgid "TestReports|%{count} errors"
+msgstr ""
+
+msgid "TestReports|%{count} failures"
+msgstr ""
+
+msgid "TestReports|%{count} jobs"
+msgstr ""
+
+msgid "TestReports|%{rate}%{sign} success rate"
+msgstr ""
+
+msgid "TestReports|Test suites"
+msgstr ""
+
+msgid "TestReports|Tests"
+msgstr ""
+
+msgid "TestReports|There are no test cases to display."
+msgstr ""
+
+msgid "TestReports|There are no test suites to show."
+msgstr ""
+
+msgid "TestReports|There are no tests to show."
+msgstr ""
+
+msgid "TestReports|There was an error fetching the test reports."
+msgstr ""
+
+msgid "Tests"
+msgstr ""
+
 msgid "Thank you for signing up for your free trial! You will get additional instructions in your inbox shortly."
 msgstr ""
 
@@ -16571,10 +17005,16 @@ msgstr ""
 msgid "The collection of events added to the data gathered for that stage."
 msgstr ""
 
+msgid "The configuration status of the table below only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd}. Once you've configured a scan for the default branch, any subsequent feature branch you create will include the scan."
+msgstr ""
+
 msgid "The connection will time out after %{timeout}. For repositories that take longer, use a clone/push combination."
 msgstr ""
 
 msgid "The content of this page is not encoded in UTF-8. Edits can only be made via the Git repository."
+msgstr ""
+
+msgid "The default CI configuration path for new projects."
 msgstr ""
 
 msgid "The dependency list details information about the components used within your project."
@@ -16883,6 +17323,9 @@ msgstr ""
 msgid "There was a problem communicating with your device."
 msgstr ""
 
+msgid "There was a problem saving your custom stage, please try again"
+msgstr ""
+
 msgid "There was a problem sending the confirmation email"
 msgstr ""
 
@@ -16899,6 +17342,12 @@ msgid "There was an error deleting the To Do."
 msgstr ""
 
 msgid "There was an error fetching configuration for charts"
+msgstr ""
+
+msgid "There was an error fetching cycle analytics stages."
+msgstr ""
+
+msgid "There was an error fetching data for the selected stage"
 msgstr ""
 
 msgid "There was an error fetching label data for the selected group"
@@ -16941,6 +17390,9 @@ msgid "There was an error when unsubscribing from this label."
 msgstr ""
 
 msgid "There was an error while fetching cycle analytics data."
+msgstr ""
+
+msgid "There was an error while fetching cycle analytics summary data."
 msgstr ""
 
 msgid "There was an error with the reCAPTCHA. Please solve the reCAPTCHA again."
@@ -17211,6 +17663,9 @@ msgid "This project does not have a wiki homepage yet"
 msgstr ""
 
 msgid "This project does not have billing enabled. To create a cluster, <a href=%{linkToBilling} target=\"_blank\" rel=\"noopener noreferrer\">enable billing <i class=\"fa fa-external-link\" aria-hidden=\"true\"></i></a> and try again."
+msgstr ""
+
+msgid "This project path either does not exist or is private."
 msgstr ""
 
 msgid "This repository"
@@ -17700,6 +18155,9 @@ msgstr ""
 msgid "Total: %{total}"
 msgstr ""
 
+msgid "Trace"
+msgstr ""
+
 msgid "Tracing"
 msgstr ""
 
@@ -18087,6 +18545,9 @@ msgstr ""
 msgid "Updated %{updated_at} by %{updated_by}"
 msgstr ""
 
+msgid "Updated at"
+msgstr ""
+
 msgid "Updated to"
 msgstr ""
 
@@ -18109,9 +18570,6 @@ msgid "Upgrade your plan to activate Contribution Analytics."
 msgstr ""
 
 msgid "Upgrade your plan to activate Group Webhooks."
-msgstr ""
-
-msgid "Upgrade your plan to activate Issue weight."
 msgstr ""
 
 msgid "Upgrade your plan to improve Issue boards."
@@ -18794,6 +19252,9 @@ msgstr ""
 msgid "VulnerabilityChart|%{formattedStartDate} to today"
 msgstr ""
 
+msgid "VulnerabilityChart|Severity"
+msgstr ""
+
 msgid "Vulnerability|Class"
 msgstr ""
 
@@ -18911,7 +19372,7 @@ msgstr ""
 msgid "Welcome to GitLab"
 msgstr ""
 
-msgid "Welcome to GitLab %{username}!"
+msgid "Welcome to GitLab @%{username}!"
 msgstr ""
 
 msgid "Welcome to the Guided GitLab Tour"
@@ -19258,6 +19719,9 @@ msgstr ""
 msgid "You can see your chat accounts."
 msgstr ""
 
+msgid "You can set up as many Runners as you need to run your jobs."
+msgstr ""
+
 msgid "You can set up jobs to only use Runners with specific tags. Separate tags with commas."
 msgstr ""
 
@@ -19370,6 +19834,9 @@ msgid "You left the \"%{membershipable_human_name}\" %{source_type}."
 msgstr ""
 
 msgid "You may also add variables that are made available to the running application by prepending the variable key with <code>K8S_SECRET_</code>."
+msgstr ""
+
+msgid "You may close the milestone now."
 msgstr ""
 
 msgid "You must accept our Terms of Service and privacy policy in order to register an account"
@@ -20071,6 +20538,9 @@ msgstr ""
 msgid "failed to dismiss associated finding(id=%{finding_id}): %{message}"
 msgstr ""
 
+msgid "finding is not found or is already attached to a vulnerability"
+msgstr ""
+
 msgid "for %{link_to_merge_request} with %{link_to_merge_request_source_branch}"
 msgstr ""
 
@@ -20182,6 +20652,9 @@ msgid "latest version"
 msgstr ""
 
 msgid "leave %{group_name}"
+msgstr ""
+
+msgid "limit of %{project_limit} reached"
 msgstr ""
 
 msgid "locked by %{path_lock_user_name} %{created_at}"
@@ -20540,6 +21013,9 @@ msgstr ""
 msgid "nounSeries|%{item}, and %{lastItem}"
 msgstr ""
 
+msgid "opened %{timeAgoString} by %{user}"
+msgstr ""
+
 msgid "or %{link_start}create a new Google account%{link_end}"
 msgstr ""
 
@@ -20676,6 +21152,9 @@ msgstr ""
 msgid "started"
 msgstr ""
 
+msgid "started a discussion on %{design_link}"
+msgstr ""
+
 msgid "started on %{milestone_start_date}"
 msgstr ""
 
@@ -20779,11 +21258,6 @@ msgstr ""
 
 msgid "with %{additions} additions, %{deletions} deletions."
 msgstr ""
-
-msgid "within %d minute "
-msgid_plural "within %d minutes "
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "yaml invalid"
 msgstr ""

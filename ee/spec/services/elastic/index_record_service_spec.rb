@@ -101,8 +101,7 @@ describe Elastic::IndexRecordService, :elastic do
         'issue',
         'merge_request',
         'milestone',
-        'note',
-        'snippet'
+        'note'
       )
     end
 

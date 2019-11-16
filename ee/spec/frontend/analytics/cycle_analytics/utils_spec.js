@@ -5,13 +5,13 @@ import {
   eventToOption,
   eventsByIdentifier,
   getLabelEventsIdentifiers,
+  nestQueryStringKeys,
 } from 'ee/analytics/cycle_analytics/utils';
 import {
   customStageEvents as events,
   labelStartEvent,
   labelStopEvent,
   customStageStartEvents as startEvents,
-  customStageStopEvents as stopEvents,
 } from './mock_data';
 
 const labelEvents = [labelStartEvent, labelStopEvent].map(i => i.identifier);
@@ -23,9 +23,11 @@ describe('Cycle analytics utils', () => {
     });
 
     it('will return false for input that is not a start event', () => {
-      [stopEvents[0], {}, [], null, undefined].forEach(ev => {
-        expect(isStartEvent(ev)).toEqual(false);
-      });
+      [{ identifier: 'fake-event', canBeStartEvent: false }, {}, [], null, undefined].forEach(
+        ev => {
+          expect(isStartEvent(ev)).toEqual(false);
+        },
+      );
     });
   });
 
@@ -100,6 +102,32 @@ describe('Cycle analytics utils', () => {
         expect(eventsByIdentifier(events, items)).toEqual([]);
       });
       expect(eventsByIdentifier([], labelEvents)).toEqual([]);
+    });
+  });
+
+  describe('nestQueryStringKeys', () => {
+    const targetKey = 'foo';
+    const obj = { bar: 10, baz: 'awesome', qux: false, boo: ['lol', 'something'] };
+
+    it('will return an object with each key nested under the targetKey', () => {
+      expect(nestQueryStringKeys(obj, targetKey)).toEqual({
+        'foo[bar]': 10,
+        'foo[baz]': 'awesome',
+        'foo[qux]': false,
+        'foo[boo]': ['lol', 'something'],
+      });
+    });
+
+    it('returns an empty object if the targetKey is not a valid string', () => {
+      ['', null, {}, []].forEach(badStr => {
+        expect(nestQueryStringKeys(obj, badStr)).toEqual({});
+      });
+    });
+
+    it('will return an empty object if given an empty object', () => {
+      [{}, null, [], ''].forEach(tarObj => {
+        expect(nestQueryStringKeys(tarObj, targetKey)).toEqual({});
+      });
     });
   });
 });

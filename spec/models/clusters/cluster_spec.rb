@@ -29,6 +29,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   it { is_expected.to delegate_method(:status).to(:provider) }
   it { is_expected.to delegate_method(:status_reason).to(:provider) }
   it { is_expected.to delegate_method(:on_creation?).to(:provider) }
+  it { is_expected.to delegate_method(:knative_pre_installed?).to(:provider) }
   it { is_expected.to delegate_method(:active?).to(:platform_kubernetes).with_prefix }
   it { is_expected.to delegate_method(:rbac?).to(:platform_kubernetes).with_prefix }
   it { is_expected.to delegate_method(:available?).to(:application_helm).with_prefix }
@@ -55,7 +56,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
     let!(:cluster) { create(:cluster, enabled: true) }
 
     before do
-      create(:cluster, enabled: false)
+      create(:cluster, :disabled)
     end
 
     it { is_expected.to contain_exactly(cluster) }
@@ -64,7 +65,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   describe '.disabled' do
     subject { described_class.disabled }
 
-    let!(:cluster) { create(:cluster, enabled: false) }
+    let!(:cluster) { create(:cluster, :disabled) }
 
     before do
       create(:cluster, enabled: true)
@@ -76,10 +77,10 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   describe '.user_provided' do
     subject { described_class.user_provided }
 
-    let!(:cluster) { create(:cluster, :provided_by_user) }
+    let!(:cluster) { create(:cluster_platform_kubernetes).cluster }
 
     before do
-      create(:cluster, :provided_by_gcp)
+      create(:cluster_provider_gcp, :created)
     end
 
     it { is_expected.to contain_exactly(cluster) }
@@ -88,7 +89,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   describe '.gcp_provided' do
     subject { described_class.gcp_provided }
 
-    let!(:cluster) { create(:cluster, :provided_by_gcp) }
+    let!(:cluster) { create(:cluster_provider_gcp, :created).cluster }
 
     before do
       create(:cluster, :provided_by_user)
@@ -100,7 +101,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   describe '.gcp_installed' do
     subject { described_class.gcp_installed }
 
-    let!(:cluster) { create(:cluster, :provided_by_gcp) }
+    let!(:cluster) { create(:cluster_provider_gcp, :created).cluster }
 
     before do
       create(:cluster, :providing_by_gcp)
@@ -112,7 +113,7 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   describe '.aws_provided' do
     subject { described_class.aws_provided }
 
-    let!(:cluster) { create(:cluster, :provided_by_aws) }
+    let!(:cluster) { create(:cluster_provider_aws, :created).cluster }
 
     before do
       create(:cluster, :provided_by_user)
@@ -124,11 +125,11 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   describe '.aws_installed' do
     subject { described_class.aws_installed }
 
-    let!(:cluster) { create(:cluster, :provided_by_aws) }
+    let!(:cluster) { create(:cluster_provider_aws, :created).cluster }
 
     before do
-      errored_cluster = create(:cluster, :provided_by_aws)
-      errored_cluster.provider.make_errored!("Error message")
+      errored_provider = create(:cluster_provider_aws)
+      errored_provider.make_errored!("Error message")
     end
 
     it { is_expected.to contain_exactly(cluster) }
@@ -914,28 +915,6 @@ describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
           subject
         end
       end
-    end
-  end
-
-  describe '#knative_pre_installed?' do
-    subject { cluster.knative_pre_installed? }
-
-    context 'with a GCP provider without cloud_run' do
-      let(:cluster) { create(:cluster, :provided_by_gcp) }
-
-      it { is_expected.to be_falsey }
-    end
-
-    context 'with a GCP provider with cloud_run' do
-      let(:cluster) { create(:cluster, :provided_by_gcp, :cloud_run_enabled) }
-
-      it { is_expected.to be_truthy }
-    end
-
-    context 'with a user provider' do
-      let(:cluster) { create(:cluster, :provided_by_user) }
-
-      it { is_expected.to be_falsey }
     end
   end
 end

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module QA
-  # Issue: https://gitlab.com/gitlab-org/gitlab/issues/35429
-  context 'Monitor', :quarantine do
-    describe 'Cluster health graphs', :orchestrated, :kubernetes do
+  context 'Monitor' do
+    # https://gitlab.com/gitlab-org/gitlab/issues/35429
+    describe 'Cluster health graphs', :orchestrated, :kubernetes, :quarantine do
       before do
         @cluster = Service::KubernetesCluster.new.create!
       end

@@ -6,6 +6,7 @@ module EE
       module Pipeline
         module Quota
           class Size < Ci::Limit
+            include ::Gitlab::Utils::StrongMemoize
             include ActionView::Helpers::TextHelper
 
             def initialize(namespace, pipeline)
@@ -14,7 +15,7 @@ module EE
             end
 
             def enabled?
-              @namespace.max_pipeline_size > 0
+              ci_pipeline_size_limit > 0
             end
 
             def exceeded?
@@ -33,7 +34,13 @@ module EE
             private
 
             def excessive_seeds_count
-              @excessive ||= @pipeline.seeds_size - @namespace.max_pipeline_size
+              @excessive ||= @pipeline.seeds_size - ci_pipeline_size_limit
+            end
+
+            def ci_pipeline_size_limit
+              strong_memoize(:ci_pipeline_size_limit) do
+                @namespace.actual_limits.ci_pipeline_size
+              end
             end
           end
         end

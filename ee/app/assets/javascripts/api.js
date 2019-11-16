@@ -15,6 +15,8 @@ export default {
     '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/logs.json',
   podLogsPathWithPodContainer:
     '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/:container_name/logs.json',
+  projectPackagesPath: '/api/:version/projects/:id/packages',
+  projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -76,7 +78,17 @@ export default {
     return axios.delete(url);
   },
 
-  getPodLogs({ projectFullPath, environmentId, podName, containerName }) {
+  /**
+   * Returns pods logs for an environment with an optional pod and container
+   *
+   * @param {Object} params
+   * @param {string} param.projectFullPath - Path of the project, in format `/<namespace>/<project-key>`
+   * @param {number} param.environmentId - Id of the environment
+   * @param {string=} params.podName - Pod name, if not set the backend assumes a default one
+   * @param {string=} params.containerName - Container name, if not set the backend assumes a default one
+   * @returns {Promise} Axios promise for the result of a GET request of logs
+   */
+  getPodLogs({ projectPath, environmentId, podName, containerName }) {
     let logPath = this.podLogsPath;
     if (podName && containerName) {
       logPath = this.podLogsPathWithPodContainer;
@@ -85,7 +97,7 @@ export default {
     }
 
     let url = this.buildUrl(logPath)
-      .replace(':project_full_path', projectFullPath)
+      .replace(':project_full_path', projectPath)
       .replace(':environment_id', environmentId);
 
     if (podName) {
@@ -95,5 +107,26 @@ export default {
       url = url.replace(':container_name', containerName);
     }
     return axios.get(url);
+  },
+
+  projectPackages(id) {
+    const url = Api.buildUrl(this.projectPackagesPath).replace(':id', id);
+    return axios.get(url);
+  },
+
+  buildProjectPackageUrl(projectId, packageId) {
+    return Api.buildUrl(this.projectPackagePath)
+      .replace(':id', projectId)
+      .replace(':package_id', packageId);
+  },
+
+  projectPackage(projectId, packageId) {
+    const url = this.buildProjectPackageUrl(projectId, packageId);
+    return axios.get(url);
+  },
+
+  deleteProjectPackage(projectId, packageId) {
+    const url = this.buildProjectPackageUrl(projectId, packageId);
+    return axios.delete(url);
   },
 };

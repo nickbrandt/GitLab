@@ -20,17 +20,17 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!, except: [:route_not_found]
   before_action :enforce_terms!, if: :should_enforce_terms?
   before_action :validate_user_service_ticket!
-  before_action :check_password_expiration
+  before_action :check_password_expiration, if: :html_request?
   before_action :ldap_security_check
   before_action :sentry_context
   before_action :default_headers
-  before_action :add_gon_variables, unless: [:peek_request?, :json_request?]
+  before_action :add_gon_variables, if: :html_request?
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :require_email, unless: :devise_controller?
   before_action :active_user_check, unless: :devise_controller?
   before_action :set_usage_stats_consent_flag
   before_action :check_impersonation_availability
-  before_action :require_role
+  before_action :required_signup_info
 
   around_action :set_locale
   around_action :set_session_storage
@@ -214,6 +214,10 @@ class ApplicationController < ActionController::Base
       format.js { render json: '', status: :not_found, content_type: 'application/json' }
       format.any { head :not_found }
     end
+  end
+
+  def respond_201
+    head :created
   end
 
   def respond_422
@@ -451,8 +455,8 @@ class ApplicationController < ActionController::Base
     response.headers['Page-Title'] = URI.escape(page_title('GitLab'))
   end
 
-  def peek_request?
-    request.path.start_with?('/-/peek')
+  def html_request?
+    request.format.html?
   end
 
   def json_request?
@@ -462,7 +466,7 @@ class ApplicationController < ActionController::Base
   def should_enforce_terms?
     return false unless Gitlab::CurrentSettings.current_application_settings.enforce_terms
 
-    !(peek_request? || devise_controller?)
+    html_request? && !devise_controller?
   end
 
   def set_usage_stats_consent_flag
@@ -534,10 +538,13 @@ class ApplicationController < ActionController::Base
     @current_user_mode ||= Gitlab::Auth::CurrentUserMode.new(current_user)
   end
 
-  # A user requires a role when they are part of the experimental signup flow (executed by the Growth team). Users
-  # are redirected to the welcome page when their role is required and the experiment is enabled for the current user.
-  def require_role
-    return unless current_user && current_user.role_required? && experiment_enabled?(:signup_flow)
+  # A user requires a role and have the setup_for_company attribute set when they are part of the experimental signup
+  # flow (executed by the Growth team). Users are redirected to the welcome page when their role is required and the
+  # experiment is enabled for the current user.
+  def required_signup_info
+    return unless current_user
+    return unless current_user.role_required?
+    return unless experiment_enabled?(:signup_flow)
 
     store_location_for :user, request.fullpath
 

@@ -5,6 +5,9 @@
     "title": { 
       "type": "string" 
     },
+    "hidden": {
+      "type": "boolean"
+    },
     "legend": { 
       "type": "string" 
     },

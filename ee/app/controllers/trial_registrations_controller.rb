@@ -12,12 +12,6 @@ class TrialRegistrationsController < RegistrationsController
   before_action :set_redirect_url, only: [:new]
   before_action :skip_confirmation, only: [:create]
 
-  def create
-    super do |new_user|
-      new_user.system_hook_service.execute_hooks_for(new_user, :create) if new_user.persisted?
-    end
-  end
-
   def new
   end
 

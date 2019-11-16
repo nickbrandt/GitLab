@@ -13,7 +13,8 @@ module Gitlab
       end
 
       def uncached_data
-        license_usage_data.merge(system_usage_data)
+        license_usage_data
+          .merge(system_usage_data)
           .merge(features_usage_data)
           .merge(components_usage_data)
           .merge(cycle_analytics_usage_data)
@@ -66,6 +67,7 @@ module Gitlab
             clusters_disabled: count(::Clusters::Cluster.disabled),
             project_clusters_disabled: count(::Clusters::Cluster.disabled.project_type),
             group_clusters_disabled: count(::Clusters::Cluster.disabled.group_type),
+            clusters_platforms_eks: count(::Clusters::Cluster.aws_installed.enabled),
             clusters_platforms_gke: count(::Clusters::Cluster.gcp_installed.enabled),
             clusters_platforms_user: count(::Clusters::Cluster.user_provided.enabled),
             clusters_applications_helm: count(::Clusters::Applications::Helm.available),
@@ -76,6 +78,7 @@ module Gitlab
             clusters_applications_knative: count(::Clusters::Applications::Knative.available),
             clusters_applications_elastic_stack: count(::Clusters::Applications::ElasticStack.available),
             in_review_folder: count(::Environment.in_review_folder),
+            grafana_integrated_projects: count(GrafanaIntegration.enabled),
             groups: count(Group),
             issues: count(Issue),
             issues_with_associated_zoom_link: count(ZoomMeeting.added_to_issue),
@@ -130,7 +133,8 @@ module Gitlab
           omniauth_enabled: Gitlab::Auth.omniauth_enabled?,
           prometheus_metrics_enabled: Gitlab::Metrics.prometheus_metrics_enabled?,
           reply_by_email_enabled: Gitlab::IncomingEmail.enabled?,
-          signup_enabled: Gitlab::CurrentSettings.allow_signup?
+          signup_enabled: Gitlab::CurrentSettings.allow_signup?,
+          web_ide_clientside_preview_enabled: Gitlab::CurrentSettings.web_ide_clientside_preview_enabled?
         }
       end
 
@@ -168,10 +172,13 @@ module Gitlab
         types = {
           SlackService: :projects_slack_notifications_active,
           SlackSlashCommandsService: :projects_slack_slash_active,
-          PrometheusService: :projects_prometheus_active
+          PrometheusService: :projects_prometheus_active,
+          CustomIssueTrackerService: :projects_custom_issue_tracker_active,
+          JenkinsService: :projects_jenkins_active,
+          MattermostService: :projects_mattermost_active
         }
 
-        results = count(Service.unscoped.where(type: types.keys, active: true).group(:type), fallback: Hash.new(-1))
+        results = count(Service.active.by_type(types.keys).group(:type), fallback: Hash.new(-1))
         types.each_with_object({}) { |(klass, key), response| response[key] = results[klass.to_s] || 0 }
           .merge(jira_usage)
       end
@@ -186,8 +193,8 @@ module Gitlab
           projects_jira_active: -1
         }
 
-        Service.unscoped
-          .where(type: :JiraService, active: true)
+        Service.active
+          .by_type(:JiraService)
           .includes(:jira_tracker_data)
           .find_in_batches(batch_size: BATCH_SIZE) do |services|
 

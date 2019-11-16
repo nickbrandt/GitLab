@@ -9,6 +9,15 @@ export const mockText = {
   RECEIVE_PROJECTS_ERROR: 'Something went wrong, unable to get projects',
 };
 
+export const mockHeaders = {
+  pageInfo: {
+    currentPage: 1,
+    nextPage: 2,
+    totalResults: 33,
+    totalPages: 2,
+  },
+};
+
 export function mockPipelineData(
   status = 'success',
   id = 1,

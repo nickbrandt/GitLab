@@ -2,7 +2,7 @@
 
 module QA
   context 'Plan' do
-    describe 'check xss occurence in @mentions in issues' do
+    describe 'check xss occurence in @mentions in issues', :requires_admin do
       it 'user mentions a user in comment' do
         QA::Runtime::Env.personal_access_token = QA::Runtime::Env.admin_personal_access_token
 
@@ -42,7 +42,7 @@ module QA
 
         Page::Project::Issue::Show.perform do |show|
           show.select_all_activities_filter
-          show.comment('cc-ing you here @eve')
+          show.comment("cc-ing you here @#{user.username}")
 
           expect do
             expect(show).to have_content("cc-ing you here")

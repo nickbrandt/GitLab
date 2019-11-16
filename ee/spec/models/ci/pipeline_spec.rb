@@ -23,9 +23,9 @@ describe Ci::Pipeline do
   end
 
   describe '#with_vulnerabilities scope' do
-    let!(:pipeline_1) { create(:ci_pipeline_without_jobs, project: project) }
-    let!(:pipeline_2) { create(:ci_pipeline_without_jobs, project: project) }
-    let!(:pipeline_3) { create(:ci_pipeline_without_jobs, project: project) }
+    let!(:pipeline_1) { create(:ci_pipeline, project: project) }
+    let!(:pipeline_2) { create(:ci_pipeline, project: project) }
+    let!(:pipeline_3) { create(:ci_pipeline, project: project) }
 
     before do
       create(:vulnerabilities_occurrence, pipelines: [pipeline_1], project: pipeline.project)

@@ -3,11 +3,13 @@
 module Clusters
   module Aws
     class FetchCredentialsService
-      attr_reader :provider
+      attr_reader :provision_role
 
       MissingRoleError = Class.new(StandardError)
 
-      def initialize(provider)
+      def initialize(provision_role, region:, provider: nil)
+        @provision_role = provision_role
+        @region = region
         @provider = provider
       end
 
@@ -24,36 +26,30 @@ module Clusters
 
       private
 
-      def provision_role
-        provider.created_by_user.aws_role
-      end
+      attr_reader :provider, :region
 
       def client
-        ::Aws::STS::Client.new(credentials: gitlab_credentials, region: provider.region)
+        ::Aws::STS::Client.new(credentials: gitlab_credentials, region: region)
       end
 
       def gitlab_credentials
         ::Aws::Credentials.new(access_key_id, secret_access_key)
       end
 
-      ##
-      # This setting is not yet configurable or documented as these
-      # services are not currently used. This will be addressed in
-      # https://gitlab.com/gitlab-org/gitlab/merge_requests/18307
       def access_key_id
-        Gitlab.config.kubernetes.provisioners.aws.access_key_id
+        Gitlab::CurrentSettings.eks_access_key_id
       end
 
-      ##
-      # This setting is not yet configurable or documented as these
-      # services are not currently used. This will be addressed in
-      # https://gitlab.com/gitlab-org/gitlab/merge_requests/18307
       def secret_access_key
-        Gitlab.config.kubernetes.provisioners.aws.secret_access_key
+        Gitlab::CurrentSettings.eks_secret_access_key
       end
 
       def session_name
-        "gitlab-eks-cluster-#{provider.cluster_id}-user-#{provider.created_by_user_id}"
+        if provider.present?
+          "gitlab-eks-cluster-#{provider.cluster_id}-user-#{provision_role.user_id}"
+        else
+          "gitlab-eks-autofill-user-#{provision_role.user_id}"
+        end
       end
     end
   end

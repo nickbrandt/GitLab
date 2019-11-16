@@ -19,6 +19,11 @@ module EE
       scope :order_created_at_desc, -> { reorder(created_at: :desc) }
       scope :service_desk, -> { where(author: ::User.support_bot) }
 
+      scope :in_epics, ->(epics) do
+        issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
+        id_in(issue_ids)
+      end
+
       has_one :epic_issue
       has_one :epic, through: :epic_issue
       has_many :designs, class_name: "DesignManagement::Design", inverse_of: :issue

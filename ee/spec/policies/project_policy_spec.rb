@@ -33,7 +33,7 @@ describe ProjectPolicy do
     let(:additional_developer_permissions) do
       %i[
         admin_vulnerability_feedback read_project_security_dashboard read_feature_flag
-        resolve_vulnerability dismiss_vulnerability
+        read_vulnerability create_vulnerability resolve_vulnerability dismiss_vulnerability
       ]
     end
     let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches admin_feature_flags_client] }
@@ -46,7 +46,7 @@ describe ProjectPolicy do
         read_pipeline read_build read_commit_status read_container_image
         read_environment read_deployment read_merge_request read_pages
         create_merge_request_in award_emoji
-        read_project_security_dashboard resolve_vulnerability dismiss_vulnerability
+        read_project_security_dashboard read_vulnerability
         read_vulnerability_feedback read_software_license_policy
       ]
     end
@@ -494,6 +494,7 @@ describe ProjectPolicy do
 
         include_context 'when security dashboard feature is not available'
 
+        it { is_expected.to be_disallowed(:create_vulnerability) }
         it { is_expected.to be_disallowed(:resolve_vulnerability) }
         it { is_expected.to be_disallowed(:dismiss_vulnerability) }
       end

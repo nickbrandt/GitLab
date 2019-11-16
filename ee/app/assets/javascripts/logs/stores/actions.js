@@ -1,17 +1,16 @@
 import { backOff } from '~/lib/utils/common_utils';
+import httpStatusCodes from '~/lib/utils/http_status';
 import axios from '~/lib/utils/axios_utils';
 import flash from '~/flash';
 import { s__ } from '~/locale';
+import Api from 'ee/api';
 import * as types from './mutation_types';
 
-const requestUntilData = (url, params) =>
+const requestLogsUntilData = ({ projectPath, environmentId, podName }) =>
   backOff((next, stop) => {
-    axios
-      .get(url, {
-        params,
-      })
+    Api.getPodLogs({ projectPath, environmentId, podName })
       .then(res => {
-        if (!res.data) {
+        if (res.status === httpStatusCodes.ACCEPTED) {
           next();
           return;
         }
@@ -22,8 +21,15 @@ const requestUntilData = (url, params) =>
       });
   });
 
-export const setLogsEndpoint = ({ commit }, logsEndpoint) => {
-  commit(types.SET_LOGS_ENDPOINT, logsEndpoint);
+export const setInitData = ({ dispatch, commit }, { projectPath, environmentId, podName }) => {
+  commit(types.SET_PROJECT_ENVIRONMENT, { projectPath, environmentId });
+  commit(types.SET_CURRENT_POD_NAME, podName);
+  dispatch('fetchLogs');
+};
+
+export const showPodLogs = ({ dispatch, commit }, podName) => {
+  commit(types.SET_CURRENT_POD_NAME, podName);
+  dispatch('fetchLogs');
 };
 
 export const fetchEnvironments = ({ commit }, environmentsPath) => {
@@ -40,20 +46,20 @@ export const fetchEnvironments = ({ commit }, environmentsPath) => {
     });
 };
 
-export const fetchLogs = ({ commit, state }, podName) => {
-  if (podName) {
-    commit(types.SET_CURRENT_POD_NAME, podName);
-  }
+export const fetchLogs = ({ commit, state }) => {
+  const params = {
+    projectPath: state.projectPath,
+    environmentId: state.environments.current,
+    podName: state.pods.current,
+  };
+
   commit(types.REQUEST_PODS_DATA);
   commit(types.REQUEST_LOGS_DATA);
-  return requestUntilData(state.logs.endpoint, { pod_name: podName })
-    .then(({ data }) => {
-      const { pods, logs } = data;
 
-      // Set first pod as default, if none is set
-      if (!podName && pods[0]) {
-        commit(types.SET_CURRENT_POD_NAME, pods[0]);
-      }
+  return requestLogsUntilData(params)
+    .then(({ data }) => {
+      const { pod_name, pods, logs } = data;
+      commit(types.SET_CURRENT_POD_NAME, pod_name);
 
       commit(types.RECEIVE_PODS_DATA_SUCCESS, pods);
       commit(types.RECEIVE_LOGS_DATA_SUCCESS, logs);

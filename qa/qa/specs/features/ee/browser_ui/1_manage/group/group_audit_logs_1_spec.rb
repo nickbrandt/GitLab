@@ -37,7 +37,7 @@ module QA
         it_behaves_like 'group audit event logs', ["Add group"]
       end
 
-      context 'Change repository size limit' do
+      context 'Change repository size limit', :requires_admin do
         before do
           sign_in(as_admin: true)
           @group.visit!
@@ -72,13 +72,7 @@ module QA
           Page::Group::Menu.perform(&:click_group_members_item)
           Page::Group::SubMenus::Members.perform do |members_page|
             members_page.add_member(user.username)
-          end
-
-          Page::Group::SubMenus::Members.perform do |members_page|
             members_page.update_access_level(user.username, "Developer")
-          end
-
-          Page::Group::SubMenus::Members.perform do |members_page|
             members_page.remove_member(user.username)
           end
         end

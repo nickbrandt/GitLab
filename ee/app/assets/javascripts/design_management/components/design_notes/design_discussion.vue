@@ -1,4 +1,5 @@
 <script>
+import { ApolloMutation } from 'vue-apollo';
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
 import ReplyPlaceholder from '~/notes/components/discussion_reply_placeholder.vue';
@@ -11,6 +12,7 @@ import { extractCurrentDiscussion } from '../../utils/design_management_utils';
 
 export default {
   components: {
+    ApolloMutation,
     DesignNote,
     ReplyPlaceholder,
     DesignReplyForm,
@@ -43,58 +45,83 @@ export default {
     return {
       discussionComment: '',
       isFormRendered: false,
-      isNoteSaving: false,
     };
   },
   computed: {
-    isSubmitButtonDisabled() {
-      return this.discussionComment.trim().length === 0;
+    mutationPayload() {
+      return {
+        noteableId: this.noteableId,
+        body: this.discussionComment,
+        discussionId: this.discussion.id,
+      };
     },
   },
   methods: {
-    addDiscussionComment() {
-      this.isNoteSaving = true;
-      return this.$apollo
-        .mutate({
-          mutation: createNoteMutation,
-          variables: {
-            input: {
-              noteableId: this.noteableId,
-              body: this.discussionComment,
-              discussionId: this.discussion.id,
-            },
+    addDiscussionComment(
+      store,
+      {
+        data: { createNote },
+      },
+    ) {
+      const data = store.readQuery({
+        query: getDesignQuery,
+        variables: {
+          id: this.designId,
+          version: this.designsVersion,
+        },
+      });
+      const currentDiscussion = extractCurrentDiscussion(
+        data.design.discussions,
+        this.discussion.id,
+      );
+
+      const updatedDiscussion = {
+        ...currentDiscussion,
+        node: {
+          ...currentDiscussion.node,
+          notes: {
+            ...currentDiscussion.node.notes,
+            edges: [
+              ...currentDiscussion.node.notes.edges,
+              { __typename: 'NoteEdge', node: createNote.note },
+            ],
           },
-          update: (store, { data: { createNote } }) => {
-            const data = store.readQuery({
-              query: getDesignQuery,
-              variables: {
-                id: this.designId,
-                version: this.designsVersion,
-              },
-            });
-            const currentDiscussion = extractCurrentDiscussion(
-              data.design.discussions,
-              this.discussion.id,
-            );
-            currentDiscussion.node.notes.edges.push({
-              __typename: 'NoteEdge',
-              node: createNote.note,
-            });
-            data.design.notesCount += 1;
-            store.writeQuery({ query: getDesignQuery, data });
+        },
+      };
+
+      const currentDiscussionIndex = data.design.discussions.edges.indexOf(currentDiscussion);
+
+      const payload = {
+        ...data,
+        design: {
+          ...data.design,
+          discussions: {
+            ...data.design.discussions,
+            edges: [
+              ...data.design.discussions.edges.slice(0, currentDiscussionIndex),
+              updatedDiscussion,
+              ...data.design.discussions.edges.slice(
+                currentDiscussionIndex + 1,
+                data.design.discussions.edges.length,
+              ),
+            ],
           },
-        })
-        .then(() => {
-          this.discussionComment = '';
-          this.hideForm();
-        })
-        .catch(e => {
-          createFlash(s__('DesignManagement|Could not add a new comment. Please try again'));
-          throw e;
-        })
-        .finally(() => {
-          this.isNoteSaving = false;
-        });
+          notesCount: data.design.notesCount + 1,
+        },
+      };
+
+      store.writeQuery({
+        query: getDesignQuery,
+        data: payload,
+      });
+    },
+    onDone() {
+      this.discussionComment = '';
+      this.hideForm();
+    },
+    onError(e) {
+      createFlash(s__('DesignManagement|Could not add a new comment. Please try again'));
+      throw e;
     },
     hideForm() {
       this.isFormRendered = false;
@@ -103,6 +130,7 @@ export default {
       this.isFormRendered = true;
     },
   },
+  createNoteMutation,
 };
 </script>
 
@@ -121,14 +149,25 @@ export default {
           :button-text="__('Reply...')"
           @onClick="showForm"
         />
-        <design-reply-form
+        <apollo-mutation
           v-else
-          v-model="discussionComment"
-          :is-saving="isNoteSaving"
-          :markdown-preview-path="markdownPreviewPath"
-          @submitForm="addDiscussionComment"
-          @cancelForm="hideForm"
-        />
+          v-slot="{ mutate, loading, error }"
+          :mutation="$options.createNoteMutation"
+          :variables="{
+            input: mutationPayload,
+          }"
+          :update="addDiscussionComment"
+          @done="onDone"
+          @error="onError"
+        >
+          <design-reply-form
+            v-model="discussionComment"
+            :is-saving="loading"
+            :markdown-preview-path="markdownPreviewPath"
+            @submitForm="mutate"
+            @cancelForm="hideForm"
+          />
+        </apollo-mutation>
       </div>
     </div>
   </div>

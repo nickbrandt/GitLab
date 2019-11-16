@@ -51,7 +51,7 @@ describe 'Environment > Pod Logs', :js do
           expect(item.text).to eq(pod_names[i])
         end
       end
-      expect(page).to have_content("Log 1\\nLog 2\\nLog 3")
+      expect(page).to have_content("Log 1 Log 2 Log 3")
     end
   end
 

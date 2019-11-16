@@ -72,6 +72,7 @@ export default {
           v-model="approvalStatus"
           class="form-check-input"
           type="radio"
+          :data-qa-selector="`${option.value}_license_radio`"
           :value="option.value"
         />
         <label :for="`js-${option.value}-license-radio`" class="form-check-label">
@@ -79,7 +80,13 @@ export default {
         </label>
       </div>
     </div>
-    <gl-button class="js-submit" variant="default" :disabled="submitDisabled" @click="addLicense">
+    <gl-button
+      class="js-submit"
+      variant="default"
+      :disabled="submitDisabled"
+      data-qa-selector="add_license_submit_button"
+      @click="addLicense"
+    >
       {{ s__('LicenseCompliance|Submit') }}
     </gl-button>
     <gl-button class="js-cancel" variant="default" @click="closeForm">
