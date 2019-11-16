@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Geo', :orchestrated, :geo do
+  # https://gitlab.com/gitlab-org/gitlab/issues/35706
+  context 'Geo', :orchestrated, :geo, :quarantine do
     describe 'GitLab Geo Wiki HTTP push secondary' do
       let(:wiki_content) { 'This tests wiki pushes via HTTP to secondary.' }
       let(:push_content) { 'This is from the Geo wiki push to secondary!' }
