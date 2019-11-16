@@ -1,4 +1,4 @@
-/* eslint-disable no-useless-escape, no-underscore-dangle, func-names, no-return-assign, one-var, consistent-return, class-methods-use-this */
+/* eslint-disable no-useless-escape, no-underscore-dangle, func-names, no-return-assign, consistent-return, class-methods-use-this */
 
 import $ from 'jquery';
 import 'cropper';
@@ -59,7 +59,7 @@ import _ from 'underscore';
     }
 
     bindEvents() {
-      let _this = this;
+      const _this = this;
       this.fileInput.on('change', function(e) {
         _this.onFileInputChange(e, this);
         this.value = null;
@@ -69,7 +69,7 @@ import _ from 'underscore';
       this.modalCrop.on('hidden.bs.modal', this.onModalHide);
       this.uploadImageBtn.on('click', this.onUploadImageBtnClick);
       this.cropActionsBtn.on('click', function() {
-        let btn = this;
+        const btn = this;
         return _this.onActionBtnClick(btn);
       });
       return (this.croppedImageBlob = null);
@@ -80,7 +80,7 @@ import _ from 'underscore';
     }
 
     onModalShow() {
-      let _this = this;
+      const _this = this;
       return this.modalCropImg.cropper({
         viewMode: 1,
         center: false,
@@ -136,7 +136,7 @@ import _ from 'underscore';
     }
 
     readFile(input) {
-      let _this = this;
+      const _this = this;
       const reader = new FileReader();
       reader.onload = () => {
         _this.modalCropImg.attr('src', reader.result);
@@ -148,8 +148,8 @@ import _ from 'underscore';
     dataURLtoBlob(dataURL) {
       let i = 0;
       let len = 0;
-      let binary = atob(dataURL.split(',')[1]);
-      let array = [];
+      const binary = atob(dataURL.split(',')[1]);
+      const array = [];
 
       for (i = 0, len = binary.length; i < len; i += 1) {
         array.push(binary.charCodeAt(i));
