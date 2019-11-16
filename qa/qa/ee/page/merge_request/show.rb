@@ -153,24 +153,26 @@ module QA
           def resolve_vulnerability_with_mr(name)
             expand_vulnerability_report
             click_vulnerability(name)
+
+            previous_page = page.current_url
             click_element :resolve_split_button
 
-            wait(reload: false) do
-              has_no_element?(:resolve_split_button)
+            wait(max: 15, reload: false) do
+              page.current_url != previous_page
             end
           end
 
           def has_vulnerability_report?(timeout: 60)
             wait(reload: true, max: timeout, interval: 1) do
               finished_loading?
-              has_element?(:vulnerability_report_grouped, wait: 1)
+              has_element?(:vulnerability_report_grouped, wait: 10)
             end
             find_element(:vulnerability_report_grouped).has_no_content?("is loading")
           end
 
-          def has_total_vulnerability_count_of?(expected)
+          def has_vulnerability_count?
             # Match text cut off in order to find both "1 vulnerability" and "X vulnerabilities"
-            find_element(:vulnerability_report_grouped).has_content?(/Security scanning detected #{expected}( new)? vulnerabilit/)
+            find_element(:vulnerability_report_grouped).has_content?(/Security scanning detected/)
           end
 
           def has_sast_vulnerability_count_of?(expected)
