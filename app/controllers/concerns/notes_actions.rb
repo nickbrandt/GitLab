@@ -63,7 +63,7 @@ module NotesActions
           json.merge!(note_json(@note))
         end
 
-        if @note.errors && @note.errors.keys != [:commands_only]
+        if @note.errors && @note.errors.keys != [] && @note.errors.keys != [:commands_only]
           render json: json, status: 422
         else
           render json: json
