@@ -205,6 +205,7 @@ describe API::Projects do
       end
 
       it 'returns a 400 error for an invalid template name' do
+        project_params.delete(:template_project_id)
         project_params[:template_name] = 'bogus-template'
 
         expect { post api('/projects', user), params: project_params }
@@ -213,23 +214,52 @@ describe API::Projects do
         expect(response).to have_gitlab_http_status(400)
         expect(json_response['message']['template_name']).to eq(["'bogus-template' is unknown or invalid"])
       end
+
+      it 'returns a 400 error for an invalid template ID' do
+        project_params.delete(:template_name)
+        new_project = create(:project)
+        project_params[:template_project_id] = new_project.id
+
+        expect { post api('/projects', user), params: project_params }
+          .not_to change { Project.count }
+
+        expect(response).to have_gitlab_http_status(400)
+        expect(json_response['message']['template_project_id']).to eq(["#{new_project.id} is unknown or invalid"])
+      end
     end
 
     context 'with instance-level templates' do
       let(:group) { create(:group) }
       let!(:project) { create(:project, :public, namespace: group) }
       let(:new_project_name) { "project-#{SecureRandom.hex}" }
-      let(:project_params) do
-        {
-          template_name: project.name,
-          name: new_project_name,
-          path: new_project_name,
-          use_custom_template: true,
-          namespace_id: group.id
-        }
+
+      context 'using template name' do
+        let(:project_params) do
+          {
+            template_name: project.name,
+            name: new_project_name,
+            path: new_project_name,
+            use_custom_template: true,
+            namespace_id: group.id
+          }
+        end
+
+        it_behaves_like 'creates projects with templates'
       end
 
-      it_behaves_like 'creates projects with templates'
+      context 'using template project ID' do
+        let(:project_params) do
+          {
+            template_project_id: project.id,
+            name: new_project_name,
+            path: new_project_name,
+            use_custom_template: true,
+            namespace_id: group.id
+          }
+        end
+
+        it_behaves_like 'creates projects with templates'
+      end
     end
 
     context 'with group templates' do
@@ -238,18 +268,36 @@ describe API::Projects do
       let(:group) { subgroup }
       let!(:project) { create(:project, :public, namespace: subgroup) }
       let(:new_project_name) { "project-#{SecureRandom.hex}" }
-      let(:project_params) do
-        {
-          template_name: project.name,
-          name: new_project_name,
-          path: new_project_name,
-          use_custom_template: true,
-          group_with_project_templates_id: subgroup.id,
-          namespace_id: subgroup.id
-        }
+
+      context 'using template name' do
+        let(:project_params) do
+          {
+            template_name: project.name,
+            name: new_project_name,
+            path: new_project_name,
+            use_custom_template: true,
+            group_with_project_templates_id: subgroup.id,
+            namespace_id: subgroup.id
+          }
+        end
+
+        it_behaves_like 'creates projects with templates'
       end
 
-      it_behaves_like 'creates projects with templates'
+      context 'using template project ID' do
+        let(:project_params) do
+          {
+            template_project_id: project.id,
+            name: new_project_name,
+            path: new_project_name,
+            use_custom_template: true,
+            group_with_project_templates_id: subgroup.id,
+            namespace_id: subgroup.id
+          }
+        end
+
+        it_behaves_like 'creates projects with templates'
+      end
     end
 
     context 'when importing with mirror attributes' do
