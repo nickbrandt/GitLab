@@ -81,15 +81,15 @@ export default {
       operators: OPERATORS,
       operator: null,
       threshold: null,
+      alertQuery: null,
       prometheusMetricId: null,
       selectedAlert: {},
-      alertQuery: '',
     };
   },
   computed: {
     isValidQuery() {
       // TODO: Add query validation check (most likely via http request)
-      return this.alertQuery.length ? true : null;
+      return this.alertQuery && this.alertQuery.length ? true : null;
     },
     currentQuery() {
       return this.relevantQueries.find(query => query.metricId === this.prometheusMetricId) || {};
@@ -110,7 +110,8 @@ export default {
         this.operator &&
         this.threshold === Number(this.threshold) &&
         (this.operator !== this.selectedAlert.operator ||
-          this.threshold !== this.selectedAlert.threshold)
+          this.threshold !== this.selectedAlert.threshold ||
+          (this.alertQuery || null) !== (this.selectedAlert.alert_query || null))
       );
     },
     submitAction() {
@@ -142,6 +143,19 @@ export default {
     },
   },
   methods: {
+    loadAlert() {
+      if (this.supportsComputedAlerts) {
+        this.prometheusMetricId = this.relevantQueries[0].metricId;
+        const keys = Object.keys(this.alertsToManage);
+        if (keys.length > 0) {
+          this.selectedAlert = this.alertsToManage[keys[0]];
+          this.alertQuery = this.selectedAlert.alert_query;
+          this.operator = this.selectedAlert.operator;
+          this.threshold = this.selectedAlert.threshold;
+          this.prometheusMetricId = this.selectedAlert.metricId;
+        }
+      }
+    },
     selectQuery(queryId) {
       const existingAlertPath = _.findKey(this.alertsToManage, alert => alert.metricId === queryId);
       const existingAlert = this.alertsToManage[existingAlertPath];
@@ -169,12 +183,14 @@ export default {
         operator: this.operator,
         threshold: this.threshold,
         prometheus_metric_id: this.prometheusMetricId,
+        alert_query: this.alertQuery,
       });
     },
     resetAlertData() {
       this.operator = null;
       this.threshold = null;
       this.prometheusMetricId = null;
+      this.alertQuery = null;
       this.selectedAlert = {};
     },
   },
@@ -197,6 +213,7 @@ export default {
     :ok-variant="submitAction === 'delete' ? 'danger' : 'success'"
     :ok-title="submitActionText"
     :ok-disabled="formDisabled"
+    @show="loadAlert"
     @ok="handleSubmit"
     @hidden="handleHidden"
   >

@@ -76,6 +76,7 @@ describe('AlertWidgetForm', () => {
     expect(wrapper.emitted().create[0]).toEqual([
       {
         alert: undefined,
+        alert_query: null,
         operator: '>',
         threshold: 900,
         prometheus_metric_id: '9',
@@ -117,6 +118,7 @@ describe('AlertWidgetForm', () => {
       expect(wrapper.emitted().delete[0]).toEqual([
         {
           alert: 'alert',
+          alert_query: null,
           operator: '<',
           threshold: 5,
           prometheus_metric_id: '8',
@@ -133,6 +135,7 @@ describe('AlertWidgetForm', () => {
       expect(wrapper.emitted().update[0]).toEqual([
         {
           alert: 'alert',
+          alert_query: null,
           operator: '<',
           threshold: 11,
           prometheus_metric_id: '8',

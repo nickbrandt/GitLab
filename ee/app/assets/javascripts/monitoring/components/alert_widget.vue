@@ -97,8 +97,9 @@ export default {
     formatAlertSummary(alertPath) {
       const alert = this.alertsToManage[alertPath];
       const alertQuery = this.relevantQueries.find(query => query.metricId === alert.metricId);
+      const alertSource = alert.alert_query || alertQuery.label;
 
-      return `${alertQuery.label} ${alert.operator} ${alert.threshold}`;
+      return `${alertSource} ${alert.operator} ${alert.threshold}`;
     },
     showModal() {
       this.$root.$emit('bv::show::modal', this.modalId);
@@ -110,8 +111,8 @@ export default {
     handleSetApiAction(apiAction) {
       this.apiAction = apiAction;
     },
-    handleCreate({ operator, threshold, prometheus_metric_id }) {
-      const newAlert = { operator, threshold, prometheus_metric_id };
+    handleCreate({ operator, threshold, prometheus_metric_id, alert_query }) {
+      const newAlert = { operator, threshold, prometheus_metric_id, alert_query };
       this.isLoading = true;
       this.service
         .createAlert(newAlert)
@@ -125,8 +126,8 @@ export default {
           this.isLoading = false;
         });
     },
-    handleUpdate({ alert, operator, threshold }) {
-      const updatedAlert = { operator, threshold };
+    handleUpdate({ alert, operator, threshold, alert_query }) {
+      const updatedAlert = { operator, threshold, alert_query };
       this.isLoading = true;
       this.service
         .updateAlert(alert, updatedAlert)
@@ -172,7 +173,7 @@ export default {
         class="d-flex-center text-secondary text-truncate"
       >
         <icon name="notifications" class="s18 append-right-4" :size="16" />
-        <span class="text-truncate">{{ alertSummary }}</span>
+        <span class="text-truncate" :title="alertSummary">{{ alertSummary }}</span>
       </gl-badge>
       <gl-loading-icon v-show="isLoading" :inline="true" />
     </span>
