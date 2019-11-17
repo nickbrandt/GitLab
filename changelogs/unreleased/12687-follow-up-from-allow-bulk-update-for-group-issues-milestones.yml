@@ -1,0 +1,5 @@
+---
+title: When bulk editing group issuables, verify that they belong to the correct group.
+merge_request:
+author:
+type: fixed

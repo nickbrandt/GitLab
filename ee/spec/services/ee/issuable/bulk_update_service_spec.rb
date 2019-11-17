@@ -7,7 +7,7 @@ describe Issuable::BulkUpdateService do
   let(:group) { create(:group) }
 
   context 'with epics' do
-    subject { described_class.new(user, params).execute('epic') }
+    subject { described_class.new(group, user, params).execute('epic') }
 
     let(:epic1) { create(:epic, group: group, labels: [label1]) }
     let(:epic2) { create(:epic, group: group, labels: [label1]) }

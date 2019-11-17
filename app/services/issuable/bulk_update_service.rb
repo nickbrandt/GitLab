@@ -4,10 +4,10 @@ module Issuable
   class BulkUpdateService
     include Gitlab::Allowable
 
-    attr_accessor :current_user, :params
+    attr_accessor :parent, :current_user, :params
 
-    def initialize(user = nil, params = {})
-      @current_user, @params = user, params.dup
+    def initialize(parent, user = nil, params = {})
+      @parent, @current_user, @params = parent, user, params.dup
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
@@ -27,7 +27,8 @@ module Issuable
       end
 
       items.each do |issuable|
-        next unless can?(current_user, :"update_#{type}", issuable)
+        next unless can?(current_user, :"update_#{type}", issuable) &&
+          valid_parent?(type, issuable.issuing_parent, parent)
 
         update_class.new(issuable.issuing_parent, current_user, params).execute(issuable)
       end
@@ -49,6 +50,19 @@ module Issuable
       else
         attrs.push(:assignee_id)
       end
+    end
+
+    def valid_parent?(type, issuing_parent, parent)
+      return true unless parent.class.name == 'Group'
+
+      issuing_parents =
+        if type == "issue" || type == "merge_request"
+          issuing_parent&.group&.self_and_descendants
+        else
+          issuing_parent&.self_and_descendants
+        end
+
+      issuing_parents.include?(parent)
     end
   end
 end
