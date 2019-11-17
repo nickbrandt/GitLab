@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Geo::UploadRegistry, :geo, :geo_fdw do
-  let!(:lfs_registry) { create(:geo_file_registry, :lfs) }
+  let!(:lfs_registry) { create(:geo_lfs_object_registry) }
   let!(:attachment_registry) { create(:geo_file_registry, :attachment, :with_file) }
   let!(:avatar_registry) { create(:geo_file_registry, :avatar) }
   let!(:file_registry) { create(:geo_file_registry, :file) }

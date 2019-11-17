@@ -6,6 +6,8 @@ module Geo
   #   * Executing the Downloader
   #   * Marking the FileRegistry record as synced or needing retry
   class FileDownloadService < BaseFileService
+    include Gitlab::Utils::StrongMemoize
+
     LEASE_TIMEOUT = 8.hours.freeze
 
     include Delay
@@ -54,17 +56,20 @@ module Geo
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def update_registry(bytes_downloaded, mark_as_synced:, missing_on_primary: false)
-      registry =
+    def registry
+      strong_memoize(:registry) do
         if job_artifact?
           Geo::JobArtifactRegistry.find_or_initialize_by(artifact_id: object_db_id)
+        elsif lfs?
+          Geo::LfsObjectRegistry.find_or_initialize_by(lfs_object_id: object_db_id)
         else
-          Geo::FileRegistry.find_or_initialize_by(
-            file_type: object_type,
-            file_id: object_db_id
-          )
+          Geo::FileRegistry.find_or_initialize_by(file_type: object_type, file_id: object_db_id)
         end
+      end
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
 
+    def update_registry(bytes_downloaded, mark_as_synced:, missing_on_primary: false)
       registry.bytes = bytes_downloaded
       registry.success = mark_as_synced
       registry.missing_on_primary = missing_on_primary
@@ -82,7 +87,6 @@ module Geo
 
       registry.save
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     def lease_key
       "file_download_service:#{object_type}:#{object_db_id}"

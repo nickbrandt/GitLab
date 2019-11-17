@@ -29,8 +29,8 @@ describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw do
     before do
       stub_lfs_object_storage
 
-      create(:geo_file_registry, :lfs, file_id: lfs_object_local.id)
-      create(:geo_file_registry, :lfs, file_id: lfs_object_remote.id)
+      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_local.id)
+      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote.id)
     end
 
     it 'schedules job for file stored remotely and synced locally' do

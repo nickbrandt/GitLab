@@ -39,13 +39,25 @@ describe('Release block', () => {
 
   const milestoneListLabel = () => wrapper.find('.js-milestone-list-label');
   const editButton = () => wrapper.find('.js-edit-button');
+  const RealDate = Date;
 
   beforeEach(() => {
+    // timeago.js calls Date(), so let's mock that case to avoid time-dependent test failures.
+    const constantDate = new Date('2019-10-25T00:12:00');
+
+    /* eslint no-global-assign:off */
+    global.Date = jest.fn((...props) =>
+      props.length ? new RealDate(...props) : new RealDate(constantDate),
+    );
+
+    Object.assign(Date, RealDate);
+
     releaseClone = JSON.parse(JSON.stringify(release));
   });
 
   afterEach(() => {
     wrapper.destroy();
+    global.Date = RealDate;
   });
 
   describe('with default props', () => {
@@ -61,7 +73,7 @@ describe('Release block', () => {
 
     it('renders an edit button that links to the "Edit release" page', () => {
       expect(editButton().exists()).toBe(true);
-      expect(editButton().attributes('href')).toBe(release._links.edit);
+      expect(editButton().attributes('href')).toBe(release._links.edit_url);
     });
 
     it('renders release name', () => {
@@ -168,7 +180,7 @@ describe('Release block', () => {
     });
   });
 
-  it("does not render an edit button if release._links.edit isn't a string", () => {
+  it("does not render an edit button if release._links.edit_url isn't a string", () => {
     delete releaseClone._links;
 
     return factory(releaseClone).then(() => {

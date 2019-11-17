@@ -52,6 +52,26 @@ describe DesignManagement::DesignsFinder do
             it { is_expected.to eq([design1]) }
           end
 
+          context 'when argument is the ids of designs' do
+            let(:params) { { ids: [design1.id] } }
+
+            it { is_expected.to eq([design1]) }
+          end
+
+          context 'when arguments are version and id' do
+            context 'when id is absent at version' do
+              let(:params) { { visible_at_version: first_version, ids: [design2.id] } }
+
+              it { is_expected.to eq([]) }
+            end
+
+            context 'when id is present at version' do
+              let(:params) { { visible_at_version: second_version, ids: [design2.id] } }
+
+              it { is_expected.to eq([design2]) }
+            end
+          end
+
           context 'when argument is the second version' do
             let(:params) { { visible_at_version: second_version } }
 

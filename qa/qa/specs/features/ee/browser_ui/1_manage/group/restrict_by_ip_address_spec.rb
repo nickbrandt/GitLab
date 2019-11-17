@@ -3,7 +3,8 @@ require 'securerandom'
 require 'socket'
 
 module QA
-  context 'Manage' do
+  # https://gitlab.com/gitlab-org/gitlab/issues/34351
+  context 'Manage', :quarantine do
     describe 'Group access' do
       LOOPBACK_ADDRESS = '127.0.0.1'
 

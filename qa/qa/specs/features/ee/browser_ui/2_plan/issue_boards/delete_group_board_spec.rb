@@ -3,7 +3,8 @@
 require 'securerandom'
 
 module QA
-  context 'Plan' do
+  # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/34936
+  context 'Plan', :quarantine do
     describe 'Group issue boards' do
       let(:board_1) { "Board-1-#{SecureRandom.hex(4)}" }
       let(:board_2) { "Board-2-#{SecureRandom.hex(4)}" }

@@ -98,7 +98,17 @@ describe Geo::FileDownloadService do
 
   shared_examples_for 'a service that downloads the file and registers the sync result' do |file_type|
     let(:download_service) { described_class.new(file_type, file.id) }
-    let(:registry) { file_type == 'job_artifact' ? Geo::JobArtifactRegistry : Geo::FileRegistry }
+
+    let(:registry) do
+      case file_type
+      when 'job_artifact'
+        Geo::JobArtifactRegistry
+      when 'lfs'
+        Geo::LfsObjectRegistry
+      else
+        Geo::FileRegistry
+      end
+    end
 
     subject(:execute!) { download_service.execute }
 
@@ -223,8 +233,11 @@ describe Geo::FileDownloadService do
 
     context 'for a registered file that failed to sync' do
       let!(:registry_entry) do
-        if file_type == 'job_artifact'
+        case file_type
+        when 'job_artifact'
           create(:geo_job_artifact_registry, success: false, artifact_id: file.id, retry_count: 3, retry_at: 1.hour.ago)
+        when 'lfs'
+          create(:geo_lfs_object_registry, success: false, lfs_object_id: file.id, retry_count: 3, retry_at: 1.hour.ago)
         else
           create(:geo_file_registry, file_type.to_sym, success: false, file_id: file.id, retry_count: 3, retry_at: 1.hour.ago)
         end

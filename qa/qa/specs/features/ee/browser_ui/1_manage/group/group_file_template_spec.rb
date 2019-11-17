@@ -9,25 +9,25 @@ module QA
         {
           type: 'Dockerfile',
           template: 'custom_dockerfile',
-          name: 'Dockerfile/custom_dockerfile.dockerfile',
+          file_path: 'Dockerfile/custom_dockerfile.dockerfile',
           content: 'dockerfile template test'
         },
         {
           type: '.gitignore',
           template: 'custom_gitignore',
-          name: 'gitignore/custom_gitignore.gitignore',
+          file_path: 'gitignore/custom_gitignore.gitignore',
           content: 'gitignore template test'
         },
         {
           type: '.gitlab-ci.yml',
           template: 'custom_gitlab-ci',
-          name: 'gitlab-ci/custom_gitlab-ci.yml',
+          file_path: 'gitlab-ci/custom_gitlab-ci.yml',
           content: 'gitlab-ci template test'
         },
         {
           type: 'LICENSE',
           template: 'custom_license',
-          name: 'LICENSE/custom_license.txt',
+          file_path: 'LICENSE/custom_license.txt',
           content: 'license template test'
         }
       ]
@@ -46,13 +46,10 @@ module QA
           project.initialize_with_readme = true
         end
 
-        templates.each do |template|
-          Resource::File.fabricate_via_api! do |file|
-            file.project = @file_template_project
-            file.name = template[:name]
-            file.content = template[:content]
-            file.commit_message = 'Add test file templates'
-          end
+        Resource::Repository::Commit.fabricate_via_api! do |commit|
+          commit.project = @file_template_project
+          commit.commit_message = 'Add CODEOWNERS and test files'
+          commit.add_files(templates)
         end
 
         @project = Resource::Project.fabricate_via_api! do |project|
@@ -66,9 +63,11 @@ module QA
       end
 
       after(:all) do
-        login unless Page::Main::Menu.perform { |p| p.has_personal_area?(wait: 0) }
+        login unless Page::Main::Menu.perform(&:signed_in?)
 
         remove_group_file_template_if_set
+
+        Page::Main::Menu.perform(&:sign_out)
       end
 
       templates.each do |template|
