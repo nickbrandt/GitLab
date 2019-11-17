@@ -7,6 +7,7 @@ class PrometheusAlertEntity < Grape::Entity
   expose :title
   expose :query
   expose :threshold
+  expose :abbreviated_query, as: :alert_query
 
   expose :operator do |prometheus_alert|
     prometheus_alert.computed_operator

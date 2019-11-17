@@ -67,7 +67,7 @@ module Projects
       private
 
       def alerts_params
-        params.permit(:operator, :threshold, :environment_id, :prometheus_metric_id)
+        params.permit(:operator, :threshold, :environment_id, :prometheus_metric_id, :alert_query)
       end
 
       def notify_service

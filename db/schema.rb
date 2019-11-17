@@ -3169,6 +3169,7 @@ ActiveRecord::Schema.define(version: 2019_11_12_221821) do
     t.integer "environment_id", null: false
     t.integer "project_id", null: false
     t.integer "prometheus_metric_id", null: false
+    t.string "alert_query"
     t.index ["environment_id"], name: "index_prometheus_alerts_on_environment_id"
     t.index ["project_id", "prometheus_metric_id", "environment_id"], name: "index_prometheus_alerts_metric_environment", unique: true
     t.index ["prometheus_metric_id"], name: "index_prometheus_alerts_on_prometheus_metric_id"

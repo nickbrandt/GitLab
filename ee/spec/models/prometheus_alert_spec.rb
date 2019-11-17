@@ -78,6 +78,47 @@ describe PrometheusAlert do
     end
   end
 
+  describe 'embedded metrics' do
+    let(:project) { create(:project) }
+    let(:other_project) { create(:project) }
+    let(:environment) { create(:environment, project: project) }
+    let(:metric) { create(:prometheus_metric, project: project, legend: "QueryLegend") }
+    let(:other_metric) { create(:prometheus_metric, project: other_project, legend: "OtherMetricLegend") }
+    let(:blank_project_metric) do
+      create(:prometheus_metric,
+             project: nil,
+             common: true,
+             query: 'increase(sum(metric))',
+             legend: "BlankMetricLegend")
+    end
+
+    subject do
+      build(:prometheus_alert,
+            prometheus_metric: metric,
+            environment: environment,
+            project: project,
+            alert_query: "(!#{metric.id})")
+    end
+
+    it 'expands embedded metrics for same project metrics' do
+      expect(subject.query).to include(metric.query)
+      expect(subject.abbreviated_query).to include(metric.legend)
+    end
+
+    it 'expands embedded metrics for blank project metrics' do
+      subject.alert_query = "(!#{blank_project_metric.id})"
+      expect(subject.query).to include(blank_project_metric.query)
+      expect(subject.abbreviated_query).to include(blank_project_metric.legend)
+    end
+
+    it 'will not expand metrics for other projects' do
+      subject.alert_query = "(!#{other_metric.id})"
+      expect(subject.query).not_to include(other_metric.query)
+      expect(subject.abbreviated_query).not_to include(other_metric.legend)
+      expect(subject.query).to match(/\(!#{other_metric.id}\)/)
+    end
+  end
+
   describe '#to_param' do
     before do
       subject.operator = "gt"

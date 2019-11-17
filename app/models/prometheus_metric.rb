@@ -16,6 +16,16 @@ class PrometheusMetric < ApplicationRecord
 
   scope :common, -> { where(common: true) }
 
+  # for particular project(s) _or_ all projects (project is null)
+  # expected to receive either project_ids, projects, or Project rel
+  scope :for_project, ->(projects) { where(project: [projects].flatten.compact.push(nil)) }
+
+  scope :order_by_legend_length, -> do
+    reorder(Arel::Nodes::Descending
+              .new(Arel::Nodes::NamedFunction
+                     .new('LENGTH', [arel_table[:legend]])))
+  end
+
   def priority
     group_details(group).fetch(:priority)
   end
