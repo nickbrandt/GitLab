@@ -11,17 +11,16 @@ describe PatchPrometheusServicesForSharedClusterApplications, :migration, :sidek
   let(:projects) { table(:projects) }
   let(:namespace) { namespaces.create!(name: 'gitlab', path: 'gitlab-org') }
 
-  before do
-    projects.create!(name: 'gitlab', path: 'gitlab-ce', namespace_id: namespace.id)
-    projects.create!(name: 'gitlab', path: 'gitlab-ee', namespace_id: namespace.id)
-  end
+
+    let!(:project1) { projects.create!(name: 'gitlab', path: 'gitlab-ce', namespace_id: namespace.id) }
+    let!(:project2) { projects.create!(name: 'gitlab', path: 'gitlab-ee', namespace_id: namespace.id) }
 
   it 'schedules a background migration' do
     Sidekiq::Testing.fake! do
       Timecop.freeze do
         migrate!
 
-        expect(migration_name).to be_scheduled_delayed_migration(2.minutes, 1, 2)
+        expect(migration_name).to be_scheduled_delayed_migration(120.seconds, project1.id, project2.id)
         expect(BackgroundMigrationWorker.jobs.size).to eq 1
       end
     end
