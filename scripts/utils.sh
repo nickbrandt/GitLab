@@ -16,8 +16,6 @@ function retry() {
 function setup_db_user_only() {
     if [ "$GITLAB_DATABASE" = "postgresql" ]; then
         source scripts/create_postgres_user.sh
-    else
-        source scripts/create_mysql_user.sh
     fi
 }
 
@@ -25,10 +23,6 @@ function setup_db() {
     setup_db_user_only
 
     bundle exec rake db:drop db:create db:schema:load db:migrate
-
-    if [ "$GITLAB_DATABASE" = "mysql" ]; then
-        bundle exec rake add_limits_mysql
-    fi
 
     bundle exec rake gitlab:db:setup_ee
 }

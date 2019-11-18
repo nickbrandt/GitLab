@@ -16,13 +16,7 @@ retry gem install knapsack --no-document
 cp config/gitlab.yml.example config/gitlab.yml
 sed -i 's/bin_path: \/usr\/bin\/git/bin_path: \/usr\/local\/bin\/git/' config/gitlab.yml
 
-# Determine the database by looking at the job name.
-# This would make the default database postgresql.
-if [[ "${CI_JOB_NAME#*mysql}" != "$CI_JOB_NAME" ]]; then
-  export GITLAB_DATABASE='mysql'
-else
-  export GITLAB_DATABASE='postgresql'
-fi
+export GITLAB_DATABASE='postgresql'
 
 cp config/database.yml.$GITLAB_DATABASE config/database.yml
 
@@ -41,12 +35,6 @@ if [ "$GITLAB_DATABASE" = 'postgresql' ]; then
     sed -i 's/localhost/postgres/g' config/database_geo.yml
     sed -i 's/username: git/username: postgres/g' config/database_geo.yml
   fi
-else # Assume it's mysql
-  sed -i 's/localhost/mysql/g' config/database.yml
-
-  if [ -f config/database_geo.yml ]; then
-    sed -i 's/localhost/mysql/g' config/database_geo.yml
-  fi
 fi
 
 cp config/resque.yml.example config/resque.yml
@@ -63,6 +51,6 @@ sed -i 's|url:.*$|url: redis://redis:6379/12|g' config/redis.shared_state.yml
 
 if [ "$SETUP_DB" != "false" ]; then
   setup_db
-elif getent hosts postgres || getent hosts mysql; then
+elif getent hosts postgres; then
   setup_db_user_only
 fi
