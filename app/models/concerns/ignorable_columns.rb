@@ -21,7 +21,7 @@ module IgnorableColumns
       raise ArgumentError, 'Please indicate when we can stop ignoring columns with remove_after (date string), example: ignore_columns(:name, remove_after: \'2019-12-01\', remove_with: \'12.6\')' unless remove_after
       raise ArgumentError, 'Please indicate in which release we can stop ignoring columns with remove_with, example: ignore_columns(:name, remove_after: \'2019-12-01\', remove_with: \'12.6\')' unless remove_with
 
-      self.ignored_columns += columns.flatten
+      self.ignored_columns += columns.flatten # rubocop:disable Cop/IgnoredColumns
 
       unless defined?(@ignored_columns_details)
         @ignored_columns_details = superclass.try(:ignored_columns_details)&.dup || {}
