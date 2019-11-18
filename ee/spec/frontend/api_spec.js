@@ -216,17 +216,32 @@ describe('Api', () => {
   describe('packages', () => {
     const projectId = 'project_a';
     const packageId = 'package_b';
+    const apiResponse = [{ id: 1, name: 'foo' }];
+
+    describe('groupPackages', () => {
+      const groupId = 'group_a';
+
+      it('fetch all group packages', () => {
+        const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/packages`;
+        jest.spyOn(axios, 'get');
+        mock.onGet(expectedUrl).replyOnce(200, apiResponse);
+
+        return Api.groupPackages(groupId).then(({ data }) => {
+          expect(data).toEqual(apiResponse);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl, {});
+        });
+      });
+    });
 
     describe('projectPackages', () => {
       it('fetch all project packages', () => {
         const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/projects/${projectId}/packages`;
-        const apiResponse = [{ id: 1, name: 'foo' }];
         jest.spyOn(axios, 'get');
         mock.onGet(expectedUrl).replyOnce(200, apiResponse);
 
         return Api.projectPackages(projectId).then(({ data }) => {
           expect(data).toEqual(apiResponse);
-          expect(axios.get).toHaveBeenCalledWith(expectedUrl);
+          expect(axios.get).toHaveBeenCalledWith(expectedUrl, {});
         });
       });
     });
@@ -242,8 +257,6 @@ describe('Api', () => {
     describe('projectPackage', () => {
       it('fetch package details', () => {
         const expectedUrl = `foo`;
-        const apiResponse = { id: 1, name: 'foo' };
-
         jest.spyOn(Api, 'buildProjectPackageUrl').mockReturnValue(expectedUrl);
         jest.spyOn(axios, 'get');
         mock.onGet(expectedUrl).replyOnce(200, apiResponse);
@@ -258,14 +271,13 @@ describe('Api', () => {
     describe('deleteProjectPackage', () => {
       it('delete a package', () => {
         const expectedUrl = `foo`;
-        const apiResponse = true;
 
         jest.spyOn(Api, 'buildProjectPackageUrl').mockReturnValue(expectedUrl);
         jest.spyOn(axios, 'delete');
-        mock.onDelete(expectedUrl).replyOnce(200, apiResponse);
+        mock.onDelete(expectedUrl).replyOnce(200, true);
 
         return Api.deleteProjectPackage(projectId, packageId).then(({ data }) => {
-          expect(data).toEqual(apiResponse);
+          expect(data).toEqual(true);
           expect(axios.delete).toHaveBeenCalledWith(expectedUrl);
         });
       });

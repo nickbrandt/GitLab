@@ -11947,6 +11947,9 @@ msgstr ""
 msgid "Owner"
 msgstr ""
 
+msgid "Package deleted successfully"
+msgstr ""
+
 msgid "Package information"
 msgstr ""
 
@@ -11965,10 +11968,10 @@ msgstr ""
 msgid "PackageRegistry|Copy yarn setup command"
 msgstr ""
 
-msgid "PackageRegistry|Delete Package"
+msgid "PackageRegistry|Delete Package Version"
 msgstr ""
 
-msgid "PackageRegistry|Delete Package Version"
+msgid "PackageRegistry|Delete package"
 msgstr ""
 
 msgid "PackageRegistry|Installation"

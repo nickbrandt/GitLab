@@ -15,6 +15,7 @@ export default {
     '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/logs.json',
   podLogsPathWithPodContainer:
     '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/:container_name/logs.json',
+  groupPackagesPath: '/api/:version/groups/:id/packages',
   projectPackagesPath: '/api/:version/projects/:id/packages',
   projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
 
@@ -109,9 +110,14 @@ export default {
     return axios.get(url);
   },
 
-  projectPackages(id) {
+  groupPackages(id, options = {}) {
+    const url = Api.buildUrl(this.groupPackagesPath).replace(':id', id);
+    return axios.get(url, options);
+  },
+
+  projectPackages(id, options = {}) {
     const url = Api.buildUrl(this.projectPackagesPath).replace(':id', id);
-    return axios.get(url);
+    return axios.get(url, options);
   },
 
   buildProjectPackageUrl(projectId, packageId) {

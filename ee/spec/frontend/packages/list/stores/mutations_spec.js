@@ -10,29 +10,35 @@ describe('Mutations Registry Store', () => {
     mockState = createState();
   });
 
-  describe('SET_PROJECT_ID', () => {
-    it('should set the project id', () => {
-      const expectedState = { ...mockState, projectId: 'foo' };
-      mutations[types.SET_PROJECT_ID](mockState, 'foo');
+  describe('SET_INITIAL_STATE', () => {
+    it('should set the initial state', () => {
+      const config = {
+        resourceId: '1',
+        pageType: 'groups',
+        userCanDelete: '',
+        emptyListIllustration: 'foo',
+        emptyListHelpUrl: 'baz',
+      };
+
+      const expectedState = {
+        ...mockState,
+        config: {
+          ...config,
+          isGroupPage: true,
+          canDestroyPackage: true,
+        },
+      };
+      mutations[types.SET_INITIAL_STATE](mockState, config);
 
       expect(mockState.projectId).toEqual(expectedState.projectId);
     });
   });
 
-  describe('SET_USER_CAN_DELETE', () => {
-    it('should set the userCanDelete', () => {
-      const expectedState = { ...mockState, userCanDelete: true };
-      mutations[types.SET_USER_CAN_DELETE](mockState, true);
-
-      expect(mockState.userCanDelete).toEqual(expectedState.userCanDelete);
-    });
-  });
-
-  describe('SET_PACKAGE_LIST', () => {
+  describe('SET_PACKAGE_LIST_SUCCESS', () => {
     it('should set a packages list', () => {
       const payload = [npmPackage, mavenPackage];
       const expectedState = { ...mockState, packages: payload };
-      mutations[types.SET_PACKAGE_LIST](mockState, payload);
+      mutations[types.SET_PACKAGE_LIST_SUCCESS](mockState, payload);
 
       expect(mockState.packages).toEqual(expectedState.packages);
     });
@@ -53,7 +59,7 @@ describe('Mutations Registry Store', () => {
       commonUtils.parseIntPagination = jest.fn().mockReturnValue(mockPagination);
     });
     it('should set a parsed pagination', () => {
-      mutations[types.SET_PAGINATION](mockState, { headers: 'foo' });
+      mutations[types.SET_PAGINATION](mockState, 'foo');
       expect(commonUtils.normalizeHeaders).toHaveBeenCalledWith('foo');
       expect(commonUtils.parseIntPagination).toHaveBeenCalledWith('baz');
       expect(mockState.pagination).toEqual(mockPagination);

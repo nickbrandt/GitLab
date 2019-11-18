@@ -2,40 +2,57 @@ import * as actions from 'ee/packages/list/stores/actions';
 import * as types from 'ee/packages/list/stores/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
 import createFlash from '~/flash';
-import Api from '~/api';
+import Api from 'ee/api';
 
 jest.mock('~/flash.js');
-jest.mock('~/api.js');
+jest.mock('ee/api.js');
 
 describe('Actions Package list store', () => {
-  let state;
-
-  beforeEach(() => {
-    state = {
-      pagination: {
-        page: 1,
-        perPage: 10,
-      },
-    };
-  });
+  const headers = 'bar';
 
   describe('requestPackagesList', () => {
     beforeEach(() => {
-      Api.projectPackages = jest.fn().mockResolvedValue({ data: 'foo' });
+      Api.projectPackages = jest.fn().mockResolvedValue({ data: 'foo', headers });
+      Api.groupPackages = jest.fn().mockResolvedValue({ data: 'baz', headers });
     });
 
-    it('should dispatch the correct actions', done => {
+    it('should fetch the project packages list when isGroupPage is false', done => {
       testAction(
         actions.requestPackagesList,
-        null,
-        state,
+        undefined,
+        { config: { isGroupPage: false, resourceId: 1 } },
         [],
         [
           { type: 'setLoading', payload: true },
-          { type: 'receivePackagesListSuccess', payload: 'foo' },
+          { type: 'receivePackagesListSuccess', payload: { data: 'foo', headers } },
           { type: 'setLoading', payload: false },
         ],
-        done,
+        () => {
+          expect(Api.projectPackages).toHaveBeenCalledWith(1, {
+            params: { page: 1, per_page: 20 },
+          });
+          done();
+        },
+      );
+    });
+
+    it('should fetch the group packages list when  isGroupPage is true', done => {
+      testAction(
+        actions.requestPackagesList,
+        undefined,
+        { config: { isGroupPage: true, resourceId: 2 } },
+        [],
+        [
+          { type: 'setLoading', payload: true },
+          { type: 'receivePackagesListSuccess', payload: { data: 'baz', headers } },
+          { type: 'setLoading', payload: false },
+        ],
+        () => {
+          expect(Api.groupPackages).toHaveBeenCalledWith(2, {
+            params: { page: 1, per_page: 20 },
+          });
+          done();
+        },
       );
     });
 
@@ -43,8 +60,8 @@ describe('Actions Package list store', () => {
       Api.projectPackages = jest.fn().mockRejectedValue();
       testAction(
         actions.requestPackagesList,
-        null,
-        state,
+        undefined,
+        { config: { isGroupPage: false, resourceId: 2 } },
         [],
         [{ type: 'setLoading', payload: true }, { type: 'setLoading', payload: false }],
         () => {
@@ -57,37 +74,29 @@ describe('Actions Package list store', () => {
 
   describe('receivePackagesListSuccess', () => {
     it('should set received packages', done => {
+      const data = 'foo';
+
       testAction(
         actions.receivePackagesListSuccess,
-        'foo',
-        state,
-        [{ type: types.SET_PACKAGE_LIST_SUCCESS, payload: 'foo' }],
+        { data, headers },
+        null,
+        [
+          { type: types.SET_PACKAGE_LIST_SUCCESS, payload: data },
+          { type: types.SET_PAGINATION, payload: headers },
+        ],
         [],
         done,
       );
     });
   });
 
-  describe('setProjectId', () => {
-    it('should commit setProjectId', done => {
+  describe('setInitialState', () => {
+    it('should commit setInitialState', done => {
       testAction(
-        actions.setProjectId,
+        actions.setInitialState,
         '1',
-        state,
-        [{ type: types.SET_PROJECT_ID, payload: '1' }],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setUserCanDelete', () => {
-    it('should commit setUserCanDelete', done => {
-      testAction(
-        actions.setUserCanDelete,
-        true,
-        state,
-        [{ type: types.SET_USER_CAN_DELETE, payload: true }],
+        null,
+        [{ type: types.SET_INITIAL_STATE, payload: '1' }],
         [],
         done,
       );
@@ -99,7 +108,7 @@ describe('Actions Package list store', () => {
       testAction(
         actions.setLoading,
         true,
-        state,
+        null,
         [{ type: types.SET_MAIN_LOADING, payload: true }],
         [],
         done,
@@ -122,7 +131,7 @@ describe('Actions Package list store', () => {
         [],
         [
           { type: 'setLoading', payload: true },
-          { type: 'fetchPackages' },
+          { type: 'requestPackagesList' },
           { type: 'setLoading', payload: false },
         ],
         done,
