@@ -6,7 +6,7 @@ module Operations
     include IgnorableColumns
 
     self.table_name = 'operations_feature_flags_clients'
-    ignore_columns :token, remove_after: '2019-12-15', remove_with: '12.6'
+    ignore_column :token, remove_after: '2019-12-15', remove_with: '12.6'
 
     belongs_to :project
 

@@ -36,7 +36,7 @@ module Ci
 
     FORM_EDITABLE = %i[description tag_list active run_untagged locked access_level maximum_timeout_human_readable].freeze
 
-    ignore_columns :is_shared, remove_after: '2019-12-15', remove_with: '12.6'
+    ignore_column :is_shared, remove_after: '2019-12-15', remove_with: '12.6'
 
     has_many :builds
     has_many :runner_projects, inverse_of: :runner, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent

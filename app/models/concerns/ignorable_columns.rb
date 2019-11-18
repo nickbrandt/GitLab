@@ -12,5 +12,7 @@ module IgnorableColumns
 
       self.ignored_columns += columns
     end
+
+    alias_method :ignore_column, :ignore_columns
   end
 end
