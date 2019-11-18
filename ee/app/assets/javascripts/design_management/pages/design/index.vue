@@ -11,8 +11,9 @@ import DesignDiscussion from '../../components/design_notes/design_discussion.vu
 import DesignReplyForm from '../../components/design_notes/design_reply_form.vue';
 import DesignDestroyer from '../../components/design_destroyer.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
+import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
-import { extractDiscussions } from '../../utils/design_management_utils';
+import { extractDiscussions, extractDesign } from '../../utils/design_management_utils';
 
 export default {
   components: {
@@ -41,18 +42,25 @@ export default {
         height: 0,
       },
       projectPath: '',
+      issueId: '',
       isNoteSaving: false,
     };
   },
   apollo: {
+    appData: {
+      query: appDataQuery,
+      manual: true,
+      result({ data: { projectPath, issueIid } }) {
+        this.projectPath = projectPath;
+        this.issueIid = issueIid;
+      },
+    },
     design: {
       query: getDesignQuery,
       variables() {
-        return {
-          id: this.id,
-          version: this.designsVersion,
-        };
+        return this.designVariables;
       },
+      update: data => extractDesign(data),
       result({ data }) {
         if (!data) {
           createFlash(s__('DesignManagement|Could not find design, please try again.'));
@@ -83,6 +91,14 @@ export default {
     },
     renderDiscussions() {
       return this.discussions.length || this.annotationCoordinates;
+    },
+    designVariables() {
+      return {
+        fullPath: this.projectPath,
+        iid: this.issueIid,
+        filenames: [this.$route.params.id],
+        atVersion: this.designsVersion,
+      };
     },
   },
   mounted() {
@@ -119,10 +135,7 @@ export default {
           update: (store, { data: { createImageDiffNote } }) => {
             const data = store.readQuery({
               query: getDesignQuery,
-              variables: {
-                id: this.id,
-                version: this.designsVersion,
-              },
+              variables: this.designVariables,
             });
             const newDiscussion = {
               __typename: 'DiscussionEdge',
@@ -143,9 +156,20 @@ export default {
                 },
               },
             };
-            data.design.discussions.edges.push(newDiscussion);
-            data.design.notesCount += 1;
-            store.writeQuery({ query: getDesignQuery, data });
+            const design = extractDesign(data);
+            design.discussions.edges = [...design.discussions.edges, newDiscussion];
+            design.notesCount += 1;
+            store.writeQuery({
+              query: getDesignQuery,
+              variables: this.designVariables,
+              data: {
+                ...data,
+                design: {
+                  ...design,
+                  notesCount: design.notesCount + 1,
+                },
+              },
+            });
           },
         })
         .then(() => {

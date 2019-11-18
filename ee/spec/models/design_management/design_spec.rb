@@ -144,6 +144,18 @@ describe DesignManagement::Design do
       end
     end
 
+    describe '.with_filename' do
+      it 'returns correct design when passed a single filename' do
+        expect(described_class.with_filename(design1.filename)).to eq([design1])
+      end
+
+      it 'returns correct designs when passed an Array of filenames' do
+        expect(
+          described_class.with_filename([design1, design2].map(&:filename))
+        ).to contain_exactly(design1, design2)
+      end
+    end
+
     describe '.current' do
       it 'returns just the undeleted designs' do
         delete_designs(design3)

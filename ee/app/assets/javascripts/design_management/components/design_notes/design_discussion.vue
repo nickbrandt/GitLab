@@ -8,7 +8,7 @@ import createNoteMutation from '../../graphql/mutations/createNote.mutation.grap
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import DesignNote from './design_note.vue';
 import DesignReplyForm from './design_reply_form.vue';
-import { extractCurrentDiscussion } from '../../utils/design_management_utils';
+import { extractCurrentDiscussion, extractDesign } from '../../utils/design_management_utils';
 
 export default {
   components: {
@@ -55,6 +55,14 @@ export default {
         discussionId: this.discussion.id,
       };
     },
+    designVariables() {
+      return {
+        fullPath: this.projectPath,
+        iid: this.issueIid,
+        filenames: [this.$route.params.id],
+        atVersion: this.designsVersion,
+      };
+    },
   },
   methods: {
     addDiscussionComment(
@@ -65,54 +73,29 @@ export default {
     ) {
       const data = store.readQuery({
         query: getDesignQuery,
-        variables: {
-          id: this.designId,
-          version: this.designsVersion,
-        },
+        variables: this.designVariables,
       });
-      const currentDiscussion = extractCurrentDiscussion(
-        data.design.discussions,
-        this.discussion.id,
-      );
 
-      const updatedDiscussion = {
-        ...currentDiscussion,
-        node: {
-          ...currentDiscussion.node,
-          notes: {
-            ...currentDiscussion.node.notes,
-            edges: [
-              ...currentDiscussion.node.notes.edges,
-              { __typename: 'NoteEdge', node: createNote.note },
-            ],
-          },
+      const design = extractDesign(data);
+      const currentDiscussion = extractCurrentDiscussion(design.discussions, this.discussion.id);
+      currentDiscussion.node.notes.edges = [
+        ...currentDiscussion.node.notes.edges,
+        {
+          __typename: 'NoteEdge',
+          node: createNote.note,
         },
-      };
+      ];
 
-      const currentDiscussionIndex = data.design.discussions.edges.indexOf(currentDiscussion);
-
-      const payload = {
-        ...data,
-        design: {
-          ...data.design,
-          discussions: {
-            ...data.design.discussions,
-            edges: [
-              ...data.design.discussions.edges.slice(0, currentDiscussionIndex),
-              updatedDiscussion,
-              ...data.design.discussions.edges.slice(
-                currentDiscussionIndex + 1,
-                data.design.discussions.edges.length,
-              ),
-            ],
-          },
-          notesCount: data.design.notesCount + 1,
-        },
-      };
-
+      design.notesCount += 1;
       store.writeQuery({
         query: getDesignQuery,
-        data: payload,
+        variables: this.designVariables,
+        data: {
+          ...data,
+          design: {
+            ...design,
+          },
+        },
       });
     },
     onDone() {
