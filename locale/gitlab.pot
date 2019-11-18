@@ -905,6 +905,9 @@ msgstr ""
 msgid "Add Kubernetes cluster"
 msgstr ""
 
+msgid "Add LICENSE"
+msgstr ""
+
 msgid "Add README"
 msgstr ""
 
