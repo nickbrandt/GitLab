@@ -1,8 +1,23 @@
 <script>
+import { mapState } from 'vuex';
 import { GlTable, GlPagination, GlButton, GlSorting, GlSortingItem, GlModal } from '@gitlab/ui';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import { s__, sprintf } from '~/locale';
+import {
+  LIST_KEY_NAME,
+  LIST_KEY_PROJECT,
+  LIST_KEY_VERSION,
+  LIST_KEY_PACKAGE_TYPE,
+  LIST_KEY_CREATED_AT,
+  LIST_KEY_ACTIONS,
+  LIST_LABEL_NAME,
+  LIST_LABEL_PROJECT,
+  LIST_LABEL_VERSION,
+  LIST_LABEL_PACKAGE_TYPE,
+  LIST_LABEL_CREATED_AT,
+  LIST_LABEL_ACTIONS,
+} from '../constants';
 
 export default {
   components: {
@@ -15,13 +30,6 @@ export default {
     GlModal,
     Icon,
   },
-  props: {
-    canDestroyPackage: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
   data() {
     return {
       modalId: 'confirm-delete-pacakge',
@@ -29,22 +37,20 @@ export default {
     };
   },
   computed: {
-    // the following computed properties are going to be connected to vuex
-    list() {
-      return [];
-    },
-    perPage() {
-      return 20;
-    },
-    totalItems() {
-      return 100;
-    },
+    ...mapState({
+      list: 'packages',
+      perPage: state => state.pagination.perPage,
+      totalItems: state => state.pagination.total,
+      page: state => state.pagination.page,
+      canDestroyPackage: state => state.config.canDestroyPackage,
+      isGroupPage: state => state.config.isGroupPage,
+    }),
     currentPage: {
       get() {
-        return 1;
+        return this.page;
       },
-      set() {
-        // do something with value
+      set(value) {
+        this.$emit('page:changed', value);
       },
     },
     orderBy() {
@@ -68,36 +74,45 @@ export default {
       return this.canDestroyPackage;
     },
     sortableFields() {
+      // This list is filtered in the case of the project page, and the project column is removed
       return [
         {
-          key: 'name',
-          label: s__('Name'),
-          tdClass: ['w-25'],
+          key: LIST_KEY_NAME,
+          label: LIST_LABEL_NAME,
+          class: ['text-left'],
         },
         {
-          key: 'version',
-          label: s__('Version'),
+          key: LIST_KEY_PROJECT,
+          label: LIST_LABEL_PROJECT,
+          class: ['text-center'],
         },
         {
-          key: 'package_type',
-          label: s__('Type'),
+          key: LIST_KEY_VERSION,
+          label: LIST_LABEL_VERSION,
+          class: ['text-center'],
         },
         {
-          key: 'created_at',
-          label: s__('Created'),
+          key: LIST_KEY_PACKAGE_TYPE,
+          label: LIST_LABEL_PACKAGE_TYPE,
+          class: ['text-center'],
         },
-      ];
+        {
+          key: LIST_KEY_CREATED_AT,
+          label: LIST_LABEL_CREATED_AT,
+          class: this.showActions ? ['text-center'] : ['text-right'],
+        },
+      ].filter(f => f.key !== LIST_KEY_PROJECT || this.isGroupPage);
     },
     headerFields() {
       const actions = {
-        key: 'actions',
-        label: '',
+        key: LIST_KEY_ACTIONS,
+        label: LIST_LABEL_ACTIONS,
         tdClass: ['text-right'],
       };
       return this.showActions ? [...this.sortableFields, actions] : this.sortableFields;
     },
     modalAction() {
-      return s__('PackageRegistry|Delete Package');
+      return s__('PackageRegistry|Delete package');
     },
     deletePackageDescription() {
       if (!this.itemToBeDeleted) {
@@ -107,20 +122,24 @@ export default {
         s__(
           'PackageRegistry|You are about to delete <b>%{packageName}</b>, this operation is irreversible, are you sure?',
         ),
-        { packageName: this.itemToBeDeleted.name },
+        { packageName: `${this.itemToBeDeleted.name}:${this.itemToBeDeleted.version}` },
         false,
       );
     },
   },
   methods: {
-    onDirectionChange() {},
-    onSortItemClick() {},
-    setItemToBeDeleted({ name, id }) {
-      this.itemToBeDeleted = { name, id };
+    onDirectionChange() {
+      // to be connected to the sorting api when the api is ready
+    },
+    onSortItemClick() {
+      // to be connected to the sorting api when the api is ready
+    },
+    setItemToBeDeleted(item) {
+      this.itemToBeDeleted = { ...item };
       this.$refs.packageListDeleteModal.show();
     },
     deleteItemConfirmation() {
-      // this is going to be connected to vuex action
+      this.$emit('package:delete', this.itemToBeDeleted.id);
       this.itemToBeDeleted = null;
     },
     deleteItemCanceled() {
@@ -160,9 +179,15 @@ export default {
       >
         <template #name="{value}">
           <div ref="col-name" class="flex-truncate-parent">
-            <a href="/asd/lol" class="flex-truncate-child" data-qa-selector="package_link">
+            <a href="#" class="flex-truncate-child" data-qa-selector="package_link">
               {{ value }}
             </a>
+          </div>
+        </template>
+
+        <template #project="{value}">
+          <div ref="col-project" class="flex-truncate-parent">
+            <a :href="value" class="flex-truncate-child"> {{ value }} </a>
           </div>
         </template>
         <template #version="{value}">

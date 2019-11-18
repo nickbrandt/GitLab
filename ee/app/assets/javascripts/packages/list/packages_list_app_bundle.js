@@ -1,35 +1,23 @@
 import Vue from 'vue';
-import PackagesListApp from './components/packages_list_app.vue';
 import Translate from '~/vue_shared/translate';
+import { createStore } from './stores';
+import PackagesListApp from './components/packages_list_app.vue';
 
 Vue.use(Translate);
 
-export default () =>
-  new Vue({
-    el: '#js-vue-packages-list',
+export default () => {
+  const el = document.getElementById('js-vue-packages-list');
+  const store = createStore();
+  store.dispatch('setInitialState', el.dataset);
+
+  return new Vue({
+    el,
+    store,
     components: {
       PackagesListApp,
     },
-    data() {
-      const {
-        dataset: { projectId, groupId, emptyListIllustration, emptyListHelpUrl, canDestroyPackage },
-      } = document.querySelector(this.$options.el);
-
-      return {
-        packageListAttrs: {
-          projectId,
-          groupId,
-          emptyListIllustration,
-          emptyListHelpUrl,
-          canDestroyPackage,
-        },
-      };
-    },
     render(createElement) {
-      return createElement('packages-list-app', {
-        props: {
-          ...this.packageListAttrs,
-        },
-      });
+      return createElement('packages-list-app');
     },
   });
+};
