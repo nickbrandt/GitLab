@@ -33,8 +33,6 @@ module QA
           push.files = @files
           push.commit_message = 'Add test files'
         end
-
-        Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
 
       context 'built-in', :requires_admin do
