@@ -37,7 +37,7 @@ export default () =>
     },
     template: `
       <div class="board-labels-toggle-wrapper d-flex align-items-center prepend-left-10">
-        <span id="board-labels-toggle-text">
+        <span id="board-labels-toggle-text" class="text-nowrap">
           {{ __('Show labels') }}
         </span>
         <gl-toggle
