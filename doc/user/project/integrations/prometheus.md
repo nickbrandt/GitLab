@@ -357,6 +357,13 @@ Note the following properties:
 
 ![heatmap panel type](img/heatmap_panel_type.png)
 
+### View and edit the source file of a custom dashboard
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/34779) in GitLab 12.5.
+
+When viewing a custom dashboard of a project, you can view the original
+`.yml` file by clicking on **Edit dashboard** button.
+
 ### Downloading data as CSV
 
 Data from Prometheus charts on the metrics dashboard can be downloaded as CSV.
