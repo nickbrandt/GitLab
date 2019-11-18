@@ -25,6 +25,8 @@ module Vulnerabilities
     has_many :occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
     has_many :pipelines, through: :occurrence_pipelines, class_name: 'Ci::Pipeline'
 
+    attr_writer :sha
+
     CONFIDENCE_LEVELS = {
       undefined: 0,
       ignore: 1,
@@ -123,19 +125,53 @@ module Vulnerabilities
           report_type: report_type,
           project_fingerprint: project_fingerprints
         )
-        .select('report_type, vulnerability_id, project_fingerprint, raw_metadata, '\
+        .select('vulnerability_occurrences.report_type, vulnerability_id, project_fingerprint, raw_metadata, '\
                 'vulnerabilities.id, vulnerabilities.state') # fetching only required attributes
+    end
+
+    # sha can be sourced from a joined pipeline or set from the report
+    def sha
+      self[:sha] || @sha
     end
 
     def state
       return 'dismissed' if dismissal_feedback.present?
 
       if vulnerability.nil?
-        'new'
-      elsif vulnerability.closed?
+        'opened'
+      elsif vulnerability.resolved?
         'resolved'
+      elsif vulnerability.closed? # fail-safe check for cases when dismissal feedback was lost or was not created
+        'dismissed'
       else
         'confirmed'
+      end
+    end
+
+    def self.undismissed
+      where(
+        "NOT EXISTS (?)",
+        Feedback.select(1)
+        .where("ENCODE(#{table_name}.project_fingerprint, 'HEX') = vulnerability_feedback.project_fingerprint") # rubocop:disable GitlabSecurity/SqlInjection
+        .for_dismissal
+      )
+    end
+
+    def self.batch_count_by_project_and_severity(project_id, severity)
+      BatchLoader.for(project_id: project_id, severity: severity).batch(default_value: 0) do |items, loader|
+        project_ids = items.map { |i| i[:project_id] }.uniq
+        severities = items.map { |i| i[:severity] }.uniq
+
+        counts = undismissed
+          .by_severities(severities)
+          .by_projects(project_ids)
+          .group(:project_id, :severity)
+          .count
+
+        counts.each do |(found_project_id, found_severity), count|
+          loader_key = { project_id: found_project_id, severity: found_severity }
+          loader.call(loader_key, count)
+        end
       end
     end
 
@@ -212,13 +248,13 @@ module Vulnerabilities
 
     def eql?(other)
       other.report_type == report_type &&
-        other.location == location &&
+        other.location_fingerprint == location_fingerprint &&
         other.first_fingerprint == first_fingerprint
     end
 
     # Array.difference (-) method uses hash and eql? methods to do comparison
     def hash
-      report_type.hash ^ location.hash ^ first_fingerprint.hash
+      report_type.hash ^ location_fingerprint.hash ^ first_fingerprint.hash
     end
 
     def severity_value

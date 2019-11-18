@@ -120,6 +120,7 @@ merge_requests:
 - pipelines_for_merge_request
 - merge_request_assignees
 - suggestions
+- unresolved_notes
 - assignees
 - reviews
 - approval_rules
@@ -339,6 +340,7 @@ project:
 - triggers
 - pipeline_schedules
 - environments
+- environments_for_dashboard
 - deployments
 - project_feature
 - auto_devops
@@ -423,6 +425,11 @@ project:
 - alerts_service
 - grafana_integration
 - remove_source_branch_after_merge
+- deleting_user
+- upstream_projects
+- downstream_projects
+- upstream_project_subscriptions
+- downstream_project_subscriptions
 award_emoji:
 - awardable
 - user

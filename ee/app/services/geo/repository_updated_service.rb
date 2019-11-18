@@ -16,10 +16,7 @@ module Geo
 
     def execute
       return false unless Gitlab::Geo.primary?
-
-      if source == Geo::RepositoryUpdatedEvent::DESIGN && Feature.disabled?(:enable_geo_design_sync)
-        return false
-      end
+      return false if design? && Feature.disabled?(:enable_geo_design_sync)
 
       reset_repository_checksum!
       create_repository_updated_event!
@@ -39,10 +36,13 @@ module Geo
       ).create!
     end
 
+    def design?
+      source == Geo::RepositoryUpdatedEvent::DESIGN
+    end
+
     def reset_repository_checksum!
       # We don't yet support verification for Design repositories
-      return if source == Geo::RepositoryUpdatedEvent::DESIGN
-
+      return if design?
       return if repository_state.nil?
 
       repository_state.update!(

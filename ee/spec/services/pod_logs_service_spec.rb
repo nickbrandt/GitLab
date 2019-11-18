@@ -54,7 +54,7 @@ describe PodLogsService do
     shared_context 'return error' do |message|
       before do
         allow_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
-          .with(pod_name, environment.deployment_namespace, container: container_name)
+          .with(environment.id, pod_name, environment.deployment_namespace, container: container_name)
           .and_return({
             status: :error,
             error: message,
@@ -67,10 +67,10 @@ describe PodLogsService do
     shared_context 'return success' do
       before do
         allow_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
-          .with(response_pod_name, environment.deployment_namespace, container: container_name)
+          .with(environment.id, response_pod_name, environment.deployment_namespace, container: container_name)
           .and_return({
             status: :success,
-            logs: "Log 1\nLog 2\nLog 3",
+            logs: ["Log 1", "Log 2", "Log 3"],
             pod_name: response_pod_name,
             container_name: container_name
           })
@@ -151,7 +151,7 @@ describe PodLogsService do
 
         it 'returns logs of first pod' do
           expect_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
-            .with(first_pod_name, environment.deployment_namespace, container: nil)
+            .with(environment.id, first_pod_name, environment.deployment_namespace, container: nil)
 
           subject.execute
         end
@@ -188,7 +188,7 @@ describe PodLogsService do
       context 'when nil is returned' do
         before do
           allow_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
-            .with(pod_name, environment.deployment_namespace, container: container_name)
+            .with(environment.id, pod_name, environment.deployment_namespace, container: container_name)
             .and_return(nil)
         end
 

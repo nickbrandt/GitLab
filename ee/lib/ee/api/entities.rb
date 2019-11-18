@@ -109,9 +109,12 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
-          expose :epic_iid,
-                 if: -> (issue, options) { ::Ability.allowed?(options[:current_user], :read_epic, issue.project&.group) } do |issue|
-            issue.epic&.iid
+          with_options if: -> (issue, options) { ::Ability.allowed?(options[:current_user], :read_epic, issue.project&.group) } do
+            expose :epic_iid do |issue|
+              issue.epic&.iid
+            end
+
+            expose :epic, using: EpicBaseEntity
           end
         end
       end
@@ -539,6 +542,7 @@ module EE
           :starts_at,
           :expires_at,
           :historical_max,
+          :maximum_user_count,
           :licensee,
           :add_ons
 
@@ -808,6 +812,28 @@ module EE
         end
       end
 
+      module ConanPackage
+        class ConanPackageManifest < Grape::Entity
+          expose :package_urls, merge: true
+        end
+
+        class ConanPackageSnapshot < Grape::Entity
+          expose :package_snapshot, merge: true
+        end
+
+        class ConanRecipeManifest < Grape::Entity
+          expose :recipe_urls, merge: true
+        end
+
+        class ConanRecipeSnapshot < Grape::Entity
+          expose :recipe_snapshot, merge: true
+        end
+
+        class ConanUploadUrls < Grape::Entity
+          expose :upload_urls, merge: true
+        end
+      end
+
       class NpmPackage < Grape::Entity
         expose :name
         expose :versions
@@ -863,11 +889,43 @@ module EE
           expose :updated_at
         end
 
+        class DetailedScope < Scope
+          expose :name
+        end
+
         expose :name
         expose :description
         expose :created_at
         expose :updated_at
         expose :scopes, using: Scope
+      end
+
+      class Vulnerability < Grape::Entity
+        expose :id
+        expose :title
+        expose :description
+
+        expose :state
+        expose :severity
+        expose :confidence
+        expose :report_type
+
+        expose :project, using: ::API::Entities::ProjectIdentity
+
+        expose :author_id
+        expose :updated_by_id
+        expose :last_edited_by_id
+        expose :resolved_by_id
+        expose :closed_by_id
+
+        expose :start_date
+        expose :due_date
+
+        expose :created_at
+        expose :updated_at
+        expose :last_edited_at
+        expose :resolved_at
+        expose :closed_at
       end
     end
   end

@@ -222,7 +222,7 @@ shared_examples 'Signup' do
             expect(current_path).to eq users_sign_up_welcome_path
           else
             expect(current_path).to eq dashboard_projects_path
-            expect(page).to have_content("Please check your email (#{new_user.email}) to verify that you own this address.")
+            expect(page).to have_content("Please check your email (#{new_user.email}) to verify that you own this address and unlock the power of CI/CD.")
           end
         end
       end
@@ -379,7 +379,9 @@ shared_examples 'Signup' do
     before do
       InvisibleCaptcha.timestamp_enabled = true
       stub_application_setting(recaptcha_enabled: true)
-      allow_any_instance_of(RegistrationsController).to receive(:verify_recaptcha).and_return(false)
+      allow_next_instance_of(RegistrationsController) do |instance|
+        allow(instance).to receive(:verify_recaptcha).and_return(false)
+      end
     end
 
     after do
@@ -441,11 +443,13 @@ describe 'With experimental flow' do
 
       fill_in 'user_name', with: 'New name'
       select 'Software Developer', from: 'user_role'
+      choose 'user_setup_for_company_true'
       click_button 'Get started!'
       new_user = User.find_by_username(new_user.username)
 
       expect(new_user.name).to eq 'New name'
       expect(new_user.software_developer_role?).to be_truthy
+      expect(new_user.setup_for_company).to be_truthy
       expect(page).to have_current_path(new_project_path)
     end
   end

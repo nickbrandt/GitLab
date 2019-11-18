@@ -4,8 +4,6 @@ module API
   class Vulnerabilities < Grape::API
     include PaginationParams
 
-    helpers ::API::Helpers::VulnerabilityFindingsHelpers
-
     helpers do
       def vulnerabilities_by(project)
         Security::VulnerabilitiesFinder.new(project).execute
@@ -23,7 +21,7 @@ module API
 
       def render_vulnerability(vulnerability)
         if vulnerability.valid?
-          present vulnerability, with: VulnerabilityEntity
+          present vulnerability, with: EE::API::Entities::Vulnerability
         else
           render_validation_error!(vulnerability)
         end
@@ -31,6 +29,8 @@ module API
     end
 
     before do
+      not_found! unless Feature.enabled?(:first_class_vulnerabilities)
+
       authenticate!
     end
 
@@ -39,33 +39,25 @@ module API
     end
     resource :vulnerabilities do
       desc 'Resolve a vulnerability' do
-        success VulnerabilityEntity
+        success EE::API::Entities::Vulnerability
       end
       post ':id/resolve' do
-        if Feature.enabled?(:first_class_vulnerabilities)
-          vulnerability = find_and_authorize_vulnerability!(:resolve_vulnerability)
-          break not_modified! if vulnerability.closed?
+        vulnerability = find_and_authorize_vulnerability!(:resolve_vulnerability)
+        break not_modified! if vulnerability.resolved?
 
-          vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
-          render_vulnerability(vulnerability)
-        else
-          not_found!
-        end
+        vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
+        render_vulnerability(vulnerability)
       end
 
       desc 'Dismiss a vulnerability' do
-        success VulnerabilityEntity
+        success EE::API::Entities::Vulnerability
       end
       post ':id/dismiss' do
-        if Feature.enabled?(:first_class_vulnerabilities)
-          vulnerability = find_and_authorize_vulnerability!(:dismiss_vulnerability)
-          break not_modified! if vulnerability.closed?
+        vulnerability = find_and_authorize_vulnerability!(:dismiss_vulnerability)
+        break not_modified! if vulnerability.closed?
 
-          vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
-          render_vulnerability(vulnerability)
-        else
-          not_found!
-        end
+        vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
+        render_vulnerability(vulnerability)
       end
     end
 
@@ -73,27 +65,39 @@ module API
       requires :id, type: String, desc: 'The ID of a project'
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
-      params do
-        # These params have no effect for Vulnerabilities API but are required to support falling back to
-        # responding with Vulnerability Findings when :first_class_vulnerabilities feature is disabled.
-        # TODO: replace :vulnerability_findings_params with just :pagination when feature flag is removed
-        # https://gitlab.com/gitlab-org/gitlab/issues/33488
-        use :vulnerability_findings_params
-      end
       desc 'Get a list of project vulnerabilities' do
-        success VulnerabilityEntity
+        success EE::API::Entities::Vulnerability
+      end
+      params do
+        use :pagination
       end
       get ':id/vulnerabilities' do
-        if Feature.enabled?(:first_class_vulnerabilities)
-          authorize! :read_project_security_dashboard, user_project
+        authorize! :read_vulnerability, user_project
 
-          vulnerabilities = paginate(
-            vulnerabilities_by(user_project)
-          )
+        vulnerabilities = paginate(
+          vulnerabilities_by(user_project)
+        )
 
-          present vulnerabilities, with: VulnerabilityEntity
+        present vulnerabilities, with: EE::API::Entities::Vulnerability
+      end
+
+      desc 'Create a new Vulnerability (from a confirmed Finding)' do
+        success EE::API::Entities::Vulnerability
+      end
+      params do
+        requires :finding_id, type: Integer, desc: 'The id of confirmed vulnerability finding'
+      end
+      post ':id/vulnerabilities' do
+        authorize! :create_vulnerability, user_project
+
+        vulnerability = ::Vulnerabilities::CreateService.new(
+          user_project, current_user, finding_id: params[:finding_id]
+        ).execute
+
+        if vulnerability.persisted?
+          present vulnerability, with: EE::API::Entities::Vulnerability
         else
-          respond_with_vulnerability_findings
+          render_validation_error!(vulnerability)
         end
       end
     end

@@ -51,7 +51,7 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
     end
 
     it 'loads serialized records' do
-      items = data_collector.records_fetcher.serialized_records
+      items = data_collector.serialized_records
       expect(items.size).to eq(3)
     end
 
@@ -62,7 +62,7 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
   shared_examples 'test various start and end event combinations' do
     context 'when `Issue` based stage is given' do
-      context 'between issue creation time and closing time' do
+      context 'between issue creation time and issue first mentioned in commit time' do
         let(:start_event_identifier) { :issue_created }
         let(:end_event_identifier) { :issue_first_mentioned_in_commit }
 
@@ -72,6 +72,68 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         def create_data_for_end_event(issue, example_class)
           issue.metrics.update!(first_mentioned_in_commit_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue creation time and closing time' do
+        let(:start_event_identifier) { :issue_created }
+        let(:end_event_identifier) { :issue_closed }
+
+        def create_data_for_start_event(example_class)
+          create(:issue, :opened, project: example_class.project)
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.close!
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue first mentioned in commit and first associated with milestone time' do
+        let(:start_event_identifier) { :issue_first_mentioned_in_commit }
+        let(:end_event_identifier) { :issue_first_associated_with_milestone }
+
+        def create_data_for_start_event(example_class)
+          issue = create(:issue, :opened, project: example_class.project)
+          issue.metrics.update!(first_mentioned_in_commit_at: Time.now)
+          issue
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.metrics.update!(first_associated_with_milestone_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue creation time and first added to board time' do
+        let(:start_event_identifier) { :issue_created }
+        let(:end_event_identifier) { :issue_first_added_to_board }
+
+        def create_data_for_start_event(example_class)
+          create(:issue, :opened, project: example_class.project)
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.metrics.update!(first_added_to_board_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue creation time and last edit time' do
+        let(:start_event_identifier) { :issue_created }
+        let(:end_event_identifier) { :issue_last_edited }
+
+        def create_data_for_start_event(example_class)
+          create(:issue, :opened, project: example_class.project)
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.update!(last_edited_at: Time.now)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -123,6 +185,36 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         def create_data_for_end_event(mr, example_class)
           mr.metrics.update!(latest_build_finished_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between merge request creation time and close time' do
+        let(:start_event_identifier) { :merge_request_created }
+        let(:end_event_identifier) { :merge_request_closed }
+
+        def create_data_for_start_event(example_class)
+          create(:merge_request, source_project: example_class.project, allow_broken: true)
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.metrics.update!(latest_closed_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between merge request creation time and last edit time' do
+        let(:start_event_identifier) { :merge_request_created }
+        let(:end_event_identifier) { :merge_request_last_edited }
+
+        def create_data_for_start_event(example_class)
+          create(:merge_request, source_project: example_class.project, allow_broken: true)
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.update!(last_edited_at: Time.now)
         end
 
         it_behaves_like 'custom cycle analytics stage'

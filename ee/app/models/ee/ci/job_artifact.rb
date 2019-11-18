@@ -17,6 +17,7 @@ module EE
       METRICS_REPORT_FILE_TYPES = %w[metrics].freeze
       CONTAINER_SCANNING_REPORT_TYPES = %w[container_scanning].freeze
       SAST_REPORT_TYPES = %w[sast].freeze
+      DAST_REPORT_TYPES = %w[dast].freeze
 
       scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
       scope :project_id_in, ->(ids) { joins(:project).merge(::Project.id_in(ids)) }
@@ -40,6 +41,10 @@ module EE
 
       scope :sast_reports, -> do
         with_file_types(SAST_REPORT_TYPES)
+      end
+
+      scope :dast_reports, -> do
+        with_file_types(DAST_REPORT_TYPES)
       end
 
       scope :metrics_reports, -> do

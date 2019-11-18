@@ -1,6 +1,7 @@
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 
-import { ChildType, PathIdSeparator } from 'ee/related_items_tree/constants';
+import { PathIdSeparator } from 'ee/related_issues/constants';
+import { ChildType } from 'ee/related_items_tree/constants';
 
 import {
   mockQueryResponse,

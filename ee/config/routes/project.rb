@@ -49,6 +49,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get '(*ref)', action: 'show', as: '', constraints: { ref: Gitlab::PathRegex.git_reference_regex }
           end
         end
+
+        resources :subscriptions, only: [:create, :destroy]
       end
       # End of the /-/ scope.
 
@@ -67,13 +69,21 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      resources :issues, only: [], constraints: { id: /\d+/ } do
+        member do
+          get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
+        end
+      end
+
       resources :merge_requests, only: [], constraints: { id: /\d+/ } do
         member do
+          get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
           get :metrics_reports
           get :license_management_reports
           get :container_scanning_reports
           get :dependency_scanning_reports
           get :sast_reports
+          get :dast_reports
         end
       end
 

@@ -13,7 +13,7 @@ module Vulnerabilities
       raise Gitlab::Access::AccessDeniedError unless can?(@user, :resolve_vulnerability, @vulnerability.project)
 
       @vulnerability.tap do |vulnerability|
-        vulnerability.update(state: :closed, closed_by: @user, closed_at: Time.zone.now)
+        vulnerability.update(state: :resolved, resolved_by: @user, resolved_at: Time.current)
       end
     end
   end

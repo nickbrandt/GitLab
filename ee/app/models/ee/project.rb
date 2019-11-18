@@ -35,6 +35,7 @@ module EE
         if: ->(project) { project.mirror? && project.import_url_updated? }
 
       belongs_to :mirror_user, foreign_key: 'mirror_user_id', class_name: 'User'
+      belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_user_id', class_name: 'User'
 
       has_one :repository_state, class_name: 'ProjectRepositoryState', inverse_of: :project
       has_one :project_registry, class_name: 'Geo::ProjectRegistry', inverse_of: :project
@@ -66,7 +67,11 @@ module EE
       # https://gitlab.com/gitlab-org/gitlab/issues/10252#terminology
       has_many :vulnerabilities
       has_many :vulnerability_feedback, class_name: 'Vulnerabilities::Feedback'
-      has_many :vulnerability_findings, class_name: 'Vulnerabilities::Occurrence'
+      has_many :vulnerability_findings, class_name: 'Vulnerabilities::Occurrence' do
+        def lock_for_confirmation!(id)
+          where(vulnerability_id: nil).lock.find(id)
+        end
+      end
       has_many :vulnerability_identifiers, class_name: 'Vulnerabilities::Identifier'
       has_many :vulnerability_scanners, class_name: 'Vulnerabilities::Scanner'
 
@@ -87,6 +92,11 @@ module EE
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
 
       has_many :project_aliases
+
+      has_many :upstream_project_subscriptions, class_name: 'Ci::Subscriptions::Project', foreign_key: :downstream_project_id, inverse_of: :downstream_project
+      has_many :upstream_projects, class_name: 'Project', through: :upstream_project_subscriptions, source: :upstream_project
+      has_many :downstream_project_subscriptions, class_name: 'Ci::Subscriptions::Project', foreign_key: :upstream_project_id, inverse_of: :upstream_project
+      has_many :downstream_projects, class_name: 'Project', through: :downstream_project_subscriptions, source: :downstream_project
 
       scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
 
@@ -132,6 +142,7 @@ module EE
       scope :with_slack_service, -> { joins(:slack_service) }
       scope :with_slack_slash_commands_service, -> { joins(:slack_slash_commands_service) }
       scope :with_prometheus_service, -> { joins(:prometheus_service) }
+      scope :aimed_for_deletion, -> (date) { where('marked_for_deletion_at <= ?', date).without_deleted }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
@@ -192,6 +203,10 @@ module EE
     def latest_pipeline_with_security_reports
       all_pipelines.newest_first(ref: default_branch).with_reports(::Ci::JobArtifact.security_reports).first ||
         all_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
+    end
+
+    def latest_pipeline_with_reports(reports)
+      all_pipelines.newest_first(ref: default_branch).with_reports(reports).take
     end
 
     def environments_for_scope(scope)
@@ -624,13 +639,18 @@ module EE
       super.presence || build_feature_usage
     end
 
+    # LFS and hashed repository storage are required for using Design Management.
     def design_management_enabled?
-      # LFS is required for using Design Management
-      #
-      # Checking both feature availability on the license, as well as the feature
-      # flag, because we don't want to enable design_management by default on
-      # on prem installs yet.
       lfs_enabled? &&
+        # We will allow the hashed storage requirement to be disabled for
+        # a few releases until we are able to understand the impact of the
+        # hashed storage requirement for existing design management projects.
+        # See https://gitlab.com/gitlab-org/gitlab/issues/13428#note_238729038
+        (hashed_storage?(:repository) || ::Feature.disabled?(:design_management_require_hashed_storage, self, default_enabled: true)) &&
+        # Check both feature availability on the license, as well as the feature
+        # flag, because we don't want to enable design_management by default on
+        # on prem installs yet.
+        # See https://gitlab.com/gitlab-org/gitlab/issues/13709
         feature_available?(:design_management) &&
         ::Feature.enabled?(:design_management_flag, self, default_enabled: true)
     end
@@ -643,12 +663,33 @@ module EE
       feature_available?(:incident_management)
     end
 
+    def alerts_service_activated?
+      alerts_service_available? && alerts_service&.active?
+    end
+
     def package_already_taken?(package_name)
       namespace.root_ancestor.all_projects
         .joins(:packages)
         .where.not(id: id)
         .merge(Packages::Package.with_name(package_name))
         .exists?
+    end
+
+    def adjourned_deletion?
+      feature_available?(:marking_project_for_deletion) &&
+        ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
+    end
+
+    def marked_for_deletion?
+      return false unless feature_available?(:marking_project_for_deletion)
+
+      marked_for_deletion_at.present?
+    end
+
+    def has_packages?(package_type)
+      return false unless feature_available?(:packages)
+
+      packages.where(package_type: package_type).exists?
     end
 
     private

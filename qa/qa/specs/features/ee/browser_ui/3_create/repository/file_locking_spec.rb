@@ -74,7 +74,7 @@ module QA
         click_lock
         sign_out_and_sign_in_as user: @user_one
         try_to_merge merge_request: merge_request
-        expect(page).to have_text("locked by Administrator")
+        expect(page).to have_text("locked by #{admin_username}")
       end
 
       it 'locks a file and unlocks in list' do
@@ -149,6 +149,12 @@ module QA
 
       def expect_no_error_on_push(for_file: 'file', as_user:)
         expect { push branch: 'master', file: for_file, as_user: as_user }.not_to raise_error
+      end
+
+      def admin_username
+        Resource::User.fabricate_via_api! do |user|
+          user.username = Runtime::User.username
+        end.name
       end
     end
   end

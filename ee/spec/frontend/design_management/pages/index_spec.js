@@ -179,6 +179,10 @@ describe('Design management index page', () => {
                       startSha: '',
                       headSha: '',
                     },
+                    discussions: {
+                      __typename: 'DesignDiscussion',
+                      edges: [],
+                    },
                     versions: {
                       __typename: 'DesignVersionConnection',
                       edges: {
@@ -229,7 +233,7 @@ describe('Design management index page', () => {
         createFlash.mockReset();
       });
 
-      it('doesn not warn when the max files are uploaded', () => {
+      it('does not warn when the max files are uploaded', () => {
         createComponent();
 
         wrapper.vm.onUploadDesign(new Array(MAXIMUM_FILE_UPLOAD_LIMIT).fill(mockDesigns[0]));
@@ -254,6 +258,10 @@ describe('Design management index page', () => {
 
     it('renders design checkboxes', () => {
       expect(findDesignCheckboxes().length).toBe(mockDesigns.length);
+    });
+
+    it('renders Delete selected button', () => {
+      expect(findDeleteButton().exists()).toBe(true);
     });
 
     it('renders a button with Select all text', () => {
@@ -319,6 +327,10 @@ describe('Design management index page', () => {
 
     it('does not render design checkboxes', () => {
       expect(findDesignCheckboxes().length).toBe(0);
+    });
+
+    it('does not render Delete selected button', () => {
+      expect(findDeleteButton().exists()).toBe(false);
     });
 
     it('does not render Select All button', () => {

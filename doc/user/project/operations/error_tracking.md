@@ -20,6 +20,7 @@ You will need at least Maintainer [permissions](../../permissions.md) to enable 
 GitLab provides an easy way to connect Sentry to your project:
 
 1. Sign up to Sentry.io or [deploy your own](#deploying-sentry) Sentry instance.
+1. [Create](https://docs.sentry.io/guides/integrate-frontend/create-new-project/) a new Sentry project. For each GitLab project that you want to integrate, we recommend that you create a new Sentry project.
 1. [Find or generate](https://docs.sentry.io/api/auth/) a Sentry auth token for your Sentry project.
    Make sure to give the token at least the following scopes: `event:read` and `project:read`.
 1. Navigate to your project’s **Settings > Operations**.
@@ -44,3 +45,14 @@ The Error Tracking list may be found at **Operations > Error Tracking** in your 
 Errors can be filtered by title.
 
 ![Error Tracking list](img/error_tracking_list.png)
+
+## Error Details
+
+From error list, users can navigate to the error details page by clicking the title of any error.
+
+This page has:
+
+- A link to Sentry issue.
+- A full stack trace along with other details.
+
+![Error Details](img/error_details_v12_5.png)

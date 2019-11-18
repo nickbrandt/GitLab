@@ -8,6 +8,7 @@
 - blob_path = project_blob_path(project, pipeline.sha)
 - license_management_settings_path = can?(current_user, :admin_software_license_policy, project) ? license_management_settings_path(project) : nil
 - licenses_api_path = licenses_project_pipeline_path(project, pipeline) if project.feature_available?(:license_management)
+- vulnerabilities_endpoint_path = expose_path(api_v4_projects_vulnerability_findings_path(id: project.id, params: { pipeline_id: pipeline.id, scope: 'dismissed' }))
 
 - if pipeline.expose_security_dashboard?
   #js-tab-security.build-security.tab-pane
@@ -16,7 +17,7 @@
       empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
       pipeline_id: pipeline.id,
       project_id: project.id,
-      vulnerabilities_endpoint: api_projects_vulnerability_findings_path(project, pipeline),
+      vulnerabilities_endpoint: vulnerabilities_endpoint_path,
       vulnerability_feedback_help_path: help_page_path('user/application_security/index') } }
     - else
       #js-security-report-app{ data: { head_blob_path: blob_path,

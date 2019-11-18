@@ -1,5 +1,24 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.4.2
+
+### Fixed (1 change)
+
+- Fix feature flag check for productivity analytics. !19025
+
+
+## 12.4.1
+
+### Security (6 changes)
+
+- Do not display project labels that are not visible for user accessing group labels.
+- Do not index system notes for issue update.
+- Redact search results based on Ability.allowed?.
+- Do not show private cross references in epic notes.
+- Filter out packages the user does'nt have permission to see at group level.
+- Fixes a Open Redirect issue in `InternalRedirect`.
+
+
 ## 12.4.0
 
 ### Security (2 changes)
@@ -4162,7 +4181,7 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Show hook errors for fast-forward merges. !1375
 - Allow all parameters of group webhooks to be set through the UI. !1376
 - Fix Elasticsearch queries when a group_id is specified. !1423
-- Check the right index mapping based on Rails environment for rake gitlab:elastic:add_feature_visiblity_levels_to_project. !1473
+- Check the right index mapping based on Rails environment for rake gitlab:elastic:add_feature_visibility_levels_to_project. !1473
 - Fix issues with another milestone that has a matching list label could not be added to a board.
 - Only admins or group owners can set LDAP overrides.
 - Add support for load balancing database queries.

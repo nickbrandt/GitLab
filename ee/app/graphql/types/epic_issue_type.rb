@@ -14,7 +14,7 @@ module Types
       issue.group_epic_issue_path(ctx[:current_user])
     end
 
-    field :id, GraphQL::ID_TYPE, null: true, resolve: -> (issue) do
+    field :id, GraphQL::ID_TYPE, null: true, resolve: -> (issue, args, ctx) do
       issue.to_global_id
     end, description: 'The global id of the epic-issue relation'
 

@@ -21,15 +21,30 @@ class GroupsWithTemplatesFinder
 
   attr_reader :group_id
 
+  # Cleanup issue: https://gitlab.com/gitlab-org/gitlab/issues/35733
   def extended_group_search
-    groups = Group.with_feature_available_in_plan(:group_project_templates)
-    Gitlab::ObjectHierarchy.new(groups).base_and_descendants
+    if ::Feature.enabled?(:optimized_groups_with_templates_finder)
+      groups = Group.with_project_templates_optimized
+      groups_with_plan = Gitlab::ObjectHierarchy
+        .new(groups)
+        .base_and_ancestors
+        .with_feature_available_in_plan(:group_project_templates)
+
+      Gitlab::ObjectHierarchy.new(groups_with_plan).base_and_descendants
+    else
+      groups = Group.with_feature_available_in_plan(:group_project_templates)
+      Gitlab::ObjectHierarchy.new(groups).base_and_descendants
+    end
   end
 
   def simple_group_search(groups)
     groups = group_id ? groups.find_by(id: group_id)&.self_and_ancestors : groups # rubocop: disable CodeReuse/ActiveRecord
     return Group.none unless groups
 
-    groups.with_project_templates
+    if ::Feature.enabled?(:optimized_groups_with_templates_finder)
+      groups.with_project_templates_optimized
+    else
+      groups.with_project_templates
+    end
   end
 end

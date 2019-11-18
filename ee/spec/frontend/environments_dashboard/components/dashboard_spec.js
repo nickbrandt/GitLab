@@ -28,6 +28,7 @@ describe('dashboard', () => {
       fetchSearchResults: jest.fn(),
       removeProject: jest.fn(),
       toggleSelectedProject: jest.fn(),
+      fetchNextPage: jest.fn(),
     };
     propsData = {
       addPath: 'mock-addPath',

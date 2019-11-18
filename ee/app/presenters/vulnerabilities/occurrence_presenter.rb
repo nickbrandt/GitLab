@@ -5,7 +5,7 @@ module Vulnerabilities
     presents :occurrence
 
     def blob_path
-      return '' unless respond_to?(:sha)
+      return '' unless sha.present?
       return '' unless location.present? && location['file'].present?
 
       add_line_numbers(location['start_line'], location['end_line'])

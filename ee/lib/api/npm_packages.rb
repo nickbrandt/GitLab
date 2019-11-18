@@ -33,8 +33,8 @@ module API
 
       project = find_project_by_package_name(package_name)
 
-      authorize!(:read_package, project)
-      forbidden! unless project.feature_available?(:packages)
+      authorize_read_package!(project)
+      authorize_packages_feature!(project)
 
       packages = ::Packages::NpmPackagesFinder
         .new(project, package_name).execute
@@ -48,7 +48,7 @@ module API
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        authorize_packages_feature!
+        authorize_packages_feature!(user_project)
       end
 
       desc 'Download the NPM tarball' do
@@ -59,7 +59,7 @@ module API
         requires :file_name, type: String, desc: 'Package file name'
       end
       get ':id/packages/npm/*package_name/-/*file_name', format: false do
-        authorize_download_package!
+        authorize_read_package!(user_project)
 
         package = user_project.packages.npm
           .by_name_and_file_name(params[:package_name], params[:file_name])
@@ -77,6 +77,7 @@ module API
         requires :package_name, type: String, desc: 'Package name'
         requires :versions, type: Hash, desc: 'Package version info'
       end
+      route_setting :authentication, job_token_allowed: true
       put ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
         authorize_create_package!
 

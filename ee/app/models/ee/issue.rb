@@ -19,6 +19,11 @@ module EE
       scope :order_created_at_desc, -> { reorder(created_at: :desc) }
       scope :service_desk, -> { where(author: ::User.support_bot) }
 
+      scope :in_epics, ->(epics) do
+        issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
+        id_in(issue_ids)
+      end
+
       has_one :epic_issue
       has_one :epic, through: :epic_issue
       has_many :designs, class_name: "DesignManagement::Design", inverse_of: :issue
@@ -33,6 +38,8 @@ module EE
       has_many :prometheus_alerts, through: :prometheus_alert_events
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
+
+      after_create :update_generic_alert_title, if: :generic_alert_with_default_title?
     end
 
     class_methods do
@@ -128,6 +135,18 @@ module EE
       def weight_options
         [WEIGHT_NONE] + WEIGHT_RANGE.to_a
       end
+    end
+
+    private
+
+    def update_generic_alert_title
+      update(title: "#{title} #{iid}")
+    end
+
+    def generic_alert_with_default_title?
+      title == ::Gitlab::Alerting::NotificationPayloadParser::DEFAULT_TITLE &&
+        project.alerts_service_activated? &&
+        author == ::User.alert_bot
     end
   end
 end

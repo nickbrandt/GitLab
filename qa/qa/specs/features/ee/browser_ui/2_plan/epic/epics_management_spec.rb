@@ -44,11 +44,11 @@ module QA
           EE::Page::Group::Epic::Show.perform do |show|
             show.add_issue_to_epic(issue.web_url)
 
-            expect(show).to have_related_issuable_item
+            expect(show).to have_related_issue_item
 
             show.remove_issue_from_epic
 
-            expect(show).to have_no_related_issuable_item
+            expect(show).to have_no_related_issue_item
           end
         end
 

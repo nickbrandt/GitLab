@@ -6,6 +6,7 @@ module Clusters
     include Gitlab::Utils::StrongMemoize
     include FromUnion
     include ReactiveCaching
+    include AfterCommitQueue
 
     self.table_name = 'clusters'
 
@@ -13,6 +14,7 @@ module Clusters
       Applications::Helm.application_name => Applications::Helm,
       Applications::Ingress.application_name => Applications::Ingress,
       Applications::CertManager.application_name => Applications::CertManager,
+      Applications::Crossplane.application_name => Applications::Crossplane,
       Applications::Prometheus.application_name => Applications::Prometheus,
       Applications::Runner.application_name => Applications::Runner,
       Applications::Jupyter.application_name => Applications::Jupyter,
@@ -46,6 +48,7 @@ module Clusters
     has_one_cluster_application :helm
     has_one_cluster_application :ingress
     has_one_cluster_application :cert_manager
+    has_one_cluster_application :crossplane
     has_one_cluster_application :prometheus
     has_one_cluster_application :runner
     has_one_cluster_application :jupyter
@@ -55,6 +58,7 @@ module Clusters
     has_many :kubernetes_namespaces
 
     accepts_nested_attributes_for :provider_gcp, update_only: true
+    accepts_nested_attributes_for :provider_aws, update_only: true
     accepts_nested_attributes_for :platform_kubernetes, update_only: true
 
     validates :name, cluster_name: true
@@ -72,6 +76,7 @@ module Clusters
     delegate :status, to: :provider, allow_nil: true
     delegate :status_reason, to: :provider, allow_nil: true
     delegate :on_creation?, to: :provider, allow_nil: true
+    delegate :knative_pre_installed?, to: :provider, allow_nil: true
 
     delegate :active?, to: :platform_kubernetes, prefix: true, allow_nil: true
     delegate :rbac?, to: :platform_kubernetes, prefix: true, allow_nil: true
@@ -126,7 +131,55 @@ module Clusters
       hierarchy_groups.flat_map(&:clusters) + Instance.new.clusters
     end
 
+    state_machine :cleanup_status, initial: :cleanup_not_started do
+      state :cleanup_not_started, value: 1
+      state :cleanup_uninstalling_applications, value: 2
+      state :cleanup_removing_project_namespaces, value: 3
+      state :cleanup_removing_service_account, value: 4
+      state :cleanup_errored, value: 5
+
+      event :start_cleanup do |cluster|
+        transition [:cleanup_not_started, :cleanup_errored] => :cleanup_uninstalling_applications
+      end
+
+      event :continue_cleanup do
+        transition(
+          cleanup_uninstalling_applications: :cleanup_removing_project_namespaces,
+          cleanup_removing_project_namespaces: :cleanup_removing_service_account)
+      end
+
+      event :make_cleanup_errored do
+        transition any => :cleanup_errored
+      end
+
+      before_transition any => [:cleanup_errored] do |cluster, transition|
+        status_reason = transition.args.first
+        cluster.cleanup_status_reason = status_reason if status_reason
+      end
+
+      after_transition [:cleanup_not_started, :cleanup_errored] => :cleanup_uninstalling_applications do |cluster|
+        cluster.run_after_commit do
+          Clusters::Cleanup::AppWorker.perform_async(cluster.id)
+        end
+      end
+
+      after_transition cleanup_uninstalling_applications: :cleanup_removing_project_namespaces do |cluster|
+        cluster.run_after_commit do
+          Clusters::Cleanup::ProjectNamespaceWorker.perform_async(cluster.id)
+        end
+      end
+
+      after_transition cleanup_removing_project_namespaces: :cleanup_removing_service_account do |cluster|
+        cluster.run_after_commit do
+          Clusters::Cleanup::ServiceAccountWorker.perform_async(cluster.id)
+        end
+      end
+    end
+
     def status_name
+      return cleanup_status_name if cleanup_errored?
+      return :cleanup_ongoing unless cleanup_not_started?
+
       provider&.status_name || connection_status.presence || :created
     end
 
@@ -207,10 +260,6 @@ module Clusters
 
         variables.append(key: KUBE_INGRESS_BASE_DOMAIN, value: kube_ingress_domain)
       end
-    end
-
-    def knative_pre_installed?
-      provider&.knative_pre_installed?
     end
 
     private

@@ -34,6 +34,7 @@ module LfsRequest
   end
 
   def lfs_check_access!
+    return render_lfs_not_found unless project
     return if download_request? && lfs_download_access?
     return if upload_request? && lfs_upload_access?
 
@@ -55,7 +56,7 @@ module LfsRequest
         documentation_url: help_url
       },
       content_type: CONTENT_TYPE,
-      status: 403
+      status: :forbidden
     )
   end
 
@@ -66,7 +67,7 @@ module LfsRequest
         documentation_url: help_url
       },
       content_type: CONTENT_TYPE,
-      status: 404
+      status: :not_found
     )
   end
 

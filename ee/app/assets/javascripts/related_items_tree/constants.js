@@ -12,11 +12,6 @@ export const ChildState = {
   Closed: 'closed',
 };
 
-export const PathIdSeparator = {
-  Epic: '&',
-  Issue: '#',
-};
-
 export const idProp = {
   Epic: 'id',
   Issue: 'epicIssueId',

@@ -190,7 +190,7 @@ describe MergeRequests::UpdateService, :mailer do
 
       context 'with finished pipeline' do
         before do
-          create(:ci_pipeline_with_one_job,
+          create(:ci_pipeline,
             project: project,
             ref:     merge_request.source_branch,
             sha:     merge_request.diff_head_sha,
@@ -212,14 +212,14 @@ describe MergeRequests::UpdateService, :mailer do
         before do
           service_mock = double
           create(
-            :ci_pipeline_with_one_job,
+            :ci_pipeline,
             project: project,
             ref: merge_request.source_branch,
             sha: merge_request.diff_head_sha,
             head_pipeline_of: merge_request
           )
 
-          expect(AutoMerge::MergeWhenPipelineSucceedsService).to receive(:new).with(project, user, {})
+          expect(AutoMerge::MergeWhenPipelineSucceedsService).to receive(:new).with(project, user, { sha: merge_request.diff_head_sha })
             .and_return(service_mock)
           allow(service_mock).to receive(:available_for?) { true }
           expect(service_mock).to receive(:execute).with(merge_request)
@@ -411,7 +411,7 @@ describe MergeRequests::UpdateService, :mailer do
 
       context 'when auto merge is enabled and target branch changed' do
         before do
-          AutoMergeService.new(project, user).execute(merge_request, AutoMergeService::STRATEGY_MERGE_WHEN_PIPELINE_SUCCEEDS)
+          AutoMergeService.new(project, user, { sha: merge_request.diff_head_sha }).execute(merge_request, AutoMergeService::STRATEGY_MERGE_WHEN_PIPELINE_SUCCEEDS)
 
           update_merge_request({ target_branch: 'target' })
         end
@@ -644,6 +644,30 @@ describe MergeRequests::UpdateService, :mailer do
 
         expect(merge_request.title).to eq('Updated title')
         expect(merge_request.allow_collaboration).to be_truthy
+      end
+    end
+
+    context 'updating `force_remove_source_branch`' do
+      let(:target_project) { create(:project, :repository, :public) }
+      let(:source_project) { fork_project(target_project, nil, repository: true) }
+      let(:user) { target_project.owner }
+      let(:merge_request) do
+        create(:merge_request,
+               source_project: source_project,
+               source_branch: 'fixes',
+               target_project: target_project)
+      end
+
+      it "cannot be done by members of the target project when they don't have access" do
+        expect { update_merge_request(force_remove_source_branch: true) }
+          .not_to change { merge_request.reload.force_remove_source_branch? }.from(nil)
+      end
+
+      it 'can be done by members of the target project if they can push to the source project' do
+        source_project.add_developer(user)
+
+        expect { update_merge_request(force_remove_source_branch: true) }
+          .to change { merge_request.reload.force_remove_source_branch? }.from(nil).to(true)
       end
     end
   end

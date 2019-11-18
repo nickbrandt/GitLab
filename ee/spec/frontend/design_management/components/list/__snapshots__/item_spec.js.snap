@@ -13,6 +13,7 @@ exports[`Design management list item component hides comment count 1`] = `
     <img
       alt="test"
       class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      data-qa-selector="design_image"
       src="http://via.placeholder.com/300"
     />
   </div>
@@ -74,6 +75,7 @@ exports[`Design management list item component renders item with correct status 
     <img
       alt="test"
       class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      data-qa-selector="design_image"
       src="http://via.placeholder.com/300"
     />
   </div>
@@ -135,6 +137,7 @@ exports[`Design management list item component renders item with correct status 
     <img
       alt="test"
       class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      data-qa-selector="design_image"
       src="http://via.placeholder.com/300"
     />
   </div>
@@ -196,6 +199,7 @@ exports[`Design management list item component renders item with correct status 
     <img
       alt="test"
       class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      data-qa-selector="design_image"
       src="http://via.placeholder.com/300"
     />
   </div>
@@ -244,6 +248,7 @@ exports[`Design management list item component renders item with multiple commen
     <img
       alt="test"
       class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      data-qa-selector="design_image"
       src="http://via.placeholder.com/300"
     />
   </div>
@@ -309,6 +314,7 @@ exports[`Design management list item component renders item with no status icon 
     <img
       alt="test"
       class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      data-qa-selector="design_image"
       src="http://via.placeholder.com/300"
     />
   </div>
@@ -357,6 +363,7 @@ exports[`Design management list item component renders item with single comment 
     <img
       alt="test"
       class="block ml-auto mr-auto mw-100 mh-100 design-img"
+      data-qa-selector="design_image"
       src="http://via.placeholder.com/300"
     />
   </div>

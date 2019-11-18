@@ -89,7 +89,7 @@ describe Analytics::CycleAnalytics::StagesController do
   end
 
   describe 'PUT `update`' do
-    let(:stage) { create(:cycle_analytics_group_stage, parent: group) }
+    let(:stage) { create(:cycle_analytics_group_stage, parent: group, relative_position: 15) }
     subject { put :update, params: params.merge(id: stage.id) }
 
     include_examples 'group permission check on the controller level'
@@ -116,6 +116,33 @@ describe Analytics::CycleAnalytics::StagesController do
         stage.reload
 
         expect(stage.name).to eq(params[:name])
+      end
+
+      context 'hidden attribute' do
+        before do
+          params[:hidden] = true
+        end
+
+        it 'updates the hidden attribute' do
+          subject
+
+          stage.reload
+
+          expect(stage.hidden).to eq(true)
+        end
+      end
+
+      context 'when positioning parameter is given' do
+        before do
+          params[:move_before_id] = create(:cycle_analytics_group_stage, parent: group, relative_position: 10).id
+        end
+
+        it 'moves the stage before the last place' do
+          subject
+
+          before_last = group.cycle_analytics_stages.ordered[-2]
+          expect(before_last.id).to eq(stage.id)
+        end
       end
     end
 
@@ -157,6 +184,45 @@ describe Analytics::CycleAnalytics::StagesController do
 
         expect(response).to have_gitlab_http_status(:forbidden)
       end
+    end
+
+    describe 'GET `median`' do
+      subject { get :median, params: params }
+
+      before do
+        params[:created_after] = '2019-01-01'
+        params[:created_before] = '2020-01-01'
+      end
+
+      it 'succeeds' do
+        subject
+
+        expect(response).to be_successful
+        expect(response).to match_response_schema('analytics/cycle_analytics/median', dir: 'ee')
+      end
+
+      include_examples 'date parameter examples'
+
+      include_examples 'group permission check on the controller level'
+    end
+
+    describe 'GET `records`' do
+      subject { get :records, params: params }
+
+      before do
+        params[:created_after] = '2019-01-01'
+        params[:created_before] = '2020-01-01'
+      end
+
+      it 'succeeds' do
+        subject
+
+        expect(response).to be_successful
+      end
+
+      include_examples 'date parameter examples'
+
+      include_examples 'group permission check on the controller level'
     end
   end
 end

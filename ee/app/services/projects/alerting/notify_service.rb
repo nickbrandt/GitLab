@@ -18,16 +18,7 @@ module Projects
 
       private
 
-      delegate :alerts_service, to: :project
-
-      def incident_management_available?
-        project.feature_available?(:incident_management)
-      end
-
-      def alerts_service_activated?
-        incident_management_available? &&
-          alerts_service.try(:active?)
-      end
+      delegate :alerts_service, :alerts_service_activated?, to: :project
 
       def process_incident_issues
         IncidentManagement::ProcessAlertWorker

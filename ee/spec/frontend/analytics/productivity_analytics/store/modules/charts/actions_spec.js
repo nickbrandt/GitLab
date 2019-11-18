@@ -31,8 +31,8 @@ describe('Productivity analytics chart actions', () => {
       rootState: {
         endpoint: `${TEST_HOST}/analytics/productivity_analytics.json`,
         filters: {
-          startDate: '2019-09-01',
-          endDate: '2091-09-05',
+          startDate: new Date('2019-09-01'),
+          endDate: new Date('2091-09-05'),
         },
       },
       getters: {

@@ -90,18 +90,16 @@ describe ApplicationController do
       let(:format) { :html }
 
       it_behaves_like 'setting gon variables'
-
-      context 'for peek requests' do
-        before do
-          request.path = '/-/peek'
-        end
-
-        it_behaves_like 'not setting gon variables'
-      end
     end
 
     context 'with json format' do
       let(:format) { :json }
+
+      it_behaves_like 'not setting gon variables'
+    end
+
+    context 'with atom format' do
+      let(:format) { :atom }
 
       it_behaves_like 'not setting gon variables'
     end
@@ -186,7 +184,7 @@ describe ApplicationController do
       expect(response).to have_gitlab_http_status(404)
     end
 
-    it 'redirects to login page via authenticate_user! if not authenticated' do
+    it 'redirects to login page if not authenticated' do
       get :index
 
       expect(response).to redirect_to new_user_session_path
@@ -639,7 +637,7 @@ describe ApplicationController do
     context 'given a 422 error page' do
       controller do
         def index
-          render 'errors/omniauth_error', layout: 'errors', status: 422
+          render 'errors/omniauth_error', layout: 'errors', status: :unprocessable_entity
         end
       end
 
@@ -653,7 +651,7 @@ describe ApplicationController do
     context 'given a 500 error page' do
       controller do
         def index
-          render 'errors/omniauth_error', layout: 'errors', status: 500
+          render 'errors/omniauth_error', layout: 'errors', status: :internal_server_error
         end
       end
 
@@ -667,7 +665,7 @@ describe ApplicationController do
     context 'given a 200 success page' do
       controller do
         def index
-          render 'errors/omniauth_error', layout: 'errors', status: 200
+          render 'errors/omniauth_error', layout: 'errors', status: :ok
         end
       end
 
@@ -827,7 +825,7 @@ describe ApplicationController do
     end
   end
 
-  describe '#require_role' do
+  describe '#required_signup_info' do
     controller(described_class) do
       def index; end
     end
@@ -849,7 +847,7 @@ describe ApplicationController do
       it { is_expected.to redirect_to users_sign_up_welcome_path }
     end
 
-    context 'experiment enabled and user without a role' do
+    context 'experiment enabled and user without a required role' do
       before do
         sign_in(user)
         get :index
@@ -858,7 +856,7 @@ describe ApplicationController do
       it { is_expected.not_to redirect_to users_sign_up_welcome_path }
     end
 
-    context 'experiment disabled and user with required role' do
+    context 'experiment disabled' do
       let(:experiment_enabled) { false }
 
       before do

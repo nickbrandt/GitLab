@@ -28,7 +28,7 @@ describe MergeTrains::RefreshMergeRequestService do
 
       it do
         expect_next_instance_of(AutoMerge::MergeTrainService) do |service|
-          expect(service).to receive(:abort).with(merge_request, kind_of(String))
+          expect(service).to receive(:abort).with(merge_request, kind_of(String), hash_including(process_next: false))
         end
 
         subject

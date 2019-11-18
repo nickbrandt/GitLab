@@ -135,17 +135,18 @@ describe Clusters::Platforms::Kubernetes do
   end
 
   describe '#read_pod_logs' do
+    let(:environment) { create(:environment) }
     let(:cluster) { create(:cluster, :project, platform_kubernetes: service) }
     let(:service) { create(:cluster_platform_kubernetes, :configured) }
     let(:pod_name) { 'pod-1' }
     let(:namespace) { 'app' }
     let(:container) { 'some-container' }
 
-    subject { service.read_pod_logs(pod_name, namespace, container: container) }
+    subject { service.read_pod_logs(environment.id, pod_name, namespace, container: container) }
 
     shared_examples 'successful log request' do
       it do
-        expect(subject[:logs]).to eq("\"Log 1\\nLog 2\\nLog 3\"")
+        expect(subject[:logs]).to eq(["Log 1", "Log 2", "Log 3"])
         expect(subject[:status]).to eq(:success)
         expect(subject[:pod_name]).to eq(pod_name)
         expect(subject[:container_name]).to eq(container)
@@ -162,6 +163,19 @@ describe Clusters::Platforms::Kubernetes do
     context 'with reactive cache' do
       before do
         synchronous_reactive_cache(service)
+      end
+
+      context 'when ElasticSearch is enabled' do
+        let(:cluster) { create(:cluster, :project, platform_kubernetes: service) }
+        let!(:elastic_stack) { create(:clusters_applications_elastic_stack, cluster: cluster) }
+
+        before do
+          expect_any_instance_of(::Clusters::Applications::ElasticStack).to receive(:elasticsearch_client).at_least(:once).and_return(Elasticsearch::Transport::Client.new)
+          expect_any_instance_of(::Gitlab::Elasticsearch::Logs).to receive(:pod_logs).and_return(["Log 1", "Log 2", "Log 3"])
+          stub_feature_flags(enable_cluster_application_elastic_stack: true)
+        end
+
+        include_examples 'successful log request'
       end
 
       context 'when kubernetes responds with valid logs' do
@@ -224,7 +238,7 @@ describe Clusters::Platforms::Kubernetes do
       context 'when container name is not specified' do
         let(:container) { 'container-0' }
 
-        subject { service.read_pod_logs(pod_name, namespace) }
+        subject { service.read_pod_logs(environment.id, pod_name, namespace) }
 
         before do
           stub_kubeclient_pod_details(pod_name, namespace)
@@ -237,7 +251,15 @@ describe Clusters::Platforms::Kubernetes do
 
     context 'with caching', :use_clean_rails_memory_store_caching do
       let(:opts) do
-        ['get_pod_log', { 'pod_name' => pod_name, 'namespace' => namespace, 'container' => container }]
+        [
+          'get_pod_log',
+          {
+            'environment_id' => environment.id,
+            'pod_name' => pod_name,
+            'namespace' => namespace,
+            'container' => container
+          }
+        ]
       end
 
       context 'result is cacheable' do
@@ -276,6 +298,37 @@ describe Clusters::Platforms::Kubernetes do
 
           expect(result).to eq(nil)
         end
+      end
+    end
+
+    context '#reactive_cache_updated' do
+      let(:opts) do
+        {
+          'environment_id' => environment.id,
+          'pod_name' => pod_name,
+          'namespace' => namespace,
+          'container' => container
+        }
+      end
+
+      subject { service.reactive_cache_updated('get_pod_log', opts) }
+
+      it 'expires k8s_pod_logs etag cache' do
+        expect_next_instance_of(Gitlab::EtagCaching::Store) do |store|
+          expect(store).to receive(:touch)
+            .with(
+              ::Gitlab::Routing.url_helpers.k8s_pod_logs_project_environment_path(
+                environment.project,
+                environment,
+                opts['pod_name'],
+                opts['container_name'],
+                format: :json
+              )
+            )
+            .and_call_original
+        end
+
+        subject
       end
     end
   end

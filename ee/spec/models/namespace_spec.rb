@@ -6,7 +6,8 @@ describe Namespace do
   include EE::GeoHelpers
 
   let!(:namespace) { create(:namespace) }
-  let!(:free_plan) { create(:free_plan) }
+  let(:default_plan) { create(:default_plan) }
+  let(:free_plan) { create(:free_plan) }
   let!(:bronze_plan) { create(:bronze_plan) }
   let!(:silver_plan) { create(:silver_plan) }
   let!(:gold_plan) { create(:gold_plan) }
@@ -269,119 +270,84 @@ describe Namespace do
     end
   end
 
-  describe '#max_active_pipelines' do
-    context 'when there is no limit defined' do
-      it 'returns zero' do
-        expect(namespace.max_active_pipelines).to be_zero
+  describe '#actual_limits' do
+    subject { namespace.actual_limits }
+
+    shared_examples 'uses an implied configuration' do
+      it 'is a non persisted PlanLimits' do
+        expect(subject.id).to be_nil
+        expect(subject).to be_kind_of(PlanLimits)
+      end
+
+      it 'has all limits disabled' do
+        limits = subject.attributes.except('id', 'plan_id')
+        limits.each do |_attribute, limit|
+          expect(limit).to be_zero
+        end
       end
     end
 
-    context 'when free plan has limit defined' do
-      before do
-        free_plan.update_column(:active_pipelines_limit, 40)
-      end
-
-      it 'returns a free plan limits' do
-        expect(namespace.max_active_pipelines).to be 40
-      end
+    context 'when no limits are defined in the system' do
+      it_behaves_like 'uses an implied configuration'
     end
 
-    context 'when associated plan has no limit defined' do
-      before do
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+    context 'when "default" plan is defined in the system' do
+      let!(:default_plan) { create(:default_plan) }
+
+      context 'when no limits are set' do
+        it_behaves_like 'uses an implied configuration'
       end
 
-      it 'returns zero' do
-        expect(namespace.max_active_pipelines).to be_zero
-      end
-    end
+      context 'when limits are set for the default plan' do
+        let!(:default_limits) do
+          create(:plan_limits,
+            plan: default_plan,
+            ci_active_pipelines: 1,
+            ci_pipeline_size: 2,
+            ci_active_jobs: 3)
+        end
 
-    context 'when limit is defined' do
-      before do
-        gold_plan.update_column(:active_pipelines_limit, 10)
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
-      end
-
-      it 'returns a number of maximum active pipelines' do
-        expect(namespace.max_active_pipelines).to eq 10
-      end
-    end
-  end
-
-  describe '#max_pipeline_size' do
-    context 'when there are no limits defined' do
-      it 'returns zero' do
-        expect(namespace.max_pipeline_size).to be_zero
-      end
-    end
-
-    context 'when free plan has limit defined' do
-      before do
-        free_plan.update_column(:pipeline_size_limit, 40)
+        it { is_expected.to eq(default_limits) }
       end
 
-      it 'returns a free plan limits' do
-        expect(namespace.max_pipeline_size).to be 40
-      end
-    end
+      context 'when "free" plan is defined in the system' do
+        let!(:free_plan) { create(:free_plan) }
 
-    context 'when associated plan has no limits defined' do
-      before do
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
-      end
+        context 'when no limits are set' do
+          it_behaves_like 'uses an implied configuration'
+        end
 
-      it 'returns zero' do
-        expect(namespace.max_pipeline_size).to be_zero
-      end
-    end
+        context 'when limits are set for the free plan' do
+          let!(:free_limits) do
+            create(:plan_limits,
+              plan: free_plan,
+              ci_active_pipelines: 3,
+              ci_pipeline_size: 4,
+              ci_active_jobs: 5)
+          end
 
-    context 'when limit is defined' do
-      before do
-        gold_plan.update_column(:pipeline_size_limit, 15)
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
-      end
+          it { is_expected.to eq(free_limits) }
+        end
 
-      it 'returns a number of maximum pipeline size' do
-        expect(namespace.max_pipeline_size).to eq 15
-      end
-    end
-  end
+        context 'when subscription plan is defined in the system' do
+          let!(:subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan) }
 
-  describe '#max_active_jobs' do
-    context 'when there is no limit defined' do
-      it 'returns zero' do
-        expect(namespace.max_active_jobs).to be_zero
-      end
-    end
+          context 'when limits are not set for the plan' do
+            it_behaves_like 'uses an implied configuration'
+          end
 
-    context 'when free plan has limit defined' do
-      before do
-        free_plan.update_column(:active_jobs_limit, 100)
-      end
+          context 'when limits are set for the plan' do
+            let!(:subscription_limits) do
+              create(:plan_limits,
+                plan: gold_plan,
+                ci_active_pipelines: 5,
+                ci_pipeline_size: 6,
+                ci_active_jobs: 7)
+            end
 
-      it 'returns a free plan limits' do
-        expect(namespace.max_active_jobs).to be 100
-      end
-    end
-
-    context 'when associated plan has no limit defined' do
-      before do
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
-      end
-
-      it 'returns zero' do
-        expect(namespace.max_active_jobs).to be_zero
-      end
-    end
-
-    context 'when limit is defined' do
-      before do
-        gold_plan.update_column(:active_jobs_limit, 10)
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
-      end
-
-      it 'returns a number of maximum active jobs' do
-        expect(namespace.max_active_jobs).to eq 10
+            it { is_expected.to eq(subscription_limits) }
+          end
+        end
       end
     end
   end
@@ -676,9 +642,31 @@ describe Namespace do
     end
 
     context 'when namespace does not have a subscription associated' do
-      it 'generates a subscription with the Free plan' do
-        expect(namespace.actual_plan).to eq(free_plan)
+      it 'generates a subscription without a plan' do
+        expect(namespace.actual_plan).to be_nil
         expect(namespace.gitlab_subscription).to be_present
+      end
+
+      context 'when free plan does exist' do
+        before do
+          free_plan
+        end
+
+        it 'generates a subscription' do
+          expect(namespace.actual_plan).to eq(free_plan)
+          expect(namespace.gitlab_subscription).to be_present
+        end
+      end
+
+      context 'when default plan does exist' do
+        before do
+          default_plan
+        end
+
+        it 'generates a subscription' do
+          expect(namespace.actual_plan).to eq(default_plan)
+          expect(namespace.gitlab_subscription).to be_present
+        end
       end
     end
   end

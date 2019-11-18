@@ -4,6 +4,7 @@ require 'spec_helper'
 RSpec.describe Packages::PackageFile, type: :model do
   describe 'relationships' do
     it { is_expected.to belong_to(:package) }
+    it { is_expected.to have_one(:conan_file_metadatum) }
   end
 
   describe 'validations' do

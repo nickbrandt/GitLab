@@ -146,6 +146,10 @@ query($project_path: ID!) {
 }
 ```
 
+To ensure that we get consistent ordering, we will append an ordering on the primary
+key, in descending order.  This is usually `id`, so basically we will add `order(id: :desc)`
+to the end of the relation.  A primary key _must_ be available on the underlying table.
+
 ### Exposing permissions for a type
 
 To expose permissions the current user has on a resource, you can call
@@ -234,6 +238,47 @@ module Types
   end
 end
 
+```
+
+## Descriptions
+
+All fields and arguments
+[must have descriptions](https://gitlab.com/gitlab-org/gitlab/merge_requests/16438).
+
+A description of a field or argument is given using the `description:`
+keyword. For example:
+
+```ruby
+field :id, GraphQL::ID_TYPE, description: 'ID of the resource'
+```
+
+Descriptions of fields and arguments are viewable to users through:
+
+- The [GraphiQL explorer](../api/graphql/#graphiql).
+- The [static GraphQL API reference](../api/graphql/#reference).
+
+### Description styleguide
+
+To ensure consistency, the following should be followed whenever adding or updating
+descriptions:
+
+- Mention the name of the resource in the description. Example:
+  `'Labels of the issue'` (issue being the resource).
+- Use `"{x} of the {y}"` where possible. Example: `'Title of the issue'`.
+  Do not start descriptions with `The`.
+- Descriptions of `GraphQL::BOOLEAN_TYPE` fields should answer the question: "What does
+  this field do?". Example: `'Indicates project has a Git repository'`.
+- Always include the word `"timestamp"` when describing an argument or
+  field of type `Types::TimeType`. This lets the reader know that the
+  format of the property will be `Time`, rather than just `Date`.
+- No `.` at end of strings.
+
+Example:
+
+```ruby
+field :id, GraphQL::ID_TYPE, description: 'ID of the Issue'
+field :confidential, GraphQL::BOOLEAN_TYPE, description: 'Indicates the issue is confidential'
+field :closed_at, Types::TimeType, description: 'Timestamp of when the issue was closed'
 ```
 
 ## Authorization
@@ -547,7 +592,7 @@ it 'returns a successful response' do
 end
 ```
 
-## Documentation
+## Documentation and Schema
 
-For information on generating GraphQL documentation, see
-[Rake tasks related to GraphQL](rake_tasks.md#update-graphql-documentation).
+For information on generating GraphQL documentation and schema files, see
+[Rake tasks related to GraphQL](rake_tasks.md#update-graphql-documentation-and-schema-definitions).

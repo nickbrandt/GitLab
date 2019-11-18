@@ -72,6 +72,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resources :billings, only: [:index]
     resources :epics, concerns: :awardable, constraints: { id: /\d+/ } do
       member do
+        get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
         get :discussions, format: :json
         get :realtime_changes
         post :toggle_subscription
@@ -110,6 +111,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     namespace :security do
       resource :dashboard, only: [:show], controller: :dashboard
+      resources :vulnerable_projects, only: [:index]
       # We have to define both legacy and new routes for Vulnerability Findings
       # because they are loaded upon application initialization and preloaded by
       # web server.

@@ -155,22 +155,4 @@ describe ProjectsHelper do
       end
     end
   end
-
-  describe '#api_projects_vulnerability_findings_path' do
-    include_context 'project with owner and pipeline'
-
-    subject { helper.api_projects_vulnerability_findings_path(project, pipeline) }
-
-    context 'when Vulnerability Findings API enabled' do
-      it { is_expected.to include("projects/#{project.id}/vulnerability_findings") }
-    end
-
-    context 'when the Vulnerability Findings API is disabled' do
-      before do
-        stub_feature_flags(first_class_vulnerabilities: false)
-      end
-
-      it { is_expected.to include("projects/#{project.id}/vulnerabilities") }
-    end
-  end
 end

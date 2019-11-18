@@ -6,6 +6,8 @@ module EE
       module Kubernetes
         extend ActiveSupport::Concern
 
+        CACHE_KEY_GET_POD_LOG = 'get_pod_log'
+
         LOGS_LIMIT = 500.freeze
 
         def calculate_reactive_cache_for(environment)
@@ -26,9 +28,12 @@ module EE
           ::Gitlab::Kubernetes::RolloutStatus.from_deployments(*deployments, pods: pods, legacy_deployments: legacy_deployments)
         end
 
-        def read_pod_logs(pod_name, namespace, container: nil)
+        def read_pod_logs(environment_id, pod_name, namespace, container: nil)
+          # environment_id is required for use in reactive_cache_updated(),
+          # to invalidate the ETag cache.
           with_reactive_cache(
-            'get_pod_log',
+            CACHE_KEY_GET_POD_LOG,
+            'environment_id' => environment_id,
             'pod_name' => pod_name,
             'namespace' => namespace,
             'container' => container
@@ -39,7 +44,7 @@ module EE
 
         def calculate_reactive_cache(request, opts)
           case request
-          when 'get_pod_log'
+          when CACHE_KEY_GET_POD_LOG
             container = opts['container']
             pod_name = opts['pod_name']
             namespace = opts['namespace']
@@ -52,12 +57,36 @@ module EE
           end
         end
 
+        def reactive_cache_updated(request, opts)
+          super
+
+          case request
+          when CACHE_KEY_GET_POD_LOG
+            environment = ::Environment.find_by(id: opts['environment_id'])
+            return unless environment
+
+            ::Gitlab::EtagCaching::Store.new.tap do |store|
+              store.touch(
+                ::Gitlab::Routing.url_helpers.k8s_pod_logs_project_environment_path(
+                  environment.project,
+                  environment,
+                  opts['pod_name'],
+                  opts['container_name'],
+                  format: :json
+                )
+              )
+            end
+          end
+        end
+
         private
 
         def pod_logs(pod_name, namespace, container: nil)
-          logs = kubeclient.get_pod_log(
-            pod_name, namespace, container: container, tail_lines: LOGS_LIMIT
-          ).body
+          logs = if ::Feature.enabled?(:enable_cluster_application_elastic_stack) && elastic_stack_client
+                   elastic_stack_pod_logs(namespace, pod_name, container)
+                 else
+                   platform_pod_logs(namespace, pod_name, container)
+                 end
 
           {
             logs: logs,
@@ -65,6 +94,25 @@ module EE
             pod_name: pod_name,
             container_name: container
           }
+        end
+
+        def platform_pod_logs(namespace, pod_name, container_name)
+          logs = kubeclient.get_pod_log(
+            pod_name, namespace, container: container_name, tail_lines: LOGS_LIMIT
+          ).body
+
+          logs.strip.split("\n")
+        end
+
+        def elastic_stack_pod_logs(namespace, pod_name, container_name)
+          client = elastic_stack_client
+          return [] if client.nil?
+
+          ::Gitlab::Elasticsearch::Logs.new(client).pod_logs(namespace, pod_name, container_name)
+        end
+
+        def elastic_stack_client
+          cluster.application_elastic_stack&.elasticsearch_client
         end
 
         def handle_exceptions(resource_not_found_error_message, opts, &block)

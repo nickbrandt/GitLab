@@ -44,7 +44,7 @@ module EE
         nav_tabs << :dependencies
       end
 
-      if can?(current_user, :read_licenses_list, project)
+      if ::Feature.enabled?(:licenses_list) && can?(current_user, :read_licenses_list, project)
         nav_tabs << :licenses
       end
 
@@ -259,18 +259,6 @@ module EE
     override :can_import_members?
     def can_import_members?
       super && !membership_locked?
-    end
-
-    def api_projects_vulnerability_findings_path(project, pipeline)
-      params = { id: project.id, params: { pipeline_id: pipeline.id, scope: 'dismissed' } }
-
-      path = if ::Feature.enabled?(:first_class_vulnerabilities)
-               api_v4_projects_vulnerability_findings_path(params)
-             else
-               api_v4_projects_vulnerabilities_path(params)
-             end
-
-      expose_path(path)
     end
   end
 end

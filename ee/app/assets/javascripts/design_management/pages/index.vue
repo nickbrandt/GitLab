@@ -114,6 +114,10 @@ export default {
           startSha: '',
           headSha: '',
         },
+        discussions: {
+          __typename: 'DesignDiscussion',
+          edges: [],
+        },
         versions: {
           __typename: 'DesignVersionConnection',
           edges: {
@@ -143,13 +147,16 @@ export default {
           update: (store, { data: { designManagementUpload } }) => {
             const data = store.readQuery(this.projectQueryBody);
 
-            const newDesigns = data.project.issue.designs.designs.edges.reduce((acc, design) => {
-              if (!acc.find(d => d.filename === design.node.filename)) {
-                acc.push(design.node);
-              }
+            const newDesigns = data.project.issue.designCollection.designs.edges.reduce(
+              (acc, design) => {
+                if (!acc.find(d => d.filename === design.node.filename)) {
+                  acc.push(design.node);
+                }
 
-              return acc;
-            }, designManagementUpload.designs);
+                return acc;
+              },
+              designManagementUpload.designs,
+            );
 
             let newVersionNode;
             const findNewVersions = designManagementUpload.designs.find(design => design.versions);
@@ -164,7 +171,7 @@ export default {
 
             const newVersions = [
               ...(newVersionNode || []),
-              ...data.project.issue.designs.versions.edges,
+              ...data.project.issue.designCollection.versions.edges,
             ];
 
             const updatedDesigns = {
@@ -182,7 +189,7 @@ export default {
               },
             };
 
-            data.project.issue.designs = updatedDesigns;
+            data.project.issue.designCollection = updatedDesigns;
 
             store.writeQuery({
               ...this.projectQueryBody,
@@ -260,6 +267,7 @@ export default {
             @done="onDesignDelete"
           >
             <delete-button
+              v-if="isLatestVersion"
               :is-deleting="loading"
               button-class="btn-danger btn-inverted mr-2"
               :has-selected-designs="hasSelectedDesigns"

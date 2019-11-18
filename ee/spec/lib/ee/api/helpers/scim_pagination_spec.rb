@@ -59,7 +59,7 @@ describe ::EE::API::Helpers::ScimPagination do
       end
 
       it 'uses a 1-based index' do
-        query = { startIndex: 1 }
+        query = { startIndex: '1' }
 
         result = pagination_class.new(query).scim_paginate(resource)
 

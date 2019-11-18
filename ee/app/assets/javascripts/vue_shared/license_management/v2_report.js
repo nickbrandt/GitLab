@@ -1,4 +1,5 @@
 import { byLicenseNameComparator } from './store/utils';
+import { VERSION_1_1 } from './constants';
 
 export default class V2Report {
   constructor(report) {
@@ -9,6 +10,7 @@ export default class V2Report {
 
   toV1Schema() {
     return {
+      version: VERSION_1_1,
       licenses: this.licenses,
       dependencies: this.report.dependencies.map(v2Dependency =>
         this.mapFromDependency(v2Dependency),
@@ -33,12 +35,15 @@ export default class V2Report {
   }
 
   mapFromDependency({ name, description, url, licenses }) {
+    const convertedLicenses = [];
     const combinedLicense = this.combine(licenses, license => {
       this.incrementCountFor(license.name);
+      convertedLicenses.push(license);
     });
 
     return {
       license: combinedLicense,
+      licenses: convertedLicenses,
       dependency: { name, url, description },
     };
   }

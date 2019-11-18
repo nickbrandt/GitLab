@@ -11,40 +11,54 @@ module Epics
     end
 
     def execute
-      klass = case moving_object
-              when EpicIssue
-                EpicIssues::UpdateService
-              when Epic
-                EpicLinks::UpdateService
-              end
-
-      return error('Only epics and epic_issues are supported.') unless klass
-
       error_message = validate_objects
 
       return error(error_message) if error_message.present?
 
-      klass.new(moving_object, current_user, moving_params).execute
+      move!
+      success
     end
 
     private
 
-    def moving_params
-      key = case params[:relative_position].to_sym
-            when :after
-              :move_after_id
-            when :before
-              :move_before_id
-            end
-
-      {}.tap { |p| p[key] = adjacent_reference.id }
+    def move!
+      moving_object.move_between(before_object, after_object)
+      moving_object.save!(touch: false)
     end
 
-    # for now we support only ordering within the same type
-    # Follow-up issue: https://gitlab.com/gitlab-org/gitlab/issues/13633
+    def before_object
+      return unless params[:relative_position] == 'before'
+
+      adjacent_reference
+    end
+
+    def after_object
+      return unless params[:relative_position] == 'after'
+
+      adjacent_reference
+    end
+
     def validate_objects
+      return 'Relative position is not valid.' unless valid_relative_position?
+
+      unless supported_type?(moving_object) && supported_type?(adjacent_reference)
+        return 'Only epics and epic_issues are supported.'
+      end
+
       return 'You don\'t have permissions to move the objects.' unless authorized?
-      return 'Provided objects are not the same type.' if moving_object.class != adjacent_reference.class
+      return 'Both objects have to belong to the same parent epic.' unless same_parent?
+    end
+
+    def valid_relative_position?
+      %w(before after).include?(params[:relative_position])
+    end
+
+    def same_parent?
+      moving_object.parent == adjacent_reference.parent
+    end
+
+    def supported_type?(object)
+      object.is_a?(EpicIssue) || object.is_a?(Epic)
     end
 
     def authorized?

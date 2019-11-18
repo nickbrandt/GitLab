@@ -74,28 +74,6 @@ module Elastic
 
         filter_conditions = []
 
-        # Include public/internal project snippets for accessible projects
-        filter_conditions << {
-          bool: {
-            filter: [
-              { terms: { visibility_level: Gitlab::VisibilityLevel.levels_for_user(user) } },
-              {
-                has_parent: {
-                  parent_type: 'project',
-                  query: {
-                    bool: project_ids_query(
-                      user,
-                      options[:project_ids],
-                      options[:public_and_internal_projects],
-                      'snippets'
-                    )
-                  }
-                }
-              }
-            ]
-          }
-        }
-
         # Include all project snippets for authorized projects
         if user
           filter_conditions << {

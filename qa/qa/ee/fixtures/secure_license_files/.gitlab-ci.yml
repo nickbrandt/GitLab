@@ -1,0 +1,12 @@
+include:
+  template: License-Management.gitlab-ci.yml
+
+license_management:
+  tags:
+    - qa
+    - test
+  script:
+    - echo "Skipped"
+  artifacts:
+    reports:
+      license_management: gl-license-management-report.json

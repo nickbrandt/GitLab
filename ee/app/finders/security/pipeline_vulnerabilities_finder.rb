@@ -41,10 +41,26 @@ module Security
         occurrences.concat(filtered_occurrences)
       end
 
-      occurrences.sort_by { |x| [-x.severity_value, -x.confidence_value] }
+      sort_occurrences(occurrences)
     end
 
     private
+
+    def sort_occurrences(occurrences)
+      # This sort is stable (see https://en.wikipedia.org/wiki/Sorting_algorithm#Stability) contrary to the bare
+      # Ruby sort_by method. Using just sort_by leads to instability across different platforms (e.g., x86_64-linux and
+      # x86_64-darwin18) which in turn leads to different sorting results for the equal elements across these platforms.
+      # This is important because it breaks test suite results consistency between local and CI
+      # environment.
+      # This is easier to address from within the class rather than from tests because this leads to bad class design
+      # and exposing too much of its implementation details to the test suite.
+      # See also https://stackoverflow.com/questions/15442298/is-sort-in-ruby-stable.
+      stable_sort_by(occurrences) { |x| [-x.severity_value, -x.confidence_value] }
+    end
+
+    def stable_sort_by(occurrences)
+      occurrences.sort_by.with_index { |x, idx| [yield(x), idx] }
+    end
 
     def pipeline_reports
       pipeline&.security_reports&.reports
@@ -68,9 +84,10 @@ module Security
 
         occurrence = Vulnerabilities::Occurrence.new(occurrence_hash)
         # assigning Vulnerabilities to Findings to enable the computed state
+        occurrence.location_fingerprint = report_occurrence.location.fingerprint
         occurrence.vulnerability = vulnerabilities[occurrence.project_fingerprint]
-
         occurrence.project = pipeline.project
+        occurrence.sha = pipeline.sha
         occurrence.build_scanner(report_occurrence.scanner.to_hash)
         occurrence.identifiers = report_occurrence.identifiers.map do |identifier|
           Vulnerabilities::Identifier.new(identifier.to_hash)

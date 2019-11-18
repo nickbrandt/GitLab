@@ -33,7 +33,7 @@ describe 'shared/billings/_trial_status.html.haml' do
 
     it 'displays expiry date' do
       render 'shared/billings/trial_status', namespace: group
-      expect(rendered).to have_content("Your GitLab.com trial will expire after #{trial_ends_on}")
+      expect(rendered).to have_content("Your GitLab.com Gold trial will expire after #{trial_ends_on}")
     end
   end
 
@@ -43,7 +43,7 @@ describe 'shared/billings/_trial_status.html.haml' do
 
     it 'displays the date is expired' do
       render 'shared/billings/trial_status', namespace: group
-      expect(rendered).to have_content("Your GitLab.com trial expired on #{trial_ends_on}")
+      expect(rendered).to have_content("Your GitLab.com Gold trial expired on #{trial_ends_on}")
     end
   end
 

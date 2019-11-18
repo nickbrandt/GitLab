@@ -52,6 +52,9 @@ describe 'Admin updates EE-only settings' do
   context 'Elasticsearch settings' do
     before do
       visit integrations_admin_application_settings_path
+      page.within('.as-elasticsearch') do
+        click_button 'Expand'
+      end
     end
 
     it 'changes elasticsearch settings' do
@@ -73,7 +76,7 @@ describe 'Admin updates EE-only settings' do
       end
     end
 
-    it 'Allows limiting projects and namespaces to index', :js do
+    it 'Allows limiting projects and namespaces to index', :aggregate_failures, :js do
       project = create(:project)
       namespace = create(:namespace)
 
@@ -111,15 +114,12 @@ describe 'Admin updates EE-only settings' do
         click_button 'Save changes'
       end
 
-      wait_for_all_requests
-
       expect(current_settings.elasticsearch_limit_indexing).to be_truthy
       expect(ElasticsearchIndexedNamespace.exists?(namespace_id: namespace.id)).to be_truthy
       expect(ElasticsearchIndexedProject.exists?(project_id: project.id)).to be_truthy
-      expect(page).to have_content 'Application settings saved successfully'
     end
 
-    it 'Allows removing all namespaces and projects', :js do
+    it 'Allows removing all namespaces and projects', :aggregate_failures, :js do
       stub_ee_application_setting(elasticsearch_limit_indexing: true)
 
       namespace = create(:elasticsearch_indexed_namespace).namespace
@@ -131,6 +131,8 @@ describe 'Admin updates EE-only settings' do
       expect(ElasticsearchIndexedProject.count).to be > 0
 
       page.within('.as-elasticsearch') do
+        click_button 'Expand'
+
         expect(page).to have_content('Namespaces to index')
         expect(page).to have_content('Projects to index')
         expect(page).to have_content(namespace.full_name)

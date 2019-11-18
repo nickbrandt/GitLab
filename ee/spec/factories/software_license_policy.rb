@@ -9,5 +9,13 @@ FactoryBot.define do
     trait :blacklist do
       approval_status { :blacklisted }
     end
+
+    trait :allowed do
+      approval_status { :approved }
+    end
+
+    trait :denied do
+      approval_status { :blacklisted }
+    end
   end
 end

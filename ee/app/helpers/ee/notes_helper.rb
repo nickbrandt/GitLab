@@ -32,5 +32,16 @@ module EE
 
       data
     end
+
+    def description_diff_path(issuable, version_id)
+      case issuable
+      when Issue
+        description_diff_project_issue_path(issuable.project, issuable, version_id)
+      when MergeRequest
+        description_diff_project_merge_request_path(issuable.project, issuable, version_id)
+      when Epic
+        description_diff_group_epic_path(issuable.group, issuable, version_id)
+      end
+    end
   end
 end

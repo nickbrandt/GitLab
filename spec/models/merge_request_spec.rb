@@ -283,6 +283,16 @@ describe MergeRequest do
     end
   end
 
+  describe '.by_merge_commit_sha' do
+    it 'returns merge requests that match the given merge commit' do
+      mr = create(:merge_request, :merged, merge_commit_sha: '123abc')
+
+      create(:merge_request, :merged, merge_commit_sha: '123def')
+
+      expect(described_class.by_merge_commit_sha('123abc')).to eq([mr])
+    end
+  end
+
   describe '.in_projects' do
     it 'returns the merge requests for a set of projects' do
       expect(described_class.in_projects(Project.all)).to eq([subject])
@@ -1251,13 +1261,49 @@ describe MergeRequest do
   end
 
   describe '#commit_shas' do
-    before do
-      allow(subject.merge_request_diff).to receive(:commit_shas)
-        .and_return(['sha1'])
+    context 'persisted merge request' do
+      context 'with a limit' do
+        it 'returns a limited number of commit shas' do
+          expect(subject.commit_shas(limit: 2)).to eq(%w[
+            b83d6e391c22777fca1ed3012fce84f633d7fed0 498214de67004b1da3d820901307bed2a68a8ef6
+          ])
+        end
+      end
+
+      context 'without a limit' do
+        it 'returns all commit shas of the merge request diff' do
+          expect(subject.commit_shas.size).to eq(29)
+        end
+      end
     end
 
-    it 'delegates to merge request diff' do
-      expect(subject.commit_shas).to eq ['sha1']
+    context 'new merge request' do
+      subject { build(:merge_request) }
+
+      context 'compare commits' do
+        before do
+          subject.compare_commits = [
+            double(sha: 'sha1'), double(sha: 'sha2')
+          ]
+        end
+
+        context 'without a limit' do
+          it 'returns all shas of compare commits' do
+            expect(subject.commit_shas).to eq(%w[sha2 sha1])
+          end
+        end
+
+        context 'with a limit' do
+          it 'returns a limited number of shas' do
+            expect(subject.commit_shas(limit: 1)).to eq(['sha2'])
+          end
+        end
+      end
+
+      it 'returns diff_head_sha as an array' do
+        expect(subject.commit_shas).to eq([subject.diff_head_sha])
+        expect(subject.commit_shas(limit: 2)).to eq([subject.diff_head_sha])
+      end
     end
   end
 
@@ -1888,7 +1934,7 @@ describe MergeRequest do
     context 'when the MR has been merged' do
       before do
         MergeRequests::MergeService
-          .new(subject.target_project, subject.author)
+          .new(subject.target_project, subject.author, { sha: subject.diff_head_sha })
           .execute(subject)
       end
 
@@ -2164,6 +2210,50 @@ describe MergeRequest do
       expect(subject).to receive(:can_be_merged?) { true }
 
       expect(subject.mergeable?).to be_truthy
+    end
+  end
+
+  describe '#check_mergeability' do
+    let(:mergeability_service) { double }
+
+    before do
+      allow(MergeRequests::MergeabilityCheckService).to receive(:new) do
+        mergeability_service
+      end
+    end
+
+    context 'if the merge status is unchecked' do
+      before do
+        subject.mark_as_unchecked!
+      end
+
+      it 'executes MergeabilityCheckService' do
+        expect(mergeability_service).to receive(:execute)
+
+        subject.check_mergeability
+      end
+    end
+
+    context 'if the merge status is checked' do
+      context 'and feature flag is enabled' do
+        it 'executes MergeabilityCheckService' do
+          expect(mergeability_service).not_to receive(:execute)
+
+          subject.check_mergeability
+        end
+      end
+
+      context 'and feature flag is disabled' do
+        before do
+          stub_feature_flags(merge_requests_conditional_mergeability_check: false)
+        end
+
+        it 'does not execute MergeabilityCheckService' do
+          expect(mergeability_service).to receive(:execute)
+
+          subject.check_mergeability
+        end
+      end
     end
   end
 
@@ -2753,7 +2843,7 @@ describe MergeRequest do
 
   describe '#mergeable_with_quick_action?' do
     def create_pipeline(status)
-      pipeline = create(:ci_pipeline_with_one_job,
+      pipeline = create(:ci_pipeline,
         project: project,
         ref:     merge_request.source_branch,
         sha:     merge_request.diff_head_sha,
@@ -2868,9 +2958,9 @@ describe MergeRequest do
     let(:project) { create(:project, :public, :repository) }
     let(:merge_request) { create(:merge_request, source_project: project) }
 
-    let!(:first_pipeline) { create(:ci_pipeline_without_jobs, pipeline_arguments) }
-    let!(:last_pipeline) { create(:ci_pipeline_without_jobs, pipeline_arguments) }
-    let!(:last_pipeline_with_other_ref) { create(:ci_pipeline_without_jobs, pipeline_arguments.merge(ref: 'other')) }
+    let!(:first_pipeline) { create(:ci_pipeline, pipeline_arguments) }
+    let!(:last_pipeline) { create(:ci_pipeline, pipeline_arguments) }
+    let!(:last_pipeline_with_other_ref) { create(:ci_pipeline, pipeline_arguments.merge(ref: 'other')) }
 
     it 'returns latest pipeline for the target branch' do
       expect(merge_request.base_pipeline).to eq(last_pipeline)
@@ -3368,7 +3458,7 @@ describe MergeRequest do
     end
   end
 
-  describe '.with_open_merge_when_pipeline_succeeds' do
+  describe '.with_auto_merge_enabled' do
     let!(:project) { create(:project) }
     let!(:fork) { fork_project(project) }
     let!(:merge_request1) do
@@ -3380,15 +3470,6 @@ describe MergeRequest do
              source_branch: 'feature-1')
     end
 
-    let!(:merge_request2) do
-      create(:merge_request,
-             :merge_when_pipeline_succeeds,
-             target_project: project,
-             target_branch: 'master',
-             source_project: fork,
-             source_branch: 'fork-feature-1')
-    end
-
     let!(:merge_request4) do
       create(:merge_request,
              target_project: project,
@@ -3397,10 +3478,73 @@ describe MergeRequest do
              source_branch: 'fork-feature-2')
     end
 
-    let(:query) { described_class.with_open_merge_when_pipeline_succeeds }
+    let(:query) { described_class.with_auto_merge_enabled }
 
-    it { expect(query).to contain_exactly(merge_request1, merge_request2) }
+    it { expect(query).to contain_exactly(merge_request1) }
   end
 
   it_behaves_like 'versioned description'
+
+  describe '#commits' do
+    context 'persisted merge request' do
+      context 'with a limit' do
+        it 'returns a limited number of commits' do
+          expect(subject.commits(limit: 2).map(&:sha)).to eq(%w[
+            b83d6e391c22777fca1ed3012fce84f633d7fed0
+            498214de67004b1da3d820901307bed2a68a8ef6
+          ])
+          expect(subject.commits(limit: 3).map(&:sha)).to eq(%w[
+            b83d6e391c22777fca1ed3012fce84f633d7fed0
+            498214de67004b1da3d820901307bed2a68a8ef6
+            1b12f15a11fc6e62177bef08f47bc7b5ce50b141
+          ])
+        end
+      end
+
+      context 'without a limit' do
+        it 'returns all commits of the merge request diff' do
+          expect(subject.commits.size).to eq(29)
+        end
+      end
+    end
+
+    context 'new merge request' do
+      subject { build(:merge_request) }
+
+      context 'compare commits' do
+        let(:first_commit) { double }
+        let(:second_commit) { double }
+
+        before do
+          subject.compare_commits = [
+            first_commit, second_commit
+          ]
+        end
+
+        context 'without a limit' do
+          it 'returns all the compare commits' do
+            expect(subject.commits.to_a).to eq([second_commit, first_commit])
+          end
+        end
+
+        context 'with a limit' do
+          it 'returns a limited number of commits' do
+            expect(subject.commits(limit: 1).to_a).to eq([second_commit])
+          end
+        end
+      end
+    end
+  end
+
+  describe '#recent_commits' do
+    before do
+      stub_const("#{MergeRequestDiff}::COMMITS_SAFE_SIZE", 2)
+    end
+
+    it 'returns the safe number of commits' do
+      expect(subject.recent_commits.map(&:sha)).to eq(%w[
+        b83d6e391c22777fca1ed3012fce84f633d7fed0 498214de67004b1da3d820901307bed2a68a8ef6
+      ])
+    end
+  end
 end

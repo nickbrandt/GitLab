@@ -7,9 +7,9 @@ shared_examples 'content 5 min private cached with revalidation' do
   end
 end
 
-shared_examples 'content long term private cached with revalidation' do
+shared_examples 'content not cached' do
   it 'ensures content will not be cached without revalidation' do
-    expect(subject['Cache-Control']).to eq('max-age=15778476, private, must-revalidate')
+    expect(subject['Cache-Control']).to eq('max-age=0, private, must-revalidate')
   end
 end
 
@@ -228,10 +228,10 @@ describe UploadsController do
             user.block
           end
 
-          it "redirects to the sign in page" do
+          it "responds with status 401" do
             get :show, params: { model: "user", mounted_as: "avatar", id: user.id, filename: "dk.png" }
 
-            expect(response).to redirect_to(new_user_session_path)
+            expect(response).to have_gitlab_http_status(401)
           end
         end
 
@@ -320,10 +320,10 @@ describe UploadsController do
         end
 
         context "when not signed in" do
-          it "redirects to the sign in page" do
+          it "responds with status 401" do
             get :show, params: { model: "project", mounted_as: "avatar", id: project.id, filename: "dk.png" }
 
-            expect(response).to redirect_to(new_user_session_path)
+            expect(response).to have_gitlab_http_status(401)
           end
         end
 
@@ -343,10 +343,10 @@ describe UploadsController do
                 project.add_maintainer(user)
               end
 
-              it "redirects to the sign in page" do
+              it "responds with status 401" do
                 get :show, params: { model: "project", mounted_as: "avatar", id: project.id, filename: "dk.png" }
 
-                expect(response).to redirect_to(new_user_session_path)
+                expect(response).to have_gitlab_http_status(401)
               end
             end
 
@@ -439,10 +439,10 @@ describe UploadsController do
                 user.block
               end
 
-              it "redirects to the sign in page" do
+              it "responds with status 401" do
                 get :show, params: { model: "group", mounted_as: "avatar", id: group.id, filename: "dk.png" }
 
-                expect(response).to redirect_to(new_user_session_path)
+                expect(response).to have_gitlab_http_status(401)
               end
             end
 
@@ -490,7 +490,7 @@ describe UploadsController do
             expect(response).to have_gitlab_http_status(200)
           end
 
-          it_behaves_like 'content long term private cached with revalidation' do
+          it_behaves_like 'content not cached' do
             subject do
               get :show, params: { model: 'note', mounted_as: 'attachment', id: note.id, filename: 'dk.png' }
 
@@ -510,7 +510,7 @@ describe UploadsController do
             expect(response).to have_gitlab_http_status(200)
           end
 
-          it_behaves_like 'content long term private cached with revalidation' do
+          it_behaves_like 'content not cached' do
             subject do
               get :show, params: { model: 'note', mounted_as: 'attachment', id: note.id, filename: 'dk.png' }
 
@@ -526,10 +526,10 @@ describe UploadsController do
         end
 
         context "when not signed in" do
-          it "redirects to the sign in page" do
+          it "responds with status 401" do
             get :show, params: { model: "note", mounted_as: "attachment", id: note.id, filename: "dk.png" }
 
-            expect(response).to redirect_to(new_user_session_path)
+            expect(response).to have_gitlab_http_status(401)
           end
         end
 
@@ -549,10 +549,10 @@ describe UploadsController do
                 project.add_maintainer(user)
               end
 
-              it "redirects to the sign in page" do
+              it "responds with status 401" do
                 get :show, params: { model: "note", mounted_as: "attachment", id: note.id, filename: "dk.png" }
 
-                expect(response).to redirect_to(new_user_session_path)
+                expect(response).to have_gitlab_http_status(401)
               end
             end
 
@@ -563,7 +563,7 @@ describe UploadsController do
                 expect(response).to have_gitlab_http_status(200)
               end
 
-              it_behaves_like 'content long term private cached with revalidation' do
+              it_behaves_like 'content not cached' do
                 subject do
                   get :show, params: { model: 'note', mounted_as: 'attachment', id: note.id, filename: 'dk.png' }
 

@@ -405,7 +405,7 @@ describe Projects::MergeRequestsController do
       end
 
       it 'starts the merge immediately with permitted params' do
-        expect(MergeWorker).to receive(:perform_async).with(merge_request.id, anything, { 'squash' => false })
+        expect(MergeWorker).to receive(:perform_async).with(merge_request.id, anything, { 'sha' => merge_request.diff_head_sha })
 
         merge_with_sha
       end
@@ -432,9 +432,14 @@ describe Projects::MergeRequestsController do
         let(:message) { 'My custom squash commit message' }
 
         it 'passes the same message to SquashService', :sidekiq_might_not_need_inline do
-          params = { squash: '1', squash_commit_message: message }
+          params = { squash: '1',
+                     squash_commit_message: message,
+                     sha: merge_request.diff_head_sha }
+          expected_squash_params = { squash_commit_message: message,
+                                     sha: merge_request.diff_head_sha,
+                                     merge_request: merge_request }
 
-          expect_next_instance_of(MergeRequests::SquashService, project, user, params.merge(merge_request: merge_request)) do |squash_service|
+          expect_next_instance_of(MergeRequests::SquashService, project, user, expected_squash_params) do |squash_service|
             expect(squash_service).to receive(:execute).and_return({
               status: :success,
               squash_sha: SecureRandom.hex(20)
@@ -889,23 +894,6 @@ describe Projects::MergeRequestsController do
         end
       end
 
-      context 'when something went wrong on our system' do
-        let(:report) { {} }
-
-        it 'does not send polling interval' do
-          expect(Gitlab::PollingInterval).not_to receive(:set_header)
-
-          subject
-        end
-
-        it 'returns 500 HTTP status' do
-          subject
-
-          expect(response).to have_gitlab_http_status(:internal_server_error)
-          expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
-        end
-      end
-
       context 'when feature flag :ci_expose_arbitrary_artifacts_in_mr is disabled' do
         let(:job_options) do
           {
@@ -1061,23 +1049,6 @@ describe Projects::MergeRequestsController do
 
         expect(response).to have_gitlab_http_status(:bad_request)
         expect(json_response).to eq({ 'status_reason' => 'Failed to parse test reports' })
-      end
-    end
-
-    context 'when something went wrong on our system' do
-      let(:comparison_status) { {} }
-
-      it 'does not send polling interval' do
-        expect(Gitlab::PollingInterval).not_to receive(:set_header)
-
-        subject
-      end
-
-      it 'returns 500 HTTP status' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:internal_server_error)
-        expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
       end
     end
   end

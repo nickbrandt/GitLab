@@ -2,13 +2,14 @@
 require 'spec_helper'
 
 describe Packages::ConanPackageFinder do
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :public) }
+
   describe '#execute' do
-    let_it_be(:user) { create(:user) }
-    let_it_be(:project) { create(:project, :public) }
     let!(:conan_package) { create(:conan_package, project: project) }
     let!(:conan_package2) { create(:conan_package, project: project) }
 
-    subject { described_class.new(query, user).execute }
+    subject { described_class.new(user, query: query).execute }
 
     context 'packages that are not visible to user' do
       let!(:non_visible_project) { create(:project, :private) }

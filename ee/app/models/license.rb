@@ -61,6 +61,7 @@ class License < ApplicationRecord
     default_project_deletion_protection
     dependency_proxy
     deploy_board
+    description_diffs
     design_management
     email_additional_text
     extended_audit_events
@@ -75,6 +76,7 @@ class License < ApplicationRecord
     issues_analytics
     jira_dev_panel_integration
     ldap_group_sync_filter
+    marking_project_for_deletion
     merge_pipelines
     merge_request_performance_metrics
     merge_trains
@@ -95,6 +97,7 @@ class License < ApplicationRecord
     smartcard_auth
     type_of_work_analytics
     unprotection_restrictions
+    ci_project_subscriptions
   ]
   EEP_FEATURES.freeze
 
@@ -261,6 +264,14 @@ class License < ApplicationRecord
     def global_feature?(feature)
       GLOBAL_FEATURES.include?(feature)
     end
+
+    def eligible_for_trial?
+      Gitlab::CurrentSettings.license_trial_ends_on.nil?
+    end
+
+    def trial_ends_on
+      Gitlab::CurrentSettings.license_trial_ends_on
+    end
   end
 
   def data_filename
@@ -416,9 +427,24 @@ class License < ApplicationRecord
     HistoricalData.max_historical_user_count(license: self, from: from, to: to)
   end
 
+  def maximum_user_count
+    [historical_max, current_active_users_count].max
+  end
+
   def historical_max_with_default_period
     @historical_max_with_default_period ||=
       historical_max
+  end
+
+  def update_trial_setting
+    return unless license.restrictions[:trial]
+    return if license.expires_at.nil?
+
+    settings = ApplicationSetting.current
+    return if settings.nil?
+    return if settings.license_trial_ends_on.present?
+
+    settings.update license_trial_ends_on: license.expires_at
   end
 
   private

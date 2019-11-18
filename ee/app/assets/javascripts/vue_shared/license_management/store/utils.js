@@ -56,9 +56,10 @@ const getLicenseStatusByName = (managedLicenses = [], licenseName) =>
   managedLicenses.find(license => caseInsensitiveMatch(license.name, licenseName)) || {};
 
 const getDependenciesByLicenseName = (dependencies = [], licenseName) =>
-  dependencies.filter(dependencyItem =>
-    caseInsensitiveMatch(dependencyItem.license.name, licenseName),
-  );
+  dependencies.filter(dependencyItem => {
+    const licenses = dependencyItem.licenses || [dependencyItem.license];
+    return licenses.find(license => caseInsensitiveMatch(license.name, licenseName));
+  });
 
 /**
  *
@@ -104,6 +105,7 @@ export const parseLicenseReportMetrics = (headMetrics, baseMetrics, managedLicen
     const { id, approvalStatus } = getLicenseStatusByName(managedLicenseList, name);
     const dependencies = getDependenciesByLicenseName(headDependencies, name);
     const url =
+      license.url ||
       (dependencies && dependencies[0] && dependencies[0].license && dependencies[0].license.url) ||
       '';
 

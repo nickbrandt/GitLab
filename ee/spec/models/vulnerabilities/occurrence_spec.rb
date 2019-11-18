@@ -280,6 +280,85 @@ describe Vulnerabilities::Occurrence do
     end
   end
 
+  describe '.undismissed' do
+    set(:project) { create(:project) }
+    set(:project2) { create(:project) }
+    let!(:finding1) { create(:vulnerabilities_occurrence, project: project) }
+    let!(:finding2) { create(:vulnerabilities_occurrence, project: project) }
+    let!(:finding3) { create(:vulnerabilities_occurrence, project: project2) }
+
+    before do
+      create(
+        :vulnerability_feedback,
+        :dismissal,
+        project_fingerprint: finding1.project_fingerprint
+      )
+    end
+
+    it 'returns all non-dismissed occurrences' do
+      expect(described_class.undismissed).to contain_exactly(finding2, finding3)
+    end
+
+    it 'returns non-dismissed occurrences for project' do
+      expect(project2.vulnerability_findings.undismissed).to contain_exactly(finding3)
+    end
+  end
+
+  describe '.batch_count_by_project_and_severity' do
+    let(:project) { create(:project) }
+
+    it 'fetches a vulnerability count for the given project and severity' do
+      create(:vulnerabilities_occurrence, project: project, severity: :high)
+
+      count = described_class.batch_count_by_project_and_severity(project.id, 'high')
+
+      expect(count).to be(1)
+    end
+
+    it 'returns 0 when there are no vulnerabilities for that severity level' do
+      count = described_class.batch_count_by_project_and_severity(project.id, 'high')
+
+      expect(count).to be(0)
+    end
+
+    it 'batch loads the counts' do
+      projects = create_list(:project, 2)
+
+      projects.each do |project|
+        create(:vulnerabilities_occurrence, project: project, severity: :high)
+        create(:vulnerabilities_occurrence, project: project, severity: :low)
+      end
+
+      projects_and_severities = [
+        [projects.first, 'high'],
+        [projects.first, 'low'],
+        [projects.second, 'high'],
+        [projects.second, 'low']
+      ]
+
+      counts = projects_and_severities.map do |(project, severity)|
+        described_class.batch_count_by_project_and_severity(project.id, severity)
+      end
+
+      expect { expect(counts).to all(be 1) }.not_to exceed_query_limit(1)
+    end
+
+    it 'does not include dismissed vulnerabilities in the counts' do
+      create(:vulnerabilities_occurrence, project: project, severity: :high)
+      dismissed_vulnerability = create(:vulnerabilities_occurrence, project: project, severity: :high)
+      create(
+        :vulnerability_feedback,
+        project: project,
+        project_fingerprint: dismissed_vulnerability.project_fingerprint,
+        feedback_type: :dismissal
+      )
+
+      count = described_class.batch_count_by_project_and_severity(project.id, 'high')
+
+      expect(count).to be(1)
+    end
+  end
+
   describe 'feedback' do
     set(:project) { create(:project) }
     let(:occurrence) do
@@ -358,13 +437,18 @@ describe Vulnerabilities::Occurrence do
   end
 
   describe '#state' do
-    let(:new_finding) { create(:vulnerabilities_finding) }
+    before do
+      create(:vulnerability, :closed, project: finding_with_issue.project, findings: [finding_with_issue])
+    end
+
+    let(:unresolved_finding) { create(:vulnerabilities_finding) }
     let(:confirmed_finding) { create(:vulnerabilities_finding, :confirmed) }
     let(:resolved_finding) { create(:vulnerabilities_finding, :resolved) }
     let(:dismissed_finding) { create(:vulnerabilities_finding, :dismissed) }
+    let(:finding_with_issue) { create(:vulnerabilities_finding, :with_issue_feedback) }
 
-    it 'returns the expected state for a new finding' do
-      expect(new_finding.state).to eq 'new'
+    it 'returns the expected state for a unresolved finding' do
+      expect(unresolved_finding.state).to eq 'opened'
     end
 
     it 'returns the expected state for a confirmed finding' do

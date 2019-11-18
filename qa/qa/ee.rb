@@ -14,6 +14,7 @@ module QA
     module Page
       module Component
         autoload :DesignManagement, 'qa/ee/page/component/design_management'
+        autoload :LicenseManagement, 'qa/ee/page/component/license_management'
 
         module IssueBoard
           autoload :Show, 'qa/ee/page/component/issue_board/show'
@@ -31,6 +32,7 @@ module QA
       module Group
         autoload :Menu, 'qa/ee/page/group/menu'
         autoload :SamlSSOSignIn, 'qa/ee/page/group/saml_sso_sign_in'
+        autoload :SamlSSOSignUp, 'qa/ee/page/group/saml_sso_sign_up'
         autoload :Members, 'qa/ee/page/group/members'
 
         module Settings
@@ -109,8 +111,15 @@ module QA
           autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
           autoload :MirroringRepositories, 'qa/ee/page/project/settings/mirroring_repositories'
           autoload :MergeRequest, 'qa/ee/page/project/settings/merge_request'
+          autoload :Integrations, 'qa/ee/page/project/settings/integrations'
           autoload :Repository, 'qa/ee/page/project/settings/repository'
           autoload :PushRules, 'qa/ee/page/project/settings/push_rules'
+          autoload :CICD, 'qa/ee/page/project/settings/ci_cd.rb'
+          autoload :LicenseCompliance, 'qa/ee/page/project/settings/license_compliance.rb'
+
+          module Services
+            autoload :Jenkins, 'qa/ee/page/project/settings/services/jenkins'
+          end
         end
 
         module Operations

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 # We stub Gitaly in `spec/support/gitaly.rb` for other tests. We don't want
@@ -15,6 +17,28 @@ describe Gitlab::GitalyClient do
     allow(Gitlab.config.repositories).to receive(:storages).and_return({
       'default' => { 'gitaly_address' => address }
     })
+  end
+
+  describe '.long_timeout' do
+    context 'default case' do
+      it { expect(subject.long_timeout).to eq(6.hours) }
+    end
+
+    context 'running in Unicorn' do
+      before do
+        stub_const('Unicorn', 1)
+      end
+
+      it { expect(subject.long_timeout).to eq(55) }
+    end
+
+    context 'running in Puma' do
+      before do
+        stub_const('Puma', 1)
+      end
+
+      it { expect(subject.long_timeout).to eq(55) }
+    end
   end
 
   describe '.filesystem_id_from_disk' do

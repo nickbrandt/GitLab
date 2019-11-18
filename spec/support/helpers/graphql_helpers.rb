@@ -37,9 +37,12 @@ module GraphqlHelpers
   # BatchLoader::GraphQL returns a wrapper, so we need to :sync in order
   # to get the actual values
   def batch_sync(max_queries: nil, &blk)
-    result = batch(max_queries: nil, &blk)
+    wrapper = proc do
+      lazy_vals = yield
+      lazy_vals.is_a?(Array) ? lazy_vals.map(&:sync) : lazy_vals&.sync
+    end
 
-    result.is_a?(Array) ? result.map(&:sync) : result&.sync
+    batch(max_queries: max_queries, &wrapper)
   end
 
   def graphql_query_for(name, attributes = {}, fields = nil)
@@ -129,6 +132,7 @@ module GraphqlHelpers
 
     allow_unlimited_graphql_complexity
     allow_unlimited_graphql_depth
+    allow_high_graphql_recursion
 
     type = GitlabSchema.types[class_name.to_s]
     return "" unless type
@@ -156,7 +160,13 @@ module GraphqlHelpers
 
   def attributes_to_graphql(attributes)
     attributes.map do |name, value|
-      "#{GraphqlHelpers.fieldnamerize(name.to_s)}: \"#{value}\""
+      value_str = if value.is_a?(Array)
+                    '["' + value.join('","') + '"]'
+                  else
+                    "\"#{value}\""
+                  end
+
+      "#{GraphqlHelpers.fieldnamerize(name.to_s)}: #{value_str}"
     end.join(", ")
   end
 
@@ -213,6 +223,23 @@ module GraphqlHelpers
     end
   end
 
+  def expect_graphql_errors_to_include(regexes_to_match)
+    raise "No errors. Was expecting to match #{regexes_to_match}" if graphql_errors.nil? || graphql_errors.empty?
+
+    error_messages = flattened_errors.collect { |error_hash| error_hash["message"] }
+    Array.wrap(regexes_to_match).flatten.each do |regex|
+      expect(error_messages).to include a_string_matching regex
+    end
+  end
+
+  def expect_graphql_errors_to_be_empty
+    expect(flattened_errors).to be_empty
+  end
+
+  def flattened_errors
+    Array.wrap(graphql_errors).flatten.compact
+  end
+
   # Raises an error if no response is found
   def graphql_mutation_response(mutation_name)
     graphql_data.fetch(GraphqlHelpers.fieldnamerize(mutation_name))
@@ -259,6 +286,16 @@ module GraphqlHelpers
   def allow_unlimited_graphql_depth
     allow_any_instance_of(GitlabSchema).to receive(:max_depth).and_return nil
     allow(GitlabSchema).to receive(:max_query_depth).with(any_args).and_return nil
+  end
+
+  def allow_high_graphql_recursion
+    allow_any_instance_of(Gitlab::Graphql::QueryAnalyzers::RecursionAnalyzer).to receive(:recursion_threshold).and_return 1000
+  end
+
+  def node_array(data, extract_attribute = nil)
+    data.map do |item|
+      extract_attribute ? item['node'][extract_attribute] : item['node']
+    end
   end
 end
 

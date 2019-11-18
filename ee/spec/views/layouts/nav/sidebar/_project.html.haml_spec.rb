@@ -94,6 +94,41 @@ describe 'layouts/nav/sidebar/_project' do
     end
   end
 
+  describe 'Operations > Pod logs' do
+    before do
+      allow(view).to receive(:can?).with(nil, :read_environment, project).and_return(can_read_environment)
+      allow(view).to receive(:can?).with(nil, :read_pod_logs, project).and_return(can_read_pod_logs)
+      render
+    end
+
+    describe 'when the user can read environments and logs' do
+      let(:can_read_environment) { true }
+      let(:can_read_pod_logs) { true }
+
+      it 'link is visible ' do
+        expect(rendered).to have_link('Pod logs', href: logs_project_environments_path(project))
+      end
+    end
+
+    describe 'when the user cannot read environment or logs' do
+      let(:can_read_environment) { false }
+      let(:can_read_pod_logs) { false }
+
+      it 'link is not visible ' do
+        expect(rendered).not_to have_link 'Pod logs'
+      end
+    end
+
+    describe 'when the user can read environment but not logs' do
+      let(:can_read_environment) { true }
+      let(:can_read_pod_logs) { false }
+
+      it 'link is not visible ' do
+        expect(rendered).not_to have_link 'Pod logs'
+      end
+    end
+  end
+
   describe 'Security and Compliance' do
     before do
       allow(view).to receive(:can?).with(nil, :read_dependencies, project).and_return(can_read_dependencies)

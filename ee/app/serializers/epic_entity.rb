@@ -40,6 +40,6 @@ class EpicEntity < IssuableEntity
   end
 
   expose :preview_note_path do |epic|
-    preview_markdown_path(epic.group, target_type: 'Epic', target_id: epic.id)
+    preview_markdown_path(epic.group, target_type: 'Epic', target_id: epic.iid)
   end
 end

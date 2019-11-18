@@ -16,6 +16,9 @@ class MergeRequest < ApplicationRecord
   include ReactiveCaching
   include FromUnion
   include DeprecatedAssignee
+  include ShaAttribute
+
+  sha_attribute :squash_commit_sha
 
   self.reactive_cache_key = ->(model) { [model.project.id, model.iid] }
   self.reactive_cache_refresh_interval = 10.minutes
@@ -65,10 +68,19 @@ class MergeRequest < ApplicationRecord
   has_many :cached_closes_issues, through: :merge_requests_closing_issues, source: :issue
   has_many :pipelines_for_merge_request, foreign_key: 'merge_request_id', class_name: 'Ci::Pipeline'
   has_many :suggestions, through: :notes
+  has_many :unresolved_notes, -> { unresolved }, as: :noteable, class_name: 'Note'
 
   has_many :merge_request_assignees
   has_many :assignees, class_name: "User", through: :merge_request_assignees
 
+  KNOWN_MERGE_PARAMS = [
+    :auto_merge_strategy,
+    :should_remove_source_branch,
+    :force_remove_source_branch,
+    :commit_message,
+    :squash_commit_message,
+    :sha
+  ].freeze
   serialize :merge_params, Hash # rubocop:disable Cop/ActiveRecordSerialize
 
   after_create :ensure_merge_request_diff
@@ -194,11 +206,14 @@ class MergeRequest < ApplicationRecord
   scope :by_commit_sha, ->(sha) do
     where('EXISTS (?)', MergeRequestDiff.select(1).where('merge_requests.latest_merge_request_diff_id = merge_request_diffs.id').by_commit_sha(sha)).reorder(nil)
   end
+  scope :by_merge_commit_sha, -> (sha) do
+    where(merge_commit_sha: sha)
+  end
   scope :join_project, -> { joins(:target_project) }
   scope :references_project, -> { references(:target_project) }
   scope :with_api_entity_associations, -> {
-    preload(:assignees, :author, :notes, :labels, :milestone, :timelogs,
-            latest_merge_request_diff: [:merge_request_diff_commits],
+    preload(:assignees, :author, :unresolved_notes, :labels, :milestone,
+            :timelogs, :latest_merge_request_diff,
             metrics: [:latest_closed_by, :merged_by],
             target_project: [:route, { namespace: :route }],
             source_project: [:route, { namespace: :route }])
@@ -209,14 +224,20 @@ class MergeRequest < ApplicationRecord
   scope :by_target_branch, ->(branch_name) { where(target_branch: branch_name) }
   scope :preload_source_project, -> { preload(:source_project) }
 
-  scope :with_open_merge_when_pipeline_succeeds, -> do
-    with_state(:opened).where(merge_when_pipeline_succeeds: true)
+  scope :with_auto_merge_enabled, -> do
+    with_state(:opened).where(auto_merge_enabled: true)
   end
 
   after_save :keep_around_commit
 
   alias_attribute :project, :target_project
   alias_attribute :project_id, :target_project_id
+
+  # Currently, `merge_when_pipeline_succeeds` column is used as a flag
+  # to check if _any_ auto merge strategy is activated on the merge request.
+  # Today, we have multiple strategies and MWPS is one of them.
+  # we'd eventually rename the column for avoiding confusions, but in the mean time
+  # please use `auto_merge_enabled` alias instead of `merge_when_pipeline_succeeds`.
   alias_attribute :auto_merge_enabled, :merge_when_pipeline_succeeds
   alias_method :issuing_parent, :target_project
 
@@ -353,16 +374,21 @@ class MergeRequest < ApplicationRecord
     "#{project.to_reference(from, full: full)}#{reference}"
   end
 
-  def commits
-    return merge_request_diff.commits if persisted?
+  def commits(limit: nil)
+    return merge_request_diff.commits(limit: limit) if persisted?
 
     commits_arr = if compare_commits
-                    compare_commits.reverse
+                    reversed_commits = compare_commits.reverse
+                    limit ? reversed_commits.take(limit) : reversed_commits
                   else
                     []
                   end
 
     CommitCollection.new(source_project, commits_arr, source_branch)
+  end
+
+  def recent_commits
+    commits(limit: MergeRequestDiff::COMMITS_SAFE_SIZE)
   end
 
   def commits_count
@@ -375,14 +401,17 @@ class MergeRequest < ApplicationRecord
     end
   end
 
-  def commit_shas
-    if persisted?
-      merge_request_diff.commit_shas
-    elsif compare_commits
-      compare_commits.to_a.reverse.map(&:sha)
-    else
-      Array(diff_head_sha)
-    end
+  def commit_shas(limit: nil)
+    return merge_request_diff.commit_shas(limit: limit) if persisted?
+
+    shas =
+      if compare_commits
+        compare_commits.to_a.reverse.map(&:sha)
+      else
+        Array(diff_head_sha)
+      end
+
+    limit ? shas.take(limit) : shas
   end
 
   # Returns true if there are commits that match at least one commit SHA.
@@ -776,6 +805,8 @@ class MergeRequest < ApplicationRecord
   end
 
   def check_mergeability
+    return if Feature.enabled?(:merge_requests_conditional_mergeability_check, default_enabled: true) && !recheck_merge_status?
+
     MergeRequests::MergeabilityCheckService.new(self).execute(retry_lease: false)
   end
   # rubocop: enable CodeReuse/ServiceClass
@@ -890,7 +921,7 @@ class MergeRequest < ApplicationRecord
 
   def commit_notes
     # Fetch comments only from last 100 commits
-    commit_ids = commit_shas.take(100)
+    commit_ids = commit_shas(limit: 100)
 
     Note
       .user
@@ -901,7 +932,7 @@ class MergeRequest < ApplicationRecord
   def mergeable_discussions_state?
     return true unless project.only_allow_merge_if_all_discussions_are_resolved?
 
-    !discussions_to_be_resolved?
+    unresolved_notes.none?(&:to_be_resolved?)
   end
 
   def for_fork?

@@ -114,7 +114,7 @@ module Gitlab
         end
 
         def event_klass_for(event)
-          event_klass_name = event.class.name.demodulize
+          event_klass_name = event.consumer_klass_name
           current_namespace = self.class.name.deconstantize
           Object.const_get("#{current_namespace}::Events::#{event_klass_name}", false)
         end

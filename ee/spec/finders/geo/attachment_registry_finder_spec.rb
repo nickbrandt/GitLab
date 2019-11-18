@@ -38,9 +38,9 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
   context 'finds all the things' do
     describe '#find_unsynced' do
       before do
-        create(:geo_file_registry, :avatar, file_id: upload_synced_group.id)
-        create(:geo_file_registry, :avatar, file_id: upload_unsynced_group.id)
-        create(:geo_file_registry, :avatar, file_id: upload_remote_synced_project.id)
+        create(:geo_upload_registry, :avatar, file_id: upload_synced_group.id)
+        create(:geo_upload_registry, :avatar, file_id: upload_unsynced_group.id)
+        create(:geo_upload_registry, :avatar, file_id: upload_remote_synced_project.id)
       end
 
       context 'with object storage sync enabled' do
@@ -96,8 +96,8 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
 
     describe '#find_migrated_local' do
       before do
-        create(:geo_file_registry, :avatar, file_id: upload_remote_synced_project.id)
-        create(:geo_file_registry, :avatar, file_id: upload_remote_unsynced_project.id)
+        create(:geo_upload_registry, :avatar, file_id: upload_remote_synced_project.id)
+        create(:geo_upload_registry, :avatar, file_id: upload_remote_unsynced_project.id)
       end
 
       it 'returns attachments stored remotely and successfully synced locally' do
@@ -137,14 +137,14 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
   context 'counts all the things' do
     describe '#count_synced' do
       before do
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_synced_group.id)
-        create(:geo_file_registry, :attachment, file_id: upload_unsynced_group.id)
-        create(:geo_file_registry, :attachment, file_id: upload_issuable_synced_nested_project.id)
-        create(:geo_file_registry, :attachment, file_id: upload_unsynced_project.id)
-        create(:geo_file_registry, :attachment, file_id: upload_synced_project.id)
-        create(:geo_file_registry, :attachment, file_id: upload_personal_snippet.id)
-        create(:geo_file_registry, :attachment, file_id: upload_remote_synced_project.id)
-        create(:geo_file_registry, :attachment, file_id: upload_remote_unsynced_project.id)
+        create(:geo_upload_registry, :attachment, :failed, file_id: upload_synced_group.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_unsynced_group.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_issuable_synced_nested_project.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_unsynced_project.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_synced_project.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_personal_snippet.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_remote_synced_project.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_remote_unsynced_project.id)
       end
 
       context 'with object storage sync enabled' do
@@ -180,14 +180,14 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
 
     describe '#count_failed' do
       before do
-        create(:geo_file_registry, :attachment, file_id: upload_synced_group.id)
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_unsynced_group.id)
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_issuable_synced_nested_project.id)
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_unsynced_project.id)
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_synced_project.id)
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_personal_snippet.id)
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_remote_synced_project.id)
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_remote_unsynced_project.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_synced_group.id)
+        create(:geo_upload_registry, :attachment, :failed, file_id: upload_unsynced_group.id)
+        create(:geo_upload_registry, :attachment, :failed, file_id: upload_issuable_synced_nested_project.id)
+        create(:geo_upload_registry, :attachment, :failed, file_id: upload_unsynced_project.id)
+        create(:geo_upload_registry, :attachment, :failed, file_id: upload_synced_project.id)
+        create(:geo_upload_registry, :attachment, :failed, file_id: upload_personal_snippet.id)
+        create(:geo_upload_registry, :attachment, :failed, file_id: upload_remote_synced_project.id)
+        create(:geo_upload_registry, :attachment, :failed, file_id: upload_remote_unsynced_project.id)
       end
 
       context 'with object storage sync enabled' do
@@ -223,14 +223,14 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
 
     describe '#count_synced_missing_on_primary' do
       before do
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_synced_group.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_unsynced_group.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_issuable_synced_nested_project.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_unsynced_project.id, missing_on_primary: false)
-        create(:geo_file_registry, :attachment, file_id: upload_synced_project.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_personal_snippet.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_remote_synced_project.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_remote_unsynced_project.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, :failed, file_id: upload_synced_group.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, file_id: upload_unsynced_group.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, file_id: upload_issuable_synced_nested_project.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, file_id: upload_unsynced_project.id, missing_on_primary: false)
+        create(:geo_upload_registry, :attachment, file_id: upload_synced_project.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, file_id: upload_personal_snippet.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, file_id: upload_remote_synced_project.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, file_id: upload_remote_unsynced_project.id, missing_on_primary: true)
       end
 
       context 'with object storage sync enabled' do
@@ -298,15 +298,15 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
 
     describe '#count_registry' do
       before do
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_synced_group.id)
-        create(:geo_file_registry, :attachment, file_id: upload_unsynced_group.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_issuable_synced_nested_project.id)
-        create(:geo_file_registry, :attachment, file_id: upload_unsynced_project.id, missing_on_primary: false)
-        create(:geo_file_registry, :attachment, file_id: upload_synced_project.id)
-        create(:geo_file_registry, :attachment, file_id: upload_personal_snippet.id)
-        create(:geo_file_registry, :attachment, file_id: upload_remote_synced_project.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_remote_unsynced_project.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_remote_synced_group.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, :failed, file_id: upload_synced_group.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_unsynced_group.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, file_id: upload_issuable_synced_nested_project.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_unsynced_project.id, missing_on_primary: false)
+        create(:geo_upload_registry, :attachment, file_id: upload_synced_project.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_personal_snippet.id)
+        create(:geo_upload_registry, :attachment, file_id: upload_remote_synced_project.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, file_id: upload_remote_unsynced_project.id, missing_on_primary: true)
+        create(:geo_upload_registry, :attachment, file_id: upload_remote_synced_group.id, missing_on_primary: true)
       end
 
       context 'with object storage sync enabled' do
