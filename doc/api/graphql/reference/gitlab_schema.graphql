@@ -2518,6 +2518,11 @@ enum IssueSort {
   DUE_DATE_DESC
 
   """
+  Relative position by ascending order
+  """
+  RELATIVE_POSITION_ASC
+
+  """
   Created at ascending order
   """
   created_asc
