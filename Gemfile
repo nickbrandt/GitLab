@@ -72,7 +72,7 @@ gem 'acme-client', '~> 2.0.2'
 gem 'browser', '~> 2.5'
 
 # GPG
-gem 'gpgme', '~> 2.0.18'
+gem 'gpgme', '~> 2.0.19'
 
 # LDAP Auth
 # GitLab fork with several improvements to original library. For full list of changes
