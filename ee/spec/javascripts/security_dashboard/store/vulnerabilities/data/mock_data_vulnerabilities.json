@@ -41,7 +41,9 @@
       "start_line": 29,
       "end_line": 29,
       "class": "com.gitlab.security_products.tests.App",
-      "method": "insecureCypher"
+      "method": "insecureCypher",
+      "hostname": "https://gitlab.com",
+      "path": "/user6"
     },
     "links": [
       {

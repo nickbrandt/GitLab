@@ -8,6 +8,7 @@ import {
   parseDiff,
 } from './utils';
 import filterByKey from './utils/filter_by_key';
+import getFileLocation from './utils/get_file_location';
 import { parseSastContainer } from './utils/container_scanning';
 import { visitUrl } from '~/lib/utils/url_utility';
 
@@ -269,6 +270,7 @@ export default {
 
   [types.SET_ISSUE_MODAL_DATA](state, payload) {
     const { issue, status } = payload;
+    const fileLocation = getFileLocation(issue.location);
 
     Vue.set(state.modal, 'title', issue.title);
     Vue.set(state.modal.data.description, 'value', issue.description);
@@ -278,6 +280,8 @@ export default {
     Vue.set(state.modal.data.methodName, 'value', issue.location && issue.location.method);
     Vue.set(state.modal.data.image, 'value', issue.location && issue.location.image);
     Vue.set(state.modal.data.namespace, 'value', issue.location && issue.location.operating_system);
+    Vue.set(state.modal.data.url, 'value', fileLocation);
+    Vue.set(state.modal.data.url, 'url', fileLocation);
 
     if (issue.identifiers && issue.identifiers.length > 0) {
       Vue.set(state.modal.data.identifiers, 'value', issue.identifiers);

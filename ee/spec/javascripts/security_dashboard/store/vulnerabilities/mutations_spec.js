@@ -275,6 +275,15 @@ describe('vulnerabilities module mutations', () => {
       it('should set the modal vulnerability', () => {
         expect(state.modal.vulnerability).toEqual(vulnerability);
       });
+
+      it('should set the modal URL', () => {
+        const { url } = state.modal.data;
+        const { hostname, path } = vulnerability.location;
+        const expected = `${hostname}${path}`;
+
+        expect(url.value).toEqual(expected);
+        expect(url.url).toEqual(expected);
+      });
     });
 
     describe('with irregular data', () => {
