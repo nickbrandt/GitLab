@@ -64,6 +64,8 @@ To run Knative on GitLab, you will need:
    using our [runtimes](https://gitlab.com/gitlab-org/serverless/runtimes).
 1. **Prometheus** (optional): Installing Prometheus allows you to monitor the scale and traffic of your serverless function/application.
    See [Installing Applications](../index.md#installing-applications) for more information.
+1. **Logging** (optional): Configuring logging allows you to view and search request logs for your serverless function/application.
+   See [Configuring logging](#configuring-logging) for more information.
 
 ## Installing Knative via GitLab's Kubernetes integration
 
@@ -165,6 +167,53 @@ You must do the following:
 1. Follow the steps to deploy [functions](#deploying-functions)
    or [serverless applications](#deploying-serverless-applications) onto your
    cluster.
+
+## Configuring logging
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/33330) in GitLab 12.5.
+
+### Prerequisites
+
+- A GitLab-managed cluster.
+- `kubectl` installed and working.
+
+Running `kubectl` commands on your cluster requires setting up access to the
+cluster first. For clusters created on:
+
+- GKE, see [GKE Cluster Access](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl)
+- Other platforms, see [Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+
+### Enable request log template
+
+Run the following command to enable request logs:
+
+```shell
+kubectl edit cm -n knative-serving config-observability
+```
+
+Copy the `logging.request-log-template` from the `data._example` field to the data field one level up in the hierarchy.
+
+### Enable request logs
+
+Run the following commands to install Elasticsearch, Kibana, and Filebeat into a `kube-logging` namespace and configure all nodes to forward logs using Filebeat:
+
+```shell
+kubectl apply -f https://gitlab.com/gitlab-org/serverless/configurations/knative/raw/v0.7.0/kube-logging-filebeat.yaml
+kubectl label nodes --all beta.kubernetes.io/filebeat-ready="true"
+```
+
+### Viewing request logs
+
+To view request logs:
+
+1. Run `kubectl proxy`.
+1. Navigate to Kibana UI.
+
+Or:
+
+1. Open the Kibana UI.
+1. Click on **Discover**, then select `filebeat-*` from the dropdown on the left.
+1. Enter `kubernetes.container.name:"queue-proxy" AND message:/httpRequest/` into the search box.
 
 ## Supported runtimes
 
@@ -348,7 +397,7 @@ Running functions locally requires:
 - Go 1.12 or newer installed.
 - Docker Engine installed and running.
 - `gitlabktl` installed using the Go package manager:
-  
+
   ```shell
   GO111MODULE=on go get gitlab.com/gitlab-org/gitlabktl
   ```
