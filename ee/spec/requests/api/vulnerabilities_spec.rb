@@ -38,6 +38,16 @@ describe API::Vulnerabilities do
     end
   end
 
+  shared_examples 'responds with "not found" for an unknown vulnerability ID' do
+    let(:vulnerability_id) { 0 }
+
+    it do
+      subject
+
+      expect(response).to have_gitlab_http_status(404)
+    end
+  end
+
   describe 'GET /projects/:id/vulnerabilities' do
     let_it_be(:project) { create(:project, :with_vulnerabilities) }
 
@@ -81,6 +91,43 @@ describe API::Vulnerabilities do
       it { expect { get_vulnerabilities }.to be_denied_for(:reporter).of(project) }
       it { expect { get_vulnerabilities }.to be_denied_for(:guest).of(project) }
       it { expect { get_vulnerabilities }.to be_denied_for(:anonymous) }
+    end
+  end
+
+  describe 'GET /vulnerabilities/:id' do
+    let_it_be(:project) { create(:project, :with_vulnerabilities) }
+    let_it_be(:vulnerability) { project.vulnerabilities.first }
+    let(:vulnerability_id) { vulnerability.id }
+
+    subject(:get_vulnerability) { get api("/vulnerabilities/#{vulnerability_id}", user) }
+
+    context 'with an authorized user with proper permissions' do
+      before do
+        project.add_developer(user)
+      end
+
+      it 'returns the desired vulnerability' do
+        get_vulnerability
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
+        expect(json_response['id']).to eq vulnerability_id
+      end
+
+      it_behaves_like 'responds with "not found" for an unknown vulnerability ID'
+      it_behaves_like 'forbids actions on vulnerability in case of disabled features'
+    end
+
+    describe 'permissions' do
+      it { expect { get_vulnerability }.to be_allowed_for(:admin) }
+      it { expect { get_vulnerability }.to be_allowed_for(:owner).of(project) }
+      it { expect { get_vulnerability }.to be_allowed_for(:maintainer).of(project) }
+      it { expect { get_vulnerability }.to be_allowed_for(:developer).of(project) }
+      it { expect { get_vulnerability }.to be_allowed_for(:auditor) }
+
+      it { expect { get_vulnerability }.to be_denied_for(:reporter).of(project) }
+      it { expect { get_vulnerability }.to be_denied_for(:guest).of(project) }
+      it { expect { get_vulnerability }.to be_denied_for(:anonymous) }
     end
   end
 
@@ -162,8 +209,9 @@ describe API::Vulnerabilities do
 
     let_it_be(:project) { create(:project, :with_vulnerabilities) }
     let(:vulnerability) { project.vulnerabilities.first }
+    let(:vulnerability_id) { vulnerability.id }
 
-    subject(:dismiss_vulnerability) { post api("/vulnerabilities/#{vulnerability.id}/dismiss", user) }
+    subject(:dismiss_vulnerability) { post api("/vulnerabilities/#{vulnerability_id}/dismiss", user) }
 
     context 'with an authorized user with proper permissions' do
       before do
@@ -182,6 +230,8 @@ describe API::Vulnerabilities do
           expect(vulnerability.findings).to all have_vulnerability_dismissal_feedback
         end
       end
+
+      it_behaves_like 'responds with "not found" for an unknown vulnerability ID'
 
       context 'when there is a dismissal error' do
         before do
@@ -239,15 +289,16 @@ describe API::Vulnerabilities do
     end
   end
 
-  describe 'POST /vulnerabilities:id/resolve' do
+  describe 'POST /vulnerabilities/:id/resolve' do
     before do
       create_list(:vulnerabilities_finding, 2, vulnerability: vulnerability)
     end
 
     let_it_be(:project) { create(:project, :with_vulnerabilities) }
     let(:vulnerability) { project.vulnerabilities.first }
+    let(:vulnerability_id) { vulnerability.id }
 
-    subject(:resolve_vulnerability) { post api("/vulnerabilities/#{vulnerability.id}/resolve", user) }
+    subject(:resolve_vulnerability) { post api("/vulnerabilities/#{vulnerability_id}/resolve", user) }
 
     context 'with an authorized user with proper permissions' do
       before do
@@ -266,6 +317,8 @@ describe API::Vulnerabilities do
           expect(vulnerability.findings).to all have_attributes(state: 'resolved')
         end
       end
+
+      it_behaves_like 'responds with "not found" for an unknown vulnerability ID'
 
       context 'when the vulnerability is already resolved' do
         let(:vulnerability) { create(:vulnerability, :resolved, project: project) }
