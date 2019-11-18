@@ -10179,6 +10179,20 @@
               "deprecationReason": null
             },
             {
+              "name": "authorName",
+              "description": "Commit authors name",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "authoredDate",
               "description": "Timestamp of when the commit was authored",
               "args": [
@@ -11284,6 +11298,24 @@
               "deprecationReason": null
             },
             {
+              "name": "sha",
+              "description": "Last commit sha for entry",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "type",
               "description": null,
               "args": [
@@ -11389,6 +11421,24 @@
             {
               "name": "path",
               "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sha",
+              "description": "Last commit sha for entry",
               "args": [
 
               ],
@@ -11663,6 +11713,24 @@
               "deprecationReason": null
             },
             {
+              "name": "sha",
+              "description": "Last commit sha for entry",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "treeUrl",
               "description": null,
               "args": [
@@ -11908,6 +11976,24 @@
             {
               "name": "path",
               "description": null,
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sha",
+              "description": "Last commit sha for entry",
               "args": [
 
               ],
