@@ -1,7 +1,7 @@
 import axios from '~/lib/utils/axios_utils';
 import createFlash, { hideFlash } from '~/flash';
 import { __ } from '~/locale';
-import Api from '~/api';
+import Api from 'ee/api';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { nestQueryStringKeys } from '../utils';
@@ -195,13 +195,6 @@ export const createCustomStage = ({ dispatch, state }, data) => {
     .catch(error => dispatch('receiveCreateCustomStageError', { error, data }));
 };
 
-export const receiveTasksByTypeSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_TASKS_BY_TYPE_SUCCESS, data);
-export const receiveTasksByTypeError = ({ commit }, error) => {
-  commit(types.RECEIVE_TASKS_BY_TYPE_ERROR, error);
-  createFlash(__('There was an error fetching data for the form'));
-};
-
 export const receiveTasksByTypeDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data);
 
@@ -212,7 +205,6 @@ export const receiveTasksByTypeDataError = ({ commit }, error) => {
 export const requestTasksByTypeData = ({ commit }) => commit(types.REQUEST_TASKS_BY_TYPE_DATA);
 
 export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
-  const endpoint = '/-/analytics/type_of_work/tasks_by_type';
   const {
     currentGroupPath,
     cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
@@ -226,17 +218,16 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   if (labelIds.length) {
     const params = {
       group_id: currentGroupPath,
-      label_ids: `[${labelIds.join(',')}]`,
       created_after,
       created_before,
       project_ids,
       subject,
+      label_ids: labelIds,
     };
 
     dispatch('requestTasksByTypeData');
 
-    return axios
-      .get(endpoint, { params })
+    return Api.cycleAnalyticsTasksByType(params)
       .then(data => dispatch('receiveTasksByTypeDataSuccess', data))
       .catch(error => dispatch('receiveTasksByTypeDataError', error));
   }

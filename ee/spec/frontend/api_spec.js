@@ -1,6 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import Api from 'ee/api';
+import * as cycleAnalyticsConstants from 'ee/analytics/cycle_analytics/constants';
 
 describe('Api', () => {
   const dummyApiVersion = 'v3000';
@@ -280,6 +281,53 @@ describe('Api', () => {
           expect(data).toEqual(true);
           expect(axios.delete).toHaveBeenCalledWith(expectedUrl);
         });
+      });
+    });
+  });
+
+  describe('Cycle analytics', () => {
+    const groupId = 'counting-54321';
+    const createdBefore = '2019-11-18';
+    const createdAfter = '2019-08-18';
+
+    describe('cycleAnalyticsTasksByType', () => {
+      it('fetches tasks by type data', done => {
+        const tasksByTypeResponse = [
+          {
+            label: {
+              id: 9,
+              title: 'Thursday',
+              color: '#7F8C8D',
+              description: 'What are you waiting for?',
+              group_id: 2,
+              project_id: null,
+              template: false,
+              text_color: '#FFFFFF',
+              created_at: '2019-08-20T05:22:49.046Z',
+              updated_at: '2019-08-20T05:22:49.046Z',
+            },
+            series: [['2019-11-03', 5]],
+          },
+        ];
+        const labelIds = [10, 9, 8, 7];
+        const params = {
+          group_id: groupId,
+          created_after: createdAfter,
+          created_before: createdBefore,
+          project_ids: null,
+          subject: cycleAnalyticsConstants.TASKS_BY_TYPE_SUBJECT_ISSUE,
+          label_ids: labelIds,
+        };
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/type_of_work/tasks_by_type`;
+        mock.onGet(expectedUrl).reply(200, tasksByTypeResponse);
+
+        Api.cycleAnalyticsTasksByType({ params })
+          .then(({ data, config: { params: reqParams } }) => {
+            expect(data).toEqual(tasksByTypeResponse);
+            expect(reqParams.params).toEqual(params);
+          })
+          .then(done)
+          .catch(done.fail);
       });
     });
   });
