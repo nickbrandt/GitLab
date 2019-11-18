@@ -21,6 +21,7 @@ describe Group do
     it { is_expected.to have_many(:cycle_analytics_stages) }
     it { is_expected.to have_many(:ip_restrictions) }
     it { is_expected.to have_one(:dependency_proxy_setting) }
+    it { is_expected.to have_one(:deletion_schedule) }
   end
 
   describe 'scopes' do
@@ -45,6 +46,30 @@ describe Group do
         expect { group.checked_file_template_project }.not_to exceed_query_limit(0)
 
         expect(group.checked_file_template_project).to be_present
+      end
+    end
+
+    describe '.aimed_for_deletion' do
+      let!(:date) { 10.days.ago }
+
+      subject(:relation) { described_class.aimed_for_deletion(date) }
+
+      it 'only includes groups that are marked for deletion on or before the specified date' do
+        group_not_marked_for_deletion = create(:group)
+
+        group_marked_for_deletion_after_specified_date = create(:group_with_deletion_schedule,
+                                                                marked_for_deletion_on: date + 2.days)
+
+        group_marked_for_deletion_before_specified_date = create(:group_with_deletion_schedule,
+                                                                 marked_for_deletion_on: date - 2.days)
+
+        group_marked_for_deletion_on_specified_date = create(:group_with_deletion_schedule,
+                                                             marked_for_deletion_on: date)
+
+        expect(relation).to include(group_marked_for_deletion_before_specified_date,
+                                    group_marked_for_deletion_on_specified_date)
+        expect(relation).not_to include(group_marked_for_deletion_after_specified_date,
+                                        group_not_marked_for_deletion)
       end
     end
   end
