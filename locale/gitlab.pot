@@ -261,9 +261,6 @@ msgstr ""
 msgid "%{from} to %{to}"
 msgstr ""
 
-msgid "%{gitlab_ci_yml} not found in this commit"
-msgstr ""
-
 msgid "%{group_docs_link_start}Groups%{group_docs_link_end} allow you to manage and collaborate across multiple projects. Members of a group have access to all of its projects."
 msgstr ""
 
