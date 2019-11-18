@@ -37,6 +37,9 @@ module EE
       has_and_belongs_to_many :prometheus_alert_events, join_table: :issues_prometheus_alert_events
       has_many :prometheus_alerts, through: :prometheus_alert_events
 
+      has_many :vulnerability_links, class_name: 'Vulnerabilities::IssueLink', inverse_of: :issue
+      has_many :related_vulnerabilities, through: :vulnerability_links, source: :vulnerability
+
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
 
       after_create :update_generic_alert_title, if: :generic_alert_with_default_title?
