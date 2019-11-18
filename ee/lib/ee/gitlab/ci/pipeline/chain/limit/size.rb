@@ -17,7 +17,7 @@ module EE
                 super
 
                 @limit = Pipeline::Quota::Size
-                  .new(project.namespace, pipeline)
+                  .new(project.namespace, pipeline, command)
               end
 
               override :perform!
