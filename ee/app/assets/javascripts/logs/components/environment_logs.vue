@@ -69,7 +69,7 @@ export default {
 </script>
 <template>
   <div class="build-page-pod-logs mt-3">
-    <div class="top-bar d-flex">
+    <div class="top-bar js-top-bar d-flex">
       <div class="row">
         <gl-form-group
           id="environments-dropdown-fg"
@@ -125,7 +125,7 @@ export default {
         @refresh="showPodLogs(pods.current)"
       />
     </div>
-    <pre class="build-trace js-log-trace"><code class="bash">{{trace}}
+    <pre class="build-trace js-log-trace"><code class="bash js-build-output">{{trace}}
       <div v-if="showLoader" class="build-loader-animation js-build-loader-animation">
         <div class="dot"></div>
         <div class="dot"></div>
