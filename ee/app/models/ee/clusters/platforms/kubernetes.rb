@@ -5,6 +5,7 @@ module EE
     module Platforms
       module Kubernetes
         extend ActiveSupport::Concern
+        include ::Gitlab::Utils::StrongMemoize
 
         CACHE_KEY_GET_POD_LOG = 'get_pod_log'
 
@@ -112,7 +113,9 @@ module EE
         end
 
         def elastic_stack_client
-          cluster.application_elastic_stack&.elasticsearch_client
+          strong_memoize(:elastic_stack_client) do
+            cluster.application_elastic_stack&.elasticsearch_client
+          end
         end
 
         def handle_exceptions(resource_not_found_error_message, opts, &block)
