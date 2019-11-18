@@ -50,13 +50,7 @@ Use [guard](https://github.com/guard/guard) to continuously monitor for changes 
 bundle exec guard
 ```
 
-When using spring and guard together, consider adjusting Guardfile:
-
-```ruby
-guard :rspec, cmd: "spring rspec" do
-  # ...
-end
-```
+When using spring and guard together, use `SPRING=1 bundle exec guard` instead to make use of spring.
 
 ### General guidelines
 

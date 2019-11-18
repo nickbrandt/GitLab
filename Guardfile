@@ -2,8 +2,9 @@
 
 # More info at https://github.com/guard/guard#readme
 
-# If using spring, change command to "spring rspec"
-guard :rspec, cmd: "bundle exec rspec" do
+cmd = ENV['SPRING'] ? 'spring rspec' : 'bundle exec rspec'
+
+guard :rspec, cmd: cmd do
   require "guard/rspec/dsl"
   dsl = Guard::RSpec::Dsl.new(self)
 
