@@ -10,13 +10,15 @@ module QA
       end
 
       it 'user creates an issue' do
-        Resource::Issue.fabricate_via_browser_ui! do |issue|
+        issue = Resource::Issue.fabricate_via_browser_ui! do |issue|
           issue.title = issue_title
         end
 
         Page::Project::Menu.perform(&:click_issues)
 
-        expect(page).to have_content(issue_title)
+        Page::Project::Issue::Index.perform do |index|
+          expect(index).to have_issue(issue)
+        end
       end
 
       context 'when using attachments in comments', :object_storage do
