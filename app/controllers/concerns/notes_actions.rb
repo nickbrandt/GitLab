@@ -64,7 +64,7 @@ module NotesActions
         end
 
         if @note.errors.present? && @note.errors.keys != [:commands_only]
-          render json: json, status: 422
+          render json: json, status: :unprocessable_entity
         else
           render json: json
         end
