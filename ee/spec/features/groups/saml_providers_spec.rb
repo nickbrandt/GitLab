@@ -24,7 +24,7 @@ describe 'SAML provider settings' do
   end
 
   def test_sso
-    click_link('Test SAML SSO')
+    click_link('Verify SAML Configuration')
   end
 
   def stub_saml_config
@@ -142,18 +142,39 @@ describe 'SAML provider settings' do
 
     describe 'test button' do
       let!(:saml_provider) { create(:saml_provider, group: group) }
+      let(:raw_saml_response) do
+        fixture = File.read('ee/spec/fixtures/saml/response.xml')
+        Base64.encode64(fixture)
+      end
 
       before do
         mock_group_saml(uid: '123')
+
+        allow_any_instance_of(Gitlab::Auth::GroupSaml::ResponseStore).to receive(:get_raw).and_return(raw_saml_response)
+
+        allow_any_instance_of(OmniAuth::Strategies::GroupSaml).to receive(:mock_callback_call) do
+          response = Rack::Response.new
+          response.redirect(group_saml_providers_path(group))
+          response.finish
+        end
       end
 
-      it 'POSTs to the SSO path for the group' do
+      it 'displays XML validation errors' do
         visit group_saml_providers_path(group)
 
         test_sso
 
         expect(current_path).to eq group_saml_providers_path(group)
-        expect(page).to have_content("SAML for #{group.name} was added to your connected accounts")
+        expect(page).to have_content("Fingerprint mismatch")
+        expect(page).to have_content("The attributes have expired, based on the SessionNotOnOrAfter")
+      end
+
+      it 'displays SAML Response XML' do
+        visit group_saml_providers_path(group)
+
+        test_sso
+
+        expect(page).to have_content("<saml:Issuer>")
       end
     end
   end

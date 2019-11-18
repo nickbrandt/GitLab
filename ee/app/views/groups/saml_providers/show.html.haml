@@ -16,6 +16,14 @@
       = s_('GroupSAML|Configuration')
   .col-lg-9
     = render 'form', group: @group, saml_provider: @saml_provider
+- if @saml_response_check
+  #response.pt-3
+    %section.row.border-top.mt-4
+      .col-lg-3.append-bottom-default
+        %h4.page-title
+          = s_('GroupSAML|SAML Response Output')
+      .col-lg-9
+        = render 'response_debug'
 %section.row.border-top.mt-4
   .col-lg-3.append-bottom-default
     %h4.page-title

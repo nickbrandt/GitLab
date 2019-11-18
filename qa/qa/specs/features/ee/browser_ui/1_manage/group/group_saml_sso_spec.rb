@@ -46,19 +46,32 @@ module QA
         end
 
         it 'Lets group admin test settings' do
+          incorrect_fingerprint = Digest::SHA1.hexdigest(rand.to_s)
           Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
           EE::Page::Group::Settings::SamlSSO.perform do |saml_sso|
             saml_sso.set_id_provider_sso_url(EE::Runtime::Saml.idp_sso_url)
+            saml_sso.set_cert_fingerprint(incorrect_fingerprint)
+            saml_sso.click_save_changes
+
+            saml_sso.click_test_button
+          end
+
+          login_to_idp_if_required
+
+          expect(page).to have_content("Verify SAML Configuration")
+          expect(page).to have_content("Fingerprint mismatch")
+          expect(page).to have_content("<saml:Issuer>#{QA::EE::Runtime::Saml.idp_issuer}</saml:Issuer>")
+
+          EE::Page::Group::Settings::SamlSSO.perform do |saml_sso|
             saml_sso.set_cert_fingerprint(EE::Runtime::Saml.idp_certificate_fingerprint)
             saml_sso.click_save_changes
 
             saml_sso.click_test_button
           end
 
-          login_to_idp_if_required_and_expect_success
-
-          expect(page).to have_content("Test SAML SSO")
+          expect(page).to have_content("Verify SAML Configuration")
+          expect(page).not_to have_content("Fingerprint mismatch")
         end
       end
 
@@ -235,8 +248,12 @@ module QA
       end
     end
 
-    def login_to_idp_if_required_and_expect_success
+    def login_to_idp_if_required
       Vendor::SAMLIdp::Page::Login.perform { |login_page| login_page.login_if_required('user1', 'user1pass') }
+    end
+
+    def login_to_idp_if_required_and_expect_success
+      login_to_idp_if_required
       expect(page).to have_content("SAML for #{Runtime::Env.sandbox_name} was added to your connected accounts")
                         .or have_content("Already signed in with SAML for #{Runtime::Env.sandbox_name}")
     end
