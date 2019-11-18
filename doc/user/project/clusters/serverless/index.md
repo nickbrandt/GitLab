@@ -166,13 +166,14 @@ You must do the following:
    or [serverless applications](#deploying-serverless-applications) onto your
    cluster.
 
-## Deploying functions
+## Supported runtimes
 
-> Introduced in GitLab 11.6.
+Serverless functions for GitLab can be written in 6 supported languages:
 
-Using functions is useful for dealing with independent events without needing
-to maintain a complex unified infrastructure. This allows you to focus on a
-single task that can be executed/scaled automatically and independently.
+- NodeJS and Ruby, with GitLab-managed and OpenFaas runtimes.
+- C#, Go, PHP, and Python with OpenFaaS runtimes only.
+
+### GitLab managed runtimes
 
 Currently the following [runtimes](https://gitlab.com/gitlab-org/serverless/runtimes) are offered:
 
@@ -181,6 +182,31 @@ Currently the following [runtimes](https://gitlab.com/gitlab-org/serverless/runt
 - Dockerfile
 
 `Dockerfile` presence is assumed when a runtime is not specified.
+
+### OpenFaaS runtimes
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/29253) in GitLab 12.5.
+
+[OpenFaaS classic runtimes](https://github.com/openfaas/templates#templates-in-store) can be used with GitLab serverless.
+Runtimes are specified using the pattern: `openfaas/classic/<template_name>`. The following
+example shows how to define a function in `serverless.yml` using an OpenFaaS runtime:
+
+```yaml
+hello:
+  source: ./hello
+  runtime: openfaas/classic/ruby
+  description: "Ruby function using OpenFaaS classic runtime"
+```
+
+`handler` is not needed for OpenFaaS functions. The location of the handler is defined
+by the conventions of the runtime.
+
+See the [`ruby-openfaas-function`](https://gitlab.com/knative-examples/ruby-openfaas-function)
+project for an example of a function using an OpenFaaS runtime.
+
+## Deploying functions
+
+> Introduced in GitLab 11.6.
 
 You can find and import all the files referenced in this doc in the
 **[functions example project](https://gitlab.com/knative-examples/functions)**.
@@ -351,6 +377,10 @@ To run a function locally:
 ## Deploying Serverless applications
 
 > Introduced in GitLab 11.5.
+
+Serverless applications are the building block of serverless functions. They are useful in scenarios where an existing
+runtime does not meet the needs of an application, such as one written in a language that has no runtime available. Note
+though that serverless applications should be stateless!
 
 NOTE: **Note:**
 You can reference and import the sample [Knative Ruby App](https://gitlab.com/knative-examples/knative-ruby-app) to get started.
