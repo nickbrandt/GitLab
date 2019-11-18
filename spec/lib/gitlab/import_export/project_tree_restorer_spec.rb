@@ -48,11 +48,11 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       it 'restore correct project features' do
         project = Project.find_by_path('project')
 
-        expect(project.project_feature.issues_access_level).to eq(ProjectFeature::DISABLED)
-        expect(project.project_feature.builds_access_level).to eq(ProjectFeature::ENABLED)
-        expect(project.project_feature.snippets_access_level).to eq(ProjectFeature::ENABLED)
-        expect(project.project_feature.wiki_access_level).to eq(ProjectFeature::ENABLED)
-        expect(project.project_feature.merge_requests_access_level).to eq(ProjectFeature::ENABLED)
+        expect(project.project_feature.issues_access_level).to eq(ProjectFeature::PRIVATE)
+        expect(project.project_feature.builds_access_level).to eq(ProjectFeature::PRIVATE)
+        expect(project.project_feature.snippets_access_level).to eq(ProjectFeature::PRIVATE)
+        expect(project.project_feature.wiki_access_level).to eq(ProjectFeature::PRIVATE)
+        expect(project.project_feature.merge_requests_access_level).to eq(ProjectFeature::PRIVATE)
       end
 
       it 'has the project description' do
