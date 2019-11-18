@@ -141,7 +141,7 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
       end
 
       it_behaves_like 'skips configured manually prometheus services'
-      it_behaves_like 'skips not a prometheus services'
+      it_behaves_like 'skips non prometheus services'
       include_context 'prometheus integration services exist'
       include_context 'prometheus integration services do not exist'
 
@@ -171,7 +171,7 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
       end
 
       it_behaves_like 'skips configured manually prometheus services'
-      it_behaves_like 'skips not a prometheus services'
+      it_behaves_like 'skips non prometheus services'
       include_context 'prometheus integration services exist'
       include_context 'prometheus integration services do not exist'
 
@@ -206,7 +206,7 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
       end
 
       it_behaves_like 'skips configured manually prometheus services'
-      it_behaves_like 'skips not a prometheus services'
+      it_behaves_like 'skips non prometheus services'
       include_context 'prometheus integration services exist'
       include_context 'prometheus integration services do not exist'
 
