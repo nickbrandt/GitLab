@@ -8,7 +8,7 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
 
   DOWNTIME = false
   MIGRATION = 'ActivatePrometheusServicesForSharedClusterApplications'.freeze
-  BATCH_SIZE = 1000
+  BATCH_SIZE = 500
 
   disable_ddl_transaction!
 
