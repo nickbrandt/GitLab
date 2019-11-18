@@ -666,6 +666,9 @@ msgstr ""
 msgid "API Token"
 msgstr ""
 
+msgid "AWS Secret Access Key"
+msgstr ""
+
 msgid "Abort"
 msgstr ""
 
