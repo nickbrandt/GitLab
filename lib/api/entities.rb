@@ -1315,7 +1315,7 @@ module API
       expose :milestones, using: Entities::Milestone, if: -> (release, _) { release.milestones.present? }
       expose :commit_path, expose_nil: false
       expose :tag_path, expose_nil: false
-      expose :evidence_sha, if: -> (release, _) { release.evidence.present? }
+      expose :evidence_sha, expose_nil: false
       expose :assets do
         expose :assets_count, as: :count do |release, _|
           assets_to_exclude = can_download_code? ? [] : [:sources]

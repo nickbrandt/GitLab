@@ -186,15 +186,17 @@ describe Projects::ReleasesController do
 
     it 'returns the correct evidence summary as a json' do
       subject
-      expect(response.body).to eq(release.evidence.summary.to_json)
+
+      expect(json_response).to eq(release.evidence.summary)
     end
 
     context 'when the release was created before evidence existed' do
       it 'returns an empty json' do
         release.evidence.destroy
+
         subject
 
-        expect(response.body).to eq('{}')
+        expect(json_response).to eq({})
       end
     end
   end

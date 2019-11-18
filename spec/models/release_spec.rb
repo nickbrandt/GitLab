@@ -151,36 +151,34 @@ RSpec.describe Release do
   end
 
   describe '#evidence_sha' do
-    let!(:release) { create(:release, :with_evidence) }
+    subject { release.evidence_sha }
 
     context 'when a release was created before evidence collection existed' do
-      it 'is nil' do
-        allow(release).to receive(:evidence).and_return(nil)
+      let!(:release) { create(:release) }
 
-        expect(release.evidence_sha).to be_nil
-      end
+      it { is_expected.to be_nil }
     end
+
     context 'when a release was created with evidence collection' do
-      it 'returns the summary sha' do
-        expect(release.evidence_sha).to eq(release.evidence.summary_sha)
-      end
+      let!(:release) { create(:release, :with_evidence) }
+
+      it { is_expected.to eq(release.evidence.summary_sha) }
     end
   end
 
   describe '#evidence_summary' do
-    let!(:release) { create(:release, :with_evidence) }
+    subject { release.evidence_summary }
 
     context 'when a release was created before evidence collection existed' do
-      it 'returns an empty hash' do
-        allow(release).to receive(:evidence).and_return(nil)
+      let!(:release) { create(:release) }
 
-        expect(release.evidence_summary).to eq({})
-      end
+      it { is_expected.to eq({}) }
     end
+
     context 'when a release was created with evidence collection' do
-      it 'returns the summary' do
-        expect(release.evidence_summary).to eq(release.evidence.summary)
-      end
+      let!(:release) { create(:release, :with_evidence) }
+
+      it { is_expected.to eq(release.evidence.summary) }
     end
   end
 end
