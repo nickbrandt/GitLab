@@ -17,7 +17,7 @@ module EE
       private
 
       def create_design_discussion_system_note?
-        note && note.for_design? && note.discussion.new_discussion?
+        note && note.for_design? && note.start_of_discussion?
       end
     end
   end
