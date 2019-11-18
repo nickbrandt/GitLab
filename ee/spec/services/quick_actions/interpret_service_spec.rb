@@ -711,17 +711,32 @@ describe QuickActions::InterpretService do
     context 'submit_review command' do
       let(:merge_request) { create(:merge_request, source_project: project) }
       let(:content) { '/submit_review' }
-      let!(:draft_note) { create(:draft_note, merge_request: merge_request, author: current_user) }
+      let!(:draft_note) { create(:draft_note, note: note, merge_request: merge_request, author: current_user) }
 
       before do
         stub_licensed_features(batch_comments: true)
       end
 
-      it 'submits the users current review' do
-        _, _, message = service.execute(content, merge_request)
+      context 'note has normal text' do
+        let(:note) { 'I like it' }
 
-        expect { draft_note.reload }.to raise_error(ActiveRecord::RecordNotFound)
-        expect(message).to eq('Submitted the current review.')
+        it 'submits the users current review' do
+          _, _, message = service.execute(content, merge_request)
+
+          expect { draft_note.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          expect(message).to eq('Submitted the current review.')
+        end
+      end
+
+      context 'note has /submit_review' do
+        let(:note) { '/submit_review' }
+
+        it 'submits the users current review' do
+          _, _, message = service.execute(content, merge_request)
+
+          expect { draft_note.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          expect(message).to eq('Submitted the current review.')
+        end
       end
     end
 
