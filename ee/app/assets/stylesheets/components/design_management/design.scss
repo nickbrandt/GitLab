@@ -55,6 +55,10 @@
       a {
         color: inherit;
       }
+
+      .note-text a {
+        color: $blue-600;
+      }
     }
 
     .reply-wrapper {
