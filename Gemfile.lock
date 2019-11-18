@@ -1227,7 +1227,7 @@ DEPENDENCIES
   net-ldap
   net-ntp
   net-ssh (~> 5.2)
-  nokogiri (~> 1.10.4)
+  nokogiri (~> 1.10.5)
   oauth2 (~> 1.4)
   octokit (~> 4.9)
   omniauth (~> 1.8)
