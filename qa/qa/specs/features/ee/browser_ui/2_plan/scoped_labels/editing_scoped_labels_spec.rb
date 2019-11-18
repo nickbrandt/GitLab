@@ -12,8 +12,7 @@ module QA
       let(:new_label_different_scope_multi_colon) { 'group::truck::mercedes-bens' }
 
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         issue = Resource::Issue.fabricate_via_api! do |issue|
           issue.title = 'Issue to test scoped labels'

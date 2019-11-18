@@ -4,8 +4,7 @@ module QA
   context 'Plan' do
     describe 'Project issue boards' do
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
       end
 
       let(:issue_title) { 'Issue to test board list' }

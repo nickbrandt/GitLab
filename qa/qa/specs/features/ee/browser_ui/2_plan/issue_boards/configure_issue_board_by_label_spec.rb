@@ -14,8 +14,7 @@ module QA
       let(:issue_2) { 'Issue 2' }
 
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         fabricate_issue_with_label(label_board_list.project, issue_1, doing)
         fabricate_issue_with_label(label_board_list.project, issue_2, ready_for_dev)

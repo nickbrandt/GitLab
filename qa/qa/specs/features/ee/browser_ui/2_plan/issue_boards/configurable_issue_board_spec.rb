@@ -8,8 +8,7 @@ module QA
       end
 
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         label_board_list.project.visit!
         Page::Project::Menu.perform(&:go_to_boards)
