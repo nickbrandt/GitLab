@@ -113,6 +113,8 @@ describe Issue do
     it { is_expected.to have_and_belong_to_many(:prometheus_alert_events) }
     it { is_expected.to have_and_belong_to_many(:self_managed_prometheus_alert_events) }
     it { is_expected.to have_many(:prometheus_alerts) }
+    it { is_expected.to have_many(:vulnerability_links).class_name('Vulnerabilities::IssueLink').inverse_of(:issue) }
+    it { is_expected.to have_many(:related_vulnerabilities).through(:vulnerability_links).source(:vulnerability) }
 
     describe 'versions.most_recent' do
       it 'returns the most recent version' do
