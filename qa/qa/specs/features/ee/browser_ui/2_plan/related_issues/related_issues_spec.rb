@@ -24,8 +24,7 @@ module QA
       end
 
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
       end
 
       it 'relates and unrelates one issue to/from another' do

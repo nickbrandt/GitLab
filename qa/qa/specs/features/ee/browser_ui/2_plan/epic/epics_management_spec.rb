@@ -4,8 +4,7 @@ module QA
   context 'Plan' do
     describe 'Epics Management' do
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
       end
 
       it 'creates, edits, and deletes an epic' do

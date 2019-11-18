@@ -6,8 +6,7 @@ module QA
       let(:issue_title) { 'issue title' }
 
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
       end
 
       it 'user creates an issue' do
