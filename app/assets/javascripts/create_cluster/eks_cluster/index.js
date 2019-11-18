@@ -12,13 +12,8 @@ export default el => {
     kubernetesIntegrationHelpPath,
     accountAndExternalIdsHelpPath,
     createRoleArnHelpPath,
-    getRolesPath,
-    getRegionsPath,
-    getKeyPairsPath,
-    getVpcsPath,
-    getSubnetsPath,
-    getSecurityGroupsPath,
-    getInstanceTypesPath,
+    accessKeyId,
+    secretAccessKey,
     externalId,
     accountId,
     hasCredentials,
@@ -26,6 +21,7 @@ export default el => {
     createClusterPath,
     signOutPath,
     externalLinkIcon,
+    getInstanceTypesPath,
   } = el.dataset;
 
   return new Vue({
@@ -40,13 +36,11 @@ export default el => {
         signOutPath,
       },
       apiPaths: {
-        getRolesPath,
-        getRegionsPath,
-        getKeyPairsPath,
-        getVpcsPath,
-        getSubnetsPath,
-        getSecurityGroupsPath,
         getInstanceTypesPath,
+      },
+      awsCredentials: {
+        accessKeyId,
+        secretAccessKey,
       },
     }),
     components: {
