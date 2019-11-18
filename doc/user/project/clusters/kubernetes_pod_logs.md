@@ -21,7 +21,9 @@ Everything you need to build, test, deploy, and run your app at scale.
 
 ## Usage
 
-Pod logs can be found in two ways, you must have permission to view logs.
+To access pod logs, you must have the right [permissions](../../permissions.md#project-members-permissions).
+
+You can access them in two ways.
 
 ### From the project sidebar
 
