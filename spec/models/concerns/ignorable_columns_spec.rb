@@ -32,21 +32,53 @@ describe IgnorableColumns do
   end
 
   describe '.ignored_columns_details' do
-    it 'stores removal information' do
-      subject.ignore_column(:name, remove_after: '2019-12-01', remove_with: '12.6')
+    shared_examples_for 'storing removal information' do
+      it 'storing removal information' do
+        subject.ignore_column(columns, remove_after: '2019-12-01', remove_with: '12.6')
 
-      expect(subject.ignored_columns_details[:name]).to eq(remove_after: '2019-12-01', remove_with: '12.6')
+        [columns].flatten.each do |column|
+          expect(subject.ignored_columns_details[column].remove_after).to eq(Date.parse('2019-12-01'))
+          expect(subject.ignored_columns_details[column].remove_with).to eq('12.6')
+        end
+      end
     end
 
-    it 'stores removal information (array version)' do
-      subject.ignore_column(%i[name created_at], remove_after: '2019-12-01', remove_with: '12.6')
+    context 'with single column' do
+      let(:columns) { :name }
+      it_behaves_like 'storing removal information'
+    end
 
-      expect(subject.ignored_columns_details[:name]).to eq(remove_after: '2019-12-01', remove_with: '12.6')
-      expect(subject.ignored_columns_details[:created_at]).to eq(remove_after: '2019-12-01', remove_with: '12.6')
+    context 'with array column' do
+      let(:columns) { %i[name created_at] }
+      it_behaves_like 'storing removal information'
     end
 
     it 'defaults to empty Hash' do
       expect(subject.ignored_columns_details).to eq({})
+    end
+  end
+
+  describe IgnorableColumns::ColumnIgnore do
+    subject { described_class.new(remove_after, remove_with) }
+
+    let(:remove_with) { double }
+
+    describe '#safe_to_remove?' do
+      context 'after remove_after date has passed' do
+        let(:remove_after) { Date.parse('2019-01-10') }
+
+        it 'returns true (safe to remove)' do
+          expect(subject.safe_to_remove?).to be_truthy
+        end
+      end
+
+      context 'before remove_after date has passed' do
+        let(:remove_after) { Date.today }
+
+        it 'returns false (not safe to remove)' do
+          expect(subject.safe_to_remove?).to be_falsey
+        end
+      end
     end
   end
 end
