@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedClusterApplications, :migration, schema: 2019_11_11_115431 do
+describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedClusterApplications, :migration, schema: 2019_11_15_121407 do
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
   let(:services) { table(:services) }
@@ -46,7 +46,7 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
   end
 
   describe '#perform' do
-    shared_examples 'skip not a prometheus services' do
+    shared_examples 'skips non prometheus services' do
       let(:other_type) { 'SomeOtherService' }
 
       before do
@@ -58,7 +58,7 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
       end
     end
 
-    shared_examples 'skip configured manually prometheus services' do
+    shared_examples 'skips configured manually prometheus services' do
       let(:properties) { '{"api_url":"http://test.dev","manual_configuration":"1"}' }
 
       before do
@@ -140,8 +140,8 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
         clusters_applications_prometheus.create(cluster_id: cluster.id, status: 3, version: '123')
       end
 
-      it_behaves_like 'skip configured manually prometheus services'
-      it_behaves_like 'skip not a prometheus services'
+      it_behaves_like 'skips configured manually prometheus services'
+      it_behaves_like 'skips not a prometheus services'
       include_context 'prometheus integration services exist'
       include_context 'prometheus integration services do not exist'
 
@@ -170,8 +170,8 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
         clusters_applications_prometheus.create(cluster_id: cluster.id, status: 3, version: '123')
       end
 
-      it_behaves_like 'skip configured manually prometheus services'
-      it_behaves_like 'skip not a prometheus services'
+      it_behaves_like 'skips configured manually prometheus services'
+      it_behaves_like 'skips not a prometheus services'
       include_context 'prometheus integration services exist'
       include_context 'prometheus integration services do not exist'
 
@@ -205,8 +205,8 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
         clusters_applications_prometheus.create(cluster_id: group_cluster.id, status: 3, version: '123')
       end
 
-      it_behaves_like 'skip configured manually prometheus services'
-      it_behaves_like 'skip not a prometheus services'
+      it_behaves_like 'skips configured manually prometheus services'
+      it_behaves_like 'skips not a prometheus services'
       include_context 'prometheus integration services exist'
       include_context 'prometheus integration services do not exist'
 
