@@ -31,4 +31,22 @@ describe IgnorableColumns do
     expect { subject.ignore_columns(:name, remove_after: '2019-12-01', remove_with: nil) }.to raise_error(ArgumentError, /Please indicate/)
   end
 
+  describe '.ignored_columns_details' do
+    it 'stores removal information' do
+      subject.ignore_column(:name, remove_after: '2019-12-01', remove_with: '12.6')
+
+      expect(subject.ignored_columns_details[:name]).to eq(remove_after: '2019-12-01', remove_with: '12.6')
+    end
+
+    it 'stores removal information (array version)' do
+      subject.ignore_column(%i[name created_at], remove_after: '2019-12-01', remove_with: '12.6')
+
+      expect(subject.ignored_columns_details[:name]).to eq(remove_after: '2019-12-01', remove_with: '12.6')
+      expect(subject.ignored_columns_details[:created_at]).to eq(remove_after: '2019-12-01', remove_with: '12.6')
+    end
+
+    it 'defaults to empty Hash' do
+      expect(subject.ignored_columns_details).to eq({})
+    end
+  end
 end
