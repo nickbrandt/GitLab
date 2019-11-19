@@ -16,25 +16,21 @@ retry gem install knapsack --no-document
 cp config/gitlab.yml.example config/gitlab.yml
 sed -i 's/bin_path: \/usr\/bin\/git/bin_path: \/usr\/local\/bin\/git/' config/gitlab.yml
 
-export GITLAB_DATABASE='postgresql'
+cp config/database.yml.postgresql config/database.yml
 
-cp config/database.yml.$GITLAB_DATABASE config/database.yml
-
-if [ -f config/database_geo.yml.$GITLAB_DATABASE ]; then
-  cp config/database_geo.yml.$GITLAB_DATABASE config/database_geo.yml
+if [ -f config/database_geo.yml.postgresql ]; then
+  cp config/database_geo.yml.postgresql config/database_geo.yml
 fi
 
 # Set user to a non-superuser to ensure we test permissions
 sed -i 's/username: root/username: gitlab/g' config/database.yml
 
-if [ "$GITLAB_DATABASE" = 'postgresql' ]; then
-  sed -i 's/localhost/postgres/g' config/database.yml
-  sed -i 's/username: git/username: postgres/g' config/database.yml
+sed -i 's/localhost/postgres/g' config/database.yml
+sed -i 's/username: git/username: postgres/g' config/database.yml
 
-  if [ -f config/database_geo.yml ]; then
-    sed -i 's/localhost/postgres/g' config/database_geo.yml
-    sed -i 's/username: git/username: postgres/g' config/database_geo.yml
-  fi
+if [ -f config/database_geo.yml ]; then
+  sed -i 's/localhost/postgres/g' config/database_geo.yml
+  sed -i 's/username: git/username: postgres/g' config/database_geo.yml
 fi
 
 cp config/resque.yml.example config/resque.yml

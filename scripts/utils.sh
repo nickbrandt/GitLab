@@ -14,9 +14,7 @@ function retry() {
 }
 
 function setup_db_user_only() {
-    if [ "$GITLAB_DATABASE" = "postgresql" ]; then
-        source scripts/create_postgres_user.sh
-    fi
+    source scripts/create_postgres_user.sh
 }
 
 function setup_db() {
