@@ -45,7 +45,7 @@ describe Projects::Security::LicensesController do
             expect(json_response['licenses'].length).to eq(4)
             expect(json_response['licenses'][0]).to include({
               'id' => nil,
-              'spdx_identifier' => nil,
+              'spdx_identifier' => 'Apache-2.0',
               'classification' => 'unclassified',
               'name' => 'Apache 2.0',
               'url' => 'http://www.apache.org/licenses/LICENSE-2.0.txt',
