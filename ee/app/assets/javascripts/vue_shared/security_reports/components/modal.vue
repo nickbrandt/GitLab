@@ -199,6 +199,7 @@ export default {
     id="modal-mrwidget-security-issue"
     :header-title-text="modal.title"
     :class="{ 'modal-hide-footer': !shouldRenderFooterSection }"
+    data-qa-selector="vulnerability_modal_content"
     class="modal-security-report-dast"
   >
     <slot>

@@ -9,6 +9,7 @@ module QA
       let(:dependency_scan_vuln_count) { 4 }
       let(:container_scan_vuln_count) { 8 }
       let(:dast_vuln_count) { 4 }
+      let(:vuln_name) { "Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js" }
 
       after do
         Service::DockerRun::GitlabRunner.new(@executor).remove!
@@ -80,9 +81,20 @@ module QA
         end
       end
 
+      it 'can dismiss a vulnerability with a reason' do
+        dismiss_reason = "Vulnerability not applicable"
+
+        Page::MergeRequest::Show.perform do |merge_request|
+          vuln_name = "Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js"
+          expect(merge_request).to have_vulnerability_report(timeout: 60)
+          merge_request.dismiss_vulnerability_with_reason(vuln_name, dismiss_reason)
+          merge_request.click_vulnerability(vuln_name)
+          expect(merge_request).to have_opened_dismissed_vulnerability(dismiss_reason)
+        end
+      end
+
       it 'can create an auto-remediation MR' do
         Page::MergeRequest::Show.perform do |mergerequest|
-          vuln_name = "Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js"
           expect(mergerequest).to have_vulnerability_report(timeout: 60)
           # Context changes as resolve method created new MR
           mergerequest.resolve_vulnerability_with_mr vuln_name

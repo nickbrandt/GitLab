@@ -65,6 +65,7 @@ export default {
       :disabled="disabled"
       :title="s__('vulnerability|Add comment & dismiss')"
       variant="close"
+      data-qa-selector="dismiss_with_comment_button"
       class="js-dismiss-with-comment "
       @click="$emit('openDismissalCommentBox')"
     >

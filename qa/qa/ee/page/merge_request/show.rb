@@ -59,8 +59,28 @@ module QA
                 element :approvals_summary_content
               end
 
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/modal.vue' do
+                element :vulnerability_modal_content
+              end
+
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/event_item.vue' do
+                element :event_item_content
+              end
+
               view 'ee/app/assets/javascripts/vue_shared/security_reports/components/modal_footer.vue' do
                 element :resolve_split_button
+              end
+
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/dismiss_button.vue' do
+                element :dismiss_with_comment_button
+              end
+
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/dismissal_comment_box_toggle.vue' do
+                element :dismiss_comment_field
+              end
+
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/dismissal_comment_modal_footer.vue' do
+                element :add_and_dismiss_button
               end
             end
           end
@@ -140,13 +160,25 @@ module QA
 
           def expand_vulnerability_report
             within_element :vulnerability_report_grouped do
-              click_element :expand_report_button
+              click_element :expand_report_button unless has_content? 'Collapse'
             end
           end
 
           def click_vulnerability(name)
             within_element :vulnerability_report_grouped do
               click_on name
+            end
+          end
+
+          def dismiss_vulnerability_with_reason(name, reason)
+            expand_vulnerability_report
+            click_vulnerability(name)
+            click_element :dismiss_with_comment_button
+            find_element(:dismiss_comment_field).fill_in with: reason
+            click_element :add_and_dismiss_button
+
+            wait(reload: false) do
+              has_no_element?(:vulnerability_modal_content)
             end
           end
 
@@ -189,6 +221,18 @@ module QA
 
           def has_dast_vulnerability_count_of?(expected)
             find_element(:dast_scan_report).has_content?(/DAST detected #{expected}( new)? vulnerabilit/)
+          end
+
+          def has_opened_dismissed_vulnerability?(reason = nil)
+            within_element(:vulnerability_modal_content) do
+              dismissal_found = has_element?(:event_item_content, text: /Dismissed on pipeline #\d+/)
+
+              if dismissal_found && reason
+                dismissal_found = has_element?(:event_item_content, text: reason)
+              end
+
+              dismissal_found
+            end
           end
 
           def num_approvals_required
