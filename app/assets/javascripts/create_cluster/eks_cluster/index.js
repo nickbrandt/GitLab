@@ -14,6 +14,7 @@ export default el => {
     createRoleArnHelpPath,
     accessKeyId,
     secretAccessKey,
+    sessionToken,
     externalId,
     accountId,
     hasCredentials,
@@ -41,6 +42,7 @@ export default el => {
       awsCredentials: {
         accessKeyId,
         secretAccessKey,
+        sessionToken,
       },
     }),
     components: {
