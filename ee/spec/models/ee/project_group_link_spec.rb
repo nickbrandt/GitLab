@@ -9,6 +9,10 @@ describe ProjectGroupLink do
     let(:user) { create(:user) }
     let!(:project_group_link) { create(:project_group_link, project: project, group: group) }
 
+    before do
+      project.add_developer(user)
+    end
+
     it 'removes related protected environment deploy access levels' do
       params = attributes_for(:protected_environment,
                               deploy_access_levels_attributes: [{ group_id: group.id }, { user_id: user.id }])
