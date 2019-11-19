@@ -16,7 +16,7 @@ module QA
           end
 
           def fabricate!
-            QA::Page::Main::Menu.perform(&:click_admin_area)
+            QA::Page::Main::Menu.perform(&:go_to_admin_area)
             QA::Page::Admin::Menu.perform(&:go_to_integration_settings)
             QA::EE::Page::Admin::Settings::Integration.perform do |integration|
               integration.expand_elasticsearch do |es|

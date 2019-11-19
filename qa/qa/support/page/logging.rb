@@ -111,10 +111,10 @@ module QA
           found
         end
 
-        def has_text?(text)
+        def has_text?(text, **kwargs)
           found = super
 
-          log(%Q{has_text?('#{text}') returned #{found}})
+          log(%Q{has_text?('#{text}', wait: #{kwargs[:wait] || Capybara.default_max_wait_time}) returned #{found}})
 
           found
         end
