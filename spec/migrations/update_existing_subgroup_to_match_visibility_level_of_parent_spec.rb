@@ -16,6 +16,16 @@ describe UpdateExistingSubgroupToMatchVisibilityLevelOfParent, :migration do
 
     it 'updates sub-sub groups' do
       parent = create_namespace('parent', Gitlab::VisibilityLevel::PRIVATE)
+      middle_group = create_namespace('middle', Gitlab::VisibilityLevel::PRIVATE, parent_id: parent.id)
+      child = create_namespace('child', Gitlab::VisibilityLevel::PUBLIC, parent_id: middle_group.id)
+
+      migrate!
+
+      expect(child.reload.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
+    end
+
+    it 'updates sub-sub groups and sub-group' do
+      parent = create_namespace('parent', Gitlab::VisibilityLevel::PRIVATE)
       middle_group = create_namespace('middle', Gitlab::VisibilityLevel::INTERNAL, parent_id: parent.id)
       child = create_namespace('child', Gitlab::VisibilityLevel::PUBLIC, parent_id: middle_group.id)
 
