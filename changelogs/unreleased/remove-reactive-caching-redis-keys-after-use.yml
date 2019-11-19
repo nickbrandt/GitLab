@@ -1,5 +1,0 @@
----
-title: remove-reactive-caching-redis-keys-after-use
-merge_request: 20111
-author:
-type: performance
