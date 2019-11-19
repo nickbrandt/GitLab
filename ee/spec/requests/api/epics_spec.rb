@@ -294,6 +294,32 @@ describe API::Epics do
         expect_paginated_array_response(epic.id)
       end
 
+      context "#to_reference" do
+        it 'exposes reference path' do
+          get api(url)
+
+          expect(json_response.first['references']['short']).to eq("&#{epic2.iid}")
+          expect(json_response.first['references']['relative']).to eq("&#{epic2.iid}")
+          expect(json_response.first['references']['full']).to eq("#{epic2.group.path}&#{epic2.iid}")
+        end
+
+        context 'referencing from parent group' do
+          let(:parent_group) { create(:group) }
+
+          before do
+            group.update(parent_id: parent_group.id)
+          end
+
+          it 'exposes full reference path' do
+            get api("/groups/#{parent_group.path}/epics")
+
+            expect(json_response.first['references']['short']).to eq("&#{epic2.iid}")
+            expect(json_response.first['references']['relative']).to eq("#{parent_group.path}/#{epic2.group.path}&#{epic2.iid}")
+            expect(json_response.first['references']['full']).to eq("#{parent_group.path}/#{epic2.group.path}&#{epic2.iid}")
+          end
+        end
+      end
+
       it_behaves_like 'can admin epics'
     end
 
@@ -435,6 +461,14 @@ describe API::Epics do
 
         expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
         expect(json_response['closed_at']).to be_present
+      end
+
+      it 'exposes full reference path' do
+        get api(url)
+
+        expect(json_response['references']['short']).to eq("&#{epic.iid}")
+        expect(json_response['references']['relative']).to eq("&#{epic.iid}")
+        expect(json_response['references']['full']).to eq("#{epic.group.path}&#{epic.iid}")
       end
 
       it_behaves_like 'can admin epics'
