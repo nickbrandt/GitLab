@@ -147,7 +147,7 @@ class Clusters::ClustersController < Clusters::BaseController
   def authorize_aws_role
     response = Clusters::Aws::AuthorizeRoleService.new(
       current_user,
-      params: create_role_params
+      params: aws_role_params
     ).execute
 
     render json: response.body, status: response.status
@@ -262,7 +262,7 @@ class Clusters::ClustersController < Clusters::BaseController
       )
   end
 
-  def create_role_params
+  def aws_role_params
     params.require(:cluster).permit(:role_arn, :role_external_id)
   end
 

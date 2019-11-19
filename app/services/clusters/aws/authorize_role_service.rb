@@ -20,7 +20,7 @@ module Clusters
       end
 
       def execute
-        @role = create_role!
+        @role = create_or_update_role!
 
         Response.new(:ok, credentials)
       rescue *ERRORS
@@ -31,8 +31,14 @@ module Clusters
 
       attr_reader :role, :params
 
-      def create_role!
-        user.create_aws_role!(params)
+      def create_or_update_role!
+        if role = user.aws_role
+          role.update!(params)
+
+          role
+        else
+          user.create_aws_role!(params)
+        end
       end
 
       def credentials

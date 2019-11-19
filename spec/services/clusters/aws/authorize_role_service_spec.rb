@@ -25,12 +25,26 @@ describe Clusters::Aws::AuthorizeRoleService do
       .with(instance_of(Aws::Role)).and_return(credentials_service)
   end
 
-  it 'creates an Aws::Role record and returns a set of credentials' do
-    expect(user).to receive(:create_aws_role!)
-      .with(params).and_call_original
+  context 'role does not exist' do
+    it 'creates an Aws::Role record and returns a set of credentials' do
+      expect(user).to receive(:create_aws_role!)
+        .with(params).and_call_original
 
-    expect(subject.status).to eq(:ok)
-    expect(subject.body).to eq(credentials)
+      expect(subject.status).to eq(:ok)
+      expect(subject.body).to eq(credentials)
+    end
+  end
+
+  context 'role already exists' do
+    let(:role) { create(:aws_role, user: user) }
+
+    it 'updates the existing Aws::Role record and returns a set of credentials' do
+      expect(role).to receive(:update!)
+        .with(params).and_call_original
+
+      expect(subject.status).to eq(:ok)
+      expect(subject.body).to eq(credentials)
+    end
   end
 
   context 'errors' do
