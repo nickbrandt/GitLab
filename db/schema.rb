@@ -2603,7 +2603,7 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
     t.boolean "emails_disabled"
     t.integer "max_pages_size"
     t.integer "max_artifacts_size"
-    t.boolean "mentionings_disabled"
+    t.boolean "mentions_disabled"
     t.index ["created_at"], name: "index_namespaces_on_created_at"
     t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)"
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id"

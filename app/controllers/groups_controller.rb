@@ -181,7 +181,7 @@ class GroupsController < Groups::ApplicationController
       :avatar,
       :description,
       :emails_disabled,
-      :mentionings_disabled,
+      :mentions_disabled,
       :lfs_enabled,
       :name,
       :path,

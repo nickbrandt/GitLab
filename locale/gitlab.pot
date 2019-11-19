@@ -8860,7 +8860,7 @@ msgstr ""
 msgid "GroupSettings|Disable email notifications"
 msgstr ""
 
-msgid "GroupSettings|Disable group mentionings"
+msgid "GroupSettings|Disable group mentions"
 msgstr ""
 
 msgid "GroupSettings|If the parent group's visibility is lower than the group current visibility, visibility levels for subgroups and projects will be changed to match the new parent group's visibility."

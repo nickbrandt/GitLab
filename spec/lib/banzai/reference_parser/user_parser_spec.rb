@@ -30,8 +30,8 @@ describe Banzai::ReferenceParser::UserParser do
             expect(subject.referenced_by([link])).to eq([user])
           end
 
-          it 'returns an empty Array when the group has mentionings disabled' do
-            group.update!(mentionings_disabled: true)
+          it 'returns an empty Array when the group has mentions disabled' do
+            group.update!(mentions_disabled: true)
 
             expect(subject.referenced_by([link])).to eq([])
           end

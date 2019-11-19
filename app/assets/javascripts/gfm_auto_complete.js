@@ -193,7 +193,7 @@ class GfmAutoComplete {
               return m;
             }
             title = m.name;
-            if (m.count && !m.mentioningsDisabled) {
+            if (m.count && !m.mentionsDisabled) {
               title += ` (${m.count})`;
             }
 
@@ -204,7 +204,7 @@ class GfmAutoComplete {
             const rectAvatarClass = m.type === GROUP_TYPE ? 'rect-avatar' : '';
             const imgAvatar = `<img src="${m.avatar_url}" alt="${m.username}" class="avatar ${rectAvatarClass} avatar-inline center s26"/>`;
             const txtAvatar = `<div class="avatar ${rectAvatarClass} center avatar-inline s26">${autoCompleteAvatar}</div>`;
-            const avatarIcon = m.mentioningsDisabled ? '<i class="fa fa-bell-slash"></i>' : '';
+            const avatarIcon = m.mentionsDisabled ? '<i class="fa fa-bell-slash"></i>' : '';
 
             return {
               username: m.username,
