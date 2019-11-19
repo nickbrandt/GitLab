@@ -9,9 +9,8 @@ module Notes
 
       note.assign_attributes(params.merge(updated_by: current_user))
 
-      note_saved = note.with_transaction_returning_status do
-        note.save
-        note.store_mentions!
+      note.with_transaction_returning_status do
+        note.save && note.store_mentions!
       end
 
       only_commands = false
@@ -25,9 +24,11 @@ module Notes
         note.note = content
       end
 
-      if !only_commands && note_saved
+      unless only_commands
         note.create_new_cross_references!(current_user)
+
         update_todos(note, old_mentioned_users)
+
         update_suggestions(note)
       end
 

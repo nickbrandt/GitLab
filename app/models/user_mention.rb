@@ -4,7 +4,7 @@ class UserMention < ApplicationRecord
   self.abstract_class = true
 
   def has_mentions?
-    mentioned_ids_present? && mentions_exist?
+    mentioned_users_ids.present? || mentioned_groups_ids.present? || mentioned_projects_ids.present?
   end
 
   private
@@ -23,9 +23,5 @@ class UserMention < ApplicationRecord
 
   def mentioned_ids_present?
     mentioned_users_ids.present? || mentioned_groups_ids.present? || mentioned_projects_ids.present?
-  end
-
-  def mentions_exist?
-    (mentioned_users.exists? || mentioned_groups.exists? || mentioned_projects.exists?)
   end
 end

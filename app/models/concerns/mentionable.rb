@@ -30,10 +30,9 @@ module Mentionable
   end
 
   # User mention that is parsed from model description rather then its related notes.
-  # Models that have a descriprion attribute like Issue, MergeEequest, Epic, Snippet may have such a user mention.
+  # Models that have a descriprion attribute like Issue, MergeRequest, Epic, Snippet may have such a user mention.
   # Other mentionable models like Commit, DesignManagement::Design, will never have such record as those do not have
   # a description attribute.
-
   def model_user_mention
     user_mentions.where(note_id: nil).first_or_initialize
   end
@@ -90,7 +89,12 @@ module Mentionable
   end
 
   def store_mentions!
-    return unless can_store_mentions?
+    # if store_mentioned_users_to_db feature flag is not enabled then consider storing operation as succeeded
+    # because we wrap this method in transaction with with_transaction_returning_status, and we need the status to be
+    # successfull if mentionable.save is successfull.
+    #
+    # This line will get removed when we remove the feature flag.
+    return true unless store_mentioned_users_to_db_enabled?
 
     refs = all_references(self.author)
 
@@ -104,6 +108,8 @@ module Mentionable
     elsif mention.persisted?
       mention.destroy!
     end
+
+    true
   end
 
   def referenced_users
@@ -218,10 +224,10 @@ module Mentionable
     {}
   end
 
-  def can_store_mentions?
-    store_mentioned_users_to_db_enabled? && respond_to?(:user_mentions)
-  end
-
+  # We need this method to be checking that store_mentioned_users_to_db feature flag is enabled at the group level
+  # and not the project level as epics are defined at group level and we want to have epics store user mentions as well
+  # for the test period.
+  # During the test period the flag should be enabled at the group level.
   def store_mentioned_users_to_db_enabled?
     return Feature.enabled?(:store_mentioned_users_to_db, self.project&.group) if self.respond_to?(:project)
     return Feature.enabled?(:store_mentioned_users_to_db, self.group) if self.respond_to?(:group)

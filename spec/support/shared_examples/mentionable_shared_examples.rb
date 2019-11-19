@@ -237,7 +237,7 @@ shared_examples_for 'mentions in descritpion' do |mentionable_type|
       it 'stores mentions' do
         expect(mentionable.user_mentions.count).to eq 1
         expect(mentionable.referenced_users).to eq [user]
-        expect(mentionable.referenced_projects).to eq [mentionable.project].compact
+        expect(mentionable.referenced_projects).to eq [mentionable.project].compact # epic.project is nil, and we want empty []
         expect(mentionable.referenced_groups).to eq [group]
       end
     end
@@ -260,7 +260,7 @@ shared_examples_for 'mentions in notes' do |mentionable_type|
     it 'returns all mentionable mentions' do
       expect(mentionable.user_mentions.count).to eq 1
       expect(mentionable.referenced_users).to eq [user]
-      expect(mentionable.referenced_projects).to eq [mentionable.project].compact
+      expect(mentionable.referenced_projects).to eq [mentionable.project].compact # epic.project is nil, and we want empty []
       expect(mentionable.referenced_groups).to eq [group]
     end
   end

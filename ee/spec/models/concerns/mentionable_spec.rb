@@ -19,7 +19,7 @@ describe Note, 'Mentionable' do
     let(:note) { create(:diff_note_on_design, noteable: design, project: design.project, note: note_desc) }
 
     it 'does not save mentions' do
-      expect(note).to receive(:can_store_mentions?).and_return(false)
+      expect(note).to receive(:store_mentioned_users_to_db_enabled?).and_return(false)
       expect(note).not_to receive(:model_user_mention)
 
       note.store_mentions!

@@ -34,11 +34,10 @@ module Notes
       end
 
       note_saved = note.with_transaction_returning_status do
-        note.save
-        note.store_mentions!
+        !only_commands && note.save && note.store_mentions!
       end
 
-      if !only_commands && note_saved
+      if note_saved
         if note.part_of_discussion? && note.discussion.can_convert_to_discussion?
           note.discussion.convert_to_discussion!(save: true)
         end

@@ -561,10 +561,6 @@ class Note < ApplicationRecord
     noteable.user_mentions.where(note: self).first_or_initialize
   end
 
-  def can_store_mentions?
-    store_mentioned_users_to_db_enabled? && noteable.respond_to?(:user_mentions)
-  end
-
   def referenced_users
     User.where(id: model_user_mention.mentioned_users_ids)
   end
