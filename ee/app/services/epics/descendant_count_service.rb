@@ -20,11 +20,15 @@ module Epics
     end
 
     def opened_issues
-      issues_count.fetch('opened', 0)
+      opened_state_id = Issue.available_states[:opened]
+
+      issues_count.fetch(opened_state_id, 0)
     end
 
     def closed_issues
-      issues_count.fetch('closed', 0)
+      closed_state_id = Issue.available_states[:closed]
+
+      issues_count.fetch(closed_state_id, 0)
     end
 
     private

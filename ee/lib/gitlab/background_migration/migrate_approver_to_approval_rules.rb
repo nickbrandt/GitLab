@@ -108,7 +108,7 @@ module Gitlab
         end
 
         def sync_code_owners_with_approvers
-          return if state_id == merged_state_id || state == closed_state_id
+          return if state_id == merged_state_id || state_id == closed_state_id
 
           Gitlab::GitalyClient.allow_n_plus_1_calls do
             gl_merge_request = ::MergeRequest.find(id)
