@@ -1,3 +1,4 @@
+import { securityReportsTypes } from 'ee/vue_shared/security_reports/constants';
 import CEMergeRequestStore from '~/vue_merge_request_widget/stores/mr_widget_store';
 import { mapApprovalsResponse, mapApprovalRulesResponse } from '../mappers';
 import CodeQualityComparisonWorker from '../workers/code_quality_comparison_worker';
@@ -37,6 +38,15 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.initPerformanceReport(data);
     this.licenseManagement = data.license_management;
     this.metricsReportsPath = data.metrics_reports_path;
+
+    const enabledReports = data.enabled_reports || {};
+    this.enabledSecurityReports = {
+      [securityReportsTypes.SAST]: Boolean(enabledReports.sast),
+      [securityReportsTypes.CONTAINER_SCANNING]: Boolean(enabledReports.container_scanning),
+      [securityReportsTypes.DAST]: Boolean(enabledReports.dast),
+      [securityReportsTypes.DEPENDENCY_SCANNING]: Boolean(enabledReports.dependency_scanning),
+      [securityReportsTypes.LICENSE_MANAGEMENT]: Boolean(enabledReports.license_management),
+    };
 
     this.blockingMergeRequests = data.blocking_merge_requests;
 

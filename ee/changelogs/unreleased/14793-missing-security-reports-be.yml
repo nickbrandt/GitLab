@@ -1,0 +1,5 @@
+---
+title: Abort rendering of security reports that aren't enabled
+merge_request: 20381
+author:
+type: fixed

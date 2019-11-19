@@ -275,6 +275,7 @@ export default {
         :head-blob-path="mr.headBlobPath"
         :source-branch="mr.sourceBranch"
         :base-blob-path="mr.baseBlobPath"
+        :enabled-reports="mr.enabledSecurityReports"
         :sast-head-path="mr.sast.head_path"
         :sast-base-path="mr.sast.base_path"
         :sast-help-path="mr.sastHelp"

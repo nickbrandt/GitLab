@@ -134,6 +134,16 @@ module EE
       end
     end
 
+    def enabled_reports
+      {
+        sast: !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(:sast),
+        container_scanning: !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(:container_scanning),
+        dast: !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(:dast),
+        dependency_scanning: !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(:dependency_scanning),
+        license_management: !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(:license_management)
+      }
+    end
+
     def has_dependency_scanning_reports?
       !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.dependency_list_reports))
     end
