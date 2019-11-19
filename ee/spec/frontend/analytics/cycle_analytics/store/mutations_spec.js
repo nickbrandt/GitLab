@@ -16,6 +16,7 @@ import {
   startDate,
   endDate,
   customizableStagesAndEvents,
+  tasksByTypeData,
 } from '../mock_data';
 
 let state = null;
@@ -47,6 +48,8 @@ describe('Cycle analytics mutations', () => {
     ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'customStageFormEvents'} | ${[]}
     ${types.REQUEST_CREATE_CUSTOM_STAGE}           | ${'isSavingCustomStage'}   | ${true}
     ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}   | ${false}
+    ${types.REQUEST_TASKS_BY_TYPE_DATA}            | ${'isLoadingChartData'}    | ${true}
+    ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingChartData'}    | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 
@@ -97,6 +100,19 @@ describe('Cycle analytics mutations', () => {
       mutations[types.RECEIVE_STAGE_DATA_SUCCESS](state);
 
       expect(state.isEmptyStage).toEqual(true);
+    });
+  });
+
+  describe.each`
+    mutation                            | value
+    ${types.REQUEST_GROUP_LABELS}       | ${[]}
+    ${types.RECEIVE_GROUP_LABELS_ERROR} | ${[]}
+  `('$mutation', ({ mutation, value }) => {
+    it(`will set tasksByType.labelIds to ${value}`, () => {
+      state = { tasksByType: {} };
+      mutations[mutation](state);
+
+      expect(state.tasksByType.labelIds).toEqual(value);
     });
   });
 
@@ -191,6 +207,21 @@ describe('Cycle analytics mutations', () => {
 
       expect(state.isLoading).toBe(false);
       expect(state.errorCode).toBe(errorCode);
+    });
+  });
+
+  describe(`${types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS}`, () => {
+    it('sets isLoadingChartData to false', () => {
+      mutations[types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, {});
+
+      expect(state.isLoadingChartData).toEqual(false);
+    });
+
+    it('sets tasksByType.data to the raw returned chart data', () => {
+      state = { tasksByType: { data: null } };
+      mutations[types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, tasksByTypeData);
+
+      expect(state.tasksByType.data).toEqual(tasksByTypeData);
     });
   });
 });

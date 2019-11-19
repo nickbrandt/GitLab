@@ -315,13 +315,18 @@ describe('Cycle Analytics component', () => {
         fetchGroupLabels: {
           status: defaultStatus,
           endpoint: `/groups/${groupId}/-/labels`,
-          response: { ...mockData.groupLabels },
+          response: [...mockData.groupLabels],
         },
         fetchStageData: {
           status: defaultStatus,
           // default first stage is issue
           endpoint: '/groups/foo/-/cycle_analytics/events/issue.json',
           response: { ...mockData.issueEvents },
+        },
+        fetchTasksByTypeData: {
+          status: defaultStatus,
+          endpoint: '/-/analytics/type_of_work/tasks_by_type',
+          response: { ...mockData.tasksByTypeData },
         },
         ...overrides,
       };
@@ -344,6 +349,13 @@ describe('Cycle Analytics component', () => {
     });
 
     const findFlashError = () => document.querySelector('.flash-container .flash-text');
+    const selectGroupAndFindError = msg => {
+      wrapper.vm.onGroupSelect(mockData.group);
+
+      return waitForPromises().then(() => {
+        expect(findFlashError().innerText.trim()).toEqual(msg);
+      });
+    };
 
     it('will display an error if the fetchSummaryData request fails', () => {
       expect(findFlashError()).toBeNull();
@@ -356,13 +368,9 @@ describe('Cycle Analytics component', () => {
         },
       });
 
-      wrapper.vm.onGroupSelect(mockData.group);
-
-      return waitForPromises().then(() => {
-        expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error while fetching cycle analytics summary data.',
-        );
-      });
+      return selectGroupAndFindError(
+        'There was an error while fetching cycle analytics summary data.',
+      );
     });
 
     it('will display an error if the fetchGroupLabels request fails', () => {
@@ -375,13 +383,9 @@ describe('Cycle Analytics component', () => {
         },
       });
 
-      wrapper.vm.onGroupSelect(mockData.group);
-
-      return waitForPromises().then(() => {
-        expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error fetching label data for the selected group',
-        );
-      });
+      return selectGroupAndFindError(
+        'There was an error fetching label data for the selected group',
+      );
     });
 
     it('will display an error if the fetchGroupStagesAndEvents request fails', () => {
@@ -395,13 +399,7 @@ describe('Cycle Analytics component', () => {
         },
       });
 
-      wrapper.vm.onGroupSelect(mockData.group);
-
-      return waitForPromises().then(() => {
-        expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error fetching cycle analytics stages.',
-        );
-      });
+      return selectGroupAndFindError('There was an error fetching cycle analytics stages.');
     });
 
     it('will display an error if the fetchStageData request fails', () => {
@@ -415,13 +413,21 @@ describe('Cycle Analytics component', () => {
         },
       });
 
-      wrapper.vm.onGroupSelect(mockData.group);
+      return selectGroupAndFindError('There was an error fetching data for the selected stage');
+    });
 
-      return waitForPromises().then(() => {
-        expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error fetching data for the selected stage',
-        );
+    it('will display an error if the fetchTasksByTypeData request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({
+        fetchTasksByTypeData: {
+          endPoint: '/-/analytics/type_of_work/tasks_by_type',
+          status: httpStatusCodes.BAD_REQUEST,
+          response: { response: { status: httpStatusCodes.BAD_REQUEST } },
+        },
       });
+
+      return selectGroupAndFindError('There was an error fetching data for the chart');
     });
   });
 });

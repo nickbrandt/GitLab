@@ -103,3 +103,5 @@ export const customStageEvents = [
   labelStartEvent,
   labelStopEvent,
 ];
+
+export const tasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_by_type.json');

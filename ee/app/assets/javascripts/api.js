@@ -18,6 +18,7 @@ export default {
   groupPackagesPath: '/api/:version/groups/:id/packages',
   projectPackagesPath: '/api/:version/projects/:id/packages',
   projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
+  cycleAnalyticsTasksByTypePath: '/-/analytics/type_of_work/tasks_by_type',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -134,5 +135,10 @@ export default {
   deleteProjectPackage(projectId, packageId) {
     const url = this.buildProjectPackageUrl(projectId, packageId);
     return axios.delete(url);
+  },
+
+  cycleAnalyticsTasksByType(params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsTasksByTypePath);
+    return axios.get(url, { params });
   },
 };

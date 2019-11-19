@@ -47,6 +47,7 @@ export default {
     ...mapState([
       'isLoading',
       'isLoadingStage',
+      'isLoadingChartData',
       'isEmptyStage',
       'isAddingCustomStage',
       'isSavingCustomStage',
@@ -61,6 +62,7 @@ export default {
       'errorCode',
       'startDate',
       'endDate',
+      'tasksByType',
     ]),
     ...mapGetters(['currentStage', 'defaultStage', 'hasNoAccessError', 'currentGroupPath']),
     shouldRenderEmptyState() {
@@ -101,6 +103,7 @@ export default {
       'showCustomStageForm',
       'setDateRange',
       'createCustomStage',
+      'fetchTasksByTypeData',
     ]),
     onGroupSelect(group) {
       this.setCycleAnalyticsDataEndpoint(group.full_path);

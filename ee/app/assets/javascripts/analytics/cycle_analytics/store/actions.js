@@ -1,7 +1,7 @@
 import axios from '~/lib/utils/axios_utils';
 import createFlash, { hideFlash } from '~/flash';
 import { __ } from '~/locale';
-import Api from '~/api';
+import Api from 'ee/api';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { nestQueryStringKeys } from '../utils';
@@ -70,10 +70,12 @@ export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
 
 export const fetchCycleAnalyticsData = ({ dispatch }) => {
   removeError();
+
   return dispatch('requestCycleAnalyticsData')
-    .then(() => dispatch('fetchGroupLabels')) // fetch group label data
-    .then(() => dispatch('fetchGroupStagesAndEvents')) // fetch stage data
-    .then(() => dispatch('fetchSummaryData')) // fetch summary data and stage medians
+    .then(() => dispatch('fetchGroupLabels'))
+    .then(() => dispatch('fetchGroupStagesAndEvents'))
+    .then(() => dispatch('fetchSummaryData'))
+    .then(() => dispatch('fetchTasksByTypeData'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
@@ -191,4 +193,43 @@ export const createCustomStage = ({ dispatch, state }, data) => {
     .post(endpoint, data)
     .then(response => dispatch('receiveCreateCustomStageSuccess', response))
     .catch(error => dispatch('receiveCreateCustomStageError', { error, data }));
+};
+
+export const receiveTasksByTypeDataSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data);
+
+export const receiveTasksByTypeDataError = ({ commit }, error) => {
+  commit(types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR, error);
+  createFlash(__('There was an error fetching data for the chart'));
+};
+export const requestTasksByTypeData = ({ commit }) => commit(types.REQUEST_TASKS_BY_TYPE_DATA);
+
+export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
+  const {
+    currentGroupPath,
+    cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
+  } = getters;
+
+  const {
+    tasksByType: { labelIds, subject },
+  } = state;
+
+  // dont request if we have no labels selected...for now
+  if (labelIds.length) {
+    const params = {
+      group_id: currentGroupPath,
+      created_after,
+      created_before,
+      project_ids,
+      subject,
+      label_ids: labelIds,
+    };
+
+    dispatch('requestTasksByTypeData');
+
+    return Api.cycleAnalyticsTasksByType(params)
+      .then(data => dispatch('receiveTasksByTypeDataSuccess', data))
+      .catch(error => dispatch('receiveTasksByTypeDataError', error));
+  }
+  return Promise.resolve();
 };
