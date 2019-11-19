@@ -86,11 +86,19 @@ module QA
       end
 
       def check_element(name)
-        find_element(name).set(true)
+        retry_until(sleep_interval: 1) do
+          find_element(name).set(true)
+
+          find_element(name).checked?
+        end
       end
 
       def uncheck_element(name)
-        find_element(name).set(false)
+        retry_until(sleep_interval: 1) do
+          find_element(name).set(false)
+
+          !find_element(name).checked?
+        end
       end
 
       # replace with (..., page = self.class)
