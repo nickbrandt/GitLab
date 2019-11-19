@@ -891,36 +891,36 @@ describe Issuable do
 
     describe '#with_release' do
       it 'returns the issues tied a specfic release' do
-        expect(items.with_release('v1.0')).to contain_exactly(issue_1, issue_2, issue_3)
+        expect(items.with_release('v1.0', project.id)).to contain_exactly(issue_1, issue_2, issue_3)
       end
 
       context 'when a release has a milestone with one issue and another one with no issue' do
         it 'returns that one issue' do
-          expect(items.with_release('v2.0')).to contain_exactly(issue_3)
+          expect(items.with_release('v2.0', project.id)).to contain_exactly(issue_3)
         end
 
         context 'when the milestone with no issue is added as a filter' do
           it 'returns an empty list' do
-            expect(items.with_release('v2.0').with_milestone('m3')).to be_empty
+            expect(items.with_release('v2.0', project.id).with_milestone('m3')).to be_empty
           end
         end
 
         context 'when the milestone with the issue is added as a filter' do
           it 'returns this issue' do
-            expect(items.with_release('v2.0').with_milestone('m2')).to contain_exactly(issue_3)
+            expect(items.with_release('v2.0', project.id).with_milestone('m2')).to contain_exactly(issue_3)
           end
         end
       end
 
       context 'when there is no issue under a specific release' do
         it 'returns no issue' do
-          expect(items.with_release('v4.0')).to be_empty
+          expect(items.with_release('v4.0', project.id)).to be_empty
         end
       end
 
       context 'when a non-existent release tag is passed in' do
         it 'returns no issue' do
-          expect(items.with_release('v999.0')).to be_empty
+          expect(items.with_release('v999.0', project.id)).to be_empty
         end
       end
     end

@@ -585,7 +585,7 @@ class IssuableFinder
     elsif filter_by_any_release?
       items.any_release
     else
-      items.with_release(params[:release_tag])
+      items.with_release(params[:release_tag], params[:project_id])
     end
   end
 

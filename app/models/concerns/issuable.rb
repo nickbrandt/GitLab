@@ -101,7 +101,7 @@ module Issuable
     scope :any_milestone, -> { where('milestone_id IS NOT NULL') }
     scope :with_milestone, ->(title) { left_joins_milestones.where(milestones: { title: title }) }
     scope :any_release, -> { joins_milestone_releases }
-    scope :with_release, -> (tag) { joins_milestone_releases.where( milestones: { releases: { tag: tag } } ) }
+    scope :with_release, -> (tag, project_id) { joins_milestone_releases.where( milestones: { releases: { tag: tag, project_id: project_id } } ) }
     scope :opened, -> { with_state(:opened) }
     scope :only_opened, -> { with_state(:opened) }
     scope :closed, -> { with_state(:closed) }
