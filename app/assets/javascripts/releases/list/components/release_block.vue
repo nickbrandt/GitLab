@@ -77,9 +77,7 @@ export default {
       return n__('Milestone', 'Milestones', this.release.milestones.length);
     },
     shouldShowEditButton() {
-      return Boolean(
-        this.glFeatures.releaseEditPage && this.release._links && this.release._links.edit_url,
-      );
+      return Boolean(this.release._links && this.release._links.edit_url);
     },
     shouldShowFooter() {
       return this.glFeatures.releaseIssueSummary;
