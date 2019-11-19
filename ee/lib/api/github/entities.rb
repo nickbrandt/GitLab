@@ -9,7 +9,9 @@ module API
       class Repository < Grape::Entity
         expose :id
         expose :owner do |project, options|
-          { login: project.root_namespace.path }
+          root_namespace = options[:root_namespace] || project.root_namespace
+
+          { login: root_namespace.path }
         end
         expose :name do |project, options|
           ::Gitlab::Jira::Dvcs.encode_project_name(project)

@@ -4,6 +4,10 @@ export const LICENSE_APPROVAL_STATUS = {
   BLACKLISTED: 'blacklisted',
 };
 
+export const VERSION_1_0 = '1.0';
+export const VERSION_1_1 = '1.1';
+export const VERSION_2_0 = '2.0';
+
 export const KNOWN_LICENSES = [
   'AGPL-1.0',
   'AGPL-3.0',

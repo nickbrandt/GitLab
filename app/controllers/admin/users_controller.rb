@@ -58,6 +58,22 @@ class Admin::UsersController < Admin::ApplicationController
     end
   end
 
+  def activate
+    return redirect_back_or_admin_user(notice: _("Error occurred. A blocked user must be unblocked to be activated")) if user.blocked?
+
+    user.activate
+    redirect_back_or_admin_user(notice: _("Successfully activated"))
+  end
+
+  def deactivate
+    return redirect_back_or_admin_user(notice: _("Error occurred. A blocked user cannot be deactivated")) if user.blocked?
+    return redirect_back_or_admin_user(notice: _("Successfully deactivated")) if user.deactivated?
+    return redirect_back_or_admin_user(notice: _("The user you are trying to deactivate has been active in the past %{minimum_inactive_days} days and cannot be deactivated") % { minimum_inactive_days: ::User::MINIMUM_INACTIVE_DAYS }) unless user.can_be_deactivated?
+
+    user.deactivate
+    redirect_back_or_admin_user(notice: _("Successfully deactivated"))
+  end
+
   def block
     if update_user { |user| user.block }
       redirect_back_or_admin_user(notice: _("Successfully blocked"))
@@ -153,7 +169,7 @@ class Admin::UsersController < Admin::ApplicationController
     user.delete_async(deleted_by: current_user, params: params.permit(:hard_delete))
 
     respond_to do |format|
-      format.html { redirect_to admin_users_path, status: 302, notice: _("The user is being deleted.") }
+      format.html { redirect_to admin_users_path, status: :found, notice: _("The user is being deleted.") }
       format.json { head :ok }
     end
   end

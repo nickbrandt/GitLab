@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'doorkeeper access' do
@@ -38,21 +40,35 @@ describe 'doorkeeper access' do
     end
   end
 
-  describe "when user is blocked" do
-    it "returns authorization error" do
-      user.block
+  shared_examples 'forbidden request' do
+    it 'returns 403 response' do
       get api("/user"), params: { access_token: token.token }
 
       expect(response).to have_gitlab_http_status(403)
     end
   end
 
-  describe "when user is ldap_blocked" do
-    it "returns authorization error" do
-      user.ldap_block
-      get api("/user"), params: { access_token: token.token }
-
-      expect(response).to have_gitlab_http_status(403)
+  context "when user is blocked" do
+    before do
+      user.block
     end
+
+    it_behaves_like 'forbidden request'
+  end
+
+  context "when user is ldap_blocked" do
+    before do
+      user.ldap_block
+    end
+
+    it_behaves_like 'forbidden request'
+  end
+
+  context "when user is deactivated" do
+    before do
+      user.deactivate
+    end
+
+    it_behaves_like 'forbidden request'
   end
 end

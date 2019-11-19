@@ -3,17 +3,7 @@
 require 'spec_helper'
 
 shared_examples 'returns recently visited boards' do
-  let(:boards) { create_list(:board, 8, parent: parent) }
-
-  context 'unauthenticated' do
-    it 'returns a 401' do
-      sign_out(user)
-
-      list_boards(recent: true)
-
-      expect(response).to have_gitlab_http_status(401)
-    end
-  end
+  let(:boards) { create_list(:board, 8, resource_parent: parent) }
 
   it 'returns last 4 visited boards' do
     [0, 2, 5, 3, 7, 1].each_with_index do |board_index, i|
@@ -28,7 +18,7 @@ shared_examples 'returns recently visited boards' do
 end
 
 shared_examples 'redirects to last visited board' do
-  let(:boards) { create_list(:board, 3, parent: parent) }
+  let(:boards) { create_list(:board, 3, resource_parent: parent) }
 
   before do
     visit_board(boards[2], Time.now + 1.minute)

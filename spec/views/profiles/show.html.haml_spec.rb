@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'profiles/show' do
@@ -6,6 +8,7 @@ describe 'profiles/show' do
   before do
     assign(:user, user)
     allow(controller).to receive(:current_user).and_return(user)
+    allow(view).to receive(:experiment_enabled?)
   end
 
   context 'when the profile page is opened' do

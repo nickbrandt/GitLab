@@ -13,6 +13,20 @@ describe Projects::CreateService, '#execute' do
     }
   end
 
+  context 'with a template project ID' do
+    before do
+      opts.merge!(
+        template_project_id: 1
+      )
+    end
+
+    it 'creates a project using the template service' do
+      expect(::Projects::CreateFromTemplateService).to receive_message_chain(:new, :execute)
+
+      create_project(user, opts)
+    end
+  end
+
   context 'with a CI/CD only project' do
     before do
       opts.merge!(

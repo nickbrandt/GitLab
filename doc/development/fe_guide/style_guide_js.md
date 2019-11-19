@@ -287,7 +287,7 @@ See [our current .eslintrc](https://gitlab.com/gitlab-org/gitlab/blob/master/.es
 
 #### CSS classes used for JavaScript
 
-1. If the class is being used in Javascript it needs to be prepend with `js-`
+1. If the class is being used in JavaScript it needs to be prepend with `js-`
 
    ```html
    // bad
@@ -581,6 +581,18 @@ Please check this [rules][eslint-plugin-vue-rules] for more documentation.
    <component />
    ```
 
+#### Component usage within templates
+
+1. Prefer a component's kebab-cased name over other styles when using it in a template
+
+   ```javascript
+   // bad
+   <MyComponent />
+
+   // good
+   <my-component />
+   ```
+
 #### Ordering
 
 1. Tag order in `.vue` file
@@ -693,7 +705,7 @@ Useful links:
    $('span').tooltip('_fixTitle');
    ```
 
-### The Javascript/Vue Accord
+### The JavaScript/Vue Accord
 
 The goal of this accord is to make sure we are all on the same page.
 

@@ -2,6 +2,8 @@
 
 module MergeRequests
   class BaseService < ::IssuableBaseService
+    include MergeRequests::AssignsMergeParams
+
     def create_note(merge_request, state = merge_request.state)
       SystemNoteService.change_status(merge_request, merge_request.target_project, current_user, state, nil)
     end
@@ -27,7 +29,32 @@ module MergeRequests
                                  .execute_for_merge_request(merge_request)
     end
 
+    def source_project
+      @source_project ||= merge_request.source_project
+    end
+
+    def target_project
+      @target_project ||= merge_request.target_project
+    end
+
+    # Don't try to print expensive instance variables.
+    def inspect
+      "#<#{self.class} #{merge_request.to_reference(full: true)}>"
+    end
+
     private
+
+    def create(merge_request)
+      self.params = assign_allowed_merge_params(merge_request, params)
+
+      super
+    end
+
+    def update(merge_request)
+      self.params = assign_allowed_merge_params(merge_request, params)
+
+      super
+    end
 
     def handle_wip_event(merge_request)
       if wip_event = params.delete(:wip_event)

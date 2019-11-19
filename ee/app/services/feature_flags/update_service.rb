@@ -9,6 +9,8 @@ module FeatureFlags
     }.freeze
 
     def execute(feature_flag)
+      return error('Access Denied', 403) unless can_update?(feature_flag)
+
       ActiveRecord::Base.transaction do
         feature_flag.assign_attributes(params)
 
@@ -19,7 +21,7 @@ module FeatureFlags
 
           success(feature_flag: feature_flag)
         else
-          error(feature_flag.errors.full_messages)
+          error(feature_flag.errors.full_messages, :bad_request)
         end
       end
     end
@@ -70,6 +72,10 @@ module FeatureFlags
       end.join(' ')
 
       message + '.'
+    end
+
+    def can_update?(feature_flag)
+      Ability.allowed?(current_user, :update_feature_flag, feature_flag)
     end
   end
 end

@@ -50,7 +50,7 @@ project's **Pipelines** page.
 
 This guide assumes that you have:
 
-- A working GitLab instance of version 8.0+r or are using
+- A working GitLab instance of version 8.0+ or are using
   [GitLab.com](https://gitlab.com).
 - A project in GitLab that you would like to use CI for.
 - Maintainer or owner access to the project
@@ -143,7 +143,7 @@ Now if you go to the **Pipelines** page you will see that the pipeline is
 pending.
 
 NOTE: **Note:**
-If you have a [mirrored repository where GitLab pulls from](../../workflow/repository_mirroring.md#pulling-from-a-remote-repository-starter),
+If you have a [mirrored repository where GitLab pulls from](../../user/project/repository/repository_mirroring.md#pulling-from-a-remote-repository-starter),
 you may need to enable pipeline triggering in your project's
 **Settings > Repository > Pull from a remote repository > Trigger pipelines for mirror updates**.
 
@@ -235,7 +235,7 @@ Visit the [examples README][examples] to see a list of examples using GitLab
 CI with various languages.
 
 [runner-install]: https://docs.gitlab.com/runner/install/
-[blog-ci]: https://about.gitlab.com/2015/05/06/why-were-replacing-gitlab-ci-jobs-with-gitlab-ci-dot-yml/
+[blog-ci]: https://about.gitlab.com/blog/2015/05/06/why-were-replacing-gitlab-ci-jobs-with-gitlab-ci-dot-yml/
 [examples]: ../examples/README.md
 [ci]: https://about.gitlab.com/product/continuous-integration/
 [yaml]: ../yaml/README.md

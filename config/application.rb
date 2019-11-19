@@ -22,7 +22,6 @@ module Gitlab
     require_dependency Rails.root.join('lib/gitlab/current_settings')
     require_dependency Rails.root.join('lib/gitlab/middleware/read_only')
     require_dependency Rails.root.join('lib/gitlab/middleware/basic_health_check')
-    require_dependency Rails.root.join('config/light_settings')
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
@@ -61,15 +60,6 @@ module Gitlab
       # Other than Ruby modules we load EE first
       config.paths['lib/tasks'].unshift "#{config.root}/ee/lib/tasks"
       config.paths['app/views'].unshift "#{config.root}/ee/app/views"
-    end
-
-    if LightSettings.com?
-      com_paths = config.eager_load_paths.each_with_object([]) do |path, memo|
-        com_path = config.root.join('com', Pathname.new(path).relative_path_from(config.root))
-        memo << com_path.to_s
-      end
-
-      config.eager_load_paths.push(*com_paths)
     end
 
     # Rake tasks ignore the eager loading settings, so we need to set the
@@ -167,6 +157,8 @@ module Gitlab
     config.assets.paths << "#{config.root}/vendor/assets/fonts"
 
     config.assets.precompile << "print.css"
+    config.assets.precompile << "mailer.css"
+    config.assets.precompile << "mailer_client_specific.css"
     config.assets.precompile << "notify.css"
     config.assets.precompile << "mailers/*.css"
     config.assets.precompile << "page_bundles/ide.css"
@@ -257,15 +249,18 @@ module Gitlab
     end
 
     # Use caching across all environments
+    # Full list of options:
+    # https://api.rubyonrails.org/classes/ActiveSupport/Cache/RedisCacheStore.html#method-c-new
     caching_config_hash = Gitlab::Redis::Cache.params
+    caching_config_hash[:compress] = false
     caching_config_hash[:namespace] = Gitlab::Redis::Cache::CACHE_NAMESPACE
     caching_config_hash[:expires_in] = 2.weeks # Cache should not grow forever
-    if Sidekiq.server? # threaded context
-      caching_config_hash[:pool_size] = Sidekiq.options[:concurrency] + 5
+    if Sidekiq.server? || defined?(::Puma) # threaded context
+      caching_config_hash[:pool_size] = Gitlab::Redis::Cache.pool_size
       caching_config_hash[:pool_timeout] = 1
     end
 
-    config.cache_store = :redis_store, caching_config_hash
+    config.cache_store = :redis_cache_store, caching_config_hash
 
     config.active_job.queue_adapter = :sidekiq
 

@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Ci::Build do
-  set(:group) { create(:group, :access_requestable, plan: :bronze_plan) }
+  set(:group) { create(:group, plan: :bronze_plan) }
   let(:project) { create(:project, :repository, group: group) }
 
   let(:pipeline) do
@@ -14,8 +14,6 @@ describe Ci::Build do
   end
 
   let(:job) { create(:ci_build, pipeline: pipeline) }
-
-  it { is_expected.to have_many(:sourced_pipelines) }
 
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
@@ -50,7 +48,7 @@ describe Ci::Build do
     let(:job) { create(:ci_build, :running, pipeline: pipeline) }
 
     %w(success drop cancel).each do |event|
-      it "for event #{event}" do
+      it "for event #{event}", :sidekiq_might_not_need_inline do
         expect(UpdateBuildMinutesService)
           .to receive(:new).and_call_original
 
@@ -139,7 +137,7 @@ describe Ci::Build do
           expect(security_reports.get_report('sast').occurrences.size).to eq(33)
           expect(security_reports.get_report('dependency_scanning').occurrences.size).to eq(4)
           expect(security_reports.get_report('container_scanning').occurrences.size).to eq(8)
-          expect(security_reports.get_report('dast').occurrences.size).to eq(2)
+          expect(security_reports.get_report('dast').occurrences.size).to eq(20)
         end
       end
 
@@ -170,19 +168,19 @@ describe Ci::Build do
     end
   end
 
-  describe '#collect_license_management_reports!' do
-    subject { job.collect_license_management_reports!(license_management_report) }
+  describe '#collect_license_scanning_reports!' do
+    subject { job.collect_license_scanning_reports!(license_scanning_report) }
 
-    let(:license_management_report) { Gitlab::Ci::Reports::LicenseManagement::Report.new }
+    let(:license_scanning_report) { Gitlab::Ci::Reports::LicenseScanning::Report.new }
 
     before do
       stub_licensed_features(license_management: true)
     end
 
-    it { expect(license_management_report.licenses.count).to eq(0) }
+    it { expect(license_scanning_report.licenses.count).to eq(0) }
 
     context 'when build has a license management report' do
-      context 'when there is a license management report' do
+      context 'when there is a license scanning report' do
         before do
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
@@ -190,9 +188,9 @@ describe Ci::Build do
         it 'parses blobs and add the results to the report' do
           expect { subject }.not_to raise_error
 
-          expect(license_management_report.licenses.count).to eq(4)
-          expect(license_management_report.found_licenses['MIT'].name).to eq('MIT')
-          expect(license_management_report.found_licenses['MIT'].dependencies.count).to eq(52)
+          expect(license_scanning_report.licenses.count).to eq(4)
+          expect(license_scanning_report.licenses.map(&:name)).to contain_exactly("Apache 2.0", "MIT", "New BSD", "unknown")
+          expect(license_scanning_report.licenses.find { |x| x.name == 'MIT' }.dependencies.count).to eq(52)
         end
       end
 
@@ -206,16 +204,16 @@ describe Ci::Build do
         end
       end
 
-      context 'when Feature flag is disabled for License Management reports parsing' do
+      context 'when Feature flag is disabled for License Scanning reports parsing' do
         before do
           stub_feature_flags(parse_license_management_reports: false)
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
 
-        it 'does NOT parse license management report' do
+        it 'does NOT parse license scanning report' do
           subject
 
-          expect(license_management_report.licenses.count).to eq(0)
+          expect(license_scanning_report.licenses.count).to eq(0)
         end
       end
 
@@ -225,10 +223,10 @@ describe Ci::Build do
           create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
 
-        it 'does NOT parse license management report' do
+        it 'does NOT parse license scanning report' do
           subject
 
-          expect(license_management_report.licenses.count).to eq(0)
+          expect(license_scanning_report.licenses.count).to eq(0)
         end
       end
     end
@@ -269,7 +267,7 @@ describe Ci::Build do
   describe '#collect_licenses_for_dependency_list!' do
     let!(:lm_artifact) { create(:ee_ci_job_artifact, :license_management, job: job, project: job.project) }
     let(:dependency_list_report) { Gitlab::Ci::Reports::DependencyList::Report.new }
-    let(:dependency) { build(:dependency) }
+    let(:dependency) { build(:dependency, :nokogiri) }
 
     subject { job.collect_licenses_for_dependency_list!(dependency_list_report) }
 
@@ -331,6 +329,34 @@ describe Ci::Build do
           expect(metrics_report.metrics.count).to eq(0)
         end
       end
+    end
+  end
+
+  describe '#retryable?' do
+    subject { build.retryable? }
+
+    let(:pipeline) { merge_request.all_pipelines.last }
+    let!(:build) { create(:ci_build, :canceled, pipeline: pipeline) }
+
+    context 'with pipeline for merged results' do
+      let(:merge_request) { create(:merge_request, :with_merge_request_pipeline) }
+
+      it { is_expected.to be true }
+    end
+
+    context 'with pipeline for merge train' do
+      let(:merge_request) { create(:merge_request, :on_train, :with_merge_train_pipeline) }
+
+      it { is_expected.to be false }
+    end
+  end
+
+  describe ".license_scan" do
+    it 'returns only license artifacts' do
+      create(:ci_build, job_artifacts: [create(:ci_job_artifact, :zip)])
+      build_with_license_scan = create(:ci_build, job_artifacts: [create(:ci_job_artifact, file_type: :license_management, file_format: :raw)])
+
+      expect(described_class.license_scan).to contain_exactly(build_with_license_scan)
     end
   end
 end

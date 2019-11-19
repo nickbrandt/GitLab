@@ -35,7 +35,7 @@ for an overview of how this is accomplished in GitLab!**
 To create an executable runbook, you will need:
 
 1. **Kubernetes** - A Kubernetes cluster is required to deploy the rest of the applications.
-    The simplest way to get started is to add a cluster using [GitLab's GKE integration](../index.md#add-new-gke-cluster).
+    The simplest way to get started is to add a cluster using one of [GitLab's integrations](../add_remove_clusters.md#add-new-cluster).
 1. **Helm Tiller** - Helm is a package manager for Kubernetes and is required to install
     all the other applications. It is installed in its own pod inside the cluster which
     can run the Helm CLI in a safe environment.
@@ -50,7 +50,7 @@ To create an executable runbook, you will need:
 Nurtch is the company behind the [Rubix library](https://github.com/Nurtch/rubix). Rubix is
 an open-source Python library that makes it easy to perform common DevOps tasks inside Jupyter Notebooks.
 Tasks such as plotting Cloudwatch metrics and rolling your ECS/Kubernetes app are simplified
-down to a couple of lines of code. See the [Nurtch Documentation](http://docs.nurtch.com/en/latest)
+down to a couple of lines of code. See the [Nurtch Documentation](http://docs.nurtch.com/en/latest/)
 for more information.
 
 ## Configure an executable runbook with GitLab
@@ -60,7 +60,7 @@ the components outlined above and the preloaded demo runbook.
 
 ### 1. Add a Kubernetes cluster
 
-Follow the steps outlined in [Add new GKE cluster](../index.md#add-new-gke-cluster)
+Follow the steps outlined in [Add new cluster](../add_remove_clusters.md#add-new-cluster)
 to add a Kubernetes cluster to your project.
 
 ### 2. Install Helm Tiller, Ingress, and JupyterHub

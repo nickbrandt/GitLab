@@ -41,7 +41,7 @@ describe 'Multiple Issue Boards', :js do
     end
 
     it 'shows a license warning when group has more than one board' do
-      create(:board, parent: parent)
+      create(:board, resource_parent: parent)
 
       visit boards_path
       wait_for_requests

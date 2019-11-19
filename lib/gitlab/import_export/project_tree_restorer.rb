@@ -6,19 +6,20 @@ module Gitlab
       # Relations which cannot be saved at project level (and have a group assigned)
       GROUP_MODELS = [GroupLabel, Milestone].freeze
 
+      attr_reader :user
+      attr_reader :shared
+      attr_reader :project
+
       def initialize(user:, shared:, project:)
         @path = File.join(shared.export_path, 'project.json')
         @user = user
         @shared = shared
         @project = project
-        @project_id = project.id
-        @saved = true
       end
 
       def restore
         begin
-          json = IO.read(@path)
-          @tree_hash = ActiveSupport::JSON.decode(json)
+          @tree_hash = read_tree_hash
         rescue => e
           Rails.logger.error("Import/Export error: #{e.message}") # rubocop:disable Gitlab/RailsLogger
           raise Gitlab::ImportExport::Error.new('Incorrect JSON format')
@@ -30,26 +31,32 @@ module Gitlab
 
         ActiveRecord::Base.uncached do
           ActiveRecord::Base.no_touching do
-            create_relations
+            update_project_params!
+            create_project_relations!
+            post_import!
           end
         end
+
+        # ensure that we have latest version of the restore
+        @project.reload # rubocop:disable Cop/ActiveRecordAssociationReload
+
+        true
       rescue => e
         @shared.error(e)
         false
       end
 
-      def restored_project
-        return @project unless @tree_hash
-
-        @restored_project ||= restore_project
-      end
-
       private
+
+      def read_tree_hash
+        json = IO.read(@path)
+        ActiveSupport::JSON.decode(json)
+      end
 
       def members_mapper
         @members_mapper ||= Gitlab::ImportExport::MembersMapper.new(exported_members: @project_members,
                                                                     user: @user,
-                                                                    project: restored_project)
+                                                                    project: @project)
       end
 
       # A Hash of the imported merge request ID -> imported ID.
@@ -62,194 +69,146 @@ module Gitlab
       # in the DB. The structure and relationships between models are guessed from
       # the configuration yaml file too.
       # Finally, it updates each attribute in the newly imported project.
-      def create_relations
-        project_relations_without_project_members.each do |relation_key, relation_definition|
-          relation_key_s = relation_key.to_s
-
-          if relation_definition.present?
-            create_sub_relations(relation_key_s, relation_definition, @tree_hash)
-          elsif @tree_hash[relation_key_s].present?
-            save_relation_hash(relation_key_s, @tree_hash[relation_key_s])
-          end
-        end
-
-        @project.merge_requests.set_latest_merge_request_diff_ids!
-
-        @saved
+      def create_project_relations!
+        project_relations.each(&method(
+          :process_project_relation!))
       end
 
-      def save_relation_hash(relation_key, relation_hash_batch)
-        relation_hash = create_relation(relation_key, relation_hash_batch)
+      def post_import!
+        @project.merge_requests.set_latest_merge_request_diff_ids!
+      end
 
-        remove_group_models(relation_hash) if relation_hash.is_a?(Array)
+      def process_project_relation!(relation_key, relation_definition)
+        data_hashes = @tree_hash.delete(relation_key)
+        return unless data_hashes
 
-        @saved = false unless restored_project.append_or_update_attribute(relation_key, relation_hash)
+        # we do not care if we process array or hash
+        data_hashes = [data_hashes] unless data_hashes.is_a?(Array)
 
-        save_id_mappings(relation_key, relation_hash_batch, relation_hash)
+        # consume and remove objects from memory
+        while data_hash = data_hashes.shift
+          process_project_relation_item!(relation_key, relation_definition, data_hash)
+        end
+      end
 
-        # Restore the project again, extra query that skips holding the AR objects in memory
-        @restored_project = Project.find(@project_id)
+      def process_project_relation_item!(relation_key, relation_definition, data_hash)
+        relation_object = build_relation(relation_key, relation_definition, data_hash)
+        return unless relation_object
+        return if group_model?(relation_object)
+
+        relation_object.project = @project
+        relation_object.save!
+
+        save_id_mapping(relation_key, data_hash, relation_object)
       end
 
       # Older, serialized CI pipeline exports may only have a
       # merge_request_id and not the full hash of the merge request. To
       # import these pipelines, we need to preserve the mapping between
       # the old and new the merge request ID.
-      def save_id_mappings(relation_key, relation_hash_batch, relation_hash)
+      def save_id_mapping(relation_key, data_hash, relation_object)
         return unless relation_key == 'merge_requests'
 
-        relation_hash = Array(relation_hash)
-
-        Array(relation_hash_batch).each_with_index do |raw_data, index|
-          merge_requests_mapping[raw_data['id']] = relation_hash[index]['id']
-        end
-      end
-
-      # Remove project models that became group models as we found them at group level.
-      # This no longer required saving them at the root project level.
-      # For example, in the case of an existing group label that matched the title.
-      def remove_group_models(relation_hash)
-        relation_hash.reject! do |value|
-          GROUP_MODELS.include?(value.class) && value.group_id
-        end
-      end
-
-      def remove_feature_dependent_sub_relations(_relation_item)
-        # no-op
-      end
-
-      def project_relations_without_project_members
-        # We remove `project_members` as they are deserialized separately
-        project_relations.except(:project_members)
+        merge_requests_mapping[data_hash['id']] = relation_object.id
       end
 
       def project_relations
-        reader.attributes_finder.find_relations_tree(:project)
+        @project_relations ||=
+          reader
+            .attributes_finder
+            .find_relations_tree(:project)
+            .deep_stringify_keys
       end
 
-      def restore_project
+      def update_project_params!
+        project_params = @tree_hash.reject do |key, value|
+          project_relations.include?(key)
+        end
+
+        project_params = project_params.merge(
+          present_project_override_params)
+
+        # Cleaning all imported and overridden params
+        project_params = Gitlab::ImportExport::AttributeCleaner.clean(
+          relation_hash: project_params,
+          relation_class: Project,
+          excluded_keys: excluded_keys_for_relation(:project))
+
+        @project.assign_attributes(project_params)
+        @project.drop_visibility_level!
+
         Gitlab::Timeless.timeless(@project) do
-          @project.update(project_params)
-        end
-
-        @project
-      end
-
-      def project_params
-        @project_params ||= begin
-          attrs = json_params.merge(override_params).merge(visibility_level, external_label)
-
-          # Cleaning all imported and overridden params
-          Gitlab::ImportExport::AttributeCleaner.clean(relation_hash: attrs,
-                                                       relation_class: Project,
-                                                       excluded_keys: excluded_keys_for_relation(:project))
+          @project.save!
         end
       end
 
-      def override_params
-        @override_params ||= @project.import_data&.data&.fetch('override_params', nil) || {}
-      end
-
-      def json_params
-        @json_params ||= @tree_hash.reject do |key, value|
-          # return params that are not 1 to many or 1 to 1 relations
-          value.respond_to?(:each) && !Project.column_names.include?(key)
-        end
-      end
-
-      def visibility_level
-        level = override_params['visibility_level'] || json_params['visibility_level'] || @project.visibility_level
-        level = @project.group.visibility_level if @project.group && level.to_i > @project.group.visibility_level
-        level = Gitlab::VisibilityLevel::PRIVATE if level == Gitlab::VisibilityLevel::INTERNAL && Gitlab::CurrentSettings.restricted_visibility_levels.include?(level)
-
-        { 'visibility_level' => level }
-      end
-
-      def external_label
-        label = override_params['external_authorization_classification_label'].presence ||
-          json_params['external_authorization_classification_label'].presence
-
-        { 'external_authorization_classification_label' => label }
-      end
-
-      # Given a relation hash containing one or more models and its relationships,
-      # loops through each model and each object from a model type and
-      # and assigns its correspondent attributes hash from +tree_hash+
-      # Example:
-      # +relation_key+ issues, loops through the list of *issues* and for each individual
-      # issue, finds any subrelations such as notes, creates them and assign them back to the hash
-      #
-      # Recursively calls this method if the sub-relation is a hash containing more sub-relations
-      def create_sub_relations(relation_key, relation_definition, tree_hash, save: true)
-        return if tree_hash[relation_key].blank?
-
-        tree_array = [tree_hash[relation_key]].flatten
-        null_iid_pipelines = []
-
-        # Avoid keeping a possible heavy object in memory once we are done with it
-        while relation_item = (tree_array.shift || null_iid_pipelines.shift)
-          if nil_iid_pipeline?(relation_key, relation_item) && tree_array.any?
-            # Move pipelines with NULL IIDs to the end
-            # so they don't clash with existing IIDs.
-            null_iid_pipelines << relation_item
-
-            next
-          end
-
-          remove_feature_dependent_sub_relations(relation_item)
-
-          # The transaction at this level is less speedy than one single transaction
-          # But we can't have it in the upper level or GC won't get rid of the AR objects
-          # after we save the batch.
-          Project.transaction do
-            process_sub_relation(relation_key, relation_definition, relation_item)
-
-            # For every subrelation that hangs from Project, save the associated records altogether
-            # This effectively batches all records per subrelation item, only keeping those in memory
-            # We have to keep in mind that more batch granularity << Memory, but >> Slowness
-            if save
-              save_relation_hash(relation_key, [relation_item])
-              tree_hash[relation_key].delete(relation_item)
-            end
-          end
-        end
-
-        tree_hash.delete(relation_key) if save
-      end
-
-      def process_sub_relation(relation_key, relation_definition, relation_item)
-        relation_definition.each do |sub_relation_key, sub_relation_definition|
-          # We just use author to get the user ID, do not attempt to create an instance.
-          next if sub_relation_key == :author
-
-          sub_relation_key_s = sub_relation_key.to_s
-
-          # create dependent relations if present
-          if sub_relation_definition.present?
-            create_sub_relations(sub_relation_key_s, sub_relation_definition, relation_item, save: false)
-          end
-
-          # transform relation hash to actual object
-          sub_relation_hash = relation_item[sub_relation_key_s]
-          if sub_relation_hash.present?
-            relation_item[sub_relation_key_s] = create_relation(sub_relation_key, sub_relation_hash)
-          end
-        end
-      end
-
-      def create_relation(relation_key, relation_hash_list)
-        relation_array = [relation_hash_list].flatten.map do |relation_hash|
-          Gitlab::ImportExport::RelationFactory.create(
-            relation_sym: relation_key.to_sym,
-            relation_hash: relation_hash,
-            members_mapper: members_mapper,
-            merge_requests_mapping: merge_requests_mapping,
-            user: @user,
-            project: @restored_project,
-            excluded_keys: excluded_keys_for_relation(relation_key))
+      def present_project_override_params
+        # we filter out the empty strings from the overrides
+        # keeping the default values configured
+        project_override_params.transform_values do |value|
+          value.is_a?(String) ? value.presence : value
         end.compact
+      end
 
-        relation_hash_list.is_a?(Array) ? relation_array : relation_array.first
+      def project_override_params
+        @project_override_params ||= @project.import_data&.data&.fetch('override_params', nil) || {}
+      end
+
+      def build_relations(relation_key, relation_definition, data_hashes)
+        data_hashes.map do |data_hash|
+          build_relation(relation_key, relation_definition, data_hash)
+        end.compact
+      end
+
+      def build_relation(relation_key, relation_definition, data_hash)
+        # TODO: This is hack to not create relation for the author
+        # Rather make `RelationFactory#set_note_author` to take care of that
+        return data_hash if relation_key == 'author'
+
+        # create relation objects recursively for all sub-objects
+        relation_definition.each do |sub_relation_key, sub_relation_definition|
+          transform_sub_relations!(data_hash, sub_relation_key, sub_relation_definition)
+        end
+
+        Gitlab::ImportExport::RelationFactory.create(
+          relation_sym: relation_key.to_sym,
+          relation_hash: data_hash,
+          members_mapper: members_mapper,
+          merge_requests_mapping: merge_requests_mapping,
+          user: @user,
+          project: @project,
+          excluded_keys: excluded_keys_for_relation(relation_key))
+      end
+
+      def transform_sub_relations!(data_hash, sub_relation_key, sub_relation_definition)
+        sub_data_hash = data_hash[sub_relation_key]
+        return unless sub_data_hash
+
+        # if object is a hash we can create simple object
+        # as it means that this is 1-to-1 vs 1-to-many
+        sub_data_hash =
+          if sub_data_hash.is_a?(Array)
+            build_relations(
+              sub_relation_key,
+              sub_relation_definition,
+              sub_data_hash).presence
+          else
+            build_relation(
+              sub_relation_key,
+              sub_relation_definition,
+              sub_data_hash)
+          end
+
+        # persist object(s) or delete from relation
+        if sub_data_hash
+          data_hash[sub_relation_key] = sub_data_hash
+        else
+          data_hash.delete(sub_relation_key)
+        end
+      end
+
+      def group_model?(relation_object)
+        GROUP_MODELS.include?(relation_object.class) && relation_object.group_id
       end
 
       def reader
@@ -259,12 +218,6 @@ module Gitlab
       def excluded_keys_for_relation(relation)
         reader.attributes_finder.find_excluded_keys(relation)
       end
-
-      def nil_iid_pipeline?(relation_key, relation_item)
-        relation_key == 'ci_pipelines' && relation_item['iid'].nil?
-      end
     end
   end
 end
-
-Gitlab::ImportExport::ProjectTreeRestorer.prepend_if_ee('::EE::Gitlab::ImportExport::ProjectTreeRestorer')

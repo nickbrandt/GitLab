@@ -5,7 +5,7 @@ class PrometheusAlert < ApplicationRecord
 
   OPERATORS_MAP = {
     lt: "<",
-    eq: "=",
+    eq: "==",
     gt: ">"
   }.freeze
 
@@ -14,6 +14,7 @@ class PrometheusAlert < ApplicationRecord
   belongs_to :prometheus_metric, required: true, validate: true, inverse_of: :prometheus_alerts
 
   has_many :prometheus_alert_events, inverse_of: :prometheus_alert
+  has_many :related_issues, through: :prometheus_alert_events
 
   after_save :clear_prometheus_adapter_cache!
   after_destroy :clear_prometheus_adapter_cache!

@@ -51,13 +51,12 @@ Style/FrozenStringLiteralComment:
     - 'danger/**/*'
     - 'db/**/*'
     - 'ee/db/**/*'
-    - 'ee/spec/**/*'
     - 'ee/lib/tasks/**/*'
     - 'lib/tasks/**/*'
     - 'qa/**/*'
     - 'rubocop/**/*'
     - 'scripts/**/*'
-    - 'spec/**/*'
+    - 'spec/lib/gitlab/**/*'
 
 RSpec/FilePath:
   Exclude:
@@ -179,6 +178,11 @@ Gitlab/ModuleWithInstanceVariables:
     - spec/support/**/*.rb
     - features/steps/**/*.rb
 
+Gitlab/ConstGetInheritFalse:
+  Enabled: true
+  Exclude:
+    - 'qa/bin/*'
+
 Gitlab/HTTParty:
   Enabled: true
   Exclude:
@@ -293,3 +297,6 @@ Graphql/Descriptions:
   Include:
     - 'app/graphql/**/*'
     - 'ee/app/graphql/**/*'
+
+RSpec/AnyInstanceOf:
+  Enabled: false

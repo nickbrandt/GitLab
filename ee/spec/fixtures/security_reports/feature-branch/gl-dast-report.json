@@ -1,39 +1,291 @@
 {
-  "site": {
-    "alerts": [
-      {
-        "sourceid": "3",
-        "wascid": "15",
-        "cweid": "16",
-        "reference": "<p>http://msdn.microsoft.com/en-us/library/ie/gg622941%28v=vs.85%29.aspx</p><p>https://www.owasp.org/index.php/List_of_useful_HTTP_headers</p>",
-        "otherinfo": "<p>This issue still applies to error type pages (401, 403, 500, etc) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.</p><p>At \"High\" threshold this scanner will not alert on client or server error responses.</p>",
-        "solution": "<p>Ensure that the application/web server sets the Content-Type header appropriately, and that it sets the X-Content-Type-Options header to 'nosniff' for all web pages.</p><p>If possible, ensure that the end user uses a standards-compliant and modern web browser that does not perform MIME-sniffing at all, or that can be directed by the web application/web server to not perform MIME-sniffing.</p>",
-        "count": "2",
-        "pluginid": "10021",
-        "alert": "X-Content-Type-Options Header Missing",
-        "name": "X-Content-Type-Options Header Missing",
-        "riskcode": "1",
-        "confidence": "2",
-        "riskdesc": "Low (Medium)",
-        "desc": "<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</p>",
-        "instances": [
-          {
-            "param": "X-Content-Type-Options",
-            "method": "GET",
-            "uri": "http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io"
-          },
-          {
-            "param": "X-Content-Type-Options",
-            "method": "GET",
-            "uri": "http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io/"
-          }
-        ]
-      }
-    ],
-    "@ssl": "false",
-    "@port": "80",
-    "@host": "bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io",
-    "@name": "http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io"
+  "site": [
+    {
+      "@port": "8080",
+      "@host": "goat",
+      "@name": "http://goat:8080",
+      "alerts": [
+        {
+          "count": "1",
+          "riskdesc": "Low (Medium)",
+          "name": "Cookie No HttpOnly Flag",
+          "reference": "<p>http://www.owasp.org/index.php/HttpOnly</p>",
+          "sourceid": "3",
+          "confidence": "2",
+          "alert": "Cookie No HttpOnly Flag",
+          "instances": [
+            {
+              "evidence": "Set-Cookie: JSESSIONID",
+              "uri": "http://goat:8080/WebGoat/login?logout",
+              "param": "JSESSIONID",
+              "method": "GET"
+            }
+          ],
+          "pluginid": "10010",
+          "riskcode": "1",
+          "wascid": "13",
+          "solution": "<p>Ensure that the HttpOnly flag is set for all cookies.</p>",
+          "cweid": "120",
+          "desc": "<p>A cookie has been set without the HttpOnly flag, which means that the cookie can be accessed by JavaScript. If a malicious script can be run on this page then the cookie will be accessible and can be transmitted to another site. If this is a session cookie then session hijacking may be possible.</p>"
+        },
+        {
+          "count": "4",
+          "riskdesc": "Informational (Medium)",
+          "name": "Information Disclosure - Suspicious Comments",
+          "reference": "<p></p>",
+          "otherinfo": "<p><!--<button type=\"button\" id=\"admin-button\" class=\"btn btn-default right_nav_button\" title=\"Administrator\">--></p><p><!--<button type=\"button\" id=\"user-management\" class=\"btn btn-default right_nav_button\"--></p><p><!--title=\"User management\">--></p><p></p>",
+          "sourceid": "3",
+          "confidence": "2",
+          "alert": "Information Disclosure - Suspicious Comments",
+          "instances": [
+            {
+              "uri": "http://goat:8080/WebGoat/start_new.mvc",
+              "method": "GET"
+            }
+          ],
+          "pluginid": "10027",
+          "riskcode": "0",
+          "wascid": "13",
+          "solution": "<p>Remove all comments that return information that may help an attacker and fix any underlying problems they refer to.</p>",
+          "cweid": "201",
+          "desc": "<p>The response appears to contain suspicious comments which may help an attacker.</p>"
+        }
+      ],
+      "@ssl": "false"
+    }
+  ],
+  "spider": {
+    "progress": "100",
+    "state": "FINISHED",
+    "result": {
+      "urlsIoError": [],
+      "urlsOutOfScope": [
+        "http://getbootstrap.com/",
+        "http://daneden.me/animate",
+        "http://fontawesome.io/",
+        "https://github.com/twbs/bootstrap/blob/master/LICENSE",
+        "https://github.com/nickpettit/glide",
+        "http://fontawesome.io/license"
+      ],
+      "urlsInScope": [
+        {
+          "url": "http://goat:8080",
+          "statusReason": "",
+          "reasonNotProcessed": "Not Text",
+          "processed": "false",
+          "method": "GET",
+          "statusCode": "404"
+        },
+        {
+          "url": "http://goat:8080/robots.txt",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "404"
+        },
+        {
+          "url": "http://goat:8080/sitemap.xml",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "404"
+        },
+        {
+          "url": "http://goat:8080/WebGoat",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "302"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/attack",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "302"
+        },
+        {
+          "url": "http://goat:8080/",
+          "statusReason": "",
+          "reasonNotProcessed": "Not Text",
+          "processed": "false",
+          "method": "GET",
+          "statusCode": "404"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "302"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/start.mvc",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/welcome.mvc",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "302"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/logout",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "302"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/css/main.css",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/images/favicon.ico",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "404"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/plugins/bootstrap/css/bootstrap.min.css",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/css/font-awesome.min.css",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/css/coderay.css",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/css/animate.css",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/js/modernizr-2.6.2.min.js",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/css/lessons.css",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/js/html5shiv.js",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/js/respond.min.js",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/js/libs/require.min.js",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/login?logout",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "302"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/login",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/login",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "POST",
+          "statusCode": "302"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/login?error",
+          "statusReason": "",
+          "reasonNotProcessed": "Max Depth",
+          "processed": "false",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/registration",
+          "statusReason": "",
+          "reasonNotProcessed": "",
+          "processed": "true",
+          "method": "GET",
+          "statusCode": "200"
+        },
+        {
+          "url": "http://goat:8080/WebGoat/register.mvc",
+          "statusReason": "",
+          "reasonNotProcessed": "Max Depth",
+          "processed": "false",
+          "method": "POST",
+          "statusCode": "200"
+        }
+      ]
+    }
   },
   "@generated": "Fri, 13 Apr 2018 09:22:01",
   "@version": "2.7.0"

@@ -1,25 +1,35 @@
 <script>
 import { s__, __ } from '~/locale';
-import { GlLink, GlButton } from '@gitlab/ui';
+import _ from 'underscore';
+import { GlLink, GlButton, GlTooltip, GlResizeObserverDirective } from '@gitlab/ui';
 import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
 import dateFormat from 'dateformat';
-import { debounceByAnimationFrame, roundOffFloat } from '~/lib/utils/common_utils';
+import { roundOffFloat } from '~/lib/utils/common_utils';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import Icon from '~/vue_shared/components/icon.vue';
-import { chartHeight, graphTypes, lineTypes, symbolSizes, dateFormats } from '../../constants';
+import {
+  chartHeight,
+  graphTypes,
+  lineTypes,
+  lineWidths,
+  symbolSizes,
+  dateFormats,
+} from '../../constants';
 import { makeDataSeries } from '~/helpers/monitor_helper';
 import { graphDataValidatorForValues } from '../../utils';
-
-let debouncedResize;
 
 export default {
   components: {
     GlAreaChart,
     GlLineChart,
+    GlTooltip,
     GlButton,
     GlChartSeriesLabel,
     GlLink,
     Icon,
+  },
+  directives: {
+    GlResizeObserverDirective,
   },
   inheritAttrs: false,
   props: {
@@ -28,9 +38,15 @@ export default {
       required: true,
       validator: graphDataValidatorForValues.bind(null, false),
     },
-    containerWidth: {
-      type: Number,
-      required: true,
+    option: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    seriesConfig: {
+      type: Object,
+      required: false,
+      default: () => ({}),
     },
     deploymentData: {
       type: Array,
@@ -62,6 +78,11 @@ export default {
       required: false,
       default: s__('Metrics|Max'),
     },
+    groupId: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -72,6 +93,7 @@ export default {
         isDeployment: false,
         sha: '',
       },
+      showTitleTooltip: false,
       width: 0,
       height: chartHeight,
       svgs: {},
@@ -92,29 +114,35 @@ export default {
         const lineWidth =
           appearance && appearance.line && appearance.line.width
             ? appearance.line.width
-            : undefined;
+            : lineWidths.default;
         const areaStyle = {
           opacity:
             appearance && appearance.area && typeof appearance.area.opacity === 'number'
               ? appearance.area.opacity
               : undefined,
         };
-
         const series = makeDataSeries(query.result, {
           name: this.formatLegendLabel(query),
           lineStyle: {
             type: lineType,
             width: lineWidth,
+            color: this.primaryColor,
           },
           showSymbol: false,
           areaStyle: this.graphData.type === 'area-chart' ? areaStyle : undefined,
+          ...this.seriesConfig,
         });
 
         return acc.concat(series);
       }, []);
     },
+    chartOptionSeries() {
+      return (this.option.series || []).concat(this.scatterSeries ? [this.scatterSeries] : []);
+    },
     chartOptions() {
+      const option = _.omit(this.option, 'series');
       return {
+        series: this.chartOptionSeries,
         xAxis: {
           name: __('Time'),
           type: 'time',
@@ -131,8 +159,8 @@ export default {
             formatter: num => roundOffFloat(num, 3).toString(),
           },
         },
-        series: this.scatterSeries,
         dataZoom: [this.dataZoomConfig],
+        ...option,
       };
     },
     dataZoomConfig() {
@@ -140,6 +168,14 @@ export default {
 
       return handleIcon ? { handleIcon } : {};
     },
+    /**
+     * This method returns the earliest time value in all series of a chart.
+     * Takes a chart data with data to populate a timeseries.
+     * data should be an array of data points [t, y] where t is a ISO formatted date,
+     * and is sorted by t (time).
+     * @returns {(String|null)} earliest x value from all series, or null when the
+     * chart series data is empty.
+     */
     earliestDatapoint() {
       return this.chartData.reduce((acc, series) => {
         const { data } = series;
@@ -199,15 +235,13 @@ export default {
       return `${this.graphData.y_label}`;
     },
   },
-  watch: {
-    containerWidth: 'onResize',
-  },
-  beforeDestroy() {
-    window.removeEventListener('resize', debouncedResize);
+  mounted() {
+    const graphTitleEl = this.$refs.graphTitle;
+    if (graphTitleEl && graphTitleEl.scrollWidth > graphTitleEl.offsetWidth) {
+      this.showTitleTooltip = true;
+    }
   },
   created() {
-    debouncedResize = debounceByAnimationFrame(this.onResize);
-    window.addEventListener('resize', debouncedResize);
     this.setSvg('rocket');
     this.setSvg('scroll-handle');
   },
@@ -219,22 +253,25 @@ export default {
       this.tooltip.title = dateFormat(params.value, dateFormats.default);
       this.tooltip.content = [];
       params.seriesData.forEach(dataPoint => {
-        const [xVal, yVal] = dataPoint.value;
-        this.tooltip.isDeployment = dataPoint.componentSubType === graphTypes.deploymentData;
-        if (this.tooltip.isDeployment) {
-          const [deploy] = this.recentDeployments.filter(
-            deployment => deployment.createdAt === xVal,
-          );
-          this.tooltip.sha = deploy.sha.substring(0, 8);
-          this.tooltip.commitUrl = deploy.commitUrl;
-        } else {
-          const { seriesName, color } = dataPoint;
-          const value = yVal.toFixed(3);
-          this.tooltip.content.push({
-            name: seriesName,
-            value,
-            color,
-          });
+        if (dataPoint.value) {
+          const [xVal, yVal] = dataPoint.value;
+          this.tooltip.isDeployment = dataPoint.componentSubType === graphTypes.deploymentData;
+          if (this.tooltip.isDeployment) {
+            const [deploy] = this.recentDeployments.filter(
+              deployment => deployment.createdAt === xVal,
+            );
+            this.tooltip.sha = deploy.sha.substring(0, 8);
+            this.tooltip.commitUrl = deploy.commitUrl;
+          } else {
+            const { seriesName, color, dataIndex } = dataPoint;
+            const value = yVal.toFixed(3);
+            this.tooltip.content.push({
+              name: seriesName,
+              dataIndex,
+              value,
+              color,
+            });
+          }
         }
       });
     },
@@ -263,10 +300,18 @@ export default {
 </script>
 
 <template>
-  <div class="prometheus-graph">
+  <div v-gl-resize-observer-directive="onResize" class="prometheus-graph">
     <div class="prometheus-graph-header">
-      <h5 class="prometheus-graph-title js-graph-title">{{ graphData.title }}</h5>
-      <div class="prometheus-graph-widgets js-graph-widgets">
+      <h5
+        ref="graphTitle"
+        class="prometheus-graph-title js-graph-title text-truncate append-right-8"
+      >
+        {{ graphData.title }}
+      </h5>
+      <gl-tooltip :target="() => $refs.graphTitle" :disabled="!showTitleTooltip">
+        {{ graphData.title }}
+      </gl-tooltip>
+      <div class="prometheus-graph-widgets js-graph-widgets flex-fill">
         <slot></slot>
       </div>
     </div>
@@ -274,6 +319,7 @@ export default {
       :is="glChartComponent"
       ref="chart"
       v-bind="$attrs"
+      :group-id="groupId"
       :data="chartData"
       :option="chartOptions"
       :format-tooltip-text="formatTooltipText"
@@ -295,23 +341,27 @@ export default {
       </template>
       <template v-else>
         <template slot="tooltipTitle">
-          <div class="text-nowrap">
-            {{ tooltip.title }}
-          </div>
+          <slot name="tooltipTitle">
+            <div class="text-nowrap">
+              {{ tooltip.title }}
+            </div>
+          </slot>
         </template>
         <template slot="tooltipContent">
-          <div
-            v-for="(content, key) in tooltip.content"
-            :key="key"
-            class="d-flex justify-content-between"
-          >
-            <gl-chart-series-label :color="isMultiSeries ? content.color : ''">
-              {{ content.name }}
-            </gl-chart-series-label>
-            <div class="prepend-left-32">
-              {{ content.value }}
+          <slot name="tooltipContent" :tooltip="tooltip">
+            <div
+              v-for="(content, key) in tooltip.content"
+              :key="key"
+              class="d-flex justify-content-between"
+            >
+              <gl-chart-series-label :color="isMultiSeries ? content.color : ''">
+                {{ content.name }}
+              </gl-chart-series-label>
+              <div class="prepend-left-32">
+                {{ content.value }}
+              </div>
             </div>
-          </div>
+          </slot>
         </template>
       </template>
     </component>

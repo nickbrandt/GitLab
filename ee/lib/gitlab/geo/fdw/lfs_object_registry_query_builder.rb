@@ -14,33 +14,32 @@ module Gitlab
     class Fdw
       class LfsObjectRegistryQueryBuilder < BaseQueryBuilder
         # rubocop:disable CodeReuse/ActiveRecord
-        def for_lfs_objects(file_ids)
+        def for_lfs_objects(ids)
           query
             .joins(fdw_inner_join_lfs_objects)
-            .file_id_in(file_ids)
+            .lfs_object_id_in(ids)
         end
         # rubocop:enable CodeReuse/ActiveRecord
 
         private
 
         def base
-          ::Geo::FileRegistry
-            .select(file_registry_table[Arel.star])
-            .lfs_objects
+          ::Geo::LfsObjectRegistry
+            .select(registry_table[Arel.star])
         end
 
-        def file_registry_table
-          ::Geo::FileRegistry.arel_table
+        def registry_table
+          ::Geo::LfsObjectRegistry.arel_table
         end
 
-        def fdw_lfs_object_table
+        def fdw_table
           ::Geo::Fdw::LfsObject.arel_table
         end
 
         def fdw_inner_join_lfs_objects
-          file_registry_table
-              .join(fdw_lfs_object_table, Arel::Nodes::InnerJoin)
-              .on(file_registry_table[:file_id].eq(fdw_lfs_object_table[:id]))
+          registry_table
+              .join(fdw_table, Arel::Nodes::InnerJoin)
+              .on(registry_table[:lfs_object_id].eq(fdw_table[:id]))
               .join_sources
         end
       end

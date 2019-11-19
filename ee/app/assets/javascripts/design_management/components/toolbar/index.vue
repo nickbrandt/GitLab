@@ -1,20 +1,26 @@
 <script>
 import { __, sprintf } from '~/locale';
-import { GlLoadingIcon } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import Pagination from './pagination.vue';
+import DeleteButton from '../delete_button.vue';
+import permissionsQuery from '../../graphql/queries/permissions.query.graphql';
+import appDataQuery from '../../graphql/queries/appData.query.graphql';
 
 export default {
   components: {
-    GlLoadingIcon,
     Icon,
     Pagination,
+    DeleteButton,
   },
   mixins: [timeagoMixin],
   props: {
     id: {
       type: String,
+      required: true,
+    },
+    isDeleting: {
+      type: Boolean,
       required: true,
     },
     name: {
@@ -32,6 +38,39 @@ export default {
       required: false,
       default: () => ({}),
     },
+    isLatestVersion: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      permissions: {
+        createDesign: false,
+      },
+      projectPath: '',
+      issueIid: null,
+    };
+  },
+  apollo: {
+    appData: {
+      query: appDataQuery,
+      manual: true,
+      result({ data: { projectPath, issueIid } }) {
+        this.projectPath = projectPath;
+        this.issueIid = issueIid;
+      },
+    },
+    permissions: {
+      query: permissionsQuery,
+      variables() {
+        return {
+          fullPath: this.projectPath,
+          iid: this.issueIid,
+        };
+      },
+      update: data => data.project.issue.userPermissions,
+    },
   },
   computed: {
     updatedText() {
@@ -40,26 +79,37 @@ export default {
         updated_by: this.updatedBy.name,
       });
     },
+    canDeleteDesign() {
+      return this.permissions.createDesign;
+    },
   },
 };
 </script>
 
 <template>
-  <header class="d-flex w-100 p-2 bg-white align-items-center js-design-header">
+  <header class="d-flex p-2 bg-white align-items-center js-design-header">
     <router-link
       :to="{
         name: 'designs',
         query: $route.query,
       }"
       :aria-label="s__('DesignManagement|Go back to designs')"
-      class="mr-3 text-plain"
+      class="mr-3 text-plain d-flex justify-content-center align-items-center"
     >
       <icon :size="18" name="close" />
     </router-link>
-    <div>
-      <h2 class="m-0">{{ name }}</h2>
+    <div class="overflow-hidden d-flex align-items-center">
+      <h2 class="m-0 str-truncated-100">{{ name }}</h2>
       <small v-if="updatedAt" class="text-secondary">{{ updatedText }}</small>
     </div>
-    <pagination :id="id" class="ml-auto" />
+    <pagination :id="id" class="ml-auto flex-shrink-0" />
+    <delete-button
+      v-if="isLatestVersion && canDeleteDesign"
+      :is-deleting="isDeleting"
+      button-variant="danger"
+      @deleteSelectedDesigns="$emit('delete')"
+    >
+      <icon :size="18" name="remove" />
+    </delete-button>
   </header>
 </template>

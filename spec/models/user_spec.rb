@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe User do
+describe User, :do_not_mock_admin_mode do
   include ProjectForksHelper
   include TermsHelper
 
@@ -79,7 +79,7 @@ describe User do
     describe '#group_members' do
       it 'does not include group memberships for which user is a requester' do
         user = create(:user)
-        group = create(:group, :public, :access_requestable)
+        group = create(:group, :public)
         group.request_access(user)
 
         expect(user.group_members).to be_empty
@@ -89,7 +89,7 @@ describe User do
     describe '#project_members' do
       it 'does not include project memberships for which user is a requester' do
         user = create(:user)
-        project = create(:project, :public, :access_requestable)
+        project = create(:project, :public)
         project.request_access(user)
 
         expect(user.project_members).to be_empty
@@ -1120,6 +1120,30 @@ describe User do
     end
   end
 
+  describe 'deactivating a user' do
+    let(:user) { create(:user, name: 'John Smith') }
+
+    context "an active user" do
+      it "can be deactivated" do
+        user.deactivate
+
+        expect(user.deactivated?).to be_truthy
+      end
+    end
+
+    context "a user who is blocked" do
+      before do
+        user.block
+      end
+
+      it "cannot be deactivated" do
+        user.deactivate
+
+        expect(user.reload.deactivated?).to be_falsy
+      end
+    end
+  end
+
   describe '.filter_items' do
     let(:user) { double }
 
@@ -1139,6 +1163,12 @@ describe User do
       expect(described_class).to receive(:blocked).and_return([user])
 
       expect(described_class.filter_items('blocked')).to include user
+    end
+
+    it 'filters by deactivated' do
+      expect(described_class).to receive(:deactivated).and_return([user])
+
+      expect(described_class.filter_items('deactivated')).to include user
     end
 
     it 'filters by two_factor_disabled' do
@@ -1161,7 +1191,7 @@ describe User do
   end
 
   describe '.without_projects' do
-    let!(:project) { create(:project, :public, :access_requestable) }
+    let!(:project) { create(:project, :public) }
     let!(:user) { create(:user) }
     let!(:user_without_project) { create(:user) }
     let!(:user_without_project2) { create(:user) }
@@ -1524,13 +1554,20 @@ describe User do
   end
 
   describe '.find_by_ssh_key_id' do
-    context 'using an existing SSH key ID' do
-      let(:user) { create(:user) }
-      let(:key) { create(:key, user: user) }
+    let_it_be(:user) { create(:user) }
+    let_it_be(:key) { create(:key, user: user) }
 
+    context 'using an existing SSH key ID' do
       it 'returns the corresponding User' do
         expect(described_class.find_by_ssh_key_id(key.id)).to eq(user)
       end
+    end
+
+    it 'only performs a single query' do
+      key # Don't count the queries for creating the key and user
+
+      expect { described_class.find_by_ssh_key_id(key.id) }
+        .not_to exceed_query_limit(1)
     end
 
     context 'using an invalid SSH key ID' do
@@ -2042,8 +2079,98 @@ describe User do
     end
   end
 
+  describe "#last_active_at" do
+    let(:last_activity_on) { 5.days.ago.to_date }
+    let(:current_sign_in_at) { 8.days.ago }
+
+    context 'for a user that has `last_activity_on` set' do
+      let(:user) { create(:user, last_activity_on: last_activity_on) }
+
+      it 'returns `last_activity_on` with current time zone' do
+        expect(user.last_active_at).to eq(last_activity_on.to_time.in_time_zone)
+      end
+    end
+
+    context 'for a user that has `current_sign_in_at` set' do
+      let(:user) { create(:user, current_sign_in_at: current_sign_in_at) }
+
+      it 'returns `current_sign_in_at`' do
+        expect(user.last_active_at).to eq(current_sign_in_at)
+      end
+    end
+
+    context 'for a user that has both `current_sign_in_at` & ``last_activity_on`` set' do
+      let(:user) { create(:user, current_sign_in_at: current_sign_in_at, last_activity_on: last_activity_on) }
+
+      it 'returns the latest among `current_sign_in_at` & `last_activity_on`' do
+        latest_event = [current_sign_in_at, last_activity_on.to_time.in_time_zone].max
+        expect(user.last_active_at).to eq(latest_event)
+      end
+    end
+
+    context 'for a user that does not have both `current_sign_in_at` & `last_activity_on` set' do
+      let(:user) { create(:user, current_sign_in_at: nil, last_activity_on: nil) }
+
+      it 'returns nil' do
+        expect(user.last_active_at).to eq(nil)
+      end
+    end
+  end
+
+  describe "#can_be_deactivated?" do
+    let(:activity) { {} }
+    let(:user) { create(:user, name: 'John Smith', **activity) }
+    let(:day_within_minium_inactive_days_threshold) { User::MINIMUM_INACTIVE_DAYS.pred.days.ago }
+    let(:day_outside_minium_inactive_days_threshold) { User::MINIMUM_INACTIVE_DAYS.next.days.ago }
+
+    shared_examples 'not eligible for deactivation' do
+      it 'returns false' do
+        expect(user.can_be_deactivated?).to be_falsey
+      end
+    end
+
+    shared_examples 'eligible for deactivation' do
+      it 'returns true' do
+        expect(user.can_be_deactivated?).to be_truthy
+      end
+    end
+
+    context "a user who is not active" do
+      before do
+        user.block
+      end
+
+      it_behaves_like 'not eligible for deactivation'
+    end
+
+    context 'a user who has activity within the specified minimum inactive days' do
+      let(:activity) { { last_activity_on: day_within_minium_inactive_days_threshold } }
+
+      it_behaves_like 'not eligible for deactivation'
+    end
+
+    context 'a user who has signed in within the specified minimum inactive days' do
+      let(:activity) { { current_sign_in_at: day_within_minium_inactive_days_threshold } }
+
+      it_behaves_like 'not eligible for deactivation'
+    end
+
+    context 'a user who has no activity within the specified minimum inactive days' do
+      let(:activity) { { last_activity_on: day_outside_minium_inactive_days_threshold } }
+
+      it_behaves_like 'eligible for deactivation'
+    end
+
+    context 'a user who has not signed in within the specified minimum inactive days' do
+      let(:activity) { { current_sign_in_at: day_outside_minium_inactive_days_threshold } }
+
+      it_behaves_like 'eligible for deactivation'
+    end
+  end
+
   describe "#contributed_projects" do
     subject { create(:user) }
+
     let!(:project1) { create(:project) }
     let!(:project2) { fork_project(project3) }
     let!(:project3) { create(:project) }
@@ -2670,10 +2797,26 @@ describe User do
       expect(user.full_private_access?).to be_falsy
     end
 
-    it 'returns true for admin user' do
-      user = build(:user, :admin)
+    context 'for admin user' do
+      include_context 'custom session'
 
-      expect(user.full_private_access?).to be_truthy
+      let(:user) { build(:user, :admin) }
+
+      context 'when admin mode is disabled' do
+        it 'returns false' do
+          expect(user.full_private_access?).to be_falsy
+        end
+      end
+
+      context 'when admin mode is enabled' do
+        before do
+          Gitlab::Auth::CurrentUserMode.new(user).enable_admin_mode!(password: user.password)
+        end
+
+        it 'returns true' do
+          expect(user.full_private_access?).to be_truthy
+        end
+      end
     end
   end
 
@@ -3605,6 +3748,80 @@ describe User do
       user2 = create(:user, name: 'B')
 
       expect(described_class.reorder_by_name).to eq([user1, user2])
+    end
+  end
+
+  describe '#notification_settings_for' do
+    let(:user) { create(:user) }
+    let(:source) { nil }
+
+    subject { user.notification_settings_for(source) }
+
+    context 'when source is nil' do
+      it 'returns a blank global notification settings object' do
+        expect(subject.source).to eq(nil)
+        expect(subject.notification_email).to eq(nil)
+        expect(subject.level).to eq('global')
+      end
+    end
+
+    context 'when source is a Group' do
+      let(:group) { create(:group) }
+
+      subject { user.notification_settings_for(group, inherit: true) }
+
+      context 'when group has no existing notification settings' do
+        context 'when group has no ancestors' do
+          it 'will be a default Global notification setting' do
+            expect(subject.notification_email).to eq(nil)
+            expect(subject.level).to eq('global')
+          end
+        end
+
+        context 'when group has ancestors' do
+          context 'when an ancestor has a level other than Global' do
+            let(:ancestor) { create(:group) }
+            let(:group) { create(:group, parent: ancestor) }
+
+            before do
+              create(:notification_setting, user: user, source: ancestor, level: 'participating', notification_email: 'ancestor@example.com')
+            end
+
+            it 'has the same level set' do
+              expect(subject.level).to eq('participating')
+            end
+
+            it 'has the same email set' do
+              expect(subject.notification_email).to eq('ancestor@example.com')
+            end
+
+            context 'when inherit is false' do
+              subject { user.notification_settings_for(group) }
+
+              it 'does not inherit settings' do
+                expect(subject.notification_email).to eq(nil)
+                expect(subject.level).to eq('global')
+              end
+            end
+          end
+
+          context 'when an ancestor has a Global level but has an email set' do
+            let(:grand_ancestor) { create(:group) }
+            let(:ancestor) { create(:group, parent: grand_ancestor) }
+            let(:group) { create(:group, parent: ancestor) }
+
+            before do
+              create(:notification_setting, user: user, source: grand_ancestor, level: 'participating', notification_email: 'grand@example.com')
+              create(:notification_setting, user: user, source: ancestor, level: 'global', notification_email: 'ancestor@example.com')
+            end
+
+            it 'has the same email set' do
+              expect(subject.level).to eq('global')
+              expect(subject.notification_email).to eq('ancestor@example.com')
+            end
+          end
+        end
+      end
     end
   end
 

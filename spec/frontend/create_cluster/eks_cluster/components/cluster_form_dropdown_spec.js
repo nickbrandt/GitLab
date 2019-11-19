@@ -3,15 +3,25 @@ import { shallowMount } from '@vue/test-utils';
 import ClusterFormDropdown from '~/create_cluster/eks_cluster/components/cluster_form_dropdown.vue';
 import DropdownButton from '~/vue_shared/components/dropdown/dropdown_button.vue';
 import DropdownSearchInput from '~/vue_shared/components/dropdown/dropdown_search_input.vue';
-import DropdownHiddenInput from '~/vue_shared/components/dropdown/dropdown_hidden_input.vue';
+import { GlIcon } from '@gitlab/ui';
 
 describe('ClusterFormDropdown', () => {
   let vm;
+  const firstItem = { name: 'item 1', value: 1 };
+  const secondItem = { name: 'item 2', value: 2 };
+  const items = [firstItem, secondItem, { name: 'item 3', value: 3 }];
 
   beforeEach(() => {
     vm = shallowMount(ClusterFormDropdown);
   });
   afterEach(() => vm.destroy());
+
+  describe('when initial value is provided', () => {
+    it('sets selectedItem to initial value', () => {
+      vm.setProps({ items, value: secondItem.value });
+      expect(vm.find(DropdownButton).props('toggleText')).toEqual(secondItem.name);
+    });
+  });
 
   describe('when no item is selected', () => {
     it('displays placeholder text', () => {
@@ -24,30 +34,57 @@ describe('ClusterFormDropdown', () => {
   });
 
   describe('when an item is selected', () => {
-    const selectedItem = { name: 'Name', value: 'value' };
+    beforeEach(() => {
+      vm.setProps({ items });
+      vm.findAll('.js-dropdown-item')
+        .at(1)
+        .trigger('click');
+    });
+
+    it('emits input event with selected item', () => {
+      expect(vm.emitted('input')[0]).toEqual([secondItem.value]);
+    });
+  });
+
+  describe('when multiple items are selected', () => {
+    const value = [1];
 
     beforeEach(() => {
-      vm.setData({ selectedItem });
+      vm.setProps({ items, multiple: true, value });
+      vm.findAll('.js-dropdown-item')
+        .at(0)
+        .trigger('click');
+      vm.findAll('.js-dropdown-item')
+        .at(1)
+        .trigger('click');
     });
 
-    it('displays selected item label', () => {
-      expect(vm.find(DropdownButton).props('toggleText')).toEqual(selectedItem.name);
+    it('emits input event with an array of selected items', () => {
+      expect(vm.emitted('input')[1]).toEqual([[firstItem.value, secondItem.value]]);
+    });
+  });
+
+  describe('when multiple items can be selected', () => {
+    beforeEach(() => {
+      vm.setProps({ items, multiple: true, value: firstItem.value });
     });
 
-    it('sets selected value to dropdown hidden input', () => {
-      expect(vm.find(DropdownHiddenInput).props('value')).toEqual(selectedItem.value);
+    it('displays a checked GlIcon next to the item', () => {
+      expect(vm.find(GlIcon).is('.invisible')).toBe(false);
+      expect(vm.find(GlIcon).props('name')).toBe('mobile-issue-close');
     });
   });
 
   describe('when an item is selected and has a custom label property', () => {
     it('displays selected item custom label', () => {
       const labelProperty = 'customLabel';
-      const selectedItem = { [labelProperty]: 'Name' };
+      const label = 'Name';
+      const currentValue = 1;
+      const customLabelItems = [{ [labelProperty]: label, value: currentValue }];
 
-      vm.setProps({ labelProperty });
-      vm.setData({ selectedItem });
+      vm.setProps({ labelProperty, items: customLabelItems, value: currentValue });
 
-      expect(vm.find(DropdownButton).props('toggleText')).toEqual(selectedItem[labelProperty]);
+      expect(vm.find(DropdownButton).props('toggleText')).toEqual(label);
     });
   });
 
@@ -124,9 +161,7 @@ describe('ClusterFormDropdown', () => {
   });
 
   it('it filters results by search query', () => {
-    const secondItem = { name: 'second item' };
-    const items = [{ name: 'first item' }, secondItem];
-    const searchQuery = 'second';
+    const searchQuery = secondItem.name;
 
     vm.setProps({ items });
     vm.setData({ searchQuery });

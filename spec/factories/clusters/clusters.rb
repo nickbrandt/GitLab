@@ -30,6 +30,10 @@ FactoryBot.define do
       end
     end
 
+    trait :management_project do
+      management_project factory: :project
+    end
+
     trait :namespace_per_environment_disabled do
       namespace_per_environment { false }
     end
@@ -46,6 +50,14 @@ FactoryBot.define do
       platform_type { :kubernetes }
 
       provider_gcp factory: [:cluster_provider_gcp, :created]
+      platform_kubernetes factory: [:cluster_platform_kubernetes, :configured]
+    end
+
+    trait :provided_by_aws do
+      provider_type { :aws }
+      platform_type { :kubernetes }
+
+      provider_aws factory: [:cluster_provider_aws, :created]
       platform_kubernetes factory: [:cluster_platform_kubernetes, :configured]
     end
 
@@ -78,8 +90,50 @@ FactoryBot.define do
       domain { 'example.com' }
     end
 
+    trait :with_environments do
+      transient do
+        environments { %i(staging production) }
+      end
+
+      cluster_type { Clusters::Cluster.cluster_types[:project_type] }
+
+      before(:create) do |cluster, evaluator|
+        cluster_project = create(:cluster_project, cluster: cluster)
+
+        evaluator.environments.each do |env_name|
+          environment = create(:environment, name: env_name, project: cluster_project.project)
+
+          cluster.kubernetes_namespaces << create(:cluster_kubernetes_namespace,
+            cluster: cluster,
+            cluster_project: cluster_project,
+            project: cluster_project.project,
+            environment: environment)
+        end
+      end
+    end
+
     trait :not_managed do
       managed { false }
+    end
+
+    trait :cleanup_not_started do
+      cleanup_status { 1 }
+    end
+
+    trait :cleanup_uninstalling_applications do
+      cleanup_status { 2 }
+    end
+
+    trait :cleanup_removing_project_namespaces do
+      cleanup_status { 3 }
+    end
+
+    trait :cleanup_removing_service_account do
+      cleanup_status { 4 }
+    end
+
+    trait :cleanup_errored do
+      cleanup_status { 5 }
     end
   end
 end

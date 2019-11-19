@@ -1,15 +1,19 @@
 import { n__, s__, sprintf } from '~/locale';
 import { parseLicenseReportMetrics } from './utils';
+import { LICENSE_APPROVAL_STATUS } from '../constants';
 
 export const isLoading = state => state.isLoadingManagedLicenses || state.isLoadingLicenseReport;
 
 export const licenseReport = state =>
-  parseLicenseReportMetrics(state.headReport, state.baseReport, state.managedLicenses);
+  gon.features && gon.features.parsedLicenseReport
+    ? state.newLicenses
+    : parseLicenseReportMetrics(state.headReport, state.baseReport, state.managedLicenses);
 
 export const licenseSummaryText = (state, getters) => {
   const hasReportItems = getters.licenseReport && getters.licenseReport.length;
   const baseReportHasLicenses =
-    state.baseReport && state.baseReport.licenses && state.baseReport.licenses.length;
+    state.existingLicenses.length ||
+    (state.baseReport && state.baseReport.licenses && state.baseReport.licenses.length);
 
   if (getters.isLoading) {
     return sprintf(s__('ciReport|Loading %{reportName} report'), {
@@ -24,19 +28,33 @@ export const licenseSummaryText = (state, getters) => {
   }
 
   if (hasReportItems) {
+    const licenseReportLength = getters.licenseReport.length;
+
     if (!baseReportHasLicenses) {
-      return n__(
-        'LicenseCompliance|License Compliance detected %d license for the source branch only',
-        'LicenseCompliance|License Compliance detected %d licenses for the source branch only',
-        getters.licenseReport.length,
-      );
+      return getters.reportContainsBlacklistedLicense
+        ? n__(
+            'LicenseCompliance|License Compliance detected %d license for the source branch only; approval required',
+            'LicenseCompliance|License Compliance detected %d licenses for the source branch only; approval required',
+            licenseReportLength,
+          )
+        : n__(
+            'LicenseCompliance|License Compliance detected %d license for the source branch only',
+            'LicenseCompliance|License Compliance detected %d licenses for the source branch only',
+            licenseReportLength,
+          );
     }
 
-    return n__(
-      'LicenseCompliance|License Compliance detected %d new license',
-      'LicenseCompliance|License Compliance detected %d new licenses',
-      getters.licenseReport.length,
-    );
+    return getters.reportContainsBlacklistedLicense
+      ? n__(
+          'LicenseCompliance|License Compliance detected %d new license; approval required',
+          'LicenseCompliance|License Compliance detected %d new licenses; approval required',
+          licenseReportLength,
+        )
+      : n__(
+          'LicenseCompliance|License Compliance detected %d new license',
+          'LicenseCompliance|License Compliance detected %d new licenses',
+          licenseReportLength,
+        );
   }
 
   if (!baseReportHasLicenses) {
@@ -47,6 +65,11 @@ export const licenseSummaryText = (state, getters) => {
 
   return s__('LicenseCompliance|License Compliance detected no new licenses');
 };
+
+export const reportContainsBlacklistedLicense = (_state, getters) =>
+  (getters.licenseReport || []).some(
+    license => license.approvalStatus === LICENSE_APPROVAL_STATUS.BLACKLISTED,
+  );
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

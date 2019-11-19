@@ -18,7 +18,7 @@ describe MergeRequest, :elastic do
     end
   end
 
-  it "searches merge requests" do
+  it "searches merge requests", :sidekiq_might_not_need_inline do
     project = create :project, :public, :repository
 
     Sidekiq::Testing.inline! do
@@ -40,6 +40,27 @@ describe MergeRequest, :elastic do
     expect(described_class.elastic_search('term3', options: { project_ids: :any, public_and_internal_projects: true }).total_count).to eq(1)
   end
 
+  it "searches by iid and scopes to type: merge_request only", :sidekiq_might_not_need_inline do
+    project = create :project, :public, :repository
+    merge_request = nil
+
+    Sidekiq::Testing.inline! do
+      merge_request = create :merge_request, title: 'bla-bla merge request', source_project: project
+      create :merge_request, description: 'term2 in description', source_project: project, target_branch: "feature2"
+
+      # Issue with the same iid should not be found in MergeRequest search
+      create :issue, project: project, iid: merge_request.iid
+
+      Gitlab::Elastic::Helper.refresh_index
+    end
+
+    options = { project_ids: [project.id] }
+
+    results = described_class.elastic_search("!#{merge_request.iid}", options: options)
+    expect(results.total_count).to eq(1)
+    expect(results.first.title).to eq('bla-bla merge request')
+  end
+
   it "returns json with all needed elements" do
     merge_request = create :merge_request
 
@@ -58,12 +79,13 @@ describe MergeRequest, :elastic do
       'target_project_id',
       'author_id'
     ).merge({
-              'join_field' => {
-                'name' => merge_request.es_type,
-                'parent' => merge_request.es_parent
-              },
-              'type' => merge_request.es_type
-            })
+      'state' => merge_request.state,
+      'type' => merge_request.es_type,
+      'join_field' => {
+        'name' => merge_request.es_type,
+        'parent' => merge_request.es_parent
+      }
+    })
 
     expect(merge_request.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end

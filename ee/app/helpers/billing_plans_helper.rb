@@ -15,7 +15,7 @@ module BillingPlansHelper
 
   def plan_purchase_link(href, link_text)
     if href
-      link_to link_text, href, class: 'btn btn-primary btn-inverted'
+      link_to link_text, href, class: 'btn btn-success'
     else
       button_tag link_text, class: 'btn disabled'
     end
@@ -42,10 +42,32 @@ module BillingPlansHelper
     "#{EE::SUBSCRIPTIONS_URL}/gitlab/namespaces/#{group.id}/upgrade/#{plan.id}"
   end
 
+  def plan_purchase_url(group, plan)
+    "#{plan.purchase_link.href}&gl_namespace_id=#{group.id}"
+  end
+
+  def plan_feature_short_list(plan)
+    return [] unless plan.features
+
+    plan.features.sort_by! { |feature| feature.highlight ? 0 : 1 }[0...4]
+  end
+
+  def plan_purchase_or_upgrade_url(group, plan, current_plan)
+    if group.upgradable?
+      plan_upgrade_url(group, current_plan)
+    else
+      plan_purchase_url(group, plan)
+    end
+  end
+
   def show_trial_banner?(namespace)
     return false unless params[:trial]
 
     root = namespace.has_parent? ? namespace.root_ancestor : namespace
     root.trial_active?
+  end
+
+  def namespace_for_user?(namespace)
+    namespace == current_user.namespace
   end
 end

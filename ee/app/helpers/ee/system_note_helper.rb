@@ -19,9 +19,10 @@ module EE
       'weight' => 'weight',
       'relate_epic' => 'epic',
       'unrelate_epic' => 'epic',
-      'design_added' => 'doc-image',
-      'design_modified' => 'doc-image',
-      'design_removed' => 'doc-image'
+      'designs_added' => 'doc-image',
+      'designs_modified' => 'doc-image',
+      'designs_removed' => 'doc-image',
+      'designs_discussion_added' => 'doc-image'
     }.freeze
 
     override :system_note_icon_name

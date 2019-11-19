@@ -163,7 +163,20 @@ export const fetchSearchResults = ({ state, dispatch }) => {
   }
 };
 
+export const fetchNextPage = ({ state, dispatch }) => {
+  if (state.pageInfo.totalPages <= state.pageInfo.currentPage) {
+    return;
+  }
+  Api.projects(state.searchQuery, { page: state.pageInfo.nextPage })
+    .then(results => dispatch('receiveNextPageSuccess', results))
+    .catch(() => dispatch('receiveSearchResultsError'));
+};
+
 export const requestSearchResults = ({ commit }) => commit(types.REQUEST_SEARCH_RESULTS);
+
+export const receiveNextPageSuccess = ({ commit }, results) => {
+  commit(types.RECEIVE_NEXT_PAGE_SUCCESS, results);
+};
 
 export const receiveSearchResultsSuccess = ({ commit }, results) => {
   commit(types.RECEIVE_SEARCH_RESULTS_SUCCESS, results);
@@ -180,6 +193,10 @@ export const setProjectEndpoints = ({ commit }, endpoints) => {
 
 export const minimumQueryMessage = ({ commit }) => {
   commit(types.MINIMUM_QUERY_MESSAGE);
+};
+
+export const setProjects = ({ commit }, projects) => {
+  commit(types.SET_PROJECTS, projects);
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

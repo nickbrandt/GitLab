@@ -97,18 +97,24 @@ describe ProjectsHelper do
     end
   end
 
-  describe '#project_security_dashboard_config' do
+  shared_context 'project with owner and pipeline' do
     let(:user) { create(:user) }
     let(:group) { create(:group).tap { |g| g.add_owner(user) } }
-    let(:project) { create(:project, :repository, group: group) }
     let(:pipeline) do
       create(:ee_ci_pipeline,
-      :with_sast_report,
-      user: user,
-      project: project,
-      ref: project.default_branch,
-      sha: project.commit.sha)
+             :with_sast_report,
+             user: user,
+             project: project,
+             ref: project.default_branch,
+             sha: project.commit.sha)
     end
+    let(:project) { create(:project, :repository, group: group) }
+  end
+
+  describe '#project_security_dashboard_config' do
+    include_context 'project with owner and pipeline'
+
+    let(:project) { create(:project, :repository, group: group) }
 
     context 'project without pipeline' do
       subject { helper.project_security_dashboard_config(project, nil) }
@@ -125,6 +131,27 @@ describe ProjectsHelper do
       it 'returns config containing pipeline details' do
         expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard/index'
         expect(subject[:has_pipeline_data]).to eq 'true'
+      end
+
+      context 'when new Vulnerability Findings API enabled' do
+        it 'returns new "vulnerability findings" endpoint paths' do
+          expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerability_findings_path(project)
+          expect(subject[:vulnerabilities_summary_endpoint]).to(
+            eq(
+              summary_project_security_vulnerability_findings_path(project)
+            ))
+        end
+      end
+
+      context 'when new Vulnerability Findings API disabled' do
+        before do
+          stub_feature_flags(first_class_vulnerabilities: false)
+        end
+
+        it 'returns legacy "vulnerabilities" endpoint paths' do
+          expect(subject[:vulnerabilities_endpoint]).to eq project_security_vulnerabilities_path(project)
+          expect(subject[:vulnerabilities_summary_endpoint]).to eq summary_project_security_vulnerabilities_path(project)
+        end
       end
     end
   end

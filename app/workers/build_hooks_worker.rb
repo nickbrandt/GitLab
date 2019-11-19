@@ -5,6 +5,8 @@ class BuildHooksWorker
   include PipelineQueue
 
   queue_namespace :pipeline_hooks
+  feature_category :continuous_integration
+  latency_sensitive_worker!
 
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(build_id)

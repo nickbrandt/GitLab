@@ -30,6 +30,15 @@ module EE
       project.feature_available?(:custom_prometheus_metrics) && can?(current_user, :admin_project, project)
     end
 
+    def environment_logs_data(project, environment)
+      {
+        "current-environment-name": environment.name,
+        "environments-path": project_environments_path(project, format: :json),
+        "project-full-path": project.full_path,
+        "environment-id": environment.id
+      }
+    end
+
     def metrics_data(project, environment)
       ee_metrics_data = {
         "custom-metrics-path" => project_prometheus_metrics_path(project),

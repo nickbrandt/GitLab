@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'cgi'
+
 module Gitlab
   module Danger
     class Teammate
@@ -34,7 +36,29 @@ module Gitlab
         has_capability?(project, category, :maintainer, labels)
       end
 
+      def status
+        api_endpoint = "https://gitlab.com/api/v4/users/#{CGI.escape(username)}/status"
+        @status ||= Gitlab::Danger::RequestHelper.http_get_json(api_endpoint)
+      rescue Gitlab::Danger::RequestHelper::HTTPError, JSON::ParserError
+        nil # better no status than a crashing Danger
+      end
+
+      # @return [Boolean]
+      def available?
+        !out_of_office? && has_capacity?
+      end
+
       private
+
+      # @return [Boolean]
+      def out_of_office?
+        status&.dig("message")&.match?(/OOO/i) || false
+      end
+
+      # @return [Boolean]
+      def has_capacity?
+        status&.dig("emoji") != 'red_circle'
+      end
 
       def has_capability?(project, category, kind, labels)
         case category
@@ -43,7 +67,10 @@ module Gitlab
 
           area && labels.any?("devops::#{area.downcase}") if kind == :reviewer
         when :engineering_productivity
-          role[/Engineering Productivity/] if kind == :reviewer
+          return false unless role[/Engineering Productivity/]
+          return true if kind == :reviewer
+
+          capabilities(project).include?("#{kind} backend")
         else
           capabilities(project).include?("#{kind} #{category}")
         end

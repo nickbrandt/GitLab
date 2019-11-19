@@ -3,6 +3,7 @@ export default () => ({
   parentItem: {},
   epicsEndpoint: '',
   issuesEndpoint: '',
+  userSignedIn: false,
 
   children: {},
   childrenFlags: {},
@@ -10,7 +11,7 @@ export default () => ({
   issuesCount: 0,
 
   // Add Item Form Data
-  actionType: '',
+  issuableType: null,
   itemInputValue: '',
   pendingReferences: [],
   itemAutoCompleteSources: {},

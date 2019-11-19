@@ -17,7 +17,7 @@ export const parseLine = (line = {}, lineNumber) => ({
  * @param Number lineNumber
  */
 export const parseHeaderLine = (line = {}, lineNumber) => ({
-  isClosed: true,
+  isClosed: false,
   isHeader: true,
   line: parseLine(line, lineNumber),
   lines: [],
@@ -147,13 +147,15 @@ export const findOffsetAndRemove = (newLog = [], oldParsed = []) => {
 
   const firstNew = newLog[0];
 
-  if (last.offset === firstNew.offset || (last.line && last.line.offset === firstNew.offset)) {
-    cloneOldLog.splice(lastIndex);
-  } else if (last.lines && last.lines.length) {
-    const lastNestedIndex = last.lines.length - 1;
-    const lastNested = last.lines[lastNestedIndex];
-    if (lastNested.offset === firstNew.offset) {
-      last.lines.splice(lastNestedIndex);
+  if (last && firstNew) {
+    if (last.offset === firstNew.offset || (last.line && last.line.offset === firstNew.offset)) {
+      cloneOldLog.splice(lastIndex);
+    } else if (last.lines && last.lines.length) {
+      const lastNestedIndex = last.lines.length - 1;
+      const lastNested = last.lines[lastNestedIndex];
+      if (lastNested.offset === firstNew.offset) {
+        last.lines.splice(lastNestedIndex);
+      }
     }
   }
 
@@ -170,7 +172,7 @@ export const findOffsetAndRemove = (newLog = [], oldParsed = []) => {
  * @param array oldLog
  * @param array newLog
  */
-export const updateIncrementalTrace = (newLog, oldParsed = []) => {
+export const updateIncrementalTrace = (newLog = [], oldParsed = []) => {
   const parsedLog = findOffsetAndRemove(newLog, oldParsed);
 
   return logLinesParser(newLog, parsedLog);

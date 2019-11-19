@@ -8,7 +8,7 @@
     // Append static, server-generated data not included in merge request entity (EE-Only)
     // Object.assign would be useful here, but it blows up Phantom.js in tests
     window.gl.mrWidgetData.is_geo_secondary_node = '#{Gitlab::Geo.secondary?}' === 'true';
-    window.gl.mrWidgetData.geo_secondary_help_path = '#{help_page_path("/gitlab-geo/configuration.md")}';
+    window.gl.mrWidgetData.geo_secondary_help_path = '#{help_page_path("administration/geo/replication/configuration.md")}';
     window.gl.mrWidgetData.sast_help_path = '#{help_page_path("user/application_security/sast/index")}';
     window.gl.mrWidgetData.sast_container_help_path = '#{help_page_path("user/application_security/container_scanning/index")}';
     window.gl.mrWidgetData.dast_help_path = '#{help_page_path("user/application_security/dast/index")}';
@@ -20,3 +20,4 @@
     window.gl.mrWidgetData.container_scanning_comparison_path = '#{container_scanning_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:container_scanning)}'
     window.gl.mrWidgetData.dependency_scanning_comparison_path = '#{dependency_scanning_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:dependency_scanning)}'
     window.gl.mrWidgetData.sast_comparison_path = '#{sast_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:sast)}'
+    window.gl.mrWidgetData.dast_comparison_path = '#{dast_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:dast)}'

@@ -37,6 +37,7 @@ export default boardsStore => {
             class="btn btn-inverted"
             :class="{ 'dot-highlight': hasScope }"
             type="button"
+            data-qa-selector="boards_config_button"
             @click.prevent="showPage('edit')"
           >
             {{ buttonText }}

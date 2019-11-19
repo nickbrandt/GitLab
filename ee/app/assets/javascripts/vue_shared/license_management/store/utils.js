@@ -1,6 +1,7 @@
 import { n__, sprintf } from '~/locale';
 import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
+import ReportMapper from 'ee/vue_shared/license_management/report_mapper';
 
 const toLowerCase = name => name.toLowerCase();
 /**
@@ -55,9 +56,10 @@ const getLicenseStatusByName = (managedLicenses = [], licenseName) =>
   managedLicenses.find(license => caseInsensitiveMatch(license.name, licenseName)) || {};
 
 const getDependenciesByLicenseName = (dependencies = [], licenseName) =>
-  dependencies.filter(dependencyItem =>
-    caseInsensitiveMatch(dependencyItem.license.name, licenseName),
-  );
+  dependencies.filter(dependencyItem => {
+    const licenses = dependencyItem.licenses || [dependencyItem.license];
+    return licenses.find(license => caseInsensitiveMatch(license.name, licenseName));
+  });
 
 /**
  *
@@ -85,10 +87,13 @@ export const parseLicenseReportMetrics = (headMetrics, baseMetrics, managedLicen
   if (!headMetrics && !baseMetrics) {
     return [];
   }
+  const reportMapper = new ReportMapper();
+  const headReport = reportMapper.mapFrom(headMetrics);
+  const baseReport = reportMapper.mapFrom(baseMetrics);
 
-  const headLicenses = headMetrics.licenses || [];
-  const headDependencies = headMetrics.dependencies || [];
-  const baseLicenses = baseMetrics.licenses || [];
+  const headLicenses = headReport.licenses || [];
+  const headDependencies = headReport.dependencies || [];
+  const baseLicenses = baseReport.licenses || [];
   const managedLicenseList = managedLicenses || [];
 
   if (!headLicenses.length && !headDependencies.length) return [];
@@ -100,6 +105,7 @@ export const parseLicenseReportMetrics = (headMetrics, baseMetrics, managedLicen
     const { id, approvalStatus } = getLicenseStatusByName(managedLicenseList, name);
     const dependencies = getDependenciesByLicenseName(headDependencies, name);
     const url =
+      license.url ||
       (dependencies && dependencies[0] && dependencies[0].license && dependencies[0].license.url) ||
       '';
 
@@ -153,4 +159,27 @@ export const getPackagesString = (packages, truncate, maxPackages) => {
     packagesString,
     lastPackage,
   });
+};
+
+/**
+ * This converts the newer licence format into the old one so we can use it with our older components.
+ *
+ * NOTE: This helper is temporary and can be removed once we flip the `parsedLicenseReport` feature flag
+ * The below issue is for tracking its removal:
+ * https://gitlab.com/gitlab-org/gitlab/issues/33878
+ *
+ * @param {Object} license The license in the newer format that needs converting
+ * @returns {Object} The converted license;
+ */
+
+export const convertToOldReportFormat = license => {
+  const approvalStatus = license.classification.approval_status;
+
+  return {
+    ...license,
+    approvalStatus,
+    id: license.classification.id,
+    packages: license.dependencies,
+    status: getIssueStatusFromLicenseStatus(approvalStatus),
+  };
 };

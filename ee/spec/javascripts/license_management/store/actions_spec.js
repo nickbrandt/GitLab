@@ -186,16 +186,47 @@ describe('License store actions', () => {
   });
 
   describe('receiveSetLicenseApproval', () => {
-    it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadManagedLicenses', done => {
-      testAction(
-        actions.receiveSetLicenseApproval,
-        null,
-        state,
-        [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
-        [{ type: 'loadManagedLicenses' }],
-      )
-        .then(done)
-        .catch(done.fail);
+    gon.features = gon.features || {};
+    const { parsedLicenseReport } = gon.features;
+
+    afterEach(() => {
+      gon.features.parsedLicenseReport = parsedLicenseReport;
+    });
+
+    describe('with the parsedLicenseReport feature flag enabled', () => {
+      beforeEach(() => {
+        gon.features.parsedLicenseReport = true;
+      });
+
+      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadParsedLicenseReport', done => {
+        testAction(
+          actions.receiveSetLicenseApproval,
+          null,
+          state,
+          [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
+          [{ type: 'loadParsedLicenseReport' }],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('with the parsedLicenseReport feature flag disabled', () => {
+      beforeEach(() => {
+        gon.features.parsedLicenseReport = false;
+      });
+
+      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadManagedLicenses', done => {
+        testAction(
+          actions.receiveSetLicenseApproval,
+          null,
+          state,
+          [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
+          [{ type: 'loadManagedLicenses' }],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
     });
   });
 
@@ -599,6 +630,202 @@ describe('License store actions', () => {
       )
         .then(done)
         .catch(done.fail);
+    });
+  });
+
+  describe('requestLoadParsedLicenseReport', () => {
+    it(`should commit ${mutationTypes.REQUEST_LOAD_PARSED_LICENSE_REPORT}`, done => {
+      testAction(
+        actions.requestLoadParsedLicenseReport,
+        null,
+        state,
+        [{ type: mutationTypes.REQUEST_LOAD_PARSED_LICENSE_REPORT }],
+        [],
+      )
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('receiveLoadParsedLicenseReport', () => {
+    it(`should commit ${mutationTypes.RECEIVE_LOAD_PARSED_LICENSE_REPORT} with the correct payload`, done => {
+      const payload = { newLicenses: [{ name: 'foo' }] };
+
+      testAction(
+        actions.receiveLoadParsedLicenseReport,
+        payload,
+        state,
+        [{ type: mutationTypes.RECEIVE_LOAD_PARSED_LICENSE_REPORT, payload }],
+        [],
+      )
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('receiveLoadParsedLicenseReportError', () => {
+    it(`should commit ${mutationTypes.RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR}`, done => {
+      const payload = new Error('Test');
+
+      testAction(
+        actions.receiveLoadParsedLicenseReportError,
+        payload,
+        state,
+        [{ type: mutationTypes.RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR, payload }],
+        [],
+      )
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('loadParsedLicenseReport', () => {
+    const licensesApiPath = `${TEST_HOST}/licensesApiPath`;
+    let licensesApiMock;
+    let rawLicenseReport;
+
+    beforeEach(() => {
+      licensesApiMock = axiosMock.onGet(licensesApiPath);
+      state = {
+        ...createState(),
+        licensesApiPath,
+      };
+    });
+
+    describe('pipeline reports', () => {
+      beforeEach(() => {
+        rawLicenseReport = [
+          {
+            name: 'MIT',
+            classification: { id: 2, approval_status: 'blacklisted', name: 'MIT' },
+            dependencies: [{ name: 'vue' }],
+            count: 1,
+            url: 'http://opensource.org/licenses/mit-license',
+          },
+        ];
+      });
+
+      it('should fetch, parse, and dispatch the new licenses on a successful request', done => {
+        licensesApiMock.replyOnce(() => [200, rawLicenseReport]);
+
+        const parsedLicenses = {
+          existingLicenses: [],
+          newLicenses: [
+            {
+              ...rawLicenseReport[0],
+              id: 2,
+              approvalStatus: 'blacklisted',
+              packages: [{ name: 'vue' }],
+              status: 'failed',
+            },
+          ],
+        };
+
+        testAction(
+          actions.loadParsedLicenseReport,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestLoadParsedLicenseReport' },
+            { type: 'receiveLoadParsedLicenseReport', payload: parsedLicenses },
+          ],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
+
+      it('should send an error on an unsuccesful request', done => {
+        licensesApiMock.replyOnce(400);
+
+        testAction(
+          actions.loadParsedLicenseReport,
+          null,
+          state,
+          [],
+          [{ type: 'requestLoadParsedLicenseReport' }, { type: 'receiveLoadLicenseReportError' }],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('MR widget reports', () => {
+      beforeEach(() => {
+        rawLicenseReport = {
+          new_licenses: [
+            {
+              name: 'Apache 2.0',
+              classification: { id: 1, approval_status: 'approved', name: 'Apache 2.0' },
+              dependencies: [{ name: 'echarts' }],
+              count: 1,
+              url: 'http://www.apache.org/licenses/LICENSE-2.0.txt',
+            },
+            {
+              name: 'New BSD',
+              classification: { id: 3, approval_status: 'unclassified', name: 'New BSD' },
+              dependencies: [{ name: 'zrender' }],
+              count: 1,
+              url: 'http://opensource.org/licenses/BSD-3-Clause',
+            },
+          ],
+          existing_licenses: [
+            {
+              name: 'MIT',
+              classification: { id: 2, approval_status: 'blacklisted', name: 'MIT' },
+              dependencies: [{ name: 'vue' }],
+              count: 1,
+              url: 'http://opensource.org/licenses/mit-license',
+            },
+          ],
+          removed_licenses: [],
+        };
+      });
+
+      it('should fetch, parse, and dispatch the new licenses on a successful request', done => {
+        licensesApiMock.replyOnce(() => [200, rawLicenseReport]);
+
+        const parsedLicenses = {
+          existingLicenses: [
+            {
+              ...rawLicenseReport.existing_licenses[0],
+              id: 2,
+              approvalStatus: 'blacklisted',
+              packages: [{ name: 'vue' }],
+              status: 'failed',
+            },
+          ],
+          newLicenses: [
+            {
+              ...rawLicenseReport.new_licenses[0],
+              id: 1,
+              approvalStatus: 'approved',
+              packages: [{ name: 'echarts' }],
+              status: 'success',
+            },
+            {
+              ...rawLicenseReport.new_licenses[1],
+              id: 3,
+              approvalStatus: 'unclassified',
+              packages: [{ name: 'zrender' }],
+              status: 'neutral',
+            },
+          ],
+        };
+
+        testAction(
+          actions.loadParsedLicenseReport,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestLoadParsedLicenseReport' },
+            { type: 'receiveLoadParsedLicenseReport', payload: parsedLicenses },
+          ],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
     });
   });
 });

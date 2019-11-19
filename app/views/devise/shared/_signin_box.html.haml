@@ -1,4 +1,4 @@
-- if form_based_providers.any?
+- if any_form_based_providers_enabled?
   - if crowd_enabled?
     .login-box.tab-pane{ id: "crowd", role: 'tabpanel', class: active_when(form_based_auth_provider_has_active_class?(:crowd)) }
       .login-body
@@ -22,3 +22,8 @@
   .login-box.tab-pane.active{ id: 'login-pane', role: 'tabpanel' }
     .login-body
       = render 'devise/sessions/new_base'
+
+- if experiment_enabled?(:signup_flow)
+  %p.light.mt-2
+    = _("Don't have an account yet?")
+    = link_to _("Register now"), new_registration_path(:user)

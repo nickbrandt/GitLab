@@ -28,7 +28,7 @@ If all the jobs in a stage:
 - Fail, the next stage is not (usually) executed and the pipeline ends early.
 
 NOTE: **Note:**
-If you have a [mirrored repository that GitLab pulls from](../workflow/repository_mirroring.md#pulling-from-a-remote-repository-starter),
+If you have a [mirrored repository that GitLab pulls from](../user/project/repository/repository_mirroring.md#pulling-from-a-remote-repository-starter),
 you may need to enable pipeline triggering in your project's
 **Settings > Repository > Pull from a remote repository > Trigger pipelines for mirror updates**.
 
@@ -269,6 +269,38 @@ To execute a pipeline manually:
 
 The pipeline will execute the jobs as configured.
 
+#### Using a query string
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/24146) in GitLab 12.5.
+
+Variables on the **Run Pipeline** page can be pre-populated by passing variable keys and values
+in a query string appended to the `pipelines/new` URL. The format is:
+
+```plaintext
+.../pipelines/new?ref=<branch>&var[<variable_key>]=<value>&file_var[<file_key>]=<value>
+```
+
+The following parameters are supported:
+
+- `ref`: specify the branch to populate the **Run for** field with.
+- `var`: specify a `Variable` variable.
+- `file_var`: specify a `File` variable.
+
+For each `var` or `file_var`, a key and value are required.
+
+For example, the query string
+`.../pipelines/new?ref=my_branch&var[foo]=bar&file_var[file_foo]=file_bar` will pre-populate the
+**Run Pipeline** page as follows:
+
+- **Run for** field: `my_branch`.
+- **Variables** section:
+  - Variable:
+    - Key: `foo`
+    - Value: `bar`
+  - File:
+    - Key: `file_foo`
+    - Value: `file_bar`
+
 ### Accessing pipelines
 
 You can find the current and historical pipeline runs under your project's
@@ -283,11 +315,11 @@ You can also access pipelines for a merge request by navigating to its **Pipelin
 
 When you access a pipeline, you can see the related jobs for that pipeline.
 
-Clicking on an individual job will show you its job trace, and allow you to:
+Clicking on an individual job will show you its job log, and allow you to:
 
 - Cancel the job.
 - Retry the job.
-- Erase the job trace.
+- Erase the job log.
 
 ### Seeing the failure reason for jobs
 
@@ -379,6 +411,8 @@ This functionality is only available:
 
 ## Most Recent Pipeline
 
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/50499) in GitLab 12.3.
+
 There's a link to the latest pipeline for the last commit of a given branch at `/project/pipelines/[branch]/latest`. Also, `/project/pipelines/latest` will redirect you to the latest pipeline for the last commit on the project's default branch.
 
 ## Security on protected branches
@@ -434,15 +468,3 @@ To illustrate its life cycle:
    even if the commit history of the `example` branch has been overwritten by force-push.
 1. GitLab Runner fetches the persistent pipeline ref and gets source code from the checkout-SHA.
 1. When the pipeline finished, its persistent ref is cleaned up in a background process.
-
-NOTE: **NOTE**: At this moment, this feature is off dy default and can be manually enabled
-by enabling `depend_on_persistent_pipeline_ref` feature flag, however, we'd remove this
-feature flag and make it enabled by deafult by the day we release 12.4 _if we don't find any issues_.
-If you'd be interested in manually turning on this behavior, please ask the administrator
-to execute the following commands in rails console.
-
-```shell
-> sudo gitlab-rails console                                        # Login to Rails console of GitLab instance.
-> project = Project.find_by_full_path('namespace/project-name')    # Get the project instance.
-> Feature.enable(:depend_on_persistent_pipeline_ref, project)      # Enable the feature flag.
-```

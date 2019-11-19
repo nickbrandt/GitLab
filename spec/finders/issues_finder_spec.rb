@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe IssuesFinder do
@@ -158,6 +160,20 @@ describe IssuesFinder do
 
         it 'returns issues not created by that user' do
           expect(issues).to contain_exactly(issue1, issue2, issue4)
+        end
+      end
+
+      context 'filtering by nonexistent author ID and issue term using CTE for search' do
+        let(:params) do
+          {
+            author_id: 'does-not-exist',
+            search: 'git',
+            attempt_group_search_optimizations: true
+          }
+        end
+
+        it 'returns no results' do
+          expect(issues).to be_empty
         end
       end
 

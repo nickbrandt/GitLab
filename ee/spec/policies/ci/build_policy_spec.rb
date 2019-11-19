@@ -17,7 +17,7 @@ describe Ci::BuildPolicy do
     it_behaves_like 'protected environments access'
 
     context 'when a pipeline has manual deployment job' do
-      let!(:build) { create(:ee_ci_build, :manual, :deploy_to_production, pipeline: pipeline) }
+      let!(:build) { create(:ee_ci_build, :with_deployment, :manual, :deploy_to_production, pipeline: pipeline) }
 
       before do
         project.add_developer(user)

@@ -96,30 +96,14 @@ describe ApplicationController do
           request.path = '/-/peek'
         end
 
-        # TODO:
-        # remove line below once `privacy_policy_update_callout`
-        # feature flag is removed and `gon` reverts back to
-        # to not setting any variables.
-        if Gitlab.ee?
-          it_behaves_like 'setting gon variables'
-        else
-          it_behaves_like 'not setting gon variables'
-        end
+        it_behaves_like 'not setting gon variables'
       end
     end
 
     context 'with json format' do
       let(:format) { :json }
 
-      # TODO:
-      # remove line below once `privacy_policy_update_callout`
-      # feature flag is removed and `gon` reverts back to
-      # to not setting any variables.
-      if Gitlab.ee?
-        it_behaves_like 'setting gon variables'
-      else
-        it_behaves_like 'not setting gon variables'
-      end
+      it_behaves_like 'not setting gon variables'
     end
   end
 
@@ -202,7 +186,7 @@ describe ApplicationController do
       expect(response).to have_gitlab_http_status(404)
     end
 
-    it 'redirects to login page via authenticate_user! if not authenticated' do
+    it 'redirects to login page if not authenticated' do
       get :index
 
       expect(response).to redirect_to new_user_session_path
@@ -460,6 +444,25 @@ describe ApplicationController do
     end
   end
 
+  context 'deactivated user' do
+    controller(described_class) do
+      def index
+        render html: 'authenticated'
+      end
+    end
+
+    before do
+      sign_in user
+      user.deactivate
+    end
+
+    it 'signs out a deactivated user' do
+      get :index
+      expect(response).to redirect_to(new_user_session_path)
+      expect(flash[:alert]).to eq('Your account has been deactivated by your administrator. Please log back in to reactivate your account.')
+    end
+  end
+
   context 'terms' do
     controller(described_class) do
       def index
@@ -636,7 +639,7 @@ describe ApplicationController do
     context 'given a 422 error page' do
       controller do
         def index
-          render 'errors/omniauth_error', layout: 'errors', status: 422
+          render 'errors/omniauth_error', layout: 'errors', status: :unprocessable_entity
         end
       end
 
@@ -650,7 +653,7 @@ describe ApplicationController do
     context 'given a 500 error page' do
       controller do
         def index
-          render 'errors/omniauth_error', layout: 'errors', status: 500
+          render 'errors/omniauth_error', layout: 'errors', status: :internal_server_error
         end
       end
 
@@ -664,7 +667,7 @@ describe ApplicationController do
     context 'given a 200 success page' do
       controller do
         def index
-          render 'errors/omniauth_error', layout: 'errors', status: 200
+          render 'errors/omniauth_error', layout: 'errors', status: :ok
         end
       end
 
@@ -821,6 +824,50 @@ describe ApplicationController do
           expect(Gitlab::Auth::CurrentUserMode.new(user).admin_mode?).to be(true)
         end
       end
+    end
+  end
+
+  describe '#required_signup_info' do
+    controller(described_class) do
+      def index; end
+    end
+
+    let(:user) { create(:user) }
+    let(:experiment_enabled) { true }
+
+    before do
+      stub_experiment_for_user(signup_flow: experiment_enabled)
+    end
+
+    context 'experiment enabled and user with required role' do
+      before do
+        user.set_role_required!
+        sign_in(user)
+        get :index
+      end
+
+      it { is_expected.to redirect_to users_sign_up_welcome_path }
+    end
+
+    context 'experiment enabled and user without a required role' do
+      before do
+        sign_in(user)
+        get :index
+      end
+
+      it { is_expected.not_to redirect_to users_sign_up_welcome_path }
+    end
+
+    context 'experiment disabled' do
+      let(:experiment_enabled) { false }
+
+      before do
+        user.set_role_required!
+        sign_in(user)
+        get :index
+      end
+
+      it { is_expected.not_to redirect_to users_sign_up_welcome_path }
     end
   end
 end

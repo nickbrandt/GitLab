@@ -36,6 +36,7 @@ describe('ee/ide/components/terminal_sync/terminal_sync_status', () => {
     });
 
     wrapper = shallowMount(localVue.extend(TerminalSyncStatus), {
+      attachToDocument: true,
       localVue,
       sync: false,
       store,

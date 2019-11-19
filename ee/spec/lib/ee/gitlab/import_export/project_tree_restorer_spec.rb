@@ -12,79 +12,54 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
   let(:restored_project_json) { project_tree_restorer.restore }
 
   before do
-    allow(shared).to receive(:export_path).and_return('spec/fixtures/lib/gitlab/import_export/')
-    project_tree_restorer.instance_variable_set(:@path, 'ee/spec/fixtures/lib/gitlab/import_export/project.designs.json')
+    setup_import_export_config('designs', 'ee')
   end
 
   describe 'restoring design management data' do
-    context 'when the `export_designs` feature is enabled' do
-      before do
-        restored_project_json
+    before do
+      restored_project_json
+    end
+
+    it_behaves_like 'restores project correctly', issues: 2
+
+    it 'restores project associations correctly' do
+      expect(project.designs.size).to eq(7)
+    end
+
+    describe 'restores issue associations correctly' do
+      let(:issue) { project.issues.offset(index).first }
+
+      where(:index, :design_filenames, :version_shas) do
+        0 | %w[chirrido3.jpg jonathan_richman.jpg mariavontrap.jpeg] | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 9358d1bac8ff300d3d2597adaa2572a20f7f8703 e1a4a501bcb42f291f84e5d04c8f927821542fb6]
+        1 | ['1 (1).jpeg', '2099743.jpg', 'a screenshot (1).jpg', 'chirrido3.jpg'] | %w[73f871b4c8c1d65c62c460635e023179fb53abc4 8587e78ab6bda3bc820a9f014c3be4a21ad4fcc8 c9b5f067f3e892122a4b12b0a25a8089192f3ac8]
       end
 
-      it_behaves_like 'restores project correctly', issues: 2
-
-      it 'restores project associations correctly' do
-        expect(project.designs.size).to eq(7)
-      end
-
-      describe 'restores issue associations correctly' do
-        let(:issue) { project.issues.offset(index).first }
-
-        where(:index, :design_filenames, :version_shas) do
-          0 | %w[chirrido3.jpg jonathan_richman.jpg mariavontrap.jpeg] | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 9358d1bac8ff300d3d2597adaa2572a20f7f8703 e1a4a501bcb42f291f84e5d04c8f927821542fb6]
-          1 | ['1 (1).jpeg', '2099743.jpg', 'a screenshot (1).jpg', 'chirrido3.jpg'] | %w[73f871b4c8c1d65c62c460635e023179fb53abc4 8587e78ab6bda3bc820a9f014c3be4a21ad4fcc8 c9b5f067f3e892122a4b12b0a25a8089192f3ac8]
-        end
-
-        with_them do
-          it do
-            expect(issue.designs.pluck(:filename)).to contain_exactly(*design_filenames)
-            expect(issue.design_versions.pluck(:sha)).to contain_exactly(*version_shas)
-          end
-        end
-      end
-
-      describe 'restores design version associations correctly' do
-        let(:project_designs) { project.designs.reorder(:filename, :issue_id) }
-        let(:design) { project_designs.offset(index).first }
-
-        where(:index, :version_shas) do
-          0 | %w[73f871b4c8c1d65c62c460635e023179fb53abc4 c9b5f067f3e892122a4b12b0a25a8089192f3ac8]
-          1 | %w[73f871b4c8c1d65c62c460635e023179fb53abc4]
-          2 | %w[c9b5f067f3e892122a4b12b0a25a8089192f3ac8]
-          3 | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 9358d1bac8ff300d3d2597adaa2572a20f7f8703 e1a4a501bcb42f291f84e5d04c8f927821542fb6]
-          4 | %w[8587e78ab6bda3bc820a9f014c3be4a21ad4fcc8]
-          5 | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 e1a4a501bcb42f291f84e5d04c8f927821542fb6]
-          6 | %w[27702d08f5ee021ae938737f84e8fe7c38599e85]
-        end
-
-        with_them do
-          it do
-            expect(design.versions.pluck(:sha)).to contain_exactly(*version_shas)
-          end
+      with_them do
+        it do
+          expect(issue.designs.pluck(:filename)).to contain_exactly(*design_filenames)
+          expect(issue.design_versions.pluck(:sha)).to contain_exactly(*version_shas)
         end
       end
     end
 
-    context 'when the `export_designs` feature is disabled' do
-      before do
-        stub_feature_flags(export_designs: false)
+    describe 'restores design version associations correctly' do
+      let(:project_designs) { project.designs.reorder(:filename, :issue_id) }
+      let(:design) { project_designs.offset(index).first }
 
-        restored_project_json
+      where(:index, :version_shas) do
+        0 | %w[73f871b4c8c1d65c62c460635e023179fb53abc4 c9b5f067f3e892122a4b12b0a25a8089192f3ac8]
+        1 | %w[73f871b4c8c1d65c62c460635e023179fb53abc4]
+        2 | %w[c9b5f067f3e892122a4b12b0a25a8089192f3ac8]
+        3 | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 9358d1bac8ff300d3d2597adaa2572a20f7f8703 e1a4a501bcb42f291f84e5d04c8f927821542fb6]
+        4 | %w[8587e78ab6bda3bc820a9f014c3be4a21ad4fcc8]
+        5 | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 e1a4a501bcb42f291f84e5d04c8f927821542fb6]
+        6 | %w[27702d08f5ee021ae938737f84e8fe7c38599e85]
       end
 
-      it_behaves_like 'restores project correctly', issues: 2
-
-      it 'does not restore any Designs' do
-        expect(DesignManagement::Design).not_to exist
-      end
-
-      it 'does not restore any Versions' do
-        expect(DesignManagement::Version.exists?).to be false
-      end
-
-      it 'does not restore any DesignVersions' do
-        expect(DesignManagement::Action.exists?).to be false
+      with_them do
+        it do
+          expect(design.versions.pluck(:sha)).to contain_exactly(*version_shas)
+        end
       end
     end
   end

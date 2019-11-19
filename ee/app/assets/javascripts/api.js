@@ -10,6 +10,15 @@ export default {
   groupEpicsPath:
     '/api/:version/groups/:id/epics?include_ancestor_groups=:includeAncestorGroups&include_descendant_groups=:includeDescendantGroups',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
+  podLogsPath: '/:project_full_path/environments/:environment_id/pods/containers/logs.json',
+  podLogsPathWithPod:
+    '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/logs.json',
+  podLogsPathWithPodContainer:
+    '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/:container_name/logs.json',
+  groupPackagesPath: '/api/:version/groups/:id/packages',
+  projectPackagesPath: '/api/:version/projects/:id/packages',
+  projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
+  cycleAnalyticsTasksByTypePath: '/-/analytics/type_of_work/tasks_by_type',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -69,5 +78,67 @@ export default {
       .replace(':issue_id', epicIssueId);
 
     return axios.delete(url);
+  },
+
+  /**
+   * Returns pods logs for an environment with an optional pod and container
+   *
+   * @param {Object} params
+   * @param {string} param.projectFullPath - Path of the project, in format `/<namespace>/<project-key>`
+   * @param {number} param.environmentId - Id of the environment
+   * @param {string=} params.podName - Pod name, if not set the backend assumes a default one
+   * @param {string=} params.containerName - Container name, if not set the backend assumes a default one
+   * @returns {Promise} Axios promise for the result of a GET request of logs
+   */
+  getPodLogs({ projectPath, environmentId, podName, containerName }) {
+    let logPath = this.podLogsPath;
+    if (podName && containerName) {
+      logPath = this.podLogsPathWithPodContainer;
+    } else if (podName) {
+      logPath = this.podLogsPathWithPod;
+    }
+
+    let url = this.buildUrl(logPath)
+      .replace(':project_full_path', projectPath)
+      .replace(':environment_id', environmentId);
+
+    if (podName) {
+      url = url.replace(':pod_name', podName);
+    }
+    if (containerName) {
+      url = url.replace(':container_name', containerName);
+    }
+    return axios.get(url);
+  },
+
+  groupPackages(id, options = {}) {
+    const url = Api.buildUrl(this.groupPackagesPath).replace(':id', id);
+    return axios.get(url, options);
+  },
+
+  projectPackages(id, options = {}) {
+    const url = Api.buildUrl(this.projectPackagesPath).replace(':id', id);
+    return axios.get(url, options);
+  },
+
+  buildProjectPackageUrl(projectId, packageId) {
+    return Api.buildUrl(this.projectPackagePath)
+      .replace(':id', projectId)
+      .replace(':package_id', packageId);
+  },
+
+  projectPackage(projectId, packageId) {
+    const url = this.buildProjectPackageUrl(projectId, packageId);
+    return axios.get(url);
+  },
+
+  deleteProjectPackage(projectId, packageId) {
+    const url = this.buildProjectPackageUrl(projectId, packageId);
+    return axios.delete(url);
+  },
+
+  cycleAnalyticsTasksByType(params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsTasksByTypePath);
+    return axios.get(url, { params });
   },
 };

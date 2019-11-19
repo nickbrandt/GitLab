@@ -4,7 +4,7 @@ require('spec_helper')
 
 describe Projects::ProjectMembersController do
   let(:user) { create(:user) }
-  let(:project) { create(:project, :public, :access_requestable) }
+  let(:project) { create(:project, :public) }
 
   describe 'GET index' do
     it 'has the project_members address with a 200 status code' do
@@ -45,7 +45,9 @@ describe Projects::ProjectMembersController do
       end
 
       it 'adds user to members' do
-        expect_any_instance_of(Members::CreateService).to receive(:execute).and_return(status: :success)
+        expect_next_instance_of(Members::CreateService) do |instance|
+          expect(instance).to receive(:execute).and_return(status: :success)
+        end
 
         post :create, params: {
                         namespace_id: project.namespace,
@@ -59,7 +61,9 @@ describe Projects::ProjectMembersController do
       end
 
       it 'adds no user to members' do
-        expect_any_instance_of(Members::CreateService).to receive(:execute).and_return(status: :failure, message: 'Message')
+        expect_next_instance_of(Members::CreateService) do |instance|
+          expect(instance).to receive(:execute).and_return(status: :failure, message: 'Message')
+        end
 
         post :create, params: {
                         namespace_id: project.namespace,

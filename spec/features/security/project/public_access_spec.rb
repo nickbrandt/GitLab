@@ -14,6 +14,7 @@ describe "Public Project Access" do
   describe "Project should be public" do
     describe '#public?' do
       subject { project.public? }
+
       it { is_expected.to be_truthy }
     end
   end
@@ -476,7 +477,9 @@ describe "Public Project Access" do
 
     before do
       # Speed increase
-      allow_any_instance_of(Project).to receive(:branches).and_return([])
+      allow_next_instance_of(Project) do |instance|
+        allow(instance).to receive(:branches).and_return([])
+      end
     end
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -495,7 +498,9 @@ describe "Public Project Access" do
 
     before do
       # Speed increase
-      allow_any_instance_of(Project).to receive(:tags).and_return([])
+      allow_next_instance_of(Project) do |instance|
+        allow(instance).to receive(:tags).and_return([])
+      end
     end
 
     it { is_expected.to be_allowed_for(:admin) }

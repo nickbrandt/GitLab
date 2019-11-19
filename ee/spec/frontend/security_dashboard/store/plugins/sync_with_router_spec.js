@@ -1,12 +1,16 @@
 import createStore from 'ee/security_dashboard/store/index';
+import syncWithRouter from 'ee/security_dashboard/store/plugins/sync_with_router';
+import createRouter from 'ee/security_dashboard/store/router';
 import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
 
 describe('syncWithRouter', () => {
+  let router;
   let store;
   const noop = () => {};
 
   beforeEach(() => {
-    store = createStore();
+    router = createRouter();
+    store = createStore({ plugins: [syncWithRouter(router)] });
   });
 
   it('updates store after URL changes', () => {
@@ -16,12 +20,12 @@ describe('syncWithRouter', () => {
 
     jest.spyOn(store, 'dispatch');
 
-    const routerPush = store.$router.push.bind(store.$router);
-    jest.spyOn(store.$router, 'push');
+    const routerPush = router.push.bind(router);
+    jest.spyOn(router, 'push');
     routerPush({ name: 'dashboard', query });
 
     // Assert no implicit synchronous recursive calls occurred
-    expect(store.$router.push).not.toHaveBeenCalled();
+    expect(router.push).not.toHaveBeenCalled();
 
     expect(store.dispatch).toHaveBeenCalledWith(`filters/setAllFilters`, query);
     expect(store.dispatch).toHaveBeenCalledWith(`vulnerabilities/setVulnerabilitiesPage`, page);
@@ -38,8 +42,8 @@ describe('syncWithRouter', () => {
 
     jest.spyOn(store, 'dispatch');
 
-    const routerPush = store.$router.push.bind(store.$router);
-    jest.spyOn(store.$router, 'push');
+    const routerPush = router.push.bind(router);
+    jest.spyOn(router, 'push');
     routerPush({ name: 'dashboard', query });
     expect(store.dispatch).toHaveBeenCalledWith(`vulnerabilities/setVulnerabilitiesPage`, 1);
   });
@@ -49,7 +53,7 @@ describe('syncWithRouter', () => {
 
     jest.spyOn(store, 'commit').mockImplementation(noop);
 
-    store.$router.push({ name: 'dashboard', query, params: { updatedFromState: true } });
+    router.push({ name: 'dashboard', query, params: { updatedFromState: true } });
 
     expect(store.commit).toHaveBeenCalledTimes(0);
   });
@@ -58,12 +62,12 @@ describe('syncWithRouter', () => {
     const activeFilters = store.getters['filters/activeFilters'];
     const page = 2;
 
-    jest.spyOn(store.$router, 'push').mockImplementation(noop);
+    jest.spyOn(router, 'push').mockImplementation(noop);
 
     store.dispatch(`vulnerabilities/fetchVulnerabilities`, { page });
 
-    expect(store.$router.push).toHaveBeenCalledTimes(1);
-    expect(store.$router.push).toHaveBeenCalledWith(
+    expect(router.push).toHaveBeenCalledTimes(1);
+    expect(router.push).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'dashboard',
         query: expect.objectContaining({
@@ -80,12 +84,12 @@ describe('syncWithRouter', () => {
     const activeFilters = store.getters['filters/activeFilters'];
     const days = DAYS.SIXTY;
 
-    jest.spyOn(store.$router, 'push').mockImplementation(noop);
+    jest.spyOn(router, 'push').mockImplementation(noop);
 
     store.dispatch(`vulnerabilities/setVulnerabilitiesHistoryDayRange`, days);
 
-    expect(store.$router.push).toHaveBeenCalledTimes(1);
-    expect(store.$router.push).toHaveBeenCalledWith(
+    expect(router.push).toHaveBeenCalledTimes(1);
+    expect(router.push).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'dashboard',
         query: expect.objectContaining({

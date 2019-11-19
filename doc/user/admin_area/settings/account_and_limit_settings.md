@@ -17,7 +17,7 @@ details.
 
 ## Repository size limit **(STARTER)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/740) in [GitLab Enterprise Edition 8.12](https://about.gitlab.com/2016/09/22/gitlab-8-12-released/#limit-project-size-ee).
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/740) in [GitLab Enterprise Edition 8.12](https://about.gitlab.com/blog/2016/09/22/gitlab-8-12-released/#limit-project-size-ee).
 > Available in [GitLab Starter](https://about.gitlab.com/pricing/).
 
 Repositories within your GitLab instance can grow quickly, especially if you are
@@ -32,7 +32,7 @@ For instance, consider the following workflow:
 
 1. Your team develops apps which require large files to be stored in
    the application repository.
-1. Although you have enabled [Git LFS](../../../workflow/lfs/manage_large_binaries_with_git_lfs.md#git-lfs)
+1. Although you have enabled [Git LFS](../../../administration/lfs/manage_large_binaries_with_git_lfs.md#git-lfs)
    to your project, your storage has grown significantly.
 1. Before you exceed available storage, you set up a limit of 10 GB
    per repository.

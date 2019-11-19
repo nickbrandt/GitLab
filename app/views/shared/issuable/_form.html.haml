@@ -12,6 +12,8 @@
     = link_to "the #{issuable.class.model_name.human.downcase}", polymorphic_path([@project.namespace.becomes(Namespace), @project, issuable]), target: "_blank", rel: 'noopener noreferrer'
     and make sure your changes will not unintentionally remove theirs
 
+= render 'shared/issuable/form/branch_chooser', issuable: issuable, form: form
+
 .form-group.row
   = form.label :title, class: 'col-form-label col-sm-2'
 
@@ -19,6 +21,7 @@
   = render 'shared/issuable/form/title', issuable: issuable, form: form, has_wip_commits: commits && commits.detect(&:work_in_progress?)
 #js-suggestions{ data: { project_path: @project.full_path } }
 
+= render 'shared/form_elements/apply_template_warning'
 = render 'shared/form_elements/description', model: issuable, form: form, project: project
 
 - if issuable.respond_to?(:confidential)
@@ -32,8 +35,6 @@
 = render 'shared/issuable/form/metadata', issuable: issuable, form: form
 
 = render_if_exists 'shared/issuable/approvals', issuable: issuable, presenter: presenter, form: form
-
-= render 'shared/issuable/form/branch_chooser', issuable: issuable, form: form
 
 = render 'shared/issuable/form/merge_params', issuable: issuable
 

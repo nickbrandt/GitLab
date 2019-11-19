@@ -15,6 +15,11 @@
             &middot;
             opened #{time_ago_with_tooltip(epic.created_at, placement: 'bottom')}
             by #{link_to_member(@group, epic.author, avatar: false)}
+          - if epic.start_date? || epic.end_date?
+            &nbsp;
+            %span.issuable-dates.d-inline-flex.align-items-center.align-top
+              = sprite_icon('calendar', size: 14, css_class: 'mr-1')
+              %span= epic_timeframe(epic)
           - if epic.labels.any?
             &nbsp;
             - epic.labels.each do |label|

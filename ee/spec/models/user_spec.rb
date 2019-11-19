@@ -24,6 +24,8 @@ describe User do
     it { is_expected.to have_many(:reviews) }
     it { is_expected.to have_many(:vulnerability_feedback) }
     it { is_expected.to have_many(:path_locks).dependent(:destroy) }
+    it { is_expected.to have_many(:users_security_dashboard_projects) }
+    it { is_expected.to have_many(:security_dashboard_projects) }
   end
 
   describe 'nested attributes' do
@@ -302,6 +304,7 @@ describe User do
         let!(:private_project) { create :project, :private, namespace: group, name: 'private_project' }
         let!(:internal_project) { create :project, :internal, namespace: group, name: 'internal_project' }
         let!(:public_project) { create :project, :public, namespace: group, name: 'public_project' }
+        let!(:public_project_two) { create :project, :public, namespace: group, name: 'public_project_second' }
 
         it 'returns public projects' do
           expect(user.available_custom_project_templates).to include public_project
@@ -332,8 +335,26 @@ describe User do
         it 'allows to search available project templates by name' do
           projects = user.available_custom_project_templates(search: 'publi')
 
-          expect(projects.count).to eq 1
+          expect(projects.count).to eq 2
           expect(projects.first).to eq public_project
+        end
+
+        it 'filters by project ID' do
+          projects = user.available_custom_project_templates(project_id: public_project.id)
+
+          expect(projects.count).to eq 1
+          expect(projects).to match_array([public_project])
+
+          projects = user.available_custom_project_templates(project_id: [public_project.id, public_project_two.id])
+
+          expect(projects.count).to eq 2
+          expect(projects).to match_array([public_project, public_project_two])
+        end
+
+        it 'does not return inaccessible projects' do
+          projects = user.available_custom_project_templates(project_id: private_project.id)
+
+          expect(projects.count).to eq 0
         end
       end
     end
@@ -552,8 +573,9 @@ describe User do
     let!(:ghost) { described_class.ghost }
     let!(:support_bot) { described_class.support_bot }
     let!(:alert_bot) { described_class.alert_bot }
+    let!(:visual_review_bot) { described_class.visual_review_bot }
     let!(:non_internal) { [user] }
-    let!(:internal) { [ghost, support_bot, alert_bot] }
+    let!(:internal) { [ghost, support_bot, alert_bot, visual_review_bot] }
 
     it 'returns non internal users' do
       expect(described_class.internal).to eq(internal)
@@ -572,6 +594,7 @@ describe User do
 
         expect(support_bot.bot?).to eq(true)
         expect(alert_bot.bot?).to eq(true)
+        expect(visual_review_bot.bot?).to eq(true)
       end
     end
   end

@@ -12,17 +12,19 @@ module Gitlab
 
       def fetch(range, force: false)
         Rails.cache.fetch(cache_key, force: force, expires_in: 1.day) do
-          vulnerabilities = ::Security::VulnerabilitiesFinder
+          findings = ::Security::VulnerabilityFindingsFinder
             .new(group, params: { project_id: [project_id] })
             .execute(:all)
             .count_by_day_and_severity(range)
-          ::Vulnerabilities::HistorySerializer.new.represent(vulnerabilities)
+          ::Vulnerabilities::HistorySerializer.new.represent(findings)
         end
       end
 
       private
 
       def cache_key
+        # TODO: rename 'vulnerabilities' to 'findings' in the cache key, but carefully
+        # https://gitlab.com/gitlab-org/gitlab/issues/32963
         ['projects', project_id, 'vulnerabilities']
       end
     end

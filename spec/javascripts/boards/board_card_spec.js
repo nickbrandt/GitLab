@@ -10,6 +10,7 @@ import eventHub from '~/boards/eventhub';
 import '~/boards/models/label';
 import '~/boards/models/assignee';
 import '~/boards/models/list';
+import store from '~/boards/stores';
 import boardsStore from '~/boards/stores/boards_store';
 import boardCard from '~/boards/components/board_card.vue';
 import { listObj, boardsMockInterceptor, mockBoardService } from './mock_data';
@@ -40,6 +41,7 @@ describe('Board card', () => {
       list.issues[0].labels.push(label1);
 
       vm = new BoardCardComp({
+        store,
         propsData: {
           list,
           issue: list.issues[0],
@@ -65,6 +67,16 @@ describe('Board card', () => {
     boardsStore.detail.issue = vm.issue;
 
     expect(vm.issueDetailVisible).toBe(true);
+  });
+
+  it("returns false when multiSelect doesn't contain issue", () => {
+    expect(vm.multiSelectVisible).toBe(false);
+  });
+
+  it('returns true when multiSelect contains issue', () => {
+    boardsStore.multiSelect.list = [vm.issue];
+
+    expect(vm.multiSelectVisible).toBe(true);
   });
 
   it('adds user-can-drag class if not disabled', () => {
@@ -180,7 +192,7 @@ describe('Board card', () => {
       triggerEvent('mousedown');
       triggerEvent('mouseup');
 
-      expect(eventHub.$emit).toHaveBeenCalledWith('newDetailIssue', vm.issue);
+      expect(eventHub.$emit).toHaveBeenCalledWith('newDetailIssue', vm.issue, undefined);
       expect(boardsStore.detail.list).toEqual(vm.list);
     });
 
@@ -203,7 +215,7 @@ describe('Board card', () => {
       triggerEvent('mousedown');
       triggerEvent('mouseup');
 
-      expect(eventHub.$emit).toHaveBeenCalledWith('clearDetailIssue');
+      expect(eventHub.$emit).toHaveBeenCalledWith('clearDetailIssue', undefined);
     });
   });
 });

@@ -58,36 +58,44 @@ describe Gitlab::SidekiqCluster do
   end
 
   describe '.start' do
-    it 'starts Sidekiq with the given queues and environment' do
-      expect(described_class).to receive(:start_sidekiq)
-        .ordered.with(%w(foo), :production, 'foo/bar', 50, dryrun: false)
+    it 'starts Sidekiq with the given queues, environment and options' do
+      expected_options = { env: :production, directory: 'foo/bar', max_concurrency: 20, dryrun: true }
 
-      expect(described_class).to receive(:start_sidekiq)
-        .ordered.with(%w(bar baz), :production, 'foo/bar', 50, dryrun: false)
+      expect(described_class).to receive(:start_sidekiq).ordered.with(%w(foo), expected_options.merge(worker_id: 0))
+      expect(described_class).to receive(:start_sidekiq).ordered.with(%w(bar baz), expected_options.merge(worker_id: 1))
 
-      described_class.start([%w(foo), %w(bar baz)], :production, 'foo/bar', 50)
+      described_class.start([%w(foo), %w(bar baz)], env: :production, directory: 'foo/bar', max_concurrency: 20, dryrun: true)
     end
 
-    it 'starts Sidekiq with capped concurrency limits for each queue' do
-      expect(described_class).to receive(:start_sidekiq)
-        .ordered.with(%w(foo bar baz), :production, 'foo/bar', 2, dryrun: false)
+    it 'starts Sidekiq with the given queues and sensible default options' do
+      expected_options = {
+        env: :development,
+        directory: an_instance_of(String),
+        max_concurrency: 50,
+        worker_id: an_instance_of(Integer),
+        dryrun: false
+      }
 
-      expect(described_class).to receive(:start_sidekiq)
-        .ordered.with(%w(solo), :production, 'foo/bar', 2, dryrun: false)
+      expect(described_class).to receive(:start_sidekiq).ordered.with(%w(foo bar baz), expected_options)
+      expect(described_class).to receive(:start_sidekiq).ordered.with(%w(solo), expected_options)
 
-      described_class.start([%w(foo bar baz), %w(solo)], :production, 'foo/bar', 2)
+      described_class.start([%w(foo bar baz), %w(solo)])
     end
   end
 
   describe '.start_sidekiq' do
-    let(:env) { { "ENABLE_SIDEKIQ_CLUSTER" => "1" } }
+    let(:first_worker_id) { 0 }
+    let(:options) do
+      { env: :production, directory: 'foo/bar', max_concurrency: 20, worker_id: first_worker_id, dryrun: false }
+    end
+    let(:env) { { "ENABLE_SIDEKIQ_CLUSTER" => "1", "SIDEKIQ_WORKER_ID" => first_worker_id.to_s } }
     let(:args) { ['bundle', 'exec', 'sidekiq', anything, '-eproduction', *([anything] * 5)] }
 
     it 'starts a Sidekiq process' do
       allow(Process).to receive(:spawn).and_return(1)
 
       expect(described_class).to receive(:wait_async).with(1)
-      expect(described_class.start_sidekiq(%w(foo), :production)).to eq(1)
+      expect(described_class.start_sidekiq(%w(foo), options)).to eq(1)
     end
 
     it 'handles duplicate queue names' do
@@ -97,7 +105,7 @@ describe Gitlab::SidekiqCluster do
         .and_return(1)
 
       expect(described_class).to receive(:wait_async).with(1)
-      expect(described_class.start_sidekiq(%w(foo foo bar baz), :production)).to eq(1)
+      expect(described_class.start_sidekiq(%w(foo foo bar baz), options)).to eq(1)
     end
 
     it 'runs the sidekiq process in a new process group' do
@@ -107,7 +115,7 @@ describe Gitlab::SidekiqCluster do
         .and_return(1)
 
       allow(described_class).to receive(:wait_async)
-      expect(described_class.start_sidekiq(%w(foo bar baz), :production)).to eq(1)
+      expect(described_class.start_sidekiq(%w(foo bar baz), options)).to eq(1)
     end
   end
 

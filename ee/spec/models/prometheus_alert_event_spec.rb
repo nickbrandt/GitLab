@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe PrometheusAlertEvent do
   subject { build(:prometheus_alert_event) }
+
   let(:alert) { subject.prometheus_alert }
 
   describe 'associations' do
@@ -85,7 +86,6 @@ describe PrometheusAlertEvent do
           expect(result).to eq(true)
           expect(subject).to be_resolved
           expect(subject.ended_at).to be_like_time(ended_at)
-          expect(subject.payload_key).to be_nil
         end
       end
 

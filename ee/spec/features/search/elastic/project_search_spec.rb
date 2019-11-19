@@ -16,7 +16,7 @@ describe 'Project elastic search', :js, :elastic do
   end
 
   describe 'searching' do
-    it 'finds issues' do
+    it 'finds issues', :sidekiq_might_not_need_inline do
       create(:issue, project: project, title: 'Test searching for an issue')
 
       submit_search('Test')
@@ -25,7 +25,7 @@ describe 'Project elastic search', :js, :elastic do
       expect(page).to have_selector('.results', text: 'Test searching for an issue')
     end
 
-    it 'finds merge requests' do
+    it 'finds merge requests', :sidekiq_might_not_need_inline do
       create(:merge_request, source_project: project, target_project: project, title: 'Test searching for an MR')
 
       submit_search('Test')
@@ -34,7 +34,7 @@ describe 'Project elastic search', :js, :elastic do
       expect(page).to have_selector('.results', text: 'Test searching for an MR')
     end
 
-    it 'finds milestones' do
+    it 'finds milestones', :sidekiq_might_not_need_inline do
       create(:milestone, project: project, title: 'Test searching for a milestone')
 
       submit_search('Test')
@@ -43,7 +43,7 @@ describe 'Project elastic search', :js, :elastic do
       expect(page).to have_selector('.results', text: 'Test searching for a milestone')
     end
 
-    it 'finds wiki pages' do
+    it 'finds wiki pages', :sidekiq_might_not_need_inline do
       project.wiki.create_page('test.md', 'Test searching for a wiki page')
       project.wiki.index_wiki_blobs
 
@@ -53,7 +53,7 @@ describe 'Project elastic search', :js, :elastic do
       expect(page).to have_selector('.results', text: 'Test searching for a wiki page')
     end
 
-    it 'finds notes' do
+    it 'finds notes', :sidekiq_might_not_need_inline do
       create(:note, project: project, note: 'Test searching for a comment')
 
       submit_search('Test')
@@ -62,7 +62,7 @@ describe 'Project elastic search', :js, :elastic do
       expect(page).to have_selector('.results', text: 'Test searching for a comment')
     end
 
-    it 'finds commits' do
+    it 'finds commits', :sidekiq_might_not_need_inline do
       project.repository.index_commits_and_blobs
 
       submit_search('initial')
@@ -71,7 +71,7 @@ describe 'Project elastic search', :js, :elastic do
       expect(page).to have_selector('.results', text: 'Initial commit')
     end
 
-    it 'finds blobs' do
+    it 'finds blobs', :sidekiq_might_not_need_inline do
       project.repository.index_commits_and_blobs
 
       submit_search('def')

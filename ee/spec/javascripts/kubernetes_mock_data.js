@@ -104,6 +104,24 @@ export const logMockData = [
   '- -> /',
 ];
 
-export const podMockData = ['production-tanuki-1', 'production-tanuki-2'];
+export const podMockData = ['production-tanuki-1', 'production-tanuki-2', 'production-tanuki-3'];
+
+export const mockEnvironmentData = [
+  {
+    name: 'production',
+    logs_path: '/namespace/project/environments/1/logs',
+    id: 1,
+  },
+  {
+    name: 'stating',
+    logs_path: '/namespace/project/environments/2/logs',
+    id: 2,
+  },
+  {
+    name: 'review/my-new-branch',
+    logs_path: '/namespace/project/environments/3/logs',
+    id: 3,
+  },
+];
 
 export default {};

@@ -369,6 +369,9 @@ describe('security reports mutations', () => {
       expect(stateCopy.modal.isCreatingNewIssue).toEqual(false);
       expect(stateCopy.modal.isDismissingVulnerability).toEqual(false);
 
+      expect(stateCopy.modal.data.url.value).toEqual(null);
+      expect(stateCopy.modal.data.url.url).toEqual(null);
+
       expect(stateCopy.modal.title).toEqual(null);
       expect(stateCopy.modal.learnMoreUrl).toEqual(null);
       expect(stateCopy.modal.error).toEqual(null);
@@ -391,6 +394,8 @@ describe('security reports mutations', () => {
           method: 'do_something',
           image: 'https://example.org/docker/example:v1.2.3',
           operating_system: 'debian:8',
+          hostname: 'https://gitlab.com',
+          path: '/user6',
         },
         links: [
           {
@@ -431,6 +436,12 @@ describe('security reports mutations', () => {
       expect(stateCopy.modal.data.confidence.value).toEqual(issue.confidence);
       expect(stateCopy.modal.data.links.value).toEqual(issue.links);
       expect(stateCopy.modal.data.instances.value).toEqual(issue.instances);
+      expect(stateCopy.modal.data.url.value).toEqual(
+        `${issue.location.hostname}${issue.location.path}`,
+      );
+      expect(stateCopy.modal.data.url.url).toEqual(
+        `${issue.location.hostname}${issue.location.path}`,
+      );
       expect(stateCopy.modal.vulnerability).toEqual(issue);
       expect(stateCopy.modal.isResolved).toEqual(true);
     });

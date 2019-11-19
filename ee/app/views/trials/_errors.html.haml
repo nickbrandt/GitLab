@@ -1,0 +1,6 @@
+- if show_trial_errors?(@namespace, @result)
+  .flash-container
+    .flash-alert.text-center
+      = _('We have found the following errors:')
+      .flash-text
+        = trial_errors(@namespace, @result)

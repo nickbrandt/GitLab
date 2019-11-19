@@ -29,6 +29,10 @@ describe Banzai::Filter::RelativeLinkFilter do
     %(<video src="#{path}"></video>)
   end
 
+  def audio(path)
+    %(<audio src="#{path}"></audio>)
+  end
+
   def link(path)
     %(<a href="#{path}">#{path}</a>)
   end
@@ -81,6 +85,12 @@ describe Banzai::Filter::RelativeLinkFilter do
       doc = filter(video('files/videos/intro.mp4'), commit: project.commit('video'), ref: 'video')
 
       expect(doc.at_css('video')['src']).to eq 'files/videos/intro.mp4'
+    end
+
+    it 'does not modify any relative URL in audio' do
+      doc = filter(audio('files/audio/sample.wav'), commit: project.commit('audio'), ref: 'audio')
+
+      expect(doc.at_css('audio')['src']).to eq 'files/audio/sample.wav'
     end
   end
 
@@ -218,6 +228,13 @@ describe Banzai::Filter::RelativeLinkFilter do
         .to eq "/#{project_path}/raw/video/files/videos/intro.mp4"
     end
 
+    it 'rebuilds relative URL for audio in the repo' do
+      doc = filter(audio('files/audio/sample.wav'), commit: project.commit('audio'), ref: 'audio')
+
+      expect(doc.at_css('audio')['src'])
+        .to eq "/#{project_path}/raw/audio/files/audio/sample.wav"
+    end
+
     it 'does not modify relative URL with an anchor only' do
       doc = filter(link('#section-1'))
       expect(doc.at_css('a')['href']).to eq '#section-1'
@@ -226,6 +243,12 @@ describe Banzai::Filter::RelativeLinkFilter do
     it 'does not modify absolute URL' do
       doc = filter(link('http://example.com'))
       expect(doc.at_css('a')['href']).to eq 'http://example.com'
+    end
+
+    it 'does not call gitaly' do
+      filter(link('http://example.com'))
+
+      expect(described_class).not_to receive(:get_blob_types)
     end
 
     it 'supports Unicode filenames' do

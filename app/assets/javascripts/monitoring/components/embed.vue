@@ -35,9 +35,9 @@ export default {
     };
   },
   computed: {
-    ...mapState('monitoringDashboard', ['groups', 'metricsWithData']),
+    ...mapState('monitoringDashboard', ['dashboard', 'metricsWithData']),
     charts() {
-      const groupWithMetrics = this.groups.find(group =>
+      const groupWithMetrics = this.dashboard.panel_groups.find(group =>
         group.metrics.find(chart => this.chartHasData(chart)),
       ) || { metrics: [] };
 
@@ -78,9 +78,6 @@ export default {
       }, sidebarAnimationDuration);
     },
     setInitialState() {
-      this.setFeatureFlags({
-        prometheusEndpointEnabled: true,
-      });
       this.setEndpoints({
         dashboardEndpoint: removeParams(['start', 'end'], this.dashboardUrl),
       });
@@ -98,7 +95,7 @@ export default {
         class="w-100"
         :graph-data="graphData"
         :container-width="elWidth"
-        group-id="monitor-area-chart"
+        :group-id="dashboardUrl"
         :project-path="null"
         :show-border="true"
         :single-embed="isSingleChart"

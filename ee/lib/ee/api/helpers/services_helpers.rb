@@ -25,6 +25,12 @@ module EE
                   name: :repository_url,
                   type: String,
                   desc: "GitHub repository URL"
+                },
+                {
+                  required: false,
+                  name: :static_context,
+                  type: ::API::Services::Boolean,
+                  desc: 'Append instance name instead of branch to status check name'
                 }
               ],
               'jenkins' => [

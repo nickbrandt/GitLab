@@ -16,6 +16,7 @@ exports[`dashboard should match the snapshot 1`] = `
     <projectselector-stub
       projectsearchresults=""
       selectedprojects=""
+      totalresults="0"
     />
   </glmodal-stub>
    

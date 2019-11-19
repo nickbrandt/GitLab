@@ -1,7 +1,14 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import ErrorTrackingList from '~/error_tracking/components/error_tracking_list.vue';
-import { GlButton, GlEmptyState, GlLoadingIcon, GlTable, GlLink } from '@gitlab/ui';
+import {
+  GlButton,
+  GlEmptyState,
+  GlLoadingIcon,
+  GlTable,
+  GlLink,
+  GlSearchBoxByClick,
+} from '@gitlab/ui';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -35,7 +42,7 @@ describe('ErrorTrackingList', () => {
   beforeEach(() => {
     actions = {
       getErrorList: () => {},
-      startPolling: () => {},
+      startPolling: jest.fn(),
       restartPolling: jest.fn().mockName('restartPolling'),
     };
 
@@ -45,8 +52,13 @@ describe('ErrorTrackingList', () => {
     };
 
     store = new Vuex.Store({
-      actions,
-      state,
+      modules: {
+        list: {
+          namespaced: true,
+          actions,
+          state,
+        },
+      },
     });
   });
 
@@ -58,19 +70,19 @@ describe('ErrorTrackingList', () => {
 
   describe('loading', () => {
     beforeEach(() => {
+      store.state.list.loading = true;
       mountComponent();
     });
 
     it('shows spinner', () => {
       expect(wrapper.find(GlLoadingIcon).exists()).toBeTruthy();
       expect(wrapper.find(GlTable).exists()).toBeFalsy();
-      expect(wrapper.find(GlButton).exists()).toBeFalsy();
     });
   });
 
   describe('results', () => {
     beforeEach(() => {
-      store.state.loading = false;
+      store.state.list.loading = false;
 
       mountComponent();
     });
@@ -80,11 +92,25 @@ describe('ErrorTrackingList', () => {
       expect(wrapper.find(GlTable).exists()).toBeTruthy();
       expect(wrapper.find(GlButton).exists()).toBeTruthy();
     });
+
+    describe('filtering', () => {
+      it('shows search box', () => {
+        expect(wrapper.find(GlSearchBoxByClick).exists()).toBeTruthy();
+      });
+
+      it('makes network request on submit', () => {
+        expect(actions.startPolling).toHaveBeenCalledTimes(1);
+
+        wrapper.find(GlSearchBoxByClick).vm.$emit('submit');
+
+        expect(actions.startPolling).toHaveBeenCalledTimes(2);
+      });
+    });
   });
 
   describe('no results', () => {
     beforeEach(() => {
-      store.state.loading = false;
+      store.state.list.loading = false;
 
       mountComponent();
     });

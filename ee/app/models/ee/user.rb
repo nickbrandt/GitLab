@@ -40,10 +40,10 @@ module EE
       has_many :approvals,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
       has_many :approvers,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
 
-      has_many :developer_groups, -> { where(members: { access_level: ::Gitlab::Access::DEVELOPER }) }, through: :group_members, source: :group
-
       has_many :users_ops_dashboard_projects
       has_many :ops_dashboard_projects, through: :users_ops_dashboard_projects, source: :project
+      has_many :users_security_dashboard_projects
+      has_many :security_dashboard_projects, through: :users_security_dashboard_projects, source: :project
 
       has_many :group_saml_identities, -> { where.not(saml_provider_id: nil) }, source: :identities, class_name: "::Identity"
 
@@ -84,7 +84,8 @@ module EE
 
       enum bot_type: {
         support_bot: 1,
-        alert_bot: 2
+        alert_bot: 2,
+        visual_review_bot: 3
       }
     end
 
@@ -106,6 +107,15 @@ module EE
         unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
           u.bio = 'The GitLab alert bot'
           u.name = 'GitLab Alert Bot'
+        end
+      end
+
+      def visual_review_bot
+        email_pattern = "visual_review%s@#{Settings.gitlab.host}"
+
+        unique_internal(where(bot_type: :visual_review_bot), 'visual-review-bot', email_pattern) do |u|
+          u.bio = 'The Gitlab Visual Review feedback bot'
+          u.name = 'Gitlab Visual Review Bot'
         end
       end
 
@@ -175,33 +185,46 @@ module EE
       self.auditor = (new_level == 'auditor')
     end
 
-    # Does the user have access to all private groups & projects?
-    def full_private_access?
-      super || auditor?
-    end
-
     def email_opted_in_source
       email_opted_in_source_id == EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM ? 'GitLab.com' : ''
     end
 
-    def available_custom_project_templates(search: nil, subgroup_id: nil)
+    def available_custom_project_templates(search: nil, subgroup_id: nil, project_id: nil)
       templates = ::Gitlab::CurrentSettings.available_custom_project_templates(subgroup_id)
+
+      params = {}
+
+      if project_id
+        templates = templates.where(id: project_id)
+      else
+        params = { search: search, sort: 'name_asc' }
+      end
 
       ::ProjectsFinder.new(current_user: self,
                            project_ids_relation: templates,
-                           params: { search: search, sort: 'name_asc' })
+                           params: params)
                       .execute
     end
 
     def available_subgroups_with_custom_project_templates(group_id = nil)
-      groups = GroupsWithTemplatesFinder.new(group_id).execute
+      found_groups = GroupsWithTemplatesFinder.new(group_id).execute
 
-      GroupsFinder.new(self, min_access_level: ::Gitlab::Access::DEVELOPER)
-                  .execute
-                  .where(id: groups.select(:custom_project_templates_group_id))
-                  .includes(:projects)
-                  .reorder(nil)
-                  .distinct
+      if ::Feature.enabled?(:optimized_groups_with_templates_finder)
+        GroupsFinder.new(self, min_access_level: ::Gitlab::Access::DEVELOPER)
+          .execute
+          .where(id: found_groups.select(:custom_project_templates_group_id))
+          .preload(:projects)
+          .joins(:projects)
+          .reorder(nil)
+          .distinct
+      else
+        GroupsFinder.new(self, min_access_level: ::Gitlab::Access::DEVELOPER)
+          .execute
+          .where(id: found_groups.select(:custom_project_templates_group_id))
+          .includes(:projects)
+          .reorder(nil)
+          .distinct
+      end
     end
 
     def roadmap_layout
@@ -216,6 +239,13 @@ module EE
       ::Namespace
         .from("(#{namespace_union(:trial_ends_on)}) #{::Namespace.table_name}")
         .where('trial_ends_on > ?', Time.now.utc)
+        .any?
+    end
+
+    def any_namespace_without_trial?
+      ::Namespace
+        .from("(#{namespace_union(:trial_ends_on)}) #{::Namespace.table_name}")
+        .where(trial_ends_on: nil)
         .any?
     end
 
@@ -279,6 +309,7 @@ module EE
       super
     end
 
+    override :internal?
     def internal?
       super || bot?
     end

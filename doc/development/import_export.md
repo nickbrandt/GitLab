@@ -36,7 +36,7 @@ SIDEKIQ_MEMORY_KILLER_HARD_LIMIT_RSS = 3000000
 SIDEKIQ_MEMORY_KILLER_GRACE_TIME = 900
 ```
 
-An import status `started`, and the following sidekiq logs will signal a memory issue:
+An import status `started`, and the following Sidekiq logs will signal a memory issue:
 
 ```bash
 WARN: Work still in progress <struct with JID>
@@ -312,7 +312,7 @@ module Gitlab
     class Importer
       def execute
         if import_file && check_version! && restorers.all?(&:restore) && overwrite_project
-          project_tree.restored_project
+          project
         else
           raise Projects::ImportService::Error.new(@shared.errors.join(', '))
         end

@@ -81,8 +81,15 @@ variables:
 
 There are two ways to define the URL to be scanned by DAST:
 
-- Set the `DAST_WEBSITE` [variable](../../../ci/yaml/README.md#variables).
-- Add it in an `environment_url.txt` file at the root of your project.
+1. Set the `DAST_WEBSITE` [variable](../../../ci/yaml/README.md#variables).
+
+1. Add it in an `environment_url.txt` file at the root of your project.
+    This is great for testing in dynamic environments. In order to run DAST against
+    an app that is dynamically created during a Gitlab CI pipeline, have the app
+    persist its domain in an `environment_url.txt` file, and DAST will
+    automatically parse that file to find its scan target.
+    You can see an [example](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/Deploy.gitlab-ci.yml)
+    of this in our Auto DevOps CI YML.
 
 If both values are set, the `DAST_WEBSITE` value will take precedence.
 
@@ -332,3 +339,33 @@ questions that you know someone might ask.
 Each scenario can be a third-level heading, e.g. `### Getting error message X`.
 If you have none to add when creating a doc, leave this section in place
 but commented out to help encourage others to add to it in the future. -->
+
+## Troubleshooting
+
+### Running out of memory
+
+By default, ZAProxy, which DAST relies on, is allocated memory that sums to 25%
+of the total memory on the host.
+Since it keeps most of its information in memory during a scan,
+it is possible for DAST to run out of memory while scanning large applications.
+This results in the following error:
+
+```
+[zap.out] java.lang.OutOfMemoryError: Java heap space
+```
+
+Fortunately, it is straightforward to increase the amount of memory available
+for DAST by overwriting the `script` key in the DAST template:
+
+```yaml
+include:
+  template: DAST.gitlab-ci.yml
+
+dast:
+  script:
+    - export DAST_WEBSITE=${DAST_WEBSITE:-$(cat environment_url.txt)}
+    - /analyze -t $DAST_WEBSITE -z"-Xmx3072m"
+```
+
+Here, DAST is being allocated 3072 MB.
+Change the number after `-Xmx` to the required memory amount.

@@ -11,15 +11,15 @@ module SystemCheck
       end
 
       def self.checks
+        return secondary_checks if Gitlab::Geo.secondary? || Gitlab::Geo.current_node_misconfigured?
+
+        common_checks
+      end
+
+      def self.common_checks
         [
           SystemCheck::Geo::LicenseCheck,
           SystemCheck::Geo::EnabledCheck,
-          SystemCheck::Geo::GeoDatabaseConfiguredCheck,
-          SystemCheck::Geo::DatabaseReplicationEnabledCheck,
-          SystemCheck::Geo::DatabaseReplicationWorkingCheck,
-          SystemCheck::Geo::FdwEnabledCheck,
-          SystemCheck::Geo::FdwSchemaUpToDateCheck,
-          SystemCheck::Geo::HttpConnectionCheck,
           SystemCheck::Geo::HTTPCloneEnabledCheck,
           SystemCheck::Geo::ClocksSynchronizationCheck,
           SystemCheck::App::GitUserDefaultSSHConfigCheck,
@@ -28,6 +28,17 @@ module SystemCheck
           SystemCheck::App::HashedStorageEnabledCheck,
           SystemCheck::App::HashedStorageAllProjectsCheck
         ]
+      end
+
+      def self.secondary_checks
+        [
+          SystemCheck::Geo::GeoDatabaseConfiguredCheck,
+          SystemCheck::Geo::DatabaseReplicationEnabledCheck,
+          SystemCheck::Geo::DatabaseReplicationWorkingCheck,
+          SystemCheck::Geo::FdwEnabledCheck,
+          SystemCheck::Geo::FdwSchemaUpToDateCheck,
+          SystemCheck::Geo::HttpConnectionCheck
+        ] + common_checks
       end
     end
   end

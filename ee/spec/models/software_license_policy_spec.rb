@@ -15,6 +15,7 @@ describe SoftwareLicensePolicy do
 
   describe ".with_license_by_name" do
     subject { described_class }
+
     let!(:mit_policy) { create(:software_license_policy, software_license: mit) }
     let!(:mit) { create(:software_license, :mit) }
     let!(:apache_policy) { create(:software_license_policy, software_license: apache) }
@@ -31,6 +32,17 @@ describe SoftwareLicensePolicy do
     it 'finds multiple licenses' do
       expect(subject.with_license_by_name([mit.name, apache.name])).to match_array([mit_policy, apache_policy])
     end
+  end
+
+  describe ".by_spdx" do
+    let_it_be(:mit) { create(:software_license, :mit) }
+    let_it_be(:mit_policy) { create(:software_license_policy, software_license: mit) }
+    let_it_be(:apache) { create(:software_license, :apache_2_0) }
+    let_it_be(:apache_policy) { create(:software_license_policy, software_license: apache) }
+
+    it { expect(described_class.by_spdx(mit.spdx_identifier)).to match_array([mit_policy]) }
+    it { expect(described_class.by_spdx([mit.spdx_identifier, apache.spdx_identifier])).to match_array([mit_policy, apache_policy]) }
+    it { expect(described_class.by_spdx(SecureRandom.uuid)).to be_empty }
   end
 
   describe "#name" do

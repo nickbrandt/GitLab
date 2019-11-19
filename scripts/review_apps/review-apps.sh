@@ -179,6 +179,17 @@ function create_application_secret() {
     "${CI_ENVIRONMENT_SLUG}-gitlab-initial-root-password" \
     --from-literal="password=${REVIEW_APPS_ROOT_PASSWORD}" \
     --dry-run -o json | kubectl apply -f -
+
+  if [ -z "${REVIEW_APPS_EE_LICENSE}" ]; then echo "License not found" && return; fi
+
+  echoinfo "Creating the ${CI_ENVIRONMENT_SLUG}-gitlab-license secret in the ${KUBE_NAMESPACE} namespace..." true
+
+  echo "${REVIEW_APPS_EE_LICENSE}" > /tmp/license.gitlab
+
+  kubectl create secret generic -n "$KUBE_NAMESPACE" \
+    "${CI_ENVIRONMENT_SLUG}-gitlab-license" \
+    --from-file=license=/tmp/license.gitlab \
+    --dry-run -o json | kubectl apply -f -
 }
 
 function download_chart() {
@@ -195,9 +206,19 @@ function download_chart() {
   helm dependency build .
 }
 
+function base_config_changed() {
+  if [ -z "${CI_MERGE_REQUEST_IID}" ]; then return; fi
+
+  curl "${CI_API_V4_URL}/projects/${CI_MERGE_REQUEST_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/changes" | jq '.changes | any(.old_path == "scripts/review_apps/base-config.yaml")'
+}
+
 function deploy() {
   local name="$CI_ENVIRONMENT_SLUG"
   local edition="${GITLAB_EDITION-ce}"
+  local base_config_file_ref="master"
+  if [[ "$(base_config_changed)" == "true" ]]; then base_config_file_ref="$CI_COMMIT_SHA"; fi
+  local base_config_file="https://gitlab.com/gitlab-org/gitlab/raw/${base_config_file_ref}/scripts/review_apps/base-config.yaml"
+
   echoinfo "Deploying ${name}..." true
 
   IMAGE_REPOSITORY="registry.gitlab.com/gitlab-org/build/cng-mirror"
@@ -239,12 +260,20 @@ HELM_CMD=$(cat << EOF
 EOF
 )
 
+if [ -n "${REVIEW_APPS_EE_LICENSE}" ]; then
 HELM_CMD=$(cat << EOF
-  $HELM_CMD \
+  ${HELM_CMD} \
+  --set global.gitlab.license.secret="${CI_ENVIRONMENT_SLUG}-gitlab-license"
+EOF
+)
+fi
+
+HELM_CMD=$(cat << EOF
+  ${HELM_CMD} \
   --namespace="$KUBE_NAMESPACE" \
-  --version="$CI_PIPELINE_ID-$CI_JOB_ID" \
-  -f "../scripts/review_apps/base-config.yaml" \
-  "$name" .
+  --version="${CI_PIPELINE_ID}-${CI_JOB_ID}" \
+  -f "${base_config_file}" \
+  "${name}" .
 EOF
 )
 
@@ -255,54 +284,11 @@ EOF
 }
 
 function display_deployment_debug() {
+  # Get all pods for this release
+  echoinfo "Pods for release ${CI_ENVIRONMENT_SLUG}"
   kubectl get pods -n "$KUBE_NAMESPACE" -lrelease=${CI_ENVIRONMENT_SLUG}
 
-  migrations_pod=$(get_pod "migrations");
-  if [ -z "${migrations_pod}" ]; then
-    echoerr "Migrations pod not found."
-  else
-    echoinfo "Logs tail of the ${migrations_pod} pod..."
-
-    kubectl logs -n "$KUBE_NAMESPACE" "${migrations_pod}" | sed "s/${REVIEW_APPS_ROOT_PASSWORD}/[REDACTED]/g"
-  fi
-
-  unicorn_pod=$(get_pod "unicorn");
-  if [ -z "${unicorn_pod}" ]; then
-    echoerr "Unicorn pod not found."
-  else
-    echoinfo "Logs tail of the ${unicorn_pod} pod..."
-
-    kubectl logs -n "$KUBE_NAMESPACE" -c unicorn "${unicorn_pod}" | sed "s/${REVIEW_APPS_ROOT_PASSWORD}/[REDACTED]/g"
-  fi
-}
-
-function add_license() {
-  if [ -z "${REVIEW_APPS_EE_LICENSE}" ]; then echo "License not found" && return; fi
-
-  task_runner_pod=$(get_pod "task-runner");
-  if [ -z "${task_runner_pod}" ]; then echo "Task runner pod not found" && return; fi
-
-  echoinfo "Installing license..." true
-
-  echo "${REVIEW_APPS_EE_LICENSE}" > /tmp/license.gitlab
-  kubectl -n "$KUBE_NAMESPACE" cp /tmp/license.gitlab "${task_runner_pod}":/tmp/license.gitlab
-  rm /tmp/license.gitlab
-
-  kubectl -n "$KUBE_NAMESPACE" exec -it "${task_runner_pod}" -- /srv/gitlab/bin/rails runner -e production \
-    '
-    content = File.read("/tmp/license.gitlab").strip;
-    FileUtils.rm_f("/tmp/license.gitlab");
-
-    unless License.where(data:content).empty?
-      puts "License already exists";
-      Kernel.exit 0;
-    end
-
-    unless License.new(data: content).save
-      puts "Could not add license";
-      Kernel.exit 0;
-    end
-
-    puts "License added";
-    '
+  # Get all non-completed jobs
+  echoinfo "Unsuccessful Jobs for release ${CI_ENVIRONMENT_SLUG}"
+  kubectl get jobs -n "$KUBE_NAMESPACE" -lrelease=${CI_ENVIRONMENT_SLUG} --field-selector=status.successful!=1
 }

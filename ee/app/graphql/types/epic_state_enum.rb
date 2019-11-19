@@ -5,6 +5,7 @@ module Types
     graphql_name 'EpicState'
     description 'State of a GitLab epic'
 
+    value 'all'
     value 'opened'
     value 'closed'
   end

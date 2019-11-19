@@ -3,6 +3,13 @@
 class ChatNotificationWorker
   include ApplicationWorker
 
+  feature_category :chatops
+  latency_sensitive_worker!
+  # TODO: break this into multiple jobs
+  # as the `responder` uses external dependencies
+  # See https://gitlab.com/gitlab-com/gl-infra/scalability/issues/34
+  # worker_has_external_dependencies!
+
   RESCHEDULE_INTERVAL = 2.seconds
 
   # rubocop: disable CodeReuse/ActiveRecord

@@ -1,16 +1,26 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { GlEmptyState, GlButton, GlLink, GlLoadingIcon, GlTable } from '@gitlab/ui';
+import {
+  GlEmptyState,
+  GlButton,
+  GlLink,
+  GlLoadingIcon,
+  GlTable,
+  GlSearchBoxByClick,
+} from '@gitlab/ui';
+import { visitUrl } from '~/lib/utils/url_utility';
 import Icon from '~/vue_shared/components/icon.vue';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 import { __ } from '~/locale';
+import TrackEventDirective from '~/vue_shared/directives/track_event';
+import { trackViewInSentryOptions } from '../utils';
 
 export default {
   fields: [
-    { key: 'error', label: __('Open errors') },
+    { key: 'error', label: __('Open errors'), thClass: 'w-70p' },
     { key: 'events', label: __('Events') },
     { key: 'users', label: __('Users') },
-    { key: 'lastSeen', label: __('Last seen') },
+    { key: 'lastSeen', label: __('Last seen'), thClass: 'w-15p' },
   ],
   components: {
     GlEmptyState,
@@ -18,8 +28,12 @@ export default {
     GlLink,
     GlLoadingIcon,
     GlTable,
+    GlSearchBoxByClick,
     Icon,
     TimeAgo,
+  },
+  directives: {
+    TrackEvent: TrackEventDirective,
   },
   props: {
     indexPath: {
@@ -43,8 +57,13 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      errorSearchQuery: '',
+    };
+  },
   computed: {
-    ...mapState(['errors', 'externalUrl', 'loading']),
+    ...mapState('list', ['errors', 'externalUrl', 'loading']),
   },
   created() {
     if (this.errorTrackingEnabled) {
@@ -52,7 +71,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['startPolling', 'restartPolling']),
+    ...mapActions('list', ['startPolling', 'restartPolling']),
+    filterErrors() {
+      this.startPolling(`${this.indexPath}?search_term=${this.errorSearchQuery}`);
+    },
+    trackViewInSentryOptions,
+    viewDetails(errorId) {
+      visitUrl(`error_tracking/${errorId}/details`);
+    },
   },
 };
 </script>
@@ -60,47 +86,72 @@ export default {
 <template>
   <div>
     <div v-if="errorTrackingEnabled">
-      <div v-if="loading" class="py-3">
-        <gl-loading-icon :size="3" />
-      </div>
-      <div v-else>
-        <div class="d-flex justify-content-end">
-          <gl-button class="my-3 ml-auto" variant="primary" :href="externalUrl" target="_blank">
+      <div>
+        <div class="d-flex flex-row justify-content-around bg-secondary border">
+          <gl-search-box-by-click
+            v-model="errorSearchQuery"
+            class="col-lg-10 m-3 p-0"
+            :placeholder="__('Search or filter results...')"
+            type="search"
+            autofocus
+            @submit="filterErrors"
+          />
+          <gl-button
+            v-track-event="trackViewInSentryOptions(externalUrl)"
+            class="m-3"
+            variant="primary"
+            :href="externalUrl"
+            target="_blank"
+          >
             {{ __('View in Sentry') }}
-            <icon name="external-link" />
+            <icon name="external-link" class="flex-shrink-0" />
           </gl-button>
         </div>
-        <gl-table :items="errors" :fields="$options.fields" :show-empty="true">
+
+        <div v-if="loading" class="py-3">
+          <gl-loading-icon size="md" />
+        </div>
+
+        <gl-table
+          v-else
+          class="mt-3"
+          :items="errors"
+          :fields="$options.fields"
+          :show-empty="true"
+          fixed
+          stacked="sm"
+        >
           <template slot="HEAD_events" slot-scope="data">
-            <div class="text-right">{{ data.label }}</div>
+            <div class="text-md-right">{{ data.label }}</div>
           </template>
           <template slot="HEAD_users" slot-scope="data">
-            <div class="text-right">{{ data.label }}</div>
+            <div class="text-md-right">{{ data.label }}</div>
           </template>
           <template slot="error" slot-scope="errors">
             <div class="d-flex flex-column">
-              <div class="d-flex">
-                <gl-link :href="errors.item.externalUrl" class="d-flex text-dark" target="_blank">
-                  <strong>{{ errors.item.title.trim() }}</strong>
-                  <icon name="external-link" class="ml-1" />
-                </gl-link>
-                <span class="text-secondary ml-2">{{ errors.item.culprit }}</span>
-              </div>
-              {{ errors.item.message || __('No details available') }}
+              <gl-link
+                class="d-flex text-dark"
+                target="_blank"
+                @click="viewDetails(errors.item.id)"
+              >
+                <strong class="text-truncate">{{ errors.item.title.trim() }}</strong>
+              </gl-link>
+              <span class="text-secondary text-truncate">
+                {{ errors.item.culprit }}
+              </span>
             </div>
           </template>
 
           <template slot="events" slot-scope="errors">
-            <div class="text-right">{{ errors.item.count }}</div>
+            <div class="text-md-right">{{ errors.item.count }}</div>
           </template>
 
           <template slot="users" slot-scope="errors">
-            <div class="text-right">{{ errors.item.userCount }}</div>
+            <div class="text-md-right">{{ errors.item.userCount }}</div>
           </template>
 
           <template slot="lastSeen" slot-scope="errors">
             <div class="d-flex align-items-center">
-              <icon name="calendar" class="text-secondary mr-1" />
               <time-ago :time="errors.item.lastSeen" class="text-secondary" />
             </div>
           </template>

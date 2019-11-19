@@ -6,9 +6,10 @@ import {
   getTimeframeForWeeksView,
   extendTimeframeForWeeksView,
   extendTimeframeForAvailableWidth,
+  getEpicsTimeframeRange,
   getEpicsPathForPreset,
-  sortEpics,
   assignDates,
+  sortEpics,
 } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
@@ -294,6 +295,53 @@ describe('extendTimeframeForAvailableWidth', () => {
     expect(timeframe.length).toBe(12);
     expect(timeframe[0].getTime()).toBe(1504224000000); // 1 Sep 2017
     expect(timeframe[timeframe.length - 1].getTime()).toBe(1535673600000); // 31 Aug 2018
+  });
+});
+
+describe('getEpicsTimeframeRange', () => {
+  it('returns object containing startDate and dueDate based on provided timeframe for Quarters', () => {
+    const timeframeQuarters = getTimeframeForQuartersView(new Date(2018, 0, 1));
+    const range = getEpicsTimeframeRange({
+      presetType: PRESET_TYPES.QUARTERS,
+      timeframe: timeframeQuarters,
+    });
+
+    expect(range).toEqual(
+      jasmine.objectContaining({
+        startDate: '2017-7-1',
+        dueDate: '2019-3-31',
+      }),
+    );
+  });
+
+  it('returns object containing startDate and dueDate based on provided timeframe for Months', () => {
+    const timeframeMonths = getTimeframeForMonthsView(new Date(2018, 0, 1));
+    const range = getEpicsTimeframeRange({
+      presetType: PRESET_TYPES.MONTHS,
+      timeframe: timeframeMonths,
+    });
+
+    expect(range).toEqual(
+      jasmine.objectContaining({
+        startDate: '2017-11-1',
+        dueDate: '2018-6-30',
+      }),
+    );
+  });
+
+  it('returns object containing startDate and dueDate based on provided timeframe for Weeks', () => {
+    const timeframeWeeks = getTimeframeForWeeksView(new Date(2018, 0, 1));
+    const range = getEpicsTimeframeRange({
+      presetType: PRESET_TYPES.WEEKS,
+      timeframe: timeframeWeeks,
+    });
+
+    expect(range).toEqual(
+      jasmine.objectContaining({
+        startDate: '2017-12-17',
+        dueDate: '2018-2-3',
+      }),
+    );
   });
 });
 

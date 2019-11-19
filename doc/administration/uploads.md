@@ -63,8 +63,8 @@ For source installations the following settings are nested under `uploads:` and 
 |---------|-------------|---------|
 | `enabled` | Enable/disable object storage | `false` |
 | `remote_directory` | The bucket name where Uploads will be stored| |
-| `direct_upload` | Set to true to enable direct upload of Uploads without the need of local shared storage. Option may be removed once we decide to support only single storage for all files. | `false` |
-| `background_upload` | Set to false to disable automatic upload. Option may be removed once upload is direct to S3 | `true` |
+| `direct_upload` | Set to true to remove Unicorn from the Upload path. Workhorse handles the actual Artifact Upload to Object Storage while Unicorn does minimal processing to keep track of the upload. There is no need for local shared storage. The option may be removed if support for a single storage type for all files is introduced. Read more on [what the direct_upload setting means](https://docs.gitlab.com/ee/development/uploads.html#what-does-the-direct_upload-setting-mean). | `false` |
+| `background_upload` | Set to false to disable automatic upload. Option may be removed once upload is direct to S3 (if `direct_upload` is set to `true` it will override `background_upload`) | `true` |
 | `proxy_download` | Set to true to enable proxying all files served. Option allows to reduce egress traffic as this allows clients to download directly from remote storage instead of proxying all data | `false` |
 | `connection` | Various connection options described below | |
 
@@ -81,7 +81,7 @@ The connection settings match those provided by [Fog](https://github.com/fog), a
 | `enable_signature_v4_streaming` | Set to true to enable HTTP chunked transfers with [AWS v4 signatures](https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-streaming.html). Oracle Cloud S3 needs this to be false | true |
 | `region` | AWS region | us-east-1 |
 | `host` | S3 compatible host for when not using AWS, e.g. `localhost` or `storage.example.com` | s3.amazonaws.com |
-| `endpoint` | Can be used when configuring an S3 compatible service such as [MinIO](https://www.minio.io), by entering a URL such as `http://127.0.0.1:9000` | (optional) |
+| `endpoint` | Can be used when configuring an S3 compatible service such as [MinIO](https://min.io), by entering a URL such as `http://127.0.0.1:9000` | (optional) |
 | `path_style` | Set to true to use `host/bucket_name/object` style paths instead of `bucket_name.host/object`. Leave as false for AWS S3 | false |
 | `use_iam_profile` | Set to true to use IAM profile instead of access keys | false
 

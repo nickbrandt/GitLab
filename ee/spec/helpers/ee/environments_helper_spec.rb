@@ -31,6 +31,24 @@ describe EnvironmentsHelper do
     end
   end
 
+  describe '#environment_logs_data' do
+    subject { helper.environment_logs_data(project, environment) }
+
+    it 'returns environment parameters data' do
+      expect(subject).to include(
+        "current-environment-name": environment.name,
+        "environments-path": project_environments_path(project, format: :json)
+      )
+    end
+
+    it 'returns parameters for forming the pod logs API URL' do
+      expect(subject).to include(
+        "project-full-path": project.full_path,
+        "environment-id": environment.id
+      )
+    end
+  end
+
   describe '#custom_metrics_available?' do
     subject { helper.custom_metrics_available?(project) }
 

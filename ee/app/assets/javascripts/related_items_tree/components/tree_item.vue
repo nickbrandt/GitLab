@@ -77,6 +77,7 @@ export default {
 <template>
   <li
     class="tree-item list-item pt-0 pb-0"
+    data-qa-selector="related_issue_item"
     :class="{
       'has-children': hasChildren,
       'item-expanded': childrenFlags[itemReference].itemExpanded,
@@ -96,7 +97,11 @@ export default {
       >
         <icon :name="chevronType" />
       </gl-button>
-      <gl-loading-icon v-if="childrenFlags[itemReference].itemChildrenFetchInProgress" size="sm" />
+      <gl-loading-icon
+        v-if="childrenFlags[itemReference].itemChildrenFetchInProgress"
+        class="loading-icon"
+        size="sm"
+      />
       <tree-item-body
         class="tree-item-row"
         :parent-item="parentItem"

@@ -9,7 +9,8 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
   before_action :load_project
   before_action -> {
     check_feature_availability!(:productivity_analytics)
-  }
+  }, if: -> { request.format.json? }
+
   before_action -> {
     authorize_view_by_action!(:view_productivity_analytics)
   }

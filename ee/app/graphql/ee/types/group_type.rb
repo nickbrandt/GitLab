@@ -20,6 +20,7 @@ module EE
         field :epics, # rubocop:disable Graphql/Descriptions
               ::Types::EpicType.connection_type,
               null: true,
+              max_page_size: 2000,
               resolver: ::Resolvers::EpicResolver
       end
     end

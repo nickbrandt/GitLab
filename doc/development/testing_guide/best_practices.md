@@ -44,6 +44,14 @@ bundle exec rspec
 bundle exec rspec spec/[path]/[to]/[spec].rb
 ```
 
+Use [guard](https://github.com/guard/guard) to continuously monitor for changes and only run matching tests:
+
+```sh
+bundle exec guard
+```
+
+When using spring and guard together, use `SPRING=1 bundle exec guard` instead to make use of spring.
+
 ### General guidelines
 
 - Use a single, top-level `describe ClassName` block.
@@ -61,6 +69,7 @@ bundle exec rspec spec/[path]/[to]/[spec].rb
 - When using `evaluate_script("$('.js-foo').testSomething()")` (or `execute_script`) which acts on a given element,
   use a Capyabara matcher beforehand (e.g. `find('.js-foo')`) to ensure the element actually exists.
 - Use `focus: true` to isolate parts of the specs you want to run.
+- Use [`:aggregate_failures`](https://relishapp.com/rspec/rspec-core/docs/expectation-framework-integration/aggregating-failures) when there is more than one expectation in a test.
 
 ### System / Feature tests
 
@@ -113,7 +122,7 @@ Finished in 34.51 seconds (files took 0.76702 seconds to load)
 1 example, 0 failures
 ```
 
-Note: `live_debug` only works on javascript enabled specs.
+Note: `live_debug` only works on JavaScript enabled specs.
 
 #### Run `:js` spec in a visible browser
 
@@ -158,7 +167,7 @@ really fast since:
 
 - Gems loading is skipped
 - Rails app boot is skipped
-- gitlab-shell and Gitaly setup are skipped
+- GitLab Shell and Gitaly setup are skipped
 - Test repositories setup are skipped
 
 `fast_spec_helper` also support autoloading classes that are located inside the
@@ -202,14 +211,29 @@ so we need to set some guidelines for their use going forward:
   order is required, otherwise `let` will suffice. Remember that `let` is lazy and won't
   be evaluated until it is referenced.
 
-### `let_it_be` variables
+### Common test setup
 
-In some cases there is no need to recreate the same object for tests
-again for each example. For example, a project is needed to test issues
-on the same project, one project will do for the entire file. This can
-be achieved by using
-[`let_it_be`](https://test-prof.evilmartians.io/#/let_it_be) variables
+In some cases, there is no need to recreate the same object for tests
+again for each example. For example, a project and a guest of that project
+is needed to test issues on the same project, one project and user will do for the entire file.
+This can be achieved by using
+[`let_it_be`](https://test-prof.evilmartians.io/#/let_it_be) variables and the
+[`before_all`](https://test-prof.evilmartians.io/#/before_all) hook
 from the [`test-prof` gem](https://rubygems.org/gems/test-prof).
+
+```
+let_it_be(:project) { create(:project) }
+let_it_be(:user) { create(:user) }
+
+before_all do
+  project.add_guest(user)
+end
+```
+
+This will result in only one `Project`, `User`, and `ProjectMember` created for this context.
+
+`let_it_be` and `before_all` are also available within nested contexts. Cleanup after the context
+is handled automatically using a transaction rollback.
 
 Note that if you modify an object defined inside a `let_it_be` block,
 then you will need to reload the object as needed, or specify the `reload`
@@ -332,7 +356,7 @@ them unspecified, and look up the value after the row is created.
 
 #### Redis
 
-GitLab stores two main categories of data in Redis: cached items, and sidekiq
+GitLab stores two main categories of data in Redis: cached items, and Sidekiq
 jobs.
 
 In most specs, the Rails cache is actually an in-memory store. This is replaced
@@ -341,10 +365,22 @@ However, if a spec makes direct Redis calls, it should mark itself with the
 `:clean_gitlab_redis_cache`, `:clean_gitlab_redis_shared_state` or
 `:clean_gitlab_redis_queues` traits as appropriate.
 
-Sidekiq jobs are typically not run in specs, but this behaviour can be altered
-in each spec through the use of `perform_enqueued_jobs` blocks. Any spec that
-causes Sidekiq jobs to be pushed to Redis should use the `:sidekiq` trait, to
-ensure that they are removed once the spec completes.
+#### Background jobs / Sidekiq
+
+By default, Sidekiq jobs are enqueued into a jobs array and aren't processed.
+If a test enqueues Sidekiq jobs and need them to be processed, the
+`:sidekiq_inline` trait can be used.
+
+The `:sidekiq_might_not_need_inline` trait was added when [Sidekiq inline mode was
+changed to fake mode](https://gitlab.com/gitlab-org/gitlab/merge_requests/15479)
+to all the tests that needed Sidekiq to actually process jobs. Tests with
+this trait should be either fixed to not rely on Sidekiq processing jobs, or their
+`:sidekiq_might_not_need_inline` trait should be updated to `:sidekiq_inline` if
+the processing of background jobs is needed/expected.
+
+NOTE: **Note:**
+The usage of `perform_enqueued_jobs` is currently useless since our
+workers aren't inheriting from `ApplicationJob` / `ActiveJob::Base`.
 
 #### Filesystem
 
@@ -572,9 +608,9 @@ All fixtures should be placed under `spec/fixtures/`.
 
 ### Repositories
 
-Testing some functionality, e.g., merging a merge request, requires a git
+Testing some functionality, e.g., merging a merge request, requires a Git
 repository with a certain state to be present in the test environment. GitLab
-maintains the [gitlab-test](https://gitlab.com/gitlab-org/gitlab-test)
+maintains the [`gitlab-test`](https://gitlab.com/gitlab-org/gitlab-test)
 repository for certain common cases - you can ensure a copy of the repository is
 used with the `:repository` trait for project factories:
 

@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Gitlab::Geo::DatabaseTasks do
   let(:schema_file) { Rails.root.join('tmp', 'tests', 'geo_schema.rb').to_s }
+
   subject { described_class }
 
   before do
@@ -28,8 +29,10 @@ describe Gitlab::Geo::DatabaseTasks do
 
   describe '.rollback' do
     context 'ENV["STEP"] not set' do
-      it 'calls ActiveRecord::Migrator.rollback with step 1' do
-        expect(ActiveRecord::Migrator).to receive(:rollback).with(anything, 1)
+      it 'calls ActiveRecord::MigrationContext.rollback with step 1' do
+        expect_next_instance_of(ActiveRecord::MigrationContext) do |migration_context|
+          expect(migration_context).to receive(:rollback).with(1)
+        end
 
         subject.rollback
       end
@@ -74,7 +77,10 @@ describe Gitlab::Geo::DatabaseTasks do
 
       it 'calls ActiveRecord::Migrator.run' do
         stub_env('VERSION', '19700101120000')
-        expect_any_instance_of(ActiveRecord::MigrationContext).to receive(:run).with(:up, any_args)
+
+        expect_next_instance_of(ActiveRecord::MigrationContext) do |migration_context|
+          expect(migration_context).to receive(:run).with(:up, any_args)
+        end
 
         subject.up
       end
@@ -89,7 +95,10 @@ describe Gitlab::Geo::DatabaseTasks do
 
       it 'calls ActiveRecord::Migrator.run' do
         stub_env('VERSION', '19700101120000')
-        expect_any_instance_of(ActiveRecord::MigrationContext).to receive(:run).with(:down, any_args)
+
+        expect_next_instance_of(ActiveRecord::MigrationContext) do |migration_context|
+          expect(migration_context).to receive(:run).with(:down, any_args)
+        end
 
         subject.down
       end

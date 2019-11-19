@@ -11,10 +11,22 @@ module EE
         result = super
 
         if issue.previous_changes.include?(:milestone_id) && issue.epic
-          issue.epic.update_start_and_due_dates
+          Epics::UpdateDatesService.new([issue.epic]).execute
         end
 
         result
+      end
+
+      override :filter_params
+      def filter_params(issue)
+        epic_iid = params.delete(:epic_iid)
+        group = issue.project.group
+        if epic_iid.present? && group && can?(current_user, :admin_epic, group)
+          finder = EpicsFinder.new(current_user, group_id: group.id)
+          params[:epic] = finder.find_by!(iid: epic_iid) # rubocop: disable CodeReuse/ActiveRecord
+        end
+
+        super
       end
 
       private

@@ -102,6 +102,11 @@ module EE
         prevent :read_project
       end
 
+      rule { visual_review_bot }.policy do
+        prevent :read_note
+        enable :create_note
+      end
+
       rule { license_block }.policy do
         prevent :create_issue
         prevent :create_merge_request_in
@@ -152,6 +157,13 @@ module EE
         prevent :read_project_security_dashboard
       end
 
+      rule { can?(:read_project_security_dashboard) & can?(:developer_access) }.policy do
+        enable :read_vulnerability
+        enable :create_vulnerability
+        enable :resolve_vulnerability
+        enable :dismiss_vulnerability
+      end
+
       rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
 
       rule { license_management_enabled & can?(:read_project) }.enable :read_software_license_policy
@@ -194,6 +206,10 @@ module EE
         enable :read_deployment
         enable :read_pages
         enable :read_project_security_dashboard
+      end
+
+      rule { auditor & can?(:read_project_security_dashboard) }.policy do
+        enable :read_vulnerability
       end
 
       rule { auditor & ~guest }.policy do
@@ -254,6 +270,14 @@ module EE
           .default_project_deletion_protection
       end
 
+      rule { needs_new_sso_session & ~admin }.policy do
+        prevent :guest_access
+        prevent :reporter_access
+        prevent :developer_access
+        prevent :maintainer_access
+        prevent :owner_access
+      end
+
       rule { ip_enforcement_prevents_access }.policy do
         prevent :read_project
       end
@@ -276,6 +300,7 @@ module EE
       return ::Gitlab::Access::NO_ACCESS if needs_new_sso_session?
       return ::Gitlab::Access::REPORTER if alert_bot?
       return ::Gitlab::Access::GUEST if support_bot? && service_desk_enabled?
+      return ::Gitlab::Access::NO_ACCESS if visual_review_bot?
 
       super
     end

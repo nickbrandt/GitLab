@@ -6,6 +6,7 @@ describe Noteable do
   let!(:active_diff_note1) { create(:diff_note_on_merge_request) }
   let(:project) { active_diff_note1.project }
   subject { active_diff_note1.noteable }
+
   let!(:active_diff_note2) { create(:diff_note_on_merge_request, project: project, noteable: subject, in_reply_to: active_diff_note1) }
   let!(:active_diff_note3) { create(:diff_note_on_merge_request, project: project, noteable: subject, position: active_position2) }
   let!(:outdated_diff_note1) { create(:diff_note_on_merge_request, project: project, noteable: subject, position: outdated_position) }
@@ -171,50 +172,6 @@ describe Noteable do
 
           it "returns false" do
             expect(subject.discussions_resolved?).to be false
-          end
-        end
-      end
-    end
-
-    describe "#discussions_to_be_resolved?" do
-      context "when discussions are not resolvable" do
-        before do
-          allow(subject).to receive(:discussions_resolvable?).and_return(false)
-        end
-
-        it "returns false" do
-          expect(subject.discussions_to_be_resolved?).to be false
-        end
-      end
-
-      context "when discussions are resolvable" do
-        before do
-          allow(subject).to receive(:discussions_resolvable?).and_return(true)
-
-          allow(first_discussion).to receive(:resolvable?).and_return(true)
-          allow(second_discussion).to receive(:resolvable?).and_return(false)
-          allow(third_discussion).to receive(:resolvable?).and_return(true)
-        end
-
-        context "when all resolvable discussions are resolved" do
-          before do
-            allow(first_discussion).to receive(:resolved?).and_return(true)
-            allow(third_discussion).to receive(:resolved?).and_return(true)
-          end
-
-          it "returns false" do
-            expect(subject.discussions_to_be_resolved?).to be false
-          end
-        end
-
-        context "when some resolvable discussions are not resolved" do
-          before do
-            allow(first_discussion).to receive(:resolved?).and_return(true)
-            allow(third_discussion).to receive(:resolved?).and_return(false)
-          end
-
-          it "returns true" do
-            expect(subject.discussions_to_be_resolved?).to be true
           end
         end
       end

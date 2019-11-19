@@ -32,6 +32,43 @@ describe Groups::UpdateService do
 
           expect(service.execute).to be_falsey
         end
+
+        context 'when a project has container images' do
+          let(:params) { { path: SecureRandom.hex } }
+          let!(:container_repository) { create(:container_repository, project: project) }
+
+          subject { described_class.new(public_group, user, params).execute }
+
+          context 'within group' do
+            let(:project) { create(:project, group: public_group) }
+
+            context 'with path updates' do
+              it 'does not allow the update' do
+                expect(subject).to be false
+                expect(public_group.errors[:base].first).to match(/Docker images in their Container Registry/)
+              end
+            end
+
+            context 'with name updates' do
+              let(:params) { { name: 'new-name' } }
+
+              it 'allows the update' do
+                expect(subject).to be true
+                expect(public_group.reload.name).to eq('new-name')
+              end
+            end
+          end
+
+          context 'within subgroup' do
+            let(:subgroup) { create(:group, parent: public_group) }
+            let(:project) { create(:project, group: subgroup) }
+
+            it 'does not allow path updates' do
+              expect(subject).to be false
+              expect(public_group.errors[:base].first).to match(/Docker images in their Container Registry/)
+            end
+          end
+        end
       end
 
       context "internal group with internal project" do

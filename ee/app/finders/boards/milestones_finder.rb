@@ -15,7 +15,7 @@ module Boards
 
     # rubocop: disable CodeReuse/Finder
     def finder_service
-      parent = @board.parent
+      parent = @board.resource_parent
 
       finder_params =
         if parent.is_a?(Group)

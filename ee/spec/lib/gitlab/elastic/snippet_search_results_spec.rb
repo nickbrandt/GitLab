@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe Gitlab::Elastic::SnippetSearchResults, :elastic do
+describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_need_inline do
   let(:snippet) { create(:personal_snippet, content: 'foo', file_name: 'foo') }
-  let(:results) { described_class.new(snippet.author, 'foo') }
+  let(:results) { described_class.new(snippet.author, 'foo', []) }
 
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
@@ -26,7 +26,7 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic do
   end
 
   context 'when user is not author' do
-    let(:results) { described_class.new(create(:user), 'foo') }
+    let(:results) { described_class.new(create(:user), 'foo', []) }
 
     it 'returns nothing' do
       expect(results.snippet_titles_count).to eq(0)
@@ -35,7 +35,7 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic do
   end
 
   context 'when user is nil' do
-    let(:results) { described_class.new(nil, 'foo') }
+    let(:results) { described_class.new(nil, 'foo', []) }
 
     it 'returns nothing' do
       expect(results.snippet_titles_count).to eq(0)
@@ -52,13 +52,28 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic do
     end
   end
 
-  context 'when user has full_private_access' do
-    let(:user) { create(:admin) }
-    let(:results) { described_class.new(user, 'foo') }
+  context 'when user has full_private_access', :do_not_mock_admin_mode do
+    include_context 'custom session'
 
-    it 'returns matched snippets' do
-      expect(results.snippet_titles_count).to eq(1)
-      expect(results.snippet_blobs_count).to eq(1)
+    let(:user) { create(:admin) }
+    let(:results) { described_class.new(user, 'foo', :any) }
+
+    context 'admin mode disabled' do
+      it 'returns nothing' do
+        expect(results.snippet_titles_count).to eq(0)
+        expect(results.snippet_blobs_count).to eq(0)
+      end
+    end
+
+    context 'admin mode enabled' do
+      before do
+        Gitlab::Auth::CurrentUserMode.new(user).enable_admin_mode!(password: user.password)
+      end
+
+      it 'returns matched snippets' do
+        expect(results.snippet_titles_count).to eq(1)
+        expect(results.snippet_blobs_count).to eq(1)
+      end
     end
   end
 
@@ -67,8 +82,8 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic do
     let(:snippet) { create(:personal_snippet, :public, content: content) }
 
     it 'indexes up to a limit' do
-      expect(described_class.new(nil, 'abc').snippet_blobs_count).to eq(1)
-      expect(described_class.new(nil, 'xyz').snippet_blobs_count).to eq(0)
+      expect(described_class.new(nil, 'abc', []).snippet_blobs_count).to eq(1)
+      expect(described_class.new(nil, 'xyz', []).snippet_blobs_count).to eq(0)
     end
   end
 end

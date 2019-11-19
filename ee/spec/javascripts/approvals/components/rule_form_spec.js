@@ -1,6 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlButton } from '@gitlab/ui';
 import { createStoreOptions } from 'ee/approvals/stores';
 import projectSettingsModule from 'ee/approvals/stores/modules/project_settings';
 import ApproversSelect from 'ee/approvals/components/approvers_select.vue';
@@ -172,19 +171,13 @@ describe('EE Approvals RuleForm', () => {
         expect(actions.postRule).toHaveBeenCalledWith(jasmine.anything(), expected, undefined);
       });
 
-      it('adds selected approvers on button click', () => {
-        const selected = [
-          { id: 1, type: TYPE_USER },
-          { id: 2, type: TYPE_USER },
-          { id: 1, type: TYPE_GROUP },
-        ];
+      it('adds selected approvers on selection', () => {
         const orig = [{ id: 7, type: TYPE_GROUP }];
-        const expected = selected.concat(orig);
+        const selected = [{ id: 2, type: TYPE_USER }];
+        const expected = [...orig, ...selected];
 
-        wrapper.vm.approvers = orig;
-
-        findApproversSelect().vm.$emit('input', selected);
-        wrapper.find(GlButton).vm.$emit('click');
+        wrapper.setData({ approvers: orig });
+        wrapper.vm.$options.watch.approversToAdd.call(wrapper.vm, selected);
 
         expect(wrapper.vm.approvers).toEqual(expected);
       });

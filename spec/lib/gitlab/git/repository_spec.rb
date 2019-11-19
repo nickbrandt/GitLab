@@ -93,6 +93,7 @@ describe Gitlab::Git::Repository, :seed_helper do
 
     describe '#last' do
       subject { super().last }
+
       it { is_expected.to eq("v1.2.1") }
     end
     it { is_expected.to include("v1.0.0") }
@@ -215,11 +216,13 @@ describe Gitlab::Git::Repository, :seed_helper do
 
     describe '#first' do
       subject { super().first }
+
       it { is_expected.to eq('feature') }
     end
 
     describe '#last' do
       subject { super().last }
+
       it { is_expected.to eq('v1.2.1') }
     end
   end
@@ -2254,7 +2257,7 @@ describe Gitlab::Git::Repository, :seed_helper do
   end
 
   describe '#remove' do
-    let(:project) { create(:project, :repository)}
+    let(:project) { create(:project, :repository) }
     let(:repository) { project.repository }
 
     it 'removes the repository' do
@@ -2263,6 +2266,18 @@ describe Gitlab::Git::Repository, :seed_helper do
       repository.remove
 
       expect(repository.raw_repository.exists?).to be false
+    end
+
+    context 'when the repository does not exist' do
+      let(:repository) { create(:project).repository }
+
+      it 'is idempotent' do
+        expect(repository.exists?).to be false
+
+        repository.remove
+
+        expect(repository.raw_repository.exists?).to be false
+      end
     end
   end
 end

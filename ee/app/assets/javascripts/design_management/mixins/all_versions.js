@@ -1,5 +1,6 @@
 import projectQuery from '../graphql/queries/project.query.graphql';
 import appDataQuery from '../graphql/queries/appData.query.graphql';
+import { findVersionId } from '../utils/design_management_utils';
 
 export default {
   apollo: {
@@ -20,7 +21,7 @@ export default {
           atVersion: null,
         };
       },
-      update: data => data.project.issue.designs.versions.edges,
+      update: data => data.project.issue.designCollection.versions.edges,
     },
   },
   computed: {
@@ -35,6 +36,13 @@ export default {
       return this.hasValidVersion
         ? `gid://gitlab/DesignManagement::Version/${this.$route.query.version}`
         : null;
+    },
+    isLatestVersion() {
+      if (this.allVersions.length > 0) {
+        const versionId = findVersionId(this.allVersions[0].node.id);
+        return !this.$route.query.version || this.$route.query.version === versionId;
+      }
+      return true;
     },
   },
   data() {

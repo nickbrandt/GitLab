@@ -22,6 +22,10 @@ export default {
       type: Object,
       required: true,
     },
+    dntExitTourContent: {
+      type: Object,
+      required: true,
+    },
     exitTourContent: {
       type: Object,
       required: true,
@@ -47,6 +51,7 @@ export default {
       'helpContentIndex',
       'tourFeedback',
       'exitTour',
+      'dntExitTour',
       'dismissed',
     ]),
     ...mapGetters([
@@ -61,6 +66,7 @@ export default {
       if (!this.showStepContent) return null;
       if (this.exitTour) return this.exitTourContent;
       if (this.tourFeedback) return this.feedbackContent;
+      if (this.dntExitTour) return this.dntExitTourContent;
 
       return this.helpContent;
     },
@@ -79,6 +85,7 @@ export default {
       'switchTourPart',
       'setExitTour',
       'setTourFeedback',
+      'setDntExitTour',
       'setDismissed',
     ]),
     init() {
@@ -137,7 +144,7 @@ export default {
         }
       }
     },
-    handleClickPopoverButton(button) {
+    handleStepContentButton(button) {
       const { showExitTourContent, redirectPath, nextPart, dismissPopover } = button;
       const helpContentItems = this.stepContent
         ? this.stepContent.getHelpContent({ projectName: this.projectName })
@@ -208,14 +215,20 @@ export default {
       this.showExitTourContent(showExitTour);
     },
     handleFeedbackTourContent(showTourFeedback) {
-      this.dismissPopover = false;
-      this.showStepContent = true;
+      this.configureEndingTourPopup();
       this.setTourFeedback(showTourFeedback);
     },
+    handleDntExitTourContent(showExitTour) {
+      this.configureEndingTourPopup();
+      this.setDntExitTour(showExitTour);
+    },
     showExitTourContent(showExitTour) {
+      this.configureEndingTourPopup();
+      this.setExitTour(showExitTour);
+    },
+    configureEndingTourPopup() {
       this.dismissPopover = false;
       this.showStepContent = true;
-      this.setExitTour(showExitTour);
     },
     handleExitTourButton() {
       this.hideActionPopover();
@@ -248,12 +261,13 @@ export default {
       :initial-show="initialShowPopover"
       :dismiss-popover="dismissPopover"
       :golden-tanuki-svg-path="goldenTanukiSvgPath"
-      @clickPopoverButton="handleClickPopoverButton"
+      @clickStepContentButton="handleStepContentButton"
       @clickExitTourButton="handleExitTourButton"
       @clickFeedbackButton="handleFeedbackButton"
       @restartStep="handleRestartStep"
       @skipStep="handleSkipStep"
       @showFeedbackContent="handleFeedbackTourContent"
+      @showDntExitContent="handleDntExitTourContent"
       @showExitTourContent="handleShowExitTourContent"
     />
   </transition>

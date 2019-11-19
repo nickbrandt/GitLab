@@ -33,16 +33,19 @@ module EE
       "Repositories within this group #{show_lfs} will be restricted to this maximum size. Can be overridden inside each project. 0 for unlimited. Leave empty to inherit the global value."
     end
 
+    override :group_packages_nav_link_paths
     def group_packages_nav_link_paths
       %w[
         groups/packages#index
         groups/dependency_proxies#show
+        groups/container_registries#index
       ]
     end
 
     def group_packages_nav?
       group_packages_list_nav? ||
-        group_dependency_proxy_nav?
+        group_dependency_proxy_nav? ||
+        group_container_registry_nav?
     end
 
     def group_packages_list_nav?
@@ -51,6 +54,37 @@ module EE
 
     def group_dependency_proxy_nav?
       @group.dependency_proxy_feature_available?
+    end
+
+    def group_path_params(group)
+      { group_id: group }
+    end
+
+    def group_vulnerabilities_endpoint_path(group)
+      params = group_path_params(group)
+      if ::Feature.enabled?(:first_class_vulnerabilities)
+        group_security_vulnerability_findings_path(params)
+      else
+        group_security_vulnerabilities_path(params)
+      end
+    end
+
+    def group_vulnerabilities_summary_endpoint_path(group)
+      params = group_path_params(group)
+      if ::Feature.enabled?(:first_class_vulnerabilities)
+        summary_group_security_vulnerability_findings_path(params)
+      else
+        summary_group_security_vulnerabilities_path(params)
+      end
+    end
+
+    def group_vulnerabilities_history_endpoint_path(group)
+      params = group_path_params(group)
+      if ::Feature.enabled?(:first_class_vulnerabilities)
+        history_group_security_vulnerability_findings_path(params)
+      else
+        history_group_security_vulnerabilities_path(params)
+      end
     end
 
     private

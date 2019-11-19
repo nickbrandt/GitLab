@@ -85,7 +85,7 @@ describe 'New project' do
         end
       end
 
-      it 'creates CI/CD project from repo URL' do
+      it 'creates CI/CD project from repo URL', :sidekiq_might_not_need_inline do
         visit new_project_path
         find('#ci-cd-project-tab').click
 
@@ -224,7 +224,7 @@ describe 'New project' do
           visit_create_from_group_template_tab
 
           page.within('.custom-project-templates') do
-            page.find(".template-option input[value='#{subgroup1_project1.name}']").first(:xpath, './/..').click
+            page.find(".template-option input[value='#{subgroup1_project1.id}']").first(:xpath, './/..').click
             wait_for_all_requests
           end
         end
@@ -253,7 +253,7 @@ describe 'New project' do
             page.within('#create-from-template-pane') do
               click_button 'Change template'
 
-              page.find(:xpath, "//input[@type='radio' and @value='#{subgroup1_project1.name}']/..").click
+              page.find(:xpath, "//input[@type='radio' and @value='#{subgroup1_project1.id}']/..").click
 
               wait_for_all_requests
             end
@@ -269,7 +269,7 @@ describe 'New project' do
         end
       end
 
-      context 'when custom project group template is set' do
+      shared_context 'when custom project group template is set' do
         let(:group1) { create(:group) }
         let(:group2) { create(:group) }
         let(:group3) { create(:group) }
@@ -427,6 +427,23 @@ describe 'New project' do
             end
           end
         end
+      end
+
+      # Cleanup issue: https://gitlab.com/gitlab-org/gitlab/issues/35733
+      context 'when `optimized_groups_with_templates_finder` feature flag is enabled' do
+        before do
+          stub_feature_flags(optimized_groups_with_templates_finder: true)
+        end
+
+        include_context 'when custom project group template is set'
+      end
+
+      context 'when `optimized_groups_with_templates_finder` feature flag is disabled' do
+        before do
+          stub_feature_flags(optimized_groups_with_templates_finder: false)
+        end
+
+        include_context 'when custom project group template is set'
       end
 
       context 'when group template is not set' do

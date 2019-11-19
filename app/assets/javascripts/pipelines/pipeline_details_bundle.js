@@ -2,11 +2,13 @@ import Vue from 'vue';
 import Flash from '~/flash';
 import Translate from '~/vue_shared/translate';
 import { __ } from '~/locale';
-import pipelineGraph from 'ee_else_ce/pipelines/components/graph/graph_component.vue';
-import GraphEEMixin from 'ee_else_ce/pipelines/mixins/graph_pipeline_bundle_mixin';
+import pipelineGraph from './components/graph/graph_component.vue';
+import GraphBundleMixin from './mixins/graph_pipeline_bundle_mixin';
 import PipelinesMediator from './pipeline_details_mediator';
 import pipelineHeader from './components/header_component.vue';
 import eventHub from './event_hub';
+import TestReports from './components/test_reports/test_reports.vue';
+import testReportsStore from './stores/test_reports';
 
 Vue.use(Translate);
 
@@ -17,13 +19,13 @@ export default () => {
 
   mediator.fetchPipeline();
 
-  // eslint-disable-next-line
+  // eslint-disable-next-line no-new
   new Vue({
     el: '#js-pipeline-graph-vue',
     components: {
       pipelineGraph,
     },
-    mixins: [GraphEEMixin],
+    mixins: [GraphBundleMixin],
     data() {
       return {
         mediator,
@@ -47,7 +49,7 @@ export default () => {
     },
   });
 
-  // eslint-disable-next-line
+  // eslint-disable-next-line no-new
   new Vue({
     el: '#js-pipeline-header-vue',
     components: {
@@ -81,4 +83,23 @@ export default () => {
       });
     },
   });
+
+  const testReportsEnabled =
+    window.gon && window.gon.features && window.gon.features.junitPipelineView;
+
+  if (testReportsEnabled) {
+    testReportsStore.dispatch('setEndpoint', dataset.testReportEndpoint);
+    testReportsStore.dispatch('fetchReports');
+
+    // eslint-disable-next-line no-new
+    new Vue({
+      el: '#js-pipeline-tests-detail',
+      components: {
+        TestReports,
+      },
+      render(createElement) {
+        return createElement('test-reports');
+      },
+    });
+  }
 };

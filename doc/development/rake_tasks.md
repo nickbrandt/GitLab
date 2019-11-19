@@ -12,6 +12,14 @@ The `setup` task is an alias for `gitlab:setup`.
 This tasks calls `db:reset` to create the database, and calls `db:seed_fu` to seed the database.
 Note: `db:setup` calls `db:seed` but this does nothing.
 
+### Env variables
+
+**MASS_INSERT**: Create millions of users (2m), projects (5m) and its
+relations. It's highly recommended to run the seed with it to catch slow queries
+while developing. Expect the process to take up to 20 extra minutes.
+
+**LARGE_PROJECTS**: Create large projects (through import) from a predefined set of urls.
+
 ### Seeding issues for all or a given project
 
 You can seed issues for all or a given project with the `gitlab:seed:issues`
@@ -220,3 +228,36 @@ bundle exec rake db:obsolete_ignored_columns
 ```
 
 Feel free to remove their definitions from their `ignored_columns` definitions.
+
+## Update GraphQL Documentation and Schema definitions
+
+To generate GraphQL documentation based on the GitLab schema, run:
+
+```shell
+bundle exec rake gitlab:graphql:compile_docs
+```
+
+In its current state, the rake task:
+
+- Generates output for GraphQL objects.
+- Places the output at `doc/api/graphql/reference/index.md`.
+
+This uses some features from `graphql-docs` gem like its schema parser and helper methods.
+The docs generator code comes from our side giving us more flexibility, like using Haml templates and generating Markdown files.
+
+To edit the template used, please take a look at `lib/gitlab/graphql/docs/templates/default.md.haml`.
+The actual renderer is at `Gitlab::Graphql::Docs::Renderer`.
+
+`@parsed_schema` is an instance variable that the `graphql-docs` gem expects to have available.
+`Gitlab::Graphql::Docs::Helper` defines the `object` method we currently use. This is also where you
+should implement any new methods for new types you'd like to display.
+
+### Update machine-readable schema files
+
+To generate GraphQL schema files based on the GitLab schema, run:
+
+```shell
+bundle exec rake gitlab:graphql:schema:dump
+```
+
+This uses graphql-ruby's built-in rake tasks to generate files in both [IDL](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51) and JSON formats.

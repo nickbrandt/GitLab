@@ -71,32 +71,70 @@ describe Gitlab do
   end
 
   describe '.com?' do
-    before do
-      Thread.current[:is_com] = nil
-    end
-
     it 'is true when on GitLab.com' do
-      allow(LightSettings).to receive(:host).and_return('gitlab.com')
+      stub_config_setting(url: 'https://gitlab.com')
 
       expect(described_class.com?).to eq true
     end
 
     it 'is true when on staging' do
-      allow(LightSettings).to receive(:host).and_return('staging.gitlab.com')
+      stub_config_setting(url: 'https://staging.gitlab.com')
 
       expect(described_class.com?).to eq true
     end
 
     it 'is true when on other gitlab subdomain' do
-      allow(LightSettings).to receive(:host).and_return('example.gitlab.com')
+      stub_config_setting(url: 'https://example.gitlab.com')
 
       expect(described_class.com?).to eq true
     end
 
     it 'is false when not on GitLab.com' do
-      allow(LightSettings).to receive(:host).and_return('example.com')
+      stub_config_setting(url: 'http://example.com')
 
       expect(described_class.com?).to eq false
+    end
+  end
+
+  describe '.canary?' do
+    it 'is true when CANARY env var is set to true' do
+      stub_env('CANARY', '1')
+
+      expect(described_class.canary?).to eq true
+    end
+
+    it 'is false when CANARY env var is set to false' do
+      stub_env('CANARY', '0')
+
+      expect(described_class.canary?).to eq false
+    end
+  end
+
+  describe '.com_and_canary?' do
+    it 'is true when on .com and canary' do
+      allow(described_class).to receive_messages(com?: true, canary?: true)
+
+      expect(described_class.com_and_canary?).to eq true
+    end
+
+    it 'is false when on .com but not on canary' do
+      allow(described_class).to receive_messages(com?: true, canary?: false)
+
+      expect(described_class.com_and_canary?).to eq false
+    end
+  end
+
+  describe '.com_but_not_canary?' do
+    it 'is false when on .com and canary' do
+      allow(described_class).to receive_messages(com?: true, canary?: true)
+
+      expect(described_class.com_but_not_canary?).to eq false
+    end
+
+    it 'is true when on .com but not on canary' do
+      allow(described_class).to receive_messages(com?: true, canary?: false)
+
+      expect(described_class.com_but_not_canary?).to eq true
     end
   end
 
@@ -150,6 +188,7 @@ describe Gitlab do
 
   describe '.ee?' do
     before do
+      stub_env('FOSS_ONLY', nil) # Make sure the ENV is clean
       described_class.instance_variable_set(:@is_ee, nil)
     end
 
@@ -157,42 +196,66 @@ describe Gitlab do
       described_class.instance_variable_set(:@is_ee, nil)
     end
 
-    it 'returns true when using Enterprise Edition' do
-      root = Pathname.new('dummy')
-      license_path = double(:path, exist?: true)
+    context 'for EE' do
+      before do
+        root = Pathname.new('dummy')
+        license_path = double(:path, exist?: true)
 
-      allow(described_class)
-        .to receive(:root)
-              .and_return(root)
+        allow(described_class)
+          .to receive(:root)
+                .and_return(root)
 
-      allow(root)
-        .to receive(:join)
-              .with('ee/app/models/license.rb')
-              .and_return(license_path)
+        allow(root)
+          .to receive(:join)
+                .with('ee/app/models/license.rb')
+                .and_return(license_path)
+      end
 
-      expect(described_class.ee?).to eq(true)
+      context 'when using FOSS_ONLY=1' do
+        before do
+          stub_env('FOSS_ONLY', '1')
+        end
+
+        it 'returns not to be EE' do
+          expect(described_class).not_to be_ee
+        end
+      end
+
+      context 'when using FOSS_ONLY=0' do
+        before do
+          stub_env('FOSS_ONLY', '0')
+        end
+
+        it 'returns to be EE' do
+          expect(described_class).to be_ee
+        end
+      end
+
+      context 'when using default FOSS_ONLY' do
+        it 'returns to be EE' do
+          expect(described_class).to be_ee
+        end
+      end
     end
 
-    it 'returns false when using Community Edition' do
-      root = double(:path)
-      license_path = double(:path, exists?: false)
+    context 'for CE' do
+      before do
+        root = double(:path)
+        license_path = double(:path, exists?: false)
 
-      allow(described_class)
-        .to receive(:root)
-              .and_return(Pathname.new('dummy'))
+        allow(described_class)
+          .to receive(:root)
+                .and_return(Pathname.new('dummy'))
 
-      allow(root)
-        .to receive(:join)
-              .with('ee/app/models/license.rb')
-              .and_return(license_path)
+        allow(root)
+          .to receive(:join)
+                .with('ee/app/models/license.rb')
+                .and_return(license_path)
+      end
 
-      expect(described_class.ee?).to eq(false)
-    end
-
-    it 'returns true when the IS_GITLAB_EE variable is not empty' do
-      stub_env('IS_GITLAB_EE', '1')
-
-      expect(described_class.ee?).to eq(true)
+      it 'returns not to be EE' do
+        expect(described_class).not_to be_ee
+      end
     end
   end
 

@@ -250,7 +250,7 @@ describe Namespace do
       it "moves dir if path changed" do
         namespace.update(path: namespace.full_path + '_new')
 
-        expect(gitlab_shell.exists?(project.repository_storage, "#{namespace.path}/#{project.path}.git")).to be_truthy
+        expect(gitlab_shell.repository_exists?(project.repository_storage, "#{namespace.path}/#{project.path}.git")).to be_truthy
       end
 
       context 'when #write_projects_repository_config raises an error' do
@@ -278,6 +278,44 @@ describe Namespace do
 
             namespace.update(path: namespace.full_path + '_new')
           end
+        end
+      end
+
+      shared_examples 'move_dir without repository storage feature' do |storage_version|
+        let(:namespace) { create(:namespace) }
+        let(:gitlab_shell) { namespace.gitlab_shell }
+        let!(:project) { create(:project_empty_repo, namespace: namespace, storage_version: storage_version) }
+
+        it 'calls namespace service' do
+          expect(gitlab_shell).to receive(:add_namespace).and_return(true)
+          expect(gitlab_shell).to receive(:mv_namespace).and_return(true)
+
+          namespace.move_dir
+        end
+      end
+
+      shared_examples 'move_dir with repository storage feature' do |storage_version|
+        let(:namespace) { create(:namespace) }
+        let(:gitlab_shell) { namespace.gitlab_shell }
+        let!(:project) { create(:project_empty_repo, namespace: namespace, storage_version: storage_version) }
+
+        it 'does not call namespace service' do
+          expect(gitlab_shell).not_to receive(:add_namespace)
+          expect(gitlab_shell).not_to receive(:mv_namespace)
+
+          namespace.move_dir
+        end
+      end
+
+      context 'project is without repository storage feature' do
+        [nil, 0].each do |storage_version|
+          it_behaves_like 'move_dir without repository storage feature', storage_version
+        end
+      end
+
+      context 'project has repository storage feature' do
+        [1, 2].each do |storage_version|
+          it_behaves_like 'move_dir with repository storage feature', storage_version
         end
       end
 
@@ -358,7 +396,7 @@ describe Namespace do
         namespace.update(path: namespace.full_path + '_new')
 
         expect(before_disk_path).to eq(project.disk_path)
-        expect(gitlab_shell.exists?(project.repository_storage, "#{project.disk_path}.git")).to be_truthy
+        expect(gitlab_shell.repository_exists?(project.repository_storage, "#{project.disk_path}.git")).to be_truthy
       end
     end
 
@@ -896,32 +934,6 @@ describe Namespace do
         end
       end
     end
-
-    context 'when :emails_disabled feature flag is off' do
-      before do
-        stub_feature_flags(emails_disabled: false)
-      end
-
-      context 'when not a subgroup' do
-        it 'returns false' do
-          group = create(:group, emails_disabled: true)
-
-          expect(group.emails_disabled?).to be_falsey
-        end
-      end
-
-      context 'when a subgroup and ancestor emails are disabled' do
-        let(:grandparent) { create(:group) }
-        let(:parent)      { create(:group, parent: grandparent) }
-        let(:group)       { create(:group, parent: parent) }
-
-        it 'returns false' do
-          grandparent.update_attribute(:emails_disabled, true)
-
-          expect(group.emails_disabled?).to be_falsey
-        end
-      end
-    end
   end
 
   describe '#pages_virtual_domain' do
@@ -956,6 +968,75 @@ describe Namespace do
           expect(virtual_domain).to be_an_instance_of(Pages::VirtualDomain)
           expect(virtual_domain.lookup_paths).not_to be_empty
         end
+      end
+    end
+  end
+
+  describe '#has_parent?' do
+    it 'returns true when the group has a parent' do
+      group = create(:group, :nested)
+
+      expect(group.has_parent?).to be_truthy
+    end
+
+    it 'returns true when the group has an unsaved parent' do
+      parent = build(:group)
+      group = build(:group, parent: parent)
+
+      expect(group.has_parent?).to be_truthy
+    end
+
+    it 'returns false when the group has no parent' do
+      group = create(:group, parent: nil)
+
+      expect(group.has_parent?).to be_falsy
+    end
+  end
+
+  describe '#closest_setting' do
+    using RSpec::Parameterized::TableSyntax
+
+    shared_examples_for 'fetching closest setting' do
+      let!(:root_namespace) { create(:namespace) }
+      let!(:namespace) { create(:namespace, parent: root_namespace) }
+
+      let(:setting) { namespace.closest_setting(setting_name) }
+
+      before do
+        root_namespace.update_attribute(setting_name, root_setting)
+        namespace.update_attribute(setting_name, child_setting)
+      end
+
+      it 'returns closest non-nil value' do
+        expect(setting).to eq(result)
+      end
+    end
+
+    context 'when setting is of non-boolean type' do
+      where(:root_setting, :child_setting, :result) do
+        100 | 200 | 200
+        100 | nil | 100
+        nil | nil | nil
+      end
+
+      with_them do
+        let(:setting_name) { :max_artifacts_size }
+
+        it_behaves_like 'fetching closest setting'
+      end
+    end
+
+    context 'when setting is of boolean type' do
+      where(:root_setting, :child_setting, :result) do
+        true | false | false
+        true | nil   | true
+        nil  | nil   | nil
+      end
+
+      with_them do
+        let(:setting_name) { :lfs_enabled }
+
+        it_behaves_like 'fetching closest setting'
       end
     end
   end

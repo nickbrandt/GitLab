@@ -42,7 +42,7 @@ assignees in the database of the GitLab instance (note that pull requests are ca
 
 For this association to succeed, prior to the import, each GitHub author and assignee in the repository must
 have either previously logged in to a GitLab account using the GitHub icon **or** have a GitHub account with
-a [public email address](https://help.github.com/articles/setting-your-commit-email-address-on-github/) that
+a [public email address](https://help.github.com/en/articles/setting-your-commit-email-address) that
 matches their GitLab account's email address.
 
 If a user referenced in the project is not found in GitLab's database, the project creator (typically the user
@@ -71,7 +71,7 @@ Before you begin, ensure that any GitHub users who you want to map to GitLab use
 
 - A GitLab account that has logged in using the GitHub icon
   \- or -
-- A GitLab account with an email address that matches the [public email address](https://help.github.com/articles/setting-your-commit-email-address-on-github/) of the GitHub user
+- A GitLab account with an email address that matches the [public email address](https://help.github.com/en/articles/setting-your-commit-email-address) of the GitHub user
 
 User-matching attempts occur in that order, and if a user is not identified either way, the activity is associated with
 the user account that is performing the import.
@@ -125,7 +125,7 @@ your GitHub repositories are listed.
 
 ## Mirroring and pipeline status sharing
 
-Depending your GitLab tier, [project mirroring](../../../workflow/repository_mirroring.md) can be set up to keep
+Depending your GitLab tier, [project mirroring](../repository/repository_mirroring.md) can be set up to keep
 your imported project in sync with its GitHub copy.
 
 Additionally, you can configure GitLab to send pipeline status updates back GitHub with the

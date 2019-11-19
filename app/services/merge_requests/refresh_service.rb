@@ -25,6 +25,7 @@ module MergeRequests
       outdate_suggestions
       refresh_pipelines_on_merge_requests
       abort_auto_merges
+      abort_ff_merge_requests_with_when_pipeline_succeeds
       mark_pending_todos_done
       cache_merge_requests_closing_issues
 
@@ -146,6 +147,32 @@ module MergeRequests
       merge_requests_for_source_branch.each do |merge_request|
         abort_auto_merge(merge_request, 'source branch was updated')
       end
+    end
+
+    def abort_ff_merge_requests_with_when_pipeline_succeeds
+      return unless @project.ff_merge_must_be_possible?
+
+      merge_requests_with_auto_merge_enabled_to(@push.branch_name).each do |merge_request|
+        next unless merge_request.auto_merge_strategy == AutoMergeService::STRATEGY_MERGE_WHEN_PIPELINE_SUCCEEDS
+        next unless merge_request.should_be_rebased?
+
+        abort_auto_merge_with_todo(merge_request, 'target branch was updated')
+      end
+    end
+
+    def abort_auto_merge_with_todo(merge_request, reason)
+      response = abort_auto_merge(merge_request, reason)
+      response = ServiceResponse.new(response)
+      return unless response.success?
+
+      todo_service.merge_request_became_unmergeable(merge_request)
+    end
+
+    def merge_requests_with_auto_merge_enabled_to(target_branch)
+      @project
+        .merge_requests
+        .by_target_branch(target_branch)
+        .with_auto_merge_enabled
     end
 
     def mark_pending_todos_done

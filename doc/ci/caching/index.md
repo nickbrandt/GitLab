@@ -12,8 +12,9 @@ content of a previous job. It can be particularly useful when you are
 developing software that depends on other libraries which are fetched via the
 internet during build time.
 
-If caching is enabled, it's shared between pipelines and jobs by default,
-starting from GitLab 9.0.
+If caching is enabled, it's shared between pipelines and jobs at the project
+level by default, starting from GitLab 9.0. Caches are not shared across
+projects.
 
 Make sure you read the [`cache` reference](../yaml/README.md#cache) to learn
 how it is defined in `.gitlab-ci.yml`.
@@ -490,8 +491,8 @@ job B:
 To fix that, use different `keys` for each job.
 
 In another case, let's assume you have more than one Runners assigned to your
-project, but the distributed cache is not enabled. We want the second time the
-pipeline is run, `job A` and `job B` to re-use their cache (which in this case
+project, but the distributed cache is not enabled. The second time the
+pipeline is run, we want `job A` and `job B` to re-use their cache (which in this case
 will be different):
 
 ```yaml
@@ -517,7 +518,7 @@ job B:
 ```
 
 In that case, even if the `key` is different (no fear of overwriting), you
-might experience the cached files to "get cleaned" before each stage if the
+might experience that the cached files "get cleaned" before each stage if the
 jobs run on different Runners in the subsequent pipelines.
 
 ## Clearing the cache

@@ -1,21 +1,30 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe LicenseEntity do
-  describe '#as_json' do
-    subject { described_class.represent(license).as_json }
+  describe "#as_json" do
+    subject { described_class.represent(license_policy).as_json }
 
-    let(:license) { build(:ci_reports_license_management_report, :mit).licenses.first }
+    let(:license) { build(:license_scanning_license, :mit) }
+    let(:license_policy) { ::SCA::LicensePolicy.new(license, software_policy) }
+    let(:software_policy) { build(:software_license_policy) }
+    let(:path) { 'some_path' }
 
-    let(:assert_license) do
-      {
-        name:       'MIT',
-        url:        'https://opensource.org/licenses/mit',
-        components: [{ name: 'rails' }]
-      }
+    before do
+      license.add_dependency('rails')
+      allow(license.dependencies.first).to receive(:path).and_return(path)
     end
 
-    it { is_expected.to eq(assert_license) }
+    it "produces the correct representation" do
+      is_expected.to eq({
+        id: license_policy.id,
+        name: license_policy.name,
+        url: license_policy.url,
+        spdx_identifier: license_policy.spdx_identifier,
+        classification: license_policy.classification,
+        components: [{ name: 'rails', blob_path: path }]
+      })
+    end
   end
 end

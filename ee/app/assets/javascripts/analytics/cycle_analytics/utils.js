@@ -1,3 +1,7 @@
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import { convertToSnakeCase } from '~/lib/utils/text_utility';
+import { isString } from 'underscore';
+
 const EVENT_TYPE_LABEL = 'label';
 
 export const isStartEvent = ev => Boolean(ev) && Boolean(ev.canBeStartEvent) && ev.canBeStartEvent;
@@ -24,3 +28,20 @@ export const isLabelEvent = (labelEvents = [], ev = null) =>
 
 export const getLabelEventsIdentifiers = (events = []) =>
   events.filter(ev => ev.type && ev.type === EVENT_TYPE_LABEL).map(i => i.identifier);
+
+export const transformRawStages = (stages = []) =>
+  stages
+    .map(({ title, ...rest }) => ({
+      ...convertObjectPropsToCamelCase(rest, { deep: true }),
+      slug: convertToSnakeCase(title),
+      title,
+    }))
+    .sort((a, b) => a.id > b.id);
+
+export const nestQueryStringKeys = (obj = null, targetKey = '') => {
+  if (!obj || !isString(targetKey) || !targetKey.length) return {};
+  return Object.entries(obj).reduce((prev, [key, value]) => {
+    const customKey = `${targetKey}[${key}]`;
+    return { ...prev, [customKey]: value };
+  }, {});
+};

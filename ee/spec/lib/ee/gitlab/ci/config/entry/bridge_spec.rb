@@ -3,6 +3,20 @@
 require 'spec_helper'
 
 describe EE::Gitlab::Ci::Config::Entry::Bridge do
+  subject { described_class.new(config, name: :my_bridge) }
+
+  it_behaves_like 'with inheritable CI config' do
+    let(:inheritable_key) { 'default' }
+    let(:inheritable_class) { Gitlab::Ci::Config::Entry::Default }
+
+    # These are entries defined in Default
+    # that we know that we don't want to inherit
+    # as they do not have sense in context of Bridge
+    let(:ignored_inheritable_columns) do
+      %i[before_script after_script image services cache interruptible]
+    end
+  end
+
   describe '.matching?' do
     subject { described_class.matching?(name, config) }
 
@@ -42,8 +56,6 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
   end
 
   describe '.new' do
-    subject { described_class.new(config, name: :my_bridge) }
-
     before do
       subject.compose!
     end
@@ -76,7 +88,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       describe '#value' do
         it 'is returns a bridge job configuration' do
           expect(subject.value).to eq(name: :my_bridge,
-                                      needs: { pipeline: 'some/project' },
+                                      needs: { bridge: [{ pipeline: 'some/project' }] },
                                       ignore: false,
                                       stage: 'test',
                                       only: { refs: %w[branches tags] })
@@ -144,6 +156,50 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       describe '#errors' do
         it 'is returns an error about empty upstream config' do
           expect(subject.errors.first).to eq('bridge config should contain either a trigger or a needs:pipeline')
+        end
+      end
+    end
+
+    context 'when bridge has only job needs' do
+      let(:config) do
+        {
+          needs: ['some_job']
+        }
+      end
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+    end
+
+    context 'when bridge has bridge and job needs' do
+      let(:config) do
+        {
+          trigger: 'other-project',
+          needs: ['some_job', { pipeline: 'some/other_project' }]
+        }
+      end
+
+      describe '#valid?' do
+        it { is_expected.to be_valid }
+      end
+    end
+
+    context 'when bridge has more than one valid bridge needs' do
+      let(:config) do
+        {
+          trigger: 'other-project',
+          needs: [{ pipeline: 'some/project' }, { pipeline: 'some/other_project' }]
+        }
+      end
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+
+      describe '#errors' do
+        it 'returns an error about too many bridge needs' do
+          expect(subject.errors).to contain_exactly('bridge config should contain at most one bridge need')
         end
       end
     end

@@ -12,7 +12,7 @@ describe 'Projects > Files > Project owner sees a link to create a license file 
 
   it 'project maintainer creates a license file from a template' do
     visit project_path(project)
-    click_on 'Add license'
+    click_on 'Add LICENSE'
     expect(page).to have_content('New file')
 
     expect(current_path).to eq(
@@ -37,7 +37,7 @@ describe 'Projects > Files > Project owner sees a link to create a license file 
 
   def select_template(template)
     page.within('.js-license-selector-wrap') do
-      click_button 'Apply a license template'
+      click_button 'Apply a template'
       click_link template
       wait_for_requests
     end

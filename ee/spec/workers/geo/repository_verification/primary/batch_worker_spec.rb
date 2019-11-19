@@ -80,6 +80,6 @@ describe Geo::RepositoryVerification::Primary::BatchWorker, :clean_gitlab_redis_
   end
 
   def result(success, shard)
-    Gitlab::HealthChecks::Result.new(success, nil, { shard: shard })
+    Gitlab::HealthChecks::Result.new('gitaly_check', success, nil, { shard: shard })
   end
 end

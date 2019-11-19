@@ -4,8 +4,9 @@ module Clusters
   class ClustersHierarchy
     DEPTH_COLUMN = :depth
 
-    def initialize(clusterable)
+    def initialize(clusterable, include_management_project: true)
       @clusterable = clusterable
+      @include_management_project = include_management_project
     end
 
     # Returns clusters in order from deepest to highest group
@@ -19,12 +20,12 @@ module Clusters
         .with
         .recursive(cte.to_arel)
         .from(cte_alias)
-        .order(DEPTH_COLUMN => :asc)
+        .order(depth_order_clause)
     end
 
     private
 
-    attr_reader :clusterable
+    attr_reader :clusterable, :include_management_project
 
     def recursive_cte
       cte = Gitlab::SQL::RecursiveCTE.new(:clusters_cte)
@@ -38,10 +39,52 @@ module Clusters
                      raise ArgumentError, "unknown type for #{clusterable}"
                    end
 
+      if clusterable.is_a?(::Project) && include_management_project
+        cte << same_namespace_management_clusters_query
+      end
+
       cte << base_query
       cte << parent_query(cte)
 
       cte
+    end
+
+    # Returns project-level clusters where the project is the management project
+    # for the cluster. The management project has to be in the same namespace /
+    # group as the cluster's project.
+    #
+    # Support for management project in sub-groups is planned in
+    # https://gitlab.com/gitlab-org/gitlab/issues/34650
+    #
+    # NB: group_parent_id is un-used but we still need to match the same number of
+    # columns as other queries in the CTE.
+    def same_namespace_management_clusters_query
+      clusterable.management_clusters
+        .project_type
+        .select([clusters_star, 'NULL AS group_parent_id', "0 AS #{DEPTH_COLUMN}"])
+        .for_project_namespace(clusterable.namespace_id)
+    end
+
+    # Management clusters should be first in the hierarchy so we use 0 for the
+    # depth column.
+    #
+    # Only applicable if the clusterable is a project (most especially when
+    # requesting project.deployment_platform).
+    def depth_order_clause
+      return { DEPTH_COLUMN => :asc } unless clusterable.is_a?(::Project) && include_management_project
+
+      order = <<~SQL
+        (CASE clusters.management_project_id
+          WHEN :project_id THEN 0
+          ELSE #{DEPTH_COLUMN}
+        END) ASC
+      SQL
+
+      values = {
+        project_id: clusterable.id
+      }
+
+      model.sanitize_sql_array([Arel.sql(order), values])
     end
 
     def group_clusters_base_query

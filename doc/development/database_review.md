@@ -47,6 +47,13 @@ A database **reviewer**'s role is to:
   reassign MR to the database **maintainer** suggested by Reviewer
   Roulette.
 
+#### When there are no database maintainers available
+
+Currently we have a [critical shortage of database maintainers](https://gitlab.com/gitlab-org/gitlab/issues/29717). Until we are able to increase the number of database maintainers to support the volume of reviews, we have implemented this temporary solution. If the database **reviewer** cannot find an available database **maintainer** then:
+
+1. Assign the MR for a second review by a **database trainee maintainer** for further review.
+1. Once satisfied with the review process, and if the database **maintainer** is still not available, skip the database maintainer approval step and assign the merge request to a backend maintainer for final review and approval.
+
 A database **maintainer**'s role is to:
 
 - Perform the final database review on the MR.
@@ -78,7 +85,8 @@ and details for a database reviewer:
 - Format any queries with a SQL query formatter, for example with [sqlformat.darold.net](http://sqlformat.darold.net).
 - Consider providing query plans via a link to [explain.depesz.com](https://explain.depesz.com) or another tool instead of textual form.
 - For query changes, it is best to provide the SQL query along with a plan *before* and *after* the change. This helps to spot differences quickly.
-- When providing query plans, make sure to use good parameter values, so that the query executed is a good example and also hits enough data. Usually, the `gitlab-org` namespace (`namespace_id = 9970`) and the `gitlab-org/gitlab-foss` project (`project_id = 13083`) provides enough data to serve as a good example.
+- When providing query plans, make sure to use good parameter values, so that the query executed is a good example and also hits enough data.
+  - Usually, the `gitlab-org` namespace (`namespace_id = 9970`) and the `gitlab-org/gitlab-foss` (`project_id = 13083`) or the `gitlab-org/gitlab` (`project_id = 278964`) projects provide enough data to serve as a good example.
 
 ### How to review for database
 
@@ -94,7 +102,7 @@ and details for a database reviewer:
   - Check queries timing (If any): Queries executed in a migration
     need to fit comfortably within `15s` - preferably much less than that - on GitLab.com.
 - Check [background migrations](background_migrations.md):
-  - Establish a time estimate for execution
+  - Establish a time estimate for execution on GitLab.com.
   - They should only be used when migrating data in larger tables.
     - If a single `update` is below than `1s` the query can be placed
       directly in a regular migration (inside `db/migrate`).
@@ -105,7 +113,11 @@ and details for a database reviewer:
     that post migrations are executed post-deployment in production.
 - Check [timing guidelines for migrations](#timing-guidelines-for-migrations)
 - Check migrations are reversible and implement a `#down` method
-- Data migrations should be reversible too or come with a description of how to reverse, when possible. This applies to all types of migrations (regular, post-deploy, background).
+- Check data migrations:
+  - Establish a time estimate for execution on GitLab.com.
+  - Depending on timing, data migrations can be placed on regular, post-deploy or background migrations.
+  - Data migrations should be reversible too or come with a description of how to reverse, when possible.
+    This applies to all types of migrations (regular, post-deploy, background).
 - Query performance
   - Check for any obviously complex queries and queries the author specifically
     points out for review (if any)
@@ -121,7 +133,7 @@ and details for a database reviewer:
     pipeline](https://ops.gitlab.net/gitlab-com/gl-infra/gitlab-restore/postgres-gprd)
     in order to establish a proper testing environment.
 
-### Timing guidelines for migrations
+### Timing guidelines for migrations
 
 In general, migrations for a single deploy shouldn't take longer than
 1 hour for GitLab.com. The following guidelines are not hard rules, they were

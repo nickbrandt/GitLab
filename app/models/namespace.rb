@@ -182,7 +182,7 @@ class Namespace < ApplicationRecord
   # any ancestor can disable emails for all descendants
   def emails_disabled?
     strong_memoize(:emails_disabled) do
-      Feature.enabled?(:emails_disabled, self, default_enabled: true) && self_and_ancestors.where(emails_disabled: true).exists?
+      self_and_ancestors.where(emails_disabled: true).exists?
     end
   end
 
@@ -256,7 +256,7 @@ class Namespace < ApplicationRecord
   end
 
   def has_parent?
-    parent.present?
+    parent_id.present? || parent.present?
   end
 
   def root_ancestor
@@ -314,6 +314,12 @@ class Namespace < ApplicationRecord
 
   def pages_virtual_domain
     Pages::VirtualDomain.new(all_projects_with_pages, trim_prefix: full_path)
+  end
+
+  def closest_setting(name)
+    self_and_ancestors(hierarchy_order: :asc)
+      .find { |n| !n.read_attribute(name).nil? }
+      .try(name)
   end
 
   private

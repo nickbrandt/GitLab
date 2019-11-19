@@ -36,7 +36,9 @@ module ContainerRegistry
     end
 
     def delete_repository_tag(name, reference)
-      faraday.delete("/v2/#{name}/manifests/#{reference}").success?
+      result = faraday.delete("/v2/#{name}/manifests/#{reference}")
+
+      result.success? || result.status == 404
     end
 
     def upload_raw_blob(path, blob)
@@ -49,7 +51,7 @@ module ContainerRegistry
 
     def upload_blob(name, content, digest)
       upload = faraday.post("/v2/#{name}/blobs/uploads/")
-      return unless upload.success?
+      return upload unless upload.success?
 
       location = URI(upload.headers['location'])
 
@@ -84,7 +86,9 @@ module ContainerRegistry
     end
 
     def delete_blob(name, digest)
-      faraday.delete("/v2/#{name}/blobs/#{digest}").success?
+      result = faraday.delete("/v2/#{name}/blobs/#{digest}")
+
+      result.success? || result.status == 404
     end
 
     def put_tag(name, reference, manifest)

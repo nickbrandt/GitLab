@@ -8,66 +8,44 @@ describe SystemNoteService do
   include RepoHelpers
   include DesignManagementTestHelpers
 
-  set(:group)    { create(:group) }
-  set(:project)  { create(:project, :repository, group: group) }
-  set(:author)   { create(:user) }
-  let(:noteable) { create(:issue, project: project) }
-  let(:issue)    { noteable }
-  let(:epic)     { create(:epic, group: group) }
-
-  shared_examples_for 'a system note' do
-    let(:expected_noteable) { noteable }
-    let(:commit_count)      { nil }
-
-    it 'has the correct attributes', :aggregate_failures do
-      expect(subject).to be_valid
-      expect(subject).to be_system
-
-      expect(subject.noteable).to eq expected_noteable
-      expect(subject.author).to eq author
-
-      expect(subject.system_note_metadata.action).to eq(action)
-      expect(subject.system_note_metadata.commit_count).to eq(commit_count)
-    end
-  end
-
-  shared_examples_for 'a project system note' do
-    it 'has the project attribute set' do
-      expect(subject.project).to eq project
-    end
-
-    it_behaves_like 'a system note'
-  end
+  let_it_be(:group)    { create(:group) }
+  let_it_be(:project)  { create(:project, :repository, group: group) }
+  let_it_be(:author)   { create(:user) }
+  let_it_be(:noteable) { create(:issue, project: project) }
+  let_it_be(:issue)    { noteable }
+  let_it_be(:epic)     { create(:epic, group: group) }
 
   describe '.relate_issue' do
-    let(:noteable_ref) { create(:issue) }
+    let(:noteable_ref) { double }
+    let(:noteable) { double }
 
-    subject { described_class.relate_issue(noteable, noteable_ref, author) }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'relate' }
+    before do
+      allow(noteable).to receive(:project).and_return(double)
     end
 
-    context 'when issue marks another as related' do
-      it 'sets the note text' do
-        expect(subject.note).to eq "marked this issue as related to #{noteable_ref.to_reference(project)}"
+    it 'calls IssuableService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:relate_issue).with(noteable_ref)
       end
+
+      described_class.relate_issue(noteable, noteable_ref, double)
     end
   end
 
   describe '.unrelate_issue' do
-    let(:noteable_ref) { create(:issue) }
+    let(:noteable_ref) { double }
+    let(:noteable) { double }
 
-    subject { described_class.unrelate_issue(noteable, noteable_ref, author) }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'unrelate' }
+    before do
+      allow(noteable).to receive(:project).and_return(double)
     end
 
-    context 'when issue relation is removed' do
-      it 'sets the note text' do
-        expect(subject.note).to eq "removed the relation with #{noteable_ref.to_reference(project)}"
+    it 'calls IssuableService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:unrelate_issue).with(noteable_ref)
       end
+
+      described_class.unrelate_issue(noteable, noteable_ref, double)
     end
   end
 
@@ -75,7 +53,6 @@ describe SystemNoteService do
     subject { described_class.design_version_added(version) }
 
     # default (valid) parameters:
-    set(:issue) { create(:issue) }
     let(:n_designs) { 3 }
     let(:designs) { create_list(:design, n_designs, issue: issue) }
     let(:user) { build(:user) }
@@ -121,6 +98,32 @@ describe SystemNoteService do
       end
     end
 
+    describe 'icons' do
+      where(:action) do
+        [
+          [:creation],
+          [:modification],
+          [:deletion]
+        ]
+      end
+
+      with_them do
+        before do
+          version.actions.update_all(event: action)
+        end
+
+        subject(:metadata) do
+          described_class.design_version_added(version)
+            .first.system_note_metadata
+        end
+
+        it 'has a valid action' do
+          expect(EE::SystemNoteHelper::EE_ICON_NAMES_BY_ACTION)
+            .to include(metadata.action)
+        end
+      end
+    end
+
     context 'it succeeds' do
       where(:action, :icon, :human_description) do
         [
@@ -136,7 +139,7 @@ describe SystemNoteService do
         end
 
         let(:anchor_tag) { %r{ <a[^>]*>#{link}</a>} }
-        let(:href) { described_class.send(:design_version_path, version) }
+        let(:href) { described_class.send(:designs_path, project, issue, { version: version.id }) }
         let(:link) { "#{n_designs} designs" }
 
         subject(:note) { described_class.design_version_added(version).first }
@@ -156,63 +159,59 @@ describe SystemNoteService do
     end
   end
 
-  describe '.approve_mr' do
-    let(:noteable) { create(:merge_request, source_project: project) }
-    subject { described_class.approve_mr(noteable, author) }
+  describe '.design_discussion_added' do
+    subject { described_class.design_discussion_added(discussion_note) }
+
+    let_it_be(:design) { create(:design, :with_file, issue: issue) }
+    let_it_be(:discussion_note) do
+      create(:diff_note_on_design, noteable: design, author: author, project: project)
+    end
+    let(:action) { 'designs_discussion_added' }
 
     it_behaves_like 'a system note' do
-      let(:action) { 'approved' }
+      let_it_be(:noteable) { discussion_note.noteable.issue }
     end
 
-    context 'when merge request approved' do
-      it 'sets the note text' do
-        expect(subject.note).to eq "approved this merge request"
+    it 'adds a new system note' do
+      expect { subject }.to change { Note.system.count }.by(1)
+    end
+
+    it 'has the correct note text' do
+      href = described_class.send(:designs_path, project, issue,
+        { vueroute: design.filename, anchor: ActionView::RecordIdentifier.dom_id(discussion_note) }
+      )
+
+      expect(subject.note).to eq("started a discussion on [#{design.filename}](#{href})")
+    end
+  end
+
+  describe '.approve_mr' do
+    it 'calls MergeRequestsService' do
+      expect_next_instance_of(::SystemNotes::MergeRequestsService) do |service|
+        expect(service).to receive(:approve_mr)
       end
+
+      described_class.approve_mr(noteable, author)
     end
   end
 
   describe '.unapprove_mr' do
-    let(:noteable) { create(:merge_request, source_project: project) }
-    subject { described_class.unapprove_mr(noteable, author) }
-
-    it_behaves_like 'a system note' do
-      let(:action) { 'unapproved' }
-    end
-
-    context 'when merge request approved' do
-      it 'sets the note text' do
-        expect(subject.note).to eq "unapproved this merge request"
+    it 'calls MergeRequestsService' do
+      expect_next_instance_of(::SystemNotes::MergeRequestsService) do |service|
+        expect(service).to receive(:unapprove_mr)
       end
+
+      described_class.unapprove_mr(noteable, author)
     end
   end
 
   describe '.change_weight_note' do
-    context 'when weight changed' do
-      let(:noteable) { create(:issue, project: project, title: 'Lorem ipsum', weight: 4) }
-
-      subject { described_class.change_weight_note(noteable, project, author) }
-
-      it_behaves_like 'a project system note' do
-        let(:action) { 'weight' }
+    it 'calls IssuableService' do
+      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
+        expect(service).to receive(:change_weight_note)
       end
 
-      it 'sets the note text' do
-        expect(subject.note).to eq "changed weight to **4**"
-      end
-    end
-
-    context 'when weight removed' do
-      let(:noteable) { create(:issue, project: project, title: 'Lorem ipsum', weight: nil) }
-
-      subject { described_class.change_weight_note(noteable, project, author) }
-
-      it_behaves_like 'a project system note' do
-        let(:action) { 'weight' }
-      end
-
-      it 'sets the note text' do
-        expect(subject.note).to eq 'removed the weight'
-      end
+      described_class.change_weight_note(noteable, project, author)
     end
   end
 
@@ -224,7 +223,7 @@ describe SystemNoteService do
 
       subject { described_class.change_epic_date_note(noteable, author, 'start date', timestamp) }
 
-      it_behaves_like 'a system note' do
+      it_behaves_like 'a system note', exclude_project: true do
         let(:action) { 'epic_date_changed' }
       end
 
@@ -238,7 +237,7 @@ describe SystemNoteService do
 
       subject { described_class.change_epic_date_note(noteable, author, 'start date', nil) }
 
-      it_behaves_like 'a system note' do
+      it_behaves_like 'a system note', exclude_project: true do
         let(:action) { 'epic_date_changed' }
       end
 
@@ -251,7 +250,7 @@ describe SystemNoteService do
       context 'note on the epic' do
         subject { described_class.issue_promoted(epic, issue, author, direction: :from) }
 
-        it_behaves_like 'a system note' do
+        it_behaves_like 'a system note', exclude_project: true do
           let(:action) { 'moved' }
           let(:expected_noteable) { epic }
         end
@@ -281,7 +280,7 @@ describe SystemNoteService do
     context 'issue added to an epic' do
       subject { described_class.epic_issue(epic, issue, author, :added) }
 
-      it_behaves_like 'a system note' do
+      it_behaves_like 'a system note', exclude_project: true do
         let(:action) { 'epic_issue_added' }
       end
 
@@ -293,7 +292,7 @@ describe SystemNoteService do
     context 'issue removed from an epic' do
       subject { described_class.epic_issue(epic, issue, author, :removed) }
 
-      it_behaves_like 'a system note' do
+      it_behaves_like 'a system note', exclude_project: true do
         let(:action) { 'epic_issue_removed' }
       end
 
@@ -349,7 +348,7 @@ describe SystemNoteService do
 
     subject { described_class.change_epics_relation(epic, child_epic, author, 'relate_epic') }
 
-    it_behaves_like 'a system note' do
+    it_behaves_like 'a system note', exclude_project: true do
       let(:action) { 'relate_epic' }
     end
 
@@ -382,7 +381,7 @@ describe SystemNoteService do
 
     subject { described_class.change_epics_relation(epic, child_epic, author, 'unrelate_epic') }
 
-    it_behaves_like 'a system note' do
+    it_behaves_like 'a system note', exclude_project: true do
       let(:action) { 'unrelate_epic' }
     end
 
@@ -466,7 +465,7 @@ describe SystemNoteService do
   describe '.add_to_merge_train_when_pipeline_succeeds' do
     subject { described_class.add_to_merge_train_when_pipeline_succeeds(noteable, project, author, pipeline.sha) }
 
-    let(:pipeline) { build(:ci_pipeline_without_jobs) }
+    let(:pipeline) { build(:ci_pipeline) }
 
     let(:noteable) do
       create(:merge_request, source_project: project, target_project: project)

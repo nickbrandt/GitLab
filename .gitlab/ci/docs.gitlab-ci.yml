@@ -2,22 +2,21 @@
   extends:
     - .default-tags
     - .default-retry
-    - .only-docs-changes
+    - .only:variables-canonical-dot-com
+    - .only:changes-docs
   only:
     refs:
       - merge_requests
-    variables:
-      - $CI_SERVER_HOST == "gitlab.com" && $CI_PROJECT_NAMESPACE == "gitlab-org"
   image: ruby:2.6-alpine
   stage: review
   dependencies: []
   variables:
     GIT_STRATEGY: none
   environment:
-    name: review-docs/$CI_COMMIT_REF_SLUG
+    name: review-docs/$DOCS_GITLAB_REPO_SUFFIX-$CI_MERGE_REQUEST_IID
     # DOCS_REVIEW_APPS_DOMAIN and DOCS_GITLAB_REPO_SUFFIX are CI variables
     # Discussion: https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/14236/diffs#note_40140693
-    url: http://$CI_ENVIRONMENT_SLUG.$DOCS_REVIEW_APPS_DOMAIN/$DOCS_GITLAB_REPO_SUFFIX
+    url: http://docs-preview-$DOCS_GITLAB_REPO_SUFFIX-$CI_MERGE_REQUEST_IID.$DOCS_REVIEW_APPS_DOMAIN/$DOCS_GITLAB_REPO_SUFFIX
     on_stop: review-docs-cleanup
   before_script:
     # We don't clone the repo by using GIT_STRATEGY: none and only download the
@@ -39,7 +38,7 @@ review-docs-deploy:
 review-docs-cleanup:
   extends: .review-docs
   environment:
-    name: review-docs/$CI_COMMIT_REF_SLUG
+    name: review-docs/$DOCS_GITLAB_REPO_SUFFIX-$CI_MERGE_REQUEST_IID
     action: stop
   script:
     - ./trigger-build-docs cleanup
@@ -50,7 +49,7 @@ docs lint:
     - .default-tags
     - .default-retry
     - .default-only
-    - .only-docs-changes
+    - .only:changes-docs
   image: "registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-docs-lint"
   stage: test
   dependencies: []
@@ -67,3 +66,19 @@ docs lint:
     - bundle exec nanoc check internal_links
     # Check the internal anchor links
     - bundle exec nanoc check internal_anchors
+
+graphql-reference-verify:
+  extends:
+    - .only-ee
+    - .default-tags
+    - .default-retry
+    - .default-cache
+    - .default-only
+    - .default-before_script
+    - .only:changes-code-backstage-qa
+    - .use-pg9
+  stage: test
+  needs: ["setup-test-env"]
+  script:
+    - bundle exec rake gitlab:graphql:check_docs
+    - bundle exec rake gitlab:graphql:check_schema

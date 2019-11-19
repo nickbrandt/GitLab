@@ -29,7 +29,7 @@ describe API::Pipelines do
         expect(json_response.first['sha']).to match /\A\h{40}\z/
         expect(json_response.first['id']).to eq pipeline.id
         expect(json_response.first['web_url']).to be_present
-        expect(json_response.first.keys).to contain_exactly(*%w[id sha ref status web_url])
+        expect(json_response.first.keys).to contain_exactly(*%w[id sha ref status web_url created_at updated_at])
       end
 
       context 'when parameter is passed' do
@@ -673,7 +673,7 @@ describe API::Pipelines do
     let!(:build) { create(:ci_build, :running, pipeline: pipeline) }
 
     context 'authorized user' do
-      it 'retries failed builds' do
+      it 'retries failed builds', :sidekiq_might_not_need_inline do
         post api("/projects/#{project.id}/pipelines/#{pipeline.id}/cancel", user)
 
         expect(response).to have_gitlab_http_status(200)

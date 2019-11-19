@@ -168,7 +168,7 @@ export default {
       }
 
       const recentBoardsPromise = new Promise((resolve, reject) =>
-        gl.boardService
+        boardsStore
           .recentBoards()
           .then(resolve)
           .catch(err => {
@@ -184,7 +184,7 @@ export default {
           }),
       );
 
-      Promise.all([gl.boardService.allBoards(), recentBoardsPromise])
+      Promise.all([boardsStore.allBoards(), recentBoardsPromise])
         .then(([allBoards, recentBoards]) => [allBoards.data, recentBoards.data])
         .then(([allBoardsJson, recentBoardsJson]) => {
           this.loading = false;
@@ -305,13 +305,18 @@ export default {
         <div v-if="canAdminBoard">
           <gl-dropdown-divider />
 
-          <gl-dropdown-item v-if="multipleIssueBoardsAvailable" @click.prevent="showPage('new')">
+          <gl-dropdown-item
+            v-if="multipleIssueBoardsAvailable"
+            data-qa-selector="create_new_board_button"
+            @click.prevent="showPage('new')"
+          >
             {{ s__('IssueBoards|Create new board') }}
           </gl-dropdown-item>
 
           <gl-dropdown-item
             v-if="showDelete"
             class="text-danger"
+            data-qa-selector="delete_board_button"
             @click.prevent="showPage('delete')"
           >
             {{ s__('IssueBoards|Delete board') }}

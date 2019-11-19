@@ -91,6 +91,9 @@ describe('projectSelector actions', () => {
             type: 'receiveAddProjectsSuccess',
             payload: mockResponse,
           },
+          {
+            type: 'clearSearchResults',
+          },
         ],
       );
     });
@@ -103,7 +106,11 @@ describe('projectSelector actions', () => {
         null,
         state,
         [],
-        [{ type: 'requestAddProjects' }, { type: 'receiveAddProjectsError' }],
+        [
+          { type: 'requestAddProjects' },
+          { type: 'receiveAddProjectsError' },
+          { type: 'clearSearchResults' },
+        ],
       );
     });
   });

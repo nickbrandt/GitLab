@@ -74,18 +74,6 @@ describe VisibleApprovable do
     end
   end
 
-  describe '#all_approvers_including_groups' do
-    let!(:group) { create(:group_with_members) }
-    let!(:approver) { create(:user) }
-    let!(:rule) { create(:approval_project_rule, project: project, groups: [group], users: [approver]) }
-
-    subject { resource.all_approvers_including_groups }
-
-    it 'returns all approvers (groups and users)' do
-      is_expected.to match_array(group.users + [approver])
-    end
-  end
-
   describe '#authors_can_approve?' do
     subject { resource.authors_can_approve? }
 
@@ -97,24 +85,6 @@ describe VisibleApprovable do
       project.update(merge_requests_author_approval: true)
 
       is_expected.to be true
-    end
-  end
-
-  describe '#reset_approval_cache!' do
-    before do
-      approver = create(:user)
-      project.add_developer(approver)
-      create(:approval_project_rule, project: project, users: [approver])
-    end
-
-    subject { resource.reset_approval_cache! }
-
-    it 'clears the all_approvers_including_groups cache' do
-      resource.all_approvers_including_groups.first.destroy!
-
-      subject
-
-      expect(resource.all_approvers_including_groups).to be_empty
     end
   end
 end

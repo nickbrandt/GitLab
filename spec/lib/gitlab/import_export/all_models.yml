@@ -25,6 +25,13 @@ issues:
 - epic
 - designs
 - design_versions
+- description_versions
+- prometheus_alerts
+- prometheus_alert_events
+- self_managed_prometheus_alert_events
+- zoom_meetings
+- vulnerability_links
+- related_vulnerabilities
 events:
 - author
 - project
@@ -79,6 +86,7 @@ releases:
 - links
 - milestone_releases
 - milestones
+- evidence
 links:
 - release
 project_members:
@@ -114,6 +122,7 @@ merge_requests:
 - pipelines_for_merge_request
 - merge_request_assignees
 - suggestions
+- unresolved_notes
 - assignees
 - reviews
 - approval_rules
@@ -128,6 +137,7 @@ merge_requests:
 - blocks_as_blockee
 - blocking_merge_requests
 - blocked_merge_requests
+- description_versions
 external_pull_requests:
 - project
 merge_request_diff:
@@ -172,7 +182,7 @@ ci_pipelines:
 - downstream_bridges
 - job_artifacts
 - vulnerabilities_occurrence_pipelines
-- vulnerabilities
+- vulnerability_findings
 pipeline_variables:
 - pipeline
 stages:
@@ -254,6 +264,7 @@ project:
 - cycle_analytics_stages
 - group
 - namespace
+- management_clusters
 - boards
 - last_event
 - services
@@ -331,6 +342,7 @@ project:
 - triggers
 - pipeline_schedules
 - environments
+- environments_for_dashboard
 - deployments
 - project_feature
 - auto_devops
@@ -389,6 +401,7 @@ project:
 - sourced_pipelines
 - prometheus_metrics
 - vulnerabilities
+- vulnerability_findings
 - vulnerability_feedback
 - vulnerability_identifiers
 - vulnerability_scanners
@@ -396,6 +409,7 @@ project:
 - operations_feature_flags_client
 - prometheus_alerts
 - prometheus_alert_events
+- self_managed_prometheus_alert_events
 - software_license_policies
 - project_registry
 - packages
@@ -411,6 +425,14 @@ project:
 - external_pull_requests
 - pages_metadatum
 - alerts_service
+- grafana_integration
+- remove_source_branch_after_merge
+- deleting_user
+- upstream_projects
+- downstream_projects
+- upstream_project_subscriptions
+- downstream_project_subscriptions
+- service_desk_setting
 award_emoji:
 - awardable
 - user
@@ -468,6 +490,8 @@ prometheus_alerts:
 - prometheus_alert_events
 prometheus_alert_events:
 - project
+self_managed_prometheus_alert_events:
+- project
 epic_issues:
 - issue
 - epic
@@ -501,6 +525,8 @@ lists:
 milestone_releases:
 - milestone
 - release
+evidences:
+- release
 design: &design
 - issue
 - actions
@@ -514,4 +540,6 @@ versions: &version
 - issue
 - designs
 - actions
+zoom_meetings:
+- issue
 design_versions: *version

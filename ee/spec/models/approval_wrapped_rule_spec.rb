@@ -196,23 +196,12 @@ describe ApprovalWrappedRule do
               .to receive(:code_owner_approval_required_available?).and_return(true)
           end
 
-          context "when no protected_branches require code owner approval" do
-            it 'returns the correct number of approvals' do
-              allow(subject.project)
-                .to receive(:merge_requests_require_code_owner_approval?).and_return(feature_enabled)
-              allow(subject.project)
-                .to receive(:branch_requires_code_owner_approval?).with(branch.name).and_return(false)
-
-              expect(subject.approvals_required).to eq(expected_required_approvals)
-            end
-          end
-
           context "when the project doesn't require code owner approval on all MRs" do
             it 'returns the expected number of approvals for protected_branches that do require approval' do
               allow(subject.project)
                 .to receive(:merge_requests_require_code_owner_approval?).and_return(false)
-              allow(subject.project)
-                .to receive(:branch_requires_code_owner_approval?).with(branch.name).and_return(feature_enabled)
+              allow(ProtectedBranch)
+                .to receive(:branch_requires_code_owner_approval?).with(subject.project, branch.name).and_return(feature_enabled)
 
               expect(subject.approvals_required).to eq(expected_required_approvals)
             end

@@ -12,8 +12,7 @@ module QA
       let(:weight_for_issue_2) { 3 }
 
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         Resource::Issue.fabricate_via_api! do |issue|
           issue.project = label_board_list.project
@@ -34,7 +33,7 @@ module QA
       end
 
       it 'shows the sum of issues weights in the board list\'s header' do
-        EE::Page::Project::Issue::Board::Show.perform do |show|
+        EE::Page::Component::IssueBoard::Show.perform do |show|
           expect(show.boards_list_header_with_index(1)).to have_content(weight_for_issue_1 + weight_for_issue_2)
         end
       end

@@ -60,14 +60,19 @@ if the job surpasses the threshold, it is marked as failed.
 Project defined timeout (either specific timeout set by user or the default
 60 minutes timeout) may be [overridden on Runner level](../../../ci/runners/README.html#setting-maximum-job-timeout-for-a-runner).
 
-## Custom CI config path
+## Maximum artifacts size **(CORE ONLY)**
+
+For information about setting a maximum artifact size for a project, see
+[Maximum artifacts size](../../admin_area/settings/continuous_integration.md#maximum-artifacts-size-core-only).
+
+## Custom CI configuration path
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/12509) in GitLab 9.4.
 
 By default we look for the `.gitlab-ci.yml` file in the project's root
 directory. If you require a different location **within** the repository,
-you can set a custom filepath that will be used to lookup the config file,
-this filepath should be **relative** to the root.
+you can set a custom path that will be used to look up the configuration file,
+this path should be **relative** to the root.
 
 Here are some valid examples:
 
@@ -80,7 +85,7 @@ The path can be customized at a project level. To customize the path:
 
 1. Go to the project's **Settings > CI / CD**.
 1. Expand the **General pipelines** section.
-1. Provide a value in the **Custom CI config path** field.
+1. Provide a value in the **Custom CI configuration path** field.
 1. Click **Save changes**.
 
 ## Test coverage parsing
@@ -92,7 +97,7 @@ job log using a regular expression. In the pipelines settings, search for the
 ![Pipelines settings test coverage](img/pipelines_settings_test_coverage.png)
 
 Leave blank if you want to disable it or enter a ruby regular expression. You
-can use <http://rubular.com> to test your regex.
+can use <https://rubular.com> to test your regex.
 
 If the pipeline succeeds, the coverage is shown in the merge request widget and
 in the jobs table.

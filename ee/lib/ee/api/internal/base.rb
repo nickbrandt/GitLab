@@ -34,6 +34,14 @@ module EE
             def fetch_geo_node_referrer
               ::Gitlab::Geo::GitPushHttp.new(params[:identifier], params[:gl_repository]).fetch_referrer_node
             end
+
+            override :check_allowed
+            def check_allowed(params)
+              ip = params.fetch(:check_ip, nil)
+              ::Gitlab::IpAddressState.with(ip) do # rubocop: disable CodeReuse/ActiveRecord
+                super
+              end
+            end
           end
         end
       end

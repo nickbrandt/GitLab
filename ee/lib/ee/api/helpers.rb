@@ -165,10 +165,6 @@ module EE
         unauthorized! unless can?(current_user, :admin_group_saml, group)
       end
 
-      def check_group_scim_enabled(group)
-        forbidden!('Group SCIM not enabled.') unless ::Feature.enabled?(:group_scim, group)
-      end
-
       def check_group_saml_configured
         forbidden!('Group SAML not enabled.') unless ::Gitlab::Auth::GroupSaml::Config.enabled?
       end

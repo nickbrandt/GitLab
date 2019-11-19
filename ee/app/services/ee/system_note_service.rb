@@ -7,6 +7,7 @@
 module EE
   module SystemNoteService
     extend ActiveSupport::Concern
+    include ActionView::RecordIdentifier
 
     prepended do
       # ::SystemNoteService wants the methods to be available as both class and
@@ -15,36 +16,12 @@ module EE
       extend_if_ee('EE::SystemNoteService') # rubocop: disable Cop/InjectEnterpriseEditionModule
     end
 
-    #
-    # noteable     - Noteable object
-    # noteable_ref - Referenced noteable object
-    # user         - User performing reference
-    #
-    # Example Note text:
-    #
-    #   "marked this issue as related to gitlab-foss#9001"
-    #
-    # Returns the created Note object
     def relate_issue(noteable, noteable_ref, user)
-      body = "marked this issue as related to #{noteable_ref.to_reference(noteable.project)}"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'relate'))
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: noteable.project, author: user).relate_issue(noteable_ref)
     end
 
-    #
-    # noteable     - Noteable object
-    # noteable_ref - Referenced noteable object
-    # user         - User performing reference
-    #
-    # Example Note text:
-    #
-    #   "removed the relation with gitlab-foss#9001"
-    #
-    # Returns the created Note object
     def unrelate_issue(noteable, noteable_ref, user)
-      body = "removed the relation with #{noteable_ref.to_reference(noteable.project)}"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'unrelate'))
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: noteable.project, author: user).unrelate_issue(noteable_ref)
     end
 
     # Parameters:
@@ -61,7 +38,7 @@ module EE
       issue = version.issue
       project = issue.project
       user = version.author
-      link_href = design_version_path(version)
+      link_href = designs_path(project, issue, version: version.id)
 
       version.designs_by_event.map do |(event_name, designs)|
         note_data = design_event_note_data(events[event_name])
@@ -72,6 +49,31 @@ module EE
 
         create_note(NoteSummary.new(issue, project, user, body, action: icon_name))
       end
+    end
+
+    # Called when a new discussion is created on a design
+    #
+    # discussion_note - DiscussionNote
+    #
+    # Example Note text:
+    #
+    #   "started a discussion on screen.png"
+    #
+    # Returns the created Note object
+    def design_discussion_added(discussion_note)
+      design = discussion_note.noteable
+      issue = design.issue
+      project = design.project
+      user = discussion_note.author
+      body = _('started a discussion on %{design_link}') % {
+        design_link: '[%s](%s)' % [
+          design.filename,
+          designs_path(project, issue, vueroute: design.filename, anchor: dom_id(discussion_note))
+        ]
+      }
+      action = :designs_discussion_added
+
+      create_note(NoteSummary.new(issue, project, user, body, action: action))
     end
 
     def epic_issue(epic, issue, user, type)
@@ -149,15 +151,11 @@ module EE
     #
     # Returns the created Note object
     def approve_mr(noteable, user)
-      body = "approved this merge request"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'approved'))
+      ::SystemNotes::MergeRequestsService.new(noteable: noteable, project: noteable.project, author: user).approve_mr
     end
 
     def unapprove_mr(noteable, user)
-      body = "unapproved this merge request"
-
-      create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'unapproved'))
+      ::SystemNotes::MergeRequestsService.new(noteable: noteable, project: noteable.project, author: user).unapprove_mr
     end
 
     # Called when the weight of a Noteable is changed
@@ -174,8 +172,7 @@ module EE
     #
     # Returns the created Note object
     def change_weight_note(noteable, project, author)
-      body = noteable.weight ? "changed weight to **#{noteable.weight}**" : 'removed the weight'
-      create_note(NoteSummary.new(noteable, project, author, body, action: 'weight'))
+      ::SystemNotes::IssuablesService.new(noteable: noteable, project: project, author: author).change_weight_note
     end
 
     # Called when the start or end date of an Issuable is changed
@@ -271,17 +268,16 @@ module EE
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
     end
 
+    def auto_resolve_prometheus_alert(noteable, project, author)
+      body = 'automatically closed this issue because the alert resolved.'
+
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'closed'))
+    end
+
     private
 
-    # We do not have a named route for DesignManagement::Version, instead
-    # we route to `/designs`, with the version in the query parameters.
-    # This is because this route is not managed by Rails, but Vue:
-    def design_version_path(version)
-      ::Gitlab::Routing.url_helpers.designs_project_issue_path(
-        version.project,
-        version.issue,
-        version: version.id
-      )
+    def designs_path(project, issue, params = {})
+      url_helpers.designs_project_issue_path(project, issue, params)
     end
 
     # Take one of the `DesignManagement::Action.events` and

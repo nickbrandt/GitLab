@@ -6,20 +6,27 @@ import { __ } from '~/locale';
 export const requestConfig = ({ commit }) => commit(types.REQUEST_CONFIG);
 export const receiveConfigSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_CONFIG_SUCCESS, data);
-export const receiveConfigError = ({ commit }) => commit(types.RECEIVE_CONFIG_ERROR);
+export const receiveConfigError = ({ commit }, errorMessage) => {
+  const error = errorMessage || __('Unknown Error');
+  const message = `${__('There was an error fetching configuration for charts')}: ${error}`;
+  createFlash(message);
+  commit(types.RECEIVE_CONFIG_ERROR);
+};
 
 export const fetchConfigData = ({ dispatch }, endpoint) => {
   dispatch('requestConfig');
 
   return axios
     .get(endpoint)
-    .then(({ data }) => dispatch('receiveConfigSuccess', data))
+    .then(({ data }) => {
+      if (data) {
+        dispatch('receiveConfigSuccess', data);
+      } else {
+        dispatch('receiveConfigError');
+      }
+    })
     .catch(error => {
-      const message = `${__('There was an error fetching configuration for charts')}: ${
-        error.response.data.message
-      }`;
-      createFlash(message);
-      dispatch('receiveConfigError');
+      dispatch('receiveConfigError', error.response.data.message);
     });
 };
 
@@ -45,10 +52,16 @@ export const fetchChartData = ({ dispatch }, { endpoint, chart }) =>
 export const setActiveTab = ({ commit, state }, key) => {
   const { configData } = state;
 
-  const page = configData[key];
+  if (configData) {
+    const page = configData[key];
 
-  commit(types.SET_ACTIVE_TAB, key);
-  commit(types.SET_ACTIVE_PAGE, page);
+    if (page) {
+      commit(types.SET_ACTIVE_TAB, key);
+      commit(types.SET_ACTIVE_PAGE, page);
+    } else {
+      createFlash(__('The specified tab is invalid, please select another'));
+    }
+  }
 };
 
 export const initChartData = ({ commit }, store) => commit(types.INIT_CHART_DATA, store);

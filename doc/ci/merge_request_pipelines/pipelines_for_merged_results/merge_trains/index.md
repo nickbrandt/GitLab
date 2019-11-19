@@ -32,8 +32,8 @@ Merge trains have the following requirements and limitations:
 - This feature requires that
   [pipelines for merged results](../index.md#pipelines-for-merged-results-premium) are
   **configured properly**.
-- Each merge train can run a maximum of **four** pipelines in parallel.
-  If more than four merge requests are added to the merge train, the merge requests
+- Each merge train can run a maximum of **twenty** pipelines in parallel.
+  If more than twenty merge requests are added to the merge train, the merge requests
   will be queued until a slot in the merge train is free. There is no limit to the
   number of merge requests that can be queued.
 - This feature does not support [squash and merge](../../../../user/project/merge_requests/squash_and_merge.md).
@@ -121,6 +121,12 @@ is unavailable when
 
 Follow [this issue](https://gitlab.com/gitlab-org/gitlab/issues/12267) to
 track progress on this issue.
+
+### Merge Train Pipeline cannot be retried
+
+A Merge Train pipeline cannot be retried because the merge request is dropped from the merge train upon failure. For this reason, the retry button does not appear next to the pipeline icon.
+
+In the case of pipeline failure, you should [re-enqueue](#how-to-add-a-merge-request-to-a-merge-train) the merge request to the merge train, which will then initiate a new pipeline.
 
 ### Merge Train disturbs your workflow
 

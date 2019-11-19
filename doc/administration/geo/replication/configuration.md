@@ -165,14 +165,40 @@ keys must be manually replicated to the **secondary** node.
 
 ### Step 3. Add the **secondary** node
 
+1. SSH into your GitLab **secondary** server and login as root:
+
+   ```sh
+   sudo -i
+   ```
+
+1. Edit `/etc/gitlab/gitlab.rb` and add a **unique** name for your node.  You will need this in the next steps:
+
+   ```ruby
+   # The unique identifier for the Geo node.
+   gitlab_rails['geo_node_name'] = '<node_name_here>'
+   ```
+
+1. Reconfigure the **secondary** node for the change to take effect:
+
+   ```sh
+   gitlab-ctl reconfigure
+   ```
+
 1. Visit the **primary** node's **Admin Area > Geo**
    (`/admin/geo/nodes`) in your browser.
-1. Add the **secondary** node by providing its full URL. **Do NOT** check the
-   **This is a primary node** checkbox.
+1. Click the **New node** button.
+   ![Add secondary node](img/adding_a_secondary_node.png)
+1. Fill in **Name** with the `gitlab_rails['geo_node_name']` in
+   `/etc/gitlab/gitlab.rb`. These values must always match *exactly*, character
+   for character.
+1. Fill in **URL** with the `external_url` in `/etc/gitlab/gitlab.rb`. These
+   values must always match, but it doesn't matter if one ends with a `/` and
+   the other doesn't.
+1. **Do NOT** check the **This is a primary node** checkbox.
 1. Optionally, choose which groups or storage shards should be replicated by the
    **secondary** node. Leave blank to replicate all. Read more in
    [selective synchronization](#selective-synchronization).
-1. Click the **Add node** button.
+1. Click the **Add node** button to add the **secondary** node.
 1. SSH into your GitLab **secondary** server and restart the services:
 
    ```sh

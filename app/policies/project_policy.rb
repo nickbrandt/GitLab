@@ -117,6 +117,10 @@ class ProjectPolicy < BasePolicy
     !@subject.builds_enabled?
   end
 
+  condition(:user_confirmed?) do
+    @user && @user.confirmed?
+  end
+
   features = %w[
     merge_requests
     issues
@@ -136,6 +140,8 @@ class ProjectPolicy < BasePolicy
   # `:read_project` may be prevented in EE, but `:read_project_for_iids` should
   # not.
   rule { guest | admin }.enable :read_project_for_iids
+
+  rule { admin }.enable :update_max_artifacts_size
 
   rule { guest }.enable :guest_access
   rule { reporter }.enable :reporter_access
@@ -247,10 +253,7 @@ class ProjectPolicy < BasePolicy
     enable :update_commit_status
     enable :create_build
     enable :update_build
-    enable :create_pipeline
-    enable :update_pipeline
     enable :read_pipeline_schedule
-    enable :create_pipeline_schedule
     enable :create_merge_request_from
     enable :create_wiki
     enable :push_code
@@ -260,8 +263,15 @@ class ProjectPolicy < BasePolicy
     enable :destroy_container_image
     enable :create_environment
     enable :create_deployment
+    enable :update_deployment
     enable :create_release
     enable :update_release
+  end
+
+  rule { can?(:developer_access) & user_confirmed? }.policy do
+    enable :create_pipeline
+    enable :update_pipeline
+    enable :create_pipeline_schedule
   end
 
   rule { can?(:maintainer_access) }.policy do
@@ -415,7 +425,7 @@ class ProjectPolicy < BasePolicy
 
   # These rules are included to allow maintainers of projects to push to certain
   # to run pipelines for the branches they have access to.
-  rule { can?(:public_access) & has_merge_requests_allowing_pushes }.policy do
+  rule { can?(:public_access) & has_merge_requests_allowing_pushes & user_confirmed? }.policy do
     enable :create_build
     enable :create_pipeline
   end

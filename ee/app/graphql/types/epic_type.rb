@@ -46,6 +46,8 @@ module Types
           ::Types::EpicType.connection_type,
           null: true,
           resolver: ::Resolvers::EpicResolver
+    field :labels, Types::LabelType.connection_type, null: true,
+          description: 'Labels assigned to the epic'
 
     field :has_children, GraphQL::BOOLEAN_TYPE, null: false, method: :has_children? # rubocop:disable Graphql/Descriptions
     field :has_issues, GraphQL::BOOLEAN_TYPE, null: false, method: :has_issues? # rubocop:disable Graphql/Descriptions
@@ -57,10 +59,25 @@ module Types
     field :reference, GraphQL::STRING_TYPE, null: false, method: :epic_reference do # rubocop:disable Graphql/Descriptions
       argument :full, GraphQL::BOOLEAN_TYPE, required: false, default_value: false # rubocop:disable Graphql/Descriptions
     end
+    field :participants, Types::UserType.connection_type, null: true, complexity: 5, description: 'List of participants for the epic'
 
-    field :issues, # rubocop:disable Graphql/Descriptions
+    field :subscribed, GraphQL::BOOLEAN_TYPE,
+      method: :subscribed?,
+      null: false,
+      complexity: 5,
+      description: 'Boolean flag for whether the currently logged in user is subscribed to this epic'
+
+    field :issues,
           Types::EpicIssueType.connection_type,
           null: true,
+          complexity: 2,
+          description: 'A list of issues associated with the epic',
           resolver: Resolvers::EpicIssuesResolver
+
+    field :descendant_counts, Types::EpicDescendantCountType, null: true, complexity: 10,
+      description: 'Number of open and closed descendant epics and issues',
+      resolve: -> (epic, args, ctx) do
+        Epics::DescendantCountService.new(epic, ctx[:current_user])
+      end
   end
 end

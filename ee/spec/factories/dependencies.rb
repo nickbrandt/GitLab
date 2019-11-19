@@ -2,15 +2,19 @@
 
 FactoryBot.define do
   factory :dependency, class: Hash do
-    name { 'nokogiri' }
+    sequence(:name) { |n| "library#{n}" }
     packager { 'Ruby (Bundler)' }
     version { '1.8.0' }
     licenses { [] }
-    location do
+    sequence(:location) do |n|
       {
-        blob_path: '/some_project/path/Gemfile.lock',
-        path:      'Gemfile.lock'
+        blob_path: "/some_project/path/File_#{n}.lock",
+        path:      "File_#{n}.lock"
       }
+    end
+
+    trait :nokogiri do
+      name { 'nokogiri' }
     end
 
     trait :with_vulnerabilities do

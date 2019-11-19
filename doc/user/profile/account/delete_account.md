@@ -32,16 +32,6 @@ As an administrator, you can delete a user account by:
    - **Delete user and contributions** to delete the user and
      their associated records.
 
-### Blocking a user
-
-In addition to blocking a user
-[via an abuse report](../../admin_area/abuse_reports.md#blocking-users),
-a user can be blocked directly from the Admin area. To do this:
-
-1. Navigate to  **Admin Area > Overview > Users**.
-1. Selecting a user.
-1. Under the **Account** tab, click **Block user**.
-
 ## Associated Records
 
 > - Introduced for issues in

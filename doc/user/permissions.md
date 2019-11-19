@@ -24,7 +24,7 @@ For information on eligible approvers for Merge Requests, see
 
 ## Principles behind permissions
 
-See our [product handbook on permissions](https://about.gitlab.com/handbook/product#permissions-in-gitlab)
+See our [product handbook on permissions](https://about.gitlab.com/handbook/product/#permissions-in-gitlab)
 
 ## Instance-wide user permissions
 
@@ -51,11 +51,11 @@ The following table depicts the various user permission levels in a project.
 | View Security reports **(ULTIMATE)**              | ✓ (*3*) | ✓          | ✓           | ✓        | ✓      |
 | View Dependency list **(ULTIMATE)**               | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | View licenses in Dependency list **(ULTIMATE)**   | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
-| View [Design Management](project/issues/design_management.md) pages **(PREMIUM)** | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
+| View [Design Management](project/issues/design_management.md) pages **(PREMIUM)** | ✓       | ✓          | ✓           | ✓        | ✓      |
 | View project code                                 | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | Pull project code                                 | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
-| View GitLab Pages protected by [access control](project/pages/introduction.md#gitlab-pages-access-control-core-only) | ✓       | ✓          | ✓           | ✓        | ✓      |
-| View wiki pages                                   | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
+| View GitLab Pages protected by [access control](project/pages/introduction.md#gitlab-pages-access-control-core) | ✓       | ✓          | ✓           | ✓        | ✓      |
+| View wiki pages                                   | ✓       | ✓          | ✓           | ✓        | ✓      |
 | See a list of jobs                                | ✓ (*3*) | ✓          | ✓           | ✓        | ✓      |
 | See a job log                                     | ✓ (*3*) | ✓          | ✓           | ✓        | ✓      |
 | Download and browse job artifacts                 | ✓ (*3*) | ✓          | ✓           | ✓        | ✓      |
@@ -76,14 +76,14 @@ The following table depicts the various user permission levels in a project.
 | See a list of merge requests                      |         | ✓          | ✓           | ✓        | ✓      |
 | View project statistics                           |         | ✓          | ✓           | ✓        | ✓      |
 | View Error Tracking list                          |         | ✓          | ✓           | ✓        | ✓      |
-| Pull from [Maven repository](packages/maven_repository/index.md) or [NPM registry](packages/npm_registry/index.md) **(PREMIUM)** |         | ✓          | ✓           | ✓        | ✓      |
-| Publish to [Maven repository](packages/maven_repository/index.md) or [NPM registry](packages/npm_registry/index.md) **(PREMIUM)** |         |            | ✓           | ✓        | ✓      |
+| Pull from [Conan repository](packages/conan_repository/index.md), [Maven repository](packages/maven_repository/index.md), or [NPM registry](packages/npm_registry/index.md) **(PREMIUM)** |         | ✓          | ✓           | ✓        | ✓      |
+| Publish to [Conan repository](packages/conan_repository/index.md), [Maven repository](packages/maven_repository/index.md), or [NPM registry](packages/npm_registry/index.md) **(PREMIUM)** |         |            | ✓           | ✓        | ✓      |
 | Upload [Design Management](project/issues/design_management.md) files **(PREMIUM)** |         |            | ✓           | ✓        | ✓      |
 | Create new branches                               |         |            | ✓           | ✓        | ✓      |
 | Push to non-protected branches                    |         |            | ✓           | ✓        | ✓      |
 | Force push to non-protected branches              |         |            | ✓           | ✓        | ✓      |
 | Remove non-protected branches                     |         |            | ✓           | ✓        | ✓      |
-| Create new merge request                          |         |            | ✓           | ✓        | ✓      |
+| Create new merge request                          |         | ✓          | ✓           | ✓        | ✓      |
 | Assign merge requests                             |         |            | ✓           | ✓        | ✓      |
 | Label merge requests                              |         |            | ✓           | ✓        | ✓      |
 | Lock merge request threads                        |         |            | ✓           | ✓        | ✓      |
@@ -103,6 +103,7 @@ The following table depicts the various user permission levels in a project.
 | Apply code change suggestions                     |         |            | ✓           | ✓        | ✓      |
 | Create and edit wiki pages                        |         |            | ✓           | ✓        | ✓      |
 | Rewrite/remove Git tags                           |         |            | ✓           | ✓        | ✓      |
+| Manage Feature Flags **(PREMIUM)**                |         |            | ✓           | ✓        | ✓      |
 | Use environment terminals                         |         |            |             | ✓        | ✓      |
 | Run Web IDE's Interactive Web Terminals **(ULTIMATE ONLY)** |     |      |             | ✓        | ✓      |
 | Add new team members                              |         |            |             | ✓        | ✓      |
@@ -120,6 +121,7 @@ The following table depicts the various user permission levels in a project.
 | Manage GitLab Pages domains and certificates      |         |            |             | ✓        | ✓      |
 | Remove GitLab Pages                               |         |            |             | ✓        | ✓      |
 | Manage clusters                                   |         |            |             | ✓        | ✓      |
+| View Pods logs **(ULTIMATE)**                     |         |            |             | ✓        | ✓      |
 | Manage license policy **(ULTIMATE)**              |         |            |             | ✓        | ✓      |
 | Edit comments (posted by any user)                |         |            |             | ✓        | ✓      |
 | Manage Error Tracking                             |         |            |             | ✓        | ✓      |
@@ -168,7 +170,7 @@ the [documentation on Cycle Analytics permissions](analytics/cycle_analytics.md#
 
 Developers and users with higher permission level can use all
 the functionality of the Issue Board, that is create/delete lists
-and drag issues around. Read though the
+and drag issues around. Read through the
 [documentation on Issue Boards permissions](project/issue_board.md#permissions)
 to learn more.
 
@@ -211,7 +213,7 @@ group.
 | View group epic **(ULTIMATE)**                         | ✓     | ✓        | ✓         | ✓          | ✓     |
 | Create/edit group epic **(ULTIMATE)**                  |       | ✓        | ✓         | ✓          | ✓     |
 | Manage group labels                                    |       | ✓        | ✓         | ✓          | ✓     |
-| Create project in group                                |       |          | ✓         | ✓          | ✓     |
+| Create project in group                                |       |          | ✓ (3)     | ✓ (3)      | ✓ (3) |
 | Create/edit/delete group milestones                    |       |          | ✓         | ✓          | ✓     |
 | Enable/disable a dependency proxy **(PREMIUM)**        |       |          | ✓         | ✓          | ✓     |
 | Use security dashboard **(ULTIMATE)**                  |       |          | ✓         | ✓          | ✓     |
@@ -228,6 +230,9 @@ group.
 - (1): Groups can be set to [allow either Owners or Owners and
   Maintainers to create subgroups](group/subgroups/index.md#creating-a-subgroup)
 - (2): Introduced in GitLab 12.2.
+- (3): Default project creation role can be changed at:
+  - The [instance level](admin_area/settings/visibility_and_access_controls.md#default-project-creation-protection).
+  - The [group level](group/index.html#default-project-creation-level).
 
 ### Subgroup permissions
 
@@ -238,58 +243,83 @@ nested groups if you have membership in one of its parents.
 To learn more, read through the documentation on
 [subgroups memberships](group/subgroups/index.md#membership).
 
-## Free Guest users **(ULTIMATE)**
-
-When a user is given `Guest` permissions on a project and/or group, and holds no
-higher permission level on any other project or group on the instance, the user
-is considered a guest user by GitLab and will not consume a license seat.
-There is no other specific "guest" designation for newly created users.
-
-If the user is assigned a higher role on any projects or groups, the user will
-take a license seat. If a user creates a project, the user becomes a `Maintainer`
-on the project, resulting in the use of a license seat.
-
-To prevent a guest user from creating projects, you can edit the user profile to mark the user as
-[External](#external-users-permissions).
-
-## External users permissions
+## External users **(CORE ONLY)**
 
 In cases where it is desired that a user has access only to some internal or
 private projects, there is the option of creating **External Users**. This
 feature may be useful when for example a contractor is working on a given
 project and should only have access to that project.
 
-External users can only access projects to which they are explicitly granted
-access, thus hiding all other internal or private ones from them. Access can be
-granted by adding the user as member to the project or group.
+External users:
 
+- Cannot create groups or projects.
+- Can only access projects to which they are explicitly granted access,
+  thus hiding all other internal or private ones from them (like being
+  logged out).
+
+Access can be granted by adding the user as member to the project or group.
 They will, like usual users, receive a role in the project or group with all
-the abilities that are mentioned in the table above. They cannot however create
-groups or projects, and they have the same access as logged out users in all
-other cases.
+the abilities that are mentioned in the [permissions table above](#project-members-permissions).
+For example, if an external user is added as Guest, and your project is
+private, they will not have access to the code; you would need to grant the external
+user access at the Reporter level or above if you want them to have access to the code. You should
+always take into account the
+[project's visibility and permissions settings](project/settings/index.md#sharing-and-permissions)
+as well as the permission level of the user.
 
-An administrator can flag a user as external [through the API](../api/users.md)
-or by checking the checkbox on the admin panel. As an administrator, navigate
-to **Admin > Users** to create a new user or edit an existing one. There, you
-will find the option to flag the user as external.
+NOTE: **Note:**
+External users still count towards a license seat.
 
-By default new users are not set as external users. This behavior can be changed
-by an administrator under **Admin > Application Settings**.
+An administrator can flag a user as external by either of the following methods:
 
-### Default internal users
+- Either [through the API](../api/users.md#user-modification).
+- Or by navigating to the **Admin area > Overview > Users** to create a new user
+  or edit an existing one. There, you will find the option to flag the user as
+  external.
 
-The "Internal users" field allows specifying an e-mail address regex pattern to identify default internal users.
+### Setting new users to external
 
-New users whose email address matches the regex pattern will be set to internal by default rather than an external collaborator.
+By default, new users are not set as external users. This behavior can be changed
+by an administrator under the **Admin Area > Settings > General > Account and limit** page.
 
-The regex pattern format is Ruby, but it needs to be convertible to JavaScript, and the ignore case flag will be set, e.g. "/regex pattern/i".
+If you change the default behavior of creating new users as external, you will
+have the option to narrow it down by defining a set of internal users.
+The **Internal users** field allows specifying an email address regex pattern to
+identify default internal users. New users whose email address matches the regex
+pattern will be set to internal by default rather than an external collaborator.
 
-Here are some examples:
+The regex pattern format is Ruby, but it needs to be convertible to JavaScript,
+and the ignore case flag will be set (`/regex pattern/i`). Here are some examples:
 
-- Use `\.internal@domain\.com$` to mark email addresses ending with ".internal@domain.com" internal.
-- Use `^(?:(?!\.ext@domain\.com).)*$\r?` to mark users with email addresses NOT including .ext@domain.com internal.
+- Use `\.internal@domain\.com$` to mark email addresses ending with
+  `.internal@domain.com` as internal.
+- Use `^(?:(?!\.ext@domain\.com).)*$\r?` to mark users with email addresses
+  NOT including `.ext@domain.com` as internal.
 
-Please be aware that this regex could lead to a DOS attack, [see](https://en.wikipedia.org/wiki/ReDoS?) ReDos on Wikipedia.
+CAUTION: **Warning:**
+Be aware that this regex could lead to a
+[regular expression denial of service (ReDoS) attack](https://en.wikipedia.org/wiki/ReDoS).
+
+## Free Guest users **(ULTIMATE)**
+
+When a user is given Guest permissions on a project, group, or both, and holds no
+higher permission level on any other project or group on the GitLab instance,
+the user is considered a guest user by GitLab and will not consume a license seat.
+There is no other specific "guest" designation for newly created users.
+
+If the user is assigned a higher role on any projects or groups, the user will
+take a license seat. If a user creates a project, the user becomes a Maintainer
+on the project, resulting in the use of a license seat. Also, note that if your
+project is internal or private, Guest users will have all the abilities that are
+mentioned in the [permissions table above](#project-members-permissions) (they
+will not be able to browse the project's repository for example).
+
+TIP: **Tip:**
+To prevent a guest user from creating projects, as an admin, you can edit the
+user's profile to mark the user as [external](#external-users-core-only).
+Beware though that even if a user is external, if they already have Reporter or
+higher permissions in any project or group, they will **not** be counted as a
+free guest user.
 
 ## Auditor users **(PREMIUM ONLY)**
 

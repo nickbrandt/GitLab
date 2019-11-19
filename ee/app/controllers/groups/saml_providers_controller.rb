@@ -7,12 +7,10 @@ class Groups::SamlProvidersController < Groups::ApplicationController
   before_action :authorize_manage_saml!
   before_action :check_group_saml_available!
   before_action :check_group_saml_configured
-  before_action do
-    push_frontend_feature_flag(:group_scim)
-  end
 
   def show
     @saml_provider = @group.saml_provider || @group.build_saml_provider
+    @saml_response_check = load_test_response if @saml_provider.persisted?
 
     scim_token = ScimOauthAccessToken.find_by_group_id(@group.id)
 
@@ -20,9 +18,11 @@ class Groups::SamlProvidersController < Groups::ApplicationController
   end
 
   def create
-    @saml_provider = @group.build_saml_provider(saml_provider_params)
+    create_service = GroupSaml::SamlProvider::CreateService.new(current_user, @group, params: saml_provider_params)
 
-    @saml_provider.save
+    create_service.execute
+
+    @saml_provider = create_service.saml_provider
 
     render :show
   end
@@ -36,6 +36,13 @@ class Groups::SamlProvidersController < Groups::ApplicationController
   end
 
   private
+
+  def load_test_response
+    test_response = Gitlab::Auth::GroupSaml::ResponseStore.new(session.id).get_raw
+    return if test_response.blank?
+
+    Gitlab::Auth::GroupSaml::ResponseCheck.for_group(group: @group, raw_response: test_response, user: current_user)
+  end
 
   def saml_provider_params
     allowed_params = %i[sso_url certificate_fingerprint enabled]

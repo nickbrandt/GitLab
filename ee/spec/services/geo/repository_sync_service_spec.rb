@@ -359,7 +359,7 @@ describe Geo::RepositorySyncService do
 
         expect(subject).to receive(:fetch_geo_mirror)
         expect(subject).to receive(:clean_up_temporary_repository).twice.and_call_original
-        expect(subject.gitlab_shell).to receive(:exists?).twice.with(project.repository_storage, /.git$/)
+        expect(subject.gitlab_shell).to receive(:repository_exists?).twice.with(project.repository_storage, /.git$/)
 
         subject.execute
       end

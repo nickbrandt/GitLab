@@ -35,7 +35,7 @@ class Gitlab::Seeder::Vulnerabilities
   private
 
   def create_occurrence(rank, primary_identifier)
-    project.vulnerabilities.create!(
+    project.vulnerability_findings.create!(
       uuid: random_uuid,
       name: 'Cipher with no integrity',
       report_type: :sast,
@@ -128,7 +128,7 @@ class Gitlab::Seeder::Vulnerabilities
 end
 
 Gitlab::Seeder.quiet do
-  Project.joins(:ci_pipelines).distinct.all.sample(5).each do |project|
+  Project.joins(:ci_pipelines).not_mass_generated.distinct.all.sample(5).each do |project|
     seeder = Gitlab::Seeder::Vulnerabilities.new(project)
     seeder.seed!
   end

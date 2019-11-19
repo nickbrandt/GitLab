@@ -19,7 +19,6 @@ description: 'Learn how to contribute to GitLab.'
 - [Code review guidelines](code_review.md) for reviewing code and having code reviewed
 - [Database review guidelines](database_review.md) for reviewing database-related changes and complex SQL queries
 - [Pipelines for the GitLab project](pipelines.md)
-- [Automatic CE->EE merge](automatic_ce_ee_merge.md)
 - [Guidelines for implementing Enterprise Edition features](ee_features.md)
 - [Security process for developers](https://gitlab.com/gitlab-org/release/docs/blob/master/general/security/developer.md#security-releases-critical-non-critical-as-a-developer)
 - [Requesting access to Chatops on GitLab.com](chatops_on_gitlabcom.md#requesting-access) (for GitLabbers)
@@ -34,6 +33,7 @@ description: 'Learn how to contribute to GitLab.'
 ## Backend guides
 
 - [GitLab utilities](utilities.md)
+- [Issuable-like Rails models](issuable-like-models.md)
 - [Logging](logging.md)
 - [API styleguide](api_styleguide.md) Use this styleguide if you are
   contributing to the API
@@ -99,6 +99,7 @@ description: 'Learn how to contribute to GitLab.'
 - [Post deployment migrations](post_deployment_migrations.md)
 - [Background migrations](background_migrations.md)
 - [Swapping tables](swapping_tables.md)
+- [Deleting migrations](deleting_migrations.md)
 
 ### Best practices
 
@@ -117,8 +118,9 @@ description: 'Learn how to contribute to GitLab.'
 - [Query Count Limits](query_count_limits.md)
 - [Database helper modules](database_helpers.md)
 - [Code comments](code_comments.md)
+- [Creating enums](creating_enums.md)
 
-## Case studies
+### Case studies
 
 - [Database case study: Filtering by label](filtering_by_label.md)
 - [Database case study: Namespaces storage statistics](namespaces_storage_statistics.md)
@@ -149,6 +151,10 @@ description: 'Learn how to contribute to GitLab.'
 - [Introduction](event_tracking/index.md)
 - [Frontend tracking guide](event_tracking/frontend.md)
 - [Backend tracking guide](event_tracking/backend.md)
+
+## Experiment Guide
+
+- [Introduction](experiment_guide/index.md)
 
 ## Build guides
 

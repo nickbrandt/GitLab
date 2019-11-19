@@ -29,7 +29,7 @@ module Security
 
     def sync_license_management_rules
       project = pipeline.project
-      report = pipeline.license_management_report
+      report = pipeline.license_scanning_report
       return if report.empty? && !pipeline.complete?
       return if report.violates?(project.software_license_policies)
 
@@ -37,12 +37,13 @@ module Security
     end
 
     def sync_vulnerability_rules
-      reports = pipeline.security_reports.reports
-      safe = reports.any? && reports.none? do |_report_type, report|
-        report.unsafe_severity?
-      end
+      reports = pipeline.security_reports
+      # If we have some reports, then we want to sync them early;
+      # If we don't have reports, then we should wait until pipeline stops.
+      return if reports.empty? && !pipeline.complete?
+      return if reports.violates_default_policy?
 
-      remove_required_approvals_for(ApprovalMergeRequestRule.security_report) if safe
+      remove_required_approvals_for(ApprovalMergeRequestRule.security_report)
     end
 
     def remove_required_approvals_for(rules)

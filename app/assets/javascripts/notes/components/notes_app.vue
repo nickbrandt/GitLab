@@ -1,7 +1,7 @@
 <script>
 import { __ } from '~/locale';
 import { mapGetters, mapActions } from 'vuex';
-import { getLocationHash } from '../../lib/utils/url_utility';
+import { getLocationHash, doesHashExistInUrl } from '../../lib/utils/url_utility';
 import Flash from '../../flash';
 import * as constants from '../constants';
 import eventHub from '../event_hub';
@@ -122,6 +122,8 @@ export default {
         this.toggleAward({ awardName, noteId });
       });
     }
+
+    window.addEventListener('hashchange', this.handleHashChanged);
   },
   updated() {
     this.$nextTick(() => {
@@ -131,6 +133,7 @@ export default {
   },
   beforeDestroy() {
     this.stopPolling();
+    window.removeEventListener('hashchange', this.handleHashChanged);
   },
   methods: {
     ...mapActions([
@@ -138,7 +141,6 @@ export default {
       'fetchDiscussions',
       'poll',
       'toggleAward',
-      'scrollToNoteIfNeeded',
       'setNotesData',
       'setNoteableData',
       'setUserData',
@@ -151,24 +153,29 @@ export default {
       'convertToDiscussion',
       'stopPolling',
     ]),
+    handleHashChanged() {
+      const noteId = this.checkLocationHash();
+
+      if (noteId) {
+        this.setTargetNoteHash(getLocationHash());
+      }
+    },
     fetchNotes() {
       if (this.isFetching) return null;
 
       this.isFetching = true;
 
-      return this.fetchDiscussions({ path: this.getNotesDataByProp('discussionsPath') })
-        .then(() => {
-          this.initPolling();
-        })
+      return this.fetchDiscussions(this.getFetchDiscussionsConfig())
+        .then(this.initPolling)
         .then(() => {
           this.setLoadingState(false);
           this.setNotesFetchedState(true);
           eventHub.$emit('fetchedNotesData');
           this.isFetching = false;
         })
-        .then(() => this.$nextTick())
-        .then(() => this.startTaskList())
-        .then(() => this.checkLocationHash())
+        .then(this.$nextTick)
+        .then(this.startTaskList)
+        .then(this.checkLocationHash)
         .catch(() => {
           this.setLoadingState(false);
           this.setNotesFetchedState(true);
@@ -196,11 +203,24 @@ export default {
           this.expandDiscussion({ discussionId: discussion.id });
         }
       }
+
+      return noteId;
     },
     startReplying(discussionId) {
       return this.convertToDiscussion(discussionId)
-        .then(() => this.$nextTick())
+        .then(this.$nextTick)
         .then(() => eventHub.$emit('startReplying', discussionId));
+    },
+    getFetchDiscussionsConfig() {
+      const defaultConfig = { path: this.getNotesDataByProp('discussionsPath') };
+
+      if (doesHashExistInUrl(constants.NOTE_UNDERSCORE)) {
+        return Object.assign({}, defaultConfig, {
+          filter: constants.DISCUSSION_FILTERS_DEFAULT_VALUE,
+          persistFilter: false,
+        });
+      }
+      return defaultConfig;
     },
   },
   systemNote: constants.SYSTEM_NOTE,

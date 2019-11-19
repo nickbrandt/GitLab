@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require './spec/simplecov_env'
 SimpleCovEnv.start!
 
@@ -10,13 +12,12 @@ require 'rspec/rails'
 require 'shoulda/matchers'
 require 'rspec/retry'
 require 'rspec-parameterized'
-require "test_prof/recipes/rspec/let_it_be"
+require 'test_prof/recipes/rspec/let_it_be'
 
 rspec_profiling_is_configured =
   ENV['RSPEC_PROFILING_POSTGRES_URL'].present? ||
   ENV['RSPEC_PROFILING']
 branch_can_be_profiled =
-  ENV['GITLAB_DATABASE'] == 'postgresql' &&
   (ENV['CI_COMMIT_REF_NAME'] == 'master' ||
     ENV['CI_COMMIT_REF_NAME'] =~ /rspec-profile/)
 
@@ -64,6 +65,11 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
   config.full_backtrace = !!ENV['CI']
 
+  unless ENV['CI']
+    # Re-run failures locally with `--only-failures`
+    config.example_status_persistence_file_path = './spec/examples.txt'
+  end
+
   config.define_derived_metadata(file_path: %r{(ee)?/spec/.+_spec\.rb\z}) do |metadata|
     location = metadata[:location]
 
@@ -86,9 +92,10 @@ RSpec.configure do |config|
   config.include FixtureHelpers
   config.include GitlabRoutingHelper
   config.include StubFeatureFlags
+  config.include StubExperiments
   config.include StubGitlabCalls
   config.include StubGitlabData
-  config.include ExpectNextInstanceOf
+  config.include NextInstanceOf
   config.include TestEnv
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::Test::IntegrationHelpers, type: :feature
@@ -150,6 +157,17 @@ RSpec.configure do |config|
     # (ie. ApplicationSetting#auto_devops_enabled)
     allow(Feature).to receive(:enabled?)
       .with(:force_autodevops_on_by_default, anything)
+      .and_return(false)
+
+    # The following can be removed once Vue Issuable Sidebar
+    # is feature-complete and can be made default in place
+    # of older sidebar.
+    # See https://gitlab.com/groups/gitlab-org/-/epics/1863
+    allow(Feature).to receive(:enabled?)
+      .with(:vue_issuable_sidebar, anything)
+      .and_return(false)
+    allow(Feature).to receive(:enabled?)
+      .with(:vue_issuable_epic_sidebar, anything)
       .and_return(false)
 
     # Stub these calls due to being expensive operations
@@ -365,3 +383,6 @@ end
 
 # Prevent Rugged from picking up local developer gitconfig.
 Rugged::Settings['search_path_global'] = Rails.root.join('tmp/tests').to_s
+
+# Disable timestamp checks for invisible_captcha
+InvisibleCaptcha.timestamp_enabled = false

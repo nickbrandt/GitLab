@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe MergeRequests::RefreshService do
   include ProjectForksHelper
+  include ProjectHelpers
 
   let(:group) { create(:group) }
   let(:project) { create(:project, :repository, namespace: group, approvals_before_merge: 1, reset_approvals_on_push: true) }
@@ -145,6 +146,61 @@ describe MergeRequests::RefreshService do
           end.not_to change { merge_request.pipelines_for_merge_request.count }
         end
       end
+    end
+  end
+
+  describe '#abort_ff_merge_requests_with_when_pipeline_succeeds' do
+    let_it_be(:project) { create(:project, :repository, merge_method: 'ff') }
+    let_it_be(:author) { create_user_from_membership(project, :developer) }
+    let_it_be(:user) { create(:user) }
+
+    let_it_be(:merge_request, refind: true) do
+      create(:merge_request,
+             author: author,
+             source_project: project,
+             source_branch: 'feature',
+             target_branch: 'master',
+             target_project: project,
+             auto_merge_enabled: true,
+             merge_user: user)
+    end
+
+    let_it_be(:newrev) do
+      project
+        .repository
+        .create_file(user, 'test1.txt', 'Test data',
+                     message: 'Test commit', branch_name: 'master')
+    end
+
+    let_it_be(:oldrev) do
+      project
+        .repository
+        .commit(newrev)
+        .parent_id
+    end
+
+    let(:refresh_service) { described_class.new(project, user) }
+
+    before do
+      merge_request.auto_merge_strategy = auto_merge_strategy
+      merge_request.save!
+
+      refresh_service.execute(oldrev, newrev, 'refs/heads/master')
+      merge_request.reload
+    end
+
+    context 'with add to merge train when pipeline succeeds strategy' do
+      let(:auto_merge_strategy) do
+        AutoMergeService::STRATEGY_ADD_TO_MERGE_TRAIN_WHEN_PIPELINE_SUCCEEDS
+      end
+
+      it_behaves_like 'maintained merge requests for MWPS'
+    end
+
+    context 'with merge train strategy' do
+      let(:auto_merge_strategy) { AutoMergeService::STRATEGY_MERGE_TRAIN }
+
+      it_behaves_like 'maintained merge requests for MWPS'
     end
   end
 end

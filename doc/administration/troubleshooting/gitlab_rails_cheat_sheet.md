@@ -442,7 +442,7 @@ personal_access_token = User.find(123).personal_access_tokens.create(
   scopes: [:api]
 )
 
-personal_access_token.token
+puts personal_access_token.token
 ```
 
 You might also want to manually set the token string:
@@ -688,6 +688,15 @@ u = User.find_by_username('')
 MergeRequests::PostMergeService.new(p, u).execute(m)
 ```
 
+### Delete a merge request
+
+```ruby
+u = User.find_by_username('<username>')
+p = Project.find_by_full_path('<group>/<project>')
+m = p.merge_requests.find_by(iid: <IID>)
+Issuable::DestroyService.new(m.project, u).execute(m)
+```
+
 ### Rebase manually
 
 ```ruby
@@ -701,11 +710,12 @@ MergeRequests::RebaseService.new(m.target_project, u).execute(m)
 
 ### Cancel stuck pending pipelines
 
-See <https://gitlab.com/gitlab-com/support-forum/issues/2449#note_41929707>.
+For more information, see the [confidential issue](../../user/project/issues/confidential_issues.md)
+`https://gitlab.com/gitlab-com/support-forum/issues/2449#note_41929707`.
 
 ```ruby
 Ci::Pipeline.where(project_id: p.id).where(status: 'pending').count
-Ci::Pipeline.where(project_id: p.id).where(status: 'pending').each {|p| p.cancel}
+Ci::Pipeline.where(project_id: p.id).where(status: 'pending').each {|p| p.cancel if p.stuck?}
 Ci::Pipeline.where(project_id: p.id).where(status: 'pending').count
 ```
 
@@ -881,6 +891,23 @@ Sidekiq::Queue.new('background_migration').size
 queue = Sidekiq::Queue.new('repository_import')
 queue.each { |job| job.delete if <condition>}
 ```
+
+`<condition>` probably includes references to job arguments, which depend on the type of job in question.
+
+| queue | worker | job args |
+| ----- | ------ | -------- |
+| repository_import | RepositoryImportWorker | project_id |
+| update_merge_requests | UpdateMergeRequestsWorker | project_id, user_id, oldrev, newrev, ref |
+
+**Example:** Delete all UpdateMergeRequestsWorker jobs associated with a merge request on project_id 125,
+merging branch `ref/heads/my_branch`.
+
+```ruby
+queue = Sidekiq::Queue.new('update_merge_requests')
+queue.each { |job| job.delete if job.args[0]==125 and job.args[4]=='ref/heads/my_branch'}
+```
+
+**Note:** Running jobs will not be killed. Stop sidekiq before doing this, to get all matching jobs.
 
 ### Enable debug logging of Sidekiq
 

@@ -1,7 +1,9 @@
 import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'spec/helpers/vuex_action_helper';
-import * as actions from 'ee/insights/stores/modules/insights/actions';
+import actionsModule, * as actions from 'ee/insights/stores/modules/insights/actions';
+
+const ERROR_MESSAGE = 'TEST_ERROR_MESSAGE';
 
 describe('Insights store actions', () => {
   const key = 'bugsPerTeam';
@@ -44,59 +46,105 @@ describe('Insights store actions', () => {
   });
 
   describe('receiveConfigError', () => {
-    it('commits RECEIVE_CONFIG_ERROR', done => {
+    let flashSpy;
+
+    beforeEach(() => {
+      flashSpy = spyOnDependency(actionsModule, 'createFlash');
+    });
+
+    it('commits RECEIVE_CONFIG_ERROR and shows flash message', done => {
+      testAction(
+        actions.receiveConfigError,
+        ERROR_MESSAGE,
+        null,
+        [{ type: 'RECEIVE_CONFIG_ERROR' }],
+        [],
+        () => {
+          expect(flashSpy).toHaveBeenCalledWith(
+            `There was an error fetching configuration for charts: ${ERROR_MESSAGE}`,
+          );
+          done();
+        },
+      );
+    });
+
+    it('flashes Unknown Error when error message is falsey', done => {
       testAction(
         actions.receiveConfigError,
         null,
         null,
-        [{ type: 'RECEIVE_CONFIG_ERROR' }],
-        [],
-        done,
+        jasmine.any(Array),
+        jasmine.any(Array),
+        () => {
+          expect(flashSpy).toHaveBeenCalledWith(
+            `There was an error fetching configuration for charts: Unknown Error`,
+          );
+          done();
+        },
       );
     });
   });
 
   describe('fetchConfigData', () => {
     let mock;
-    let dispatch;
 
     beforeEach(() => {
-      dispatch = jasmine.createSpy('dispatch');
       mock = new MockAdapter(axios);
-
-      mock.onGet(gl.TEST_HOST).reply(200, configData);
     });
 
     afterEach(() => {
       mock.restore();
     });
 
-    it('calls requestConfig', done => {
-      const context = {
-        dispatch,
-      };
+    describe('success calls', () => {
+      beforeEach(() => {
+        mock.onGet(gl.TEST_HOST).reply(200, configData);
+      });
 
-      actions
-        .fetchConfigData(context, gl.TEST_HOST)
-        .then(() => {
-          expect(dispatch.calls.argsFor(0)).toEqual(['requestConfig']);
-        })
-        .then(done)
-        .catch(done.fail);
+      it('calls requestConfig and receiveConfigSuccess', done => {
+        testAction(
+          actions.fetchConfigData,
+          gl.TEST_HOST,
+          {},
+          [],
+          [{ type: 'requestConfig' }, { type: 'receiveConfigSuccess', payload: configData }],
+          done,
+        );
+      });
     });
 
-    it('calls receiveConfigSuccess with config data', done => {
-      const context = {
-        dispatch,
-      };
+    describe('failed calls', () => {
+      beforeEach(() => {
+        mock.onGet(gl.TEST_HOST).reply(500, { message: ERROR_MESSAGE });
+      });
 
-      actions
-        .fetchConfigData(context, gl.TEST_HOST)
-        .then(() => {
-          expect(dispatch.calls.argsFor(1)).toEqual(['receiveConfigSuccess', configData]);
-        })
-        .then(done)
-        .catch(done.fail);
+      it('calls receiveConfigError upon error from service', done => {
+        testAction(
+          actions.fetchConfigData,
+          gl.TEST_HOST,
+          {},
+          [],
+          [{ type: 'requestConfig' }, { type: 'receiveConfigError', payload: ERROR_MESSAGE }],
+          done,
+        );
+      });
+    });
+
+    describe('success calls with null data', () => {
+      beforeEach(() => {
+        mock.onGet(gl.TEST_HOST).reply(200, null);
+      });
+
+      it('calls receiveConfigError upon null config data returned', done => {
+        testAction(
+          actions.fetchConfigData,
+          gl.TEST_HOST,
+          {},
+          [],
+          [{ type: 'requestConfig' }, { type: 'receiveConfigError' }],
+          done,
+        );
+      });
     });
   });
 
@@ -220,9 +268,13 @@ describe('Insights store actions', () => {
   });
 
   describe('setActiveTab', () => {
-    it('commits SET_ACTIVE_TAB and SET_ACTIVE_PAGE', done => {
-      const state = { configData };
+    let state;
 
+    beforeEach(() => {
+      state = { configData };
+    });
+
+    it('commits SET_ACTIVE_TAB and SET_ACTIVE_PAGE', done => {
       testAction(
         actions.setActiveTab,
         key,
@@ -231,6 +283,16 @@ describe('Insights store actions', () => {
         [],
         done,
       );
+    });
+
+    it('does not mutate with no configData', done => {
+      state = { configData: null };
+
+      testAction(actions.setActiveTab, key, state, [], [], done);
+    });
+
+    it('does not mutate with no matching tab', done => {
+      testAction(actions.setActiveTab, 'invalidTab', state, [], [], done);
     });
   });
 

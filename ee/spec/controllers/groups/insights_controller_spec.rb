@@ -10,6 +10,7 @@ describe Groups::InsightsController do
   set(:user) { create(:user) }
   let(:query_params) { { type: 'bar', query: { issuable_type: 'issue', collection_labels: ['bug'] }, projects: projects_params } }
   let(:projects_params) { { only: [project.id, project.full_path] } }
+  let(:params) { { trailing_slash: true } }
 
   before do
     stub_licensed_features(insights: true)
@@ -37,19 +38,19 @@ describe Groups::InsightsController do
   context 'when insights configuration project cannot be read by current user' do
     context 'when visiting the parent group' do
       describe 'GET #show.html' do
-        subject { get :show, params: { group_id: parent_group.to_param } }
+        subject { get :show, params: params.merge(group_id: parent_group.to_param) }
 
         it_behaves_like '404 status'
       end
 
       describe 'GET #show.json' do
-        subject { get :show, params: { group_id: parent_group.to_param }, format: :json }
+        subject { get :show, params: params.merge(group_id: parent_group.to_param), format: :json }
 
         it_behaves_like '404 status'
       end
 
       describe 'POST #query' do
-        subject { post :query, params: query_params.merge(group_id: parent_group.to_param) }
+        subject { post :query, params: params.merge(query_params.merge(group_id: parent_group.to_param)) }
 
         it_behaves_like '404 status'
       end
@@ -57,7 +58,7 @@ describe Groups::InsightsController do
 
     context 'when visiting a nested group' do
       describe 'GET #show.html' do
-        subject { get :show, params: { group_id: nested_group.to_param } }
+        subject { get :show, params: params.merge(group_id: nested_group.to_param) }
 
         # The following expectation should be changed to
         # it_behaves_like '404 status'
@@ -66,7 +67,7 @@ describe Groups::InsightsController do
       end
 
       describe 'GET #show.json' do
-        subject { get :show, params: { group_id: nested_group.to_param }, format: :json }
+        subject { get :show, params: params.merge(group_id: nested_group.to_param), format: :json }
 
         # The following expectation should be changed to
         # it_behaves_like '404 status'
@@ -83,7 +84,7 @@ describe Groups::InsightsController do
       end
 
       describe 'POST #query.json' do
-        subject { post :query, params: query_params.merge(group_id: nested_group.to_param), format: :json }
+        subject { post :query, params: params.merge(query_params.merge(group_id: nested_group.to_param)), format: :json }
 
         # The following expectation should be changed to
         # it_behaves_like '404 status'
@@ -100,19 +101,19 @@ describe Groups::InsightsController do
 
     context 'when the configuration is attached to the current group' do
       describe 'GET #show.html' do
-        subject { get :show, params: { group_id: parent_group.to_param } }
+        subject { get :show, params: params.merge(group_id: parent_group.to_param) }
 
         it_behaves_like '200 status'
       end
 
       describe 'GET #show.sjon' do
-        subject { get :show, params: { group_id: parent_group.to_param }, format: :json }
+        subject { get :show, params: params.merge(group_id: parent_group.to_param), format: :json }
 
         it_behaves_like '200 status'
       end
 
       describe 'POST #query.json' do
-        subject { post :query, params: query_params.merge(group_id: parent_group.to_param), format: :json }
+        subject { post :query, params: params.merge(query_params.merge(group_id: parent_group.to_param)), format: :json }
 
         it_behaves_like '200 status'
       end
@@ -120,19 +121,19 @@ describe Groups::InsightsController do
 
     context 'when the configuration is attached to a nested group' do
       describe 'GET #show.html' do
-        subject { get :show, params: { group_id: nested_group.to_param } }
+        subject { get :show, params: params.merge(group_id: nested_group.to_param) }
 
         it_behaves_like '200 status'
       end
 
       describe 'GET #show.json' do
-        subject { get :show, params: { group_id: nested_group.to_param }, format: :json }
+        subject { get :show, params: params.merge(group_id: nested_group.to_param), format: :json }
 
         it_behaves_like '200 status'
       end
 
       describe 'POST #query.json' do
-        subject { post :query, params: query_params.merge(group_id: nested_group.to_param), format: :json }
+        subject { post :query, params: params.merge(query_params.merge(group_id: nested_group.to_param)), format: :json }
 
         it_behaves_like '200 status'
       end

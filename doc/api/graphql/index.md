@@ -42,7 +42,7 @@ A first iteration of a GraphQL API includes the following queries
 ### Multiplex queries
 
 GitLab supports batching queries into a single request using
-[apollo-link-batch-http](https://www.apollographql.com/docs/link/links/batch-http). More
+[apollo-link-batch-http](https://www.apollographql.com/docs/link/links/batch-http/). More
 info about multiplexed queries is also available for
 [graphql-ruby](https://graphql-ruby.org/queries/multiplex.html) the
 library GitLab uses on the backend.
@@ -52,6 +52,11 @@ library GitLab uses on the backend.
 GitLab's GraphQL reference [is available](reference/index.md).
 
 It is automatically generated from GitLab's GraphQL schema and embedded in a Markdown file.
+
+Machine-readable versions are also available:
+
+- [JSON format](reference/gitlab_schema.json)
+- [IDL format](reference/gitlab_schema.graphql)
 
 ## GraphiQL
 

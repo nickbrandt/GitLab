@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe TagsFinder do
@@ -47,6 +49,44 @@ describe TagsFinder do
 
       it 'does not find any tags with that name' do
         tags_finder = described_class.new(repository, { search: 'hey' })
+
+        result = tags_finder.execute
+
+        expect(result.count).to eq(0)
+      end
+
+      it 'filters tags by name that begins with' do
+        params = { search: '^v1.0' }
+        tags_finder = described_class.new(repository, params)
+
+        result = tags_finder.execute
+
+        expect(result.first.name).to eq('v1.0.0')
+        expect(result.count).to eq(1)
+      end
+
+      it 'filters tags by name that ends with' do
+        params = { search: '0.0$' }
+        tags_finder = described_class.new(repository, params)
+
+        result = tags_finder.execute
+
+        expect(result.first.name).to eq('v1.0.0')
+        expect(result.count).to eq(1)
+      end
+
+      it 'filters tags by nonexistent name that begins with' do
+        params = { search: '^nope' }
+        tags_finder = described_class.new(repository, params)
+
+        result = tags_finder.execute
+
+        expect(result.count).to eq(0)
+      end
+
+      it 'filters tags by nonexistent name that ends with' do
+        params = { search: 'nope$' }
+        tags_finder = described_class.new(repository, params)
 
         result = tags_finder.execute
 

@@ -9,6 +9,7 @@ module QA
       module Test
         class Geo < QA::Scenario::Template
           include QA::Scenario::Bootable
+          include QA::Scenario::SharedAttributes
 
           tags :geo
 
@@ -102,6 +103,8 @@ module QA
           class Secondary
             include QA::Scenario::Actable
 
+            WAIT_FOR_SERVICES_SECS = 120
+
             def initialize
               @address = QA::Runtime::Scenario.geo_secondary_address
               @name = QA::Runtime::Scenario.geo_secondary_name
@@ -135,25 +138,13 @@ module QA
             def wait_for_services
               puts 'Waiting until secondary node services are ready ...'
 
-              Time.new.tap do |start|
-                while Time.new - start < 120
-                  begin
-                    Net::HTTP.get(URI.join(@address, '/-/readiness')).tap do |body|
-                      if JSON.parse(body).all? { |_, service| service['status'] == 'ok' }
-                        return puts "\nSecondary ready after #{Time.now - start} seconds." # rubocop:disable Cop/AvoidReturnFromBlocks
-                      else
-                        print '.'
-                      end
-                    end
-                  rescue StandardError
-                    print 'e'
-                  end
-
-                  sleep 1
-                end
-
-                raise "Secondary node did not start correctly in #{Time.now - start} seconds!"
+              elapsed = try_for(WAIT_FOR_SERVICES_SECS) do |elapsed|
+                break elapsed if host_ready?
               end
+
+              puts "\nSecondary ready after #{elapsed} seconds."
+            rescue TryForExceeded
+              raise "Secondary node did not start correctly after #{WAIT_FOR_SERVICES_SECS} seconds!"
             end
 
             def authorize
@@ -167,6 +158,39 @@ module QA
                 # Log out so that tests are in an initially unauthenticated state
                 QA::Page::Main::Menu.perform(&:sign_out)
               end
+            end
+
+            private
+
+            TryForExceeded = Class.new(StandardError)
+
+            def try_for(secs)
+              start = Time.new
+
+              loop do
+                elapsed = (Time.new - start).round(2)
+                break elapsed if elapsed >= secs
+
+                yield elapsed
+                sleep 1
+              end
+
+              raise TryForExceeded
+            end
+
+            def host_ready?
+              return true if host_status_ok?
+
+              print '.'
+              false
+            rescue StandardError
+              print 'e'
+              false
+            end
+
+            def host_status_ok?
+              body = Net::HTTP.get(URI.join(@address, '/-/readiness'))
+              JSON.parse(body)['status'] == 'ok'
             end
           end
         end

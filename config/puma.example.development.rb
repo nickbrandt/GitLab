@@ -14,9 +14,13 @@ rackup 'config.ru'
 pidfile '/home/git/gitlab/tmp/pids/puma.pid'
 state_path '/home/git/gitlab/tmp/pids/puma.state'
 
-stdout_redirect '/home/git/gitlab/log/puma.stdout.log',
-  '/home/git/gitlab/log/puma.stderr.log',
-  true
+## Uncomment the lines if you would like to write puma stdout & stderr streams
+## to a different location than rails logs.
+## When using GitLab Development Kit, by default, these logs will be consumed
+## by runit and can be accessed using `gdk tail rails-web`
+# stdout_redirect '/home/git/gitlab/log/puma.stdout.log',
+#  '/home/git/gitlab/log/puma.stderr.log',
+#  true
 
 # Configure "min" to be the minimum number of threads to use to answer
 # requests and "max" the maximum.
@@ -45,7 +49,7 @@ require_relative "/home/git/gitlab/lib/gitlab/cluster/lifecycle_events"
 
 on_restart do
   # Signal application hooks that we're about to restart
-  Gitlab::Cluster::LifecycleEvents.do_master_restart
+  Gitlab::Cluster::LifecycleEvents.do_before_master_restart
 end
 
 before_fork do

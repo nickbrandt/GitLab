@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe API::Groups do
+  include GroupAPIHelpers
+
   set(:group) { create(:group) }
   set(:private_group) { create(:group, :private) }
   set(:project) { create(:project, group: group) }
@@ -133,14 +135,14 @@ describe API::Groups do
   describe "POST /groups" do
     context "when authenticated as user with group permissions" do
       it "creates an ldap_group_link if ldap_cn and ldap_access are supplied" do
-        group_attributes = attributes_for(:group, ldap_cn: 'ldap-group', ldap_access: Gitlab::Access::DEVELOPER)
+        group_attributes = attributes_for_group_api ldap_cn: 'ldap-group', ldap_access: Gitlab::Access::DEVELOPER
         expect { post api("/groups", admin), params: group_attributes }.to change { LdapGroupLink.count }.by(1)
       end
 
       context 'when shared_runners_minutes_limit is given' do
         context 'when the current user is not an admin' do
           it "does not create a group with shared_runners_minutes_limit" do
-            group = attributes_for(:group, { shared_runners_minutes_limit: 133 })
+            group = attributes_for_group_api shared_runners_minutes_limit: 133
 
             expect do
               post api("/groups", another_user), params: group
@@ -152,7 +154,7 @@ describe API::Groups do
 
         context 'when the current user is an admin' do
           it "creates a group with shared_runners_minutes_limit" do
-            group = attributes_for(:group, { shared_runners_minutes_limit: 133 })
+            group = attributes_for_group_api shared_runners_minutes_limit: 133
 
             expect do
               post api("/groups", admin), params: group
@@ -293,6 +295,166 @@ describe API::Groups do
 
           # using `include` since other projects may be added to this group from different contexts
           expect(json_response.map { |p| p['id'] }).to include(project_with_reports.id, project_without_reports.id)
+        end
+      end
+    end
+  end
+
+  describe 'GET group/:id/audit_events' do
+    let(:path) { "/groups/#{group.id}/audit_events" }
+
+    context 'when authenticated, as a user' do
+      it_behaves_like '403 response' do
+        let(:request) { get api(path, create(:user)) }
+      end
+    end
+
+    context 'when authenticated, as a group owner' do
+      context 'audit events feature is not available' do
+        before do
+          stub_licensed_features(audit_events: false)
+        end
+
+        it_behaves_like '403 response' do
+          let(:request) { get api(path, user) }
+        end
+      end
+
+      context 'audit events feature is available' do
+        let_it_be(:group_audit_event_1) { create(:group_audit_event, created_at: Date.new(2000, 1, 10), entity_id: group.id) }
+        let_it_be(:group_audit_event_2) { create(:group_audit_event, created_at: Date.new(2000, 1, 15), entity_id: group.id) }
+        let_it_be(:group_audit_event_3) { create(:group_audit_event, created_at: Date.new(2000, 1, 20), entity_id: group.id) }
+
+        before do
+          stub_licensed_features(audit_events: true)
+        end
+
+        it 'returns 200 response' do
+          get api(path, user)
+
+          expect(response).to have_gitlab_http_status(200)
+        end
+
+        it 'includes the correct pagination headers' do
+          audit_events_counts = 3
+
+          get api(path, user)
+
+          expect(response).to include_pagination_headers
+          expect(response.headers['X-Total']).to eq(audit_events_counts.to_s)
+          expect(response.headers['X-Page']).to eq('1')
+        end
+
+        it 'does not include audit events of a different group' do
+          group = create(:group)
+          audit_event = create(:group_audit_event, created_at: Date.new(2000, 1, 20), entity_id: group.id)
+
+          get api(path, user)
+
+          audit_event_ids = json_response.map { |audit_event| audit_event['id'] }
+
+          expect(audit_event_ids).not_to include(audit_event.id)
+        end
+
+        context 'parameters' do
+          context 'created_before parameter' do
+            it "returns audit events created before the given parameter" do
+              created_before = '2000-01-20T00:00:00.060Z'
+
+              get api(path, user), params: { created_before: created_before }
+
+              expect(json_response.size).to eq 3
+              expect(json_response.first["id"]).to eq(group_audit_event_3.id)
+              expect(json_response.last["id"]).to eq(group_audit_event_1.id)
+            end
+          end
+
+          context 'created_after parameter' do
+            it "returns audit events created after the given parameter" do
+              created_after = '2000-01-12T00:00:00.060Z'
+
+              get api(path, user), params: { created_after: created_after }
+
+              expect(json_response.size).to eq 2
+              expect(json_response.first["id"]).to eq(group_audit_event_3.id)
+              expect(json_response.last["id"]).to eq(group_audit_event_2.id)
+            end
+          end
+        end
+
+        context 'response schema' do
+          it 'matches the response schema' do
+            get api(path, user)
+
+            expect(response).to match_response_schema('public_api/v4/audit_events', dir: 'ee')
+          end
+        end
+      end
+    end
+  end
+
+  describe 'GET group/:id/audit_events/:audit_event_id' do
+    let(:path) { "/groups/#{group.id}/audit_events/#{group_audit_event.id}" }
+
+    let_it_be(:group_audit_event) { create(:group_audit_event, created_at: Date.new(2000, 1, 10), entity_id: group.id) }
+
+    context 'when authenticated, as a user' do
+      it_behaves_like '403 response' do
+        let(:request) { get api(path, create(:user)) }
+      end
+    end
+
+    context 'when authenticated, as a group owner' do
+      context 'audit events feature is not available' do
+        before do
+          stub_licensed_features(audit_events: false)
+        end
+
+        it_behaves_like '403 response' do
+          let(:request) { get api(path, user) }
+        end
+      end
+
+      context 'audit events feature is available' do
+        before do
+          stub_licensed_features(audit_events: true)
+        end
+
+        context 'existent audit event' do
+          it 'returns 200 response' do
+            get api(path, user)
+
+            expect(response).to have_gitlab_http_status(200)
+          end
+
+          context 'response schema' do
+            it 'matches the response schema' do
+              get api(path, user)
+
+              expect(response).to match_response_schema('public_api/v4/audit_event', dir: 'ee')
+            end
+          end
+
+          context 'non existent audit event' do
+            context 'non existent audit event of a group' do
+              let(:path) { "/groups/#{group.id}/audit_events/non-existent-id" }
+
+              it_behaves_like '404 response' do
+                let(:request) { get api(path, user) }
+              end
+            end
+
+            context 'existing audit event of a different group' do
+              let(:new_group) { create(:group) }
+              let(:audit_event) { create(:group_audit_event, created_at: Date.new(2000, 1, 10), entity_id: new_group.id) }
+
+              let(:path) { "/groups/#{group.id}/audit_events/#{audit_event.id}" }
+
+              it_behaves_like '404 response' do
+                let(:request) { get api(path, user) }
+              end
+            end
+          end
         end
       end
     end

@@ -15,7 +15,7 @@ module EE
     end
 
     def sign_up_params
-      clean_params = params.require(:user).permit(:username, :email, :email_confirmation, :name, :password, :email_opted_in)
+      clean_params = super.merge(params.require(:user).permit(:email_opted_in))
 
       if clean_params[:email_opted_in] == '1'
         clean_params[:email_opted_in_ip] = request.remote_ip

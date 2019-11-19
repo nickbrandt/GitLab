@@ -17,11 +17,15 @@ module Gitlab
 
           def apply_license(license)
             dependencies.each do |dependency|
-              next unless dependency[:name] == license[:dependency][:name]
-              next if dependency[:licenses].include?(license[:license])
+              next unless license.dependencies.find { |license_dependency| license_dependency.name == dependency[:name] }
+              next if dependency[:licenses].find { |license_hash| license_hash[:name] == license.name }
 
-              dependency[:licenses] << license[:license]
+              dependency[:licenses].push(name: license.name, url: license.url)
             end
+          end
+
+          def dependencies_with_licenses
+            dependencies.select { |dependency| dependency[:licenses].any? }
           end
         end
       end

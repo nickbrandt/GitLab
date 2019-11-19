@@ -5,6 +5,11 @@ class HealthController < ActionController::Base
   include RequiresWhitelistedMonitoringClient
 
   CHECKS = [
+    Gitlab::HealthChecks::MasterCheck
+  ].freeze
+
+  ALL_CHECKS = [
+    *CHECKS,
     Gitlab::HealthChecks::DbCheck,
     Gitlab::HealthChecks::Redis::RedisCheck,
     Gitlab::HealthChecks::Redis::CacheCheck,
@@ -14,37 +19,26 @@ class HealthController < ActionController::Base
   ].freeze
 
   def readiness
-    results = CHECKS.map { |check| [check.name, check.readiness] }
-
-    render_check_results(results)
+    # readiness check is a collection of application-level checks
+    # and optionally all service checks
+    render_checks(params[:all] ? ALL_CHECKS : CHECKS)
   end
 
   def liveness
-    render json: { status: 'ok' }, status: :ok
+    # liveness check is a collection without additional checks
+    render_checks
   end
 
   private
 
-  def render_check_results(results)
-    flattened = results.flat_map do |name, result|
-      if result.is_a?(Gitlab::HealthChecks::Result)
-        [[name, result]]
-      else
-        result.map { |r| [name, r] }
-      end
-    end
-    success = flattened.all? { |name, r| r.success }
-
-    response = flattened.map do |name, r|
-      info = { status: r.success ? 'ok' : 'failed' }
-      info['message'] = r.message if r.message
-      info[:labels] = r.labels if r.labels
-      [name, info]
-    end
+  def render_checks(checks = [])
+    result = Gitlab::HealthChecks::Probes::Collection
+      .new(*checks)
+      .execute
 
     # disable static error pages at the gitlab-workhorse level, we want to see this error response even in production
-    headers["X-GitLab-Custom-Error"] = 1 unless success
+    headers["X-GitLab-Custom-Error"] = 1 unless result.success?
 
-    render json: response.to_h, status: success ? :ok : :service_unavailable
+    render json: result.json, status: result.http_status
   end
 end

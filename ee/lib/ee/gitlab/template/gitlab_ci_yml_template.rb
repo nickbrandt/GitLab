@@ -18,7 +18,8 @@ module EE
 
           def categories_ee
             {
-              'Security' => 'Security'
+              'Security' => 'Security',
+              'Verify' => 'Verify'
             }
           end
         end

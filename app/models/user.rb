@@ -56,8 +56,7 @@ class User < ApplicationRecord
   BLOCKED_MESSAGE = "Your account has been blocked. Please contact your GitLab " \
                     "administrator if you think this is an error."
 
-  # Removed in GitLab 12.3. Keep until after 2019-09-22.
-  self.ignored_columns += %i[support_bot]
+  MINIMUM_INACTIVE_DAYS = 180
 
   # Override Devise::Models::Trackable#update_tracked_fields!
   # to limit database writes to at most once every hour
@@ -97,6 +96,7 @@ class User < ApplicationRecord
   has_many :u2f_registrations, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_many :chat_names, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_one :user_synced_attributes_metadata, autosave: true
+  has_one :aws_role, class_name: 'Aws::Role'
 
   # Groups
   has_many :members
@@ -228,6 +228,10 @@ class User < ApplicationRecord
   # Note: When adding an option, it MUST go on the end of the array.
   enum project_view: [:readme, :activity, :files]
 
+  # User's role
+  # Note: When adding an option, it MUST go on the end of the array.
+  enum role: [:software_developer, :development_team_lead, :devops_engineer, :systems_administrator, :security_analyst, :data_analyst, :product_manager, :product_designer, :other], _suffix: true
+
   delegate :path, to: :namespace, allow_nil: true, prefix: true
   delegate :notes_filter_for, to: :user_preference
   delegate :set_notes_filter, to: :user_preference
@@ -236,22 +240,31 @@ class User < ApplicationRecord
   delegate :time_display_relative, :time_display_relative=, to: :user_preference
   delegate :time_format_in_24h, :time_format_in_24h=, to: :user_preference
   delegate :show_whitespace_in_diffs, :show_whitespace_in_diffs=, to: :user_preference
+  delegate :sourcegraph_enabled, :sourcegraph_enabled=, to: :user_preference
+  delegate :setup_for_company, :setup_for_company=, to: :user_preference
 
   accepts_nested_attributes_for :user_preference, update_only: true
 
   state_machine :state, initial: :active do
     event :block do
       transition active: :blocked
+      transition deactivated: :blocked
       transition ldap_blocked: :blocked
     end
 
     event :ldap_block do
       transition active: :ldap_blocked
+      transition deactivated: :ldap_blocked
     end
 
     event :activate do
+      transition deactivated: :active
       transition blocked: :active
       transition ldap_blocked: :active
+    end
+
+    event :deactivate do
+      transition active: :deactivated
     end
 
     state :blocked, :ldap_blocked do
@@ -284,6 +297,7 @@ class User < ApplicationRecord
   scope :blocked, -> { with_states(:blocked, :ldap_blocked) }
   scope :external, -> { where(external: true) }
   scope :active, -> { with_state(:active).non_internal }
+  scope :deactivated, -> { with_state(:deactivated).non_internal }
   scope :without_projects, -> { joins('LEFT JOIN project_authorizations ON users.id = project_authorizations.user_id').where(project_authorizations: { user_id: nil }) }
   scope :order_recent_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('current_sign_in_at', 'DESC')) }
   scope :order_oldest_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('current_sign_in_at', 'ASC')) }
@@ -431,6 +445,8 @@ class User < ApplicationRecord
         without_projects
       when 'external'
         external
+      when 'deactivated'
+        deactivated
       else
         active
       end
@@ -521,7 +537,7 @@ class User < ApplicationRecord
 
     # Returns a user for the given SSH key.
     def find_by_ssh_key_id(key_id)
-      Key.find_by(id: key_id)&.user
+      find_by('EXISTS (?)', Key.select(1).where('keys.user_id = users.id').where(id: key_id))
     end
 
     def find_by_full_path(path, follow_redirects: false)
@@ -1304,14 +1320,27 @@ class User < ApplicationRecord
     notification_group&.notification_email_for(self) || notification_email
   end
 
-  def notification_settings_for(source)
+  def notification_settings_for(source, inherit: false)
     if notification_settings.loaded?
       notification_settings.find do |notification|
         notification.source_type == source.class.base_class.name &&
           notification.source_id == source.id
       end
     else
-      notification_settings.find_or_initialize_by(source: source)
+      notification_settings.find_or_initialize_by(source: source) do |ns|
+        next unless source.is_a?(Group) && inherit
+
+        # If we're here it means we're trying to create a NotificationSetting for a group that doesn't have one.
+        # Find the closest parent with a notification_setting that's not Global level, or that has an email set.
+        ancestor_ns = source
+                        .notification_settings(hierarchy_order: :asc)
+                        .where(user: self)
+                        .find_by('level != ? OR notification_email IS NOT NULL', NotificationSetting.levels[:global])
+        # Use it to seed the settings
+        ns.assign_attributes(ancestor_ns&.slice(*NotificationSetting.allowed_fields))
+        ns.source = source
+        ns.user = self
+      end
     end
   end
 
@@ -1393,14 +1422,13 @@ class User < ApplicationRecord
   # flow means we don't call that automatically (and can't conveniently do so).
   #
   # See:
-  #   <https://github.com/plataformatec/devise/blob/v4.0.0/lib/devise/models/lockable.rb#L92>
+  #   <https://github.com/plataformatec/devise/blob/v4.7.1/lib/devise/models/lockable.rb#L104>
   #
   # rubocop: disable CodeReuse/ServiceClass
   def increment_failed_attempts!
     return if ::Gitlab::Database.read_only?
 
-    self.failed_attempts ||= 0
-    self.failed_attempts += 1
+    increment_failed_attempts
 
     if attempts_exceeded?
       lock_access! unless access_locked?
@@ -1428,7 +1456,7 @@ class User < ApplicationRecord
   # Does the user have access to all private groups & projects?
   # Overridden in EE to also check auditor?
   def full_private_access?
-    admin?
+    can?(:read_all_resources)
   end
 
   def update_two_factor_requirement
@@ -1533,6 +1561,31 @@ class User < ApplicationRecord
   def password_expired?
     !!(password_expires_at && password_expires_at < Time.now)
   end
+
+  def can_be_deactivated?
+    active? && no_recent_activity?
+  end
+
+  def last_active_at
+    last_activity = last_activity_on&.to_time&.in_time_zone
+    last_sign_in = current_sign_in_at
+
+    [last_activity, last_sign_in].compact.max
+  end
+
+  # Below is used for the signup_flow experiment. Should be removed
+  # when experiment finishes.
+  # See https://gitlab.com/gitlab-org/growth/engineering/issues/64
+  REQUIRES_ROLE_VALUE = 99
+
+  def role_required?
+    role_before_type_cast == REQUIRES_ROLE_VALUE
+  end
+
+  def set_role_required!
+    update_column(:role, REQUIRES_ROLE_VALUE)
+  end
+  # End of signup_flow experiment methods
 
   # @deprecated
   alias_method :owned_or_masters_groups, :owned_or_maintainers_groups
@@ -1682,6 +1735,10 @@ class User < ApplicationRecord
     developer_groups_hierarchy = ::Gitlab::ObjectHierarchy.new(developer_groups).base_and_descendants
     ::Group.where(id: developer_groups_hierarchy.select(:id),
                   project_creation_level: project_creation_levels)
+  end
+
+  def no_recent_activity?
+    last_active_at.to_i <= MINIMUM_INACTIVE_DAYS.days.ago.to_i
   end
 end
 

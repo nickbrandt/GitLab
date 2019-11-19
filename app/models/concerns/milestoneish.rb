@@ -6,7 +6,9 @@ module Milestoneish
   end
 
   def closed_issues_count(user)
-    count_issues_by_state(user)['closed'].to_i
+    closed_state_id = Issue.available_states[:closed]
+
+    count_issues_by_state(user)[closed_state_id].to_i
   end
 
   def complete?(user)
@@ -99,6 +101,10 @@ module Milestoneish
     false
   end
 
+  def global_milestone?
+    false
+  end
+
   def total_issue_time_spent
     @total_issue_time_spent ||= issues.joins(:timelogs).sum(:time_spent)
   end
@@ -117,7 +123,7 @@ module Milestoneish
 
   def count_issues_by_state(user)
     memoize_per_user(user, :count_issues_by_state) do
-      issues_visible_to_user(user).reorder(nil).group(:state).count
+      issues_visible_to_user(user).reorder(nil).group(:state_id).count
     end
   end
 

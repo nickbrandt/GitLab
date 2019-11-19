@@ -6,7 +6,7 @@ type: tutorial
 
 > **Notes**:
 >
-> - [Introduced](https://about.gitlab.com/2015/08/22/gitlab-7-14-released/) in GitLab 7.14.
+> - [Introduced](https://about.gitlab.com/blog/2015/08/22/gitlab-7-14-released/) in GitLab 7.14.
 > - GitLab 8.12 has a completely redesigned job permissions system. Read all
 >   about the [new model and its implications](../../user/project/new_ci_build_permissions_model.md#pipeline-triggers).
 
@@ -32,11 +32,10 @@ to protect trigger tokens.
 You can use the `CI_JOB_TOKEN` [variable][predef] (used to authenticate
 with the [GitLab Container Registry][registry]) in the following cases.
 
-#### When used with multi-project pipelines **(PREMIUM)**
+#### When used with multi-project pipelines
 
-> **Note**:
-The use of `CI_JOB_TOKEN` for multi-project pipelines was [introduced][ee-2017]
-in [GitLab Premium][ee] 9.3.
+> - Use of `CI_JOB_TOKEN` for multi-project pipelines was [introduced][ee-2017] in [GitLab Premium][ee] 9.3.
+> - Use of `CI_JOB_TOKEN` for multi-project pipelines was [made available](https://gitlab.com/gitlab-org/gitlab/issues/31573) in all tiers in GitLab 12.4.
 
 This way of triggering can only be used when invoked inside `.gitlab-ci.yml`,
 and it creates a dependent pipeline relation visible on the
@@ -157,7 +156,7 @@ curl --request POST \
 You can also benefit by using triggers in your `.gitlab-ci.yml`. Let's say that
 you have two projects, A and B, and you want to trigger a rebuild on the `master`
 branch of project B whenever a tag on project A is created. This is the job you
-need to add in project's A `.gitlab-ci.yml`:
+need to add in project A's `.gitlab-ci.yml`:
 
 ```yaml
 build_docs:

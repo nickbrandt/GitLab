@@ -18,7 +18,6 @@ describe 'Projects > Merge Requests > User edits a merge request' do
 
     let(:project) do
       create(:project, :custom_repo,
-             merge_requests_require_code_owner_approval: true,
              files: { 'docs/CODEOWNERS' => "*.rb @ruby-owner\n*.js @js-owner" })
     end
 
@@ -37,6 +36,11 @@ describe 'Projects > Merge Requests > User edits a merge request' do
       project.repository.create_file(user, 'ruby.rb', '# a ruby file',
                                      message: 'Add a ruby file',
                                      branch_name: 'feature')
+
+      create(:protected_branch,
+        name: 'master',
+        code_owner_approval_required: true,
+        project: project)
 
       # To make sure the rules are created for the merge request, the services
       # that do that aren't triggered from factories

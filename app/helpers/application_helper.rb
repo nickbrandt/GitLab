@@ -108,6 +108,11 @@ module ApplicationHelper
     Gitlab.config.extra
   end
 
+  # shortcut for gitlab registry config
+  def registry_config
+    Gitlab.config.registry
+  end
+
   # Render a `time` element with Javascript-based relative date and tooltip
   #
   # time       - Time object
@@ -317,6 +322,15 @@ module ApplicationHelper
       commands: commands_project_autocomplete_sources_path(object, type: noteable_type, type_id: params[:id]),
       snippets: snippets_project_autocomplete_sources_path(object)
     }
+  end
+
+  def asset_to_string(name)
+    app = Rails.application
+    if Rails.configuration.assets.compile
+      app.assets.find_asset(name).to_s
+    else
+      controller.view_context.render(file: Rails.root.join('public/assets', app.assets_manifest.assets[name]).to_s)
+    end
   end
 
   private

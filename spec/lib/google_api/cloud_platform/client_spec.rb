@@ -54,6 +54,7 @@ describe GoogleApi::CloudPlatform::Client do
 
   describe '#projects_zones_clusters_get' do
     subject { client.projects_zones_clusters_get(spy, spy, spy) }
+
     let(:gke_cluster) { double }
 
     before do
@@ -101,6 +102,10 @@ describe GoogleApi::CloudPlatform::Client do
           },
           legacy_abac: {
             enabled: legacy_abac
+          },
+          ip_allocation_policy: {
+            use_ip_aliases: true,
+            cluster_ipv4_cidr_block: '/16'
           },
           addons_config: addons_config
         }
@@ -157,6 +162,7 @@ describe GoogleApi::CloudPlatform::Client do
 
   describe '#projects_zones_operations' do
     subject { client.projects_zones_operations(spy, spy, spy) }
+
     let(:operation) { double }
 
     before do

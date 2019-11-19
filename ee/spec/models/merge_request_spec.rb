@@ -50,6 +50,48 @@ describe MergeRequest do
     end
   end
 
+  describe '#note_positions_for_paths' do
+    let(:user) { create(:user) }
+    let(:merge_request) { create(:merge_request, :with_diffs) }
+    let(:project) { merge_request.project }
+    let!(:diff_note) do
+      create(:diff_note_on_merge_request, project: project, noteable: merge_request)
+    end
+    let!(:draft_note) do
+      create(:draft_note_on_text_diff, author: user, merge_request: merge_request)
+    end
+
+    let(:file_paths) { merge_request.diffs.diff_files.map(&:file_path) }
+
+    subject do
+      merge_request.note_positions_for_paths(file_paths)
+    end
+
+    it 'returns a Gitlab::Diff::PositionCollection' do
+      expect(subject).to be_a(Gitlab::Diff::PositionCollection)
+    end
+
+    context 'when user is given' do
+      subject do
+        merge_request.note_positions_for_paths(file_paths, user)
+      end
+
+      it 'returns notes and draft notes positions' do
+        expect(subject).to match_array([draft_note.position, diff_note.position])
+      end
+    end
+
+    context 'when user is not given' do
+      subject do
+        merge_request.note_positions_for_paths(file_paths)
+      end
+
+      it 'returns notes positions' do
+        expect(subject).to match_array([diff_note.position])
+      end
+    end
+  end
+
   describe '#participant_approvers' do
     let(:approvers) { create_list(:user, 2) }
     let(:code_owners) { create_list(:user, 2) }
@@ -120,6 +162,7 @@ describe MergeRequest do
 
   describe '#has_license_management_reports?' do
     subject { merge_request.has_license_management_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -141,6 +184,7 @@ describe MergeRequest do
 
   describe '#has_dependency_scanning_reports?' do
     subject { merge_request.has_dependency_scanning_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -162,6 +206,7 @@ describe MergeRequest do
 
   describe '#has_container_scanning_reports?' do
     subject { merge_request.has_container_scanning_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -183,6 +228,7 @@ describe MergeRequest do
 
   describe '#has_sast_reports?' do
     subject { merge_request.has_sast_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -202,8 +248,38 @@ describe MergeRequest do
     end
   end
 
+  describe '#has_dast_reports?' do
+    subject { merge_request.has_dast_reports? }
+
+    let(:project) { create(:project, :repository) }
+
+    before do
+      stub_licensed_features(dast: true)
+    end
+
+    context 'when head pipeline has dast reports' do
+      let(:merge_request) { create(:ee_merge_request, :with_dast_reports, source_project: project) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when pipeline ran for an older commit than the branch head' do
+      let(:pipeline) { create(:ci_empty_pipeline, sha: 'notlatestsha') }
+      let(:merge_request) { create(:ee_merge_request, source_project: project, head_pipeline: pipeline) }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when head pipeline does not have dast reports' do
+      let(:merge_request) { create(:ee_merge_request, source_project: project) }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
   describe '#has_metrics_reports?' do
     subject { merge_request.has_metrics_reports? }
+
     let(:project) { create(:project, :repository) }
 
     before do
@@ -400,15 +476,27 @@ describe MergeRequest do
         end
 
         it 'returns status and data' do
-          expect_any_instance_of(Ci::CompareLicenseManagementReportsService)
+          expect_any_instance_of(Ci::CompareLicenseScanningReportsService)
               .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
 
           subject
         end
 
+        context 'cache key includes sofware license policies' do
+          let!(:license_1) { create(:software_license_policy, project: project) }
+          let!(:license_2) { create(:software_license_policy, project: project) }
+
+          it 'returns key with license information' do
+            expect_any_instance_of(Ci::CompareLicenseScanningReportsService)
+                .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
+
+            expect(subject[:key]).to include(*[license_1.id, license_1.approval_status, license_2.id, license_2.approval_status])
+          end
+        end
+
         context 'when cached results is not latest' do
           before do
-            allow_any_instance_of(Ci::CompareLicenseManagementReportsService)
+            allow_any_instance_of(Ci::CompareLicenseScanningReportsService)
                 .to receive(:latest?).and_return(false)
           end
 
@@ -509,7 +597,7 @@ describe MergeRequest do
 
   describe '#mergeable_with_quick_action?' do
     def create_pipeline(status)
-      pipeline = create(:ci_pipeline_with_one_job,
+      pipeline = create(:ci_pipeline,
         project: project,
         ref:     merge_request.source_branch,
         sha:     merge_request.diff_head_sha,
@@ -545,29 +633,6 @@ describe MergeRequest do
           expect(merge_request.mergeable_with_quick_action?(developer, last_diff_sha: mr_sha)).to be_truthy
         end
       end
-    end
-  end
-
-  describe '#all_approvers_including_groups' do
-    it 'returns correct set of users' do
-      user = create :user
-      user1 = create :user
-      user2 = create :user
-      create :user
-
-      project = create :project
-      group = create :group
-      group.add_maintainer user
-      create :approver_group, target: project, group: group
-
-      merge_request = create :merge_request, target_project: project, source_project: project
-      group1 = create :group
-      group1.add_maintainer user1
-      create :approver_group, target: merge_request, group: group1
-
-      create(:approver, user: user2, target: merge_request)
-
-      expect(merge_request.all_approvers_including_groups).to match_array([user1, user2])
     end
   end
 

@@ -35,6 +35,21 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     end
   end
 
+  # Search for a list of projects associated with registries,
+  # based on the query given in `query`.
+  #
+  # @param [String] query term that will search over :path, :name and :description
+  def self.with_search_by_project(query)
+    where(project: Geo::Fdw::Project.search(query))
+  end
+
+  def self.search(params)
+    designs_repositories = self
+    designs_repositories = designs_repositories.with_state(params[:sync_status]) if params[:sync_status].present?
+    designs_repositories = designs_repositories.with_search_by_project(params[:search]) if params[:search].present?
+    designs_repositories
+  end
+
   def fail_sync!(message, error, attrs = {})
     new_retry_count = retry_count + 1
 
@@ -46,16 +61,28 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     update!(attrs)
   end
 
-  # TODO: This method has to use optimistic locking to update state
   def finish_sync!(missing_on_primary = false)
     update!(
-      state: :synced,
       missing_on_primary: missing_on_primary,
       retry_count: 0,
       last_sync_failure: nil,
       retry_at: nil,
       force_to_redownload: false
     )
+
+    mark_synced_atomically
+  end
+
+  def mark_synced_atomically
+    # We can only update registry if state is started.
+    # If state is set to pending that means that repository_updated! was called
+    # during the sync so we need to reschedule new sync
+    num_rows = self.class
+                   .where(project_id: project_id)
+                   .where(state: 'started')
+                   .update_all(state: 'synced')
+
+    num_rows > 0
   end
 
   def should_be_redownloaded?

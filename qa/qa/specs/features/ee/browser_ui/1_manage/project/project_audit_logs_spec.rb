@@ -13,8 +13,7 @@ module QA
 
     describe 'Project audit logs' do
       before(:all) do
-        sign_in
-        @project = Resource::Project.fabricate_via_browser_ui! do |project|
+        @project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'awesome-project'
           project.initialize_with_readme = true
         end
@@ -28,7 +27,10 @@ module QA
 
       context "Add project" do
         before do
-          @project.visit!
+          Resource::Project.fabricate_via_browser_ui! do |project|
+            project.name = 'audit-add-project-via-ui'
+            project.initialize_with_readme = true
+          end.visit!
         end
         it_behaves_like 'project audit event logs', ["Add project"]
       end

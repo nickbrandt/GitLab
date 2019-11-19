@@ -3,7 +3,9 @@
 module Projects
   module Prometheus
     class AlertPresenter < Gitlab::View::Presenter::Delegated
-      RESERVED_ANNOTATIONS = %w(gitlab_incident_markdown).freeze
+      RESERVED_ANNOTATIONS = %w(gitlab_incident_markdown title).freeze
+      GENERIC_ALERT_SUMMARY_ANNOTATIONS = %w(monitoring_tool service hosts).freeze
+      MARKDOWN_LINE_BREAK = "  \n".freeze
 
       def full_title
         [environment_name, alert_title].compact.join(': ')
@@ -35,10 +37,10 @@ module Projects
 
       def issue_summary_markdown
         <<~MARKDOWN.chomp
-          ## Summary
+          #### Summary
 
           #{metadata_list}
-          #{annotation_list}
+          #{alert_details}
         MARKDOWN
       end
 
@@ -57,27 +59,51 @@ module Projects
       def metadata_list
         metadata = []
 
-        metadata << bullet('starts_at', starts_at) if starts_at
-        metadata << bullet('full_query', backtick(full_query)) if full_query
+        metadata << list_item('Start time', starts_at) if starts_at
+        metadata << list_item('full_query', backtick(full_query)) if full_query
+        metadata << list_item(service.label.humanize, service.value) if service
+        metadata << list_item(monitoring_tool.label.humanize, monitoring_tool.value) if monitoring_tool
+        metadata << list_item(hosts.label.humanize, host_links) if hosts
 
-        metadata.join("\n")
+        metadata.join(MARKDOWN_LINE_BREAK)
+      end
+
+      def alert_details
+        if annotation_list.present?
+          <<~MARKDOWN.chomp
+
+            #### Alert Details
+
+            #{annotation_list}
+          MARKDOWN
+        end
       end
 
       def annotation_list
         strong_memoize(:annotation_list) do
           annotations
-            .reject { |annotation| RESERVED_ANNOTATIONS.include?(annotation.label) }
-            .map { |annotation| bullet(annotation.label, annotation.value) }
-            .join("\n")
+            .reject { |annotation| annotation.label.in?(RESERVED_ANNOTATIONS | GENERIC_ALERT_SUMMARY_ANNOTATIONS) }
+            .map { |annotation| list_item(annotation.label, annotation.value) }
+            .join(MARKDOWN_LINE_BREAK)
         end
       end
 
-      def bullet(key, value)
-        "* #{key}: #{value}"
+      def list_item(key, value)
+        "**#{key}:** #{value}".strip
       end
 
       def backtick(value)
         "`#{value}`"
+      end
+
+      GENERIC_ALERT_SUMMARY_ANNOTATIONS.each do |annotation_name|
+        define_method(annotation_name) do
+          annotations.find { |a| a.label == annotation_name }
+        end
+      end
+
+      def host_links
+        Array(hosts.value).join(' ')
       end
     end
   end

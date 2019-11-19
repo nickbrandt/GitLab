@@ -292,10 +292,10 @@ For the value of:
   the web server to serve these requests is based on your setup.
 
   We have used `$CI_ENVIRONMENT_SLUG` here because it is guaranteed to be unique. If
-  you're using a workflow like [GitLab Flow](../workflow/gitlab_flow.md), collisions
+  you're using a workflow like [GitLab Flow](../topics/gitlab_flow.md), collisions
   are unlikely and you may prefer environment names to be more closely based on the
-  branch name. In that case, you could use `$CI_COMMIT_REF_SLUG` in `environment:url` in
-  the example above: `https://$CI_COMMIT_REF_SLUG.example.com`, which would give a URL
+  branch name. In that case, you could use `$CI_COMMIT_REF_NAME` in `environment:url` in
+  the example above: `https://$CI_COMMIT_REF_NAME.example.com`, which would give a URL
   of `https://100-do-the-thing.example.com`.
 
 NOTE: **Note:**
@@ -748,7 +748,7 @@ Re-using variables defined inside `script` as part of the environment name will 
 Below are some links you may find interesting:
 
 - [The `.gitlab-ci.yml` definition of environments](yaml/README.md#environment)
-- [A blog post on Deployments & Environments](https://about.gitlab.com/2016/08/26/ci-deployment-and-environments/)
+- [A blog post on Deployments & Environments](https://about.gitlab.com/blog/2016/08/26/ci-deployment-and-environments/)
 - [Review Apps - Use dynamic environments to deploy your code for every branch](review_apps/index.md)
 - [Deploy Boards for your applications running on Kubernetes](../user/project/deploy_boards.md) **(PREMIUM)**
 

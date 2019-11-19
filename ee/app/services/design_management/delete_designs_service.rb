@@ -17,6 +17,9 @@ module DesignManagement
       actions = build_actions
       version = run_actions(actions)
 
+      # Create a Geo event so changes will be replicated to secondary node(s)
+      repository.log_geo_updated_event
+
       success(version: version)
     end
 

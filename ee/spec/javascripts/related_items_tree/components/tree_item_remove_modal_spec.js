@@ -6,12 +6,13 @@ import TreeItemRemoveModal from 'ee/related_items_tree/components/tree_item_remo
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { ChildType } from 'ee/related_items_tree/constants';
+import { PathIdSeparator } from 'ee/related_issues/constants';
 
 import { mockParentItem, mockQueryResponse, mockIssue1 } from '../mock_data';
 
 const mockItem = Object.assign({}, mockIssue1, {
   type: ChildType.Issue,
-  pathIdSeparator: '#',
+  pathIdSeparator: PathIdSeparator.Issue,
   assignees: epicUtils.extractIssueAssignees(mockIssue1.assignees),
 });
 

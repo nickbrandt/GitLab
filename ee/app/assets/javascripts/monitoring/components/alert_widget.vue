@@ -1,16 +1,19 @@
 <script>
-import { s__ } from '~/locale';
+import { GlBadge, GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
+import { s__, sprintf } from '~/locale';
 import createFlash from '~/flash';
+import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
 import AlertsService from '../services/alerts_service';
 import { alertsValidator, queriesValidator } from '../validators';
-import { GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
 
 export default {
   components: {
     AlertWidgetForm,
+    GlBadge,
     GlLoadingIcon,
     GlModal,
+    Icon,
   },
   directives: {
     GlModal: GlModalDirective,
@@ -50,21 +53,19 @@ export default {
   },
   computed: {
     alertSummary() {
-      return Object.keys(this.alertsToManage)
-        .map(this.formatAlertSummary)
-        .join(', ');
-    },
-    supportsComputedAlerts() {
-      return gon.features && gon.features.prometheusComputedAlerts;
+      const alertsToManage = Object.keys(this.alertsToManage);
+      const alertCountMsg = sprintf(s__('PrometheusAlerts|%{count} alerts applied'), {
+        count: alertsToManage.length,
+      });
+
+      return alertsToManage.length > 1
+        ? alertCountMsg
+        : alertsToManage.map(this.formatAlertSummary)[0];
     },
   },
   created() {
     this.service = new AlertsService({ alertsEndpoint: this.alertsEndpoint });
     this.fetchAlertData();
-  },
-  beforeDestroy() {
-    // clean up external event listeners
-    document.removeEventListener('click', this.handleOutsideClick);
   },
   methods: {
     fetchAlertData() {
@@ -98,6 +99,9 @@ export default {
       const alertQuery = this.relevantQueries.find(query => query.metricId === alert.metricId);
 
       return `${alertQuery.label} ${alert.operator} ${alert.threshold}`;
+    },
+    showModal() {
+      this.$root.$emit('bv::show::modal', this.modalId);
     },
     hideModal() {
       this.errorMessage = null;
@@ -155,11 +159,22 @@ export default {
 </script>
 
 <template>
-  <div class="prometheus-alert-widget dropdown d-flex align-items-center">
-    <span v-if="errorMessage" class="alert-error-message"> {{ errorMessage }} </span>
-    <span v-else class="alert-current-setting text-secondary">
+  <div class="prometheus-alert-widget dropdown flex-grow-2 overflow-hidden">
+    <span v-if="errorMessage" class="alert-error-message">{{ errorMessage }}</span>
+    <span
+      v-else
+      class="alert-current-setting text-secondary cursor-pointer d-flex align-items-end"
+      @click="showModal"
+    >
+      <gl-badge
+        v-if="alertSummary"
+        variant="secondary"
+        class="d-flex-center text-secondary text-truncate"
+      >
+        <icon name="notifications" class="s18 append-right-4" :size="16" />
+        <span class="text-truncate">{{ alertSummary }}</span>
+      </gl-badge>
       <gl-loading-icon v-show="isLoading" :inline="true" />
-      {{ alertSummary }}
     </span>
     <alert-widget-form
       ref="widgetForm"

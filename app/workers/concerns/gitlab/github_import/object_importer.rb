@@ -12,6 +12,9 @@ module Gitlab
         include GithubImport::Queue
         include ReschedulingMethods
         include NotifyUponDeath
+
+        feature_category :importers
+        worker_has_external_dependencies!
       end
 
       # project - An instance of `Project` to import the data into.

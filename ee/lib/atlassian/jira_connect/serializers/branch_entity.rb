@@ -4,7 +4,9 @@ module Atlassian
   module JiraConnect
     module Serializers
       class BranchEntity < BaseEntity
-        expose :name, as: :id
+        expose :id do |branch|
+          Digest::SHA256.hexdigest(branch.name)
+        end
         expose :issueKeys do |branch|
           JiraIssueKeyExtractor.new(branch.name).issue_keys
         end

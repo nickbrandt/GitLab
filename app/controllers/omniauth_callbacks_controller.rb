@@ -47,7 +47,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def omniauth_error
     @provider = params[:provider]
     @error = params[:error]
-    render 'errors/omniauth_error', layout: "oauth_error", status: 422
+    render 'errors/omniauth_error', layout: "oauth_error", status: :unprocessable_entity
   end
 
   def cas3
@@ -148,6 +148,11 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
       if user.two_factor_enabled? && !auth_user.bypass_two_factor?
         prompt_for_two_factor(user)
       else
+        if user.deactivated?
+          user.activate
+          flash[:notice] = _('Welcome back! Your account had been deactivated due to inactivity but is now reactivated.')
+        end
+
         sign_in_and_redirect(user, event: :authentication)
       end
     else

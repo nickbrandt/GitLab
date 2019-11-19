@@ -44,18 +44,8 @@ describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state 
       stub_ci_pipeline_yaml_file(YAML.dump(ci_yaml))
     end
 
-    shared_examples_for 'creates a merge request pipeline' do
-      it do
-        subject
-
-        expect(merge_request.all_pipelines.count).to eq(1)
-        expect(merge_request.all_pipelines.last).to be_merge_request_pipeline
-        expect(merge_request.all_pipelines.last).not_to be_detached_merge_request_pipeline
-      end
-    end
-
-    shared_examples_for 'creates a detached merge request pipeline' do
-      it do
+    shared_examples_for 'detached merge request pipeline' do
+      it 'creates a detached merge request pipeline', :sidekiq_might_not_need_inline do
         subject
 
         expect(merge_request.all_pipelines.count).to eq(1)
@@ -64,20 +54,26 @@ describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state 
       end
     end
 
-    it_behaves_like 'creates a merge request pipeline'
+    it 'creates a merge request pipeline', :sidekiq_might_not_need_inline do
+      subject
+
+      expect(merge_request.all_pipelines.count).to eq(1)
+      expect(merge_request.all_pipelines.last).to be_merge_request_pipeline
+      expect(merge_request.all_pipelines.last).not_to be_detached_merge_request_pipeline
+    end
 
     context 'when merge request is WIP' do
       before do
         merge_request.update!(title: merge_request.wip_title)
       end
 
-      it_behaves_like 'creates a detached merge request pipeline'
+      it_behaves_like 'detached merge request pipeline'
     end
 
     context 'when project setting for merge request pipelines is disabled' do
       let(:merge_pipelines_enabled) { false }
 
-      it_behaves_like 'creates a detached merge request pipeline'
+      it_behaves_like 'detached merge request pipeline'
     end
 
     context 'when ci_use_merge_request_ref feature flag is disabled' do
@@ -85,13 +81,13 @@ describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state 
         stub_feature_flags(ci_use_merge_request_ref: false)
       end
 
-      it_behaves_like 'creates a detached merge request pipeline'
+      it_behaves_like 'detached merge request pipeline'
     end
 
     context 'when merge request is submitted from fork' do
       let(:source_project) { fork_project(project, nil, repository: true) }
 
-      it_behaves_like 'creates a detached merge request pipeline'
+      it_behaves_like 'detached merge request pipeline'
     end
 
     context 'when the CreateService is retried' do
@@ -105,14 +101,14 @@ describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state 
     context 'when merge request has no commit' do
       let(:source_branch) { 'empty-branch' }
 
-      it_behaves_like 'creates a detached merge request pipeline'
+      it_behaves_like 'detached merge request pipeline'
     end
 
     context 'when merge request has a conflict' do
       let(:source_branch) { 'feature' }
       let(:target_branch) { 'feature_conflict' }
 
-      it_behaves_like 'creates a detached merge request pipeline'
+      it_behaves_like 'detached merge request pipeline'
     end
   end
 end

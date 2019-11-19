@@ -38,5 +38,13 @@ class SoftwareLicensePolicy < ApplicationRecord
     with_license.where(SoftwareLicense.arel_table[:name].lower.in(Array(license_name).map(&:downcase)))
   end
 
-  delegate :name, to: :software_license
+  scope :by_spdx, -> (spdx_identifier) do
+    with_license.where(software_licenses: { spdx_identifier: spdx_identifier })
+  end
+
+  delegate :name, :spdx_identifier, to: :software_license
+
+  def self.workaround_cache_key
+    pluck(:id, :approval_status).flatten
+  end
 end

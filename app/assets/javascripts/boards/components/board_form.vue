@@ -133,7 +133,7 @@ export default {
       if (this.board.name.length === 0) return;
       this.isLoading = true;
       if (this.isDeleteForm) {
-        gl.boardService
+        boardsStore
           .deleteBoard(this.currentBoard)
           .then(() => {
             visitUrl(boardsStore.rootPath);
@@ -143,7 +143,7 @@ export default {
             this.isLoading = false;
           });
       } else {
-        gl.boardService
+        boardsStore
           .createBoard(this.board)
           .then(resp => resp.data)
           .then(data => {
@@ -194,6 +194,7 @@ export default {
             ref="name"
             v-model="board.name"
             class="form-control"
+            data-qa-selector="board_name_field"
             type="text"
             :placeholder="__('Enter board name')"
             @keyup.enter="submit"

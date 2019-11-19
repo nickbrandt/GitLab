@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Group do
-  let!(:group) { create(:group, :access_requestable) }
+  let!(:group) { create(:group) }
 
   describe 'associations' do
     it { is_expected.to have_many :projects }
@@ -331,7 +331,7 @@ describe Group do
   end
 
   describe '#avatar_url' do
-    let!(:group) { create(:group, :access_requestable, :with_avatar) }
+    let!(:group) { create(:group, :with_avatar) }
     let(:user) { create(:user) }
 
     context 'when avatar file is uploaded' do
@@ -523,6 +523,128 @@ describe Group do
 
     it { is_expected.to be_valid }
     it { expect(subject.parent).to be_kind_of(described_class) }
+  end
+
+  describe '#max_member_access_for_user' do
+    context 'group shared with another group' do
+      let(:parent_group_user) { create(:user) }
+      let(:group_user) { create(:user) }
+      let(:child_group_user) { create(:user) }
+
+      let_it_be(:group_parent) { create(:group, :private) }
+      let_it_be(:group) { create(:group, :private, parent: group_parent) }
+      let_it_be(:group_child) { create(:group, :private, parent: group) }
+
+      let_it_be(:shared_group_parent) { create(:group, :private) }
+      let_it_be(:shared_group) { create(:group, :private, parent: shared_group_parent) }
+      let_it_be(:shared_group_child) { create(:group, :private, parent: shared_group) }
+
+      before do
+        group_parent.add_owner(parent_group_user)
+        group.add_owner(group_user)
+        group_child.add_owner(child_group_user)
+
+        create(:group_group_link, { shared_with_group: group,
+                                    shared_group: shared_group,
+                                    group_access: GroupMember::DEVELOPER })
+      end
+
+      context 'when feature flag share_group_with_group is enabled' do
+        before do
+          stub_feature_flags(share_group_with_group: true)
+        end
+
+        context 'with user in the group' do
+          let(:user) { group_user }
+
+          it 'returns correct access level' do
+            expect(shared_group_parent.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group.max_member_access_for_user(user)).to eq(Gitlab::Access::DEVELOPER)
+            expect(shared_group_child.max_member_access_for_user(user)).to eq(Gitlab::Access::DEVELOPER)
+          end
+        end
+
+        context 'with user in the parent group' do
+          let(:user) { parent_group_user }
+
+          it 'returns correct access level' do
+            expect(shared_group_parent.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group_child.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+          end
+        end
+
+        context 'with user in the child group' do
+          let(:user) { child_group_user }
+
+          it 'returns correct access level' do
+            expect(shared_group_parent.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group_child.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+          end
+        end
+      end
+
+      context 'when feature flag share_group_with_group is disabled' do
+        before do
+          stub_feature_flags(share_group_with_group: false)
+        end
+
+        context 'with user in the group' do
+          let(:user) { group_user }
+
+          it 'returns correct access level' do
+            expect(shared_group_parent.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group_child.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+          end
+        end
+
+        context 'with user in the parent group' do
+          let(:user) { parent_group_user }
+
+          it 'returns correct access level' do
+            expect(shared_group_parent.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group_child.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+          end
+        end
+
+        context 'with user in the child group' do
+          let(:user) { child_group_user }
+
+          it 'returns correct access level' do
+            expect(shared_group_parent.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+            expect(shared_group_child.max_member_access_for_user(user)).to eq(Gitlab::Access::NO_ACCESS)
+          end
+        end
+      end
+    end
+
+    context 'multiple groups shared with group' do
+      let(:user) { create(:user) }
+      let(:group) { create(:group, :private) }
+      let(:shared_group_parent) { create(:group, :private) }
+      let(:shared_group) { create(:group, :private, parent: shared_group_parent) }
+
+      before do
+        stub_feature_flags(share_group_with_group: true)
+
+        group.add_owner(user)
+
+        create(:group_group_link, { shared_with_group: group,
+                                    shared_group: shared_group,
+                                    group_access: GroupMember::DEVELOPER })
+        create(:group_group_link, { shared_with_group: group,
+                                    shared_group: shared_group_parent,
+                                    group_access: GroupMember::MAINTAINER })
+      end
+
+      it 'returns correct access level' do
+        expect(shared_group.max_member_access_for_user(user)).to eq(Gitlab::Access::MAINTAINER)
+      end
+    end
   end
 
   describe '#members_with_parents' do
@@ -880,22 +1002,6 @@ describe Group do
     end
   end
 
-  describe '#has_parent?' do
-    context 'when the group has a parent' do
-      it 'is truthy' do
-        group = create(:group, :nested)
-        expect(group.has_parent?).to be_truthy
-      end
-    end
-
-    context 'when the group has no parent' do
-      it 'is falsy' do
-        group = create(:group, parent: nil)
-        expect(group.has_parent?).to be_falsy
-      end
-    end
-  end
-
   context 'with uploads' do
     it_behaves_like 'model with uploads', true do
       let(:model_object) { create(:group, :with_avatar) }
@@ -1056,6 +1162,23 @@ describe Group do
       active_owners_in_recent_sign_in_desc_order = group.members_and_requesters.where(id: active_owners).order_recent_sign_in.limit(10)
 
       expect(group.access_request_approvers_to_be_notified).to eq(active_owners_in_recent_sign_in_desc_order)
+    end
+  end
+
+  describe '.groups_including_descendants_by' do
+    it 'returns the expected groups for a group and its descendants' do
+      parent_group1 = create(:group)
+      child_group1 = create(:group, parent: parent_group1)
+      child_group2 = create(:group, parent: parent_group1)
+
+      parent_group2 = create(:group)
+      child_group3 = create(:group, parent: parent_group2)
+
+      create(:group)
+
+      groups = described_class.groups_including_descendants_by([parent_group2.id, parent_group1.id])
+
+      expect(groups).to contain_exactly(parent_group1, parent_group2, child_group1, child_group2, child_group3)
     end
   end
 end

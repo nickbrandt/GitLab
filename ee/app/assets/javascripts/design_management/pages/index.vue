@@ -1,25 +1,30 @@
 <script>
-import { GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
+import { GlLoadingIcon, GlEmptyState, GlButton } from '@gitlab/ui';
 import _ from 'underscore';
 import createFlash from '~/flash';
 import { s__, sprintf } from '~/locale';
-import DesignList from '../components/list/index.vue';
-import UploadForm from '../components/upload/form.vue';
 import UploadButton from '../components/upload/button.vue';
+import DeleteButton from '../components/delete_button.vue';
+import Design from '../components/list/item.vue';
+import DesignDestroyer from '../components/design_destroyer.vue';
+import DesignVersionDropdown from '../components/upload/design_version_dropdown.vue';
 import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.graphql';
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
-import allDesignsMixin from '../mixins/all_designs';
 import projectQuery from '../graphql/queries/project.query.graphql';
+import allDesignsMixin from '../mixins/all_designs';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 
 export default {
   components: {
     GlLoadingIcon,
-    DesignList,
-    UploadForm,
     UploadButton,
     GlEmptyState,
+    GlButton,
+    Design,
+    DesignDestroyer,
+    DesignVersionDropdown,
+    DeleteButton,
   },
   mixins: [allDesignsMixin],
   apollo: {
@@ -40,6 +45,7 @@ export default {
         createDesign: false,
       },
       isSaving: false,
+      selectedDesigns: [],
     };
   },
   computed: {
@@ -49,18 +55,35 @@ export default {
     canCreateDesign() {
       return this.permissions.createDesign;
     },
-    showUploadForm() {
-      return this.canCreateDesign && this.hasDesigns;
+    showToolbar() {
+      return this.canCreateDesign && this.allVersions.length > 0;
     },
     hasDesigns() {
       return this.designs.length > 0;
+    },
+    hasSelectedDesigns() {
+      return this.selectedDesigns.length > 0;
+    },
+    canDeleteDesigns() {
+      return this.isLatestVersion && this.hasSelectedDesigns;
+    },
+    projectQueryBody() {
+      return {
+        query: projectQuery,
+        variables: { fullPath: this.projectPath, iid: this.issueIid, atVersion: null },
+      };
+    },
+    selectAllButtonText() {
+      return this.hasSelectedDesigns
+        ? s__('DesignManagement|Deselect all')
+        : s__('DesignManagement|Select all');
     },
   },
   methods: {
     onUploadDesign(files) {
       if (!this.canCreateDesign) return null;
 
-      if (files.length >= MAXIMUM_FILE_UPLOAD_LIMIT) {
+      if (files.length > MAXIMUM_FILE_UPLOAD_LIMIT) {
         createFlash(
           sprintf(
             s__(
@@ -83,11 +106,17 @@ export default {
         image: '',
         filename: file.name,
         fullPath: '',
+        notesCount: 0,
+        event: 'NONE',
         diffRefs: {
           __typename: 'DiffRefs',
           baseSha: '',
           startSha: '',
           headSha: '',
+        },
+        discussions: {
+          __typename: 'DesignDiscussion',
+          edges: [],
         },
         versions: {
           __typename: 'DesignVersionConnection',
@@ -116,18 +145,18 @@ export default {
             hasUpload: true,
           },
           update: (store, { data: { designManagementUpload } }) => {
-            const data = store.readQuery({
-              query: projectQuery,
-              variables: { fullPath: this.projectPath, iid: this.issueIid, atVersion: null },
-            });
+            const data = store.readQuery(this.projectQueryBody);
 
-            const newDesigns = data.project.issue.designs.designs.edges.reduce((acc, design) => {
-              if (!acc.find(d => d.filename === design.node.filename)) {
-                acc.push(design.node);
-              }
+            const newDesigns = data.project.issue.designCollection.designs.edges.reduce(
+              (acc, design) => {
+                if (!acc.find(d => d.filename === design.node.filename)) {
+                  acc.push(design.node);
+                }
 
-              return acc;
-            }, designManagementUpload.designs);
+                return acc;
+              },
+              designManagementUpload.designs,
+            );
 
             let newVersionNode;
             const findNewVersions = designManagementUpload.designs.find(design => design.versions);
@@ -142,41 +171,29 @@ export default {
 
             const newVersions = [
               ...(newVersionNode || []),
-              ...data.project.issue.designs.versions.edges,
+              ...data.project.issue.designCollection.versions.edges,
             ];
 
-            const newQueryData = {
-              project: {
-                // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-                // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-                __typename: 'Project',
-                id: '',
-                issue: {
-                  // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-                  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-                  __typename: 'Issue',
-                  designs: {
-                    __typename: 'DesignCollection',
-                    designs: {
-                      __typename: 'DesignConnection',
-                      edges: newDesigns.map(design => ({
-                        __typename: 'DesignEdge',
-                        node: design,
-                      })),
-                    },
-                    versions: {
-                      __typename: 'DesignVersionConnection',
-                      edges: newVersions,
-                    },
-                  },
-                },
+            const updatedDesigns = {
+              __typename: 'DesignCollection',
+              designs: {
+                __typename: 'DesignConnection',
+                edges: newDesigns.map(design => ({
+                  __typename: 'DesignEdge',
+                  node: design,
+                })),
+              },
+              versions: {
+                __typename: 'DesignVersionConnection',
+                edges: newVersions,
               },
             };
 
+            data.project.issue.designCollection = updatedDesigns;
+
             store.writeQuery({
-              query: projectQuery,
-              variables: { fullPath: this.projectPath, iid: this.issueIid, atVersion: null },
-              data: newQueryData,
+              ...this.projectQueryBody,
+              data,
             });
           },
           optimisticResponse: {
@@ -200,25 +217,87 @@ export default {
           this.isSaving = false;
         });
     },
+    changeSelectedDesigns(filename) {
+      if (this.isDesignSelected(filename)) {
+        this.selectedDesigns = this.selectedDesigns.filter(design => design !== filename);
+      } else {
+        this.selectedDesigns.push(filename);
+      }
+    },
+    toggleDesignsSelection() {
+      if (this.hasSelectedDesigns) {
+        this.selectedDesigns = [];
+      } else {
+        this.selectedDesigns = this.designs.map(design => design.filename);
+      }
+    },
+    isDesignSelected(filename) {
+      return this.selectedDesigns.includes(filename);
+    },
+    onDesignDelete() {
+      this.selectedDesigns = [];
+      if (this.$route.query.version) this.$router.push({ name: 'designs' });
+    },
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.selectedDesigns = [];
+    next();
   },
 };
 </script>
 
 <template>
   <div>
-    <upload-form
-      v-if="showUploadForm"
-      :can-upload-design="canCreateDesign"
-      :is-saving="isSaving"
-      :all-versions="allVersions"
-      @upload="onUploadDesign"
-    />
+    <header v-if="showToolbar" class="row-content-block border-top-0 p-2 d-flex">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <design-version-dropdown />
+        <div class="d-flex">
+          <gl-button
+            v-if="isLatestVersion"
+            variant="link"
+            class="mr-2 js-select-all"
+            @click="toggleDesignsSelection"
+            >{{ selectAllButtonText }}</gl-button
+          >
+          <design-destroyer
+            v-slot="{ mutate, loading, error }"
+            :filenames="selectedDesigns"
+            :project-path="projectPath"
+            :iid="issueIid"
+            @done="onDesignDelete"
+          >
+            <delete-button
+              v-if="isLatestVersion"
+              :is-deleting="loading"
+              button-class="btn-danger btn-inverted mr-2"
+              :has-selected-designs="hasSelectedDesigns"
+              @deleteSelectedDesigns="mutate()"
+            >
+              {{ s__('DesignManagement|Delete selected') }}
+              <gl-loading-icon v-if="loading" inline class="ml-1" />
+            </delete-button>
+          </design-destroyer>
+          <upload-button v-if="canCreateDesign" :is-saving="isSaving" @upload="onUploadDesign" />
+        </div>
+      </div>
+    </header>
     <div class="mt-4">
       <gl-loading-icon v-if="isLoading" size="md" />
       <div v-else-if="error" class="alert alert-danger">
         {{ __('An error occurred while loading designs. Please try again.') }}
       </div>
-      <design-list v-else-if="hasDesigns" :designs="designs" />
+      <ol v-else-if="hasDesigns" class="list-unstyled row">
+        <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
+          <design v-bind="design" />
+          <input
+            v-if="isLatestVersion && canCreateDesign"
+            :checked="isDesignSelected(design.filename)"
+            type="checkbox"
+            class="design-checkbox"
+            @change="changeSelectedDesigns(design.filename)"
+          />
+        </li>
+      </ol>
       <gl-empty-state
         v-else
         :title="s__('DesignManagement|The one place for your designs')"

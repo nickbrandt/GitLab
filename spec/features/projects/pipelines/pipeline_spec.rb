@@ -98,6 +98,16 @@ describe 'Pipeline', :js do
       end
     end
 
+    it 'shows links to the related merge requests' do
+      visit_pipeline
+
+      within '.related-merge-request-info' do
+        pipeline.all_merge_requests.map do |merge_request|
+          expect(page).to have_link(project_merge_request_path(project, merge_request))
+        end
+      end
+    end
+
     it_behaves_like 'showing user status' do
       let(:user_with_status) { pipeline.user }
 
@@ -118,7 +128,7 @@ describe 'Pipeline', :js do
           end
         end
 
-        it 'cancels the running build and shows retry button' do
+        it 'cancels the running build and shows retry button', :sidekiq_might_not_need_inline do
           find('#ci-badge-deploy .ci-action-icon-container').click
 
           page.within('#ci-badge-deploy') do
@@ -136,7 +146,7 @@ describe 'Pipeline', :js do
           end
         end
 
-        it 'cancels the preparing build and shows retry button' do
+        it 'cancels the preparing build and shows retry button', :sidekiq_might_not_need_inline do
           find('#ci-badge-deploy .ci-action-icon-container').click
 
           page.within('#ci-badge-deploy') do
@@ -176,7 +186,7 @@ describe 'Pipeline', :js do
           end
         end
 
-        it 'unschedules the delayed job and shows play button as a manual job' do
+        it 'unschedules the delayed job and shows play button as a manual job', :sidekiq_might_not_need_inline do
           find('#ci-badge-delayed-job .ci-action-icon-container').click
 
           page.within('#ci-badge-delayed-job') do
@@ -295,7 +305,9 @@ describe 'Pipeline', :js do
           find('.js-retry-button').click
         end
 
-        it { expect(page).not_to have_content('Retry') }
+        it 'does not show a "Retry" button', :sidekiq_might_not_need_inline do
+          expect(page).not_to have_content('Retry')
+        end
       end
     end
 
@@ -311,7 +323,9 @@ describe 'Pipeline', :js do
           click_on 'Cancel running'
         end
 
-        it { expect(page).not_to have_content('Cancel running') }
+        it 'does not show a "Cancel running" button', :sidekiq_might_not_need_inline do
+          expect(page).not_to have_content('Cancel running')
+        end
       end
     end
 
@@ -390,7 +404,7 @@ describe 'Pipeline', :js do
           visit project_pipeline_path(source_project, pipeline)
         end
 
-        it 'shows the pipeline information' do
+        it 'shows the pipeline information', :sidekiq_might_not_need_inline do
           within '.pipeline-info' do
             expect(page).to have_content("#{pipeline.statuses.count} jobs " \
                                          "for !#{merge_request.iid} " \
@@ -463,7 +477,7 @@ describe 'Pipeline', :js do
           visit project_pipeline_path(source_project, pipeline)
         end
 
-        it 'shows the pipeline information' do
+        it 'shows the pipeline information', :sidekiq_might_not_need_inline do
           within '.pipeline-info' do
             expect(page).to have_content("#{pipeline.statuses.count} jobs " \
                                        "for !#{merge_request.iid} " \
@@ -641,7 +655,9 @@ describe 'Pipeline', :js do
           find('.js-retry-button').click
         end
 
-        it { expect(page).not_to have_content('Retry') }
+        it 'does not show a "Retry" button', :sidekiq_might_not_need_inline do
+          expect(page).not_to have_content('Retry')
+        end
       end
     end
 
@@ -653,7 +669,9 @@ describe 'Pipeline', :js do
           click_on 'Cancel running'
         end
 
-        it { expect(page).not_to have_content('Cancel running') }
+        it 'does not show a "Cancel running" button', :sidekiq_might_not_need_inline do
+          expect(page).not_to have_content('Cancel running')
+        end
       end
     end
 
@@ -768,10 +786,10 @@ describe 'Pipeline', :js do
         expect(page).to have_content(failed_build.stage)
       end
 
-      it 'does not show trace' do
+      it 'does not show log' do
         subject
 
-        expect(page).to have_content('No job trace')
+        expect(page).to have_content('No job log')
       end
     end
 

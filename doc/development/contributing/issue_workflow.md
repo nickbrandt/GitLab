@@ -26,10 +26,11 @@ on those issues. Please select someone with relevant experience from the
 If there is nobody mentioned with that expertise look in the commit history for
 the affected files to find someone.
 
-We also use [GitLab Triage](https://gitlab.com/gitlab-org/gitlab-triage) to
-automate some triaging policies. This is currently set up as a
-[scheduled pipeline](https://gitlab.com/gitlab-org/quality/triage-ops/pipeline_schedules/10512/edit)
-running on [quality/triage-ops](https://gitlab.com/gitlab-org/quality/triage-ops) project.
+We also use [GitLab Triage](https://gitlab.com/gitlab-org/gitlab-triage) to automate
+some triaging policies. This is currently set up as a scheduled pipeline
+(`https://gitlab.com/gitlab-org/quality/triage-ops/pipeline_schedules/10512/editpipeline_schedules/10512/edit`,
+must have at least developer access to the project) running on [quality/triage-ops](https://gitlab.com/gitlab-org/quality/triage-ops)
+project.
 
 ## Labels
 
@@ -267,7 +268,7 @@ Each issue scheduled for the current milestone should be labeled ~Deliverable
 or ~"Stretch". Any open issue for a previous milestone should be labeled
 ~"Next Patch Release", or otherwise rescheduled to a different milestone.
 
-#### Priority labels
+### Priority labels
 
 Priority labels help us define the time a ~bug fix should be completed. Priority determines how quickly the defect turnaround time must be.
 If there are multiple defects, the priority decides which defect has to be fixed immediately versus later.

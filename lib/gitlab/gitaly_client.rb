@@ -86,7 +86,7 @@ module Gitlab
       if name == :health_check
         Grpc::Health::V1::Health::Stub
       else
-        Gitaly.const_get(name.to_s.camelcase.to_sym).const_get(:Stub)
+        Gitaly.const_get(name.to_s.camelcase.to_sym, false).const_get(:Stub, false)
       end
     end
 
@@ -142,18 +142,39 @@ module Gitlab
     #   kwargs.merge(deadline: Time.now + 10)
     # end
     #
-    def self.call(storage, service, rpc, request, remote_storage: nil, timeout: default_timeout)
-      start = Gitlab::Metrics::System.monotonic_time
-      request_hash = request.is_a?(Google::Protobuf::MessageExts) ? request.to_h : {}
+    def self.call(storage, service, rpc, request, remote_storage: nil, timeout: default_timeout, &block)
+      self.measure_timings(service, rpc, request) do
+        self.execute(storage, service, rpc, request, remote_storage: remote_storage, timeout: timeout, &block)
+      end
+    end
 
+    # This method is like GitalyClient.call but should be used with
+    # Gitaly streaming RPCs. It measures how long the the RPC took to
+    # produce the full response, not just the initial response.
+    def self.streaming_call(storage, service, rpc, request, remote_storage: nil, timeout: default_timeout)
+      self.measure_timings(service, rpc, request) do
+        response = self.execute(storage, service, rpc, request, remote_storage: remote_storage, timeout: timeout)
+
+        yield(response)
+      end
+    end
+
+    def self.execute(storage, service, rpc, request, remote_storage:, timeout:)
       enforce_gitaly_request_limits(:call)
 
       kwargs = request_kwargs(storage, timeout: timeout.to_f, remote_storage: remote_storage)
       kwargs = yield(kwargs) if block_given?
 
       stub(service, storage).__send__(rpc, request, kwargs) # rubocop:disable GitlabSecurity/PublicSend
+    end
+
+    def self.measure_timings(service, rpc, request)
+      start = Gitlab::Metrics::System.monotonic_time
+
+      yield
     ensure
       duration = Gitlab::Metrics::System.monotonic_time - start
+      request_hash = request.is_a?(Google::Protobuf::MessageExts) ? request.to_h : {}
 
       # Keep track, separately, for the performance bar
       self.query_time += duration
@@ -362,11 +383,15 @@ module Gitlab
     end
 
     def self.long_timeout
-      if Sidekiq.server?
-        6.hours
-      else
+      if web_app_server?
         default_timeout
+      else
+        6.hours
       end
+    end
+
+    def self.web_app_server?
+      defined?(::Unicorn) || defined?(::Puma)
     end
 
     def self.storage_metadata_file_path(storage)

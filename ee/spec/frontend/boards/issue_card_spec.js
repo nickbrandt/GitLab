@@ -3,14 +3,16 @@ import ListLabel from '~/boards/models/label';
 import IssueCardInner from '~/boards/components/issue_card_inner.vue';
 import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
 import ListIssueEE from 'ee/boards/models/issue';
+import defaultStore from '~/boards/stores';
 
 describe('Issue card component', () => {
   let wrapper;
   let issue;
   let list;
 
-  const createComponent = (props = {}) => {
+  const createComponent = (props = {}, store = defaultStore) => {
     wrapper = mount(IssueCardInner, {
+      store,
       propsData: {
         list,
         issue,
@@ -20,6 +22,7 @@ describe('Issue card component', () => {
         ...props,
       },
       sync: false,
+      attachToDocument: true,
     });
   };
 
@@ -86,6 +89,19 @@ describe('Issue card component', () => {
 
       expect(wrapper.findAll('.badge').length).toBe(3);
       expect(wrapper.text()).toContain(title);
+    });
+
+    it('shows no labels when the isShowingLabels state is false', () => {
+      const store = {
+        ...defaultStore,
+        state: {
+          ...defaultStore.state,
+          isShowingLabels: false,
+        },
+      };
+      createComponent({}, store);
+
+      expect(wrapper.findAll('.board-card-labels').length).toBe(0);
     });
   });
 

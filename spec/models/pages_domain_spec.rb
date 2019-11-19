@@ -160,7 +160,7 @@ describe PagesDomain do
       end
 
       context 'when curve is set explicitly by parameters' do
-        it 'adds errors to private key', :quarantine do
+        it 'adds errors to private key' do
           domain = build(:pages_domain, :explicit_ecdsa)
 
           expect(domain).to be_invalid
@@ -293,11 +293,13 @@ describe PagesDomain do
   describe "#https?" do
     context "when a certificate is present" do
       subject { build(:pages_domain) }
+
       it { is_expected.to be_https }
     end
 
     context "when no certificate is present" do
       subject { build(:pages_domain, :without_certificate) }
+
       it { is_expected.not_to be_https }
     end
   end

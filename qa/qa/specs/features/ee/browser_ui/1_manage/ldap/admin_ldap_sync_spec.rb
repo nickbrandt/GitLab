@@ -39,14 +39,14 @@ module QA
       end
 
       def run_ldap_service_with_user_as(user_status)
-        Service::LDAP.new(user_status).tap do |runner|
+        Service::DockerRun::LDAP.new(user_status).tap do |runner|
           runner.pull
           runner.register!
         end
       end
 
       def remove_ldap_service_with_user_as(user_status)
-        Service::LDAP.new(user_status).remove!
+        Service::DockerRun::LDAP.new(user_status).remove!
       end
 
       def login_with_ldap_admin_user

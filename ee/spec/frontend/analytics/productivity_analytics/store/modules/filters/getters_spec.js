@@ -29,8 +29,8 @@ describe('Productivity analytics filter getters', () => {
           author_username: 'root',
           group_id: 'gitlab-org',
           label_name: ['labelxyz'],
-          merged_at_after: '2019-09-01',
-          merged_at_before: '2019-09-07',
+          merged_at_after: '2019-09-01T00:00:00Z',
+          merged_at_before: '2019-09-07T23:59:59Z',
           milestone_title: 'foo',
           project_id: 'gitlab-org/gitlab-test',
         };
@@ -47,8 +47,8 @@ describe('Productivity analytics filter getters', () => {
           author_username: 'root',
           group_id: 'gitlab-org',
           label_name: ['labelxyz'],
-          merged_at_after: '2019-08-02',
-          merged_at_before: '2019-09-07',
+          merged_at_after: '2019-08-02T00:00:00Z',
+          merged_at_before: '2019-09-07T23:59:59Z',
           milestone_title: 'foo',
           project_id: 'gitlab-org/gitlab-test',
         };

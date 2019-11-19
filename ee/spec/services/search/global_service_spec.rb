@@ -15,7 +15,7 @@ describe Search::GlobalService do
 
   it_behaves_like 'EE search service shared examples', ::Gitlab::SearchResults, ::Gitlab::Elastic::SearchResults do
     let(:scope) { nil }
-    let(:service) { described_class.new(user, search: '*') }
+    let(:service) { described_class.new(user, params) }
   end
 
   context 'visibility', :elastic do

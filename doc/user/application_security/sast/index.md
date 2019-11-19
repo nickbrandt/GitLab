@@ -76,9 +76,10 @@ The following table shows which languages, package managers and frameworks are s
 | Node.js                                                                     | [NodeJsScan](https://github.com/ajinabraham/NodeJsScan)                                | 11.1                         |
 | PHP                                                                         | [phpcs-security-audit](https://github.com/FloeDesignTechnologies/phpcs-security-audit) | 10.8                         |
 | Python ([pip](https://pip.pypa.io/en/stable/))                              | [bandit](https://github.com/PyCQA/bandit)                                              | 10.3                         |
+| React                                                                       | [ESLint react plugin](https://github.com/yannickcr/eslint-plugin-react)                | 12.5                         |
 | Ruby on Rails                                                               | [brakeman](https://brakemanscanner.org)                                                | 10.3                         |
 | Scala ([Ant](https://ant.apache.org/), [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) and [SBT](https://www.scala-sbt.org/)) | [SpotBugs](https://spotbugs.github.io/) with the [find-sec-bugs](https://find-sec-bugs.github.io/) plugin | 11.0 (SBT) & 11.9 (Ant, Gradle, Maven) |
-| Typescript                                                                  | [TSLint config security](https://github.com/webschik/tslint-config-security/)          | 11.9                         |
+| TypeScript                                                                  | [TSLint config security](https://github.com/webschik/tslint-config-security/)          | 11.9                         |
 
 NOTE: **Note:**
 The Java analyzers can also be used for variants like the
@@ -113,10 +114,9 @@ is used to detect the languages/frameworks and in turn runs the matching scan to
 
 ### Customizing the SAST settings
 
-The SAST settings can be changed through environment variables by using the
+The SAST settings can be changed through [environment variables](#available-variables)
+by using the
 [`variables`](../../../ci/yaml/README.md#variables) parameter in `.gitlab-ci.yml`.
-These variables are documented in the
-[SAST tool documentation](https://gitlab.com/gitlab-org/security-products/sast#settings).
 
 In the following example, we include the SAST template and at the same time we
 set the `SAST_GOSEC_LEVEL` variable to `2`:
@@ -132,6 +132,29 @@ variables:
 Because the template is [evaluated before](../../../ci/yaml/README.md#include)
 the pipeline configuration, the last mention of the variable will take precedence.
 
+### Overriding the SAST template
+
+If you want to override the job definition (for example, change properties like
+`variables` or `dependencies`), you need to declare a `sast` job after the
+template inclusion and specify any additional keys under it. For example:
+
+```yaml
+include:
+  template: SAST.gitlab-ci.yml
+
+sast:
+  variables:
+    CI_DEBUG_TRACE: "true"
+```
+
+### Using environment variables to pass credentials for private repositories
+
+Some analyzers require downloading the project's dependencies in order to
+perform the analysis. In turn, such dependencies may live in private Git
+repositories and thus require credentials like username and password to download them.
+Depending on the analyzer, such credentials can be provided to
+it via [custom environment variables](#custom-environment-variables).
+
 #### Using a variable to pass username and password to a private Maven repository
 
 If you have a private Apache Maven repository that requires login credentials,
@@ -140,7 +163,7 @@ to pass a username and password. You can set it under your project's settings
 so that your credentials aren't exposed in `.gitlab-ci.yml`.
 
 If the username is `myuser` and the password is `verysecret` then you would
-set the following [variable](../../../ci/variables/README.md#via-the-ui)
+[set the following variable](../../../ci/variables/README.md#via-the-ui)
 under your project's settings:
 
 | Type | Key | Value |
@@ -162,21 +185,6 @@ variables:
 
 This will create individual `<analyzer-name>-sast` jobs for each analyzer that runs in your CI/CD pipeline.
 
-### Overriding the SAST template
-
-If you want to override the job definition (for example, change properties like
-`variables` or `dependencies`), you need to declare a `sast` job after the
-template inclusion and specify any additional keys under it. For example:
-
-```yaml
-include:
-  template: SAST.gitlab-ci.yml
-
-sast:
-  variables:
-    CI_DEBUG_TRACE: "true"
-```
-
 ### Available variables
 
 SAST can be [configured](#customizing-the-sast-settings) using environment variables.
@@ -185,16 +193,16 @@ SAST can be [configured](#customizing-the-sast-settings) using environment varia
 
 The following are Docker image-related variables.
 
-| Environment variable          | Description                                                                    |
-|-------------------------------|--------------------------------------------------------------------------------|
-| `SAST_ANALYZER_IMAGES`        | Comma separated list of custom images. Default images are still enabled. Read more about [customizing analyzers](analyzers.md).       |
-| `SAST_ANALYZER_IMAGE_PREFIX`  | Override the name of the Docker registry providing the default images (proxy). Read more about [customizing analyzers](analyzers.md). |
-| `SAST_ANALYZER_IMAGE_TAG`     | Override the Docker tag of the default images. Read more about [customizing analyzers](analyzers.md).                                 |
-| `SAST_DEFAULT_ANALYZERS`      | Override the names of default images. Read more about [customizing analyzers](analyzers.md).                                          |
-| `SAST_DISABLE_DIND`           | Disable Docker in Docker and run analyzers [individually](#disabling-docker-in-docker-for-sast).                                      |
-| `SAST_PULL_ANALYZER_IMAGES`   | Pull the images from the Docker registry (set to 0 to disable). Read more about [customizing analyzers](analyzers.md).                 |
+| Environment variable         | Description                                                                                                                                                                                                              |
+|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `SAST_ANALYZER_IMAGES`       | Comma separated list of custom images. Default images are still enabled. Read more about [customizing analyzers](analyzers.md). Not available when [Docker in Docker is disabled](#disabling-docker-in-docker-for-sast). |
+| `SAST_ANALYZER_IMAGE_PREFIX` | Override the name of the Docker registry providing the default images (proxy). Read more about [customizing analyzers](analyzers.md).                                                                                    |
+| `SAST_ANALYZER_IMAGE_TAG`    | Override the Docker tag of the default images. Read more about [customizing analyzers](analyzers.md).                                                                                                                    |
+| `SAST_DEFAULT_ANALYZERS`     | Override the names of default images. Read more about [customizing analyzers](analyzers.md).                                                                                                                             |
+| `SAST_DISABLE_DIND`          | Disable Docker in Docker and run analyzers [individually](#disabling-docker-in-docker-for-sast).                                                                                                                         |
+| `SAST_PULL_ANALYZER_IMAGES`  | Pull the images from the Docker registry (set to 0 to disable). Read more about [customizing analyzers](analyzers.md). Not available when [Docker in Docker is disabled](#disabling-docker-in-docker-for-sast).          |
 
-### Vulnerability filters
+#### Vulnerability filters
 
 Some analyzers make it possible to filter out vulnerabilities under a given threshold.
 
@@ -207,7 +215,7 @@ Some analyzers make it possible to filter out vulnerabilities under a given thre
 | `SAST_GOSEC_LEVEL`      |         0 | Ignore gosec vulnerabilities under given confidence level. Integer, 0=Undefined, 1=Low, 2=Medium, 3=High. | |
 | `SAST_EXCLUDED_PATHS`   |   -        | Exclude vulnerabilities from output based on the paths. This is a comma-separated list of patterns. Patterns can be globs, file or folder paths. Parent directories will also match patterns. | `SAST_EXCLUDED_PATHS=doc,spec` |
 
-### Timeouts
+#### Timeouts
 
 The following variables configure timeouts.
 
@@ -217,7 +225,10 @@ The following variables configure timeouts.
 | `SAST_PULL_ANALYZER_IMAGE_TIMEOUT`       |      5m | Time limit when pulling the image of an analyzer. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". For example, "300ms", "1.5h" or "2h45m". |
 | `SAST_RUN_ANALYZER_TIMEOUT`              |     20m | Time limit when running an analyzer. Timeouts are parsed using Go's [`ParseDuration`](https://golang.org/pkg/time/#ParseDuration). Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". For example, "300ms", "1.5h" or "2h45m".|
 
-### Analyzer settings
+NOTE: **Note:**
+Timeout variables are not applicable for setups with [disabled Docker In Docker](index.md#disabling-docker-in-docker-for-sast).
+
+#### Analyzer settings
 
 Some analyzers can be customized with environment variables.
 
@@ -234,6 +245,19 @@ Some analyzers can be customized with environment variables.
 | `MAVEN_REPO_PATH`       | spotbugs | Path to the Maven local repository (shortcut for the `maven.repo.local` property). |
 | `SBT_PATH`              | spotbugs | Path to the `sbt` executable. |
 | `FAIL_NEVER`            | spotbugs | Set to `1` to ignore compilation failure. |
+
+#### Custom environment variables
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/18193) in GitLab Ultimate 12.5.
+
+In addition to the aforementioned SAST configuration variables,
+all [custom environment variables](../../../ci/variables/README.md#creating-a-custom-environment-variable) are propagated
+to the underlying SAST analyzer images if
+[the SAST vendored template](#configuration) is used.
+
+CAUTION: **Caution:**
+Variables having names starting with these prefixes will **not** be propagated to the SAST Docker container and/or
+analyzer containers: `DOCKER_`, `CI`, `GITLAB_`, `FF_`, `HOME`, `PWD`, `OLDPWD`, `PATH`, `SHLVL`, `HOSTNAME`.
 
 ## Reports JSON format
 

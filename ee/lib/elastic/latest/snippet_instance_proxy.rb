@@ -28,10 +28,13 @@ module Elastic
           data['content'] = data['content'].mb_chars.limit(MAX_INDEX_SIZE).to_s # rubocop: disable CodeReuse/ActiveRecord
         end
 
-        # ES6 is now single-type per index, so we implement our own typing
-        data['type'] = es_type
+        data.merge(generic_attributes)
+      end
 
-        data
+      # TODO: Reenable support for public/internal project snippets
+      # https://gitlab.com/gitlab-org/gitlab/issues/2358
+      def es_parent
+        nil
       end
     end
   end

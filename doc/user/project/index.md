@@ -26,6 +26,7 @@ When you create a project in GitLab, you'll have access to a large number of
   from messing with history or pushing code without review
   - [Protected tags](protected_tags.md): Control over who has
   permission to create tags, and prevent accidental update or deletion
+  - [Repository mirroring](repository/repository_mirroring.md)
   - [Signing commits](gpg_signed_commits/index.md): use GPG to sign your commits
   - [Deploy tokens](deploy_tokens/index.md): Manage project-based deploy tokens that allow permanent access to the repository and Container Registry.
 - [Web IDE](web_ide/index.md)
@@ -44,7 +45,7 @@ When you create a project in GitLab, you'll have access to a large number of
   - [Review Apps](../../ci/review_apps/index.md): Live preview the results
   of the changes proposed in a merge request in a per-branch basis
 - [Labels](labels.md): Organize issues and merge requests by labels
-- [Time Tracking](../../workflow/time_tracking.md): Track estimate time
+- [Time Tracking](time_tracking.md): Track estimate time
   and time spent on
   the conclusion of an issue or merge request
 - [Milestones](milestones/index.md): Work towards a target date
@@ -59,10 +60,10 @@ When you create a project in GitLab, you'll have access to a large number of
 
 **GitLab CI/CD:**
 
-- [GitLab CI/CD](../../ci/README.md): GitLab's built-in [Continuous Integration, Delivery, and Deployment](https://about.gitlab.com/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab/) tool
+- [GitLab CI/CD](../../ci/README.md): GitLab's built-in [Continuous Integration, Delivery, and Deployment](https://about.gitlab.com/blog/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab/) tool
   - [Container Registry](../packages/container_registry/index.md): Build and push Docker
   images out-of-the-box
-  - [Auto Deploy](../../ci/autodeploy/index.md): Configure GitLab CI/CD
+  - [Auto Deploy](../../topics/autodevops/index.md#auto-deploy): Configure GitLab CI/CD
   to automatically set up your app's deployment
   - [Enable and disable GitLab CI](../../ci/enable_or_disable_ci.md)
   - [Pipelines](../../ci/pipelines.md): Configure and visualize
@@ -95,6 +96,7 @@ When you create a project in GitLab, you'll have access to a large number of
 - [Releases](releases/index.md): a way to track deliverables in your project as snapshot in time of
   the source, build output, and other metadata or artifacts
   associated with a released version of your code.
+- [Conan packages](../packages/conan_repository/index.md): your private Conan repository in GitLab. **(PREMIUM)**
 - [Maven packages](../packages/maven_repository/index.md): your private Maven repository in GitLab. **(PREMIUM)**
 - [NPM packages](../packages/npm_registry/index.md): your private NPM package registry in GitLab. **(PREMIUM)**
 - [Code owners](code_owners.md): specify code owners for certain files **(STARTER)**
@@ -154,6 +156,26 @@ when a project is part of a group (under a
 If you choose to leave a project you will no longer be a project
 member, therefore, unable to contribute.
 
+## Project's landing page
+
+The project's landing page shows different information depending on
+the project's visibility settings and user permissions.
+
+For public projects, and to members of internal and private projects
+with [permissions to view the project's code](../permissions.md#project-members-permissions):
+
+- The content of a
+  [`README` or an index file](repository/#repository-readme-and-index-files)
+  is displayed (if any), followed by the list of directories within the
+  project's repository.
+- If the project doesn't contain either of these files, the
+  visitor will see the list of files and directories of the repository.
+
+For users without permissions to view the project's code:
+
+- The wiki homepage is displayed, if any.
+- The list of issues within the project is displayed.
+
 ## Redirects when changing repository paths
 
 When a repository path changes, it is essential to smoothly transition from the
@@ -178,9 +200,14 @@ When [renaming a user](../profile/index.md#changing-your-username),
 
 ## Use your project as a Go package
 
-Any project can be used as a Go package including private projects in subgroups. To use packages
-hosted in private projects with the `go get` command, use a [`.netrc` file](https://ec.haxx.se/usingcurl-netrc.html)
-and a [personal access token](../profile/personal_access_tokens.md) in the password field.
+Any project can be used as a Go package including private projects in subgroups.
+GitLab responds correctly to `go get` and `godoc.org` discovery requests,
+including the [`go-import`](https://golang.org/cmd/go/#hdr-Remote_import_paths)
+and [`go-source`](https://github.com/golang/gddo/wiki/Source-Code-Links) meta
+tags, respectively. To use packages hosted in private projects with the `go get`
+command, use a [`.netrc` file](https://ec.haxx.se/usingcurl-netrc.html) and a
+[personal access token](../profile/personal_access_tokens.md) in the password
+field.
 
 For example:
 

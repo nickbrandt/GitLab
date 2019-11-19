@@ -13,12 +13,13 @@ describe 'Database schema' do
   # EE: edit the ee/spec/db/schema_support.rb
   IGNORED_FK_COLUMNS = {
     abuse_reports: %w[reporter_id user_id],
-    application_settings: %w[performance_bar_allowed_group_id slack_app_id snowplow_site_id],
+    application_settings: %w[performance_bar_allowed_group_id slack_app_id snowplow_app_id eks_account_id eks_access_key_id],
     approvers: %w[target_id user_id],
     approvals: %w[user_id],
     approver_groups: %w[target_id],
     audit_events: %w[author_id entity_id],
     award_emoji: %w[awardable_id user_id],
+    aws_roles: %w[role_external_id],
     boards: %w[milestone_id],
     chat_names: %w[chat_id service_id team_id user_id],
     chat_teams: %w[team_id],
@@ -26,6 +27,7 @@ describe 'Database schema' do
     ci_pipelines: %w[user_id],
     ci_runner_projects: %w[runner_id],
     ci_trigger_requests: %w[commit_id],
+    cluster_providers_aws: %w[security_group_id vpc_id access_key_id],
     cluster_providers_gcp: %w[gcp_project_id operation_id],
     deploy_keys_projects: %w[deploy_key_id],
     deployments: %w[deployable_id environment_id user_id],
@@ -77,7 +79,8 @@ describe 'Database schema' do
     vulnerability_identifiers: %w[external_id],
     vulnerability_scanners: %w[external_id],
     web_hooks: %w[service_id group_id],
-    suggestions: %w[commit_id]
+    suggestions: %w[commit_id],
+    commit_user_mentions: %w[commit_id]
   }.with_indifferent_access.freeze
 
   context 'for table' do
@@ -118,9 +121,55 @@ describe 'Database schema' do
     end
   end
 
+  # These pre-existing enums have limits > 2 bytes
+  IGNORED_LIMIT_ENUMS = {
+    'Analytics::CycleAnalytics::GroupStage' => %w[start_event_identifier end_event_identifier],
+    'Analytics::CycleAnalytics::ProjectStage' => %w[start_event_identifier end_event_identifier],
+    'Ci::Bridge' => %w[failure_reason],
+    'Ci::Build' => %w[failure_reason],
+    'Ci::BuildMetadata' => %w[timeout_source],
+    'Ci::BuildTraceChunk' => %w[data_store],
+    'Ci::JobArtifact' => %w[file_type],
+    'Ci::Pipeline' => %w[source config_source failure_reason],
+    'Ci::Runner' => %w[access_level],
+    'Ci::Stage' => %w[status],
+    'Clusters::Applications::Ingress' => %w[ingress_type],
+    'Clusters::Cluster' => %w[platform_type provider_type],
+    'CommitStatus' => %w[failure_reason],
+    'GenericCommitStatus' => %w[failure_reason],
+    'Gitlab::DatabaseImporters::CommonMetrics::PrometheusMetric' => %w[group],
+    'InternalId' => %w[usage],
+    'List' => %w[list_type],
+    'NotificationSetting' => %w[level],
+    'Project' => %w[auto_cancel_pending_pipelines],
+    'ProjectAutoDevops' => %w[deploy_strategy],
+    'PrometheusMetric' => %w[group],
+    'ResourceLabelEvent' => %w[action],
+    'User' => %w[layout dashboard project_view],
+    'UserCallout' => %w[feature_name],
+    'PrometheusAlert' => %w[operator]
+  }.freeze
+
+  context 'for enums' do
+    ApplicationRecord.descendants.each do |model|
+      describe model do
+        let(:ignored_enums) { ignored_limit_enums(model.name) }
+        let(:enums) { model.defined_enums.keys - ignored_enums }
+
+        it 'uses smallint for enums' do
+          expect(model).to use_smallint_for_enums(enums)
+        end
+      end
+    end
+  end
+
   private
 
   def ignored_fk_columns(column)
     IGNORED_FK_COLUMNS.fetch(column, [])
+  end
+
+  def ignored_limit_enums(model)
+    IGNORED_LIMIT_ENUMS.fetch(model, [])
   end
 end

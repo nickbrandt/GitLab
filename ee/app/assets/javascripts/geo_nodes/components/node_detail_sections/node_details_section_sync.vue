@@ -42,24 +42,30 @@ export default {
           itemValueType: VALUE_TYPE.GRAPH,
         },
         {
-          itemTitle: s__('GeoNodes|Local LFS objects'),
+          itemTitle: s__('GeoNodes|LFS objects'),
           itemValue: this.nodeDetails.lfs,
           itemValueType: VALUE_TYPE.GRAPH,
         },
         {
-          itemTitle: s__('GeoNodes|Local attachments'),
+          itemTitle: s__('GeoNodes|Attachments'),
           itemValue: this.nodeDetails.attachments,
           itemValueType: VALUE_TYPE.GRAPH,
         },
         {
-          itemTitle: s__('GeoNodes|Local job artifacts'),
+          itemTitle: s__('GeoNodes|Job artifacts'),
           itemValue: this.nodeDetails.jobArtifacts,
           itemValueType: VALUE_TYPE.GRAPH,
         },
         {
-          itemTitle: s__('GeoNodes|Local container repositories'),
+          itemTitle: s__('GeoNodes|Container repositories'),
           itemValue: this.nodeDetails.containerRepositories,
           itemValueType: VALUE_TYPE.GRAPH,
+        },
+        {
+          itemTitle: s__('GeoNodes|Design repositories'),
+          itemValue: this.nodeDetails.designRepositories,
+          itemValueType: VALUE_TYPE.GRAPH,
+          featureDisabled: !gon.features.enableGeoDesignSync,
         },
         {
           itemTitle: s__('GeoNodes|Data replication lag'),
@@ -146,6 +152,7 @@ export default {
         :item-value-stale-tooltip="statusInfoStaleMessage"
         :custom-type="nodeDetailItem.customType"
         :event-type-log-status="nodeDetailItem.eventTypeLogStatus"
+        :feature-disabled="nodeDetailItem.featureDisabled"
       />
     </div>
   </div>

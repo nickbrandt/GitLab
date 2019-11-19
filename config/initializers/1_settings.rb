@@ -5,6 +5,7 @@ require_relative '../smime_signature_settings'
 # Default settings
 Settings['ldap'] ||= Settingslogic.new({})
 Settings.ldap['enabled'] = false if Settings.ldap['enabled'].nil?
+Settings.ldap['prevent_ldap_sign_in'] = false if Settings.ldap['prevent_ldap_sign_in'].blank?
 
 Gitlab.ee do
   Settings.ldap['sync_time'] = 3600 if Settings.ldap['sync_time'].nil?
@@ -290,9 +291,6 @@ Settings.pages['url']               ||= Settings.__send__(:build_pages_url)
 Settings.pages['external_http']     ||= false unless Settings.pages['external_http'].present?
 Settings.pages['external_https']    ||= false unless Settings.pages['external_https'].present?
 Settings.pages['artifacts_server']  ||= Settings.pages['enabled'] if Settings.pages['artifacts_server'].nil?
-
-Settings.pages['admin'] ||= Settingslogic.new({})
-Settings.pages.admin['certificate'] ||= ''
 Settings.pages['secret_file'] ||= Rails.root.join('.gitlab_pages_shared_secret')
 
 #
@@ -309,6 +307,13 @@ Gitlab.ee do
   Settings.geo['registry_replication'] ||= Settingslogic.new({})
   Settings.geo.registry_replication['enabled'] ||= false
 end
+
+#
+# Unleash
+#
+Settings['feature_flags'] ||= Settingslogic.new({})
+Settings.feature_flags['unleash'] ||= Settingslogic.new({})
+Settings.feature_flags.unleash['enabled'] = false if Settings.feature_flags.unleash['enabled'].nil?
 
 #
 # External merge request diffs
@@ -491,6 +496,9 @@ Gitlab.ee do
   Settings.cron_jobs['historical_data_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['historical_data_worker']['cron'] ||= '0 12 * * *'
   Settings.cron_jobs['historical_data_worker']['job_class'] = 'HistoricalDataWorker'
+  Settings.cron_jobs['import_software_licenses_worker'] ||= Settingslogic.new({})
+  Settings.cron_jobs['import_software_licenses_worker']['cron'] ||= '0 3 * * 0'
+  Settings.cron_jobs['import_software_licenses_worker']['job_class'] = 'ImportSoftwareLicensesWorker'
   Settings.cron_jobs['ldap_group_sync_worker'] ||= Settingslogic.new({})
   Settings.cron_jobs['ldap_group_sync_worker']['cron'] ||= '0 * * * *'
   Settings.cron_jobs['ldap_group_sync_worker']['job_class'] = 'LdapAllGroupsSyncWorker'
@@ -663,7 +671,17 @@ Settings.monitoring['ruby_sampler_interval'] ||= 60
 Settings.monitoring['sidekiq_exporter'] ||= Settingslogic.new({})
 Settings.monitoring.sidekiq_exporter['enabled'] ||= false
 Settings.monitoring.sidekiq_exporter['address'] ||= 'localhost'
-Settings.monitoring.sidekiq_exporter['port'] ||= 3807
+Settings.monitoring.sidekiq_exporter['port'] ||= 8082
+Settings.monitoring['web_exporter'] ||= Settingslogic.new({})
+Settings.monitoring.web_exporter['enabled'] ||= false
+Settings.monitoring.web_exporter['address'] ||= 'localhost'
+Settings.monitoring.web_exporter['port'] ||= 8083
+
+#
+# Shutdown settings
+#
+Settings['shutdown'] ||= Settingslogic.new({})
+Settings.shutdown['blackout_seconds'] ||= 10
 
 #
 # Testing settings

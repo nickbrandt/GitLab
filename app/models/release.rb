@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Release < ApplicationRecord
+  include Presentable
   include CacheMarkdownField
   include Gitlab::Utils::StrongMemoize
 
@@ -14,6 +15,7 @@ class Release < ApplicationRecord
 
   has_many :milestone_releases
   has_many :milestones, through: :milestone_releases
+  has_one :evidence
 
   default_value_for :released_at, allows_nil: false do
     Time.zone.now
@@ -25,8 +27,20 @@ class Release < ApplicationRecord
   validates_associated :milestone_releases, message: -> (_, obj) { obj[:value].map(&:errors).map(&:full_messages).join(",") }
 
   scope :sorted, -> { order(released_at: :desc) }
+  scope :preloaded, -> { includes(project: :namespace) }
+  scope :with_project_and_namespace, -> { includes(project: :namespace) }
+  scope :recent, -> { sorted.limit(MAX_NUMBER_TO_DISPLAY) }
 
   delegate :repository, to: :project
+
+  after_commit :create_evidence!, on: :create
+  after_commit :notify_new_release, on: :create
+
+  MAX_NUMBER_TO_DISPLAY = 3
+
+  def to_param
+    CGI.escape(tag)
+  end
 
   def commit
     strong_memoize(:commit) do
@@ -55,6 +69,18 @@ class Release < ApplicationRecord
     released_at.present? && released_at > Time.zone.now
   end
 
+  def name
+    self.read_attribute(:name) || tag
+  end
+
+  def evidence_sha
+    evidence&.summary_sha
+  end
+
+  def evidence_summary
+    evidence&.summary || {}
+  end
+
   private
 
   def actual_sha
@@ -66,4 +92,14 @@ class Release < ApplicationRecord
       repository.find_tag(tag)
     end
   end
+
+  def create_evidence!
+    CreateEvidenceWorker.perform_async(self.id)
+  end
+
+  def notify_new_release
+    NewReleaseWorker.perform_async(id)
+  end
 end
+
+Release.prepend_if_ee('EE::Release')

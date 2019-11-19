@@ -79,8 +79,8 @@ describe EpicIssues::DestroyService do
       end
 
       context 'refresh epic dates' do
-        it 'calls epic#update_start_and_due_dates' do
-          expect(epic).to receive(:update_start_and_due_dates)
+        it 'calls UpdateDatesService' do
+          expect(Epics::UpdateDatesService).to receive(:new).with([epic_issue.epic]).and_call_original
 
           subject
         end

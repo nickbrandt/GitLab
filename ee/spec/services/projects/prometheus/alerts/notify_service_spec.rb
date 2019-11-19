@@ -33,7 +33,7 @@ describe Projects::Prometheus::Alerts::NotifyService do
     let(:create_incident_service) { spy }
 
     it 'processes issues', :sidekiq do
-      expect(IncidentManagement::ProcessAlertWorker)
+      expect(IncidentManagement::ProcessPrometheusAlertWorker)
         .to receive(:perform_async)
         .with(project.id, kind_of(Hash))
         .exactly(amount).times
@@ -46,7 +46,7 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
   shared_examples 'does not process incident issues' do
     it 'does not process issues' do
-      expect(IncidentManagement::ProcessAlertWorker)
+      expect(IncidentManagement::ProcessPrometheusAlertWorker)
         .not_to receive(:perform_async)
 
       expect(subject).to eq(true)
@@ -232,12 +232,11 @@ describe Projects::Prometheus::Alerts::NotifyService do
       context 'when incident_management_setting does not exist' do
         it_behaves_like 'persists events'
 
-        it 'does not send notification email' do
+        it 'does not send notification email', :sidekiq_might_not_need_inline do
           expect(project.feature_available?(:incident_management)).to eq(true)
 
-          expect_next_instance_of(NotificationService) do |service|
-            expect(service).not_to receive(:async)
-          end
+          expect_any_instance_of(NotificationService)
+            .not_to receive(:async)
 
           expect(subject).to eq(true)
         end
@@ -291,14 +290,14 @@ describe Projects::Prometheus::Alerts::NotifyService do
             setting.update!(create_issue: true)
           end
 
-          it_behaves_like 'processes incident issues', 1
+          it_behaves_like 'processes incident issues', 2
 
           context 'without firing alerts' do
             let(:payload_raw) do
               payload_for(firing: [], resolved: [alert_resolved])
             end
 
-            it_behaves_like 'does not process incident issues'
+            it_behaves_like 'processes incident issues', 1
           end
         end
 
@@ -338,6 +337,24 @@ describe Projects::Prometheus::Alerts::NotifyService do
       let(:payload) { { 'version' => '4' } }
 
       it_behaves_like 'no notifications'
+    end
+
+    context 'when the payload is too big' do
+      let(:payload) { { 'the-payload-is-too-big' => true } }
+      let(:deep_size_object) { instance_double(Gitlab::Utils::DeepSize, valid?: false) }
+
+      before do
+        allow(Gitlab::Utils::DeepSize).to receive(:new).and_return(deep_size_object)
+      end
+
+      it_behaves_like 'no notifications'
+
+      it 'does not process issues' do
+        expect(IncidentManagement::ProcessPrometheusAlertWorker)
+          .not_to receive(:perform_async)
+
+        subject
+      end
     end
   end
 

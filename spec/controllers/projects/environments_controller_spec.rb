@@ -256,7 +256,7 @@ describe Projects::EnvironmentsController do
       it 'loads the terminals for the environment' do
         # In EE we have to stub EE::Environment since it overwrites the
         # "terminals" method.
-        expect_any_instance_of(defined?(EE) ? EE::Environment : Environment)
+        expect_any_instance_of(Gitlab.ee? ? EE::Environment : Environment)
           .to receive(:terminals)
 
         get :terminal, params: environment_params
@@ -282,7 +282,7 @@ describe Projects::EnvironmentsController do
         it 'returns the first terminal for the environment' do
           # In EE we have to stub EE::Environment since it overwrites the
           # "terminals" method.
-          expect_any_instance_of(defined?(EE) ? EE::Environment : Environment)
+          expect_any_instance_of(Gitlab.ee? ? EE::Environment : Environment)
             .to receive(:terminals)
             .and_return([:fake_terminal])
 
@@ -330,11 +330,11 @@ describe Projects::EnvironmentsController do
       expect(response).to redirect_to(environment_metrics_path(environment))
     end
 
-    it 'redirects to empty page if no environment exists' do
+    it 'redirects to empty metrics page if no environment exists' do
       get :metrics_redirect, params: { namespace_id: project.namespace, project_id: project }
 
       expect(response).to be_ok
-      expect(response).to render_template 'empty'
+      expect(response).to render_template 'empty_metrics'
     end
   end
 

@@ -10,7 +10,7 @@ module EE
 
         override :usage_data_counters
         def usage_data_counters
-          super + [::Gitlab::UsageCounters::DesignsCounter]
+          super + [::Gitlab::UsageCounters::DesignsCounter, ::Gitlab::UsageDataCounters::LicensesList]
         end
 
         override :uncached_data
@@ -62,20 +62,6 @@ module EE
 
           usage_data
         end
-
-        # rubocop: disable CodeReuse/ActiveRecord
-        def projects_mirrored_with_pipelines_enabled
-          count(
-            ::Project.joins(:project_feature).where(
-              mirror: true,
-              mirror_trigger_builds: true,
-              project_features: {
-                builds_access_level: ::ProjectFeature::ENABLED
-              }
-            )
-          )
-        end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         # rubocop: disable CodeReuse/ActiveRecord
         def service_desk_counts
@@ -145,14 +131,14 @@ module EE
                                          ldap_group_links: count(::LdapGroupLink),
                                          ldap_keys: count(::LDAPKey),
                                          ldap_users: count(::User.ldap),
-                                         operations_dashboard: operations_dashboard_usage,
                                          pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
                                          projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
-                                         projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
+                                         projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
                                          projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
                                          projects_with_packages: count(::Packages::Package.select('distinct project_id')),
                                          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
-                                         projects_with_tracing_enabled: count(ProjectTracingSetting)
+                                         projects_with_tracing_enabled: count(ProjectTracingSetting),
+                                         projects_with_alerts_service_enabled: count(AlertsService.active)
                                        },
                                        service_desk_counts,
                                        security_products_usage,
@@ -183,11 +169,39 @@ module EE
         def usage_activity_by_stage
           {
             usage_activity_by_stage: {
+              configure: usage_activity_by_stage_configure,
               create: usage_activity_by_stage_create,
               manage: usage_activity_by_stage_manage,
+              monitor: usage_activity_by_stage_monitor,
+              package: usage_activity_by_stage_package,
               plan: usage_activity_by_stage_plan,
+              release: usage_activity_by_stage_release,
+              secure: usage_activity_by_stage_secure,
               verify: usage_activity_by_stage_verify
             }
+          }
+        end
+
+        # Omitted because no user, creator or author associated: `auto_devops_disabled`, `auto_devops_enabled`
+        # Omitted because not in use anymore: `gcp_clusters`, `gcp_clusters_disabled`, `gcp_clusters_enabled`
+        def usage_activity_by_stage_configure
+          {
+            clusters_applications_cert_managers: ::Clusters::Applications::CertManager.distinct_by_user,
+            clusters_applications_helm: ::Clusters::Applications::Helm.distinct_by_user,
+            clusters_applications_ingress: ::Clusters::Applications::Ingress.distinct_by_user,
+            clusters_applications_knative: ::Clusters::Applications::Knative.distinct_by_user,
+            clusters_disabled: ::Clusters::Cluster.disabled.distinct_count_by(:user_id),
+            clusters_enabled: ::Clusters::Cluster.enabled.distinct_count_by(:user_id),
+            clusters_platforms_gke: ::Clusters::Cluster.gcp_installed.enabled.distinct_count_by(:user_id),
+            clusters_platforms_eks: ::Clusters::Cluster.aws_installed.enabled.distinct_count_by(:user_id),
+            clusters_platforms_user: ::Clusters::Cluster.user_provided.enabled.distinct_count_by(:user_id),
+            group_clusters_disabled: ::Clusters::Cluster.disabled.group_type.distinct_count_by(:user_id),
+            group_clusters_enabled: ::Clusters::Cluster.enabled.group_type.distinct_count_by(:user_id),
+            project_clusters_disabled: ::Clusters::Cluster.disabled.project_type.distinct_count_by(:user_id),
+            project_clusters_enabled: ::Clusters::Cluster.enabled.project_type.distinct_count_by(:user_id),
+            projects_slack_notifications_active: ::Project.with_slack_service.distinct_count_by(:creator_id),
+            projects_slack_slash_active: ::Project.with_slack_slash_commands_service.distinct_count_by(:creator_id),
+            projects_with_prometheus_alerts: ::Project.with_prometheus_service.distinct_count_by(:creator_id)
           }
         end
 
@@ -216,6 +230,24 @@ module EE
           }
         end
 
+        def usage_activity_by_stage_monitor
+          {
+            clusters: ::Clusters::Cluster.distinct_count_by(:user_id),
+            clusters_applications_prometheus: ::Clusters::Applications::Prometheus.distinct_by_user,
+            operations_dashboard_default_dashboard: count(::User.active.with_dashboard('operations')),
+            operations_dashboard_users_with_projects_added: count(UsersOpsDashboardProject.distinct_users(::User.active)),
+            projects_prometheus_active: ::Project.with_active_prometheus_service.distinct_count_by(:creator_id),
+            projects_with_error_tracking_enabled: ::Project.with_enabled_error_tracking.distinct_count_by(:creator_id),
+            projects_with_tracing_enabled: ::Project.with_tracing_enabled.distinct_count_by(:creator_id)
+          }
+        end
+
+        def usage_activity_by_stage_package
+          {
+            projects_with_packages: ::Project.with_packages.distinct_count_by(:creator_id)
+          }
+        end
+
         # Omitted because no user, creator or author associated: `boards`, `labels`, `milestones`, `uploads`
         # Omitted because too expensive: `epics_deepest_relationship_level`
         # Omitted because of encrypted properties: `projects_jira_cloud_active`, `projects_jira_server_active`
@@ -237,6 +269,17 @@ module EE
           }
         end
 
+        # Omitted because no user, creator or author associated: `environments`, `feature_flags`, `in_review_folder`, `pages_domains`
+        def usage_activity_by_stage_release
+          {
+            deployments: ::Deployment.distinct_count_by(:user_id),
+            failed_deployments: ::Deployment.failed.distinct_count_by(:user_id),
+            projects_mirrored_with_pipelines_enabled: ::Project.mirrored_with_enabled_pipelines.distinct_count_by(:creator_id),
+            releases: ::Release.distinct_count_by(:author_id),
+            successful_deployments: ::Deployment.success.distinct_count_by(:user_id)
+          }
+        end
+
         # Omitted because no user, creator or author associated: `ci_runners`
         def usage_activity_by_stage_verify
           {
@@ -250,6 +293,15 @@ module EE
             ci_triggers: ::Ci::Trigger.distinct_count_by(:owner_id),
             clusters_applications_runner: ::Clusters::Applications::Runner.distinct_by_user,
             projects_reporting_ci_cd_back_to_github: ::Project.with_github_service_pipeline_events.distinct_count_by(:creator_id)
+          }
+        end
+
+        # Currently too complicated and to get reliable counts for these stats:
+        # container_scanning_jobs, dast_jobs, dependency_scanning_jobs, license_management_jobs, sast_jobs
+        # Once https://gitlab.com/gitlab-org/gitlab/merge_requests/17568 is merged, this might be doable
+        def usage_activity_by_stage_secure
+          {
+            user_preferences_group_overview_security_dashboard: count(::User.active.group_view_security_dashboard)
           }
         end
       end

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe GroupPolicy do
   include_context 'GroupPolicy context'
 
-  context 'with no user' do
+  context 'public group with no user' do
     let(:group) { create(:group, :public) }
     let(:current_user) { nil }
 
@@ -33,7 +35,6 @@ describe GroupPolicy do
 
   context 'with foreign user and public project' do
     let(:project) { create(:project, :public) }
-    let(:user) { create(:user) }
     let(:current_user) { create(:user) }
 
     before do
@@ -105,8 +106,8 @@ describe GroupPolicy do
     let(:current_user) { maintainer }
 
     context 'with subgroup_creation level set to maintainer' do
-      let(:group) do
-        create(:group, :private, subgroup_creation_level: ::Gitlab::Access::MAINTAINER_SUBGROUP_ACCESS)
+      before_all do
+        group.update(subgroup_creation_level: ::Gitlab::Access::MAINTAINER_SUBGROUP_ACCESS)
       end
 
       it 'allows every maintainer permission plus creating subgroups' do
@@ -164,11 +165,11 @@ describe GroupPolicy do
   end
 
   describe 'private nested group use the highest access level from the group and inherited permissions' do
-    let(:nested_group) do
+    let_it_be(:nested_group) do
       create(:group, :private, :owner_subgroup_creation_only, parent: group)
     end
 
-    before do
+    before_all do
       nested_group.add_guest(guest)
       nested_group.add_guest(reporter)
       nested_group.add_guest(developer)
@@ -268,6 +269,10 @@ describe GroupPolicy do
       context 'when the group share_with_group_lock is enabled' do
         let(:group) { create(:group, share_with_group_lock: true, parent: parent) }
 
+        before do
+          group.add_owner(owner)
+        end
+
         context 'when the parent group share_with_group_lock is enabled' do
           context 'when the group has a grandparent' do
             let(:parent) { create(:group, share_with_group_lock: true, parent: grandparent) }
@@ -351,9 +356,93 @@ describe GroupPolicy do
     end
   end
 
+  context 'transfer_projects' do
+    shared_examples_for 'allowed to transfer projects' do
+      before do
+        group.update(project_creation_level: project_creation_level)
+      end
+
+      it { is_expected.to be_allowed(:transfer_projects) }
+    end
+
+    shared_examples_for 'not allowed to transfer projects' do
+      before do
+        group.update(project_creation_level: project_creation_level)
+      end
+
+      it { is_expected.to be_disallowed(:transfer_projects) }
+    end
+
+    context 'reporter' do
+      let(:current_user) { reporter }
+
+      it_behaves_like 'not allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::NO_ONE_PROJECT_ACCESS }
+      end
+
+      it_behaves_like 'not allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::MAINTAINER_PROJECT_ACCESS }
+      end
+
+      it_behaves_like 'not allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS }
+      end
+    end
+
+    context 'developer' do
+      let(:current_user) { developer }
+
+      it_behaves_like 'not allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::NO_ONE_PROJECT_ACCESS }
+      end
+
+      it_behaves_like 'not allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::MAINTAINER_PROJECT_ACCESS }
+      end
+
+      it_behaves_like 'not allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS }
+      end
+    end
+
+    context 'maintainer' do
+      let(:current_user) { maintainer }
+
+      it_behaves_like 'not allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::NO_ONE_PROJECT_ACCESS }
+      end
+
+      it_behaves_like 'allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::MAINTAINER_PROJECT_ACCESS }
+      end
+
+      it_behaves_like 'allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS }
+      end
+    end
+
+    context 'owner' do
+      let(:current_user) { owner }
+
+      it_behaves_like 'not allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::NO_ONE_PROJECT_ACCESS }
+      end
+
+      it_behaves_like 'allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::MAINTAINER_PROJECT_ACCESS }
+      end
+
+      it_behaves_like 'allowed to transfer projects' do
+        let(:project_creation_level) { ::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS }
+      end
+    end
+  end
+
   context "create_projects" do
     context 'when group has no project creation level set' do
-      let(:group) { create(:group, project_creation_level: nil) }
+      before_all do
+        group.update(project_creation_level: nil)
+      end
 
       context 'reporter' do
         let(:current_user) { reporter }
@@ -381,7 +470,9 @@ describe GroupPolicy do
     end
 
     context 'when group has project creation level set to no one' do
-      let(:group) { create(:group, project_creation_level: ::Gitlab::Access::NO_ONE_PROJECT_ACCESS) }
+      before_all do
+        group.update(project_creation_level: ::Gitlab::Access::NO_ONE_PROJECT_ACCESS)
+      end
 
       context 'reporter' do
         let(:current_user) { reporter }
@@ -409,7 +500,9 @@ describe GroupPolicy do
     end
 
     context 'when group has project creation level set to maintainer only' do
-      let(:group) { create(:group, project_creation_level: ::Gitlab::Access::MAINTAINER_PROJECT_ACCESS) }
+      before_all do
+        group.update(project_creation_level: ::Gitlab::Access::MAINTAINER_PROJECT_ACCESS)
+      end
 
       context 'reporter' do
         let(:current_user) { reporter }
@@ -437,7 +530,9 @@ describe GroupPolicy do
     end
 
     context 'when group has project creation level set to developers + maintainer' do
-      let(:group) { create(:group, project_creation_level: ::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS) }
+      before_all do
+        group.update(project_creation_level: ::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS)
+      end
 
       context 'reporter' do
         let(:current_user) { reporter }
@@ -467,10 +562,8 @@ describe GroupPolicy do
 
   context "create_subgroup" do
     context 'when group has subgroup creation level set to owner' do
-      let(:group) do
-        create(
-          :group,
-          subgroup_creation_level: ::Gitlab::Access::OWNER_SUBGROUP_ACCESS)
+      before_all do
+        group.update(subgroup_creation_level: ::Gitlab::Access::OWNER_SUBGROUP_ACCESS)
       end
 
       context 'reporter' do
@@ -499,10 +592,8 @@ describe GroupPolicy do
     end
 
     context 'when group has subgroup creation level set to maintainer' do
-      let(:group) do
-        create(
-          :group,
-          subgroup_creation_level: ::Gitlab::Access::MAINTAINER_SUBGROUP_ACCESS)
+      before_all do
+        group.update(subgroup_creation_level: ::Gitlab::Access::MAINTAINER_SUBGROUP_ACCESS)
       end
 
       context 'reporter' do
@@ -538,6 +629,30 @@ describe GroupPolicy do
              :provided_by_gcp,
              :group,
              groups: [clusterable])
+    end
+  end
+
+  describe 'update_max_artifacts_size' do
+    let(:group) { create(:group, :public) }
+
+    context 'when no user' do
+      let(:current_user) { nil }
+
+      it { expect_disallowed(:update_max_artifacts_size) }
+    end
+
+    context 'admin' do
+      let(:current_user) { admin }
+
+      it { expect_allowed(:update_max_artifacts_size) }
+    end
+
+    %w(guest reporter developer maintainer owner).each do |role|
+      context role do
+        let(:current_user) { send(role) }
+
+        it { expect_disallowed(:update_max_artifacts_size) }
+      end
     end
   end
 end

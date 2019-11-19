@@ -33,8 +33,6 @@ class Snippet < ApplicationRecord
     default_content_html_invalidator || file_name_changed?
   end
 
-  default_value_for(:visibility_level) { Gitlab::CurrentSettings.default_snippet_visibility }
-
   belongs_to :author, class_name: 'User'
   belongs_to :project
 
@@ -53,8 +51,8 @@ class Snippet < ApplicationRecord
   # Scopes
   scope :are_internal, -> { where(visibility_level: Snippet::INTERNAL) }
   scope :are_private, -> { where(visibility_level: Snippet::PRIVATE) }
-  scope :are_public, -> { where(visibility_level: Snippet::PUBLIC) }
-  scope :public_and_internal, -> { where(visibility_level: [Snippet::PUBLIC, Snippet::INTERNAL]) }
+  scope :are_public, -> { public_only }
+  scope :are_secret, -> { public_only.where(secret: true) }
   scope :fresh, -> { order("created_at DESC") }
   scope :inc_author, -> { includes(:author) }
   scope :inc_relations_for_view, -> { includes(author: :status) }
@@ -65,6 +63,11 @@ class Snippet < ApplicationRecord
   attr_spammable :title, spam_title: true
   attr_spammable :content, spam_description: true
 
+  attr_encrypted :secret_token,
+    key:       Settings.attr_encrypted_db_key_base_truncated,
+    mode:      :per_attribute_iv,
+    algorithm: 'aes-256-cbc'
+
   def self.with_optional_visibility(value = nil)
     if value
       where(visibility_level: value)
@@ -73,7 +76,7 @@ class Snippet < ApplicationRecord
     end
   end
 
-  def self.only_global_snippets
+  def self.only_personal_snippets
     where(project_id: nil)
   end
 
@@ -114,11 +117,8 @@ class Snippet < ApplicationRecord
   end
 
   def self.visible_to_or_authored_by(user)
-    where(
-      'snippets.visibility_level IN (?) OR snippets.author_id = ?',
-      Gitlab::VisibilityLevel.levels_for_user(user),
-      user.id
-    )
+    query = where(visibility_level: Gitlab::VisibilityLevel.levels_for_user(user))
+    query.or(where(author_id: user.id))
   end
 
   def self.reference_prefix
@@ -137,6 +137,24 @@ class Snippet < ApplicationRecord
 
   def self.link_reference_pattern
     @link_reference_pattern ||= super("snippets", /(?<snippet>\d+)/)
+  end
+
+  def initialize(attributes = {})
+    # We can't use default_value_for because the database has a default
+    # value of 0 for visibility_level. If someone attempts to create a
+    # private snippet, default_value_for will assume that the
+    # visibility_level hasn't changed and will use the application
+    # setting default, which could be internal or public.
+    #
+    # To fix the problem, we assign the actual snippet default if no
+    # explicit visibility has been initialized.
+    attributes ||= {}
+
+    unless visibility_attribute_present?(attributes)
+      attributes[:visibility_level] = Gitlab::CurrentSettings.default_snippet_visibility
+    end
+
+    super
   end
 
   def to_reference(from = nil, full: false)
@@ -204,6 +222,19 @@ class Snippet < ApplicationRecord
 
   def to_ability_name
     model_name.singular
+  end
+
+  def valid_secret_token?(token)
+    return false unless token && secret_token
+
+    ActiveSupport::SecurityUtils.secure_compare(token.to_s, secret_token.to_s)
+  end
+
+  def as_json(options = {})
+    options[:except] = Array.wrap(options[:except])
+    options[:except] << :secret_token
+
+    super
   end
 
   class << self

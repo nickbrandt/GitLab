@@ -7,7 +7,7 @@ GitLab has several features based on receiving incoming emails:
 - [New issue by email](../user/project/issues/managing_issues.md#new-issue-via-email):
   allow GitLab users to create a new issue by sending an email to a
   user-specific email address.
-- [New merge request by email](../user/project/merge_requests/index.md#create-new-merge-requests-by-email):
+- [New merge request by email](../user/project/merge_requests/creating_merge_requests.md#create-new-merge-requests-by-email):
   allow GitLab users to create a new merge request by sending an email to a
   user-specific email address.
 - [Service Desk](../user/project/service_desk.md): provide e-mail support to
@@ -58,7 +58,7 @@ this method only supports replies, and not the other features of [incoming email
 ## Set it up
 
 If you want to use Gmail / Google Apps for incoming emails, make sure you have
-[IMAP access enabled](https://support.google.com/mail/troubleshooter/1668960?hl=en#ts=1665018)
+[IMAP access enabled](https://support.google.com/mail/answer/7126229)
 and [allowed less secure apps to access the account](https://support.google.com/accounts/answer/6010255)
 or [turn-on 2-step validation](https://support.google.com/accounts/answer/185839)
 and use [an application password](https://support.google.com/mail/answer/185833).
@@ -79,7 +79,7 @@ email address in order to sign up.
 If you also host a public-facing GitLab instance at `hooli.com` and set your
 incoming email domain to `hooli.com`, an attacker could abuse the "Create new
 issue by email" or
-"[Create new merge request by email](../user/project/merge_requests/index.md#create-new-merge-requests-by-email)"
+"[Create new merge request by email](../user/project/merge_requests/creating_merge_requests.md#create-new-merge-requests-by-email)"
 features by using a project's unique address as the email when signing up for
 Slack, which would send a confirmation email, which would create a new issue or
 merge request on the project owned by the attacker, allowing them to click the

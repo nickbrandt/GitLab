@@ -15,7 +15,10 @@ if (process.env.CI) {
   ]);
 }
 
-let testMatch = ['<rootDir>/spec/frontend/**/*_spec.js', '<rootDir>/ee/spec/frontend/**/*_spec.js'];
+let testMatch = ['<rootDir>/spec/frontend/**/*_spec.js'];
+if (IS_EE) {
+  testMatch.push('<rootDir>/ee/spec/frontend/**/*_spec.js');
+}
 
 // workaround for eslint-import-resolver-jest only resolving in test files
 // see https://github.com/JoinColony/eslint-import-resolver-jest#note
@@ -25,32 +28,39 @@ if (isESLint) {
   testMatch = testMatch.map(path => path.replace('_spec.js', ''));
 }
 
+const moduleNameMapper = {
+  '^~(/.*)$': '<rootDir>/app/assets/javascripts$1',
+  '^ee_component(/.*)$':
+    '<rootDir>/app/assets/javascripts/vue_shared/components/empty_component.js',
+  '^ee_else_ce(/.*)$': '<rootDir>/app/assets/javascripts$1',
+  '^helpers(/.*)$': '<rootDir>/spec/frontend/helpers$1',
+  '^vendor(/.*)$': '<rootDir>/vendor/assets/javascripts$1',
+  '\\.(jpg|jpeg|png|svg)$': '<rootDir>/spec/frontend/__mocks__/file_mock.js',
+  'emojis(/.*).json': '<rootDir>/fixtures/emojis$1.json',
+  '^spec/test_constants$': '<rootDir>/spec/frontend/helpers/test_constants',
+};
+
+if (IS_EE) {
+  const rootDirEE = '<rootDir>/ee/app/assets/javascripts$1';
+  Object.assign(moduleNameMapper, {
+    '^ee(/.*)$': rootDirEE,
+    '^ee_component(/.*)$': rootDirEE,
+    '^ee_else_ce(/.*)$': rootDirEE,
+  });
+}
+
 // eslint-disable-next-line import/no-commonjs
 module.exports = {
   testMatch,
   moduleFileExtensions: ['js', 'json', 'vue'],
-  moduleNameMapper: {
-    '^~(/.*)$': '<rootDir>/app/assets/javascripts$1',
-    '^ee(/.*)$': '<rootDir>/ee/app/assets/javascripts$1',
-    '^ee_component(/.*)$': IS_EE
-      ? '<rootDir>/ee/app/assets/javascripts$1'
-      : '<rootDir>/app/assets/javascripts/vue_shared/components/empty_component.js',
-    '^ee_else_ce(/.*)$': IS_EE
-      ? '<rootDir>/ee/app/assets/javascripts$1'
-      : '<rootDir>/app/assets/javascripts$1',
-    '^helpers(/.*)$': '<rootDir>/spec/frontend/helpers$1',
-    '^vendor(/.*)$': '<rootDir>/vendor/assets/javascripts$1',
-    '\\.(jpg|jpeg|png|svg)$': '<rootDir>/spec/frontend/__mocks__/file_mock.js',
-    'emojis(/.*).json': '<rootDir>/fixtures/emojis$1.json',
-    '^spec/test_constants$': '<rootDir>/spec/frontend/helpers/test_constants',
-  },
+  moduleNameMapper,
   collectCoverageFrom: ['<rootDir>/app/assets/javascripts/**/*.{js,vue}'],
   coverageDirectory: '<rootDir>/coverage-frontend/',
   coverageReporters: ['json', 'lcov', 'text-summary', 'clover'],
   cacheDirectory: '<rootDir>/tmp/cache/jest',
   modulePathIgnorePatterns: ['<rootDir>/.yarn-cache/'],
   reporters,
-  setupFilesAfterEnv: ['<rootDir>/spec/frontend/test_setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/spec/frontend/test_setup.js', 'jest-canvas-mock'],
   restoreMocks: true,
   transform: {
     '^.+\\.(gql|graphql)$': 'jest-transform-graphql',

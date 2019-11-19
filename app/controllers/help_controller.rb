@@ -36,12 +36,12 @@ class HelpController < ApplicationController
           render 'show.html.haml'
         else
           # Force template to Haml
-          render 'errors/not_found.html.haml', layout: 'errors', status: 404
+          render 'errors/not_found.html.haml', layout: 'errors', status: :not_found
         end
       end
 
-      # Allow access to images in the doc folder
-      format.any(:png, :gif, :jpeg, :mp4) do
+      # Allow access to specific media files in the doc folder
+      format.any(:png, :gif, :jpeg, :mp4, :mp3) do
         # Note: We are purposefully NOT using `Rails.root.join`
         path = File.join(Rails.root, 'doc', "#{@path}.#{params[:format]}")
 

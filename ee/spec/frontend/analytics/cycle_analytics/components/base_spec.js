@@ -1,18 +1,19 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Vue from 'vue';
+import httpStatusCodes from '~/lib/utils/http_status';
 import store from 'ee/analytics/cycle_analytics/store';
 import Component from 'ee/analytics/cycle_analytics/components/base.vue';
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlDaterangePicker } from '@gitlab/ui';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import GroupsDropdownFilter from 'ee/analytics/shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from 'ee/analytics/shared/components/projects_dropdown_filter.vue';
-import DateRangeDropdown from 'ee/analytics/shared/components/date_range_dropdown.vue';
 import SummaryTable from 'ee/analytics/cycle_analytics/components/summary_table.vue';
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
 import 'bootstrap';
 import '~/gl_dropdown';
+import waitForPromises from 'helpers/wait_for_promises';
 import * as mockData from '../mock_data';
 
 const noDataSvgPath = 'path/to/no/data';
@@ -41,8 +42,8 @@ function createComponent({ opts = {}, shallow = true, withStageSelected = false 
       ...mockData.group,
     });
 
-    comp.vm.$store.dispatch('receiveCycleAnalyticsDataSuccess', {
-      ...mockData.cycleAnalyticsData,
+    comp.vm.$store.dispatch('receiveGroupStagesAndEventsSuccess', {
+      ...mockData.customizableStagesAndEvents,
     });
 
     comp.vm.$store.dispatch('receiveStageDataSuccess', {
@@ -66,8 +67,8 @@ describe('Cycle Analytics component', () => {
     expect(wrapper.find(ProjectsDropdownFilter).exists()).toBe(flag);
   };
 
-  const displaysDateRangeDropdown = flag => {
-    expect(wrapper.find(DateRangeDropdown).exists()).toBe(flag);
+  const displaysDateRangePicker = flag => {
+    expect(wrapper.find(GlDaterangePicker).exists()).toBe(flag);
   };
 
   const displaysSummaryTable = flag => {
@@ -88,6 +89,27 @@ describe('Cycle Analytics component', () => {
     mock.restore();
   });
 
+  describe('mounted', () => {
+    const actionSpies = {
+      setDateRange: jest.fn(),
+    };
+
+    beforeEach(() => {
+      jest.spyOn(global.Date, 'now').mockImplementation(() => new Date(mockData.endDate));
+      wrapper = createComponent({ opts: { methods: actionSpies } });
+    });
+
+    describe('initDateRange', () => {
+      it('dispatches setDateRange with skipFetch=true', () => {
+        expect(actionSpies.setDateRange).toHaveBeenCalledWith({
+          skipFetch: true,
+          startDate: mockData.startDate,
+          endDate: mockData.endDate,
+        });
+      });
+    });
+  });
+
   describe('displays the components as required', () => {
     describe('before a filter has been selected', () => {
       it('displays an empty state', () => {
@@ -100,7 +122,7 @@ describe('Cycle Analytics component', () => {
       it('displays the groups filter', () => {
         expect(wrapper.find(GroupsDropdownFilter).exists()).toBe(true);
         expect(wrapper.find(GroupsDropdownFilter).props('queryParams')).toEqual(
-          wrapper.vm.groupsQueryParams,
+          wrapper.vm.$options.groupsQueryParams,
         );
       });
 
@@ -108,8 +130,8 @@ describe('Cycle Analytics component', () => {
         displaysProjectsDropdownFilter(false);
       });
 
-      it('does not display the date range dropdown', () => {
-        displaysDateRangeDropdown(false);
+      it('does not display the date range picker', () => {
+        displaysDateRangePicker(false);
       });
 
       it('does not display the summary table', () => {
@@ -136,15 +158,15 @@ describe('Cycle Analytics component', () => {
 
           expect(wrapper.find(ProjectsDropdownFilter).props()).toEqual(
             expect.objectContaining({
-              queryParams: wrapper.vm.projectsQueryParams,
+              queryParams: wrapper.vm.$options.projectsQueryParams,
               groupId: mockData.group.id,
               multiSelect: wrapper.vm.multiProjectSelect,
             }),
           );
         });
 
-        it('displays the date range dropdown', () => {
-          displaysDateRangeDropdown(true);
+        it('displays the date range picker', () => {
+          displaysDateRangePicker(true);
         });
 
         it('displays the summary table', () => {
@@ -224,8 +246,8 @@ describe('Cycle Analytics component', () => {
           displaysProjectsDropdownFilter(false);
         });
 
-        it('does not display the date range dropdown', () => {
-          displaysDateRangeDropdown(false);
+        it('does not display the date range picker', () => {
+          displaysDateRangePicker(false);
         });
 
         it('does not display the summary table', () => {
@@ -271,6 +293,141 @@ describe('Cycle Analytics component', () => {
           expect(wrapper.find('.js-add-stage-button').exists()).toBe(true);
         });
       });
+    });
+  });
+
+  describe('with failed requests while loading', () => {
+    const { full_path: groupId } = mockData.group;
+
+    function mockRequestCycleAnalyticsData(overrides = {}) {
+      const defaultStatus = 200;
+      const defaultRequests = {
+        fetchSummaryData: {
+          status: defaultStatus,
+          endpoint: `/groups/${groupId}/-/cycle_analytics`,
+          response: { ...mockData.cycleAnalyticsData },
+        },
+        fetchGroupStagesAndEvents: {
+          status: defaultStatus,
+          endpoint: `/-/analytics/cycle_analytics/stages?group_id=${groupId}`,
+          response: { ...mockData.customizableStagesAndEvents },
+        },
+        fetchGroupLabels: {
+          status: defaultStatus,
+          endpoint: `/groups/${groupId}/-/labels`,
+          response: [...mockData.groupLabels],
+        },
+        fetchStageData: {
+          status: defaultStatus,
+          // default first stage is issue
+          endpoint: '/groups/foo/-/cycle_analytics/events/issue.json',
+          response: { ...mockData.issueEvents },
+        },
+        fetchTasksByTypeData: {
+          status: defaultStatus,
+          endpoint: '/-/analytics/type_of_work/tasks_by_type',
+          response: { ...mockData.tasksByTypeData },
+        },
+        ...overrides,
+      };
+
+      Object.values(defaultRequests).forEach(({ endpoint, status, response }) => {
+        mock.onGet(endpoint).replyOnce(status, response);
+      });
+    }
+
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+
+      mock = new MockAdapter(axios);
+      wrapper = createComponent();
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+      mock.restore();
+    });
+
+    const findFlashError = () => document.querySelector('.flash-container .flash-text');
+    const selectGroupAndFindError = msg => {
+      wrapper.vm.onGroupSelect(mockData.group);
+
+      return waitForPromises().then(() => {
+        expect(findFlashError().innerText.trim()).toEqual(msg);
+      });
+    };
+
+    it('will display an error if the fetchSummaryData request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({
+        fetchSummaryData: {
+          status: httpStatusCodes.NOT_FOUND,
+          endpoint: `/groups/${groupId}/-/cycle_analytics`,
+          response: { response: { status: httpStatusCodes.NOT_FOUND } },
+        },
+      });
+
+      return selectGroupAndFindError(
+        'There was an error while fetching cycle analytics summary data.',
+      );
+    });
+
+    it('will display an error if the fetchGroupLabels request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({
+        fetchGroupLabels: {
+          status: httpStatusCodes.NOT_FOUND,
+          response: { response: { status: httpStatusCodes.NOT_FOUND } },
+        },
+      });
+
+      return selectGroupAndFindError(
+        'There was an error fetching label data for the selected group',
+      );
+    });
+
+    it('will display an error if the fetchGroupStagesAndEvents request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({
+        fetchGroupStagesAndEvents: {
+          endPoint: '/-/analytics/cycle_analytics/stages',
+          status: httpStatusCodes.NOT_FOUND,
+          response: { response: { status: httpStatusCodes.NOT_FOUND } },
+        },
+      });
+
+      return selectGroupAndFindError('There was an error fetching cycle analytics stages.');
+    });
+
+    it('will display an error if the fetchStageData request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({
+        fetchStageData: {
+          endPoint: `/groups/${groupId}/-/cycle_analytics/events/issue.json`,
+          status: httpStatusCodes.NOT_FOUND,
+          response: { response: { status: httpStatusCodes.NOT_FOUND } },
+        },
+      });
+
+      return selectGroupAndFindError('There was an error fetching data for the selected stage');
+    });
+
+    it('will display an error if the fetchTasksByTypeData request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({
+        fetchTasksByTypeData: {
+          endPoint: '/-/analytics/type_of_work/tasks_by_type',
+          status: httpStatusCodes.BAD_REQUEST,
+          response: { response: { status: httpStatusCodes.BAD_REQUEST } },
+        },
+      });
+
+      return selectGroupAndFindError('There was an error fetching data for the chart');
     });
   });
 });

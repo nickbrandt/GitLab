@@ -17,8 +17,6 @@ describe('Environment Header', () => {
         environment_path: '/enivronment/1',
         name: 'staging',
         external_url: 'http://example.com',
-        size: 1,
-        within_folder: false,
       },
     };
   });
@@ -30,6 +28,8 @@ describe('Environment Header', () => {
   describe('renders name and link to app', () => {
     beforeEach(() => {
       wrapper = shallowMount(Component, {
+        sync: false,
+        attachToDocument: true,
         propsData,
         localVue,
       });
@@ -65,6 +65,8 @@ describe('Environment Header', () => {
       propsData.environment.name = 'review/testing';
 
       wrapper = shallowMount(Component, {
+        sync: false,
+        attachToDocument: true,
         propsData,
         localVue,
       });
@@ -92,6 +94,8 @@ describe('Environment Header', () => {
       propsData.hasErrors = true;
 
       wrapper = shallowMount(Component, {
+        sync: false,
+        attachToDocument: true,
         propsData,
         localVue,
       });
@@ -107,6 +111,8 @@ describe('Environment Header', () => {
       propsData.hasPipelineFailed = true;
 
       wrapper = shallowMount(Component, {
+        sync: false,
+        attachToDocument: true,
         propsData,
         localVue,
       });

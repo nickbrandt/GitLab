@@ -10,15 +10,14 @@ module QA
       end
 
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
       end
 
       it 'focuses on issue board' do
         project.visit!
 
         Page::Project::Menu.perform(&:go_to_boards)
-        EE::Page::Project::Issue::Board::Show.perform do |show|
+        EE::Page::Component::IssueBoard::Show.perform do |show|
           show.click_focus_mode_button
 
           expect(show.focused_board).to be_visible

@@ -355,7 +355,7 @@ class IssuableBaseService < BaseService
     associations =
       {
         labels: issuable.labels.to_a,
-        mentioned_users: issuable.mentioned_users.to_a,
+        mentioned_users: issuable.mentioned_users(current_user).to_a,
         assignees: issuable.assignees.to_a
       }
     associations[:total_time_spent] = issuable.total_time_spent if issuable.respond_to?(:total_time_spent)
@@ -397,7 +397,7 @@ class IssuableBaseService < BaseService
   end
 
   def update_project_counter_caches?(issuable)
-    issuable.state_changed?
+    issuable.state_id_changed?
   end
 
   def parent

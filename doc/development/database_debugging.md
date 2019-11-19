@@ -3,7 +3,7 @@
 This section is to help give some copy-pasta you can use as a reference when you
 run into some head-banging database problems.
 
-An easy first step is to search for your error in Slack or google "GitLab (my error)".
+An easy first step is to search for your error in Slack, or search for `GitLab <my error>` with Google.
 
 ---
 
@@ -19,7 +19,7 @@ If you just want to delete everything and start over with an empty DB (~1 minute
 
 - `bundle exec rake db:reset RAILS_ENV=development`
 
-If you just want to delete everything and start over with dummy data (~40 minutes). This also does `db:reset` and runs DB-specific migrations:
+If you just want to delete everything and start over with dummy data (~4 minutes). This also does `db:reset` and runs DB-specific migrations:
 
 - `bundle exec rake dev:setup RAILS_ENV=development`
 

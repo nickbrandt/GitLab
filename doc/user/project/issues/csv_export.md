@@ -1,6 +1,6 @@
 # Export Issues to CSV **(STARTER)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/1126) in [GitLab Starter 9.0](https://about.gitlab.com/2017/03/22/gitlab-9-0-released/#export-issues-ees-eep).
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/1126) in [GitLab Starter 9.0](https://about.gitlab.com/blog/2017/03/22/gitlab-9-0-released/#export-issues-ees-eep).
 
 Issues can be exported as CSV from GitLab and are sent to your default notification email as an attachment.
 
@@ -67,8 +67,8 @@ Data will be encoded with a comma as the column delimiter, with `"` used to quot
 | Milestone | Title of the issue milestone |
 | Weight | Issue weight |
 | Labels | Title of any labels joined with a `,` |
-| Time Estimate | [Time estimate](../../../workflow/time_tracking.md#estimates) in seconds |
-| Time Spent | [Time spent](../../../workflow/time_tracking.md#time-spent) in seconds |
+| Time Estimate | [Time estimate](../time_tracking.md#estimates) in seconds |
+| Time Spent | [Time spent](../time_tracking.md#time-spent) in seconds |
 
 ## Limitations
 

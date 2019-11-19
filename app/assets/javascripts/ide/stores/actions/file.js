@@ -1,11 +1,10 @@
 import { joinPaths } from '~/lib/utils/url_utility';
-import { normalizeHeaders } from '~/lib/utils/common_utils';
 import { __ } from '~/locale';
 import eventHub from '../../eventhub';
 import service from '../../services';
 import * as types from '../mutation_types';
 import router from '../../ide_router';
-import { setPageTitle } from '../utils';
+import { escapeFileUrl, addFinalNewlineIfNeeded, setPageTitleForFile } from '../utils';
 import { viewerTypes, stageKeys } from '../../constants';
 
 export const closeFile = ({ commit, state, dispatch }, file) => {
@@ -58,7 +57,7 @@ export const setFileActive = ({ commit, state, getters, dispatch }, path) => {
 };
 
 export const getFileData = (
-  { state, commit, dispatch },
+  { state, commit, dispatch, getters },
   { path, makeFileActive = true, openFile = makeFileActive },
 ) => {
   const file = state.entries[path];
@@ -67,15 +66,18 @@ export const getFileData = (
 
   commit(types.TOGGLE_LOADING, { entry: file });
 
-  const url = file.prevPath ? file.url.replace(file.path, file.prevPath) : file.url;
+  const url = joinPaths(
+    gon.relative_url_root || '/',
+    state.currentProjectId,
+    file.type,
+    getters.lastCommit && getters.lastCommit.id,
+    escapeFileUrl(file.prevPath || file.path),
+  );
 
   return service
-    .getFileData(joinPaths(gon.relative_url_root || '', url.replace('/-/', '/')))
-    .then(({ data, headers }) => {
-      const normalizedHeaders = normalizeHeaders(headers);
-      let title = normalizedHeaders['PAGE-TITLE'];
-      title = file.prevPath ? title.replace(file.prevPath, file.path) : title;
-      setPageTitle(decodeURI(title));
+    .getFileData(url)
+    .then(({ data }) => {
+      setPageTitleForFile(state, file);
 
       if (data) commit(types.SET_FILE_DATA, { data, file });
       if (openFile) commit(types.TOGGLE_FILE_OPEN, path);
@@ -140,7 +142,10 @@ export const getRawFileData = ({ state, commit, dispatch, getters }, { path }) =
 
 export const changeFileContent = ({ commit, dispatch, state }, { path, content }) => {
   const file = state.entries[path];
-  commit(types.UPDATE_FILE_CONTENT, { path, content });
+  commit(types.UPDATE_FILE_CONTENT, {
+    path,
+    content: addFinalNewlineIfNeeded(content),
+  });
 
   const indexOfChangedFile = state.changedFiles.findIndex(f => f.path === path);
 
@@ -184,11 +189,6 @@ export const discardFileChanges = ({ dispatch, state, commit, getters }, path) =
 
   if (file.deleted && file.parentPath) {
     dispatch('restoreTree', file.parentPath);
-  }
-
-  if (file.movedPath) {
-    commit(types.DISCARD_FILE_CHANGES, file.movedPath);
-    commit(types.REMOVE_FILE_FROM_CHANGED, file.movedPath);
   }
 
   commit(types.DISCARD_FILE_CHANGES, path);

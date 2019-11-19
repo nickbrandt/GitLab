@@ -9,9 +9,6 @@ module EE
     CANARY_DEPLOYMENT = 'canary_deployment'
     GOLD_TRIAL = 'gold_trial'
     GOLD_TRIAL_BILLINGS = 'gold_trial_billings'
-    # Privacy Policy Update: https://gitlab.com/gitlab-org/gitlab/issues/13665
-    LATEST_PRIVACY_POLICY_UPDATE = '13665'
-    PRIVACY_POLICY_UPDATE = "privacy_policy_update_#{LATEST_PRIVACY_POLICY_UPDATE}"
 
     def show_canary_deployment_callout?(project)
       !user_dismissed?(CANARY_DEPLOYMENT) &&
@@ -53,20 +50,18 @@ module EE
     def render_dashboard_gold_trial(user)
       return unless show_gold_trial?(user, GOLD_TRIAL) &&
           user_default_dashboard?(user) &&
-          has_no_trial_or_gold_plan?(user)
+          has_no_trial_or_gold_plan?(user) &&
+          has_some_namespaces_with_no_trials?(user)
 
       render 'shared/gold_trial_callout_content'
     end
 
     def render_billings_gold_trial(user, namespace)
       return if namespace.gold_plan?
+      return unless namespace.never_had_trial?
       return unless show_gold_trial?(user, GOLD_TRIAL_BILLINGS)
 
       render 'shared/gold_trial_callout_content', is_dismissable: !namespace.free_plan?, callout: GOLD_TRIAL_BILLINGS
-    end
-
-    def show_privacy_policy_update?
-      ::Feature.enabled?(:privacy_policy_update_callout) && !user_dismissed?(PRIVACY_POLICY_UPDATE)
     end
 
     private
@@ -113,6 +108,10 @@ module EE
       return false if user.any_namespace_with_gold?
 
       !user.any_namespace_with_trial?
+    end
+
+    def has_some_namespaces_with_no_trials?(user)
+      user&.any_namespace_without_trial?
     end
   end
 end

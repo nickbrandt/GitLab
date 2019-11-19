@@ -6,6 +6,10 @@ class SyncSecurityReportsToReportApprovalRulesWorker
   include ApplicationWorker
   include PipelineQueue
 
+  feature_category :static_application_security_testing
+  latency_sensitive_worker!
+  worker_resource_boundary :cpu
+
   def perform(pipeline_id)
     pipeline = Ci::Pipeline.find_by_id(pipeline_id)
     return unless pipeline

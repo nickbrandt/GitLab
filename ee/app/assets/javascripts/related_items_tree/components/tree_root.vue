@@ -1,14 +1,11 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import Draggable from 'vuedraggable';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 
-import { ChildType } from '../constants';
 import TreeDragAndDropMixin from '../mixins/tree_dd_mixin';
 
 export default {
   components: {
-    Draggable,
     GlButton,
     GlLoadingIcon,
   },
@@ -29,10 +26,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['childrenFlags']),
-    currentItemIssuesBeginAtIndex() {
-      return this.children.findIndex(item => item.type === ChildType.Issue);
-    },
+    ...mapState(['childrenFlags', 'userSignedIn']),
     hasMoreChildren() {
       const flags = this.childrenFlags[this.parentItem.reference];
 
@@ -58,14 +52,10 @@ export default {
 </script>
 
 <template>
-  <draggable
-    tag="ul"
-    v-bind="dragOptions"
+  <component
+    :is="treeRootWrapper"
+    v-bind="treeRootOptions"
     class="list-unstyled related-items-list tree-root"
-    ghost-class="tree-item-drag-active"
-    :data-parent-reference="parentItem.reference"
-    :value="children"
-    :move="handleDragOnMove"
     @start="handleDragOnStart"
     @end="handleDragOnEnd"
   >
@@ -80,5 +70,5 @@ export default {
       >
       <gl-loading-icon v-else size="sm" class="mt-1 mb-1" />
     </li>
-  </draggable>
+  </component>
 </template>

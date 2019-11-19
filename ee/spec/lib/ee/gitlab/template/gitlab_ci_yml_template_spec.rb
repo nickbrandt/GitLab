@@ -3,17 +3,19 @@
 require 'spec_helper'
 
 describe Gitlab::Template::GitlabCiYmlTemplate do
-  subject { described_class }
-
   describe '.all' do
-    it 'finds the Security Products templates' do
-      all = subject.all.map(&:name)
+    let(:templates) { described_class.all.map(&:name) }
 
-      expect(all).to include('Container-Scanning')
-      expect(all).to include('DAST')
-      expect(all).to include('Dependency-Scanning')
-      expect(all).to include('License-Management')
-      expect(all).to include('SAST')
+    it 'finds the Security Products templates' do
+      expect(templates).to include('Container-Scanning')
+      expect(templates).to include('DAST')
+      expect(templates).to include('Dependency-Scanning')
+      expect(templates).to include('License-Management')
+      expect(templates).to include('SAST')
+    end
+
+    it 'finds the Verify templates' do
+      expect(templates).to include('Browser-Performance')
     end
   end
 end

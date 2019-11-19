@@ -23,7 +23,7 @@ module Gitlab
         step = ENV['STEP'] ? ENV['STEP'].to_i : 1
 
         with_geo_db do
-          ActiveRecord::Migrator.rollback(ActiveRecord::Migrator.migrations_paths, step)
+          migration_context.rollback(step)
         end
       end
 

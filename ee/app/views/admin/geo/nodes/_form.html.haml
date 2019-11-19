@@ -70,13 +70,11 @@
     = form.number_field :minimum_reverification_interval, class: 'form-control col-sm-2', min: 1
     .form-text.text-muted= s_('Geo|Control the minimum interval in days that a repository should be reverified for this primary node')
 
-- if ::Feature.enabled?(:geo_object_storage_replication)
-  .form-group.row.js-hide-if-geo-primary{ class: ('hidden' unless geo_node.secondary?) }
-    .col-sm-10
-      = form.label :sync_object_storage, _('Object Storage replication'), class: 'label-bold'
-      .form-check
-        = form.check_box :sync_object_storage, class: 'form-check-input'
-        = form.label :sync_object_storage, class: 'form-check-label' do
-          %span= s_('Geo|Allow this secondary node to replicate content on Object Storage')
-        .form-text.text-muted= s_('Geo|If enabled, and if object storage is enabled, GitLab will handle Object Storage replication using Geo')
-
+.form-group.row.js-hide-if-geo-primary{ class: ('hidden' unless geo_node.secondary?) }
+  .col-sm-10
+    = form.label :sync_object_storage, _('Object Storage replication'), class: 'label-bold'
+    .form-check
+      = form.check_box :sync_object_storage, class: 'form-check-input'
+      = form.label :sync_object_storage, class: 'form-check-label' do
+        %span= s_('Geo|Allow this secondary node to replicate content on Object Storage')
+      .form-text.text-muted= s_('Geo|If enabled, and if object storage is enabled, GitLab will handle Object Storage replication using Geo')

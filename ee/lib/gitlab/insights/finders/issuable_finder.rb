@@ -31,6 +31,8 @@ module Gitlab
 
         # Returns an Active Record relation of issuables.
         def find
+          return unless entity_args
+
           relation = finder
             .new(current_user, finder_args)
             .execute
@@ -69,23 +71,24 @@ module Gitlab
             state: query[:issuable_state] || 'opened',
             label_name: query[:filter_labels],
             sort: 'created_asc',
-            created_after: created_after_argument,
-            projects: finder_projects
-          }.merge(entity_arg)
+            created_after: created_after_argument
+          }.merge(entity_args)
         end
 
-        def entity_arg
-          case entity
-          when ::Project
-            if finder_projects
-              {} # We just rely on projects argument
+        def entity_args
+          strong_memoize(:entity_args) do
+            case entity
+            when ::Project
+              if finder_projects
+                { project_id: entity.id } if finder_projects.exists?(entity.id) # rubocop: disable CodeReuse/ActiveRecord
+              else
+                { project_id: entity.id }
+              end
+            when ::Namespace
+              { group_id: entity.id, projects: finder_projects }
             else
-              { project_id: entity.id }
+              raise InvalidEntityError, "Entity class `#{entity.class}` is not supported. Supported classes are Project and Namespace!"
             end
-          when ::Namespace
-            { group_id: entity.id }
-          else
-            raise InvalidEntityError, "Entity class `#{entity.class}` is not supported. Supported classes are Project and Namespace!"
           end
         end
 

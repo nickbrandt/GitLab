@@ -16,13 +16,10 @@ module QA
       end
     end
 
-    before(:all) do
-      Runtime::Browser.visit(:gitlab, Page::Main::Login)
-      Page::Main::Login.perform(&:sign_in_using_credentials)
-    end
-
     context 'group insights page' do
       before do
+        Flow::Login.sign_in
+
         group = Resource::Group.fabricate_via_api!
         group.visit!
 
@@ -34,6 +31,8 @@ module QA
 
     context 'project insights page' do
       before do
+        Flow::Login.sign_in
+
         project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'project-insights'
           project.description = 'Project Insights'

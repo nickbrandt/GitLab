@@ -36,6 +36,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! |  |
+| `sha` | String! | Last commit sha for entry |
 | `name` | String! |  |
 | `type` | EntryType! |  |
 | `path` | String! |  |
@@ -47,15 +48,102 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
+| `id` | ID! | ID (global ID) of the commit |
+| `sha` | String! | SHA1 ID of the commit |
+| `title` | String | Title of the commit message |
+| `description` | String | Description of the commit message |
+| `message` | String | Raw commit message |
+| `authoredDate` | Time | Timestamp of when the commit was authored |
+| `webUrl` | String! | Web URL of the commit |
+| `signatureHtml` | String | Rendered HTML of the commit signature |
+| `authorName` | String | Commit authors name |
+| `author` | User | Author of the commit |
+| `latestPipeline` | Pipeline | Latest pipeline of the commit |
+
+### CreateDiffNotePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `note` | Note | The note after mutation |
+
+### CreateEpicPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `epic` | Epic | The created epic |
+
+### CreateImageDiffNotePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `note` | Note | The note after mutation |
+
+### CreateNotePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `note` | Note | The note after mutation |
+
+### Design
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
 | `id` | ID! |  |
-| `sha` | String! |  |
-| `title` | String |  |
-| `description` | String |  |
-| `message` | String |  |
-| `authoredDate` | Time |  |
-| `webUrl` | String! |  |
-| `author` | User |  |
-| `latestPipeline` | Pipeline | Latest pipeline for this commit |
+| `project` | Project! |  |
+| `issue` | Issue! |  |
+| `notesCount` | Int! | The total count of user-created notes for this design |
+| `filename` | String! |  |
+| `fullPath` | String! |  |
+| `event` | DesignVersionEvent! | The change that happened to the design at this version |
+| `image` | String! |  |
+| `diffRefs` | DiffRefs! |  |
+
+### DesignCollection
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `project` | Project! |  |
+| `issue` | Issue! |  |
+
+### DesignManagementDeletePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `version` | DesignVersion | The new version in which the designs are deleted |
+
+### DesignManagementUploadPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `designs` | Design! => Array | The designs that were uploaded by the mutation |
+| `skippedDesigns` | Design! => Array | Any designs that were skipped from the upload due to there being no change to their content since their last version |
+
+### DesignVersion
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `id` | ID! |  |
+| `sha` | ID! |  |
+
+### DestroyNotePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `note` | Note | The note after mutation |
 
 ### DetailedStatus
 
@@ -74,9 +162,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `headSha` | String! | The sha of the head at the time the comment was made |
-| `baseSha` | String | The merge base of the branch the comment was made on |
-| `startSha` | String! | The sha of the branch being compared against |
+| `diffRefs` | DiffRefs! |  |
 | `filePath` | String! | The path of the file that was changed |
 | `oldPath` | String | The path of the file on the start sha. |
 | `newPath` | String | The path of the file on the head sha. |
@@ -88,32 +174,152 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `width` | Int | The total width of the image |
 | `height` | Int | The total height of the image |
 
+### DiffRefs
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `headSha` | String! | The sha of the head at the time the comment was made |
+| `baseSha` | String! | The merge base of the branch the comment was made on |
+| `startSha` | String! | The sha of the branch being compared against |
+
 ### Discussion
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! |  |
+| `replyId` | ID! | The ID used to reply to this discussion |
 | `createdAt` | Time! |  |
+
+### Epic
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `userPermissions` | EpicPermissions! | Permissions for the current user on the resource |
+| `id` | ID! |  |
+| `iid` | ID! |  |
+| `title` | String |  |
+| `description` | String |  |
+| `state` | EpicState! |  |
+| `group` | Group! |  |
+| `parent` | Epic |  |
+| `author` | User! |  |
+| `startDate` | Time |  |
+| `startDateIsFixed` | Boolean |  |
+| `startDateFixed` | Time |  |
+| `startDateFromMilestones` | Time |  |
+| `dueDate` | Time |  |
+| `dueDateIsFixed` | Boolean |  |
+| `dueDateFixed` | Time |  |
+| `dueDateFromMilestones` | Time |  |
+| `closedAt` | Time |  |
+| `createdAt` | Time |  |
+| `updatedAt` | Time |  |
+| `hasChildren` | Boolean! |  |
+| `hasIssues` | Boolean! |  |
+| `webPath` | String! |  |
+| `webUrl` | String! |  |
+| `relativePosition` | Int | The relative position of the epic in the Epic tree |
+| `relationPath` | String |  |
+| `reference` | String! |  |
+| `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this epic |
+| `descendantCounts` | EpicDescendantCount | Number of open and closed descendant epics and issues |
+
+### EpicDescendantCount
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `openedEpics` | Int | Number of opened sub-epics |
+| `closedEpics` | Int | Number of closed sub-epics |
+| `openedIssues` | Int | Number of opened epic issues |
+| `closedIssues` | Int | Number of closed epic issues |
+
+### EpicIssue
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `userPermissions` | IssuePermissions! | Permissions for the current user on the resource |
+| `iid` | ID! | Internal ID of the issue |
+| `title` | String! | Title of the issue |
+| `titleHtml` | String | The GitLab Flavored Markdown rendering of `title` |
+| `description` | String | Description of the issue |
+| `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
+| `state` | IssueState! | State of the issue |
+| `reference` | String! | Internal reference of the issue. Returned in shortened format by default |
+| `author` | User! | User that created the issue |
+| `milestone` | Milestone | Milestone of the issue |
+| `dueDate` | Time | Due date of the issue |
+| `confidential` | Boolean! | Indicates the issue is confidential |
+| `discussionLocked` | Boolean! | Indicates discussion is locked on the issue |
+| `upvotes` | Int! | Number of upvotes the issue has received |
+| `downvotes` | Int! | Number of downvotes the issue has received |
+| `userNotesCount` | Int! | Number of user notes of the issue |
+| `webPath` | String! | Web path of the issue |
+| `webUrl` | String! | Web URL of the issue |
+| `relativePosition` | Int | Relative position of the issue (used for positioning in epic tree and issue boards) |
+| `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this issue |
+| `timeEstimate` | Int! | Time estimate of the issue |
+| `totalTimeSpent` | Int! | Total time reported as spent on the issue |
+| `closedAt` | Time | Timestamp of when the issue was closed |
+| `createdAt` | Time! | Timestamp of when the issue was created |
+| `updatedAt` | Time! | Timestamp of when the issue was last updated |
+| `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
+| `epic` | Epic | The epic to which issue belongs |
+| `weight` | Int |  |
+| `designs` | DesignCollection |  |
+| `designCollection` | DesignCollection |  |
+| `epicIssueId` | ID! |  |
+| `relationPath` | String |  |
+| `id` | ID | The global id of the epic-issue relation |
+
+### EpicPermissions
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `readEpic` | Boolean! | Whether or not a user can perform `read_epic` on this resource |
+| `readEpicIid` | Boolean! | Whether or not a user can perform `read_epic_iid` on this resource |
+| `updateEpic` | Boolean! | Whether or not a user can perform `update_epic` on this resource |
+| `destroyEpic` | Boolean! | Whether or not a user can perform `destroy_epic` on this resource |
+| `adminEpic` | Boolean! | Whether or not a user can perform `admin_epic` on this resource |
+| `createEpic` | Boolean! | Whether or not a user can perform `create_epic` on this resource |
+| `createNote` | Boolean! | Whether or not a user can perform `create_note` on this resource |
+| `awardEmoji` | Boolean! | Whether or not a user can perform `award_emoji` on this resource |
+
+### EpicSetSubscriptionPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `epic` | Epic | The epic after mutation |
+
+### EpicTreeReorderPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
 
 ### Group
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `id` | ID! |  |
-| `name` | String! |  |
-| `path` | String! |  |
-| `fullName` | String! |  |
-| `fullPath` | ID! |  |
-| `description` | String |  |
+| `id` | ID! | ID of the namespace |
+| `name` | String! | Name of the namespace |
+| `path` | String! | Path of the namespace |
+| `fullName` | String! | Full name of the namespace |
+| `fullPath` | ID! | Full path of the namespace |
+| `description` | String | Description of the namespace |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
-| `visibility` | String |  |
-| `lfsEnabled` | Boolean |  |
-| `requestAccessEnabled` | Boolean |  |
-| `rootStorageStatistics` | RootStorageStatistics | The aggregated storage statistics. Only available if the namespace has no parent |
+| `visibility` | String | Visibility of the namespace |
+| `lfsEnabled` | Boolean | Indicates if Large File Storage (LFS) is enabled for namespace |
+| `requestAccessEnabled` | Boolean | Indicates if users can request access to namespace |
+| `rootStorageStatistics` | RootStorageStatistics | Aggregated storage statistics of the namespace. Only available for root namespaces |
 | `userPermissions` | GroupPermissions! | Permissions for the current user on the resource |
-| `webUrl` | String! |  |
-| `avatarUrl` | String |  |
-| `parent` | Group |  |
+| `webUrl` | String! | Web URL of the group |
+| `avatarUrl` | String | Avatar URL of the group |
+| `parent` | Group | Parent group |
+| `epicsEnabled` | Boolean |  |
+| `epic` | Epic |  |
 
 ### GroupPermissions
 
@@ -126,28 +332,35 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `userPermissions` | IssuePermissions! | Permissions for the current user on the resource |
-| `iid` | ID! |  |
-| `title` | String! |  |
+| `iid` | ID! | Internal ID of the issue |
+| `title` | String! | Title of the issue |
 | `titleHtml` | String | The GitLab Flavored Markdown rendering of `title` |
-| `description` | String |  |
+| `description` | String | Description of the issue |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
-| `state` | IssueState! |  |
-| `reference` | String! |  |
-| `author` | User! |  |
-| `milestone` | Milestone |  |
-| `dueDate` | Time |  |
-| `confidential` | Boolean! |  |
-| `discussionLocked` | Boolean! |  |
-| `upvotes` | Int! |  |
-| `downvotes` | Int! |  |
-| `userNotesCount` | Int! |  |
-| `webPath` | String! |  |
-| `webUrl` | String! |  |
-| `relativePosition` | Int |  |
-| `closedAt` | Time |  |
-| `createdAt` | Time! |  |
-| `updatedAt` | Time! |  |
-| `taskCompletionStatus` | TaskCompletionStatus! |  |
+| `state` | IssueState! | State of the issue |
+| `reference` | String! | Internal reference of the issue. Returned in shortened format by default |
+| `author` | User! | User that created the issue |
+| `milestone` | Milestone | Milestone of the issue |
+| `dueDate` | Time | Due date of the issue |
+| `confidential` | Boolean! | Indicates the issue is confidential |
+| `discussionLocked` | Boolean! | Indicates discussion is locked on the issue |
+| `upvotes` | Int! | Number of upvotes the issue has received |
+| `downvotes` | Int! | Number of downvotes the issue has received |
+| `userNotesCount` | Int! | Number of user notes of the issue |
+| `webPath` | String! | Web path of the issue |
+| `webUrl` | String! | Web URL of the issue |
+| `relativePosition` | Int | Relative position of the issue (used for positioning in epic tree and issue boards) |
+| `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this issue |
+| `timeEstimate` | Int! | Time estimate of the issue |
+| `totalTimeSpent` | Int! | Total time reported as spent on the issue |
+| `closedAt` | Time | Timestamp of when the issue was closed |
+| `createdAt` | Time! | Timestamp of when the issue was created |
+| `updatedAt` | Time! | Timestamp of when the issue was last updated |
+| `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
+| `epic` | Epic | The epic to which issue belongs |
+| `weight` | Int |  |
+| `designs` | DesignCollection |  |
+| `designCollection` | DesignCollection |  |
 
 ### IssuePermissions
 
@@ -158,64 +371,74 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `updateIssue` | Boolean! | Whether or not a user can perform `update_issue` on this resource |
 | `createNote` | Boolean! | Whether or not a user can perform `create_note` on this resource |
 | `reopenIssue` | Boolean! | Whether or not a user can perform `reopen_issue` on this resource |
+| `readDesign` | Boolean! | Whether or not a user can perform `read_design` on this resource |
+| `createDesign` | Boolean! | Whether or not a user can perform `create_design` on this resource |
+| `destroyDesign` | Boolean! | Whether or not a user can perform `destroy_design` on this resource |
 
 ### Label
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `description` | String |  |
+| `id` | ID! | Label ID |
+| `description` | String | Description of the label (markdown rendered as HTML for caching) |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
-| `title` | String! |  |
-| `color` | String! |  |
-| `textColor` | String! |  |
+| `title` | String! | Content of the label |
+| `color` | String! | Background color of the label |
+| `textColor` | String! | Text color of the label |
 
 ### MergeRequest
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `userPermissions` | MergeRequestPermissions! | Permissions for the current user on the resource |
-| `id` | ID! |  |
-| `iid` | String! |  |
-| `title` | String! |  |
+| `id` | ID! | ID of the merge request |
+| `iid` | String! | Internal ID of the merge request |
+| `title` | String! | Title of the merge request |
 | `titleHtml` | String | The GitLab Flavored Markdown rendering of `title` |
-| `description` | String |  |
+| `description` | String | Description of the merge request (markdown rendered as HTML for caching) |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
-| `state` | MergeRequestState! |  |
-| `createdAt` | Time! |  |
-| `updatedAt` | Time! |  |
-| `sourceProject` | Project |  |
-| `targetProject` | Project! |  |
-| `project` | Project! |  |
-| `projectId` | Int! |  |
-| `sourceProjectId` | Int |  |
-| `targetProjectId` | Int! |  |
-| `sourceBranch` | String! |  |
-| `targetBranch` | String! |  |
-| `workInProgress` | Boolean! |  |
-| `mergeWhenPipelineSucceeds` | Boolean |  |
-| `diffHeadSha` | String |  |
-| `mergeCommitSha` | String |  |
-| `userNotesCount` | Int |  |
-| `shouldRemoveSourceBranch` | Boolean |  |
-| `forceRemoveSourceBranch` | Boolean |  |
-| `mergeStatus` | String |  |
-| `inProgressMergeCommitSha` | String |  |
-| `mergeError` | String |  |
-| `allowCollaboration` | Boolean |  |
-| `shouldBeRebased` | Boolean! |  |
-| `rebaseCommitSha` | String |  |
-| `rebaseInProgress` | Boolean! |  |
-| `mergeCommitMessage` | String |  |
-| `defaultMergeCommitMessage` | String |  |
-| `mergeOngoing` | Boolean! |  |
-| `sourceBranchExists` | Boolean! |  |
-| `mergeableDiscussionsState` | Boolean |  |
-| `webUrl` | String |  |
-| `upvotes` | Int! |  |
-| `downvotes` | Int! |  |
-| `subscribed` | Boolean! |  |
-| `headPipeline` | Pipeline |  |
-| `taskCompletionStatus` | TaskCompletionStatus! |  |
+| `state` | MergeRequestState! | State of the merge request |
+| `createdAt` | Time! | Timestamp of when the merge request was created |
+| `updatedAt` | Time! | Timestamp of when the merge request was last updated |
+| `sourceProject` | Project | Source project of the merge request |
+| `targetProject` | Project! | Target project of the merge request |
+| `diffRefs` | DiffRefs | References of the base SHA, the head SHA, and the start SHA for this merge request |
+| `project` | Project! | Alias for target_project |
+| `projectId` | Int! | ID of the merge request project |
+| `sourceProjectId` | Int | ID of the merge request source project |
+| `targetProjectId` | Int! | ID of the merge request target project |
+| `sourceBranch` | String! | Source branch of the merge request |
+| `targetBranch` | String! | Target branch of the merge request |
+| `workInProgress` | Boolean! | Indicates if the merge request is a work in progress (WIP) |
+| `mergeWhenPipelineSucceeds` | Boolean | Indicates if the merge has been set to be merged when its pipeline succeeds (MWPS) |
+| `diffHeadSha` | String | Diff head SHA of the merge request |
+| `mergeCommitSha` | String | SHA of the merge request commit (set once merged) |
+| `userNotesCount` | Int | User notes count of the merge request |
+| `shouldRemoveSourceBranch` | Boolean | Indicates if the source branch of the merge request will be deleted after merge |
+| `forceRemoveSourceBranch` | Boolean | Indicates if the project settings will lead to source branch deletion after merge |
+| `mergeStatus` | String | Status of the merge request |
+| `inProgressMergeCommitSha` | String | Commit SHA of the merge request if merge is in progress |
+| `mergeError` | String | Error message due to a merge error |
+| `allowCollaboration` | Boolean | Indicates if members of the target project can push to the fork |
+| `shouldBeRebased` | Boolean! | Indicates if the merge request will be rebased |
+| `rebaseCommitSha` | String | Rebase commit SHA of the merge request |
+| `rebaseInProgress` | Boolean! | Indicates if there is a rebase currently in progress for the merge request |
+| `mergeCommitMessage` | String | Deprecated - renamed to defaultMergeCommitMessage |
+| `defaultMergeCommitMessage` | String | Default merge commit message of the merge request |
+| `mergeOngoing` | Boolean! | Indicates if a merge is currently occurring |
+| `sourceBranchExists` | Boolean! | Indicates if the source branch of the merge request exists |
+| `mergeableDiscussionsState` | Boolean | Indicates if all discussions in the merge request have been resolved, allowing the merge request to be merged |
+| `webUrl` | String | Web URL of the merge request |
+| `upvotes` | Int! | Number of upvotes for the merge request |
+| `downvotes` | Int! | Number of downvotes for the merge request |
+| `headPipeline` | Pipeline | The pipeline running on the branch HEAD of the merge request |
+| `milestone` | Milestone | The milestone of the merge request |
+| `subscribed` | Boolean! | Indicates if the currently logged in user is subscribed to this merge request |
+| `discussionLocked` | Boolean! | Indicates if comments on the merge request are locked to members only |
+| `timeEstimate` | Int! | Time estimate of the merge request |
+| `totalTimeSpent` | Int! | Total time reported as spent on the merge request |
+| `reference` | String! | Internal reference of the merge request. Returned in shortened format by default |
+| `taskCompletionStatus` | TaskCompletionStatus! | Completion status of tasks |
 
 ### MergeRequestPermissions
 
@@ -230,6 +453,46 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `cherryPickOnCurrentMergeRequest` | Boolean! | Whether or not a user can perform `cherry_pick_on_current_merge_request` on this resource |
 | `revertOnCurrentMergeRequest` | Boolean! | Whether or not a user can perform `revert_on_current_merge_request` on this resource |
 
+### MergeRequestSetAssigneesPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
+### MergeRequestSetLabelsPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
+### MergeRequestSetLockedPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
+### MergeRequestSetMilestonePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
+### MergeRequestSetSubscriptionPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
 ### MergeRequestSetWipPayload
 
 | Name  | Type  | Description |
@@ -242,35 +505,37 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `version` | String! |  |
-| `revision` | String! |  |
+| `version` | String! | Version |
+| `revision` | String! | Revision |
 
 ### Milestone
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `description` | String |  |
-| `title` | String! |  |
-| `state` | String! |  |
-| `dueDate` | Time |  |
-| `startDate` | Time |  |
-| `createdAt` | Time! |  |
-| `updatedAt` | Time! |  |
+| `id` | ID! | ID of the milestone |
+| `description` | String | Description of the milestone |
+| `title` | String! | Title of the milestone |
+| `state` | String! | State of the milestone |
+| `dueDate` | Time | Timestamp of the milestone due date |
+| `startDate` | Time | Timestamp of the milestone start date |
+| `createdAt` | Time! | Timestamp of milestone creation |
+| `updatedAt` | Time! | Timestamp of last milestone update |
 
 ### Namespace
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `id` | ID! |  |
-| `name` | String! |  |
-| `path` | String! |  |
-| `fullName` | String! |  |
-| `fullPath` | ID! |  |
-| `description` | String |  |
+| `id` | ID! | ID of the namespace |
+| `name` | String! | Name of the namespace |
+| `path` | String! | Path of the namespace |
+| `fullName` | String! | Full name of the namespace |
+| `fullPath` | ID! | Full path of the namespace |
+| `description` | String | Description of the namespace |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
-| `visibility` | String |  |
-| `lfsEnabled` | Boolean |  |
-| `requestAccessEnabled` | Boolean |  |
+| `visibility` | String | Visibility of the namespace |
+| `lfsEnabled` | Boolean | Indicates if Large File Storage (LFS) is enabled for namespace |
+| `requestAccessEnabled` | Boolean | Indicates if users can request access to namespace |
+| `rootStorageStatistics` | RootStorageStatistics | Aggregated storage statistics of the namespace. Only available for root namespaces |
 
 ### Note
 
@@ -342,46 +607,47 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `userPermissions` | ProjectPermissions! | Permissions for the current user on the resource |
-| `id` | ID! |  |
-| `fullPath` | ID! |  |
-| `path` | String! |  |
-| `nameWithNamespace` | String! |  |
-| `name` | String! |  |
-| `description` | String |  |
+| `id` | ID! | ID of the project |
+| `fullPath` | ID! | Full path of the project |
+| `path` | String! | Path of the project |
+| `nameWithNamespace` | String! | Full name of the project with its namespace |
+| `name` | String! | Name of the project (without namespace) |
+| `description` | String | Short description of the project |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
-| `tagList` | String |  |
-| `sshUrlToRepo` | String |  |
-| `httpUrlToRepo` | String |  |
-| `webUrl` | String |  |
-| `starCount` | Int! |  |
-| `forksCount` | Int! |  |
-| `createdAt` | Time |  |
-| `lastActivityAt` | Time |  |
-| `archived` | Boolean |  |
-| `visibility` | String |  |
-| `containerRegistryEnabled` | Boolean |  |
-| `sharedRunnersEnabled` | Boolean |  |
-| `lfsEnabled` | Boolean |  |
-| `mergeRequestsFfOnlyEnabled` | Boolean |  |
-| `avatarUrl` | String |  |
-| `issuesEnabled` | Boolean |  |
-| `mergeRequestsEnabled` | Boolean |  |
-| `wikiEnabled` | Boolean |  |
-| `snippetsEnabled` | Boolean |  |
-| `jobsEnabled` | Boolean |  |
-| `publicJobs` | Boolean |  |
-| `openIssuesCount` | Int |  |
-| `importStatus` | String |  |
-| `onlyAllowMergeIfPipelineSucceeds` | Boolean |  |
-| `requestAccessEnabled` | Boolean |  |
-| `onlyAllowMergeIfAllDiscussionsAreResolved` | Boolean |  |
-| `printingMergeRequestLinkEnabled` | Boolean |  |
-| `namespace` | Namespace |  |
-| `group` | Group |  |
-| `statistics` | ProjectStatistics |  |
-| `repository` | Repository |  |
-| `mergeRequest` | MergeRequest |  |
-| `issue` | Issue |  |
+| `tagList` | String | List of project tags |
+| `sshUrlToRepo` | String | URL to connect to the project via SSH |
+| `httpUrlToRepo` | String | URL to connect to the project via HTTPS |
+| `webUrl` | String | Web URL of the project |
+| `starCount` | Int! | Number of times the project has been starred |
+| `forksCount` | Int! | Number of times the project has been forked |
+| `createdAt` | Time | Timestamp of the project creation |
+| `lastActivityAt` | Time | Timestamp of the project last activity |
+| `archived` | Boolean | Archived status of the project |
+| `visibility` | String | Visibility of the project |
+| `containerRegistryEnabled` | Boolean | Indicates if the project stores Docker container images in a container registry |
+| `sharedRunnersEnabled` | Boolean | Indicates if shared runners are enabled on the project |
+| `lfsEnabled` | Boolean | Indicates if the project has Large File Storage (LFS) enabled |
+| `mergeRequestsFfOnlyEnabled` | Boolean | Indicates if no merge commits should be created and all merges should instead be fast-forwarded, which means that merging is only allowed if the branch could be fast-forwarded. |
+| `avatarUrl` | String | URL to avatar image file of the project |
+| `issuesEnabled` | Boolean | (deprecated) Does this project have issues enabled?. Use `issues_access_level` instead |
+| `mergeRequestsEnabled` | Boolean | (deprecated) Does this project have merge_requests enabled?. Use `merge_requests_access_level` instead |
+| `wikiEnabled` | Boolean | (deprecated) Does this project have wiki enabled?. Use `wiki_access_level` instead |
+| `snippetsEnabled` | Boolean | (deprecated) Does this project have snippets enabled?. Use `snippets_access_level` instead |
+| `jobsEnabled` | Boolean | (deprecated) Enable jobs for this project. Use `builds_access_level` instead |
+| `publicJobs` | Boolean | Indicates if there is public access to pipelines and job details of the project, including output logs and artifacts |
+| `openIssuesCount` | Int | Number of open issues for the project |
+| `importStatus` | String | Status of project import background job of the project |
+| `onlyAllowMergeIfPipelineSucceeds` | Boolean | Indicates if merge requests of the project can only be merged with successful jobs |
+| `requestAccessEnabled` | Boolean | Indicates if users can request member access to the project |
+| `onlyAllowMergeIfAllDiscussionsAreResolved` | Boolean | Indicates if merge requests of the project can only be merged when all the discussions are resolved |
+| `printingMergeRequestLinkEnabled` | Boolean | Indicates if a link to create or view a merge request should display after a push to Git repositories of the project from the command line |
+| `removeSourceBranchAfterMerge` | Boolean | Indicates if `Delete source branch` option should be enabled by default for all new merge requests of the project |
+| `namespace` | Namespace | Namespace of the project |
+| `group` | Group | Group of the project |
+| `statistics` | ProjectStatistics | Statistics of the project |
+| `repository` | Repository | Git repository of the project |
+| `mergeRequest` | MergeRequest | A single merge request of the project |
+| `issue` | Issue | A single issue of the project |
 
 ### ProjectPermissions
 
@@ -424,18 +690,22 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `createPages` | Boolean! | Whether or not a user can perform `create_pages` on this resource |
 | `destroyPages` | Boolean! | Whether or not a user can perform `destroy_pages` on this resource |
 | `readPagesContent` | Boolean! | Whether or not a user can perform `read_pages_content` on this resource |
+| `adminOperations` | Boolean! | Whether or not a user can perform `admin_operations` on this resource |
+| `readDesign` | Boolean! | Whether or not a user can perform `read_design` on this resource |
+| `createDesign` | Boolean! | Whether or not a user can perform `create_design` on this resource |
+| `destroyDesign` | Boolean! | Whether or not a user can perform `destroy_design` on this resource |
 
 ### ProjectStatistics
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `commitCount` | Int! |  |
-| `storageSize` | Int! |  |
-| `repositorySize` | Int! |  |
-| `lfsObjectsSize` | Int! |  |
-| `buildArtifactsSize` | Int! |  |
-| `packagesSize` | Int! |  |
-| `wikiSize` | Int |  |
+| `commitCount` | Int! | Commit count of the project |
+| `storageSize` | Int! | Storage size of the project |
+| `repositorySize` | Int! | Repository size of the project |
+| `lfsObjectsSize` | Int! | Large File Storage (LFS) object size of the project |
+| `buildArtifactsSize` | Int! | Build artifacts size of the project |
+| `packagesSize` | Int! | Packages size of the project |
+| `wikiSize` | Int | Wiki size of the project |
 
 ### RemoveAwardEmojiPayload
 
@@ -449,38 +719,63 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `rootRef` | String |  |
-| `empty` | Boolean! |  |
-| `exists` | Boolean! |  |
-| `tree` | Tree |  |
+| `rootRef` | String | Default branch of the repository |
+| `empty` | Boolean! | Indicates repository has no visible content |
+| `exists` | Boolean! | Indicates a corresponding Git repository exists on disk |
+| `tree` | Tree | Tree of the repository |
 
 ### RootStorageStatistics
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `storageSize` | Int! | The total storage in Bytes |
-| `repositorySize` | Int! | The Git repository size in Bytes |
-| `lfsObjectsSize` | Int! | The LFS objects size in Bytes |
-| `buildArtifactsSize` | Int! | The CI artifacts size in Bytes |
-| `packagesSize` | Int! | The packages size in Bytes |
-| `wikiSize` | Int! | The wiki size in Bytes |
+| `storageSize` | Int! | The total storage in bytes |
+| `repositorySize` | Int! | The git repository size in bytes |
+| `lfsObjectsSize` | Int! | The LFS objects size in bytes |
+| `buildArtifactsSize` | Int! | The CI artifacts size in bytes |
+| `packagesSize` | Int! | The packages size in bytes |
+| `wikiSize` | Int! | The wiki size in bytes |
 
 ### Submodule
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! |  |
+| `sha` | String! | Last commit sha for entry |
 | `name` | String! |  |
 | `type` | EntryType! |  |
 | `path` | String! |  |
 | `flatPath` | String! |  |
+| `webUrl` | String |  |
+| `treeUrl` | String |  |
 
 ### TaskCompletionStatus
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `count` | Int! |  |
-| `completedCount` | Int! |  |
+| `count` | Int! | Number of total tasks |
+| `completedCount` | Int! | Number of completed tasks |
+
+### Todo
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `id` | ID! | Id of the todo |
+| `project` | Project | The project this todo is associated with |
+| `group` | Group | Group this todo is associated with |
+| `author` | User! | The owner of this todo |
+| `action` | TodoActionEnum! | Action of the todo |
+| `targetType` | TodoTargetEnum! | Target type of the todo |
+| `body` | String! | Body of the todo |
+| `state` | TodoStateEnum! | State of the todo |
+| `createdAt` | Time! | Timestamp this todo was created |
+
+### TodoMarkDonePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `todo` | Todo! | The requested todo |
 
 ### ToggleAwardEmojiPayload
 
@@ -495,24 +790,41 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `lastCommit` | Commit |  |
+| `lastCommit` | Commit | Last commit for the tree |
 
 ### TreeEntry
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! |  |
+| `sha` | String! | Last commit sha for entry |
 | `name` | String! |  |
 | `type` | EntryType! |  |
 | `path` | String! |  |
 | `flatPath` | String! |  |
 | `webUrl` | String |  |
 
+### UpdateEpicPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `epic` | Epic | The epic after mutation |
+
+### UpdateNotePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `note` | Note | The note after mutation |
+
 ### User
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `name` | String! |  |
-| `username` | String! |  |
-| `avatarUrl` | String! |  |
-| `webUrl` | String! |  |
+| `name` | String! | Human-readable name of the user |
+| `username` | String! | Username of the user. Unique within this instance of GitLab |
+| `avatarUrl` | String! | URL of the user's avatar |
+| `webUrl` | String! | Web URL of the user |

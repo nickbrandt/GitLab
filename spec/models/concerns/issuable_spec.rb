@@ -45,8 +45,11 @@ describe Issuable do
       it { is_expected.to validate_presence_of(:iid) }
       it { is_expected.to validate_presence_of(:author) }
       it { is_expected.to validate_presence_of(:title) }
-      it { is_expected.to validate_length_of(:title).is_at_most(255) }
-      it { is_expected.to validate_length_of(:description).is_at_most(1_000_000) }
+      it { is_expected.to validate_length_of(:title).is_at_most(described_class::TITLE_LENGTH_MAX) }
+      it { is_expected.to validate_length_of(:description).is_at_most(described_class::DESCRIPTION_LENGTH_MAX).on(:create) }
+
+      it_behaves_like 'validates description length with custom validation'
+      it_behaves_like 'truncates the description to its allowed maximum length on import'
     end
 
     describe 'milestone' do
@@ -105,6 +108,34 @@ describe Issuable do
       issue.save(validate: false)
 
       expect(issue.author_name).to eq nil
+    end
+  end
+
+  describe '.initialize' do
+    it 'maps the state to the right state_id' do
+      described_class::STATE_ID_MAP.each do |key, value|
+        issuable = MergeRequest.new(state: key)
+
+        expect(issuable.state).to eq(key)
+        expect(issuable.state_id).to eq(value)
+      end
+    end
+
+    it 'maps a string version of the state to the right state_id' do
+      described_class::STATE_ID_MAP.each do |key, value|
+        issuable = MergeRequest.new('state' => key)
+
+        expect(issuable.state).to eq(key)
+        expect(issuable.state_id).to eq(value)
+      end
+    end
+
+    it 'gives preference to state_id if present' do
+      issuable = MergeRequest.new('state' => 'opened',
+                                  'state_id' => described_class::STATE_ID_MAP['merged'])
+
+      expect(issuable.state).to eq('merged')
+      expect(issuable.state_id).to eq(described_class::STATE_ID_MAP['merged'])
     end
   end
 

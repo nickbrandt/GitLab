@@ -7,6 +7,8 @@ module Noteable
   # avoiding n+1 queries and improving performance.
   NoteableMeta = Struct.new(:user_notes_count)
 
+  MAX_NOTES_LIMIT = 5_000
+
   class_methods do
     # `Noteable` class names that support replying to individual notes.
     def replyable_types
@@ -104,10 +106,6 @@ module Noteable
 
   def discussions_resolved?
     discussions_resolvable? && resolvable_discussions.none?(&:to_be_resolved?)
-  end
-
-  def discussions_to_be_resolved?
-    discussions_resolvable? && !discussions_resolved?
   end
 
   def discussions_to_be_resolved

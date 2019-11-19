@@ -3,9 +3,11 @@
 module EE
   module Clusters
     module ClustersController
+      include MetricsDashboard
       extend ActiveSupport::Concern
 
       prepended do
+        before_action :expire_etag_cache, only: [:show]
         before_action :authorize_read_prometheus!, only: :prometheus_proxy
       end
 
@@ -50,27 +52,39 @@ module EE
         end
       end
 
-      def metrics_dashboard
-        project_for_dashboard = defined?(project) ? project : nil # Project is not defined for group and admin level clusters
-        dashboard = ::Gitlab::Metrics::Dashboard::Finder.find(project_for_dashboard, current_user, metrics_dashboard_params)
-
+      def environments
         respond_to do |format|
-          if dashboard[:status] == :success
-            format.json do
-              render status: :ok, json: dashboard.slice(:dashboard, :status)
-            end
-          else
-            format.json do
-              render(
-                status: dashboard[:http_status],
-                json: dashboard.slice(:message, :status)
-              )
-            end
+          format.json do
+            ::Gitlab::PollingInterval.set_header(response, interval: 5_000)
+
+            environments = ::Clusters::EnvironmentsFinder.new(cluster, current_user).execute
+
+            render json: serialize_environments(
+              environments.preload_for_cluster_environment_entity,
+              request,
+              response
+            )
           end
         end
       end
 
       private
+
+      def expire_etag_cache
+        return if request.format.json? || !clusterable.environments_cluster_path(cluster)
+
+        # this forces to reload json content
+        ::Gitlab::EtagCaching::Store.new.tap do |store|
+          store.touch(clusterable.environments_cluster_path(cluster))
+        end
+      end
+
+      def serialize_environments(environments, request, response)
+        ::Clusters::EnvironmentSerializer
+          .new(cluster: cluster, current_user: current_user)
+          .with_pagination(request, response)
+          .represent(environments)
+      end
 
       def prometheus_adapter
         return unless cluster&.application_prometheus_available?

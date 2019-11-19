@@ -212,9 +212,9 @@ Do not include the same information in multiple places. [Link to a SSOT instead.
 
 - Use inclusive language and avoid jargon, as well as uncommon
   words. The docs should be clear and easy to understand.
-- Write in the 3rd person (use "we", "you", "us", "one", instead of "I" or "me").
+- Write in the 3rd person (use "we," "you," "us," "one," instead of "I" or "me").
 - Be clear, concise, and stick to the goal of the doc.
-- Write in US English.
+- Write in US English with US grammar.
 - Capitalize "G" and "L" in GitLab.
 - Use title case when referring to:
   - [GitLab Features](https://about.gitlab.com/features/). For example, Issue Board,
@@ -225,9 +225,23 @@ Do not include the same information in multiple places. [Link to a SSOT instead.
   - Methods or methodologies. For example, Continuous Integration, Continuous
     Deployment, Scrum, and Agile.
 
-NOTE: **Note:**
-Some features are also objects. For example, "GitLab's Merge Requests support X." and
-"Create a new merge request for Z.".
+    NOTE: **Note:**
+    Some features are also objects. For example, "GitLab's Merge Requests support X" and
+    "Create a new merge request for Z."
+
+- Avoid use of the future tense:
+  - Instead of, "After you execute this command, the result will be displayed," say "After you execute this command, the result is displayed."
+  - Only use the future tense to convey when the action or result will actually occur at a future time.
+- Do not use contractions:
+  - Instead of "don't," "can't," "doesn't," and so on, say "do not," "cannot," or "does not."
+  - Possible exceptions are cases when a more familiar tone is desired, such as a blog post or other casual context.
+- Do not use slashes to clump different words together or as a replacement for the word "or":
+  - Instead of "and/or," consider saying "or," or use another sensible construction.
+  - Other examples include "clone/fetch," author/assignee," and "namespace/repository name." Break apart any such instances in an appropriate way.
+  - Exceptions to this rule include commonly accepted technical terms such as CI/CD, TCP/IP, and so on.
+- Do not use "may" and "might" interchangeably:
+  - Use "might" to indicate the probability of something occurring. "If you skip this step, the import process might fail."
+  - Use "may" to indicate giving permission for someone to do something, or consider using "can" instead. "You may select either option on this screen." Or, "you can select either option on this screen."
 
 ## Text
 
@@ -470,23 +484,57 @@ For other punctuation rules, please refer to the
 - Leave exactly one blank line before and after a heading.
 - Do not use links in headings.
 - Add the corresponding [product badge](#product-badges) according to the tier the feature belongs.
+- Use sentence case in headings. Do not capitalize the words of the title, unless
+  it refers to a product feature. For example, capitalizing "issues" is acceptable in
+  `## What you can do with GitLab Issues`, but not in `## Closing multiple issues`.
 
 ## Links
 
 - Use inline link markdown markup `[Text](https://example.com)`.
   It's easier to read, review, and maintain. **Do not** use `[Text][identifier]`.
-- To link to internal documentation, use relative links, not full URLs. Use `../` to
-  navigate to high-level directories, and always add the file name `file.md` at the
-  end of the link with the `.md` extension, not `.html`.
-  Example: instead of `[text](../../merge_requests/)`, use
-  `[text](../../merge_requests/index.md)` or, `[text](../../ci/README.md)`, or,
-  for anchor links, `[text](../../ci/README.md#examples)`.
-  Using the markdown extension is necessary for the [`/help`](index.md#gitlab-help)
-  section of GitLab.
-- To link from CE to EE-only documentation, use the EE-only doc full URL.
+
 - Use [meaningful anchor texts](https://www.futurehosting.com/blog/links-should-have-meaningful-anchor-text-heres-why/).
   E.g., instead of writing something like `Read more about GitLab Issue Boards [here](LINK)`,
   write `Read more about [GitLab Issue Boards](LINK)`.
+
+### Links to internal documentation
+
+- To link to internal documentation, use relative links, not full URLs.
+  Use `../` to navigate to high-level directories. Links should not refer to root.
+
+  Don't:
+
+  ```md
+  [Geo Troubleshooting](https://docs.gitlab.com/ee/administration/geo/replication/troubleshooting.html)
+  [Geo Troubleshooting](/ee/administration/geo/replication/troubleshooting.md)
+  ```
+
+  Do:
+
+  ```md
+  [Geo Troubleshooting](../../geo/replication/troubleshooting.md)
+  ```
+
+- Always add the file name `file.md` at the end of the link with the `.md` extension, not `.html`.
+
+  Don't:
+
+  ```md
+  [merge requests](../../merge_requests/)
+  [issues](../../issues/tags.html)
+  [issue tags](../../issues/tags.html#stages)
+  ```
+
+  Do:
+
+  ```md
+  [merge requests](../../merge_requests/index.md)
+  [issues](../../issues/tags.md)
+  [issue tags](../../issues/tags.md#stages)
+  ```
+
+- Using the markdown extension is necessary for the [`/help`](index.md#gitlab-help)
+  section of GitLab.
 
 ### Links requiring permissions
 
@@ -556,15 +604,12 @@ Inside the document:
 - Always use a proper description for what the image is about. That way, when a
   browser fails to show the image, this text will be used as an alternative
   description.
-- If there are consecutive images with little text between them, always add
-  three dashes (`---`) between the image and the text to create a horizontal
-  line for better clarity.
 - If a heading is placed right after an image, always add three dashes (`---`)
   between the image and the heading.
 
 ### Remove image shadow
 
-All images displayed on docs.gitlab.com have a box shadow by default.
+All images displayed on the [GitLab Docs site](https://docs.gitlab.com) have a box shadow by default.
 To remove the box shadow, use the image class `.image-noshadow` applied
 directly to an HTML `img` tag:
 
@@ -598,7 +643,7 @@ You can link any up-to-date video that is useful to the GitLab user.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/472) in GitLab 12.1.
 
-GitLab docs (docs.gitlab.com) support embedded videos.
+The [GitLab Docs site](https://docs.gitlab.com) supports embedded videos.
 
 You can only embed videos from
 [GitLab's official YouTube account](https://www.youtube.com/channel/UCnMGQ8QHMAnVIsI3xJrihhg).
@@ -634,7 +679,7 @@ leave a blank line here
 leave a blank line here
 ```
 
-This is how it renders on docs.gitlab.com:
+This is how it renders on the GitLab Docs site:
 
 <div class="video-fallback">
   See the video: <a href="https://www.youtube.com/watch?v=enMumwvLAug">What is GitLab</a>.
@@ -693,6 +738,10 @@ use the following markup for highlighting.
 _Note that the alert boxes only work for one paragraph only. Multiple paragraphs,
 lists, headers, etc will not render correctly. For multiple lines, use blockquotes instead._
 
+Alert boxes only render on the GitLab Docs site (<https://docs.gitlab.com>).
+Within GitLab itself, they will appear as plain markdown text (like the examples
+above the rendered versions, below).
+
 ### Note
 
 Notes catch the eye of most readers, and therefore should be used very sparingly.
@@ -717,7 +766,7 @@ NOTE: **Note:**
 This is something to note.
 ```
 
-How it renders in docs.gitlab.com:
+How it renders on the GitLab Docs site:
 
 NOTE: **Note:**
 This is something to note.
@@ -729,7 +778,7 @@ TIP: **Tip:**
 This is a tip.
 ```
 
-How it renders in docs.gitlab.com:
+How it renders on the GitLab Docs site:
 
 TIP: **Tip:**
 This is a tip.
@@ -741,7 +790,7 @@ CAUTION: **Caution:**
 This is something to be cautious about.
 ```
 
-How it renders in docs.gitlab.com:
+How it renders on the GitLab Docs site:
 
 CAUTION: **Caution:**
 This is something to be cautious about.
@@ -753,7 +802,7 @@ DANGER: **Danger:**
 This is a breaking change, a bug, or something very important to note.
 ```
 
-How it renders in docs.gitlab.com:
+How it renders on the GitLab Docs site:
 
 DANGER: **Danger:**
 This is a breaking change, a bug, or something very important to note.
@@ -766,7 +815,7 @@ For highlighting a text within a blue blockquote, use this format:
 > This is a blockquote.
 ```
 
-which renders in docs.gitlab.com to:
+which renders on the [GitLab Docs site](https://docs.gitlab.com) as:
 
 > This is a blockquote.
 
@@ -999,6 +1048,38 @@ In this case:
 - Different highlighting languages are used for each config in the code block.
 - The [GitLab Restart](#gitlab-restart) section is used to explain a required restart/reconfigure of GitLab.
 
+## Feature flags
+
+Sometimes features are shipped with feature flags, either:
+
+- On by default, but providing the option to turn the feature off.
+- Off by default, but providing the option to turn the feature on.
+
+When documenting feature flags for a feature, it's important that users know:
+
+- Why a feature flag is necessary. Some of the reasons are
+  [outlined in the handbook](https://about.gitlab.com/handbook/product/#alpha-beta-ga).
+- That administrative access is required to make a feature flag change.
+- What to ask for when requesting a change to a feature flag's state.
+
+NOTE: **Note:**
+The [Product Manager for the relevant group](https://about.gitlab.com/handbook/product/categories/#devops-stages)
+must review and approve the addition or removal of any mentions of using feature flags before the doc change is merged.
+
+The following is sample text for adding feature flag documentation for a feature:
+
+````md
+### Disabling the feature
+
+This feature comes with the `:feature_flag` feature flag enabled by default. However, in some cases
+this feature is incompatible with old configuration. To turn off the feature while configuration is
+migrated, ask a GitLab administrator with Rails console access to run the following command:
+
+```ruby
+Feature.disable(:feature_flag)
+```
+````
+
 ## API
 
 Here is a list of must-have items. Use them in the exact order that appears
@@ -1098,12 +1179,12 @@ Rendered example:
 - Prefer to use examples using the personal access token and don't pass data of
   username and password.
 
-| Methods                                    | Description                                           |
-|:-------------------------------------------|:------------------------------------------------------|
-| `-H "PRIVATE-TOKEN: <your_access_token>"`  | Use this method as is, whenever authentication needed |
-| `-X POST`                                  | Use this method when creating new objects             |
-| `-X PUT`                                   | Use this method when updating existing objects        |
-| `-X DELETE`                                | Use this method when removing existing objects        |
+| Methods                                         | Description                                           |
+|:-------------------------------------------     |:------------------------------------------------------|
+| `--header "PRIVATE-TOKEN: <your_access_token>"` | Use this method as is, whenever authentication needed |
+| `--request POST`                                | Use this method when creating new objects             |
+| `--request PUT`                                 | Use this method when updating existing objects        |
+| `--request DELETE`                              | Use this method when removing existing objects        |
 
 ### cURL Examples
 
@@ -1125,9 +1206,9 @@ Create a new project under the authenticated user's namespace:
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects?name=foo"
 ```
 
-#### Post data using cURL's --data
+#### Post data using cURL's `--data`
 
-Instead of using `-X POST` and appending the parameters to the URI, you can use
+Instead of using `--request POST` and appending the parameters to the URI, you can use
 cURL's `--data` option. The example below will create a new project `foo` under
 the authenticated user's namespace.
 
@@ -1154,7 +1235,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "title=
 ```
 
 The above example is run by and administrator and will add an SSH public key
-titled ssh-key to user's account which has an id of 25.
+titled `ssh-key` to user's account which has an id of 25.
 
 #### Escape special characters
 

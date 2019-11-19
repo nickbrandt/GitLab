@@ -24,8 +24,8 @@ In the above example:
 
 - A Review App is built every time a commit is pushed to `topic branch`.
 - The reviewer fails two reviews before passing the third review.
-- Once the review as passed, `topic branch` is merged into `master` where it's deploy to staging.
-- After been approved in staging, the changes that were merged into `master` are deployed in to production.
+- Once the review has passed, `topic branch` is merged into `master` where it is deployed to staging.
+- After having been approved in staging, the changes that were merged into `master` are deployed in to production.
 
 ## How Review Apps work
 
@@ -85,7 +85,7 @@ in your repository map to paths of pages on your website using a Route Map.
 Once set, GitLab will display **View on ...** buttons, which will take you
 to the pages changed directly from merge requests.
 
-To set up a route map, add a a file inside the repository at `.gitlab/route-map.yml`,
+To set up a route map, add a file inside the repository at `.gitlab/route-map.yml`,
 which contains a YAML array that maps `source` paths (in the repository) to `public`
 paths (on the website).
 

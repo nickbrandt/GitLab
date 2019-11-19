@@ -10,6 +10,9 @@ This section documents LDAP features specific to to GitLab Enterprise Edition
 For documentation relevant to both Community Edition and Enterprise Edition,
 see the main [LDAP documentation](ldap.md).
 
+NOTE: **Note:**
+[Microsoft Active Directory Trusts](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc771568(v=ws.10)) are not supported
+
 ## Use cases
 
 - User sync: Once a day, GitLab will update users against LDAP.
@@ -281,7 +284,7 @@ sync to run once every 2 hours at the top of the hour.
 > Introduced in GitLab Enterprise Edition Starter 8.9.
 
 Using the `external_groups` setting will allow you to mark all users belonging
-to these groups as [external users](../../user/permissions.md#external-users-permissions).
+to these groups as [external users](../../user/permissions.md#external-users-core-only).
 Group membership is checked periodically through the `LdapGroupSync` background
 task.
 
@@ -415,7 +418,7 @@ main: # 'main' is the GitLab 'provider ID' of this LDAP server
 
 [^1]: In Active Directory, a user is marked as disabled/blocked if the user
       account control attribute (`userAccountControl:1.2.840.113556.1.4.803`)
-      has bit 2 set. See <https://ctogonewild.com/2009/09/03/bitmask-searches-in-ldap/>
+      has bit 2 set. See <https://ctovswild.com/2009/09/03/bitmask-searches-in-ldap/>
       for more information.
 
 ### User DN has changed

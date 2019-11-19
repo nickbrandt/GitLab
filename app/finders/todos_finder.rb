@@ -23,9 +23,15 @@ class TodosFinder
 
   NONE = '0'
 
-  TODO_TYPES = Set.new(%w(Issue MergeRequest Epic)).freeze
+  TODO_TYPES = Set.new(%w(Issue MergeRequest)).freeze
 
   attr_accessor :current_user, :params
+
+  class << self
+    def todo_types
+      TODO_TYPES
+    end
+  end
 
   def initialize(current_user, params = {})
     @current_user = current_user
@@ -33,6 +39,8 @@ class TodosFinder
   end
 
   def execute
+    return Todo.none if current_user.nil?
+
     items = current_user.todos
     items = by_action_id(items)
     items = by_action(items)
@@ -65,8 +73,20 @@ class TodosFinder
     params[:action_id]
   end
 
+  def action_array_provided?
+    params[:action].is_a?(Array)
+  end
+
+  def map_actions_to_ids
+    params[:action].map { |item| Todo::ACTION_NAMES.key(item.to_sym) }
+  end
+
   def to_action_id
-    Todo::ACTION_NAMES.key(action.to_sym)
+    if action_array_provided?
+      map_actions_to_ids
+    else
+      Todo::ACTION_NAMES.key(action.to_sym)
+    end
   end
 
   def action?
@@ -97,12 +117,6 @@ class TodosFinder
     params[:group_id].present?
   end
 
-  def project
-    strong_memoize(:project) do
-      Project.find_without_deleted(params[:project_id]) if project?
-    end
-  end
-
   def group
     strong_memoize(:group) do
       Group.find(params[:group_id])
@@ -110,7 +124,7 @@ class TodosFinder
   end
 
   def type?
-    type.present? && TODO_TYPES.include?(type)
+    type.present? && self.class.todo_types.include?(type)
   end
 
   def type
@@ -133,9 +147,19 @@ class TodosFinder
     end
   end
 
+  def action_id_array_provided?
+    params[:action_id].is_a?(Array) && params[:action_id].any?
+  end
+
+  def by_action_ids(items)
+    items.for_action(action_id)
+  end
+
   def by_action_id(items)
+    return by_action_ids(items) if action_id_array_provided?
+
     if action_id?
-      items.for_action(action_id)
+      by_action_ids(items)
     else
       items
     end
@@ -151,26 +175,22 @@ class TodosFinder
 
   def by_project(items)
     if project?
-      items.for_project(project)
+      items.for_undeleted_projects.for_project(params[:project_id])
     else
       items
     end
   end
 
   def by_group(items)
-    if group?
-      items.for_group_and_descendants(group)
-    else
-      items
-    end
+    return items unless group?
+
+    items.for_group_ids_and_descendants(params[:group_id])
   end
 
   def by_state(items)
-    if params[:state].to_s == 'done'
-      items.done
-    else
-      items.pending
-    end
+    return items.pending if params[:state].blank?
+
+    items.with_states(params[:state])
   end
 
   def by_type(items)
@@ -181,3 +201,5 @@ class TodosFinder
     end
   end
 end
+
+TodosFinder.prepend_if_ee('EE::TodosFinder')

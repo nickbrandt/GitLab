@@ -40,6 +40,9 @@ describe Geo::DesignRepositorySyncService do
 
       allow_any_instance_of(Geo::ProjectHousekeepingService).to receive(:execute)
         .and_return(nil)
+
+      allow_any_instance_of(Users::RefreshAuthorizedProjectsService).to receive(:execute)
+        .and_return(nil)
     end
 
     include_context 'lease handling'
@@ -135,6 +138,17 @@ describe Geo::DesignRepositorySyncService do
       def registry_with_retry_count(retries)
         create(:geo_design_registry, project: project, retry_count: retries)
       end
+    end
+  end
+
+  context 'race condition when RepositoryUpdatedEvent was processed during a sync' do
+    let(:registry) { subject.send(:registry) }
+
+    it 'reschedules the sync' do
+      expect(::Geo::DesignRepositorySyncWorker).to receive(:perform_async)
+      expect(registry).to receive(:finish_sync!).and_return(false)
+
+      subject.send(:mark_sync_as_successful)
     end
   end
 end

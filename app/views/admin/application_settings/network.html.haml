@@ -24,7 +24,7 @@
   .settings-content
     = render 'ip_limits'
 
-%section.settings.as-outbound.no-animate#js-outbound-settings{ class: ('expanded' if expanded_by_default?) }
+%section.settings.as-outbound.no-animate#js-outbound-settings{ class: ('expanded' if expanded_by_default?), data: { qa_selector: 'outbound_requests_section' } }
   .settings-header
     %h4
       = _('Outbound requests')
@@ -45,3 +45,5 @@
       = _('Configure paths to be protected by Rack Attack. A web server restart is required after changing these settings.')
   .settings-content
     = render 'protected_paths'
+
+= render_if_exists 'admin/application_settings/ee_network_settings'

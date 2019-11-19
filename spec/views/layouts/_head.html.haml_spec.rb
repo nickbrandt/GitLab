@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'layouts/_head' do
@@ -5,6 +7,7 @@ describe 'layouts/_head' do
 
   before do
     allow(view).to receive(:current_application_settings).and_return(Gitlab::CurrentSettings.current_application_settings)
+    allow(view).to receive(:experiment_enabled?).and_return(false)
   end
 
   it 'escapes HTML-safe strings in page_title' do
@@ -81,7 +84,7 @@ describe 'layouts/_head' do
       allow(Gitlab::CurrentSettings).to receive(:snowplow_collector_hostname).and_return('www.snow.plow')
     end
 
-    it 'add a snowplow script tag with asset host' do
+    it 'adds a snowplow script tag with asset host' do
       render
       expect(rendered).to match('http://test.host/assets/snowplow/')
       expect(rendered).to match('window.snowplow')

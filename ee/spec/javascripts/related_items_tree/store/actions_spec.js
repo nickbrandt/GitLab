@@ -5,12 +5,8 @@ import * as actions from 'ee/related_items_tree/store/actions';
 import * as types from 'ee/related_items_tree/store/mutation_types';
 
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
-import {
-  ChildType,
-  ChildState,
-  ActionType,
-  PathIdSeparator,
-} from 'ee/related_items_tree/constants';
+import { ChildType, ChildState } from 'ee/related_items_tree/constants';
+import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
 
 import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
@@ -805,8 +801,7 @@ describe('RelatedItemTree', () => {
 
       describe('receiveAddItemSuccess', () => {
         it('should set `state.itemAddInProgress` to false and dispatches actions `setPendingReferences`, `setItemInputValue` and `toggleAddItemForm`', done => {
-          state.epicsBeginAtIndex = 0;
-          state.actionType = ActionType.Epic;
+          state.issuableType = issuableTypesMap.EPIC;
           state.isEpic = true;
 
           const mockEpicsWithoutPerm = mockEpics.map(item =>
@@ -848,7 +843,7 @@ describe('RelatedItemTree', () => {
               },
               {
                 type: 'toggleAddItemForm',
-                payload: { actionType: ActionType.Epic, toggleState: false },
+                payload: { toggleState: false },
               },
             ],
             done,
@@ -881,7 +876,7 @@ describe('RelatedItemTree', () => {
           actions.receiveAddItemFailure(
             {
               commit: () => {},
-              state: { actionType: ActionType.Epic },
+              state: { issuableType: issuableTypesMap.EPIC },
             },
             {
               message,
@@ -906,7 +901,7 @@ describe('RelatedItemTree', () => {
         });
 
         it('should dispatch `requestAddItem` and `receiveAddItemSuccess` actions on request success', done => {
-          state.actionType = ActionType.Epic;
+          state.issuableType = issuableTypesMap.EPIC;
           state.epicsEndpoint = '/foo/bar';
           state.pendingReferences = ['foo'];
           state.isEpic = true;
@@ -932,7 +927,7 @@ describe('RelatedItemTree', () => {
         });
 
         it('should dispatch `requestAddItem` and `receiveAddItemFailure` actions on request failure', done => {
-          state.actionType = ActionType.Epic;
+          state.issuableType = issuableTypesMap.EPIC;
           state.epicsEndpoint = '/foo/bar';
           state.pendingReferences = ['foo'];
 
@@ -974,13 +969,12 @@ describe('RelatedItemTree', () => {
           const createdEpic = Object.assign({}, mockEpics[0], {
             id: `gid://gitlab/Epic/${mockEpics[0].id}`,
             reference: `${mockEpics[0].group.fullPath}${mockEpics[0].reference}`,
-            pathIdSeparator: '&',
+            pathIdSeparator: PathIdSeparator.Epic,
           });
-          state.epicsBeginAtIndex = 0;
           state.parentItem = {
             fullPath: createdEpic.group.fullPath,
           };
-          state.actionType = ActionType.Epic;
+          state.issuableType = issuableTypesMap.EPIC;
           state.isEpic = true;
 
           testAction(
@@ -1004,7 +998,7 @@ describe('RelatedItemTree', () => {
               },
               {
                 type: 'toggleCreateEpicForm',
-                payload: { actionType: ActionType.Epic, toggleState: false },
+                payload: { toggleState: false },
               },
             ],
             done,
@@ -1033,7 +1027,7 @@ describe('RelatedItemTree', () => {
           actions.receiveCreateItemFailure(
             {
               commit: () => {},
-              state: { actionType: ActionType.Epic },
+              state: {},
             },
             {
               message,
@@ -1052,7 +1046,7 @@ describe('RelatedItemTree', () => {
         beforeEach(() => {
           mock = new MockAdapter(axios);
           state.parentItem = mockParentItem;
-          state.actionType = ActionType.Epic;
+          state.issuableType = issuableTypesMap.EPIC;
         });
 
         afterEach(() => {

@@ -32,6 +32,14 @@ module BlobHelper
     File.join(segments)
   end
 
+  def ide_fork_and_edit_path(project = @project, ref = @ref, path = @path, options = {})
+    if current_user
+      project_forks_path(project,
+                        namespace_key: current_user&.namespace&.id,
+                        continue: edit_blob_fork_params(ide_edit_path(project, ref, path)))
+    end
+  end
+
   def encode_ide_path(path)
     url_encode(path).gsub('%2F', '/')
   end
@@ -39,7 +47,7 @@ module BlobHelper
   def edit_blob_button(project = @project, ref = @ref, path = @path, options = {})
     return unless blob = readable_blob(options, path, project, ref)
 
-    common_classes = "btn js-edit-blob #{options[:extra_class]}"
+    common_classes = "btn btn-primary js-edit-blob #{options[:extra_class]}"
 
     edit_button_tag(blob,
                     common_classes,
@@ -54,7 +62,7 @@ module BlobHelper
     return unless blob = readable_blob(options, path, project, ref)
 
     edit_button_tag(blob,
-                    'btn btn-default',
+                    'btn btn-inverted btn-primary ide-edit-button',
                     _('Web IDE'),
                     ide_edit_path(project, ref, path, options),
                     project,
@@ -100,7 +108,7 @@ module BlobHelper
       path,
       label:      _("Delete"),
       action:     "delete",
-      btn_class:  "remove",
+      btn_class:  "default",
       modal_type: "remove"
     )
   end
@@ -133,11 +141,7 @@ module BlobHelper
     if @build && @entry
       raw_project_job_artifacts_url(@project, @build, path: @entry.path, **kwargs)
     elsif @snippet
-      if @snippet.project_id
-        raw_project_snippet_url(@project, @snippet, **kwargs)
-      else
-        raw_snippet_url(@snippet, **kwargs)
-      end
+      reliable_raw_snippet_url(@snippet)
     elsif @blob
       project_raw_url(@project, @id, **kwargs)
     end
@@ -197,13 +201,13 @@ module BlobHelper
   end
 
   def copy_file_path_button(file_path)
-    clipboard_button(text: file_path, gfm: "`#{file_path}`", class: 'btn-clipboard btn-transparent', title: 'Copy file path to clipboard')
+    clipboard_button(text: file_path, gfm: "`#{file_path}`", class: 'btn-clipboard btn-transparent', title: _('Copy file path'))
   end
 
   def copy_blob_source_button(blob)
     return unless blob.rendered_as_text?(ignore_errors: false)
 
-    clipboard_button(target: ".blob-content[data-blob-id='#{blob.id}']", class: "btn btn-sm js-copy-blob-source-btn", title: "Copy source to clipboard")
+    clipboard_button(target: ".blob-content[data-blob-id='#{blob.id}']", class: "btn btn-sm js-copy-blob-source-btn", title: _("Copy file contents"))
   end
 
   def open_raw_blob_button(blob)

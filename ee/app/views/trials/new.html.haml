@@ -1,0 +1,29 @@
+- page_title _('Start a Free Gold Trial')
+
+%h3.center.pt-6
+  = _('Start a Free Gold Trial')
+
+%p.center
+  = _('We need some additional information to activate your free trial')
+
+= render 'errors'
+
+= form_tag create_lead_trials_path, method: :post do |f|
+  .form-group
+    = label_tag :company_name, _('Company name'), for: :company_name, class: 'col-form-label'
+    = text_field_tag :company_name, params[:company_name], class: 'form-control', required: true
+  .form-group
+    = label_tag :company_size, _('Number of employees?'), for: :company_size, class: 'col-form-label'
+    = select_tag :company_size, company_size_options_for_select(params[:company_size]), include_blank: true, class: 'select2', required: true
+  .form-group
+    = label_tag :phone_number, _('Telephone number'), for: :phone_number, class: 'col-form-label'
+    = text_field_tag :phone_number, params[:phone_number], class: 'form-control', required: true
+  .form-group
+    = label_tag :number_of_users, _('How many users will be evaluating the trial?'), for: :number_of_users, class: 'col-form-label'
+    = number_field_tag :number_of_users, nil, class: 'form-control', required: true, min: 1
+  .form-group
+    = label_tag :country, _('Country'), class: 'col-form-label'
+    = select_tag :country, options_for_select([[_('Please select a country'), '']]), class: 'select2', required: true, id: 'country_select', data: { countries_end_point: countries_path }
+  = submit_tag _('Continue'), class: 'btn btn-success btn-block'
+
+= render 'skip_trial'

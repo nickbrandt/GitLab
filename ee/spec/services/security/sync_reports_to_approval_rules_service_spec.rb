@@ -35,7 +35,7 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
 
       context 'when only low-severity vulnerabilities are present' do
         before do
-          create(:ee_ci_build, :success, :dast, name: 'dast_job', pipeline: pipeline, project: project)
+          create(:ee_ci_build, :success, :low_severity_dast_report, name: 'dast_job', pipeline: pipeline, project: project)
         end
 
         it 'lowers approvals_required count to zero' do
@@ -56,10 +56,6 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
         end
 
         it "won't change approvals_required count" do
-          expect(
-            pipeline.security_reports.reports.values.all?(&:unsafe_severity?)
-          ).to be false
-
           expect { subject }
             .not_to change { report_approver_rule.reload.approvals_required }
         end
@@ -73,7 +69,7 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
         context "when a license violates the license compliance policy" do
           let!(:blacklisted_license) { create(:software_license, name: license_name) }
           let!(:ci_build) { create(:ee_ci_build, :success, :license_management, pipeline: pipeline, project: project) }
-          let!(:license_name) { ci_build.pipeline.license_management_report.license_names[0] }
+          let!(:license_name) { ci_build.pipeline.license_scanning_report.license_names[0] }
 
           specify { expect { subject }.not_to change { license_compliance_rule.reload.approvals_required } }
           specify { expect(subject[:status]).to be(:success) }
@@ -88,7 +84,7 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
 
         context "when an unexpected error occurs" do
           before do
-            allow_any_instance_of(Gitlab::Ci::Reports::LicenseManagement::Report).to receive(:violates?).and_raise('heck')
+            allow_any_instance_of(Gitlab::Ci::Reports::LicenseScanning::Report).to receive(:violates?).and_raise('heck')
           end
 
           specify { expect(subject[:status]).to be(:error) }
@@ -119,7 +115,7 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
 
       context 'when only low-severity vulnerabilities are present' do
         before do
-          create(:ee_ci_build, :success, :dast, name: 'dast_job', pipeline: pipeline, project: project)
+          create(:ee_ci_build, :success, :low_severity_dast_report, name: 'dast_job', pipeline: pipeline, project: project)
         end
 
         it 'lowers approvals_required count to zero' do
@@ -135,13 +131,14 @@ describe Security::SyncReportsToApprovalRulesService, '#execute' do
   end
 
   context 'without reports' do
+    let(:pipeline) { create(:ci_pipeline, :running, project: project, merge_requests_as_head_pipeline: [merge_request]) }
+
     it "won't change approvals_required count" do
       expect { subject }
         .not_to change { report_approver_rule.reload.approvals_required }
     end
 
     context "license compliance policy" do
-      let(:pipeline) { create(:ee_ci_pipeline, :running, project: project, merge_requests_as_head_pipeline: [merge_request]) }
       let!(:software_license_policy) { create(:software_license_policy, :blacklist, project: project, software_license: blacklisted_license) }
       let!(:license_compliance_rule) { create(:report_approver_rule, :license_management, merge_request: merge_request, approvals_required: 1) }
       let!(:blacklisted_license) { create(:software_license) }

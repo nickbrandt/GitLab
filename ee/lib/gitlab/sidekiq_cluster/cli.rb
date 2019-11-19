@@ -49,7 +49,8 @@ module Gitlab
 
         @logger.info("Starting cluster with #{queue_groups.length} processes")
 
-        @processes = SidekiqCluster.start(queue_groups, @environment, @rails_path, @max_concurrency, dryrun: @dryrun)
+        @processes = SidekiqCluster.start(queue_groups, env: @environment, directory: @rails_path,
+          max_concurrency: @max_concurrency, dryrun: @dryrun)
 
         return if @dryrun
 

@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { ApolloMutation } from 'vue-apollo';
 import ReplyPlaceholder from '~/notes/components/discussion_reply_placeholder.vue';
 import DesignDiscussion from 'ee/design_management/components/design_notes/design_discussion.vue';
 import DesignNote from 'ee/design_management/components/design_notes/design_note.vue';
@@ -49,6 +50,7 @@ describe('Design discussions component', () => {
       },
       stubs: {
         ReplyPlaceholder,
+        ApolloMutation,
       },
       mocks: { $apollo },
     });
@@ -73,7 +75,7 @@ describe('Design discussions component', () => {
   it('hides reply placeholder and opens form on placeholder click', () => {
     findReplyPlaceholder().trigger('click');
 
-    wrapper.vm.$nextTick(() => {
+    return wrapper.vm.$nextTick().then(() => {
       expect(findReplyPlaceholder().exists()).toBe(false);
       expect(findReplyForm().exists()).toBe(true);
     });
@@ -85,16 +87,17 @@ describe('Design discussions component', () => {
       isFormRendered: true,
     });
 
-    wrapper.vm.$nextTick(() => {
-      findReplyForm().vm.$emit('submitForm');
+    return wrapper.vm
+      .$nextTick()
+      .then(() => {
+        findReplyForm().vm.$emit('submitForm');
 
-      expect(mutate).toHaveBeenCalledWith(mutationVariables);
+        expect(mutate).toHaveBeenCalledWith(mutationVariables);
 
-      const addComment = wrapper.vm.addDiscussionComment();
-
-      return addComment.then(() => {
+        return mutate({ variables: mutationVariables });
+      })
+      .then(() => {
         expect(findReplyForm().exists()).toBe(false);
       });
-    });
   });
 });

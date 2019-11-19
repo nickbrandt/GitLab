@@ -109,7 +109,7 @@ describe Gitlab::WebIde::Config::Entry::Global do
       describe '#errors' do
         it 'reports errors about missing script' do
           expect(global.errors)
-            .to include "terminal:before_script config should be an array of strings"
+            .to include "terminal:before_script config should be an array containing strings and arrays of strings"
         end
       end
     end

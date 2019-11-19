@@ -135,9 +135,9 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       create_list(:user, 3, avatar: fixture_file_upload('spec/fixtures/dk.png', 'image/png'))
       uploads = Upload.all.pluck(:id)
 
-      create(:geo_file_registry, :avatar, file_id: uploads[0])
-      create(:geo_file_registry, :avatar, file_id: uploads[1])
-      create(:geo_file_registry, :avatar, :failed, file_id: uploads[2])
+      create(:geo_upload_registry, :avatar, file_id: uploads[0])
+      create(:geo_upload_registry, :avatar, file_id: uploads[1])
+      create(:geo_upload_registry, :avatar, :failed, file_id: uploads[2])
 
       expect(subject.attachments_synced_count).to eq(2)
     end
@@ -149,7 +149,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       expect(subject.attachments_synced_count).to eq(0)
 
       upload = Upload.find_by(model: user, uploader: 'AvatarUploader')
-      create(:geo_file_registry, :avatar, file_id: upload.id)
+      create(:geo_upload_registry, :avatar, file_id: upload.id)
 
       subject = described_class.current_node_status
 
@@ -164,7 +164,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       expect(subject.attachments_synced_count).to eq(0)
 
       upload = Upload.find_by(model: user, uploader: 'AvatarUploader')
-      create(:geo_file_registry, :avatar, file_id: upload.id)
+      create(:geo_upload_registry, :avatar, file_id: upload.id)
 
       subject = described_class.current_node_status
 
@@ -178,9 +178,9 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       create_list(:user, 3, avatar: fixture_file_upload('spec/fixtures/dk.png', 'image/png'))
       uploads = Upload.all.pluck(:id)
 
-      create(:geo_file_registry, :avatar, file_id: uploads[0], missing_on_primary: true)
-      create(:geo_file_registry, :avatar, file_id: uploads[1])
-      create(:geo_file_registry, :avatar, :failed, file_id: uploads[2])
+      create(:geo_upload_registry, :avatar, file_id: uploads[0], missing_on_primary: true)
+      create(:geo_upload_registry, :avatar, file_id: uploads[1])
+      create(:geo_upload_registry, :avatar, :failed, file_id: uploads[2])
 
       expect(subject.attachments_synced_missing_on_primary_count).to eq(1)
     end
@@ -189,13 +189,13 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#attachments_failed_count' do
     it 'counts failed avatars, attachment, personal snippets and files' do
       # These two should be ignored
-      create(:geo_file_registry, :lfs, :with_file, :failed)
-      create(:geo_file_registry, :with_file)
+      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
+      create(:geo_upload_registry, :with_file)
 
-      create(:geo_file_registry, :with_file, :failed, file_type: :personal_file)
-      create(:geo_file_registry, :with_file, :failed, file_type: :attachment)
-      create(:geo_file_registry, :avatar, :with_file, :failed)
-      create(:geo_file_registry, :with_file, :failed)
+      create(:geo_upload_registry, :with_file, :failed, file_type: :personal_file)
+      create(:geo_upload_registry, :with_file, :failed, file_type: :attachment)
+      create(:geo_upload_registry, :avatar, :with_file, :failed)
+      create(:geo_upload_registry, :with_file, :failed)
 
       expect(subject.attachments_failed_count).to eq(4)
     end
@@ -216,16 +216,16 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
 
     it 'returns the right percentage with no group restrictions' do
-      create(:geo_file_registry, :avatar, file_id: upload_1.id)
-      create(:geo_file_registry, :avatar, file_id: upload_2.id)
+      create(:geo_upload_registry, :avatar, file_id: upload_1.id)
+      create(:geo_upload_registry, :avatar, file_id: upload_2.id)
 
       expect(subject.attachments_synced_in_percentage).to be_within(0.0001).of(50)
     end
 
     it 'returns the right percentage with group restrictions' do
       secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-      create(:geo_file_registry, :avatar, file_id: upload_1.id)
-      create(:geo_file_registry, :avatar, file_id: upload_2.id)
+      create(:geo_upload_registry, :avatar, file_id: upload_1.id)
+      create(:geo_upload_registry, :avatar, file_id: upload_2.id)
 
       expect(subject.attachments_synced_in_percentage).to be_within(0.0001).of(100)
     end
@@ -250,12 +250,12 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#lfs_objects_synced_count' do
     it 'counts synced LFS objects' do
       # These four should be ignored
-      create(:geo_file_registry, :failed)
-      create(:geo_file_registry, :avatar)
-      create(:geo_file_registry, file_type: :attachment)
-      create(:geo_file_registry, :lfs, :with_file, :failed)
+      create(:geo_upload_registry, :failed)
+      create(:geo_upload_registry, :avatar)
+      create(:geo_upload_registry, file_type: :attachment)
+      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
 
-      create(:geo_file_registry, :lfs, :with_file)
+      create(:geo_lfs_object_registry, :with_lfs_object)
 
       expect(subject.lfs_objects_synced_count).to eq(1)
     end
@@ -264,12 +264,12 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#lfs_objects_synced_missing_on_primary_count' do
     it 'counts LFS objects marked as synced due to file missing on the primary' do
       # These four should be ignored
-      create(:geo_file_registry, :failed)
-      create(:geo_file_registry, :avatar, missing_on_primary: true)
-      create(:geo_file_registry, file_type: :attachment, missing_on_primary: true)
-      create(:geo_file_registry, :lfs, :with_file, :failed)
+      create(:geo_upload_registry, :failed)
+      create(:geo_upload_registry, :avatar, missing_on_primary: true)
+      create(:geo_upload_registry, file_type: :attachment, missing_on_primary: true)
+      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
 
-      create(:geo_file_registry, :lfs, :with_file, missing_on_primary: true)
+      create(:geo_lfs_object_registry, :with_lfs_object, missing_on_primary: true)
 
       expect(subject.lfs_objects_synced_missing_on_primary_count).to eq(1)
     end
@@ -278,12 +278,12 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#lfs_objects_failed_count' do
     it 'counts failed LFS objects' do
       # These four should be ignored
-      create(:geo_file_registry, :failed)
-      create(:geo_file_registry, :avatar, :failed)
-      create(:geo_file_registry, :failed, file_type: :attachment)
-      create(:geo_file_registry, :lfs, :with_file)
+      create(:geo_upload_registry, :failed)
+      create(:geo_upload_registry, :avatar, :failed)
+      create(:geo_upload_registry, :failed, file_type: :attachment)
+      create(:geo_lfs_object_registry, :with_lfs_object)
 
-      create(:geo_file_registry, :lfs, :with_file, :failed)
+      create(:geo_lfs_object_registry, :with_lfs_object, :failed)
 
       expect(subject.lfs_objects_failed_count).to eq(1)
     end
@@ -304,14 +304,14 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
 
     it 'returns the right percentage with no group restrictions' do
-      create(:geo_file_registry, :lfs, file_id: lfs_object_project.lfs_object_id)
+      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_project.lfs_object_id)
 
       expect(subject.lfs_objects_synced_in_percentage).to be_within(0.0001).of(25)
     end
 
     it 'returns the right percentage with group restrictions' do
       secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-      create(:geo_file_registry, :lfs, file_id: lfs_object_project.lfs_object_id)
+      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_project.lfs_object_id)
 
       expect(subject.lfs_objects_synced_in_percentage).to be_within(0.0001).of(50)
     end
@@ -320,7 +320,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#job_artifacts_synced_count' do
     it 'counts synced job artifacts' do
       # These should be ignored
-      create(:geo_file_registry)
+      create(:geo_upload_registry)
       create(:geo_job_artifact_registry, :with_artifact, success: false)
 
       create(:geo_job_artifact_registry, :with_artifact, success: true)
@@ -332,7 +332,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#job_artifacts_synced_missing_on_primary_count' do
     it 'counts job artifacts marked as synced due to file missing on the primary' do
       # These should be ignored
-      create(:geo_file_registry, missing_on_primary: true)
+      create(:geo_upload_registry, missing_on_primary: true)
       create(:geo_job_artifact_registry, :with_artifact, success: true)
 
       create(:geo_job_artifact_registry, :with_artifact, success: true, missing_on_primary: true)
@@ -344,9 +344,9 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#job_artifacts_failed_count' do
     it 'counts failed job artifacts' do
       # These should be ignored
-      create(:geo_file_registry, :failed)
-      create(:geo_file_registry, :avatar, :failed)
-      create(:geo_file_registry, :attachment, :failed)
+      create(:geo_upload_registry, :failed)
+      create(:geo_upload_registry, :avatar, :failed)
+      create(:geo_upload_registry, :attachment, :failed)
       create(:geo_job_artifact_registry, :with_artifact, success: true)
 
       create(:geo_job_artifact_registry, :with_artifact, success: false)
@@ -702,6 +702,67 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       create(:container_repository_registry, :synced, container_repository: container_repository)
 
       expect(subject.container_repositories_synced_in_percentage).to be_within(0.0001).of(50)
+    end
+  end
+
+  describe '#design_repositories_count' do
+    it 'counts all the designs' do
+      create(:design)
+      create(:design)
+
+      expect(subject.design_repositories_count).to eq(2)
+    end
+  end
+
+  describe '#design_repositories_synced_count' do
+    it 'counts synced repositories' do
+      create(:geo_design_registry, :synced)
+      create(:geo_design_registry, :sync_failed)
+
+      expect(subject.design_repositories_synced_count).to eq(1)
+    end
+  end
+
+  describe '#design_repositories_failed_count' do
+    it 'counts failed to sync repositories' do
+      create(:geo_design_registry, :sync_failed)
+      create(:geo_design_registry, :synced)
+
+      expect(subject.design_repositories_failed_count).to eq(1)
+    end
+  end
+
+  describe '#design_repositories_registry_count' do
+    it 'counts number of registries for repositories' do
+      create(:geo_design_registry, :sync_failed)
+      create(:geo_design_registry)
+      create(:geo_design_registry, :synced)
+
+      expect(subject.design_repositories_registry_count).to eq(3)
+    end
+  end
+
+  describe '#design_repositories_synced_in_percentage' do
+    it 'returns 0 when no objects are available' do
+      expect(subject.design_repositories_synced_in_percentage).to eq(0)
+    end
+
+    it 'returns the right percentage with no group restrictions' do
+      create(:geo_design_registry, :synced)
+      create(:geo_design_registry, :sync_failed)
+
+      expect(subject.design_repositories_synced_in_percentage).to be_within(0.0001).of(50)
+    end
+
+    it 'returns the right percentage with group restrictions' do
+      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+
+      create(:geo_design_registry, :synced, project: project_1)
+      create(:geo_design_registry, :sync_failed, project: project_2)
+      create(:geo_design_registry, :sync_failed, project: project_3)
+      create(:geo_design_registry, :sync_failed, project: project_4)
+
+      expect(subject.design_repositories_synced_in_percentage).to be_within(0.0001).of(50)
     end
   end
 

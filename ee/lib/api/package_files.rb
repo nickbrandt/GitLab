@@ -5,9 +5,7 @@ module API
     include PaginationParams
 
     before do
-      require_packages_enabled!
-      authorize_packages_feature!
-      authorize_read_package!
+      authorize_packages_access!(user_project)
     end
 
     helpers ::API::Helpers::PackagesHelpers

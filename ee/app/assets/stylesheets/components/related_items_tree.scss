@@ -2,15 +2,6 @@
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 
-  .btn-create-epic {
-    .dropdown-menu {
-      top: 100%;
-      right: 0;
-      bottom: auto;
-      left: auto;
-    }
-  }
-
   .add-item-form-container {
     border-bottom: 1px solid $border-color;
   }
@@ -28,6 +19,11 @@
 
     .item-body {
       cursor: grab;
+
+      &.item-logged-out {
+        cursor: default;
+        min-height: $grid-size * 5;
+      }
     }
 
     .btn-tree-item-chevron {
@@ -48,7 +44,7 @@
       margin-left: $gl-sidebar-padding;
     }
 
-    .loading-container {
+    .loading-icon {
       margin-left: $gl-padding-4 / 2;
       margin-right: $gl-padding-4;
     }

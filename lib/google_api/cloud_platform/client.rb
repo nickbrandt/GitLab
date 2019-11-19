@@ -12,6 +12,7 @@ module GoogleApi
       SCOPE = 'https://www.googleapis.com/auth/cloud-platform'
       LEAST_TOKEN_LIFE_TIME = 10.minutes
       CLUSTER_MASTER_AUTH_USERNAME = 'admin'
+      CLUSTER_IPV4_CIDR_BLOCK = '/16'
 
       class << self
         def session_key_for_token
@@ -95,6 +96,10 @@ module GoogleApi
             },
             legacy_abac: {
               enabled: legacy_abac
+            },
+            ip_allocation_policy: {
+              use_ip_aliases: true,
+              cluster_ipv4_cidr_block: CLUSTER_IPV4_CIDR_BLOCK
             },
             addons_config: enable_addons.each_with_object({}) do |addon, hash|
               hash[addon] = { disabled: false }

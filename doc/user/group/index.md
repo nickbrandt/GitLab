@@ -17,7 +17,7 @@ Find your groups by clicking **Groups > Your Groups** in the top navigation.
 
 ![GitLab Groups](img/groups.png)
 
-> The **Groups** dropdown in the top navigation was [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/36234) in [GitLab 11.1](https://about.gitlab.com/2018/07/22/gitlab-11-1-released/#groups-dropdown-in-navigation).
+> The **Groups** dropdown in the top navigation was [introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/36234) in [GitLab 11.1](https://about.gitlab.com/blog/2018/07/22/gitlab-11-1-released/#groups-dropdown-in-navigation).
 
 The **Groups** page displays:
 
@@ -75,7 +75,7 @@ By doing so:
 ## Issues and merge requests within a group
 
 Issues and merge requests are part of projects. For a given group, you can view all of the
-[issues](../project/issues/index.md#issues-list) and [merge requests](../project/merge_requests/index.md#merge-requests-per-group) across all projects in that group,
+[issues](../project/issues/index.md#issues-list) and [merge requests](../project/merge_requests/reviewing_and_managing_merge_requests.md#view-merge-requests-for-all-projects-in-a-group) across all projects in that group,
 together in a single list view.
 
 ### Bulk editing issues and merge requests
@@ -123,7 +123,7 @@ For more details on creating groups, watch the video [GitLab Namespaces (users, 
 ## Add users to a group
 
 A benefit of putting multiple projects in one group is that you can
-give a user to access to all projects in the group with one action.
+give a user access to all projects in the group with one action.
 
 Add members to a group by navigating to the group's dashboard and clicking **Members**.
 
@@ -135,14 +135,14 @@ Consider a group with two projects:
 
 - On the **Group Members** page, you can now add a new user to the group.
 - Now, because this user is a **Developer** member of the group, they automatically
-  gets **Developer** access to **all projects** within that group.
+  get **Developer** access to **all projects** within that group.
 
 To increase the access level of an existing user for a specific project,
 add them again as a new member to the project with the desired permission level.
 
 ## Request access to a group
 
-As a group owner, you can enable or disable the ability for non members to request access to
+As a group owner, you can enable or disable the ability for non-members to request access to
 your group. Go to the group settings, and click **Allow users to request access**.
 
 As a user, you can request to be a member of a group, if that setting is enabled. Go to the group for which you'd like to be a member, and click the **Request Access** button on the right
@@ -178,9 +178,9 @@ There are two different ways to add a new project to a group:
 
 ### Default project-creation level
 
-> [Introduced][ee-2534] in [GitLab Premium][ee] 10.5.
-> Brought to [GitLab Starter][ee] in 10.7.
-> [Moved](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/25975) to [GitLab Core](https://about.gitlab.com/pricing/) in 11.10.
+> - [Introduced][ee-2534] in [GitLab Premium][ee] 10.5.
+> - Brought to [GitLab Starter][ee] in 10.7.
+> - [Moved](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/25975) to [GitLab Core](https://about.gitlab.com/pricing/) in 11.10.
 
 By default, [Developers and Maintainers](../permissions.md#group-members-permissions) can create projects under a group.
 
@@ -338,8 +338,7 @@ request to add a new user to a project through API will not be possible.
 
 #### IP access restriction **(ULTIMATE)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1985) in
-[GitLab Ultimate and Gold](https://about.gitlab.com/pricing/) 12.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/1985) in [GitLab Ultimate and Gold](https://about.gitlab.com/pricing/) 12.0.
 
 To make sure only people from within your organization can access particular
 resources, you have the option to restrict access to groups and their
@@ -351,16 +350,20 @@ Add one or more whitelisted IP subnets using CIDR notation in comma separated fo
 coming from a different IP address won't be able to access the restricted
 content.
 
-Restriction currently applies to UI and API access, Git actions via SSH are not restricted.
-To avoid accidental lock-out, admins and group owners are are able to access
+Restriction currently applies to:
+
+- UI.
+- [From GitLab 12.3](https://gitlab.com/gitlab-org/gitlab/issues/12874), API access.
+- [From GitLab 12.4](https://gitlab.com/gitlab-org/gitlab/issues/32113), Git actions via SSH.
+
+To avoid accidental lock-out, admins and group owners are able to access
 the group regardless of the IP restriction.
 
 #### Allowed domain restriction **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7297) in
-[GitLab Premium and Silver](https://about.gitlab.com/pricing/) 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/7297) in [GitLab Premium and Silver](https://about.gitlab.com/pricing/) 12.2.
 
-You can restrict access to groups and their underlying projects by
+You can restrict access to groups by
 allowing only users with email addresses in particular domains to be added to the group.
 
 Add email domains you want to whitelist and users with emails from different
@@ -382,7 +385,7 @@ Some domains cannot be restricted. These are the most popular public email domai
 To enable this feature:
 
 1. Navigate to the group's **Settings > General** page.
-1. Expand the **Permissions, LFS, 2FA** section, and enter domain name into **Restrict membership by email** field.
+1. Expand the **Permissions, LFS, 2FA** section, and enter the domain name into **Restrict membership by email** field.
 1. Click **Save changes**.
 
 This will enable the domain-checking for all new users added to the group from this moment on.
@@ -418,8 +421,9 @@ Define project templates at a group level by setting a group as the template sou
 
 #### Disabling email notifications
 
-You can disable all email notifications related to the group, which also includes
-it's subgroups and projects.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/23585) in GitLab 12.2.
+
+You can disable all email notifications related to the group, which includes its subgroups and projects.
 
 To enable this feature:
 
@@ -441,7 +445,7 @@ To enable this feature:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/13294) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.0.
 
-A group owner can check the aggregated storage usage for all the project in a group, sub-groups included, in the **Storage** tab of the **Usage Quotas** page available to the group page settings list.
+A group owner can check the aggregated storage usage for all the projects in a group, sub-groups included, in the **Storage** tab of the **Usage Quotas** page available to the group page settings list.
 
 ![Group storage usage quota](img/group_storage_usage_quota.png)
 
@@ -450,6 +454,11 @@ will affect its value is triggered (e.g., a commit push).
 For performance reasons, we may delay the update up to 1 hour and 30 minutes.
 
 If your namespace shows `N/A` as the total storage usage, you can trigger a recalculation by pushing a commit to any project in that namespace.
+
+### Maximum artifacts size **(CORE ONLY)**
+
+For information about setting a maximum artifact size for a group, see
+[Maximum artifacts size](../admin_area/settings/continuous_integration.md#maximum-artifacts-size-core-only).
 
 ## User contribution analysis **(STARTER)**
 

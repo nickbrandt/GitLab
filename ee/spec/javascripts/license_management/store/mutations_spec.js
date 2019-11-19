@@ -229,4 +229,53 @@ describe('License store mutations', () => {
       expect(store.state.isLoadingLicenseReport).toBe(true);
     });
   });
+
+  describe('RECEIVE_LOAD_PARSED_LICENSE_REPORT', () => {
+    const newLicenses = [];
+    const existingLicenses = [];
+
+    beforeEach(() => {
+      store.state.isLoadingLicenseReport = true;
+      store.state.loadLicenseReportError = new Error('test');
+      store.commit(types.RECEIVE_LOAD_PARSED_LICENSE_REPORT, { newLicenses, existingLicenses });
+    });
+
+    it('should set the new and existing reports', () => {
+      expect(store.state.newLicenses).toBe(newLicenses);
+      expect(store.state.existingLicenses).toBe(existingLicenses);
+    });
+
+    it('should cancel loading and clear any errors', () => {
+      expect(store.state.isLoadingLicenseReport).toBe(false);
+      expect(store.state.loadLicenseReportError).toBe(false);
+    });
+  });
+
+  describe('RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR', () => {
+    const error = new Error('test');
+    beforeEach(() => {
+      store.state.isLoadingLicenseReport = true;
+      store.state.loadLicenseReportError = false;
+      store.commit(types.RECEIVE_LOAD_PARSED_LICENSE_REPORT_ERROR, error);
+    });
+
+    it('should set the error on the state', () => {
+      expect(store.state.loadLicenseReportError).toBe(error);
+    });
+
+    it('should cancel loading', () => {
+      expect(store.state.isLoadingLicenseReport).toBe(false);
+    });
+  });
+
+  describe('REQUEST_LOAD_PARSED_LICENSE_REPORT', () => {
+    beforeEach(() => {
+      store.state.isLoadingLicenseReport = false;
+      store.commit(types.REQUEST_LOAD_PARSED_LICENSE_REPORT);
+    });
+
+    it('should initiate loading', () => {
+      expect(store.state.isLoadingLicenseReport).toBe(true);
+    });
+  });
 });

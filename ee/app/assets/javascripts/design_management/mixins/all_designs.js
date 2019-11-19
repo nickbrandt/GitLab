@@ -1,3 +1,4 @@
+import { propertyOf } from 'underscore';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import projectQuery from '../graphql/queries/project.query.graphql';
@@ -16,7 +17,13 @@ export default {
           atVersion: this.designsVersion,
         };
       },
-      update: data => extractNodes(data.project.issue.designs.designs),
+      update: data => {
+        const designEdges = propertyOf(data)(['project', 'issue', 'designCollection', 'designs']);
+        if (designEdges) {
+          return extractNodes(designEdges);
+        }
+        return [];
+      },
       error() {
         this.error = true;
       },

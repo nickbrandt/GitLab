@@ -33,54 +33,54 @@ describe Snippet, :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it 'returns only public snippets when user is blank' do
-      result = described_class.elastic_search_code('password', options: { user: nil })
+    it 'returns only public snippets when user is blank', :sidekiq_might_not_need_inline do
+      result = described_class.elastic_search_code('password', options: { current_user: nil })
 
       expect(result.total_count).to eq(1)
       expect(result.records).to match_array [public_snippet]
     end
 
-    it 'returns only public and internal personal snippets for non-members' do
+    it 'returns only public and internal personal snippets for non-members', :sidekiq_might_not_need_inline do
       non_member = create(:user)
 
-      result = described_class.elastic_search_code('password', options: { user: non_member })
+      result = described_class.elastic_search_code('password', options: { current_user: non_member })
 
       expect(result.total_count).to eq(2)
       expect(result.records).to match_array [public_snippet, internal_snippet]
     end
 
-    it 'returns public, internal snippets, and project private snippets for project members' do
+    it 'returns public, internal snippets, and project private snippets for project members', :sidekiq_might_not_need_inline do
       member = create(:user)
       project.add_developer(member)
 
-      result = described_class.elastic_search_code('password', options: { user: member })
+      result = described_class.elastic_search_code('password', options: { current_user: member })
 
       expect(result.total_count).to eq(5)
       expect(result.records).to match_array [public_snippet, internal_snippet, project_public_snippet, project_internal_snippet, project_private_snippet]
     end
 
-    it 'returns private snippets where the user is the author' do
-      result = described_class.elastic_search_code('password', options: { user: author })
+    it 'returns private snippets where the user is the author', :sidekiq_might_not_need_inline do
+      result = described_class.elastic_search_code('password', options: { current_user: author })
 
       expect(result.total_count).to eq(3)
       expect(result.records).to match_array [public_snippet, internal_snippet, private_snippet]
     end
 
-    it 'supports advanced search syntax' do
+    it 'supports advanced search syntax', :sidekiq_might_not_need_inline do
       member = create(:user)
       project.add_reporter(member)
 
-      result = described_class.elastic_search_code('password +(123 | 789)', options: { user: member })
+      result = described_class.elastic_search_code('password +(123 | 789)', options: { current_user: member })
 
       expect(result.total_count).to eq(2)
       expect(result.records).to match_array [project_public_snippet, project_private_snippet]
     end
 
     [:admin, :auditor].each do |user_type|
-      it "returns all snippets for #{user_type}" do
+      it "returns all snippets for #{user_type}", :sidekiq_might_not_need_inline do
         superuser = create(user_type)
 
-        result = described_class.elastic_search_code('password', options: { user: superuser })
+        result = described_class.elastic_search_code('password', options: { current_user: superuser })
 
         expect(result.total_count).to eq(6)
         expect(result.records).to match_array [public_snippet, internal_snippet, private_snippet, project_public_snippet, project_internal_snippet, project_private_snippet]
@@ -92,12 +92,12 @@ describe Snippet, :elastic do
         allow(Ability).to receive(:allowed?).and_call_original
       end
 
-      it 'returns public, internal snippets, but not project snippets' do
+      it 'returns public, internal snippets, but not project snippets', :sidekiq_might_not_need_inline do
         member = create(:user)
         project.add_developer(member)
         expect(Ability).to receive(:allowed?).with(member, :read_cross_project) { false }
 
-        result = described_class.elastic_search_code('password', options: { user: member })
+        result = described_class.elastic_search_code('password', options: { current_user: member })
 
         expect(result.records).to match_array [public_snippet, internal_snippet]
       end
@@ -116,7 +116,7 @@ describe Snippet, :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    options = { user: user }
+    options = { current_user: user }
 
     expect(described_class.elastic_search('home', options: options).total_count).to eq(1)
     expect(described_class.elastic_search('index.php', options: options).total_count).to eq(1)
@@ -136,7 +136,9 @@ describe Snippet, :elastic do
       'project_id',
       'author_id',
       'visibility_level'
-    ).merge({ 'type' => snippet.es_type })
+    ).merge({
+      'type' => snippet.es_type
+    })
 
     expect(snippet.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end

@@ -44,34 +44,67 @@ describe TrialsController do
     it_behaves_like 'an authenticated endpoint', :post, :create_lead
 
     describe 'authenticated' do
-      let(:user) { create(:user) }
+      let(:user) { create(:user, email_opted_in: true) }
       let(:create_lead_result) { nil }
 
       before do
         sign_in(user)
+      end
 
-        expect_any_instance_of(GitlabSubscriptions::CreateLeadService).to receive(:execute) do
-          { success: create_lead_result }
+      context 'response url' do
+        before do
+          allow_next_instance_of(GitlabSubscriptions::CreateLeadService) do |lead_service|
+            expect(lead_service).to receive(:execute).and_return({ success: create_lead_result })
+          end
+        end
+
+        context 'on success' do
+          let(:create_lead_result) { true }
+
+          it 'redirects user to Step 3' do
+            post :create_lead
+
+            expect(response).to redirect_to(select_trials_url)
+          end
+        end
+
+        context 'on failure' do
+          let(:create_lead_result) { false }
+
+          it 'renders the :new template' do
+            post :create_lead
+
+            expect(response).to render_template(:new)
+          end
         end
       end
 
-      context 'on success' do
-        let(:create_lead_result) { true }
+      context 'request params to Lead Service' do
+        it 'sends appropriate request params' do
+          params = {
+              company_name: 'Gitlab',
+              company_size: '1-99',
+              phone_number: '1111111111',
+              number_of_users: "20",
+              country: 'IN'
+          }
+          extra_params = {
+              first_name: user.first_name,
+              last_name: user.last_name,
+              work_email: user.email,
+              uid: user.id,
+              skip_email_confirmation: true,
+              gitlab_com_trial: true,
+              provider: 'gitlab',
+              newsletter_segment: user.email_opted_in
+          }
+          expected_params = ActionController::Parameters.new(params).merge(extra_params).permit!
 
-        it 'redirects user to Step 3' do
-          post :create_lead
+          expect_next_instance_of(GitlabSubscriptions::CreateLeadService) do |lead_service|
+            expect(lead_service).to receive(:execute).with({ trial_user: expected_params }).and_return({ success: true })
+          end
 
-          expect(response).to redirect_to(select_trials_url)
-        end
-      end
-
-      context 'on failure' do
-        let(:create_lead_result) { false }
-
-        it 'renders the :new template' do
-          post :create_lead
-
-          expect(response).to render_template(:new)
+          post :create_lead, params: params
         end
       end
     end
@@ -89,7 +122,7 @@ describe TrialsController do
     before do
       sign_in(user)
 
-      expect_any_instance_of(GitlabSubscriptions::ApplyTrialService).to receive(:execute) do
+      allow_any_instance_of(GitlabSubscriptions::ApplyTrialService).to receive(:execute) do
         { success: apply_trial_result }
       end
     end
@@ -102,15 +135,32 @@ describe TrialsController do
 
         expect(response).to redirect_to("/#{namespace.path}?trial=true")
       end
+
+      context 'with a new Group' do
+        it 'creates the Group' do
+          expect do
+            post :apply, params: { new_group_name: 'GitLab' }
+          end.to change { Group.count }.to(1)
+        end
+      end
     end
 
     context 'on failure' do
       let(:apply_trial_result) { false }
 
-      it 'redirects to new select namespaces for trials path' do
+      it 'renders the :select view' do
         post :apply, params: { namespace_id: namespace.id }
 
-        expect(response).to redirect_to(select_trials_path)
+        expect(response).to render_template(:select)
+      end
+
+      context 'with a new Group' do
+        it 'renders the :select view' do
+          post :apply, params: { new_group_name: 'admin' }
+
+          expect(response).to render_template(:select)
+          expect(Group.count).to eq(0)
+        end
       end
     end
   end

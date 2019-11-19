@@ -11,6 +11,10 @@ class ContainerRepository < ApplicationRecord
   delegate :client, to: :registry
 
   scope :ordered, -> { order(:name) }
+  scope :with_api_entity_associations, -> { preload(project: [:route, { namespace: :route }]) }
+  scope :for_group_and_its_subgroups, ->(group) do
+    where(project_id: Project.for_group_and_its_subgroups(group).with_container_registry.select(:id))
+  end
 
   # rubocop: disable CodeReuse/ServiceClass
   def registry
@@ -67,11 +71,9 @@ class ContainerRepository < ApplicationRecord
   def delete_tags!
     return unless has_tags?
 
-    digests = tags.map { |tag| tag.digest }.to_set
+    digests = tags.map { |tag| tag.digest }.compact.to_set
 
-    digests.all? do |digest|
-      delete_tag_by_digest(digest)
-    end
+    digests.map(&method(:delete_tag_by_digest)).all?
   end
 
   def delete_tag_by_digest(digest)

@@ -42,6 +42,48 @@ User clone/fetch activity using http transport appears in this log as `action: g
 In addition, the log contains the IP address from which the request originated
 (`remote_ip`) as well as the user's ID (`user_id`), and username (`username`).
 
+NOTE: **Note:** Starting with GitLab 12.5, if an error occurs, an
+`exception` field is included with `class`, `message`, and
+`backtrace`. Previous versions included an `error` field instead of
+`exception.class` and `exception.message`. For example:
+
+```json
+{
+  "method": "GET",
+  "path": "/admin",
+  "format": "html",
+  "controller": "Admin::DashboardController",
+  "action": "index",
+  "status": 500,
+  "duration": 2584.11,
+  "view": 0,
+  "db": 9.21,
+  "time": "2019-11-14T13:12:46.156Z",
+  "params": [],
+  "remote_ip": "127.0.0.1",
+  "user_id": 1,
+  "username": "root",
+  "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:70.0) Gecko/20100101 Firefox/70.0",
+  "queue_duration": 274.35,
+  "correlation_id": "KjDVUhNvvV3",
+  "cpu_s": 2.837645135999999,
+  "exception": {
+    "class": "NameError",
+    "message": "undefined local variable or method `adsf' for #<Admin::DashboardController:0x00007ff3c9648588>",
+    "backtrace": [
+      "app/controllers/admin/dashboard_controller.rb:11:in `index'",
+      "ee/app/controllers/ee/admin/dashboard_controller.rb:14:in `index'",
+      "ee/lib/gitlab/ip_address_state.rb:10:in `with'",
+      "ee/app/controllers/ee/application_controller.rb:43:in `set_current_ip_address'",
+      "lib/gitlab/session.rb:11:in `with_session'",
+      "app/controllers/application_controller.rb:450:in `set_session_storage'",
+      "app/controllers/application_controller.rb:444:in `set_locale'",
+      "ee/lib/gitlab/jira/middleware.rb:19:in `call'"
+    ]
+  }
+}
+```
+
 ## `production.log`
 
 This file lives in `/var/log/gitlab/gitlab-rails/production.log` for
@@ -294,9 +336,11 @@ This log records:
 
 - Information whenever [Rack Attack] registers an abusive request.
 - Requests over the [Rate Limit] on raw endpoints.
+- [Protected paths] abusive requests.
 
 NOTE: **Note:**
-From [%12.1](https://gitlab.com/gitlab-org/gitlab-foss/issues/62756), user id and username are available on this log.
+From [%12.1](https://gitlab.com/gitlab-org/gitlab-foss/issues/62756), user id and username are also
+recorded on this log, if available.
 
 ## `graphql_json.log`
 
@@ -327,17 +371,19 @@ is populated whenever `gitlab-ctl reconfigure` is run manually or as part of an 
 Reconfigure logs files are named according to the UNIX timestamp of when the reconfigure
 was initiated, such as `1509705644.log`
 
-## `sidekiq_exporter.log`
+## `sidekiq_exporter.log` and `web_exporter.log`
 
 If Prometheus metrics and the Sidekiq Exporter are both enabled, Sidekiq will
-start a Web server and listen to the defined port (default: 3807). Access logs
+start a Web server and listen to the defined port (default: 8082). Access logs
 will be generated in `/var/log/gitlab/gitlab-rails/sidekiq_exporter.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/sidekiq_exporter.log` for
 installations from source.
 
-[repocheck]: repository_checks.md
-[Rack Attack]: ../security/rack_attack.md
-[Rate Limit]: ../user/admin_area/settings/rate_limits_on_raw_endpoints.md
+If Prometheus metrics and the Web Exporter are both enabled, Unicorn/Puma will
+start a Web server and listen to the defined port (default: 8083). Access logs
+will be generated in `/var/log/gitlab/gitlab-rails/web_exporter.log` for
+Omnibus GitLab packages or in `/home/git/gitlab/log/web_exporter.log` for
+installations from source.
 
 ## `database_load_balancing.log` **(PREMIUM ONLY)**
 
@@ -348,3 +394,8 @@ It is stored at:
 
 - `/var/log/gitlab/gitlab-rails/database_load_balancing.log` for Omnibus GitLab packages.
 - `/home/git/gitlab/log/database_load_balancing.log` for installations from source.
+
+[repocheck]: repository_checks.md
+[Rack Attack]: ../security/rack_attack.md
+[Rate Limit]: ../user/admin_area/settings/rate_limits_on_raw_endpoints.md
+[Protected paths]: ../user/admin_area/settings/protected_paths.md

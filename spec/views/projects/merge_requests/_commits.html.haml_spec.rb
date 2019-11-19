@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-describe 'projects/merge_requests/_commits.html.haml' do
+describe 'projects/merge_requests/_commits.html.haml', :sidekiq_might_not_need_inline do
   include Devise::Test::ControllerHelpers
   include ProjectForksHelper
 

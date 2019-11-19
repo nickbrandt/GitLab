@@ -7,7 +7,7 @@ module EE
 
       prepended do
         EE_IGNORED_FK_COLUMNS = {
-          application_settings: %w[slack_app_id snowplow_site_id],
+          application_settings: %w[slack_app_id snowplow_app_id],
           approvals: %w[user_id],
           approver_groups: %w[target_id],
           approvers: %w[target_id user_id],
@@ -29,10 +29,19 @@ module EE
           vulnerability_scanners: %w[external_id],
           web_hooks: %w[group_id]
         }.with_indifferent_access.freeze
+
+        IGNORED_LIMIT_ENUMS = {
+          'SoftwareLicensePolicy' => %w[approval_status],
+          'User' => %w[group_view]
+        }.freeze
       end
 
       def ignored_fk_columns(column)
         super + EE_IGNORED_FK_COLUMNS.fetch(column, [])
+      end
+
+      def ignored_limit_enums(model)
+        super + IGNORED_LIMIT_ENUMS.fetch(model, [])
       end
     end
   end

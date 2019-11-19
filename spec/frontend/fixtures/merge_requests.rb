@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :controller do
@@ -6,7 +8,23 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
   let(:admin) { create(:admin) }
   let(:namespace) { create(:namespace, name: 'frontend-fixtures' )}
   let(:project) { create(:project, :repository, namespace: namespace, path: 'merge-requests-project') }
-  let(:merge_request) { create(:merge_request, :with_diffs, source_project: project, target_project: project, description: '- [ ] Task List Item') }
+
+  # rubocop: disable Layout/TrailingWhitespace
+  let(:merge_request) do
+    create(
+      :merge_request,
+      :with_diffs,
+      source_project: project,
+      target_project: project,
+      description: <<~MARKDOWN.strip_heredoc
+      - [ ] Task List Item
+      - [ ]   
+      - [ ] Task List Item 2
+      MARKDOWN
+    )
+  end
+  # rubocop: enable Layout/TrailingWhitespace
+
   let(:merged_merge_request) { create(:merge_request, :merged, source_project: project, target_project: project) }
   let(:pipeline) do
     create(

@@ -1,5 +1,6 @@
-import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab } from '@gitlab/ui';
+import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab, GlLink } from '@gitlab/ui';
 import { createLocalVue, mount } from '@vue/test-utils';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/dependencies/store';
 import { addListType } from 'ee/dependencies/store/utils';
@@ -64,6 +65,8 @@ describe('DependenciesApp component', () => {
       });
       store.state[namespace].pageInfo.total = total;
       store.state[namespace].reportInfo.status = REPORT_STATUS.ok;
+      store.state[namespace].reportInfo.generatedAt = getDateInPast(new Date(), 7);
+      store.state[namespace].reportInfo.jobPath = '/jobs/foo/321';
     });
   };
 
@@ -95,6 +98,10 @@ describe('DependenciesApp component', () => {
   const findVulnerableTabControl = () => findTabControls().at(1);
   const findVulnerableTabComponent = () => wrapper.findAll(GlTab).at(1);
 
+  const findHeader = () => wrapper.find('section > header');
+  const findHeaderHelpLink = () => findHeader().find(GlLink);
+  const findHeaderJobLink = () => findHeader().find('a');
+
   const expectComponentWithProps = (Component, props = {}) => {
     const componentWrapper = wrapper.find(Component);
     expect(componentWrapper.isVisible()).toBe(true);
@@ -102,12 +109,17 @@ describe('DependenciesApp component', () => {
   };
 
   const expectNoDependenciesTables = () => expect(findDependenciesTables()).toHaveLength(0);
+  const expectNoHeader = () => expect(findHeader().exists()).toBe(false);
 
   const expectDependenciesTables = () => {
     const { wrappers } = findDependenciesTables();
     expect(wrappers).toHaveLength(2);
     expect(wrappers[0].props()).toEqual({ namespace: allNamespace });
     expect(wrappers[1].props()).toEqual({ namespace: vulnerableNamespace });
+  };
+
+  const expectHeader = () => {
+    expect(findHeader().exists()).toBe(true);
   };
 
   afterEach(() => {
@@ -128,6 +140,7 @@ describe('DependenciesApp component', () => {
 
     it('shows only the loading icon', () => {
       expectComponentWithProps(GlLoadingIcon);
+      expectNoHeader();
       expectNoDependenciesTables();
     });
 
@@ -140,6 +153,7 @@ describe('DependenciesApp component', () => {
 
       it('shows only the empty state', () => {
         expectComponentWithProps(GlEmptyState, { svgPath: basicAppProps.emptyStateSvgPath });
+        expectNoHeader();
         expectNoDependenciesTables();
       });
     });
@@ -152,7 +166,20 @@ describe('DependenciesApp component', () => {
       });
 
       it('shows both dependencies tables with the correct props', () => {
+        expectHeader();
         expectDependenciesTables();
+      });
+
+      it('shows a link to the latest job', () => {
+        expect(findHeaderJobLink().attributes('href')).toBe('/jobs/foo/321');
+      });
+
+      it('shows when the last job ran', () => {
+        expect(findHeader().text()).toContain('1 week ago');
+      });
+
+      it('shows a link to the dependencies documentation page', () => {
+        expect(findHeaderHelpLink().attributes('href')).toBe(TEST_HOST);
       });
 
       it('displays the tabs correctly', () => {
@@ -223,6 +250,27 @@ describe('DependenciesApp component', () => {
 
         it('disables the vulnerable tab', () => {
           expect(findVulnerableTabComponent().classes('disabled')).toBe(true);
+        });
+      });
+
+      describe('given the user has public permissions', () => {
+        beforeEach(() => {
+          store.state[allNamespace].reportInfo.generatedAt = '';
+          store.state[allNamespace].reportInfo.jobPath = '';
+
+          return wrapper.vm.$nextTick();
+        });
+
+        it('shows the header', () => {
+          expectHeader();
+        });
+
+        it('does not show when the last job ran', () => {
+          expect(findHeader().text()).not.toContain('1 week ago');
+        });
+
+        it('does not show a link to the latest job', () => {
+          expect(findHeaderJobLink().exists()).toBe(false);
         });
       });
     });

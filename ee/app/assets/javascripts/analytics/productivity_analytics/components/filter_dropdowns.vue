@@ -3,6 +3,7 @@ import { mapState, mapActions } from 'vuex';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import { accessLevelReporter, projectsPerPage } from '../constants';
+import { LAST_ACTIVITY_AT } from '../../shared/constants';
 
 export default {
   components: {
@@ -12,14 +13,6 @@ export default {
   data() {
     return {
       groupId: null,
-      groupsQueryParams: {
-        min_access_level: accessLevelReporter,
-      },
-      projectsQueryParams: {
-        per_page: projectsPerPage,
-        with_shared: false, // exclude forks
-        order_by: 'last_activity_at',
-      },
     };
   },
   computed: {
@@ -53,6 +46,14 @@ export default {
       });
     },
   },
+  groupsQueryParams: {
+    min_access_level: accessLevelReporter,
+  },
+  projectsQueryParams: {
+    per_page: projectsPerPage,
+    with_shared: false, // exclude forks
+    order_by: LAST_ACTIVITY_AT,
+  },
 };
 </script>
 
@@ -60,14 +61,14 @@ export default {
   <div class="dropdown-container d-flex flex-column flex-lg-row">
     <groups-dropdown-filter
       class="group-select"
-      :query-params="groupsQueryParams"
+      :query-params="$options.groupsQueryParams"
       @selected="onGroupSelected"
     />
     <projects-dropdown-filter
       v-if="showProjectsDropdownFilter"
       :key="groupId"
       class="project-select"
-      :query-params="projectsQueryParams"
+      :query-params="$options.projectsQueryParams"
       :group-id="groupId"
       @selected="onProjectsSelected"
     />

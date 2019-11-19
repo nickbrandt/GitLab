@@ -22,7 +22,7 @@ module QA
           runner.project = upstream_project
           runner.token = upstream_project.group.sandbox.runners_token
           runner.name = upstream_project_name
-          runner.tags = %w[qa test]
+          runner.tags = [upstream_project_name]
         end
       end
 
@@ -38,6 +38,7 @@ module QA
 
             job1:
               stage: test
+              tags: ["#{upstream_project_name}"]
               script: echo "done"
 
             staging:
@@ -55,6 +56,7 @@ module QA
           project_push.file_content = <<~CI
             downstream_job:
               stage: test
+              tags: ["#{upstream_project_name}"]
               script: echo "done"
           CI
         end
@@ -74,7 +76,7 @@ module QA
 
       it 'creates a multi-project pipeline' do
         Page::MergeRequest::Show.perform do |show|
-          pipeline_passed = Support::Retrier.retry_until do
+          pipeline_passed = show.retry_until(reload: true, max_attempts: 20, sleep_interval: 6) do
             show.has_content?(/Pipeline #\d+ passed/)
           end
 

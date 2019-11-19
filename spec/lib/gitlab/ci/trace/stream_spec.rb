@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Ci::Trace::Stream, :clean_gitlab_redis_cache do
@@ -100,7 +102,7 @@ describe Gitlab::Ci::Trace::Stream, :clean_gitlab_redis_cache do
   describe '#append' do
     shared_examples_for 'appends' do
       it "truncates and append content" do
-        stream.append("89", 4)
+        stream.append(+"89", 4)
         stream.seek(0)
 
         expect(stream.size).to eq(6)
@@ -108,7 +110,7 @@ describe Gitlab::Ci::Trace::Stream, :clean_gitlab_redis_cache do
       end
 
       it 'appends in binary mode' do
-        '😺'.force_encoding('ASCII-8BIT').each_char.with_index do |byte, offset|
+        (+'😺').force_encoding('ASCII-8BIT').each_char.with_index do |byte, offset|
           stream.append(byte, offset)
         end
 
@@ -154,7 +156,7 @@ describe Gitlab::Ci::Trace::Stream, :clean_gitlab_redis_cache do
   describe '#set' do
     shared_examples_for 'sets' do
       before do
-        stream.set("8901")
+        stream.set(+"8901")
       end
 
       it "overwrite content" do
@@ -168,7 +170,7 @@ describe Gitlab::Ci::Trace::Stream, :clean_gitlab_redis_cache do
     context 'when stream is StringIO' do
       let(:stream) do
         described_class.new do
-          StringIO.new("12345678")
+          StringIO.new(+"12345678")
         end
       end
 
@@ -245,60 +247,6 @@ describe Gitlab::Ci::Trace::Stream, :clean_gitlab_redis_cache do
       end
 
       it_behaves_like 'sets'
-    end
-  end
-
-  describe '#html_with_state' do
-    shared_examples_for 'html_with_states' do
-      it 'returns html content with state' do
-        result = stream.html_with_state
-
-        expect(result.html).to eq("<span>1234</span>")
-      end
-
-      context 'follow-up state' do
-        let!(:last_result) { stream.html_with_state }
-
-        before do
-          data_stream.seek(4, IO::SEEK_SET)
-          data_stream.write("5678")
-          stream.seek(0)
-        end
-
-        it "returns appended trace" do
-          result = stream.html_with_state(last_result.state)
-
-          expect(result.append).to be_truthy
-          expect(result.html).to eq("<span>5678</span>")
-        end
-      end
-    end
-
-    context 'when stream is StringIO' do
-      let(:data_stream) do
-        StringIO.new("1234")
-      end
-
-      let(:stream) do
-        described_class.new { data_stream }
-      end
-
-      it_behaves_like 'html_with_states'
-    end
-
-    context 'when stream is ChunkedIO' do
-      let(:data_stream) do
-        Gitlab::Ci::Trace::ChunkedIO.new(build).tap do |chunked_io|
-          chunked_io.write("1234")
-          chunked_io.seek(0, IO::SEEK_SET)
-        end
-      end
-
-      let(:stream) do
-        described_class.new { data_stream }
-      end
-
-      it_behaves_like 'html_with_states'
     end
   end
 

@@ -1180,6 +1180,7 @@ describe Projects::IssuesController do
         name: emoji_name
       })
     end
+
     let(:emoji_name) { 'thumbsup' }
 
     it "toggles the award emoji" do
@@ -1251,7 +1252,7 @@ describe Projects::IssuesController do
           stub_feature_flags(create_confidential_merge_request: true)
         end
 
-        it 'creates a new merge request' do
+        it 'creates a new merge request', :sidekiq_might_not_need_inline do
           expect { create_merge_request }.to change(target_project.merge_requests, :count).by(1)
         end
       end
@@ -1440,7 +1441,7 @@ describe Projects::IssuesController do
   context 'private project with token authentication' do
     let(:private_project) { create(:project, :private) }
 
-    it_behaves_like 'authenticates sessionless user', :index, :atom do
+    it_behaves_like 'authenticates sessionless user', :index, :atom, ignore_incrementing: true do
       before do
         default_params.merge!(project_id: private_project, namespace_id: private_project.namespace)
 
@@ -1448,7 +1449,7 @@ describe Projects::IssuesController do
       end
     end
 
-    it_behaves_like 'authenticates sessionless user', :calendar, :ics do
+    it_behaves_like 'authenticates sessionless user', :calendar, :ics, ignore_incrementing: true do
       before do
         default_params.merge!(project_id: private_project, namespace_id: private_project.namespace)
 

@@ -66,8 +66,8 @@ describe 'Environment' do
           create(:deployment, :running, environment: environment, deployable: build)
         end
 
-        it 'does not show deployments' do
-          expect(page).to have_content('You don\'t have any deployments right now.')
+        it 'does show deployments' do
+          expect(page).to have_link("#{build.name} (##{build.id})")
         end
       end
 
@@ -79,8 +79,8 @@ describe 'Environment' do
           create(:deployment, :failed, environment: environment, deployable: build)
         end
 
-        it 'does not show deployments' do
-          expect(page).to have_content('You don\'t have any deployments right now.')
+        it 'does show deployments' do
+          expect(page).to have_link("#{build.name} (##{build.id})")
         end
       end
 
@@ -175,8 +175,9 @@ describe 'Environment' do
                     #
                     # In EE we have to stub EE::Environment since it overwrites
                     # the "terminals" method.
-                    allow_any_instance_of(defined?(EE) ? EE::Environment : Environment)
-                      .to receive(:terminals) { nil }
+                    allow_next_instance_of(Gitlab.ee? ? EE::Environment : Environment) do |instance|
+                      allow(instance).to receive(:terminals) { nil }
+                    end
 
                     visit terminal_project_environment_path(project, environment)
                   end

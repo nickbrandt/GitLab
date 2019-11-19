@@ -23,4 +23,17 @@ FactoryBot.define do
     token { 'github-token' }
     type { 'GithubService' }
   end
+
+  factory :slack_service do
+    project
+    active { true }
+    webhook { 'https://slack.service.url' }
+    type { 'SlackService' }
+  end
+
+  factory :slack_slash_commands_service do
+    project
+    active { true }
+    type { 'SlackSlashCommandsService' }
+  end
 end

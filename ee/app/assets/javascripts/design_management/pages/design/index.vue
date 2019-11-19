@@ -9,15 +9,18 @@ import DesignImage from '../../components/image.vue';
 import DesignOverlay from '../../components/design_overlay.vue';
 import DesignDiscussion from '../../components/design_notes/design_discussion.vue';
 import DesignReplyForm from '../../components/design_notes/design_reply_form.vue';
+import DesignDestroyer from '../../components/design_destroyer.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
+import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
-import { extractDiscussions } from '../../utils/design_management_utils';
+import { extractDiscussions, extractDesign } from '../../utils/design_management_utils';
 
 export default {
   components: {
     DesignImage,
     DesignOverlay,
     DesignDiscussion,
+    DesignDestroyer,
     Toolbar,
     DesignReplyForm,
     GlLoadingIcon,
@@ -39,18 +42,25 @@ export default {
         height: 0,
       },
       projectPath: '',
+      issueId: '',
       isNoteSaving: false,
     };
   },
   apollo: {
+    appData: {
+      query: appDataQuery,
+      manual: true,
+      result({ data: { projectPath, issueIid } }) {
+        this.projectPath = projectPath;
+        this.issueIid = issueIid;
+      },
+    },
     design: {
       query: getDesignQuery,
       variables() {
-        return {
-          id: this.id,
-          version: this.designsVersion,
-        };
+        return this.designVariables;
       },
+      update: data => extractDesign(data),
       result({ data }) {
         if (!data) {
           createFlash(s__('DesignManagement|Could not find design, please try again.'));
@@ -81,6 +91,14 @@ export default {
     },
     renderDiscussions() {
       return this.discussions.length || this.annotationCoordinates;
+    },
+    designVariables() {
+      return {
+        fullPath: this.projectPath,
+        iid: this.issueIid,
+        filenames: [this.$route.params.id],
+        atVersion: this.designsVersion,
+      };
     },
   },
   mounted() {
@@ -117,10 +135,7 @@ export default {
           update: (store, { data: { createImageDiffNote } }) => {
             const data = store.readQuery({
               query: getDesignQuery,
-              variables: {
-                id: this.id,
-                version: this.designsVersion,
-              },
+              variables: this.designVariables,
             });
             const newDiscussion = {
               __typename: 'DiscussionEdge',
@@ -141,8 +156,20 @@ export default {
                 },
               },
             };
-            data.design.discussions.edges.push(newDiscussion);
-            store.writeQuery({ query: getDesignQuery, data });
+            const design = extractDesign(data);
+            design.discussions.edges = [...design.discussions.edges, newDiscussion];
+            design.notesCount += 1;
+            store.writeQuery({
+              query: getDesignQuery,
+              variables: this.designVariables,
+              data: {
+                ...data,
+                design: {
+                  ...design,
+                  notesCount: design.notesCount + 1,
+                },
+              },
+            });
           },
         })
         .then(() => {
@@ -189,17 +216,32 @@ export default {
 </script>
 
 <template>
-  <div class="design-detail fixed-top w-100 position-bottom-0 d-sm-flex justify-content-center">
+  <div
+    class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
+  >
     <gl-loading-icon v-if="isLoading" size="xl" class="align-self-center" />
     <template v-else>
-      <div class="d-flex flex-column w-100">
-        <toolbar
-          :id="id"
-          :name="design.filename"
-          :updated-at="design.updatedAt"
-          :updated-by="design.updatedBy"
-        />
-        <div class="d-flex flex-column w-100 h-100 mh-100 position-relative">
+      <div class="d-flex overflow-hidden flex-lg-grow-1 flex-column">
+        <design-destroyer
+          :filenames="[design.filename]"
+          :project-path="projectPath"
+          :iid="issueIid"
+          @done="$router.push({ name: 'designs' })"
+          @error="$router.push({ name: 'designs' })"
+        >
+          <template v-slot="{ mutate, loading, error }">
+            <toolbar
+              :id="id"
+              :is-deleting="loading"
+              :name="design.filename"
+              :updated-at="design.updatedAt"
+              :updated-by="design.updatedBy"
+              :is-latest-version="isLatestVersion"
+              @delete="mutate()"
+            />
+          </template>
+        </design-destroyer>
+        <div class="d-flex flex-column h-100 mh-100 position-relative">
           <design-image
             :image="design.image"
             :name="design.filename"

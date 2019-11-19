@@ -3,6 +3,18 @@
 require 'spec_helper'
 
 describe LfsObject do
+  context 'scopes' do
+    describe '.not_existing_in_project' do
+      it 'contains only lfs objects not linked to the project' do
+        project = create(:project)
+        create(:lfs_objects_project, project: project)
+        other_lfs_object = create(:lfs_object)
+
+        expect(described_class.not_linked_to_project(project)).to contain_exactly(other_lfs_object)
+      end
+    end
+  end
+
   it 'has a distinct has_many :projects relation through lfs_objects_projects' do
     lfs_object = create(:lfs_object)
     project = create(:project)
@@ -154,6 +166,17 @@ describe LfsObject do
           end
         end
       end
+    end
+  end
+
+  describe ".calculate_oid" do
+    let(:lfs_object) { create(:lfs_object, :with_file) }
+
+    it 'returns SHA256 sum of the file' do
+      path = lfs_object.file.path
+      expected = Digest::SHA256.file(path).hexdigest
+
+      expect(described_class.calculate_oid(path)).to eq expected
     end
   end
 end

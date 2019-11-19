@@ -4,7 +4,10 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import RelatedItemsTreeApp from 'ee/related_items_tree/components/related_items_tree_app.vue';
 import RelatedItemsTreeHeader from 'ee/related_items_tree/components/related_items_tree_header.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
-import { ActionType } from 'ee/related_items_tree/constants';
+import { issuableTypesMap } from 'ee/related_issues/constants';
+import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
+import CreateIssueForm from 'ee/related_items_tree/components/create_issue_form.vue';
+import IssueActionsSplitButton from 'ee/related_items_tree/components/issue_actions_split_button.vue';
 
 import { mockInitialConfig, mockParentItem } from '../mock_data';
 
@@ -24,15 +27,19 @@ const createComponent = () => {
 describe('RelatedItemsTreeApp', () => {
   let wrapper;
 
-  beforeEach(() => {
-    wrapper = createComponent();
-  });
+  const findAddItemForm = () => wrapper.find(AddItemForm);
+  const findCreateIssueForm = () => wrapper.find(CreateIssueForm);
+  const findIssueActionsSplitButton = () => wrapper.find(IssueActionsSplitButton);
 
   afterEach(() => {
     wrapper.destroy();
   });
 
   describe('methods', () => {
+    beforeEach(() => {
+      wrapper = createComponent();
+    });
+
     describe('getRawRefs', () => {
       it('returns array of references from provided string with spaces', () => {
         const value = '&1 &2 &3';
@@ -119,7 +126,7 @@ describe('RelatedItemsTreeApp', () => {
     });
 
     describe('handleAddItemFormCancel', () => {
-      it('calls `toggleAddItemForm` actions with params `toggleState` as true and `actionType` as `ActionType.Epic`', () => {
+      it('calls `toggleAddItemForm` actions with params `toggleState` as `false`', () => {
         spyOn(wrapper.vm, 'toggleAddItemForm');
 
         wrapper.vm.handleAddItemFormCancel();
@@ -145,10 +152,12 @@ describe('RelatedItemsTreeApp', () => {
     });
 
     describe('handleCreateEpicFormCancel', () => {
-      it('calls `toggleCreateEpicForm` actions with params `toggleState` and `actionType`', () => {
+      it('calls `toggleCreateEpicForm` actions with params `toggleState`', () => {
         spyOn(wrapper.vm, 'toggleCreateEpicForm');
 
         wrapper.vm.handleCreateEpicFormCancel();
+
+        expect(wrapper.vm.toggleCreateEpicForm).toHaveBeenCalledWith({ toggleState: false });
       });
 
       it('calls `setItemInputValue` action with empty string', () => {
@@ -163,6 +172,7 @@ describe('RelatedItemsTreeApp', () => {
 
   describe('template', () => {
     beforeEach(() => {
+      wrapper = createComponent();
       wrapper.vm.$store.dispatch('receiveItemsSuccess', {
         parentItem: mockParentItem,
         children: [],
@@ -208,12 +218,97 @@ describe('RelatedItemsTreeApp', () => {
     it('renders item add/create form container element', done => {
       wrapper.vm.$store.dispatch('toggleAddItemForm', {
         toggleState: true,
-        actionType: ActionType.Epic,
+        issuableType: issuableTypesMap.Epic,
       });
 
       wrapper.vm.$nextTick(() => {
         expect(wrapper.find('.add-item-form-container').isVisible()).toBe(true);
         done();
+      });
+    });
+
+    it('does not render issue actions split button', () => {
+      expect(findIssueActionsSplitButton().exists()).toBe(false);
+    });
+
+    it('does not render create issue form', () => {
+      expect(findCreateIssueForm().exists()).toBe(false);
+    });
+  });
+
+  describe('with epicNewIssue feature flag enabled', () => {
+    beforeEach(done => {
+      window.gon.features = { epicNewIssue: true };
+      wrapper = createComponent();
+      wrapper.vm.$store.state.itemsFetchInProgress = false;
+      wrapper.vm
+        .$nextTick()
+        .then(done)
+        .catch(done.fail);
+    });
+
+    afterEach(() => {
+      window.gon.features = {};
+    });
+
+    it('renders issue actions split button', () => {
+      expect(findIssueActionsSplitButton().exists()).toBe(true);
+    });
+
+    describe('after split button emitted showAddIssueForm event', () => {
+      it('shows add item form', done => {
+        expect(findAddItemForm().exists()).toBe(false);
+
+        findIssueActionsSplitButton().vm.$emit('showAddIssueForm');
+
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            expect(findAddItemForm().exists()).toBe(true);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('after split button emitted showCreateIssueForm event', () => {
+      it('shows create item form', done => {
+        expect(findCreateIssueForm().exists()).toBe(false);
+
+        findIssueActionsSplitButton().vm.$emit('showCreateIssueForm');
+
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            expect(findCreateIssueForm().exists()).toBe(true);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('after create issue form emitted cancel event', () => {
+      beforeEach(done => {
+        findIssueActionsSplitButton().vm.$emit('showCreateIssueForm');
+
+        wrapper.vm
+          .$nextTick()
+          .then(done)
+          .catch(done.fail);
+      });
+
+      it('hides the form', done => {
+        expect(findCreateIssueForm().exists()).toBe(true);
+
+        findCreateIssueForm().vm.$emit('cancel');
+
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            expect(findCreateIssueForm().exists()).toBe(false);
+          })
+          .then(done)
+          .catch(done.fail);
       });
     });
   });

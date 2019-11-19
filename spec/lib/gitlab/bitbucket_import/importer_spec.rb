@@ -158,6 +158,7 @@ describe Gitlab::BitbucketImport::Importer do
       expect { subject.execute }.to change { MergeRequest.count }.by(1)
 
       merge_request = MergeRequest.first
+      expect(merge_request.state).to eq('merged')
       expect(merge_request.notes.count).to eq(2)
       expect(merge_request.notes.map(&:discussion_id).uniq.count).to eq(1)
 
@@ -308,8 +309,8 @@ describe Gitlab::BitbucketImport::Importer do
 
       importer.execute
 
-      expect(project.issues.where(state: "closed").size).to eq(5)
-      expect(project.issues.where(state: "opened").size).to eq(2)
+      expect(project.issues.where(state_id: Issue.available_states[:closed]).size).to eq(5)
+      expect(project.issues.where(state_id: Issue.available_states[:opened]).size).to eq(2)
     end
 
     describe 'wiki import' do

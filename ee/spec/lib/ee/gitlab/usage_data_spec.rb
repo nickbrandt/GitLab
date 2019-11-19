@@ -39,17 +39,42 @@ describe Gitlab::UsageData do
         expect(described_class.uncached_data).to include(:usage_activity_by_stage)
       end
 
-      context 'for Manage' do
+      context 'for configure' do
         it 'includes accurate usage_activity_by_stage data' do
-          user = create(:user)
-          create(:group_member, user: user)
-          create(:key, type: 'LDAPKey', user: user)
-          create(:group_member, ldap: true, user: user)
+          user    = create(:user)
+          cluster = create(:cluster, user: user)
+          project = create(:project, creator: user)
+          create(:clusters_applications_cert_manager, :installed, cluster: cluster)
+          create(:clusters_applications_helm, :installed, cluster: cluster)
+          create(:clusters_applications_ingress, :installed, cluster: cluster)
+          create(:clusters_applications_knative, :installed, cluster: cluster)
+          create(:cluster, :disabled, user: user)
+          create(:cluster_provider_gcp, :created)
+          create(:cluster_provider_aws, :created)
+          create(:cluster_platform_kubernetes)
+          create(:cluster, :group, :disabled, user: user)
+          create(:cluster, :group, user: user)
+          create(:slack_service, project: project)
+          create(:slack_slash_commands_service, project: project)
+          create(:prometheus_service, project: project)
 
-          expect(described_class.uncached_data[:usage_activity_by_stage][:manage]).to eq(
-            groups: 1,
-            ldap_keys: 1,
-            ldap_users: 1
+          expect(described_class.uncached_data[:usage_activity_by_stage][:configure]).to eq(
+            clusters_applications_cert_managers: 1,
+            clusters_applications_helm: 1,
+            clusters_applications_ingress: 1,
+            clusters_applications_knative: 1,
+            clusters_disabled: 1,
+            clusters_enabled: 4,
+            clusters_platforms_gke: 1,
+            clusters_platforms_eks: 1,
+            clusters_platforms_user: 1,
+            group_clusters_disabled: 1,
+            group_clusters_enabled: 1,
+            project_clusters_disabled: 1,
+            project_clusters_enabled: 4,
+            projects_slack_notifications_active: 1,
+            projects_slack_slash_active: 1,
+            projects_with_prometheus_alerts: 1
           )
         end
       end
@@ -57,7 +82,7 @@ describe Gitlab::UsageData do
       context 'for create' do
         it 'includes accurate usage_activity_by_stage data' do
           user = create(:user)
-          project = create(:project, :repository_private, :requiring_code_owner_approval, :github_imported,
+          project = create(:project, :repository_private, :github_imported,
                            :test_repo, :remote_mirror, creator: user)
           create(:deploy_key, user: user)
           create(:key, user: user)
@@ -72,13 +97,62 @@ describe Gitlab::UsageData do
             deploy_keys: 1,
             keys: 1,
             merge_requests: 1,
-            projects_enforcing_code_owner_approval: 1,
+            projects_enforcing_code_owner_approval: 0,
             projects_imported_from_github: 1,
             projects_with_repositories_enabled: 1,
             protected_branches: 1,
             remote_mirrors: 1,
             snippets: 1,
             suggestions: 1
+          )
+        end
+      end
+
+      context 'for manage' do
+        it 'includes accurate usage_activity_by_stage data' do
+          user = create(:user)
+          create(:group_member, user: user)
+          create(:key, type: 'LDAPKey', user: user)
+          create(:group_member, ldap: true, user: user)
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:manage]).to eq(
+            groups: 1,
+            ldap_keys: 1,
+            ldap_users: 1
+          )
+        end
+      end
+
+      context 'for monitor' do
+        it 'includes accurate usage_activity_by_stage data' do
+          user    = create(:user, dashboard: 'operations')
+          cluster = create(:cluster, user: user)
+          project = create(:project, creator: user)
+
+          create(:clusters_applications_prometheus, :installed, cluster: cluster)
+          create(:users_ops_dashboard_project, user: user)
+          create(:prometheus_service, project: project)
+          create(:project_error_tracking_setting, project: project)
+          create(:project_tracing_setting, project: project)
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:monitor]).to eq(
+            clusters: 1,
+            clusters_applications_prometheus: 1,
+            operations_dashboard_default_dashboard: 1,
+            operations_dashboard_users_with_projects_added: 1,
+            projects_prometheus_active: 1,
+            projects_with_error_tracking_enabled: 1,
+            projects_with_tracing_enabled: 1
+          )
+        end
+      end
+
+      context 'for package' do
+        it 'includes accurate usage_activity_by_stage data' do
+          create(:project, packages: [create(:package)] )
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:package]).to eq(
+            projects_with_packages: 1
           )
         end
       end
@@ -114,6 +188,34 @@ describe Gitlab::UsageData do
             service_desk_enabled_projects: 1,
             service_desk_issues: 1,
             todos: 1
+          )
+        end
+      end
+
+      context 'for release' do
+        it 'includes accurate usage_activity_by_stage data' do
+          user = create(:user)
+          create(:deployment, :failed, user: user)
+          create(:project, :mirror, mirror_trigger_builds: true)
+          create(:release, author: user)
+          create(:deployment, :success, user: user)
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:release]).to eq(
+            deployments: 1,
+            failed_deployments: 1,
+            projects_mirrored_with_pipelines_enabled: 1,
+            releases: 1,
+            successful_deployments: 1
+          )
+        end
+      end
+
+      context 'for secure' do
+        it 'includes accurate usage_activity_by_stage data' do
+          create(:user, group_view: :security_dashboard)
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:secure]).to eq(
+            user_preferences_group_overview_security_dashboard: 1
           )
         end
       end

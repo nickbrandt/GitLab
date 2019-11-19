@@ -113,10 +113,6 @@ module Gitlab
       success
     end
 
-    # Move repository reroutes to mv_directory which is an alias for
-    # mv_namespace. Given the underlying implementation is a move action,
-    # indescriminate of what the folders might be.
-    #
     # storage - project's storage path
     # path - project disk path
     # new_path - new project disk path
@@ -275,7 +271,6 @@ module Gitlab
 
       false
     end
-    alias_method :mv_directory, :mv_namespace # Note: ShellWorker uses this alias
 
     def url_to_repo(path)
       Gitlab.config.gitlab_shell.ssh_path_prefix + "#{path}.git"
@@ -290,17 +285,11 @@ module Gitlab
       end
     end
 
-    # Check if such directory exists in repositories.
-    #
-    # Usage:
-    #   exists?(storage, 'gitlab')
-    #   exists?(storage, 'gitlab/cookies.git')
-    #
-    # rubocop: disable CodeReuse/ActiveRecord
-    def exists?(storage, dir_name)
-      Gitlab::GitalyClient::NamespaceService.new(storage).exists?(dir_name)
+    def repository_exists?(storage, dir_name)
+      Gitlab::Git::Repository.new(storage, dir_name, nil, nil).exists?
+    rescue GRPC::Internal
+      false
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     def hooks_path
       File.join(gitlab_shell_path, 'hooks')

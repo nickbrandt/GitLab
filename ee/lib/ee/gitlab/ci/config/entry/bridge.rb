@@ -12,6 +12,7 @@ module EE
           class Bridge < ::Gitlab::Config::Entry::Node
             include ::Gitlab::Config::Entry::Configurable
             include ::Gitlab::Config::Entry::Attributable
+            include ::Gitlab::Config::Entry::Inheritable
 
             ALLOWED_KEYS = %i[trigger stage allow_failure only except
                               when extends variables needs].freeze
@@ -22,38 +23,52 @@ module EE
               validates :name, presence: true
               validates :name, type: Symbol
 
-              validate do
-                unless trigger.present? || needs.present?
-                  errors.add(:config, 'should contain either a trigger or a needs:pipeline')
-                end
-              end
-
               with_options allow_nil: true do
                 validates :when,
                   inclusion: { in: %w[on_success on_failure always],
                                message: 'should be on_success, on_failure or always' }
                 validates :extends, type: String
               end
+
+              validate on: :composed do
+                unless trigger.present? || bridge_needs.present?
+                  errors.add(:config, 'should contain either a trigger or a needs:pipeline')
+                end
+              end
+
+              validate on: :composed do
+                next unless bridge_needs.present?
+                next if bridge_needs.one?
+
+                errors.add(:config, 'should contain at most one bridge need')
+              end
             end
 
             entry :trigger, ::EE::Gitlab::Ci::Config::Entry::Trigger,
-              description: 'CI/CD Bridge downstream trigger definition.'
+              description: 'CI/CD Bridge downstream trigger definition.',
+              inherit: false
 
-            entry :needs, ::EE::Gitlab::Ci::Config::Entry::Needs,
-              description: 'CI/CD Bridge needs dependency definition.'
+            entry :needs, ::Gitlab::Ci::Config::Entry::Needs,
+              description: 'CI/CD Bridge needs dependency definition.',
+              inherit: false,
+              metadata: { allowed_needs: %i[bridge job] }
 
             entry :stage, ::Gitlab::Ci::Config::Entry::Stage,
-              description: 'Pipeline stage this job will be executed into.'
+              description: 'Pipeline stage this job will be executed into.',
+              inherit: false
 
             entry :only, ::Gitlab::Ci::Config::Entry::Policy,
               description: 'Refs policy this job will be executed for.',
-              default: ::Gitlab::Ci::Config::Entry::Policy::DEFAULT_ONLY
+              default: ::Gitlab::Ci::Config::Entry::Policy::DEFAULT_ONLY,
+              inherit: false
 
             entry :except, ::Gitlab::Ci::Config::Entry::Policy,
-              description: 'Refs policy this job will be executed for.'
+              description: 'Refs policy this job will be executed for.',
+              inherit: false
 
             entry :variables, ::Gitlab::Ci::Config::Entry::Variables,
-              description: 'Environment variables available for this job.'
+              description: 'Environment variables available for this job.',
+              inherit: false
 
             helpers(*ALLOWED_KEYS)
             attributes(*ALLOWED_KEYS)
@@ -84,6 +99,16 @@ module EE
                 variables: (variables_value if variables_defined?),
                 only: only_value,
                 except: except_value }.compact
+            end
+
+            def bridge_needs
+              needs_value[:bridge] if needs_value
+            end
+
+            private
+
+            def overwrite_entry(deps, key, current_entry)
+              deps.default[key] unless current_entry.specified?
             end
           end
         end

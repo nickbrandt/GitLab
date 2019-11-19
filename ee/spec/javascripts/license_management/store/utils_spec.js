@@ -4,10 +4,12 @@ import {
   normalizeLicense,
   getPackagesString,
   getIssueStatusFromLicenseStatus,
+  convertToOldReportFormat,
 } from 'ee/vue_shared/license_management/store/utils';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import {
+  Builder,
   approvedLicense,
   blacklistedLicense,
   licenseHeadIssues,
@@ -35,7 +37,7 @@ describe('utils', () => {
       const result = parseLicenseReportMetrics(licenseHeadIssues, licenseBaseIssues);
 
       expect(result[0].name).toBe(licenseHeadIssues.licenses[0].name);
-      expect(result[0].url).toBe(licenseHeadIssues.dependencies[0].license.url);
+      expect(result[0].url).toBe(licenseHeadIssues.licenses[0].url);
     });
 
     it('should omit issues from base report', () => {
@@ -60,6 +62,90 @@ describe('utils', () => {
       expect(result[0].id).toBe(approvedLicense.id);
       expect(result[1].approvalStatus).toBe(blacklistedLicense.approvalStatus);
       expect(result[1].id).toBe(blacklistedLicense.id);
+    });
+
+    it('compares a v2 report with a v2 report', () => {
+      const policies = [{ id: 100, name: 'BSD License', approvalStatus: 'blacklisted' }];
+      const baseReport = Builder.forV2()
+        .addLicense({ id: 'MIT', name: 'MIT License' })
+        .addDependency({ name: 'x', licenses: ['MIT'] })
+        .build();
+
+      const headReport = Builder.forV2()
+        .addLicense({ id: 'MIT', name: 'MIT License' })
+        .addLicense({ id: 'BSD', name: 'BSD License' })
+        .addDependency({ name: 'x', licenses: ['MIT'] })
+        .addDependency({ name: 'y', licenses: ['BSD'] })
+        .addDependency({ name: 'z', licenses: ['BSD', 'MIT'] })
+        .build();
+
+      const result = parseLicenseReportMetrics(headReport, baseReport, policies);
+
+      expect(result.length).toBe(1);
+      expect(result[0]).toEqual(
+        jasmine.objectContaining({
+          id: 100,
+          approvalStatus: 'blacklisted',
+          count: 2,
+          status: 'failed',
+          name: 'BSD License',
+          url: 'https://opensource.org/licenses/BSD',
+          packages: [
+            { name: 'y', url: 'https://www.example.org/y', description: 'Y' },
+            { name: 'z', url: 'https://www.example.org/z', description: 'Z' },
+          ],
+        }),
+      );
+    });
+
+    it('compares a v1 report with a v2 report', () => {
+      const policies = [{ id: 101, name: 'BSD License', approvalStatus: 'blacklisted' }];
+      const baseReport = Builder.forV1()
+        .addLicense({ name: 'MIT License' })
+        .addDependency({
+          name: 'x',
+          license: { name: 'MIT License', url: 'https://opensource.org/licenses/MIT' },
+        })
+        .build();
+
+      const headReport = Builder.forV2()
+        .addLicense({ id: 'MIT', name: 'MIT License' })
+        .addLicense({ id: 'BSD', name: 'BSD License' })
+        .addLicense({ id: 'MPL-1.1', name: 'Mozilla Public License 1.1' })
+        .addDependency({ name: 'x', licenses: ['MIT'] })
+        .addDependency({ name: 'y', licenses: ['BSD'] })
+        .addDependency({ name: 'z', licenses: ['BSD', 'MIT', 'MPL-1.1'] })
+        .build();
+
+      const result = parseLicenseReportMetrics(headReport, baseReport, policies);
+
+      expect(result.length).toBe(2);
+      expect(result[0]).toEqual(
+        jasmine.objectContaining({
+          id: 101,
+          approvalStatus: 'blacklisted',
+          count: 2,
+          status: 'failed',
+          name: 'BSD License',
+          url: 'https://opensource.org/licenses/BSD',
+          packages: [
+            { name: 'y', url: 'https://www.example.org/y', description: 'Y' },
+            { name: 'z', url: 'https://www.example.org/z', description: 'Z' },
+          ],
+        }),
+      );
+
+      expect(result[1]).toEqual(
+        jasmine.objectContaining({
+          id: undefined,
+          approvalStatus: undefined,
+          count: 1,
+          status: 'neutral',
+          name: 'Mozilla Public License 1.1',
+          url: 'https://opensource.org/licenses/MPL-1.1',
+          packages: [{ name: 'z', url: 'https://www.example.org/z', description: 'Z' }],
+        }),
+      );
     });
 
     it('matches using a case insensitive match on license name', () => {
@@ -162,6 +248,42 @@ describe('utils', () => {
 
     it('returns NEUTRAL status for undefined', () => {
       expect(getIssueStatusFromLicenseStatus()).toBe(STATUS_NEUTRAL);
+    });
+  });
+
+  describe('convertToOldReportFormat', () => {
+    const rawLicense = {
+      name: 'license',
+      classification: {
+        id: 1,
+        approval_status: LICENSE_APPROVAL_STATUS.APPROVED,
+      },
+      dependencies: [{ id: 1 }, { id: 2 }, { id: 3 }],
+    };
+    let parsedLicense;
+
+    beforeEach(() => {
+      parsedLicense = convertToOldReportFormat(rawLicense);
+    });
+
+    it('should get the approval status', () => {
+      expect(parsedLicense.approvalStatus).toEqual(rawLicense.classification.approval_status);
+    });
+
+    it('should get the packages', () => {
+      expect(parsedLicense.packages).toEqual(rawLicense.dependencies);
+    });
+
+    it('should get the id', () => {
+      expect(parsedLicense.id).toEqual(rawLicense.classification.id);
+    });
+
+    it('should get the status', () => {
+      expect(parsedLicense.status).toEqual(STATUS_SUCCESS);
+    });
+
+    it('should retain the license name', () => {
+      expect(parsedLicense.name).toEqual(rawLicense.name);
     });
   });
 });

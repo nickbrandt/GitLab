@@ -380,6 +380,34 @@ describe Projects::Settings::OperationsController do
           )
         end
       end
+
+      context 'updating each incident management setting' do
+        let(:project) { create(:project) }
+        let(:new_incident_management_settings) { {} }
+
+        before do
+          project.add_maintainer(user)
+        end
+
+        shared_examples 'a gitlab tracking event' do |params, event_key|
+          it "creates a gitlab tracking event #{event_key}" do
+            new_incident_management_settings = params
+
+            expect(Gitlab::Tracking).to receive(:event)
+              .with('IncidentManagement::Settings', event_key, kind_of(Hash))
+
+            update_project(project,
+              incident_management_params: new_incident_management_settings)
+          end
+        end
+
+        it_behaves_like 'a gitlab tracking event', { create_issue: '1' }, 'enabled_issue_auto_creation_on_alerts'
+        it_behaves_like 'a gitlab tracking event', { create_issue: '0' }, 'disabled_issue_auto_creation_on_alerts'
+        it_behaves_like 'a gitlab tracking event', { issue_template_key: 'template' }, 'enabled_issue_template_on_alerts'
+        it_behaves_like 'a gitlab tracking event', { issue_template_key: nil }, 'disabled_issue_template_on_alerts'
+        it_behaves_like 'a gitlab tracking event', { send_email: '1' }, 'enabled_sending_emails'
+        it_behaves_like 'a gitlab tracking event', { send_email: '0' }, 'disabled_sending_emails'
+      end
     end
 
     context 'without a license' do
@@ -478,10 +506,10 @@ describe Projects::Settings::OperationsController do
         sign_out(user)
       end
 
-      it 'returns unauthorized status' do
+      it 'returns a redirect' do
         reset_alerting_token
 
-        expect(response).to have_gitlab_http_status(:unauthorized)
+        expect(response).to have_gitlab_http_status(:redirect)
       end
     end
 

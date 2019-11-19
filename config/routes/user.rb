@@ -1,7 +1,4 @@
-Gitlab.ee do
-  get  'unsubscribes/:email', to: 'unsubscribes#show', as: :unsubscribe
-  post 'unsubscribes/:email', to: 'unsubscribes#create'
-end
+# frozen_string_literal: true
 
 # Allows individual providers to be directed to a chosen controller
 # Call from inside devise_scope
@@ -13,7 +10,7 @@ def override_omniauth(provider, controller, path_prefix = '/users/auth')
 end
 
 # Use custom controller for LDAP omniauth callback
-if Gitlab::Auth::LDAP::Config.enabled?
+if Gitlab::Auth::LDAP::Config.sign_in_enabled?
   devise_scope :user do
     Gitlab::Auth::LDAP::Config.available_servers.each do |server|
       override_omniauth(server['provider_name'], 'ldap/omniauth_callbacks')
@@ -30,10 +27,6 @@ devise_for :users, controllers: { omniauth_callbacks: :omniauth_callbacks,
 devise_scope :user do
   get '/users/auth/:provider/omniauth_error' => 'omniauth_callbacks#omniauth_error', as: :omniauth_error
   get '/users/almost_there' => 'confirmations#almost_there'
-
-  Gitlab.ee do
-    get '/users/auth/kerberos_spnego/negotiate' => 'omniauth_kerberos_spnego#negotiate'
-  end
 end
 
 scope '-/users', module: :users do
@@ -55,6 +48,7 @@ scope(constraints: { username: Gitlab::PathRegex.root_namespace_route_regex }) d
     get :starred, as: :starred_projects
     get :snippets
     get :exists
+    get :suggests
     get :activity
     get '/', to: redirect('%{username}'), as: nil
   end

@@ -12,12 +12,10 @@ module EE::Gitlab::ImportExport::Importer
   end
 
   def design_repo_restorer
-    return unless Feature.enabled?(:export_designs, project, default_enabled: true)
-
     Gitlab::ImportExport::DesignRepoRestorer.new(
       path_to_bundle: design_repo_path,
       shared: shared,
-      project: project_tree.restored_project
+      project: project
     )
   end
 

@@ -35,6 +35,7 @@ module EE
         if: ->(project) { project.mirror? && project.import_url_updated? }
 
       belongs_to :mirror_user, foreign_key: 'mirror_user_id', class_name: 'User'
+      belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_user_id', class_name: 'User'
 
       has_one :repository_state, class_name: 'ProjectRepositoryState', inverse_of: :project
       has_one :project_registry, class_name: 'Geo::ProjectRegistry', inverse_of: :project
@@ -47,6 +48,7 @@ module EE
       has_one :gitlab_slack_application_service
       has_one :alerts_service
 
+      has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
       has_one :incident_management_setting, inverse_of: :project, class_name: 'IncidentManagement::ProjectIncidentManagementSetting'
@@ -61,10 +63,19 @@ module EE
       has_many :audit_events, as: :entity
       has_many :designs, inverse_of: :project, class_name: 'DesignManagement::Design'
       has_many :path_locks
+
+      # the rationale behind vulnerabilities and vulnerability_findings can be found here:
+      # https://gitlab.com/gitlab-org/gitlab/issues/10252#terminology
+      has_many :vulnerabilities
       has_many :vulnerability_feedback, class_name: 'Vulnerabilities::Feedback'
-      has_many :vulnerabilities, class_name: 'Vulnerabilities::Occurrence'
+      has_many :vulnerability_findings, class_name: 'Vulnerabilities::Occurrence' do
+        def lock_for_confirmation!(id)
+          where(vulnerability_id: nil).lock.find(id)
+        end
+      end
       has_many :vulnerability_identifiers, class_name: 'Vulnerabilities::Identifier'
       has_many :vulnerability_scanners, class_name: 'Vulnerabilities::Scanner'
+
       has_many :protected_environments
       has_many :software_license_policies, inverse_of: :project, class_name: 'SoftwareLicensePolicy'
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
@@ -72,19 +83,21 @@ module EE
       has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'
       has_many :merge_trains, foreign_key: 'target_project_id', inverse_of: :target_project
 
-      has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
-
-      has_many :source_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :project_id
-
       has_many :webide_pipelines, -> { webide_source }, class_name: 'Ci::Pipeline', inverse_of: :project
 
       has_many :prometheus_alerts, inverse_of: :project
       has_many :prometheus_alert_events, inverse_of: :project
+      has_many :self_managed_prometheus_alert_events, inverse_of: :project
 
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
 
       has_many :project_aliases
+
+      has_many :upstream_project_subscriptions, class_name: 'Ci::Subscriptions::Project', foreign_key: :downstream_project_id, inverse_of: :downstream_project
+      has_many :upstream_projects, class_name: 'Project', through: :upstream_project_subscriptions, source: :upstream_project
+      has_many :downstream_project_subscriptions, class_name: 'Ci::Subscriptions::Project', foreign_key: :upstream_project_id, inverse_of: :upstream_project
+      has_many :downstream_projects, class_name: 'Project', through: :downstream_project_subscriptions, source: :downstream_project
 
       scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
 
@@ -106,7 +119,7 @@ module EE
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
       scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
       scope :requiring_code_owner_approval,
-            -> { where(merge_requests_require_code_owner_approval: true) }
+            -> { joins(:protected_branches).where(protected_branches: { code_owner_approval_required: true }) }
       scope :with_active_services, -> { joins(:services).merge(::Service.active) }
       scope :with_active_jira_services, -> { joins(:services).merge(::JiraService.active) }
       scope :with_jira_dvcs_cloud, -> { joins(:feature_usage).merge(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: true)) }
@@ -119,6 +132,18 @@ module EE
       scope :with_security_reports_stored, -> { where('EXISTS (?)', ::Vulnerabilities::Occurrence.scoped_project.select(1)) }
       scope :with_security_reports, -> { where('EXISTS (?)', ::Ci::JobArtifact.security_reports.scoped_project.select(1)) }
       scope :with_github_service_pipeline_events, -> { joins(:github_service).merge(GithubService.pipeline_hooks) }
+      scope :with_active_prometheus_service, -> { joins(:prometheus_service).merge(PrometheusService.active) }
+      scope :with_enabled_error_tracking, -> { joins(:error_tracking_setting).where(project_error_tracking_settings: { enabled: true }) }
+      scope :with_tracing_enabled, -> { joins(:tracing_setting) }
+      scope :with_packages, -> { joins(:packages) }
+      scope :mirrored_with_enabled_pipelines, -> do
+        joins(:project_feature).mirror.where(mirror_trigger_builds: true,
+                                             project_features: { builds_access_level: ::ProjectFeature::ENABLED })
+      end
+      scope :with_slack_service, -> { joins(:slack_service) }
+      scope :with_slack_slash_commands_service, -> { joins(:slack_slash_commands_service) }
+      scope :with_prometheus_service, -> { joins(:prometheus_service) }
+      scope :aimed_for_deletion, -> (date) { where('marked_for_deletion_at <= ?', date).without_deleted }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
@@ -132,7 +157,7 @@ module EE
 
       delegate :log_jira_dvcs_integration_usage, :jira_dvcs_server_last_sync_at, :jira_dvcs_cloud_last_sync_at, to: :feature_usage
 
-      delegate :merge_pipelines_enabled, :merge_pipelines_enabled=, :merge_pipelines_enabled?, to: :ci_cd_settings
+      delegate :merge_pipelines_enabled, :merge_pipelines_enabled=, :merge_pipelines_enabled?, :merge_pipelines_were_disabled?, to: :ci_cd_settings
       delegate :merge_trains_enabled, :merge_trains_enabled=, :merge_trains_enabled?, to: :ci_cd_settings
 
       validates :repository_size_limit,
@@ -149,8 +174,6 @@ module EE
       end
 
       default_value_for :packages_enabled, true
-
-      delegate :store_security_reports_available?, to: :namespace
 
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :alerting_setting, update_only: true
@@ -170,6 +193,10 @@ module EE
       end
     end
 
+    def can_store_security_reports?
+      namespace.store_security_reports_available? || public?
+    end
+
     def tracing_external_url
       self.tracing_setting.try(:external_url)
     end
@@ -177,6 +204,10 @@ module EE
     def latest_pipeline_with_security_reports
       all_pipelines.newest_first(ref: default_branch).with_reports(::Ci::JobArtifact.security_reports).first ||
         all_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
+    end
+
+    def latest_pipeline_with_reports(reports)
+      all_pipelines.newest_first(ref: default_branch).with_reports(reports).take
     end
 
     def environments_for_scope(scope)
@@ -393,13 +424,14 @@ module EE
     end
 
     def merge_requests_require_code_owner_approval?
-      super && code_owner_approval_required_available?
+      code_owner_approval_required_available? &&
+        protected_branches.requiring_code_owner_approval.any?
     end
 
     def branch_requires_code_owner_approval?(branch_name)
       return false unless code_owner_approval_required_available?
 
-      protected_branches.requiring_code_owner_approval.matching(branch_name).any?
+      ::ProtectedBranch.branch_requires_code_owner_approval?(self, branch_name)
     end
 
     def require_password_to_approve
@@ -608,13 +640,18 @@ module EE
       super.presence || build_feature_usage
     end
 
+    # LFS and hashed repository storage are required for using Design Management.
     def design_management_enabled?
-      # LFS is required for using Design Management
-      #
-      # Checking both feature availability on the license, as well as the feature
-      # flag, because we don't want to enable design_management by default on
-      # on prem installs yet.
       lfs_enabled? &&
+        # We will allow the hashed storage requirement to be disabled for
+        # a few releases until we are able to understand the impact of the
+        # hashed storage requirement for existing design management projects.
+        # See https://gitlab.com/gitlab-org/gitlab/issues/13428#note_238729038
+        (hashed_storage?(:repository) || ::Feature.disabled?(:design_management_require_hashed_storage, self, default_enabled: true)) &&
+        # Check both feature availability on the license, as well as the feature
+        # flag, because we don't want to enable design_management by default on
+        # on prem installs yet.
+        # See https://gitlab.com/gitlab-org/gitlab/issues/13709
         feature_available?(:design_management) &&
         ::Feature.enabled?(:design_management_flag, self, default_enabled: true)
     end
@@ -624,8 +661,11 @@ module EE
     end
 
     def alerts_service_available?
-      ::Feature.enabled?(:generic_alert_endpoint, self) &&
-        feature_available?(:incident_management)
+      feature_available?(:incident_management)
+    end
+
+    def alerts_service_activated?
+      alerts_service_available? && alerts_service&.active?
     end
 
     def package_already_taken?(package_name)
@@ -634,6 +674,23 @@ module EE
         .where.not(id: id)
         .merge(Packages::Package.with_name(package_name))
         .exists?
+    end
+
+    def adjourned_deletion?
+      feature_available?(:marking_project_for_deletion) &&
+        ::Gitlab::CurrentSettings.deletion_adjourned_period > 0
+    end
+
+    def marked_for_deletion?
+      return false unless feature_available?(:marking_project_for_deletion)
+
+      marked_for_deletion_at.present?
+    end
+
+    def has_packages?(package_type)
+      return false unless feature_available?(:packages)
+
+      packages.where(package_type: package_type).exists?
     end
 
     private
@@ -669,10 +726,6 @@ module EE
       else
         globally_available
       end
-    end
-
-    def validate_board_limit(board)
-      # Board limits are disabled in EE, so this method is just a no-op.
     end
 
     def check_pull_mirror_branch_prefix

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ErrorTracking
-  class ListIssuesService < ::BaseService
+  class ListIssuesService < ErrorTracking::BaseService
     DEFAULT_ISSUE_STATUS = 'unresolved'
     DEFAULT_LIMIT = 20
 
@@ -9,8 +9,11 @@ module ErrorTracking
       return error('Error Tracking is not enabled') unless enabled?
       return error('Access denied', :unauthorized) unless can_read?
 
-      result = project_error_tracking_setting
-        .list_sentry_issues(issue_status: issue_status, limit: limit)
+      result = project_error_tracking_setting.list_sentry_issues(
+        issue_status: issue_status,
+        limit: limit,
+        search_term: search_term
+      )
 
       # our results are not yet ready
       unless result
@@ -18,7 +21,7 @@ module ErrorTracking
       end
 
       if result[:error].present?
-        return error(result[:error], http_status_from_error_type(result[:error_type]))
+        return error(result[:error], http_status_for(result[:error_type]))
       end
 
       success(issues: result[:issues])
@@ -30,17 +33,12 @@ module ErrorTracking
 
     private
 
-    def http_status_from_error_type(error_type)
-      case error_type
-      when ErrorTracking::ProjectErrorTrackingSetting::SENTRY_API_ERROR_TYPE_MISSING_KEYS
-        :internal_server_error
-      else
-        :bad_request
-      end
+    def fetch
+      project_error_tracking_setting.list_sentry_issues(issue_status: issue_status, limit: limit)
     end
 
-    def project_error_tracking_setting
-      project.error_tracking_setting
+    def parse_response(response)
+      { issues: response[:issues] }
     end
 
     def issue_status
@@ -49,6 +47,10 @@ module ErrorTracking
 
     def limit
       params[:limit] || DEFAULT_LIMIT
+    end
+
+    def search_term
+      params[:search_term].presence
     end
 
     def enabled?

@@ -40,7 +40,7 @@ these additional steps before proceeding with GitLab installation.
    ```
 
 1. Download/install GitLab Omnibus using **steps 1 and 2** from
-   [GitLab downloads](https://about.gitlab.com/downloads). Do not complete other
+   [GitLab downloads](https://about.gitlab.com/install/). Do not complete other
    steps on the download page.
 1. Create/edit `/etc/gitlab/gitlab.rb` and use the following configuration.
    Be sure to change the `external_url` to match your eventual GitLab front-end
@@ -99,14 +99,14 @@ these additional steps before proceeding with GitLab installation.
 
 ## First GitLab application server
 
-As a final step, run the setup rake task **only on** the first GitLab application server.
-Do not run this on additional application servers.
+On the first application server, run:
 
-1. Initialize the database by running `sudo gitlab-rake gitlab:setup`.
-1. Run `sudo gitlab-ctl reconfigure` to compile the configuration.
+```sh
+sudo gitlab-ctl reconfigure
+```
 
-   CAUTION: **WARNING:** Only run this setup task on **NEW** GitLab instances because it
-   will wipe any existing data.
+This should compile the configuration and initialize the database. Do
+not run this on additional application servers until the next step.
 
 ## Extra configuration for additional GitLab application servers
 

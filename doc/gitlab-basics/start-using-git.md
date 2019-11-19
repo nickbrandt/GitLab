@@ -13,9 +13,9 @@ make sure that you have created and/or signed into an account on GitLab.
 Depending on your operating system, you will need to use a shell of your preference.
 Here are some suggestions:
 
-- [Terminal](http://blog.teamtreehouse.com/introduction-to-the-mac-os-x-command-line) on macOS
+- [Terminal](https://blog.teamtreehouse.com/introduction-to-the-mac-os-x-command-line) on macOS
 - [GitBash](https://msysgit.github.io) on Windows
-- [Linux Terminal](http://www.howtogeek.com/140679/beginner-geek-how-to-start-using-the-linux-terminal/) on Linux
+- [Linux Terminal](https://www.howtogeek.com/140679/beginner-geek-how-to-start-using-the-linux-terminal/) on Linux
 
 ## Check if Git has already been installed
 
@@ -287,7 +287,7 @@ git reset HEAD~1
 This leaves the changed files and folders unstaged in your local repository.
 
 CAUTION: **Warning:**
-A Git commit should not usually be reverse, particularly if you already pushed it
+A Git commit should not usually be reversed, particularly if you already pushed it
 to the remote repository. Although you can undo a commit, the best option is to avoid
 the situation altogether by working carefully.
 

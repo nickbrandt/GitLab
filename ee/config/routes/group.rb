@@ -31,12 +31,6 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
 
-    resources :clusters, only: [] do
-      member do
-        get :environments, format: :json
-      end
-    end
-
     resource :ldap, only: [] do
       member do
         put :sync
@@ -45,7 +39,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resource :issues_analytics, only: [:show]
 
-    resource :insights, only: [:show] do
+    resource :insights, only: [:show], trailing_slash: true do
       collection do
         post :query
       end
@@ -78,6 +72,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resources :billings, only: [:index]
     resources :epics, concerns: :awardable, constraints: { id: /\d+/ } do
       member do
+        get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
         get :discussions, format: :json
         get :realtime_changes
         post :toggle_subscription
@@ -116,7 +111,19 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     namespace :security do
       resource :dashboard, only: [:show], controller: :dashboard
-      resources :vulnerabilities, only: [:index], controller: :vulnerabilities do
+      resources :vulnerable_projects, only: [:index]
+      # We have to define both legacy and new routes for Vulnerability Findings
+      # because they are loaded upon application initialization and preloaded by
+      # web server.
+      # TODO: remove this comment and `resources :vulnerabilities` when feature flag is removed
+      # see https://gitlab.com/gitlab-org/gitlab/issues/33488
+      resources :vulnerabilities, only: [:index] do
+        collection do
+          get :summary
+          get :history
+        end
+      end
+      resources :vulnerability_findings, only: [:index] do
         collection do
           get :summary
           get :history
@@ -137,14 +144,6 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     post :sign_up, to: 'sso#sign_up'
 
     resource :roadmap, only: [:show], controller: 'roadmap'
-
-    legacy_ee_group_boards_redirect = redirect do |params, request|
-      path = "/groups/#{params[:group_id]}/-/boards"
-      path << "/#{params[:extra_params]}" if params[:extra_params].present?
-      path << "?#{request.query_string}" if request.query_string.present?
-      path
-    end
-    get 'boards(/*extra_params)', as: :legacy_ee_group_boards_redirect, to: legacy_ee_group_boards_redirect
 
     resource :dependency_proxy, only: [:show, :update]
     resources :packages, only: [:index]

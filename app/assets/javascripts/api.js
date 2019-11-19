@@ -2,6 +2,8 @@ import $ from 'jquery';
 import _ from 'underscore';
 import axios from './lib/utils/axios_utils';
 import { joinPaths } from './lib/utils/url_utility';
+import flash from '~/flash';
+import { __ } from '~/locale';
 
 const Api = {
   groupsPath: '/api/:version/groups.json',
@@ -29,6 +31,7 @@ const Api = {
   usersPath: '/api/:version/users.json',
   userPath: '/api/:version/users/:id',
   userStatusPath: '/api/:version/users/:id/status',
+  userProjectsPath: '/api/:version/users/:id/projects',
   userPostStatusPath: '/api/:version/user/status',
   commitPath: '/api/:version/projects/:id/repository/commits',
   applySuggestionPath: '/api/:version/suggestions/:id/apply',
@@ -36,6 +39,7 @@ const Api = {
   branchSinglePath: '/api/:version/projects/:id/repository/branches/:branch',
   createBranchPath: '/api/:version/projects/:id/repository/branches',
   releasesPath: '/api/:version/projects/:id/releases',
+  releasePath: '/api/:version/projects/:id/releases/:tag_name',
   mergeRequestsPipeline: '/api/:version/projects/:id/merge_requests/:merge_request_iid/pipelines',
   adminStatisticsPath: 'api/:version/application/statistics',
 
@@ -109,10 +113,9 @@ const Api = {
       .get(url, {
         params: Object.assign(defaults, options),
       })
-      .then(({ data }) => {
+      .then(({ data, headers }) => {
         callback(data);
-
-        return data;
+        return { data, headers };
       });
   },
 
@@ -238,7 +241,8 @@ const Api = {
       .get(url, {
         params: Object.assign({}, defaults, options),
       })
-      .then(({ data }) => callback(data));
+      .then(({ data }) => callback(data))
+      .catch(() => flash(__('Something went wrong while fetching projects')));
   },
 
   commitMultiple(id, data) {
@@ -347,6 +351,20 @@ const Api = {
     });
   },
 
+  userProjects(userId, query, options, callback) {
+    const url = Api.buildUrl(Api.userProjectsPath).replace(':id', userId);
+    const defaults = {
+      search: query,
+      per_page: 20,
+    };
+    return axios
+      .get(url, {
+        params: Object.assign({}, defaults, options),
+      })
+      .then(({ data }) => callback(data))
+      .catch(() => flash(__('Something went wrong while fetching projects')));
+  },
+
   branches(id, query = '', options = {}) {
     const url = Api.buildUrl(this.createBranchPath).replace(':id', encodeURIComponent(id));
 
@@ -389,6 +407,22 @@ const Api = {
     const url = Api.buildUrl(this.releasesPath).replace(':id', encodeURIComponent(id));
 
     return axios.get(url);
+  },
+
+  release(projectPath, tagName) {
+    const url = Api.buildUrl(this.releasePath)
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':tag_name', encodeURIComponent(tagName));
+
+    return axios.get(url);
+  },
+
+  updateRelease(projectPath, tagName, release) {
+    const url = Api.buildUrl(this.releasePath)
+      .replace(':id', encodeURIComponent(projectPath))
+      .replace(':tag_name', encodeURIComponent(tagName));
+
+    return axios.put(url, release);
   },
 
   adminStatistics() {

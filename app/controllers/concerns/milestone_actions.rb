@@ -35,7 +35,7 @@ module MilestoneActions
 
         render json: tabs_json("shared/milestones/_labels_tab", {
           labels: milestone_labels.map do |label|
-            label.present(issuable_subject: @milestone.parent)
+            label.present(issuable_subject: @milestone.resource_parent)
           end
         })
       end
@@ -53,12 +53,10 @@ module MilestoneActions
 
   # rubocop:disable Gitlab/ModuleWithInstanceVariables
   def milestone_redirect_path
-    if @project
-      project_milestone_path(@project, @milestone)
-    elsif @group
-      group_milestone_path(@group, @milestone.safe_title, title: @milestone.title)
+    if @milestone.global_milestone?
+      url_for(action: :show, title: @milestone.title)
     else
-      dashboard_milestone_path(@milestone.safe_title, title: @milestone.title)
+      url_for(action: :show)
     end
   end
   # rubocop:enable Gitlab/ModuleWithInstanceVariables

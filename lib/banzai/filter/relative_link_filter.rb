@@ -21,6 +21,7 @@ module Banzai
         return doc if context[:system_note]
 
         clear_memoization(:linkable_files)
+        clear_memoization(:linkable_attributes)
 
         load_uri_types
 
@@ -35,9 +36,8 @@ module Banzai
 
       def load_uri_types
         return unless linkable_files?
+        return unless linkable_attributes.present?
         return {} unless repository
-
-        clear_memoization(:linkable_attributes)
 
         @uri_types = request_path.present? ? get_uri_types([request_path]) : {}
 
@@ -65,7 +65,7 @@ module Banzai
             el.attribute('href')
           end
 
-          attrs += doc.search('img, video').flat_map do |el|
+          attrs += doc.search('img, video, audio').flat_map do |el|
             [el.attribute('src'), el.attribute('data-src')]
           end
 
@@ -83,7 +83,7 @@ module Banzai
         get_blob_types(paths).each do |name, type|
           if type == :blob
             blob = ::Blob.decorate(Gitlab::Git::Blob.new(name: name), project)
-            uri_types[name] = blob.image? || blob.video? ? :raw : :blob
+            uri_types[name] = blob.image? || blob.video? || blob.audio? ? :raw : :blob
           else
             uri_types[name] = type
           end

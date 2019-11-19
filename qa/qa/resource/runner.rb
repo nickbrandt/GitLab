@@ -29,14 +29,13 @@ module QA
       end
 
       def fabricate_via_api!
-        Service::Runner.new(name).tap do |runner|
+        Service::DockerRun::GitlabRunner.new(name).tap do |runner|
           runner.pull
           runner.token = @token ||= project.runners_token
           runner.address = Runtime::Scenario.gitlab_address
           runner.tags = tags
           runner.image = image
           runner.config = config if config
-          runner.run_untagged = true
           runner.register!
         end
       end
@@ -46,7 +45,7 @@ module QA
 
         super
 
-        Service::Runner.new(name).remove!
+        Service::DockerRun::GitlabRunner.new(name).remove!
       end
 
       def api_delete_path

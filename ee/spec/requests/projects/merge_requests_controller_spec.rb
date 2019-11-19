@@ -19,7 +19,7 @@ describe Projects::MergeRequestsController do
     context 'when the project requires code owner approval' do
       before do
         stub_licensed_features(code_owners: true, code_owner_approval_required: true)
-        project.update!(merge_requests_require_code_owner_approval: true)
+
         get_edit # Warm the cache
       end
 

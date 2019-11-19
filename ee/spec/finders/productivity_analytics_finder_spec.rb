@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe ProductivityAnalyticsFinder do
   subject { described_class.new(current_user, search_params.merge(state: :merged)) }
+
   let(:current_user) { create(:admin) }
   let(:search_params) { {} }
 
@@ -43,6 +44,12 @@ describe ProductivityAnalyticsFinder do
     end
 
     context 'allows to filter by merged_at' do
+      let(:pa_start_date) { 2.years.ago }
+
+      before do
+        allow(ProductivityAnalytics).to receive(:start_date).and_return(pa_start_date)
+      end
+
       around do |example|
         Timecop.freeze { example.run }
       end
@@ -61,20 +68,6 @@ describe ProductivityAnalyticsFinder do
         end
       end
 
-      context 'with merged_at_after specified as days-range' do
-        let(:search_params) do
-          {
-            merged_at_after: '11days'
-          }
-        end
-
-        it 'returns all MRs with merged date later than Xdays ago' do
-          long_mr
-          short_mr
-          expect(subject.execute).to match_array([long_mr])
-        end
-      end
-
       context 'with merged_at_after and merged_at_before specified' do
         let(:search_params) do
           {
@@ -87,6 +80,20 @@ describe ProductivityAnalyticsFinder do
           long_mr
           short_mr
           expect(subject.execute).to match_array([short_mr])
+        end
+      end
+
+      context 'with merged_at_after earlier than PA start date' do
+        let(:search_params) do
+          { merged_at_after: 3.years.ago.to_s }
+        end
+
+        it 'uses start_date as filter value' do
+          metrics_data = { merged_at: (2.years + 1.day).ago }
+          create(:merge_request, :merged, :with_productivity_metrics, created_at: 800.days.ago, metrics_data: metrics_data)
+          long_mr
+
+          expect(subject.execute).to match_array([long_mr])
         end
       end
     end

@@ -7,17 +7,22 @@ module Projects
         include Gitlab::Utils::StrongMemoize
 
         def execute(token)
+          return false unless valid_payload_size?
           return false unless valid_version?
           return false unless valid_alert_manager_token?(token)
 
-          send_alert_email if send_email?
-          process_incident_issues if create_issue?
           persist_events
+          send_alert_email if send_email?
+          process_incident_issues if process_issues?
 
           true
         end
 
         private
+
+        def valid_payload_size?
+          Gitlab::Utils::DeepSize.new(params).valid?
+        end
 
         def incident_management_available?
           project.feature_available?(:incident_management)
@@ -41,8 +46,7 @@ module Projects
           incident_management_setting.send_email && firings.any?
         end
 
-        def create_issue?
-          return unless firings.any?
+        def process_issues?
           return unless incident_management_available?
 
           incident_management_setting.create_issue?
@@ -128,8 +132,8 @@ module Projects
         end
 
         def process_incident_issues
-          firings.each do |alert|
-            IncidentManagement::ProcessAlertWorker
+          alerts.each do |alert|
+            IncidentManagement::ProcessPrometheusAlertWorker
               .perform_async(project.id, alert.to_h)
           end
         end

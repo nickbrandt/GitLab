@@ -35,6 +35,7 @@ class Admin::LicensesController < Admin::ApplicationController
 
     respond_with(@license, location: admin_license_path) do
       if @license.save
+        @license.update_trial_setting
         flash[:notice] = _('The license was successfully uploaded and is now active. You can see the details below.')
       end
     end

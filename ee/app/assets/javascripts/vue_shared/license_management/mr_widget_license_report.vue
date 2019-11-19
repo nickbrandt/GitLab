@@ -1,5 +1,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
+import { GlLink } from '@gitlab/ui';
 import ReportSection from '~/reports/components/report_section.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
@@ -15,6 +16,7 @@ export default {
   componentNames,
   store,
   components: {
+    GlLink,
     ReportSection,
     SetLicenseApprovalModal,
     Icon,
@@ -44,6 +46,11 @@ export default {
       type: String,
       required: true,
     },
+    licensesApiPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
     canManageLicenses: {
       type: Boolean,
       required: true,
@@ -58,10 +65,20 @@ export default {
       required: false,
       default: false,
     },
+    securityApprovalsHelpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     ...mapState(['loadLicenseReportError']),
-    ...mapGetters(['licenseReport', 'isLoading', 'licenseSummaryText']),
+    ...mapGetters([
+      'licenseReport',
+      'isLoading',
+      'licenseSummaryText',
+      'reportContainsBlacklistedLicense',
+    ]),
     hasLicenseReportIssues() {
       const { licenseReport } = this;
       return licenseReport && licenseReport.length > 0;
@@ -79,20 +96,30 @@ export default {
     },
   },
   mounted() {
-    const { headPath, basePath, apiUrl, canManageLicenses } = this;
+    const { headPath, basePath, apiUrl, canManageLicenses, licensesApiPath } = this;
 
     this.setAPISettings({
       apiUrlManageLicenses: apiUrl,
       headPath,
       basePath,
       canManageLicenses,
+      licensesApiPath,
     });
 
-    this.loadLicenseReport();
-    this.loadManagedLicenses();
+    if (gon.features && gon.features.parsedLicenseReport) {
+      this.loadParsedLicenseReport();
+    } else {
+      this.loadLicenseReport();
+      this.loadManagedLicenses();
+    }
   },
   methods: {
-    ...mapActions(['setAPISettings', 'loadManagedLicenses', 'loadLicenseReport']),
+    ...mapActions([
+      'setAPISettings',
+      'loadManagedLicenses',
+      'loadLicenseReport',
+      'loadParsedLicenseReport',
+    ]),
   },
 };
 </script>
@@ -101,7 +128,6 @@ export default {
     <set-license-approval-modal />
     <report-section
       :status="licenseReportStatus"
-      :success-text="licenseSummaryText"
       :loading-text="licenseSummaryText"
       :error-text="licenseSummaryText"
       :neutral-issues="licenseReport"
@@ -110,7 +136,19 @@ export default {
       :class="reportSectionClass"
       :always-open="alwaysOpen"
       class="license-report-widget mr-report"
+      data-qa-selector="license_report_widget"
     >
+      <template #success>
+        {{ licenseSummaryText }}
+        <gl-link
+          v-if="reportContainsBlacklistedLicense && securityApprovalsHelpPagePath"
+          :href="securityApprovalsHelpPagePath"
+          class="js-security-approval-help-link"
+          target="_blank"
+        >
+          <icon :size="12" name="question" />
+        </gl-link>
+      </template>
       <div v-if="showActionButtons" slot="actionButtons" class="append-right-default">
         <a
           v-if="licenseManagementSettingsPath"

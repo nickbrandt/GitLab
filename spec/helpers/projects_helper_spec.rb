@@ -157,6 +157,7 @@ describe ProjectsHelper do
       allow(helper).to receive(:current_user).and_return(user)
       allow(helper).to receive(:can?).with(user, :read_cross_project) { true }
       allow(user).to receive(:max_member_access_for_project).and_return(40)
+      allow(Gitlab::I18n).to receive(:locale).and_return('es')
     end
 
     it "includes the route" do
@@ -201,6 +202,10 @@ describe ProjectsHelper do
       create(:ci_pipeline, :success, project: project, sha: project.commit.sha)
 
       expect(helper.project_list_cache_key(project)).to include("pipeline-status/#{project.commit.sha}-success")
+    end
+
+    it "includes the user locale" do
+      expect(helper.project_list_cache_key(project)).to include('es')
     end
 
     it "includes the user max member access" do
@@ -900,6 +905,60 @@ describe ProjectsHelper do
       it 'returns nil' do
         expect(helper.metrics_external_dashboard_url).to eq(nil)
       end
+    end
+  end
+
+  describe '#grafana_integration_url' do
+    let(:project) { create(:project) }
+
+    before do
+      helper.instance_variable_set(:@project, project)
+    end
+
+    subject { helper.grafana_integration_url }
+
+    it { is_expected.to eq(nil) }
+
+    context 'grafana integration exists' do
+      let!(:grafana_integration) { create(:grafana_integration, project: project) }
+
+      it { is_expected.to eq(grafana_integration.grafana_url) }
+    end
+  end
+
+  describe '#grafana_integration_token' do
+    let(:project) { create(:project) }
+
+    before do
+      helper.instance_variable_set(:@project, project)
+    end
+
+    subject { helper.grafana_integration_token }
+
+    it { is_expected.to eq(nil) }
+
+    context 'grafana integration exists' do
+      let!(:grafana_integration) { create(:grafana_integration, project: project) }
+
+      it { is_expected.to eq(grafana_integration.token) }
+    end
+  end
+
+  describe '#grafana_integration_enabled?' do
+    let(:project) { create(:project) }
+
+    before do
+      helper.instance_variable_set(:@project, project)
+    end
+
+    subject { helper.grafana_integration_enabled? }
+
+    it { is_expected.to eq(nil) }
+
+    context 'grafana integration exists' do
+      let!(:grafana_integration) { create(:grafana_integration, project: project) }
+
+      it { is_expected.to eq(grafana_integration.enabled) }
     end
   end
 end

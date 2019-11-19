@@ -32,6 +32,18 @@ describe Projects::Prometheus::Alerts::CreateEventsService do
     end
   end
 
+  shared_examples 'self managed events persisted' do
+    subject { service.execute }
+
+    it 'returns created events' do
+      expect(subject).not_to be_empty
+    end
+
+    it 'does change self managed event count' do
+      expect { subject }.to change { SelfManagedPrometheusAlertEvent.count }
+    end
+  end
+
   context 'with valid alerts_payload' do
     let!(:alert) { create(:prometheus_alert, prometheus_metric: metric, project: project) }
 
@@ -221,14 +233,14 @@ describe Projects::Prometheus::Alerts::CreateEventsService do
       end
 
       describe '`ended_at`' do
-        context 'is missing' do
-          let(:alerts_payload) { { 'alerts' => [alert_payload(ended_at: nil)] } }
+        context 'is missing and status is resolved' do
+          let(:alerts_payload) { { 'alerts' => [alert_payload(ended_at: nil, status: 'resolved')] } }
 
           it_behaves_like 'no events persisted'
         end
 
-        context 'is invalid' do
-          let(:alerts_payload) { { 'alerts' => [alert_payload(ended_at: 'invalid date')] } }
+        context 'is invalid and status is resolved' do
+          let(:alerts_payload) { { 'alerts' => [alert_payload(ended_at: 'invalid date', status: 'resolved')] } }
 
           it_behaves_like 'no events persisted'
         end
@@ -240,6 +252,25 @@ describe Projects::Prometheus::Alerts::CreateEventsService do
             let(:alerts_payload) { { 'alerts' => [alert_payload(gitlab_alert_id: nil)] } }
 
             it_behaves_like 'no events persisted'
+          end
+
+          context 'is missing but title is given' do
+            let(:alerts_payload) { { 'alerts' => [alert_payload(gitlab_alert_id: nil, title: 'alert')] } }
+
+            it_behaves_like 'self managed events persisted'
+          end
+
+          context 'is missing and environment name is given' do
+            let(:environment) { create(:environment, project: project) }
+            let(:alerts_payload) { { 'alerts' => [alert_payload(gitlab_alert_id: nil, title: 'alert', environment: environment.name)] } }
+
+            it_behaves_like 'self managed events persisted'
+
+            it 'associates the environment to the alert event' do
+              service.execute
+
+              expect(SelfManagedPrometheusAlertEvent.last.environment).to eq environment
+            end
           end
 
           context 'is invalid' do
@@ -254,13 +285,16 @@ describe Projects::Prometheus::Alerts::CreateEventsService do
 
   private
 
-  def alert_payload(status: 'firing', started_at: Time.now, ended_at: Time.now, gitlab_alert_id: alert.prometheus_metric_id)
+  def alert_payload(status: 'firing', started_at: Time.now, ended_at: Time.now, gitlab_alert_id: alert.prometheus_metric_id, title: nil, environment: nil)
     payload = {}
 
     payload['status'] = status if status
     payload['startsAt'] = utc_rfc3339(started_at) if started_at
     payload['endsAt'] = utc_rfc3339(ended_at) if ended_at
-    payload['labels'] = { 'gitlab_alert_id' => gitlab_alert_id.to_s } if gitlab_alert_id
+    payload['labels'] = {}
+    payload['labels']['gitlab_alert_id'] = gitlab_alert_id.to_s if gitlab_alert_id
+    payload['labels']['alertname'] = title if title
+    payload['labels']['gitlab_environment_name'] = environment if environment
 
     payload
   end

@@ -74,7 +74,8 @@ describe Environment, :use_clean_rails_memory_store_caching do
       end
 
       it 'returns the pod_names' do
-        allow(environment).to receive(:rollout_status).and_return(rollout_status)
+        allow(environment).to receive(:rollout_status_with_reactive_cache)
+          .and_return(rollout_status)
 
         expect(environment.pod_names).to eq([pod_name])
       end
@@ -179,6 +180,28 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
           expect(store).to receive(:touch)
             .with(::Gitlab::Routing.url_helpers.environments_group_cluster_path(cluster.group, cluster))
+            .and_call_original
+        end
+
+        subject
+      end
+    end
+
+    context 'with an instance cluster' do
+      let(:cluster) { create(:cluster, :instance) }
+
+      before do
+        create(:deployment, :success, environment: environment, cluster: cluster)
+      end
+
+      it 'expires the environments path for the group cluster' do
+        expect_next_instance_of(Gitlab::EtagCaching::Store) do |store|
+          expect(store).to receive(:touch)
+            .with(::Gitlab::Routing.url_helpers.project_environments_path(project, format: :json))
+            .and_call_original
+
+          expect(store).to receive(:touch)
+            .with(::Gitlab::Routing.url_helpers.environments_admin_cluster_path(cluster))
             .and_call_original
         end
 

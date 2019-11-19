@@ -61,8 +61,8 @@ describe('Embed', () => {
 
   describe('metrics are available', () => {
     beforeEach(() => {
-      store.state.monitoringDashboard.groups = groups;
-      store.state.monitoringDashboard.groups[0].metrics = metricsData;
+      store.state.monitoringDashboard.dashboard.panel_groups = groups;
+      store.state.monitoringDashboard.dashboard.panel_groups[0].metrics = metricsData;
       store.state.monitoringDashboard.metricsWithData = metricsWithData;
 
       mountComponent();
@@ -73,6 +73,10 @@ describe('Embed', () => {
       expect(wrapper.find('.metrics-embed').exists()).toBe(true);
       expect(wrapper.find(MonitorTimeSeriesChart).exists()).toBe(true);
       expect(wrapper.findAll(MonitorTimeSeriesChart).length).toBe(2);
+    });
+
+    it('includes groupId with dashboardUrl', () => {
+      expect(wrapper.find(MonitorTimeSeriesChart).props('groupId')).toBe(TEST_HOST);
     });
   });
 });

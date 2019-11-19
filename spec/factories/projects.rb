@@ -117,8 +117,8 @@ FactoryBot.define do
       storage_version { nil }
     end
 
-    trait :access_requestable do
-      request_access_enabled { true }
+    trait :request_access_disabled do
+      request_access_enabled { false }
     end
 
     trait :with_avatar do
@@ -234,10 +234,7 @@ FactoryBot.define do
 
     trait :broken_repo do
       after(:create) do |project|
-        raise "Failed to create repository!" unless project.create_repository
-
-        project.gitlab_shell.rm_directory(project.repository_storage,
-                                          File.join("#{project.disk_path}.git", 'refs'))
+        TestEnv.rm_storage_dir(project.repository_storage, "#{project.disk_path}.git/refs")
       end
     end
 

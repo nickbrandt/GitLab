@@ -38,6 +38,9 @@
 - gcp_cluster:cluster_patch_app
 - gcp_cluster:cluster_upgrade_app
 - gcp_cluster:cluster_provision
+- gcp_cluster:clusters_cleanup_app
+- gcp_cluster:clusters_cleanup_project_namespace
+- gcp_cluster:clusters_cleanup_service_account
 - gcp_cluster:cluster_wait_for_app_installation
 - gcp_cluster:wait_for_cluster_creation
 - gcp_cluster:cluster_wait_for_ingress_ip_address
@@ -45,6 +48,9 @@
 - gcp_cluster:cluster_project_configure
 - gcp_cluster:clusters_applications_wait_for_uninstall_app
 - gcp_cluster:clusters_applications_uninstall
+- gcp_cluster:clusters_cleanup_app
+- gcp_cluster:clusters_cleanup_project_namespace
+- gcp_cluster:clusters_cleanup_service_account
 
 - github_import_advance_stage
 - github_importer:github_import_import_diff_note
@@ -119,6 +125,8 @@
 - container_repository:delete_container_repository
 - container_repository:cleanup_container_repository
 
+- notifications:new_release
+
 - default
 - mailers # ActionMailer::DeliveryJob.queue_name
 
@@ -173,3 +181,5 @@
 - delete_stored_files
 - import_issues_csv
 - project_daily_statistics
+- create_evidence
+- group_export

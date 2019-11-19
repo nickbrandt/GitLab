@@ -5,7 +5,7 @@ type: reference
 # Multi-project pipelines **(PREMIUM)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/2121) in
-[GitLab Premium 9.3](https://about.gitlab.com/2017/06/22/gitlab-9-3-released/#multi-project-pipeline-graphs).
+[GitLab Premium 9.3](https://about.gitlab.com/blog/2017/06/22/gitlab-9-3-released/#multi-project-pipeline-graphs).
 
 When you set up [GitLab CI/CD](README.md) across multiple projects, you can visualize
 the entire pipeline, including all cross-project inter-dependencies.
@@ -24,7 +24,7 @@ and when hovering or tapping (on touchscreen devices) they will expand and be sh
 ![Multi-project mini graph](img/multi_pipeline_mini_graph.gif)
 
 Multi-project pipelines are useful for larger products that require cross-project inter-dependencies, such as those
-adopting a [microservices architecture](https://about.gitlab.com/2016/08/16/trends-in-version-control-land-microservices/).
+adopting a [microservices architecture](https://about.gitlab.com/blog/2016/08/16/trends-in-version-control-land-microservices/).
 
 For a demonstration of how cross-functional development teams can use cross-pipeline
 triggering to trigger multiple pipelines for different microservices projects, see
@@ -87,10 +87,9 @@ not be found, or a user does not have access rights to create pipeline there,
 the `staging` job is going to be marked as _failed_.
 
 CAUTION: **Caution:**
-`staging` will succeed as soon as a downstream pipeline gets created.
-GitLab does not support status attribution yet, however adding first-class
-`trigger` configuration syntax is ground work for implementing
-[status attribution](https://gitlab.com/gitlab-org/gitlab-foss/issues/39640).
+In the example, `staging` will be marked as succeeded as soon as a downstream pipeline
+gets created. If you want to display the downstream pipeline's status instead, see
+[Mirroring status from triggered pipeline](#mirroring-status-from-triggered-pipeline).
 
 NOTE: **Note:**
 Bridge jobs do not support every configuration entry that a user can use
@@ -119,7 +118,8 @@ Use:
 
 - The `project` keyword to specify the full path to a downstream project.
 - The `branch` keyword to specify the name of a branch in the project specified by `project`.
-  Variable expansion is supported.
+  [From GitLab 12.4](https://gitlab.com/gitlab-org/gitlab/issues/10126), variable expansion is
+  supported.
 
 GitLab will use a commit that is currently on the HEAD of the branch when
 creating a downstream pipeline.

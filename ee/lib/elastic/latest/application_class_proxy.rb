@@ -5,11 +5,6 @@ module Elastic
     class ApplicationClassProxy < Elasticsearch::Model::Proxy::ClassMethodsProxy
       include ClassProxyUtil
 
-      # Should be overridden for all nested models
-      def nested?
-        false
-      end
-
       def es_type
         target.name.underscore
       end
@@ -82,7 +77,10 @@ module Elastic
         {
           query: {
             bool: {
-              filter: [{ term: { iid: iid } }]
+              filter: [
+                { term: { iid: iid } },
+                { term: { type: self.es_type } }
+              ]
             }
           }
         }

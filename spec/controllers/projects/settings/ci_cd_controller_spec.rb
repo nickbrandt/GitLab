@@ -78,6 +78,7 @@ describe Projects::Settings::CiCdController do
 
   describe 'PUT #reset_registration_token' do
     subject { put :reset_registration_token, params: { namespace_id: project.namespace, project_id: project } }
+
     it 'resets runner registration token' do
       expect { subject }.to change { project.reload.runners_token }
     end
@@ -124,7 +125,9 @@ describe Projects::Settings::CiCdController do
 
       context 'when run_auto_devops_pipeline is true' do
         before do
-          expect_any_instance_of(Projects::UpdateService).to receive(:run_auto_devops_pipeline?).and_return(true)
+          expect_next_instance_of(Projects::UpdateService) do |instance|
+            expect(instance).to receive(:run_auto_devops_pipeline?).and_return(true)
+          end
         end
 
         context 'when the project repository is empty' do
@@ -158,7 +161,9 @@ describe Projects::Settings::CiCdController do
 
       context 'when run_auto_devops_pipeline is not true' do
         before do
-          expect_any_instance_of(Projects::UpdateService).to receive(:run_auto_devops_pipeline?).and_return(false)
+          expect_next_instance_of(Projects::UpdateService) do |instance|
+            expect(instance).to receive(:run_auto_devops_pipeline?).and_return(false)
+          end
         end
 
         it 'does not queue a CreatePipelineWorker' do
@@ -213,6 +218,30 @@ describe Projects::Settings::CiCdController do
 
           project.reload
           expect(project.ci_default_git_depth).to eq(10)
+        end
+      end
+
+      context 'when max_artifacts_size is specified' do
+        let(:params) { { max_artifacts_size: 10 } }
+
+        context 'and user is not an admin' do
+          it 'does not set max_artifacts_size' do
+            subject
+
+            project.reload
+            expect(project.max_artifacts_size).to be_nil
+          end
+        end
+
+        context 'and user is an admin' do
+          let(:user) { create(:admin)  }
+
+          it 'sets max_artifacts_size' do
+            subject
+
+            project.reload
+            expect(project.max_artifacts_size).to eq(10)
+          end
         end
       end
     end

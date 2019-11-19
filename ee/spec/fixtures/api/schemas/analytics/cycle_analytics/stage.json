@@ -5,6 +5,9 @@
     "title": { 
       "type": "string" 
     },
+    "hidden": {
+      "type": "boolean"
+    },
     "legend": { 
       "type": "string" 
     },
@@ -21,5 +24,5 @@
       "type": "boolean"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }

@@ -59,8 +59,10 @@ module EE
 
       scope :with_project_templates, -> do
         joins("INNER JOIN projects ON projects.namespace_id = namespaces.custom_project_templates_group_id")
-        .distinct
+          .distinct
       end
+
+      scope :with_project_templates_optimized, -> { where.not(custom_project_templates_group_id: nil) }
 
       scope :with_custom_file_templates, -> do
         preload(
@@ -116,6 +118,10 @@ module EE
       return unless ip_restrictions.present?
 
       ip_restrictions.map(&:range).join(",")
+    end
+
+    def vulnerable_projects
+      projects.where("EXISTS(?)", ::Vulnerabilities::Occurrence.select(1).undismissed.where('vulnerability_occurrences.project_id = projects.id'))
     end
 
     def human_ldap_access
@@ -217,7 +223,7 @@ module EE
     # for billing purposes.
     override :billable_members_count
     def billable_members_count(requested_hosted_plan = nil)
-      if [actual_plan_name, requested_hosted_plan].include?(Namespace::GOLD_PLAN)
+      if [actual_plan_name, requested_hosted_plan].include?(Plan::GOLD)
         users_with_descendants.excluding_guests.count
       else
         users_with_descendants.count
@@ -230,6 +236,11 @@ module EE
 
     def dependency_proxy_feature_available?
       ::Gitlab.config.dependency_proxy.enabled && feature_available?(:dependency_proxy)
+    end
+
+    override :supports_events?
+    def supports_events?
+      feature_available?(:epics)
     end
 
     private

@@ -14,11 +14,17 @@ export default class ProtectedBranchCreate {
     this.currentProjectUserDefaults = {};
     this.buildDropdowns();
     this.$branchInput = this.$form.find('input[name="protected_branch[name]"]');
+    this.$codeOwnerToggle = this.$form.find('.js-code-owner-toggle');
     this.bindEvents();
   }
 
   bindEvents() {
+    this.$codeOwnerToggle.on('click', this.onCodeOwnerToggleClick.bind(this));
     this.$form.on('submit', this.onFormSubmit.bind(this));
+  }
+
+  onCodeOwnerToggleClick() {
+    this.$codeOwnerToggle.toggleClass('is-checked');
   }
 
   buildDropdowns() {
@@ -75,6 +81,7 @@ export default class ProtectedBranchCreate {
       authenticity_token: this.$form.find('input[name="authenticity_token"]').val(),
       protected_branch: {
         name: this.$form.find('input[name="protected_branch[name]"]').val(),
+        code_owner_approval_required: this.$codeOwnerToggle.hasClass('is-checked'),
       },
     };
 

@@ -15,11 +15,13 @@ RSpec.describe Release do
     it { is_expected.to have_many(:links).class_name('Releases::Link') }
     it { is_expected.to have_many(:milestones) }
     it { is_expected.to have_many(:milestone_releases) }
+    it { is_expected.to have_one(:evidence) }
   end
 
   describe 'validation' do
     it { is_expected.to validate_presence_of(:project) }
     it { is_expected.to validate_presence_of(:description) }
+    it { is_expected.to validate_presence_of(:tag) }
 
     context 'when a release exists in the database without a name' do
       it 'does not require name' do
@@ -32,7 +34,7 @@ RSpec.describe Release do
 
         expect(existing_release_without_name).to be_valid
         expect(existing_release_without_name.description).to eq("change")
-        expect(existing_release_without_name.name).to be_nil
+        expect(existing_release_without_name.name).not_to be_nil
       end
     end
 
@@ -51,18 +53,24 @@ RSpec.describe Release do
     end
   end
 
+  describe 'callbacks' do
+    it 'creates a new Evidence object on after_commit', :sidekiq_inline do
+      expect { release }.to change(Evidence, :count).by(1)
+    end
+  end
+
   describe '#assets_count' do
     subject { release.assets_count }
 
     it 'returns the number of sources' do
-      is_expected.to eq(Releases::Source::FORMATS.count)
+      is_expected.to eq(Gitlab::Workhorse::ARCHIVE_FORMATS.count)
     end
 
     context 'when a links exists' do
       let!(:link) { create(:release_link, release: release) }
 
       it 'counts the link as an asset' do
-        is_expected.to eq(1 + Releases::Source::FORMATS.count)
+        is_expected.to eq(1 + Gitlab::Workhorse::ARCHIVE_FORMATS.count)
       end
 
       it "excludes sources count when asked" do
@@ -87,6 +95,90 @@ RSpec.describe Release do
 
         expect(release.upcoming_release?).to eq(false)
       end
+    end
+  end
+
+  describe 'evidence' do
+    let(:release_with_evidence) { create(:release, :with_evidence, project: project) }
+
+    describe '#create_evidence!' do
+      context 'when a release is created' do
+        it 'creates one Evidence object too' do
+          expect { release_with_evidence }.to change(Evidence, :count).by(1)
+        end
+      end
+    end
+
+    context 'when a release is deleted' do
+      it 'also deletes the associated evidence' do
+        release_with_evidence
+
+        expect { release_with_evidence.destroy }.to change(Evidence, :count).by(-1)
+      end
+    end
+  end
+
+  describe '#notify_new_release' do
+    context 'when a release is created' do
+      it 'instantiates NewReleaseWorker to send notifications' do
+        expect(NewReleaseWorker).to receive(:perform_async)
+
+        create(:release)
+      end
+    end
+
+    context 'when a release is updated' do
+      let!(:release) { create(:release) }
+
+      it 'does not send any new notification' do
+        expect(NewReleaseWorker).not_to receive(:perform_async)
+
+        release.update!(description: 'new description')
+      end
+    end
+  end
+
+  describe '#name' do
+    context 'name is nil' do
+      before do
+        release.update(name: nil)
+      end
+
+      it 'returns tag' do
+        expect(release.name).to eq(release.tag)
+      end
+    end
+  end
+
+  describe '#evidence_sha' do
+    subject { release.evidence_sha }
+
+    context 'when a release was created before evidence collection existed' do
+      let!(:release) { create(:release) }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when a release was created with evidence collection' do
+      let!(:release) { create(:release, :with_evidence) }
+
+      it { is_expected.to eq(release.evidence.summary_sha) }
+    end
+  end
+
+  describe '#evidence_summary' do
+    subject { release.evidence_summary }
+
+    context 'when a release was created before evidence collection existed' do
+      let!(:release) { create(:release) }
+
+      it { is_expected.to eq({}) }
+    end
+
+    context 'when a release was created with evidence collection' do
+      let!(:release) { create(:release, :with_evidence) }
+
+      it { is_expected.to eq(release.evidence.summary) }
     end
   end
 end

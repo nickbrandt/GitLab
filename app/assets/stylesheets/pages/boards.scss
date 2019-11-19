@@ -245,6 +245,7 @@
   box-shadow: 0 1px 2px $issue-boards-card-shadow;
   line-height: $gl-padding;
   list-style: none;
+  position: relative;
 
   &:not(:last-child) {
     margin-bottom: $gl-padding-8;
@@ -252,6 +253,11 @@
 
   &.is-active,
   &.is-active .board-card-assignee:hover a {
+    background-color: $blue-50;
+  }
+
+  &.multi-select {
+    border-color: $blue-200;
     background-color: $blue-50;
   }
 
@@ -491,7 +497,7 @@
 .add-issues-footer-to-list {
   padding-left: $gl-vert-padding;
   padding-right: $gl-vert-padding;
-  line-height: 34px;
+  line-height: $input-height;
 }
 
 .issue-card-selected {
@@ -538,4 +544,12 @@
 
 .board-issue-path.js-show-tooltip {
   cursor: help;
+}
+
+.board-labels-toggle-wrapper {
+  /**
+   * Make the wrapper the same height as a button so it aligns properly when the
+   * filtered-search-box input element increases in size on Linux smaller breakpoints
+   */
+  height: $input-height;
 }

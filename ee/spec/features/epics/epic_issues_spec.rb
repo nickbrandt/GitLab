@@ -40,6 +40,10 @@ describe 'Epic Issues', :js do
     wait_for_requests
   end
 
+  before do
+    stub_feature_flags(epic_new_issue: false)
+  end
+
   context 'when user is not a group member of a public group' do
     before do
       visit_epic
@@ -67,8 +71,8 @@ describe 'Epic Issues', :js do
     let(:issue_invalid) { create(:issue) }
     let(:epic_to_add) { create(:epic, group: group) }
 
-    def add_issues(references)
-      find('.related-items-tree-container .js-add-issues-button').click
+    def add_issues(references, button_selector: '.js-add-issues-button')
+      find(".related-items-tree-container #{button_selector}").click
       find('.related-items-tree-container .js-add-issuable-form-input').set(references)
       # When adding long references, for some reason the input gets stuck
       # waiting for more text. Send a keystroke before clicking the button to
@@ -145,6 +149,26 @@ describe 'Epic Issues', :js do
 
       within('.related-items-tree-container ul.related-items-list') do
         expect(page).to have_selector('li.js-item-type-issue', count: 3)
+      end
+    end
+
+    context 'with epic_new_issue feature flag enabled' do
+      before do
+        stub_feature_flags(epic_new_issue: true)
+        visit_epic
+      end
+
+      it 'user can add new issues to the epic' do
+        references = "#{issue_to_add.to_reference(full: true)}"
+
+        add_issues(references, button_selector: '.js-issue-actions-split-button')
+
+        expect(page).not_to have_selector('.content-wrapper .flash-text')
+        expect(page).not_to have_content("We can't find an issue that matches what you are looking for.")
+
+        within('.related-items-tree-container ul.related-items-list') do
+          expect(page).to have_selector('li.js-item-type-issue', count: 3)
+        end
       end
     end
 

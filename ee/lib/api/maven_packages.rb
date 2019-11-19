@@ -64,12 +64,12 @@ module API
       # the endpoint that includes project id
       project = find_project_by_path(params[:path])
 
-      authorize!(:read_package, project)
+      authorize_read_package!(project)
 
       package = ::Packages::MavenPackageFinder
         .new(params[:path], current_user, project: project).execute!
 
-      forbidden! unless package.project.feature_available?(:packages)
+      authorize_packages_feature!(package.project)
 
       package_file = ::Packages::PackageFileFinder
         .new(package, file_name).execute!
@@ -106,9 +106,8 @@ module API
         package = ::Packages::MavenPackageFinder
           .new(params[:path], current_user, group: group).execute!
 
-        forbidden! unless package.project.feature_available?(:packages)
-
-        authorize!(:read_package, package.project)
+        authorize_packages_feature!(package.project)
+        authorize_read_package!(package.project)
 
         package_file = ::Packages::PackageFileFinder
           .new(package, file_name).execute!
@@ -129,7 +128,7 @@ module API
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
-        authorize_packages_feature!
+        authorize_packages_feature!(user_project)
       end
 
       desc 'Download the maven package file' do
@@ -141,7 +140,7 @@ module API
       end
       route_setting :authentication, job_token_allowed: true
       get ':id/packages/maven/*path/:file_name', requirements: MAVEN_ENDPOINT_REQUIREMENTS do
-        authorize_download_package!
+        authorize_read_package!(user_project)
 
         file_name, format = extract_format(params[:file_name])
 

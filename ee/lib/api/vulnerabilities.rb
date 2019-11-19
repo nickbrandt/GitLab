@@ -5,62 +5,113 @@ module API
     include PaginationParams
 
     helpers do
-      def vulnerability_occurrences_by(params)
-        pipeline = if params[:pipeline_id]
-                     params[:project].all_pipelines.find_by(id: params[:pipeline_id]) # rubocop:disable CodeReuse/ActiveRecord
-                   else
-                     params[:project].latest_pipeline_with_security_reports
-                   end
+      def vulnerabilities_by(project)
+        Security::VulnerabilitiesFinder.new(project).execute
+      end
 
-        return [] unless pipeline
+      def find_vulnerability!
+        Vulnerability.with_findings.find(params[:id])
+      end
 
-        Security::PipelineVulnerabilitiesFinder.new(pipeline: pipeline, params: params).execute
+      def authorize_vulnerability!(vulnerability, action)
+        authorize! action, vulnerability.project
+      end
+
+      def find_and_authorize_vulnerability!(action)
+        find_vulnerability!.tap do |vulnerability|
+          authorize_vulnerability!(vulnerability, action)
+        end
+      end
+
+      def render_vulnerability(vulnerability)
+        if vulnerability.valid?
+          present vulnerability, with: EE::API::Entities::Vulnerability
+        else
+          render_validation_error!(vulnerability)
+        end
       end
     end
 
     before do
+      not_found! unless Feature.enabled?(:first_class_vulnerabilities)
+
       authenticate!
+    end
+
+    params do
+      requires :id, type: String, desc: 'The ID of a vulnerability'
+    end
+    resource :vulnerabilities do
+      desc 'Get a vulnerability' do
+        success EE::API::Entities::Vulnerability
+      end
+      get ':id' do
+        vulnerability = Vulnerability.find(params[:id])
+        authorize_vulnerability!(vulnerability, :read_project_security_dashboard)
+        render_vulnerability(vulnerability)
+      end
+
+      desc 'Resolve a vulnerability' do
+        success EE::API::Entities::Vulnerability
+      end
+      post ':id/resolve' do
+        vulnerability = find_and_authorize_vulnerability!(:resolve_vulnerability)
+        break not_modified! if vulnerability.resolved?
+
+        vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
+        render_vulnerability(vulnerability)
+      end
+
+      desc 'Dismiss a vulnerability' do
+        success EE::API::Entities::Vulnerability
+      end
+      post ':id/dismiss' do
+        vulnerability = find_and_authorize_vulnerability!(:dismiss_vulnerability)
+        break not_modified! if vulnerability.closed?
+
+        vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
+        render_vulnerability(vulnerability)
+      end
     end
 
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end
-
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get a list of project vulnerabilities' do
-        success ::Vulnerabilities::OccurrenceEntity
+        success EE::API::Entities::Vulnerability
       end
-
       params do
-        optional :report_type, type: Array[String], desc: 'The type of report vulnerability belongs to', default: ::Vulnerabilities::Occurrence.report_types.keys
-        optional :scope, type: String, desc: 'Return vulnerabilities for the given scope: `dismissed` or `all`', default: 'dismissed', values: %w[all dismissed]
-        optional :severity,
-                 type: Array[String],
-                 desc: 'Returns issues belonging to specified severity level: `undefined`, `info`, `unknown`, `low`, `medium`, `high`, or `critical`. Defaults to all',
-                 default: ::Vulnerabilities::Occurrence.severities.keys
-        optional :confidence,
-                 type: Array[String],
-                 desc: 'Returns vulnerabilities belonging to specified confidence level: `undefined`, `ignore`, `unknown`, `experimental`, `low`, `medium`, `high`, or `confirmed`. Defaults to all',
-                 default: ::Vulnerabilities::Occurrence.confidences.keys
-        optional :pipeline_id, type: String, desc: 'The ID of the pipeline'
-
         use :pagination
       end
-
       get ':id/vulnerabilities' do
-        authorize! :read_project_security_dashboard, user_project
+        authorize! :read_vulnerability, user_project
 
-        vulnerability_occurrences = paginate(
-          Kaminari.paginate_array(
-            vulnerability_occurrences_by(declared_params.merge(project: user_project))
-          )
+        vulnerabilities = paginate(
+          vulnerabilities_by(user_project)
         )
 
-        Gitlab::Vulnerabilities::OccurrencesPreloader.preload_feedback!(vulnerability_occurrences)
+        present vulnerabilities, with: EE::API::Entities::Vulnerability
+      end
 
-        present vulnerability_occurrences,
-          with: ::Vulnerabilities::OccurrenceEntity,
-          request: GrapeRequestProxy.new(request, current_user)
+      desc 'Create a new Vulnerability (from a confirmed Finding)' do
+        success EE::API::Entities::Vulnerability
+      end
+      params do
+        requires :finding_id, type: Integer, desc: 'The id of confirmed vulnerability finding'
+      end
+      post ':id/vulnerabilities' do
+        authorize! :create_vulnerability, user_project
+
+        vulnerability = ::Vulnerabilities::CreateService.new(
+          user_project, current_user, finding_id: params[:finding_id]
+        ).execute
+
+        if vulnerability.persisted?
+          present vulnerability, with: EE::API::Entities::Vulnerability
+        else
+          render_validation_error!(vulnerability)
+        end
       end
     end
   end

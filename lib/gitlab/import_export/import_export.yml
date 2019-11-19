@@ -28,6 +28,7 @@ tree:
         - label:
           - :priorities
       - :issue_assignees
+      - :zoom_meetings
     - snippets:
       - :award_emoji
       - notes:
@@ -147,6 +148,8 @@ excluded_attributes:
     - :emails_disabled
     - :max_pages_size
     - :max_artifacts_size
+    - :marked_for_deletion_at
+    - :marked_for_deletion_by_user_id
   namespaces:
     - :runners_token
     - :runners_token_encrypted
@@ -160,6 +163,9 @@ excluded_attributes:
     - :identifier
   snippets:
     - :expired_at
+    - :secret
+    - :encrypted_secret_token
+    - :encrypted_secret_token_iv
   merge_request_diff:
     - :external_diff
     - :stored_externally
@@ -269,3 +275,4 @@ ee:
         - :unprotect_access_levels
       - protected_environments:
         - :deploy_access_levels
+      - :service_desk_setting

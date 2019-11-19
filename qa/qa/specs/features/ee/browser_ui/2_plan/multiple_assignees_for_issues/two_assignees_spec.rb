@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 module QA
-  # https://gitlab.com/gitlab-org/quality/nightly/issues/146
-  context 'Plan', :quarantine do
+  context 'Plan' do
     describe 'Multiple assignees per issue' do
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         user_1 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
         @user_2 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
@@ -30,6 +28,8 @@ module QA
 
         Page::Project::Issue::Show.perform do |show|
           show.assign(@user_2)
+
+          show.select_all_activities_filter
 
           expect(show).to have_content "assigned to @#{@user_2.username}"
           expect(show.avatar_image_count).to be 2

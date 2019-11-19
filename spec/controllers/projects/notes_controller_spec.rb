@@ -259,6 +259,17 @@ describe Projects::NotesController do
         end
       end
 
+      context 'the note does not have commands_only errors' do
+        context 'for empty note' do
+          let(:note_text) { '' }
+          let(:extra_request_params) { { format: :json } }
+
+          it "returns status 422 for json" do
+            expect(response).to have_gitlab_http_status(422)
+          end
+        end
+      end
+
       context 'the project is a private project' do
         let(:project_visibility) { Gitlab::VisibilityLevel::PRIVATE }
 
@@ -518,7 +529,7 @@ describe Projects::NotesController do
           project.id && Project.maximum(:id).succ
         end
 
-        it 'returns a 404' do
+        it 'returns a 404', :sidekiq_might_not_need_inline do
           create!
           expect(response).to have_gitlab_http_status(404)
         end
@@ -527,13 +538,13 @@ describe Projects::NotesController do
       context 'when the user has no access to the fork' do
         let(:fork_visibility) { Gitlab::VisibilityLevel::PRIVATE }
 
-        it 'returns a 404' do
+        it 'returns a 404', :sidekiq_might_not_need_inline do
           create!
           expect(response).to have_gitlab_http_status(404)
         end
       end
 
-      context 'when the user has access to the fork' do
+      context 'when the user has access to the fork', :sidekiq_might_not_need_inline do
         let!(:discussion) { forked_project.notes.find_discussion(existing_comment.discussion_id) }
         let(:fork_visibility) { Gitlab::VisibilityLevel::PUBLIC }
 
@@ -713,6 +724,7 @@ describe Projects::NotesController do
     end
 
     subject { post(:toggle_award_emoji, params: request_params.merge(name: emoji_name)) }
+
     let(:emoji_name) { 'thumbsup' }
 
     it "toggles the award emoji" do
@@ -784,7 +796,9 @@ describe Projects::NotesController do
           end
 
           it "sends notifications if all discussions are resolved" do
-            expect_any_instance_of(MergeRequests::ResolvedDiscussionNotificationService).to receive(:execute).with(merge_request)
+            expect_next_instance_of(MergeRequests::ResolvedDiscussionNotificationService) do |instance|
+              expect(instance).to receive(:execute).with(merge_request)
+            end
 
             post :resolve, params: request_params
           end

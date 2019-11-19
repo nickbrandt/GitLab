@@ -273,11 +273,6 @@ RSpec/ContextWording:
 RSpec/EmptyLineAfterFinalLet:
   Enabled: false
 
-# Offense count: 232
-# Cop supports --auto-correct.
-RSpec/EmptyLineAfterSubject:
-  Enabled: false
-
 # Offense count: 719
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
@@ -404,13 +399,6 @@ Rails/FilePath:
 # Configuration parameters: Include.
 # Include: app/models/**/*.rb
 Rails/HasManyOrHasOneDependent:
-  Enabled: false
-
-# Offense count: 40
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: numeric, symbolic
-Rails/HttpStatus:
   Enabled: false
 
 # Offense count: 2

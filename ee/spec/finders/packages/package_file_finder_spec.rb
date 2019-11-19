@@ -17,5 +17,17 @@ describe Packages::PackageFileFinder do
 
       expect { finder.execute! }.to raise_error(ActiveRecord::RecordNotFound)
     end
+
+    context 'with conan_file_type' do
+      let(:package) { create(:conan_package) }
+
+      it 'returns a package of the correct file_type' do
+        # conan packages contain a conanmanifest.txt file for both conan_file_types
+        result = described_class.new(package, 'conanmanifest.txt', conan_file_type: :recipe_file).execute!
+
+        expect(result.conan_file_type).to eq('recipe_file')
+        expect(result.conan_file_type).not_to eq('package_file')
+      end
+    end
   end
 end

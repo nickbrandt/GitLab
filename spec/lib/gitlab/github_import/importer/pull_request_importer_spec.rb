@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::GithubImport::Importer::PullRequestImporter, :clean_gitlab_redis_cache do
@@ -92,7 +94,6 @@ describe Gitlab::GithubImport::Importer::PullRequestImporter, :clean_gitlab_redi
               target_project_id: project.id,
               source_branch: 'github/fork/alice/feature',
               target_branch: 'master',
-              state: :merged,
               state_id: 3,
               milestone_id: milestone.id,
               author_id: user.id,
@@ -138,7 +139,6 @@ describe Gitlab::GithubImport::Importer::PullRequestImporter, :clean_gitlab_redi
               target_project_id: project.id,
               source_branch: 'github/fork/alice/feature',
               target_branch: 'master',
-              state: :merged,
               state_id: 3,
               milestone_id: milestone.id,
               author_id: project.creator_id,
@@ -185,7 +185,6 @@ describe Gitlab::GithubImport::Importer::PullRequestImporter, :clean_gitlab_redi
               target_project_id: project.id,
               source_branch: 'master-42',
               target_branch: 'master',
-              state: :merged,
               state_id: 3,
               milestone_id: milestone.id,
               author_id: user.id,
@@ -311,10 +310,11 @@ describe Gitlab::GithubImport::Importer::PullRequestImporter, :clean_gitlab_redi
       end
     end
 
-    it 'creates the merge request diffs' do
+    it 'creates a merge request diff and sets it as the latest' do
       mr = insert_git_data
 
       expect(mr.merge_request_diffs.exists?).to eq(true)
+      expect(mr.reload.latest_merge_request_diff_id).to eq(mr.merge_request_diffs.first.id)
     end
 
     it 'creates the merge request diff commits' do

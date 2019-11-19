@@ -21,6 +21,7 @@ module QA
           project_push.commit_message = 'Add .gitlab-ci.yml'
           project_push.file_content = <<~EOF
             test:
+              tags: ["qa"]
               script: echo 'OK'
               only:
               - merge_requests
@@ -44,7 +45,7 @@ module QA
       end
 
       after(:context) do
-        Service::Runner.new(@executor).remove!
+        Service::DockerRun::GitlabRunner.new(@executor).remove!
       end
 
       it 'creates a pipeline with merged results' do
@@ -63,14 +64,22 @@ module QA
         end.visit!
 
         Page::MergeRequest::Show.perform do |show|
-          expect(show).to have_pipeline_status(/Merged result pipeline #\d+ passed/)
+          pipeline_passed = Support::Retrier.retry_until(max_attempts: 5, sleep_interval: 5) do
+            show.has_pipeline_status?(/Merged result pipeline #\d+ passed/)
+          end
+
+          expect(pipeline_passed).to be_truthy, "Expected the merged result pipeline to pass."
 
           # The default option is to merge via merge train,
           # but that will be covered by another test
           show.merge_immediately
         end
 
-        expect(page).to have_content('The changes were merged')
+        merged = Support::Retrier.retry_until(reload_page: page) do
+          page.has_content?('The changes were merged')
+        end
+
+        expect(merged).to be_truthy, "Expected content 'The changes were merged' but it did not appear."
       end
 
       it 'merges via a merge train' do
@@ -91,12 +100,16 @@ module QA
         end.visit!
 
         Page::MergeRequest::Show.perform do |show|
-          expect(show).to have_pipeline_status(/Merged result pipeline #\d+ passed/)
+          pipeline_passed = Support::Retrier.retry_until(max_attempts: 5, sleep_interval: 5) do
+            show.has_pipeline_status?(/Merged result pipeline #\d+ passed/)
+          end
+
+          expect(pipeline_passed).to be_truthy, "Expected the merged result pipeline to pass."
 
           show.merge_via_merge_train
         end
 
-        expect(page).to have_content('Added to the merge train')
+        expect(page).to have_content('Added to the merge train', wait: 60)
         expect(page).to have_content('The changes will be merged into master')
 
         # It's faster to refresh the page than to wait for the UI to

@@ -17,20 +17,14 @@ module EE
 
         has_many :job_artifacts, through: :builds
         has_many :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
-        has_many :vulnerabilities, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
-
-        has_one :source_pipeline, class_name: "::Ci::Sources::Pipeline", inverse_of: :pipeline
-        has_many :sourced_pipelines, class_name: "::Ci::Sources::Pipeline", foreign_key: :source_pipeline_id
-
-        has_one :triggered_by_pipeline, through: :source_pipeline, source: :source_pipeline
-        has_one :source_job, through: :source_pipeline, source: :source_job
-        has_one :source_bridge, through: :source_pipeline, source: :source_bridge
-        has_many :triggered_pipelines, through: :sourced_pipelines, source: :pipeline
+        has_many :vulnerability_findings, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
 
         has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
         has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
 
         has_many :downstream_bridges, class_name: '::Ci::Bridge', foreign_key: :upstream_pipeline_id
+
+        has_one :source_bridge, through: :source_pipeline, source: :source_bridge
 
         # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_legacy_security_reports, -> do
@@ -98,6 +92,10 @@ module EE
         source_bridge&.dependent?
       end
 
+      def retryable?
+        !merge_train_pipeline? && super
+      end
+
       def update_bridge_status!
         raise ArgumentError unless bridge_triggered?
         raise BridgeStatusError unless source_bridge.active?
@@ -121,7 +119,7 @@ module EE
         job_artifacts.where(file_type: ::Ci::JobArtifact.file_types[file_type]).last
       end
 
-      def expose_license_management_data?
+      def expose_license_scanning_data?
         any_report_artifact_for_type(:license_management)
       end
 
@@ -133,10 +131,10 @@ module EE
         end
       end
 
-      def license_management_report
-        ::Gitlab::Ci::Reports::LicenseManagement::Report.new.tap do |license_management_report|
+      def license_scanning_report
+        ::Gitlab::Ci::Reports::LicenseScanning::Report.new.tap do |license_management_report|
           builds.latest.with_reports(::Ci::JobArtifact.license_management_reports).each do |build|
-            build.collect_license_management_reports!(license_management_report)
+            build.collect_license_scanning_reports!(license_management_report)
           end
         end
       end

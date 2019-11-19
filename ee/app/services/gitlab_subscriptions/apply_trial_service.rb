@@ -11,11 +11,11 @@ module GitlabSubscriptions
         { success: false, errors: response.dig(:data, :errors) }
       end
     end
-  end
 
-  private
+    private
 
-  def client
-    Gitlab::SubscriptionPortal::Client.new
+    def client
+      Gitlab::SubscriptionPortal::Client.new
+    end
   end
 end

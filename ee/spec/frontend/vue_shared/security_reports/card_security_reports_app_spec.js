@@ -6,7 +6,6 @@ import { TEST_HOST } from 'helpers/test_constants';
 
 import CardSecurityDashboardApp from 'ee/vue_shared/security_reports/card_security_reports_app.vue';
 import createStore from 'ee/security_dashboard/store';
-import router from 'ee/security_dashboard/store/router';
 import { trimText } from 'helpers/text_helper';
 
 const localVue = createLocalVue();
@@ -25,7 +24,6 @@ describe('Card security reports app', () => {
     wrapper = mount(CardSecurityDashboardApp, {
       localVue,
       store: createStore(),
-      router,
       sync: false,
       stubs: ['security-dashboard-table'],
       propsData: {

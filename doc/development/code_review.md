@@ -170,8 +170,8 @@ Maintainers should check before merging if the merge request is approved by the
 required approvers.
 
 Maintainers must check before merging if the merge request is introducing new
-vulnerabilities, by inspecting the list in the Merge Request [Security
-Widget](../user/project/merge_requests/index.md#security-reports-ultimate).
+vulnerabilities, by inspecting the list in the Merge Request
+[Security Widget](../user/application_security/index.md).
 When in doubt, a [Security Engineer](https://about.gitlab.com/company/team/) can be involved. The list of detected
 vulnerabilities must be either empty or containing:
 
@@ -256,18 +256,12 @@ Since [unblocking others is always a top priority](https://about.gitlab.com/hand
 reviewers are expected to review assigned merge requests in a timely manner,
 even when this may negatively impact their other tasks and priorities.
 Doing so allows everyone involved in the merge request to iterate faster as the
-context is fresh in memory, improves contributors' experiences significantly,
-and gives authors more time to address feedback and iterate on their work before
-the [feature freeze](https://gitlab.com/gitlab-org/gitlab/blob/master/PROCESS.md#feature-freeze-on-the-7th-for-the-release-on-the-22nd).
+context is fresh in memory, improves contributors' experiences significantly.
 
 A turnaround time of two working days is usually acceptable, since engineers
 will typically have other things to work on while they're waiting for review,
 but don't hesitate to ask the author if it's unclear what time frame would be
-acceptable, how urgent the review is, or how significant the blockage. Authors
-are also encouraged to provide this information up-front to reviewers, but are
-expected to be mindful of the [guidelines on when to ask for review on MRs that
-are intended to go in before the feature freeze](https://gitlab.com/gitlab-org/gitlab/blob/master/PROCESS.md#between-the-1st-and-the-7th),
-and realistic in their expectations if these were not followed.
+acceptable, how urgent the review is, or how significant the blockage.
 
 If you don't think you'll be able to review a merge request within a reasonable
 time frame, let the author know as soon as possible and try to help them find
@@ -374,7 +368,7 @@ Enterprise Edition instance. This has some implications:
       - [Background migrations](background_migrations.md) run in Sidekiq, and
         should only be done for migrations that would take an extreme amount of
         time at GitLab.com scale.
-1. **Sidekiq workers** [cannot change in a backwards-incompatible way](sidekiq_style_guide.md#removing-or-renaming-queues):
+1. **Sidekiq workers** [cannot change in a backwards-incompatible way](sidekiq_style_guide.md#sidekiq-compatibility-across-updates):
    1. Sidekiq queues are not drained before a deploy happens, so there will be
       workers in the queue from the previous version of GitLab.
    1. If you need to change a method signature, try to do so across two releases,

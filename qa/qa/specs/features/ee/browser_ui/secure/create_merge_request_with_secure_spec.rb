@@ -5,18 +5,23 @@ require 'pathname'
 module QA
   context 'Secure', :docker do
     describe 'Security Reports in a Merge Request' do
-      let(:total_vuln_count) { 49 }
       let(:sast_vuln_count) { 33 }
       let(:dependency_scan_vuln_count) { 4 }
       let(:container_scan_vuln_count) { 8 }
       let(:dast_vuln_count) { 4 }
 
       after do
-        Service::Runner.new(@executor).remove!
+        Service::DockerRun::GitlabRunner.new(@executor).remove!
+
+        Runtime::Feature.enable('job_log_json') if @job_log_json_flag_enabled
       end
 
       before do
         @executor = "qa-runner-#{Time.now.to_i}"
+
+        # Handle WIP Job Logs flag - https://gitlab.com/gitlab-org/gitlab/issues/31162
+        @job_log_json_flag_enabled = Runtime::Feature.enabled?('job_log_json')
+        Runtime::Feature.disable('job_log_json') if @job_log_json_flag_enabled
 
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)
@@ -24,6 +29,7 @@ module QA
         @project = Resource::Project.fabricate_via_api! do |p|
           p.name = Runtime::Env.auto_devops_project_name || 'project-with-secure'
           p.description = 'Project with Secure'
+          p.auto_devops_enabled = false
           p.initialize_with_readme = true
         end
 
@@ -63,7 +69,7 @@ module QA
       it 'displays the Security reports in the merge request' do
         Page::MergeRequest::Show.perform do |mergerequest|
           expect(mergerequest).to have_vulnerability_report(timeout: 60)
-          expect(mergerequest).to have_total_vulnerability_count_of(total_vuln_count)
+          expect(mergerequest).to have_vulnerability_count
 
           mergerequest.expand_vulnerability_report
 
@@ -77,8 +83,8 @@ module QA
       it 'can create an auto-remediation MR' do
         Page::MergeRequest::Show.perform do |mergerequest|
           vuln_name = "Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js"
-
           expect(mergerequest).to have_vulnerability_report(timeout: 60)
+          # Context changes as resolve method created new MR
           mergerequest.resolve_vulnerability_with_mr vuln_name
           expect(mergerequest).to have_title vuln_name
         end

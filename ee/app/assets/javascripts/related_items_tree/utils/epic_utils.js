@@ -1,6 +1,7 @@
 import createGqClient from '~/lib/graphql';
 
-import { ChildType, PathIdSeparator } from '../constants';
+import { PathIdSeparator } from 'ee/related_issues/constants';
+import { ChildType } from '../constants';
 
 export const gqClient = createGqClient();
 
@@ -33,15 +34,13 @@ export const formatChildItem = item =>
  * @param {Array} children
  */
 export const extractChildEpics = children =>
-  children.edges
-    .map(({ node, epicNode = node }) =>
-      formatChildItem({
-        ...epicNode,
-        fullPath: epicNode.group.fullPath,
-        type: ChildType.Epic,
-      }),
-    )
-    .sort(sortChildren);
+  children.edges.map(({ node, epicNode = node }) =>
+    formatChildItem({
+      ...epicNode,
+      fullPath: epicNode.group.fullPath,
+      type: ChildType.Epic,
+    }),
+  );
 
 /**
  * Returns formatted array of Assignees that doesn't contain
@@ -61,20 +60,20 @@ export const extractIssueAssignees = assignees =>
  * @param {Array} issues
  */
 export const extractChildIssues = issues =>
-  issues.edges
-    .map(({ node, issueNode = node }) =>
-      formatChildItem({
-        ...issueNode,
-        type: ChildType.Issue,
-        assignees: extractIssueAssignees(issueNode.assignees),
-      }),
-    )
-    .sort(sortChildren);
+  issues.edges.map(({ node, issueNode = node }) =>
+    formatChildItem({
+      ...issueNode,
+      type: ChildType.Issue,
+      assignees: extractIssueAssignees(issueNode.assignees),
+    }),
+  );
 
 /**
  * Parses Graph query response and updates
  * children array to include issues within it
+ * and then sorts everything based on `relativePosition`
+ *
  * @param {Object} responseRoot
  */
 export const processQueryResponse = ({ epic }) =>
-  [].concat(extractChildEpics(epic.children), extractChildIssues(epic.issues));
+  [].concat(extractChildEpics(epic.children), extractChildIssues(epic.issues)).sort(sortChildren);

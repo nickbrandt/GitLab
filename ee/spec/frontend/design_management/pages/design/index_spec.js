@@ -58,6 +58,10 @@ describe('Design management design index page', () => {
       propsData: { id: '1' },
       mocks: { $apollo },
     });
+
+    wrapper.setData({
+      issueIid: '1',
+    });
   }
 
   function setDesign() {
@@ -136,7 +140,7 @@ describe('Design management design index page', () => {
 
     wrapper.vm.openCommentForm({ x: 0, y: 0 });
 
-    wrapper.vm.$nextTick(() => {
+    return wrapper.vm.$nextTick().then(() => {
       expect(findDiscussionForm().exists()).toBe(true);
     });
   });
@@ -155,15 +159,16 @@ describe('Design management design index page', () => {
       comment: newComment,
     });
 
-    wrapper.vm.$nextTick(() => {
-      findDiscussionForm().vm.$emit('submitForm');
+    return wrapper.vm
+      .$nextTick()
+      .then(() => {
+        findDiscussionForm().vm.$emit('submitForm');
 
-      expect(mutate).toHaveBeenCalledWith(mutationVariables);
-      const addNote = wrapper.vm.addImageDiffNote();
-
-      return addNote.then(() => {
+        expect(mutate).toHaveBeenCalledWith(mutationVariables);
+        return wrapper.vm.addImageDiffNote();
+      })
+      .then(() => {
         expect(findDiscussionForm().exists()).toBe(false);
       });
-    });
   });
 });

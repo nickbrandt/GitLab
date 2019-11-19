@@ -29,11 +29,17 @@ describe('User onboarding helper app', () => {
     text: 'exit tour content',
     buttons: [{ text: 'OK', btnClass: 'btn-primary' }],
   };
+  const dntExitTourContent = {
+    text: 'dnt exit tour content',
+    buttonText: 'Got it',
+    exitTour: true,
+  };
 
   const defaultProps = {
     tourTitles,
     exitTourContent,
     feedbackContent,
+    dntExitTourContent,
     goldenTanukiSvgPath: 'illustrations/golden_tanuki.svg',
   };
 
@@ -82,6 +88,12 @@ describe('User onboarding helper app', () => {
         store.dispatch('setTourFeedback', true);
 
         expect(vm.helpContentData).toEqual(feedbackContent);
+      });
+
+      it('returns an object containing do not track exit content if dntExitTour is true', () => {
+        store.dispatch('setDntExitTour', true);
+
+        expect(vm.helpContentData).toEqual(dntExitTourContent);
       });
     });
 
@@ -216,7 +228,7 @@ describe('User onboarding helper app', () => {
       });
     });
 
-    describe('handleClickPopoverButton', () => {
+    describe('handleStepContentButton', () => {
       it('shows the exitTour content', () => {
         spyOn(vm, 'showExitTourContent');
 
@@ -224,7 +236,7 @@ describe('User onboarding helper app', () => {
           showExitTourContent: true,
         };
 
-        vm.handleClickPopoverButton(button);
+        vm.handleStepContentButton(button);
 
         expect(vm.showExitTourContent).toHaveBeenCalledWith(true);
       });
@@ -234,13 +246,13 @@ describe('User onboarding helper app', () => {
           dismissPopover: true,
         };
 
-        vm.handleClickPopoverButton(button);
+        vm.handleStepContentButton(button);
 
         expect(vm.dismissPopover).toBe(true);
 
         button = {};
 
-        vm.handleClickPopoverButton(button);
+        vm.handleStepContentButton(button);
 
         expect(vm.dismissPopover).toBe(true);
       });
@@ -250,7 +262,7 @@ describe('User onboarding helper app', () => {
           dismissPopover: false,
         };
 
-        vm.handleClickPopoverButton(button);
+        vm.handleStepContentButton(button);
 
         expect(vm.dismissPopover).toBe(false);
       });
@@ -261,7 +273,7 @@ describe('User onboarding helper app', () => {
           redirectPath: 'my-redirect/path',
         };
 
-        vm.handleClickPopoverButton(button);
+        vm.handleStepContentButton(button);
 
         expect(redirectSpy).toHaveBeenCalledWith(button.redirectPath);
       });
@@ -275,7 +287,7 @@ describe('User onboarding helper app', () => {
           nextPart,
         };
 
-        vm.handleClickPopoverButton(button);
+        vm.handleStepContentButton(button);
 
         expect(vm.$store.dispatch).toHaveBeenCalledWith('switchTourPart', nextPart);
         expect(vm.initActionPopover).toHaveBeenCalled();
@@ -289,7 +301,7 @@ describe('User onboarding helper app', () => {
         vm.$store.state.url = 'http://gitlab-org/gitlab-test/foo';
         vm.$store.state.lastStepIndex = 0;
 
-        vm.handleClickPopoverButton(button);
+        vm.handleStepContentButton(button);
 
         expect(vm.$store.dispatch).toHaveBeenCalledWith('setHelpContentIndex', 1);
       });
@@ -350,6 +362,22 @@ describe('User onboarding helper app', () => {
         vm.handleFeedbackTourContent(true);
 
         expect(vm.$store.dispatch).toHaveBeenCalledWith('setTourFeedback', true);
+      });
+    });
+
+    describe('handleDntExitTourContent', () => {
+      it('sets the "dismissPopover" prop to false', () => {
+        vm.handleDntExitTourContent(true);
+
+        expect(vm.dismissPopover).toBeFalsy();
+      });
+
+      it('calls the "setDntExitTour" method', () => {
+        spyOn(vm.$store, 'dispatch');
+
+        vm.handleDntExitTourContent(true);
+
+        expect(vm.$store.dispatch).toHaveBeenCalledWith('setDntExitTour', true);
       });
     });
 

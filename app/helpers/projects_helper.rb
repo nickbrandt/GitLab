@@ -160,7 +160,7 @@ module ProjectsHelper
   def can_disable_emails?(project, current_user)
     return false if project.group&.emails_disabled?
 
-    can?(current_user, :set_emails_disabled, project) && Feature.enabled?(:emails_disabled, project, default_enabled: true)
+    can?(current_user, :set_emails_disabled, project)
   end
 
   def last_push_event
@@ -168,7 +168,7 @@ module ProjectsHelper
   end
 
   def link_to_autodeploy_doc
-    link_to _('About auto deploy'), help_page_path('ci/autodeploy/index'), target: '_blank'
+    link_to _('About auto deploy'), help_page_path('autodevops/index.md#auto-deploy'), target: '_blank'
   end
 
   def autodeploy_flash_notice(branch_name)
@@ -188,6 +188,7 @@ module ProjectsHelper
       "cross-project:#{can?(current_user, :read_cross_project)}",
       max_project_member_access_cache_key(project),
       pipeline_status,
+      Gitlab::I18n.locale,
       'v2.6'
     ]
 
@@ -352,6 +353,18 @@ module ProjectsHelper
 
   def metrics_external_dashboard_url
     @project.metrics_setting_external_dashboard_url
+  end
+
+  def grafana_integration_url
+    @project.grafana_integration&.grafana_url
+  end
+
+  def grafana_integration_token
+    @project.grafana_integration&.token
+  end
+
+  def grafana_integration_enabled?
+    @project.grafana_integration&.enabled?
   end
 
   private
@@ -565,7 +578,7 @@ module ProjectsHelper
       lfsHelpPath: help_page_path('workflow/lfs/manage_large_binaries_with_git_lfs'),
       pagesAvailable: Gitlab.config.pages.enabled,
       pagesAccessControlEnabled: Gitlab.config.pages.access_control,
-      pagesHelpPath: help_page_path('user/project/pages/introduction', anchor: 'gitlab-pages-access-control-core-only')
+      pagesHelpPath: help_page_path('user/project/pages/introduction', anchor: 'gitlab-pages-access-control-core')
     }
   end
 

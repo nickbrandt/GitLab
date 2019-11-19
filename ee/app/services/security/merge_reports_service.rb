@@ -77,9 +77,10 @@ module Security
         occurrence.identifiers.each do |identifier|
           # TODO: remove .downcase here after the DAST parser is harmonized to the common library identifiers' keys format
           # See https://gitlab.com/gitlab-org/gitlab/issues/11976#note_191257912
-          next if identifier.external_type.casecmp("cwe").zero? # ignored because it describes a class of vulnerabilities
+          next if %w[cwe wasc].include?(identifier.external_type.downcase) # ignored because these describe a class of vulnerabilities
 
           seen = check_or_mark_seen_identifier!(identifier, occurrence.location.fingerprint, seen_identifiers)
+
           break if seen
         end
 

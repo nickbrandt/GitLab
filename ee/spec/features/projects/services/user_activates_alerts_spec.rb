@@ -25,7 +25,6 @@ describe 'User activates Alerts' do
   context 'when feature available', :js do
     before do
       stub_licensed_features(incident_management: true)
-      stub_feature_flags(generic_alert_endpoint: true)
     end
 
     context 'when service is deactivated' do
@@ -59,14 +58,6 @@ describe 'User activates Alerts' do
 
         expect(reset_key.value).to be_present
       end
-    end
-
-    context 'when feature flag `generic_alert_endpoint` disabled' do
-      before do
-        stub_feature_flags(generic_alert_endpoint: false)
-      end
-
-      it_behaves_like 'no service'
     end
   end
 

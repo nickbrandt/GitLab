@@ -12,7 +12,6 @@ module Ci
     include Presentable
     include Importable
     include Gitlab::Utils::StrongMemoize
-    include Deployable
     include HasRef
 
     BuildArchivedError = Class.new(StandardError)
@@ -36,13 +35,17 @@ module Ci
       refspecs: -> (build) { build.merge_request_ref? }
     }.freeze
 
+    DEFAULT_RETRIES = {
+      scheduler_failure: 2
+    }.freeze
+
     has_one :deployment, as: :deployable, class_name: 'Deployment'
     has_many :trace_sections, class_name: 'Ci::BuildTraceSection'
     has_many :trace_chunks, class_name: 'Ci::BuildTraceChunk', foreign_key: :build_id
-    has_many :needs, class_name: 'Ci::BuildNeed', foreign_key: :build_id, inverse_of: :build
 
     has_many :job_artifacts, class_name: 'Ci::JobArtifact', foreign_key: :job_id, dependent: :destroy, inverse_of: :job # rubocop:disable Cop/ActiveRecordDependent
     has_many :job_variables, class_name: 'Ci::JobVariable', foreign_key: :job_id
+    has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_job_id
 
     Ci::JobArtifact.file_types.each do |key, value|
       has_one :"job_artifacts_#{key}", -> { where(file_type: value) }, class_name: 'Ci::JobArtifact', inverse_of: :job, foreign_key: :job_id
@@ -52,7 +55,6 @@ module Ci
 
     accepts_nested_attributes_for :runner_session
     accepts_nested_attributes_for :job_variables
-    accepts_nested_attributes_for :needs
 
     delegate :url, to: :runner_session, prefix: true, allow_nil: true
     delegate :terminal_specification, to: :runner_session, allow_nil: true
@@ -118,6 +120,11 @@ module Ci
 
     scope :eager_load_job_artifacts, -> { includes(:job_artifacts) }
 
+    scope :with_exposed_artifacts, -> do
+      joins(:metadata).merge(Ci::BuildMetadata.with_exposed_artifacts)
+        .includes(:metadata, :job_artifacts_metadata)
+    end
+
     scope :with_artifacts_not_expired, ->() { with_artifacts_archive.where('artifacts_expire_at IS NULL OR artifacts_expire_at > ?', Time.now) }
     scope :with_expired_artifacts, ->() { with_artifacts_archive.where('artifacts_expire_at < ?', Time.now) }
     scope :last_month, ->() { where('created_at > ?', Date.today - 1.month) }
@@ -127,6 +134,12 @@ module Ci
     scope :with_live_trace, -> { where('EXISTS (?)', Ci::BuildTraceChunk.where('ci_builds.id = ci_build_trace_chunks.build_id').select(1)) }
     scope :with_stale_live_trace, -> { with_live_trace.finished_before(12.hours.ago) }
     scope :finished_before, -> (date) { finished.where('finished_at < ?', date) }
+
+    scope :with_secure_reports_from_options, -> (job_type) { where('options like :job_type', job_type: "%:artifacts:%:reports:%:#{job_type}:%") }
+
+    scope :with_secure_reports_from_config_options, -> (job_types) do
+      joins(:metadata).where("ci_builds_metadata.config_options -> 'artifacts' -> 'reports' ?| array[:job_types]", job_types: job_types)
+    end
 
     scope :matches_tag_ids, -> (tag_ids) do
       matcher = ::ActsAsTaggableOn::Tagging
@@ -361,18 +374,25 @@ module Ci
       pipeline.builds.retried.where(name: self.name).count
     end
 
-    def retries_max
-      normalized_retry.fetch(:max, 0)
-    end
-
-    def retry_when
-      normalized_retry.fetch(:when, ['always'])
-    end
-
     def retry_failure?
-      return false if retries_max.zero? || retries_count >= retries_max
+      max_allowed_retries = nil
+      max_allowed_retries ||= options_retry_max if retry_on_reason_or_always?
+      max_allowed_retries ||= DEFAULT_RETRIES.fetch(failure_reason.to_sym, 0)
 
-      retry_when.include?('always') || retry_when.include?(failure_reason.to_s)
+      max_allowed_retries > 0 && retries_count < max_allowed_retries
+    end
+
+    def options_retry_max
+      options_retry[:max]
+    end
+
+    def options_retry_when
+      options_retry.fetch(:when, ['always'])
+    end
+
+    def retry_on_reason_or_always?
+      options_retry_when.include?(failure_reason.to_s) ||
+        options_retry_when.include?('always')
     end
 
     def latest?
@@ -409,10 +429,6 @@ module Ci
 
     def environment_action
       self.options.fetch(:environment, {}).fetch(:action, 'start') if self.options
-    end
-
-    def has_deployment?
-      !!self.deployment
     end
 
     def outdated_deployment?
@@ -593,6 +609,14 @@ module Ci
       update_column(:trace, nil)
     end
 
+    def artifacts_expose_as
+      options.dig(:artifacts, :expose_as)
+    end
+
+    def artifacts_paths
+      options.dig(:artifacts, :paths)
+    end
+
     def needs_touch?
       Time.now - updated_at > 15.minutes.to_i
     end
@@ -752,6 +776,10 @@ module Ci
       true
     end
 
+    def invalid_dependencies
+      dependencies.reject(&:valid_dependency?)
+    end
+
     def runner_required_feature_names
       strong_memoize(:runner_required_feature_names) do
         RUNNER_FEATURES.select do |feature, method|
@@ -812,6 +840,13 @@ module Ci
       :creating
     end
 
+    # Consider this object to have a structural integrity problems
+    def doom!
+      update_columns(
+        status: :failed,
+        failure_reason: :data_integrity_failure)
+    end
+
     private
 
     def successful_deployment_status
@@ -856,18 +891,12 @@ module Ci
     # format, but builds created before GitLab 11.5 and saved in database still
     # have the old integer only format. This method returns the retry option
     # normalized as a hash in 11.5+ format.
-    def normalized_retry
-      strong_memoize(:normalized_retry) do
+    def options_retry
+      strong_memoize(:options_retry) do
         value = options&.dig(:retry)
         value = value.is_a?(Integer) ? { max: value } : value.to_h
         value.with_indifferent_access
       end
-    end
-
-    def build_attributes_from_config
-      return {} unless pipeline.config_processor
-
-      pipeline.config_processor.build_attributes(name)
     end
   end
 end

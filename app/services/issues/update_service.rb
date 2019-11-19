@@ -56,13 +56,11 @@ module Issues
 
       handle_milestone_change(issue)
 
-      added_mentions = issue.mentioned_users - old_mentioned_users
+      added_mentions = issue.mentioned_users(current_user) - old_mentioned_users
 
       if added_mentions.present?
         notification_service.async.new_mentions_in_issue(issue, added_mentions, current_user)
       end
-
-      ZoomNotesService.new(issue, project, current_user, old_description: old_associations[:description]).execute
     end
 
     def handle_task_changes(issuable)

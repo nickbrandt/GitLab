@@ -95,7 +95,7 @@ describe EnvironmentStatus do
   describe '.build_environments_status' do
     subject { described_class.send(:build_environments_status, merge_request, user, pipeline) }
 
-    let!(:build) { create(:ci_build, :deploy_to_production, pipeline: pipeline) }
+    let!(:build) { create(:ci_build, :with_deployment, :deploy_to_production, pipeline: pipeline) }
     let(:environment) { build.deployment.environment }
     let(:user) { project.owner }
 
@@ -113,7 +113,7 @@ describe EnvironmentStatus do
                head_pipeline: pipeline)
       end
 
-      it 'returns environment status' do
+      it 'returns environment status', :sidekiq_might_not_need_inline do
         expect(subject.count).to eq(1)
         expect(subject[0].environment).to eq(environment)
         expect(subject[0].merge_request).to eq(merge_request)

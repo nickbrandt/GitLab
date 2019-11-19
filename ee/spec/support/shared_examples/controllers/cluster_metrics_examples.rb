@@ -188,39 +188,13 @@ shared_examples 'cluster metrics' do
     end
   end
 
-  shared_examples_for 'correctly formatted response' do |status_code|
+  shared_examples_for 'the default dashboard' do
     it 'returns a json object with the correct keys' do
       get :metrics_dashboard, params: metrics_params, format: :json
 
-      found_keys = json_response.keys - ['all_dashboards']
-
-      expect(response).to have_gitlab_http_status(status_code)
-      expect(found_keys).to contain_exactly(*expected_keys)
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response.keys).to contain_exactly('dashboard', 'status')
     end
-  end
-
-  shared_examples_for '200 response' do
-    let(:expected_keys) { %w(dashboard status) }
-
-    it_behaves_like 'correctly formatted response', :ok
-  end
-
-  shared_context 'error response' do |status_code|
-    let(:expected_keys) { %w(message status) }
-
-    it_behaves like 'correctly formatted response', status_code
-  end
-
-  shared_examples_for 'includes all dashboards' do
-    it 'includes info for all findable dashboards' do
-      expect(json_response).to have_key('all_dashboards')
-      expect(json_response['all_dashboards']).to be_an_instance_of(Array)
-      expect(json_response['all_dashboards']).to all( include('path', 'default', 'display_name') )
-    end
-  end
-
-  shared_examples_for 'the default dashboard' do
-    it_behaves_like '200 response'
 
     it 'is the default dashboard' do
       get :metrics_dashboard, params: metrics_params, format: :json

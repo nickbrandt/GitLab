@@ -5,6 +5,8 @@ module QA
     module Page
       module MergeRequest
         module Show
+          include Page::Component::LicenseManagement
+
           def self.prepended(page)
             page.module_eval do
               view 'app/assets/javascripts/vue_merge_request_widget/components/states/sha_mismatch.vue' do
@@ -79,6 +81,8 @@ module QA
 
           def click_approve
             click_element :approve_button
+
+            find_element :approve_button, text: "Revoke approval"
           end
 
           def start_review
@@ -112,8 +116,32 @@ module QA
             check_element :unresolve_review_discussion_checkbox
           end
 
+          def expand_license_report
+            within_element(:license_report_widget) do
+              click_element(:expand_report_button)
+            end
+          end
+
+          def license_report_expanded?
+            within_element(:license_report_widget) do
+              has_element?(:expand_report_button, text: "Collapse")
+            end
+          end
+
+          def approve_license_with_mr(name)
+            expand_license_report unless license_report_expanded?
+            approve_license(name)
+          end
+
+          def blacklist_license_with_mr(name)
+            expand_license_report unless license_report_expanded?
+            blacklist_license(name)
+          end
+
           def expand_vulnerability_report
-            click_element :expand_report_button
+            within_element :vulnerability_report_grouped do
+              click_element :expand_report_button
+            end
           end
 
           def click_vulnerability(name)
@@ -125,20 +153,26 @@ module QA
           def resolve_vulnerability_with_mr(name)
             expand_vulnerability_report
             click_vulnerability(name)
+
+            previous_page = page.current_url
             click_element :resolve_split_button
+
+            wait(max: 15, reload: false) do
+              page.current_url != previous_page
+            end
           end
 
           def has_vulnerability_report?(timeout: 60)
             wait(reload: true, max: timeout, interval: 1) do
               finished_loading?
-              has_element?(:vulnerability_report_grouped, wait: 1)
+              has_element?(:vulnerability_report_grouped, wait: 10)
             end
             find_element(:vulnerability_report_grouped).has_no_content?("is loading")
           end
 
-          def has_total_vulnerability_count_of?(expected)
+          def has_vulnerability_count?
             # Match text cut off in order to find both "1 vulnerability" and "X vulnerabilities"
-            find_element(:vulnerability_report_grouped).has_content?(/Security scanning detected #{expected}( new)? vulnerabilit/)
+            find_element(:vulnerability_report_grouped).has_content?(/Security scanning detected/)
           end
 
           def has_sast_vulnerability_count_of?(expected)

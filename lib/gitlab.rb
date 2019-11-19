@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'pathname'
-require_relative '../config/light_settings'
 
 module Gitlab
   def self.root
@@ -38,16 +37,34 @@ module Gitlab
 
   COM_URL = 'https://gitlab.com'
   APP_DIRS_PATTERN = %r{^/?(app|config|ee|lib|spec|\(\w*\))}.freeze
+  SUBDOMAIN_REGEX = %r{\Ahttps://[a-z0-9]+\.gitlab\.com\z}.freeze
   VERSION = File.read(root.join("VERSION")).strip.freeze
   INSTALLATION_TYPE = File.read(root.join("INSTALLATION_TYPE")).strip.freeze
   HTTP_PROXY_ENV_VARS = %w(http_proxy https_proxy HTTP_PROXY HTTPS_PROXY).freeze
 
   def self.com?
-    LightSettings.com?
+    # Check `gl_subdomain?` as well to keep parity with gitlab.com
+    Gitlab.config.gitlab.url == COM_URL || gl_subdomain?
+  end
+
+  def self.canary?
+    Gitlab::Utils.to_boolean(ENV['CANARY'])
+  end
+
+  def self.com_and_canary?
+    com? && canary?
+  end
+
+  def self.com_but_not_canary?
+    com? && !canary?
   end
 
   def self.org?
     Gitlab.config.gitlab.url == 'https://dev.gitlab.org'
+  end
+
+  def self.gl_subdomain?
+    SUBDOMAIN_REGEX === Gitlab.config.gitlab.url
   end
 
   def self.dev_env_org_or_com?
@@ -60,22 +77,22 @@ module Gitlab
 
   def self.ee?
     @is_ee ||=
-      if ENV['IS_GITLAB_EE'] && !ENV['IS_GITLAB_EE'].empty?
-        Gitlab::Utils.to_boolean(ENV['IS_GITLAB_EE'])
-      else
-        # We may use this method when the Rails environment is not loaded. This
-        # means that checking the presence of the License class could result in
-        # this method returning `false`, even for an EE installation.
-        root.join('ee/app/models/license.rb').exist?
-      end
+      # We use this method when the Rails environment is not loaded. This
+      # means that checking the presence of the License class could result in
+      # this method returning `false`, even for an EE installation.
+      #
+      # The `FOSS_ONLY` is always `string` or `nil`
+      # Thus the nil or empty string will result
+      # in using default value: false
+      #
+      # The behavior needs to be synchronised with
+      # config/helpers/is_ee_env.js
+      root.join('ee/app/models/license.rb').exist? &&
+        !%w[true 1].include?(ENV['FOSS_ONLY'].to_s)
   end
 
   def self.ee
     yield if ee?
-  end
-
-  def self.com
-    yield if com?
   end
 
   def self.http_proxy_env?

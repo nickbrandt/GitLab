@@ -13,6 +13,7 @@ import 'ee_else_ce/boards/models/issue';
 import 'ee_else_ce/boards/models/list';
 import '~/boards/models/milestone';
 import '~/boards/models/project';
+import store from '~/boards/stores';
 import boardsStore from '~/boards/stores/boards_store';
 import ModalStore from '~/boards/stores/modal_store';
 import BoardService from 'ee_else_ce/boards/services/board_service';
@@ -29,6 +30,7 @@ import {
 } from '~/lib/utils/common_utils';
 import boardConfigToggle from 'ee_else_ce/boards/config_toggle';
 import toggleFocusMode from 'ee_else_ce/boards/toggle_focus';
+import toggleLabels from 'ee_else_ce/boards/toggle_labels';
 import {
   setPromotionState,
   setWeigthFetchingState,
@@ -67,6 +69,7 @@ export default () => {
       BoardSidebar,
       BoardAddIssuesModal,
     },
+    store,
     data: {
       state: boardsStore.state,
       loading: true,
@@ -146,7 +149,7 @@ export default () => {
       updateTokens() {
         this.filterManager.updateTokens();
       },
-      updateDetailIssue(newIssue) {
+      updateDetailIssue(newIssue, multiSelect = false) {
         const { sidebarInfoEndpoint } = newIssue;
         if (sidebarInfoEndpoint && newIssue.subscribed === undefined) {
           newIssue.setFetchingState('subscriptions', true);
@@ -185,9 +188,23 @@ export default () => {
             });
         }
 
+        if (multiSelect) {
+          boardsStore.toggleMultiSelect(newIssue);
+
+          if (boardsStore.detail.issue) {
+            boardsStore.clearDetailIssue();
+            return;
+          }
+
+          return;
+        }
+
         boardsStore.setIssueDetail(newIssue);
       },
-      clearDetailIssue() {
+      clearDetailIssue(multiSelect = false) {
+        if (multiSelect) {
+          boardsStore.clearMultiSelect();
+        }
         boardsStore.clearDetailIssue();
       },
       toggleSubscription(id) {
@@ -300,5 +317,6 @@ export default () => {
   }
 
   toggleFocusMode(ModalStore, boardsStore, $boardApp);
+  toggleLabels();
   mountMultipleBoardsSwitcher();
 };
