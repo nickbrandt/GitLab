@@ -9,8 +9,8 @@
     'create-cluster-path' => clusterable.create_aws_clusters_path,
     'account-id' => Gitlab::CurrentSettings.eks_account_id,
     'external-id' => @aws_role.role_external_id,
+    'role-arn' => @aws_role.role_arn,
     'kubernetes-integration-help-path' => help_page_path('user/project/clusters/index'),
     'account-and-external-ids-help-path' => help_page_path('user/project/clusters/add_remove_clusters.md', anchor: 'eks-cluster'),
     'create-role-arn-help-path' => help_page_path('user/project/clusters/add_remove_clusters.md', anchor: 'eks-cluster'),
-    'external-link-icon' => icon('external-link'),
-    'has-credentials' => @aws_role.role_arn.present?.to_s } }
+    'external-link-icon' => icon('external-link') } }
