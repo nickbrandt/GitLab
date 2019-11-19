@@ -9,6 +9,7 @@ import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
+import { LAST_ACTIVITY_AT } from '../../shared/constants';
 
 export default {
   name: 'CycleAnalytics',
@@ -135,7 +136,7 @@ export default {
   projectsQueryParams: {
     per_page: PROJECTS_PER_PAGE,
     with_shared: false,
-    order_by: 'last_activity_at',
+    order_by: LAST_ACTIVITY_AT,
   },
 };
 </script>
