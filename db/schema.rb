@@ -3486,6 +3486,10 @@ ActiveRecord::Schema.define(version: 2019_11_15_091425) do
     t.index ["reply_key"], name: "index_sent_notifications_on_reply_key", unique: true
   end
 
+  create_table "service_desk_settings", primary_key: "project_id", id: :bigint, default: nil, force: :cascade do |t|
+    t.string "issue_template_key", limit: 255
+  end
+
   create_table "services", id: :serial, force: :cascade do |t|
     t.string "type"
     t.string "title"
@@ -4509,6 +4513,7 @@ ActiveRecord::Schema.define(version: 2019_11_15_091425) do
   add_foreign_key "scim_oauth_access_tokens", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "self_managed_prometheus_alert_events", "environments", on_delete: :cascade
   add_foreign_key "self_managed_prometheus_alert_events", "projects", on_delete: :cascade
+  add_foreign_key "service_desk_settings", "projects", on_delete: :cascade
   add_foreign_key "services", "projects", name: "fk_71cce407f9", on_delete: :cascade
   add_foreign_key "slack_integrations", "services", on_delete: :cascade
   add_foreign_key "smartcard_identities", "users", on_delete: :cascade
