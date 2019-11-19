@@ -13,6 +13,11 @@ describe Issuable::BulkUpdateService do
     let(:epic2) { create(:epic, group: group, labels: [label1]) }
     let(:label1) { create(:group_label, group: group) }
 
+    before do
+      group.add_reporter(user)
+      stub_licensed_features(epics: true)
+    end
+
     describe 'updating labels' do
       let(:label2) { create(:group_label, group: group, title: 'Bug') }
       let(:label3) { create(:group_label, group: group, title: 'suggestion') }
@@ -26,9 +31,21 @@ describe Issuable::BulkUpdateService do
         }
       end
 
+      context 'when epics are enabled' do
+        it 'updates epic labels' do
+          result = subject
+
+          expect(result[:success]).to be_truthy
+          expect(result[:count]).to eq(issuables.count)
+
+          issuables.each do |issuable|
+            expect(issuable.reload.labels).to eq([label2, label3])
+          end
+        end
+      end
+
       context 'when epics are disabled' do
         before do
-          group.add_reporter(user)
           stub_licensed_features(epics: false)
         end
 
@@ -39,21 +56,19 @@ describe Issuable::BulkUpdateService do
         end
       end
 
-      context 'when epics are enabled' do
-        before do
-          group.add_reporter(user)
-          stub_licensed_features(epics: true)
-        end
-
-        it 'updates epic labels' do
-          result = subject
+      context 'when issuable_ids contain external epics' do
+        it 'updates epics that belong to the parent group or descendants' do
+          epic3 = create(:epic, labels: [label1])
+          epic4 = create(:epic, group: create(:group, parent: group), labels: [label1])
+          params = { issuable_ids: [epic1.id, epic3.id, epic4.id], add_label_ids: [label3.id] }
+          result = described_class.new(group, user, params).execute('epic')
 
           expect(result[:success]).to be_truthy
-          expect(result[:count]).to eq(issuables.count)
+          expect(result[:count]).to eq(2)
 
-          issuables.each do |issuable|
-            expect(issuable.reload.labels).to eq([label2, label3])
-          end
+          expect(epic1.reload.labels).to eq([label1, label3])
+          expect(epic3.reload.labels).to eq([label1])
+          expect(epic4.reload.labels).to eq([label1, label3])
         end
       end
     end
