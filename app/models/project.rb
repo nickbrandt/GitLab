@@ -179,6 +179,7 @@ class Project < ApplicationRecord
   has_one :forked_from_project, through: :fork_network_member
   has_many :forked_to_members, class_name: 'ForkNetworkMember', foreign_key: 'forked_from_project_id'
   has_many :forks, through: :forked_to_members, source: :project, inverse_of: :forked_from_project
+  has_many :fork_network_projects, through: :fork_network, source: :projects
 
   has_one :import_state, autosave: true, class_name: 'ProjectImportState', inverse_of: :project
   has_one :import_export_upload, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -713,6 +714,10 @@ class Project < ApplicationRecord
 
   def daily_statistics_enabled?
     Feature.enabled?(:project_daily_statistics, self, default_enabled: true)
+  end
+
+  def unlink_forks_upon_visibility_decrease_enabled?
+    Feature.enabled?(:unlink_fork_network_upon_visibility_decrease, self)
   end
 
   def empty_repo?
@@ -1533,6 +1538,7 @@ class Project < ApplicationRecord
 
   # update visibility_level of forks
   def update_forks_visibility_level
+    return if unlink_forks_upon_visibility_decrease_enabled?
     return unless visibility_level < visibility_level_before_last_save
 
     forks.each do |forked_project|
