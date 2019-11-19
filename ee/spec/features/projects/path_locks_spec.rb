@@ -67,7 +67,7 @@ describe 'Path Locks', :js do
     within '.locks' do
       expect(page).to have_content('encoding')
 
-      accept_confirm { find('.btn-remove').click }
+      accept_confirm { click_link "Unlock" }
 
       expect(page).not_to have_content('encoding')
     end
