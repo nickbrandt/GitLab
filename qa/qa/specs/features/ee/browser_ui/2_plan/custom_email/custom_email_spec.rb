@@ -7,7 +7,7 @@ module QA
     describe 'Custom email', :requires_admin do
       before do
         Flow::Login.sign_in_as_admin
-        Page::Main::Menu.perform(&:click_admin_area)
+        Page::Main::Menu.perform(&:go_to_admin_area)
         Page::Admin::Menu.perform(&:go_to_preferences_settings)
       end
 

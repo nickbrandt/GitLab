@@ -125,8 +125,8 @@ module QA
         has_no_css?(element_selector_css(name, kwargs), wait: wait, text: text)
       end
 
-      def has_text?(text)
-        page.has_text? text
+      def has_text?(text, wait: Capybara.default_max_wait_time)
+        page.has_text?(text, wait: wait)
       end
 
       def has_no_text?(text)
