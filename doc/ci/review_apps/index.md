@@ -163,8 +163,12 @@ that spawned the Review App.
 
 ### Configuring Visual Reviews
 
-Ensure that the `anonymous_visual_review_feedback` feature flag is enabled on
-your GitLab instance or project if you are self-hosting.
+Ensure that the `anonymous_visual_review_feedback` feature flag is enabled.
+Administrators can enable with a Rails console as follows:
+
+```ruby
+Feature.enabled(:anonymous_visual_review_feedback)
+```
 
 The feedback form is served through a script you add to pages in your Review App.
 If you have [Developer permissions](../../user/permissions.md) to the project,
@@ -226,14 +230,16 @@ to make this process even easier.
 
 ### Determining merge request ID
 
-The merge request ID can be automatically determined through the script tag
-via the data attribute `data-merge-request-id`.
+The visual review tools retrieve the merge request ID from the `data-merge-request-id`
+data attribute included in the `script` HTML tag used to add the visual review tools
+to your review app.
 
-There are three ways to provide a merge request ID to a Visual Review app:
+​After determining the ID for the merge request to link to a visual review app, you
+can supply the ID by either:​​
 
-- By hardcoding it in the script tag via the data attribute `data-merge-request-id`
-- Dynamically adding the `data-merge-request-id` value during build.
-- Supplying it manually through the visual review form.
+- Hardcoding it in the script tag via the data attribute `data-merge-request-id` of the app.
+- Dynamically adding the `data-merge-request-id` value during the build of the app.
+- Supplying it manually through the visual review form in the app.
 
 ### Using Visual Reviews
 
