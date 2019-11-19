@@ -37,6 +37,7 @@ export const STAGE_ACTIONS = {
   SELECT: 'selectStage',
   EDIT: 'editStage',
   REMOVE: 'removeStage',
-  SAVE: 'saveStage',
   HIDE: 'hideStage',
+  CREATE: 'createStage',
+  UPDATE: 'updateStage',
 };

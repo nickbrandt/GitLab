@@ -86,10 +86,12 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
 export const hideCustomStageForm = ({ commit }) => commit(types.HIDE_CUSTOM_STAGE_FORM);
 export const showCustomStageForm = ({ commit }) => commit(types.SHOW_CUSTOM_STAGE_FORM);
 
-export const editCustomStage = ({ commit, dispatch }, initData = {}) => {
-  commit(types.EDIT_CUSTOM_STAGE, initData);
-  if (initData.id) {
-    dispatch('setSelectedStageId', initData.id);
+export const editCustomStage = ({ commit, dispatch }, selectedStage = {}) => {
+  commit(types.EDIT_CUSTOM_STAGE);
+  commit(types.SET_SELECTED_STAGE_DATA, selectedStage);
+
+  if (selectedStage.id) {
+    dispatch('setSelectedStageId', selectedStage.id);
   }
 };
 
@@ -251,11 +253,12 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
 };
 
 export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
-export const receiveUpdateStageSuccess = ({ commit, dispatch }) => {
+export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => {
   commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
   createFlash(__(`Stage data updated`), 'notice');
 
   dispatch('fetchGroupStagesAndEvents');
+  commit(types.SET_SELECTED_STAGE_DATA, updatedData);
 };
 
 export const receiveUpdateStageError = ({ commit }) => {

@@ -80,25 +80,8 @@ export default {
     state.isCreatingCustomStage = true;
     state.customStageFormInitData = {};
   },
-  [types.EDIT_CUSTOM_STAGE](state, initData) {
-    console.log('EDIT_CUSTOM_STAGE::initData', initData);
-    const {
-      title: name,
-      startEventIdentifier,
-      endEventIdentifier,
-      startEventLabelId,
-      endEventLabelId,
-    } = initData;
-
+  [types.EDIT_CUSTOM_STAGE](state) {
     state.isEditingCustomStage = true;
-    state.customStageFormInitData = {
-      ...state.customStageFormInitData,
-      name,
-      startEventIdentifier,
-      endEventIdentifier,
-      startEventLabelId,
-      endEventLabelId,
-    };
   },
   [types.HIDE_CUSTOM_STAGE_FORM](state) {
     state.isEditingCustomStage = false;
@@ -106,7 +89,29 @@ export default {
     state.customStageFormInitData = {};
   },
   [types.SHOW_CUSTOM_STAGE_FORM](state) {
-    state.isAddingCustomStage = true;
+    state.isCreatingCustomStage = true;
+  },
+  [types.SET_SELECTED_STAGE_DATA](state, initData) {
+    const data = convertObjectPropsToCamelCase(initData);
+    const {
+      id,
+      title: name, // TODO: do we still need to do this?
+      startEventIdentifier,
+      endEventIdentifier,
+      startEventLabelId,
+      endEventLabelId,
+    } = data;
+
+    // TODO: remove setSelectedStageId action in favour of passing the id into this + a getter
+    state.customStageFormInitData = {
+      ...state.customStageFormInitData,
+      id,
+      name,
+      startEventIdentifier,
+      endEventIdentifier,
+      startEventLabelId,
+      endEventLabelId,
+    };
   },
   [types.RECEIVE_SUMMARY_DATA_ERROR](state) {
     state.summary = [];
@@ -179,6 +184,7 @@ export default {
   },
   [types.RECEIVE_UPDATE_STAGE_RESPONSE](state) {
     state.isLoading = false;
+    state.isSavingCustomStage = false;
   },
   [types.REQUEST_REMOVE_STAGE](state) {
     state.isLoading = true;

@@ -91,6 +91,9 @@ export default {
       const { currentStageEvents = [], isLoading, isEmptyStage } = this;
       return currentStageEvents.length && !isLoading && !isEmptyStage;
     },
+    customStageFormActive() {
+      return this.isCreatingCustomStage;
+    },
     stageHeaders() {
       return [
         {
@@ -109,13 +112,13 @@ export default {
           title: this.stageName,
           description: __('The collection of events added to the data gathered for that stage.'),
           classes: 'event-header pl-3',
-          displayHeader: !this.isAddingCustomStage,
+          displayHeader: !this.customStageFormActive,
         },
         {
           title: __('Total Time'),
           description: __('The time taken by each data entry gathered by that stage.'),
           classes: 'total-time-header pr-5 text-right',
-          displayHeader: !this.isAddingCustomStage,
+          displayHeader: !this.customStageFormActive,
         },
       ];
     },
@@ -129,6 +132,7 @@ export default {
       this.$emit(STAGE_ACTIONS.REMOVE, stageId);
     },
   },
+  STAGE_ACTIONS,
 };
 </script>
 <template>
@@ -159,14 +163,14 @@ export default {
               :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
               :can-edit="canEditStages"
               :is-default-stage="!stage.custom"
-              @select="$emit('selectStage', stage)"
               @remove="removeStage(stage.id)"
               @hide="hideStage(stage.id)"
-              @edit="$emit(STAGE_ACTIONS.EDIT, stageData)"
+              @select="$emit($options.STAGE_ACTIONS.SELECT, stage)"
+              @edit="$emit($options.STAGE_ACTIONS.EDIT, stage)"
             />
             <add-stage-button
               v-if="canEditStages"
-              :active="isAddingCustomStage"
+              :active="customStageFormActive"
               @showform="$emit('showAddStageForm')"
             />
           </ul>
@@ -181,7 +185,8 @@ export default {
             :initial-fields="customStageFormInitData"
             :is-editing-custom-stage="isEditingCustomStage"
             @submit="$emit('submit', $event)"
-            @saveStage="saveStage"
+            @createStage="$emit($options.STAGE_ACTIONS.CREATE, $event)"
+            @updateStage="$emit($options.STAGE_ACTIONS.UPDATE, $event)"
           />
           <template v-else>
             <stage-event-list

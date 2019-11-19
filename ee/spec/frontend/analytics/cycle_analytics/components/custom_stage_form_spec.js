@@ -12,6 +12,7 @@ import {
 } from '../mock_data';
 
 const initData = {
+  id: 74,
   name: 'Cool stage pre',
   startEventIdentifier: labelStartEvent.identifier,
   startEventLabelId: groupLabels[0].id,
@@ -35,11 +36,11 @@ describe('CustomStageForm', () => {
   const findEvent = ev => wrapper.emitted()[ev];
 
   const sel = {
-    name: '[name="add-stage-name"]',
-    startEvent: '[name="add-stage-start-event"]',
-    startEventLabel: '[name="add-stage-start-event-label"]',
-    endEvent: '[name="add-stage-stop-event"]',
-    endEventLabel: '[name="add-stage-stop-event-label"]',
+    name: '[name="custom-stage-name"]',
+    startEvent: '[name="custom-stage-start-event"]',
+    startEventLabel: '[name="custom-stage-start-event-label"]',
+    endEvent: '[name="custom-stage-stop-event"]',
+    endEventLabel: '[name="custom-stage-stop-event-label"]',
     submit: '.js-save-stage',
     cancel: '.js-save-stage-cancel',
     invalidFeedback: '.invalid-feedback',
@@ -360,7 +361,7 @@ describe('CustomStageForm', () => {
         wrapper.destroy();
       });
 
-      it('has text `Edit stage`', () => {
+      it('has text `Add stage`', () => {
         expect(wrapper.find(sel.submit).text('value')).toEqual('Add stage');
       });
 
@@ -395,21 +396,25 @@ describe('CustomStageForm', () => {
           wrapper.destroy();
         });
 
-        it(`emits a ${STAGE_ACTIONS.SAVE} event when clicked`, () => {
-          let event = findEvent(STAGE_ACTIONS.SAVE);
+        it(`emits a ${STAGE_ACTIONS.CREATE} event when clicked`, done => {
+          let event = findEvent(STAGE_ACTIONS.CREATE);
           expect(event).toBeUndefined();
 
           wrapper.find(sel.submit).trigger('click');
-          event = findEvent(STAGE_ACTIONS.SAVE);
-          expect(event).toBeTruthy();
-          expect(event.length).toEqual(1);
+
+          Vue.nextTick(() => {
+            event = findEvent(STAGE_ACTIONS.CREATE);
+            expect(event).toBeTruthy();
+            expect(event.length).toEqual(1);
+            done();
+          });
         });
 
-        it('`submit` event receives the latest data', () => {
+        it(`${STAGE_ACTIONS.CREATE} event receives the latest data`, () => {
           const startEv = startEvents[startEventIndex];
           const selectedStopEvent = getDropdownOption(wrapper, sel.stopEvent, stopEventIndex);
 
-          let event = findEvent(STAGE_ACTIONS.SAVE);
+          let event = findEvent(STAGE_ACTIONS.CREATE);
           expect(event).toBeUndefined();
 
           const res = [
@@ -423,7 +428,7 @@ describe('CustomStageForm', () => {
           ];
 
           wrapper.find(sel.submit).trigger('click');
-          event = findEvent(STAGE_ACTIONS.SAVE);
+          event = findEvent(STAGE_ACTIONS.CREATE);
           expect(event[0]).toEqual(res);
         });
       });
@@ -464,6 +469,7 @@ describe('CustomStageForm', () => {
 
           Vue.nextTick(() => {
             expect(wrapper.vm.fields).toEqual({
+              id: null,
               name: null,
               startEventIdentifier: null,
               startEventLabelId: null,
@@ -495,6 +501,21 @@ describe('CustomStageForm', () => {
             done();
           });
         });
+      });
+    });
+
+    describe('isSavingCustomStage=true', () => {
+      beforeEach(() => {
+        wrapper = createComponent(
+          {
+            isSavingCustomStage: true,
+          },
+          false,
+        );
+      });
+
+      it('displays a loading icon', () => {
+        expect(wrapper.find(sel.submit).html()).toMatchSnapshot();
       });
     });
   });
@@ -547,9 +568,9 @@ describe('CustomStageForm', () => {
       });
     });
 
-    describe('Edit stage button', () => {
-      it('has text `Edit stage`', () => {
-        expect(wrapper.find(sel.submit).text('value')).toEqual('Edit stage');
+    describe('Update stage button', () => {
+      it('has text `Update stage`', () => {
+        expect(wrapper.find(sel.submit).text('value')).toEqual('Update stage');
       });
 
       it('is disabled by default', () => {
@@ -632,24 +653,24 @@ describe('CustomStageForm', () => {
         });
       });
     });
-  });
 
-  it('does not have a loading icon', () => {
-    expect(wrapper.find(sel.submit).html()).toMatchSnapshot();
-  });
+    describe('isSavingCustomStage=true', () => {
+      beforeEach(() => {
+        wrapper = createComponent(
+          {
+            isEditingCustomStage: true,
+            initialFields: {
+              ...initData,
+            },
+            isSavingCustomStage: true,
+          },
+          false,
+        );
+      });
 
-  describe('isSavingCustomStage=true', () => {
-    beforeEach(() => {
-      wrapper = createComponent(
-        {
-          isSavingCustomStage: true,
-        },
-        false,
-      );
-    });
-
-    it('displays a loading icon', () => {
-      expect(wrapper.find(sel.submit).html()).toMatchSnapshot();
+      it('displays a loading icon', () => {
+        expect(wrapper.find(sel.submit).html()).toMatchSnapshot();
+      });
     });
   });
 });

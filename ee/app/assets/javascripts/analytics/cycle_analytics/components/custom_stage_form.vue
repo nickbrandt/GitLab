@@ -15,6 +15,7 @@ import {
 } from '../utils';
 
 const initFields = {
+  id: null,
   name: null,
   startEventIdentifier: null,
   startEventLabelId: null,
@@ -132,7 +133,7 @@ export default {
     },
     saveStageText() {
       return this.isEditingCustomStage
-        ? s__('CustomCycleAnalytics|Edit stage')
+        ? s__('CustomCycleAnalytics|Update stage')
         : s__('CustomCycleAnalytics|Add stage');
     },
     formTitle() {
@@ -150,10 +151,13 @@ export default {
       this.$emit('cancel');
     },
     handleSave() {
-      this.$emit(
-        this.isEditingCustomStage ? STAGE_ACTIONS.EDIT : STAGE_ACTIONS.SAVE,
-        snakeFields(this.fields),
-      );
+      const data = snakeFields(this.fields);
+      if (this.isEditingCustomStage) {
+        const { id } = this.initialFields;
+        this.$emit(STAGE_ACTIONS.UPDATE, { ...data, id });
+      } else {
+        this.$emit(STAGE_ACTIONS.CREATE, data);
+      }
     },
     handleSelectLabel(key, labelId = null) {
       this.fields[key] = labelId;
@@ -184,7 +188,7 @@ export default {
         <gl-form-group :label="s__('CustomCycleAnalytics|Start event')">
           <gl-form-select
             v-model="fields.startEventIdentifier"
-            name="add-stage-start-event"
+            name="custom-stage-start-event"
             :required="true"
             :options="startEventOptions"
           />
@@ -195,7 +199,7 @@ export default {
           <labels-selector
             :labels="labels"
             :selected-label-id="fields.startEventLabelId"
-            name="add-stage-start-event-label"
+            name="custom-stage-start-event-label"
             @selectLabel="labelId => handleSelectLabel('startEventLabelId', labelId)"
             @clearLabel="handleClearLabel('startEventLabelId')"
           />
@@ -214,7 +218,7 @@ export default {
         >
           <gl-form-select
             v-model="fields.endEventIdentifier"
-            name="add-stage-stop-event"
+            name="custom-stage-stop-event"
             :options="endEventOptions"
             :required="true"
             :disabled="!hasStartEvent"
@@ -226,7 +230,7 @@ export default {
           <labels-selector
             :labels="labels"
             :selected-label-id="fields.endEventLabelId"
-            name="add-stage-stop-event-label"
+            name="custom-stage-stop-event-label"
             @selectLabel="labelId => handleSelectLabel('endEventLabelId', labelId)"
             @clearLabel="handleClearLabel('endEventLabelId')"
           />
