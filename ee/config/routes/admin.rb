@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 namespace :admin do
-  resources :users, constraints: { id: %r{[a-zA-Z./0-9_\-]+} } do
+  resources :users, only: [], constraints: { id: %r{[a-zA-Z./0-9_\-]+} } do
     member do
       post :reset_runners_minutes
     end
