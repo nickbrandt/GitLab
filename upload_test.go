@@ -331,6 +331,7 @@ func TestPackageFilesUpload(t *testing.T) {
 	routes := []string{
 		"/api/v4/packages/conan/v1/files",
 		"/api/v4/projects/9001/packages/nuget/v1/files",
+		"/api/v4/projects/2412/packages/maven/v1/files",
 	}
 
 	for _, r := range routes {
