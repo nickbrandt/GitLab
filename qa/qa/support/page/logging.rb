@@ -59,6 +59,18 @@ module QA
           elements
         end
 
+        def check_element(name)
+          log("checking :#{name}")
+
+          super
+        end
+
+        def uncheck_element(name)
+          log("unchecking :#{name}")
+
+          super
+        end
+
         def click_element(name, page = nil, **kwargs)
           msg = ["clicking :#{name}"]
           msg << ", expecting to be at #{page.class}" if page
