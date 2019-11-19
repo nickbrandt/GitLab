@@ -10,10 +10,8 @@ describe PatchPrometheusServicesForSharedClusterApplications, :migration, :sidek
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
   let(:namespace) { namespaces.create!(name: 'gitlab', path: 'gitlab-org') }
-
-
-    let!(:project1) { projects.create!(name: 'gitlab', path: 'gitlab-ce', namespace_id: namespace.id) }
-    let!(:project2) { projects.create!(name: 'gitlab', path: 'gitlab-ee', namespace_id: namespace.id) }
+  let!(:project1) { projects.create!(name: 'gitlab', path: 'gitlab-ce', namespace_id: namespace.id) }
+  let!(:project2) { projects.create!(name: 'gitlab', path: 'gitlab-ee', namespace_id: namespace.id) }
 
   it 'schedules a background migration' do
     Sidekiq::Testing.fake! do
