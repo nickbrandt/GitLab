@@ -10,13 +10,12 @@ module Issuable
       @parent, @current_user, @params = parent, user, params.dup
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def execute(type)
       model_class = type.classify.constantize
       update_class = type.classify.pluralize.constantize::UpdateService
 
       ids = params.delete(:issuable_ids).split(",")
-      items = model_class.where(id: ids)
+      items = find_issuables(model_class, ids, parent)
 
       permitted_attrs(type).each do |key|
         params.delete(key) unless params[key].present?
@@ -27,8 +26,7 @@ module Issuable
       end
 
       items.each do |issuable|
-        next unless can?(current_user, :"update_#{type}", issuable) &&
-          valid_parent?(type, issuable.issuing_parent, parent)
+        next unless can?(current_user, :"update_#{type}", issuable)
 
         update_class.new(issuable.issuing_parent, current_user, params).execute(issuable)
       end
@@ -38,7 +36,6 @@ module Issuable
         success:  !items.count.zero?
       }
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     private
 
@@ -64,5 +61,15 @@ module Issuable
 
       issuing_parents.include?(parent)
     end
+
+    # rubocop: disable CodeReuse/ActiveRecord
+    def find_issuables(model_class, ids, parent)
+      if parent.is_a?(Project)
+        model_class.where(id: ids).where(project_id: parent)
+      elsif parent.is_a?(Group)
+        model_class.where(id: ids).where(project_id: parent.all_projects)
+      end
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
