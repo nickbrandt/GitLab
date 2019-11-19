@@ -1,0 +1,5 @@
+---
+title: Prevent IDOR when adding users to protected environments
+merge_request:
+author:
+type: security
