@@ -57,6 +57,7 @@ export default {
     <dismissal-comment-box
       v-if="isActive"
       v-model="localComment"
+      data-qa-selector="dismiss_comment_field"
       :dismissal-comment="dismissalComment"
       :error-message="errorMessage"
       :placeholder="$options.PLACEHOLDER"
