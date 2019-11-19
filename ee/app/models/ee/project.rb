@@ -48,6 +48,7 @@ module EE
       has_one :gitlab_slack_application_service
       has_one :alerts_service
 
+      has_one :service_desk_setting, class_name: 'ServiceDeskSetting'
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
       has_one :incident_management_setting, inverse_of: :project, class_name: 'IncidentManagement::ProjectIncidentManagementSetting'
