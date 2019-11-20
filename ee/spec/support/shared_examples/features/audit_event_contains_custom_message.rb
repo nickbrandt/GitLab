@@ -28,7 +28,7 @@ shared_examples 'audit event contains custom message' do
     let(:custom_message) { 'Message <strong>with</strong> <i>deleted</i> tags' }
 
     it 'allows only <strong> tag' do
-      message_row = find('td', text: 'Message with deleted tags')
+      message_row = find('.js-audit-action', text: 'Message with deleted tags')
 
       expect(message_row).to have_selector('strong')
       expect(message_row).to have_no_selector('i')

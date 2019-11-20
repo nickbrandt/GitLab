@@ -109,7 +109,7 @@ describe 'Projects > Audit Events', :js do
 
       click_link 'Audit Events'
 
-      page.within('table#audits') do
+      page.within('#audits') do
         expect(page).to have_content 'Change access level from developer to maintainer'
         expect(page).to have_content(project.owner.name)
         expect(page).to have_content('Pete')
