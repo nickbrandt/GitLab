@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import { mount, createLocalVue } from '@vue/test-utils';
-import { GlPopover } from '@gitlab/ui';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { GlPopover, GlLink } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import component from 'ee/approvals/components/approval_check_popover.vue';
 
@@ -9,12 +9,13 @@ describe('Approval Check Popover', () => {
 
   beforeEach(() => {
     const localVue = createLocalVue();
-    wrapper = mount(component, {
+    wrapper = shallowMount(component, {
       localVue,
       propsData: {
         title: 'Title',
       },
       sync: false,
+      attachToDocument: true,
     });
   });
 
@@ -31,7 +32,7 @@ describe('Approval Check Popover', () => {
       expect(
         wrapper
           .find(GlPopover)
-          .find('a')
+          .find(GlLink)
           .attributes('href'),
       ).toBe(documentationLink);
     });
@@ -42,7 +43,7 @@ describe('Approval Check Popover', () => {
       expect(
         wrapper
           .find(GlPopover)
-          .find('a')
+          .find(GlLink)
           .exists(),
       ).toBeFalsy();
     });
