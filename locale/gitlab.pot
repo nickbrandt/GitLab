@@ -15546,6 +15546,9 @@ msgstr ""
 msgid "Service Desk"
 msgstr ""
 
+msgid "Service Desk is enabled but not yet active"
+msgstr ""
+
 msgid "Service Templates"
 msgstr ""
 
@@ -19939,6 +19942,9 @@ msgid "You must provide your current password in order to change it."
 msgstr ""
 
 msgid "You must select a stack for configuring your cloud provider. Learn more about"
+msgstr ""
+
+msgid "You must set up incoming email before it becomes active."
 msgstr ""
 
 msgid "You need a different license to enable FileLocks feature"

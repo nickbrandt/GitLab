@@ -8,9 +8,9 @@ describe 'Service Desk Issue Tracker', :js do
 
   before do
     allow(License).to receive(:feature_available?).and_call_original
-    allow(License).to receive(:feature_available?).with(:service_desk) { true }
-    allow(Gitlab::IncomingEmail).to receive(:enabled?) { true }
-    allow(Gitlab::IncomingEmail).to receive(:supports_wildcard?) { true }
+    allow(License).to receive(:feature_available?).with(:service_desk).and_return(true)
+    allow(Gitlab::IncomingEmail).to receive(:enabled?).and_return(true)
+    allow(Gitlab::IncomingEmail).to receive(:supports_wildcard?).and_return(true)
 
     project.add_maintainer(user)
     sign_in(user)
@@ -29,6 +29,20 @@ describe 'Service Desk Issue Tracker', :js do
   end
 
   describe 'issues list' do
+    context 'when service desk is misconfigured' do
+      before do
+        allow(EE::Gitlab::ServiceDesk).to receive(:supported?).and_return(false)
+        visit service_desk_project_issues_path(project)
+      end
+
+      it 'shows a message to say the configuration is incomplete' do
+        expect(page).to have_css('.empty-state')
+        expect(page).to have_text('Service Desk is enabled but not yet active')
+        expect(page).to have_text('You must set up incoming email before it becomes active')
+        expect(page).to have_link('More information', href: help_page_path('administration/incoming_email', anchor: 'set-it-up'))
+      end
+    end
+
     context 'when service desk has not been activated' do
       let(:project_without_service_desk) { create(:project, :private, service_desk_enabled: false) }
 
