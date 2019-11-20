@@ -185,7 +185,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resource :dependencies, only: [:show]
       resource :licenses, only: [:show]
-      resources :managed_licenses, only: [:index, :show, :new, :create, :edit, :update, :destroy]
 
       resources :environments, only: [] do
         member do
