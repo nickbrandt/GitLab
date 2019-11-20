@@ -228,6 +228,9 @@ class MergeRequest < ApplicationRecord
     with_state(:opened).where(auto_merge_enabled: true)
   end
 
+  # Only remove after 2019-12-22 and with %12.7
+  self.ignored_columns += %i[state]
+
   after_save :keep_around_commit
 
   alias_attribute :project, :target_project
@@ -240,6 +243,9 @@ class MergeRequest < ApplicationRecord
   # please use `auto_merge_enabled` alias instead of `merge_when_pipeline_succeeds`.
   alias_attribute :auto_merge_enabled, :merge_when_pipeline_succeeds
   alias_method :issuing_parent, :target_project
+
+  delegate :active?, to: :head_pipeline, prefix: true, allow_nil: true
+  delegate :success?, to: :actual_head_pipeline, prefix: true, allow_nil: true
 
   RebaseLockTimeout = Class.new(StandardError)
 

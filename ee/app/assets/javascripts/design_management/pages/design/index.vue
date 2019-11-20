@@ -57,6 +57,7 @@ export default {
     },
     design: {
       query: getDesignQuery,
+      fetchPolicy: 'network-only',
       variables() {
         return this.designVariables;
       },

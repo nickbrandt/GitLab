@@ -9,7 +9,7 @@ module AutoMerge
     end
 
     def process(merge_request)
-      return unless merge_request.actual_head_pipeline&.success?
+      return unless merge_request.actual_head_pipeline_success?
 
       merge_train_service = AutoMerge::MergeTrainService.new(project, merge_request.merge_user)
 

@@ -3,6 +3,7 @@ import { mapState, mapActions } from 'vuex';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import { accessLevelReporter, projectsPerPage } from '../constants';
+import { LAST_ACTIVITY_AT } from '../../shared/constants';
 
 export default {
   components: {
@@ -51,7 +52,7 @@ export default {
   projectsQueryParams: {
     per_page: projectsPerPage,
     with_shared: false, // exclude forks
-    order_by: 'last_activity_at',
+    order_by: LAST_ACTIVITY_AT,
   },
 };
 </script>

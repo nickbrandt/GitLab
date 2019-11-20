@@ -4892,6 +4892,9 @@ msgstr ""
 msgid "Create group label"
 msgstr ""
 
+msgid "Create issue"
+msgstr ""
+
 msgid "Create lists from labels. Issues with that label appear in that list."
 msgstr ""
 
@@ -7346,6 +7349,9 @@ msgid "FeatureFlags|Inactive"
 msgstr ""
 
 msgid "FeatureFlags|Inactive flag for %{scope}"
+msgstr ""
+
+msgid "FeatureFlags|Include additional user IDs"
 msgstr ""
 
 msgid "FeatureFlags|Install a %{docs_link_anchored_start}compatible client library%{docs_link_anchored_end} and specify the API URL, application name, and instance ID during the configuration setup. %{docs_link_start}More Information%{docs_link_end}"
@@ -17417,6 +17423,9 @@ msgid "There was an error fetching configuration for charts"
 msgstr ""
 
 msgid "There was an error fetching cycle analytics stages."
+msgstr ""
+
+msgid "There was an error fetching data for the chart"
 msgstr ""
 
 msgid "There was an error fetching data for the selected stage"

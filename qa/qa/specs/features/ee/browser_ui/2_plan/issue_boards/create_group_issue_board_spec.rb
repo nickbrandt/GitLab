@@ -6,8 +6,7 @@ module QA
   context 'Plan' do
     describe 'Group issue boards' do
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         group = QA::Resource::Group.fabricate_via_api!
 

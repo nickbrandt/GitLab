@@ -57,7 +57,7 @@ export default {
     <div class="circle-icon-container" :class="iconStyle">
       <icon :size="16" :name="iconName" />
     </div>
-    <div class="ml-3">
+    <div class="ml-3" data-qa-selector="event_item_content">
       <div class="note-header-info pb-0">
         <a
           :href="author.path"

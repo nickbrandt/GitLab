@@ -140,7 +140,8 @@ export default {
   },
 
   [types.ADD_PENDING_REFERENCES](state, references) {
-    state.pendingReferences.push(...references);
+    const nonDuplicateReferences = references.filter(ref => !state.pendingReferences.includes(ref));
+    state.pendingReferences.push(...nonDuplicateReferences);
   },
 
   [types.REMOVE_PENDING_REFERENCE](state, indexToRemove) {

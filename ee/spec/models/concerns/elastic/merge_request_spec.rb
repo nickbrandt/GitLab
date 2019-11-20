@@ -79,6 +79,7 @@ describe MergeRequest, :elastic do
       'target_project_id',
       'author_id'
     ).merge({
+      'state' => merge_request.state,
       'type' => merge_request.es_type,
       'join_field' => {
         'name' => merge_request.es_type,

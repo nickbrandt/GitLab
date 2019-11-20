@@ -13,3 +13,5 @@ export const scatterChartLineProps = {
     zlevel: 3,
   },
 };
+
+export const LAST_ACTIVITY_AT = 'last_activity_at';
