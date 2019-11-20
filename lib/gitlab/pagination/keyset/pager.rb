@@ -11,21 +11,30 @@ module Gitlab
         end
 
         def paginate(relation)
-          relation = relation.limit(page.per_page) # rubocop: disable CodeReuse/ActiveRecord
-
           # Validate an assumption we're making (TODO: subject to be removed)
           check_order!(relation)
 
-          apply_headers(relation.last)
+          # This performs the database query and retrieves records
+          # We retrieve one record more to check if we have data beyond this page
+          all_records = relation.limit(page.per_page + 1).to_a # rubocop: disable CodeReuse/ActiveRecord
 
-          relation
+          records_for_page = all_records.first(page.per_page)
+
+          # If we retrieved more records than belong on this page,
+          # we know there's a next page
+          there_is_more = all_records.size > records_for_page.size
+          apply_headers(records_for_page.last, there_is_more)
+
+          records_for_page
         end
 
         private
 
-        def apply_headers(last_record_in_page)
+        def apply_headers(last_record_in_page, there_is_more)
+          end_reached = last_record_in_page.nil? || !there_is_more
           lower_bounds = last_record_in_page&.slice(page.order_by.keys)
-          next_page = page.next(lower_bounds, last_record_in_page.nil?)
+
+          next_page = page.next(lower_bounds, end_reached)
 
           request.apply_headers(next_page)
         end
