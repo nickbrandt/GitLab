@@ -15291,7 +15291,7 @@ msgstr ""
 msgid "SecurityDashboard|More information"
 msgstr ""
 
-msgid "SecurityDashboard|Pipeline %{pipelineLink} triggered"
+msgid "SecurityDashboard|Pipeline %{pipelineLink} triggered %{timeago} by %{user}"
 msgstr ""
 
 msgid "SecurityDashboard|Project"

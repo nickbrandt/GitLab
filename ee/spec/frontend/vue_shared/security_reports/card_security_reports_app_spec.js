@@ -72,16 +72,6 @@ describe('Card security reports app', () => {
     mock.restore();
   });
 
-  describe('computed properties', () => {
-    describe('headline', () => {
-      it('renders `Pipeline <link> triggered`', () => {
-        expect(wrapper.vm.headline).toBe(
-          `Pipeline <a href="${TEST_HOST}/pipeline">#55</a> triggered`,
-        );
-      });
-    });
-  });
-
   describe('Headline renders', () => {
     it('renders pipeline metadata information', () => {
       const element = wrapper.find('.card-header .js-security-dashboard-left');
