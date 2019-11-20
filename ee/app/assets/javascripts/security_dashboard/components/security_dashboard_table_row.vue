@@ -69,6 +69,11 @@ export default {
       <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
     </div>
 
+    <div class="table-section section-10 ml-md-2">
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Confidence') }}</div>
+      <div class="table-mobile-content text-capitalize">{{ confidence }}</div>
+    </div>
+
     <div class="table-section flex-grow-1">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
       <div class="table-mobile-content vulnerability-info">
@@ -102,11 +107,6 @@ export default {
           </span>
         </template>
       </div>
-    </div>
-
-    <div class="table-section section-10 ml-md-2">
-      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Confidence') }}</div>
-      <div class="table-mobile-content text-capitalize">{{ confidence }}</div>
     </div>
 
     <div class="table-section section-20">
