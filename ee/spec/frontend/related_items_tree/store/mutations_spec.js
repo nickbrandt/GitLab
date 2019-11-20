@@ -410,6 +410,16 @@ describe('RelatedItemsTree', () => {
             expect.arrayContaining(['foo'].concat(reference)),
           );
         });
+
+        it('should not add duplicated `references` param to `pendingReferences` within state', () => {
+          const references = ['foo', 'bar'];
+
+          state.pendingReferences = ['foo'];
+
+          mutations[types.ADD_PENDING_REFERENCES](state, references);
+
+          expect(state.pendingReferences).toEqual(['foo', 'bar']);
+        });
       });
 
       describe(types.REMOVE_PENDING_REFERENCE, () => {
