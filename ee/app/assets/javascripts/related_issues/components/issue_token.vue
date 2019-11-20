@@ -15,7 +15,13 @@ export default {
   computed: {
     removeButtonLabel() {
       const { displayReference } = this;
-      return sprintf(__('Remove %{displayReference}'), { displayReference });
+      /*
+       * Giving false as third argument to prevent unescaping of ampersand in
+       * epic reference. Eg. &42 will remain &42 instead of &amp;42
+       *
+       * https://docs.gitlab.com/ee/development/i18n/externalization.html#interpolation
+       */
+      return sprintf(__('Remove %{displayReference}'), { displayReference }, false);
     },
     stateTitle() {
       if (this.isCondensed) return '';

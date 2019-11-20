@@ -30,7 +30,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['toggleAddItemForm', 'toggleCreateEpicForm']),
+    ...mapActions(['toggleAddItemForm', 'toggleCreateEpicForm', 'setItemInputValue']),
     showAddEpicForm() {
       this.toggleAddItemForm({
         issuableType: issuableTypesMap.EPIC,
@@ -38,6 +38,7 @@ export default {
       });
     },
     showAddIssueForm() {
+      this.setItemInputValue('');
       this.toggleAddItemForm({
         issuableType: issuableTypesMap.ISSUE,
         toggleState: true,
@@ -69,7 +70,7 @@ export default {
         </span>
       </div>
     </div>
-    <div class="d-inline-flex">
+    <div class="d-inline-flex js-button-container">
       <template v-if="parentItem.userPermissions.adminEpic">
         <epic-actions-split-button
           :class="headerItems[0].qaClass"
