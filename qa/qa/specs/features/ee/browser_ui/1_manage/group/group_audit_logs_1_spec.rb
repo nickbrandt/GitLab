@@ -86,13 +86,13 @@ module QA
           project.visit!
 
           Page::Project::Menu.perform(&:go_to_members_settings)
-          Page::Project::Settings::Members.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
-            page.invite_group(@group.path)
+          Page::Project::Settings::Members.perform do |members|
+            members.invite_group(@group.path)
           end
 
           Page::Project::Menu.perform(&:go_to_members_settings)
-          Page::Project::Settings::Members.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
-            page.remove_group(@group.path)
+          Page::Project::Settings::Members.perform do |members|
+            members.remove_group(@group.path)
           end
 
           @group.visit!
