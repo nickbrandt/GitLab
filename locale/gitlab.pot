@@ -4560,6 +4560,9 @@ msgstr ""
 msgid "ContainerRegistry|If you are not already logged in, you need to authenticate to the Container Registry by using your GitLab username and password. If you have %{twofaDocLinkStart}Two-Factor Authentication%{twofaDocLinkEnd} enabled, use a %{personalAccessTokensDocLinkStart}Personal Access Token%{personalAccessTokensDocLinkEnd} instead of a password."
 msgstr ""
 
+msgid "ContainerRegistry|Image ID"
+msgstr ""
+
 msgid "ContainerRegistry|Last Updated"
 msgstr ""
 
@@ -4581,9 +4584,6 @@ msgid "ContainerRegistry|Size"
 msgstr ""
 
 msgid "ContainerRegistry|Tag"
-msgstr ""
-
-msgid "ContainerRegistry|Tag ID"
 msgstr ""
 
 msgid "ContainerRegistry|The last tag related to this image was recently removed. This empty image and any associated data will be automatically removed as part of the regular Garbage Collection process. If you have any questions, contact your administrator."
