@@ -93,12 +93,8 @@ export const transformScatterData = (data, startDate, endDate) => {
 
   Object.keys(data).forEach(id => {
     const mergedAtDate = new Date(data[id].merged_at);
-    const d = new Date();
-    d.setDate(mergedAtDate.getDate());
-    d.setMonth(mergedAtDate.getMonth());
-    d.setFullYear(mergedAtDate.getFullYear());
+    const dayDiff = getDayDifference(mergedAtDate, endDate);
 
-    const dayDiff = getDayDifference(d, endDate);
     if (dayDiff > -1) {
       const idx = totalItems - (dayDiff + 1);
       result[idx].push(data[id]);
