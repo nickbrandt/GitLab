@@ -1,0 +1,6 @@
+---
+title: Geo - Improve query performance to determine job artifacts to sync when selective
+  sync is enabled
+merge_request: 19583
+author:
+type: performance
