@@ -8911,7 +8911,7 @@ msgstr ""
 msgid "GroupSettings|This setting will override user notification preferences for all members of the group, subgroups, and projects."
 msgstr ""
 
-msgid "GroupSettings|This setting will prevent group members from getting notified if the group is mentioned."
+msgid "GroupSettings|This setting will prevent group members from being notified if the group is mentioned."
 msgstr ""
 
 msgid "GroupSettings|Transfer group"

@@ -436,11 +436,11 @@ To enable this feature:
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/21301) in GitLab 12.6.
 
 You can prevent users from being added to a conversation and getting notified when
-one mentions a group in which those users are members.
+anyone mentions a group in which those users are members.
 
-Groups with disabled mentions are visualised accordingly in the auto-completion menu.
+Groups with disabled mentions are visualized accordingly in the autocompletion dropdown.
 
-This is particularly helpful, if a group has large amount of users.
+This is particularly helpful for groups with a large number of users.
 
 To enable this feature:
 

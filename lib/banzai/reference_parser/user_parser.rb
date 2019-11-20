@@ -98,7 +98,7 @@ module Banzai
         return [] if ids.empty?
 
         User.joins(:group_members).where(members: {
-          source_id: Namespace.where(id: ids, mentions_disabled: [false, nil]).select(:id)
+          source_id: Namespace.where(id: ids).where('mentions_disabled IS NOT TRUE').select(:id)
         }).to_a
       end
 

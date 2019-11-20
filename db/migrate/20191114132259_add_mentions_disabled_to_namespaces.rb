@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class AddMentionsDisabledToNamespaces < ActiveRecord::Migration[5.2]
-  include Gitlab::Database::MigrationHelpers
-
   DOWNTIME = false
 
   def change
