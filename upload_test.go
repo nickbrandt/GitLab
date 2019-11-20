@@ -328,5 +328,12 @@ func testPackageFileUpload(t *testing.T, resource string) {
 }
 
 func TestPackageFilesUpload(t *testing.T) {
-	testPackageFileUpload(t, `/api/v4/packages/conan/v1/files`)
+	routes := []string{
+		"/api/v4/packages/conan/v1/files",
+		"/api/v4/projects/9001/packages/nuget/v1/files",
+	}
+
+	for _, r := range routes {
+		testPackageFileUpload(t, r)
+	}
 }
