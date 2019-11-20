@@ -33,6 +33,16 @@ module Epics
       @new_entity = Epics::CreateService.new(@group, current_user, params).execute
     end
 
+    def update_old_entity
+      super
+
+      mark_as_promoted
+    end
+
+    def mark_as_promoted
+      original_entity.update(promoted_to_epic: new_entity)
+    end
+
     def params
       {
         title: original_entity.title

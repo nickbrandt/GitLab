@@ -115,6 +115,7 @@ describe Issue do
     it { is_expected.to have_many(:prometheus_alerts) }
     it { is_expected.to have_many(:vulnerability_links).class_name('Vulnerabilities::IssueLink').inverse_of(:issue) }
     it { is_expected.to have_many(:related_vulnerabilities).through(:vulnerability_links).source(:vulnerability) }
+    it { is_expected.to belong_to(:promoted_to_epic).class_name('Epic') }
 
     describe 'versions.most_recent' do
       it 'returns the most recent version' do
@@ -253,6 +254,22 @@ describe Issue do
       end
 
       it { is_expected.to eq(expected) }
+    end
+  end
+
+  describe '#promoted?' do
+    let(:issue) { create(:issue) }
+    subject { issue.promoted? }
+
+    context 'issue not promoted' do
+      it { is_expected.to be_falsey }
+    end
+
+    context 'issue promoted' do
+      let(:promoted_to_epic) { create(:epic) }
+      let(:issue) { create(:issue, promoted_to_epic: promoted_to_epic) }
+
+      it { is_expected.to be_truthy }
     end
   end
 
