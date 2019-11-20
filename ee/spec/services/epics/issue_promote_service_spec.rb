@@ -83,6 +83,11 @@ describe Epics::IssuePromoteService do
           it 'closes the original issue' do
             expect(issue).to be_closed
           end
+
+          it 'marks the old issue as promoted' do
+            expect(issue).to be_promoted
+            expect(issue.promoted_to_epic).to eq(epic)
+          end
         end
 
         context 'when promoted issue has notes' do
