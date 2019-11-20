@@ -1,0 +1,27 @@
+.row.prepend-top-default.append-bottom-default
+  .col-lg-12
+    = form_for project_subscriptions_path(@project), method: :post, authenticity_token: true do |f|
+      %fieldset
+        .form-group
+          = f.label :upstream_project_id do
+            = _("Project path")
+          = f.text_field :upstream_project_id, class: "form-control"
+        = f.submit _('Subscribe'), class: "btn btn-success float-right"
+
+.row.prepend-top-default.append-bottom-default
+  .col-lg-12
+    %h5
+      = _("Subscriptions")
+      %span.badge.badge-pill
+        = @project.upstream_projects.count + @project.downstream_projects.count
+
+    %table.table.prepend-top-default
+      %thead
+        %tr
+          %th= _("Project")
+          %th= _("Author")
+      %tbody
+        - @project.upstream_projects.each do |project|
+          = render 'projects/settings/subscriptions/project', project: project
+        - @project.downstream_projects.each do |project|
+          = render 'projects/settings/subscriptions/project', project: project
