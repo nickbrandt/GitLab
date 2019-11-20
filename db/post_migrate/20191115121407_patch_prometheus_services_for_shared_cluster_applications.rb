@@ -12,8 +12,14 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
 
   disable_ddl_transaction!
 
+  class Project < ActiveRecord::Base
+    self.table_name = 'projects'
+
+    include ::EachBatch
+  end
+
   def up
-    queue_background_migration_jobs_by_range_at_intervals(Project.without_deleted,
+    queue_background_migration_jobs_by_range_at_intervals(Project.where(pending_delete: false),
                                                           MIGRATION,
                                                           2.minutes,
                                                           batch_size: BATCH_SIZE)
