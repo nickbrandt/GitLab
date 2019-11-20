@@ -481,32 +481,6 @@ describe Groups::ClustersController do
     end
   end
 
-  describe 'DELETE revoke AWS role for EKS cluster' do
-    let!(:role) { create(:aws_role, user: user) }
-
-    def go
-      delete :revoke_aws_role, params: { group_id: group }
-    end
-
-    it 'deletes the Aws::Role record' do
-      expect { go }.to change { Aws::Role.count }
-
-      expect(response.status).to eq 204
-      expect(user.reload_aws_role).to be_nil
-    end
-
-    describe 'security' do
-      it { expect { go }.to be_allowed_for(:admin) }
-      it { expect { go }.to be_allowed_for(:owner).of(group) }
-      it { expect { go }.to be_allowed_for(:maintainer).of(group) }
-      it { expect { go }.to be_denied_for(:developer).of(group) }
-      it { expect { go }.to be_denied_for(:reporter).of(group) }
-      it { expect { go }.to be_denied_for(:guest).of(group) }
-      it { expect { go }.to be_denied_for(:user) }
-      it { expect { go }.to be_denied_for(:external) }
-    end
-  end
-
   describe 'DELETE clear cluster cache' do
     let(:cluster) { create(:cluster, :group, groups: [group]) }
     let!(:kubernetes_namespace) do

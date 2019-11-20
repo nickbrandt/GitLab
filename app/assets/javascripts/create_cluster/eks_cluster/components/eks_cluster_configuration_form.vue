@@ -314,11 +314,6 @@ export default {
       {{ s__('ClusterIntegration|Enter the details for your Amazon EKS Kubernetes cluster') }}
     </h2>
     <div class="mb-3" v-html="kubernetesIntegrationHelpText"></div>
-    <div class="mb-3">
-      <button class="btn btn-link js-sign-out" @click.prevent="signOut()">
-        {{ s__('ClusterIntegration|Select a different AWS role') }}
-      </button>
-    </div>
     <div class="form-group">
       <label class="label-bold" for="eks-cluster-name">{{
         s__('ClusterIntegration|Kubernetes cluster name')

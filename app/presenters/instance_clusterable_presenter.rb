@@ -67,11 +67,6 @@ class InstanceClusterablePresenter < ClusterablePresenter
     authorize_aws_role_admin_clusters_path
   end
 
-  override :revoke_aws_role_path
-  def revoke_aws_role_path
-    revoke_aws_role_admin_clusters_path
-  end
-
   override :empty_state_help_text
   def empty_state_help_text
     s_('ClusterIntegration|Adding an integration will share the cluster across all projects.')

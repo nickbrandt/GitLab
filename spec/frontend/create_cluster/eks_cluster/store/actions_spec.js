@@ -21,7 +21,6 @@ import {
   CREATE_ROLE_ERROR,
   REQUEST_CREATE_CLUSTER,
   CREATE_CLUSTER_ERROR,
-  SIGN_OUT,
 } from '~/create_cluster/eks_cluster/store/mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
@@ -279,16 +278,6 @@ describe('EKS Cluster Store Actions', () => {
 
     it('creates a flash that displays the create cluster error', () => {
       expect(createFlash).toHaveBeenCalledWith(payload.name[0]);
-    });
-  });
-
-  describe('signOut', () => {
-    beforeEach(() => {
-      mock.onDelete(state.signOutPath).reply(200, null);
-    });
-
-    it('commits signOut mutation', () => {
-      testAction(actions.signOut, null, state, [{ type: SIGN_OUT }]);
     });
   });
 });

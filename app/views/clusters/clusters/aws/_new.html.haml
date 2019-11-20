@@ -5,7 +5,6 @@
 - else
   .js-create-eks-cluster-form-container{ data: { 'gitlab-managed-cluster-help-path' => help_page_path('user/project/clusters/index.md', anchor: 'gitlab-managed-clusters'),
     'create-role-path' => clusterable.authorize_aws_role_path,
-    'sign-out-path' => clusterable.revoke_aws_role_path,
     'create-cluster-path' => clusterable.create_aws_clusters_path,
     'account-id' => Gitlab::CurrentSettings.eks_account_id,
     'external-id' => @aws_role.role_external_id,

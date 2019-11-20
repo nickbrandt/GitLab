@@ -414,27 +414,6 @@ describe Admin::ClustersController do
     end
   end
 
-  describe 'DELETE revoke AWS role for EKS cluster' do
-    let!(:role) { create(:aws_role, user: admin) }
-
-    def go
-      delete :revoke_aws_role
-    end
-
-    it 'deletes the Aws::Role record' do
-      expect { go }.to change { Aws::Role.count }
-
-      expect(response.status).to eq 204
-      expect(admin.reload_aws_role).to be_nil
-    end
-
-    describe 'security' do
-      it { expect { go }.to be_allowed_for(:admin) }
-      it { expect { go }.to be_denied_for(:user) }
-      it { expect { go }.to be_denied_for(:external) }
-    end
-  end
-
   describe 'DELETE clear cluster cache' do
     let(:cluster) { create(:cluster, :instance) }
     let!(:kubernetes_namespace) do

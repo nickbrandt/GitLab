@@ -117,9 +117,3 @@ export const setInstanceType = ({ commit }, payload) => {
 export const setNodeCount = ({ commit }, payload) => {
   commit(types.SET_NODE_COUNT, payload);
 };
-
-export const signOut = ({ commit, state: { signOutPath } }) =>
-  axios
-    .delete(signOutPath)
-    .then(() => commit(types.SIGN_OUT))
-    .catch(({ response: { data } }) => createFlash(getErrorMessage(data)));

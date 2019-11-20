@@ -8,7 +8,7 @@ class Clusters::ClustersController < Clusters::BaseController
   before_action :validate_gcp_token, only: [:new]
   before_action :gcp_cluster, only: [:new]
   before_action :user_cluster, only: [:new]
-  before_action :authorize_create_cluster!, only: [:new, :authorize_aws_role, :revoke_aws_role]
+  before_action :authorize_create_cluster!, only: [:new, :authorize_aws_role]
   before_action :authorize_update_cluster!, only: [:update]
   before_action :authorize_admin_cluster!, only: [:destroy, :clear_cache]
   before_action :update_applications_status, only: [:cluster_status]
@@ -152,12 +152,6 @@ class Clusters::ClustersController < Clusters::BaseController
     ).execute
 
     render json: response.body, status: response.status
-  end
-
-  def revoke_aws_role
-    current_user.aws_role&.destroy
-
-    head :no_content
   end
 
   def clear_cache
