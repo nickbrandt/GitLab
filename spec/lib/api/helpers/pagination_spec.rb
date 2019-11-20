@@ -31,13 +31,25 @@ describe API::Helpers::Pagination do
       let(:params) { { pagination: 'keyset' } }
       let(:request_context) { double('request context') }
 
+      before do
+        allow(Gitlab::Pagination::Keyset::RequestContext).to receive(:new).with(subject).and_return(request_context)
+        allow(Gitlab::Pagination::Keyset).to receive(:available?).and_return(true)
+      end
+
       it 'delegates to KeysetPagination' do
-        expect(Gitlab::Pagination::Keyset::RequestContext).to receive(:new).with(subject).and_return(request_context)
         expect(Gitlab::Pagination::Keyset).to receive(:paginate).with(request_context, relation).and_return(expected_result)
 
         result = subject.paginate(relation)
 
         expect(result).to eq(expected_result)
+      end
+
+      it 'renders a 501 error if keyset pagination isnt available yet' do
+        expect(Gitlab::Pagination::Keyset).to receive(:available?).with(request_context, relation).and_return(false)
+        expect(Gitlab::Pagination::Keyset).not_to receive(:paginate)
+        expect(subject).to receive(:error!).with(/not yet available/, 501)
+
+        subject.paginate(relation)
       end
     end
   end
