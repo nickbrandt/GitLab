@@ -48,7 +48,7 @@ module Ci
     private
 
     def enabled?
-      Feature.enabled?(:depend_on_persistent_pipeline_ref, project)
+      Feature.enabled?(:depend_on_persistent_pipeline_ref, project, default_enabled: true)
     end
   end
 end
