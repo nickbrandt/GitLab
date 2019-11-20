@@ -42,6 +42,7 @@ class Clusters::ClustersController < Clusters::BaseController
     if params[:provider] == 'aws'
       @aws_role = current_user.aws_role || Aws::Role.new
       @aws_role.ensure_role_external_id!
+      @instance_types = load_instance_types.to_json
 
     elsif params[:provider] == 'gcp'
       redirect_to @authorize_url if @authorize_url && !@valid_gcp_token
@@ -306,6 +307,19 @@ class Clusters::ClustersController < Clusters::BaseController
     GoogleApi::CloudPlatform::Client.new_session_key_for_redirect_uri do |key|
       session[key] = uri
     end
+  end
+
+  ##
+  # Unfortunately the EC2 API doesn't provide a list of
+  # possible instance types. There is a workaround, using
+  # the Pricing API, but instead of requiring the
+  # user to grant extra permissions for this we use the
+  # values that validate the CloudFormation template.
+  def load_instance_types
+    stack_template = File.read(Rails.root.join('vendor', 'aws', 'cloudformation', 'eks_cluster.yaml'))
+    instance_types = YAML.safe_load(stack_template).dig('Parameters', 'NodeInstanceType', 'AllowedValues')
+
+    instance_types.map { |type| Hash(name: type, value: type) }
   end
 
   def update_applications_status
