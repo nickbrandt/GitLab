@@ -222,7 +222,7 @@ describe Gitlab::Graphql::Connections::Keyset::Connection do
       let(:arguments) { { before: Base64Bp.urlsafe_encode64('invalidcursor', padding: false) } }
 
       it 'raises an error' do
-        expect { expect(subject.sliced_nodes) }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
+        expect { subject.sliced_nodes }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
       end
     end
   end
