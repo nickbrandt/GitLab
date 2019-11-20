@@ -154,7 +154,7 @@ describe Gitlab::UsageData do
         issues
         issues_with_associated_zoom_link
         issues_using_zoom_quick_actions
-        issues_with_embeded_grafana_charts
+        issues_with_embeded_grafana_charts_aprox
         keys
         label_lists
         labels
@@ -214,7 +214,7 @@ describe Gitlab::UsageData do
       expect(count_data[:projects_with_error_tracking_enabled]).to eq(1)
       expect(count_data[:issues_with_associated_zoom_link]).to eq(2)
       expect(count_data[:issues_using_zoom_quick_actions]).to eq(3)
-      expect(count_data[:issues_with_embeded_grafana_charts]).to eq(2)
+      expect(count_data[:issues_with_embeded_grafana_charts_aprox]).to eq(2)
 
       expect(count_data[:clusters_enabled]).to eq(4)
       expect(count_data[:project_clusters_enabled]).to eq(3)

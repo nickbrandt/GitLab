@@ -4,12 +4,12 @@ module Gitlab
   class GrafanaEmbedUsageData
     class << self
       def issue_count
-        count = 0
-        Issue.select(:id).with_project_grafana_integration.grafana_embedded.each_batch do |issue_batch|
-          count += issue_batch.count
-        end
-
-        count
+        # rubocop:disable CodeReuse/ActiveRecord
+        Issue.joins(project: :grafana_integration)
+          .merge(Project.with_grafana_integration_enabled)
+          .where("issues.description LIKE '%' || grafana_integrations.grafana_url || '%'")
+          .count
+        # rubocop:enable CodeReuse/ActiveRecord
       end
     end
   end

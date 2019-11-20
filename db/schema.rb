@@ -1888,6 +1888,7 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
     t.string "encrypted_token_iv", limit: 255, null: false
     t.string "grafana_url", limit: 1024, null: false
     t.boolean "enabled", default: false, null: false
+    t.index ["enabled"], name: "index_grafana_integrations_on_enabled", where: "(enabled IS TRUE)"
     t.index ["project_id"], name: "index_grafana_integrations_on_project_id"
   end
 
