@@ -1,13 +1,12 @@
 <script>
-import { GlLink, GlPopover } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlLink, GlPopover, GlIcon } from '@gitlab/ui';
 
 export default {
   name: 'ApprovalCheckPopover',
   components: {
     GlLink,
     GlPopover,
-    Icon,
+    GlIcon,
   },
   props: {
     documentationLink: {
@@ -35,10 +34,10 @@ export default {
 
 <template>
   <span class="vertical-align-middle text-muted js-help">
-    <icon
+    <gl-icon
       ref="reportInfo"
       name="question"
-      css-classes="text-info"
+      class="text-info"
       :aria-label="__('help')"
       :size="14"
     />
@@ -51,7 +50,7 @@ export default {
       <div class="mb-2">{{ text }}</div>
       <gl-link v-if="documentationLink" target="_blank" :href="documentationLink">
         <span class="vertical-align-middle">{{ documentationText }}</span>
-        <icon name="external-link" class="vertical-align-middle" />
+        <gl-icon name="external-link" class="vertical-align-middle" />
       </gl-link>
     </gl-popover>
   </span>
