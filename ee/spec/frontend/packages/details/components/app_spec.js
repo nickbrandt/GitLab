@@ -26,6 +26,8 @@ describe('PackagesApp', () => {
 
     wrapper = mount(PackagesApp, {
       propsData,
+      sync: false,
+      attachToDocument: true,
     });
   }
 
