@@ -27,7 +27,6 @@ describe('EksClusterConfigurationForm', () => {
   let subnetsActions;
   let keyPairsActions;
   let securityGroupsActions;
-  let instanceTypesActions;
   let vm;
 
   beforeEach(() => {
@@ -64,9 +63,6 @@ describe('EksClusterConfigurationForm', () => {
       fetchItems: jest.fn(),
     };
     securityGroupsActions = {
-      fetchItems: jest.fn(),
-    };
-    instanceTypesActions = {
       fetchItems: jest.fn(),
     };
     rolesState = {
@@ -127,7 +123,6 @@ describe('EksClusterConfigurationForm', () => {
         instanceTypes: {
           namespaced: true,
           state: instanceTypesState,
-          actions: instanceTypesActions,
         },
       },
     });
@@ -186,10 +181,6 @@ describe('EksClusterConfigurationForm', () => {
 
     it('fetches available roles', () => {
       expect(rolesActions.fetchItems).toHaveBeenCalled();
-    });
-
-    it('fetches available instance types', () => {
-      expect(instanceTypesActions.fetchItems).toHaveBeenCalled();
     });
   });
 

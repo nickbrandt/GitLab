@@ -48,7 +48,7 @@ const createStore = ({ initialState }) =>
       },
       instanceTypes: {
         namespaced: true,
-        ...clusterDropdownStore({ initialState: initialState.instanceTypes }),
+        ...clusterDropdownStore({ initialState: { items: initialState.instanceTypes } }),
       },
     },
   });

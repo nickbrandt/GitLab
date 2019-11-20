@@ -24,7 +24,6 @@ const {
 } = createNamespacedHelpers('securityGroups');
 const {
   mapState: mapInstanceTypesState,
-  mapActions: mapInstanceTypesActions,
 } = createNamespacedHelpers('instanceTypes');
 
 export default {
@@ -265,7 +264,6 @@ export default {
   mounted() {
     this.fetchRegions();
     this.fetchRoles();
-    this.fetchInstanceTypes();
   },
   methods: {
     ...mapActions([

@@ -23,7 +23,6 @@ export default el => {
     createClusterPath,
     signOutPath,
     externalLinkIcon,
-    getInstanceTypesPath,
   } = el.dataset;
 
   return new Vue({
@@ -37,9 +36,6 @@ export default el => {
         createRolePath,
         createClusterPath,
         signOutPath,
-      },
-      apiPaths: {
-        getInstanceTypesPath,
       },
       awsCredentials: {
         accessKeyId,
