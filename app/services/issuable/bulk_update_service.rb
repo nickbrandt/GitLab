@@ -15,7 +15,7 @@ module Issuable
       update_class = type.classify.pluralize.constantize::UpdateService
 
       ids = params.delete(:issuable_ids).split(",")
-      items = find_issuables(model_class, ids, parent)
+      items = find_issuables(parent, model_class, ids)
 
       permitted_attrs(type).each do |key|
         params.delete(key) unless params[key].present?
@@ -49,27 +49,14 @@ module Issuable
       end
     end
 
-    def valid_parent?(type, issuing_parent, parent)
-      return true unless parent.class.name == 'Group'
-
-      issuing_parents =
-        if type == "issue" || type == "merge_request"
-          issuing_parent&.group&.self_and_descendants
-        else
-          issuing_parent&.self_and_descendants
-        end
-
-      issuing_parents.include?(parent)
-    end
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def find_issuables(model_class, ids, parent)
+    def find_issuables(parent, model_class, ids)
       if parent.is_a?(Project)
-        model_class.where(id: ids).where(project_id: parent)
+        model_class.id_in(ids).of_projects(parent)
       elsif parent.is_a?(Group)
-        model_class.where(id: ids).where(project_id: parent.all_projects)
+        model_class.id_in(ids).of_projects(parent.all_projects)
       end
     end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
+
+Issuable::BulkUpdateService.prepend_if_ee('EE::Issuable::BulkUpdateService')

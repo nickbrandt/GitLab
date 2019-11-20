@@ -33,10 +33,8 @@ describe Issuable::BulkUpdateService do
 
       context 'when epics are enabled' do
         it 'updates epic labels' do
-          result = subject
-
-          expect(result[:success]).to be_truthy
-          expect(result[:count]).to eq(issuables.count)
+          expect(subject[:success]).to be_truthy
+          expect(subject[:count]).to eq(issuables.count)
 
           issuables.each do |issuable|
             expect(issuable.reload.labels).to eq([label2, label3])
@@ -57,18 +55,17 @@ describe Issuable::BulkUpdateService do
       end
 
       context 'when issuable_ids contain external epics' do
-        it 'updates epics that belong to the parent group or descendants' do
-          epic3 = create(:epic, labels: [label1])
-          epic4 = create(:epic, group: create(:group, parent: group), labels: [label1])
-          params = { issuable_ids: [epic1.id, epic3.id, epic4.id], add_label_ids: [label3.id] }
-          result = described_class.new(group, user, params).execute('epic')
+        let(:epic3) { create(:epic, group: create(:group, parent: group), labels: [label1]) }
+        let(:outer_epic) { create(:epic, labels: [label1]) }
+        let(:params) { { issuable_ids: [epic1.id, epic3.id, outer_epic.id], add_label_ids: [label3.id] } }
 
-          expect(result[:success]).to be_truthy
-          expect(result[:count]).to eq(2)
+        it 'updates epics that belong to the parent group or descendants' do
+          expect(subject[:success]).to be_truthy
+          expect(subject[:count]).to eq(2)
 
           expect(epic1.reload.labels).to eq([label1, label3])
-          expect(epic3.reload.labels).to eq([label1])
-          expect(epic4.reload.labels).to eq([label1, label3])
+          expect(epic3.reload.labels).to eq([label1, label3])
+          expect(outer_epic.reload.labels).to eq([label1])
         end
       end
     end

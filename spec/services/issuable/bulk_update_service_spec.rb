@@ -338,8 +338,8 @@ describe Issuable::BulkUpdateService do
       end
     end
 
-    describe 'updating issuables from external project' do
-      it 'updates issuables that belong to the parent project' do
+    describe 'updating issues from external project' do
+      it 'updates only issues that belong to the parent project' do
         issue1 = create(:issue, project: project)
         issue2 = create(:issue, project: create(:project))
         result = bulk_update([issue1, issue2], assignee_ids: [user.id])
@@ -395,8 +395,8 @@ describe Issuable::BulkUpdateService do
       it_behaves_like 'updating labels'
     end
 
-    describe 'updating issuables from external group' do
-      it 'updates issuables that belong to the parent group or descendants' do
+    describe 'with issues from external group' do
+      it 'updates issues that belong to the parent group or descendants' do
         issue1 = create(:issue, project: create(:project, group: group))
         issue2 = create(:issue, project: create(:project, group: create(:group)))
         issue3 = create(:issue, project: create(:project, group: create(:group, parent: group)))
