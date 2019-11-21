@@ -1,11 +1,12 @@
 <script>
-import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlAvatar, GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import allVersionsMixin from '../../mixins/all_versions';
 import { findVersionId } from '../../utils/design_management_utils';
 
 export default {
   components: {
+    GlAvatar,
     GlDropdown,
     GlDropdownItem,
   },
@@ -51,12 +52,23 @@ export default {
 
 <template>
   <gl-dropdown :text="dropdownText" variant="link" class="design-version-dropdown">
-    <gl-dropdown-item v-for="(version, index) in allVersions" :key="version.node.id">
+    <gl-dropdown-item
+      v-for="(version, index) in allVersions"
+      :key="version.node.id"
+      class="border-top"
+      :class="{ 'bg-light': getVersionId(version.node.id) === currentVersion }"
+    >
       <router-link
-        class="d-flex js-version-link"
-        :to="{ path: $route.path, query: { version: findVersionId(version.node.id) } }"
+        class="d-flex js-version-link px-0"
+        :to="{ path: $route.path, query: { version: getVersionId(version.node.id) } }"
       >
-        <div class="flex-grow-1 ml-2">
+        <div class="flex-shrink-0">
+          <gl-avatar
+            src="https://about.gitlab.com/images/press/gitlab-summit-south-africa.jpg"
+            :size="32"
+          />
+        </div>
+        <div class="flex-grow-1 mx-2">
           <div>
             <strong
               >{{ __('Version') }} {{ allVersions.length - index }}
@@ -64,11 +76,16 @@ export default {
                 >({{ __('latest') }})</span
               >
             </strong>
+            <div class="text-muted mt-1">
+              <span>Adam Landers changed 1 screen and removed 2 screens</span>
+              <br />
+              <span>22 minutes ago</span>
+            </div>
           </div>
         </div>
         <i
-          v-if="findVersionId(version.node.id) === currentVersionId"
-          class="fa fa-check pull-right"
+          v-if="getVersionId(version.node.id) === currentVersion"
+          class="fa fa-check pull-right align-self-center"
         ></i>
       </router-link>
     </gl-dropdown-item>
