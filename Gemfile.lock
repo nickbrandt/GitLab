@@ -460,17 +460,16 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
-    haml (5.0.4)
+    haml (5.1.2)
       temple (>= 0.8.0)
       tilt
-    haml_lint (0.31.0)
-      haml (>= 4.0, < 5.1)
+    haml_lint (0.34.0)
+      haml (>= 4.0, < 5.2)
       rainbow
-      rake (>= 10, < 13)
       rubocop (>= 0.50.0)
       sysexits (~> 1.1)
-    hamlit (2.8.8)
-      temple (>= 0.8.0)
+    hamlit (2.10.0)
+      temple (>= 0.8.2)
       thor
       tilt
     hangouts-chat (0.0.5)
@@ -1017,7 +1016,7 @@ GEM
     sys-filesystem (1.1.6)
       ffi
     sysexits (1.2.0)
-    temple (0.8.1)
+    temple (0.8.2)
     terminal-table (1.8.0)
       unicode-display_width (~> 1.1, >= 1.1.1)
     test-prof (0.10.0)
@@ -1219,8 +1218,8 @@ DEPENDENCIES
   grpc (~> 1.24.0)
   gssapi
   guard-rspec
-  haml_lint (~> 0.31.0)
-  hamlit (~> 2.8.8)
+  haml_lint (~> 0.34.0)
+  hamlit (~> 2.10.0)
   hangouts-chat (~> 0.0.5)
   hashie-forbidden_attributes
   health_check (~> 2.6.0)
