@@ -92,8 +92,6 @@ export default {
       'fetchCycleAnalyticsData',
       'fetchStageData',
       'fetchGroupStagesAndEvents',
-      'setCycleAnalyticsDataEndpoint',
-      'setStageDataEndpoint',
       'setSelectedGroup',
       'setSelectedProjects',
       'setSelectedTimeframe',
@@ -106,7 +104,6 @@ export default {
       'fetchTasksByTypeData',
     ]),
     onGroupSelect(group) {
-      this.setCycleAnalyticsDataEndpoint(group.full_path);
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
     },
@@ -118,8 +115,7 @@ export default {
     onStageSelect(stage) {
       this.hideCustomStageForm();
       this.setSelectedStageId(stage.id);
-      this.setStageDataEndpoint(this.currentStage.slug);
-      this.fetchStageData(this.currentStage.name);
+      this.fetchStageData(this.currentStage.slug);
     },
     onShowAddStageForm() {
       this.showCustomStageForm();
