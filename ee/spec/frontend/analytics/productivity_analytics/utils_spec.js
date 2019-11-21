@@ -73,22 +73,23 @@ describe('Productivity Analytics utils', () => {
 
   describe('transformScatterData', () => {
     it('transforms the raw scatter data into a two-dimensional array and groups by date', () => {
-      const startDate = new Date('2019-08-01');
-      const endDate = new Date('2019-08-03');
+      const startDate = new Date('2019-10-29');
+      const endDate = new Date('2019-11-01');
       const data = {
-        1: { merged_at: '2019-08-01T11:10:00.000Z', metric: 10 },
-        2: { merged_at: '2019-08-01T12:11:00.000Z', metric: 20 },
-        3: { merged_at: '2019-08-02T13:13:00.000Z', metric: 30 },
-        4: { merged_at: '2019-08-03T14:14:00.000Z', metric: 40 },
+        1: { merged_at: '2019-10-29T11:10:00.000Z', metric: 10 },
+        2: { merged_at: '2019-10-29T12:11:00.000Z', metric: 20 },
+        3: { merged_at: '2019-10-30T13:13:00.000Z', metric: 30 },
+        4: { merged_at: '2019-10-31T01:23:15.231Z', metric: 40 },
       };
       const result = transformScatterData(data, startDate, endDate);
       const expected = [
         [
-          { merged_at: '2019-08-01T11:10:00.000Z', metric: 10 },
-          { merged_at: '2019-08-01T12:11:00.000Z', metric: 20 },
+          { merged_at: '2019-10-29T11:10:00.000Z', metric: 10 },
+          { merged_at: '2019-10-29T12:11:00.000Z', metric: 20 },
         ],
-        [{ merged_at: '2019-08-02T13:13:00.000Z', metric: 30 }],
-        [{ merged_at: '2019-08-03T14:14:00.000Z', metric: 40 }],
+        [{ merged_at: '2019-10-30T13:13:00.000Z', metric: 30 }],
+        [{ merged_at: '2019-10-31T01:23:15.231Z', metric: 40 }],
+        [],
       ];
       expect(result).toEqual(expected);
     });
