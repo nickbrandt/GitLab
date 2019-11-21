@@ -12,7 +12,6 @@ module Gitlab
         @backend          = backend
         @diff_collection  = diff_collection
         @redis_key        = "highlighted-diff-files:#{diffable.cache_key}"
-        @file_identifiers = @diff_collection.diff_files.collect(&:file_identifier)
       end
 
       # - Reads from cache
@@ -81,6 +80,10 @@ module Gitlab
 
       private
 
+      def file_identifiers
+        @file_identifiers ||= @diff_collection.diff_files.collect(&:file_identifier)
+      end
+
       def read_file(diff_file)
         cached_content[diff_file.file_identifier]
       end
@@ -93,14 +96,14 @@ module Gitlab
         results = []
 
         Redis::Cache.with do |redis|
-          results = redis.hmget(@redis_key, @file_identifiers)
+          results = redis.hmget(@redis_key, file_identifiers)
         end
 
         results.map! do |result|
           JSON.parse(result, symbolize_names: true) unless result.nil?
         end
 
-        @file_identifiers.zip(results).to_h
+        file_identifiers.zip(results).to_h
       end
 
       def cacheable?(diff_file)
