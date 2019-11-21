@@ -11,7 +11,7 @@ describe GitlabSchema.types['Epic'] do
       closed_at created_at updated_at children has_children has_issues
       web_path web_url relation_path reference issues user_permissions
       notes discussions relative_position subscribed participants
-      descendant_counts
+      descendant_counts upvotes downvotes
     ]
   end
 
