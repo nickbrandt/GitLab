@@ -5,7 +5,7 @@ module EE
     module ApplicationSettingsController
       extend ::Gitlab::Utils::Override
 
-      EE_VALID_SETTING_PANELS = %w(geo templates).freeze
+      EE_VALID_SETTING_PANELS = %w(templates).freeze
 
       EE_VALID_SETTING_PANELS.each do |action|
         define_method(action) { perform_update if submitted? }
@@ -43,6 +43,11 @@ module EE
         end
 
         attrs
+      end
+
+      def geo_redirection
+        redirect_to admin_geo_settings_url, notice: 'You were automatically redirected to <strong>Admin Area > Geo > Setting</strong><br /> '\
+                                                    'From GitLab 12.7 on, this will be the only place for Geo settings and <strong>Admin Area > Settings > Geo</strong> will be removed.'.html_safe
       end
 
       private
