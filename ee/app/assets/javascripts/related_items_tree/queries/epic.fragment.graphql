@@ -8,6 +8,12 @@ fragment BaseEpic on Epic {
     adminEpic
     createEpic
   }
+  descendantCounts {
+    openedEpics
+    closedEpics
+    openedIssues
+    closedIssues
+  }
 }
 
 fragment EpicNode on Epic {

@@ -28,6 +28,7 @@ const createComponent = ({ slots } = {}) => {
     isSubItem: false,
     children,
   });
+  store.dispatch('setChildrenCount', mockParentItem.descendantCounts);
 
   return shallowMount(RelatedItemsTreeHeader, {
     attachToDocument: true,

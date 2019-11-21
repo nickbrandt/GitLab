@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 import { GlButton, GlTooltipDirective } from '@gitlab/ui';
 
@@ -20,13 +20,18 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   computed: {
-    ...mapGetters(['headerItems']),
-    ...mapState(['parentItem']),
+    ...mapState(['parentItem', 'descendantCounts']),
     badgeTooltip() {
       return sprintf(s__('Epics|%{epicsCount} epics and %{issuesCount} issues'), {
-        epicsCount: this.headerItems[0].count,
-        issuesCount: this.headerItems[1].count,
+        epicsCount: this.totalEpicsCount,
+        issuesCount: this.totalIssuesCount,
       });
+    },
+    totalEpicsCount() {
+      return this.descendantCounts.openedEpics + this.descendantCounts.closedEpics;
+    },
+    totalIssuesCount() {
+      return this.descendantCounts.openedIssues + this.descendantCounts.closedIssues;
     },
   },
   methods: {
@@ -59,29 +64,27 @@ export default {
         class="issue-count-badge"
         :title="badgeTooltip"
       >
-        <span
-          v-for="(item, index) in headerItems"
-          :key="index"
-          :class="{ 'ml-2': index }"
-          class="d-inline-flex align-items-center"
-        >
-          <icon :size="16" :name="item.iconName" class="text-secondary mr-1" />
-          {{ item.count }}
+        <span class="d-inline-flex align-items-center">
+          <icon :size="16" name="epic" class="text-secondary mr-1" />
+          {{ totalEpicsCount }}
+        </span>
+        <span class="ml-2 d-inline-flex align-items-center">
+          <icon :size="16" name="issues" class="text-secondary mr-1" />
+          {{ totalIssuesCount }}
         </span>
       </div>
     </div>
     <div class="d-inline-flex js-button-container">
       <template v-if="parentItem.userPermissions.adminEpic">
         <epic-actions-split-button
-          :class="headerItems[0].qaClass"
+          class="qa-add-epics-button"
           @showAddEpicForm="showAddEpicForm"
           @showCreateEpicForm="showCreateEpicForm"
         />
 
         <slot name="issueActions">
           <gl-button
-            :class="headerItems[1].qaClass"
-            class="ml-1 js-add-issues-button"
+            class="ml-1 js-add-issues-button qa-add-issues-button"
             size="sm"
             @click="showAddIssueForm"
             >{{ __('Add an issue') }}</gl-button
