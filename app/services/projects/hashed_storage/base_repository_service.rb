@@ -61,3 +61,5 @@ module Projects
     end
   end
 end
+
+Projects::HashedStorage::BaseRepositoryService.prepend_if_ee('EE::Projects::HashedStorage::BaseRepositoryService')
