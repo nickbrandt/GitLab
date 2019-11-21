@@ -164,23 +164,29 @@ module Gitlab
           raise 'add_concurrent_foreign_key can not be run inside a transaction'
         end
 
+        options = {}
+        options[:on_delete] = on_delete
+
         if name
           key_name = name
-          foreign_key_exists = foreign_key_exists?(source, target, name: name)
+          options[:name] = name
         else
           key_name = concurrent_foreign_key_name(source, column)
-          foreign_key_exists = foreign_key_exists?(source, target, column: column)
+          options[:column] = column
         end
 
-        if foreign_key_exists
-          Rails.logger.warn "Foreign key not created because it exists already " \
+        if foreign_key_exists?(source, target, options)
+          warning_message = "Foreign key not created because it exists already " \
             "(this may be due to an aborted migration or similar): " \
-            "source: #{source}, target: #{target}, column: #{column}"
+            "source: #{source}, target: #{target}, column: #{column}, name: #{name}, on_delete: #{on_delete}"
+
+          Rails.logger.warn warning_message
         else
           # Using NOT VALID allows us to create a key without immediately
           # validating it. This means we keep the ALTER TABLE lock only for a
           # short period of time. The key _is_ enforced for any newly created
           # data.
+
           on_delete = 'SET NULL' if on_delete == :nullify
 
           execute <<-EOF.strip_heredoc
@@ -204,15 +210,10 @@ module Gitlab
       end
       # rubocop:enable Gitlab/RailsLogger
 
-      def foreign_key_exists?(source, target = nil, column: nil, name: nil)
-        foreign_keys(source).any? do |key|
-          if column
-            key.options[:column].to_s == column.to_s
-          elsif name
-            key.options[:name].to_s == name.to_s
-          else
-            key.to_table.to_s == target.to_s
-          end
+      def foreign_key_exists?(source, target = nil, **options)
+        foreign_keys(source).any? do |foreign_key|
+          (target.nil? || foreign_key.to_table.to_s == target.to_s) &&
+            options.all? { |k, v| foreign_key.options[k].to_s == v.to_s }
         end
       end
 

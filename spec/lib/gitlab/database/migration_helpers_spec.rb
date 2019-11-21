@@ -236,7 +236,7 @@ describe Gitlab::Database::MigrationHelpers do
         end
 
         it 'does not create a foreign key if it exists already' do
-          expect(model).to receive(:foreign_key_exists?).with(:projects, :users, column: :user_id).and_return(true)
+          expect(model).to receive(:foreign_key_exists?).with(:projects, :users, column: :user_id, on_delete: :cascade).and_return(true)
           expect(model).not_to receive(:execute).with(/ADD CONSTRAINT/)
           expect(model).to receive(:execute).with(/VALIDATE CONSTRAINT/)
 
@@ -260,7 +260,7 @@ describe Gitlab::Database::MigrationHelpers do
         context 'for creating a duplicate foreign key for a column that presently exists' do
           context 'when the supplied key name is the same as the existing foreign key name' do
             it 'does not create a new foreign key' do
-              expect(model).to receive(:foreign_key_exists?).with(:projects, :users, name: :foo).and_return(true)
+              expect(model).to receive(:foreign_key_exists?).with(:projects, :users, name: :foo, on_delete: :cascade).and_return(true)
 
               expect(model).not_to receive(:execute).with(/ADD CONSTRAINT/)
               expect(model).to receive(:execute).with(/VALIDATE CONSTRAINT/)
@@ -297,7 +297,7 @@ describe Gitlab::Database::MigrationHelpers do
 
   describe '#foreign_key_exists?' do
     before do
-      key = ActiveRecord::ConnectionAdapters::ForeignKeyDefinition.new(:projects, :users, { column: :non_standard_id, name: :fk_projects_users_non_standard_id })
+      key = ActiveRecord::ConnectionAdapters::ForeignKeyDefinition.new(:projects, :users, { column: :non_standard_id, name: :fk_projects_users_non_standard_id, on_delete: :cascade })
       allow(model).to receive(:foreign_keys).with(:projects).and_return([key])
     end
 
@@ -307,6 +307,14 @@ describe Gitlab::Database::MigrationHelpers do
 
     it 'finds existing foreign keys by name' do
       expect(model.foreign_key_exists?(:projects, :users, name: :fk_projects_users_non_standard_id)).to be_truthy
+    end
+
+    it 'finds existing foreign_keys by name and column' do
+      expect(model.foreign_key_exists?(:projects, :users, name: :fk_projects_users_non_standard_id, column: :non_standard_id)).to be_truthy
+    end
+
+    it 'finds existing foreign_keys by name, column and on_delete' do
+      expect(model.foreign_key_exists?(:projects, :users, name: :fk_projects_users_non_standard_id, column: :non_standard_id, on_delete: :cascade)).to be_truthy
     end
 
     it 'finds existing foreign keys by target table only' do
@@ -319,6 +327,14 @@ describe Gitlab::Database::MigrationHelpers do
 
     it 'compares by foreign key name if given' do
       expect(model.foreign_key_exists?(:projects, :users, name: :non_existent_foreign_key_name)).to be_falsey
+    end
+
+    it 'compares by foreign key name and column if given' do
+      expect(model.foreign_key_exists?(:projects, :users, name: :non_existent_foreign_key_name, column: :non_standard_id)).to be_falsey
+    end
+
+    it 'compares by foreign key name, column and on_delete if given' do
+      expect(model.foreign_key_exists?(:projects, :users, name: :fk_projects_users_non_standard_id, column: :non_standard_id, on_delete: :nullify)).to be_falsey
     end
 
     it 'compares by target if no column given' do
