@@ -1,5 +1,5 @@
 <script>
-import { GlAvatar, GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlAvatar, GlDropdown, GlDropdownItem, GlSprintf } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import allVersionsMixin from '../../mixins/all_versions';
@@ -9,6 +9,7 @@ export default {
   components: {
     GlAvatar,
     GlDropdown,
+    GlSprintf,
     GlDropdownItem,
     TimeAgoTooltip,
   },
@@ -76,7 +77,9 @@ export default {
               >
             </strong>
             <div class="text-muted mt-1">
-              <span>{{ version.node.author.name }} updated the designs</span>
+              <gl-sprintf :message="__('%{author} updated the designs')">
+                <template #author>{{ version.node.author.name }}</template>
+              </gl-sprintf>
               <br />
               <time-ago-tooltip :time="version.node.createdAt" tooltip-placement="bottom" />
             </div>
