@@ -216,7 +216,7 @@ describe NotesFinder do
   end
 
   describe '.search' do
-    let(:project) { create(:project, :public) }
+    let(:project) { create(:project, :public, :repository) }
     let(:note) { create(:note_on_issue, note: 'WoW', project: project) }
 
     it 'returns notes with matching content' do

@@ -158,6 +158,7 @@ class Note < ApplicationRecord
   after_save :keep_around_commit, if: :for_project_noteable?
   after_save :expire_etag_cache
   after_save :touch_noteable
+  after_save :store_mentions!, if: :any_mentionable_attributes_changed?
   after_destroy :expire_etag_cache
 
   class << self
@@ -500,11 +501,11 @@ class Note < ApplicationRecord
   end
 
   def user_mentions
-    noteable.user_mentions.where(note: self)
+    noteable&.user_mentions&.where(note: self)
   end
 
   def model_user_mention
-    user_mentions.first_or_initialize
+    user_mentions&.first_or_initialize
   end
 
   private

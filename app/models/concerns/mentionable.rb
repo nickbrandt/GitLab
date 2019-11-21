@@ -95,21 +95,29 @@ module Mentionable
     #
     # This line will get removed when we remove the feature flag.
     return true unless store_mentioned_users_to_db_enabled?
+    return true unless model_user_mention
 
     refs = all_references(self.author)
 
-    mention = model_user_mention
-    mention.mentioned_users_ids = refs.mentioned_users&.pluck(:id).presence
-    mention.mentioned_groups_ids = refs.mentioned_groups&.pluck(:id).presence
-    mention.mentioned_projects_ids = refs.mentioned_projects&.pluck(:id).presence
+    references = {}
+    references[:mentioned_users_ids] = refs.mentioned_users&.pluck(:id).presence
+    references[:mentioned_groups_ids] = refs.mentioned_groups&.pluck(:id).presence
+    references[:mentioned_projects_ids] = refs.mentioned_projects&.pluck(:id).presence
 
-    if mention.has_mentions?
-      mention.save!
-    elsif mention.persisted?
-      mention.destroy!
+    return self.class.safe_ensure_unique(retries: 1) do
+      user_mention = model_user_mention
+      user_mention.mentioned_users_ids = references[:mentioned_users_ids]
+      user_mention.mentioned_groups_ids = references[:mentioned_groups_ids]
+      user_mention.mentioned_projects_ids = references[:mentioned_projects_ids]
+
+      if user_mention.has_mentions?
+        user_mention.save!
+      elsif user_mention.persisted?
+        user_mention.destroy!
+      end
+
+      true
     end
-
-    true
   end
 
   def referenced_users
@@ -191,6 +199,10 @@ module Mentionable
     return if changes.empty?
 
     create_cross_references!(author)
+  end
+
+  def any_mentionable_attributes_changed?
+    (saved_changes.keys.map(&:to_sym) & self.class.mentionable_attrs.map(&:first).map(&:to_sym)).present?
   end
 
   private

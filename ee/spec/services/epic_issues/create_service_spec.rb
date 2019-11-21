@@ -123,6 +123,10 @@ describe EpicIssues::CreateService do
               # Extractor makes a permission check for each issue which messes up the query count check
               extractor = double
               allow(Gitlab::ReferenceExtractor).to receive(:new).and_return(extractor)
+              allow(extractor).to receive(:reset_memoized_values)
+              allow(extractor).to receive(:mentioned_users)
+              allow(extractor).to receive(:mentioned_projects)
+              allow(extractor).to receive(:mentioned_groups)
               allow(extractor).to receive(:analyze)
               allow(extractor).to receive(:issues).and_return([issue])
 

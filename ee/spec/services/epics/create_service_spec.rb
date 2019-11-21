@@ -40,4 +40,33 @@ describe Epics::CreateService do
       expect(epic.start_date_is_fixed).to be_truthy
     end
   end
+
+  context 'after_save callback to store_mentions' do
+    # let(:user2) { create(:user) }
+    # let(:epic) { create(:epic, group: group, description: "mentioning: #{user2.to_reference}") }
+    let(:labels) { create_pair(:group_label, group: group) }
+
+    context 'when mentionable attributes change' do
+      let(:params) { { title: 'Title', description: "Description with #{user.to_reference}" } }
+
+      it 'saves mentions' do
+        expect_next_instance_of(Epic) do |instance|
+          expect(instance).to receive(:store_mentions!).and_call_original
+        end
+        expect(subject.user_mentions.count).to eq 1
+      end
+    end
+
+    context 'when save fails' do
+      let(:params) { { title: '', label_ids: labels.map(&:id) } }
+
+      it 'does not call store_mentions' do
+        expect_next_instance_of(Epic) do |instance|
+          expect(instance).not_to receive(:store_mentions!).and_call_original
+        end
+        expect(subject.valid?).to be false
+        expect(subject.user_mentions.count).to eq 0
+      end
+    end
+  end
 end

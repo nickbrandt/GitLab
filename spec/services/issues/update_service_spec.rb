@@ -210,6 +210,47 @@ describe Issues::UpdateService, :mailer do
           expect(note.note).to eq 'locked this issue'
         end
       end
+
+      context 'after_save callback to store_mentions' do
+        let(:labels) { create_pair(:label, project: project) }
+        let(:milestone) { create(:milestone, project: project) }
+
+        context 'when mentionable attributes change' do
+          let(:opts) { { description: "Description with #{user.to_reference}" } }
+
+          it 'saves mentions' do
+            expect(issue).to receive(:store_mentions!).and_call_original
+
+            update_issue(opts)
+
+            expect(issue.referenced_users).to match_array([user])
+          end
+        end
+
+        context 'when mentionable attributes do not change' do
+          let(:opts) { { label_ids: labels.map(&:id), milestone_id: milestone.id } }
+
+          it 'does not call store_mentions' do
+            expect(issue).not_to receive(:store_mentions!).and_call_original
+
+            update_issue(opts)
+
+            expect(issue.referenced_users).to match_array([user2])
+          end
+        end
+
+        context 'when save fails' do
+          let(:opts) { { title: '', label_ids: labels.map(&:id), milestone_id: milestone.id } }
+
+          it 'does not call store_mentions' do
+            expect(issue).not_to receive(:store_mentions!).and_call_original
+
+            update_issue(opts)
+
+            expect(issue.valid?).to be false
+          end
+        end
+      end
     end
 
     context 'when description changed' do

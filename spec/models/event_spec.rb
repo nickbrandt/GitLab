@@ -148,7 +148,7 @@ describe Event do
   end
 
   describe '#visible_to_user?' do
-    let(:project) { create(:project, :public) }
+    let(:project) { create(:project, :public, :repository) }
     let(:non_member) { create(:user) }
     let(:member) { create(:user) }
     let(:guest) { create(:user) }
@@ -185,7 +185,7 @@ describe Event do
       end
 
       context 'private project' do
-        let(:project) { create(:project, :private) }
+        let(:project) { create(:project, :private, :repository) }
 
         it do
           aggregate_failures do

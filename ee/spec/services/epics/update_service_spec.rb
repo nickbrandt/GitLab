@@ -82,6 +82,48 @@ describe Epics::UpdateService do
       end
     end
 
+    context 'after_save callback to store_mentions' do
+      let(:user2) { create(:user) }
+      let(:epic) { create(:epic, group: group, description: "mentioning: #{user2.to_reference}") }
+      let(:labels) { create_pair(:group_label, group: group) }
+
+      context 'when mentionable attributes change' do
+        let(:opts) { { description: "Description with #{user.to_reference}" } }
+
+        it 'saves mentions' do
+          expect(epic).to receive(:store_mentions!).and_call_original
+
+          update_epic(opts)
+
+          expect(epic.referenced_users).to match_array([user])
+        end
+      end
+
+      context 'when mentionable attributes do not change' do
+        let(:opts) { { label_ids: labels.map(&:id) } }
+
+        it 'does not call store_mentions' do
+          expect(epic).not_to receive(:store_mentions!).and_call_original
+
+          update_epic(opts)
+
+          expect(epic.referenced_users).to match_array([user2])
+        end
+      end
+
+      context 'when save fails' do
+        let(:opts) { { title: '', label_ids: labels.map(&:id) } }
+
+        it 'does not call store_mentions' do
+          expect(epic).not_to receive(:store_mentions!).and_call_original
+
+          update_epic(opts)
+
+          expect(epic.valid?).to be false
+        end
+      end
+    end
+
     context 'todos' do
       before do
         group.update(visibility: Gitlab::VisibilityLevel::PUBLIC)
