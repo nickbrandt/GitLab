@@ -14,6 +14,7 @@ import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
 import { extractDiscussions, extractDesign } from '../../utils/design_management_utils';
+import { ADD_DISCUSSION_COMMENT_ERROR } from '../../utils/error_messages';
 
 export default {
   components: {
@@ -175,12 +176,13 @@ export default {
         })
         .then(() => {
           this.closeCommentForm();
-          this.isNoteSaving = false;
         })
         .catch(e => {
+          createFlash(ADD_DISCUSSION_COMMENT_ERROR);
+          throw new Error(e);
+        })
+        .finally(() => {
           this.isNoteSaving = false;
-          createFlash(s__('DesignManagement|Could not create new discussion, please try again.'));
-          throw e;
         });
     },
     openCommentForm(position) {
