@@ -101,6 +101,10 @@ describe('EKS Cluster Store Actions', () => {
       roleArn: 'role_arn',
       externalId: 'externalId',
     };
+    const response = {
+      accessKeyId: 'access-key-id',
+      secretAccessKey: 'secret-key-id',
+    };
 
     describe('when request succeeds', () => {
       beforeEach(() => {
@@ -109,7 +113,7 @@ describe('EKS Cluster Store Actions', () => {
             role_arn: payload.roleArn,
             role_external_id: payload.externalId,
           })
-          .reply(201);
+          .reply(201, response);
       });
 
       it('dispatches createRoleSuccess action', () =>
@@ -118,7 +122,7 @@ describe('EKS Cluster Store Actions', () => {
           payload,
           state,
           [],
-          [{ type: 'requestCreateRole' }, { type: 'createRoleSuccess' }],
+          [{ type: 'requestCreateRole' }, { type: 'createRoleSuccess', payload: response }],
         ));
     });
 

@@ -12,9 +12,6 @@ export default el => {
     kubernetesIntegrationHelpPath,
     accountAndExternalIdsHelpPath,
     createRoleArnHelpPath,
-    accessKeyId,
-    secretAccessKey,
-    sessionToken,
     externalId,
     accountId,
     instanceTypes,
@@ -38,11 +35,6 @@ export default el => {
         createClusterPath,
         signOutPath,
         roleArn,
-      },
-      awsCredentials: {
-        accessKeyId,
-        secretAccessKey,
-        sessionToken,
       },
     }),
     components: {
