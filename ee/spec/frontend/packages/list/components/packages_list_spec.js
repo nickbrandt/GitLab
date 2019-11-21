@@ -8,13 +8,13 @@ import { packageList } from '../../mock_data';
 describe('packages_list', () => {
   let wrapper;
 
-  const findFirstActionColumn = (w = wrapper) => w.find({ ref: 'action-delete' });
-  const findPackageListTable = (w = wrapper) => w.find({ ref: 'packageListTable' });
-  const findPackageListSorting = (w = wrapper) => w.find({ ref: 'packageListSorting' });
-  const findPackageListPagination = (w = wrapper) => w.find({ ref: 'packageListPagination' });
-  const findPackageListDeleteModal = (w = wrapper) => w.find({ ref: 'packageListDeleteModal' });
-  const findSortingItems = (w = wrapper) => w.findAll({ name: 'sorting-item-stub' });
-  const findFirstProjectColumn = (w = wrapper) => w.find({ ref: 'col-project' });
+  const findFirstActionColumn = () => wrapper.find({ ref: 'action-delete' });
+  const findPackageListTable = () => wrapper.find({ ref: 'packageListTable' });
+  const findPackageListSorting = () => wrapper.find({ ref: 'packageListSorting' });
+  const findPackageListPagination = () => wrapper.find({ ref: 'packageListPagination' });
+  const findPackageListDeleteModal = () => wrapper.find({ ref: 'packageListDeleteModal' });
+  const findSortingItems = () => wrapper.findAll({ name: 'sorting-item-stub' });
+  const findFirstProjectColumn = () => wrapper.find({ ref: 'col-project' });
 
   const defaultShallowMountOptions = {
     stubs: {
@@ -143,7 +143,7 @@ describe('packages_list', () => {
   });
 
   describe('when the list is empty', () => {
-    const findEmptySlot = (w = wrapper) => w.find({ name: 'empty-slot-stub' });
+    const findEmptySlot = () => wrapper.find({ name: 'empty-slot-stub' });
 
     beforeEach(() => {
       wrapper = shallowMount(PackagesList, {
