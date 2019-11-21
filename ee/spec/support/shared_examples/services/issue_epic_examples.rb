@@ -33,11 +33,28 @@ RSpec.shared_examples 'issue with epic_id parameter' do
 
     let(:params) { { title: 'issue1', epic_id: epic.id } }
 
-    it 'creates epic issue link' do
-      issue = execute
+    context 'when a project is a direct child of the epic group' do
+      it 'creates epic issue link' do
+        issue = execute
 
-      expect(issue).to be_persisted
-      expect(issue.epic).to eq(epic)
+        expect(issue).to be_persisted
+        expect(issue.epic).to eq(epic)
+      end
+    end
+
+    context 'when a project is from a subgroup of the epic group' do
+      before do
+        subgroup = create(:group, parent: group)
+        create(:epic, group: subgroup)
+        project.update(group: subgroup)
+      end
+
+      it 'creates epic issue link' do
+        issue = execute
+
+        expect(issue).to be_persisted
+        expect(issue.epic).to eq(epic)
+      end
     end
   end
 end
