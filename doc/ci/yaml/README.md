@@ -3391,6 +3391,31 @@ variables:
 
 You can set it globally or per-job in the [`variables`](#variables) section.
 
+### `workflow:rules`
+
+> Introduced in Gitlab 12.6
+
+The top-level `workflow:` key applies to the entirety of a Pipeline being
+configured by your CI configuration file. It currently accepts a single key
+`rules:` that operates in the [exact same way](#rules) as `job:rules`; a list
+of rules is evaluated until a single one of them is matched, and that rule
+provides dynamically-selected configuration.
+
+Currently the only configuration option allowed for `workflow:rules` is `when:`
+
+- `when:` may be set to `always` or `never`
+- If not provided, the default value is `always`
+
+```yaml
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /-wip$/
+      when: never
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: always
+```
+
 ## Deprecated parameters
 
 The following parameters are deprecated.
