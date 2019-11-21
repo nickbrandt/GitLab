@@ -5,6 +5,10 @@ module EE
     module ListsController
       extend ::Gitlab::Utils::Override
 
+      included do
+        before_action :push_wip_limits
+      end
+
       override :list_creation_attrs
       def list_creation_attrs
         additional_attrs = %i[assignee_id milestone_id]

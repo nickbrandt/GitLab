@@ -7,5 +7,13 @@ module EE
     prepended do
       include ::MultipleBoardsActions
     end
+
+    private
+
+    def push_wip_limits
+      if parent.feature_available?(:wip_limits)
+        push_frontend_feature_flag(:wip_limits)
+      end
+    end
   end
 end
