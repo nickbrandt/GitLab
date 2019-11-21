@@ -21,8 +21,10 @@ module EE
           token = (params[JOB_TOKEN_PARAM] || env[JOB_TOKEN_HEADER]).to_s
           return unless token.present?
 
-          job = find_job_from_token(token)
+          job = ::Ci::Build.find_by_token(token)
           raise ::Gitlab::Auth::UnauthorizedError unless job
+
+          @current_authenticated_job = job # rubocop:disable Gitlab/ModuleWithInstanceVariables
 
           job.user
         end
@@ -37,7 +39,7 @@ module EE
         override :validate_access_token!
         def validate_access_token!(scopes: [])
           # return early if we've already authenticated via a job token
-          @job_token_authentication.present? || super # rubocop:disable Gitlab/ModuleWithInstanceVariables
+          @current_authenticated_job.present? || super # rubocop:disable Gitlab/ModuleWithInstanceVariables
         end
 
         def scim_request?
@@ -46,18 +48,16 @@ module EE
 
         private
 
-        def find_job_from_token(token)
-          @job_token_authentication ||= ::Ci::Build.find_by_token(token)
-        end
-
         def find_user_from_job_bearer_token
           return unless route_authentication_setting[:job_token_allowed]
 
           token = parsed_oauth_token
           return unless token
 
-          job = find_job_from_token(token)
+          job = ::Ci::Build.find_by_token(token)
           return unless job
+
+          @current_authenticated_job = job # rubocop:disable Gitlab/ModuleWithInstanceVariables
 
           job.user
         end

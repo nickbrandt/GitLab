@@ -140,11 +140,13 @@ module EE
       end
 
       def job_token_authentication?
-        initial_current_user && @job_token_authentication # rubocop:disable Gitlab/ModuleWithInstanceVariables
+        initial_current_user && @current_authenticated_job.present? # rubocop:disable Gitlab/ModuleWithInstanceVariables
       end
 
-      def current_ci_job
-        @job_token_authentication
+      # Returns the job associated with the token provided for
+      # authentication, if any
+      def current_authenticated_job
+        @current_authenticated_job
       end
 
       def warden
