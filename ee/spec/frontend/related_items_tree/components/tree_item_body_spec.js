@@ -297,6 +297,10 @@ describe('RelatedItemsTree', () => {
         expect(wrapper.find('.item-body').classes()).not.toContain('item-logged-out');
       });
 
+      it('renders item body element without class `item-closed` when item state is opened', () => {
+        expect(wrapper.find('.item-body').classes()).not.toContain('item-closed');
+      });
+
       it('renders item state icon for large screens', () => {
         const statusIcon = wrapper.findAll(Icon).at(0);
 
