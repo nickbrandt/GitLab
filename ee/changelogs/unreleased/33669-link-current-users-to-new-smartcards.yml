@@ -1,0 +1,5 @@
+---
+title: Link user accounts to new Smartcards identities on login
+merge_request: 20059
+author:
+type: fixed
