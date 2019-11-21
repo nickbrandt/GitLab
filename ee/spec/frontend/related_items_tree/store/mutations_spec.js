@@ -49,14 +49,15 @@ describe('RelatedItemsTree', () => {
       describe(types.SET_CHILDREN_COUNT, () => {
         it('should set provided `epicsCount` and `issuesCount` to state', () => {
           const data = {
-            epicsCount: 4,
-            issuesCount: 5,
+            openedEpics: 4,
+            closedEpics: 5,
+            openedIssues: 6,
+            closedIssues: 7,
           };
 
           mutations[types.SET_CHILDREN_COUNT](state, data);
 
-          expect(state.epicsCount).toBe(data.epicsCount);
-          expect(state.issuesCount).toBe(data.issuesCount);
+          expect(state.descendantCounts).toEqual(data);
         });
       });
 

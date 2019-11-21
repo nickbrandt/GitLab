@@ -15,6 +15,12 @@ export const mockParentItem = {
     adminEpic: true,
     createEpic: true,
   },
+  descendantCounts: {
+    openedEpics: 1,
+    closedEpics: 1,
+    openedIssues: 1,
+    closedIssues: 1,
+  },
 };
 
 export const mockEpic1 = {
@@ -177,6 +183,7 @@ export const mockQueryResponse = {
             hasNextPage: true,
           },
         },
+        descendantCounts: mockParentItem.descendantCounts,
       },
     },
   },

@@ -61,6 +61,36 @@ describe('RelatedItemTree', () => {
       });
 
       describe('setChildrenCount', () => {
+        it('should set initial descendantCounts on state', done => {
+          testAction(
+            actions.setChildrenCount,
+            mockParentItem.descendantCounts,
+            {},
+            [{ type: types.SET_CHILDREN_COUNT, payload: mockParentItem.descendantCounts }],
+            [],
+            done,
+          );
+        });
+
+        it('should persist non overwritten descendantCounts state', done => {
+          const descendantCounts = { openedEpics: 9 };
+          testAction(
+            actions.setChildrenCount,
+            descendantCounts,
+            { descendantCounts: mockParentItem.descendantCounts },
+            [
+              {
+                type: types.SET_CHILDREN_COUNT,
+                payload: { ...mockParentItem.descendantCounts, ...descendantCounts },
+              },
+            ],
+            [],
+            done,
+          );
+        });
+      });
+
+      describe('updateChildrenCount', () => {
         const mockEpicsWithType = mockEpics.map(item =>
           Object.assign({}, item, {
             type: ChildType.Epic,
@@ -73,39 +103,66 @@ describe('RelatedItemTree', () => {
           }),
         );
 
-        const mockChildren = [...mockEpicsWithType, ...mockIssuesWithType];
-
-        it('should set `epicsCount` and `issuesCount`, by incrementing it, on state', done => {
+        it('should update openedEpics, by incrementing it', done => {
           testAction(
-            actions.setChildrenCount,
-            { children: mockChildren, isRemoved: false },
-            {},
+            actions.updateChildrenCount,
+            { item: mockEpicsWithType[0], isRemoved: false },
+            { descendantCounts: mockParentItem.descendantCounts },
+            [],
             [
               {
-                type: types.SET_CHILDREN_COUNT,
-                payload: { epicsCount: mockEpics.length, issuesCount: mockIssues.length },
+                type: 'setChildrenCount',
+                payload: { openedEpics: mockParentItem.descendantCounts.openedEpics + 1 },
               },
             ],
-            [],
             done,
           );
         });
 
-        it('should set `epicsCount` and `issuesCount`, by decrementing it, on state', done => {
+        it('should update openedIssues, by incrementing it', done => {
           testAction(
-            actions.setChildrenCount,
-            { children: mockChildren, isRemoved: true },
-            {
-              epicsCount: mockEpics.length,
-              issuesCount: mockIssues.length,
-            },
+            actions.updateChildrenCount,
+            { item: mockIssuesWithType[0], isRemoved: false },
+            { descendantCounts: mockParentItem.descendantCounts },
+            [],
             [
               {
-                type: types.SET_CHILDREN_COUNT,
-                payload: { epicsCount: 0, issuesCount: 0 },
+                type: 'setChildrenCount',
+                payload: { openedIssues: mockParentItem.descendantCounts.openedIssues + 1 },
               },
             ],
+            done,
+          );
+        });
+
+        it('should update openedEpics, by decrementing it', done => {
+          testAction(
+            actions.updateChildrenCount,
+            { item: mockEpicsWithType[0], isRemoved: true },
+            { descendantCounts: mockParentItem.descendantCounts },
             [],
+            [
+              {
+                type: 'setChildrenCount',
+                payload: { openedEpics: mockParentItem.descendantCounts.openedEpics - 1 },
+              },
+            ],
+            done,
+          );
+        });
+
+        it('should update openedIssues, by decrementing it', done => {
+          testAction(
+            actions.updateChildrenCount,
+            { item: mockIssuesWithType[0], isRemoved: true },
+            { descendantCounts: mockParentItem.descendantCounts },
+            [],
+            [
+              {
+                type: 'setChildrenCount',
+                payload: { openedIssues: mockParentItem.descendantCounts.openedIssues - 1 },
+              },
+            ],
             done,
           );
         });
@@ -156,12 +213,7 @@ describe('RelatedItemTree', () => {
                 payload: mockPayload,
               },
             ],
-            [
-              {
-                type: 'setChildrenCount',
-                payload: { children: mockPayload.children },
-              },
-            ],
+            [],
             done,
           );
         });
@@ -180,10 +232,6 @@ describe('RelatedItemTree', () => {
               },
             ],
             [
-              {
-                type: 'setChildrenCount',
-                payload: { children: mockPayload.children },
-              },
               {
                 type: 'expandItem',
                 payload: { parentItem: mockPayload.parentItem },
@@ -331,6 +379,7 @@ describe('RelatedItemTree', () => {
           const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
           const epicPageInfo = mockQueryResponse.data.group.epic.children.pageInfo;
           const issuesPageInfo = mockQueryResponse.data.group.epic.issues.pageInfo;
+          const epicDescendantCounts = mockQueryResponse.data.group.epic.descendantCounts;
 
           testAction(
             actions.fetchItems,
@@ -377,6 +426,12 @@ describe('RelatedItemTree', () => {
                 payload: {
                   parentItem: mockParentItem,
                   pageInfo: issuesPageInfo,
+                },
+              },
+              {
+                type: 'setChildrenCount',
+                payload: {
+                  ...epicDescendantCounts,
                 },
               },
             ],
@@ -684,8 +739,8 @@ describe('RelatedItemTree', () => {
                 payload: { parentItem: data.parentItem, item: data.item },
               },
               {
-                type: 'setChildrenCount',
-                payload: { children: [data.item], isRemoved: true },
+                type: 'updateChildrenCount',
+                payload: { item: data.item, isRemoved: true },
               },
             ],
             done,
@@ -826,8 +881,12 @@ describe('RelatedItemTree', () => {
             ],
             [
               {
-                type: 'setChildrenCount',
-                payload: { children: mockEpicsWithoutPerm },
+                type: 'updateChildrenCount',
+                payload: { item: mockEpicsWithoutPerm[0] },
+              },
+              {
+                type: 'updateChildrenCount',
+                payload: { item: mockEpicsWithoutPerm[1] },
               },
               {
                 type: 'setItemChildrenFlags',
@@ -989,8 +1048,8 @@ describe('RelatedItemTree', () => {
             ],
             [
               {
-                type: 'setChildrenCount',
-                payload: { children: [createdEpic] },
+                type: 'updateChildrenCount',
+                payload: { item: createdEpic },
               },
               {
                 type: 'setItemChildrenFlags',
