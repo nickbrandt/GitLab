@@ -22,6 +22,7 @@ describe('DependenciesActions component', () => {
       localVue,
       store,
       sync: false,
+      attachToDocument: true,
       propsData: { ...propsData },
     });
   };
