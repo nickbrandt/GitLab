@@ -32,6 +32,7 @@ describe Gitlab::Auth::UserAuthFinders do
         set_token(job.token)
 
         expect(subject).to eq(user)
+        expect(@current_authenticated_job).to eq job
       end
     end
   end
