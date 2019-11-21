@@ -9,6 +9,6 @@ describe 'operations/environments.html.haml' do
     expect(rendered).to match %r{data-add-path="/-/operations"}
     expect(rendered).to match %r{data-list-path="/-/operations/environments_list"}
     expect(rendered).to match %r{data-empty-dashboard-svg-path="/assets/illustrations/operations-dashboard_empty.*\.svg"}
-    expect(rendered).to match %r{data-empty-dashboard-help-path="/help/user/operations_dashboard/index.html"}
+    expect(rendered).to match %r{data-empty-dashboard-help-path="/help/ci/environments/environments_dashboard.html"}
   end
 end
