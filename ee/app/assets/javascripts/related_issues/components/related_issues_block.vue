@@ -180,7 +180,7 @@ export default {
           </a>
           <div class="d-inline-flex lh-100 align-middle">
             <div
-              class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge mx-1"
+              class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge mx-1 border-width-1px border-style-solid border-color-default"
             >
               <span class="issue-count-badge-count">
                 <icon :name="issuableTypeIcon" class="mr-1 text-secondary" />
