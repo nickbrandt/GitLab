@@ -1,7 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
-import { TEST_HOST } from 'helpers/test_constants';
 import createFlash from '~/flash';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
@@ -18,10 +17,14 @@ import {
 
 const stageData = { events: [] };
 const error = new Error('Request failed with status code 404');
-const groupPath = 'cool-group';
-const groupLabelsEndpoint = `/groups/${groupPath}/-/labels`;
 const flashErrorMessage = 'There was an error while fetching cycle analytics data.';
-const selectedGroup = { fullPath: groupPath };
+const selectedGroup = { fullPath: group.path };
+const [{ id: selectedStageSlug }] = stages;
+const endpoints = {
+  groupLabels: `/groups/${group.path}/-/labels`,
+  cycleAnalyticsData: `/groups/${group.path}/-/cycle_analytics`,
+  stageData: `/groups/${group.path}/-/cycle_analytics/events/${selectedStageSlug}.json`,
+};
 
 describe('Cycle analytics actions', () => {
   let state;
@@ -33,10 +36,6 @@ describe('Cycle analytics actions', () => {
 
   beforeEach(() => {
     state = {
-      endpoints: {
-        cycleAnalyticsData: `${TEST_HOST}/groups/${group.path}/-/cycle_analytics`,
-        stageData: `${TEST_HOST}/groups/${group.path}/-/cycle_analytics/events/${cycleAnalyticsData.stats[0].name}.json`,
-      },
       stages: [],
       getters,
     };
@@ -49,12 +48,10 @@ describe('Cycle analytics actions', () => {
   });
 
   it.each`
-    action                             | type                                   | stateKey                          | payload
-    ${'setCycleAnalyticsDataEndpoint'} | ${'SET_CYCLE_ANALYTICS_DATA_ENDPOINT'} | ${'endpoints.cycleAnalyticsData'} | ${'coolGroupName'}
-    ${'setStageDataEndpoint'}          | ${'SET_STAGE_DATA_ENDPOINT'}           | ${'endpoints.stageData'}          | ${'new_stage_name'}
-    ${'setSelectedGroup'}              | ${'SET_SELECTED_GROUP'}                | ${'selectedGroup'}                | ${'someNewGroup'}
-    ${'setSelectedProjects'}           | ${'SET_SELECTED_PROJECTS'}             | ${'selectedProjectIds'}           | ${[10, 20, 30, 40]}
-    ${'setSelectedStageId'}            | ${'SET_SELECTED_STAGE_ID'}             | ${'selectedStageId'}              | ${'someNewGroup'}
+    action                   | type                       | stateKey                | payload
+    ${'setSelectedGroup'}    | ${'SET_SELECTED_GROUP'}    | ${'selectedGroup'}      | ${'someNewGroup'}
+    ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
+    ${'setSelectedStageId'}  | ${'SET_SELECTED_STAGE_ID'} | ${'selectedStageId'}    | ${'someNewGroup'}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
     testAction(
       actions[action],
@@ -87,13 +84,14 @@ describe('Cycle analytics actions', () => {
 
   describe('fetchStageData', () => {
     beforeEach(() => {
-      mock.onGet(state.endpoints.stageData).replyOnce(200, { events: [] });
+      state = { ...state, selectedGroup };
+      mock.onGet(endpoints.stageData).replyOnce(200, { events: [] });
     });
 
     it('dispatches receiveStageDataSuccess with received data on success', done => {
       testAction(
         actions.fetchStageData,
-        null,
+        selectedStageSlug,
         state,
         [],
         [
@@ -108,17 +106,10 @@ describe('Cycle analytics actions', () => {
     });
 
     it('dispatches receiveStageDataError on error', done => {
-      const brokenState = {
-        ...state,
-        endpoints: {
-          stageData: 'this will break',
-        },
-      };
-
       testAction(
         actions.fetchStageData,
         null,
-        brokenState,
+        state,
         [],
         [
           { type: 'requestStageData' },
@@ -176,7 +167,7 @@ describe('Cycle analytics actions', () => {
   describe('fetchGroupLabels', () => {
     beforeEach(() => {
       state = { ...state, selectedGroup };
-      mock.onGet(groupLabelsEndpoint).replyOnce(200, groupLabels);
+      mock.onGet(endpoints.groupLabels).replyOnce(200, groupLabels);
     });
 
     it('dispatches receiveGroupLabels if the request succeeds', done => {
@@ -251,7 +242,7 @@ describe('Cycle analytics actions', () => {
 
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
-      mock.onGet(state.endpoints.cycleAnalyticsData).replyOnce(200, cycleAnalyticsData);
+      mock.onGet(endpoints.cycleAnalyticsData).replyOnce(200, cycleAnalyticsData);
       state = { ...state, selectedGroup, startDate, endDate };
     });
 
@@ -354,8 +345,7 @@ describe('Cycle analytics actions', () => {
       });
     });
 
-    it("dispatches the 'setStageDataEndpoint' and 'fetchStageData' actions", done => {
-      const { id } = stages[0];
+    it("dispatches the 'fetchStageData' action", done => {
       const stateWithStages = {
         ...state,
         stages,
@@ -371,7 +361,7 @@ describe('Cycle analytics actions', () => {
             payload: { ...customizableStagesAndEvents },
           },
         ],
-        [{ type: 'setStageDataEndpoint', payload: id }, { type: 'fetchStageData' }],
+        [{ type: 'fetchStageData', payload: selectedStageSlug }],
         done,
       );
     });
@@ -463,8 +453,7 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    it("dispatches the 'setStageDataEndpoint' and 'fetchStageData' actions", done => {
-      const { id } = stages[0];
+    it("dispatches the 'fetchStageData' actions", done => {
       const stateWithStages = {
         ...state,
         stages,
@@ -480,7 +469,7 @@ describe('Cycle analytics actions', () => {
             payload: { ...customizableStagesAndEvents },
           },
         ],
-        [{ type: 'setStageDataEndpoint', payload: id }, { type: 'fetchStageData' }],
+        [{ type: 'fetchStageData', payload: selectedStageSlug }],
         done,
       );
     });

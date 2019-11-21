@@ -3,18 +3,6 @@ import * as types from './mutation_types';
 import { transformRawStages } from '../utils';
 
 export default {
-  [types.SET_CYCLE_ANALYTICS_DATA_ENDPOINT](state, groupPath) {
-    // TODO: this endpoint will be removed when the /-/analytics endpoints are ready
-    // https://gitlab.com/gitlab-org/gitlab/issues/34751
-    state.endpoints.cycleAnalyticsData = `/groups/${groupPath}/-/cycle_analytics`;
-    state.endpoints.cycleAnalyticsStagesAndEvents = `/-/analytics/cycle_analytics/stages?group_id=${groupPath}`;
-  },
-  [types.SET_STAGE_DATA_ENDPOINT](state, stageSlug) {
-    // TODO: this endpoint will be replaced with a /-/analytics... endpoint when backend is ready
-    // https://gitlab.com/gitlab-org/gitlab/issues/34751
-    const { fullPath } = state.selectedGroup;
-    state.endpoints.stageData = `/groups/${fullPath}/-/cycle_analytics/events/${stageSlug}.json`;
-  },
   [types.SET_SELECTED_GROUP](state, group) {
     state.selectedGroup = convertObjectPropsToCamelCase(group, { deep: true });
     state.selectedProjectIds = [];

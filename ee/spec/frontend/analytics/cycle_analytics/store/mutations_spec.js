@@ -57,13 +57,11 @@ describe('Cycle analytics mutations', () => {
   });
 
   it.each`
-    mutation                                   | payload                       | expectedState
-    ${types.SET_CYCLE_ANALYTICS_DATA_ENDPOINT} | ${'cool-beans'}               | ${{ endpoints: { cycleAnalyticsStagesAndEvents: '/-/analytics/cycle_analytics/stages?group_id=cool-beans' } }}
-    ${types.SET_STAGE_DATA_ENDPOINT}           | ${'rad-stage'}                | ${{ endpoints: { stageData: '/groups/rad-stage/-/cycle_analytics/events/rad-stage.json' } }}
-    ${types.SET_SELECTED_GROUP}                | ${{ fullPath: 'cool-beans' }} | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjectIds: [] }}
-    ${types.SET_SELECTED_PROJECTS}             | ${[606, 707, 808, 909]}       | ${{ selectedProjectIds: [606, 707, 808, 909] }}
-    ${types.SET_DATE_RANGE}                    | ${{ startDate, endDate }}     | ${{ startDate, endDate }}
-    ${types.SET_SELECTED_STAGE_ID}             | ${'first-stage'}              | ${{ selectedStageId: 'first-stage' }}
+    mutation                       | payload                       | expectedState
+    ${types.SET_SELECTED_GROUP}    | ${{ fullPath: 'cool-beans' }} | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjectIds: [] }}
+    ${types.SET_SELECTED_PROJECTS} | ${[606, 707, 808, 909]}       | ${{ selectedProjectIds: [606, 707, 808, 909] }}
+    ${types.SET_DATE_RANGE}        | ${{ startDate, endDate }}     | ${{ startDate, endDate }}
+    ${types.SET_SELECTED_STAGE_ID} | ${'first-stage'}              | ${{ selectedStageId: 'first-stage' }}
   `(
     '$mutation with payload $payload will update state with $expectedState',
     ({ mutation, payload, expectedState }) => {

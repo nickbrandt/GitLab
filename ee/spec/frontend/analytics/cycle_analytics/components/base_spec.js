@@ -309,7 +309,7 @@ describe('Cycle Analytics component', () => {
         },
         fetchGroupStagesAndEvents: {
           status: defaultStatus,
-          endpoint: `/-/analytics/cycle_analytics/stages?group_id=${groupId}`,
+          endpoint: `/-/analytics/cycle_analytics/stages`,
           response: { ...mockData.customizableStagesAndEvents },
         },
         fetchGroupLabels: {
