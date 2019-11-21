@@ -29,12 +29,12 @@ module QA
 
           QA::Page::Group::Menu.perform(&:click_group_epics_link)
 
-          QA::EE::Page::Group::Epic::Index.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
-            page.click_new_epic
-            page.set_title(@title)
-            page.create_new_epic
-            page.wait(interval: 1) do
-              page.has_text?(@title)
+          QA::EE::Page::Group::Epic::Index.perform do |index|
+            index.click_new_epic
+            index.set_title(@title)
+            index.create_new_epic
+            index.wait(interval: 1) do
+              index.has_text?(@title)
             end
           end
         end
