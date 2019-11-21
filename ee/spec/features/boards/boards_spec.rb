@@ -196,15 +196,15 @@ describe 'issue boards', :js do
     let!(:list) { create(:list, board: board, label: label, position: 1) }
 
     before do
+      stub_licensed_features(wip_limits: wip_limits)
+
       project.add_developer(user)
       login_as(user)
       visit project_boards_path(project)
     end
 
     context 'When FF is turned on' do
-      before do
-        stub_licensed_features(wip_limits: true)
-      end
+      let(:wip_limits) { true }
 
       it 'shows the list settings button' do
         expect(page).to have_selector(:button, "List Settings")
@@ -212,6 +212,8 @@ describe 'issue boards', :js do
     end
 
     context 'When FF is turned off' do
+      let(:wip_limits) { false }
+
       it 'shows the list settings button' do
         expect(page).to have_no_selector(:button, "List Settings")
       end
