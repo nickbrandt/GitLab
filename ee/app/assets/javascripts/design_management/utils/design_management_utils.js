@@ -53,6 +53,7 @@ export const designUploadOptimisticResponse = files => {
     __typename: 'Design',
     id: -uniqueId(),
     image: '',
+    imageV432x230: '',
     filename: file.name,
     fullPath: '',
     notesCount: 0,
