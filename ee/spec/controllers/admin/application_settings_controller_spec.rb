@@ -140,5 +140,21 @@ describe Admin::ApplicationSettingsController do
         end
       end
     end
+
+    describe 'GET #geo_redirection' do
+      subject { get :geo_redirection }
+
+      it 'redirects the user to the admin_geo_settings_url' do
+        subject
+
+        expect(response).to redirect_to(admin_geo_settings_url)
+      end
+
+      it 'fires a notice about the redirection' do
+        subject
+
+        expect(response).to set_flash[:notice]
+      end
+    end
   end
 end
