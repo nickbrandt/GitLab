@@ -499,6 +499,14 @@ class Note < ApplicationRecord
     project
   end
 
+  def user_mentions
+    noteable.user_mentions.where(note: self)
+  end
+
+  def model_user_mention
+    user_mentions.first_or_initialize
+  end
+
   private
 
   def system_note_viewable_by?(user)
@@ -555,22 +563,6 @@ class Note < ApplicationRecord
     return unless noteable
 
     errors.add(:base, _('Maximum number of comments exceeded')) if noteable.notes.count >= Noteable::MAX_NOTES_LIMIT
-  end
-
-  def model_user_mention
-    noteable.user_mentions.where(note: self).first_or_initialize
-  end
-
-  def referenced_users
-    User.where(id: model_user_mention.mentioned_users_ids)
-  end
-
-  def referenced_projects
-    Project.where(id: model_user_mention.mentioned_projects_ids)
-  end
-
-  def referenced_groups
-    Group.where(id: model_user_mention.mentioned_groups_ids)
   end
 end
 

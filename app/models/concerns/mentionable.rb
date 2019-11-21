@@ -113,22 +113,29 @@ module Mentionable
   end
 
   def referenced_users
-    User.where(id: user_mentions.select("unnest(mentioned_users_ids)") )
+    User.where(id: user_mentions.select("unnest(mentioned_users_ids)"))
   end
 
-  def referenced_projects
-    Project.where(id: user_mentions.select("unnest(mentioned_projects_ids)") )
+  def referenced_projects(current_user = nil)
+    Project.where(id: user_mentions.select("unnest(mentioned_projects_ids)")).public_or_visible_to_user(current_user)
   end
 
-  def referenced_project_users
-    User.joins(:project_members).where(members: { source_id: referenced_projects }).distinct
+  def referenced_project_users(current_user = nil)
+    User.joins(:project_members).where(members: { source_id: referenced_projects(current_user) }).distinct
   end
 
-  def referenced_groups
-    Group.where(id: user_mentions.select("unnest(mentioned_groups_ids)") )
+  def referenced_groups(current_user = nil)
+    # TODO: IMPORTANT: Revisit before using it.
+    # Check DB data for max mentioned groups per mentionable:
+    #
+    # select issue_id, count(mentions_count.men_gr_id) gr_count from
+    # (select DISTINCT unnest(mentioned_groups_ids) as men_gr_id, issue_id
+    # from issue_user_mentions group by issue_id, mentioned_groups_ids) as mentions_count
+    # group by mentions_count.issue_id order by gr_count desc limit 10
+    Group.where(id: user_mentions.select("unnest(mentioned_groups_ids)")).public_or_visible_to_user(current_user)
   end
 
-  def referenced_group_users
+  def referenced_group_users(current_user = nil)
     User.joins(:group_members).where(members: { source_id: referenced_groups }).distinct
   end
 

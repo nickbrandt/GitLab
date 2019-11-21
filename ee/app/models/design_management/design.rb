@@ -7,6 +7,7 @@ module DesignManagement
     include Gitlab::FileTypeDetection
     include Gitlab::Utils::StrongMemoize
     include Referable
+    include Mentionable
 
     belongs_to :project, inverse_of: :designs
     belongs_to :issue
