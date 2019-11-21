@@ -1,4 +1,7 @@
 fragment VersionListItem on DesignVersion {
   id
   sha
+  versionNumber @client
+  author @client
+  createdAt @client
 }

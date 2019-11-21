@@ -3,11 +3,12 @@ import VueApollo from 'vue-apollo';
 import _ from 'underscore';
 import { defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import createDefaultClient from '~/lib/graphql';
+import resolvers from './graphql/resolvers';
 
 Vue.use(VueApollo);
 
 const defaultClient = createDefaultClient(
-  {},
+  resolvers,
   // This config is added temporarily to resolve an issue with duplicate design IDs.
   // Should be removed as soon as https://gitlab.com/gitlab-org/gitlab/issues/13495 is resolved
   {

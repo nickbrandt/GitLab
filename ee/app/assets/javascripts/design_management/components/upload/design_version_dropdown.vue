@@ -1,6 +1,7 @@
 <script>
 import { GlAvatar, GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
+import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import allVersionsMixin from '../../mixins/all_versions';
 import { findVersionId } from '../../utils/design_management_utils';
 
@@ -9,6 +10,7 @@ export default {
     GlAvatar,
     GlDropdown,
     GlDropdownItem,
+    TimeAgoTooltip,
   },
   mixins: [allVersionsMixin],
   computed: {
@@ -63,10 +65,7 @@ export default {
         :to="{ path: $route.path, query: { version: getVersionId(version.node.id) } }"
       >
         <div class="flex-shrink-0">
-          <gl-avatar
-            src="https://about.gitlab.com/images/press/gitlab-summit-south-africa.jpg"
-            :size="32"
-          />
+          <gl-avatar :src="version.node.author.avatarUrl" :size="32" />
         </div>
         <div class="flex-grow-1 mx-2">
           <div>
@@ -77,9 +76,9 @@ export default {
               >
             </strong>
             <div class="text-muted mt-1">
-              <span>Adam Landers changed 1 screen and removed 2 screens</span>
+              <span>{{ version.node.author.name }} updated the designs</span>
               <br />
-              <span>22 minutes ago</span>
+              <time-ago-tooltip :time="version.node.createdAt" tooltip-placement="bottom" />
             </div>
           </div>
         </div>
