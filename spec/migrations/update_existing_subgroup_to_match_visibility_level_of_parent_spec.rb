@@ -34,6 +34,30 @@ describe UpdateExistingSubgroupToMatchVisibilityLevelOfParent, :migration do
       expect(child.reload.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
       expect(middle_group.reload.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
     end
+
+    it 'updates mixed groups and sub-group' do
+      parent = create_namespace('parent', Gitlab::VisibilityLevel::PUBLIC)
+      middle_group = create_namespace('middle', Gitlab::VisibilityLevel::INTERNAL, parent_id: parent.id)
+      middle_group_2 = create_namespace('middle_2', Gitlab::VisibilityLevel::PRIVATE, parent_id: middle_group.id)
+      child = create_namespace('child', Gitlab::VisibilityLevel::PUBLIC, parent_id: middle_group_2.id)
+
+      migrate!
+
+      expect(child.reload.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
+    end
+
+    it 'updates mixed groups and sub-group with private top group' do
+      parent = create_namespace('parent', Gitlab::VisibilityLevel::PRIVATE)
+      middle_group = create_namespace('middle', Gitlab::VisibilityLevel::INTERNAL, parent_id: parent.id)
+      middle_group_2 = create_namespace('middle_2', Gitlab::VisibilityLevel::PUBLIC, parent_id: middle_group.id)
+      child = create_namespace('child', Gitlab::VisibilityLevel::PUBLIC, parent_id: middle_group_2.id)
+
+      migrate!
+
+      expect(child.reload.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
+      expect(middle_group.reload.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
+      expect(middle_group_2.reload.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
+    end
   end
 
   context 'internal visibility level' do
