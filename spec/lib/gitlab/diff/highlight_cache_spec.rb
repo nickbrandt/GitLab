@@ -37,7 +37,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
         new_pos: 20 }] }
   end
 
-  let(:cache_key) { cache.instance_variable_get(:@redis_key) }
+  let(:cache_key) { cache.key }
 
   subject(:cache) { described_class.new(merge_request.diffs, backend: backend) }
 

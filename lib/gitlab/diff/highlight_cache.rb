@@ -11,7 +11,6 @@ module Gitlab
       def initialize(diff_collection, backend: Rails.cache)
         @backend          = backend
         @diff_collection  = diff_collection
-        @redis_key        = "highlighted-diff-files:#{diffable.cache_key}"
       end
 
       # - Reads from cache
@@ -58,30 +57,30 @@ module Gitlab
         Redis::Cache.with do |redis|
           redis.multi do |multi|
             hash.each do |diff_file_id, highlighted_diff_lines_hash|
-              multi.hset(@redis_key, diff_file_id, highlighted_diff_lines_hash.to_json)
+              multi.hset(key, diff_file_id, highlighted_diff_lines_hash.to_json)
             end
 
             # HSETs have to have their expiration date manually updated
             #
-            multi.expire(@redis_key, EXPIRATION)
+            multi.expire(key, EXPIRATION)
           end
         end
       end
 
       def read_single_entry_from_redis_hash(diff_file_id)
         Redis::Cache.with do |redis|
-          redis.hget(@redis_key, diff_file_id)
+          redis.hget(key, diff_file_id)
         end
       end
 
       def clear
         Redis::Cache.with do |redis|
-          redis.del(@redis_key)
+          redis.del(key)
         end
       end
 
       def key
-        @redis_key
+        [diffable.head_commit_sha, VERSION, 'highlighted-diff-files', diff_options].join(":")
       end
 
       private
@@ -104,7 +103,7 @@ module Gitlab
         results = []
 
         Redis::Cache.with do |redis|
-          results = redis.hmget(@redis_key, file_paths)
+          results = redis.hmget(key, file_paths)
         end
 
         results.map! do |result|
