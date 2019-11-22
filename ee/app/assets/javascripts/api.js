@@ -22,6 +22,7 @@ export default {
   cycleAnalyticsSummaryDataPath: '/groups/:group_id/-/cycle_analytics',
   cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/cycle_analytics/stages',
   cycleAnalyticsStageEventsPath: '/groups/:group_id/-/cycle_analytics/events/:stage_id.json',
+  cycleAnalyticsStagePath: '/-/analytics/cycle_analytics/stages/:stage_id',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -170,6 +171,26 @@ export default {
     const url = Api.buildUrl(this.cycleAnalyticsGroupStagesAndEventsPath);
 
     return axios.post(url, data, {
+      params: { group_id: groupId },
+    });
+  },
+
+  cycleAnalyticsStageUrl(stageId) {
+    return Api.buildUrl(this.cycleAnalyticsStagePath).replace(':stage_id', stageId);
+  },
+
+  cycleAnalyticsUpdateStage(stageId, groupId, data) {
+    const url = this.cycleAnalyticsStageUrl(stageId);
+
+    return axios.put(url, data, {
+      params: { group_id: groupId },
+    });
+  },
+
+  cycleAnalyticsRemoveStage(stageId, groupId) {
+    const url = this.cycleAnalyticsStageUrl(stageId);
+
+    return axios.delete(url, {
       params: { group_id: groupId },
     });
   },

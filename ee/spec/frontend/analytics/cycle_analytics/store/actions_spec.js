@@ -26,11 +26,13 @@ const endpoints = {
   stageData: `/groups/${group.path}/-/cycle_analytics/events/${selectedStageSlug}.json`,
 };
 
+const stageEndpoint = ({ stageId }) => `/-/analytics/cycle_analytics/stages/${stageId}`;
+
 describe('Cycle analytics actions', () => {
   let state;
   let mock;
 
-  function shouldFlashAnError(msg = flashErrorMessage) {
+  function shouldFlashAMessage(msg = flashErrorMessage) {
     expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(msg);
   }
 
@@ -160,7 +162,7 @@ describe('Cycle analytics actions', () => {
         commit: () => {},
       });
 
-      shouldFlashAnError('There was an error fetching data for the selected stage');
+      shouldFlashAMessage('There was an error fetching data for the selected stage');
     });
   });
 
@@ -213,7 +215,7 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         });
 
-        shouldFlashAnError('There was an error fetching label data for the selected group');
+        shouldFlashAMessage('There was an error fetching label data for the selected group');
       });
     });
   });
@@ -286,7 +288,7 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         })
         .then(() => {
-          shouldFlashAnError('There was an error while fetching cycle analytics summary data.');
+          shouldFlashAMessage('There was an error while fetching cycle analytics summary data.');
           done();
         })
         .catch(done.fail);
@@ -312,7 +314,7 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         })
         .then(() => {
-          shouldFlashAnError('There was an error fetching cycle analytics stages.');
+          shouldFlashAMessage('There was an error fetching cycle analytics stages.');
           done();
         })
         .catch(done.fail);
@@ -376,7 +378,7 @@ describe('Cycle analytics actions', () => {
           {},
         );
 
-        shouldFlashAnError();
+        shouldFlashAMessage();
       });
     });
   });
@@ -429,7 +431,7 @@ describe('Cycle analytics actions', () => {
         { response },
       );
 
-      shouldFlashAnError();
+      shouldFlashAMessage();
     });
   });
 
@@ -483,9 +485,178 @@ describe('Cycle analytics actions', () => {
           },
           {},
         );
-
-        shouldFlashAnError();
       });
+
+      shouldFlashAMessage();
+    });
+  });
+
+  describe('updateStage', () => {
+    const stageId = 'cool-stage';
+    const payload = { hidden: true };
+
+    beforeEach(() => {
+      mock.onPut(stageEndpoint({ stageId }), payload).replyOnce(200, payload);
+      state = { selectedGroup };
+    });
+
+    it('dispatches receiveUpdateStageSuccess with put request response data', done => {
+      testAction(
+        actions.updateStage,
+        {
+          id: stageId,
+          ...payload,
+        },
+        state,
+        [],
+        [
+          { type: 'requestUpdateStage' },
+          {
+            type: 'receiveUpdateStageSuccess',
+            payload,
+          },
+        ],
+        done,
+      );
+    });
+
+    describe('with a failed request', () => {
+      beforeEach(() => {
+        setFixtures('<div class="flash-container"></div>');
+        mock = new MockAdapter(axios);
+        mock.onPut(stageEndpoint({ stageId })).replyOnce(404);
+      });
+
+      it('dispatches receiveUpdateStageError', done => {
+        testAction(
+          actions.updateStage,
+          {
+            id: stageId,
+            ...payload,
+          },
+          state,
+          [],
+          [
+            { type: 'requestUpdateStage' },
+            {
+              type: 'receiveUpdateStageError',
+              payload: error,
+            },
+          ],
+          done,
+        );
+      });
+
+      it('flashes an error message', done => {
+        actions.receiveUpdateStageError(
+          {
+            commit: () => {},
+            state,
+          },
+          {},
+        );
+
+        shouldFlashAMessage('There was a problem saving your custom stage, please try again');
+        done();
+      });
+    });
+  });
+
+  describe('removeStage', () => {
+    const stageId = 'cool-stage';
+
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+      mock.onDelete(stageEndpoint({ stageId })).replyOnce(200);
+      state = { selectedGroup };
+    });
+
+    it('dispatches receiveRemoveStageSuccess with put request response data', done => {
+      testAction(
+        actions.removeStage,
+        stageId,
+        state,
+        [],
+        [
+          { type: 'requestRemoveStage' },
+          {
+            type: 'receiveRemoveStageSuccess',
+          },
+        ],
+        done,
+      );
+    });
+
+    describe('with a failed request', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        mock.onDelete(stageEndpoint({ stageId })).replyOnce(404);
+      });
+
+      it('dispatches receiveRemoveStageError', done => {
+        testAction(
+          actions.removeStage,
+          stageId,
+          state,
+          [],
+          [
+            { type: 'requestRemoveStage' },
+            {
+              type: 'receiveRemoveStageError',
+              payload: error,
+            },
+          ],
+          done,
+        );
+      });
+
+      it('flashes an error message', done => {
+        actions.receiveRemoveStageError(
+          {
+            commit: () => {},
+            state,
+          },
+          {},
+        );
+
+        shouldFlashAMessage('There was an error removing your custom stage, please try again');
+        done();
+      });
+    });
+  });
+
+  describe('receiveRemoveStageSuccess', () => {
+    const stageId = 'cool-stage';
+
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+      mock.onDelete(stageEndpoint({ stageId })).replyOnce(200);
+      state = { selectedGroup };
+    });
+
+    it('dispatches fetchCycleAnalyticsData', done => {
+      testAction(
+        actions.receiveRemoveStageSuccess,
+        stageId,
+        state,
+        [{ type: 'RECEIVE_REMOVE_STAGE_RESPONSE' }],
+        [{ type: 'fetchCycleAnalyticsData' }],
+        done,
+      );
+    });
+
+    it('flashes a success message', done => {
+      actions.receiveRemoveStageSuccess(
+        {
+          dispatch: () => {},
+          commit: () => {},
+          state,
+        },
+        {},
+      );
+
+      shouldFlashAMessage('Stage removed');
+      done();
     });
   });
 });

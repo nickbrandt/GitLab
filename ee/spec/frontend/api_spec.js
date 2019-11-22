@@ -437,5 +437,45 @@ describe('Api', () => {
           .catch(done.fail);
       });
     });
+
+    describe('cycleAnalyticsUpdateStage', () => {
+      it('updates the stage data', done => {
+        const response = { id: stageId, custom: false, hidden: true, name: 'nice-stage' };
+        const stageData = {
+          name: 'nice-stage',
+          hidden: true,
+        };
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}`;
+        mock.onPut(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsUpdateStage(stageId, groupId, stageData)
+          .then(({ data, config: { params: reqParams, data: reqData, url } }) => {
+            expect(data).toEqual(response);
+            expect(reqParams).toEqual({ group_id: groupId });
+            expect(JSON.parse(reqData)).toMatchObject(stageData);
+            expect(url).toEqual(expectedUrl);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsRemoveStage', () => {
+      it('deletes the specified data', done => {
+        const response = { id: stageId, hidden: true, custom: true };
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}`;
+        mock.onDelete(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsRemoveStage(stageId, groupId)
+          .then(({ data, config: { params: reqParams, url } }) => {
+            expect(data).toEqual(response);
+            expect(reqParams).toEqual({ group_id: groupId });
+
+            expect(url).toEqual(expectedUrl);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
   });
 });
