@@ -19,9 +19,9 @@
               = event.author_name
             - else
               = s_('AuditEvents|(removed)')
-        .table-section.section-50.flex-truncate-parent.audit-action.js-audit-action
+        .table-section.section-50.section-wrap.audit-action.js-audit-action
           %span= sanitize(human_text(event.details), tags: %w(strong))
-        .table-section.section-15.flex-truncate-parent
+        .table-section.section-15.section-wrap
           = event.details[:target_details]
         .table-section.section-20
           = event.created_at
