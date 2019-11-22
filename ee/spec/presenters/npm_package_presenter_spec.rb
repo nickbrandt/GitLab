@@ -39,11 +39,27 @@ describe NpmPackagePresenter do
     end
   end
 
-  describe '#dist-tags' do
+  describe '#dist_tags' do
     subject { presenter.dist_tags }
 
-    it { is_expected.to be_a(Hash) }
-    it { expect(subject.size).to eq(1) }
-    it { expect(subject[:latest]).to eq(latest_package.version) }
+    context 'for packages without tags' do
+      it { is_expected.to be_a(Hash) }
+      it { expect(subject["latest"]).to eq(latest_package.version) }
+    end
+
+    context 'for packages with tags' do
+      let!(:package_tag1) { create(:packages_tag, package: package1, name: 'release_a') }
+      let!(:package_tag2) { create(:packages_tag, package: package1, name: 'test_release') }
+      let!(:package_tag3) { create(:packages_tag, package: package2, name: 'release_b') }
+      let!(:package_tag4) { create(:packages_tag, package: latest_package, name: 'release_c') }
+      let!(:package_tag5) { create(:packages_tag, package: latest_package, name: 'latest') }
+
+      it { is_expected.to be_a(Hash) }
+      it { expect(subject[package_tag1.name]).to eq(package1.version) }
+      it { expect(subject[package_tag2.name]).to eq(package1.version) }
+      it { expect(subject[package_tag3.name]).to eq(package2.version) }
+      it { expect(subject[package_tag4.name]).to eq(latest_package.version) }
+      it { expect(subject[package_tag5.name]).to eq(latest_package.version) }
+    end
   end
 end

@@ -48,7 +48,7 @@ module API
         requires :package_id, type: Integer, desc: 'The ID of a package'
       end
       delete ':id/packages/:package_id' do
-        authorize_destroy_package!
+        authorize_destroy_package!(user_project)
 
         package = ::Packages::PackageFinder
           .new(user_project, params[:package_id]).execute

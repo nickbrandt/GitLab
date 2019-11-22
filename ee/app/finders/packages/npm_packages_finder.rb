@@ -2,6 +2,8 @@
 class Packages::NpmPackagesFinder
   attr_reader :project, :package_name
 
+  delegate :find_by_version, to: :execute
+
   def initialize(project, package_name)
     @project = project
     @package_name = package_name

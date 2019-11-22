@@ -4,18 +4,31 @@ require 'spec_helper'
 describe Packages::NpmPackagesFinder do
   let(:package) { create(:npm_package) }
   let(:project) { package.project }
+  let(:package_name) { package.name }
 
   describe '#execute!' do
-    it 'returns project packages' do
-      finder = described_class.new(project, package.name)
+    subject { described_class.new(project, package_name).execute }
 
-      expect(finder.execute).to eq([package])
+    it { is_expected.to eq([package]) }
+
+    context 'with unknown package name' do
+      let(:package_name) { 'baz' }
+
+      it { is_expected.to be_empty }
     end
+  end
 
-    it 'returns an empty collection' do
-      finder = described_class.new(project, 'baz')
+  describe '#find_by_version' do
+    let(:version) { package.version }
 
-      expect(finder.execute).to be_empty
+    subject { described_class.new(project, package.name).find_by_version(version) }
+
+    it { is_expected.to eq(package) }
+
+    context 'with unknown version' do
+      let(:version) { 'foobar' }
+
+      it { is_expected.to be_nil }
     end
   end
 end
