@@ -93,6 +93,8 @@ module Gitlab
       end
 
       def read_cache
+        return {} unless file_paths.any?
+
         results = []
 
         Redis::Cache.with do |redis|
