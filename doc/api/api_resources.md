@@ -138,6 +138,7 @@ The following API resources are available outside of project and group contexts 
 | [Validate `.gitlab-ci.yml` file](lint.md)         | `/lint`                                                                 |
 | [Version](version.md)                             | `/version`                                                              |
 | [Vulnerabilities](vulnerabilities.md) **(ULTIMATE)**  | `/vulnerabilities` (also available for projects)                    |
+| [Vulnerability Issue links](vulnerability_issue_links.md) **(ULTIMATE)** | `/vulnerabilities/:id/issue_links`               |
 
 ## Templates API resources
 
