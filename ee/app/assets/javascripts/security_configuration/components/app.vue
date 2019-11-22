@@ -9,7 +9,7 @@ export default {
     Icon,
   },
   props: {
-    autoDevOpsEnabled: {
+    autoDevopsEnabled: {
       type: Boolean,
       required: false,
       default: false,
@@ -22,7 +22,7 @@ export default {
       type: String,
       required: true,
     },
-    autoDevOpsHelpPagePath: {
+    autoDevopsHelpPagePath: {
       type: String,
       required: true,
     },
@@ -44,8 +44,8 @@ export default {
       return sprintf(body, { wordBreakOpportunity }, false);
     },
     callOutLink() {
-      if (this.autoDevOpsEnabled) {
-        return this.autoDevOpsHelpPagePath;
+      if (this.autoDevopsEnabled) {
+        return this.autoDevopsHelpPagePath;
       }
 
       if (this.latestPipelinePath) {
@@ -59,11 +59,11 @@ export default {
           is based on the %{linkStart}latest pipeline%{linkEnd}.
           Once you've configured a scan for the default branch, any subsequent feature branch you create will include the scan.`);
 
-      const bodyAutoDevOpsEnabled = __(
+      const bodyAutoDevopsEnabled = __(
         'All security scans are enabled because %{linkStart}Auto DevOps%{linkEnd} is enabled on this project',
       );
 
-      const body = this.autoDevOpsEnabled ? bodyAutoDevOpsEnabled : bodyDefault;
+      const body = this.autoDevopsEnabled ? bodyAutoDevopsEnabled : bodyDefault;
 
       const linkStart = `<a href="${this.callOutLink}" target="_blank" rel="noopener">`;
       const linkEnd = '</a>';
