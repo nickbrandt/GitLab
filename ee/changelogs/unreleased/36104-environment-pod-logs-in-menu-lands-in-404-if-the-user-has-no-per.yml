@@ -1,5 +1,0 @@
----
-title: Enable pod logs nav menu only for maintainers in projects with k8s environments
-merge_request: 19927
-author:
-type: fixed

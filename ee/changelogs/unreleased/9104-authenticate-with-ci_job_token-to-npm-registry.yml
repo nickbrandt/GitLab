@@ -1,6 +1,0 @@
----
-title: CI_JOB_TOKEN can be accepted with 'Bearer ' prefix to allow for NPM registry
-  usage
-merge_request: 19059
-author:
-type: added
