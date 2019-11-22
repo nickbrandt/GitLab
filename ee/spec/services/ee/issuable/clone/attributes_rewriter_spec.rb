@@ -30,11 +30,11 @@ describe Issuable::Clone::AttributesRewriter do
       end
 
       context 'setting milestones' do
-        it 'sets milestone attribute as nil' do
+        it 'ignores milestone attribute' do
           milestone = create(:milestone, title: 'milestone', group: group)
           original_issue.update(milestone: milestone)
 
-          expect(new_epic).to receive(:update).with(labels: [], milestone: nil)
+          expect(new_epic).to receive(:update).with(labels: [])
 
           subject.execute
         end
