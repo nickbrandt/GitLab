@@ -2386,6 +2386,9 @@ msgstr ""
 msgid "Badges|Link"
 msgstr ""
 
+msgid "Badges|Name"
+msgstr ""
+
 msgid "Badges|No badge image"
 msgstr ""
 
