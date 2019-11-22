@@ -78,6 +78,10 @@ module Gitlab
         end
       end
 
+      def key
+        @redis_key
+      end
+
       private
 
       def file_paths
