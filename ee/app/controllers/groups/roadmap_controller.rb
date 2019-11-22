@@ -5,6 +5,8 @@ module Groups
     include IssuableCollections
     include EpicsActions
 
+    EPICS_ROADMAP_LIMIT = 1000
+
     before_action :check_epics_available!
     before_action :group
     before_action :persist_roadmap_layout, only: [:show]

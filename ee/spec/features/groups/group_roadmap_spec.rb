@@ -165,4 +165,48 @@ describe 'group epic roadmap', :js do
       end
     end
   end
+
+  context 'when over 1000 epics exist for the group' do
+    6.times do |i|
+      let!("epic_#{i}") { create(:epic, group: group, start_date: 10.days.ago, end_date: 1.day.ago) }
+    end
+
+    before do
+      stub_const('Groups::RoadmapController::EPICS_ROADMAP_LIMIT', 5)
+      visit group_roadmap_path(group)
+      wait_for_requests
+    end
+
+    describe 'roadmap page' do
+      it 'renders warning callout banner' do
+        page.within('.content-wrapper .content') do
+          expect(page).to have_selector('.js-epics-limit-callout', count: 1)
+          expect(find('.js-epics-limit-callout')).to have_content 'Some of your epics may not be visible. A roadmap is limited to the first 1,000 epics, in your selected sort order.'
+        end
+      end
+
+      it 'is removed after dismissal' do
+        find('.js-epics-limit-callout .js-close-callout').click
+
+        expect(page).not_to have_selector('.js-epics-limit-callout')
+      end
+
+      it 'does not appear on page after dismissal and reload' do
+        find('.js-epics-limit-callout .js-close-callout').click
+        visit group_roadmap_path(group)
+        wait_for_requests
+
+        expect(page).not_to have_selector('.js-epics-limit-callout')
+      end
+
+      it 'links to roadmap documentation' do
+        page.within('.js-epics-limit-callout') do
+          find('#js-learn-more').click
+          wait_for_requests
+          expect(URI.parse(current_url).host).to eq("docs.gitlab.com")
+          expect(URI.parse(current_url).path).to eq("/ee/user/group/roadmap/")
+        end
+      end
+    end
+  end
 end
