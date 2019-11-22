@@ -13,7 +13,7 @@ module Vulnerabilities
     end
 
     def execute
-      raise Gitlab::Access::AccessDeniedError unless can?(@user, :dismiss_vulnerability, @project)
+      raise Gitlab::Access::AccessDeniedError unless can?(@user, :admin_vulnerability, @project)
 
       @vulnerability.transaction do
         result = dismiss_findings
