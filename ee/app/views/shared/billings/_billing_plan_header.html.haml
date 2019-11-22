@@ -1,7 +1,5 @@
 - parent_group = local_assigns[:parent_group]
 
-.mb-2= render_billings_gold_trial(current_user, parent_group || namespace)
-
 - if namespace_for_user?(namespace)
   = render_if_exists 'trials/banner', namespace: namespace
 
