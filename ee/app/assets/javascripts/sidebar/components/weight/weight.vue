@@ -118,7 +118,9 @@ export default {
       }
     },
     onCollapsedClick() {
-      this.showEditField(true);
+      if (this.editable) {
+        this.showEditField(true);
+      }
       this.collapsedAfterUpdate = true;
     },
     onSubmit(e) {

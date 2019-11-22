@@ -50,7 +50,38 @@ describe 'Issue Sidebar' do
     end
   end
 
+  context 'as a guest' do
+    before do
+      project.add_guest(user)
+      visit_issue(project, issue)
+    end
+
+    it 'does not have a option to edit weight' do
+      expect(page).not_to have_selector('.block.weight .js-weight-edit-link')
+    end
+  end
+
+  context 'as a guest, interacting with collapsed sidebar', :js do
+    before do
+      project.add_guest(user)
+      resize_screen_sm
+      visit_issue(project, issue)
+    end
+
+    it 'edit weight field does not appear after clicking on weight when sidebar is collapsed then expanding it' do
+      find('.js-weight-collapsed-block').click
+      # Expand sidebar
+      open_issue_sidebar
+      expect(page).not_to have_selector('.block.weight .form-control')
+    end
+  end
+
   def visit_issue(project, issue)
     visit project_issue_path(project, issue)
+  end
+
+  def open_issue_sidebar
+    find('aside.right-sidebar.right-sidebar-collapsed .js-sidebar-toggle').click
+    find('aside.right-sidebar.right-sidebar-expanded')
   end
 end
