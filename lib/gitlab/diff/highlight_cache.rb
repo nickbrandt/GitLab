@@ -27,13 +27,13 @@ module Gitlab
       def write_if_empty
         diff_files = @diff_collection.diff_files
         cached_diff_files = read_cache
-        uncached_files = diff_files.select { |file| cached_diff_files[file.new_path].nil? }
+        uncached_files = diff_files.select { |file| cached_diff_files[file.file_path].nil? }
 
         new_cache_content = {}
         uncached_files.each do |diff_file|
           next unless cacheable?(diff_file)
 
-          new_cache_content[diff_file.new_path] = diff_file.highlighted_diff_lines.map(&:to_hash)
+          new_cache_content[diff_file.file_path] = diff_file.highlighted_diff_lines.map(&:to_hash)
         end
 
         write_to_redis_hash(new_cache_content)
@@ -85,11 +85,11 @@ module Gitlab
       private
 
       def file_paths
-        @file_paths ||= @diff_collection.diffs.collect(&:new_path)
+        @file_paths ||= @diff_collection.diffs.collect(&:file_path)
       end
 
       def read_file(diff_file)
-        cached_content[diff_file.new_path]
+        cached_content[diff_file.file_path]
       end
 
       def cached_content
