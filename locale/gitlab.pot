@@ -374,6 +374,9 @@ msgstr[1] ""
 msgid "%{tabname} changed"
 msgstr ""
 
+msgid "%{tag}-evidence.json"
+msgstr ""
+
 msgid "%{template_project_id} is unknown or invalid"
 msgstr ""
 
@@ -6028,6 +6031,9 @@ msgstr ""
 msgid "Download codes"
 msgstr ""
 
+msgid "Download evidence JSON"
+msgstr ""
+
 msgid "Download export"
 msgstr ""
 
@@ -6947,6 +6953,9 @@ msgid "Everything you need to create a GitLab Pages site using Jekyll."
 msgstr ""
 
 msgid "Everything you need to create a GitLab Pages site using plain HTML."
+msgstr ""
+
+msgid "Evidence collection"
 msgstr ""
 
 msgid "Example: @sub\\.company\\.com$"
