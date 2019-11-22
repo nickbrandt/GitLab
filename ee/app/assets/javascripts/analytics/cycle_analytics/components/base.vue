@@ -100,8 +100,10 @@ export default {
       'hideCustomStageForm',
       'showCustomStageForm',
       'setDateRange',
-      'createCustomStage',
       'fetchTasksByTypeData',
+      'createCustomStage',
+      'updateStage',
+      'removeStage',
     ]),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
@@ -127,6 +129,12 @@ export default {
     },
     onCreateCustomStage(data) {
       this.createCustomStage(data);
+    },
+    onUpdateStage(data) {
+      this.updateStage(data);
+    },
+    onRemoveStage(id) {
+      this.removeStage(id);
     },
   },
   groupsQueryParams: {
@@ -225,6 +233,8 @@ export default {
             @selectStage="onStageSelect"
             @showAddStageForm="onShowAddStageForm"
             @submit="onCreateCustomStage"
+            @hideStage="onUpdateStage"
+            @removeStage="onRemoveStage"
           />
         </div>
       </div>

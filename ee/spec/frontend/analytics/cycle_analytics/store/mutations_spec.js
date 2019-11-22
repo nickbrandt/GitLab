@@ -50,6 +50,10 @@ describe('Cycle analytics mutations', () => {
     ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}   | ${false}
     ${types.REQUEST_TASKS_BY_TYPE_DATA}            | ${'isLoadingChartData'}    | ${true}
     ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingChartData'}    | ${false}
+    ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}             | ${true}
+    ${types.RECEIVE_UPDATE_STAGE_RESPONSE}         | ${'isLoading'}             | ${false}
+    ${types.REQUEST_REMOVE_STAGE}                  | ${'isLoading'}             | ${true}
+    ${types.RECEIVE_REMOVE_STAGE_RESPONSE}         | ${'isLoading'}             | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 
@@ -194,6 +198,23 @@ describe('Cycle analytics mutations', () => {
         { slug: 'issue', value: '1 day ago' },
         { slug: 'test', value: null },
       ]);
+    });
+
+    describe('with hidden stages', () => {
+      const mockStages = customizableStagesAndEvents.stages;
+
+      beforeEach(() => {
+        mockStages[0].hidden = true;
+
+        mutations[types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS](state, {
+          ...customizableStagesAndEvents.events,
+          stages: mockStages,
+        });
+      });
+
+      it('will only return stages that are not hidden', () => {
+        expect(state.stages.map(({ id }) => id)).not.toContain(mockStages[0].id);
+      });
     });
   });
 

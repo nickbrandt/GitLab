@@ -111,7 +111,7 @@ export default {
   },
   [types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS](state, data) {
     const { events = [], stages = [] } = data;
-    state.stages = transformRawStages(stages);
+    state.stages = transformRawStages(stages.filter(({ hidden = false }) => !hidden));
 
     state.customStageFormEvents = events.map(ev =>
       convertObjectPropsToCamelCase(ev, { deep: true }),
@@ -121,12 +121,6 @@ export default {
       const { id } = state.stages[0];
       state.selectedStageId = id;
     }
-  },
-  [types.REQUEST_CREATE_CUSTOM_STAGE](state) {
-    state.isSavingCustomStage = true;
-  },
-  [types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE](state) {
-    state.isSavingCustomStage = false;
   },
   [types.REQUEST_TASKS_BY_TYPE_DATA](state) {
     state.isLoadingChartData = true;
@@ -140,5 +134,23 @@ export default {
       ...state.tasksByType,
       data,
     };
+  },
+  [types.REQUEST_CREATE_CUSTOM_STAGE](state) {
+    state.isSavingCustomStage = true;
+  },
+  [types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE](state) {
+    state.isSavingCustomStage = false;
+  },
+  [types.REQUEST_UPDATE_STAGE](state) {
+    state.isLoading = true;
+  },
+  [types.RECEIVE_UPDATE_STAGE_RESPONSE](state) {
+    state.isLoading = false;
+  },
+  [types.REQUEST_REMOVE_STAGE](state) {
+    state.isLoading = true;
+  },
+  [types.RECEIVE_REMOVE_STAGE_RESPONSE](state) {
+    state.isLoading = false;
   },
 };

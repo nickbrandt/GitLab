@@ -239,3 +239,52 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
   }
   return Promise.resolve();
 };
+
+export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
+export const receiveUpdateStageSuccess = ({ commit, dispatch }) => {
+  commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
+  createFlash(__(`Stage data updated`), 'notice');
+
+  dispatch('fetchCycleAnalyticsData');
+};
+
+export const receiveUpdateStageError = ({ commit }) => {
+  commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
+  createFlash(__('There was a problem saving your custom stage, please try again'));
+};
+
+export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
+  const {
+    selectedGroup: { fullPath },
+  } = state;
+
+  dispatch('requestUpdateStage');
+
+  return Api.cycleAnalyticsUpdateStage(id, fullPath, { ...rest })
+    .then(({ data }) => dispatch('receiveUpdateStageSuccess', data))
+    .catch(error => dispatch('receiveUpdateStageError', error));
+};
+
+export const requestRemoveStage = ({ commit }) => commit(types.REQUEST_REMOVE_STAGE);
+export const receiveRemoveStageSuccess = ({ commit, dispatch }) => {
+  commit(types.RECEIVE_REMOVE_STAGE_RESPONSE);
+  createFlash(__('Stage removed'), 'notice');
+  dispatch('fetchCycleAnalyticsData');
+};
+
+export const receiveRemoveStageError = ({ commit }) => {
+  commit(types.RECEIVE_REMOVE_STAGE_RESPONSE);
+  createFlash(__('There was an error removing your custom stage, please try again'));
+};
+
+export const removeStage = ({ dispatch, state }, stageId) => {
+  const {
+    selectedGroup: { fullPath },
+  } = state;
+
+  dispatch('requestRemoveStage');
+
+  return Api.cycleAnalyticsRemoveStage(stageId, fullPath)
+    .then(() => dispatch('receiveRemoveStageSuccess'))
+    .catch(error => dispatch('receiveRemoveStageError', error));
+};
