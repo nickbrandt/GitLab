@@ -10,6 +10,7 @@ namespace :analytics do
     namespace :cycle_analytics do
       resources :stages, only: [:index, :create, :update, :destroy] do
         member do
+          get :duration_chart
           get :median
           get :records
         end

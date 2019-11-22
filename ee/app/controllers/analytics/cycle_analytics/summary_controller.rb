@@ -13,15 +13,19 @@ module Analytics
       def show
         return render_403 unless can?(current_user, :read_group_cycle_analytics, @group)
 
-        group_level = ::CycleAnalytics::GroupLevel.new(group: @group, options: options(allowed_group_params))
+        group_level = ::CycleAnalytics::GroupLevel.new(group: @group, options: options(group_params))
 
         render json: group_level.summary
       end
 
       private
 
-      def allowed_group_params
-        params.permit(:created_after, :created_before, project_ids: [])
+      def group_params
+        {
+          created_after: request_params.created_after,
+          created_before: request_params.created_before,
+          project_ids: request_params.project_ids
+        }
       end
 
       def validate_params
@@ -34,7 +38,11 @@ module Analytics
       end
 
       def request_params
-        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(params.permit(:created_before, :created_after))
+        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(allowed_params)
+      end
+
+      def allowed_params
+        params.permit(:created_after, :created_before, project_ids: [])
       end
     end
   end
