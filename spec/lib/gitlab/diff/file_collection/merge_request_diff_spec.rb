@@ -31,7 +31,7 @@ describe Gitlab::Diff::FileCollection::MergeRequestDiff do
 
   context 'using Gitlab::Diff::DeprecatedHighlightCache' do
     before do
-      stub_feature_flags(redis_diff_caching: false)
+      stub_feature_flags(hset_redis_diff_caching: false)
     end
 
     it 'uses a different cache key if diff line keys change' do

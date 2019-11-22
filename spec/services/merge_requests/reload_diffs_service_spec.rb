@@ -35,7 +35,7 @@ describe MergeRequests::ReloadDiffsService, :use_clean_rails_memory_store_cachin
     context 'cache clearing' do
       context 'using Gitlab::Diff::DeprecatedHighlightCache' do
         before do
-          stub_feature_flags(redis_diff_caching: false)
+          stub_feature_flags(hset_redis_diff_caching: false)
         end
 
         it 'clears the cache for older diffs on the merge request' do
@@ -50,7 +50,7 @@ describe MergeRequests::ReloadDiffsService, :use_clean_rails_memory_store_cachin
 
       context 'using Gitlab::Diff::HighlightCache' do
         before do
-          stub_feature_flags(redis_diff_caching: true)
+          stub_feature_flags(hset_redis_diff_caching: true)
         end
 
         it 'clears the cache for older diffs on the merge request' do

@@ -75,7 +75,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
   describe '#write_if_empty' do
     let(:backend) { double('backend', read: {}).as_null_object }
 
-    context 'when :redis_diff_caching is enabled' do
+    context 'when :hset_redis_diff_caching is enabled' do
       xit 'submits a single write action to the redis cache when invoked multiple times' do
         expect(cache).to receive(:write_to_redis_hash).once
 
