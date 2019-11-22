@@ -57,11 +57,11 @@ module Gitlab
           redis.multi do |multi|
             hash.each do |diff_file_id, highlighted_diff_lines_hash|
               multi.hset(@redis_key, diff_file_id, highlighted_diff_lines_hash.to_json)
-
-              # HSETs have to have their expiration date manually updated
-              #
-              multi.expire(@redis_key, EXPIRATION)
             end
+
+            # HSETs have to have their expiration date manually updated
+            #
+            multi.expire(@redis_key, EXPIRATION)
           end
         end
       end
