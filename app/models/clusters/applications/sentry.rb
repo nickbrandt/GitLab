@@ -5,8 +5,9 @@ require 'securerandom'
 module Clusters
   module Applications
     class Sentry < ApplicationRecord
-      # TODO
-      # VERSION = '0.9-174bbd5'
+      VERSION = '3.1.1'
+      DEFAULT_USER_EMAIL = 'sentry@gitlab.com'
+      DEFAULT_USER_PASSWORD = '5iveL!fe'
 
       self.table_name = 'clusters_applications_sentry'
 
@@ -26,11 +27,7 @@ module Clusters
       end
 
       def chart
-        "#{name}/sentry"
-      end
-
-      def repository
-        'https://charts.gitlab.io'
+        "stable/sentry"
       end
 
       def values
@@ -48,78 +45,30 @@ module Clusters
         )
       end
 
-      # def callback_url
-      #   "http://#{hostname}/hub/oauth_callback"
-      # end
-
-      # def oauth_scopes
-      #   'api read_repository write_repository'
-      # end
-
       private
 
       def specification
         {
           "ingress" => {
-            "hosts" => [hostname],
-            "tls" => [{
-              "hosts" => [hostname],
-              "secretName" => "jupyter-cert"
-            }]
-          },
-          "hub" => {
-            "extraEnv" => {
-              "GITLAB_HOST" => gitlab_url
-            },
-            "cookieSecret" => cookie_secret
-          },
-          "proxy" => {
-            "secretToken" => secret_token
-          },
-          "auth" => {
-            "state" => {
-              "cryptoKey" => crypto_key
-            },
-            "gitlab" => {
-              "clientId" => oauth_application.uid,
-              "clientSecret" => oauth_application.secret,
-              "callbackUrl" => callback_url,
-              "gitlabProjectIdWhitelist" => cluster.projects.ids,
-              "gitlabGroupWhitelist" => cluster.groups.map(&:to_param)
+            "enabled" => true,
+            "hostname" => hostname,
+            "annotations" => {
+              "kubernetes.io/ingress.class" => "nginx"
             }
           },
-          "singleuser" => {
-            "extraEnv" => {
-              "GITLAB_CLUSTER_ID" => cluster.id.to_s,
-              "GITLAB_HOST" => gitlab_host
-            }
+          "service" => {
+            "type" => "ClusterIP"
+          },
+          "user" => {
+            "email" => DEFAULT_USER_EMAIL,
+            "password" => DEFAULT_USER_PASSWORD
           }
         }
       end
 
-      # def crypto_key
-      #   @crypto_key ||= SecureRandom.hex(32)
-      # end
-
-      # def gitlab_url
-      #   Gitlab.config.gitlab.url
-      # end
-
-      # def gitlab_host
-      #   Gitlab.config.gitlab.host
-      # end
-
       def content_values
         YAML.load_file(chart_values_file).deep_merge!(specification)
       end
-
-      # def secret_token
-      #   @secret_token ||= SecureRandom.hex(32)
-      # end
-
-      # def cookie_secret
-      #   @cookie_secret ||= SecureRandom.hex(32)
-      # end
     end
   end
 end

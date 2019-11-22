@@ -1181,6 +1181,17 @@ ActiveRecord::Schema.define(version: 2019_11_24_150431) do
     t.index ["runner_id"], name: "index_clusters_applications_runners_on_runner_id"
   end
 
+  create_table "clusters_applications_sentry", force: :cascade do |t|
+    t.bigint "cluster_id", null: false
+    t.integer "status", null: false
+    t.string "version", null: false
+    t.string "hostname"
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.text "status_reason"
+    t.index ["cluster_id"], name: "index_clusters_applications_sentry_on_cluster_id"
+  end
+
   create_table "clusters_kubernetes_namespaces", force: :cascade do |t|
     t.integer "cluster_id", null: false
     t.integer "project_id"
