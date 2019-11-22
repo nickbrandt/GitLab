@@ -45,6 +45,16 @@ module EE
       errors.add(:invite_email, email_no_match_email_domain(invite_email))
     end
 
+    def group_saml_identity
+      return unless source.saml_provider
+
+      if user.group_saml_identities.loaded?
+        user.group_saml_identities.detect { |i| i.saml_provider_id == source.saml_provider.id }
+      else
+        user.group_saml_identities.find_by(saml_provider: source.saml_provider)
+      end
+    end
+
     private
 
     def email_no_match_email_domain(email)
