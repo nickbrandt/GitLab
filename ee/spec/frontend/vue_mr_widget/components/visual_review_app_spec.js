@@ -2,6 +2,7 @@ import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import VisualReviewAppLink from 'ee/vue_merge_request_widget/components/visual_review_app_link.vue';
 import { GlButton, GlModal } from '@gitlab/ui';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
+import { mockTracking, triggerEvent } from 'helpers/tracking_helper';
 
 const localVue = createLocalVue();
 
@@ -81,9 +82,19 @@ describe('Visual Review App Link', () => {
       expect(
         wrapper
           .find(GlModal)
-          .find('a')
+          .find('a.js-review-app-link')
           .attributes('href'),
       ).toEqual(propsData.link);
+    });
+
+    it('tracks an event when review app link is clicked', () => {
+      const spy = mockTracking('_category_', wrapper.element, jest.spyOn);
+      const appLink = wrapper.find(GlModal).find('a.js-review-app-link');
+      triggerEvent(appLink.element);
+
+      expect(spy).toHaveBeenCalledWith('_category_', 'open_review_app', {
+        label: 'review_app',
+      });
     });
   });
 
