@@ -554,10 +554,9 @@
     }
 
     a.trial-link gl-emoji {
-      font-size: 14px;
-      margin-top: -4px;
+      font-size: $gl-font-size;
+      vertical-align: baseline;
     }
-
   }
 }
 
