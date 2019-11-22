@@ -124,9 +124,7 @@ export default {
     },
   },
   mounted() {
-    if (!this.allValuesEmpty) {
-      this.draw();
-    }
+    this.draw();
   },
   methods: {
     draw() {
@@ -153,7 +151,7 @@ export default {
       this.yScale = d3.scaleLinear().rangeRound([this.vbHeight, 0]);
 
       this.xScale.domain(this.graphData.map(d => d.name));
-      this.yScale.domain([0, d3.max(this.graphData.map(d => d.value))]);
+      this.yScale.domain([0, d3.max(this.graphData.map(d => d.value)) || Infinity]);
 
       // Zoom/Panning Function
       this.zoom = d3
