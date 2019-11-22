@@ -167,6 +167,19 @@ describe API::ProjectPackages do
 
           it_behaves_like 'destroy url'
         end
+
+        context 'with build info' do
+          let!(:package1) { create(:npm_package, :with_build, project: project) }
+
+          it 'returns the build info' do
+            project.add_developer(user)
+
+            get api(package_url, user)
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(response).to match_response_schema('public_api/v4/packages/package_with_build', dir: 'ee')
+          end
+        end
       end
     end
 
