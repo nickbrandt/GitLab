@@ -1,7 +1,7 @@
 <script>
 import { isUndefined } from 'underscore';
-import { s__, sprintf } from '~/locale';
-import { GlEmptyState } from '@gitlab/ui';
+import { s__ } from '~/locale';
+import { GlEmptyState, GlSprintf } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
@@ -10,6 +10,7 @@ import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
 export default {
   components: {
     GlEmptyState,
+    GlSprintf,
     UserAvatarLink,
     Icon,
     TimeagoTooltip,
@@ -83,15 +84,6 @@ export default {
     },
   },
   computed: {
-    headline() {
-      return sprintf(
-        s__('SecurityDashboard|Pipeline %{pipelineLink} triggered'),
-        {
-          pipelineLink: `<a href="${this.pipeline.path}">#${this.pipeline.id}</a>`,
-        },
-        false,
-      );
-    },
     emptyStateDescription() {
       return s__(
         `SecurityDashboard|
@@ -108,17 +100,28 @@ export default {
       <div class="card security-dashboard prepend-top-default">
         <div class="card-header border-bottom-0">
           <span class="js-security-dashboard-left">
-            <span v-html="headline"></span>
-            <timeago-tooltip :time="pipeline.created" />
-            {{ __('by') }}
-            <user-avatar-link
-              :link-href="triggeredBy.path"
-              :img-src="triggeredBy.avatarPath"
-              :img-alt="triggeredBy.name"
-              :img-size="24"
-              :username="triggeredBy.name"
-              class="avatar-image-container"
-            />
+            <gl-sprintf
+              :message="
+                s__('SecurityDashboard|Pipeline %{pipelineLink} triggered %{timeago} by %{user}')
+              "
+            >
+              <template #pipelineLink>
+                <a :href="pipeline.path">#{{ pipeline.id }}</a>
+              </template>
+              <template #timeago>
+                <timeago-tooltip :time="pipeline.created" />
+              </template>
+              <template #user>
+                <user-avatar-link
+                  :link-href="triggeredBy.path"
+                  :img-src="triggeredBy.avatarPath"
+                  :img-alt="triggeredBy.name"
+                  :img-size="24"
+                  :username="triggeredBy.name"
+                  class="avatar-image-container"
+                />
+              </template>
+            </gl-sprintf>
           </span>
           <span class="js-security-dashboard-right pull-right">
             <icon name="branch" />
