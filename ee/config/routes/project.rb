@@ -162,6 +162,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       namespace :security do
         resource :dashboard, only: [:show], controller: :dashboard
+        resource :configuration, only: [:show], controller: :configuration
+
         resources :dependencies, only: [:index]
         resources :licenses, only: [:index]
         # We have to define both legacy and new routes for Vulnerability Findings
