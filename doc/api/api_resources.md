@@ -68,6 +68,7 @@ The following API resources are available in the project context:
 | [Services](services.md)                                             | `/projects/:id/services`                                                                                                                                                                              |
 | [Tags](tags.md)                                                     | `/projects/:id/repository/tags`                                                                                                                                                                       |
 | [Visual Review discussions](visual_review_discussions.md) **(STARTER**) | `/projects/:id/merge_requests/:merge_request_id/visual_review_discussions`                                                                                                                        |
+| [Vulnerabilities](project_vulnerabilities.md) **(ULTIMATE)**   | `/projects/:id/vulnerabilities`                                                                                                                                                                            |
 | [Vulnerability Findings](vulnerability_findings.md) **(ULTIMATE)**  | `/projects/:id/vulnerability_findings`                                                                                                                                                                |
 | [Wikis](wikis.md)                                                   | `/projects/:id/wikis`                                                                                                                                                                                 |
 
@@ -136,6 +137,7 @@ The following API resources are available outside of project and group contexts 
 | [Users](users.md)                                 | `/users`                                                                |
 | [Validate `.gitlab-ci.yml` file](lint.md)         | `/lint`                                                                 |
 | [Version](version.md)                             | `/version`                                                              |
+| [Vulnerabilities](vulnerabilities.md) **(ULTIMATE)**  | `/vulnerabilities` (also available for projects)                    |
 
 ## Templates API resources
 
