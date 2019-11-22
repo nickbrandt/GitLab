@@ -7,7 +7,7 @@ describe('Date time utils', () => {
       const date = new Date();
       date.setFullYear(date.getFullYear() - 1);
 
-      expect(datetimeUtility.timeFor(date)).toBe(__('Past due'));
+      expect(datetimeUtility.timeFor(date)).toBe(s__('Timeago|Past due'));
     });
 
     it('returns localized remaining time when in the future', () => {
@@ -18,7 +18,7 @@ describe('Date time utils', () => {
       // short of a full year, timeFor will return '11 months remaining'
       date.setDate(date.getDate() + 1);
 
-      expect(datetimeUtility.timeFor(date)).toBe(__('1 year remaining'));
+      expect(datetimeUtility.timeFor(date)).toBe(s__('Timeago|1 year remaining'));
     });
   });
 
