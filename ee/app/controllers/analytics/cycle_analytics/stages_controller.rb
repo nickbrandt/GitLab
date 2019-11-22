@@ -6,7 +6,7 @@ module Analytics
       check_feature_flag Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG
 
       before_action :load_group
-      before_action :validate_params, only: %i[median records]
+      before_action :validate_params, only: %i[median records duration_chart]
 
       def index
         return render_403 unless can?(current_user, :read_group_cycle_analytics, @group)
@@ -50,6 +50,12 @@ module Analytics
         render json: data_collector.serialized_records
       end
 
+      def duration_chart
+        return render_403 unless can?(current_user, :read_group_stage, @group)
+
+        render json: Analytics::CycleAnalytics::DurationChartItemEntity.represent(data_collector.duration_chart_data)
+      end
+
       private
 
       def validate_params
@@ -62,14 +68,15 @@ module Analytics
       end
 
       def request_params
-        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(params.permit(:created_before, :created_after))
+        @request_params ||= Gitlab::Analytics::CycleAnalytics::RequestParams.new(data_collector_params)
       end
 
       def data_collector
         @data_collector ||= Gitlab::Analytics::CycleAnalytics::DataCollector.new(stage: stage, params: {
           current_user: current_user,
           from: request_params.created_after,
-          to: request_params.created_before
+          to: request_params.created_before,
+          project_ids: request_params.project_ids
         })
       end
 
@@ -106,6 +113,10 @@ module Analytics
         else
           render json: { message: result.message, errors: result.payload[:errors] }, status: result.http_status
         end
+      end
+
+      def data_collector_params
+        params.permit(:created_before, :created_after, project_ids: [])
       end
 
       def update_params

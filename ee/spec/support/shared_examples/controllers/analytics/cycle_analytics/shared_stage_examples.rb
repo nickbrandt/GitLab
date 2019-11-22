@@ -78,7 +78,7 @@ shared_context 'when invalid stage parameters are given' do
   end
 end
 
-shared_examples 'date parameter examples' do
+shared_examples 'cycle analytics data endpoint examples' do
   before do
     params[:created_after] = '2019-01-01'
     params[:created_before] = '2020-01-01'
@@ -86,6 +86,20 @@ shared_examples 'date parameter examples' do
 
   context 'when valid parameters are given' do
     it 'succeeds' do
+      subject
+
+      expect(response).to be_successful
+    end
+  end
+
+  context 'accepts optional `project_ids` array' do
+    before do
+      params[:project_ids] = [1, 2, 3]
+    end
+
+    it 'succeeds' do
+      expect_any_instance_of(Gitlab::Analytics::CycleAnalytics::RequestParams).to receive(:project_ids=).with(%w[1 2 3]).and_call_original
+
       subject
 
       expect(response).to be_successful
