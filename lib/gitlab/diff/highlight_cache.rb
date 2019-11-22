@@ -29,6 +29,8 @@ module Gitlab
         cached_diff_files = read_cache
         uncached_files = diff_files.select { |file| cached_diff_files[file.file_path].nil? }
 
+        return if uncached_files.empty?
+
         new_cache_content = {}
         uncached_files.each do |diff_file|
           next unless cacheable?(diff_file)
