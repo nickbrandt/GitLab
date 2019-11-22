@@ -15,12 +15,18 @@ module Audit
     def humanize
       if @details[:with]
         "Signed in with #{@details[:with].upcase} authentication"
+      elsif event_created_by_system?
+        "#{action_text} via system job. Reason: #{@details[:reason]}"
       else
         action_text
       end
     end
 
     private
+
+    def event_created_by_system?
+      @details[:system_event]
+    end
 
     def action_text
       action = @details.slice(*ACTIONS)
