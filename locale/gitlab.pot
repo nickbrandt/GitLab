@@ -65,6 +65,9 @@ msgstr ""
 msgid "\"%{path}\" did not exist on \"%{ref}\""
 msgstr ""
 
+msgid "## Error Details: %{description}"
+msgstr ""
+
 msgid "%d comment"
 msgid_plural "%d comments"
 msgstr[0] ""
@@ -474,10 +477,25 @@ msgstr ""
 msgid ", or "
 msgstr ""
 
+msgid "- Events: %{count}"
+msgstr ""
+
+msgid "- First seen: %{first_seen}"
+msgstr ""
+
+msgid "- Last seen: %{last_seen}"
+msgstr ""
+
 msgid "- Runner is active and can process any new jobs"
 msgstr ""
 
 msgid "- Runner is paused and will not receive any new jobs"
+msgstr ""
+
+msgid "- Sentry Event: %{external_url}"
+msgstr ""
+
+msgid "- Users: %{user_count}"
 msgstr ""
 
 msgid "- show less"
@@ -6983,9 +7001,6 @@ msgstr ""
 msgid "Events"
 msgstr ""
 
-msgid "Events: %{count}"
-msgstr ""
-
 msgid "Every %{action} attempt has failed: %{job_error_message}. Please try again."
 msgstr ""
 
@@ -7640,9 +7655,6 @@ msgid "First name"
 msgstr ""
 
 msgid "First seen"
-msgstr ""
-
-msgid "First seen: %{first_seen}"
 msgstr ""
 
 msgid "Fixed date"
@@ -10106,9 +10118,6 @@ msgid "Last reply by"
 msgstr ""
 
 msgid "Last seen"
-msgstr ""
-
-msgid "Last seen: %{last_seen}"
 msgstr ""
 
 msgid "Last successful update"
@@ -15637,9 +15646,6 @@ msgstr ""
 msgid "Sentry event"
 msgstr ""
 
-msgid "Sentry event: %{external_url}"
-msgstr ""
-
 msgid "Sep"
 msgstr ""
 
@@ -19360,9 +19366,6 @@ msgid "Users were successfully added."
 msgstr ""
 
 msgid "Users with a Guest role or those who don't belong to any projects or groups don't count towards seats in use."
-msgstr ""
-
-msgid "Users: %{user_count}"
 msgstr ""
 
 msgid "UsersSelect|%{name} + %{length} more"

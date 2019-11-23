@@ -32,7 +32,11 @@ export default {
       type: String,
       required: true,
     },
-    issueProjectPath: {
+    projectIssuesPath: {
+      type: String,
+      required: true,
+    },
+    csrfToken: {
       type: String,
       required: true,
     },
@@ -66,29 +70,46 @@ export default {
       return `${this.error.title}`;
     },
     errorUrl() {
-      return sprintf(__('Sentry event: %{external_url}'), {
-        external_url: this.error.external_url,
-      });
+      return sprintf(
+        __('- Sentry Event: %{external_url}'),
+        {
+          external_url: `${this.error.external_url}\n`,
+        },
+        false,
+      );
     },
     errorFirstSeen() {
-      return sprintf(__('First seen: %{first_seen}'), { first_seen: this.error.first_seen });
+      return sprintf(
+        __('- First seen: %{first_seen}'),
+        { first_seen: `${this.error.first_seen}\n` },
+        false,
+      );
     },
     errorLastSeen() {
-      return sprintf(__('Last seen: %{last_seen}'), { last_seen: this.error.last_seen });
+      return sprintf(
+        __('- Last seen: %{last_seen}'),
+        { last_seen: `${this.error.last_seen}\n` },
+        false,
+      );
     },
     errorCount() {
-      return sprintf(__('Events: %{count}'), { count: this.error.count });
+      return sprintf(__('- Events: %{count}'), { count: `${this.error.count}\n` }, false);
     },
     errorUserCount() {
-      return sprintf(__('Users: %{user_count}'), { user_count: this.error.user_count });
-    },
-    issueLink() {
-      return `${this.issueProjectPath}?issue[title]=${encodeURIComponent(
-        this.errorTitle,
-      )}&issue[description]=${encodeURIComponent(this.issueDescription)}`;
+      return sprintf(
+        __('- Users: %{user_count}'),
+        { user_count: `${this.error.user_count}\n` },
+        false,
+      );
     },
     issueDescription() {
-      return `${this.errorUrl}${this.errorFirstSeen}${this.errorLastSeen}${this.errorCount}${this.errorUserCount}`;
+      return sprintf(
+        __('## Error Details: %{description}'),
+        {
+          description: `\n${this.errorUrl}${this.errorFirstSeen}${this.errorLastSeen}${this.errorCount}${this.errorUserCount}`,
+        },
+        false,
+      );
     },
   },
   mounted() {
@@ -98,6 +119,9 @@ export default {
   methods: {
     ...mapActions('details', ['startPollingDetails', 'startPollingStacktrace']),
     trackClickErrorLinkToSentryOptions,
+    createIssue() {
+      this.$refs.sentryIssueForm.submit();
+    },
     formatDate(date) {
       return `${this.timeFormated(date)} (${dateFormat(date, 'UTC:yyyy-mm-dd h:MM:ssTT Z')})`;
     },
@@ -114,9 +138,14 @@ export default {
     <div v-else-if="showDetails" class="error-details">
       <div class="top-area align-items-center justify-content-between py-3">
         <span v-if="!loadingStacktrace && stacktrace" v-html="reported"></span>
-        <gl-button variant="success" :href="issueLink">
-          {{ __('Create issue') }}
-        </gl-button>
+        <form ref="sentryIssueForm" :action="projectIssuesPath" method="POST">
+          <input name="issue[title]" :value="errorTitle" type="hidden" />
+          <input name="issue[description]" :value="issueDescription" type="hidden" />
+          <input :value="csrfToken" type="hidden" name="authenticity_token" />
+          <gl-button variant="success" @click="createIssue">
+            {{ __('Create issue') }}
+          </gl-button>
+        </form>
       </div>
       <div>
         <tooltip-on-truncate :title="error.title" truncate-target="child" placement="top">
