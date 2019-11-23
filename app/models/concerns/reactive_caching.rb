@@ -106,6 +106,8 @@ module ReactiveCaching
     end
 
     def with_reactive_cache(*args, &blk)
+      return reactive_cache_pry(*args, &blk) if ENV['REACTIVE_CACHE_PRY'] == 'true'
+
       unless within_reactive_cache_lifetime?(*args)
         refresh_reactive_cache!(*args)
         return
@@ -145,6 +147,14 @@ module ReactiveCaching
     end
 
     private
+
+    def reactive_cache_pry(*args, &blk)
+      data = Rails.cache.fetch(full_reactive_cache_key(*args), expires_in: 5.seconds) do
+        self.class.reactive_cache_worker_finder.call(id, *args).calculate_reactive_cache(*args)
+      end
+
+      yield data
+    end
 
     def refresh_reactive_cache!(*args)
       clear_reactive_cache!(*args)
