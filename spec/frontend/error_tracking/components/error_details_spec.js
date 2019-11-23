@@ -1,6 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlButton, GlLoadingIcon, GlLink } from '@gitlab/ui';
+import { GlLoadingIcon, GlLink } from '@gitlab/ui';
 import Stacktrace from '~/error_tracking/components/stacktrace.vue';
 import ErrorDetails from '~/error_tracking/components/error_details.vue';
 
@@ -20,7 +20,8 @@ describe('ErrorDetails', () => {
       propsData: {
         issueDetailsPath: '/123/details',
         issueStackTracePath: '/stacktrace',
-        issueProjectPath: '/test-project/issues/new',
+        projectIssuesPath: '/test-project/issues/',
+        csrfToken: 'fakeToken',
       },
     });
   }
@@ -83,7 +84,7 @@ describe('ErrorDetails', () => {
       expect(wrapper.find(Stacktrace).exists()).toBe(false);
     });
 
-    it('should allow an issue to be created with title and description', () => {
+    it('should create an issue with title and description', () => {
       store.state.details.loading = false;
       store.state.details.error = {
         id: 1,
@@ -95,22 +96,16 @@ describe('ErrorDetails', () => {
         user_count: 2,
       };
       mountComponent();
-      const button = wrapper.find(GlButton);
-      const title = 'Issue title';
-      const url = 'Sentry event: http://sentry.gitlab.net/gitlab';
-      const firstSeen = 'First seen: 2017-05-26T13:32:48Z';
-      const lastSeen = 'Last seen: 2018-05-26T13:32:48Z';
-      const count = 'Events: 12';
-      const userCount = 'Users: 2';
 
-      const issueDescription = `${url}${firstSeen}${lastSeen}${count}${userCount}`;
+      const form = wrapper.find({ ref: 'sentryIssueForm' });
+      const csrfTokenInput = wrapper.find('input[name="authenticity_token"]');
+      const issueTitleInput = wrapper.find('input[name="issue[title]"]');
+      const issueDescriptionInput = wrapper.find('input[name="issue[description]"]');
 
-      const issueLink = `/test-project/issues/new?issue[title]=${encodeURIComponent(
-        title,
-      )}&issue[description]=${encodeURIComponent(issueDescription)}`;
-
-      expect(button.exists()).toBe(true);
-      expect(button.attributes().href).toBe(issueLink);
+      expect(form).toExist();
+      expect(csrfTokenInput.attributes('value')).toBe('fakeToken');
+      expect(issueTitleInput.attributes('value')).toContain(wrapper.vm.issueTitle);
+      expect(issueDescriptionInput.attributes('value')).toContain(wrapper.vm.issueDescription);
     });
 
     describe('Stacktrace', () => {

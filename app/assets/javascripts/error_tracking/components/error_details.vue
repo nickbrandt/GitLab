@@ -66,7 +66,7 @@ export default {
     showStacktrace() {
       return Boolean(!this.loadingStacktrace && this.stacktrace && this.stacktrace.length);
     },
-    errorTitle() {
+    issueTitle() {
       return `${this.error.title}`;
     },
     errorUrl() {
@@ -139,7 +139,7 @@ export default {
       <div class="top-area align-items-center justify-content-between py-3">
         <span v-if="!loadingStacktrace && stacktrace" v-html="reported"></span>
         <form ref="sentryIssueForm" :action="projectIssuesPath" method="POST">
-          <input name="issue[title]" :value="errorTitle" type="hidden" />
+          <input name="issue[title]" :value="issueTitle" type="hidden" />
           <input name="issue[description]" :value="issueDescription" type="hidden" />
           <input :value="csrfToken" type="hidden" name="authenticity_token" />
           <gl-button variant="success" @click="createIssue">
