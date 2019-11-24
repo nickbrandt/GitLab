@@ -56,6 +56,7 @@ module Clusters
     has_one_cluster_application :jupyter
     has_one_cluster_application :knative
     has_one_cluster_application :elastic_stack
+    has_one_cluster_application :sentry
 
     has_many :kubernetes_namespaces
 
