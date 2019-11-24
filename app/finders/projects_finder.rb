@@ -82,7 +82,29 @@ class ProjectsFinder < UnionFinder
       if private_only?
         current_user.authorized_projects
       else
-        Project.public_or_visible_to_user(current_user)
+        default_visibility_levels = Gitlab::VisibilityLevel.levels_for_user(current_user)
+
+        # This is an optimization - surprisingly PostgreSQL does not optimize
+        # for this.
+        #
+        # If the default visiblity level and desired visiblity level filter
+        # cancels each other out, don't use the SQL clause for visibility level.
+        # In fact, this then becames equivalent to just authorized projects for
+        # the user.
+        #
+        # E.g.
+        # (EXISTS(<authorized_projects>) OR projects.visibility_level IN (10,20))
+        #   AND "projects"."visibility_level" = 0
+        #
+        # is essentially
+        # EXISTS(<authorized_projects>) AND "projects"."visibility_level" = 0
+        #
+        # See https://gitlab.com/gitlab-org/gitlab/issues/37007
+        if params[:visibility_level].present? && !default_visibility_levels.include?(params[:visibility_level])
+          current_user.authorized_projects
+        else
+          Project.public_or_visible_to_user(current_user)
+        end
       end
     end
   end
