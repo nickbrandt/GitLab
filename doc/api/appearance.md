@@ -1,6 +1,6 @@
 # Appearance API
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/???) in GitLab 12.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/20674) in GitLab 12.6.
 
 These API calls allow you to read and modify the GitLab appearance as visible in
 `/admin/appearance`. You have to be an administrator in order to perform this action.

@@ -10,7 +10,7 @@ describe API::Appearance, 'Appearance' do
     context 'as a non-admin user' do
       it "returns 403" do
         get api("/application/appearance", user)
-  
+
         expect(response).to have_gitlab_http_status(403)
       end
     end
@@ -40,11 +40,11 @@ describe API::Appearance, 'Appearance' do
     context 'as a non-admin user' do
       it "returns 403" do
         put api("/application/appearance", user), params: { title: "Test" }
-  
+
         expect(response).to have_gitlab_http_status(403)
       end
     end
-    
+
     context 'as an admin user' do
       context "instance basics" do
         it "allows updating the settings" do
@@ -53,7 +53,7 @@ describe API::Appearance, 'Appearance' do
             description: "gitlab-test.example.com",
             new_project_guidelines: "Please read the FAQs for help."
           }
-  
+
           expect(response).to have_gitlab_http_status(200)
           expect(json_response).to be_an Hash
           expect(json_response['description']).to eq('gitlab-test.example.com')
@@ -69,7 +69,7 @@ describe API::Appearance, 'Appearance' do
           expect(json_response['title']).to eq('GitLab Test Instance')
         end
       end
-  
+
       context "system header and footer" do
         it "allows updating the settings" do
           settings = {
@@ -79,64 +79,64 @@ describe API::Appearance, 'Appearance' do
             message_background_color: "#009999",
             email_header_and_footer_enabled: true
           }
-  
+
           put api("/application/appearance", admin), params: settings
-  
+
           expect(response).to have_gitlab_http_status(200)
           settings.each do |attribute, value|
             expect(Appearance.current.public_send(attribute)).to eq(value)
           end
         end
-  
+
         context "fails on invalid color values" do
           it "with message_font_color" do
             put api("/application/appearance", admin), params: { message_font_color: "No Color" }
-  
+
             expect(response).to have_gitlab_http_status(400)
             expect(json_response['message']['message_font_color']).to contain_exactly('must be a valid color code')
           end
-  
+
           it "with message_background_color" do
             put api("/application/appearance", admin), params: { message_background_color: "#1" }
-  
+
             expect(response).to have_gitlab_http_status(400)
             expect(json_response['message']['message_background_color']).to contain_exactly('must be a valid color code')
           end
         end
       end
-  
+
       context "instance logos" do
         let_it_be(:appearance) { create(:appearance) }
-  
+
         it "allows updating the image files" do
           put api("/application/appearance", admin), params: {
             logo: fixture_file_upload("spec/fixtures/dk.png", "image/png"),
             header_logo: fixture_file_upload("spec/fixtures/dk.png", "image/png"),
             favicon: fixture_file_upload("spec/fixtures/dk.png", "image/png")
           }
-  
+
           expect(response).to have_gitlab_http_status(200)
           expect(json_response['logo']).to eq("/uploads/-/system/appearance/logo/#{appearance.id}/dk.png")
           expect(json_response['header_logo']).to eq("/uploads/-/system/appearance/header_logo/#{appearance.id}/dk.png")
           expect(json_response['favicon']).to eq("/uploads/-/system/appearance/favicon/#{appearance.id}/dk.png")
         end
-  
+
         context "fails on invalid color images" do
           it "with string instead of file" do
             put api("/application/appearance", admin), params: { logo: 'not-a-file.png' }
-  
+
             expect(response).to have_gitlab_http_status(400)
             expect(json_response['error']).to eq("logo is invalid")
           end
-  
+
           it "with .svg file instead of .png" do
             put api("/application/appearance", admin), params: { favicon: fixture_file_upload("spec/fixtures/logo_sample.svg", "image/svg") }
-  
+
             expect(response).to have_gitlab_http_status(400)
             expect(json_response['message']['favicon']).to contain_exactly("You are not allowed to upload \"svg\" files, allowed types: png, ico")
           end
         end
-      end  
+      end
     end
   end
 end
