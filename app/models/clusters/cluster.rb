@@ -19,7 +19,8 @@ module Clusters
       Applications::Runner.application_name => Applications::Runner,
       Applications::Jupyter.application_name => Applications::Jupyter,
       Applications::Knative.application_name => Applications::Knative,
-      Applications::ElasticStack.application_name => Applications::ElasticStack
+      Applications::ElasticStack.application_name => Applications::ElasticStack,
+      Applications::Sentry.application_name => Applications::Sentry
     }.freeze
     DEFAULT_ENVIRONMENT = '*'
     KUBE_INGRESS_BASE_DOMAIN = 'KUBE_INGRESS_BASE_DOMAIN'

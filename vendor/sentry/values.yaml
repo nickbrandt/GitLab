@@ -8,11 +8,6 @@ image:
 web:
   replicacount: 1
   resources: {}
-  env:
-    - name: GITHUB_APP_ID
-      value:
-    - name: GITHUB_API_SECRET
-      value:
   nodeSelector: {}
   tolerations: []
   affinity: {}
