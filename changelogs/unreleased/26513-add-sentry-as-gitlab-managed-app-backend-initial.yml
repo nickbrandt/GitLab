@@ -1,0 +1,5 @@
+---
+title: 'Add migration and application files for Sentry as a GitLab managed app'
+merge_request: 20597
+author:
+type: added
