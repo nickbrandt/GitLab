@@ -1,8 +1,9 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import dateFormat from 'dateformat';
-import { __, sprintf } from '~/locale';
-import { GlButton, GlLink, GlLoadingIcon } from '@gitlab/ui';
+import { GlFormInput, GlLink, GlLoadingIcon } from '@gitlab/ui';
+import { __, sprintf, n__ } from '~/locale';
+import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
 import Stacktrace from './stacktrace.vue';
@@ -12,7 +13,8 @@ import { trackClickErrorLinkToSentryOptions } from '../utils';
 
 export default {
   components: {
-    GlButton,
+    LoadingButton,
+    GlFormInput,
     GlLink,
     GlLoadingIcon,
     TooltipOnTruncate,
@@ -41,6 +43,11 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      issueCreationInProgress: false,
+    };
+  },
   computed: {
     ...mapState('details', ['error', 'loading', 'loadingStacktrace', 'stacktraceData']),
     ...mapGetters('details', ['stacktrace']),
@@ -67,46 +74,22 @@ export default {
       return Boolean(!this.loadingStacktrace && this.stacktrace && this.stacktrace.length);
     },
     issueTitle() {
-      return `${this.error.title}`;
-    },
-    errorUrl() {
-      return sprintf(
-        __('- Sentry Event: %{external_url}'),
-        {
-          external_url: `${this.error.external_url}\n`,
-        },
-        false,
-      );
-    },
-    errorFirstSeen() {
-      return sprintf(
-        __('- First seen: %{first_seen}'),
-        { first_seen: `${this.error.first_seen}\n` },
-        false,
-      );
-    },
-    errorLastSeen() {
-      return sprintf(
-        __('- Last seen: %{last_seen}'),
-        { last_seen: `${this.error.last_seen}\n` },
-        false,
-      );
-    },
-    errorCount() {
-      return sprintf(__('- Events: %{count}'), { count: `${this.error.count}\n` }, false);
-    },
-    errorUserCount() {
-      return sprintf(
-        __('- Users: %{user_count}'),
-        { user_count: `${this.error.user_count}\n` },
-        false,
-      );
+      return this.error.title;
     },
     issueDescription() {
       return sprintf(
-        __('## Error Details: %{description}'),
+        __(
+          '%{description}- Sentry event: %{errorUrl}- First seen: %{firstSeen}- Last seen: %{lastSeen} %{countLabel}: %{count}%{userCountLabel}: %{userCount}',
+        ),
         {
-          description: `\n${this.errorUrl}${this.errorFirstSeen}${this.errorLastSeen}${this.errorCount}${this.errorUserCount}`,
+          description: '# Error Details:\n',
+          errorUrl: `${this.error.external_url}\n`,
+          firstSeen: `\n${this.error.first_seen}\n`,
+          lastSeen: `${this.error.last_seen}\n`,
+          countLabel: n__('- Event', '- Events', this.error.count),
+          count: `${this.error.count}\n`,
+          userCountLabel: n__('- User', '- Users', this.error.user_count),
+          userCount: `${this.error.user_count}\n`,
         },
         false,
       );
@@ -120,6 +103,7 @@ export default {
     ...mapActions('details', ['startPollingDetails', 'startPollingStacktrace']),
     trackClickErrorLinkToSentryOptions,
     createIssue() {
+      this.issueCreationInProgress = true;
       this.$refs.sentryIssueForm.submit();
     },
     formatDate(date) {
@@ -139,12 +123,15 @@ export default {
       <div class="top-area align-items-center justify-content-between py-3">
         <span v-if="!loadingStacktrace && stacktrace" v-html="reported"></span>
         <form ref="sentryIssueForm" :action="projectIssuesPath" method="POST">
-          <input name="issue[title]" :value="issueTitle" type="hidden" />
+          <gl-form-input class="hidden" name="issue[title]" :value="issueTitle" />
           <input name="issue[description]" :value="issueDescription" type="hidden" />
-          <input :value="csrfToken" type="hidden" name="authenticity_token" />
-          <gl-button variant="success" @click="createIssue">
-            {{ __('Create issue') }}
-          </gl-button>
+          <gl-form-input :value="csrfToken" class="hidden" name="authenticity_token" />
+          <loading-button
+            class="btn-success"
+            :label="__('Create issue')"
+            :loading="issueCreationInProgress"
+            @click="createIssue"
+          />
         </form>
       </div>
       <div>

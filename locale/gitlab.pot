@@ -65,9 +65,6 @@ msgstr ""
 msgid "\"%{path}\" did not exist on \"%{ref}\""
 msgstr ""
 
-msgid "## Error Details: %{description}"
-msgstr ""
-
 msgid "%d comment"
 msgid_plural "%d comments"
 msgstr[0] ""
@@ -235,6 +232,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "%{count} related %{pluralized_subject}: %{links}"
+msgstr ""
+
+msgid "%{description}- Sentry event: %{errorUrl}- First seen: %{firstSeen}- Last seen: %{lastSeen} %{countLabel}: %{count}%{userCountLabel}: %{userCount}"
 msgstr ""
 
 msgid "%{duration}ms"
@@ -477,14 +477,10 @@ msgstr ""
 msgid ", or "
 msgstr ""
 
-msgid "- Events: %{count}"
-msgstr ""
-
-msgid "- First seen: %{first_seen}"
-msgstr ""
-
-msgid "- Last seen: %{last_seen}"
-msgstr ""
+msgid "- Event"
+msgid_plural "- Events"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "- Runner is active and can process any new jobs"
 msgstr ""
@@ -492,11 +488,10 @@ msgstr ""
 msgid "- Runner is paused and will not receive any new jobs"
 msgstr ""
 
-msgid "- Sentry Event: %{external_url}"
-msgstr ""
-
-msgid "- Users: %{user_count}"
-msgstr ""
+msgid "- User"
+msgid_plural "- Users"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "- show less"
 msgstr ""
