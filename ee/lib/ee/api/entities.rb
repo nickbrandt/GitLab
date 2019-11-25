@@ -938,6 +938,14 @@ module EE
         expose :resolved_at
         expose :closed_at
       end
+
+      class VulnerabilityRelatedIssue < ::API::Entities::IssueBasic
+        # vulnerability_link_* attributes come from joined Vulnerabilities::IssueLink record
+        expose :vulnerability_link_id
+        expose :vulnerability_link_type do |related_issue|
+          ::Vulnerabilities::IssueLink.link_types.key(related_issue.vulnerability_link_type)
+        end
+      end
     end
   end
 end
