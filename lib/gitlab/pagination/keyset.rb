@@ -12,7 +12,7 @@ module Gitlab
 
         # This is only available for Project and order-by id (asc/desc)
         return false unless relation.klass == Project
-        return false unless order_by[:id]
+        return false unless order_by.size == 1 && order_by[:id]
 
         true
       end

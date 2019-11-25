@@ -6,8 +6,13 @@ module Gitlab
       class RequestContext
         attr_reader :request
 
-        DEFAULT_SORT_DIRECTION = :asc
-        TIE_BREAKER = { id: :desc }.freeze
+        DEFAULT_SORT_DIRECTION = :desc
+        PRIMARY_KEY = :id
+
+        # A tie breaker is added as an additional order-by column
+        # to establish a well-defined order. We use the primary key
+        # column here.
+        TIE_BREAKER = { PRIMARY_KEY => DEFAULT_SORT_DIRECTION }.freeze
 
         def initialize(request)
           @request = request
@@ -15,7 +20,7 @@ module Gitlab
 
         # extracts Paging information from request parameters
         def page
-          Page.new(order_by: order_by, per_page: params[:per_page])
+          @page ||= Page.new(order_by: order_by, per_page: params[:per_page])
         end
 
         def apply_headers(next_page)
@@ -27,12 +32,16 @@ module Gitlab
         def order_by
           return TIE_BREAKER.dup unless params[:order_by]
 
-          order_by = { params[:order_by]&.to_sym => params[:sort]&.to_sym || DEFAULT_SORT_DIRECTION }
+          order_by = { params[:order_by].to_sym => params[:sort]&.to_sym || DEFAULT_SORT_DIRECTION }
 
           # Order by an additional unique key, we use the primary key here
-          order_by = order_by.merge(TIE_BREAKER) unless order_by[:id]
+          order_by = order_by.merge(TIE_BREAKER) unless order_by[PRIMARY_KEY]
 
           order_by
+        end
+
+        def params
+          @params ||= request.params
         end
 
         def lower_bounds_params(page)
@@ -52,8 +61,10 @@ module Gitlab
           end
         end
 
-        def params
-          @params ||= request.params
+        def page_href(page)
+          base_request_uri.tap do |uri|
+            uri.query = query_params_for(page).to_query
+          end.to_s
         end
 
         def pagination_links(next_page)
@@ -71,12 +82,6 @@ module Gitlab
 
         def query_params_for(page)
           request.params.merge(lower_bounds_params(page))
-        end
-
-        def page_href(page)
-          base_request_uri.tap do |uri|
-            uri.query = query_params_for(page).to_query
-          end.to_s
         end
       end
     end

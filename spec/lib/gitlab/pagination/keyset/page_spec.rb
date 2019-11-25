@@ -21,6 +21,12 @@ describe Gitlab::Pagination::Keyset::Page do
 
       expect(per_page).to eq(described_class::DEFAULT_PAGE_SIZE)
     end
+
+    it 'uses the given value if it is within range' do
+      per_page = described_class.new(per_page: 10).per_page
+
+      expect(per_page).to eq(10)
+    end
   end
 
   describe '#next' do

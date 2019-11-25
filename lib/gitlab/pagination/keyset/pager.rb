@@ -12,7 +12,7 @@ module Gitlab
 
         def paginate(relation)
           # Validate assumption: The last two columns must match the page order_by
-          raise "Page's order_by doesnt match the relation's order: #{present_order} vs #{page.order_by}" unless correct_order?(relation)
+          validate_order!(relation)
 
           # This performs the database query and retrieves records
           # We retrieve one record more to check if we have data beyond this page
@@ -43,10 +43,12 @@ module Gitlab
           @page ||= request.page
         end
 
-        def correct_order?(rel)
+        def validate_order!(rel)
           present_order = rel.order_values.map { |val| [val.expr.name, val.direction] }.last(2).to_h
 
-          page.order_by.with_indifferent_access == present_order.with_indifferent_access
+          unless page.order_by.with_indifferent_access == present_order.with_indifferent_access
+            raise ArgumentError, "Page's order_by does not match the relation's order: #{present_order} vs #{page.order_by}"
+          end
         end
       end
     end

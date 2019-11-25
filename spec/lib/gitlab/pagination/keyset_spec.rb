@@ -48,7 +48,7 @@ describe Gitlab::Pagination::Keyset do
     end
 
     context 'with other order-by columns' do
-      let(:order_by) { { created_at: :desc } }
+      let(:order_by) { { created_at: :desc, id: :desc } }
       it 'returns false for Project' do
         expect(subject.available?(request_context, Project.all)).to be_falsey
       end

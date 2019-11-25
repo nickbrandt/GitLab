@@ -12,7 +12,7 @@ module Gitlab
         attr_reader :order_by
 
         def initialize(order_by: {}, lower_bounds: nil, per_page: DEFAULT_PAGE_SIZE, end_reached: false)
-          @order_by = order_by
+          @order_by = order_by.with_indifferent_access
           @lower_bounds = lower_bounds
           @per_page = per_page
           @end_reached = end_reached
