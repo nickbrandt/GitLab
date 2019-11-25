@@ -80,12 +80,10 @@ export default {
     },
   },
   data() {
-    const store = new MRWidgetStore(this.mrData || window.gl.mrWidgetData);
-    const service = this.createService(store);
     return {
-      mr: store,
-      state: store.state,
-      service,
+      mr: null,
+      state: null,
+      service: null,
     };
   },
   computed: {
@@ -133,18 +131,24 @@ export default {
       }
     },
   },
-  created() {
-    this.initPolling();
-    this.bindEventHubListeners();
-    eventHub.$on('mr.discussion.updated', this.checkStatus);
-  },
+  created() {},
   mounted() {
-    this.setFaviconHelper();
-    this.initDeploymentsPolling();
+    return MRWidgetService.fetchInitialData().then(({ data }) => {
+      this.mr = new MRWidgetStore({ ...window.gl.mrWidgetData, ...data });
+      this.state = this.mr.state;
+      this.service = this.createService(this.mr);
 
-    if (this.shouldRenderMergedPipeline) {
-      this.initPostMergeDeploymentsPolling();
-    }
+      this.setFaviconHelper();
+      this.initDeploymentsPolling();
+
+      if (this.shouldRenderMergedPipeline) {
+        this.initPostMergeDeploymentsPolling();
+      }
+
+      this.initPolling();
+      this.bindEventHubListeners();
+      eventHub.$on('mr.discussion.updated', this.checkStatus);
+    });
   },
   beforeDestroy() {
     eventHub.$off('mr.discussion.updated', this.checkStatus);
@@ -319,7 +323,7 @@ export default {
 };
 </script>
 <template>
-  <div class="mr-state-widget prepend-top-default">
+  <div v-if="mr" class="mr-state-widget prepend-top-default">
     <mr-widget-header :mr="mr" />
     <mr-widget-pipeline-container
       v-if="shouldRenderPipelines"

@@ -3,6 +3,8 @@
 class MergeRequestWidgetEntity < Grape::Entity
   include RequestAwareEntity
 
+  expose :iid
+
   expose :source_project_full_path do |merge_request|
     merge_request.source_project&.full_path
   end
@@ -66,8 +68,6 @@ class MergeRequestWidgetEntity < Grape::Entity
 
   def as_json(options = {})
     super(options)
-      .merge(MergeRequestPollCachedWidgetEntity.new(object, **@options.opts_hash).as_json(options))
-      .merge(MergeRequestPollWidgetEntity.new(object, **@options.opts_hash).as_json(options))
   end
 
   private
