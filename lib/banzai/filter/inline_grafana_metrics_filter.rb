@@ -13,7 +13,6 @@ module Banzai
         doc.document.create_element(
           'div',
           class: 'js-render-metrics',
-          # Grafana usage ping depends on this implementation
           'data-dashboard-url': metrics_dashboard_url(params)
         )
       end

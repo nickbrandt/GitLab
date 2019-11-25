@@ -62,10 +62,7 @@ class Issue < ApplicationRecord
   scope :order_relative_position_asc, -> { reorder(::Gitlab::Database.nulls_last_order('relative_position', 'ASC')) }
 
   scope :preload_associated_models, -> { preload(:labels, project: :namespace) }
-  scope :with_project_grafana_integration, -> { joins(project: :grafana_integration).where(projects: { grafana_integrations: { enabled: true } } ) }
   scope :with_api_entity_associations, -> { preload(:timelogs, :assignees, :author, :notes, :labels, project: [:route, { namespace: :route }] ) }
-
-  scope :grafana_embedded_aprox, -> { where('"issues"."description" ILIKE \'%\' || "grafana_integrations"."grafana_url" || \'%\'') }
 
   scope :public_only, -> { where(confidential: false) }
   scope :confidential_only, -> { where(confidential: true) }
