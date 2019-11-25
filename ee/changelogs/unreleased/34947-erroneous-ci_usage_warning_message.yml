@@ -1,0 +1,5 @@
+---
+title: Display CI Minutes warning only if minutes left is still below last level
+merge_request: 19751
+author:
+type: fixed

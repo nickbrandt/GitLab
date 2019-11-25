@@ -34,7 +34,10 @@ describe 'CI shared runner limits' do
       end
 
       context 'when usage has reached a notification level' do
-        let(:group) { create(:group, :with_build_minutes_limit, last_ci_minutes_usage_notification_level: 30) }
+        before do
+          group.update(last_ci_minutes_usage_notification_level: 30, shared_runners_minutes_limit: 10)
+          allow_any_instance_of(EE::Namespace).to receive(:shared_runners_remaining_minutes).and_return(2)
+        end
 
         it 'displays a warning message on pipelines page' do
           visit_project_pipelines

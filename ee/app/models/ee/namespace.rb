@@ -197,6 +197,17 @@ module EE
         shared_runners_minutes.to_i >= actual_shared_runners_minutes_limit
     end
 
+    def shared_runners_remaining_minutes_percent
+      return 0 if shared_runners_remaining_minutes.to_f <= 0
+      return 0 if actual_shared_runners_minutes_limit.to_f == 0
+
+      (shared_runners_remaining_minutes.to_f * 100) / actual_shared_runners_minutes_limit.to_f
+    end
+
+    def shared_runners_remaining_minutes_below_threshold?
+      shared_runners_remaining_minutes_percent.to_i <= last_ci_minutes_usage_notification_level.to_i
+    end
+
     def extra_shared_runners_minutes_used?
       shared_runners_minutes_limit_enabled? &&
         extra_shared_runners_minutes_limit &&
@@ -351,6 +362,10 @@ module EE
         start_date: created_at,
         seats: 0
       )
+    end
+
+    def shared_runners_remaining_minutes
+      [actual_shared_runners_minutes_limit.to_f - shared_runners_minutes.to_f, 0].max
     end
   end
 end
