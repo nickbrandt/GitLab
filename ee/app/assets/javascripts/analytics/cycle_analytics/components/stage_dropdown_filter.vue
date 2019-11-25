@@ -1,10 +1,9 @@
 <script>
-import { sprintf, s__, n__ } from '~/locale';
+import { sprintf, s__ } from '~/locale';
 import $ from 'jquery';
 import _ from 'underscore';
 import Icon from '~/vue_shared/components/icon.vue';
 import { GlButton } from '@gitlab/ui';
-import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
 
 export default {
   name: 'StageDropdownFilter',
@@ -25,21 +24,26 @@ export default {
   },
   data() {
     return {
-      selectedStages: [],
+      selectedStages: this.stages,
     };
   },
   computed: {
     selectedStagesLabel() {
-      return this.selectedStages.length
-        ? sprintf(
-            n__(
-              'CycleAnalytics|%{stageName}',
-              'CycleAnalytics|%d stages selected',
-              this.selectedStages.length,
-            ),
-            { stageName: capitalizeFirstCharacter(this.selectedStages[0].name) },
-          )
-        : s__('CycleAnalytics|All stages');
+      const { stages, selectedStages } = this;
+
+      if (selectedStages.length === stages.length) {
+        return s__('CycleAnalytics|All stages');
+      }
+      if (selectedStages.length > 1) {
+        return sprintf(s__('CycleAnalytics|%{stageCount} stages selected'), {
+          stageCount: selectedStages.length,
+        });
+      }
+      if (selectedStages.length === 1) {
+        return selectedStages[0].title;
+      }
+
+      return s__('CycleAnalytics|No stages selected');
     },
   },
   mounted() {
@@ -49,14 +53,14 @@ export default {
       clicked: this.onClick.bind(this),
       data: this.formatData.bind(this),
       renderRow: group => this.rowTemplate(group),
-      text: stage => stage.name,
+      text: stage => stage.title,
     });
   },
   methods: {
     setSelectedStages(selectedObj, isMarking) {
       this.selectedStages = isMarking
         ? this.selectedStages.concat([selectedObj])
-        : this.selectedStages.filter(stage => stage.name !== selectedObj.name);
+        : this.selectedStages.filter(stage => stage.title !== selectedObj.title);
     },
     onClick({ selectedObj, e, isMarking }) {
       e.preventDefault();
@@ -69,8 +73,8 @@ export default {
     rowTemplate(stage) {
       return `
           <li>
-            <a href='#' class='dropdown-menu-link'>
-              ${_.escape(capitalizeFirstCharacter(stage.name))}
+            <a href='#' class='dropdown-menu-link is-active'>
+              ${_.escape(stage.title)}
             </a>
           </li>
         `;
