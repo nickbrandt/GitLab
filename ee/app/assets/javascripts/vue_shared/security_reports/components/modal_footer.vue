@@ -122,6 +122,7 @@ export default {
       :label="actionButtons[0].name"
       container-class="btn btn-success btn-inverted"
       class="js-action-button"
+      data-qa-selector="create_issue_button"
       @click="$emit(actionButtons[0].action)"
     />
   </div>
