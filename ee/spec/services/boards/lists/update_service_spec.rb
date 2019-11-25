@@ -14,27 +14,87 @@ describe 'EE::Boards::Lists::UpdateService' do
       end
 
       it 'updates the list if max_issue_count is given' do
-        service = Boards::Lists::UpdateService.new(board, user, max_issue_count: 42)
-        expect(service.execute(list)).to be_truthy
-
-        reloaded_list = list.reload
-        expect(reloaded_list.max_issue_count).to eq(42)
+        update_list_and_test_result(list, { max_issue_count: 42 }, { max_issue_count: 42 })
       end
 
-      it 'updates the list with max_issue_count of 0 if max_issue_count is nil' do
-        service = Boards::Lists::UpdateService.new(board, user, max_issue_count: nil)
-        expect(service.execute(list)).to be_truthy
-
-        reloaded_list = list.reload
-        expect(reloaded_list.max_issue_count).to eq(0)
+      it 'updates the list if max_issue_weight is given' do
+        update_list_and_test_result(list, { max_issue_weight: 42 }, { max_issue_weight: 42 })
       end
 
-      it 'does not update the list if can_admin returns false' do
-        service = Boards::Lists::UpdateService.new(board, unpriviledged_user, max_issue_count: 42)
-        expect(service.execute(list)).to be_truthy
+      it 'updates the list if max_issue_count is nil' do
+        update_list_and_test_result(list, { max_issue_count: nil }, { max_issue_count: 0 })
+      end
 
-        reloaded_list = list.reload
-        expect(reloaded_list.max_issue_count).to eq(0)
+      it 'updates the list if max_issue_weight is nil' do
+        update_list_and_test_result(list, { max_issue_weight: nil }, { max_issue_weight: 0 })
+      end
+
+      it 'updates the max issue count of the list if both count and weight limits are provided' do
+        update_list_and_test_result(list, { max_issue_count: 10, max_issue_weight: 42 }, { max_issue_count: 10, max_issue_weight: 42 })
+      end
+
+      it 'does not change count if weight is updated' do
+        list.update!(max_issue_count: 55)
+
+        update_list_and_test_result(list, { max_issue_weight: 42 }, { max_issue_count: 55, max_issue_weight: 42 })
+      end
+
+      it 'does not change weight if count is updated' do
+        list.update!(max_issue_weight: 55)
+
+        update_list_and_test_result(list, { max_issue_count: 42 }, { max_issue_weight: 55, max_issue_count: 42 })
+      end
+
+      it 'does not update max_issue_count if max_issue_count is nil' do
+        update_list_and_test_result(list, { max_issue_count: nil }, { max_issue_count: 0 })
+      end
+
+      it 'sets max_issue_count to 0 if requested' do
+        list.update!(max_issue_count: 3)
+
+        update_list_and_test_result(list, { max_issue_count: 0 }, { max_issue_count: 0 })
+      end
+
+      it 'sets max_issue_weight to 0 if requested' do
+        list.update!(max_issue_weight: 3)
+
+        update_list_and_test_result(list, { max_issue_weight: 0 }, { max_issue_weight: 0 })
+      end
+
+      it 'sets max_issue_count to 0 if requested' do
+        list.update!(max_issue_count: 10)
+
+        update_list_and_test_result(list, { max_issue_count: 0, max_issue_weight: 0 }, { max_issue_count: 0, max_issue_weight: 0 })
+      end
+
+      it 'sets max_issue_weight to 0 if requested' do
+        list.update!(max_issue_weight: 10)
+
+        update_list_and_test_result(list, { max_issue_count: 0, max_issue_weight: 0 }, { max_issue_count: 0, max_issue_weight: 0 })
+      end
+
+      it 'does not update count and weight when negative values for both are given' do
+        list.update!(max_issue_count: 10)
+
+        update_list_and_test_result(list, { max_issue_count: -1, max_issue_weight: -1 }, { max_issue_count: 10, max_issue_weight: 0 })
+      end
+
+      it 'sets count and weight to 0 when non numerical values are given' do
+        list.update!(max_issue_count: 0, max_issue_weight: 3)
+
+        update_list_and_test_result(list, { max_issue_count: 'test', max_issue_weight: 'test2' }, { max_issue_count: 0, max_issue_weight: 0 })
+      end
+
+      it 'does not update the list max issue count if can_admin returns false' do
+        update_list_and_test_result_by_user(unpriviledged_user, list,
+                                            { max_issue_count: 42 },
+                                            { max_issue_count: 0 })
+      end
+
+      it 'does not update the list max issue weight if can_admin returns false' do
+        update_list_and_test_result_by_user(unpriviledged_user, list,
+                                            { max_issue_weight: 42 },
+                                            { max_issue_weight: 0 })
       end
     end
 
@@ -44,20 +104,34 @@ describe 'EE::Boards::Lists::UpdateService' do
       end
 
       it 'does not update the list even if max_issue_count is given' do
-        service = Boards::Lists::UpdateService.new(board, user, max_issue_count: 42)
-        expect(service.execute(list)).to be_truthy
-
-        reloaded_list = list.reload
-        expect(reloaded_list.max_issue_count).to eq(0)
+        update_list_and_test_result(list, { max_issue_count: 42 }, { max_issue_count: 0 })
       end
 
       it 'does not update the list if can_admin returns false' do
-        service = Boards::Lists::UpdateService.new(board, unpriviledged_user, max_issue_count: 42)
-        expect(service.execute(list)).to be_truthy
-
-        reloaded_list = list.reload
-        expect(reloaded_list.max_issue_count).to eq(0)
+        update_list_and_test_result_by_user(unpriviledged_user, list, { max_issue_count: 42 }, { max_issue_count: 0 })
       end
+
+      it 'does not update the list even if max_issue_weight is given' do
+        update_list_and_test_result(list, { max_issue_weight: 42 }, { max_issue_weight: 0 })
+      end
+
+      it 'does not update the list if can_admin returns false' do
+        update_list_and_test_result_by_user(unpriviledged_user, list, { max_issue_weight: 42 }, { max_issue_weight: 0 })
+      end
+    end
+
+    def update_list_and_test_result(list, initialization_params, expected_list_attributes)
+      update_list_and_test_result_by_user(user, list, initialization_params, expected_list_attributes)
+    end
+
+    def update_list_and_test_result_by_user(user, list, initialization_params, expected_list_attributes)
+      service = Boards::Lists::UpdateService.new(board, user, initialization_params)
+      expect(service.execute(list)).to be_truthy
+
+      reloaded_list = list.reload
+
+      expect(reloaded_list.max_issue_count).to eq(expected_list_attributes.fetch(:max_issue_count, 0))
+      expect(reloaded_list.max_issue_weight).to eq(expected_list_attributes.fetch(:max_issue_weight, 0))
     end
   end
 
