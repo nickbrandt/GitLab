@@ -23,6 +23,7 @@ export default {
   cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/cycle_analytics/stages',
   cycleAnalyticsStageEventsPath: '/groups/:group_id/-/cycle_analytics/events/:stage_id.json',
   cycleAnalyticsStagePath: '/-/analytics/cycle_analytics/stages/:stage_id',
+  cycleAnalyticsDurationChartPath: '/-/analytics/cycle_analytics/stages/:stage_id/duration_chart',
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
@@ -154,6 +155,7 @@ export default {
 
   cycleAnalyticsGroupStagesAndEvents(groupId, params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsGroupStagesAndEventsPath);
+
     return axios.get(url, {
       params: { group_id: groupId, ...params },
     });
@@ -192,6 +194,14 @@ export default {
 
     return axios.delete(url, {
       params: { group_id: groupId },
+    });
+  },
+
+  cycleAnalyticsDurationChart(stageSlug, params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsDurationChartPath).replace(':stage_id', stageSlug);
+
+    return axios.get(url, {
+      params,
     });
   },
 };

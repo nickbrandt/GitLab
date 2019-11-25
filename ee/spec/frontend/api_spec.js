@@ -477,5 +477,29 @@ describe('Api', () => {
           .catch(done.fail);
       });
     });
+
+    describe('cycleAnalyticsDurationChart', () => {
+      it('fetches stage duration data', done => {
+        const response = [];
+        const params = {
+          group_id: groupId,
+          created_after: createdAfter,
+          created_before: createdBefore,
+        };
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/thursday/duration_chart`;
+        mock.onGet(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsDurationChart(stageId, params)
+          .then(responseObj =>
+            expectRequestWithCorrectParameters(responseObj, {
+              response,
+              params,
+              expectedUrl,
+            }),
+          )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
   });
 });
