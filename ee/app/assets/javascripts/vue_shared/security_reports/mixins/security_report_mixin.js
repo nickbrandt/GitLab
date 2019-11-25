@@ -1,5 +1,13 @@
 import { sprintf, s__ } from '~/locale';
 
+// Securely open external links in a new tab.
+function getLinkStartTag(url) {
+  return `<a href="${url}" target="_blank" rel="noopener noreferrer">`;
+}
+
+// Add in the external link icon at the end of every link.
+const linkEndTag = '<i class="fa fa-external-link" aria-hidden="true"></i></a>';
+
 export default {
   computed: {
     sastPopover() {
@@ -10,8 +18,8 @@ export default {
         content: sprintf(
           s__('ciReport|%{linkStartTag}Learn more about SAST %{linkEndTag}'),
           {
-            linkStartTag: `<a href="${this.sastHelpPath}">`,
-            linkEndTag: '</a>',
+            linkStartTag: getLinkStartTag(this.sastHelpPath),
+            linkEndTag,
           },
           false,
         ),
@@ -25,8 +33,8 @@ export default {
         content: sprintf(
           s__('ciReport|%{linkStartTag}Learn more about Container Scanning %{linkEndTag}'),
           {
-            linkStartTag: `<a href="${this.sastContainerHelpPath}">`,
-            linkEndTag: '</a>',
+            linkStartTag: getLinkStartTag(this.sastContainerHelpPath),
+            linkEndTag,
           },
           false,
         ),
@@ -40,8 +48,8 @@ export default {
         content: sprintf(
           s__('ciReport|%{linkStartTag}Learn more about DAST %{linkEndTag}'),
           {
-            linkStartTag: `<a href="${this.dastHelpPath}">`,
-            linkEndTag: '</a>',
+            linkStartTag: getLinkStartTag(this.dastHelpPath),
+            linkEndTag,
           },
           false,
         ),
@@ -55,8 +63,8 @@ export default {
         content: sprintf(
           s__('ciReport|%{linkStartTag}Learn more about Dependency Scanning %{linkEndTag}'),
           {
-            linkStartTag: `<a href="${this.dependencyScanningHelpPath}">`,
-            linkEndTag: '</a>',
+            linkStartTag: getLinkStartTag(this.dependencyScanningHelpPath),
+            linkEndTag,
           },
           false,
         ),
