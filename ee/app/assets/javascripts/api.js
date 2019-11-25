@@ -49,7 +49,7 @@ export default {
 
   createChildEpic({ groupId, parentEpicIid, title }) {
     const url = Api.buildUrl(this.childEpicPath)
-      .replace(':id', groupId)
+      .replace(':id', encodeURIComponent(groupId))
       .replace(':epic_iid', parentEpicIid);
 
     return axios.post(url, {
