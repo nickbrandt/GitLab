@@ -13,7 +13,7 @@ module EE
         # triggering a page load.
         before_action only: [:show, :builds, :failures, :security, :licenses] do
           push_frontend_feature_flag(:pipeline_report_api, default_enabled: true)
-          push_frontend_feature_flag(:parsed_license_report)
+          push_frontend_feature_flag(:parsed_license_report, default_enabled: true)
         end
       end
 
