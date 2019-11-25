@@ -2,7 +2,6 @@
 
 module RuboCop
   module Cop
-
     # Cop that blacklists the usage of Group.public_or_visible_to_user
     class IgnoredColumns < RuboCop::Cop::Cop
       MSG = 'Use `IgnoredColumns` concern instead of adding to `self.ignored_columns`.'
