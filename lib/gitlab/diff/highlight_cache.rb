@@ -80,7 +80,7 @@ module Gitlab
       end
 
       def key
-        ['highlighted-diff-files', diffable, VERSION, diff_options].join(":")
+        @redis_key ||= ['highlighted-diff-files', diffable, VERSION, diff_options].join(":")
       end
 
       private
