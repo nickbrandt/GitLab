@@ -69,6 +69,7 @@ module QA
 
               view 'ee/app/assets/javascripts/vue_shared/security_reports/components/modal_footer.vue' do
                 element :resolve_split_button
+                element :create_issue_button
               end
 
               view 'ee/app/assets/javascripts/vue_shared/security_reports/components/dismiss_button.vue' do
@@ -188,6 +189,18 @@ module QA
 
             previous_page = page.current_url
             click_element :resolve_split_button
+
+            wait(max: 15, reload: false) do
+              page.current_url != previous_page
+            end
+          end
+
+          def create_vulnerability_issue(name)
+            expand_vulnerability_report
+            click_vulnerability(name)
+
+            previous_page = page.current_url
+            click_element(:create_issue_button)
 
             wait(max: 15, reload: false) do
               page.current_url != previous_page
