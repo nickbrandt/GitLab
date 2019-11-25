@@ -668,6 +668,32 @@ describe Namespace do
           expect(namespace.gitlab_subscription).to be_present
         end
       end
+
+      context 'when namespace is a subgroup with a parent' do
+        let(:subgroup) { create(:namespace, parent: namespace) }
+
+        context 'when free plan does exist' do
+          before do
+            free_plan
+          end
+
+          it 'does not generates a subscription' do
+            expect(subgroup.actual_plan).to eq(free_plan)
+            expect(subgroup.gitlab_subscription).not_to be_present
+          end
+        end
+
+        context 'when namespace has a subscription associated' do
+          before do
+            create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+          end
+
+          it 'returns the plan from the subscription' do
+            expect(subgroup.actual_plan).to eq(gold_plan)
+            expect(subgroup.gitlab_subscription).not_to be_present
+          end
+        end
+      end
     end
   end
 
@@ -685,6 +711,26 @@ describe Namespace do
     context 'when namespace does not have subscription associated' do
       it 'returns a free plan name' do
         expect(namespace.actual_plan_name).to eq 'free'
+      end
+    end
+
+    context 'when namespace is a subgroup with a parent' do
+      let(:subgroup) { create(:namespace, parent: namespace) }
+
+      context 'when namespace has a subscription associated' do
+        before do
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+        end
+
+        it 'returns an associated plan name' do
+          expect(subgroup.actual_plan_name).to eq 'gold'
+        end
+      end
+
+      context 'when namespace does not have subscription associated' do
+        it 'returns a free plan name' do
+          expect(subgroup.actual_plan_name).to eq 'free'
+        end
       end
     end
   end

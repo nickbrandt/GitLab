@@ -147,7 +147,7 @@ module EE
             namespace.billable_members_count(options[:requested_hosted_plan])
           end
           expose :plan, if: ->(namespace, opts) { ::Ability.allowed?(opts[:current_user], :admin_namespace, namespace) } do |namespace, _|
-            namespace.actual_plan&.name
+            namespace.actual_plan_name
           end
         end
       end

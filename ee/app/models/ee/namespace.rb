@@ -142,9 +142,12 @@ module EE
 
     def actual_plan
       strong_memoize(:actual_plan) do
-        subscription = find_or_create_subscription
-
-        subscription&.hosted_plan || Plan.free || Plan.default
+        if parent_id
+          root_ancestor.actual_plan
+        else
+          subscription = find_or_create_subscription
+          subscription&.hosted_plan || Plan.free || Plan.default
+        end
       end
     end
 
