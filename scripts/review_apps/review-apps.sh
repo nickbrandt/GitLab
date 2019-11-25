@@ -141,6 +141,7 @@ function install_tiller() {
     --tiller-namespace "${namespace}" \
     --wait \
     --upgrade \
+    --force-upgrade \
     --node-selectors "app=helm" \
     --replicas 3 \
     --override "spec.template.spec.tolerations[0].key"="dedicated" \
