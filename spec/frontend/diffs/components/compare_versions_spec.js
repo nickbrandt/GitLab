@@ -14,7 +14,7 @@ describe('CompareVersions', () => {
   let wrapper;
   const targetBranch = { branchName: 'tmp-wine-dev', versionIndex: -1 };
 
-  beforeEach(() => {
+  const createWrapper = props => {
     const store = createStore();
 
     store.state.diffs.addedLines = 10;
@@ -30,8 +30,18 @@ describe('CompareVersions', () => {
         mergeRequestDiffs: diffsMockData,
         mergeRequestDiff: diffsMockData[0],
         targetBranch,
+        ...props,
       },
     });
+  };
+
+  beforeEach(() => {
+    createWrapper();
+  });
+
+  afterEach(() => {
+    wrapper.destroy();
+    wrapper = null;
   });
 
   describe('template', () => {
@@ -55,15 +65,13 @@ describe('CompareVersions', () => {
     });
 
     it('should not render comparison dropdowns if no mergeRequestDiffs are specified', () => {
-      wrapper.setProps({ mergeRequestDiffs: [] });
+      createWrapper({ mergeRequestDiffs: [] });
 
-      return wrapper.vm.$nextTick(() => {
-        const sourceDropdown = wrapper.find('.mr-version-dropdown');
-        const targetDropdown = wrapper.find('.mr-version-compare-dropdown');
+      const sourceDropdown = wrapper.find('.mr-version-dropdown');
+      const targetDropdown = wrapper.find('.mr-version-compare-dropdown');
 
-        expect(sourceDropdown.exists()).toBe(false);
-        expect(targetDropdown.exists()).toBe(false);
-      });
+      expect(sourceDropdown.exists()).toBe(false);
+      expect(targetDropdown.exists()).toBe(false);
     });
 
     it('should render view types buttons with correct values', () => {
@@ -79,23 +87,19 @@ describe('CompareVersions', () => {
     });
 
     it('adds container-limiting classes when showFileTree is false with inline diffs', () => {
-      wrapper.setProps({ isLimitedContainer: true });
+      createWrapper({ isLimitedContainer: true });
 
-      return wrapper.vm.$nextTick(() => {
-        const limitedContainer = wrapper.find('.container-limited.limit-container-width');
+      const limitedContainer = wrapper.find('.container-limited.limit-container-width');
 
-        expect(limitedContainer.exists()).toBe(true);
-      });
+      expect(limitedContainer.exists()).toBe(true);
     });
 
     it('does not add container-limiting classes when showFileTree is false with inline diffs', () => {
-      wrapper.setProps({ isLimitedContainer: false });
+      createWrapper({ isLimitedContainer: false });
 
-      return wrapper.vm.$nextTick(() => {
-        const limitedContainer = wrapper.find('.container-limited.limit-container-width');
+      const limitedContainer = wrapper.find('.container-limited.limit-container-width');
 
-        expect(limitedContainer.exists()).toBe(false);
-      });
+      expect(limitedContainer.exists()).toBe(false);
     });
   });
 
