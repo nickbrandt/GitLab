@@ -80,7 +80,7 @@ module Gitlab
       end
 
       def key
-        [diffable.head_commit_sha, VERSION, 'highlighted-diff-files', diff_options].join(":")
+        ['highlighted-diff-files', diffable, VERSION, diff_options].join(":")
       end
 
       private
