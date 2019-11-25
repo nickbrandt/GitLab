@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::GrafanaEmbedUsageData do
-  describe '#issue_count', :use_clean_rails_memory_store_caching do
+  describe '#issue_count' do
     subject { described_class.issue_count }
 
     let(:project) { create(:project) }
