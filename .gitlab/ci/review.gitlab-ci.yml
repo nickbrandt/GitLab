@@ -135,13 +135,11 @@ review-deploy:
     - .review-deploy-base
     - .only-review
     - .only:changes-code-qa
-  needs: ["review-build-cng"]
 
 schedule:review-deploy:
   extends:
     - .review-deploy-base
     - .only-review-schedules
-  needs: ["schedule:review-build-cng"]
 
 .base-review-stop:
   extends:
