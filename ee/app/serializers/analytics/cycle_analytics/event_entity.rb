@@ -8,6 +8,7 @@ module Analytics
       expose :type
       expose :can_be_start_event?, as: :can_be_start_event
       expose :allowed_end_events
+      expose :label_based?, as: :label_based
 
       private
 

@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "required": ["name", "identifier", "type", "can_be_start_event", "allowed_end_events"],
+  "required": ["name", "identifier", "type", "can_be_start_event", "allowed_end_events", "label_based"],
   "properties": {
     "name": { 
       "type": "string" 
@@ -13,6 +13,9 @@
       "enum": ["simple"]
     },
     "can_be_start_event": {
+      "type": "boolean"
+    },
+    "label_based": {
       "type": "boolean"
     },
     "allowed_end_events": {
