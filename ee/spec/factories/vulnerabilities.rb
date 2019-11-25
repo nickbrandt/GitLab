@@ -34,5 +34,13 @@ FactoryBot.define do
           project: vulnerability.project)
       end
     end
+
+    trait :with_issue_links do
+      after(:create) do |vulnerability|
+        create_list(:issue, 2).each do |issue|
+          create(:vulnerabilities_issue_link, vulnerability: vulnerability, issue: issue)
+        end
+      end
+    end
   end
 end
