@@ -26,11 +26,22 @@ describe Search::SnippetService do
       context 'project snippet' do
         let(:pendings) do
           [
-            { project_level: :public, feature_access_level: :enabled, membership: :non_member, expected_count: 1 },
-            { project_level: :public, feature_access_level: :private, membership: :non_member, expected_count: 1 },
-            { project_level: :internal, feature_access_level: :enabled, membership: :non_member, expected_count: 1 },
-            { project_level: :internal, feature_access_level: :private, membership: :non_member, expected_count: 1 }
+            { snippet_level: :public, project_level: :public, feature_access_level: :enabled, membership: :non_member, expected_count: 1 },
+            { snippet_level: :public, project_level: :internal, feature_access_level: :enabled, membership: :non_member, expected_count: 1 },
+            { snippet_level: :internal, project_level: :public, feature_access_level: :enabled, membership: :non_member, expected_count: 1 },
+            { snippet_level: :internal, project_level: :internal, feature_access_level: :enabled, membership: :non_member, expected_count: 1 }
           ]
+        end
+        let(:pending?) do
+          pendings.include?(
+            {
+              snippet_level: snippet_level,
+              project_level: project_level,
+              feature_access_level: feature_access_level,
+              membership: membership,
+              expected_count: expected_count
+            }
+          )
         end
 
         let_it_be(:group) { create(:group) }
