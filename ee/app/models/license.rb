@@ -13,6 +13,7 @@ class License < ApplicationRecord
     burndown_charts
     code_owners
     contribution_analytics
+    description_diffs
     elastic_search
     export_issues
     group_bulk_edit
@@ -61,7 +62,6 @@ class License < ApplicationRecord
     default_project_deletion_protection
     dependency_proxy
     deploy_board
-    description_diffs
     design_management
     email_additional_text
     extended_audit_events
