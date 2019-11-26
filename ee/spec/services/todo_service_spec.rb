@@ -305,6 +305,26 @@ describe TodoService do
     end
   end
 
+  context 'Merge Requests' do
+    let(:project) { create(:project, :private, :repository) }
+    let(:merge_request) { create(:merge_request, source_project: project, author: author) }
+
+    context 'an approver has lost access to the project' do
+      before do
+        create(:approver, user: non_member, target: project)
+        project.members.find_by(user_id: non_member.id).destroy
+      end
+
+      describe '#new_merge_request' do
+        it 'does not create a todo for the approver' do
+          service.new_merge_request(merge_request, author)
+
+          should_not_create_todo(user: non_member, target: merge_request, action: Todo::APPROVAL_REQUIRED)
+        end
+      end
+    end
+  end
+
   describe 'Designs' do
     let(:project) { create(:project) }
     let(:issue) { create(:issue, project: project) }
