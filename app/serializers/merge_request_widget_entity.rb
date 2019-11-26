@@ -3,6 +3,7 @@
 class MergeRequestWidgetEntity < Grape::Entity
   include RequestAwareEntity
 
+  expose :id
   expose :iid
 
   expose :source_project_full_path do |merge_request|

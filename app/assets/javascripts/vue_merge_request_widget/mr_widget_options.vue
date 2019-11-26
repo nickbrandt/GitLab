@@ -80,10 +80,12 @@ export default {
     },
   },
   data() {
+    const store = this.mrData ? new MRWidgetStore(this.mrData) : null;
+
     return {
-      mr: null,
-      state: null,
-      service: null,
+      mr: store,
+      state: store && store.state,
+      service: store && this.createService(store),
     };
   },
   computed: {
@@ -131,12 +133,21 @@ export default {
       }
     },
   },
-  created() {},
   mounted() {
     return MRWidgetService.fetchInitialData().then(({ data }) => {
-      this.mr = new MRWidgetStore({ ...window.gl.mrWidgetData, ...data });
-      this.state = this.mr.state;
-      this.service = this.createService(this.mr);
+      if (this.mr) {
+        this.mr.setData({ ...window.gl.mrWidgetData, ...data });
+      } else {
+        this.mr = new MRWidgetStore({ ...window.gl.mrWidgetData, ...data });
+      }
+
+      if (!this.state) {
+        this.state = this.mr.state;
+      }
+
+      if (!this.service) {
+        this.service = this.createService(this.mr);
+      }
 
       this.setFaviconHelper();
       this.initDeploymentsPolling();
@@ -152,8 +163,13 @@ export default {
   },
   beforeDestroy() {
     eventHub.$off('mr.discussion.updated', this.checkStatus);
-    this.pollingInterval.destroy();
-    this.deploymentsInterval.destroy();
+    if (this.pollingInterval) {
+      this.pollingInterval.destroy();
+    }
+
+    if (this.deploymentsInterval) {
+      this.deploymentsInterval.destroy();
+    }
 
     if (this.postMergeDeploymentsInterval) {
       this.postMergeDeploymentsInterval.destroy();
