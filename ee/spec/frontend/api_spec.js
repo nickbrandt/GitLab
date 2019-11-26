@@ -502,4 +502,21 @@ describe('Api', () => {
       });
     });
   });
+
+  describe('getGeoDesigns', () => {
+    it('fetches designs', () => {
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/geo_replication/designs`;
+      const apiResponse = [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }];
+      const mockParams = { page: 1 };
+
+      jest.spyOn(Api, 'buildUrl').mockReturnValue(expectedUrl);
+      jest.spyOn(axios, 'get');
+      mock.onGet(expectedUrl).replyOnce(200, apiResponse);
+
+      return Api.getGeoDesigns(mockParams).then(({ data }) => {
+        expect(data).toEqual(apiResponse);
+        expect(axios.get).toHaveBeenCalledWith(expectedUrl, { params: mockParams });
+      });
+    });
+  });
 });

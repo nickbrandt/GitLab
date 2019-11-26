@@ -51,6 +51,8 @@ namespace :admin do
 
     resource :settings, only: [:show, :update]
 
+    resources :designs, only: [:index]
+
     resources :uploads, only: [:index, :destroy]
   end
 

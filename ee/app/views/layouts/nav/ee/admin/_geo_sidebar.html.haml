@@ -1,4 +1,4 @@
-= nav_link(controller: %w(admin/geo/nodes admin/geo/projects admin/geo/uploads admin/geo/settings)) do
+= nav_link(controller: %w(admin/geo/nodes admin/geo/projects admin/geo/uploads admin/geo/settings admin/geo/uploads)) do
   = link_to admin_geo_nodes_path, class: "qa-link-geo-menu" do
     .nav-icon-container
       = sprite_icon('location-dot')
@@ -22,6 +22,11 @@
         = link_to admin_geo_projects_path, title: 'Projects' do
           %span
             = _('Projects')
+      - if Feature.enabled?(:enable_geo_design_sync) && Feature.enabled?(:enable_geo_design_view)
+        = nav_link(path: 'admin/geo/designs#index') do
+          = link_to admin_geo_designs_path, title: _('Designs') do
+            %span
+              = _('Designs')
       = nav_link(path: 'admin/geo/uploads#index') do
         = link_to admin_geo_uploads_path, title: 'Uploads' do
           %span
