@@ -130,5 +130,10 @@ remote: Calculating new repository size... (cancelled after 729ms)
 This could be used to further investigate what operation is performing poorly
 and provide GitLab with more information on how to improve the service.
 
+## `curl 18 transfer closed with outstanding read data remaining` during `git clone` over HTTP
+
+This error usually indicates that the request is chunked, and the buffer size is smaller than the request. If the repository is large, 
+and if `git clone` only fails over HTTP after a number of objects have been pulled, consider increasing the `http.postBuffer` value. 
+
 [SSH troubleshooting]: ../../ssh/README.md#troubleshooting "SSH Troubleshooting"
 [Broken-Pipe]: https://stackoverflow.com/questions/19120120/broken-pipe-when-pushing-to-git-repository/36971469#36971469 "StackOverflow: 'Broken pipe when pushing to Git repository'"
