@@ -10,6 +10,10 @@ module EE
           @package_name_regex ||= %r{\A\@?(([\w\-\.]*)/)*([\w\-\.]*)\z}.freeze
         end
 
+        def maven_file_name_regex
+          @maven_file_name_regex ||= %r{^[A-Za-z0-9\.\_\-\+]+$}.freeze
+        end
+
         def maven_path_regex
           @maven_path_regex ||= %r{\A\@?(([\w\-\.]*)/)*([\w\-\.\+]*)\z}.freeze
         end
