@@ -4,6 +4,7 @@ module Gitlab
   module Diff
     class HighlightCache
       EXPIRATION = 1.week
+      VERSION = 1
 
       delegate :diffable,     to: :@diff_collection
       delegate :diff_options, to: :@diff_collection
