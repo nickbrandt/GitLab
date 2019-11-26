@@ -25,6 +25,7 @@ describe('Card security reports app', () => {
       localVue,
       store: createStore(),
       sync: false,
+      attachToDocument: true,
       stubs: ['security-dashboard-table'],
       propsData: {
         hasPipelineData: true,

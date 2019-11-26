@@ -21,9 +21,13 @@ describe('dismissal note', () => {
   };
   let wrapper;
 
+  const mountComponent = (options, mountFn = shallowMount) => {
+    wrapper = mountFn(component, { sync: false, attachToDocument: true, ...options });
+  };
+
   describe('with no attached project or pipeline', () => {
     beforeEach(() => {
-      wrapper = shallowMount(component, {
+      mountComponent({
         propsData: { feedback },
       });
     });
@@ -43,7 +47,7 @@ describe('dismissal note', () => {
 
   describe('with an attached project', () => {
     beforeEach(() => {
-      wrapper = shallowMount(component, {
+      mountComponent({
         propsData: { feedback, project },
       });
     });
@@ -55,7 +59,7 @@ describe('dismissal note', () => {
 
   describe('with an attached pipeline', () => {
     beforeEach(() => {
-      wrapper = shallowMount(component, {
+      mountComponent({
         propsData: { feedback: { ...feedback, pipeline } },
       });
     });
@@ -67,7 +71,7 @@ describe('dismissal note', () => {
 
   describe('with an attached pipeline and project', () => {
     beforeEach(() => {
-      wrapper = shallowMount(component, {
+      mountComponent({
         propsData: { feedback: { ...feedback, pipeline }, project },
       });
     });
@@ -84,7 +88,7 @@ describe('dismissal note', () => {
     };
 
     beforeEach(() => {
-      wrapper = shallowMount(component, {
+      mountComponent({
         propsData: {
           feedback,
           project: unsafeProject,
@@ -116,7 +120,7 @@ describe('dismissal note', () => {
 
     describe('without confirm deletion buttons', () => {
       beforeEach(() => {
-        wrapper = shallowMount(component, {
+        mountComponent({
           propsData: {
             feedback: {
               ...feedback,
@@ -143,16 +147,19 @@ describe('dismissal note', () => {
 
     describe('with confirm deletion buttons', () => {
       beforeEach(() => {
-        wrapper = mount(component, {
-          propsData: {
-            feedback: {
-              ...feedback,
-              comment_details: commentDetails,
+        mountComponent(
+          {
+            propsData: {
+              feedback: {
+                ...feedback,
+                comment_details: commentDetails,
+              },
+              project,
+              isShowingDeleteButtons: true,
             },
-            project,
-            isShowingDeleteButtons: true,
           },
-        });
+          mount,
+        );
         commentItem = wrapper.findAll(EventItem).at(1);
       });
 
