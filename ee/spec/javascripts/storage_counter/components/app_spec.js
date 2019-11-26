@@ -1,7 +1,9 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import StorageApp from 'ee/storage_counter/components/app.vue';
 import Project from 'ee/storage_counter/components/project.vue';
 import { projects, withRootStorageStatistics } from '../data';
+
+const localVue = createLocalVue();
 
 describe('Storage counter app', () => {
   let wrapper;
@@ -15,10 +17,11 @@ describe('Storage counter app', () => {
       },
     };
 
-    wrapper = shallowMount(StorageApp, {
+    wrapper = shallowMount(localVue.extend(StorageApp), {
       propsData: { namespacePath: 'h5bp', helpPagePath: 'help' },
       mocks: { $apollo },
-      sync: true,
+      sync: false,
+      localVue,
     });
   }
 
@@ -30,33 +33,51 @@ describe('Storage counter app', () => {
     wrapper.destroy();
   });
 
-  it('renders the 2 projects', () => {
+  it('renders the 2 projects', done => {
     wrapper.setData({
       namespace: projects,
     });
 
-    expect(wrapper.findAll(Project).length).toEqual(2);
+    wrapper.vm
+      .$nextTick()
+      .then(() => {
+        expect(wrapper.findAll(Project).length).toEqual(2);
+      })
+      .then(done)
+      .catch(done.fail);
   });
 
   describe('with rootStorageStatistics information', () => {
-    it('renders total usage', () => {
+    it('renders total usage', done => {
       wrapper.setData({
         namespace: withRootStorageStatistics,
       });
 
-      expect(wrapper.find('.js-total-usage').text()).toContain(
-        withRootStorageStatistics.totalUsage,
-      );
+      wrapper.vm
+        .$nextTick()
+        .then(() => {
+          expect(wrapper.find('.js-total-usage').text()).toContain(
+            withRootStorageStatistics.totalUsage,
+          );
+        })
+        .then(done)
+        .catch(done.fail);
     });
   });
 
   describe('without rootStorageStatistics information', () => {
-    it('renders N/A', () => {
+    it('renders N/A', done => {
       wrapper.setData({
         namespace: projects,
       });
 
-      expect(wrapper.find('.js-total-usage').text()).toContain('N/A');
+      wrapper.vm
+        .$nextTick()
+        .then(() => {
+          expect(wrapper.find('.js-total-usage').text()).toContain('N/A');
+        })
+        .then(done)
+        .catch(done.fail);
     });
   });
 });

@@ -18,13 +18,14 @@ import {
 
 const { epic } = mockQueryResponse.data.group;
 
+const localVue = createLocalVue();
+
 const createComponent = ({
   parentItem = mockParentItem,
   epicPageInfo = epic.children.pageInfo,
   issuesPageInfo = epic.issues.pageInfo,
 } = {}) => {
   const store = createDefaultStore();
-  const localVue = createLocalVue();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
   store.dispatch('setInitialParentItem', mockParentItem);
@@ -44,7 +45,7 @@ const createComponent = ({
     pageInfo: issuesPageInfo,
   });
 
-  return shallowMount(TreeRoot, {
+  return shallowMount(localVue.extend(TreeRoot), {
     localVue,
     store,
     stubs: {
@@ -55,6 +56,7 @@ const createComponent = ({
       parentItem,
       children,
     },
+    sync: false,
   });
 };
 

@@ -23,9 +23,10 @@ const mockItem = Object.assign({}, mockEpic1, {
   pathIdSeparator: PathIdSeparator.Epic,
 });
 
+const localVue = createLocalVue();
+
 const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   const store = createDefaultStore();
-  const localVue = createLocalVue();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
   store.dispatch('setInitialParentItem', mockParentItem);
@@ -44,7 +45,7 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
     isSubItem: true,
   });
 
-  return shallowMount(TreeItem, {
+  return shallowMount(localVue.extend(TreeItem), {
     localVue,
     store,
     stubs: {
@@ -54,6 +55,7 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
       parentItem,
       item,
     },
+    sync: false,
   });
 };
 

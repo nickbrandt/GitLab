@@ -28,9 +28,10 @@ const mockItem = Object.assign({}, mockIssue1, {
   assignees: epicUtils.extractIssueAssignees(mockIssue1.assignees),
 });
 
+const localVue = createLocalVue();
+
 const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   const store = createDefaultStore();
-  const localVue = createLocalVue();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
   store.dispatch('setInitialParentItem', mockParentItem);
