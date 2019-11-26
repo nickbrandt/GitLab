@@ -50,6 +50,20 @@ describe Admin::ApplicationSettingsController do
       expect(ApplicationSetting.current.elasticsearch_url).to contain_exactly(settings[:elasticsearch_url])
     end
 
+    context 'elasticsearch_aws_secret_access_key setting is blank' do
+      let(:settings) do
+        {
+          elasticsearch_aws_access_key: 'elasticsearch_aws_access_key',
+          elasticsearch_aws_secret_access_key: ''
+        }
+      end
+
+      it 'does not update the elasticsearch_aws_secret_access_key setting' do
+        expect { put :update, params: { application_setting: settings } }
+          .not_to change { ApplicationSetting.current.reload.elasticsearch_aws_secret_access_key }
+      end
+    end
+
     shared_examples 'settings for licensed features' do
       it 'does not update settings when licensed feature is not available' do
         stub_licensed_features(feature => false)
