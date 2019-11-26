@@ -133,6 +133,10 @@ module EE
 
       rule { security_dashboard_enabled & developer }.enable :read_group_security_dashboard
 
+      rule { admin | owner }.policy do
+        enable :read_group_compliance_dashboard
+      end
+
       rule { needs_new_sso_session }.policy do
         prevent :read_group
       end
