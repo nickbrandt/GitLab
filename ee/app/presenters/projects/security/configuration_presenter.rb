@@ -7,8 +7,6 @@ module Projects
 
       presents :project
 
-      SECURITY_SCAN_TYPES = ::Security::JobsFinder::JOB_TYPES
-
       SCAN_DESCRIPTIONS = {
         container_scanning: _('Check your Docker images for known vulnerabilities'),
         dast: _('Analyze a review version of your web application.'),
@@ -46,7 +44,7 @@ module Projects
       private
 
       def features
-        SECURITY_SCAN_TYPES.map do |scan_type|
+        scan_types.map do |scan_type|
           if auto_devops_source?
             scan(scan_type, configured: true)
           elsif latest_builds_reports.include?(scan_type)
@@ -72,7 +70,8 @@ module Projects
       def latest_security_builds
         return [] unless latest_default_branch_pipeline
 
-        ::Security::JobsFinder.new(pipeline: latest_default_branch_pipeline).execute
+        ::Security::SecurityJobsFinder.new(pipeline: latest_default_branch_pipeline).execute +
+          ::Security::LicenseManagementJobsFinder.new(pipeline: latest_default_branch_pipeline).execute
       end
 
       def latest_default_branch_pipeline
@@ -96,6 +95,10 @@ module Projects
 
       def auto_devops_source?
         latest_default_branch_pipeline&.auto_devops_source?
+      end
+
+      def scan_types
+        ::Security::SecurityJobsFinder.allowed_job_types + ::Security::LicenseManagementJobsFinder.allowed_job_types
       end
     end
   end
