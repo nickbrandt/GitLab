@@ -2,8 +2,7 @@
 
 module QA
   context 'Monitor' do
-    # https://gitlab.com/gitlab-org/gitlab/issues/35429
-    describe 'Cluster health graphs', :orchestrated, :kubernetes, :quarantine do
+    describe 'Cluster health graphs', :orchestrated, :kubernetes do
       before do
         @cluster = Service::KubernetesCluster.new.create!
       end
