@@ -24,6 +24,26 @@ describe Search::SnippetService do
       let(:search_term) { 'foobar' }
 
       context 'project snippet' do
+        let(:pendings) do
+          [
+            { snippet_level: :public, project_level: :public, feature_access_level: :enabled, membership: :non_member, expected_count: 1 },
+            { snippet_level: :public, project_level: :internal, feature_access_level: :enabled, membership: :non_member, expected_count: 1 },
+            { snippet_level: :internal, project_level: :public, feature_access_level: :enabled, membership: :non_member, expected_count: 1 },
+            { snippet_level: :internal, project_level: :internal, feature_access_level: :enabled, membership: :non_member, expected_count: 1 }
+          ]
+        end
+        let(:pending?) do
+          pendings.include?(
+            {
+              snippet_level: snippet_level,
+              project_level: project_level,
+              feature_access_level: feature_access_level,
+              membership: membership,
+              expected_count: expected_count
+            }
+          )
+        end
+
         let_it_be(:group) { create(:group) }
         let!(:project) { create(:project, project_level, namespace: group) }
         let!(:snippet) { create(:project_snippet, snippet_level, project: project, title: search_term, content: search_term) }
