@@ -47,6 +47,18 @@ module Gitlab
         write_to_redis_hash(new_cache_content)
       end
 
+      def clear
+        Redis::Cache.with do |redis|
+          redis.del(key)
+        end
+      end
+
+      def key
+        @redis_key ||= ['highlighted-diff-files', diffable.cache_key, VERSION, diff_options].join(":")
+      end
+
+      private
+
       # Given a hash of:
       #   { "file/to/cache" =>
       #   [ { line_code: "a5cc2925ca8258af241be7e5b0381edf30266302_19_19",
@@ -73,18 +85,6 @@ module Gitlab
           end
         end
       end
-
-      def clear
-        Redis::Cache.with do |redis|
-          redis.del(key)
-        end
-      end
-
-      def key
-        @redis_key ||= ['highlighted-diff-files', diffable.cache_key, VERSION, diff_options].join(":")
-      end
-
-      private
 
       def file_paths
         @file_paths ||= @diff_collection.diffs.collect(&:file_path)
