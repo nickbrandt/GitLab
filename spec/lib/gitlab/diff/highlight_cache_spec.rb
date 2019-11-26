@@ -93,22 +93,6 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
     end
   end
 
-  describe '#read_single_entry_from_redis_hash' do
-    let(:backend) { Rails.cache }
-
-    before do
-      cache.write_to_redis_hash(diff_hash)
-    end
-
-    it 'returns highlighted diff content for a single file as JSON' do
-      diff_hash.each do |file_path, value|
-        found = cache.read_single_entry_from_redis_hash(file_path)
-
-        expect(found).to eq(value.to_json)
-      end
-    end
-  end
-
   describe '#clear' do
     let(:backend) { double('backend').as_null_object }
 

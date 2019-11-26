@@ -74,12 +74,6 @@ module Gitlab
         end
       end
 
-      def read_single_entry_from_redis_hash(diff_file_id)
-        Redis::Cache.with do |redis|
-          redis.hget(key, diff_file_id)
-        end
-      end
-
       def clear
         Redis::Cache.with do |redis|
           redis.del(key)
