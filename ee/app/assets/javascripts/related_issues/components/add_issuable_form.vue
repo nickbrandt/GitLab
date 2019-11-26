@@ -2,7 +2,12 @@
 /* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { GlLoadingIcon } from '@gitlab/ui';
 import RelatedIssuableInput from './related_issuable_input.vue';
-import { issuableTypesMap } from '../constants';
+import {
+  issuableTypesMap,
+  itemAddFailureTypesMap,
+  addRelatedIssueErrorMap,
+  addRelatedItemErrorMap,
+} from '../constants';
 
 export default {
   name: 'AddIssuableForm',
@@ -39,12 +44,29 @@ export default {
       required: false,
       default: issuableTypesMap.ISSUE,
     },
+    hasError: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    itemAddFailureType: {
+      type: String,
+      required: false,
+      default: itemAddFailureTypesMap.NOT_FOUND,
+    },
   },
   computed: {
     isSubmitButtonDisabled() {
       return (
         (this.inputValue.length === 0 && this.pendingReferences.length === 0) || this.isSubmitting
       );
+    },
+    addRelatedErrorMessage() {
+      if (this.itemAddFailureType === itemAddFailureTypesMap.NOT_FOUND) {
+        return addRelatedIssueErrorMap[this.issuableType];
+      }
+      // Only other failure is MAX_NUMBER_OF_CHILD_EPICS at the moment
+      return addRelatedItemErrorMap[this.itemAddFailureType];
     },
   },
   methods: {
@@ -83,12 +105,16 @@ export default {
       @addIssuableFormBlur="onAddIssuableFormBlur"
       @addIssuableFormInput="onAddIssuableFormInput"
     />
+    <p v-if="hasError" class="gl-field-error">
+      {{ addRelatedErrorMessage }}
+    </p>
     <div class="add-issuable-form-actions clearfix">
       <button
         ref="addButton"
         :disabled="isSubmitButtonDisabled"
         type="submit"
         class="js-add-issuable-form-add-button btn btn-success float-left qa-add-issue-button"
+        :class="{ disabled: isSubmitButtonDisabled }"
       >
         Add
         <gl-loading-icon v-if="isSubmitting" ref="loadingIcon" :inline="true" />

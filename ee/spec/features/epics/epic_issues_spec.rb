@@ -135,8 +135,8 @@ describe 'Epic Issues', :js do
     it 'user cannot add new issues to the epic from another group' do
       add_issues("#{issue_invalid.to_reference(full: true)}")
 
-      expect(page).to have_selector('.content-wrapper .flash-text')
-      expect(find('.flash-alert')).to have_text("We can't find an issue that matches what you are looking for.")
+      expect(page).to have_selector('.gl-field-error')
+      expect(find('.gl-field-error')).to have_text("Issue cannot be found.")
     end
 
     it 'user can add new issues to the epic' do
@@ -144,11 +144,53 @@ describe 'Epic Issues', :js do
 
       add_issues(references)
 
-      expect(page).not_to have_selector('.content-wrapper .flash-text')
-      expect(page).not_to have_content("We can't find an issue that matches what you are looking for.")
+      expect(page).not_to have_selector('.gl-field-error')
+      expect(page).not_to have_content("Issue cannot be found.")
 
       within('.related-items-tree-container ul.related-items-list') do
         expect(page).to have_selector('li.js-item-type-issue', count: 3)
+      end
+    end
+
+    it 'user cannot add new issue that does not exist' do
+      add_issues("&123")
+
+      expect(page).to have_selector('.gl-field-error')
+      expect(find('.gl-field-error')).to have_text("Issue cannot be found.")
+    end
+
+    it 'user cannot add new epic that does not exist' do
+      add_epics("&123")
+
+      expect(page).to have_selector('.gl-field-error')
+      expect(find('.gl-field-error')).to have_text("Epic cannot be found.")
+    end
+
+    context 'when epics are nested too deep' do
+      let(:epic1) { create(:epic, group: group, parent_id: epic.id) }
+      let(:epic2) { create(:epic, group: group, parent_id: epic1.id) }
+      let(:epic3) { create(:epic, group: group, parent_id: epic2.id) }
+      let(:epic4) { create(:epic, group: group, parent_id: epic3.id) }
+
+      before do
+        stub_licensed_features(epics: true)
+
+        sign_in(user)
+        visit group_epic_path(group, epic4)
+
+        wait_for_requests
+
+        find('.js-epic-tabs-container #tree-tab').click
+
+        wait_for_requests
+      end
+
+      it 'user cannot add new epic when hierarchy level limit has been reached' do
+        references = "#{epic_to_add.to_reference(full: true)}"
+        add_epics(references)
+
+        expect(page).to have_selector('.gl-field-error')
+        expect(find('.gl-field-error')).to have_text("This epic already has the maximum number of child epics.")
       end
     end
 
@@ -163,8 +205,8 @@ describe 'Epic Issues', :js do
 
         add_issues(references, button_selector: '.js-issue-actions-split-button')
 
-        expect(page).not_to have_selector('.content-wrapper .flash-text')
-        expect(page).not_to have_content("We can't find an issue that matches what you are looking for.")
+        expect(page).not_to have_selector('.gl-field-error')
+        expect(page).not_to have_content("Issue cannot be found.")
 
         within('.related-items-tree-container ul.related-items-list') do
           expect(page).to have_selector('li.js-item-type-issue', count: 3)
@@ -176,8 +218,8 @@ describe 'Epic Issues', :js do
       references = "#{epic_to_add.to_reference(full: true)}"
       add_epics(references)
 
-      expect(page).not_to have_selector('.content-wrapper .flash-text')
-      expect(page).not_to have_content("We can't find an epic that matches what you are looking for.")
+      expect(page).not_to have_selector('.gl-field-error')
+      expect(page).not_to have_content("Epic cannot be found.")
 
       within('.related-items-tree-container ul.related-items-list') do
         expect(page).to have_selector('li.js-item-type-epic', count: 3)

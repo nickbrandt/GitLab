@@ -21,12 +21,14 @@ export default () => ({
   itemInputValue: '',
   pendingReferences: [],
   itemAutoCompleteSources: {},
+  itemAddFailureType: null,
 
   // UI Flags
   itemsFetchInProgress: false,
   itemsFetchFailure: false,
   itemsFetchResultEmpty: false,
   itemAddInProgress: false,
+  itemAddFailure: false,
   itemCreateInProgress: false,
   showAddItemForm: false,
   showCreateEpicForm: false,
