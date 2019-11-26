@@ -6,6 +6,10 @@ module Projects
     UpdateError = Class.new(Error)
 
     def execute
+      unless can?(current_user, :access_git)
+        return error('The mirror user is not allowed to perform any git operations.')
+      end
+
       unless project.mirror?
         return success
       end
