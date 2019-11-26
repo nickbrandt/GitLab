@@ -63,7 +63,10 @@ module Elastic
 
       def authorized_project_ids_for_user(user)
         if Ability.allowed?(user, :read_cross_project)
-          user.authorized_projects.pluck_primary_key
+          user
+            .authorized_projects(Gitlab::Access::GUEST)
+            .filter_by_feature_visibility(:snippets, user)
+            .pluck_primary_key
         else
           []
         end

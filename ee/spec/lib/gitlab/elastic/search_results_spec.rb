@@ -213,45 +213,6 @@ describe Gitlab::Elastic::SearchResults, :elastic do
       expect(results.objects('notes')).to be_empty
       expect(results.notes_count).to eq 0
     end
-
-    it 'redacts issue comments on public projects where issue has lower access_level' do
-      project_1.project_feature.update!(issues_access_level: ProjectFeature::PRIVATE)
-
-      results = described_class.new(user, 'foo', limit_project_ids)
-
-      expect(results.send(:logger))
-        .to receive(:error)
-        .with(hash_including(message: "redacted_search_results", filtered: array_including([
-          { class_name: "Note", id: @note_1.id, ability: :read_note },
-          { class_name: "Note", id: @note_2.id, ability: :read_note }
-      ])))
-
-      expect(results.notes_count).to eq(2) # 2 because redacting only happens when we instantiate the results
-      expect(results.objects('notes')).to be_empty
-    end
-
-    it 'redacts commit comments when user is a guest on a private project' do
-      project_1.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
-      project_1.add_guest(user)
-      note_on_commit = create(
-        :note_on_commit,
-        project: project_1,
-        note: 'foo note on commit'
-      )
-
-      Gitlab::Elastic::Helper.refresh_index
-
-      results = described_class.new(user, 'foo', limit_project_ids)
-
-      expect(results.send(:logger))
-        .to receive(:error)
-        .with(hash_including(message: "redacted_search_results", filtered: array_including([
-          { class_name: "Note", id: note_on_commit.id, ability: :read_note }
-      ])))
-
-      expect(results.notes_count).to eq(3) # 3 because redacting only happens when we instantiate the results
-      expect(results.objects('notes')).to match_array([@note_1, @note_2])
-    end
   end
 
   describe 'confidential issues' do
@@ -906,18 +867,15 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
       context 'when project_ids is not present' do
         context 'when project_ids is :any' do
-          it 'returns all milestones and redacts them when the user has no access' do
+          it 'returns all milestones' do
             results = described_class.new(user, 'project', :any)
-            expect(results.send(:logger))
-              .to receive(:error)
-              .with(hash_including(message: "redacted_search_results", filtered: [{ class_name: "Milestone", id: milestone_2.id, ability: :read_milestone }]))
 
             milestones = results.objects('milestones')
 
-            expect(results.milestones_count).to eq(4) # 4 because redacting only happens when we instantiate the results
+            expect(results.milestones_count).to eq(4)
 
             expect(milestones).to include(milestone_1)
-            expect(milestones).not_to include(milestone_2)
+            expect(milestones).to include(milestone_2)
             expect(milestones).to include(milestone_3)
             expect(milestones).to include(milestone_4)
           end
