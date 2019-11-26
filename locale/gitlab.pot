@@ -6929,6 +6929,9 @@ msgstr ""
 msgid "Estimated"
 msgstr ""
 
+msgid "Event Actions"
+msgstr ""
+
 msgid "EventFilterBy|Filter by all"
 msgstr ""
 
@@ -13370,6 +13373,12 @@ msgstr ""
 msgid "ProjectService|%{service_title}: status on"
 msgstr ""
 
+msgid "ProjectService|Comment"
+msgstr ""
+
+msgid "ProjectService|Comment will be posted on each event"
+msgstr ""
+
 msgid "ProjectService|Integrations"
 msgstr ""
 
@@ -18430,6 +18439,9 @@ msgid "Tree view"
 msgstr ""
 
 msgid "Trending"
+msgstr ""
+
+msgid "Trigger"
 msgstr ""
 
 msgid "Trigger pipelines for mirror updates"
