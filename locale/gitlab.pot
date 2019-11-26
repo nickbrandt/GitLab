@@ -12224,6 +12224,9 @@ msgstr ""
 msgid "Performance optimization"
 msgstr ""
 
+msgid "PerformanceBar|Download"
+msgstr ""
+
 msgid "PerformanceBar|Gitaly calls"
 msgstr ""
 
