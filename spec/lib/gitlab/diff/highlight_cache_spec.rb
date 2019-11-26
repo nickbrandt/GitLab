@@ -75,8 +75,10 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
   describe '#write_if_empty' do
     let(:backend) { double('backend', read: {}).as_null_object }
 
-    xit 'submits a single write action to the redis cache when invoked multiple times' do
-      expect(cache).to receive(:write_to_redis_hash).once
+    it 'filters the key/value list of entries to be caches for each invocation' do
+      expect(cache).to receive(:write_to_redis_hash)
+        .once.with(hash_including(".gitignore")).and_call_original
+      expect(cache).to receive(:write_to_redis_hash).once.with({}).and_call_original
 
       2.times { cache.write_if_empty }
     end
