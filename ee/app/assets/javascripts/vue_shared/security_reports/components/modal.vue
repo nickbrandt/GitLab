@@ -148,10 +148,7 @@ export default {
         current_username,
       } = gon;
 
-      const currentDate = new Date();
-
       return {
-        created_at: currentDate.toString(),
         project_id: this.project ? this.project.id : null,
         author: {
           id: current_user_id,

@@ -21,6 +21,7 @@ describe('Security Reports modal', () => {
         propsData.modal.vulnerability.dismissalFeedback = {
           author: { username: 'jsmith', name: 'John Smith' },
           pipeline: { id: '123', path: '#' },
+          created_at: new Date().toString(),
         };
         mountComponent({ propsData }, mount);
       });
@@ -33,6 +34,26 @@ describe('Security Reports modal', () => {
 
       it('renders the dismissal comment placeholder', () => {
         expect(wrapper.find('.js-comment-placeholder')).not.toBeNull();
+      });
+    });
+
+    describe('with about to be dismissed issue', () => {
+      beforeEach(() => {
+        const propsData = {
+          modal: createState().modal,
+          canDismissVulnerability: true,
+        };
+        propsData.modal.vulnerability.dismissalFeedback = {
+          author: { username: 'jsmith', name: 'John Smith' },
+          pipeline: { id: '123', path: '#' },
+        };
+        mountComponent({ propsData }, mount);
+      });
+
+      it('renders dismissal author and hides associated pipeline', () => {
+        expect(wrapper.text().trim()).toContain('John Smith');
+        expect(wrapper.text().trim()).toContain('@jsmith');
+        expect(wrapper.text().trim()).not.toContain('#123');
       });
     });
 
