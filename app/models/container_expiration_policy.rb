@@ -3,11 +3,19 @@
 class ContainerExpirationPolicy < ApplicationRecord
   belongs_to :project, inverse_of: :container_expiration_policy
 
+  delegate :container_repositories, to: :project
+
   validates :project, presence: true
   validates :enabled, inclusion: { in: [true, false] }
   validates :cadence, presence: true, inclusion: { in: ->(_) { self.cadence_options.stringify_keys } }
   validates :older_than, inclusion: { in: ->(_) { self.older_than_options.stringify_keys } }, allow_nil: true
   validates :keep_n, inclusion: { in: ->(_) { self.keep_n_options.keys } }, allow_nil: true
+
+  scope :enabled, -> { where(enabled: true) }
+  scope :runnable_schedules, -> { enabled.where("next_run_at < ?", Time.zone.now) }
+  scope :preloaded, -> { preload(:project) }
+
+  before_save :set_next_run_at
 
   def self.keep_n_options
     {
@@ -37,5 +45,16 @@ class ContainerExpirationPolicy < ApplicationRecord
       '30d': _('%{days} days until tags are automatically removed') % { days: 30 },
       '90d': _('%{days} days until tags are automatically removed') % { days: 90 }
     }
+  end
+
+  def set_next_run_at
+    self.next_run_at = Time.zone.now + ChronicDuration.parse(cadence).seconds
+  end
+
+  # To be extracted with technical debt issue https://gitlab.com/gitlab-org/gitlab/issues/191331
+  def schedule_next_run!
+    save! # executes set_next_run_at
+  rescue ActiveRecord::RecordInvalid
+    update_column(:next_run_at, nil) # update without validation
   end
 end

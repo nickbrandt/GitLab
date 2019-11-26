@@ -62,6 +62,7 @@ module Ci
                          end
     end
 
+    # To be extracted with technical debt issue https://gitlab.com/gitlab-org/gitlab/issues/191331
     def schedule_next_run!
       save! # with set_next_run_at
     rescue ActiveRecord::RecordInvalid
