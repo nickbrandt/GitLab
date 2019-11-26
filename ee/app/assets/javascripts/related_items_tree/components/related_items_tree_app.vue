@@ -48,6 +48,8 @@ export default {
       'itemsFetchInProgress',
       'itemsFetchResultEmpty',
       'itemAddInProgress',
+      'itemAddFailure',
+      'itemAddFailureType',
       'itemCreateInProgress',
       'showAddItemForm',
       'showCreateEpicForm',
@@ -172,7 +174,10 @@ export default {
         v-if="visibleForm"
         :active-slot-names="[visibleForm]"
         class="card-body add-item-form-container"
-        :class="{ 'border-bottom-0': itemsFetchResultEmpty }"
+        :class="{
+          'border-bottom-0': itemsFetchResultEmpty,
+          'gl-show-field-errors': itemAddFailure,
+        }"
       >
         <add-item-form
           :slot="$options.FORM_SLOTS.addItem"
@@ -182,6 +187,8 @@ export default {
           :pending-references="pendingReferences"
           :auto-complete-sources="itemAutoCompleteSources"
           :path-id-separator="itemPathIdSeparator"
+          :has-error="itemAddFailure"
+          :item-add-failure-type="itemAddFailureType"
           @pendingIssuableRemoveRequest="handlePendingItemRemove"
           @addIssuableFormInput="handleAddItemFormInput"
           @addIssuableFormBlur="handleAddItemFormBlur"

@@ -6,8 +6,8 @@ import httpStatusCodes from '~/lib/utils/http_status';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import {
-  addRelatedIssueErrorMap,
   issuableTypesMap,
+  itemAddFailureTypesMap,
   pathIndeterminateErrorMap,
   relatedIssuesRemoveErrorMap,
 } from 'ee/related_issues/constants';
@@ -308,14 +308,8 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { rawItems 
   dispatch('setItemInputValue', '');
   dispatch('toggleAddItemForm', { toggleState: false });
 };
-export const receiveAddItemFailure = ({ commit, state }, data = {}) => {
-  commit(types.RECEIVE_ADD_ITEM_FAILURE);
-
-  let errorMessage = addRelatedIssueErrorMap[state.issuableType];
-  if (data.message) {
-    errorMessage = data.message;
-  }
-  flash(errorMessage);
+export const receiveAddItemFailure = ({ commit }, { itemAddFailureType }) => {
+  commit(types.RECEIVE_ADD_ITEM_FAILURE, { itemAddFailureType });
 };
 export const addItem = ({ state, dispatch, getters }) => {
   dispatch('requestAddItem');
@@ -330,8 +324,23 @@ export const addItem = ({ state, dispatch, getters }) => {
         rawItems: data.issuables.slice(0, state.pendingReferences.length),
       });
     })
-    .catch(({ data }) => {
-      dispatch('receiveAddItemFailure', data);
+    .catch(data => {
+      const { response } = data;
+      if (response.status === 404) {
+        dispatch('receiveAddItemFailure', { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND });
+      }
+      // Ignore 409 conflict when the issue or epic is already attached to epic
+      /* eslint-disable @gitlab/i18n/no-non-i18n-strings */
+      else if (
+        response.status === 409 &&
+        response.data.message === 'Epic hierarchy level too deep'
+      ) {
+        dispatch('receiveAddItemFailure', {
+          itemAddFailureType: itemAddFailureTypesMap.MAX_NUMBER_OF_CHILD_EPICS,
+        });
+      } else {
+        dispatch('receiveAddItemFailure');
+      }
     });
 };
 

@@ -6,7 +6,11 @@ import * as types from 'ee/related_items_tree/store/mutation_types';
 
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { ChildType, ChildState } from 'ee/related_items_tree/constants';
-import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
+import {
+  issuableTypesMap,
+  itemAddFailureTypesMap,
+  PathIdSeparator,
+} from 'ee/related_issues/constants';
 
 import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
@@ -911,39 +915,19 @@ describe('RelatedItemTree', () => {
       });
 
       describe('receiveAddItemFailure', () => {
-        beforeEach(() => {
-          setFixtures('<div class="flash-container"></div>');
-        });
-
         it('should set `state.itemAddInProgress` to false', done => {
           testAction(
             actions.receiveAddItemFailure,
-            {},
+            { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND },
             {},
             [
               {
                 type: types.RECEIVE_ADD_ITEM_FAILURE,
+                payload: { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND },
               },
             ],
             [],
             done,
-          );
-        });
-
-        it('should show flash error with message "Something went wrong while adding item."', () => {
-          const message = 'Something went wrong while adding item.';
-          actions.receiveAddItemFailure(
-            {
-              commit: () => {},
-              state: { issuableType: issuableTypesMap.EPIC },
-            },
-            {
-              message,
-            },
-          );
-
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            message,
           );
         });
       });
@@ -1003,6 +987,7 @@ describe('RelatedItemTree', () => {
               },
               {
                 type: 'receiveAddItemFailure',
+                payload: { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND },
               },
             ],
             done,

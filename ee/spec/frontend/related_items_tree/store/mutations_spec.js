@@ -431,6 +431,16 @@ describe('RelatedItemsTree', () => {
 
           expect(state.pendingReferences).toEqual(expect.arrayContaining(['foo']));
         });
+
+        it('should update `itemAddFailure` to false if no `pendingReferences` are left', () => {
+          state.pendingReferences = ['foo'];
+          state.itemAddFailure = true;
+
+          mutations[types.REMOVE_PENDING_REFERENCE](state, 0);
+
+          expect(state.pendingReferences.length).toEqual(0);
+          expect(state.itemAddFailure).toBe(false);
+        });
       });
 
       describe(types.SET_ITEM_INPUT_VALUE, () => {
@@ -468,10 +478,12 @@ describe('RelatedItemsTree', () => {
       });
 
       describe(types.RECEIVE_ADD_ITEM_FAILURE, () => {
-        it('should set `itemAddInProgress` to false within state', () => {
-          mutations[types.RECEIVE_ADD_ITEM_FAILURE](state);
+        it('should set `itemAddInProgress` to false, `itemAddFailure` to true and `itemAddFailureType` value within state', () => {
+          mutations[types.RECEIVE_ADD_ITEM_FAILURE](state, { itemAddFailureType: 'bar' });
 
           expect(state.itemAddInProgress).toBe(false);
+          expect(state.itemAddFailure).toBe(true);
+          expect(state.itemAddFailureType).toEqual('bar');
         });
       });
 
