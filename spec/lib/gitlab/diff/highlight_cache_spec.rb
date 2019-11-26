@@ -73,7 +73,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
   end
 
   describe '#write_if_empty' do
-    let(:backend) { double('backend', read: {}).as_null_object }
+    let(:backend) { Rails.cache }
 
     it 'filters the key/value list of entries to be caches for each invocation' do
       expect(cache).to receive(:write_to_redis_hash)
@@ -81,6 +81,19 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
       expect(cache).to receive(:write_to_redis_hash).once.with({}).and_call_original
 
       2.times { cache.write_if_empty }
+    end
+
+    context 'different diff_collections for the same diffable' do
+      before do
+        cache.write_if_empty
+      end
+
+      it 'writes an uncached files in the collection to the same redis hash' do
+        Gitlab::Redis::Cache.with { |r| r.hdel(cache_key, "files/whitespace") }
+
+        expect { cache.write_if_empty }
+          .to change { Gitlab::Redis::Cache.with { |r| r.hgetall(cache_key) } }
+      end
     end
   end
 
