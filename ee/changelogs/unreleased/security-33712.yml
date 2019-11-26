@@ -1,0 +1,5 @@
+---
+title: Fix private comment Elasticsearch leak on project search scope
+merge_request:
+author:
+type: security
