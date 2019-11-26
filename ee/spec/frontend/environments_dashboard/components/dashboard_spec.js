@@ -29,6 +29,7 @@ describe('dashboard', () => {
       removeProject: jest.fn(),
       toggleSelectedProject: jest.fn(),
       fetchNextPage: jest.fn(),
+      fetchProjects: jest.fn(),
     };
     propsData = {
       addPath: 'mock-addPath',
@@ -42,7 +43,6 @@ describe('dashboard', () => {
       localVue,
       store,
       methods: {
-        fetchProjects: () => {},
         ...actionSpies,
       },
     });
@@ -134,6 +134,16 @@ describe('dashboard', () => {
       it('should toggle a project when clicked', () => {
         wrapper.find(ProjectSelector).vm.$emit('projectClicked', { name: 'test', id: 1 });
         expect(actionSpies.toggleSelectedProject).toHaveBeenCalledWith({ name: 'test', id: 1 });
+      });
+
+      it('should fetch the next page when bottom is reached', () => {
+        wrapper.find(ProjectSelector).vm.$emit('bottomReached');
+        expect(actionSpies.fetchNextPage).toHaveBeenCalled();
+      });
+
+      it('should get the page info from the state', () => {
+        store.state.pageInfo = { totalResults: 100 };
+        expect(wrapper.find(ProjectSelector).props('totalResults')).toBe(100);
       });
     });
   });
