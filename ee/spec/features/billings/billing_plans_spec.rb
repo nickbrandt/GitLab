@@ -85,8 +85,6 @@ describe 'Billing plan pages', :feature do
   context 'users profile billing page' do
     let(:page_path) { profile_billings_path }
 
-    it_behaves_like 'billings gold trial callout'
-
     context 'on free' do
       let(:plan) { free_plan }
 
@@ -177,8 +175,6 @@ describe 'Billing plan pages', :feature do
     context 'top-most group' do
       let(:page_path) { group_billings_path(namespace) }
 
-      it_behaves_like 'billings gold trial callout'
-
       context 'on bronze' do
         let(:plan) { bronze_plan }
 
@@ -220,8 +216,6 @@ describe 'Billing plan pages', :feature do
     let!(:subgroup2_member) { create(:group_member, :owner, group: subgroup2, user: user3) }
     let(:page_path) { group_billings_path(subgroup2) }
     let(:namespace) { group }
-
-    it_behaves_like 'billings gold trial callout'
 
     context 'on bronze' do
       let(:plan) { bronze_plan }
