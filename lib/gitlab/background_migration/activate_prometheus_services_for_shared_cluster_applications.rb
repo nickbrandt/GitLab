@@ -8,15 +8,23 @@ module Gitlab
       include Gitlab::Database::MigrationHelpers
 
       module Migratable
+        class Applications::Prometheus < ActiveRecord::Base
+          self.table_name = 'clusters_applications_prometheus'
+          enum status: {
+            installed: 3,
+            updated: 5
+          }
+        end
+
         class Project < ActiveRecord::Base
           self.table_name = 'projects'
 
           def self.with_application_on_group_clusters
             joins("INNER JOIN namespaces ON namespaces.id = projects.namespace_id")
               .joins("INNER JOIN cluster_groups ON cluster_groups.group_id = namespaces.id")
-              .joins("INNER JOIN clusters ON clusters.id = cluster_groups.cluster_id AND clusters.cluster_type = 2")
+              .joins("INNER JOIN clusters ON clusters.id = cluster_groups.cluster_id AND clusters.cluster_type = #{Cluster.cluster_types['group_type']}")
               .joins("INNER JOIN clusters_applications_prometheus ON clusters_applications_prometheus.cluster_id = clusters.id
-                      AND clusters_applications_prometheus.status IN (3,5)")
+                      AND clusters_applications_prometheus.status IN (#{Applications::Prometheus.statuses[:installed]}, #{Applications::Prometheus.statuses[:updated]})")
           end
 
           def self.with_missing_prometheus_services
@@ -28,13 +36,15 @@ module Gitlab
         class Cluster < ActiveRecord::Base
           self.table_name = 'clusters'
 
-          def self.cluster_type
-            where("clusters.cluster_type = 1")
-          end
+          enum cluster_type: {
+            instance_type: 1,
+            group_type: 2,
+            project_type: 3
+          }
 
           def self.has_prometheus_application?
             joins("INNER JOIN clusters_applications_prometheus ON clusters_applications_prometheus.cluster_id = clusters.id
-                   AND clusters_applications_prometheus.status IN (3,5)").exists?
+                   AND clusters_applications_prometheus.status IN (#{Applications::Prometheus.statuses[:installed]}, #{Applications::Prometheus.statuses[:updated]})").exists?
           end
         end
 
@@ -48,60 +58,37 @@ module Gitlab
           def self.with_project
             joins("INNER JOIN projects ON projects.id = services.project_id")
           end
-
-          def self.with_application_on_group_cluster
-            with_project
-              .joins("INNER JOIN namespaces ON namespaces.id = projects.namespace_id ")
-              .joins("INNER JOIN cluster_groups ON cluster_groups.group_id = namespaces.id")
-              .joins("INNER JOIN clusters ON clusters.id = cluster_groups.cluster_id AND clusters.cluster_type = 2")
-              .joins("INNER JOIN clusters_applications_prometheus ON clusters_applications_prometheus.cluster_id = clusters.id
-                      AND clusters_applications_prometheus.status IN (3,5)")
-          end
         end
       end
 
       def perform(start_id, stop_id)
-        migrate_group_clusters(start_id, stop_id)
-        migrate_instance_clusters(start_id, stop_id)
+        ### Reactivate existing services which weren't configured manually
+        prometheus_services_to_update(start_id, stop_id).update_all(active: true)
+        ### create missing services
+        insert_into_services(projects_with_missing_services(start_id, stop_id).map(&method(:values_for_prometheus_service)))
       end
 
       private
 
-      def migrate_instance_clusters(start_id, stop_id)
-        return unless Migratable::Cluster.cluster_type.has_prometheus_application?
+      def prometheus_services_to_update(start_id, stop_id)
+        scope = Migratable::PrometheusService
+          .managed_inactive
+          .with_project
+          .where(projects: { id: start_id..stop_id })
 
-        ### Reactivate existing services which weren't configured manually
-        Migratable::PrometheusService
-            .managed_inactive
-            .with_project
-            .where(projects: { id: start_id..stop_id })
-            .update_all(active: true)
+        return scope if migrate_instance_cluster?
 
-        ### create missing entries
-        sql_values = Migratable::Project
-                         .with_missing_prometheus_services
-                         .where(projects: { id: start_id..stop_id })
-                         .map(&method(:values_for_prometheus_service))
-
-        insert_into_services(sql_values)
+        scope.merge(Migratable::Project.with_application_on_group_clusters)
       end
 
-      def migrate_group_clusters(start_id, stop_id)
-        ### Reactivate existing services which weren't configured manually
-        Migratable::PrometheusService
-            .managed_inactive
-            .with_application_on_group_cluster
-            .where(projects: { id: start_id..stop_id })
-            .update_all(active: true)
+      def projects_with_missing_services(start_id, stop_id)
+        scope = Migratable::Project
+                    .with_missing_prometheus_services
+                    .where(projects: { id: start_id..stop_id })
 
-        ### create missing entries
-        sql_values = Migratable::Project
-                         .with_application_on_group_clusters
-                         .with_missing_prometheus_services
-                         .where(projects: { id: start_id..stop_id })
-                         .map(&method(:values_for_prometheus_service))
+        return scope if migrate_instance_cluster?
 
-        insert_into_services(sql_values)
+        scope.with_application_on_group_clusters
       end
 
       def values_for_prometheus_service(project)
@@ -134,6 +121,12 @@ module Gitlab
         Gitlab::Database.bulk_insert(Migratable::PrometheusService.table_name,
                                      rows,
                                      disable_quote: [:created_at, :updated_at])
+      end
+
+      def migrate_instance_cluster?
+        return @_migrate_instance_cluster if defined? @_migrate_instance_cluster
+
+        @_migrate_instance_cluster = Migratable::Cluster.instance_type.has_prometheus_application?
       end
     end
   end
