@@ -1,7 +1,15 @@
+# frozen_string_literal: true
+
+# rubocop:disable Layout/SpaceInsideHashLiteralBraces
+# rubocop:disable Layout/SpaceAroundOperators
+# rubocop:disable Metrics/AbcSize
+# rubocop:disable Migration/AddConcurrentForeignKey
+# rubocop:disable Style/WordArray
+# rubocop:disable Migration/AddLimitToStringColumns
+
 class InitSchema < ActiveRecord::Migration[4.2]
   DOWNTIME = true
 
-  # rubocop:disable Metrics/AbcSize
   def up
     create_table "broadcast_messages", force: :cascade do |t|
       t.text "message", null: false
