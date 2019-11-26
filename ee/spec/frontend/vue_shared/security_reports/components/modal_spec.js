@@ -109,7 +109,7 @@ describe('Security Reports modal', () => {
 
       it('renders help link', () => {
         expect(wrapper.find('.js-link-vulnerabilityFeedbackHelpPath').attributes('href')).toBe(
-          'feedbacksHelpPath#solutions-for-vulnerabilities',
+          'feedbacksHelpPath#solutions-for-vulnerabilities-auto-remediation',
         );
       });
     });
