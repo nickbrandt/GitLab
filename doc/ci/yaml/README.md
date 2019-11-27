@@ -1245,11 +1245,12 @@ Delayed job are for executing scripts after a certain period.
 This is useful if you want to avoid jobs entering `pending` state immediately.
 
 You can set the period with `start_in` key. The value of `start_in` key is an elapsed time in seconds, unless a unit is
-provided. `start_in` key must be less than or equal to one hour. Examples of valid values include:
+provided. `start_in` key must be less than or equal to one week. Examples of valid values include:
 
 - `10 seconds`
 - `30 minutes`
-- `1 hour`
+- `1 day`
+- `1 week`
 
 When there is a delayed job in a stage, the pipeline will not progress until the delayed job has finished.
 This means this keyword can also be used for inserting delays between different stages.
