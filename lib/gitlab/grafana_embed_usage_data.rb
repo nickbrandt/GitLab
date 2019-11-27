@@ -5,9 +5,9 @@ module Gitlab
     class << self
       def issue_count
         # rubocop:disable CodeReuse/ActiveRecord
-        Issue.joins(project: :grafana_integration)
-          .merge(Project.with_grafana_integration_enabled)
+        Issue.joins('JOIN grafana_integrations USING (project_id)')
           .where("issues.description LIKE '%' || grafana_integrations.grafana_url || '%'")
+          .where(grafana_integrations: { enabled: true })
           .count
         # rubocop:enable CodeReuse/ActiveRecord
       end
