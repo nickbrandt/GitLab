@@ -6,7 +6,7 @@ exports[`Design management list item component hides comment count 1`] = `
   to="[object Object]"
 >
   <div
-    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+    class="card-body p-0 d-flex-center overflow-hidden position-relative"
   >
     <!---->
      
@@ -55,7 +55,7 @@ exports[`Design management list item component renders item with correct status 
   to="[object Object]"
 >
   <div
-    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+    class="card-body p-0 d-flex-center overflow-hidden position-relative"
   >
     <div
       class="design-event position-absolute"
@@ -117,7 +117,7 @@ exports[`Design management list item component renders item with correct status 
   to="[object Object]"
 >
   <div
-    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+    class="card-body p-0 d-flex-center overflow-hidden position-relative"
   >
     <div
       class="design-event position-absolute"
@@ -179,7 +179,7 @@ exports[`Design management list item component renders item with correct status 
   to="[object Object]"
 >
   <div
-    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+    class="card-body p-0 d-flex-center overflow-hidden position-relative"
   >
     <div
       class="design-event position-absolute"
@@ -241,7 +241,7 @@ exports[`Design management list item component renders item with multiple commen
   to="[object Object]"
 >
   <div
-    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+    class="card-body p-0 d-flex-center overflow-hidden position-relative"
   >
     <!---->
      
@@ -307,7 +307,7 @@ exports[`Design management list item component renders item with no status icon 
   to="[object Object]"
 >
   <div
-    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+    class="card-body p-0 d-flex-center overflow-hidden position-relative"
   >
     <!---->
      
@@ -356,7 +356,7 @@ exports[`Design management list item component renders item with single comment 
   to="[object Object]"
 >
   <div
-    class="card-body p-0 d-flex align-items-center overflow-hidden position-relative"
+    class="card-body p-0 d-flex-center overflow-hidden position-relative"
   >
     <!---->
      
