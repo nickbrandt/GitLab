@@ -10,7 +10,7 @@ module Gitlab
       delegate :diff_options, to: :@diff_collection
 
       def initialize(diff_collection)
-        @diff_collection  = diff_collection
+        @diff_collection = diff_collection
       end
 
       # - Reads from cache
@@ -43,7 +43,7 @@ module Gitlab
       end
 
       def clear
-        Redis::Cache.with do |redis|
+        Gitlab::Redis::Cache.with do |redis|
           redis.del(key)
         end
       end
@@ -71,10 +71,10 @@ module Gitlab
       #       new_pos: 19 }
       #   ] }
       #
-      #   ...it will write/update a Redis hash (HSET)
+      #   ...it will write/update a Gitlab::Redis hash (HSET)
       #
       def write_to_redis_hash(hash)
-        Redis::Cache.with do |redis|
+        Gitlab::Redis::Cache.with do |redis|
           redis.multi do |multi|
             hash.each do |diff_file_id, highlighted_diff_lines_hash|
               multi.hset(key, diff_file_id, highlighted_diff_lines_hash.to_json)
@@ -104,7 +104,7 @@ module Gitlab
 
         results = []
 
-        Redis::Cache.with do |redis|
+        Gitlab::Redis::Cache.with do |redis|
           results = redis.hmget(key, file_paths)
         end
 
