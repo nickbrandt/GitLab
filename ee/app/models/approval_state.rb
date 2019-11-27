@@ -139,9 +139,10 @@ class ApprovalState
 
   def can_approve?(user)
     return false unless user
+    return false unless user.can?(:approve_merge_request, merge_request)
+
     return true if unactioned_approvers.include?(user)
     return false unless any_approver_allowed?
-    return false unless user.can?(:update_merge_request, merge_request)
     # Users can only approve once.
     return false if approvals.where(user: user).any?
     # At this point, follow self-approval rules. Otherwise authors must
