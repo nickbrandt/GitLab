@@ -36,7 +36,7 @@ module QA
 
           EE::Page::Group::SamlSSOSignIn.perform(&:click_sign_in)
 
-          login_to_idp_if_required_and_expect_success
+          login_to_idp_if_required_and_expect_success('user1', 'user1pass')
 
           page.visit managed_group_url
 
@@ -57,7 +57,7 @@ module QA
             saml_sso.click_test_button
           end
 
-          login_to_idp_if_required
+          login_to_idp_if_required('user2', 'user2pass')
 
           expect(page).to have_content("Verify SAML Configuration")
           expect(page).to have_content("Fingerprint mismatch")
@@ -193,7 +193,7 @@ module QA
 
             EE::Page::Group::SamlSSOSignIn.perform(&:click_sign_in)
 
-            Vendor::SAMLIdp::Page::Login.perform { |login_page| login_page.login_if_required('user2', 'user2pass') }
+            login_to_idp_if_required('user3', 'user3pass')
 
             expect(page).to have_text("uses group managed accounts. You need to create a new GitLab account which will be managed by")
 
@@ -233,27 +233,27 @@ module QA
           end
         end
 
-        after do
+        after(:all) do
           disable_enforce_sso_and_group_managed_account
-          remove_user_if_exists(developer_user.email)
+
+          %w[enforced_sso enforced_sso_requires_session group_managed_accounts sign_up_on_sso group_scim].each do |flag|
+            Runtime::Feature.remove(flag)
+          end
         end
       end
 
       after(:all) do
         remove_group(@group) unless @group.nil?
-
-        %w[enforced_sso enforced_sso_requires_session group_managed_accounts sign_up_on_sso group_scim].each do |flag|
-          Runtime::Feature.remove(flag)
-        end
+        Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
     end
 
-    def login_to_idp_if_required
-      Vendor::SAMLIdp::Page::Login.perform { |login_page| login_page.login_if_required('user1', 'user1pass') }
+    def login_to_idp_if_required(username, password)
+      Vendor::SAMLIdp::Page::Login.perform { |login_page| login_page.login_if_required(username, password) }
     end
 
-    def login_to_idp_if_required_and_expect_success
-      login_to_idp_if_required
+    def login_to_idp_if_required_and_expect_success(username, password)
+      login_to_idp_if_required(username, password)
       expect(page).to have_content("SAML for #{Runtime::Env.sandbox_name} was added to your connected accounts")
                         .or have_content("Already signed in with SAML for #{Runtime::Env.sandbox_name}")
     end
@@ -314,16 +314,6 @@ module QA
 
           saml_sso.click_save_changes
 
-          # To work around a bug (https://gitlab.com/gitlab-org/gitlab/issues/35365),
-          # we need to disable group managed accounts and enable it again in order for
-          # any existing non-owner users to be removed from the group.
-          # This should be updated once the bug is fixed.
-          saml_sso.disable_group_managed_accounts
-          saml_sso.click_save_changes
-
-          saml_sso.enable_group_managed_accounts
-          saml_sso.click_save_changes
-
           saml_sso.user_login_url_link_text
         end
       end
@@ -360,7 +350,10 @@ module QA
 
       page.visit Runtime::Scenario.gitlab_address
 
-      Page::Main::Menu.perform(&:sign_out_if_signed_in)
+      Support::Retrier.retry_until(exit_on_failure: true) do
+        Page::Main::Menu.perform(&:sign_out_if_signed_in)
+        !Page::Main::Menu.perform(&:signed_in?)
+      end
       Page::Main::Login.perform(&:sign_in_using_admin_credentials)
 
       @group.visit!
