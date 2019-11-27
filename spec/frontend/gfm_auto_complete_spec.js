@@ -1,6 +1,7 @@
 /* eslint no-param-reassign: "off" */
 
 import $ from 'jquery';
+import { membersBeforeSave } from '~/gfm_auto_complete';
 import GfmAutoComplete from 'ee_else_ce/gfm_auto_complete';
 
 import 'jquery.caret';
@@ -259,6 +260,79 @@ describe('GfmAutoComplete', () => {
 
     it('should be false with actual data item', () => {
       expect(GfmAutoComplete.isLoading({ title: 'Foo' })).toBe(false);
+    });
+  });
+
+  describe('membersBeforeSave', () => {
+    const mockGroup = {
+      username: 'my-group',
+      name: 'My Group',
+      count: 2,
+      avatar_url: './group.jpg',
+      type: 'Group',
+      mentionsDisabled: false,
+    };
+
+    it('should return the original object when username is null', () => {
+      expect(membersBeforeSave([{ ...mockGroup, username: null }])).toEqual([
+        { ...mockGroup, username: null },
+      ]);
+    });
+
+    it('should set the text avatar if avatar_url is null', () => {
+      expect(membersBeforeSave([{ ...mockGroup, avatar_url: null }])).toEqual([
+        {
+          username: 'my-group',
+          avatarTag: '<div class="avatar rect-avatar center avatar-inline s26">M</div>',
+          title: 'My Group (2)',
+          search: 'my-group My Group',
+          icon: '',
+        },
+      ]);
+    });
+
+    it('should set the image avatar if avatar_url is given', () => {
+      expect(membersBeforeSave([mockGroup])).toEqual([
+        {
+          username: 'my-group',
+          avatarTag:
+            '<img src="./group.jpg" alt="my-group" class="avatar rect-avatar avatar-inline center s26"/>',
+          title: 'My Group (2)',
+          search: 'my-group My Group',
+          icon: '',
+        },
+      ]);
+    });
+
+    it('should set mentions disabled icon if mentionsDisabled is set', () => {
+      expect(membersBeforeSave([{ ...mockGroup, mentionsDisabled: true }])).toEqual([
+        {
+          username: 'my-group',
+          avatarTag:
+            '<img src="./group.jpg" alt="my-group" class="avatar rect-avatar avatar-inline center s26"/>',
+          title: 'My Group',
+          search: 'my-group My Group',
+          icon:
+            '<svg class="s16 vertical-align-middle prepend-left-5"><use xlink:href="undefined#notifications-off" /></svg>',
+        },
+      ]);
+    });
+
+    it('should set the right image classes for User type members', () => {
+      expect(
+        membersBeforeSave([
+          { username: 'my-user', name: 'My User', avatar_url: './users.jpg', type: 'User' },
+        ]),
+      ).toEqual([
+        {
+          username: 'my-user',
+          avatarTag:
+            '<img src="./users.jpg" alt="my-user" class="avatar  avatar-inline center s26"/>',
+          title: 'My User',
+          search: 'my-user My User',
+          icon: '',
+        },
+      ]);
     });
   });
 

@@ -3,9 +3,42 @@ import 'at.js';
 import _ from 'underscore';
 import glRegexp from './lib/utils/regexp';
 import AjaxCache from './lib/utils/ajax_cache';
+import { spriteIcon } from './lib/utils/common_utils';
 
 function sanitize(str) {
   return str.replace(/<(?:.|\n)*?>/gm, '');
+}
+
+export function membersBeforeSave(members) {
+  return _.map(members, member => {
+    const GROUP_TYPE = 'Group';
+
+    let title = '';
+    if (member.username == null) {
+      return member;
+    }
+    title = member.name;
+    if (member.count && !member.mentionsDisabled) {
+      title += ` (${member.count})`;
+    }
+
+    const autoCompleteAvatar = member.avatar_url || member.username.charAt(0).toUpperCase();
+
+    const rectAvatarClass = member.type === GROUP_TYPE ? 'rect-avatar' : '';
+    const imgAvatar = `<img src="${member.avatar_url}" alt="${member.username}" class="avatar ${rectAvatarClass} avatar-inline center s26"/>`;
+    const txtAvatar = `<div class="avatar ${rectAvatarClass} center avatar-inline s26">${autoCompleteAvatar}</div>`;
+    const avatarIcon = member.mentionsDisabled
+      ? spriteIcon('notifications-off', 's16 vertical-align-middle prepend-left-5')
+      : '';
+
+    return {
+      username: member.username,
+      avatarTag: autoCompleteAvatar.length === 1 ? txtAvatar : imgAvatar,
+      title: sanitize(title),
+      search: sanitize(`${member.username} ${member.name}`),
+      icon: avatarIcon,
+    };
+  });
 }
 
 export const defaultAutocompleteConfig = {
@@ -186,35 +219,7 @@ class GfmAutoComplete {
       data: GfmAutoComplete.defaultLoadingData,
       callbacks: {
         ...this.getDefaultCallbacks(),
-        beforeSave(members) {
-          return $.map(members, m => {
-            let title = '';
-            if (m.username == null) {
-              return m;
-            }
-            title = m.name;
-            if (m.count && !m.mentionsDisabled) {
-              title += ` (${m.count})`;
-            }
-
-            const GROUP_TYPE = 'Group';
-
-            const autoCompleteAvatar = m.avatar_url || m.username.charAt(0).toUpperCase();
-
-            const rectAvatarClass = m.type === GROUP_TYPE ? 'rect-avatar' : '';
-            const imgAvatar = `<img src="${m.avatar_url}" alt="${m.username}" class="avatar ${rectAvatarClass} avatar-inline center s26"/>`;
-            const txtAvatar = `<div class="avatar ${rectAvatarClass} center avatar-inline s26">${autoCompleteAvatar}</div>`;
-            const avatarIcon = m.mentionsDisabled ? '<i class="fa fa-bell-slash"></i>' : '';
-
-            return {
-              username: m.username,
-              avatarTag: autoCompleteAvatar.length === 1 ? txtAvatar : imgAvatar,
-              title: sanitize(title),
-              search: sanitize(`${m.username} ${m.name}`),
-              icon: avatarIcon,
-            };
-          });
-        },
+        beforeSave: membersBeforeSave,
       },
     });
   }
