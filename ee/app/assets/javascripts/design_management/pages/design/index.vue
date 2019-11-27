@@ -200,10 +200,8 @@ export default {
             <toolbar
               :id="id"
               :is-deleting="loading"
-              :name="design.filename"
-              :updated-at="design.updatedAt"
-              :updated-by="design.updatedBy"
               :is-latest-version="isLatestVersion"
+              v-bind="design"
               @delete="mutate()"
             />
           </template>
