@@ -150,6 +150,8 @@ module EE
 
       rule { can?(:public_access) }.enable :read_package
 
+      rule { can?(:read_project) & can?(:read_build) }.enable :read_security_findings
+
       rule { can?(:developer_access) }.policy do
         enable :read_project_security_dashboard
       end

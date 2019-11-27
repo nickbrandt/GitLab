@@ -47,7 +47,7 @@ describe ProjectPolicy do
         read_environment read_deployment read_merge_request read_pages
         create_merge_request_in award_emoji
         read_project_security_dashboard read_vulnerability
-        read_vulnerability_feedback read_software_license_policy
+        read_vulnerability_feedback read_security_findings read_software_license_policy
       ]
     end
 
@@ -407,6 +407,54 @@ describe ProjectPolicy do
         let(:project) { create(:project, :public) }
 
         it { is_expected.to be_allowed(:read_vulnerability_feedback) }
+      end
+    end
+  end
+
+  describe 'read_security_findings' do
+    context 'with private project' do
+      let(:project) { create(:project, :private, namespace: owner.namespace) }
+
+      context 'with guest or above' do
+        let(:current_user) { guest }
+
+        it { is_expected.to be_allowed(:read_security_findings) }
+      end
+
+      context 'with non member' do
+        let(:current_user) { create(:user) }
+
+        it { is_expected.to be_disallowed(:read_security_findings) }
+      end
+
+      context 'with anonymous' do
+        let(:current_user) { nil }
+
+        it { is_expected.to be_disallowed(:read_security_findings) }
+      end
+    end
+
+    context 'with public project' do
+      let(:current_user) { create(:user) }
+
+      context 'with limited access to builds' do
+        context 'when builds enabled only for project members' do
+          let(:project) { create(:project, :public, :builds_private) }
+
+          it { is_expected.not_to be_allowed(:read_security_findings) }
+        end
+
+        context 'when public builds disabled' do
+          let(:project) { create(:project, :public, public_builds: false) }
+
+          it { is_expected.not_to be_allowed(:read_security_findings) }
+        end
+      end
+
+      context 'with public access to repository' do
+        let(:project) { create(:project, :public) }
+
+        it { is_expected.to be_allowed(:read_security_findings) }
       end
     end
   end
