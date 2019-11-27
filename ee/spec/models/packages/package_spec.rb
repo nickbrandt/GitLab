@@ -110,4 +110,14 @@ RSpec.describe Packages::Package, type: :model do
       end
     end
   end
+
+  describe '.with_conan_channel' do
+    let!(:package) { create(:conan_package) }
+
+    subject { described_class.with_conan_channel('stable') }
+
+    it 'includes only packages with specified version' do
+      is_expected.to eq([package])
+    end
+  end
 end
