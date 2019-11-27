@@ -67,7 +67,7 @@ describe Gitlab::Ci::YamlProcessor do
             bridge_needs: { pipeline: 'some/project' }
           },
           needs_attributes: [
-            { name: "build" }
+            { name: "build", artifacts: true }
           ],
           when: "on_success",
           allow_failure: false,
