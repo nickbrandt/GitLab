@@ -163,9 +163,9 @@ module API
           use :project_full_path
         end
         get ':namespace/:project/pulls/:id' do
-          mr = find_merge_request_with_access(params[:id])
+          merge_request = find_merge_request_with_access(params[:id])
 
-          present mr, with: ::API::Github::Entities::PullRequest
+          present merge_request, with: ::API::Github::Entities::PullRequest
         end
 
         # In Github, each Merge Request is automatically also an issue.
