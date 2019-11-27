@@ -74,13 +74,10 @@ const addDiscussionCommentToStore = (store, createNote, query, queryVariables) =
   });
 };
 
-const addImageDiffNoteToStore = (store, createImageDiffNote, query) => {
+const addImageDiffNoteToStore = (store, createImageDiffNote, query, variables) => {
   const data = store.readQuery({
     query,
-    variables: {
-      id: this.id,
-      version: this.designsVersion,
-    },
+    variables,
   });
   const newDiscussion = {
     __typename: 'DiscussionEdge',
@@ -101,9 +98,20 @@ const addImageDiffNoteToStore = (store, createImageDiffNote, query) => {
       },
     },
   };
-  data.design.discussions.edges.push(newDiscussion);
-  data.design.notesCount += 1;
-  store.writeQuery({ query, data });
+  const design = extractDesign(data);
+  const notesCount = design.notesCount + 1;
+  design.discussions.edges = [...design.discussions.edges, newDiscussion];
+  store.writeQuery({
+    query,
+    variables,
+    data: {
+      ...data,
+      design: {
+        ...design,
+        notesCount,
+      },
+    },
+  });
 };
 
 const addNewDesignToStore = (store, designManagementUpload, query) => {
@@ -186,11 +194,11 @@ export const updateStoreAfterAddDiscussionComment = (store, data, query, queryVa
   }
 };
 
-export const updateStoreAfterAddImageDiffNote = (store, data, query) => {
+export const updateStoreAfterAddImageDiffNote = (store, data, query, queryVariables) => {
   if (data.errors) {
     onError(data, ADD_IMAGE_DIFF_NOTE_ERROR);
   } else {
-    addImageDiffNoteToStore(store, data, query);
+    addImageDiffNoteToStore(store, data, query, queryVariables);
   }
 };
 

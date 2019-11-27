@@ -1,4 +1,5 @@
 <script>
+import { ApolloMutation } from 'vue-apollo';
 import Mousetrap from 'mousetrap';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
@@ -14,10 +15,12 @@ import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
 import { extractDiscussions, extractDesign } from '../../utils/design_management_utils';
+import { updateStoreAfterAddImageDiffNote } from '../../utils/cache_update';
 import { ADD_DISCUSSION_COMMENT_ERROR } from '../../utils/error_messages';
 
 export default {
   components: {
+    ApolloMutation,
     DesignImage,
     DesignOverlay,
     DesignDiscussion,
@@ -44,7 +47,6 @@ export default {
       },
       projectPath: '',
       issueId: '',
-      isNoteSaving: false,
     };
   },
   apollo: {
@@ -102,6 +104,25 @@ export default {
         atVersion: this.designsVersion,
       };
     },
+    mutationPayload() {
+      const { x, y, width, height } = this.annotationCoordinates;
+      return {
+        noteableId: this.design.id,
+        body: this.comment,
+        position: {
+          headSha: this.design.diffRefs.headSha,
+          baseSha: this.design.diffRefs.baseSha,
+          startSha: this.design.diffRefs.startSha,
+          x,
+          y,
+          width,
+          height,
+          paths: {
+            newPath: this.design.fullPath,
+          },
+        },
+      };
+    },
   },
   mounted() {
     Mousetrap.bind('esc', this.closeDesign);
@@ -110,80 +131,22 @@ export default {
     Mousetrap.unbind('esc', this.closeDesign);
   },
   methods: {
-    addImageDiffNote() {
-      const { x, y, width, height } = this.annotationCoordinates;
-      this.isNoteSaving = true;
-      return this.$apollo
-        .mutate({
-          mutation: createImageDiffNoteMutation,
-          variables: {
-            input: {
-              noteableId: this.design.id,
-              body: this.comment,
-              position: {
-                headSha: this.design.diffRefs.headSha,
-                baseSha: this.design.diffRefs.baseSha,
-                startSha: this.design.diffRefs.startSha,
-                x,
-                y,
-                width,
-                height,
-                paths: {
-                  newPath: this.design.fullPath,
-                },
-              },
-            },
-          },
-          update: (store, { data: { createImageDiffNote } }) => {
-            const data = store.readQuery({
-              query: getDesignQuery,
-              variables: this.designVariables,
-            });
-            const newDiscussion = {
-              __typename: 'DiscussionEdge',
-              node: {
-                // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-                // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-                __typename: 'Discussion',
-                id: createImageDiffNote.note.discussion.id,
-                replyId: createImageDiffNote.note.discussion.replyId,
-                notes: {
-                  __typename: 'NoteConnection',
-                  edges: [
-                    {
-                      __typename: 'NoteEdge',
-                      node: createImageDiffNote.note,
-                    },
-                  ],
-                },
-              },
-            };
-            const design = extractDesign(data);
-            design.discussions.edges = [...design.discussions.edges, newDiscussion];
-            design.notesCount += 1;
-            store.writeQuery({
-              query: getDesignQuery,
-              variables: this.designVariables,
-              data: {
-                ...data,
-                design: {
-                  ...design,
-                  notesCount: design.notesCount + 1,
-                },
-              },
-            });
-          },
-        })
-        .then(() => {
-          this.closeCommentForm();
-        })
-        .catch(e => {
-          createFlash(ADD_DISCUSSION_COMMENT_ERROR);
-          throw new Error(e);
-        })
-        .finally(() => {
-          this.isNoteSaving = false;
-        });
+    addImageDiffNoteToStore(
+      store,
+      {
+        data: { createImageDiffNote },
+      },
+    ) {
+      updateStoreAfterAddImageDiffNote(
+        store,
+        createImageDiffNote,
+        getDesignQuery,
+        this.designVariables,
+      );
+    },
+    onMutationError(e) {
+      createFlash(ADD_DISCUSSION_COMMENT_ERROR);
+      throw e;
     },
     openCommentForm(position) {
       const { x, y } = position;
@@ -215,6 +178,7 @@ export default {
     this.closeCommentForm();
     next();
   },
+  createImageDiffNoteMutation,
 };
 </script>
 
@@ -269,14 +233,25 @@ export default {
             :discussion-index="index + 1"
             :markdown-preview-path="markdownPreviewPath"
           />
-          <design-reply-form
+          <apollo-mutation
             v-if="annotationCoordinates"
-            v-model="comment"
-            :is-saving="isNoteSaving"
-            :markdown-preview-path="markdownPreviewPath"
-            @submitForm="addImageDiffNote"
-            @cancelForm="closeCommentForm"
-          />
+            v-slot="{ mutate, loading }"
+            :mutation="$options.createImageDiffNoteMutation"
+            :variables="{
+              input: mutationPayload,
+            }"
+            :update="addImageDiffNoteToStore"
+            @done="closeCommentForm"
+            @error="onMutationError"
+          >
+            <design-reply-form
+              v-model="comment"
+              :is-saving="loading"
+              :markdown-preview-path="markdownPreviewPath"
+              @submitForm="mutate()"
+              @cancelForm="closeCommentForm"
+            />
+          </apollo-mutation>
         </template>
         <h2 v-else class="new-discussion-disclaimer m-0">
           {{ __("Click the image where you'd like to start a new discussion") }}
