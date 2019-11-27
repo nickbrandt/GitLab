@@ -9,7 +9,7 @@ const router = new VueRouter();
 describe('Design management list item component', () => {
   let wrapper;
 
-  function createComponent(notesCount = 1, event = 'NONE') {
+  function createComponent(notesCount = 1, event = 'NONE', isLoading = false) {
     wrapper = shallowMount(Item, {
       sync: false,
       localVue,
@@ -17,7 +17,7 @@ describe('Design management list item component', () => {
       propsData: {
         id: 1,
         filename: 'test',
-        image: 'http://via.placeholder.com/300',
+        image: isLoading ? '' : 'http://via.placeholder.com/300',
         event,
         notesCount,
         updatedAt: '01-01-2019',
@@ -68,6 +68,12 @@ describe('Design management list item component', () => {
 
   it('renders item with no status icon for none event', () => {
     createComponent(0, 'NONE');
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('renders loading spinner when no image prop present', () => {
+    createComponent(0, 'NONE', true);
 
     expect(wrapper.element).toMatchSnapshot();
   });

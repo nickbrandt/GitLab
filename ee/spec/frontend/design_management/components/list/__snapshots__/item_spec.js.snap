@@ -415,3 +415,51 @@ exports[`Design management list item component renders item with single comment 
   </div>
 </router-link-stub>
 `;
+
+exports[`Design management list item component renders loading spinner when no image prop present 1`] = `
+<router-link-stub
+  class="card cursor-pointer text-plain js-design-list-item design-list-item"
+  to="[object Object]"
+>
+  <div
+    class="card-body p-0 d-flex-center overflow-hidden position-relative"
+  >
+    <!---->
+     
+    <glloadingicon-stub
+      color="orange"
+      label="Loading"
+      size="md"
+    />
+  </div>
+   
+  <div
+    class="card-footer d-flex w-100"
+  >
+    <div
+      class="d-flex flex-column str-truncated-100"
+    >
+      <span
+        class="bold str-truncated-100"
+        data-qa-selector="design_file_name"
+      >
+        test
+      </span>
+       
+      <span
+        class="str-truncated-100"
+      >
+        
+        Updated 
+        <timeago-stub
+          cssclass=""
+          time="01-01-2019"
+          tooltipplacement="bottom"
+        />
+      </span>
+    </div>
+     
+    <!---->
+  </div>
+</router-link-stub>
+`;
