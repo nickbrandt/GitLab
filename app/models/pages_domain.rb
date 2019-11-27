@@ -6,6 +6,7 @@ class PagesDomain < ApplicationRecord
   SSL_RENEWAL_THRESHOLD = 30.days.freeze
 
   enum certificate_source: { user_provided: 0, gitlab_provided: 1 }, _prefix: :certificate
+  enum domain_type: { instance: 0, group: 1, project: 2 }, _prefix: :domain_type
 
   belongs_to :project
   has_many :acme_orders, class_name: "PagesDomainAcmeOrder"

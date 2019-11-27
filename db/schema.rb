@@ -2929,13 +2929,17 @@ ActiveRecord::Schema.define(version: 2019_12_08_071112) do
     t.datetime_with_timezone "certificate_valid_not_before"
     t.datetime_with_timezone "certificate_valid_not_after"
     t.integer "certificate_source", limit: 2, default: 0, null: false
+    t.boolean "wildcard", default: false, null: false
+    t.integer "domain_type", limit: 2, default: 2, null: false
     t.index ["certificate_source", "certificate_valid_not_after"], name: "index_pages_domains_need_auto_ssl_renewal", where: "(auto_ssl_enabled = true)"
     t.index ["domain"], name: "index_pages_domains_on_domain", unique: true
+    t.index ["domain_type"], name: "index_pages_domains_on_domain_type"
     t.index ["project_id", "enabled_until"], name: "index_pages_domains_on_project_id_and_enabled_until"
     t.index ["project_id"], name: "index_pages_domains_on_project_id"
     t.index ["remove_at"], name: "index_pages_domains_on_remove_at"
     t.index ["verified_at", "enabled_until"], name: "index_pages_domains_on_verified_at_and_enabled_until"
     t.index ["verified_at"], name: "index_pages_domains_on_verified_at"
+    t.index ["wildcard"], name: "index_pages_domains_on_wildcard"
   end
 
   create_table "path_locks", id: :serial, force: :cascade do |t|
