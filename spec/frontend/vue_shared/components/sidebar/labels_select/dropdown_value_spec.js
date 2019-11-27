@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-
+import { hexToRgb } from '~/lib/utils/color_utils';
 import DropdownValueComponent from '~/vue_shared/components/sidebar/labels_select/dropdown_value.vue';
 import DropdownValueScopedLabel from '~/vue_shared/components/sidebar/labels_select/dropdown_value_scoped_label.vue';
 
@@ -107,7 +107,9 @@ describe('DropdownValueComponent', () => {
       const labelEl = vm.find('a span.badge.color-label');
 
       expect(labelEl.exists()).toBe(true);
-      expect(labelEl.attributes('style')).toContain('background-color: rgb(186, 218, 85);');
+      expect(labelEl.attributes('style')).toContain(
+        `background-color: rgb(${hexToRgb(labelStyles.color).join(', ')});`,
+      );
       expect(labelEl.text().trim()).toBe(mockLabels[0].title);
     });
 
