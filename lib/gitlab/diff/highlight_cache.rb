@@ -56,9 +56,8 @@ module Gitlab
 
       def uncached_files
         diff_files = @diff_collection.diff_files
-        cached_diff_files = read_cache
 
-        diff_files.select { |file| cached_diff_files[file.file_path].nil? }
+        diff_files.select { |file| read_cache[file.file_path].nil? }
       end
 
       # Given a hash of:
