@@ -1,0 +1,5 @@
+---
+title: Resolve Version dropdown goes wrong if versions are not monotonic
+merge_request: 20515
+author: Tom Quirk
+type: fixed

@@ -30,6 +30,6 @@ export const extractDiscussions = discussions =>
 export const extractCurrentDiscussion = (discussions, id) =>
   discussions.edges.find(({ node }) => node.id === id);
 
-export const findVersionId = id => id.match('::Version/(.+$)')[1];
+export const findVersionId = id => (id.match('::Version/(.+$)') || [])[1];
 
 export const extractDesign = data => data.project.issue.designCollection.designs.edges[0].node;
