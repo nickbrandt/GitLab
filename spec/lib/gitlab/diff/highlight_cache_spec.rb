@@ -39,11 +39,9 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
   let(:cache_key) { cache.key }
 
-  subject(:cache) { described_class.new(merge_request.diffs, backend: backend) }
+  subject(:cache) { described_class.new(merge_request.diffs) }
 
   describe '#decorate' do
-    let(:backend) { double('backend').as_null_object }
-
     # Manually creates a Diff::File object to avoid triggering the cache on
     # the FileCollection::MergeRequestDiff
     let(:diff_file) do
@@ -73,8 +71,6 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
   end
 
   describe '#write_if_empty' do
-    let(:backend) { Rails.cache }
-
     it 'filters the key/value list of entries to be caches for each invocation' do
       expect(cache).to receive(:write_to_redis_hash)
         .once.with(hash_including(".gitignore")).and_call_original
@@ -98,8 +94,6 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
   end
 
   describe '#write_to_redis_hash' do
-    let(:backend) { Rails.cache }
-
     it 'creates or updates a Redis hash' do
       expect { cache.send(:write_to_redis_hash, diff_hash) }
         .to change { Gitlab::Redis::Cache.with { |r| r.hgetall(cache_key) } }
@@ -107,8 +101,6 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
   end
 
   describe '#clear' do
-    let(:backend) { double('backend').as_null_object }
-
     it 'clears cache' do
       expect_any_instance_of(Redis).to receive(:del).with(cache_key)
 

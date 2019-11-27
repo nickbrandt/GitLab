@@ -9,8 +9,7 @@ module Gitlab
       delegate :diffable,     to: :@diff_collection
       delegate :diff_options, to: :@diff_collection
 
-      def initialize(diff_collection, backend: Rails.cache)
-        @backend          = backend
+      def initialize(diff_collection)
         @diff_collection  = diff_collection
       end
 
