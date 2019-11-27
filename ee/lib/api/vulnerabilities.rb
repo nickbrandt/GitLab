@@ -46,7 +46,7 @@ module API
         success EE::API::Entities::Vulnerability
       end
       post ':id/resolve' do
-        vulnerability = find_and_authorize_vulnerability!(:resolve_vulnerability)
+        vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
         break not_modified! if vulnerability.resolved?
 
         vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
@@ -57,7 +57,7 @@ module API
         success EE::API::Entities::Vulnerability
       end
       post ':id/dismiss' do
-        vulnerability = find_and_authorize_vulnerability!(:dismiss_vulnerability)
+        vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
         break not_modified! if vulnerability.closed?
 
         vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
