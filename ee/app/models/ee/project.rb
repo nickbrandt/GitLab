@@ -663,12 +663,7 @@ module EE
         # hashed storage requirement for existing design management projects.
         # See https://gitlab.com/gitlab-org/gitlab/issues/13428#note_238729038
         (hashed_storage?(:repository) || ::Feature.disabled?(:design_management_require_hashed_storage, self, default_enabled: true)) &&
-        # Check both feature availability on the license, as well as the feature
-        # flag, because we don't want to enable design_management by default on
-        # on prem installs yet.
-        # See https://gitlab.com/gitlab-org/gitlab/issues/13709
-        feature_available?(:design_management) &&
-        ::Feature.enabled?(:design_management_flag, self, default_enabled: true)
+        feature_available?(:design_management)
     end
 
     def design_repository
