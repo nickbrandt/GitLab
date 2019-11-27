@@ -3632,6 +3632,17 @@ ActiveRecord::Schema.define(version: 2019_12_08_071112) do
     t.index ["issue_id"], name: "index_sentry_issues_on_issue_id", unique: true
   end
 
+  create_table "serverless_domain_cluster", primary_key: "uuid", id: :string, limit: 14, force: :cascade do |t|
+    t.bigint "pages_domain_id", null: false
+    t.bigint "clusters_applications_knative_id", null: false
+    t.bigint "creator_id"
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.index ["clusters_applications_knative_id"], name: "idx_serverless_domain_cluster_on_clusters_applications_knative", unique: true
+    t.index ["creator_id"], name: "index_serverless_domain_cluster_on_creator_id"
+    t.index ["pages_domain_id"], name: "index_serverless_domain_cluster_on_pages_domain_id"
+  end
+
   create_table "service_desk_settings", primary_key: "project_id", id: :bigint, default: nil, force: :cascade do |t|
     t.string "issue_template_key", limit: 255
   end
@@ -4688,6 +4699,9 @@ ActiveRecord::Schema.define(version: 2019_12_08_071112) do
   add_foreign_key "self_managed_prometheus_alert_events", "environments", on_delete: :cascade
   add_foreign_key "self_managed_prometheus_alert_events", "projects", on_delete: :cascade
   add_foreign_key "sentry_issues", "issues", on_delete: :cascade
+  add_foreign_key "serverless_domain_cluster", "clusters_applications_knative", on_delete: :cascade
+  add_foreign_key "serverless_domain_cluster", "pages_domains", on_delete: :cascade
+  add_foreign_key "serverless_domain_cluster", "users", column: "creator_id", on_delete: :nullify
   add_foreign_key "service_desk_settings", "projects", on_delete: :cascade
   add_foreign_key "services", "projects", name: "fk_71cce407f9", on_delete: :cascade
   add_foreign_key "slack_integrations", "services", on_delete: :cascade
