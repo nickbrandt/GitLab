@@ -191,7 +191,7 @@ Test:
   artifacts:
     when: always
     paths:
-     - .\**\*test-result.xml
+      - .\**\*test-result.xml
     reports:
       junit:
        - .\**\*test-result.xml
