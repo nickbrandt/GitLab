@@ -91,3 +91,9 @@ describe 'Group elastic search', :js, :elastic do
     end
   end
 end
+
+describe 'Group elastic search redactions', :elastic do
+  it_behaves_like 'a redacted search results page' do
+    let(:search_path) { group_path(public_group) }
+  end
+end
