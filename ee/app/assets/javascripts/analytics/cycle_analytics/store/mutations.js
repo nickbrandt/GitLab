@@ -13,8 +13,8 @@ export default {
   [types.SET_SELECTED_PROJECTS](state, projectIds) {
     state.selectedProjectIds = projectIds;
   },
-  [types.SET_SELECTED_STAGE_ID](state, stageId) {
-    state.selectedStageId = stageId;
+  [types.SET_SELECTED_STAGE](state, rawData) {
+    state.selectedStage = convertObjectPropsToCamelCase(rawData);
   },
   [types.SET_DATE_RANGE](state, { startDate, endDate }) {
     state.startDate = startDate;
@@ -91,28 +91,6 @@ export default {
   [types.SHOW_CUSTOM_STAGE_FORM](state) {
     state.isCreatingCustomStage = true;
   },
-  [types.SET_SELECTED_STAGE_DATA](state, initData) {
-    const data = convertObjectPropsToCamelCase(initData);
-    const {
-      id,
-      title: name, // TODO: do we still need to do this?
-      startEventIdentifier,
-      endEventIdentifier,
-      startEventLabelId,
-      endEventLabelId,
-    } = data;
-
-    // TODO: remove setSelectedStageId action in favour of passing the id into this + a getter
-    state.customStageFormInitData = {
-      ...state.customStageFormInitData,
-      id,
-      name,
-      startEventIdentifier,
-      endEventIdentifier,
-      startEventLabelId,
-      endEventLabelId,
-    };
-  },
   [types.RECEIVE_SUMMARY_DATA_ERROR](state) {
     state.summary = [];
   },
@@ -154,11 +132,6 @@ export default {
     state.customStageFormEvents = events.map(ev =>
       convertObjectPropsToCamelCase(ev, { deep: true }),
     );
-
-    if (state.stages.length) {
-      const { id } = state.stages[0];
-      state.selectedStageId = id;
-    }
   },
   [types.REQUEST_TASKS_BY_TYPE_DATA](state) {
     state.isLoadingChartData = true;

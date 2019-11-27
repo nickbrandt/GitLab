@@ -22,11 +22,11 @@ const stageData = { events: [] };
 const error = new Error('Request failed with status code 404');
 const flashErrorMessage = 'There was an error while fetching cycle analytics data.';
 const selectedGroup = { fullPath: group.path };
-const [{ id: selectedStageSlug }] = stages;
+const [selectedStage] = stages;
 const endpoints = {
   groupLabels: `/groups/${group.path}/-/labels`,
   cycleAnalyticsData: `/groups/${group.path}/-/cycle_analytics`,
-  stageData: `/groups/${group.path}/-/cycle_analytics/events/${selectedStageSlug}.json`,
+  stageData: `/groups/${group.path}/-/cycle_analytics/events/${selectedStage.slug}.json`,
   baseStagesEndpoint: '/-/analytics/cycle_analytics/stages',
 };
 
@@ -62,7 +62,7 @@ describe('Cycle analytics actions', () => {
     ${'setFeatureFlags'}     | ${'SET_FEATURE_FLAGS'}     | ${'featureFlags'}       | ${{ hasDurationChart: true }}
     ${'setSelectedGroup'}    | ${'SET_SELECTED_GROUP'}    | ${'selectedGroup'}      | ${'someNewGroup'}
     ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
-    ${'setSelectedStageId'}  | ${'SET_SELECTED_STAGE_ID'} | ${'selectedStageId'}    | ${'someNewGroup'}
+    ${'setSelectedStage'}    | ${'SET_SELECTED_STAGE'}    | ${'selectedStage'}      | ${{ id: 'someStageId' }}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
     testAction(
       actions[action],
@@ -100,7 +100,7 @@ describe('Cycle analytics actions', () => {
     it('dispatches receiveStageDataSuccess with received data on success', done => {
       testAction(
         actions.fetchStageData,
-        selectedStageSlug,
+        selectedStage,
         state,
         [],
         [
@@ -114,21 +114,30 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    it('dispatches receiveStageDataError on error', done => {
-      testAction(
-        actions.fetchStageData,
-        null,
-        state,
-        [],
-        [
-          { type: 'requestStageData' },
-          {
-            type: 'receiveStageDataError',
-            payload: error,
-          },
-        ],
-        done,
-      );
+    describe('with a failing request', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        mock.onGet(endpoints.stageData).replyOnce(404, { error });
+      });
+
+      it('dispatches receiveStageDataError on error', done => {
+        testAction(
+          actions.fetchStageData,
+          selectedStage,
+          state,
+          [],
+          [
+            {
+              type: 'requestStageData',
+            },
+            {
+              type: 'receiveStageDataError',
+              payload: error,
+            },
+          ],
+          done,
+        );
+      });
     });
 
     describe('receiveStageDataSuccess', () => {
@@ -387,33 +396,13 @@ describe('Cycle analytics actions', () => {
       });
     });
 
-    it("dispatches the 'fetchStageData' action", done => {
-      const stateWithStages = {
-        ...state,
-        stages,
-      };
-
-      testAction(
-        actions.receiveGroupStagesAndEventsSuccess,
-        { ...customizableStagesAndEvents },
-        stateWithStages,
-        [
-          {
-            type: types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS,
-            payload: { ...customizableStagesAndEvents },
-          },
-        ],
-        [{ type: 'fetchStageData', payload: selectedStageSlug }],
-        done,
-      );
-    });
-
     it('will flash an error when there are no stages', () => {
-      [[], null].forEach(emptyStages => {
+      [([], null)].forEach(emptyStages => {
         actions.receiveGroupStagesAndEventsSuccess(
           {
             commit: () => {},
             state: { stages: emptyStages },
+            getters,
           },
           {},
         );
@@ -496,7 +485,7 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    it("dispatches the 'fetchStageData' actions", done => {
+    it("dispatches the 'fetchStageData' action", done => {
       const stateWithStages = {
         ...state,
         stages,
@@ -512,7 +501,10 @@ describe('Cycle analytics actions', () => {
             payload: { ...customizableStagesAndEvents },
           },
         ],
-        [{ type: 'fetchStageData', payload: selectedStageSlug }],
+        [
+          { type: 'setSelectedStage', payload: selectedStage },
+          { type: 'fetchStageData', payload: selectedStage },
+        ],
         done,
       );
     });

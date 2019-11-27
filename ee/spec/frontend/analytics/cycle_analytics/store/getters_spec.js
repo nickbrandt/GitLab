@@ -15,18 +15,12 @@ describe('Cycle analytics getters', () => {
     beforeEach(() => {
       state = {
         stages: [],
-        selectedStageId: null,
+        selectedStage: null,
       };
     });
 
     afterEach(() => {
       state = null;
-    });
-
-    describe('currentStage', () => {
-      it('will return null', () => {
-        expect(getters.currentStage(state)).toEqual(null);
-      });
     });
 
     describe('defaultStage', () => {
@@ -40,42 +34,17 @@ describe('Cycle analytics getters', () => {
     beforeEach(() => {
       state = {
         stages,
-        selectedStageId: null,
+        selectedStage: null,
       };
     });
 
     afterEach(() => {
       state = null;
-    });
-
-    describe('currentStage', () => {
-      it('will return null', () => {
-        expect(getters.currentStage(state)).toEqual(null);
-      });
     });
 
     describe('defaultStage', () => {
       it('will return the first stage', () => {
         expect(getters.defaultStage(state)).toEqual(stages[0]);
-      });
-    });
-  });
-
-  describe('with a set of stages and a stage selected', () => {
-    beforeEach(() => {
-      state = {
-        stages,
-        selectedStageId: stages[2].id,
-      };
-    });
-
-    afterEach(() => {
-      state = null;
-    });
-
-    describe('currentStage', () => {
-      it('will return null', () => {
-        expect(getters.currentStage(state)).toEqual(stages[2]);
       });
     });
   });

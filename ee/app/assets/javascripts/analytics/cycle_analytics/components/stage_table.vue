@@ -77,11 +77,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    customStageFormInitData: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
   },
   computed: {
     stageName() {
@@ -121,6 +116,9 @@ export default {
           displayHeader: !this.customStageFormActive,
         },
       ];
+    },
+    customStageInitialData() {
+      return this.isEditingCustomStage ? this.currentStage : {};
     },
   },
   methods: {
@@ -182,7 +180,7 @@ export default {
             :events="customStageFormEvents"
             :labels="labels"
             :is-saving-custom-stage="isSavingCustomStage"
-            :initial-fields="customStageFormInitData"
+            :initial-fields="customStageInitialData"
             :is-editing-custom-stage="isEditingCustomStage"
             @submit="$emit('submit', $event)"
             @createStage="$emit($options.STAGE_ACTIONS.CREATE, $event)"

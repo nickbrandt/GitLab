@@ -20,7 +20,7 @@ export default () => ({
 
   selectedGroup: null,
   selectedProjectIds: [],
-  selectedStageId: null,
+  selectedStage: null,
 
   currentStageEvents: [],
 

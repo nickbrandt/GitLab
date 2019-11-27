@@ -70,7 +70,7 @@ describe('Cycle analytics mutations', () => {
     ${types.SET_SELECTED_GROUP}                    | ${{ fullPath: 'cool-beans' }} | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjectIds: [] }}
     ${types.SET_SELECTED_PROJECTS}                 | ${[606, 707, 808, 909]}       | ${{ selectedProjectIds: [606, 707, 808, 909] }}
     ${types.SET_DATE_RANGE}                        | ${{ startDate, endDate }}     | ${{ startDate, endDate }}
-    ${types.SET_SELECTED_STAGE_ID}                 | ${'first-stage'}              | ${{ selectedStageId: 'first-stage' }}
+    ${types.SET_SELECTED_STAGE}                    | ${{ id: 'first-stage' }}      | ${{ selectedStage: { id: 'first-stage' } }}
     ${types.UPDATE_SELECTED_DURATION_CHART_STAGES} | ${transformedDurationData}    | ${{ durationData: transformedDurationData }}
   `(
     '$mutation with payload $payload will update state with $expectedState',
@@ -160,10 +160,6 @@ describe('Cycle analytics mutations', () => {
             expect(state.stages).toContainEqual(stage);
           },
         );
-      });
-
-      it('will set the selectedStageId to the id of the first stage', () => {
-        expect(state.selectedStageId).toEqual('issue');
       });
     });
   });

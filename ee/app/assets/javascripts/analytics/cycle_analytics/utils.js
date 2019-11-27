@@ -34,10 +34,11 @@ export const getLabelEventsIdentifiers = (events = []) =>
 
 export const transformRawStages = (stages = []) =>
   stages
-    .map(({ title, ...rest }) => ({
+    .map(({ title, name = null, ...rest }) => ({
       ...convertObjectPropsToCamelCase(rest, { deep: true }),
       slug: convertToSnakeCase(title),
       title,
+      name: name || title,
     }))
     .sort((a, b) => a.id > b.id);
 
