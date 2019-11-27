@@ -6,7 +6,7 @@ describe Ci::BuildPolicy do
 
   let(:project) { create(:project, :repository) }
   let(:user) { create(:user) }
-  let(:pipeline) { create(:ci_empty_pipeline, project: project) }
+  let(:pipeline) { create(:ci_empty_pipeline, project: project, sha: 'b83d6e391c22777fca1ed3012fce84f633d7fed0') }
 
   describe '#update_build?' do
     let(:environment) { create(:environment, project: project, name: 'production') }
