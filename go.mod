@@ -20,8 +20,8 @@ require (
 	github.com/rafaeljusto/redigomock v0.0.0-20190202135759-257e089e14a1
 	github.com/sebest/xff v0.0.0-20160910043805-6c115e0ffa35
 	github.com/sirupsen/logrus v1.3.0
-	github.com/stretchr/testify v1.3.0
-	gitlab.com/gitlab-org/gitaly v1.71.0
+	github.com/stretchr/testify v1.4.0
+	gitlab.com/gitlab-org/gitaly v1.74.0
 	gitlab.com/gitlab-org/labkit v0.0.0-20190731061835-905271af7abb
 	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3
 	golang.org/x/net v0.0.0-20190613194153-d28f0bde5980
