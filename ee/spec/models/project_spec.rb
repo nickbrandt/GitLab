@@ -2352,4 +2352,35 @@ describe Project do
       end
     end
   end
+
+  describe 'caculate template repositories' do
+    let(:group1) { create(:group) }
+    let(:group2) { create(:group) }
+    let(:group2_sub1) { create(:group, parent: group2) }
+    let(:group2_sub2) { create(:group, parent: group2) }
+
+    before do
+      stub_ee_application_setting(custom_project_templates_group_id: group2.id)
+      group2.update(custom_project_templates_group_id: group2_sub2.id)
+      create(:project, group: group1)
+
+      2.times do
+        create(:project, group: group2)
+      end
+      3.times do
+        create(:project, group: group2_sub1)
+      end
+      4.times do
+        create(:project, group: group2_sub2)
+      end
+    end
+
+    it 'counts instance level templates' do
+      expect(described_class.with_repos_templates.count).to eq(2)
+    end
+
+    it 'counts group level templates' do
+      expect(described_class.with_groups_level_repos_templates.count).to eq(4)
+    end
+  end
 end

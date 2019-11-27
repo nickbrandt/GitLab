@@ -82,12 +82,13 @@ Complete the following installation steps in order. A link at the end of each
 section will bring you back to the Scalable Architecture Examples section so
 you can continue with the next step.
 
+1. [Load Balancer(s)](load_balancer.md)[^2]
+1. [Consul](consul.md)
 1. [PostgreSQL](database.md#postgresql-in-a-scaled-environment) with [PGBouncer](https://docs.gitlab.com/ee/administration/high_availability/pgbouncer.html)
 1. [Redis](redis.md#redis-in-a-scaled-environment)
 1. [Gitaly](gitaly.md) (recommended) and / or [NFS](nfs.md)[^4]
 1. [GitLab application nodes](gitlab.md)
     - With [Object Storage service enabled](../gitaly/index.md#eliminating-nfs-altogether)[^3]
-1. [Load Balancer(s)](load_balancer.md)[^2]
 1. [Monitoring node (Prometheus and Grafana)](monitoring_node.md)
 
 ### Full Scaling
@@ -201,13 +202,14 @@ with the added complexity of many more nodes to configure, manage, and monitor.
 ## Reference Architecture Examples
 
 The Support and Quality teams build, performance test, and validate Reference
-Architectures that support set large numbers of users. The specifications below are a
-representation of this work so far and may be adjusted in the future based on
+Architectures that support large numbers of users. The specifications below are
+a representation of this work so far and may be adjusted in the future based on
 additional testing and iteration.
 
-The architectures have been tested with specific coded workloads. The throughputs
-used for testing are calculated based on sample customer data. We test each endpoint
-type with the following number of requests per second (RPS) per 1000 users:
+The architectures have been tested with specific coded workloads, and the
+throughputs used for testing were calculated based on sample customer data. We
+test each endpoint type with the following number of requests per second (RPS)
+per 1000 users:
 
 - API: 20 RPS
 - Web: 2 RPS
@@ -221,9 +223,9 @@ users are, how much automation you use, mirroring, and repo/change size.
 
 - **Supported Users (approximate):** 10,000
 - **Test RPS Rates:** API: 200 RPS, Web: 20 RPS, Git: 20 RPS
-- **Known Issues:** While validating the reference architecture, slow API endpoints
-  were discovered. For details, see the related issues list in
-  [this issue](https://gitlab.com/gitlab-org/gitlab-foss/issues/64335).
+- **Known Issues:** While validating the reference architectures, slow API
+endpoints were discovered. For details, see the related issues list in
+[this issue](https://gitlab.com/gitlab-org/quality/performance/issues/125).
 
 | Service                     | Nodes | Configuration         | GCP type      |
 | ----------------------------|-------|-----------------------|---------------|
@@ -248,10 +250,9 @@ vendors a best effort like for like can be used.
 
 - **Supported Users (approximate):** 25,000
 - **Test RPS Rates:** API: 500 RPS, Web: 50 RPS, Git: 50 RPS
-- **Known Issues:** The slow API endpoints that were discovered during testing
-  the 10,000 user architecture also affect the 25,000 user architecture. For
-  details, see the related issues list in
-  [this issue](https://gitlab.com/gitlab-org/gitlab-foss/issues/64335).
+- **Known Issues:** While validating the reference architectures, slow API
+endpoints were discovered. For details, see the related issues list in
+[this issue](https://gitlab.com/gitlab-org/quality/performance/issues/125).
 
 | Service                     | Nodes | Configuration         | GCP type      |
 | ----------------------------|-------|-----------------------|---------------|
@@ -276,12 +277,9 @@ vendors a best effort like for like can be used.
 
 - **Supported Users (approximate):** 50,000
 - **Test RPS Rates:** API: 1000 RPS, Web: 100 RPS, Git: 100 RPS
-- **Status:** Work-in-progress
-- **Related Issue:** See the [related issue](https://gitlab.com/gitlab-org/quality/performance/issues/66) for more information.
-
-NOTE: **Note:**  This architecture is a work-in-progress of the work so far. The
-Quality team will be certifying this environment in late 2019. The specifications
-may be adjusted prior to certification based on performance testing.
+- **Known Issues:** While validating the reference architectures, slow API
+endpoints were discovered. For details, see the related issues list in
+[this issue](https://gitlab.com/gitlab-org/quality/performance/issues/125).
 
 | Service                     | Nodes | Configuration         | GCP type      |
 | ----------------------------|-------|-----------------------|---------------|

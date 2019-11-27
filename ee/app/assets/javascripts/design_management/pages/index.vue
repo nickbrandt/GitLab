@@ -12,6 +12,8 @@ import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.gra
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
+import { UPLOAD_DESIGN_ERROR } from '../utils/error_messages';
+import { updateStoreAfterUploadDesign } from '../utils/cache_update';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 
@@ -145,56 +147,7 @@ export default {
             hasUpload: true,
           },
           update: (store, { data: { designManagementUpload } }) => {
-            const data = store.readQuery(this.projectQueryBody);
-
-            const newDesigns = data.project.issue.designCollection.designs.edges.reduce(
-              (acc, design) => {
-                if (!acc.find(d => d.filename === design.node.filename)) {
-                  acc.push(design.node);
-                }
-
-                return acc;
-              },
-              designManagementUpload.designs,
-            );
-
-            let newVersionNode;
-            const findNewVersions = designManagementUpload.designs.find(design => design.versions);
-
-            if (findNewVersions) {
-              const findNewVersionsEdges = findNewVersions.versions.edges;
-
-              if (findNewVersionsEdges && findNewVersionsEdges.length) {
-                newVersionNode = [findNewVersionsEdges[0]];
-              }
-            }
-
-            const newVersions = [
-              ...(newVersionNode || []),
-              ...data.project.issue.designCollection.versions.edges,
-            ];
-
-            const updatedDesigns = {
-              __typename: 'DesignCollection',
-              designs: {
-                __typename: 'DesignConnection',
-                edges: newDesigns.map(design => ({
-                  __typename: 'DesignEdge',
-                  node: design,
-                })),
-              },
-              versions: {
-                __typename: 'DesignVersionConnection',
-                edges: newVersions,
-              },
-            };
-
-            data.project.issue.designCollection = updatedDesigns;
-
-            store.writeQuery({
-              ...this.projectQueryBody,
-              data,
-            });
+            updateStoreAfterUploadDesign(store, designManagementUpload, this.projectQueryBody);
           },
           optimisticResponse: {
             // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
@@ -210,7 +163,7 @@ export default {
           this.$router.push({ name: 'designs' });
         })
         .catch(e => {
-          createFlash(s__('DesignManagement|Error uploading a new design. Please try again'));
+          createFlash(UPLOAD_DESIGN_ERROR);
           throw e;
         })
         .finally(() => {

@@ -84,29 +84,11 @@ describe Admin::ClustersController do
           GoogleApi::CloudPlatform::Client.session_key_for_redirect_uri(key)
         end
 
-        before do
-          stub_feature_flags(create_eks_clusters: false)
-          allow(SecureRandom).to receive(:hex).and_return(key)
-        end
+        context 'when selected provider is gke and no valid gcp token exists' do
+          it 'redirects to gcp authorize_url' do
+            get_new
 
-        it 'has authorize_url' do
-          get_new
-
-          expect(assigns(:authorize_url)).to include(key)
-          expect(session[session_key_for_redirect_uri]).to eq(new_admin_cluster_path)
-        end
-
-        context 'when create_eks_clusters feature flag is enabled' do
-          before do
-            stub_feature_flags(create_eks_clusters: true)
-          end
-
-          context 'when selected provider is gke and no valid gcp token exists' do
-            it 'redirects to gcp authorize_url' do
-              get_new
-
-              expect(response).to redirect_to(assigns(:authorize_url))
-            end
+            expect(response).to redirect_to(assigns(:authorize_url))
           end
         end
       end
@@ -439,6 +421,33 @@ describe Admin::ClustersController do
 
       expect(response.status).to eq 204
       expect(admin.reload_aws_role).to be_nil
+    end
+
+    describe 'security' do
+      it { expect { go }.to be_allowed_for(:admin) }
+      it { expect { go }.to be_denied_for(:user) }
+      it { expect { go }.to be_denied_for(:external) }
+    end
+  end
+
+  describe 'DELETE clear cluster cache' do
+    let(:cluster) { create(:cluster, :instance) }
+    let!(:kubernetes_namespace) do
+      create(:cluster_kubernetes_namespace,
+        cluster: cluster,
+        project: create(:project)
+      )
+    end
+
+    def go
+      delete :clear_cache, params: { id: cluster }
+    end
+
+    it 'deletes the namespaces associated with the cluster' do
+      expect { go }.to change { Clusters::KubernetesNamespace.count }
+
+      expect(response).to redirect_to(admin_cluster_path(cluster))
+      expect(cluster.kubernetes_namespaces).to be_empty
     end
 
     describe 'security' do

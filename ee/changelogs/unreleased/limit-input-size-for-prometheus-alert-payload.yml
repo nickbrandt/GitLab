@@ -1,5 +1,0 @@
----
-title: Limit input size for Prometheus alert JSON payload
-merge_request: 19940
-author:
-type: changed

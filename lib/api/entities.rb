@@ -283,7 +283,9 @@ module API
       expose :shared_runners_enabled
       expose :lfs_enabled?, as: :lfs_enabled
       expose :creator_id
-      expose :forked_from_project, using: Entities::BasicProjectDetails, if: lambda { |project, options| project.forked? }
+      expose :forked_from_project, using: Entities::BasicProjectDetails, if: ->(project, options) do
+        project.forked? && Ability.allowed?(options[:current_user], :read_project, project.forked_from_project)
+      end
       expose :import_status
 
       expose :import_error, if: lambda { |_project, options| options[:user_can_admin_project] } do |project|
@@ -660,6 +662,8 @@ module API
       expose :subscribed, if: -> (_, options) { options.fetch(:include_subscribed, true) } do |issue, options|
         issue.subscribed?(options[:current_user], options[:project] || issue.project)
       end
+
+      expose :moved_to_id
     end
 
     class IssuableTimeStats < Grape::Entity
@@ -1736,6 +1740,7 @@ module API
     end
 
     class BasicBadgeDetails < Grape::Entity
+      expose :name
       expose :link_url
       expose :image_url
       expose :rendered_link_url do |badge, options|
@@ -1838,6 +1843,7 @@ end
 ::API::Entities::Issue.prepend_if_ee('EE::API::Entities::Issue')
 ::API::Entities::List.prepend_if_ee('EE::API::Entities::List')
 ::API::Entities::MergeRequestBasic.prepend_if_ee('EE::API::Entities::MergeRequestBasic', with_descendants: true)
+::API::Entities::Member.prepend_if_ee('EE::API::Entities::Member', with_descendants: true)
 ::API::Entities::Namespace.prepend_if_ee('EE::API::Entities::Namespace')
 ::API::Entities::Project.prepend_if_ee('EE::API::Entities::Project', with_descendants: true)
 ::API::Entities::ProtectedRefAccess.prepend_if_ee('EE::API::Entities::ProtectedRefAccess')

@@ -25,6 +25,7 @@ describe('Card security reports app', () => {
       localVue,
       store: createStore(),
       sync: false,
+      attachToDocument: true,
       stubs: ['security-dashboard-table'],
       propsData: {
         hasPipelineData: true,
@@ -70,16 +71,6 @@ describe('Card security reports app', () => {
   afterEach(() => {
     wrapper.destroy();
     mock.restore();
-  });
-
-  describe('computed properties', () => {
-    describe('headline', () => {
-      it('renders `Pipeline <link> triggered`', () => {
-        expect(wrapper.vm.headline).toBe(
-          `Pipeline <a href="${TEST_HOST}/pipeline">#55</a> triggered`,
-        );
-      });
-    });
   });
 
   describe('Headline renders', () => {

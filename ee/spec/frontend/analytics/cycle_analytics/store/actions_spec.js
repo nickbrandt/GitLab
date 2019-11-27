@@ -1,7 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
-import { TEST_HOST } from 'helpers/test_constants';
 import createFlash from '~/flash';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
@@ -18,25 +17,27 @@ import {
 
 const stageData = { events: [] };
 const error = new Error('Request failed with status code 404');
-const groupPath = 'cool-group';
-const groupLabelsEndpoint = `/groups/${groupPath}/-/labels`;
 const flashErrorMessage = 'There was an error while fetching cycle analytics data.';
-const selectedGroup = { fullPath: groupPath };
+const selectedGroup = { fullPath: group.path };
+const [{ id: selectedStageSlug }] = stages;
+const endpoints = {
+  groupLabels: `/groups/${group.path}/-/labels`,
+  cycleAnalyticsData: `/groups/${group.path}/-/cycle_analytics`,
+  stageData: `/groups/${group.path}/-/cycle_analytics/events/${selectedStageSlug}.json`,
+};
+
+const stageEndpoint = ({ stageId }) => `/-/analytics/cycle_analytics/stages/${stageId}`;
 
 describe('Cycle analytics actions', () => {
   let state;
   let mock;
 
-  function shouldFlashAnError(msg = flashErrorMessage) {
+  function shouldFlashAMessage(msg = flashErrorMessage) {
     expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(msg);
   }
 
   beforeEach(() => {
     state = {
-      endpoints: {
-        cycleAnalyticsData: `${TEST_HOST}/groups/${group.path}/-/cycle_analytics`,
-        stageData: `${TEST_HOST}/groups/${group.path}/-/cycle_analytics/events/${cycleAnalyticsData.stats[0].name}.json`,
-      },
       stages: [],
       getters,
     };
@@ -49,12 +50,10 @@ describe('Cycle analytics actions', () => {
   });
 
   it.each`
-    action                             | type                                   | stateKey                          | payload
-    ${'setCycleAnalyticsDataEndpoint'} | ${'SET_CYCLE_ANALYTICS_DATA_ENDPOINT'} | ${'endpoints.cycleAnalyticsData'} | ${'coolGroupName'}
-    ${'setStageDataEndpoint'}          | ${'SET_STAGE_DATA_ENDPOINT'}           | ${'endpoints.stageData'}          | ${'new_stage_name'}
-    ${'setSelectedGroup'}              | ${'SET_SELECTED_GROUP'}                | ${'selectedGroup'}                | ${'someNewGroup'}
-    ${'setSelectedProjects'}           | ${'SET_SELECTED_PROJECTS'}             | ${'selectedProjectIds'}           | ${[10, 20, 30, 40]}
-    ${'setSelectedStageId'}            | ${'SET_SELECTED_STAGE_ID'}             | ${'selectedStageId'}              | ${'someNewGroup'}
+    action                   | type                       | stateKey                | payload
+    ${'setSelectedGroup'}    | ${'SET_SELECTED_GROUP'}    | ${'selectedGroup'}      | ${'someNewGroup'}
+    ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
+    ${'setSelectedStageId'}  | ${'SET_SELECTED_STAGE_ID'} | ${'selectedStageId'}    | ${'someNewGroup'}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
     testAction(
       actions[action],
@@ -87,13 +86,14 @@ describe('Cycle analytics actions', () => {
 
   describe('fetchStageData', () => {
     beforeEach(() => {
-      mock.onGet(state.endpoints.stageData).replyOnce(200, { events: [] });
+      state = { ...state, selectedGroup };
+      mock.onGet(endpoints.stageData).replyOnce(200, { events: [] });
     });
 
     it('dispatches receiveStageDataSuccess with received data on success', done => {
       testAction(
         actions.fetchStageData,
-        null,
+        selectedStageSlug,
         state,
         [],
         [
@@ -108,17 +108,10 @@ describe('Cycle analytics actions', () => {
     });
 
     it('dispatches receiveStageDataError on error', done => {
-      const brokenState = {
-        ...state,
-        endpoints: {
-          stageData: 'this will break',
-        },
-      };
-
       testAction(
         actions.fetchStageData,
         null,
-        brokenState,
+        state,
         [],
         [
           { type: 'requestStageData' },
@@ -169,14 +162,14 @@ describe('Cycle analytics actions', () => {
         commit: () => {},
       });
 
-      shouldFlashAnError('There was an error fetching data for the selected stage');
+      shouldFlashAMessage('There was an error fetching data for the selected stage');
     });
   });
 
   describe('fetchGroupLabels', () => {
     beforeEach(() => {
       state = { ...state, selectedGroup };
-      mock.onGet(groupLabelsEndpoint).replyOnce(200, groupLabels);
+      mock.onGet(endpoints.groupLabels).replyOnce(200, groupLabels);
     });
 
     it('dispatches receiveGroupLabels if the request succeeds', done => {
@@ -222,7 +215,7 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         });
 
-        shouldFlashAnError('There was an error fetching label data for the selected group');
+        shouldFlashAMessage('There was an error fetching label data for the selected group');
       });
     });
   });
@@ -251,7 +244,7 @@ describe('Cycle analytics actions', () => {
 
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
-      mock.onGet(state.endpoints.cycleAnalyticsData).replyOnce(200, cycleAnalyticsData);
+      mock.onGet(endpoints.cycleAnalyticsData).replyOnce(200, cycleAnalyticsData);
       state = { ...state, selectedGroup, startDate, endDate };
     });
 
@@ -295,7 +288,7 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         })
         .then(() => {
-          shouldFlashAnError('There was an error while fetching cycle analytics summary data.');
+          shouldFlashAMessage('There was an error while fetching cycle analytics summary data.');
           done();
         })
         .catch(done.fail);
@@ -321,7 +314,7 @@ describe('Cycle analytics actions', () => {
           commit: () => {},
         })
         .then(() => {
-          shouldFlashAnError('There was an error fetching cycle analytics stages.');
+          shouldFlashAMessage('There was an error fetching cycle analytics stages.');
           done();
         })
         .catch(done.fail);
@@ -354,8 +347,7 @@ describe('Cycle analytics actions', () => {
       });
     });
 
-    it("dispatches the 'setStageDataEndpoint' and 'fetchStageData' actions", done => {
-      const { id } = stages[0];
+    it("dispatches the 'fetchStageData' action", done => {
       const stateWithStages = {
         ...state,
         stages,
@@ -371,7 +363,7 @@ describe('Cycle analytics actions', () => {
             payload: { ...customizableStagesAndEvents },
           },
         ],
-        [{ type: 'setStageDataEndpoint', payload: id }, { type: 'fetchStageData' }],
+        [{ type: 'fetchStageData', payload: selectedStageSlug }],
         done,
       );
     });
@@ -386,7 +378,7 @@ describe('Cycle analytics actions', () => {
           {},
         );
 
-        shouldFlashAnError();
+        shouldFlashAMessage();
       });
     });
   });
@@ -439,7 +431,7 @@ describe('Cycle analytics actions', () => {
         { response },
       );
 
-      shouldFlashAnError();
+      shouldFlashAMessage();
     });
   });
 
@@ -463,8 +455,7 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    it("dispatches the 'setStageDataEndpoint' and 'fetchStageData' actions", done => {
-      const { id } = stages[0];
+    it("dispatches the 'fetchStageData' actions", done => {
       const stateWithStages = {
         ...state,
         stages,
@@ -480,7 +471,7 @@ describe('Cycle analytics actions', () => {
             payload: { ...customizableStagesAndEvents },
           },
         ],
-        [{ type: 'setStageDataEndpoint', payload: id }, { type: 'fetchStageData' }],
+        [{ type: 'fetchStageData', payload: selectedStageSlug }],
         done,
       );
     });
@@ -494,9 +485,178 @@ describe('Cycle analytics actions', () => {
           },
           {},
         );
-
-        shouldFlashAnError();
       });
+
+      shouldFlashAMessage();
+    });
+  });
+
+  describe('updateStage', () => {
+    const stageId = 'cool-stage';
+    const payload = { hidden: true };
+
+    beforeEach(() => {
+      mock.onPut(stageEndpoint({ stageId }), payload).replyOnce(200, payload);
+      state = { selectedGroup };
+    });
+
+    it('dispatches receiveUpdateStageSuccess with put request response data', done => {
+      testAction(
+        actions.updateStage,
+        {
+          id: stageId,
+          ...payload,
+        },
+        state,
+        [],
+        [
+          { type: 'requestUpdateStage' },
+          {
+            type: 'receiveUpdateStageSuccess',
+            payload,
+          },
+        ],
+        done,
+      );
+    });
+
+    describe('with a failed request', () => {
+      beforeEach(() => {
+        setFixtures('<div class="flash-container"></div>');
+        mock = new MockAdapter(axios);
+        mock.onPut(stageEndpoint({ stageId })).replyOnce(404);
+      });
+
+      it('dispatches receiveUpdateStageError', done => {
+        testAction(
+          actions.updateStage,
+          {
+            id: stageId,
+            ...payload,
+          },
+          state,
+          [],
+          [
+            { type: 'requestUpdateStage' },
+            {
+              type: 'receiveUpdateStageError',
+              payload: error,
+            },
+          ],
+          done,
+        );
+      });
+
+      it('flashes an error message', done => {
+        actions.receiveUpdateStageError(
+          {
+            commit: () => {},
+            state,
+          },
+          {},
+        );
+
+        shouldFlashAMessage('There was a problem saving your custom stage, please try again');
+        done();
+      });
+    });
+  });
+
+  describe('removeStage', () => {
+    const stageId = 'cool-stage';
+
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+      mock.onDelete(stageEndpoint({ stageId })).replyOnce(200);
+      state = { selectedGroup };
+    });
+
+    it('dispatches receiveRemoveStageSuccess with put request response data', done => {
+      testAction(
+        actions.removeStage,
+        stageId,
+        state,
+        [],
+        [
+          { type: 'requestRemoveStage' },
+          {
+            type: 'receiveRemoveStageSuccess',
+          },
+        ],
+        done,
+      );
+    });
+
+    describe('with a failed request', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        mock.onDelete(stageEndpoint({ stageId })).replyOnce(404);
+      });
+
+      it('dispatches receiveRemoveStageError', done => {
+        testAction(
+          actions.removeStage,
+          stageId,
+          state,
+          [],
+          [
+            { type: 'requestRemoveStage' },
+            {
+              type: 'receiveRemoveStageError',
+              payload: error,
+            },
+          ],
+          done,
+        );
+      });
+
+      it('flashes an error message', done => {
+        actions.receiveRemoveStageError(
+          {
+            commit: () => {},
+            state,
+          },
+          {},
+        );
+
+        shouldFlashAMessage('There was an error removing your custom stage, please try again');
+        done();
+      });
+    });
+  });
+
+  describe('receiveRemoveStageSuccess', () => {
+    const stageId = 'cool-stage';
+
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+      mock.onDelete(stageEndpoint({ stageId })).replyOnce(200);
+      state = { selectedGroup };
+    });
+
+    it('dispatches fetchCycleAnalyticsData', done => {
+      testAction(
+        actions.receiveRemoveStageSuccess,
+        stageId,
+        state,
+        [{ type: 'RECEIVE_REMOVE_STAGE_RESPONSE' }],
+        [{ type: 'fetchCycleAnalyticsData' }],
+        done,
+      );
+    });
+
+    it('flashes a success message', done => {
+      actions.receiveRemoveStageSuccess(
+        {
+          dispatch: () => {},
+          commit: () => {},
+          state,
+        },
+        {},
+      );
+
+      shouldFlashAMessage('Stage removed');
+      done();
     });
   });
 });

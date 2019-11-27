@@ -62,20 +62,6 @@ class Project < ApplicationRecord
 
   cache_markdown_field :description, pipeline: :description
 
-  delegate :feature_available?, :builds_enabled?, :wiki_enabled?, :merge_requests_enabled?,
-    :issues_enabled?, :pages_enabled?, :public_pages?, :private_pages?,
-    :merge_requests_access_level, :issues_access_level, :wiki_access_level,
-    :snippets_access_level, :builds_access_level, :repository_access_level,
-    to: :project_feature, allow_nil: true
-
-  delegate :base_dir, :disk_path, to: :storage
-
-  delegate :scheduled?, :started?, :in_progress?,
-    :failed?, :finished?,
-    prefix: :import, to: :import_state, allow_nil: true
-
-  delegate :no_import?, to: :import_state, allow_nil: true
-
   # TODO: remove once GitLab 12.5 is released
   # https://gitlab.com/gitlab-org/gitlab/issues/34638
   self.ignored_columns += %i[merge_requests_require_code_owner_approval]
@@ -323,6 +309,15 @@ class Project < ApplicationRecord
   accepts_nested_attributes_for :metrics_setting, update_only: true, allow_destroy: true
   accepts_nested_attributes_for :grafana_integration, update_only: true, allow_destroy: true
 
+  delegate :feature_available?, :builds_enabled?, :wiki_enabled?, :merge_requests_enabled?,
+    :issues_enabled?, :pages_enabled?, :public_pages?, :private_pages?,
+    :merge_requests_access_level, :issues_access_level, :wiki_access_level,
+    :snippets_access_level, :builds_access_level, :repository_access_level,
+    to: :project_feature, allow_nil: true
+  delegate :scheduled?, :started?, :in_progress?, :failed?, :finished?,
+    prefix: :import, to: :import_state, allow_nil: true
+  delegate :base_dir, :disk_path, to: :storage
+  delegate :no_import?, to: :import_state, allow_nil: true
   delegate :name, to: :owner, allow_nil: true, prefix: true
   delegate :members, to: :team, prefix: true
   delegate :add_user, :add_users, to: :team
@@ -517,7 +512,11 @@ class Project < ApplicationRecord
 
   # This scope returns projects where user has access to both the project and the feature.
   def self.filter_by_feature_visibility(feature, user)
-    with_feature_available_for_user(feature, user).public_or_visible_to_user(user)
+    with_feature_available_for_user(feature, user)
+      .public_or_visible_to_user(
+        user,
+        ProjectFeature.required_minimum_access_level_for_private_project(feature)
+      )
   end
 
   scope :active, -> { joins(:issues, :notes, :merge_requests).order('issues.created_at, notes.created_at, merge_requests.created_at DESC') }
@@ -1773,7 +1772,6 @@ class Project < ApplicationRecord
     InternalId.flush_records!(project: self)
 
     import_state.finish
-    import_state.remove_jid
     update_project_counter_caches
     after_create_default_branch
     join_pool_repository
@@ -1868,9 +1866,18 @@ class Project < ApplicationRecord
   end
 
   def predefined_variables
-    visibility = Gitlab::VisibilityLevel.string_level(visibility_level)
-
     Gitlab::Ci::Variables::Collection.new
+      .concat(predefined_ci_server_variables)
+      .concat(predefined_project_variables)
+      .concat(pages_variables)
+      .concat(container_registry_variables)
+      .concat(auto_devops_variables)
+      .concat(api_variables)
+  end
+
+  def predefined_project_variables
+    Gitlab::Ci::Variables::Collection.new
+      .append(key: 'GITLAB_FEATURES', value: licensed_features.join(','))
       .append(key: 'CI_PROJECT_ID', value: id.to_s)
       .append(key: 'CI_PROJECT_NAME', value: path)
       .append(key: 'CI_PROJECT_TITLE', value: title)
@@ -1878,16 +1885,28 @@ class Project < ApplicationRecord
       .append(key: 'CI_PROJECT_PATH_SLUG', value: full_path_slug)
       .append(key: 'CI_PROJECT_NAMESPACE', value: namespace.full_path)
       .append(key: 'CI_PROJECT_URL', value: web_url)
-      .append(key: 'CI_PROJECT_VISIBILITY', value: visibility)
+      .append(key: 'CI_PROJECT_VISIBILITY', value: Gitlab::VisibilityLevel.string_level(visibility_level))
       .append(key: 'CI_PROJECT_REPOSITORY_LANGUAGES', value: repository_languages.map(&:name).join(',').downcase)
-      .concat(pages_variables)
-      .concat(container_registry_variables)
-      .concat(auto_devops_variables)
-      .concat(api_variables)
+      .append(key: 'CI_DEFAULT_BRANCH', value: default_branch)
+  end
+
+  def predefined_ci_server_variables
+    Gitlab::Ci::Variables::Collection.new
+      .append(key: 'CI', value: 'true')
+      .append(key: 'GITLAB_CI', value: 'true')
+      .append(key: 'CI_SERVER_HOST', value: Gitlab.config.gitlab.host)
+      .append(key: 'CI_SERVER_NAME', value: 'GitLab')
+      .append(key: 'CI_SERVER_VERSION', value: Gitlab::VERSION)
+      .append(key: 'CI_SERVER_VERSION_MAJOR', value: Gitlab.version_info.major.to_s)
+      .append(key: 'CI_SERVER_VERSION_MINOR', value: Gitlab.version_info.minor.to_s)
+      .append(key: 'CI_SERVER_VERSION_PATCH', value: Gitlab.version_info.patch.to_s)
+      .append(key: 'CI_SERVER_REVISION', value: Gitlab.revision)
   end
 
   def pages_variables
     Gitlab::Ci::Variables::Collection.new.tap do |variables|
+      break unless pages_enabled?
+
       variables.append(key: 'CI_PAGES_DOMAIN', value: Gitlab.config.pages.host)
       variables.append(key: 'CI_PAGES_URL', value: pages_url)
     end

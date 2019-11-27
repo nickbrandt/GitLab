@@ -1,13 +1,6 @@
 import { TASKS_BY_TYPE_SUBJECT_ISSUE } from '../constants';
 
 export default () => ({
-  endpoints: {
-    cycleAnalyticsData: null,
-    stageData: null,
-    cycleAnalyticsStagesAndEvents: null,
-    summaryData: null,
-  },
-
   startDate: null,
   endDate: null,
 

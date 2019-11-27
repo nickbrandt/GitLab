@@ -1,4 +1,3 @@
-import axios from '~/lib/utils/axios_utils';
 import createFlash, { hideFlash } from '~/flash';
 import { __ } from '~/locale';
 import Api from 'ee/api';
@@ -13,11 +12,6 @@ const removeError = () => {
   }
 };
 
-export const setCycleAnalyticsDataEndpoint = ({ commit }, groupPath) =>
-  commit(types.SET_CYCLE_ANALYTICS_DATA_ENDPOINT, groupPath);
-
-export const setStageDataEndpoint = ({ commit }, stageSlug) =>
-  commit(types.SET_STAGE_DATA_ENDPOINT, stageSlug);
 export const setSelectedGroup = ({ commit }, group) => commit(types.SET_SELECTED_GROUP, group);
 export const setSelectedProjects = ({ commit }, projectIds) =>
   commit(types.SET_SELECTED_PROJECTS, projectIds);
@@ -44,14 +38,19 @@ export const receiveStageDataError = ({ commit }) => {
   createFlash(__('There was an error fetching data for the selected stage'));
 };
 
-export const fetchStageData = ({ state, dispatch, getters }) => {
+export const fetchStageData = ({ state, dispatch, getters }, slug) => {
   const { cycleAnalyticsRequestParams = {} } = getters;
   dispatch('requestStageData');
 
-  axios
-    .get(state.endpoints.stageData, {
-      params: nestQueryStringKeys(cycleAnalyticsRequestParams, 'cycle_analytics'),
-    })
+  const {
+    selectedGroup: { fullPath },
+  } = state;
+
+  return Api.cycleAnalyticsStageEvents(
+    fullPath,
+    slug,
+    nestQueryStringKeys(cycleAnalyticsRequestParams, 'cycle_analytics'),
+  )
     .then(({ data }) => dispatch('receiveStageDataSuccess', data))
     .catch(error => dispatch('receiveStageDataError', error));
 };
@@ -94,10 +93,14 @@ export const fetchSummaryData = ({ state, dispatch, getters }) => {
   const { cycleAnalyticsRequestParams = {} } = getters;
   dispatch('requestSummaryData');
 
-  return axios
-    .get(state.endpoints.cycleAnalyticsData, {
-      params: nestQueryStringKeys(cycleAnalyticsRequestParams, 'cycle_analytics'),
-    })
+  const {
+    selectedGroup: { fullPath },
+  } = state;
+
+  return Api.cycleAnalyticsSummaryData(
+    fullPath,
+    nestQueryStringKeys(cycleAnalyticsRequestParams, 'cycle_analytics'),
+  )
     .then(({ data }) => dispatch('receiveSummaryDataSuccess', data))
     .catch(error => dispatch('receiveSummaryDataError', error));
 };
@@ -139,8 +142,7 @@ export const receiveGroupStagesAndEventsSuccess = ({ state, commit, dispatch }, 
   const { stages = [] } = state;
   if (stages && stages.length) {
     const { slug } = stages[0];
-    dispatch('setStageDataEndpoint', slug);
-    dispatch('fetchStageData');
+    dispatch('fetchStageData', slug);
   } else {
     createFlash(__('There was an error while fetching cycle analytics data.'));
   }
@@ -148,14 +150,18 @@ export const receiveGroupStagesAndEventsSuccess = ({ state, commit, dispatch }, 
 
 export const fetchGroupStagesAndEvents = ({ state, dispatch, getters }) => {
   const {
+    selectedGroup: { fullPath },
+  } = state;
+
+  const {
     cycleAnalyticsRequestParams: { created_after, project_ids },
   } = getters;
   dispatch('requestGroupStagesAndEvents');
 
-  return axios
-    .get(state.endpoints.cycleAnalyticsStagesAndEvents, {
-      params: nestQueryStringKeys({ start_date: created_after, project_ids }, 'cycle_analytics'),
-    })
+  return Api.cycleAnalyticsGroupStagesAndEvents(
+    fullPath,
+    nestQueryStringKeys({ start_date: created_after, project_ids }, 'cycle_analytics'),
+  )
     .then(({ data }) => dispatch('receiveGroupStagesAndEventsSuccess', data))
     .catch(error => dispatch('receiveGroupStagesAndEventsError', error));
 };
@@ -173,6 +179,8 @@ export const receiveCreateCustomStageError = ({ commit }, { error, data }) => {
 
   const { name } = data;
   const { status } = error;
+  // TODO: check for 403, 422 etc
+  // Follow up issue to investigate https://gitlab.com/gitlab-org/gitlab/issues/36685
   const message =
     status !== httpStatus.UNPROCESSABLE_ENTITY
       ? __(`'${name}' stage already exists'`)
@@ -186,11 +194,9 @@ export const createCustomStage = ({ dispatch, state }, data) => {
     selectedGroup: { fullPath },
   } = state;
 
-  const endpoint = `/-/analytics/cycle_analytics/stages?group_id=${fullPath}`;
   dispatch('requestCreateCustomStage');
 
-  axios
-    .post(endpoint, data)
+  return Api.cycleAnalyticsCreateStage(fullPath, data)
     .then(response => dispatch('receiveCreateCustomStageSuccess', response))
     .catch(error => dispatch('receiveCreateCustomStageError', { error, data }));
 };
@@ -232,4 +238,53 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
       .catch(error => dispatch('receiveTasksByTypeDataError', error));
   }
   return Promise.resolve();
+};
+
+export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
+export const receiveUpdateStageSuccess = ({ commit, dispatch }) => {
+  commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
+  createFlash(__(`Stage data updated`), 'notice');
+
+  dispatch('fetchCycleAnalyticsData');
+};
+
+export const receiveUpdateStageError = ({ commit }) => {
+  commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
+  createFlash(__('There was a problem saving your custom stage, please try again'));
+};
+
+export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
+  const {
+    selectedGroup: { fullPath },
+  } = state;
+
+  dispatch('requestUpdateStage');
+
+  return Api.cycleAnalyticsUpdateStage(id, fullPath, { ...rest })
+    .then(({ data }) => dispatch('receiveUpdateStageSuccess', data))
+    .catch(error => dispatch('receiveUpdateStageError', error));
+};
+
+export const requestRemoveStage = ({ commit }) => commit(types.REQUEST_REMOVE_STAGE);
+export const receiveRemoveStageSuccess = ({ commit, dispatch }) => {
+  commit(types.RECEIVE_REMOVE_STAGE_RESPONSE);
+  createFlash(__('Stage removed'), 'notice');
+  dispatch('fetchCycleAnalyticsData');
+};
+
+export const receiveRemoveStageError = ({ commit }) => {
+  commit(types.RECEIVE_REMOVE_STAGE_RESPONSE);
+  createFlash(__('There was an error removing your custom stage, please try again'));
+};
+
+export const removeStage = ({ dispatch, state }, stageId) => {
+  const {
+    selectedGroup: { fullPath },
+  } = state;
+
+  dispatch('requestRemoveStage');
+
+  return Api.cycleAnalyticsRemoveStage(stageId, fullPath)
+    .then(() => dispatch('receiveRemoveStageSuccess'))
+    .catch(error => dispatch('receiveRemoveStageError', error));
 };

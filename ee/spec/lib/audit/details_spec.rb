@@ -144,5 +144,28 @@ describe Audit::Details do
         expect(string).to eq('Updated ref master from b6bce79c to a7bce79c')
       end
     end
+
+    context 'system event' do
+      let(:user_member) { create(:user) }
+      let(:project) { create(:project) }
+      let(:member) { create(:project_member, :developer, user: user_member, project: project, expires_at: 1.day.from_now) }
+      let(:system_event_action) do
+        {
+          remove: 'user_access',
+          author_name: 'Admin User',
+          target_id: member.id,
+          target_type: 'User',
+          target_details: member.user.name,
+          system_event: true,
+          reason: "access expired on #{member.expires_at}"
+        }
+      end
+
+      it 'humanizes system event' do
+        string = described_class.humanize(system_event_action)
+
+        expect(string).to eq("Removed user access via system job. Reason: access expired on #{member.expires_at}")
+      end
+    end
   end
 end

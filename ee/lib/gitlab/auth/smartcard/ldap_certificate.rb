@@ -21,6 +21,10 @@ module Gitlab
           identity&.user
         end
 
+        def create_identity_for_existing_user
+          # TODO: create new identity for existing users as part of https://gitlab.com/gitlab-org/gitlab/issues/36808
+        end
+
         def create_user
           user_params = {
             name:                       ldap_user.name,

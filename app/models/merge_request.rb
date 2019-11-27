@@ -103,7 +103,7 @@ class MergeRequest < ApplicationRecord
     super + [:merged, :locked]
   end
 
-  state_machine :state_id, initial: :opened do
+  state_machine :state_id, initial: :opened, initialize: false do
     event :close do
       transition [:opened] => :closed
     end
@@ -418,15 +418,6 @@ class MergeRequest < ApplicationRecord
       end
 
     limit ? shas.take(limit) : shas
-  end
-
-  # Returns true if there are commits that match at least one commit SHA.
-  def includes_any_commits?(shas)
-    if persisted?
-      merge_request_diff.commits_by_shas(shas).exists?
-    else
-      (commit_shas & shas).present?
-    end
   end
 
   def supports_suggestion?
@@ -1066,7 +1057,7 @@ class MergeRequest < ApplicationRecord
   # Returns the oldest multi-line commit message, or the MR title if none found
   def default_squash_commit_message
     strong_memoize(:default_squash_commit_message) do
-      commits.without_merge_commits.reverse.find(&:description?)&.safe_message || title
+      recent_commits.without_merge_commits.reverse_each.find(&:description?)&.safe_message || title
     end
   end
 
@@ -1149,26 +1140,6 @@ class MergeRequest < ApplicationRecord
     actual_head_pipeline.environments
   end
 
-  def state_human_name
-    if merged?
-      "Merged"
-    elsif closed?
-      "Closed"
-    else
-      "Open"
-    end
-  end
-
-  def state_icon_name
-    if merged?
-      "git-merge"
-    elsif closed?
-      "close"
-    else
-      "issue-open-m"
-    end
-  end
-
   def fetch_ref!
     target_project.repository.fetch_source_branch!(source_project.repository, source_branch, ref_path)
   end
@@ -1245,16 +1216,8 @@ class MergeRequest < ApplicationRecord
   end
 
   def all_pipelines
-    return Ci::Pipeline.none unless source_project
-
-    shas = all_commit_shas
-
     strong_memoize(:all_pipelines) do
-      Ci::Pipeline.from_union(
-        [source_project.ci_pipelines.merge_request_pipelines(self, shas),
-         source_project.ci_pipelines.detached_merge_request_pipelines(self, shas),
-         source_project.ci_pipelines.triggered_for_branch(source_branch).for_sha(shas)],
-         remove_duplicates: false).sort_by_merge_request_pipelines
+      MergeRequest::Pipelines.new(self).all
     end
   end
 

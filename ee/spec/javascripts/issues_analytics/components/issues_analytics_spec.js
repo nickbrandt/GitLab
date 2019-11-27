@@ -1,14 +1,14 @@
-import Vue from 'vue';
 import IssuesAnalytics from 'ee/issues_analytics/components/issues_analytics.vue';
 import EmptyState from 'ee/issues_analytics/components/empty_state.vue';
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { createStore } from 'ee/issues_analytics/stores';
+
+const localVue = createLocalVue();
 
 describe('Issues Analytics component', () => {
   let vm;
   let store;
   let mountComponent;
-  const Component = Vue.extend(IssuesAnalytics);
   const mockChartData = { '2017-11': 0, '2017-12': 2 };
 
   beforeEach(() => {
@@ -22,13 +22,14 @@ describe('Issues Analytics component', () => {
         filterBlockEl: document.querySelector('#mock-filter'),
       };
 
-      return shallowMount(Component, {
+      return shallowMount(localVue.extend(IssuesAnalytics), {
         propsData: props,
         stubs: {
           GlColumnChart: true,
           EmptyState,
         },
         store,
+        localVue,
       }).vm;
     };
 

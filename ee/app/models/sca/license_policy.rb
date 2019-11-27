@@ -10,19 +10,7 @@ module SCA
       @url = reported_license&.url
       @dependencies = reported_license&.dependencies || []
       @spdx_identifier = software_policy&.spdx_identifier || reported_license.id
-      @classification = classify(software_policy)
-    end
-
-    private
-
-    def classify(policy)
-      if policy&.approved?
-        'allowed'
-      elsif policy&.blacklisted?
-        'denied'
-      else
-        'unclassified'
-      end
+      @classification = software_policy&.approval_status || 'unclassified'
     end
   end
 end

@@ -7,6 +7,7 @@ import StageEventList from './stage_event_list.vue';
 import StageTableHeader from './stage_table_header.vue';
 import AddStageButton from './add_stage_button.vue';
 import CustomStageForm from './custom_stage_form.vue';
+import { STAGE_ACTIONS } from '../constants';
 
 export default {
   name: 'StageTable',
@@ -110,6 +111,15 @@ export default {
       ];
     },
   },
+  methods: {
+    // TODO: DRY These up
+    hideStage(stageId) {
+      this.$emit(STAGE_ACTIONS.HIDE, { id: stageId, hidden: true });
+    },
+    removeStage(stageId) {
+      this.$emit(STAGE_ACTIONS.REMOVE, stageId);
+    },
+  },
 };
 </script>
 <template>
@@ -138,8 +148,11 @@ export default {
               :title="stage.title"
               :value="stage.value"
               :is-active="!isAddingCustomStage && stage.id === currentStage.id"
+              :can-edit="canEditStages"
               :is-default-stage="!stage.custom"
               @select="$emit('selectStage', stage)"
+              @remove="removeStage(stage.id)"
+              @hide="hideStage(stage.id)"
             />
             <add-stage-button
               v-if="canEditStages"

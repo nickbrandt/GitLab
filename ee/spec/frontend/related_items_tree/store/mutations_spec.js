@@ -49,14 +49,15 @@ describe('RelatedItemsTree', () => {
       describe(types.SET_CHILDREN_COUNT, () => {
         it('should set provided `epicsCount` and `issuesCount` to state', () => {
           const data = {
-            epicsCount: 4,
-            issuesCount: 5,
+            openedEpics: 4,
+            closedEpics: 5,
+            openedIssues: 6,
+            closedIssues: 7,
           };
 
           mutations[types.SET_CHILDREN_COUNT](state, data);
 
-          expect(state.epicsCount).toBe(data.epicsCount);
-          expect(state.issuesCount).toBe(data.issuesCount);
+          expect(state.descendantCounts).toEqual(data);
         });
       });
 
@@ -430,6 +431,16 @@ describe('RelatedItemsTree', () => {
 
           expect(state.pendingReferences).toEqual(expect.arrayContaining(['foo']));
         });
+
+        it('should update `itemAddFailure` to false if no `pendingReferences` are left', () => {
+          state.pendingReferences = ['foo'];
+          state.itemAddFailure = true;
+
+          mutations[types.REMOVE_PENDING_REFERENCE](state, 0);
+
+          expect(state.pendingReferences.length).toEqual(0);
+          expect(state.itemAddFailure).toBe(false);
+        });
       });
 
       describe(types.SET_ITEM_INPUT_VALUE, () => {
@@ -467,10 +478,12 @@ describe('RelatedItemsTree', () => {
       });
 
       describe(types.RECEIVE_ADD_ITEM_FAILURE, () => {
-        it('should set `itemAddInProgress` to false within state', () => {
-          mutations[types.RECEIVE_ADD_ITEM_FAILURE](state);
+        it('should set `itemAddInProgress` to false, `itemAddFailure` to true and `itemAddFailureType` value within state', () => {
+          mutations[types.RECEIVE_ADD_ITEM_FAILURE](state, { itemAddFailureType: 'bar' });
 
           expect(state.itemAddInProgress).toBe(false);
+          expect(state.itemAddFailure).toBe(true);
+          expect(state.itemAddFailureType).toEqual('bar');
         });
       });
 

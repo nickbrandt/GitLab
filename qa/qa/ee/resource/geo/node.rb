@@ -14,12 +14,12 @@ module QA
             QA::Page::Admin::Menu.perform(&:click_geo_menu_link)
             EE::Page::Admin::Geo::Nodes::Show.perform(&:new_node!)
 
-            EE::Page::Admin::Geo::Nodes::New.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
+            EE::Page::Admin::Geo::Nodes::New.perform do |new_page|
               raise ArgumentError if @name.nil? || @address.nil?
 
-              page.set_node_name(@name)
-              page.set_node_address(@address)
-              page.add_node!
+              new_page.set_node_name(@name)
+              new_page.set_node_address(@address)
+              new_page.add_node!
             end
 
             QA::Page::Main::Menu.perform(&:sign_out)

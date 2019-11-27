@@ -6,9 +6,9 @@ describe('packages_list_app', () => {
   let wrapper;
 
   const emptyListHelpUrl = 'helpUrl';
-  const findGlEmptyState = (w = wrapper) => w.find({ name: 'gl-empty-state-stub' });
-  const findListComponent = (w = wrapper) => w.find({ name: 'package-list' });
-  const findLoadingComponent = (w = wrapper) => w.find({ name: 'gl-loading-icon' });
+  const findGlEmptyState = () => wrapper.find({ name: 'gl-empty-state-stub' });
+  const findListComponent = () => wrapper.find({ name: 'package-list' });
+  const findLoadingComponent = () => wrapper.find({ name: 'gl-loading-icon' });
 
   const componentConfig = {
     stubs: {

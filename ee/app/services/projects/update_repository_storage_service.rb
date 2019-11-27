@@ -23,6 +23,10 @@ module Projects
         result &&= mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::WIKI)
       end
 
+      if project.design_repository.exists?
+        result &&= mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::DESIGN)
+      end
+
       if result
         mark_old_paths_for_archive
 
@@ -70,6 +74,13 @@ module Projects
                                           old_repository_storage,
                                           wiki.disk_path,
                                           "#{new_project_path}.wiki")
+        end
+
+        if design_repository.exists?
+          GitlabShellWorker.perform_async(:mv_repository,
+                                          old_repository_storage,
+                                          design_repository.disk_path,
+                                          "#{new_project_path}.design")
         end
       end
     end

@@ -50,6 +50,10 @@ describe('Cycle analytics mutations', () => {
     ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}   | ${false}
     ${types.REQUEST_TASKS_BY_TYPE_DATA}            | ${'isLoadingChartData'}    | ${true}
     ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingChartData'}    | ${false}
+    ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}             | ${true}
+    ${types.RECEIVE_UPDATE_STAGE_RESPONSE}         | ${'isLoading'}             | ${false}
+    ${types.REQUEST_REMOVE_STAGE}                  | ${'isLoading'}             | ${true}
+    ${types.RECEIVE_REMOVE_STAGE_RESPONSE}         | ${'isLoading'}             | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 
@@ -57,13 +61,11 @@ describe('Cycle analytics mutations', () => {
   });
 
   it.each`
-    mutation                                   | payload                       | expectedState
-    ${types.SET_CYCLE_ANALYTICS_DATA_ENDPOINT} | ${'cool-beans'}               | ${{ endpoints: { cycleAnalyticsStagesAndEvents: '/-/analytics/cycle_analytics/stages?group_id=cool-beans' } }}
-    ${types.SET_STAGE_DATA_ENDPOINT}           | ${'rad-stage'}                | ${{ endpoints: { stageData: '/groups/rad-stage/-/cycle_analytics/events/rad-stage.json' } }}
-    ${types.SET_SELECTED_GROUP}                | ${{ fullPath: 'cool-beans' }} | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjectIds: [] }}
-    ${types.SET_SELECTED_PROJECTS}             | ${[606, 707, 808, 909]}       | ${{ selectedProjectIds: [606, 707, 808, 909] }}
-    ${types.SET_DATE_RANGE}                    | ${{ startDate, endDate }}     | ${{ startDate, endDate }}
-    ${types.SET_SELECTED_STAGE_ID}             | ${'first-stage'}              | ${{ selectedStageId: 'first-stage' }}
+    mutation                       | payload                       | expectedState
+    ${types.SET_SELECTED_GROUP}    | ${{ fullPath: 'cool-beans' }} | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjectIds: [] }}
+    ${types.SET_SELECTED_PROJECTS} | ${[606, 707, 808, 909]}       | ${{ selectedProjectIds: [606, 707, 808, 909] }}
+    ${types.SET_DATE_RANGE}        | ${{ startDate, endDate }}     | ${{ startDate, endDate }}
+    ${types.SET_SELECTED_STAGE_ID} | ${'first-stage'}              | ${{ selectedStageId: 'first-stage' }}
   `(
     '$mutation with payload $payload will update state with $expectedState',
     ({ mutation, payload, expectedState }) => {
@@ -196,6 +198,23 @@ describe('Cycle analytics mutations', () => {
         { slug: 'issue', value: '1 day ago' },
         { slug: 'test', value: null },
       ]);
+    });
+
+    describe('with hidden stages', () => {
+      const mockStages = customizableStagesAndEvents.stages;
+
+      beforeEach(() => {
+        mockStages[0].hidden = true;
+
+        mutations[types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS](state, {
+          ...customizableStagesAndEvents.events,
+          stages: mockStages,
+        });
+      });
+
+      it('will only return stages that are not hidden', () => {
+        expect(state.stages.map(({ id }) => id)).not.toContain(mockStages[0].id);
+      });
     });
   });
 

@@ -66,14 +66,16 @@ describe Repository do
   end
 
   describe 'tags_sorted_by' do
+    let(:tags_to_compare) { %w[v1.0.0 v1.1.0] }
+
     context 'name_desc' do
-      subject { repository.tags_sorted_by('name_desc').map(&:name) }
+      subject { repository.tags_sorted_by('name_desc').map(&:name) & tags_to_compare }
 
       it { is_expected.to eq(['v1.1.0', 'v1.0.0']) }
     end
 
     context 'name_asc' do
-      subject { repository.tags_sorted_by('name_asc').map(&:name) }
+      subject { repository.tags_sorted_by('name_asc').map(&:name) & tags_to_compare }
 
       it { is_expected.to eq(['v1.0.0', 'v1.1.0']) }
     end
@@ -115,7 +117,7 @@ describe Repository do
       context 'annotated tag pointing to a blob' do
         let(:annotated_tag_name) { 'annotated-tag' }
 
-        subject { repository.tags_sorted_by('updated_asc').map(&:name) }
+        subject { repository.tags_sorted_by('updated_asc').map(&:name) & (tags_to_compare + [annotated_tag_name]) }
 
         before do
           options = { message: 'test tag message\n',
@@ -845,7 +847,7 @@ describe Repository do
   end
 
   describe '#get_raw_changes' do
-    context `with non-UTF8 bytes in paths` do
+    context 'with non-UTF8 bytes in paths' do
       let(:old_rev) { 'd0888d297eadcd7a345427915c309413b1231e65' }
       let(:new_rev) { '19950f03c765f7ac8723a73a0599764095f52fc0' }
       let(:changes) { repository.raw_changes_between(old_rev, new_rev) }
@@ -1528,13 +1530,24 @@ describe Repository do
           expect(merge_request.reload.rebase_commit_sha).to eq(new_sha)
         end
 
-        it 'does rollback when an error is encountered in the second step' do
+        it 'does rollback when a PreReceiveError is encountered in the second step' do
           second_response = double(pre_receive_error: 'my_error', git_error: nil)
           mock_gitaly(second_response)
 
           expect do
             repository.rebase(user, merge_request)
           end.to raise_error(Gitlab::Git::PreReceiveError)
+
+          expect(merge_request.reload.rebase_commit_sha).to be_nil
+        end
+
+        it 'does rollback when a GitError is encountered in the second step' do
+          second_response = double(pre_receive_error: nil, git_error: 'git error')
+          mock_gitaly(second_response)
+
+          expect do
+            repository.rebase(user, merge_request)
+          end.to raise_error(Gitlab::Git::Repository::GitError)
 
           expect(merge_request.reload.rebase_commit_sha).to be_nil
         end

@@ -3,43 +3,11 @@ import VueApollo from 'vue-apollo';
 import _ from 'underscore';
 import { defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import createDefaultClient from '~/lib/graphql';
-import createFlash from '~/flash';
-import { s__ } from '~/locale';
-import appDataQuery from './graphql/queries/appData.query.graphql';
-import projectQuery from './graphql/queries/project.query.graphql';
-
-const genericErrorMessage = s__(
-  'DesignManagement|An error occurred while loading designs. Please try again.',
-);
 
 Vue.use(VueApollo);
 
 const defaultClient = createDefaultClient(
-  {
-    Query: {
-      design(ctx, { id, version }, { cache, client }) {
-        const { projectPath, issueIid } = cache.readQuery({ query: appDataQuery });
-        return client
-          .query({
-            query: projectQuery,
-            variables: {
-              fullPath: projectPath,
-              iid: issueIid,
-              atVersion: version,
-            },
-          })
-          .then(({ data }) => {
-            const edge = data.project.issue.designCollection.designs.edges.find(
-              ({ node }) => node.filename === id,
-            );
-            return edge.node;
-          })
-          .catch(() => {
-            createFlash(genericErrorMessage);
-          });
-      },
-    },
-  },
+  {},
   // This config is added temporarily to resolve an issue with duplicate design IDs.
   // Should be removed as soon as https://gitlab.com/gitlab-org/gitlab/issues/13495 is resolved
   {

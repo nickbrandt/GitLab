@@ -33,7 +33,7 @@ describe ProjectPolicy do
     let(:additional_developer_permissions) do
       %i[
         admin_vulnerability_feedback read_project_security_dashboard read_feature_flag
-        read_vulnerability create_vulnerability resolve_vulnerability dismiss_vulnerability
+        read_vulnerability create_vulnerability admin_vulnerability
       ]
     end
     let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches admin_feature_flags_client] }
@@ -47,7 +47,7 @@ describe ProjectPolicy do
         read_environment read_deployment read_merge_request read_pages
         create_merge_request_in award_emoji
         read_project_security_dashboard read_vulnerability
-        read_vulnerability_feedback read_software_license_policy
+        read_vulnerability_feedback read_security_findings read_software_license_policy
       ]
     end
 
@@ -411,6 +411,54 @@ describe ProjectPolicy do
     end
   end
 
+  describe 'read_security_findings' do
+    context 'with private project' do
+      let(:project) { create(:project, :private, namespace: owner.namespace) }
+
+      context 'with guest or above' do
+        let(:current_user) { guest }
+
+        it { is_expected.to be_allowed(:read_security_findings) }
+      end
+
+      context 'with non member' do
+        let(:current_user) { create(:user) }
+
+        it { is_expected.to be_disallowed(:read_security_findings) }
+      end
+
+      context 'with anonymous' do
+        let(:current_user) { nil }
+
+        it { is_expected.to be_disallowed(:read_security_findings) }
+      end
+    end
+
+    context 'with public project' do
+      let(:current_user) { create(:user) }
+
+      context 'with limited access to builds' do
+        context 'when builds enabled only for project members' do
+          let(:project) { create(:project, :public, :builds_private) }
+
+          it { is_expected.not_to be_allowed(:read_security_findings) }
+        end
+
+        context 'when public builds disabled' do
+          let(:project) { create(:project, :public, public_builds: false) }
+
+          it { is_expected.not_to be_allowed(:read_security_findings) }
+        end
+      end
+
+      context 'with public access to repository' do
+        let(:project) { create(:project, :public) }
+
+        it { is_expected.to be_allowed(:read_security_findings) }
+      end
+    end
+  end
+
   describe 'vulnerability feedback permissions' do
     subject { described_class.new(current_user, project) }
 
@@ -495,8 +543,7 @@ describe ProjectPolicy do
         include_context 'when security dashboard feature is not available'
 
         it { is_expected.to be_disallowed(:create_vulnerability) }
-        it { is_expected.to be_disallowed(:resolve_vulnerability) }
-        it { is_expected.to be_disallowed(:dismiss_vulnerability) }
+        it { is_expected.to be_disallowed(:admin_vulnerability) }
       end
     end
   end

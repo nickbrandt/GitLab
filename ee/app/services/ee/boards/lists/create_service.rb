@@ -6,6 +6,8 @@ module EE
       module CreateService
         extend ::Gitlab::Utils::Override
 
+        include MaxLimits
+
         override :type
         def type
           # We don't ever expect to have more than one list
@@ -35,13 +37,13 @@ module EE
 
         override :create_list_attributes
         def create_list_attributes(type, target, position)
-          max_issue_count = if wip_limits_available?
-                              params[:max_issue_count] || 0
-                            else
-                              0
-                            end
+          max_issue_count, max_issue_weight = if wip_limits_available?
+                                                [max_issue_count_by_params, max_issue_weight_by_params]
+                                              else
+                                                [0, 0]
+                                              end
 
-          super.merge(max_issue_count: max_issue_count)
+          super.merge(max_issue_count: max_issue_count, max_issue_weight: max_issue_weight)
         end
 
         private

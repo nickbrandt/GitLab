@@ -34,6 +34,7 @@ function createComponent(props = {}, shallow = false) {
       currentStageEvents: issueEvents,
       labels: groupLabels,
       isLoading: false,
+      isLoadingSummaryData: false,
       isEmptyStage: false,
       isAddingCustomStage: false,
       isSavingCustomStage: false,

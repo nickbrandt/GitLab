@@ -1,9 +1,11 @@
 import component from 'ee/onboarding/onboarding_helper/components/onboarding_helper.vue';
 import TourPartsList from 'ee/onboarding/onboarding_helper/components/tour_parts_list.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlProgressBar, GlLoadingIcon } from '@gitlab/ui';
 import Tracking from '~/tracking';
+
+const localVue = createLocalVue();
 
 describe('User onboarding tour parts list', () => {
   let wrapper;
@@ -29,7 +31,7 @@ describe('User onboarding tour parts list', () => {
   };
 
   function createComponent(propsData) {
-    wrapper = shallowMount(component, { propsData });
+    wrapper = shallowMount(localVue.extend(component), { propsData, localVue, sync: false });
   }
 
   beforeEach(() => {
@@ -125,10 +127,16 @@ describe('User onboarding tour parts list', () => {
 
   describe('watch', () => {
     describe('watch initialShow', () => {
-      it('sets showPopover to true if initialShow is true', () => {
+      it('sets showPopover to true if initialShow is true', done => {
         wrapper.setProps({ initialShow: true });
 
-        expect(wrapper.vm.showPopover).toBe(true);
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            expect(wrapper.vm.showPopover).toBe(true);
+          })
+          .then(done)
+          .catch(done.fail);
       });
     });
 
@@ -314,7 +322,7 @@ describe('User onboarding tour parts list', () => {
       expect(wrapper.find('.qa-toggle-btn').exists()).toBe(true);
     });
 
-    it('renders the proper toggle button icons', () => {
+    it('renders the proper toggle button icons', done => {
       const btn = wrapper.find('.qa-toggle-btn');
       const icon = btn.find(Icon);
 
@@ -322,7 +330,13 @@ describe('User onboarding tour parts list', () => {
 
       wrapper.vm.expanded = true;
 
-      expect(icon.props('name')).toEqual('close');
+      wrapper.vm
+        .$nextTick()
+        .then(() => {
+          expect(icon.props('name')).toEqual('close');
+        })
+        .then(done)
+        .catch(done.fail);
     });
 
     it('renders the tour parts list if there are tour titles', () => {

@@ -12,6 +12,7 @@ describe List do
 
   describe 'validations' do
     it { is_expected.to validate_numericality_of(:max_issue_count).only_integer.is_greater_than_or_equal_to(0) }
+    it { is_expected.to validate_numericality_of(:max_issue_weight).only_integer.is_greater_than_or_equal_to(0) }
   end
 
   context 'when it is an assignee type' do
@@ -55,6 +56,39 @@ describe List do
     describe '#title' do
       it 'returns the milestone title' do
         expect(subject.title).to eq('awesome-release')
+      end
+    end
+  end
+
+  describe '#wip_limits_available?' do
+    let!(:project) { create(:project) }
+    let!(:group) { create(:group) }
+
+    let!(:board1) { create(:board, resource_parent: project, name: 'b') }
+    let!(:board2) { create(:board, resource_parent: group, name: 'a') }
+
+    let!(:list1) { create(:list, board: board1) }
+    let!(:list2) { create(:list, board: board2) }
+
+    context 'with enabled wip_limits' do
+      before do
+        stub_licensed_features(wip_limits: true)
+      end
+
+      it 'returns the expected values' do
+        expect(list1.wip_limits_available?).to be_truthy
+        expect(list2.wip_limits_available?).to be_truthy
+      end
+    end
+
+    context 'with disabled wip_limits' do
+      before do
+        stub_licensed_features(wip_limits: false)
+      end
+
+      it 'returns the expected values' do
+        expect(list1.wip_limits_available?).to be_falsy
+        expect(list2.wip_limits_available?).to be_falsy
       end
     end
   end

@@ -14,14 +14,17 @@ describe('project component', () => {
   const ProjectComponent = localVue.extend(Project);
   let wrapper;
 
-  beforeEach(() => {
+  const createComponent = (props = {}) => {
     wrapper = shallowMount(ProjectComponent, {
       sync: false,
       store,
       localVue,
-      propsData: { project: mockOneProject },
+      propsData: {
+        project: mockOneProject,
+        ...props,
+      },
     });
-  });
+  };
 
   afterEach(() => {
     wrapper.destroy();
@@ -37,12 +40,8 @@ describe('project component', () => {
           upgrade_required: true,
           upgrade_path: '/upgrade',
         };
-        wrapper = shallowMount(ProjectComponent, {
-          sync: false,
-          store,
-          localVue,
-          propsData: { project },
-        });
+
+        createComponent({ project });
       });
 
       it('shows project title', () => {
@@ -72,12 +71,8 @@ describe('project component', () => {
           upgrade_required: true,
           upgrade_path: '',
         };
-        wrapper = shallowMount(ProjectComponent, {
-          sync: false,
-          store,
-          localVue,
-          propsData: { project },
-        });
+
+        createComponent({ project });
       });
 
       it('shows upgrade license text', () => {
@@ -91,6 +86,10 @@ describe('project component', () => {
   });
 
   describe('wrapped components', () => {
+    beforeEach(() => {
+      createComponent();
+    });
+
     describe('project header', () => {
       it('binds project', () => {
         const header = wrapper.find(ProjectHeader);

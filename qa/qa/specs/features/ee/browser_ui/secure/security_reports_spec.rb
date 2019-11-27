@@ -115,8 +115,8 @@ module QA
 
       it 'displays security reports in the group security dashboard' do
         Page::Main::Menu.perform(&:go_to_groups)
-        Page::Dashboard::Groups.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
-          page.click_group @project.group.path
+        Page::Dashboard::Groups.perform do |groups|
+          groups.click_group @project.group.path
         end
         Page::Group::Menu.perform(&:click_group_security_link)
 
@@ -144,8 +144,8 @@ module QA
       it 'displays the Dependency List' do
         Page::Project::Menu.perform(&:click_on_dependency_list)
 
-        EE::Page::Project::Secure::DependencyList.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
-          expect(page).to have_dependency_count_of number_of_dependencies_in_fixture
+        EE::Page::Project::Secure::DependencyList.perform do |dependency_list|
+          expect(dependency_list).to have_dependency_count_of number_of_dependencies_in_fixture
         end
       end
     end

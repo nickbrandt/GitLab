@@ -465,7 +465,6 @@ export default {
         </div>
       </div>
     </fieldset>
-    <user-with-id :value="userIds" @input="updateUserIds" />
 
     <user-with-id v-if="!shouldShowUsersPerEnvironment" :value="userIds" @input="updateUserIds" />
 

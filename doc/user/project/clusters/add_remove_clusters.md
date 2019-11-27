@@ -34,7 +34,7 @@ namespace.
 
 This service account will be:
 
-- Added to the installed Helm Tiller
+- Added to the installed Helm Tiller.
 - Used by Helm to install and run [GitLab managed applications](index.md#installing-applications).
 
 Helm will also create additional service accounts and other resources for each
@@ -110,6 +110,11 @@ If you don't want to use GitLab Runner in privileged mode, either:
      [using `docker+machine`](https://docs.gitlab.com/runner/executors/docker_machine.html).
 
 ## Add new cluster
+
+New clusters can be added using GitLab for:
+
+- Google Kubernetes Engine.
+- Amazon Elastic Kubernetes Service.
 
 ### GKE cluster
 
@@ -295,6 +300,7 @@ new Kubernetes cluster to your project:
                       "iam:AttachRolePolicy",
                       "iam:CreateRole",
                       "iam:CreateInstanceProfile",
+                      "iam:CreateServiceLinkedRole",
                       "iam:GetRole",
                       "iam:ListRoles",
                       "iam:PassRole",

@@ -7,11 +7,11 @@ import { reposServerResponse, parsedReposServerResponse } from '../mock_data';
 describe('Registry List', () => {
   let wrapper;
 
-  const findCollapsibleContainer = w => w.findAll({ name: 'CollapsibeContainerRegisty' });
-  const findProjectEmptyState = w => w.find({ name: 'ProjectEmptyState' });
-  const findGroupEmptyState = w => w.find({ name: 'GroupEmptyState' });
-  const findSpinner = w => w.find('.gl-spinner');
-  const findCharacterErrorText = w => w.find('.js-character-error-text');
+  const findCollapsibleContainer = () => wrapper.findAll({ name: 'CollapsibeContainerRegisty' });
+  const findProjectEmptyState = () => wrapper.find({ name: 'ProjectEmptyState' });
+  const findGroupEmptyState = () => wrapper.find({ name: 'GroupEmptyState' });
+  const findSpinner = () => wrapper.find('.gl-spinner');
+  const findCharacterErrorText = () => wrapper.find('.js-character-error-text');
 
   const propsData = {
     endpoint: `${TEST_HOST}/foo`,
@@ -39,6 +39,8 @@ describe('Registry List', () => {
     // See https://github.com/vuejs/vue-test-utils/issues/532.
     Vue.config.silent = true;
     wrapper = mount(registry, {
+      attachToDocument: true,
+      sync: false,
       propsData,
       computed: {
         repos() {
@@ -57,16 +59,17 @@ describe('Registry List', () => {
 
   describe('with data', () => {
     it('should render a list of CollapsibeContainerRegisty', () => {
-      const containers = findCollapsibleContainer(wrapper);
+      const containers = findCollapsibleContainer();
       expect(wrapper.vm.repos.length).toEqual(reposServerResponse.length);
       expect(containers.length).toEqual(reposServerResponse.length);
     });
   });
 
   describe('without data', () => {
-    let localWrapper;
     beforeEach(() => {
-      localWrapper = mount(registry, {
+      wrapper = mount(registry, {
+        attachToDocument: true,
+        sync: false,
         propsData,
         computed: {
           repos() {
@@ -78,16 +81,14 @@ describe('Registry List', () => {
     });
 
     it('should render project empty message', () => {
-      const projectEmptyState = findProjectEmptyState(localWrapper);
+      const projectEmptyState = findProjectEmptyState();
       expect(projectEmptyState.exists()).toBe(true);
     });
   });
 
   describe('while loading data', () => {
-    let localWrapper;
-
     beforeEach(() => {
-      localWrapper = mount(registry, {
+      wrapper = mount(registry, {
         propsData,
         computed: {
           repos() {
@@ -102,16 +103,14 @@ describe('Registry List', () => {
     });
 
     it('should render a loading spinner', () => {
-      const spinner = findSpinner(localWrapper);
+      const spinner = findSpinner();
       expect(spinner.exists()).toBe(true);
     });
   });
 
   describe('invalid characters in path', () => {
-    let localWrapper;
-
     beforeEach(() => {
-      localWrapper = mount(registry, {
+      wrapper = mount(registry, {
         propsData: {
           ...propsData,
           characterError: true,
@@ -126,7 +125,7 @@ describe('Registry List', () => {
     });
 
     it('should render invalid characters error message', () => {
-      const characterErrorText = findCharacterErrorText(localWrapper);
+      const characterErrorText = findCharacterErrorText();
       expect(characterErrorText.text()).toEqual(
         'We are having trouble connecting to Docker, which could be due to an issue with your project name or path. More Information',
       );

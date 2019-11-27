@@ -12,9 +12,9 @@ describe('Security Configuration App', () => {
       localVue,
       propsData: {
         features: [],
-        autoDevOpsEnabled: false,
+        autoDevopsEnabled: false,
         latestPipelinePath: 'http://latestPipelinePath',
-        autoDevOpsHelpPagePath: 'http://autoDevOpsHelpPagePath',
+        autoDevopsHelpPagePath: 'http://autoDevopsHelpPagePath',
         helpPagePath: 'http://helpPagePath',
         pipelinesHelpPagePath: 'http://pipelineHelpPagePath',
         ...props,
@@ -49,14 +49,14 @@ describe('Security Configuration App', () => {
     });
 
     it.each`
-      autoDevOpsEnabled | latestPipelinePath         | expectedUrl
-      ${true}           | ${'http://latestPipeline'} | ${'http://autoDevOpsHelpPagePath'}
+      autoDevopsEnabled | latestPipelinePath         | expectedUrl
+      ${true}           | ${'http://latestPipeline'} | ${'http://autoDevopsHelpPagePath'}
       ${false}          | ${'http://latestPipeline'} | ${'http://latestPipeline'}
       ${false}          | ${undefined}               | ${'http://pipelineHelpPagePath'}
     `(
-      'displays a link to "$expectedUrl" when autoDevOps is "$autoDevOpsEnabled" and pipelinesPath is $latestPipelinePath',
-      ({ autoDevOpsEnabled, latestPipelinePath, expectedUrl }) => {
-        createComponent({ autoDevOpsEnabled, latestPipelinePath });
+      'displays a link to "$expectedUrl" when autoDevops is "$autoDevopsEnabled" and pipelinesPath is $latestPipelinePath',
+      ({ autoDevopsEnabled, latestPipelinePath, expectedUrl }) => {
+        createComponent({ autoDevopsEnabled, latestPipelinePath });
 
         expect(getPipelinesLink().attributes('href')).toBe(expectedUrl);
         expect(getPipelinesLink().attributes('rel')).toBe('noopener');

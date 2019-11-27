@@ -4,8 +4,8 @@ import SecurityConfigurationApp from './components/app.vue';
 export default function init() {
   const el = document.getElementById('js-security-configuration');
   const {
-    autoDevOpsEnabled,
-    autoDevOpsHelpPagePath,
+    autoDevopsEnabled,
+    autoDevopsHelpPagePath,
     features,
     helpPagePath,
     latestPipelinePath,
@@ -20,8 +20,8 @@ export default function init() {
     render(createElement) {
       return createElement(SecurityConfigurationApp, {
         props: {
-          autoDevOpsEnabled,
-          autoDevOpsHelpPagePath,
+          autoDevopsEnabled,
+          autoDevopsHelpPagePath,
           features: JSON.parse(features),
           helpPagePath,
           latestPipelinePath,

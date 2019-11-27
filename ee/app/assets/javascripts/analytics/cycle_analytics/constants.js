@@ -32,3 +32,10 @@ export const EMPTY_STAGE_TEXT = {
 
 export const TASKS_BY_TYPE_SUBJECT_ISSUE = 'Issue';
 export const TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST = 'MergeRequest';
+
+export const STAGE_ACTIONS = {
+  EDIT: 'editStage',
+  REMOVE: 'removeStage',
+  SAVE: 'saveStage',
+  HIDE: 'hideStage',
+};

@@ -60,6 +60,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         resources :subscriptions, only: [:create, :destroy]
+        resources :licenses, only: [:index, :create], controller: 'security/licenses'
       end
       # End of the /-/ scope.
 
@@ -161,6 +162,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       namespace :security do
         resource :dashboard, only: [:show], controller: :dashboard
+        resource :configuration, only: [:show], controller: :configuration
+
         resources :dependencies, only: [:index]
         resources :licenses, only: [:index]
         # We have to define both legacy and new routes for Vulnerability Findings
@@ -184,7 +187,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resource :dependencies, only: [:show]
       resource :licenses, only: [:show]
-      resources :managed_licenses, only: [:index, :show, :new, :create, :edit, :update, :destroy]
 
       resources :environments, only: [] do
         member do

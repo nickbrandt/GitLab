@@ -46,14 +46,12 @@ module Gitlab
                 message: "should be one of: #{ALLOWED_WHEN.join(', ')}"
               }
 
-              validates :timeout, duration: { limit: ChronicDuration.output(Project::MAX_BUILD_TIMEOUT) }
-
               validates :dependencies, array_of_strings: true
               validates :extends, array_of_strings_or_string: true
               validates :rules, array_of_hashes: true
             end
 
-            validates :start_in, duration: { limit: '1 day' }, if: :delayed?
+            validates :start_in, duration: { limit: '1 week' }, if: :delayed?
             validates :start_in, absence: true, if: -> { has_rules? || !delayed? }
 
             validate do
@@ -103,6 +101,14 @@ module Gitlab
             description: 'Set jobs interruptible value.',
             inherit: true
 
+          entry :timeout, Entry::Timeout,
+            description: 'Timeout duration of this job.',
+            inherit: true
+
+          entry :retry, Entry::Retry,
+            description: 'Retry configuration for this job.',
+            inherit: true
+
           entry :only, Entry::Policy,
             description: 'Refs policy this job will be executed for.',
             default: Entry::Policy::DEFAULT_ONLY,
@@ -138,10 +144,6 @@ module Gitlab
 
           entry :coverage, Entry::Coverage,
             description: 'Coverage configuration for this job.',
-            inherit: false
-
-          entry :retry, Entry::Retry,
-            description: 'Retry configuration for this job.',
             inherit: false
 
           helpers :before_script, :script, :stage, :type, :after_script,

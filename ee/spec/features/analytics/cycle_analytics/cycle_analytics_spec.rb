@@ -33,9 +33,7 @@ describe 'Group Cycle Analytics', :js do
 
   context 'displays correct fields after group selection' do
     before do
-      dropdown = page.find('.dropdown-groups')
-      dropdown.click
-      dropdown.find('a').click
+      select_group
     end
 
     it 'hides the empty state' do
@@ -216,6 +214,10 @@ describe 'Group Cycle Analytics', :js do
   describe 'Customizable cycle analytics', :js do
     let(:button_class) { '.js-add-stage-button' }
 
+    def select_dropdown_option(name, elem = "option", index = 1)
+      page.find("select[name='#{name}']").all(elem)[index].select_option
+    end
+
     context 'enabled' do
       before do
         select_group
@@ -311,6 +313,86 @@ describe 'Group Cycle Analytics', :js do
 
               expect(page.find('.flash-alert')).to have_text("'#{name}' stage already exists")
             end
+          end
+        end
+      end
+
+      context 'Stage table' do
+        custom_stage = "Cool beans"
+        let(:params) { { name: custom_stage, start_event_identifier: :merge_request_created, end_event_identifier: :merge_request_merged } }
+        let(:first_default_stage) { page.find('.stage-nav-item-cell', text: "Issue").ancestor(".stage-nav-item") }
+        let(:first_custom_stage) { page.find('.stage-nav-item-cell', text: custom_stage).ancestor(".stage-nav-item") }
+
+        def create_custom_stage
+          Analytics::CycleAnalytics::Stages::CreateService.new(parent: group, params: params, current_user: user).execute
+        end
+
+        def toggle_more_options(stage)
+          stage.hover
+
+          stage.find(".more-actions-toggle").click
+        end
+
+        context 'default stages' do
+          before do
+            select_group
+
+            toggle_more_options(first_default_stage)
+          end
+
+          it 'can be hidden' do
+            expect(first_default_stage.find('.more-actions-dropdown')).to have_text "Hide stage"
+          end
+
+          it 'can not be edited' do
+            expect(first_default_stage.find('.more-actions-dropdown')).not_to have_text "Edit stage"
+          end
+
+          it 'can not be removed' do
+            expect(first_default_stage.find('.more-actions-dropdown')).not_to have_text "Remove stage"
+          end
+
+          it 'will not appear in the stage table after being hidden' do
+            nav = page.find('.stage-nav')
+            expect(nav).to have_text("Issue")
+
+            click_button "Hide stage"
+
+            expect(page.find('.flash-notice')).to have_text 'Stage data updated'
+            expect(nav).not_to have_text("Issue")
+          end
+        end
+
+        context 'custom stages' do
+          before do
+            create_custom_stage
+            select_group
+
+            expect(page).to have_text custom_stage
+
+            toggle_more_options(first_custom_stage)
+          end
+
+          it 'can not be hidden' do
+            expect(first_custom_stage.find('.more-actions-dropdown')).not_to have_text "Hide stage"
+          end
+
+          it 'can be edited' do
+            expect(first_custom_stage.find('.more-actions-dropdown')).to have_text "Edit stage"
+          end
+
+          it 'can be removed' do
+            expect(first_custom_stage.find('.more-actions-dropdown')).to have_text "Remove stage"
+          end
+
+          it 'will not appear in the stage table after being removed' do
+            nav = page.find('.stage-nav')
+            expect(nav).to have_text(custom_stage)
+
+            click_button "Remove stage"
+
+            expect(page.find('.flash-notice')).to have_text 'Stage removed'
+            expect(nav).not_to have_text(custom_stage)
           end
         end
       end

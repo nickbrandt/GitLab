@@ -4,6 +4,11 @@ module Projects
   module Security
     class LicensesController < Projects::ApplicationController
       before_action :authorize_read_licenses_list!
+      before_action :authorize_admin_software_license_policy!, only: [:create]
+
+      before_action do
+        push_frontend_feature_flag(:licenses_list)
+      end
 
       def index
         respond_to do |format|
@@ -19,6 +24,18 @@ module Projects
         end
       end
 
+      def create
+        result = ::Projects::Licenses::CreatePolicyService
+          .new(project, current_user, software_license_policy_params)
+          .execute
+
+        if result[:status] == :success
+          render json: LicenseEntity.represent(result[:software_license_policy]), status: :created
+        else
+          render_error_for(result)
+        end
+      end
+
       private
 
       def serializer
@@ -28,6 +45,14 @@ module Projects
 
       def pageable(items)
         ::Gitlab::ItemsCollection.new(items)
+      end
+
+      def software_license_policy_params
+        params.require(:software_license_policy).permit(:software_license_id, :spdx_identifier, :classification)
+      end
+
+      def render_error_for(result)
+        render json: { errors: result[:message].as_json }, status: result.fetch(:http_status, :unprocessable_entity)
       end
     end
   end

@@ -10,6 +10,7 @@ module EE
       issue_link
       approvers
       vulnerability_feedback
+      vulnerability
       license_management
       feature_flag
       feature_flags_client
@@ -149,6 +150,8 @@ module EE
 
       rule { can?(:public_access) }.enable :read_package
 
+      rule { can?(:read_project) & can?(:read_build) }.enable :read_security_findings
+
       rule { can?(:developer_access) }.policy do
         enable :read_project_security_dashboard
       end
@@ -160,8 +163,7 @@ module EE
       rule { can?(:read_project_security_dashboard) & can?(:developer_access) }.policy do
         enable :read_vulnerability
         enable :create_vulnerability
-        enable :resolve_vulnerability
-        enable :dismiss_vulnerability
+        enable :admin_vulnerability
       end
 
       rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback

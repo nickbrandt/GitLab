@@ -28,9 +28,10 @@ const mockItem = Object.assign({}, mockIssue1, {
   assignees: epicUtils.extractIssueAssignees(mockIssue1.assignees),
 });
 
+const localVue = createLocalVue();
+
 const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   const store = createDefaultStore();
-  const localVue = createLocalVue();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
   store.dispatch('setInitialParentItem', mockParentItem);
@@ -295,6 +296,10 @@ describe('RelatedItemsTree', () => {
     describe('template', () => {
       it('renders item body element without class `item-logged-out` when user is signed in', () => {
         expect(wrapper.find('.item-body').classes()).not.toContain('item-logged-out');
+      });
+
+      it('renders item body element without class `item-closed` when item state is opened', () => {
+        expect(wrapper.find('.item-body').classes()).not.toContain('item-closed');
       });
 
       it('renders item state icon for large screens', () => {

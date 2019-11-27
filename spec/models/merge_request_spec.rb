@@ -115,8 +115,24 @@ describe MergeRequest do
     let(:multiline_commits) { subject.commits.select(&is_multiline) }
     let(:singleline_commits) { subject.commits.reject(&is_multiline) }
 
-    it 'returns the oldest multiline commit message' do
-      expect(subject.default_squash_commit_message).to eq(multiline_commits.last.message)
+    context 'when the total number of commits is safe' do
+      it 'returns the oldest multiline commit message' do
+        expect(subject.default_squash_commit_message).to eq(multiline_commits.last.message)
+      end
+    end
+
+    context 'when the total number of commits is big' do
+      let(:safe_number) { 20 }
+
+      before do
+        stub_const('MergeRequestDiff::COMMITS_SAFE_SIZE', safe_number)
+      end
+
+      it 'returns the oldest multiline commit message from safe number of commits' do
+        expect(subject.default_squash_commit_message).to eq(
+          "remove emtpy file.(beacase git ignore empty file)\nadd whitespace test file.\n"
+        )
+      end
     end
 
     it 'returns the merge request title if there are no multiline commits' do
@@ -1421,183 +1437,6 @@ describe MergeRequest do
         allow(merge_request).to receive(:has_no_commits?) { true }
 
         expect(merge_request.has_ci?).to be(false)
-      end
-    end
-  end
-
-  describe '#all_pipelines' do
-    shared_examples 'returning pipelines with proper ordering' do
-      let!(:all_pipelines) do
-        subject.all_commit_shas.map do |sha|
-          create(:ci_empty_pipeline,
-                 project: subject.source_project,
-                 sha: sha,
-                 ref: subject.source_branch)
-        end
-      end
-
-      it 'returns all pipelines' do
-        expect(subject.all_pipelines).not_to be_empty
-        expect(subject.all_pipelines).to eq(all_pipelines.reverse)
-      end
-    end
-
-    context 'with single merge_request_diffs' do
-      it_behaves_like 'returning pipelines with proper ordering'
-    end
-
-    context 'with multiple irrelevant merge_request_diffs' do
-      before do
-        subject.update(target_branch: 'v1.0.0')
-      end
-
-      it_behaves_like 'returning pipelines with proper ordering'
-    end
-
-    context 'with unsaved merge request' do
-      subject { build(:merge_request) }
-
-      let!(:pipeline) do
-        create(:ci_empty_pipeline,
-               project: subject.project,
-               sha: subject.diff_head_sha,
-               ref: subject.source_branch)
-      end
-
-      it 'returns pipelines from diff_head_sha' do
-        expect(subject.all_pipelines).to contain_exactly(pipeline)
-      end
-    end
-
-    context 'when pipelines exist for the branch and merge request' do
-      let(:source_ref) { 'feature' }
-      let(:target_ref) { 'master' }
-
-      let!(:branch_pipeline) do
-        create(:ci_pipeline,
-               source: :push,
-               project: project,
-               ref: source_ref,
-               sha: shas.second)
-      end
-
-      let!(:detached_merge_request_pipeline) do
-        create(:ci_pipeline,
-               source: :merge_request_event,
-               project: project,
-               ref: source_ref,
-               sha: shas.second,
-               merge_request: merge_request)
-      end
-
-      let(:merge_request) do
-        create(:merge_request,
-               source_project: project,
-               source_branch: source_ref,
-               target_project: project,
-               target_branch: target_ref)
-      end
-
-      let(:project) { create(:project, :repository) }
-      let(:shas) { project.repository.commits(source_ref, limit: 2).map(&:id) }
-
-      before do
-        allow(merge_request).to receive(:all_commit_shas) { shas }
-      end
-
-      it 'returns merge request pipeline first' do
-        expect(merge_request.all_pipelines)
-          .to eq([detached_merge_request_pipeline,
-                  branch_pipeline])
-      end
-
-      context 'when there are a branch pipeline and a merge request pipeline' do
-        let!(:branch_pipeline_2) do
-          create(:ci_pipeline,
-                 source: :push,
-                 project: project,
-                 ref: source_ref,
-                 sha: shas.first)
-        end
-
-        let!(:detached_merge_request_pipeline_2) do
-          create(:ci_pipeline,
-                 source: :merge_request_event,
-                 project: project,
-                 ref: source_ref,
-                 sha: shas.first,
-                 merge_request: merge_request)
-        end
-
-        it 'returns merge request pipelines first' do
-          expect(merge_request.all_pipelines)
-            .to eq([detached_merge_request_pipeline_2,
-                    detached_merge_request_pipeline,
-                    branch_pipeline_2,
-                    branch_pipeline])
-        end
-      end
-
-      context 'when there are multiple merge request pipelines from the same branch' do
-        let!(:branch_pipeline_2) do
-          create(:ci_pipeline,
-                 source: :push,
-                 project: project,
-                 ref: source_ref,
-                 sha: shas.first)
-        end
-
-        let!(:detached_merge_request_pipeline_2) do
-          create(:ci_pipeline,
-                 source: :merge_request_event,
-                 project: project,
-                 ref: source_ref,
-                 sha: shas.first,
-                 merge_request: merge_request_2)
-        end
-
-        let(:merge_request_2) do
-          create(:merge_request,
-                 source_project: project,
-                 source_branch: source_ref,
-                 target_project: project,
-                 target_branch: 'stable')
-        end
-
-        before do
-          allow(merge_request_2).to receive(:all_commit_shas) { shas }
-        end
-
-        it 'returns only related merge request pipelines' do
-          expect(merge_request.all_pipelines)
-            .to eq([detached_merge_request_pipeline,
-                    branch_pipeline_2,
-                    branch_pipeline])
-
-          expect(merge_request_2.all_pipelines)
-            .to eq([detached_merge_request_pipeline_2,
-                    branch_pipeline_2,
-                    branch_pipeline])
-        end
-      end
-
-      context 'when detached merge request pipeline is run on head ref of the merge request' do
-        let!(:detached_merge_request_pipeline) do
-          create(:ci_pipeline,
-                 source: :merge_request_event,
-                 project: project,
-                 ref: merge_request.ref_path,
-                 sha: shas.second,
-                 merge_request: merge_request)
-        end
-
-        it 'sets the head ref of the merge request to the pipeline ref' do
-          expect(detached_merge_request_pipeline.ref).to match(%r{refs/merge-requests/\d+/head})
-        end
-
-        it 'includes the detached merge request pipeline even though the ref is custom path' do
-          expect(merge_request.all_pipelines).to include(detached_merge_request_pipeline)
-        end
       end
     end
   end
@@ -3292,36 +3131,6 @@ describe MergeRequest do
                                    .and_return(true)
 
       expect(merge_request.collaborative_push_possible?).to be_falsy
-    end
-  end
-
-  describe '#includes_any_commits?' do
-    it 'returns false' do
-      expect(subject.includes_any_commits?([])).to be_falsey
-    end
-
-    it 'returns false' do
-      expect(subject.includes_any_commits?([Gitlab::Git::BLANK_SHA])).to be_falsey
-    end
-
-    it 'returns true' do
-      expect(subject.includes_any_commits?([subject.merge_request_diff.head_commit_sha])).to be_truthy
-    end
-
-    it 'returns true even when there is a non-existent comit' do
-      expect(subject.includes_any_commits?([Gitlab::Git::BLANK_SHA, subject.merge_request_diff.head_commit_sha])).to be_truthy
-    end
-
-    context 'unpersisted merge request' do
-      let(:new_mr) { build(:merge_request) }
-
-      it 'returns false' do
-        expect(new_mr.includes_any_commits?([Gitlab::Git::BLANK_SHA])).to be_falsey
-      end
-
-      it 'returns true' do
-        expect(new_mr.includes_any_commits?([subject.merge_request_diff.head_commit_sha])).to be_truthy
-      end
     end
   end
 

@@ -19,9 +19,8 @@ export default {
     state.childrenFlags[state.parentItem.reference] = {};
   },
 
-  [types.SET_CHILDREN_COUNT](state, { epicsCount, issuesCount }) {
-    state.epicsCount = epicsCount;
-    state.issuesCount = issuesCount;
+  [types.SET_CHILDREN_COUNT](state, data) {
+    state.descendantCounts = data;
   },
 
   [types.SET_ITEM_CHILDREN](state, { parentItem, children, append }) {
@@ -148,6 +147,9 @@ export default {
     state.pendingReferences = state.pendingReferences.filter(
       (ref, index) => index !== indexToRemove,
     );
+    if (state.pendingReferences.length === 0) {
+      state.itemAddFailure = false;
+    }
   },
 
   [types.SET_ITEM_INPUT_VALUE](state, itemInputValue) {
@@ -162,8 +164,12 @@ export default {
     state.itemAddInProgress = false;
     state.itemsFetchResultEmpty = false;
   },
-  [types.RECEIVE_ADD_ITEM_FAILURE](state) {
+  [types.RECEIVE_ADD_ITEM_FAILURE](state, { itemAddFailureType }) {
     state.itemAddInProgress = false;
+    state.itemAddFailure = true;
+    if (itemAddFailureType) {
+      state.itemAddFailureType = itemAddFailureType;
+    }
   },
 
   [types.REQUEST_CREATE_ITEM](state) {

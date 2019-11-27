@@ -1,10 +1,10 @@
 <script>
-import { __, s__, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import { ApolloMutation } from 'vue-apollo';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import destroyDesignMutation from '../graphql/mutations/destroyDesign.mutation.graphql';
-import { updateStoreAfterDesignsDelete } from '../utils/design_management_utils';
+import { updateStoreAfterDesignsDelete } from '../utils/cache_update';
+import { designDeletionError } from '../utils/error_messages';
 
 export default {
   components: {
@@ -34,12 +34,8 @@ export default {
   },
   methods: {
     onError() {
-      const design = this.filenames.length > 1 ? __('designs') : __('a design');
-      createFlash(
-        sprintf(s__('DesignManagement|We could not delete %{design}. Please try again.'), {
-          design,
-        }),
-      );
+      const errorMessage = designDeletionError(this.filenames.length === 1);
+      createFlash(errorMessage);
     },
     updateStoreAfterDelete(
       store,

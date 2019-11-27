@@ -9,9 +9,6 @@ module EE
         before_action :authorize_read_pod_logs!, only: [:k8s_pod_logs, :logs]
         before_action :environment_ee, only: [:k8s_pod_logs, :logs]
         before_action :authorize_create_environment_terminal!, only: [:terminal]
-        before_action do
-          push_frontend_feature_flag(:environment_logs_use_vue_ui)
-        end
       end
 
       def logs_redirect

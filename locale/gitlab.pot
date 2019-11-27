@@ -374,6 +374,9 @@ msgstr[1] ""
 msgid "%{tabname} changed"
 msgstr ""
 
+msgid "%{tag}-evidence.json"
+msgstr ""
+
 msgid "%{template_project_id} is unknown or invalid"
 msgstr ""
 
@@ -1780,6 +1783,15 @@ msgstr ""
 msgid "Analytics"
 msgstr ""
 
+msgid "Analyze a review version of your web application."
+msgstr ""
+
+msgid "Analyze your dependencies for known vulnerabilities"
+msgstr ""
+
+msgid "Analyze your source code for known vulnerabilities"
+msgstr ""
+
 msgid "Ancestors"
 msgstr ""
 
@@ -2179,6 +2191,18 @@ msgstr ""
 msgid "Audit Events is a way to keep track of important events that happened in GitLab."
 msgstr ""
 
+msgid "AuditEvents|(removed)"
+msgstr ""
+
+msgid "AuditEvents|Action"
+msgstr ""
+
+msgid "AuditEvents|At"
+msgstr ""
+
+msgid "AuditEvents|Target"
+msgstr ""
+
 msgid "Aug"
 msgstr ""
 
@@ -2371,6 +2395,9 @@ msgstr ""
 msgid "Badges|Link"
 msgstr ""
 
+msgid "Badges|Name"
+msgstr ""
+
 msgid "Badges|No badge image"
 msgstr ""
 
@@ -2503,10 +2530,10 @@ msgstr ""
 msgid "BillingPlans|To manage the plan for this group, visit the billing section of %{parent_billing_page_link}."
 msgstr ""
 
-msgid "BillingPlans|Your GitLab.com Gold trial expired on %{expiration_date}. You can restore access to the Gold features at any time by upgrading below."
+msgid "BillingPlans|Your GitLab.com %{plan} trial will <strong>expire after %{expiration_date}</strong>. You can retain access to the %{plan} features by upgrading below."
 msgstr ""
 
-msgid "BillingPlans|Your GitLab.com Gold trial will <strong>expire after %{expiration_date}</strong>. You can retain access to the Gold features by upgrading below."
+msgid "BillingPlans|Your GitLab.com trial expired on %{expiration_date}. You can restore access to the features at any time by upgrading below."
 msgstr ""
 
 msgid "BillingPlans|billed annually at %{price_per_year}"
@@ -3100,6 +3127,9 @@ msgstr ""
 msgid "Check your .gitlab-ci.yml"
 msgstr ""
 
+msgid "Check your Docker images for known vulnerabilities"
+msgstr ""
+
 msgid "Checking %{text} availability…"
 msgstr ""
 
@@ -3439,6 +3469,9 @@ msgstr ""
 msgid "Cluster Health"
 msgstr ""
 
+msgid "Cluster cache cleared."
+msgstr ""
+
 msgid "ClusterIntegration| %{custom_domain_start}More information%{custom_domain_end}."
 msgstr ""
 
@@ -3571,6 +3604,12 @@ msgstr ""
 msgid "ClusterIntegration|Choose which of your environments will use this cluster."
 msgstr ""
 
+msgid "ClusterIntegration|Clear cluster cache"
+msgstr ""
+
+msgid "ClusterIntegration|Clear the local cache of namespace and service accounts. This is necessary if your integration has become out of sync. The cache is repopulated during the next CI job that requires namespace and service accounts."
+msgstr ""
+
 msgid "ClusterIntegration|Cloud Run"
 msgstr ""
 
@@ -3659,6 +3698,9 @@ msgid "ClusterIntegration|Crossplane enables declarative provisioning of managed
 msgstr ""
 
 msgid "ClusterIntegration|Did you know?"
+msgstr ""
+
+msgid "ClusterIntegration|Elastic Kubernetes Service"
 msgstr ""
 
 msgid "ClusterIntegration|Elastic Stack"
@@ -3892,7 +3934,7 @@ msgstr ""
 msgid "ClusterIntegration|Make sure your account %{link_to_requirements} to create Kubernetes clusters"
 msgstr ""
 
-msgid "ClusterIntegration|Manage your Kubernetes cluster by visiting %{link_gke}"
+msgid "ClusterIntegration|Manage your Kubernetes cluster by visiting %{provider_link}"
 msgstr ""
 
 msgid "ClusterIntegration|No IAM Roles found"
@@ -4536,6 +4578,9 @@ msgstr ""
 msgid "Container Registry"
 msgstr ""
 
+msgid "Container Scanning"
+msgstr ""
+
 msgid "Container registry images"
 msgstr ""
 
@@ -4560,6 +4605,9 @@ msgstr ""
 msgid "ContainerRegistry|If you are not already logged in, you need to authenticate to the Container Registry by using your GitLab username and password. If you have %{twofaDocLinkStart}Two-Factor Authentication%{twofaDocLinkEnd} enabled, use a %{personalAccessTokensDocLinkStart}Personal Access Token%{personalAccessTokensDocLinkEnd} instead of a password."
 msgstr ""
 
+msgid "ContainerRegistry|Image ID"
+msgstr ""
+
 msgid "ContainerRegistry|Last Updated"
 msgstr ""
 
@@ -4581,9 +4629,6 @@ msgid "ContainerRegistry|Size"
 msgstr ""
 
 msgid "ContainerRegistry|Tag"
-msgstr ""
-
-msgid "ContainerRegistry|Tag ID"
 msgstr ""
 
 msgid "ContainerRegistry|The last tag related to this image was recently removed. This empty image and any associated data will be automatically removed as part of the regular Garbage Collection process. If you have any questions, contact your administrator."
@@ -5221,12 +5266,13 @@ msgid_plural "CycleAnalytics|%d projects selected"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "CycleAnalytics|%{stageName}"
-msgid_plural "CycleAnalytics|%d stages selected"
-msgstr[0] ""
-msgstr[1] ""
+msgid "CycleAnalytics|%{stageCount} stages selected"
+msgstr ""
 
 msgid "CycleAnalytics|All stages"
+msgstr ""
+
+msgid "CycleAnalytics|No stages selected"
 msgstr ""
 
 msgid "CycleAnalytics|Stages"
@@ -5512,6 +5558,9 @@ msgstr ""
 msgid "Dependency Proxy"
 msgstr ""
 
+msgid "Dependency Scanning"
+msgstr ""
+
 msgid "Dependency proxy"
 msgstr ""
 
@@ -5680,9 +5729,6 @@ msgstr ""
 msgid "Deployed"
 msgstr ""
 
-msgid "Deployed %{deployedSince}"
-msgstr ""
-
 msgid "Deployed to"
 msgstr ""
 
@@ -5737,7 +5783,13 @@ msgstr ""
 msgid "Deselect all"
 msgstr ""
 
+msgid "Design Management"
+msgstr ""
+
 msgid "Design Management files and data"
+msgstr ""
+
+msgid "Design Sync Not Enabled"
 msgstr ""
 
 msgid "DesignManagement|%{current_design} of %{designs_count}"
@@ -5749,16 +5801,13 @@ msgstr ""
 msgid "DesignManagement|Adding a design with the same filename replaces the file in a new version."
 msgstr ""
 
-msgid "DesignManagement|An error occurred while loading designs. Please try again."
-msgstr ""
-
 msgid "DesignManagement|Are you sure you want to delete the selected designs?"
 msgstr ""
 
 msgid "DesignManagement|Could not add a new comment. Please try again"
 msgstr ""
 
-msgid "DesignManagement|Could not create new discussion, please try again."
+msgid "DesignManagement|Could not create new discussion. Please try again."
 msgstr ""
 
 msgid "DesignManagement|Could not find design, please try again."
@@ -5809,10 +5858,10 @@ msgstr ""
 msgid "DesignManagement|We could not delete %{design}. Please try again."
 msgstr ""
 
-msgid "DesignManagement|We could not delete design(s). Please try again."
+msgid "Designs"
 msgstr ""
 
-msgid "Designs"
+msgid "Designs coming soon."
 msgstr ""
 
 msgid "Destroy"
@@ -6022,6 +6071,9 @@ msgstr ""
 msgid "Download codes"
 msgstr ""
 
+msgid "Download evidence JSON"
+msgstr ""
+
 msgid "Download export"
 msgstr ""
 
@@ -6059,6 +6111,9 @@ msgid "Duration"
 msgstr ""
 
 msgid "During this process, you’ll be asked for URLs from GitLab’s side. Use the URLs shown below."
+msgstr ""
+
+msgid "Dynamic Application Security Testing (DAST)"
 msgstr ""
 
 msgid "Each Runner can be in one of the following states:"
@@ -6397,6 +6452,9 @@ msgstr ""
 msgid "Enter merge request URLs"
 msgstr ""
 
+msgid "Enter new AWS Secret Access Key"
+msgstr ""
+
 msgid "Enter the issue description"
 msgstr ""
 
@@ -6445,6 +6503,9 @@ msgstr ""
 msgid "Environments allow you to track deployments of your application %{link_to_read_more}."
 msgstr ""
 
+msgid "Environments in %{name}"
+msgstr ""
+
 msgid "EnvironmentsDashboard|Add a project to the dashboard"
 msgstr ""
 
@@ -6467,15 +6528,6 @@ msgid "EnvironmentsDashboard|The environments dashboard provides a summary of ea
 msgstr ""
 
 msgid "Environments|An error occurred while fetching the environments."
-msgstr ""
-
-msgid "Environments|An error occurred while fetching the logs"
-msgstr ""
-
-msgid "Environments|An error occurred while fetching the logs - Error: %{message}"
-msgstr ""
-
-msgid "Environments|An error occurred while fetching the logs for this environment or pod. Please try again"
 msgstr ""
 
 msgid "Environments|An error occurred while making the request."
@@ -6605,6 +6657,9 @@ msgid "Environments|protected"
 msgstr ""
 
 msgid "Epic"
+msgstr ""
+
+msgid "Epic cannot be found."
 msgstr ""
 
 msgid "Epic events"
@@ -6880,6 +6935,9 @@ msgstr ""
 msgid "Estimated"
 msgstr ""
 
+msgid "Event Actions"
+msgstr ""
+
 msgid "EventFilterBy|Filter by all"
 msgstr ""
 
@@ -6902,6 +6960,9 @@ msgid "EventFilterBy|Filter by team"
 msgstr ""
 
 msgid "Events"
+msgstr ""
+
+msgid "Events: %{count}"
 msgstr ""
 
 msgid "Every %{action} attempt has failed: %{job_error_message}. Please try again."
@@ -6941,6 +7002,9 @@ msgid "Everything you need to create a GitLab Pages site using Jekyll."
 msgstr ""
 
 msgid "Everything you need to create a GitLab Pages site using plain HTML."
+msgstr ""
+
+msgid "Evidence collection"
 msgstr ""
 
 msgid "Example: @sub\\.company\\.com$"
@@ -7112,9 +7176,6 @@ msgid "Failed to change the owner"
 msgstr ""
 
 msgid "Failed to check related branches."
-msgstr ""
-
-msgid "Failed to connect to the prometheus server"
 msgstr ""
 
 msgid "Failed to create Merge Request. Please try again."
@@ -7560,6 +7621,9 @@ msgstr ""
 msgid "First seen"
 msgstr ""
 
+msgid "First seen: %{first_seen}"
+msgstr ""
+
 msgid "Fixed date"
 msgstr ""
 
@@ -7591,6 +7655,9 @@ msgid "FogBugz URL"
 msgstr ""
 
 msgid "FogBugz import"
+msgstr ""
+
+msgid "Folder/%{name}"
 msgstr ""
 
 msgid "Follow the steps below to export your Google Code project data."
@@ -7641,7 +7708,7 @@ msgstr ""
 msgid "ForkedFromProjectPath|Forked from"
 msgstr ""
 
-msgid "ForkedFromProjectPath|Forked from %{project_name} (deleted)"
+msgid "ForkedFromProjectPath|Forked from an inaccessible project"
 msgstr ""
 
 msgid "Forking in progress"
@@ -7749,7 +7816,16 @@ msgstr ""
 msgid "Geo"
 msgstr ""
 
+msgid "Geo Designs"
+msgstr ""
+
 msgid "Geo Nodes"
+msgstr ""
+
+msgid "Geo Settings"
+msgstr ""
+
+msgid "Geo Troubleshooting"
 msgstr ""
 
 msgid "Geo allows you to replicate your GitLab instance to other geographical locations."
@@ -8200,9 +8276,6 @@ msgid "GitLab CI Linter has been moved"
 msgstr ""
 
 msgid "GitLab Enterprise Edition %{plan}"
-msgstr ""
-
-msgid "GitLab Geo"
 msgstr ""
 
 msgid "GitLab Group Runners can execute code for all the projects in this group."
@@ -9167,6 +9240,9 @@ msgstr ""
 msgid "If using GitHub, you’ll see pipeline statuses on GitHub for your commits and pull requests. %{more_info_link}"
 msgstr ""
 
+msgid "If you believe this page to be an error, check out the links below for more information."
+msgstr ""
+
 msgid "If you lose your recovery codes you can generate new ones, invalidating all previous codes."
 msgstr ""
 
@@ -9553,6 +9629,9 @@ msgstr ""
 msgid "IssuableStatus|moved"
 msgstr ""
 
+msgid "IssuableStatus|promoted"
+msgstr ""
+
 msgid "Issue"
 msgstr ""
 
@@ -9560,6 +9639,9 @@ msgid "Issue Boards"
 msgstr ""
 
 msgid "Issue board focus mode"
+msgstr ""
+
+msgid "Issue cannot be found."
 msgstr ""
 
 msgid "Issue events"
@@ -9996,6 +10078,9 @@ msgstr ""
 msgid "Last seen"
 msgstr ""
 
+msgid "Last seen: %{last_seen}"
+msgstr ""
+
 msgid "Last successful update"
 msgstr ""
 
@@ -10276,6 +10361,9 @@ msgstr ""
 msgid "List"
 msgstr ""
 
+msgid "List Settings"
+msgstr ""
+
 msgid "List Your Gitea Repositories"
 msgstr ""
 
@@ -10373,6 +10461,9 @@ msgid "Logs"
 msgstr ""
 
 msgid "Logs|To see the pod logs, deploy your code to an environment."
+msgstr ""
+
+msgid "MB"
 msgstr ""
 
 msgid "MD5"
@@ -12151,6 +12242,9 @@ msgstr ""
 msgid "Performance optimization"
 msgstr ""
 
+msgid "PerformanceBar|Download"
+msgstr ""
+
 msgid "PerformanceBar|Gitaly calls"
 msgstr ""
 
@@ -12218,6 +12312,9 @@ msgid "Pipeline minutes quota"
 msgstr ""
 
 msgid "Pipeline quota"
+msgstr ""
+
+msgid "Pipeline subscriptions"
 msgstr ""
 
 msgid "Pipeline triggers"
@@ -13207,6 +13304,9 @@ msgstr ""
 msgid "Project overview"
 msgstr ""
 
+msgid "Project path"
+msgstr ""
+
 msgid "Project slug"
 msgstr ""
 
@@ -13286,6 +13386,12 @@ msgid "ProjectService|%{service_title}: status off"
 msgstr ""
 
 msgid "ProjectService|%{service_title}: status on"
+msgstr ""
+
+msgid "ProjectService|Comment"
+msgstr ""
+
+msgid "ProjectService|Comment will be posted on each event"
 msgstr ""
 
 msgid "ProjectService|Integrations"
@@ -15017,6 +15123,9 @@ msgstr ""
 msgid "Search users or groups"
 msgstr ""
 
+msgid "Search your project dependencies for their licenses and apply policies"
+msgstr ""
+
 msgid "Search your projects"
 msgstr ""
 
@@ -15133,6 +15242,9 @@ msgid "Security"
 msgstr ""
 
 msgid "Security & Compliance"
+msgstr ""
+
+msgid "Security Configuration"
 msgstr ""
 
 msgid "Security Dashboard"
@@ -15270,7 +15382,7 @@ msgstr ""
 msgid "SecurityDashboard|More information"
 msgstr ""
 
-msgid "SecurityDashboard|Pipeline %{pipelineLink} triggered"
+msgid "SecurityDashboard|Pipeline %{pipelineLink} triggered %{timeago} by %{user}"
 msgstr ""
 
 msgid "SecurityDashboard|Project"
@@ -15450,6 +15562,9 @@ msgstr ""
 msgid "Sentry event"
 msgstr ""
 
+msgid "Sentry event: %{external_url}"
+msgstr ""
+
 msgid "Sep"
 msgstr ""
 
@@ -15544,6 +15659,9 @@ msgid "Service"
 msgstr ""
 
 msgid "Service Desk"
+msgstr ""
+
+msgid "Service Desk is enabled but not yet active"
 msgstr ""
 
 msgid "Service Templates"
@@ -15646,6 +15764,9 @@ msgid "Set up new U2F device"
 msgstr ""
 
 msgid "Set up new password"
+msgstr ""
+
+msgid "Set up pipeline subscriptions for this project."
 msgstr ""
 
 msgid "Set up your project to automatically push and/or pull changes to/from another repository. Branches, tags, and commits will be synced automatically."
@@ -15827,9 +15948,6 @@ msgstr ""
 msgid "Sign in via 2FA code"
 msgstr ""
 
-msgid "Sign in with Google"
-msgstr ""
-
 msgid "Sign in with Single Sign-On"
 msgstr ""
 
@@ -15960,6 +16078,9 @@ msgid "Snowplow"
 msgstr ""
 
 msgid "Some email servers do not support overriding the email sender name. Enable this option to include the name of the author of the issue, merge request or comment in the email body instead."
+msgstr ""
+
+msgid "Some of your epics may not be visible. A roadmap is limited to the first 1,000 epics, in your selected sort order."
 msgstr ""
 
 msgid "Someone edited the issue at the same time you did. Please check out %{linkStart}the issue%{linkEnd} and make sure your changes will not unintentionally remove theirs."
@@ -16346,6 +16467,12 @@ msgstr ""
 msgid "Stage changes"
 msgstr ""
 
+msgid "Stage data updated"
+msgstr ""
+
+msgid "Stage removed"
+msgstr ""
+
 msgid "Staged"
 msgstr ""
 
@@ -16467,6 +16594,9 @@ msgid "Starts at (UTC)"
 msgstr ""
 
 msgid "State your message to activate"
+msgstr ""
+
+msgid "Static Application Security Testing (SAST)"
 msgstr ""
 
 msgid "Statistics"
@@ -16656,6 +16786,12 @@ msgid "SubscriptionTable|Usage"
 msgstr ""
 
 msgid "SubscriptionTable|Usage count is performed once a day at 12:00 PM."
+msgstr ""
+
+msgid "Subscriptions"
+msgstr ""
+
+msgid "Subscriptions allow successfully completed pipelines on the %{default_branch_docs} of the subscribed project to trigger a new pipeline on thee default branch of this project."
 msgstr ""
 
 msgid "Subtracted"
@@ -17392,6 +17528,9 @@ msgstr ""
 msgid "There are no unstaged changes"
 msgstr ""
 
+msgid "There is a limit of 100 subscriptions from or to a project."
+msgstr ""
+
 msgid "There is already a repository with that name on disk"
 msgstr ""
 
@@ -17434,6 +17573,9 @@ msgstr ""
 msgid "There was an error fetching label data for the selected group"
 msgstr ""
 
+msgid "There was an error fetching the Designs"
+msgstr ""
+
 msgid "There was an error gathering the chart data"
 msgstr ""
 
@@ -17441,6 +17583,9 @@ msgid "There was an error loading users activity calendar."
 msgstr ""
 
 msgid "There was an error removing the e-mail."
+msgstr ""
+
+msgid "There was an error removing your custom stage, please try again"
 msgstr ""
 
 msgid "There was an error resetting group pipeline minutes."
@@ -17573,6 +17718,9 @@ msgid "This domain is not verified. You will need to verify ownership before acc
 msgstr ""
 
 msgid "This environment has no deployments yet."
+msgstr ""
+
+msgid "This epic already has the maximum number of child epics."
 msgstr ""
 
 msgid "This epic does not exist or you don't have sufficient permission."
@@ -17788,7 +17936,10 @@ msgstr ""
 msgid "This will redirect you to an external sign in page."
 msgstr ""
 
-msgid "This will remove the fork relationship to source project"
+msgid "This will remove the fork relationship between this project and %{fork_source}."
+msgstr ""
+
+msgid "This will remove the fork relationship between this project and other projects in the fork network."
 msgstr ""
 
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."
@@ -18308,6 +18459,9 @@ msgstr ""
 msgid "Trending"
 msgstr ""
 
+msgid "Trigger"
+msgstr ""
+
 msgid "Trigger pipelines for mirror updates"
 msgstr ""
 
@@ -18335,7 +18489,7 @@ msgstr ""
 msgid "Triggerer"
 msgstr ""
 
-msgid "Triggers can force a specific branch or tag to get rebuilt with an API call.  These tokens will impersonate their associated user including their access to projects and their project permissions."
+msgid "Triggers can force a specific branch or tag to get rebuilt with an API call. These tokens will impersonate their associated user including their access to projects and their project permissions."
 msgstr ""
 
 msgid "Troubleshoot and monitor your application with tracing"
@@ -19115,6 +19269,9 @@ msgstr ""
 msgid "Users with a Guest role or those who don't belong to any projects or groups don't count towards seats in use."
 msgstr ""
 
+msgid "Users: %{user_count}"
+msgstr ""
+
 msgid "UsersSelect|%{name} + %{length} more"
 msgstr ""
 
@@ -19294,13 +19451,10 @@ msgstr ""
 msgid "VisualReviewApp|%{stepStart}Step 2%{stepEnd}. Add it to the %{headTags} tags of every page of your application, ensuring the merge request ID is set or not set as required. "
 msgstr ""
 
-msgid "VisualReviewApp|%{stepStart}Step 3%{stepEnd}. Open the Review App and provide a %{linkStart}personal access token%{linkEnd}."
+msgid "VisualReviewApp|%{stepStart}Step 3%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}%{mrId}%{stepStart}."
 msgstr ""
 
-msgid "VisualReviewApp|%{stepStart}Step 4%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}%{mrId}%{stepStart}."
-msgstr ""
-
-msgid "VisualReviewApp|%{stepStart}Step 5%{stepEnd}. Leave feedback in the Review App."
+msgid "VisualReviewApp|%{stepStart}Step 4%{stepEnd}. Leave feedback in the Review App."
 msgstr ""
 
 msgid "VisualReviewApp|Copy merge request ID"
@@ -19382,12 +19536,6 @@ msgid "Waiting for performance data"
 msgstr ""
 
 msgid "Want to see the data? Please ask an administrator for access."
-msgstr ""
-
-msgid "We can't find an epic that matches what you are looking for."
-msgstr ""
-
-msgid "We can't find an issue that matches what you are looking for."
 msgstr ""
 
 msgid "We could not determine the path to remove the epic"
@@ -19710,7 +19858,7 @@ msgstr ""
 msgid "You are going to remove %{project_full_name}. Removed project CANNOT be restored! Are you ABSOLUTELY sure?"
 msgstr ""
 
-msgid "You are going to remove the fork relationship to source project %{forked_from_project}. Are you ABSOLUTELY sure?"
+msgid "You are going to remove the fork relationship from %{project_full_name}. Are you ABSOLUTELY sure?"
 msgstr ""
 
 msgid "You are going to transfer %{project_full_name} to another owner. Are you ABSOLUTELY sure?"
@@ -19939,6 +20087,9 @@ msgid "You must provide your current password in order to change it."
 msgstr ""
 
 msgid "You must select a stack for configuring your cloud provider. Learn more about"
+msgstr ""
+
+msgid "You must set up incoming email before it becomes active."
 msgstr ""
 
 msgid "You need a different license to enable FileLocks feature"
@@ -20560,6 +20711,9 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "default branch"
+msgstr ""
+
 msgid "deleted"
 msgstr ""
 
@@ -21107,9 +21261,6 @@ msgid "nounSeries|%{item}, and %{lastItem}"
 msgstr ""
 
 msgid "opened %{timeAgoString} by %{user}"
-msgstr ""
-
-msgid "or %{link_start}create a new Google account%{link_end}"
 msgstr ""
 
 msgid "out of %d total test"

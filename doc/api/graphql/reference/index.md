@@ -375,6 +375,14 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `createDesign` | Boolean! | Whether or not a user can perform `create_design` on this resource |
 | `destroyDesign` | Boolean! | Whether or not a user can perform `destroy_design` on this resource |
 
+### IssueSetDueDatePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `issue` | Issue | The issue after mutation |
+
 ### Label
 
 | Name  | Type  | Description |
@@ -776,6 +784,22 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `clientMutationId` | String | A unique identifier for the client performing the mutation. |
 | `errors` | String! => Array | Reasons why the mutation failed. |
 | `todo` | Todo! | The requested todo |
+
+### TodoRestorePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `todo` | Todo! | The requested todo |
+
+### TodosMarkAllDonePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `updatedIds` | ID! => Array | Ids of the updated todos |
 
 ### ToggleAwardEmojiPayload
 

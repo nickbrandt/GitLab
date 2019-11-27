@@ -92,8 +92,6 @@ export default {
       'fetchCycleAnalyticsData',
       'fetchStageData',
       'fetchGroupStagesAndEvents',
-      'setCycleAnalyticsDataEndpoint',
-      'setStageDataEndpoint',
       'setSelectedGroup',
       'setSelectedProjects',
       'setSelectedTimeframe',
@@ -102,11 +100,12 @@ export default {
       'hideCustomStageForm',
       'showCustomStageForm',
       'setDateRange',
-      'createCustomStage',
       'fetchTasksByTypeData',
+      'createCustomStage',
+      'updateStage',
+      'removeStage',
     ]),
     onGroupSelect(group) {
-      this.setCycleAnalyticsDataEndpoint(group.full_path);
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
     },
@@ -118,8 +117,7 @@ export default {
     onStageSelect(stage) {
       this.hideCustomStageForm();
       this.setSelectedStageId(stage.id);
-      this.setStageDataEndpoint(this.currentStage.slug);
-      this.fetchStageData(this.currentStage.name);
+      this.fetchStageData(this.currentStage.slug);
     },
     onShowAddStageForm() {
       this.showCustomStageForm();
@@ -131,6 +129,12 @@ export default {
     },
     onCreateCustomStage(data) {
       this.createCustomStage(data);
+    },
+    onUpdateStage(data) {
+      this.updateStage(data);
+    },
+    onRemoveStage(id) {
+      this.removeStage(id);
     },
   },
   groupsQueryParams: {
@@ -229,6 +233,8 @@ export default {
             @selectStage="onStageSelect"
             @showAddStageForm="onShowAddStageForm"
             @submit="onCreateCustomStage"
+            @hideStage="onUpdateStage"
+            @removeStage="onRemoveStage"
           />
         </div>
       </div>

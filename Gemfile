@@ -101,7 +101,7 @@ gem 'hashie-forbidden_attributes'
 gem 'kaminari', '~> 1.0'
 
 # HAML
-gem 'hamlit', '~> 2.8.8'
+gem 'hamlit', '~> 2.10.0'
 
 # Files attachments
 gem 'carrierwave', '~> 1.3'
@@ -135,11 +135,11 @@ gem 'aws-sdk'
 gem 'faraday_middleware-aws-signers-v4'
 
 # Markdown and HTML processing
-gem 'html-pipeline', '~> 2.8'
+gem 'html-pipeline', '~> 2.12'
 gem 'deckar01-task_list', '2.2.1'
 gem 'gitlab-markup', '~> 1.7.0'
 gem 'github-markup', '~> 1.7.0', require: 'github/markup'
-gem 'commonmarker', '~> 0.17'
+gem 'commonmarker', '~> 0.20'
 gem 'RedCloth', '~> 4.3.2'
 gem 'rdoc', '~> 6.0'
 gem 'org-ruby', '~> 0.9.12'
@@ -273,8 +273,8 @@ gem 'mimemagic', '~> 0.3.2'
 gem 'fast_blank'
 
 # Parse time & duration
-gem 'chronic', '~> 0.10.2'
-gem 'gitlab_chronic_duration', '~> 0.10.6.1'
+gem 'gitlab-chronic', '~> 0.10.5'
+gem 'gitlab_chronic_duration', '~> 0.10.6.2'
 
 gem 'webpack-rails', '~> 0.9.10'
 gem 'rack-proxy', '~> 0.6.0'
@@ -352,25 +352,16 @@ group :development, :test do
   gem 'pry-rails', '~> 0.3.4'
 
   gem 'awesome_print', require: false
-  gem 'fuubar', '~> 2.2.0'
 
   gem 'database_cleaner', '~> 1.7.0'
   gem 'factory_bot_rails', '~> 5.1.0'
-  gem 'rspec-rails', '~> 3.8.0'
-  gem 'rspec-retry', '~> 0.6.1'
-  gem 'rspec_profiling', '~> 0.0.5'
-  gem 'rspec-set', '~> 0.1.3'
-  gem 'rspec-parameterized', require: false
+  gem 'rspec-rails', '~> 4.0.0.beta3'
 
   # Prevent occasions where minitest is not bundled in packaged versions of ruby (see #3826)
   gem 'minitest', '~> 5.11.0'
 
   # Generate Fake data
   gem 'ffaker', '~> 2.10'
-
-  gem 'capybara', '~> 3.22.0'
-  gem 'capybara-screenshot', '~> 1.0.22'
-  gem 'selenium-webdriver', '~> 3.141'
 
   gem 'spring', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
@@ -382,7 +373,7 @@ group :development, :test do
   gem 'rubocop-rspec', '~> 1.22.1'
 
   gem 'scss_lint', '~> 0.56.0', require: false
-  gem 'haml_lint', '~> 0.31.0', require: false
+  gem 'haml_lint', '~> 0.34.0', require: false
   gem 'simplecov', '~> 0.16.1', require: false
   gem 'bundler-audit', '~> 0.5.0', require: false
 
@@ -403,6 +394,16 @@ group :development, :test, :omnibus do
 end
 
 group :test do
+  gem 'fuubar', '~> 2.2.0'
+  gem 'rspec-retry', '~> 0.6.1'
+  gem 'rspec_profiling', '~> 0.0.5'
+  gem 'rspec-set', '~> 0.1.3'
+  gem 'rspec-parameterized', require: false
+
+  gem 'capybara', '~> 3.22.0'
+  gem 'capybara-screenshot', '~> 1.0.22'
+  gem 'selenium-webdriver', '~> 3.141'
+
   gem 'shoulda-matchers', '~> 4.0.1', require: false
   gem 'email_spec', '~> 2.2.0'
   gem 'json-schema', '~> 2.8.0'
@@ -451,7 +452,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC protocol definitions
-gem 'gitaly', '~> 1.70.0'
+gem 'gitaly', '~> 1.73.0'
 
 gem 'grpc', '~> 1.24.0'
 

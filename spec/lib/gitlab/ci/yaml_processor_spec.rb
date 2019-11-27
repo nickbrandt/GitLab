@@ -149,6 +149,28 @@ module Gitlab
               expect(subject[:options]).not_to have_key(:retry)
             end
           end
+
+          context 'when retry count is specified by default' do
+            let(:config) do
+              YAML.dump(default: { retry: { max: 1 } },
+                        rspec: { script: 'rspec' })
+            end
+
+            it 'does use the default value' do
+              expect(subject[:options]).to include(retry: { max: 1 })
+            end
+          end
+
+          context 'when retry count default value is overridden' do
+            let(:config) do
+              YAML.dump(default: { retry: { max: 1 } },
+                        rspec: { script: 'rspec', retry: { max: 2 } })
+            end
+
+            it 'does use the job value' do
+              expect(subject[:options]).to include(retry: { max: 2 })
+            end
+          end
         end
 
         describe 'allow failure entry' do
@@ -1375,7 +1397,7 @@ module Gitlab
           end
 
           it 'raises an error for invalid number' do
-            expect { builds }.to raise_error('jobs:deploy_to_production timeout should be a duration')
+            expect { builds }.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, 'jobs:deploy_to_production:timeout config should be a duration')
           end
         end
 
@@ -1503,8 +1525,48 @@ module Gitlab
               name: "test1",
               options: { script: ["test"] },
               needs_attributes: [
-                { name: "build1" },
-                { name: "build2" }
+                { name: "build1", artifacts: true },
+                { name: "build2", artifacts: true }
+              ],
+              when: "on_success",
+              allow_failure: false,
+              yaml_variables: []
+            )
+          end
+        end
+
+        context 'needs two builds' do
+          let(:needs) do
+            [
+              { job: 'parallel', artifacts: false },
+              { job: 'build1',   artifacts: true },
+              'build2'
+            ]
+          end
+
+          it "does create jobs with valid specification" do
+            expect(subject.builds.size).to eq(7)
+            expect(subject.builds[0]).to eq(
+              stage: "build",
+              stage_idx: 1,
+              name: "build1",
+              options: {
+                script: ["test"]
+              },
+              when: "on_success",
+              allow_failure: false,
+              yaml_variables: []
+            )
+            expect(subject.builds[4]).to eq(
+              stage: "test",
+              stage_idx: 2,
+              name: "test1",
+              options: { script: ["test"] },
+              needs_attributes: [
+                { name: "parallel 1/2", artifacts: false },
+                { name: "parallel 2/2", artifacts: false },
+                { name: "build1", artifacts: true },
+                { name: "build2", artifacts: true }
               ],
               when: "on_success",
               allow_failure: false,
@@ -1524,8 +1586,37 @@ module Gitlab
               name: "test1",
               options: { script: ["test"] },
               needs_attributes: [
-                { name: "parallel 1/2" },
-                { name: "parallel 2/2" }
+                { name: "parallel 1/2", artifacts: true },
+                { name: "parallel 2/2", artifacts: true }
+              ],
+              when: "on_success",
+              allow_failure: false,
+              yaml_variables: []
+            )
+          end
+        end
+
+        context 'needs dependencies artifacts' do
+          let(:needs) do
+            [
+              "build1",
+              { job: "build2" },
+              { job: "parallel", artifacts: true }
+            ]
+          end
+
+          it "does create jobs with valid specification" do
+            expect(subject.builds.size).to eq(7)
+            expect(subject.builds[4]).to eq(
+              stage: "test",
+              stage_idx: 2,
+              name: "test1",
+              options: { script: ["test"] },
+              needs_attributes: [
+                { name: "build1", artifacts: true },
+                { name: "build2", artifacts: true },
+                { name: "parallel 1/2", artifacts: true },
+                { name: "parallel 2/2", artifacts: true }
               ],
               when: "on_success",
               allow_failure: false,

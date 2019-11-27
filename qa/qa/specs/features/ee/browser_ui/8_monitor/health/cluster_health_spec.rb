@@ -2,8 +2,7 @@
 
 module QA
   context 'Monitor' do
-    # https://gitlab.com/gitlab-org/gitlab/issues/35429
-    describe 'Cluster health graphs', :orchestrated, :kubernetes, :quarantine do
+    describe 'Cluster health graphs', :orchestrated, :kubernetes do
       before do
         @cluster = Service::KubernetesCluster.new.create!
       end
@@ -13,7 +12,7 @@ module QA
       end
 
       it 'installs Kubernetes and Prometheus' do
-        login
+        Flow::Login.sign_in
 
         create_project
 
@@ -23,11 +22,6 @@ module QA
       end
 
       private
-
-      def login
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
-      end
 
       def create_project
         @project = Resource::Project.fabricate_via_api! do |p|

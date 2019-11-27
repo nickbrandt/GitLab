@@ -1,0 +1,9 @@
+- if current_board_parent.feature_available?(:wip_limits)
+  %gl-button.no-drag.rounded-right{ type: "button",
+    "v-if" => "isSettingsShown",
+    "aria-label" => _("List Settings"),
+    "ref" => "settingsBtn",
+    "title" => _("List Settings") }
+    = sprite_icon("settings")
+  %gl-tooltip{ ":target" => "() => $refs.settingsBtn" }
+    = _("List Settings")
