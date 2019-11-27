@@ -18,6 +18,7 @@ export default {
     state.name = response.name;
     state.description = response.description;
     state.iid = response.iid;
+    state.active = response.active;
     state.scopes = mapToScopesViewModel(response.scopes);
   },
   [types.RECEIVE_FEATURE_FLAG_ERROR](state) {
@@ -34,5 +35,8 @@ export default {
   [types.RECEIVE_UPDATE_FEATURE_FLAG_ERROR](state, error) {
     state.isSendingRequest = false;
     state.error = error.message || [];
+  },
+  [types.TOGGLE_ACTIVE](state, active) {
+    state.active = active;
   },
 };
