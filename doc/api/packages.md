@@ -72,18 +72,31 @@ Example response:
     "id": 1,
     "name": "com/mycompany/my-app",
     "version": "1.0-SNAPSHOT",
-    "package_type": "maven"
+    "package_type": "maven",
+    "_links": {
+      "details": "/namespace1/project1/-/packages/1",
+      "destroy": "/namespace1/project1/-/packages/1"
+    }
   },
   {
     "id": 2,
     "name": "@foo/bar",
     "version": "1.0.3",
-    "package_type": "npm"
+    "package_type": "npm",
+    "_links": {
+      "details": "/namespace1/project1/-/packages/2",
+      "destroy": "/namespace1/project1/-/packages/2"
+    }
   }
 ]
 ```
 
 By default, the `GET` request will return 20 results, since the API is [paginated](README.md#pagination).
+
+The `_links` object contains the following properties:
+
+- `details`: URL to fetch details about the package.
+- `destroy`: URL to destroy the package. Only available if the request user has permission to do so.
 
 ## Get a project package
 
@@ -111,9 +124,18 @@ Example response:
   "id": 1,
   "name": "com/mycompany/my-app",
   "version": "1.0-SNAPSHOT",
-  "package_type": "maven"
+  "package_type": "maven",
+  "_links": {
+    "details": "/namespace1/project1/-/packages/1",
+    "destroy": "/namespace1/project1/-/packages/1"
+  }
 }
 ```
+
+The `_links` object contains the following properties:
+
+- `details`: URL to fetch details about the package.
+- `destroy`: URL to destroy the package. Only available if the request user has permission to do so.
 
 ## List package files
 

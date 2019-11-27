@@ -8,6 +8,10 @@ module EE
           ->(obj, opts) { Ability.allowed?(opts[:user], "read_#{attr}".to_sym, yield(obj)) }
         end
 
+        def can_destroy(attr, &block)
+          ->(obj, opts) { Ability.allowed?(opts[:user], "destroy_#{attr}".to_sym, yield(obj)) }
+        end
+
         def expose_restricted(attr, &block)
           expose attr, if: can_read(attr, &block)
         end
@@ -847,10 +851,23 @@ module EE
       end
 
       class Package < Grape::Entity
+        include ::API::Helpers::RelatedResourcesHelpers
+        extend EntityHelpers
+
         expose :id
         expose :name
         expose :version
         expose :package_type
+
+        expose :_links do
+          expose :details do |package|
+            expose_url api_v4_projects_packages_path(package_id: package.id, id: package.project_id)
+          end
+
+          expose :destroy, if: can_destroy(:package, &:project) do |package|
+            expose_url api_v4_projects_packages_path(package_id: package.id, id: package.project_id)
+          end
+        end
       end
 
       class PackageFile < Grape::Entity

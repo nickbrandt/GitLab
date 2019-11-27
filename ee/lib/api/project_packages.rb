@@ -38,7 +38,7 @@ module API
         package = ::Packages::PackageFinder
           .new(user_project, params[:package_id]).execute
 
-        present package, with: EE::API::Entities::Package
+        present package, with: EE::API::Entities::Package, user: current_user
       end
 
       desc 'Remove a package' do
