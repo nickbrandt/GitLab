@@ -870,6 +870,8 @@ module EE
             expose_url api_v4_projects_packages_path(package_id: package.id, id: package.project_id)
           end
         end
+
+        expose :created_at
       end
 
       class PackageFile < Grape::Entity

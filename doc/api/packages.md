@@ -76,7 +76,8 @@ Example response:
     "_links": {
       "web_path": "/namespace1/project1/-/packages/1",
       "delete_api_path": "/namespace1/project1/-/packages/1"
-    }
+    },
+    "created_at": "2019-11-27T03:37:38.711Z"
   },
   {
     "id": 2,
@@ -86,7 +87,8 @@ Example response:
     "_links": {
       "web_path": "/namespace1/project1/-/packages/1",
       "delete_api_path": "/namespace1/project1/-/packages/1"
-    }
+    },
+    "created_at": "2019-11-27T03:37:38.711Z"
   }
 ]
 ```
@@ -128,7 +130,8 @@ Example response:
   "_links": {
     "web_path": "/namespace1/project1/-/packages/1",
     "delete_api_path": "/namespace1/project1/-/packages/1"
-  }
+  },
+  "created_at": "2019-11-27T03:37:38.711Z"
 }
 ```
 

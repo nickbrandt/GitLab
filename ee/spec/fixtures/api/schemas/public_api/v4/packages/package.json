@@ -26,6 +26,9 @@
           "type": "string"
         }
       }
+    },
+    "created_at": {
+      "type": "string"
     }
   }
 }
