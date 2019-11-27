@@ -2233,6 +2233,49 @@ This example creates three paths of execution:
 - Related to the above, stages must be explicitly defined for all jobs
   that have the keyword `needs:` or are referred to by one.
 
+#### Artifact downloads with `needs`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/14311) in GitLab v12.6.
+
+When using `needs`, artifact downloads are controlled with `artifacts: true` or `artifacts: false`.
+The `dependencies` keyword should not be used with `needs`, as this is deprecated since GitLab 12.6.
+
+In the example below, the `rspec` job will download the `build_job` artifacts, while the
+`rubocop` job will not:
+
+```yaml
+build_job:
+  stage: build
+  artifacts:
+    paths:
+      - binaries/
+
+rspec:
+  stage: test
+  needs:
+    - job: build_job
+      artifacts: true
+
+rubocop:
+  stage: test
+  needs:
+    - job: build_job
+      artifacts: false
+```
+
+Additionally, in the three syntax examples below, the `rspec` job will download the artifacts
+from all three `build_jobs`, as `artifacts` is true for `build_job_1`, and will
+**default** to true for both `build_job_2` and `build_job_3`.
+
+```yaml
+rspec:
+  needs:
+    - job: build_job_1
+      artifacts: true
+    - job: build_job_2
+    - build_job_3
+```
+
 ### `coverage`
 
 > [Introduced][ce-7447] in GitLab 8.17.
