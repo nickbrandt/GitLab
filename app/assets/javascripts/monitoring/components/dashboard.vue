@@ -22,7 +22,8 @@ import MonitorTimeSeriesChart from './charts/time_series.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
-import { getTimeDiff, isValidDate } from '../utils';
+import TrackEventDirective from '~/vue_shared/directives/track_event';
+import { getTimeDiff, isValidDate, getAddMetricTrackingOptions } from '../utils';
 
 export default {
   components: {
@@ -43,6 +44,7 @@ export default {
   directives: {
     GlModal: GlModalDirective,
     GlTooltip: GlTooltipDirective,
+    TrackEvent: TrackEventDirective,
   },
   props: {
     externalDashboardUrl: {
@@ -298,6 +300,7 @@ export default {
     onDateTimePickerApply(timeWindowUrlParams) {
       return redirectTo(mergeUrlParams(timeWindowUrlParams, window.location.href));
     },
+    getAddMetricTrackingOptions,
   },
   addMetric: {
     title: s__('Metrics|Add metric'),
@@ -411,7 +414,9 @@ export default {
               <div slot="modal-footer">
                 <gl-button @click="hideAddMetricModal">{{ __('Cancel') }}</gl-button>
                 <gl-button
+                  v-track-event="getAddMetricTrackingOptions()"
                   :disabled="!formIsValid"
+                  class="js-submit-custom-metrics-form"
                   variant="success"
                   @click="submitCustomMetricsForm"
                 >
