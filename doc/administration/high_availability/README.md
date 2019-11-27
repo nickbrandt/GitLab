@@ -300,15 +300,16 @@ endpoints were discovered. For details, see the related issues list in
 NOTE: **Note:** Memory values are given directly by GCP machine sizes. On different cloud
 vendors a best effort like for like can be used.
 
-[^1]: Gitaly node requirements are dependent on customer data. We recommend 2
-      nodes as an absolute minimum for performance at the 10,000 and 25,000 user
-      scale and 4 nodes as an absolute minimum at the 50,000 user scale, but
-      additional nodes should be considered in conjunction with a review of
-      project counts and sizes.
+[^1]: Gitaly node requirements are dependent on customer data, specifically the number of
+      projects and their sizes. We recommend 2 nodes as an absolute minimum for HA environments
+      and at least 4 nodes should be used when supporting 50,000 or more users.
+      We recommend that each Gitaly node should store no more than 5TB of data.
+      Additional nodes should be considered in conjunction with a review of expected
+      data size and spread based on the recommendations above.
 
 [^2]: Our architectures have been tested and validated with [HAProxy](https://www.haproxy.org/)
       as the load balancer. However other reputable load balancers with similar feature sets
-          should also work here but be aware these aren't validated.
+      should also work instead but be aware these aren't validated.
 
 [^3]: For data objects such as LFS, Uploads, Artifacts, etc... We recommend a S3 Object Storage
       where possible over NFS due to better performance and availability. Several types of objects
