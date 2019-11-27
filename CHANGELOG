@@ -2,10 +2,22 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+
+v 8.16.0
+
+- Ignore CompleteMultiparytUpload ETag !438
+- Add NuGet route for package uploads !441
+- Upgrade Gitaly client to v1.74.0 !443
+- Set a time limit on git upload-pack requests
+
 v 8.15.0
 
 - Object store case insensitive ETag comparison !434
 - Upgrade gitaly to 1.68.0 !435
+
+v 8.14.1
+
+- Set a time limit on git upload-pack requests
 
 v 8.14.0
 
@@ -25,6 +37,10 @@ v8.11.0
 - Accelerate GraphQL uploads !403
 - Add route for handling Conan package uploads !412
 - Accelerate wiki attachments !422
+
+v8.10.1
+
+- Set a time limit on git upload-pack requests
 
 v8.10.0
 
