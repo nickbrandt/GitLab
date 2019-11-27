@@ -91,6 +91,17 @@ describe ApplicationSettings::UpdateService do
 
               expect(ElasticsearchIndexedNamespace.where(namespace_id: namespaces.last.id)).not_to exist
             end
+
+            it 'disregards already existing ElasticsearchIndexedNamespace in elasticsearch_namespace_ids' do
+              create :elasticsearch_indexed_namespace, namespace: namespaces.first
+              opts = { elasticsearch_namespace_ids: namespaces.first(2).map(&:id).join(',') }
+
+              expect do
+                described_class.new(setting, user, opts).execute
+              end.to change { ElasticsearchIndexedNamespace.count }.from(1).to(2)
+
+              expect(ElasticsearchIndexedNamespace.pluck(:namespace_id)).to eq([namespaces.first.id, namespaces.second.id])
+            end
           end
 
           context 'projects' do
@@ -113,6 +124,17 @@ describe ApplicationSettings::UpdateService do
               end.to change { ElasticsearchIndexedProject.count }.from(1).to(2)
 
               expect(ElasticsearchIndexedProject.where(project_id: projects.last.id)).not_to exist
+            end
+
+            it 'disregards already existing ElasticsearchIndexedProject in elasticsearch_project_ids' do
+              create :elasticsearch_indexed_project, project: projects.first
+              opts = { elasticsearch_project_ids: projects.first(2).map(&:id).join(',') }
+
+              expect do
+                described_class.new(setting, user, opts).execute
+              end.to change { ElasticsearchIndexedProject.count }.from(1).to(2)
+
+              expect(ElasticsearchIndexedProject.pluck(:project_id)).to eq([projects.first.id, projects.second.id])
             end
           end
         end
