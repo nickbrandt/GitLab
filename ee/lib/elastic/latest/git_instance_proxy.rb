@@ -3,22 +3,6 @@
 module Elastic
   module Latest
     module GitInstanceProxy
-      GITALY_TRANSFORM_TABLES = {
-        commit: {
-          'Type' => 'type',
-          'Author' => 'author',
-          'Committer' => 'committer',
-          'RepoID' => 'rid',
-          'Message' => 'message',
-          'SHA' => 'sha'
-        },
-        blob: {
-          'Type' => 'type',
-          'OID' => 'oid',
-          'RepoID' => 'rid'
-        }
-      }.freeze
-
       def self.methods_for_all_write_targets
         super + [:delete_index_for_commits_and_blobs]
       end
