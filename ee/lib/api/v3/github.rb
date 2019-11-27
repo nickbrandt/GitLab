@@ -54,7 +54,7 @@ module API
           project = find_project!(
             ::Gitlab::Jira::Dvcs.restore_full_path(params.slice(:namespace, :project).symbolize_keys)
           )
-          not_found! unless licensed?(project)
+          not_found! unless licensed?(project) && can?(current_user, :download_code, project)
           project
         end
 

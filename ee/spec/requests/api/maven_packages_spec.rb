@@ -307,6 +307,12 @@ describe API::MavenPackages do
   end
 
   describe 'PUT /api/v4/projects/:id/packages/maven/*path/:file_name/authorize' do
+    it 'rejects a malicious request' do
+      put api("/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/%2e%2e%2F.ssh%2Fauthorized_keys/authorize"), params: {}, headers: headers_with_token
+
+      expect(response).to have_gitlab_http_status(400)
+    end
+
     it 'authorizes posting package with a valid token' do
       authorize_upload_with_token
 
@@ -390,6 +396,12 @@ describe API::MavenPackages do
           'file.path' => file_upload.path,
           'file.name' => file_upload.original_filename
         }
+      end
+
+      it 'rejects a malicious request' do
+        put api("/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/%2e%2e%2f.ssh%2fauthorized_keys"), params: params, headers: headers_with_token
+
+        expect(response).to have_gitlab_http_status(400)
       end
 
       it 'creates package and stores package file' do
