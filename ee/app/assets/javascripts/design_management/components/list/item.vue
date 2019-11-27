@@ -1,10 +1,12 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import Timeago from '~/vue_shared/components/time_ago_tooltip.vue';
 import { n__, __ } from '~/locale';
 
 export default {
   components: {
+    GlLoadingIcon,
     Icon,
     Timeago,
   },
@@ -36,6 +38,9 @@ export default {
     },
   },
   computed: {
+    isLoading() {
+      return !this.image;
+    },
     icon() {
       const normalizedEvent = this.event.toLowerCase();
       const icons = {
@@ -74,13 +79,15 @@ export default {
     }"
     class="card cursor-pointer text-plain js-design-list-item design-list-item"
   >
-    <div class="card-body p-0 d-flex align-items-center overflow-hidden position-relative">
+    <div class="card-body p-0 d-flex-center overflow-hidden position-relative">
       <div v-if="icon.name" class="design-event position-absolute">
         <span :title="icon.tooltip" :aria-label="icon.tooltip">
           <icon :name="icon.name" :size="18" :class="icon.classes" />
         </span>
       </div>
+      <gl-loading-icon v-if="isLoading" size="md" />
       <img
+        v-else
         :src="image"
         :alt="filename"
         class="block ml-auto mr-auto mw-100 mh-100 design-img"
