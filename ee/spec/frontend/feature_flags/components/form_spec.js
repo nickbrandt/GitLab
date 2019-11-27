@@ -37,7 +37,11 @@ describe('feature flag form', () => {
       localVue,
       propsData: props,
       provide: {
-        glFeatures: { featureFlagPermissions: true, featureFlagsUsersPerEnvironment: true },
+        glFeatures: {
+          featureFlagPermissions: true,
+          featureFlagsUsersPerEnvironment: true,
+          featureFlagToggle: true,
+        },
       },
       sync: false,
     });
@@ -93,6 +97,14 @@ describe('feature flag form', () => {
             expect(wrapper.vm.newScope).toEqual('');
           });
         });
+
+        it('should be disabled if the feature flag is not active', done => {
+          wrapper.setProps({ active: false });
+          wrapper.vm.$nextTick(() => {
+            expect(wrapper.find(ToggleButton).props('disabledInput')).toBe(true);
+            done();
+          });
+        });
       });
     });
   });
@@ -103,6 +115,7 @@ describe('feature flag form', () => {
         ...requiredProps,
         name: featureFlag.name,
         description: featureFlag.description,
+        active: true,
         scopes: [
           {
             id: 1,
@@ -155,6 +168,15 @@ describe('feature flag form', () => {
             wrapper.find(ToggleButton).vm.$emit('change', false);
 
             expect(_.first(wrapper.vm.formScopes).active).toBe(false);
+          });
+
+          it('should be disabled if the feature flag is not active', done => {
+            wrapper.setProps({ active: false });
+
+            wrapper.vm.$nextTick(() => {
+              expect(wrapper.find(ToggleButton).props('disabledInput')).toBe(true);
+              done();
+            });
           });
         });
       });
@@ -262,6 +284,7 @@ describe('feature flag form', () => {
         factory({
           ...requiredProps,
           name: 'feature_flag_1',
+          active: true,
           description: 'this is a feature flag',
           scopes: [
             {
@@ -316,6 +339,7 @@ describe('feature flag form', () => {
 
             expect(data.name).toEqual('feature_flag_2');
             expect(data.description).toEqual('this is a feature flag');
+            expect(data.active).toBe(true);
 
             expect(data.scopes).toEqual([
               {

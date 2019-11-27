@@ -152,6 +152,7 @@ describe('feature flags helpers spec', () => {
       const input = {
         name: 'name',
         description: 'description',
+        active: true,
         scopes: [
           {
             id: 4,
@@ -171,6 +172,7 @@ describe('feature flags helpers spec', () => {
         operations_feature_flag: {
           name: 'name',
           description: 'description',
+          active: true,
           scopes_attributes: [
             {
               id: 4,
