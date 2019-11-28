@@ -59,11 +59,11 @@ export default {
       v-for="(version, index) in allVersions"
       :key="version.node.id"
       class="border-top"
-      :class="{ 'bg-light': getVersionId(version.node.id) === currentVersion }"
+      :class="{ 'bg-light': findVersionId(version.node.id) === currentVersion }"
     >
       <router-link
         class="d-flex js-version-link px-0"
-        :to="{ path: $route.path, query: { version: getVersionId(version.node.id) } }"
+        :to="{ path: $route.path, query: { version: findVersionId(version.node.id) } }"
       >
         <div class="flex-shrink-0">
           <gl-avatar :src="version.node.author.avatarUrl" :size="32" />
@@ -86,7 +86,7 @@ export default {
           </div>
         </div>
         <i
-          v-if="getVersionId(version.node.id) === currentVersion"
+          v-if="findVersionId(version.node.id) === currentVersion"
           class="fa fa-check pull-right align-self-center"
         ></i>
       </router-link>
