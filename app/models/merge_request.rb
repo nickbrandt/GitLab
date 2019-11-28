@@ -1468,6 +1468,10 @@ class MergeRequest < ApplicationRecord
     all_pipelines.for_sha_or_source_sha(diff_head_sha).first
   end
 
+  def etag_caching_enabled?
+    true
+  end
+
   private
 
   def with_rebase_lock
