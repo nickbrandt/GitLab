@@ -33,7 +33,7 @@ module EE
           end
         end
 
-        resource :namespaces do
+        resource :namespaces, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
           helpers do
             params :gitlab_subscription_optional_attributes do
               optional :seats, type: Integer, default: 0, desc: 'The number of seats purchased'
