@@ -78,7 +78,7 @@ module API
           MergeRequestsFinder.new(current_user, authorized_only: true).execute
         end
 
-        def authorized_merge_requests_for(project)
+        def authorized_merge_requests_for_project(project)
           MergeRequestsFinder.new(current_user, authorized_only: true, project_id: project.id).execute
         end
 
@@ -158,7 +158,7 @@ module API
         get ':namespace/:project/pulls' do
           user_project = find_project_with_access(params)
 
-          merge_requests = authorized_merge_requests_for(user_project)
+          merge_requests = authorized_merge_requests_for_project(user_project)
 
           present paginate(merge_requests), with: ::API::Github::Entities::PullRequest
         end
@@ -199,7 +199,7 @@ module API
         get ':namespace/:project/events' do
           user_project = find_project_with_access(params)
 
-          merge_requests = authorized_merge_requests_for(user_project)
+          merge_requests = authorized_merge_requests_for_project(user_project)
 
           present paginate(merge_requests), with: ::API::Github::Entities::PullRequestEvent
         end
