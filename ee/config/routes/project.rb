@@ -64,6 +64,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
       # End of the /-/ scope.
 
+      # All new routes should go under /-/ scope.
+      # Look for scope '-' at the top of the file.
+      # rubocop: disable Cop/PutProjectRoutesUnderScope
+
       resources :path_locks, only: [:index, :destroy] do
         collection do
           post :toggle
@@ -206,6 +210,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
 
       resources :audit_events, only: [:index]
+
+      # All new routes should go under /-/ scope.
+      # Look for scope '-' at the top of the file.
+      # rubocop: enable Cop/PutProjectRoutesUnderScope
     end
   end
 end
