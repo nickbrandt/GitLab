@@ -267,4 +267,95 @@ describe Projects::Security::LicensesController do
       end
     end
   end
+
+  describe "PATCH #update" do
+    let(:project) { create(:project, :repository, :private) }
+    let(:software_license_policy) { create(:software_license_policy, project: project, software_license: mit_license) }
+    let(:mit_license) { create(:software_license, :mit) }
+
+    let(:default_params) do
+      {
+        namespace_id: project.namespace,
+        project_id: project,
+        id: software_license_policy.id,
+        software_license_policy: { classification: "approved" }
+      }
+    end
+
+    context "when authenticated" do
+      let(:current_user) { create(:user) }
+
+      before do
+        stub_licensed_features(licenses_list: true, license_management: true)
+        sign_in(current_user)
+      end
+
+      context "when the current user is not a member of the project" do
+        before do
+          patch :update, xhr: true, params: default_params
+        end
+
+        it { expect(response).to have_http_status(:not_found) }
+      end
+
+      context "when the current user is a member of the project but not authorized to update policies" do
+        before do
+          project.add_guest(current_user)
+
+          patch :update, xhr: true, params: default_params
+        end
+
+        it { expect(response).to have_http_status(:not_found) }
+      end
+
+      context "when authorized as a maintainer" do
+        let(:json) { json_response.with_indifferent_access }
+
+        before do
+          project.add_maintainer(current_user)
+        end
+
+        context "when updating a software license policy" do
+          before do
+            patch :update, xhr: true, params: default_params.merge({
+              software_license_policy: {
+                classification: "blacklisted"
+              }
+            })
+          end
+
+          it { expect(response).to have_http_status(:ok) }
+          it { expect(software_license_policy.reload).to be_blacklisted }
+
+          it "generates the proper JSON response" do
+            expect(json[:id]).to eql(software_license_policy.id)
+            expect(json[:spdx_identifier]).to eq(mit_license.spdx_identifier)
+            expect(json[:classification]).to eq("blacklisted")
+            expect(json[:name]).to eq(mit_license.name)
+          end
+        end
+
+        context "when the parameters are invalid" do
+          before do
+            patch :update, xhr: true, params: default_params.merge({
+              software_license_policy: {
+                classification: "invalid"
+              }
+            })
+          end
+
+          it { expect(response).to have_http_status(:unprocessable_entity) }
+          it { expect(json).to eq({ "errors" => { "approval_status" => ["is invalid"] } }) }
+        end
+      end
+    end
+
+    context "when unauthenticated" do
+      before do
+        patch :update, xhr: true, params: default_params
+      end
+
+      it { expect(response).to redirect_to(new_user_session_path) }
+    end
+  end
 end
