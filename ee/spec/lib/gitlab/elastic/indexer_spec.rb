@@ -282,8 +282,7 @@ describe Gitlab::Elastic::Indexer do
   end
 
   def elasticsearch_config
-    config = Gitlab::CurrentSettings.elasticsearch_config.dup
-    config.merge!(
+    Gitlab::CurrentSettings.elasticsearch_config.merge(
       index_name: 'gitlab-test'
     )
   end
