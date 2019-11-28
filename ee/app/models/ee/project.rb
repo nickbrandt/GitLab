@@ -720,6 +720,13 @@ module EE
       strong_memoize(:license_compliance) { SCA::LicenseCompliance.new(self) }
     end
 
+    override :template_source?
+    def template_source?
+      return true if namespace_id == ::Gitlab::CurrentSettings.current_application_settings.custom_project_templates_group_id
+
+      ::Project.with_groups_level_repos_templates.exists?(id)
+    end
+
     private
 
     def set_override_pull_mirror_available
