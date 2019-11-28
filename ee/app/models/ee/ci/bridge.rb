@@ -132,6 +132,13 @@ module EE
         end
       end
 
+      def yaml_for_downstream
+        strong_memoize(:yaml_for_downstream) do
+          includes = options&.dig(:trigger, :include)
+          YAML.dump('include' => includes) if includes
+        end
+      end
+
       def upstream_project
         strong_memoize(:upstream_project) do
           upstream_project_path && ::Project.find_by_full_path(upstream_project_path)
