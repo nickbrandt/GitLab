@@ -2,8 +2,8 @@ import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import featureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { trimText } from 'spec/helpers/text_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
+import { trimText } from 'helpers/text_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import { getRequestData } from '../mock_data';
 
@@ -56,9 +56,9 @@ describe('Feature flags', () => {
 
       component = mountComponent(FeatureFlagsComponent, props);
 
-      setTimeout(() => {
+      setImmediate(() => {
         done();
-      }, 0);
+      });
     });
 
     it('does not render configure button', () => {
@@ -71,7 +71,7 @@ describe('Feature flags', () => {
   });
 
   describe('loading state', () => {
-    it('renders a loading icon', done => {
+    it('renders a loading icon', () => {
       mock
         .onGet(`${TEST_HOST}/endpoint.json`, { params: { scope: 'all', page: '1' } })
         .replyOnce(200, getRequestData, {});
@@ -84,10 +84,6 @@ describe('Feature flags', () => {
       expect(loadingElement.querySelector('span').getAttribute('aria-label')).toEqual(
         'Loading feature flags',
       );
-
-      setTimeout(() => {
-        done();
-      }, 0);
     });
   });
 
@@ -109,9 +105,9 @@ describe('Feature flags', () => {
 
         component = mountComponent(FeatureFlagsComponent, mockData);
 
-        setTimeout(() => {
+        setImmediate(() => {
           done();
-        }, 0);
+        });
       });
 
       it('should render the empty state', () => {
@@ -175,9 +171,9 @@ describe('Feature flags', () => {
           });
 
         component = mountComponent(FeatureFlagsComponent, mockData);
-        setTimeout(() => {
+        setImmediate(() => {
           done();
-        }, 0);
+        });
       });
 
       it('should render a table with feature flags', () => {
@@ -204,30 +200,24 @@ describe('Feature flags', () => {
           expect(component.$el.querySelectorAll('.gl-pagination')).not.toBeNull();
         });
 
-        it('should make an API request when page is clicked', done => {
-          spyOn(component, 'updateFeatureFlagOptions');
-          setTimeout(() => {
-            component.$el.querySelector('.gl-pagination li:nth-child(5) .page-link').click();
+        it('should make an API request when page is clicked', () => {
+          jest.spyOn(component, 'updateFeatureFlagOptions');
+          component.$el.querySelector('.gl-pagination li:nth-child(5) .page-link').click();
 
-            expect(component.updateFeatureFlagOptions).toHaveBeenCalledWith({
-              scope: 'all',
-              page: '4',
-            });
-            done();
-          }, 0);
+          expect(component.updateFeatureFlagOptions).toHaveBeenCalledWith({
+            scope: 'all',
+            page: '4',
+          });
         });
 
-        it('should make an API request when using tabs', done => {
-          setTimeout(() => {
-            spyOn(component, 'updateFeatureFlagOptions');
-            component.$el.querySelector('.js-featureflags-tab-enabled').click();
+        it('should make an API request when using tabs', () => {
+          jest.spyOn(component, 'updateFeatureFlagOptions');
+          component.$el.querySelector('.js-featureflags-tab-enabled').click();
 
-            expect(component.updateFeatureFlagOptions).toHaveBeenCalledWith({
-              scope: 'enabled',
-              page: '1',
-            });
-            done();
-          }, 0);
+          expect(component.updateFeatureFlagOptions).toHaveBeenCalledWith({
+            scope: 'enabled',
+            page: '1',
+          });
         });
       });
     });
@@ -239,9 +229,9 @@ describe('Feature flags', () => {
 
       component = mountComponent(FeatureFlagsComponent, mockData);
 
-      setTimeout(() => {
+      setImmediate(() => {
         done();
-      }, 0);
+      });
     });
 
     it('should render error state', () => {
@@ -263,13 +253,13 @@ describe('Feature flags', () => {
     beforeEach(done => {
       component = mountComponent(FeatureFlagsComponent, mockData);
 
-      setTimeout(() => {
+      setImmediate(() => {
         done();
-      }, 0);
+      });
     });
 
     it('should fire the rotate action when a `token` event is received', () => {
-      const actionSpy = spyOn(component, 'rotateInstanceId');
+      const actionSpy = jest.spyOn(component, 'rotateInstanceId');
       const [modal] = component.$children;
       modal.$emit('token');
 
