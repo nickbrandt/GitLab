@@ -7,7 +7,7 @@ module Elastic
       extend Elasticsearch::Model::Indexing::ClassMethods
       extend Elasticsearch::Model::Naming::ClassMethods
 
-      self.index_name = [Rails.application.class.parent_name.downcase, Rails.env].join('-')
+      self.index_name = [Rails.application.class.module_parent_name.downcase, Rails.env].join('-')
 
       # ES6 requires a single type per index
       self.document_type = 'doc'

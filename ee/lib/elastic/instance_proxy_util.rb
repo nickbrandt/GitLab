@@ -22,7 +22,7 @@ module Elastic
     end
 
     def version_namespace
-      real_class.parent
+      real_class.module_parent
     end
 
     class_methods do

@@ -25,7 +25,7 @@ describe Groups::SamlProvidersController, '(JavaScript fixtures)', type: :contro
 
     get :show, params: { group_id: group }
 
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response).to render_template 'groups/saml_providers/show'
   end
 end
