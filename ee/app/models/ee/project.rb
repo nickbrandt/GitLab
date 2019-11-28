@@ -695,6 +695,10 @@ module EE
       packages.where(package_type: package_type).exists?
     end
 
+    def license_compliance
+      strong_memoize(:license_compliance) { SCA::LicenseCompliance.new(self) }
+    end
+
     private
 
     def set_override_pull_mirror_available

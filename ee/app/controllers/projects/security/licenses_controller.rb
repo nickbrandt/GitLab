@@ -4,7 +4,7 @@ module Projects
   module Security
     class LicensesController < Projects::ApplicationController
       before_action :authorize_read_licenses_list!
-      before_action :authorize_admin_software_license_policy!, only: [:create]
+      before_action :authorize_admin_software_license_policy!, only: [:create, :update]
 
       before_action do
         push_frontend_feature_flag(:licenses_list)
@@ -15,7 +15,7 @@ module Projects
           format.json do
             ::Gitlab::UsageDataCounters::LicensesList.count(:views)
 
-            license_compliance = ::SCA::LicenseCompliance.new(project)
+            license_compliance = project.license_compliance
             render json: serializer.represent(
               pageable(license_compliance.policies),
               build: license_compliance.latest_build_for_default_branch
@@ -31,6 +31,18 @@ module Projects
 
         if result[:status] == :success
           render json: LicenseEntity.represent(result[:software_license_policy]), status: :created
+        else
+          render_error_for(result)
+        end
+      end
+
+      def update
+        result = ::Projects::Licenses::UpdatePolicyService
+          .new(project, current_user, software_license_policy_params)
+          .execute(params[:id])
+
+        if result[:status] == :success
+          render json: LicenseEntity.represent(result[:software_license_policy]), status: :ok
         else
           render_error_for(result)
         end

@@ -2383,4 +2383,8 @@ describe Project do
       expect(described_class.with_groups_level_repos_templates.count).to eq(4)
     end
   end
+
+  describe '#license_compliance' do
+    it { expect(subject.license_compliance).to be_instance_of(::SCA::LicenseCompliance) }
+  end
 end
