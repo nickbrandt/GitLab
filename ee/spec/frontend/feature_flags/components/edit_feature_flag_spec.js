@@ -38,7 +38,7 @@ describe('Edit feature flag form', () => {
     });
   };
 
-  beforeEach(() => {
+  beforeEach(done => {
     mock = new MockAdapter(axios);
 
     mock.onGet(`${TEST_HOST}/feature_flags.json'`).replyOnce(200, {
@@ -63,6 +63,8 @@ describe('Edit feature flag form', () => {
     });
 
     factory();
+
+    setImmediate(() => done());
   });
 
   afterEach(() => {
@@ -70,41 +72,29 @@ describe('Edit feature flag form', () => {
     mock.restore();
   });
 
-  it('should display the iid', done => {
-    setTimeout(() => {
-      expect(wrapper.find('h3').text()).toContain('^5');
-
-      done();
-    });
+  it('should display the iid', () => {
+    expect(wrapper.find('h3').text()).toContain('^5');
   });
 
   describe('with error', () => {
     it('should render the error', done => {
-      setTimeout(() => {
-        store.dispatch('edit/receiveUpdateFeatureFlagError', { message: ['The name is required'] });
+      store.dispatch('edit/receiveUpdateFeatureFlagError', { message: ['The name is required'] });
 
-        wrapper.vm.$nextTick(() => {
-          expect(wrapper.find('.alert-danger').exists()).toEqual(true);
-          expect(wrapper.find('.alert-danger').text()).toContain('The name is required');
-          done();
-        });
-      }, 0);
+      wrapper.vm.$nextTick(() => {
+        expect(wrapper.find('.alert-danger').exists()).toEqual(true);
+        expect(wrapper.find('.alert-danger').text()).toContain('The name is required');
+        done();
+      });
     });
   });
 
   describe('without error', () => {
-    it('renders form title', done => {
-      setTimeout(() => {
-        expect(wrapper.text()).toContain('^5 feature_flag');
-        done();
-      }, 0);
+    it('renders form title', () => {
+      expect(wrapper.text()).toContain('^5 feature_flag');
     });
 
-    it('should render feature flag form', done => {
-      setTimeout(() => {
-        expect(wrapper.find(Form).exists()).toEqual(true);
-        done();
-      }, 0);
+    it('should render feature flag form', () => {
+      expect(wrapper.find(Form).exists()).toEqual(true);
     });
   });
 });
