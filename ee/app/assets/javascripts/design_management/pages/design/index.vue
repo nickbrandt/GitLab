@@ -18,6 +18,9 @@ import { extractDiscussions, extractDesign } from '../../utils/design_management
 import { updateStoreAfterAddImageDiffNote } from '../../utils/cache_update';
 import { ADD_DISCUSSION_COMMENT_ERROR } from '../../utils/error_messages';
 
+const createFlash = message =>
+  _createFlash(message, alert, document.querySelector('.design-detail'));
+
 export default {
   components: {
     ApolloMutation,
@@ -207,6 +210,9 @@ export default {
           </template>
         </design-destroyer>
         <div class="d-flex flex-column h-100 mh-100 position-relative">
+          <div class="p-3">
+            <div class="flash-container"></div>
+          </div>
           <design-image
             :image="design.image"
             :name="design.filename"
