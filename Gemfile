@@ -381,7 +381,7 @@ group :development, :test do
 
   gem 'knapsack', '~> 1.17'
 
-  gem 'stackprof', '~> 0.2.10', require: false
+  gem 'stackprof', '~> 0.2.13', require: false
 
   gem 'simple_po_parser', '~> 1.1.2', require: false
 
