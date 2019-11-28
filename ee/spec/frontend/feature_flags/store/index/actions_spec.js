@@ -16,7 +16,7 @@ import {
 } from 'ee/feature_flags/store/modules/index/actions';
 import state from 'ee/feature_flags/store/modules/index/state';
 import * as types from 'ee/feature_flags/store/modules/index/mutation_types';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import { getRequestData, rotateData } from '../../mock_data';
 
