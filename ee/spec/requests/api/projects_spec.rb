@@ -143,7 +143,7 @@ describe API::Projects do
     end
 
     describe 'packages_enabled attribute' do
-      it 'exposed when the feature is available' do
+      it 'is exposed when the feature is available' do
         stub_licensed_features(packages: true)
 
         get api("/projects/#{project.id}", user)
@@ -151,12 +151,32 @@ describe API::Projects do
         expect(json_response).to have_key 'packages_enabled'
       end
 
-      it 'not exposed when the feature is available' do
+      it 'is not exposed when the feature is not available' do
         stub_licensed_features(packages: false)
 
         get api("/projects/#{project.id}", user)
 
         expect(json_response).not_to have_key 'packages_enabled'
+      end
+    end
+
+    describe 'service desk attributes' do
+      it 'are exposed when the feature is available' do
+        stub_licensed_features(service_desk: true)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).to have_key 'service_desk_enabled'
+        expect(json_response).to have_key 'service_desk_address'
+      end
+
+      it 'are not exposed when the feature is not available' do
+        stub_licensed_features(service_desk: false)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).not_to have_key 'service_desk_enabled'
+        expect(json_response).not_to have_key 'service_desk_address'
       end
     end
 
