@@ -1,5 +1,5 @@
 #!/bin/sh
 
-output=`git ls-files -z | grep -zvE '\.(rb|js|haml)$' | xargs -0n1 grep -HEn '^<<<<<<< '`
+output=`git grep -En '^<<<<<<< ' -- . ':(exclude)*.haml' ':(exclude)*.js' ':(exclude)*.rb'`
 echo $output
 test -z "$output"
