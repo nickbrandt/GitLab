@@ -434,6 +434,7 @@ project:
 - upstream_project_subscriptions
 - downstream_project_subscriptions
 - service_desk_setting
+- import_failures
 award_emoji:
 - awardable
 - user
