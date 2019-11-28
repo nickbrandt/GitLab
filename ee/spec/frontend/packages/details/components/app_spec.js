@@ -2,7 +2,8 @@ import { mount } from '@vue/test-utils';
 import { GlModal } from '@gitlab/ui';
 import PackagesApp from 'ee/packages/details/components/app.vue';
 import PackageInformation from 'ee/packages/details/components/information.vue';
-import PackageInstallation from 'ee/packages/details/components/installation.vue';
+import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
+import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
 import { mavenPackage, mavenFiles, npmPackage, npmFiles } from '../../mock_data';
 
 describe('PackagesApp', () => {
@@ -16,6 +17,8 @@ describe('PackagesApp', () => {
     emptySvgPath: 'empty-illustration',
     npmPath: 'foo',
     npmHelpPath: 'foo',
+    mavenPath: 'foo',
+    mavenHelpPath: 'foo',
   };
 
   function createComponent(props = {}) {
@@ -35,7 +38,8 @@ describe('PackagesApp', () => {
   const emptyState = () => wrapper.find('.js-package-empty-state');
   const allPackageInformation = () => wrapper.findAll(PackageInformation);
   const packageInformation = index => allPackageInformation().at(index);
-  const packageInstallation = () => wrapper.find(PackageInstallation);
+  const npmInstallation = () => wrapper.find(NpmInstallation);
+  const mavenInstallation = () => wrapper.find(MavenInstallation);
   const allFileRows = () => wrapper.findAll('.js-file-row');
   const firstFileDownloadLink = () => wrapper.find('.js-file-download');
   const deleteButton = () => wrapper.find('.js-delete-button');
@@ -67,6 +71,12 @@ describe('PackagesApp', () => {
     expect(packageInformation(1)).toExist();
   });
 
+  it('renders package installation instructions for maven packages', () => {
+    createComponent();
+
+    expect(mavenInstallation()).toExist();
+  });
+
   it('does not render package metadata for npm as npm packages do not contain metadata', () => {
     createComponent({
       packageEntity: npmPackage,
@@ -83,13 +93,13 @@ describe('PackagesApp', () => {
       files: npmFiles,
     });
 
-    expect(packageInstallation()).toExist();
+    expect(npmInstallation()).toExist();
   });
 
   it('does not render package installation instructions for non npm packages', () => {
     createComponent();
 
-    expect(packageInstallation().exists()).toBe(false);
+    expect(npmInstallation().exists()).toBe(false);
   });
 
   it('renders a single file for an npm package as they only contain one file', () => {

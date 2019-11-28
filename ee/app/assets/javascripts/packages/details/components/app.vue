@@ -10,7 +10,8 @@ import {
 } from '@gitlab/ui';
 import _ from 'underscore';
 import PackageInformation from './information.vue';
-import PackageInstallation from './installation.vue';
+import NpmInstallation from './npm_installation.vue';
+import MavenInstallation from './maven_installation.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -28,7 +29,8 @@ export default {
     GlTable,
     Icon,
     PackageInformation,
-    PackageInstallation,
+    NpmInstallation,
+    MavenInstallation,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -67,14 +69,24 @@ export default {
       type: String,
       required: true,
     },
+    mavenPath: {
+      type: String,
+      required: true,
+    },
+    mavenHelpPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
+    isNpmPackage() {
+      return this.packageEntity.package_type === PackageType.NPM;
+    },
+    isMavenPackage() {
+      return this.packageEntity.package_type === PackageType.MAVEN;
+    },
     isValidPackage() {
-      if (this.packageEntity.name) {
-        return true;
-      }
-
-      return false;
+      return Boolean(this.packageEntity.name);
     },
     canDeletePackage() {
       return this.canDelete && this.destroyPath;
@@ -204,20 +216,31 @@ export default {
     </div>
 
     <div class="row prepend-top-default" data-qa-selector="package_information_content">
-      <package-information :type="packageEntity.package_type" :information="packageInformation" />
-      <package-information
-        v-if="packageMetadata"
-        :heading="packageMetadataTitle"
-        :information="packageMetadata"
-        :show-copy="true"
-      />
-      <package-installation
-        v-else
-        :type="packageEntity.package_type"
-        :name="packageEntity.name"
-        :registry-url="npmPath"
-        :help-url="npmHelpPath"
-      />
+      <div class="col-sm-6">
+        <package-information :information="packageInformation" />
+        <package-information
+          v-if="packageMetadata"
+          :heading="packageMetadataTitle"
+          :information="packageMetadata"
+          :show-copy="true"
+        />
+      </div>
+
+      <div class="col-sm-6">
+        <npm-installation
+          v-if="isNpmPackage"
+          :name="packageEntity.name"
+          :registry-url="npmPath"
+          :help-url="npmHelpPath"
+        />
+
+        <maven-installation
+          v-else-if="isMavenPackage"
+          :maven-metadata="packageEntity.maven_metadatum"
+          :registry-url="mavenPath"
+          :help-url="mavenHelpPath"
+        />
+      </div>
     </div>
 
     <gl-table
