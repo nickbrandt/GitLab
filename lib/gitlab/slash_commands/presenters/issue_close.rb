@@ -7,7 +7,7 @@ module Gitlab
         include Presenters::IssueBase
 
         def present
-          if @resource.confidential?
+          if resource.confidential?
             ephemeral_response(response_message)
           else
             in_channel_response(response_message)
@@ -15,7 +15,7 @@ module Gitlab
         end
 
         def already_closed
-          ephemeral_response(text: "Issue #{@resource.to_reference} is already closed.")
+          ephemeral_response(text: "Issue #{resource.to_reference} is already closed.")
         end
 
         private
