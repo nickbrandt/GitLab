@@ -15,6 +15,21 @@ describe Gitlab::Ci::Pipeline::Chain::Config::Content do
         stub_feature_flags(ci_root_config_content: false)
       end
 
+      context 'when config is passed in as parameter and already available in command' do
+        let(:ci_config_path) { nil }
+
+        before do
+          command.config_content = 'the-content'
+        end
+
+        it 'returns the content already available in command' do
+          subject.perform!
+
+          expect(pipeline.config_source).to eq 'bridge_source'
+          expect(command.config_content).to eq 'the-content'
+        end
+      end
+
       context 'when config is defined in a custom path in the repository' do
         let(:ci_config_path) { 'path/to/config.yml' }
 
@@ -132,6 +147,21 @@ describe Gitlab::Ci::Pipeline::Chain::Config::Content do
           expect(command.config_content).to be_nil
           expect(pipeline.errors.full_messages).to include('Missing CI config file')
         end
+      end
+    end
+
+    context 'when config is passed in as parameter and already available in command' do
+      let(:ci_config_path) { nil }
+
+      before do
+        command.config_content = 'the-content'
+      end
+
+      it 'returns the content already available in command' do
+        subject.perform!
+
+        expect(pipeline.config_source).to eq 'bridge_source'
+        expect(command.config_content).to eq 'the-content'
       end
     end
 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Ci
+  # TODO: rename this (and worker) to CreateDownstreamPipelineService
   class CreateCrossProjectPipelineService < ::BaseService
     include Gitlab::Utils::StrongMemoize
 
@@ -11,7 +12,7 @@ module Ci
         return bridge.drop!(:downstream_bridge_project_not_found)
       end
 
-      if target_project == project
+      if target_project == project && !bridge.triggers_child_pipeline?
         return bridge.drop!(:invalid_bridge_trigger)
       end
 
@@ -19,7 +20,11 @@ module Ci
         return bridge.drop!(:insufficient_bridge_permissions)
       end
 
-      create_pipeline!
+      if bridge.triggers_child_pipeline?
+        create_child_pipeline!
+      else
+        create_cross_project_pipeline!
+      end
     end
 
     private
@@ -39,10 +44,10 @@ module Ci
       ::Gitlab::UserAccess.new(target_user, project: target_project).can_update_branch?(target_ref)
     end
 
-    def create_pipeline!
+    def create_cross_project_pipeline!
       ::Ci::CreatePipelineService
         .new(target_project, target_user, ref: target_ref)
-        .execute(:pipeline, ignore_skip_ci: true) do |pipeline|
+        .execute(:cross_project_pipeline, ignore_skip_ci: true) do |pipeline|
           @bridge.sourced_pipelines.build(
             source_pipeline: @bridge.pipeline,
             source_project: @bridge.project,
@@ -51,6 +56,61 @@ module Ci
 
           pipeline.variables.build(@bridge.downstream_variables)
         end
+    end
+
+    def create_child_pipeline!
+      return unless @bridge.triggers_child_pipeline?
+
+      parent_pipeline = @bridge.pipeline
+
+      ::Ci::CreatePipelineService
+        .new(@bridge.project, @bridge.user,
+          ref: parent_pipeline.ref,
+          checkout_sha: parent_pipeline.sha,
+          before: parent_pipeline.before_sha,
+          source_sha: parent_pipeline.source_sha,
+          target_sha: parent_pipeline.target_sha
+        )
+        .execute(:parent_pipeline, ignore_skip_ci: true, config_content: @bridge.yaml_for_downstream) do |pipeline|
+          @bridge.sourced_pipelines.build(
+            source_pipeline: @bridge.pipeline,
+            source_project: @bridge.project,
+            project: target_project,
+            pipeline: pipeline)
+
+          pipeline.variables.build(@bridge.downstream_variables)
+        end
+    end
+
+    def create_child_pipeline!
+      parent_pipeline = @bridge.pipeline
+
+      ::Ci::CreatePipelineService
+        .new(@bridge.project, @bridge.user,
+          ref: parent_pipeline.ref,
+          checkout_sha: parent_pipeline.sha,
+          before: parent_pipeline.before_sha,
+          source_sha: parent_pipeline.source_sha,
+          target_sha: parent_pipeline.target_sha
+        )
+        .execute(:pipeline,
+          ignore_skip_ci: true,
+          config_content: downstream_yaml,
+          schedule: parent_pipeline.pipeline_schedule) do |pipeline|
+            @bridge.sourced_pipelines.build(
+              source_pipeline: @bridge.pipeline,
+              source_project: @bridge.project,
+              project: target_project,
+              pipeline: pipeline)
+
+            pipeline.variables.build(@bridge.downstream_variables)
+          end
+    end
+
+    def downstream_yaml
+      return unless @bridge.triggers_child_pipeline?
+
+      @bridge.downstream_yaml
     end
 
     def target_user

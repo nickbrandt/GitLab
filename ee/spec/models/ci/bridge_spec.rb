@@ -289,4 +289,48 @@ describe Ci::Bridge do
       expect(bridge.metadata.config_options).to be bridge.options
     end
   end
+
+  describe '#triggers_child_pipeline?' do
+    subject { bridge.triggers_child_pipeline? }
+
+    context 'when downstream project is same as the bridge project' do
+      context 'when bridge defines a downstream YAML' do
+        let(:options) do
+          {
+            trigger: {
+              project: project.full_path,
+              yaml: YAML.dump(rspec: { script: 'rspec' })
+            }
+          }
+        end
+
+        it { is_expected.to be_truthy }
+      end
+
+      context 'when bridge does not define a downstream YAML' do
+        let(:options) do
+          {
+            trigger: {
+              project: project.full_path
+            }
+          }
+        end
+
+        it { is_expected.to be_falsey }
+      end
+    end
+
+    context 'when downstream project is different than bridge project' do
+      let(:options) do
+        {
+          trigger: {
+            project: 'my/project',
+            yaml: YAML.dump(rspec: { script: 'rspec' })
+          }
+        }
+      end
+
+      it { is_expected.to be_falsey }
+    end
+  end
 end

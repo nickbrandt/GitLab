@@ -102,9 +102,19 @@ module EE
         downstream_project || upstream_project
       end
 
+      def triggers_child_pipeline?
+        same_project? && yaml_for_downstream.present?
+      end
+
       def downstream_project
         strong_memoize(:downstream_project) do
           options&.dig(:trigger, :project)
+        end
+      end
+
+      def yaml_for_downstream
+        strong_memoize(:yaml_for_downstream) do
+          options&.dig(:trigger, :yaml)
         end
       end
 
@@ -137,6 +147,12 @@ module EE
             { key: hash[:key], value: ::ExpandVariables.expand(hash[:value], all_variables) }
           end
         end
+      end
+
+      private
+
+      def same_project?
+        ::Project.find_by_full_path(downstream_project) == project
       end
     end
   end

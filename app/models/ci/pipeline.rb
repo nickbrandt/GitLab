@@ -694,6 +694,19 @@ module Ci
       all_merge_requests.order(id: :desc)
     end
 
+    # If pipeline is a child of another pipeline, include the parent
+    # and the siblings, otherwise return only itself.
+    def same_family_pipeline_ids
+      upstream_pipeline = triggered_by_pipeline
+
+      if upstream_pipeline && upstream_pipeline.project == self.project
+        child_pipeline_ids = upstream_pipeline&.triggered_pipelines&.pluck(:id) || []
+        child_pipeline_ids + [upstream_pipeline.id]
+      else
+        [self.id]
+      end
+    end
+
     def detailed_status(current_user)
       Gitlab::Ci::Status::Pipeline::Factory
         .new(self, current_user)
