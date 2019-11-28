@@ -11,6 +11,7 @@ import actions, {
   requestFeatureFlag,
   receiveFeatureFlagSuccess,
   receiveFeatureFlagError,
+  toggleActive,
 } from 'ee/feature_flags/store/modules/edit/actions';
 import state from 'ee/feature_flags/store/modules/edit/state';
 import * as types from 'ee/feature_flags/store/modules/edit/mutation_types';
@@ -255,6 +256,19 @@ describe('Feature flags Edit Module actions', () => {
             type: types.RECEIVE_FEATURE_FLAG_ERROR,
           },
         ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('toggelActive', () => {
+    it('should commit TOGGLE_ACTIVE mutation', done => {
+      testAction(
+        toggleActive,
+        true,
+        mockedState,
+        [{ type: types.TOGGLE_ACTIVE, payload: true }],
         [],
         done,
       );
