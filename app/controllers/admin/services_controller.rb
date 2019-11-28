@@ -7,7 +7,7 @@ class Admin::ServicesController < Admin::ApplicationController
   before_action :service, only: [:edit, :update]
 
   def index
-    @services = services_templates
+    @services = services_templates.reject(&:project_only?)
   end
 
   def edit

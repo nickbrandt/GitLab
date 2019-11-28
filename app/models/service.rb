@@ -330,6 +330,11 @@ class Service < ApplicationRecord
     false
   end
 
+  # Override for services supported at project level only
+  def project_only?
+    false
+  end
+
   private
 
   def cache_project_has_external_issue_tracker

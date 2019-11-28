@@ -58,6 +58,10 @@ class AlertsService < Service
     super || build_data
   end
 
+  def project_only?
+    true
+  end
+
   private
 
   def prevent_token_assignment

@@ -399,6 +399,12 @@ describe Service do
     end
   end
 
+  describe '#project_only?' do
+    let(:service) { build_stubbed(:service, template: true) }
+
+    it { expect(service).not_to be_project_only }
+  end
+
   describe '#api_field_names' do
     let(:fake_service) do
       Class.new(Service) do
