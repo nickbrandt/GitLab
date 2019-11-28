@@ -4,18 +4,13 @@ import { GlTab, GlTabs } from '@gitlab/ui';
 import CodeInstruction from './code_instruction.vue';
 
 export default {
-  name: 'PackageInstallation',
+  name: 'NpmInstallation',
   components: {
     CodeInstruction,
     GlTab,
     GlTabs,
   },
   props: {
-    heading: {
-      type: String,
-      default: s__('PackageRegistry|Package installation'),
-      required: false,
-    },
     name: {
       type: String,
       required: true,
@@ -72,7 +67,7 @@ export default {
 </script>
 
 <template>
-  <div class="col-sm-6 append-bottom-default">
+  <div class="append-bottom-default">
     <gl-tabs>
       <gl-tab :title="s__('PackageRegistry|Installation')">
         <div class="prepend-left-default append-right-default">

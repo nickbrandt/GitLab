@@ -1,6 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Package code instruction to match the default snapshot 1`] = `
+exports[`Package code instruction multiline to match the snapshot 1`] = `
+<div>
+  <pre>
+    this is some
+multiline text
+  </pre>
+</div>
+`;
+
+exports[`Package code instruction single line to match the default snapshot 1`] = `
 <div
   class="input-group append-bottom-10"
 >

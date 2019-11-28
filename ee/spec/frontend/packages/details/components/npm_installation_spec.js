@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
-import PackageInstallation from 'ee/packages/details/components/installation.vue';
+import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
 
-describe('PackageInstallation', () => {
+describe('NpmInstallation', () => {
   let wrapper;
 
   const packageScope = '@fake-scope';
@@ -29,7 +29,7 @@ describe('PackageInstallation', () => {
       ...props,
     };
 
-    wrapper = mount(PackageInstallation, {
+    wrapper = mount(NpmInstallation, {
       propsData,
     });
   }
