@@ -1,9 +1,10 @@
-import Vue from 'vue';
+import Vuex from 'vuex';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { GlEmptyState } from '@gitlab/ui';
 
-import component from 'ee/security_dashboard/components/security_dashboard_table.vue';
+import SecurityDashboardTable from 'ee/security_dashboard/components/security_dashboard_table.vue';
+import SecurityDashboardTableRow from 'ee/security_dashboard/components/security_dashboard_table_row.vue';
 import createStore from 'ee/security_dashboard/store';
-import { TEST_HOST } from 'spec/test_constants';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 
 import {
   RECEIVE_VULNERABILITIES_ERROR,
@@ -11,37 +12,37 @@ import {
   REQUEST_VULNERABILITIES,
 } from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
 
-import { resetStore } from '../helpers';
 import mockDataVulnerabilities from '../store/vulnerabilities/data/mock_data_vulnerabilities.json';
 
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 describe('Security Dashboard Table', () => {
-  const Component = Vue.extend(component);
   const vulnerabilitiesEndpoint = '/vulnerabilitiesEndpoint.json';
-  const props = {
-    dashboardDocumentation: TEST_HOST,
-    emptyStateSvgPath: TEST_HOST,
-  };
   let store;
-  let vm;
+  let wrapper;
 
   beforeEach(() => {
     store = createStore();
+    wrapper = shallowMount(SecurityDashboardTable, {
+      localVue,
+      store,
+      sync: false,
+    });
     store.state.vulnerabilities.vulnerabilitiesEndpoint = vulnerabilitiesEndpoint;
   });
 
   afterEach(() => {
-    resetStore(store);
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   describe('while loading', () => {
     beforeEach(() => {
       store.commit(`vulnerabilities/${REQUEST_VULNERABILITIES}`);
-      vm = mountComponentWithStore(Component, { store, props });
     });
 
     it('should render 10 skeleton rows in the table', () => {
-      expect(vm.$el.querySelectorAll('.vulnerabilities-row')).toHaveLength(10);
+      expect(wrapper.findAll(SecurityDashboardTableRow).length).toEqual(10);
     });
   });
 
@@ -51,11 +52,10 @@ describe('Security Dashboard Table', () => {
         vulnerabilities: mockDataVulnerabilities,
         pageInfo: {},
       });
-      vm = mountComponentWithStore(Component, { store, props });
     });
 
     it('should render a row for each vulnerability', () => {
-      expect(vm.$el.querySelectorAll('.vulnerabilities-row')).toHaveLength(
+      expect(wrapper.findAll(SecurityDashboardTableRow).length).toEqual(
         mockDataVulnerabilities.length,
       );
     });
@@ -67,26 +67,46 @@ describe('Security Dashboard Table', () => {
         vulnerabilities: [],
         pageInfo: {},
       });
-      vm = mountComponentWithStore(Component, { store, props });
     });
 
     it('should render the empty state', () => {
-      expect(vm.$el.querySelector('.empty-state')).not.toBeNull();
+      expect(wrapper.find(GlEmptyState).exists()).toBe(true);
     });
   });
 
   describe('on error', () => {
     beforeEach(() => {
       store.commit(`vulnerabilities/${RECEIVE_VULNERABILITIES_ERROR}`);
-      vm = mountComponentWithStore(Component, { store, props });
     });
 
     it('should not render the empty state', () => {
-      expect(vm.$el.querySelector('.empty-state')).toBeNull();
+      expect(wrapper.find(GlEmptyState).exists()).toBe(false);
     });
 
     it('should render the error alert', () => {
-      expect(vm.$el.querySelector('.flash-alert')).not.toBeNull();
+      expect(wrapper.find('.flash-alert').exists()).toBe(true);
+    });
+  });
+
+  describe('with a custom empty state', () => {
+    beforeEach(() => {
+      wrapper = shallowMount(SecurityDashboardTable, {
+        localVue,
+        store,
+        sync: false,
+        slots: {
+          emptyState: '<div class="customEmptyState">Hello World</div>',
+        },
+      });
+
+      store.commit(`vulnerabilities/${RECEIVE_VULNERABILITIES_SUCCESS}`, {
+        vulnerabilities: [],
+        pageInfo: {},
+      });
+    });
+
+    it('should render the custom empty state', () => {
+      expect(wrapper.find('.customEmptyState').exists()).toBe(true);
     });
   });
 });

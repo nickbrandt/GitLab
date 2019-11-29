@@ -139,8 +139,6 @@ export default {
 
         <security-dashboard
           v-else
-          :dashboard-documentation="dashboardDocumentation"
-          :empty-state-svg-path="emptyDashboardStateSvgPath"
           :vulnerabilities-endpoint="vulnerabilitiesEndpoint"
           :vulnerabilities-count-endpoint="vulnerabilitiesCountEndpoint"
           :vulnerabilities-history-endpoint="vulnerabilitiesHistoryEndpoint"

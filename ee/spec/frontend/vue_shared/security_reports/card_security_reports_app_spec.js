@@ -53,8 +53,6 @@ describe('Card security reports app', () => {
           id: 123,
           name: 'my-project',
         },
-        dashboardDocumentation: `${TEST_HOST}/dashboard_documentation`,
-        emptyStateSvgPath: `/empty_state.svg`,
         vulnerabilityFeedbackHelpPath: `${TEST_HOST}/vulnerability_feedback_help`,
         vulnerabilitiesEndpoint,
         vulnerabilitiesSummaryEndpoint,
