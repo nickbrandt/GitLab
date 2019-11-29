@@ -22,9 +22,7 @@ const {
   mapState: mapSecurityGroupsState,
   mapActions: mapSecurityGroupsActions,
 } = createNamespacedHelpers('securityGroups');
-const {
-  mapState: mapInstanceTypesState,
-} = createNamespacedHelpers('instanceTypes');
+const { mapState: mapInstanceTypesState } = createNamespacedHelpers('instanceTypes');
 
 export default {
   components: {
@@ -268,7 +266,6 @@ export default {
   methods: {
     ...mapActions([
       'createCluster',
-      'signOut',
       'setClusterName',
       'setEnvironmentScope',
       'setKubernetesVersion',
@@ -288,7 +285,6 @@ export default {
     ...mapRolesActions({ fetchRoles: 'fetchItems' }),
     ...mapKeyPairsActions({ fetchKeyPairs: 'fetchItems' }),
     ...mapSecurityGroupsActions({ fetchSecurityGroups: 'fetchItems' }),
-    ...mapInstanceTypesActions({ fetchInstanceTypes: 'fetchItems' }),
     setRegionAndFetchVpcsAndKeyPairs(region) {
       this.setRegion({ region });
       this.setVpc({ vpc: null });
