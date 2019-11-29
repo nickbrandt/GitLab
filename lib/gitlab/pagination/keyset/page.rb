@@ -12,8 +12,8 @@ module Gitlab
         attr_reader :order_by
 
         def initialize(order_by: {}, lower_bounds: nil, per_page: DEFAULT_PAGE_SIZE, end_reached: false)
-          @order_by = order_by.with_indifferent_access
-          @lower_bounds = lower_bounds
+          @order_by = order_by.symbolize_keys
+          @lower_bounds = lower_bounds&.symbolize_keys
           @per_page = per_page
           @end_reached = end_reached
         end
@@ -34,7 +34,7 @@ module Gitlab
         # Uses identical order_by/per_page information for the next page
         def next(lower_bounds, end_reached)
           dup.tap do |next_page|
-            next_page.lower_bounds = lower_bounds
+            next_page.lower_bounds = lower_bounds&.symbolize_keys
             next_page.end_reached = end_reached
           end
         end

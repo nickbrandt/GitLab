@@ -14,7 +14,7 @@ describe Gitlab::Pagination::Keyset::RequestContext do
       it 'extracts order_by/sorting information' do
         page = subject
 
-        expect(page.order_by).to eq('id' => :desc)
+        expect(page.order_by).to eq(id: :desc)
       end
     end
 
@@ -24,7 +24,7 @@ describe Gitlab::Pagination::Keyset::RequestContext do
       it 'extracts order_by/sorting information and adds tie breaker' do
         page = subject
 
-        expect(page.order_by).to eq('created_at' => :desc, 'id' => :desc)
+        expect(page.order_by).to eq(created_at: :desc, id: :desc)
       end
     end
 
@@ -34,7 +34,7 @@ describe Gitlab::Pagination::Keyset::RequestContext do
       it 'defaults to tie breaker' do
         page = subject
 
-        expect(page.order_by).to eq({ 'id' => :desc })
+        expect(page.order_by).to eq({ id: :desc })
       end
     end
 

@@ -33,12 +33,12 @@ describe Gitlab::Pagination::Keyset::Page do
     let(:page) { described_class.new(order_by: order_by, lower_bounds: lower_bounds, per_page: per_page, end_reached: end_reached) }
     subject { page.next(new_lower_bounds, new_end_reached) }
 
-    let(:order_by) { {} }
-    let(:lower_bounds) { double }
+    let(:order_by) { { id: :desc } }
+    let(:lower_bounds) { { id: 42 } }
     let(:per_page) { 10 }
     let(:end_reached) { false }
 
-    let(:new_lower_bounds) { double }
+    let(:new_lower_bounds) { { id: 21 } }
     let(:new_end_reached) { true }
 
     it 'copies over order_by' do
