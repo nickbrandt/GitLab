@@ -196,7 +196,13 @@ module EE
       end
 
       def groups_user_can_read_epics(epics, user)
-        groups = ::Group.where(id: epics.select(:group_id))
+        groups = if ::Feature.enabled?(:optimized_groups_user_can_read_epics_method)
+                   epics_query = epics.select(:group_id)
+                   ::Group.joins("INNER JOIN (#{epics_query.to_sql}) as epics on epics.group_id = namespaces.id")
+                 else
+                   ::Group.where(id: epics.select(:group_id))
+                 end
+
         groups = ::Gitlab::GroupPlansPreloader.new.preload(groups)
 
         DeclarativePolicy.user_scope do

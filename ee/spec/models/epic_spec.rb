@@ -101,7 +101,7 @@ describe Epic do
     end
   end
 
-  describe '.groups_user_can_read_epics' do
+  shared_examples '.groups_user_can_read_epics examples' do
     let_it_be(:private_group) { create(:group, :private) }
     let_it_be(:epic) { create(:epic, group: private_group) }
 
@@ -138,6 +138,24 @@ describe Epic do
           expect(subject).to be_empty
         end
       end
+    end
+  end
+
+  describe '.groups_user_can_read_epics' do
+    context 'with `optimized_groups_user_can_read_epics_method` feature flag enabled' do
+      before do
+        stub_feature_flags(optimized_groups_user_can_read_epics_method: true)
+      end
+
+      include_examples '.groups_user_can_read_epics examples'
+    end
+
+    context 'with `optimized_groups_user_can_read_epics_method` feature flag disabled' do
+      before do
+        stub_feature_flags(optimized_groups_user_can_read_epics_method: false)
+      end
+
+      include_examples '.groups_user_can_read_epics examples'
     end
   end
 
