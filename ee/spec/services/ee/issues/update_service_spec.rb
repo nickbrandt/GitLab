@@ -129,7 +129,7 @@ describe Issues::UpdateService do
         end
       end
 
-      context 'when issue does belongs to an epic' do
+      context 'when issue belongs to an epic' do
         before do
           issue.update!(epic: epic)
         end
@@ -153,6 +153,11 @@ describe Issues::UpdateService do
     it_behaves_like 'existing issuable with scoped labels' do
       let(:issuable) { issue }
       let(:parent) { project }
+    end
+
+    it_behaves_like 'issue with epic_id parameter' do
+      let(:execute) { described_class.new(project, user, params).execute(issue) }
+      let(:epic) { create(:epic, group: group) }
     end
   end
 end
