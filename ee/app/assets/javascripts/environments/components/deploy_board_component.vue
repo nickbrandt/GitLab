@@ -11,9 +11,9 @@
  */
 import _ from 'underscore';
 import { GlLoadingIcon, GlLink } from '@gitlab/ui';
+import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
 import { __, n__, s__, sprintf } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
-import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
 import STATUS_MAP from '../constants';
 
 export default {
@@ -97,8 +97,8 @@ export default {
     statuses() {
       return {
         ...STATUS_MAP,
-        transparent: {
-          class: 'transparent',
+        canary: {
+          class: 'canary-icon',
           text: __('Canary'),
           stable: false,
         },
