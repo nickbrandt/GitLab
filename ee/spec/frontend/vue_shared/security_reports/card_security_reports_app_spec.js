@@ -1,12 +1,12 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import { GlEmptyState } from '@gitlab/ui';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import { TEST_HOST } from 'helpers/test_constants';
 
 import CardSecurityDashboardApp from 'ee/vue_shared/security_reports/card_security_reports_app.vue';
 import createStore from 'ee/security_dashboard/store';
 import { trimText } from 'helpers/text_helper';
+import axios from '~/lib/utils/axios_utils';
 
 const localVue = createLocalVue();
 

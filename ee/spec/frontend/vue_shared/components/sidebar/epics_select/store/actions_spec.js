@@ -1,7 +1,5 @@
 import Api from 'ee/api';
 
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-
 import testAction from 'helpers/vuex_action_helper';
 
 import createDefaultState from 'ee/vue_shared/components/sidebar/epics_select/store/state';
@@ -9,6 +7,7 @@ import * as actions from 'ee/vue_shared/components/sidebar/epics_select/store/ac
 import * as types from 'ee/vue_shared/components/sidebar/epics_select/store/mutation_types';
 
 import { noneEpic } from 'ee/vue_shared/constants';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import { mockEpic1, mockIssue, mockEpics, mockAssignRemoveRes } from '../../mock_data';
 
