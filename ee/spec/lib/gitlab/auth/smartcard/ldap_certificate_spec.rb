@@ -25,7 +25,6 @@ describe Gitlab::Auth::Smartcard::LDAPCertificate do
       entry['mail'] = ldap_person_email
     end
   end
-  let(:ldap_person) { ::Gitlab::Auth::LDAP::Person.new(ldap_entry, ldap_provider) }
 
   before do
     allow(described_class).to(
@@ -41,7 +40,7 @@ describe Gitlab::Auth::Smartcard::LDAPCertificate do
   describe '#find_or_create_user' do
     subject { described_class.new(ldap_provider, certificate_header).find_or_create_user }
 
-    context 'user already exists' do
+    context 'user and smartcard ldap certificate already exists' do
       let(:user) { create(:user) }
 
       before do
@@ -56,6 +55,35 @@ describe Gitlab::Auth::Smartcard::LDAPCertificate do
 
       it 'does not create new user' do
         expect { subject }.not_to change { User.count }
+      end
+    end
+
+    context 'user exists but it is using a new ldap certificate' do
+      let(:ldap_person_email) { user.email }
+      let_it_be(:user) { create(:user) }
+
+      it 'finds existing user' do
+        expect(subject).to eql(user)
+      end
+
+      it 'does create new user identity' do
+        expect { subject }.to change { user.identities.count }.by(1)
+      end
+
+      context 'user already has a different ldap certificate identity' do
+        before do
+          create(:identity, { provider: 'ldapmain',
+                              extern_uid: 'old_subject_ldap_dn',
+                              user: user })
+        end
+
+        it "doesn't create a new identity" do
+          expect { subject }.not_to change { Identity.count }
+        end
+
+        it "doesn't create a new user" do
+          expect { subject }.not_to change { User.count }
+        end
       end
     end
 
