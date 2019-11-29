@@ -48,7 +48,6 @@ describe('Security Dashboard app', () => {
       },
       propsData: {
         dashboardDocumentation: '',
-        emptyStateSvgPath: '',
         vulnerabilitiesEndpoint,
         vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
