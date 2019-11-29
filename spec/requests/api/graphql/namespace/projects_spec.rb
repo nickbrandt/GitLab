@@ -32,6 +32,9 @@ describe 'getting projects' do
   end
 
   before do
+    # we don't care how many SQL queries the spec takes
+    stub_const("Gitlab::QueryLimiting::Transaction::THRESHOLD", 1000)
+
     group.add_owner(user)
   end
 
