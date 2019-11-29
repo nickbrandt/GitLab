@@ -75,9 +75,7 @@ module QA
           show.merge_immediately
         end
 
-        merged = Support::Retrier.retry_until(reload_page: page) do
-          page.has_content?('The changes were merged')
-        end
+        merged = Page::MergeRequest::Show.perform(&:merged?)
 
         expect(merged).to be_truthy, "Expected content 'The changes were merged' but it did not appear."
       end
@@ -116,7 +114,7 @@ module QA
         # automatically refresh, so we reload if the merge status
         # doesn't update quickly.
         merged = Support::Retrier.retry_until(reload_page: page) do
-          page.has_content?('The changes were merged')
+          Page::MergeRequest::Show.perform(&:merged?)
         end
 
         expect(merged).to be_truthy, "Expected content 'The changes were merged' but it did not appear."
