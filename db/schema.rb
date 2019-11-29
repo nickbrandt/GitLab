@@ -1293,6 +1293,7 @@ ActiveRecord::Schema.define(version: 2019_12_06_122926) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "can_push", default: false, null: false
+    t.index ["deploy_key_id"], name: "index_deploy_keys_projects_on_deploy_key_id"
     t.index ["project_id"], name: "index_deploy_keys_projects_on_project_id"
   end
 
