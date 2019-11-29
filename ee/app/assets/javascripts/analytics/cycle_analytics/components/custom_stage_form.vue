@@ -2,7 +2,7 @@
 import { isEqual } from 'underscore';
 import { GlButton, GlFormGroup, GlFormInput, GlFormSelect, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
-import { convertToSnakeCase } from '~/lib/utils/text_utility';
+import { convertObjectKeysToSnakeCase } from '~/lib/utils/common_utils';
 import LabelsSelector from './labels_selector.vue';
 import { STAGE_ACTIONS } from '../constants';
 import {
@@ -22,13 +22,6 @@ const initFields = {
   endEventIdentifier: null,
   endEventLabelId: null,
 };
-
-// TODO: should be a util / use a util if exists...
-const snakeFields = (fields = {}) =>
-  Object.entries(fields).reduce((acc, curr) => {
-    const [key, value] = curr;
-    return { ...acc, [convertToSnakeCase(key)]: value };
-  }, {});
 
 export default {
   components: {
@@ -97,17 +90,25 @@ export default {
       return isLabelEvent(this.labelEvents, this.fields.endEventIdentifier);
     },
     isComplete() {
-      if (!this.hasValidStartAndEndEventPair) return false;
-      const requiredFields = [
-        this.fields.startEventIdentifier,
-        this.fields.endEventIdentifier,
-        this.fields.name,
-      ];
+      if (!this.hasValidStartAndEndEventPair) {
+        return false;
+      }
+      const {
+        fields: {
+          name,
+          startEventIdentifier,
+          startEventLabelId,
+          endEventIdentifier,
+          endEventLabelId,
+        },
+      } = this;
+
+      const requiredFields = [startEventIdentifier, endEventIdentifier, name];
       if (this.startEventRequiresLabel) {
-        requiredFields.push(this.fields.startEventLabelId);
+        requiredFields.push(startEventLabelId);
       }
       if (this.endEventRequiresLabel) {
-        requiredFields.push(this.fields.endEventLabelId);
+        requiredFields.push(endEventLabelId);
       }
       return requiredFields.every(
         fieldValue => fieldValue && (fieldValue.length > 0 || fieldValue > 0),
@@ -151,7 +152,7 @@ export default {
       this.$emit('cancel');
     },
     handleSave() {
-      const data = snakeFields(this.fields);
+      const data = convertObjectKeysToSnakeCase(this.fields);
       if (this.isEditingCustomStage) {
         const { id } = this.initialFields;
         this.$emit(STAGE_ACTIONS.UPDATE, { ...data, id });
@@ -159,7 +160,7 @@ export default {
         this.$emit(STAGE_ACTIONS.CREATE, data);
       }
     },
-    handleSelectLabel(key, labelId = null) {
+    handleSelectLabel(key, labelId) {
       this.fields[key] = labelId;
     },
     handleClearLabel(key) {
@@ -200,7 +201,7 @@ export default {
             :labels="labels"
             :selected-label-id="fields.startEventLabelId"
             name="custom-stage-start-event-label"
-            @selectLabel="labelId => handleSelectLabel('startEventLabelId', labelId)"
+            @selectLabel="handleSelectLabel('startEventLabelId', $event)"
             @clearLabel="handleClearLabel('startEventLabelId')"
           />
         </gl-form-group>
@@ -231,7 +232,7 @@ export default {
             :labels="labels"
             :selected-label-id="fields.endEventLabelId"
             name="custom-stage-stop-event-label"
-            @selectLabel="labelId => handleSelectLabel('endEventLabelId', labelId)"
+            @selectLabel="handleSelectLabel('endEventLabelId', $event)"
             @clearLabel="handleClearLabel('endEventLabelId')"
           />
         </gl-form-group>

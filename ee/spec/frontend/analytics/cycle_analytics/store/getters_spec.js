@@ -1,6 +1,5 @@
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import {
-  allowedStages as stages,
   startDate,
   endDate,
   transformedDurationData,
@@ -11,44 +10,6 @@ let state = null;
 const selectedProjectIds = [5, 8, 11];
 
 describe('Cycle analytics getters', () => {
-  describe('with default state', () => {
-    beforeEach(() => {
-      state = {
-        stages: [],
-        selectedStage: null,
-      };
-    });
-
-    afterEach(() => {
-      state = null;
-    });
-
-    describe('defaultStage', () => {
-      it('will return null', () => {
-        expect(getters.defaultStage(state)).toEqual(null);
-      });
-    });
-  });
-
-  describe('with a set of stages', () => {
-    beforeEach(() => {
-      state = {
-        stages,
-        selectedStage: null,
-      };
-    });
-
-    afterEach(() => {
-      state = null;
-    });
-
-    describe('defaultStage', () => {
-      it('will return the first stage', () => {
-        expect(getters.defaultStage(state)).toEqual(stages[0]);
-      });
-    });
-  });
-
   describe('hasNoAccessError', () => {
     beforeEach(() => {
       state = {

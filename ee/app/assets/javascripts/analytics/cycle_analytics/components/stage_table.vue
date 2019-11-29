@@ -122,7 +122,12 @@ export default {
     },
   },
   methods: {
-    // TODO: DRY These up
+    selectStage(stage) {
+      this.$emit(STAGE_ACTIONS.SELECT, stage);
+    },
+    editStage(stage) {
+      this.$emit(STAGE_ACTIONS.EDIT, stage);
+    },
     hideStage(stageId) {
       this.$emit(STAGE_ACTIONS.HIDE, { id: stageId, hidden: true });
     },
@@ -163,8 +168,8 @@ export default {
               :is-default-stage="!stage.custom"
               @remove="removeStage(stage.id)"
               @hide="hideStage(stage.id)"
-              @select="$emit($options.STAGE_ACTIONS.SELECT, stage)"
-              @edit="$emit($options.STAGE_ACTIONS.EDIT, stage)"
+              @select="selectStage(stage)"
+              @edit="editStage(stage)"
             />
             <add-stage-button
               v-if="canEditStages"

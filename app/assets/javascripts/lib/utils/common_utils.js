@@ -5,7 +5,7 @@
 import $ from 'jquery';
 import axios from './axios_utils';
 import { getLocationHash } from './url_utility';
-import { convertToCamelCase } from './text_utility';
+import { convertToCamelCase, convertToSnakeCase } from './text_utility';
 import { isObject } from './type_utility';
 import breakpointInstance from '../../breakpoints';
 
@@ -696,6 +696,20 @@ export const convertObjectPropsToCamelCase = (obj = {}, options = {}) => {
     return acc;
   }, initial);
 };
+
+/**
+ * Converts all the object keys to snake case
+ *
+ * @param {Object} obj    Object to transform
+ * @returns {Object}
+ */
+export const convertObjectKeysToSnakeCase = (obj = {}) =>
+  obj
+    ? Object.entries(obj).reduce(
+        (acc, [key, value]) => ({ ...acc, [convertToSnakeCase(key)]: value }),
+        {},
+      )
+    : {};
 
 export const imagePath = imgUrl =>
   `${gon.asset_host || ''}${gon.relative_url_root || ''}/assets/${imgUrl}`;

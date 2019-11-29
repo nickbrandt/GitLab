@@ -70,13 +70,9 @@ export default {
       'endDate',
       'tasksByType',
     ]),
-    ...mapGetters([
-      'defaultStage',
-      'hasNoAccessError',
-      'durationChartPlottableData',
-    ]),
+    ...mapGetters(['hasNoAccessError', 'currentGroupPath', 'durationChartPlottableData']),
     shouldRenderEmptyState() {
-      return !this.selectedGroup;
+      return !this.selectedGroup;g
     },
     hasCustomizableCycleAnalytics() {
       return Boolean(this.glFeatures.customizableCycleAnalytics);
@@ -137,7 +133,7 @@ export default {
     onStageSelect(stage) {
       this.hideCustomStageForm();
       this.setSelectedStage(stage);
-      this.fetchStageData(this.selectedStage);
+      this.fetchStageData(this.selectedStage.slug);
     },
     onShowAddStageForm() {
       this.showCustomStageForm();

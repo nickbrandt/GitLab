@@ -5196,9 +5196,6 @@ msgstr ""
 msgid "CustomCycleAnalytics|Add stage"
 msgstr ""
 
-msgid "CustomCycleAnalytics|Edit stage"
-msgstr ""
-
 msgid "CustomCycleAnalytics|Editing stage"
 msgstr ""
 
@@ -5233,6 +5230,9 @@ msgid "CustomCycleAnalytics|Stop event"
 msgstr ""
 
 msgid "CustomCycleAnalytics|Stop event label"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Update stage"
 msgstr ""
 
 msgid "Customize colors"

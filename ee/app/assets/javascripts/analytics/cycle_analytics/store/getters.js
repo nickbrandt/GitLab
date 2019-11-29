@@ -3,8 +3,6 @@ import httpStatus from '~/lib/utils/http_status';
 import { dateFormats } from '../../shared/constants';
 import { getDurationChartData } from '../utils';
 
-export const defaultStage = ({ stages = [] }) => (stages.length ? stages[0] : null);
-
 export const hasNoAccessError = state => state.errorCode === httpStatus.FORBIDDEN;
 
 export const currentGroupPath = ({ selectedGroup }) =>

@@ -23,10 +23,11 @@ const error = new Error('Request failed with status code 404');
 const flashErrorMessage = 'There was an error while fetching cycle analytics data.';
 const selectedGroup = { fullPath: group.path };
 const [selectedStage] = stages;
+const selectedStageSlug = selectedStage.slug;
 const endpoints = {
   groupLabels: `/groups/${group.path}/-/labels`,
   cycleAnalyticsData: `/groups/${group.path}/-/cycle_analytics`,
-  stageData: `/groups/${group.path}/-/cycle_analytics/events/${selectedStage.slug}.json`,
+  stageData: `/groups/${group.path}/-/cycle_analytics/events/${selectedStageSlug}.json`,
   baseStagesEndpoint: '/-/analytics/cycle_analytics/stages',
 };
 
@@ -100,7 +101,7 @@ describe('Cycle analytics actions', () => {
     it('dispatches receiveStageDataSuccess with received data on success', done => {
       testAction(
         actions.fetchStageData,
-        selectedStage,
+        selectedStageSlug,
         state,
         [],
         [
@@ -397,7 +398,7 @@ describe('Cycle analytics actions', () => {
     });
 
     it('will flash an error when there are no stages', () => {
-      [([], null)].forEach(emptyStages => {
+      [[], null].forEach(emptyStages => {
         actions.receiveGroupStagesAndEventsSuccess(
           {
             commit: () => {},
@@ -503,7 +504,7 @@ describe('Cycle analytics actions', () => {
         ],
         [
           { type: 'setSelectedStage', payload: selectedStage },
-          { type: 'fetchStageData', payload: selectedStage },
+          { type: 'fetchStageData', payload: selectedStageSlug },
         ],
         done,
       );

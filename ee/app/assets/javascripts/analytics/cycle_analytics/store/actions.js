@@ -37,9 +37,8 @@ export const receiveStageDataError = ({ commit }) => {
   createFlash(__('There was an error fetching data for the selected stage'));
 };
 
-export const fetchStageData = ({ state, dispatch, getters }, stage) => {
+export const fetchStageData = ({ state, dispatch, getters }, slug) => {
   const { cycleAnalyticsRequestParams = {} } = getters;
-  const { id, slug } = stage;
   const {
     selectedGroup: { fullPath },
   } = state;
@@ -48,7 +47,7 @@ export const fetchStageData = ({ state, dispatch, getters }, stage) => {
 
   return Api.cycleAnalyticsStageEvents(
     fullPath,
-    stage.custom ? id : slug,
+    slug,
     nestQueryStringKeys(cycleAnalyticsRequestParams, 'cycle_analytics'),
   )
     .then(({ data }) => dispatch('receiveStageDataSuccess', data))
@@ -89,12 +88,8 @@ export const hideCustomStageForm = ({ commit }) => commit(types.HIDE_CUSTOM_STAG
 export const showCustomStageForm = ({ commit }) => commit(types.SHOW_CUSTOM_STAGE_FORM);
 
 export const editCustomStage = ({ commit, dispatch }, selectedStage = {}) => {
-  // TODO: should this be in the if
   commit(types.EDIT_CUSTOM_STAGE);
-
-  if (selectedStage.id) {
-    dispatch('setSelectedStage', selectedStage);
-  }
+  dispatch('setSelectedStage', selectedStage);
 };
 
 export const requestSummaryData = ({ commit }) => commit(types.REQUEST_SUMMARY_DATA);
@@ -147,8 +142,8 @@ export const fetchGroupLabels = ({ dispatch, state }) => {
     .catch(error => dispatch('receiveGroupLabelsError', error));
 };
 
-export const receiveGroupStagesAndEventsError = ({ commit }) => {
-  commit(types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR);
+export const receiveGroupStagesAndEventsError = ({ commit }, error) => {
+  commit(types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR, error);
   createFlash(__('There was an error fetching cycle analytics stages.'));
 };
 
@@ -156,8 +151,9 @@ export const receiveGroupStagesAndEventsSuccess = ({ state, commit, dispatch }, 
   commit(types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS, data);
   const { stages = [] } = state;
   if (stages && stages.length) {
-    dispatch('setSelectedStage', stages[0]);
-    dispatch('fetchStageData', stages[0]);
+    const [firstStage] = stages;
+    dispatch('setSelectedStage', firstStage);
+    dispatch('fetchStageData', firstStage.slug);
   } else {
     createFlash(__('There was an error while fetching cycle analytics data.'));
   }

@@ -377,7 +377,7 @@ describe 'Group Cycle Analytics', :js do
         context 'with changes' do
           before do
             select_edit_stage
-          end 
+          end
 
           it 'enables the submit button' do
             fill_in name_field, with: updated_custom_stage_name
