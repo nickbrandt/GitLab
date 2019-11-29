@@ -1,10 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { GlModal, GlButton } from '@gitlab/ui';
-import Tracking from '~/tracking';
 import Dashboard from 'ee/monitoring/components/dashboard.vue';
-import { createStore } from '~/monitoring/stores';
-import axios from '~/lib/utils/axios_utils';
 import {
   metricsGroupsAPIResponse,
   mockApiEndpoint,
@@ -13,6 +10,9 @@ import {
 } from 'spec/monitoring/mock_data';
 import propsData from 'spec/monitoring/components/dashboard_spec';
 import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
+import Tracking from '~/tracking';
+import { createStore } from '~/monitoring/stores';
+import axios from '~/lib/utils/axios_utils';
 import * as types from '~/monitoring/stores/mutation_types';
 
 const localVue = createLocalVue();
@@ -23,7 +23,7 @@ describe('Dashboard', () => {
   let store;
   let wrapper;
 
-  const findAddMetricButton = () => wrapper.find('.js-add-metric-button');
+  const findAddMetricButton = () => wrapper.vm.$refs.addMetricBtn;
 
   const createComponent = (props = {}) => {
     wrapper = shallowMount(localVue.extend(Component), {
@@ -89,7 +89,7 @@ describe('Dashboard', () => {
       });
 
       it('does not render add button on the dashboard', () => {
-        expect(findAddMetricButton().exists()).toBe(false);
+        expect(findAddMetricButton()).toBeUndefined();
       });
     });
 
@@ -120,7 +120,7 @@ describe('Dashboard', () => {
       });
 
       it('renders add button on the dashboard', () => {
-        expect(findAddMetricButton().exists()).toBe(true);
+        expect(findAddMetricButton()).toBeDefined();
       });
 
       it('uses modal for custom metrics form', () => {
@@ -129,10 +129,10 @@ describe('Dashboard', () => {
       });
 
       it('adding new metric is tracked', done => {
-        const submitButton = wrapper.find('.js-submit-custom-metrics-form');
+        const submitButton = wrapper.vm.$refs.submitCustomMetricsFormBtn;
         wrapper.setData({ formIsValid: true });
         wrapper.vm.$nextTick(() => {
-          submitButton.trigger('click');
+          submitButton.$el.click();
           wrapper.vm.$nextTick(() => {
             expect(Tracking.event).toHaveBeenCalledWith(
               document.body.dataset.page,
