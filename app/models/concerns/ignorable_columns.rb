@@ -23,19 +23,21 @@ module IgnorableColumns
 
       self.ignored_columns += columns.flatten # rubocop:disable Cop/IgnoredColumns
 
-      IGNORE_COLUMN_MUTEX.synchronize do
-        @ignored_columns_details ||= superclass.try(:ignored_columns_details)&.dup || {}
-
-        columns.flatten.each do |column|
-          @ignored_columns_details[column.to_sym] = ColumnIgnore.new(Date.parse(remove_after), remove_with)
-        end
+      columns.flatten.each do |column|
+        self.ignored_columns_details[column.to_sym] = ColumnIgnore.new(Date.parse(remove_after), remove_with)
       end
     end
 
     alias_method :ignore_column, :ignore_columns
 
     def ignored_columns_details
-      @ignored_columns_details || {}
+      unless defined?(@ignored_columns_details)
+        IGNORE_COLUMN_MUTEX.synchronize do
+          @ignored_columns_details ||= superclass.try(:ignored_columns_details)&.dup || {}
+        end
+      end
+
+      @ignored_columns_details
     end
 
     IGNORE_COLUMN_MUTEX = Mutex.new
