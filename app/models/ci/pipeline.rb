@@ -95,8 +95,12 @@ module Ci
 
     state_machine :status, initial: :created do
       event :enqueue do
-        transition [:created, :preparing, :skipped, :scheduled] => :pending
+        transition [:created, :waiting_for_resource, :preparing, :skipped, :scheduled] => :pending
         transition [:success, :failed, :canceled] => :running
+      end
+
+      event :request_resource do
+        transition any - [:waiting_for_resource] => :waiting_for_resource
       end
 
       event :prepare do
@@ -135,7 +139,7 @@ module Ci
       # Do not add any operations to this state_machine
       # Create a separate worker for each new operation
 
-      before_transition [:created, :preparing, :pending] => :running do |pipeline|
+      before_transition [:created, :waiting_for_resource, :preparing, :pending] => :running do |pipeline|
         pipeline.started_at = Time.now
       end
 
@@ -158,7 +162,7 @@ module Ci
         end
       end
 
-      after_transition [:created, :preparing, :pending] => :running do |pipeline|
+      after_transition [:created, :waiting_for_resource, :preparing, :pending] => :running do |pipeline|
         pipeline.run_after_commit { PipelineMetricsWorker.perform_async(pipeline.id) }
       end
 
@@ -166,7 +170,7 @@ module Ci
         pipeline.run_after_commit { PipelineMetricsWorker.perform_async(pipeline.id) }
       end
 
-      after_transition [:created, :preparing, :pending, :running] => :success do |pipeline|
+      after_transition [:created, :waiting_for_resource, :preparing, :pending, :running] => :success do |pipeline|
         pipeline.run_after_commit { PipelineSuccessWorker.perform_async(pipeline.id) }
       end
 
@@ -317,7 +321,7 @@ module Ci
     end
 
     def self.bridgeable_statuses
-      ::Ci::Pipeline::AVAILABLE_STATUSES - %w[created preparing pending]
+      ::Ci::Pipeline::AVAILABLE_STATUSES - %w[created waiting_for_resource preparing pending]
     end
 
     def stages_count
@@ -576,6 +580,7 @@ module Ci
         new_status = latest_builds_status.to_s
         case new_status
         when 'created' then nil
+        when 'waiting_for_resource' then request_resource
         when 'preparing' then prepare
         when 'pending' then enqueue
         when 'running' then run

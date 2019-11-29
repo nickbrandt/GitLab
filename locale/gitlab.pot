@@ -3358,6 +3358,9 @@ msgstr ""
 msgid "CiStatusLabel|waiting for manual action"
 msgstr ""
 
+msgid "CiStatusLabel|waiting for resource"
+msgstr ""
+
 msgid "CiStatusText|blocked"
 msgstr ""
 
@@ -3386,6 +3389,9 @@ msgid "CiStatusText|preparing"
 msgstr ""
 
 msgid "CiStatusText|skipped"
+msgstr ""
+
+msgid "CiStatusText|waiting"
 msgstr ""
 
 msgid "CiStatus|running"
@@ -18503,6 +18509,9 @@ msgid "This job is stuck because you don't have any active runners online with a
 msgstr ""
 
 msgid "This job is stuck because you don't have any active runners that can run this job."
+msgstr ""
+
+msgid "This job is waiting for resource: "
 msgstr ""
 
 msgid "This job requires a manual action"
