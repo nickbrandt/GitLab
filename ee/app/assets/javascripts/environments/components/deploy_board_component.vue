@@ -130,7 +130,7 @@ export default {
           </section>
 
           <section class="deploy-board-instances">
-            <span class="deploy-board-instances-text text-secondary">
+            <span class="deploy-board-instances-text gl-font-size-14 text-secondary">
               {{ instanceTitle }} ({{ instanceCount }})
             </span>
 

@@ -30,17 +30,6 @@
       width: 100%;
     }
 
-    .deploy-board-instances-text {
-      font-size: $gl-font-size;
-      color: $gl-text-color-secondary;
-    }
-
-    /*
-    .deploy-board-instances-container {
-      margin-top: -8px;
-    }
-    */
-
     .deploy-board-actions {
       order: 3;
       align-self: center;
@@ -76,7 +65,7 @@
     color: $gl-text-color;
     font-size: $gl-font-size-small;
     font-weight: $gl-font-weight-bold;
-    line-height: $gl-font-size-small;
+    line-height: $gl-line-height-14;
   }
 }
 
