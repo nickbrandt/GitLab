@@ -72,7 +72,7 @@ Decision on whether backporting a change will be performed is done at the discre
 
 1. Estimated [severity][severity-labels] of the bug: Highest possible impact to users based on the current definition of severity.
 
-1. Estimated [priority][priority-labels] of the bug: Immediate impact on all impacted users based on the above estimated severity.
+1. Estimated [priority][priority-definition] of the bug: Immediate impact on all impacted users based on the above estimated severity.
 
 1. Potentially incurring data loss and/or security breach.
 
@@ -151,4 +151,4 @@ More information about the release procedures can be found in our
 [priority-definition]: ../development/contributing/issue_workflow.md#priority-labels
 [severity-labels]: ../development/contributing/issue_workflow.html#severity-labels
 [managing bugs]: https://gitlab.com/gitlab-org/gitlab/blob/master/PROCESS.md#managing-bugs
-[release/tasks]: https://gitlab.com/gitlab-org/release/tasks/issues
+[release/tasks]: https://gitlab.com/gitlab-org/release/tasks/issues/new?issuable_template=Backporting-request
