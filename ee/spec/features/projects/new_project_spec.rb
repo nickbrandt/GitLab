@@ -269,7 +269,7 @@ describe 'New project' do
         end
       end
 
-      shared_context 'when custom project group template is set' do
+      context 'when custom project group template is set' do
         let(:group1) { create(:group) }
         let(:group2) { create(:group) }
         let(:group3) { create(:group) }
@@ -427,23 +427,6 @@ describe 'New project' do
             end
           end
         end
-      end
-
-      # Cleanup issue: https://gitlab.com/gitlab-org/gitlab/issues/35733
-      context 'when `optimized_groups_with_templates_finder` feature flag is enabled' do
-        before do
-          stub_feature_flags(optimized_groups_with_templates_finder: true)
-        end
-
-        include_context 'when custom project group template is set'
-      end
-
-      context 'when `optimized_groups_with_templates_finder` feature flag is disabled' do
-        before do
-          stub_feature_flags(optimized_groups_with_templates_finder: false)
-        end
-
-        include_context 'when custom project group template is set'
       end
 
       context 'when group template is not set' do

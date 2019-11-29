@@ -62,12 +62,7 @@ module EE
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })
       end
 
-      scope :with_project_templates, -> do
-        joins("INNER JOIN projects ON projects.namespace_id = namespaces.custom_project_templates_group_id")
-          .distinct
-      end
-
-      scope :with_project_templates_optimized, -> { where.not(custom_project_templates_group_id: nil) }
+      scope :with_project_templates, -> { where.not(custom_project_templates_group_id: nil) }
 
       scope :with_custom_file_templates, -> do
         preload(
