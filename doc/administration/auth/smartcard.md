@@ -114,6 +114,7 @@ attribute. As a prerequisite, you must use an LDAP server that:
    gitlab_rails['smartcard_enabled'] = true
    gitlab_rails['smartcard_ca_file'] = "/etc/ssl/certs/CA.pem"
    gitlab_rails['smartcard_client_certificate_required_port'] = 3444
+   gitlab_rails['smartcard_client_certificate_required_host'] = "cac.gitlab.example.com"
    ```
 
 1. Save the file and [reconfigure](../restart_gitlab.md#omnibus-gitlab-reconfigure)
@@ -129,11 +130,24 @@ attribute. As a prerequisite, you must use an LDAP server that:
    the same configuration except:
 
    - The additional NGINX server context must be configured to run on a different
-     port:
+     port. Alternatively, it can run on any port, including standard HTTPS port,
+     but with a different host name:
 
      ```
      listen *:3444 ssl;
      ```
+
+     Or
+
+     ```
+     listen *:443 ssl;
+     server_name cac.gitlab.example.com;
+     ```
+
+     NOTE: **Note:**
+     Currently, you can **only use a sub-domain of GitLab host name**, otherwise the
+     authentication module fails to redirect the authenticated users as if they haven't
+     logged in.
 
    - The additional NGINX server context must be configured to require the client
      side certificate:
@@ -197,6 +211,9 @@ attribute. As a prerequisite, you must use an LDAP server that:
 
      # Port where the client side certificate is requested by NGINX
      client_certificate_required_port: 3444
+
+     # Host where the client side certificate is requested by NGINX
+     client_certificate_required_host: cac.gitlab.example.com
    ```
 
 1. Save the file and [restart](../restart_gitlab.md#installations-from-source)

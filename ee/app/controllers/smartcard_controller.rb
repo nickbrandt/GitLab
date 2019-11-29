@@ -19,11 +19,19 @@ class SmartcardController < ApplicationController
 
   private
 
+  def root_url_options
+    {
+      protocol: Gitlab.config.gitlab.protocol,
+      host: Gitlab.config.gitlab.host,
+      port: Gitlab.config.gitlab.port
+    }
+  end
+
   def sign_in_with(certificate)
     user = certificate.find_or_create_user
     unless user&.persisted?
       flash[:alert] = _('Failed to signing using smartcard authentication')
-      redirect_to new_user_session_path(port: Gitlab.config.gitlab.port)
+      redirect_to new_user_session_path(root_url_options)
 
       return
     end
@@ -67,6 +75,6 @@ class SmartcardController < ApplicationController
   end
 
   def after_sign_in_path_for(resource)
-    stored_location_for(:redirect) || stored_location_for(resource) || root_url(port: Gitlab.config.gitlab.port)
+    stored_location_for(:redirect) || stored_location_for(resource) || root_url(root_url_options)
   end
 end

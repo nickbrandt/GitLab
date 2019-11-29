@@ -21,7 +21,11 @@ describe SmartcardController, type: :request do
       it 'redirects to root' do
         subject
 
-        expect(response).to redirect_to(root_url)
+        expect(response).to redirect_to(root_url({
+          protocol: Gitlab.config.gitlab.protocol,
+          host: Gitlab.config.gitlab.host,
+          port: Gitlab.config.gitlab.port
+        }))
       end
 
       it 'logs audit event' do

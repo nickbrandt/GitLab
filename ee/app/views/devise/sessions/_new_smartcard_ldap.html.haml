@@ -9,9 +9,8 @@
       = _('Use your smart card to authenticate with the LDAP server.')
 
     .login-body
-      = form_tag(smartcard_ldap_auth_url(provider: server['provider_name'],
-                                         port: smartcard_config_port),
-                 html: { 'aria-live' => 'assertive'}) do
+      = form_tag(smartcard_ldap_auth_url(protocol: 'https', host: smartcard_config_host, port: smartcard_config_port,
+                                         provider: server['provider_name']), html: { 'aria-live' => 'assertive'}) do
         .submit-container
           = submit_tag(_('Sign in with smart card'),
                        class: smartcard_login_button_classes(server['provider_name']))

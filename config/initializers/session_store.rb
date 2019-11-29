@@ -20,10 +20,14 @@ sessions_config[:namespace] = Gitlab::Redis::SharedState::SESSION_NAMESPACE
 
 Gitlab::Application.config.session_store(
   :redis_store, # Using the cookie_store would enable session replay attacks.
-  servers: sessions_config,
-  key: cookie_key,
-  secure: Gitlab.config.gitlab.https,
-  httponly: true,
-  expires_in: Settings.gitlab['session_expire_delay'] * 60,
-  path: Rails.application.config.relative_url_root.nil? ? '/' : Gitlab::Application.config.relative_url_root
+  {
+    servers: sessions_config,
+    key: cookie_key,
+    secure: Gitlab.config.gitlab.https,
+    httponly: true,
+    expires_in: Settings.gitlab['session_expire_delay'] * 60,
+    path: Rails.application.config.relative_url_root.nil? ? '/' : Gitlab::Application.config.relative_url_root,
+    # set the domain whenever the gitlab[host] is a valid domain name.
+    domain: ( ".#{Settings.gitlab['host']}" if Settings.gitlab['host'] =~ /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/ )
+  }.compact
 )

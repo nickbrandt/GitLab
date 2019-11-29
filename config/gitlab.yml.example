@@ -722,6 +722,10 @@ production: &base
     # Port where the client side certificate is requested by the webserver (NGINX/Apache)
     # client_certificate_required_port: 3444
 
+    # Host where the client side certificate is requested by the webserver (NGINX/Apache).
+    # Must be a subdomain of GitLab host.
+    # client_certificate_required_host: cac.gitlab.example.com
+
     # Browser session with smartcard sign-in is required for Git access
     # required_for_git_access: false
 

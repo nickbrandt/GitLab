@@ -1,0 +1,5 @@
+---
+title: Support different hostname for smartcard authentication
+merge_request: 20945
+author:
+type: added

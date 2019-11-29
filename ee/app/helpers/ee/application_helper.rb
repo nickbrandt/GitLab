@@ -72,6 +72,10 @@ module EE
       end
     end
 
+    def smartcard_config_host
+      ::Gitlab.config.smartcard.client_certificate_required_host
+    end
+
     def smartcard_config_port
       ::Gitlab.config.smartcard.client_certificate_required_port
     end
