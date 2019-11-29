@@ -20386,6 +20386,9 @@ msgstr ""
 msgid "assign yourself"
 msgstr ""
 
+msgid "at line %{errorLine}%{errorColumn}"
+msgstr ""
+
 msgid "attach a new file"
 msgstr ""
 
@@ -20864,6 +20867,9 @@ msgid "import flow"
 msgstr ""
 
 msgid "importing"
+msgstr ""
+
+msgid "in %{errorFn} "
 msgstr ""
 
 msgid "in group %{link_to_group}"
