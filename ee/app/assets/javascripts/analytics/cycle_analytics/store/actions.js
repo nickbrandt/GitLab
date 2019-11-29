@@ -1,9 +1,11 @@
+import dateFormat from 'dateformat';
 import createFlash, { hideFlash } from '~/flash';
 import { __ } from '~/locale';
 import Api from 'ee/api';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { nestQueryStringKeys } from '../utils';
+import { dateFormats } from '../../shared/constants';
 
 const removeError = () => {
   const flashEl = document.querySelector('.flash-alert');
@@ -11,22 +13,20 @@ const removeError = () => {
     hideFlash(flashEl);
   }
 };
-
+export const setFeatureFlags = ({ commit }, featureFlags) =>
+  commit(types.SET_FEATURE_FLAGS, featureFlags);
 export const setSelectedGroup = ({ commit }, group) => commit(types.SET_SELECTED_GROUP, group);
 export const setSelectedProjects = ({ commit }, projectIds) =>
   commit(types.SET_SELECTED_PROJECTS, projectIds);
 export const setSelectedStageId = ({ commit }, stageId) =>
   commit(types.SET_SELECTED_STAGE_ID, stageId);
 
-export const setDateRange = (
-  { commit, dispatch, state },
-  { skipFetch = false, startDate, endDate },
-) => {
+export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDate, endDate }) => {
   commit(types.SET_DATE_RANGE, { startDate, endDate });
 
   if (skipFetch) return false;
 
-  return dispatch('fetchCycleAnalyticsData', { state, dispatch });
+  return dispatch('fetchCycleAnalyticsData');
 };
 
 export const requestStageData = ({ commit }) => commit(types.REQUEST_STAGE_DATA);
@@ -56,8 +56,11 @@ export const fetchStageData = ({ state, dispatch, getters }, slug) => {
 };
 
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CYCLE_ANALYTICS_DATA);
-export const receiveCycleAnalyticsDataSuccess = ({ commit }) =>
+export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS);
+
+  dispatch('fetchDurationData');
+};
 
 export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
   const { status } = response;
@@ -287,4 +290,67 @@ export const removeStage = ({ dispatch, state }, stageId) => {
   return Api.cycleAnalyticsRemoveStage(stageId, fullPath)
     .then(() => dispatch('receiveRemoveStageSuccess'))
     .catch(error => dispatch('receiveRemoveStageError', error));
+};
+
+export const requestDurationData = ({ commit }) => commit(types.REQUEST_DURATION_DATA);
+
+export const receiveDurationDataSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_DURATION_DATA_SUCCESS, data);
+
+export const receiveDurationDataError = ({ commit }) => {
+  commit(types.RECEIVE_DURATION_DATA_ERROR);
+  createFlash(__('There was an error while fetching cycle analytics duration data.'));
+};
+
+export const fetchDurationData = ({ state, dispatch }) => {
+  dispatch('requestDurationData');
+
+  const {
+    featureFlags: { hasDurationChart },
+    stages,
+    startDate,
+    endDate,
+    selectedProjectIds,
+    selectedGroup: { fullPath },
+  } = state;
+
+  if (hasDurationChart) {
+    return Promise.all(
+      stages.map(stage => {
+        const { slug } = stage;
+
+        return Api.cycleAnalyticsDurationChart(slug, {
+          group_id: fullPath,
+          created_after: dateFormat(startDate, dateFormats.isoDate),
+          created_before: dateFormat(endDate, dateFormats.isoDate),
+          project_ids: selectedProjectIds,
+        }).then(({ data }) => ({
+          slug,
+          selected: true,
+          data,
+        }));
+      }),
+    )
+      .then(data => {
+        dispatch('receiveDurationDataSuccess', data);
+      })
+      .catch(() => dispatch('receiveDurationDataError'));
+  }
+  return false;
+};
+
+export const updateSelectedDurationChartStages = ({ state, commit }, stages) => {
+  const updatedDurationStageData = state.durationData.map(stage => {
+    const selected = stages.reduce((result, object) => {
+      if (object.slug === stage.slug) return true;
+      return result;
+    }, false);
+
+    return {
+      ...stage,
+      selected,
+    };
+  });
+
+  commit(types.UPDATE_SELECTED_DURATION_CHART_STAGES, updatedDurationStageData);
 };

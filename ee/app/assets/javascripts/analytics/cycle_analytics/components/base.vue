@@ -7,6 +7,8 @@ import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { PROJECTS_PER_PAGE, DEFAULT_DAYS_IN_PAST } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
+import Scatterplot from '../../shared/components/scatterplot.vue';
+import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
 import { LAST_ACTIVITY_AT } from '../../shared/constants';
@@ -14,13 +16,15 @@ import { LAST_ACTIVITY_AT } from '../../shared/constants';
 export default {
   name: 'CycleAnalytics',
   components: {
-    GlEmptyState,
     GlLoadingIcon,
+    GlEmptyState,
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
     SummaryTable,
     StageTable,
     GlDaterangePicker,
+    StageDropdownFilter,
+    Scatterplot,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -45,9 +49,11 @@ export default {
   },
   computed: {
     ...mapState([
+      'featureFlags',
       'isLoading',
       'isLoadingStage',
       'isLoadingChartData',
+      'isLoadingDurationChart',
       'isEmptyStage',
       'isAddingCustomStage',
       'isSavingCustomStage',
@@ -64,7 +70,13 @@ export default {
       'endDate',
       'tasksByType',
     ]),
-    ...mapGetters(['currentStage', 'defaultStage', 'hasNoAccessError', 'currentGroupPath']),
+    ...mapGetters([
+      'currentStage',
+      'defaultStage',
+      'hasNoAccessError',
+      'currentGroupPath',
+      'durationChartPlottableData',
+    ]),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -74,17 +86,26 @@ export default {
     shouldDisplayFilters() {
       return this.selectedGroup && !this.errorCode;
     },
+    shouldDisplayDurationChart() {
+      return !this.isLoadingDurationChart && !this.isLoading;
+    },
     dateRange: {
       get() {
         return { startDate: this.startDate, endDate: this.endDate };
       },
       set({ startDate, endDate }) {
-        this.setDateRange({ startDate, endDate });
+        this.setDateRange({
+          startDate,
+          endDate,
+        });
       },
     },
   },
   mounted() {
     this.initDateRange();
+    this.setFeatureFlags({
+      hasDurationChart: this.glFeatures.cycleAnalyticsScatterplotEnabled,
+    });
   },
   methods: {
     ...mapActions([
@@ -95,7 +116,6 @@ export default {
       'setSelectedGroup',
       'setSelectedProjects',
       'setSelectedTimeframe',
-      'fetchStageData',
       'setSelectedStageId',
       'hideCustomStageForm',
       'showCustomStageForm',
@@ -104,6 +124,8 @@ export default {
       'createCustomStage',
       'updateStage',
       'removeStage',
+      'updateSelectedDurationChartStages',
+      'setFeatureFlags',
     ]),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
@@ -135,6 +157,9 @@ export default {
     },
     onRemoveStage(id) {
       this.removeStage(id);
+    },
+    onDurationStageSelect(stages) {
+      this.updateSelectedDurationChartStages(stages);
     },
   },
   groupsQueryParams: {
@@ -238,6 +263,29 @@ export default {
           />
         </div>
       </div>
+      <template v-if="featureFlags.hasDurationChart">
+        <template v-if="shouldDisplayDurationChart">
+          <div class="mt-3 d-flex">
+            <h4 class="mt-0">{{ s__('CycleAnalytics|Days to completion') }}</h4>
+            <stage-dropdown-filter
+              v-if="stages.length"
+              class="ml-auto"
+              :stages="stages"
+              @selected="onDurationStageSelect"
+            />
+          </div>
+          <scatterplot
+            v-if="durationChartPlottableData"
+            :x-axis-title="s__('CycleAnalytics|Date')"
+            :y-axis-title="s__('CycleAnalytics|Total days to completion')"
+            :scatter-data="durationChartPlottableData"
+          />
+          <div v-else ref="duration-chart-no-data" class="bs-callout bs-callout-info">
+            {{ __('There is no data available. Please change your selection.') }}
+          </div>
+        </template>
+        <gl-loading-icon v-else-if="!isLoading" size="md" class="my-4 py-4" />
+      </template>
     </div>
   </div>
 </template>

@@ -13,6 +13,9 @@ import {
   startDate,
   endDate,
   customizableStagesAndEvents,
+  rawDurationData,
+  transformedDurationData,
+  defaultStages,
 } from '../mock_data';
 
 const stageData = { events: [] };
@@ -24,6 +27,7 @@ const endpoints = {
   groupLabels: `/groups/${group.path}/-/labels`,
   cycleAnalyticsData: `/groups/${group.path}/-/cycle_analytics`,
   stageData: `/groups/${group.path}/-/cycle_analytics/events/${selectedStageSlug}.json`,
+  baseStagesEndpoint: '/-/analytics/cycle_analytics/stages',
 };
 
 const stageEndpoint = ({ stageId }) => `/-/analytics/cycle_analytics/stages/${stageId}`;
@@ -40,6 +44,9 @@ describe('Cycle analytics actions', () => {
     state = {
       stages: [],
       getters,
+      featureFlags: {
+        hasDurationChart: true,
+      },
     };
     mock = new MockAdapter(axios);
   });
@@ -51,6 +58,7 @@ describe('Cycle analytics actions', () => {
 
   it.each`
     action                   | type                       | stateKey                | payload
+    ${'setFeatureFlags'}     | ${'SET_FEATURE_FLAGS'}     | ${'featureFlags'}       | ${{ hasDurationChart: true }}
     ${'setSelectedGroup'}    | ${'SET_SELECTED_GROUP'}    | ${'selectedGroup'}      | ${'someNewGroup'}
     ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
     ${'setSelectedStageId'}  | ${'SET_SELECTED_STAGE_ID'} | ${'selectedStageId'}    | ${'someNewGroup'}
@@ -71,14 +79,12 @@ describe('Cycle analytics actions', () => {
 
   describe('setDateRange', () => {
     it('sets the dates as expected and dispatches fetchCycleAnalyticsData', done => {
-      const dispatch = expect.any(Function);
-
       testAction(
         actions.setDateRange,
         { startDate, endDate },
         state,
         [{ type: types.SET_DATE_RANGE, payload: { startDate, endDate } }],
-        [{ type: 'fetchCycleAnalyticsData', payload: { dispatch, state } }],
+        [{ type: 'fetchCycleAnalyticsData' }],
         done,
       );
     });
@@ -230,6 +236,7 @@ describe('Cycle analytics actions', () => {
         fetchSummaryData: overrides.fetchSummaryData || jest.fn().mockResolvedValue(),
         receiveCycleAnalyticsDataSuccess:
           overrides.receiveCycleAnalyticsDataSuccess || jest.fn().mockResolvedValue(),
+        fetchDurationData: overrides.fetchDurationData || jest.fn().mockResolvedValue(),
       };
       return {
         mocks,
@@ -238,7 +245,8 @@ describe('Cycle analytics actions', () => {
           .mockImplementationOnce(mocks.requestCycleAnalyticsData)
           .mockImplementationOnce(mocks.fetchGroupStagesAndEvents)
           .mockImplementationOnce(mocks.fetchSummaryData)
-          .mockImplementationOnce(mocks.receiveCycleAnalyticsDataSuccess),
+          .mockImplementationOnce(mocks.receiveCycleAnalyticsDataSuccess)
+          .mockImplementationOnce(mocks.fetchDurationData),
       };
     }
 
@@ -263,6 +271,7 @@ describe('Cycle analytics actions', () => {
           expect(mocks.fetchGroupStagesAndEvents).toHaveBeenCalled();
           expect(mocks.fetchSummaryData).toHaveBeenCalled();
           expect(mocks.receiveCycleAnalyticsDataSuccess).toHaveBeenCalled();
+          expect(mocks.fetchDurationData).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
@@ -318,6 +327,34 @@ describe('Cycle analytics actions', () => {
           done();
         })
         .catch(done.fail);
+    });
+
+    it(`displays an error if fetchDurationData fails`, () => {
+      const { mockDispatchContext } = mockFetchCycleAnalyticsAction({
+        fetchDurationData: actions.fetchDurationData(
+          {
+            dispatch: jest
+              .fn()
+              .mockResolvedValueOnce()
+              .mockImplementation(actions.receiveDurationDataError({ commit: () => {} })),
+            commit: () => {},
+            state: { ...state, endpoints: { cycleAnalyticsStagesPath: '/this/is/fake' } },
+            getters,
+          },
+          {},
+        ),
+      });
+
+      actions.fetchDurationData(
+        {
+          dispatch: mockDispatchContext,
+          state: { ...state, endpoints: { cycleAnalyticsStagesPath: '/this/is/fake' } },
+          commit: () => {},
+        },
+        {},
+      );
+
+      shouldFlashAMessage('There was an error while fetching cycle analytics duration data.');
     });
 
     describe('with an existing error', () => {
@@ -439,6 +476,7 @@ describe('Cycle analytics actions', () => {
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
     });
+
     it(`commits the ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS} mutation`, done => {
       testAction(
         actions.receiveGroupStagesAndEventsSuccess,
@@ -657,6 +695,186 @@ describe('Cycle analytics actions', () => {
 
       shouldFlashAMessage('Stage removed');
       done();
+    });
+  });
+
+  describe('fetchDurationData', () => {
+    beforeEach(() => {
+      defaultStages.forEach(stage => {
+        mock
+          .onGet(`${endpoints.baseStagesEndpoint}/${stage}/duration_chart`)
+          .replyOnce(200, [...rawDurationData]);
+      });
+    });
+
+    it("dispatches the 'requestDurationData' and 'receiveDurationDataSuccess' actions", done => {
+      const stateWithStages = {
+        ...state,
+        stages: [stages[0], stages[1]],
+        selectedGroup,
+        startDate,
+        endDate,
+      };
+
+      testAction(
+        actions.fetchDurationData,
+        transformedDurationData,
+        stateWithStages,
+        [],
+        [
+          { type: 'requestDurationData' },
+          {
+            type: 'receiveDurationDataSuccess',
+            payload: transformedDurationData,
+          },
+        ],
+        done,
+      );
+    });
+
+    it("dispatches the 'requestDurationData' and 'receiveDurationDataError' actions when there is an error", done => {
+      const brokenState = {
+        ...state,
+        stages: [
+          {
+            slug: 'oops',
+          },
+        ],
+        selectedGroup,
+        startDate,
+        endDate,
+      };
+
+      testAction(
+        actions.fetchDurationData,
+        {},
+        brokenState,
+        [],
+        [{ type: 'requestDurationData' }, { type: 'receiveDurationDataError' }],
+        done,
+      );
+    });
+  });
+
+  describe('receiveDurationDataSuccess', () => {
+    const payload = { durationData: transformedDurationData, isLoadingDurationChart: false };
+
+    testAction(
+      actions.receiveDurationDataSuccess,
+      payload,
+      state,
+      [
+        {
+          type: types.RECEIVE_DURATION_DATA_SUCCESS,
+          payload,
+        },
+      ],
+      [],
+    );
+  });
+
+  describe('receiveDurationDataError', () => {
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+    });
+
+    it("commits the 'RECEIVE_DURATION_DATA_ERROR' mutation", () => {
+      testAction(
+        actions.receiveDurationDataError,
+        {},
+        state,
+        [
+          {
+            type: types.RECEIVE_DURATION_DATA_ERROR,
+          },
+        ],
+        [],
+      );
+    });
+
+    it('will flash an error', () => {
+      actions.receiveDurationDataError({
+        commit: () => {},
+      });
+
+      shouldFlashAMessage('There was an error while fetching cycle analytics duration data.');
+    });
+  });
+
+  describe('updateSelectedDurationChartStages', () => {
+    it("commits the 'UPDATE_SELECTED_DURATION_CHART_STAGES' mutation with all the selected stages in the duration data", () => {
+      const stateWithDurationData = {
+        ...state,
+        durationData: transformedDurationData,
+      };
+
+      testAction(
+        actions.updateSelectedDurationChartStages,
+        [...stages],
+        stateWithDurationData,
+        [
+          {
+            type: types.UPDATE_SELECTED_DURATION_CHART_STAGES,
+            payload: transformedDurationData,
+          },
+        ],
+        [],
+      );
+    });
+
+    it("commits the 'UPDATE_SELECTED_DURATION_CHART_STAGES' mutation with all the selected and deselected stages in the duration data", () => {
+      const stateWithDurationData = {
+        ...state,
+        durationData: transformedDurationData,
+      };
+
+      testAction(
+        actions.updateSelectedDurationChartStages,
+        [stages[0]],
+        stateWithDurationData,
+        [
+          {
+            type: types.UPDATE_SELECTED_DURATION_CHART_STAGES,
+            payload: [
+              transformedDurationData[0],
+              {
+                ...transformedDurationData[1],
+                selected: false,
+              },
+            ],
+          },
+        ],
+        [],
+      );
+    });
+
+    it("commits the 'UPDATE_SELECTED_DURATION_CHART_STAGES' mutation with all deselected stages in the duration data", () => {
+      const stateWithDurationData = {
+        ...state,
+        durationData: transformedDurationData,
+      };
+
+      testAction(
+        actions.updateSelectedDurationChartStages,
+        [],
+        stateWithDurationData,
+        [
+          {
+            type: types.UPDATE_SELECTED_DURATION_CHART_STAGES,
+            payload: [
+              {
+                ...transformedDurationData[0],
+                selected: false,
+              },
+              {
+                ...transformedDurationData[1],
+                selected: false,
+              },
+            ],
+          },
+        ],
+        [],
+      );
     });
   });
 });

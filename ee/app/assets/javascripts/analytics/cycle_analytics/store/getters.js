@@ -1,6 +1,7 @@
 import dateFormat from 'dateformat';
 import httpStatus from '~/lib/utils/http_status';
 import { dateFormats } from '../../shared/constants';
+import { getDurationChartData } from '../utils';
 
 export const currentStage = ({ stages, selectedStageId }) =>
   stages.length && selectedStageId ? stages.find(stage => stage.id === selectedStageId) : null;
@@ -20,3 +21,11 @@ export const cycleAnalyticsRequestParams = ({
   created_after: startDate ? dateFormat(startDate, dateFormats.isoDate) : null,
   created_before: endDate ? dateFormat(endDate, dateFormats.isoDate) : null,
 });
+
+export const durationChartPlottableData = state => {
+  const { durationData, startDate, endDate } = state;
+  const selectedStagesDurationData = durationData.filter(stage => stage.selected);
+  const plottableData = getDurationChartData(selectedStagesDurationData, startDate, endDate);
+
+  return plottableData.length ? plottableData : null;
+};
