@@ -231,4 +231,68 @@ describe GitlabSubscription do
       end
     end
   end
+
+  describe 'callbacks' do
+    it 'gitlab_subscription columns are contained in gitlab_subscription_history columns' do
+      diff_attrs = %w(updated_at)
+      expect(described_class.attribute_names - GitlabSubscriptionHistory.attribute_names).to eq(diff_attrs)
+    end
+
+    it 'gitlab_subscription_history columns have some extra columns over gitlab_subscription' do
+      diff_attrs = %w(gitlab_subscription_created_at gitlab_subscription_updated_at change_type gitlab_subscription_id)
+      expect(GitlabSubscriptionHistory.attribute_names - described_class.attribute_names).to eq(diff_attrs)
+    end
+
+    context 'after_create_commit' do
+      it 'logs previous state to gitlab subscription history' do
+        subject.save
+
+        expect(GitlabSubscriptionHistory.count).to eq(1)
+        expected_attrs = {
+          'gitlab_subscription_id' => subject.id,
+          'change_type' => 'gitlab_subscription_created'
+        }
+        expect(GitlabSubscriptionHistory.last.attributes).to include(expected_attrs)
+      end
+    end
+
+    context 'before_update' do
+      it 'logs previous state to gitlab subscription history' do
+        subject.update max_seats_used: 42, seats: 13
+        subject.update max_seats_used: 32
+
+        expect(GitlabSubscriptionHistory.count).to eq(2)
+        expected_attrs = {
+          'gitlab_subscription_id' => subject.id,
+          'change_type' => 'gitlab_subscription_updated',
+          'max_seats_used' => 42,
+          'seats' => 13
+        }
+        expect(GitlabSubscriptionHistory.last.attributes).to include(expected_attrs)
+      end
+    end
+
+    context 'after_destroy_commit' do
+      it 'logs previous state to gitlab subscription history' do
+        group = create(:group)
+        plan = create(:bronze_plan)
+        subject.update max_seats_used: 37, seats: 11, namespace: group, hosted_plan: plan
+        db_created_at = described_class.last.created_at
+
+        subject.destroy
+
+        expect(GitlabSubscriptionHistory.count).to eq(2)
+        expected_attrs = {
+          'gitlab_subscription_id' => subject.id,
+          'change_type' => 'gitlab_subscription_destroyed',
+          'max_seats_used' => 37,
+          'seats' => 11,
+          'namespace_id' => group.id,
+          'hosted_plan_id' => plan.id,
+          'gitlab_subscription_created_at' => db_created_at
+        }
+        expect(GitlabSubscriptionHistory.last.attributes).to include(expected_attrs)
+      end
+    end
+  end
 end
