@@ -12278,6 +12278,9 @@ msgstr ""
 msgid "PerformanceBar|Download"
 msgstr ""
 
+msgid "PerformanceBar|Frontend resources"
+msgstr ""
+
 msgid "PerformanceBar|Gitaly calls"
 msgstr ""
 
