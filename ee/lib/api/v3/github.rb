@@ -78,6 +78,10 @@ module API
           MergeRequestsFinder.new(current_user, authorized_only: true).execute
         end
 
+        def authorized_merge_requests_for_project(project)
+          MergeRequestsFinder.new(current_user, authorized_only: true, project_id: project.id).execute
+        end
+
         # rubocop: disable CodeReuse/ActiveRecord
         def find_notes(noteable)
           # They're not presented on Jira Dev Panel ATM. A comments count with a
@@ -154,7 +158,7 @@ module API
         get ':namespace/:project/pulls' do
           user_project = find_project_with_access(params)
 
-          merge_requests = MergeRequestsFinder.new(current_user, authorized_only: true, project_id: user_project.id).execute
+          merge_requests = authorized_merge_requests_for_project(user_project)
 
           present paginate(merge_requests), with: ::API::Github::Entities::PullRequest
         end
@@ -163,9 +167,9 @@ module API
           use :project_full_path
         end
         get ':namespace/:project/pulls/:id' do
-          mr = find_merge_request_with_access(params[:id])
+          merge_request = find_merge_request_with_access(params[:id])
 
-          present mr, with: ::API::Github::Entities::PullRequest
+          present merge_request, with: ::API::Github::Entities::PullRequest
         end
 
         # In Github, each Merge Request is automatically also an issue.
@@ -195,7 +199,7 @@ module API
         get ':namespace/:project/events' do
           user_project = find_project_with_access(params)
 
-          merge_requests = MergeRequestsFinder.new(current_user, authorized_only: true, project_id: user_project.id).execute
+          merge_requests = authorized_merge_requests_for_project(user_project)
 
           present paginate(merge_requests), with: ::API::Github::Entities::PullRequestEvent
         end
