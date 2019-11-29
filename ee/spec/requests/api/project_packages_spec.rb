@@ -5,9 +5,9 @@ require 'spec_helper'
 describe API::ProjectPackages do
   let(:user) { create(:user) }
   let(:project) { create(:project, :public) }
-  let!(:package1) { create(:npm_package, project: project) }
+  let!(:package1) { create(:npm_package, project: project, version: '3.1.0', name: "@#{project.root_namespace.path}/foo1") }
   let(:package_url) { "/projects/#{project.id}/packages/#{package1.id}" }
-  let!(:package2) { create(:npm_package, project: project) }
+  let!(:package2) { create(:npm_package, project: project, version: '2.0.4', name: "@#{project.root_namespace.path}/foo2") }
   let!(:another_package) { create(:npm_package) }
   let(:no_package_url) { "/projects/#{project.id}/packages/0" }
   let(:wrong_package_url) { "/projects/#{project.id}/packages/#{another_package.id}" }
@@ -66,6 +66,58 @@ describe API::ProjectPackages do
           let!(:package4) { create(:npm_package, project: project) }
 
           it_behaves_like 'returns paginated packages'
+        end
+      end
+
+      context 'with sorting' do
+        shared_examples 'package sorting' do |order_by, package_names|
+          subject { get api(url), params: { sort: sort, order_by: order_by } }
+
+          let(:packages) { package_names.map { |name| send(name) } }
+
+          context "sorting by #{order_by}" do
+            context 'ascending order' do
+              let(:sort) { 'asc' }
+
+              it 'returns the sorted packages' do
+                subject
+
+                expect(json_response.map { |package| package['id'] }).to eq(packages.map(&:id))
+              end
+            end
+
+            context 'descending order' do
+              let(:sort) { 'desc' }
+
+              it 'returns the sorted packages' do
+                subject
+
+                expect(json_response.map { |package| package['id'] }).to eq(packages.reverse.map(&:id))
+              end
+            end
+          end
+        end
+
+        let(:package3) { create(:maven_package, project: project, version: '1.1.1', name: 'zzz') }
+
+        before do
+          travel_to(1.day.ago) do
+            package3
+          end
+        end
+
+        it_behaves_like 'package sorting', 'name', [:package1, :package2, :package3]
+        it_behaves_like 'package sorting', 'created_at', [:package3, :package1, :package2]
+        it_behaves_like 'package sorting', 'version', [:package3, :package2, :package1]
+
+        context 'by packages type' do
+          before do
+            # get rid of extra npm package as it messes up
+            # the package type sorting test
+            package2.destroy
+          end
+
+          it_behaves_like 'package sorting', 'type', [:package3, :package1]
         end
       end
     end
