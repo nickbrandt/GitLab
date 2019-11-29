@@ -212,7 +212,23 @@ describe 'Group Cycle Analytics', :js do
   end
 
   describe 'Customizable cycle analytics', :js do
+    custom_stage = "Cool beans"
+    start_event_identifier = :merge_request_created
+    end_event_identifier = :merge_request_merged
     let(:button_class) { '.js-add-stage-button' }
+    let(:params) { { name: custom_stage, start_event_identifier: start_event_identifier, end_event_identifier: end_event_identifier } }
+    let(:first_default_stage) { page.find('.stage-nav-item-cell', text: "Issue").ancestor(".stage-nav-item") }
+    let(:first_custom_stage) { page.find('.stage-nav-item-cell', text: custom_stage).ancestor(".stage-nav-item") }
+
+    def create_custom_stage
+      Analytics::CycleAnalytics::Stages::CreateService.new(parent: group, params: params, current_user: user).execute
+    end
+
+    def toggle_more_options(stage)
+      stage.hover
+
+      stage.find(".more-actions-toggle").click
+    end
 
     def select_dropdown_option(name, elem = "option", index = 1)
       page.find("select[name='#{name}']").all(elem)[index].select_option
@@ -317,22 +333,37 @@ describe 'Group Cycle Analytics', :js do
         end
       end
 
+      context 'Edit stage form' do
+        stage_form_class = '.custom-stage-form'
+        stage_save_button = '.js-save-stage'
+        name_field = "custom-stage-name"
+        start_event_field = "custom-stage-start-event"
+        end_event_field = "custom-stage-end-event"
+
+        before do
+          create_custom_stage
+          select_group
+
+          expect(page).to have_text custom_stage
+
+          toggle_more_options(first_custom_stage)
+          click_button "Edit stage"
+        end
+
+        it 'prepoulates the stage data' do
+          expect(page.find(stage_form_class)).to have_text 'Editing stage'
+
+          expect(page.find_field(name_field).value).to eq custom_stage
+          expect(page.find_field(start_event_field).value).to eq start_event_identifier
+          expect(page.find_field(end_event_field).value).to eq end_event_identifier
+        end
+
+        it 'disables the submit form if there are no changes' do
+          expect(page.find(stage_save_button)[:disabled]).to eq "true"
+        end
+      end
+
       context 'Stage table' do
-        custom_stage = "Cool beans"
-        let(:params) { { name: custom_stage, start_event_identifier: :merge_request_created, end_event_identifier: :merge_request_merged } }
-        let(:first_default_stage) { page.find('.stage-nav-item-cell', text: "Issue").ancestor(".stage-nav-item") }
-        let(:first_custom_stage) { page.find('.stage-nav-item-cell', text: custom_stage).ancestor(".stage-nav-item") }
-
-        def create_custom_stage
-          Analytics::CycleAnalytics::Stages::CreateService.new(parent: group, params: params, current_user: user).execute
-        end
-
-        def toggle_more_options(stage)
-          stage.hover
-
-          stage.find(".more-actions-toggle").click
-        end
-
         context 'default stages' do
           before do
             select_group
