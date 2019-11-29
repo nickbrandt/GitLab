@@ -53,6 +53,7 @@ module EE
         end
       end
 
+<<<<<<< HEAD
       scope :order_review_time_desc, -> do
         joins(:metrics).reorder(::Gitlab::Database.nulls_last_order('merge_request_metrics.first_comment_at'))
       end
@@ -62,6 +63,9 @@ module EE
           :author, :approved_by_users, :metrics,
           latest_merge_request_diff: :merge_request_diff_files, target_project: :namespace, milestone: :project)
       end
+=======
+      scope :by_merge_date, -> { joins(:metrics).order("merge_requests.target_project_id, merge_request_metrics.merged_at DESC") }
+>>>>>>> Add new scope to gather data properly
     end
 
     class_methods do

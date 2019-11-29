@@ -1,4 +1,4 @@
-- max_render = 4
+- max_render = 2
 - approvers_rendering_overflow = merge_request.approved_by_users.size > max_render
 - render_count = approvers_rendering_overflow ? max_render - 1 : max_render
 - more_approvers_count = merge_request.approved_by_users.size - render_count
@@ -8,4 +8,4 @@
   = link_to_member(project, approver, name: true, title: "Approved by  :name")
 
 - if more_approvers_count.positive?
-  %span{ class: 'avatar-counter has-tooltip', data: { container: 'body', placement: 'bottom', 'line-type' => 'old', 'original-title' => "+#{more_assignees_count} more approvers", qa_selector: 'avatar_counter' } } +#{more_approvers_count}
+  %span{ class: 'avatar-counter has-tooltip', data: { container: 'body', placement: 'bottom', 'line-type' => 'old', 'original-title' => "+#{more_approvers_count} more approvers", qa_selector: 'avatar_counter' } } +#{more_approvers_count}

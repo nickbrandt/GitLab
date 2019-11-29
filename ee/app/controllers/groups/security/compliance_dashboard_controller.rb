@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 class Groups::Security::ComplianceDashboardController < Groups::ApplicationController
-  include SortingHelper
   include Gitlab::IssuableMetadata
 
   layout 'group'
@@ -12,13 +11,17 @@ class Groups::Security::ComplianceDashboardController < Groups::ApplicationContr
     finder_options = {
       scope: :all,
       state: :merged,
-      sort: sort_value_recently_updated
+      sort: :by_merge_date,
+      include_subgroups: true,
+      attempt_group_search_optimizations: true
     }
     finder_options[:group_id] = @group.id
-    finder_options[:include_subgroups] = true
-    finder_options[:attempt_group_search_optimizations] = true
-    @merge_requests = MergeRequestsFinder.new(current_user, finder_options).execute.preload(preload_for_collection).page(params[:page])
-    @issuable_meta_data = issuable_meta_data(@merge_requests, 'MergeRequest', current_user)
+
+    @merge_requests = MergeRequestsFinder.new(current_user, finder_options).execute
+      .select('DISTINCT ON (merge_requests.target_project_id) merge_requests.*')
+      .preload(preload_for_collection)
+
+    @merge_requests = @merge_requests.order('merge_request_metrics.merged_at').page(params[:page])
   end
 
   private
