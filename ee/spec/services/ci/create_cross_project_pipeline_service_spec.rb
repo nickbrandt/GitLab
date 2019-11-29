@@ -148,7 +148,7 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
         end
       end
 
-      context 'when a custom YAML is provided' do
+      context 'when "include" is provided' do
         shared_examples 'creates a child pipeline' do
           it 'creates only one new pipeline' do
             expect { service.execute(bridge) }
@@ -201,10 +201,7 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
 
         let(:trigger) do
           {
-            trigger: {
-              project: upstream_project.full_path,
-              yaml: YAML.dump({ include: 'child-pipeline.yml' })
-            }
+            trigger: { include: 'child-pipeline.yml' }
           }
         end
 

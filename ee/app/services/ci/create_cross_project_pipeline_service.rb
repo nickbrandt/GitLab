@@ -8,124 +8,70 @@ module Ci
     def execute(bridge)
       @bridge = bridge
 
-      unless target_project_exists?
-        return bridge.drop!(:downstream_bridge_project_not_found)
-      end
+      pipeline_params = @bridge.downstream_pipeline_params
+      target_ref = pipeline_params.dig(:target_revision, :ref)
 
-      if target_project == project && !bridge.triggers_child_pipeline?
-        return bridge.drop!(:invalid_bridge_trigger)
-      end
+      return unless ensure_preconditions!(target_ref)
 
-      unless can_create_cross_pipeline?
-        return bridge.drop!(:insufficient_bridge_permissions)
-      end
+      service = ::Ci::CreatePipelineService.new(
+        pipeline_params.fetch(:project),
+        current_user,
+        pipeline_params.fetch(:target_revision))
 
-      if bridge.triggers_child_pipeline?
-        create_child_pipeline!
-      else
-        create_cross_project_pipeline!
-      end
+      service.execute(
+        pipeline_params.fetch(:source),
+        { ignore_skip_ci: true }.merge(pipeline_params[:other_execute_params] || {})) do |pipeline|
+          @bridge.sourced_pipelines.build(
+            source_pipeline: @bridge.pipeline,
+            source_project: @bridge.project,
+            project: @bridge.downstream_project,
+            pipeline: pipeline)
+
+          pipeline.variables.build(@bridge.downstream_variables)
+        end
     end
 
     private
 
-    def target_project_exists?
-      target_project.present? &&
-        can?(current_user, :read_project, target_project)
-    end
-
-    def can_create_cross_pipeline?
-      can?(current_user, :update_pipeline, project) &&
-        can?(target_user, :create_pipeline, target_project) &&
-          can_update_branch?
-    end
-
-    def can_update_branch?
-      ::Gitlab::UserAccess.new(target_user, project: target_project).can_update_branch?(target_ref)
-    end
-
-    def create_cross_project_pipeline!
-      ::Ci::CreatePipelineService
-        .new(target_project, target_user, ref: target_ref)
-        .execute(:cross_project_pipeline, ignore_skip_ci: true) do |pipeline|
-          @bridge.sourced_pipelines.build(
-            source_pipeline: @bridge.pipeline,
-            source_project: @bridge.project,
-            project: target_project,
-            pipeline: pipeline)
-
-          pipeline.variables.build(@bridge.downstream_variables)
-        end
-    end
-
-    def create_child_pipeline!
-      return unless @bridge.triggers_child_pipeline?
-
-      parent_pipeline = @bridge.pipeline
-
-      ::Ci::CreatePipelineService
-        .new(@bridge.project, @bridge.user,
-          ref: parent_pipeline.ref,
-          checkout_sha: parent_pipeline.sha,
-          before: parent_pipeline.before_sha,
-          source_sha: parent_pipeline.source_sha,
-          target_sha: parent_pipeline.target_sha
-        )
-        .execute(:parent_pipeline, ignore_skip_ci: true, config_content: @bridge.yaml_for_downstream) do |pipeline|
-          @bridge.sourced_pipelines.build(
-            source_pipeline: @bridge.pipeline,
-            source_project: @bridge.project,
-            project: target_project,
-            pipeline: pipeline)
-
-          pipeline.variables.build(@bridge.downstream_variables)
-        end
-    end
-
-    def create_child_pipeline!
-      parent_pipeline = @bridge.pipeline
-
-      ::Ci::CreatePipelineService
-        .new(@bridge.project, @bridge.user,
-          ref: parent_pipeline.ref,
-          checkout_sha: parent_pipeline.sha,
-          before: parent_pipeline.before_sha,
-          source_sha: parent_pipeline.source_sha,
-          target_sha: parent_pipeline.target_sha
-        )
-        .execute(:pipeline,
-          ignore_skip_ci: true,
-          config_content: downstream_yaml,
-          schedule: parent_pipeline.pipeline_schedule) do |pipeline|
-            @bridge.sourced_pipelines.build(
-              source_pipeline: @bridge.pipeline,
-              source_project: @bridge.project,
-              project: target_project,
-              pipeline: pipeline)
-
-            pipeline.variables.build(@bridge.downstream_variables)
-          end
-    end
-
-    def downstream_yaml
-      return unless @bridge.triggers_child_pipeline?
-
-      @bridge.downstream_yaml
-    end
-
-    def target_user
-      strong_memoize(:target_user) { @bridge.target_user }
-    end
-
-    def target_ref
-      strong_memoize(:target_ref) do
-        @bridge.target_ref || target_project.default_branch
+    def ensure_preconditions!(target_ref)
+      unless downstream_project_accessible?
+        @bridge.drop!(:downstream_bridge_project_not_found)
+        return false
       end
+
+      # TODO: Remove this condition if favour of model validation
+      # https://gitlab.com/gitlab-org/gitlab/issues/38338
+      if downstream_project == project && !@bridge.triggers_child_pipeline?
+        @bridge.drop!(:invalid_bridge_trigger)
+        return false
+      end
+
+      unless can_create_downstream_pipeline?(target_ref)
+        @bridge.drop!(:insufficient_bridge_permissions)
+        return false
+      end
+
+      true
     end
 
-    def target_project
-      strong_memoize(:target_project) do
-        Project.find_by_full_path(@bridge.target_project_path)
+    def downstream_project_accessible?
+      downstream_project.present? &&
+        can?(current_user, :read_project, downstream_project)
+    end
+
+    def can_create_downstream_pipeline?(target_ref)
+      can?(current_user, :update_pipeline, project) &&
+        can?(current_user, :create_pipeline, downstream_project) &&
+          can_update_branch?(target_ref)
+    end
+
+    def can_update_branch?(target_ref)
+      ::Gitlab::UserAccess.new(current_user, project: downstream_project).can_update_branch?(target_ref)
+    end
+
+    def downstream_project
+      strong_memoize(:downstream_project) do
+        @bridge.downstream_project
       end
     end
   end
