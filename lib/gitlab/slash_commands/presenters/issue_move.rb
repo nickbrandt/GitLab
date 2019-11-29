@@ -22,7 +22,7 @@ module Gitlab
           response_message(custom_pretext: custom_pretext(old_issue))
         end
 
-        def fallback
+        def fallback_message
           "Issue #{issue.to_reference}: #{issue.title}"
         end
 

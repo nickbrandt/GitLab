@@ -16,7 +16,7 @@ module Gitlab
 
         private
 
-        def fallback
+        def fallback_message
           "Issue #{resource.to_reference}: #{resource.title}"
         end
 

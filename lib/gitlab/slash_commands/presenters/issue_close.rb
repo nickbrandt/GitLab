@@ -20,7 +20,7 @@ module Gitlab
 
         private
 
-        def fallback
+        def fallback_message
           "Closed issue #{issue.to_reference}: #{issue.title}"
         end
 

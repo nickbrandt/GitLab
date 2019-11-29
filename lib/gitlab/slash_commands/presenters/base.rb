@@ -92,7 +92,7 @@ module Gitlab
                 title_link:   resource_url,
                 author_name:  author.name,
                 author_icon:  author.avatar_url,
-                fallback:     fallback,
+                fallback:     fallback_message,
                 pretext:      custom_pretext,
                 text:         text,
                 color:        color(resource),

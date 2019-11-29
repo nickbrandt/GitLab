@@ -12,7 +12,7 @@ module Gitlab
 
         private
 
-        def fallback
+        def fallback_message
           "New comment on #{issue.to_reference}: #{issue.title}"
         end
 
