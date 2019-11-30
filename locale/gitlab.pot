@@ -16833,7 +16833,7 @@ msgstr ""
 msgid "Subscriptions"
 msgstr ""
 
-msgid "Subscriptions allow successfully completed pipelines on the %{default_branch_docs} of the subscribed project to trigger a new pipeline on thee default branch of this project."
+msgid "Subscriptions allow successfully completed pipelines on the %{default_branch_docs} of the subscribed project to trigger a new pipeline on the default branch of this project."
 msgstr ""
 
 msgid "Subtracted"
