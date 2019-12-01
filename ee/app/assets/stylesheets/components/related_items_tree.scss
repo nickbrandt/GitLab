@@ -24,6 +24,10 @@
         cursor: default;
         min-height: $grid-size * 5;
       }
+
+      &.item-closed {
+        background-color: $gray-50;
+      }
     }
 
     .btn-tree-item-chevron {

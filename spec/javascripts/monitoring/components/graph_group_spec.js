@@ -1,8 +1,21 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import GraphGroup from '~/monitoring/components/graph_group.vue';
+
+const localVue = createLocalVue();
 
 describe('Graph group component', () => {
   let graphGroup;
+
+  const findPrometheusGroup = () => graphGroup.find('.prometheus-graph-group');
+  const findPrometheusPanel = () => graphGroup.find('.prometheus-panel');
+
+  const createComponent = propsData => {
+    graphGroup = shallowMount(localVue.extend(GraphGroup), {
+      propsData,
+      sync: false,
+      localVue,
+    });
+  };
 
   afterEach(() => {
     graphGroup.destroy();
@@ -10,11 +23,9 @@ describe('Graph group component', () => {
 
   describe('When groups can be collapsed', () => {
     beforeEach(() => {
-      graphGroup = shallowMount(GraphGroup, {
-        propsData: {
-          name: 'panel',
-          collapseGroup: true,
-        },
+      createComponent({
+        name: 'panel',
+        collapseGroup: true,
       });
     });
 
@@ -31,17 +42,34 @@ describe('Graph group component', () => {
 
   describe('When groups can not be collapsed', () => {
     beforeEach(() => {
-      graphGroup = shallowMount(GraphGroup, {
-        propsData: {
-          name: 'panel',
-          collapseGroup: true,
-          showPanels: false,
-        },
+      createComponent({
+        name: 'panel',
+        collapseGroup: true,
+        showPanels: false,
       });
     });
 
-    it('should not contain a prometheus-graph-group container when showPanels is false', () => {
-      expect(graphGroup.vm.$el.querySelector('.prometheus-graph-group')).toBe(null);
+    it('should not contain a prometheus-panel container when showPanels is false', () => {
+      expect(findPrometheusPanel().exists()).toBe(false);
+    });
+  });
+
+  describe('When collapseGroup prop is updated', () => {
+    beforeEach(() => {
+      createComponent({ name: 'panel', collapseGroup: false });
+    });
+
+    it('previously collapsed group should respond to the prop change', done => {
+      expect(findPrometheusGroup().exists()).toBe(false);
+
+      graphGroup.setProps({
+        collapseGroup: true,
+      });
+
+      graphGroup.vm.$nextTick(() => {
+        expect(findPrometheusGroup().exists()).toBe(true);
+        done();
+      });
     });
   });
 });

@@ -16,6 +16,10 @@ module Gitlab
           def object_type
             MergeRequest
           end
+
+          def subquery
+            resource_label_events_with_subquery(:merge_request_id, label, ::ResourceLabelEvent.actions[:remove], :desc)
+          end
         end
       end
     end

@@ -101,22 +101,6 @@ describe TrialRegistrationsController do
           expect(User.last.name).to eq("#{user_params[:first_name]} #{user_params[:last_name]}")
         end
       end
-
-      context 'system hook' do
-        it 'triggers user_create event on trial sign up' do
-          expect_any_instance_of(SystemHooksService).to receive(:execute_hooks_for).with(an_instance_of(User), :create)
-
-          post :create, params: { user: user_params }
-        end
-
-        it 'does not trigger user_create event when data is invalid' do
-          user_params[:email] = ''
-
-          expect_any_instance_of(SystemHooksService).not_to receive(:execute_hooks_for).with(an_instance_of(User), :create)
-
-          post :create, params: { user: user_params }
-        end
-      end
     end
   end
 end

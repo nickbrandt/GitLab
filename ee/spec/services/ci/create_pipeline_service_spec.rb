@@ -64,7 +64,6 @@ describe Ci::CreatePipelineService, '#execute' do
 
         expect(pipeline).to be_persisted
         expect(pipeline).to be_failed
-        expect(pipeline.seeds_size).to be > 2
         expect(pipeline.statuses).to be_empty
         expect(pipeline.size_limit_exceeded?).to be true
       end

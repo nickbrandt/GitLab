@@ -38,6 +38,7 @@ describe('DependenciesApp component', () => {
       localVue,
       store,
       sync: false,
+      attachToDocument: true,
       propsData: { ...props },
       stubs,
     });

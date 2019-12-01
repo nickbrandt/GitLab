@@ -48,7 +48,13 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
 
   describe '.compose!' do
     context 'when valid job entries composed' do
-      let(:config) { ['first_job_name', pipeline: 'some/project'] }
+      let(:config) do
+        [
+          'first_job_name',
+          { job: 'second_job_name', artifacts: false },
+          { pipeline: 'some/project' }
+        ]
+      end
 
       before do
         needs.compose!
@@ -61,7 +67,10 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
       describe '#value' do
         it 'returns key value' do
           expect(needs.value).to eq(
-            job: [{ name: 'first_job_name' }],
+            job: [
+              { name: 'first_job_name',  artifacts: true },
+              { name: 'second_job_name', artifacts: false }
+            ],
             bridge: [{ pipeline: 'some/project' }]
           )
         end
@@ -69,7 +78,7 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
 
       describe '#descendants' do
         it 'creates valid descendant nodes' do
-          expect(needs.descendants.count).to eq 2
+          expect(needs.descendants.count).to eq(3)
           expect(needs.descendants)
             .to all(be_an_instance_of(::Gitlab::Ci::Config::Entry::Need))
         end

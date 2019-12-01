@@ -69,8 +69,8 @@ export default {
   methods: {
     renderTooltip({ data }) {
       const [, metric, dateTime] = data;
-      this.tooltipTitle = metric;
-      this.tooltipContent = dateFormat(dateTime, dateFormats.defaultDateTime);
+      this.tooltipTitle = dateFormat(dateTime, dateFormats.defaultDateTime);
+      this.tooltipContent = metric;
     },
   },
 };
@@ -84,7 +84,10 @@ export default {
     :x-axis-title="xAxisTitle"
     :format-tooltip-text="renderTooltip"
   >
-    <div slot="tooltipTitle">{{ tooltipTitle }}</div>
-    <div slot="tooltipContent">{{ tooltipContent }}</div>
+    <div slot="tooltipTitle">{{ tooltipTitle }} ({{ xAxisTitle }})</div>
+    <div slot="tooltipContent" class="d-flex">
+      <div class="flex-grow-1">{{ yAxisTitle }}</div>
+      <div class="font-weight-bold">{{ tooltipContent }}</div>
+    </div>
   </gl-discrete-scatter-chart>
 </template>

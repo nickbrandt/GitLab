@@ -2,7 +2,10 @@
 
 module API
   class Vulnerabilities < Grape::API
+    include ::API::Helpers::VulnerabilitiesHooks
     include PaginationParams
+
+    helpers ::API::Helpers::VulnerabilitiesHelpers
 
     helpers do
       def vulnerabilities_by(project)
@@ -13,18 +16,8 @@ module API
         Vulnerability.with_findings.find(params[:id])
       end
 
-      def find_and_authorize_vulnerability!(action)
-        find_vulnerability!.tap do |vulnerability|
-          authorize! action, vulnerability.project
-        end
-      end
-
-      def authorize_can_read!
-        authorize! :read_project_security_dashboard, user_project
-      end
-
-      def authorize_can_create!
-        authorize! :create_vulnerability, user_project
+      def authorize_vulnerability!(vulnerability, action)
+        authorize! action, vulnerability.project
       end
 
       def render_vulnerability(vulnerability)
@@ -36,22 +29,25 @@ module API
       end
     end
 
-    before do
-      not_found! unless Feature.enabled?(:first_class_vulnerabilities)
-
-      authenticate!
-    end
-
     params do
       requires :id, type: String, desc: 'The ID of a vulnerability'
     end
     resource :vulnerabilities do
+      desc 'Get a vulnerability' do
+        success EE::API::Entities::Vulnerability
+      end
+      get ':id' do
+        vulnerability = Vulnerability.find(params[:id])
+        authorize_vulnerability!(vulnerability, :read_project_security_dashboard)
+        render_vulnerability(vulnerability)
+      end
+
       desc 'Resolve a vulnerability' do
         success EE::API::Entities::Vulnerability
       end
       post ':id/resolve' do
-        vulnerability = find_and_authorize_vulnerability!(:resolve_vulnerability)
-        break not_modified! if vulnerability.closed?
+        vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
+        break not_modified! if vulnerability.resolved?
 
         vulnerability = ::Vulnerabilities::ResolveService.new(current_user, vulnerability).execute
         render_vulnerability(vulnerability)
@@ -61,7 +57,7 @@ module API
         success EE::API::Entities::Vulnerability
       end
       post ':id/dismiss' do
-        vulnerability = find_and_authorize_vulnerability!(:dismiss_vulnerability)
+        vulnerability = find_and_authorize_vulnerability!(:admin_vulnerability)
         break not_modified! if vulnerability.closed?
 
         vulnerability = ::Vulnerabilities::DismissService.new(current_user, vulnerability).execute
@@ -80,7 +76,7 @@ module API
         use :pagination
       end
       get ':id/vulnerabilities' do
-        authorize_can_read!
+        authorize! :read_vulnerability, user_project
 
         vulnerabilities = paginate(
           vulnerabilities_by(user_project)
@@ -96,7 +92,7 @@ module API
         requires :finding_id, type: Integer, desc: 'The id of confirmed vulnerability finding'
       end
       post ':id/vulnerabilities' do
-        authorize_can_create!
+        authorize! :create_vulnerability, user_project
 
         vulnerability = ::Vulnerabilities::CreateService.new(
           user_project, current_user, finding_id: params[:finding_id]

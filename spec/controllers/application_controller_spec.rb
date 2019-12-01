@@ -90,16 +90,18 @@ describe ApplicationController do
       let(:format) { :html }
 
       it_behaves_like 'setting gon variables'
+
+      context 'for peek requests' do
+        before do
+          request.path = '/-/peek'
+        end
+
+        it_behaves_like 'not setting gon variables'
+      end
     end
 
     context 'with json format' do
       let(:format) { :json }
-
-      it_behaves_like 'not setting gon variables'
-    end
-
-    context 'with atom format' do
-      let(:format) { :atom }
 
       it_behaves_like 'not setting gon variables'
     end
@@ -637,7 +639,7 @@ describe ApplicationController do
     context 'given a 422 error page' do
       controller do
         def index
-          render 'errors/omniauth_error', layout: 'errors', status: 422
+          render 'errors/omniauth_error', layout: 'errors', status: :unprocessable_entity
         end
       end
 
@@ -651,7 +653,7 @@ describe ApplicationController do
     context 'given a 500 error page' do
       controller do
         def index
-          render 'errors/omniauth_error', layout: 'errors', status: 500
+          render 'errors/omniauth_error', layout: 'errors', status: :internal_server_error
         end
       end
 
@@ -665,7 +667,7 @@ describe ApplicationController do
     context 'given a 200 success page' do
       controller do
         def index
-          render 'errors/omniauth_error', layout: 'errors', status: 200
+          render 'errors/omniauth_error', layout: 'errors', status: :ok
         end
       end
 

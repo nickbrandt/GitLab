@@ -4,6 +4,8 @@ module EE
   module List
     extend ::Gitlab::Utils::Override
 
+    include ::Gitlab::Utils::StrongMemoize
+
     # ActiveSupport::Concern does not prepend the ClassMethods,
     # so we cannot call `super` if we use it.
     def self.prepended(base)
@@ -21,6 +23,7 @@ module EE
       base.validates :user_id, uniqueness: { scope: :board_id }, if: :assignee?
       base.validates :milestone_id, uniqueness: { scope: :board_id }, if: :milestone?
       base.validates :max_issue_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+      base.validates :max_issue_weight, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
       base.validates :list_type,
         exclusion: { in: %w[assignee], message: _('Assignee lists not available with your current license') },
         unless: -> { board&.resource_parent&.feature_available?(:board_assignee_lists) }
@@ -31,6 +34,12 @@ module EE
 
     def assignee=(user)
       self.user = user
+    end
+
+    def wip_limits_available?
+      strong_memoize(:wip_limits_available) do
+        board.resource_parent.feature_available?(:wip_limits)
+      end
     end
 
     override :title

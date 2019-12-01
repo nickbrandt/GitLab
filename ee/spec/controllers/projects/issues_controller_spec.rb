@@ -329,4 +329,9 @@ describe Projects::IssuesController do
       end
     end
   end
+
+  it_behaves_like DescriptionDiffActions do
+    let_it_be(:project)  { create(:project_empty_repo, :public) }
+    let_it_be(:issuable) { create(:issue, project: project) }
+  end
 end

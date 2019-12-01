@@ -24,7 +24,7 @@ describe Groups::Security::VulnerabilitiesController do
 
   context 'when new Vulnerability Findings API is disabled' do
     before do
-      stub_feature_flags(vulnerability_findings_api: false)
+      stub_feature_flags(first_class_vulnerabilities: false)
     end
 
     # when new Vulnerability Findings API is disabled, we fall back to this controller

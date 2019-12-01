@@ -7,6 +7,10 @@ FactoryBot.modify do
       project { nil }
     end
 
+    trait :on_design do
+      noteable { create(:design, :with_file, project: project) }
+    end
+
     trait :with_review do
       review
     end
@@ -16,13 +20,7 @@ end
 FactoryBot.define do
   factory :note_on_epic, parent: :note, traits: [:on_epic]
 
-  factory :diff_note_on_design, class: DiffNote do
-    association :project
-    note { generate(:title) }
-    author { project&.creator || create(:user) }
-
-    noteable { create(:design, :with_file, project: project) }
-
+  factory :diff_note_on_design, parent: :note, traits: [:on_design], class: DiffNote do
     position do
       Gitlab::Diff::Position.new(
         old_path: noteable.full_path,

@@ -18,6 +18,7 @@ describe('EE MRWidget approvals summary optional', () => {
       propsData: props,
       sync: false,
       localVue,
+      attachToDocument: true,
     });
   };
 

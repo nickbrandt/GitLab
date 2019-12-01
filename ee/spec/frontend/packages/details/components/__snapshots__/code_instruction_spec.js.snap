@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Package code instruction multiline to match the snapshot 1`] = `
+<div>
+  <pre>
+    this is some
+multiline text
+  </pre>
+</div>
+`;
+
+exports[`Package code instruction single line to match the default snapshot 1`] = `
+<div
+  class="input-group append-bottom-10"
+>
+  <input
+    class="form-control monospace"
+    readonly="readonly"
+    type="text"
+  />
+   
+  <span
+    class="input-group-append"
+  >
+    <button
+      class="btn input-group-text btn-secondary btn-default"
+      data-clipboard-text="npm i @my-package"
+      data-original-title="Copy npm install command"
+      title=""
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="s16 ic-duplicate"
+      >
+        <use
+          xlink:href="#duplicate"
+        />
+      </svg>
+    </button>
+  </span>
+</div>
+`;

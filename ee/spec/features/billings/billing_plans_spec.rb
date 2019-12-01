@@ -9,6 +9,7 @@ describe 'Billing plan pages', :feature do
   let(:namespace) { user.namespace }
   let(:free_plan) { create(:free_plan) }
   let(:bronze_plan) { create(:bronze_plan) }
+  let(:silver_plan) { create(:silver_plan) }
   let(:gold_plan) { create(:gold_plan) }
   let(:plans_data) do
     JSON.parse(File.read(Rails.root.join('ee/spec/fixtures/gitlab_com_plans.json'))).map do |data|
@@ -17,7 +18,7 @@ describe 'Billing plan pages', :feature do
   end
 
   before do
-    stub_full_request("#{EE::SUBSCRIPTIONS_URL}/gitlab_plans?plan=#{plan}")
+    stub_full_request("#{EE::SUBSCRIPTIONS_URL}/gitlab_plans?plan=#{plan.name}")
       .to_return(status: 200, body: plans_data.to_json)
     stub_application_setting(check_namespace_plan: true)
     allow(Gitlab).to receive(:com?) { true }
@@ -30,13 +31,62 @@ describe 'Billing plan pages', :feature do
     end
   end
 
+  shared_examples 'upgradable plan' do
+    before do
+      visit page_path
+    end
+
+    it 'displays the upgrade link' do
+      page.within('.content') do
+        expect(page).to have_link('Upgrade', href: external_upgrade_url(namespace, plan))
+      end
+    end
+  end
+
+  shared_examples 'non-upgradable plan' do
+    before do
+      visit page_path
+    end
+
+    it 'does not display the upgrade link' do
+      page.within('.content') do
+        expect(page).not_to have_link('Upgrade', href: external_upgrade_url(namespace, plan))
+      end
+    end
+  end
+
+  shared_examples 'downgradable plan' do
+    before do
+      visit page_path
+    end
+
+    it 'displays the downgrade link' do
+      page.within('.content') do
+        expect(page).to have_content('downgrade your plan')
+        expect(page).to have_link('Customer Support', href: EE::CUSTOMER_SUPPORT_URL)
+      end
+    end
+  end
+
+  shared_examples 'plan with header' do
+    before do
+      visit page_path
+    end
+
+    it 'displays header' do
+      page.within('.billing-plan-header') do
+        expect(page).to have_content("#{user.username} you are currently using the #{plan.name.titleize} plan.")
+
+        expect(page).to have_css('.billing-plan-logo img')
+      end
+    end
+  end
+
   context 'users profile billing page' do
     let(:page_path) { profile_billings_path }
 
-    it_behaves_like 'billings gold trial callout'
-
     context 'on free' do
-      let(:plan) { free_plan.name }
+      let(:plan) { free_plan }
 
       let!(:subscription) do
         create(:gitlab_subscription, namespace: namespace, hosted_plan: nil, seats: 15)
@@ -81,55 +131,40 @@ describe 'Billing plan pages', :feature do
       end
     end
 
-    context 'on bronze' do
-      let(:plan) { bronze_plan.name }
+    context 'on bronze plan' do
+      let(:plan) { bronze_plan }
 
       let!(:subscription) do
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: bronze_plan, seats: 15)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
       end
 
-      before do
-        visit page_path
-      end
-
-      it 'displays header and actions' do
-        page.within('.billing-plan-header') do
-          expect(page).to have_content("#{user.username} you are currently using the Bronze plan.")
-
-          expect(page).to have_css('.billing-plan-logo img')
-        end
-
-        page.within('.content') do
-          expect(page).to have_link('Upgrade', href: external_upgrade_url(namespace, bronze_plan))
-          expect(page).to have_content('downgrade your plan')
-          expect(page).to have_link('Customer Support', href: EE::CUSTOMER_SUPPORT_URL)
-        end
-      end
+      it_behaves_like 'plan with header'
+      it_behaves_like 'downgradable plan'
+      it_behaves_like 'upgradable plan'
     end
 
-    context 'on gold' do
-      let(:plan) { gold_plan.name }
+    context 'on silver plan' do
+      let(:plan) { silver_plan }
 
       let!(:subscription) do
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan, seats: 15)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
       end
 
-      before do
-        visit page_path
+      it_behaves_like 'plan with header'
+      it_behaves_like 'downgradable plan'
+      it_behaves_like 'upgradable plan'
+    end
+
+    context 'on gold plan' do
+      let(:plan) { gold_plan }
+
+      let!(:subscription) do
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
       end
 
-      it 'displays header and actions' do
-        page.within('.billing-plan-header') do
-          expect(page).to have_content("#{user.username} you are currently using the Gold plan.")
-
-          expect(page).to have_css('.billing-plan-logo img')
-        end
-
-        page.within('.content') do
-          expect(page).to have_content('downgrade your plan')
-          expect(page).to have_link('Customer Support', href: EE::CUSTOMER_SUPPORT_URL)
-        end
-      end
+      it_behaves_like 'plan with header'
+      it_behaves_like 'downgradable plan'
+      it_behaves_like 'non-upgradable plan'
     end
   end
 
@@ -140,13 +175,11 @@ describe 'Billing plan pages', :feature do
     context 'top-most group' do
       let(:page_path) { group_billings_path(namespace) }
 
-      it_behaves_like 'billings gold trial callout'
-
       context 'on bronze' do
-        let(:plan) { bronze_plan.name }
+        let(:plan) { bronze_plan }
 
         let!(:subscription) do
-          create(:gitlab_subscription, namespace: namespace, hosted_plan: bronze_plan, seats: 15)
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
         end
 
         before do
@@ -184,13 +217,11 @@ describe 'Billing plan pages', :feature do
     let(:page_path) { group_billings_path(subgroup2) }
     let(:namespace) { group }
 
-    it_behaves_like 'billings gold trial callout'
-
     context 'on bronze' do
-      let(:plan) { bronze_plan.name }
+      let(:plan) { bronze_plan }
 
       let!(:subscription) do
-        create(:gitlab_subscription, namespace: namespace, hosted_plan: bronze_plan, seats: 15)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
       end
 
       before do
@@ -210,7 +241,7 @@ describe 'Billing plan pages', :feature do
   end
 
   context 'with unexpected JSON' do
-    let(:plan) { 'free' }
+    let(:plan) { free_plan }
 
     let(:plans_data) do
       [

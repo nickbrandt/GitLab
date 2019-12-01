@@ -13,7 +13,7 @@ module Vulnerabilities
     end
 
     def execute
-      raise Gitlab::Access::AccessDeniedError unless can?(@user, :dismiss_vulnerability, @project)
+      raise Gitlab::Access::AccessDeniedError unless can?(@user, :admin_vulnerability, @project)
 
       @vulnerability.transaction do
         result = dismiss_findings
@@ -23,7 +23,7 @@ module Vulnerabilities
           raise ActiveRecord::Rollback
         end
 
-        @vulnerability.update(state: :closed, closed_by: @user, closed_at: Time.zone.now)
+        @vulnerability.update(state: :closed, closed_by: @user, closed_at: Time.current)
       end
 
       @vulnerability

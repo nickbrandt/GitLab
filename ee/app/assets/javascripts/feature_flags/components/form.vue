@@ -28,8 +28,8 @@ export default {
   components: {
     GlButton,
     GlBadge,
-    GlFormCheckbox,
     GlFormTextarea,
+    GlFormCheckbox,
     GlTooltip,
     ToggleButton,
     Icon,
@@ -87,7 +87,6 @@ export default {
 
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
-  ROLLOUT_STRATEGY_USER_ID,
 
   // Matches numbers 0 through 100
   rolloutPercentageRegex: /^[0-9]$|^[1-9][0-9]$|^100$/,
@@ -112,6 +111,14 @@ export default {
     },
     permissionsFlag() {
       return this.glFeatures.featureFlagPermissions;
+    },
+
+    userIds() {
+      const scope = this.formScopes.find(s => Array.isArray(s.rolloutUserIds)) || {};
+      return scope.rolloutUserIds || [];
+    },
+    shouldShowUsersPerEnvironment() {
+      return this.glFeatures.featureFlagsUsersPerEnvironment;
     },
   },
   methods: {
@@ -160,9 +167,18 @@ export default {
         scopes: this.formScopes,
       });
     },
+
+    updateUserIds(userIds) {
+      this.formScopes = this.formScopes.map(s => ({
+        ...s,
+        rolloutUserIds: userIds,
+      }));
+    },
+
     canUpdateScope(scope) {
       return !this.permissionsFlag || scope.canUpdate;
     },
+
     isRolloutPercentageInvalid: _.memoize(function isRolloutPercentageInvalid(percentage) {
       return !this.$options.rolloutPercentageRegex.test(percentage);
     }),
@@ -187,6 +203,7 @@ export default {
     rolloutUserId(index) {
       return `rollout-user-id-${index}`;
     },
+
     shouldDisplayIncludeUserIds(scope) {
       return ![ROLLOUT_STRATEGY_ALL_USERS, ROLLOUT_STRATEGY_USER_ID].includes(
         scope.rolloutStrategy,
@@ -249,7 +266,7 @@ export default {
             <div
               v-for="(scope, index) in filteredScopes"
               :key="scope.id"
-              class="gl-responsive-table-row align-items-start"
+              class="gl-responsive-table-row"
               role="row"
             >
               <div class="table-section section-30" role="gridcell">
@@ -259,7 +276,7 @@ export default {
                 <div
                   class="table-mobile-content js-feature-flag-status d-flex align-items-center justify-content-start"
                 >
-                  <p v-if="isAllEnvironment(scope.environmentScope)" class="js-scope-all pl-3 mb-0">
+                  <p v-if="isAllEnvironment(scope.environmentScope)" class="js-scope-all pl-3">
                     {{ $options.allEnvironmentsText }}
                   </p>
 
@@ -293,7 +310,7 @@ export default {
                 </div>
               </div>
 
-              <div class="table-section section-40 align-items-start" role="gridcell">
+              <div class="table-section section-40" role="gridcell">
                 <div class="table-mobile-header" role="rowheader">
                   {{ s__('FeatureFlags|Rollout Strategy') }}
                 </div>
@@ -314,7 +331,10 @@ export default {
                       <option :value="$options.ROLLOUT_STRATEGY_PERCENT_ROLLOUT">
                         {{ s__('FeatureFlags|Percent rollout (logged in users)') }}
                       </option>
-                      <option :value="$options.ROLLOUT_STRATEGY_USER_ID">
+                      <option
+                        v-if="shouldShowUsersPerEnvironment"
+                        :value="$options.ROLLOUT_STRATEGY_USER_ID"
+                      >
                         {{ s__('FeatureFlags|User IDs') }}
                       </option>
                     </select>
@@ -353,7 +373,10 @@ export default {
                     </gl-tooltip>
                     <span class="ml-1">%</span>
                   </div>
-                  <div class="d-flex flex-column align-items-start mt-2 w-100">
+                  <div
+                    v-if="shouldShowUsersPerEnvironment"
+                    class="d-flex flex-column align-items-start mt-2 w-100"
+                  >
                     <gl-form-checkbox
                       v-if="shouldDisplayIncludeUserIds(scope)"
                       v-model="scope.shouldIncludeUserIds"
@@ -442,6 +465,8 @@ export default {
         </div>
       </div>
     </fieldset>
+
+    <user-with-id v-if="!shouldShowUsersPerEnvironment" :value="userIds" @input="updateUserIds" />
 
     <div class="form-actions">
       <gl-button

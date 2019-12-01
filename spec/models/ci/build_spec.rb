@@ -741,20 +741,26 @@ describe Ci::Build do
 
       before do
         needs.to_a.each do |need|
-          create(:ci_build_need, build: final, name: need)
+          create(:ci_build_need, build: final, **need)
         end
       end
 
       subject { final.dependencies }
 
-      context 'when depedencies are defined' do
+      context 'when dependencies are defined' do
         let(:dependencies) { %w(rspec staging) }
 
         it { is_expected.to contain_exactly(rspec_test, staging) }
       end
 
       context 'when needs are defined' do
-        let(:needs) { %w(build rspec staging) }
+        let(:needs) do
+          [
+            { name: 'build',   artifacts: true },
+            { name: 'rspec',   artifacts: true },
+            { name: 'staging', artifacts: true }
+          ]
+        end
 
         it { is_expected.to contain_exactly(build, rspec_test, staging) }
 
@@ -767,11 +773,42 @@ describe Ci::Build do
         end
       end
 
+      context 'when need artifacts are defined' do
+        let(:needs) do
+          [
+            { name: 'build',   artifacts: true },
+            { name: 'rspec',   artifacts: false },
+            { name: 'staging', artifacts: true }
+          ]
+        end
+
+        it { is_expected.to contain_exactly(build, staging) }
+      end
+
       context 'when needs and dependencies are defined' do
         let(:dependencies) { %w(rspec staging) }
-        let(:needs) { %w(build rspec staging) }
+        let(:needs) do
+          [
+            { name: 'build',   artifacts: true },
+            { name: 'rspec',   artifacts: true },
+            { name: 'staging', artifacts: true }
+          ]
+        end
 
         it { is_expected.to contain_exactly(rspec_test, staging) }
+      end
+
+      context 'when needs and dependencies contradict' do
+        let(:dependencies) { %w(rspec staging) }
+        let(:needs) do
+          [
+            { name: 'build',   artifacts: true },
+            { name: 'rspec',   artifacts: false },
+            { name: 'staging', artifacts: true }
+          ]
+        end
+
+        it { is_expected.to contain_exactly(staging) }
       end
 
       context 'when nor dependencies or needs are defined' do
@@ -2183,9 +2220,13 @@ describe Ci::Build do
           { key: 'CI_REGISTRY_USER', value: 'gitlab-ci-token', public: true, masked: false },
           { key: 'CI_REGISTRY_PASSWORD', value: 'my-token', public: false, masked: true },
           { key: 'CI_REPOSITORY_URL', value: build.repo_url, public: false, masked: false },
+          { key: 'CI_JOB_NAME', value: 'test', public: true, masked: false },
+          { key: 'CI_JOB_STAGE', value: 'test', public: true, masked: false },
+          { key: 'CI_NODE_TOTAL', value: '1', public: true, masked: false },
+          { key: 'CI_BUILD_NAME', value: 'test', public: true, masked: false },
+          { key: 'CI_BUILD_STAGE', value: 'test', public: true, masked: false },
           { key: 'CI', value: 'true', public: true, masked: false },
           { key: 'GITLAB_CI', value: 'true', public: true, masked: false },
-          { key: 'GITLAB_FEATURES', value: project.licensed_features.join(','), public: true, masked: false },
           { key: 'CI_SERVER_HOST', value: Gitlab.config.gitlab.host, public: true, masked: false },
           { key: 'CI_SERVER_NAME', value: 'GitLab', public: true, masked: false },
           { key: 'CI_SERVER_VERSION', value: Gitlab::VERSION, public: true, masked: false },
@@ -2193,21 +2234,7 @@ describe Ci::Build do
           { key: 'CI_SERVER_VERSION_MINOR', value: Gitlab.version_info.minor.to_s, public: true, masked: false },
           { key: 'CI_SERVER_VERSION_PATCH', value: Gitlab.version_info.patch.to_s, public: true, masked: false },
           { key: 'CI_SERVER_REVISION', value: Gitlab.revision, public: true, masked: false },
-          { key: 'CI_JOB_NAME', value: 'test', public: true, masked: false },
-          { key: 'CI_JOB_STAGE', value: 'test', public: true, masked: false },
-          { key: 'CI_COMMIT_SHA', value: build.sha, public: true, masked: false },
-          { key: 'CI_COMMIT_SHORT_SHA', value: build.short_sha, public: true, masked: false },
-          { key: 'CI_COMMIT_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
-          { key: 'CI_COMMIT_REF_NAME', value: build.ref, public: true, masked: false },
-          { key: 'CI_COMMIT_REF_SLUG', value: build.ref_slug, public: true, masked: false },
-          { key: 'CI_NODE_TOTAL', value: '1', public: true, masked: false },
-          { key: 'CI_DEFAULT_BRANCH', value: project.default_branch, public: true, masked: false },
-          { key: 'CI_BUILD_REF', value: build.sha, public: true, masked: false },
-          { key: 'CI_BUILD_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
-          { key: 'CI_BUILD_REF_NAME', value: build.ref, public: true, masked: false },
-          { key: 'CI_BUILD_REF_SLUG', value: build.ref_slug, public: true, masked: false },
-          { key: 'CI_BUILD_NAME', value: 'test', public: true, masked: false },
-          { key: 'CI_BUILD_STAGE', value: 'test', public: true, masked: false },
+          { key: 'GITLAB_FEATURES', value: project.licensed_features.join(','), public: true, masked: false },
           { key: 'CI_PROJECT_ID', value: project.id.to_s, public: true, masked: false },
           { key: 'CI_PROJECT_NAME', value: project.path, public: true, masked: false },
           { key: 'CI_PROJECT_TITLE', value: project.title, public: true, masked: false },
@@ -2217,16 +2244,26 @@ describe Ci::Build do
           { key: 'CI_PROJECT_URL', value: project.web_url, public: true, masked: false },
           { key: 'CI_PROJECT_VISIBILITY', value: 'private', public: true, masked: false },
           { key: 'CI_PROJECT_REPOSITORY_LANGUAGES', value: project.repository_languages.map(&:name).join(',').downcase, public: true, masked: false },
+          { key: 'CI_DEFAULT_BRANCH', value: project.default_branch, public: true, masked: false },
           { key: 'CI_PAGES_DOMAIN', value: Gitlab.config.pages.host, public: true, masked: false },
           { key: 'CI_PAGES_URL', value: project.pages_url, public: true, masked: false },
           { key: 'CI_API_V4_URL', value: 'http://localhost/api/v4', public: true, masked: false },
           { key: 'CI_PIPELINE_IID', value: pipeline.iid.to_s, public: true, masked: false },
-          { key: 'CI_CONFIG_PATH', value: pipeline.ci_yaml_file_path, public: true, masked: false },
           { key: 'CI_PIPELINE_SOURCE', value: pipeline.source, public: true, masked: false },
+          { key: 'CI_CONFIG_PATH', value: pipeline.config_path, public: true, masked: false },
+          { key: 'CI_COMMIT_SHA', value: build.sha, public: true, masked: false },
+          { key: 'CI_COMMIT_SHORT_SHA', value: build.short_sha, public: true, masked: false },
+          { key: 'CI_COMMIT_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
+          { key: 'CI_COMMIT_REF_NAME', value: build.ref, public: true, masked: false },
+          { key: 'CI_COMMIT_REF_SLUG', value: build.ref_slug, public: true, masked: false },
           { key: 'CI_COMMIT_MESSAGE', value: pipeline.git_commit_message, public: true, masked: false },
           { key: 'CI_COMMIT_TITLE', value: pipeline.git_commit_title, public: true, masked: false },
           { key: 'CI_COMMIT_DESCRIPTION', value: pipeline.git_commit_description, public: true, masked: false },
-          { key: 'CI_COMMIT_REF_PROTECTED', value: (!!pipeline.protected_ref?).to_s, public: true, masked: false }
+          { key: 'CI_COMMIT_REF_PROTECTED', value: (!!pipeline.protected_ref?).to_s, public: true, masked: false },
+          { key: 'CI_BUILD_REF', value: build.sha, public: true, masked: false },
+          { key: 'CI_BUILD_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
+          { key: 'CI_BUILD_REF_NAME', value: build.ref, public: true, masked: false },
+          { key: 'CI_BUILD_REF_SLUG', value: build.ref_slug, public: true, masked: false }
         ]
       end
 
@@ -2235,7 +2272,7 @@ describe Ci::Build do
         build.yaml_variables = []
       end
 
-      it { is_expected.to include(*predefined_variables) }
+      it { is_expected.to eq(predefined_variables) }
 
       describe 'variables ordering' do
         context 'when variables hierarchy is stubbed' do
@@ -2449,6 +2486,7 @@ describe Ci::Build do
 
       before do
         build.update(tag: true)
+        pipeline.update(tag: true)
       end
 
       it { is_expected.to include(tag_variable) }
@@ -2667,11 +2705,17 @@ describe Ci::Build do
       it { is_expected.to include(deployment_variable) }
     end
 
+    context 'when project has default CI config path' do
+      let(:ci_config_path) { { key: 'CI_CONFIG_PATH', value: '.gitlab-ci.yml', public: true, masked: false } }
+
+      it { is_expected.to include(ci_config_path) }
+    end
+
     context 'when project has custom CI config path' do
       let(:ci_config_path) { { key: 'CI_CONFIG_PATH', value: 'custom', public: true, masked: false } }
 
       before do
-        project.update(ci_config_path: 'custom')
+        expect_any_instance_of(Project).to receive(:ci_config_path) { 'custom' }
       end
 
       it { is_expected.to include(ci_config_path) }
@@ -3080,10 +3124,20 @@ describe Ci::Build do
     rescue StateMachines::InvalidTransition
     end
 
-    it 'ensures pipeline ref existence' do
-      expect(job.pipeline.persistent_ref).to receive(:create).once
+    context 'for pipeline ref existence' do
+      it 'ensures pipeline ref creation' do
+        expect(job.pipeline.persistent_ref).to receive(:create).once
 
-      run_job_without_exception
+        run_job_without_exception
+      end
+
+      it 'ensures that it is not run in database transaction' do
+        expect(job.pipeline.persistent_ref).to receive(:create) do
+          expect(Gitlab::Database).not_to be_inside_transaction
+        end
+
+        run_job_without_exception
+      end
     end
 
     shared_examples 'saves data on transition' do

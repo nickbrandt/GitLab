@@ -12,6 +12,14 @@ The `setup` task is an alias for `gitlab:setup`.
 This tasks calls `db:reset` to create the database, and calls `db:seed_fu` to seed the database.
 Note: `db:setup` calls `db:seed` but this does nothing.
 
+### Env variables
+
+**MASS_INSERT**: Create millions of users (2m), projects (5m) and its
+relations. It's highly recommended to run the seed with it to catch slow queries
+while developing. Expect the process to take up to 20 extra minutes.
+
+**LARGE_PROJECTS**: Create large projects (through import) from a predefined set of urls.
+
 ### Seeding issues for all or a given project
 
 You can seed issues for all or a given project with the `gitlab:seed:issues`
@@ -88,7 +96,7 @@ In order to run the test you can use the following commands:
 - `bin/rake spec:unit` to run the only the unit tests
 - `bin/rake spec:integration` to run the only the integration tests
 - `bin/rake spec:system` to run the only the system tests
-- `bin/rake karma` to run the karma test suite
+- `bin/rake karma` to run the Karma test suite
 
 Note: `bin/rake spec` takes significant time to pass.
 Instead of running full test suite locally you can save a lot of time by running

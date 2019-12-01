@@ -20,6 +20,7 @@ Issue:
 - due_date
 - moved_to_id
 - duplicated_to_id
+- promoted_to_epic_id
 - lock_version
 - milestone_id
 - weight
@@ -442,6 +443,7 @@ Service:
 - note_events
 - pipeline_events
 - job_events
+- comment_on_event_enabled
 - category
 - default
 - wiki_page_events
@@ -650,6 +652,7 @@ PrometheusAlert:
 - prometheus_metric_id
 Badge:
 - id
+- name
 - link_url
 - image_url
 - project_id
@@ -726,6 +729,7 @@ List:
 - milestone_id
 - user_id
 - max_issue_count
+- max_issue_weight
 ExternalPullRequest:
 - id
 - created_at
@@ -762,3 +766,6 @@ ZoomMeeting:
 - url
 - created_at
 - updated_at
+ServiceDeskSetting:
+- project_id
+- issue_template_key

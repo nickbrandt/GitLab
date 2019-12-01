@@ -1,5 +1,0 @@
----
-title: Fix new project page load performance
-merge_request: 18180
-author:
-type: performance

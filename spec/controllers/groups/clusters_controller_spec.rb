@@ -97,29 +97,15 @@ describe Groups::ClustersController do
         end
 
         before do
-          stub_feature_flags(create_eks_clusters: false)
           allow(SecureRandom).to receive(:hex).and_return(key)
         end
 
-        it 'has authorize_url' do
+        it 'redirects to gcp authorize_url' do
           go
 
           expect(assigns(:authorize_url)).to include(key)
-          expect(session[session_key_for_redirect_uri]).to eq(new_group_cluster_path(group))
-        end
-
-        context 'when create_eks_clusters feature flag is enabled' do
-          before do
-            stub_feature_flags(create_eks_clusters: true)
-          end
-
-          context 'when selected provider is gke and no valid gcp token exists' do
-            it 'redirects to gcp authorize_url' do
-              go
-
-              expect(response).to redirect_to(assigns(:authorize_url))
-            end
-          end
+          expect(session[session_key_for_redirect_uri]).to eq(new_group_cluster_path(group, provider: :gcp))
+          expect(response).to redirect_to(assigns(:authorize_url))
         end
       end
 
@@ -502,6 +488,42 @@ describe Groups::ClustersController do
 
       expect(response.status).to eq 204
       expect(user.reload_aws_role).to be_nil
+    end
+
+    describe 'security' do
+      it { expect { go }.to be_allowed_for(:admin) }
+      it { expect { go }.to be_allowed_for(:owner).of(group) }
+      it { expect { go }.to be_allowed_for(:maintainer).of(group) }
+      it { expect { go }.to be_denied_for(:developer).of(group) }
+      it { expect { go }.to be_denied_for(:reporter).of(group) }
+      it { expect { go }.to be_denied_for(:guest).of(group) }
+      it { expect { go }.to be_denied_for(:user) }
+      it { expect { go }.to be_denied_for(:external) }
+    end
+  end
+
+  describe 'DELETE clear cluster cache' do
+    let(:cluster) { create(:cluster, :group, groups: [group]) }
+    let!(:kubernetes_namespace) do
+      create(:cluster_kubernetes_namespace,
+        cluster: cluster,
+        project: create(:project)
+      )
+    end
+
+    def go
+      delete :clear_cache,
+        params: {
+          group_id: group,
+          id: cluster
+        }
+    end
+
+    it 'deletes the namespaces associated with the cluster' do
+      expect { go }.to change { Clusters::KubernetesNamespace.count }
+
+      expect(response).to redirect_to(group_cluster_path(group, cluster))
+      expect(cluster.kubernetes_namespaces).to be_empty
     end
 
     describe 'security' do

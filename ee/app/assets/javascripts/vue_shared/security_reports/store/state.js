@@ -1,4 +1,4 @@
-import { s__ } from '~/locale';
+import { __, s__ } from '~/locale';
 
 export default () => ({
   blobPath: {
@@ -67,6 +67,12 @@ export default () => ({
         value: null,
         text: s__('ciReport|Description'),
         isLink: false,
+      },
+      url: {
+        value: null,
+        url: null,
+        text: __('URL'),
+        isLink: true,
       },
       file: {
         value: null,

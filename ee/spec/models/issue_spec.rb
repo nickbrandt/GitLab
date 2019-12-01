@@ -66,6 +66,22 @@ describe Issue do
         expect(described_class.service_desk).not_to include(regular_issue)
       end
     end
+
+    describe '.in_epics' do
+      let_it_be(:epic1) { create(:epic) }
+      let_it_be(:epic2) { create(:epic) }
+      let_it_be(:epic_issue1) { create(:epic_issue, epic: epic1) }
+      let_it_be(:epic_issue2) { create(:epic_issue, epic: epic2) }
+
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      it 'returns only issues in selected epics' do
+        expect(described_class.count).to eq 2
+        expect(described_class.in_epics([epic1])).to eq [epic_issue1.issue]
+      end
+    end
   end
 
   describe 'validations' do
@@ -97,6 +113,9 @@ describe Issue do
     it { is_expected.to have_and_belong_to_many(:prometheus_alert_events) }
     it { is_expected.to have_and_belong_to_many(:self_managed_prometheus_alert_events) }
     it { is_expected.to have_many(:prometheus_alerts) }
+    it { is_expected.to have_many(:vulnerability_links).class_name('Vulnerabilities::IssueLink').inverse_of(:issue) }
+    it { is_expected.to have_many(:related_vulnerabilities).through(:vulnerability_links).source(:vulnerability) }
+    it { is_expected.to belong_to(:promoted_to_epic).class_name('Epic') }
 
     describe 'versions.most_recent' do
       it 'returns the most recent version' do
@@ -235,6 +254,22 @@ describe Issue do
       end
 
       it { is_expected.to eq(expected) }
+    end
+  end
+
+  describe '#promoted?' do
+    let(:issue) { create(:issue) }
+    subject { issue.promoted? }
+
+    context 'issue not promoted' do
+      it { is_expected.to be_falsey }
+    end
+
+    context 'issue promoted' do
+      let(:promoted_to_epic) { create(:epic) }
+      let(:issue) { create(:issue, promoted_to_epic: promoted_to_epic) }
+
+      it { is_expected.to be_truthy }
     end
   end
 

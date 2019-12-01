@@ -1,6 +1,8 @@
 import component from 'ee/onboarding/onboarding_helper/components/help_content_popover.vue';
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
+
+const localVue = createLocalVue();
 
 describe('User onboarding help content popover', () => {
   let wrapper;
@@ -42,7 +44,7 @@ describe('User onboarding help content popover', () => {
   };
 
   function createComponent(propsData) {
-    wrapper = shallowMount(component, { propsData });
+    wrapper = shallowMount(localVue.extend(component), { propsData, localVue, sync: false });
   }
 
   afterEach(() => {

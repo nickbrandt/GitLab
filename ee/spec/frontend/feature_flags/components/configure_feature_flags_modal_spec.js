@@ -24,6 +24,8 @@ describe('Configure Feature Flags Modal', () => {
     wrapper = shallowMount(Component, {
       propsData,
       localVue,
+      sync: false,
+      attachToDocument: true,
     });
   });
 
@@ -41,7 +43,9 @@ describe('Configure Feature Flags Modal', () => {
 
     it('should be hidden if the user cannot rotate tokens', () => {
       wrapper.setProps({ canUserRotateToken: false });
-      expect(wrapper.find('.js-ff-rotate-token-button').exists()).toBe(false);
+      return wrapper.vm.$nextTick(() => {
+        expect(wrapper.find('.js-ff-rotate-token-button').exists()).toBe(false);
+      });
     });
   });
 

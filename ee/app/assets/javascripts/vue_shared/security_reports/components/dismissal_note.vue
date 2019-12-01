@@ -99,7 +99,7 @@ export default {
       icon-name="cancel"
       icon-style="ci-status-icon-pending"
     >
-      <div v-html="eventText"></div>
+      <div v-if="feedback.created_at" v-html="eventText"></div>
     </event-item>
     <template v-if="commentDetails && !isCommentingOnDismissal">
       <hr class="my-3" />

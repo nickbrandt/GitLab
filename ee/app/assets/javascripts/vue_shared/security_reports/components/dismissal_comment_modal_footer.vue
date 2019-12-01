@@ -73,6 +73,7 @@ export default {
       :loading="isDismissingVulnerability"
       :disabled="isDismissingVulnerability"
       :label="submitLabel"
+      data-qa-selector="add_and_dismiss_button"
       class="js-loading-button"
       container-class="btn btn-close"
       @click="handleSubmit"

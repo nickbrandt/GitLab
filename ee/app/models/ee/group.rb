@@ -42,6 +42,9 @@ module EE
       has_many :managed_users, class_name: 'User', foreign_key: 'managing_group_id', inverse_of: :managing_group
       has_many :cycle_analytics_stages, class_name: 'Analytics::CycleAnalytics::GroupStage'
 
+      has_one :deletion_schedule, class_name: 'GroupDeletionSchedule'
+      delegate :deleting_user, :marked_for_deletion_on, to: :deletion_schedule, allow_nil: true
+
       belongs_to :file_template_project, class_name: "Project"
 
       # Use +checked_file_template_project+ instead, which implements important
@@ -52,6 +55,8 @@ module EE
                 numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
       validate :custom_project_templates_group_allowed, if: :custom_project_templates_group_id_changed?
+
+      scope :aimed_for_deletion, -> (date) { joins(:deletion_schedule).where('group_deletion_schedules.marked_for_deletion_on <= ?', date) }
 
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })

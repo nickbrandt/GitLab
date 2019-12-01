@@ -1,6 +1,7 @@
 <script>
 import { GlButton } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
+import { setUrlFragment } from '~/lib/utils/url_utility';
 
 export default {
   name: 'SolutionCard',
@@ -42,7 +43,10 @@ export default {
       return (this.remediation && this.remediation.summary) || this.solution;
     },
     helpPath() {
-      return `${this.vulnerabilityFeedbackHelpPath}#solutions-for-vulnerabilities`;
+      return setUrlFragment(
+        this.vulnerabilityFeedbackHelpPath,
+        'solutions-for-vulnerabilities-auto-remediation',
+      );
     },
     showCreateMergeRequestMsg() {
       return !this.hasMr && this.hasRemediation && this.hasDownload;

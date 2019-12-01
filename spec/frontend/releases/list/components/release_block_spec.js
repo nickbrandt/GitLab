@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils';
+import EvidenceBlock from '~/releases/list/components/evidence_block.vue';
 import ReleaseBlock from '~/releases/list/components/release_block.vue';
 import ReleaseBlockFooter from '~/releases/list/components/release_block_footer.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -29,7 +30,6 @@ describe('Release block', () => {
       },
       provide: {
         glFeatures: {
-          releaseEditPage: true,
           releaseIssueSummary: true,
           ...featureFlags,
         },
@@ -179,11 +179,6 @@ describe('Release block', () => {
     });
   });
 
-  it('does not render an edit button if the releaseEditPage feature flag is disabled', () =>
-    factory(releaseClone, { releaseEditPage: false }).then(() => {
-      expect(editButton().exists()).toBe(false);
-    }));
-
   it('does not render the milestone list if no milestones are associated to the release', () => {
     delete releaseClone.milestones;
 
@@ -217,6 +212,26 @@ describe('Release block', () => {
 
     return factory(releaseClone).then(() => {
       expect(wrapper.attributes().id).toBe('a-dangerous-tag-name-script-alert-hello-script-');
+    });
+  });
+
+  describe('evidence block', () => {
+    it('renders the evidence block when the evidence is available and the feature flag is true', () =>
+      factory(releaseClone, { releaseEvidenceCollection: true }).then(() =>
+        expect(wrapper.find(EvidenceBlock).exists()).toBe(true),
+      ));
+
+    it('does not render the evidence block when the evidence is available but the feature flag is false', () =>
+      factory(releaseClone, { releaseEvidenceCollection: true }).then(() =>
+        expect(wrapper.find(EvidenceBlock).exists()).toBe(true),
+      ));
+
+    it('does not render the evidence block when there is no evidence', () => {
+      releaseClone.evidence_sha = null;
+
+      return factory(releaseClone).then(() => {
+        expect(wrapper.find(EvidenceBlock).exists()).toBe(false);
+      });
     });
   });
 

@@ -4,7 +4,8 @@
 - if vue_package_list_enabled_for?(@project)
   .row
     .col-12
-      #js-vue-packages-list{ data: { project_id: @project.id,
+      #js-vue-packages-list{ data: { resource_id: @project.id,
+        page_type: 'projects',
         can_destroy_package: can_destroy_package,
         empty_list_help_url: help_page_path('administration/packages/index'),
         empty_list_illustration: image_path('illustrations/no-packages.svg') } }

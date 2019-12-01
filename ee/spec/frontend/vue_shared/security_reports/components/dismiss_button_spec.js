@@ -5,12 +5,16 @@ import LoadingButton from '~/vue_shared/components/loading_button.vue';
 describe('DismissalButton', () => {
   let wrapper;
 
+  const mountComponent = options => {
+    wrapper = mount(component, { sync: false, attachToDocument: true, ...options });
+  };
+
   describe('With a non-dismissed vulnerability', () => {
     beforeEach(() => {
       const propsData = {
         isDismissed: false,
       };
-      wrapper = mount(component, { propsData });
+      mountComponent({ propsData });
     });
 
     it('should render the dismiss button', () => {
@@ -37,7 +41,7 @@ describe('DismissalButton', () => {
       const propsData = {
         isDismissed: true,
       };
-      wrapper = mount(component, { propsData });
+      mountComponent({ propsData });
     });
 
     it('should render the undo dismiss button', () => {

@@ -5,12 +5,9 @@ class ApplicationSetting < ApplicationRecord
   include CacheMarkdownField
   include TokenAuthenticatable
   include ChronicDurationAttribute
+  include IgnorableColumns
 
-  # Only remove this >= %12.6 and >= 2019-12-01
-  self.ignored_columns += %i[
-      pendo_enabled
-      pendo_url
-    ]
+  ignore_columns :pendo_enabled, :pendo_url, remove_after: '2019-12-01', remove_with: '12.6'
 
   add_authentication_token_field :runners_registration_token, encrypted: -> { Feature.enabled?(:application_settings_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
   add_authentication_token_field :health_check_access_token
@@ -98,6 +95,10 @@ class ApplicationSetting < ApplicationRecord
   validates :plantuml_url,
             presence: true,
             if: :plantuml_enabled
+
+  validates :sourcegraph_url,
+            presence: true,
+            if: :sourcegraph_enabled
 
   validates :snowplow_collector_hostname,
             presence: true,
@@ -309,29 +310,25 @@ class ApplicationSetting < ApplicationRecord
                  algorithm: 'aes-256-cbc',
                  insecure_mode: true
 
-  attr_encrypted :external_auth_client_key,
-                 mode: :per_attribute_iv,
-                 key: Settings.attr_encrypted_db_key_base_truncated,
-                 algorithm: 'aes-256-gcm',
-                 encode: true
+  private_class_method def self.encryption_options_base_truncated_aes_256_gcm
+    {
+      mode: :per_attribute_iv,
+      key: Settings.attr_encrypted_db_key_base_truncated,
+      algorithm: 'aes-256-gcm',
+      encode: true
+    }
+  end
 
-  attr_encrypted :external_auth_client_key_pass,
-                 mode: :per_attribute_iv,
-                 key: Settings.attr_encrypted_db_key_base_truncated,
-                 algorithm: 'aes-256-gcm',
-                 encode: true
-
-  attr_encrypted :lets_encrypt_private_key,
-                 mode: :per_attribute_iv,
-                 key: Settings.attr_encrypted_db_key_base_truncated,
-                 algorithm: 'aes-256-gcm',
-                 encode: true
-
-  attr_encrypted :eks_secret_access_key,
-                 mode: :per_attribute_iv,
-                 key: Settings.attr_encrypted_db_key_base_truncated,
-                 algorithm: 'aes-256-gcm',
-                 encode: true
+  attr_encrypted :external_auth_client_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :external_auth_client_key_pass, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :lets_encrypt_private_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :eks_secret_access_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :akismet_api_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :elasticsearch_aws_secret_access_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :recaptcha_private_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :recaptcha_site_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :slack_app_secret, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :slack_app_verification_token, encryption_options_base_truncated_aes_256_gcm
 
   before_validation :ensure_uuid!
 
@@ -342,6 +339,10 @@ class ApplicationSetting < ApplicationRecord
     reset_memoized_terms
   end
   after_commit :expire_performance_bar_allowed_user_ids_cache, if: -> { previous_changes.key?('performance_bar_allowed_group_id') }
+
+  def sourcegraph_url_is_com?
+    !!(sourcegraph_url =~ /\Ahttps:\/\/(www\.)?sourcegraph\.com/)
+  end
 
   def self.create_from_defaults
     transaction(requires_new: true) do

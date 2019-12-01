@@ -54,7 +54,7 @@ If a project is private or you want to upload an NPM package to GitLab,
 credentials will need to be provided for authentication. Support is available for [OAuth tokens](../../../api/oauth2.md#resource-owner-password-credentials-flow) or [personal access tokens](../../profile/personal_access_tokens.md).
 
 CAUTION: **2FA is only supported with personal access tokens:**
-If you have 2FA enabled, you need to use a [personal access token](../../profile/personal_access_tokens.md) with OAuth headers. Standard OAuth tokens won't be able to authenticate to the GitLab NPM Registry.
+If you have 2FA enabled, you need to use a [personal access token](../../profile/personal_access_tokens.md) with OAuth headers with the scope set to `api`. Standard OAuth tokens won't be able to authenticate to the GitLab NPM Registry.
 
 ### Authenticating with an OAuth token
 
@@ -108,6 +108,21 @@ Then, you could run `npm publish` either locally or via GitLab CI/CD:
 
 - **GitLab CI/CD:** Set an `NPM_TOKEN` [variable](../../../ci/variables/README.md)
   under your project's **Settings > CI/CD > Variables**.
+  
+### Authenticating with a CI job token
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/9104) in GitLab Premium 12.5.
+
+If you’re using NPM with GitLab CI/CD, a CI job token can be used instead of a personal access token.
+The token will inherit the permissions of the user that generates the pipeline.
+
+Add a corresponding section to your `.npmrc` file:  
+
+```ini
+@foo:registry=https://gitlab.com/api/v4/packages/npm/
+//gitlab.com/api/v4/packages/npm/:_authToken=${env.CI_JOB_TOKEN}
+//gitlab.com/api/v4/projects/{env.CI_PROJECT_ID>/packages/npm/:_authToken=${env.CI_JOB_TOKEN}
+```
 
 ## Uploading packages
 
@@ -141,9 +156,10 @@ a given scope, you will receive a `403 Forbidden!` error.
 
 ## Uploading a package with the same version twice
 
-If you upload a package with a same name and version twice, GitLab will show
-both packages in the UI, but the GitLab NPM Registry will expose the most recent
-one as it supports only one package per version for `npm install`.
+You cannot upload a package with the same name and version twice, unless you
+delete the existing package first. This aligns with npmjs.org's behavior, with
+the exception that npmjs.org does not allow users to ever publish the same version
+more than once, even if it has been deleted.
 
 ## Troubleshooting
 

@@ -33,8 +33,6 @@ module QA
           push.files = @files
           push.commit_message = 'Add test files'
         end
-
-        Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
 
       context 'built-in', :requires_admin do
@@ -73,7 +71,7 @@ module QA
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_admin_credentials)
 
-          Page::Main::Menu.perform(&:click_admin_area)
+          Page::Main::Menu.perform(&:go_to_admin_area)
           Page::Admin::Menu.perform(&:go_to_template_settings)
 
           EE::Page::Admin::Settings::Templates.perform do |templates|

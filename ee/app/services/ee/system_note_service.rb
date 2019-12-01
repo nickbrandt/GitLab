@@ -7,6 +7,7 @@
 module EE
   module SystemNoteService
     extend ActiveSupport::Concern
+    include ActionView::RecordIdentifier
 
     prepended do
       # ::SystemNoteService wants the methods to be available as both class and
@@ -37,7 +38,7 @@ module EE
       issue = version.issue
       project = issue.project
       user = version.author
-      link_href = design_version_path(version)
+      link_href = designs_path(project, issue, version: version.id)
 
       version.designs_by_event.map do |(event_name, designs)|
         note_data = design_event_note_data(events[event_name])
@@ -48,6 +49,31 @@ module EE
 
         create_note(NoteSummary.new(issue, project, user, body, action: icon_name))
       end
+    end
+
+    # Called when a new discussion is created on a design
+    #
+    # discussion_note - DiscussionNote
+    #
+    # Example Note text:
+    #
+    #   "started a discussion on screen.png"
+    #
+    # Returns the created Note object
+    def design_discussion_added(discussion_note)
+      design = discussion_note.noteable
+      issue = design.issue
+      project = design.project
+      user = discussion_note.author
+      body = _('started a discussion on %{design_link}') % {
+        design_link: '[%s](%s)' % [
+          design.filename,
+          designs_path(project, issue, vueroute: design.filename, anchor: dom_id(discussion_note))
+        ]
+      }
+      action = :designs_discussion_added
+
+      create_note(NoteSummary.new(issue, project, user, body, action: action))
     end
 
     def epic_issue(epic, issue, user, type)
@@ -250,15 +276,8 @@ module EE
 
     private
 
-    # We do not have a named route for DesignManagement::Version, instead
-    # we route to `/designs`, with the version in the query parameters.
-    # This is because this route is not managed by Rails, but Vue:
-    def design_version_path(version)
-      ::Gitlab::Routing.url_helpers.designs_project_issue_path(
-        version.project,
-        version.issue,
-        version: version.id
-      )
+    def designs_path(project, issue, params = {})
+      url_helpers.designs_project_issue_path(project, issue, params)
     end
 
     # Take one of the `DesignManagement::Action.events` and

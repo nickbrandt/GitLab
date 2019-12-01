@@ -18,7 +18,6 @@ rspec_profiling_is_configured =
   ENV['RSPEC_PROFILING_POSTGRES_URL'].present? ||
   ENV['RSPEC_PROFILING']
 branch_can_be_profiled =
-  ENV['GITLAB_DATABASE'] == 'postgresql' &&
   (ENV['CI_COMMIT_REF_NAME'] == 'master' ||
     ENV['CI_COMMIT_REF_NAME'] =~ /rspec-profile/)
 
@@ -65,6 +64,11 @@ RSpec.configure do |config|
 
   config.infer_spec_type_from_file_location!
   config.full_backtrace = !!ENV['CI']
+
+  unless ENV['CI']
+    # Re-run failures locally with `--only-failures`
+    config.example_status_persistence_file_path = './spec/examples.txt'
+  end
 
   config.define_derived_metadata(file_path: %r{(ee)?/spec/.+_spec\.rb\z}) do |metadata|
     location = metadata[:location]

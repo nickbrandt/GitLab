@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::GrapeLogging::Loggers::ExceptionLogger do
@@ -24,10 +26,8 @@ describe Gitlab::GrapeLogging::Loggers::ExceptionLogger do
 
       let(:expected) do
         {
-          exception: {
-            class: 'RuntimeError',
-            message: 'This is a test'
-          }
+          'exception.class' => 'RuntimeError',
+          'exception.message' => 'This is a test'
         }
       end
 
@@ -39,7 +39,7 @@ describe Gitlab::GrapeLogging::Loggers::ExceptionLogger do
         before do
           current_backtrace = caller
           allow(exception).to receive(:backtrace).and_return(current_backtrace)
-          expected[:exception][:backtrace] = Gitlab::Profiler.clean_backtrace(current_backtrace)
+          expected['exception.backtrace'] = Gitlab::Profiler.clean_backtrace(current_backtrace)
         end
 
         it 'includes the backtrace' do

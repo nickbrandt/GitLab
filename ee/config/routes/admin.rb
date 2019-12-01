@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 namespace :admin do
-  resources :users, constraints: { id: %r{[a-zA-Z./0-9_\-]+} } do
+  resources :users, only: [], constraints: { id: %r{[a-zA-Z./0-9_\-]+} } do
     member do
       post :reset_runners_minutes
     end
@@ -27,7 +27,8 @@ namespace :admin do
 
   # using `only: []` to keep duplicate routes from being created
   resource :application_settings, only: [] do
-    match :geo, :templates, via: [:get, :patch]
+    match :templates, via: [:get, :patch]
+    get :geo, to: "application_settings#geo_redirection"
   end
 
   namespace :geo do
@@ -47,6 +48,10 @@ namespace :admin do
         post :resync_all
       end
     end
+
+    resource :settings, only: [:show, :update]
+
+    resources :designs, only: [:index]
 
     resources :uploads, only: [:index, :destroy]
   end

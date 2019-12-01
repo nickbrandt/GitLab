@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import _ from 'underscore';
 import { shallowMount } from '@vue/test-utils';
 import { GlTable } from '@gitlab/ui';
 import PackagesList from 'ee/packages/list/components/packages_list.vue';
@@ -7,23 +8,26 @@ import { packageList } from '../../mock_data';
 describe('packages_list', () => {
   let wrapper;
 
-  const findFirstActionColumn = (w = wrapper) => w.find({ ref: 'action-delete' });
-  const findPackageListTable = (w = wrapper) => w.find({ ref: 'packageListTable' });
-  const findPackageListSorting = (w = wrapper) => w.find({ ref: 'packageListSorting' });
-  const findPackageListPagination = (w = wrapper) => w.find({ ref: 'packageListPagination' });
-  const findPackageListDeleteModal = (w = wrapper) => w.find({ ref: 'packageListDeleteModal' });
-  const findSortingItems = (w = wrapper) => w.findAll({ name: 'sorting-item-stub' });
+  const findFirstActionColumn = () => wrapper.find({ ref: 'action-delete' });
+  const findPackageListTable = () => wrapper.find({ ref: 'packageListTable' });
+  const findPackageListSorting = () => wrapper.find({ ref: 'packageListSorting' });
+  const findPackageListPagination = () => wrapper.find({ ref: 'packageListPagination' });
+  const findPackageListDeleteModal = () => wrapper.find({ ref: 'packageListDeleteModal' });
+  const findSortingItems = () => wrapper.findAll({ name: 'sorting-item-stub' });
+  const findFirstProjectColumn = () => wrapper.find({ ref: 'col-project' });
 
   const defaultShallowMountOptions = {
-    propsData: {
-      canDestroyPackage: true,
-    },
     stubs: {
       GlTable,
       GlSortingItem: { name: 'sorting-item-stub', template: '<div><slot></slot></div>' },
     },
     computed: {
       list: () => [...packageList],
+      perPage: () => 1,
+      totalItems: () => 1,
+      page: () => 1,
+      canDestroyPackage: () => true,
+      isGroupPage: () => false,
     },
   };
 
@@ -41,6 +45,24 @@ describe('packages_list', () => {
 
   it('renders', () => {
     expect(wrapper.element).toMatchSnapshot();
+  });
+
+  describe('when is isGroupPage', () => {
+    beforeEach(() => {
+      wrapper = shallowMount(PackagesList, {
+        ...defaultShallowMountOptions,
+        computed: {
+          ...defaultShallowMountOptions.computed,
+          canDestroyPackage: () => false,
+          isGroupPage: () => true,
+        },
+      });
+    });
+
+    it('has project field', () => {
+      const projectColumn = findFirstProjectColumn();
+      expect(projectColumn.exists()).toBe(true);
+    });
   });
 
   it('contains a sorting component', () => {
@@ -63,8 +85,14 @@ describe('packages_list', () => {
   });
 
   describe('when user can not destroy the package', () => {
+    beforeEach(() => {
+      wrapper = shallowMount(PackagesList, {
+        ...defaultShallowMountOptions,
+        computed: { ...defaultShallowMountOptions.computed, canDestroyPackage: () => false },
+      });
+    });
+
     it('does not show the action column', () => {
-      wrapper.setProps({ canDestroyPackage: false });
       const action = findFirstActionColumn();
       expect(action.exists()).toBe(false);
     });
@@ -79,19 +107,19 @@ describe('packages_list', () => {
     it('shows the correct deletePackageDescription', () => {
       expect(wrapper.vm.deletePackageDescription).toEqual('');
 
-      wrapper.setData({ itemToBeDeleted: { name: 'foo' } });
-      expect(wrapper.vm.deletePackageDescription).toEqual(
-        'You are about to delete <b>foo</b>, this operation is irreversible, are you sure?',
+      wrapper.setData({ itemToBeDeleted: { name: 'foo', version: '1.0.10-beta' } });
+      expect(wrapper.vm.deletePackageDescription).toMatchInlineSnapshot(
+        `"You are about to delete <b>foo:1.0.10-beta</b>, this operation is irreversible, are you sure?"`,
       );
     });
 
     it('delete button set itemToBeDeleted and open the modal', () => {
       wrapper.vm.$refs.packageListDeleteModal.show = jest.fn();
-      const [{ name, id }] = packageList.slice(-1);
+      const item = _.last(packageList);
       const action = findFirstActionColumn();
       action.vm.$emit('click');
       return Vue.nextTick().then(() => {
-        expect(wrapper.vm.itemToBeDeleted).toEqual({ id, name });
+        expect(wrapper.vm.itemToBeDeleted).toEqual(item);
         expect(wrapper.vm.$refs.packageListDeleteModal.show).toHaveBeenCalled();
       });
     });
@@ -100,6 +128,11 @@ describe('packages_list', () => {
       wrapper.setData({ itemToBeDeleted: 1 });
       wrapper.vm.deleteItemConfirmation();
       expect(wrapper.vm.itemToBeDeleted).toEqual(null);
+    });
+    it('deleteItemConfirmation emit package:delete', () => {
+      wrapper.setData({ itemToBeDeleted: { id: 2 } });
+      wrapper.vm.deleteItemConfirmation();
+      expect(wrapper.emitted('package:delete')).toEqual([[2]]);
     });
 
     it('deleteItemCanceled resets itemToBeDeleted', () => {
@@ -110,7 +143,7 @@ describe('packages_list', () => {
   });
 
   describe('when the list is empty', () => {
-    const findEmptySlot = (w = wrapper) => w.find({ name: 'empty-slot-stub' });
+    const findEmptySlot = () => wrapper.find({ name: 'empty-slot-stub' });
 
     beforeEach(() => {
       wrapper = shallowMount(PackagesList, {
@@ -134,6 +167,10 @@ describe('packages_list', () => {
     it('has all the sortable items', () => {
       const sortingItems = findSortingItems();
       expect(sortingItems.length).toEqual(wrapper.vm.sortableFields.length);
+    });
+    it('emits page:changed events when the page changes', () => {
+      wrapper.vm.currentPage = 2;
+      expect(wrapper.emitted('page:changed')).toEqual([[2]]);
     });
   });
 });

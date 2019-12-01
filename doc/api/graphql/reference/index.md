@@ -36,6 +36,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! |  |
+| `sha` | String! | Last commit sha for entry |
 | `name` | String! |  |
 | `type` | EntryType! |  |
 | `path` | String! |  |
@@ -55,6 +56,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `authoredDate` | Time | Timestamp of when the commit was authored |
 | `webUrl` | String! | Web URL of the commit |
 | `signatureHtml` | String | Rendered HTML of the commit signature |
+| `authorName` | String | Commit authors name |
 | `author` | User | Author of the commit |
 | `latestPipeline` | Pipeline | Latest pipeline of the commit |
 
@@ -220,6 +222,16 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `relationPath` | String |  |
 | `reference` | String! |  |
 | `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this epic |
+| `descendantCounts` | EpicDescendantCount | Number of open and closed descendant epics and issues |
+
+### EpicDescendantCount
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `openedEpics` | Int | Number of opened sub-epics |
+| `closedEpics` | Int | Number of closed sub-epics |
+| `openedIssues` | Int | Number of opened epic issues |
+| `closedIssues` | Int | Number of closed epic issues |
 
 ### EpicIssue
 
@@ -244,6 +256,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `webPath` | String! | Web path of the issue |
 | `webUrl` | String! | Web URL of the issue |
 | `relativePosition` | Int | Relative position of the issue (used for positioning in epic tree and issue boards) |
+| `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this issue |
 | `timeEstimate` | Int! | Time estimate of the issue |
 | `totalTimeSpent` | Int! | Total time reported as spent on the issue |
 | `closedAt` | Time | Timestamp of when the issue was closed |
@@ -285,41 +298,6 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | ---   |  ---- | ----------  |
 | `clientMutationId` | String | A unique identifier for the client performing the mutation. |
 | `errors` | String! => Array | Reasons why the mutation failed. |
-
-### ExtendedIssue
-
-| Name  | Type  | Description |
-| ---   |  ---- | ----------  |
-| `userPermissions` | IssuePermissions! | Permissions for the current user on the resource |
-| `iid` | ID! | Internal ID of the issue |
-| `title` | String! | Title of the issue |
-| `titleHtml` | String | The GitLab Flavored Markdown rendering of `title` |
-| `description` | String | Description of the issue |
-| `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
-| `state` | IssueState! | State of the issue |
-| `reference` | String! | Internal reference of the issue. Returned in shortened format by default |
-| `author` | User! | User that created the issue |
-| `milestone` | Milestone | Milestone of the issue |
-| `dueDate` | Time | Due date of the issue |
-| `confidential` | Boolean! | Indicates the issue is confidential |
-| `discussionLocked` | Boolean! | Indicates discussion is locked on the issue |
-| `upvotes` | Int! | Number of upvotes the issue has received |
-| `downvotes` | Int! | Number of downvotes the issue has received |
-| `userNotesCount` | Int! | Number of user notes of the issue |
-| `webPath` | String! | Web path of the issue |
-| `webUrl` | String! | Web URL of the issue |
-| `relativePosition` | Int | Relative position of the issue (used for positioning in epic tree and issue boards) |
-| `timeEstimate` | Int! | Time estimate of the issue |
-| `totalTimeSpent` | Int! | Total time reported as spent on the issue |
-| `closedAt` | Time | Timestamp of when the issue was closed |
-| `createdAt` | Time! | Timestamp of when the issue was created |
-| `updatedAt` | Time! | Timestamp of when the issue was last updated |
-| `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
-| `epic` | Epic | The epic to which issue belongs |
-| `weight` | Int |  |
-| `designs` | DesignCollection |  |
-| `designCollection` | DesignCollection |  |
-| `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this issue |
 
 ### Group
 
@@ -372,6 +350,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `webPath` | String! | Web path of the issue |
 | `webUrl` | String! | Web URL of the issue |
 | `relativePosition` | Int | Relative position of the issue (used for positioning in epic tree and issue boards) |
+| `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this issue |
 | `timeEstimate` | Int! | Time estimate of the issue |
 | `totalTimeSpent` | Int! | Total time reported as spent on the issue |
 | `closedAt` | Time | Timestamp of when the issue was closed |
@@ -396,10 +375,19 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `createDesign` | Boolean! | Whether or not a user can perform `create_design` on this resource |
 | `destroyDesign` | Boolean! | Whether or not a user can perform `destroy_design` on this resource |
 
+### IssueSetDueDatePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `issue` | Issue | The issue after mutation |
+
 ### Label
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
+| `id` | ID! | Label ID |
 | `description` | String | Description of the label (markdown rendered as HTML for caching) |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
 | `title` | String! | Content of the label |
@@ -473,7 +461,39 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `cherryPickOnCurrentMergeRequest` | Boolean! | Whether or not a user can perform `cherry_pick_on_current_merge_request` on this resource |
 | `revertOnCurrentMergeRequest` | Boolean! | Whether or not a user can perform `revert_on_current_merge_request` on this resource |
 
+### MergeRequestSetAssigneesPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
+### MergeRequestSetLabelsPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
+### MergeRequestSetLockedPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
 ### MergeRequestSetMilestonePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `mergeRequest` | MergeRequest | The merge request after mutation |
+
+### MergeRequestSetSubscriptionPayload
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
@@ -635,7 +655,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `statistics` | ProjectStatistics | Statistics of the project |
 | `repository` | Repository | Git repository of the project |
 | `mergeRequest` | MergeRequest | A single merge request of the project |
-| `issue` | ExtendedIssue | A single issue of the project |
+| `issue` | Issue | A single issue of the project |
 
 ### ProjectPermissions
 
@@ -728,6 +748,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! |  |
+| `sha` | String! | Last commit sha for entry |
 | `name` | String! |  |
 | `type` | EntryType! |  |
 | `path` | String! |  |
@@ -764,6 +785,22 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `errors` | String! => Array | Reasons why the mutation failed. |
 | `todo` | Todo! | The requested todo |
 
+### TodoRestorePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `todo` | Todo! | The requested todo |
+
+### TodosMarkAllDonePayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `updatedIds` | ID! => Array | Ids of the updated todos |
+
 ### ToggleAwardEmojiPayload
 
 | Name  | Type  | Description |
@@ -784,6 +821,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! |  |
+| `sha` | String! | Last commit sha for entry |
 | `name` | String! |  |
 | `type` | EntryType! |  |
 | `path` | String! |  |

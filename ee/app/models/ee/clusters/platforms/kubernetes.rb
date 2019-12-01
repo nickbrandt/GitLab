@@ -5,6 +5,7 @@ module EE
     module Platforms
       module Kubernetes
         extend ActiveSupport::Concern
+        include ::Gitlab::Utils::StrongMemoize
 
         CACHE_KEY_GET_POD_LOG = 'get_pod_log'
 
@@ -82,9 +83,11 @@ module EE
         private
 
         def pod_logs(pod_name, namespace, container: nil)
-          logs = kubeclient.get_pod_log(
-            pod_name, namespace, container: container, tail_lines: LOGS_LIMIT
-          ).body
+          logs = if ::Feature.enabled?(:enable_cluster_application_elastic_stack) && elastic_stack_client
+                   elastic_stack_pod_logs(namespace, pod_name, container)
+                 else
+                   platform_pod_logs(namespace, pod_name, container)
+                 end
 
           {
             logs: logs,
@@ -92,6 +95,27 @@ module EE
             pod_name: pod_name,
             container_name: container
           }
+        end
+
+        def platform_pod_logs(namespace, pod_name, container_name)
+          logs = kubeclient.get_pod_log(
+            pod_name, namespace, container: container_name, tail_lines: LOGS_LIMIT
+          ).body
+
+          logs.strip.split("\n")
+        end
+
+        def elastic_stack_pod_logs(namespace, pod_name, container_name)
+          client = elastic_stack_client
+          return [] if client.nil?
+
+          ::Gitlab::Elasticsearch::Logs.new(client).pod_logs(namespace, pod_name, container_name)
+        end
+
+        def elastic_stack_client
+          strong_memoize(:elastic_stack_client) do
+            cluster.application_elastic_stack&.elasticsearch_client
+          end
         end
 
         def handle_exceptions(resource_not_found_error_message, opts, &block)

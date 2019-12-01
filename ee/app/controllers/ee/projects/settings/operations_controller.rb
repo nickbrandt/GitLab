@@ -53,6 +53,14 @@ module EE
           def incident_management_available?
             project.feature_available?(:incident_management, current_user)
           end
+
+          def track_tracing_external_url
+            external_url_previous_change = project&.tracing_setting&.external_url_previous_change
+            return unless external_url_previous_change
+            return unless external_url_previous_change[0].blank? && external_url_previous_change[1].present?
+
+            ::Gitlab::Tracking.event('project:operations:tracing', "external_url_populated")
+          end
         end
 
         override :permitted_project_params
@@ -91,6 +99,8 @@ module EE
             ::Gitlab::Tracking::IncidentManagement.track_from_params(
               update_params[:incident_management_setting_attributes]
             )
+
+            track_tracing_external_url
           end
         end
       end

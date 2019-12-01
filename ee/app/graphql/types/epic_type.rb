@@ -67,9 +67,17 @@ module Types
       complexity: 5,
       description: 'Boolean flag for whether the currently logged in user is subscribed to this epic'
 
-    field :issues, # rubocop:disable Graphql/Descriptions
+    field :issues,
           Types::EpicIssueType.connection_type,
           null: true,
+          complexity: 2,
+          description: 'A list of issues associated with the epic',
           resolver: Resolvers::EpicIssuesResolver
+
+    field :descendant_counts, Types::EpicDescendantCountType, null: true, complexity: 10,
+      description: 'Number of open and closed descendant epics and issues',
+      resolve: -> (epic, args, ctx) do
+        Epics::DescendantCountService.new(epic, ctx[:current_user])
+      end
   end
 end

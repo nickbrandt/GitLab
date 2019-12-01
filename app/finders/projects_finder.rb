@@ -79,7 +79,7 @@ class ProjectsFinder < UnionFinder
     elsif min_access_level?
       current_user.authorized_projects(params[:min_access_level])
     else
-      if private_only?
+      if private_only? || impossible_visibility_level?
         current_user.authorized_projects
       else
         Project.public_or_visible_to_user(current_user)
@@ -96,6 +96,30 @@ class ProjectsFinder < UnionFinder
     end
   end
 
+  # This is an optimization - surprisingly PostgreSQL does not optimize
+  # for this.
+  #
+  # If the default visiblity level and desired visiblity level filter cancels
+  # each other out, don't use the SQL clause for visibility level in
+  # `Project.public_or_visible_to_user`. In fact, this then becames equivalent
+  # to just authorized projects for the user.
+  #
+  # E.g.
+  # (EXISTS(<authorized_projects>) OR projects.visibility_level IN (10,20))
+  #   AND "projects"."visibility_level" = 0
+  #
+  # is essentially
+  # EXISTS(<authorized_projects>) AND "projects"."visibility_level" = 0
+  #
+  # See https://gitlab.com/gitlab-org/gitlab/issues/37007
+  def impossible_visibility_level?
+    return unless params[:visibility_level].present?
+
+    public_visibility_levels = Gitlab::VisibilityLevel.levels_for_user(current_user)
+
+    !public_visibility_levels.include?(params[:visibility_level])
+  end
+
   def owned_projects?
     params[:owned].present?
   end
@@ -110,7 +134,10 @@ class ProjectsFinder < UnionFinder
 
   # rubocop: disable CodeReuse/ActiveRecord
   def by_ids(items)
-    project_ids_relation ? items.where(id: project_ids_relation) : items
+    items = items.where(id: project_ids_relation) if project_ids_relation
+    items = items.where('id > ?', params[:id_after]) if params[:id_after]
+    items = items.where('id < ?', params[:id_before]) if params[:id_before]
+    items
   end
   # rubocop: enable CodeReuse/ActiveRecord
 

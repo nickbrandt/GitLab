@@ -33,9 +33,7 @@ describe 'Group Cycle Analytics', :js do
 
   context 'displays correct fields after group selection' do
     before do
-      dropdown = page.find('.dropdown-groups')
-      dropdown.click
-      dropdown.find('a').click
+      select_group
     end
 
     it 'hides the empty state' do
@@ -61,7 +59,7 @@ describe 'Group Cycle Analytics', :js do
     dropdown.click
     dropdown.find('a').click
 
-    wait_for_requests
+    wait_for_stages_to_load
   end
 
   def select_project
@@ -216,13 +214,13 @@ describe 'Group Cycle Analytics', :js do
   describe 'Customizable cycle analytics', :js do
     let(:button_class) { '.js-add-stage-button' }
 
+    def select_dropdown_option(name, elem = "option", index = 1)
+      page.find("select[name='#{name}']").all(elem)[index].select_option
+    end
+
     context 'enabled' do
       before do
-        dropdown = page.find('.dropdown-groups')
-        dropdown.click
-        dropdown.find('a').click
-
-        wait_for_stages_to_load
+        select_group
       end
 
       context 'Add a stage button' do
@@ -245,6 +243,157 @@ describe 'Group Cycle Analytics', :js do
           page.find(button_class).click
 
           expect(page).to have_text('New stage')
+        end
+      end
+
+      context 'Custom stage form' do
+        let(:show_form_button_class) { '.js-add-stage-button' }
+
+        def select_dropdown_option(name, elem = "option", index = 1)
+          page.find("select[name='#{name}']").all(elem)[index].select_option
+        end
+
+        before do
+          select_group
+
+          page.find(show_form_button_class).click
+          wait_for_requests
+        end
+
+        context 'with empty fields' do
+          it 'submit button is disabled by default' do
+            expect(page).to have_button('Add stage', disabled: true)
+          end
+        end
+
+        context 'with all required fields set' do
+          custom_stage_name = "cool beans"
+
+          before do
+            fill_in 'custom-stage-name', with: custom_stage_name
+            select_dropdown_option 'custom-stage-start-event'
+            select_dropdown_option 'custom-stage-stop-event'
+          end
+
+          it 'submit button is enabled' do
+            expect(page).to have_button('Add stage', disabled: false)
+          end
+
+          it 'submit button is disabled if the start event changes' do
+            select_dropdown_option 'custom-stage-start-event', 'option', 2
+
+            expect(page).to have_button('Add stage', disabled: true)
+          end
+
+          it 'an error message is displayed if the start event is changed' do
+            select_dropdown_option 'custom-stage-start-event', 'option', 2
+
+            expect(page).to have_text 'Start event changed, please select a valid stop event'
+          end
+
+          context 'submit button is clicked' do
+            it 'the custom stage is saved' do
+              click_button 'Add stage'
+
+              expect(page).to have_selector('.stage-nav-item', text: custom_stage_name)
+            end
+
+            it 'a confirmation message is displayed' do
+              name = 'cool beans number 2'
+              fill_in 'custom-stage-name', with: name
+              click_button 'Add stage'
+
+              expect(page.find('.flash-notice')).to have_text("Your custom stage '#{name}' was created")
+            end
+
+            it 'with a default name' do
+              name = 'issue'
+              fill_in 'custom-stage-name', with: name
+              click_button 'Add stage'
+
+              expect(page.find('.flash-alert')).to have_text("'#{name}' stage already exists")
+            end
+          end
+        end
+      end
+
+      context 'Stage table' do
+        custom_stage = "Cool beans"
+        let(:params) { { name: custom_stage, start_event_identifier: :merge_request_created, end_event_identifier: :merge_request_merged } }
+        let(:first_default_stage) { page.find('.stage-nav-item-cell', text: "Issue").ancestor(".stage-nav-item") }
+        let(:first_custom_stage) { page.find('.stage-nav-item-cell', text: custom_stage).ancestor(".stage-nav-item") }
+
+        def create_custom_stage
+          Analytics::CycleAnalytics::Stages::CreateService.new(parent: group, params: params, current_user: user).execute
+        end
+
+        def toggle_more_options(stage)
+          stage.hover
+
+          stage.find(".more-actions-toggle").click
+        end
+
+        context 'default stages' do
+          before do
+            select_group
+
+            toggle_more_options(first_default_stage)
+          end
+
+          it 'can be hidden' do
+            expect(first_default_stage.find('.more-actions-dropdown')).to have_text "Hide stage"
+          end
+
+          it 'can not be edited' do
+            expect(first_default_stage.find('.more-actions-dropdown')).not_to have_text "Edit stage"
+          end
+
+          it 'can not be removed' do
+            expect(first_default_stage.find('.more-actions-dropdown')).not_to have_text "Remove stage"
+          end
+
+          it 'will not appear in the stage table after being hidden' do
+            nav = page.find('.stage-nav')
+            expect(nav).to have_text("Issue")
+
+            click_button "Hide stage"
+
+            expect(page.find('.flash-notice')).to have_text 'Stage data updated'
+            expect(nav).not_to have_text("Issue")
+          end
+        end
+
+        context 'custom stages' do
+          before do
+            create_custom_stage
+            select_group
+
+            expect(page).to have_text custom_stage
+
+            toggle_more_options(first_custom_stage)
+          end
+
+          it 'can not be hidden' do
+            expect(first_custom_stage.find('.more-actions-dropdown')).not_to have_text "Hide stage"
+          end
+
+          it 'can be edited' do
+            expect(first_custom_stage.find('.more-actions-dropdown')).to have_text "Edit stage"
+          end
+
+          it 'can be removed' do
+            expect(first_custom_stage.find('.more-actions-dropdown')).to have_text "Remove stage"
+          end
+
+          it 'will not appear in the stage table after being removed' do
+            nav = page.find('.stage-nav')
+            expect(nav).to have_text(custom_stage)
+
+            click_button "Remove stage"
+
+            expect(page.find('.flash-notice')).to have_text 'Stage removed'
+            expect(nav).not_to have_text(custom_stage)
+          end
         end
       end
     end

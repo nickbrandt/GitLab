@@ -6,12 +6,19 @@ import {
   eventsByIdentifier,
   getLabelEventsIdentifiers,
   nestQueryStringKeys,
+  flattenDurationChartData,
+  getDurationChartData,
 } from 'ee/analytics/cycle_analytics/utils';
 import {
   customStageEvents as events,
   labelStartEvent,
   labelStopEvent,
   customStageStartEvents as startEvents,
+  transformedDurationData,
+  flattenedDurationData,
+  durationChartPlottableData,
+  startDate,
+  endDate,
 } from './mock_data';
 
 const labelEvents = [labelStartEvent, labelStopEvent].map(i => i.identifier);
@@ -128,6 +135,22 @@ describe('Cycle analytics utils', () => {
       [{}, null, [], ''].forEach(tarObj => {
         expect(nestQueryStringKeys(tarObj, targetKey)).toEqual({});
       });
+    });
+  });
+
+  describe('flattenDurationChartData', () => {
+    it('flattens the data as expected', () => {
+      const flattenedData = flattenDurationChartData(transformedDurationData);
+
+      expect(flattenedData).toStrictEqual(flattenedDurationData);
+    });
+  });
+
+  describe('cycleAnalyticsDurationChart', () => {
+    it('computes the plottable data as expected', () => {
+      const plottableData = getDurationChartData(transformedDurationData, startDate, endDate);
+
+      expect(plottableData).toStrictEqual(durationChartPlottableData);
     });
   });
 });

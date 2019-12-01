@@ -1,7 +1,5 @@
 - parent_group = local_assigns[:parent_group]
 
-.mb-2= render_billings_gold_trial(current_user, parent_group || namespace)
-
 - if namespace_for_user?(namespace)
   = render_if_exists 'trials/banner', namespace: namespace
 
@@ -31,4 +29,4 @@
     = render 'shared/billings/trial_status', namespace: namespace
 
   - if namespace.eligible_for_trial?
-    %p= link_to 'Start your free trial', new_gitlab_com_trial_url, class: 'btn btn-primary'
+    %p= link_to 'Start your free trial', new_trial_registration_path, class: 'btn btn-primary'

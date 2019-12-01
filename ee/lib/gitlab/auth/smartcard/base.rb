@@ -42,11 +42,27 @@ module Gitlab
           return unless valid?
 
           user = find_user
+          user ||= create_identity_for_existing_user
           user ||= create_user if allow_signup?
           user
         end
 
         private
+
+        def find_user
+          raise NotImplementedError,
+                "#{self.class.name} does not implement #{__method__}"
+        end
+
+        def create_identity_for_existing_user
+          raise NotImplementedError,
+                "#{self.class.name} does not implement #{__method__}"
+        end
+
+        def create_user
+          raise NotImplementedError,
+                "#{self.class.name} does not implement #{__method__}"
+        end
 
         def valid?
           self.class.store.verify(@certificate) if @certificate

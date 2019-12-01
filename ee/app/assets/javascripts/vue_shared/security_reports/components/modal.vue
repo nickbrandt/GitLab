@@ -148,10 +148,7 @@ export default {
         current_username,
       } = gon;
 
-      const currentDate = new Date();
-
       return {
-        created_at: currentDate.toString(),
         project_id: this.project ? this.project.id : null,
         author: {
           id: current_user_id,
@@ -199,6 +196,7 @@ export default {
     id="modal-mrwidget-security-issue"
     :header-title-text="modal.title"
     :class="{ 'modal-hide-footer': !shouldRenderFooterSection }"
+    data-qa-selector="vulnerability_modal_content"
     class="modal-security-report-dast"
   >
     <slot>

@@ -20,7 +20,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       restored_project_json
     end
 
-    it_behaves_like 'restores project correctly', issues: 2
+    it_behaves_like 'restores project successfully', issues: 2
 
     it 'restores project associations correctly' do
       expect(project.designs.size).to eq(7)

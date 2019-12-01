@@ -7,6 +7,8 @@ module EE
       extend ::Gitlab::Utils::Override
 
       prepended do
+        include DescriptionDiffActions
+
         # Specifying before_action :authenticate_user! multiple times
         # doesn't work, since the last filter will override the previous
         # ones.

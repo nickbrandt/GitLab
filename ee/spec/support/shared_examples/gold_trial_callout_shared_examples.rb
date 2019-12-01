@@ -60,7 +60,7 @@ end
 
 shared_examples 'billings gold trial callout' do
   context 'on a free plan' do
-    let(:plan) { 'free' }
+    let(:plan) { free_plan }
 
     let!(:subscription) do
       create(:gitlab_subscription, namespace: namespace, hosted_plan: nil, seats: 15)
@@ -82,7 +82,7 @@ shared_examples 'billings gold trial callout' do
     where(case_names: ->(plan_type) {"like #{plan_type}"}, plan_type: [:bronze, :silver])
 
     with_them do
-      let(:plan) { plan_type }
+      let(:plan) { plans[plan_type] }
 
       let!(:subscription) do
         create(:gitlab_subscription, namespace: namespace, hosted_plan: plans[plan_type], seats: 15)
@@ -103,10 +103,10 @@ shared_examples 'billings gold trial callout' do
   end
 
   context 'on a gold plan' do
-    let(:plan) { gold_plan.name }
+    let(:plan) { gold_plan }
 
     let!(:subscription) do
-      create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan, seats: 15)
+      create(:gitlab_subscription, namespace: namespace, hosted_plan: plan, seats: 15)
     end
 
     before do

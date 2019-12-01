@@ -13,17 +13,24 @@ import SummaryTable from 'ee/analytics/cycle_analytics/components/summary_table.
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
 import 'bootstrap';
 import '~/gl_dropdown';
+import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import * as mockData from '../mock_data';
 
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';
 const emptyStateSvgPath = 'path/to/empty/state';
+const baseStagesEndpoint = '/-/analytics/cycle_analytics/stages';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-function createComponent({ opts = {}, shallow = true, withStageSelected = false } = {}) {
+function createComponent({
+  opts = {},
+  shallow = true,
+  withStageSelected = false,
+  scatterplotEnabled = true,
+} = {}) {
   const func = shallow ? shallowMount : mount;
   const comp = func(Component, {
     localVue,
@@ -33,6 +40,10 @@ function createComponent({ opts = {}, shallow = true, withStageSelected = false 
       emptyStateSvgPath,
       noDataSvgPath,
       noAccessSvgPath,
+      baseStagesEndpoint,
+    },
+    provide: {
+      glFeatures: { cycleAnalyticsScatterplotEnabled: scatterplotEnabled },
     },
     ...opts,
   });
@@ -77,6 +88,10 @@ describe('Cycle Analytics component', () => {
 
   const displaysStageTable = flag => {
     expect(wrapper.find(StageTable).exists()).toBe(flag);
+  };
+
+  const displaysDurationScatterPlot = flag => {
+    expect(wrapper.find(Scatterplot).exists()).toBe(flag);
   };
 
   beforeEach(() => {
@@ -141,6 +156,10 @@ describe('Cycle Analytics component', () => {
       it('does not display the stage table', () => {
         displaysStageTable(false);
       });
+
+      it('does not display the duration scatter plot', () => {
+        displaysDurationScatterPlot(false);
+      });
     });
 
     describe('after a filter has been selected', () => {
@@ -179,6 +198,39 @@ describe('Cycle Analytics component', () => {
 
         it('does not display the add stage button', () => {
           expect(wrapper.find('.js-add-stage-button').exists()).toBe(false);
+        });
+
+        describe('with no durationData', () => {
+          it('displays the duration chart', () => {
+            expect(wrapper.find(Scatterplot).exists()).toBe(false);
+          });
+
+          it('displays the no data message', () => {
+            const element = wrapper.find({ ref: 'duration-chart-no-data' });
+
+            expect(element.exists()).toBe(true);
+            expect(element.text()).toBe(
+              'There is no data available. Please change your selection.',
+            );
+          });
+        });
+
+        describe('with durationData', () => {
+          beforeEach(() => {
+            wrapper.vm.$store.dispatch('setDateRange', {
+              skipFetch: true,
+              startDate: mockData.startDate,
+              endDate: mockData.endDate,
+            });
+            wrapper.vm.$store.dispatch(
+              'receiveDurationDataSuccess',
+              mockData.transformedDurationData,
+            );
+          });
+
+          it('displays the duration chart', () => {
+            expect(wrapper.find(Scatterplot).exists()).toBe(true);
+          });
         });
 
         describe('StageTable', () => {
@@ -299,7 +351,7 @@ describe('Cycle Analytics component', () => {
   describe('with failed requests while loading', () => {
     const { full_path: groupId } = mockData.group;
 
-    function mockRequestCycleAnalyticsData(overrides = {}) {
+    function mockRequestCycleAnalyticsData(overrides = {}, includeDutationDataRequests = true) {
       const defaultStatus = 200;
       const defaultRequests = {
         fetchSummaryData: {
@@ -309,19 +361,24 @@ describe('Cycle Analytics component', () => {
         },
         fetchGroupStagesAndEvents: {
           status: defaultStatus,
-          endpoint: `/-/analytics/cycle_analytics/stages?group_id=${groupId}`,
+          endpoint: `/-/analytics/cycle_analytics/stages`,
           response: { ...mockData.customizableStagesAndEvents },
         },
         fetchGroupLabels: {
           status: defaultStatus,
           endpoint: `/groups/${groupId}/-/labels`,
-          response: { ...mockData.groupLabels },
+          response: [...mockData.groupLabels],
         },
         fetchStageData: {
           status: defaultStatus,
           // default first stage is issue
           endpoint: '/groups/foo/-/cycle_analytics/events/issue.json',
-          response: { ...mockData.issueEvents },
+          response: [...mockData.issueEvents],
+        },
+        fetchTasksByTypeData: {
+          status: defaultStatus,
+          endpoint: '/-/analytics/type_of_work/tasks_by_type',
+          response: { ...mockData.tasksByTypeData },
         },
         ...overrides,
       };
@@ -329,6 +386,14 @@ describe('Cycle Analytics component', () => {
       Object.values(defaultRequests).forEach(({ endpoint, status, response }) => {
         mock.onGet(endpoint).replyOnce(status, response);
       });
+
+      if (includeDutationDataRequests) {
+        mockData.defaultStages.forEach(stage => {
+          mock
+            .onGet(`${baseStagesEndpoint}/${stage}/duration_chart`)
+            .replyOnce(defaultStatus, [...mockData.rawDurationData]);
+        });
+      }
     }
 
     beforeEach(() => {
@@ -344,6 +409,13 @@ describe('Cycle Analytics component', () => {
     });
 
     const findFlashError = () => document.querySelector('.flash-container .flash-text');
+    const selectGroupAndFindError = msg => {
+      wrapper.vm.onGroupSelect(mockData.group);
+
+      return waitForPromises().then(() => {
+        expect(findFlashError().innerText.trim()).toEqual(msg);
+      });
+    };
 
     it('will display an error if the fetchSummaryData request fails', () => {
       expect(findFlashError()).toBeNull();
@@ -356,13 +428,9 @@ describe('Cycle Analytics component', () => {
         },
       });
 
-      wrapper.vm.onGroupSelect(mockData.group);
-
-      return waitForPromises().then(() => {
-        expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error while fetching cycle analytics summary data.',
-        );
-      });
+      return selectGroupAndFindError(
+        'There was an error while fetching cycle analytics summary data.',
+      );
     });
 
     it('will display an error if the fetchGroupLabels request fails', () => {
@@ -375,13 +443,9 @@ describe('Cycle Analytics component', () => {
         },
       });
 
-      wrapper.vm.onGroupSelect(mockData.group);
-
-      return waitForPromises().then(() => {
-        expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error fetching label data for the selected group',
-        );
-      });
+      return selectGroupAndFindError(
+        'There was an error fetching label data for the selected group',
+      );
     });
 
     it('will display an error if the fetchGroupStagesAndEvents request fails', () => {
@@ -395,13 +459,7 @@ describe('Cycle Analytics component', () => {
         },
       });
 
-      wrapper.vm.onGroupSelect(mockData.group);
-
-      return waitForPromises().then(() => {
-        expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error fetching cycle analytics stages.',
-        );
-      });
+      return selectGroupAndFindError('There was an error fetching cycle analytics stages.');
     });
 
     it('will display an error if the fetchStageData request fails', () => {
@@ -415,11 +473,41 @@ describe('Cycle Analytics component', () => {
         },
       });
 
+      return selectGroupAndFindError('There was an error fetching data for the selected stage');
+    });
+
+    it('will display an error if the fetchTasksByTypeData request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({
+        fetchTasksByTypeData: {
+          endPoint: '/-/analytics/type_of_work/tasks_by_type',
+          status: httpStatusCodes.BAD_REQUEST,
+          response: { response: { status: httpStatusCodes.BAD_REQUEST } },
+        },
+      });
+
+      return selectGroupAndFindError('There was an error fetching data for the chart');
+    });
+
+    it('will display an error if the fetchDurationData request fails', () => {
+      expect(findFlashError()).toBeNull();
+
+      mockRequestCycleAnalyticsData({}, false);
+
+      mockData.defaultStages.forEach(stage => {
+        mock
+          .onGet(`${baseStagesEndpoint}/${stage}/duration_chart`)
+          .replyOnce(httpStatusCodes.NOT_FOUND, {
+            response: { status: httpStatusCodes.NOT_FOUND },
+          });
+      });
+
       wrapper.vm.onGroupSelect(mockData.group);
 
-      return waitForPromises().then(() => {
+      return waitForPromises().catch(() => {
         expect(findFlashError().innerText.trim()).toEqual(
-          'There was an error fetching data for the selected stage',
+          'There was an error while fetching cycle analytics duration data.',
         );
       });
     });

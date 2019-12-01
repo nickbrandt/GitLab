@@ -29,7 +29,7 @@ describe ::Gitlab::Ci::Config::Entry::Need do
     describe '#errors' do
       it 'is returns an error about an empty config' do
         expect(subject.errors)
-          .to include("bridge config can't be blank")
+          .to include("bridge hash config can't be blank")
       end
     end
   end

@@ -14,10 +14,6 @@ describe 'EE Clusters', :js do
   end
 
   context 'when user has a cluster' do
-    before do
-      stub_feature_flags(create_eks_clusters: false)
-    end
-
     context 'when license has multiple clusters feature' do
       before do
         allow(License).to receive(:feature_available?).and_call_original
@@ -115,7 +111,8 @@ describe 'EE Clusters', :js do
         context 'when user filled form with environment scope' do
           before do
             click_link 'Add Kubernetes cluster'
-            click_link 'Create new Cluster on GKE'
+            click_link 'Create new Cluster'
+            click_link 'Google GKE'
 
             sleep 2 # wait for ajax
             execute_script('document.querySelector(".js-gcp-project-id-dropdown input").setAttribute("type", "text")')
@@ -159,7 +156,8 @@ describe 'EE Clusters', :js do
         context 'when user updates duplicated environment scope' do
           before do
             click_link 'Add Kubernetes cluster'
-            click_link 'Create new Cluster on GKE'
+            click_link 'Create new Cluster'
+            click_link 'Google GKE'
 
             sleep 2 # wait for ajax
             execute_script('document.querySelector(".js-gcp-project-id-dropdown input").setAttribute("type", "text")')

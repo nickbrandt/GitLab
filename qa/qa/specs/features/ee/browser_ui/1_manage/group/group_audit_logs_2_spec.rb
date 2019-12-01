@@ -14,7 +14,6 @@ module QA
 
     describe 'Group audit logs' do
       before(:all) do
-        sign_in
         @group = Resource::Group.fabricate_via_api! do |resource|
           resource.path = "test-group-#{SecureRandom.hex(8)}"
         end

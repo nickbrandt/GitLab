@@ -3,20 +3,18 @@
 class Clusters::ClustersController < Clusters::BaseController
   include RoutableActions
 
-  before_action :cluster, only: [:cluster_status, :show, :update, :destroy]
+  before_action :cluster, only: [:cluster_status, :show, :update, :destroy, :clear_cache]
   before_action :generate_gcp_authorize_url, only: [:new]
   before_action :validate_gcp_token, only: [:new]
   before_action :gcp_cluster, only: [:new]
   before_action :user_cluster, only: [:new]
   before_action :authorize_create_cluster!, only: [:new, :authorize_aws_role, :revoke_aws_role, :aws_proxy]
   before_action :authorize_update_cluster!, only: [:update]
-  before_action :authorize_admin_cluster!, only: [:destroy]
+  before_action :authorize_admin_cluster!, only: [:destroy, :clear_cache]
   before_action :update_applications_status, only: [:cluster_status]
-  before_action only: [:new, :create_gcp] do
-    push_frontend_feature_flag(:create_eks_clusters)
-  end
   before_action only: [:show] do
     push_frontend_feature_flag(:enable_cluster_application_elastic_stack)
+    push_frontend_feature_flag(:enable_cluster_application_crossplane)
   end
 
   helper_method :token_in_session
@@ -41,8 +39,6 @@ class Clusters::ClustersController < Clusters::BaseController
   end
 
   def new
-    return unless Feature.enabled?(:create_eks_clusters)
-
     if params[:provider] == 'aws'
       @aws_role = current_user.aws_role || Aws::Role.new
       @aws_role.ensure_role_external_id!
@@ -112,6 +108,7 @@ class Clusters::ClustersController < Clusters::BaseController
       generate_gcp_authorize_url
       validate_gcp_token
       user_cluster
+      params[:provider] = 'gcp'
 
       render :new, locals: { active_tab: 'create' }
     end
@@ -168,14 +165,16 @@ class Clusters::ClustersController < Clusters::BaseController
     render json: response.body, status: response.status
   end
 
+  def clear_cache
+    cluster.delete_cached_resources!
+
+    redirect_to cluster.show_path, notice: _('Cluster cache cleared.')
+  end
+
   private
 
   def destroy_params
-    # To be uncomented on https://gitlab.com/gitlab-org/gitlab/merge_requests/16954
-    # This MR got split into other since it was too big.
-    #
-    # params.permit(:cleanup)
-    {}
+    params.permit(:cleanup)
   end
 
   def update_params
@@ -274,8 +273,7 @@ class Clusters::ClustersController < Clusters::BaseController
   end
 
   def generate_gcp_authorize_url
-    params = Feature.enabled?(:create_eks_clusters) ? { provider: :gke } : {}
-    state = generate_session_key_redirect(clusterable.new_path(params).to_s)
+    state = generate_session_key_redirect(clusterable.new_path(provider: :gcp).to_s)
 
     @authorize_url = GoogleApi::CloudPlatform::Client.new(
       nil, callback_google_api_auth_url,

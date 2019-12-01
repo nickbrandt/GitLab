@@ -14,12 +14,25 @@ import propsData from 'spec/monitoring/components/dashboard_spec';
 import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
 import * as types from '~/monitoring/stores/mutation_types';
 
+const localVue = createLocalVue();
+
 describe('Dashboard', () => {
   let Component;
   let mock;
   let store;
   let vm;
-  const localVue = createLocalVue();
+
+  const createComponent = (props = {}) => {
+    vm = shallowMount(localVue.extend(Component), {
+      propsData: {
+        ...propsData,
+        ...props,
+      },
+      store,
+      sync: false,
+      localVue,
+    });
+  };
 
   beforeEach(() => {
     setFixtures(`
@@ -60,52 +73,37 @@ describe('Dashboard', () => {
   describe('add custom metrics', () => {
     describe('when not available', () => {
       beforeEach(() => {
-        vm = shallowMount(Component, {
-          propsData: {
-            ...propsData,
-            customMetricsAvailable: false,
-            customMetricsPath: '/endpoint',
-            hasMetrics: true,
-            prometheusAlertsAvailable: true,
-            alertsEndpoint: '/endpoint',
-          },
-          store,
+        createComponent({
+          customMetricsAvailable: false,
+          customMetricsPath: '/endpoint',
+          hasMetrics: true,
+          prometheusAlertsAvailable: true,
+          alertsEndpoint: '/endpoint',
         });
       });
 
-      it('does not render add button on the dashboard', done => {
-        setTimeout(() => {
-          expect(vm.element.querySelector('.js-add-metric-button')).toBe(null);
-          done();
-        });
+      it('does not render add button on the dashboard', () => {
+        expect(vm.element.querySelector('.js-add-metric-button')).toBe(null);
       });
     });
 
     describe('when available', () => {
-      beforeEach(() => {
-        vm = shallowMount(Component, {
-          propsData: {
-            ...propsData,
-            customMetricsAvailable: true,
-            customMetricsPath: '/endpoint',
-            hasMetrics: true,
-            prometheusAlertsAvailable: true,
-            alertsEndpoint: '/endpoint',
-          },
-          store,
+      beforeEach(done => {
+        createComponent({
+          customMetricsAvailable: true,
+          customMetricsPath: '/endpoint',
+          hasMetrics: true,
+          prometheusAlertsAvailable: true,
+          alertsEndpoint: '/endpoint',
         });
 
         setupComponentStore(vm);
+
+        vm.vm.$nextTick(done);
       });
 
-      it('renders add button on the dashboard', done => {
-        localVue.nextTick(() => {
-          expect(vm.element.querySelector('.js-add-metric-button').innerText).toContain(
-            'Add metric',
-          );
-
-          done();
-        });
+      it('renders add button on the dashboard', () => {
+        expect(vm.element.querySelector('.js-add-metric-button').innerText).toContain('Add metric');
       });
 
       it('uses modal for custom metrics form', () => {

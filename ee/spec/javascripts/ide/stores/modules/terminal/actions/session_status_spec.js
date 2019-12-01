@@ -1,10 +1,10 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { PENDING, RUNNING, STOPPING, STOPPED } from 'ee/ide/constants';
 import * as messages from 'ee/ide/stores/modules/terminal/messages';
 import * as mutationTypes from 'ee/ide/stores/modules/terminal/mutation_types';
 import actionsModule, * as actions from 'ee/ide/stores/modules/terminal/actions/session_status';
+import axios from '~/lib/utils/axios_utils';
 
 const TEST_SESSION = {
   id: 7,

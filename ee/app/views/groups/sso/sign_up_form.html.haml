@@ -12,10 +12,10 @@
           = (_("Finish setting up your dedicated account for <strong>%{group_name}</strong>.") % { group_name: @group_name }).html_safe
       .form-group
         = f.label :email, class: 'label-bold'
-        = f.email_field :email, class: "form-control qa-new-user-email", required: true, disabled: true
+        = f.email_field :email, class: "form-control", required: true, disabled: true, data: { qa_selector: 'new_user_email_field' }
       .name.form-group
         = f.label :name, _('Full name'), class: 'label-bold'
-        = f.text_field :name, class: "form-control top qa-new-user-name js-block-emoji", required: true, disabled: resource.name.present?
+        = f.text_field :name, class: "form-control top js-block-emoji", required: true, data: { qa_selector: 'new_user_username_field' }, disabled: resource.name.present?
       .username.form-group
         = f.label :username, class: 'label-bold'
         = f.text_field :username, class: "form-control qa-new-user-username js-block-emoji", pattern: Gitlab::PathRegex::NAMESPACE_FORMAT_REGEX_JS, required: true, title: _("Please create a username with only alphanumeric characters.")
@@ -35,7 +35,7 @@
         .d-flex.justify-content-center
           = render 'user_info'
         .submit-container
-          = f.submit _("Sign out & Register"), class: "btn-register btn qa-new-user-register-button"
+          = f.submit _("Sign out & Register"), class: "btn-register btn qa-new-user-register-button", data: { qa_selector: 'sign_out_and_register_button' }
       - else
         .submit-container
           = f.submit _("Register"), class: "btn-register btn qa-new-user-register-button"

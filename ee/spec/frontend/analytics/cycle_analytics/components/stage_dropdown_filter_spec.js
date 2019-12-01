@@ -10,13 +10,13 @@ jest.mock('~/api', () => ({
 
 const stages = [
   {
-    name: 'issue',
+    title: 'Issue',
   },
   {
-    name: 'plan',
+    title: 'Plan',
   },
   {
-    name: 'code',
+    title: 'Code',
   },
 ];
 
@@ -34,10 +34,11 @@ describe('StageDropdownFilter component', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   beforeEach(() => {
-    createComponent({ multiSelect: false });
+    createComponent();
   });
 
   const findDropdown = () => wrapper.find('.dropdown');
@@ -55,43 +56,42 @@ describe('StageDropdownFilter component', () => {
       return wrapper.vm.$nextTick();
     });
 
-    it('should add to selection when new stage is clicked', () => {
-      findDropdownItems()
-        .at(0)
-        .trigger('click');
+    describe('clicking a selected stage', () => {
+      it('should remove from selection', () => {
+        const item = findDropdownItems().at(0);
 
-      findDropdownItems()
-        .at(1)
-        .trigger('click');
+        item.trigger('click');
 
-      expect(wrapper.emittedByOrder()).toEqual([
-        {
-          name: 'selected',
-          args: [[stages[0]]],
-        },
-        {
-          name: 'selected',
-          args: [[stages[0], stages[1]]],
-        },
-      ]);
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'selected',
+            args: [[stages[1], stages[2]]],
+          },
+        ]);
+      });
     });
 
-    it('should remove from selection when clicked again', () => {
-      const item = findDropdownItems().at(0);
+    describe('clicking a deselected stage', () => {
+      it('should add to selection', () => {
+        findDropdownItems()
+          .at(0)
+          .trigger('click');
 
-      item.trigger('click');
-      item.trigger('click');
+        findDropdownItems()
+          .at(0)
+          .trigger('click');
 
-      expect(wrapper.emittedByOrder()).toEqual([
-        {
-          name: 'selected',
-          args: [[stages[0]]],
-        },
-        {
-          name: 'selected',
-          args: [[]],
-        },
-      ]);
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'selected',
+            args: [[stages[1], stages[2]]],
+          },
+          {
+            name: 'selected',
+            args: [[stages[1], stages[2], stages[0]]],
+          },
+        ]);
+      });
     });
   });
 });
