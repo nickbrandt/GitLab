@@ -10,8 +10,10 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
   let(:pipeline) { build(:ci_pipeline, project: project) }
 
   let(:command) do
-    double('command', project: project,
-                      current_user: user)
+    double(:command,
+      project: project,
+      current_user: user,
+      stage_seeds: [double(:seed_1, size: 1), double(:seed_2, size: 1)])
   end
 
   let(:step) { described_class.new(pipeline, command) }
@@ -31,9 +33,11 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
 
     context 'when saving incomplete pipelines' do
       let(:command) do
-        double('command', project: project,
-                          current_user: user,
-                          save_incompleted: true)
+        double(:command,
+          project: project,
+          current_user: user,
+          save_incompleted: true,
+          stage_seeds: [double(:seed_1, size: 1), double(:seed_2, size: 1)])
       end
 
       it 'drops the pipeline' do
@@ -79,9 +83,11 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
 
     context 'when not saving incomplete pipelines' do
       let(:command) do
-        double('command', project: project,
-                          current_user: user,
-                          save_incompleted: false)
+        double(:command,
+          project: project,
+          current_user: user,
+          save_incompleted: false,
+          stage_seeds: [double(:seed_1, size: 1), double(:seed_2, size: 1)])
       end
 
       it 'does not drop the pipeline' do

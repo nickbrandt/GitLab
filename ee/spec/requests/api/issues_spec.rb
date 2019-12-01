@@ -79,51 +79,6 @@ describe API::Issues, :mailer do
     end
   end
 
-  shared_examples 'sets epic_iid' do
-    context 'with epics feature' do
-      before do
-        stub_licensed_features(epics: true)
-      end
-
-      it 'sets epic on issue' do
-        subject
-
-        expect(epic_issue.epic).to eq(epic)
-      end
-    end
-
-    context 'without epics feature' do
-      before do
-        stub_licensed_features(epics: false)
-      end
-
-      it 'does not set epic on issue' do
-        subject
-
-        expect(epic_issue.epic).not_to eq(epic)
-      end
-    end
-  end
-
-  shared_examples 'ignores epic_iid' do
-    before do
-      stub_licensed_features(epics: true)
-    end
-
-    it 'does not contain epic_iid in response' do
-      subject
-
-      expect(response).to have_gitlab_http_status(:success)
-      expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
-    end
-
-    it 'does not set epic on issue' do
-      subject
-
-      expect(epic_issue.epic).not_to eq(epic)
-    end
-  end
-
   describe "GET /issues" do
     context "when authenticated" do
       it 'matches V4 response schema' do
@@ -270,6 +225,81 @@ describe API::Issues, :mailer do
     end
   end
 
+  shared_examples 'with epic parameter' do
+    let(:params) { { title: 'issue with epic', epic_id: epic.id } }
+
+    context 'for a group project' do
+      let(:target_project) { group_project }
+
+      context 'with epics feature' do
+        before do
+          stub_licensed_features(epics: true)
+        end
+
+        context 'when user can admin epics' do
+          before do
+            group.add_owner(user)
+          end
+
+          it 'sets epic on issue' do
+            request
+
+            expect(response).to have_gitlab_http_status(:success)
+            expect(json_response['epic_iid']).to eq(epic.iid)
+          end
+        end
+
+        context 'when user can not edit epics' do
+          before do
+            group.add_guest(user)
+          end
+
+          it 'returns an error' do
+            request
+
+            expect(response).to have_gitlab_http_status(403)
+            expect(json_response['message']).to eq('403 Forbidden')
+          end
+        end
+      end
+
+      context 'without epics feature' do
+        before do
+          stub_licensed_features(epics: false)
+          group.add_owner(user)
+        end
+
+        it 'does not set epic on issue' do
+          request
+
+          expect(response).to have_gitlab_http_status(404)
+          expect(json_response['message']).to eq('404 Not found')
+        end
+      end
+
+      context 'when both epic_id and epic_iid is used' do
+        let(:params) { { title: 'issue with epic', epic_id: epic.id, epic_iid: epic.iid } }
+
+        it 'returns an error' do
+          request
+
+          expect(response).to have_gitlab_http_status(400)
+        end
+      end
+    end
+
+    context 'for a user project' do
+      let(:target_project) { project }
+
+      it 'does not set epic on issue' do
+        request
+
+        expect(response).to have_gitlab_http_status(:success)
+        expect(json_response).not_to have_key('epic_iid')
+      end
+    end
+  end
+
   describe "POST /projects/:id/issues" do
     it 'creates a new project issue' do
       post api("/projects/#{project.id}/issues", user),
@@ -285,26 +315,8 @@ describe API::Issues, :mailer do
       expect(json_response['assignees'].first['name']).to eq(user2.name)
     end
 
-    context 'with epic parameter' do
-      let(:epic_issue) { Issue.last }
-      let(:params) { { title: 'issue with epic', epic_iid: epic.iid } }
-
-      context 'for a group project' do
-        subject { post api("/projects/#{group_project.id}/issues", user), params: params }
-
-        before do
-          group.add_owner(user)
-        end
-
-        include_examples 'exposes epic'
-        include_examples 'sets epic_iid'
-      end
-
-      context 'for a user project' do
-        subject { post api("/projects/#{project.id}/issues", user), params: params }
-
-        include_examples 'ignores epic_iid'
-      end
+    it_behaves_like 'with epic parameter' do
+      let(:request) { post api("/projects/#{target_project.id}/issues", user), params: params }
     end
   end
 
@@ -357,25 +369,9 @@ describe API::Issues, :mailer do
   end
 
   describe 'PUT /projects/:id/issues/:issue_id to update epic' do
-    context 'for a group project' do
-      let!(:epic_issue) { create(:issue, project: group_project) }
-
-      subject { put api("/projects/#{group_project.id}/issues/#{epic_issue.iid}", user), params: { epic_iid: epic.iid } }
-
-      before do
-        group.add_owner(user)
-      end
-
-      include_examples 'exposes epic'
-      include_examples 'sets epic_iid'
-    end
-
-    context 'for a user project' do
-      let!(:epic_issue) { create(:issue, project: project) }
-
-      subject { put api("/projects/#{project.id}/issues/#{epic_issue.iid}", user), params: { epic_iid: epic.iid } }
-
-      include_examples 'ignores epic_iid'
+    it_behaves_like 'with epic parameter' do
+      let(:epic_issue) { create(:issue, project: target_project) }
+      let(:request) { put api("/projects/#{target_project.id}/issues/#{epic_issue.iid}", user), params: params }
     end
   end
 

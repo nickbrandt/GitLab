@@ -21,7 +21,8 @@ module EE
       'unrelate_epic' => 'epic',
       'designs_added' => 'doc-image',
       'designs_modified' => 'doc-image',
-      'designs_removed' => 'doc-image'
+      'designs_removed' => 'doc-image',
+      'designs_discussion_added' => 'doc-image'
     }.freeze
 
     override :system_note_icon_name

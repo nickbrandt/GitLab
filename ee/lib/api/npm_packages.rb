@@ -77,6 +77,7 @@ module API
         requires :package_name, type: String, desc: 'Package name'
         requires :versions, type: Hash, desc: 'Package version info'
       end
+      route_setting :authentication, job_token_allowed: true
       put ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
         authorize_create_package!
 

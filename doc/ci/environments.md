@@ -485,6 +485,13 @@ To retry or rollback a deployment:
    - **Retry** button next to the last deployment, to retry that deployment.
    - **Rollback** button next to a previously successful deployment, to roll back to that deployment.
 
+#### What to expect with a rollback
+
+Pressing the **Rollback** button on a specific commit will trigger a _new_ deployment with its
+own unique job ID.
+
+This means that you will see a new deployment that points to the commit you are rolling back to.
+
 NOTE: **Note:**
 The defined deployment process in the job's `script` determines whether the rollback succeeds or not.
 
@@ -737,6 +744,11 @@ such as [Review Apps](review_apps/index.md) (`review/*`).
 NOTE: **Note:**
 The most _specific_ spec takes precedence over the other wildcard matching.
 In this case, `review/feature-1` spec takes precedence over `review/*` and `*` specs.
+
+### Environments Dashboard **(PREMIUM)**
+
+See [Environments Dashboard](environments/environments_dashboard.md) for a summary of each
+environment's operational health.
 
 ## Limitations
 

@@ -110,16 +110,17 @@ export default {
       <div v-if="canRenderDeployBoard" class="deploy-board-information">
         <section class="deploy-board-status">
           <span v-tooltip :title="instanceIsCompletedText">
-            <span class="percentage text-center text-plain">{{ deployBoardData.completion }}%</span>
+            <span ref="percentage" class="text-center text-plain gl-font-size-large"
+              >{{ deployBoardData.completion }}%</span
+            >
             <span class="text text-center text-secondary">{{ __('Complete') }}</span>
           </span>
         </section>
 
         <section class="deploy-board-instances">
-          <p class="deploy-board-instances-text text-secondary">
-            <span>{{ instanceTitle }}</span>
-            <span class="total-instances">({{ instanceCount }})</span>
-          </p>
+          <span class="deploy-board-instances-text text-secondary">
+            {{ instanceTitle }} ({{ instanceCount }})
+          </span>
 
           <div class="deploy-board-instances-container d-flex flex-wrap flex-row">
             <template v-for="(instance, i) in deployBoardData.instances">

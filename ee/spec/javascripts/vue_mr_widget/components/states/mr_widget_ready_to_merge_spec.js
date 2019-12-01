@@ -1,4 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { MERGE_DISABLED_TEXT_UNAPPROVED } from 'ee/vue_merge_request_widget/mixins/ready_to_merge';
 import ReadyToMerge from '~/vue_merge_request_widget/components/states/ready_to_merge.vue';
 import {
   MWPS_MERGE_STRATEGY,
@@ -6,7 +7,6 @@ import {
   MTWPS_MERGE_STRATEGY,
 } from '~/vue_merge_request_widget/constants';
 import { MERGE_DISABLED_TEXT } from '~/vue_merge_request_widget/mixins/ready_to_merge';
-import { MERGE_DISABLED_TEXT_UNAPPROVED } from 'ee/vue_merge_request_widget/mixins/ready_to_merge';
 
 describe('ReadyToMerge', () => {
   const localVue = createLocalVue();

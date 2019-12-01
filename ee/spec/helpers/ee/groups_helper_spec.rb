@@ -61,7 +61,7 @@ describe GroupsHelper do
 
   context 'when new Vulnerability Findings API disabled' do
     before do
-      stub_feature_flags(vulnerability_findings_api: false)
+      stub_feature_flags(first_class_vulnerabilities: false)
     end
 
     it 'returns legacy "vulnerabilities" endpoint paths' do

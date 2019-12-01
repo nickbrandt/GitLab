@@ -1,0 +1,5 @@
+---
+title: Fix Infinite Scrolling on Environments Dashboard Project Selector
+merge_request: 20408
+author:
+type: fixed

@@ -45,6 +45,15 @@ module EE
 
             super
           end
+
+          def check_audit_events_available!(group)
+            forbidden! unless group.feature_available?(:audit_events)
+          end
+
+          def audit_log_finder_params(group)
+            audit_log_finder_params = params.slice(:created_after, :created_before)
+            audit_log_finder_params.merge(entity_type: group.class.name, entity_id: group.id)
+          end
         end
 
         resource :groups, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
@@ -60,6 +69,40 @@ module EE
             end
 
             status 202
+          end
+
+          segment ':id/audit_events' do
+            before do
+              authorize! :admin_group, user_group
+              check_audit_events_available!(user_group)
+            end
+
+            desc 'Get a list of audit events in this group.' do
+              success EE::API::Entities::AuditEvent
+            end
+            params do
+              optional :created_after, type: DateTime, desc: 'Return audit events created after the specified time'
+              optional :created_before, type: DateTime, desc: 'Return audit events created before the specified time'
+
+              use :pagination
+            end
+            get '/' do
+              audit_events = AuditLogFinder.new(audit_log_finder_params(user_group)).execute
+
+              present paginate(audit_events), with: EE::API::Entities::AuditEvent
+            end
+
+            desc 'Get a specific audit event in this group.' do
+              success EE::API::Entities::AuditEvent
+            end
+            get '/:audit_event_id' do
+              audit_log_finder_params = audit_log_finder_params(user_group)
+              audit_event = AuditLogFinder.new(audit_log_finder_params.merge(id: params[:audit_event_id])).execute
+
+              not_found!('Audit Event') unless audit_event
+
+              present audit_event, with: EE::API::Entities::AuditEvent
+            end
           end
         end
       end

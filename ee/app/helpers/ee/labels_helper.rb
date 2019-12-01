@@ -2,7 +2,7 @@
 
 module EE
   module LabelsHelper
-    def render_label(label, tooltip: true, link: nil, css: nil)
+    def render_label(label, tooltip: true, link: nil, css: nil, dataset: nil)
       content = super
       content = scoped_label_wrapper(content, label) if label.scoped_label?
 

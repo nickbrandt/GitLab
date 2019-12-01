@@ -23,7 +23,7 @@ No matter how you use GitLab, we have documentation for you.
 | Essential Documentation                                                                                                                    | Essential Documentation                                                                                                    |
 |:-------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------|
 | [**User Documentation**](user/index.md)<br/>Discover features and concepts for GitLab users.                                               | [**Administrator documentation**](administration/index.md)<br/>Everything GitLab self-managed administrators need to know. |
-| [**Contributing to GitLab**](#contributing-to-gitlab)<br/>At GitLab, everyone can contribute!                                              | [**New to Git and GitLab?**](#new-to-git-and-gitlab)<br/>We have resources to get you started.                             |
+| [**Contributing to GitLab**](#contributing-to-gitlab)<br/>At GitLab, everyone can contribute!                                              | [**New to Git and GitLab?**](#new-to-git-and-gitlab)<br/>We have the resources to get you started.                             |
 | [**Building an integration with GitLab?**](#building-an-integration-with-gitlab)<br/>Consult our automation and integration documentation. | [**Coming to GitLab from another platform?**](#coming-to-gitlab-from-another-platform)<br/>Consult our handy guides.       |
 | [**Install GitLab**](https://about.gitlab.com/install/)<br/>Installation options for different platforms.                                  | [**Customers**](subscriptions/index.md)<br/>Information for new and existing customers.                                    |
 | [**Update GitLab**](update/README.md)<br/>Update your GitLab self-managed instance to the latest version.                                  | [**GitLab Releases**](https://about.gitlab.com/releases/)<br/>What's new in GitLab.                                        |
@@ -42,6 +42,7 @@ Have a look at some of our most popular documentation resources:
 | [Kubernetes integration](user/project/clusters/index.md)        | Use GitLab with Kubernetes.                                      |
 | [SSH authentication](ssh/README.md)                             | Secure your network communications.                              |
 | [Using Docker images](ci/docker/using_docker_images.md)         | Build and test your applications with Docker.                    |
+| [GraphQL](api/graphql/index.md)                                 | Explore GitLab's GraphQL API.                                    |
 
 ## The entire DevOps Lifecycle
 
@@ -87,7 +88,7 @@ The following documentation relates to the DevOps **Manage** stage:
 | Manage Topics                                                                         | Description                                                                                                                                                                                                                  |
 |:--------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Authentication and<br/>Authorization](administration/auth/README.md) **(CORE ONLY)** | Supported authentication and authorization providers.                                                                                                                                                                        |
-| [GitLab Cycle Analytics](user/project/cycle_analytics.md)                             | Measure the time it takes to go from an [idea to production](https://about.gitlab.com/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab/#from-idea-to-production-with-gitlab) for each project you have. |
+| [GitLab Cycle Analytics](user/project/cycle_analytics.md)                             | Measure the time it takes to go from an [idea to production](https://about.gitlab.com/blog/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab/#from-idea-to-production-with-gitlab) for each project you have. |
 | [Instance Statistics](user/instance_statistics/index.md)                              | Discover statistics on how many GitLab features you use and user activity.                                                                                                                                                   |
 
 <div align="right">
@@ -305,7 +306,7 @@ The following documentation relates to the DevOps **Configure** stage:
 | Configure Topics                                                                                                                   | Description                                                               |
 |:-----------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------|
 | [Auto DevOps](topics/autodevops/index.md)                                                                                          | Automatically employ a complete DevOps lifecycle.                         |
-| [Create Kubernetes clusters on GKE](user/project/clusters/add_remove_clusters.md#add-new-gke-cluster)                              | Use Google Kubernetes Engine and GitLab.                                  |
+| [Create Kubernetes clusters](user/project/clusters/add_remove_clusters.md#add-new-cluster)                                         | Use Kubernetes and GitLab.                                                |
 | [Executable Runbooks](user/project/clusters/runbooks/index.md)                                                                     | Documented procedures that explain how to carry out particular processes. |
 | [GitLab ChatOps](ci/chatops/README.md)                                                                                             | Interact with CI/CD jobs through chat services.                           |
 | [Installing Applications](user/project/clusters/index.md#installing-applications)                                                  | Deploy Helm, Ingress, and Prometheus on Kubernetes.                       |
@@ -337,6 +338,7 @@ The following documentation relates to the DevOps **Monitor** stage:
 | [Health check](user/admin_area/monitoring/health_check.md)                                      | GitLab provides liveness and readiness probes to indicate service health and reachability to required services.                          |
 | [Prometheus project integration](user/project/integrations/prometheus.md)                       | Configure the Prometheus integration per project and monitor your CI/CD environments.                                                    |
 | [Prometheus metrics](user/project/integrations/prometheus_library/index.md)                     | Let Prometheus collect metrics from various services, like Kubernetes, NGINX, NGINX Ingress controller, HAProxy, and Amazon Cloud Watch. |
+| [Incident management](user/incident_management/index.md)                     | Use GitLab to help you better respond to incidents that may occur in your systems. |
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#overview">
@@ -375,7 +377,7 @@ We have the following documentation to rapidly uplift your GitLab knowledge:
 | Topic                                                                                                                  | Description                                                    |
 |:-----------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------|
 | [GitLab basics guides](gitlab-basics/README.md)                                                                        | Start working on the command line and with GitLab.             |
-| [GitLab workflow overview](https://about.gitlab.com/2016/10/25/gitlab-workflow-an-overview/)                           | Enhance your workflow with the best of GitLab Workflow.        |
+| [GitLab workflow overview](https://about.gitlab.com/blog/2016/10/25/gitlab-workflow-an-overview/)                           | Enhance your workflow with the best of GitLab Workflow.        |
 | [Get started with GitLab CI/CD](ci/quick_start/README.md)                                                              | Quickly implement GitLab CI/CD.                                |
 | [Auto DevOps](topics/autodevops/index.md)                                                                              | Learn more about GitLab's Auto DevOps.                         |
 | [GitLab Markdown](user/markdown.md)                                                                                    | GitLab's advanced formatting system (GitLab Flavored Markdown) |
@@ -410,7 +412,7 @@ Learn more about using Git, and using Git with GitLab:
 | Topic                                                                       | Description                                                                |
 |:----------------------------------------------------------------------------|:---------------------------------------------------------------------------|
 | [Git](topics/git/index.md)                                                  | Getting started with Git, branching strategies, Git LFS, and advanced use. |
-| [Git cheatsheet](https://about.gitlab.com/images/press/git-cheat-sheet.pdf) | Download a PDF describing the most used Git operations.                    |
+| [Git cheat sheet](https://about.gitlab.com/images/press/git-cheat-sheet.pdf) | Download a PDF describing the most used Git operations.                    |
 | [GitLab Flow](topics/gitlab_flow.md)                                      | Explore the best of Git with the GitLab Flow strategy.                     |
 
 <div align="right">

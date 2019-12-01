@@ -6,8 +6,7 @@ module QA
       let(:issue_title) { "My Awesome Issue #{SecureRandom.hex(8)}" }
 
       it 'user promotes issue to an epic' do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         group = Resource::Group.fabricate_via_api!
 

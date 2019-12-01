@@ -48,7 +48,7 @@ describe('Time series component', () => {
     // Mock data contains 2 panels, pick the first one
     store.commit(`monitoringDashboard/${types.SET_QUERY_RESULT}`, mockedQueryResultPayload);
 
-    [mockGraphData] = store.state.monitoringDashboard.dashboard.panel_groups[0].metrics;
+    [mockGraphData] = store.state.monitoringDashboard.dashboard.panel_groups[0].panels;
 
     makeTimeSeriesChart = (graphData, type) =>
       shallowMount(TimeSeries, {
@@ -114,6 +114,19 @@ describe('Time series component', () => {
             ],
             value: mockDate,
           });
+        });
+
+        it('does not throw error if data point is outside the zoom range', () => {
+          const seriesDataWithoutValue = generateSeriesData('line');
+          expect(
+            timeSeriesChart.vm.formatTooltipText({
+              ...seriesDataWithoutValue,
+              seriesData: seriesDataWithoutValue.seriesData.map(data => ({
+                ...data,
+                value: undefined,
+              })),
+            }),
+          ).toBeUndefined();
         });
 
         describe('when series is of line type', () => {
@@ -222,7 +235,7 @@ describe('Time series component', () => {
         });
 
         it('utilizes all data points', () => {
-          const { values } = mockGraphData.queries[0].result[0];
+          const { values } = mockGraphData.metrics[0].result[0];
 
           expect(chartData.length).toBe(1);
           expect(seriesData().data.length).toBe(values.length);

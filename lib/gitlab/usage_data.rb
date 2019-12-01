@@ -73,6 +73,7 @@ module Gitlab
             clusters_applications_helm: count(::Clusters::Applications::Helm.available),
             clusters_applications_ingress: count(::Clusters::Applications::Ingress.available),
             clusters_applications_cert_managers: count(::Clusters::Applications::CertManager.available),
+            clusters_applications_crossplane: count(::Clusters::Applications::Crossplane.available),
             clusters_applications_prometheus: count(::Clusters::Applications::Prometheus.available),
             clusters_applications_runner: count(::Clusters::Applications::Runner.available),
             clusters_applications_knative: count(::Clusters::Applications::Knative.available),
@@ -134,7 +135,8 @@ module Gitlab
           prometheus_metrics_enabled: Gitlab::Metrics.prometheus_metrics_enabled?,
           reply_by_email_enabled: Gitlab::IncomingEmail.enabled?,
           signup_enabled: Gitlab::CurrentSettings.allow_signup?,
-          web_ide_clientside_preview_enabled: Gitlab::CurrentSettings.web_ide_clientside_preview_enabled?
+          web_ide_clientside_preview_enabled: Gitlab::CurrentSettings.web_ide_clientside_preview_enabled?,
+          ingress_modsecurity_enabled: Feature.enabled?(:ingress_modsecurity)
         }
       end
 

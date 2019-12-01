@@ -136,6 +136,7 @@ export default {
       :class="reportSectionClass"
       :always-open="alwaysOpen"
       class="license-report-widget mr-report"
+      data-qa-selector="license_report_widget"
     >
       <template #success>
         {{ licenseSummaryText }}

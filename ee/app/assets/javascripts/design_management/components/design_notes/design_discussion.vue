@@ -1,6 +1,5 @@
 <script>
 import { ApolloMutation } from 'vue-apollo';
-import { s__ } from '~/locale';
 import createFlash from '~/flash';
 import ReplyPlaceholder from '~/notes/components/discussion_reply_placeholder.vue';
 import allVersionsMixin from '../../mixins/all_versions';
@@ -8,7 +7,8 @@ import createNoteMutation from '../../graphql/mutations/createNote.mutation.grap
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import DesignNote from './design_note.vue';
 import DesignReplyForm from './design_reply_form.vue';
-import { extractCurrentDiscussion } from '../../utils/design_management_utils';
+import { updateStoreAfterAddDiscussionComment } from '../../utils/cache_update';
+import { ADD_DISCUSSION_COMMENT_ERROR } from '../../utils/error_messages';
 
 export default {
   components: {
@@ -55,6 +55,14 @@ export default {
         discussionId: this.discussion.id,
       };
     },
+    designVariables() {
+      return {
+        fullPath: this.projectPath,
+        iid: this.issueIid,
+        filenames: [this.$route.params.id],
+        atVersion: this.designsVersion,
+      };
+    },
   },
   methods: {
     addDiscussionComment(
@@ -63,43 +71,14 @@ export default {
         data: { createNote },
       },
     ) {
-      const data = store.readQuery({
-        query: getDesignQuery,
-        variables: {
-          id: this.designId,
-          version: this.designsVersion,
-        },
-      });
-      const currentDiscussion = extractCurrentDiscussion(
-        data.design.discussions,
-        this.discussion.id,
-      );
-      currentDiscussion.node.notes.edges = [
-        ...currentDiscussion.node.notes.edges,
-        {
-          __typename: 'NoteEdge',
-          node: createNote.note,
-        },
-      ];
-
-      store.writeQuery({
-        query: getDesignQuery,
-        data: {
-          ...data,
-          design: {
-            ...data.design,
-            notesCount: data.design.notesCount + 1,
-          },
-        },
-      });
+      updateStoreAfterAddDiscussionComment(store, createNote, getDesignQuery, this.designVariables);
     },
     onDone() {
       this.discussionComment = '';
       this.hideForm();
     },
-    onError(e) {
-      createFlash(s__('DesignManagement|Could not add a new comment. Please try again'));
-      throw e;
+    onError() {
+      createFlash(ADD_DISCUSSION_COMMENT_ERROR);
     },
     hideForm() {
       this.isFormRendered = false;

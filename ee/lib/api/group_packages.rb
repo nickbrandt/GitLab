@@ -15,7 +15,7 @@ module API
       optional :exclude_subgroups, type: Boolean, default: false, desc: 'Determines if subgroups should be excluded'
     end
     resource :groups, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
-      desc 'Get all project packages' do
+      desc 'Get all project packages within a group' do
         detail 'This feature was introduced in GitLab 12.5'
         success EE::API::Entities::Package
       end

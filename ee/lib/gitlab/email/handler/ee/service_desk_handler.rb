@@ -9,6 +9,7 @@ module Gitlab
       module EE
         class ServiceDeskHandler < BaseHandler
           include ReplyProcessing
+          include Gitlab::Utils::StrongMemoize
 
           HANDLER_REGEX        = /\A#{HANDLER_ACTION_BASE_REGEX}-issue-\z/.freeze
           HANDLER_REGEX_LEGACY = /\A(?<project_path>[^\+]*)\z/.freeze
@@ -62,16 +63,57 @@ module Gitlab
               project,
               User.support_bot,
               title: issue_title,
-              description: message_including_reply,
+              description: message_including_template,
               confidential: true,
               service_desk_reply_to: from_address
             ).execute
 
             raise InvalidIssueError unless @issue.persisted?
+
+            if service_desk_setting&.issue_template_missing?
+              create_template_not_found_note(@issue)
+            end
           end
 
           def send_thank_you_email!
             Notify.service_desk_thank_you_email(@issue.id).deliver_later!
+          end
+
+          def message_including_template
+            description = message_including_reply
+            template_content = service_desk_setting&.issue_template_content
+
+            if template_content.present?
+              description += "  \n" + template_content
+            end
+
+            description
+          end
+
+          def service_desk_setting
+            strong_memoize(:service_desk_setting) do
+              project.service_desk_setting
+            end
+          end
+
+          def create_template_not_found_note(issue)
+            issue_template_key = service_desk_setting&.issue_template_key
+
+            warning_note = <<-MD.strip_heredoc
+              WARNING: The template file #{issue_template_key}.md used for service desk issues is empty or could not be found.
+              Please check service desk settings and update the file to be used.
+            MD
+
+            note_params = {
+              noteable: issue,
+              note: warning_note
+            }
+
+            ::Notes::CreateService.new(
+              project,
+              User.support_bot,
+              note_params
+            ).execute
           end
 
           def from_address

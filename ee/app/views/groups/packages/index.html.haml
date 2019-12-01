@@ -3,7 +3,8 @@
 - if vue_package_list_enabled_for?(@group)
   .row
     .col-12
-      #js-vue-packages-list{ data: { group_id: @group.id,
+      #js-vue-packages-list{ data: { resource_id: @group.id,
+        page_type: 'groups',
         empty_list_help_url: help_page_path('administration/packages/index'),
         empty_list_illustration: image_path('illustrations/no-packages.svg') } }
 

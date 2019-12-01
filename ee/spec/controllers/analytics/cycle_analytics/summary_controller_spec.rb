@@ -25,8 +25,7 @@ describe Analytics::CycleAnalytics::SummaryController do
       expect(response).to match_response_schema('analytics/cycle_analytics/summary', dir: 'ee')
     end
 
-    include_examples 'date parameter examples'
-
+    include_examples 'cycle analytics data endpoint examples'
     include_examples 'group permission check on the controller level'
   end
 end

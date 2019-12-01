@@ -5,10 +5,12 @@ stages:
   - prepare
   - quick-test
   - test
+  - post-test
   - review-prepare
   - review
   - qa
-  - post-test
+  - post-qa
+  - notification
   - pages
 
 variables:
@@ -33,6 +35,7 @@ include:
   - local: .gitlab/ci/frontend.gitlab-ci.yml
   - local: .gitlab/ci/global.gitlab-ci.yml
   - local: .gitlab/ci/memory.gitlab-ci.yml
+  - local: .gitlab/ci/notifications.gitlab-ci.yml
   - local: .gitlab/ci/pages.gitlab-ci.yml
   - local: .gitlab/ci/qa.gitlab-ci.yml
   - local: .gitlab/ci/reports.gitlab-ci.yml

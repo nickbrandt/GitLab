@@ -484,7 +484,9 @@ describe Environment, :use_clean_rails_memory_store_caching do
     subject { environment.last_deployment }
 
     before do
-      allow_any_instance_of(Deployment).to receive(:create_ref)
+      allow_next_instance_of(Deployment) do |instance|
+        allow(instance).to receive(:create_ref)
+      end
     end
 
     context 'when there is an old deployment record' do
@@ -742,6 +744,12 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
     before do
       allow(environment).to receive(:deployment_platform).and_return(double)
+    end
+
+    context 'reactive cache configuration' do
+      it 'does not continue to spawn jobs' do
+        expect(described_class.reactive_cache_lifetime).to be < described_class.reactive_cache_refresh_interval
+      end
     end
 
     context 'reactive cache is empty' do
@@ -1025,7 +1033,9 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
   describe '#prometheus_adapter' do
     it 'calls prometheus adapter service' do
-      expect_any_instance_of(Prometheus::AdapterService).to receive(:prometheus_adapter)
+      expect_next_instance_of(Prometheus::AdapterService) do |instance|
+        expect(instance).to receive(:prometheus_adapter)
+      end
 
       subject.prometheus_adapter
     end

@@ -3,7 +3,8 @@
 require 'spec_helper'
 
 describe Epic do
-  set(:group) { create(:group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
   let(:project) { create(:project, group: group) }
 
   describe 'associations' do
@@ -97,6 +98,64 @@ describe Epic do
 
     it 'orders by relative_position ASC' do
       expect(epics(:relative_position)).to eq([epic2, epic3, epic1, epic4])
+    end
+  end
+
+  shared_examples '.groups_user_can_read_epics examples' do
+    let_it_be(:private_group) { create(:group, :private) }
+    let_it_be(:epic) { create(:epic, group: private_group) }
+
+    subject do
+      epics = described_class.where(id: epic.id)
+      described_class.groups_user_can_read_epics(epics, user)
+    end
+
+    it 'does not return inaccessible groups' do
+      expect(subject).to be_empty
+    end
+
+    context 'with authorized user' do
+      before do
+        private_group.add_developer(user)
+      end
+
+      context 'with epics enabled' do
+        before do
+          stub_licensed_features(epics: true)
+        end
+
+        it 'returns epic groups user can access' do
+          expect(subject).to eq [private_group]
+        end
+      end
+
+      context 'with epics are disabled' do
+        before do
+          stub_licensed_features(epics: false)
+        end
+
+        it 'returns an empty list' do
+          expect(subject).to be_empty
+        end
+      end
+    end
+  end
+
+  describe '.groups_user_can_read_epics' do
+    context 'with `optimized_groups_user_can_read_epics_method` feature flag enabled' do
+      before do
+        stub_feature_flags(optimized_groups_user_can_read_epics_method: true)
+      end
+
+      include_examples '.groups_user_can_read_epics examples'
+    end
+
+    context 'with `optimized_groups_user_can_read_epics_method` feature flag disabled' do
+      before do
+        stub_feature_flags(optimized_groups_user_can_read_epics_method: false)
+      end
+
+      include_examples '.groups_user_can_read_epics examples'
     end
   end
 
@@ -352,7 +411,6 @@ describe Epic do
   end
 
   describe '#issues_readable_by' do
-    let(:user) { create(:user) }
     let(:group) { create(:group, :private) }
     let(:project) { create(:project, group: group) }
     let(:project2) { create(:project, group: group) }
@@ -400,7 +458,6 @@ describe Epic do
   end
 
   describe '#reopen' do
-    let(:user) { create(:user) }
     subject(:epic) { create(:epic, state: 'closed', closed_at: Time.now, closed_by: user) }
 
     it 'sets closed_at to nil when an epic is reopend' do
@@ -538,6 +595,22 @@ describe Epic do
     it_behaves_like "a class that supports relative positioning" do
       let(:factory) { :epic }
       let(:default_params) { {} }
+    end
+  end
+
+  describe '.related_issues' do
+    it 'returns epic issues ordered by relative position' do
+      epic1 = create(:epic, group: group)
+      epic2 = create(:epic, group: group)
+      issue1 = create(:issue, project: project)
+      issue2 = create(:issue, project: project)
+      create(:issue, project: project)
+      create(:epic_issue, epic: epic1, issue: issue1, relative_position: 5)
+      create(:epic_issue, epic: epic2, issue: issue2, relative_position: 2)
+
+      result = described_class.related_issues(ids: [epic1.id, epic2.id])
+
+      expect(result.pluck(:id)).to eq [issue2.id, issue1.id]
     end
   end
 

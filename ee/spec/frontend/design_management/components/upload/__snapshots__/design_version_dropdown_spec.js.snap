@@ -9,10 +9,8 @@ exports[`Design management design version dropdown component renders design vers
   variant="link"
 >
   <gldropdownitem-stub>
-    <routerlink-stub
+    <router-link-stub
       class="d-flex js-version-link"
-      event="click"
-      tag="a"
       to="[object Object]"
     >
       <div
@@ -32,13 +30,11 @@ exports[`Design management design version dropdown component renders design vers
       <i
         class="fa fa-check pull-right"
       />
-    </routerlink-stub>
+    </router-link-stub>
   </gldropdownitem-stub>
   <gldropdownitem-stub>
-    <routerlink-stub
+    <router-link-stub
       class="d-flex js-version-link"
-      event="click"
-      tag="a"
       to="[object Object]"
     >
       <div
@@ -54,7 +50,7 @@ exports[`Design management design version dropdown component renders design vers
       </div>
        
       <!---->
-    </routerlink-stub>
+    </router-link-stub>
   </gldropdownitem-stub>
 </gldropdown-stub>
 `;
@@ -68,10 +64,8 @@ exports[`Design management design version dropdown component renders design vers
   variant="link"
 >
   <gldropdownitem-stub>
-    <routerlink-stub
+    <router-link-stub
       class="d-flex js-version-link"
-      event="click"
-      tag="a"
       to="[object Object]"
     >
       <div
@@ -91,13 +85,11 @@ exports[`Design management design version dropdown component renders design vers
       <i
         class="fa fa-check pull-right"
       />
-    </routerlink-stub>
+    </router-link-stub>
   </gldropdownitem-stub>
   <gldropdownitem-stub>
-    <routerlink-stub
+    <router-link-stub
       class="d-flex js-version-link"
-      event="click"
-      tag="a"
       to="[object Object]"
     >
       <div
@@ -113,7 +105,7 @@ exports[`Design management design version dropdown component renders design vers
       </div>
        
       <!---->
-    </routerlink-stub>
+    </router-link-stub>
   </gldropdownitem-stub>
 </gldropdown-stub>
 `;

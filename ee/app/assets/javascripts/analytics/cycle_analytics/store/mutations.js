@@ -3,17 +3,8 @@ import * as types from './mutation_types';
 import { transformRawStages } from '../utils';
 
 export default {
-  [types.SET_CYCLE_ANALYTICS_DATA_ENDPOINT](state, groupPath) {
-    // TODO: this endpoint will be removed when the /-/analytics endpoints are ready
-    // https://gitlab.com/gitlab-org/gitlab/issues/34751
-    state.endpoints.cycleAnalyticsData = `/groups/${groupPath}/-/cycle_analytics`;
-    state.endpoints.cycleAnalyticsStagesAndEvents = `/-/analytics/cycle_analytics/stages?group_id=${groupPath}`;
-  },
-  [types.SET_STAGE_DATA_ENDPOINT](state, stageSlug) {
-    // TODO: this endpoint will be replaced with a /-/analytics... endpoint when backend is ready
-    // https://gitlab.com/gitlab-org/gitlab/issues/34751
-    const { fullPath } = state.selectedGroup;
-    state.endpoints.stageData = `/groups/${fullPath}/-/cycle_analytics/events/${stageSlug}.json`;
+  [types.SET_FEATURE_FLAGS](state, featureFlags) {
+    state.featureFlags = featureFlags;
   },
   [types.SET_SELECTED_GROUP](state, group) {
     state.selectedGroup = convertObjectPropsToCamelCase(group, { deep: true });
@@ -28,6 +19,9 @@ export default {
   [types.SET_DATE_RANGE](state, { startDate, endDate }) {
     state.startDate = startDate;
     state.endDate = endDate;
+  },
+  [types.UPDATE_SELECTED_DURATION_CHART_STAGES](state, updatedDurationStageData) {
+    state.durationData = updatedDurationStageData;
   },
   [types.REQUEST_CYCLE_ANALYTICS_DATA](state) {
     state.isLoading = true;
@@ -60,12 +54,26 @@ export default {
   },
   [types.REQUEST_GROUP_LABELS](state) {
     state.labels = [];
+    state.tasksByType = {
+      ...state.tasksByType,
+      labelIds: [],
+    };
   },
   [types.RECEIVE_GROUP_LABELS_SUCCESS](state, data = []) {
+    const { tasksByType } = state;
     state.labels = data.map(convertObjectPropsToCamelCase);
+    state.tasksByType = {
+      ...tasksByType,
+      labelIds: data.map(({ id }) => id),
+    };
   },
   [types.RECEIVE_GROUP_LABELS_ERROR](state) {
+    const { tasksByType } = state;
     state.labels = [];
+    state.tasksByType = {
+      ...tasksByType,
+      labelIds: [],
+    };
   },
   [types.HIDE_CUSTOM_STAGE_FORM](state) {
     state.isAddingCustomStage = false;
@@ -109,7 +117,7 @@ export default {
   },
   [types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS](state, data) {
     const { events = [], stages = [] } = data;
-    state.stages = transformRawStages(stages);
+    state.stages = transformRawStages(stages.filter(({ hidden = false }) => !hidden));
 
     state.customStageFormEvents = events.map(ev =>
       convertObjectPropsToCamelCase(ev, { deep: true }),
@@ -119,5 +127,47 @@ export default {
       const { id } = state.stages[0];
       state.selectedStageId = id;
     }
+  },
+  [types.REQUEST_TASKS_BY_TYPE_DATA](state) {
+    state.isLoadingChartData = true;
+  },
+  [types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR](state) {
+    state.isLoadingChartData = false;
+  },
+  [types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS](state, data) {
+    state.isLoadingChartData = false;
+    state.tasksByType = {
+      ...state.tasksByType,
+      data,
+    };
+  },
+  [types.REQUEST_CREATE_CUSTOM_STAGE](state) {
+    state.isSavingCustomStage = true;
+  },
+  [types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE](state) {
+    state.isSavingCustomStage = false;
+  },
+  [types.REQUEST_UPDATE_STAGE](state) {
+    state.isLoading = true;
+  },
+  [types.RECEIVE_UPDATE_STAGE_RESPONSE](state) {
+    state.isLoading = false;
+  },
+  [types.REQUEST_REMOVE_STAGE](state) {
+    state.isLoading = true;
+  },
+  [types.RECEIVE_REMOVE_STAGE_RESPONSE](state) {
+    state.isLoading = false;
+  },
+  [types.REQUEST_DURATION_DATA](state) {
+    state.isLoadingDurationChart = true;
+  },
+  [types.RECEIVE_DURATION_DATA_SUCCESS](state, data) {
+    state.durationData = data;
+    state.isLoadingDurationChart = false;
+  },
+  [types.RECEIVE_DURATION_DATA_ERROR](state) {
+    state.durationData = [];
+    state.isLoadingDurationChart = false;
   },
 };

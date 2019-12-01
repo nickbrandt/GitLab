@@ -17,7 +17,7 @@ describe('CustomMetricsForm', () => {
       legend: '',
     },
   }) {
-    wrapper = shallowMount(CustomMetricsForm, {
+    wrapper = shallowMount(localVue.extend(CustomMetricsForm), {
       localVue,
       sync: false,
       propsData: {

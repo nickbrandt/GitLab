@@ -1,6 +1,6 @@
 <script>
 import { isEqual } from 'underscore';
-import { GlButton, GlFormGroup, GlFormInput, GlFormSelect } from '@gitlab/ui';
+import { GlButton, GlFormGroup, GlFormInput, GlFormSelect, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import LabelsSelector from './labels_selector.vue';
 import {
@@ -26,6 +26,7 @@ export default {
     GlFormGroup,
     GlFormInput,
     GlFormSelect,
+    GlLoadingIcon,
     LabelsSelector,
   },
   props: {
@@ -43,6 +44,11 @@ export default {
       default: () => ({
         ...initFields,
       }),
+    },
+    isSavingCustomStage: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -116,7 +122,14 @@ export default {
       this.$emit('cancel');
     },
     handleSave() {
-      this.$emit('submit', this.fields);
+      const { startEvent, startEventLabel, stopEvent, stopEventLabel, name } = this.fields;
+      this.$emit('submit', {
+        name,
+        start_event_identifier: startEvent,
+        start_event_label_id: startEventLabel,
+        end_event_identifier: stopEvent,
+        end_event_label_id: stopEventLabel,
+      });
     },
     handleSelectLabel(key, labelId = null) {
       this.fields[key] = labelId;
@@ -128,7 +141,7 @@ export default {
 };
 </script>
 <template>
-  <form class="add-stage-form m-4">
+  <form class="custom-stage-form m-4 mt-0">
     <div class="mb-1">
       <h4>{{ s__('CustomCycleAnalytics|New stage') }}</h4>
     </div>
@@ -137,7 +150,7 @@ export default {
         v-model="fields.name"
         class="form-control"
         type="text"
-        name="add-stage-name"
+        name="custom-stage-name"
         :placeholder="s__('CustomCycleAnalytics|Enter a name for the stage')"
         required
       />
@@ -147,7 +160,7 @@ export default {
         <gl-form-group :label="s__('CustomCycleAnalytics|Start event')">
           <gl-form-select
             v-model="fields.startEvent"
-            name="add-stage-start-event"
+            name="custom-stage-start-event"
             :required="true"
             :options="startEventOptions"
           />
@@ -158,7 +171,7 @@ export default {
           <labels-selector
             :labels="labels"
             :selected-label-id="fields.startEventLabel"
-            name="add-stage-start-event-label"
+            name="custom-stage-start-event-label"
             @selectLabel="labelId => handleSelectLabel('startEventLabel', labelId)"
             @clearLabel="handleClearLabel('startEventLabel')"
           />
@@ -177,7 +190,7 @@ export default {
         >
           <gl-form-select
             v-model="fields.stopEvent"
-            name="add-stage-stop-event"
+            name="custom-stage-stop-event"
             :options="stopEventOptions"
             :required="true"
             :disabled="!hasStartEvent"
@@ -189,7 +202,7 @@ export default {
           <labels-selector
             :labels="labels"
             :selected-label-id="fields.stopEventLabel"
-            name="add-stage-stop-event-label"
+            name="custom-stage-stop-event-label"
             @selectLabel="labelId => handleSelectLabel('stopEventLabel', labelId)"
             @clearLabel="handleClearLabel('stopEventLabel')"
           />
@@ -197,10 +210,10 @@ export default {
       </div>
     </div>
 
-    <div class="add-stage-form-actions">
+    <div class="custom-stage-form-actions">
       <button
         :disabled="!isDirty"
-        class="btn btn-cancel js-add-stage-cancel"
+        class="btn btn-cancel js-custom-stage-form-cancel"
         type="button"
         @click="handleCancel"
       >
@@ -209,9 +222,10 @@ export default {
       <button
         :disabled="!isComplete || !isDirty"
         type="button"
-        class="js-add-stage btn btn-success"
+        class="js-custom-stage-form-submit btn btn-success"
         @click="handleSave"
       >
+        <gl-loading-icon v-if="isSavingCustomStage" size="sm" inline />
         {{ s__('CustomCycleAnalytics|Add stage') }}
       </button>
     </div>

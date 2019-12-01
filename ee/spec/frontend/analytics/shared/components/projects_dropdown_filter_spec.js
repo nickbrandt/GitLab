@@ -3,6 +3,7 @@ import $ from 'jquery';
 import 'bootstrap';
 import '~/gl_dropdown';
 import ProjectsDropdownFilter from 'ee/analytics/shared/components/projects_dropdown_filter.vue';
+import { LAST_ACTIVITY_AT } from 'ee/analytics/shared/constants';
 import Api from '~/api';
 import { TEST_HOST } from 'helpers/test_constants';
 
@@ -67,7 +68,7 @@ describe('ProjectsDropdownFilter component', () => {
         queryParams: {
           per_page: 50,
           with_shared: false,
-          order_by: 'last_activity_at',
+          order_by: LAST_ACTIVITY_AT,
         },
       });
 
@@ -80,7 +81,7 @@ describe('ProjectsDropdownFilter component', () => {
       expect(Api.groupProjects).toHaveBeenCalledWith(
         expect.any(Number),
         expect.any(String),
-        expect.objectContaining({ per_page: 50, with_shared: false, order_by: 'last_activity_at' }),
+        expect.objectContaining({ per_page: 50, with_shared: false, order_by: LAST_ACTIVITY_AT }),
         expect.any(Function),
       );
     });

@@ -350,4 +350,13 @@ describe Ci::Build do
       it { is_expected.to be false }
     end
   end
+
+  describe ".license_scan" do
+    it 'returns only license artifacts' do
+      create(:ci_build, job_artifacts: [create(:ci_job_artifact, :zip)])
+      build_with_license_scan = create(:ci_build, job_artifacts: [create(:ci_job_artifact, file_type: :license_management, file_format: :raw)])
+
+      expect(described_class.license_scan).to contain_exactly(build_with_license_scan)
+    end
+  end
 end

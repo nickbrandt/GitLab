@@ -283,7 +283,9 @@ module API
       expose :shared_runners_enabled
       expose :lfs_enabled?, as: :lfs_enabled
       expose :creator_id
-      expose :forked_from_project, using: Entities::BasicProjectDetails, if: lambda { |project, options| project.forked? }
+      expose :forked_from_project, using: Entities::BasicProjectDetails, if: ->(project, options) do
+        project.forked? && Ability.allowed?(options[:current_user], :read_project, project.forked_from_project)
+      end
       expose :import_status
 
       expose :import_error, if: lambda { |_project, options| options[:user_can_admin_project] } do |project|
@@ -530,7 +532,7 @@ module API
 
     class PersonalSnippet < Snippet
       expose :raw_url do |snippet|
-        Gitlab::UrlBuilder.build(snippet) + "/raw"
+        Gitlab::UrlBuilder.build(snippet, raw: true)
       end
     end
 
@@ -660,6 +662,8 @@ module API
       expose :subscribed, if: -> (_, options) { options.fetch(:include_subscribed, true) } do |issue, options|
         issue.subscribed?(options[:current_user], options[:project] || issue.project)
       end
+
+      expose :moved_to_id
     end
 
     class IssuableTimeStats < Grape::Entity
@@ -1315,6 +1319,7 @@ module API
       expose :milestones, using: Entities::Milestone, if: -> (release, _) { release.milestones.present? }
       expose :commit_path, expose_nil: false
       expose :tag_path, expose_nil: false
+      expose :evidence_sha, expose_nil: false
       expose :assets do
         expose :assets_count, as: :count do |release, _|
           assets_to_exclude = can_download_code? ? [] : [:sources]
@@ -1324,6 +1329,7 @@ module API
         expose :links, using: Entities::Releases::Link do |release, options|
           release.links.sorted
         end
+        expose :evidence_file_path, expose_nil: false
       end
       expose :_links do
         expose :merge_requests_url, expose_nil: false
@@ -1681,6 +1687,7 @@ module API
       expose :verified?, as: :verified
       expose :verification_code, as: :verification_code
       expose :enabled_until
+      expose :auto_ssl_enabled
 
       expose :certificate,
         as: :certificate_expiration,
@@ -1696,6 +1703,7 @@ module API
       expose :verified?, as: :verified
       expose :verification_code, as: :verification_code
       expose :enabled_until
+      expose :auto_ssl_enabled
 
       expose :certificate,
         if: ->(pages_domain, _) { pages_domain.certificate? },
@@ -1732,6 +1740,7 @@ module API
     end
 
     class BasicBadgeDetails < Grape::Entity
+      expose :name
       expose :link_url
       expose :image_url
       expose :rendered_link_url do |badge, options|
@@ -1834,6 +1843,7 @@ end
 ::API::Entities::Issue.prepend_if_ee('EE::API::Entities::Issue')
 ::API::Entities::List.prepend_if_ee('EE::API::Entities::List')
 ::API::Entities::MergeRequestBasic.prepend_if_ee('EE::API::Entities::MergeRequestBasic', with_descendants: true)
+::API::Entities::Member.prepend_if_ee('EE::API::Entities::Member', with_descendants: true)
 ::API::Entities::Namespace.prepend_if_ee('EE::API::Entities::Namespace')
 ::API::Entities::Project.prepend_if_ee('EE::API::Entities::Project', with_descendants: true)
 ::API::Entities::ProtectedRefAccess.prepend_if_ee('EE::API::Entities::ProtectedRefAccess')

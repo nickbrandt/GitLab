@@ -1,9 +1,8 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 
 import { GlButton } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
-
 import DropdownSearchInput from 'ee/vue_shared/components/sidebar/epics_select/dropdown_search_input.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
 const createComponent = () => {
   const localVue = createLocalVue();

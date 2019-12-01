@@ -15,6 +15,12 @@ export const mockParentItem = {
     adminEpic: true,
     createEpic: true,
   },
+  descendantCounts: {
+    openedEpics: 1,
+    closedEpics: 1,
+    openedIssues: 1,
+    closedIssues: 1,
+  },
 };
 
 export const mockEpic1 = {
@@ -111,6 +117,25 @@ export const mockIssue2 = {
   milestone: null,
 };
 
+export const mockIssue3 = {
+  iid: '42',
+  epicIssueId: 'gid://gitlab/EpicIssue/5',
+  title: 'View closed issues in epic',
+  closedAt: null,
+  state: 'closed',
+  createdAt: '2019-02-18T14:13:05Z',
+  confidential: false,
+  dueDate: null,
+  weight: null,
+  webPath: '/gitlab-org/gitlab-shell/issues/42',
+  reference: 'gitlab-org/gitlab-shell#42',
+  relationPath: '/groups/gitlab-org/-/epics/1/issues/27',
+  assignees: {
+    edges: [],
+  },
+  milestone: null,
+};
+
 export const mockEpics = [mockEpic1, mockEpic2];
 
 export const mockIssues = [mockIssue1, mockIssue2];
@@ -146,6 +171,58 @@ export const mockQueryResponse = {
         },
         issues: {
           edges: [
+            {
+              node: mockIssue1,
+            },
+            {
+              node: mockIssue2,
+            },
+          ],
+          pageInfo: {
+            endCursor: 'def',
+            hasNextPage: true,
+          },
+        },
+        descendantCounts: mockParentItem.descendantCounts,
+      },
+    },
+  },
+};
+
+export const mockQueryResponse2 = {
+  data: {
+    group: {
+      id: 1,
+      path: 'gitlab-org',
+      fullPath: 'gitlab-org',
+      epic: {
+        id: 1,
+        iid: 1,
+        title: 'Foo bar',
+        webPath: '/groups/gitlab-org/-/epics/1',
+        userPermissions: {
+          adminEpic: true,
+          createEpic: true,
+        },
+        children: {
+          edges: [
+            {
+              node: mockEpic1,
+            },
+            {
+              node: mockEpic2,
+            },
+          ],
+          pageInfo: {
+            endCursor: 'abc',
+            hasNextPage: true,
+          },
+        },
+        issues: {
+          edges: [
+            {
+              node: mockIssue3,
+            },
             {
               node: mockIssue1,
             },

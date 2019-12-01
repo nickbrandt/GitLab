@@ -2,6 +2,7 @@
 
 class Projects::ErrorTrackingController < Projects::ApplicationController
   before_action :authorize_read_sentry_issue!
+  before_action :set_issue_id, only: [:details, :stack_trace]
 
   POLLING_INTERVAL = 10_000
 
@@ -43,7 +44,11 @@ class Projects::ErrorTrackingController < Projects::ApplicationController
   private
 
   def render_index_json
-    service = ErrorTracking::ListIssuesService.new(project, current_user)
+    service = ErrorTracking::ListIssuesService.new(
+      project,
+      current_user,
+      list_issues_params
+    )
     result = service.execute
 
     return if handle_errors(result)
@@ -105,12 +110,20 @@ class Projects::ErrorTrackingController < Projects::ApplicationController
     end
   end
 
+  def list_issues_params
+    params.permit([:search_term, :sort])
+  end
+
   def list_projects_params
     params.require(:error_tracking_setting).permit([:api_host, :token])
   end
 
   def issue_details_params
     params.permit(:issue_id)
+  end
+
+  def set_issue_id
+    @issue_id = issue_details_params[:issue_id]
   end
 
   def set_polling_interval

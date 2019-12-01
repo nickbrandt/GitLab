@@ -138,7 +138,8 @@ module EE
                                          projects_with_packages: count(::Packages::Package.select('distinct project_id')),
                                          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
                                          projects_with_tracing_enabled: count(ProjectTracingSetting),
-                                         projects_with_alerts_service_enabled: count(AlertsService.active)
+                                         projects_with_alerts_service_enabled: count(AlertsService.active),
+                                         template_repositories:  count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
                                        },
                                        service_desk_counts,
                                        security_products_usage,

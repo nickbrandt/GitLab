@@ -5,6 +5,15 @@ require 'spec_helper'
 describe ErrorTracking::ListIssuesService do
   set(:user) { create(:user) }
   set(:project) { create(:project) }
+  let(:params) { { search_term: 'something', sort: 'last_seen' } }
+  let(:list_sentry_issues_args) do
+    {
+      issue_status: 'unresolved',
+      limit: 20,
+      search_term: params[:search_term],
+      sort: params[:sort]
+    }
+  end
 
   let(:sentry_url) { 'https://sentrytest.gitlab.com/api/0/projects/sentry-org/sentry-project' }
   let(:token) { 'test-token' }
@@ -14,7 +23,7 @@ describe ErrorTracking::ListIssuesService do
     create(:project_error_tracking_setting, api_url: sentry_url, token: token, project: project)
   end
 
-  subject { described_class.new(project, user) }
+  subject { described_class.new(project, user, params) }
 
   before do
     expect(project).to receive(:error_tracking_setting).at_least(:once).and_return(error_tracking_setting)
@@ -29,7 +38,9 @@ describe ErrorTracking::ListIssuesService do
 
         before do
           expect(error_tracking_setting)
-            .to receive(:list_sentry_issues).and_return(issues: issues)
+            .to receive(:list_sentry_issues)
+            .with(list_sentry_issues_args)
+            .and_return(issues: issues)
         end
 
         it 'returns the issues' do

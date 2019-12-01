@@ -1,8 +1,8 @@
 import Vuex from 'vuex';
-import { createStore } from '~/ide/stores';
 import { mount, createLocalVue } from '@vue/test-utils';
 import TerminalSyncStatusSafe from 'ee/ide/components/terminal_sync/terminal_sync_status_safe.vue';
 import IdeStatusList from 'ee/ide/components/ide_status_list.vue';
+import { createStore } from '~/ide/stores';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);

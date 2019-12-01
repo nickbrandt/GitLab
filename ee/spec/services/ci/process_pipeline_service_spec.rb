@@ -11,7 +11,7 @@ describe Ci::ProcessPipelineService, '#execute' do
     create(:ci_empty_pipeline, ref: 'master', project: project, user: user)
   end
 
-  let(:service) { described_class.new(pipeline.project, user) }
+  let(:service) { described_class.new(pipeline) }
 
   before do
     project.add_maintainer(user)
@@ -30,7 +30,7 @@ describe Ci::ProcessPipelineService, '#execute' do
     end
 
     it 'creates a downstream cross-project pipeline', :sidekiq_might_not_need_inline do
-      pipeline.process!
+      service.execute
 
       expect_statuses(%w[test pending], %w[cross created], %w[deploy created])
 

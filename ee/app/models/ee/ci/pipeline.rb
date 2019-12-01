@@ -4,6 +4,7 @@ module EE
   module Ci
     module Pipeline
       extend ActiveSupport::Concern
+      extend ::Gitlab::Utils::Override
 
       BridgeStatusError = Class.new(StandardError)
 
@@ -167,7 +168,24 @@ module EE
           target_sha == merge_request.target_branch_sha
       end
 
+      override :merge_request_event_type
+      def merge_request_event_type
+        return unless merge_request_event?
+
+        strong_memoize(:merge_request_event_type) do
+          merge_train_pipeline? ? :merge_train : super
+        end
+      end
+
+      def merge_train_pipeline?
+        merge_request_pipeline? && merge_train_ref?
+      end
+
       private
+
+      def merge_train_ref?
+        ::MergeRequest.merge_train_ref?(ref)
+      end
 
       # This batch loads the latest reports for each CI job artifact
       # type (e.g. sast, dast, etc.) in a single SQL query to eliminate

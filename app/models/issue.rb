@@ -14,6 +14,7 @@ class Issue < ApplicationRecord
   include TimeTrackable
   include ThrottledTouch
   include LabelEventable
+  include IgnorableColumns
 
   DueDateStruct                   = Struct.new(:title, :name).freeze
   NoDueDate                       = DueDateStruct.new('No Due Date', '0').freeze
@@ -60,11 +61,15 @@ class Issue < ApplicationRecord
   scope :order_closest_future_date, -> { reorder(Arel.sql('CASE WHEN issues.due_date >= CURRENT_DATE THEN 0 ELSE 1 END ASC, ABS(CURRENT_DATE - issues.due_date) ASC')) }
   scope :order_relative_position_asc, -> { reorder(::Gitlab::Database.nulls_last_order('relative_position', 'ASC')) }
 
-  scope :preload_associations, -> { preload(:labels, project: :namespace) }
+  scope :preload_associated_models, -> { preload(:labels, project: :namespace) }
   scope :with_api_entity_associations, -> { preload(:timelogs, :assignees, :author, :notes, :labels, project: [:route, { namespace: :route }] ) }
 
   scope :public_only, -> { where(confidential: false) }
   scope :confidential_only, -> { where(confidential: true) }
+
+  scope :counts_by_state, -> { reorder(nil).group(:state_id).count }
+
+  ignore_column :state, remove_with: '12.7', remove_after: '2019-12-22'
 
   after_commit :expire_etag_cache
   after_save :ensure_metrics, unless: :imported?
@@ -72,7 +77,7 @@ class Issue < ApplicationRecord
   attr_spammable :title, spam_title: true
   attr_spammable :description, spam_description: true
 
-  state_machine :state_id, initial: :opened do
+  state_machine :state_id, initial: :opened, initialize: false do
     event :close do
       transition [:opened] => :closed
     end

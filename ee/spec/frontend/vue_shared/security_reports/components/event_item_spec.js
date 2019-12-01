@@ -2,9 +2,13 @@ import Component from 'ee/vue_shared/security_reports/components/event_item.vue'
 import { shallowMount, mount } from '@vue/test-utils';
 
 describe('Event Item', () => {
-  describe('initial state', () => {
-    let wrapper;
+  let wrapper;
 
+  const mountComponent = (options, mountFn = shallowMount) => {
+    wrapper = mountFn(Component, { sync: false, attachToDocument: true, ...options });
+  };
+
+  describe('initial state', () => {
     const propsData = {
       author: {
         name: 'Tanuki',
@@ -17,7 +21,7 @@ describe('Event Item', () => {
     });
 
     beforeEach(() => {
-      wrapper = shallowMount(Component, { propsData });
+      mountComponent({ propsData });
     });
 
     it('uses the author name', () => {
@@ -41,8 +45,6 @@ describe('Event Item', () => {
     });
   });
   describe('with action buttons', () => {
-    let wrapper;
-
     const propsData = {
       author: {
         name: 'Tanuki',
@@ -67,7 +69,7 @@ describe('Event Item', () => {
     });
 
     beforeEach(() => {
-      wrapper = mount(Component, { propsData });
+      mountComponent({ propsData }, mount);
     });
 
     it('renders the action buttons container', () => {

@@ -1,11 +1,10 @@
 <script>
+import createFlash from '~/flash';
 import { ApolloMutation } from 'vue-apollo';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import destroyDesignMutation from '../graphql/mutations/destroyDesign.mutation.graphql';
-import {
-  updateStoreAfterDesignsDelete,
-  onDesignDeletionError,
-} from '../utils/design_management_utils';
+import { updateStoreAfterDesignsDelete } from '../utils/cache_update';
+import { designDeletionError } from '../utils/error_messages';
 
 export default {
   components: {
@@ -34,8 +33,9 @@ export default {
     },
   },
   methods: {
-    onError(...args) {
-      onDesignDeletionError(...args);
+    onError() {
+      const errorMessage = designDeletionError(this.filenames.length === 1);
+      createFlash(errorMessage);
     },
     updateStoreAfterDelete(
       store,

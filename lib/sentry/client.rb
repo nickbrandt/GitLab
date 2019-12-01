@@ -5,6 +5,14 @@ module Sentry
     Error = Class.new(StandardError)
     MissingKeysError = Class.new(StandardError)
     ResponseInvalidSizeError = Class.new(StandardError)
+    BadRequestError = Class.new(StandardError)
+
+    SENTRY_API_SORT_VALUE_MAP = {
+      # <accepted_by_client> => <accepted_by_sentry_api>
+      'frequency' => 'freq',
+      'first_seen' => 'new',
+      'last_seen' => nil
+    }.freeze
 
     attr_accessor :url, :token
 
@@ -25,8 +33,8 @@ module Sentry
       map_to_event(latest_event)
     end
 
-    def list_issues(issue_status:, limit:)
-      issues = get_issues(issue_status: issue_status, limit: limit)
+    def list_issues(**keyword_args)
+      issues = get_issues(keyword_args)
 
       validate_size(issues)
 
@@ -48,14 +56,14 @@ module Sentry
     def validate_size(issues)
       return if Gitlab::Utils::DeepSize.new(issues).valid?
 
-      raise Client::ResponseInvalidSizeError, "Sentry API response is too big. Limit is #{Gitlab::Utils::DeepSize.human_default_max_size}."
+      raise ResponseInvalidSizeError, "Sentry API response is too big. Limit is #{Gitlab::Utils::DeepSize.human_default_max_size}."
     end
 
     def handle_mapping_exceptions(&block)
       yield
     rescue KeyError => e
       Gitlab::Sentry.track_acceptable_exception(e)
-      raise Client::MissingKeysError, "Sentry API response is missing keys. #{e.message}"
+      raise MissingKeysError, "Sentry API response is missing keys. #{e.message}"
     end
 
     def request_params
@@ -71,15 +79,28 @@ module Sentry
       response = handle_request_exceptions do
         Gitlab::HTTP.get(url, **request_params.merge(params))
       end
-
       handle_response(response)
     end
 
-    def get_issues(issue_status:, limit:)
-      http_get(issues_api_url, query: {
-        query: "is:#{issue_status}",
-        limit: limit
-      })
+    def get_issues(**keyword_args)
+      http_get(
+        issues_api_url,
+        query: list_issue_sentry_query(keyword_args)
+      )
+    end
+
+    def list_issue_sentry_query(issue_status:, limit:, sort: nil, search_term: '')
+      unless SENTRY_API_SORT_VALUE_MAP.key?(sort)
+        raise BadRequestError, 'Invalid value for sort param'
+      end
+
+      query_params = {
+        query: "is:#{issue_status} #{search_term}".strip,
+        limit: limit,
+        sort: SENTRY_API_SORT_VALUE_MAP[sort]
+      }
+
+      query_params.compact
     end
 
     def get_issue(issue_id:)

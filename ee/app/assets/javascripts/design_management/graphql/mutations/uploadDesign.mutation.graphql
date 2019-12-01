@@ -1,9 +1,9 @@
-#import "../fragments/designList.fragment.graphql"
+#import "../fragments/design.fragment.graphql"
 
 mutation uploadDesign($files: [Upload!]!, $projectPath: ID!, $iid: ID!) {
   designManagementUpload(input: { projectPath: $projectPath, iid: $iid, files: $files }) {
     designs {
-      ...DesignListItem
+      ...DesignItem
       versions {
         edges {
           node {

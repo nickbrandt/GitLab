@@ -46,28 +46,55 @@ describe Boards::Lists::CreateService do
       end
     end
 
-    context 'wip limits' do
+    context 'max limits' do
       describe '#create_list_attributes' do
-        subject(:service) { described_class.new(project, user, max_issue_count: 42) }
-
-        context 'license unavailable' do
+        shared_examples 'attribute provider for list creation' do
           before do
-            stub_licensed_features(wip_limits: false)
+            stub_licensed_features(wip_limits: wip_limits_enabled)
           end
 
-          it 'contains a max_issue_count of 0' do
-            expect(service.create_list_attributes(nil, nil, nil)).to include(max_issue_count: 0)
+          where(:params, :expected_max_issue_count, :expected_max_issue_weight) do
+            [
+              [{ max_issue_count: 0 }, 0, 0],
+              [{ max_issue_count: nil }, 0, 0],
+              [{ max_issue_count: 1 }, 1, 0],
+
+              [{ max_issue_weight: 0 }, 0, 0],
+              [{ max_issue_weight: nil }, 0, 0],
+              [{ max_issue_weight: 1 }, 0, 1],
+
+              [{ max_issue_count: 1, max_issue_weight: 0 }, 1, 0],
+              [{ max_issue_count: 0, max_issue_weight: 1 }, 0, 1],
+              [{ max_issue_count: 1, max_issue_weight: 1 }, 1, 1],
+
+              [{ max_issue_count: nil, max_issue_weight: 1 }, 0, 1],
+              [{ max_issue_count: 1, max_issue_weight: nil }, 1, 0],
+
+              [{ max_issue_count: nil, max_issue_weight: nil }, 0, 0]
+            ]
+          end
+
+          with_them do
+            it 'contains the expected max limits' do
+              service = described_class.new(project, user, params)
+
+              attrs = service.create_list_attributes(nil, nil, nil)
+
+              if wip_limits_enabled
+                expect(attrs).to include(max_issue_count: expected_max_issue_count, max_issue_weight: expected_max_issue_weight)
+              else
+                expect(attrs).to include(max_issue_count: 0, max_issue_weight: 0)
+              end
+            end
           end
         end
 
-        context 'license available' do
-          before do
-            stub_licensed_features(wip_limits: true)
-          end
+        it_behaves_like 'attribute provider for list creation' do
+          let(:wip_limits_enabled) { true }
+        end
 
-          it 'contains the params provided max issue count' do
-            expect(service.create_list_attributes(nil, nil, nil)).to include(max_issue_count: 42)
-          end
+        it_behaves_like 'attribute provider for list creation' do
+          let(:wip_limits_enabled) { false }
         end
       end
     end

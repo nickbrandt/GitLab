@@ -11,11 +11,11 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
   end
 
   let(:email_raw) { email_fixture('emails/service_desk.eml', dir: 'ee') }
-  let(:namespace) { create(:namespace, name: "email") }
+  let_it_be(:namespace) { create(:namespace, name: "email") }
   let(:expected_description) { "Service desk stuff!\n\n```\na = b\n```\n\n![image](uploads/image.png)" }
 
   context 'service desk is enabled for the project' do
-    let(:project) { create(:project, :public, namespace: namespace, path: 'test', service_desk_enabled: true) }
+    let_it_be(:project) { create(:project, :repository, :public, namespace: namespace, path: 'test', service_desk_enabled: true) }
 
     before do
       allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).and_return(true)
@@ -51,6 +51,63 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
         let(:email_raw) { fixture_file('emails/service_desk_legacy.eml', dir: 'ee') }
 
         it_behaves_like 'a new issue request'
+      end
+
+      context 'when using issue templates' do
+        let_it_be(:user) { create(:user) }
+
+        before do
+          setup_attachment
+        end
+
+        context 'and template is present' do
+          it 'appends template text to issue description' do
+            template_path = '.gitlab/issue_templates/service_desk.md'
+            project.repository.create_file(user, template_path, 'text from template', message: 'message', branch_name: 'master')
+            ServiceDeskSetting.update_template_key_for(project: project, issue_template_key: 'service_desk')
+
+            receiver.execute
+
+            issue_description = Issue.last.description
+            expect(issue_description).to include(expected_description)
+            expect(issue_description.lines.last).to eq('text from template')
+          end
+        end
+
+        context 'and template cannot be found' do
+          before do
+            service = ServiceDeskSetting.new(project_id: project.id, issue_template_key: 'unknown')
+            service.save(validate: false)
+          end
+
+          it 'does not append template text to issue description' do
+            receiver.execute
+
+            new_issue = Issue.last
+
+            expect(new_issue.description).to eq(expected_description.strip)
+          end
+
+          it 'creates support bot note on issue' do
+            receiver.execute
+
+            note = Note.last
+
+            expect(note.note).to include("WARNING: The template file unknown.md used for service desk issues is empty or could not be found.")
+            expect(note.author).to eq(User.support_bot)
+          end
+
+          it 'does not send warning note email' do
+            ActionMailer::Base.deliveries = []
+
+            perform_enqueued_jobs do
+              expect { receiver.execute }.to change { ActionMailer::Base.deliveries.size }.by(1)
+            end
+
+            # Only sends created issue email
+            expect(ActionMailer::Base.deliveries.last.text_part.body).to include("Thank you for your support request!")
+          end
+        end
       end
     end
 

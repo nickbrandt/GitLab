@@ -9,10 +9,12 @@ module EE
             extend ActiveSupport::Concern
 
             prepended do
-              strategy :Bridge, class: EE::Gitlab::Ci::Config::Entry::Need::Bridge, if: -> (config) { config.is_a?(Hash) }
+              strategy :BridgeHash,
+                class: EE::Gitlab::Ci::Config::Entry::Need::BridgeHash,
+                if: -> (config) { config.is_a?(Hash) && !config.key?(:job) }
             end
 
-            class Bridge < ::Gitlab::Config::Entry::Node
+            class BridgeHash < ::Gitlab::Config::Entry::Node
               include ::Gitlab::Config::Entry::Validatable
               include ::Gitlab::Config::Entry::Attributable
 

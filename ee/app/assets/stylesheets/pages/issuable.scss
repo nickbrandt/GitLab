@@ -40,6 +40,10 @@
     border-color: $blue-300;
     box-shadow: 0 0 4px $dropdown-input-focus-shadow;
   }
+
+  .gl-show-field-errors &.form-control:not(textarea) {
+    height: auto;
+  }
 }
 
 .add-issuable-form-input-token-list {

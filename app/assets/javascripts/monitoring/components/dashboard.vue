@@ -22,8 +22,7 @@ import MonitorTimeSeriesChart from './charts/time_series.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
-import TrackEventDirective from '~/vue_shared/directives/track_event';
-import { getTimeDiff, isValidDate, downloadCSVOptions, generateLinkToChartOptions } from '../utils';
+import { getTimeDiff, isValidDate } from '../utils';
 
 export default {
   components: {
@@ -44,7 +43,6 @@ export default {
   directives: {
     GlModal: GlModalDirective,
     GlTooltip: GlTooltipDirective,
-    TrackEvent: TrackEventDirective,
   },
   props: {
     externalDashboardUrl: {
@@ -252,14 +250,9 @@ export default {
       'setEndpoints',
       'setPanelGroupMetrics',
     ]),
-    chartsWithData(charts) {
-      return charts.filter(chart =>
-        chart.metrics.some(metric => this.metricsWithData.includes(metric.metric_id)),
-      );
-    },
-    updateMetrics(key, metrics) {
+    updateMetrics(key, panels) {
       this.setPanelGroupMetrics({
-        metrics,
+        panels,
         key,
       });
     },
@@ -294,14 +287,17 @@ export default {
     submitCustomMetricsForm() {
       this.$refs.customMetricsForm.submit();
     },
+    chartsWithData(panels) {
+      return panels.filter(panel =>
+        panel.metrics.some(metric => this.metricsWithData.includes(metric.metric_id)),
+      );
+    },
     groupHasData(group) {
-      return this.chartsWithData(group.metrics).length > 0;
+      return this.chartsWithData(group.panels).length > 0;
     },
     onDateTimePickerApply(timeWindowUrlParams) {
       return redirectTo(mergeUrlParams(timeWindowUrlParams, window.location.href));
     },
-    downloadCSVOptions,
-    generateLinkToChartOptions,
   },
   addMetric: {
     title: s__('Metrics|Add metric'),
@@ -457,14 +453,14 @@ export default {
         :collapse-group="groupHasData(groupData)"
       >
         <vue-draggable
-          :value="groupData.metrics"
+          :value="groupData.panels"
           group="metrics-dashboard"
           :component-data="{ attrs: { class: 'row mx-0 w-100' } }"
           :disabled="!isRearrangingPanels"
           @input="updateMetrics(groupData.key, $event)"
         >
           <div
-            v-for="(graphData, graphIndex) in groupData.metrics"
+            v-for="(graphData, graphIndex) in groupData.panels"
             :key="`panel-type-${graphIndex}`"
             class="col-12 col-lg-6 px-2 mb-2 draggable"
             :class="{ 'draggable-enabled': isRearrangingPanels }"
@@ -473,7 +469,7 @@ export default {
               <div
                 v-if="isRearrangingPanels"
                 class="draggable-remove js-draggable-remove p-2 w-100 position-absolute d-flex justify-content-end"
-                @click="removeGraph(groupData.metrics, graphIndex)"
+                @click="removeGraph(groupData.panels, graphIndex)"
               >
                 <a class="mx-2 p-2 draggable-remove-link" :aria-label="__('Remove')"
                   ><icon name="close"

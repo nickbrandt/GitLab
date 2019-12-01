@@ -56,6 +56,12 @@ export default {
     };
   },
   computed: {
+    tracking() {
+      return {
+        // eslint-disable-next-line no-underscore-dangle
+        category: this.$options._componentTag,
+      };
+    },
     isNoValue() {
       return this.checkIfNoValue(this.weight);
     },
@@ -118,7 +124,9 @@ export default {
       }
     },
     onCollapsedClick() {
-      this.showEditField(true);
+      if (this.editable) {
+        this.showEditField(true);
+      }
       this.collapsedAfterUpdate = true;
     },
     onSubmit(e) {

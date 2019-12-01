@@ -1,45 +1,37 @@
 # frozen_string_literal: true
 
-shared_examples 'prevents working with vulnerabilities in case of insufficient access level' do
-  it 'responds 403 Forbidden when accessed by reporter' do
-    project.add_reporter(user)
+shared_examples 'forbids actions on vulnerability in case of disabled features' do
+  context 'when "first-class vulnerabilities" feature is disabled' do
+    before do
+      stub_feature_flags(first_class_vulnerabilities: false)
+    end
 
-    subject
+    it 'responds with "not found"' do
+      subject
 
-    expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(404)
+    end
   end
 
-  it 'responds 403 Forbidden when accessed by guest' do
-    project.add_guest(user)
+  context 'when security dashboard feature is not available' do
+    before do
+      stub_licensed_features(security_dashboard: false)
+    end
 
-    subject
+    it 'responds with 403 Forbidden' do
+      subject
 
-    expect(response).to have_gitlab_http_status(403)
+      expect(response).to have_gitlab_http_status(403)
+    end
   end
 end
 
-shared_examples 'responds with "not found" when there is no access to the project' do
-  context 'with no project access' do
-    let(:project) { create(:project) }
+shared_examples 'responds with "not found" for an unknown vulnerability ID' do
+  let(:vulnerability_id) { 0 }
 
-    it 'responds with 404 Not Found' do
-      subject
+  it do
+    subject
 
-      expect(response).to have_gitlab_http_status(404)
-    end
-  end
-
-  context 'with unknown project' do
-    before do
-      project.id = 0
-    end
-
-    let(:project) { build(:project) }
-
-    it 'responds with 404 Not Found' do
-      subject
-
-      expect(response).to have_gitlab_http_status(404)
-    end
+    expect(response).to have_gitlab_http_status(404)
   end
 end

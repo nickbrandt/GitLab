@@ -34,6 +34,38 @@ describe EE::RunnersHelper do
       end
     end
 
+    context 'when the last_ci_minutes_usage_notification_level field is set' do
+      before do
+        namespace.update_attribute(:last_ci_minutes_usage_notification_level, 50)
+      end
+
+      context 'when there are minutes used but remaining minutes percent is still below the notification threshold' do
+        let(:minutes_used) { 51 }
+
+        it 'returns the partial usage notification message' do
+          expect(subject).to match("#{namespace.name} has less than 50% of CI minutes available.")
+        end
+      end
+
+      context 'when limit is increased so there are now more remaining minutes percentage than the notification threshold' do
+        before do
+          namespace.update(shared_runners_minutes_limit: 200)
+        end
+
+        it 'returns nil' do
+          expect(subject).to be_nil
+        end
+      end
+
+      context 'when there are no more remaining minutes' do
+        let(:minutes_used) { 100 }
+
+        it 'returns the exceeded usage message' do
+          expect(subject).to match("#{namespace.name} has exceeded its pipeline minutes quota.")
+        end
+      end
+    end
+
     context 'when current user is an owner' do
       before do
         allow(helper).to receive(:can?).with(user, :admin_project, project) { true }
@@ -50,6 +82,8 @@ describe EE::RunnersHelper do
       end
 
       context 'when usage has reached first level of notification' do
+        let(:minutes_used) { 50 }
+
         before do
           namespace.update_attribute(:last_ci_minutes_usage_notification_level, 50)
         end
@@ -82,6 +116,8 @@ describe EE::RunnersHelper do
       end
 
       context 'when usage has reached first level of notification' do
+        let(:minutes_used) { 50 }
+
         before do
           namespace.update_attribute(:last_ci_minutes_usage_notification_level, 50)
         end

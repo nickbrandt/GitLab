@@ -2,6 +2,7 @@
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
+import { GlButton } from '@gitlab/ui';
 import Pagination from './pagination.vue';
 import DeleteButton from '../delete_button.vue';
 import permissionsQuery from '../../graphql/queries/permissions.query.graphql';
@@ -12,6 +13,7 @@ export default {
     Icon,
     Pagination,
     DeleteButton,
+    GlButton,
   },
   mixins: [timeagoMixin],
   props: {
@@ -23,7 +25,7 @@ export default {
       type: Boolean,
       required: true,
     },
-    name: {
+    filename: {
       type: String,
       required: false,
       default: '',
@@ -40,6 +42,10 @@ export default {
     },
     isLatestVersion: {
       type: Boolean,
+      required: true,
+    },
+    image: {
+      type: String,
       required: true,
     },
   },
@@ -99,10 +105,13 @@ export default {
       <icon :size="18" name="close" />
     </router-link>
     <div class="overflow-hidden d-flex align-items-center">
-      <h2 class="m-0 str-truncated-100">{{ name }}</h2>
+      <h2 class="m-0 str-truncated-100">{{ filename }}</h2>
       <small v-if="updatedAt" class="text-secondary">{{ updatedText }}</small>
     </div>
     <pagination :id="id" class="ml-auto flex-shrink-0" />
+    <gl-button :href="image" class="mr-2">
+      <icon :size="18" name="download" />
+    </gl-button>
     <delete-button
       v-if="isLatestVersion && canDeleteDesign"
       :is-deleting="isDeleting"

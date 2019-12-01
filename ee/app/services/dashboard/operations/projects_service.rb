@@ -7,11 +7,12 @@ module Dashboard
         @user = user
       end
 
-      def execute(project_ids, include_unavailable: false)
+      def execute(project_ids, include_unavailable: false, limit: nil)
         return [] unless License.feature_available?(:operations_dashboard)
 
         projects = find_projects(user, project_ids).to_a
         projects = available_projects(projects) unless include_unavailable
+        projects = limit ? projects.first(limit) : projects
 
         projects
       end

@@ -1,0 +1,6 @@
+---
+title: Geo - Does not schedule duplicated jobs while backfilling uploads, LFS objects
+  and job artifacts
+merge_request: 20324
+author:
+type: other

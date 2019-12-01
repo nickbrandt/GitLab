@@ -1,14 +1,9 @@
 import Vue from 'vue';
-import { GlDropdown, GlButton, GlDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import {
-  canScroll,
-  isScrolledToTop,
-  isScrolledToBottom,
-  scrollDown,
-  scrollUp,
-} from '~/lib/utils/scroll_utils';
+import { scrollDown } from '~/lib/utils/scroll_utils';
 import EnvironmentLogs from 'ee/logs/components/environment_logs.vue';
+
 import { createStore } from 'ee/logs/stores';
 import {
   mockProjectPath,
@@ -30,8 +25,8 @@ describe('EnvironmentLogs', () => {
   let state;
 
   const propsData = {
-    environmentId: mockEnvId,
     projectFullPath: mockProjectPath,
+    environmentId: mockEnvId,
     currentEnvironmentName: mockEnvName,
     environmentsPath: mockEnvironmentsEndpoint,
   };
@@ -42,17 +37,28 @@ describe('EnvironmentLogs', () => {
     fetchEnvironments: jest.fn(),
   };
 
+  const updateControlBtnsMock = jest.fn();
+
   const findEnvironmentsDropdown = () => wrapper.find('.js-environments-dropdown');
   const findPodsDropdown = () => wrapper.find('.js-pods-dropdown');
-  const findScrollToTop = () => wrapper.find('.js-scroll-to-top');
-  const findScrollToBottom = () => wrapper.find('.js-scroll-to-bottom');
-  const findRefreshLog = () => wrapper.find('.js-refresh-log');
+  const findLogControlButtons = () => wrapper.find({ name: 'log-control-buttons-stub' });
   const findLogTrace = () => wrapper.find('.js-log-trace');
 
   const initWrapper = () => {
     wrapper = shallowMount(EnvironmentLogsComponent, {
+      attachToDocument: true,
+      sync: false,
       propsData,
       store,
+      stubs: {
+        LogControlButtons: {
+          name: 'log-control-buttons-stub',
+          template: '<div/>',
+          methods: {
+            update: updateControlBtnsMock,
+          },
+        },
+      },
       methods: {
         ...actionMocks,
       },
@@ -76,15 +82,12 @@ describe('EnvironmentLogs', () => {
 
     expect(wrapper.isVueInstance()).toBe(true);
     expect(wrapper.isEmpty()).toBe(false);
+    expect(findLogTrace().isEmpty()).toBe(false);
 
     expect(findEnvironmentsDropdown().is(GlDropdown)).toBe(true);
     expect(findPodsDropdown().is(GlDropdown)).toBe(true);
 
-    expect(findScrollToTop().is(GlButton)).toBe(true);
-    expect(findScrollToBottom().is(GlButton)).toBe(true);
-    expect(findRefreshLog().is(GlButton)).toBe(true);
-
-    expect(findLogTrace().isEmpty()).toBe(false);
+    expect(findLogControlButtons().exists()).toBe(true);
   });
 
   it('mounted inits data', () => {
@@ -127,6 +130,10 @@ describe('EnvironmentLogs', () => {
       expect(findPodsDropdown().findAll(GlDropdownItem).length).toBe(0);
     });
 
+    it('does not update buttons state', () => {
+      expect(updateControlBtnsMock).not.toHaveBeenCalled();
+    });
+
     it('shows a logs trace', () => {
       expect(findLogTrace().text()).toBe('');
       expect(
@@ -162,7 +169,7 @@ describe('EnvironmentLogs', () => {
 
     afterEach(() => {
       scrollDown.mockReset();
-      scrollUp.mockReset();
+      updateControlBtnsMock.mockReset();
 
       actionMocks.setInitData.mockReset();
       actionMocks.showPodLogs.mockReset();
@@ -199,6 +206,10 @@ describe('EnvironmentLogs', () => {
       expect(trace.text().split('\n')).toEqual(mockLines);
     });
 
+    it('update control buttons state', () => {
+      expect(updateControlBtnsMock).toHaveBeenCalledTimes(1);
+    });
+
     it('scrolls to bottom when loaded', () => {
       expect(scrollDown).toHaveBeenCalledTimes(1);
     });
@@ -219,61 +230,10 @@ describe('EnvironmentLogs', () => {
       it('refresh button, trace is refreshed', () => {
         expect(actionMocks.showPodLogs).toHaveBeenCalledTimes(0);
 
-        findRefreshLog().vm.$emit('click');
+        findLogControlButtons().vm.$emit('refresh');
 
         expect(actionMocks.showPodLogs).toHaveBeenCalledTimes(1);
         expect(actionMocks.showPodLogs).toHaveBeenLastCalledWith(mockPodName);
-      });
-
-      describe('when scrolling actions are enabled', () => {
-        beforeEach(done => {
-          // mock scrolled to the middle of a long page
-          canScroll.mockReturnValue(true);
-          isScrolledToBottom.mockReturnValue(false);
-          isScrolledToTop.mockReturnValue(false);
-
-          initWrapper();
-          wrapper.vm.updateScrollState();
-          wrapper.vm.$nextTick(done);
-        });
-
-        afterEach(() => {
-          canScroll.mockReset();
-          isScrolledToTop.mockReset();
-          isScrolledToBottom.mockReset();
-        });
-
-        it('click on "scroll to top" scrolls up', () => {
-          expect(findScrollToTop().is('[disabled]')).toBe(false);
-          findScrollToTop().vm.$emit('click');
-          expect(scrollUp).toHaveBeenCalledTimes(1);
-        });
-
-        it('click on "scroll to bottom" scrolls down', () => {
-          expect(findScrollToBottom().is('[disabled]')).toBe(false);
-          findScrollToBottom().vm.$emit('click');
-          expect(scrollDown).toHaveBeenCalledTimes(2); // plus one time when trace was loaded
-        });
-      });
-
-      describe('when scrolling actions are disabled', () => {
-        beforeEach(() => {
-          // mock a short page without a scrollbar
-          canScroll.mockReturnValue(false);
-          isScrolledToBottom.mockReturnValue(true);
-          isScrolledToTop.mockReturnValue(true);
-
-          initWrapper();
-        });
-
-        it('buttons are disabled', done => {
-          wrapper.vm.updateScrollState();
-          wrapper.vm.$nextTick(() => {
-            expect(findScrollToTop().is('[disabled]')).toBe(true);
-            expect(findScrollToBottom().is('[disabled]')).toBe(true);
-            done();
-          });
-        });
       });
     });
   });

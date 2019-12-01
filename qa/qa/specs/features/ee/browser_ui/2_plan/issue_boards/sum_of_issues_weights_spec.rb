@@ -12,8 +12,7 @@ module QA
       let(:weight_for_issue_2) { 3 }
 
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         Resource::Issue.fabricate_via_api! do |issue|
           issue.project = label_board_list.project

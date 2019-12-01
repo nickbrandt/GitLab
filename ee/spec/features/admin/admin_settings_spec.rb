@@ -14,8 +14,8 @@ describe 'Admin updates EE-only settings' do
   context 'Geo settings' do
     context 'when the license has Geo feature' do
       it 'allows users to change Geo settings' do
-        visit geo_admin_application_settings_path
-        page.within('.as-geo') do
+        visit admin_geo_settings_path
+        page.within('section') do
           fill_in 'Connection timeout', with: 15
           fill_in 'Allowed Geo IP', with: '192.34.34.34'
           click_button 'Save changes'
@@ -31,9 +31,9 @@ describe 'Admin updates EE-only settings' do
       it 'shows empty page' do
         allow(License).to receive(:feature_available?).and_return(false)
 
-        visit geo_admin_application_settings_path
+        visit admin_geo_settings_path
 
-        expect(page).to have_content 'Discover GitLab Geo'
+        expect(page).to have_content 'You need a different license to use Geo replication'
       end
     end
   end

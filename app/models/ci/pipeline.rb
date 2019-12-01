@@ -205,14 +205,6 @@ module Ci
 
     scope :internal, -> { where(source: internal_sources) }
     scope :ci_sources, -> { where(config_source: ci_sources_values) }
-
-    scope :sort_by_merge_request_pipelines, -> do
-      sql = 'CASE ci_pipelines.source WHEN (?) THEN 0 ELSE 1 END, ci_pipelines.id DESC'
-      query = ApplicationRecord.send(:sanitize_sql_array, [sql, sources[:merge_request_event]]) # rubocop:disable GitlabSecurity/PublicSend
-
-      order(Arel.sql(query))
-    end
-
     scope :for_user, -> (user) { where(user: user) }
     scope :for_sha, -> (sha) { where(sha: sha) }
     scope :for_source_sha, -> (source_sha) { where(source_sha: source_sha) }
@@ -220,22 +212,6 @@ module Ci
     scope :for_ref, -> (ref) { where(ref: ref) }
     scope :for_id, -> (id) { where(id: id) }
     scope :created_after, -> (time) { where('ci_pipelines.created_at > ?', time) }
-
-    scope :triggered_by_merge_request, -> (merge_request) do
-      where(source: :merge_request_event, merge_request: merge_request)
-    end
-
-    scope :detached_merge_request_pipelines, -> (merge_request, sha) do
-      triggered_by_merge_request(merge_request).for_sha(sha)
-    end
-
-    scope :merge_request_pipelines, -> (merge_request, source_sha) do
-      triggered_by_merge_request(merge_request).for_source_sha(source_sha)
-    end
-
-    scope :triggered_for_branch, -> (ref) do
-      where(source: branch_pipeline_sources).where(ref: ref, tag: false)
-    end
 
     scope :with_reports, -> (reports_scope) do
       where('EXISTS (?)', ::Ci::Build.latest.with_reports(reports_scope).where('ci_pipelines.id=ci_builds.commit_id').select(1))
@@ -323,11 +299,6 @@ module Ci
       end
     end
 
-    def self.latest_for_shas(shas)
-      max_id_per_sha = for_sha(shas).group(:sha).select("max(id)")
-      where(id: max_id_per_sha)
-    end
-
     def self.latest_successful_ids_per_project
       success.group(:project_id).select('max(id) as id')
     end
@@ -342,10 +313,6 @@ module Ci
 
     def self.internal_sources
       sources.reject { |source| source == "external" }.values
-    end
-
-    def self.branch_pipeline_sources
-      @branch_pipeline_sources ||= sources.reject { |source| source == 'merge_request_event' }.values
     end
 
     def self.ci_sources_values
@@ -478,6 +445,10 @@ module Ci
       end
     end
 
+    def before_sha
+      super || Gitlab::Git::BLANK_SHA
+    end
+
     def short_sha
       Ci::Pipeline.truncate_sha(sha)
     end
@@ -551,23 +522,6 @@ module Ci
       end
     end
 
-    def stage_seeds
-      return [] unless config_processor
-
-      strong_memoize(:stage_seeds) do
-        seeds = config_processor.stages_attributes.inject([]) do |previous_stages, attributes|
-          seed = Gitlab::Ci::Pipeline::Seed::Stage.new(self, attributes, previous_stages)
-          previous_stages + [seed]
-        end
-
-        seeds.select(&:included?)
-      end
-    end
-
-    def seeds_size
-      stage_seeds.sum(&:size)
-    end
-
     def has_kubernetes_active?
       project.deployment_platform&.active?
     end
@@ -587,60 +541,12 @@ module Ci
       end
     end
 
-    def set_config_source
-      if ci_yaml_from_repo
-        self.config_source = :repository_source
-      elsif implied_ci_yaml_file
-        self.config_source = :auto_devops_source
-      end
-    end
-
-    ##
-    # TODO, setting yaml_errors should be moved to the pipeline creation chain.
-    #
-    def config_processor
-      return unless ci_yaml_file
-      return @config_processor if defined?(@config_processor)
-
-      @config_processor ||= begin
-        ::Gitlab::Ci::YamlProcessor.new(ci_yaml_file, { project: project, sha: sha, user: user })
-      rescue Gitlab::Ci::YamlProcessor::ValidationError => e
-        self.yaml_errors = e.message
-        nil
-      rescue => ex
-        self.yaml_errors = "Undefined error (#{Labkit::Correlation::CorrelationId.current_id})"
-
-        Gitlab::Sentry.track_acceptable_exception(ex, extra: {
-          project_id: project.id,
-          sha: sha,
-          ci_yaml_file: ci_yaml_file_path
-        })
-        nil
-      end
-    end
-
-    def ci_yaml_file_path
+    # TODO: this logic is duplicate with Pipeline::Chain::Config::Content
+    # we should persist this is `ci_pipelines.config_path`
+    def config_path
       return unless repository_source? || unknown_source?
 
       project.ci_config_path.presence || '.gitlab-ci.yml'
-    end
-
-    def ci_yaml_file
-      return @ci_yaml_file if defined?(@ci_yaml_file)
-
-      @ci_yaml_file =
-        if auto_devops_source?
-          implied_ci_yaml_file
-        else
-          ci_yaml_from_repo
-        end
-
-      if @ci_yaml_file
-        @ci_yaml_file
-      else
-        self.yaml_errors = "Failed to load CI/CD config file for #{sha}"
-        nil
-      end
     end
 
     def has_yaml_errors?
@@ -663,12 +569,6 @@ module Ci
     def notes
       project.notes.for_commit_id(sha)
     end
-
-    # rubocop: disable CodeReuse/ServiceClass
-    def process!(trigger_build_ids = nil)
-      Ci::ProcessPipelineService.new(project, user).execute(self, trigger_build_ids)
-    end
-    # rubocop: enable CodeReuse/ServiceClass
 
     def update_status
       retry_optimistic_lock(self) do
@@ -711,12 +611,11 @@ module Ci
     def predefined_variables
       Gitlab::Ci::Variables::Collection.new.tap do |variables|
         variables.append(key: 'CI_PIPELINE_IID', value: iid.to_s)
-        variables.append(key: 'CI_CONFIG_PATH', value: ci_yaml_file_path)
         variables.append(key: 'CI_PIPELINE_SOURCE', value: source.to_s)
-        variables.append(key: 'CI_COMMIT_MESSAGE', value: git_commit_message.to_s)
-        variables.append(key: 'CI_COMMIT_TITLE', value: git_commit_full_title.to_s)
-        variables.append(key: 'CI_COMMIT_DESCRIPTION', value: git_commit_description.to_s)
-        variables.append(key: 'CI_COMMIT_REF_PROTECTED', value: (!!protected_ref?).to_s)
+
+        variables.append(key: 'CI_CONFIG_PATH', value: config_path)
+
+        variables.concat(predefined_commit_variables)
 
         if merge_request_event? && merge_request
           variables.append(key: 'CI_MERGE_REQUEST_EVENT_TYPE', value: merge_request_event_type.to_s)
@@ -728,6 +627,28 @@ module Ci
         if external_pull_request_event? && external_pull_request
           variables.concat(external_pull_request.predefined_variables)
         end
+      end
+    end
+
+    def predefined_commit_variables
+      Gitlab::Ci::Variables::Collection.new.tap do |variables|
+        variables.append(key: 'CI_COMMIT_SHA', value: sha)
+        variables.append(key: 'CI_COMMIT_SHORT_SHA', value: short_sha)
+        variables.append(key: 'CI_COMMIT_BEFORE_SHA', value: before_sha)
+        variables.append(key: 'CI_COMMIT_REF_NAME', value: source_ref)
+        variables.append(key: 'CI_COMMIT_REF_SLUG', value: source_ref_slug)
+        variables.append(key: 'CI_COMMIT_TAG', value: ref) if tag?
+        variables.append(key: 'CI_COMMIT_MESSAGE', value: git_commit_message.to_s)
+        variables.append(key: 'CI_COMMIT_TITLE', value: git_commit_full_title.to_s)
+        variables.append(key: 'CI_COMMIT_DESCRIPTION', value: git_commit_description.to_s)
+        variables.append(key: 'CI_COMMIT_REF_PROTECTED', value: (!!protected_ref?).to_s)
+
+        # legacy variables
+        variables.append(key: 'CI_BUILD_REF', value: sha)
+        variables.append(key: 'CI_BUILD_BEFORE_SHA', value: before_sha)
+        variables.append(key: 'CI_BUILD_REF_NAME', value: source_ref)
+        variables.append(key: 'CI_BUILD_REF_SLUG', value: source_ref_slug)
+        variables.append(key: 'CI_BUILD_TAG', value: ref) if tag?
       end
     end
 
@@ -846,16 +767,8 @@ module Ci
       triggered_by_merge_request? && target_sha.present?
     end
 
-    def merge_train_pipeline?
-      merge_request_pipeline? && merge_train_ref?
-    end
-
     def merge_request_ref?
       MergeRequest.merge_request_ref?(ref)
-    end
-
-    def merge_train_ref?
-      MergeRequest.merge_train_ref?(ref)
     end
 
     def matches_sha_or_source_sha?(sha)
@@ -890,9 +803,7 @@ module Ci
       return unless merge_request_event?
 
       strong_memoize(:merge_request_event_type) do
-        if merge_train_pipeline?
-          :merge_train
-        elsif merge_request_pipeline?
+        if merge_request_pipeline?
           :merged_result
         elsif detached_merge_request_pipeline?
           :detached
@@ -905,24 +816,6 @@ module Ci
     end
 
     private
-
-    def ci_yaml_from_repo
-      return unless project
-      return unless sha
-      return unless ci_yaml_file_path
-
-      project.repository.gitlab_ci_yml_for(sha, ci_yaml_file_path)
-    rescue GRPC::NotFound, GRPC::Internal
-      nil
-    end
-
-    def implied_ci_yaml_file
-      return unless project
-
-      if project.auto_devops_enabled?
-        Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content
-      end
-    end
 
     def pipeline_data
       Gitlab::DataBuilder::Pipeline.build(self)

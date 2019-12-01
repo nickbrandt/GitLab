@@ -1,4 +1,4 @@
-import { s__ } from '~/locale';
+import { __, s__ } from '~/locale';
 
 export default () => ({
   isLoadingVulnerabilities: true,
@@ -25,6 +25,7 @@ export default () => ({
         text: s__('Vulnerability|Project'),
         isLink: true,
       },
+      url: { text: __('URL'), isLink: true },
       file: { text: s__('Vulnerability|File') },
       identifiers: { text: s__('Vulnerability|Identifiers') },
       severity: { text: s__('Vulnerability|Severity') },

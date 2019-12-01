@@ -88,4 +88,39 @@ describe('BoardsStoreEE', () => {
       expect(state.milestones).toEqual([]);
     });
   });
+
+  describe('updateWeight', () => {
+    const dummyEndpoint = `${TEST_HOST}/update/weight`;
+    const dummyResponse = 'just another response in the network';
+    const weight = 'elephant';
+    const expectedRequest = expect.objectContaining({ data: JSON.stringify({ weight }) });
+
+    let requestSpy;
+
+    beforeEach(() => {
+      requestSpy = jest.fn();
+      axiosMock.onPut(dummyEndpoint).replyOnce(config => requestSpy(config));
+    });
+
+    it('makes a request to update the weight', () => {
+      requestSpy.mockReturnValue([200, dummyResponse]);
+      const expectedResponse = expect.objectContaining({ data: dummyResponse });
+
+      return expect(BoardsStoreEE.store.updateWeight(dummyEndpoint, weight))
+        .resolves.toEqual(expectedResponse)
+        .then(() => {
+          expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
+        });
+    });
+
+    it('fails for error response', () => {
+      requestSpy.mockReturnValue([500]);
+
+      return expect(BoardsStoreEE.store.updateWeight(dummyEndpoint, weight))
+        .rejects.toThrow()
+        .then(() => {
+          expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
+        });
+    });
+  });
 });
