@@ -408,6 +408,20 @@ describe Projects::Settings::OperationsController do
         it_behaves_like 'a gitlab tracking event', { send_email: '1' }, 'enabled_sending_emails'
         it_behaves_like 'a gitlab tracking event', { send_email: '0' }, 'disabled_sending_emails'
       end
+
+      context 'updating tracing settings' do
+        let(:project) { create(:project) }
+        let(:new_tracing_settings) { {} }
+
+        before do
+          project.add_maintainer(user)
+        end
+
+        it 'creates a gitlab tracking event' do
+          expect(Gitlab::Tracking).to receive(:event).with('project:operations:tracing', 'external_url_populated')
+          update_project(project, tracing_params: { external_url: "http://example.com" } )
+        end
+      end
     end
 
     context 'without a license' do

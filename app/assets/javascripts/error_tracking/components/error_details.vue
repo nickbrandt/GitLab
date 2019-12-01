@@ -32,6 +32,10 @@ export default {
       type: String,
       required: true,
     },
+    issueProjectPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapState('details', ['error', 'loading', 'loadingStacktrace', 'stacktraceData']),
@@ -58,6 +62,34 @@ export default {
     showStacktrace() {
       return Boolean(!this.loadingStacktrace && this.stacktrace && this.stacktrace.length);
     },
+    errorTitle() {
+      return `${this.error.title}`;
+    },
+    errorUrl() {
+      return sprintf(__('Sentry event: %{external_url}'), {
+        external_url: this.error.external_url,
+      });
+    },
+    errorFirstSeen() {
+      return sprintf(__('First seen: %{first_seen}'), { first_seen: this.error.first_seen });
+    },
+    errorLastSeen() {
+      return sprintf(__('Last seen: %{last_seen}'), { last_seen: this.error.last_seen });
+    },
+    errorCount() {
+      return sprintf(__('Events: %{count}'), { count: this.error.count });
+    },
+    errorUserCount() {
+      return sprintf(__('Users: %{user_count}'), { user_count: this.error.user_count });
+    },
+    issueLink() {
+      return `${this.issueProjectPath}?issue[title]=${encodeURIComponent(
+        this.errorTitle,
+      )}&issue[description]=${encodeURIComponent(this.issueDescription)}`;
+    },
+    issueDescription() {
+      return `${this.errorUrl}${this.errorFirstSeen}${this.errorLastSeen}${this.errorCount}${this.errorUserCount}`;
+    },
   },
   mounted() {
     this.startPollingDetails(this.issueDetailsPath);
@@ -82,9 +114,9 @@ export default {
     <div v-else-if="showDetails" class="error-details">
       <div class="top-area align-items-center justify-content-between py-3">
         <span v-if="!loadingStacktrace && stacktrace" v-html="reported"></span>
-        <!--   <gl-button class="my-3 ml-auto" variant="success">
-             {{ __('Create Issue') }}
-           </gl-button>-->
+        <gl-button variant="success" :href="issueLink">
+          {{ __('Create issue') }}
+        </gl-button>
       </div>
       <div>
         <tooltip-on-truncate :title="error.title" truncate-target="child" placement="top">

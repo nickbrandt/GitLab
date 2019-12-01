@@ -72,6 +72,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resources :billings, only: [:index]
     resources :epics, concerns: :awardable, constraints: { id: /\d+/ } do
       member do
+        get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
         get :discussions, format: :json
         get :realtime_changes
         post :toggle_subscription
@@ -143,14 +144,6 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     post :sign_up, to: 'sso#sign_up'
 
     resource :roadmap, only: [:show], controller: 'roadmap'
-
-    legacy_ee_group_boards_redirect = redirect do |params, request|
-      path = "/groups/#{params[:group_id]}/-/boards"
-      path << "/#{params[:extra_params]}" if params[:extra_params].present?
-      path << "?#{request.query_string}" if request.query_string.present?
-      path
-    end
-    get 'boards(/*extra_params)', as: :legacy_ee_group_boards_redirect, to: legacy_ee_group_boards_redirect
 
     resource :dependency_proxy, only: [:show, :update]
     resources :packages, only: [:index]

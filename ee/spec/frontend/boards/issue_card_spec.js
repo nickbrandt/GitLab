@@ -22,6 +22,7 @@ describe('Issue card component', () => {
         ...props,
       },
       sync: false,
+      attachToDocument: true,
     });
   };
 

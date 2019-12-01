@@ -19,8 +19,14 @@ module EE
       scope :order_created_at_desc, -> { reorder(created_at: :desc) }
       scope :service_desk, -> { where(author: ::User.support_bot) }
 
+      scope :in_epics, ->(epics) do
+        issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
+        id_in(issue_ids)
+      end
+
       has_one :epic_issue
       has_one :epic, through: :epic_issue
+      belongs_to :promoted_to_epic, class_name: 'Epic'
       has_many :designs, class_name: "DesignManagement::Design", inverse_of: :issue
       has_many :design_versions, class_name: "DesignManagement::Version", inverse_of: :issue do
         def most_recent
@@ -31,6 +37,9 @@ module EE
       has_and_belongs_to_many :self_managed_prometheus_alert_events, join_table: :issues_self_managed_prometheus_alert_events
       has_and_belongs_to_many :prometheus_alert_events, join_table: :issues_prometheus_alert_events
       has_many :prometheus_alerts, through: :prometheus_alert_events
+
+      has_many :vulnerability_links, class_name: 'Vulnerabilities::IssueLink', inverse_of: :issue
+      has_many :related_vulnerabilities, through: :vulnerability_links, source: :vulnerability
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
 
@@ -114,6 +123,10 @@ module EE
 
     def design_collection
       @design_collection ||= ::DesignManagement::DesignCollection.new(self)
+    end
+
+    def promoted?
+      !!promoted_to_epic_id
     end
 
     class_methods do

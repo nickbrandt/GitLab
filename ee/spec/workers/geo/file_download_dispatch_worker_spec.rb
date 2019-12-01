@@ -42,6 +42,21 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw do
     subject.perform
   end
 
+  it 'does not schedule duplicated jobs' do
+    lfs_object_1 = create(:lfs_object, :with_file)
+    lfs_object_2 = create(:lfs_object, :with_file)
+
+    stub_const('Geo::Scheduler::SchedulerWorker::DB_RETRIEVE_BATCH_SIZE', 5)
+    secondary.update!(files_max_capacity: 2)
+    allow(Gitlab::SidekiqStatus).to receive(:job_status).with([]).and_return([]).twice
+    allow(Gitlab::SidekiqStatus).to receive(:job_status).with(%w[123 456]).and_return([true, true], [true, true], [false, false])
+
+    expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_1.id).once.and_return('123')
+    expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_2.id).once.and_return('456')
+
+    subject.perform
+  end
+
   context 'with attachments (Upload records)' do
     let(:upload) { create(:upload) }
 

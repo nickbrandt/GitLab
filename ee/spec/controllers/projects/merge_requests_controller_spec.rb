@@ -869,4 +869,9 @@ describe Projects::MergeRequestsController do
       end
     end
   end
+
+  it_behaves_like DescriptionDiffActions do
+    let_it_be(:project)  { create(:project, :repository, :public) }
+    let_it_be(:issuable) { create(:merge_request, source_project: project) }
+  end
 end

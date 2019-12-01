@@ -72,13 +72,7 @@ module QA
           Page::Group::Menu.perform(&:click_group_members_item)
           Page::Group::SubMenus::Members.perform do |members_page|
             members_page.add_member(user.username)
-          end
-
-          Page::Group::SubMenus::Members.perform do |members_page|
             members_page.update_access_level(user.username, "Developer")
-          end
-
-          Page::Group::SubMenus::Members.perform do |members_page|
             members_page.remove_member(user.username)
           end
         end
@@ -92,13 +86,13 @@ module QA
           project.visit!
 
           Page::Project::Menu.perform(&:go_to_members_settings)
-          Page::Project::Settings::Members.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
-            page.invite_group(@group.path)
+          Page::Project::Settings::Members.perform do |members|
+            members.invite_group(@group.path)
           end
 
           Page::Project::Menu.perform(&:go_to_members_settings)
-          Page::Project::Settings::Members.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
-            page.remove_group(@group.path)
+          Page::Project::Settings::Members.perform do |members|
+            members.remove_group(@group.path)
           end
 
           @group.visit!

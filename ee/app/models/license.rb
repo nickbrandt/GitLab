@@ -13,6 +13,7 @@ class License < ApplicationRecord
     burndown_charts
     code_owners
     contribution_analytics
+    description_diffs
     elastic_search
     export_issues
     group_bulk_edit
@@ -96,6 +97,7 @@ class License < ApplicationRecord
     smartcard_auth
     type_of_work_analytics
     unprotection_restrictions
+    ci_project_subscriptions
   ]
   EEP_FEATURES.freeze
 

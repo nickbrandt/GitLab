@@ -1,13 +1,11 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import mrWidgetOptions from 'ee/vue_merge_request_widget/mr_widget_options.vue';
 import MRWidgetService from 'ee/vue_merge_request_widget/services/mr_widget_service';
 import MRWidgetStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import state from 'ee/vue_shared/security_reports/store/state';
 import mockData, {
@@ -29,6 +27,8 @@ import {
   sastBaseAllIssues,
   sastHeadAllIssues,
 } from 'ee_spec/vue_shared/security_reports/mock_data';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import axios from '~/lib/utils/axios_utils';
 import { MTWPS_MERGE_STRATEGY, MT_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 
 describe('ee merge request widget options', () => {

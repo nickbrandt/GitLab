@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import actions, {
   setHeadBlobPath,
   setBaseBlobPath,
@@ -72,6 +71,7 @@ import actions, {
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import state from 'ee/vue_shared/security_reports/store/state';
 import testAction from 'spec/helpers/vuex_action_helper';
+import axios from '~/lib/utils/axios_utils';
 import {
   sastIssues,
   sastIssuesBase,

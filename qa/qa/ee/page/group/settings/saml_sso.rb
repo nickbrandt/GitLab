@@ -10,6 +10,7 @@ module QA
               element :identity_provider_sso_field
               element :certificate_fingerprint_field
               element :enforced_sso_toggle_button
+              element :group_managed_accounts_toggle_button
               element :save_changes_button
             end
 
@@ -30,7 +31,31 @@ module QA
             end
 
             def enforce_sso
-              click_element :enforced_sso_toggle_button unless find_element(:enforced_sso_toggle_button)[:class].include?('is-checked')
+              Support::Retrier.retry_until do
+                click_element :enforced_sso_toggle_button unless find_element(:enforced_sso_toggle_button)[:class].include?('is-checked')
+                find_element(:enforced_sso_toggle_button)[:class].include?('is-checked')
+              end
+            end
+
+            def disable_enforce_sso
+              Support::Retrier.retry_until do
+                click_element :enforced_sso_toggle_button if find_element(:enforced_sso_toggle_button)[:class].include?('is-checked')
+                !find_element(:enforced_sso_toggle_button)[:class].include?('is-checked')
+              end
+            end
+
+            def enable_group_managed_accounts
+              Support::Retrier.retry_until do
+                click_element :group_managed_accounts_toggle_button unless find_element(:group_managed_accounts_toggle_button)[:class].include?('is-checked')
+                find_element(:group_managed_accounts_toggle_button)[:class].include?('is-checked')
+              end
+            end
+
+            def disable_group_managed_accounts
+              Support::Retrier.retry_until do
+                click_element :group_managed_accounts_toggle_button if find_element(:group_managed_accounts_toggle_button)[:class].include?('is-checked')
+                !find_element(:group_managed_accounts_toggle_button)[:class].include?('is-checked')
+              end
             end
 
             def click_save_changes
@@ -43,6 +68,10 @@ module QA
 
             def click_user_login_url_link
               click_element :user_login_url_link
+            end
+
+            def user_login_url_link_text
+              find_element(:user_login_url_link).text
             end
           end
         end

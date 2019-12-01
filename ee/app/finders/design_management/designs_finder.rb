@@ -17,7 +17,8 @@ module DesignManagement
       items = init_collection
 
       items = by_visible_at_version(items)
-      items = by_ids(items)
+      items = by_filename(items)
+      items = by_id(items)
 
       items
     end
@@ -37,7 +38,13 @@ module DesignManagement
       items.visible_at_version(params[:visible_at_version])
     end
 
-    def by_ids(items)
+    def by_filename(items)
+      return items unless params[:filenames].present?
+
+      items.with_filename(params[:filenames])
+    end
+
+    def by_id(items)
       return items unless params[:ids].present?
 
       items.id_in(params[:ids])

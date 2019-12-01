@@ -14,16 +14,16 @@ const mockClosedAt = `${currentDate.getFullYear() - 1}-${currentDate.getMonth() 
   1}-${currentDate.getDate()}`;
 const mockClosedAtYear = currentDate.getFullYear() - 1;
 
+const localVue = createLocalVue();
+
 const createComponent = ({
   getTargetRef = () => {},
   isOpen = false,
   state = 'closed',
   createdAt = mockCreatedAt,
   closedAt = mockClosedAt,
-}) => {
-  const localVue = createLocalVue();
-
-  return shallowMount(StateTooltip, {
+}) =>
+  shallowMount(localVue.extend(StateTooltip), {
     localVue,
     propsData: {
       getTargetRef,
@@ -32,8 +32,8 @@ const createComponent = ({
       createdAt,
       closedAt,
     },
+    sync: false,
   });
-};
 
 describe('RelatedItemsTree', () => {
   describe('RelatedItemsTreeHeader', () => {

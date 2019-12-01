@@ -837,8 +837,7 @@ describe ProjectsController do
       get :refs, params: { namespace_id: project.namespace, id: project, sort: 'updated_desc' }
 
       expect(json_response['Branches']).to include('master')
-      expect(json_response['Tags'].first).to eq('v1.1.0')
-      expect(json_response['Tags'].last).to eq('v1.0.0')
+      expect(json_response['Tags']).to include('v1.0.0')
       expect(json_response['Commits']).to be_nil
     end
 
@@ -925,6 +924,30 @@ describe ProjectsController do
                                 }
 
         expect(json_response['body']).to match(/\!#{merge_request.iid} \(closed\)/)
+      end
+    end
+
+    context 'when path parameter is provided' do
+      let(:project_with_repo) { create(:project, :repository) }
+      let(:preview_markdown_params) do
+        {
+          namespace_id: project_with_repo.namespace,
+          id: project_with_repo,
+          text: "![](./logo-white.png)\n",
+          path: 'files/images/README.md'
+        }
+      end
+
+      before do
+        project_with_repo.add_maintainer(user)
+      end
+
+      it 'renders JSON body with image links expanded' do
+        expanded_path = "/#{project_with_repo.full_path}/raw/master/files/images/logo-white.png"
+
+        post :preview_markdown, params: preview_markdown_params
+
+        expect(json_response['body']).to include(expanded_path)
       end
     end
   end

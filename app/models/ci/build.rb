@@ -13,17 +13,11 @@ module Ci
     include Importable
     include Gitlab::Utils::StrongMemoize
     include HasRef
+    include IgnorableColumns
 
     BuildArchivedError = Class.new(StandardError)
 
-    self.ignored_columns += %i[
-      artifacts_file
-      artifacts_file_store
-      artifacts_metadata
-      artifacts_metadata_store
-      artifacts_size
-      commands
-    ]
+    ignore_columns :artifacts_file, :artifacts_file_store, :artifacts_metadata, :artifacts_metadata_store, :artifacts_size, :commands, remove_after: '2019-12-15', remove_with: '12.7'
 
     belongs_to :project, inverse_of: :builds
     belongs_to :runner
@@ -42,7 +36,6 @@ module Ci
     has_one :deployment, as: :deployable, class_name: 'Deployment'
     has_many :trace_sections, class_name: 'Ci::BuildTraceSection'
     has_many :trace_chunks, class_name: 'Ci::BuildTraceChunk', foreign_key: :build_id
-    has_many :needs, class_name: 'Ci::BuildNeed', foreign_key: :build_id, inverse_of: :build
 
     has_many :job_artifacts, class_name: 'Ci::JobArtifact', foreign_key: :job_id, dependent: :destroy, inverse_of: :job # rubocop:disable Cop/ActiveRecordDependent
     has_many :job_variables, class_name: 'Ci::JobVariable', foreign_key: :job_id
@@ -54,9 +47,8 @@ module Ci
 
     has_one :runner_session, class_name: 'Ci::BuildRunnerSession', validate: true, inverse_of: :build
 
-    accepts_nested_attributes_for :runner_session
+    accepts_nested_attributes_for :runner_session, update_only: true
     accepts_nested_attributes_for :job_variables
-    accepts_nested_attributes_for :needs
 
     delegate :url, to: :runner_session, prefix: true, allow_nil: true
     delegate :terminal_specification, to: :runner_session, allow_nil: true
@@ -122,6 +114,20 @@ module Ci
 
     scope :eager_load_job_artifacts, -> { includes(:job_artifacts) }
 
+    scope :eager_load_everything, -> do
+      includes(
+        [
+          { pipeline: [:project, :user] },
+          :job_artifacts_archive,
+          :metadata,
+          :trigger_request,
+          :project,
+          :user,
+          :tags
+        ]
+      )
+    end
+
     scope :with_exposed_artifacts, -> do
       joins(:metadata).merge(Ci::BuildMetadata.with_exposed_artifacts)
         .includes(:metadata, :job_artifacts_metadata)
@@ -163,6 +169,7 @@ module Ci
     end
 
     scope :queued_before, ->(time) { where(arel_table[:queued_at].lt(time)) }
+    scope :order_id_desc, -> { order('ci_builds.id DESC') }
 
     acts_as_taggable
 
@@ -249,10 +256,11 @@ module Ci
       end
 
       after_transition pending: :running do |build|
-        build.pipeline.persistent_ref.create
         build.deployment&.run
 
         build.run_after_commit do
+          build.pipeline.persistent_ref.create
+
           BuildHooksWorker.perform_async(id)
         end
       end
@@ -750,7 +758,7 @@ module Ci
 
       # find all jobs that are needed
       if Feature.enabled?(:ci_dag_support, project, default_enabled: true) && needs.exists?
-        depended_jobs = depended_jobs.where(name: needs.select(:name))
+        depended_jobs = depended_jobs.where(name: needs.artifacts.select(:name))
       end
 
       # find all jobs that are dependent on
@@ -758,6 +766,8 @@ module Ci
         depended_jobs = depended_jobs.where(name: options[:dependencies])
       end
 
+      # if both needs and dependencies are used,
+      # the end result will be an intersection between them
       depended_jobs
     end
 
@@ -899,12 +909,6 @@ module Ci
         value = value.is_a?(Integer) ? { max: value } : value.to_h
         value.with_indifferent_access
       end
-    end
-
-    def build_attributes_from_config
-      return {} unless pipeline.config_processor
-
-      pipeline.config_processor.build_attributes(name)
     end
   end
 end

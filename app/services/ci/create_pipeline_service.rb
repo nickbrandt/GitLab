@@ -7,11 +7,14 @@ module Ci
     CreateError = Class.new(StandardError)
 
     SEQUENCE = [Gitlab::Ci::Pipeline::Chain::Build,
-                Gitlab::Ci::Pipeline::Chain::RemoveUnwantedChatJobs,
                 Gitlab::Ci::Pipeline::Chain::Validate::Abilities,
                 Gitlab::Ci::Pipeline::Chain::Validate::Repository,
-                Gitlab::Ci::Pipeline::Chain::Validate::Config,
+                Gitlab::Ci::Pipeline::Chain::Config::Content,
+                Gitlab::Ci::Pipeline::Chain::Config::Process,
+                Gitlab::Ci::Pipeline::Chain::RemoveUnwantedChatJobs,
                 Gitlab::Ci::Pipeline::Chain::Skip,
+                Gitlab::Ci::Pipeline::Chain::EvaluateWorkflowRules,
+                Gitlab::Ci::Pipeline::Chain::Seed,
                 Gitlab::Ci::Pipeline::Chain::Limit::Size,
                 Gitlab::Ci::Pipeline::Chain::Populate,
                 Gitlab::Ci::Pipeline::Chain::Create,
@@ -54,7 +57,9 @@ module Ci
           cancel_pending_pipelines if project.auto_cancel_pending_pipelines?
           pipeline_created_counter.increment(source: source)
 
-          pipeline.process!
+          Ci::ProcessPipelineService
+            .new(pipeline)
+            .execute
         end
       end
 

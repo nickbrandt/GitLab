@@ -115,10 +115,12 @@ Any **secondary** nodes should point only to read-only instances.
 
 #### Can Geo detect the current node correctly?
 
-Geo finds the current machine's name in `/etc/gitlab/gitlab.rb` by first looking
-for `gitlab_rails['geo_node_name']`. If it is not defined, then it defaults to
-the external URL defined in e.g. `external_url "http://gitlab.example.com"`. To
-get a machine's name, run:
+Geo finds the current machine's name in `/etc/gitlab/gitlab.rb` by:
+
+- Using the `gitlab_rails['geo_node_name']` setting.
+- If that is not defined, using the `external_url` setting.
+
+To get a machine's name, run:
 
 ```sh
 sudo gitlab-rails runner "puts GeoNode.current_node_name"
@@ -366,7 +368,7 @@ to start again from scratch, there are a few steps that can help you:
    gitlab-ctl tail sidekiq
    ```
 
-1. Rename repository storage folders and create new ones
+1. Rename repository storage folders and create new ones. If you are not concerned about possible orphaned directories and files, then you can simply skip this step.
 
    ```sh
    mv /var/opt/gitlab/git-data/repositories /var/opt/gitlab/git-data/repositories.old
@@ -413,7 +415,9 @@ to start again from scratch, there are a few steps that can help you:
 1. Reset the Tracking Database
 
    ```sh
-   gitlab-rake geo:db:reset
+   gitlab-rake geo:db:drop
+   gitlab-ctl reconfigure
+   gitlab-rake geo:db:setup
    ```
 
 1. Restart previously stopped services
@@ -652,13 +656,6 @@ Geo cannot reuse an existing tracking database.
 
 It is safest to use a fresh secondary, or reset the whole secondary by following
 [Resetting Geo secondary node replication](#resetting-geo-secondary-node-replication).
-
-If you are not concerned about possible orphaned directories and files, then you
-can simply reset the existing tracking database with:
-
-```sh
-sudo gitlab-rake geo:db:reset
-```
 
 ### Geo node has a database that is writable which is an indication it is not configured for replication with the primary node
 

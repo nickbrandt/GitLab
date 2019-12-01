@@ -17,14 +17,6 @@ export default {
     VulnerabilityCountList,
   },
   props: {
-    dashboardDocumentation: {
-      type: String,
-      required: true,
-    },
-    emptyStateSvgPath: {
-      type: String,
-      required: true,
-    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -146,10 +138,11 @@ export default {
 
     <div class="row mt-4">
       <article class="col" :class="{ 'col-xl-7': !isLockedToProject }">
-        <security-dashboard-table
-          :dashboard-documentation="dashboardDocumentation"
-          :empty-state-svg-path="emptyStateSvgPath"
-        />
+        <security-dashboard-table>
+          <template #emptyState>
+            <slot name="emptyState"></slot>
+          </template>
+        </security-dashboard-table>
       </article>
 
       <aside v-if="shouldShowChart" class="col-xl-5">

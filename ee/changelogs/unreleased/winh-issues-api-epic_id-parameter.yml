@@ -1,0 +1,5 @@
+---
+title: Expose epic_id parameter in issues API
+merge_request: 19953
+author:
+type: changed

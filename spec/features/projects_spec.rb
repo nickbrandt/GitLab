@@ -6,10 +6,6 @@ describe 'Project' do
   include ProjectForksHelper
   include MobileHelpers
 
-  before do
-    stub_feature_flags(vue_file_list: false)
-  end
-
   describe 'creating from template' do
     let(:user) { create(:user) }
     let(:template) { Gitlab::ProjectTemplate.find(:rails) }
@@ -206,13 +202,13 @@ describe 'Project' do
       expect(page).not_to have_content('Forked from')
     end
 
-    it 'shows the name of the deleted project when the source was deleted', :sidekiq_might_not_need_inline do
+    it 'does not show the name of the deleted project when the source was deleted', :sidekiq_might_not_need_inline do
       forked_project
       Projects::DestroyService.new(base_project, base_project.owner).execute
 
       visit project_path(forked_project)
 
-      expect(page).to have_content("Forked from #{base_project.full_name} (deleted)")
+      expect(page).to have_content('Forked from an inaccessible project')
     end
 
     context 'a fork of a fork' do
@@ -272,7 +268,7 @@ describe 'Project' do
     end
   end
 
-  describe 'tree view (default view is set to Files)' do
+  describe 'tree view (default view is set to Files)', :js do
     let(:user) { create(:user, project_view: 'files') }
     let(:project) { create(:forked_project_with_submodules) }
 
@@ -285,19 +281,19 @@ describe 'Project' do
     it 'has working links to files' do
       click_link('PROCESS.md')
 
-      expect(page.status_code).to eq(200)
+      expect(page).to have_selector('.file-holder')
     end
 
     it 'has working links to directories' do
       click_link('encoding')
 
-      expect(page.status_code).to eq(200)
+      expect(page).to have_selector('.breadcrumb-item', text: 'encoding')
     end
 
     it 'has working links to submodules' do
       click_link('645f6c4c')
 
-      expect(page.status_code).to eq(200)
+      expect(page).to have_selector('.qa-branches-select', text: '645f6c4c82fd3f5e06f67134450a570b795e55a6')
     end
 
     context 'for signed commit on default branch', :js do

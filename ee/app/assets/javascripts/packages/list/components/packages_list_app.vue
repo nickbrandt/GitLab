@@ -1,39 +1,22 @@
 <script>
-import { GlEmptyState } from '@gitlab/ui';
+import { mapActions, mapState } from 'vuex';
+import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 import PackageList from './packages_list.vue';
 
 export default {
   components: {
     GlEmptyState,
+    GlLoadingIcon,
     PackageList,
   },
-  props: {
-    projectId: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    groupId: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    canDestroyPackage: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    emptyListIllustration: {
-      type: String,
-      required: true,
-    },
-    emptyListHelpUrl: {
-      type: String,
-      required: true,
-    },
-  },
   computed: {
+    ...mapState({
+      isLoading: 'isLoading',
+      resourceId: state => state.config.resourceId,
+      emptyListIllustration: state => state.config.emptyListIllustration,
+      emptyListHelpUrl: state => state.config.emptyListHelpUrl,
+    }),
     emptyListText() {
       return sprintf(
         s__(
@@ -47,11 +30,24 @@ export default {
       );
     },
   },
+  mounted() {
+    this.requestPackagesList();
+  },
+  methods: {
+    ...mapActions(['requestPackagesList', 'requestDeletePackage']),
+    onPageChanged(page) {
+      return this.requestPackagesList({ page });
+    },
+    onPackageDeleteRequest(packageId) {
+      return this.requestDeletePackage({ projectId: this.resourceId, packageId });
+    },
+  },
 };
 </script>
 
 <template>
-  <package-list :can-destroy-package="canDestroyPackage">
+  <gl-loading-icon v-if="isLoading" />
+  <package-list v-else @page:changed="onPageChanged" @package:delete="onPackageDeleteRequest">
     <template #empty-state>
       <gl-empty-state
         :title="s__('PackageRegistry|There are no packages yet')"

@@ -58,6 +58,8 @@ GET /projects
 | `wiki_checksum_failed`        | boolean | no | **(PREMIUM)** Limit projects where the wiki checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
 | `repository_checksum_failed`  | boolean | no | **(PREMIUM)** Limit projects where the repository checksum calculation has failed ([Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/6137) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.2) |
 | `min_access_level`            | integer | no | Limit by current user minimal [access level](members.md) |
+| `id_after`                    | integer | no | Limit results to projects with IDs greater than the specified ID |
+| `id_before`                   | integer | no | Limit results to projects with IDs less than the specified ID |
 
 When `simple=true` or the user is unauthenticated this returns something like:
 
@@ -304,6 +306,8 @@ GET /users/:user_id/projects
 | `with_merge_requests_enabled` | boolean | no | Limit by enabled merge requests feature |
 | `with_programming_language` | string | no | Limit by projects which use the given programming language |
 | `min_access_level` | integer | no | Limit by current user minimal [access level](members.md) |
+| `id_after`                    | integer | no | Limit results to projects with IDs greater than the specified ID |
+| `id_before`                   | integer | no | Limit results to projects with IDs less than the specified ID |
 
 ```json
 [
@@ -944,6 +948,7 @@ POST /projects
 | `mirror_trigger_builds` | boolean | no | **(STARTER)** Pull mirroring triggers builds |
 | `initialize_with_readme` | boolean | no | `false` by default |
 | `template_name` | string | no | When used without `use_custom_template`, name of a [built-in project template](../gitlab-basics/create-project.md#built-in-templates). When used with `use_custom_template`, name of a custom project template |
+| `template_project_id` | integer | no | **(PREMIUM)** When used with `use_custom_template`, project ID of a custom project template. This is preferable to using `template_name` since `template_name` may be ambiguous. |
 | `use_custom_template` | boolean | no | **(PREMIUM)** Use either custom [instance](../user/admin_area/custom_project_templates.md) or [group](../user/group/custom_project_templates.md) (with `group_with_project_templates_id`) project template |
 | `group_with_project_templates_id` | integer | no | **(PREMIUM)** For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires `use_custom_template` to be true |
 

@@ -135,6 +135,8 @@ The following job parameters can be defined inside a `default:` block:
 - [`before_script`](#before_script-and-after_script)
 - [`after_script`](#before_script-and-after_script)
 - [`cache`](#cache)
+- [`retry`](#retry)
+- [`timeout`](#timeout)
 - [`interruptible`](#interruptible)
 
 In the following example, the `ruby:2.5` image is set as the default for all
@@ -181,6 +183,17 @@ For example, commands that contain a colon (`:`) need to be wrapped in quotes so
 that the YAML parser knows to interpret the whole thing as a string rather than
 a "key: value" pair. Be careful when using special characters:
 `:`, `{`, `}`, `[`, `]`, `,`, `&`, `*`, `#`, `?`, `|`, `-`, `<`, `>`, `=`, `!`, `%`, `@`, `` ` ``.
+
+If any of the script commands return an exit code different from zero, the job
+will fail and further commands will not be executed. This behavior can be avoided by
+storing the exit code in a variable:
+
+```yaml
+job:
+  script:
+    - false && true; exit_code=$?
+    - if [ $exit_code -ne 0 ]; then echo "Previous command failed"; fi;
+```
 
 #### YAML anchors for `script`
 
@@ -262,13 +275,13 @@ For more information, see see [Available settings for `services`](../docker/usin
 
 `before_script` is used to define a command that should be run before each
 job, including deploy jobs, but after the restoration of any [artifacts](#artifacts).
-This must be an an array.
+This must be an array.
 
 Scripts specified in `before_script` are concatenated with any scripts specified
 in the main [`script`](#script), and executed together in a single shell.
 
 `after_script` is used to define the command that will be run after each
-job, including failed ones. This must be an an array.
+job, including failed ones. This must be an array.
 
 Scripts specified in `after_script` are executed in a new shell, separate from any
 `before_script` or `script` scripts. As a result, they:
@@ -1232,11 +1245,12 @@ Delayed job are for executing scripts after a certain period.
 This is useful if you want to avoid jobs entering `pending` state immediately.
 
 You can set the period with `start_in` key. The value of `start_in` key is an elapsed time in seconds, unless a unit is
-provided. `start_in` key must be less than or equal to one hour. Examples of valid values include:
+provided. `start_in` key must be less than or equal to one week. Examples of valid values include:
 
 - `10 seconds`
 - `30 minutes`
-- `1 hour`
+- `1 day`
+- `1 week`
 
 When there is a delayed job in a stage, the pipeline will not progress until the delayed job has finished.
 This means this keyword can also be used for inserting delays between different stages.
@@ -1534,6 +1548,73 @@ cache:
   paths:
     - binaries/
 ```
+
+##### `cache:key:files`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/18986) in GitLab v12.5.
+
+The `cache:key:files` keyword extends the `cache:key` functionality by making it easier
+to reuse some caches, and rebuild them less often, which will speed up subsequent pipeline
+runs.
+
+When you include `cache:key:files`, you must also list the project files that will be used to generate the key, up to a maximum of two files.
+The cache `key` will be a SHA checksum computed from the most recent commits (up to two, if two files are listed)
+that changed the given files. If neither file was changed in any commits,
+the fallback key will be `default`.
+
+```yaml
+cache:
+  key:
+    files:
+      - Gemfile.lock
+      - package.json
+  paths:
+    - vendor/ruby
+    - node_modules
+```
+
+In this example we are creating a cache for Ruby and Nodejs dependencies that
+is tied to current versions of the `Gemfile.lock` and `package.json` files. Whenever one of
+these files changes, a new cache key is computed and a new cache is created. Any future
+job runs using the same `Gemfile.lock` and `package.json`  with `cache:key:files` will
+use the new cache, instead of rebuilding the dependencies.
+
+##### `cache:key:prefix`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/18986) in GitLab v12.5.
+The `prefix` parameter adds extra functionality to `key:files` by allowing the key to
+be composed of the given `prefix` combined with the SHA computed for `cache:key:files`.
+For example, adding a `prefix` of `test`, will cause keys to look like: `test-feef9576d21ee9b6a32e30c5c79d0a0ceb68d1e5`.
+If neither file was changed in any commits, the prefix is added to `default`, so the
+key in the example would be `test-default`.
+
+Like `cache:key`, `prefix` can use any of the [predefined variables](../variables/README.md),
+but the following are not allowed:
+
+- the `/` character (or the equivalent URI-encoded `%2F`)
+- a value made only of `.` (or the equivalent URI-encoded `%2E`)
+
+```yaml
+cache:
+  key:
+    files:
+      - Gemfile.lock
+    prefix: ${CI_JOB_NAME}
+  paths:
+    - vendor/ruby
+
+rspec:
+  script:
+    - bundle exec rspec
+```
+
+For example, adding a `prefix` of `$CI_JOB_NAME` will
+cause the key to look like: `rspec-feef9576d21ee9b6a32e30c5c79d0a0ceb68d1e5` and
+the job cache is shared across different branches. If a branch changes
+`Gemfile.lock`, that branch will have a new SHA checksum for `cache:key:files`. A new cache key
+will be generated, and a new cache will be created for that key.
+If `Gemfile.lock` is not found, the prefix is added to
+`default`, so the key in the example would be `rspec-default`.
 
 #### `cache:untracked`
 
@@ -2151,6 +2232,49 @@ This example creates three paths of execution:
   current stage is not possible either, but support [is planned](https://gitlab.com/gitlab-org/gitlab/issues/30632).
 - Related to the above, stages must be explicitly defined for all jobs
   that have the keyword `needs:` or are referred to by one.
+
+#### Artifact downloads with `needs`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/14311) in GitLab v12.6.
+
+When using `needs`, artifact downloads are controlled with `artifacts: true` or `artifacts: false`.
+The `dependencies` keyword should not be used with `needs`, as this is deprecated since GitLab 12.6.
+
+In the example below, the `rspec` job will download the `build_job` artifacts, while the
+`rubocop` job will not:
+
+```yaml
+build_job:
+  stage: build
+  artifacts:
+    paths:
+      - binaries/
+
+rspec:
+  stage: test
+  needs:
+    - job: build_job
+      artifacts: true
+
+rubocop:
+  stage: test
+  needs:
+    - job: build_job
+      artifacts: false
+```
+
+Additionally, in the three syntax examples below, the `rspec` job will download the artifacts
+from all three `build_jobs`, as `artifacts` is true for `build_job_1`, and will
+**default** to true for both `build_job_2` and `build_job_3`.
+
+```yaml
+rspec:
+  needs:
+    - job: build_job_1
+      artifacts: true
+    - job: build_job_2
+    - build_job_3
+```
 
 ### `coverage`
 

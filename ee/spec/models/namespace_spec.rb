@@ -618,6 +618,69 @@ describe Namespace do
     end
   end
 
+  describe '#shared_runners_remaining_minutes_percent' do
+    let(:namespace) { build(:namespace) }
+    subject { namespace.shared_runners_remaining_minutes_percent }
+
+    it 'returns the minutes left as a percent of the limit' do
+      stub_minutes_used_and_limit(8, 10)
+
+      expect(subject).to eq(20)
+    end
+
+    it 'returns 100 when minutes used are 0' do
+      stub_minutes_used_and_limit(0, 10)
+
+      expect(subject).to eq(100)
+    end
+
+    it 'returns 0 when the limit is 0' do
+      stub_minutes_used_and_limit(0, 0)
+
+      expect(subject).to eq(0)
+    end
+
+    it 'returns 0 when the limit is nil' do
+      stub_minutes_used_and_limit(nil, nil)
+
+      expect(subject).to eq(0)
+    end
+
+    it 'returns 0 when minutes used are over the limit' do
+      stub_minutes_used_and_limit(11, 10)
+
+      expect(subject).to eq(0)
+    end
+
+    it 'returns 0 when minutes used are equal to the limit' do
+      stub_minutes_used_and_limit(10, 10)
+
+      expect(subject).to eq(0)
+    end
+
+    def stub_minutes_used_and_limit(minutes_used, limit)
+      allow(namespace).to receive(:shared_runners_minutes).and_return(minutes_used)
+      allow(namespace).to receive(:actual_shared_runners_minutes_limit).and_return(limit)
+    end
+  end
+
+  describe '#shared_runners_remaining_minutes_below_threshold?' do
+    let(:namespace) { build(:namespace, last_ci_minutes_usage_notification_level: 30) }
+    subject { namespace.shared_runners_remaining_minutes_below_threshold? }
+
+    it 'is true when minutes left is below the notification level' do
+      allow(namespace).to receive(:shared_runners_remaining_minutes_percent).and_return(10)
+
+      expect(subject).to be_truthy
+    end
+
+    it 'is false when minutes left is not below the notification level' do
+      allow(namespace).to receive(:shared_runners_remaining_minutes_percent).and_return(80)
+
+      expect(subject).to be_falsey
+    end
+  end
+
   describe '#actual_plan' do
     context 'when namespace has a plan associated' do
       before do
@@ -668,6 +731,32 @@ describe Namespace do
           expect(namespace.gitlab_subscription).to be_present
         end
       end
+
+      context 'when namespace is a subgroup with a parent' do
+        let(:subgroup) { create(:namespace, parent: namespace) }
+
+        context 'when free plan does exist' do
+          before do
+            free_plan
+          end
+
+          it 'does not generates a subscription' do
+            expect(subgroup.actual_plan).to eq(free_plan)
+            expect(subgroup.gitlab_subscription).not_to be_present
+          end
+        end
+
+        context 'when namespace has a subscription associated' do
+          before do
+            create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+          end
+
+          it 'returns the plan from the subscription' do
+            expect(subgroup.actual_plan).to eq(gold_plan)
+            expect(subgroup.gitlab_subscription).not_to be_present
+          end
+        end
+      end
     end
   end
 
@@ -685,6 +774,26 @@ describe Namespace do
     context 'when namespace does not have subscription associated' do
       it 'returns a free plan name' do
         expect(namespace.actual_plan_name).to eq 'free'
+      end
+    end
+
+    context 'when namespace is a subgroup with a parent' do
+      let(:subgroup) { create(:namespace, parent: namespace) }
+
+      context 'when namespace has a subscription associated' do
+        before do
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+        end
+
+        it 'returns an associated plan name' do
+          expect(subgroup.actual_plan_name).to eq 'gold'
+        end
+      end
+
+      context 'when namespace does not have subscription associated' do
+        it 'returns a free plan name' do
+          expect(subgroup.actual_plan_name).to eq 'free'
+        end
       end
     end
   end

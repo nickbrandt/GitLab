@@ -1,13 +1,12 @@
 import Vue from 'vue';
 import { mapState, mapActions } from 'vuex';
-import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { defaultDaysInPast } from './constants';
 import store from './store';
 import FilterDropdowns from './components/filter_dropdowns.vue';
 import DateRange from '../shared/components/daterange.vue';
 import ProductivityAnalyticsApp from './components/app.vue';
 import FilteredSearchProductivityAnalytics from './filtered_search_productivity_analytics';
-import { getLabelsEndpoint, getMilestonesEndpoint } from './utils';
+import { getLabelsEndpoint, getMilestonesEndpoint, getDefaultStartDate } from './utils';
 
 export default () => {
   const container = document.getElementById('js-productivity-analytics');
@@ -20,11 +19,11 @@ export default () => {
   const appContainer = container.querySelector('.js-productivity-analytics-app-container');
 
   const { endpoint, emptyStateSvgPath, noAccessSvgPath } = appContainer.dataset;
-  const { startDate: minDate } = timeframeContainer.dataset;
+  const { startDate: computedStartDate } = timeframeContainer.dataset;
 
-  const now = new Date(Date.now());
-  const defaultStartDate = getDateInPast(now, defaultDaysInPast);
-  const defaultEndDate = now;
+  const minDate = computedStartDate ? new Date(computedStartDate) : null;
+  const defaultStartDate = getDefaultStartDate(minDate, defaultDaysInPast);
+  const defaultEndDate = new Date(Date.now());
 
   let filterManager;
 
@@ -98,7 +97,7 @@ export default () => {
           show: this.groupNamespace !== null,
           startDate: defaultStartDate,
           endDate: defaultEndDate,
-          minDate: minDate ? new Date(minDate) : null,
+          minDate,
         },
         on: {
           change: this.onDateRangeChange,

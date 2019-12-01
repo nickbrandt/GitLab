@@ -7,6 +7,7 @@ import StageEventList from './stage_event_list.vue';
 import StageTableHeader from './stage_table_header.vue';
 import AddStageButton from './add_stage_button.vue';
 import CustomStageForm from './custom_stage_form.vue';
+import { STAGE_ACTIONS } from '../constants';
 
 export default {
   name: 'StageTable',
@@ -41,6 +42,10 @@ export default {
       required: true,
     },
     isAddingCustomStage: {
+      type: Boolean,
+      required: true,
+    },
+    isSavingCustomStage: {
       type: Boolean,
       required: true,
     },
@@ -95,21 +100,24 @@ export default {
           title: this.stageName,
           description: __('The collection of events added to the data gathered for that stage.'),
           classes: 'event-header pl-3',
+          displayHeader: !this.isAddingCustomStage,
         },
         {
           title: __('Total Time'),
           description: __('The time taken by each data entry gathered by that stage.'),
           classes: 'total-time-header pr-5 text-right',
+          displayHeader: !this.isAddingCustomStage,
         },
       ];
     },
   },
   methods: {
-    selectStage(stage) {
-      this.$emit('selectStage', stage);
+    // TODO: DRY These up
+    hideStage(stageId) {
+      this.$emit(STAGE_ACTIONS.HIDE, { id: stageId, hidden: true });
     },
-    showAddStageForm() {
-      this.$emit('showAddStageForm');
+    removeStage(stageId) {
+      this.$emit(STAGE_ACTIONS.REMOVE, stageId);
     },
   },
 };
@@ -121,7 +129,8 @@ export default {
         <nav class="col-headers">
           <ul>
             <stage-table-header
-              v-for="({ title, description, classes }, i) in stageHeaders"
+              v-for="({ title, description, classes, displayHeader = true }, i) in stageHeaders"
+              v-show="displayHeader"
               :key="`stage-header-${i}`"
               :header-classes="classes"
               :title="title"
@@ -139,13 +148,16 @@ export default {
               :title="stage.title"
               :value="stage.value"
               :is-active="!isAddingCustomStage && stage.id === currentStage.id"
+              :can-edit="canEditStages"
               :is-default-stage="!stage.custom"
-              @select="selectStage(stage)"
+              @select="$emit('selectStage', stage)"
+              @remove="removeStage(stage.id)"
+              @hide="hideStage(stage.id)"
             />
             <add-stage-button
               v-if="canEditStages"
               :active="isAddingCustomStage"
-              @showform="showAddStageForm"
+              @showform="$emit('showAddStageForm')"
             />
           </ul>
         </nav>
@@ -155,6 +167,8 @@ export default {
             v-else-if="isAddingCustomStage"
             :events="customStageFormEvents"
             :labels="labels"
+            :is-saving-custom-stage="isSavingCustomStage"
+            @submit="$emit('submit', $event)"
           />
           <template v-else>
             <stage-event-list

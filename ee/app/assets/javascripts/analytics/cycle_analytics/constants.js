@@ -29,3 +29,13 @@ export const EMPTY_STAGE_TEXT = {
     'The production stage shows the total time it takes between creating an issue and deploying the code to production. The data will be automatically added once you have completed the full idea to production cycle.',
   ),
 };
+
+export const TASKS_BY_TYPE_SUBJECT_ISSUE = 'Issue';
+export const TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST = 'MergeRequest';
+
+export const STAGE_ACTIONS = {
+  EDIT: 'editStage',
+  REMOVE: 'removeStage',
+  SAVE: 'saveStage',
+  HIDE: 'hideStage',
+};

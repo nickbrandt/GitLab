@@ -15,7 +15,6 @@ describe 'Environment > Pod Logs', :js do
 
   before do
     stub_licensed_features(pod_logs: true)
-    stub_feature_flags(environment_logs_use_vue_ui: false)
 
     create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
     create(:deployment, :success, environment: environment)
@@ -35,14 +34,34 @@ describe 'Environment > Pod Logs', :js do
     sign_in(project.owner)
   end
 
+  it "shows environments in dropdown" do
+    create(:environment, project: project)
+
+    visit logs_project_environment_path(environment.project, environment, pod_name: pod_name)
+
+    wait_for_requests
+
+    page.within('.js-environments-dropdown') do
+      toggle = find(".dropdown-menu-toggle:not([disabled])")
+
+      expect(toggle).to have_content(environment.name)
+
+      toggle.click
+
+      dropdown_items = find(".dropdown-menu").all(".dropdown-item")
+      expect(dropdown_items.first).to have_content(environment.name)
+      expect(dropdown_items.size).to eq(2)
+    end
+  end
+
   context 'with logs', :use_clean_rails_memory_store_caching do
     it "shows pod logs", :sidekiq_might_not_need_inline do
       visit logs_project_environment_path(environment.project, environment, pod_name: pod_name)
 
       wait_for_requests
 
-      page.within('.js-pod-dropdown') do
-        find(".dropdown-menu-toggle").click
+      page.within('.js-pods-dropdown') do
+        find(".dropdown-menu-toggle:not([disabled])").click
 
         dropdown_items = find(".dropdown-menu").all(".dropdown-item")
         expect(dropdown_items.size).to eq(2)
@@ -51,7 +70,7 @@ describe 'Environment > Pod Logs', :js do
           expect(item.text).to eq(pod_names[i])
         end
       end
-      expect(page).to have_content("Log 1\\nLog 2\\nLog 3")
+      expect(page).to have_content("Log 1 Log 2 Log 3")
     end
   end
 

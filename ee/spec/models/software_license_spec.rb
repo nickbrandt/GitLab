@@ -39,8 +39,24 @@ describe SoftwareLicense do
   describe 'scopes' do
     subject { described_class }
 
-    let!(:mit) { create(:software_license, :mit, spdx_identifier: 'MIT') }
-    let!(:apache_2) { create(:software_license, :apache_2_0, spdx_identifier: nil) }
+    let_it_be(:mit) { create(:software_license, :mit, spdx_identifier: 'MIT') }
+    let_it_be(:apache_2) { create(:software_license, :apache_2_0, spdx_identifier: nil) }
+
+    describe '.by_spdx' do
+      it { expect(subject.by_spdx(mit.spdx_identifier)).to contain_exactly(mit) }
+    end
+
+    describe '.spdx' do
+      it { expect(subject.spdx).to contain_exactly(mit) }
+    end
+
+    describe '.by_spdx' do
+      it { expect(subject.by_spdx(mit.spdx_identifier)).to contain_exactly(mit) }
+    end
+
+    describe '.spdx' do
+      it { expect(subject.spdx).to contain_exactly(mit) }
+    end
 
     describe '.by_name' do
       it { expect(subject.by_name(mit.name)).to contain_exactly(mit) }

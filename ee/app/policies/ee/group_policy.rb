@@ -45,6 +45,10 @@ module EE
         @subject.feature_available?(:cluster_deployments)
       end
 
+      condition(:group_saml_enabled) do
+        @subject.saml_provider&.enabled?
+      end
+
       rule { reporter }.policy do
         enable :admin_list
         enable :admin_board
@@ -134,6 +138,10 @@ module EE
 
       rule { ip_enforcement_prevents_access & ~owner }.policy do
         prevent :read_group
+      end
+
+      rule { owner & group_saml_enabled }.policy do
+        enable :read_group_saml_identity
       end
     end
 

@@ -1,4 +1,4 @@
-/* eslint-disable one-var, no-var, no-shadow, no-else-return */
+/* eslint-disable no-shadow, no-else-return */
 
 import $ from 'jquery';
 import '~/gl_dropdown';
@@ -7,11 +7,10 @@ function WeightSelect(els, options = {}) {
   const $els = $(els || '.js-weight-select');
 
   $els.each((i, dropdown) => {
-    var $block, $dropdown, $selectbox, $value;
-    $dropdown = $(dropdown);
-    $selectbox = $dropdown.closest('.selectbox');
-    $block = $selectbox.closest('.block');
-    $value = $block.find('.value');
+    const $dropdown = $(dropdown);
+    const $selectbox = $dropdown.closest('.selectbox');
+    const $block = $selectbox.closest('.block');
+    const $value = $block.find('.value');
     $block.find('.block-loading').fadeOut();
     const fieldName = options.fieldName || $dropdown.data('fieldName');
     const inputField = $dropdown.closest('.selectbox').find(`input[name='${fieldName}']`);

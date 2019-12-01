@@ -1,4 +1,5 @@
 import Vuex from 'vuex';
+import { GlEmptyState } from '@gitlab/ui';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import GroupSecurityDashboard from 'ee/security_dashboard/components/group_security_dashboard.vue';
 import SecurityDashboard from 'ee/security_dashboard/components/app.vue';
@@ -18,7 +19,7 @@ describe('Group Security Dashboard component', () => {
   let store;
   let wrapper;
 
-  const factory = () => {
+  const factory = options => {
     store = new Vuex.Store({
       modules: {
         projects: {
@@ -45,6 +46,7 @@ describe('Group Security Dashboard component', () => {
         vulnerabilitiesHistoryEndpoint,
         vulnerabilityFeedbackHelpPath,
       },
+      ...options,
     });
   };
 
@@ -69,14 +71,28 @@ describe('Group Security Dashboard component', () => {
       expect(dashboard.exists()).toBe(true);
       expect(dashboard.props()).toEqual(
         expect.objectContaining({
-          dashboardDocumentation,
-          emptyStateSvgPath,
           vulnerabilitiesEndpoint,
           vulnerabilitiesCountEndpoint,
           vulnerabilitiesHistoryEndpoint,
           vulnerabilityFeedbackHelpPath,
         }),
       );
+    });
+  });
+
+  describe('with a stubbed dashboard for slot testing', () => {
+    beforeEach(() => {
+      factory({
+        stubs: {
+          'security-dashboard': { template: '<div><slot name="emptyState"></slot></div>' },
+        },
+      });
+    });
+
+    it('renders empty state component with correct props', () => {
+      const emptyState = wrapper.find(GlEmptyState);
+
+      expect(emptyState.attributes('title')).toBe('No vulnerabilities found for this group');
     });
   });
 });

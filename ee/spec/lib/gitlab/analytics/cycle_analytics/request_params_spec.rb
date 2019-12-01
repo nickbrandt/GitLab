@@ -40,4 +40,34 @@ describe Gitlab::Analytics::CycleAnalytics::RequestParams do
   it 'casts `created_before` to date' do
     expect(subject.created_before).to be_a_kind_of(Date)
   end
+
+  describe 'optional `project_ids`' do
+    it { expect(subject.project_ids).to eq([]) }
+
+    context 'when `project_ids` is not empty' do
+      let(:project_ids) { [1, 2, 3] }
+
+      before do
+        params[:project_ids] = project_ids
+      end
+
+      it { expect(subject.project_ids).to eq(project_ids) }
+    end
+
+    context 'when `project_ids` is not an array' do
+      before do
+        params[:project_ids] = 1
+      end
+
+      it { expect(subject.project_ids).to eq([1]) }
+    end
+
+    context 'when `project_ids` is nil' do
+      before do
+        params[:project_ids] = nil
+      end
+
+      it { expect(subject.project_ids).to eq([]) }
+    end
+  end
 end

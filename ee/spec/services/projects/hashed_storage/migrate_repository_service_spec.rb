@@ -8,7 +8,8 @@ describe Projects::HashedStorage::MigrateRepositoryService do
   let(:project) { create(:project, :empty_repo, :wiki_repo, :legacy_storage) }
   let(:legacy_storage) { Storage::LegacyProject.new(project) }
   let(:hashed_storage) { Storage::HashedProject.new(project) }
-  let(:service) { described_class.new(project, legacy_storage.disk_path) }
+
+  subject { described_class.new(project: project, old_disk_path: legacy_storage.disk_path) }
 
   describe '#execute' do
     set(:primary) { create(:geo_node, :primary) }
@@ -20,7 +21,7 @@ describe Projects::HashedStorage::MigrateRepositoryService do
     end
 
     it 'creates a Geo::HashedStorageMigratedEvent on success' do
-      expect { service.execute }.to change(Geo::EventLog, :count).by(1)
+      expect { subject.execute }.to change(Geo::EventLog, :count).by(1)
 
       event = Geo::EventLog.first.event
 
@@ -39,10 +40,10 @@ describe Projects::HashedStorage::MigrateRepositoryService do
       from_name = project.disk_path
       to_name = hashed_storage.disk_path
 
-      allow(service).to receive(:move_repository).and_call_original
-      allow(service).to receive(:move_repository).with(from_name, to_name).once { false } # will disable first move only
+      allow(subject).to receive(:move_repository).and_call_original
+      allow(subject).to receive(:move_repository).with(from_name, to_name).once { false } # will disable first move only
 
-      expect { service.execute }.not_to change { Geo::EventLog.count }
+      expect { subject.execute }.not_to change { Geo::EventLog.count }
     end
   end
 end

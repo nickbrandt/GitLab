@@ -5,6 +5,9 @@ require 'spec_helper'
 describe OperationsController do
   include Rails.application.routes.url_helpers
 
+  PUBLIC = Gitlab::VisibilityLevel::PUBLIC
+  PRIVATE = Gitlab::VisibilityLevel::PRIVATE
+
   let(:user) { create(:user) }
 
   shared_examples 'unlicensed' do |http_method, action|
@@ -163,6 +166,22 @@ describe OperationsController do
         expect(expected_project['alert_count']).to eq(firing_alert_events.size)
         expect(expected_project['alert_path']).to eq(alert_path)
         expect(expected_project['last_alert']['id']).to eq(last_firing_alert.id)
+      end
+
+      it "returns as many projects as are in the user's dashboard" do
+        projects = Array.new(8).map do
+          project = create(:project)
+          project.add_developer(user)
+          project
+        end
+        user.update!(ops_dashboard_projects: projects)
+
+        get :list
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('dashboard/operations/list', dir: 'ee')
+
+        expect(json_response['projects'].size).to eq(8)
       end
 
       it 'returns a list of added projects regardless of the environments_dashboard feature flag' do
@@ -435,6 +454,105 @@ describe OperationsController do
           expect(last_deployment_json['id']).to eq(deployment.id)
         end
 
+        it 'returns a maximum of seven projects' do
+          projects = Array.new(8).map do
+            project = create(:project)
+            project.add_developer(user)
+            project
+          end
+          user.update!(ops_dashboard_projects: projects)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+          expect(json_response['projects'].count).to eq(7)
+        end
+
+        it 'does not return a project for which the operations dashboard feature is unavailable' do
+          stub_application_setting(check_namespace_plan: true)
+          namespace = create(:namespace, visibility_level: PRIVATE)
+          unavailable_project = create(:project, namespace: namespace, visibility_level: PRIVATE)
+          unavailable_project.add_developer(user)
+          user.update!(ops_dashboard_projects: [unavailable_project])
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+          expect(json_response['projects'].count).to eq(0)
+        end
+
+        it 'returns seven projects when some projects do not have the dashboard feature available' do
+          stub_application_setting(check_namespace_plan: true)
+
+          public_namespace = create(:namespace, visibility_level: PUBLIC)
+          public_projects = Array.new(7).map do
+            project = create(:project, namespace: public_namespace, visibility_level: PUBLIC)
+            project.add_developer(user)
+            project
+          end
+
+          private_namespace = create(:namespace, visibility_level: PRIVATE)
+          private_project = create(:project, namespace: private_namespace, visibility_level: PRIVATE)
+          private_project.add_developer(user)
+
+          all_projects = [private_project] + public_projects
+          user.update!(ops_dashboard_projects: all_projects)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+          expect(json_response['projects'].count).to eq(7)
+
+          actual_ids = json_response['projects'].map { |p| p['id'].to_i }
+          expected_ids = public_projects.map(&:id)
+
+          expect(actual_ids).to contain_exactly(*expected_ids)
+        end
+
+        it 'returns a maximum of three environments for a project' do
+          create(:environment, project: project)
+          create(:environment, project: project)
+          create(:environment, project: project)
+          create(:environment, project: project)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+
+          expect(project_json['environments'].count).to eq(3)
+        end
+
+        it 'returns a maximum of three environments for multiple projects' do
+          project_b = create(:project)
+          project_b.add_developer(user)
+          create(:environment, project: project)
+          create(:environment, project: project)
+          create(:environment, project: project)
+          create(:environment, project: project)
+          create(:environment, project: project_b)
+          create(:environment, project: project_b)
+          create(:environment, project: project_b)
+          create(:environment, project: project_b)
+          user.update!(ops_dashboard_projects: [project, project_b])
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].find { |p| p['id'] == project.id }
+          project_b_json = json_response['projects'].find { |p| p['id'] == project_b.id }
+
+          expect(project_json['environments'].count).to eq(3)
+          expect(project_b_json['environments'].count).to eq(3)
+        end
+
         context 'with a pipeline' do
           let(:project) { create(:project, :repository) }
           let(:commit) { project.commit }
@@ -460,6 +578,8 @@ describe OperationsController do
             last_pipeline_json = environment_json['last_pipeline']
 
             expect(last_pipeline_json['id']).to eq(pipeline.id)
+            expect(last_pipeline_json['triggered']).to eq([])
+            expect(last_pipeline_json['triggered_by']).to be_nil
           end
 
           it 'returns the last pipeline details' do
@@ -475,8 +595,73 @@ describe OperationsController do
             project_json = json_response['projects'].first
             environment_json = project_json['environments'].first
             last_pipeline_json = environment_json['last_pipeline']
+            expected_details_path = project_pipeline_path(project, pipeline)
 
             expect(last_pipeline_json.dig('details', 'status', 'group')).to eq('canceled')
+            expect(last_pipeline_json.dig('details', 'status', 'tooltip')).to eq('canceled')
+            expect(last_pipeline_json.dig('details', 'status', 'details_path')).to eq(expected_details_path)
+          end
+
+          it 'returns an upstream pipeline' do
+            project_b = create(:project, :repository)
+            project_b.add_developer(user)
+            commit_b = project_b.commit
+            pipeline_b = create(:ci_pipeline, project: project_b, user: user, sha: commit_b.sha)
+            ci_build_b = create(:ci_build, project: project_b, pipeline: pipeline_b)
+            pipeline = create(:ci_pipeline, project: project, user: user, sha: commit.sha)
+            ci_build = create(:ci_build, project: project, pipeline: pipeline)
+            create(:deployment, :success, project: project, environment: environment, deployable: ci_build, sha: commit.sha)
+            create(:ci_sources_pipeline, project: project, pipeline: pipeline, source_project: project_b, source_pipeline: pipeline_b, source_job: ci_build_b)
+
+            get :environments_list
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+            project_json = json_response['projects'].first
+            environment_json = project_json['environments'].first
+            last_pipeline_json = environment_json['last_pipeline']
+            triggered_by_pipeline_json = last_pipeline_json['triggered_by']
+
+            expected_details_path = project_pipeline_path(project_b, pipeline_b)
+
+            expect(last_pipeline_json['id']).to eq(pipeline.id)
+            expect(triggered_by_pipeline_json['id']).to eq(pipeline_b.id)
+            expect(triggered_by_pipeline_json.dig('details', 'status', 'details_path')).to eq(expected_details_path)
+            expect(triggered_by_pipeline_json.dig('project', 'full_name')).to eq(project_b.full_name)
+          end
+
+          it 'returns a downstream pipeline' do
+            project_b = create(:project, :repository)
+            project_b.add_developer(user)
+            commit_b = project_b.commit
+            pipeline_b = create(:ci_pipeline, :failed, project: project_b, user: user, sha: commit_b.sha)
+            create(:ci_build, :failed, project: project_b, pipeline: pipeline_b)
+            pipeline = create(:ci_pipeline, project: project, user: user, sha: commit.sha)
+            ci_build = create(:ci_build, project: project, pipeline: pipeline)
+            create(:deployment, :success, project: project, environment: environment, deployable: ci_build, sha: commit.sha)
+            create(:ci_sources_pipeline, project: project_b, pipeline: pipeline_b, source_project: project, source_pipeline: pipeline, source_job: ci_build)
+
+            get :environments_list
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+            project_json = json_response['projects'].first
+            environment_json = project_json['environments'].first
+            last_pipeline_json = environment_json['last_pipeline']
+
+            expect(last_pipeline_json['triggered'].count).to eq(1)
+
+            triggered_pipeline_json = last_pipeline_json['triggered'].first
+
+            expected_details_path = project_pipeline_path(project_b, pipeline_b)
+
+            expect(last_pipeline_json['id']).to eq(pipeline.id)
+            expect(triggered_pipeline_json['id']).to eq(pipeline_b.id)
+            expect(triggered_pipeline_json.dig('details', 'status', 'details_path')).to eq(expected_details_path)
+            expect(triggered_pipeline_json.dig('details', 'status', 'group')).to eq('failed')
+            expect(triggered_pipeline_json.dig('project', 'full_name')).to eq(project_b.full_name)
           end
         end
       end

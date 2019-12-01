@@ -84,29 +84,11 @@ describe Admin::ClustersController do
           GoogleApi::CloudPlatform::Client.session_key_for_redirect_uri(key)
         end
 
-        before do
-          stub_feature_flags(create_eks_clusters: false)
-          allow(SecureRandom).to receive(:hex).and_return(key)
-        end
+        context 'when selected provider is gke and no valid gcp token exists' do
+          it 'redirects to gcp authorize_url' do
+            get_new
 
-        it 'has authorize_url' do
-          get_new
-
-          expect(assigns(:authorize_url)).to include(key)
-          expect(session[session_key_for_redirect_uri]).to eq(new_admin_cluster_path)
-        end
-
-        context 'when create_eks_clusters feature flag is enabled' do
-          before do
-            stub_feature_flags(create_eks_clusters: true)
-          end
-
-          context 'when selected provider is gke and no valid gcp token exists' do
-            it 'redirects to gcp authorize_url' do
-              get_new
-
-              expect(response).to redirect_to(assigns(:authorize_url))
-            end
+            expect(response).to redirect_to(assigns(:authorize_url))
           end
         end
       end
@@ -227,16 +209,17 @@ describe Admin::ClustersController do
 
     describe 'security' do
       before do
-        allow_any_instance_of(described_class)
-          .to receive(:token_in_session).and_return('token')
-        allow_any_instance_of(described_class)
-          .to receive(:expires_at_in_session).and_return(1.hour.since.to_i.to_s)
-        allow_any_instance_of(GoogleApi::CloudPlatform::Client)
-          .to receive(:projects_zones_clusters_create) do
-          OpenStruct.new(
-            self_link: 'projects/gcp-project-12345/zones/us-central1-a/operations/ope-123',
-            status: 'RUNNING'
-          )
+        allow_next_instance_of(described_class) do |instance|
+          allow(instance).to receive(:token_in_session).and_return('token')
+          allow(instance).to receive(:expires_at_in_session).and_return(1.hour.since.to_i.to_s)
+        end
+        allow_next_instance_of(GoogleApi::CloudPlatform::Client) do |instance|
+          allow(instance).to receive(:projects_zones_clusters_create) do
+            OpenStruct.new(
+              self_link: 'projects/gcp-project-12345/zones/us-central1-a/operations/ope-123',
+              status: 'RUNNING'
+            )
+          end
         end
 
         allow(WaitForClusterCreationWorker).to receive(:perform_in).and_return(nil)
@@ -447,6 +430,33 @@ describe Admin::ClustersController do
     end
   end
 
+  describe 'DELETE clear cluster cache' do
+    let(:cluster) { create(:cluster, :instance) }
+    let!(:kubernetes_namespace) do
+      create(:cluster_kubernetes_namespace,
+        cluster: cluster,
+        project: create(:project)
+      )
+    end
+
+    def go
+      delete :clear_cache, params: { id: cluster }
+    end
+
+    it 'deletes the namespaces associated with the cluster' do
+      expect { go }.to change { Clusters::KubernetesNamespace.count }
+
+      expect(response).to redirect_to(admin_cluster_path(cluster))
+      expect(cluster.kubernetes_namespaces).to be_empty
+    end
+
+    describe 'security' do
+      it { expect { go }.to be_allowed_for(:admin) }
+      it { expect { go }.to be_denied_for(:user) }
+      it { expect { go }.to be_denied_for(:external) }
+    end
+  end
+
   describe 'GET #cluster_status' do
     let(:cluster) { create(:cluster, :providing_by_gcp, :instance) }
 
@@ -467,7 +477,9 @@ describe Admin::ClustersController do
       end
 
       it 'invokes schedule_status_update on each application' do
-        expect_any_instance_of(Clusters::Applications::Ingress).to receive(:schedule_status_update)
+        expect_next_instance_of(Clusters::Applications::Ingress) do |instance|
+          expect(instance).to receive(:schedule_status_update)
+        end
 
         get_cluster_status
       end

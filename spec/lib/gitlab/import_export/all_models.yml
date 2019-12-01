@@ -15,6 +15,7 @@ issues:
 - user_agent_detail
 - moved_to
 - duplicated_to
+- promoted_to_epic
 - events
 - merge_requests_closing_issues
 - metrics
@@ -30,6 +31,8 @@ issues:
 - prometheus_alert_events
 - self_managed_prometheus_alert_events
 - zoom_meetings
+- vulnerability_links
+- related_vulnerabilities
 events:
 - author
 - project
@@ -136,6 +139,8 @@ merge_requests:
 - blocking_merge_requests
 - blocked_merge_requests
 - description_versions
+- deployment_merge_requests
+- deployments
 external_pull_requests:
 - project
 merge_request_diff:
@@ -340,7 +345,7 @@ project:
 - triggers
 - pipeline_schedules
 - environments
-- unfoldered_environments
+- environments_for_dashboard
 - deployments
 - project_feature
 - auto_devops
@@ -362,6 +367,7 @@ project:
 - root_of_fork_network
 - fork_network_member
 - fork_network
+- fork_network_projects
 - custom_attributes
 - lfs_file_locks
 - project_badges
@@ -426,6 +432,12 @@ project:
 - grafana_integration
 - remove_source_branch_after_merge
 - deleting_user
+- upstream_projects
+- downstream_projects
+- upstream_project_subscriptions
+- downstream_project_subscriptions
+- service_desk_setting
+- import_failures
 award_emoji:
 - awardable
 - user

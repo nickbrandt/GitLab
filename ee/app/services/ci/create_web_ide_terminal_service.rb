@@ -29,7 +29,11 @@ module Ci
       build_pipeline.tap do |pipeline|
         pipeline.stages << terminal_stage_seed(pipeline).to_resource
         pipeline.save!
-        pipeline.process!
+
+        Ci::ProcessPipelineService
+          .new(pipeline)
+          .execute
+
         pipeline_created_counter.increment(source: :webide)
       end
     end

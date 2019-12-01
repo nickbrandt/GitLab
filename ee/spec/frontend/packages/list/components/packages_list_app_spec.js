@@ -4,21 +4,38 @@ import PackageListApp from 'ee/packages/list/components/packages_list_app.vue';
 
 describe('packages_list_app', () => {
   let wrapper;
+
   const emptyListHelpUrl = 'helpUrl';
-  const findGlEmptyState = (w = wrapper) => w.find({ name: 'gl-empty-state-stub' });
+  const findGlEmptyState = () => wrapper.find({ name: 'gl-empty-state-stub' });
+  const findListComponent = () => wrapper.find({ name: 'package-list' });
+  const findLoadingComponent = () => wrapper.find({ name: 'gl-loading-icon' });
+
+  const componentConfig = {
+    stubs: {
+      'package-list': {
+        name: 'package-list',
+        template: '<div><slot name="empty-state"></slot></div>',
+      },
+      GlEmptyState: { ...GlEmptyState, name: 'gl-empty-state-stub' },
+      'gl-loading-icon': { name: 'gl-loading-icon', template: '<div>loading</div>' },
+    },
+    computed: {
+      isLoading: () => false,
+      emptyListIllustration: () => 'helpSvg',
+      emptyListHelpUrl: () => emptyListHelpUrl,
+      resourceId: () => 'project_id',
+    },
+    methods: {
+      requestPackagesList: jest.fn(),
+      requestDeletePackage: jest.fn(),
+      setProjectId: jest.fn(),
+      setGroupId: jest.fn(),
+      setUserCanDelete: jest.fn(),
+    },
+  };
 
   beforeEach(() => {
-    wrapper = shallowMount(PackageListApp, {
-      propsData: {
-        projectId: '1',
-        emptyListIllustration: 'helpSvg',
-        emptyListHelpUrl,
-      },
-      stubs: {
-        'package-list': '<div><slot name="empty-state"></slot></div>',
-        GlEmptyState: { ...GlEmptyState, name: 'gl-empty-state-stub' },
-      },
-    });
+    wrapper = shallowMount(PackageListApp, componentConfig);
   });
 
   afterEach(() => {
@@ -29,6 +46,21 @@ describe('packages_list_app', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
+  describe('when isLoading is true', () => {
+    beforeEach(() => {
+      wrapper = shallowMount(PackageListApp, {
+        ...componentConfig,
+        computed: {
+          isLoading: () => true,
+        },
+      });
+    });
+    it('shows the loading component', () => {
+      const loader = findLoadingComponent();
+      expect(loader.exists()).toBe(true);
+    });
+  });
+
   it('generate the correct empty list link', () => {
     const emptyState = findGlEmptyState();
     const link = emptyState.find('a');
@@ -36,5 +68,20 @@ describe('packages_list_app', () => {
     expect(link.html()).toMatchInlineSnapshot(
       `"<a href=\\"${emptyListHelpUrl}\\" target=\\"_blank\\">publish and share your packages</a>"`,
     );
+  });
+
+  it('call requestPackagesList on page:changed', () => {
+    const list = findListComponent();
+    list.vm.$emit('page:changed', 1);
+    expect(componentConfig.methods.requestPackagesList).toHaveBeenCalledWith({ page: 1 });
+  });
+
+  it('call requestDeletePackage on package:delete', () => {
+    const list = findListComponent();
+    list.vm.$emit('package:delete', 1);
+    expect(componentConfig.methods.requestDeletePackage).toHaveBeenCalledWith({
+      projectId: 'project_id',
+      packageId: 1,
+    });
   });
 });

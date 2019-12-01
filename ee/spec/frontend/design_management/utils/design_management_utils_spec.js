@@ -1,6 +1,7 @@
 import {
   extractCurrentDiscussion,
   extractDiscussions,
+  findVersionId,
 } from 'ee/design_management/utils/design_management_utils';
 
 describe('extractCurrentDiscussion', () => {
@@ -50,5 +51,20 @@ describe('extractDiscussions', () => {
       { id: 3, notes: ['c'] },
       { id: 4, notes: ['d'] },
     ]);
+  });
+});
+
+describe('version parser', () => {
+  it('correctly extracts version ID from a valid version string', () => {
+    const testVersionId = '123';
+    const testVersionString = `gid://gitlab/DesignManagement::Version/${testVersionId}`;
+
+    expect(findVersionId(testVersionString)).toEqual(testVersionId);
+  });
+
+  it('fails to extract version ID from an invalid version string', () => {
+    const testInvalidVersionString = `gid://gitlab/DesignManagement::Version`;
+
+    expect(findVersionId(testInvalidVersionString)).toBeUndefined();
   });
 });

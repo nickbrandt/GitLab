@@ -7,6 +7,7 @@ import FileQuantityDropdown from './file_quantity_dropdown.vue';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import { PROJECTS_PER_PAGE, DEFAULT_FILE_QUANTITY } from '../constants';
 import createStore from '../store';
+import { LAST_ACTIVITY_AT } from '../../shared/constants';
 
 export default {
   name: 'CodeAnalytics',
@@ -56,7 +57,7 @@ export default {
   projectsQueryParams: {
     per_page: PROJECTS_PER_PAGE,
     with_shared: false,
-    order_by: 'last_activity_at',
+    order_by: LAST_ACTIVITY_AT,
   },
 };
 </script>

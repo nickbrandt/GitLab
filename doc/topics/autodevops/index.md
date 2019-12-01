@@ -100,7 +100,7 @@ To make full use of Auto DevOps, you will need:
   To enable deployments, you will need:
 
   1. A [Kubernetes 1.12+ cluster](../../user/project/clusters/index.md) for the project. The easiest
-     way is to add a [new GKE cluster using the GitLab UI](../../user/project/clusters/add_remove_clusters.md#add-new-gke-cluster).
+     way is to add a [new cluster using the GitLab UI](../../user/project/clusters/add_remove_clusters.md#add-new-cluster).
   1. NGINX Ingress. You can deploy it to your Kubernetes cluster by installing
      the [GitLab-managed app for Ingress](../../user/clusters/applications.md#ingress),
      once you have configured GitLab's Kubernetes integration in the previous step.
@@ -766,10 +766,17 @@ or a `.buildpacks` file in your project:
   and add the URL of the buildpack to use on a line in the file. If you want to
   use multiple buildpacks, you can enter them in, one on each line.
 
-CAUTION: **Caution:**
-Using multiple buildpacks isn't yet supported by Auto DevOps.
+#### Multiple buildpacks
 
-CAUTION: **Caution:** When using the `.buildpacks` file, Auto Test will not work. The buildpack [heroku-buildpack-multi](https://github.com/heroku/heroku-buildpack-multi/) (which is used under the hood to parse the `.buildpacks` file) doesn't provide the necessary commands `bin/test-compile` and `bin/test`. Make sure to provide the project variable `BUILDPACK_URL` instead.
+Using multiple buildpacks isn't fully supported by Auto DevOps because, when using the `.buildpacks`
+file, Auto Test will not work.
+
+The buildpack [heroku-buildpack-multi](https://github.com/heroku/heroku-buildpack-multi/),
+which is used under the hood to parse the `.buildpacks` file, doesn't provide the necessary commands
+`bin/test-compile` and `bin/test`.
+
+If your goal is to use only a single custom buildpack, you should provide the project variable
+`BUILDPACK_URL` instead.
 
 ### Custom `Dockerfile`
 

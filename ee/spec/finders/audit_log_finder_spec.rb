@@ -18,7 +18,7 @@ describe AuditLogFinder do
       end
     end
 
-    context 'filtering by ID' do
+    context 'filtering by entity_id' do
       context 'no entity_type provided' do
         let(:params) { { entity_id: 1 } }
 
@@ -66,7 +66,7 @@ describe AuditLogFinder do
       end
     end
 
-    context 'filtering by type' do
+    context 'filtering by entity_type' do
       let(:entity_types) { subject.map(&:entity_type) }
 
       context 'User Event' do
@@ -134,6 +134,24 @@ describe AuditLogFinder do
 
         it 'returns events created between the given dates' do
           expect(subject).to contain_exactly(user_audit_event, project_audit_event)
+        end
+      end
+    end
+
+    context 'filtering by id' do
+      context 'non-existent id provided' do
+        let(:params) { { id: 'non-existent-id' } }
+
+        it 'returns nil' do
+          expect(subject).to be_nil
+        end
+      end
+
+      context 'existent id provided' do
+        let(:params) { { id: user_audit_event.id } }
+
+        it 'returns the specific audit events with the id' do
+          expect(subject).to eql(user_audit_event)
         end
       end
     end

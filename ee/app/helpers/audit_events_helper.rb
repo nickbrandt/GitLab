@@ -10,6 +10,8 @@ module AuditEventsHelper
   def select_keys(key, value)
     if key =~ /^(author|target)_.*/
       ""
+    elsif key.to_s == 'ip_address' && value.blank?
+      ""
     else
       "#{key} <strong>#{value}</strong>"
     end

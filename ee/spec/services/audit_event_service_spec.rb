@@ -5,7 +5,7 @@ require 'spec_helper'
 describe AuditEventService do
   let(:project) { create(:project) }
   let(:user) { create(:user) }
-  let(:project_member) { create(:project_member, user: user) }
+  let(:project_member) { create(:project_member, user: user, expires_at: 1.day.from_now) }
   let(:service) { described_class.new(user, project, { action: :destroy }) }
 
   describe '#for_member' do
@@ -24,6 +24,18 @@ describe AuditEventService do
     it 'has the IP address' do
       event = service.for_member(project_member).security_event
       expect(event[:details][:ip_address]).to eq(user.current_sign_in_ip)
+    end
+
+    context 'user access expiry' do
+      let(:service) { described_class.new(nil, project, { action: :expired }) }
+
+      it 'generates a system event' do
+        event = service.for_member(project_member).security_event
+
+        expect(event[:details][:remove]).to eq('user_access')
+        expect(event[:details][:system_event]).to be_truthy
+        expect(event[:details][:reason]).to include('access expired on')
+      end
     end
 
     context 'admin audit log licensed' do

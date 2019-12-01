@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
+import component from 'ee/vue_shared/security_reports/components/dismissal_comment_modal_footer.vue';
 import Tracking from '~/tracking';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
-import component from 'ee/vue_shared/security_reports/components/dismissal_comment_modal_footer.vue';
 
 jest.mock('~/tracking');
 

@@ -1,10 +1,10 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'helpers/vuex_action_helper';
 
 import createState from 'ee/vue_shared/security_reports/store/modules/sast/state';
 import * as types from 'ee/vue_shared/security_reports/store/modules/sast/mutation_types';
 import * as actions from 'ee/vue_shared/security_reports/store/modules/sast/actions';
+import axios from '~/lib/utils/axios_utils';
 
 const headPath = 'head-path.json';
 const basePath = 'base-path.json';

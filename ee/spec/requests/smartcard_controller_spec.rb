@@ -157,12 +157,13 @@ describe SmartcardController, type: :request do
     end
 
     let(:ldap_connection) { instance_double(::Net::LDAP) }
+    let(:ldap_email) { 'john.doe@example.com' }
     let(:ldap_entry) do
       Net::LDAP::Entry.new.tap do |entry|
         entry['dn'] = subject_ldap_dn
         entry['uid'] = 'john doe'
         entry['cn'] = 'John Doe'
-        entry['mail'] = 'john.doe@example.com'
+        entry['mail'] = ldap_email
       end
     end
     let(:ldap_user_search_scope) { 'dc=example,dc=com' }
@@ -205,16 +206,36 @@ describe SmartcardController, type: :request do
     end
 
     context 'user already exists' do
-      before do
-        user = create(:user)
+      let_it_be(:user) { create(:user) }
+
+      it 'finds existing user' do
         create(:identity, { provider: 'ldapmain',
                             extern_uid: subject_ldap_dn,
                             user: user })
+
+        expect { subject }.not_to change { User.count }
+
+        expect(request.env['warden']).to be_authenticated
       end
 
-      it 'finds existing user' do
-        expect { subject }.not_to change { User.count }
-        expect(request.env['warden']).to be_authenticated
+      context "user has a different identity" do
+        let(:ldap_email) { user.email }
+
+        before do
+          create(:identity, { provider: 'ldapmain',
+                              extern_uid: 'different_identity_dn',
+                              user: user })
+        end
+
+        it "doesn't login a user" do
+          subject
+
+          expect(request.env['warden']).not_to be_authenticated
+        end
+
+        it "doesn't create a new user entry either" do
+          expect { subject }.not_to change { User.count }
+        end
       end
     end
   end

@@ -6,11 +6,11 @@
  * Each instance has a state and a tooltip.
  * The state needs to be represented in different colors,
  * see more information about this in
- * https://gitlab.com/gitlab-org/gitlab/uploads/5fff049fd88336d9ee0c6ef77b1ba7e3/monitoring__deployboard--key.png
+ * https://gitlab.com/gitlab-org/gitlab/uploads/f1f00df6293d30f241dbeaa876a1e939/Screen_Shot_2019-11-26_at_3.35.43_PM.png
  *
  * An instance can represent a normal deploy or a canary deploy. In the latter we need to provide
  * this information in the tooltip and the colors.
- * Mockup is https://gitlab.com/gitlab-org/gitlab/merge_requests/1551#note_26595150
+ * Mockup is https://gitlab.com/gitlab-org/gitlab/issues/35570
  */
 import tooltip from '~/vue_shared/directives/tooltip';
 
@@ -24,12 +24,12 @@ export default {
      * Represents the status of the pod. Each state is represented with a different
      * color.
      * It should be one of the following:
-     * finished || deploying || failed || ready || preparing || waiting
+     * succeeded || running || failed || pending || unknown
      */
     status: {
       type: String,
       required: true,
-      default: 'finished',
+      default: 'succeeded',
     },
 
     tooltipText: {
@@ -58,13 +58,10 @@ export default {
 
   computed: {
     cssClass() {
-      let cssClassName = `deployment-instance-${this.status}`;
-
-      if (!this.stable) {
-        cssClassName = `${cssClassName} deployment-instance-canary`;
-      }
-
-      return cssClassName;
+      return {
+        [`deployment-instance-${this.status}`]: true,
+        'deployment-instance-canary': !this.stable,
+      };
     },
 
     computedLogPath() {

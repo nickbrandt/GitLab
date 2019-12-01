@@ -2,6 +2,8 @@
 
 module EE
   module IssuesHelper
+    extend ::Gitlab::Utils::Override
+
     def weight_dropdown_tag(issuable, opts = {}, &block)
       title = issuable.weight || 'Weight'
       additional_toggle_class = opts.delete(:toggle_class)
@@ -26,6 +28,15 @@ module EE
         weight
       else
         h(weight.presence || 'Weight')
+      end
+    end
+
+    override :issue_closed_link
+    def issue_closed_link(issue, current_user, css_class: '')
+      if issue.promoted? && can?(current_user, :read_epic, issue.promoted_to_epic)
+        link_to(s_('IssuableStatus|promoted'), issue.promoted_to_epic, class: css_class)
+      else
+        super
       end
     end
   end

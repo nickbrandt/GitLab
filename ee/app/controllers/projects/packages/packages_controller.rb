@@ -25,7 +25,7 @@ module Projects
         @package = project.packages.find(params[:id])
         @package.destroy
 
-        redirect_to project_packages_path(@project), status: 302, notice: _('Package was removed')
+        redirect_to project_packages_path(@project), status: :found, notice: _('Package was removed')
       end
     end
   end

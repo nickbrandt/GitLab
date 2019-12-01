@@ -38,18 +38,6 @@ describe API::FeatureFlagScopes do
         expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
-
-    context 'when feature_flag_api feature flag is disabled' do
-      before do
-        stub_feature_flags(feature_flag_api: false)
-      end
-
-      it 'forbids the request' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
   end
 
   shared_examples_for 'not found' do

@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import { createLocalVue, mount } from '@vue/test-utils';
-import { GlFormCheckbox, GlFormTextarea } from '@gitlab/ui';
+import { GlFormTextarea, GlFormCheckbox } from '@gitlab/ui';
 import Form from 'ee/feature_flags/components/form.vue';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
@@ -14,11 +14,21 @@ import { featureFlag } from '../mock_data';
 
 describe('feature flag form', () => {
   let wrapper;
+  let oldGon;
   const requiredProps = {
     cancelPath: 'feature_flags',
     submitText: 'Create',
     environmentsEndpoint: '/environments.json',
   };
+
+  beforeEach(() => {
+    oldGon = window.gon;
+    window.gon = { features: { featureFlagsUsersPerEnvironment: true } };
+  });
+
+  afterEach(() => {
+    window.gon = oldGon;
+  });
 
   const factory = (props = {}) => {
     const localVue = createLocalVue();
@@ -27,7 +37,7 @@ describe('feature flag form', () => {
       localVue,
       propsData: props,
       provide: {
-        glFeatures: { featureFlagPermissions: true },
+        glFeatures: { featureFlagPermissions: true, featureFlagsUsersPerEnvironment: true },
       },
       sync: false,
     });

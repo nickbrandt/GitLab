@@ -50,7 +50,7 @@ exports[`packages_list renders 1`] = `
       >
         <th
           aria-colindex="1"
-          class=""
+          class="text-left"
           role="columnheader"
           scope="col"
         >
@@ -58,7 +58,7 @@ exports[`packages_list renders 1`] = `
         </th>
         <th
           aria-colindex="2"
-          class=""
+          class="text-center"
           role="columnheader"
           scope="col"
         >
@@ -66,7 +66,7 @@ exports[`packages_list renders 1`] = `
         </th>
         <th
           aria-colindex="3"
-          class=""
+          class="text-center"
           role="columnheader"
           scope="col"
         >
@@ -74,7 +74,7 @@ exports[`packages_list renders 1`] = `
         </th>
         <th
           aria-colindex="4"
-          class=""
+          class="text-center"
           role="columnheader"
           scope="col"
         >
@@ -103,7 +103,7 @@ exports[`packages_list renders 1`] = `
       >
         <td
           aria-colindex="1"
-          class="w-25"
+          class="text-left"
           role="cell"
         >
           <div
@@ -112,7 +112,7 @@ exports[`packages_list renders 1`] = `
             <a
               class="flex-truncate-child"
               data-qa-selector="package_link"
-              href="/asd/lol"
+              href="#"
             >
               
             Test package
@@ -122,7 +122,7 @@ exports[`packages_list renders 1`] = `
         </td>
         <td
           aria-colindex="2"
-          class=""
+          class="text-center"
           role="cell"
         >
           
@@ -131,7 +131,7 @@ exports[`packages_list renders 1`] = `
         </td>
         <td
           aria-colindex="3"
-          class=""
+          class="text-center"
           role="cell"
         >
           
@@ -140,7 +140,7 @@ exports[`packages_list renders 1`] = `
         </td>
         <td
           aria-colindex="4"
-          class=""
+          class="text-center"
           role="cell"
         >
           <timeagotooltip-stub
@@ -172,7 +172,7 @@ exports[`packages_list renders 1`] = `
       >
         <td
           aria-colindex="1"
-          class="w-25"
+          class="text-left"
           role="cell"
         >
           <div
@@ -181,7 +181,7 @@ exports[`packages_list renders 1`] = `
             <a
               class="flex-truncate-child"
               data-qa-selector="package_link"
-              href="/asd/lol"
+              href="#"
             >
               
             @Test/package
@@ -191,7 +191,7 @@ exports[`packages_list renders 1`] = `
         </td>
         <td
           aria-colindex="2"
-          class=""
+          class="text-center"
           role="cell"
         >
           
@@ -200,7 +200,7 @@ exports[`packages_list renders 1`] = `
         </td>
         <td
           aria-colindex="3"
-          class=""
+          class="text-center"
           role="cell"
         >
           
@@ -209,7 +209,7 @@ exports[`packages_list renders 1`] = `
         </td>
         <td
           aria-colindex="4"
-          class=""
+          class="text-center"
           role="cell"
         >
           <timeagotooltip-stub
@@ -253,9 +253,9 @@ exports[`packages_list renders 1`] = `
     labelprevpage="Go to previous page"
     limits="[object Object]"
     nexttext="Next ›"
-    perpage="20"
+    perpage="1"
     prevtext="‹ Prev"
-    totalitems="100"
+    totalitems="1"
     value="1"
   />
    

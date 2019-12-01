@@ -45,15 +45,23 @@ FactoryBot.define do
 
     trait :resolved do
       after(:create) do |finding|
-        create(:vulnerability, :closed, project: finding.project, findings: [finding])
+        create(:vulnerability, :resolved, project: finding.project, findings: [finding])
       end
     end
 
     trait :dismissed do
       after(:create) do |finding|
-        create(:vulnerability, :closed, project: finding.project, findings: [finding])
         create(:vulnerability_feedback,
                :dismissal,
+               project: finding.project,
+               project_fingerprint: finding.project_fingerprint)
+      end
+    end
+
+    trait :with_issue_feedback do
+      after(:create) do |finding|
+        create(:vulnerability_feedback,
+               :issue,
                project: finding.project,
                project_fingerprint: finding.project_fingerprint)
       end

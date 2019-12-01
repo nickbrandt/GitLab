@@ -3,12 +3,19 @@
 module Resolvers
   module DesignManagement
     class DesignResolver < BaseResolver
-      argument :ids, [GraphQL::ID_TYPE], required: false, description: 'The list of IDs of designs.'
+      argument :ids,
+               [GraphQL::ID_TYPE],
+               required: false,
+               description: 'Filters designs by their ID'
+      argument :filenames,
+               [GraphQL::STRING_TYPE],
+               required: false,
+               description: 'Filters designs by their filename'
       argument :at_version,
                GraphQL::ID_TYPE,
                required: false,
                description: 'Filters designs to only those that existed at the version. ' \
-                            'If argument is omitted or nil then all designs will reflect the latest version.'
+                            'If argument is omitted or nil then all designs will reflect the latest version'
 
       def resolve(**args)
         find_designs(args)
@@ -27,6 +34,7 @@ module Resolvers
           object.issue,
           context[:current_user],
           ids: design_ids(args),
+          filenames: args[:filenames],
           visible_at_version: version(args)
         ).execute
       end

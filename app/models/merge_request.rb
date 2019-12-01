@@ -17,6 +17,7 @@ class MergeRequest < ApplicationRecord
   include FromUnion
   include DeprecatedAssignee
   include ShaAttribute
+  include IgnorableColumns
 
   sha_attribute :squash_commit_sha
 
@@ -73,6 +74,14 @@ class MergeRequest < ApplicationRecord
   has_many :merge_request_assignees
   has_many :assignees, class_name: "User", through: :merge_request_assignees
 
+  has_many :deployment_merge_requests
+
+  # These are deployments created after the merge request has been merged, and
+  # the merge request was tracked explicitly (instead of implicitly using a CI
+  # build).
+  has_many :deployments,
+    through: :deployment_merge_requests
+
   KNOWN_MERGE_PARAMS = [
     :auto_merge_strategy,
     :should_remove_source_branch,
@@ -103,7 +112,7 @@ class MergeRequest < ApplicationRecord
     super + [:merged, :locked]
   end
 
-  state_machine :state_id, initial: :opened do
+  state_machine :state_id, initial: :opened, initialize: false do
     event :close do
       transition [:opened] => :closed
     end
@@ -199,6 +208,9 @@ class MergeRequest < ApplicationRecord
   scope :by_milestone, ->(milestone) { where(milestone_id: milestone) }
   scope :of_projects, ->(ids) { where(target_project_id: ids) }
   scope :from_project, ->(project) { where(source_project_id: project.id) }
+  scope :from_and_to_forks, ->(project) do
+    where('source_project_id <> target_project_id AND (source_project_id = ? OR target_project_id = ?)', project.id, project.id)
+  end
   scope :merged, -> { with_state(:merged) }
   scope :closed_and_merged, -> { with_states(:closed, :merged) }
   scope :open_and_closed, -> { with_states(:opened, :closed) }
@@ -212,8 +224,8 @@ class MergeRequest < ApplicationRecord
   scope :join_project, -> { joins(:target_project) }
   scope :references_project, -> { references(:target_project) }
   scope :with_api_entity_associations, -> {
-    preload(:assignees, :author, :unresolved_notes, :labels, :milestone, :timelogs,
-            latest_merge_request_diff: [:merge_request_diff_commits],
+    preload(:assignees, :author, :unresolved_notes, :labels, :milestone,
+            :timelogs, :latest_merge_request_diff,
             metrics: [:latest_closed_by, :merged_by],
             target_project: [:route, { namespace: :route }],
             source_project: [:route, { namespace: :route }])
@@ -228,6 +240,8 @@ class MergeRequest < ApplicationRecord
     with_state(:opened).where(auto_merge_enabled: true)
   end
 
+  ignore_column :state, remove_with: '12.7', remove_after: '2019-12-22'
+
   after_save :keep_around_commit
 
   alias_attribute :project, :target_project
@@ -240,6 +254,9 @@ class MergeRequest < ApplicationRecord
   # please use `auto_merge_enabled` alias instead of `merge_when_pipeline_succeeds`.
   alias_attribute :auto_merge_enabled, :merge_when_pipeline_succeeds
   alias_method :issuing_parent, :target_project
+
+  delegate :active?, to: :head_pipeline, prefix: true, allow_nil: true
+  delegate :success?, to: :actual_head_pipeline, prefix: true, allow_nil: true
 
   RebaseLockTimeout = Class.new(StandardError)
 
@@ -260,7 +277,7 @@ class MergeRequest < ApplicationRecord
   def self.recent_target_branches(limit: 100)
     group(:target_branch)
       .select(:target_branch)
-      .reorder('MAX(merge_requests.updated_at) DESC')
+      .reorder(arel_table[:updated_at].maximum.desc)
       .limit(limit)
       .pluck(:target_branch)
   end
@@ -374,16 +391,21 @@ class MergeRequest < ApplicationRecord
     "#{project.to_reference(from, full: full)}#{reference}"
   end
 
-  def commits
-    return merge_request_diff.commits if persisted?
+  def commits(limit: nil)
+    return merge_request_diff.commits(limit: limit) if persisted?
 
     commits_arr = if compare_commits
-                    compare_commits.reverse
+                    reversed_commits = compare_commits.reverse
+                    limit ? reversed_commits.take(limit) : reversed_commits
                   else
                     []
                   end
 
     CommitCollection.new(source_project, commits_arr, source_branch)
+  end
+
+  def recent_commits
+    commits(limit: MergeRequestDiff::COMMITS_SAFE_SIZE)
   end
 
   def commits_count
@@ -396,23 +418,17 @@ class MergeRequest < ApplicationRecord
     end
   end
 
-  def commit_shas
-    if persisted?
-      merge_request_diff.commit_shas
-    elsif compare_commits
-      compare_commits.to_a.reverse.map(&:sha)
-    else
-      Array(diff_head_sha)
-    end
-  end
+  def commit_shas(limit: nil)
+    return merge_request_diff.commit_shas(limit: limit) if persisted?
 
-  # Returns true if there are commits that match at least one commit SHA.
-  def includes_any_commits?(shas)
-    if persisted?
-      merge_request_diff.commits_by_shas(shas).exists?
-    else
-      (commit_shas & shas).present?
-    end
+    shas =
+      if compare_commits
+        compare_commits.to_a.reverse.map(&:sha)
+      else
+        Array(diff_head_sha)
+      end
+
+    limit ? shas.take(limit) : shas
   end
 
   def supports_suggestion?
@@ -913,7 +929,7 @@ class MergeRequest < ApplicationRecord
 
   def commit_notes
     # Fetch comments only from last 100 commits
-    commit_ids = commit_shas.take(100)
+    commit_ids = commit_shas(limit: 100)
 
     Note
       .user
@@ -1052,7 +1068,7 @@ class MergeRequest < ApplicationRecord
   # Returns the oldest multi-line commit message, or the MR title if none found
   def default_squash_commit_message
     strong_memoize(:default_squash_commit_message) do
-      commits.without_merge_commits.reverse.find(&:description?)&.safe_message || title
+      recent_commits.without_merge_commits.reverse_each.find(&:description?)&.safe_message || title
     end
   end
 
@@ -1135,26 +1151,6 @@ class MergeRequest < ApplicationRecord
     actual_head_pipeline.environments
   end
 
-  def state_human_name
-    if merged?
-      "Merged"
-    elsif closed?
-      "Closed"
-    else
-      "Open"
-    end
-  end
-
-  def state_icon_name
-    if merged?
-      "git-merge"
-    elsif closed?
-      "close"
-    else
-      "issue-open-m"
-    end
-  end
-
   def fetch_ref!
     target_project.repository.fetch_source_branch!(source_project.repository, source_branch, ref_path)
   end
@@ -1231,16 +1227,8 @@ class MergeRequest < ApplicationRecord
   end
 
   def all_pipelines
-    return Ci::Pipeline.none unless source_project
-
-    shas = all_commit_shas
-
     strong_memoize(:all_pipelines) do
-      Ci::Pipeline.from_union(
-        [source_project.ci_pipelines.merge_request_pipelines(self, shas),
-         source_project.ci_pipelines.detached_merge_request_pipelines(self, shas),
-         source_project.ci_pipelines.triggered_for_branch(source_branch).for_sha(shas)],
-         remove_duplicates: false).sort_by_merge_request_pipelines
+      MergeRequest::Pipelines.new(self).all
     end
   end
 
@@ -1489,6 +1477,14 @@ class MergeRequest < ApplicationRecord
 
   def find_actual_head_pipeline
     all_pipelines.for_sha_or_source_sha(diff_head_sha).first
+  end
+
+  def etag_caching_enabled?
+    true
+  end
+
+  def recent_visible_deployments
+    deployments.visible.includes(:environment).order(id: :desc).limit(10)
   end
 
   private

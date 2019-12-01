@@ -1043,14 +1043,12 @@ describe API::MergeRequests do
 
   describe 'POST /projects/:id/merge_requests/:merge_request_iid/pipelines' do
     before do
-      allow_any_instance_of(Ci::Pipeline)
-        .to receive(:ci_yaml_file)
-        .and_return(YAML.dump({
-          rspec: {
-            script: 'ls',
-            only: ['merge_requests']
-          }
-        }))
+      stub_ci_pipeline_yaml_file(YAML.dump({
+        rspec: {
+          script: 'ls',
+          only: ['merge_requests']
+        }
+      }))
     end
 
     let(:project) do
@@ -1567,6 +1565,18 @@ describe API::MergeRequests do
       end.to change { merge_request.reload.squash }
 
       expect(response).to have_gitlab_http_status(200)
+    end
+
+    it 'does not merge if merge_when_pipeline_succeeds is passed and the pipeline has failed' do
+      create(:ci_pipeline,
+        :failed,
+        sha: merge_request.diff_head_sha,
+        merge_requests_as_head_pipeline: [merge_request])
+
+      put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user), params: { merge_when_pipeline_succeeds: true }
+
+      expect(response).to have_gitlab_http_status(405)
+      expect(merge_request.reload.state).to eq('opened')
     end
 
     it "enables merge when pipeline succeeds if the pipeline is active" do

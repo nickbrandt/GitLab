@@ -55,7 +55,8 @@ export const rawEvents = rawIssueEvents.events;
 
 const deepCamelCase = obj => convertObjectPropsToCamelCase(obj, { deep: true });
 
-const defaultStages = ['issue', 'plan', 'review', 'code', 'test', 'staging', 'production'];
+export const defaultStages = ['issue', 'plan', 'review', 'code', 'test', 'staging', 'production'];
+
 const stageFixtures = defaultStages.reduce((acc, stage) => {
   const { events } = getJSONFixture(endpoints.stageEvents(stage));
   return {
@@ -102,4 +103,42 @@ export const customStageEvents = [
   ...customStageStopEvents.filter(ev => ev.identifier !== labelStopEvent.identifier),
   labelStartEvent,
   labelStopEvent,
+];
+
+export const tasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_by_type.json');
+
+export const rawDurationData = [
+  {
+    duration_in_seconds: 1234000,
+    finished_at: '2019-01-01T00:00:00.000Z',
+  },
+  {
+    duration_in_seconds: 4321000,
+    finished_at: '2019-01-02T00:00:00.000Z',
+  },
+];
+
+export const transformedDurationData = [
+  {
+    slug: 'issue',
+    selected: true,
+    data: rawDurationData,
+  },
+  {
+    slug: 'plan',
+    selected: true,
+    data: rawDurationData,
+  },
+];
+
+export const flattenedDurationData = [
+  { duration_in_seconds: 1234000, finished_at: '2019-01-01' },
+  { duration_in_seconds: 4321000, finished_at: '2019-01-02' },
+  { duration_in_seconds: 1234000, finished_at: '2019-01-01' },
+  { duration_in_seconds: 4321000, finished_at: '2019-01-02' },
+];
+
+export const durationChartPlottableData = [
+  ['2019-01-01', 29, '2019-01-01'],
+  ['2019-01-02', 100, '2019-01-02'],
 ];

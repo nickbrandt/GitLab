@@ -1,6 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
-import { normalizeData, resolveCommit, fetchLogsTree } from '~/repository/log_tree';
+import { resolveCommit, fetchLogsTree } from '~/repository/log_tree';
 
 const mockData = [
   {
@@ -15,33 +15,24 @@ const mockData = [
   },
 ];
 
-describe('normalizeData', () => {
-  it('normalizes data into LogTreeCommit object', () => {
-    expect(normalizeData(mockData)).toEqual([
-      {
-        sha: '123',
-        message: 'testing message',
-        committedDate: '2019-01-01',
-        commitPath: 'https://test.com',
-        fileName: 'index.js',
-        type: 'blob',
-        __typename: 'LogTreeCommit',
-      },
-    ]);
-  });
-});
-
 describe('resolveCommit', () => {
   it('calls resolve when commit found', () => {
     const resolver = {
       entry: { name: 'index.js', type: 'blob' },
       resolve: jest.fn(),
     };
-    const commits = [{ fileName: 'index.js', type: 'blob' }];
+    const commits = [
+      { fileName: 'index.js', filePath: '/index.js', type: 'blob' },
+      { fileName: 'index.js', filePath: '/app/assets/index.js', type: 'blob' },
+    ];
 
-    resolveCommit(commits, resolver);
+    resolveCommit(commits, '', resolver);
 
-    expect(resolver.resolve).toHaveBeenCalledWith({ fileName: 'index.js', type: 'blob' });
+    expect(resolver.resolve).toHaveBeenCalledWith({
+      fileName: 'index.js',
+      filePath: '/index.js',
+      type: 'blob',
+    });
   });
 });
 
@@ -57,7 +48,7 @@ describe('fetchLogsTree', () => {
 
     jest.spyOn(axios, 'get');
 
-    global.gon = { gitlab_url: 'https://test.com' };
+    global.gon = { relative_url_root: '' };
 
     client = {
       readQuery: () => ({
@@ -80,10 +71,9 @@ describe('fetchLogsTree', () => {
 
   it('calls axios get', () =>
     fetchLogsTree(client, '', '0', resolver).then(() => {
-      expect(axios.get).toHaveBeenCalledWith(
-        'https://test.com/gitlab-org/gitlab-foss/refs/master/logs_tree/',
-        { params: { format: 'json', offset: '0' } },
-      );
+      expect(axios.get).toHaveBeenCalledWith('/gitlab-org/gitlab-foss/refs/master/logs_tree/', {
+        params: { format: 'json', offset: '0' },
+      });
     }));
 
   it('calls axios get once', () =>
@@ -101,6 +91,7 @@ describe('fetchLogsTree', () => {
         commitPath: 'https://test.com',
         committedDate: '2019-01-01',
         fileName: 'index.js',
+        filePath: '/index.js',
         message: 'testing message',
         sha: '123',
         type: 'blob',
@@ -118,6 +109,7 @@ describe('fetchLogsTree', () => {
               commitPath: 'https://test.com',
               committedDate: '2019-01-01',
               fileName: 'index.js',
+              filePath: '/index.js',
               message: 'testing message',
               sha: '123',
               type: 'blob',

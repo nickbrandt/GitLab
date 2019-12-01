@@ -57,7 +57,7 @@ class OperationsController < ApplicationController
   end
 
   def environments_dashboard_feature_flag
-    render_404 unless Feature.enabled?(:environments_dashboard, current_user)
+    render_404 unless Feature.enabled?(:environments_dashboard, current_user, default_enabled: true)
   end
 
   def load_projects(current_user)

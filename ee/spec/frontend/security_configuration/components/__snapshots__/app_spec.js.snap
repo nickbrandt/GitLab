@@ -1,0 +1,104 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Security Configuration App features table displays a given feature 1`] = `
+<section
+  class="mt-0"
+>
+  <div
+    class="gl-responsive-table-row table-row-header text-2 font-weight-bold px-2"
+    role="row"
+  >
+    <div
+      class="table-section section-80"
+    >
+      
+        Secure features
+      
+    </div>
+     
+    <div
+      class="table-section section-20"
+    >
+      Status
+    </div>
+  </div>
+   
+  <div
+    class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
+  >
+    <div
+      class="d-md-flex align-items-center"
+    >
+      <div
+        class="table-section section-80 section-wrap pr-md-3"
+      >
+        <div
+          class="table-mobile-header"
+          role="rowheader"
+        >
+          
+            Feature
+          
+        </div>
+         
+        <div
+          class="table-mobile-content"
+        >
+          <div
+            class="d-flex align-items-center justify-content-end justify-content-md-start"
+          >
+            <div
+              class="text-2"
+            >
+              
+                name-feature-0
+              
+            </div>
+             
+            <gllink-stub
+              aria-label="Feature documentation"
+              class="d-inline-flex ml-1"
+              href="link-feature-0"
+              target="_blank"
+            >
+              <icon-stub
+                name="external-link"
+                size="16"
+              />
+            </gllink-stub>
+          </div>
+           
+          <div
+            class="text-secondary"
+          >
+            
+              description-feature-0
+            
+          </div>
+        </div>
+      </div>
+       
+      <div
+        class="table-section section-20 section-wrap pr-md-3"
+      >
+        <div
+          class="table-mobile-header"
+          role="rowheader"
+        >
+          
+            Status
+          
+        </div>
+         
+        <div
+          class="table-mobile-content"
+        >
+          
+            Not yet configured
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+`;

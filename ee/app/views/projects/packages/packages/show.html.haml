@@ -10,4 +10,8 @@
       can_delete: can?(current_user, :destroy_package, @project).to_s,
       destroy_path: project_package_path(@project, @package),
       svg_path: image_path('illustrations/no-packages.svg'),
+      npm_path: npm_package_registry_url,
+      npm_help_path: help_page_path('user/packages/npm_registry/index'),
+      maven_path: package_registry_project_url(@project.id, :maven),
+      maven_help_path: help_page_path('user/packages/maven_repository/index'),
       package_file_download_path: download_project_package_file_path(@project, @package_files.first) } }

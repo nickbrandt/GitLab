@@ -76,6 +76,11 @@ type Blob implements Entry {
   lfsOid: String
   name: String!
   path: String!
+
+  """
+  Last commit sha for entry
+  """
+  sha: String!
   type: EntryType!
   webUrl: String
 }
@@ -122,6 +127,11 @@ type Commit {
   author: User
 
   """
+  Commit authors name
+  """
+  authorName: String
+
+  """
   Timestamp of when the commit was authored
   """
   authoredDate: Time
@@ -139,12 +149,67 @@ type Commit {
   """
   Latest pipeline of the commit
   """
-  latestPipeline: Pipeline
+  latestPipeline(
+    """
+    Filter pipelines by the ref they are run for
+    """
+    ref: String
+
+    """
+    Filter pipelines by the sha of the commit they are run for
+    """
+    sha: String
+
+    """
+    Filter pipelines by their status
+    """
+    status: PipelineStatusEnum
+  ): Pipeline @deprecated(reason: "use pipelines")
 
   """
   Raw commit message
   """
   message: String
+
+  """
+  Pipelines of the commit ordered latest first
+  """
+  pipelines(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Filter pipelines by the ref they are run for
+    """
+    ref: String
+
+    """
+    Filter pipelines by the sha of the commit they are run for
+    """
+    sha: String
+
+    """
+    Filter pipelines by their status
+    """
+    status: PipelineStatusEnum
+  ): PipelineConnection
 
   """
   SHA1 ID of the commit
@@ -484,7 +549,7 @@ type DesignCollection {
 
     """
     Filters designs to only those that existed at the version. If argument is
-    omitted or nil then all designs will reflect the latest version.
+    omitted or nil then all designs will reflect the latest version
     """
     atVersion: ID
 
@@ -494,12 +559,17 @@ type DesignCollection {
     before: String
 
     """
+    Filters designs by their filename
+    """
+    filenames: [String!]
+
+    """
     Returns the first _n_ elements from the list.
     """
     first: Int
 
     """
-    The list of IDs of designs.
+    Filters designs by their ID
     """
     ids: [ID!]
 
@@ -1040,6 +1110,11 @@ interface Entry {
   id: ID!
   name: String!
   path: String!
+
+  """
+  Last commit sha for entry
+  """
+  sha: String!
   type: EntryType!
 }
 
@@ -1124,6 +1199,11 @@ type Epic implements Noteable {
   ): EpicConnection
   closedAt: Time
   createdAt: Time
+
+  """
+  Number of open and closed descendant epics and issues
+  """
+  descendantCounts: EpicDescendantCount
   description: String
 
   """
@@ -1159,6 +1239,10 @@ type Epic implements Noteable {
   hasIssues: Boolean!
   id: ID!
   iid: ID!
+
+  """
+  A list of issues associated with the epic
+  """
   issues(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -1302,6 +1386,28 @@ type EpicConnection {
   Information to aid in pagination.
   """
   pageInfo: PageInfo!
+}
+
+type EpicDescendantCount {
+  """
+  Number of closed sub-epics
+  """
+  closedEpics: Int
+
+  """
+  Number of closed epic issues
+  """
+  closedIssues: Int
+
+  """
+  Number of opened sub-epics
+  """
+  openedEpics: Int
+
+  """
+  Number of opened epic issues
+  """
+  openedIssues: Int
 }
 
 """
@@ -1533,6 +1639,11 @@ type EpicIssue implements Noteable {
   State of the issue
   """
   state: IssueState!
+
+  """
+  Boolean flag for whether the currently logged in user is subscribed to this issue
+  """
+  subscribed: Boolean!
 
   """
   Task completion status of the issue
@@ -1815,276 +1926,6 @@ type EpicTreeReorderPayload {
   Reasons why the mutation failed.
   """
   errors: [String!]!
-}
-
-type ExtendedIssue implements Noteable {
-  """
-  Assignees of the issue
-  """
-  assignees(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: String
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: String
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-  ): UserConnection
-
-  """
-  User that created the issue
-  """
-  author: User!
-
-  """
-  Timestamp of when the issue was closed
-  """
-  closedAt: Time
-
-  """
-  Indicates the issue is confidential
-  """
-  confidential: Boolean!
-
-  """
-  Timestamp of when the issue was created
-  """
-  createdAt: Time!
-
-  """
-  Description of the issue
-  """
-  description: String
-
-  """
-  The GitLab Flavored Markdown rendering of `description`
-  """
-  descriptionHtml: String
-  designCollection: DesignCollection
-  designs: DesignCollection @deprecated(reason: "use design_collection")
-
-  """
-  Indicates discussion is locked on the issue
-  """
-  discussionLocked: Boolean!
-
-  """
-  All discussions on this noteable
-  """
-  discussions(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: String
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: String
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-  ): DiscussionConnection!
-
-  """
-  Number of downvotes the issue has received
-  """
-  downvotes: Int!
-
-  """
-  Due date of the issue
-  """
-  dueDate: Time
-
-  """
-  The epic to which issue belongs
-  """
-  epic: Epic
-
-  """
-  Internal ID of the issue
-  """
-  iid: ID!
-
-  """
-  Labels of the issue
-  """
-  labels(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: String
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: String
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-  ): LabelConnection
-
-  """
-  Milestone of the issue
-  """
-  milestone: Milestone
-
-  """
-  All notes on this noteable
-  """
-  notes(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: String
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: String
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-  ): NoteConnection!
-
-  """
-  List of participants in the issue
-  """
-  participants(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: String
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: String
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-  ): UserConnection
-
-  """
-  Internal reference of the issue. Returned in shortened format by default
-  """
-  reference(
-    """
-    Boolean option specifying whether the reference should be returned in full
-    """
-    full: Boolean = false
-  ): String!
-
-  """
-  Relative position of the issue (used for positioning in epic tree and issue boards)
-  """
-  relativePosition: Int
-
-  """
-  State of the issue
-  """
-  state: IssueState!
-
-  """
-  Boolean flag for whether the currently logged in user is subscribed to this issue
-  """
-  subscribed: Boolean!
-
-  """
-  Task completion status of the issue
-  """
-  taskCompletionStatus: TaskCompletionStatus!
-
-  """
-  Time estimate of the issue
-  """
-  timeEstimate: Int!
-
-  """
-  Title of the issue
-  """
-  title: String!
-
-  """
-  The GitLab Flavored Markdown rendering of `title`
-  """
-  titleHtml: String
-
-  """
-  Total time reported as spent on the issue
-  """
-  totalTimeSpent: Int!
-
-  """
-  Timestamp of when the issue was last updated
-  """
-  updatedAt: Time!
-
-  """
-  Number of upvotes the issue has received
-  """
-  upvotes: Int!
-
-  """
-  Number of user notes of the issue
-  """
-  userNotesCount: Int!
-
-  """
-  Permissions for the current user on the resource
-  """
-  userPermissions: IssuePermissions!
-
-  """
-  Web path of the issue
-  """
-  webPath: String!
-
-  """
-  Web URL of the issue
-  """
-  webUrl: String!
-  weight: Int
 }
 
 type Group {
@@ -2536,6 +2377,11 @@ type Issue implements Noteable {
   state: IssueState!
 
   """
+  Boolean flag for whether the currently logged in user is subscribed to this issue
+  """
+  subscribed: Boolean!
+
+  """
   Task completion status of the issue
   """
   taskCompletionStatus: TaskCompletionStatus!
@@ -2673,6 +2519,51 @@ type IssuePermissions {
 }
 
 """
+Autogenerated input type of IssueSetDueDate
+"""
+input IssueSetDueDateInput {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  The desired due date for the issue
+  """
+  dueDate: Time!
+
+  """
+  The iid of the issue to mutate
+  """
+  iid: String!
+
+  """
+  The project the issue to mutate is in
+  """
+  projectPath: ID!
+}
+
+"""
+Autogenerated return type of IssueSetDueDate
+"""
+type IssueSetDueDatePayload {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Reasons why the mutation failed.
+  """
+  errors: [String!]!
+
+  """
+  The issue after mutation
+  """
+  issue: Issue
+}
+
+"""
 Values for sorting issues
 """
 enum IssueSort {
@@ -2685,6 +2576,21 @@ enum IssueSort {
   Due date by descending order
   """
   DUE_DATE_DESC
+
+  """
+  Relative position by ascending order
+  """
+  RELATIVE_POSITION_ASC
+
+  """
+  Weight by ascending order
+  """
+  WEIGHT_ASC
+
+  """
+  Weight by descending order
+  """
+  WEIGHT_DESC
 
   """
   Created at ascending order
@@ -2731,6 +2637,11 @@ type Label {
   The GitLab Flavored Markdown rendering of `description`
   """
   descriptionHtml: String
+
+  """
+  Label ID
+  """
+  id: ID!
 
   """
   Text color of the label
@@ -3276,6 +3187,151 @@ type MergeRequestPermissions {
 }
 
 """
+Autogenerated input type of MergeRequestSetAssignees
+"""
+input MergeRequestSetAssigneesInput {
+  """
+  The usernames to assign to the merge request. Replaces existing assignees by default.
+  """
+  assigneeUsernames: [String!]!
+
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  The iid of the merge request to mutate
+  """
+  iid: String!
+
+  """
+  The operation to perform. Defaults to REPLACE.
+  """
+  operationMode: MutationOperationMode
+
+  """
+  The project the merge request to mutate is in
+  """
+  projectPath: ID!
+}
+
+"""
+Autogenerated return type of MergeRequestSetAssignees
+"""
+type MergeRequestSetAssigneesPayload {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Reasons why the mutation failed.
+  """
+  errors: [String!]!
+
+  """
+  The merge request after mutation
+  """
+  mergeRequest: MergeRequest
+}
+
+"""
+Autogenerated input type of MergeRequestSetLabels
+"""
+input MergeRequestSetLabelsInput {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  The iid of the merge request to mutate
+  """
+  iid: String!
+
+  """
+  The Label IDs to set. Replaces existing labels by default.
+  """
+  labelIds: [ID!]!
+
+  """
+  Changes the operation mode. Defaults to REPLACE.
+  """
+  operationMode: MutationOperationMode
+
+  """
+  The project the merge request to mutate is in
+  """
+  projectPath: ID!
+}
+
+"""
+Autogenerated return type of MergeRequestSetLabels
+"""
+type MergeRequestSetLabelsPayload {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Reasons why the mutation failed.
+  """
+  errors: [String!]!
+
+  """
+  The merge request after mutation
+  """
+  mergeRequest: MergeRequest
+}
+
+"""
+Autogenerated input type of MergeRequestSetLocked
+"""
+input MergeRequestSetLockedInput {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  The iid of the merge request to mutate
+  """
+  iid: String!
+
+  """
+  Whether or not to lock the merge request.
+  """
+  locked: Boolean!
+
+  """
+  The project the merge request to mutate is in
+  """
+  projectPath: ID!
+}
+
+"""
+Autogenerated return type of MergeRequestSetLocked
+"""
+type MergeRequestSetLockedPayload {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Reasons why the mutation failed.
+  """
+  errors: [String!]!
+
+  """
+  The merge request after mutation
+  """
+  mergeRequest: MergeRequest
+}
+
+"""
 Autogenerated input type of MergeRequestSetMilestone
 """
 input MergeRequestSetMilestoneInput {
@@ -3304,6 +3360,51 @@ input MergeRequestSetMilestoneInput {
 Autogenerated return type of MergeRequestSetMilestone
 """
 type MergeRequestSetMilestonePayload {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Reasons why the mutation failed.
+  """
+  errors: [String!]!
+
+  """
+  The merge request after mutation
+  """
+  mergeRequest: MergeRequest
+}
+
+"""
+Autogenerated input type of MergeRequestSetSubscription
+"""
+input MergeRequestSetSubscriptionInput {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  The iid of the merge request to mutate
+  """
+  iid: String!
+
+  """
+  The project the merge request to mutate is in
+  """
+  projectPath: ID!
+
+  """
+  The desired state of the subscription
+  """
+  subscribedState: Boolean!
+}
+
+"""
+Autogenerated return type of MergeRequestSetSubscription
+"""
+type MergeRequestSetSubscriptionPayload {
   """
   A unique identifier for the client performing the mutation.
   """
@@ -3455,13 +3556,40 @@ type Mutation {
   destroyNote(input: DestroyNoteInput!): DestroyNotePayload
   epicSetSubscription(input: EpicSetSubscriptionInput!): EpicSetSubscriptionPayload
   epicTreeReorder(input: EpicTreeReorderInput!): EpicTreeReorderPayload
+  issueSetDueDate(input: IssueSetDueDateInput!): IssueSetDueDatePayload
+  mergeRequestSetAssignees(input: MergeRequestSetAssigneesInput!): MergeRequestSetAssigneesPayload
+  mergeRequestSetLabels(input: MergeRequestSetLabelsInput!): MergeRequestSetLabelsPayload
+  mergeRequestSetLocked(input: MergeRequestSetLockedInput!): MergeRequestSetLockedPayload
   mergeRequestSetMilestone(input: MergeRequestSetMilestoneInput!): MergeRequestSetMilestonePayload
+  mergeRequestSetSubscription(input: MergeRequestSetSubscriptionInput!): MergeRequestSetSubscriptionPayload
   mergeRequestSetWip(input: MergeRequestSetWipInput!): MergeRequestSetWipPayload
   removeAwardEmoji(input: RemoveAwardEmojiInput!): RemoveAwardEmojiPayload
   todoMarkDone(input: TodoMarkDoneInput!): TodoMarkDonePayload
+  todoRestore(input: TodoRestoreInput!): TodoRestorePayload
+  todosMarkAllDone(input: TodosMarkAllDoneInput!): TodosMarkAllDonePayload
   toggleAwardEmoji(input: ToggleAwardEmojiInput!): ToggleAwardEmojiPayload
   updateEpic(input: UpdateEpicInput!): UpdateEpicPayload
   updateNote(input: UpdateNoteInput!): UpdateNotePayload
+}
+
+"""
+Different toggles for changing mutator behavior.
+"""
+enum MutationOperationMode {
+  """
+  Performs an append operation
+  """
+  APPEND
+
+  """
+  Performs a removal operation
+  """
+  REMOVE
+
+  """
+  Performs a replace operation
+  """
+  REPLACE
 }
 
 type Namespace {
@@ -3960,7 +4088,7 @@ type Project {
     Issues updated before this date
     """
     updatedBefore: Time
-  ): ExtendedIssue
+  ): Issue
 
   """
   Issues of the project
@@ -4717,6 +4845,11 @@ type Submodule implements Entry {
   id: ID!
   name: String!
   path: String!
+
+  """
+  Last commit sha for entry
+  """
+  sha: String!
   treeUrl: String
   type: EntryType!
   webUrl: String
@@ -4907,6 +5040,41 @@ type TodoMarkDonePayload {
   todo: Todo!
 }
 
+"""
+Autogenerated input type of TodoRestore
+"""
+input TodoRestoreInput {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  The global id of the todo to restore
+  """
+  id: ID!
+}
+
+"""
+Autogenerated return type of TodoRestore
+"""
+type TodoRestorePayload {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Reasons why the mutation failed.
+  """
+  errors: [String!]!
+
+  """
+  The requested todo
+  """
+  todo: Todo!
+}
+
 enum TodoStateEnum {
   done
   pending
@@ -4937,6 +5105,36 @@ enum TodoTargetEnum {
   A MergeRequest
   """
   MERGEREQUEST
+}
+
+"""
+Autogenerated input type of TodosMarkAllDone
+"""
+input TodosMarkAllDoneInput {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+}
+
+"""
+Autogenerated return type of TodosMarkAllDone
+"""
+type TodosMarkAllDonePayload {
+  """
+  A unique identifier for the client performing the mutation.
+  """
+  clientMutationId: String
+
+  """
+  Reasons why the mutation failed.
+  """
+  errors: [String!]!
+
+  """
+  Ids of the updated todos
+  """
+  updatedIds: [ID!]!
 }
 
 """
@@ -5063,6 +5261,11 @@ type TreeEntry implements Entry {
   id: ID!
   name: String!
   path: String!
+
+  """
+  Last commit sha for entry
+  """
+  sha: String!
   type: EntryType!
   webUrl: String
 }

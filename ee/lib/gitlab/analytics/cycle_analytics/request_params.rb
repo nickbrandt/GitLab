@@ -8,6 +8,8 @@ module Gitlab
         include ActiveModel::Validations
         include ActiveModel::Attributes
 
+        attr_writer :project_ids
+
         attribute :created_after, :date
         attribute :created_before, :date
 
@@ -15,6 +17,10 @@ module Gitlab
         validates :created_before, presence: true
 
         validate :validate_created_before
+
+        def project_ids
+          Array(@project_ids)
+        end
 
         private
 
