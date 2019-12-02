@@ -241,6 +241,17 @@ describe QuickActions::InterpretService do
               expect(updates).to be_empty
             end
           end
+
+          context 'when issue is already added to epic' do
+            it 'returns error message' do
+              issue = create(:issue, project: project, epic: epic)
+
+              _, updates, message = service.execute(content, issue)
+
+              expect(updates).to be_empty
+              expect(message).to eq("Issue #{issue.to_reference} has already been added to epic #{epic.to_reference}.")
+            end
+          end
         end
 
         context 'when epic does not exist' do
