@@ -5,8 +5,11 @@ module Gitlab
     module Keyset
       # A Page models the pagination information for a particular page of the collection
       class Page
-        # Default and maximum size of records for a page
+        # Default number of records for a page
         DEFAULT_PAGE_SIZE = 20
+
+        # Maximum number of records for a page
+        MAXIMUM_PAGE_SIZE = 100
 
         attr_accessor :lower_bounds, :end_reached
         attr_reader :order_by
@@ -22,7 +25,7 @@ module Gitlab
         def per_page
           return DEFAULT_PAGE_SIZE if @per_page <= 0
 
-          [@per_page, DEFAULT_PAGE_SIZE].min
+          [@per_page, MAXIMUM_PAGE_SIZE].min
         end
 
         # Determine whether this page indicates the end of the collection
