@@ -13316,6 +13316,9 @@ msgstr ""
 msgid "ProductivityAanalytics|Merge requests"
 msgstr ""
 
+msgid "ProductivityAanalytics|is earlier than the allowed minimum date"
+msgstr ""
+
 msgid "ProductivityAnalytics|Ascending"
 msgstr ""
 
@@ -13347,6 +13350,9 @@ msgid "ProductivityAnalytics|Time to merge"
 msgstr ""
 
 msgid "ProductivityAnalytics|Trendline"
+msgstr ""
+
+msgid "ProductivityAnalytics|is earlier than the given merged at after date"
 msgstr ""
 
 msgid "Profile"
