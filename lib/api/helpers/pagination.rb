@@ -9,7 +9,7 @@ module API
         request_context = Gitlab::Pagination::Keyset::RequestContext.new(self)
 
         unless Gitlab::Pagination::Keyset.available?(request_context, relation)
-          return error!('Keyset pagination is not yet available for this type of request', 501)
+          return error!('Keyset pagination is not yet available for this type of request', 405)
         end
 
         Gitlab::Pagination::Keyset.paginate(request_context, relation)

@@ -632,7 +632,7 @@ describe API::Projects do
         it 'responds with 501 if order_by is different from id' do
           get api('/projects', current_user), params: params.merge(order_by: :created_at)
 
-          expect(response).to have_gitlab_http_status(501)
+          expect(response).to have_gitlab_http_status(405)
         end
       end
 

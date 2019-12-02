@@ -47,7 +47,7 @@ describe API::Helpers::Pagination do
       it 'renders a 501 error if keyset pagination isnt available yet' do
         expect(Gitlab::Pagination::Keyset).to receive(:available?).with(request_context, relation).and_return(false)
         expect(Gitlab::Pagination::Keyset).not_to receive(:paginate)
-        expect(subject).to receive(:error!).with(/not yet available/, 501)
+        expect(subject).to receive(:error!).with(/not yet available/, 405)
 
         subject.paginate(relation)
       end
