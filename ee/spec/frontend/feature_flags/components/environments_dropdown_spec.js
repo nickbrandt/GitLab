@@ -1,9 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
 import { createLocalVue, mount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
-import axios from '~/lib/utils/axios_utils';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
 import { TEST_HOST } from 'spec/test_constants';
+import axios from '~/lib/utils/axios_utils';
 
 const localVue = createLocalVue();
 
@@ -63,38 +63,27 @@ describe('Feature flags > Environments dropdown ', () => {
       });
 
       describe('with received data', () => {
-        it('sets is loading to false', done => {
-          setTimeout(() => {
-            expect(wrapper.vm.isLoading).toEqual(false);
+        beforeEach(done => setImmediate(() => done()));
+        it('sets is loading to false', () => {
+          expect(wrapper.vm.isLoading).toEqual(false);
 
-            expect(wrapper.find(GlLoadingIcon).exists()).toEqual(false);
-            done();
-          });
+          expect(wrapper.find(GlLoadingIcon).exists()).toEqual(false);
         });
 
-        it('sets results with the received data', done => {
-          setTimeout(() => {
-            expect(wrapper.vm.results).toEqual(results);
-            done();
-          });
+        it('sets results with the received data', () => {
+          expect(wrapper.vm.results).toEqual(results);
         });
 
-        it('sets showSuggestions to true', done => {
-          setTimeout(() => {
-            expect(wrapper.vm.showSuggestions).toEqual(true);
-            done();
-          });
+        it('sets showSuggestions to true', () => {
+          expect(wrapper.vm.showSuggestions).toEqual(true);
         });
 
-        it('emits even when a suggestion is clicked', done => {
-          setTimeout(() => {
-            spyOn(wrapper.vm, '$emit');
+        it('emits even when a suggestion is clicked', () => {
+          jest.spyOn(wrapper.vm, '$emit');
 
-            wrapper.find('ul button').trigger('click');
+          wrapper.find('ul button').trigger('click');
 
-            expect(wrapper.vm.$emit).toHaveBeenCalledWith('selectEnvironment', 'production');
-            done();
-          });
+          expect(wrapper.vm.$emit).toHaveBeenCalledWith('selectEnvironment', 'production');
         });
       });
     });
@@ -115,23 +104,21 @@ describe('Feature flags > Environments dropdown ', () => {
   });
 
   describe('on click create button', () => {
-    beforeEach(() => {
+    beforeEach(done => {
       mock.onGet(`${TEST_HOST}/environments.json'`).replyOnce(200, []);
 
       factory();
 
       wrapper.find('input').setValue('production');
+
+      setImmediate(() => done());
     });
 
-    it('emits create event', done => {
-      setTimeout(() => {
-        spyOn(wrapper.vm, '$emit');
-        wrapper.find('.js-create-button').trigger('click');
+    it('emits create event', () => {
+      jest.spyOn(wrapper.vm, '$emit');
+      wrapper.find('.js-create-button').trigger('click');
 
-        expect(wrapper.vm.$emit).toHaveBeenCalledWith('createClicked', 'production');
-
-        done();
-      });
+      expect(wrapper.vm.$emit).toHaveBeenCalledWith('createClicked', 'production');
     });
   });
 });

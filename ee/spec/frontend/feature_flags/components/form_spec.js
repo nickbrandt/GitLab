@@ -2,7 +2,6 @@ import _ from 'underscore';
 import { createLocalVue, mount } from '@vue/test-utils';
 import { GlFormTextarea, GlFormCheckbox } from '@gitlab/ui';
 import Form from 'ee/feature_flags/components/form.vue';
-import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
@@ -10,6 +9,7 @@ import {
   INTERNAL_ID_PREFIX,
   DEFAULT_PERCENT_ROLLOUT,
 } from 'ee/feature_flags/constants';
+import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import { featureFlag } from '../mock_data';
 
 describe('feature flag form', () => {
@@ -169,7 +169,7 @@ describe('feature flag form', () => {
         });
 
         it('should not render deleted scopes', () => {
-          expect(wrapper.vm.filteredScopes).toEqual([jasmine.objectContaining({ id: 2 })]);
+          expect(wrapper.vm.filteredScopes).toEqual([expect.objectContaining({ id: 2 })]);
         });
       });
 
@@ -329,7 +329,7 @@ describe('feature flag form', () => {
                 rolloutUserIds: '',
               },
               {
-                id: jasmine.any(String),
+                id: expect.any(String),
                 active: false,
                 environmentScope: 'review',
                 canUpdate: true,
@@ -339,7 +339,7 @@ describe('feature flag form', () => {
                 rolloutUserIds: '',
               },
               {
-                id: jasmine.any(String),
+                id: expect.any(String),
                 active: true,
                 environmentScope: '',
                 canUpdate: true,

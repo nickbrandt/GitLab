@@ -1,6 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import actions, {
+import {
   setEndpoint,
   setPath,
   createFeatureFlag,
@@ -10,13 +9,16 @@ import actions, {
 } from 'ee/feature_flags/store/modules/new/actions';
 import state from 'ee/feature_flags/store/modules/new/state';
 import * as types from 'ee/feature_flags/store/modules/new/mutation_types';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
 } from 'ee/feature_flags/constants';
 import { mapFromScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
+import axios from '~/lib/utils/axios_utils';
+
+jest.mock('~/lib/utils/url_utility');
 
 describe('Feature flags New Module Actions', () => {
   let mockedState;
@@ -74,7 +76,6 @@ describe('Feature flags New Module Actions', () => {
     beforeEach(() => {
       mockedState.endpoint = `${TEST_HOST}/endpoint.json`;
       mock = new MockAdapter(axios);
-      spyOnDependency(actions, 'visitUrl');
     });
 
     afterEach(() => {

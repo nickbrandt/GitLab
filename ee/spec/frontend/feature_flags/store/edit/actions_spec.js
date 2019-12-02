@@ -1,6 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import actions, {
+import {
   setEndpoint,
   setPath,
   updateFeatureFlag,
@@ -15,8 +14,11 @@ import actions, {
 } from 'ee/feature_flags/store/modules/edit/actions';
 import state from 'ee/feature_flags/store/modules/edit/state';
 import * as types from 'ee/feature_flags/store/modules/edit/mutation_types';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
+import axios from '~/lib/utils/axios_utils';
+
+jest.mock('~/lib/utils/url_utility');
 
 describe('Feature flags Edit Module actions', () => {
   let mockedState;
@@ -57,7 +59,6 @@ describe('Feature flags Edit Module actions', () => {
     beforeEach(() => {
       mockedState.endpoint = `${TEST_HOST}/endpoint.json`;
       mock = new MockAdapter(axios);
-      spyOnDependency(actions, 'visitUrl');
     });
 
     afterEach(() => {

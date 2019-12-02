@@ -247,7 +247,7 @@ export default {
     <gl-loading-icon
       v-if="isLoading"
       :label="s__('FeatureFlags|Loading feature flags')"
-      :size="3"
+      size="md"
       class="js-loading-state prepend-top-20"
     />
 
