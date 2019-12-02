@@ -12,6 +12,8 @@ describe 'gitlab:import_export:import rake task', :sidekiq do
   before do
     Rake.application.rake_require('tasks/gitlab/import_export/import')
     allow(Settings.uploads.object_store).to receive(:[]=).and_call_original
+    allow_any_instance_of(GitlabProjectImport).to receive(:exit)
+      .and_raise(RuntimeError, 'exit not handled')
   end
 
   around do |example|
@@ -95,6 +97,10 @@ describe 'gitlab:import_export:import rake task', :sidekiq do
       end
 
       it 'fails project import with an error' do
+        # Catch exit call, and raise exception instead
+        expect_any_instance_of(GitlabProjectImport).to receive(:exit)
+          .with(1).and_raise(SystemExit)
+
         expect { subject }.to raise_error(SystemExit).and output(error).to_stdout
 
         expect(project.merge_requests).to be_empty
