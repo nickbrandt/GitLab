@@ -730,9 +730,9 @@ describe ProjectPolicy do
   end
 
   describe 'read_dependencies' do
-    context 'when dependency list feature available' do
+    context 'when dependency scanning feature available' do
       before do
-        stub_licensed_features(dependency_list: true)
+        stub_licensed_features(dependency_scanning: true)
       end
 
       context 'with public project' do

@@ -105,7 +105,6 @@ class License < ApplicationRecord
     cluster_health
     container_scanning
     dast
-    dependency_list
     dependency_scanning
     epics
     group_ip_restriction

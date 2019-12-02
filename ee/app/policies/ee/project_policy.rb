@@ -76,8 +76,8 @@ module EE
       end
 
       with_scope :subject
-      condition(:dependency_list_enabled) do
-        @subject.feature_available?(:dependency_list)
+      condition(:dependency_scanning_enabled) do
+        @subject.feature_available?(:dependency_scanning)
       end
 
       with_scope :subject
@@ -170,7 +170,7 @@ module EE
 
       rule { license_management_enabled & can?(:read_project) }.enable :read_software_license_policy
 
-      rule { dependency_list_enabled & can?(:download_code) }.enable :read_dependencies
+      rule { dependency_scanning_enabled & can?(:download_code) }.enable :read_dependencies
 
       rule { licenses_list_enabled & can?(:read_software_license_policy) }.enable :read_licenses_list
 
