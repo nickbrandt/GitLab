@@ -269,7 +269,7 @@ describe Projects::UpdateMirrorService do
             repository = project.repository
 
             allow(project).to receive(:fetch_mirror) { create_file(repository) }
-            expect(CreateBranchService).not_to receive(:create_master_branch)
+            expect(::Branches::CreateService).not_to receive(:create_master_branch)
 
             service.execute
 

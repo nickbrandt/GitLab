@@ -46,7 +46,7 @@ class Projects::BranchesController < Projects::ApplicationController
   def diverging_commit_counts
     respond_to do |format|
       format.json do
-        service = Branches::DivergingCommitCountsService.new(repository)
+        service = ::Branches::DivergingCommitCountsService.new(repository)
         branches = BranchesFinder.new(repository, params.permit(names: [])).execute
 
         Gitlab::GitalyClient.allow_n_plus_1_calls do
@@ -63,7 +63,7 @@ class Projects::BranchesController < Projects::ApplicationController
 
     redirect_to_autodeploy = project.empty_repo? && project.deployment_platform.present?
 
-    result = CreateBranchService.new(project, current_user)
+    result = ::Branches::CreateService.new(project, current_user)
         .execute(branch_name, ref)
 
     success = (result[:status] == :success)

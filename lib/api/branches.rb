@@ -137,7 +137,7 @@ module API
       post ':id/repository/branches' do
         authorize_push_project
 
-        result = CreateBranchService.new(user_project, current_user)
+        result = ::Branches::CreateService.new(user_project, current_user)
                  .execute(params[:branch], params[:ref])
 
         if result[:status] == :success
