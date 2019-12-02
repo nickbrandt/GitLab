@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import featureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
 import mountComponent from 'helpers/vue_mount_component_helper';
 import { trimText } from 'helpers/text_helper';
 import { TEST_HOST } from 'spec/test_constants';
+import axios from '~/lib/utils/axios_utils';
 import { getRequestData } from '../mock_data';
 
 describe('Feature flags', () => {

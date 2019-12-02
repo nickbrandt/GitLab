@@ -1,5 +1,4 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import {
   setEndpoint,
   setPath,
@@ -17,6 +16,7 @@ import {
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
 } from 'ee/feature_flags/constants';
 import { mapFromScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
+import axios from '~/lib/utils/axios_utils';
 
 jest.mock('~/lib/utils/url_utility');
 

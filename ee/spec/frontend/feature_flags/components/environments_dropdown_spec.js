@@ -1,9 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
 import { createLocalVue, mount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
-import axios from '~/lib/utils/axios_utils';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
 import { TEST_HOST } from 'spec/test_constants';
+import axios from '~/lib/utils/axios_utils';
 
 const localVue = createLocalVue();
 
