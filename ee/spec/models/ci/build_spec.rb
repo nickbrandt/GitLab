@@ -240,7 +240,7 @@ describe Ci::Build do
 
     context 'with available licensed feature' do
       before do
-        stub_licensed_features(dependency_list: true)
+        stub_licensed_features(dependency_scanning: true)
       end
 
       it 'parses blobs and add the results to the report' do
@@ -277,7 +277,7 @@ describe Ci::Build do
 
     context 'with available licensed feature' do
       before do
-        stub_licensed_features(dependency_list: true)
+        stub_licensed_features(dependency_scanning: true)
       end
 
       it 'parses blobs and add found license' do
