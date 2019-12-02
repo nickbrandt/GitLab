@@ -26,7 +26,8 @@ module ApplicationSettingImplementation
     '/users',
     '/users/confirmation',
     '/unsubscribes/',
-    '/import/github/personal_access_token'
+    '/import/github/personal_access_token',
+    '/admin/session'
   ].freeze
 
   class_methods do
