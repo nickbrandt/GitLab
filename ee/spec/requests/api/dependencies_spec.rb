@@ -11,7 +11,7 @@ describe API::Dependencies do
     let(:params) { {} }
 
     before do
-      stub_licensed_features(dependency_list: true, security_dashboard: true)
+      stub_licensed_features(dependency_scanning: true, security_dashboard: true)
     end
 
     context 'with an authorized user with proper permissions' do
