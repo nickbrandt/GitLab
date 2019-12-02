@@ -169,7 +169,7 @@ describe('feature flag form', () => {
         });
 
         it('should not render deleted scopes', () => {
-          expect(wrapper.vm.filteredScopes).toEqual([jasmine.objectContaining({ id: 2 })]);
+          expect(wrapper.vm.filteredScopes).toEqual([expect.objectContaining({ id: 2 })]);
         });
       });
 
@@ -329,7 +329,7 @@ describe('feature flag form', () => {
                 rolloutUserIds: '',
               },
               {
-                id: jasmine.any(String),
+                id: expect.any(String),
                 active: false,
                 environmentScope: 'review',
                 canUpdate: true,
@@ -339,7 +339,7 @@ describe('feature flag form', () => {
                 rolloutUserIds: '',
               },
               {
-                id: jasmine.any(String),
+                id: expect.any(String),
                 active: true,
                 environmentScope: '',
                 canUpdate: true,

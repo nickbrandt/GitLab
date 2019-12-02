@@ -61,7 +61,7 @@ describe('New feature flag form', () => {
   it('should render default * row', () => {
     expect(wrapper.vm.scopes).toEqual([
       {
-        id: jasmine.any(String),
+        id: expect.any(String),
         environmentScope: '*',
         active: true,
         rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
