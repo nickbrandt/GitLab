@@ -1,16 +1,15 @@
 <script>
-import Flash from '~/flash';
+import { GlAlert } from '@gitlab/ui';
 import { __ } from '~/locale';
-import serviceDeskSetting from './service_desk_setting.vue';
-import ServiceDeskStore from '../stores/service_desk_store';
+import ServiceDeskSetting from './service_desk_setting.vue';
 import ServiceDeskService from '../services/service_desk_service';
 import eventHub from '../event_hub';
 
 export default {
   name: 'ServiceDeskRoot',
-
   components: {
-    serviceDeskSetting,
+    GlAlert,
+    ServiceDeskSetting,
   },
   props: {
     initialIsEnabled: {
@@ -21,45 +20,52 @@ export default {
       type: String,
       required: true,
     },
-    incomingEmail: {
+    initialIncomingEmail: {
       type: String,
       required: false,
       default: '',
     },
+    selectedTemplate: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    templates: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
 
   data() {
-    const store = new ServiceDeskStore({
-      incomingEmail: this.incomingEmail,
-    });
-
     return {
-      store,
-      state: store.state,
       isEnabled: this.initialIsEnabled,
+      incomingEmail: this.initialIncomingEmail,
+      isTemplateSaving: false,
+      isAlertShowing: false,
+      alertVariant: 'danger',
+      alertMessage: '',
     };
   },
 
   created() {
     eventHub.$on('serviceDeskEnabledCheckboxToggled', this.onEnableToggled);
+    eventHub.$on('serviceDeskTemplateSave', this.onSaveTemplate);
 
     this.service = new ServiceDeskService(this.endpoint);
 
-    if (this.isEnabled && !this.store.state.incomingEmail) {
+    if (this.isEnabled && !this.incomingEmail) {
       this.fetchIncomingEmail();
     }
   },
 
   beforeDestroy() {
     eventHub.$off('serviceDeskEnabledCheckboxToggled', this.onEnableToggled);
+    eventHub.$off('serviceDeskTemplateSave', this.onSaveTemplate);
   },
 
   methods: {
     fetchIncomingEmail() {
-      if (this.flash) {
-        this.flash.innerHTML = '';
-      }
-
       this.service
         .fetchIncomingEmail()
         .then(({ data }) => {
@@ -68,24 +74,16 @@ export default {
             throw new Error(__("Response didn't include `service_desk_address`"));
           }
 
-          this.store.setIncomingEmail(email);
+          this.incomingEmail = email;
         })
-        .catch(() => {
-          this.flash = Flash(
-            __('An error occurred while fetching the Service Desk address.'),
-            'alert',
-            this.$el,
-          );
-        });
+        .catch(() =>
+          this.showAlert(__('An error occurred while fetching the Service Desk address.')),
+        );
     },
 
     onEnableToggled(isChecked) {
       this.isEnabled = isChecked;
-      this.store.resetIncomingEmail();
-      if (this.flash) {
-        this.flash.remove();
-        this.flash = undefined;
-      }
+      this.incomingEmail = '';
 
       this.service
         .toggleServiceDesk(isChecked)
@@ -95,15 +93,40 @@ export default {
             throw new Error(__("Response didn't include `service_desk_address`"));
           }
 
-          this.store.setIncomingEmail(email);
+          this.incomingEmail = email;
         })
         .catch(() => {
           const message = isChecked
             ? __('An error occurred while enabling Service Desk.')
             : __('An error occurred while disabling Service Desk.');
 
-          this.flash = Flash(message, 'alert', this.$el);
+          this.showAlert(message);
         });
+    },
+
+    onSaveTemplate(template) {
+      this.isTemplateSaving = true;
+      this.service
+        .updateTemplate(template, this.isEnabled)
+        .then(() => this.showAlert(__('Template was successfully saved.'), 'success'))
+        .catch(() =>
+          this.showAlert(
+            __('An error occurred while saving the template. Please check if the template exists.'),
+          ),
+        )
+        .finally(() => {
+          this.isTemplateSaving = false;
+        });
+    },
+
+    showAlert(message, variant = 'danger') {
+      this.isAlertShowing = true;
+      this.alertMessage = message;
+      this.alertVariant = variant;
+    },
+
+    onDismiss() {
+      this.isAlertShowing = false;
     },
   },
 };
@@ -111,7 +134,15 @@ export default {
 
 <template>
   <div>
-    <div class="flash-container"></div>
-    <service-desk-setting :is-enabled="isEnabled" :incoming-email="state.incomingEmail" />
+    <gl-alert v-if="isAlertShowing" class="mb-3" :variant="alertVariant" @dismiss="onDismiss">
+      {{ alertMessage }}
+    </gl-alert>
+    <service-desk-setting
+      :is-enabled="isEnabled"
+      :incoming-email="incomingEmail"
+      :initial-selected-template="selectedTemplate"
+      :templates="templates"
+      :is-template-saving="isTemplateSaving"
+    />
   </div>
 </template>
