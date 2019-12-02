@@ -3361,6 +3361,9 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
+msgid "Clear chart filters"
+msgstr ""
+
 msgid "Clear input"
 msgstr ""
 

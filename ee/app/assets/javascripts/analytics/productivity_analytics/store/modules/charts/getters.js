@@ -153,5 +153,7 @@ export const hasNoAccessError = state =>
 
 export const isChartEnabled = state => chartKey => state.charts[chartKey].enabled;
 
+export const isFilteringByDaysToMerge = state => state.charts[chartKeys.main].selected.length > 0;
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

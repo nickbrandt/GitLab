@@ -68,6 +68,7 @@ export default {
       'scatterplotYaxisLabel',
       'hasNoAccessError',
       'isChartEnabled',
+      'isFilteringByDaysToMerge',
     ]),
     ...mapGetters('table', [
       'sortFieldDropdownLabel',
@@ -103,6 +104,7 @@ export default {
       'fetchChartData',
       'setMetricType',
       'updateSelectedItems',
+      'resetMainChartSelection',
       'setChartEnabled',
     ]),
     ...mapActions('table', ['setSortField', 'setPage', 'toggleSortOrder', 'setColumnMetric']),
@@ -154,7 +156,18 @@ export default {
       "
     />
     <template v-if="showAppContent">
-      <h4>{{ s__('ProductivityAnalytics|Merge Requests') }}</h4>
+      <div class="d-flex justify-content-between">
+        <h4>{{ s__('ProductivityAnalytics|Merge Requests') }}</h4>
+        <gl-button
+          v-if="isFilteringByDaysToMerge"
+          ref="clearChartFiltersBtn"
+          class="btn-link float-right"
+          type="button"
+          variant="default"
+          @click="resetMainChartSelection()"
+          >{{ __('Clear chart filters') }}</gl-button
+        >
+      </div>
       <metric-chart
         ref="mainChart"
         class="mb-4"
