@@ -26,8 +26,8 @@ describe('Productivity analytics filter actions', () => {
           expect(store.commit).toHaveBeenCalledWith(types.SET_GROUP_NAMESPACE, groupNamespace);
 
           expect(store.dispatch.mock.calls[0]).toEqual([
-            'charts/updateSelectedItems',
-            { chartKey: chartKeys.main, item: null, skipReload: true },
+            'charts/resetMainChartSelection',
+            true,
             { root: true },
           ]);
 
@@ -58,8 +58,8 @@ describe('Productivity analytics filter actions', () => {
           expect(store.commit).toHaveBeenCalledWith(types.SET_PROJECT_PATH, projectPath);
 
           expect(store.dispatch.mock.calls[0]).toEqual([
-            'charts/updateSelectedItems',
-            { chartKey: chartKeys.main, item: null, skipReload: true },
+            'charts/resetMainChartSelection',
+            true,
             { root: true },
           ]);
 
@@ -90,8 +90,8 @@ describe('Productivity analytics filter actions', () => {
           expect(store.commit).toHaveBeenCalledWith(types.SET_PATH, path);
 
           expect(store.dispatch.mock.calls[0]).toEqual([
-            'charts/updateSelectedItems',
-            { chartKey: chartKeys.main, item: null, skipReload: true },
+            'charts/resetMainChartSelection',
+            true,
             { root: true },
           ]);
 
@@ -122,8 +122,8 @@ describe('Productivity analytics filter actions', () => {
           expect(store.commit).toHaveBeenCalledWith(types.SET_PATH, { startDate, endDate });
 
           expect(store.dispatch.mock.calls[0]).toEqual([
-            'charts/updateSelectedItems',
-            { chartKey: chartKeys.main, item: null, skipReload: true },
+            'charts/resetMainChartSelection',
+            true,
             { root: true },
           ]);
 
