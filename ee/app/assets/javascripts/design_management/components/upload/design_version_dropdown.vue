@@ -56,37 +56,35 @@ export default {
 <template>
   <gl-dropdown :text="dropdownText" variant="link" class="design-version-dropdown">
     <gl-dropdown-item
-      v-for="(version, index) in allVersions"
-      :key="version.node.id"
+      v-for="({ node }, index) in allVersions"
+      :key="node.id"
       class="border-top"
-      :class="{ 'bg-light': findVersionId(version.node.id) === currentVersion }"
+      :class="{ 'bg-light': findVersionId(node.id) === currentVersion }"
     >
       <router-link
         class="d-flex js-version-link px-0"
-        :to="{ path: $route.path, query: { version: findVersionId(version.node.id) } }"
+        :to="{ path: $route.path, query: { version: findVersionId(node.id) } }"
       >
         <div class="flex-shrink-0">
-          <gl-avatar :src="version.node.author.avatarUrl" :size="32" />
+          <gl-avatar :src="node.author.avatarUrl" :size="32" />
         </div>
         <div class="flex-grow-1 mx-2">
           <div>
             <strong
               >{{ __('Version') }} {{ allVersions.length - index }}
-              <span v-if="findVersionId(version.node.id) === latestVersionId"
-                >({{ __('latest') }})</span
-              >
+              <span v-if="findVersionId(node.id) === latestVersionId">({{ __('latest') }})</span>
             </strong>
             <div class="text-muted mt-1">
               <gl-sprintf :message="__('%{author} updated the designs')">
-                <template #author>{{ version.node.author.name }}</template>
+                <template #author>{{ node.author.name }}</template>
               </gl-sprintf>
               <br />
-              <time-ago-tooltip :time="version.node.createdAt" tooltip-placement="bottom" />
+              <time-ago-tooltip :time="node.createdAt" tooltip-placement="bottom" />
             </div>
           </div>
         </div>
         <i
-          v-if="findVersionId(version.node.id) === currentVersion"
+          v-if="findVersionId(node.id) === currentVersion"
           class="fa fa-check pull-right align-self-center"
         ></i>
       </router-link>
