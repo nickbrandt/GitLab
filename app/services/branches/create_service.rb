@@ -5,8 +5,7 @@ module Branches
     def execute(branch_name, ref, create_master_if_empty: true)
       create_master_branch if create_master_if_empty && project.empty_repo?
 
-      result = ValidateNewBranchService.new(project, current_user)
-                 .execute(branch_name)
+      result = ::Branches::ValidateNewService.new(project).execute(branch_name)
 
       return result if result[:status] == :error
 
