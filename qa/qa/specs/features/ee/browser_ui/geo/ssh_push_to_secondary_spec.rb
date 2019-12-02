@@ -3,22 +3,13 @@
 module QA
   context 'Geo', :orchestrated, :geo do
     describe 'GitLab SSH push to secondary' do
-      let(:file_content_primary) { 'This is a Geo project!  Commit from primary.' }
-      let(:file_content_secondary) { 'This is a Geo project!  Commit from secondary.' }
-
-      after do
-        # Log out so subsequent tests can start unauthenticated
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-      end
+      let(:file_content_primary) { 'This is a Geo project! Commit from primary.' }
+      let(:file_content_secondary) { 'This is a Geo project! Commit from secondary.' }
 
       context 'regular git commit' do
         it 'is proxied to the primary and ultimately replicated to the secondary' do
           file_name = 'README.md'
           key_title = "key for ssh tests #{Time.now.to_f}"
-          file_content = 'This is a Geo project!  Commit from secondary.'
           project = nil
           key = nil
 
@@ -100,9 +91,9 @@ module QA
 
             # Validate git push worked and new content is visible
             Page::Project::Show.perform do |show|
-              show.wait_for_repository_replication_with(file_content)
+              show.wait_for_repository_replication_with(file_content_secondary)
 
-              expect(page).to have_content(file_content)
+              expect(page).to have_content(file_content_secondary)
             end
           end
         end

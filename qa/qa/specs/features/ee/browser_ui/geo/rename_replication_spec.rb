@@ -3,14 +3,6 @@
 module QA
   context 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo project rename replication' do
-      after do
-        # Log out so subsequent tests can start unauthenticated
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-      end
-
       it 'user renames project' do
         # create the project and push code
         Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
