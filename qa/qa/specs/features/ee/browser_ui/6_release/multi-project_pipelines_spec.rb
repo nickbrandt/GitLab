@@ -61,8 +61,7 @@ module QA
           CI
         end
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         Resource::MergeRequest.fabricate_via_api! do |merge_request|
           merge_request.project = upstream_project
