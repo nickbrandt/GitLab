@@ -10,8 +10,7 @@ module QA
         @project_file_name = 'elasticsearch.rb'
         @project_file_content = 'elasticsearch: true'
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         QA::EE::Resource::Settings::Elasticsearch.fabricate_via_browser_ui!
 

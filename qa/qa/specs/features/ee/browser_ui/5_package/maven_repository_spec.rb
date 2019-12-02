@@ -10,8 +10,7 @@ module QA
       let(:package_name) { "#{group_id}/#{artifact_id}".tr('.', '/') }
       let(:auth_token) do
         unless Page::Main::Menu.perform(&:signed_in?)
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_credentials)
+          Flow::Login.sign_in
         end
 
         Resource::PersonalAccessToken.fabricate!.access_token

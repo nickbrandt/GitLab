@@ -119,8 +119,7 @@ module QA
 
       def sign_in
         unless Page::Main::Menu.perform { |p| p.has_personal_area?(wait: 0) }
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_credentials)
+          Flow::Login.sign_in
         end
       end
     end

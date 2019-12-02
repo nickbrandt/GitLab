@@ -9,8 +9,7 @@ module QA
 
     describe 'License Compliance settings page' do
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         @project = Resource::Project.fabricate_via_api! do |project|
           project.name = Runtime::Env.auto_devops_project_name || 'project-with-secure'
@@ -53,8 +52,7 @@ module QA
         @job_log_json_flag_enabled = Runtime::Feature.enabled?('job_log_json')
         Runtime::Feature.disable('job_log_json') if @job_log_json_flag_enabled
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         @project = Resource::Project.fabricate_via_api! do |project|
           project.name = Runtime::Env.auto_devops_project_name || 'project-with-secure'

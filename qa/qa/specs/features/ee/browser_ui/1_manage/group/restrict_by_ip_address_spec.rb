@@ -26,8 +26,7 @@ module QA
           menu.sign_out if menu.has_personal_area?(wait: 0)
         end
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
       end
 
       context 'when restricted by another ip address' do
