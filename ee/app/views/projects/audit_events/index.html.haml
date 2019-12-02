@@ -8,4 +8,5 @@
 %p.light Events in #{@project.full_path}
 
 - if feature_available
+  = render 'shared/audit_events/event_filter', path: project_audit_events_path(@project)
   = render 'shared/audit_events/event_table', events: @events

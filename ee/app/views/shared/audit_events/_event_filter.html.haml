@@ -1,0 +1,14 @@
+.row-content-block.second-block
+  = form_tag path, method: :get, class: 'filter-form' do
+    .prepend-top-10
+      .form-group
+        = label_tag :created_after, _('Created after'), class: 'label-bold'
+        = date_field_tag :created_after, params[:created_after],
+          class: 'form-control', placeholder: 'YYYY-MM-DD'
+
+      .form-group
+        = label_tag :created_before, _('Created before'), class: 'label-bold'
+        = date_field_tag :created_before, params[:created_before],
+          class: 'form-control', placeholder: 'YYYY-MM-DD'
+
+      = submit_tag _('Search'), class: 'btn'
