@@ -9,7 +9,7 @@ describe Security::DependencyListService do
     subject { described_class.new(pipeline: pipeline, params: params).execute }
 
     before do
-      stub_licensed_features(dependency_list: true)
+      stub_licensed_features(dependency_scanning: true)
     end
 
     context 'without params' do
