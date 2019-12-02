@@ -1,6 +1,6 @@
 .deployment-instance {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   margin: 1px;
   border: 1px solid;
   border-radius: $border-radius-small;
@@ -84,8 +84,8 @@
     border: 0;
 
     &::after {
-      width: 15px !important;
-      height: 15px !important;
+      width: 16px !important;
+      height: 16px !important;
     }
   }
 }
