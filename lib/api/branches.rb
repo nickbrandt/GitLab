@@ -173,7 +173,7 @@ module API
 
       desc 'Delete all merged branches'
       delete ':id/repository/merged_branches' do
-        DeleteMergedBranchesService.new(user_project, current_user).async_execute
+        ::Branches::DeleteMergedService.new(user_project, current_user).async_execute
 
         accepted!
       end

@@ -459,7 +459,7 @@ describe Projects::BranchesController do
       end
 
       it 'starts worker to delete merged branches' do
-        expect_any_instance_of(DeleteMergedBranchesService).to receive(:async_execute)
+        expect_any_instance_of(::Branches::DeleteMergedService).to receive(:async_execute)
 
         destroy_all_merged
       end

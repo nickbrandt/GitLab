@@ -118,7 +118,7 @@ class Projects::BranchesController < Projects::ApplicationController
   end
 
   def destroy_all_merged
-    DeleteMergedBranchesService.new(@project, current_user).async_execute
+    ::Branches::DeleteMergedService.new(@project, current_user).async_execute
 
     redirect_to project_branches_path(@project),
       notice: _('Merged branches are being deleted. This can take some time depending on the number of branches. Please refresh the page to see changes.')
