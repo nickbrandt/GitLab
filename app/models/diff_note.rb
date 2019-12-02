@@ -37,7 +37,8 @@ class DiffNote < Note
 
     creation_params = diff_file.diff.to_hash
       .except(:too_large)
-      .merge(diff: diff_file.diff_hunk(diff_line))
+
+    creation_params.merge(diff: diff_file.diff_hunk(diff_line)) if diff_line
 
     create_note_diff_file(creation_params)
   end
@@ -109,19 +110,16 @@ class DiffNote < Note
 
   def fetch_diff_file
     return note_diff_file.raw_diff_file if note_diff_file
-
-    file =
-      if created_at_diff?(noteable.diff_refs)
-        # We're able to use the already persisted diffs (Postgres) if we're
-        # presenting a "current version" of the MR discussion diff.
-        # So no need to make an extra Gitaly diff request for it.
-        # As an extra benefit, the returned `diff_file` already
-        # has `highlighted_diff_lines` data set from Redis on
-        # `Diff::FileCollection::MergeRequestDiff`.
-        noteable.diffs(original_position.diff_options).diff_files.first
-      else
-        original_position.diff_file(repository)
-      end
+    if created_at_diff?(noteable.diff_refs)
+      # We're able to use the already persisted diffs (Postgres) if we're
+      # presenting a "current version" of the MR discussion diff.
+      # So no need to make an extra Gitaly diff request for it.
+      # As an extra benefit, the returned `diff_file` already
+      # has `highlighted_diff_lines` data set from Redis on
+      # `Diff::FileCollection::MergeRequestDiff`.
+      file = noteable.diffs(original_position.diff_options).diff_files.first
+    end
+    file ||= original_position.diff_file(repository)
 
     file&.unfold_diff_lines(position)
 
