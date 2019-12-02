@@ -1,6 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import DesignVersionDropdown from 'ee/design_management/components/upload/design_version_dropdown.vue';
-import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlAvatar } from '@gitlab/ui';
+import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import mockAllVersions from './mock_data/all_versions';
 
 const LATEST_VERSION_ID = 3;
@@ -88,6 +89,18 @@ describe('Design management design version dropdown component', () => {
     it('displays latest version text when the current version is the latest', () => {
       createComponent({ $route: designRouteFactory(LATEST_VERSION_ID) });
       expect(wrapper.find(GlDropdown).attributes('text')).toBe('Showing Latest Version');
+    });
+
+    it("displays the user's avatar", () => {
+      createComponent();
+
+      expect(wrapper.find(GlAvatar).props('src')).toEqual(mockAllVersions[0].node.author.avatarUrl);
+    });
+
+    it('displays the created at tooltip', () => {
+      createComponent();
+
+      expect(wrapper.find(TimeAgoTooltip).props('time')).toEqual(mockAllVersions[0].node.createdAt);
     });
 
     it('should have the same length as apollo query', () => {

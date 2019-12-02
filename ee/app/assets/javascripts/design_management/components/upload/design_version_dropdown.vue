@@ -59,7 +59,7 @@ export default {
       v-for="({ node }, index) in allVersions"
       :key="node.id"
       class="border-top"
-      :class="{ 'bg-light': findVersionId(node.id) === currentVersion }"
+      :class="{ 'bg-light': findVersionId(node.id) === currentVersionId }"
     >
       <router-link
         class="d-flex js-version-link px-0"
@@ -84,7 +84,7 @@ export default {
           </div>
         </div>
         <i
-          v-if="findVersionId(node.id) === currentVersion"
+          v-if="findVersionId(node.id) === currentVersionId"
           class="fa fa-check pull-right align-self-center"
         ></i>
       </router-link>

@@ -8,13 +8,28 @@ exports[`Design management design version dropdown component renders design vers
   text="Showing Latest Version"
   variant="link"
 >
-  <gldropdownitem-stub>
+  <gldropdownitem-stub
+    class="border-top bg-light"
+  >
     <router-link-stub
-      class="d-flex js-version-link"
+      class="d-flex js-version-link px-0"
       to="[object Object]"
     >
       <div
-        class="flex-grow-1 ml-2"
+        class="flex-shrink-0"
+      >
+        <glavatar-stub
+          alt="avatar"
+          entityid="0"
+          entityname=""
+          shape="circle"
+          size="32"
+          src="https://placehold.it/200"
+        />
+      </div>
+       
+      <div
+        class="flex-grow-1 mx-2"
       >
         <div>
           <strong>
@@ -24,21 +39,52 @@ exports[`Design management design version dropdown component renders design vers
               (latest)
             </span>
           </strong>
+           
+          <div
+            class="text-muted mt-1"
+          >
+            <glsprintf-stub
+              message="%{author} updated the designs"
+            />
+             
+            <br />
+             
+            <timeagotooltip-stub
+              cssclass=""
+              time="2019-11-13T16:08:11Z"
+              tooltipplacement="bottom"
+            />
+          </div>
         </div>
       </div>
        
       <i
-        class="fa fa-check pull-right"
+        class="fa fa-check pull-right align-self-center"
       />
     </router-link-stub>
   </gldropdownitem-stub>
-  <gldropdownitem-stub>
+  <gldropdownitem-stub
+    class="border-top"
+  >
     <router-link-stub
-      class="d-flex js-version-link"
+      class="d-flex js-version-link px-0"
       to="[object Object]"
     >
       <div
-        class="flex-grow-1 ml-2"
+        class="flex-shrink-0"
+      >
+        <glavatar-stub
+          alt="avatar"
+          entityid="0"
+          entityname=""
+          shape="circle"
+          size="32"
+          src="https://placehold.it/200"
+        />
+      </div>
+       
+      <div
+        class="flex-grow-1 mx-2"
       >
         <div>
           <strong>
@@ -46,6 +92,22 @@ exports[`Design management design version dropdown component renders design vers
             
             <!---->
           </strong>
+           
+          <div
+            class="text-muted mt-1"
+          >
+            <glsprintf-stub
+              message="%{author} updated the designs"
+            />
+             
+            <br />
+             
+            <timeagotooltip-stub
+              cssclass=""
+              time="2019-11-13T12:08:11Z"
+              tooltipplacement="bottom"
+            />
+          </div>
         </div>
       </div>
        
@@ -63,13 +125,28 @@ exports[`Design management design version dropdown component renders design vers
   text="Showing Latest Version"
   variant="link"
 >
-  <gldropdownitem-stub>
+  <gldropdownitem-stub
+    class="border-top bg-light"
+  >
     <router-link-stub
-      class="d-flex js-version-link"
+      class="d-flex js-version-link px-0"
       to="[object Object]"
     >
       <div
-        class="flex-grow-1 ml-2"
+        class="flex-shrink-0"
+      >
+        <glavatar-stub
+          alt="avatar"
+          entityid="0"
+          entityname=""
+          shape="circle"
+          size="32"
+          src="https://placehold.it/200"
+        />
+      </div>
+       
+      <div
+        class="flex-grow-1 mx-2"
       >
         <div>
           <strong>
@@ -79,21 +156,52 @@ exports[`Design management design version dropdown component renders design vers
               (latest)
             </span>
           </strong>
+           
+          <div
+            class="text-muted mt-1"
+          >
+            <glsprintf-stub
+              message="%{author} updated the designs"
+            />
+             
+            <br />
+             
+            <timeagotooltip-stub
+              cssclass=""
+              time="2019-11-13T16:08:11Z"
+              tooltipplacement="bottom"
+            />
+          </div>
         </div>
       </div>
        
       <i
-        class="fa fa-check pull-right"
+        class="fa fa-check pull-right align-self-center"
       />
     </router-link-stub>
   </gldropdownitem-stub>
-  <gldropdownitem-stub>
+  <gldropdownitem-stub
+    class="border-top"
+  >
     <router-link-stub
-      class="d-flex js-version-link"
+      class="d-flex js-version-link px-0"
       to="[object Object]"
     >
       <div
-        class="flex-grow-1 ml-2"
+        class="flex-shrink-0"
+      >
+        <glavatar-stub
+          alt="avatar"
+          entityid="0"
+          entityname=""
+          shape="circle"
+          size="32"
+          src="https://placehold.it/200"
+        />
+      </div>
+       
+      <div
+        class="flex-grow-1 mx-2"
       >
         <div>
           <strong>
@@ -101,6 +209,22 @@ exports[`Design management design version dropdown component renders design vers
             
             <!---->
           </strong>
+           
+          <div
+            class="text-muted mt-1"
+          >
+            <glsprintf-stub
+              message="%{author} updated the designs"
+            />
+             
+            <br />
+             
+            <timeagotooltip-stub
+              cssclass=""
+              time="2019-11-13T12:08:11Z"
+              tooltipplacement="bottom"
+            />
+          </div>
         </div>
       </div>
        
