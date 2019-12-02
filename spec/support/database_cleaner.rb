@@ -34,9 +34,9 @@ RSpec.configure do |config|
 
     if tables_with_more_than_allowed_columns.any?
       tables_with_more_than_allowed_columns.each do |result|
-        puts "The #{result['table']} has #{result['column_count']} columns."
+        puts "The #{result['table']} table has #{result['column_count']} columns."
       end
-      puts "Recreating the database to reset the 'application_settings' columns count"
+      puts "Recreating the database"
       start = Gitlab::Metrics::System.monotonic_time
 
       ActiveRecord::Tasks::DatabaseTasks.drop_current
@@ -44,7 +44,7 @@ RSpec.configure do |config|
       ActiveRecord::Tasks::DatabaseTasks.load_schema_current
       ActiveRecord::Tasks::DatabaseTasks.migrate
 
-      puts "Schema re-creation done in #{Gitlab::Metrics::System.monotonic_time - start}"
+      puts "Database re-creation done in #{Gitlab::Metrics::System.monotonic_time - start}"
     end
   end
 
