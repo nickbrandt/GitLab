@@ -5,16 +5,8 @@ module QA
     let(:git_push_http_path_prefix) { '/-/push_from_secondary' }
 
     describe 'GitLab Geo HTTP push secondary' do
-      let(:file_content_primary) { 'This is a Geo project!  Commit from primary.' }
-      let(:file_content_secondary) { 'This is a Geo project!  Commit from secondary.' }
-
-      after do
-        # Log out so subsequent tests can start unauthenticated
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-      end
+      let(:file_content_primary) { 'This is a Geo project! Commit from primary.' }
+      let(:file_content_secondary) { 'This is a Geo project! Commit from secondary.' }
 
       context 'regular git commit' do
         it 'is redirected to the primary and ultimately replicated to the secondary' do
