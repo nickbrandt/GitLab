@@ -162,7 +162,7 @@ module API
         commit = user_project.repository.commit(branch.dereferenced_target)
 
         destroy_conditionally!(commit, last_updated: commit.authored_date) do
-          result = DeleteBranchService.new(user_project, current_user)
+          result = ::Branches::DeleteService.new(user_project, current_user)
                     .execute(params[:branch])
 
           if result.error?

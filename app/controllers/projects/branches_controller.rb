@@ -102,7 +102,7 @@ class Projects::BranchesController < Projects::ApplicationController
 
   def destroy
     @branch_name = Addressable::URI.unescape(params[:id])
-    result = DeleteBranchService.new(project, current_user).execute(@branch_name)
+    result = ::Branches::DeleteService.new(project, current_user).execute(@branch_name)
 
     respond_to do |format|
       format.html do

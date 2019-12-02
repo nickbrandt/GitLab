@@ -15,7 +15,7 @@ class DeleteMergedBranchesService < BaseService
     branches = branches.reject { |branch| ProtectedBranch.protected?(project, branch) }
 
     branches.each do |branch|
-      DeleteBranchService.new(project, current_user).execute(branch)
+      ::Branches::DeleteService.new(project, current_user).execute(branch)
     end
   end
 
