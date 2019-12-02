@@ -78,6 +78,27 @@
               %p
                 = _("If disabled, the access level will depend on the user's permissions in the project.")
 
+        - if Feature.enabled?(:allow_fork_pipelines_to_run_in_parent, @project)
+          %hr
+          .form-group
+            .form-check
+              = f.check_box :allow_fork_pipelines_to_run_in_parent, { class: 'form-check-input' }
+              = f.label :allow_fork_pipelines_to_run_in_parent, class: 'form-check-label' do
+                %strong= _("Allow forked projects to create pipelines")
+              .form-text.text-muted
+                = _("Allow merge requests and pull requests from forked projects to create pipelines in parent")
+              .bs-callout.bs-callout-info
+                %p #{_("If enabled")}:
+                %ul
+                  %li
+                    = _("Forked projects can create/read/update pipelines")
+                  %li
+                    = _("Forked projects can read container registry")
+                  %li
+                    = _("Forked projects cannot access project/group-level secret variables, clusters, project/group-level specific runners, environments/deployments, or service integrations")
+                %p
+                  = _("If disabled, forked projects cannot create/read/update pipelines.")
+
         %hr
         .form-group
           .form-check
