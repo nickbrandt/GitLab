@@ -61,6 +61,25 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         resources :subscriptions, only: [:create, :destroy]
         resources :licenses, only: [:index, :create, :update], controller: 'security/licenses'
+
+        resources :environments, only: [] do
+          member do
+            get :logs
+            get '/pods/(:pod_name)/containers/(:container_name)/logs', to: 'environments#k8s_pod_logs', as: :k8s_pod_logs
+          end
+
+          collection do
+            get :logs, action: :logs_redirect
+          end
+        end
+
+        resources :protected_environments, only: [:create, :update, :destroy], constraints: { id: /\d+/ } do
+          collection do
+            get 'search'
+          end
+        end
+
+        resources :audit_events, only: [:index]
       end
       # End of the /-/ scope.
 
@@ -191,25 +210,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resource :dependencies, only: [:show]
       resource :licenses, only: [:show]
-
-      resources :environments, only: [] do
-        member do
-          get :logs
-          get '/pods/(:pod_name)/containers/(:container_name)/logs', to: 'environments#k8s_pod_logs', as: :k8s_pod_logs
-        end
-
-        collection do
-          get :logs, action: :logs_redirect
-        end
-      end
-
-      resources :protected_environments, only: [:create, :update, :destroy], constraints: { id: /\d+/ } do
-        collection do
-          get 'search'
-        end
-      end
-
-      resources :audit_events, only: [:index]
 
       # All new routes should go under /-/ scope.
       # Look for scope '-' at the top of the file.

@@ -50,4 +50,16 @@ describe 'EE-specific project routing' do
       expect(post('/gitlab/gitlabhq/-/settings/operations/reset_alerting_token')).to route_to('projects/settings/operations#reset_alerting_token', namespace_id: 'gitlab', project_id: 'gitlabhq')
     end
   end
+
+  describe Projects::ProtectedEnvironmentsController, 'routing' do
+    describe 'legacy routing' do
+      it_behaves_like 'redirecting a legacy project path', "/gitlab/gitlabhq/protected_environments", "/gitlab/gitlabhq/-/protected_environments"
+    end
+  end
+
+  describe Projects::AuditEventsController, 'routing' do
+    describe 'legacy routing' do
+      it_behaves_like 'redirecting a legacy project path', "/gitlab/gitlabhq/audit_events", "/gitlab/gitlabhq/-/audit_events"
+    end
+  end
 end
