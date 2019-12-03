@@ -78,7 +78,7 @@ export default {
               <gl-sprintf v-if="node.author" :message="__('%{author} updated the designs')">
                 <template #author>{{ node.author.name }}</template>
               </gl-sprintf>
-              <br />
+              <br v-if="node.author" />
               <time-ago-tooltip
                 v-if="node.createdAt"
                 :time="node.createdAt"
