@@ -3,8 +3,12 @@
 module Elastic
   module Latest
     module GitInstanceProxy
-      def self.methods_for_all_write_targets
-        super + [:delete_index_for_commits_and_blobs]
+      extend ActiveSupport::Concern
+
+      class_methods do
+        def methods_for_all_write_targets
+          super + [:delete_index_for_commits_and_blobs]
+        end
       end
 
       def es_parent
