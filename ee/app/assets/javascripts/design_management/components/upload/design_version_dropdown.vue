@@ -65,7 +65,7 @@ export default {
         class="d-flex js-version-link px-0"
         :to="{ path: $route.path, query: { version: findVersionId(node.id) } }"
       >
-        <div class="flex-shrink-0">
+        <div class="flex-shrink-0" v-if="node.author">
           <gl-avatar :src="node.author.avatarUrl" :size="32" />
         </div>
         <div class="flex-grow-1 mx-2">
@@ -75,11 +75,15 @@ export default {
               <span v-if="findVersionId(node.id) === latestVersionId">({{ __('latest') }})</span>
             </strong>
             <div class="text-muted mt-1">
-              <gl-sprintf :message="__('%{author} updated the designs')">
+              <gl-sprintf v-if="node.author" :message="__('%{author} updated the designs')">
                 <template #author>{{ node.author.name }}</template>
               </gl-sprintf>
               <br />
-              <time-ago-tooltip :time="node.createdAt" tooltip-placement="bottom" />
+              <time-ago-tooltip
+                v-if="node.createdAt"
+                :time="node.createdAt"
+                tooltip-placement="bottom"
+              />
             </div>
           </div>
         </div>
