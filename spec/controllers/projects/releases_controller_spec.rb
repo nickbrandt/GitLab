@@ -207,13 +207,13 @@ describe Projects::ReleasesController do
         project.add_guest(user)
       end
 
-      context 'if the project is private' do
+      context 'when the project is private' do
         let(:project) { private_project }
 
         it_behaves_like 'not found'
       end
 
-      context 'if the project is public' do
+      context 'when the project is public' do
         it_behaves_like 'successful request'
       end
     end
