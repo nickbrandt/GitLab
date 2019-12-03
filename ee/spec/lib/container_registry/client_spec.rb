@@ -136,4 +136,42 @@ describe ContainerRegistry::Client do
       expect(client.repository_raw_manifest('group/test', 'my-tag')).to eq(manifest)
     end
   end
+
+  describe '#pull_blob' do
+    let(:auth_headers) { { 'Authorization' => 'Bearer 12345' } }
+
+    before do
+      stub_request(:get, "http://registry/v2/group/test/blobs/e2312abc")
+          .with(headers: auth_headers)
+          .to_return(status: 302, headers: { "Location" => 'http://download-link.com' })
+    end
+
+    it 'GET "/v2/:name/blobs/:reference' do
+      stub_request(:get, "http://download-link.com/")
+        .to_return(status: 200)
+
+      # With this stub we assert that there is no Authorization header in the request.
+      # This also mimics the real case because Amazon s3 returns error too.
+      stub_request(:get, "http://download-link.com/")
+        .with(headers: auth_headers)
+        .to_return(status: 500)
+
+      expect(client.pull_blob('group/test', 'e2312abc')).to be_a_kind_of(Tempfile)
+    end
+
+    it 'raises error when it can not download blob' do
+      stub_request(:get, "http://download-link.com/")
+        .to_return(status: 500)
+
+      expect { client.pull_blob('group/test', 'e2312abc') }.to raise_error(EE::ContainerRegistry::Client::Error)
+    end
+
+    it 'raises error when request is not authenticated' do
+      stub_request(:get, "http://registry/v2/group/test/blobs/e2312abc")
+          .with(headers: auth_headers)
+          .to_return(status: 401)
+
+      expect { client.pull_blob('group/test', 'e2312abc') }.to raise_error(EE::ContainerRegistry::Client::Error)
+    end
+  end
 end
