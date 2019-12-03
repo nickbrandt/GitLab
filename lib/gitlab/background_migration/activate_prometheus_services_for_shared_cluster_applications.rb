@@ -6,6 +6,7 @@ module Gitlab
   module BackgroundMigration
     class ActivatePrometheusServicesForSharedClusterApplications
       include Gitlab::Database::MigrationHelpers
+      include Gitlab::Utils::StrongMemoize
 
       module Migratable
         class Applications::Prometheus < ActiveRecord::Base
@@ -124,9 +125,9 @@ module Gitlab
       end
 
       def migrate_instance_cluster?
-        return @_migrate_instance_cluster if defined? @_migrate_instance_cluster
-
-        @_migrate_instance_cluster = Migratable::Cluster.instance_type.has_prometheus_application?
+        strong_memoize(:migrate_instance_cluster) do
+          Migratable::Cluster.instance_type.has_prometheus_application?
+        end
       end
     end
   end
