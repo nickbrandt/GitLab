@@ -36,7 +36,7 @@ RSpec.describe ChatMessage::MergeMessage do
 
     it 'returns a message regarding completed approval of merge requests' do
       expect(subject.pretext).to eq(
-        'Test User (test.user) approved <http://somewhere.com/merge_requests/100|!100 *Merge Request title*> '\
+        'Test User (test.user) approved <http://somewhere.com/-/merge_requests/100|!100 *Merge Request title*> '\
         'in <http://somewhere.com|project_name>')
       expect(subject.attachments).to be_empty
     end
@@ -49,7 +49,7 @@ RSpec.describe ChatMessage::MergeMessage do
 
     it 'returns a message regarding revocation of completed approval of merge requests' do
       expect(subject.pretext).to eq(
-        'Test User (test.user) unapproved <http://somewhere.com/merge_requests/100|!100 *Merge Request title*> '\
+        'Test User (test.user) unapproved <http://somewhere.com/-/merge_requests/100|!100 *Merge Request title*> '\
         'in <http://somewhere.com|project_name>')
       expect(subject.attachments).to be_empty
     end
@@ -62,7 +62,7 @@ RSpec.describe ChatMessage::MergeMessage do
 
     it 'returns a message regarding added approval of merge requests' do
       expect(subject.pretext).to eq(
-        'Test User (test.user) added their approval to <http://somewhere.com/merge_requests/100|!100 *Merge Request title*> '\
+        'Test User (test.user) added their approval to <http://somewhere.com/-/merge_requests/100|!100 *Merge Request title*> '\
         'in <http://somewhere.com|project_name>')
       expect(subject.attachments).to be_empty
     end
@@ -75,7 +75,7 @@ RSpec.describe ChatMessage::MergeMessage do
 
     it 'returns a message regarding revoking approval of merge requests' do
       expect(subject.pretext).to eq(
-        'Test User (test.user) removed their approval from <http://somewhere.com/merge_requests/100|!100 *Merge Request title*> '\
+        'Test User (test.user) removed their approval from <http://somewhere.com/-/merge_requests/100|!100 *Merge Request title*> '\
         'in <http://somewhere.com|project_name>')
       expect(subject.attachments).to be_empty
     end
