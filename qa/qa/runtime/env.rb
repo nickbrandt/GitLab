@@ -281,6 +281,10 @@ module QA
         ENV.fetch('GITLAB_QA_LOOP_RUNNER_MINUTES', 1).to_i
       end
 
+      def mailhog_hostname
+        ENV['MAILHOG_HOSTNAME']
+      end
+
       private
 
       def remote_grid_credentials
