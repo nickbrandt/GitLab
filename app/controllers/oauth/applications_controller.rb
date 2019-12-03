@@ -8,6 +8,8 @@ class Oauth::ApplicationsController < Doorkeeper::ApplicationsController
   include Gitlab::Experimentation::ControllerConcern
   include InitializesCurrentUserMode
 
+  skip_before_action :authenticate_admin!
+
   prepend_before_action :verify_user_oauth_applications_enabled, except: :index
   prepend_before_action :authenticate_user!
   before_action :add_gon_variables
