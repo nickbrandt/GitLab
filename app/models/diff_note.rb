@@ -21,7 +21,7 @@ class DiffNote < Note
   validate :positions_complete
   validate :verify_supported
 
-  before_validation :set_line_code, if: :on_text?
+  before_validation :set_line_code, if: :on_text?, unless: :importing?
   after_save :keep_around_commits, unless: :importing?
   after_commit :create_diff_file, on: :create
 
@@ -104,7 +104,7 @@ class DiffNote < Note
   end
 
   def should_create_diff_file?
-    false && on_text? && note_diff_file.nil? && start_of_discussion?
+    on_text? && note_diff_file.nil? && start_of_discussion?
   end
 
   def fetch_diff_file
