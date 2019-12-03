@@ -851,6 +851,17 @@ describe ProjectPolicy do
         end
       end
 
+      context "when the licenses_list feature is enabled for a specific project" do
+        let(:current_user) { create(:user) }
+
+        before do
+          stub_feature_flags(licenses_list: { enabled: true, thing: project })
+          stub_licensed_features(license_management: true)
+        end
+
+        it { is_expected.to be_allowed(:read_licenses_list) }
+      end
+
       context 'when license management feature in not available' do
         let(:current_user) { admin }
 
