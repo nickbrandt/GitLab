@@ -170,6 +170,17 @@ describe PipelinesFinder do
       end
     end
 
+    context 'when updated_at filters are specified' do
+      let(:params) { { updated_before: 1.day.ago, updated_after: 3.days.ago } }
+      let!(:pipeline1) { create(:ci_pipeline, project: project, updated_at: 2.days.ago) }
+      let!(:pipeline2) { create(:ci_pipeline, project: project, updated_at: 4.days.ago) }
+      let!(:pipeline3) { create(:ci_pipeline, project: project, updated_at: 1.hour.ago) }
+
+      it 'returns deployments with matched updated_at' do
+        is_expected.to match_array([pipeline1])
+      end
+    end
+
     context 'when order_by and sort are specified' do
       context 'when order_by user_id' do
         let(:params)     { { order_by: 'user_id', sort: 'asc' } }

@@ -14,6 +14,7 @@ module Ci
     include HasRef
     include ShaAttribute
     include FromUnion
+    include UpdatedAtFilterable
 
     sha_attribute :source_sha
     sha_attribute :target_sha
