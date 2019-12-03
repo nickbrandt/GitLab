@@ -1,45 +1,58 @@
+import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
+import AxiosMockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import { createStore } from '~/monitoring/stores';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import PanelType from 'ee/monitoring/components/panel_type.vue';
-import { graphDataPrometheusQueryRange } from 'spec/monitoring/mock_data';
 import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
+import { graphDataPrometheusQueryRange } from '../../../../spec/frontend/monitoring/mock_data';
+
+global.URL.createObjectURL = jest.fn();
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('Panel Type', () => {
-  let localVue;
+  let axiosMock;
   let panelType;
   let store;
   const dashboardWidth = 100;
   const exampleText = 'example_text';
 
+  const createWrapper = propsData => {
+    store = createStore();
+    panelType = shallowMount(PanelType, {
+      propsData,
+      store,
+      localVue,
+      sync: false,
+      attachToDocument: true,
+    });
+  };
+
   beforeEach(() => {
+    axiosMock = new AxiosMockAdapter(axios);
     window.gon = {
       ...window.gon,
       ee: true,
     };
   });
 
+  afterEach(() => {
+    axiosMock.reset();
+  });
+
   describe('metrics with alert', () => {
-    localVue = createLocalVue();
-
     describe('with license', () => {
-      beforeEach(done => {
-        store = createStore();
-
-        panelType = shallowMount(PanelType, {
-          localVue,
-          propsData: {
-            clipboardText: exampleText,
-            dashboardWidth,
-            graphData: graphDataPrometheusQueryRange,
-            alertsEndpoint: '/endpoint',
-            prometheusAlertsAvailable: true,
-          },
-          store,
-          sync: false,
+      beforeEach(() => {
+        createWrapper({
+          clipboardText: exampleText,
+          dashboardWidth,
+          graphData: graphDataPrometheusQueryRange,
+          alertsEndpoint: '/endpoint',
+          prometheusAlertsAvailable: true,
         });
-
-        panelType.vm.$nextTick(done);
       });
 
       afterEach(() => {
@@ -75,36 +88,24 @@ describe('Panel Type', () => {
     });
 
     describe('without license', () => {
-      beforeEach(done => {
-        store = createStore();
-
-        panelType = shallowMount(PanelType, {
-          localVue,
-          propsData: {
-            clipboardText: exampleText,
-            dashboardWidth,
-            graphData: graphDataPrometheusQueryRange,
-            alertsEndpoint: '/endpoint',
-            prometheusAlertsAvailable: false,
-          },
-          sync: false,
-          store,
+      beforeEach(() => {
+        createWrapper({
+          clipboardText: exampleText,
+          dashboardWidth,
+          graphData: graphDataPrometheusQueryRange,
+          alertsEndpoint: '/endpoint',
+          prometheusAlertsAvailable: false,
         });
-        panelType.vm.$nextTick(done);
       });
 
-      it('does not show alert widget', done => {
-        setTimeout(() => {
-          expect(panelType.find(AlertWidget).exists()).toBe(false);
-          expect(
-            panelType
-              .findAll(GlDropdownItem)
-              .filter(i => i.text() === 'Alerts')
-              .exists(),
-          ).toBe(false);
-
-          done();
-        });
+      it('does not show alert widget', () => {
+        expect(panelType.find(AlertWidget).exists()).toBe(false);
+        expect(
+          panelType
+            .findAll(GlDropdownItem)
+            .filter(i => i.text() === 'Alerts')
+            .exists(),
+        ).toBe(false);
       });
     });
   });
