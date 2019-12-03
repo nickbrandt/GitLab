@@ -1,0 +1,5 @@
+---
+title: Fix typo in Kubernetes GKE setup error message
+merge_request: 21091
+author:
+type: fixed
