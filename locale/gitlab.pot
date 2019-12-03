@@ -696,6 +696,9 @@ msgstr ""
 msgid "A plain HTML site that uses Netlify for CI/CD instead of GitLab, but still with all the other great GitLab features."
 msgstr ""
 
+msgid "A project boilerplate for Salesforce App development with Salesforce Developer tools."
+msgstr ""
+
 msgid "A project is where you house your files (repository), plan your work (issues), and publish your documentation (wiki), %{among_other_things_link}."
 msgstr ""
 
@@ -13719,6 +13722,9 @@ msgid "ProjectTemplates|Pages/Plain HTML"
 msgstr ""
 
 msgid "ProjectTemplates|Ruby on Rails"
+msgstr ""
+
+msgid "ProjectTemplates|SalesforceDX"
 msgstr ""
 
 msgid "ProjectTemplates|Serverless Framework/JS"
