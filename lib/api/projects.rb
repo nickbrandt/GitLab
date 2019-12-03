@@ -84,7 +84,6 @@ module API
       def prepare_query(projects)
         projects = reorder_projects(projects)
         projects = apply_filters(projects)
-        projects = paginate(projects)
 
         projects, options = with_custom_attributes(projects)
 
@@ -104,6 +103,8 @@ module API
 
       def prepare_and_present(project_relation)
         projects, options = prepare_query(project_relation)
+
+        projects = paginate_and_retrieve!(projects)
 
         # Refresh count caches
         options[:with].execute_batch_counting(projects)
