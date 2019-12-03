@@ -91,6 +91,10 @@ module Clusters
         # we need to silence the exceptions
       end
 
+      def configured?
+        kube_client.present? && available?
+      end
+
       private
 
       def disable_prometheus_integration
