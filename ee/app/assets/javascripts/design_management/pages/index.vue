@@ -47,6 +47,7 @@ export default {
         createDesign: false,
       },
       isSaving: false,
+      savingDesignFiles: [],
       selectedDesigns: [],
     };
   },
@@ -100,7 +101,8 @@ export default {
         return null;
       }
 
-      const optimisticResponse = Array.from(files).map(file => ({
+      const filesArray = Array.from(files);
+      const optimisticResponse = filesArray.map(file => ({
         // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
         // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
         __typename: 'Design',
@@ -134,6 +136,7 @@ export default {
       }));
 
       this.isSaving = true;
+      this.savingDesignFiles = filesArray;
 
       return this.$apollo
         .mutate({
@@ -186,6 +189,13 @@ export default {
     },
     isDesignSelected(filename) {
       return this.selectedDesigns.includes(filename);
+    },
+    canSelectDesign(filename) {
+      return (
+        this.isLatestVersion &&
+        this.canCreateDesign &&
+        !this.savingDesignFiles.some(file => file.name === filename)
+      );
     },
     onDesignDelete() {
       this.selectedDesigns = [];
@@ -243,7 +253,7 @@ export default {
         <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
           <design v-bind="design" />
           <input
-            v-if="isLatestVersion && canCreateDesign"
+            v-if="canSelectDesign(design.filename)"
             :checked="isDesignSelected(design.filename)"
             type="checkbox"
             class="design-checkbox"
