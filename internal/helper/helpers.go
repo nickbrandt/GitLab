@@ -21,11 +21,15 @@ import (
 const NginxResponseBufferHeader = "X-Accel-Buffering"
 
 func LogError(r *http.Request, err error) {
+	LogErrorWithFields(r, err, nil)
+}
+
+func LogErrorWithFields(r *http.Request, err error, fields log.Fields) {
 	if err != nil {
-		captureRavenError(r, err)
+		captureRavenError(r, err, fields)
 	}
 
-	printError(r, err)
+	printError(r, err, fields)
 }
 
 func CaptureAndFail(w http.ResponseWriter, r *http.Request, err error, msg string, code int) {
@@ -41,14 +45,15 @@ func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
 	CaptureAndFail(w, r, err, "Request Entity Too Large", http.StatusRequestEntityTooLarge)
 }
 
-func printError(r *http.Request, err error) {
+func printError(r *http.Request, err error, fields log.Fields) {
 	if r != nil {
-		log.WithContextFields(r.Context(), log.Fields{
+		entry := log.WithContextFields(r.Context(), log.Fields{
 			"method": r.Method,
 			"uri":    mask.URL(r.RequestURI),
-		}).WithError(err).Error("error")
+		})
+		entry.WithFields(fields).WithError(err).Error("error")
 	} else {
-		log.WithError(err).Error("unknown error")
+		log.WithFields(fields).WithError(err).Error("unknown error")
 	}
 }
 
