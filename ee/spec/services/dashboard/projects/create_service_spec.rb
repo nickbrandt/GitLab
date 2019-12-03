@@ -2,18 +2,18 @@
 
 require 'spec_helper'
 
-describe UsersOpsDashboardProjects::CreateService do
+describe Dashboard::Projects::CreateService do
   let(:user) { create(:user) }
-  let(:service) { described_class.new(user) }
+  let(:service) { described_class.new(user, user.ops_dashboard_projects, feature: :operations_dashboard) }
   let(:project) { create(:project) }
 
   describe '#execute' do
-    let(:projects_service) { double(Dashboard::Operations::ProjectsService) }
+    let(:projects_service) { double(Dashboard::Projects::ListService) }
     let(:result) { service.execute(input) }
 
     before do
-      allow(Dashboard::Operations::ProjectsService)
-        .to receive(:new).with(user).and_return(projects_service)
+      allow(Dashboard::Projects::ListService)
+        .to receive(:new).with(user, feature: :operations_dashboard).and_return(projects_service)
       allow(projects_service)
         .to receive(:execute).with(input).and_return(output)
     end
@@ -63,7 +63,7 @@ describe UsersOpsDashboardProjects::CreateService do
       let(:output) { [] }
 
       it 'does not add invalid project ids' do
-        expect(result).to eq(expected_result(invalid_project_ids: input))
+        expect(result).to eq(expected_result(invalid_project_ids: input.map(&:to_s)))
       end
     end
   end
@@ -75,7 +75,7 @@ describe UsersOpsDashboardProjects::CreateService do
     invalid_project_ids: [],
     duplicate_project_ids: []
   )
-    UsersOpsDashboardProjects::CreateService::Result.new(
+    described_class::Result.new(
       added_project_ids, invalid_project_ids, duplicate_project_ids
     )
   end

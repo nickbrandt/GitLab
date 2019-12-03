@@ -10,11 +10,11 @@ describe Dashboard::Operations::ListService do
   let!(:user) { create(:user) }
 
   describe '#execute' do
-    let(:projects_service) { double(Dashboard::Operations::ProjectsService) }
+    let(:projects_service) { double(Dashboard::Projects::ListService) }
 
     before do
-      allow(Dashboard::Operations::ProjectsService)
-        .to receive(:new).with(user).and_return(projects_service)
+      allow(Dashboard::Projects::ListService)
+        .to receive(:new).with(user, feature: :operations_dashboard).and_return(projects_service)
     end
 
     shared_examples 'no projects' do
