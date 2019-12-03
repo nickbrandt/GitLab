@@ -181,11 +181,13 @@ describe Group do
 
     it 'does not include projects that only have dismissed vulnerabilities' do
       project = create(:project, namespace: group)
-      vulnerability = create(:vulnerabilities_occurrence, project: project)
+      vulnerability = create(:vulnerabilities_occurrence, report_type: :dast, project: project)
       create(
         :vulnerability_feedback,
-        project_fingerprint: vulnerability.project_fingerprint,
-        feedback_type: :dismissal
+        category: :dast,
+        feedback_type: :dismissal,
+        project: project,
+        project_fingerprint: vulnerability.project_fingerprint
       )
 
       vulnerable_projects = group.vulnerable_projects
