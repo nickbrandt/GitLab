@@ -19,8 +19,8 @@ module Dashboard
 
       # rubocop: disable CodeReuse/ActiveRecord
       def load_projects(user)
-        projects = ::Dashboard::Operations::ProjectsService
-          .new(user)
+        projects = ::Dashboard::Projects::ListService
+          .new(user, feature: :operations_dashboard)
           .execute(user.ops_dashboard_projects, limit: MAX_NUM_PROJECTS)
 
         ActiveRecord::Associations::Preloader.new.preload(projects, [

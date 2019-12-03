@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Dashboard::Operations::ProjectsService do
+describe Dashboard::Projects::ListService do
   PUBLIC = Gitlab::VisibilityLevel::PUBLIC
   PRIVATE = Gitlab::VisibilityLevel::PRIVATE
 
@@ -11,7 +11,7 @@ describe Dashboard::Operations::ProjectsService do
   let(:user) { create(:user) }
   let(:project) { create(:project, namespace: namespace, visibility_level: PRIVATE) }
   let(:namespace) { create(:namespace, visibility_level: PRIVATE) }
-  let(:service) { described_class.new(user) }
+  let(:service) { described_class.new(user, feature: :operations_dashboard) }
 
   describe '#execute' do
     let(:result) { service.execute(projects) }
@@ -154,6 +154,13 @@ describe Dashboard::Operations::ProjectsService do
           it_behaves_like 'project not found'
         end
       end
+    end
+
+    context 'when the user is an auditor' do
+      let(:projects) { [project] }
+      let(:user) { create(:auditor) }
+
+      it_behaves_like 'project found'
     end
   end
 end
