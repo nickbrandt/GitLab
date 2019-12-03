@@ -176,7 +176,6 @@ module API
     end
 
     class BasicProjectDetails < ProjectIdentity
-      include ::API::ProjectsRelationBuilder
       include ::API::ProjectsBatchCounting
 
       expose :default_branch, if: -> (project, options) { Ability.allowed?(options[:current_user], :download_code, project) }
@@ -211,6 +210,14 @@ module API
       expose :last_activity_at
       expose :namespace, using: 'API::Entities::NamespaceBasic'
       expose :custom_attributes, using: 'API::Entities::CustomAttribute', if: :with_custom_attributes
+
+      # This adds preloading to the query and executes batch counting
+      # Side-effect: The query will be executed during batch counting
+      def self.prepare!(projects_relation)
+        preload_relation(projects_relation).tap do |projects|
+          execute_batch_counting(projects)
+        end
+      end
 
       # rubocop: disable CodeReuse/ActiveRecord
       def self.preload_relation(projects_relation, options = {})
@@ -419,7 +426,7 @@ module API
           options: { only_owned: true }
         ).execute
 
-        Entities::Project.prepare_relation(projects)
+        Entities::Project.prepare!(projects)
       end
 
       expose :shared_projects, using: Entities::Project do |group, options|
@@ -429,7 +436,7 @@ module API
           options: { only_shared: true }
         ).execute
 
-        Entities::Project.prepare_relation(projects)
+        Entities::Project.prepare!(projects)
       end
     end
 
