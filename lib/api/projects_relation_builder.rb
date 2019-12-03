@@ -5,10 +5,9 @@ module API
     extend ActiveSupport::Concern
 
     class_methods do
+      # Prepare the given projects relation, e.g. perform preloading.
       def prepare_relation(projects_relation, options = {})
-        projects_relation = preload_relation(projects_relation, options)
-        execute_batch_counting(projects_relation)
-        projects_relation
+        preload_relation(projects_relation, options)
       end
 
       def preload_relation(projects_relation, options = {})

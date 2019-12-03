@@ -93,7 +93,12 @@ module API
         )
         options[:with] = Entities::BasicProjectDetails if params[:simple]
 
-        present options[:with].prepare_relation(projects, options), options
+        projects = options[:with].prepare_relation(projects, options)
+
+        # Refresh count caches
+        options[:with].execute_batch_counting(projects)
+
+        present projects, options
       end
 
       def translate_params_for_compatibility(params)
