@@ -155,7 +155,7 @@ class Note < ApplicationRecord
   after_initialize :ensure_discussion_id
   before_validation :nullify_blank_type, :nullify_blank_line_code
   before_validation :set_discussion_id, on: :create
-  after_save :keep_around_commit, if: :for_project_noteable?
+  after_save :keep_around_commit, if: :for_project_noteable?, unless: :importing?
   after_save :expire_etag_cache
   after_save :touch_noteable
   after_destroy :expire_etag_cache

@@ -22,7 +22,7 @@ class DiffNote < Note
   validate :verify_supported
 
   before_validation :set_line_code, if: :on_text?
-  after_save :keep_around_commits
+  after_save :keep_around_commits, unless: :importing?
   after_commit :create_diff_file, on: :create
 
   def discussion_class(*)
@@ -104,7 +104,7 @@ class DiffNote < Note
   end
 
   def should_create_diff_file?
-    on_text? && note_diff_file.nil? && start_of_discussion?
+    false && on_text? && note_diff_file.nil? && start_of_discussion?
   end
 
   def fetch_diff_file
