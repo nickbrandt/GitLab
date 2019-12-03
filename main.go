@@ -23,8 +23,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gitlab.com/gitlab-org/labkit/log"
+	"gitlab.com/gitlab-org/labkit/monitoring"
 	"gitlab.com/gitlab-org/labkit/tracing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
@@ -36,6 +36,8 @@ import (
 
 // Version is the current version of GitLab Workhorse
 var Version = "(unknown version)" // Set at build time in the Makefile
+// BuildTime signifies the time the binary was build
+var BuildTime = "19700101.000000" // Set at build time in the Makefile
 
 var printVersion = flag.Bool("version", false, "Print version and exit")
 var configFile = flag.String("config", "", "TOML file to load config from")
@@ -71,9 +73,8 @@ func main() {
 	}
 	flag.Parse()
 
-	version := fmt.Sprintf("gitlab-workhorse %s", Version)
 	if *printVersion {
-		fmt.Println(version)
+		fmt.Printf("gitlab-workhorse %s-%s\n", Version, BuildTime)
 		os.Exit(0)
 	}
 
@@ -90,7 +91,7 @@ func main() {
 		log.WithError(err).Fatal("Invalid authBackend")
 	}
 
-	log.WithField("version", version).Print("Starting")
+	log.WithField("version", Version).WithField("build_time", BuildTime).Print("Starting")
 
 	// Good housekeeping for Unix sockets: unlink before binding
 	if *listenNetwork == "unix" {
@@ -121,10 +122,11 @@ func main() {
 	}
 
 	if *prometheusListenAddr != "" {
-		promMux := http.NewServeMux()
-		promMux.Handle("/metrics", promhttp.Handler())
 		go func() {
-			err := http.ListenAndServe(*prometheusListenAddr, promMux)
+			err := monitoring.Serve(
+				monitoring.WithListenerAddress(*prometheusListenAddr),
+				monitoring.WithBuildInformation(Version, BuildTime),
+			)
 			if err != nil {
 				log.WithError(err).Error("Failed to start prometheus listener")
 			}

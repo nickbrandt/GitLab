@@ -9,8 +9,8 @@ VERSION_STRING := $(shell git describe)
 ifeq ($(strip $(VERSION_STRING)),)
 VERSION_STRING := v$(shell cat VERSION)
 endif
-VERSION := ${VERSION_STRING}-$(shell date -u +%Y%m%d.%H%M%S)
-GOBUILD := go build -ldflags "-X main.Version=$(VERSION)"
+BUILD_TIME := $(shell date -u +%Y%m%d.%H%M%S)
+GOBUILD := go build -ldflags "-X main.Version=$(VERSION_STRING) -X main.BuildTime=$(BUILD_TIME)"
 EXE_ALL := gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
 INSTALL := install
 BUILD_TAGS := tracer_static tracer_static_jaeger
