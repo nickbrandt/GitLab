@@ -44,6 +44,16 @@ module Projects
         gitlab_shell.mv_repository(project.repository_storage, from_name, to_name)
       end
 
+      def move_repositories
+        result = move_repository(old_disk_path, new_disk_path)
+
+        if move_wiki
+          result &&= move_repository(old_wiki_disk_path, "#{new_disk_path}.wiki")
+        end
+
+        result
+      end
+
       def rollback_folder_move
         move_repository(new_disk_path, old_disk_path)
         move_repository("#{new_disk_path}.wiki", old_wiki_disk_path)

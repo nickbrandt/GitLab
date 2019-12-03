@@ -20,6 +20,17 @@ module EE
           gitlab_shell.repository_exists?(project.repository_storage, "#{old_disk_path}.design.git")
         end
 
+        override :move_repositories
+        def move_repositories
+          result = super
+
+          if move_design
+            result &&= move_repository("#{old_disk_path}.design", "#{new_disk_path}.design")
+          end
+
+          result
+        end
+
         override :rollback_folder_move
         def rollback_folder_move
           super

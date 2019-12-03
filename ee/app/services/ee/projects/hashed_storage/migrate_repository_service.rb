@@ -17,19 +17,6 @@ module EE
             ).create!
           end
         end
-
-        private
-
-        override :move_repositories
-        def move_repositories
-          result = super
-
-          if move_design
-            result &&= move_repository("#{old_disk_path}.design", "#{new_disk_path}.design")
-          end
-
-          result
-        end
       end
     end
   end
