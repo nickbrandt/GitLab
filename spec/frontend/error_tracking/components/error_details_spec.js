@@ -1,7 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
+import { GlLoadingIcon, GlLink } from '@gitlab/ui';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
-import { GlFormInput, GlLoadingIcon, GlLink } from '@gitlab/ui';
 import Stacktrace from '~/error_tracking/components/stacktrace.vue';
 import ErrorDetails from '~/error_tracking/components/error_details.vue';
 
