@@ -75,14 +75,14 @@ module Gitlab
       #
       def write_to_redis_hash(hash)
         Gitlab::Redis::Cache.with do |redis|
-          redis.multi do |multi|
+          redis.pipelined do
             hash.each do |diff_file_id, highlighted_diff_lines_hash|
-              multi.hset(key, diff_file_id, highlighted_diff_lines_hash.to_json)
+              redis.hset(key, diff_file_id, highlighted_diff_lines_hash.to_json)
             end
 
             # HSETs have to have their expiration date manually updated
             #
-            multi.expire(key, EXPIRATION)
+            redis.expire(key, EXPIRATION)
           end
         end
       end
