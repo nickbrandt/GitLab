@@ -20,7 +20,7 @@ describe 'Groups::Security::Credentials' do
 
   context 'licensed' do
     before do
-      stub_licensed_features(credentials_inventory: true)
+      stub_licensed_features(credentials_inventory: true, group_saml: true)
     end
 
     context 'links' do
