@@ -3,7 +3,7 @@
 module Geo
   class DesignRegistryFinder < RegistryFinder
     def count_syncable
-      designs_repositories.count
+      GeoNode.find(current_node_id).projects.count_designs
     end
 
     def count_synced
@@ -22,12 +22,10 @@ module Geo
 
     private
 
-    def designs_repositories
-      current_node.projects.inner_join_design_management
-    end
-
     def registries
-      designs_repositories
+      current_node
+        .projects
+        .inner_join_design_management
         .inner_join_design_registry
     end
   end

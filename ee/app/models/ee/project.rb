@@ -191,6 +191,19 @@ module EE
         joins('LEFT JOIN services ON services.project_id = projects.id AND services.type = \'GitlabSlackApplicationService\' AND services.active IS true')
           .where('services.id IS NULL')
       end
+
+      def inner_join_design_management
+        join_statement =
+          arel_table
+            .join(DesignManagement::Design.arel_table, Arel::Nodes::InnerJoin)
+            .on(arel_table[:id].eq(DesignManagement::Design.arel_table[:project_id]))
+
+        joins(join_statement.join_sources)
+      end
+
+      def count_designs
+        inner_join_design_management.distinct.count
+      end
     end
 
     def can_store_security_reports?
