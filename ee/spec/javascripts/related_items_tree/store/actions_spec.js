@@ -930,6 +930,22 @@ describe('RelatedItemTree', () => {
             done,
           );
         });
+
+        it('should set `state.itemAddInProgress` to false, no payload', done => {
+          testAction(
+            actions.receiveAddItemFailure,
+            undefined,
+            {},
+            [
+              {
+                type: types.RECEIVE_ADD_ITEM_FAILURE,
+                payload: { itemAddFailureType: undefined },
+              },
+            ],
+            [],
+            done,
+          );
+        });
       });
 
       describe('addItem', () => {
