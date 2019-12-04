@@ -27,6 +27,9 @@ export default {
       };
       return `graph-position-${this.graphPosition} ${positionValues[this.graphPosition]}`;
     },
+    isUpstream() {
+      return this.columnTitle === 'Upstream';
+    },
   },
 };
 </script>
@@ -34,13 +37,12 @@ export default {
 <template>
   <div :class="columnClass" class="stage-column linked-pipelines-column">
     <div class="stage-name linked-pipelines-column-title">{{ columnTitle }}</div>
-    <div class="cross-project-triangle"></div>
+    <div v-if="isUpstream" class="cross-project-triangle"></div>
     <ul>
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"
         :key="pipeline.id"
         :class="{
-          'flat-connector-before': index === 0 && graphPosition === 'right',
           active: pipeline.isExpanded,
           'left-connector': pipeline.isExpanded && graphPosition === 'left',
         }"
