@@ -4743,9 +4743,6 @@ msgstr ""
 msgid "Control the maximum concurrency of repository backfill for this secondary node"
 msgstr ""
 
-msgid "ConvDev Index"
-msgstr ""
-
 msgid "Cookie domain"
 msgstr ""
 
@@ -5919,6 +5916,9 @@ msgstr ""
 msgid "Detect host keys"
 msgstr ""
 
+msgid "DevOps Score"
+msgstr ""
+
 msgid "Diff content limits"
 msgstr ""
 
@@ -6021,10 +6021,10 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
-msgid "Dismiss ConvDev introduction"
+msgid "Dismiss Cycle Analytics introduction box"
 msgstr ""
 
-msgid "Dismiss Cycle Analytics introduction box"
+msgid "Dismiss DevOps Score introduction"
 msgstr ""
 
 msgid "Dismiss Merge Request promotion"
@@ -9594,7 +9594,7 @@ msgstr ""
 msgid "Introducing Cycle Analytics"
 msgstr ""
 
-msgid "Introducing Your Conversational Development Index"
+msgid "Introducing Your DevOps Score"
 msgstr ""
 
 msgid "Invalid Git ref"
@@ -20324,10 +20324,10 @@ msgstr ""
 msgid "Your Commit Email will be used for web based operations, such as edits and merges."
 msgstr ""
 
-msgid "Your Conversational Development Index gives an overview of how you are using GitLab from a feature perspective. View how you compare with other organizations, discover features you are not using, and learn best practices through blog posts and white papers."
+msgid "Your Default Notification Email will be used for account notifications if a %{openingTag}group-specific email address%{closingTag} is not set."
 msgstr ""
 
-msgid "Your Default Notification Email will be used for account notifications if a %{openingTag}group-specific email address%{closingTag} is not set."
+msgid "Your DevOps Score gives an overview of how you are using GitLab from a feature perspective. View how you compare with other organizations, discover features you are not using, and learn best practices through blog posts and white papers."
 msgstr ""
 
 msgid "Your GPG keys (%{count})"
