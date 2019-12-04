@@ -1,6 +1,6 @@
 .deployment-instance {
-  width: 16px;
-  height: 16px;
+  width: $gl-padding;
+  height: $gl-padding;
   margin: 1px;
   border: 1px solid;
   border-radius: $border-radius-small;
@@ -84,8 +84,8 @@
     border: 0;
 
     &::after {
-      width: 16px !important;
-      height: 16px !important;
+      width: $gl-padding !important;
+      height: $gl-padding !important;
     }
   }
 }

@@ -112,6 +112,7 @@ describe('Deploy Board', () => {
   });
 
   describe('has legend component', () => {
+    let statuses = [];
     beforeEach(done => {
       wrapper = createComponent({
         isLoading: false,
@@ -120,6 +121,7 @@ describe('Deploy Board', () => {
         hasLegacyAppLabel: true,
         deployBoardData: deployBoardMockData,
       });
+      ({ statuses } = wrapper.vm);
       wrapper.vm.$nextTick(done);
     });
 
@@ -127,7 +129,16 @@ describe('Deploy Board', () => {
       const deployBoardLegend = wrapper.find('.deploy-board-legend');
 
       expect(deployBoardLegend).toBeDefined();
-      expect(deployBoardLegend.findAll('a').length).toBe(6);
+      expect(deployBoardLegend.findAll('a').length).toBe(Object.keys(statuses).length);
+    });
+
+    Object.keys(statuses).forEach(item => {
+      it(`with ${item} text next to deployment instance icon`, () => {
+        expect(wrapper.find(`.deployment-instance-${item}`)).toBeDefined();
+        expect(wrapper.find(`.deployment-instance-${item} + .legend-text`).text()).toBe(
+          statuses[item].text,
+        );
+      });
     });
   });
 });
