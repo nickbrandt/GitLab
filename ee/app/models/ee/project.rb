@@ -677,6 +677,17 @@ module EE
       end
     end
 
+    override(:expire_caches_before_rename)
+    def expire_caches_before_rename(old_path)
+      super
+
+      design = ::Repository.new("#{old_path}#{EE::Gitlab::GlRepository::DESIGN.path_suffix}", self)
+
+      if design.exists?
+        design.before_delete
+      end
+    end
+
     def alerts_service_available?
       feature_available?(:incident_management)
     end
