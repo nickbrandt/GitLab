@@ -46,6 +46,11 @@ module ApprovalRules
         provided_user_ids = rule_attributes[:user_ids].map(&:to_i)
         rule_attributes[:user_ids] = provided_user_ids & visible_user_ids
       end
+
+      if rule_attributes[:group_ids].blank? && rule_attributes[:user_ids].blank?
+        rule_attributes[:rule_type] = :any_approver
+        rule_attributes[:name] = ApprovalRuleLike::ALL_MEMBERS
+      end
     end
 
     # Append hidden groups to params to prevent them from being removed,

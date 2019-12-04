@@ -94,6 +94,37 @@ describe ApprovalRules::CreateService do
         specify { expect(result[:rule].rule_type).to eq('report_approver') }
       end
     end
+
+    context 'when approval rule is being created' do
+      subject { described_class.new(target, user, { user_ids: [], group_ids: [] }) }
+
+      it 'sets default attributes for any-approver rule' do
+        rule = subject.execute[:rule]
+
+        expect(rule[:rule_type]).to eq('any_approver')
+        expect(rule[:name]).to eq('All Members')
+      end
+    end
+
+    context 'when any-approver rule exists' do
+      let!(:any_approver_rule) do
+        create(:approval_project_rule, project: target, rule_type: :any_approver)
+      end
+
+      context 'multiple approval rules are not enabled' do
+        subject { described_class.new(target, user, { user_ids: [1], group_ids: [] }) }
+
+        before do
+          stub_licensed_features(multiple_approval_rules: false)
+        end
+
+        it 'removes the rule if a regular one is created' do
+          expect { subject.execute }.to change(
+            target.approval_rules.any_approver, :count
+          ).from(1).to(0)
+        end
+      end
+    end
   end
 
   context 'when target is merge request' do

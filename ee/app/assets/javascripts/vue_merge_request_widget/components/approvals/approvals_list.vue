@@ -3,7 +3,7 @@ import _ from 'underscore';
 import { sprintf, __ } from '~/locale';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import ApprovalCheckRulePopover from 'ee/approvals/components/approval_check_rule_popover.vue';
-import { RULE_TYPE_CODE_OWNER } from 'ee/approvals/constants';
+import { RULE_TYPE_CODE_OWNER, RULE_TYPE_ANY_APPROVER } from 'ee/approvals/constants';
 import ApprovedIcon from './approved_icon.vue';
 
 export default {
@@ -70,6 +70,9 @@ export default {
         name: rule.name,
       });
     },
+    ruleName(rule) {
+      return rule.rule_type === RULE_TYPE_ANY_APPROVER ? __('Any eligible user') : rule.name;
+    },
   },
 };
 </script>
@@ -96,7 +99,7 @@ export default {
         <td class="w-0"><approved-icon :is-approved="rule.approved" /></td>
         <td :colspan="rule.fallback ? 2 : 1">
           <div class="d-none d-sm-block js-name" :class="rule.nameClass">
-            {{ rule.name }}
+            {{ ruleName(rule) }}
             <approval-check-rule-popover
               :rule="rule"
               :security-approvals-help-page-path="securityApprovalsHelpPagePath"

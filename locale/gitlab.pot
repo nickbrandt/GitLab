@@ -1826,7 +1826,13 @@ msgstr ""
 msgid "Any Milestone"
 msgstr ""
 
+msgid "Any eligible user"
+msgstr ""
+
 msgid "Any encrypted tokens"
+msgstr ""
+
+msgid "Any member with Developer or higher permissions to the project."
 msgstr ""
 
 msgid "Any namespace"
@@ -1935,9 +1941,6 @@ msgid "ApprovalRuleSummary|%{count} approval required from %{membersCount}"
 msgid_plural "ApprovalRuleSummary|%{count} approvals required from %{membersCount}"
 msgstr[0] ""
 msgstr[1] ""
-
-msgid "ApprovalRule|All members with Developer role or higher and code owners (if any)"
-msgstr ""
 
 msgid "ApprovalRule|Approvers"
 msgstr ""
@@ -4305,6 +4308,9 @@ msgid "Code Analytics"
 msgstr ""
 
 msgid "Code Owners"
+msgstr ""
+
+msgid "Code Owners to the merge request changes."
 msgstr ""
 
 msgid "Code owner approval is required"
@@ -19351,6 +19357,9 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
+msgid "Users or groups set as approvers in the project's or merge request's settings."
+msgstr ""
+
 msgid "Users outside of license"
 msgstr ""
 
@@ -19746,6 +19755,9 @@ msgid "White helpers give contextual information."
 msgstr ""
 
 msgid "Whitelist to allow requests to the local network from hooks and services"
+msgstr ""
+
+msgid "Who can be an approver?"
 msgstr ""
 
 msgid "Who can see this group?"

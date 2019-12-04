@@ -18,7 +18,19 @@ describe ApprovalProjectRule do
     end
   end
 
-  describe '.code_ownerscope' do
+  describe '.regular_or_any_approver scope' do
+    it 'returns regular or any-approver rules' do
+      any_approver_rule = create(:approval_project_rule, rule_type: :any_approver)
+      regular_rule = create(:approval_project_rule)
+      create(:approval_project_rule, :security_report)
+
+      expect(described_class.regular_or_any_approver).to(
+        contain_exactly(any_approver_rule, regular_rule)
+      )
+    end
+  end
+
+  describe '.code_owner scope' do
     it 'returns nothing' do
       create_list(:approval_project_rule, 2)
 

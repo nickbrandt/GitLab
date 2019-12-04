@@ -112,8 +112,8 @@ describe('EE Approvals RuleControls', () => {
       expect(findEditButton().exists()).toBe(true);
     });
 
-    it('does not render remove button', () => {
-      expect(findRemoveButton()).toBe(undefined);
+    it('does remove button', () => {
+      expect(findRemoveButton().exists()).toBe(true);
     });
   });
 });
