@@ -93,7 +93,9 @@ describe Projects::HashedStorage::MigrateRepositoryService do
           old_disk_path: legacy_storage.disk_path,
           new_disk_path: hashed_storage.disk_path,
           old_wiki_disk_path: legacy_storage.disk_path + '.wiki',
-          new_wiki_disk_path: hashed_storage.disk_path + '.wiki'
+          new_wiki_disk_path: hashed_storage.disk_path + '.wiki',
+          old_design_disk_path: legacy_storage.disk_path + '.design',
+          new_design_disk_path: hashed_storage.disk_path + '.design'
         )
       end
 

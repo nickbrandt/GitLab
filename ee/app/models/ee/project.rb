@@ -672,7 +672,9 @@ module EE
     end
 
     def design_repository
-      @design_repository ||= DesignManagement::Repository.new(self)
+      strong_memoize(:design_repository) do
+        DesignManagement::Repository.new(self)
+      end
     end
 
     def alerts_service_available?

@@ -26,6 +26,7 @@ module EE
 
           if move_design
             result &&= move_repository(old_design_disk_path, new_design_disk_path)
+            project.clear_memoization(:design_repository)
           end
 
           result
