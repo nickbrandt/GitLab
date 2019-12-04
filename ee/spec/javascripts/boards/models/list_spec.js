@@ -1,4 +1,4 @@
-import { listObj, mockBoardService } from 'spec/boards/mock_data';
+import { listObj } from 'spec/boards/mock_data';
 import CeList from '~/boards/models/list';
 import List from 'ee/boards/models/list';
 import Issue from 'ee/boards/models/issue';
@@ -8,8 +8,6 @@ describe('List model', () => {
   let issue;
 
   beforeEach(() => {
-    gl.boardService = mockBoardService();
-
     list = new List(listObj);
     issue = new Issue({
       title: 'Testing',
