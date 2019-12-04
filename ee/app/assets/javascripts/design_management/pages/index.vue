@@ -46,14 +46,16 @@ export default {
       permissions: {
         createDesign: false,
       },
-      isSaving: false,
-      savingDesignFiles: [],
+      filesToBeSaved: [],
       selectedDesigns: [],
     };
   },
   computed: {
     isLoading() {
       return this.$apollo.queries.designs.loading || this.$apollo.queries.permissions.loading;
+    },
+    isSaving() {
+      return this.filesToBeSaved.length > 0;
     },
     canCreateDesign() {
       return this.permissions.createDesign;
@@ -101,8 +103,8 @@ export default {
         return null;
       }
 
-      const filesArray = Array.from(files);
-      const optimisticResponse = filesArray.map(file => ({
+      this.filesToBeSaved = Array.from(files);
+      const optimisticResponse = this.filesToBeSaved.map(file => ({
         // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
         // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
         __typename: 'Design',
@@ -134,9 +136,6 @@ export default {
           },
         },
       }));
-
-      this.isSaving = true;
-      this.savingDesignFiles = filesArray;
 
       return this.$apollo
         .mutate({
@@ -170,7 +169,7 @@ export default {
           throw e;
         })
         .finally(() => {
-          this.isSaving = false;
+          this.filesToBeSaved = [];
         });
     },
     changeSelectedDesigns(filename) {
@@ -194,7 +193,7 @@ export default {
       return (
         this.isLatestVersion &&
         this.canCreateDesign &&
-        !this.savingDesignFiles.some(file => file.name === filename)
+        !this.filesToBeSaved.some(file => file.name === filename)
       );
     },
     onDesignDelete() {
