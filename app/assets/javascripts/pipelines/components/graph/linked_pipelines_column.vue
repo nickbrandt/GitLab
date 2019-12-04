@@ -1,5 +1,6 @@
 <script>
 import LinkedPipeline from './linked_pipeline.vue';
+import { __ } from '~/locale';
 
 export default {
   components: {
@@ -28,7 +29,7 @@ export default {
       return `graph-position-${this.graphPosition} ${positionValues[this.graphPosition]}`;
     },
     isUpstream() {
-      return this.columnTitle === 'Upstream';
+      return this.columnTitle === __('Upstream');
     },
   },
 };
