@@ -868,6 +868,7 @@ describe ProjectPolicy do
 
         before do
           stub_feature_flags(licenses_list: true)
+          stub_licensed_features(license_management: false)
         end
 
         it { is_expected.to be_disallowed(:read_licenses_list) }
