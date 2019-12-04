@@ -289,4 +289,28 @@ describe Clusters::Applications::Prometheus do
       end
     end
   end
+
+  describe '#configured?' do
+    let(:prometheus) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
+
+    subject { prometheus.configured? }
+
+    context 'when a kubenetes client is present' do
+      let(:cluster) { create(:cluster, :project, :provided_by_gcp) }
+
+      it { is_expected.to be_truthy }
+
+      context 'when it is not availalble' do
+        let(:prometheus) { create(:clusters_applications_prometheus, cluster: cluster) }
+
+        it { is_expected.to be_falsey }
+      end
+    end
+
+    context 'when a kubenetes client is not present' do
+      let(:cluster) { create(:cluster) }
+
+      it { is_expected.to be_falsy }
+    end
+  end
 end
