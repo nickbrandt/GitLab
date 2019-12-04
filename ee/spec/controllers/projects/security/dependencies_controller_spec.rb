@@ -22,7 +22,7 @@ describe Projects::Security::DependenciesController do
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(dependency_list: true, license_management: true, security_dashboard: true)
+          stub_licensed_features(dependency_scanning: true, license_management: true, security_dashboard: true)
         end
 
         context 'when usage ping is collected' do
@@ -228,7 +228,7 @@ describe Projects::Security::DependenciesController do
       let(:user) { guest }
 
       before do
-        stub_licensed_features(dependency_list: true)
+        stub_licensed_features(dependency_scanning: true)
         project.add_guest(user)
 
         get :index, params: params, format: :json

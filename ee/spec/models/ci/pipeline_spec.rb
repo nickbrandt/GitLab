@@ -277,7 +277,7 @@ describe Ci::Pipeline do
     subject { pipeline.dependency_list_report }
 
     before do
-      stub_licensed_features(dependency_list: true)
+      stub_licensed_features(dependency_scanning: true)
     end
 
     context 'when pipeline has a build with dependency list reports' do
