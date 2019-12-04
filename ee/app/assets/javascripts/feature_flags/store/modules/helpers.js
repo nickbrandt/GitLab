@@ -113,13 +113,16 @@ export const mapFromScopesViewModel = params => {
     };
   });
 
-  return {
+  const model = {
     operations_feature_flag: {
       name: params.name,
       description: params.description,
+      active: params.active,
       scopes_attributes: scopes,
     },
   };
+
+  return model;
 };
 
 /**

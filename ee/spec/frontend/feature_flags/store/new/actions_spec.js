@@ -59,6 +59,7 @@ describe('Feature flags New Module Actions', () => {
     const actionParams = {
       name: 'name',
       description: 'description',
+      active: true,
       scopes: [
         {
           id: 1,
