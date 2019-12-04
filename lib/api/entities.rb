@@ -211,14 +211,6 @@ module API
       expose :namespace, using: 'API::Entities::NamespaceBasic'
       expose :custom_attributes, using: 'API::Entities::CustomAttribute', if: :with_custom_attributes
 
-      # This adds preloading to the query and executes batch counting
-      # Side-effect: The query will be executed during batch counting
-      def self.prepare!(projects_relation)
-        preload_relation(projects_relation).tap do |projects|
-          execute_batch_counting(projects)
-        end
-      end
-
       # rubocop: disable CodeReuse/ActiveRecord
       def self.preload_relation(projects_relation, options = {})
         # Preloading tags, should be done with using only `:tags`,

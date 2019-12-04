@@ -3,13 +3,32 @@
 require 'spec_helper'
 
 describe API::ProjectsBatchCounting do
-  describe '.execute_batch_counting' do
-    subject do
-      Class.new do
-        include ::API::ProjectsBatchCounting
-      end
+  subject do
+    Class.new do
+      include ::API::ProjectsBatchCounting
+    end
+  end
+
+  describe '.prepare!' do
+    let(:projects) { double }
+    let(:preloaded_projects) { double }
+
+    it 'preloads the relation' do
+      expect(subject).to receive(:preload_relation).with(projects).and_return(preloaded_projects)
+      allow(subject).to receive(:execute_batch_counting).with(preloaded_projects)
+
+      expect(subject.prepare!(projects)).to eq(preloaded_projects)
     end
 
+    it 'executes batch counting' do
+      allow(subject).to receive(:preload_relation).with(projects).and_return(preloaded_projects)
+      expect(subject).to receive(:execute_batch_counting).with(preloaded_projects)
+
+      subject.prepare!(projects)
+    end
+  end
+
+  describe '.execute_batch_counting' do
     let(:projects) { create_list(:project, 2) }
     let(:count_service) { double }
 
