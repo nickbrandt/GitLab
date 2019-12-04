@@ -35,7 +35,11 @@ describe('IDE merge requests actions', () => {
         requestMergeRequests,
         null,
         mockedState,
-        [{ type: types.REQUEST_MERGE_REQUESTS }],
+        [
+          {
+            type: types.REQUEST_MERGE_REQUESTS,
+          },
+        ],
         [],
         done,
       );
@@ -46,17 +50,27 @@ describe('IDE merge requests actions', () => {
     it('should commit error', done => {
       testAction(
         receiveMergeRequestsError,
-        { type: 'created', search: '' },
+        {
+          type: 'created',
+          search: '',
+        },
         mockedState,
-        [{ type: types.RECEIVE_MERGE_REQUESTS_ERROR }],
+        [
+          {
+            type: types.RECEIVE_MERGE_REQUESTS_ERROR,
+          },
+        ],
         [
           {
             type: 'setErrorMessage',
             payload: {
               text: 'Error loading merge requests.',
-              action: jasmine.any(Function),
+              action: expect.any(Function),
               actionText: 'Please try again',
-              actionPayload: { type: 'created', search: '' },
+              actionPayload: {
+                type: 'created',
+                search: '',
+              },
             },
           },
         ],
@@ -94,14 +108,19 @@ describe('IDE merge requests actions', () => {
       });
 
       it('calls API with params', () => {
-        const apiSpy = spyOn(axios, 'get').and.callThrough();
-
+        const apiSpy = jest.spyOn(axios, 'get');
         fetchMergeRequests(
-          { dispatch() {}, state: mockedState, rootState: mockedRootState },
-          { type: 'created' },
-        );
+          {
+            dispatch() {},
 
-        expect(apiSpy).toHaveBeenCalledWith(jasmine.anything(), {
+            state: mockedState,
+            rootState: mockedRootState,
+          },
+          {
+            type: 'created',
+          },
+        );
+        expect(apiSpy).toHaveBeenCalledWith(expect.anything(), {
           params: {
             scope: 'created-by-me',
             state: 'opened',
@@ -111,14 +130,20 @@ describe('IDE merge requests actions', () => {
       });
 
       it('calls API with search', () => {
-        const apiSpy = spyOn(axios, 'get').and.callThrough();
-
+        const apiSpy = jest.spyOn(axios, 'get');
         fetchMergeRequests(
-          { dispatch() {}, state: mockedState, rootState: mockedRootState },
-          { type: 'created', search: 'testing search' },
-        );
+          {
+            dispatch() {},
 
-        expect(apiSpy).toHaveBeenCalledWith(jasmine.anything(), {
+            state: mockedState,
+            rootState: mockedRootState,
+          },
+          {
+            type: 'created',
+            search: 'testing search',
+          },
+        );
+        expect(apiSpy).toHaveBeenCalledWith(expect.anything(), {
           params: {
             scope: 'created-by-me',
             state: 'opened',
@@ -130,12 +155,18 @@ describe('IDE merge requests actions', () => {
       it('dispatches success with received data', done => {
         testAction(
           fetchMergeRequests,
-          { type: 'created' },
+          {
+            type: 'created',
+          },
           mockedState,
           [],
           [
-            { type: 'requestMergeRequests' },
-            { type: 'resetMergeRequests' },
+            {
+              type: 'requestMergeRequests',
+            },
+            {
+              type: 'resetMergeRequests',
+            },
             {
               type: 'receiveMergeRequestsSuccess',
               payload: mergeRequests,
@@ -152,15 +183,21 @@ describe('IDE merge requests actions', () => {
       });
 
       it('calls API with project', () => {
-        const apiSpy = spyOn(axios, 'get').and.callThrough();
-
+        const apiSpy = jest.spyOn(axios, 'get');
         fetchMergeRequests(
-          { dispatch() {}, state: mockedState, rootState: mockedRootState },
-          { type: null, search: 'testing search' },
-        );
+          {
+            dispatch() {},
 
+            state: mockedState,
+            rootState: mockedRootState,
+          },
+          {
+            type: null,
+            search: 'testing search',
+          },
+        );
         expect(apiSpy).toHaveBeenCalledWith(
-          jasmine.stringMatching(`projects/${mockedRootState.currentProjectId}/merge_requests`),
+          expect.stringMatching(`projects/${mockedRootState.currentProjectId}/merge_requests`),
           {
             params: {
               state: 'opened',
@@ -173,12 +210,18 @@ describe('IDE merge requests actions', () => {
       it('dispatches success with received data', done => {
         testAction(
           fetchMergeRequests,
-          { type: null },
+          {
+            type: null,
+          },
           { ...mockedState, ...mockedRootState },
           [],
           [
-            { type: 'requestMergeRequests' },
-            { type: 'resetMergeRequests' },
+            {
+              type: 'requestMergeRequests',
+            },
+            {
+              type: 'resetMergeRequests',
+            },
             {
               type: 'receiveMergeRequestsSuccess',
               payload: mergeRequests,
@@ -197,13 +240,26 @@ describe('IDE merge requests actions', () => {
       it('dispatches error', done => {
         testAction(
           fetchMergeRequests,
-          { type: 'created', search: '' },
+          {
+            type: 'created',
+            search: '',
+          },
           mockedState,
           [],
           [
-            { type: 'requestMergeRequests' },
-            { type: 'resetMergeRequests' },
-            { type: 'receiveMergeRequestsError', payload: { type: 'created', search: '' } },
+            {
+              type: 'requestMergeRequests',
+            },
+            {
+              type: 'resetMergeRequests',
+            },
+            {
+              type: 'receiveMergeRequestsError',
+              payload: {
+                type: 'created',
+                search: '',
+              },
+            },
           ],
           done,
         );
@@ -217,7 +273,11 @@ describe('IDE merge requests actions', () => {
         resetMergeRequests,
         null,
         mockedState,
-        [{ type: types.RESET_MERGE_REQUESTS }],
+        [
+          {
+            type: types.RESET_MERGE_REQUESTS,
+          },
+        ],
         [],
         done,
       );

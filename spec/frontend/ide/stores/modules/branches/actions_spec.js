@@ -1,5 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import testAction from 'spec/helpers/vuex_action_helper';
+import testAction from 'helpers/vuex_action_helper';
 import axios from '~/lib/utils/axios_utils';
 import state from '~/ide/stores/modules/branches/state';
 import * as types from '~/ide/stores/modules/branches/mutation_types';
@@ -51,7 +51,11 @@ describe('IDE branches actions', () => {
         requestBranches,
         null,
         mockedContext.state,
-        [{ type: types.REQUEST_BRANCHES }],
+        [
+          {
+            type: types.REQUEST_BRANCHES,
+          },
+        ],
         [],
         done,
       );
@@ -62,17 +66,25 @@ describe('IDE branches actions', () => {
     it('should commit error', done => {
       testAction(
         receiveBranchesError,
-        { search: TEST_SEARCH },
+        {
+          search: TEST_SEARCH,
+        },
         mockedContext.state,
-        [{ type: types.RECEIVE_BRANCHES_ERROR }],
+        [
+          {
+            type: types.RECEIVE_BRANCHES_ERROR,
+          },
+        ],
         [
           {
             type: 'setErrorMessage',
             payload: {
               text: 'Error loading branches.',
-              action: jasmine.any(Function),
+              action: expect.any(Function),
               actionText: 'Please try again',
-              actionPayload: { search: TEST_SEARCH },
+              actionPayload: {
+                search: TEST_SEARCH,
+              },
             },
           },
         ],
@@ -87,7 +99,12 @@ describe('IDE branches actions', () => {
         receiveBranchesSuccess,
         branches,
         mockedContext.state,
-        [{ type: types.RECEIVE_BRANCHES_SUCCESS, payload: branches }],
+        [
+          {
+            type: types.RECEIVE_BRANCHES_SUCCESS,
+            payload: branches,
+          },
+        ],
         [],
         done,
       );
@@ -105,12 +122,14 @@ describe('IDE branches actions', () => {
       });
 
       it('calls API with params', () => {
-        const apiSpy = spyOn(axios, 'get').and.callThrough();
+        const apiSpy = jest.spyOn(axios, 'get');
 
-        fetchBranches(mockedContext, { search: TEST_SEARCH });
+        fetchBranches(mockedContext, {
+          search: TEST_SEARCH,
+        });
 
-        expect(apiSpy).toHaveBeenCalledWith(jasmine.anything(), {
-          params: jasmine.objectContaining({
+        expect(apiSpy).toHaveBeenCalledWith(expect.anything(), {
+          params: expect.objectContaining({
             search: TEST_SEARCH,
             sort: 'updated_desc',
           }),
@@ -120,12 +139,18 @@ describe('IDE branches actions', () => {
       it('dispatches success with received data', done => {
         testAction(
           fetchBranches,
-          { search: TEST_SEARCH },
+          {
+            search: TEST_SEARCH,
+          },
           mockedState,
           [],
           [
-            { type: 'requestBranches' },
-            { type: 'resetBranches' },
+            {
+              type: 'requestBranches',
+            },
+            {
+              type: 'resetBranches',
+            },
             {
               type: 'receiveBranchesSuccess',
               payload: branches,
@@ -144,15 +169,23 @@ describe('IDE branches actions', () => {
       it('dispatches error', done => {
         testAction(
           fetchBranches,
-          { search: TEST_SEARCH },
+          {
+            search: TEST_SEARCH,
+          },
           mockedState,
           [],
           [
-            { type: 'requestBranches' },
-            { type: 'resetBranches' },
+            {
+              type: 'requestBranches',
+            },
+            {
+              type: 'resetBranches',
+            },
             {
               type: 'receiveBranchesError',
-              payload: { search: TEST_SEARCH },
+              payload: {
+                search: TEST_SEARCH,
+              },
             },
           ],
           done,
@@ -166,7 +199,11 @@ describe('IDE branches actions', () => {
           resetBranches,
           null,
           mockedContext.state,
-          [{ type: types.RESET_BRANCHES }],
+          [
+            {
+              type: types.RESET_BRANCHES,
+            },
+          ],
           [],
           done,
         );
