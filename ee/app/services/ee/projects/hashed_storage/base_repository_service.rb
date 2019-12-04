@@ -17,7 +17,7 @@ module EE
         protected
 
         def has_design?
-          gitlab_shell.repository_exists?(project.repository_storage, "#{old_disk_path}.design.git")
+          gitlab_shell.repository_exists?(project.repository_storage, "#{old_design_disk_path}.git")
         end
 
         override :move_repositories
@@ -25,7 +25,7 @@ module EE
           result = super
 
           if move_design
-            result &&= move_repository("#{old_disk_path}.design", "#{new_disk_path}.design")
+            result &&= move_repository(old_design_disk_path, new_design_disk_path)
           end
 
           result
@@ -36,8 +36,20 @@ module EE
           super
 
           if move_design
-            move_repository("#{new_disk_path}.design", "#{old_disk_path}.design")
+            move_repository(new_design_disk_path, old_design_disk_path)
           end
+        end
+
+        def design_path_suffix
+          @design_path_suffix ||= EE::Gitlab::GlRepository::DESIGN.path_suffix
+        end
+
+        def old_design_disk_path
+          @old_design_disk_path ||= "#{old_disk_path}#{design_path_suffix}"
+        end
+
+        def new_design_disk_path
+          @new_design_disk_path ||= "#{new_disk_path}#{design_path_suffix}"
         end
       end
     end
