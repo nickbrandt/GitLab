@@ -181,7 +181,7 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` with pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/${podName}/containers/${containerName}/logs.json`;
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/environments/${environmentId}/pods/${podName}/containers/${containerName}/logs.json`;
 
       Api.getPodLogs({ projectPath, environmentId, podName, containerName })
         .then(() => {
@@ -192,7 +192,7 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` without pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/containers/logs.json`;
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/environments/${environmentId}/pods/containers/logs.json`;
 
       Api.getPodLogs({ projectPath, environmentId })
         .then(() => {
@@ -203,7 +203,7 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` with pod_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/environments/${environmentId}/pods/${podName}/containers/logs.json`;
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/environments/${environmentId}/pods/${podName}/containers/logs.json`;
 
       Api.getPodLogs({ projectPath, environmentId, podName })
         .then(() => {
