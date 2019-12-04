@@ -53,6 +53,16 @@ describe Clusters::Applications::Prometheus do
   end
 
   describe '#prometheus_client' do
+    shared_examples 'exception caught for prometheus client' do
+      before do
+        allow(kube_client).to receive(:proxy_url).and_raise(exception)
+      end
+
+      it 'returns nil' do
+        expect(subject.prometheus_client).to be_nil
+      end
+    end
+
     context 'cluster is nil' do
       it 'returns nil' do
         expect(subject.cluster).to be_nil
@@ -98,12 +108,18 @@ describe Clusters::Applications::Prometheus do
       end
 
       context 'when cluster is not reachable' do
-        before do
-          allow(kube_client).to receive(:proxy_url).and_raise(Kubeclient::HttpError.new(401, 'Unauthorized', nil))
+        it_behaves_like 'exception caught for prometheus client' do
+          let(:exception) { Kubeclient::HttpError.new(401, 'Unauthorized', nil) }
+        end
+      end
+
+      context 'when there is a socket error while contacting cluster' do
+        it_behaves_like 'exception caught for prometheus client' do
+          let(:exception) { Errno::ECONNREFUSED }
         end
 
-        it 'returns nil' do
-          expect(subject.prometheus_client).to be_nil
+        it_behaves_like 'exception caught for prometheus client' do
+          let(:exception) { Errno::ECONNRESET }
         end
       end
     end
