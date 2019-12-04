@@ -387,7 +387,7 @@ describe('EE Approvals RuleForm', () => {
     it('hides name', () => {
       createComponent();
 
-      expect(findNameInput().exists()).toBe(false);
+      expect(findNameInput().exists()).toBe(true);
     });
 
     describe('with no init rule', () => {

@@ -62,8 +62,8 @@ describe ApprovalRulePresenter do
       it_behaves_like 'filtering private group'
     end
 
-    context 'fallback rule' do
-      let(:rule) { ApprovalMergeRequestFallback.new(create(:merge_request)) }
+    context 'any_approver rule' do
+      let(:rule) { create(:any_approver_rule) }
 
       it 'contains no groups without raising an error' do
         expect(subject.groups).to be_empty
@@ -103,8 +103,8 @@ describe ApprovalRulePresenter do
       it_behaves_like 'detecting hidden group'
     end
 
-    context 'fallback rule' do
-      let(:rule) { ApprovalMergeRequestFallback.new(create(:merge_request)) }
+    context 'any_approver rule' do
+      let(:rule) { create(:any_approver_rule) }
 
       it 'contains no groups without raising an error' do
         expect(subject.contains_hidden_groups?).to eq(false)

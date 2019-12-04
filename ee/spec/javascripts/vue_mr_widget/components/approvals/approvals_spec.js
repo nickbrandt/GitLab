@@ -19,7 +19,6 @@ const TEST_HELP_PATH = 'help/path';
 const TEST_PASSWORD = 'password';
 const testApprovedBy = () => [1, 7, 10].map(id => ({ id }));
 const testApprovals = () => ({
-  has_approval_rules: true,
   approved: false,
   approved_by: testApprovedBy().map(user => ({ user })),
   approval_rules_left: [],

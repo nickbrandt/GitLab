@@ -22,6 +22,7 @@ module ApprovalRuleLike
     validates :approvals_required, numericality: { less_than_or_equal_to: APPROVALS_REQUIRED_MAX, greater_than_or_equal_to: 0 }
 
     scope :with_users, -> { preload(:users, :group_users) }
+    scope :regular_or_any_approver, -> { where(rule_type: [:regular, :any_approver]) }
   end
 
   # Users who are eligible to approve, including specified group members.
@@ -43,6 +44,10 @@ module ApprovalRuleLike
   end
 
   def report_approver?
+    raise NotImplementedError
+  end
+
+  def any_approver?
     raise NotImplementedError
   end
 end

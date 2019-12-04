@@ -116,7 +116,9 @@ class ApprovalMergeRequestRule < ApplicationRecord
     # Before being merged, approved_approvers are dynamically calculated in ApprovalWrappedRule instead of being persisted.
     return unless merge_request.merged?
 
-    self.approved_approver_ids = merge_request.approvals.map(&:user_id) & approvers.map(&:id)
+    approvers = ApprovalWrappedRule.wrap(merge_request, self).approved_approvers
+
+    self.approved_approver_ids = approvers.map(&:id)
   end
 
   def refresh_required_approvals!(project_approval_rule)
