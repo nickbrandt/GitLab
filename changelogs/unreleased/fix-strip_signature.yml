@@ -1,0 +1,5 @@
+---
+title: 'fix: strip_signature helper'
+merge_request: 21187
+author: Roger Meier
+type: fixed
