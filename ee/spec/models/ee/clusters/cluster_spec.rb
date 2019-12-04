@@ -61,6 +61,24 @@ describe Clusters::Cluster do
           it { is_expected.to be_truthy }
         end
       end
+
+      context 'for an instance cluster' do
+        before do
+          create(:cluster, :instance, environment_scope: 'product/*')
+        end
+
+        context 'identical environment scope exists' do
+          let(:cluster) { build(:cluster, :instance, environment_scope: 'product/*') }
+
+          it { is_expected.to be_falsey }
+        end
+
+        context 'identical environment scope does not exist' do
+          let(:cluster) { build(:cluster, :instance, environment_scope: '*') }
+
+          it { is_expected.to be_truthy }
+        end
+      end
     end
   end
 end
