@@ -69,7 +69,7 @@ module Geo
     end
 
     def wiki_path_suffix
-     Gitlab::GlRepository::WIKI.path_suffix
+      Gitlab::GlRepository::WIKI.path_suffix
     end
 
     def old_wiki_disk_path
