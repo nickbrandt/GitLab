@@ -239,6 +239,34 @@ describe Boards::Issues::MoveService, services: true do
 
       it_behaves_like 'moving an issue to/from assignee lists'
       it_behaves_like 'moving an issue to/from milestone lists'
+
+      context 'when moving to same list' do
+        let(:subgroup) { create(:group, parent: group) }
+        let(:subgroup_project) { create(:project, namespace: subgroup) }
+        # let!(:list1) { create(:list, board: board1, label: development, position: 0) }
+
+        let(:params) { { board_id: board1.id, from_list_id: label_list1.id, to_list_id: label_list1.id } }
+        let(:issue) { create(:labeled_issue, project: subgroup_project, labels: [bug, development]) }
+        let(:issue0) { create(:labeled_issue, project: subgroup_project, labels: [bug, development]) }
+        let(:issue1) { create(:labeled_issue, project: project, labels: [bug, development]) }
+        let(:issue2) { create(:labeled_issue, project: project, labels: [bug, development]) }
+
+        it 'sorts issues included in subgroups' do
+          reorder_issues(params, issues: [issue, issue0, issue1, issue2])
+
+          described_class.new(parent, user, params).execute(issue)
+
+          expect(issue.relative_position).to be_between(issue0.relative_position, issue1.relative_position)
+        end
+      end
+
+      def reorder_issues(params, issues: [])
+        issues.each do |issue|
+          issue.move_to_end && issue.save!
+        end
+
+        params.merge!(move_after_id: issues[1].id, move_before_id: issues[2].id)
+      end
     end
   end
 end
