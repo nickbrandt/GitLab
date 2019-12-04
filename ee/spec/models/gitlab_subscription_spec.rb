@@ -245,30 +245,28 @@ describe GitlabSubscription do
 
     context 'after_create_commit' do
       it 'logs previous state to gitlab subscription history' do
-        subject.save
+        subject.save!
 
         expect(GitlabSubscriptionHistory.count).to eq(1)
-        expected_attrs = {
+        expect(GitlabSubscriptionHistory.last.attributes).to include(
           'gitlab_subscription_id' => subject.id,
           'change_type' => 'gitlab_subscription_created'
-        }
-        expect(GitlabSubscriptionHistory.last.attributes).to include(expected_attrs)
+        )
       end
     end
 
     context 'before_update' do
       it 'logs previous state to gitlab subscription history' do
-        subject.update max_seats_used: 42, seats: 13
-        subject.update max_seats_used: 32
+        subject.update! max_seats_used: 42, seats: 13
+        subject.update! max_seats_used: 32
 
         expect(GitlabSubscriptionHistory.count).to eq(2)
-        expected_attrs = {
+        expect(GitlabSubscriptionHistory.last.attributes).to include(
           'gitlab_subscription_id' => subject.id,
           'change_type' => 'gitlab_subscription_updated',
           'max_seats_used' => 42,
           'seats' => 13
-        }
-        expect(GitlabSubscriptionHistory.last.attributes).to include(expected_attrs)
+        )
       end
     end
 
@@ -276,13 +274,13 @@ describe GitlabSubscription do
       it 'logs previous state to gitlab subscription history' do
         group = create(:group)
         plan = create(:bronze_plan)
-        subject.update max_seats_used: 37, seats: 11, namespace: group, hosted_plan: plan
+        subject.update! max_seats_used: 37, seats: 11, namespace: group, hosted_plan: plan
         db_created_at = described_class.last.created_at
 
-        subject.destroy
+        subject.destroy!
 
         expect(GitlabSubscriptionHistory.count).to eq(2)
-        expected_attrs = {
+        expect(GitlabSubscriptionHistory.last.attributes).to include(
           'gitlab_subscription_id' => subject.id,
           'change_type' => 'gitlab_subscription_destroyed',
           'max_seats_used' => 37,
@@ -290,8 +288,7 @@ describe GitlabSubscription do
           'namespace_id' => group.id,
           'hosted_plan_id' => plan.id,
           'gitlab_subscription_created_at' => db_created_at
-        }
-        expect(GitlabSubscriptionHistory.last.attributes).to include(expected_attrs)
+        )
       end
     end
   end

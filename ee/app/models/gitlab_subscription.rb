@@ -80,9 +80,8 @@ class GitlabSubscription < ApplicationRecord
     attrs['change_type'] = change_type
 
     omitted_attrs = %w(id created_at updated_at)
-    attrs.reject! { |k, v| omitted_attrs.include?(k) }
 
-    GitlabSubscriptionHistory.create(attrs)
+    GitlabSubscriptionHistory.create(attrs.except(*omitted_attrs))
   end
 
   def hosted?
