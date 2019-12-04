@@ -26,7 +26,7 @@ module AutoMerge
       super do
         if merge_request.merge_train&.destroy
           SystemNoteService.cancel_merge_train(merge_request, project, current_user)
-          AutoMergeProcessWorker.perform_async(next_merge_request.id) if next_merge_request
+          next_merge_request.merge_train.stale! if next_merge_request
         end
       end
     end
@@ -39,7 +39,7 @@ module AutoMerge
       super(merge_request, reason) do
         if merge_request.merge_train&.destroy
           SystemNoteService.abort_merge_train(merge_request, project, current_user, reason)
-          AutoMergeProcessWorker.perform_async(next_merge_request.id) if next_merge_request && process_next
+          next_merge_request.merge_train.stale! if next_merge_request && process_next
         end
       end
     end

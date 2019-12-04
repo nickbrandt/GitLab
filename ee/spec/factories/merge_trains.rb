@@ -8,8 +8,20 @@ FactoryBot.define do
     user
     pipeline factory: :ci_pipeline
 
+    trait :created do
+      status { :created }
+    end
+
     trait :merged do
       status { :merged }
+    end
+
+    trait :stale do
+      status { :stale }
+    end
+
+    trait :fresh do
+      status { :fresh }
     end
   end
 end
