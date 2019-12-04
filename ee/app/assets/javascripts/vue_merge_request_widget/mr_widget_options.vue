@@ -369,4 +369,5 @@ export default {
       :is-post-merge="true"
     />
   </div>
+  <loading v-else />
 </template>

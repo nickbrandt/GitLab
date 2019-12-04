@@ -18694,6 +18694,9 @@ msgstr ""
 msgid "Unable to load the diff. %{button_try_again}"
 msgstr ""
 
+msgid "Unable to load the merge request widget. Try reloading the page."
+msgstr ""
+
 msgid "Unable to resolve"
 msgstr ""
 

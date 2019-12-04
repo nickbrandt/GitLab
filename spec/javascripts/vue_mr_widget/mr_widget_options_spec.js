@@ -28,6 +28,7 @@ describe('mrWidgetOptions', () => {
     delete mrWidgetOptions.el;
 
     gl.mrWidgetData = { ...mockData };
+    gon.features = { asyncMrWidget: true };
 
     mock = new MockAdapter(axios);
     mock.onGet(mockData.merge_request_widget_path).reply(() => [200, { ...mockData }]);
@@ -43,6 +44,7 @@ describe('mrWidgetOptions', () => {
     vm.$destroy();
     mock.restore();
     gl.mrWidgetData = {};
+    gon.features = {};
   });
 
   describe('data', () => {

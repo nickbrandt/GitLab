@@ -44,6 +44,8 @@ describe('ee merge request widget options', () => {
   beforeEach(() => {
     delete mrWidgetOptions.extends.el; // Prevent component mounting
 
+    gon.features = { asyncMrWidget: true };
+
     Component = Vue.extend(mrWidgetOptions);
     mock = new MockAdapter(axios);
 
@@ -54,6 +56,7 @@ describe('ee merge request widget options', () => {
   afterEach(() => {
     vm.$destroy();
     mock.restore();
+    gon.features = {};
   });
 
   describe('security widget', () => {

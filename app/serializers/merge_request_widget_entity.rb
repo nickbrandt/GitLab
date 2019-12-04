@@ -68,7 +68,11 @@ class MergeRequestWidgetEntity < Grape::Entity
   end
 
   def as_json(options = {})
+    return super(options) if Feature.enabled?(:async_mr_widget)
+
     super(options)
+      .merge(MergeRequestPollCachedWidgetEntity.new(object, **@options.opts_hash).as_json(options))
+      .merge(MergeRequestPollWidgetEntity.new(object, **@options.opts_hash).as_json(options))
   end
 
   private
