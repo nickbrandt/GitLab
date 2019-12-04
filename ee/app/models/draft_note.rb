@@ -56,6 +56,10 @@ class DraftNote < ApplicationRecord
     commit_id.present?
   end
 
+  def importing?
+    false
+  end
+
   def resolvable?
     false
   end
