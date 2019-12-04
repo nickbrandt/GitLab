@@ -4866,6 +4866,9 @@ msgstr ""
 msgid "Could not remove the trigger."
 msgstr ""
 
+msgid "Could not restore the group"
+msgstr ""
+
 msgid "Could not revoke impersonation token %{token_name}."
 msgstr ""
 
@@ -8679,6 +8682,12 @@ msgid "Group description (optional)"
 msgstr ""
 
 msgid "Group details"
+msgstr ""
+
+msgid "Group has been already marked for deletion"
+msgstr ""
+
+msgid "Group has not been marked for deletion"
 msgstr ""
 
 msgid "Group info:"
@@ -19983,6 +19992,9 @@ msgid "You are going to transfer %{project_full_name} to another owner. Are you 
 msgstr ""
 
 msgid "You are not allowed to unlink your primary login account"
+msgstr ""
+
+msgid "You are not authorized to perform this action"
 msgstr ""
 
 msgid "You are now impersonating %{username}"

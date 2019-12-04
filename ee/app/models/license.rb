@@ -41,6 +41,7 @@ class License < ApplicationRecord
   ].freeze
 
   EEP_FEATURES = EES_FEATURES + %i[
+    adjourned_deletion_for_projects_and_groups
     admin_audit_log
     auditor_user
     batch_comments
