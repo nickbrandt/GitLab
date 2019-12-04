@@ -192,9 +192,11 @@ describe Projects::ReleasesController do
       end
 
       context 'when the release was created before evidence existed' do
-        it 'returns an empty json' do
+        before do
           release.evidence.destroy
+        end
 
+        it 'returns an empty json' do
           subject
 
           expect(json_response).to eq({})
