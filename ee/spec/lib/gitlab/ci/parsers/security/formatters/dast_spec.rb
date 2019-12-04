@@ -15,7 +15,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::Dast do
   end
 
   describe '#format_vulnerability' do
-    let(:instance) { file_vulnerability['instances'][1] }
+    let(:instance) { file_vulnerability['instances'][0] }
     let(:hostname) { 'http://goat:8080' }
     let(:sanitized_desc) { file_vulnerability['desc'].gsub('<p>', '').gsub('</p>', '') }
     let(:sanitized_solution) { file_vulnerability['solution'].gsub('<p>', '').gsub('</p>', '') }
@@ -53,7 +53,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::Dast do
                                              'url'   => "http://projects.webappsec.org/w/page/13246974/Threat%20Classification%20Reference%20Grid"
                                            })
       expect(data['location']).to eq({
-                                       'param' => nil,
+                                       'param' => '',
                                        'method' => 'GET',
                                        'hostname' => hostname,
                                        'path' => '/WebGoat/login'
