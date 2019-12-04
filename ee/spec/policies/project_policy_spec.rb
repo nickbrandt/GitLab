@@ -878,9 +878,9 @@ describe ProjectPolicy do
     context 'when licenses list feature not available' do
       let(:current_user) { admin }
 
-        before do
-          stub_feature_flags(licenses_list: false)
-        end
+      before do
+        stub_feature_flags(licenses_list: false)
+      end
 
       it { is_expected.to be_disallowed(:read_licenses_list) }
     end
