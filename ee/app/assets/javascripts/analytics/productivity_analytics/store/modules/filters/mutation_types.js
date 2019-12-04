@@ -1,4 +1,4 @@
 export const SET_GROUP_NAMESPACE = 'SET_GROUP_NAMESPACE';
 export const SET_PROJECT_PATH = 'SET_PROJECT_PATH';
-export const SET_PATH = 'SET_PATH';
+export const SET_FILTERS = 'SET_FILTERS';
 export const SET_DATE_RANGE = 'SET_DATE_RANGE';

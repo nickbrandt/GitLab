@@ -29,8 +29,15 @@ export const setProjectPath = ({ commit, dispatch }, projectPath) => {
   });
 };
 
-export const setPath = ({ commit, dispatch }, path) => {
-  commit(types.SET_PATH, path);
+export const setFilters = (
+  { commit, dispatch },
+  { author_username, label_name, milestone_title },
+) => {
+  commit(types.SET_FILTERS, {
+    authorUsername: author_username,
+    labelName: label_name,
+    milestoneTitle: milestone_title,
+  });
 
   dispatch('charts/resetMainChartSelection', true, { root: true });
 

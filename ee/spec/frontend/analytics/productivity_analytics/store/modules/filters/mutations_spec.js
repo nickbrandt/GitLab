@@ -27,12 +27,16 @@ describe('Productivity analytics filter mutations', () => {
     });
   });
 
-  describe(types.SET_PATH, () => {
-    it('sets the filters string', () => {
-      const path = '?author_username=root&milestone_title=foo&label_name[]=labelxyz';
-      mutations[types.SET_PATH](state, path);
+  describe(types.SET_FILTERS, () => {
+    it('sets the authorUsername, milestoneTitle and labelName', () => {
+      const authorUsername = 'root';
+      const labelName = ['my label', 'yet another label'];
+      const milestoneTitle = 'my milestone';
+      mutations[types.SET_FILTERS](state, { authorUsername, labelName, milestoneTitle });
 
-      expect(state.filters).toBe(path);
+      expect(state.authorUsername).toBe(authorUsername);
+      expect(state.labelName).toBe(labelName);
+      expect(state.milestoneTitle).toBe(milestoneTitle);
     });
   });
 
