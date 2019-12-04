@@ -6,10 +6,21 @@ const localVue = createLocalVue();
 localVue.use(VueRouter);
 const router = new VueRouter();
 
+// Referenced from: doc/api/graphql/reference/gitlab_schema.graphql:DesignVersionEvent
+const DESIGN_VERSION_EVENT = {
+  CREATION: 'CREATION',
+  DELETION: 'DELETION',
+  MODIFICATION: 'MODIFICATION',
+  NO_CHANGE: 'NONE',
+};
+
 describe('Design management list item component', () => {
   let wrapper;
-
-  function createComponent(notesCount = 1, event = 'NONE', isLoading = false) {
+  function createComponent({
+    notesCount = 1,
+    event = DESIGN_VERSION_EVENT.NO_CHANGE,
+    isLoading = false,
+  } = {}) {
     wrapper = shallowMount(Item, {
       sync: false,
       localVue,
@@ -37,43 +48,43 @@ describe('Design management list item component', () => {
   });
 
   it('renders item with multiple comments', () => {
-    createComponent(2);
+    createComponent({ notesCount: 2 });
 
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('hides comment count', () => {
-    createComponent(0);
+    createComponent({ notesCount: 0 });
 
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('renders item with correct status icon for modification event', () => {
-    createComponent(0, 'MODIFICATION');
+    createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.MODIFICATION });
 
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('renders item with correct status icon for deletion event', () => {
-    createComponent(0, 'DELETION');
+    createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.DELETION });
 
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('renders item with correct status icon for creation event', () => {
-    createComponent(0, 'CREATION');
+    createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.CREATION });
 
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('renders item with no status icon for none event', () => {
-    createComponent(0, 'NONE');
+    createComponent({ notesCount: 0 });
 
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('renders loading spinner when no image prop present', () => {
-    createComponent(0, 'NONE', true);
+    createComponent({ notesCount: 0, isLoading: true });
 
     expect(wrapper.element).toMatchSnapshot();
   });
