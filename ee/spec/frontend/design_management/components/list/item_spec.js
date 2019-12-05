@@ -57,7 +57,7 @@ describe('Design management list item component', () => {
   });
 
   describe('with no notes', () => {
-    it('hides comment count', () => {
+    it('renders item with no status icon for none event', () => {
       createComponent();
 
       expect(wrapper.element).toMatchSnapshot();
@@ -77,12 +77,6 @@ describe('Design management list item component', () => {
 
     it('renders item with correct status icon for creation event', () => {
       createComponent({ event: DESIGN_VERSION_EVENT.CREATION });
-
-      expect(wrapper.element).toMatchSnapshot();
-    });
-
-    it('renders item with no status icon for none event', () => {
-      createComponent();
 
       expect(wrapper.element).toMatchSnapshot();
     });
