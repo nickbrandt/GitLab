@@ -12,5 +12,20 @@ describe ManagedLicenseEntity do
     it 'contains required fields' do
       expect(subject).to include(:id, :name, :approval_status)
     end
+
+    describe "#approval_status" do
+      where(:classification, :approval_status) do
+        [
+          ['approved', 'approved'],
+          ['denied', 'blacklisted']
+        ]
+      end
+
+      with_them do
+        let(:software_license_policy) { build(:software_license_policy, classification: classification) }
+
+        it { expect(subject[:approval_status]).to eql(approval_status) }
+      end
+    end
   end
 end
