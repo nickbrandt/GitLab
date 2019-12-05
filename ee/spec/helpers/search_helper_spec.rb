@@ -65,7 +65,7 @@ describe SearchHelper do
       project.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
 
-      result = project.repository.search(
+      result = project.repository.elastic_search(
         'def popen',
         type: :blob,
         options: { highlight: true }
@@ -89,7 +89,7 @@ describe SearchHelper do
     end
 
     def es_blob_search
-      Repository.search(
+      Repository.elastic_search(
         'def popen',
         type: :blob,
         options: { highlight: true }
