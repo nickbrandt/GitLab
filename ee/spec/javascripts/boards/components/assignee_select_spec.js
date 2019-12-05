@@ -1,7 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import Vue from 'vue';
 import axios from '~/lib/utils/axios_utils';
-import '~/boards/services/board_service';
 import boardsStore from '~/boards/stores/boards_store';
 import IssuableContext from '~/issuable_context';
 import AssigneeSelect from 'ee/boards/components/assignee_select.vue';
