@@ -811,6 +811,10 @@ module Ci
       @persistent_ref ||= PersistentRef.new(pipeline: self)
     end
 
+    def find_successful_build_ids_by_names(names)
+      statuses.latest.success.where(name: names).pluck(:id)
+    end
+
     private
 
     def pipeline_data
