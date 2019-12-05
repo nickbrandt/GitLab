@@ -2942,6 +2942,9 @@ msgstr ""
 msgid "Callback URL"
 msgstr ""
 
+msgid "Can deploy manually to"
+msgstr ""
+
 msgid "Can override approvers and approvals required per merge request"
 msgstr ""
 
@@ -2967,6 +2970,9 @@ msgid "Cancel running"
 msgstr ""
 
 msgid "Cancel this job"
+msgstr ""
+
+msgid "Canceled deploy to"
 msgstr ""
 
 msgid "Cancelling Preview"
@@ -19549,6 +19555,9 @@ msgid "View log"
 msgstr ""
 
 msgid "View open merge request"
+msgstr ""
+
+msgid "View previous app"
 msgstr ""
 
 msgid "View project labels"

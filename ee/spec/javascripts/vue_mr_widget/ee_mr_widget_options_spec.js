@@ -6,6 +6,7 @@ import MRWidgetStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
+import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/constants';
 
 import state from 'ee/vue_shared/security_reports/store/state';
 import mockData, {
@@ -861,6 +862,7 @@ describe('ee merge request widget options', () => {
       external_url_formatted: 'diplo.',
       deployed_at: '2017-03-22T22:44:42.258Z',
       deployed_at_formatted: 'Mar 22, 2017 10:44pm',
+      status: SUCCESS,
     };
 
     beforeEach(done => {

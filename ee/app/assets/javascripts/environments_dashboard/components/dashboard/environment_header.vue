@@ -73,6 +73,7 @@ export default {
     <review-app-link
       v-else-if="environment.external_url"
       :link="environment.external_url"
+      :is-current="true"
       css-class="btn btn-default btn-sm"
     />
   </div>
