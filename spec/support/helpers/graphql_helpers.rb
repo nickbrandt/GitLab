@@ -177,14 +177,24 @@ module GraphqlHelpers
 
   def attributes_to_graphql(attributes)
     attributes.map do |name, value|
-      value_str = if value.is_a?(Array)
-                    '["' + value.join('","') + '"]'
-                  else
-                    "\"#{value}\""
-                  end
+      value_str = as_graphql_literal(value)
 
       "#{GraphqlHelpers.fieldnamerize(name.to_s)}: #{value_str}"
     end.join(", ")
+  end
+
+  # Fairly dumb Ruby => GraphQL rendering function. Only suitable for testing.
+  # Missing support for Enums (feel free to add if you need it).
+  def as_graphql_literal(value)
+    case value
+    when Array then "[#{value.map { |v| as_graphql_literal(v) }.join(',')}]"
+    when Integer, Float then value.to_s
+    when String then "\"#{value.gsub(/"/, '\\"')}\""
+    when nil then 'null'
+    when true then 'true'
+    when false then 'false'
+    else raise ArgumentError, "Cannot represent #{value} as GraphQL literal"
+    end
   end
 
   def post_multiplex(queries, current_user: nil, headers: {})
@@ -227,6 +237,11 @@ module GraphqlHelpers
   # Raises an error if no data is found
   def graphql_data
     json_response['data'] || (raise NoData, graphql_errors)
+  end
+
+  def graphql_data_at(*path)
+    keys = path.map { |segment| GraphqlHelpers.fieldnamerize(segment) }
+    graphql_data.dig(*keys)
   end
 
   def graphql_errors

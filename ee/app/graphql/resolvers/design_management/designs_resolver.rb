@@ -21,32 +21,29 @@ module Resolvers
         ::Resolvers::DesignManagement::DesignResolver
       end
 
-      def resolve(**args)
-        find_designs(args)
+      def resolve(ids: nil, filenames: nil, at_version: nil)
+        ::DesignManagement::DesignsFinder.new(
+          issue,
+          current_user,
+          ids: design_ids(ids),
+          filenames: filenames,
+          visible_at_version: version(at_version),
+          order: :id
+        ).execute
       end
 
       private
 
-      def version(args)
-        args[:at_version] ? GitlabSchema.object_from_id(args[:at_version])&.sync : nil
+      def version(at_version)
+        GitlabSchema.object_from_id(at_version)&.sync if at_version
       end
 
-      def design_ids(args)
-        args[:ids] ? args[:ids].map { |id| GlobalID.parse(id).model_id } : nil
+      def design_ids(ids)
+        ids&.map { |id| GlobalID.parse(id).model_id }
       end
 
       def issue
         object.issue
-      end
-
-      def find_designs(args)
-        ::DesignManagement::DesignsFinder.new(
-          issue,
-          context[:current_user],
-          ids: design_ids(args),
-          filenames: args[:filenames],
-          visible_at_version: version(args)
-        ).execute
       end
     end
   end

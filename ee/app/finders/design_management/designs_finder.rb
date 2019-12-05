@@ -8,6 +8,7 @@ module DesignManagement
     # ids: integer[]
     # filenames: string[]
     # visible_at_version: ?version
+    # filenames: String[]
     def initialize(issue, current_user, params = {})
       @issue = issue
       @current_user = current_user

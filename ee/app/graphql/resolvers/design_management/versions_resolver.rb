@@ -11,6 +11,7 @@ module Resolvers
                as: :sha,
                required: false,
                description: 'The SHA256 of the most recent acceptable version'
+
       argument :earlier_or_equal_to_id, GraphQL::ID_TYPE,
                as: :id,
                required: false,
@@ -25,14 +26,17 @@ module Resolvers
         version = cutoff(parent, id, sha)
 
         raise ::Gitlab::Graphql::Errors::ResourceNotAvailable, 'cutoff not found' unless version.present?
-        return find if version == :unconstrained
 
-        find(earlier_or_equal_to: version)
+        if version == :unconstrained
+          find
+        else
+          find(earlier_or_equal_to: version)
+        end
       end
 
       private
 
-      # Find the version most recent version that the client will accept
+      # Find the most recent version that the client will accept
       def cutoff(parent, id, sha)
         if sha.present? || id.present?
           specific_version(id, sha)
