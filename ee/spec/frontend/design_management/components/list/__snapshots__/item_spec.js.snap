@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Design management list item component hides comment count 1`] = `
+exports[`Design management list item component with no notes hides comment count 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
@@ -49,7 +49,7 @@ exports[`Design management list item component hides comment count 1`] = `
 </router-link-stub>
 `;
 
-exports[`Design management list item component renders item with correct status icon for creation event 1`] = `
+exports[`Design management list item component with no notes renders item with correct status icon for creation event 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
@@ -111,7 +111,7 @@ exports[`Design management list item component renders item with correct status 
 </router-link-stub>
 `;
 
-exports[`Design management list item component renders item with correct status icon for deletion event 1`] = `
+exports[`Design management list item component with no notes renders item with correct status icon for deletion event 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
@@ -173,7 +173,7 @@ exports[`Design management list item component renders item with correct status 
 </router-link-stub>
 `;
 
-exports[`Design management list item component renders item with correct status icon for modification event 1`] = `
+exports[`Design management list item component with no notes renders item with correct status icon for modification event 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
@@ -235,7 +235,7 @@ exports[`Design management list item component renders item with correct status 
 </router-link-stub>
 `;
 
-exports[`Design management list item component renders item with multiple comments 1`] = `
+exports[`Design management list item component with notes renders item with multiple comments 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
@@ -301,7 +301,7 @@ exports[`Design management list item component renders item with multiple commen
 </router-link-stub>
 `;
 
-exports[`Design management list item component renders item with no status icon for none event 1`] = `
+exports[`Design management list item component with no notes renders item with no status icon for none event 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
@@ -350,7 +350,7 @@ exports[`Design management list item component renders item with no status icon 
 </router-link-stub>
 `;
 
-exports[`Design management list item component renders item with single comment 1`] = `
+exports[`Design management list item component with notes renders item with single comment 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
@@ -416,7 +416,7 @@ exports[`Design management list item component renders item with single comment 
 </router-link-stub>
 `;
 
-exports[`Design management list item component renders loading spinner when no image prop present 1`] = `
+exports[`Design management list item component with no notes renders loading spinner when no image prop present 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"

@@ -41,51 +41,55 @@ describe('Design management list item component', () => {
     wrapper.destroy();
   });
 
-  it('renders item with single comment', () => {
-    createComponent();
+  describe('with notes', () => {
+    it('renders item with single comment', () => {
+      createComponent();
 
-    expect(wrapper.element).toMatchSnapshot();
+      expect(wrapper.element).toMatchSnapshot();
+    });
+
+    it('renders item with multiple comments', () => {
+      createComponent({ notesCount: 2 });
+
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 
-  it('renders item with multiple comments', () => {
-    createComponent({ notesCount: 2 });
+  describe('with no notes', () => {
+    it('hides comment count', () => {
+      createComponent({ notesCount: 0 });
 
-    expect(wrapper.element).toMatchSnapshot();
-  });
+      expect(wrapper.element).toMatchSnapshot();
+    });
 
-  it('hides comment count', () => {
-    createComponent({ notesCount: 0 });
+    it('renders item with correct status icon for modification event', () => {
+      createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.MODIFICATION });
 
-    expect(wrapper.element).toMatchSnapshot();
-  });
+      expect(wrapper.element).toMatchSnapshot();
+    });
 
-  it('renders item with correct status icon for modification event', () => {
-    createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.MODIFICATION });
+    it('renders item with correct status icon for deletion event', () => {
+      createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.DELETION });
 
-    expect(wrapper.element).toMatchSnapshot();
-  });
+      expect(wrapper.element).toMatchSnapshot();
+    });
 
-  it('renders item with correct status icon for deletion event', () => {
-    createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.DELETION });
+    it('renders item with correct status icon for creation event', () => {
+      createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.CREATION });
 
-    expect(wrapper.element).toMatchSnapshot();
-  });
+      expect(wrapper.element).toMatchSnapshot();
+    });
 
-  it('renders item with correct status icon for creation event', () => {
-    createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.CREATION });
+    it('renders item with no status icon for none event', () => {
+      createComponent({ notesCount: 0 });
 
-    expect(wrapper.element).toMatchSnapshot();
-  });
+      expect(wrapper.element).toMatchSnapshot();
+    });
 
-  it('renders item with no status icon for none event', () => {
-    createComponent({ notesCount: 0 });
+    it('renders loading spinner when no image prop present', () => {
+      createComponent({ notesCount: 0, isLoading: true });
 
-    expect(wrapper.element).toMatchSnapshot();
-  });
-
-  it('renders loading spinner when no image prop present', () => {
-    createComponent({ notesCount: 0, isLoading: true });
-
-    expect(wrapper.element).toMatchSnapshot();
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 });
