@@ -45,14 +45,14 @@ const addNewVersionToStore = (store, query, version) => {
   });
 };
 
-const addDiscussionCommentToStore = (store, createNote, query, queryVariables) => {
+const addDiscussionCommentToStore = (store, createNote, query, queryVariables, discussionId) => {
   const data = store.readQuery({
     query,
     variables: queryVariables,
   });
 
   const design = extractDesign(data);
-  const currentDiscussion = extractCurrentDiscussion(design.discussions, this.discussion.id);
+  const currentDiscussion = extractCurrentDiscussion(design.discussions, discussionId);
   currentDiscussion.node.notes.edges = [
     ...currentDiscussion.node.notes.edges,
     {
@@ -186,11 +186,17 @@ export const updateStoreAfterDesignsDelete = (store, data, query, designs) => {
   }
 };
 
-export const updateStoreAfterAddDiscussionComment = (store, data, query, queryVariables) => {
+export const updateStoreAfterAddDiscussionComment = (
+  store,
+  data,
+  query,
+  queryVariables,
+  discussionId,
+) => {
   if (data.errors) {
     onError(data, ADD_DISCUSSION_COMMENT_ERROR);
   } else {
-    addDiscussionCommentToStore(store, data, query, queryVariables);
+    addDiscussionCommentToStore(store, data, query, queryVariables, discussionId);
   }
 };
 

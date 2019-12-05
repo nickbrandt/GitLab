@@ -1,0 +1,5 @@
+---
+title: Fix inability to add comments to a discussion in Design Management
+merge_request: 21229
+author:
+type: fixed
