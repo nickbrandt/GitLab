@@ -862,7 +862,8 @@ module EE
       class ManagedLicense < Grape::Entity
         expose :id, :name
         expose :classification, as: :approval_status do |policy|
-          policy.denied? ? 'blacklisted' : policy.classification
+          SoftwareLicensePolicy::APPROVAL_STATUS.invert
+            .fetch(policy.classification, policy.classification)
         end
       end
 
