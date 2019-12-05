@@ -4340,6 +4340,24 @@ msgstr ""
 msgid "Cohorts"
 msgstr ""
 
+msgid "Cohorts|Inactive users"
+msgstr ""
+
+msgid "Cohorts|Month %{month_index}"
+msgstr ""
+
+msgid "Cohorts|New users"
+msgstr ""
+
+msgid "Cohorts|Registration month"
+msgstr ""
+
+msgid "Cohorts|Returning users"
+msgstr ""
+
+msgid "Cohorts|User cohorts are shown for the last %{months_included} months. Only users with activity are counted in the 'New users' column; inactive users are counted separately."
+msgstr ""
+
 msgid "Collapse"
 msgstr ""
 
