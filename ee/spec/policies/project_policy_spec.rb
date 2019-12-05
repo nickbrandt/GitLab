@@ -418,8 +418,8 @@ describe ProjectPolicy do
     context 'with private project' do
       let(:project) { create(:project, :private, namespace: owner.namespace) }
 
-      context 'with guest or above' do
-        let(:current_user) { guest }
+      context 'with reporter or above' do
+        let(:current_user) { reporter }
 
         it { is_expected.to be_allowed(:read_security_findings) }
       end
