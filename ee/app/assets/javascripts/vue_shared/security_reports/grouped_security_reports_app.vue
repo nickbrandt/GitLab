@@ -5,7 +5,6 @@ import ReportSection from '~/reports/components/report_section.vue';
 import SummaryRow from '~/reports/components/summary_row.vue';
 import IssuesList from '~/reports/components/issues_list.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import { securityReportsTypes } from './constants';
 import IssueModal from './components/modal.vue';
 import securityReportsMixin from './mixins/security_report_mixin';
 import createStore from './store';
@@ -175,7 +174,7 @@ export default {
       return `${this.pipelinePath}/security`;
     },
     hasContainerScanningReports() {
-      const type = securityReportsTypes.CONTAINER_SCANNING;
+      const type = 'containerScanning';
       if (this.isMergeRequestReportApiEnabled(type)) {
         return this.enabledReports[type];
       }
@@ -183,13 +182,13 @@ export default {
       return Boolean(head || diffEndpoint);
     },
     hasDependencyScanningReports() {
-      return this.hasReportsType(securityReportsTypes.DEPENDENCY_SCANNING);
+      return this.hasReportsType('dependencyScanning');
     },
     hasDastReports() {
-      return this.hasReportsType(securityReportsTypes.DAST);
+      return this.hasReportsType('dast');
     },
     hasSastReports() {
-      return this.hasReportsType(securityReportsTypes.SAST);
+      return this.hasReportsType('sast');
     },
   },
 
