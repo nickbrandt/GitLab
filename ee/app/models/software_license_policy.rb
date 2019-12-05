@@ -6,6 +6,7 @@
 class SoftwareLicensePolicy < ApplicationRecord
   include Presentable
   APPROVAL_STATUS = {
+    'approved' => 'allowed',
     'blacklisted' => 'denied'
   }.freeze
 
@@ -18,7 +19,7 @@ class SoftwareLicensePolicy < ApplicationRecord
 
   enum classification: {
     denied: 0,
-      approved: 1
+    allowed: 1
   }
 
   # Software license is mandatory, it contains the license informations.

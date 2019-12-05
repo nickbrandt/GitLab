@@ -46,7 +46,7 @@ describe SoftwareLicensePolicies::UpdateService do
           update_software_license_policy(opts)
 
           expect(software_license_policy).to be_valid
-          expect(software_license_policy.classification).to eq(opts[:approval_status])
+          expect(software_license_policy).to be_allowed
           expect(RefreshLicenseComplianceChecksWorker).to have_received(:perform_async).with(project.id)
         end
       end

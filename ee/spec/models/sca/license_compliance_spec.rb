@@ -108,7 +108,7 @@ RSpec.describe SCA::LicenseCompliance do
           expect(subject.policies[2].id).to eq(other_license_policy.id)
           expect(subject.policies[2].name).to eq(other_license.name)
           expect(subject.policies[2].url).to be_blank
-          expect(subject.policies[2].classification).to eq("approved")
+          expect(subject.policies[2].classification).to eq("allowed")
           expect(subject.policies[2].spdx_identifier).to eq(other_license.spdx_identifier)
 
           expect(subject.policies[3].id).to be_nil
@@ -151,7 +151,7 @@ RSpec.describe SCA::LicenseCompliance do
           expect(subject.policies[2].id).to eq(other_license_policy.id)
           expect(subject.policies[2].name).to eq(other_license.name)
           expect(subject.policies[2].url).to be_blank
-          expect(subject.policies[2].classification).to eq("approved")
+          expect(subject.policies[2].classification).to eq("allowed")
           expect(subject.policies[2].spdx_identifier).to eq(other_license.spdx_identifier)
 
           expect(subject.policies[3].id).to be_nil

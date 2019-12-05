@@ -74,7 +74,7 @@ RSpec.describe SCA::LicensePolicy do
     context "when a allowed software_policy is provided" do
       let(:policy) { build(:software_license_policy, :allowed, software_license: software_license) }
 
-      it { expect(subject.classification).to eq("approved") }
+      it { expect(subject.classification).to eq("allowed") }
     end
 
     context "when a denied software_policy is provided" do

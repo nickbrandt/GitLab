@@ -20,14 +20,14 @@ describe Projects::Licenses::UpdatePolicyService do
       end
 
       context "when updating a policy" do
-        let(:params) { { classification: "approved" } }
+        let(:params) { { classification: "allowed" } }
 
         it "updates the policy" do
           result = subject.execute(policy.id)
 
           expect(result[:status]).to eq(:success)
           expect(result[:software_license_policy]).to be_present
-          expect(result[:software_license_policy].classification).to eq('approved')
+          expect(result[:software_license_policy].classification).to eq('allowed')
           expect(RefreshLicenseComplianceChecksWorker).to have_received(:perform_async).with(project.id)
         end
       end
