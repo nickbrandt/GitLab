@@ -136,11 +136,11 @@ module EE
 
     def enabled_reports
       {
-        sast: !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(:sast),
-        container_scanning: !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(:container_scanning),
-        dast: !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(:dast),
-        dependency_scanning: !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(:dependency_scanning),
-        license_management: !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(:license_management)
+        sast: report_type_enabled?(:sast),
+        container_scanning: report_type_enabled?(:container_scanning),
+        dast: report_type_enabled?(:dast),
+        dependency_scanning: report_type_enabled?(:dependency_scanning),
+        license_management: report_type_enabled?(:license_management)
       }
     end
 
@@ -217,6 +217,10 @@ module EE
 
     def missing_report_error(report_type)
       { status: :error, status_reason: "This merge request does not have #{report_type} reports" }
+    end
+
+    def report_type_enabled?(report_type)
+      !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(report_type)
     end
   end
 end
