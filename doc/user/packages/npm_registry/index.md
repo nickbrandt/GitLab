@@ -5,7 +5,7 @@
 With the GitLab NPM Registry, every
 project can have its own space to store NPM packages.
 
-![GitLab NPM Registry](img/npm_package_view.png)
+![GitLab NPM Registry](img/npm_package_view_v12_5.png)
 
 NOTE: **Note:**
 Only [scoped](https://docs.npmjs.com/misc/scope) packages are supported.
