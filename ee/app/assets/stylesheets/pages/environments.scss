@@ -11,7 +11,7 @@
     padding: 10px;
   }
 
-  > .deploy-board-information {
+  .deploy-board-information {
     display: flex;
     justify-content: space-between;
 
@@ -21,7 +21,7 @@
       width: 70px;
       flex-wrap: wrap;
       justify-content: center;
-      margin: 20px 0 20px 5px;
+      margin: 20px 0 0 5px;
     }
 
     .deploy-board-instances {
@@ -59,6 +59,13 @@
       font-size: 17px;
       line-height: 40px;
     }
+  }
+
+  .deploy-board-legend .legend-text {
+    color: $gl-text-color;
+    font-size: $gl-font-size-small;
+    font-weight: $gl-font-weight-bold;
+    line-height: $gl-line-height-14;
   }
 }
 

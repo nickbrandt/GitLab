@@ -1,6 +1,6 @@
 .deployment-instance {
-  width: 15px;
-  height: 15px;
+  width: $gl-padding;
+  height: $gl-padding;
   margin: 1px;
   border: 1px solid;
   border-radius: $border-radius-small;
@@ -10,7 +10,7 @@
     background-color: $green-600;
     border-color: $green-800;
 
-    &:hover {
+    &.link:hover {
       background-color: $green-800;
       border-color: $green-950;
     }
@@ -20,7 +20,7 @@
     background-color: $green-300;
     border-color: $green-600;
 
-    &:hover {
+    &.link:hover {
       background-color: $green-500;
       border-color: $green-800;
     }
@@ -41,7 +41,7 @@
       bottom: -2px;
     }
 
-    &:hover {
+    &.link:hover {
       background-color: $red-800;
       border-color: $red-950;
     }
@@ -51,7 +51,7 @@
     background-color: $gray-300;
     border-color: $gray-700;
 
-    &:hover {
+    &.link:hover {
       background-color: $gray-500;
       border-color: $gray-900;
     }
@@ -61,7 +61,7 @@
     background-color: $white-light;
     border-color: $gray-700;
 
-    &:hover {
+    &.link:hover {
       background-color: $white-light;
       border-color: $gray-900;
     }
@@ -76,6 +76,16 @@
       border-radius: 50%;
       content: '';
       z-index: 1;
+    }
+  }
+
+  &-canary-icon {
+    background-color: transparent;
+    border: 0;
+
+    &::after {
+      width: $gl-padding !important;
+      height: $gl-padding !important;
     }
   }
 }

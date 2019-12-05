@@ -2960,6 +2960,9 @@ msgstr ""
 msgid "Can't scan the code?"
 msgstr ""
 
+msgid "Canary"
+msgstr ""
+
 msgid "Canary Deployments is a popular CI strategy, where a small portion of the fleet is updated to the new version of your application."
 msgstr ""
 
@@ -15325,16 +15328,16 @@ msgstr ""
 msgid "SearchCodeResults|of %{link_to_project}"
 msgstr ""
 
-msgid "SearchResults|Showing %{count} %{scope} for \"%{term}\""
+msgid "SearchResults|Showing %{count} %{scope} for%{term_element}"
 msgstr ""
 
-msgid "SearchResults|Showing %{count} %{scope} for \"%{term}\" in your personal and project snippets"
+msgid "SearchResults|Showing %{count} %{scope} for%{term_element} in your personal and project snippets"
 msgstr ""
 
-msgid "SearchResults|Showing %{from} - %{to} of %{count} %{scope} for \"%{term}\""
+msgid "SearchResults|Showing %{from} - %{to} of %{count} %{scope} for%{term_element}"
 msgstr ""
 
-msgid "SearchResults|Showing %{from} - %{to} of %{count} %{scope} for \"%{term}\" in your personal and project snippets"
+msgid "SearchResults|Showing %{from} - %{to} of %{count} %{scope} for%{term_element} in your personal and project snippets"
 msgstr ""
 
 msgid "SearchResults|We couldn't find any %{scope} matching %{term}"
@@ -16963,6 +16966,9 @@ msgstr ""
 msgid "Subtracts"
 msgstr ""
 
+msgid "Succeeded"
+msgstr ""
+
 msgid "Successfully activated"
 msgstr ""
 
@@ -17890,6 +17896,9 @@ msgid "This directory"
 msgstr ""
 
 msgid "This domain is not verified. You will need to verify ownership before access is enabled."
+msgstr ""
+
+msgid "This endpoint has been requested too many times. Try again later."
 msgstr ""
 
 msgid "This environment has no deployments yet."

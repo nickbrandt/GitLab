@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::NpmPackages do
@@ -6,6 +7,7 @@ describe API::NpmPackages do
   let(:user)    { create(:user) }
   let(:project) { create(:project, :public, namespace: group) }
   let(:token)   { create(:oauth_access_token, scopes: 'api', resource_owner: user) }
+  let(:job) { create(:ci_build, user: user) }
 
   before do
     project.add_developer(user)
@@ -15,6 +17,12 @@ describe API::NpmPackages do
   shared_examples 'a package that requires auth' do
     it 'returns the package info with oauth token' do
       get_package_with_token(package)
+
+      expect_a_valid_package_response
+    end
+
+    it 'returns the package info with job token' do
+      get_package_with_job_token(package)
 
       expect_a_valid_package_response
     end
@@ -87,15 +95,41 @@ describe API::NpmPackages do
     def get_package_with_token(package, params = {})
       get_package(package, params.merge(access_token: token.token))
     end
+
+    def get_package_with_job_token(package, params = {})
+      get_package(package, params.merge(job_token: job.token))
+    end
   end
 
   describe 'GET /api/v4/projects/:id/packages/npm/*package_name/-/*file_name' do
     let(:package) { create(:npm_package, project: project) }
     let(:package_file) { package.package_files.first }
 
-    context 'a public project' do
-      it 'returns the file' do
+    shared_examples 'a package file that requires auth' do
+      it 'returns the file with an access token' do
         get_file_with_token(package_file)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
+
+      it 'returns the file with a job token' do
+        get_file_with_job_token(package_file)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
+
+      it 'denies download with no token' do
+        get_file(package_file)
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    context 'a public project' do
+      it 'returns the file with no token needed' do
+        get_file(package_file)
 
         expect(response).to have_gitlab_http_status(200)
         expect(response.content_type.to_s).to eq('application/octet-stream')
@@ -107,12 +141,7 @@ describe API::NpmPackages do
         project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
       end
 
-      it 'returns the file' do
-        get_file_with_token(package_file)
-
-        expect(response).to have_gitlab_http_status(200)
-        expect(response.content_type.to_s).to eq('application/octet-stream')
-      end
+      it_behaves_like 'a package file that requires auth'
 
       it 'denies download when not enough permissions' do
         project.add_guest(user)
@@ -121,12 +150,14 @@ describe API::NpmPackages do
 
         expect(response).to have_gitlab_http_status(403)
       end
+    end
 
-      it 'denies download when no private token' do
-        get_file(package_file)
-
-        expect(response).to have_gitlab_http_status(404)
+    context 'internal project' do
+      before do
+        project.update!(visibility_level: Gitlab::VisibilityLevel::INTERNAL)
       end
+
+      it_behaves_like 'a package file that requires auth'
     end
 
     it 'rejects request if feature is not in the license' do
@@ -144,6 +175,10 @@ describe API::NpmPackages do
 
     def get_file_with_token(package_file, params = {})
       get_file(package_file, params.merge(access_token: token.token))
+    end
+
+    def get_file_with_job_token(package_file, params = {})
+      get_file(package_file, params.merge(job_token: job.token))
     end
   end
 
@@ -179,8 +214,16 @@ describe API::NpmPackages do
         let(:package_name) { "@#{group.path}/my_package_name" }
         let(:params) { upload_params(package_name) }
 
-        it 'creates npm package with file' do
+        it 'creates npm package with file with access token' do
           expect { upload_package_with_token(package_name, params) }
+            .to change { project.packages.count }.by(1)
+            .and change { Packages::PackageFile.count }.by(1)
+
+          expect(response).to have_gitlab_http_status(200)
+        end
+
+        it 'creates npm package with file with job token' do
+          expect { upload_package_with_job_token(package_name, params) }
             .to change { project.packages.count }.by(1)
             .and change { Packages::PackageFile.count }.by(1)
 
@@ -208,6 +251,10 @@ describe API::NpmPackages do
 
     def upload_package_with_token(package_name, params = {})
       upload_package(package_name, params.merge(access_token: token.token))
+    end
+
+    def upload_package_with_job_token(package_name, params = {})
+      upload_package(package_name, params.merge(job_token: job.token))
     end
 
     def upload_params(package_name)
