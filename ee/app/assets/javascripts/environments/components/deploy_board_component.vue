@@ -10,10 +10,9 @@
  * [Mockup](https://gitlab.com/gitlab-org/gitlab-foss/uploads/2f655655c0eadf655d0ae7467b53002a/environments__deploy-graphic.png)
  */
 import _ from 'underscore';
-import { GlLoadingIcon, GlLink } from '@gitlab/ui';
+import { GlLoadingIcon, GlLink, GlTooltipDirective } from '@gitlab/ui';
 import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
 import { __, n__, s__, sprintf } from '~/locale';
-import tooltip from '~/vue_shared/directives/tooltip';
 import STATUS_MAP from '../constants';
 
 export default {
@@ -23,7 +22,7 @@ export default {
     GlLink,
   },
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     deployBoardData: {
@@ -94,7 +93,12 @@ export default {
     deployBoardSvg() {
       return deployBoardSvg;
     },
+    deployBoardActions() {
+      return this.deployBoardData.rollback_url || this.deployBoardData.abort_url;
+    },
     statuses() {
+      // Canary is not a pod status but it needs to be in the legend.
+      // Hence adding it here.
       return {
         ...STATUS_MAP,
         canary: {
@@ -121,7 +125,7 @@ export default {
       <div v-if="canRenderDeployBoard" class="deploy-board-information p-3">
         <div class="deploy-board-information">
           <section class="deploy-board-status">
-            <span v-tooltip :title="instanceIsCompletedText">
+            <span v-gl-tooltip :title="instanceIsCompletedText">
               <span ref="percentage" class="text-center text-plain gl-font-size-large"
                 >{{ deployBoardData.completion }}%</span
               >
@@ -158,25 +162,22 @@ export default {
             </div>
           </section>
 
-          <section
-            v-if="deployBoardData.rollback_url || deployBoardData.abort_url"
-            class="deploy-board-actions"
-          >
-            <a
+          <section v-if="deployBoardActions" class="deploy-board-actions">
+            <gl-link
               v-if="deployBoardData.rollback_url"
               :href="deployBoardData.rollback_url"
               class="btn"
               data-method="post"
               rel="nofollow"
-              >{{ __('Rollback') }}</a
+              >{{ __('Rollback') }}</gl-link
             >
-            <a
+            <gl-link
               v-if="deployBoardData.abort_url"
               :href="deployBoardData.abort_url"
               class="btn btn-red btn-inverted"
               data-method="post"
               rel="nofollow"
-              >{{ __('Abort') }}</a
+              >{{ __('Abort') }}</gl-link
             >
           </section>
         </div>

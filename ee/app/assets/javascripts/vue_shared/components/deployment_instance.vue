@@ -12,11 +12,14 @@
  * this information in the tooltip and the colors.
  * Mockup is https://gitlab.com/gitlab-org/gitlab/issues/35570
  */
-import tooltip from '~/vue_shared/directives/tooltip';
+import { GlLink, GlTooltipDirective } from '@gitlab/ui';
 
 export default {
+  components: {
+    GlLink,
+  },
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
 
   props: {
@@ -77,13 +80,11 @@ export default {
 };
 </script>
 <template>
-  <a
-    v-tooltip
+  <gl-link
+    v-gl-tooltip
     :class="cssClass"
     :title="tooltipText"
     :href="computedLogPath"
     class="deployment-instance d-flex justify-content-center align-items-center"
-    data-placement="top"
-  >
-  </a>
+  />
 </template>
