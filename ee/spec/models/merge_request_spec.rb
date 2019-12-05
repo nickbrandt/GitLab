@@ -719,4 +719,32 @@ describe MergeRequest do
       it { is_expected.to be_falsy }
     end
   end
+
+  describe 'state machine' do
+    context 'when the merge request is on a merge train' do
+      let(:merge_request) do
+        create(:merge_request, :on_train, source_project: project, target_project: project)
+      end
+
+      context 'when the merge request is merged' do
+        it 'ensures to finish merge train' do
+          expect(merge_request.merge_train).to receive(:merged!)
+
+          merge_request.mark_as_merged!
+        end
+      end
+    end
+
+    context 'when the merge request is not on a merge train' do
+      let(:merge_request) do
+        create(:merge_request, source_project: project, target_project: project)
+      end
+
+      context 'when the merge request is merged' do
+        it 'does not raise error' do
+          expect { merge_request.mark_as_merged! }.not_to raise_error
+        end
+      end
+    end
+  end
 end

@@ -77,9 +77,7 @@ module MergeTrains
       MergeRequests::MergeService.new(project, merge_user, merge_request.merge_params)
                                  .execute(merge_request)
 
-      raise ProcessError, 'failed to merge' unless merge_request.merged?
-
-      merge_train.destroy
+      raise ProcessError, "failed to merge. #{merge_request.merge_error}" unless merge_request.merged?
     end
 
     # NOTE: This method works for both no-ff-merge and ff-merge, however,
