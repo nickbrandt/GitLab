@@ -152,7 +152,7 @@ end
 
 # Dependency proxy for containers
 # Because docker adds v2 prefix to URI this need to be outside of usual group routes
-scope constraints: { format: nil } do
+scope format: false do
   get 'v2', to: proc { [200, {}, ['']] }
 
   constraints image: Gitlab::PathRegex.container_image_regex do

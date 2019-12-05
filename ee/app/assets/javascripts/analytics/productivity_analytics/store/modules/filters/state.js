@@ -1,7 +1,9 @@
 export default () => ({
   groupNamespace: null,
   projectPath: null,
-  filters: '',
+  authorUsername: null,
+  labelName: [],
+  milestoneTitle: null,
   startDate: null,
   endDate: null,
 });

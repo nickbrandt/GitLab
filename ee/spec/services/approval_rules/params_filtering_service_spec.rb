@@ -12,21 +12,21 @@ describe ApprovalRules::ParamsFilteringService do
   let(:user) { create(:user) }
 
   describe '#execute' do
+    before do
+      project.add_maintainer(user)
+      project.add_reporter(project_member)
+
+      accessible_group.add_developer(user)
+
+      allow(Ability).to receive(:allowed?).and_call_original
+
+      allow(Ability)
+        .to receive(:allowed?)
+        .with(user, :update_approvers, merge_request)
+        .and_return(can_update_approvers?)
+    end
+
     shared_examples_for(:assigning_users_and_groups) do
-      before do
-        project.add_maintainer(user)
-        project.add_reporter(project_member)
-
-        accessible_group.add_developer(user)
-
-        allow(Ability).to receive(:allowed?).and_call_original
-
-        allow(Ability)
-          .to receive(:allowed?)
-          .with(user, :update_approvers, merge_request)
-          .and_return(can_update_approvers?)
-      end
-
       context 'user can update approvers' do
         let(:can_update_approvers?) { true }
 
@@ -55,22 +55,43 @@ describe ApprovalRules::ParamsFilteringService do
     end
 
     context 'create' do
+      let(:merge_request) { build(:merge_request, target_project: project, source_project: project) }
+      let(:params) do
+        {
+          title: 'Awesome merge_request',
+          description: 'please fix',
+          source_branch: 'feature',
+          target_branch: 'master',
+          force_remove_source_branch: '1',
+          approval_rules_attributes: approval_rules_attributes
+        }
+      end
+
       it_behaves_like :assigning_users_and_groups do
-        let(:merge_request) { build(:merge_request, target_project: project, source_project: project) }
-        let(:params) do
-          {
-            title: 'Awesome merge_request',
-            description: 'please fix',
-            source_branch: 'feature',
-            target_branch: 'master',
-            force_remove_source_branch: '1',
-            approval_rules_attributes: [
-              { name: 'foo', user_ids: [project_member.id, outsider.id] },
-              { name: 'bar', user_ids: [outsider.id], group_ids: [accessible_group.id, inaccessible_group.id] }
-            ]
-          }
+        let(:approval_rules_attributes) do
+          [
+            { name: 'foo', user_ids: [project_member.id, outsider.id] },
+            { name: 'bar', user_ids: [outsider.id], group_ids: [accessible_group.id, inaccessible_group.id] }
+          ]
         end
         let(:expected_groups) { [accessible_group] }
+      end
+
+      context 'any approver rule' do
+        let(:can_update_approvers?) { true }
+        let(:approval_rules_attributes) do
+          [
+            { user_ids: [], group_ids: [] }
+          ]
+        end
+
+        it 'sets rule type for the rules attributes' do
+          params = service.execute
+          rule = params[:approval_rules_attributes].first
+
+          expect(rule[:rule_type]).to eq(:any_approver)
+          expect(rule[:name]).to eq('All Members')
+        end
       end
     end
 

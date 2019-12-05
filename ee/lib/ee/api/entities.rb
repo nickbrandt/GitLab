@@ -530,7 +530,7 @@ module EE
         expose :approval_rules_left, using: ApprovalRuleShort
 
         expose :has_approval_rules do |approval_state|
-          approval_state.has_non_fallback_rules?
+          approval_state.user_defined_rules.present?
         end
 
         expose :merge_request_approvers_available do |approval_state|

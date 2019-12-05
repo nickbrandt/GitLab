@@ -46,8 +46,8 @@ module EE
       end
 
       def geo_redirection
-        redirect_to admin_geo_settings_url, notice: 'You were automatically redirected to <strong>Admin Area > Geo > Setting</strong><br /> '\
-                                                    'From GitLab 12.7 on, this will be the only place for Geo settings and <strong>Admin Area > Settings > Geo</strong> will be removed.'.html_safe
+        redirect_to admin_geo_settings_url, notice: 'You were automatically redirected to <strong>Admin Area > Geo > Settings</strong><br /> '\
+                                                    'From GitLab 13.0 on, this will be the only place for Geo settings and <strong>Admin Area > Settings > Geo</strong> will be removed.'.html_safe
       end
 
       private

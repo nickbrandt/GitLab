@@ -24,9 +24,7 @@ export default {
       <slot name="thead" v-bind="$options.HEADERS"></slot>
     </thead>
     <tbody>
-      <tr v-for="rule in rules" :key="rule.id">
-        <slot :rule="rule" name="tr"></slot>
-      </tr>
+      <slot name="tbody" :rules="rules"></slot>
     </tbody>
   </table>
 </template>

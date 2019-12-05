@@ -41,6 +41,11 @@ export default {
   },
   mixins: [featureFlagsMixin()],
   props: {
+    active: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     name: {
       type: String,
       required: false,
@@ -165,6 +170,7 @@ export default {
         name: this.formName,
         description: this.formDescription,
         scopes: this.formScopes,
+        active: this.active,
       });
     },
 
@@ -304,7 +310,7 @@ export default {
                 <div class="table-mobile-content js-feature-flag-status">
                   <toggle-button
                     :value="scope.active"
-                    :disabled-input="!canUpdateScope(scope)"
+                    :disabled-input="!active || !canUpdateScope(scope)"
                     @change="status => (scope.active = status)"
                   />
                 </div>
@@ -436,7 +442,11 @@ export default {
                   {{ s__('FeatureFlags|Status') }}
                 </div>
                 <div class="table-mobile-content js-feature-flag-status">
-                  <toggle-button :value="false" @change="createNewScope({ active: true })" />
+                  <toggle-button
+                    :disabled-input="!active"
+                    :value="false"
+                    @change="createNewScope({ active: true })"
+                  />
                 </div>
               </div>
 

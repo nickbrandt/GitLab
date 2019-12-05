@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_25_140458) do
+ActiveRecord::Schema.define(version: 2019_12_02_031812) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -349,6 +349,7 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
     t.boolean "sourcegraph_enabled", default: false, null: false
     t.string "sourcegraph_url", limit: 255
     t.boolean "sourcegraph_public_only", default: true, null: false
+    t.bigint "snippet_size_limit", default: 52428800, null: false
     t.text "encrypted_akismet_api_key"
     t.string "encrypted_akismet_api_key_iv", limit: 255
     t.text "encrypted_elasticsearch_aws_secret_access_key"
@@ -361,7 +362,6 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
     t.string "encrypted_slack_app_secret_iv", limit: 255
     t.text "encrypted_slack_app_verification_token"
     t.string "encrypted_slack_app_verification_token_iv", limit: 255
-    t.bigint "snippet_size_limit", default: 52428800, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id"
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id"
     t.index ["instance_administration_project_id"], name: "index_applicationsettings_on_instance_administration_project_id"
@@ -821,6 +821,7 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
     t.integer "pipeline_id", null: false
     t.integer "variable_type", limit: 2, default: 1, null: false
     t.index ["pipeline_id", "key"], name: "index_ci_pipeline_variables_on_pipeline_id_and_key", unique: true
+    t.index ["pipeline_id"], name: "index_ci_pipeline_variables_on_pipeline_id", where: "((key)::text = 'AUTO_DEVOPS_MODSECURITY_SEC_RULE_ENGINE'::text)"
   end
 
   create_table "ci_pipelines", id: :serial, force: :cascade do |t|
@@ -979,6 +980,7 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
     t.boolean "masked", default: false, null: false
     t.integer "variable_type", limit: 2, default: 1, null: false
     t.index ["project_id", "key", "environment_scope"], name: "index_ci_variables_on_project_id_and_key_and_environment_scope", unique: true
+    t.index ["project_id"], name: "index_ci_variables_on_project_id", where: "((key)::text = 'AUTO_DEVOPS_MODSECURITY_SEC_RULE_ENGINE'::text)"
   end
 
   create_table "cluster_groups", id: :serial, force: :cascade do |t|
@@ -1888,6 +1890,7 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
     t.string "encrypted_token_iv", limit: 255, null: false
     t.string "grafana_url", limit: 1024, null: false
     t.boolean "enabled", default: false, null: false
+    t.index ["enabled"], name: "index_grafana_integrations_on_enabled", where: "(enabled IS TRUE)"
     t.index ["project_id"], name: "index_grafana_integrations_on_project_id"
   end
 
@@ -2603,6 +2606,7 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
     t.boolean "emails_disabled"
     t.integer "max_pages_size"
     t.integer "max_artifacts_size"
+    t.boolean "mentions_disabled"
     t.index ["created_at"], name: "index_namespaces_on_created_at"
     t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)"
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id"
@@ -2772,9 +2776,7 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
 
   create_table "operations_feature_flags_clients", force: :cascade do |t|
     t.integer "project_id", null: false
-    t.string "token"
     t.string "token_encrypted"
-    t.index ["project_id", "token"], name: "index_operations_feature_flags_clients_on_project_id_and_token", unique: true
     t.index ["project_id", "token_encrypted"], name: "index_feature_flags_clients_on_project_id_and_token_encrypted", unique: true
   end
 
@@ -4534,7 +4536,7 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
   add_foreign_key "notes", "projects", name: "fk_99e097b079", on_delete: :cascade
   add_foreign_key "notes", "reviews", name: "fk_2e82291620", on_delete: :nullify
   add_foreign_key "notification_settings", "users", name: "fk_0c95e91db7", on_delete: :cascade
-  add_foreign_key "oauth_openid_requests", "oauth_access_grants", column: "access_grant_id", name: "fk_oauth_openid_requests_oauth_access_grants_access_grant_id"
+  add_foreign_key "oauth_openid_requests", "oauth_access_grants", column: "access_grant_id", name: "fk_77114b3b09", on_delete: :cascade
   add_foreign_key "operations_feature_flag_scopes", "operations_feature_flags", column: "feature_flag_id", on_delete: :cascade
   add_foreign_key "operations_feature_flags", "projects", on_delete: :cascade
   add_foreign_key "operations_feature_flags_clients", "projects", on_delete: :cascade

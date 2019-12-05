@@ -16,9 +16,6 @@ export default {
   },
   computed: {
     ...mapState(['settings']),
-    isRemoveable() {
-      return !this.rule.isFallback && this.settings.allowMultiRule;
-    },
   },
   methods: {
     ...mapActions(['requestEditRule', 'requestDeleteRule']),
@@ -29,9 +26,9 @@ export default {
 <template>
   <div>
     <gl-button variant="none" @click="requestEditRule(rule)">
-      <span>{{ __('Edit') }}</span> </gl-button
-    ><gl-button
-      v-if="isRemoveable"
+      <span>{{ __('Edit') }}</span>
+    </gl-button>
+    <gl-button
       class="prepend-left-8 btn btn-inverted"
       variant="danger"
       @click="requestDeleteRule(rule)"

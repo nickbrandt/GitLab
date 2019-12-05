@@ -191,6 +191,19 @@ module EE
         joins('LEFT JOIN services ON services.project_id = projects.id AND services.type = \'GitlabSlackApplicationService\' AND services.active IS true')
           .where('services.id IS NULL')
       end
+
+      def inner_join_design_management
+        join_statement =
+          arel_table
+            .join(DesignManagement::Design.arel_table, Arel::Nodes::InnerJoin)
+            .on(arel_table[:id].eq(DesignManagement::Design.arel_table[:project_id]))
+
+        joins(join_statement.join_sources)
+      end
+
+      def count_designs
+        inner_join_design_management.distinct.count
+      end
     end
 
     def can_store_security_reports?
@@ -377,6 +390,7 @@ module EE
       default_issues_tracker? || jira_tracker_active?
     end
 
+    # TODO: Clean up this method in the https://gitlab.com/gitlab-org/gitlab/issues/33329
     def approvals_before_merge
       return 0 unless feature_available?(:merge_request_approvers)
 
@@ -385,24 +399,24 @@ module EE
 
     def visible_approval_rules
       strong_memoize(:visible_approval_rules) do
-        visible_regular_approval_rules + approval_rules.report_approver
+        visible_user_defined_rules + approval_rules.report_approver
       end
     end
 
-    def visible_regular_approval_rules
-      strong_memoize(:visible_regular_approval_rules) do
-        regular_rules = approval_rules.regular.order(:id)
+    def visible_user_defined_rules
+      strong_memoize(:visible_user_defined_rules) do
+        rules = approval_rules.regular_or_any_approver.order(rule_type: :desc, id: :asc)
 
-        next regular_rules.take(1) unless multiple_approval_rules_available?
+        next rules.take(1) unless multiple_approval_rules_available?
 
-        regular_rules
+        rules
       end
     end
 
+    # TODO: Clean up this method in the https://gitlab.com/gitlab-org/gitlab/issues/33329
     def min_fallback_approvals
       strong_memoize(:min_fallback_approvals) do
-        visible_regular_approval_rules.map(&:approvals_required).max ||
-          approvals_before_merge.to_i
+        visible_user_defined_rules.map(&:approvals_required).max.to_i
       end
     end
 

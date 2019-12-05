@@ -181,11 +181,13 @@ describe Group do
 
     it 'does not include projects that only have dismissed vulnerabilities' do
       project = create(:project, namespace: group)
-      vulnerability = create(:vulnerabilities_occurrence, project: project)
+      vulnerability = create(:vulnerabilities_occurrence, report_type: :dast, project: project)
       create(
         :vulnerability_feedback,
-        project_fingerprint: vulnerability.project_fingerprint,
-        feedback_type: :dismissal
+        category: :dast,
+        feedback_type: :dismissal,
+        project: project,
+        project_fingerprint: vulnerability.project_fingerprint
       )
 
       vulnerable_projects = group.vulnerable_projects
@@ -536,6 +538,54 @@ describe Group do
         insights_config = group.insights_config
 
         expect(insights_config).to eq(key: 'monthlyBugsCreated')
+      end
+    end
+  end
+
+  describe '#marked_for_deletion?' do
+    subject { group.marked_for_deletion? }
+
+    shared_examples_for 'returns false' do
+      it { is_expected.to be_falsey }
+    end
+
+    shared_examples_for 'returns true' do
+      it { is_expected.to be_truthy }
+    end
+
+    context 'adjourned deletion feature is available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
+      end
+
+      context 'when the group is marked for adjourned deletion' do
+        before do
+          create(:group_deletion_schedule, group: group, marked_for_deletion_on: 1.day.ago)
+        end
+
+        it_behaves_like 'returns true'
+      end
+
+      context 'when the group is not marked for adjourned deletion' do
+        it_behaves_like 'returns false'
+      end
+    end
+
+    context 'adjourned deletion feature is not available' do
+      before do
+        stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
+      end
+
+      context 'when the group is marked for adjourned deletion' do
+        before do
+          create(:group_deletion_schedule, group: group, marked_for_deletion_on: 1.day.ago)
+        end
+
+        it_behaves_like 'returns false'
+      end
+
+      context 'when the group is not marked for adjourned deletion' do
+        it_behaves_like 'returns false'
       end
     end
   end

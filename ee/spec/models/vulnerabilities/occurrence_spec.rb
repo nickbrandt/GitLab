@@ -284,14 +284,28 @@ describe Vulnerabilities::Occurrence do
     set(:project) { create(:project) }
     set(:project2) { create(:project) }
     let!(:finding1) { create(:vulnerabilities_occurrence, project: project) }
-    let!(:finding2) { create(:vulnerabilities_occurrence, project: project) }
+    let!(:finding2) { create(:vulnerabilities_occurrence, project: project, report_type: :dast) }
     let!(:finding3) { create(:vulnerabilities_occurrence, project: project2) }
 
     before do
       create(
         :vulnerability_feedback,
         :dismissal,
+        project: finding1.project,
         project_fingerprint: finding1.project_fingerprint
+      )
+      create(
+        :vulnerability_feedback,
+        :dismissal,
+        project_fingerprint: finding2.project_fingerprint,
+        project: project2
+      )
+      create(
+        :vulnerability_feedback,
+        :dismissal,
+        category: :sast,
+        project_fingerprint: finding2.project_fingerprint,
+        project: finding2.project
       )
     end
 

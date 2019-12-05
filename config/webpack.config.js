@@ -1,5 +1,6 @@
 const path = require('path');
 const glob = require('glob');
+const fs = require('fs');
 const webpack = require('webpack');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin;
@@ -23,6 +24,7 @@ const NO_SOURCEMAPS = process.env.NO_SOURCEMAPS;
 
 const VUE_VERSION = require('vue/package.json').version;
 const VUE_LOADER_VERSION = require('vue-loader/package.json').version;
+const WEBPACK_VERSION = require('webpack/package.json').version;
 
 const devtool = IS_PRODUCTION ? 'source-map' : 'cheap-module-eval-source-map';
 
@@ -102,6 +104,7 @@ const alias = {
 if (IS_EE) {
   Object.assign(alias, {
     ee: path.join(ROOT_PATH, 'ee/app/assets/javascripts'),
+    ee_component: path.join(ROOT_PATH, 'ee/app/assets/javascripts'),
     ee_empty_states: path.join(ROOT_PATH, 'ee/app/views/shared/empty_states'),
     ee_icons: path.join(ROOT_PATH, 'ee/app/views/shared/icons'),
     ee_images: path.join(ROOT_PATH, 'ee/app/assets/images'),
@@ -283,16 +286,13 @@ module.exports = {
       jQuery: 'jquery',
     }),
 
-    new webpack.NormalModuleReplacementPlugin(/^ee_component\/(.*)\.vue/, function(resource) {
-      if (Object.keys(module.exports.resolve.alias).indexOf('ee') >= 0) {
-        resource.request = resource.request.replace(/^ee_component/, 'ee');
-      } else {
+    !IS_EE &&
+      new webpack.NormalModuleReplacementPlugin(/^ee_component\/(.*)\.vue/, resource => {
         resource.request = path.join(
           ROOT_PATH,
           'app/assets/javascripts/vue_shared/components/empty_component.js',
         );
-      }
-    }),
+      }),
 
     new CopyWebpackPlugin([
       {
@@ -360,6 +360,21 @@ module.exports = {
           const toMB = bytes => Math.floor(bytes / 1024 / 1024);
 
           console.log(`Webpack heap size: ${toMB(memoryUsage)} MB`);
+
+          const webpackStatistics = {
+            memoryUsage,
+            date: Date.now(), // milliseconds
+            commitSHA: process.env.CI_COMMIT_SHA,
+            nodeVersion: process.versions.node,
+            webpackVersion: WEBPACK_VERSION,
+          };
+
+          console.log(webpackStatistics);
+
+          fs.writeFileSync(
+            path.join(ROOT_PATH, 'webpack-dev-server.json'),
+            JSON.stringify(webpackStatistics),
+          );
 
           // exit in case we're running webpack-dev-server
           IS_DEV_SERVER && process.exit();

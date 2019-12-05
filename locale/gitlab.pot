@@ -234,6 +234,9 @@ msgstr[1] ""
 msgid "%{count} related %{pluralized_subject}: %{links}"
 msgstr ""
 
+msgid "%{description}- Sentry event: %{errorUrl}- First seen: %{firstSeen}- Last seen: %{lastSeen} %{countLabel}: %{count}%{userCountLabel}: %{userCount}"
+msgstr ""
+
 msgid "%{duration}ms"
 msgstr ""
 
@@ -319,6 +322,9 @@ msgid "%{openOrClose} %{noteable}"
 msgstr ""
 
 msgid "%{percent}%% complete"
+msgstr ""
+
+msgid "%{percent}%{percentSymbol} complete"
 msgstr ""
 
 msgid "%{primary} (%{secondary})"
@@ -474,11 +480,21 @@ msgstr ""
 msgid ", or "
 msgstr ""
 
+msgid "- Event"
+msgid_plural "- Events"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "- Runner is active and can process any new jobs"
 msgstr ""
 
 msgid "- Runner is paused and will not receive any new jobs"
 msgstr ""
+
+msgid "- User"
+msgid_plural "- Users"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "- show less"
 msgstr ""
@@ -694,6 +710,9 @@ msgid "A new impersonation token has been created."
 msgstr ""
 
 msgid "A plain HTML site that uses Netlify for CI/CD instead of GitLab, but still with all the other great GitLab features."
+msgstr ""
+
+msgid "A project boilerplate for Salesforce App development with Salesforce Developer tools."
 msgstr ""
 
 msgid "A project is where you house your files (repository), plan your work (issues), and publish your documentation (wiki), %{among_other_things_link}."
@@ -966,9 +985,6 @@ msgid "Add an issue"
 msgstr ""
 
 msgid "Add approval rule"
-msgstr ""
-
-msgid "Add approvers"
 msgstr ""
 
 msgid "Add bold text"
@@ -1813,7 +1829,13 @@ msgstr ""
 msgid "Any Milestone"
 msgstr ""
 
+msgid "Any eligible user"
+msgstr ""
+
 msgid "Any encrypted tokens"
+msgstr ""
+
+msgid "Any member with Developer or higher permissions to the project."
 msgstr ""
 
 msgid "Any namespace"
@@ -1897,6 +1919,9 @@ msgstr ""
 msgid "Applying suggestion"
 msgstr ""
 
+msgid "Approval rules"
+msgstr ""
+
 msgid "ApprovalRuleRemove|%d member"
 msgid_plural "ApprovalRuleRemove|%d members"
 msgstr[0] ""
@@ -1919,9 +1944,6 @@ msgid "ApprovalRuleSummary|%{count} approval required from %{membersCount}"
 msgid_plural "ApprovalRuleSummary|%{count} approvals required from %{membersCount}"
 msgstr[0] ""
 msgstr[1] ""
-
-msgid "ApprovalRule|All members with Developer role or higher and code owners (if any)"
-msgstr ""
 
 msgid "ApprovalRule|Approvers"
 msgstr ""
@@ -4291,6 +4313,9 @@ msgstr ""
 msgid "Code Owners"
 msgstr ""
 
+msgid "Code Owners to the merge request changes."
+msgstr ""
+
 msgid "Code owner approval is required"
 msgstr ""
 
@@ -4721,9 +4746,6 @@ msgstr ""
 msgid "Control the maximum concurrency of repository backfill for this secondary node"
 msgstr ""
 
-msgid "ConvDev Index"
-msgstr ""
-
 msgid "Cookie domain"
 msgstr ""
 
@@ -4842,6 +4864,9 @@ msgid "Could not delete chat nickname %{chat_name}."
 msgstr ""
 
 msgid "Could not remove the trigger."
+msgstr ""
+
+msgid "Could not restore the group"
 msgstr ""
 
 msgid "Could not revoke impersonation token %{token_name}."
@@ -5894,6 +5919,9 @@ msgstr ""
 msgid "Detect host keys"
 msgstr ""
 
+msgid "DevOps Score"
+msgstr ""
+
 msgid "Diff content limits"
 msgstr ""
 
@@ -5996,10 +6024,10 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
-msgid "Dismiss ConvDev introduction"
+msgid "Dismiss Cycle Analytics introduction box"
 msgstr ""
 
-msgid "Dismiss Cycle Analytics introduction box"
+msgid "Dismiss DevOps Score introduction"
 msgstr ""
 
 msgid "Dismiss Merge Request promotion"
@@ -6980,9 +7008,6 @@ msgstr ""
 msgid "Events"
 msgstr ""
 
-msgid "Events: %{count}"
-msgstr ""
-
 msgid "Every %{action} attempt has failed: %{job_error_message}. Please try again."
 msgstr ""
 
@@ -7637,9 +7662,6 @@ msgid "First name"
 msgstr ""
 
 msgid "First seen"
-msgstr ""
-
-msgid "First seen: %{first_seen}"
 msgstr ""
 
 msgid "Fixed date"
@@ -8578,7 +8600,7 @@ msgstr ""
 msgid "Google Takeout"
 msgstr ""
 
-msgid "Google authentication is not %{link_start}property configured%{link_end}. Ask your GitLab administrator if you want to use this service."
+msgid "Google authentication is not %{link_start}properly configured%{link_end}. Ask your GitLab administrator if you want to use this service."
 msgstr ""
 
 msgid "Got it"
@@ -8663,6 +8685,12 @@ msgid "Group description (optional)"
 msgstr ""
 
 msgid "Group details"
+msgstr ""
+
+msgid "Group has been already marked for deletion"
+msgstr ""
+
+msgid "Group has not been marked for deletion"
 msgstr ""
 
 msgid "Group info:"
@@ -8860,6 +8888,9 @@ msgstr ""
 msgid "GroupSettings|Disable email notifications"
 msgstr ""
 
+msgid "GroupSettings|Disable group mentions"
+msgstr ""
+
 msgid "GroupSettings|If the parent group's visibility is lower than the group current visibility, visibility levels for subgroups and projects will be changed to match the new parent group's visibility."
 msgstr ""
 
@@ -8906,6 +8937,9 @@ msgid "GroupSettings|This setting will be applied to all subgroups unless overri
 msgstr ""
 
 msgid "GroupSettings|This setting will override user notification preferences for all members of the group, subgroups, and projects."
+msgstr ""
+
+msgid "GroupSettings|This setting will prevent group members from being notified if the group is mentioned."
 msgstr ""
 
 msgid "GroupSettings|Transfer group"
@@ -9563,7 +9597,7 @@ msgstr ""
 msgid "Introducing Cycle Analytics"
 msgstr ""
 
-msgid "Introducing Your Conversational Development Index"
+msgid "Introducing Your DevOps Score"
 msgstr ""
 
 msgid "Invalid Git ref"
@@ -10097,9 +10131,6 @@ msgid "Last reply by"
 msgstr ""
 
 msgid "Last seen"
-msgstr ""
-
-msgid "Last seen: %{last_seen}"
 msgstr ""
 
 msgid "Last successful update"
@@ -11987,6 +12018,9 @@ msgstr ""
 msgid "Open source software to collaborate on code"
 msgstr ""
 
+msgid "Open: %{open} • Closed: %{closed}"
+msgstr ""
+
 msgid "Opened"
 msgstr ""
 
@@ -13719,6 +13753,9 @@ msgid "ProjectTemplates|Pages/Plain HTML"
 msgstr ""
 
 msgid "ProjectTemplates|Ruby on Rails"
+msgstr ""
+
+msgid "ProjectTemplates|SalesforceDX"
 msgstr ""
 
 msgid "ProjectTemplates|Serverless Framework/JS"
@@ -15623,9 +15660,6 @@ msgid "Sentry API URL"
 msgstr ""
 
 msgid "Sentry event"
-msgstr ""
-
-msgid "Sentry event: %{external_url}"
 msgstr ""
 
 msgid "Sep"
@@ -19338,6 +19372,9 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
+msgid "Users or groups set as approvers in the project's or merge request's settings."
+msgstr ""
+
 msgid "Users outside of license"
 msgstr ""
 
@@ -19348,9 +19385,6 @@ msgid "Users were successfully added."
 msgstr ""
 
 msgid "Users with a Guest role or those who don't belong to any projects or groups don't count towards seats in use."
-msgstr ""
-
-msgid "Users: %{user_count}"
 msgstr ""
 
 msgid "UsersSelect|%{name} + %{length} more"
@@ -19738,6 +19772,9 @@ msgstr ""
 msgid "Whitelist to allow requests to the local network from hooks and services"
 msgstr ""
 
+msgid "Who can be an approver?"
+msgstr ""
+
 msgid "Who can see this group?"
 msgstr ""
 
@@ -19961,6 +19998,9 @@ msgid "You are going to transfer %{project_full_name} to another owner. Are you 
 msgstr ""
 
 msgid "You are not allowed to unlink your primary login account"
+msgstr ""
+
+msgid "You are not authorized to perform this action"
 msgstr ""
 
 msgid "You are now impersonating %{username}"
@@ -20272,13 +20312,19 @@ msgstr ""
 msgid "You're only seeing %{startTag}other activity%{endTag} in the feed. To add a comment, switch to one of the following options."
 msgstr ""
 
-msgid "You're receiving this email because %{reason}."
-msgstr ""
-
 msgid "You're receiving this email because of your account on %{host}."
 msgstr ""
 
 msgid "You're receiving this email because of your account on %{host}. %{manage_notifications_link} &middot; %{help_link}"
+msgstr ""
+
+msgid "You're receiving this email because of your activity on %{host}."
+msgstr ""
+
+msgid "You're receiving this email because you have been assigned an item on %{host}."
+msgstr ""
+
+msgid "You're receiving this email because you have been mentioned on %{host}."
 msgstr ""
 
 msgid "You've already enabled two-factor authentication using one time password authenticators. In order to register a different device, you must first disable two-factor authentication."
@@ -20290,10 +20336,10 @@ msgstr ""
 msgid "Your Commit Email will be used for web based operations, such as edits and merges."
 msgstr ""
 
-msgid "Your Conversational Development Index gives an overview of how you are using GitLab from a feature perspective. View how you compare with other organizations, discover features you are not using, and learn best practices through blog posts and white papers."
+msgid "Your Default Notification Email will be used for account notifications if a %{openingTag}group-specific email address%{closingTag} is not set."
 msgstr ""
 
-msgid "Your Default Notification Email will be used for account notifications if a %{openingTag}group-specific email address%{closingTag} is not set."
+msgid "Your DevOps Score gives an overview of how you are using GitLab from a feature perspective. View how you compare with other organizations, discover features you are not using, and learn best practices through blog posts and white papers."
 msgstr ""
 
 msgid "Your GPG keys (%{count})"
@@ -21475,6 +21521,12 @@ msgid "severity|Unknown"
 msgstr ""
 
 msgid "should be greater than or equal to %{access} inherited membership from group %{group_name}"
+msgstr ""
+
+msgid "show %{count} more"
+msgstr ""
+
+msgid "show fewer"
 msgstr ""
 
 msgid "show less"

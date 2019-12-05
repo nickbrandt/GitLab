@@ -152,6 +152,8 @@ module Vulnerabilities
       where(
         "NOT EXISTS (?)",
         Feedback.select(1)
+        .where("#{table_name}.report_type = vulnerability_feedback.category")
+        .where("#{table_name}.project_id = vulnerability_feedback.project_id")
         .where("ENCODE(#{table_name}.project_fingerprint, 'HEX') = vulnerability_feedback.project_fingerprint") # rubocop:disable GitlabSecurity/SqlInjection
         .for_dismissal
       )

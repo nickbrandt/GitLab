@@ -58,7 +58,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :trace, defaults: { format: 'json' }
             get :raw
             get :terminal
-            get '/terminal.ws/authorize', to: 'jobs#terminal_websocket_authorize', constraints: { format: nil }
+            get '/terminal.ws/authorize', to: 'jobs#terminal_websocket_authorize', format: false
           end
 
           resource :artifacts, only: [] do
@@ -209,6 +209,55 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :production
           end
         end
+
+        concerns :clusterable
+
+        namespace :serverless do
+          scope :functions do
+            get '/:environment_id/:id', to: 'functions#show'
+            get '/:environment_id/:id/metrics', to: 'functions#metrics', as: :metrics
+          end
+
+          resources :functions, only: [:index]
+        end
+
+        resources :environments, except: [:destroy] do
+          member do
+            post :stop
+            get :terminal
+            get :metrics
+            get :additional_metrics
+            get :metrics_dashboard
+            get '/terminal.ws/authorize', to: 'environments#terminal_websocket_authorize', format: false
+
+            get '/prometheus/api/v1/*proxy_path', to: 'environments/prometheus_api#proxy', as: :prometheus_api
+          end
+
+          collection do
+            get :metrics, action: :metrics_redirect
+            get :folder, path: 'folders/*id', constraints: { format: /(html|json)/ }
+            get :search
+          end
+
+          resources :deployments, only: [:index] do
+            member do
+              get :metrics
+              get :additional_metrics
+            end
+          end
+        end
+
+        resources :error_tracking, only: [:index], controller: :error_tracking do
+          collection do
+            get ':issue_id/details',
+              to: 'error_tracking#details',
+              as: 'details'
+            get ':issue_id/stack_trace',
+              to: 'error_tracking#stack_trace',
+              as: 'stack_trace'
+            post :list_projects
+          end
+        end
       end
       # End of the /-/ scope.
 
@@ -279,13 +328,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :test_reports
           get :exposed_artifacts
 
-          scope constraints: { format: nil }, action: :show do
-            get :commits, defaults: { tab: 'commits' }
-            get :pipelines, defaults: { tab: 'pipelines' }
-            get :diffs, defaults: { tab: 'diffs' }
-          end
-
-          scope constraints: { format: 'json' }, as: :json do
+          scope constraints: ->(req) { req.format == :json }, as: :json do
             get :commits
             get :pipelines
             get :diffs, to: 'merge_requests/diffs#show'
@@ -293,6 +336,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :diffs_metadata, to: 'merge_requests/diffs#diffs_metadata'
             get :widget, to: 'merge_requests/content#widget'
             get :cached_widget, to: 'merge_requests/content#cached_widget'
+          end
+
+          scope action: :show do
+            get :commits, defaults: { tab: 'commits' }
+            get :pipelines, defaults: { tab: 'pipelines' }
+            get :diffs, defaults: { tab: 'diffs' }
           end
 
           get :diff_for_path, controller: 'merge_requests/diffs'
@@ -323,14 +372,14 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         scope path: 'new', as: :new_merge_request do
           get '', action: :new
 
-          scope constraints: { format: nil }, action: :new do
-            get :diffs, defaults: { tab: 'diffs' }
-            get :pipelines, defaults: { tab: 'pipelines' }
-          end
-
-          scope constraints: { format: 'json' }, as: :json do
+          scope constraints: ->(req) { req.format == :json }, as: :json do
             get :diffs
             get :pipelines
+          end
+
+          scope action: :new do
+            get :diffs, defaults: { tab: 'diffs' }
+            get :pipelines, defaults: { tab: 'pipelines' }
           end
 
           get :diff_for_path
@@ -371,43 +420,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :play
           post :take_ownership
         end
-      end
-
-      concerns :clusterable
-
-      resources :environments, except: [:destroy] do
-        member do
-          post :stop
-          get :terminal
-          get :metrics
-          get :additional_metrics
-          get :metrics_dashboard
-          get '/terminal.ws/authorize', to: 'environments#terminal_websocket_authorize', constraints: { format: nil }
-
-          get '/prometheus/api/v1/*proxy_path', to: 'environments/prometheus_api#proxy', as: :prometheus_api
-        end
-
-        collection do
-          get :metrics, action: :metrics_redirect
-          get :folder, path: 'folders/*id', constraints: { format: /(html|json)/ }
-          get :search
-        end
-
-        resources :deployments, only: [:index] do
-          member do
-            get :metrics
-            get :additional_metrics
-          end
-        end
-      end
-
-      namespace :serverless do
-        scope :functions do
-          get '/:environment_id/:id', to: 'functions#show'
-          get '/:environment_id/:id/metrics', to: 'functions#metrics', as: :metrics
-        end
-
-        resources :functions, only: [:index]
       end
 
       draw :legacy_builds
@@ -507,18 +519,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resources :error_tracking, only: [:index], controller: :error_tracking do
-        collection do
-          get ':issue_id/details',
-              to: 'error_tracking#details',
-              as: 'details'
-          get ':issue_id/stack_trace',
-              to: 'error_tracking#stack_trace',
-              as: 'stack_trace'
-          post :list_projects
-        end
-      end
-
       scope :usage_ping, controller: :usage_ping do
         post :web_ide_clientside_preview
       end
@@ -540,7 +540,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
                                             :project_members, :deploy_keys, :deploy_tokens,
                                             :labels, :milestones, :services, :boards, :releases,
                                             :forks, :group_links, :import, :avatar, :mirror,
-                                            :cycle_analytics, :mattermost, :variables, :triggers)
+                                            :cycle_analytics, :mattermost, :variables, :triggers,
+                                            :environments, :protected_environments, :error_tracking,
+                                            :serverless, :clusters, :audit_events)
     end
 
     # rubocop: disable Cop/PutProjectRoutesUnderScope
