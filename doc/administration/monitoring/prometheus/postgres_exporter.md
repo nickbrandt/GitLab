@@ -16,6 +16,11 @@ To enable the postgres exporter:
    postgres_exporter['enable'] = true
    ```
 
+NOTE: **Note:**
+If PostgreSQL is configured on a separate node, make sure that the local
+address is [listed in `trust_auth_cidr_addresses`](../../high_availability/database.md#network-information) or the
+exporter will not be able to connect to the database.
+
 1. Save the file and [reconfigure GitLab][reconfigure] for the changes to
    take effect
 
