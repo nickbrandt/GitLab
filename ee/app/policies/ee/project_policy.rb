@@ -62,8 +62,8 @@ module EE
       end
 
       with_scope :subject
-      condition(:security_dashboard_feature_disabled) do
-        !@subject.feature_available?(:security_dashboard)
+      condition(:security_dashboard_enabled) do
+        @subject.feature_available?(:security_dashboard)
       end
 
       condition(:prometheus_alerts_enabled) do
@@ -159,15 +159,9 @@ module EE
 
       rule { can?(:read_build) & can?(:download_code) }.enable :read_security_findings
 
-      rule { can?(:developer_access) }.policy do
-        enable :read_project_security_dashboard
-      end
+      rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_project_security_dashboard
 
-      rule { security_dashboard_feature_disabled }.policy do
-        prevent :read_project_security_dashboard
-      end
-
-      rule { can?(:read_project_security_dashboard) & can?(:developer_access) }.policy do
+      rule { can?(:read_project_security_dashboard) }.policy do
         enable :read_vulnerability
         enable :create_vulnerability
         enable :admin_vulnerability
