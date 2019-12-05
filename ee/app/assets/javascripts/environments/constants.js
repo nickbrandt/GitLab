@@ -3,7 +3,7 @@ import { __ } from '~/locale';
 // These statuses are based on how the backend defines pod phases here
 // lib/gitlab/kubernetes/pod.rb
 
-const STATUS_MAP = {
+export const STATUS_MAP = {
   succeeded: {
     class: 'succeeded',
     text: __('Succeeded'),
@@ -31,4 +31,8 @@ const STATUS_MAP = {
   },
 };
 
-export default STATUS_MAP;
+export const CANARY_STATUS = {
+  class: 'canary-icon',
+  text: __('Canary'),
+  stable: false,
+};

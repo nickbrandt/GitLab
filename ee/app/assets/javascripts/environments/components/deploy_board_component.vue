@@ -12,8 +12,8 @@
 import _ from 'underscore';
 import { GlLoadingIcon, GlLink, GlTooltipDirective } from '@gitlab/ui';
 import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
-import { __, n__, s__, sprintf } from '~/locale';
-import STATUS_MAP from '../constants';
+import { n__, s__, sprintf } from '~/locale';
+import { STATUS_MAP, CANARY_STATUS } from '../constants';
 
 export default {
   components: {
@@ -101,11 +101,7 @@ export default {
       // Hence adding it here.
       return {
         ...STATUS_MAP,
-        canary: {
-          class: 'canary-icon',
-          text: __('Canary'),
-          stable: false,
-        },
+        CANARY_STATUS,
       };
     },
   },
