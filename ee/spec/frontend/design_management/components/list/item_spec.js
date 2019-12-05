@@ -28,7 +28,8 @@ describe('Design management list item component', () => {
       propsData: {
         id: 1,
         filename: 'test',
-        image: isLoading ? '' : 'http://via.placeholder.com/300',
+        image: 'http://via.placeholder.com/300',
+        isLoading,
         event,
         notesCount,
         updatedAt: '01-01-2019',
@@ -86,7 +87,7 @@ describe('Design management list item component', () => {
       expect(wrapper.element).toMatchSnapshot();
     });
 
-    it('renders loading spinner when no image prop present', () => {
+    it('renders loading spinner when isLoading is true', () => {
       createComponent({ notesCount: 0, isLoading: true });
 
       expect(wrapper.element).toMatchSnapshot();

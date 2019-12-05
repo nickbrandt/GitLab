@@ -189,12 +189,11 @@ export default {
     isDesignSelected(filename) {
       return this.selectedDesigns.includes(filename);
     },
+    isDesignToBeSaved(filename) {
+      return this.filesToBeSaved.some(file => file.name === filename);
+    },
     canSelectDesign(filename) {
-      return (
-        this.isLatestVersion &&
-        this.canCreateDesign &&
-        !this.filesToBeSaved.some(file => file.name === filename)
-      );
+      return this.isLatestVersion && this.canCreateDesign && !this.isDesignToBeSaved(filename);
     },
     onDesignDelete() {
       this.selectedDesigns = [];
@@ -250,7 +249,7 @@ export default {
       </div>
       <ol v-else-if="hasDesigns" class="list-unstyled row">
         <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
-          <design v-bind="design" />
+          <design v-bind="design" :is-loading="isDesignToBeSaved(design.filename)" />
           <input
             v-if="canSelectDesign(design.filename)"
             :checked="isDesignSelected(design.filename)"

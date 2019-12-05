@@ -36,11 +36,13 @@ export default {
       required: false,
       default: null,
     },
+    isLoading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
-    isLoading() {
-      return !this.image;
-    },
     icon() {
       const normalizedEvent = this.event.toLowerCase();
       const icons = {
