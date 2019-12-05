@@ -410,6 +410,14 @@ This functionality is only available:
 - For users with at least Developer access.
 - If the the stage contains [manual actions](#manual-actions-from-pipeline-graphs).
 
+### Deleting a single pipeline
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/21365) in GitLab 12.6.
+
+Users with at least Owner access can delete a pipeline and all related child objects,
+such as jobs and artifacts. Deleting a pipeline is done via **Delete** button on the
+pipeline detail view.
+
 ## Most Recent Pipeline
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/50499) in GitLab 12.3.

@@ -29,6 +29,7 @@ class PipelineEntity < Grape::Entity
     expose :has_yaml_errors?, as: :yaml_errors
     expose :can_retry?, as: :retryable
     expose :can_cancel?, as: :cancelable
+    expose :can_delete?, as: :deleteable
     expose :failure_reason?, as: :failure_reason
     expose :detached_merge_request_pipeline?, as: :detached_merge_request_pipeline
     expose :merge_request_pipeline?, as: :merge_request_pipeline
@@ -77,6 +78,10 @@ class PipelineEntity < Grape::Entity
     cancel_project_pipeline_path(pipeline.project, pipeline)
   end
 
+  expose :delete_path, if: -> (*) { can_delete? } do |pipeline|
+    project_pipeline_path(pipeline.project, pipeline)
+  end
+
   expose :failed_builds, if: -> (*) { can_retry? }, using: JobEntity do |pipeline|
     pipeline.failed_builds
   end
@@ -93,6 +98,10 @@ class PipelineEntity < Grape::Entity
   def can_cancel?
     can?(request.current_user, :update_pipeline, pipeline) &&
       pipeline.cancelable?
+  end
+
+  def can_delete?
+    can?(request.current_user, :destroy_pipeline, pipeline)
   end
 
   def has_presentable_merge_request?

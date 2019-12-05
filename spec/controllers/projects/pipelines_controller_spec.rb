@@ -740,4 +740,51 @@ describe Projects::PipelinesController do
       expect(response).to have_gitlab_http_status(404)
     end
   end
+
+  describe 'DELETE #destroy' do
+    let!(:project) { create(:project, :private, :repository) }
+    let!(:pipeline) { create(:ci_pipeline, :failed, project: project) }
+    let!(:build) { create(:ci_build, :failed, pipeline: pipeline) }
+
+    context 'when user has ability to delete pipeline' do
+      before do
+        sign_in(project.owner)
+      end
+
+      it 'deletes pipeline and redirects' do
+        delete_pipeline
+
+        expect(response).to have_gitlab_http_status(302)
+
+        expect { build.reload }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { pipeline.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      context 'and builds are disabled' do
+        let(:feature) { ProjectFeature::DISABLED }
+
+        it 'fails to delete pipeline' do
+          delete_pipeline
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+    end
+
+    context 'when user has no privileges' do
+      it 'fails to delete pipeline' do
+        delete_pipeline
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    def delete_pipeline
+      delete :destroy, params: {
+                         namespace_id: project.namespace,
+                         project_id: project,
+                         id: pipeline.id
+                       }
+    end
+  end
 end

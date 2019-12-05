@@ -131,7 +131,8 @@ export default {
           :key="i"
           :href="action.path"
           :class="action.cssClass"
-          data-method="post"
+          :data-method="action.method"
+          :data-confirm="action.confirm"
           rel="nofollow"
         >
           {{ action.label }}

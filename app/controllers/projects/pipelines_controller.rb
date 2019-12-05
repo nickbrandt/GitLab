@@ -80,6 +80,14 @@ class Projects::PipelinesController < Projects::ApplicationController
     end
   end
 
+  def destroy
+    ::Ci::DestroyPipelineService.new(project, current_user).execute(pipeline)
+
+    redirect_to project_pipelines_path(project),
+                status: :found,
+                notice: _("Pipeline has been successfully deleted!")
+  end
+
   def builds
     render_show
   end

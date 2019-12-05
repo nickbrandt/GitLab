@@ -73,6 +73,18 @@ export default {
         });
       }
 
+      if (this.pipeline.delete_path) {
+        actions.push({
+          label: __('Delete'),
+          path: this.pipeline.delete_path,
+          method: 'delete',
+          confirm: __('Are you sure you want to delete this pipeline?'),
+          cssClass: 'js-btn-delete-pipeline btn btn-danger btn-inverted',
+          type: 'ujs-link',
+          isLoading: false,
+        });
+      }
+
       return actions;
     },
   },
