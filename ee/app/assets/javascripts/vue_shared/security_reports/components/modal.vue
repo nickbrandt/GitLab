@@ -1,8 +1,4 @@
 <script>
-import { __ } from '~/locale';
-import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
-import ExpandButton from '~/vue_shared/components/expand_button.vue';
-
 import DismissalNote from 'ee/vue_shared/security_reports/components/dismissal_note.vue';
 import DismissalCommentBoxToggle from 'ee/vue_shared/security_reports/components/dismissal_comment_box_toggle.vue';
 import DismissalCommentModalFooter from 'ee/vue_shared/security_reports/components/dismissal_comment_modal_footer.vue';
@@ -12,6 +8,9 @@ import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_re
 import ModalFooter from 'ee/vue_shared/security_reports/components/modal_footer.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import VulnerabilityDetails from 'ee/vue_shared/security_reports/components/vulnerability_details.vue';
+import ExpandButton from '~/vue_shared/components/expand_button.vue';
+import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
+import { __ } from '~/locale';
 
 export default {
   components: {

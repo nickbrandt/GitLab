@@ -1,10 +1,10 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
+import { componentNames } from 'ee/reports/components/issue_body';
 import ReportSection from '~/reports/components/report_section.vue';
 import SummaryRow from '~/reports/components/summary_row.vue';
 import IssuesList from '~/reports/components/issues_list.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import { componentNames } from 'ee/reports/components/issue_body';
 import IssueModal from './components/modal.vue';
 import securityReportsMixin from './mixins/security_report_mixin';
 import createStore from './store';

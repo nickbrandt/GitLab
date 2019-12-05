@@ -1,11 +1,11 @@
 <script>
 import { isUndefined } from 'underscore';
-import { s__ } from '~/locale';
 import { GlEmptyState, GlSprintf } from '@gitlab/ui';
+import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
+import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
 
 export default {
   components: {
