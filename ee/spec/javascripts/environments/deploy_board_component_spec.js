@@ -110,4 +110,35 @@ describe('Deploy Board', () => {
       );
     });
   });
+
+  describe('has legend component', () => {
+    let statuses = [];
+    beforeEach(done => {
+      wrapper = createComponent({
+        isLoading: false,
+        isEmpty: false,
+        logsPath: environment.log_path,
+        hasLegacyAppLabel: true,
+        deployBoardData: deployBoardMockData,
+      });
+      ({ statuses } = wrapper.vm);
+      wrapper.vm.$nextTick(done);
+    });
+
+    it('with all the possible statuses', () => {
+      const deployBoardLegend = wrapper.find('.deploy-board-legend');
+
+      expect(deployBoardLegend).toBeDefined();
+      expect(deployBoardLegend.findAll('a').length).toBe(Object.keys(statuses).length);
+    });
+
+    Object.keys(statuses).forEach(item => {
+      it(`with ${item} text next to deployment instance icon`, () => {
+        expect(wrapper.find(`.deployment-instance-${item}`)).toBeDefined();
+        expect(wrapper.find(`.deployment-instance-${item} + .legend-text`).text()).toBe(
+          statuses[item].text,
+        );
+      });
+    });
+  });
 });

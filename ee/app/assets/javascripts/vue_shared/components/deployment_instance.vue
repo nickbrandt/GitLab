@@ -12,11 +12,14 @@
  * this information in the tooltip and the colors.
  * Mockup is https://gitlab.com/gitlab-org/gitlab/issues/35570
  */
-import tooltip from '~/vue_shared/directives/tooltip';
+import { GlLink, GlTooltipDirective } from '@gitlab/ui';
 
 export default {
+  components: {
+    GlLink,
+  },
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
 
   props: {
@@ -52,32 +55,36 @@ export default {
 
     logsPath: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
   },
 
   computed: {
+    isLink() {
+      return Boolean(this.logsPath || this.podName);
+    },
+
     cssClass() {
       return {
         [`deployment-instance-${this.status}`]: true,
         'deployment-instance-canary': !this.stable,
+        link: this.isLink,
       };
     },
 
     computedLogPath() {
-      return `${this.logsPath}?pod_name=${this.podName}`;
+      return this.isLink ? `${this.logsPath}?pod_name=${this.podName}` : null;
     },
   },
 };
 </script>
 <template>
-  <a
-    v-tooltip
+  <gl-link
+    v-gl-tooltip
     :class="cssClass"
-    :data-title="tooltipText"
+    :title="tooltipText"
     :href="computedLogPath"
     class="deployment-instance d-flex justify-content-center align-items-center"
-    data-placement="top"
-  >
-  </a>
+  />
 </template>
