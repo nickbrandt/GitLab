@@ -169,7 +169,7 @@ module EE
 
       rule { threat_monitoring_enabled & (auditor | can?(:developer_access)) }.enable :read_threat_monitoring
 
-      rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
+      rule { can?(:read_security_findings) }.enable :read_vulnerability_feedback
 
       rule { dependency_scanning_enabled & can?(:download_code) }.enable :read_dependencies
 
