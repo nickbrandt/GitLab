@@ -10155,6 +10155,9 @@ msgstr ""
 msgid "Job has been successfully erased!"
 msgstr ""
 
+msgid "Job has not started as of yet or job_id is wrong"
+msgstr ""
+
 msgid "Job has wrong arguments format."
 msgstr ""
 
@@ -13792,9 +13795,6 @@ msgid "Project URL"
 msgstr ""
 
 msgid "Project access must be granted explicitly to each user."
-msgstr ""
-
-msgid "Project already created"
 msgstr ""
 
 msgid "Project already deleted"
