@@ -6,9 +6,20 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
   before_action :set_application_setting
   before_action :whitelist_query_limiting, only: [:usage_data]
 
+  before_action do
+    push_frontend_feature_flag(:self_monitoring_project)
+  end
+
   VALID_SETTING_PANELS = %w(general integrations repository
                             ci_cd reporting metrics_and_profiling
                             network preferences).freeze
+
+  # The current size of a sidekiq job's jid is 24 characters. The size of the
+  # jid is an internal detail of Sidekiq, and they do not guarantee that it'll
+  # stay the same. We chose 50 to give us room in case the size of the jid
+  # increases. The jid is alphanumeric, so 50 is very generous. There is a spec
+  # that ensures that the constant value is more than the size of an actual jid.
+  PARAM_JOB_ID_MAX_SIZE = 50
 
   VALID_SETTING_PANELS.each do |action|
     define_method(action) { perform_update if submitted? }
@@ -62,7 +73,86 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     redirect_to ::Gitlab::LetsEncrypt.terms_of_service_url
   end
 
+  def create_self_monitoring_project
+    return self_monitoring_project_not_implemented unless Feature.enabled?(:self_monitoring_project)
+
+    job_id = SelfMonitoringProjectCreateWorker.perform_async
+
+    render status: :accepted, json: {
+      job_id: job_id,
+      monitor_status: status_create_self_monitoring_project_admin_application_settings_path
+    }
+  end
+
+  def status_create_self_monitoring_project
+    return self_monitoring_project_not_implemented unless Feature.enabled?(:self_monitoring_project)
+
+    job_id = params[:job_id]
+
+    unless job_id.present? && job_id.is_a?(String)
+      return render status: :bad_request, json: {
+        message: _('"job_id" must be an alphanumeric value')
+      }
+    end
+
+    unless job_id.length <= PARAM_JOB_ID_MAX_SIZE
+      return render status: :bad_request, json: {
+        message: _('Parameter "job_id" cannot exceed length of %{job_id_max_size}' %
+          { job_id_max_size: PARAM_JOB_ID_MAX_SIZE })
+      }
+    end
+
+    ::Gitlab::PollingInterval.set_header(response, interval: 3_000)
+
+    result = SelfMonitoringProjectCreateWorker.status(job_id)
+
+    if [:in_progress, :unknown].include?(result[:status])
+      render status: :accepted, json: result
+
+    elsif result[:status] == :completed
+      data = result[:output].merge(self_monitoring_data)
+
+      render status: :ok, json: data
+    else
+      message = _('SelfMonitoringProjectCreateWorker#status returned unknown status "%{status}"') %
+        { status: result[:status] }
+      raise_exception_for_dev(
+        message,
+        { return_value: result }
+      )
+
+      render(
+        status: :internal_server_error,
+        json: { message: message }
+      )
+    end
+  end
+
   private
+
+  def self_monitoring_data
+    {
+      project_id: Gitlab::CurrentSettings.instance_administration_project_id,
+      project_full_path: Gitlab::CurrentSettings.instance_administration_project&.full_path
+    }
+  end
+
+  def raise_exception_for_dev(message, extra = {})
+    Gitlab::ErrorTracking.track_and_raise_for_dev_exception(
+      StandardError.new(message),
+      extra
+    )
+  end
+
+  def self_monitoring_project_not_implemented
+    render(
+      status: :not_implemented,
+      json: {
+        message: _('Self-monitoring is not enabled on this GitLab server, contact your administrator.'),
+        documentation_url: help_page_path('administration/monitoring/gitlab_instance_administration_project/index')
+      }
+    )
+  end
 
   def set_application_setting
     @application_setting = ApplicationSetting.current_without_cache
