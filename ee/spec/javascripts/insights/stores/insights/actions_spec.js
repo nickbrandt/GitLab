@@ -1,7 +1,7 @@
-import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'spec/helpers/vuex_action_helper';
 import actionsModule, * as actions from 'ee/insights/stores/modules/insights/actions';
+import axios from '~/lib/utils/axios_utils';
 
 const ERROR_MESSAGE = 'TEST_ERROR_MESSAGE';
 

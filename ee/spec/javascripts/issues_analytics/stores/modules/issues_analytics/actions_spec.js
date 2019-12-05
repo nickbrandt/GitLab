@@ -1,7 +1,7 @@
-import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'spec/helpers/vuex_action_helper';
 import * as actions from 'ee/issues_analytics/stores/modules/issue_analytics/actions';
+import axios from '~/lib/utils/axios_utils';
 
 describe('Issue analytics store actions', () => {
   describe('setFilters', () => {

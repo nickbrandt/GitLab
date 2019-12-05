@@ -12,8 +12,8 @@ import {
   PathIdSeparator,
 } from 'ee/related_issues/constants';
 
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
+import axios from '~/lib/utils/axios_utils';
 
 import {
   mockInitialConfig,

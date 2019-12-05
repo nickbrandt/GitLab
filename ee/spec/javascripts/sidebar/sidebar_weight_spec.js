@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import sidebarWeight from 'ee/sidebar/components/weight/sidebar_weight.vue';
 import SidebarMediator from 'ee/sidebar/sidebar_mediator';
-import SidebarService from '~/sidebar/services/sidebar_service';
 import SidebarStore from 'ee/sidebar/stores/sidebar_store';
-import eventHub from '~/sidebar/event_hub';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import SidebarService from '~/sidebar/services/sidebar_service';
+import eventHub from '~/sidebar/event_hub';
 import Mock from './ee_mock_data';
 
 describe('Sidebar Weight', function() {
