@@ -157,11 +157,6 @@ export default {
       );
     },
   },
-  watch: {
-    issuesCount() {
-      this.$emit('updateBadgeCount', this.issuesCount);
-    },
-  },
   created() {
     // update the store with the received props
     this.setHeadBlobPath(this.headBlobPath);
