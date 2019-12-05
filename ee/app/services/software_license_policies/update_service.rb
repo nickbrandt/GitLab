@@ -12,15 +12,19 @@ module SoftwareLicensePolicies
       return success(software_license_policy: software_license_policy) unless params[:approval_status].present?
 
       begin
-        approval_status = params[:approval_status]
-        classification = SoftwareLicensePolicy::APPROVAL_STATUS.fetch(approval_status, approval_status)
-        software_license_policy.update(classification: classification)
+        software_license_policy.update(classification: map_from(params[:approval_status]))
         RefreshLicenseComplianceChecksWorker.perform_async(project.id)
       rescue ArgumentError => ex
         return error(ex.message, 400)
       end
 
       success(software_license_policy: software_license_policy)
+    end
+
+    private
+
+    def map_from(approval_status)
+      SoftwareLicensePolicy::APPROVAL_STATUS.fetch(approval_status, approval_status)
     end
   end
 end
