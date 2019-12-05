@@ -42,9 +42,9 @@ describe SoftwareLicensePolicies::CreateService do
       context 'when valid parameters are specified' do
         where(:approval_status, :expected_classification) do
           [
-            ['approved', 'approved'],
-            ['denied', 'denied'],
-            ['blacklisted', 'denied'],
+            %w[approved approved],
+            %w[denied denied],
+            %w[blacklisted denied]
           ]
         end
 
