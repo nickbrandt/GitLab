@@ -11,11 +11,11 @@ export default {
   groupEpicsPath:
     '/api/:version/groups/:id/epics?include_ancestor_groups=:includeAncestorGroups&include_descendant_groups=:includeDescendantGroups',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
-  podLogsPath: '/:project_full_path/environments/:environment_id/pods/containers/logs.json',
+  podLogsPath: '/:project_full_path/-/environments/:environment_id/pods/containers/logs.json',
   podLogsPathWithPod:
-    '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/logs.json',
+    '/:project_full_path/-/environments/:environment_id/pods/:pod_name/containers/logs.json',
   podLogsPathWithPodContainer:
-    '/:project_full_path/environments/:environment_id/pods/:pod_name/containers/:container_name/logs.json',
+    '/:project_full_path/-/environments/:environment_id/pods/:pod_name/containers/:container_name/logs.json',
   groupPackagesPath: '/api/:version/groups/:id/packages',
   projectPackagesPath: '/api/:version/projects/:id/packages',
   projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
