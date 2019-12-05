@@ -4,15 +4,23 @@ module Ci
   class LegacyStagePresenter < Gitlab::View::Presenter::Delegated
     presents :legacy_stage
 
-    def preloaded_statuses
-      legacy_stage.statuses.tap do |statuses|
+    def latest_ordered_statuses
+      preload_statuses(legacy_stage.statuses.latest_ordered)
+    end
+
+    def retried_ordered_statuses
+      preload_statuses(legacy_stage.statuses.retried_ordered)
+    end
+
+    private
+
+    def preload_statuses(statuses)
+      statuses.tap do |statuses|
         # rubocop: disable CodeReuse/ActiveRecord
         ActiveRecord::Associations::Preloader.new.preload(preloadable_statuses(statuses), :tags)
         # rubocop: enable CodeReuse/ActiveRecord
       end
     end
-
-    private
 
     def preloadable_statuses(statuses)
       statuses.reject do |status|

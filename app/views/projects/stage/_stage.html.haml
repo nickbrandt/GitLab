@@ -1,4 +1,4 @@
-- statuses = stage.present(current_user: current_user).preloaded_statuses
+- stage = stage.present(current_user: current_user)
 
 %tr
   %th{ colspan: 10 }
@@ -8,8 +8,8 @@
         = ci_icon_for_status(stage.status)
       &nbsp;
       = stage.name.titleize
-= render statuses.latest_ordered, stage: false, ref: false, pipeline_link: false, allow_retry: true
-= render statuses.retried_ordered, stage: false, ref: false, pipeline_link: false, retried: true
+= render stage.latest_ordered_statuses, stage: false, ref: false, pipeline_link: false, allow_retry: true
+= render stage.retried_ordered_statuses, stage: false, ref: false, pipeline_link: false, retried: true
 %tr
   %td{ colspan: 10 }
     &nbsp;
