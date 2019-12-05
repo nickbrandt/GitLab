@@ -5,7 +5,7 @@
 class SoftwareLicense < ApplicationRecord
   include Presentable
 
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: true
   validates :spdx_identifier, length: { maximum: 255 }
 
   scope :by_name, -> (names) { where(name: names) }
