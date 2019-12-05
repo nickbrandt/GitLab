@@ -16,8 +16,8 @@ describe ManagedLicenseEntity do
     describe "#approval_status" do
       where(:classification, :approval_status) do
         [
-          ['approved', 'approved'],
-          ['denied', 'blacklisted']
+          %w[approved approved],
+          %w[denied blacklisted]
         ]
       end
 
