@@ -65,6 +65,9 @@ msgstr ""
 msgid "\"%{path}\" did not exist on \"%{ref}\""
 msgstr ""
 
+msgid "\"job_id\" must be an alphanumeric value"
+msgstr ""
+
 msgid "%d comment"
 msgid_plural "%d comments"
 msgstr[0] ""
@@ -12669,6 +12672,9 @@ msgstr ""
 msgid "Parameter"
 msgstr ""
 
+msgid "Parameter \"job_id\" cannot exceed length of %{job_id_max_size}"
+msgstr ""
+
 msgid "Parent epic doesn't exist."
 msgstr ""
 
@@ -16158,6 +16164,12 @@ msgid "Selected levels cannot be used by non-admin users for groups, projects or
 msgstr ""
 
 msgid "Selecting a GitLab user will add a link to the GitLab user in the descriptions of issues and comments (e.g. \"By <a href=\"#\">@johnsmith</a>\"). It will also associate and/or assign these issues and comments with the selected user."
+msgstr ""
+
+msgid "Self-monitoring is not enabled on this GitLab server, contact your administrator."
+msgstr ""
+
+msgid "SelfMonitoringProjectCreateWorker#status returned unknown status \"%{status}\""
 msgstr ""
 
 msgid "Send a separate email notification to Developers."
