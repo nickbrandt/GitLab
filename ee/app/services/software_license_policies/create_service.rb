@@ -21,22 +21,15 @@ module SoftwareLicensePolicies
     private
 
     def create_software_license_policy
+      approval_status = params[:approval_status]
+      classification = SoftwareLicensePolicy::APPROVAL_STATUS.fetch(approval_status, approval_status)
       policy = SoftwareLicense.create_policy_for!(
         project: project,
         name: params[:name],
-        classification: map_from(params[:approval_status])
+        classification: classification
       )
       RefreshLicenseComplianceChecksWorker.perform_async(project.id)
       policy
-    end
-
-    def map_from(approval_status)
-      case approval_status
-      when 'blacklisted'
-        'denied'
-      else
-        approval_status
-      end
     end
   end
 end

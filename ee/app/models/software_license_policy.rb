@@ -5,6 +5,9 @@
 # For use in the License Management feature.
 class SoftwareLicensePolicy < ApplicationRecord
   include Presentable
+  APPROVAL_STATUS = {
+    'blacklisted' => 'denied'
+  }.freeze
 
   # Only allows modification of the approval status
   FORM_EDITABLE = %i[approval_status].freeze
