@@ -3,40 +3,44 @@
 module Resolvers
   module DesignManagement
     class DesignResolver < BaseResolver
-      argument :ids,
-               [GraphQL::ID_TYPE],
+      argument :id, GraphQL::ID_TYPE,
                required: false,
-               description: 'Filters designs by their ID'
-      argument :filenames,
-               [GraphQL::STRING_TYPE],
-               required: false,
-               description: 'Filters designs by their filename'
-      argument :at_version,
-               GraphQL::ID_TYPE,
-               required: false,
-               description: 'Filters designs to only those that existed at the version. ' \
-                            'If argument is omitted or nil then all designs will reflect the latest version'
+               description: 'Find a design by its ID'
 
-      def resolve(**args)
-        find_designs(args)
+      argument :filename, GraphQL::STRING_TYPE,
+               required: false,
+               description: 'Find a design by its filename'
+
+      def resolve(filename: nil, id: nil)
+        params = if !filename.present? && !id.present?
+                   error('one of id or filename must be passed')
+                 elsif filename.present? && id.present?
+                   error('only one of id or filename may be passed')
+                 elsif filename.present?
+                   { filenames: [filename] }
+                 else
+                   { ids: [GitlabSchema.parse_gid(id, expected_type: ::DesignManagement::Design).model_id] }
+                 end
+
+        build_finder(params).execute.first
       end
 
-      def version(args)
-        args[:at_version] ? GitlabSchema.object_from_id(args[:at_version])&.sync : nil
+      private
+
+      def issue
+        object.issue
       end
 
-      def design_ids(args)
-        args[:ids] ? args[:ids].map { |id| GlobalID.parse(id).model_id } : nil
+      def user
+        context[:current_user]
       end
 
-      def find_designs(args)
-        ::DesignManagement::DesignsFinder.new(
-          object.issue,
-          context[:current_user],
-          ids: design_ids(args),
-          filenames: args[:filenames],
-          visible_at_version: version(args)
-        ).execute
+      def build_finder(params)
+        ::DesignManagement::DesignsFinder.new(issue, user, params)
+      end
+
+      def error(msg)
+        raise ::Gitlab::Graphql::Errors::ArgumentError, 'one of id or filename must be passed'
       end
     end
   end

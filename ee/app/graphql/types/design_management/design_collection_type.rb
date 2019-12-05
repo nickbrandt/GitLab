@@ -13,12 +13,12 @@ module Types
       field :issue, Types::IssueType, null: false,
             description: 'Issue associated with the design collection'
       field :designs, Types::DesignManagement::DesignType.connection_type, null: false,
-            resolver: Resolvers::DesignManagement::DesignResolver,
+            resolver: Resolvers::DesignManagement::DesignsResolver,
             description: 'All designs for the design collection'
       # TODO: allow getting a single design by filename
       # exposing all designs
       field :versions, Types::DesignManagement::VersionType.connection_type,
-            resolver: Resolvers::DesignManagement::VersionResolver,
+            resolver: Resolvers::DesignManagement::VersionsResolver,
             description: 'All versions related to all designs, ordered newest first'
     end
   end
