@@ -10,7 +10,6 @@ module QA::EE
           page.module_eval do
             view 'ee/app/views/projects/pipelines/_tabs_holder.html.haml' do
               element :security_tab
-              element :security_counter
               element :licenses_tab
               element :licenses_counter
             end
@@ -22,17 +21,12 @@ module QA::EE
 
             view 'ee/app/views/projects/pipelines/_tabs_holder.html.haml' do
               element :security_tab
-              element :security_counter
             end
           end
         end
 
         def click_on_security
           click_element(:security_tab)
-        end
-
-        def has_vulnerability_count_of?(count)
-          find_element(:security_counter).has_content?(count)
         end
 
         def filter_report_type(report)
