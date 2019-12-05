@@ -36,7 +36,7 @@ describe SoftwareLicensePolicies::CreateService do
         software_license_policy = project.software_license_policies.last
         expect(software_license_policy).to be_persisted
         expect(software_license_policy.name).to eq(params[:name])
-        expect(software_license_policy.approval_status).to eq('blacklisted')
+        expect(software_license_policy.classification).to eq('blacklisted')
       end
 
       context "when valid parameters are specified" do
@@ -51,7 +51,7 @@ describe SoftwareLicensePolicies::CreateService do
         specify { expect(result[:software_license_policy]).to be_present }
         specify { expect(result[:software_license_policy]).to be_persisted }
         specify { expect(result[:software_license_policy].name).to eql(params[:name]) }
-        specify { expect(result[:software_license_policy].approval_status).to eql('blacklisted') }
+        specify { expect(result[:software_license_policy].classification).to eql('blacklisted') }
         specify { expect(RefreshLicenseComplianceChecksWorker).to have_received(:perform_async).with(project.id) }
       end
 

@@ -24,7 +24,7 @@ describe RefreshLicenseComplianceChecksWorker do
         context "when a license is blacklisted, that appears in some of the license management reports" do
           let!(:open_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [open_merge_request]) }
           let!(:closed_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [closed_merge_request]) }
-          let!(:blacklist_policy) { create(:software_license_policy, project: project, software_license: license, approval_status: :blacklisted) }
+          let!(:blacklist_policy) { create(:software_license_policy, project: project, software_license: license, classification: :blacklisted) }
           let(:license) { create(:software_license, name: license_report.license_names[0]) }
           let(:license_report) { open_pipeline.license_scanning_report }
 
@@ -39,7 +39,7 @@ describe RefreshLicenseComplianceChecksWorker do
         context "when none of the blacklisted licenses appear in the most recent license management reports" do
           let!(:open_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [open_merge_request]) }
           let!(:closed_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [closed_merge_request]) }
-          let!(:blacklist_policy) { create(:software_license_policy, project: project, software_license: license, approval_status: :blacklisted) }
+          let!(:blacklist_policy) { create(:software_license_policy, project: project, software_license: license, classification: :blacklisted) }
           let(:license) { create(:software_license, name: SecureRandom.uuid) }
 
           before do

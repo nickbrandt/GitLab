@@ -31,7 +31,7 @@ module EE
         }.with_indifferent_access.freeze
 
         IGNORED_LIMIT_ENUMS = {
-          'SoftwareLicensePolicy' => %w[approval_status],
+          'SoftwareLicensePolicy' => %w[classification],
           'User' => %w[group_view]
         }.freeze
       end
