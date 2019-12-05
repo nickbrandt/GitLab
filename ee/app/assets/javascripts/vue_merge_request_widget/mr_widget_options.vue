@@ -43,7 +43,7 @@ export default {
       return this.mr.hasApprovalsAvailable && this.mr.state !== 'nothingToMerge';
     },
     shouldRenderCodeQuality() {
-      const { codeclimate } = this.mr;
+      const { codeclimate } = this.mr || {};
       return codeclimate && codeclimate.head_path && codeclimate.base_path;
     },
     shouldRenderLicenseReport() {
@@ -67,7 +67,7 @@ export default {
       );
     },
     shouldRenderPerformance() {
-      const { performance } = this.mr;
+      const { performance } = this.mr || {};
       return performance && performance.head_path && performance.base_path;
     },
     shouldRenderSecurityReport() {
@@ -149,14 +149,17 @@ export default {
       return (gl && gl.mrWidgetData && gl.mrWidgetData.license_management_comparison_path) || null;
     },
   },
-  created() {
-    if (this.shouldRenderCodeQuality) {
-      this.fetchCodeQuality();
-    }
-
-    if (this.shouldRenderPerformance) {
-      this.fetchPerformance();
-    }
+  watch: {
+    shouldRenderCodeQuality(newVal) {
+      if (newVal) {
+        this.fetchCodeQuality();
+      }
+    },
+    shouldRenderPerformance(newVal) {
+      if (newVal) {
+        this.fetchPerformance();
+      }
+    },
   },
   methods: {
     getServiceEndpoints(store) {
@@ -223,7 +226,7 @@ export default {
 };
 </script>
 <template>
-  <div class="mr-state-widget prepend-top-default">
+  <div v-if="mr" class="mr-state-widget prepend-top-default">
     <mr-widget-header :mr="mr" />
     <mr-widget-pipeline-container
       v-if="shouldRenderPipelines"
@@ -366,4 +369,5 @@ export default {
       :is-post-merge="true"
     />
   </div>
+  <loading v-else />
 </template>
