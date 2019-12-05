@@ -25,6 +25,10 @@ module Resolvers
         build_finder(params).execute.first
       end
 
+      def self.single
+        self
+      end
+
       private
 
       def issue
@@ -40,7 +44,7 @@ module Resolvers
       end
 
       def error(msg)
-        raise ::Gitlab::Graphql::Errors::ArgumentError, 'one of id or filename must be passed'
+        raise ::Gitlab::Graphql::Errors::ArgumentError, msg
       end
     end
   end

@@ -3,25 +3,20 @@
 module Resolvers
   module DesignManagement
     class VersionResolver < BaseResolver
-      type Types::DesignManagement::VersionType.connection_type, null: false
+      include Gitlab::Graphql::Authorize::AuthorizeResource
 
-      alias_method :design_or_collection, :object
+      type Types::DesignManagement::VersionType, null: true
 
-      def resolve(parent: nil)
-        # Find an `at_version` argument passed to a parent node.
-        #
-        # If one is found, then a design collection further up the AST
-        # has been filtered to reflect designs at that version, and so
-        # for consistency we should only present versions up to the given
-        # version here.
-        at_version = Gitlab::Graphql::FindArgumentInParent.find(parent, :at_version, limit_depth: 4)
-        version = at_version ? GitlabSchema.object_from_id(at_version).sync : nil
+      authorize :read_design
 
-        ::DesignManagement::VersionsFinder.new(
-          design_or_collection,
-          context[:current_user],
-          earlier_or_equal_to: version
-        ).execute
+      argument :id, GraphQL::ID_TYPE,
+               required: true,
+               description: 'The Global ID of the version'
+
+      alias_method :resolve, :authorized_find!
+
+      def find_object(id:)
+        GitlabSchema.object_from_id(id, expected_type: ::DesignManagement::Version)
       end
     end
   end

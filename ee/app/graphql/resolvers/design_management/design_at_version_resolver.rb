@@ -25,6 +25,10 @@ module Resolvers
         context[:current_user]
       end
 
+      def self.single
+        self
+      end
+
       private
 
       def inconsistent?(dav)

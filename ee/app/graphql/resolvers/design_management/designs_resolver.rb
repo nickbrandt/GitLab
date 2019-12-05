@@ -17,6 +17,10 @@ module Resolvers
                description: 'Filters designs to only those that existed at the version. ' \
                             'If argument is omitted or nil then all designs will reflect the latest version'
 
+      def self.single
+        ::Resolvers::DesignManagement::DesignResolver
+      end
+
       def resolve(**args)
         find_designs(args)
       end
