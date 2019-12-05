@@ -176,7 +176,7 @@ export default {
     },
     hasContainerScanningReports() {
       const type = securityReportsTypes.CONTAINER_SCANNING;
-      if (gon.features && gon.features[`${type}MergeRequestReportApi`]) {
+      if (this.isMergeRequestReportApiEnabled(type)) {
         return this.enabledReports[type];
       }
       const { head, diffEndpoint } = this.sastContainer.paths;
@@ -212,12 +212,7 @@ export default {
 
     const sastDiffEndpoint = gl && gl.mrWidgetData && gl.mrWidgetData.sast_comparison_path;
 
-    if (
-      gon.features &&
-      gon.features.sastMergeRequestReportApi &&
-      sastDiffEndpoint &&
-      this.hasSastReports
-    ) {
+    if (this.isMergeRequestReportApiEnabled('sast') && sastDiffEndpoint && this.hasSastReports) {
       this.setSastDiffEndpoint(sastDiffEndpoint);
       this.fetchSastDiff();
     } else if (this.sastHeadPath) {
@@ -233,8 +228,7 @@ export default {
       gl && gl.mrWidgetData && gl.mrWidgetData.container_scanning_comparison_path;
 
     if (
-      gon.features &&
-      gon.features.containerScanningMergeRequestReportApi &&
+      this.isMergeRequestReportApiEnabled('containerScanning') &&
       sastContainerDiffEndpoint &&
       this.hasContainerScanningReports
     ) {
@@ -251,12 +245,7 @@ export default {
 
     const dastDiffEndpoint = gl && gl.mrWidgetData && gl.mrWidgetData.dast_comparison_path;
 
-    if (
-      gon.features &&
-      gon.features.dastMergeRequestReportApi &&
-      dastDiffEndpoint &&
-      this.hasDastReports
-    ) {
+    if (this.isMergeRequestReportApiEnabled('dast') && dastDiffEndpoint && this.hasDastReports) {
       this.setDastDiffEndpoint(dastDiffEndpoint);
       this.fetchDastDiff();
     } else if (this.dastHeadPath) {
@@ -272,8 +261,7 @@ export default {
       gl && gl.mrWidgetData && gl.mrWidgetData.dependency_scanning_comparison_path;
 
     if (
-      gon.features &&
-      gon.features.dependencyScanningMergeRequestReportApi &&
+      this.isMergeRequestReportApiEnabled('dependencyScanning') &&
       dependencyScanningDiffEndpoint &&
       this.hasDependencyScanningReports
     ) {
@@ -336,8 +324,11 @@ export default {
       fetchSastReports: 'fetchReports',
       fetchSastDiff: 'fetchDiff',
     }),
+    isMergeRequestReportApiEnabled(type) {
+      return Boolean(gon.features && gon.features[`${type}MergeRequestReportApi`]);
+    },
     hasReportsType(type) {
-      if (gon.features && gon.features[`${type}MergeRequestReportApi`]) {
+      if (this.isMergeRequestReportApiEnabled(type)) {
         return this.enabledReports[type];
       }
       const { head, diffEndpoint } = this[type].paths;
@@ -362,7 +353,8 @@ export default {
         target="_blank"
         class="btn btn-default btn-sm float-right append-right-default"
       >
-        <span>{{ s__('ciReport|View full report') }}</span> <icon :size="16" name="external-link" />
+        <span>{{ s__('ciReport|View full report') }}</span>
+        <icon :size="16" name="external-link" />
       </a>
     </div>
 
