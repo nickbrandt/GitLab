@@ -58,6 +58,8 @@
 - jira_connect:jira_connect_sync_branch
 - jira_connect:jira_connect_sync_merge_request
 
+- personal_access_tokens:personal_access_tokens_policy
+
 - admin_emails
 - create_github_webhook
 - design_management_new_version
