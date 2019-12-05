@@ -187,6 +187,8 @@ module API
         delete do
           authorize!(:destroy_package, project)
 
+          track_event('delete_package')
+
           package.destroy
         end
       end
@@ -373,6 +375,8 @@ module API
         package_file = ::Packages::PackageFileFinder
           .new(package, "#{params[:file_name]}", conan_file_type: file_type).execute!
 
+        track_event('pull_package') if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY
+
         present_carrierwave_file!(package_file.file)
       end
 
@@ -383,6 +387,8 @@ module API
         bad_request!('Missing package file!') unless uploaded_file
 
         current_package = package || ::Packages::Conan::CreatePackageService.new(project, current_user, params).execute
+
+        track_event('push_package') if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY && params['file.size'].positive?
 
         # conan sends two upload requests, the first has no file, so we skip record creation if file.size == 0
         ::Packages::Conan::CreatePackageFileService.new(current_package, uploaded_file, params.merge(conan_file_type: file_type)).execute unless params['file.size'] == 0

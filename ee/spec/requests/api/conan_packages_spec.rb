@@ -434,6 +434,8 @@ describe API::ConanPackages do
           project.add_maintainer(user)
         end
 
+        it_behaves_like 'a gitlab tracking event', described_class.name, 'delete_package'
+
         it 'deletes a package' do
           expect { subject }.to change { Packages::Package.count }.from(2).to(1)
         end
@@ -546,6 +548,12 @@ describe API::ConanPackages do
       it_behaves_like 'an internal project with packages'
       it_behaves_like 'a private project with packages'
       it_behaves_like 'a project is not found'
+
+      context 'tracking the conan_package.tgz download' do
+        let(:package_file) { package.package_files.find_by(file_name: ::Packages::ConanFileMetadatum::PACKAGE_BINARY) }
+
+        it_behaves_like 'a gitlab tracking event', described_class.name, 'pull_package'
+      end
     end
   end
 
@@ -783,6 +791,11 @@ describe API::ConanPackages do
 
       it_behaves_like 'rejects invalid recipe'
       it_behaves_like 'uploads a package file'
+      context 'tracking the conan_package.tgz upload' do
+        let(:file_name) { ::Packages::ConanFileMetadatum::PACKAGE_BINARY }
+
+        it_behaves_like 'a gitlab tracking event', described_class.name, 'push_package'
+      end
     end
 
     def temp_file(package_tmp)
