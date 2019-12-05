@@ -20,7 +20,7 @@ module Secpick
     end
 
     def ee?
-      File.exist?('./ee/app/models/license.rb')
+      File.exist?(File.expand_path('../ee/app/models/license.rb', __dir__))
     end
 
     def dry_run?
@@ -127,7 +127,7 @@ module Secpick
         options[:branch] ||= `git rev-parse --abbrev-ref HEAD`
         options[:remote] ||= DEFAULT_REMOTE
 
-        abort("Missing options. Use #{$0} --help to see the list of options available".red) if options.values.include?(nil)
+        abort("Missing options. Use #{$0} --help to see the list of options available".red) if options.value?(nil)
         abort("Wrong version format #{options[:version].bold}".red) unless options[:version] =~ /\A\d*\-\d*\Z/
       end
     end
