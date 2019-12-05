@@ -9,6 +9,7 @@ describe SoftwareLicense do
     it { is_expected.to include_module(Presentable) }
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_length_of(:spdx_identifier).is_at_most(255) }
+    it { is_expected.to validate_uniqueness_of(:name) }
   end
 
   describe '.create_policy_for!' do

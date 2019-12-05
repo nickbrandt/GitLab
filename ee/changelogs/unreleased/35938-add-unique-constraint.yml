@@ -1,0 +1,5 @@
+---
+title: Add a unique constraint to `software_licenses.name` column
+merge_request: 19840
+author:
+type: fixed
