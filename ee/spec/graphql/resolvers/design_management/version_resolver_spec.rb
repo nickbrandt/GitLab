@@ -6,54 +6,38 @@ describe Resolvers::DesignManagement::VersionResolver do
   include GraphqlHelpers
   include DesignManagementTestHelpers
 
+  let_it_be(:issue) { create(:issue) }
+  let_it_be(:current_user) { create(:user) }
+  let_it_be(:version) { create(:design_version, issue: issue) }
+  let_it_be(:developer) { create(:user) }
+
+  let(:project) { issue.project }
+  let(:params) { { id: global_id_of(version) } }
+
   before do
     enable_design_management
+    project.add_developer(developer)
   end
 
-  describe "#resolve" do
-    set(:issue) { create(:issue) }
-    set(:project) { issue.project }
-    set(:first_version) { create(:design_version) }
-    set(:first_design) { create(:design, issue: issue, versions: [first_version]) }
+  context 'the current user is not authorized' do
     let(:current_user) { create(:user) }
 
-    before do
-      project.add_developer(current_user)
+    it 'raises an error on resolution' do
+      expect { resolve_version }.to raise_error(::Gitlab::Graphql::Errors::ResourceNotAvailable)
     end
+  end
 
-    context "for a design collection" do
-      let(:collection) { DesignManagement::DesignCollection.new(issue) }
+  context 'the current user is authorized' do
+    let(:current_user) { developer }
 
-      it "returns the ordered versions" do
-        second_version = create(:design_version)
-        create(:design, issue: issue, versions: [second_version])
-
-        expect(resolve_versions(collection)).to eq([second_version, first_version])
-      end
-    end
-
-    context "for a design" do
-      it "returns the versions" do
-        expect(resolve_versions(first_design)).to eq([first_version])
-      end
-    end
-
-    context "when the user is anonymous" do
-      let(:current_user) { nil }
-
-      it "returns nothing" do
-        expect(resolve_versions(first_design)).to be_empty
-      end
-    end
-
-    context "when the user cannot see designs" do
-      it "returns nothing" do
-        expect(resolve_versions(first_design, {}, current_user: create(:user))).to be_empty
+    context 'the id parameter is provided' do
+      it 'returns the specified version' do
+        expect(resolve_version).to eq(version)
       end
     end
   end
 
-  def resolve_versions(obj, args = {}, context = { current_user: current_user })
-    resolve(described_class, obj: obj, args: args, ctx: context)
+  def resolve_version
+    resolve(described_class, obj: nil, args: params, ctx: { current_user: current_user })
   end
 end
