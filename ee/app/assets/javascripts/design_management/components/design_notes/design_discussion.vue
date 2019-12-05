@@ -71,7 +71,13 @@ export default {
         data: { createNote },
       },
     ) {
-      updateStoreAfterAddDiscussionComment(store, createNote, getDesignQuery, this.designVariables);
+      updateStoreAfterAddDiscussionComment(
+        store,
+        createNote,
+        getDesignQuery,
+        this.designVariables,
+        this.discussion.id,
+      );
     },
     onDone() {
       this.discussionComment = '';
