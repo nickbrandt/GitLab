@@ -18,6 +18,35 @@ describe DesignManagement::DesignAtVersion do
     end
   end
 
+  describe '#==' do
+    it 'has structural semantics' do
+      design = create(:design, issue: issue)
+      version = create(:design_version, designs: [design], issue: issue)
+
+      this = create(:design_at_version, design: design, version: version)
+      other = create(:design_at_version, design: design, version: version)
+
+      expect(this).to eq(other)
+    end
+
+    it 'does not admit false positives' do
+      design = create(:design, issue: issue)
+      version_a = create(:design_version, designs: [design])
+      version_b = create(:design_version, designs: [design])
+
+      this = create(:design_at_version, design: design, version: version_a)
+      other = create(:design_at_version, design: design, version: version_b)
+
+      expect(this).not_to eq(other)
+    end
+
+    it 'rejects objects with the same id and the wrong class' do
+      dav = create(:design_at_version)
+
+      expect(dav).not_to eq(OpenStruct.new(id: dav.id))
+    end
+  end
+
   describe 'status methods' do
     let!(:design_a) { create(:design, issue: issue) }
     let!(:design_b) { create(:design, issue: issue) }
