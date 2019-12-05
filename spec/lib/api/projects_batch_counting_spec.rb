@@ -9,7 +9,7 @@ describe API::ProjectsBatchCounting do
     end
   end
 
-  describe '.prepare!' do
+  describe '.preload_and_batch_count!' do
     let(:projects) { double }
     let(:preloaded_projects) { double }
 
@@ -18,7 +18,7 @@ describe API::ProjectsBatchCounting do
 
       expect(subject).to receive(:preload_relation).with(projects).and_return(preloaded_projects)
 
-      expect(subject.prepare!(projects)).to eq(preloaded_projects)
+      expect(subject.preload_and_batch_count!(projects)).to eq(preloaded_projects)
     end
 
     it 'executes batch counting' do
@@ -26,7 +26,7 @@ describe API::ProjectsBatchCounting do
 
       expect(subject).to receive(:execute_batch_counting).with(preloaded_projects)
 
-      subject.prepare!(projects)
+      subject.preload_and_batch_count!(projects)
     end
   end
 

@@ -418,7 +418,7 @@ module API
           options: { only_owned: true }
         ).execute
 
-        Entities::Project.prepare!(projects)
+        Entities::Project.preload_and_batch_count!(projects)
       end
 
       expose :shared_projects, using: Entities::Project do |group, options|
@@ -428,7 +428,7 @@ module API
           options: { only_shared: true }
         ).execute
 
-        Entities::Project.prepare!(projects)
+        Entities::Project.preload_and_batch_count!(projects)
       end
     end
 

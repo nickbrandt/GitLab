@@ -7,7 +7,7 @@ module API
     class_methods do
       # This adds preloading to the query and executes batch counting
       # Side-effect: The query will be executed during batch counting
-      def prepare!(projects_relation)
+      def preload_and_batch_count!(projects_relation)
         preload_relation(projects_relation).tap do |projects|
           execute_batch_counting(projects)
         end
