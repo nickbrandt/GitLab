@@ -36,23 +36,34 @@ describe SoftwareLicensePolicies::CreateService do
         software_license_policy = project.software_license_policies.last
         expect(software_license_policy).to be_persisted
         expect(software_license_policy.name).to eq(params[:name])
-        expect(software_license_policy.classification).to eq('blacklisted')
+        expect(software_license_policy.classification).to eq('denied')
       end
 
-      context "when valid parameters are specified" do
-        let(:result) { subject.execute }
-
-        before do
-          allow(RefreshLicenseComplianceChecksWorker).to receive(:perform_async)
-          result
+      context 'when valid parameters are specified' do
+        where(:approval_status, :expected_classification) do
+          [
+            ['approved', 'approved'],
+            ['denied', 'denied'],
+            ['blacklisted', 'denied'],
+          ]
         end
 
-        specify { expect(result[:status]).to be(:success) }
-        specify { expect(result[:software_license_policy]).to be_present }
-        specify { expect(result[:software_license_policy]).to be_persisted }
-        specify { expect(result[:software_license_policy].name).to eql(params[:name]) }
-        specify { expect(result[:software_license_policy].classification).to eql('blacklisted') }
-        specify { expect(RefreshLicenseComplianceChecksWorker).to have_received(:perform_async).with(project.id) }
+        with_them do
+          let(:params) { { name: 'MIT', approval_status: approval_status } }
+          let(:result) { subject.execute }
+
+          before do
+            allow(RefreshLicenseComplianceChecksWorker).to receive(:perform_async)
+            result
+          end
+
+          specify { expect(result[:status]).to be(:success) }
+          specify { expect(result[:software_license_policy]).to be_present }
+          specify { expect(result[:software_license_policy]).to be_persisted }
+          specify { expect(result[:software_license_policy].name).to eql(params[:name]) }
+          specify { expect(result[:software_license_policy].classification).to eql(expected_classification) }
+          specify { expect(RefreshLicenseComplianceChecksWorker).to have_received(:perform_async).with(project.id) }
+        end
       end
 
       context "when an argument error is raised" do
