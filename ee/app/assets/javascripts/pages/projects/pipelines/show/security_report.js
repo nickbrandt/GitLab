@@ -6,7 +6,6 @@ import createDashboardStore from 'ee/security_dashboard/store';
 import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
 import SecurityReportApp from 'ee/vue_shared/security_reports/split_security_reports_app.vue';
 import createStore from 'ee/vue_shared/security_reports/store';
-import { updateBadgeCount } from './utils';
 
 Vue.use(Translate);
 
@@ -32,11 +31,6 @@ const initSecurityDashboardApp = el => {
           pipelineId: parseInt(pipelineId, 10),
           vulnerabilitiesEndpoint,
           vulnerabilityFeedbackHelpPath,
-        },
-        on: {
-          vulnerabilitiesCountChanged(count) {
-            updateBadgeCount('.js-security-counter', count);
-          },
         },
         scopedSlots: {
           emptyState: () =>
@@ -110,11 +104,6 @@ const initSplitSecurityReportsApp = el => {
           canCreateIssue: Boolean(createVulnerabilityFeedbackIssuePath),
           canCreateMergeRequest: Boolean(createVulnerabilityFeedbackMergeRequestPath),
           canDismissVulnerability: Boolean(createVulnerabilityFeedbackDismissalPath),
-        },
-        on: {
-          updateBadgeCount: count => {
-            updateBadgeCount('.js-security-counter', count);
-          },
         },
       });
     },

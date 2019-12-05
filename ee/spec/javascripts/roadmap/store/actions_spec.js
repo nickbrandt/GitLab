@@ -10,8 +10,8 @@ import { PRESET_TYPES, EXTEND_AS } from 'ee/roadmap/constants';
 import groupEpics from 'ee/roadmap/queries/groupEpics.query.graphql';
 import epicChildEpics from 'ee/roadmap/queries/epicChildEpics.query.graphql';
 
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
+import axios from '~/lib/utils/axios_utils';
 
 import {
   mockGroupId,

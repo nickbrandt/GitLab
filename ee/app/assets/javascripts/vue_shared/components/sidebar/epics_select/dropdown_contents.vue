@@ -1,7 +1,7 @@
 <script>
 import { GlLink } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
 import { noneEpic } from 'ee/vue_shared/constants';
+import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   noneEpic,

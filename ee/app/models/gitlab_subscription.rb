@@ -2,6 +2,9 @@
 
 class GitlabSubscription < ApplicationRecord
   default_value_for(:start_date) { Date.today }
+  after_create_commit :log_previous_state_for_create
+  before_update :log_previous_state_for_update
+  after_destroy_commit :log_previous_state_for_destroy
 
   belongs_to :namespace
   belongs_to :hosted_plan, class_name: 'Plan'
@@ -55,6 +58,31 @@ class GitlabSubscription < ApplicationRecord
   end
 
   private
+
+  def log_previous_state_for_create
+    log_previous_state_to_history(:gitlab_subscription_created)
+  end
+
+  def log_previous_state_for_update
+    attrs = self.attributes.merge(self.attributes_in_database)
+    log_previous_state_to_history(:gitlab_subscription_updated, attrs)
+  end
+
+  def log_previous_state_for_destroy
+    attrs = self.attributes
+    log_previous_state_to_history(:gitlab_subscription_destroyed, attrs)
+  end
+
+  def log_previous_state_to_history(change_type, attrs = {})
+    attrs['gitlab_subscription_created_at'] = attrs['created_at']
+    attrs['gitlab_subscription_updated_at'] = attrs['updated_at']
+    attrs['gitlab_subscription_id'] = self.id
+    attrs['change_type'] = change_type
+
+    omitted_attrs = %w(id created_at updated_at)
+
+    GitlabSubscriptionHistory.create(attrs.except(*omitted_attrs))
+  end
 
   def hosted?
     namespace_id.present?

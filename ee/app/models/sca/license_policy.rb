@@ -10,7 +10,7 @@ module SCA
       @url = reported_license&.url
       @dependencies = reported_license&.dependencies || []
       @spdx_identifier = software_policy&.spdx_identifier || reported_license&.id
-      @classification = software_policy&.approval_status || 'unclassified'
+      @classification = software_policy&.classification || 'unclassified'
     end
   end
 end

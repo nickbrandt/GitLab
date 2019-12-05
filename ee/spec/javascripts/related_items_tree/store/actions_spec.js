@@ -12,8 +12,8 @@ import {
   PathIdSeparator,
 } from 'ee/related_issues/constants';
 
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
+import axios from '~/lib/utils/axios_utils';
 
 import {
   mockInitialConfig,
@@ -924,6 +924,22 @@ describe('RelatedItemTree', () => {
               {
                 type: types.RECEIVE_ADD_ITEM_FAILURE,
                 payload: { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND },
+              },
+            ],
+            [],
+            done,
+          );
+        });
+
+        it('should set `state.itemAddInProgress` to false, no payload', done => {
+          testAction(
+            actions.receiveAddItemFailure,
+            undefined,
+            {},
+            [
+              {
+                type: types.RECEIVE_ADD_ITEM_FAILURE,
+                payload: { itemAddFailureType: undefined },
               },
             ],
             [],

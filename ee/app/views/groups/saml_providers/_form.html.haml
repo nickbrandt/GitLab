@@ -3,41 +3,23 @@
     .form-group
       = form_errors(saml_provider)
       %label.toggle-wrapper.mb-0.js-group-saml-enabled-toggle-area
-        %button{ type: 'button',
-          class: "js-project-feature-toggle project-feature-toggle d-inline #{'is-checked' if saml_provider.enabled?}",
-          "aria-label": s_("GroupSAML|Toggle SAML authentication") }
+        = render "shared/buttons/project_feature_toggle", is_checked: saml_provider.enabled?, label: s_("GroupSAML|Toggle SAML authentication"), class_list: "js-project-feature-toggle project-feature-toggle d-inline" do
           = f.hidden_field :enabled, { class: 'js-group-saml-enabled-input js-project-feature-toggle-input'}
-          %span.toggle-icon
-            = sprite_icon('status_success_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-checked')
-            = sprite_icon('status_failed_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-unchecked')
         %span.d-inline.font-weight-normal.align-text-bottom.ml-3= s_('GroupSAML|Enable SAML authentication for this group.')
     - if Feature.enabled?(:enforced_sso, group)
       .form-group
         %label.toggle-wrapper.mb-0.js-group-saml-enforced-sso-toggle-area
-          %button{ type: 'button',
-            class: "js-project-feature-toggle js-group-saml-enforced-sso-toggle project-feature-toggle d-inline #{'is-checked' if saml_provider.enforced_sso?}",
-            data: { qa_selector: 'enforced_sso_toggle_button' },
-            "aria-label": s_("GroupSAML|Enforced SSO") }
+          = render "shared/buttons/project_feature_toggle", is_checked: saml_provider.enabled?, label: s_("GroupSAML|Enforced SSO"), class_list: "js-project-feature-toggle js-group-saml-enforced-sso-toggle project-feature-toggle d-inline", data: { qa_selector: 'enforced_sso_toggle_button' } do
             = f.hidden_field :enforced_sso, { class: 'js-group-saml-enforced-sso-input js-project-feature-toggle-input'}
-            %span.toggle-icon
-              = sprite_icon('status_success_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-checked')
-              = sprite_icon('status_failed_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-unchecked')
-            - sso_enforcement_text = Feature.enabled?(:enforced_sso_requires_session, group) ? s_('GroupSAML|Enforce SSO-only authentication for this group.') : s_('GroupSAML|Enforce SSO-only membership for this group.')
-          %span.form-text.d-inline.font-weight-normal.align-text-bottom.ml-3= sso_enforcement_text
+          %span.form-text.d-inline.font-weight-normal.align-text-bottom.ml-3= Feature.enabled?(:enforced_sso_requires_session, group) ? s_('GroupSAML|Enforce SSO-only authentication for this group.') : s_('GroupSAML|Enforce SSO-only membership for this group.')
         .form-text.text-muted.js-group-saml-enforced-sso-helper-text{ style: "display: #{'none' if saml_provider.enabled?} #{'block' unless saml_provider.enabled?}" }
           %span
             = s_('GroupSAML|To be able to enable enforced SSO, you first need to enable SAML authentication.')
     - if Feature.enabled?(:group_managed_accounts, group)
       .form-group
         %label.toggle-wrapper.mb-0.js-group-saml-enforced-group-managed-accounts-toggle-area
-          %button{ type: 'button',
-            class: "js-project-feature-toggle js-group-saml-enforced-group-managed-accounts-toggle project-feature-toggle d-inline #{'is-checked' if saml_provider.enforced_group_managed_accounts?}",
-            data: { qa_selector: 'group_managed_accounts_toggle_button' },
-            "aria-label": s_("GroupSAML|Enforced SSO") }
+          = render "shared/buttons/project_feature_toggle", is_checked: saml_provider.enabled?, label: s_("GroupSAML|Enforced SSO"), class_list: "js-project-feature-toggle js-group-saml-enforced-group-managed-accounts-toggle project-feature-toggle d-inline", data: { qa_selector: 'group_managed_accounts_toggle_button' } do
             = f.hidden_field :enforced_group_managed_accounts, { class: 'js-group-saml-enforced-group-managed-accounts-input js-project-feature-toggle-input'}
-            %span.toggle-icon
-              = sprite_icon('status_success_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-checked')
-              = sprite_icon('status_failed_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-unchecked')
           %span.form-text.d-inline.font-weight-normal.align-text-bottom.ml-3= s_('GroupSAML|Enforce users to have dedicated group managed accounts for this group.')
         .form-text.text-muted.js-group-saml-enforced-group-managed-accounts-helper-text{ style: "display: #{'none' if saml_provider.enforced_sso?} #{'block' unless saml_provider.enforced_sso?}" }
           %span

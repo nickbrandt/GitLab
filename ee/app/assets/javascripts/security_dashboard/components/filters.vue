@@ -8,13 +8,6 @@ export default {
     DashboardFilter,
     GlToggleVuex,
   },
-  props: {
-    showHideDismissedToggle: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
   computed: {
     ...mapGetters({
       filters: 'filters/visibleFilters',
@@ -32,7 +25,7 @@ export default {
         class="col-sm-6 col-md-4 col-lg-2 p-2 js-filter"
         :filter-id="filter.id"
       />
-      <div v-if="showHideDismissedToggle" class="ml-lg-auto p-2">
+      <div class="ml-lg-auto p-2">
         <strong>{{ s__('SecurityDashboard|Hide dismissed') }}</strong>
         <gl-toggle-vuex
           class="d-block mt-1 js-toggle"

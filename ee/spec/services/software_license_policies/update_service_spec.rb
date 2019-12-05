@@ -15,7 +15,7 @@ describe SoftwareLicensePolicies::UpdateService do
     create(
       :software_license_policy,
       software_license: create(:software_license, name: 'ExamplePL/2.1'),
-      approval_status: 'blacklisted'
+      classification: 'blacklisted'
     )
   end
 
@@ -42,7 +42,7 @@ describe SoftwareLicensePolicies::UpdateService do
           update_software_license_policy(opts)
 
           expect(software_license_policy).to be_valid
-          expect(software_license_policy.approval_status).not_to eq(opts[:approval_status])
+          expect(software_license_policy.classification).not_to eq(opts[:approval_status])
         end
       end
 
@@ -52,7 +52,7 @@ describe SoftwareLicensePolicies::UpdateService do
           update_software_license_policy(opts)
 
           expect(software_license_policy).to be_valid
-          expect(software_license_policy.approval_status).to eq(opts[:approval_status])
+          expect(software_license_policy.classification).to eq(opts[:approval_status])
           expect(RefreshLicenseComplianceChecksWorker).to have_received(:perform_async).with(project.id)
         end
       end
@@ -64,7 +64,7 @@ describe SoftwareLicensePolicies::UpdateService do
           update_software_license_policy(opts)
 
           expect(software_license_policy).to be_valid
-          expect(software_license_policy.approval_status).not_to eq(opts[:approval_status])
+          expect(software_license_policy.classification).not_to eq(opts[:classification])
         end
       end
     end

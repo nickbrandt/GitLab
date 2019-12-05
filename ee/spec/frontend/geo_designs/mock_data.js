@@ -1,5 +1,7 @@
 export const MOCK_GEO_SVG_PATH = 'illustrations/gitlab_geo.svg';
 
+export const MOCK_ISSUES_SVG_PATH = 'illustrations/issues.svg';
+
 export const MOCK_GEO_TROUBLESHOOTING_LINK =
   'https://docs.gitlab.com/ee/administration/geo/replication/troubleshooting.html';
 

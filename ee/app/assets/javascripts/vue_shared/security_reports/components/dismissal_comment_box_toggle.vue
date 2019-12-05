@@ -4,8 +4,8 @@
 // https://zaengle.com/blog/using-v-model-on-nested-vue-components
 
 import { GlFormTextarea } from '@gitlab/ui';
-import { s__ } from '~/locale';
 import DismissalCommentBox from 'ee/vue_shared/security_reports/components/dismissal_comment_box.vue';
+import { s__ } from '~/locale';
 
 const PLACEHOLDER = s__('vulnerability|Add a comment or reason for dismissal');
 

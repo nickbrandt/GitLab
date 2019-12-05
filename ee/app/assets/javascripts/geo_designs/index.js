@@ -16,14 +16,14 @@ export default () => {
     },
     data() {
       const {
-        dataset: { geoSvgPath, geoTroubleshootingLink, designManagementLink, designsEnabled },
+        dataset: { geoSvgPath, issuesSvgPath, geoTroubleshootingLink, designManagementLink },
       } = this.$options.el;
 
       return {
         geoSvgPath,
+        issuesSvgPath,
         geoTroubleshootingLink,
         designManagementLink,
-        designsEnabled,
       };
     },
 
@@ -31,9 +31,9 @@ export default () => {
       return createElement('geo-designs-app', {
         props: {
           geoSvgPath: this.geoSvgPath,
+          issuesSvgPath: this.issuesSvgPath,
           geoTroubleshootingLink: this.geoTroubleshootingLink,
           designManagementLink: this.designManagementLink,
-          designsEnabled: this.designsEnabled,
         },
       });
     },

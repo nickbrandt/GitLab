@@ -1,7 +1,7 @@
 <script>
+import { GlButton, GlTooltipDirective } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
-import { GlButton, GlTooltipDirective } from '@gitlab/ui';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {

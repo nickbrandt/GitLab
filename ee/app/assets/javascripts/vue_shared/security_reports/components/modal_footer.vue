@@ -1,9 +1,9 @@
 <script>
 import { GlButton } from '@gitlab/ui';
-import { s__ } from '~/locale';
 import DismissButton from 'ee/vue_shared/security_reports/components/dismiss_button.vue';
-import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
+import { s__ } from '~/locale';
+import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {
   name: 'ModalFooter',

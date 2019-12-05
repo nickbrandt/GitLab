@@ -50,7 +50,7 @@ module Gitlab
         else
           # We use elastic for default branch only
           if root_ref?
-            project.repository.search(
+            project.repository.elastic_search(
               query,
               type: :blob,
               options: { highlight: true }
@@ -67,7 +67,7 @@ module Gitlab
         return Kaminari.paginate_array([]) unless Ability.allowed?(@current_user, :read_wiki, project)
 
         if project.wiki_enabled? && !project.wiki.empty? && query.present?
-          project.wiki.search(
+          project.wiki.elastic_search(
             query,
             type: :wiki_blob,
             options: { highlight: true }
