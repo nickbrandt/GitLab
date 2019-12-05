@@ -58,19 +58,12 @@ class GitlabSchema < GraphQL::Schema
     end
 
     def object_from_id(global_id, ctx = {})
-      expected_type = ctx[:expected_type]
-      gid = GlobalID.parse(global_id)
+      gid = parse_gid(global_id, ctx)
 
-      unless gid
-        raise Gitlab::Graphql::Errors::ArgumentError, "#{global_id} is not a valid GitLab id."
-      end
+      find_by_gid(gid)
+    end
 
-      if expected_type && !gid.model_class.ancestors.include?(expected_type)
-        vars = { global_id: global_id, expected_type: expected_type }
-        msg = _('%{global_id} is not a valid id for %{expected_type}.') % vars
-        raise Gitlab::Graphql::Errors::ArgumentError, msg
-      end
-
+    def find_by_gid(gid)
       if gid.model_class < ApplicationRecord
         Gitlab::Graphql::Loaders::BatchModelLoader.new(gid.model_class, gid.model_id).find
       elsif gid.model_class.respond_to?(:lazy_find)
@@ -78,6 +71,21 @@ class GitlabSchema < GraphQL::Schema
       else
         gid.find
       end
+    end
+
+    def parse_gid(global_id, ctx = {})
+      expected_type = ctx[:expected_type]
+      gid = GlobalID.parse(global_id)
+
+      raise Gitlab::Graphql::Errors::ArgumentError, "#{global_id} is not a valid GitLab id." unless gid
+
+      if expected_type && !gid.model_class.ancestors.include?(expected_type)
+        vars = { global_id: global_id, expected_type: expected_type }
+        msg = _('%{global_id} is not a valid id for %{expected_type}.') % vars
+        raise Gitlab::Graphql::Errors::ArgumentError, msg
+      end
+
+      gid
     end
 
     private
