@@ -243,7 +243,6 @@ describe Boards::Issues::MoveService, services: true do
       context 'when moving to same list' do
         let(:subgroup) { create(:group, parent: group) }
         let(:subgroup_project) { create(:project, namespace: subgroup) }
-        # let!(:list1) { create(:list, board: board1, label: development, position: 0) }
 
         let(:params) { { board_id: board1.id, from_list_id: label_list1.id, to_list_id: label_list1.id } }
         let(:issue) { create(:labeled_issue, project: subgroup_project, labels: [bug, development]) }
