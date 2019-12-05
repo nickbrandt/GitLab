@@ -80,7 +80,7 @@ module API
       end
 
       # Prepare the full projects query
-      # None if this is supposed to actually execute any database query
+      # None of this is supposed to actually execute any database query
       def prepare_query(projects)
         projects = reorder_projects(projects)
         projects = apply_filters(projects)
