@@ -46,13 +46,16 @@ export default {
       permissions: {
         createDesign: false,
       },
-      isSaving: false,
+      filesToBeSaved: [],
       selectedDesigns: [],
     };
   },
   computed: {
     isLoading() {
       return this.$apollo.queries.designs.loading || this.$apollo.queries.permissions.loading;
+    },
+    isSaving() {
+      return this.filesToBeSaved.length > 0;
     },
     canCreateDesign() {
       return this.permissions.createDesign;
@@ -100,7 +103,8 @@ export default {
         return null;
       }
 
-      const optimisticResponse = Array.from(files).map(file => ({
+      this.filesToBeSaved = Array.from(files);
+      const optimisticResponse = this.filesToBeSaved.map(file => ({
         // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
         // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
         __typename: 'Design',
@@ -132,8 +136,6 @@ export default {
           },
         },
       }));
-
-      this.isSaving = true;
 
       return this.$apollo
         .mutate({
@@ -167,7 +169,7 @@ export default {
           throw e;
         })
         .finally(() => {
-          this.isSaving = false;
+          this.filesToBeSaved = [];
         });
     },
     changeSelectedDesigns(filename) {
@@ -186,6 +188,12 @@ export default {
     },
     isDesignSelected(filename) {
       return this.selectedDesigns.includes(filename);
+    },
+    isDesignToBeSaved(filename) {
+      return this.filesToBeSaved.some(file => file.name === filename);
+    },
+    canSelectDesign(filename) {
+      return this.isLatestVersion && this.canCreateDesign && !this.isDesignToBeSaved(filename);
     },
     onDesignDelete() {
       this.selectedDesigns = [];
@@ -241,9 +249,9 @@ export default {
       </div>
       <ol v-else-if="hasDesigns" class="list-unstyled row">
         <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
-          <design v-bind="design" />
+          <design v-bind="design" :is-loading="isDesignToBeSaved(design.filename)" />
           <input
-            v-if="isLatestVersion && canCreateDesign"
+            v-if="canSelectDesign(design.filename)"
             :checked="isDesignSelected(design.filename)"
             type="checkbox"
             class="design-checkbox"
