@@ -14,7 +14,7 @@ class SoftwareLicensePolicy < ApplicationRecord
   attr_readonly :software_license
 
   enum classification: {
-      denied: 0,
+    denied: 0,
       approved: 1
   }
 

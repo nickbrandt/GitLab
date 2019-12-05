@@ -861,7 +861,9 @@ module EE
 
       class ManagedLicense < Grape::Entity
         expose :id, :name
-        expose :classification, as: :approval_status
+        expose :classification, as: :approval_status do |policy|
+          policy.denied? ? 'blacklisted' : policy.classification
+        end
       end
 
       class ProjectAlias < Grape::Entity

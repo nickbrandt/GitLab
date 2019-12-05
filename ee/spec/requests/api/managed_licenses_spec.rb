@@ -38,7 +38,7 @@ describe API::ManagedLicenses do
         expect(json_response).to be_a(Array)
         expect(json_response.first['id']).to eq(software_license_policy.id)
         expect(json_response.first['name']).to eq(software_license_policy.name)
-        expect(json_response.first['approval_status']).to eq(software_license_policy.classification)
+        expect(json_response.first['approval_status']).to eq('approved')
       end
     end
 
@@ -51,7 +51,7 @@ describe API::ManagedLicenses do
         expect(json_response).to be_a(Array)
         expect(json_response.first['id']).to eq(software_license_policy.id)
         expect(json_response.first['name']).to eq(software_license_policy.name)
-        expect(json_response.first['approval_status']).to eq(software_license_policy.classification)
+        expect(json_response.first['approval_status']).to eq('approved')
       end
     end
 
@@ -92,7 +92,7 @@ describe API::ManagedLicenses do
         expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response['id']).to eq(software_license_policy.id)
         expect(json_response['name']).to eq(software_license_policy.name)
-        expect(json_response['approval_status']).to eq(software_license_policy.classification)
+        expect(json_response['approval_status']).to eq('approved')
       end
 
       it 'returns project managed license details using the license name as key' do
@@ -103,7 +103,7 @@ describe API::ManagedLicenses do
         expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response['id']).to eq(software_license_policy.id)
         expect(json_response['name']).to eq(software_license_policy.name)
-        expect(json_response['approval_status']).to eq(software_license_policy.classification)
+        expect(json_response['approval_status']).to eq('approved')
       end
 
       it 'responds with 404 Not Found if requesting non-existing managed license' do
@@ -121,7 +121,7 @@ describe API::ManagedLicenses do
         expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response['id']).to eq(software_license_policy.id)
         expect(json_response['name']).to eq(software_license_policy.name)
-        expect(json_response['approval_status']).to eq(software_license_policy.classification)
+        expect(json_response['approval_status']).to eq('approved')
       end
     end
 
@@ -220,10 +220,10 @@ describe API::ManagedLicenses do
         # Check that response is equal to the updated object
         expect(json_response['id']).to eq(initial_id)
         expect(json_response['name']).to eq(updated_software_license_policy.name)
-        expect(json_response['approval_status']).to eq(updated_software_license_policy.classification)
+        expect(json_response['approval_status']).to eq('blacklisted')
 
         # Check that the approval status was updated
-        expect(updated_software_license_policy.classification).to eq('blacklisted')
+        expect(updated_software_license_policy).to be_denied
 
         # Check that response is equal to the old object except for the approval status
         expect(initial_id).to eq(updated_software_license_policy.id)
