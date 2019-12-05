@@ -336,7 +336,7 @@ describe ApprovalMergeRequestRule do
       let!(:project_approval_rule) { create(:approval_project_rule, :requires_approval, :license_management, project: project) }
       let(:project) { create(:project) }
       let!(:open_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [open_merge_request]) }
-      let!(:blacklist_policy) { create(:software_license_policy, project: project, software_license: license, approval_status: :blacklisted) }
+      let!(:blacklist_policy) { create(:software_license_policy, project: project, software_license: license, classification: :blacklisted) }
 
       before do
         subject.refresh_required_approvals!(project_approval_rule)

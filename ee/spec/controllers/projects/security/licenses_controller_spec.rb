@@ -345,7 +345,7 @@ describe Projects::Security::LicensesController do
           end
 
           it { expect(response).to have_http_status(:unprocessable_entity) }
-          it { expect(json).to eq({ "errors" => { "approval_status" => ["is invalid"] } }) }
+          it { expect(json).to eq({ "errors" => { "classification" => ["is invalid"] } }) }
         end
       end
     end

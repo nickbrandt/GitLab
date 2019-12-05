@@ -32,12 +32,12 @@ module Projects
 
       def classification_error
         errors = ActiveModel::Errors.new(SoftwareLicensePolicy.new)
-        errors.add(:approval_status, :invalid)
+        errors.add(:classification, :invalid)
         error(errors, :unprocessable_entity)
       end
 
       def valid_classification?
-        SoftwareLicensePolicy.approval_statuses.key?(params[:classification])
+        SoftwareLicensePolicy.classifications.key?(params[:classification])
       end
 
       def blacklisted_classification?

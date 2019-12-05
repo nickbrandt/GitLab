@@ -18,7 +18,7 @@ describe SoftwareLicense do
 
     context 'when a software license with a given name has already been created' do
       let(:mit_license) { create(:software_license, :mit) }
-      let(:result) { subject.create_policy_for!(project: project, name: mit_license.name, approval_status: :approved) }
+      let(:result) { subject.create_policy_for!(project: project, name: mit_license.name, classification: :approved) }
 
       specify { expect(result).to be_persisted }
       specify { expect(result).to be_approved }
@@ -27,7 +27,7 @@ describe SoftwareLicense do
 
     context 'when a software license with a given name has NOT been created' do
       let(:license_name) { SecureRandom.uuid }
-      let(:result) { subject.create_policy_for!(project: project, name: license_name, approval_status: :blacklisted) }
+      let(:result) { subject.create_policy_for!(project: project, name: license_name, classification: :blacklisted) }
 
       specify { expect(result).to be_persisted }
       specify { expect(result).to be_blacklisted }

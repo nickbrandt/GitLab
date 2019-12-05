@@ -13,8 +13,7 @@ class SoftwareLicensePolicy < ApplicationRecord
   belongs_to :software_license, -> { readonly }
   attr_readonly :software_license
 
-  # Licenses must be approved or blacklisted.
-  enum approval_status: {
+  enum classification: {
       blacklisted: 0,
       approved: 1
   }
@@ -24,7 +23,7 @@ class SoftwareLicensePolicy < ApplicationRecord
   validates_presence_of :software_license
 
   validates_presence_of :project
-  validates :approval_status, presence: true
+  validates :classification, presence: true
 
   # A license is unique for its project since it can't be approved and blacklisted.
   validates :software_license, uniqueness: { scope: :project_id }
@@ -46,6 +45,6 @@ class SoftwareLicensePolicy < ApplicationRecord
   delegate :name, :spdx_identifier, to: :software_license
 
   def self.workaround_cache_key
-    pluck(:id, :approval_status).flatten
+    pluck(:id, :classification).flatten
   end
 end
