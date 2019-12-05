@@ -416,7 +416,7 @@ exports[`Design management list item component with notes renders item with sing
 </router-link-stub>
 `;
 
-exports[`Design management list item component with no notes renders loading spinner when no image prop present 1`] = `
+exports[`Design management list item component with no notes renders loading spinner when isLoading is true 1`] = `
 <router-link-stub
   class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"

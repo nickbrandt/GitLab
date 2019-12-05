@@ -17,7 +17,7 @@ const DESIGN_VERSION_EVENT = {
 describe('Design management list item component', () => {
   let wrapper;
   function createComponent({
-    notesCount = 1,
+    notesCount = 0,
     event = DESIGN_VERSION_EVENT.NO_CHANGE,
     isLoading = false,
   } = {}) {
@@ -44,7 +44,7 @@ describe('Design management list item component', () => {
 
   describe('with notes', () => {
     it('renders item with single comment', () => {
-      createComponent();
+      createComponent({ notesCount: 1 });
 
       expect(wrapper.element).toMatchSnapshot();
     });
@@ -58,37 +58,37 @@ describe('Design management list item component', () => {
 
   describe('with no notes', () => {
     it('hides comment count', () => {
-      createComponent({ notesCount: 0 });
+      createComponent();
 
       expect(wrapper.element).toMatchSnapshot();
     });
 
     it('renders item with correct status icon for modification event', () => {
-      createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.MODIFICATION });
+      createComponent({ event: DESIGN_VERSION_EVENT.MODIFICATION });
 
       expect(wrapper.element).toMatchSnapshot();
     });
 
     it('renders item with correct status icon for deletion event', () => {
-      createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.DELETION });
+      createComponent({ event: DESIGN_VERSION_EVENT.DELETION });
 
       expect(wrapper.element).toMatchSnapshot();
     });
 
     it('renders item with correct status icon for creation event', () => {
-      createComponent({ notesCount: 0, event: DESIGN_VERSION_EVENT.CREATION });
+      createComponent({ event: DESIGN_VERSION_EVENT.CREATION });
 
       expect(wrapper.element).toMatchSnapshot();
     });
 
     it('renders item with no status icon for none event', () => {
-      createComponent({ notesCount: 0 });
+      createComponent();
 
       expect(wrapper.element).toMatchSnapshot();
     });
 
     it('renders loading spinner when isLoading is true', () => {
-      createComponent({ notesCount: 0, isLoading: true });
+      createComponent({ isLoading: true });
 
       expect(wrapper.element).toMatchSnapshot();
     });
