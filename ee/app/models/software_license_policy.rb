@@ -14,7 +14,7 @@ class SoftwareLicensePolicy < ApplicationRecord
   attr_readonly :software_license
 
   enum classification: {
-      blacklisted: 0,
+      denied: 0,
       approved: 1
   }
 
@@ -25,7 +25,7 @@ class SoftwareLicensePolicy < ApplicationRecord
   validates_presence_of :project
   validates :classification, presence: true
 
-  # A license is unique for its project since it can't be approved and blacklisted.
+  # A license is unique for its project since it can't be approved and blocklisted.
   validates :software_license, uniqueness: { scope: :project_id }
 
   scope :ordered, -> { SoftwareLicensePolicy.includes(:software_license).order("software_licenses.name ASC") }

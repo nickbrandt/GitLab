@@ -63,8 +63,8 @@ module Gitlab
           end
 
           def violates?(software_license_policies)
-            policies_with_matching_license_name = software_license_policies.blacklisted.with_license_by_name(license_names)
-            policies_with_matching_spdx_id = software_license_policies.blacklisted.by_spdx(licenses.map(&:id).compact)
+            policies_with_matching_license_name = software_license_policies.denied.with_license_by_name(license_names)
+            policies_with_matching_spdx_id = software_license_policies.denied.by_spdx(licenses.map(&:id).compact)
             policies_with_matching_spdx_id.or(policies_with_matching_license_name).exists?
           end
 

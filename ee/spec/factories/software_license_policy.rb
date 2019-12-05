@@ -6,16 +6,12 @@ FactoryBot.define do
     project
     software_license
 
-    trait :blacklist do
-      classification { :blacklisted }
-    end
-
     trait :allowed do
       classification { :approved }
     end
 
     trait :denied do
-      classification { :blacklisted }
+      classification { :denied }
     end
   end
 end

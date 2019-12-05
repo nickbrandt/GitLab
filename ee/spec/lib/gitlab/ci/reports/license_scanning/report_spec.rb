@@ -93,32 +93,32 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
           .add_dependency('rails')
       end
 
-      context 'when a blacklisted license is found in the report' do
-        let(:mit_blacklist) { build(:software_license_policy, :blacklist, software_license: mit_license) }
+      context 'when a blocked license is found in the report' do
+        let(:mit_blocklist) { build(:software_license_policy, :denied, software_license: mit_license) }
 
         before do
-          project.software_license_policies << mit_blacklist
+          project.software_license_policies << mit_blocklist
         end
 
         it { is_expected.to be_truthy }
       end
 
-      context 'when a blacklisted license is discovered with a different casing for the name' do
-        let(:mit_blacklist) { build(:software_license_policy, :blacklist, software_license: mit_license) }
+      context 'when a blocked license is discovered with a different casing for the name' do
+        let(:mit_blocklist) { build(:software_license_policy, :denied, software_license: mit_license) }
 
         before do
           mit_license.update!(name: 'mit')
-          project.software_license_policies << mit_blacklist
+          project.software_license_policies << mit_blocklist
         end
 
         it { is_expected.to be_truthy }
       end
 
-      context 'when none of the licenses discovered in the report violate the blacklist policy' do
-        let(:apache_blacklist) { build(:software_license_policy, :blacklist, software_license: apache_license) }
+      context 'when none of the licenses discovered in the report violate the blocklist policy' do
+        let(:apache_blocklist) { build(:software_license_policy, :denied, software_license: apache_license) }
 
         before do
-          project.software_license_policies << apache_blacklist
+          project.software_license_policies << apache_blocklist
         end
 
         it { is_expected.to be_falsey }
@@ -128,10 +128,10 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
     context "when checking for violations using the v2 license scan reports" do
       let(:report) { build(:license_scan_report) }
 
-      context "when a blacklisted license with a SPDX identifier is also in the report" do
+      context "when a blocked license with a SPDX identifier is also in the report" do
         let(:mit_spdx_id) { 'MIT' }
         let(:mit_license) { build(:software_license, :mit, spdx_identifier: mit_spdx_id) }
-        let(:mit_policy) { build(:software_license_policy, :blacklist, software_license: mit_license) }
+        let(:mit_policy) { build(:software_license_policy, :denied, software_license: mit_license) }
 
         before do
           report.add_license(id: mit_spdx_id, name: 'MIT License')
@@ -141,9 +141,9 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
         it { is_expected.to be_truthy }
       end
 
-      context "when a blacklisted license does not have an SPDX identifier because it was provided by an end user" do
+      context "when a blocked license does not have an SPDX identifier because it was provided by an end user" do
         let(:custom_license) { build(:software_license, name: 'custom', spdx_identifier: nil) }
-        let(:custom_policy) { build(:software_license_policy, :blacklist, software_license: custom_license) }
+        let(:custom_policy) { build(:software_license_policy, :denied, software_license: custom_license) }
 
         before do
           report.add_license(id: nil, name: 'Custom')
@@ -153,9 +153,9 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
         it { is_expected.to be_truthy }
       end
 
-      context "when none of the licenses discovered match any of the blacklisted software policies" do
+      context "when none of the licenses discovered match any of the blocklist software policies" do
         let(:apache_license) { build(:software_license, :apache_2_0, spdx_identifier: 'Apache-2.0') }
-        let(:apache_policy) { build(:software_license_policy, :blacklist, software_license: apache_license) }
+        let(:apache_policy) { build(:software_license_policy, :denied, software_license: apache_license) }
 
         before do
           report.add_license(id: nil, name: 'Custom')
