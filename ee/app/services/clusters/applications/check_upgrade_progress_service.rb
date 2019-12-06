@@ -50,17 +50,21 @@ module Clusters
       end
 
       def remove_pod
-        helm_api.delete_pod!(upgrade_command.pod_name)
+        helm_api.delete_pod!(pod_name)
       rescue
         # no-op
       end
 
       def phase
-        helm_api.status(upgrade_command.pod_name)
+        helm_api.status(pod_name)
       end
 
       def errors
-        helm_api.log(upgrade_command.pod_name)
+        helm_api.log(pod_name)
+      end
+
+      def pod_name
+        @pod_name ||= patch_command.pod_name
       end
     end
   end

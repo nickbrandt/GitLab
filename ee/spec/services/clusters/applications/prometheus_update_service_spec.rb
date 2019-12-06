@@ -8,20 +8,20 @@ describe Clusters::Applications::PrometheusUpdateService do
     let(:environment) { create(:environment, project: project) }
     let(:cluster) { create(:cluster, :provided_by_user, :with_installed_helm, projects: [project]) }
     let(:application) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
-    let(:values_yaml) { application.values }
-    let!(:upgrade_command) { application.upgrade_command('') }
+    let(:empty_alerts_values_update_yaml) { "---\nalertmanager:\n  enabled: false\nserverFiles:\n  alerts: {}\n" }
+    let!(:patch_command) { application.patch_command(empty_alerts_values_update_yaml) }
     let(:helm_client) { instance_double(::Gitlab::Kubernetes::Helm::Api) }
 
     subject(:service) { described_class.new(application, project) }
 
     before do
-      allow(service).to receive(:upgrade_command).and_return(upgrade_command)
+      allow(service).to receive(:patch_command).with(empty_alerts_values_update_yaml).and_return(patch_command)
       allow(service).to receive(:helm_api).and_return(helm_client)
     end
 
     context 'when there are no errors' do
       before do
-        expect(helm_client).to receive(:update).with(upgrade_command)
+        expect(helm_client).to receive(:update).with(patch_command)
 
         allow(::ClusterWaitForAppUpdateWorker)
           .to receive(:perform_in)
@@ -38,7 +38,6 @@ describe Clusters::Applications::PrometheusUpdateService do
 
       it 'updates current config' do
         prometheus_config_service = spy(:prometheus_config_service)
-        values = YAML.safe_load(values_yaml)
 
         expect(Clusters::Applications::PrometheusConfigService)
           .to receive(:new)
@@ -47,7 +46,7 @@ describe Clusters::Applications::PrometheusUpdateService do
 
         expect(prometheus_config_service)
           .to receive(:execute)
-          .with(values)
+          .and_return(YAML.safe_load(empty_alerts_values_update_yaml))
 
         service.execute
       end
