@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import { createLocalVue, mount } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlFormTextarea, GlFormCheckbox } from '@gitlab/ui';
 import Form from 'ee/feature_flags/components/form.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
@@ -33,7 +33,7 @@ describe('feature flag form', () => {
   const factory = (props = {}) => {
     const localVue = createLocalVue();
 
-    wrapper = mount(localVue.extend(Form), {
+    wrapper = shallowMount(Form, {
       localVue,
       propsData: props,
       provide: {
@@ -183,7 +183,7 @@ describe('feature flag form', () => {
 
       describe('deleting an existing scope', () => {
         beforeEach(() => {
-          wrapper.find('.js-delete-scope').trigger('click');
+          wrapper.find('.js-delete-scope').vm.$emit('click');
         });
 
         it('should add `shouldBeDestroyed` key the clicked scope', () => {
@@ -218,7 +218,7 @@ describe('feature flag form', () => {
             ],
           });
 
-          wrapper.find('.js-delete-scope').trigger('click');
+          wrapper.find('.js-delete-scope').vm.$emit('click');
 
           expect(wrapper.vm.formScopes).toEqual([]);
         });
@@ -280,7 +280,7 @@ describe('feature flag form', () => {
           .setSelected();
       };
 
-      beforeEach(done => {
+      beforeEach(() => {
         factory({
           ...requiredProps,
           name: 'feature_flag_1',
@@ -300,10 +300,10 @@ describe('feature flag form', () => {
           ],
         });
 
-        wrapper.vm.$nextTick(done, done.fail);
+        return wrapper.vm.$nextTick();
       });
 
-      it('should emit handleSubmit with the updated data', done => {
+      it('should emit handleSubmit with the updated data', () => {
         wrapper.find('#feature-flag-name').setValue('feature_flag_2');
 
         wrapper
@@ -318,7 +318,7 @@ describe('feature flag form', () => {
 
         wrapper.find(ToggleButton).vm.$emit('change', true);
 
-        wrapper.vm
+        return wrapper.vm
           .$nextTick()
 
           .then(() => {
@@ -333,7 +333,7 @@ describe('feature flag form', () => {
             return wrapper.vm.$nextTick();
           })
           .then(() => {
-            wrapper.find({ ref: 'submitButton' }).trigger('click');
+            wrapper.find({ ref: 'submitButton' }).vm.$emit('click');
 
             const data = wrapper.emitted().handleSubmit[0][0];
 
@@ -373,9 +373,7 @@ describe('feature flag form', () => {
                 rolloutUserIds: '',
               },
             ]);
-          })
-          .then(done)
-          .catch(done.fail);
+          });
       });
     });
   });

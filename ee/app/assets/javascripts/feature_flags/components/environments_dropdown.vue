@@ -175,7 +175,7 @@ export default {
 
       <input
         type="text"
-        class="js-env-input form-control pl-4"
+        class="form-control pl-4 js-env-input"
         :aria-label="placeholder"
         :value="filter"
         :placeholder="placeholder"

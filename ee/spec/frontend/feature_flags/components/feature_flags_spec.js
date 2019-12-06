@@ -1,11 +1,16 @@
-import Vue from 'vue';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import featureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
-import mountComponent from 'helpers/vue_mount_component_helper';
-import { trimText } from 'helpers/text_helper';
+import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import FeatureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
+import FeatureFlagsTable from 'ee/feature_flags/components/feature_flags_table.vue';
+import ConfigureFeatureFlagsModal from 'ee/feature_flags/components/configure_feature_flags_modal.vue';
 import { TEST_HOST } from 'spec/test_constants';
+import NavigationTabs from '~/vue_shared/components/navigation_tabs';
+import TablePagination from '~/vue_shared/components/pagination/table_pagination.vue';
 import axios from '~/lib/utils/axios_utils';
 import { getRequestData } from '../mock_data';
+
+const localVue = createLocalVue();
 
 describe('Feature flags', () => {
   const mockData = {
@@ -21,23 +26,31 @@ describe('Feature flags', () => {
     newFeatureFlagPath: 'feature-flags/new',
   };
 
-  let FeatureFlagsComponent;
-  let component;
+  let wrapper;
   let mock;
+
+  const factory = (propsData = mockData) => {
+    wrapper = shallowMount(FeatureFlagsComponent, {
+      localVue,
+      propsData,
+      sync: false,
+    });
+  };
+
+  const configureButton = () => wrapper.find('.js-ff-configure');
+  const newButton = () => wrapper.find('.js-ff-new');
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
-
-    FeatureFlagsComponent = Vue.extend(featureFlagsComponent);
   });
 
   afterEach(() => {
     mock.restore();
-    component.$destroy();
+    wrapper.destroy();
   });
 
   describe('without permissions', () => {
-    const props = {
+    const propsData = {
       endpoint: `${TEST_HOST}/endpoint.json`,
       csrfToken: 'testToken',
       errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
@@ -54,7 +67,7 @@ describe('Feature flags', () => {
         .onGet(`${TEST_HOST}/endpoint.json`, { params: { scope: 'all', page: '1' } })
         .reply(200, getRequestData, {});
 
-      component = mountComponent(FeatureFlagsComponent, props);
+      factory(propsData);
 
       setImmediate(() => {
         done();
@@ -62,11 +75,11 @@ describe('Feature flags', () => {
     });
 
     it('does not render configure button', () => {
-      expect(component.$el.querySelector('.js-ff-configure')).toBeNull();
+      expect(configureButton().exists()).toBe(false);
     });
 
     it('does not render new feature flag button', () => {
-      expect(component.$el.querySelector('.js-ff-new')).toBeNull();
+      expect(newButton().exists()).toBe(false);
     });
   });
 
@@ -76,19 +89,19 @@ describe('Feature flags', () => {
         .onGet(`${TEST_HOST}/endpoint.json`, { params: { scope: 'all', page: '1' } })
         .replyOnce(200, getRequestData, {});
 
-      component = mountComponent(FeatureFlagsComponent, mockData);
+      factory();
 
-      const loadingElement = component.$el.querySelector('.js-loading-state');
+      const loadingElement = wrapper.find(GlLoadingIcon);
 
-      expect(loadingElement).not.toBeNull();
-      expect(loadingElement.querySelector('span').getAttribute('aria-label')).toEqual(
-        'Loading feature flags',
-      );
+      expect(loadingElement.exists()).toBe(true);
+      expect(loadingElement.props('label')).toEqual('Loading feature flags');
     });
   });
 
   describe('successful request', () => {
     describe('without feature flags', () => {
+      let emptyState;
+
       beforeEach(done => {
         mock.onGet(mockData.endpoint, { params: { scope: 'all', page: '1' } }).replyOnce(
           200,
@@ -103,55 +116,48 @@ describe('Feature flags', () => {
           {},
         );
 
-        component = mountComponent(FeatureFlagsComponent, mockData);
+        factory();
 
         setImmediate(() => {
+          emptyState = wrapper.find(GlEmptyState);
           done();
         });
       });
 
       it('should render the empty state', () => {
-        expect(component.$el.querySelector('.js-feature-flags-empty-state')).not.toBeNull();
+        expect(wrapper.find(GlEmptyState).exists()).toBe(true);
       });
 
       it('renders configure button', () => {
-        expect(component.$el.querySelector('.js-ff-configure')).not.toBeNull();
+        expect(configureButton().exists()).toBe(true);
       });
 
       it('renders new feature flag button', () => {
-        expect(component.$el.querySelector('.js-ff-new')).not.toBeNull();
+        expect(newButton().exists()).toBe(true);
       });
 
       describe('in all tab', () => {
         it('renders generic title', () => {
-          expect(
-            component.$el.querySelector('.js-feature-flags-empty-state h4').textContent.trim(),
-          ).toEqual('Get started with feature flags');
+          expect(emptyState.props('title')).toEqual('Get started with feature flags');
         });
       });
 
       describe('in disabled tab', () => {
-        it('renders disabled title', done => {
-          component.scope = 'disabled';
+        it('renders disabled title', () => {
+          wrapper.setData({ scope: 'disabled' });
 
-          Vue.nextTick(() => {
-            expect(
-              component.$el.querySelector('.js-feature-flags-empty-state h4').textContent.trim(),
-            ).toEqual('There are no inactive feature flags');
-            done();
+          return localVue.nextTick(() => {
+            expect(emptyState.props('title')).toEqual('There are no inactive feature flags');
           });
         });
       });
 
       describe('in enabled tab', () => {
-        it('renders enabled title', done => {
-          component.scope = 'enabled';
+        it('renders enabled title', () => {
+          wrapper.setData({ scope: 'enabled' });
 
-          Vue.nextTick(() => {
-            expect(
-              component.$el.querySelector('.js-feature-flags-empty-state h4').textContent.trim(),
-            ).toEqual('There are no active feature flags');
-            done();
+          localVue.nextTick(() => {
+            expect(emptyState.props('title')).toEqual('There are no active feature flags');
           });
         });
       });
@@ -170,51 +176,53 @@ describe('Feature flags', () => {
             'X-Total-Pages': '5',
           });
 
-        component = mountComponent(FeatureFlagsComponent, mockData);
+        factory();
         setImmediate(() => {
           done();
         });
       });
 
       it('should render a table with feature flags', () => {
-        expect(component.$el.querySelectorAll('.js-feature-flag-table')).not.toBeNull();
-        expect(component.$el.querySelector('.feature-flag-name').textContent.trim()).toEqual(
-          getRequestData.feature_flags[0].name,
-        );
-
-        expect(component.$el.querySelector('.feature-flag-description').textContent.trim()).toEqual(
-          getRequestData.feature_flags[0].description,
+        const table = wrapper.find(FeatureFlagsTable);
+        expect(wrapper.find(FeatureFlagsTable).exists()).toBe(true);
+        expect(table.props('featureFlags')).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              name: getRequestData.feature_flags[0].name,
+              description: getRequestData.feature_flags[0].description,
+            }),
+          ]),
         );
       });
 
       it('renders configure button', () => {
-        expect(component.$el.querySelector('.js-ff-configure')).not.toBeNull();
+        expect(configureButton().exists()).toBe(true);
       });
 
       it('renders new feature flag button', () => {
-        expect(component.$el.querySelector('.js-ff-new')).not.toBeNull();
+        expect(newButton().exists()).toBe(true);
       });
 
       describe('pagination', () => {
         it('should render pagination', () => {
-          expect(component.$el.querySelectorAll('.gl-pagination')).not.toBeNull();
+          expect(wrapper.find(TablePagination).exists()).toBe(true);
         });
 
         it('should make an API request when page is clicked', () => {
-          jest.spyOn(component, 'updateFeatureFlagOptions');
-          component.$el.querySelector('.gl-pagination li:nth-child(5) .page-link').click();
+          jest.spyOn(wrapper.vm, 'updateFeatureFlagOptions');
+          wrapper.find(TablePagination).vm.change(4);
 
-          expect(component.updateFeatureFlagOptions).toHaveBeenCalledWith({
+          expect(wrapper.vm.updateFeatureFlagOptions).toHaveBeenCalledWith({
             scope: 'all',
             page: '4',
           });
         });
 
         it('should make an API request when using tabs', () => {
-          jest.spyOn(component, 'updateFeatureFlagOptions');
-          component.$el.querySelector('.js-featureflags-tab-enabled').click();
+          jest.spyOn(wrapper.vm, 'updateFeatureFlagOptions');
+          wrapper.find(NavigationTabs).vm.$emit('onChangeTab', 'enabled');
 
-          expect(component.updateFeatureFlagOptions).toHaveBeenCalledWith({
+          expect(wrapper.vm.updateFeatureFlagOptions).toHaveBeenCalledWith({
             scope: 'enabled',
             page: '1',
           });
@@ -227,7 +235,7 @@ describe('Feature flags', () => {
     beforeEach(done => {
       mock.onGet(mockData.endpoint, { params: { scope: 'all', page: '1' } }).replyOnce(500, {});
 
-      component = mountComponent(FeatureFlagsComponent, mockData);
+      factory();
 
       setImmediate(() => {
         done();
@@ -235,23 +243,28 @@ describe('Feature flags', () => {
     });
 
     it('should render error state', () => {
-      expect(trimText(component.$el.querySelector('.empty-state').textContent)).toContain(
-        'There was an error fetching the feature flags. Try again in a few moments or contact your support team.',
+      const emptyState = wrapper.find(GlEmptyState);
+      expect(emptyState.props('title')).toEqual('There was an error fetching the feature flags.');
+      expect(emptyState.props('description')).toEqual(
+        'Try again in a few moments or contact your support team.',
       );
     });
 
     it('renders configure button', () => {
-      expect(component.$el.querySelector('.js-ff-configure')).not.toBeNull();
+      expect(configureButton().exists()).toBe(true);
     });
 
     it('renders new feature flag button', () => {
-      expect(component.$el.querySelector('.js-ff-new')).not.toBeNull();
+      expect(newButton().exists()).toBe(true);
     });
   });
 
   describe('rotate instance id', () => {
     beforeEach(done => {
-      component = mountComponent(FeatureFlagsComponent, mockData);
+      mock
+        .onGet(`${TEST_HOST}/endpoint.json`, { params: { scope: 'all', page: '1' } })
+        .reply(200, getRequestData, {});
+      factory();
 
       setImmediate(() => {
         done();
@@ -259,9 +272,9 @@ describe('Feature flags', () => {
     });
 
     it('should fire the rotate action when a `token` event is received', () => {
-      const actionSpy = jest.spyOn(component, 'rotateInstanceId');
-      const [modal] = component.$children;
-      modal.$emit('token');
+      const actionSpy = jest.spyOn(wrapper.vm, 'rotateInstanceId');
+      const modal = wrapper.find(ConfigureFeatureFlagsModal);
+      modal.vm.$emit('token');
 
       expect(actionSpy).toHaveBeenCalled();
     });
