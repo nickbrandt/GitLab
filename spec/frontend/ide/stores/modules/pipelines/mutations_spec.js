@@ -51,12 +51,8 @@ describe('IDE pipelines mutations', () => {
         expect(mockedState.latestPipeline).toEqual({
           id: '51',
           path: 'test',
-          commit: {
-            id: '123',
-          },
-          details: {
-            status: expect.any(Object),
-          },
+          commit: { id: '123' },
+          details: { status: expect.any(Object) },
           yamlError: undefined,
         });
       });
@@ -129,24 +125,16 @@ describe('IDE pipelines mutations', () => {
     beforeEach(() => {
       mockedState.stages = stages.map((stage, i) => ({ ...stage, id: i }));
 
-      data = {
-        latest_statuses: [...jobs],
-      };
+      data = { latest_statuses: [...jobs] };
     });
 
     it('updates loading', () => {
-      mutations[types.RECEIVE_JOBS_SUCCESS](mockedState, {
-        id: mockedState.stages[0].id,
-        data,
-      });
+      mutations[types.RECEIVE_JOBS_SUCCESS](mockedState, { id: mockedState.stages[0].id, data });
       expect(mockedState.stages[0].isLoading).toBe(false);
     });
 
     it('sets jobs on stage', () => {
-      mutations[types.RECEIVE_JOBS_SUCCESS](mockedState, {
-        id: mockedState.stages[0].id,
-        data,
-      });
+      mutations[types.RECEIVE_JOBS_SUCCESS](mockedState, { id: mockedState.stages[0].id, data });
       expect(mockedState.stages[0].jobs.length).toBe(jobs.length);
       expect(mockedState.stages[0].jobs).toEqual(
         jobs.map(job => ({
@@ -217,9 +205,7 @@ describe('IDE pipelines mutations', () => {
     });
 
     it('sets output on detail job', () => {
-      mutations[types.RECEIVE_JOB_TRACE_SUCCESS](mockedState, {
-        html: 'html',
-      });
+      mutations[types.RECEIVE_JOB_TRACE_SUCCESS](mockedState, { html: 'html' });
       expect(mockedState.detailJob.output).toBe('html');
       expect(mockedState.detailJob.isLoading).toBe(false);
     });

@@ -49,11 +49,7 @@ describe('IDE pipelines actions', () => {
         requestLatestPipeline,
         null,
         mockedState,
-        [
-          {
-            type: types.REQUEST_LATEST_PIPELINE,
-          },
-        ],
+        [{ type: types.REQUEST_LATEST_PIPELINE }],
         [],
         done,
       );
@@ -64,20 +60,10 @@ describe('IDE pipelines actions', () => {
     it('commits error', done => {
       testAction(
         receiveLatestPipelineError,
-        {
-          status: 404,
-        },
+        { status: 404 },
         mockedState,
-        [
-          {
-            type: types.RECEIVE_LASTEST_PIPELINE_ERROR,
-          },
-        ],
-        [
-          {
-            type: 'stopPipelinePolling',
-          },
-        ],
+        [{ type: types.RECEIVE_LASTEST_PIPELINE_ERROR }],
+        [{ type: 'stopPipelinePolling' }],
         done,
       );
     });
@@ -85,15 +71,9 @@ describe('IDE pipelines actions', () => {
     it('dispatches setErrorMessage is not 404', done => {
       testAction(
         receiveLatestPipelineError,
-        {
-          status: 500,
-        },
+        { status: 500 },
         mockedState,
-        [
-          {
-            type: types.RECEIVE_LASTEST_PIPELINE_ERROR,
-          },
-        ],
+        [{ type: types.RECEIVE_LASTEST_PIPELINE_ERROR }],
         [
           {
             type: 'setErrorMessage',
@@ -104,9 +84,7 @@ describe('IDE pipelines actions', () => {
               actionPayload: null,
             },
           },
-          {
-            type: 'stopPipelinePolling',
-          },
+          { type: 'stopPipelinePolling' },
         ],
         done,
       );
@@ -114,11 +92,7 @@ describe('IDE pipelines actions', () => {
   });
 
   describe('receiveLatestPipelineSuccess', () => {
-    const rootGetters = {
-      lastCommit: {
-        id: '123',
-      },
-    };
+    const rootGetters = { lastCommit: { id: '123' } };
     let commit;
 
     beforeEach(() => {
@@ -126,28 +100,12 @@ describe('IDE pipelines actions', () => {
     });
 
     it('commits pipeline', () => {
-      receiveLatestPipelineSuccess(
-        {
-          rootGetters,
-          commit,
-        },
-        {
-          pipelines,
-        },
-      );
+      receiveLatestPipelineSuccess({ rootGetters, commit }, { pipelines });
       expect(commit).toHaveBeenCalledWith(types.RECEIVE_LASTEST_PIPELINE_SUCCESS, pipelines[0]);
     });
 
     it('commits false when there are no pipelines', () => {
-      receiveLatestPipelineSuccess(
-        {
-          rootGetters,
-          commit,
-        },
-        {
-          pipelines: [],
-        },
-      );
+      receiveLatestPipelineSuccess({ rootGetters, commit }, { pipelines: [] });
       expect(commit).toHaveBeenCalledWith(types.RECEIVE_LASTEST_PIPELINE_SUCCESS, false);
     });
   });
@@ -162,17 +120,9 @@ describe('IDE pipelines actions', () => {
 
     describe('success', () => {
       beforeEach(() => {
-        mock.onGet('/abc/def/commit/abc123def456ghi789jkl/pipelines').reply(
-          200,
-          {
-            data: {
-              foo: 'bar',
-            },
-          },
-          {
-            'poll-interval': '10000',
-          },
-        );
+        mock
+          .onGet('/abc/def/commit/abc123def456ghi789jkl/pipelines')
+          .reply(200, { data: { foo: 'bar' } }, { 'poll-interval': '10000' });
       });
 
       it('dispatches request', done => {
@@ -181,18 +131,11 @@ describe('IDE pipelines actions', () => {
 
         const dispatch = jest.fn().mockName('dispatch');
         const rootGetters = {
-          lastCommit: {
-            id: 'abc123def456ghi789jkl',
-          },
-          currentProject: {
-            path_with_namespace: 'abc/def',
-          },
+          lastCommit: { id: 'abc123def456ghi789jkl' },
+          currentProject: { path_with_namespace: 'abc/def' },
         };
 
-        fetchLatestPipeline({
-          dispatch,
-          rootGetters,
-        });
+        fetchLatestPipeline({ dispatch, rootGetters });
 
         expect(dispatch).toHaveBeenCalledWith('requestLatestPipeline');
 
@@ -231,18 +174,11 @@ describe('IDE pipelines actions', () => {
       it('dispatches error', done => {
         const dispatch = jest.fn().mockName('dispatch');
         const rootGetters = {
-          lastCommit: {
-            id: 'abc123def456ghi789jkl',
-          },
-          currentProject: {
-            path_with_namespace: 'abc/def',
-          },
+          lastCommit: { id: 'abc123def456ghi789jkl' },
+          currentProject: { path_with_namespace: 'abc/def' },
         };
 
-        fetchLatestPipeline({
-          dispatch,
-          rootGetters,
-        });
+        fetchLatestPipeline({ dispatch, rootGetters });
 
         jest.advanceTimersByTime(1500);
 
@@ -258,19 +194,7 @@ describe('IDE pipelines actions', () => {
 
   describe('requestJobs', () => {
     it('commits request', done => {
-      testAction(
-        requestJobs,
-        1,
-        mockedState,
-        [
-          {
-            type: types.REQUEST_JOBS,
-            payload: 1,
-          },
-        ],
-        [],
-        done,
-      );
+      testAction(requestJobs, 1, mockedState, [{ type: types.REQUEST_JOBS, payload: 1 }], [], done);
     });
   });
 
@@ -278,16 +202,9 @@ describe('IDE pipelines actions', () => {
     it('commits error', done => {
       testAction(
         receiveJobsError,
-        {
-          id: 1,
-        },
+        { id: 1 },
         mockedState,
-        [
-          {
-            type: types.RECEIVE_JOBS_ERROR,
-            payload: 1,
-          },
-        ],
+        [{ type: types.RECEIVE_JOBS_ERROR, payload: 1 }],
         [
           {
             type: 'setErrorMessage',
@@ -295,9 +212,7 @@ describe('IDE pipelines actions', () => {
               text: 'An error occurred whilst loading the pipelines jobs.',
               action: expect.anything(),
               actionText: 'Please try again',
-              actionPayload: {
-                id: 1,
-              },
+              actionPayload: { id: 1 },
             },
           },
         ],
@@ -310,20 +225,9 @@ describe('IDE pipelines actions', () => {
     it('commits data', done => {
       testAction(
         receiveJobsSuccess,
-        {
-          id: 1,
-          data: jobs,
-        },
+        { id: 1, data: jobs },
         mockedState,
-        [
-          {
-            type: types.RECEIVE_JOBS_SUCCESS,
-            payload: {
-              id: 1,
-              data: jobs,
-            },
-          },
-        ],
+        [{ type: types.RECEIVE_JOBS_SUCCESS, payload: { id: 1, data: jobs } }],
         [],
         done,
       );
@@ -331,10 +235,7 @@ describe('IDE pipelines actions', () => {
   });
 
   describe('fetchJobs', () => {
-    const stage = {
-      id: 1,
-      dropdownPath: `${TEST_HOST}/jobs`,
-    };
+    const stage = { id: 1, dropdownPath: `${TEST_HOST}/jobs` };
 
     describe('success', () => {
       beforeEach(() => {
@@ -348,17 +249,8 @@ describe('IDE pipelines actions', () => {
           mockedState,
           [],
           [
-            {
-              type: 'requestJobs',
-              payload: stage.id,
-            },
-            {
-              type: 'receiveJobsSuccess',
-              payload: {
-                id: stage.id,
-                data: jobs,
-              },
-            },
+            { type: 'requestJobs', payload: stage.id },
+            { type: 'receiveJobsSuccess', payload: { id: stage.id, data: jobs } },
           ],
           done,
         );
@@ -377,14 +269,8 @@ describe('IDE pipelines actions', () => {
           mockedState,
           [],
           [
-            {
-              type: 'requestJobs',
-              payload: stage.id,
-            },
-            {
-              type: 'receiveJobsError',
-              payload: stage,
-            },
+            { type: 'requestJobs', payload: stage.id },
+            { type: 'receiveJobsError', payload: stage },
           ],
           done,
         );
@@ -398,12 +284,7 @@ describe('IDE pipelines actions', () => {
         toggleStageCollapsed,
         1,
         mockedState,
-        [
-          {
-            type: types.TOGGLE_STAGE_COLLAPSE,
-            payload: 1,
-          },
-        ],
+        [{ type: types.TOGGLE_STAGE_COLLAPSE, payload: 1 }],
         [],
         done,
       );
@@ -416,18 +297,8 @@ describe('IDE pipelines actions', () => {
         setDetailJob,
         'job',
         mockedState,
-        [
-          {
-            type: types.SET_DETAIL_JOB,
-            payload: 'job',
-          },
-        ],
-        [
-          {
-            type: 'rightPane/open',
-            payload: rightSidebarViews.jobsDetail,
-          },
-        ],
+        [{ type: types.SET_DETAIL_JOB, payload: 'job' }],
+        [{ type: 'rightPane/open', payload: rightSidebarViews.jobsDetail }],
         done,
       );
     });
@@ -437,18 +308,8 @@ describe('IDE pipelines actions', () => {
         setDetailJob,
         null,
         mockedState,
-        [
-          {
-            type: types.SET_DETAIL_JOB,
-            payload: null,
-          },
-        ],
-        [
-          {
-            type: 'rightPane/open',
-            payload: rightSidebarViews.pipelines,
-          },
-        ],
+        [{ type: types.SET_DETAIL_JOB, payload: null }],
+        [{ type: 'rightPane/open', payload: rightSidebarViews.pipelines }],
         done,
       );
     });
@@ -458,18 +319,8 @@ describe('IDE pipelines actions', () => {
         setDetailJob,
         'job',
         mockedState,
-        [
-          {
-            type: types.SET_DETAIL_JOB,
-            payload: 'job',
-          },
-        ],
-        [
-          {
-            type: 'rightPane/open',
-            payload: rightSidebarViews.jobsDetail,
-          },
-        ],
+        [{ type: types.SET_DETAIL_JOB, payload: 'job' }],
+        [{ type: 'rightPane/open', payload: rightSidebarViews.jobsDetail }],
         done,
       );
     });
@@ -477,18 +328,7 @@ describe('IDE pipelines actions', () => {
 
   describe('requestJobTrace', () => {
     it('commits request', done => {
-      testAction(
-        requestJobTrace,
-        null,
-        mockedState,
-        [
-          {
-            type: types.REQUEST_JOB_TRACE,
-          },
-        ],
-        [],
-        done,
-      );
+      testAction(requestJobTrace, null, mockedState, [{ type: types.REQUEST_JOB_TRACE }], [], done);
     });
   });
 
@@ -498,11 +338,7 @@ describe('IDE pipelines actions', () => {
         receiveJobTraceError,
         null,
         mockedState,
-        [
-          {
-            type: types.RECEIVE_JOB_TRACE_ERROR,
-          },
-        ],
+        [{ type: types.RECEIVE_JOB_TRACE_ERROR }],
         [
           {
             type: 'setErrorMessage',
@@ -525,12 +361,7 @@ describe('IDE pipelines actions', () => {
         receiveJobTraceSuccess,
         'data',
         mockedState,
-        [
-          {
-            type: types.RECEIVE_JOB_TRACE_SUCCESS,
-            payload: 'data',
-          },
-        ],
+        [{ type: types.RECEIVE_JOB_TRACE_SUCCESS, payload: 'data' }],
         [],
         done,
       );
@@ -539,17 +370,13 @@ describe('IDE pipelines actions', () => {
 
   describe('fetchJobTrace', () => {
     beforeEach(() => {
-      mockedState.detailJob = {
-        path: `${TEST_HOST}/project/builds`,
-      };
+      mockedState.detailJob = { path: `${TEST_HOST}/project/builds` };
     });
 
     describe('success', () => {
       beforeEach(() => {
         jest.spyOn(axios, 'get');
-        mock.onGet(`${TEST_HOST}/project/builds/trace`).replyOnce(200, {
-          html: 'html',
-        });
+        mock.onGet(`${TEST_HOST}/project/builds/trace`).replyOnce(200, { html: 'html' });
       });
 
       it('dispatches request', done => {
@@ -559,15 +386,8 @@ describe('IDE pipelines actions', () => {
           mockedState,
           [],
           [
-            {
-              type: 'requestJobTrace',
-            },
-            {
-              type: 'receiveJobTraceSuccess',
-              payload: {
-                html: 'html',
-              },
-            },
+            { type: 'requestJobTrace' },
+            { type: 'receiveJobTraceSuccess', payload: { html: 'html' } },
           ],
           done,
         );
@@ -580,9 +400,7 @@ describe('IDE pipelines actions', () => {
           dispatch() {},
         });
         expect(axios.get).toHaveBeenCalledWith(`${TEST_HOST}/project/builds/trace`, {
-          params: {
-            format: 'json',
-          },
+          params: { format: 'json' },
         });
       });
     });
@@ -598,14 +416,7 @@ describe('IDE pipelines actions', () => {
           null,
           mockedState,
           [],
-          [
-            {
-              type: 'requestJobTrace',
-            },
-            {
-              type: 'receiveJobTraceError',
-            },
-          ],
+          [{ type: 'requestJobTrace' }, { type: 'receiveJobTraceError' }],
           done,
         );
       });
@@ -619,14 +430,8 @@ describe('IDE pipelines actions', () => {
         null,
         mockedState,
         [
-          {
-            type: types.RECEIVE_LASTEST_PIPELINE_SUCCESS,
-            payload: null,
-          },
-          {
-            type: types.SET_DETAIL_JOB,
-            payload: null,
-          },
+          { type: types.RECEIVE_LASTEST_PIPELINE_SUCCESS, payload: null },
+          { type: types.SET_DETAIL_JOB, payload: null },
         ],
         [],
         done,

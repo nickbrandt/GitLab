@@ -21,12 +21,8 @@ describe('IDE branches actions', () => {
   beforeEach(() => {
     mockedContext = {
       dispatch() {},
-      rootState: {
-        currentProjectId: projectData.name_with_namespace,
-      },
-      rootGetters: {
-        currentProject: projectData,
-      },
+      rootState: { currentProjectId: projectData.name_with_namespace },
+      rootGetters: { currentProject: projectData },
       state: state(),
     };
 
@@ -51,11 +47,7 @@ describe('IDE branches actions', () => {
         requestBranches,
         null,
         mockedContext.state,
-        [
-          {
-            type: types.REQUEST_BRANCHES,
-          },
-        ],
+        [{ type: types.REQUEST_BRANCHES }],
         [],
         done,
       );
@@ -66,15 +58,9 @@ describe('IDE branches actions', () => {
     it('should commit error', done => {
       testAction(
         receiveBranchesError,
-        {
-          search: TEST_SEARCH,
-        },
+        { search: TEST_SEARCH },
         mockedContext.state,
-        [
-          {
-            type: types.RECEIVE_BRANCHES_ERROR,
-          },
-        ],
+        [{ type: types.RECEIVE_BRANCHES_ERROR }],
         [
           {
             type: 'setErrorMessage',
@@ -82,9 +68,7 @@ describe('IDE branches actions', () => {
               text: 'Error loading branches.',
               action: expect.any(Function),
               actionText: 'Please try again',
-              actionPayload: {
-                search: TEST_SEARCH,
-              },
+              actionPayload: { search: TEST_SEARCH },
             },
           },
         ],
@@ -99,12 +83,7 @@ describe('IDE branches actions', () => {
         receiveBranchesSuccess,
         branches,
         mockedContext.state,
-        [
-          {
-            type: types.RECEIVE_BRANCHES_SUCCESS,
-            payload: branches,
-          },
-        ],
+        [{ type: types.RECEIVE_BRANCHES_SUCCESS, payload: branches }],
         [],
         done,
       );
@@ -124,37 +103,23 @@ describe('IDE branches actions', () => {
       it('calls API with params', () => {
         const apiSpy = jest.spyOn(axios, 'get');
 
-        fetchBranches(mockedContext, {
-          search: TEST_SEARCH,
-        });
+        fetchBranches(mockedContext, { search: TEST_SEARCH });
 
         expect(apiSpy).toHaveBeenCalledWith(expect.anything(), {
-          params: expect.objectContaining({
-            search: TEST_SEARCH,
-            sort: 'updated_desc',
-          }),
+          params: expect.objectContaining({ search: TEST_SEARCH, sort: 'updated_desc' }),
         });
       });
 
       it('dispatches success with received data', done => {
         testAction(
           fetchBranches,
-          {
-            search: TEST_SEARCH,
-          },
+          { search: TEST_SEARCH },
           mockedState,
           [],
           [
-            {
-              type: 'requestBranches',
-            },
-            {
-              type: 'resetBranches',
-            },
-            {
-              type: 'receiveBranchesSuccess',
-              payload: branches,
-            },
+            { type: 'requestBranches' },
+            { type: 'resetBranches' },
+            { type: 'receiveBranchesSuccess', payload: branches },
           ],
           done,
         );
@@ -169,24 +134,13 @@ describe('IDE branches actions', () => {
       it('dispatches error', done => {
         testAction(
           fetchBranches,
-          {
-            search: TEST_SEARCH,
-          },
+          { search: TEST_SEARCH },
           mockedState,
           [],
           [
-            {
-              type: 'requestBranches',
-            },
-            {
-              type: 'resetBranches',
-            },
-            {
-              type: 'receiveBranchesError',
-              payload: {
-                search: TEST_SEARCH,
-              },
-            },
+            { type: 'requestBranches' },
+            { type: 'resetBranches' },
+            { type: 'receiveBranchesError', payload: { search: TEST_SEARCH } },
           ],
           done,
         );
@@ -199,11 +153,7 @@ describe('IDE branches actions', () => {
           resetBranches,
           null,
           mockedContext.state,
-          [
-            {
-              type: types.RESET_BRANCHES,
-            },
-          ],
+          [{ type: types.RESET_BRANCHES }],
           [],
           done,
         );

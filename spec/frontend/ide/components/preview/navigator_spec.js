@@ -13,16 +13,9 @@ describe('IDE clientside preview navigator', () => {
   });
 
   beforeEach(() => {
-    manager = {
-      bundlerURL: TEST_HOST,
-      iframe: {
-        src: '',
-      },
-    };
+    manager = { bundlerURL: TEST_HOST, iframe: { src: '' } };
 
-    vm = mountComponent(Component, {
-      manager,
-    });
+    vm = mountComponent(Component, { manager });
   });
 
   afterEach(() => {
@@ -76,49 +69,35 @@ describe('IDE clientside preview navigator', () => {
 
   describe('onUrlChange', () => {
     it('updates the path', () => {
-      vm.onUrlChange({
-        url: `${TEST_HOST}/url`,
-      });
+      vm.onUrlChange({ url: `${TEST_HOST}/url` });
 
       expect(vm.path).toBe('/url');
     });
 
     it('sets currentBrowsingIndex 0 if not already set', () => {
-      vm.onUrlChange({
-        url: `${TEST_HOST}/url`,
-      });
+      vm.onUrlChange({ url: `${TEST_HOST}/url` });
 
       expect(vm.currentBrowsingIndex).toBe(0);
     });
 
     it('increases currentBrowsingIndex if path doesnt match', () => {
-      vm.onUrlChange({
-        url: `${TEST_HOST}/url`,
-      });
+      vm.onUrlChange({ url: `${TEST_HOST}/url` });
 
-      vm.onUrlChange({
-        url: `${TEST_HOST}/url2`,
-      });
+      vm.onUrlChange({ url: `${TEST_HOST}/url2` });
 
       expect(vm.currentBrowsingIndex).toBe(1);
     });
 
     it('does not increase currentBrowsingIndex if path matches', () => {
-      vm.onUrlChange({
-        url: `${TEST_HOST}/url`,
-      });
+      vm.onUrlChange({ url: `${TEST_HOST}/url` });
 
-      vm.onUrlChange({
-        url: `${TEST_HOST}/url`,
-      });
+      vm.onUrlChange({ url: `${TEST_HOST}/url` });
 
       expect(vm.currentBrowsingIndex).toBe(0);
     });
 
     it('pushes path into navigation stack', () => {
-      vm.onUrlChange({
-        url: `${TEST_HOST}/url`,
-      });
+      vm.onUrlChange({ url: `${TEST_HOST}/url` });
 
       expect(vm.navigationStack).toEqual(['/url']);
     });

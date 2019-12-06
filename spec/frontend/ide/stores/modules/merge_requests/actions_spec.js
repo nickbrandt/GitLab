@@ -19,9 +19,7 @@ describe('IDE merge requests actions', () => {
 
   beforeEach(() => {
     mockedState = state();
-    mockedRootState = {
-      currentProjectId: 7,
-    };
+    mockedRootState = { currentProjectId: 7 };
     mock = new MockAdapter(axios);
   });
 
@@ -35,11 +33,7 @@ describe('IDE merge requests actions', () => {
         requestMergeRequests,
         null,
         mockedState,
-        [
-          {
-            type: types.REQUEST_MERGE_REQUESTS,
-          },
-        ],
+        [{ type: types.REQUEST_MERGE_REQUESTS }],
         [],
         done,
       );
@@ -50,16 +44,9 @@ describe('IDE merge requests actions', () => {
     it('should commit error', done => {
       testAction(
         receiveMergeRequestsError,
-        {
-          type: 'created',
-          search: '',
-        },
+        { type: 'created', search: '' },
         mockedState,
-        [
-          {
-            type: types.RECEIVE_MERGE_REQUESTS_ERROR,
-          },
-        ],
+        [{ type: types.RECEIVE_MERGE_REQUESTS_ERROR }],
         [
           {
             type: 'setErrorMessage',
@@ -67,10 +54,7 @@ describe('IDE merge requests actions', () => {
               text: 'Error loading merge requests.',
               action: expect.any(Function),
               actionText: 'Please try again',
-              actionPayload: {
-                type: 'created',
-                search: '',
-              },
+              actionPayload: { type: 'created', search: '' },
             },
           },
         ],
@@ -85,12 +69,7 @@ describe('IDE merge requests actions', () => {
         receiveMergeRequestsSuccess,
         mergeRequests,
         mockedState,
-        [
-          {
-            type: types.RECEIVE_MERGE_REQUESTS_SUCCESS,
-            payload: mergeRequests,
-          },
-        ],
+        [{ type: types.RECEIVE_MERGE_REQUESTS_SUCCESS, payload: mergeRequests }],
         [],
         done,
       );
@@ -116,16 +95,10 @@ describe('IDE merge requests actions', () => {
             state: mockedState,
             rootState: mockedRootState,
           },
-          {
-            type: 'created',
-          },
+          { type: 'created' },
         );
         expect(apiSpy).toHaveBeenCalledWith(expect.anything(), {
-          params: {
-            scope: 'created-by-me',
-            state: 'opened',
-            search: '',
-          },
+          params: { scope: 'created-by-me', state: 'opened', search: '' },
         });
       });
 
@@ -138,39 +111,23 @@ describe('IDE merge requests actions', () => {
             state: mockedState,
             rootState: mockedRootState,
           },
-          {
-            type: 'created',
-            search: 'testing search',
-          },
+          { type: 'created', search: 'testing search' },
         );
         expect(apiSpy).toHaveBeenCalledWith(expect.anything(), {
-          params: {
-            scope: 'created-by-me',
-            state: 'opened',
-            search: 'testing search',
-          },
+          params: { scope: 'created-by-me', state: 'opened', search: 'testing search' },
         });
       });
 
       it('dispatches success with received data', done => {
         testAction(
           fetchMergeRequests,
-          {
-            type: 'created',
-          },
+          { type: 'created' },
           mockedState,
           [],
           [
-            {
-              type: 'requestMergeRequests',
-            },
-            {
-              type: 'resetMergeRequests',
-            },
-            {
-              type: 'receiveMergeRequestsSuccess',
-              payload: mergeRequests,
-            },
+            { type: 'requestMergeRequests' },
+            { type: 'resetMergeRequests' },
+            { type: 'receiveMergeRequestsSuccess', payload: mergeRequests },
           ],
           done,
         );
@@ -191,41 +148,24 @@ describe('IDE merge requests actions', () => {
             state: mockedState,
             rootState: mockedRootState,
           },
-          {
-            type: null,
-            search: 'testing search',
-          },
+          { type: null, search: 'testing search' },
         );
         expect(apiSpy).toHaveBeenCalledWith(
           expect.stringMatching(`projects/${mockedRootState.currentProjectId}/merge_requests`),
-          {
-            params: {
-              state: 'opened',
-              search: 'testing search',
-            },
-          },
+          { params: { state: 'opened', search: 'testing search' } },
         );
       });
 
       it('dispatches success with received data', done => {
         testAction(
           fetchMergeRequests,
-          {
-            type: null,
-          },
+          { type: null },
           { ...mockedState, ...mockedRootState },
           [],
           [
-            {
-              type: 'requestMergeRequests',
-            },
-            {
-              type: 'resetMergeRequests',
-            },
-            {
-              type: 'receiveMergeRequestsSuccess',
-              payload: mergeRequests,
-            },
+            { type: 'requestMergeRequests' },
+            { type: 'resetMergeRequests' },
+            { type: 'receiveMergeRequestsSuccess', payload: mergeRequests },
           ],
           done,
         );
@@ -240,26 +180,13 @@ describe('IDE merge requests actions', () => {
       it('dispatches error', done => {
         testAction(
           fetchMergeRequests,
-          {
-            type: 'created',
-            search: '',
-          },
+          { type: 'created', search: '' },
           mockedState,
           [],
           [
-            {
-              type: 'requestMergeRequests',
-            },
-            {
-              type: 'resetMergeRequests',
-            },
-            {
-              type: 'receiveMergeRequestsError',
-              payload: {
-                type: 'created',
-                search: '',
-              },
-            },
+            { type: 'requestMergeRequests' },
+            { type: 'resetMergeRequests' },
+            { type: 'receiveMergeRequestsError', payload: { type: 'created', search: '' } },
           ],
           done,
         );
@@ -273,11 +200,7 @@ describe('IDE merge requests actions', () => {
         resetMergeRequests,
         null,
         mockedState,
-        [
-          {
-            type: types.RESET_MERGE_REQUESTS,
-          },
-        ],
+        [{ type: types.RESET_MERGE_REQUESTS }],
         [],
         done,
       );
