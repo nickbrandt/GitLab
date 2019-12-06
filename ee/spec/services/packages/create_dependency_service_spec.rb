@@ -24,6 +24,11 @@ describe Packages::CreateDependencyService do
       subject { described_class.new(package, dependencies).execute }
 
       it 'creates dependencies and links' do
+        expect(Packages::Dependency)
+            .to receive(:ids_for_package_names_and_version_patterns)
+            .once
+            .and_call_original
+
         expect { subject }
           .to change { Packages::Dependency.count }.by(1)
           .and change { Packages::DependencyLink.count }.by(1)
@@ -35,11 +40,39 @@ describe Packages::CreateDependencyService do
         let(:json_file) { 'npm/payload_with_duplicated_packages.json' }
 
         it 'creates dependencies and links' do
+          expect(Packages::Dependency)
+            .to receive(:ids_for_package_names_and_version_patterns)
+            .exactly(5).times
+            .and_call_original
+
           expect { subject }
             .to change { Packages::Dependency.count }.by(4)
             .and change { Packages::DependencyLink.count }.by(7)
           expect(dependency_names).to match_array(%w(d3 d3 d3 dagre-d3 dagre-d3 express express))
           expect(dependency_link_types).to match_array(%w(bundleDependencies dependencies dependencies deprecated devDependencies devDependencies peerDependencies))
+        end
+      end
+
+      context 'with dependencies bulk insert conflicts' do
+        let_it_be(:rows) { [{ name: 'express', version_pattern: '^4.16.4' }] }
+
+        it 'creates dependences and links' do
+          original_bulk_insert = ::Gitlab::Database.method(:bulk_insert)
+          expect(::Gitlab::Database)
+            .to receive(:bulk_insert) do |table, rows, return_ids: false, disable_quote: [], on_conflict: nil|
+              call_count = table == Packages::Dependency.table_name ? 2 : 1
+              call_count.times { original_bulk_insert.call(table, rows, return_ids: return_ids, disable_quote: disable_quote, on_conflict: on_conflict) }
+            end.twice
+          expect(Packages::Dependency)
+            .to receive(:ids_for_package_names_and_version_patterns)
+            .twice
+            .and_call_original
+
+          expect { subject }
+            .to change { Packages::Dependency.count }.by(1)
+            .and change { Packages::DependencyLink.count }.by(1)
+          expect(dependency_names).to match_array(%w(express))
+          expect(dependency_link_types).to match_array(%w(dependencies))
         end
       end
 

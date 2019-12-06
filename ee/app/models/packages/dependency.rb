@@ -10,7 +10,7 @@ class Packages::Dependency < ApplicationRecord
   MAX_STRING_LENGTH = 255.freeze
   MAX_CHUNKED_QUERIES_COUNT = 10.freeze
 
-  def self.for_package_names_and_version_patterns(names_and_version_patterns = {}, chunk_size = 50, max_rows_limit = 200)
+  def self.ids_for_package_names_and_version_patterns(names_and_version_patterns = {}, chunk_size = 50, max_rows_limit = 200)
     names_and_version_patterns.reject! { |key, value| key.size > MAX_STRING_LENGTH || value.size > MAX_STRING_LENGTH }
     raise ArgumentError, 'Too many names_and_version_patterns' if names_and_version_patterns.size > MAX_CHUNKED_QUERIES_COUNT * chunk_size
 
@@ -26,9 +26,15 @@ class Packages::Dependency < ApplicationRecord
       raise ArgumentError, 'Too many Dependencies selected' if matched_ids.size > max_rows_limit
     end
 
-    return none if matched_ids.empty?
+    matched_ids
+  end
 
-    where(id: matched_ids)
+  def self.for_package_names_and_version_patterns(names_and_version_patterns = {}, chunk_size = 50, max_rows_limit = 200)
+    ids = ids_for_package_names_and_version_patterns(names_and_version_patterns, chunk_size, max_rows_limit)
+
+    return none if ids.empty?
+
+    id_in(ids)
   end
 
   def self.pluck_ids_and_names

@@ -19,12 +19,12 @@ module Packages
     def create_dependency(type)
       return unless dependencies.key?(type)
 
-      names_and_version_patterns = dependencies[type].to_a
+      names_and_version_patterns = dependencies[type]
       existing_ids, existing_names = find_existing_ids_and_names(names_and_version_patterns)
       dependencies_to_insert = names_and_version_patterns
 
       if existing_names.any?
-        dependencies_to_insert = names_and_version_patterns.reject { |e| e.first.in?(existing_names) }
+        dependencies_to_insert = names_and_version_patterns.reject { |k, _| k.in?(existing_names) }
       end
 
       ActiveRecord::Base.transaction do
@@ -51,7 +51,16 @@ module Packages
         }
       end
 
-      database.bulk_insert(Packages::Dependency.table_name, rows, return_ids: true)
+      ids = database.bulk_insert(Packages::Dependency.table_name, rows, return_ids: true, on_conflict: :do_nothing)
+      return ids if ids.size == names_and_version_patterns.size
+
+      Packages::Dependency.uncached do
+        # The bulk_insert statement above do not dirty the query cache. To make
+        # sure that the results are fresh from the database and not from a stalled
+        # and potentially wrong cache, this query has to be done with the query
+        # chache disabled.
+        Packages::Dependency.ids_for_package_names_and_version_patterns(names_and_version_patterns)
+      end
     end
 
     def bulk_insert_package_dependency_links(type, dependency_ids)
