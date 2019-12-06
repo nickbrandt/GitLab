@@ -45,9 +45,11 @@ module Projects
 
       def move_repositories
         result = move_repository(old_disk_path, new_disk_path)
+        project.reload_repository!
 
         if move_wiki
           result &&= move_repository(old_wiki_disk_path, new_wiki_disk_path)
+          project.clear_memoization(:wiki)
         end
 
         result
