@@ -126,5 +126,14 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         end
       end
     end
+
+    it 'restores `protected_environments` with `deploy_access_levels`' do
+      aggregate_failures do
+        expect(project.protected_environments.count).to eq(1)
+
+        protected_env = project.protected_environments.first
+        expect(protected_env.deploy_access_levels.count).to eq(1)
+      end
+    end
   end
 end
