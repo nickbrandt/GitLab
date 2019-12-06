@@ -1,8 +1,8 @@
 import state from 'ee/feature_flags/store/modules/index/state';
 import mutations from 'ee/feature_flags/store/modules/index/mutations';
 import * as types from 'ee/feature_flags/store/modules/index/mutation_types';
-import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { mapToScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
+import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { getRequestData, rotateData } from '../../mock_data';
 
 describe('Feature flags store Mutations', () => {

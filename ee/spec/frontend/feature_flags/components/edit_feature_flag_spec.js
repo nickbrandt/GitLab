@@ -1,10 +1,10 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import { TEST_HOST } from 'spec/test_constants';
 import Form from 'ee/feature_flags/components/form.vue';
 import editModule from 'ee/feature_flags/store/modules/edit';
 import EditFeatureFlag from 'ee/feature_flags/components/edit_feature_flag.vue';
+import { TEST_HOST } from 'spec/test_constants';
 import axios from '~/lib/utils/axios_utils';
 
 const localVue = createLocalVue();
