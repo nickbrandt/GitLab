@@ -220,6 +220,8 @@ class PagesDomain < ApplicationRecord
 
   # rubocop: disable CodeReuse/ServiceClass
   def update_daemon
+    return if domain_type_instance?
+
     ::Projects::UpdatePagesConfigurationService.new(project).execute
   end
   # rubocop: enable CodeReuse/ServiceClass

@@ -315,6 +315,14 @@ describe PagesDomain do
   end
 
   describe '#update_daemon' do
+    context 'when domain_type is instance' do
+      it 'does nothing' do
+        expect(Projects::UpdatePagesConfigurationService).not_to receive(:new)
+
+        create(:pages_domain, domain_type: :instance)
+      end
+    end
+
     it 'runs when the domain is created' do
       domain = build(:pages_domain)
 
