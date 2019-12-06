@@ -721,6 +721,10 @@ module Ci
       artifacts_expire_at.present? && artifacts_expire_at > Time.now
     end
 
+    def has_expiring_archive_artifacts?
+      has_expiring_artifacts? && artifacts_file&.exists?
+    end
+
     def keep_artifacts!
       self.update(artifacts_expire_at: nil)
       self.job_artifacts.update_all(expire_at: nil)
