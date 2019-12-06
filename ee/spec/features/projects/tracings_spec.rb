@@ -31,7 +31,7 @@ describe 'Tracings Content Security Policy' do
   context 'when a global CSP config exists' do
     before do
       csp = ActionDispatch::ContentSecurityPolicy.new do |p|
-        p.frame_src :self, 'https://should-get-overwritten.com'
+        p.frame_src 'https://global-policy.com'
       end
 
       expect_next_instance_of(Projects::TracingsController) do |controller|
@@ -39,10 +39,22 @@ describe 'Tracings Content Security Policy' do
       end
     end
 
-    it 'overwrites frame-src' do
-      visit project_tracing_path(project)
+    context 'when external_url is set' do
+      let!(:project_tracing_setting) { create(:project_tracing_setting, project: project) }
 
-      is_expected.to eq("frame-src *")
+      it 'overwrites frame-src' do
+        visit project_tracing_path(project)
+
+        is_expected.to eq("frame-src https://example.com")
+      end
+    end
+
+    context 'when external_url is not set' do
+      it 'uses global policy' do
+        visit project_tracing_path(project)
+
+        is_expected.to eq("frame-src https://global-policy.com")
+      end
     end
   end
 end
