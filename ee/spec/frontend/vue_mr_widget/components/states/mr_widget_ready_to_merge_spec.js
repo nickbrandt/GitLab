@@ -1,5 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { MERGE_DISABLED_TEXT_UNAPPROVED } from 'ee/vue_merge_request_widget/mixins/ready_to_merge';
+import MergeImmediatelyConfirmationDialog from 'ee/vue_merge_request_widget/components/merge_immediately_confirmation_dialog.vue';
 import ReadyToMerge from '~/vue_merge_request_widget/components/states/ready_to_merge.vue';
 import {
   MWPS_MERGE_STRATEGY,
@@ -38,6 +39,7 @@ describe('ReadyToMerge', () => {
     targetBranch: 'master',
     preferredAutoMergeStrategy: MWPS_MERGE_STRATEGY,
     availableAutoMergeStrategies: [MWPS_MERGE_STRATEGY],
+    mergeImmediatelyDocsPath: 'path/to/merge/immediately/docs',
   };
 
   const factory = (mrUpdates = {}) => {
@@ -48,6 +50,9 @@ describe('ReadyToMerge', () => {
       },
       localVue,
       sync: false,
+      stubs: {
+        MergeImmediatelyConfirmationDialog,
+      },
     });
 
     ({ vm } = wrapper);
@@ -55,6 +60,8 @@ describe('ReadyToMerge', () => {
 
   const findResolveItemsMessage = () => wrapper.find('.js-resolve-mr-widget-items-message');
   const findMergeButton = () => wrapper.find('.qa-merge-button');
+  const findMergeButtonDropdown = () => wrapper.find('.js-merge-moment');
+  const findMergeImmediatelyButton = () => wrapper.find('.js-merge-immediately-button');
 
   afterEach(() => {
     wrapper.destroy();
@@ -145,6 +152,20 @@ describe('ReadyToMerge', () => {
         expect(vm.autoMergeText).toEqual('Add to merge train when pipeline succeeds');
       });
     });
+
+    describe('isMergeImmediatelyDangerous', () => {
+      it('should return false if the preferred auto merge strategy is not merge trains', () => {
+        factory({ preferredAutoMergeStrategy: MWPS_MERGE_STRATEGY });
+
+        expect(vm.isMergeImmediatelyDangerous).toBe(false);
+      });
+
+      it('should return true if the preferred auto merge strategy is merge trains', () => {
+        factory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY });
+
+        expect(vm.isMergeImmediatelyDangerous).toBe(true);
+      });
+    });
   });
 
   describe('shouldShowMergeImmediatelyDropdown', () => {
@@ -183,6 +204,45 @@ describe('ReadyToMerge', () => {
       });
 
       expect(vm.shouldShowMergeImmediatelyDropdown).toBe(true);
+    });
+  });
+
+  describe('merge immediately warning dialog', () => {
+    let dialog;
+
+    const clickMergeImmediately = () => {
+      dialog = wrapper.find(MergeImmediatelyConfirmationDialog);
+
+      expect(dialog.exists()).toBe(true);
+      dialog.vm.show = jest.fn();
+      vm.handleMergeButtonClick = jest.fn();
+      findMergeButtonDropdown().trigger('click');
+      findMergeImmediatelyButton().trigger('click');
+    };
+
+    it('should show a warning dialog asking for confirmation if the user is trying to skip the merge train', () => {
+      factory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY });
+      clickMergeImmediately();
+
+      expect(dialog.vm.show).toHaveBeenCalled();
+      expect(vm.handleMergeButtonClick).not.toHaveBeenCalled();
+    });
+
+    it('should perform the merge when the user confirms their intent to merge immediately', () => {
+      factory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY });
+      clickMergeImmediately();
+
+      dialog.vm.$emit('mergeImmediately');
+
+      expect(vm.handleMergeButtonClick).toHaveBeenCalled();
+    });
+
+    it('should not ask for confirmation in non-merge train scenarios', () => {
+      factory({ isPipelineActive: true, onlyAllowMergeIfPipelineSucceeds: false });
+      clickMergeImmediately();
+
+      expect(dialog.vm.show).not.toHaveBeenCalled();
+      expect(vm.handleMergeButtonClick).toHaveBeenCalled();
     });
   });
 

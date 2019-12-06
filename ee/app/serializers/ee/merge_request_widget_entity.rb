@@ -150,6 +150,10 @@ module EE
         presenter(merge_request).merge_train_when_pipeline_succeeds_docs_path
       end
 
+      expose :merge_immediately_docs_path do |merge_request|
+        presenter(merge_request).merge_immediately_docs_path
+      end
+
       expose :blocking_merge_requests, if: -> (mr, _) { mr&.target_project&.feature_available?(:blocking_merge_requests) }
 
       private
