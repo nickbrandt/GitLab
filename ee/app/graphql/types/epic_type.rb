@@ -38,6 +38,9 @@ module Types
     field :due_date_fixed, Types::TimeType, null: true, authorize: :admin_epic # rubocop:disable Graphql/Descriptions
     field :due_date_from_milestones, Types::TimeType, null: true, authorize: :admin_epic # rubocop:disable Graphql/Descriptions
 
+    field :upvotes, GraphQL::INT_TYPE, null: false, description: 'Number of upvotes the epic has received'
+    field :downvotes, GraphQL::INT_TYPE, null: false, description: 'Number of downvotes the epic has received'
+
     field :closed_at, Types::TimeType, null: true # rubocop:disable Graphql/Descriptions
     field :created_at, Types::TimeType, null: true # rubocop:disable Graphql/Descriptions
     field :updated_at, Types::TimeType, null: true # rubocop:disable Graphql/Descriptions
