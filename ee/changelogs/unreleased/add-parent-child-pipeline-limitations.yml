@@ -1,0 +1,5 @@
+---
+title: Prevent a child pipeline to create further child pipelines
+merge_request: 22675
+author:
+type: added

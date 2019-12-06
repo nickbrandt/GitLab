@@ -45,6 +45,13 @@ module Ci
         return false
       end
 
+      # TODO: Remove this condition if favour of model validation
+      # https://gitlab.com/gitlab-org/gitlab/issues/38338
+      if @bridge.triggers_child_pipeline? && @bridge.pipeline.parent_pipeline.present?
+        @bridge.drop!(:bridge_pipeline_is_child_pipeline)
+        return false
+      end
+
       unless can_create_downstream_pipeline?(target_ref)
         @bridge.drop!(:insufficient_bridge_permissions)
         return false
