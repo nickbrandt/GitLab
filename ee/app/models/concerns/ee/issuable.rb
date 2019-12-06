@@ -18,18 +18,6 @@ module EE
       end
     end
 
-    override :milestone_available?
-    def milestone_available?
-      return true if is_a?(Epic)
-
-      super
-    end
-
-    override :supports_milestone?
-    def supports_milestone?
-      super && !is_a?(Epic)
-    end
-
     def supports_epic?
       is_a?(Issue) && project.group
     end
