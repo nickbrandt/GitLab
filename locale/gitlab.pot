@@ -11461,6 +11461,9 @@ msgstr ""
 msgid "New branch unavailable"
 msgstr ""
 
+msgid "New changes were added. %{linkStart}Reload the page to review them%{linkEnd}"
+msgstr ""
+
 msgid "New deploy key"
 msgstr ""
 
