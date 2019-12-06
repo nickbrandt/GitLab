@@ -15,3 +15,6 @@ export const ADD_IMAGE_DIFF_NOTE_ERROR = s__(
 export const UPLOAD_DESIGN_ERROR = s__(
   'DesignManagement|Error uploading a new design. Please try again',
 );
+export const DESIGN_NOT_FOUND_ERROR = s__(
+  'DesignManagement|Could not find design, please try again.',
+);

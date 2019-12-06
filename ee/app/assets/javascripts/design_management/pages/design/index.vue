@@ -3,6 +3,7 @@ import { ApolloMutation } from 'vue-apollo';
 import Mousetrap from 'mousetrap';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import createFlash from '~/flash';
 import allVersionsMixin from '../../mixins/all_versions';
 import Toolbar from '../../components/toolbar/index.vue';
 import DesignImage from '../../components/image.vue';
@@ -19,7 +20,7 @@ import {
   createDesignDetailFlash,
 } from '../../utils/design_management_utils';
 import { updateStoreAfterAddImageDiffNote } from '../../utils/cache_update';
-import { ADD_DISCUSSION_COMMENT_ERROR } from '../../utils/error_messages';
+import { ADD_DISCUSSION_COMMENT_ERROR, DESIGN_NOT_FOUND_ERROR } from '../../utils/error_messages';
 import DESIGN_DETAIL_CONTAINER_CLASS from '../../utils/constants';
 
 export default {
@@ -71,13 +72,14 @@ export default {
       update: data => extractDesign(data),
       result({ data }) {
         if (!data) {
-          createDesignDetailFlash(s__('DesignManagement|Could not find design, please try again.'));
-          this.$router.push({ name: 'designs' });
+          this.onQueryError(DESIGN_NOT_FOUND_ERROR);
         }
         if (this.$route.query.version && !this.hasValidVersion) {
-          createDesignDetailFlash(s__('DesignManagement|Requested design version does not exist'));
-          this.$router.push({ name: 'designs' });
+          this.onQueryError(s__('DesignManagement|Requested design version does not exist'));
         }
+      },
+      error() {
+        this.onQueryError(DESIGN_NOT_FOUND_ERROR);
       },
     },
   },
@@ -147,6 +149,12 @@ export default {
         getDesignQuery,
         this.designVariables,
       );
+    },
+    onQueryError(message) {
+      // because we redirect user to /designs (the issue page),
+      // we want to create these flashes on the issue page
+      createFlash(message);
+      this.$router.push({ name: 'designs' });
     },
     onMutationError(e) {
       createDesignDetailFlash(ADD_DISCUSSION_COMMENT_ERROR);
