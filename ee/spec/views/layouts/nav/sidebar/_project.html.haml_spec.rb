@@ -148,6 +148,10 @@ describe 'layouts/nav/sidebar/_project' do
         expect(rendered).to have_link('Security Dashboard', href: project_security_dashboard_path(project))
       end
 
+      it 'security configuration link is visible' do
+        expect(rendered).to have_link('Configuration', href: project_security_configuration_path(project))
+      end
+
       it 'dependency list link is visible' do
         expect(rendered).to have_link('Dependency List', href: project_dependencies_path(project))
       end
@@ -163,6 +167,10 @@ describe 'layouts/nav/sidebar/_project' do
 
       it 'security dashboard link is visible' do
         expect(rendered).to have_link('Security Dashboard', href: project_security_dashboard_path(project))
+      end
+
+      it 'security configuration link is visible' do
+        expect(rendered).to have_link('Configuration', href: project_security_configuration_path(project))
       end
 
       it 'dependency list link is not visible' do
@@ -182,6 +190,10 @@ describe 'layouts/nav/sidebar/_project' do
         expect(rendered).not_to have_link('Security Dashboard', href: project_security_dashboard_path(project))
       end
 
+      it 'security configuration link is not visible' do
+        expect(rendered).not_to have_link('Configuration', href: project_security_configuration_path(project))
+      end
+
       it 'dependency list link is visible' do
         expect(rendered).to have_link('Dependency List', href: project_dependencies_path(project))
       end
@@ -197,6 +209,10 @@ describe 'layouts/nav/sidebar/_project' do
 
       it 'security dashboard link is not visible' do
         expect(rendered).not_to have_link('Security Dashboard', href: project_security_dashboard_path(project))
+      end
+
+      it 'security configuration link is not visible' do
+        expect(rendered).not_to have_link('Configuration', href: project_security_configuration_path(project))
       end
 
       it 'dependency list link is not visible' do
