@@ -125,6 +125,7 @@ module.exports = {
     publicPath: '/assets/webpack/',
     filename: IS_PRODUCTION ? '[name].[chunkhash:8].bundle.js' : '[name].bundle.js',
     chunkFilename: IS_PRODUCTION ? '[name].[chunkhash:8].chunk.js' : '[name].chunk.js',
+    sourceMapFilename: IS_PRODUCTION ? '[name].[chunkhash:8].chunk.js.map' : '[name].chunk.js.map',
     globalObject: 'this', // allow HMR and web workers to play nice
   },
 
