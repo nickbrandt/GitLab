@@ -13,7 +13,8 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
     # that we know that we don't want to inherit
     # as they do not have sense in context of Bridge
     let(:ignored_inheritable_columns) do
-      %i[before_script after_script image services cache interruptible timeout retry]
+      %i[before_script after_script image services cache interruptible timeout
+         retry tags]
     end
   end
 
