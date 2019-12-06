@@ -19,4 +19,18 @@ describe API::Helpers::Pagination do
       expect(result).to eq(expected_result)
     end
   end
+
+  describe '#paginate_and_retrieve!' do
+    let(:relation) { double("relation") }
+
+    let(:paginated_result) { double }
+    let(:result) { double }
+
+    it 'applies pagination and returns an array' do
+      expect(subject).to receive(:paginate).with(relation).and_return(paginated_result)
+      expect(paginated_result).to receive(:to_a).and_return(result)
+
+      expect(subject.paginate_and_retrieve!(relation)).to eq(result)
+    end
+  end
 end
