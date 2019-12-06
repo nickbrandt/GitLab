@@ -2,7 +2,6 @@
 import { ApolloMutation } from 'vue-apollo';
 import Mousetrap from 'mousetrap';
 import { GlLoadingIcon } from '@gitlab/ui';
-import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import allVersionsMixin from '../../mixins/all_versions';
 import Toolbar from '../../components/toolbar/index.vue';
@@ -14,12 +13,14 @@ import DesignDestroyer from '../../components/design_destroyer.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
-import { extractDiscussions, extractDesign } from '../../utils/design_management_utils';
+import {
+  extractDiscussions,
+  extractDesign,
+  createDesignDetailFlash,
+} from '../../utils/design_management_utils';
 import { updateStoreAfterAddImageDiffNote } from '../../utils/cache_update';
 import { ADD_DISCUSSION_COMMENT_ERROR } from '../../utils/error_messages';
-
-const createFlash = message =>
-  _createFlash(message, alert, document.querySelector('.design-detail'));
+import DESIGN_DETAIL_CONTAINER_CLASS from '../../utils/constants';
 
 export default {
   components: {
@@ -70,11 +71,11 @@ export default {
       update: data => extractDesign(data),
       result({ data }) {
         if (!data) {
-          createFlash(s__('DesignManagement|Could not find design, please try again.'));
+          createDesignDetailFlash(s__('DesignManagement|Could not find design, please try again.'));
           this.$router.push({ name: 'designs' });
         }
         if (this.$route.query.version && !this.hasValidVersion) {
-          createFlash(s__('DesignManagement|Requested design version does not exist'));
+          createDesignDetailFlash(s__('DesignManagement|Requested design version does not exist'));
           this.$router.push({ name: 'designs' });
         }
       },
@@ -148,7 +149,7 @@ export default {
       );
     },
     onMutationError(e) {
-      createFlash(ADD_DISCUSSION_COMMENT_ERROR);
+      createDesignDetailFlash(ADD_DISCUSSION_COMMENT_ERROR);
       throw e;
     },
     openCommentForm(position) {
@@ -182,12 +183,15 @@ export default {
     next();
   },
   createImageDiffNoteMutation,
+  DESIGN_DETAIL_CONTAINER_CLASS,
 };
 </script>
 
 <template>
   <div
-    class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
+    :class="
+      `${$options.DESIGN_DETAIL_CONTAINER_CLASS} fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row`
+    "
   >
     <gl-loading-icon v-if="isLoading" size="xl" class="align-self-center" />
     <template v-else>
