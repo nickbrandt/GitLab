@@ -215,5 +215,4 @@ describe 'Gcp Cluster', :js do
       expect(page).not_to have_css('.gcp-signup-offer')
     end
   end
-
 end
