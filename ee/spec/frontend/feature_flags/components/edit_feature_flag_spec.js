@@ -77,13 +77,12 @@ describe('Edit feature flag form', () => {
   });
 
   describe('with error', () => {
-    it('should render the error', done => {
+    it('should render the error', () => {
       store.dispatch('edit/receiveUpdateFeatureFlagError', { message: ['The name is required'] });
 
-      wrapper.vm.$nextTick(() => {
+      return wrapper.vm.$nextTick(() => {
         expect(wrapper.find('.alert-danger').exists()).toEqual(true);
         expect(wrapper.find('.alert-danger').text()).toContain('The name is required');
-        done();
       });
     });
   });

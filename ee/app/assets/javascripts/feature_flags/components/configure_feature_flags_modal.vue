@@ -140,7 +140,7 @@ export default {
             v-if="canUserRotateToken"
             v-gl-tooltip.hover
             :title="$options.regenerateInstanceIdTooltip"
-            class="input-group-text js-ff-rotate-token-button"
+            class="input-group-text"
             @click="rotateToken"
           >
             <icon name="retry" />

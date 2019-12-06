@@ -1,6 +1,5 @@
 import Vuex from 'vuex';
-import Vue from 'vue';
-import { createLocalVue, mount } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Form from 'ee/feature_flags/components/form.vue';
 import newModule from 'ee/feature_flags/store/modules/new';
 import NewFeatureFlag from 'ee/feature_flags/components/new_feature_flag.vue';
@@ -19,7 +18,7 @@ describe('New feature flag form', () => {
   });
 
   const factory = () => {
-    wrapper = mount(localVue.extend(NewFeatureFlag), {
+    wrapper = shallowMount(NewFeatureFlag, {
       localVue,
       propsData: {
         endpoint: 'feature_flags.json',
@@ -40,12 +39,11 @@ describe('New feature flag form', () => {
   });
 
   describe('with error', () => {
-    it('should render the error', done => {
+    it('should render the error', () => {
       store.dispatch('new/receiveCreateFeatureFlagError', { message: ['The name is required'] });
-      Vue.nextTick(() => {
+      return wrapper.vm.$nextTick(() => {
         expect(wrapper.find('.alert').exists()).toEqual(true);
         expect(wrapper.find('.alert').text()).toContain('The name is required');
-        done();
       });
     });
   });
@@ -59,17 +57,16 @@ describe('New feature flag form', () => {
   });
 
   it('should render default * row', () => {
-    expect(wrapper.vm.scopes).toEqual([
-      {
-        id: expect.any(String),
-        environmentScope: '*',
-        active: true,
-        rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
-        rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-        rolloutUserIds: [],
-      },
-    ]);
+    const defaultScope = {
+      id: expect.any(String),
+      environmentScope: '*',
+      active: true,
+      rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+      rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
+      rolloutUserIds: [],
+    };
+    expect(wrapper.vm.scopes).toEqual([defaultScope]);
 
-    expect(wrapper.find('.js-scope-all').exists()).toEqual(true);
+    expect(wrapper.find(Form).props('scopes')).toContainEqual(defaultScope);
   });
 });

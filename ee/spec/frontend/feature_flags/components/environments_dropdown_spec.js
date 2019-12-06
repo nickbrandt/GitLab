@@ -1,6 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
-import { createLocalVue, mount } from '@vue/test-utils';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
 import { TEST_HOST } from 'spec/test_constants';
 import axios from '~/lib/utils/axios_utils';
@@ -12,7 +12,7 @@ describe('Feature flags > Environments dropdown ', () => {
   let mock;
 
   const factory = props => {
-    wrapper = mount(localVue.extend(EnvironmentsDropdown), {
+    wrapper = shallowMount(EnvironmentsDropdown, {
       localVue,
       propsData: {
         endpoint: `${TEST_HOST}/environments.json'`,
@@ -78,28 +78,29 @@ describe('Feature flags > Environments dropdown ', () => {
           expect(wrapper.vm.showSuggestions).toEqual(true);
         });
 
-        it('emits even when a suggestion is clicked', () => {
-          jest.spyOn(wrapper.vm, '$emit');
+        it('emits event when a suggestion is clicked', () => {
+          const button = wrapper
+            .findAll(GlButton)
+            .filter(b => b.text() === 'production')
+            .at(0);
+          button.vm.$emit('click');
 
-          wrapper.find('ul button').trigger('click');
-
-          expect(wrapper.vm.$emit).toHaveBeenCalledWith('selectEnvironment', 'production');
+          expect(wrapper.emitted('selectEnvironment')).toEqual([['production']]);
         });
       });
-    });
-  });
+      describe('on click clear button', () => {
+        beforeEach(() => {
+          wrapper.find(GlButton).vm.$emit('click');
+        });
 
-  describe('on click clear button', () => {
-    beforeEach(() => {
-      wrapper.find('.js-clear-search-input').trigger('click');
-    });
+        it('resets filter value', () => {
+          expect(wrapper.vm.filter).toEqual('');
+        });
 
-    it('resets filter value', () => {
-      expect(wrapper.vm.filter).toEqual('');
-    });
-
-    it('closes list of suggestions', () => {
-      expect(wrapper.vm.showSuggestions).toEqual(false);
+        it('closes list of suggestions', () => {
+          expect(wrapper.vm.showSuggestions).toEqual(false);
+        });
+      });
     });
   });
 
@@ -115,10 +116,12 @@ describe('Feature flags > Environments dropdown ', () => {
     });
 
     it('emits create event', () => {
-      jest.spyOn(wrapper.vm, '$emit');
-      wrapper.find('.js-create-button').trigger('click');
+      wrapper
+        .findAll(GlButton)
+        .at(1)
+        .vm.$emit('click');
 
-      expect(wrapper.vm.$emit).toHaveBeenCalledWith('createClicked', 'production');
+      expect(wrapper.emitted('createClicked')).toEqual([['production']]);
     });
   });
 });
