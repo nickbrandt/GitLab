@@ -1,6 +1,6 @@
 import { __, s__, sprintf } from '~/locale';
 
-export const designDeletionError = (singular = true) => {
+export const designDeletionError = ({ singular = true } = {}) => {
   const design = singular ? __('a design') : __('designs');
   return sprintf(s__('DesignManagement|We could not delete %{design}. Please try again.'), {
     design,

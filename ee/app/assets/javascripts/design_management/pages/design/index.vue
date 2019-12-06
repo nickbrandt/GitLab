@@ -20,7 +20,11 @@ import {
   createDesignDetailFlash,
 } from '../../utils/design_management_utils';
 import { updateStoreAfterAddImageDiffNote } from '../../utils/cache_update';
-import { ADD_DISCUSSION_COMMENT_ERROR, DESIGN_NOT_FOUND_ERROR } from '../../utils/error_messages';
+import {
+  ADD_DISCUSSION_COMMENT_ERROR,
+  DESIGN_NOT_FOUND_ERROR,
+  designDeletionError,
+} from '../../utils/error_messages';
 import DESIGN_DETAIL_CONTAINER_CLASS from '../../utils/constants';
 
 export default {
@@ -185,6 +189,12 @@ export default {
         query: this.$route.query,
       });
     },
+    onDesignDeleteError() {
+      const errorMessage = designDeletionError({ singular: true });
+      createDesignDetailFlash(errorMessage);
+
+      this.$router.push({ name: 'designs' });
+    },
   },
   beforeRouteUpdate(to, from, next) {
     this.closeCommentForm();
@@ -209,7 +219,7 @@ export default {
           :project-path="projectPath"
           :iid="issueIid"
           @done="$router.push({ name: 'designs' })"
-          @error="$router.push({ name: 'designs' })"
+          @error="onDesignDeleteError"
         >
           <template v-slot="{ mutate, loading, error }">
             <toolbar
