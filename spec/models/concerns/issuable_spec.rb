@@ -880,7 +880,7 @@ describe Issuable do
 
     let(:mr_1) { create(:merge_request, milestone: milestone_1, target_project: project, source_project: project) }
     let(:mr_2) { create(:merge_request, milestone: milestone_3, target_project: project, source_project: forked_project) }
-    let(:mr_3) { create(:merge_request, target_project: project, source_project: project) }
+    let(:mr_3) { create(:merge_request, source_project: project) }
 
     let_it_be(:issue_items) { Issue.all }
     let(:mr_items) { MergeRequest.all }
