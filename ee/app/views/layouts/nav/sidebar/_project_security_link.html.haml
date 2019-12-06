@@ -32,3 +32,8 @@
       = nav_link(path: 'projects/licenses#show') do
         = link_to project_licenses_path(@project), title: _('License Compliance'), data: { qa_selector: 'licenses_list_link' } do
           %span= _('License Compliance')
+
+    - if project_nav_tab?(:security_configuration)
+      = nav_link(path: 'projects/security/configuration#show') do
+        = link_to project_security_configuration_path(@project), title: _('Configuration'), data: { qa_selector: 'security_configuration_link'} do
+          %span= _('Configuration')
