@@ -12,14 +12,6 @@ class UpdateExistingSubgroupToMatchVisibilityLevelOfParent < ActiveRecord::Migra
   disable_ddl_transaction!
 
   def up
-    update_group_visibility_level
-  end
-
-  def down
-    # no-op
-  end
-
-  def update_group_visibility_level
     group_ids = execute <<~SQL
       SELECT ARRAY_TO_STRING(ARRAY_AGG(id), ',') as ids, min as level FROM (WITH RECURSIVE base_and_descendants AS (
         (SELECT visibility_level AS strictest_parent_level,
@@ -40,13 +32,21 @@ class UpdateExistingSubgroupToMatchVisibilityLevelOfParent < ActiveRecord::Migra
       GROUP BY level
     SQL
 
-    group_ids = group_ids.each do |row|
+    group_ids.each do |row|
       ids = row.fetch('ids', nil)
       level = row.fetch('level')
-      return unless ids
+      next unless ids
+
       execute("UPDATE namespaces
                 SET visibility_level = #{level}
                 WHERE namespaces.id IN (#{ids})")
+
+      logger = Gitlab::BackgroundMigration::Logger.build
+      logger.info(message: "groups were updated to metch visibility level of a parent", groups_ids: ids, parent_level: level)
     end
+  end
+
+  def down
+    # no-op
   end
 end
