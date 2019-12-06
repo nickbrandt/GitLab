@@ -175,6 +175,16 @@ describe PagesDomain do
     it { is_expected.to validate_presence_of(:verification_code) }
   end
 
+  describe 'default values' do
+    it 'defaults wildcard to false' do
+      expect(subject.wildcard).to eq(false)
+    end
+
+    it 'defaults domain_type to project' do
+      expect(subject.domain_type).to eq('project')
+    end
+  end
+
   describe '#verification_code' do
     subject { pages_domain.verification_code }
 

@@ -26,6 +26,8 @@ class PagesDomain < ApplicationRecord
   validate :validate_intermediates, if: ->(domain) { domain.certificate.present? && domain.certificate_changed? }
 
   default_value_for(:auto_ssl_enabled, allow_nil: false) { ::Gitlab::LetsEncrypt.enabled? }
+  default_value_for :domain_type, allow_nil: false, value: :project
+  default_value_for :wildcard, allow_nil: false, value: false
 
   attr_encrypted :key,
     mode: :per_attribute_iv_and_salt,
