@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Layout/SpaceInsideHashLiteralBraces
-# rubocop:disable Layout/SpaceAroundOperators
 # rubocop:disable Metrics/AbcSize
-# rubocop:disable Migration/AddConcurrentForeignKey
-# rubocop:disable Style/WordArray
-# rubocop:disable Migration/AddLimitToStringColumns
 
 class InitSchema < ActiveRecord::Migration[4.2]
   DOWNTIME = true
