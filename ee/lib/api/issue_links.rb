@@ -30,6 +30,8 @@ module API
       params do
         requires :target_project_id, type: String, desc: 'The ID of the target project'
         requires :target_issue_iid, type: Integer, desc: 'The IID of the target issue'
+        optional :link_type, type: String, values: IssueLink.link_types.keys,
+          desc: 'The type of the relation. Ignored unless `issue_link_types` feature flag is enabled.'
       end
       # rubocop: disable CodeReuse/ActiveRecord
       post ':id/issues/:issue_iid/links' do
@@ -37,7 +39,7 @@ module API
         target_issue = find_project_issue(declared_params[:target_issue_iid],
                                           declared_params[:target_project_id])
 
-        create_params = { target_issuable: target_issue }
+        create_params = { target_issuable: target_issue, link_type: params[:link_type] }
 
         result = ::IssueLinks::CreateService
                    .new(source_issue, current_user, create_params)

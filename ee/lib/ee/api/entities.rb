@@ -269,6 +269,7 @@ module EE
 
       class RelatedIssue < ::API::Entities::Issue
         expose :issue_link_id
+        expose :issue_link_type, as: :link_type
       end
 
       class LinkedEpic < Grape::Entity
@@ -395,6 +396,7 @@ module EE
       class IssueLink < Grape::Entity
         expose :source, as: :source_issue, using: ::API::Entities::IssueBasic
         expose :target, as: :target_issue, using: ::API::Entities::IssueBasic
+        expose :link_type
       end
 
       class SpecialBoardFilter < Grape::Entity
