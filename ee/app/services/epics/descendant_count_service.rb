@@ -48,7 +48,8 @@ module Epics
     def accessible_epics
       strong_memoize(:epics) do
         epics = epic.base_and_descendants
-        groups = Epic.groups_user_can_read_epics(epics, current_user)
+        epic_groups = Group.for_epics(epics)
+        groups = Group.groups_user_can_read_epics(epic_groups, current_user, same_root: true)
         epics.in_selected_groups(groups)
       end
     end

@@ -72,6 +72,36 @@ describe Group do
                                         group_not_marked_for_deletion)
       end
     end
+
+    describe '.for_epics' do
+      let_it_be(:epic1) { create(:epic) }
+      let_it_be(:epic2) { create(:epic) }
+
+      shared_examples '.for_epics examples' do
+        it 'returns groups only for selected epics' do
+          epics = ::Epic.where(id: epic1)
+          expect(described_class.for_epics(epics)).to contain_exactly(epic1.group)
+        end
+      end
+
+      context 'with `optimized_groups_user_can_read_epics_method` feature flag' do
+        before do
+          stub_feature_flags(optimized_groups_user_can_read_epics_method: flag_state)
+        end
+
+        context 'enabled' do
+          let(:flag_state) { true }
+
+          include_examples '.for_epics examples'
+        end
+
+        context 'disabled' do
+          let(:flag_state) { false }
+
+          include_examples '.for_epics examples'
+        end
+      end
+    end
   end
 
   describe 'validations' do
@@ -163,6 +193,107 @@ describe Group do
 
         expect(group.ldap_sync_last_update_at)
           .not_to eq(group.ldap_sync_last_successful_update_at)
+      end
+    end
+  end
+
+  describe '.groups_user_can_read_epics' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:private_group) { create(:group, :private) }
+
+    subject do
+      groups = described_class.where(id: private_group.id)
+      described_class.groups_user_can_read_epics(groups, user)
+    end
+
+    it 'does not return inaccessible groups' do
+      expect(subject).to be_empty
+    end
+
+    context 'with authorized user' do
+      before do
+        private_group.add_developer(user)
+      end
+
+      context 'with epics enabled' do
+        before do
+          stub_licensed_features(epics: true)
+        end
+
+        it 'returns epic groups user can access' do
+          expect(subject).to eq [private_group]
+        end
+      end
+
+      context 'with epics disabled' do
+        before do
+          stub_licensed_features(epics: false)
+        end
+
+        it 'returns an empty list' do
+          expect(subject).to be_empty
+        end
+      end
+    end
+
+    context 'getting group root ancestor' do
+      let_it_be(:subgroup1) { create(:group, :private, parent: private_group) }
+      let_it_be(:subgroup2) { create(:group, :private, parent: subgroup1) }
+
+      shared_examples 'group root ancestor' do
+        it 'does not exceed SQL queries count' do
+          groups = described_class.where(id: subgroup1)
+          control_count = ActiveRecord::QueryRecorder.new do
+            described_class.groups_user_can_read_epics(groups, user, params)
+          end.count
+
+          groups = described_class.where(id: [subgroup1, subgroup2])
+          expect { described_class.groups_user_can_read_epics(groups, user, params) }
+            .not_to exceed_query_limit(control_count + extra_query_count)
+        end
+      end
+
+      context 'with `preset_group_root` feature flag disabled' do
+        before do
+          stub_feature_flags(preset_group_root: false)
+        end
+
+        it_behaves_like 'group root ancestor' do
+          let(:params) { {} }
+          let(:extra_query_count) { 6 }
+        end
+      end
+
+      context 'with `preset_group_root` feature flag enabled' do
+        before do
+          stub_feature_flags(preset_group_root: true)
+        end
+
+        context 'when same_root is false' do
+          let(:params) { { same_root: false } }
+
+          # extra 6 queries:
+          # * getting root_ancestor
+          # * getting root ancestor's saml_provider
+          # * check if group has projects
+          # * max_member_access_for_user_from_shared_groups
+          # * max_member_access_for_user
+          # * self_and_ancestors_ids
+          it_behaves_like 'group root ancestor' do
+            let(:extra_query_count) { 6 }
+          end
+        end
+
+        context 'when same_root is true' do
+          let(:params) { { same_root: true } }
+
+          # avoids 2 queries from the list above:
+          # * getting root ancestor
+          # * getting root ancestor's saml_provider
+          it_behaves_like 'group root ancestor' do
+            let(:extra_query_count) { 4 }
+          end
+        end
       end
     end
   end

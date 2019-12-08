@@ -101,64 +101,6 @@ describe Epic do
     end
   end
 
-  shared_examples '.groups_user_can_read_epics examples' do
-    let_it_be(:private_group) { create(:group, :private) }
-    let_it_be(:epic) { create(:epic, group: private_group) }
-
-    subject do
-      epics = described_class.where(id: epic.id)
-      described_class.groups_user_can_read_epics(epics, user)
-    end
-
-    it 'does not return inaccessible groups' do
-      expect(subject).to be_empty
-    end
-
-    context 'with authorized user' do
-      before do
-        private_group.add_developer(user)
-      end
-
-      context 'with epics enabled' do
-        before do
-          stub_licensed_features(epics: true)
-        end
-
-        it 'returns epic groups user can access' do
-          expect(subject).to eq [private_group]
-        end
-      end
-
-      context 'with epics are disabled' do
-        before do
-          stub_licensed_features(epics: false)
-        end
-
-        it 'returns an empty list' do
-          expect(subject).to be_empty
-        end
-      end
-    end
-  end
-
-  describe '.groups_user_can_read_epics' do
-    context 'with `optimized_groups_user_can_read_epics_method` feature flag enabled' do
-      before do
-        stub_feature_flags(optimized_groups_user_can_read_epics_method: true)
-      end
-
-      include_examples '.groups_user_can_read_epics examples'
-    end
-
-    context 'with `optimized_groups_user_can_read_epics_method` feature flag disabled' do
-      before do
-        stub_feature_flags(optimized_groups_user_can_read_epics_method: false)
-      end
-
-      include_examples '.groups_user_can_read_epics examples'
-    end
-  end
-
   describe '#valid_parent?' do
     context 'basic checks' do
       let(:epic) { build(:epic, group: group) }
