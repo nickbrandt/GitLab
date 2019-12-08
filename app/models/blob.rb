@@ -49,6 +49,7 @@ class Blob < SimpleDelegator
     BlobViewer::Contributing,
     BlobViewer::Changelog,
 
+    BlobViewer::CargoToml,
     BlobViewer::Cartfile,
     BlobViewer::ComposerJson,
     BlobViewer::Gemfile,
