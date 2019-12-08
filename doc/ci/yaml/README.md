@@ -310,6 +310,17 @@ job:
     - execute this after my script
 ```
 
+NOTE: **Note:**
+`after_script` has a hard-coded timeout of 5 minutes.
+See the [Allow configurable after_script timeouts proposal](https://gitlab.com/gitlab-org/gitlab-runner/issues/2716)
+for updates.
+
+NOTE: **Note:**
+The `after_script` timeout does not affect the job's exit code.
+If the `script` section succeeds and the `after_script` times out, the job will
+still exit with exit code 0 (success). This does not trigger `retry: when: always`.
+The pipeline also continues as though no failures have been encountered.
+
 #### YAML anchors for `before_script` and `after_script`
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/23005) in GitLab 12.5.
