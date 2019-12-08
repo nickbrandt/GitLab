@@ -195,21 +195,6 @@ module EE
         ::Gitlab::ObjectHierarchy.new(self.where(parent_id: nil)).max_descendants_depth
       end
 
-      def groups_user_can_read_epics(epics, user)
-        groups = if ::Feature.enabled?(:optimized_groups_user_can_read_epics_method)
-                   epics_query = epics.select(:group_id)
-                   ::Group.joins("INNER JOIN (#{epics_query.to_sql}) as epics on epics.group_id = namespaces.id")
-                 else
-                   ::Group.where(id: epics.select(:group_id))
-                 end
-
-        groups = ::Gitlab::GroupPlansPreloader.new.preload(groups)
-
-        DeclarativePolicy.user_scope do
-          groups.select { |g| Ability.allowed?(user, :read_epic, g) }
-        end
-      end
-
       def related_issues(ids:, preload: nil)
         ::Issue.select('issues.*, epic_issues.id as epic_issue_id, epic_issues.relative_position, epic_issues.epic_id as epic_id')
           .joins(:epic_issue)

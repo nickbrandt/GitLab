@@ -78,7 +78,9 @@ class EpicsFinder < IssuableFinder
                # The `group` method takes care of checking permissions
                [group]
              else
-               groups_user_can_read_epics(related_groups)
+               # `same_root` should be set only if we are sure that all groups
+               # in related_groups have the same ancestor root group
+               ::Group.groups_user_can_read_epics(related_groups, current_user, same_root: true)
              end
 
     Epic.where(group: groups)
@@ -111,16 +113,6 @@ class EpicsFinder < IssuableFinder
       last_value.to_sym
     end
   end
-
-  # rubocop: disable CodeReuse/ActiveRecord
-  def groups_user_can_read_epics(groups)
-    groups = Gitlab::GroupPlansPreloader.new.preload(groups)
-
-    DeclarativePolicy.user_scope do
-      groups.select { |g| Ability.allowed?(current_user, :read_epic, g) }
-    end
-  end
-  # rubocop: enable CodeReuse/ActiveRecord
 
   # rubocop: disable CodeReuse/ActiveRecord
   def by_timeframe(items)

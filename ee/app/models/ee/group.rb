@@ -72,6 +72,15 @@ module EE
         ).where.not(file_template_project_id: nil)
       end
 
+      scope :for_epics, ->(epics) do
+        if ::Feature.enabled?(:optimized_groups_user_can_read_epics_method)
+          epics_query = epics.select(:group_id)
+          joins("INNER JOIN (#{epics_query.to_sql}) as epics on epics.group_id = namespaces.id")
+        else
+          where(id: epics.select(:group_id))
+        end
+      end
+
       state_machine :ldap_sync_status, namespace: :ldap_sync, initial: :ready do
         state :ready
         state :started
@@ -111,6 +120,29 @@ module EE
           group.ldap_sync_last_update_at = DateTime.now
           group.save
         end
+      end
+    end
+
+    class_methods do
+      def groups_user_can_read_epics(groups, user, same_root: false)
+        groups = ::Gitlab::GroupPlansPreloader.new.preload(groups)
+
+        # if we are sure that all groups have the same root group, we can
+        # preset root_ancestor for all of them to avoid an additional SQL query
+        # done for each group permission check:
+        # https://gitlab.com/gitlab-org/gitlab/issues/11539
+        preset_root_ancestor_for(groups) if same_root && ::Feature.enabled?(:preset_group_root)
+
+        DeclarativePolicy.user_scope do
+          groups.select { |group| Ability.allowed?(user, :read_epic, group) }
+        end
+      end
+
+      def preset_root_ancestor_for(groups)
+        return groups if groups.size < 2
+
+        root = groups.first.root_ancestor
+        groups.drop(1).each { |group| group.root_ancestor = root }
       end
     end
 
