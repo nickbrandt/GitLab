@@ -2957,6 +2957,7 @@ release:
 ```
 
 #### Complete example for `release`
+
 Combining the individual examples given above for `release`, we'd have the following code snippet:
 
 ```yaml
