@@ -251,6 +251,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Docs for protected branch code owner approval API. !17132
 
 
+## 12.3.9
+
+### Security (1 change)
+
+- Fix stale Elasticsearch permissions when moving group from public group to private parent group.
+
+
 ## 12.3.7
 
 ### Security (6 changes)

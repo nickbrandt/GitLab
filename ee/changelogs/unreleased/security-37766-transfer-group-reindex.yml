@@ -1,5 +1,0 @@
----
-title: Fix stale Elasticsearch permissions when moving group from public group to private parent group
-merge_request:
-author:
-type: security
