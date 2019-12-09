@@ -2815,7 +2815,7 @@ job:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/19298) in GitLab 12.6.
 
-`release` indicates that the job will create a [Release](../../user/project/releases/index.md#releases),
+`release` indicates that the job will create a [Release](../../user/project/releases/index.md),
 and optionally include URLs for Release assets.
 
 These methods are supported:
