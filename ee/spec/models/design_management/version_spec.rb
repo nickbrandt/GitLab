@@ -2,6 +2,8 @@
 require 'spec_helper'
 
 describe DesignManagement::Version do
+  let_it_be(:issue) { create(:issue) }
+
   describe 'relations' do
     it { is_expected.to have_many(:actions) }
     it { is_expected.to have_many(:designs).through(:actions) }
@@ -82,7 +84,6 @@ describe DesignManagement::Version do
     end
 
     let_it_be(:author) { create(:user) }
-    let_it_be(:issue) { create(:issue) }
     let_it_be(:design_a) { create(:design, issue: issue) }
     let_it_be(:design_b) { create(:design, issue: issue) }
     let_it_be(:designs) { [design_a, design_b] }
@@ -289,6 +290,53 @@ describe DesignManagement::Version do
 
       expect(version.author_id).to eq(nil)
       expect(version.author).to eq(commit_user)
+    end
+  end
+
+  describe '#diff_refs' do
+    let(:project) { issue.project }
+
+    before do
+      expect(project.design_repository).to receive(:commit)
+        .once
+        .with(sha)
+        .and_return(commit)
+    end
+
+    subject { create(:design_version, issue: issue, sha: sha) }
+
+    context 'there is a commit in the repo by the SHA' do
+      let(:commit) { build(:commit) }
+      let(:sha) { commit.id }
+
+      it { is_expected.to have_attributes(diff_refs: commit.diff_refs) }
+
+      it 'memoizes calls to #diff_refs' do
+        expect(subject.diff_refs).to eq(subject.diff_refs)
+      end
+    end
+
+    context 'there is no commit in the repo by the SHA' do
+      let(:commit) { nil }
+      let(:sha) { Digest::SHA1.hexdigest("points to nothing") }
+
+      it { is_expected.to have_attributes(diff_refs: be_nil) }
+    end
+  end
+
+  describe '#reset' do
+    subject { create(:design_version, issue: issue) }
+
+    it 'removes memoized values' do
+      expect(subject).to receive(:commit).twice.and_return(nil)
+
+      subject.diff_refs
+      subject.diff_refs
+
+      subject.reset
+
+      subject.diff_refs
+      subject.diff_refs
     end
   end
 end

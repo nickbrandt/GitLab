@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :design_version, class: DesignManagement::Version do
     sequence(:sha) { |n| Digest::SHA1.hexdigest("commit-like-#{n}") }
     issue { designs.first&.issue || create(:issue) }
-    author { issue.author || create(:user) }
+    author { issue&.author || create(:user) }
 
     transient do
       designs_count { 1 }
@@ -16,6 +16,19 @@ FactoryBot.define do
     # Warning: this will intentionally result in an invalid version!
     trait :empty do
       designs_count { 0 }
+    end
+
+    trait :importing do
+      issue { nil }
+
+      designs_count { 0 }
+      importing { true }
+      imported { false }
+    end
+
+    trait :imported do
+      importing { false }
+      imported { true }
     end
 
     after(:build) do |version, evaluator|
