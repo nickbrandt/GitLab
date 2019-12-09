@@ -330,7 +330,7 @@ module QA
     end
 
     def reset_idp_session
-      Runtime::Logger.debug(%Q[Visiting IDP url at "#{EE::Runtime::Saml.idp_sso_url}"]) if Runtime::Env.debug?
+      Runtime::Logger.debug(%Q[Visiting IDP url at "#{EE::Runtime::Saml.idp_sso_url}"])
 
       page.visit EE::Runtime::Saml.idp_sso_url
       Support::Waiter.wait { current_url == EE::Runtime::Saml.idp_sso_url }
@@ -339,7 +339,7 @@ module QA
     end
 
     def visit_managed_group_url
-      Runtime::Logger.debug(%Q[Visiting managed_group_url at "#{@managed_group_url}"]) if Runtime::Env.debug?
+      Runtime::Logger.debug(%Q[Visiting managed_group_url at "#{@managed_group_url}"])
 
       page.visit @managed_group_url
       Support::Waiter.wait { current_url == @managed_group_url }
