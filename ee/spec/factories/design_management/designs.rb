@@ -37,6 +37,8 @@ FactoryBot.define do
         # and maybe a deletion
         run_action[DesignManagement::DesignAction.new(design, :delete)] if evaluator.deleted
       end
+
+      design.clear_version_cache
     end
 
     trait :with_lfs_file do
