@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.17.0
+
+- Add labkit monitoring for build metrics !440
+- Log duration_ms when Workhorse hits a bad gateway !445
 
 v 8.16.0
 
