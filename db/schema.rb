@@ -1849,6 +1849,7 @@ ActiveRecord::Schema.define(version: 2019_12_06_122926) do
     t.integer "change_type", limit: 2
     t.bigint "gitlab_subscription_id", null: false
     t.datetime_with_timezone "created_at"
+    t.date "trial_starts_on"
     t.index ["gitlab_subscription_id"], name: "index_gitlab_subscription_histories_on_gitlab_subscription_id"
   end
 
@@ -1863,6 +1864,7 @@ ActiveRecord::Schema.define(version: 2019_12_06_122926) do
     t.integer "max_seats_used", default: 0
     t.integer "seats", default: 0
     t.boolean "trial", default: false
+    t.date "trial_starts_on"
     t.index ["hosted_plan_id"], name: "index_gitlab_subscriptions_on_hosted_plan_id"
     t.index ["namespace_id"], name: "index_gitlab_subscriptions_on_namespace_id", unique: true
   end
