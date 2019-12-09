@@ -46,6 +46,7 @@ describe('Cycle analytics actions', () => {
       getters,
       featureFlags: {
         hasDurationChart: true,
+        hasTasksByTypeChart: true,
       },
     };
     mock = new MockAdapter(axios);
@@ -237,6 +238,7 @@ describe('Cycle analytics actions', () => {
         receiveCycleAnalyticsDataSuccess:
           overrides.receiveCycleAnalyticsDataSuccess || jest.fn().mockResolvedValue(),
         fetchDurationData: overrides.fetchDurationData || jest.fn().mockResolvedValue(),
+        fetchTasksByTypeData: overrides.fetchTasksByTypeData || jest.fn().mockResolvedValue(),
       };
       return {
         mocks,
@@ -245,8 +247,8 @@ describe('Cycle analytics actions', () => {
           .mockImplementationOnce(mocks.requestCycleAnalyticsData)
           .mockImplementationOnce(mocks.fetchGroupStagesAndEvents)
           .mockImplementationOnce(mocks.fetchSummaryData)
-          .mockImplementationOnce(mocks.receiveCycleAnalyticsDataSuccess)
-          .mockImplementationOnce(mocks.fetchDurationData),
+          .mockImplementationOnce(mocks.fetchDurationData)
+          .mockImplementationOnce(mocks.fetchTasksByTypeData),
       };
     }
 
@@ -270,8 +272,9 @@ describe('Cycle analytics actions', () => {
           expect(mocks.requestCycleAnalyticsData).toHaveBeenCalled();
           expect(mocks.fetchGroupStagesAndEvents).toHaveBeenCalled();
           expect(mocks.fetchSummaryData).toHaveBeenCalled();
-          expect(mocks.receiveCycleAnalyticsDataSuccess).toHaveBeenCalled();
           expect(mocks.fetchDurationData).toHaveBeenCalled();
+          expect(mocks.fetchTasksByTypeData).toHaveBeenCalled();
+
           done();
         })
         .catch(done.fail);

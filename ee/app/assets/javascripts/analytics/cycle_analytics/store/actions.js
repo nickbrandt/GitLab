@@ -56,10 +56,14 @@ export const fetchStageData = ({ state, dispatch, getters }, slug) => {
 };
 
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CYCLE_ANALYTICS_DATA);
-export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
+export const receiveCycleAnalyticsDataSuccess = ({ state, commit, dispatch }) => {
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS);
 
-  dispatch('fetchDurationData');
+  const { featureFlags: { hasDurationChart = false, hasTasksByTypeChart = false } = {} } = state;
+  const promises = [];
+  if (hasDurationChart) promises.push('fetchDurationData');
+  if (hasTasksByTypeChart) promises.push('fetchTasksByTypeData');
+  return Promise.all(promises.map(func => dispatch(func)));
 };
 
 export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
@@ -77,7 +81,6 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
     .then(() => dispatch('fetchGroupLabels'))
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchSummaryData'))
-    .then(() => dispatch('fetchTasksByTypeData'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
@@ -306,7 +309,6 @@ export const fetchDurationData = ({ state, dispatch }) => {
   dispatch('requestDurationData');
 
   const {
-    featureFlags: { hasDurationChart },
     stages,
     startDate,
     endDate,
@@ -314,29 +316,26 @@ export const fetchDurationData = ({ state, dispatch }) => {
     selectedGroup: { fullPath },
   } = state;
 
-  if (hasDurationChart) {
-    return Promise.all(
-      stages.map(stage => {
-        const { slug } = stage;
+  return Promise.all(
+    stages.map(stage => {
+      const { slug } = stage;
 
-        return Api.cycleAnalyticsDurationChart(slug, {
-          group_id: fullPath,
-          created_after: dateFormat(startDate, dateFormats.isoDate),
-          created_before: dateFormat(endDate, dateFormats.isoDate),
-          project_ids: selectedProjectIds,
-        }).then(({ data }) => ({
-          slug,
-          selected: true,
-          data,
-        }));
-      }),
-    )
-      .then(data => {
-        dispatch('receiveDurationDataSuccess', data);
-      })
-      .catch(() => dispatch('receiveDurationDataError'));
-  }
-  return false;
+      return Api.cycleAnalyticsDurationChart(slug, {
+        group_id: fullPath,
+        created_after: dateFormat(startDate, dateFormats.isoDate),
+        created_before: dateFormat(endDate, dateFormats.isoDate),
+        project_ids: selectedProjectIds,
+      }).then(({ data }) => ({
+        slug,
+        selected: true,
+        data,
+      }));
+    }),
+  )
+    .then(data => {
+      dispatch('receiveDurationDataSuccess', data);
+    })
+    .catch(() => dispatch('receiveDurationDataError'));
 };
 
 export const updateSelectedDurationChartStages = ({ state, commit }, stages) => {
