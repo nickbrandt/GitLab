@@ -26,12 +26,6 @@ module Operations
     scope :enabled, -> { where(active: true) }
     scope :disabled, -> { where(active: false) }
 
-    def userwithid_strategy
-      strong_memoize(:userwithid_strategy) do
-        strategies.select { |s| s['name'] == FeatureFlagStrategiesValidator::STRATEGY_USERWITHID }
-      end
-    end
-
     def self.with_name_and_description
       joins(:feature_flag)
         .select(FeatureFlag.arel_table[:name], FeatureFlag.arel_table[:description])
