@@ -9,14 +9,18 @@
       = _("None")
     %span{ "v-for" => "label in issue.labels" }
       %span.d-inline-block.position-relative.scoped-label-wrapper{ "v-if" => "showScopedLabels(label)" }
-        %a{ href: '#' }
-          %span.badge.color-label.label{ ":style" => "{ backgroundColor: label.color, color: label.textColor }" }
+        %span.gl-label.gl-label-scoped{ ":style" => "{ borderColor: label.color }" }
+          %a.gl-link.gl-label-link{ href: '#' }
+            %span.gl-label-text{ ":style" => "{ backgroundColor: label.color, color: label.textColor }" }
+              {{ scopedLabelScope(label) }}
+            %span.gl-label-text{ ":style" => "{ backgroundColor: label.textColor, color: label.Color }" }
+              {{ scopedValue(label) }}
+          %a.label.scoped-label.gl-link.gl-label-icon{ ":href" => "helpLink()" }
+            %i.fa.fa-question-circle
+      %span.gl-label{ "v-else" => true }
+        %a.gl-link.gl-label-link{ href: "#" }
+          %span.gl-label-text{ ":style" => "{ backgroundColor: label.color, color: label.textColor }" }
             {{ label.title }}
-        %a.label.scoped-label{ ":href" => "helpLink()" }
-          %i.fa.fa-question-circle{ ":style" => "{ backgroundColor: label.color, color: label.textColor }" }
-      %a{ href: "#", "v-else" => true }
-        .badge.color-label.has-tooltip{ ":style" => "{ backgroundColor: label.color, color: label.textColor }" }
-          {{ label.title }}
 
   - if can_admin_issue?
     .selectbox

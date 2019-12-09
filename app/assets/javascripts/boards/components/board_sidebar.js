@@ -147,6 +147,17 @@ export default Vue.extend({
     showScopedLabels(label) {
       return boardsStore.scopedLabels.enabled && isScopedLabel(label);
     },
+    splitScopedLabel(label) {
+      return label.title.split('::');
+    },
+    scopedLabelScope(label) {
+      const splitLabel = this.splitScopedLabel(label)
+      return splitLabel[0];
+    },
+    scopedValue(label) {
+      const splitLabel = this.splitScopedLabel(label)
+      return splitLabel[1];
+    },
     helpLink() {
       return boardsStore.scopedLabels.helpLink;
     },
