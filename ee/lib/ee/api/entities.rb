@@ -783,22 +783,8 @@ module EE
       class UnleashFeature < Grape::Entity
         expose :name
         expose :description, unless: ->(feature) { feature.description.nil? }
-        # The UI has a single field for user ids for whom the feature flag should be enabled across all scopes.
-        # Each scope is given a userWithId strategy with the list of user ids.
-        # However, the user can also directly toggle the active field of a scope.
-        # So if the user has entered user ids, and disabled the scope, we need to send an enabled scope with
-        # the list of user ids.
-        # See: https://gitlab.com/gitlab-org/gitlab/issues/14011
-        expose :active, as: :enabled do |feature|
-          feature.active || feature.userwithid_strategy.present?
-        end
-        expose :strategies do |feature|
-          if !feature.active && feature.userwithid_strategy.present?
-            feature.userwithid_strategy
-          else
-            feature.strategies
-          end
-        end
+        expose :active, as: :enabled
+        expose :strategies
       end
 
       class GitlabSubscription < Grape::Entity

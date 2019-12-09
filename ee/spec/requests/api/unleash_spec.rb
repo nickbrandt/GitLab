@@ -248,38 +248,16 @@ describe API::Unleash do
       end
 
       context "with an inactive scope" do
-        let!(:scope) { create(:operations_feature_flag_scope, feature_flag: feature_flag, environment_scope: 'production', active: false, strategies: strategies) }
+        let!(:scope) { create(:operations_feature_flag_scope, feature_flag: feature_flag, environment_scope: 'production', active: false, strategies: [{ name: "default", parameters: {} }]) }
         let(:headers) { { "UNLEASH-INSTANCEID" => client.token, "UNLEASH-APPNAME" => "production" } }
 
-        context 'with userWithId strategy' do
-          let(:strategies) { [{ name: "default", parameters: {} }, { name: "userWithId", parameters: { userIds: "fred" } }] }
+        it 'returns a disabled feature' do
+          get api(features_url), headers: headers
 
-          it 'returns an enabled feature with only the userWithId strategy' do
-            get api(features_url), headers: headers
-
-            expect(response).to have_gitlab_http_status(:ok)
-            feature_json = json_response['features'].first
-            expect(feature_json['enabled']).to eq(true)
-            expect(feature_json['strategies']).to eq([{
-              'name' => 'userWithId',
-              'parameters' => {
-                'userIds' => 'fred'
-              }
-            }])
-          end
-        end
-
-        context 'with default strategy' do
-          let(:strategies) { [{ name: "default", parameters: {} }] }
-
-          it 'returns a disabled feature that does not contain a userWithId strategy' do
-            get api(features_url), headers: headers
-
-            expect(response).to have_gitlab_http_status(:ok)
-            feature_json = json_response['features'].first
-            expect(feature_json['enabled']).to eq(false)
-            expect(feature_json['strategies']).to eq([{ 'name' => 'default', 'parameters' => {} }])
-          end
+          expect(response).to have_gitlab_http_status(:ok)
+          feature_json = json_response['features'].first
+          expect(feature_json['enabled']).to eq(false)
+          expect(feature_json['strategies']).to eq([{ 'name' => 'default', 'parameters' => {} }])
         end
       end
     end

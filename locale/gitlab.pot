@@ -7437,13 +7437,7 @@ msgstr ""
 msgid "FeatureFlags|Active"
 msgstr ""
 
-msgid "FeatureFlags|Add"
-msgstr ""
-
 msgid "FeatureFlags|All users"
-msgstr ""
-
-msgid "FeatureFlags|Clear all"
 msgstr ""
 
 msgid "FeatureFlags|Configure"
@@ -7465,9 +7459,6 @@ msgid "FeatureFlags|Description"
 msgstr ""
 
 msgid "FeatureFlags|Edit Feature Flag"
-msgstr ""
-
-msgid "FeatureFlags|Enter comma separated list of user IDs"
 msgstr ""
 
 msgid "FeatureFlags|Environment Spec"
@@ -7551,13 +7542,7 @@ msgstr ""
 msgid "FeatureFlags|Status"
 msgstr ""
 
-msgid "FeatureFlags|Target Users"
-msgstr ""
-
 msgid "FeatureFlags|Target environments"
-msgstr ""
-
-msgid "FeatureFlags|Target user behaviour is built up by creating a list of active user IDs. These IDs should be the users in the system in which the feature flag is set, not GitLab ids. Target users apply across %{strong_start}All Environments%{strong_end} and are not affected by Target Environment rules."
 msgstr ""
 
 msgid "FeatureFlags|There are no active feature flags"
