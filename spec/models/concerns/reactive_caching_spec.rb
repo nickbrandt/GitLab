@@ -221,6 +221,21 @@ describe ReactiveCaching, :use_clean_rails_memory_store_caching do
           expect { go! }.to raise_error("foo")
         end
       end
+
+      context 'when reactive_cache_enqueue_updates is false' do
+        let(:instance) { EnqueueUpdatesFalseCacheTest.new(666, &calculation) }
+
+        class EnqueueUpdatesFalseCacheTest < CacheTest
+          self.reactive_cache_enqueue_updates = false
+        end
+
+        it 'does not enqueue a repeat worker' do
+          expect(ReactiveCachingWorker)
+            .not_to receive(:perform_in)
+
+          go!
+        end
+      end
     end
 
     context 'when lifetime is exceeded' do
@@ -242,6 +257,23 @@ describe ReactiveCaching, :use_clean_rails_memory_store_caching do
         stub_exclusive_lease_taken(cache_key)
 
         expect(instance).to receive(:calculate_reactive_cache).never
+
+        go!
+      end
+    end
+
+    context 'lease key name can be overridden' do
+      let(:instance) { OverrideLeaseNameCacheTest.new(666, &calculation) }
+
+      class OverrideLeaseNameCacheTest < CacheTest
+        def reactive_cache_exclusive_lease_key(*args)
+          "custom_exclusive_lease_key"
+        end
+      end
+
+      it 'takes exclusive lease with given key name' do
+        expect_to_obtain_exclusive_lease("custom_exclusive_lease_key", 'uuid')
+        expect_to_cancel_exclusive_lease("custom_exclusive_lease_key", 'uuid')
 
         go!
       end

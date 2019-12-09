@@ -65,6 +65,8 @@
 # `#calculate_reactive_cache`. It is also re-enqueued to run again after
 # `reactive_cache_refresh_interval`, so keeping the stored value up to date.
 # Calculations are never run concurrently.
+# You can disable re-enqueuing of jobs by setting
+# `reactive_cache_enqueue_updates` to false.
 #
 # Calling `#result` while a value is in the cache will call the block given to
 # `#with_reactive_cache`, yielding the cached value. It will also extend the
@@ -73,6 +75,10 @@
 # Once the lifetime has expired, no more background jobs will be enqueued and
 # calling `#result` will again return `nil` - starting the process all over
 # again
+#
+# The default exclusive lease key name is the same as the cache key name. The
+# exclusive lease key name can be overridden by overriding the
+# `reactive_cache_exclusive_lease_key` method.
 module ReactiveCaching
   extend ActiveSupport::Concern
 
@@ -80,19 +86,18 @@ module ReactiveCaching
 
   included do
     class_attribute :reactive_cache_lease_timeout
-
     class_attribute :reactive_cache_key
     class_attribute :reactive_cache_lifetime
     class_attribute :reactive_cache_refresh_interval
     class_attribute :reactive_cache_worker_finder
+    class_attribute :reactive_cache_enqueue_updates
 
     # defaults
     self.reactive_cache_key = -> (record) { [model_name.singular, record.id] }
-
     self.reactive_cache_lease_timeout = 2.minutes
-
     self.reactive_cache_refresh_interval = 1.minute
     self.reactive_cache_lifetime = 10.minutes
+    self.reactive_cache_enqueue_updates = true
 
     self.reactive_cache_worker_finder = ->(id, *_args) do
       find_by(primary_key => id)
@@ -168,11 +173,18 @@ module ReactiveCaching
     end
 
     def locking_reactive_cache(*args)
-      lease = Gitlab::ExclusiveLease.new(full_reactive_cache_key(*args), timeout: reactive_cache_lease_timeout)
+      lease = Gitlab::ExclusiveLease.new(
+        reactive_cache_exclusive_lease_key(*args),
+        timeout: reactive_cache_lease_timeout
+      )
       uuid = lease.try_obtain
       yield if uuid
     ensure
-      Gitlab::ExclusiveLease.cancel(full_reactive_cache_key(*args), uuid)
+      Gitlab::ExclusiveLease.cancel(reactive_cache_exclusive_lease_key(*args), uuid)
+    end
+
+    def reactive_cache_exclusive_lease_key(*args)
+      full_reactive_cache_key(*args)
     end
 
     def within_reactive_cache_lifetime?(*args)
@@ -182,7 +194,9 @@ module ReactiveCaching
     def enqueuing_update(*args)
       yield
 
-      ReactiveCachingWorker.perform_in(self.class.reactive_cache_refresh_interval, self.class, id, *args)
+      if self.class.reactive_cache_enqueue_updates
+        ReactiveCachingWorker.perform_in(self.class.reactive_cache_refresh_interval, self.class, id, *args)
+      end
     end
   end
 end
