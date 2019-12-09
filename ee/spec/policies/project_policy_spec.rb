@@ -815,7 +815,8 @@ describe ProjectPolicy do
     context 'when licenses list feature available' do
       context 'when license management feature available' do
         before do
-          stub_licensed_features(licenses_list: true, license_management: true)
+          stub_feature_flags(licenses_list: true)
+          stub_licensed_features(license_management: true)
         end
 
         context 'with public project' do
@@ -851,11 +852,23 @@ describe ProjectPolicy do
         end
       end
 
+      context "when the licenses_list feature is enabled for a specific project" do
+        let(:current_user) { create(:user) }
+
+        before do
+          stub_feature_flags(licenses_list: { enabled: true, thing: project })
+          stub_licensed_features(license_management: true)
+        end
+
+        it { is_expected.to be_allowed(:read_licenses_list) }
+      end
+
       context 'when license management feature in not available' do
         let(:current_user) { admin }
 
         before do
-          stub_licensed_features(licenses_list: true)
+          stub_feature_flags(licenses_list: true)
+          stub_licensed_features(license_management: false)
         end
 
         it { is_expected.to be_disallowed(:read_licenses_list) }
@@ -864,6 +877,10 @@ describe ProjectPolicy do
 
     context 'when licenses list feature not available' do
       let(:current_user) { admin }
+
+      before do
+        stub_feature_flags(licenses_list: false)
+      end
 
       it { is_expected.to be_disallowed(:read_licenses_list) }
     end

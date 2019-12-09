@@ -82,7 +82,7 @@ module EE
 
       with_scope :subject
       condition(:licenses_list_enabled) do
-        @subject.feature_available?(:licenses_list)
+        @subject.beta_feature_available?(:licenses_list)
       end
 
       with_scope :subject
