@@ -9,15 +9,6 @@ describe Admin::ServicesController do
     sign_in(admin)
   end
 
-  describe 'GET #index' do
-    it 'does not show project_only services' do
-      get :index
-
-      expect(assigns(:services)).not_to include(be_project_only),
-        "expected to exclude project_only services"
-    end
-  end
-
   describe 'GET #edit' do
     let!(:project) { create(:project) }
 

@@ -106,8 +106,4 @@ describe AlertsService do
       it_behaves_like 'valid token'
     end
   end
-
-  describe '#project_only?' do
-    it { expect(service).to be_project_only }
-  end
 end
