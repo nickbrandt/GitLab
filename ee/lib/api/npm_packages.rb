@@ -40,7 +40,7 @@ module API
       packages = ::Packages::NpmPackagesFinder
         .new(project, package_name).execute
 
-      present NpmPackagePresenter.new(project, package_name, packages),
+      present NpmPackagePresenter.new(package_name, packages),
         with: EE::API::Entities::NpmPackage
     end
 

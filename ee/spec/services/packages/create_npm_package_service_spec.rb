@@ -12,17 +12,21 @@ describe Packages::CreateNpmPackageService do
       fixture_file('npm/payload.json', dir: 'ee')
         .gsub('@root/npm-test', package_name)
         .gsub('1.0.1', version))
-      .with_indifferent_access
+        .with_indifferent_access
   end
 
-  shared_examples 'valid package' do
-    it 'creates a valid package' do
-      package = described_class.new(project, user, params).execute
+  subject { described_class.new(project, user, params).execute }
 
-      expect(package).to be_valid
-      expect(package.name).to eq(package_name)
-      expect(package.version).to eq(version)
+  shared_examples 'valid package' do
+    it 'creates a package' do
+      expect { subject }
+        .to change { Packages::Package.count }.by(1)
+        .and change { Packages::Package.npm.count }.by(1)
     end
+
+    it { is_expected.to be_valid }
+    it { expect(subject.name).to eq(package_name) }
+    it { expect(subject.version).to eq(version) }
   end
 
   describe '#execute' do
@@ -35,32 +39,22 @@ describe Packages::CreateNpmPackageService do
     context 'invalid package name' do
       let(:package_name) { "@#{namespace.path}/my-group/my-app".freeze }
 
-      it 'raises a RecordInvalid error' do
-        service = described_class.new(project, user, params)
-
-        expect { service.execute }.to raise_error(ActiveRecord::RecordInvalid)
-      end
+      it { expect { subject }.to raise_error(ActiveRecord::RecordInvalid) }
     end
 
     context 'package already exists' do
       let(:package_name) { "@#{namespace.path}/my_package" }
+      let!(:existing_package) { create(:npm_package, project: project, name: package_name, version: '1.0.1') }
 
-      it 'returns a 403 error' do
-        create(:npm_package, project: project, name: package_name, version: '1.0.1')
-        response = described_class.new(project, user, params).execute
-
-        expect(response[:http_status]).to eq 403
-        expect(response[:message]).to be 'Package already exists.'
-      end
+      it { expect(subject[:http_status]).to eq 403 }
+      it { expect(subject[:message]).to be 'Package already exists.' }
     end
 
     context 'with incorrect namespace' do
       let(:package_name) { '@my_other_namespace/my-app' }
 
       it 'raises a RecordInvalid error' do
-        service = described_class.new(project, user, params)
-
-        expect { service.execute }.to raise_error(ActiveRecord::RecordInvalid)
+        expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end

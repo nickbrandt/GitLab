@@ -36,6 +36,11 @@ describe API::NpmPackages do
 
   describe 'GET /api/v4/packages/npm/*package_name' do
     let(:package) { create(:npm_package, project: project) }
+    let!(:package_dependency_link1) { create(:packages_dependency_link, package: package, dependency_type: :dependencies) }
+    let!(:package_dependency_link2) { create(:packages_dependency_link, package: package, dependency_type: :devDependencies) }
+    let!(:package_dependency_link3) { create(:packages_dependency_link, package: package, dependency_type: :bundleDependencies) }
+    let!(:package_dependency_link4) { create(:packages_dependency_link, package: package, dependency_type: :peerDependencies) }
+    let!(:package_dependency_link5) { create(:packages_dependency_link, package: package, dependency_type: :deprecated) }
 
     context 'a public project' do
       it 'returns the package info without oauth token' do
@@ -243,6 +248,36 @@ describe API::NpmPackages do
           expect(response).to have_gitlab_http_status(403)
         end
       end
+
+      context 'with dependencies' do
+        let(:package_name) { "@#{group.path}/my_package_name" }
+        let(:params) { upload_params(package_name, 'npm/payload_with_duplicated_packages.json') }
+
+        it 'creates npm package with file and dependencies' do
+          expect { upload_package_with_token(package_name, params) }
+            .to change { project.packages.count }.by(1)
+            .and change { Packages::PackageFile.count }.by(1)
+            .and change { Packages::Dependency.count}.by(4)
+            .and change { Packages::DependencyLink.count}.by(7)
+
+          expect(response).to have_gitlab_http_status(200)
+        end
+
+        context 'with existing dependencies' do
+          before do
+            name = "@#{group.path}/existing_package"
+            upload_package_with_token(name, upload_params(name, 'npm/payload_with_duplicated_packages.json'))
+          end
+
+          it 'reuses them' do
+            expect { upload_package_with_token(package_name, params) }
+              .to change { project.packages.count }.by(1)
+              .and change { Packages::PackageFile.count }.by(1)
+              .and not_change { Packages::Dependency.count}
+              .and change { Packages::DependencyLink.count}.by(7)
+          end
+        end
+      end
     end
 
     def upload_package(package_name, params = {})
@@ -257,9 +292,9 @@ describe API::NpmPackages do
       upload_package(package_name, params.merge(job_token: job.token))
     end
 
-    def upload_params(package_name)
+    def upload_params(package_name, file = 'npm/payload.json')
       JSON.parse(
-        fixture_file('npm/payload.json', dir: 'ee')
+        fixture_file(file, dir: 'ee')
           .gsub('@root/npm-test', package_name))
     end
   end
@@ -270,5 +305,8 @@ describe API::NpmPackages do
     expect(response).to match_response_schema('public_api/v4/packages/npm_package', dir: 'ee')
     expect(json_response['name']).to eq(package.name)
     expect(json_response['versions'][package.version]).to match_schema('public_api/v4/packages/npm_package_version', dir: 'ee')
+    NpmPackagePresenter::NPM_VALID_DEPENDENCY_TYPES.each do |dependency_type|
+      expect(json_response.dig('versions', package.version, dependency_type.to_s)).to be_any
+    end
   end
 end
