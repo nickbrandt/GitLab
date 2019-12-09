@@ -12,13 +12,6 @@ module QA
 
       wiki = nil
 
-      after do
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-      end
-
       before do
         Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
           # Visit the primary node and login

@@ -1,7 +1,7 @@
+import boardPromotionState from 'ee/boards/components/board_promotion_state';
 import Board from '~/boards/components/board';
 import { __, n__, sprintf } from '~/locale';
 import boardsStore from '~/boards/stores/boards_store';
-import boardPromotionState from 'ee/boards/components/board_promotion_state';
 
 export default Board.extend({
   data() {

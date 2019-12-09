@@ -17,7 +17,9 @@ describe('Productivity analytics filter getters', () => {
       state = {
         groupNamespace: 'gitlab-org',
         projectPath: 'gitlab-org/gitlab-test',
-        filters: '?author_username=root&milestone_title=foo&label_name[]=labelxyz',
+        authorUsername: 'root',
+        milestoneTitle: 'foo',
+        labelName: ['labelxyz'],
         startDate,
         endDate,
       };

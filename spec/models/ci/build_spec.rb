@@ -1197,6 +1197,54 @@ describe Ci::Build do
       end
     end
 
+    describe '#expanded_kubernetes_namespace' do
+      let(:build) { create(:ci_build, environment: environment, options: options) }
+
+      subject { build.expanded_kubernetes_namespace }
+
+      context 'environment and namespace are not set' do
+        let(:environment) { nil }
+        let(:options) { nil }
+
+        it { is_expected.to be_nil }
+      end
+
+      context 'environment is specified' do
+        let(:environment) { 'production' }
+
+        context 'namespace is not set' do
+          let(:options) { nil }
+
+          it { is_expected.to be_nil }
+        end
+
+        context 'namespace is provided' do
+          let(:options) do
+            {
+              environment: {
+                name: environment,
+                kubernetes: {
+                  namespace: namespace
+                }
+              }
+            }
+          end
+
+          context 'with a static value' do
+            let(:namespace) { 'production' }
+
+            it { is_expected.to eq namespace }
+          end
+
+          context 'with a dynamic value' do
+            let(:namespace) { 'deploy-$CI_COMMIT_REF_NAME'}
+
+            it { is_expected.to eq 'deploy-master' }
+          end
+        end
+      end
+    end
+
     describe '#starts_environment?' do
       subject { build.starts_environment? }
 
@@ -2987,6 +3035,32 @@ describe Ci::Build do
     end
   end
 
+  describe '#deployment_variables' do
+    let(:build) { create(:ci_build, environment: environment) }
+    let(:environment) { 'production' }
+    let(:kubernetes_namespace) { 'namespace' }
+    let(:project_variables) { double }
+
+    subject { build.deployment_variables(environment: environment) }
+
+    before do
+      allow(build).to receive(:expanded_kubernetes_namespace)
+        .and_return(kubernetes_namespace)
+
+      allow(build.project).to receive(:deployment_variables)
+        .with(environment: environment, kubernetes_namespace: kubernetes_namespace)
+        .and_return(project_variables)
+    end
+
+    it { is_expected.to eq(project_variables) }
+
+    context 'environment is nil' do
+      let(:environment) { nil }
+
+      it { is_expected.to be_empty }
+    end
+  end
+
   describe '#scoped_variables_hash' do
     context 'when overriding CI variables' do
       before do
@@ -3987,6 +4061,56 @@ describe Ci::Build do
 
     it 'returns invalid dependencies' do
       expect(job.invalid_dependencies).to eq([pre_stage_job_invalid])
+    end
+  end
+
+  describe '#execute_hooks' do
+    context 'with project hooks' do
+      before do
+        create(:project_hook, project: project, job_events: true)
+      end
+
+      it 'execute hooks' do
+        expect_any_instance_of(ProjectHook).to receive(:async_execute)
+
+        build.execute_hooks
+      end
+    end
+
+    context 'without relevant project hooks' do
+      before do
+        create(:project_hook, project: project, job_events: false)
+      end
+
+      it 'does not execute a hook' do
+        expect_any_instance_of(ProjectHook).not_to receive(:async_execute)
+
+        build.execute_hooks
+      end
+    end
+
+    context 'with project services' do
+      before do
+        create(:service, active: true, job_events: true, project: project)
+      end
+
+      it 'execute services' do
+        expect_any_instance_of(Service).to receive(:async_execute)
+
+        build.execute_hooks
+      end
+    end
+
+    context 'without relevant project services' do
+      before do
+        create(:service, active: true, job_events: false, project: project)
+      end
+
+      it 'execute services' do
+        expect_any_instance_of(Service).not_to receive(:async_execute)
+
+        build.execute_hooks
+      end
     end
   end
 end

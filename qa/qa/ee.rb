@@ -34,6 +34,7 @@ module QA
         autoload :SamlSSOSignIn, 'qa/ee/page/group/saml_sso_sign_in'
         autoload :SamlSSOSignUp, 'qa/ee/page/group/saml_sso_sign_up'
         autoload :Members, 'qa/ee/page/group/members'
+        autoload :ContributionAnalytics, 'qa/ee/page/group/contribution_analytics'
 
         module Settings
           autoload :SamlSSO, 'qa/ee/page/group/settings/saml_sso'

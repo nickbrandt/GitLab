@@ -10,7 +10,7 @@
       = _("Set up pipeline subscriptions for this project.")
     %p
       - default_branch_docs = link_to(_("default branch"), help_page_path('user/project/repository/branches', anchor: 'default-branch'))
-      = _("Subscriptions allow successfully completed pipelines on the %{default_branch_docs} of the subscribed project to trigger a new pipeline on thee default branch of this project.").html_safe % { default_branch_docs: default_branch_docs }
+      = _("Subscriptions allow successfully completed pipelines on the %{default_branch_docs} of the subscribed project to trigger a new pipeline on the default branch of this project.").html_safe % { default_branch_docs: default_branch_docs }
     %p
       = _("There is a limit of 100 subscriptions from or to a project.")
 

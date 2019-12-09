@@ -7,5 +7,9 @@ FactoryBot.define do
     merge_request
     user
     pipeline factory: :ci_pipeline
+
+    trait :merged do
+      status { :merged }
+    end
   end
 end

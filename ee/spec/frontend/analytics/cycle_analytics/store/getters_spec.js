@@ -1,5 +1,11 @@
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
-import { allowedStages as stages, startDate, endDate } from '../mock_data';
+import {
+  allowedStages as stages,
+  startDate,
+  endDate,
+  transformedDurationData,
+  durationChartPlottableData,
+} from '../mock_data';
 
 let state = null;
 const selectedProjectIds = [5, 8, 11];
@@ -133,6 +139,30 @@ describe('Cycle analytics getters', () => {
       ${'project_ids'}    | ${[5, 8, 11]}
     `('should return the $param with value $value', ({ param, value }) => {
       expect(getters.cycleAnalyticsRequestParams(state)).toMatchObject({ [param]: value });
+    });
+  });
+
+  describe('durationChartPlottableData', () => {
+    it('returns plottable data for selected stages', () => {
+      const stateWithDurationData = {
+        startDate,
+        endDate,
+        durationData: transformedDurationData,
+      };
+
+      expect(getters.durationChartPlottableData(stateWithDurationData)).toEqual(
+        durationChartPlottableData,
+      );
+    });
+
+    it('returns null if there is no plottable data for the selected stages', () => {
+      const stateWithDurationData = {
+        startDate,
+        endDate,
+        durationData: [],
+      };
+
+      expect(getters.durationChartPlottableData(stateWithDurationData)).toBeNull();
     });
   });
 });

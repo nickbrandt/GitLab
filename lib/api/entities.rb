@@ -166,6 +166,18 @@ module API
       end
     end
 
+    class RemoteMirror < Grape::Entity
+      expose :id
+      expose :enabled
+      expose :safe_url, as: :url
+      expose :update_status
+      expose :last_update_at
+      expose :last_update_started_at
+      expose :last_successful_update_at
+      expose :last_error
+      expose :only_protected_branches
+    end
+
     class ProjectImportStatus < ProjectIdentity
       expose :import_status
 
@@ -176,7 +188,7 @@ module API
     end
 
     class BasicProjectDetails < ProjectIdentity
-      include ::API::ProjectsRelationBuilder
+      include ::API::ProjectsBatchCounting
 
       expose :default_branch, if: -> (project, options) { Ability.allowed?(options[:current_user], :download_code, project) }
       # Avoids an N+1 query: https://github.com/mbleigh/acts-as-taggable-on/issues/91#issuecomment-168273770
@@ -415,20 +427,28 @@ module API
         projects = GroupProjectsFinder.new(
           group: group,
           current_user: options[:current_user],
-          options: { only_owned: true }
+          options: { only_owned: true, limit: projects_limit }
         ).execute
 
-        Entities::Project.prepare_relation(projects)
+        Entities::Project.preload_and_batch_count!(projects)
       end
 
       expose :shared_projects, using: Entities::Project do |group, options|
         projects = GroupProjectsFinder.new(
           group: group,
           current_user: options[:current_user],
-          options: { only_shared: true }
+          options: { only_shared: true, limit: projects_limit }
         ).execute
 
-        Entities::Project.prepare_relation(projects)
+        Entities::Project.preload_and_batch_count!(projects)
+      end
+
+      def projects_limit
+        if ::Feature.enabled?(:limit_projects_in_groups_api, default_enabled: true)
+          GroupProjectsFinder::DEFAULT_PROJECTS_LIMIT
+        else
+          nil
+        end
       end
     end
 
@@ -532,7 +552,7 @@ module API
 
     class PersonalSnippet < Snippet
       expose :raw_url do |snippet|
-        Gitlab::UrlBuilder.build(snippet) + "/raw"
+        Gitlab::UrlBuilder.build(snippet, raw: true)
       end
     end
 
@@ -1319,7 +1339,7 @@ module API
       expose :milestones, using: Entities::Milestone, if: -> (release, _) { release.milestones.present? }
       expose :commit_path, expose_nil: false
       expose :tag_path, expose_nil: false
-      expose :evidence_sha, expose_nil: false
+      expose :evidence_sha, expose_nil: false, if: ->(_, _) { can_download_code? }
       expose :assets do
         expose :assets_count, as: :count do |release, _|
           assets_to_exclude = can_download_code? ? [] : [:sources]
@@ -1329,7 +1349,7 @@ module API
         expose :links, using: Entities::Releases::Link do |release, options|
           release.links.sorted
         end
-        expose :evidence_file_path, expose_nil: false
+        expose :evidence_file_path, expose_nil: false, if: ->(_, _) { can_download_code? }
       end
       expose :_links do
         expose :merge_requests_url, expose_nil: false

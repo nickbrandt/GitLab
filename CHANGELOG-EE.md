@@ -1,5 +1,16 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.5.3
+
+### Performance (1 change)
+
+- Geo - Improve query performance to determine job artifacts to sync when selective sync is enabled. !19583
+
+### Other (1 change)
+
+- Geo - Does not schedule duplicated jobs while backfilling uploads, LFS objects and job artifacts. !20324
+
+
 ## 12.5.1
 
 ### Security (6 changes)
@@ -97,6 +108,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Remove plaintext tokens for feature flags clients. !18923
 - Remove IIFEs from jira_connect.js file. !19248 (nuwe1)
 
+
+## 12.4.5
+
+- No changes.
 
 ## 12.4.3
 

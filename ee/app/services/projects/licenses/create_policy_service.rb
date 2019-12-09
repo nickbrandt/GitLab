@@ -17,9 +17,9 @@ module Projects
       end
 
       def create_policy(software_license, classification)
-        raise error_for(:approval_status, :invalid) unless known?(classification)
+        raise error_for(:classification, :invalid) unless known?(classification)
 
-        policy = project.software_license_policies.create!(software_license: software_license, approval_status: classification)
+        policy = project.software_license_policies.create!(software_license: software_license, classification: classification)
         RefreshLicenseComplianceChecksWorker.perform_async(project.id)
         policy
       end
@@ -29,7 +29,7 @@ module Projects
       end
 
       def known?(classification)
-        SoftwareLicensePolicy.approval_statuses.key?(classification)
+        SoftwareLicensePolicy.classifications.key?(classification)
       end
 
       def error_for(attribute, error)

@@ -7,7 +7,6 @@ import {
   convertToOldReportFormat,
 } from 'ee/vue_shared/license_management/store/utils';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
-import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import {
   Builder,
   approvedLicense,
@@ -16,6 +15,7 @@ import {
   licenseBaseIssues,
   licenseReport,
 } from 'ee_spec/license_management/mock_data';
+import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 
 describe('utils', () => {
   describe('parseLicenseReportMetrics', () => {

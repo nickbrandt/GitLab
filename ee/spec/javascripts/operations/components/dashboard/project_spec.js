@@ -1,10 +1,10 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import Commit from '~/vue_shared/components/commit.vue';
 import Project from 'ee/operations/components/dashboard/project.vue';
 import ProjectHeader from 'ee/operations/components/dashboard/project_header.vue';
 import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
 import store from 'ee/vue_shared/dashboards/store';
+import Commit from '~/vue_shared/components/commit.vue';
 import { mockOneProject } from '../../mock_data';
 
 const localVue = createLocalVue();

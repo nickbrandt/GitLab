@@ -6,14 +6,6 @@ module QA
       deleted_project_name = nil
       deleted_project_id = nil
 
-      # Log out so subsequent tests can start unauthenticated
-      after do
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-      end
-
       before do
         Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
           Page::Main::Login.perform(&:sign_in_using_credentials)

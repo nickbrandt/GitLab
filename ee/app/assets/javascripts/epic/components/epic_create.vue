@@ -62,7 +62,8 @@ export default {
         :disabled="epicCreateInProgress"
         :placeholder="__('Title')"
         type="text"
-        class="form-control qa-epic-title"
+        class="form-control"
+        data-qa-selector="epic_title_field"
         @keyup.enter.exact="createEpic"
       />
       <loading-button

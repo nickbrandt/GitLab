@@ -42,7 +42,7 @@ At the pipeline level, the Security Dashboard displays the vulnerabilities prese
 
 Visit the page for any pipeline which has run any of the [supported reports](#supported-reports). Click the **Security** tab to view the Security Dashboard.
 
-![Pipeline Security Dashboard](img/pipeline_security_dashboard_v12_3.png)
+![Pipeline Security Dashboard](img/pipeline_security_dashboard_v12_6.png)
 
 ## Project Security Dashboard
 
@@ -71,7 +71,7 @@ Once you're on the dashboard, at the top you should see a series of filters for:
 - Report type
 - Project
 
-To the right of the filters, you should see a **Hide dismissed** toggle button ([available for GitLab.com Gold, planned for GitLab Ultimate 12.6](https://gitlab.com/gitlab-org/gitlab/issues/9102)).
+To the right of the filters, you should see a **Hide dismissed** toggle button.
 
 NOTE: **Note:**
 The dashboard only shows projects with [security reports](#supported-reports) enabled in a group.

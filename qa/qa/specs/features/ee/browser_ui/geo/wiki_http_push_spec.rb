@@ -3,14 +3,6 @@
 module QA
   context 'Geo', :orchestrated, :geo do
     describe 'GitLab wiki HTTP push' do
-      after do
-        # Log out so subsequent tests can start unauthenticated
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-      end
-
       context 'wiki commit' do
         it 'is replicated to the secondary node' do
           wiki_title = 'Geo Replication Wiki'

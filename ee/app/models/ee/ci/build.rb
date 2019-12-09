@@ -72,7 +72,7 @@ module EE
       end
 
       def collect_dependency_list_reports!(dependency_list_report)
-        if project.feature_available?(:dependency_list)
+        if project.feature_available?(:dependency_scanning)
           dependency_list = ::Gitlab::Ci::Parsers::Security::DependencyList.new(project, sha)
 
           each_report(::Ci::JobArtifact::DEPENDENCY_LIST_REPORT_FILE_TYPES) do |file_type, blob|
@@ -84,7 +84,7 @@ module EE
       end
 
       def collect_licenses_for_dependency_list!(dependency_list_report)
-        if project.feature_available?(:dependency_list)
+        if project.feature_available?(:dependency_scanning)
           dependency_list = ::Gitlab::Ci::Parsers::Security::DependencyList.new(project, sha)
 
           each_report(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES) do |file_type, blob|

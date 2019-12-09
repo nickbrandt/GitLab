@@ -1,12 +1,12 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { GlButton, GlModal } from '@gitlab/ui';
-import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import createStore from 'ee/vue_shared/dashboards/store/index';
 import state from 'ee/vue_shared/dashboards/store/state';
 import component from 'ee/environments_dashboard/components/dashboard/dashboard.vue';
 import ProjectHeader from 'ee/environments_dashboard/components/dashboard/project_header.vue';
 import Environment from 'ee/environments_dashboard/components/dashboard/environment.vue';
+import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 
 import environment from './mock_environment.json';
 

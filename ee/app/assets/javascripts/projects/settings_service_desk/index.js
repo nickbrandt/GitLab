@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import serviceDeskRoot from './components/service_desk_root.vue';
+import ServiceDeskRoot from './components/service_desk_root.vue';
 
 export default () => {
   const serviceDeskRootElement = document.querySelector('.js-service-desk-setting-root');
@@ -9,7 +9,7 @@ export default () => {
     new Vue({
       el: serviceDeskRootElement,
       components: {
-        serviceDeskRoot,
+        ServiceDeskRoot,
       },
       data() {
         const { dataset } = serviceDeskRootElement;
@@ -17,6 +17,8 @@ export default () => {
           initialIsEnabled: parseBoolean(dataset.enabled),
           endpoint: dataset.endpoint,
           incomingEmail: dataset.incomingEmail,
+          selectedTemplate: dataset.selectedTemplate,
+          templates: JSON.parse(dataset.templates),
         };
       },
       render(createElement) {
@@ -24,7 +26,9 @@ export default () => {
           props: {
             initialIsEnabled: this.initialIsEnabled,
             endpoint: this.endpoint,
-            incomingEmail: this.incomingEmail,
+            initialIncomingEmail: this.incomingEmail,
+            selectedTemplate: this.selectedTemplate,
+            templates: this.templates,
           },
         });
       },

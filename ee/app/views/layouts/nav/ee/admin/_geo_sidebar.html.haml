@@ -22,7 +22,7 @@
         = link_to admin_geo_projects_path, title: 'Projects' do
           %span
             = _('Projects')
-      - if Feature.enabled?(:enable_geo_design_sync) && Feature.enabled?(:enable_geo_design_view)
+      - if Feature.enabled?(:enable_geo_design_sync)
         = nav_link(path: 'admin/geo/designs#index') do
           = link_to admin_geo_designs_path, title: _('Designs') do
             %span

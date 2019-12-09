@@ -82,9 +82,13 @@ module EE
 
           def committer_check(commit)
             unless push_rule.committer_allowed?(commit.committer_email, user_access.user)
-              committer_is_current_user = commit.committer == user_access.user
+              # We can assume only one user holds an unconfirmed e-mail address. Since we want
+              # to give feedback whether this is an unconfirmed address, we look for any user that
+              # matches by disabling the confirmation requirement.
+              committer = commit.committer(confirmed: false)
+              committer_is_current_user = committer == user_access.user
 
-              if committer_is_current_user && !commit.committer.verified_email?(commit.committer_email)
+              if committer_is_current_user && !committer.verified_email?(commit.committer_email)
                 ERROR_MESSAGES[:committer_not_verified] % { committer_email: commit.committer_email }
               else
                 ERROR_MESSAGES[:committer_not_allowed] % { committer_email: commit.committer_email }

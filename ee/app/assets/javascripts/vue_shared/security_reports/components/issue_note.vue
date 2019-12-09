@@ -1,7 +1,7 @@
 <script>
 import _ from 'underscore';
-import { __, sprintf } from '~/locale';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
+import { __, sprintf } from '~/locale';
 
 export default {
   components: {

@@ -1,6 +1,8 @@
 import * as actions from 'ee/analytics/productivity_analytics/store/modules/filters/actions';
 import * as types from 'ee/analytics/productivity_analytics/store/modules/filters/mutation_types';
+import testAction from 'helpers/vuex_action_helper';
 import { chartKeys } from 'ee/analytics/productivity_analytics/constants';
+import getInitialState from 'ee/analytics/productivity_analytics/store/modules/filters/state';
 
 describe('Productivity analytics filter actions', () => {
   let store;
@@ -9,7 +11,6 @@ describe('Productivity analytics filter actions', () => {
   const endDate = new Date(currentYear, 8, 7);
   const groupNamespace = 'gitlab-org';
   const projectPath = 'gitlab-org/gitlab-test';
-  const path = 'author_username=root';
 
   beforeEach(() => {
     store = {
@@ -26,8 +27,8 @@ describe('Productivity analytics filter actions', () => {
           expect(store.commit).toHaveBeenCalledWith(types.SET_GROUP_NAMESPACE, groupNamespace);
 
           expect(store.dispatch.mock.calls[0]).toEqual([
-            'charts/updateSelectedItems',
-            { chartKey: chartKeys.main, item: null, skipReload: true },
+            'charts/resetMainChartSelection',
+            true,
             { root: true },
           ]);
 
@@ -58,8 +59,8 @@ describe('Productivity analytics filter actions', () => {
           expect(store.commit).toHaveBeenCalledWith(types.SET_PROJECT_PATH, projectPath);
 
           expect(store.dispatch.mock.calls[0]).toEqual([
-            'charts/updateSelectedItems',
-            { chartKey: chartKeys.main, item: null, skipReload: true },
+            'charts/resetMainChartSelection',
+            true,
             { root: true },
           ]);
 
@@ -82,16 +83,16 @@ describe('Productivity analytics filter actions', () => {
     });
   });
 
-  describe('setPath', () => {
-    it('commits the SET_PATH mutation', done => {
+  describe('setFilters', () => {
+    it('commits the SET_FILTERS mutation', done => {
       actions
-        .setPath(store, path)
+        .setFilters(store, { author_username: 'root' })
         .then(() => {
-          expect(store.commit).toHaveBeenCalledWith(types.SET_PATH, path);
+          expect(store.commit).toHaveBeenCalledWith(types.SET_FILTERS, { authorUsername: 'root' });
 
           expect(store.dispatch.mock.calls[0]).toEqual([
-            'charts/updateSelectedItems',
-            { chartKey: chartKeys.main, item: null, skipReload: true },
+            'charts/resetMainChartSelection',
+            true,
             { root: true },
           ]);
 
@@ -117,13 +118,13 @@ describe('Productivity analytics filter actions', () => {
   describe('setDateRange', () => {
     it('commits the SET_DATE_RANGE mutation and fetches data by default', done => {
       actions
-        .setPath(store, { startDate, endDate })
+        .setDateRange(store, { startDate, endDate })
         .then(() => {
-          expect(store.commit).toHaveBeenCalledWith(types.SET_PATH, { startDate, endDate });
+          expect(store.commit).toHaveBeenCalledWith(types.SET_DATE_RANGE, { startDate, endDate });
 
           expect(store.dispatch.mock.calls[0]).toEqual([
-            'charts/updateSelectedItems',
-            { chartKey: chartKeys.main, item: null, skipReload: true },
+            'charts/resetMainChartSelection',
+            true,
             { root: true },
           ]);
 
@@ -145,18 +146,19 @@ describe('Productivity analytics filter actions', () => {
         .catch(done.fail);
     });
 
-    it("commits the SET_DATE_RANGE mutation and doesn't fetch data when fetchData=false", done => {
-      actions
-        .setPath(store, { fetchData: false, startDate, endDate })
-        .then(() => {
-          expect(store.commit).toHaveBeenCalledWith(types.SET_PATH, {
-            fetchData: false,
-            startDate,
-            endDate,
-          });
-        })
-        .then(done)
-        .catch(done.fail);
-    });
+    it("commits the SET_DATE_RANGE mutation and doesn't fetch data when skipFetch=true", done =>
+      testAction(
+        actions.setDateRange,
+        { skipFetch: true, startDate, endDate },
+        getInitialState(),
+        [
+          {
+            type: types.SET_DATE_RANGE,
+            payload: { startDate, endDate },
+          },
+        ],
+        [],
+        done,
+      ));
   });
 });

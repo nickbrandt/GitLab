@@ -1,4 +1,5 @@
 import CEMergeRequestStore from '~/vue_merge_request_widget/stores/mr_widget_store';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { mapApprovalsResponse, mapApprovalRulesResponse } from '../mappers';
 import CodeQualityComparisonWorker from '../workers/code_quality_comparison_worker';
 
@@ -37,6 +38,8 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.initPerformanceReport(data);
     this.licenseManagement = data.license_management;
     this.metricsReportsPath = data.metrics_reports_path;
+
+    this.enabledSecurityReports = convertObjectPropsToCamelCase(data.enabled_reports);
 
     this.blockingMergeRequests = data.blocking_merge_requests;
 

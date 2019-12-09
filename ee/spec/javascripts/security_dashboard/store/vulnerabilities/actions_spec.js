@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
@@ -8,6 +7,7 @@ import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/consta
 import initialState from 'ee/security_dashboard/store/modules/vulnerabilities/state';
 import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
 import * as actions from 'ee/security_dashboard/store/modules/vulnerabilities/actions';
+import axios from '~/lib/utils/axios_utils';
 
 import mockDataVulnerabilities from './data/mock_data_vulnerabilities.json';
 import mockDataVulnerabilitiesCount from './data/mock_data_vulnerabilities_count.json';

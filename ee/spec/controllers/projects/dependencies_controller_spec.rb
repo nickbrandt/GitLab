@@ -19,7 +19,7 @@ describe Projects::DependenciesController do
         render_views
 
         before do
-          stub_licensed_features(dependency_list: true)
+          stub_licensed_features(dependency_scanning: true)
         end
 
         it 'renders the show template' do
@@ -52,7 +52,7 @@ describe Projects::DependenciesController do
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(dependency_list: true)
+          stub_licensed_features(dependency_scanning: true)
         end
 
         it 'returns 404' do

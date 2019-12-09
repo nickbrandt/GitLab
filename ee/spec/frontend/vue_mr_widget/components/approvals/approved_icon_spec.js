@@ -1,6 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import Icon from '~/vue_shared/components/icon.vue';
 import ApprovedIcon from 'ee/vue_merge_request_widget/components/approvals/approved_icon.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
 const localVue = createLocalVue();
 const EXPECTED_SIZE = 16;

@@ -6,11 +6,7 @@ export const setGroupNamespace = ({ commit, dispatch }, groupNamespace) => {
 
   // let's reset the current selection first
   // with skipReload=true we avoid data from being fetched here
-  dispatch(
-    'charts/updateSelectedItems',
-    { chartKey: chartKeys.main, item: null, skipReload: true },
-    { root: true },
-  );
+  dispatch('charts/resetMainChartSelection', true, { root: true });
 
   // let's fetch the main chart data first to see if the user has access to the selected group
   // if there's no 403, then we fetch all remaining chart data and table data
@@ -24,11 +20,7 @@ export const setGroupNamespace = ({ commit, dispatch }, groupNamespace) => {
 export const setProjectPath = ({ commit, dispatch }, projectPath) => {
   commit(types.SET_PROJECT_PATH, projectPath);
 
-  dispatch(
-    'charts/updateSelectedItems',
-    { chartKey: chartKeys.main, item: null, skipReload: true },
-    { root: true },
-  );
+  dispatch('charts/resetMainChartSelection', true, { root: true });
 
   return dispatch('charts/fetchChartData', chartKeys.main, { root: true }).then(() => {
     dispatch('charts/fetchSecondaryChartData', null, { root: true });
@@ -37,14 +29,17 @@ export const setProjectPath = ({ commit, dispatch }, projectPath) => {
   });
 };
 
-export const setPath = ({ commit, dispatch }, path) => {
-  commit(types.SET_PATH, path);
+export const setFilters = (
+  { commit, dispatch },
+  { author_username, label_name, milestone_title },
+) => {
+  commit(types.SET_FILTERS, {
+    authorUsername: author_username,
+    labelName: label_name,
+    milestoneTitle: milestone_title,
+  });
 
-  dispatch(
-    'charts/updateSelectedItems',
-    { chartKey: chartKeys.main, item: null, skipReload: true },
-    { root: true },
-  );
+  dispatch('charts/resetMainChartSelection', true, { root: true });
 
   return dispatch('charts/fetchChartData', chartKeys.main, { root: true }).then(() => {
     dispatch('charts/fetchSecondaryChartData', null, { root: true });
@@ -58,11 +53,7 @@ export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDat
 
   if (skipFetch) return false;
 
-  dispatch(
-    'charts/updateSelectedItems',
-    { chartKey: chartKeys.main, item: null, skipReload: true },
-    { root: true },
-  );
+  dispatch('charts/resetMainChartSelection', true, { root: true });
 
   return dispatch('charts/fetchChartData', chartKeys.main, { root: true }).then(() => {
     dispatch('charts/fetchSecondaryChartData', null, { root: true });

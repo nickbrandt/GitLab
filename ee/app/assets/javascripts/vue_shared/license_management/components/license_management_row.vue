@@ -1,10 +1,10 @@
 <script>
 import { mapActions } from 'vuex';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { getIssueStatusFromLicenseStatus } from 'ee/vue_shared/license_management/store/utils';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import IssueStatusIcon from '~/reports/components/issue_status_icon.vue';
-import { getIssueStatusFromLicenseStatus } from 'ee/vue_shared/license_management/store/utils';
 
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 

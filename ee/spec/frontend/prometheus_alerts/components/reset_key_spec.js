@@ -1,10 +1,10 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import ResetKey from 'ee/prometheus_alerts/components/reset_key.vue';
-import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import { GlModal } from '@gitlab/ui';
 import waitForPromises from 'helpers/wait_for_promises';
+import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
+import axios from '~/lib/utils/axios_utils';
 
 describe('ResetKey', () => {
   let Component;

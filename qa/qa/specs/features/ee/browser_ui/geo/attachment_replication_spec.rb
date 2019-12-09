@@ -5,14 +5,6 @@ module QA
     describe 'GitLab Geo attachment replication' do
       let(:file_to_attach) { File.absolute_path(File.join('spec', 'fixtures', 'banana_sample.gif')) }
 
-      after do
-        # Log out so subsequent tests can start unauthenticated
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-      end
-
       it 'user uploads attachment to the primary node' do
         Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
           Page::Main::Login.perform(&:sign_in_using_credentials)

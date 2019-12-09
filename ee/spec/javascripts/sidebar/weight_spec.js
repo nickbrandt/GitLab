@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import weight from 'ee/sidebar/components/weight/weight.vue';
-import eventHub from '~/sidebar/event_hub';
-import { ENTER_KEY_CODE } from '~/lib/utils/keycodes';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockTracking, triggerEvent } from 'spec/helpers/tracking_helper';
+import eventHub from '~/sidebar/event_hub';
+import { ENTER_KEY_CODE } from '~/lib/utils/keycodes';
 
 const DEFAULT_PROPS = {
   weightNoneValue: 'None',

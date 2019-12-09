@@ -1,11 +1,10 @@
 import MockAdapter from 'axios-mock-adapter';
 import Vue from 'vue';
 import axios from '~/lib/utils/axios_utils';
-import '~/boards/services/board_service';
 import boardsStore from '~/boards/stores/boards_store';
 import IssuableContext from '~/issuable_context';
 import AssigneeSelect from 'ee/boards/components/assignee_select.vue';
-import { boardObj, mockBoardService } from 'spec/boards/mock_data';
+import { boardObj } from 'spec/boards/mock_data';
 
 let vm;
 
@@ -32,7 +31,6 @@ const assignee2 = {
 describe('Assignee select component', () => {
   beforeEach(done => {
     setFixtures('<div class="test-container"></div>');
-    gl.boardService = mockBoardService();
     boardsStore.create();
 
     // eslint-disable-next-line no-new

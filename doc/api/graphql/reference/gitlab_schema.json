@@ -1167,6 +1167,33 @@
               "deprecationReason": null
             },
             {
+              "name": "sentryDetailedError",
+              "description": "Detailed version of a Sentry error on the project",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "ID of the Sentry issue",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "ID",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SentryDetailedError",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "sharedRunnersEnabled",
               "description": "Indicates if shared runners are enabled on the project",
               "args": [
@@ -3315,7 +3342,7 @@
           "fields": [
             {
               "name": "author",
-              "description": null,
+              "description": "Author of the epic",
               "args": [
 
               ],
@@ -3333,7 +3360,7 @@
             },
             {
               "name": "children",
-              "description": null,
+              "description": "Children (sub-epics) of the epic",
               "args": [
                 {
                   "name": "iid",
@@ -3492,7 +3519,7 @@
             },
             {
               "name": "closedAt",
-              "description": null,
+              "description": "Timestamp of the epic's closure",
               "args": [
 
               ],
@@ -3506,7 +3533,7 @@
             },
             {
               "name": "createdAt",
-              "description": null,
+              "description": "Timestamp of the epic's creation",
               "args": [
 
               ],
@@ -3534,7 +3561,7 @@
             },
             {
               "name": "description",
-              "description": null,
+              "description": "Description of the epic",
               "args": [
 
               ],
@@ -3604,8 +3631,26 @@
               "deprecationReason": null
             },
             {
+              "name": "downvotes",
+              "description": "Number of downvotes the epic has received",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "dueDate",
-              "description": null,
+              "description": "Due date of the epic",
               "args": [
 
               ],
@@ -3619,7 +3664,7 @@
             },
             {
               "name": "dueDateFixed",
-              "description": null,
+              "description": "Fixed due date of the epic",
               "args": [
 
               ],
@@ -3633,7 +3678,7 @@
             },
             {
               "name": "dueDateFromMilestones",
-              "description": null,
+              "description": "Inherited due date of the epic from milestones",
               "args": [
 
               ],
@@ -3647,7 +3692,7 @@
             },
             {
               "name": "dueDateIsFixed",
-              "description": null,
+              "description": "Indicates if the due date has been manually set",
               "args": [
 
               ],
@@ -3661,7 +3706,7 @@
             },
             {
               "name": "group",
-              "description": null,
+              "description": "Group to which the epic belongs",
               "args": [
 
               ],
@@ -3679,7 +3724,7 @@
             },
             {
               "name": "hasChildren",
-              "description": null,
+              "description": "Indicates if the epic has children",
               "args": [
 
               ],
@@ -3697,7 +3742,7 @@
             },
             {
               "name": "hasIssues",
-              "description": null,
+              "description": "Indicates if the epic has direct issues",
               "args": [
 
               ],
@@ -3715,7 +3760,7 @@
             },
             {
               "name": "id",
-              "description": null,
+              "description": "ID of the epic",
               "args": [
 
               ],
@@ -3733,7 +3778,7 @@
             },
             {
               "name": "iid",
-              "description": null,
+              "description": "Internal ID of the epic",
               "args": [
 
               ],
@@ -3914,7 +3959,7 @@
             },
             {
               "name": "parent",
-              "description": null,
+              "description": "Parent epic of the epic",
               "args": [
 
               ],
@@ -4022,7 +4067,7 @@
             },
             {
               "name": "relativePosition",
-              "description": "The relative position of the epic in the Epic tree",
+              "description": "The relative position of the epic in the epic tree",
               "args": [
 
               ],
@@ -4036,7 +4081,7 @@
             },
             {
               "name": "startDate",
-              "description": null,
+              "description": "Start date of the epic",
               "args": [
 
               ],
@@ -4050,7 +4095,7 @@
             },
             {
               "name": "startDateFixed",
-              "description": null,
+              "description": "Fixed start date of the epic",
               "args": [
 
               ],
@@ -4064,7 +4109,7 @@
             },
             {
               "name": "startDateFromMilestones",
-              "description": null,
+              "description": "Inherited start date of the epic from milestones",
               "args": [
 
               ],
@@ -4078,7 +4123,7 @@
             },
             {
               "name": "startDateIsFixed",
-              "description": null,
+              "description": "Indicates if the start date has been manually set",
               "args": [
 
               ],
@@ -4092,7 +4137,7 @@
             },
             {
               "name": "state",
-              "description": null,
+              "description": "State of the epic",
               "args": [
 
               ],
@@ -4128,7 +4173,7 @@
             },
             {
               "name": "title",
-              "description": null,
+              "description": "Title of the epic",
               "args": [
 
               ],
@@ -4142,7 +4187,7 @@
             },
             {
               "name": "updatedAt",
-              "description": null,
+              "description": "Timestamp of the epic's last activity",
               "args": [
 
               ],
@@ -4150,6 +4195,24 @@
                 "kind": "SCALAR",
                 "name": "Time",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "upvotes",
+              "description": "Number of upvotes the epic has received",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -13790,6 +13853,469 @@
         },
         {
           "kind": "OBJECT",
+          "name": "SentryDetailedError",
+          "description": null,
+          "fields": [
+            {
+              "name": "count",
+              "description": "Count of occurrences",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "culprit",
+              "description": "Culprit of the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "externalUrl",
+              "description": "External URL of the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "firstReleaseLastCommit",
+              "description": "Commit the error was first seen",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "firstReleaseShortVersion",
+              "description": "Release version the error was first seen",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "firstSeen",
+              "description": "Timestamp when the error was first seen",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Time",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "frequency",
+              "description": "Last 24hr stats of the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "SentryErrorFrequency",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": "ID (global ID) of the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "lastReleaseLastCommit",
+              "description": "Commit the error was last seen",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "lastReleaseShortVersion",
+              "description": "Release version the error was last seen",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "lastSeen",
+              "description": "Timestamp when the error was last seen",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Time",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "message",
+              "description": "Sentry metadata message of the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sentryId",
+              "description": "ID (Sentry ID) of the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sentryProjectId",
+              "description": "ID of the project (Sentry project)",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sentryProjectName",
+              "description": "Name of the project affected by the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "sentryProjectSlug",
+              "description": "Slug of the project affected by the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "shortId",
+              "description": "Short ID (Sentry ID) of the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "status",
+              "description": "Status of the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "SentryErrorStatus",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "title",
+              "description": "Title of the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "type",
+              "description": "Type of the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "userCount",
+              "description": "Count of users affected by the error",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "SentryErrorStatus",
+          "description": "State of a Sentry error",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "RESOLVED",
+              "description": "Error has been resolved",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "RESOLVED_IN_NEXT_RELEASE",
+              "description": "Error has been ignored until next release",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "UNRESOLVED",
+              "description": "Error is unresolved",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "IGNORED",
+              "description": "Error has been ignored",
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SentryErrorFrequency",
+          "description": null,
+          "fields": [
+            {
+              "name": "count",
+              "description": "Count of errors received since the previously recorded time",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "time",
+              "description": "Time the error frequency stats were recorded",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Time",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "Metadata",
           "description": null,
           "fields": [
@@ -14107,6 +14633,33 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "EpicTreeReorderPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "issueSetConfidential",
+              "description": null,
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "IssueSetConfidentialInput",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "IssueSetConfidentialPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -14965,6 +15518,136 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": "A unique identifier for the client performing the mutation.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "IssueSetConfidentialPayload",
+          "description": "Autogenerated return type of IssueSetConfidential",
+          "fields": [
+            {
+              "name": "clientMutationId",
+              "description": "A unique identifier for the client performing the mutation.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "Reasons why the mutation failed.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "issue",
+              "description": "The issue after mutation",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Issue",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "IssueSetConfidentialInput",
+          "description": "Autogenerated input type of IssueSetConfidential",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "projectPath",
+              "description": "The project the issue to mutate is in",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "iid",
+              "description": "The iid of the issue to mutate",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "confidential",
+              "description": "Whether or not to set the issue as a confidential.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
                   "ofType": null
                 }
               },

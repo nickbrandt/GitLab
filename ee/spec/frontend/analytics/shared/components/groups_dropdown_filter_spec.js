@@ -3,8 +3,8 @@ import $ from 'jquery';
 import 'bootstrap';
 import '~/gl_dropdown';
 import GroupsDropdownFilter from 'ee/analytics/shared/components/groups_dropdown_filter.vue';
-import Api from '~/api';
 import { TEST_HOST } from 'helpers/test_constants';
+import Api from '~/api';
 
 jest.mock('~/api', () => ({
   groups: jest.fn(),

@@ -1,9 +1,9 @@
 import { mount, createLocalVue } from '@vue/test-utils';
-import MrWidgetPipelineContainer from '~/vue_merge_request_widget/components/mr_widget_pipeline_container.vue';
-import { MT_MERGE_STRATEGY, MWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 import MergeTrainPositionIndicator from 'ee/vue_merge_request_widget/components/merge_train_position_indicator.vue';
 import VisualReviewAppLink from 'ee/vue_merge_request_widget/components/visual_review_app_link.vue';
 import { mockStore } from 'spec/vue_mr_widget/mock_data';
+import MrWidgetPipelineContainer from '~/vue_merge_request_widget/components/mr_widget_pipeline_container.vue';
+import { MT_MERGE_STRATEGY, MWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 
 describe('MrWidgetPipelineContainer', () => {
   let wrapper;

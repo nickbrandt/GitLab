@@ -117,7 +117,7 @@ describe('Logs Store actions', () => {
       state.environments.current = mockEnvId;
       state.pods.current = mockPodName;
 
-      const endpoint = `/${mockProjectPath}/environments/${mockEnvId}/pods/${mockPodName}/containers/logs.json`;
+      const endpoint = `/${mockProjectPath}/-/environments/${mockEnvId}/pods/${mockPodName}/containers/logs.json`;
 
       mock.onGet(endpoint).reply(200, {
         pod_name: mockPodName,
@@ -147,7 +147,7 @@ describe('Logs Store actions', () => {
       state.projectPath = mockProjectPath;
       state.environments.current = mockEnvId;
 
-      const endpoint = `/${mockProjectPath}/environments/${mockEnvId}/pods/containers/logs.json`;
+      const endpoint = `/${mockProjectPath}/-/environments/${mockEnvId}/pods/containers/logs.json`;
 
       mock.onGet(endpoint).reply(200, {
         pod_name: mockPodName,
@@ -176,7 +176,7 @@ describe('Logs Store actions', () => {
       state.projectPath = mockProjectPath;
       state.environments.current = mockEnvId;
 
-      const endpoint = `/${mockProjectPath}/environments/${mockEnvId}/pods/containers/logs.json`;
+      const endpoint = `/${mockProjectPath}/-/environments/${mockEnvId}/pods/containers/logs.json`;
       mock.onGet(endpoint).replyOnce(500);
 
       testAction(

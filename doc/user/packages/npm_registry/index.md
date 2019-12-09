@@ -5,7 +5,7 @@
 With the GitLab NPM Registry, every
 project can have its own space to store NPM packages.
 
-![GitLab NPM Registry](img/npm_package_view.png)
+![GitLab NPM Registry](img/npm_package_view_v12_5.png)
 
 NOTE: **Note:**
 Only [scoped](https://docs.npmjs.com/misc/scope) packages are supported.
@@ -42,6 +42,20 @@ it is not possible due to a naming collision. For example:
 | `gitlab-org/gitlab`    | `@gitlab-org/gitlab`    | Yes       |
 | `gitlab-org/gitlab`    | `@foo/bar`              | No        |
 
+The regex that is used for naming is validating all package names from all package managers:
+
+```
+/\A\@?(([\w\-\.\+]*)\/)*([\w\-\.]+)@?(([\w\-\.\+]*)\/)*([\w\-\.]*)\z/
+```
+
+It allows for capital letters, while NPM does not, and allows for almost all of the
+characters NPM allows with a few exceptions (`~` is not allowed).
+
+NOTE: **Note:** Capital letters are needed because the scope is required to be
+identical to the top level namespace of the project. So, for example, if your
+project path is `My-Group/project-foo`, your package must be named `@My-Group/any-package-name`.
+`@my-group/any-package-name` will not work.
+
 CAUTION: **When updating the path of a user/group or transferring a (sub)group/project:**
 If you update the root namespace of a project with NPM packages, your changes will be rejected. To be allowed to do that, make sure to remove any NPM package first. Don't forget to update your `.npmrc` files to follow the above naming convention and run `npm publish` if necessary.
 
@@ -54,7 +68,7 @@ If a project is private or you want to upload an NPM package to GitLab,
 credentials will need to be provided for authentication. Support is available for [OAuth tokens](../../../api/oauth2.md#resource-owner-password-credentials-flow) or [personal access tokens](../../profile/personal_access_tokens.md).
 
 CAUTION: **2FA is only supported with personal access tokens:**
-If you have 2FA enabled, you need to use a [personal access token](../../profile/personal_access_tokens.md) with OAuth headers. Standard OAuth tokens won't be able to authenticate to the GitLab NPM Registry.
+If you have 2FA enabled, you need to use a [personal access token](../../profile/personal_access_tokens.md) with OAuth headers with the scope set to `api`. Standard OAuth tokens won't be able to authenticate to the GitLab NPM Registry.
 
 ### Authenticating with an OAuth token
 

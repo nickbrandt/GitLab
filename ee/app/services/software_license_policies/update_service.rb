@@ -7,14 +7,12 @@ module SoftwareLicensePolicies
       super(project, user, params.with_indifferent_access)
     end
 
-    # returns the updated managed license
     def execute(software_license_policy)
       return error("", 403) unless can?(@current_user, :admin_software_license_policy, @project)
-
-      @params = @params.slice(*SoftwareLicensePolicy::FORM_EDITABLE)
+      return success(software_license_policy: software_license_policy) unless params[:approval_status].present?
 
       begin
-        software_license_policy.update(params)
+        software_license_policy.update(classification: params[:approval_status])
         RefreshLicenseComplianceChecksWorker.perform_async(project.id)
       rescue ArgumentError => ex
         return error(ex.message, 400)

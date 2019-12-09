@@ -1,11 +1,11 @@
 <script>
 import { isUndefined } from 'underscore';
-import { s__ } from '~/locale';
 import { GlEmptyState, GlSprintf } from '@gitlab/ui';
+import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
+import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
 
 export default {
   components: {
@@ -135,12 +135,26 @@ export default {
       <h4 class="mt-4 mb-3">{{ __('Vulnerabilities') }}</h4>
       <security-dashboard-app
         :lock-to-project="project"
-        :dashboard-documentation="dashboardDocumentation"
-        :empty-state-svg-path="emptyStateSvgPath"
         :vulnerabilities-endpoint="vulnerabilitiesEndpoint"
         :vulnerabilities-count-endpoint="vulnerabilitiesSummaryEndpoint"
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
-      />
+      >
+        <template #emptyState>
+          <gl-empty-state
+            :title="s__(`No vulnerabilities found for this project`)"
+            :svg-path="emptyStateSvgPath"
+            :description="
+              s__(
+                `While it's rare to have no vulnerabilities for your project, it can happen. In any event, we ask that you double check your settings to make sure you've set up your dashboard correctly.`,
+              )
+            "
+            :primary-button-link="dashboardDocumentation"
+            :primary-button-text="
+              s__('Security Reports|Learn more about setting up your dashboard')
+            "
+          />
+        </template>
+      </security-dashboard-app>
     </template>
     <gl-empty-state
       v-else

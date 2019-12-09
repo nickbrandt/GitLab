@@ -308,7 +308,7 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { rawItems 
   dispatch('setItemInputValue', '');
   dispatch('toggleAddItemForm', { toggleState: false });
 };
-export const receiveAddItemFailure = ({ commit }, { itemAddFailureType }) => {
+export const receiveAddItemFailure = ({ commit }, { itemAddFailureType } = {}) => {
   commit(types.RECEIVE_ADD_ITEM_FAILURE, { itemAddFailureType });
 };
 export const addItem = ({ state, dispatch, getters }) => {

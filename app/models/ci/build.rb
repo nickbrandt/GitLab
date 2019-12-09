@@ -13,17 +13,11 @@ module Ci
     include Importable
     include Gitlab::Utils::StrongMemoize
     include HasRef
+    include IgnorableColumns
 
     BuildArchivedError = Class.new(StandardError)
 
-    self.ignored_columns += %i[
-      artifacts_file
-      artifacts_file_store
-      artifacts_metadata
-      artifacts_metadata_store
-      artifacts_size
-      commands
-    ]
+    ignore_columns :artifacts_file, :artifacts_file_store, :artifacts_metadata, :artifacts_metadata_store, :artifacts_size, :commands, remove_after: '2019-12-15', remove_with: '12.7'
 
     belongs_to :project, inverse_of: :builds
     belongs_to :runner
@@ -53,7 +47,7 @@ module Ci
 
     has_one :runner_session, class_name: 'Ci::BuildRunnerSession', validate: true, inverse_of: :build
 
-    accepts_nested_attributes_for :runner_session
+    accepts_nested_attributes_for :runner_session, update_only: true
     accepts_nested_attributes_for :job_variables
 
     delegate :url, to: :runner_session, prefix: true, allow_nil: true
@@ -431,6 +425,18 @@ module Ci
       end
     end
 
+    def expanded_kubernetes_namespace
+      return unless has_environment?
+
+      namespace = options.dig(:environment, :kubernetes, :namespace)
+
+      if namespace.present?
+        strong_memoize(:expanded_kubernetes_namespace) do
+          ExpandVariables.expand(namespace, -> { simple_variables })
+        end
+      end
+    end
+
     def has_environment?
       environment.present?
     end
@@ -656,9 +662,8 @@ module Ci
     def execute_hooks
       return unless project
 
-      build_data = Gitlab::DataBuilder::Build.build(self)
-      project.execute_hooks(build_data.dup, :job_hooks)
-      project.execute_services(build_data.dup, :job_hooks)
+      project.execute_hooks(build_data.dup, :job_hooks) if project.has_active_hooks?(:job_hooks)
+      project.execute_services(build_data.dup, :job_hooks) if project.has_active_services?(:job_hooks)
     end
 
     def browsable_artifacts?
@@ -866,6 +871,10 @@ module Ci
     end
 
     private
+
+    def build_data
+      @build_data ||= Gitlab::DataBuilder::Build.build(self)
+    end
 
     def successful_deployment_status
       if deployment&.last?

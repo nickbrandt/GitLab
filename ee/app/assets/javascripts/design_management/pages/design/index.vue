@@ -1,9 +1,9 @@
 <script>
 import { ApolloMutation } from 'vue-apollo';
 import Mousetrap from 'mousetrap';
+import { GlLoadingIcon } from '@gitlab/ui';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
-import { GlLoadingIcon } from '@gitlab/ui';
 import allVersionsMixin from '../../mixins/all_versions';
 import Toolbar from '../../components/toolbar/index.vue';
 import DesignImage from '../../components/image.vue';
@@ -200,10 +200,8 @@ export default {
             <toolbar
               :id="id"
               :is-deleting="loading"
-              :name="design.filename"
-              :updated-at="design.updatedAt"
-              :updated-by="design.updatedBy"
               :is-latest-version="isLatestVersion"
+              v-bind="design"
               @delete="mutate()"
             />
           </template>

@@ -19,12 +19,14 @@ describe Groups::AuditEventsController do
       end
 
       context 'when audit_events feature is available' do
+        let(:audit_logs_params) { ActionController::Parameters.new(entity_type: ::Group.name, entity_id: group.id).permit! }
+
         before do
           stub_licensed_features(audit_events: true)
         end
 
         it 'renders index with 200 status code' do
-          expect(AuditLogFinder).to receive(:new).with(entity_type: ::Group.name, entity_id: group.id).and_call_original
+          expect(AuditLogFinder).to receive(:new).with(audit_logs_params).and_call_original
 
           request
 

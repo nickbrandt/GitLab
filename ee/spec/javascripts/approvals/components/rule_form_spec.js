@@ -190,6 +190,10 @@ describe('EE Approvals RuleForm', () => {
         });
       });
 
+      it('does not disable the name text field', () => {
+        expect(findNameInput().attributes('disabled')).toBe(undefined);
+      });
+
       it('shows approvers', () => {
         const list = findApproversList();
 
@@ -377,6 +381,30 @@ describe('EE Approvals RuleForm', () => {
         ).toBe(true);
       });
     });
+
+    describe('with new License-Check rule', () => {
+      beforeEach(() => {
+        createComponent({
+          initRule: { ...TEST_RULE, id: null, name: 'License-Check' },
+        });
+      });
+
+      it('does not disable the name text field', () => {
+        expect(findNameInput().attributes('disabled')).toBe(undefined);
+      });
+    });
+
+    describe('with editing the License-Check rule', () => {
+      beforeEach(() => {
+        createComponent({
+          initRule: { ...TEST_RULE, name: 'License-Check' },
+        });
+      });
+
+      it('disables the name text field', () => {
+        expect(findNameInput().attributes('disabled')).toBe('disabled');
+      });
+    });
   });
 
   describe('when allow only single rule', () => {
@@ -387,7 +415,7 @@ describe('EE Approvals RuleForm', () => {
     it('hides name', () => {
       createComponent();
 
-      expect(findNameInput().exists()).toBe(false);
+      expect(findNameInput().exists()).toBe(true);
     });
 
     describe('with no init rule', () => {

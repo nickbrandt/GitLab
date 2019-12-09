@@ -9,6 +9,7 @@ describe SoftwareLicense do
     it { is_expected.to include_module(Presentable) }
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_length_of(:spdx_identifier).is_at_most(255) }
+    it { is_expected.to validate_uniqueness_of(:name) }
   end
 
   describe '.create_policy_for!' do
@@ -18,7 +19,7 @@ describe SoftwareLicense do
 
     context 'when a software license with a given name has already been created' do
       let(:mit_license) { create(:software_license, :mit) }
-      let(:result) { subject.create_policy_for!(project: project, name: mit_license.name, approval_status: :approved) }
+      let(:result) { subject.create_policy_for!(project: project, name: mit_license.name, classification: :approved) }
 
       specify { expect(result).to be_persisted }
       specify { expect(result).to be_approved }
@@ -27,7 +28,7 @@ describe SoftwareLicense do
 
     context 'when a software license with a given name has NOT been created' do
       let(:license_name) { SecureRandom.uuid }
-      let(:result) { subject.create_policy_for!(project: project, name: license_name, approval_status: :blacklisted) }
+      let(:result) { subject.create_policy_for!(project: project, name: license_name, classification: :blacklisted) }
 
       specify { expect(result).to be_persisted }
       specify { expect(result).to be_blacklisted }
@@ -41,6 +42,14 @@ describe SoftwareLicense do
 
     let_it_be(:mit) { create(:software_license, :mit, spdx_identifier: 'MIT') }
     let_it_be(:apache_2) { create(:software_license, :apache_2_0, spdx_identifier: nil) }
+
+    describe '.by_spdx' do
+      it { expect(subject.by_spdx(mit.spdx_identifier)).to contain_exactly(mit) }
+    end
+
+    describe '.spdx' do
+      it { expect(subject.spdx).to contain_exactly(mit) }
+    end
 
     describe '.by_spdx' do
       it { expect(subject.by_spdx(mit.spdx_identifier)).to contain_exactly(mit) }

@@ -18,13 +18,20 @@ module EE
           params '<&epic | group&epic | Epic URL>'
           command :epic do |epic_param|
             epic = extract_epic(epic_param)
+            issue = quick_action_target
 
-            if epic && current_user.can?(:read_epic, epic)
-              @updates[:epic] = epic
-              message = _('Added an issue to an epic.')
-            else
-              message = _("This epic does not exist or you don't have sufficient permission.")
-            end
+            message =
+              if epic && current_user.can?(:read_epic, epic)
+                if issue&.epic == epic
+                  _('Issue %{issue_reference} has already been added to epic %{epic_reference}.') %
+                    { issue_reference: issue.to_reference, epic_reference: epic.to_reference }
+                else
+                  @updates[:epic] = epic
+                  _('Added an issue to an epic.')
+                end
+              else
+                _("This epic does not exist or you don't have sufficient permission.")
+              end
 
             @execution_message[:epic] = message
           end

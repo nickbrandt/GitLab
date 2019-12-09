@@ -37,8 +37,7 @@ module QA
 
       context 'built-in', :requires_admin do
         before do
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+          Flow::Login.sign_in_as_admin
 
           @group = Resource::Group.fabricate_via_api!
         end
@@ -68,8 +67,7 @@ module QA
       # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/61
       context 'instance level', :quarantine, :requires_admin do
         before do
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+          Flow::Login.sign_in_as_admin
 
           Page::Main::Menu.perform(&:go_to_admin_area)
           Page::Admin::Menu.perform(&:go_to_template_settings)
@@ -111,8 +109,7 @@ module QA
 
       context 'group level' do
         before do
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_credentials)
+          Flow::Login.sign_in
 
           Page::Main::Menu.perform(&:go_to_groups)
           Page::Dashboard::Groups.perform { |groups| groups.click_group(Runtime::Namespace.sandbox_name) }

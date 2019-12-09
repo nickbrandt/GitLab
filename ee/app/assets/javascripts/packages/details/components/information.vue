@@ -28,26 +28,24 @@ export default {
 </script>
 
 <template>
-  <div class="col-sm-6">
-    <div class="card">
-      <div class="card-header">
-        <strong>{{ heading }}</strong>
-      </div>
-
-      <ul class="content-list">
-        <li v-for="(item, index) in information" :key="index">
-          <span class="text-secondary">{{ item.label }}</span>
-          <div class="pull-right">
-            <span>{{ item.value }}</span>
-            <clipboard-button
-              v-if="showCopy"
-              :text="item.value"
-              :title="sprintf(__('Copy %{field}'), { field: item.label })"
-              css-class="border-0 text-secondary py-0"
-            />
-          </div>
-        </li>
-      </ul>
+  <div class="card">
+    <div class="card-header">
+      <strong>{{ heading }}</strong>
     </div>
+
+    <ul class="content-list">
+      <li v-for="(item, index) in information" :key="index">
+        <span class="text-secondary">{{ item.label }}</span>
+        <div class="pull-right">
+          <span>{{ item.value }}</span>
+          <clipboard-button
+            v-if="showCopy"
+            :text="item.value"
+            :title="sprintf(__('Copy %{field}'), { field: item.label })"
+            css-class="border-0 text-secondary py-0"
+          />
+        </div>
+      </li>
+    </ul>
   </div>
 </template>

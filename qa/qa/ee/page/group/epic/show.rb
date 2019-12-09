@@ -8,10 +8,6 @@ module QA
           class Show < QA::Page::Base
             include QA::Page::Component::Issuable::Common
 
-            view 'app/assets/javascripts/issue_show/components/title.vue' do
-              element :title, required: true
-            end
-
             view 'ee/app/assets/javascripts/epic/components/epic_header.vue' do
               element :close_reopen_epic_button
             end

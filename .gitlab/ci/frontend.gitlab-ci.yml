@@ -13,7 +13,7 @@
     - .default-before_script
     - .assets-compile-cache
     - .only:changes-code-backstage-qa
-  image: registry.gitlab.com/gitlab-org/gitlab-build-images:ruby-2.6.3-git-2.22-chrome-73.0-node-12.x-yarn-1.16-graphicsmagick-1.3.33-docker-18.06.1
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:ruby-2.6.3-git-2.22-chrome-73.0-node-12.x-yarn-1.16-graphicsmagick-1.3.33-docker-19.03.1
   stage: test
   dependencies: ["setup-test-env"]
   needs: ["setup-test-env"]
@@ -245,5 +245,9 @@ webpack-dev-server:
   variables:
     WEBPACK_MEMORY_TEST: "true"
   script:
-    - node --version
     - node --expose-gc node_modules/.bin/webpack-dev-server --config config/webpack.config.js
+  artifacts:
+    name: webpack-dev-server
+    expire_in: 31d
+    paths:
+      - webpack-dev-server.json

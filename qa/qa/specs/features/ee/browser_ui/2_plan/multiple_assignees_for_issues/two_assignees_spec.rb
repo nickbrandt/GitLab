@@ -31,7 +31,6 @@ module QA
 
           show.select_all_activities_filter
 
-          expect(show).to have_content "assigned to @#{@user_2.username}"
           expect(show.avatar_image_count).to be 2
           expect(show.assignee_title).to have_content '2 Assignees'
         end

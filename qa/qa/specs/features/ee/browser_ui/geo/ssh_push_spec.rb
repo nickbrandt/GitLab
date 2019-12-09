@@ -5,18 +5,10 @@ module QA
     describe 'GitLab SSH push' do
       let(:file_name) { 'README.md' }
 
-      after do
-        # Log out so subsequent tests can start unauthenticated
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-      end
-
       context 'regular git commit' do
         it "is replicated to the secondary" do
           key_title = "key for ssh tests #{Time.now.to_f}"
-          file_content = 'This is a Geo project!  Commit from primary.'
+          file_content = 'This is a Geo project! Commit from primary.'
           project = nil
           key = nil
 

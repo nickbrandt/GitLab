@@ -1,5 +1,4 @@
 import dateFormat from 'dateformat';
-import { urlParamsToObject } from '~/lib/utils/common_utils';
 import { getDateInPast, beginOfDayTime, endOfDayTime } from '~/lib/utils/datetime_utility';
 import { chartKeys, scatterPlotAddonQueryDays } from '../../../constants';
 import { dateFormats } from '../../../../shared/constants';
@@ -21,8 +20,15 @@ import { dateFormats } from '../../../../shared/constants';
  *
  */
 export const getCommonFilterParams = state => chartKey => {
-  const { groupNamespace, projectPath, filters, startDate, endDate } = state;
-  const { author_username, milestone_title, label_name } = urlParamsToObject(filters);
+  const {
+    groupNamespace,
+    projectPath,
+    startDate,
+    endDate,
+    authorUsername,
+    labelName,
+    milestoneTitle,
+  } = state;
 
   // for the scatterplot we need to remove 30 days from the state's merged_at_after date
   const mergedAtAfterDate =
@@ -33,9 +39,9 @@ export const getCommonFilterParams = state => chartKey => {
   return {
     group_id: groupNamespace,
     project_id: projectPath,
-    author_username,
-    milestone_title,
-    label_name,
+    author_username: authorUsername,
+    milestone_title: milestoneTitle,
+    label_name: labelName,
     merged_at_after: `${mergedAtAfterDate}${beginOfDayTime}`,
     merged_at_before: `${dateFormat(endDate, dateFormats.isoDate)}${endOfDayTime}`,
   };

@@ -1,7 +1,7 @@
-import { n__, sprintf } from '~/locale';
-import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 import ReportMapper from 'ee/vue_shared/license_management/report_mapper';
+import { n__, sprintf } from '~/locale';
+import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 
 const toLowerCase = name => name.toLowerCase();
 /**

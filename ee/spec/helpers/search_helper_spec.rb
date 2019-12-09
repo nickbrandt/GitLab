@@ -65,7 +65,7 @@ describe SearchHelper do
       project.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
 
-      result = project.repository.search(
+      result = project.repository.elastic_search(
         'def popen',
         type: :blob,
         options: { highlight: true }
@@ -89,7 +89,7 @@ describe SearchHelper do
     end
 
     def es_blob_search
-      Repository.search(
+      Repository.elastic_search(
         'def popen',
         type: :blob,
         options: { highlight: true }
@@ -119,7 +119,7 @@ describe SearchHelper do
     let(:show_snippets) { true }
     let(:collection) { Kaminari.paginate_array([:foo]).page(1).per(10) }
     let(:user) { create(:user) }
-    let(:message) { "Showing %{count} %{scope} for \"%{term}\"" }
+    let(:message) { "Showing %{count} %{scope} for%{term_element}" }
     let(:new_message) { message + " in your personal and project snippets" }
 
     subject { search_entries_info_template(collection) }

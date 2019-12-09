@@ -22,7 +22,12 @@ module Gitlab
         end
 
         def create_identity_for_existing_user
-          # TODO: create new identity for existing users as part of https://gitlab.com/gitlab-org/gitlab/issues/36808
+          user = User.find_by_email(ldap_user.email.first)
+
+          return if user.nil? || user.ldap_user?
+
+          create_ldap_certificate_identity_for(user)
+          user
         end
 
         def create_user
@@ -39,6 +44,10 @@ module Gitlab
           }
 
           Users::CreateService.new(nil, user_params).execute(skip_authorization: true)
+        end
+
+        def create_ldap_certificate_identity_for(user)
+          user.identities.create(provider: @provider, extern_uid: ldap_user.dn)
         end
 
         def adapter

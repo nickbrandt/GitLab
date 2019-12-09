@@ -24,6 +24,8 @@ export default () =>
         emptySvgPath: dataset.svgPath,
         npmPath: dataset.npmPath,
         npmHelpPath: dataset.npmHelpPath,
+        mavenPath: dataset.mavenPath,
+        mavenHelpPath: dataset.mavenHelpPath,
       };
     },
     render(createElement) {
@@ -36,6 +38,8 @@ export default () =>
           emptySvgPath: this.emptySvgPath,
           npmPath: this.npmPath,
           npmHelpPath: this.npmHelpPath,
+          mavenPath: this.mavenPath,
+          mavenHelpPath: this.mavenHelpPath,
         },
       });
     },

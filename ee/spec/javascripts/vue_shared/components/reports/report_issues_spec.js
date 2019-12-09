@@ -1,6 +1,4 @@
 import Vue from 'vue';
-import reportIssues from '~/reports/components/report_item.vue';
-import { STATUS_FAILED, STATUS_SUCCESS } from '~/reports/constants';
 import { componentNames } from 'ee/reports/components/issue_body';
 import store from 'ee/vue_shared/security_reports/store';
 import mountComponent, { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
@@ -10,6 +8,8 @@ import {
   dockerReportParsed,
   parsedDast,
 } from 'ee_spec/vue_shared/security_reports/mock_data';
+import { STATUS_FAILED, STATUS_SUCCESS } from '~/reports/constants';
+import reportIssues from '~/reports/components/report_item.vue';
 
 describe('Report issues', () => {
   let vm;

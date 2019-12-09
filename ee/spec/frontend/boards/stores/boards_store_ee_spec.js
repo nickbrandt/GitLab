@@ -1,8 +1,8 @@
 import AxiosMockAdapter from 'axios-mock-adapter';
 import BoardsStoreEE from 'ee_else_ce/boards/stores/boards_store_ee';
+import { TEST_HOST } from 'helpers/test_constants';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
-import { TEST_HOST } from 'helpers/test_constants';
 
 jest.mock('~/flash');
 

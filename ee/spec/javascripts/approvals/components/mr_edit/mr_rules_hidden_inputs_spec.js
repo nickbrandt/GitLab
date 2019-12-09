@@ -163,10 +163,10 @@ describe('EE Approvlas MRRulesHiddenInputs', () => {
           rule.isNew = true;
         });
 
-        it('does not render id input', () => {
+        it('does render id input', () => {
           factory();
 
-          expect(findHiddenInputs().map(x => x.name)).not.toContain(INPUT_ID);
+          expect(findHiddenInputs().map(x => x.name)).toContain(INPUT_ID);
         });
 
         describe('with source', () => {

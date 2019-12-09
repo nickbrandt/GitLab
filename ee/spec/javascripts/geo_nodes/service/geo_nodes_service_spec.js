@@ -1,6 +1,6 @@
+import GeoNodesService from 'ee/geo_nodes/service/geo_nodes_service';
 import axios from '~/lib/utils/axios_utils';
 
-import GeoNodesService from 'ee/geo_nodes/service/geo_nodes_service';
 import { NODE_DETAILS_PATH } from '../mock_data';
 
 describe('GeoNodesService', () => {

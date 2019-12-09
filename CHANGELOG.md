@@ -2,6 +2,20 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 12.5.3
+
+### Fixed (4 changes)
+
+- Fix project creation with templates using /projects/user/:id API. !20590
+- Fix merging merge requests from push options. !20639
+- Fix Crossplane help link in cluster applications page. !20668
+- Fixes job log not scrolling to the bottom.
+
+### Changed (1 change)
+
+- Flatten exception details in API and controller logs. !20434
+
+
 ## 12.5.1
 
 ### Security (11 changes)
@@ -369,6 +383,10 @@ entry.
 - Adding dropdown arrow icon and updated text alignment.
 - Change selects from default browser style to custom style.
 
+
+## 12.4.5
+
+- No changes.
 
 ## 12.4.3
 

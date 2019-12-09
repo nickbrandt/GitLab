@@ -54,7 +54,7 @@ export default {
     state.searchCount += 1;
   },
   [types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, results) {
-    state.projectSearchResults = results;
+    state.projectSearchResults = results.data;
 
     state.messages.noResults = state.projectSearchResults.length === 0;
     state.messages.searchError = false;

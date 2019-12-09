@@ -120,4 +120,16 @@ describe 'Projects > Audit Events', :js do
   it_behaves_like 'audit event contains custom message' do
     let(:audit_events_url) { project_audit_events_path(project) }
   end
+
+  describe 'filter by date', js: false do
+    let!(:audit_event_1) { create(:project_audit_event, entity_type: 'Project', entity_id: project.id, created_at: 5.days.ago) }
+    let!(:audit_event_2) { create(:project_audit_event, entity_type: 'Project', entity_id: project.id, created_at: 3.days.ago) }
+    let!(:audit_event_3) { create(:project_audit_event, entity_type: 'Project', entity_id: project.id, created_at: 1.day.ago) }
+
+    before do
+      visit project_audit_events_path(project)
+    end
+
+    it_behaves_like 'audit events filter'
+  end
 end

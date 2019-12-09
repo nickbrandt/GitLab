@@ -59,6 +59,37 @@ describe MergeRequestWidgetEntity do
     expect { serializer.represent(merge_request) }.not_to exceed_query_limit(control)
   end
 
+  describe 'enabled_reports' do
+    it 'marks all reports as disabled by default' do
+      expect(subject.as_json).to include(:enabled_reports)
+      expect(subject.as_json[:enabled_reports]).to eq({
+        sast: false,
+        container_scanning: false,
+        dast: false,
+        dependency_scanning: false,
+        license_management: false
+      })
+    end
+
+    it 'marks reports as enabled if artifacts exist' do
+      allow(merge_request).to receive(:enabled_reports).and_return({
+        sast: true,
+        container_scanning: true,
+        dast: true,
+        dependency_scanning: true,
+        license_management: true
+      })
+      expect(subject.as_json).to include(:enabled_reports)
+      expect(subject.as_json[:enabled_reports]).to eq({
+        sast: true,
+        container_scanning: true,
+        dast: true,
+        dependency_scanning: true,
+        license_management: true
+      })
+    end
+  end
+
   describe 'test report artifacts', :request_store do
     using RSpec::Parameterized::TableSyntax
 
@@ -196,38 +227,6 @@ describe MergeRequestWidgetEntity do
     allow(merge_request).to receive(:head_pipeline).and_return(pipeline)
 
     expect(subject.as_json).to include(:pipeline_id)
-  end
-
-  describe 'Merge Trains' do
-    let!(:merge_train) { create(:merge_train, merge_request: merge_request) }
-
-    before do
-      stub_licensed_features(merge_pipelines: true, merge_trains: true)
-      project.update!(merge_pipelines_enabled: true)
-    end
-
-    it 'has merge train entity' do
-      expect(subject.as_json).to include(:merge_trains_count)
-      expect(subject.as_json).to include(:merge_train_index)
-    end
-
-    context 'when the merge train feature is disabled' do
-      before do
-        stub_feature_flags(merge_trains_enabled: false)
-      end
-
-      it 'does not have merge trains count' do
-        expect(subject.as_json).not_to include(:merge_trains_count)
-      end
-    end
-
-    context 'when the merge request is not on a merge train' do
-      let!(:merge_train) { }
-
-      it 'does not have merge train index' do
-        expect(subject.as_json).not_to include(:merge_train_index)
-      end
-    end
   end
 
   describe 'blocking merge requests' do

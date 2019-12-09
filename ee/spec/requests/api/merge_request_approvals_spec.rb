@@ -226,16 +226,6 @@ describe API::MergeRequestApprovals do
           expect(response).to have_gitlab_http_status(422)
         end
       end
-
-      it 'only shows approver groups that are visible to current user' do
-        private_group = create(:group, :private)
-        merge_request.approver_groups.create(group: private_group)
-
-        post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", current_user), params: { approvals_required: 5 }
-
-        expect(response).to have_gitlab_http_status(201)
-        expect(json_response['approver_groups'].size).to eq(expected_approver_group_size)
-      end
     end
 
     context 'as a project admin' do

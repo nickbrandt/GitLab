@@ -114,8 +114,10 @@ module ProjectsHelper
     source = visible_fork_source(project)
 
     if source
-      _('This will remove the fork relationship between this project and %{fork_source}.') %
+      msg = _('This will remove the fork relationship between this project and %{fork_source}.') %
         { fork_source: link_to(source.full_name, project_path(source)) }
+
+      msg.html_safe
     else
       _('This will remove the fork relationship between this project and other projects in the fork network.')
     end
@@ -696,5 +698,9 @@ module ProjectsHelper
 
   def vue_file_list_enabled?
     Feature.enabled?(:vue_file_list, @project)
+  end
+
+  def show_visibility_confirm_modal?(project)
+    project.unlink_forks_upon_visibility_decrease_enabled? && project.visibility_level > Gitlab::VisibilityLevel::PRIVATE && project.forks_count > 0
   end
 end

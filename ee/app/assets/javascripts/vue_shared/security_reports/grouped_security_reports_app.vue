@@ -1,10 +1,10 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
+import { componentNames } from 'ee/reports/components/issue_body';
 import ReportSection from '~/reports/components/report_section.vue';
 import SummaryRow from '~/reports/components/summary_row.vue';
 import IssuesList from '~/reports/components/issues_list.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import { componentNames } from 'ee/reports/components/issue_body';
 import IssueModal from './components/modal.vue';
 import securityReportsMixin from './mixins/security_report_mixin';
 import createStore from './store';
@@ -20,6 +20,11 @@ export default {
   },
   mixins: [securityReportsMixin],
   props: {
+    enabledReports: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
     headBlobPath: {
       type: String,
       required: true,
@@ -168,25 +173,22 @@ export default {
     securityTab() {
       return `${this.pipelinePath}/security`;
     },
-    shouldRenderSastContainer() {
+    hasContainerScanningReports() {
+      const type = 'containerScanning';
+      if (this.isMergeRequestReportApiEnabled(type)) {
+        return this.enabledReports[type];
+      }
       const { head, diffEndpoint } = this.sastContainer.paths;
-
-      return head || diffEndpoint;
+      return Boolean(head || diffEndpoint);
     },
-    shouldRenderDependencyScanning() {
-      const { head, diffEndpoint } = this.dependencyScanning.paths;
-
-      return head || diffEndpoint;
+    hasDependencyScanningReports() {
+      return this.hasReportsType('dependencyScanning');
     },
-    shouldRenderDast() {
-      const { head, diffEndpoint } = this.dast.paths;
-
-      return head || diffEndpoint;
+    hasDastReports() {
+      return this.hasReportsType('dast');
     },
-    shouldRenderSast() {
-      const { head, diffEndpoint } = this.sast.paths;
-
-      return head || diffEndpoint;
+    hasSastReports() {
+      return this.hasReportsType('sast');
     },
   },
 
@@ -209,7 +211,7 @@ export default {
 
     const sastDiffEndpoint = gl && gl.mrWidgetData && gl.mrWidgetData.sast_comparison_path;
 
-    if (gon.features && gon.features.sastMergeRequestReportApi && sastDiffEndpoint) {
+    if (this.isMergeRequestReportApiEnabled('sast') && sastDiffEndpoint && this.hasSastReports) {
       this.setSastDiffEndpoint(sastDiffEndpoint);
       this.fetchSastDiff();
     } else if (this.sastHeadPath) {
@@ -225,9 +227,9 @@ export default {
       gl && gl.mrWidgetData && gl.mrWidgetData.container_scanning_comparison_path;
 
     if (
-      gon.features &&
-      gon.features.containerScanningMergeRequestReportApi &&
-      sastContainerDiffEndpoint
+      this.isMergeRequestReportApiEnabled('containerScanning') &&
+      sastContainerDiffEndpoint &&
+      this.hasContainerScanningReports
     ) {
       this.setSastContainerDiffEndpoint(sastContainerDiffEndpoint);
       this.fetchSastContainerDiff();
@@ -242,7 +244,7 @@ export default {
 
     const dastDiffEndpoint = gl && gl.mrWidgetData && gl.mrWidgetData.dast_comparison_path;
 
-    if (gon.features && gon.features.dastMergeRequestReportApi && dastDiffEndpoint) {
+    if (this.isMergeRequestReportApiEnabled('dast') && dastDiffEndpoint && this.hasDastReports) {
       this.setDastDiffEndpoint(dastDiffEndpoint);
       this.fetchDastDiff();
     } else if (this.dastHeadPath) {
@@ -258,9 +260,9 @@ export default {
       gl && gl.mrWidgetData && gl.mrWidgetData.dependency_scanning_comparison_path;
 
     if (
-      gon.features &&
-      gon.features.dependencyScanningMergeRequestReportApi &&
-      dependencyScanningDiffEndpoint
+      this.isMergeRequestReportApiEnabled('dependencyScanning') &&
+      dependencyScanningDiffEndpoint &&
+      this.hasDependencyScanningReports
     ) {
       this.setDependencyScanningDiffEndpoint(dependencyScanningDiffEndpoint);
       this.fetchDependencyScanningDiff();
@@ -321,6 +323,16 @@ export default {
       fetchSastReports: 'fetchReports',
       fetchSastDiff: 'fetchDiff',
     }),
+    isMergeRequestReportApiEnabled(type) {
+      return Boolean(gon.features && gon.features[`${type}MergeRequestReportApi`]);
+    },
+    hasReportsType(type) {
+      if (this.isMergeRequestReportApiEnabled(type)) {
+        return this.enabledReports[type];
+      }
+      const { head, diffEndpoint } = this[type].paths;
+      return Boolean(head || diffEndpoint);
+    },
   },
 };
 </script>
@@ -340,12 +352,13 @@ export default {
         target="_blank"
         class="btn btn-default btn-sm float-right append-right-default"
       >
-        <span>{{ s__('ciReport|View full report') }}</span> <icon :size="16" name="external-link" />
+        <span>{{ s__('ciReport|View full report') }}</span>
+        <icon :size="16" name="external-link" />
       </a>
     </div>
 
     <div slot="body" class="mr-widget-grouped-section report-block">
-      <template v-if="shouldRenderSast">
+      <template v-if="hasSastReports">
         <summary-row
           :summary="groupedSastText"
           :status-icon="sastStatusIcon"
@@ -364,7 +377,7 @@ export default {
         />
       </template>
 
-      <template v-if="shouldRenderDependencyScanning">
+      <template v-if="hasDependencyScanningReports">
         <summary-row
           :summary="groupedDependencyText"
           :status-icon="dependencyScanningStatusIcon"
@@ -382,7 +395,7 @@ export default {
         />
       </template>
 
-      <template v-if="shouldRenderSastContainer">
+      <template v-if="hasContainerScanningReports">
         <summary-row
           :summary="groupedSastContainerText"
           :status-icon="sastContainerStatusIcon"
@@ -400,7 +413,7 @@ export default {
         />
       </template>
 
-      <template v-if="shouldRenderDast">
+      <template v-if="hasDastReports">
         <summary-row
           :summary="groupedDastText"
           :status-icon="dastStatusIcon"

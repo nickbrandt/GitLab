@@ -14,6 +14,7 @@ module Ci
     include HasRef
     include ShaAttribute
     include FromUnion
+    include UpdatedAtFilterable
 
     sha_attribute :source_sha
     sha_attribute :target_sha
@@ -204,7 +205,7 @@ module Ci
     end
 
     scope :internal, -> { where(source: internal_sources) }
-    scope :ci_sources, -> { where(config_source: ci_sources_values) }
+    scope :ci_sources, -> { where(config_source: ::Ci::PipelineEnums.ci_config_sources_values) }
     scope :for_user, -> (user) { where(user: user) }
     scope :for_sha, -> (sha) { where(sha: sha) }
     scope :for_source_sha, -> (source_sha) { where(source_sha: source_sha) }
@@ -299,11 +300,6 @@ module Ci
       end
     end
 
-    def self.latest_for_shas(shas)
-      max_id_per_sha = for_sha(shas).group(:sha).select("max(id)")
-      where(id: max_id_per_sha)
-    end
-
     def self.latest_successful_ids_per_project
       success.group(:project_id).select('max(id) as id')
     end
@@ -318,10 +314,6 @@ module Ci
 
     def self.internal_sources
       sources.reject { |source| source == "external" }.values
-    end
-
-    def self.ci_sources_values
-      config_sources.values_at(:repository_source, :auto_devops_source, :unknown_source)
     end
 
     def self.bridgeable_statuses
@@ -818,6 +810,10 @@ module Ci
 
     def persistent_ref
       @persistent_ref ||= PersistentRef.new(pipeline: self)
+    end
+
+    def find_successful_build_ids_by_names(names)
+      statuses.latest.success.where(name: names).pluck(:id)
     end
 
     private
