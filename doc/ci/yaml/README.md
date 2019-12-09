@@ -130,6 +130,7 @@ The following table lists available parameters for jobs:
 | [`variables`](#variables)                          | Define job variables on a job level.                                                                                                                                                |
 | [`interruptible`](#interruptible)                  | Defines if a job can be canceled when made redundant by a newer run.                                                                                                                |
 | [`resource_group`](#resource_group)                | Limit job concurrency.                                                                                                                                                              |
+| [`release`](#release) | Instructs the Runner to generate a [Release](../../user/project/releases/index.md#releases) object. |
 
 NOTE: **Note:**
 Parameters `types` and `type` are [deprecated](#deprecated-parameters).
@@ -256,8 +257,8 @@ karma:
 
 ### `stages`
 
-`stages` is used to define stages that can be used by jobs and is defined
-globally.
+`stages` is used to define stages that contain jobs and is defined
+globally for the pipeline.
 
 The specification of `stages` allows for having flexible multi stage pipelines.
 The ordering of elements in `stages` defines the ordering of jobs' execution:
@@ -2809,6 +2810,179 @@ job:
   artifacts:
     when: on_failure
 ```
+
+### `release`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/19298) in GitLab 12.6.
+
+`release` indicates that the job will create a [Release](../../user/project/releases/index.md#releases),
+and optionally include URLs for Release assets.
+
+These methods are supported:
+
+- [`tag_name`](#releasetag_name)
+- [`name`](#releasename)
+- [`description`](#releasedescription)
+- [`assets`](#releaseassets)
+- [`assets:links:name`](#releaseassetslinksname)
+- [`assets:links:url`](#releaseassetslinksurl)
+
+The Release will only be created if the job is processed without error. If an error is returned
+from Rails API during Release creation, the `release` job will fail. There can multiple
+`release` jobs in a pipeline, for example:
+
+```yaml
+ios-release:
+  script: release > changelog.md
+  release:
+     tag_name: v1.0.0-ios
+     description: changelog.md
+
+android-release:
+  script: release > changelog.md
+  release:
+     tag_name: v1.0.0-android
+     description: changelog.md
+```
+
+#### `release:tag_name`
+
+The `tag_name` must be specified, and this can either refer to a Git tag or can be specified by the user.
+
+If the `$CI_COMMIT_TAG` [predefined variable](../variables/predefined_variables.md) is specified
+as a tag name, it is necessary to also specify `only: [tags]`, otherwise the job will fail when
+running against branches.
+
+When the specified tag doesn't exist in repository, a new tag will be created from the associated
+`ref` of the pipeline. In this case, the tag will point to the latest commit of the `ref`,
+instead of the associated SHA of the pipeline.
+
+For example, when creating a Release from a Git tag creation:
+
+```yaml
+job:
+  release:
+    tag_name: $CI_COMMIT_TAG
+    description: changelog.txt
+  only:
+    - tags
+```
+
+It is also possible to create any unique tag, in which case `only: tags` is not mandatory.
+A semantic versioning example:
+
+```yaml
+job:
+  release:
+    tag_name: ${MAJOR}_${MINOR}_${REVISION}
+    description: changelog.txt
+```
+
+- The Release will only be created if the main script of the job succeeded.
+- If the Release already exists it will not update and will cause the job with `release` keyword to fail.
+- The `release` section executes after the `script` tag and before the `after_script`.
+
+#### `release:name`
+
+Specifies the Release name. This is an optional field, if omitted it will be populated with
+`release:tag_name`.
+
+#### `release:description`
+
+Specifies a file containing the longer description of the Release. This is a mandatory
+field and can point to a changelog.
+
+#### `release:assets`
+
+An array of `release:assets:links`.
+
+Adds [assets](../../user/project/releases/index.md#release-assets) to the release.
+
+It is possible to add assets to a release, in the form of URLs pointing to an arbitrary external
+location (such as a S3 bucket or package registry). Any external locations must be populated by
+a code specified in the `script` section.
+
+```yaml
+job:
+  script:
+    - cd src
+    - go build hello-world.go
+    - make changelog | tee release_changelog.txt
+  release:
+    name: Release $CI_TAG_NAME
+    tag_name: v0.06
+    description: release_changelog.txt
+    assets:
+      - name: hello-world
+        url: https://s3.amazonaws.com/myapp_binaries/hello-world
+```
+
+The GitLab Runner will call the GitLab Rails API and create the Release object, adding assets
+as URLs if defined.
+
+#### `release:assets:links`
+
+An array of `link` entries, optional.
+
+```yaml
+release:
+  assets:
+    links:
+      - name: cool-app.zip
+        url: https://downloads.example.org/1.0-$CI_COMMIT_SHORT_SHA.zip
+```
+
+#### `release:assets:links:url`
+
+Specifies any valid URL, mandatory if `release:assets:links` are specified.
+
+```yaml
+release:
+  assets:
+    links:
+      - url: https://downloads.example.org/cool-app.exe
+```
+
+#### `release:assets:links:name`
+
+Optional entry. If this is provided, the `release:assets:links:url` in the same `links` array
+element will be displayed using this name, instead of the raw URL.
+
+```yaml
+release:
+  assets:
+    links:
+      - name: cool-app.zip
+        url: https://downloads.example.org/1.0-$CI_COMMIT_SHORT_SHA.zip
+```
+
+#### Complete example for `release`
+Combining the individual examples given above for `release`, we'd have the following code snippet:
+
+```yaml
+stages:
+- build
+- test
+- release
+
+release:
+  stage: release
+  tag_name: $CI_COMMIT_TAG
+  only:
+   - tags
+  script:
+    - make changelog | tee release_changelog.txt
+  release:
+    name: Release $CI_TAG_NAME
+    description: release_changelog.txt
+    assets:
+      links:
+        - name: cool-app.zip
+          url: https://downloads.example.org/1.0-$CI_COMMIT_SHORT_SHA.zip
+        - url: https://downloads.example.org/cool-app.exe
+```
+
+### `include`
 
 #### `artifacts:expire_in`
 
