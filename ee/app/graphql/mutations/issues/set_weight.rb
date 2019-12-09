@@ -2,7 +2,7 @@
 
 module Mutations
   module Issues
-    class SetWeight < Base
+    class SetWeight < ::Mutations::Issues::Base
       graphql_name 'IssueSetWeight'
 
       argument :weight,
