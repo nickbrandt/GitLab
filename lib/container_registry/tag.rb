@@ -82,7 +82,7 @@ module ContainerRegistry
       return unless config
 
       strong_memoize(:created_at) do
-        DateTime.rfc3339(config['created'])
+        DateTime.rfc3339(config['created']) if config['created']
       end
     end
 
