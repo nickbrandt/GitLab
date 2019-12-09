@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SelfMonitoringProjectCreateWorker
+class SelfMonitoringProjectDeleteWorker
   include ApplicationWorker
   include ExclusiveLeaseGuard
 
@@ -14,7 +14,7 @@ class SelfMonitoringProjectCreateWorker
 
   def perform
     try_obtain_lease do
-      Gitlab::DatabaseImporters::SelfMonitoring::Project::CreateService.new.execute
+      Gitlab::DatabaseImporters::SelfMonitoring::Project::DeleteService.new.execute
     end
   end
 
