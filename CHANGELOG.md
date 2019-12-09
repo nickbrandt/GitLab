@@ -756,6 +756,13 @@ entry.
 - Remove Postgresql specific setup tasks and move to schema.rb.
 
 
+## 12.3.9
+
+### Security (1 change)
+
+- Update maven_file_name_regex for full string match.
+
+
 ## 12.3.7
 
 ### Security (12 changes)
