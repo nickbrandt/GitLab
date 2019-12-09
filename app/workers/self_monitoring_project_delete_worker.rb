@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SelfMonitoringProjectCreateWorker
+class SelfMonitoringProjectDeleteWorker
   include ApplicationWorker
   include ExclusiveLeaseGuard
 
@@ -10,18 +10,16 @@ class SelfMonitoringProjectCreateWorker
   # this worker.
   feature_category :metrics
 
-  LEASE_TIMEOUT = 15.minutes.to_i
+  LEASE_TIMEOUT = 5.minutes.to_i
   DATA_KEY_EXPIRY = 15.minutes
 
-  EXCLUSIVE_LEASE_KEY = 'self_monitoring_service_creation_deletion'
-
-  CACHE_DATA_KEY = 'self_monitoring_create_result'
+  CACHE_DATA_KEY = 'self_monitoring_delete_result'
 
   SERVICE_RESULT_KEYS_TO_STORE = [:status, :message].freeze
 
   def perform
     try_obtain_lease do
-      result = Gitlab::DatabaseImporters::SelfMonitoring::Project::CreateService.new.execute
+      result = Gitlab::DatabaseImporters::SelfMonitoring::Project::DeleteService.new.execute
       data_to_store = result.slice(*SERVICE_RESULT_KEYS_TO_STORE).to_a.flatten
 
       Gitlab::Redis::SharedState.with do |redis|

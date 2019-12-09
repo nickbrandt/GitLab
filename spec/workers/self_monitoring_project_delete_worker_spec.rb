@@ -2,12 +2,12 @@
 
 require 'spec_helper'
 
-describe SelfMonitoringProjectCreateWorker do
+describe SelfMonitoringProjectDeleteWorker do
   let_it_be(:jid) { 'b5b28910d97563e58c2fe55f' }
-  let_it_be(:data_key) { "self_monitoring_create_result:#{jid}" }
+  let_it_be(:data_key) { "self_monitoring_delete_result:#{jid}" }
 
   describe '#perform' do
-    let(:service_class) { Gitlab::DatabaseImporters::SelfMonitoring::Project::CreateService }
+    let(:service_class) { Gitlab::DatabaseImporters::SelfMonitoring::Project::DeleteService }
     let(:service) { instance_double(service_class) }
     let(:service_result) { { status: 'success', project_id: 2 } }
 
