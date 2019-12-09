@@ -2,7 +2,7 @@
 import { isEqual } from 'underscore';
 import { GlButton, GlFormGroup, GlFormInput, GlFormSelect, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
-import { convertObjectKeysToSnakeCase } from '~/lib/utils/common_utils';
+import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
 import LabelsSelector from './labels_selector.vue';
 import { STAGE_ACTIONS } from '../constants';
 import {
@@ -152,7 +152,7 @@ export default {
       this.$emit('cancel');
     },
     handleSave() {
-      const data = convertObjectKeysToSnakeCase(this.fields);
+      const data = convertObjectPropsToSnakeCase(this.fields);
       if (this.isEditingCustomStage) {
         const { id } = this.initialFields;
         this.$emit(STAGE_ACTIONS.UPDATE, { ...data, id });

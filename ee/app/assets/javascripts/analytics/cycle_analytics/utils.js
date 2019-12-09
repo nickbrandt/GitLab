@@ -53,6 +53,8 @@ export const transformRawStages = (stages = []) =>
       id,
       title,
       slug: custom ? id : convertToSnakeCase(title),
+      custom,
+      name: title, // editing a stage takes 'name' as a parameter, but the api returns title
     }))
     .sort((a, b) => a.id > b.id);
 

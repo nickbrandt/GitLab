@@ -121,20 +121,6 @@ export default {
       return this.isEditingCustomStage ? this.currentStage : {};
     },
   },
-  methods: {
-    selectStage(stage) {
-      this.$emit(STAGE_ACTIONS.SELECT, stage);
-    },
-    editStage(stage) {
-      this.$emit(STAGE_ACTIONS.EDIT, stage);
-    },
-    hideStage(stageId) {
-      this.$emit(STAGE_ACTIONS.HIDE, { id: stageId, hidden: true });
-    },
-    removeStage(stageId) {
-      this.$emit(STAGE_ACTIONS.REMOVE, stageId);
-    },
-  },
   STAGE_ACTIONS,
 };
 </script>
@@ -166,10 +152,10 @@ export default {
               :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
               :can-edit="canEditStages"
               :is-default-stage="!stage.custom"
-              @remove="removeStage(stage.id)"
-              @hide="hideStage(stage.id)"
-              @select="selectStage(stage)"
-              @edit="editStage(stage)"
+              @remove="$emit($options.STAGE_ACTIONS.REMOVE, stage.id)"
+              @hide="$emit($options.STAGE_ACTIONS.HIDE, { id: stage.id, hidden: true })"
+              @select="$emit($options.STAGE_ACTIONS.SELECT, stage)"
+              @edit="$emit($options.STAGE_ACTIONS.EDIT, stage)"
             />
             <add-stage-button
               v-if="canEditStages"

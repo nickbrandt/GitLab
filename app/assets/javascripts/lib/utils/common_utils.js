@@ -703,7 +703,9 @@ export const convertObjectPropsToCamelCase = (obj = {}, options = {}) => {
  * @param {Object} obj    Object to transform
  * @returns {Object}
  */
-export const convertObjectKeysToSnakeCase = (obj = {}) =>
+// Follow up to add additional options param:
+// https://gitlab.com/gitlab-org/gitlab/issues/39173
+export const convertObjectPropsToSnakeCase = (obj = {}) =>
   obj
     ? Object.entries(obj).reduce(
         (acc, [key, value]) => ({ ...acc, [convertToSnakeCase(key)]: value }),

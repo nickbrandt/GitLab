@@ -721,7 +721,7 @@ describe('common_utils', () => {
       });
     });
 
-    describe('convertObjectKeysToSnakeCase', () => {
+    describe('convertObjectPropsToSnakeCase', () => {
       it('converts each object key to snake case', () => {
         const obj = {
           some: 'some',
@@ -729,7 +729,7 @@ describe('common_utils', () => {
           likeThisLongOne: 'likeThisLongOne',
         };
 
-        expect(commonUtils.convertObjectKeysToSnakeCase(obj)).toEqual({
+        expect(commonUtils.convertObjectPropsToSnakeCase(obj)).toEqual({
           some: 'some',
           cool_object: 'cool object',
           like_this_long_one: 'likeThisLongOne',
@@ -738,7 +738,7 @@ describe('common_utils', () => {
 
       it('returns an empty object if there are no keys', () => {
         ['', {}, [], null].forEach(badObj => {
-          expect(commonUtils.convertObjectKeysToSnakeCase(badObj)).toEqual({});
+          expect(commonUtils.convertObjectPropsToSnakeCase(badObj)).toEqual({});
         });
       });
     });

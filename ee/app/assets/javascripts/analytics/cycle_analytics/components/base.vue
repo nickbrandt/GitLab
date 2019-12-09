@@ -59,7 +59,7 @@ export default {
       'isCreatingCustomStage',
       'isEditingCustomStage',
       'selectedGroup',
-      'selectedStageId',
+      'selectedStage',
       'stages',
       'summary',
       'labels',
@@ -72,7 +72,7 @@ export default {
     ]),
     ...mapGetters(['hasNoAccessError', 'currentGroupPath', 'durationChartPlottableData']),
     shouldRenderEmptyState() {
-      return !this.selectedGroup;g
+      return !this.selectedGroup;
     },
     hasCustomizableCycleAnalytics() {
       return Boolean(this.glFeatures.customizableCycleAnalytics);
@@ -108,7 +108,7 @@ export default {
       'fetchStageData',
       'setSelectedGroup',
       'setSelectedProjects',
-      'setSelectedStageId',
+      'setSelectedStage',
       'hideCustomStageForm',
       'showCustomStageForm',
       'setDateRange',
