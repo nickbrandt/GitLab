@@ -105,6 +105,7 @@ export default {
     this.initDateRange();
     this.setFeatureFlags({
       hasDurationChart: this.glFeatures.cycleAnalyticsScatterplotEnabled,
+      hasTasksByTypeChart: this.glFeatures.tasksByTypeChart,
     });
   },
   methods: {
