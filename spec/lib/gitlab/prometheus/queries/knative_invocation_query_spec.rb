@@ -9,6 +9,7 @@ describe Gitlab::Prometheus::Queries::KnativeInvocationQuery do
   let(:serverless_func) { Serverless::Function.new(project, 'test-name', 'test-ns') }
 
   let(:client) { double('prometheus_client') }
+
   subject { described_class.new(client) }
 
   context 'verify queries' do

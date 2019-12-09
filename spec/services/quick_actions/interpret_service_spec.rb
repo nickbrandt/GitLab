@@ -1370,6 +1370,7 @@ describe QuickActions::InterpretService do
       context 'if issuable is a Commit' do
         let(:content) { '/award :100:' }
         let(:issuable) { commit }
+
         it_behaves_like 'empty command'
       end
     end
@@ -1497,23 +1498,27 @@ describe QuickActions::InterpretService do
       context 'if the given label does not exist' do
         let(:issuable) { issue }
         let(:content) { '/board_move ~"Fake Label"' }
+
         it_behaves_like 'empty command', 'Failed to move this issue because label was not found.'
       end
 
       context 'if multiple labels are given' do
         let(:issuable) { issue }
         let(:content) { %{/board_move ~"#{inreview.title}" ~"#{todo.title}"} }
+
         it_behaves_like 'empty command', 'Failed to move this issue because only a single label can be provided.'
       end
 
       context 'if the given label is not a list on the board' do
         let(:issuable) { issue }
         let(:content) { %{/board_move ~"#{bug.title}"} }
+
         it_behaves_like 'empty command', 'Failed to move this issue because label was not found.'
       end
 
       context 'if issuable is not an Issue' do
         let(:issuable) { merge_request }
+
         it_behaves_like 'empty command'
       end
     end

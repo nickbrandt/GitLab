@@ -7,6 +7,7 @@ describe Gitlab::Prometheus::Queries::DeploymentQuery do
   let(:deployment) { create(:deployment, environment: environment) }
 
   let(:client) { double('prometheus_client') }
+
   subject { described_class.new(client) }
 
   around do |example|

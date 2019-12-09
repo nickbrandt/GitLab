@@ -29,6 +29,7 @@ describe Lfs::UnlockFileService do
 
       context 'when lock does not exists' do
         let(:params) { { id: 123 } }
+
         it "doesn't succeed" do
           result = subject.execute
 

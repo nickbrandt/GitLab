@@ -1708,6 +1708,7 @@ module Gitlab
 
       describe "Hidden jobs" do
         let(:config_processor) { Gitlab::Ci::YamlProcessor.new(config) }
+
         subject { config_processor.stage_builds_attributes("test") }
 
         shared_examples 'hidden_job_handling' do
@@ -1752,6 +1753,7 @@ module Gitlab
 
       describe "YAML Alias/Anchor" do
         let(:config_processor) { Gitlab::Ci::YamlProcessor.new(config) }
+
         subject { config_processor.stage_builds_attributes("build") }
 
         shared_examples 'job_templates_handling' do
