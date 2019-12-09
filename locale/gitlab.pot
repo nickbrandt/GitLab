@@ -697,6 +697,9 @@ msgstr ""
 msgid "A merge request approval is required when the license compliance report contains a blacklisted license."
 msgstr ""
 
+msgid "A new Auto DevOps pipeline has been created, go to %{pipelines_link_start}Pipelines page%{pipelines_link_end} for details"
+msgstr ""
+
 msgid "A new Release %{tag} for %{name} was published. Visit the %{release_link_start}Releases page%{release_link_end} to read more about it."
 msgstr ""
 
