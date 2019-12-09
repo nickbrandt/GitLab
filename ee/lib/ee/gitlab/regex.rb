@@ -28,7 +28,7 @@ module EE
         end
 
         def maven_file_name_regex
-          @maven_file_name_regex ||= %r{^[A-Za-z0-9\.\_\-\+]+$}.freeze
+          @maven_file_name_regex ||= %r{\A[A-Za-z0-9\.\_\-\+]+\z}.freeze
         end
 
         def maven_path_regex
