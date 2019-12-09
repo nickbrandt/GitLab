@@ -45,7 +45,7 @@ module EE
         nav_tabs << :dependencies
       end
 
-      if ::Feature.enabled?(:licenses_list) && can?(current_user, :read_licenses_list, project)
+      if can?(current_user, :read_licenses_list, project)
         nav_tabs << :licenses
       end
 

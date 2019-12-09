@@ -6,10 +6,6 @@ module Projects
       before_action :authorize_read_licenses_list!
       before_action :authorize_admin_software_license_policy!, only: [:create, :update]
 
-      before_action do
-        push_frontend_feature_flag(:licenses_list)
-      end
-
       def index
         respond_to do |format|
           format.json do
