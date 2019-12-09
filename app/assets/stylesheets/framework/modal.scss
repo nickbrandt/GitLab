@@ -18,10 +18,9 @@
       display: inline-block;
     }
 
-    .color-label {
-      font-size: $gl-font-size;
-      padding: $gl-vert-padding $label-padding-modal;
-      vertical-align: middle;
+    .gl-label {
+      vertical-align: top;
+      line-height: 16px;
     }
   }
 

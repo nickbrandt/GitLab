@@ -86,17 +86,6 @@
 }
 
 .issuable-show-labels {
-  .gl-label-scoped {
-    border-style: solid;
-    border-width: 2px;
-    &.gl-label-sm {
-      border-width: 1px;
-    }
-    .gl-label-text:last-child {
-      padding-right: 22px;
-    }
-  }
-
   .gl-label {
     margin-bottom: 5px;
     margin-right: 5px;
@@ -134,7 +123,8 @@
       padding-right: $gl-padding-24;
     }
 
-    .scoped-label {
+    .scoped-label,
+    .gl-label-icon {
       right: 12px;
     }
   }
@@ -173,9 +163,17 @@
       .avatar {
         border-color: rgba($gray-normal, 0.2);
       }
-
     }
+  }
 
+  .gl-label .gl-label-link:hover,
+  .gl-label + .gl-label-icon:hover {
+    text-decoration: none;
+    color: inherit;
+
+    .gl-label-text:last-of-type {
+      text-decoration: underline;
+    }
   }
 
   .btn-link {
@@ -814,9 +812,17 @@
 
       a {
         color: $gl-text-color;
+      }
 
-        .fa {
-          color: $gl-text-color-secondary;
+      .gl-label-link {
+        color: inherit;
+
+        &:hover {
+          text-decoration: none;
+
+          .gl-label-text:last-of-type {
+            text-decoration: underline;
+          }
         }
       }
     }

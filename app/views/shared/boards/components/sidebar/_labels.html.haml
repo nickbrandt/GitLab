@@ -8,19 +8,13 @@
     %span.no-value{ "v-if" => "issue.labels && issue.labels.length === 0" }
       = _("None")
     %span{ "v-for" => "label in issue.labels" }
-      %span.d-inline-block.position-relative.scoped-label-wrapper{ "v-if" => "showScopedLabels(label)" }
-        %span.gl-label.gl-label-scoped{ ":style" => "{ borderColor: label.color }" }
-          %a.gl-link.gl-label-link{ href: '#' }
-            %span.gl-label-text{ ":style" => "{ backgroundColor: label.color, color: label.textColor }" }
-              {{ scopedLabelScope(label) }}
-            %span.gl-label-text{ ":style" => "{ backgroundColor: label.textColor, color: label.Color }" }
-              {{ scopedValue(label) }}
-          %a.label.scoped-label.gl-link.gl-label-icon{ ":href" => "helpLink()" }
-            %i.fa.fa-question-circle
-      %span.gl-label{ "v-else" => true }
-        %a.gl-link.gl-label-link{ href: "#" }
-          %span.gl-label-text{ ":style" => "{ backgroundColor: label.color, color: label.textColor }" }
-            {{ label.title }}
+      %gl-label{ ":id" => "label.id",
+        ":key" => "label.id",
+        ":background-color" => "label.color",
+        ":title" => "label.title",
+        ":description" => "label.description",
+        ":scoped" => "showScopedLabels(label)",
+        ":scoped-labels-documentation-link" => "helpLink" }
 
   - if can_admin_issue?
     .selectbox

@@ -80,7 +80,15 @@ module Banzai
         end
       end
 
-      def object_link_text(object, matches)
+      def label_link_text(object, matches)
+        parent = project || group
+
+        presenter = object.present(issuable_subject: parent)
+
+        presenter
+      end
+
+      def label_link_suffix(object, matches)
         label_suffix = ''
         parent = project || group
 
@@ -92,8 +100,20 @@ module Banzai
           label_suffix = " <i>in #{ERB::Util.html_escape(reference)}</i>" if reference.present?
         end
 
-        presenter = object.present(issuable_subject: parent)
-        LabelsHelper.render_colored_label(presenter, label_suffix: label_suffix, title: tooltip_title(presenter))
+        label_suffix
+      end
+
+      def object_link_text(object, matches)
+        presenter = label_link_text(object, matches)
+        label_suffix = label_link_suffix(object, matches)
+        LabelsHelper.render_colored_label(presenter, label_suffix: label_suffix)
+      end
+
+      def wrap_link(link, label)
+        content = super
+        content = %(<span class="gl-label gl-label-sm">#{content}</span>)
+
+        content
       end
 
       def tooltip_title(label)
@@ -104,9 +124,12 @@ module Banzai
         matches[:namespace] && matches[:project]
       end
 
+      def reference_class(type, tooltip: true)
+        super + ' gl-link gl-label-link'
+      end
+
       def object_link_title(object, matches)
-        # use title of wrapped element instead
-        nil
+        LabelsHelper.label_tooltip_title(object)
       end
     end
   end
