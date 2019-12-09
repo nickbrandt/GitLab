@@ -4,6 +4,7 @@ module DesignManagement
   class Version < ApplicationRecord
     include Importable
     include ShaAttribute
+    include Gitlab::Utils::StrongMemoize
 
     NotSameIssue = Class.new(StandardError)
 
@@ -50,7 +51,7 @@ module DesignManagement
     delegate :project, to: :issue
 
     scope :for_designs, -> (designs) do
-      where(id: Action.where(design_id: designs).select(:version_id)).distinct
+      where(id: ::DesignManagement::Action.where(design_id: designs).select(:version_id)).distinct
     end
     scope :earlier_or_equal_to, -> (version) { where('id <= ?', version) }
     scope :ordered, -> { order(id: :desc) }
@@ -81,7 +82,7 @@ module DesignManagement
 
         rows = design_actions.map { |action| action.row_attrs(version) }
 
-        Gitlab::Database.bulk_insert(Action.table_name, rows)
+        Gitlab::Database.bulk_insert(::DesignManagement::Action.table_name, rows)
         version.designs.reset
         version.validate!
         design_actions.each(&:performed)
@@ -103,6 +104,15 @@ module DesignManagement
       super || (commit_author if persisted?)
     end
 
+    def diff_refs
+      strong_memoize(:diff_refs) { commit.try(:diff_refs) }
+    end
+
+    def reset
+      %i[diff_refs commit].each { |k| clear_memoization(k) }
+      super
+    end
+
     private
 
     def commit_author
@@ -110,7 +120,7 @@ module DesignManagement
     end
 
     def commit
-      @commit ||= issue.project.design_repository.commit(sha)
+      strong_memoize(:commit) { issue.project.design_repository.commit(sha) }
     end
   end
 end

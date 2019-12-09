@@ -108,7 +108,7 @@ module DesignManagement
 
     def diff_refs
       strong_memoize(:diff_refs) do
-        head_version.presence && repository.commit(head_version.sha).diff_refs
+        head_version.try(:diff_refs)
       end
     end
 
@@ -158,7 +158,7 @@ module DesignManagement
 
     def user_notes_count_service
       strong_memoize(:user_notes_count_service) do
-        DesignManagement::DesignUserNotesCountService.new(self) # rubocop: disable CodeReuse/ServiceClass
+        ::DesignManagement::DesignUserNotesCountService.new(self) # rubocop: disable CodeReuse/ServiceClass
       end
     end
   end
