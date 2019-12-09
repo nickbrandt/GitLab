@@ -19,7 +19,7 @@ module EE
             optional :approver_ids, types: [String, Array], array_none_any: true,
                      desc: 'Return merge requests which have specified the users with the given IDs as an individual approver'
             optional :approved_by_ids, types: [String, Array], array_none_any: true,
-                     desc: 'Return merge requests which have been approved by the specified the users with the given IDs'
+                     desc: 'Return merge requests which have been approved by the specified users with the given IDs'
           end
         end
       end

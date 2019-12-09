@@ -42,37 +42,24 @@ module MergeRequests
 
     # Merge Requests without any approval
     def without_approvals(items)
-      items
-        .left_outer_joins(:approvals)
-        .joins('LEFT OUTER JOIN approvals ON approvals.merge_request_id = merge_requests.id')
-        .where(approvals: { id: nil })
+      items.without_approvals
     end
 
     # Merge Requests with any number of approvals
     def with_any_approvals(items)
       items.select_from_union([
-        items.joins(:approvals),
-        items.joins('INNER JOIN approvals ON approvals.merge_request_id = merge_requests.id')
+        items.with_approvals
       ])
     end
 
     # Merge Requests approved by given usernames
     def find_approved_by_names(items)
-      find_approved_by_query(items, :username, usernames)
+      items.approved_by_users_with_usernames(usernames)
     end
 
     # Merge Requests approved by given user IDs
     def find_approved_by_ids(items)
-      find_approved_by_query(items, :id, ids)
-    end
-
-    def find_approved_by_query(items, field, values)
-      items
-        .joins(:approvals)
-        .joins(approvals: [:user])
-        .where(users: { field => values })
-        .group('merge_requests.id')
-        .having("COUNT(users.id) = ?", values.size)
+      items.approved_by_users_with_ids(ids)
     end
   end
 end
