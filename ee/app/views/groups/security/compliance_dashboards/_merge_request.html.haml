@@ -1,4 +1,4 @@
-%li{ id: dom_id(merge_request), class: mr_css_classes(merge_request), data: { labels: merge_request.label_ids, id: merge_request.id } }
+%li{ id: dom_id(merge_request), class: mr_css_classes(merge_request), data: { id: merge_request.id } }
   .issuable-info-container
     .issuable-main-info
       .merge-request-title.title
@@ -13,6 +13,6 @@
       %ul.controls.d-flex.align-items-end
         - if merge_request.approved_by_users.any?
           %li.d-flex
-            = render 'approvers', project: merge_request.project, merge_request: merge_request
+            = render 'approvers', merge_request: merge_request
       %span
         = _('merged %{time_ago}').html_safe % { time_ago: time_ago_with_tooltip(merge_request.merged_at, placement: 'bottom', html_class: 'merge_request_updated_ago') }

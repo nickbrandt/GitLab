@@ -70,20 +70,37 @@ describe 'layouts/nav/sidebar/_group' do
   end
 
   describe 'security dashboard tab' do
+    let(:group) { create(:group, plan: :gold_plan) }
+
     before do
-      stub_licensed_features(security_dashboard: true)
       enable_namespace_license_check!
 
       create(:gitlab_subscription, hosted_plan: group.plan, namespace: group)
     end
 
     context 'when security dashboard feature is enabled' do
-      let(:group) { create(:group, plan: :gold_plan) }
+      before do
+        stub_licensed_features(security_dashboard: true)
+      end
 
       it 'is visible' do
         render
 
+        expect(rendered).to have_link 'Security & Compliance'
         expect(rendered).to have_link 'Security'
+      end
+    end
+
+    context 'when compliance dashboard feature is enabled' do
+      before do
+        stub_licensed_features(group_level_compliance_dashboard: true)
+      end
+
+      it 'is visible' do
+        render
+
+        expect(rendered).to have_link 'Security & Compliance'
+        expect(rendered).to have_link 'Compliance'
       end
     end
 
@@ -93,7 +110,7 @@ describe 'layouts/nav/sidebar/_group' do
       it 'is not visible' do
         render
 
-        expect(rendered).not_to have_link 'Security'
+        expect(rendered).not_to have_link 'Security & Compliance'
       end
     end
   end

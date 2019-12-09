@@ -1,0 +1,10 @@
+- presentable_approvers_limit = 0
+- approvers_over_presentable_limit = merge_request.approved_by_users.size - presentable_approvers_limit
+- project = merge_request.project
+
+= _('Approved by: ')
+- merge_request.approved_by_users.take(presentable_approvers_limit).each do |approver| # rubocop: disable CodeReuse/ActiveRecord
+  = link_to_member(project, approver, name: true, title: "Approved by  :name")
+- if approvers_over_presentable_limit.positive?
+  %span{ class: 'avatar-counter has-tooltip', data: { container: 'body', placement: 'bottom', 'line-type' => 'old', 'original-title' => "+#{approvers_over_presentable_limit} more approvers", qa_selector: 'avatar_counter' } }
+    = "+ #{approvers_over_presentable_limit}"

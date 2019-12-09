@@ -102,7 +102,6 @@ class License < ApplicationRecord
     type_of_work_analytics
     unprotection_restrictions
     ci_project_subscriptions
-    group_level_compliance_dashboard
   ]
   EEP_FEATURES.freeze
 
@@ -114,6 +113,7 @@ class License < ApplicationRecord
     dependency_scanning
     epics
     group_ip_restriction
+    group_level_compliance_dashboard
     incident_management
     insights
     license_management

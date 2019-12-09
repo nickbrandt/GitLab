@@ -1,15 +1,19 @@
-- if @group.feature_available?(:group_level_compliance_dashboard)
-  = nav_link(path: 'groups/security/compliance_dashboard#show') do
-    = link_to group_security_compliance_dashboard_path(@group), data: { qa_selector: 'security_dashboard_link' } do
-      .nav-icon-container
-        = sprite_icon('shield')
-      %span.nav-item-name
-        = _('Security & Compliance')
-    %ul.sidebar-sub-level-items
-      - if @group.feature_available?(:security_dashboard)
-        = nav_link(path: 'groups/security/dashboard#show') do
-          = link_to group_security_dashboard_path(@group), title: _('Security') do
-            %span= _('Security')
+- return unless @group.feature_available?(:group_level_compliance_dashboard) || @group.feature_available?(:security_dashboard)
+
+- main_path = @group.feature_available?(:group_level_compliance_dashboard) ? 'groups/security/compliance_dashboards#show' : 'groups/security/dashboard#show'
+= nav_link(path: main_path) do
+  = link_to group_security_compliance_dashboard_path(@group), data: { qa_selector: 'security_dashboard_link' } do
+    .nav-icon-container
+      = sprite_icon('shield')
+    %span.nav-item-name
+      = _('Security & Compliance')
+  %ul.sidebar-sub-level-items
+    - if @group.feature_available?(:security_dashboard)
+      = nav_link(path: 'groups/security/dashboard#show') do
+        = link_to group_security_dashboard_path(@group), title: _('Security') do
+          %span= _('Security')
+
+    - if @group.feature_available?(:group_level_compliance_dashboard)
       = nav_link(path: 'groups/security/compliance_dashboard#show') do
-        = link_to group_security_compliance_dashboard_path(@group), title: _('Security') do
+        = link_to group_security_compliance_dashboard_path(@group), title: _('Compliance') do
           %span= _('Compliance')

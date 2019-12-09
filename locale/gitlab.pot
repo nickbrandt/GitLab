@@ -2095,6 +2095,9 @@ msgstr ""
 msgid "Approve the current merge request."
 msgstr ""
 
+msgid "Approved by: "
+msgstr ""
+
 msgid "Approved the current merge request."
 msgstr ""
 
@@ -4823,6 +4826,12 @@ msgid "CompareBranches|There isn't anything to compare."
 msgstr ""
 
 msgid "Complete"
+msgstr ""
+
+msgid "Compliance"
+msgstr ""
+
+msgid "Compliance Dashboard"
 msgstr ""
 
 msgid "Confidence: %{confidence}"
@@ -22399,6 +22408,9 @@ msgid "merge request"
 msgid_plural "merge requests"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "merged %{time_ago}"
+msgstr ""
 
 msgid "milestone should belong either to a project or a group."
 msgstr ""
