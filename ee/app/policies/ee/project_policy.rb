@@ -216,6 +216,11 @@ module EE
         enable :read_vulnerability
       end
 
+      rule { auditor & ~developer }.policy do
+        prevent :create_vulnerability
+        prevent :admin_vulnerability
+      end
+
       rule { auditor & ~guest }.policy do
         prevent :create_project
         prevent :create_issue
