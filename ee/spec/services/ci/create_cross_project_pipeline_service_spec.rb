@@ -184,5 +184,44 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
         end
       end
     end
+
+    # TODO: Move this context into a feature spec that uses
+    # multiple pipeline processing services. Location TBD in:
+    # https://gitlab.com/gitlab-org/gitlab/issues/36216
+    context 'when configured with bridge job rules' do
+      before do
+        stub_ci_pipeline_yaml_file(config)
+        downstream_project.add_maintainer(upstream_project.owner)
+      end
+
+      let(:config) do
+        <<-EOY
+          hello:
+            script: echo world
+
+          bridge-job:
+            rules:
+              - if: $CI_COMMIT_REF_NAME == "master"
+            trigger:
+              project: #{downstream_project.full_path}
+              branch: master
+        EOY
+      end
+
+      let(:primary_pipeline) do
+        Ci::CreatePipelineService.new(upstream_project, upstream_project.owner, { ref: 'master' })
+          .execute(:push, save_on_errors: false)
+      end
+
+      let(:bridge)  { primary_pipeline.processables.find_by(name: 'bridge-job') }
+      let(:service) { described_class.new(upstream_project, upstream_project.owner) }
+
+      context 'that include the bridge job' do
+        it 'creates the downstream pipeline' do
+          expect { service.execute(bridge) }
+            .to change(downstream_project.ci_pipelines, :count).by(1)
+        end
+      end
+    end
   end
 end
