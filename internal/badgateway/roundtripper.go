@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"gitlab.com/gitlab-org/labkit/log"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
@@ -37,9 +39,11 @@ func (t *roundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 	// and administrators expect to see a 502 error. To show 502s
 	// instead of 500s we catch the RoundTrip error here and inject a
 	// 502 response.
-	helper.LogError(
+	fields := log.Fields{"duration_ms": int64(time.Since(start).Seconds() * 1000)}
+	helper.LogErrorWithFields(
 		r,
-		&sentryError{fmt.Errorf("badgateway: failed after %.fs: %v", time.Since(start).Seconds(), err)},
+		&sentryError{fmt.Errorf("badgateway: failed to receive response: %v", err)},
+		fields,
 	)
 
 	message := "GitLab is not responding"

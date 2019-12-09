@@ -8,6 +8,8 @@ import (
 
 	//lint:ignore SA1019 this was recently deprecated. Update workhorse to use labkit errortracking package.
 	correlation "gitlab.com/gitlab-org/labkit/correlation/raven"
+
+	"gitlab.com/gitlab-org/labkit/log"
 )
 
 var ravenHeaderBlacklist = []string{
@@ -15,9 +17,13 @@ var ravenHeaderBlacklist = []string{
 	"Private-Token",
 }
 
-func captureRavenError(r *http.Request, err error) {
+func captureRavenError(r *http.Request, err error, fields log.Fields) {
 	client := raven.DefaultClient
 	extra := raven.Extra{}
+
+	for k, v := range fields {
+		extra[k] = v
+	}
 
 	interfaces := []raven.Interface{}
 	if r != nil {
