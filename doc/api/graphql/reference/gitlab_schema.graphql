@@ -646,6 +646,16 @@ type Design implements DesignFields & Noteable {
     before: String
 
     """
+    The Global ID of the most recent acceptable version
+    """
+    earlierOrEqualToId: ID
+
+    """
+    The SHA256 of the most recent acceptable version
+    """
+    earlierOrEqualToSha: String
+
+    """
     Returns the first _n_ elements from the list.
     """
     first: Int
@@ -725,6 +735,16 @@ type DesignCollection {
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
+
+    """
+    The Global ID of the most recent acceptable version
+    """
+    earlierOrEqualToId: ID
+
+    """
+    The SHA256 of the most recent acceptable version
+    """
+    earlierOrEqualToSha: String
 
     """
     Returns the first _n_ elements from the list.
