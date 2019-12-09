@@ -10420,6 +10420,36 @@ msgstr ""
 msgid "Licenses"
 msgstr ""
 
+msgid "Licenses|%{remainingComponentsCount} more"
+msgstr ""
+
+msgid "Licenses|Component"
+msgstr ""
+
+msgid "Licenses|Components"
+msgstr ""
+
+msgid "Licenses|Displays licenses detected in the project, based on the %{linkStart}latest pipeline%{linkEnd} scan"
+msgstr ""
+
+msgid "Licenses|Error fetching the license list. Please check your network connection and try again."
+msgstr ""
+
+msgid "Licenses|Learn more about license compliance"
+msgstr ""
+
+msgid "Licenses|License Compliance"
+msgstr ""
+
+msgid "Licenses|Name"
+msgstr ""
+
+msgid "Licenses|The license list details information about the licenses used within your project."
+msgstr ""
+
+msgid "Licenses|View license details for your project"
+msgstr ""
+
 msgid "License|Buy license"
 msgstr ""
 
@@ -11633,6 +11663,9 @@ msgid "No deployments found"
 msgstr ""
 
 msgid "No due date"
+msgstr ""
+
+msgid "No endpoint provided"
 msgstr ""
 
 msgid "No errors to display."
