@@ -16,6 +16,7 @@
 - cronjob:pages_domain_verification_cron
 - cronjob:pages_domain_removal_cron
 - cronjob:pages_domain_ssl_renewal_cron
+- cronjob:personal_access_tokens_expiring
 - cronjob:pipeline_schedule
 - cronjob:prune_old_events
 - cronjob:remove_expired_group_links

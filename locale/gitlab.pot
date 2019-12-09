@@ -12036,6 +12036,9 @@ msgstr ""
 msgid "One or more of your dependency files are not supported, and the dependency list may be incomplete. Below is a list of supported file types."
 msgstr ""
 
+msgid "One or more of your personal access tokens will expire in %{days_to_expire} days or less."
+msgstr ""
+
 msgid "Only 'Reporter' roles and above on tiers Premium / Silver and above can see Cycle Analytics."
 msgstr ""
 
@@ -20164,6 +20167,12 @@ msgstr ""
 msgid "You can apply your Trial to your Personal account or create a New Group."
 msgstr ""
 
+msgid "You can create a new one or check them in your %{pat_link_start}Personal Access Tokens%{pat_link_end} settings"
+msgstr ""
+
+msgid "You can create a new one or check them in your Personal Access Tokens settings %{pat_link}"
+msgstr ""
+
 msgid "You can create files directly in GitLab using one of the following options."
 msgstr ""
 
@@ -20489,6 +20498,9 @@ msgid "Your Groups"
 msgstr ""
 
 msgid "Your New Personal Access Token"
+msgstr ""
+
+msgid "Your Personal Access Tokens will expire in %{days_to_expire} days or less"
 msgstr ""
 
 msgid "Your Primary Email will be used for avatar detection."
