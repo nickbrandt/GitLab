@@ -16,6 +16,7 @@ describe ErrorTracking::ProjectErrorTrackingSetting do
   describe 'Validations' do
     it { is_expected.to validate_length_of(:api_url).is_at_most(255) }
     it { is_expected.to allow_value("http://gitlab.com/api/0/projects/project1/something").for(:api_url) }
+    it { is_expected.not_to allow_values("http://gitlab.com/api/0/projects/project1/something€").for(:api_url) }
 
     it 'rejects invalid api_urls' do
       is_expected.not_to allow_values(
