@@ -23,6 +23,7 @@ describe Gitlab::Regex do
     it { is_expected.not_to match('@foo/@/bar') }
     it { is_expected.not_to match('my package name') }
     it { is_expected.not_to match('!!()()') }
+    it { is_expected.not_to match("..\n..\foo") }
   end
 
   describe '.maven_file_name_regex' do
