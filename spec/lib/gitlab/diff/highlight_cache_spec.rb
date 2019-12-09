@@ -111,6 +111,15 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
     end
   end
 
+  describe `#file_paths` do
+    it 'accesses path info via #diff_files' do
+      expect_any_instance_of(Gitlab::Diff::FileCollection::MergeRequestDiff)
+        .to receive(:diff_files).at_least(:once).and_call_original
+
+      cache.send(:file_paths)
+    end
+  end
+
   describe '#write_to_redis_hash' do
     it 'creates or updates a Redis hash' do
       expect { cache.send(:write_to_redis_hash, diff_hash) }
