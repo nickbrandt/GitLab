@@ -16181,6 +16181,9 @@ msgstr ""
 msgid "SelfMonitoringProjectCreateWorker#status returned unknown status \"%{status}\""
 msgstr ""
 
+msgid "SelfMonitoringProjectDeleteWorker#status returned unknown status \"%{status}\""
+msgstr ""
+
 msgid "Send a separate email notification to Developers."
 msgstr ""
 

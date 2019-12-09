@@ -79,4 +79,71 @@ describe 'Self-Monitoring project requests' do
       end
     end
   end
+
+  describe 'DELETE #delete_self_monitoring_project' do
+    let(:worker_class) { SelfMonitoringProjectDeleteWorker }
+
+    subject { delete delete_self_monitoring_project_admin_application_settings_path }
+
+    it_behaves_like 'not accessible to non-admin users'
+
+    context 'with admin user' do
+      before do
+        login_as(admin)
+      end
+
+      context 'with feature flag disabled' do
+        it_behaves_like 'not accessible if feature flag is disabled'
+      end
+
+      context 'with feature flag enabled' do
+        let(:status_api) { status_delete_self_monitoring_project_admin_application_settings_path }
+
+        it_behaves_like 'triggers async worker, returns sidekiq job_id with response accepted'
+      end
+    end
+  end
+
+  describe 'GET #status_delete_self_monitoring_project' do
+    let(:worker_class) { SelfMonitoringProjectDeleteWorker }
+    let(:job_id) { 'job_id' }
+
+    subject do
+      get status_delete_self_monitoring_project_admin_application_settings_path,
+        params: { job_id: job_id }
+    end
+
+    it_behaves_like 'not accessible to non-admin users'
+
+    context 'with admin user' do
+      before do
+        login_as(admin)
+      end
+
+      context 'with feature flag disabled' do
+        it_behaves_like 'not accessible if feature flag is disabled'
+      end
+
+      context 'with feature flag enabled' do
+        it_behaves_like 'calls .status, handles invalid job_id, and different status values'
+
+        context 'when status returns completed' do
+          let(:status) { { status: :completed, output: { status: :success } } }
+
+          before do
+            allow(worker_class).to receive(:status).and_return(status)
+          end
+
+          it 'returns output' do
+            subject
+
+            aggregate_failures do
+              expect(response).to have_gitlab_http_status(:success)
+              expect(json_response).to eq('status' => 'success')
+            end
+          end
+        end
+      end
+    end
+  end
 end

@@ -128,6 +128,61 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     end
   end
 
+  def delete_self_monitoring_project
+    return self_monitoring_project_not_implemented unless Feature.enabled?(:self_monitoring_project)
+
+    job_id = SelfMonitoringProjectDeleteWorker.perform_async
+
+    render status: :accepted, json: {
+      job_id: job_id,
+      monitor_status: status_delete_self_monitoring_project_admin_application_settings_path
+    }
+  end
+
+  def status_delete_self_monitoring_project
+    return self_monitoring_project_not_implemented unless Feature.enabled?(:self_monitoring_project)
+
+    job_id = params[:job_id]
+
+    unless job_id.present? && job_id.is_a?(String)
+      return render status: :bad_request, json: {
+        message: _('"job_id" must be an alphanumeric value')
+      }
+    end
+
+    unless job_id.length <= PARAM_JOB_ID_MAX_SIZE
+      return render status: :bad_request, json: {
+        message: _('Parameter "job_id" cannot exceed length of %{job_id_max_size}' %
+          { job_id_max_size: PARAM_JOB_ID_MAX_SIZE })
+      }
+    end
+
+    ::Gitlab::PollingInterval.set_header(response, interval: 3_000)
+
+    result = SelfMonitoringProjectDeleteWorker.status(job_id)
+
+    if [:in_progress, :unknown].include?(result[:status])
+      render status: :accepted, json: result
+
+    elsif result[:status] == :completed
+      render status: :ok, json: result[:output]
+
+    else
+      message = _('SelfMonitoringProjectDeleteWorker#status returned unknown status "%{status}"') %
+        { status: result[:status] }
+
+      raise_exception_for_dev(
+        message,
+        { return_value: result }
+      )
+
+      render(
+        status: :internal_server_error,
+        json: { message: message }
+      )
+    end
+  end
+
   private
 
   def self_monitoring_data
