@@ -159,10 +159,10 @@ module EE
 
       rule { can?(:read_build) & can?(:download_code) }.enable :read_security_findings
 
-      rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_project_security_dashboard
+      rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
 
-      rule { can?(:read_project_security_dashboard) }.policy do
-        enable :read_vulnerability
+      rule { can?(:read_vulnerability) }.policy do
+        enable :read_project_security_dashboard
         enable :create_vulnerability
         enable :admin_vulnerability
       end
@@ -210,10 +210,9 @@ module EE
         enable :read_environment
         enable :read_deployment
         enable :read_pages
-        enable :read_project_security_dashboard
       end
 
-      rule { auditor & can?(:read_project_security_dashboard) }.policy do
+      rule { auditor & security_dashboard_enabled }.policy do
         enable :read_vulnerability
       end
 
