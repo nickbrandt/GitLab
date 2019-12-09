@@ -717,6 +717,7 @@ ActiveRecord::Schema.define(version: 2019_12_04_093410) do
     t.jsonb "config_options"
     t.jsonb "config_variables"
     t.boolean "has_exposed_artifacts"
+    t.string "environment_auto_stop_in", limit: 255
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id", unique: true
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id_and_has_exposed_artifacts", where: "(has_exposed_artifacts IS TRUE)"
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id_and_interruptible", where: "(interruptible = true)"
@@ -1447,6 +1448,7 @@ ActiveRecord::Schema.define(version: 2019_12_04_093410) do
     t.string "environment_type"
     t.string "state", default: "available", null: false
     t.string "slug", null: false
+    t.datetime_with_timezone "auto_stop_at"
     t.index ["name"], name: "index_environments_on_name_varchar_pattern_ops", opclass: :varchar_pattern_ops
     t.index ["project_id", "name"], name: "index_environments_on_project_id_and_name", unique: true
     t.index ["project_id", "slug"], name: "index_environments_on_project_id_and_slug", unique: true

@@ -2312,6 +2312,9 @@ msgstr ""
 msgid "Auto License Compliance"
 msgstr ""
 
+msgid "Auto stop successfully canceled."
+msgstr ""
+
 msgid "Auto-cancel redundant, pending pipelines"
 msgstr ""
 
@@ -7249,6 +7252,15 @@ msgid "Failed to apply commands."
 msgstr ""
 
 msgid "Failed to assign a user because no user was found."
+msgstr ""
+
+msgid "Failed to cancel auto stop because failed to update the environment."
+msgstr ""
+
+msgid "Failed to cancel auto stop because the environment is not set as auto stop."
+msgstr ""
+
+msgid "Failed to cancel auto stop because you do not have permission to update the environment."
 msgstr ""
 
 msgid "Failed to change the owner"
