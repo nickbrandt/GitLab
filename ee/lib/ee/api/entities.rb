@@ -336,9 +336,12 @@ module EE
         expose :created_at
         expose :updated_at
         expose :closed_at
-        expose :labels do |epic|
-          # Avoids an N+1 query since labels are preloaded
-          epic.labels.map(&:title).sort
+        expose :labels do |epic, options|
+          if options[:with_labels_details]
+            ::API::Entities::LabelBasic.represent(epic.labels.sort_by(&:title))
+          else
+            epic.labels.map(&:title).sort
+          end
         end
         expose :upvotes do |epic, options|
           if options[:issuable_metadata]

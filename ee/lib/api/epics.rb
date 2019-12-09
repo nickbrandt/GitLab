@@ -30,6 +30,7 @@ module API
                          desc: 'Return opened, closed, or all epics'
         optional :author_id, type: Integer, desc: 'Return epics which are authored by the user with the given ID'
         optional :labels, type: Array[String], coerce_with: Validations::Types::LabelsList.coerce, desc: 'Comma-separated list of label names'
+        optional :with_labels_details, type: Boolean, desc: 'Return titles of labels and other details', default: false
         optional :created_after, type: DateTime, desc: 'Return epics created after the specified time'
         optional :created_before, type: DateTime, desc: 'Return epics created before the specified time'
         optional :updated_after, type: DateTime, desc: 'Return epics updated after the specified time'
@@ -42,8 +43,8 @@ module API
         epics = paginate(find_epics(finder_params: { group_id: user_group.id })).with_api_entity_associations
 
         # issuable_metadata is the standard used by the Todo API
-
-        present epics, epic_options.merge(issuable_metadata: issuable_meta_data(epics, 'Epic'))
+        extra_options = { issuable_metadata: issuable_meta_data(epics, 'Epic'), with_labels_details: declared_params[:with_labels_details] }
+        present epics, epic_options.merge(extra_options)
       end
 
       desc 'Get details of an epic' do
