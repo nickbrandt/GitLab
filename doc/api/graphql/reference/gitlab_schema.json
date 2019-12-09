@@ -9376,6 +9376,26 @@
               "description": "All versions related to all designs, ordered newest first",
               "args": [
                 {
+                  "name": "earlierOrEqualToSha",
+                  "description": "The SHA256 of the most recent acceptable version",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "earlierOrEqualToId",
+                  "description": "The Global ID of the most recent acceptable version",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
                   "type": {
@@ -10628,6 +10648,26 @@
               "name": "versions",
               "description": "All versions related to this design ordered newest first",
               "args": [
+                {
+                  "name": "earlierOrEqualToSha",
+                  "description": "The SHA256 of the most recent acceptable version",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "earlierOrEqualToId",
+                  "description": "The Global ID of the most recent acceptable version",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
                 {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
