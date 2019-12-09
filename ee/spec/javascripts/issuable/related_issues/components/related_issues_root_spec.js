@@ -185,7 +185,9 @@ describe('RelatedIssuesRoot', () => {
         });
       });
 
-      it('displays a message from the backend upon error', done => {
+      // https://gitlab.com/gitlab-org/gitlab/issues/38410
+      // eslint-disable-next-line jasmine/no-disabled-tests
+      xit('displays a message from the backend upon error', done => {
         const input = '#123';
         const message = 'error';
 
