@@ -134,6 +134,16 @@ module EE
       end
     end
 
+    def enabled_reports
+      {
+        sast: report_type_enabled?(:sast),
+        container_scanning: report_type_enabled?(:container_scanning),
+        dast: report_type_enabled?(:dast),
+        dependency_scanning: report_type_enabled?(:dependency_scanning),
+        license_management: report_type_enabled?(:license_management)
+      }
+    end
+
     def has_dependency_scanning_reports?
       !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.dependency_list_reports))
     end
@@ -207,6 +217,10 @@ module EE
 
     def missing_report_error(report_type)
       { status: :error, status_reason: "This merge request does not have #{report_type} reports" }
+    end
+
+    def report_type_enabled?(report_type)
+      !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(report_type)
     end
   end
 end

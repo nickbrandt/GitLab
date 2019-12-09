@@ -36,6 +36,10 @@ module EE
         end
       end
 
+      expose :enabled_reports do |merge_request|
+        merge_request.enabled_reports
+      end
+
       expose :sast, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:sast) } do
         expose :head_path do |merge_request|
           head_pipeline_downloadable_path_for_report_type(:sast)
