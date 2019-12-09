@@ -9,7 +9,7 @@ v 8.17.0
 
 v 8.16.0
 
-- Ignore CompleteMultiparytUpload ETag !438
+- Ignore CompleteMultipartUpload ETag !438
 - Add NuGet route for package uploads !441
 - Upgrade Gitaly client to v1.74.0 !443
 - Set a time limit on git upload-pack requests
