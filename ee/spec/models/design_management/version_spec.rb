@@ -60,6 +60,14 @@ describe DesignManagement::Version do
         end
       end
     end
+
+    describe '.by_sha' do
+      it 'can find versions by sha' do
+        [version_1, version_2].each do |version|
+          expect(described_class.by_sha(version.sha)).to contain_exactly(version)
+        end
+      end
+    end
   end
 
   describe ".create_for_designs" do

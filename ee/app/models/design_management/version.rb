@@ -55,6 +55,7 @@ module DesignManagement
     scope :earlier_or_equal_to, -> (version) { where('id <= ?', version) }
     scope :ordered, -> { order(id: :desc) }
     scope :for_issue, -> (issue) { where(issue: issue) }
+    scope :by_sha, -> (sha) { where(sha: sha) }
 
     # This is the one true way to create a Version.
     #
