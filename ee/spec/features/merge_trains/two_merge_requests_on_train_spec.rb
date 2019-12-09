@@ -92,7 +92,7 @@ describe 'Two merge requests on a merge train' do
       it 'merges merge request 2', :sidekiq_might_not_need_inline do
         expect(merge_request_2).to be_merged
         expect(merge_request_2.metrics.merged_by).to eq(maintainer_2)
-        expect(merge_request_2.merge_train).to be_nil
+        expect(merge_request_2.merge_train).to be_merged
       end
     end
   end
@@ -114,7 +114,7 @@ describe 'Two merge requests on a merge train' do
       it 'merges merge request 2', :sidekiq_might_not_need_inline do
         expect(merge_request_2).to be_merged
         expect(merge_request_2.metrics.merged_by).to eq(maintainer_2)
-        expect(merge_request_2.merge_train).to be_nil
+        expect(merge_request_2.merge_train).to be_merged
       end
     end
   end
@@ -130,7 +130,7 @@ describe 'Two merge requests on a merge train' do
     it 'merges merge request 1', :sidekiq_might_not_need_inline do
       expect(merge_request_1).to be_merged
       expect(merge_request_1.metrics.merged_by).to eq(maintainer_1)
-      expect(merge_request_1.merge_train).to be_nil
+      expect(merge_request_1.merge_train).to be_merged
     end
 
     it_behaves_like 'has an intact pipeline for merge request 2'

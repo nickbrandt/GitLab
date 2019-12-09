@@ -23,7 +23,7 @@ module EE
       has_many :approver_groups, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approval_rules, class_name: 'ApprovalMergeRequestRule', inverse_of: :merge_request
       has_many :draft_notes
-      has_one :merge_train, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+      has_one :merge_train, inverse_of: :merge_request, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
       has_many :blocks_as_blocker,
                class_name: 'MergeRequestBlock',
@@ -44,6 +44,14 @@ module EE
       participant :participant_approvers
 
       accepts_nested_attributes_for :approval_rules, allow_destroy: true
+
+      state_machine :state_id do
+        after_transition any => :merged do |merge_request|
+          merge_request.merge_train&.merged!
+
+          true
+        end
+      end
     end
 
     class_methods do
@@ -126,6 +134,16 @@ module EE
       end
     end
 
+    def enabled_reports
+      {
+        sast: report_type_enabled?(:sast),
+        container_scanning: report_type_enabled?(:container_scanning),
+        dast: report_type_enabled?(:dast),
+        dependency_scanning: report_type_enabled?(:dependency_scanning),
+        license_management: report_type_enabled?(:license_management)
+      }
+    end
+
     def has_dependency_scanning_reports?
       !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.dependency_list_reports))
     end
@@ -199,6 +217,10 @@ module EE
 
     def missing_report_error(report_type)
       { status: :error, status_reason: "This merge request does not have #{report_type} reports" }
+    end
+
+    def report_type_enabled?(report_type)
+      !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(report_type)
     end
   end
 end

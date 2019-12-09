@@ -10,7 +10,7 @@
 # Technical debt: https://gitlab.com/gitlab-org/gitlab/issues/35798
 module API
   class ConanPackages < Grape::API
-    helpers ::API::Helpers::PackagesHelpers
+    helpers ::API::Helpers::PackagesManagerClientsHelpers
 
     PACKAGE_REQUIREMENTS = {
       package_name: API::NO_SLASH_URL_PART_REGEX,
@@ -186,6 +186,8 @@ module API
         end
         delete do
           authorize!(:destroy_package, project)
+
+          track_event('delete_package')
 
           package.destroy
         end
@@ -373,6 +375,8 @@ module API
         package_file = ::Packages::PackageFileFinder
           .new(package, "#{params[:file_name]}", conan_file_type: file_type).execute!
 
+        track_event('pull_package') if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY
+
         present_carrierwave_file!(package_file.file)
       end
 
@@ -383,6 +387,8 @@ module API
         bad_request!('Missing package file!') unless uploaded_file
 
         current_package = package || ::Packages::Conan::CreatePackageService.new(project, current_user, params).execute
+
+        track_event('push_package') if params[:file_name] == ::Packages::ConanFileMetadatum::PACKAGE_BINARY && params['file.size'].positive?
 
         # conan sends two upload requests, the first has no file, so we skip record creation if file.size == 0
         ::Packages::Conan::CreatePackageFileService.new(current_package, uploaded_file, params.merge(conan_file_type: file_type)).execute unless params['file.size'] == 0
@@ -409,7 +415,7 @@ module API
 
       def find_personal_access_token
         personal_access_token = find_personal_access_token_from_conan_jwt ||
-          find_personal_access_token_from_conan_http_basic_auth
+          find_personal_access_token_from_http_basic_auth
 
         personal_access_token || unauthorized!
       end
@@ -427,14 +433,6 @@ module API
         return unless token&.personal_access_token_id && token&.user_id
 
         PersonalAccessToken.find_by_id_and_user_id(token.personal_access_token_id, token.user_id)
-      end
-
-      def find_personal_access_token_from_conan_http_basic_auth
-        encoded_credentials = headers['Authorization'].to_s.split('Basic ', 2).second
-        token = Base64.decode64(encoded_credentials || '').split(':', 2).second
-        return unless token
-
-        PersonalAccessToken.find_by_token(token)
       end
     end
   end

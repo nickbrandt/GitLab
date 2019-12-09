@@ -203,7 +203,7 @@ job:
 You can use [YAML anchors](#anchors) with scripts, which makes it possible to
 include a predefined list of commands in multiple jobs.
 
-Example:
+For example:
 
 ```yaml
 .something: &something
@@ -1413,6 +1413,11 @@ Also in the example, `GIT_STRATEGY` is set to `none` so that GitLab Runner wonâ€
 try to check out the code after the branch is deleted when the `stop_review_app`
 job is [automatically triggered](../environments.md#automatically-stopping-an-environment).
 
+NOTE: **Note:**
+The above example overwrites global variables. If your stop environment job depends
+on global variables, you can use [anchor variables](#yaml-anchors-for-variables) when setting the `GIT_STRATEGY`
+to change it without overriding the global variables.
+
 The `stop_review_app` job is **required** to have the following keywords defined:
 
 - `when` - [reference](#when)
@@ -1420,6 +1425,38 @@ The `stop_review_app` job is **required** to have the following keywords defined
 - `environment:action`
 - `stage` should be the same as the `review_app` in order for the environment
   to stop automatically when the branch is deleted
+
+#### `environment:kubernetes`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/27630) in GitLab 12.6.
+
+The `kubernetes` block is used to configure deployments to a
+[Kubernetes cluster](../../user/project/clusters/index.md) that is associated with your project.
+
+For example:
+
+```yaml
+deploy:
+  stage: deploy
+  script: make deploy-app
+  environment:
+    name: production
+    kubernetes:
+      namespace: production
+```
+
+This will set up the `deploy` job to deploy to the `production`
+environment, using the `production`
+[Kubernetes namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/).
+
+For more information, see
+[Available settings for `kubernetes`](../environments.md#configuring-kubernetes-deployments).
+
+NOTE: **Note:**
+Kubernetes configuration is not supported for Kubernetes clusters
+that are [managed by GitLab](../../user/project/clusters/index.md#gitlab-managed-clusters).
+To follow progress on support for Gitlab-managed clusters, see the
+[relevant issue](https://gitlab.com/gitlab-org/gitlab/issues/38054).
 
 #### Dynamic environments
 
@@ -3126,6 +3163,29 @@ you can set in `.gitlab-ci.yml`, there are also the so called
 which can be set in GitLab's UI.
 
 Learn more about [variables and their priority][variables].
+
+#### YAML anchors for variables
+
+[YAML anchors](#anchors) can be used with `variables`, to easily repeat assignment
+of variables across multiple jobs. It can also enable more flexibility when a job
+requires a specific `variables` block that would otherwise override the global variables.
+
+In the example below, we will override the `GIT_STRATEGY` variable without affecting
+the use of the `SAMPLE_VARIABLE` variable:
+
+```yaml
+# global variables
+variables: &global-variables
+  SAMPLE_VARIABLE: sample_variable_value
+
+# a job that needs to set the GIT_STRATEGY variable, yet depend on global variables
+job_no_git_strategy:
+  stage: cleanup
+  variables:
+    <<: *global-variables
+    GIT_STRATEGY: none
+  script: echo $SAMPLE_VARIABLE
+```
 
 #### Git strategy
 

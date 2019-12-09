@@ -1,8 +1,8 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Commit from '~/vue_shared/components/commit.vue';
 import component from 'ee/environments_dashboard/components/dashboard/environment.vue';
 import EnvironmentHeader from 'ee/environments_dashboard/components/dashboard/environment_header.vue';
 import Alert from 'ee/vue_shared/dashboards/components/alerts.vue';
+import Commit from '~/vue_shared/components/commit.vue';
 import environment from './mock_environment.json';
 
 const localVue = createLocalVue();

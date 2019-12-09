@@ -36,6 +36,10 @@ module EE
         end
       end
 
+      expose :enabled_reports do |merge_request|
+        merge_request.enabled_reports
+      end
+
       expose :sast, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:sast) } do
         expose :head_path do |merge_request|
           head_pipeline_downloadable_path_for_report_type(:sast)
@@ -148,6 +152,10 @@ module EE
 
       expose :merge_train_when_pipeline_succeeds_docs_path do |merge_request|
         presenter(merge_request).merge_train_when_pipeline_succeeds_docs_path
+      end
+
+      expose :merge_immediately_docs_path do |merge_request|
+        presenter(merge_request).merge_immediately_docs_path
       end
 
       expose :blocking_merge_requests, if: -> (mr, _) { mr&.target_project&.feature_available?(:blocking_merge_requests) }

@@ -1,7 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import Api from 'ee/api';
 import * as cycleAnalyticsConstants from 'ee/analytics/cycle_analytics/constants';
+import axios from '~/lib/utils/axios_utils';
 
 describe('Api', () => {
   const dummyApiVersion = 'v3000';

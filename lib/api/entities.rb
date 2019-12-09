@@ -166,6 +166,18 @@ module API
       end
     end
 
+    class RemoteMirror < Grape::Entity
+      expose :id
+      expose :enabled
+      expose :safe_url, as: :url
+      expose :update_status
+      expose :last_update_at
+      expose :last_update_started_at
+      expose :last_successful_update_at
+      expose :last_error
+      expose :only_protected_branches
+    end
+
     class ProjectImportStatus < ProjectIdentity
       expose :import_status
 
@@ -176,7 +188,7 @@ module API
     end
 
     class BasicProjectDetails < ProjectIdentity
-      include ::API::ProjectsRelationBuilder
+      include ::API::ProjectsBatchCounting
 
       expose :default_branch, if: -> (project, options) { Ability.allowed?(options[:current_user], :download_code, project) }
       # Avoids an N+1 query: https://github.com/mbleigh/acts-as-taggable-on/issues/91#issuecomment-168273770
@@ -415,20 +427,28 @@ module API
         projects = GroupProjectsFinder.new(
           group: group,
           current_user: options[:current_user],
-          options: { only_owned: true }
+          options: { only_owned: true, limit: projects_limit }
         ).execute
 
-        Entities::Project.prepare_relation(projects)
+        Entities::Project.preload_and_batch_count!(projects)
       end
 
       expose :shared_projects, using: Entities::Project do |group, options|
         projects = GroupProjectsFinder.new(
           group: group,
           current_user: options[:current_user],
-          options: { only_shared: true }
+          options: { only_shared: true, limit: projects_limit }
         ).execute
 
-        Entities::Project.prepare_relation(projects)
+        Entities::Project.preload_and_batch_count!(projects)
+      end
+
+      def projects_limit
+        if ::Feature.enabled?(:limit_projects_in_groups_api, default_enabled: true)
+          GroupProjectsFinder::DEFAULT_PROJECTS_LIMIT
+        else
+          nil
+        end
       end
     end
 

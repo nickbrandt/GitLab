@@ -1349,6 +1349,14 @@ describe Project do
     end
   end
 
+  describe '.with_limit' do
+    it 'limits the number of projects returned' do
+      create_list(:project, 3)
+
+      expect(described_class.with_limit(1).count).to eq(1)
+    end
+  end
+
   describe '.visible_to_user' do
     let!(:project) { create(:project, :private) }
     let!(:user)    { create(:user) }
@@ -1365,6 +1373,16 @@ describe Project do
 
     describe 'when a user does not have access to any projects' do
       it { is_expected.to eq([]) }
+    end
+  end
+
+  describe '.with_service' do
+    before do
+      create_list(:prometheus_project, 2)
+    end
+
+    it 'avoid n + 1' do
+      expect { described_class.with_service(:prometheus_service).map(&:prometheus_service) }.not_to exceed_query_limit(1)
     end
   end
 
@@ -5089,6 +5107,17 @@ describe Project do
 
       it 'returns clusters for groups of this project' do
         expect(subject).to contain_exactly(cluster, group_cluster)
+      end
+    end
+
+    context 'project is hosted on instance with integrated cluster' do
+      let(:group_cluster) { create(:cluster, :group) }
+      let(:instance_cluster) { create(:cluster, :instance) }
+      let(:group) { group_cluster.group }
+      let(:project) { create(:project, group: group) }
+
+      it 'returns all available clusters for this project' do
+        expect(subject).to contain_exactly(cluster, group_cluster, instance_cluster)
       end
     end
   end

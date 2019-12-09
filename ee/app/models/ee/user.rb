@@ -73,6 +73,10 @@ module EE
       scope :bots, -> { where.not(bot_type: nil) }
       scope :humans, -> { where(bot_type: nil) }
 
+      scope :with_invalid_expires_at_tokens, ->(expiration_date) do
+        where(id: ::PersonalAccessToken.with_invalid_expires_at(expiration_date).select(:user_id))
+      end
+
       accepts_nested_attributes_for :namespace
 
       enum roadmap_layout: { weeks: 1, months: 4, quarters: 12 }

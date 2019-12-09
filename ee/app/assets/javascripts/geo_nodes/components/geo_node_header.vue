@@ -1,8 +1,8 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import icon from '~/vue_shared/components/icon.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
-import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {

@@ -25,6 +25,8 @@ module EE
     prepended do
       include EachBatch
 
+      attr_writer :root_ancestor
+
       belongs_to :plan
 
       has_one :namespace_statistics

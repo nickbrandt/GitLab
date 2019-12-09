@@ -26,11 +26,16 @@ export default {
       required: false,
       default: () => ({}),
     },
+    defaultGroup: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
       loading: true,
-      selectedGroup: {},
+      selectedGroup: this.defaultGroup || {},
     };
   },
   computed: {

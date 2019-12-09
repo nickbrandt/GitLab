@@ -10,6 +10,13 @@ export default Object.assign({}, mockData, {
     head_path: 'blob_path',
   },
   vulnerability_feedback_help_path: '/help/user/application_security/index',
+  enabled_reports: {
+    sast: true,
+    container_scanning: false,
+    dast: true,
+    dependency_scanning: false,
+    license_management: true,
+  },
 });
 
 // Codeclimate

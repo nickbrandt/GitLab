@@ -30,6 +30,16 @@ describe API::Deployments do
         expect(json_response.last['iid']).to eq(deployment_3.iid)
       end
 
+      context 'with updated_at filters specified' do
+        it 'returns projects deployments with last update in specified datetime range' do
+          get api("/projects/#{project.id}/deployments", user), params: { updated_before: 30.minutes.ago, updated_after: 90.minutes.ago }
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to include_pagination_headers
+          expect(json_response.first['id']).to eq(deployment_3.id)
+        end
+      end
+
       describe 'ordering' do
         let(:order_by) { 'iid' }
         let(:sort) { 'desc' }
@@ -329,6 +339,42 @@ describe API::Deployments do
         )
 
         expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  context 'prevent N + 1 queries' do
+    context 'when the endpoint returns multiple records' do
+      let(:project) { create(:project) }
+
+      def create_record
+        create(:deployment, :success, project: project)
+      end
+
+      def request_with_query_count
+        ActiveRecord::QueryRecorder.new { trigger_request }.count
+      end
+
+      def trigger_request
+        get api("/projects/#{project.id}/deployments?order_by=updated_at&sort=asc", user)
+      end
+
+      before do
+        create_record
+      end
+
+      it 'succeeds' do
+        trigger_request
+
+        expect(response).to have_gitlab_http_status(200)
+
+        expect(json_response.size).to eq(1)
+      end
+
+      it 'does not increase the query count' do
+        expect { create_record }.not_to change { request_with_query_count }
+
+        expect(json_response.size).to eq(2)
       end
     end
   end

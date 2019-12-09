@@ -30,6 +30,7 @@ module EE
         mount ::API::License
         mount ::API::ProjectMirror
         mount ::API::ProjectPushRule
+        mount ::API::NugetPackages
         mount ::API::ConanPackages
         mount ::API::MavenPackages
         mount ::API::NpmPackages

@@ -1,4 +1,5 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import Flash from '~/flash';
 import DeprecatedModal from '~/vue_shared/components/deprecated_modal.vue';
@@ -9,7 +10,6 @@ import eventHub from '../event_hub';
 import { NODE_ACTIONS } from '../constants';
 
 import GeoNodeItem from './geo_node_item.vue';
-import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {

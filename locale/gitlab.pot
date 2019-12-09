@@ -2041,6 +2041,9 @@ msgstr ""
 msgid "Are you sure you want to lose your issue information?"
 msgstr ""
 
+msgid "Are you sure you want to merge immediately?"
+msgstr ""
+
 msgid "Are you sure you want to permanently delete this license?"
 msgstr ""
 
@@ -2307,6 +2310,9 @@ msgid "Auto DevOps, runners and job artifacts"
 msgstr ""
 
 msgid "Auto License Compliance"
+msgstr ""
+
+msgid "Auto stop successfully canceled."
 msgstr ""
 
 msgid "Auto-cancel redundant, pending pipelines"
@@ -6993,7 +6999,7 @@ msgstr ""
 msgid "ErrorTracking|Connection has failed. Re-check Auth Token and try again."
 msgstr ""
 
-msgid "ErrorTracking|Find your hostname in your Sentry account settings page"
+msgid "ErrorTracking|If you self-host Sentry, enter the full URL of your Sentry instance. If you're using Sentry's hosted solution, enter https://sentry.io"
 msgstr ""
 
 msgid "ErrorTracking|No projects available"
@@ -7246,6 +7252,15 @@ msgid "Failed to apply commands."
 msgstr ""
 
 msgid "Failed to assign a user because no user was found."
+msgstr ""
+
+msgid "Failed to cancel auto stop because failed to update the environment."
+msgstr ""
+
+msgid "Failed to cancel auto stop because the environment is not set as auto stop."
+msgstr ""
+
+msgid "Failed to cancel auto stop because you do not have permission to update the environment."
 msgstr ""
 
 msgid "Failed to change the owner"
@@ -9128,6 +9143,9 @@ msgstr ""
 msgid "Helps reduce request volume for protected paths"
 msgstr ""
 
+msgid "Hi %{username}!"
+msgstr ""
+
 msgid "Hide archived projects"
 msgstr ""
 
@@ -9574,7 +9592,7 @@ msgstr ""
 msgid "Install Runner on Kubernetes"
 msgstr ""
 
-msgid "Install a soft token authenticator like %{free_otp_link} or Google Authenticator from your application repository and scan this QR code. More information is available in the %{help_link_start}documentation%{help_link_end}."
+msgid "Install a soft token authenticator like %{free_otp_link} or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the %{help_link_start}documentation%{help_link_end}."
 msgstr ""
 
 msgid "Install on clusters"
@@ -10274,6 +10292,9 @@ msgstr ""
 msgid "Leave Admin Mode"
 msgstr ""
 
+msgid "Leave blank for no limit. Once set, existing personal access tokens may be revoked"
+msgstr ""
+
 msgid "Leave edit mode? All unsaved changes will be lost."
 msgstr ""
 
@@ -10605,6 +10626,9 @@ msgstr ""
 msgid "Makes this issue confidential."
 msgstr ""
 
+msgid "Malformed string"
+msgstr ""
+
 msgid "Manage"
 msgstr ""
 
@@ -10764,6 +10788,9 @@ msgstr ""
 msgid "Max seats used"
 msgstr ""
 
+msgid "Maximum allowable lifetime for personal access token (days)"
+msgstr ""
+
 msgid "Maximum artifacts size (MB)"
 msgstr ""
 
@@ -10780,6 +10807,9 @@ msgid "Maximum job timeout"
 msgstr ""
 
 msgid "Maximum job timeout has a value which could not be accepted"
+msgstr ""
+
+msgid "Maximum lifetime allowable for Personal Access Tokens is active, your expire date must be set before %{maximum_allowable_date}."
 msgstr ""
 
 msgid "Maximum number of comments exceeded"
@@ -10990,6 +11020,9 @@ msgid "Merged branches are being deleted. This can take some time depending on t
 msgstr ""
 
 msgid "Merges this merge request when the pipeline succeeds."
+msgstr ""
+
+msgid "Merging immediately isn't recommended as it may negatively impact the existing merge train. Read the %{docsLinkStart}documentation%{docsLinkEnd} for more information."
 msgstr ""
 
 msgid "Messages"
@@ -11449,6 +11482,9 @@ msgstr ""
 msgid "New branch unavailable"
 msgstr ""
 
+msgid "New changes were added. %{linkStart}Reload the page to review them%{linkEnd}"
+msgstr ""
+
 msgid "New deploy key"
 msgstr ""
 
@@ -11629,7 +11665,7 @@ msgstr ""
 msgid "No files found."
 msgstr ""
 
-msgid "No forks available to you."
+msgid "No forks are available to you."
 msgstr ""
 
 msgid "No issues for the selected time period."
@@ -11977,12 +12013,18 @@ msgstr ""
 msgid "Once the exported file is ready, you will receive a notification email with a download link, or you can download it from this page."
 msgstr ""
 
+msgid "Once you confirm and press \"Reduce project visibility\":"
+msgstr ""
+
 msgid "One more item"
 msgid_plural "%d more items"
 msgstr[0] ""
 msgstr[1] ""
 
 msgid "One or more groups that you don't have access to."
+msgstr ""
+
+msgid "One or more of you personal access tokens were revoked"
 msgstr ""
 
 msgid "One or more of your Bitbucket projects cannot be imported into GitLab directly because they use Subversion or Mercurial for version control, rather than Git."
@@ -11992,6 +12034,9 @@ msgid "One or more of your Google Code projects cannot be imported into GitLab d
 msgstr ""
 
 msgid "One or more of your dependency files are not supported, and the dependency list may be incomplete. Below is a list of supported file types."
+msgstr ""
+
+msgid "One or more of your personal access tokens will expire in %{days_to_expire} days or less."
 msgstr ""
 
 msgid "Only 'Reporter' roles and above on tiers Premium / Silver and above can see Cycle Analytics."
@@ -14380,6 +14425,12 @@ msgid "Recovery Codes"
 msgstr ""
 
 msgid "Redirect to SAML provider to test configuration"
+msgstr ""
+
+msgid "Reduce project visibility"
+msgstr ""
+
+msgid "Reduce this project’s visibility?"
 msgstr ""
 
 msgid "Reference:"
@@ -17439,6 +17490,11 @@ msgstr ""
 msgid "The following items will be exported:"
 msgstr ""
 
+msgid "The following personal access token: %{token_names} was revoked, because a new policy to expire personal access tokens were set."
+msgid_plural "The following personal access tokens: %{token_names} were revoked, because a new policy to expire personal access tokens were set."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "The fork relationship has been removed."
 msgstr ""
 
@@ -18427,7 +18483,7 @@ msgstr ""
 msgid "To preserve performance only <strong>%{display_size} of %{real_size}</strong> files are displayed."
 msgstr ""
 
-msgid "To protect this issue's confidentiality, %{link_start}fork the project%{link_end} and set the forks visibility to private."
+msgid "To protect this issue's confidentiality, %{forkLink} and set the fork's visibility to private."
 msgstr ""
 
 msgid "To protect this issue's confidentiality, a private fork of this project was selected."
@@ -20111,7 +20167,19 @@ msgstr ""
 msgid "You can apply your Trial to your Personal account or create a New Group."
 msgstr ""
 
+msgid "You can create a new one or check them in your %{pat_link_start}Personal Access Tokens%{pat_link_end} settings"
+msgstr ""
+
+msgid "You can create a new one or check them in your Personal Access Tokens settings %{pat_link}"
+msgstr ""
+
 msgid "You can create files directly in GitLab using one of the following options."
+msgstr ""
+
+msgid "You can create new ones at your %{pat_link_start}Personal Access Tokens%{pat_link_end} settings"
+msgstr ""
+
+msgid "You can create new ones at your Personal Access Tokens settings %{pat_link}"
 msgstr ""
 
 msgid "You can easily contribute to them by requesting to join these groups."
@@ -20375,6 +20443,12 @@ msgstr ""
 msgid "You'll need to use different branch names to get a valid comparison."
 msgstr ""
 
+msgid "You're about to reduce the visibility of the project %{strong_start}%{project_name}%{strong_end} in %{strong_start}%{group_name}%{strong_end}."
+msgstr ""
+
+msgid "You're about to reduce the visibility of the project %{strong_start}%{project_name}%{strong_end}."
+msgstr ""
+
 msgid "You're not allowed to %{tag_start}edit%{tag_end} files in this project directly. Please fork this project, make your changes there, and submit a merge request."
 msgstr ""
 
@@ -20424,6 +20498,9 @@ msgid "Your Groups"
 msgstr ""
 
 msgid "Your New Personal Access Token"
+msgstr ""
+
+msgid "Your Personal Access Tokens will expire in %{days_to_expire} days or less"
 msgstr ""
 
 msgid "Your Primary Email will be used for avatar detection."
@@ -21021,6 +21098,9 @@ msgid "for %{ref}"
 msgstr ""
 
 msgid "for this project"
+msgstr ""
+
+msgid "fork this project"
 msgstr ""
 
 msgid "from"

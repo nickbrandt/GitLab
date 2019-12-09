@@ -34,6 +34,17 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
 
       it { is_expected.to be_falsey }
+
+      context 'with rules' do
+        let(:config) do
+          {
+            script: 'ls -al',
+            rules: [{ if: '$VAR == "value"', when: 'always' }]
+          }
+        end
+
+        it { is_expected.to be_falsey }
+      end
     end
 
     context 'when config is a bridge job' do
@@ -43,6 +54,17 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
 
       it { is_expected.to be_truthy }
+
+      context 'with rules' do
+        let(:config) do
+          {
+            trigger: 'other-project',
+            rules: [{ if: '$VAR == "value"', when: 'always' }]
+          }
+        end
+
+        it { is_expected.to be_truthy }
+      end
     end
 
     context 'when config is a hidden job' do
@@ -58,6 +80,16 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
   describe '.new' do
     before do
       subject.compose!
+    end
+
+    let(:base_config) do
+      {
+        trigger: { project: 'some/project', branch: 'feature' },
+        needs: { pipeline: 'other/project' },
+        extends: '.some-key',
+        stage: 'deploy',
+        variables: { VARIABLE: '123' }
+      }
     end
 
     context 'when trigger config is a non-empty string' do
@@ -117,19 +149,55 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
     end
 
-    context 'when bridge configuration contains all supported keys' do
+    context 'when bridge configuration contains trigger, needs, when, extends, stage, only, except, and variables' do
       let(:config) do
-        { trigger: { project: 'some/project', branch: 'feature' },
-          needs: { pipeline: 'other/project' },
+        base_config.merge({
           when: 'always',
-          extends: '.some-key',
-          stage: 'deploy',
           only: { variables: %w[$SOMEVARIABLE] },
-          except: { refs: %w[feature] },
-          variables: { VARIABLE: '123' } }
+          except: { refs: %w[feature] }
+        })
       end
 
       it { is_expected.to be_valid }
+    end
+
+    context 'when bridge configuration uses rules' do
+      let(:config) { base_config.merge({ rules: [{ if: '$VAR == null', when: 'never' }] }) }
+
+      it { is_expected.to be_valid }
+    end
+
+    context 'when bridge configuration uses rules with job:when' do
+      let(:config) do
+        base_config.merge({
+          when: 'always',
+          rules: [{ if: '$VAR == null', when: 'never' }]
+        })
+      end
+
+      it { is_expected.not_to be_valid }
+    end
+
+    context 'when bridge configuration uses rules with only' do
+      let(:config) do
+        base_config.merge({
+          only: { variables: %w[$SOMEVARIABLE] },
+          rules: [{ if: '$VAR == null', when: 'never' }]
+        })
+      end
+
+      it { is_expected.not_to be_valid }
+    end
+
+    context 'when bridge configuration uses rules with except' do
+      let(:config) do
+        base_config.merge({
+          except: { refs: %w[feature] },
+          rules: [{ if: '$VAR == null', when: 'never' }]
+        })
+      end
+
+      it { is_expected.not_to be_valid }
     end
 
     context 'when trigger config is nil' do

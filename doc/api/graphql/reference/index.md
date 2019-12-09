@@ -195,30 +195,32 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `userPermissions` | EpicPermissions! | Permissions for the current user on the resource |
-| `id` | ID! |  |
-| `iid` | ID! |  |
-| `title` | String |  |
-| `description` | String |  |
-| `state` | EpicState! |  |
-| `group` | Group! |  |
-| `parent` | Epic |  |
-| `author` | User! |  |
-| `startDate` | Time |  |
-| `startDateIsFixed` | Boolean |  |
-| `startDateFixed` | Time |  |
-| `startDateFromMilestones` | Time |  |
-| `dueDate` | Time |  |
-| `dueDateIsFixed` | Boolean |  |
-| `dueDateFixed` | Time |  |
-| `dueDateFromMilestones` | Time |  |
-| `closedAt` | Time |  |
-| `createdAt` | Time |  |
-| `updatedAt` | Time |  |
-| `hasChildren` | Boolean! |  |
-| `hasIssues` | Boolean! |  |
+| `id` | ID! | ID of the epic |
+| `iid` | ID! | Internal ID of the epic |
+| `title` | String | Title of the epic |
+| `description` | String | Description of the epic |
+| `state` | EpicState! | State of the epic |
+| `group` | Group! | Group to which the epic belongs |
+| `parent` | Epic | Parent epic of the epic |
+| `author` | User! | Author of the epic |
+| `startDate` | Time | Start date of the epic |
+| `startDateIsFixed` | Boolean | Indicates if the start date has been manually set |
+| `startDateFixed` | Time | Fixed start date of the epic |
+| `startDateFromMilestones` | Time | Inherited start date of the epic from milestones |
+| `dueDate` | Time | Due date of the epic |
+| `dueDateIsFixed` | Boolean | Indicates if the due date has been manually set |
+| `dueDateFixed` | Time | Fixed due date of the epic |
+| `dueDateFromMilestones` | Time | Inherited due date of the epic from milestones |
+| `upvotes` | Int! | Number of upvotes the epic has received |
+| `downvotes` | Int! | Number of downvotes the epic has received |
+| `closedAt` | Time | Timestamp of the epic's closure |
+| `createdAt` | Time | Timestamp of the epic's creation |
+| `updatedAt` | Time | Timestamp of the epic's last activity |
+| `hasChildren` | Boolean! | Indicates if the epic has children |
+| `hasIssues` | Boolean! | Indicates if the epic has direct issues |
 | `webPath` | String! |  |
 | `webUrl` | String! |  |
-| `relativePosition` | Int | The relative position of the epic in the Epic tree |
+| `relativePosition` | Int | The relative position of the epic in the epic tree |
 | `relationPath` | String |  |
 | `reference` | String! |  |
 | `subscribed` | Boolean! | Boolean flag for whether the currently logged in user is subscribed to this epic |
@@ -664,6 +666,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `repository` | Repository | Git repository of the project |
 | `mergeRequest` | MergeRequest | A single merge request of the project |
 | `issue` | Issue | A single issue of the project |
+| `sentryDetailedError` | SentryDetailedError | Detailed version of a Sentry error on the project |
 
 ### ProjectPermissions
 
@@ -686,7 +689,6 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `downloadCode` | Boolean! | Whether or not a user can perform `download_code` on this resource |
 | `downloadWikiCode` | Boolean! | Whether or not a user can perform `download_wiki_code` on this resource |
 | `forkProject` | Boolean! | Whether or not a user can perform `fork_project` on this resource |
-| `createProjectSnippet` | Boolean! | Whether or not a user can perform `create_project_snippet` on this resource |
 | `readCommitStatus` | Boolean! | Whether or not a user can perform `read_commit_status` on this resource |
 | `requestAccess` | Boolean! | Whether or not a user can perform `request_access` on this resource |
 | `createPipeline` | Boolean! | Whether or not a user can perform `create_pipeline` on this resource |
@@ -707,6 +709,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `destroyPages` | Boolean! | Whether or not a user can perform `destroy_pages` on this resource |
 | `readPagesContent` | Boolean! | Whether or not a user can perform `read_pages_content` on this resource |
 | `adminOperations` | Boolean! | Whether or not a user can perform `admin_operations` on this resource |
+| `createSnippet` | Boolean! | Whether or not a user can perform `create_snippet` on this resource |
 | `readDesign` | Boolean! | Whether or not a user can perform `read_design` on this resource |
 | `createDesign` | Boolean! | Whether or not a user can perform `create_design` on this resource |
 | `destroyDesign` | Boolean! | Whether or not a user can perform `destroy_design` on this resource |
@@ -750,6 +753,68 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `buildArtifactsSize` | Int! | The CI artifacts size in bytes |
 | `packagesSize` | Int! | The packages size in bytes |
 | `wikiSize` | Int! | The wiki size in bytes |
+
+### SentryDetailedError
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `id` | ID! | ID (global ID) of the error |
+| `sentryId` | String! | ID (Sentry ID) of the error |
+| `title` | String! | Title of the error |
+| `type` | String! | Type of the error |
+| `userCount` | Int! | Count of users affected by the error |
+| `count` | Int! | Count of occurrences |
+| `firstSeen` | Time! | Timestamp when the error was first seen |
+| `lastSeen` | Time! | Timestamp when the error was last seen |
+| `message` | String | Sentry metadata message of the error |
+| `culprit` | String! | Culprit of the error |
+| `externalUrl` | String! | External URL of the error |
+| `sentryProjectId` | ID! | ID of the project (Sentry project) |
+| `sentryProjectName` | String! | Name of the project affected by the error |
+| `sentryProjectSlug` | String! | Slug of the project affected by the error |
+| `shortId` | String! | Short ID (Sentry ID) of the error |
+| `status` | SentryErrorStatus! | Status of the error |
+| `frequency` | SentryErrorFrequency! => Array | Last 24hr stats of the error |
+| `firstReleaseLastCommit` | String | Commit the error was first seen |
+| `lastReleaseLastCommit` | String | Commit the error was last seen |
+| `firstReleaseShortVersion` | String | Release version the error was first seen |
+| `lastReleaseShortVersion` | String | Release version the error was last seen |
+
+### SentryErrorFrequency
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `time` | Time! | Time the error frequency stats were recorded |
+| `count` | Int! | Count of errors received since the previously recorded time |
+
+### Snippet
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `userPermissions` | SnippetPermissions! | Permissions for the current user on the resource |
+| `id` | ID! | Id of the snippet |
+| `title` | String! | Title of the snippet |
+| `project` | Project | The project the snippet is associated with |
+| `author` | User! | The owner of the snippet |
+| `fileName` | String | File Name of the snippet |
+| `content` | String! | Content of the snippet |
+| `description` | String | Description of the snippet |
+| `visibility` | String! | Visibility of the snippet |
+| `createdAt` | Time! | Timestamp this snippet was created |
+| `updatedAt` | Time! | Timestamp this snippet was updated |
+| `webUrl` | String! | Web URL of the snippet |
+| `rawUrl` | String! | Raw URL of the snippet |
+| `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
+
+### SnippetPermissions
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `createNote` | Boolean! | Whether or not a user can perform `create_note` on this resource |
+| `awardEmoji` | Boolean! | Whether or not a user can perform `award_emoji` on this resource |
+| `readSnippet` | Boolean! | Whether or not a user can perform `read_snippet` on this resource |
+| `updateSnippet` | Boolean! | Whether or not a user can perform `update_snippet` on this resource |
+| `adminSnippet` | Boolean! | Whether or not a user can perform `admin_snippet` on this resource |
 
 ### Submodule
 
@@ -856,7 +921,14 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
+| `userPermissions` | UserPermissions! | Permissions for the current user on the resource |
 | `name` | String! | Human-readable name of the user |
 | `username` | String! | Username of the user. Unique within this instance of GitLab |
 | `avatarUrl` | String! | URL of the user's avatar |
 | `webUrl` | String! | Web URL of the user |
+
+### UserPermissions
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `createSnippet` | Boolean! | Whether or not a user can perform `create_snippet` on this resource |

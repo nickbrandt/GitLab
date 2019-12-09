@@ -9,9 +9,9 @@ module Clusters
     end
 
     def execute
-      cluster&.kubeclient&.get_cluster_role_bindings&.find do |resource|
-        resource.metadata.name == Clusters::Kubernetes::GITLAB_KNATIVE_VERSION_ROLE_BINDING_NAME
-      end
+      cluster.kubeclient&.get_cluster_role_binding(Clusters::Kubernetes::GITLAB_KNATIVE_VERSION_ROLE_BINDING_NAME)
+    rescue Kubeclient::ResourceNotFoundError
+      nil
     end
   end
 end

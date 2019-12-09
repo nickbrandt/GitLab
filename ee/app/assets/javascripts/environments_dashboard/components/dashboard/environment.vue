@@ -1,15 +1,15 @@
 <script>
 import _ from 'underscore';
 import { GlTooltipDirective, GlLink, GlBadge } from '@gitlab/ui';
+import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
+import TimeAgo from 'ee/vue_shared/dashboards/components/time_ago.vue';
+import { STATUS_FAILED } from 'ee/vue_shared/dashboards/constants';
+import ProjectPipeline from 'ee/vue_shared/dashboards/components/project_pipeline.vue';
 import { s__, __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import Commit from '~/vue_shared/components/commit.vue';
-import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
-import TimeAgo from 'ee/vue_shared/dashboards/components/time_ago.vue';
-import { STATUS_FAILED } from 'ee/vue_shared/dashboards/constants';
-import ProjectPipeline from 'ee/vue_shared/dashboards/components/project_pipeline.vue';
 import EnvironmentHeader from './environment_header.vue';
 
 export default {

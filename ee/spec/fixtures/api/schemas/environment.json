@@ -71,6 +71,8 @@
         },
         "can_stop": {
             "type": "boolean"
-        }
+        },
+        "cancel_auto_stop_path": { "type": "string" },
+        "auto_stop_at": { "type": "string", "format": "date-time" }
     }
 }

@@ -1,13 +1,12 @@
 - page_title 'Geo Nodes'
-- @content_class = "geo-admin-container"
 
 = render_enable_hashed_storage_warning
 = render_migrate_hashed_storage_warning
 
-%h2.page-title.clearfix
-  %span.title-text.float-left= _("Geo Nodes")
-  = link_to s_("GeoNodes|New node"), new_admin_geo_node_path, class: 'btn btn-success float-right qa-new-node-link'
-%hr.page-title-separator
+.d-flex.align-items-center.border-bottom.border-default.mb-4
+  %h2.page-title
+    = _("Geo Nodes")
+  = link_to s_("GeoNodes|New node"), new_admin_geo_node_path, class: 'btn btn-success ml-auto qa-new-node-link'
 
 %p.page-subtitle.light
   = s_('GeoNodes|With %{geo} you can install a special read-only and replicated instance anywhere. Before you add nodes, follow the %{instructions} in the exact order they appear.').html_safe % { geo: link_to('GitLab Geo', help_page_path('administration/geo/replication/index.md'), target: '_blank'), instructions: link_to('setup instructions', help_page_path('administration/geo/replication/index.md', anchor: 'setup-instructions'), target: '_blank') }
