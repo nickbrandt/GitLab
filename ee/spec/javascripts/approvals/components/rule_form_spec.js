@@ -190,6 +190,10 @@ describe('EE Approvals RuleForm', () => {
         });
       });
 
+      it('does not disable the name text field', () => {
+        expect(findNameInput().attributes('disabled')).toBe(undefined);
+      });
+
       it('shows approvers', () => {
         const list = findApproversList();
 
@@ -375,6 +379,30 @@ describe('EE Approvals RuleForm', () => {
             .props('value')
             .every(x => x.type !== TYPE_HIDDEN_GROUPS),
         ).toBe(true);
+      });
+    });
+
+    describe('with new License-Check rule', () => {
+      beforeEach(() => {
+        createComponent({
+          initRule: { ...TEST_RULE, id: null, name: 'License-Check' },
+        });
+      });
+
+      it('does not disable the name text field', () => {
+        expect(findNameInput().attributes('disabled')).toBe(undefined);
+      });
+    });
+
+    describe('with editing the License-Check rule', () => {
+      beforeEach(() => {
+        createComponent({
+          initRule: { ...TEST_RULE, name: 'License-Check' },
+        });
+      });
+
+      it('disables the name text field', () => {
+        expect(findNameInput().attributes('disabled')).toBe('disabled');
       });
     });
   });
