@@ -845,6 +845,13 @@ module EE
         end
       end
 
+      module Nuget
+        class ServiceIndex < Grape::Entity
+          expose :version
+          expose :resources
+        end
+      end
+
       class NpmPackage < Grape::Entity
         expose :name
         expose :versions
