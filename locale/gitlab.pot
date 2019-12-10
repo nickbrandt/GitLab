@@ -3263,6 +3263,9 @@ msgstr ""
 msgid "Checkout"
 msgstr ""
 
+msgid "Checkout|%{selectedPlanText} plan"
+msgstr ""
+
 msgid "Checkout|1. Your profile"
 msgstr ""
 
@@ -3275,7 +3278,34 @@ msgstr ""
 msgid "Checkout|Checkout"
 msgstr ""
 
+msgid "Checkout|Continue to billing"
+msgstr ""
+
 msgid "Checkout|Edit"
+msgstr ""
+
+msgid "Checkout|GitLab plan"
+msgstr ""
+
+msgid "Checkout|Group"
+msgstr ""
+
+msgid "Checkout|Name of company or organization using GitLab"
+msgstr ""
+
+msgid "Checkout|Need more users? Purchase GitLab for your %{company}."
+msgstr ""
+
+msgid "Checkout|Number of users"
+msgstr ""
+
+msgid "Checkout|Subscription details"
+msgstr ""
+
+msgid "Checkout|Users"
+msgstr ""
+
+msgid "Checkout|company or team"
 msgstr ""
 
 msgid "Cherry-pick this commit"
