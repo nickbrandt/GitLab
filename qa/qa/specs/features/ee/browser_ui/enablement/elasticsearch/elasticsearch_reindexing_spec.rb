@@ -2,7 +2,7 @@
 
 module QA
   context 'Create' do
-    describe 'Search using Elasticsearch', :orchestrated, :elasticsearch do
+    describe 'Search using Elasticsearch', :orchestrated, :elasticsearch, :requires_admin do
       include Runtime::Fixtures
 
       before do
@@ -10,13 +10,15 @@ module QA
         @project_file_name = 'elasticsearch.rb'
         @project_file_content = 'elasticsearch: true'
 
-        Flow::Login.sign_in
-
-        QA::EE::Resource::Settings::Elasticsearch.fabricate_via_browser_ui!
+        Flow::Login.while_signed_in_as_admin do
+          QA::EE::Resource::Settings::Elasticsearch.fabricate_via_browser_ui!
+        end
 
         @project = Resource::Project.fabricate_via_api! do |project|
           project.name = project_name
         end
+
+        Flow::Login.sign_in
 
         Resource::Repository::ProjectPush.fabricate! do |push|
           push.project = @project
