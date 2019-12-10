@@ -7373,6 +7373,12 @@ msgstr ""
 msgid "Failed to enqueue the rebase operation, possibly due to a long-lived transaction. Try again later."
 msgstr ""
 
+msgid "Failed to find diff file"
+msgstr ""
+
+msgid "Failed to find diff line for: %{file_path}, new_pos: %{new_pos}, old_pos: %{old_pos}"
+msgstr ""
+
 msgid "Failed to get ref."
 msgstr ""
 

@@ -39,13 +39,16 @@ class DiffNote < Note
     return unless should_create_diff_file?
 
     diff_file = fetch_diff_file
-    raise  NoteDiffFileCreationError, DIFF_FILE_NOT_FOUND_MESSAGE unless diff_file
+    raise NoteDiffFileCreationError, DIFF_FILE_NOT_FOUND_MESSAGE unless diff_file
+
     diff_line = diff_file.line_for_position(self.original_position)
-    raise  NoteDiffFileCreationError,  DIFF_LINE_NOT_FOUND_MESSAGE % {
-        file_path: diff_file.file_path,
-        new_pos: original_position.new_line,
-        old_pos: original_position.old_line
-    } unless diff_line
+    unless diff_line
+      raise NoteDiffFileCreationError, DIFF_LINE_NOT_FOUND_MESSAGE % {
+          file_path: diff_file.file_path,
+          new_pos: original_position.new_line,
+          old_pos: original_position.old_line
+      }
+    end
 
     creation_params = diff_file.diff.to_hash
       .except(:too_large)
@@ -121,6 +124,7 @@ class DiffNote < Note
 
   def fetch_diff_file
     return note_diff_file.raw_diff_file if note_diff_file
+
     if created_at_diff?(noteable.diff_refs)
       # We're able to use the already persisted diffs (Postgres) if we're
       # presenting a "current version" of the MR discussion diff.
@@ -132,6 +136,7 @@ class DiffNote < Note
       # if line is not found in persisted diffs, fallback and retrieve file from repository using gitaly
       file = nil if file&.line_for_position(original_position).nil? && importing?
     end
+
     file ||= original_position.diff_file(repository)
     file&.unfold_diff_lines(position)
 

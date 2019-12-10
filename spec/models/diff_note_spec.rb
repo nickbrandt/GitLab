@@ -91,7 +91,6 @@ describe DiffNote do
   end
 
   describe '#create_diff_file callback' do
-
     context 'merge request' do
       let(:position) do
         Gitlab::Diff::Position.new(old_path: "files/ruby/popen.rb",
@@ -101,6 +100,7 @@ describe DiffNote do
                                    diff_refs: merge_request.diff_refs)
       end
       subject { build(:diff_note_on_merge_request, project: project, position: position, noteable: merge_request) }
+
       let(:diff_file_from_repository) do
         position.diff_file(project.repository)
       end
@@ -168,7 +168,6 @@ describe DiffNote do
                 subject.save
                 expect(subject.reload.note_diff_file).to be_present
               end
-
             end
           end
         end
@@ -189,7 +188,7 @@ describe DiffNote do
       end
 
       it 'does not create diff note file if it is a reply' do
-        diff_note =  create(:diff_note_on_merge_request, project: project, noteable: merge_request)
+        diff_note = create(:diff_note_on_merge_request, project: project, noteable: merge_request)
         expect { create(:diff_note_on_merge_request, noteable: merge_request, in_reply_to: diff_note) }
           .not_to change(NoteDiffFile, :count)
       end
