@@ -19,6 +19,7 @@ import { dateFormats } from '../../../../shared/constants';
  * }
  *
  */
+// eslint-disable-next-line import/prefer-default-export
 export const getCommonFilterParams = state => chartKey => {
   const {
     groupNamespace,
@@ -46,6 +47,3 @@ export const getCommonFilterParams = state => chartKey => {
     merged_at_before: `${dateFormat(endDate, dateFormats.isoDate)}${endOfDayTime}`,
   };
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

@@ -61,6 +61,3 @@ export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDat
     dispatch('table/setPage', 0, { root: true });
   });
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};
