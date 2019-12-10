@@ -18,7 +18,6 @@ export default el => {
     hasCredentials,
     createRolePath,
     createClusterPath,
-    signOutPath,
     externalLinkIcon,
     roleArn,
   } = el.dataset;
@@ -33,7 +32,6 @@ export default el => {
         instanceTypes: JSON.parse(instanceTypes),
         createRolePath,
         createClusterPath,
-        signOutPath,
         roleArn,
       },
     }),
