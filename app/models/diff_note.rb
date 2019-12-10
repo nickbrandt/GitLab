@@ -23,6 +23,12 @@ class DiffNote < Note
 
   before_validation :set_line_code, if: :on_text?, unless: :importing?
   after_save :keep_around_commits, unless: :importing?
+
+  NoteDiffFileCreationError = Class.new(StandardError)
+
+  DIFF_LINE_NOT_FOUND_MESSAGE = _("Failed to find diff line for: %{file_path}, new_pos: %{new_pos}, old_pos: %{old_pos}")
+  DIFF_FILE_NOT_FOUND_MESSAGE = _("Failed to find diff file")
+
   after_commit :create_diff_file, on: :create
 
   def discussion_class(*)
@@ -33,12 +39,17 @@ class DiffNote < Note
     return unless should_create_diff_file?
 
     diff_file = fetch_diff_file
+    raise  NoteDiffFileCreationError, DIFF_FILE_NOT_FOUND_MESSAGE unless diff_file
     diff_line = diff_file.line_for_position(self.original_position)
+    raise  NoteDiffFileCreationError,  DIFF_LINE_NOT_FOUND_MESSAGE % {
+        file_path: diff_file.file_path,
+        new_pos: original_position.new_line,
+        old_pos: original_position.old_line
+    } unless diff_line
 
     creation_params = diff_file.diff.to_hash
       .except(:too_large)
-
-    creation_params.merge(diff: diff_file.diff_hunk(diff_line)) if diff_line
+      .merge(diff: diff_file.diff_hunk(diff_line))
 
     create_note_diff_file(creation_params)
   end
@@ -118,9 +129,10 @@ class DiffNote < Note
       # has `highlighted_diff_lines` data set from Redis on
       # `Diff::FileCollection::MergeRequestDiff`.
       file = noteable.diffs(original_position.diff_options).diff_files.first
+      # if line is not found in persisted diffs, fallback and retrieve file from repository using gitaly
+      file = nil if file&.line_for_position(original_position).nil? && importing?
     end
     file ||= original_position.diff_file(repository)
-
     file&.unfold_diff_lines(position)
 
     file

@@ -91,18 +91,106 @@ describe DiffNote do
   end
 
   describe '#create_diff_file callback' do
-    let(:noteable) { create(:merge_request) }
-    let(:project) { noteable.project }
 
     context 'merge request' do
-      let!(:diff_note) { create(:diff_note_on_merge_request, project: project, noteable: noteable) }
+      let(:position) do
+        Gitlab::Diff::Position.new(old_path: "files/ruby/popen.rb",
+                                   new_path: "files/ruby/popen.rb",
+                                   old_line: nil,
+                                   new_line: 9,
+                                   diff_refs: merge_request.diff_refs)
+      end
+      subject { build(:diff_note_on_merge_request, project: project, position: position, noteable: merge_request) }
+      let(:diff_file_from_repository) do
+        position.diff_file(project.repository)
+      end
+      let(:diff_file) do
+        diffs = merge_request.diffs
+        raw_diff = diffs.diffable.raw_diffs(diffs.diff_options.merge(paths: ['files/ruby/popen.rb'])).first
+        Gitlab::Diff::File.new(raw_diff,
+                               repository: diffs.project.repository,
+                               diff_refs: diffs.diff_refs,
+                               fallback_diff_refs: diffs.fallback_diff_refs)
+      end
+      let(:diff_line) { diff_file.diff_lines.first }
+      before do
+        allow_any_instance_of(::Gitlab::Diff::Position).to receive(:line_code).with(project.repository).and_return('2f6fcd96b88b36ce98c38da085c795a27d92a3dd_15_14')
+      end
+      context 'when diffs are already created' do
+        before do
+          allow(subject).to receive(:created_at_diff?).and_return(true)
+        end
+        context 'when diff_file is found in  persisted diffs' do
+          before do
+            allow(merge_request).to receive_message_chain(:diffs, :diff_files, :first).and_return(diff_file)
+          end
+          context 'when importing' do
+            before do
+              subject.importing = true
+              subject.line_code = '2f6fcd96b88b36ce98c38da085c795a27d92a3dd_15_14'
+            end
 
-      it 'creates a diff note file' do
-        expect(diff_note.reload.note_diff_file).to be_present
+            context 'when diff_line is found in persisted diff_file' do
+              before do
+                allow(diff_file).to receive(:line_for_position).with(position).and_return(diff_line)
+              end
+              it 'creates a diff note file' do
+                subject.save
+                expect(subject.note_diff_file).to be_present
+              end
+            end
+            context 'when diff_line is not found in persisted diff_file' do
+              before do
+                allow(diff_file).to receive(:line_for_position).and_return(nil)
+              end
+
+              it_behaves_like 'a valid diff note with after commit callback'
+            end
+          end
+
+          context 'when not importing' do
+            context 'when diff_line is not found' do
+              it 'raises an error' do
+                allow(diff_file).to receive(:line_for_position).with(position).and_return(nil)
+                expect { subject.save }.to raise_error(::DiffNote::NoteDiffFileCreationError,
+                                                       "Failed to find diff line for: #{diff_file.file_path}, "\
+                                                       "new_pos: #{position.new_line}"\
+                                                       ", old_pos: #{position.old_line}")
+              end
+            end
+
+            context 'when diff_line is found' do
+              before do
+                allow(diff_file).to receive(:line_for_position).with(position).and_return(diff_line)
+              end
+
+              it 'creates a diff note file' do
+                subject.save
+                expect(subject.reload.note_diff_file).to be_present
+              end
+
+            end
+          end
+        end
+
+        context 'when diff file is not found in persisted diffs' do
+          before do
+            allow_any_instance_of(::Gitlab::Diff::FileCollection::MergeRequestDiff).to receive(:diff_files).and_return([])
+          end
+
+          it_behaves_like 'a valid diff note with after commit callback'
+        end
+      end
+      context 'when diffs are not already created' do
+        before do
+          allow(subject).to receive(:created_at_diff?).and_return(false)
+        end
+        it_behaves_like 'a valid diff note with after commit callback'
       end
 
       it 'does not create diff note file if it is a reply' do
-        expect { create(:diff_note_on_merge_request, noteable: noteable, in_reply_to: diff_note) }
+        diff_note =  create(:diff_note_on_merge_request, project: project, noteable: merge_request)
+        expect { create(:diff_note_on_merge_request, noteable: merge_request, in_reply_to: diff_note) }
           .not_to change(NoteDiffFile, :count)
       end
     end
