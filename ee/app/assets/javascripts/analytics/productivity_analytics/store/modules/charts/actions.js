@@ -90,6 +90,3 @@ export const resetMainChartSelection = ({ commit, dispatch }, skipReload = false
 
 export const setChartEnabled = ({ commit }, { chartKey, isEnabled }) =>
   commit(types.SET_CHART_ENABLED, { chartKey, isEnabled });
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};
