@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Sentry::Client do
+  include SentryClientHelpers
+
   let(:sentry_url) { 'https://sentrytest.gitlab.com/api/0/projects/sentry-org/sentry-project' }
   let(:token) { 'test-token' }
   let(:default_httparty_options) do
@@ -215,16 +217,5 @@ describe Sentry::Client do
       it_behaves_like 'issues has correct return type', Gitlab::ErrorTracking::Error
       it_behaves_like 'issues has correct length', 1
     end
-  end
-
-  private
-
-  def stub_sentry_request(url, body: {}, status: 200, headers: {})
-    stub_request(:get, url)
-      .to_return(
-        status: status,
-        headers: { 'Content-Type' => 'application/json' }.merge(headers),
-        body: body.to_json
-      )
   end
 end

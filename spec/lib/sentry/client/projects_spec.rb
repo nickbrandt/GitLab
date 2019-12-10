@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Sentry::Client::Projects do
+  include SentryClientHelpers
+
   let(:sentry_url) { 'https://sentrytest.gitlab.com/api/0/projects/sentry-org/sentry-project' }
   let(:token) { 'test-token' }
   let(:client) { Sentry::Client.new(sentry_url, token) }
@@ -113,16 +115,5 @@ describe Sentry::Client::Projects do
 
       it_behaves_like 'maps Sentry exceptions'
     end
-  end
-
-  private
-
-  def stub_sentry_request(url, body: {}, status: 200, headers: {})
-    stub_request(:get, url)
-      .to_return(
-        status: status,
-        headers: { 'Content-Type' => 'application/json' }.merge(headers),
-        body: body.to_json
-      )
   end
 end
