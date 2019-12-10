@@ -1,7 +1,7 @@
 # Read more about this feature here: https://docs.gitlab.com/ee/user/application_security/dast/
 
 # Configure the scanning tool through the environment variables.
-# List of the variables: https://gitlab.com/gitlab-org/security-products/dast#settings
+# List of the variables: https://docs.gitlab.com/ee/user/application_security/dast/#available-variables
 # How to set: https://docs.gitlab.com/ee/ci/yaml/#variables
 
 stages:
@@ -47,3 +47,5 @@ dast:
     variables:
       - $DAST_DISABLED
       - $DAST_DISABLED_FOR_DEFAULT_BRANCH && $CI_DEFAULT_BRANCH == $CI_COMMIT_REF_NAME
+      - $REVIEW_DISABLED && !$DAST_WEBSITE && !environment_url.txt
+

@@ -29,6 +29,7 @@ dast_environment_deploy:
       - $CI_DEFAULT_BRANCH != $CI_COMMIT_REF_NAME
       - $DAST_DISABLED || $DAST_DISABLED_FOR_DEFAULT_BRANCH
       - $DAST_WEBSITE  # we don't need to create a review app if a URL is already given
+      - $REVIEW_DISABLED && !$DAST_WEBSITE && !environment_url.txt # Don't create a review app if disabled and URL not given
 
 stop_dast_environment:
   extends: .dast-auto-deploy
@@ -53,3 +54,5 @@ stop_dast_environment:
       - $CI_DEFAULT_BRANCH != $CI_COMMIT_REF_NAME
       - $DAST_DISABLED || $DAST_DISABLED_FOR_DEFAULT_BRANCH
       - $DAST_WEBSITE
+      - $REVIEW_DISABLED && !$DAST_WEBSITE && !environment_url.txt
+
