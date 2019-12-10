@@ -2,6 +2,13 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 12.5.4
+
+### Security (1 change)
+
+- Update maven_file_name_regex for full string match.
+
+
 ## 12.5.3
 
 ### Fixed (4 changes)
