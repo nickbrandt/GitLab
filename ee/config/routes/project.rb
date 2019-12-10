@@ -65,10 +65,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resources :dashboards, only: [:create]
         end
 
-        resource :licenses, only: [:show]
-        namespace :security do
-          resources :licenses, only: [:index, :create, :update]
-        end
+        resources :licenses, only: [:index, :create, :update]
 
         resource :threat_monitoring, only: [:show], controller: :threat_monitoring
 
