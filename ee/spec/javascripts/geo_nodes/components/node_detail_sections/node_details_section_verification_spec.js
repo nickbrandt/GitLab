@@ -83,6 +83,13 @@ describe('NodeDetailsSectionVerification', () => {
       expect(vm.$el.classList.contains('verification-section')).toBe(true);
     });
 
+    it('renders show section button element', () => {
+      expect(vm.$el.querySelector('.btn-link')).not.toBeNull();
+      expect(vm.$el.querySelector('.btn-link > span').innerText.trim()).toBe(
+        'Verification information',
+      );
+    });
+
     it('renders section items container element', done => {
       vm.showSectionItems = true;
       Vue.nextTick(() => {
