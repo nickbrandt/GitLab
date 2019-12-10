@@ -649,7 +649,9 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
     before do
       setup_import_export_config('with_invalid_records')
 
-      Labkit::Correlation::CorrelationId.use_id(correlation_id) { subject }
+      # Import is running from the rake task, `correlation_id` is not assigned
+      expect(Labkit::Correlation::CorrelationId).to receive(:new_id).and_return(correlation_id)
+      subject
     end
 
     context 'when failures occur because a relation fails to be processed' do
