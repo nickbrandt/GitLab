@@ -3269,6 +3269,54 @@ describe Project do
     it { expect(project.parent_changed?).to be_truthy }
   end
 
+  describe '#default_merge_request_target' do
+    context 'when forked from a more visible project' do
+      it 'returns the more restrictive project' do
+        project = create(:project, :public)
+        forked = fork_project(project)
+        forked.visibility = Gitlab::VisibilityLevel::PRIVATE
+        forked.save!
+
+        expect(project.visibility).to eq 'public'
+        expect(forked.visibility).to eq 'private'
+
+        expect(forked.default_merge_request_target).to eq(forked)
+      end
+    end
+
+    context 'when forked from a project with disabled merge requests' do
+      it 'returns the current project' do
+        project = create(:project, :merge_requests_disabled)
+        forked = fork_project(project)
+
+        expect(forked.forked_from_project).to receive(:merge_requests_enabled?)
+          .and_call_original
+
+        expect(forked.default_merge_request_target).to eq(forked)
+      end
+    end
+
+    context 'when forked from a project with enabled merge requests' do
+      it 'returns the source project' do
+        project = create(:project, :public)
+        forked = fork_project(project)
+
+        expect(project.visibility).to eq 'public'
+        expect(forked.visibility).to eq 'public'
+
+        expect(forked.default_merge_request_target).to eq(project)
+      end
+    end
+
+    context 'when not forked' do
+      it 'returns the current project' do
+        project = build_stubbed(:project)
+
+        expect(project.default_merge_request_target).to eq(project)
+      end
+    end
+  end
+
   def enable_lfs
     allow(Gitlab.config.lfs).to receive(:enabled).and_return(true)
   end
