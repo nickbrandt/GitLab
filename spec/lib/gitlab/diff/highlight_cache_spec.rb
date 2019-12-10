@@ -112,11 +112,44 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
   end
 
   describe `#file_paths` do
-    it 'accesses path info via #diff_files' do
-      expect_any_instance_of(Gitlab::Diff::FileCollection::MergeRequestDiff)
-        .to receive(:diff_files).at_least(:once).and_call_original
+    it 'accesses path info without error' do
+      expect { cache.send(:file_paths) }
+        .not_to raise_error
+    end
 
-      cache.send(:file_paths)
+    it 'returns an array of file path strings' do
+      results = cache.send(:file_paths)
+
+      expect(results).to be_an Array
+      expect(results).not_to be_empty
+      expect(results).to include(".DS_Store")
+    end
+
+    context 'when cache initialized with MergeRequestDiffBatch' do
+      let(:merge_request_diff_batch) do
+        Gitlab::Diff::FileCollection::MergeRequestDiffBatch.new(
+          merge_request.merge_request_diff,
+          1,
+          10,
+          diff_options: nil)
+      end
+
+      subject(:cache_with_merge_request_diff_batch) do
+        described_class.new(merge_request_diff_batch)
+      end
+
+      it 'accesses path info without error' do
+        expect { cache_with_merge_request_diff_batch.send(:file_paths) }
+          .not_to raise_error
+      end
+
+      it 'returns an array of file path strings' do
+        results = cache_with_merge_request_diff_batch.send(:file_paths)
+
+        expect(results).to be_an Array
+        expect(results).not_to be_empty
+        expect(results).to include(".DS_Store")
+      end
     end
   end
 
