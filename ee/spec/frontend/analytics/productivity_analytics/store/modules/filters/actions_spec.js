@@ -11,12 +11,57 @@ describe('Productivity analytics filter actions', () => {
   const endDate = new Date(currentYear, 8, 7);
   const groupNamespace = 'gitlab-org';
   const projectPath = 'gitlab-org/gitlab-test';
+  const initialData = {
+    mergedAtAfter: new Date('2019-11-01'),
+    mergedAtBefore: new Date('2019-12-09'),
+  };
 
   beforeEach(() => {
     store = {
       commit: jest.fn(),
       dispatch: jest.fn(() => Promise.resolve()),
     };
+  });
+
+  describe('setInitialData', () => {
+    it('commits the SET_INITIAL_DATA mutation and fetches data by default', done => {
+      actions
+        .setInitialData(store, { data: initialData })
+        .then(() => {
+          expect(store.commit).toHaveBeenCalledWith(types.SET_INITIAL_DATA, initialData);
+
+          expect(store.dispatch.mock.calls[0]).toEqual([
+            'charts/fetchChartData',
+            chartKeys.main,
+            { root: true },
+          ]);
+
+          expect(store.dispatch.mock.calls[1]).toEqual([
+            'charts/fetchSecondaryChartData',
+            null,
+            { root: true },
+          ]);
+
+          expect(store.dispatch.mock.calls[2]).toEqual(['table/setPage', 0, { root: true }]);
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it("commits the SET_INITIAL_DATA mutation and doesn't fetch data when skipFetch=true", done =>
+      testAction(
+        actions.setInitialData,
+        { skipFetch: true, data: initialData },
+        getInitialState(),
+        [
+          {
+            type: types.SET_INITIAL_DATA,
+            payload: initialData,
+          },
+        ],
+        [],
+        done,
+      ));
   });
 
   describe('setGroupNamespace', () => {
@@ -116,7 +161,7 @@ describe('Productivity analytics filter actions', () => {
   });
 
   describe('setDateRange', () => {
-    it('commits the SET_DATE_RANGE mutation and fetches data by default', done => {
+    it('commits the SET_DATE_RANGE mutation', done => {
       actions
         .setDateRange(store, { startDate, endDate })
         .then(() => {
@@ -145,20 +190,5 @@ describe('Productivity analytics filter actions', () => {
         .then(done)
         .catch(done.fail);
     });
-
-    it("commits the SET_DATE_RANGE mutation and doesn't fetch data when skipFetch=true", done =>
-      testAction(
-        actions.setDateRange,
-        { skipFetch: true, startDate, endDate },
-        getInitialState(),
-        [
-          {
-            type: types.SET_DATE_RANGE,
-            payload: { startDate, endDate },
-          },
-        ],
-        [],
-        done,
-      ));
   });
 });
