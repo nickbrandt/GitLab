@@ -99,11 +99,13 @@ describe DiffNote do
                                    new_line: 9,
                                    diff_refs: merge_request.diff_refs)
       end
+
       subject { build(:diff_note_on_merge_request, project: project, position: position, noteable: merge_request) }
 
       let(:diff_file_from_repository) do
         position.diff_file(project.repository)
       end
+
       let(:diff_file) do
         diffs = merge_request.diffs
         raw_diff = diffs.diffable.raw_diffs(diffs.diff_options.merge(paths: ['files/ruby/popen.rb'])).first
@@ -112,18 +114,23 @@ describe DiffNote do
                                diff_refs: diffs.diff_refs,
                                fallback_diff_refs: diffs.fallback_diff_refs)
       end
+
       let(:diff_line) { diff_file.diff_lines.first }
+
       before do
         allow_any_instance_of(::Gitlab::Diff::Position).to receive(:line_code).with(project.repository).and_return('2f6fcd96b88b36ce98c38da085c795a27d92a3dd_15_14')
       end
+
       context 'when diffs are already created' do
         before do
           allow(subject).to receive(:created_at_diff?).and_return(true)
         end
+
         context 'when diff_file is found in  persisted diffs' do
           before do
             allow(merge_request).to receive_message_chain(:diffs, :diff_files, :first).and_return(diff_file)
           end
+
           context 'when importing' do
             before do
               subject.importing = true
@@ -134,11 +141,13 @@ describe DiffNote do
               before do
                 allow(diff_file).to receive(:line_for_position).with(position).and_return(diff_line)
               end
+
               it 'creates a diff note file' do
                 subject.save
                 expect(subject.note_diff_file).to be_present
               end
             end
+
             context 'when diff_line is not found in persisted diff_file' do
               before do
                 allow(diff_file).to receive(:line_for_position).and_return(nil)
@@ -150,12 +159,15 @@ describe DiffNote do
 
           context 'when not importing' do
             context 'when diff_line is not found' do
-              it 'raises an error' do
+              before do
                 allow(diff_file).to receive(:line_for_position).with(position).and_return(nil)
+              end
+
+              it 'raises an error' do
                 expect { subject.save }.to raise_error(::DiffNote::NoteDiffFileCreationError,
                                                        "Failed to find diff line for: #{diff_file.file_path}, "\
-                                                       "new_pos: #{position.new_line}"\
-                                                       ", old_pos: #{position.old_line}")
+                                                       "old_line: #{position.old_line}"\
+                                                       ", new_line: #{position.new_line}")
               end
             end
 
@@ -180,10 +192,12 @@ describe DiffNote do
           it_behaves_like 'a valid diff note with after commit callback'
         end
       end
+
       context 'when diffs are not already created' do
         before do
           allow(subject).to receive(:created_at_diff?).and_return(false)
         end
+
         it_behaves_like 'a valid diff note with after commit callback'
       end
 

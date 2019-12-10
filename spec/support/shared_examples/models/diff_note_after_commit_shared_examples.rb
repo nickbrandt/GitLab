@@ -11,8 +11,8 @@ shared_examples 'a valid diff note with after commit callback' do
         allow(diff_file_from_repository).to receive(:line_for_position).with(position).and_return(nil)
         expect { subject.save }.to raise_error(::DiffNote::NoteDiffFileCreationError,
                                                "Failed to find diff line for: #{diff_file_from_repository.file_path}, "\
-                                               "new_pos: #{position.new_line}"\
-                                               ", old_pos: #{position.old_line}")
+                                               "old_line: #{position.old_line}"\
+                                               ", new_line: #{position.new_line}")
       end
     end
 

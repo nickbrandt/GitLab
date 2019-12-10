@@ -26,7 +26,7 @@ class DiffNote < Note
 
   NoteDiffFileCreationError = Class.new(StandardError)
 
-  DIFF_LINE_NOT_FOUND_MESSAGE = _("Failed to find diff line for: %{file_path}, new_pos: %{new_pos}, old_pos: %{old_pos}")
+  DIFF_LINE_NOT_FOUND_MESSAGE = _("Failed to find diff line for: %{file_path}, old_line: %{old_line}, new_line: %{new_line}")
   DIFF_FILE_NOT_FOUND_MESSAGE = _("Failed to find diff file")
 
   after_commit :create_diff_file, on: :create
@@ -45,8 +45,8 @@ class DiffNote < Note
     unless diff_line
       raise NoteDiffFileCreationError, DIFF_LINE_NOT_FOUND_MESSAGE % {
           file_path: diff_file.file_path,
-          new_pos: original_position.new_line,
-          old_pos: original_position.old_line
+          old_line: original_position.old_line,
+          new_line: original_position.new_line
       }
     end
 
