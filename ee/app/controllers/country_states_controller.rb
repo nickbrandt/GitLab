@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CountriesController < ActionController::Metal
+class CountryStatesController < ActionController::Metal
   include AbstractController::Rendering
   include ActionController::ApiRendering
   include ActionController::Renderers
@@ -8,8 +8,9 @@ class CountriesController < ActionController::Metal
   use_renderers :json
 
   def index
-    countries = World.countries_for_select
+    country = params[:country]
+    states = World.states_for_country(country)
 
-    render json: countries, status: (countries ? :ok : :not_found)
+    render json: states, status: (states ? :ok : :not_found)
   end
 end
