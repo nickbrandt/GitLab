@@ -137,7 +137,10 @@ export default {
             </div>
           </div>
         </td>
-        <td v-if="!rule.fallback" class="d-none d-sm-table-cell js-approvers">
+        <td
+          v-if="rule.rule_type !== $options.ruleTypeAnyApprover"
+          class="d-none d-sm-table-cell js-approvers"
+        >
           <div><user-avatar-list :items="rule.approvers" :img-size="24" empty-text="" /></div>
         </td>
         <td class="w-0 d-none d-sm-table-cell text-nowrap js-pending">

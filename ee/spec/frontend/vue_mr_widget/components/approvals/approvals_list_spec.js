@@ -35,6 +35,7 @@ const testRuleFallback = () => ({
   id: 'fallback',
   name: '',
   fallback: true,
+  rule_type: 'any_approver',
   approvals_required: 3,
   approved_by: [{ id: 1 }, { id: 2 }],
   approvers: [],
