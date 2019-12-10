@@ -16,67 +16,42 @@ describe Gitlab::Vulnerabilities::History do
   describe '#findings_counter', :use_clean_rails_memory_store_caching do
     subject(:counter) { described_class.new(group, filters).findings_counter }
 
-    context 'feature disabled' do
-      before do
-        stub_feature_flags(cache_vulnerability_history: false)
-      end
+    context 'filters are passed' do
+      let(:filters) { { report_type: :sast } }
 
       it 'does not call Gitlab::Vulnerabilities::HistoryCache' do
         expect(Gitlab::Vulnerabilities::HistoryCache).not_to receive(:new)
 
         counter
       end
+    end
 
-      it 'returns the proper format for the history' do
-        Timecop.freeze do
-          expect(counter[:total]).to eq({ Date.today => 3 })
-          expect(counter[:high]).to eq({ Date.today => 2 })
-        end
+    it 'calls Gitlab::Vulnerabilities::HistoryCache' do
+      expect(Gitlab::Vulnerabilities::HistoryCache).to receive(:new).twice.and_call_original
+
+      counter
+    end
+
+    it 'returns the proper format for the history' do
+      Timecop.freeze do
+        expect(counter[:total]).to eq({ Date.today => 3 })
+        expect(counter[:high]).to eq({ Date.today => 2 })
       end
     end
 
-    context 'feature enabled' do
+    context 'multiple projects with vulnerabilities' do
       before do
-        stub_feature_flags(cache_vulnerability_history: true)
-      end
-
-      context 'filters are passed' do
-        let(:filters) { { report_type: :sast } }
-
-        it 'does not call Gitlab::Vulnerabilities::HistoryCache' do
-          expect(Gitlab::Vulnerabilities::HistoryCache).not_to receive(:new)
-
-          counter
+        Timecop.freeze(Date.today - 1) do
+          create_vulnerabilities(1, project1, { severity: :high })
+        end
+        Timecop.freeze(Date.today - 4) do
+          create_vulnerabilities(1, project2, { severity: :high })
         end
       end
 
-      it 'calls Gitlab::Vulnerabilities::HistoryCache' do
-        expect(Gitlab::Vulnerabilities::HistoryCache).to receive(:new).twice.and_call_original
-
-        counter
-      end
-
-      it 'returns the proper format for the history' do
+      it 'sorts by date for each key' do
         Timecop.freeze do
-          expect(counter[:total]).to eq({ Date.today => 3 })
-          expect(counter[:high]).to eq({ Date.today => 2 })
-        end
-      end
-
-      context 'multiple projects with vulnerabilities' do
-        before do
-          Timecop.freeze(Date.today - 1) do
-            create_vulnerabilities(1, project1, { severity: :high })
-          end
-          Timecop.freeze(Date.today - 4) do
-            create_vulnerabilities(1, project2, { severity: :high })
-          end
-        end
-
-        it 'sorts by date for each key' do
-          Timecop.freeze do
-            expect(counter[:high].keys).to eq([(Date.today - 4), (Date.today - 1), Date.today])
-          end
+          expect(counter[:high].keys).to eq([(Date.today - 4), (Date.today - 1), Date.today])
         end
       end
     end
