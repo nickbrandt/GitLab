@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Release', :docker do
+  # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/36824
+  context 'Release', :docker, :quarantine do
     describe 'Pipelines for merged results and merge trains' do
       before(:context) do
         @project = Resource::Project.fabricate_via_api! do |project|
