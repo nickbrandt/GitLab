@@ -297,6 +297,7 @@ module EE
       ::Feature.enabled?(feature, self) ||
         (::Feature.enabled?(feature) && feature_available?(feature))
     end
+    alias_method :alpha_feature_available?, :beta_feature_available?
 
     def push_audit_events_enabled?
       ::Feature.enabled?(:repository_push_audit_event, self)
