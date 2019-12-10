@@ -10,7 +10,7 @@ describe Gitlab::Diff::FileCollection::MergeRequestDiff do
 
   describe '#diff_files' do
     context 'when decorate_diff_files is false' do
-      it 'should not attempt to decorate diff files' do
+      it 'does not attempt to decorate diff files' do
         expect(subject.send(:cache)).not_to receive(:decorate)
 
         subject.diff_files(decorate_diff_files: false)
