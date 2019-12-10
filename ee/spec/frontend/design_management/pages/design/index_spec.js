@@ -4,6 +4,7 @@ import DesignIndex from 'ee/design_management/pages/design/index.vue';
 import DesignDiscussion from 'ee/design_management/components/design_notes/design_discussion.vue';
 import DesignReplyForm from 'ee/design_management/components/design_notes/design_reply_form.vue';
 import createImageDiffNoteMutation from 'ee/design_management/graphql/mutations/createImageDiffNote.mutation.graphql';
+import * as utils from 'ee/design_management/utils/design_management_utils';
 import design from '../../mock_data/design';
 
 jest.mock('mousetrap', () => ({
@@ -174,5 +175,38 @@ describe('Design management design index page', () => {
       .then(() => {
         expect(findDiscussionForm().exists()).toBe(false);
       });
+  });
+
+  describe('flash', () => {
+    beforeEach(() => {
+      setDesign();
+
+      wrapper.setData({
+        design: {
+          ...design,
+          discussions: {
+            edges: [],
+          },
+        },
+      });
+    });
+    it('container is in correct position in DOM', () => {
+      wrapper.vm.$nextTick(() => {
+        // tests that `design-detail` class exists on Component container,
+        // and that the '.flash-container' element exists and is placed correctly
+        expect(wrapper.element).toMatchSnapshot();
+      });
+    });
+    it('creates flash on mutation error', () => {
+      const createDesignDetailFlash = jest.fn();
+      // eslint-disable-next-line import/no-named-as-default-member
+      utils.createDesignDetailFlash = createDesignDetailFlash;
+
+      try {
+        wrapper.vm.onMutationError('test error');
+      } catch (e) {
+        expect(createDesignDetailFlash).toHaveBeenCalled();
+      }
+    });
   });
 });

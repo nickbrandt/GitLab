@@ -1,5 +1,55 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Design management design index page flash container is in correct position in DOM 1`] = `
+<div
+  class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
+>
+  <div
+    class="d-flex overflow-hidden flex-lg-grow-1 flex-column"
+  >
+    <designdestroyer-stub
+      filenames="test.jpg"
+      iid="1"
+      projectpath=""
+    />
+     
+    <div
+      class="d-flex flex-column h-100 mh-100 position-relative"
+    >
+      <div
+        class="p-3"
+      >
+        <div
+          class="flash-container"
+        />
+      </div>
+       
+      <designimage-stub
+        image="test.jpg"
+        name="test.jpg"
+      />
+       
+      <designoverlay-stub
+        notes=""
+        position="[object Object]"
+      />
+    </div>
+  </div>
+   
+  <div
+    class="image-notes"
+  >
+    <h2
+      class="new-discussion-disclaimer m-0"
+    >
+      
+        Click the image where you'd like to start a new discussion
+      
+    </h2>
+  </div>
+</div>
+`;
+
 exports[`Design management design index page renders design index 1`] = `
 <div
   class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
