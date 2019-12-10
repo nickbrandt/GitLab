@@ -1,13 +1,12 @@
-import boardsStore from '~/boards/stores/boards_store';
-
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import BoardListSelector from 'ee/boards/components/boards_list_selector/';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 import { mockAssigneesList } from 'spec/boards/mock_data';
 import { TEST_HOST } from 'spec/test_constants';
+import axios from '~/lib/utils/axios_utils';
+import boardsStore from '~/boards/stores/boards_store';
 
 describe('BoardListSelector', () => {
   const dummyEndpoint = `${TEST_HOST}/users.json`;
