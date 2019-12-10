@@ -89,18 +89,20 @@ describe('NodeDetailsSectionOther', () => {
     });
 
     describe('storageShardsCssClass', () => {
-      it('returns CSS class `node-detail-value-bold` when `nodeDetails.storageShardsMatch` is true', done => {
+      it('returns CSS class `font-weight-bold` when `nodeDetails.storageShardsMatch` is true', done => {
         vm.nodeDetails.storageShardsMatch = true;
         Vue.nextTick()
           .then(() => {
-            expect(vm.storageShardsCssClass).toBe('node-detail-value-bold');
+            expect(vm.storageShardsCssClass[0]).toBe('font-weight-bold');
+            expect(vm.storageShardsCssClass[1]['text-danger-500']).toBeFalsy();
           })
           .then(done)
           .catch(done.fail);
       });
 
-      it('returns CSS class `node-detail-value-bold node-detail-value-error` when `nodeDetails.storageShardsMatch` is false', () => {
-        expect(vm.storageShardsCssClass).toBe('node-detail-value-bold node-detail-value-error');
+      it('returns CSS class `font-weight-bold text-danger-500` when `nodeDetails.storageShardsMatch` is false', () => {
+        expect(vm.storageShardsCssClass[0]).toBe('font-weight-bold');
+        expect(vm.storageShardsCssClass[1]['text-danger-500']).toBeTruthy();
       });
     });
   });
@@ -111,14 +113,16 @@ describe('NodeDetailsSectionOther', () => {
     });
 
     it('renders show section button element', () => {
-      expect(vm.$el.querySelector('.btn-show-section')).not.toBeNull();
-      expect(vm.$el.querySelector('.btn-show-section > span').innerText.trim()).toBe(
-        'Other information',
-      );
+      expect(vm.$el.querySelector('.btn-link')).not.toBeNull();
+      expect(vm.$el.querySelector('.btn-link > span').innerText.trim()).toBe('Other information');
     });
 
-    it('renders section items container element', () => {
-      expect(vm.$el.querySelector('.section-items-container')).not.toBeNull();
+    it('renders section items container element', done => {
+      vm.showSectionItems = true;
+      Vue.nextTick(() => {
+        expect(vm.$el.querySelector('.section-items-container')).not.toBeNull();
+        done();
+      });
     });
   });
 });

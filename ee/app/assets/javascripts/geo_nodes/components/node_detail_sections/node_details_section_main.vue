@@ -46,13 +46,13 @@ export default {
 </script>
 
 <template>
-  <div class="row-fluid clearfix node-detail-section primary-section">
-    <div class="col-md-8 section-items-container">
-      <div class="detail-section-item node-version">
-        <div class="node-detail-title">{{ s__('GeoNodes|GitLab version') }}</div>
+  <div class="row-fluid clearfix py-3 primary-section">
+    <div class="col-md-8">
+      <div>
+        <div class="text-secondary-700 node-detail-title">{{ s__('GeoNodes|GitLab version') }}</div>
         <div
-          :class="{ 'node-detail-value-error': versionMismatch }"
-          class="node-detail-value node-detail-value-bold"
+          :class="{ 'text-danger-500': versionMismatch }"
+          class="mt-1 font-weight-bold node-detail-value"
         >
           {{ nodeVersion }}
         </div>

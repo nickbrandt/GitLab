@@ -125,8 +125,7 @@ describe('GeoNodeActionsComponent', () => {
   describe('template', () => {
     it('renders container elements correctly', () => {
       expect(vm.$el.classList.contains('geo-node-actions')).toBe(true);
-      expect(vm.$el.querySelectorAll('.node-action-container').length).not.toBe(0);
-      expect(vm.$el.querySelectorAll('.btn-node-action').length).not.toBe(0);
+      expect(vm.$el.querySelectorAll('.btn-sm').length).not.toBe(0);
     });
   });
 });

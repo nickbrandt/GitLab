@@ -31,7 +31,7 @@ export default {
 </script>
 
 <template>
-  <button class="btn-link btn-show-section" type="button" @click="onClickButton">
+  <button class="btn-link d-flex align-items-center" type="button" @click="onClickButton">
     <icon :size="16" :name="toggleButtonIcon" />
     <span class="prepend-left-8">{{ buttonTitle }}</span>
   </button>
