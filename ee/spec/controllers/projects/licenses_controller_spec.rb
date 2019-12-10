@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-describe Projects::Security::LicensesController do
-  describe "GET index.json" do
+describe Projects::LicensesController do
+  describe "GET #index" do
     let_it_be(:project) { create(:project, :repository, :private) }
     let_it_be(:user) { create(:user) }
     let(:params) { { namespace_id: project.namespace, project_id: project } }
@@ -21,6 +21,12 @@ describe Projects::Security::LicensesController do
       context 'when feature is available' do
         before do
           stub_licensed_features(license_management: true)
+        end
+
+        it 'responds to an HTML request' do
+          get :index, params: params
+
+          expect(response).to have_http_status(:ok)
         end
 
         it 'counts usage of the feature' do

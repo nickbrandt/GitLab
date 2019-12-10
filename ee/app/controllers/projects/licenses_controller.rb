@@ -7,6 +7,9 @@ module Projects
 
     def index
       respond_to do |format|
+        format.html do
+          render status: :ok
+        end
         format.json do
           ::Gitlab::UsageDataCounters::LicensesList.count(:views)
 
