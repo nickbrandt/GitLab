@@ -68,12 +68,17 @@ module Gitlab
         end
       end
 
+<<<<<<< HEAD
       def cacheable_files
         strong_memoize(:cacheable_files) do
           diff_files = @diff_collection.diff_files
 
           diff_files.select { |file| cacheable?(file) && read_file(file).nil? }
         end
+=======
+      def uncached_files
+        diff_files.select { |file| read_cache[file.file_path].nil? }
+>>>>>>> Allow diff_files to return undecorated files
       end
 
       # Given a hash of:
@@ -112,10 +117,9 @@ module Gitlab
         deprecated_cache.clear
       end
 
-      #
       def file_paths
         strong_memoize(:file_paths) do
-          @diff_collection.diffs.collect(&:file_path)
+          diff_files.collect(&:file_path)
         end
       end
 
@@ -145,6 +149,12 @@ module Gitlab
 
       def cacheable?(diff_file)
         diffable.present? && diff_file.text? && diff_file.diffable?
+      end
+
+      def diff_files
+        strong_memoize(:diff_files) do
+          @diff_collection.diff_files(decorate_diff_files: true)
+        end
       end
     end
   end
