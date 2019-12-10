@@ -112,6 +112,7 @@ module Gitlab
         deprecated_cache.clear
       end
 
+      #
       def file_paths
         strong_memoize(:file_paths) do
           @diff_collection.diffs.collect(&:file_path)
