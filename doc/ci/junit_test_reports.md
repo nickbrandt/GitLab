@@ -178,8 +178,8 @@ package can generate test reports for .Net Framework and .Net Core applications.
 example expects a solution in the root folder of the repository, with one or more
 project files in sub-folders. One result file is produced per test project, and each file
 is placed in a new artifacts folder. This example includes optional formatting arguments, which
-improve the readability of test data in the test widget. A full .Net Core example is availble
-[here](https://gitlab.com/Siphonophora/dot-net-cicd-test-logging-demo).
+improve the readability of test data in the test widget. A full .Net Core
+[example is available](https://gitlab.com/Siphonophora/dot-net-cicd-test-logging-demo).
 
 ```yaml
 ## Source code and documentation are here: https://github.com/spekt/junit.testlogger/
