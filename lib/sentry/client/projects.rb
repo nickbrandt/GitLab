@@ -3,7 +3,7 @@
 module Sentry
   class Client
     module Projects
-      def list_projects
+      def projects
         projects = get_projects
 
         handle_mapping_exceptions do

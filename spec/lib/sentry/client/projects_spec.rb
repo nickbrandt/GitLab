@@ -24,12 +24,12 @@ describe Sentry::Client::Projects do
     it { expect(subject.length).to eq(length) }
   end
 
-  describe '#list_projects' do
+  describe '#projects' do
     let(:sentry_list_projects_url) { 'https://sentrytest.gitlab.com/api/0/projects/' }
     let(:sentry_api_response) { projects_sample_response }
     let!(:sentry_api_request) { stub_sentry_request(sentry_list_projects_url, body: sentry_api_response) }
 
-    subject { client.list_projects }
+    subject { client.projects }
 
     it_behaves_like 'calls sentry api'
 
