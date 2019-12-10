@@ -15,6 +15,8 @@ var (
 
 	VideoTypeRegex = regexp.MustCompile(`^video/*`)
 
+	PdfTypeRegex = regexp.MustCompile(`application\/pdf`)
+
 	AttachmentRegex = regexp.MustCompile(`^attachment`)
 	InlineRegex     = regexp.MustCompile(`^inline`)
 )
@@ -27,7 +29,7 @@ var forbiddenInlineTypes = []*regexp.Regexp{SvgMimeTypeRegex}
 // allowed type that can't be inlined we must add it to the forbiddenInlineTypes var.
 // One example of this is the mime type "image". We allow all images to be
 // inlined except for SVGs.
-var allowedInlineTypes = []*regexp.Regexp{ImageTypeRegex, TextTypeRegex, VideoTypeRegex}
+var allowedInlineTypes = []*regexp.Regexp{ImageTypeRegex, TextTypeRegex, VideoTypeRegex, PdfTypeRegex}
 
 func SafeContentHeaders(data []byte, contentDisposition string) (string, string) {
 	contentType := safeContentType(data)

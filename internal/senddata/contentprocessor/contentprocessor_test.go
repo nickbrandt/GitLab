@@ -86,6 +86,12 @@ func TestSetProperContentTypeAndDisposition(t *testing.T) {
 			body:               testhelper.LoadFile(t, "testdata/file.pdf"),
 		},
 		{
+			desc:               "Application type pdf with inline disposition",
+			contentType:        "application/pdf",
+			contentDisposition: "inline",
+			body:               testhelper.LoadFile(t, "testdata/file.pdf"),
+		},
+		{
 			desc:               "Application executable type",
 			contentType:        "application/octet-stream",
 			contentDisposition: "attachment",
@@ -201,8 +207,24 @@ func TestSuccessOverrideContentDispositionFromInlineToAttachment(t *testing.T) {
 	require.Equal(t, "attachment", resp.Header.Get(headers.ContentDispositionHeader))
 }
 
-func TestFailOverrideContentDispositionFromAttachmentToInline(t *testing.T) {
+func TestInlineContentDispositionForPdfFiles(t *testing.T) {
 	testCaseBody := testhelper.LoadFile(t, "testdata/file.pdf")
+
+	h := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		// We are pretending to be upstream or an inner layer of the ResponseWriter chain
+		w.Header().Set(headers.ContentDispositionHeader, "inline")
+		w.Header().Set(headers.GitlabWorkhorseDetectContentTypeHeader, "true")
+		_, err := io.WriteString(w, testCaseBody)
+		require.NoError(t, err)
+	})
+
+	resp := makeRequest(t, h, testCaseBody, "")
+
+	require.Equal(t, "inline", resp.Header.Get(headers.ContentDispositionHeader))
+}
+
+func TestFailOverrideContentDispositionFromAttachmentToInline(t *testing.T) {
+	testCaseBody := testhelper.LoadFile(t, "testdata/image.svg")
 
 	h := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		// We are pretending to be upstream or an inner layer of the ResponseWriter chain

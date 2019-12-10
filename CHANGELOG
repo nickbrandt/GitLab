@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+Next
+
+- Allow inline content disposition for pdf files !446
+
 v 8.17.0
 
 - Add labkit monitoring for build metrics !440
