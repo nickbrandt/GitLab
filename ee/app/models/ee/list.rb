@@ -38,7 +38,7 @@ module EE
 
     def wip_limits_available?
       strong_memoize(:wip_limits_available) do
-        board.resource_parent.feature_available?(:wip_limits)
+        board.resource_parent.beta_feature_available?(:wip_limits)
       end
     end
 

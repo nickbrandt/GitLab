@@ -71,10 +71,6 @@ describe List do
     let!(:list2) { create(:list, board: board2) }
 
     context 'with enabled wip_limits' do
-      before do
-        stub_licensed_features(wip_limits: true)
-      end
-
       it 'returns the expected values' do
         expect(list1.wip_limits_available?).to be_truthy
         expect(list2.wip_limits_available?).to be_truthy
@@ -83,7 +79,7 @@ describe List do
 
     context 'with disabled wip_limits' do
       before do
-        stub_licensed_features(wip_limits: false)
+        stub_feature_flags(wip_limits: false)
       end
 
       it 'returns the expected values' do

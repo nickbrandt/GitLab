@@ -70,10 +70,6 @@ describe Boards::ListsController do
       let(:label) { create(:group_label, group: group, name: 'Development') }
 
       context 'with licensed wip limits' do
-        before do
-          stub_licensed_features(wip_limits: true)
-        end
-
         it 'returns the created list' do
           create_board_list user: user, board: board, label_id: label.id, params: { max_issue_count: 2 }
 
@@ -84,7 +80,7 @@ describe Boards::ListsController do
 
       context 'without licensed wip limits' do
         before do
-          stub_licensed_features(wip_limits: false)
+          stub_feature_flags(wip_limits: false)
         end
 
         it 'ignores max issue count' do
@@ -100,10 +96,6 @@ describe Boards::ListsController do
       let(:label) { create(:group_label, group: group, name: 'Development') }
 
       context 'with licensed wip limits' do
-        before do
-          stub_licensed_features(wip_limits: true)
-        end
-
         it 'returns the created list' do
           create_board_list user: user, board: board, label_id: label.id, params: { max_issue_weight: 3 }
 
@@ -114,7 +106,7 @@ describe Boards::ListsController do
 
       context 'without licensed wip limits' do
         before do
-          stub_licensed_features(wip_limits: false)
+          stub_feature_flags(wip_limits: false)
         end
 
         it 'ignores max issue count' do
@@ -174,7 +166,6 @@ describe Boards::ListsController do
     context 'when updating max limits' do
       before do
         sign_in(user)
-        stub_licensed_features(wip_limits: true)
       end
 
       it 'returns a successful 200 response when max issue count should be updated' do
@@ -329,7 +320,7 @@ describe Boards::ListsController do
 
       context 'when wip limits are not licensed' do
         before do
-          stub_licensed_features(wip_limits: false)
+          stub_feature_flags(wip_limits: false)
         end
 
         it 'fails to update max issue count with expected status' do

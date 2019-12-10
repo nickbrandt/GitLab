@@ -9,10 +9,6 @@ describe 'EE::Boards::Lists::UpdateService' do
 
   shared_examples 'board list update' do
     context 'with licensed wip limits' do
-      before do
-        stub_licensed_features(wip_limits: true)
-      end
-
       it 'updates the list if max_issue_count is given' do
         update_list_and_test_result(list, { max_issue_count: 42 }, { max_issue_count: 42 })
       end
@@ -100,7 +96,7 @@ describe 'EE::Boards::Lists::UpdateService' do
 
     context 'without licensed wip limits' do
       before do
-        stub_licensed_features(wip_limits: false)
+        stub_feature_flags(wip_limits: false)
       end
 
       it 'does not update the list even if max_issue_count is given' do
