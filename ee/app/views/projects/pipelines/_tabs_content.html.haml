@@ -23,3 +23,7 @@
     license_management_settings_path: license_management_settings_path,
     licenses_api_path: licenses_api_path,
     can_manage_licenses: can?(current_user, :admin_software_license_policy, project).to_s } }
+
+#js-tab-codequality.tab-pane
+  #js-pipeline-codequality-report{ data: { codequality_report_download_path: pipeline.downloadable_path_for_report_type(:codequality),
+  blob_path: project_blob_path(project, pipeline.ref) } }

@@ -30,6 +30,10 @@ module EE
           end
         end
       end
+
+      def codequality_report
+        render_show
+      end
     end
   end
 end
