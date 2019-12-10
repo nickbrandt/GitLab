@@ -171,7 +171,7 @@ cpp:
       junit: report.xml
 ```
 
-#### .Net Test
+### .Net example
 
 The [JunitXML.TestLogger](https://www.nuget.org/packages/JunitXml.TestLogger/) NuGet
 package can generate test reports for .Net Framework and .Net Core applications. The following
