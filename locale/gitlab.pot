@@ -1338,6 +1338,9 @@ msgstr ""
 msgid "AdminUsers|External"
 msgstr ""
 
+msgid "AdminUsers|Is using seat"
+msgstr ""
+
 msgid "AdminUsers|It's you!"
 msgstr ""
 
