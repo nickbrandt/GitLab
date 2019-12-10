@@ -146,7 +146,7 @@ module Gitlab
 
       def diff_files
         strong_memoize(:diff_files) do
-          @diff_collection.diff_files(decorate_diff_files: true)
+          @diff_collection.diff_files(decorate_diff_files: false)
         end
       end
     end

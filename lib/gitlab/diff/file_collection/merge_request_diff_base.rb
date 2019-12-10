@@ -17,12 +17,14 @@ module Gitlab
         end
 
         def diff_files(decorate_diff_files: true)
-          if decorate_diff_files
-            decorated_diff_files
-          else
-            strong_memoize(:undecorated_diff_files) do
-              super()
-            end
+          files = super()
+
+          return files unless decorate_diff_files
+
+          strong_memoize(:decorated_diff_files) do
+            files.each { |diff_file| cache.decorate(diff_file) }
+
+            files
           end
         end
 
@@ -45,16 +47,6 @@ module Gitlab
         end
 
         private
-
-        def decorated_diff_files
-          strong_memoize(:diff_files) do
-            diff_files = diff_files(decorate_diff_files: false)
-
-            diff_files.each { |diff_file| cache.decorate(diff_file) }
-
-            diff_files
-          end
-        end
 
         def cache
           @cache ||= if Feature.enabled?(:hset_redis_diff_caching, project)
