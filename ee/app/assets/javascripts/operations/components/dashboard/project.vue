@@ -2,15 +2,15 @@
 import { mapActions } from 'vuex';
 import _ from 'underscore';
 import { GlTooltip } from '@gitlab/ui';
+import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
+import TimeAgo from 'ee/vue_shared/dashboards/components/time_ago.vue';
+import ProjectPipeline from 'ee/vue_shared/dashboards/components/project_pipeline.vue';
+import { STATUS_FAILED, STATUS_RUNNING } from 'ee/vue_shared/dashboards/constants';
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import Commit from '~/vue_shared/components/commit.vue';
-import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
-import TimeAgo from 'ee/vue_shared/dashboards/components/time_ago.vue';
-import ProjectPipeline from 'ee/vue_shared/dashboards/components/project_pipeline.vue';
-import { STATUS_FAILED, STATUS_RUNNING } from 'ee/vue_shared/dashboards/constants';
 import ProjectHeader from './project_header.vue';
 
 export default {
