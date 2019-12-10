@@ -15,7 +15,7 @@ module Gitlab
       end
 
       def findings_counter
-        return cached_vulnerability_history if use_vulnerability_cache?
+        return cached_vulnerability_history unless dynamic_filters_included?
 
         findings = vulnerability_findings.count_by_day_and_severity(HISTORY_RANGE)
         ::Vulnerabilities::HistorySerializer.new.represent(findings)
@@ -46,10 +46,6 @@ module Gitlab
         end
 
         history
-      end
-
-      def use_vulnerability_cache?
-        Feature.enabled?(:cache_vulnerability_history, group) && !dynamic_filters_included?
       end
 
       def dynamic_filters_included?

@@ -27,9 +27,9 @@ module Security
     # Silently swallow errors if there are any problems caching vulnerabilities
     def cache_vulnerabilities
       project = @pipeline.project
-      if Feature.enabled?(:cache_vulnerability_history, project.group)
-        Gitlab::Vulnerabilities::HistoryCache.new(project.group, project.id).fetch(Gitlab::Vulnerabilities::History::HISTORY_RANGE, force: true)
-      end
+
+      Gitlab::Vulnerabilities::HistoryCache.new(project.group, project.id)
+        .fetch(Gitlab::Vulnerabilities::History::HISTORY_RANGE, force: true)
     rescue => err
       error("Failed to cache vulnerabilities for pipeline #{@pipeline.id}: #{err}")
     end
