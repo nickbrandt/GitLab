@@ -1024,6 +1024,33 @@ Additional job configuration may be added to rules in the future. If something
 useful isn't available, please
 [open an issue](https://gitlab.com/gitlab-org/gitlab/issues).
 
+#### `workflow:rules`
+
+> Introduced in Gitlab 12.6
+
+The top-level `workflow:` key applies to the entirety of a pipeline, and will
+determine whether or not a pipeline is created. It currently accepts a single
+`rules:` key that operates similarly to [`rules:` defined within jobs](#rules),
+enabling dynamic configuration of the pipeline.
+
+The only configuration options currently available for `workflow:rules` are:​
+
+- [`if`](#rulesif): Define a rule.
+- [`when`](#when): May be set to `always` or `never` only. If not provided, the default value is `always`​.
+
+The list of `if` rules is evaluated until a single one is matched. If none
+match, the last `when` will be used:
+
+```yaml
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /-wip$/
+      when: never
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: always
+```
+
 ### `tags`
 
 `tags` is used to select specific Runners from the list of all Runners that are
@@ -3390,31 +3417,6 @@ variables:
 ```
 
 You can set it globally or per-job in the [`variables`](#variables) section.
-
-### `workflow:rules`
-
-> Introduced in Gitlab 12.6
-
-The top-level `workflow:` key applies to the entirety of a Pipeline being
-configured by your CI configuration file. It currently accepts a single key
-`rules:` that operates in the [exact same way](#rules) as `job:rules`; a list
-of rules is evaluated until a single one of them is matched, and that rule
-provides dynamically-selected configuration.
-
-Currently the only configuration option allowed for `workflow:rules` is `when:`
-
-- `when:` may be set to `always` or `never`
-- If not provided, the default value is `always`
-
-```yaml
-workflow:
-  rules:
-    - if: $CI_COMMIT_REF_NAME =~ /-wip$/
-      when: never
-    - if: $CI_COMMIT_TAG
-      when: never
-    - when: always
-```
 
 ## Deprecated parameters
 
