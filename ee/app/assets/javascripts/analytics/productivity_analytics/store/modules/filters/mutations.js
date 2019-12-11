@@ -1,6 +1,10 @@
 import * as types from './mutation_types';
 
 export default {
+  [types.SET_INITIAL_DATA](state, { mergedAtAfter, mergedAtBefore }) {
+    state.startDate = mergedAtAfter;
+    state.endDate = mergedAtBefore;
+  },
   [types.SET_GROUP_NAMESPACE](state, groupNamespace) {
     state.groupNamespace = groupNamespace;
     state.projectPath = null;

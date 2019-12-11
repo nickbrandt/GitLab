@@ -22,8 +22,13 @@ export default () => {
   const { startDate: computedStartDate } = timeframeContainer.dataset;
 
   const minDate = computedStartDate ? new Date(computedStartDate) : null;
-  const defaultStartDate = getDefaultStartDate(minDate, defaultDaysInPast);
-  const defaultEndDate = new Date(Date.now());
+  const mergedAtAfter = getDefaultStartDate(minDate, defaultDaysInPast);
+  const mergedAtBefore = new Date(Date.now());
+
+  const initialData = {
+    mergedAtAfter,
+    mergedAtBefore,
+  };
 
   let filterManager;
 
@@ -31,7 +36,16 @@ export default () => {
   new Vue({
     el: groupProjectSelectContainer,
     store,
+    created() {
+      this.setEndpoint(endpoint);
+
+      // let's not fetch data since we might not have a groupNamespace selected yet
+      // this just populates the store with the initial data and waits for a groupNamespace to be set
+      this.setInitialData({ skipFetch: true, data: initialData });
+    },
     methods: {
+      ...mapActions(['setEndpoint']),
+      ...mapActions('filters', ['setInitialData']),
       onGroupSelected({ groupNamespace, groupId }) {
         this.initFilteredSearch({ groupNamespace, groupId });
       },
@@ -80,11 +94,6 @@ export default () => {
     computed: {
       ...mapState('filters', ['groupNamespace', 'startDate', 'endDate']),
     },
-    mounted() {
-      // let's not fetch data since we might not have a groupNamespace selected yet
-      // this just populates the store with the initial data and waits for a groupNamespace to be set
-      this.setDateRange({ startDate: defaultStartDate, endDate: defaultEndDate, skipFetch: true });
-    },
     methods: {
       ...mapActions('filters', ['setDateRange']),
       onDateRangeChange({ startDate, endDate }) {
@@ -95,8 +104,8 @@ export default () => {
       return h(DateRange, {
         props: {
           show: this.groupNamespace !== null,
-          startDate: defaultStartDate,
-          endDate: defaultEndDate,
+          startDate: mergedAtAfter,
+          endDate: mergedAtBefore,
           minDate,
         },
         on: {
@@ -113,7 +122,6 @@ export default () => {
     render(h) {
       return h(ProductivityAnalyticsApp, {
         props: {
-          endpoint,
           emptyStateSvgPath,
           noAccessSvgPath,
         },
