@@ -3256,6 +3256,9 @@ msgstr ""
 msgid "Checkout|Checkout"
 msgstr ""
 
+msgid "Checkout|Edit"
+msgstr ""
+
 msgid "Cherry-pick this commit"
 msgstr ""
 
