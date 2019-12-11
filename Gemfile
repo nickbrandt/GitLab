@@ -170,8 +170,8 @@ group :unicorn do
 end
 
 group :puma do
-  gem 'puma', '~> 4.3.0', require: false
-  gem 'puma_worker_killer', '~> 0.1.1', require: false
+  gem 'gitlab-puma', '~> 4.3.1.gitlab.2', require: false
+  gem 'gitlab-puma_worker_killer', '~> 0.1.1.gitlab.1', require: false
   gem 'rack-timeout', require: false
 end
 
