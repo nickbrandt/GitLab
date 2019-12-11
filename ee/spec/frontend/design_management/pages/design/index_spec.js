@@ -198,14 +198,12 @@ describe('Design management design index page', () => {
       });
     });
     it('creates flash on mutation error', () => {
-      const createDesignDetailFlash = jest.fn();
-      // eslint-disable-next-line import/no-named-as-default-member
-      utils.createDesignDetailFlash = createDesignDetailFlash;
+      utils.createDesignDetailFlash = jest.fn();
 
       try {
         wrapper.vm.onMutationError('test error');
       } catch (e) {
-        expect(createDesignDetailFlash).toHaveBeenCalled();
+        expect(utils.createDesignDetailFlash).toHaveBeenCalled();
       }
     });
   });
