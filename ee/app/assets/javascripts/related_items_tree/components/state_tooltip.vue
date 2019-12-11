@@ -60,7 +60,7 @@ export default {
       return rawTimestamp ? formatDate(new Date(rawTimestamp)) : '';
     },
     getTimestampInWords(rawTimestamp) {
-      return rawTimestamp ? this.timeFormated(rawTimestamp) : '';
+      return rawTimestamp ? this.timeFormatted(rawTimestamp) : '';
     },
   },
 };

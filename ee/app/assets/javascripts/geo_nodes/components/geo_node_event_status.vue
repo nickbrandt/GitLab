@@ -49,7 +49,7 @@ export default {
         class="event-status-timestamp"
         data-placement="bottom"
       >
-        ({{ timeFormated(timeStamp) }})
+        ({{ timeFormatted(timeStamp) }})
       </span>
     </template>
     <strong v-else> {{ __('Not available') }} </strong>

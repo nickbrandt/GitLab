@@ -81,7 +81,7 @@ export default {
   computed: {
     updatedText() {
       return sprintf(__('Updated %{updated_at} by %{updated_by}'), {
-        updated_at: this.timeFormated(this.updatedAt),
+        updated_at: this.timeFormatted(this.updatedAt),
         updated_by: this.updatedBy.name,
       });
     },
