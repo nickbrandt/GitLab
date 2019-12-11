@@ -102,6 +102,19 @@ describe 'Rack Attack global throttles' do
         end
       end
 
+      context 'when the request is for email assets' do
+        let(:email_assets_url) do
+          '/assets/mailer-fingerprint-checksum.css'
+        end
+
+        it 'allows requests over the rate limit' do
+          (1 + requests_per_period).times do
+            get email_assets_url
+            expect(response).to have_http_status 302
+          end
+        end
+      end
+
       context 'when the request is authenticated by a runner token' do
         let(:request_jobs_url) { '/api/v4/jobs/request' }
         let(:runner) { create(:ci_runner) }

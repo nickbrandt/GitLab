@@ -136,8 +136,12 @@ class Rack::Attack
       path =~ %r{^/-/(health|liveness|readiness)}
     end
 
+    def premailer_request?
+      path.start_with?('/assets/mailer-')
+    end
+
     def should_be_skipped?
-      api_internal_request? || health_check_request?
+      api_internal_request? || health_check_request? || premailer_request?
     end
 
     def web_request?
