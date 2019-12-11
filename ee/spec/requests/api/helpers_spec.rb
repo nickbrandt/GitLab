@@ -41,13 +41,13 @@ describe API::Helpers do
         let(:route_authentication_setting) { { job_token_allowed: true } }
 
         it "returns a 401 response for an invalid token" do
-          env[Gitlab::Auth::UserAuthFinders::JOB_TOKEN_HEADER] = 'invalid token'
+          env[Gitlab::Auth::AuthFinders::JOB_TOKEN_HEADER] = 'invalid token'
 
           expect { current_user }.to raise_error /401/
         end
 
         it "returns a 403 response for a user without access" do
-          env[Gitlab::Auth::UserAuthFinders::JOB_TOKEN_HEADER] = job.token
+          env[Gitlab::Auth::AuthFinders::JOB_TOKEN_HEADER] = job.token
           allow_any_instance_of(Gitlab::UserAccess).to receive(:allowed?).and_return(false)
 
           expect { current_user }.to raise_error /403/
@@ -55,13 +55,13 @@ describe API::Helpers do
 
         it 'returns a 403 response for a user who is blocked' do
           user.block!
-          env[Gitlab::Auth::UserAuthFinders::JOB_TOKEN_HEADER] = job.token
+          env[Gitlab::Auth::AuthFinders::JOB_TOKEN_HEADER] = job.token
 
           expect { current_user }.to raise_error /403/
         end
 
         it "sets current_user" do
-          env[Gitlab::Auth::UserAuthFinders::JOB_TOKEN_HEADER] = job.token
+          env[Gitlab::Auth::AuthFinders::JOB_TOKEN_HEADER] = job.token
 
           expect(current_user).to eq(user)
         end
@@ -71,7 +71,7 @@ describe API::Helpers do
         let(:route_authentication_setting) { { job_token_allowed: false } }
 
         it "sets current_user to nil" do
-          env[Gitlab::Auth::UserAuthFinders::JOB_TOKEN_HEADER] = job.token
+          env[Gitlab::Auth::AuthFinders::JOB_TOKEN_HEADER] = job.token
           allow_any_instance_of(Gitlab::UserAccess).to receive(:allowed?).and_return(true)
 
           expect(current_user).to be_nil
