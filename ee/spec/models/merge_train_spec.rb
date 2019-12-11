@@ -15,22 +15,27 @@ describe MergeTrain do
     allow(AutoMergeProcessWorker).to receive(:perform_async)
   end
 
+  shared_context 'various merge trains' do
+    let_it_be(:merge_train_created) { create(:merge_train, :created) }
+    let_it_be(:merge_train_stale) { create(:merge_train, :stale) }
+    let_it_be(:merge_train_fresh) { create(:merge_train, :fresh) }
+    let_it_be(:merge_train_merged) { create(:merge_train, :merged) }
+  end
+
   describe '.active' do
     subject { described_class.active }
 
-    let!(:merge_train_created) { create(:merge_train) }
-    let!(:merge_train_merged) { create(:merge_train, :merged) }
+    include_context 'various merge trains'
 
     it 'returns only active merge trains' do
-      is_expected.to contain_exactly(merge_train_created)
+      is_expected.to contain_exactly(merge_train_created, merge_train_stale, merge_train_fresh)
     end
   end
 
   describe '.merged' do
     subject { described_class.merged }
 
-    let!(:merge_train_created) { create(:merge_train) }
-    let!(:merge_train_merged) { create(:merge_train, :merged) }
+    include_context 'various merge trains'
 
     it 'returns only merged merge trains' do
       is_expected.to contain_exactly(merge_train_merged)
@@ -74,8 +79,10 @@ describe MergeTrain do
   end
 
   describe '.all_active_mrs_in_train' do
-    subject { described_class.all_active_mrs_in_train(merge_request) }
+    subject { described_class.all_active_mrs_in_train(target_project_id, target_branch) }
 
+    let(:target_project_id) { merge_request.target_project_id }
+    let(:target_branch) { merge_request.target_branch }
     let!(:merge_request) { create_merge_request_on_train }
 
     it 'returns the merge request' do
@@ -108,8 +115,10 @@ describe MergeTrain do
   end
 
   describe '.first_in_train' do
-    subject { described_class.first_in_train(merge_request) }
+    subject { described_class.first_in_train(target_project_id, target_branch) }
 
+    let(:target_project_id) { merge_request.target_project_id }
+    let(:target_branch) { merge_request.target_branch }
     let!(:merge_request) { create_merge_request_on_train }
 
     it 'returns the merge request' do
@@ -247,6 +256,58 @@ describe MergeTrain do
       it 'returns nothing' do
         is_expected.to be_nil
       end
+    end
+  end
+
+  describe '.sha_exists_in_history?' do
+    subject { described_class.sha_exists_in_history?(target_project_id, target_branch, target_sha, limit: limit) }
+
+    let(:target_project_id) { project.id }
+    let(:target_branch) { 'master' }
+    let(:target_sha) { '' }
+    let(:limit) { 20 }
+
+    context 'when there is a merge request on train' do
+      let!(:merge_request_1) { create_merge_request_on_train }
+      let(:merge_commit_sha_1) { Digest::SHA1.hexdigest 'test-1' }
+      let(:target_sha) { merge_commit_sha_1 }
+
+      context 'when the merge request has already been merged' do
+        before do
+          merge_request_1.merge_train.merged!
+          merge_request_1.update_column(:merge_commit_sha, merge_commit_sha_1)
+        end
+
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when there is another merge request on train and it has been merged' do
+        let!(:merge_request_2) { create_merge_request_on_train(source_branch: 'improve/awesome') }
+        let(:merge_commit_sha_2) { Digest::SHA1.hexdigest 'test-2' }
+        let(:target_sha) { merge_commit_sha_2 }
+
+        before do
+          merge_request_2.merge_train.merged!
+          merge_request_2.update_column(:merge_commit_sha, merge_commit_sha_2)
+        end
+
+        it { is_expected.to eq(true) }
+
+        context 'when limit is 1' do
+          let(:limit) { 1 }
+          let(:target_sha) { merge_commit_sha_1 }
+
+          it { is_expected.to eq(false) }
+        end
+      end
+
+      context 'when the merge request has not been merged yet' do
+        it { is_expected.to eq(false) }
+      end
+    end
+
+    context 'when there are no merge requests on train' do
+      it { is_expected.to eq(false) }
     end
   end
 
@@ -437,6 +498,34 @@ describe MergeTrain do
           expect(merge_train).to receive(:cleanup_ref).once
 
           merge_train.merged!
+        end
+      end
+
+      context 'and transits to stale' do
+        it 'refreshes asynchronously' do
+          expect(merge_train).to receive(:refresh_async).once
+
+          merge_train.stale!
+        end
+      end
+    end
+
+    context 'when status is fresh' do
+      let(:merge_train) { create(:merge_train, :fresh) }
+
+      context 'and transits to merged' do
+        it 'cleanup ref' do
+          expect(merge_train).to receive(:cleanup_ref).once
+
+          merge_train.merged!
+        end
+      end
+
+      context 'and transits to stale' do
+        it 'refreshes asynchronously' do
+          expect(merge_train).to receive(:refresh_async).once
+
+          merge_train.stale!
         end
       end
     end
