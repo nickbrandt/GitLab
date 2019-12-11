@@ -861,10 +861,7 @@ module EE
 
       class ManagedLicense < Grape::Entity
         expose :id, :name
-        expose :classification, as: :approval_status do |policy|
-          SoftwareLicensePolicy::APPROVAL_STATUS.key(policy.classification) ||
-            policy.classification
-        end
+        expose :approval_status
       end
 
       class ProjectAlias < Grape::Entity

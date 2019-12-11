@@ -2,10 +2,7 @@
 
 class ManagedLicenseEntity < Grape::Entity
   expose :id
-  expose :classification, as: :approval_status do |policy|
-    classification = policy[:classification]
-    SoftwareLicensePolicy::APPROVAL_STATUS.key(classification) || classification
-  end
+  expose :approval_status
   expose :software_license, merge: true do
     expose :name
   end

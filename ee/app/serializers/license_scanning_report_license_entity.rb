@@ -10,7 +10,7 @@ class LicenseScanningReportLicenseEntity < Grape::Entity
   expose :url
 
   def classification
-    default = { id: nil, name: value_for(:name), classification: 'unclassified' }
+    default = { id: nil, name: value_for(:name), approval_status: 'unclassified' }
     found = SoftwareLicensePoliciesFinder.new(request&.current_user, request&.project, name: value_for(:name)).find
     ManagedLicenseEntity.represent(found || default)
   end
