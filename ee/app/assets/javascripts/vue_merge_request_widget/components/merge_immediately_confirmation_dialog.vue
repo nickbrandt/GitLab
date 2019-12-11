@@ -62,9 +62,12 @@ export default {
     <p>{{ __('Are you sure you want to merge immediately?') }}</p>
     <template v-slot:modal-footer>
       <gl-button ref="cancelButton" @click="cancel">{{ __('Cancel') }}</gl-button>
-      <gl-button variant="danger" @click="mergeImmediately">{{
-        __('Merge immediately')
-      }}</gl-button>
+      <gl-button
+        variant="danger"
+        data-qa-selector="merge_immediately_button"
+        @click="mergeImmediately"
+        >{{ __('Merge immediately') }}</gl-button
+      >
     </template>
   </gl-modal>
 </template>
