@@ -1,10 +1,10 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 
 import testAction from 'helpers/vuex_action_helper';
 import * as types from 'ee/logs/stores/mutation_types';
 import logsPageState from 'ee/logs/stores/state';
 import { setInitData, showPodLogs, fetchEnvironments, fetchLogs } from 'ee/logs/stores/actions';
+import axios from '~/lib/utils/axios_utils';
 
 import flash from '~/flash';
 

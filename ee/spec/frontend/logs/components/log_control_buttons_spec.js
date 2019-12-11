@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
+import LogControlButtons from 'ee/logs/components/log_control_buttons.vue';
 import {
   canScroll,
   isScrolledToTop,
@@ -7,8 +8,6 @@ import {
   scrollDown,
   scrollUp,
 } from '~/lib/utils/scroll_utils';
-
-import LogControlButtons from 'ee/logs/components/log_control_buttons.vue';
 
 jest.mock('~/lib/utils/scroll_utils');
 

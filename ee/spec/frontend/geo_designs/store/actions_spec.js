@@ -1,10 +1,10 @@
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
-import axios from '~/lib/utils/axios_utils';
-import flash from '~/flash';
 import * as actions from 'ee/geo_designs/store/actions';
 import * as types from 'ee/geo_designs/store/mutation_types';
 import createState from 'ee/geo_designs/store/state';
+import flash from '~/flash';
+import axios from '~/lib/utils/axios_utils';
 import { MOCK_BASIC_FETCH_DATA_MAP, MOCK_BASIC_FETCH_RESPONSE } from '../mock_data';
 
 jest.mock('~/flash');

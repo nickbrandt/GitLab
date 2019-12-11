@@ -1,7 +1,6 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Vue from 'vue';
-import httpStatusCodes from '~/lib/utils/http_status';
 import store from 'ee/analytics/cycle_analytics/store';
 import Component from 'ee/analytics/cycle_analytics/components/base.vue';
 import { GlEmptyState, GlDaterangePicker } from '@gitlab/ui';
@@ -15,6 +14,7 @@ import 'bootstrap';
 import '~/gl_dropdown';
 import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import waitForPromises from 'helpers/wait_for_promises';
+import httpStatusCodes from '~/lib/utils/http_status';
 import * as mockData from '../mock_data';
 
 const noDataSvgPath = 'path/to/no/data';

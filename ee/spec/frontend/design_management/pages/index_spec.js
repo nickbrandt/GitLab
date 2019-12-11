@@ -1,9 +1,9 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import createFlash from '~/flash';
 import VueRouter from 'vue-router';
 import Index from 'ee/design_management/pages/index.vue';
 import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesign.mutation.graphql';
 import DesignDestroyer from 'ee/design_management/components/design_destroyer.vue';
+import createFlash from '~/flash';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);

@@ -1,7 +1,7 @@
-import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { TEST_HOST } from 'helpers/test_constants';
 import * as getters from 'ee/dependencies/store/modules/list/getters';
 import { REPORT_STATUS } from 'ee/dependencies/store/modules/list/constants';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
 
 describe('Dependencies getters', () => {
   describe.each`

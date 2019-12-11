@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import { scrollDown } from '~/lib/utils/scroll_utils';
 import EnvironmentLogs from 'ee/logs/components/environment_logs.vue';
 
 import { createStore } from 'ee/logs/stores';
+import { scrollDown } from '~/lib/utils/scroll_utils';
 import {
   mockProjectPath,
   mockEnvId,
