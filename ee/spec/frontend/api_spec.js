@@ -166,11 +166,11 @@ describe('Api', () => {
 
   describe('getPodLogs', () => {
     const projectPath = 'root/test-project';
-    const environmentId = 2;
+    const environmentName = 'production';
     const podName = 'pod';
     const containerName = 'container';
 
-    const lastUrl = () => mock.history.get[0].url;
+    const getRequest = () => mock.history.get[0];
 
     beforeEach(() => {
       mock.onAny().reply(200);
@@ -181,33 +181,45 @@ describe('Api', () => {
     });
 
     it('calls `axios.get` with pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/environments/${environmentId}/pods/${podName}/containers/${containerName}/logs.json`;
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/logs/k8s.json`;
 
-      Api.getPodLogs({ projectPath, environmentId, podName, containerName })
+      Api.getPodLogs({ projectPath, environmentName, podName, containerName })
         .then(() => {
-          expect(expectedUrl).toBe(lastUrl());
+          expect(getRequest().url).toBe(expectedUrl);
+          expect(getRequest().params).toEqual({
+            environment_name: environmentName,
+            pod_name: podName,
+            container_name: containerName,
+          });
         })
         .then(done)
         .catch(done.fail);
     });
 
     it('calls `axios.get` without pod_name and container_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/environments/${environmentId}/pods/containers/logs.json`;
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/logs/k8s.json`;
 
-      Api.getPodLogs({ projectPath, environmentId })
+      Api.getPodLogs({ projectPath, environmentName })
         .then(() => {
-          expect(expectedUrl).toBe(lastUrl());
+          expect(getRequest().url).toBe(expectedUrl);
+          expect(getRequest().params).toEqual({
+            environment_name: environmentName,
+          });
         })
         .then(done)
         .catch(done.fail);
     });
 
     it('calls `axios.get` with pod_name', done => {
-      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/environments/${environmentId}/pods/${podName}/containers/logs.json`;
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/logs/k8s.json`;
 
-      Api.getPodLogs({ projectPath, environmentId, podName })
+      Api.getPodLogs({ projectPath, environmentName, podName })
         .then(() => {
-          expect(expectedUrl).toBe(lastUrl());
+          expect(getRequest().url).toBe(expectedUrl);
+          expect(getRequest().params).toEqual({
+            environment_name: environmentName,
+            pod_name: podName,
+          });
         })
         .then(done)
         .catch(done.fail);

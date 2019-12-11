@@ -37,7 +37,7 @@ describe 'Environment > Pod Logs', :js do
   it "shows environments in dropdown" do
     create(:environment, project: project)
 
-    visit logs_project_environment_path(environment.project, environment, pod_name: pod_name)
+    visit project_logs_path(environment.project, environment_name: environment.name, pod_name: pod_name)
 
     wait_for_requests
 
@@ -56,7 +56,7 @@ describe 'Environment > Pod Logs', :js do
 
   context 'with logs', :use_clean_rails_memory_store_caching do
     it "shows pod logs", :sidekiq_might_not_need_inline do
-      visit logs_project_environment_path(environment.project, environment, pod_name: pod_name)
+      visit project_logs_path(environment.project, environment_name: environment.name, pod_name: pod_name)
 
       wait_for_requests
 
@@ -95,7 +95,7 @@ describe 'Environment > Pod Logs', :js do
   end
 
   def load_and_scroll_down
-    visit logs_project_environment_path(environment.project, environment, pod_name: pod_name)
+    visit project_logs_path(environment.project, environment_name: environment.name, pod_name: pod_name)
 
     wait_for_requests
 

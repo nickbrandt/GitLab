@@ -68,11 +68,11 @@ module EE
 
             ::Gitlab::EtagCaching::Store.new.tap do |store|
               store.touch(
-                ::Gitlab::Routing.url_helpers.k8s_pod_logs_project_environment_path(
+                ::Gitlab::Routing.url_helpers.k8s_project_logs_path(
                   environment.project,
-                  environment,
-                  opts['pod_name'],
-                  opts['container_name'],
+                  environment_name: environment.name,
+                  pod_name: opts['pod_name'],
+                  container_name: opts['container_name'],
                   format: :json
                 )
               )

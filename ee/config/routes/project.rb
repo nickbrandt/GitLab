@@ -70,14 +70,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resources :licenses, only: [:index, :create, :update]
         end
 
-        resources :environments, only: [] do
-          member do
-            get :logs
-            get '/pods/(:pod_name)/containers/(:container_name)/logs', to: 'environments#k8s_pod_logs', as: :k8s_pod_logs
-          end
-
+        resources :logs, only: [:index] do
           collection do
-            get :logs, action: :logs_redirect
+            get :k8s
           end
         end
 

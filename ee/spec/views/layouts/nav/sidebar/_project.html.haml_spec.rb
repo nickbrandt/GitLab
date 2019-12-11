@@ -106,7 +106,7 @@ describe 'layouts/nav/sidebar/_project' do
       let(:can_read_pod_logs) { true }
 
       it 'link is visible ' do
-        expect(rendered).to have_link('Pod logs', href: logs_project_environments_path(project))
+        expect(rendered).to have_link('Pod logs', href: project_logs_path(project))
       end
     end
 

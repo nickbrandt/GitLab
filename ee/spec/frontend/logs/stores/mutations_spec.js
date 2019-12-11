@@ -4,7 +4,7 @@ import * as types from 'ee/logs/stores/mutation_types';
 import logsPageState from 'ee/logs/stores/state';
 import {
   mockProjectPath,
-  mockEnvId,
+  mockEnvName,
   mockEnvironments,
   mockPods,
   mockPodName,
@@ -25,13 +25,14 @@ describe('Logs Store Mutations', () => {
   });
 
   describe('SET_PROJECT_ENVIRONMENT', () => {
-    it('sets the logs json endpoint', () => {
-      mutations[types.SET_PROJECT_ENVIRONMENT](state, {
-        projectPath: mockProjectPath,
-        environmentId: mockEnvId,
-      });
+    it('sets the project path', () => {
+      mutations[types.SET_PROJECT_PATH](state, mockProjectPath);
       expect(state.projectPath).toEqual(mockProjectPath);
-      expect(state.environments.current).toEqual(mockEnvId);
+    });
+
+    it('sets the environment', () => {
+      mutations[types.SET_PROJECT_ENVIRONMENT](state, mockEnvName);
+      expect(state.environments.current).toEqual(mockEnvName);
     });
   });
 
