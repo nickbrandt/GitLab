@@ -2383,4 +2383,29 @@ describe Project do
   describe '#license_compliance' do
     it { expect(subject.license_compliance).to be_instance_of(::SCA::LicenseCompliance) }
   end
+
+  describe '#expire_caches_before_rename' do
+    let(:project) { create(:project, :repository) }
+    let(:repo)    { double(:repo, exists?: true, before_delete: true) }
+    let(:wiki)    { double(:wiki, exists?: true, before_delete: true) }
+    let(:design)  { double(:design, exists?: true) }
+
+    it 'expires the caches of the design repository' do
+      allow(Repository).to receive(:new)
+        .with('foo', project)
+        .and_return(repo)
+
+      allow(Repository).to receive(:new)
+        .with('foo.wiki', project)
+        .and_return(wiki)
+
+      allow(Repository).to receive(:new)
+        .with('foo.design', project)
+        .and_return(design)
+
+      expect(design).to receive(:before_delete)
+
+      project.expire_caches_before_rename('foo')
+    end
+  end
 end
