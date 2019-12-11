@@ -117,8 +117,10 @@ describe DiffNote do
 
       let(:diff_line) { diff_file.diff_lines.first }
 
+      let(:line_code) { '2f6fcd96b88b36ce98c38da085c795a27d92a3dd_15_14' }
+
       before do
-        allow_any_instance_of(::Gitlab::Diff::Position).to receive(:line_code).with(project.repository).and_return('2f6fcd96b88b36ce98c38da085c795a27d92a3dd_15_14')
+        allow(subject.position).to receive(:line_code).and_return('2f6fcd96b88b36ce98c38da085c795a27d92a3dd_15_14')
       end
 
       context 'when diffs are already created' do
@@ -126,7 +128,7 @@ describe DiffNote do
           allow(subject).to receive(:created_at_diff?).and_return(true)
         end
 
-        context 'when diff_file is found in  persisted diffs' do
+        context 'when diff_file is found in persisted diffs' do
           before do
             allow(merge_request).to receive_message_chain(:diffs, :diff_files, :first).and_return(diff_file)
           end
@@ -134,7 +136,7 @@ describe DiffNote do
           context 'when importing' do
             before do
               subject.importing = true
-              subject.line_code = '2f6fcd96b88b36ce98c38da085c795a27d92a3dd_15_14'
+              subject.line_code = line_code
             end
 
             context 'when diff_line is found in persisted diff_file' do
@@ -186,7 +188,9 @@ describe DiffNote do
 
         context 'when diff file is not found in persisted diffs' do
           before do
-            allow_any_instance_of(::Gitlab::Diff::FileCollection::MergeRequestDiff).to receive(:diff_files).and_return([])
+            allow_next_instance_of(Gitlab::Diff::FileCollection::MergeRequestDiff) do |merge_request_diff|
+              allow(merge_request_diff).to receive(:diff_files).and_return([])
+            end
           end
 
           it_behaves_like 'a valid diff note with after commit callback'
