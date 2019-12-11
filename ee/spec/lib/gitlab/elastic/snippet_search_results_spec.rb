@@ -67,6 +67,7 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
 
     context 'admin mode enabled' do
       before do
+        Gitlab::Auth::CurrentUserMode.new(user).request_admin_mode!
         Gitlab::Auth::CurrentUserMode.new(user).enable_admin_mode!(password: user.password)
       end
 

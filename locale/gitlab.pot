@@ -1134,7 +1134,13 @@ msgstr ""
 msgid "Admin Section"
 msgstr ""
 
+msgid "Admin mode already enabled"
+msgstr ""
+
 msgid "Admin mode disabled"
+msgstr ""
+
+msgid "Admin mode enabled"
 msgstr ""
 
 msgid "Admin notes"
@@ -9678,6 +9684,9 @@ msgstr ""
 msgid "Invalid input, please avoid emojis"
 msgstr ""
 
+msgid "Invalid login or password"
+msgstr ""
+
 msgid "Invalid pin code"
 msgstr ""
 
@@ -14395,6 +14404,9 @@ msgid "Rake Tasks Help"
 msgstr ""
 
 msgid "Raw blob request rate limit per minute"
+msgstr ""
+
+msgid "Re-authentication period expired or never requested. Please try again"
 msgstr ""
 
 msgid "Re-authentication required"

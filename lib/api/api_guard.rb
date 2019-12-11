@@ -56,7 +56,9 @@ module API
 
         # Set admin mode for API requests (if admin)
         if Feature.enabled?(:user_mode_in_session)
-          Gitlab::Auth::CurrentUserMode.new(user).enable_admin_mode!(skip_password_validation: true)
+          current_user_mode = Gitlab::Auth::CurrentUserMode.new(user)
+
+          current_user_mode.enable_sessionless_admin_mode!
         end
 
         user
