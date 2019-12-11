@@ -15,9 +15,9 @@ module Gitlab
           findings = ::Security::VulnerabilityFindingsFinder
             .new(group, params: { project_id: [project_id] })
             .execute(:all)
-            .count_by_severity
+            .counted_by_severity
 
-          ::Vulnerabilities::HistorySerializer.new.represent(findings)
+          VulnerabilitySummarySerializer.new.represent(findings)
         end
       end
 

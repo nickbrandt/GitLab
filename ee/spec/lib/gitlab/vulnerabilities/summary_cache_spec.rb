@@ -24,10 +24,9 @@ describe Gitlab::Vulnerabilities::SummaryCache do
 
     it 'returns the proper format for uncached summary' do
       Timecop.freeze do
-        fetched_history = described_class.new(group, project_id).fetch
+        fetched_history = described_class.new(group, project.id).fetch
 
-        expect(fetched_history[:total]).to eq( Date.today => 1 )
-        expect(fetched_history[:high]).to eq( Date.today => 1 )
+        expect(fetched_history[:high]).to eq(1)
       end
     end
 
@@ -36,8 +35,7 @@ describe Gitlab::Vulnerabilities::SummaryCache do
         described_class.new(group, project.id).fetch
         fetched_history = described_class.new(group, project.id).fetch
 
-        expect(fetched_history[:total]).to eq( Date.today => 1 )
-        expect(fetched_history[:high]).to eq( Date.today => 1 )
+        expect(fetched_history[:high]).to eq(1)
       end
     end
 

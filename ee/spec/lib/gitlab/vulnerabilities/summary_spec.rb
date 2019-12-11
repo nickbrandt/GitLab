@@ -9,8 +9,8 @@ describe Gitlab::Vulnerabilities::Summary do
   let(:filters) { {} }
 
   before do
-    create_vulnerabilities(1, project1, { severity: :medium })
-    create_vulnerabilities(2, project2)
+    create_vulnerabilities(1, project1, { severity: :medium, report_type: :sast })
+    create_vulnerabilities(2, project2, { severity: :high, report_type: :sast})
   end
 
   describe '#vulnerabilities_counter', :use_clean_rails_memory_store_caching do
@@ -18,7 +18,7 @@ describe Gitlab::Vulnerabilities::Summary do
 
     context 'feature disabled' do
       before do
-        stub_feature_flags(cache_vulnerability_history: false)
+        stub_feature_flags(cache_vulnerability_summary: false)
       end
 
       it 'does not call Gitlab::Vulnerabilities::SummaryCache' do
@@ -29,8 +29,7 @@ describe Gitlab::Vulnerabilities::Summary do
 
       it 'returns the proper format for the summary' do
         Timecop.freeze do
-          expect(counter[:total]).to eq({ Date.today => 3 })
-          expect(counter[:high]).to eq({ Date.today => 2 })
+          expect(counter[:high]).to eq(2)
         end
       end
     end
@@ -51,15 +50,14 @@ describe Gitlab::Vulnerabilities::Summary do
       end
 
       it 'calls Gitlab::Vulnerabilities::SummaryCache' do
-        expect(Gitlab::Vulnerabilities::SummaryCache).to receive(:new)
+        expect(Gitlab::Vulnerabilities::SummaryCache).to receive(:new).twice.and_call_original
 
         counter
       end
 
       it 'returns the proper format for the summary' do
         Timecop.freeze do
-          expect(counter[:total]).to eq({ Date.today => 3 })
-          expect(counter[:high]).to eq({ Date.today => 2 })
+          expect(counter[:high]).to eq(2)
         end
       end
 
@@ -71,12 +69,6 @@ describe Gitlab::Vulnerabilities::Summary do
 
           Timecop.freeze(Date.today - 4) do
             create_vulnerabilities(1, project2)
-          end
-        end
-
-        it 'sorts by date for each key' do
-          Timecop.freeze do
-            expect(counter[:high].keys).to eq([(Date.today - 4), (Date.today - 1), Date.today])
           end
         end
       end
@@ -91,6 +83,7 @@ describe Gitlab::Vulnerabilities::Summary do
         report_type: options[:report_type] || :sast,
         severity:    options[:severity] || :high,
         pipelines:   [pipeline],
+        project:     project,
         created_at:  options[:created_at] || Date.today
       )
     end

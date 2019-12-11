@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-module GitLab
+module Gitlab
   module Vulnerabilities
     class Summary
       attr_reader :group, :filters
 
       def initialize(group, params)
-        @filters = params.permit(:scope, report_type: [], confidence: [], project_id: [], severity: [])
+        @filters = params
         @group = group
       end
 
@@ -21,23 +21,28 @@ module GitLab
       private
 
       def cached_vulnerability_summary
-        summary = {} # TODO what are the keys?
+        summary = {
+          undefined: 0,
+          info:      0,
+          unknown:   0,
+          low:       0,
+          medium:    0,
+          high:      0,
+          critical:  0
+        }
+
+        summary_keys = ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.map(&:to_sym)
 
         project_ids_to_fetch.each do |project_id|
           project_summary = Gitlab::Vulnerabilities::SummaryCache
             .new(group, project_id)
             .fetch
 
-          summary_keys = ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.map(&:to_sym) # TODO sakto ba?
-          summary_keys << :total # TODO kinahanglan pa ba?
           summary_keys.each do |key|
-            summary[key].merge!(project_summary[key]) do |k, aggregate, project_count|
-              aggregate + project_count
-            end
+            summary[key] += project_summary[key] unless project_summary[key].nil?
           end
         end
 
-        summary[:total] = summary[:total].sort_by { |date, count| date }.to_h # TODO what is this???
         summary
       end
 
