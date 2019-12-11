@@ -3,7 +3,7 @@
 module EE
   module Gitlab
     module Auth
-      module UserAuthFinders
+      module AuthFinders
         extend ActiveSupport::Concern
         extend ::Gitlab::Utils::Override
 

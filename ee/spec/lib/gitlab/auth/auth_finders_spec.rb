@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Auth::UserAuthFinders do
+describe Gitlab::Auth::AuthFinders do
   include described_class
 
   let(:user) { create(:user) }
@@ -98,7 +98,7 @@ describe Gitlab::Auth::UserAuthFinders do
       let(:token) { pat.token }
 
       before do
-        env[Gitlab::Auth::UserAuthFinders::PRIVATE_TOKEN_HEADER] = pat.token
+        env[described_class::PRIVATE_TOKEN_HEADER] = pat.token
       end
 
       it { is_expected.to eq user }
@@ -124,7 +124,7 @@ describe Gitlab::Auth::UserAuthFinders do
 
     context 'when the job token is in the headers' do
       def set_token(token)
-        env[Gitlab::Auth::UserAuthFinders::JOB_TOKEN_HEADER] = token
+        env[described_class::JOB_TOKEN_HEADER] = token
       end
 
       it_behaves_like 'find user from job token'
@@ -133,7 +133,7 @@ describe Gitlab::Auth::UserAuthFinders do
 
     context 'when the job token is in the params' do
       def set_token(token)
-        set_param(Gitlab::Auth::UserAuthFinders::JOB_TOKEN_PARAM, token)
+        set_param(described_class::JOB_TOKEN_PARAM, token)
       end
 
       it_behaves_like 'find user from job token'
