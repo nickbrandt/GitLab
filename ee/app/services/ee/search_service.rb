@@ -2,10 +2,14 @@
 
 module EE
   module SearchService
-    # Both of these classes conform to the necessary pagination interface and
-    # both of these are returned in various places from search results. There
+    # All of these classes conform to the necessary pagination interface and
+    # all of these are returned in various places from search results. There
     # doesn't seem to be a common ancestor to check.
-    REDACTABLE_RESULTS = [Kaminari::PaginatableArray, Elasticsearch::Model::Response::Records].freeze
+    REDACTABLE_RESULTS = [
+      Kaminari::PaginatableArray,
+      Elasticsearch::Model::Response::Records,
+      Elasticsearch::Model::Response::Response
+    ].freeze
 
     # This is a proper method instead of a `delegate` in order to
     # avoid adding unnecessary methods to Search::SnippetService
