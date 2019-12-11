@@ -48,7 +48,7 @@ module SCA
 
     def pipeline
       strong_memoize(:pipeline) do
-        project.all_pipelines.latest_successful_for_ref(project.default_branch)
+        project.latest_pipeline_with_reports(::Ci::JobArtifact.license_management_reports)
       end
     end
 
