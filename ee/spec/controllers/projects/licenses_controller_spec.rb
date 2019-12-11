@@ -76,46 +76,101 @@ describe Projects::LicensesController do
         end
 
         context "when software policies are applied to some of the most recently detected licenses" do
-          let_it_be(:raw_report) { fixture_file_upload(Rails.root.join('ee/spec/fixtures/security_reports/gl-license-management-report-v2.json'), 'application/json') }
           let_it_be(:mit) { create(:software_license, :mit) }
           let_it_be(:mit_policy) { create(:software_license_policy, :denied, software_license: mit, project: project) }
-          let_it_be(:pipeline) do
-            create(:ee_ci_pipeline, :with_license_management_report, project: project).tap do |pipeline|
-              pipeline.job_artifacts.license_management.last.update!(file: raw_report)
+          let_it_be(:other_license) { create(:software_license, spdx_identifier: "Other-Id") }
+          let_it_be(:other_license_policy) { create(:software_license_policy, :allowed, software_license: other_license, project: project) }
+          let_it_be(:pipeline) { create(:ee_ci_pipeline, project: project, builds: [create(:ee_ci_build, :license_scan_v2, :success)]) }
+
+          context "when loading all policies" do
+            before do
+              get :index, params: { namespace_id: project.namespace, project_id: project }, format: :json
+            end
+
+            it { expect(response).to have_http_status(:ok) }
+            it { expect(json_response["licenses"].count).to be(4) }
+
+            it 'includes a policy for an unclassified and known license that was detected in the scan report' do
+              expect(json_response.dig("licenses", 0)).to include({
+                "id" => nil,
+                "spdx_identifier" => "BSD-3-Clause",
+                "name" => "BSD 3-Clause \"New\" or \"Revised\" License",
+                "url" => "http://spdx.org/licenses/BSD-3-Clause.json",
+                "classification" => "unclassified"
+              })
+            end
+
+            it 'includes a policy for a denied license found in the scan report' do
+              expect(json_response.dig("licenses", 1)).to include({
+                "id" => mit_policy.id,
+                "spdx_identifier" => "MIT",
+                "name" => mit.name,
+                "url" => "http://spdx.org/licenses/MIT.json",
+                "classification" => "denied"
+              })
+            end
+
+            it 'includes a policy for an allowed license NOT found in the latest scan report' do
+              expect(json_response.dig("licenses", 2)).to include({
+                "id" => other_license_policy.id,
+                "spdx_identifier" => other_license.spdx_identifier,
+                "name" => other_license.name,
+                "url" => nil,
+                "classification" => "allowed"
+              })
+            end
+
+            it 'includes an entry for an unclassified and unknown license found in the scan report' do
+              expect(json_response.dig("licenses", 3)).to include({
+                "id" => nil,
+                "spdx_identifier" => nil,
+                "name" => "unknown",
+                "url" => nil,
+                "classification" => "unclassified"
+              })
             end
           end
 
-          before do
-            get :index, params: { namespace_id: project.namespace, project_id: project }, format: :json
-          end
+          context "when loading software policies that match licenses detected in the most recent license scan report" do
+            before do
+              get :index, params: {
+                namespace_id: project.namespace,
+                project_id: project,
+                detected: true
+              }, format: :json
+            end
 
-          it { expect(response).to have_http_status(:ok) }
+            it { expect(response).to have_http_status(:ok) }
 
-          it 'generates the proper JSON response' do
-            expect(json_response["licenses"].count).to be(3)
-            expect(json_response.dig("licenses", 0)).to include({
-              "id" => nil,
-              "spdx_identifier" => "BSD-3-Clause",
-              "name" => "BSD 3-Clause \"New\" or \"Revised\" License",
-              "url" => "http://spdx.org/licenses/BSD-3-Clause.json",
-              "classification" => "unclassified"
-            })
+            it 'only includes policies for licenses detected in the most recent scan report' do
+              expect(json_response["licenses"].count).to be(3)
+            end
 
-            expect(json_response.dig("licenses", 1)).to include({
-              "id" => mit_policy.id,
-              "spdx_identifier" => "MIT",
-              "name" => mit.name,
-              "url" => "http://spdx.org/licenses/MIT.json",
-              "classification" => "denied"
-            })
+            it 'includes an unclassified policy for a known license detected in the scan report' do
+              expect(json_response.dig("licenses", 0)).to include({
+                "id" => nil,
+                "spdx_identifier" => "BSD-3-Clause",
+                "classification" => "unclassified"
+              })
+            end
 
-            expect(json_response.dig("licenses", 2)).to include({
-              "id" => nil,
-              "spdx_identifier" => nil,
-              "name" => "unknown",
-              "url" => "",
-              "classification" => "unclassified"
-            })
+            it 'includes a classified license for a known license detected in the scan report' do
+              expect(json_response.dig("licenses", 1)).to include({
+                "id" => mit_policy.id,
+                "spdx_identifier" => "MIT",
+                "classification" => "denied"
+              })
+            end
+
+            it 'includes an unclassified and unknown license discovered in the scan report' do
+              expect(json_response.dig("licenses", 2)).to include({
+                "id" => nil,
+                "spdx_identifier" => nil,
+                "name" => "unknown",
+                "url" => nil,
+                "classification" => "unclassified"
+              })
+            end
           end
         end
 
