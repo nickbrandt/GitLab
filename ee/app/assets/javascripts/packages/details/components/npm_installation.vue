@@ -1,6 +1,6 @@
 <script>
-import { s__, sprintf } from '~/locale';
 import { GlTab, GlTabs } from '@gitlab/ui';
+import { s__, sprintf } from '~/locale';
 import CodeInstruction from './code_instruction.vue';
 
 export default {

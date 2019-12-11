@@ -1,7 +1,7 @@
 <script>
 import { GlModal, GlButton } from '@gitlab/ui';
-import { __, sprintf } from '~/locale';
 import _ from 'underscore';
+import { __, sprintf } from '~/locale';
 
 export default {
   name: 'MergeImmediatelyConfirmationDialog',

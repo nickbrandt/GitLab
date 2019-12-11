@@ -1,9 +1,9 @@
+import Api from 'ee/api';
 import { backOff } from '~/lib/utils/common_utils';
 import httpStatusCodes from '~/lib/utils/http_status';
 import axios from '~/lib/utils/axios_utils';
 import flash from '~/flash';
 import { s__ } from '~/locale';
-import Api from 'ee/api';
 import * as types from './mutation_types';
 
 const requestLogsUntilData = ({ projectPath, environmentId, podName }) =>
