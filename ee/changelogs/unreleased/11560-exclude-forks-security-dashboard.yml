@@ -1,0 +1,5 @@
+---
+title: Exclude forks from Group Security Dashboard filter
+merge_request: 14667
+author:
+type: fixed
