@@ -184,5 +184,12 @@ RSpec.describe SCA::LicenseCompliance do
 
       it { expect(subject.latest_build_for_default_branch).to be_nil }
     end
+
+    context "when latest pipeline doesn't contain license job" do
+      let!(:pipeline1) { create(:ci_pipeline, :success, project: project, builds: [license_scan_build]) }
+      let!(:pipeline2) { create(:ci_pipeline, :success, project: project, builds: [regular_build]) }
+
+      it { expect(subject.latest_build_for_default_branch).to eq(license_scan_build) }
+    end
   end
 end
