@@ -154,7 +154,7 @@ describe('ReadyToMerge', () => {
     });
 
     describe('isMergeImmediatelyDangerous', () => {
-      it('should return false if the preferred auto merge strategy is not merge trains', () => {
+      it('should return false if the preferred auto merge strategy is not merge train-related', () => {
         factory({ preferredAutoMergeStrategy: MWPS_MERGE_STRATEGY });
 
         expect(vm.isMergeImmediatelyDangerous).toBe(false);
@@ -162,6 +162,12 @@ describe('ReadyToMerge', () => {
 
       it('should return true if the preferred auto merge strategy is merge trains', () => {
         factory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY });
+
+        expect(vm.isMergeImmediatelyDangerous).toBe(true);
+      });
+
+      it('should return true if the preferred auto merge strategy is merge trains when pipeline succeeds', () => {
+        factory({ preferredAutoMergeStrategy: MTWPS_MERGE_STRATEGY });
 
         expect(vm.isMergeImmediatelyDangerous).toBe(true);
       });
