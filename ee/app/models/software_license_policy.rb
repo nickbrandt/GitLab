@@ -5,7 +5,8 @@
 # For use in the License Management feature.
 class SoftwareLicensePolicy < ApplicationRecord
   include Presentable
-  APPROVAL_STATUS = {
+  # Mapping from old classification names to new names
+  LEGACY_CLASSIFICATION_STATUS = {
     'approved' => 'allowed',
     'blacklisted' => 'denied'
   }.freeze
@@ -49,7 +50,7 @@ class SoftwareLicensePolicy < ApplicationRecord
   delegate :name, :spdx_identifier, to: :software_license
 
   def approval_status
-    APPROVAL_STATUS.key(classification) || classification
+    LEGACY_CLASSIFICATION_STATUS.key(classification) || classification
   end
 
   def self.workaround_cache_key
@@ -57,6 +58,6 @@ class SoftwareLicensePolicy < ApplicationRecord
   end
 
   def self.to_classification(approval_status)
-    APPROVAL_STATUS.fetch(approval_status, approval_status)
+    LEGACY_CLASSIFICATION_STATUS.fetch(approval_status, approval_status)
   end
 end
