@@ -44,6 +44,8 @@ module EE
           expose :external_authorization_classification_label,
                  if: ->(_, _) { License.feature_available?(:external_authorization_service_api_management) }
           expose :packages_enabled, if: ->(project, _) { project.feature_available?(:packages) }
+          expose :service_desk_enabled, if: ->(project, _) { project.feature_available?(:service_desk) }
+          expose :service_desk_address, if: ->(project, _) { project.feature_available?(:service_desk) }
         end
       end
 
