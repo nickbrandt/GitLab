@@ -79,12 +79,9 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
     end
   end
 
-  describe '#write_if_empty' do
+  shared_examples 'caches missing entries' do
     it 'filters the key/value list of entries to be caches for each invocation' do
-      paths = merge_request.diffs.diff_files.select(&:text?).map(&:file_path)
-
       expect(cache).to receive(:write_to_redis_hash)
-        .with(hash_including(*paths))
         .once
         .and_call_original
 
@@ -96,6 +93,10 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
       cache.write_if_empty
     end
+  end
+
+  describe '#write_if_empty' do
+    it_behaves_like 'caches missing entries'
 
     context 'different diff_collections for the same diffable' do
       before do
@@ -109,21 +110,6 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
           .to change { Gitlab::Redis::Cache.with { |r| r.hgetall(cache_key) } }
       end
     end
-  end
-
-  describe `#file_paths` do
-    it 'accesses path info without error' do
-      expect { cache.send(:file_paths) }
-        .not_to raise_error
-    end
-
-    it 'returns an array of file path strings' do
-      results = cache.send(:file_paths)
-
-      expect(results).to be_an Array
-      expect(results).not_to be_empty
-      expect(results).to include(".DS_Store")
-    end
 
     context 'when cache initialized with MergeRequestDiffBatch' do
       let(:merge_request_diff_batch) do
@@ -134,21 +120,8 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
           diff_options: nil)
       end
 
-      subject(:cache_with_merge_request_diff_batch) do
-        described_class.new(merge_request_diff_batch)
-      end
-
-      it 'accesses path info without error' do
-        expect { cache_with_merge_request_diff_batch.send(:file_paths) }
-          .not_to raise_error
-      end
-
-      it 'returns an array of file path strings' do
-        results = cache_with_merge_request_diff_batch.send(:file_paths)
-
-        expect(results).to be_an Array
-        expect(results).not_to be_empty
-        expect(results).to include(".DS_Store")
+      it_behaves_like 'caches missing entries' do
+        let(:cache) { described_class.new(merge_request_diff_batch) }
       end
     end
   end
