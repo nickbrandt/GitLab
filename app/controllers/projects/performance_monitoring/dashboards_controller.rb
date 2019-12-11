@@ -11,8 +11,7 @@ module Projects
 
       USER_DASHBOARDS_DIR = ::Metrics::Dashboard::ProjectDashboardService::DASHBOARD_ROOT
       DASHBOARD_TEMPLATES = {
-        ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH => true,
-        ::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH => true
+        ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH => true
       }.freeze
 
       def create
@@ -75,8 +74,14 @@ module Projects
       end
 
       def validate_dashboard_template!
-        access_denied! unless DASHBOARD_TEMPLATES[params.require(:dashboard)]
+        access_denied! unless dashboard_templates[params.require(:dashboard)]
+      end
+
+      def dashboard_templates
+        DASHBOARD_TEMPLATES
       end
     end
   end
 end
+
+Projects::PerformanceMonitoring::DashboardsController.prepend_if_ee('EE::Projects::PerformanceMonitoring::DashboardsController')
