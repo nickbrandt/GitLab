@@ -1,5 +1,5 @@
 ---
 title: Fix visibility levels of subgroups to be not higher than their parents' level
-merge_request:
+merge_request: 20360
 author:
 type: other
