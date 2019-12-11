@@ -1,8 +1,8 @@
+import { isString } from 'underscore';
+import dateFormat from 'dateformat';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
 import { newDate, dayAfter, secondsToDays } from '~/lib/utils/datetime_utility';
-import { isString } from 'underscore';
-import dateFormat from 'dateformat';
 import { dateFormats } from '../shared/constants';
 
 const EVENT_TYPE_LABEL = 'label';
