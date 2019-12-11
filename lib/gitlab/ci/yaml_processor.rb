@@ -108,12 +108,10 @@ module Gitlab
         config = Gitlab::Ci::Config.new(content, **opts)
         return config.errors unless config.valid?
 
-        begin
-          Gitlab::Ci::YamlProcessor.new(content, opts)
-          []
-        rescue ValidationError => e
-          [e.message]
-        end
+        Gitlab::Ci::YamlProcessor.new(content, opts)
+        []
+      rescue ValidationError, Gitlab::Ci::Config::ConfigError => e
+        [e.message]
       end
 
       private
