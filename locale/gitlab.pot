@@ -15349,6 +15349,9 @@ msgstr ""
 msgid "Search or filter results..."
 msgstr ""
 
+msgid "Search or filter results…"
+msgstr ""
+
 msgid "Search or jump to…"
 msgstr ""
 
