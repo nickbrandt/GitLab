@@ -7,17 +7,20 @@ module QA
       deleted_project_id = nil
 
       before do
-        Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-          Page::Main::Login.perform(&:sign_in_using_credentials)
-
-          project_to_delete = Resource::Project.fabricate_via_api! do |project|
-            project.name = 'delete-this-project'
-            project.description = 'Geo project to be deleted'
-          end
-
-          deleted_project_name = project_to_delete.name
-          deleted_project_id = project_to_delete.id
+        # Need to have at least one project to remain after project deletion,
+        # to make sure dashboard shows the project list
+        Resource::Project.fabricate_via_api! do |project|
+          project.name = 'keep-this-project'
+          project.description = 'Geo project to keep'
         end
+
+        project_to_delete = Resource::Project.fabricate_via_api! do |project|
+          project.name = 'delete-this-project'
+          project.description = 'Geo project to be deleted'
+        end
+
+        deleted_project_name = project_to_delete.name
+        deleted_project_id = project_to_delete.id
       end
 
       it 'replicates deletion of a project to secondary node' do
