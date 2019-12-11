@@ -1,5 +1,16 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.15
+
+### Security (1 change)
+
+- Filter out packages the user does'nt have permission to see at group level.
+
+### Fixed (1 change)
+
+- Backport the new reliable fetcher. !21197
+
+
 ## 12.1.14
 
 ### Fixed (1 change)
