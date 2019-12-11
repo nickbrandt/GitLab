@@ -16,7 +16,7 @@ describe Banzai::Pipeline::BroadcastMessagePipeline do
   end
 
   context "allows `br` elements" do
-    let(:exp) { "<a>Link</a>" }
+    let(:exp) { "Hello<br>World" }
 
     it { is_expected.to eq("<p>#{exp}</p>") }
   end

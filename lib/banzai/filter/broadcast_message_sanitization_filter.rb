@@ -2,7 +2,7 @@
 
 module Banzai
   module Filter
-    # Sanitize HTML produced by Markdown.
+    # Sanitize HTML produced by Markdown. Allows styling of links and usage of line breaks.
     #
     # Extends Banzai::Filter::BaseSanitizationFilter with specific rules.
     class BroadcastMessageSanitizationFilter < Banzai::Filter::BaseSanitizationFilter
