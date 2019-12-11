@@ -8,7 +8,7 @@ class Projects::Ci::LintsController < Projects::ApplicationController
 
   def create
     @content = params[:content]
-    @error = Gitlab::Ci::YamlProcessor.validation_message(@content, yaml_processor_options)
+    @error  = Gitlab::Ci::YamlProcessor.validation_errors(@content, yaml_processor_options).join(', ')
     @status = @error.blank?
 
     if @error.blank?

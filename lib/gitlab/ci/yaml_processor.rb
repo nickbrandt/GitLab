@@ -102,6 +102,20 @@ module Gitlab
         end
       end
 
+      def self.validation_errors(content, opts = {})
+        return ['Please provide content of .gitlab-ci.yml'] if content.blank?
+
+        config = Gitlab::Ci::Config.new(content, **opts)
+        return config.errors unless config.valid?
+
+        begin
+          Gitlab::Ci::YamlProcessor.new(content, opts)
+          []
+        rescue ValidationError => e
+          [e.message]
+        end
+      end
+
       private
 
       def initial_parsing
