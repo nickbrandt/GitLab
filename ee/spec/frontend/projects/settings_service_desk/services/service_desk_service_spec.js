@@ -1,7 +1,7 @@
 import AxiosMockAdapter from 'axios-mock-adapter';
+import ServiceDeskService from 'ee/projects/settings_service_desk/services/service_desk_service';
 import axios from '~/lib/utils/axios_utils';
 import httpStatusCodes from '~/lib/utils/http_status';
-import ServiceDeskService from 'ee/projects/settings_service_desk/services/service_desk_service';
 
 describe('ServiceDeskService', () => {
   const endpoint = `/gitlab-org/gitlab-test/service_desk`;

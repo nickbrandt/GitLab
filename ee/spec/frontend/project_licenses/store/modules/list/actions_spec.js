@@ -6,9 +6,9 @@ import * as actions from 'ee/project_licenses/store/modules/list/actions';
 import * as types from 'ee/project_licenses/store/modules/list/mutation_types';
 import getInitialState from 'ee/project_licenses/store/modules/list/state';
 
+import { FETCH_ERROR_MESSAGE } from 'ee/project_licenses/store/modules/list/constants';
 import createFlash from '~/flash';
 
-import { FETCH_ERROR_MESSAGE } from 'ee/project_licenses/store/modules/list/constants';
 import mockLicensesResponse from './data/mock_licenses';
 
 jest.mock('~/flash', () => jest.fn());

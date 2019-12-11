@@ -1,10 +1,10 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
-import createFlash from '~/flash';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
+import createFlash from '~/flash';
 import {
   group,
   cycleAnalyticsData,
