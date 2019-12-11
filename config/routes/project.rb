@@ -256,6 +256,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
+        namespace :performance_monitoring do
+          resources :dashboards, only: [:create]
+        end
+
         resources :error_tracking, only: [:index], controller: :error_tracking do
           collection do
             get ':issue_id/details',
