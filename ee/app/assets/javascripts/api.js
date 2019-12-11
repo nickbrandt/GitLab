@@ -11,11 +11,7 @@ export default {
   groupEpicsPath:
     '/api/:version/groups/:id/epics?include_ancestor_groups=:includeAncestorGroups&include_descendant_groups=:includeDescendantGroups',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
-  podLogsPath: '/:project_full_path/-/environments/:environment_id/pods/containers/logs.json',
-  podLogsPathWithPod:
-    '/:project_full_path/-/environments/:environment_id/pods/:pod_name/containers/logs.json',
-  podLogsPathWithPodContainer:
-    '/:project_full_path/-/environments/:environment_id/pods/:pod_name/containers/:container_name/logs.json',
+  podLogsPath: '/:project_full_path/-/logs/k8s.json',
   groupPackagesPath: '/api/:version/groups/:id/packages',
   projectPackagesPath: '/api/:version/projects/:id/packages',
   projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
@@ -96,25 +92,21 @@ export default {
    * @param {string=} params.containerName - Container name, if not set the backend assumes a default one
    * @returns {Promise} Axios promise for the result of a GET request of logs
    */
-  getPodLogs({ projectPath, environmentId, podName, containerName }) {
-    let logPath = this.podLogsPath;
-    if (podName && containerName) {
-      logPath = this.podLogsPathWithPodContainer;
-    } else if (podName) {
-      logPath = this.podLogsPathWithPod;
-    }
+  getPodLogs({ projectPath, environmentName, podName, containerName }) {
+    const url = this.buildUrl(this.podLogsPath).replace(':project_full_path', projectPath);
 
-    let url = this.buildUrl(logPath)
-      .replace(':project_full_path', projectPath)
-      .replace(':environment_id', environmentId);
+    const params = {
+      environment_name: environmentName,
+    };
 
     if (podName) {
-      url = url.replace(':pod_name', podName);
+      params.pod_name = podName;
     }
     if (containerName) {
-      url = url.replace(':container_name', containerName);
+      params.container_name = containerName;
     }
-    return axios.get(url);
+
+    return axios.get(url, { params });
   },
 
   groupPackages(id, options = {}) {

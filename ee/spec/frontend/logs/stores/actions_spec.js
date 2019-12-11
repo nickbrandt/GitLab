@@ -10,12 +10,12 @@ import flash from '~/flash';
 
 import {
   mockProjectPath,
-  mockEnvId,
   mockPodName,
   mockEnvironmentsEndpoint,
   mockEnvironments,
   mockPods,
   mockLines,
+  mockEnvName,
 } from '../mock_data';
 
 jest.mock('~/flash');
@@ -36,13 +36,11 @@ describe('Logs Store actions', () => {
     it('should commit environment and pod name mutation', done => {
       testAction(
         setInitData,
-        { projectPath: mockProjectPath, environmentId: mockEnvId, podName: mockPodName },
+        { projectPath: mockProjectPath, environmentName: mockEnvName, podName: mockPodName },
         state,
         [
-          {
-            type: types.SET_PROJECT_ENVIRONMENT,
-            payload: { projectPath: mockProjectPath, environmentId: mockEnvId },
-          },
+          { type: types.SET_PROJECT_PATH, payload: mockProjectPath },
+          { type: types.SET_PROJECT_ENVIRONMENT, payload: mockEnvName },
           { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
         ],
         [{ type: 'fetchLogs' }],
@@ -114,16 +112,18 @@ describe('Logs Store actions', () => {
 
     it('should commit logs and pod data when there is pod name defined', done => {
       state.projectPath = mockProjectPath;
-      state.environments.current = mockEnvId;
+      state.environments.current = mockEnvName;
       state.pods.current = mockPodName;
 
-      const endpoint = `/${mockProjectPath}/-/environments/${mockEnvId}/pods/${mockPodName}/containers/logs.json`;
+      const endpoint = `/${mockProjectPath}/-/logs/k8s.json`;
 
-      mock.onGet(endpoint).reply(200, {
-        pod_name: mockPodName,
-        pods: mockPods,
-        logs: mockLines,
-      });
+      mock
+        .onGet(endpoint, { params: { environment_name: mockEnvName, pod_name: mockPodName } })
+        .reply(200, {
+          pod_name: mockPodName,
+          pods: mockPods,
+          logs: mockLines,
+        });
 
       mock.onGet(endpoint).replyOnce(202); // mock reactive cache
 
@@ -145,11 +145,11 @@ describe('Logs Store actions', () => {
 
     it('should commit logs and pod data when no pod name defined', done => {
       state.projectPath = mockProjectPath;
-      state.environments.current = mockEnvId;
+      state.environments.current = mockEnvName;
 
-      const endpoint = `/${mockProjectPath}/-/environments/${mockEnvId}/pods/containers/logs.json`;
+      const endpoint = `/${mockProjectPath}/-/logs/k8s.json`;
 
-      mock.onGet(endpoint).reply(200, {
+      mock.onGet(endpoint, { params: { environment_name: mockEnvName } }).reply(200, {
         pod_name: mockPodName,
         pods: mockPods,
         logs: mockLines,
@@ -174,9 +174,9 @@ describe('Logs Store actions', () => {
 
     it('should commit logs and pod errors when backend fails', done => {
       state.projectPath = mockProjectPath;
-      state.environments.current = mockEnvId;
+      state.environments.current = mockEnvName;
 
-      const endpoint = `/${mockProjectPath}/-/environments/${mockEnvId}/pods/containers/logs.json`;
+      const endpoint = `/${mockProjectPath}/logs.json?environment_name=${mockEnvName}`;
       mock.onGet(endpoint).replyOnce(500);
 
       testAction(

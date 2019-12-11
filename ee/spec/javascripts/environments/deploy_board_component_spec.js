@@ -4,6 +4,8 @@ import DeployBoard from 'ee/environments/components/deploy_board_component.vue';
 import { environment } from 'spec/environments/mock_data';
 import { deployBoardMockData } from './mock_data';
 
+const projectPath = 'gitlab-org/gitlab-test';
+
 describe('Deploy Board', () => {
   let wrapper;
 
@@ -13,7 +15,8 @@ describe('Deploy Board', () => {
         deployBoardData: deployBoardMockData,
         isLoading: false,
         isEmpty: false,
-        logsPath: environment.log_path,
+        projectPath,
+        environmentName: environment.name,
         ...props,
       },
       sync: false,
@@ -60,7 +63,8 @@ describe('Deploy Board', () => {
         deployBoardData: {},
         isLoading: false,
         isEmpty: true,
-        logsPath: environment.log_path,
+        projectPath,
+        environmentName: environment.name,
       });
       wrapper.vm.$nextTick(done);
     });
@@ -79,7 +83,8 @@ describe('Deploy Board', () => {
         deployBoardData: {},
         isLoading: true,
         isEmpty: false,
-        logsPath: environment.log_path,
+        projectPath,
+        environmentName: environment.name,
       });
       wrapper.vm.$nextTick(done);
     });
@@ -94,7 +99,8 @@ describe('Deploy Board', () => {
       wrapper = createComponent({
         isLoading: false,
         isEmpty: false,
-        logsPath: environment.log_path,
+        projectPath,
+        environmentName: environment.name,
         hasLegacyAppLabel: true,
         deployBoardData: {},
       });
