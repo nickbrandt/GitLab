@@ -73,7 +73,7 @@ module Gitlab
       # Returns true if load balancing is to be enabled.
       def self.enable?
         return false unless ::License.feature_available?(:db_load_balancing)
-        return false if program_name == 'rake' || Sidekiq.server?
+        return false if program_name == 'rake' || Gitlab::Runtime.sidekiq?
 
         hosts.any? || service_discovery_enabled?
       end
