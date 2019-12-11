@@ -3,7 +3,13 @@
 module IssueLinks
   class CreateService < IssuableLinks::CreateService
     def relate_issuables(referenced_issue)
-      link = IssueLink.create(source: issuable, target: referenced_issue)
+      attrs = { source: issuable, target: referenced_issue }
+
+      if ::Feature.enabled?(:issue_link_types, issuable.project) && params[:link_type].present?
+        attrs[:link_type] = params[:link_type]
+      end
+
+      link = IssueLink.create(attrs)
 
       yield if link.persisted?
     end

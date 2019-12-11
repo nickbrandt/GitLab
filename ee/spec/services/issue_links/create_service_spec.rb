@@ -87,7 +87,7 @@ describe IssueLinks::CreateService do
       let(:another_project_issue_ref) { another_project_issue.to_reference(project) }
 
       let(:params) do
-        { issuable_references: [issue_a_ref, another_project_issue_ref] }
+        { issuable_references: [issue_a_ref, another_project_issue_ref], link_type: 'is_blocked_by' }
       end
 
       before do
@@ -97,8 +97,8 @@ describe IssueLinks::CreateService do
       it 'creates relationships' do
         expect { subject }.to change(IssueLink, :count).from(0).to(2)
 
-        expect(IssueLink.find_by!(target: issue_a)).to have_attributes(source: issue)
-        expect(IssueLink.find_by!(target: another_project_issue)).to have_attributes(source: issue)
+        expect(IssueLink.find_by!(target: issue_a)).to have_attributes(source: issue, link_type: 'is_blocked_by')
+        expect(IssueLink.find_by!(target: another_project_issue)).to have_attributes(source: issue, link_type: 'is_blocked_by')
       end
 
       it 'returns success status' do
@@ -119,6 +119,19 @@ describe IssueLinks::CreateService do
           .with(another_project_issue, issue, user)
 
         subject
+      end
+
+      context 'when issue_link_types is disabled' do
+        before do
+          stub_feature_flags(issue_link_types: false)
+        end
+
+        it 'creates links with default type' do
+          expect { subject }.to change(IssueLink, :count).from(0).to(2)
+
+          expect(IssueLink.find_by!(target: issue_a)).to have_attributes(source: issue, link_type: 'relates_to')
+          expect(IssueLink.find_by!(target: another_project_issue)).to have_attributes(source: issue, link_type: 'relates_to')
+        end
       end
     end
 
