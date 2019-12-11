@@ -14,6 +14,7 @@ describe('Productivity analytics filter actions', () => {
   const initialData = {
     mergedAtAfter: new Date('2019-11-01'),
     mergedAtBefore: new Date('2019-12-09'),
+    minDate: new Date('2019-01-01'),
   };
 
   beforeEach(() => {

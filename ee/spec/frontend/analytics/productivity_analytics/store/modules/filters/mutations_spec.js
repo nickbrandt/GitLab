@@ -12,6 +12,7 @@ describe('Productivity analytics filter mutations', () => {
   const currentYear = new Date().getFullYear();
   const startDate = new Date(currentYear, 8, 1);
   const endDate = new Date(currentYear, 8, 7);
+  const minDate = new Date(currentYear, 0, 1);
 
   beforeEach(() => {
     state = getInitialState();
@@ -22,11 +23,13 @@ describe('Productivity analytics filter mutations', () => {
       const initialData = {
         mergedAtAfter: startDate,
         mergedAtBefore: endDate,
+        minDate,
       };
       mutations[types.SET_INITIAL_DATA](state, initialData);
 
       expect(state.startDate).toBe(startDate);
       expect(state.endDate).toBe(endDate);
+      expect(state.minDate).toBe(minDate);
     });
   });
 

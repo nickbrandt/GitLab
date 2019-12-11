@@ -28,6 +28,7 @@ export default () => {
   const initialData = {
     mergedAtAfter,
     mergedAtBefore,
+    minDate,
   };
 
   let filterManager;
