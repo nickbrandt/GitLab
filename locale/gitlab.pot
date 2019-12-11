@@ -7376,7 +7376,7 @@ msgstr ""
 msgid "Failed to find diff file"
 msgstr ""
 
-msgid "Failed to find diff line for: %{file_path}, new_pos: %{new_pos}, old_pos: %{old_pos}"
+msgid "Failed to find diff line for: %{file_path}, old_line: %{old_line}, new_line: %{new_line}"
 msgstr ""
 
 msgid "Failed to get ref."
