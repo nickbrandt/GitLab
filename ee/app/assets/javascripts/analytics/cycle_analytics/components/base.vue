@@ -58,7 +58,6 @@ export default {
       'isAddingCustomStage',
       'isSavingCustomStage',
       'selectedGroup',
-      'selectedProjectIds',
       'selectedStageId',
       'stages',
       'summary',
@@ -74,7 +73,6 @@ export default {
       'currentStage',
       'defaultStage',
       'hasNoAccessError',
-      'currentGroupPath',
       'durationChartPlottableData',
     ]),
     shouldRenderEmptyState() {
@@ -110,13 +108,10 @@ export default {
   },
   methods: {
     ...mapActions([
-      'fetchCustomStageFormData',
       'fetchCycleAnalyticsData',
       'fetchStageData',
-      'fetchGroupStagesAndEvents',
       'setSelectedGroup',
       'setSelectedProjects',
-      'setSelectedTimeframe',
       'setSelectedStageId',
       'hideCustomStageForm',
       'showCustomStageForm',
