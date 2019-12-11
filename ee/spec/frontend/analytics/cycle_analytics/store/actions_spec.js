@@ -352,7 +352,7 @@ describe('Cycle analytics actions', () => {
         {
           dispatch: mockDispatchContext,
           state: { ...state, endpoints: { cycleAnalyticsStagesPath: '/this/is/fake' } },
-          commit: () => {},
+          getters,
         },
         {},
       );
@@ -710,32 +710,52 @@ describe('Cycle analytics actions', () => {
       });
     });
 
-    it("dispatches the 'requestDurationData' and 'receiveDurationDataSuccess' actions", done => {
+    it("dispatches the 'receiveDurationDataSuccess' action on success", done => {
       const stateWithStages = {
         ...state,
         stages: [stages[0], stages[1]],
         selectedGroup,
-        startDate,
-        endDate,
       };
+      const dispatch = jest.fn();
 
-      testAction(
-        actions.fetchDurationData,
-        transformedDurationData,
-        stateWithStages,
-        [],
-        [
-          { type: 'requestDurationData' },
-          {
-            type: 'receiveDurationDataSuccess',
-            payload: transformedDurationData,
-          },
-        ],
-        done,
-      );
+      actions
+        .fetchDurationData({
+          dispatch,
+          state: stateWithStages,
+          getters,
+        })
+        .then(() => {
+          expect(dispatch).toHaveBeenCalledWith(
+            'receiveDurationDataSuccess',
+            transformedDurationData,
+          );
+          done();
+        })
+        .catch(done.fail);
     });
 
-    it("dispatches the 'requestDurationData' and 'receiveDurationDataError' actions when there is an error", done => {
+    it("dispatches the 'requestDurationData' action", done => {
+      const stateWithStages = {
+        ...state,
+        stages: [stages[0], stages[1]],
+        selectedGroup,
+      };
+      const dispatch = jest.fn();
+
+      actions
+        .fetchDurationData({
+          dispatch,
+          state: stateWithStages,
+          getters,
+        })
+        .then(() => {
+          expect(dispatch).toHaveBeenNthCalledWith(1, 'requestDurationData');
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it("dispatches the 'receiveDurationDataError' action when there is an error", done => {
       const brokenState = {
         ...state,
         stages: [
@@ -744,18 +764,20 @@ describe('Cycle analytics actions', () => {
           },
         ],
         selectedGroup,
-        startDate,
-        endDate,
       };
+      const dispatch = jest.fn();
 
-      testAction(
-        actions.fetchDurationData,
-        {},
-        brokenState,
-        [],
-        [{ type: 'requestDurationData' }, { type: 'receiveDurationDataError' }],
-        done,
-      );
+      actions
+        .fetchDurationData({
+          dispatch,
+          state: brokenState,
+          getters,
+        })
+        .then(() => {
+          expect(dispatch).toHaveBeenCalledWith('receiveDurationDataError');
+          done();
+        })
+        .catch(done.fail);
     });
   });
 

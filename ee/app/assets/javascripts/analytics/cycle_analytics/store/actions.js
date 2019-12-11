@@ -1,11 +1,9 @@
-import dateFormat from 'dateformat';
+import Api from 'ee/api';
 import createFlash, { hideFlash } from '~/flash';
 import { __ } from '~/locale';
-import Api from 'ee/api';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { nestQueryStringKeys } from '../utils';
-import { dateFormats } from '../../shared/constants';
 
 const removeError = () => {
   const flashEl = document.querySelector('.flash-alert');
@@ -305,16 +303,17 @@ export const receiveDurationDataError = ({ commit }) => {
   createFlash(__('There was an error while fetching cycle analytics duration data.'));
 };
 
-export const fetchDurationData = ({ state, dispatch }) => {
+export const fetchDurationData = ({ state, dispatch, getters }) => {
   dispatch('requestDurationData');
 
   const {
     stages,
-    startDate,
-    endDate,
-    selectedProjectIds,
     selectedGroup: { fullPath },
   } = state;
+
+  const {
+    cycleAnalyticsRequestParams: { created_after, created_before, project_ids },
+  } = getters;
 
   return Promise.all(
     stages.map(stage => {
@@ -322,9 +321,9 @@ export const fetchDurationData = ({ state, dispatch }) => {
 
       return Api.cycleAnalyticsDurationChart(slug, {
         group_id: fullPath,
-        created_after: dateFormat(startDate, dateFormats.isoDate),
-        created_before: dateFormat(endDate, dateFormats.isoDate),
-        project_ids: selectedProjectIds,
+        created_after,
+        created_before,
+        project_ids,
       }).then(({ data }) => ({
         slug,
         selected: true,
