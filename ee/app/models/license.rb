@@ -120,6 +120,7 @@ class License < ApplicationRecord
     report_approver_rules
     sast
     security_dashboard
+    threat_monitoring
     tracing
     web_ide_terminal
   ]

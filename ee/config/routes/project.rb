@@ -70,6 +70,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resources :licenses, only: [:index, :create, :update]
         end
 
+        resource :threat_monitoring, only: [:show], controller: :threat_monitoring
+
         resources :logs, only: [:index] do
           collection do
             get :k8s

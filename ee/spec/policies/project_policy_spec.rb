@@ -50,6 +50,7 @@ describe ProjectPolicy do
         create_merge_request_in award_emoji
         read_project_security_dashboard read_vulnerability
         read_vulnerability_feedback read_security_findings read_software_license_policy
+        read_threat_monitoring
       ]
     end
 
@@ -65,7 +66,7 @@ describe ProjectPolicy do
       let(:current_user) { create(:user, :auditor) }
 
       before do
-        stub_licensed_features(security_dashboard: true, license_management: true)
+        stub_licensed_features(security_dashboard: true, license_management: true, threat_monitoring: true)
       end
 
       context 'who is not a team member' do
@@ -547,6 +548,58 @@ describe ProjectPolicy do
         it { is_expected.to be_disallowed(:create_vulnerability) }
         it { is_expected.to be_disallowed(:admin_vulnerability) }
       end
+    end
+  end
+
+  describe 'read_threat_monitoring' do
+    context 'when threat monitoring feature is available' do
+      before do
+        stub_feature_flags(threat_monitoring: true)
+        stub_licensed_features(threat_monitoring: true)
+      end
+
+      context 'with developer or higher role' do
+        where(role: %w[admin owner maintainer developer])
+
+        with_them do
+          let(:current_user) { public_send(role) }
+
+          it { is_expected.to be_allowed(:read_threat_monitoring) }
+        end
+      end
+
+      context 'with less than developer role' do
+        where(role: %w[reporter guest])
+
+        with_them do
+          let(:current_user) { public_send(role) }
+
+          it { is_expected.to be_disallowed(:read_threat_monitoring) }
+        end
+      end
+
+      context 'with not member' do
+        let(:current_user) { create(:user) }
+
+        it { is_expected.to be_disallowed(:read_threat_monitoring) }
+      end
+
+      context 'with anonymous' do
+        let(:current_user) { nil }
+
+        it { is_expected.to be_disallowed(:read_threat_monitoring) }
+      end
+    end
+
+    context 'when threat monitoring feature is not available' do
+      let(:current_user) { admin }
+
+      before do
+        stub_feature_flags(threat_monitoring: false)
+        stub_licensed_features(threat_monitoring: false)
+      end
+
+      it { is_expected.to be_disallowed(:read_threat_monitoring) }
     end
   end
 
