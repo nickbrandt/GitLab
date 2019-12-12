@@ -153,4 +153,8 @@ describe('projectsSelector default state', () => {
   it('sets isLoadingPaymentMethod to false', () => {
     expect(state.isLoadingPaymentMethod).toEqual(false);
   });
+
+  it('sets isConfirmingOrder to false', () => {
+    expect(state.isConfirmingOrder).toBe(false);
+  });
 });

@@ -68,4 +68,8 @@ export default {
   [types.UPDATE_IS_LOADING_PAYMENT_METHOD](state, isLoadingPaymentMethod) {
     state.isLoadingPaymentMethod = isLoadingPaymentMethod;
   },
+
+  [types.UPDATE_IS_CONFIRMING_ORDER](state, isConfirmingOrder) {
+    state.isConfirmingOrder = isConfirmingOrder;
+  },
 };

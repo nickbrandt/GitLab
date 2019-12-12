@@ -4,9 +4,10 @@ import ProgressBar from './checkout/progress_bar.vue';
 import SubscriptionDetails from './checkout/subscription_details.vue';
 import BillingAddress from './checkout/billing_address.vue';
 import PaymentMethod from './checkout/payment_method.vue';
+import ConfirmOrder from './checkout/confirm_order.vue';
 
 export default {
-  components: { ProgressBar, SubscriptionDetails, BillingAddress, PaymentMethod },
+  components: { ProgressBar, SubscriptionDetails, BillingAddress, PaymentMethod, ConfirmOrder },
   i18n: {
     checkout: s__('Checkout|Checkout'),
   },
@@ -22,5 +23,6 @@ export default {
       <billing-address />
       <payment-method />
     </div>
+    <confirm-order />
   </div>
 </template>

@@ -557,4 +557,98 @@ describe('Subscriptions Actions', () => {
       });
     });
   });
+
+  describe('confirmOrder', () => {
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it('calls confirmOrderSuccess with a redirect location on success', done => {
+      mock.onPost(constants.CONFIRM_ORDER_URL).replyOnce(200, { location: 'x' });
+
+      testAction(
+        actions.confirmOrder,
+        null,
+        {},
+        [{ type: 'UPDATE_IS_CONFIRMING_ORDER', payload: true }],
+        [{ type: 'confirmOrderSuccess', payload: 'x' }],
+        done,
+      );
+    });
+
+    it('calls confirmOrderError with the errors on error', done => {
+      mock.onPost(constants.CONFIRM_ORDER_URL).replyOnce(200, { errors: 'errors' });
+
+      testAction(
+        actions.confirmOrder,
+        null,
+        {},
+        [{ type: 'UPDATE_IS_CONFIRMING_ORDER', payload: true }],
+        [{ type: 'confirmOrderError', payload: '"errors"' }],
+        done,
+      );
+    });
+
+    it('calls confirmOrderError on failure', done => {
+      mock.onPost(constants.CONFIRM_ORDER_URL).replyOnce(500);
+
+      testAction(
+        actions.confirmOrder,
+        null,
+        {},
+        [{ type: 'UPDATE_IS_CONFIRMING_ORDER', payload: true }],
+        [{ type: 'confirmOrderError' }],
+        done,
+      );
+    });
+  });
+
+  describe('confirmOrderSuccess', () => {
+    it('changes the window location', done => {
+      const spy = jest.spyOn(window.location, 'assign').mockImplementation();
+
+      testAction(actions.confirmOrderSuccess, 'http://example.com', {}, [], [], () => {
+        expect(spy).toHaveBeenCalledWith('http://example.com');
+        done();
+      });
+    });
+  });
+
+  describe('confirmOrderError', () => {
+    it('creates a flash with a default message when no error given', done => {
+      testAction(
+        actions.confirmOrderError,
+        null,
+        {},
+        [{ type: 'UPDATE_IS_CONFIRMING_ORDER', payload: false }],
+        [],
+        () => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'Failed to confirm your order! Please try again.',
+          );
+          done();
+        },
+      );
+    });
+
+    it('creates a flash with a the error message when an error is given', done => {
+      testAction(
+        actions.confirmOrderError,
+        '"Error"',
+        {},
+        [{ type: 'UPDATE_IS_CONFIRMING_ORDER', payload: false }],
+        [],
+        () => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'Failed to confirm your order: "Error". Please try again.',
+          );
+          done();
+        },
+      );
+    });
+  });
 });

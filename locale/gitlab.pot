@@ -3371,6 +3371,12 @@ msgstr ""
 msgid "Checkout|City"
 msgstr ""
 
+msgid "Checkout|Confirm purchase"
+msgstr ""
+
+msgid "Checkout|Confirming..."
+msgstr ""
+
 msgid "Checkout|Continue to billing"
 msgstr ""
 
@@ -3390,6 +3396,12 @@ msgid "Checkout|Edit"
 msgstr ""
 
 msgid "Checkout|Exp %{expirationMonth}/%{expirationYear}"
+msgstr ""
+
+msgid "Checkout|Failed to confirm your order! Please try again."
+msgstr ""
+
+msgid "Checkout|Failed to confirm your order: %{message}. Please try again."
 msgstr ""
 
 msgid "Checkout|Failed to load countries. Please try again."

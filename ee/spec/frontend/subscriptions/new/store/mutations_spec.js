@@ -10,6 +10,7 @@ const state = () => ({
   countryOptions: [],
   stateOptions: [],
   isLoadingPaymentMethod: false,
+  isConfirmingOrder: false,
 });
 
 let stateCopy;
@@ -38,6 +39,7 @@ describe('ee/subscriptions/new/store/mutation', () => {
     ${types.UPDATE_PAYMENT_METHOD_ID}         | ${'paymentMethodId'}                  | ${'paymentMethodId'}
     ${types.UPDATE_CREDIT_CARD_DETAILS}       | ${{ type: 'x' }}                      | ${'creditCardDetails'}
     ${types.UPDATE_IS_LOADING_PAYMENT_METHOD} | ${true}                               | ${'isLoadingPaymentMethod'}
+    ${types.UPDATE_IS_CONFIRMING_ORDER}       | ${true}                               | ${'isConfirmingOrder'}
   `('$mutation', ({ mutation, value, stateProp }) => {
     it(`should set the ${stateProp} to the given value`, () => {
       expect(stateCopy[stateProp]).not.toEqual(value);
