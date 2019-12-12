@@ -1,5 +1,0 @@
----
-title: Introduce "trigger:include" CI YAML syntax to create a sub-pipeline
-merge_request: 21041
-author:
-type: added

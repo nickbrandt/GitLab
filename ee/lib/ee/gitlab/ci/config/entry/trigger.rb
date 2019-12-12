@@ -63,6 +63,10 @@ module EE
                 entry :include, ::Gitlab::Ci::Config::Entry::Includes,
                   description: 'List of external YAML files to include.',
                   reserved: true
+
+                def value
+                  @config
+                end
               end
 
               class UnknownStrategy < ::Gitlab::Config::Entry::Node

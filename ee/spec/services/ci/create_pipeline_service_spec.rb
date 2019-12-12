@@ -170,7 +170,7 @@ describe Ci::CreatePipelineService, '#execute' do
       expect(bridge.stage).to eq 'deploy'
       expect(pipeline.statuses).to match_array [test, bridge]
       expect(bridge.options).to eq(
-        'trigger' => { 'include' => { '0' => { 'local' => 'path/to/child.yml' } } }
+        'trigger' => { 'include' => [{ 'local' => 'path/to/child.yml' }] }
       )
       expect(bridge.yaml_variables)
         .to include(key: 'CROSS', value: 'downstream', public: true)
