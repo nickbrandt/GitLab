@@ -4,11 +4,15 @@ import { GlButton } from '@gitlab/ui';
 
 import { __ } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
+import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 
 export default {
   components: {
     GlButton,
     LoadingButton,
+  },
+  directives: {
+    autofocusonshow,
   },
   props: {
     alignRight: {
@@ -38,27 +42,20 @@ export default {
   },
   methods: {
     ...mapActions(['setEpicCreateTitle', 'createEpic']),
-    focusInput() {
-      this.$nextTick(() => this.$refs.epicTitleInput.focus());
-    },
   },
 };
 </script>
 
 <template>
   <div class="dropdown epic-create-dropdown">
-    <gl-button
-      variant="success"
-      class="qa-new-epic-button"
-      data-toggle="dropdown"
-      @click="focusInput"
-    >
+    <gl-button variant="success" class="qa-new-epic-button" data-toggle="dropdown">
       {{ __('New epic') }}
     </gl-button>
     <div :class="{ 'dropdown-menu-right': alignRight }" class="dropdown-menu">
       <input
         ref="epicTitleInput"
         v-model="epicTitle"
+        v-autofocusonshow
         :disabled="epicCreateInProgress"
         :placeholder="__('Title')"
         type="text"
