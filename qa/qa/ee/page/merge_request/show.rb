@@ -59,6 +59,10 @@ module QA
                 element :approvals_summary_content
               end
 
+              view 'ee/app/assets/javascripts/vue_merge_request_widget/components/merge_immediately_confirmation_dialog.vue' do
+                element :merge_immediately_button
+              end
+
               view 'ee/app/assets/javascripts/vue_shared/security_reports/components/modal.vue' do
                 element :vulnerability_modal_content
               end
@@ -250,6 +254,16 @@ module QA
 
           def num_approvals_required
             approvals_content.match(/Requires (\d+) more approvals/)[1].to_i
+          end
+
+          def merge_merge_train_immediately
+            click_element :merge_moment_dropdown
+            click_element :merge_immediately_option
+
+            # Wait for the warning modal dialog to appear
+            wait_for_animated_element :merge_immediately_button
+
+            click_element :merge_immediately_button
           end
 
           def merge_via_merge_train
