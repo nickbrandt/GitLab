@@ -50,7 +50,7 @@ export default {
       return this.mr.isPipelineActive && !this.mr.onlyAllowMergeIfPipelineSucceeds;
     },
     isMergeImmediatelyDangerous() {
-      return this.mr.preferredAutoMergeStrategy === MT_MERGE_STRATEGY;
+      return [MT_MERGE_STRATEGY, MTWPS_MERGE_STRATEGY].includes(this.mr.preferredAutoMergeStrategy);
     },
   },
 };
