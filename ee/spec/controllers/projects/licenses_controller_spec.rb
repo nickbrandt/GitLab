@@ -17,7 +17,7 @@ describe Projects::LicensesController do
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(licenses_list: true, license_management: true)
+          stub_licensed_features(license_management: true)
         end
 
         it 'renders the show template' do
@@ -44,7 +44,7 @@ describe Projects::LicensesController do
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(licenses_list: true, license_management: true)
+          stub_licensed_features(license_management: true)
         end
 
         it 'returns 404' do

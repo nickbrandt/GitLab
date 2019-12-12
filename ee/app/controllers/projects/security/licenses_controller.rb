@@ -3,7 +3,7 @@
 module Projects
   module Security
     class LicensesController < Projects::ApplicationController
-      before_action :authorize_read_licenses_list!
+      before_action :authorize_read_licenses!, only: [:index]
       before_action :authorize_admin_software_license_policy!, only: [:create, :update]
 
       def index

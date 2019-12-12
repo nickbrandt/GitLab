@@ -112,7 +112,6 @@ class License < ApplicationRecord
     group_ip_restriction
     incident_management
     insights
-    licenses_list
     license_management
     personal_access_token_expiration_policy
     pod_logs

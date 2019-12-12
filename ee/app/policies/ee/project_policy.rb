@@ -81,11 +81,6 @@ module EE
       end
 
       with_scope :subject
-      condition(:licenses_list_enabled) do
-        @subject.beta_feature_available?(:licenses_list)
-      end
-
-      with_scope :subject
       condition(:feature_flags_disabled) do
         !@subject.feature_available?(:feature_flags)
       end
@@ -175,11 +170,11 @@ module EE
 
       rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
 
-      rule { license_management_enabled & can?(:read_project) }.enable :read_software_license_policy
-
       rule { dependency_scanning_enabled & can?(:download_code) }.enable :read_dependencies
 
-      rule { licenses_list_enabled & can?(:read_software_license_policy) }.enable :read_licenses_list
+      rule { license_management_enabled & can?(:download_code) }.enable :read_licenses
+
+      rule { can?(:read_licenses) }.enable :read_software_license_policy
 
       rule { repository_mirrors_enabled & ((mirror_available & can?(:admin_project)) | admin) }.enable :admin_mirror
 
