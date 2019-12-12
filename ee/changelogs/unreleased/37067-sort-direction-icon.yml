@@ -1,0 +1,5 @@
+---
+title: Fix sort icon direction when sorting by weight
+merge_request: 21447
+author: Jan Beckmann
+type: fixed
