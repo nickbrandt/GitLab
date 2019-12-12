@@ -10,11 +10,11 @@ describe Gitlab::Vulnerabilities::Summary do
 
   before do
     create_vulnerabilities(1, project1, { severity: :medium, report_type: :sast })
-    create_vulnerabilities(2, project2, { severity: :high, report_type: :sast})
+    create_vulnerabilities(2, project2, { severity: :high, report_type: :sast })
   end
 
-  describe '#vulnerabilities_counter', :use_clean_rails_memory_store_caching do
-    subject(:counter) { described_class.new(group, filters).vulnerabilities_counter }
+  describe '#findings_counter', :use_clean_rails_memory_store_caching do
+    subject(:counter) { described_class.new(group, filters).findings_counter }
 
     context 'feature disabled' do
       before do
@@ -58,18 +58,6 @@ describe Gitlab::Vulnerabilities::Summary do
       it 'returns the proper format for the summary' do
         Timecop.freeze do
           expect(counter[:high]).to eq(2)
-        end
-      end
-
-      context 'multiple projects with vulnerabilities' do
-        before do
-          Timecop.freeze(Date.today - 1) do
-            create_vulnerabilities(1, project1)
-          end
-
-          Timecop.freeze(Date.today - 4) do
-            create_vulnerabilities(1, project2)
-          end
         end
       end
     end

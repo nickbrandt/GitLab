@@ -10,11 +10,10 @@ module Gitlab
         @group = group
       end
 
-      def vulnerabilities_counter
+      def findings_counter
         return cached_vulnerability_summary if use_vulnerability_cache?
 
         vulnerabilities = found_vulnerabilities.counted_by_severity
-
         VulnerabilitySummarySerializer.new.represent(vulnerabilities)
       end
 
