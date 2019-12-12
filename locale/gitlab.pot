@@ -9235,6 +9235,9 @@ msgstr ""
 msgid "Group ID: %{group_id}"
 msgstr ""
 
+msgid "Group Owner must have signed in with SAML before enabling Group Managed Accounts"
+msgstr ""
+
 msgid "Group Runners"
 msgstr ""
 
