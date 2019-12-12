@@ -10,7 +10,7 @@ describe Groups::Security::VulnerabilitiesController do
   # when new Vulnerability Findings API is enabled this controller is not,
   # its actions are "moved" Groups::Security::VulnerabilityFindingsController
 
-  it_behaves_like 'VulnerabilityFindingsActions disabled' do
+  it_behaves_like 'ProjectVulnerabilityFindingsActions disabled' do
     let(:vulnerable) { group }
     let(:vulnerable_params) { params }
   end
@@ -29,7 +29,7 @@ describe Groups::Security::VulnerabilitiesController do
 
     # when new Vulnerability Findings API is disabled, we fall back to this controller
 
-    it_behaves_like VulnerabilityFindingsActions do
+    it_behaves_like ProjectVulnerabilityFindingsActions do
       let(:vulnerable) { group }
       let(:vulnerable_params) { params }
     end
