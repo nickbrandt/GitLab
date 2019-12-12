@@ -52,7 +52,7 @@ module EE
     private
 
     def logger
-      @logger ||= ::Gitlab::ProjectServiceLogger.build
+      @logger ||= ::Gitlab::Elasticsearch::Logger.build
     end
   end
 end
