@@ -19,6 +19,7 @@ import {
   tasksByTypeData,
   transformedDurationData,
   transformedTasksByTypeData,
+  transformedDurationMedianData,
 } from '../mock_data';
 
 let state = null;
@@ -33,34 +34,35 @@ describe('Cycle analytics mutations', () => {
   });
 
   it.each`
-    mutation                                       | stateKey                       | value
-    ${types.HIDE_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}     | ${false}
-    ${types.SHOW_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}     | ${true}
-    ${types.EDIT_CUSTOM_STAGE}                     | ${'isEditingCustomStage'}      | ${true}
-    ${types.REQUEST_STAGE_DATA}                    | ${'isLoadingStage'}            | ${true}
-    ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isEmptyStage'}              | ${true}
-    ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isLoadingStage'}            | ${false}
-    ${types.REQUEST_CYCLE_ANALYTICS_DATA}          | ${'isLoading'}                 | ${true}
-    ${types.REQUEST_GROUP_LABELS}                  | ${'labels'}                    | ${[]}
-    ${types.RECEIVE_GROUP_LABELS_ERROR}            | ${'labels'}                    | ${[]}
-    ${types.RECEIVE_SUMMARY_DATA_ERROR}            | ${'summary'}                   | ${[]}
-    ${types.REQUEST_SUMMARY_DATA}                  | ${'summary'}                   | ${[]}
-    ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'stages'}                    | ${[]}
-    ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'stages'}                    | ${[]}
-    ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'customStageFormEvents'}     | ${[]}
-    ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'customStageFormEvents'}     | ${[]}
-    ${types.REQUEST_CREATE_CUSTOM_STAGE}           | ${'isSavingCustomStage'}       | ${true}
-    ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}       | ${false}
-    ${types.REQUEST_TASKS_BY_TYPE_DATA}            | ${'isLoadingTasksByTypeChart'} | ${true}
-    ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingTasksByTypeChart'} | ${false}
-    ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}                 | ${true}
-    ${types.RECEIVE_UPDATE_STAGE_RESPONSE}         | ${'isLoading'}                 | ${false}
-    ${types.REQUEST_REMOVE_STAGE}                  | ${'isLoading'}                 | ${true}
-    ${types.RECEIVE_REMOVE_STAGE_RESPONSE}         | ${'isLoading'}                 | ${false}
-    ${types.REQUEST_DURATION_DATA}                 | ${'isLoadingDurationChart'}    | ${true}
-    ${types.RECEIVE_DURATION_DATA_ERROR}           | ${'isLoadingDurationChart'}    | ${false}
-    ${types.REQUEST_STAGE_MEDIANS}                 | ${'medians'}                   | ${{}}
-    ${types.RECEIVE_STAGE_MEDIANS_ERROR}           | ${'medians'}                   | ${{}}
+    mutation                                       | stateKey                              | value
+    ${types.HIDE_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}            | ${false}
+    ${types.SHOW_CUSTOM_STAGE_FORM}                | ${'isCreatingCustomStage'}            | ${true}
+    ${types.EDIT_CUSTOM_STAGE}                     | ${'isEditingCustomStage'}             | ${true}
+    ${types.REQUEST_STAGE_DATA}                    | ${'isLoadingStage'}                   | ${true}
+    ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isEmptyStage'}                     | ${true}
+    ${types.RECEIVE_STAGE_DATA_ERROR}              | ${'isLoadingStage'}                   | ${false}
+    ${types.REQUEST_CYCLE_ANALYTICS_DATA}          | ${'isLoading'}                        | ${true}
+    ${types.REQUEST_GROUP_LABELS}                  | ${'labels'}                           | ${[]}
+    ${types.RECEIVE_GROUP_LABELS_ERROR}            | ${'labels'}                           | ${[]}
+    ${types.RECEIVE_SUMMARY_DATA_ERROR}            | ${'summary'}                          | ${[]}
+    ${types.REQUEST_SUMMARY_DATA}                  | ${'summary'}                          | ${[]}
+    ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'stages'}                           | ${[]}
+    ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'stages'}                           | ${[]}
+    ${types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR} | ${'customStageFormEvents'}            | ${[]}
+    ${types.REQUEST_GROUP_STAGES_AND_EVENTS}       | ${'customStageFormEvents'}            | ${[]}
+    ${types.REQUEST_CREATE_CUSTOM_STAGE}           | ${'isSavingCustomStage'}              | ${true}
+    ${types.RECEIVE_CREATE_CUSTOM_STAGE_RESPONSE}  | ${'isSavingCustomStage'}              | ${false}
+    ${types.REQUEST_TASKS_BY_TYPE_DATA}            | ${'isLoadingTasksByTypeChart'}        | ${true}
+    ${types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR}      | ${'isLoadingTasksByTypeChart'}        | ${false}
+    ${types.REQUEST_UPDATE_STAGE}                  | ${'isLoading'}                        | ${true}
+    ${types.RECEIVE_UPDATE_STAGE_RESPONSE}         | ${'isLoading'}                        | ${false}
+    ${types.REQUEST_REMOVE_STAGE}                  | ${'isLoading'}                        | ${true}
+    ${types.RECEIVE_REMOVE_STAGE_RESPONSE}         | ${'isLoading'}                        | ${false}
+    ${types.REQUEST_DURATION_DATA}                 | ${'isLoadingDurationChart'}           | ${true}
+    ${types.RECEIVE_DURATION_DATA_ERROR}           | ${'isLoadingDurationChart'}           | ${false}
+    ${types.REQUEST_STAGE_MEDIANS}                 | ${'medians'}                          | ${{}}
+    ${types.RECEIVE_STAGE_MEDIANS_ERROR}           | ${'medians'}                          | ${{}}
+    ${types.REQUEST_DURATION_MEDIAN_DATA}          | ${'isLoadingDurationChartMedianData'} | ${true}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 
@@ -68,13 +70,13 @@ describe('Cycle analytics mutations', () => {
   });
 
   it.each`
-    mutation                                       | payload                       | expectedState
-    ${types.SET_FEATURE_FLAGS}                     | ${{ hasDurationChart: true }} | ${{ featureFlags: { hasDurationChart: true } }}
-    ${types.SET_SELECTED_GROUP}                    | ${{ fullPath: 'cool-beans' }} | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjectIds: [] }}
-    ${types.SET_SELECTED_PROJECTS}                 | ${[606, 707, 808, 909]}       | ${{ selectedProjectIds: [606, 707, 808, 909] }}
-    ${types.SET_DATE_RANGE}                        | ${{ startDate, endDate }}     | ${{ startDate, endDate }}
-    ${types.SET_SELECTED_STAGE}                    | ${{ id: 'first-stage' }}      | ${{ selectedStage: { id: 'first-stage' } }}
-    ${types.UPDATE_SELECTED_DURATION_CHART_STAGES} | ${transformedDurationData}    | ${{ durationData: transformedDurationData }}
+    mutation                                       | payload                                                                                                                 | expectedState
+    ${types.SET_FEATURE_FLAGS}                     | ${{ hasDurationChart: true }}                                                                                           | ${{ featureFlags: { hasDurationChart: true } }}
+    ${types.SET_SELECTED_GROUP}                    | ${{ fullPath: 'cool-beans' }}                                                                                           | ${{ selectedGroup: { fullPath: 'cool-beans' }, selectedProjectIds: [] }}
+    ${types.SET_SELECTED_PROJECTS}                 | ${[606, 707, 808, 909]}                                                                                                 | ${{ selectedProjectIds: [606, 707, 808, 909] }}
+    ${types.SET_DATE_RANGE}                        | ${{ startDate, endDate }}                                                                                               | ${{ startDate, endDate }}
+    ${types.SET_SELECTED_STAGE}                    | ${{ id: 'first-stage' }}                                                                                                | ${{ selectedStage: { id: 'first-stage' } }}
+    ${types.UPDATE_SELECTED_DURATION_CHART_STAGES} | ${{ updatedDurationStageData: transformedDurationData, updatedDurationStageMedianData: transformedDurationMedianData }} | ${{ durationData: transformedDurationData, durationMedianData: transformedDurationMedianData }}
   `(
     '$mutation with payload $payload will update state with $expectedState',
     ({ mutation, payload, expectedState }) => {
@@ -215,6 +217,37 @@ describe('Cycle analytics mutations', () => {
 
       expect(stateWithData.isLoadingDurationChart).toBe(false);
       expect(stateWithData.durationData).toBe(transformedDurationData);
+    });
+  });
+
+  describe(`${types.RECEIVE_DURATION_MEDIAN_DATA_SUCCESS}`, () => {
+    it('sets the data correctly and falsifies isLoadingDurationChartMedianData', () => {
+      const stateWithData = {
+        isLoadingDurationChartMedianData: true,
+        durationMedianData: [['something', 'random']],
+      };
+
+      mutations[types.RECEIVE_DURATION_MEDIAN_DATA_SUCCESS](
+        stateWithData,
+        transformedDurationMedianData,
+      );
+
+      expect(stateWithData.isLoadingDurationChartMedianData).toBe(false);
+      expect(stateWithData.durationMedianData).toBe(transformedDurationMedianData);
+    });
+  });
+
+  describe(`${types.RECEIVE_DURATION_MEDIAN_DATA_ERROR}`, () => {
+    it('falsifies isLoadingDurationChartMedianData and sets durationMedianData to an empty array', () => {
+      const stateWithData = {
+        isLoadingDurationChartMedianData: true,
+        durationMedianData: [['something', 'random']],
+      };
+
+      mutations[types.RECEIVE_DURATION_MEDIAN_DATA_ERROR](stateWithData);
+
+      expect(stateWithData.isLoadingDurationChartMedianData).toBe(false);
+      expect(stateWithData.durationMedianData).toStrictEqual([]);
     });
   });
 

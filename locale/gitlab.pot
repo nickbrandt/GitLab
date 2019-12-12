@@ -18647,6 +18647,9 @@ msgstr ""
 msgid "There was an error while fetching cycle analytics duration data."
 msgstr ""
 
+msgid "There was an error while fetching cycle analytics duration median data."
+msgstr ""
+
 msgid "There was an error while fetching cycle analytics summary data."
 msgstr ""
 
