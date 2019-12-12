@@ -1217,11 +1217,11 @@ ActiveRecord::Schema.define(version: 2019_12_14_175727) do
 
   create_table "commit_user_mentions", force: :cascade do |t|
     t.integer "note_id", null: false
-    t.binary "commit_id", null: false
     t.integer "mentioned_users_ids", array: true
     t.integer "mentioned_projects_ids", array: true
     t.integer "mentioned_groups_ids", array: true
-    t.index ["commit_id", "note_id"], name: "commit_user_mentions_on_commit_id_and_note_id_index"
+    t.string "commit_id", null: false
+    t.index ["commit_id", "note_id"], name: "commit_id_and_note_id_index"
     t.index ["note_id"], name: "index_commit_user_mentions_on_note_id", unique: true
   end
 
