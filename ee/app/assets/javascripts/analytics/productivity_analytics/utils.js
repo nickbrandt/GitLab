@@ -186,3 +186,45 @@ export const getMedianLineData = (data, startDate, endDate, daysOffset) => {
 
   return result;
 };
+
+/**
+ * Creates a group object from a dataset. Returns null if no groupId is present.
+ *
+ * @param {Object} dataset - The container's dataset
+ * @returns {Object} - A group object
+ */
+export const buildGroupFromDataset = dataset => {
+  const { groupId, groupName, groupFullPath, groupAvatarUrl } = dataset;
+
+  if (groupId) {
+    return {
+      id: Number(groupId),
+      name: groupName,
+      full_path: groupFullPath,
+      avatar_url: groupAvatarUrl,
+    };
+  }
+
+  return null;
+};
+
+/**
+ * Creates a project object from a dataset. Returns null if no projectId is present.
+ *
+ * @param {Object} dataset - The container's dataset
+ * @returns {Object} - A project object
+ */
+export const buildProjectFromDataset = dataset => {
+  const { projectId, projectName, projectPathWithNamespace, projectAvatarUrl } = dataset;
+
+  if (projectId) {
+    return {
+      id: Number(projectId),
+      name: projectName,
+      path_with_namespace: projectPathWithNamespace,
+      avatar_url: projectAvatarUrl,
+    };
+  }
+
+  return null;
+};

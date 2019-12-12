@@ -2,6 +2,8 @@ import {
   getLabelsEndpoint,
   getMilestonesEndpoint,
   getDefaultStartDate,
+  buildGroupFromDataset,
+  buildProjectFromDataset,
   initDateArray,
   transformScatterData,
   getScatterPlotData,
@@ -59,6 +61,51 @@ describe('Productivity Analytics utils', () => {
       const minDate = new Date('2019-09-01');
 
       expect(getDefaultStartDate(minDate, defaultDaysInPast)).toEqual(new Date('2019-09-21'));
+    });
+  });
+
+  describe('buildGroupFromDataset', () => {
+    it('returns null if groupId is missing', () => {
+      const dataset = { foo: 'bar' };
+      expect(buildGroupFromDataset(dataset)).toBeNull();
+    });
+
+    it('returns a group object when the groupId is given', () => {
+      const dataset = {
+        groupId: '1',
+        groupName: 'My Group',
+        groupFullPath: 'my-group',
+        groupAvatarUrl: 'foo/bar',
+      };
+
+      expect(buildGroupFromDataset(dataset)).toEqual({
+        id: 1,
+        name: 'My Group',
+        full_path: 'my-group',
+        avatar_url: 'foo/bar',
+      });
+    });
+  });
+
+  describe('buildProjectFromDataset', () => {
+    it('returns null if projectId is missing', () => {
+      const dataset = { foo: 'bar' };
+      expect(buildProjectFromDataset(dataset)).toBeNull();
+    });
+
+    it('returns a project object when the projectId is given', () => {
+      const dataset = {
+        projectId: '1',
+        projectName: 'My Project',
+        projectPathWithNamespace: 'my-group/my-project',
+      };
+
+      expect(buildProjectFromDataset(dataset)).toEqual({
+        id: 1,
+        name: 'My Project',
+        path_with_namespace: 'my-group/my-project',
+        avatar_url: undefined,
+      });
     });
   });
 
