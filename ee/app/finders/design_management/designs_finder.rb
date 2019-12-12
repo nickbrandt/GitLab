@@ -39,13 +39,15 @@ module DesignManagement
     end
 
     def by_filename(items)
-      return items unless params[:filenames].present?
+      return items if params[:filenames].nil?
+      return ::DesignManagement::Design.none if params[:filenames].empty?
 
       items.with_filename(params[:filenames])
     end
 
     def by_id(items)
-      return items unless params[:ids].present?
+      return items if params[:ids].nil?
+      return ::DesignManagement::Design.none if params[:ids].empty?
 
       items.id_in(params[:ids])
     end

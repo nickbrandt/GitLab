@@ -54,6 +54,16 @@ describe DesignManagement::DesignsFinder do
           it { is_expected.to eq([design2]) }
         end
 
+        context 'when passed empty array' do
+          %i[filenames ids].each do |arg|
+            context "for #{arg}" do
+              let(:params) { { arg => [] } }
+
+              it { is_expected.to be_empty }
+            end
+          end
+        end
+
         describe 'returning designs that existed at a particular given version' do
           let(:all_versions) { issue.design_collection.versions.ordered }
           let(:first_version) { all_versions.last }
