@@ -145,8 +145,9 @@ module Gitlab
       end
 
       def diff_files
-        # We access the raw, undecorated diff_files here, as decorating refers
-        #   back into this class and leads to a circular reference.
+        # We access raw_diff_files here, as diff_files will attempt to apply the
+        #   highlighting code found in this class, leading  to a circular
+        #   reference.
         #
         @diff_collection.raw_diff_files
       end
