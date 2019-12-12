@@ -1903,20 +1903,19 @@ describe Project do
   describe '#design_management_enabled?' do
     let(:project) { build(:project) }
 
-    where(:feature_enabled, :license_enabled, :lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
-      false | false | false | false | false | false
-      true  | false | false | false | false | false
-      true  | true  | false | false | false | false
-      true  | true  | true  | false | false | true
-      true  | true  | true  | false | true  | false
-      true  | true  | true  | true  | false | true
-      true  | true  | true  | true  | true  | true
+    where(:license_enabled, :lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
+      false | false | false | false | false
+      true  | false | false | false | false
+      true  | true  | false | false | true
+      true  | true  | false | true  | false
+      true  | true  | true  | false | true
+      true  | true  | true  | true  | true
     end
 
     with_them do
       before do
         stub_licensed_features(design_management: license_enabled)
-        stub_feature_flags(design_management_flag: feature_enabled, design_management_require_hashed_storage: hash_storage_required)
+        stub_feature_flags(design_management_require_hashed_storage: hash_storage_required)
         expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
         allow(project).to receive(:hashed_storage?).with(:repository).and_return(hashed_storage_enabled)
       end
