@@ -7,7 +7,8 @@ class MigrateEpicNotesMentionsToDb < ActiveRecord::Migration[5.2]
 
   DELAY = 2.minutes.to_i
   BATCH_SIZE = 10000
-  MIGRATION = 'CreateResourceUserMention'
+  MIGRATION = 'UserMentions::CreateResourceUserMention'
+  INDEX_NAME = 'epic_mentions_temp_index'
 
   class Note < ActiveRecord::Base
     include EachBatch
@@ -16,8 +17,12 @@ class MigrateEpicNotesMentionsToDb < ActiveRecord::Migration[5.2]
   end
 
   def up
+    disable_statement_timeout do
+      # create temporary index, takes ~25 mins on #database-lab
+      execute "create index #{INDEX_NAME} on notes (id) where note ~~ '%@%'::text AND notes.noteable_type = 'Epic' AND notes.system = false"
+    end
     conditions = "note LIKE '%@%' AND notes.noteable_type = 'Epic' AND epic_user_mentions.epic_id IS NULL"
-    join = "INNER JOIN epics ON notes.noteable_id = epics.id LEFT JOIN epic_user_mentions ON notes.id = epic_user_mentions.note_id"
+    join = "LEFT JOIN epic_user_mentions ON notes.id = epic_user_mentions.note_id"
 
     Note
       .joins(join)
