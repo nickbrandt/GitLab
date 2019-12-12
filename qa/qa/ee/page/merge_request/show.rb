@@ -256,7 +256,7 @@ module QA
             approvals_content.match(/Requires (\d+) more approvals/)[1].to_i
           end
 
-          def merge_merge_train_immediately
+          def skip_merge_train_and_merge_immediately
             click_element :merge_moment_dropdown
             click_element :merge_immediately_option
 

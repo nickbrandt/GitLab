@@ -74,8 +74,8 @@ module QA
           expect(pipeline_passed).to be_truthy, "Expected the merged result pipeline to pass."
 
           # The default option is to merge via merge train,
-          # but that will be covered by another test
-          show.merge_merge_train_immediately
+          # but that is covered by the 'merges via a merge train' test
+          show.skip_merge_train_and_merge_immediately
         end
 
         merged = Page::MergeRequest::Show.perform(&:merged?)
