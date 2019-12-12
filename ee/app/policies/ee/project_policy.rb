@@ -81,6 +81,11 @@ module EE
       end
 
       with_scope :subject
+      condition(:threat_monitoring_enabled) do
+        @subject.beta_feature_available?(:threat_monitoring)
+      end
+
+      with_scope :subject
       condition(:feature_flags_disabled) do
         !@subject.feature_available?(:feature_flags)
       end
@@ -167,6 +172,8 @@ module EE
         enable :create_vulnerability
         enable :admin_vulnerability
       end
+
+      rule { threat_monitoring_enabled & (auditor | can?(:developer_access)) }.enable :read_threat_monitoring
 
       rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
 

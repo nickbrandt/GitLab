@@ -49,6 +49,10 @@ module EE
         nav_tabs << :licenses
       end
 
+      if can?(current_user, :read_threat_monitoring, project)
+        nav_tabs << :threat_monitoring
+      end
+
       if ::Gitlab.config.packages.enabled &&
           project.feature_available?(:packages) &&
           can?(current_user, :read_package, project)
@@ -145,6 +149,7 @@ module EE
         projects/security/dashboard#show
         projects/dependencies#show
         projects/licenses#show
+        projects/threat_monitoring#show
       ]
     end
 

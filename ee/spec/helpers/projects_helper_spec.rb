@@ -155,4 +155,49 @@ describe ProjectsHelper do
       end
     end
   end
+
+  describe '#get_project_nav_tabs' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:ability, :nav_tab) do
+      :read_dependencies               | :dependencies
+      :read_feature_flag               | :operations
+      :read_licenses                   | :licenses
+      :read_project_security_dashboard | :security
+      :read_threat_monitoring          | :threat_monitoring
+    end
+
+    with_them do
+      let(:project) { create(:project) }
+      let(:user)    { create(:user) }
+
+      before do
+        allow(helper).to receive(:can?) { false }
+      end
+
+      subject do
+        helper.send(:get_project_nav_tabs, project, user)
+      end
+
+      context 'when the feature is disabled' do
+        before do
+          allow(helper).to receive(:can?).with(user, ability, project).and_return(false)
+        end
+
+        it 'does not include the nav tab' do
+          is_expected.not_to include(nav_tab)
+        end
+      end
+
+      context 'when threat monitoring is enabled' do
+        before do
+          allow(helper).to receive(:can?).with(user, ability, project).and_return(true)
+        end
+
+        it 'includes the nav tab' do
+          is_expected.to include(nav_tab)
+        end
+      end
+    end
+  end
 end
