@@ -9,6 +9,7 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 ## 12.0.10
 
+- No changes.
 - Unreleased due to build failures
 
 ## 12.0.9
