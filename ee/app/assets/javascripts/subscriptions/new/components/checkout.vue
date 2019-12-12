@@ -2,9 +2,10 @@
 import { s__ } from '~/locale';
 import ProgressBar from './checkout/progress_bar.vue';
 import SubscriptionDetails from './checkout/subscription_details.vue';
+import BillingAddress from './checkout/billing_address.vue';
 
 export default {
-  components: { ProgressBar, SubscriptionDetails },
+  components: { ProgressBar, SubscriptionDetails, BillingAddress },
   i18n: {
     checkout: s__('Checkout|Checkout'),
   },
@@ -17,6 +18,7 @@ export default {
       <div class="flash-container"></div>
       <h2 class="mt-4 mb-3 mb-lg-5">{{ $options.i18n.checkout }}</h2>
       <subscription-details />
+      <billing-address />
     </div>
   </div>
 </template>

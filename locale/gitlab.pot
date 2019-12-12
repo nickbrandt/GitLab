@@ -3359,13 +3359,31 @@ msgstr ""
 msgid "Checkout|3. Your GitLab group"
 msgstr ""
 
+msgid "Checkout|Billing address"
+msgstr ""
+
 msgid "Checkout|Checkout"
+msgstr ""
+
+msgid "Checkout|City"
 msgstr ""
 
 msgid "Checkout|Continue to billing"
 msgstr ""
 
+msgid "Checkout|Continue to payment"
+msgstr ""
+
+msgid "Checkout|Country"
+msgstr ""
+
 msgid "Checkout|Edit"
+msgstr ""
+
+msgid "Checkout|Failed to load countries. Please try again."
+msgstr ""
+
+msgid "Checkout|Failed to load states. Please try again."
 msgstr ""
 
 msgid "Checkout|GitLab plan"
@@ -3381,6 +3399,18 @@ msgid "Checkout|Need more users? Purchase GitLab for your %{company}."
 msgstr ""
 
 msgid "Checkout|Number of users"
+msgstr ""
+
+msgid "Checkout|Please select a country"
+msgstr ""
+
+msgid "Checkout|Please select a state"
+msgstr ""
+
+msgid "Checkout|State"
+msgstr ""
+
+msgid "Checkout|Street address"
 msgstr ""
 
 msgid "Checkout|Subscription details"
@@ -3399,6 +3429,9 @@ msgid "Checkout|Users"
 msgstr ""
 
 msgid "Checkout|Your organization"
+msgstr ""
+
+msgid "Checkout|Zip code"
 msgstr ""
 
 msgid "Checkout|company or team"

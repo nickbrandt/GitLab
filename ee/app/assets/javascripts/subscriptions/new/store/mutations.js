@@ -20,4 +20,36 @@ export default {
   [types.UPDATE_ORGANIZATION_NAME](state, organizationName) {
     state.organizationName = organizationName;
   },
+
+  [types.UPDATE_COUNTRY_OPTIONS](state, countryOptions) {
+    state.countryOptions = countryOptions;
+  },
+
+  [types.UPDATE_STATE_OPTIONS](state, stateOptions) {
+    state.stateOptions = stateOptions;
+  },
+
+  [types.UPDATE_COUNTRY](state, country) {
+    state.country = country;
+  },
+
+  [types.UPDATE_STREET_ADDRESS_LINE_ONE](state, streetAddressLine1) {
+    state.streetAddressLine1 = streetAddressLine1;
+  },
+
+  [types.UPDATE_STREET_ADDRESS_LINE_TWO](state, streetAddressLine2) {
+    state.streetAddressLine2 = streetAddressLine2;
+  },
+
+  [types.UPDATE_CITY](state, city) {
+    state.city = city;
+  },
+
+  [types.UPDATE_COUNTRY_STATE](state, countryState) {
+    state.countryState = countryState;
+  },
+
+  [types.UPDATE_ZIP_CODE](state, zipCode) {
+    state.zipCode = zipCode;
+  },
 };
