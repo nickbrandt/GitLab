@@ -2,13 +2,6 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
-## 12.1.15
-
-### Security (1 change)
-
-- Sanitize search text to prevent XSS.
-
-
 ## 12.1.14
 
 ### Security (1 change)
