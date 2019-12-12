@@ -1,8 +1,15 @@
 import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
-import { s__ } from '~/locale';
+import { sprintf, s__ } from '~/locale';
 import createFlash from '~/flash';
-import { STEPS, COUNTRIES_URL, STATES_URL } from '../constants';
+import {
+  STEPS,
+  COUNTRIES_URL,
+  STATES_URL,
+  PAYMENT_FORM_URL,
+  PAYMENT_FORM_ID,
+  PAYMENT_METHOD_URL,
+} from '../constants';
 
 export const activateStep = ({ commit }, currentStep) => {
   if (STEPS.includes(currentStep)) {
@@ -103,4 +110,76 @@ export const updateCountryState = ({ commit }, countryState) => {
 
 export const updateZipCode = ({ commit }, zipCode) => {
   commit(types.UPDATE_ZIP_CODE, zipCode);
+};
+
+export const fetchPaymentFormParams = ({ dispatch }) => {
+  axios
+    .get(PAYMENT_FORM_URL, { params: { id: PAYMENT_FORM_ID } })
+    .then(({ data }) => dispatch('fetchPaymentFormParamsSuccess', data))
+    .catch(() => dispatch('fetchPaymentFormParamsError'));
+};
+
+export const fetchPaymentFormParamsSuccess = ({ commit }, data) => {
+  if (data.errors) {
+    createFlash(
+      sprintf(s__('Checkout|Credit card form failed to load: %{message}'), {
+        message: data.errors,
+      }),
+    );
+  } else {
+    commit(types.UPDATE_PAYMENT_FORM_PARAMS, data);
+  }
+};
+
+export const fetchPaymentFormParamsError = () => {
+  createFlash(s__('Checkout|Credit card form failed to load. Please try again.'));
+};
+
+export const paymentFormSubmitted = ({ dispatch }, response) => {
+  if (response.success) {
+    dispatch('paymentFormSubmittedSuccess', response.refId);
+  } else {
+    dispatch('paymentFormSubmittedError', response);
+  }
+};
+
+export const paymentFormSubmittedSuccess = ({ commit, dispatch }, paymentMethodId) => {
+  commit(types.UPDATE_PAYMENT_METHOD_ID, paymentMethodId);
+
+  dispatch('fetchPaymentMethodDetails');
+};
+
+export const paymentFormSubmittedError = (_, response) => {
+  createFlash(
+    sprintf(
+      s__(
+        'Checkout|Submitting the credit card form failed with code %{errorCode}: %{errorMessage}',
+      ),
+      response,
+    ),
+  );
+};
+
+export const fetchPaymentMethodDetails = ({ state, dispatch }) => {
+  axios
+    .get(PAYMENT_METHOD_URL, { params: { id: state.paymentMethodId } })
+    .then(({ data }) => dispatch('fetchPaymentMethodDetailsSuccess', data))
+    .catch(() => dispatch('fetchPaymentMethodDetailsError'));
+};
+
+export const fetchPaymentMethodDetailsSuccess = ({ commit, dispatch }, data) => {
+  const creditCardDetails = {
+    cardType: data.credit_card_type,
+    lastFourDigits: data.credit_card_mask_number.slice(-4),
+    expirationMonth: data.credit_card_expiration_month,
+    expirationYear: data.credit_card_expiration_year % 100,
+  };
+
+  commit(types.UPDATE_CREDIT_CARD_DETAILS, creditCardDetails);
+
+  dispatch('activateNextStep');
+};
+
+export const fetchPaymentMethodDetailsError = () => {
+  createFlash(s__('Checkout|Failed to register credit card. Please try again.'));
 };

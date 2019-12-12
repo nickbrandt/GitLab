@@ -133,6 +133,20 @@ $subscriptions-full-width-lg: 541px;
     }
   }
 
+  #zuora_payment {
+    margin-right: -8px;
+
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      margin-right: 0;
+    }
+
+    iframe {
+      background-color: $white-light;
+      margin: -4px;
+      width: 100% !important;
+    }
+  }
+
   .order-summary {
     max-width: $subscriptions-full-width-md;
 

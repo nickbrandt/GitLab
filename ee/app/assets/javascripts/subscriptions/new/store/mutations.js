@@ -52,4 +52,16 @@ export default {
   [types.UPDATE_ZIP_CODE](state, zipCode) {
     state.zipCode = zipCode;
   },
+
+  [types.UPDATE_PAYMENT_FORM_PARAMS](state, paymentFormParams) {
+    state.paymentFormParams = paymentFormParams;
+  },
+
+  [types.UPDATE_PAYMENT_METHOD_ID](state, paymentMethodId) {
+    state.paymentMethodId = paymentMethodId;
+  },
+
+  [types.UPDATE_CREDIT_CARD_DETAILS](state, creditCardDetails) {
+    state.creditCardDetails = creditCardDetails;
+  },
 };

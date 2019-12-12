@@ -341,4 +341,218 @@ describe('Subscriptions Actions', () => {
       );
     });
   });
+
+  describe('fetchPaymentFormParams', () => {
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it('fetches paymentFormParams and calls fetchPaymentFormParamsSuccess with the returned data on success', done => {
+      mock
+        .onGet(constants.PAYMENT_FORM_URL, { params: { id: constants.PAYMENT_FORM_ID } })
+        .replyOnce(200, { token: 'x' });
+
+      testAction(
+        actions.fetchPaymentFormParams,
+        null,
+        {},
+        [],
+        [{ type: 'fetchPaymentFormParamsSuccess', payload: { token: 'x' } }],
+        done,
+      );
+    });
+
+    it('calls fetchPaymentFormParamsError on error', done => {
+      mock.onGet(constants.PAYMENT_FORM_URL).replyOnce(500);
+
+      testAction(
+        actions.fetchPaymentFormParams,
+        null,
+        {},
+        [],
+        [{ type: 'fetchPaymentFormParamsError' }],
+        done,
+      );
+    });
+  });
+
+  describe('fetchPaymentFormParamsSuccess', () => {
+    it('updates paymentFormParams to the provided value when no errors are present', done => {
+      testAction(
+        actions.fetchPaymentFormParamsSuccess,
+        { token: 'x' },
+        {},
+        [{ type: 'UPDATE_PAYMENT_FORM_PARAMS', payload: { token: 'x' } }],
+        [],
+        done,
+      );
+    });
+
+    it('creates a flash when errors are present', done => {
+      testAction(
+        actions.fetchPaymentFormParamsSuccess,
+        { errors: 'error message' },
+        {},
+        [],
+        [],
+        () => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'Credit card form failed to load: error message',
+          );
+          done();
+        },
+      );
+    });
+  });
+
+  describe('fetchPaymentFormParamsError', () => {
+    it('creates a flash', done => {
+      testAction(actions.fetchPaymentFormParamsError, null, {}, [], [], () => {
+        expect(createFlash).toHaveBeenCalledWith(
+          'Credit card form failed to load. Please try again.',
+        );
+        done();
+      });
+    });
+  });
+
+  describe('paymentFormSubmitted', () => {
+    describe('on success', () => {
+      it('calls paymentFormSubmittedSuccess with the refID from the response', done => {
+        testAction(
+          actions.paymentFormSubmitted,
+          { success: true, refId: 'id' },
+          {},
+          [],
+          [{ type: 'paymentFormSubmittedSuccess', payload: 'id' }],
+          done,
+        );
+      });
+    });
+
+    describe('on failure', () => {
+      it('calls paymentFormSubmittedError with the response', done => {
+        testAction(
+          actions.paymentFormSubmitted,
+          { error: 'foo' },
+          {},
+          [],
+          [{ type: 'paymentFormSubmittedError', payload: { error: 'foo' } }],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('paymentFormSubmittedSuccess', () => {
+    it('updates paymentMethodId to the provided value and calls fetchPaymentMethodDetails', done => {
+      testAction(
+        actions.paymentFormSubmittedSuccess,
+        'id',
+        {},
+        [{ type: 'UPDATE_PAYMENT_METHOD_ID', payload: 'id' }],
+        [{ type: 'fetchPaymentMethodDetails' }],
+        done,
+      );
+    });
+  });
+
+  describe('paymentFormSubmittedError', () => {
+    it('creates a flash', done => {
+      testAction(
+        actions.paymentFormSubmittedError,
+        { errorCode: 'codeFromResponse', errorMessage: 'messageFromResponse' },
+        {},
+        [],
+        [],
+        () => {
+          expect(createFlash).toHaveBeenCalledWith(
+            'Submitting the credit card form failed with code codeFromResponse: messageFromResponse',
+          );
+          done();
+        },
+      );
+    });
+  });
+
+  describe('fetchPaymentMethodDetails', () => {
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it('fetches paymentMethodDetails and calls fetchPaymentMethodDetailsSuccess with the returned data on success', done => {
+      mock
+        .onGet(constants.PAYMENT_METHOD_URL, { params: { id: 'paymentMethodId' } })
+        .replyOnce(200, { token: 'x' });
+
+      testAction(
+        actions.fetchPaymentMethodDetails,
+        null,
+        { paymentMethodId: 'paymentMethodId' },
+        [],
+        [{ type: 'fetchPaymentMethodDetailsSuccess', payload: { token: 'x' } }],
+        done,
+      );
+    });
+
+    it('calls fetchPaymentMethodDetailsError on error', done => {
+      mock.onGet(constants.PAYMENT_METHOD_URL).replyOnce(500);
+
+      testAction(
+        actions.fetchPaymentMethodDetails,
+        null,
+        {},
+        [],
+        [{ type: 'fetchPaymentMethodDetailsError' }],
+        done,
+      );
+    });
+  });
+
+  describe('fetchPaymentMethodDetailsSuccess', () => {
+    it('updates creditCardDetails to the provided data and calls activateNextStep', done => {
+      testAction(
+        actions.fetchPaymentMethodDetailsSuccess,
+        {
+          credit_card_type: 'cc_type',
+          credit_card_mask_number: '4242424242424242',
+          credit_card_expiration_month: 12,
+          credit_card_expiration_year: 2019,
+        },
+        {},
+        [
+          {
+            type: 'UPDATE_CREDIT_CARD_DETAILS',
+            payload: {
+              cardType: 'cc_type',
+              lastFourDigits: '4242',
+              expirationMonth: 12,
+              expirationYear: 19,
+            },
+          },
+        ],
+        [{ type: 'activateNextStep' }],
+        done,
+      );
+    });
+  });
+
+  describe('fetchPaymentMethodDetailsError', () => {
+    it('creates a flash', done => {
+      testAction(actions.fetchPaymentMethodDetailsError, null, {}, [], [], () => {
+        expect(createFlash).toHaveBeenCalledWith(
+          'Failed to register credit card. Please try again.',
+        );
+        done();
+      });
+    });
+  });
 });

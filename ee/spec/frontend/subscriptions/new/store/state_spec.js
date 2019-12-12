@@ -137,4 +137,16 @@ describe('projectsSelector default state', () => {
   it('sets the startDate to the current date', () => {
     expect(state.startDate).toEqual(currentDate);
   });
+
+  it('sets the paymentFormParams to an empty object', () => {
+    expect(state.paymentFormParams).toEqual({});
+  });
+
+  it('sets the paymentMethodId to null', () => {
+    expect(state.paymentMethodId).toBeNull();
+  });
+
+  it('sets the creditCardDetails to an empty object', () => {
+    expect(state.creditCardDetails).toEqual({});
+  });
 });

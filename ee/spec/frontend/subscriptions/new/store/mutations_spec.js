@@ -43,3 +43,27 @@ describe('ee/subscriptions/new/store/mutation', () => {
     });
   });
 });
+
+describe('UPDATE_PAYMENT_FORM_PARAMS', () => {
+  it('should set the paymentFormParams to the given paymentFormParams', () => {
+    mutations[types.UPDATE_PAYMENT_FORM_PARAMS](stateCopy, { token: 'x' });
+
+    expect(stateCopy.paymentFormParams).toEqual({ token: 'x' });
+  });
+});
+
+describe('UPDATE_PAYMENT_METHOD_ID', () => {
+  it('should set the paymentMethodId to the given paymentMethodId', () => {
+    mutations[types.UPDATE_PAYMENT_METHOD_ID](stateCopy, 'paymentMethodId');
+
+    expect(stateCopy.paymentMethodId).toEqual('paymentMethodId');
+  });
+});
+
+describe('UPDATE_CREDIT_CARD_DETAILS', () => {
+  it('should set the creditCardDetails to the given creditCardDetails', () => {
+    mutations[types.UPDATE_CREDIT_CARD_DETAILS](stateCopy, { type: 'x' });
+
+    expect(stateCopy.creditCardDetails).toEqual({ type: 'x' });
+  });
+});
