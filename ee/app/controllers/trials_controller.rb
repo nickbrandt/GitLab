@@ -6,7 +6,6 @@ class TrialsController < ApplicationController
   layout 'trial'
 
   before_action :check_if_gl_com
-  before_action :check_if_improved_trials_enabled
   before_action :authenticate_user!
   before_action :find_or_create_namespace, only: :apply
 
@@ -61,10 +60,6 @@ class TrialsController < ApplicationController
     attrs[:newsletter_segment] = current_user.email_opted_in
 
     attrs
-  end
-
-  def check_if_improved_trials_enabled
-    render_404 unless Feature.enabled?(:improved_trial_signup)
   end
 
   def apply_trial_params

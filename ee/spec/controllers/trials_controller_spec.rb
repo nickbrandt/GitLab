@@ -13,7 +13,6 @@ describe TrialsController do
 
   before do
     allow(::Gitlab).to receive(:com?).and_return(true)
-    stub_feature_flags(improved_trial_signup: true)
   end
 
   describe '#new' do
@@ -22,16 +21,6 @@ describe TrialsController do
     context 'when invalid - instance is not GL.com' do
       it 'returns 404 not found' do
         allow(::Gitlab).to receive(:com?).and_return(false)
-
-        get :new
-
-        expect(response.status).to eq(404)
-      end
-    end
-
-    context 'when feature is turned off' do
-      it 'returns 404 not found' do
-        stub_feature_flags(improved_trial_signup: false)
 
         get :new
 

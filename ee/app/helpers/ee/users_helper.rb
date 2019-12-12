@@ -15,7 +15,6 @@ module EE
     def trials_allowed?(user)
       return unless user
       return unless ::Gitlab.com?
-      return unless ::Feature.enabled?(:improved_trial_signup)
 
       user.any_namespace_without_trial?
     end
