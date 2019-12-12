@@ -17,7 +17,7 @@ import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import { __, s__, sprintf } from '~/locale';
-import PackageType from '../constants';
+import { PackageType } from '../constants';
 
 export default {
   name: 'PackagesApp',
