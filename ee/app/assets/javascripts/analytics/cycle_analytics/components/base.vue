@@ -55,10 +55,11 @@ export default {
       'isLoadingChartData',
       'isLoadingDurationChart',
       'isEmptyStage',
-      'isAddingCustomStage',
       'isSavingCustomStage',
+      'isCreatingCustomStage',
+      'isEditingCustomStage',
       'selectedGroup',
-      'selectedStageId',
+      'selectedStage',
       'stages',
       'summary',
       'labels',
@@ -69,12 +70,7 @@ export default {
       'endDate',
       'tasksByType',
     ]),
-    ...mapGetters([
-      'currentStage',
-      'defaultStage',
-      'hasNoAccessError',
-      'durationChartPlottableData',
-    ]),
+    ...mapGetters(['hasNoAccessError', 'currentGroupPath', 'durationChartPlottableData']),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -112,16 +108,18 @@ export default {
       'fetchStageData',
       'setSelectedGroup',
       'setSelectedProjects',
-      'setSelectedStageId',
+      'setSelectedStage',
       'hideCustomStageForm',
       'showCustomStageForm',
       'setDateRange',
       'fetchTasksByTypeData',
+      'updateSelectedDurationChartStages',
       'createCustomStage',
       'updateStage',
       'removeStage',
-      'updateSelectedDurationChartStages',
       'setFeatureFlags',
+      'editCustomStage',
+      'updateStage',
     ]),
     onGroupSelect(group) {
       this.setSelectedGroup(group);
@@ -134,11 +132,14 @@ export default {
     },
     onStageSelect(stage) {
       this.hideCustomStageForm();
-      this.setSelectedStageId(stage.id);
-      this.fetchStageData(this.currentStage.slug);
+      this.setSelectedStage(stage);
+      this.fetchStageData(this.selectedStage.slug);
     },
     onShowAddStageForm() {
       this.showCustomStageForm();
+    },
+    onShowEditStageForm(initData = {}) {
+      this.editCustomStage(initData);
     },
     initDateRange() {
       const endDate = new Date(Date.now());
@@ -148,7 +149,7 @@ export default {
     onCreateCustomStage(data) {
       this.createCustomStage(data);
     },
-    onUpdateStage(data) {
+    onUpdateCustomStage(data) {
       this.updateStage(data);
     },
     onRemoveStage(id) {
@@ -237,14 +238,15 @@ export default {
         <div v-else>
           <summary-table class="js-summary-table" :items="summary" />
           <stage-table
-            v-if="currentStage"
+            v-if="selectedStage"
             class="js-stage-table"
-            :current-stage="currentStage"
+            :current-stage="selectedStage"
             :stages="stages"
             :is-loading="isLoadingStage"
             :is-empty-stage="isEmptyStage"
-            :is-adding-custom-stage="isAddingCustomStage"
             :is-saving-custom-stage="isSavingCustomStage"
+            :is-creating-custom-stage="isCreatingCustomStage"
+            :is-editing-custom-stage="isEditingCustomStage"
             :current-stage-events="currentStageEvents"
             :custom-stage-form-events="customStageFormEvents"
             :labels="labels"
@@ -252,10 +254,12 @@ export default {
             :no-access-svg-path="noAccessSvgPath"
             :can-edit-stages="hasCustomizableCycleAnalytics"
             @selectStage="onStageSelect"
+            @editStage="onShowEditStageForm"
             @showAddStageForm="onShowAddStageForm"
-            @submit="onCreateCustomStage"
-            @hideStage="onUpdateStage"
+            @hideStage="onUpdateCustomStage"
             @removeStage="onRemoveStage"
+            @createStage="onCreateCustomStage"
+            @updateStage="onUpdateCustomStage"
           />
         </div>
       </div>

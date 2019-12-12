@@ -32,12 +32,29 @@ export const isLabelEvent = (labelEvents = [], ev = null) =>
 export const getLabelEventsIdentifiers = (events = []) =>
   events.filter(ev => ev.type && ev.type === EVENT_TYPE_LABEL).map(i => i.identifier);
 
+/**
+ * Checks if the specified stage is in memory or persisted to storage based on the id
+ *
+ * Default cycle analytics stages are initially stored in memory, when they are first
+ * created the id for the stage is the name of the stage in lowercase. This string id
+ * is used to fetch stage data (events, median calculation)
+ *
+ * When either a custom stage is created or an edit is made to a default stage then the
+ * default stages get persisted to storage and will have a numeric id. The new numeric
+ * id should then be used to access stage data
+ *
+ * This will be fixed in https://gitlab.com/gitlab-org/gitlab/merge_requests/19278
+ */
+
 export const transformRawStages = (stages = []) =>
   stages
-    .map(({ title, ...rest }) => ({
+    .map(({ id, title, custom = false, ...rest }) => ({
       ...convertObjectPropsToCamelCase(rest, { deep: true }),
-      slug: convertToSnakeCase(title),
+      id,
       title,
+      slug: custom ? id : convertToSnakeCase(title),
+      custom,
+      name: title, // editing a stage takes 'name' as a parameter, but the api returns title
     }))
     .sort((a, b) => a.id > b.id);
 

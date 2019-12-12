@@ -14,10 +14,11 @@ const removeError = () => {
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 export const setSelectedGroup = ({ commit }, group) => commit(types.SET_SELECTED_GROUP, group);
+
 export const setSelectedProjects = ({ commit }, projectIds) =>
   commit(types.SET_SELECTED_PROJECTS, projectIds);
-export const setSelectedStageId = ({ commit }, stageId) =>
-  commit(types.SET_SELECTED_STAGE_ID, stageId);
+
+export const setSelectedStage = ({ commit }, stage) => commit(types.SET_SELECTED_STAGE, stage);
 
 export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDate, endDate }) => {
   commit(types.SET_DATE_RANGE, { startDate, endDate });
@@ -38,11 +39,11 @@ export const receiveStageDataError = ({ commit }) => {
 
 export const fetchStageData = ({ state, dispatch, getters }, slug) => {
   const { cycleAnalyticsRequestParams = {} } = getters;
-  dispatch('requestStageData');
-
   const {
     selectedGroup: { fullPath },
   } = state;
+
+  dispatch('requestStageData');
 
   return Api.cycleAnalyticsStageEvents(
     fullPath,
@@ -83,6 +84,14 @@ export const fetchCycleAnalyticsData = ({ dispatch }) => {
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
 
+export const hideCustomStageForm = ({ commit }) => commit(types.HIDE_CUSTOM_STAGE_FORM);
+export const showCustomStageForm = ({ commit }) => commit(types.SHOW_CUSTOM_STAGE_FORM);
+
+export const editCustomStage = ({ commit, dispatch }, selectedStage = {}) => {
+  commit(types.EDIT_CUSTOM_STAGE);
+  dispatch('setSelectedStage', selectedStage);
+};
+
 export const requestSummaryData = ({ commit }) => commit(types.REQUEST_SUMMARY_DATA);
 
 export const receiveSummaryDataError = ({ commit }, error) => {
@@ -112,9 +121,6 @@ export const fetchSummaryData = ({ state, dispatch, getters }) => {
 export const requestGroupStagesAndEvents = ({ commit }) =>
   commit(types.REQUEST_GROUP_STAGES_AND_EVENTS);
 
-export const hideCustomStageForm = ({ commit }) => commit(types.HIDE_CUSTOM_STAGE_FORM);
-export const showCustomStageForm = ({ commit }) => commit(types.SHOW_CUSTOM_STAGE_FORM);
-
 export const receiveGroupLabelsSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_GROUP_LABELS_SUCCESS, data);
 
@@ -136,8 +142,8 @@ export const fetchGroupLabels = ({ dispatch, state }) => {
     .catch(error => dispatch('receiveGroupLabelsError', error));
 };
 
-export const receiveGroupStagesAndEventsError = ({ commit }) => {
-  commit(types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR);
+export const receiveGroupStagesAndEventsError = ({ commit }, error) => {
+  commit(types.RECEIVE_GROUP_STAGES_AND_EVENTS_ERROR, error);
   createFlash(__('There was an error fetching cycle analytics stages.'));
 };
 
@@ -145,8 +151,9 @@ export const receiveGroupStagesAndEventsSuccess = ({ state, commit, dispatch }, 
   commit(types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS, data);
   const { stages = [] } = state;
   if (stages && stages.length) {
-    const { slug } = stages[0];
-    dispatch('fetchStageData', slug);
+    const [firstStage] = stages;
+    dispatch('setSelectedStage', firstStage);
+    dispatch('fetchStageData', firstStage.slug);
   } else {
     createFlash(__('There was an error while fetching cycle analytics data.'));
   }
@@ -197,7 +204,6 @@ export const createCustomStage = ({ dispatch, state }, data) => {
   const {
     selectedGroup: { fullPath },
   } = state;
-
   dispatch('requestCreateCustomStage');
 
   return Api.cycleAnalyticsCreateStage(fullPath, data)
@@ -245,11 +251,12 @@ export const fetchTasksByTypeData = ({ dispatch, state, getters }) => {
 };
 
 export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
-export const receiveUpdateStageSuccess = ({ commit, dispatch }) => {
+export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => {
   commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
-  createFlash(__(`Stage data updated`), 'notice');
+  createFlash(__('Stage data updated'), 'notice');
 
-  dispatch('fetchCycleAnalyticsData');
+  dispatch('fetchGroupStagesAndEvents');
+  dispatch('setSelectedStage', updatedData);
 };
 
 export const receiveUpdateStageError = ({ commit }) => {

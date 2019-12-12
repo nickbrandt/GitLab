@@ -41,7 +41,11 @@ export default {
       type: Boolean,
       required: true,
     },
-    isAddingCustomStage: {
+    isCreatingCustomStage: {
+      type: Boolean,
+      required: true,
+    },
+    isEditingCustomStage: {
       type: Boolean,
       required: true,
     },
@@ -82,6 +86,9 @@ export default {
       const { currentStageEvents = [], isLoading, isEmptyStage } = this;
       return currentStageEvents.length && !isLoading && !isEmptyStage;
     },
+    customStageFormActive() {
+      return this.isCreatingCustomStage;
+    },
     stageHeaders() {
       return [
         {
@@ -100,26 +107,21 @@ export default {
           title: this.stageName,
           description: __('The collection of events added to the data gathered for that stage.'),
           classes: 'event-header pl-3',
-          displayHeader: !this.isAddingCustomStage,
+          displayHeader: !this.customStageFormActive,
         },
         {
           title: __('Total Time'),
           description: __('The time taken by each data entry gathered by that stage.'),
           classes: 'total-time-header pr-5 text-right',
-          displayHeader: !this.isAddingCustomStage,
+          displayHeader: !this.customStageFormActive,
         },
       ];
     },
-  },
-  methods: {
-    // TODO: DRY These up
-    hideStage(stageId) {
-      this.$emit(STAGE_ACTIONS.HIDE, { id: stageId, hidden: true });
-    },
-    removeStage(stageId) {
-      this.$emit(STAGE_ACTIONS.REMOVE, stageId);
+    customStageInitialData() {
+      return this.isEditingCustomStage ? this.currentStage : {};
     },
   },
+  STAGE_ACTIONS,
 };
 </script>
 <template>
@@ -147,16 +149,17 @@ export default {
               :key="`ca-stage-title-${stage.title}`"
               :title="stage.title"
               :value="stage.value"
-              :is-active="!isAddingCustomStage && stage.id === currentStage.id"
+              :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
               :can-edit="canEditStages"
               :is-default-stage="!stage.custom"
-              @select="$emit('selectStage', stage)"
-              @remove="removeStage(stage.id)"
-              @hide="hideStage(stage.id)"
+              @remove="$emit($options.STAGE_ACTIONS.REMOVE, stage.id)"
+              @hide="$emit($options.STAGE_ACTIONS.HIDE, { id: stage.id, hidden: true })"
+              @select="$emit($options.STAGE_ACTIONS.SELECT, stage)"
+              @edit="$emit($options.STAGE_ACTIONS.EDIT, stage)"
             />
             <add-stage-button
               v-if="canEditStages"
-              :active="isAddingCustomStage"
+              :active="customStageFormActive"
               @showform="$emit('showAddStageForm')"
             />
           </ul>
@@ -164,11 +167,15 @@ export default {
         <div class="section stage-events">
           <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
           <custom-stage-form
-            v-else-if="isAddingCustomStage"
+            v-else-if="isCreatingCustomStage || isEditingCustomStage"
             :events="customStageFormEvents"
             :labels="labels"
             :is-saving-custom-stage="isSavingCustomStage"
+            :initial-fields="customStageInitialData"
+            :is-editing-custom-stage="isEditingCustomStage"
             @submit="$emit('submit', $event)"
+            @createStage="$emit($options.STAGE_ACTIONS.CREATE, $event)"
+            @updateStage="$emit($options.STAGE_ACTIONS.UPDATE, $event)"
           />
           <template v-else>
             <stage-event-list
