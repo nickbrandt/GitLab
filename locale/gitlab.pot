@@ -53,10 +53,10 @@ msgstr ""
 msgid " or <!merge request id>"
 msgstr ""
 
-msgid " or <#epic id>"
+msgid " or <#issue id>"
 msgstr ""
 
-msgid " or <#issue id>"
+msgid " or <&epic id>"
 msgstr ""
 
 msgid " or references (e.g. path/to/project!merge_request_id)"
