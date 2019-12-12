@@ -6,4 +6,5 @@ export default () => ({
   milestoneTitle: null,
   startDate: null,
   endDate: null,
+  minDate: null,
 });
