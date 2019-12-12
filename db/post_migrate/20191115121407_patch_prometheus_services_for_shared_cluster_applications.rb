@@ -5,27 +5,84 @@
 
 class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migration[5.2]
   include Gitlab::Database::MigrationHelpers
+  include Gitlab::Utils::StrongMemoize
 
   DOWNTIME = false
   MIGRATION = 'ActivatePrometheusServicesForSharedClusterApplications'.freeze
-  BATCH_SIZE = 10_000
+  BATCH_SIZE = 1_000
+  DELAY = 2.minutes
 
   disable_ddl_transaction!
 
-  class Project < ActiveRecord::Base
-    self.table_name = 'projects'
+  module Migratable
+    module Applications
+      class Prometheus < ActiveRecord::Base
+        self.table_name = 'clusters_applications_prometheus'
+        enum status: {
+          installed: 3,
+          updated: 5
+        }
+      end
+    end
 
-    include ::EachBatch
+    class Project < ActiveRecord::Base
+      self.table_name = 'projects'
+      include ::EachBatch
+
+      def self.with_application_on_group_clusters
+        joins("INNER JOIN namespaces ON namespaces.id = projects.namespace_id")
+          .joins("INNER JOIN cluster_groups ON cluster_groups.group_id = namespaces.id")
+          .joins("INNER JOIN clusters ON clusters.id = cluster_groups.cluster_id AND clusters.cluster_type = #{Cluster.cluster_types['group_type']}")
+          .joins("INNER JOIN clusters_applications_prometheus ON clusters_applications_prometheus.cluster_id = clusters.id
+                      AND clusters_applications_prometheus.status IN (#{Applications::Prometheus.statuses[:installed]}, #{Applications::Prometheus.statuses[:updated]})")
+      end
+
+      def self.without_active_prometheus_services
+        joins("LEFT JOIN services ON services.project_id = projects.id AND services.type = 'PrometheusService'")
+          .where("(services.id IS NULL OR (services.active = FALSE AND services.properties = '{}'))")
+      end
+    end
+
+    class Cluster < ActiveRecord::Base
+      self.table_name = 'clusters'
+
+      enum cluster_type: {
+        instance_type: 1,
+        group_type: 2,
+        project_type: 3
+      }
+
+      def self.has_prometheus_application?
+        joins("INNER JOIN clusters_applications_prometheus ON clusters_applications_prometheus.cluster_id = clusters.id
+                   AND clusters_applications_prometheus.status IN (#{Applications::Prometheus.statuses[:installed]}, #{Applications::Prometheus.statuses[:updated]})").exists?
+      end
+    end
   end
 
   def up
-    queue_background_migration_jobs_by_range_at_intervals(Project.where(pending_delete: false),
-                                                          MIGRATION,
-                                                          2.minutes,
-                                                          batch_size: BATCH_SIZE)
+    scope.group('projects.id').each_batch(of: migrate_instance_cluster? ? BATCH_SIZE * 5 : BATCH_SIZE) do |batch, index|
+      range = batch.pluck('projects.id')
+      delay = index * DELAY
+      BackgroundMigrationWorker.perform_in(delay.seconds, MIGRATION, range)
+    end
   end
 
   def down
     # no-op
+  end
+
+  def scope
+    scope = Migratable::Project
+              .without_active_prometheus_services
+
+    return scope if migrate_instance_cluster?
+
+    scope.with_application_on_group_clusters
+  end
+
+  def migrate_instance_cluster?
+    strong_memoize(:migrate_instance_cluster) do
+      Migratable::Cluster.instance_type.has_prometheus_application?
+    end
   end
 end
