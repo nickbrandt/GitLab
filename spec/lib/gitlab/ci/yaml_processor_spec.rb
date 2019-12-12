@@ -2236,43 +2236,67 @@ module Gitlab
         end
       end
 
-      describe '#validation_errors' do
-        subject { Gitlab::Ci::YamlProcessor.validation_errors(content) }
+      describe '.new_with_validation_errors' do
+        subject { Gitlab::Ci::YamlProcessor.new_with_validation_errors(content) }
 
         context 'when the YAML could not be parsed' do
           let(:content) { YAML.dump('invalid: yaml: test') }
 
-          it { is_expected.to eq(['Invalid configuration format']) }
+          it 'returns errors and empty configuration' do
+            expect(subject.valid?).to eq(false)
+            expect(subject.errors).to eq(['Invalid configuration format'])
+            expect(subject.content).to be_blank
+          end
         end
 
         context 'when the tags parameter is invalid' do
           let(:content) { YAML.dump({ rspec: { script: 'test', tags: 'mysql' } }) }
 
-          it { is_expected.to eq(['jobs:rspec:tags config should be an array of strings']) }
+          it 'returns errors and empty configuration' do
+            expect(subject.valid?).to eq(false)
+            expect(subject.errors).to eq(['jobs:rspec:tags config should be an array of strings'])
+            expect(subject.content).to be_blank
+          end
         end
 
         context 'when the configuration contains multiple keyword-syntax errors' do
           let(:content) { YAML.dump({ rspec: { script: 'test', bad_tags: 'mysql', rules: { wrong: 'format' } } }) }
 
-          it { is_expected.to eq(['jobs:rspec config contains unknown keys: bad_tags', 'jobs:rspec rules should be an array of hashes']) }
+          it 'returns errors and empty configuration' do
+            expect(subject.valid?).to eq(false)
+            expect(subject.errors).to eq(['jobs:rspec config contains unknown keys: bad_tags', 'jobs:rspec rules should be an array of hashes'])
+            expect(subject.content).to be_blank
+          end
         end
 
         context 'when YAML content is empty' do
           let(:content) { '' }
 
-          it { is_expected.to eq(['Please provide content of .gitlab-ci.yml']) }
+          it 'returns errors and empty configuration' do
+            expect(subject.valid?).to eq(false)
+            expect(subject.errors).to eq(['Please provide content of .gitlab-ci.yml'])
+            expect(subject.content).to be_blank
+          end
         end
 
         context 'when the YAML contains an unknown alias' do
           let(:content) { 'steps: *bad_alias' }
 
-          it { is_expected.to eq(['Unknown alias: bad_alias']) }
+          it 'returns errors and empty configuration' do
+            expect(subject.valid?).to eq(false)
+            expect(subject.errors).to eq(['Unknown alias: bad_alias'])
+            expect(subject.content).to be_blank
+          end
         end
 
         context 'when the YAML is valid' do
           let(:content) { File.read(Rails.root.join('spec/support/gitlab_stubs/gitlab_ci.yml')) }
 
-          it { is_expected.to be_empty }
+          it 'returns errors and empty configuration' do
+            expect(subject.valid?).to eq(true)
+            expect(subject.errors).to be_empty
+            expect(subject.content).to be_present
+          end
         end
       end
     end

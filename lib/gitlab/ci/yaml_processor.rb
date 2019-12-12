@@ -9,6 +9,12 @@ module Gitlab
 
       attr_reader :stages, :jobs
 
+      ResultWithErrors = Struct.new(:content, :errors) do
+        def valid?
+          errors.empty?
+        end
+      end
+
       def initialize(config, opts = {})
         @ci_config = Gitlab::Ci::Config.new(config, **opts)
         @config = @ci_config.to_hash
@@ -20,6 +26,18 @@ module Gitlab
         initial_parsing
       rescue Gitlab::Ci::Config::ConfigError => e
         raise ValidationError, e.message
+      end
+
+      def self.new_with_validation_errors(content, opts = {})
+        return ResultWithErrors.new('', ['Please provide content of .gitlab-ci.yml']) if content.blank?
+
+        config = Gitlab::Ci::Config.new(content, **opts)
+        return ResultWithErrors.new("", config.errors) unless config.valid?
+
+        config = Gitlab::Ci::YamlProcessor.new(content, opts)
+        ResultWithErrors.new(config, [])
+      rescue ValidationError, Gitlab::Ci::Config::ConfigError => e
+        ResultWithErrors.new('', [e.message])
       end
 
       def builds
@@ -100,18 +118,6 @@ module Gitlab
         rescue ValidationError => e
           e.message
         end
-      end
-
-      def self.validation_errors(content, opts = {})
-        return ['Please provide content of .gitlab-ci.yml'] if content.blank?
-
-        config = Gitlab::Ci::Config.new(content, **opts)
-        return config.errors unless config.valid?
-
-        Gitlab::Ci::YamlProcessor.new(content, opts)
-        []
-      rescue ValidationError, Gitlab::Ci::Config::ConfigError => e
-        [e.message]
       end
 
       private
