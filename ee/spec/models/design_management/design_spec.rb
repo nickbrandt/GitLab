@@ -166,6 +166,57 @@ describe DesignManagement::Design do
     end
   end
 
+  describe '#visible_in?' do
+    set(:issue) { create(:issue) }
+
+    # It is expensive to re-create complex histories, so we do it once, and then
+    # assert that we can establish visibility at any given version.
+    it 'tells us when a design is visible' do
+      expected = []
+
+      first_design = create(:design, :with_versions, issue: issue, versions_count: 1)
+      prior_to_creation = first_design.versions.first
+      expected << [prior_to_creation, :not_created_yet, false]
+
+      v = modify_designs(first_design)
+      expected << [v, :not_created_yet, false]
+
+      design = create(:design, :with_versions, issue: issue, versions_count: 1)
+      created_in = design.versions.first
+      expected << [created_in, :created, true]
+
+      # The future state should not affect the result for any state, so we
+      # ensure that most states have a long future as well as a rich past
+      2.times do
+        v = modify_designs(first_design)
+        expected << [v, :unaffected_visible, true]
+
+        v = modify_designs(design)
+        expected << [v, :modified, true]
+
+        v = modify_designs(first_design)
+        expected << [v, :unaffected_visible, true]
+
+        v = delete_designs(design)
+        expected << [v, :deleted, false]
+
+        v = modify_designs(first_design)
+        expected << [v, :unaffected_nv, false]
+
+        v = restore_designs(design)
+        expected << [v, :restored, true]
+      end
+
+      delete_designs(design) # ensure visibility is not corelated with current state
+
+      got = expected.map do |(v, sym, _)|
+        [v, sym, design.visible_in?(v)]
+      end
+
+      expect(got).to eq(expected)
+    end
+  end
+
   describe '#to_ability_name' do
     it { expect(described_class.new.to_ability_name).to eq('design') }
   end

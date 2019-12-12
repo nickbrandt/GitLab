@@ -73,6 +73,19 @@ module DesignManagement
       most_recent_action&.deletion?
     end
 
+    # A design is visible_in? a version if:
+    #   * it was created before that version
+    #   * the most recent action before the version was not a deletion
+    def visible_in?(version)
+      map = strong_memoize(:visible_in) do
+        Hash.new do |h, k|
+          h[k] = self.class.visible_at_version(k).where(id: id).exists?
+        end
+      end
+
+      map[version]
+    end
+
     def most_recent_action
       strong_memoize(:most_recent_action) { actions.ordered.last }
     end
@@ -112,7 +125,7 @@ module DesignManagement
 
     def clear_version_cache
       [versions, actions].each(&:reset)
-      [:new_design, :diff_refs, :head_sha, :most_recent_action].each do |key|
+      %i[new_design diff_refs head_sha visible_in most_recent_action].each do |key|
         clear_memoization(key)
       end
     end
