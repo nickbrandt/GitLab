@@ -16,15 +16,13 @@ module Gitlab
             fallback_diff_refs: merge_request_diff.fallback_diff_refs)
         end
 
-        def diff_files(decorate_diff_files: true)
-          files = super()
+        def diff_files
+          strong_memoize(:diff_files) do
+            diff_files = super
 
-          return files unless decorate_diff_files
+            diff_files.each { |diff_file| cache.decorate(diff_file) }
 
-          strong_memoize(:decorated_diff_files) do
-            files.each { |diff_file| cache.decorate(diff_file) }
-
-            files
+            diff_files
           end
         end
 

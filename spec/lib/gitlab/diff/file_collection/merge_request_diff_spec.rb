@@ -9,14 +9,6 @@ describe Gitlab::Diff::FileCollection::MergeRequestDiff do
   let(:diff_files) { subject.diff_files }
 
   describe '#diff_files' do
-    context 'when decorate_diff_files is false' do
-      it 'does not attempt to decorate diff files' do
-        expect_any_instance_of(Gitlab::Diff::HighlightCache).not_to receive(:decorate)
-
-        subject.diff_files(decorate_diff_files: false)
-      end
-    end
-
     it 'does not highlight binary files' do
       allow_next_instance_of(Gitlab::Diff::File) do |instance|
         allow(instance).to receive(:text?).and_return(false)

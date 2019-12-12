@@ -98,7 +98,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
   describe '#write_if_empty' do
     it_behaves_like 'caches missing entries' do
-      let(:paths) { merge_request.diffs.diff_files.select(&:text?).map(&:file_path) }
+      let(:paths) { merge_request.diffs.raw_diff_files.select(&:text?).map(&:file_path) }
     end
 
     context 'different diff_collections for the same diffable' do
@@ -125,7 +125,7 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
       it_behaves_like 'caches missing entries' do
         let(:cache) { described_class.new(merge_request_diff_batch) }
-        let(:paths) { merge_request_diff_batch.diff_files.select(&:text?).map(&:file_path) }
+        let(:paths) { merge_request_diff_batch.raw_diff_files.select(&:text?).map(&:file_path) }
       end
     end
   end

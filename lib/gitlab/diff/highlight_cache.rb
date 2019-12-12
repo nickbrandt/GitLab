@@ -145,7 +145,10 @@ module Gitlab
       end
 
       def diff_files
-        @diff_collection.diff_files(decorate_diff_files: false)
+        # We access the raw, undecorated diff_files here, as decorating refers
+        #   back into this class and leads to a circular reference.
+        #
+        @diff_collection.raw_diff_files
       end
     end
   end
