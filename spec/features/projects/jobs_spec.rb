@@ -809,7 +809,8 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
 
         it 'renders job log' do
           wait_for_all_requests
-          expect(page).to have_selector('.js-build-trace')
+          # todo
+          expect(page).to have_selector('.job-log')
         end
       end
 
