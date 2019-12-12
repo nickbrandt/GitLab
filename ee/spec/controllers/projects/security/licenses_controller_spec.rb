@@ -15,12 +15,12 @@ describe Projects::Security::LicensesController do
 
     context 'with authorized user' do
       before do
-        project.add_guest(user)
+        project.add_reporter(user)
       end
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(licenses_list: true, license_management: true)
+          stub_licensed_features(license_management: true)
         end
 
         it 'counts usage of the feature' do
@@ -139,7 +139,7 @@ describe Projects::Security::LicensesController do
 
     context 'with unauthorized user' do
       before do
-        stub_licensed_features(licenses_list: true, license_management: true)
+        stub_licensed_features(license_management: true)
 
         get_licenses
       end
@@ -168,7 +168,7 @@ describe Projects::Security::LicensesController do
       let(:current_user) { create(:user) }
 
       before do
-        stub_licensed_features(licenses_list: true, license_management: true)
+        stub_licensed_features(license_management: true)
         sign_in(current_user)
       end
 
@@ -286,7 +286,7 @@ describe Projects::Security::LicensesController do
       let(:current_user) { create(:user) }
 
       before do
-        stub_licensed_features(licenses_list: true, license_management: true)
+        stub_licensed_features(license_management: true)
         sign_in(current_user)
       end
 

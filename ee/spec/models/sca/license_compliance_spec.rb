@@ -8,7 +8,7 @@ RSpec.describe SCA::LicenseCompliance do
   let(:project) { create(:project, :repository, :private) }
 
   before do
-    stub_licensed_features(licenses_list: true, license_management: true)
+    stub_licensed_features(license_management: true)
   end
 
   describe "#policies" do

@@ -27,9 +27,11 @@ describe ProjectPolicy do
     include_context 'ProjectPolicy context'
 
     let(:additional_guest_permissions) do
-      %i[read_issue_link read_software_license_policy]
+      %i[read_issue_link]
     end
-    let(:additional_reporter_permissions) { [:admin_issue_link] }
+    let(:additional_reporter_permissions) do
+      %i[read_software_license_policy admin_issue_link]
+    end
     let(:additional_developer_permissions) do
       %i[
         admin_vulnerability_feedback read_project_security_dashboard read_feature_flag
@@ -717,7 +719,7 @@ describe ProjectPolicy do
     end
   end
 
-  describe 'read_license_management' do
+  describe 'read_software_license_policy' do
     context 'without license management feature available' do
       before do
         stub_licensed_features(license_management: false)
@@ -811,78 +813,55 @@ describe ProjectPolicy do
     end
   end
 
-  describe 'read_licenses_list' do
-    context 'when licenses list feature available' do
-      context 'when license management feature available' do
-        before do
-          stub_feature_flags(licenses_list: true)
-          stub_licensed_features(license_management: true)
-        end
-
-        context 'with public project' do
-          let(:current_user) { create(:user) }
-
-          context 'with public access to repository' do
-            it { is_expected.to be_allowed(:read_licenses_list) }
-          end
-        end
-
-        context 'with private project' do
-          let(:project) { create(:project, :private, namespace: owner.namespace) }
-
-          where(role: %w[admin owner maintainer developer reporter guest])
-
-          with_them do
-            let(:current_user) { public_send(role) }
-
-            it { is_expected.to be_allowed(:read_licenses_list) }
-          end
-
-          context 'with not member' do
-            let(:current_user) { create(:user) }
-
-            it { is_expected.to be_disallowed(:read_licenses_list) }
-          end
-
-          context 'with anonymous' do
-            let(:current_user) { nil }
-
-            it { is_expected.to be_disallowed(:read_licenses_list) }
-          end
-        end
-      end
-
-      context "when the licenses_list feature is enabled for a specific project" do
+  describe 'read_licenses' do
+    context 'when license management feature available' do
+      context 'with public project' do
         let(:current_user) { create(:user) }
 
-        before do
-          stub_feature_flags(licenses_list: { enabled: true, thing: project })
-          stub_licensed_features(license_management: true)
+        context 'with public access to repository' do
+          it { is_expected.to be_allowed(:read_licenses) }
         end
-
-        it { is_expected.to be_allowed(:read_licenses_list) }
       end
 
-      context 'when license management feature in not available' do
-        let(:current_user) { admin }
+      context 'with private project' do
+        let(:project) { create(:project, :private, namespace: owner.namespace) }
 
-        before do
-          stub_feature_flags(licenses_list: true)
-          stub_licensed_features(license_management: false)
+        where(role: %w[admin owner maintainer developer reporter])
+
+        with_them do
+          let(:current_user) { public_send(role) }
+
+          it { is_expected.to be_allowed(:read_licenses) }
         end
 
-        it { is_expected.to be_disallowed(:read_licenses_list) }
+        context 'with guest' do
+          let(:current_user) { guest }
+
+          it { is_expected.to be_disallowed(:read_licenses) }
+        end
+
+        context 'with not member' do
+          let(:current_user) { create(:user) }
+
+          it { is_expected.to be_disallowed(:read_licenses) }
+        end
+
+        context 'with anonymous' do
+          let(:current_user) { nil }
+
+          it { is_expected.to be_disallowed(:read_licenses) }
+        end
       end
     end
 
-    context 'when licenses list feature not available' do
-      let(:current_user) { admin }
-
+    context 'when license management feature in not available' do
       before do
-        stub_feature_flags(licenses_list: false)
+        stub_licensed_features(license_management: false)
       end
 
-      it { is_expected.to be_disallowed(:read_licenses_list) }
+      let(:current_user) { admin }
+
+      it { is_expected.to be_disallowed(:read_licenses) }
     end
   end
 

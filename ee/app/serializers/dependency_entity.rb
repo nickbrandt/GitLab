@@ -27,6 +27,6 @@ class DependencyEntity < Grape::Entity
   end
 
   def can_read_licenses?
-    can?(request.user, :read_software_license_policy, request.project)
+    can?(request.user, :read_licenses, request.project)
   end
 end
