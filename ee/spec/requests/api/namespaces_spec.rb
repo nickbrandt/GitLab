@@ -220,6 +220,13 @@ describe API::Namespaces do
         expect(group1.gitlab_subscription).to be_present
       end
 
+      it 'sets the trial_starts_on to the start_date' do
+        do_post(admin, params.merge(trial: true))
+
+        expect(group1.gitlab_subscription.trial_starts_on).to be_present
+        expect(group1.gitlab_subscription.trial_starts_on.strftime('%d/%m/%Y')).to eq(params[:start_date])
+      end
+
       it 'creates a subscription using full_path when the namespace path contains dots' do
         post api("/namespaces/#{group1.full_path}/gitlab_subscription", admin), params: params
 
