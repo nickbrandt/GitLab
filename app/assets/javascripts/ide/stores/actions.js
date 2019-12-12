@@ -134,12 +134,14 @@ export const scrollToTab = () => {
   });
 };
 
-export const stageAllChanges = ({ state, commit, dispatch }) => {
+export const stageAllChanges = ({ state, commit, dispatch, getters }) => {
   const openFile = state.openFiles[0];
 
   commit(types.SET_LAST_COMMIT_MSG, '');
 
-  state.changedFiles.forEach(file => commit(types.STAGE_CHANGE, file.path));
+  state.changedFiles.forEach(file =>
+    commit(types.STAGE_CHANGE, { path: file.path, diffInfo: getters.getDiffInfo(file.path) }),
+  );
 
   dispatch('openPendingTab', {
     file: state.stagedFiles.find(f => f.path === openFile.path),
@@ -147,10 +149,12 @@ export const stageAllChanges = ({ state, commit, dispatch }) => {
   });
 };
 
-export const unstageAllChanges = ({ state, commit, dispatch }) => {
+export const unstageAllChanges = ({ state, commit, dispatch, getters }) => {
   const openFile = state.openFiles[0];
 
-  state.stagedFiles.forEach(file => commit(types.UNSTAGE_CHANGE, file.path));
+  state.stagedFiles.forEach(file =>
+    commit(types.UNSTAGE_CHANGE, { path: file.path, diffInfo: getters.getDiffInfo(file.path) }),
+  );
 
   dispatch('openPendingTab', {
     file: state.changedFiles.find(f => f.path === openFile.path),

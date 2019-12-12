@@ -214,11 +214,11 @@ export const discardFileChanges = ({ dispatch, state, commit, getters }, path) =
   eventHub.$emit(`editor.update.model.dispose.unstaged-${file.key}`, file.content);
 };
 
-export const stageChange = ({ commit, state, dispatch }, path) => {
+export const stageChange = ({ commit, state, dispatch, getters }, path) => {
   const stagedFile = state.stagedFiles.find(f => f.path === path);
   const openFile = state.openFiles.find(f => f.path === path);
 
-  commit(types.STAGE_CHANGE, path);
+  commit(types.STAGE_CHANGE, { path, diffInfo: getters.getDiffInfo(path) });
   commit(types.SET_LAST_COMMIT_MSG, '');
 
   if (stagedFile) {
@@ -235,10 +235,10 @@ export const stageChange = ({ commit, state, dispatch }, path) => {
   }
 };
 
-export const unstageChange = ({ commit, dispatch, state }, path) => {
+export const unstageChange = ({ commit, dispatch, state, getters }, path) => {
   const openFile = state.openFiles.find(f => f.path === path);
 
-  commit(types.UNSTAGE_CHANGE, path);
+  commit(types.UNSTAGE_CHANGE, { path, diffInfo: getters.getDiffInfo(path) });
 
   if (openFile && openFile.active) {
     const file = state.changedFiles.find(f => f.path === path);
