@@ -77,14 +77,31 @@ describe('Dashboard', () => {
   }
 
   describe('add custom metrics', () => {
+    const defaultProps = {
+      customMetricsPath: '/endpoint',
+      hasMetrics: true,
+      documentationPath: '/path/to/docs',
+      settingsPath: '/path/to/settings',
+      clustersPath: '/path/to/clusters',
+      projectPath: '/path/to/project',
+      metricsEndpoint: mockApiEndpoint,
+      tagsPath: '/path/to/tags',
+      emptyGettingStartedSvgPath: '/path/to/getting-started.svg',
+      emptyLoadingSvgPath: '/path/to/loading.svg',
+      emptyNoDataSvgPath: '/path/to/no-data.svg',
+      emptyNoDataSmallSvgPath: '/path/to/no-data-small.svg',
+      emptyUnableToConnectSvgPath: '/path/to/unable-to-connect.svg',
+      environmentsEndpoint: '/root/hello-prometheus/environments/35',
+      currentEnvironmentName: 'production',
+      prometheusAlertsAvailable: true,
+      alertsEndpoint: '/endpoint',
+    };
+
     describe('when not available', () => {
       beforeEach(() => {
         createComponent({
           customMetricsAvailable: false,
-          customMetricsPath: '/endpoint',
-          hasMetrics: true,
-          prometheusAlertsAvailable: true,
-          alertsEndpoint: '/endpoint',
+          ...defaultProps,
         });
       });
 
@@ -101,10 +118,7 @@ describe('Dashboard', () => {
 
         createComponent({
           customMetricsAvailable: true,
-          customMetricsPath: '/endpoint',
-          hasMetrics: true,
-          prometheusAlertsAvailable: true,
-          alertsEndpoint: '/endpoint',
+          ...defaultProps,
         });
 
         setupComponentStore(wrapper);

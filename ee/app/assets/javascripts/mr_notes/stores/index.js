@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import batchCommentsModule from 'ee/batch_comments/stores/modules/batch_comments';
 import notesModule from '~/notes/stores/modules';
 import diffsModule from '~/diffs/store/modules';
 import mrPageModule from '~/mr_notes/stores/modules';
-import batchCommentsModule from 'ee/batch_comments/stores/modules/batch_comments';
 
 Vue.use(Vuex);
 

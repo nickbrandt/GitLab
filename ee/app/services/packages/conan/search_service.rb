@@ -13,8 +13,6 @@ module Packages
       end
 
       def execute
-        return ServiceResponse.error(message: 'not found', http_status: :not_found) unless feature_available?
-
         ServiceResponse.success(payload: { results: search_results })
       end
 
@@ -36,10 +34,6 @@ module Packages
         return "#{sanitized_query}%" if params[:query].end_with?(WILDCARD)
 
         sanitized_query
-      end
-
-      def feature_available?
-        Feature.enabled?(:conan_package_registry)
       end
 
       def search_packages(query)

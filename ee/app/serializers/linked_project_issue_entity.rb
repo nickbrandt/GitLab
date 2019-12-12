@@ -11,6 +11,10 @@ class LinkedProjectIssueEntity < LinkedIssueEntity
     end
   end
 
+  expose :link_type, if: -> (issue, _) { Feature.enabled?(:issue_link_types, issue.project) } do |issue|
+    issue.issue_link_type
+  end
+
   private
 
   def can_admin_issue_link_on_current_project?

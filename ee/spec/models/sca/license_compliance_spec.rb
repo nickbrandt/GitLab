@@ -8,7 +8,7 @@ RSpec.describe SCA::LicenseCompliance do
   let(:project) { create(:project, :repository, :private) }
 
   before do
-    stub_licensed_features(licenses_list: true, license_management: true)
+    stub_licensed_features(license_management: true)
   end
 
   describe "#policies" do
@@ -24,7 +24,7 @@ RSpec.describe SCA::LicenseCompliance do
           expect(subject.policies[0].id).to eq(mit_policy.id)
           expect(subject.policies[0].name).to eq(mit.name)
           expect(subject.policies[0].url).to be_nil
-          expect(subject.policies[0].classification).to eq("blacklisted")
+          expect(subject.policies[0].classification).to eq("denied")
           expect(subject.policies[0].spdx_identifier).to eq("MIT")
         end
       end
@@ -102,7 +102,7 @@ RSpec.describe SCA::LicenseCompliance do
           expect(subject.policies[1].id).to eq(mit_policy.id)
           expect(subject.policies[1].name).to eq(mit.name)
           expect(subject.policies[1].url).to eq("http://spdx.org/licenses/MIT.json")
-          expect(subject.policies[1].classification).to eq("blacklisted")
+          expect(subject.policies[1].classification).to eq("denied")
           expect(subject.policies[1].spdx_identifier).to eq("MIT")
 
           expect(subject.policies[2].id).to eq(other_license_policy.id)
@@ -145,7 +145,7 @@ RSpec.describe SCA::LicenseCompliance do
           expect(subject.policies[1].id).to eq(mit_policy.id)
           expect(subject.policies[1].name).to eq(mit.name)
           expect(subject.policies[1].url).to eq("http://opensource.org/licenses/mit-license")
-          expect(subject.policies[1].classification).to eq("blacklisted")
+          expect(subject.policies[1].classification).to eq("denied")
           expect(subject.policies[1].spdx_identifier).to eq("MIT")
 
           expect(subject.policies[2].id).to eq(other_license_policy.id)
@@ -183,6 +183,13 @@ RSpec.describe SCA::LicenseCompliance do
       let!(:pipeline) { create(:ci_pipeline, :success, project: project, builds: [regular_build]) }
 
       it { expect(subject.latest_build_for_default_branch).to be_nil }
+    end
+
+    context "when latest pipeline doesn't contain license job" do
+      let!(:pipeline1) { create(:ci_pipeline, :success, project: project, builds: [license_scan_build]) }
+      let!(:pipeline2) { create(:ci_pipeline, :success, project: project, builds: [regular_build]) }
+
+      it { expect(subject.latest_build_for_default_branch).to eq(license_scan_build) }
     end
   end
 end

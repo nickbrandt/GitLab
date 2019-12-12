@@ -545,8 +545,8 @@ describe Project do
     end
   end
 
-  describe '#beta_feature_available?' do
-    it_behaves_like 'an entity with beta feature support' do
+  describe '#alpha/beta_feature_available?' do
+    it_behaves_like 'an entity with alpha/beta feature support' do
       let(:entity) { create(:project) }
     end
   end
@@ -1903,20 +1903,19 @@ describe Project do
   describe '#design_management_enabled?' do
     let(:project) { build(:project) }
 
-    where(:feature_enabled, :license_enabled, :lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
-      false | false | false | false | false | false
-      true  | false | false | false | false | false
-      true  | true  | false | false | false | false
-      true  | true  | true  | false | false | true
-      true  | true  | true  | false | true  | false
-      true  | true  | true  | true  | false | true
-      true  | true  | true  | true  | true  | true
+    where(:license_enabled, :lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
+      false | false | false | false | false
+      true  | false | false | false | false
+      true  | true  | false | false | true
+      true  | true  | false | true  | false
+      true  | true  | true  | false | true
+      true  | true  | true  | true  | true
     end
 
     with_them do
       before do
         stub_licensed_features(design_management: license_enabled)
-        stub_feature_flags(design_management_flag: feature_enabled, design_management_require_hashed_storage: hash_storage_required)
+        stub_feature_flags(design_management_require_hashed_storage: hash_storage_required)
         expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
         allow(project).to receive(:hashed_storage?).with(:repository).and_return(hashed_storage_enabled)
       end
@@ -2382,5 +2381,30 @@ describe Project do
 
   describe '#license_compliance' do
     it { expect(subject.license_compliance).to be_instance_of(::SCA::LicenseCompliance) }
+  end
+
+  describe '#expire_caches_before_rename' do
+    let(:project) { create(:project, :repository) }
+    let(:repo)    { double(:repo, exists?: true, before_delete: true) }
+    let(:wiki)    { double(:wiki, exists?: true, before_delete: true) }
+    let(:design)  { double(:design, exists?: true) }
+
+    it 'expires the caches of the design repository' do
+      allow(Repository).to receive(:new)
+        .with('foo', project)
+        .and_return(repo)
+
+      allow(Repository).to receive(:new)
+        .with('foo.wiki', project)
+        .and_return(wiki)
+
+      allow(Repository).to receive(:new)
+        .with('foo.design', project)
+        .and_return(design)
+
+      expect(design).to receive(:before_delete)
+
+      project.expire_caches_before_rename('foo')
+    end
   end
 end

@@ -1,7 +1,7 @@
+import Api from 'ee/api';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
-import Api from 'ee/api';
 import * as types from './mutation_types';
 
 // Fetch Designs

@@ -71,6 +71,7 @@ class MergeRequest < ApplicationRecord
 
   has_many :merge_request_assignees
   has_many :assignees, class_name: "User", through: :merge_request_assignees
+  has_many :user_mentions, class_name: "MergeRequestUserMention"
 
   has_many :deployment_merge_requests
 
@@ -1420,6 +1421,12 @@ class MergeRequest < ApplicationRecord
     return false if last_diff_sha != diff_head_sha
 
     true
+  end
+
+  def pipeline_coverage_delta
+    if base_pipeline&.coverage && head_pipeline&.coverage
+      '%.2f' % (head_pipeline.coverage.to_f - base_pipeline.coverage.to_f)
+    end
   end
 
   def base_pipeline

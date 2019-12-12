@@ -1,6 +1,6 @@
 <script>
-import { __, sprintf } from '~/locale';
 import { GlLink } from '@gitlab/ui';
+import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {

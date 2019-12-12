@@ -28,10 +28,10 @@ describe SoftwareLicense do
 
     context 'when a software license with a given name has NOT been created' do
       let(:license_name) { SecureRandom.uuid }
-      let(:result) { subject.create_policy_for!(project: project, name: license_name, classification: :blacklisted) }
+      let(:result) { subject.create_policy_for!(project: project, name: license_name, classification: :denied) }
 
       specify { expect(result).to be_persisted }
-      specify { expect(result).to be_blacklisted }
+      specify { expect(result).to be_denied }
       specify { expect(result.software_license).to be_persisted }
       specify { expect(result.software_license.name).to eql(license_name) }
     end

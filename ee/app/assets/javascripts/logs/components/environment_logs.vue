@@ -12,15 +12,11 @@ export default {
     LogControlButtons,
   },
   props: {
-    environmentId: {
-      type: String,
-      required: true,
-    },
     projectFullPath: {
       type: String,
       required: true,
     },
-    currentEnvironmentName: {
+    environmentName: {
       type: String,
       required: false,
       default: '',
@@ -56,14 +52,19 @@ export default {
   mounted() {
     this.setInitData({
       projectPath: this.projectFullPath,
-      environmentId: this.environmentId,
+      environmentName: this.environmentName,
       podName: this.currentPodName,
     });
 
     this.fetchEnvironments(this.environmentsPath);
   },
   methods: {
-    ...mapActions('environmentLogs', ['setInitData', 'showPodLogs', 'fetchEnvironments']),
+    ...mapActions('environmentLogs', [
+      'setInitData',
+      'showPodLogs',
+      'showEnvironment',
+      'fetchEnvironments',
+    ]),
   },
 };
 </script>
@@ -80,7 +81,7 @@ export default {
         >
           <gl-dropdown
             id="environments-dropdown"
-            :text="currentEnvironmentName"
+            :text="environments.current"
             :disabled="environments.isLoading"
             class="d-flex js-environments-dropdown"
             toggle-class="dropdown-menu-toggle"
@@ -88,7 +89,7 @@ export default {
             <gl-dropdown-item
               v-for="env in environments.options"
               :key="env.id"
-              :href="env.logs_path"
+              @click="showEnvironment(env.name)"
             >
               {{ env.name }}
             </gl-dropdown-item>

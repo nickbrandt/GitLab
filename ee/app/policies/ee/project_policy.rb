@@ -81,8 +81,8 @@ module EE
       end
 
       with_scope :subject
-      condition(:licenses_list_enabled) do
-        @subject.feature_available?(:licenses_list)
+      condition(:threat_monitoring_enabled) do
+        @subject.beta_feature_available?(:threat_monitoring)
       end
 
       with_scope :subject
@@ -93,6 +93,10 @@ module EE
       with_scope :subject
       condition(:design_management_disabled) do
         !@subject.design_management_enabled?
+      end
+
+      condition(:group_timelogs_available) do
+        @subject.feature_available?(:group_timelogs)
       end
 
       rule { admin }.enable :change_repository_storage
@@ -120,6 +124,8 @@ module EE
         prevent :admin_issue_link
       end
 
+      rule { ~group_timelogs_available }.prevent :read_group_timelogs
+
       rule { can?(:read_issue) }.policy do
         enable :read_issue_link
         enable :read_design
@@ -131,6 +137,7 @@ module EE
         enable :admin_issue_link
         enable :admin_epic_issue
         enable :read_package
+        enable :read_group_timelogs
       end
 
       rule { can?(:developer_access) }.policy do
@@ -166,13 +173,15 @@ module EE
         enable :admin_vulnerability
       end
 
-      rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
+      rule { threat_monitoring_enabled & (auditor | can?(:developer_access)) }.enable :read_threat_monitoring
 
-      rule { license_management_enabled & can?(:read_project) }.enable :read_software_license_policy
+      rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
 
       rule { dependency_scanning_enabled & can?(:download_code) }.enable :read_dependencies
 
-      rule { licenses_list_enabled & can?(:read_software_license_policy) }.enable :read_licenses_list
+      rule { license_management_enabled & can?(:download_code) }.enable :read_licenses
+
+      rule { can?(:read_licenses) }.enable :read_software_license_policy
 
       rule { repository_mirrors_enabled & ((mirror_available & can?(:admin_project)) | admin) }.enable :admin_mirror
 

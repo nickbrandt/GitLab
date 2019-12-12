@@ -1,11 +1,11 @@
 import _ from 'underscore';
-import { __ } from '~/locale';
 import {
   RULE_TYPE_REGULAR,
   RULE_TYPE_FALLBACK,
   RULE_TYPE_CODE_OWNER,
   RULE_TYPE_REPORT_APPROVER,
 } from 'ee/approvals/constants';
+import { __ } from '~/locale';
 
 function mapApprovalRule(rule, settings) {
   if (rule.rule_type === RULE_TYPE_FALLBACK) {

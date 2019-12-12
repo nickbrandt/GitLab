@@ -297,6 +297,7 @@ module EE
       ::Feature.enabled?(feature, self) ||
         (::Feature.enabled?(feature) && feature_available?(feature))
     end
+    alias_method :alpha_feature_available?, :beta_feature_available?
 
     def push_audit_events_enabled?
       ::Feature.enabled?(:repository_push_audit_event, self)
@@ -662,16 +663,24 @@ module EE
         # hashed storage requirement for existing design management projects.
         # See https://gitlab.com/gitlab-org/gitlab/issues/13428#note_238729038
         (hashed_storage?(:repository) || ::Feature.disabled?(:design_management_require_hashed_storage, self, default_enabled: true)) &&
-        # Check both feature availability on the license, as well as the feature
-        # flag, because we don't want to enable design_management by default on
-        # on prem installs yet.
-        # See https://gitlab.com/gitlab-org/gitlab/issues/13709
-        feature_available?(:design_management) &&
-        ::Feature.enabled?(:design_management_flag, self, default_enabled: true)
+        feature_available?(:design_management)
     end
 
     def design_repository
-      @design_repository ||= DesignManagement::Repository.new(self)
+      strong_memoize(:design_repository) do
+        DesignManagement::Repository.new(self)
+      end
+    end
+
+    override(:expire_caches_before_rename)
+    def expire_caches_before_rename(old_path)
+      super
+
+      design = ::Repository.new("#{old_path}#{EE::Gitlab::GlRepository::DESIGN.path_suffix}", self)
+
+      if design.exists?
+        design.before_delete
+      end
     end
 
     def alerts_service_available?

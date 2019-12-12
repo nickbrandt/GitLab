@@ -96,6 +96,7 @@ class License < ApplicationRecord
     scoped_labels
     service_desk
     smartcard_auth
+    group_timelogs
     type_of_work_analytics
     unprotection_restrictions
     ci_project_subscriptions
@@ -111,7 +112,6 @@ class License < ApplicationRecord
     group_ip_restriction
     incident_management
     insights
-    licenses_list
     license_management
     personal_access_token_expiration_policy
     pod_logs
@@ -120,6 +120,7 @@ class License < ApplicationRecord
     report_approver_rules
     sast
     security_dashboard
+    threat_monitoring
     tracing
     web_ide_terminal
   ]

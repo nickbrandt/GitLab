@@ -78,7 +78,7 @@ export default {
 </script>
 
 <template>
-  <div :class="{ 'node-action-active': node.nodeActionActive }" class="card geo-node-item">
+  <div :class="{ 'node-action-active': node.nodeActionActive }" class="card">
     <geo-node-header
       :node="node"
       :node-details="nodeDetails"
@@ -93,8 +93,8 @@ export default {
       :node-actions-allowed="nodeActionsAllowed"
       :geo-troubleshooting-help-path="geoTroubleshootingHelpPath"
     />
-    <div v-if="isNodeDetailsFailed" class="node-health-message-container">
-      <p class="node-health-message">
+    <div v-if="isNodeDetailsFailed">
+      <p class="p-3 mb-0 bg-danger-100 text-danger-500">
         {{ errorMessage
         }}<gl-link :href="geoTroubleshootingHelpPath">{{
           s__('Geo|Please refer to Geo Troubleshooting.')

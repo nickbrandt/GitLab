@@ -170,8 +170,8 @@ group :unicorn do
 end
 
 group :puma do
-  gem 'puma', '~> 4.3.0', require: false
-  gem 'puma_worker_killer', '~> 0.1.1', require: false
+  gem 'gitlab-puma', '~> 4.3.1.gitlab.2', require: false
+  gem 'gitlab-puma_worker_killer', '~> 0.1.1.gitlab.1', require: false
   gem 'rack-timeout', require: false
 end
 
@@ -242,7 +242,7 @@ gem 'slack-notifier', '~> 1.5.1'
 gem 'hangouts-chat', '~> 0.0.5'
 
 # Asana integration
-gem 'asana', '~> 0.8.1'
+gem 'asana', '~> 0.9'
 
 # FogBugz integration
 gem 'ruby-fogbugz', '~> 0.2.1'
@@ -346,7 +346,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'bullet', '~> 5.5.0', require: !!ENV['ENABLE_BULLET']
+  gem 'bullet', '~> 6.0.2', require: !!ENV['ENABLE_BULLET']
   gem 'pry-byebug', '~> 3.5.1', platform: :mri
   gem 'pry-rails', '~> 0.3.4'
 

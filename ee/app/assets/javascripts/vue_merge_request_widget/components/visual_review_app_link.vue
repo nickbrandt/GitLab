@@ -1,7 +1,7 @@
 <script>
+import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
-import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 
 export default {

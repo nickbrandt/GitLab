@@ -1,6 +1,18 @@
 import * as types from './mutation_types';
 import { chartKeys } from '../../../constants';
 
+export const setInitialData = ({ commit, dispatch }, { skipFetch = false, data }) => {
+  commit(types.SET_INITIAL_DATA, data);
+
+  if (skipFetch) return Promise.resolve();
+
+  return dispatch('charts/fetchChartData', chartKeys.main, { root: true }).then(() => {
+    dispatch('charts/fetchSecondaryChartData', null, { root: true });
+    // let's reset the page on the MR table and fetch data
+    dispatch('table/setPage', 0, { root: true });
+  });
+};
+
 export const setGroupNamespace = ({ commit, dispatch }, groupNamespace) => {
   commit(types.SET_GROUP_NAMESPACE, groupNamespace);
 
@@ -48,10 +60,8 @@ export const setFilters = (
   });
 };
 
-export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDate, endDate }) => {
+export const setDateRange = ({ commit, dispatch }, { startDate, endDate }) => {
   commit(types.SET_DATE_RANGE, { startDate, endDate });
-
-  if (skipFetch) return false;
 
   dispatch('charts/resetMainChartSelection', true, { root: true });
 
@@ -61,6 +71,3 @@ export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDat
     dispatch('table/setPage', 0, { root: true });
   });
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

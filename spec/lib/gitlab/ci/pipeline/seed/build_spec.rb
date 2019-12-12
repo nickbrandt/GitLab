@@ -231,6 +231,15 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
           end
         end
       end
+
+      context 'when job belongs to a resource group' do
+        let(:attributes) { { name: 'rspec', ref: 'master', resource_group_key: 'iOS' } }
+
+        it 'returns a job with resource group' do
+          expect(subject.resource_group).not_to be_nil
+          expect(subject.resource_group.key).to eq('iOS')
+        end
+      end
     end
 
     context 'when job is a bridge' do
@@ -852,7 +861,7 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
 
       it "returns an error" do
         expect(subject.errors).to contain_exactly(
-          "rspec: one job can only need 5 others, but you have listed 6. See needs keyword documentation for more details")
+          "rspec: one job can only need 10 others, but you have listed 11. See needs keyword documentation for more details")
       end
     end
 

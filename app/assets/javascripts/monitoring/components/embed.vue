@@ -1,7 +1,7 @@
 <script>
-import { mapActions, mapState } from 'vuex';
-import { getParameterValues, removeParams } from '~/lib/utils/url_utility';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import PanelType from 'ee_else_ce/monitoring/components/panel_type.vue';
+import { getParameterValues, removeParams } from '~/lib/utils/url_utility';
 import GraphGroup from './graph_group.vue';
 import { sidebarAnimationDuration } from '../constants';
 import { getTimeDiff } from '../utils';
@@ -35,7 +35,8 @@ export default {
     };
   },
   computed: {
-    ...mapState('monitoringDashboard', ['dashboard', 'metricsWithData']),
+    ...mapState('monitoringDashboard', ['dashboard']),
+    ...mapGetters('monitoringDashboard', ['metricsWithData']),
     charts() {
       if (!this.dashboard || !this.dashboard.panel_groups) {
         return [];
@@ -73,7 +74,7 @@ export default {
       'setShowErrorBanner',
     ]),
     chartHasData(chart) {
-      return chart.metrics.some(metric => this.metricsWithData.includes(metric.metric_id));
+      return chart.metrics.some(metric => this.metricsWithData().includes(metric.metric_id));
     },
     onSidebarMutation() {
       setTimeout(() => {

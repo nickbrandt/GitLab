@@ -29,10 +29,14 @@ module API
         project = find_project(id)
 
         unless project && can?(current_user, :read_project, project)
-          return current_user ? not_found! : unauthorized_with_header!
+          return unauthorized_project_message
         end
 
         project
+      end
+
+      def unauthorized_project_message
+        current_user ? not_found! : unauthorized_with_header!
       end
 
       def unauthorized_with_header!

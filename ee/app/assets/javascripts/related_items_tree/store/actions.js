@@ -1,16 +1,15 @@
-import flash from '~/flash';
-import { s__ } from '~/locale';
 import Api from 'ee/api';
-import axios from '~/lib/utils/axios_utils';
-import httpStatusCodes from '~/lib/utils/http_status';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-
 import {
   issuableTypesMap,
   itemAddFailureTypesMap,
   pathIndeterminateErrorMap,
   relatedIssuesRemoveErrorMap,
 } from 'ee/related_issues/constants';
+import flash from '~/flash';
+import { s__ } from '~/locale';
+import axios from '~/lib/utils/axios_utils';
+import httpStatusCodes from '~/lib/utils/http_status';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import { processQueryResponse, formatChildItem, gqClient } from '../utils/epic_utils';
 import { ChildType, ChildState } from '../constants';

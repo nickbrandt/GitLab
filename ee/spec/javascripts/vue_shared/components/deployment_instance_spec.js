@@ -23,7 +23,7 @@ describe('Deploy Board Instance', () => {
 
     it('should render a div with the correct css status and tooltip data', () => {
       wrapper = createComponent({
-        logsPath: folder.log_path,
+        projectPath: folder.project_path,
         tooltipText: 'This is a pod',
       });
 
@@ -46,12 +46,13 @@ describe('Deploy Board Instance', () => {
 
     it('should have a log path computed with a pod name as a parameter', () => {
       wrapper = createComponent({
-        logsPath: folder.log_path,
+        projectPath: folder.project_path,
+        environmentName: 'foo',
         podName: 'tanuki-1',
       });
 
       expect(wrapper.vm.computedLogPath).toEqual(
-        '/root/review-app/environments/12/logs?pod_name=tanuki-1',
+        '/root/review-app/-/logs?environment_name=foo&pod_name=tanuki-1',
       );
     });
   });
@@ -78,10 +79,10 @@ describe('Deploy Board Instance', () => {
       wrapper.destroy();
     });
 
-    it('should not be a link without a logsPath prop', done => {
+    it('should not be a link without a projectPath prop', done => {
       wrapper = createComponent({
         stable: false,
-        logsPath: '',
+        projectPath: '',
       });
 
       wrapper.vm.$nextTick(() => {

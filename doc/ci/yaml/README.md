@@ -135,6 +135,7 @@ The following job parameters can be defined inside a `default:` block:
 - [`services`](#services)
 - [`before_script`](#before_script-and-after_script)
 - [`after_script`](#before_script-and-after_script)
+- [`tags`](#tags)
 - [`cache`](#cache)
 - [`retry`](#retry)
 - [`timeout`](#timeout)
@@ -292,6 +293,10 @@ Scripts specified in `after_script` are executed in a new shell, separate from a
   - Command aliases and variables exported in `script` scripts.
   - Changes outside of the working tree (depending on the Runner executor), like
     software installed by a `before_script` or `script` script.
+- Have a separate timeout, which is hard coded to 5 minutes. See
+  [related issue](https://gitlab.com/gitlab-org/gitlab-runner/issues/2716) for details.
+- Do not affect the job's exit code. If the `script` section succeeds and the
+  `after_script` times out or fails, the job will exit with code `0` (`Job Succeeded`).
 
 It's possible to overwrite a globally defined `before_script` or `after_script`
 if you set it per-job:
@@ -1019,6 +1024,33 @@ Additional job configuration may be added to rules in the future. If something
 useful isn't available, please
 [open an issue](https://gitlab.com/gitlab-org/gitlab/issues).
 
+### `workflow:rules`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/29654) in GitLab 12.5
+
+The top-level `workflow:` key applies to the entirety of a pipeline, and will
+determine whether or not a pipeline is created. It currently accepts a single
+`rules:` key that operates similarly to [`rules:` defined within jobs](#rules),
+enabling dynamic configuration of the pipeline.
+
+The configuration options currently available for `workflow:rules` are:​
+
+- [`if`](#rulesif): Define a rule.
+- [`when`](#when): May be set to `always` or `never` only. If not provided, the default value is `always`​.
+
+The list of `if` rules is evaluated until a single one is matched. If none
+match, the last `when` will be used:
+
+```yaml
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /-wip$/
+      when: never
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: always
+```
+
 ### `tags`
 
 `tags` is used to select specific Runners from the list of all Runners that are
@@ -1455,7 +1487,7 @@ For more information, see
 NOTE: **Note:**
 Kubernetes configuration is not supported for Kubernetes clusters
 that are [managed by GitLab](../../user/project/clusters/index.md#gitlab-managed-clusters).
-To follow progress on support for Gitlab-managed clusters, see the
+To follow progress on support for GitLab-managed clusters, see the
 [relevant issue](https://gitlab.com/gitlab-org/gitlab/issues/38054).
 
 #### Dynamic environments
@@ -1513,8 +1545,10 @@ globally and all jobs will use that definition.
 
 #### `cache:paths`
 
-Use the `paths` directive to choose which files or directories will be cached. You can only specify paths within your `$CI_PROJECT_DIR`.
-Wildcards can be used that follow the [glob](https://en.wikipedia.org/wiki/Glob_(programming)) patterns and [filepath.Match](https://golang.org/pkg/path/filepath/#Match).
+Use the `paths` directive to choose which files or directories will be cached. Paths
+are relative to the project directory (`$CI_PROJECT_DIR`) and cannot directly link outside it.
+Wildcards can be used that follow the [glob](https://en.wikipedia.org/wiki/Glob_(programming))
+patterns and [filepath.Match](https://golang.org/pkg/path/filepath/#Match).
 
 Cache all files in `binaries` that end in `.apk` and the `.config` file:
 
@@ -1743,8 +1777,9 @@ be available for download in the GitLab UI.
 
 #### `artifacts:paths`
 
-You can only use paths that are within the local working copy.
-Wildcards can be used that follow the [glob](https://en.wikipedia.org/wiki/Glob_(programming)) patterns and [filepath.Match](https://golang.org/pkg/path/filepath/#Match).
+Paths are relative to the project directory (`$CI_PROJECT_DIR`) and cannot directly
+link outside it. Wildcards can be used that follow the [glob](https://en.wikipedia.org/wiki/Glob_(programming))
+patterns and [filepath.Match](https://golang.org/pkg/path/filepath/#Match).
 
 To restrict which jobs a specific job will fetch artifacts from, see [dependencies](#dependencies).
 
@@ -2256,11 +2291,11 @@ This example creates three paths of execution:
   pipeline will be created with YAML error.
 - We are temporarily limiting the maximum number of jobs that a single job can
   need in the `needs:` array:
-  - For GitLab.com, the limit is five. For more information, see our
+  - For GitLab.com, the limit is ten. For more information, see our
     [infrastructure issue](https://gitlab.com/gitlab-com/gl-infra/infrastructure/issues/7541).
   - For self-managed instances, the limit is:
-    - Five by default (`ci_dag_limit_needs` feature flag is enabled).
-    - 50 if the `ci_dag_limit_needs` feature flag is disabled.
+    - 10, if the `ci_dag_limit_needs` feature flag is enabled (default).
+    - 50, if the `ci_dag_limit_needs` feature flag is disabled.
 - It is impossible for now to have `needs: []` (empty needs), the job always needs to
   depend on something, unless this is the job in the first stage. However, support for
   an empty needs array [is planned](https://gitlab.com/gitlab-org/gitlab/issues/30631).

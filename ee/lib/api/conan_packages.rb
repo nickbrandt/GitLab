@@ -27,7 +27,6 @@ module API
     CONAN_REVISION_REGEX = Gitlab::Regex.conan_revision_regex
 
     before do
-      not_found! unless Feature.enabled?(:conan_package_registry)
       require_packages_enabled!
 
       # Personal access token will be extracted from Bearer or Basic authorization

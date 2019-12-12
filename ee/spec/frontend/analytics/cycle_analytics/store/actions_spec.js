@@ -1,10 +1,10 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
-import createFlash from '~/flash';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
+import createFlash from '~/flash';
 import {
   group,
   cycleAnalyticsData,
@@ -22,7 +22,8 @@ const stageData = { events: [] };
 const error = new Error('Request failed with status code 404');
 const flashErrorMessage = 'There was an error while fetching cycle analytics data.';
 const selectedGroup = { fullPath: group.path };
-const [{ id: selectedStageSlug }] = stages;
+const [selectedStage] = stages;
+const selectedStageSlug = selectedStage.slug;
 const endpoints = {
   groupLabels: `/groups/${group.path}/-/labels`,
   cycleAnalyticsData: `/groups/${group.path}/-/cycle_analytics`,
@@ -46,6 +47,7 @@ describe('Cycle analytics actions', () => {
       getters,
       featureFlags: {
         hasDurationChart: true,
+        hasTasksByTypeChart: true,
       },
     };
     mock = new MockAdapter(axios);
@@ -61,7 +63,7 @@ describe('Cycle analytics actions', () => {
     ${'setFeatureFlags'}     | ${'SET_FEATURE_FLAGS'}     | ${'featureFlags'}       | ${{ hasDurationChart: true }}
     ${'setSelectedGroup'}    | ${'SET_SELECTED_GROUP'}    | ${'selectedGroup'}      | ${'someNewGroup'}
     ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
-    ${'setSelectedStageId'}  | ${'SET_SELECTED_STAGE_ID'} | ${'selectedStageId'}    | ${'someNewGroup'}
+    ${'setSelectedStage'}    | ${'SET_SELECTED_STAGE'}    | ${'selectedStage'}      | ${{ id: 'someStageId' }}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
     testAction(
       actions[action],
@@ -113,21 +115,30 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    it('dispatches receiveStageDataError on error', done => {
-      testAction(
-        actions.fetchStageData,
-        null,
-        state,
-        [],
-        [
-          { type: 'requestStageData' },
-          {
-            type: 'receiveStageDataError',
-            payload: error,
-          },
-        ],
-        done,
-      );
+    describe('with a failing request', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        mock.onGet(endpoints.stageData).replyOnce(404, { error });
+      });
+
+      it('dispatches receiveStageDataError on error', done => {
+        testAction(
+          actions.fetchStageData,
+          selectedStage,
+          state,
+          [],
+          [
+            {
+              type: 'requestStageData',
+            },
+            {
+              type: 'receiveStageDataError',
+              payload: error,
+            },
+          ],
+          done,
+        );
+      });
     });
 
     describe('receiveStageDataSuccess', () => {
@@ -237,6 +248,7 @@ describe('Cycle analytics actions', () => {
         receiveCycleAnalyticsDataSuccess:
           overrides.receiveCycleAnalyticsDataSuccess || jest.fn().mockResolvedValue(),
         fetchDurationData: overrides.fetchDurationData || jest.fn().mockResolvedValue(),
+        fetchTasksByTypeData: overrides.fetchTasksByTypeData || jest.fn().mockResolvedValue(),
       };
       return {
         mocks,
@@ -245,8 +257,8 @@ describe('Cycle analytics actions', () => {
           .mockImplementationOnce(mocks.requestCycleAnalyticsData)
           .mockImplementationOnce(mocks.fetchGroupStagesAndEvents)
           .mockImplementationOnce(mocks.fetchSummaryData)
-          .mockImplementationOnce(mocks.receiveCycleAnalyticsDataSuccess)
-          .mockImplementationOnce(mocks.fetchDurationData),
+          .mockImplementationOnce(mocks.fetchDurationData)
+          .mockImplementationOnce(mocks.fetchTasksByTypeData),
       };
     }
 
@@ -270,8 +282,9 @@ describe('Cycle analytics actions', () => {
           expect(mocks.requestCycleAnalyticsData).toHaveBeenCalled();
           expect(mocks.fetchGroupStagesAndEvents).toHaveBeenCalled();
           expect(mocks.fetchSummaryData).toHaveBeenCalled();
-          expect(mocks.receiveCycleAnalyticsDataSuccess).toHaveBeenCalled();
           expect(mocks.fetchDurationData).toHaveBeenCalled();
+          expect(mocks.fetchTasksByTypeData).toHaveBeenCalled();
+
           done();
         })
         .catch(done.fail);
@@ -349,7 +362,7 @@ describe('Cycle analytics actions', () => {
         {
           dispatch: mockDispatchContext,
           state: { ...state, endpoints: { cycleAnalyticsStagesPath: '/this/is/fake' } },
-          commit: () => {},
+          getters,
         },
         {},
       );
@@ -384,33 +397,13 @@ describe('Cycle analytics actions', () => {
       });
     });
 
-    it("dispatches the 'fetchStageData' action", done => {
-      const stateWithStages = {
-        ...state,
-        stages,
-      };
-
-      testAction(
-        actions.receiveGroupStagesAndEventsSuccess,
-        { ...customizableStagesAndEvents },
-        stateWithStages,
-        [
-          {
-            type: types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS,
-            payload: { ...customizableStagesAndEvents },
-          },
-        ],
-        [{ type: 'fetchStageData', payload: selectedStageSlug }],
-        done,
-      );
-    });
-
     it('will flash an error when there are no stages', () => {
       [[], null].forEach(emptyStages => {
         actions.receiveGroupStagesAndEventsSuccess(
           {
             commit: () => {},
             state: { stages: emptyStages },
+            getters,
           },
           {},
         );
@@ -493,7 +486,7 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    it("dispatches the 'fetchStageData' actions", done => {
+    it("dispatches the 'fetchStageData' action", done => {
       const stateWithStages = {
         ...state,
         stages,
@@ -509,7 +502,10 @@ describe('Cycle analytics actions', () => {
             payload: { ...customizableStagesAndEvents },
           },
         ],
-        [{ type: 'fetchStageData', payload: selectedStageSlug }],
+        [
+          { type: 'setSelectedStage', payload: selectedStage },
+          { type: 'fetchStageData', payload: selectedStageSlug },
+        ],
         done,
       );
     });
@@ -707,32 +703,52 @@ describe('Cycle analytics actions', () => {
       });
     });
 
-    it("dispatches the 'requestDurationData' and 'receiveDurationDataSuccess' actions", done => {
+    it("dispatches the 'receiveDurationDataSuccess' action on success", done => {
       const stateWithStages = {
         ...state,
         stages: [stages[0], stages[1]],
         selectedGroup,
-        startDate,
-        endDate,
       };
+      const dispatch = jest.fn();
 
-      testAction(
-        actions.fetchDurationData,
-        transformedDurationData,
-        stateWithStages,
-        [],
-        [
-          { type: 'requestDurationData' },
-          {
-            type: 'receiveDurationDataSuccess',
-            payload: transformedDurationData,
-          },
-        ],
-        done,
-      );
+      actions
+        .fetchDurationData({
+          dispatch,
+          state: stateWithStages,
+          getters,
+        })
+        .then(() => {
+          expect(dispatch).toHaveBeenCalledWith(
+            'receiveDurationDataSuccess',
+            transformedDurationData,
+          );
+          done();
+        })
+        .catch(done.fail);
     });
 
-    it("dispatches the 'requestDurationData' and 'receiveDurationDataError' actions when there is an error", done => {
+    it("dispatches the 'requestDurationData' action", done => {
+      const stateWithStages = {
+        ...state,
+        stages: [stages[0], stages[1]],
+        selectedGroup,
+      };
+      const dispatch = jest.fn();
+
+      actions
+        .fetchDurationData({
+          dispatch,
+          state: stateWithStages,
+          getters,
+        })
+        .then(() => {
+          expect(dispatch).toHaveBeenNthCalledWith(1, 'requestDurationData');
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it("dispatches the 'receiveDurationDataError' action when there is an error", done => {
       const brokenState = {
         ...state,
         stages: [
@@ -741,18 +757,20 @@ describe('Cycle analytics actions', () => {
           },
         ],
         selectedGroup,
-        startDate,
-        endDate,
       };
+      const dispatch = jest.fn();
 
-      testAction(
-        actions.fetchDurationData,
-        {},
-        brokenState,
-        [],
-        [{ type: 'requestDurationData' }, { type: 'receiveDurationDataError' }],
-        done,
-      );
+      actions
+        .fetchDurationData({
+          dispatch,
+          state: brokenState,
+          getters,
+        })
+        .then(() => {
+          expect(dispatch).toHaveBeenCalledWith('receiveDurationDataError');
+          done();
+        })
+        .catch(done.fail);
     });
   });
 

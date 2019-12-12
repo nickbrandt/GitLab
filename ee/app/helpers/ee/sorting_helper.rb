@@ -55,10 +55,10 @@ module EE
       }.merge(super)
     end
 
-    override :issuable_sort_icon_suffix
-    def issuable_sort_icon_suffix(sort_value)
+    override :sort_direction_icon
+    def sort_direction_icon(sort_value)
       if sort_value == sort_value_weight
-        'lowest'
+        'sort-lowest'
       else
         super
       end

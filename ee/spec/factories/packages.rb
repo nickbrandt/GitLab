@@ -3,7 +3,7 @@ FactoryBot.define do
   factory :package, class: Packages::Package do
     project
     name { 'my/company/app/my-app' }
-    version { '1.0-SNAPSHOT' }
+    sequence(:version) { |n| "1.#{n}-SNAPSHOT" }
     package_type { 'maven' }
 
     factory :maven_package do
@@ -187,5 +187,16 @@ FactoryBot.define do
       package_revision { '0' }
       conan_package_reference { '123456789' }
     end
+  end
+
+  factory :packages_dependency, class: Packages::Dependency do
+    sequence(:name) { |n| "@test/package-#{n}"}
+    sequence(:version_pattern) { |n| "~6.2.#{n}" }
+  end
+
+  factory :packages_dependency_link, class: Packages::DependencyLink do
+    package
+    dependency { create(:packages_dependency) }
+    dependency_type { :dependencies }
   end
 end

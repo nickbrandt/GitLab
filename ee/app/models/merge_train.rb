@@ -9,12 +9,13 @@ class MergeTrain < ApplicationRecord
   belongs_to :pipeline, class_name: 'Ci::Pipeline'
 
   after_commit :cleanup_ref, if: -> { saved_change_to_status? && merged? }
+  after_commit :refresh_async, if: -> { saved_change_to_status? && stale? }
 
   after_destroy do |merge_train|
     run_after_commit { merge_train.cleanup_ref }
   end
 
-  enum status: %i[created merged]
+  enum status: %i[created merged stale fresh]
 
   scope :active, -> { where(status: active_statuses) }
   scope :merged, -> { where(status: merged_statuses) }
@@ -22,14 +23,14 @@ class MergeTrain < ApplicationRecord
   scope :by_id, -> { order('merge_trains.id ASC') }
 
   class << self
-    def all_active_mrs_in_train(merge_request)
+    def all_active_mrs_in_train(target_project_id, target_branch)
       MergeRequest.joins(:merge_train).merge(
-        MergeTrain.active.for_target(merge_request.target_project_id, merge_request.target_branch).by_id
+        MergeTrain.active.for_target(target_project_id, target_branch).by_id
       )
     end
 
-    def first_in_train(merge_request)
-      all_active_mrs_in_train(merge_request).first
+    def first_in_train(target_project_id, target_branch)
+      all_active_mrs_in_train(target_project_id, target_branch).first
     end
 
     def first_in_trains(project)
@@ -38,19 +39,24 @@ class MergeTrain < ApplicationRecord
 
     def first_in_train_from(merge_request_ids)
       merge_request = MergeRequest.find(merge_request_ids.first)
-      all_active_mrs_in_train(merge_request).where(id: merge_request_ids).first
+      all_active_mrs_in_train(merge_request.target_project_id, merge_request.target_branch).where(id: merge_request_ids).first
     end
 
     def last_merged_mr_in_train(target_project_id, target_branch)
       MergeRequest.where(id: last_merged_merge_train(target_project_id, target_branch)).take
     end
 
+    def sha_exists_in_history?(target_project_id, target_branch, newrev, limit: 20)
+      MergeRequest.exists?(id: merged_merge_trains(target_project_id, target_branch, limit: limit),
+                           merge_commit_sha: newrev)
+    end
+
     def total_count_in_train(merge_request)
-      all_active_mrs_in_train(merge_request).count
+      all_active_mrs_in_train(merge_request.target_project_id, merge_request.target_branch).count
     end
 
     def active_statuses
-      statuses.values_at(:created)
+      statuses.values_at(:created, :stale, :fresh)
     end
 
     def merged_statuses
@@ -67,17 +73,21 @@ class MergeTrain < ApplicationRecord
     end
 
     def last_merged_merge_train(target_project_id, target_branch)
+      merged_merge_trains(target_project_id, target_branch, limit: 1)
+    end
+
+    def merged_merge_trains(target_project_id, target_branch, limit:)
       MergeTrain.for_target(target_project_id, target_branch)
-        .merged.order(id: :desc).select(:merge_request_id).limit(1)
+        .merged.order(id: :desc).select(:merge_request_id).limit(limit)
     end
   end
 
   def all_next
-    self.class.all_active_mrs_in_train(merge_request).where('merge_trains.id > ?', id)
+    self.class.all_active_mrs_in_train(target_project_id, target_branch).where('merge_trains.id > ?', id)
   end
 
   def all_prev
-    self.class.all_active_mrs_in_train(merge_request).where('merge_trains.id < ?', id)
+    self.class.all_active_mrs_in_train(target_project_id, target_branch).where('merge_trains.id < ?', id)
   end
 
   def next
@@ -102,5 +112,11 @@ class MergeTrain < ApplicationRecord
 
   def cleanup_ref
     merge_request.cleanup_refs(only: :train)
+  end
+
+  private
+
+  def refresh_async
+    AutoMergeProcessWorker.perform_async(merge_request_id)
   end
 end

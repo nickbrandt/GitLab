@@ -1,7 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import ProjectHeader from 'ee/operations/components/dashboard/project_header.vue';
-import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { trimText } from 'helpers/text_helper';
+import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { mockOneProject } from '../../mock_data';
 
 const localVue = createLocalVue();

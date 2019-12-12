@@ -63,7 +63,7 @@ describe('New feature flag form', () => {
       active: true,
       rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
       rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-      rolloutUserIds: [],
+      rolloutUserIds: '',
     };
     expect(wrapper.vm.scopes).toEqual([defaultScope]);
 

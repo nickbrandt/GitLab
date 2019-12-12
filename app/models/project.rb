@@ -97,8 +97,11 @@ class Project < ApplicationRecord
     unless: :ci_cd_settings,
     if: proc { ProjectCiCdSetting.available? }
 
+  after_create :create_container_expiration_policy,
+               unless: :container_expiration_policy
+
   after_create :create_pages_metadatum,
-    unless: :pages_metadatum
+               unless: :pages_metadatum
 
   after_create :set_timestamps_for_create
   after_update :update_forks_visibility_level
@@ -248,6 +251,7 @@ class Project < ApplicationRecord
   # which is not managed by the DB. Hence we're still using dependent: :destroy
   # here.
   has_many :container_repositories, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+  has_one :container_expiration_policy, inverse_of: :project
 
   has_many :commit_statuses
   # The relation :all_pipelines is intended to be used when we want to get the
@@ -281,6 +285,7 @@ class Project < ApplicationRecord
   has_many :pipeline_schedules, class_name: 'Ci::PipelineSchedule'
   has_many :project_deploy_tokens
   has_many :deploy_tokens, through: :project_deploy_tokens
+  has_many :resource_groups, class_name: 'Ci::ResourceGroup', inverse_of: :project
 
   has_one :auto_devops, class_name: 'ProjectAutoDevops', inverse_of: :project, autosave: true
   has_many :custom_attributes, class_name: 'ProjectCustomAttribute'
@@ -305,6 +310,7 @@ class Project < ApplicationRecord
   accepts_nested_attributes_for :import_data
   accepts_nested_attributes_for :auto_devops, update_only: true
   accepts_nested_attributes_for :ci_cd_settings, update_only: true
+  accepts_nested_attributes_for :container_expiration_policy, update_only: true
 
   accepts_nested_attributes_for :remote_mirrors,
                                 allow_destroy: true,
@@ -1577,7 +1583,9 @@ class Project < ApplicationRecord
   end
 
   def wiki
-    @wiki ||= ProjectWiki.new(self, self.owner)
+    strong_memoize(:wiki) do
+      ProjectWiki.new(self, self.owner)
+    end
   end
 
   def jira_tracker_active?
@@ -2071,10 +2079,16 @@ class Project < ApplicationRecord
   end
 
   def default_merge_request_target
-    if forked_from_project&.merge_requests_enabled?
-      forked_from_project
-    else
+    return self unless forked_from_project
+    return self unless forked_from_project.merge_requests_enabled?
+
+    # When our current visibility is more restrictive than the source project,
+    # (e.g., the fork is `private` but the parent is `public`), target the less
+    # permissive project
+    if visibility_level_value < forked_from_project.visibility_level_value
       self
+    else
+      forked_from_project
     end
   end
 

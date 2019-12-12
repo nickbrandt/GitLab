@@ -68,15 +68,33 @@ describe Gitlab::Diff::HighlightCache, :clean_gitlab_redis_cache do
 
       expect(diff_file.highlighted_diff_lines.size).to be > 5
     end
+
+    it 'assigns highlighted diff lines which rich_text are HTML-safe' do
+      cache.write_if_empty
+      cache.decorate(diff_file)
+
+      rich_texts = diff_file.highlighted_diff_lines.map(&:rich_text)
+
+      expect(rich_texts).to all(be_html_safe)
+    end
   end
 
   describe '#write_if_empty' do
     it 'filters the key/value list of entries to be caches for each invocation' do
+      paths = merge_request.diffs.diff_files.select(&:text?).map(&:file_path)
+
       expect(cache).to receive(:write_to_redis_hash)
-        .once.with(hash_including(".gitignore")).and_call_original
-      expect(cache).to receive(:write_to_redis_hash).once.with({}).and_call_original
+        .with(hash_including(*paths))
+        .once
+        .and_call_original
 
       2.times { cache.write_if_empty }
+    end
+
+    it 'reads from cache once' do
+      expect(cache).to receive(:read_cache).once.and_call_original
+
+      cache.write_if_empty
     end
 
     context 'different diff_collections for the same diffable' do

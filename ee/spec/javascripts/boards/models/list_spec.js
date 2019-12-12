@@ -1,7 +1,7 @@
 import { listObj } from 'spec/boards/mock_data';
-import CeList from '~/boards/models/list';
 import List from 'ee/boards/models/list';
 import Issue from 'ee/boards/models/issue';
+import CeList from '~/boards/models/list';
 
 describe('List model', () => {
   let list;

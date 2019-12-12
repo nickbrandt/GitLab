@@ -148,11 +148,9 @@ describe('GeoNodeItemComponent', () => {
       vm.isNodeDetailsFailed = true;
       vm.errorMessage = err;
       Vue.nextTick(() => {
-        expect(vm.$el.querySelectorAll('p.node-health-message').length).not.toBe(0);
-        expect(vm.$el.querySelector('p.node-health-message').innerText.trim()).toContain(err);
-        expect(vm.$el.querySelector('p.node-health-message a').getAttribute('href')).toBe(
-          '/foo/bar',
-        );
+        expect(vm.$el.querySelectorAll('p.bg-danger-100').length).not.toBe(0);
+        expect(vm.$el.querySelector('p.bg-danger-100').innerText.trim()).toContain(err);
+        expect(vm.$el.querySelector('p.bg-danger-100 a').getAttribute('href')).toBe('/foo/bar');
         done();
       });
     });

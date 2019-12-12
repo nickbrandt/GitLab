@@ -5,8 +5,8 @@ import { GlLoadingIcon } from '@gitlab/ui';
 
 import { issuableTypesMap } from 'ee/related_issues/constants';
 
-import SlotSwitch from '~/vue_shared/components/slot_switch.vue';
 import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
+import SlotSwitch from '~/vue_shared/components/slot_switch.vue';
 import CreateEpicForm from './create_epic_form.vue';
 import CreateIssueForm from './create_issue_form.vue';
 import IssueActionsSplitButton from './issue_actions_split_button.vue';

@@ -3,8 +3,7 @@
 class Groups::Security::VulnerabilitiesController < Groups::ApplicationController
   include VulnerabilitiesApiFeatureGate # must come first
   include SecurityDashboardsPermissions
-  include VulnerabilityFindingsActions
-  include VulnerabilityFindingsHistory
+  include ProjectCollectionVulnerabilityFindingsActions
 
   alias_method :vulnerable, :group
 

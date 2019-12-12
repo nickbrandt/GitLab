@@ -53,10 +53,10 @@ msgstr ""
 msgid " or <!merge request id>"
 msgstr ""
 
-msgid " or <#epic id>"
+msgid " or <#issue id>"
 msgstr ""
 
-msgid " or <#issue id>"
+msgid " or <&epic id>"
 msgstr ""
 
 msgid " or references (e.g. path/to/project!merge_request_id)"
@@ -234,6 +234,9 @@ msgstr[1] ""
 msgid "%{count} related %{pluralized_subject}: %{links}"
 msgstr ""
 
+msgid "%{days} days until tags are automatically removed"
+msgstr ""
+
 msgid "%{description}- Sentry event: %{errorUrl}- First seen: %{firstSeen}- Last seen: %{lastSeen} %{countLabel}: %{count}%{userCountLabel}: %{userCount}"
 msgstr ""
 
@@ -378,6 +381,12 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "%{tabname} changed"
+msgstr ""
+
+msgid "%{tags} tag per image name"
+msgstr ""
+
+msgid "%{tags} tags per image name"
 msgstr ""
 
 msgid "%{tag}-evidence.json"
@@ -695,6 +704,9 @@ msgid "A merge request approval is required when a security report contains a ne
 msgstr ""
 
 msgid "A merge request approval is required when the license compliance report contains a blacklisted license."
+msgstr ""
+
+msgid "A new Auto DevOps pipeline has been created, go to %{pipelines_link_start}Pipelines page%{pipelines_link_end} for details"
 msgstr ""
 
 msgid "A new Release %{tag} for %{name} was published. Visit the %{release_link_start}Releases page%{release_link_end} to read more about it."
@@ -1131,7 +1143,13 @@ msgstr ""
 msgid "Admin Section"
 msgstr ""
 
+msgid "Admin mode already enabled"
+msgstr ""
+
 msgid "Admin mode disabled"
+msgstr ""
+
+msgid "Admin mode enabled"
 msgstr ""
 
 msgid "Admin notes"
@@ -3191,6 +3209,9 @@ msgstr ""
 msgid "Checking username availability..."
 msgstr ""
 
+msgid "Checkout"
+msgstr ""
+
 msgid "Cherry-pick this commit"
 msgstr ""
 
@@ -4125,9 +4146,6 @@ msgid "ClusterIntegration|Select a VPC to choose a subnet"
 msgstr ""
 
 msgid "ClusterIntegration|Select a VPC to use for your EKS Cluster resources. To use a new VPC, first create one on %{startLink}Amazon Web Services %{externalLinkIcon} %{endLink}."
-msgstr ""
-
-msgid "ClusterIntegration|Select a different AWS role"
 msgstr ""
 
 msgid "ClusterIntegration|Select a region to choose a Key Pair"
@@ -5187,6 +5205,9 @@ msgstr ""
 msgid "CustomCycleAnalytics|Add stage"
 msgstr ""
 
+msgid "CustomCycleAnalytics|Editing stage"
+msgstr ""
+
 msgid "CustomCycleAnalytics|Enter a name for the stage"
 msgstr ""
 
@@ -5218,6 +5239,9 @@ msgid "CustomCycleAnalytics|Stop event"
 msgstr ""
 
 msgid "CustomCycleAnalytics|Stop event label"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Update stage"
 msgstr ""
 
 msgid "Customize colors"
@@ -5973,7 +5997,7 @@ msgstr ""
 msgid "Diffs|No file name available"
 msgstr ""
 
-msgid "Diffs|Show all lines"
+msgid "Diffs|Show unchanged lines"
 msgstr ""
 
 msgid "Diffs|Something went wrong while fetching diff lines."
@@ -7047,10 +7071,25 @@ msgstr ""
 msgid "Every %{action} attempt has failed: %{job_error_message}. Please try again."
 msgstr ""
 
+msgid "Every day"
+msgstr ""
+
 msgid "Every day (at 4:00am)"
 msgstr ""
 
+msgid "Every month"
+msgstr ""
+
 msgid "Every month (on the 1st at 4:00am)"
+msgstr ""
+
+msgid "Every three months"
+msgstr ""
+
+msgid "Every two weeks"
+msgstr ""
+
+msgid "Every week"
 msgstr ""
 
 msgid "Every week (Sundays at 4:00am)"
@@ -7437,13 +7476,7 @@ msgstr ""
 msgid "FeatureFlags|Active"
 msgstr ""
 
-msgid "FeatureFlags|Add"
-msgstr ""
-
 msgid "FeatureFlags|All users"
-msgstr ""
-
-msgid "FeatureFlags|Clear all"
 msgstr ""
 
 msgid "FeatureFlags|Configure"
@@ -7465,9 +7498,6 @@ msgid "FeatureFlags|Description"
 msgstr ""
 
 msgid "FeatureFlags|Edit Feature Flag"
-msgstr ""
-
-msgid "FeatureFlags|Enter comma separated list of user IDs"
 msgstr ""
 
 msgid "FeatureFlags|Environment Spec"
@@ -7551,13 +7581,7 @@ msgstr ""
 msgid "FeatureFlags|Status"
 msgstr ""
 
-msgid "FeatureFlags|Target Users"
-msgstr ""
-
 msgid "FeatureFlags|Target environments"
-msgstr ""
-
-msgid "FeatureFlags|Target user behaviour is built up by creating a list of active user IDs. These IDs should be the users in the system in which the feature flag is set, not GitLab ids. Target users apply across %{strong_start}All Environments%{strong_end} and are not affected by Target Environment rules."
 msgstr ""
 
 msgid "FeatureFlags|There are no active feature flags"
@@ -7683,9 +7707,6 @@ msgid "Find the newly extracted <code>Takeout/Google Code Project Hosting/Google
 msgstr ""
 
 msgid "Fingerprint"
-msgstr ""
-
-msgid "Fingerprint:"
 msgstr ""
 
 msgid "Fingerprints"
@@ -8370,6 +8391,9 @@ msgid "GitLab Group Runners can execute code for all the projects in this group.
 msgstr ""
 
 msgid "GitLab Import"
+msgstr ""
+
+msgid "GitLab Issue"
 msgstr ""
 
 msgid "GitLab Shared Runners execute code of different projects on the same Runner unless you configure GitLab Runner Autoscale with MaxBuilds 1 (which it is on GitLab.com)."
@@ -9687,6 +9711,9 @@ msgstr ""
 msgid "Invalid input, please avoid emojis"
 msgstr ""
 
+msgid "Invalid login or password"
+msgstr ""
+
 msgid "Invalid pin code"
 msgstr ""
 
@@ -10432,6 +10459,36 @@ msgstr ""
 msgid "Licenses"
 msgstr ""
 
+msgid "Licenses|%{remainingComponentsCount} more"
+msgstr ""
+
+msgid "Licenses|Component"
+msgstr ""
+
+msgid "Licenses|Components"
+msgstr ""
+
+msgid "Licenses|Displays licenses detected in the project, based on the %{linkStart}latest pipeline%{linkEnd} scan"
+msgstr ""
+
+msgid "Licenses|Error fetching the license list. Please check your network connection and try again."
+msgstr ""
+
+msgid "Licenses|Learn more about license compliance"
+msgstr ""
+
+msgid "Licenses|License Compliance"
+msgstr ""
+
+msgid "Licenses|Name"
+msgstr ""
+
+msgid "Licenses|The license list details information about the licenses used within your project."
+msgstr ""
+
+msgid "Licenses|View license details for your project"
+msgstr ""
+
 msgid "License|Buy license"
 msgstr ""
 
@@ -11136,6 +11193,9 @@ msgstr ""
 msgid "Metrics|There was an error while retrieving metrics"
 msgstr ""
 
+msgid "Metrics|There was an error while retrieving metrics. %{message}"
+msgstr ""
+
 msgid "Metrics|Unexpected deployment data response from prometheus endpoint"
 msgstr ""
 
@@ -11645,6 +11705,9 @@ msgid "No deployments found"
 msgstr ""
 
 msgid "No due date"
+msgstr ""
+
+msgid "No endpoint provided"
 msgstr ""
 
 msgid "No errors to display."
@@ -12325,9 +12388,6 @@ msgid "Pages"
 msgstr ""
 
 msgid "Pages Domain"
-msgstr ""
-
-msgid "Pages Domains"
 msgstr ""
 
 msgid "Pages getting started guide"
@@ -14373,6 +14433,9 @@ msgstr ""
 msgid "Raw blob request rate limit per minute"
 msgstr ""
 
+msgid "Re-authentication period expired or never requested. Please try again"
+msgstr ""
+
 msgid "Re-authentication required"
 msgstr ""
 
@@ -15323,6 +15386,9 @@ msgid "Search milestones"
 msgstr ""
 
 msgid "Search or filter results..."
+msgstr ""
+
+msgid "Search or filter results…"
 msgstr ""
 
 msgid "Search or jump to…"
@@ -17457,6 +17523,9 @@ msgstr ""
 msgid "The content of this page is not encoded in UTF-8. Edits can only be made via the Git repository."
 msgstr ""
 
+msgid "The data source is connected, but there is no data to display."
+msgstr ""
+
 msgid "The default CI configuration path for new projects."
 msgstr ""
 
@@ -18183,6 +18252,9 @@ msgid "This will remove the fork relationship between this project and other pro
 msgstr ""
 
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."
+msgstr ""
+
+msgid "Threat Monitoring"
 msgstr ""
 
 msgid "Thursday"

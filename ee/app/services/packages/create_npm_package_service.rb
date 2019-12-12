@@ -26,9 +26,17 @@ module Packages
         file_name: package_file_name
       }
 
-      ::Packages::CreatePackageFileService.new(package, file_params).execute
+      package.transaction do
+        ::Packages::CreatePackageFileService.new(package, file_params).execute
+        ::Packages::CreateDependencyService.new(package, package_dependencies).execute
+      end
 
       package
+    end
+
+    def package_dependencies
+      _version, version_data = params[:versions].first
+      version_data
     end
   end
 end

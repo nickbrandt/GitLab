@@ -1,7 +1,6 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Vue from 'vue';
-import httpStatusCodes from '~/lib/utils/http_status';
 import store from 'ee/analytics/cycle_analytics/store';
 import Component from 'ee/analytics/cycle_analytics/components/base.vue';
 import { GlEmptyState, GlDaterangePicker } from '@gitlab/ui';
@@ -15,6 +14,7 @@ import 'bootstrap';
 import '~/gl_dropdown';
 import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import waitForPromises from 'helpers/wait_for_promises';
+import httpStatusCodes from '~/lib/utils/http_status';
 import * as mockData from '../mock_data';
 
 const noDataSvgPath = 'path/to/no/data';
@@ -30,6 +30,7 @@ function createComponent({
   shallow = true,
   withStageSelected = false,
   scatterplotEnabled = true,
+  tasksByTypeChartEnabled = true,
 } = {}) {
   const func = shallow ? shallowMount : mount;
   const comp = func(Component, {
@@ -43,7 +44,10 @@ function createComponent({
       baseStagesEndpoint,
     },
     provide: {
-      glFeatures: { cycleAnalyticsScatterplotEnabled: scatterplotEnabled },
+      glFeatures: {
+        cycleAnalyticsScatterplotEnabled: scatterplotEnabled,
+        tasksByTypeChart: tasksByTypeChartEnabled,
+      },
     },
     ...opts,
   });
@@ -351,7 +355,7 @@ describe('Cycle Analytics component', () => {
   describe('with failed requests while loading', () => {
     const { full_path: groupId } = mockData.group;
 
-    function mockRequestCycleAnalyticsData(overrides = {}, includeDutationDataRequests = true) {
+    function mockRequestCycleAnalyticsData(overrides = {}, includeDurationDataRequests = true) {
       const defaultStatus = 200;
       const defaultRequests = {
         fetchSummaryData: {
@@ -383,17 +387,17 @@ describe('Cycle Analytics component', () => {
         ...overrides,
       };
 
-      Object.values(defaultRequests).forEach(({ endpoint, status, response }) => {
-        mock.onGet(endpoint).replyOnce(status, response);
-      });
-
-      if (includeDutationDataRequests) {
+      if (includeDurationDataRequests) {
         mockData.defaultStages.forEach(stage => {
           mock
             .onGet(`${baseStagesEndpoint}/${stage}/duration_chart`)
             .replyOnce(defaultStatus, [...mockData.rawDurationData]);
         });
       }
+
+      Object.values(defaultRequests).forEach(({ endpoint, status, response }) => {
+        mock.onGet(endpoint).replyOnce(status, response);
+      });
     }
 
     beforeEach(() => {

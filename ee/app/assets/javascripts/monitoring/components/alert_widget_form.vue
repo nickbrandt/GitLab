@@ -1,9 +1,6 @@
 <script>
-import { __, s__ } from '~/locale';
 import _ from 'underscore';
 import Vue from 'vue';
-import Translate from '~/vue_shared/translate';
-import { alertsValidator, queriesValidator } from '../validators';
 import {
   GlButton,
   GlButtonGroup,
@@ -14,6 +11,9 @@ import {
   GlModal,
   GlTooltipDirective,
 } from '@gitlab/ui';
+import { __, s__ } from '~/locale';
+import Translate from '~/vue_shared/translate';
+import { alertsValidator, queriesValidator } from '../validators';
 import Icon from '~/vue_shared/components/icon.vue';
 
 Vue.use(Translate);

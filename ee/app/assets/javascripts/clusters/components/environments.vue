@@ -143,7 +143,8 @@ export default {
               :tooltip-text="instance.tooltip"
               :pod-name="instance.pod_name"
               :stable="instance.stable"
-              :logs-path="`${row.item.environmentPath}/logs`"
+              :project-path="`/${row.item.project.path_with_namespace}`"
+              :environment-name="row.item.name"
             />
           </template>
         </div>

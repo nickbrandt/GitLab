@@ -320,7 +320,8 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `webUrl` | String! | Web URL of the group |
 | `avatarUrl` | String | Avatar URL of the group |
 | `parent` | Group | Parent group |
-| `epicsEnabled` | Boolean |  |
+| `epicsEnabled` | Boolean | Indicates if Epics are enabled for namespace |
+| `groupTimelogsEnabled` | Boolean | Indicates if Group timelogs are enabled for namespace |
 | `epic` | Epic |  |
 
 ### GroupPermissions
@@ -398,7 +399,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! | Label ID |
-| `description` | String | Description of the label (markdown rendered as HTML for caching) |
+| `description` | String | Description of the label (Markdown rendered as HTML for caching) |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
 | `title` | String! | Content of the label |
 | `color` | String! | Background color of the label |
@@ -413,7 +414,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `iid` | String! | Internal ID of the merge request |
 | `title` | String! | Title of the merge request |
 | `titleHtml` | String | The GitLab Flavored Markdown rendering of `title` |
-| `description` | String | Description of the merge request (markdown rendered as HTML for caching) |
+| `description` | String | Description of the merge request (Markdown rendered as HTML for caching) |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
 | `state` | MergeRequestState! | State of the merge request |
 | `createdAt` | Time! | Timestamp of when the merge request was created |
@@ -667,6 +668,8 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `mergeRequest` | MergeRequest | A single merge request of the project |
 | `issue` | Issue | A single issue of the project |
 | `sentryDetailedError` | SentryDetailedError | Detailed version of a Sentry error on the project |
+| `serviceDeskEnabled` | Boolean | Indicates if the project has service desk enabled. |
+| `serviceDeskAddress` | String | E-mail address of the service desk. |
 
 ### ProjectPermissions
 
@@ -748,7 +751,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `storageSize` | Int! | The total storage in bytes |
-| `repositorySize` | Int! | The git repository size in bytes |
+| `repositorySize` | Int! | The Git repository size in bytes |
 | `lfsObjectsSize` | Int! | The LFS objects size in bytes |
 | `buildArtifactsSize` | Int! | The CI artifacts size in bytes |
 | `packagesSize` | Int! | The packages size in bytes |
@@ -835,6 +838,15 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | ---   |  ---- | ----------  |
 | `count` | Int! | Number of total tasks |
 | `completedCount` | Int! | Number of completed tasks |
+
+### Timelog
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `date` | Time! | The date when the time tracked was spent at |
+| `timeSpent` | Int! | The time spent displayed in seconds |
+| `user` | User! | The user that logged the time |
+| `issue` | Issue | The issue that logged time was added to |
 
 ### Todo
 

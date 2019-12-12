@@ -5,6 +5,7 @@ import {
   DIFF_VIEW_COOKIE_NAME,
   INLINE_DIFF_VIEW_TYPE,
   PARALLEL_DIFF_VIEW_TYPE,
+  DIFFS_PER_PAGE,
 } from '~/diffs/constants';
 import actions, {
   setBaseConfig,
@@ -75,6 +76,7 @@ describe('DiffsStoreActions', () => {
       const projectPath = '/root/project';
       const dismissEndpoint = '/-/user_callouts';
       const showSuggestPopover = false;
+      const useSingleDiffStyle = false;
 
       testAction(
         setBaseConfig,
@@ -85,6 +87,7 @@ describe('DiffsStoreActions', () => {
           projectPath,
           dismissEndpoint,
           showSuggestPopover,
+          useSingleDiffStyle,
         },
         {
           endpoint: '',
@@ -93,6 +96,7 @@ describe('DiffsStoreActions', () => {
           projectPath: '',
           dismissEndpoint: '',
           showSuggestPopover: true,
+          useSingleDiffStyle: true,
         },
         [
           {
@@ -104,6 +108,7 @@ describe('DiffsStoreActions', () => {
               projectPath,
               dismissEndpoint,
               showSuggestPopover,
+              useSingleDiffStyle,
             },
           },
         ],
@@ -140,10 +145,11 @@ describe('DiffsStoreActions', () => {
   });
 
   describe('fetchDiffFilesBatch', () => {
-    it('should fetch batch diff files', done => {
+    // eslint-disable-next-line jasmine/no-focused-tests
+    fit('should fetch batch diff files', done => {
       const endpointBatch = '/fetch/diffs_batch';
-      const batch1 = `${endpointBatch}?per_page=10`;
-      const batch2 = `${endpointBatch}?per_page=10&page=2`;
+      const batch1 = `${endpointBatch}?per_page=${DIFFS_PER_PAGE}`;
+      const batch2 = `${endpointBatch}?per_page=${DIFFS_PER_PAGE}&page=2`;
       const mock = new MockAdapter(axios);
       const res1 = { diff_files: [], pagination: { next_page: 2 } };
       const res2 = { diff_files: [], pagination: {} };

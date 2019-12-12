@@ -1,6 +1,6 @@
 <script>
-import { __, s__, sprintf } from '~/locale';
 import { GlLink, GlProgressBar, GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { __, s__, sprintf } from '~/locale';
 import userAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import HelpContentPopover from './help_content_popover.vue';

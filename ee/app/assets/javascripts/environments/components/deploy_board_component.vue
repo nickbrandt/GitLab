@@ -42,10 +42,13 @@ export default {
       type: Boolean,
       required: true,
     },
-    logsPath: {
+    environmentName: {
       type: String,
-      required: false,
-      default: '',
+      required: true,
+    },
+    projectPath: {
+      type: String,
+      required: true,
     },
     hasLegacyAppLabel: {
       type: Boolean,
@@ -140,8 +143,9 @@ export default {
                   :key="i"
                   :status="instance.status"
                   :tooltip-text="instance.tooltip"
+                  :environment-name="environmentName"
                   :pod-name="instance.pod_name"
-                  :logs-path="logsPath"
+                  :project-path="projectPath"
                   :stable="instance.stable"
                 />
               </template>

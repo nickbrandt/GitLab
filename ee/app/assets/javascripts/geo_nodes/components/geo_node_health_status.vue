@@ -1,6 +1,6 @@
 <script>
 import icon from '~/vue_shared/components/icon.vue';
-import { HEALTH_STATUS_ICON } from '../constants';
+import { HEALTH_STATUS_ICON, HEALTH_STATUS_CLASS } from '../constants';
 
 export default {
   components: {
@@ -14,7 +14,7 @@ export default {
   },
   computed: {
     healthCssClass() {
-      return `geo-node-${this.status.toLowerCase()}`;
+      return HEALTH_STATUS_CLASS[this.status.toLowerCase()];
     },
     statusIconName() {
       return HEALTH_STATUS_ICON[this.status.toLowerCase()];
@@ -24,11 +24,11 @@ export default {
 </script>
 
 <template>
-  <div class="prepend-top-15 detail-section-item">
-    <div class="node-detail-title">{{ s__('GeoNodes|Health status') }}</div>
-    <div :class="healthCssClass" class="node-detail-value node-health-status">
+  <div class="mt-2 detail-section-item">
+    <div class="text-secondary-700 node-detail-title">{{ s__('GeoNodes|Health status') }}</div>
+    <div :class="healthCssClass" class="mt-1 d-flex align-items-center node-health-status">
       <icon :size="16" :name="statusIconName" />
-      <span class="status-text prepend-left-5"> {{ status }} </span>
+      <span class="status-text ml-2"> {{ status }} </span>
     </div>
   </div>
 </template>

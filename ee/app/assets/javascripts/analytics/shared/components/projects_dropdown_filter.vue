@@ -1,9 +1,9 @@
 <script>
-import { sprintf, n__, s__, __ } from '~/locale';
 import $ from 'jquery';
 import _ from 'underscore';
-import Icon from '~/vue_shared/components/icon.vue';
 import { GlLoadingIcon, GlButton, GlAvatar } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
+import { sprintf, n__, s__, __ } from '~/locale';
 import Api from '~/api';
 import { renderAvatar, renderIdenticon } from '~/helpers/avatar_helper';
 
@@ -111,7 +111,7 @@ export default {
       });
     },
     rowTemplate(project) {
-      const selected = this.defaultProjects.length
+      const selected = this.defaultProjects
         ? this.defaultProjects.find(p => p.id === project.id)
         : false;
       const isActiveClass = selected ? 'is-active' : '';

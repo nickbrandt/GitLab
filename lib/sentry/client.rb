@@ -2,6 +2,8 @@
 
 module Sentry
   class Client
+    include Sentry::Client::Projects
+
     Error = Class.new(StandardError)
     MissingKeysError = Class.new(StandardError)
     ResponseInvalidSizeError = Class.new(StandardError)
@@ -46,14 +48,6 @@ module Sentry
           issues: map_to_errors(issues),
           pagination: pagination
         }
-      end
-    end
-
-    def list_projects
-      projects = get_projects
-
-      handle_mapping_exceptions do
-        map_to_projects(projects)
       end
     end
 
@@ -121,10 +115,6 @@ module Sentry
       http_get(issue_latest_event_api_url(issue_id))[:body]
     end
 
-    def get_projects
-      http_get(projects_api_url)[:body]
-    end
-
     def handle_request_exceptions
       yield
     rescue Gitlab::HTTP::Error => e
@@ -155,13 +145,6 @@ module Sentry
       raise Client::Error, message
     end
 
-    def projects_api_url
-      projects_url = URI(@url)
-      projects_url.path = '/api/0/projects/'
-
-      projects_url
-    end
-
     def issue_api_url(issue_id)
       issue_url = URI(@url)
       issue_url.path = "/api/0/issues/#{issue_id}/"
@@ -185,10 +168,6 @@ module Sentry
 
     def map_to_errors(issues)
       issues.map(&method(:map_to_error))
-    end
-
-    def map_to_projects(projects)
-      projects.map(&method(:map_to_project))
     end
 
     def issue_url(id)
@@ -233,6 +212,15 @@ module Sentry
       stack_trace_entry.dig('stacktrace', 'frames')
     end
 
+    def parse_gitlab_issue(plugin_issues)
+      return unless plugin_issues
+
+      gitlab_plugin = plugin_issues.detect { |item| item['id'] == 'gitlab' }
+      return unless gitlab_plugin
+
+      gitlab_plugin.dig('issue', 'url')
+    end
+
     def map_to_detailed_error(issue)
       Gitlab::ErrorTracking::DetailedError.new(
         id: issue.fetch('id'),
@@ -252,6 +240,7 @@ module Sentry
         project_id: issue.dig('project', 'id'),
         project_name: issue.dig('project', 'name'),
         project_slug: issue.dig('project', 'slug'),
+        gitlab_issue: parse_gitlab_issue(issue.fetch('pluginIssues', nil)),
         first_release_last_commit: issue.dig('firstRelease', 'lastCommit'),
         last_release_last_commit: issue.dig('lastRelease', 'lastCommit'),
         first_release_short_version: issue.dig('firstRelease', 'shortVersion'),
@@ -277,20 +266,6 @@ module Sentry
         project_id: issue.dig('project', 'id'),
         project_name: issue.dig('project', 'name'),
         project_slug: issue.dig('project', 'slug')
-      )
-    end
-
-    def map_to_project(project)
-      organization = project.fetch('organization')
-
-      Gitlab::ErrorTracking::Project.new(
-        id: project.fetch('id', nil),
-        name: project.fetch('name'),
-        slug: project.fetch('slug'),
-        status: project.dig('status'),
-        organization_name: organization.fetch('name'),
-        organization_id: organization.fetch('id', nil),
-        organization_slug: organization.fetch('slug')
       )
     end
   end

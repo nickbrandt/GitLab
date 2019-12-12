@@ -19,7 +19,6 @@ describe('ProductivityApp component', () => {
   let mock;
 
   const propsData = {
-    endpoint: TEST_HOST,
     emptyStateSvgPath: TEST_HOST,
     noAccessSvgPath: TEST_HOST,
   };
@@ -47,6 +46,8 @@ describe('ProductivityApp component', () => {
         glFeatures: { productivityAnalyticsScatterplotEnabled: scatterplotEnabled },
       },
     });
+
+    wrapper.vm.$store.dispatch('setEndpoint', TEST_HOST);
   };
 
   beforeEach(() => {
@@ -83,10 +84,12 @@ describe('ProductivityApp component', () => {
 
     describe('with a group being selected', () => {
       beforeEach(() => {
-        wrapper.vm.$store.dispatch('filters/setDateRange', {
+        wrapper.vm.$store.dispatch('filters/setInitialData', {
           skipFetch: true,
-          startDate: new Date('2019-09-01'),
-          endDate: new Date('2019-09-02'),
+          data: {
+            mergedAtAfter: new Date('2019-09-01'),
+            mergedAtBefore: new Date('2019-09-02'),
+          },
         });
         wrapper.vm.$store.dispatch('filters/setGroupNamespace', 'gitlab-org');
         mock.onGet(wrapper.vm.$store.state.endpoint).replyOnce(200);

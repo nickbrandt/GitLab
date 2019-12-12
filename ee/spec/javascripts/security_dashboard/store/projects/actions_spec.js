@@ -27,8 +27,20 @@ describe('projects actions', () => {
     });
 
     describe('on success', () => {
+      const expectedParams = {
+        include_subgroups: true,
+        with_security_reports: true,
+        with_shared: false,
+      };
+
       beforeEach(() => {
-        mock.onGet(state.projectsEndpoint).replyOnce(200, data);
+        mock.onGet(state.projectsEndpoint).replyOnce(config => {
+          const hasExpectedParams = Object.keys(expectedParams).every(
+            param => config.params[param] === expectedParams[param],
+          );
+
+          return hasExpectedParams ? [200, data] : [400];
+        });
       });
 
       it('should dispatch the request and success actions', done => {

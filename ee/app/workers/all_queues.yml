@@ -1,4 +1,5 @@
 ---
+- cronjob:adjourned_group_deletion
 - cronjob:clear_shared_runners_minutes
 - cronjob:geo_file_download_dispatch
 - cronjob:geo_metrics_update

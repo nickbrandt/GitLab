@@ -1,15 +1,3 @@
-import Vue from 'vue';
-import { __ } from '~/locale';
+import initProjectLicensesApp from 'ee/project_licenses';
 
-if (gon.features && gon.features.licensesList) {
-  document.addEventListener(
-    'DOMContentLoaded',
-    () =>
-      new Vue({
-        el: '#js-licenses-app',
-        render(createElement) {
-          return createElement('h1', __('License Compliance'));
-        },
-      }),
-  );
-}
+document.addEventListener('DOMContentLoaded', initProjectLicensesApp);

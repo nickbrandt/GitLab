@@ -2,9 +2,9 @@ import { TEST_HOST } from 'helpers/test_constants';
 import { getJSONFixture } from 'helpers/fixtures';
 import mutations from 'ee/analytics/cycle_analytics/store/mutations';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
+import { DEFAULT_DAYS_IN_PAST } from 'ee/analytics/cycle_analytics/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
-import { DEFAULT_DAYS_IN_PAST } from 'ee/analytics/cycle_analytics/constants';
 import { mockLabels } from '../../../../../spec/javascripts/vue_shared/components/sidebar/labels_select/mock_data';
 
 /*
@@ -75,6 +75,16 @@ export const codeEvents = stageFixtures.code;
 export const testEvents = stageFixtures.test;
 export const stagingEvents = stageFixtures.staging;
 export const productionEvents = stageFixtures.production;
+export const rawCustomStage = {
+  title: 'Coolest beans stage',
+  hidden: false,
+  legend: '',
+  description: '',
+  id: 18,
+  custom: true,
+  start_event_identifier: 'issue_first_mentioned_in_commit',
+  end_event_identifier: 'issue_first_added_to_board',
+};
 
 const { events: rawCustomStageEvents } = customizableStagesAndEvents;
 const camelCasedStageEvents = rawCustomStageEvents.map(deepCamelCase);

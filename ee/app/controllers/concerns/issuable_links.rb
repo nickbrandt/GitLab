@@ -28,7 +28,7 @@ module IssuableLinks
   end
 
   def create_params
-    params.slice(:issuable_references)
+    params.permit(issuable_references: [])
   end
 
   def create_service

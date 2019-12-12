@@ -239,6 +239,21 @@ module Gitlab
             end
           end
         end
+
+        describe 'resource group' do
+          context 'when resource group is defined' do
+            let(:config) do
+              YAML.dump(rspec: {
+                script:   'test',
+                resource_group: 'iOS'
+              })
+            end
+
+            it 'has the attributes' do
+              expect(subject[:resource_group_key]).to eq 'iOS'
+            end
+          end
+        end
       end
 
       describe '#stages_attributes' do
@@ -1708,6 +1723,7 @@ module Gitlab
 
       describe "Hidden jobs" do
         let(:config_processor) { Gitlab::Ci::YamlProcessor.new(config) }
+
         subject { config_processor.stage_builds_attributes("test") }
 
         shared_examples 'hidden_job_handling' do
@@ -1752,6 +1768,7 @@ module Gitlab
 
       describe "YAML Alias/Anchor" do
         let(:config_processor) { Gitlab::Ci::YamlProcessor.new(config) }
+
         subject { config_processor.stage_builds_attributes("build") }
 
         shared_examples 'job_templates_handling' do
@@ -1849,7 +1866,7 @@ module Gitlab
           config = YAML.dump({ rspec: { script: "test", tags: "mysql" } })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec tags should be an array of strings")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:rspec:tags config should be an array of strings")
         end
 
         it "returns errors if before_script parameter is invalid" do
@@ -2197,7 +2214,7 @@ module Gitlab
         context "when the tags parameter is invalid" do
           let(:content) { YAML.dump({ rspec: { script: "test", tags: "mysql" } }) }
 
-          it { is_expected.to eq "jobs:rspec tags should be an array of strings" }
+          it { is_expected.to eq "jobs:rspec:tags config should be an array of strings" }
         end
 
         context "when YAML content is empty" do

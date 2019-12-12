@@ -3,8 +3,7 @@
 require 'pathname'
 
 module QA
-  # https://gitlab.com/gitlab-org/gitlab/issues/36696
-  context 'Secure', :docker, :quarantine do
+  context 'Secure', :docker do
     describe 'License merge request widget' do
       let(:approved_license_name) { "MIT" }
       let(:blacklisted_license_name) { "Zlib" }
@@ -61,6 +60,50 @@ module QA
                 {
                   "count": 1,
                   "name": "Zlib"
+                }
+              ],
+              "dependencies": [
+                {
+                  "license": {
+                      "name": "MIT",
+                      "url": "http://opensource.org/licenses/mit-license"
+                  },
+                  "dependency": {
+                      "name": "actioncable",
+                      "url": "http://rubyonrails.org",
+                      "description": "WebSocket framework for Rails.",
+                      "paths": [
+                          "."
+                      ]
+                  }
+                },
+                {
+                  "license": {
+                      "name": "WTFPL",
+                      "url": "http://www.wtfpl.net/"
+                  },
+                  "dependency": {
+                      "name": "wtfpl_init",
+                      "url": "https://rubygems.org/gems/wtfpl_init",
+                      "description": "Download WTFPL license file and rename to LICENSE.md or something",
+                      "paths": [
+                          "."
+                      ]
+                  }
+                },
+                {
+                  "license": {
+                      "name": "Zlib",
+                      "url": "https://www.zlib.net/"
+                  },
+                  "dependency": {
+                      "name": "zlib",
+                      "url": "https://www.zlib.net/",
+                      "description": "Ruby interface for the zlib compression/decompression library",
+                      "paths": [
+                          "."
+                      ]
+                  }
                 }
               ]
             }

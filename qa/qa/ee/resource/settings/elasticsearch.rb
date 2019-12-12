@@ -29,7 +29,7 @@ module QA
           end
 
           def fabricate_via_api!
-            @es_enabled ? api_post : resource_web_url(api_get)
+            @es_enabled ? api_put : resource_web_url(api_get)
           end
 
           def resource_web_url(resource)
@@ -42,11 +42,11 @@ module QA
             "/application/settings"
           end
 
-          def api_post_path
+          def api_put_path
             "/application/settings"
           end
 
-          def api_post_body
+          def api_put_body
             {
               elasticsearch_search: @es_enabled,
               elasticsearch_indexing: @es_indexing,

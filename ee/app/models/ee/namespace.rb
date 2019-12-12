@@ -64,7 +64,7 @@ module EE
       validate :validate_plan_name
       validate :validate_shared_runner_minutes_support
 
-      delegate :trial?, :trial_ends_on, :upgradable?, to: :gitlab_subscription, allow_nil: true
+      delegate :trial?, :trial_ends_on, :trial_starts_on, :upgradable?, to: :gitlab_subscription, allow_nil: true
 
       before_create :sync_membership_lock_with_parent
 
@@ -112,6 +112,7 @@ module EE
       ::Feature.enabled?(feature, self) ||
         (::Feature.enabled?(feature) && feature_available?(feature))
     end
+    alias_method :alpha_feature_available?, :beta_feature_available?
 
     # Checks features (i.e. https://about.gitlab.com/pricing/) availabily
     # for a given Namespace plan. This method should consider ancestor groups

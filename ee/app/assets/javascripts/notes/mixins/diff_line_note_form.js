@@ -1,6 +1,6 @@
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { TEXT_DIFF_POSITION_TYPE, IMAGE_DIFF_POSITION_TYPE } from '~/diffs/constants';
 import { getDraftReplyFormData, getDraftFormData } from 'ee/batch_comments/utils';
+import { TEXT_DIFF_POSITION_TYPE, IMAGE_DIFF_POSITION_TYPE } from '~/diffs/constants';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import { clearDraft } from '~/lib/utils/autosave';

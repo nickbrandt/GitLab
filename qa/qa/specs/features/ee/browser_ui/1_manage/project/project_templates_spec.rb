@@ -64,7 +64,8 @@ module QA
         end
       end
 
-      # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/61
+      # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/36815 bug_in_code
+      # BUG_IN_CODE
       context 'instance level', :quarantine, :requires_admin do
         before do
           Flow::Login.sign_in_as_admin

@@ -9,7 +9,7 @@ describe Projects::Security::VulnerabilitiesController do
   # when new Vulnerability Findings API is enabled, this controller is not
   # and its actions are "moved" to Projects::Security::VulnerabilityFindingsController
 
-  it_behaves_like 'VulnerabilityFindingsActions disabled' do
+  it_behaves_like 'ProjectVulnerabilityFindingsActions disabled' do
     let(:vulnerable) { project }
     let(:vulnerable_params) { params }
   end
@@ -26,7 +26,7 @@ describe Projects::Security::VulnerabilitiesController do
 
     # when new Vulnerability Findings API is disabled, we fall back to this controller
 
-    it_behaves_like VulnerabilityFindingsActions do
+    it_behaves_like ProjectVulnerabilityFindingsActions do
       let(:vulnerable) { project }
       let(:vulnerable_params) { params }
     end

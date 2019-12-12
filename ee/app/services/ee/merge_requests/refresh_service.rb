@@ -11,6 +11,7 @@ module EE
       def refresh_merge_requests!
         update_approvers
         reset_approvals_for_merge_requests(push.ref, push.newrev)
+        check_merge_train_status
 
         super
       end
@@ -44,6 +45,13 @@ module EE
           ::MergeRequests::SyncReportApproverApprovalRules.new(merge_request).execute if project.feature_available?(:report_approver_rules)
         end
       end
+
+      # rubocop:disable Gitlab/ModuleWithInstanceVariables
+      def check_merge_train_status
+        MergeTrains::CheckStatusService.new(project, current_user)
+          .execute(project, @push.branch_name, @push.newrev)
+      end
+      # rubocop:enable Gitlab/ModuleWithInstanceVariables
     end
   end
 end
