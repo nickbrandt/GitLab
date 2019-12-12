@@ -7,7 +7,7 @@ class MigrateEpicMentionsToDb < ActiveRecord::Migration[5.2]
 
   DELAY = 2.minutes.to_i
   BATCH_SIZE = 10000
-  MIGRATION = 'CreateResourceUserMention'
+  MIGRATION = 'UserMentions::CreateResourceUserMention'
 
   class Epic < ActiveRecord::Base
     include EachBatch

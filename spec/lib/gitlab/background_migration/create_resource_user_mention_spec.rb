@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
+
 require 'spec_helper'
 
 # rubocop:disable RSpec/FactoriesInMigrationSpecs
-describe Gitlab::BackgroundMigration::CreateResourceUserMention do
+describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention do
   let(:author) { create(:user, username: 'author') }
   let(:non_member) { create(:user, username: 'non_member') }
   let(:member) { create(:user, username: 'member') }
@@ -74,9 +75,9 @@ describe Gitlab::BackgroundMigration::CreateResourceUserMention do
       end.to change { MergeRequestUserMention.count }.by(1)
 
       merge_request_user_mention = MergeRequestUserMention.last
-      expect(merge_request_user_mention.mentioned_users_ids.sort).to eq(users.pluck(:id).sort)
-      expect(merge_request_user_mention.mentioned_groups_ids.sort).to eq([group.id])
-      expect(merge_request_user_mention.mentioned_groups_ids.sort).not_to include(inaccessible_group.id)
+      expect(merge_request_user_mention.mentioned_users_ids&.sort).to eq(users.pluck(:id).sort)
+      expect(merge_request_user_mention.mentioned_groups_ids&.sort).to eq([group.id])
+      expect(merge_request_user_mention.mentioned_groups_ids&.sort).not_to include(inaccessible_group.id)
     end
 
     context 'mentions in note' do
