@@ -62,10 +62,14 @@ module QA
 
         def click_discussions_tab
           click_element :notes_tab
+
+          finished_loading?
         end
 
         def click_diffs_tab
           click_element :diffs_tab
+
+          finished_loading?
         end
 
         def click_pipeline_link

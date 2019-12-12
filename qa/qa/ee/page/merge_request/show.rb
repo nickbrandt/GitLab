@@ -108,16 +108,28 @@ module QA
 
           def start_review
             click_element :start_review
+
+            # After clicking the button, wait for it to disappear
+            # before moving on to the next part of the test
+            has_no_element? :start_review
           end
 
           def comment_now
             click_element :comment_now
+
+            # After clicking the button, wait for it to disappear
+            # before moving on to the next part of the test
+            has_no_element? :comment_now
           end
 
           def submit_pending_reviews
             within_element :review_bar do
               click_element :review_preview_toggle
               click_element :submit_review
+
+              # After clicking the button, wait for it to disappear
+              # before moving on to the next part of the test
+              has_no_element? :submit_review
             end
           end
 
