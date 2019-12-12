@@ -2,6 +2,13 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 12.1.16
+
+### Security (1 change)
+
+- Sanitize search text to prevent XSS.
+
+
 ## 12.1.15
 
 - Unreleased due to build failures.
