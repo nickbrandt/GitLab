@@ -4,7 +4,7 @@ import { s__, sprintf } from '~/locale';
 import CodeInstruction from './code_instruction.vue';
 import Tracking from '~/tracking';
 import { TrackingActions, TrackingLabels } from '../constants';
-import trackInstallationTabChange from '../utils';
+import { trackInstallationTabChange } from '../utils';
 
 export default {
   name: 'NpmInstallation',
