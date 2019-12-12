@@ -526,7 +526,7 @@ const boardsStore = {
     this.multiSelect.list = [];
   },
 
-  saveList(list) {    
+  saveList(list) {
     const entity = list.label || list.assignee || list.milestone;
     let entityType = '';
     if (list.label) {
