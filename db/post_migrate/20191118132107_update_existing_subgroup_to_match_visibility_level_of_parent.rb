@@ -9,14 +9,13 @@ class UpdateExistingSubgroupToMatchVisibilityLevelOfParent < ActiveRecord::Migra
 
   VISIBILITY_LEVELS = {
     private: 0,
-    internal: 10,
+    internal: 10
   }
 
   def up
     update_namespaces_with_level(VISIBILITY_LEVELS[:private])
     update_namespaces_with_level(VISIBILITY_LEVELS[:internal])
   end
-
 
   def update_namespaces_with_level(visibility_level)
     namespace_ids_with_level(visibility_level).rows.each_slice(500) do |ids|
