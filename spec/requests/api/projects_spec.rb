@@ -155,35 +155,6 @@ describe API::Projects do
       project4
     end
 
-    # This is a regression spec for https://gitlab.com/gitlab-org/gitlab/issues/37919
-    context 'batch counting forks and open issues and refreshing count caches' do
-      # We expect to count these projects (only the ones on the first page, not all matching ones)
-      let(:projects) { Project.public_to_user(nil).order(id: :desc).first(per_page) }
-      let(:per_page) { 2 }
-      let(:count_service) { double }
-
-      before do
-        # Create more projects, so we have more than one page
-        create_list(:project, 5, :public)
-      end
-
-      it 'batch counts project forks' do
-        expect(::Projects::BatchForksCountService).to receive(:new).with(projects).and_return(count_service)
-        expect(count_service).to receive(:refresh_cache)
-
-        get api("/projects?per_page=#{per_page}")
-        expect(response.status).to eq 200
-      end
-
-      it 'batch counts open issues' do
-        expect(::Projects::BatchOpenIssuesCountService).to receive(:new).with(projects).and_return(count_service)
-        expect(count_service).to receive(:refresh_cache)
-
-        get api("/projects?per_page=#{per_page}")
-        expect(response.status).to eq 200
-      end
-    end
-
     context 'when unauthenticated' do
       it_behaves_like 'projects response' do
         let(:filter) { { search: project.name } }
