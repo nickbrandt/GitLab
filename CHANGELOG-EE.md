@@ -1,12 +1,5 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
-## 12.0.10
-
-### Fixed (1 change)
-
-- Backport the new reliable fetcher to 12.0.9. !20532
-
-
 ## 12.0.9
 
 ### Security (1 change)
