@@ -1,0 +1,5 @@
+---
+title: Skip request throttling for inlining CSS in emails
+merge_request: 21567
+author:
+type: fixed
