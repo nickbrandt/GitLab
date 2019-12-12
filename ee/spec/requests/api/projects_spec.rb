@@ -449,6 +449,27 @@ describe API::Projects do
       end
     end
 
+    context 'when updating service desk' do
+      subject { put(api("/projects/#{project.id}", user), params: { service_desk_enabled: true }) }
+
+      before do
+        stub_licensed_features(service_desk: true)
+        project.update!(service_desk_enabled: false)
+
+        allow(::Gitlab::IncomingEmail).to receive(:enabled?).and_return(true)
+      end
+
+      it 'returns 200' do
+        subject
+
+        expect(response).to have_gitlab_http_status(200)
+      end
+
+      it 'enables the service_desk' do
+        expect { subject }.to change { project.reload.service_desk_enabled }.to(true)
+      end
+    end
+
     context 'when updating repository storage' do
       let(:unknown_storage) { 'new-storage' }
       let(:new_project) { create(:project, :repository, namespace: user.namespace) }
