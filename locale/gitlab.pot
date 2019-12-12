@@ -6252,6 +6252,9 @@ msgstr ""
 msgid "DeleteProject|Failed to remove project repository. Please try again or contact administrator."
 msgstr ""
 
+msgid "DeleteProject|Failed to remove project snippets. Please try again or contact administrator."
+msgstr ""
+
 msgid "DeleteProject|Failed to remove some tags in project container registry. Please try again or contact administrator."
 msgstr ""
 
