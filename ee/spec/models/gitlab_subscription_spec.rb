@@ -159,6 +159,7 @@ describe GitlabSubscription do
 
   describe '#expired?' do
     let(:gitlab_subscription) { create(:gitlab_subscription, end_date: end_date) }
+
     subject { gitlab_subscription.expired? }
 
     context 'when end_date is expired' do

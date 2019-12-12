@@ -86,6 +86,7 @@ describe Search::GroupService, :elastic do
           { project_level: :internal, feature_access_level: :enabled, membership: :guest, expected_count: 1 }
         ]
       end
+
       where(:project_level, :feature_access_level, :membership, :expected_count) do
         permission_table_for_reporter_feature_access
       end

@@ -70,6 +70,7 @@ describe Gitlab::Auth::AuthFinders do
 
   describe '#find_user_from_bearer_token' do
     let(:job) { create(:ci_build, user: user) }
+
     subject { find_user_from_bearer_token }
 
     context 'when the token is passed as an oauth token' do
@@ -107,6 +108,7 @@ describe Gitlab::Auth::AuthFinders do
 
   describe '#find_user_from_job_token' do
     let(:job) { create(:ci_build, user: user) }
+
     subject { find_user_from_job_token }
 
     shared_examples 'job token disabled' do

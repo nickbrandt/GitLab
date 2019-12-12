@@ -5,12 +5,14 @@ require 'spec_helper'
 describe Mutations::MergeRequests::SetAssignees do
   let(:merge_request) { create(:merge_request) }
   let(:user) { create(:user) }
+
   subject(:mutation) { described_class.new(object: nil, context: { current_user: user }) }
 
   describe '#resolve' do
     let(:assignees) { create_list(:user, 3) }
     let(:assignee_usernames) { assignees.map(&:username) }
     let(:mutated_merge_request) { subject[:merge_request] }
+
     subject { mutation.resolve(project_path: merge_request.project.full_path, iid: merge_request.iid, assignee_usernames: assignee_usernames) }
 
     before do

@@ -122,6 +122,7 @@ describe Notify do
 
       describe 'that are approved' do
         let(:last_approver) { create(:user) }
+
         subject { described_class.approved_merge_request_email(recipient.id, merge_request.id, last_approver.id) }
 
         before do
@@ -185,6 +186,7 @@ describe Notify do
 
       describe 'that are unapproved' do
         let(:last_unapprover) { create(:user) }
+
         subject { described_class.unapproved_merge_request_email(recipient.id, merge_request.id, last_unapprover.id) }
 
         before do
@@ -239,6 +241,7 @@ describe Notify do
     context 'for merge requests without assignee' do
       describe 'that are unapproved' do
         let(:last_unapprover) { create(:user) }
+
         subject { described_class.unapproved_merge_request_email(recipient.id, merge_request_without_assignee.id, last_unapprover.id) }
 
         before do

@@ -24,6 +24,7 @@ describe LicenseHelper do
 
       context 'normal user' do
         let(:is_admin) { false }
+
         it 'displays correct error message for normal user' do
           expect(license_message(signed_in: true, is_admin: is_admin)).to be_blank
         end

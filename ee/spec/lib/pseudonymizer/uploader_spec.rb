@@ -10,6 +10,7 @@ describe Pseudonymizer::Uploader do
     )
   end
   let(:remote_directory) { subject.send(:remote_directory) }
+
   subject { described_class.new(options) }
 
   def mock_file(file_name)

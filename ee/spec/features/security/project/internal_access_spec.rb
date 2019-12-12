@@ -70,6 +70,7 @@ describe '[EE] Internal Project Access' do
 
   describe "GET /:project_path/blob" do
     let(:commit) { project.repository.commit }
+
     subject { project_blob_path(project, File.join(commit.id, '.gitignore')) }
 
     it { is_expected.to be_allowed_for(:auditor) }
@@ -153,6 +154,7 @@ describe '[EE] Internal Project Access' do
 
   describe "GET /:project_path/pipelines/:id" do
     let(:pipeline) { create(:ci_pipeline, project: project) }
+
     subject { project_pipeline_path(project, pipeline) }
 
     it { is_expected.to be_allowed_for(:auditor) }
@@ -181,6 +183,7 @@ describe '[EE] Internal Project Access' do
   describe "GET /:project_path/builds/:id" do
     let(:pipeline) { create(:ci_pipeline, project: project) }
     let(:build) { create(:ci_build, pipeline: pipeline) }
+
     subject { project_job_path(project, build.id) }
 
     context "when allowed for public and internal" do
@@ -208,6 +211,7 @@ describe '[EE] Internal Project Access' do
 
   describe "GET /:project_path/-/environments/:id" do
     let(:environment) { create(:environment, project: project) }
+
     subject { project_environment_path(project, environment) }
 
     it { is_expected.to be_allowed_for(:auditor) }

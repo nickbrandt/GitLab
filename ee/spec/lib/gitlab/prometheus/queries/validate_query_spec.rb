@@ -5,6 +5,7 @@ require 'spec_helper'
 describe Gitlab::Prometheus::Queries::ValidateQuery do
   let(:client) { double('prometheus_client') }
   let(:query) { 'avg(metric)' }
+
   subject { described_class.new(client) }
 
   context 'valid query' do
@@ -21,6 +22,7 @@ describe Gitlab::Prometheus::Queries::ValidateQuery do
 
   context 'invalid query' do
     let(:message) { 'message' }
+
     before do
       allow(client).to receive(:query).with(query).and_raise(Gitlab::PrometheusClient::QueryError.new(message))
     end

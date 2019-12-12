@@ -207,6 +207,7 @@ describe DesignManagement::Version do
 
   describe '#author' do
     let(:author) { create(:user) }
+
     subject(:version) { create(:design_version, :committed, author: author) }
 
     it { is_expected.to have_attributes(author: author) }

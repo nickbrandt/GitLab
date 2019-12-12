@@ -138,6 +138,7 @@ describe GroupPolicy do
 
     context 'with sso enforcement enabled' do
       let(:current_user) { guest }
+
       let_it_be(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
 
       context 'when the session has been set globally' do

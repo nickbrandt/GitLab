@@ -73,6 +73,7 @@ describe Projects::PushRulesController do
       context "Updating #{rule_attr} rule" do
         context 'as an admin' do
           let(:user) { create(:admin) }
+
           it_behaves_like 'a setting with global default', rule_attr, updates: true
         end
 

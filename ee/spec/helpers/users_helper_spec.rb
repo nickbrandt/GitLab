@@ -5,6 +5,7 @@ require 'spec_helper'
 describe UsersHelper do
   describe '#current_user_menu_items' do
     let(:user) { create(:user) }
+
     using RSpec::Parameterized::TableSyntax
 
     subject(:items) { helper.current_user_menu_items }
