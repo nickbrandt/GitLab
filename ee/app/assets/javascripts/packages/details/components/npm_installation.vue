@@ -4,6 +4,7 @@ import { s__, sprintf } from '~/locale';
 import CodeInstruction from './code_instruction.vue';
 import Tracking from '~/tracking';
 import { TrackingActions, TrackingLabels } from '../constants';
+import trackInstallationTabChange from '../utils';
 
 export default {
   name: 'NpmInstallation',
@@ -16,6 +17,7 @@ export default {
     Tracking.mixin({
       label: TrackingLabels.NPM_INSTALLATION,
     }),
+    trackInstallationTabChange,
   ],
   props: {
     name: {
@@ -70,19 +72,13 @@ export default {
       );
     },
   },
-  methods: {
-    onTabChanged(tabIndex) {
-      const action = tabIndex === 0 ? TrackingActions.INSTALLATION : TrackingActions.REGISTRY_SETUP;
-      this.track(action);
-    },
-  },
   trackingActions: { ...TrackingActions },
 };
 </script>
 
 <template>
   <div class="append-bottom-default">
-    <gl-tabs @input="onTabChanged">
+    <gl-tabs @input="trackInstallationTabChange">
       <gl-tab :title="s__('PackageRegistry|Installation')" title-item-class="js-installation-tab">
         <div class="prepend-left-default append-right-default">
           <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|npm') }}</p>
