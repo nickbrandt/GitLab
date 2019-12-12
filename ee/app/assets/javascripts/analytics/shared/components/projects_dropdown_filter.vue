@@ -111,7 +111,7 @@ export default {
       });
     },
     rowTemplate(project) {
-      const selected = this.defaultProjects.length
+      const selected = this.defaultProjects
         ? this.defaultProjects.find(p => p.id === project.id)
         : false;
       const isActiveClass = selected ? 'is-active' : '';
