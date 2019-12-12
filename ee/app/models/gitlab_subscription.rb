@@ -2,7 +2,6 @@
 
 class GitlabSubscription < ApplicationRecord
   default_value_for(:start_date) { Date.today }
-  after_create_commit :log_previous_state_for_create
   before_update :log_previous_state_for_update
   after_destroy_commit :log_previous_state_for_destroy
 
@@ -58,10 +57,6 @@ class GitlabSubscription < ApplicationRecord
   end
 
   private
-
-  def log_previous_state_for_create
-    log_previous_state_to_history(:gitlab_subscription_created)
-  end
 
   def log_previous_state_for_update
     attrs = self.attributes.merge(self.attributes_in_database)
