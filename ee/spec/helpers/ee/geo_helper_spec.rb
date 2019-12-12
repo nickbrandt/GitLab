@@ -5,9 +5,9 @@ describe EE::GeoHelper do
   describe '.current_node_human_status' do
     where(:primary, :secondary, :result) do
       [
-        [true, false, 'primary'],
-        [false, true, 'secondary'],
-        [false, false, 'misconfigured']
+        [true, false, s_('Geo|primary')],
+        [false, true, s_('Geo|secondary')],
+        [false, false, s_('Geo|misconfigured')]
       ]
     end
 

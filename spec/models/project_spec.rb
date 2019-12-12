@@ -244,7 +244,7 @@ describe Project do
           new_project = build_stubbed(:project, namespace_id: project.namespace_id, path: "#{project.path}.wiki")
 
           expect(new_project).not_to be_valid
-          expect(new_project.errors[:name].first).to eq('has already been taken')
+          expect(new_project.errors[:name].first).to eq(_('has already been taken'))
         end
       end
 
@@ -254,7 +254,7 @@ describe Project do
           new_project = build_stubbed(:project, namespace_id: project_with_wiki_suffix.namespace_id, path: 'foo')
 
           expect(new_project).not_to be_valid
-          expect(new_project.errors[:name].first).to eq('has already been taken')
+          expect(new_project.errors[:name].first).to eq(_('has already been taken'))
         end
       end
     end
@@ -385,7 +385,7 @@ describe Project do
       end
 
       it 'contains errors related to the project being deleted' do
-        expect(new_project.errors.full_messages.first).to eq('The project is still being deleted. Please try again later.')
+        expect(new_project.errors.full_messages.first).to eq(_('The project is still being deleted. Please try again later.'))
       end
     end
 
@@ -2270,7 +2270,7 @@ describe Project do
       it 'returns the right human import status' do
         project = create(:project, :import_started)
 
-        expect(project.human_import_status_name).to eq('started')
+        expect(project.human_import_status_name).to eq(_('started'))
       end
     end
 
