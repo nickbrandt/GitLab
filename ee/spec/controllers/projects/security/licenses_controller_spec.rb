@@ -100,7 +100,7 @@ describe Projects::Security::LicensesController do
               "spdx_identifier" => "MIT",
               "name" => mit.name,
               "url" => "http://spdx.org/licenses/MIT.json",
-              "classification" => "blacklisted"
+              "classification" => "denied"
             })
 
             expect(json_response.dig("licenses", 2)).to include({
@@ -202,7 +202,7 @@ describe Projects::Security::LicensesController do
             post :create, xhr: true, params: default_params.merge({
               software_license_policy: {
                 software_license_id: mit_license.id,
-                classification: 'blacklisted'
+                classification: 'denied'
               }
             })
           end
@@ -210,14 +210,14 @@ describe Projects::Security::LicensesController do
           it { expect(response).to have_http_status(:created) }
 
           it 'creates a new policy' do
-            expect(project.reload.software_license_policies.blacklisted.count).to be(1)
-            expect(project.reload.software_license_policies.blacklisted.last.software_license).to eq(mit_license)
+            expect(project.reload.software_license_policies.denied.count).to be(1)
+            expect(project.reload.software_license_policies.denied.last.software_license).to eq(mit_license)
           end
 
           it 'returns the proper JSON response' do
             expect(json[:id]).to be_present
             expect(json[:spdx_identifier]).to eq(mit_license.spdx_identifier)
-            expect(json[:classification]).to eq('blacklisted')
+            expect(json[:classification]).to eq('denied')
             expect(json[:name]).to eq(mit_license.name)
             expect(json[:url]).to be_nil
             expect(json[:components]).to be_empty
@@ -319,18 +319,18 @@ describe Projects::Security::LicensesController do
           before do
             patch :update, xhr: true, params: default_params.merge({
               software_license_policy: {
-                classification: "blacklisted"
+                classification: "denied"
               }
             })
           end
 
           it { expect(response).to have_http_status(:ok) }
-          it { expect(software_license_policy.reload).to be_blacklisted }
+          it { expect(software_license_policy.reload).to be_denied }
 
           it "generates the proper JSON response" do
             expect(json[:id]).to eql(software_license_policy.id)
             expect(json[:spdx_identifier]).to eq(mit_license.spdx_identifier)
-            expect(json[:classification]).to eq("blacklisted")
+            expect(json[:classification]).to eq("denied")
             expect(json[:name]).to eq(mit_license.name)
           end
         end

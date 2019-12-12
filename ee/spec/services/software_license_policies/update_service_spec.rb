@@ -11,13 +11,7 @@ describe SoftwareLicensePolicies::UpdateService do
     end
   end
 
-  let(:software_license_policy) do
-    create(
-      :software_license_policy,
-      software_license: create(:software_license, name: 'ExamplePL/2.1'),
-      classification: 'blacklisted'
-    )
-  end
+  let(:software_license_policy) { create(:software_license_policy, :denied) }
 
   before do
     stub_licensed_features(license_management: true)
