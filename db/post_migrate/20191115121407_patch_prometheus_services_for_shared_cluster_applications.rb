@@ -29,18 +29,18 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
       self.table_name = 'projects'
       include ::EachBatch
 
-      def self.with_application_on_group_clusters
+      scope :with_application_on_group_clusters, -> {
         joins("INNER JOIN namespaces ON namespaces.id = projects.namespace_id")
           .joins("INNER JOIN cluster_groups ON cluster_groups.group_id = namespaces.id")
           .joins("INNER JOIN clusters ON clusters.id = cluster_groups.cluster_id AND clusters.cluster_type = #{Cluster.cluster_types['group_type']}")
           .joins("INNER JOIN clusters_applications_prometheus ON clusters_applications_prometheus.cluster_id = clusters.id
                       AND clusters_applications_prometheus.status IN (#{Applications::Prometheus.statuses[:installed]}, #{Applications::Prometheus.statuses[:updated]})")
-      end
+      }
 
-      def self.without_active_prometheus_services
+      scope :without_active_prometheus_services, -> {
         joins("LEFT JOIN services ON services.project_id = projects.id AND services.type = 'PrometheusService'")
           .where("(services.id IS NULL OR (services.active = FALSE AND services.properties = '{}'))")
-      end
+      }
     end
 
     class Cluster < ActiveRecord::Base
@@ -48,8 +48,7 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
 
       enum cluster_type: {
         instance_type: 1,
-        group_type: 2,
-        project_type: 3
+        group_type: 2
       }
 
       def self.has_prometheus_application?
@@ -60,7 +59,7 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
   end
 
   def up
-    scope.group('projects.id').each_batch(of: migrate_instance_cluster? ? BATCH_SIZE * 5 : BATCH_SIZE) do |batch, index|
+    projects_without_active_prometheus_service.group('projects.id').each_batch(of: migrate_instance_cluster? ? BATCH_SIZE * 5 : BATCH_SIZE) do |batch, index|
       range = batch.pluck('projects.id')
       delay = index * DELAY
       BackgroundMigrationWorker.perform_in(delay.seconds, MIGRATION, range)
@@ -71,7 +70,9 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
     # no-op
   end
 
-  def scope
+  private
+
+  def projects_without_active_prometheus_service
     scope = Migratable::Project
               .without_active_prometheus_services
 

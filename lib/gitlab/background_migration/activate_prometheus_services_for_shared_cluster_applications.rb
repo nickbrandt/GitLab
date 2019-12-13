@@ -1,31 +1,23 @@
 # frozen_string_literal: true
-#
-# rubocop:disable Style/Documentation
 
 module Gitlab
   module BackgroundMigration
+    # Description of Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedClusterApplications class
+    # It is an implementation of https://docs.gitlab.com/ee/development/background_migrations.html
+    # It accepts array of projects records ids, and for related service records either updates active attribute
+    # or create new records with default values
     class ActivatePrometheusServicesForSharedClusterApplications
-      include Gitlab::Database::MigrationHelpers
-
       module Migratable
+        # Migration model namespace isolated from application code.
         class PrometheusService < ActiveRecord::Base
           self.table_name = 'services'
 
-          def self.managed
-            where("services.type = 'PrometheusService' AND services.properties = '{}'")
-          end
+          default_scope { where("services.type = 'PrometheusService'") }
 
-          def self.custom_config
-            where("services.type = 'PrometheusService' AND services.properties != '{}'")
-          end
-
-          def self.active
-            where("services.type = 'PrometheusService' AND services.active = TRUE")
-          end
-
-          def self.inactive
-            where("services.type = 'PrometheusService' AND services.active = FALSE")
-          end
+          scope :managed, -> { where("services.properties = '{}'") }
+          scope :custom_config, -> { where("services.properties != '{}'") }
+          scope :active, -> { where("services.active = TRUE") }
+          scope :inactive, -> { where("services.active = FALSE") }
         end
       end
 
