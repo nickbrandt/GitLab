@@ -57,6 +57,7 @@ module QA
           project_push.project = @project
           project_push.new_branch = true
           project_push.branch_name = branch_name
+          project_push.file_name = "file-#{SecureRandom.hex(8)}.txt"
         end
 
         # Create a merge request to merge the branch we just created
@@ -91,7 +92,7 @@ module QA
           project_push.project = @project
           project_push.new_branch = true
           project_push.branch_name = branch_name
-          project_push.file_name = "another_file.txt"
+          project_push.file_name = "file-#{SecureRandom.hex(8)}.txt"
           project_push.file_content = "merge me"
         end
 
