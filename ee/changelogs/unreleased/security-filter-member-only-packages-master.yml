@@ -1,0 +1,5 @@
+---
+title: Filter out packages the user does'nt have permission to see at group level
+merge_request:
+author:
+type: security
