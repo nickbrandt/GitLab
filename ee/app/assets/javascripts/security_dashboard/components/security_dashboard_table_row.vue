@@ -76,7 +76,10 @@ export default {
 
     <div class="table-section flex-grow-1">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
-      <div class="table-mobile-content vulnerability-info">
+      <div
+        class="table-mobile-content vulnerability-info"
+        data-qa-selector="vulnerability_info_content"
+      >
         <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
         <template v-else>
           <gl-button
