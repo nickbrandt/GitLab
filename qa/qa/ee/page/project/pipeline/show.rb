@@ -22,6 +22,10 @@ module QA::EE
             view 'ee/app/views/projects/pipelines/_tabs_holder.html.haml' do
               element :security_tab
             end
+
+            view 'ee/app/assets/javascripts/security_dashboard/components/security_dashboard_table_row.vue' do
+              element :vulnerability_info_content
+            end
           end
         end
 
@@ -44,6 +48,10 @@ module QA::EE
 
         def has_license_count_of?(count)
           find_element(:licenses_counter).has_content?(count)
+        end
+
+        def has_vulnerability?(name)
+          has_element?(:vulnerability_info_content, text: name)
         end
       end
     end
