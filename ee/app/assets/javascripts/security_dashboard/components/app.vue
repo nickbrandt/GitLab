@@ -6,6 +6,7 @@ import Filters from './filters.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityChart from './vulnerability_chart.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
+import VulnerabilitySeverity from './vulnerability_severity.vue';
 
 export default {
   name: 'SecurityDashboardApp',
@@ -15,6 +16,7 @@ export default {
     SecurityDashboardTable,
     VulnerabilityChart,
     VulnerabilityCountList,
+    VulnerabilitySeverity,
   },
   props: {
     vulnerabilitiesEndpoint: {
@@ -34,6 +36,11 @@ export default {
     vulnerabilityFeedbackHelpPath: {
       type: String,
       required: true,
+    },
+    vulnerableProjectsEndpoint: {
+      type: String,
+      required: false,
+      default: '',
     },
     lockToProject: {
       type: Object,
@@ -68,8 +75,14 @@ export default {
     isLockedToProject() {
       return this.lockToProject !== null;
     },
+    shouldShowAside() {
+      return this.shouldShowChart || this.shouldShowVulnerabilitySeverities;
+    },
     shouldShowChart() {
       return Boolean(this.vulnerabilitiesHistoryEndpoint);
+    },
+    shouldShowVulnerabilitySeverities() {
+      return Boolean(this.vulnerableProjectsEndpoint);
     },
     shouldShowCountList() {
       return this.isLockedToProject && Boolean(this.vulnerabilitiesCountEndpoint);
@@ -140,8 +153,12 @@ export default {
         </security-dashboard-table>
       </article>
 
-      <aside v-if="shouldShowChart" class="col-xl-5">
-        <vulnerability-chart />
+      <aside v-if="shouldShowAside" class="col-xl-5">
+        <vulnerability-chart v-if="shouldShowChart" class="mb-3" />
+        <vulnerability-severity
+          v-if="shouldShowVulnerabilitySeverities"
+          :endpoint="vulnerableProjectsEndpoint"
+        />
       </aside>
     </div>
 

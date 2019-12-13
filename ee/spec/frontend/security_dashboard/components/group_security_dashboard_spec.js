@@ -14,6 +14,7 @@ const vulnerabilitiesEndpoint = '/vulnerabilities';
 const vulnerabilitiesCountEndpoint = '/vulnerabilities_summary';
 const vulnerabilitiesHistoryEndpoint = '/vulnerabilities_history';
 const vulnerabilityFeedbackHelpPath = '/vulnerabilities_feedback_help';
+const vulnerableProjectsEndpoint = '/vulnerable_projects';
 
 describe('Group Security Dashboard component', () => {
   let store;
@@ -45,6 +46,7 @@ describe('Group Security Dashboard component', () => {
         vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
         vulnerabilityFeedbackHelpPath,
+        vulnerableProjectsEndpoint,
       },
       ...options,
     });
@@ -75,6 +77,7 @@ describe('Group Security Dashboard component', () => {
           vulnerabilitiesCountEndpoint,
           vulnerabilitiesHistoryEndpoint,
           vulnerabilityFeedbackHelpPath,
+          vulnerableProjectsEndpoint,
         }),
       );
     });

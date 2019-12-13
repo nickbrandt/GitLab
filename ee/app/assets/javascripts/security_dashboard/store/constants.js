@@ -8,6 +8,7 @@ export const SEVERITY_LEVELS = {
   unknown: s__('severity|Unknown'),
   info: s__('severity|Info'),
   undefined: s__('severity|Undefined'),
+  none: s__('severity|None'),
 };
 
 export const CONFIDENCE_LEVELS = {
