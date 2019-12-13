@@ -33,7 +33,11 @@ const findMetricInDashboard = (metricId, dashboard) => {
 };
 
 /**
- * Set a new state for a metric
+ * Set a new state for a metric.
+ *
+ * Initally metric data is not populated, so `Vue.set` is
+ * used to add new properties to the metric.
+ *
  * @param {Object} metric - Metric object as defined in the dashboard
  * @param {Object} state - New state
  * @param {Array|null} state.result - Array of results
