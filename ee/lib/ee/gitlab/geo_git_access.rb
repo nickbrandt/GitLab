@@ -10,21 +10,6 @@ module EE
 
       GEO_SERVER_DOCS_URL = 'https://docs.gitlab.com/ee/administration/geo/replication/using_a_geo_server.html'.freeze
 
-      override :check_custom_action
-      def check_custom_action(cmd)
-        custom_action = custom_action_for(cmd)
-        return custom_action if custom_action
-
-        super
-      end
-
-      override :check_for_console_messages
-      def check_for_console_messages(cmd)
-        super.push(
-          *current_replication_lag_message
-        )
-      end
-
       protected
 
       def project_or_wiki

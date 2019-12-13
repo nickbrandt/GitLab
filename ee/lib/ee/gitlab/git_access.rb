@@ -34,6 +34,21 @@ module EE
 
       private
 
+      override :check_custom_action
+      def check_custom_action(cmd)
+        custom_action = custom_action_for(cmd)
+        return custom_action if custom_action
+
+        super
+      end
+
+      override :check_for_console_messages
+      def check_for_console_messages(cmd)
+        super.push(
+          *current_replication_lag_message
+        )
+      end
+
       override :check_download_access!
       def check_download_access!
         return if geo?
