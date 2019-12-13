@@ -9,7 +9,7 @@ module Gitlab
           include Chain::Helpers
 
           def perform!
-            return unless Feature.enabled?(:workflow_rules, @pipeline.project)
+            return unless feature_enabled?
 
             unless workflow_passed?
               error('Pipeline filtered out by workflow rules.')
@@ -17,12 +17,16 @@ module Gitlab
           end
 
           def break?
-            return false unless Feature.enabled?(:workflow_rules, @pipeline.project)
+            return false unless feature_enabled?
 
             !workflow_passed?
           end
 
           private
+
+          def feature_enabled?
+            Feature.enabled?(:workflow_rules, default_enabled: true)
+          end
 
           def workflow_passed?
             strong_memoize(:workflow_passed) do

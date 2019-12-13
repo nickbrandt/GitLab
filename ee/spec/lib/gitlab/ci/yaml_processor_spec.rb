@@ -22,6 +22,7 @@ describe Gitlab::Ci::YamlProcessor do
           stage: "build",
           stage_idx: 1,
           name: "build",
+          only: { refs: %w[branches tags] },
           options: {
             script: ["test"]
           },
@@ -33,6 +34,7 @@ describe Gitlab::Ci::YamlProcessor do
           stage: "test",
           stage_idx: 2,
           name: "bridge",
+          only: { refs: %w[branches tags] },
           options: {
             bridge_needs: { pipeline: 'some/project' }
           },
@@ -52,6 +54,7 @@ describe Gitlab::Ci::YamlProcessor do
           stage: "build",
           stage_idx: 1,
           name: "build",
+          only: { refs: %w[branches tags] },
           options: {
             script: ["test"]
           },
@@ -63,6 +66,7 @@ describe Gitlab::Ci::YamlProcessor do
           stage: "test",
           stage_idx: 2,
           name: "bridge",
+          only: { refs: %w[branches tags] },
           options: {
             bridge_needs: { pipeline: 'some/project' }
           },

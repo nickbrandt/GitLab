@@ -42,6 +42,8 @@ module Gitlab
           yaml_variables: transform_to_yaml_variables(job_variables(name)),
           needs_attributes: job.dig(:needs, :job),
           interruptible: job[:interruptible],
+          only: job[:only],
+          except: job[:except],
           rules: job[:rules],
           cache: job[:cache],
           resource_group_key: job[:resource_group],
@@ -72,13 +74,7 @@ module Gitlab
 
       def stages_attributes
         @stages.uniq.map do |stage|
-          seeds = stage_builds_attributes(stage).map do |attributes|
-            job = @jobs.fetch(attributes[:name].to_sym)
-
-            attributes
-              .merge(only: job.fetch(:only, {}))
-              .merge(except: job.fetch(:except, {}))
-          end
+          seeds = stage_builds_attributes(stage)
 
           { name: stage, index: @stages.index(stage), builds: seeds }
         end

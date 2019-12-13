@@ -65,7 +65,6 @@ module EE
 
             entry :only, ::Gitlab::Ci::Config::Entry::Policy,
               description: 'Refs policy this job will be executed for.',
-              default: ::Gitlab::Ci::Config::Entry::Policy::DEFAULT_ONLY,
               inherit: false
 
             entry :except, ::Gitlab::Ci::Config::Entry::Policy,
@@ -99,11 +98,12 @@ module EE
 
             def compose!(deps = nil)
               super do
-                # This is something of a hack, see issue for details:
-                # https://gitlab.com/gitlab-org/gitlab/issues/31685
-                if !only_defined? && has_rules?
-                  @entries.delete(:only)
-                  @entries.delete(:except)
+                # If workflow:rules:, rules: and only: are undefined
+                # do create default `only:`
+                #
+                # This is to make `only:` to be backward compatible
+                if !deps&.workflow&.has_rules? && !has_rules? && !only_defined?
+                  entry_create!(:only, ::Gitlab::Ci::Config::Entry::Policy::DEFAULT_ONLY)
                 end
               end
             end
