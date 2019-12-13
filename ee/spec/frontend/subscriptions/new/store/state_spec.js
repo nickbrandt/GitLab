@@ -2,6 +2,7 @@ import createState from 'ee/subscriptions/new/store/state';
 import * as constants from 'ee/subscriptions/new/constants';
 
 constants.STEPS = ['firstStep', 'secondStep'];
+constants.TAX_RATE = 0;
 
 describe('projectsSelector default state', () => {
   const planData = [
@@ -15,6 +16,10 @@ describe('projectsSelector default state', () => {
     setupForCompany: 'true',
     fullName: 'Full Name',
   };
+
+  const currentDate = new Date('2020-01-07T12:44:08.135Z');
+
+  jest.spyOn(global.Date, 'now').mockImplementationOnce(() => currentDate.valueOf());
 
   const state = createState(initialData);
 
@@ -90,6 +95,18 @@ describe('projectsSelector default state', () => {
       const modifiedState = createState({ ...initialData, ...{ setupForCompany: 'false' } });
 
       expect(modifiedState.numberOfUsers).toEqual(1);
+    });
+  });
+
+  describe('taxRate', () => {
+    it('sets the taxRate to the TAX_RATE constant', () => {
+      expect(state.taxRate).toEqual(0);
+    });
+  });
+
+  describe('startDate', () => {
+    it('sets the startDate to the current date', () => {
+      expect(state.startDate).toEqual(currentDate);
     });
   });
 });
