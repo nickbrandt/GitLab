@@ -2589,6 +2589,19 @@ describe Ci::Build do
       it { is_expected.to include(job_variable) }
     end
 
+    context 'when build is for branch' do
+      let(:branch_variable) do
+        { key: 'CI_COMMIT_BRANCH', value: 'master', public: true, masked: false }
+      end
+
+      before do
+        build.update(tag: false)
+        pipeline.update(tag: false)
+      end
+
+      it { is_expected.to include(branch_variable) }
+    end
+
     context 'when build is for tag' do
       let(:tag_variable) do
         { key: 'CI_COMMIT_TAG', value: 'master', public: true, masked: false }
