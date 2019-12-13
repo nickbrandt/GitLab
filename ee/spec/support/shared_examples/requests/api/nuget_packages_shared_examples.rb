@@ -80,6 +80,7 @@ end
 RSpec.shared_examples 'process nuget upload' do |user_type, status, add_member = true|
   shared_examples 'creates nuget package files' do
     it 'creates package files' do
+      expect(::Packages::Nuget::ExtractionWorker).to receive(:perform_async).once
       expect { subject }
           .to change { project.packages.count }.by(1)
           .and change { Packages::PackageFile.count }.by(1)

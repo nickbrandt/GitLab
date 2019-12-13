@@ -93,17 +93,21 @@ module API
         put do
           authorize_upload!(authorized_user_project)
 
-          package = ::Packages::Nuget::CreatePackageService.new(authorized_user_project, current_user).execute
-
           file_params = params.merge(
             file: uploaded_package_file(:package),
             file_name: PACKAGE_FILENAME,
             file_type: PACKAGE_FILETYPE
           )
 
+          package = ::Packages::Nuget::CreatePackageService.new(authorized_user_project, current_user)
+                                                           .execute
+
+          package_file = ::Packages::CreatePackageFileService.new(package, file_params)
+                                                             .execute
+
           track_event('push_package')
 
-          ::Packages::CreatePackageFileService.new(package, file_params).execute
+          ::Packages::Nuget::ExtractionWorker.perform_async(package_file.id)
 
           created!
         rescue ObjectStorage::RemoteStoreError => e
