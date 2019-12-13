@@ -1,4 +1,4 @@
-- return unless current_user.admin? && License.feature_available?(:max_pages_size) && (Gitlab.config.pages.external_http || Gitlab.config.pages.external_https)
+- return unless can?(current_user, :update_max_pages_size, current_group) && License.feature_available?(:pages_size_limit)
 - expanded = expanded_by_default?
 
 %section.settings.gs-pages.no-animate#js-pages-settings{ class: ('expanded' if expanded) }
