@@ -1,4 +1,4 @@
-- return unless can?(current_user, :update_max_pages_size, current_group) && License.feature_available?(:pages_size_limit)
+- return unless can?(current_user, :update_max_pages_size, @project) && License.feature_available?(:pages_size_limit)
 
 - form = local_assigns.fetch(:form)
 
