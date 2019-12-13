@@ -12719,6 +12719,9 @@ msgstr ""
 msgid "Pipelines|CI Lint"
 msgstr ""
 
+msgid "Pipelines|Child pipeline"
+msgstr ""
+
 msgid "Pipelines|Clear Runner Caches"
 msgstr ""
 
@@ -12752,7 +12755,13 @@ msgstr ""
 msgid "Pipelines|There was an error fetching the pipelines. Try again in a few moments or contact your support team."
 msgstr ""
 
+msgid "Pipelines|This is a child pipeline within the parent pipeline"
+msgstr ""
+
 msgid "Pipelines|This project is not currently set up to run pipelines."
+msgstr ""
+
+msgid "Pipelines|parent"
 msgstr ""
 
 msgid "Pipeline|Commit"
