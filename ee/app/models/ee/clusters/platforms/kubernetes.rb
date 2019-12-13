@@ -126,7 +126,7 @@ module EE
             status: :error
           }.merge(opts)
         rescue Kubeclient::HttpError => e
-          ::Gitlab::Sentry.track_acceptable_exception(e)
+          ::Gitlab::Sentry.track_exception(e)
 
           {
             error: _('Kubernetes API returned status code: %{error_code}') % {

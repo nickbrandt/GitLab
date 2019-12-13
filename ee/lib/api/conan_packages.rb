@@ -392,7 +392,7 @@ module API
         # conan sends two upload requests, the first has no file, so we skip record creation if file.size == 0
         ::Packages::Conan::CreatePackageFileService.new(current_package, uploaded_file, params.merge(conan_file_type: file_type)).execute unless params['file.size'] == 0
       rescue ObjectStorage::RemoteStoreError => e
-        Gitlab::Sentry.track_acceptable_exception(e, extra: { file_name: params[:file_name], project_id: project.id })
+        Gitlab::Sentry.track_exception(e, file_name: params[:file_name], project_id: project.id)
 
         forbidden!
       end
