@@ -107,9 +107,7 @@ module DesignManagement
     end
 
     def diff_refs
-      strong_memoize(:diff_refs) do
-        head_version.try(:diff_refs)
-      end
+      strong_memoize(:diff_refs) { head_version&.diff_refs }
     end
 
     def clear_version_cache

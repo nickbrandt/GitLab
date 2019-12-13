@@ -105,7 +105,7 @@ module DesignManagement
     end
 
     def diff_refs
-      strong_memoize(:diff_refs) { commit.try(:diff_refs) }
+      strong_memoize(:diff_refs) { commit&.diff_refs }
     end
 
     def reset
