@@ -54,9 +54,9 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
     end
 
     it 'logs the error' do
-      expect(Gitlab::Sentry).to receive(:track_acceptable_exception).with(
+      expect(Gitlab::Sentry).to receive(:track_exception).with(
         instance_of(EE::Gitlab::Ci::Limit::LimitExceededError),
-        extra: { project_id: project.id, plan: namespace.actual_plan_name }
+        project_id: project.id, plan: namespace.actual_plan_name
       )
 
       subject
@@ -83,7 +83,7 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
     end
 
     it 'does not log any error' do
-      expect(Gitlab::Sentry).not_to receive(:track_acceptable_exception)
+      expect(Gitlab::Sentry).not_to receive(:track_exception)
 
       subject
     end
