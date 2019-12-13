@@ -41,6 +41,7 @@ export default function() {
           vulnerabilitiesEndpoint: el.dataset.vulnerabilitiesEndpoint,
           vulnerabilitiesCountEndpoint: el.dataset.vulnerabilitiesSummaryEndpoint,
           vulnerabilitiesHistoryEndpoint: el.dataset.vulnerabilitiesHistoryEndpoint,
+          vulnerableProjectsEndpoint: el.dataset.vulnerableProjectsEndpoint,
         },
       });
     },
