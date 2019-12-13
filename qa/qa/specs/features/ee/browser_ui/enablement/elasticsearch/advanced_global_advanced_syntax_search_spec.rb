@@ -17,6 +17,8 @@ module QA
           es.api_client = Runtime::API::Client.as_admin
         end
 
+        Runtime::Search.elasticsearch_responding?
+
         @project = Resource::Project.fabricate_via_api! do |project|
           project.add_name_uuid = false
           project.name = "es-adv-global-search-#{project_name_suffix}1"
@@ -50,6 +52,7 @@ module QA
         Page::Search::Results.perform do |results|
           results.switch_to_projects
 
+          expect(results).to have_content("Advanced search functionality is enabled")
           expect(results).to have_project(@project.name)
         end
       end

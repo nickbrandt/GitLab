@@ -14,6 +14,8 @@ module QA
           QA::EE::Resource::Settings::Elasticsearch.fabricate_via_browser_ui!
         end
 
+        Runtime::Search.elasticsearch_responding?
+
         @project = Resource::Project.fabricate_via_api! do |project|
           project.name = project_name
         end
