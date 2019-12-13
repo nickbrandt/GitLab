@@ -2224,28 +2224,6 @@ describe Ci::Build do
     end
   end
 
-  describe '#has_expiring_artifacts?' do
-    context 'when artifacts have expiration date set' do
-      before do
-        build.update(artifacts_expire_at: 1.day.from_now)
-      end
-
-      it 'has expiring artifacts' do
-        expect(build).to have_expiring_artifacts
-      end
-    end
-
-    context 'when artifacts do not have expiration date set' do
-      before do
-        build.update(artifacts_expire_at: nil)
-      end
-
-      it 'does not have expiring artifacts' do
-        expect(build).not_to have_expiring_artifacts
-      end
-    end
-  end
-
   describe '#has_expiring_archive_artifacts?' do
     context 'when artifacts have expiration date set' do
       before do

@@ -717,10 +717,6 @@ module Ci
         end
     end
 
-    def has_expiring_artifacts?
-      artifacts_expire_at.present? && artifacts_expire_at > Time.now
-    end
-
     def has_expiring_archive_artifacts?
       has_expiring_artifacts? && artifacts_file&.exists?
     end
@@ -928,6 +924,10 @@ module Ci
         value = value.is_a?(Integer) ? { max: value } : value.to_h
         value.with_indifferent_access
       end
+    end
+
+    def has_expiring_artifacts?
+      artifacts_expire_at.present? && artifacts_expire_at > Time.now
     end
   end
 end
