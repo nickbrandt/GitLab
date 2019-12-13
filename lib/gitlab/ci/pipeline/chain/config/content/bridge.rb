@@ -6,12 +6,11 @@ module Gitlab
       module Chain
         module Config
           class Content
-            # This case represents when a config content is passed in
-            # as parameter to Ci::CreatePipelineService from the outside.
-            # For example when creating a child pipeline.
             class Bridge < Source
               def content
-                @command.config_content
+                return unless @command.bridge
+
+                @command.bridge.yaml_for_downstream
               end
 
               def source

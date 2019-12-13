@@ -318,4 +318,33 @@ describe Ci::Bridge do
       it { is_expected.to be_falsey }
     end
   end
+
+  describe '#yaml_for_downstream' do
+    subject { bridge.yaml_for_downstream }
+
+    context 'when bridge defines a downstream YAML' do
+      let(:options) do
+        {
+          trigger: {
+            include: 'path/to/child.yml'
+          }
+        }
+      end
+
+      let(:yaml) do
+        <<~EOY
+          ---
+          include: path/to/child.yml
+        EOY
+      end
+
+      it { is_expected.to eq yaml }
+    end
+
+    context 'when bridge does not define a downstream YAML' do
+      let(:options) { {} }
+
+      it { is_expected.to be_nil }
+    end
+  end
 end

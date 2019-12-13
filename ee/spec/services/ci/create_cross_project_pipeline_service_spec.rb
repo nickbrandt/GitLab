@@ -86,8 +86,11 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
   end
 
   context 'when user can create pipeline in a downstream project' do
+    let(:stub_config) { true }
+
     before do
       downstream_project.add_developer(user)
+      stub_ci_pipeline_yaml_file(YAML.dump(rspec: { script: 'rspec' })) if stub_config
     end
 
     it 'creates only one new pipeline' do
@@ -128,10 +131,6 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
     context 'when downstream project is the same as the job project' do
       let(:trigger) do
         { trigger: { project: upstream_project.full_path } }
-      end
-
-      before do
-        downstream_project.add_developer(user)
       end
 
       context 'detects a circular dependency' do
@@ -198,6 +197,8 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
 
           upstream_pipeline.update!(sha: upstream_project.commit.id)
         end
+
+        let(:stub_config) { false }
 
         let(:trigger) do
           {

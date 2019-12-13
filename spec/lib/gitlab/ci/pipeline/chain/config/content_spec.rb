@@ -15,18 +15,39 @@ describe Gitlab::Ci::Pipeline::Chain::Config::Content do
         stub_feature_flags(ci_root_config_content: false)
       end
 
-      context 'when config is passed in as parameter and already available in command' do
+      context 'when bridge job is passed in as parameter' do
         let(:ci_config_path) { nil }
+        let(:bridge) { create(:ci_bridge) }
 
         before do
-          command.config_content = 'the-content'
+          command.bridge = bridge
         end
 
-        it 'returns the content already available in command' do
-          subject.perform!
+        context 'when bridge job has downstream yaml' do
+          before do
+            allow(bridge).to receive(:yaml_for_downstream).and_return('the-yaml')
+          end
 
-          expect(pipeline.config_source).to eq 'bridge_source'
-          expect(command.config_content).to eq 'the-content'
+          it 'returns the content already available in command' do
+            subject.perform!
+
+            expect(pipeline.config_source).to eq 'bridge_source'
+            expect(command.config_content).to eq 'the-yaml'
+          end
+        end
+
+        context 'when bridge job does not have downstream yaml' do
+          before do
+            allow(bridge).to receive(:yaml_for_downstream).and_return(nil)
+          end
+
+          it 'returns the next available source' do
+            subject.perform!
+
+            expect(pipeline.config_source).to eq 'auto_devops_source'
+            template = Gitlab::Template::GitlabCiYmlTemplate.find('Beta/Auto-DevOps')
+            expect(command.config_content).to eq(template.content)
+          end
         end
       end
 
@@ -150,18 +171,20 @@ describe Gitlab::Ci::Pipeline::Chain::Config::Content do
       end
     end
 
-    context 'when config is passed in as parameter and already available in command' do
+    context 'when bridge job is passed in as parameter' do
       let(:ci_config_path) { nil }
+      let(:bridge) { create(:ci_bridge) }
 
       before do
-        command.config_content = 'the-content'
+        command.bridge = bridge
+        allow(bridge).to receive(:yaml_for_downstream).and_return('the-yaml')
       end
 
       it 'returns the content already available in command' do
         subject.perform!
 
         expect(pipeline.config_source).to eq 'bridge_source'
-        expect(command.config_content).to eq 'the-content'
+        expect(command.config_content).to eq 'the-yaml'
       end
     end
 

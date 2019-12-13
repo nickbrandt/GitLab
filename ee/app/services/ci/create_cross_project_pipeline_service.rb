@@ -19,8 +19,7 @@ module Ci
         pipeline_params.fetch(:target_revision))
 
       service.execute(
-        pipeline_params.fetch(:source),
-        { ignore_skip_ci: true }.merge(pipeline_params[:other_execute_params] || {})) do |pipeline|
+        pipeline_params.fetch(:source), pipeline_params[:execute_params]) do |pipeline|
           @bridge.sourced_pipelines.build(
             source_pipeline: @bridge.pipeline,
             source_project: @bridge.project,

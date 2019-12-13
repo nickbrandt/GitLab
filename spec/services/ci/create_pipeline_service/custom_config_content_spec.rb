@@ -6,20 +6,24 @@ describe Ci::CreatePipelineService do
   let_it_be(:user) { create(:admin) }
   let(:ref) { 'refs/heads/master' }
   let(:service) { described_class.new(project, user, { ref: ref }) }
-  let(:pipeline) { service.execute(:push, config_content: config_content) }
 
   context 'custom config content' do
-    let(:config_content) do
-      YAML.dump(
-        rspec: { script: 'rspec' },
-        custom: { script: 'custom' }
+    let(:bridge) do
+      double(:bridge, yaml_for_downstream: <<~YML
+        rspec:
+          script: rspec
+        custom:
+          script: custom
+      YML
       )
     end
 
+    subject { service.execute(:push, bridge: bridge) }
+
     it 'creates a pipeline using the content passed in as param' do
-      expect(pipeline).to be_persisted
-      expect(pipeline.builds.map(&:name)).to eq %w[rspec custom]
-      expect(pipeline.config_source).to eq 'bridge_source'
+      expect(subject).to be_persisted
+      expect(subject.builds.map(&:name)).to eq %w[rspec custom]
+      expect(subject.config_source).to eq 'bridge_source'
     end
   end
 end

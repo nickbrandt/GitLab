@@ -4,6 +4,7 @@ module EE
   module Ci
     module Bridge
       extend ActiveSupport::Concern
+      extend ::Gitlab::Utils::Override
       include ::Gitlab::Utils::StrongMemoize
 
       InvalidBridgeTypeError = Class.new(StandardError)
@@ -106,6 +107,14 @@ module EE
         yaml_for_downstream.present?
       end
 
+      override :yaml_for_downstream
+      def yaml_for_downstream
+        strong_memoize(:yaml_for_downstream) do
+          includes = options&.dig(:trigger, :include)
+          YAML.dump('include' => includes) if includes
+        end
+      end
+
       def downstream_pipeline_params
         return child_params if triggers_child_pipeline?
         return cross_project_params if downstream_project.present?
@@ -120,13 +129,6 @@ module EE
           elsif triggers_child_pipeline?
             project
           end
-        end
-      end
-
-      def yaml_for_downstream
-        strong_memoize(:yaml_for_downstream) do
-          includes = options&.dig(:trigger, :include)
-          YAML.dump('include' => includes) if includes
         end
       end
 
@@ -181,7 +183,8 @@ module EE
           source: :cross_project_pipeline,
           target_revision: {
             ref: target_ref || downstream_project.default_branch
-          }
+          },
+          execute_params: { ignore_skip_ci: true }
         }
       end
 
@@ -198,8 +201,9 @@ module EE
             source_sha: parent_pipeline.source_sha,
             target_sha: parent_pipeline.target_sha
           },
-          other_execute_params: {
-            config_content: yaml_for_downstream
+          execute_params: {
+            ignore_skip_ci: true,
+            bridge: self
           }
         }
       end

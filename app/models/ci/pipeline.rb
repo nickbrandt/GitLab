@@ -511,10 +511,6 @@ module Ci
       builds.skipped.after_stage(stage_idx).find_each(&:process)
     end
 
-    def child?
-      false
-    end
-
     def latest?
       return false unless git_ref && commit.present?
 
