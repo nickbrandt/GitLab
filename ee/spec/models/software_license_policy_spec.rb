@@ -48,4 +48,34 @@ describe SoftwareLicensePolicy do
   describe "#name" do
     specify { expect(subject.name).to eql(subject.software_license.name) }
   end
+
+  describe "#approval_status" do
+    where(:classification, :approval_status) do
+      [
+        %w[allowed approved],
+        %w[denied blacklisted]
+      ]
+    end
+
+    with_them do
+      subject { build(:software_license_policy, classification: classification) }
+
+      it { expect(subject.approval_status).to eql(approval_status) }
+    end
+  end
+
+  describe ".to_classification" do
+    where(:approval_status, :classification) do
+      [
+        %w[approved allowed],
+        %w[blacklisted denied]
+      ]
+    end
+
+    with_them do
+      subject { described_class.to_classification(approval_status) }
+
+      it { expect(subject).to eql(classification) }
+    end
+  end
 end

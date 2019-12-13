@@ -19,10 +19,10 @@ describe SoftwareLicense do
 
     context 'when a software license with a given name has already been created' do
       let(:mit_license) { create(:software_license, :mit) }
-      let(:result) { subject.create_policy_for!(project: project, name: mit_license.name, classification: :approved) }
+      let(:result) { subject.create_policy_for!(project: project, name: mit_license.name, classification: :allowed) }
 
       specify { expect(result).to be_persisted }
-      specify { expect(result).to be_approved }
+      specify { expect(result).to be_allowed }
       specify { expect(result.software_license).to eql(mit_license) }
     end
 

@@ -19,7 +19,7 @@ describe Projects::Licenses::CreatePolicyService do
       let(:params) do
         {
           software_license_id: mit_license.id,
-          classification: 'approved'
+          classification: 'allowed'
         }
       end
 
@@ -30,7 +30,7 @@ describe Projects::Licenses::CreatePolicyService do
         expect(result[:software_license_policy]).to be_present
         expect(result[:software_license_policy].id).to be_present
         expect(result[:software_license_policy].spdx_identifier).to eq(mit_license.spdx_identifier)
-        expect(result[:software_license_policy].classification).to eq('approved')
+        expect(result[:software_license_policy].classification).to eq('allowed')
         expect(result[:software_license_policy].name).to eq(mit_license.name)
         expect(result[:software_license_policy].url).to be_nil
         expect(result[:software_license_policy].dependencies).to be_empty

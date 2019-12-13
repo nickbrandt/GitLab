@@ -2,12 +2,12 @@
 
 FactoryBot.define do
   factory :software_license_policy, class: SoftwareLicensePolicy do
-    classification { :approved }
+    classification { :allowed }
     project
     software_license
 
     trait :allowed do
-      classification { :approved }
+      classification { :allowed }
     end
 
     trait :denied do

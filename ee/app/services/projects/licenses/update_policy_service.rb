@@ -20,7 +20,7 @@ module Projects
         if denied_classification?
           policy.denied!
         else
-          policy.approved!
+          policy.allowed!
         end
 
         RefreshLicenseComplianceChecksWorker.perform_async(project.id)

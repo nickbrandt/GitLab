@@ -159,7 +159,7 @@ describe Projects::Security::LicensesController do
         project_id: project,
         software_license_policy: {
           software_license_id: mit_license.id,
-          classification: 'approved'
+          classification: 'allowed'
         }
       }
     end
@@ -229,7 +229,7 @@ describe Projects::Security::LicensesController do
             post :create, xhr: true, params: default_params.merge({
               software_license_policy: {
                 spdx_identifier: mit_license.spdx_identifier,
-                classification: 'approved'
+                classification: 'allowed'
               }
             })
           end
@@ -237,14 +237,14 @@ describe Projects::Security::LicensesController do
           it { expect(response).to have_http_status(:created) }
 
           it 'creates a new policy' do
-            expect(project.reload.software_license_policies.approved.count).to be(1)
-            expect(project.reload.software_license_policies.approved.last.software_license).to eq(mit_license)
+            expect(project.reload.software_license_policies.allowed.count).to be(1)
+            expect(project.reload.software_license_policies.allowed.last.software_license).to eq(mit_license)
           end
 
           it 'returns the proper JSON response' do
             expect(json[:id]).to be_present
             expect(json[:spdx_identifier]).to eq(mit_license.spdx_identifier)
-            expect(json[:classification]).to eq('approved')
+            expect(json[:classification]).to eq('allowed')
             expect(json[:name]).to eq(mit_license.name)
             expect(json[:url]).to be_nil
             expect(json[:components]).to be_empty
@@ -256,7 +256,7 @@ describe Projects::Security::LicensesController do
             post :create, xhr: true, params: default_params.merge({
               software_license_policy: {
                 spdx_identifier: nil,
-                classification: 'approved'
+                classification: 'allowed'
               }
             })
           end
@@ -278,7 +278,7 @@ describe Projects::Security::LicensesController do
         namespace_id: project.namespace,
         project_id: project,
         id: software_license_policy.id,
-        software_license_policy: { classification: "approved" }
+        software_license_policy: { classification: "allowed" }
       }
     end
 
