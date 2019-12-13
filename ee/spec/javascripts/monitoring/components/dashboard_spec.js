@@ -67,7 +67,7 @@ describe('Dashboard', () => {
       metricsGroupsAPIResponse,
     );
     component.vm.$store.commit(
-      `monitoringDashboard/${types.SET_QUERY_RESULT}`,
+      `monitoringDashboard/${types.RECEIVE_METRIC_RESULT_SUCCESS}`,
       mockedQueryResultPayload,
     );
     component.vm.$store.commit(
