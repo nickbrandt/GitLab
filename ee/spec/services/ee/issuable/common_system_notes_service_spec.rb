@@ -35,12 +35,40 @@ describe Issuable::CommonSystemNotesService do
 
     subject { described_class.new(project, user).execute(issuable, old_labels: [], is_update: false) }
 
-    it 'creates a system note for weight' do
+    before do
       issuable.weight = 5
       issuable.save
+    end
 
+    it 'creates a system note for weight' do
       expect { subject }.to change { issuable.notes.count }.from(0).to(1)
       expect(issuable.notes.last.note).to match('changed weight')
+    end
+
+    context 'when resource weight event tracking is enabled' do
+      before do
+        stub_feature_flags(track_resource_weight_change_events: true)
+      end
+
+      it 'creates a resource weight event' do
+        subject
+
+        note = issuable.notes.last
+        event = issuable.resource_weight_events.last
+
+        expect(event.weight).to eq(5)
+        expect(event.created_at).to eq(note.created_at)
+      end
+    end
+
+    context 'when resource weight event tracking is disabled' do
+      before do
+        stub_feature_flags(track_resource_weight_change_events: false)
+      end
+
+      it 'does not created a resource weight event' do
+        expect { subject }.not_to change { ResourceWeightEvent.count }
+      end
     end
   end
 end

@@ -30,12 +30,24 @@ module EE
 
       def handle_weight_change_note
         if issuable.previous_changes.include?('weight')
-          create_weight_change_note
+          note = create_weight_change_note
+
+          track_weight_change(note)
         end
       end
 
       def create_weight_change_note
         ::SystemNoteService.change_weight_note(issuable, issuable.project, current_user)
+      end
+
+      def track_weight_change(note)
+        return unless weight_changes_tracking_enabled?
+
+        EE::ResourceEvents::ChangeWeightService.new(issuable, current_user, note.created_at).execute
+      end
+
+      def weight_changes_tracking_enabled?
+        ::Feature.enabled?(:track_resource_weight_change_events, issuable.project)
       end
     end
   end
