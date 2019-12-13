@@ -9,23 +9,15 @@ describe UsersHelper do
 
     subject(:items) { helper.current_user_menu_items }
 
-    where(:user?, :gitlab_com?, :improved_trial_signup_feature_enabled?, :user_eligible?, :should_include_start_trial?) do
-      true  | true   | true   | true   | true
-      true  | true   | true   | false  | false
-      true  | true   | false  | true   | false
-      true  | true   | false  | false  | false
-      true  | false  | true   | true   | false
-      true  | false  | true   | false  | false
-      true  | false  | false  | true   | false
-      true  | false  | false  | false  | false
-      false | true   | true   | true   | false
-      false | true   | true   | false  | false
-      false | true   | false  | true   | false
-      false | true   | false  | false  | false
-      false | false  | true   | true   | false
-      false | false  | true   | false  | false
-      false | false  | false  | true   | false
-      false | false  | false  | false  | false
+    where(:user?, :gitlab_com?, :user_eligible?, :should_include_start_trial?) do
+      true  | true   | true   | true
+      true  | true   | false  | false
+      true  | false  | true   | false
+      true  | false  | false  | false
+      false | true   | true   | false
+      false | true   | false  | false
+      false | false  | true   | false
+      false | false  | false  | false
     end
 
     with_them do
@@ -34,7 +26,6 @@ describe UsersHelper do
         allow(helper).to receive(:can?).and_return(false)
 
         allow(::Gitlab).to receive(:com?) { gitlab_com? }
-        stub_feature_flags(improved_trial_signup: improved_trial_signup_feature_enabled?)
         allow(user).to receive(:any_namespace_without_trial?) { user_eligible? }
       end
 
