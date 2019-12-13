@@ -25,4 +25,8 @@ module World
   def all_countries
     strong_memoize(:all_countries) { ISO3166::Country.all.reject {|item| DENYLIST.include?(item.name) } }
   end
+
+  def alpha3_from_alpha2(alpha2)
+    ISO3166::Country[alpha2]&.alpha3
+  end
 end
