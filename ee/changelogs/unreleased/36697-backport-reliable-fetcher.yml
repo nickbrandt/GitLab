@@ -1,0 +1,5 @@
+---
+title: Backport the new reliable fetcher
+merge_request: 21198
+author:
+type: fixed
