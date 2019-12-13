@@ -3,6 +3,12 @@
 module QA
   context 'Plan' do
     describe 'Multiple assignees per issue' do
+      let(:project) do
+        Resource::Project.fabricate_via_api! do |resource|
+          resource.name = 'project-to-test-issue-with-multiple-assignees'
+        end
+      end
+
       before do
         Flow::Login.sign_in
 
@@ -13,20 +19,16 @@ module QA
         user_5 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_5, Runtime::Env.gitlab_qa_password_5)
         user_6 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_6, Runtime::Env.gitlab_qa_password_6)
 
-        @project = Resource::Project.fabricate_via_api! do |resource|
-          resource.name = 'project-to-test-issue-with-multiple-assignees'
-        end
-
-        @project.add_member(user_1)
-        @project.add_member(user_2)
-        @project.add_member(user_3)
-        @project.add_member(user_4)
-        @project.add_member(user_5)
-        @project.add_member(user_6)
+        project.add_member(user_1)
+        project.add_member(user_2)
+        project.add_member(user_3)
+        project.add_member(user_4)
+        project.add_member(user_5)
+        project.add_member(user_6)
 
         @issue = Resource::Issue.fabricate_via_api! do |issue|
           issue.title = issue.title = 'issue-to-test-multiple-assignees'
-          issue.project = @project
+          issue.project = project
           issue.assignee_ids = [
             user_1.id,
             user_2.id,
@@ -39,7 +41,7 @@ module QA
       end
 
       it 'shows the first three assignees and a +n sign in the issues list' do
-        @project.visit!
+        project.visit!
 
         Page::Project::Menu.perform(&:click_issues)
 
