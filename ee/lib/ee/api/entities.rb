@@ -882,7 +882,7 @@ module EE
         private
 
         def can_read_vulnerabilities?(user, project)
-          Ability.allowed?(user, :read_project_security_dashboard, project)
+          Ability.allowed?(user, :read_vulnerability, project)
         end
       end
 

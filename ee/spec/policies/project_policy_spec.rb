@@ -334,32 +334,10 @@ describe ProjectPolicy do
       let(:current_user) { admin }
       let(:project) { create(:project, :private, namespace: owner.namespace) }
 
-      context 'with admin' do
-        let(:current_user) { admin }
+      where(role: %w[admin owner maintainer developer reporter])
 
-        it { is_expected.to be_allowed(:read_vulnerability_feedback) }
-      end
-
-      context 'with owner' do
-        let(:current_user) { owner }
-
-        it { is_expected.to be_allowed(:read_vulnerability_feedback) }
-      end
-
-      context 'with maintainer' do
-        let(:current_user) { maintainer }
-
-        it { is_expected.to be_allowed(:read_vulnerability_feedback) }
-      end
-
-      context 'with developer' do
-        let(:current_user) { developer }
-
-        it { is_expected.to be_allowed(:read_vulnerability_feedback) }
-      end
-
-      context 'with reporter' do
-        let(:current_user) { reporter }
+      with_them do
+        let(:current_user) { public_send(role) }
 
         it { is_expected.to be_allowed(:read_vulnerability_feedback) }
       end
@@ -367,7 +345,7 @@ describe ProjectPolicy do
       context 'with guest' do
         let(:current_user) { guest }
 
-        it { is_expected.to be_allowed(:read_vulnerability_feedback) }
+        it { is_expected.to be_disallowed(:read_vulnerability_feedback) }
       end
 
       context 'with non member' do
@@ -418,8 +396,8 @@ describe ProjectPolicy do
     context 'with private project' do
       let(:project) { create(:project, :private, namespace: owner.namespace) }
 
-      context 'with guest or above' do
-        let(:current_user) { guest }
+      context 'with reporter or above' do
+        let(:current_user) { reporter }
 
         it { is_expected.to be_allowed(:read_security_findings) }
       end

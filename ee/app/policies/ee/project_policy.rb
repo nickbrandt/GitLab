@@ -62,8 +62,8 @@ module EE
       end
 
       with_scope :subject
-      condition(:security_dashboard_feature_disabled) do
-        !@subject.feature_available?(:security_dashboard)
+      condition(:security_dashboard_enabled) do
+        @subject.feature_available?(:security_dashboard)
       end
 
       condition(:prometheus_alerts_enabled) do
@@ -157,25 +157,19 @@ module EE
 
       rule { can?(:public_access) }.enable :read_package
 
-      rule { can?(:read_project) & can?(:read_build) }.enable :read_security_findings
+      rule { can?(:read_build) & can?(:download_code) }.enable :read_security_findings
 
-      rule { can?(:developer_access) }.policy do
+      rule { security_dashboard_enabled & can?(:developer_access) }.enable :read_vulnerability
+
+      rule { can?(:read_vulnerability) }.policy do
         enable :read_project_security_dashboard
-      end
-
-      rule { security_dashboard_feature_disabled }.policy do
-        prevent :read_project_security_dashboard
-      end
-
-      rule { can?(:read_project_security_dashboard) & can?(:developer_access) }.policy do
-        enable :read_vulnerability
         enable :create_vulnerability
         enable :admin_vulnerability
       end
 
       rule { threat_monitoring_enabled & (auditor | can?(:developer_access)) }.enable :read_threat_monitoring
 
-      rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
+      rule { can?(:read_security_findings) }.enable :read_vulnerability_feedback
 
       rule { dependency_scanning_enabled & can?(:download_code) }.enable :read_dependencies
 
@@ -216,11 +210,15 @@ module EE
         enable :read_environment
         enable :read_deployment
         enable :read_pages
-        enable :read_project_security_dashboard
       end
 
-      rule { auditor & can?(:read_project_security_dashboard) }.policy do
+      rule { auditor & security_dashboard_enabled }.policy do
         enable :read_vulnerability
+      end
+
+      rule { auditor & ~developer }.policy do
+        prevent :create_vulnerability
+        prevent :admin_vulnerability
       end
 
       rule { auditor & ~guest }.policy do
