@@ -16,7 +16,9 @@ module EE
       return unless user
       return unless ::Gitlab.com?
 
-      user.any_namespace_without_trial?
+      Rails.cache.fetch(['users', user.id, 'trials_allowed?'], expires_in: 10.minutes) do
+        !user.has_paid_namespace? && user.any_namespace_without_trial?
+      end
     end
   end
 end
