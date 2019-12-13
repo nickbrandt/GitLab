@@ -52,6 +52,14 @@ describe Projects::PerformanceMonitoring::DashboardsController do
               post :create, params: params
             end
 
+            it 'extends dashboard template path to absolute url' do
+              allow(::Files::CreateService).to receive(:new).and_return(double(execute: { status: :success }))
+
+              expect(File).to receive(:read).with(Rails.root.join('config/prometheus/common_metrics.yml')).and_return('')
+
+              post :create, params: params
+            end
+
             context 'selected branch already exists' do
               it 'responds with :created status code', :aggregate_failures do
                 post :create, params: params

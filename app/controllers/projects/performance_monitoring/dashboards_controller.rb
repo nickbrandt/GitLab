@@ -70,7 +70,7 @@ module Projects
       end
 
       def new_dashboard_content
-        File.read params.require(:dashboard)
+        File.read(Rails.root.join(params.require(:dashboard)))
       end
 
       def validate_dashboard_template!
