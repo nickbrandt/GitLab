@@ -25,7 +25,7 @@ module EE
         ::Gitlab::CurrentSettings.lock_memberships_to_ldap?
       end
 
-      condition(:security_dashboard_feature_enabled) do
+      condition(:security_dashboard_enabled) do
         @subject.feature_available?(:security_dashboard)
       end
 
@@ -132,7 +132,7 @@ module EE
         enable :admin_merge_request
       end
 
-      rule { security_dashboard_feature_enabled & developer }.enable :read_group_security_dashboard
+      rule { security_dashboard_enabled & developer }.enable :read_group_security_dashboard
 
       rule { needs_new_sso_session }.policy do
         prevent :read_group
