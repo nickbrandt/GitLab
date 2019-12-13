@@ -59,7 +59,7 @@ describe Ci::ArchiveTraceService, '#execute' do
     let(:job) { create(:ci_build, :running, :trace_live) }
 
     it 'increments Prometheus counter, sends crash report to Sentry and ignore an error for continuing to archive' do
-      expect(Gitlab::Sentry)
+      expect(Gitlab::ErrorTracking)
         .to receive(:track_and_raise_for_dev_exception)
         .with(::Gitlab::Ci::Trace::ArchiveError,
               issue_url: 'https://gitlab.com/gitlab-org/gitlab-foss/issues/51502',

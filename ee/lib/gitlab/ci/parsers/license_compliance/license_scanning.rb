@@ -18,7 +18,7 @@ module Gitlab
           rescue JSON::ParserError
             raise LicenseScanningParserError, 'JSON parsing failed'
           rescue => e
-            Gitlab::Sentry.track_and_raise_for_dev_exception(e)
+            Gitlab::ErrorTracking.track_and_raise_for_dev_exception(e)
             raise LicenseScanningParserError, 'License scanning report parsing failed'
           end
         end
