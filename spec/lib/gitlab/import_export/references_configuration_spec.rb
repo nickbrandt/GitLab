@@ -13,12 +13,14 @@ describe 'Import/Export Project configuration' do
   include ConfigurationHelper
 
   where(:relation_path, :relation_name) do
-    project_relation_paths.map {|a| [a.join("."), a.last]}
+    relation_paths_for(:project).map do |relation_names|
+      next if relation_names.last == "author"
+
+      [relation_names.join("."), relation_names.last]
+    end.compact
   end
 
   with_them do
-    next if params[:relation_name] == "author"
-
     context "where relation #{params[:relation_path]}" do
       it 'does not have prohibited keys' do
         relation_class = relation_class_for_name(relation_name)

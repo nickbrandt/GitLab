@@ -22,22 +22,22 @@ module ConfigurationHelper
     new_hash
   end
 
-  def config_hash
-    Gitlab::ImportExport::Config.new.to_h.deep_stringify_keys
+  def config_hash(config = Gitlab::ImportExport.config_file)
+    Gitlab::ImportExport::Config.new(config: config).to_h.deep_stringify_keys
   end
 
-  def project_relation_paths
+  def relation_paths_for(key, config: Gitlab::ImportExport.config_file)
     # - project is not part of the tree, so it has to be added manually.
-    flat_hash({ "project" => config_hash.dig('tree', 'project') }).keys
+    flat_hash({ "project" => config_hash(config).dig('tree', key.to_s) }).keys
   end
 
-  def project_relation_names
-    names = names_from_tree(config_hash.dig('tree', 'project'))
+  def relation_names_for(key, config: Gitlab::ImportExport.config_file)
+    names = names_from_tree(config_hash(config).dig('tree', key.to_s))
     # Remove duplicated or add missing models
     # - project is not part of the tree, so it has to be added manually.
     # - milestone, labels, merge_request have both singular and plural versions in the tree, so remove the duplicates.
     # - User, Author... Models we do not care about for checking models
-    names.flatten.uniq - %w(milestones labels user author merge_request design) + ['project']
+    names.flatten.uniq - %w(milestones labels user author merge_request design) + [key.to_s]
   end
 
   def relation_class_for_name(relation_name)

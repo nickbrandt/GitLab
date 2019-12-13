@@ -16,7 +16,7 @@ describe 'Import/Export attribute configuration' do
   let(:safe_model_attributes) { YAML.load_file(safe_attributes_file) }
 
   it 'has no new columns' do
-    project_relation_names.each do |relation_name|
+    relation_names_for(:project).each do |relation_name|
       relation_class = relation_class_for_name(relation_name)
       relation_attributes = relation_class.new.attributes.keys - relation_class.encrypted_attributes.keys.map(&:to_s)
 
