@@ -65,6 +65,7 @@ module EE
 
             entry :only, ::Gitlab::Ci::Config::Entry::Policy,
               description: 'Refs policy this job will be executed for.',
+              default: ::Gitlab::Ci::Config::Entry::Policy::DEFAULT_ONLY,
               inherit: false
 
             entry :except, ::Gitlab::Ci::Config::Entry::Policy,
@@ -98,12 +99,18 @@ module EE
 
             def compose!(deps = nil)
               super do
-                # If workflow:rules:, rules: and only: are undefined
-                # do create default `only:`
+                has_workflow_rules = deps&.workflow&.has_rules?
+
+                # If workflow:rules: or rules: are used
+                # they are considered not compatible
+                # with `only/except` defaults
                 #
-                # This is to make `only:` to be backward compatible
-                if !deps&.workflow&.has_rules? && !has_rules? && !only_defined?
-                  entry_create!(:only, ::Gitlab::Ci::Config::Entry::Policy::DEFAULT_ONLY)
+                # Context: https://gitlab.com/gitlab-org/gitlab/merge_requests/21742
+                if has_rules? || has_workflow_rules
+                  # Remove only/except defaults
+                  # defaults are not considered as defined
+                  @entries.delete(:only) unless only_defined?
+                  @entries.delete(:except) unless except_defined?
                 end
               end
             end
