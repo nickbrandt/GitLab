@@ -7,18 +7,12 @@ describe UsersHelper do
     let(:user) { create(:user) }
     using RSpec::Parameterized::TableSyntax
 
-    subject(:items) { helper.current_user_menu_items }
-
-    where(:user?, :gitlab_com?, :user_eligible?, :should_include_start_trial?) do
-      true  | true   | true   | true
-      true  | true   | false  | false
-      true  | false  | true   | false
-      true  | false  | false  | false
-      false | true   | true   | false
-      false | true   | false  | false
-      false | false  | true   | false
-      false | false  | false  | false
-    end
+    where(
+      has_paid_namespace?: [true, false],
+      user?: [true, false],
+      gitlab_com?: [true, false],
+      user_eligible?: [true, false]
+    )
 
     with_them do
       before do
@@ -27,15 +21,14 @@ describe UsersHelper do
 
         allow(::Gitlab).to receive(:com?) { gitlab_com? }
         allow(user).to receive(:any_namespace_without_trial?) { user_eligible? }
+        allow(user).to receive(:has_paid_namespace?) { has_paid_namespace? }
       end
 
-      it do
-        if should_include_start_trial?
-          expect(items).to include(:start_trial)
-        else
-          expect(items).not_to include(:start_trial)
-        end
-      end
+      let(:expected_result) { !has_paid_namespace? && user? && gitlab_com? && user_eligible? }
+
+      subject { helper.current_user_menu_items.include?(:start_trial) }
+
+      it { is_expected.to eq(expected_result) }
     end
   end
 end

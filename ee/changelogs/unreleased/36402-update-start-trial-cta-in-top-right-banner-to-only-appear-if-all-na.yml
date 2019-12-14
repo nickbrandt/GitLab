@@ -1,0 +1,6 @@
+---
+title: Update start trial CTA in top right banner to only appear if all namespaces
+  are free
+merge_request: 20177
+author:
+type: changed
