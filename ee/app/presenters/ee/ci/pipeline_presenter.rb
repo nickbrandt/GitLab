@@ -12,7 +12,8 @@ module EE
         def failure_reasons
           super.merge(
             activity_limit_exceeded: 'Pipeline activity limit exceeded!',
-            size_limit_exceeded: 'Pipeline size limit exceeded!'
+            size_limit_exceeded: 'Pipeline size limit exceeded!',
+            job_activity_limit_exceeded: 'Pipeline job activity limit exceeded!'
           )
         end
       end
