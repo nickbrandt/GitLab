@@ -61,8 +61,7 @@ module Gitlab
             description: 'Default artifacts.',
             inherit: false
 
-          helpers :before_script, :image, :services, :after_script, :cache, :interruptible,
-            :timeout, :retry, :tags, :artifacts
+          helpers :before_script, :image, :services, :after_script, :cache
 
           private
 
