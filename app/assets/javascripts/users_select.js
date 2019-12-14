@@ -28,9 +28,8 @@ function UsersSelect(currentUser, els, options = {}) {
 
   const { handleClick } = options;
 
-  $els.each(
-    (function(_this) {
-      return function(i, dropdown) {
+  $els.each( (i, dropdown) => {
+        const _this = this;
         const options = {};
         const $dropdown = $(dropdown);
         options.projectId = $dropdown.data('projectId');
@@ -554,14 +553,12 @@ function UsersSelect(currentUser, els, options = {}) {
             return _this.renderRow(options.issuableType, user, selected, username, img);
           },
         });
-      };
-    })(this),
-  );
+  });
   import(/* webpackChunkName: 'select2' */ 'select2/select2')
     .then(() => {
       $('.ajax-users-select').each(
-        (function(_this) {
-          return function(i, select) {
+        (i, select) => {
+            const _this = this;
             const options = {};
             options.skipLdap = $(select).hasClass('skip_ldap');
             options.projectId = $(select).data('projectId');
@@ -651,9 +648,7 @@ function UsersSelect(currentUser, els, options = {}) {
                 return m;
               },
             });
-          };
-        })(this),
-      );
+      });
     })
     .catch(() => {});
 }
