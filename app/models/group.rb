@@ -55,6 +55,8 @@ class Group < Namespace
 
   has_many :todos
 
+  has_one :import_export_upload
+
   accepts_nested_attributes_for :variables, allow_destroy: true
 
   validate :visibility_level_allowed_by_projects
@@ -124,7 +126,7 @@ class Group < Namespace
 
     def visible_to_user_arel(user)
       groups_table = self.arel_table
-      authorized_groups = user.authorized_groups.as('authorized')
+      authorized_groups = user.authorized_groups.arel.as('authorized')
 
       groups_table.project(1)
         .from(authorized_groups)
@@ -263,8 +265,8 @@ class Group < Namespace
     members_with_parents.maintainers.exists?(user_id: user)
   end
 
-  def has_container_repositories?
-    container_repositories.exists?
+  def has_container_repository_including_subgroups?
+    ::ContainerRepository.for_group_and_its_subgroups(self).exists?
   end
 
   # @deprecated
@@ -447,6 +449,14 @@ class Group < Namespace
 
   def supports_events?
     false
+  end
+
+  def export_file_exists?
+    export_file&.file
+  end
+
+  def export_file
+    import_export_upload&.export_file
   end
 
   private

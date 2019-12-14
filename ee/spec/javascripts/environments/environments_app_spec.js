@@ -1,16 +1,15 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import environmentsComponent from '~/environments/components/environments_app.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { environment, folder } from 'spec/environments/mock_data';
+import axios from '~/lib/utils/axios_utils';
+import environmentsComponent from '~/environments/components/environments_app.vue';
 
 describe('Environment', () => {
   const mockData = {
     endpoint: 'environments.json',
     canCreateEnvironment: true,
     canReadEnvironment: true,
-    cssContainerClass: 'container',
     newEnvironmentPath: 'environments/new',
     helpPagePath: 'help',
     canaryDeploymentFeatureId: 'canary_deployment',
@@ -93,13 +92,13 @@ describe('Environment', () => {
 
       describe('pagination', () => {
         it('should render pagination', () => {
-          expect(component.$el.querySelectorAll('.gl-pagination li').length).toEqual(5);
+          expect(component.$el.querySelectorAll('.gl-pagination li').length).toEqual(9);
         });
 
         it('should make an API request when page is clicked', done => {
           spyOn(component, 'updateContent');
           setTimeout(() => {
-            component.$el.querySelector('.gl-pagination li:nth-child(5) .page-link').click();
+            component.$el.querySelector('.gl-pagination li:nth-child(3) .page-link').click();
 
             expect(component.updateContent).toHaveBeenCalledWith({ scope: 'available', page: '2' });
             done();

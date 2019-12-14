@@ -1,6 +1,6 @@
 <script>
-import { __ } from '~/locale';
 import { GlEmptyState } from '@gitlab/ui';
+import { __ } from '~/locale';
 
 export default {
   components: {
@@ -34,6 +34,10 @@ export default {
       required: true,
     },
     emptyNoDataSvgPath: {
+      type: String,
+      required: true,
+    },
+    emptyNoDataSmallSvgPath: {
       type: String,
       required: true,
     },
@@ -79,6 +83,11 @@ export default {
           buttonPath: this.settingsPath,
           secondaryButtonText: '',
           secondaryButtonPath: '',
+        },
+        noDataGroup: {
+          svgUrl: this.emptyNoDataSmallSvgPath,
+          title: __('No data to display'),
+          description: __('The data source is connected, but there is no data to display.'),
         },
         unableToConnect: {
           svgUrl: this.emptyUnableToConnectSvgPath,

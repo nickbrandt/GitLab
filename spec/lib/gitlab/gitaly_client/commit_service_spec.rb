@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::GitalyClient::CommitService do
@@ -186,6 +188,7 @@ describe Gitlab::GitalyClient::CommitService do
 
   describe '#find_commit' do
     let(:revision) { Gitlab::Git::EMPTY_TREE_ID }
+
     it 'sends an RPC request' do
       request = Gitaly::FindCommitRequest.new(
         repository: repository_message, revision: revision

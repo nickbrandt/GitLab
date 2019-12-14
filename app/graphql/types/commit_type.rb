@@ -24,17 +24,23 @@ module Types
           description: 'Web URL of the commit'
     field :signature_html, type: GraphQL::STRING_TYPE, null: true, calls_gitaly: true,
           description: 'Rendered HTML of the commit signature'
+    field :author_name, type: GraphQL::STRING_TYPE, null: true,
+          description: 'Commit authors name'
 
     # models/commit lazy loads the author by email
     field :author, type: Types::UserType, null: true,
           description: 'Author of the commit'
 
+    field :pipelines, Types::Ci::PipelineType.connection_type,
+          null: true,
+          description: 'Pipelines of the commit ordered latest first',
+          resolver: Resolvers::CommitPipelinesResolver
+
     field :latest_pipeline,
           type: Types::Ci::PipelineType,
           null: true,
           description: "Latest pipeline of the commit",
-          resolve: -> (obj, ctx, args) do
-            Gitlab::Graphql::Loaders::PipelineForShaLoader.new(obj.project, obj.sha).find_last
-          end
+          deprecation_reason: 'use pipelines',
+          resolver: Resolvers::CommitPipelinesResolver.last
   end
 end

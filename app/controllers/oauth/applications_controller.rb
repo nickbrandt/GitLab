@@ -6,6 +6,7 @@ class Oauth::ApplicationsController < Doorkeeper::ApplicationsController
   include PageLayoutHelper
   include OauthApplications
   include Gitlab::Experimentation::ControllerConcern
+  include InitializesCurrentUserMode
 
   before_action :verify_user_oauth_applications_enabled, except: :index
   before_action :authenticate_user!
@@ -57,7 +58,7 @@ class Oauth::ApplicationsController < Doorkeeper::ApplicationsController
   end
 
   rescue_from ActiveRecord::RecordNotFound do |exception|
-    render "errors/not_found", layout: "errors", status: 404
+    render "errors/not_found", layout: "errors", status: :not_found
   end
 
   def create_application_params

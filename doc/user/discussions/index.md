@@ -352,10 +352,7 @@ bottom of the screen with two buttons:
   Clicking **Submit review** will publish all comments. Any quick actions
   submitted are performed at this time.
 
-Alternatively, to finish the entire review from a pending comment:
-
-- Click the **Finish review** button on the comment.
-- Use the `/submit_review` [quick action](../project/quick_actions.md) in the text of the comment.
+Alternatively, every pending comment has a button to finish the entire review.
 
 ![Review submission](img/review_preview.png)
 
@@ -389,7 +386,7 @@ from any device you're logged into.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/18008) in GitLab 11.6.
 
 As a reviewer, you're able to suggest code changes with a simple
-markdown syntax in Merge Request Diff threads. Then, the
+Markdown syntax in Merge Request Diff threads. Then, the
 Merge Request author (or other users with appropriate
 [permission](../permissions.md)) is able to apply these
 suggestions with a click, which will generate a commit in

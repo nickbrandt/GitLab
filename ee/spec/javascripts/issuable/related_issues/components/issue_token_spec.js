@@ -218,4 +218,24 @@ describe('IssueToken', () => {
       expect(vm.$emit).toHaveBeenCalledWith('pendingIssuableRemoveRequest', vm.idKey);
     });
   });
+
+  describe('tooltip', () => {
+    beforeEach(() => {
+      vm = new IssueToken({
+        propsData: {
+          idKey,
+          eventNamespace,
+          displayReference,
+          pathIdSeparator,
+          canRemove: true,
+        },
+      }).$mount();
+    });
+
+    it('should not be escaped', () => {
+      const { originalTitle } = vm.$refs.removeButton.dataset;
+
+      expect(originalTitle).toEqual(`Remove ${displayReference}`);
+    });
+  });
 });

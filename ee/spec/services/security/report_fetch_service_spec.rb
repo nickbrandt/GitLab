@@ -8,20 +8,6 @@ describe Security::ReportFetchService do
   let(:service) { described_class.new(project, artifact) }
   let(:artifact) { ::Ci::JobArtifact.dependency_list_reports }
 
-  describe '.pipeline_for' do
-    subject { described_class.pipeline_for(project) }
-
-    context 'with found pipeline' do
-      let!(:pipeline) { create(:ee_ci_pipeline, :with_dependency_list_report, project: project) }
-
-      it { is_expected.to eq(pipeline) }
-    end
-
-    context 'without any pipelines' do
-      it { is_expected.to be_nil }
-    end
-  end
-
   describe '#pipeline' do
     subject { service.pipeline }
 

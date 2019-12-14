@@ -16,7 +16,6 @@ class PodLogsService < ::BaseService
     :check_pod_names,
     :check_pod_name,
     :pod_logs,
-    :split_logs,
     :filter_return_keys
 
   def initialize(environment, params: {})
@@ -92,23 +91,12 @@ class PodLogsService < ::BaseService
     end
   end
 
-  def split_logs(result)
-    result[:logs] = split_by_newline(result[:logs])
-    success(result)
-  end
-
   def filter_return_keys(result)
     result.slice(*SUCCESS_RETURN_KEYS)
   end
 
   def filter_params(params)
     params.slice(*PARAMS)
-  end
-
-  def split_by_newline(logs)
-    return unless logs
-
-    logs.strip.split("\n").as_json
   end
 
   def namespace

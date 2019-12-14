@@ -27,6 +27,7 @@ class Projects::PagesDomainsController < Projects::ApplicationController
   end
 
   def edit
+    redirect_to project_pages_domain_path(@project, @domain)
   end
 
   def create
@@ -42,10 +43,10 @@ class Projects::PagesDomainsController < Projects::ApplicationController
   def update
     if @domain.update(update_params)
       redirect_to project_pages_path(@project),
-        status: 302,
+        status: :found,
         notice: 'Domain was updated'
     else
-      render 'edit'
+      render 'show'
     end
   end
 
@@ -55,7 +56,7 @@ class Projects::PagesDomainsController < Projects::ApplicationController
     respond_to do |format|
       format.html do
         redirect_to project_pages_path(@project),
-                    status: 302,
+                    status: :found,
                     notice: 'Domain was removed'
       end
       format.js
@@ -67,7 +68,7 @@ class Projects::PagesDomainsController < Projects::ApplicationController
       flash[:alert] = @domain.errors.full_messages.join(', ')
     end
 
-    redirect_to edit_project_pages_domain_path(@project, @domain)
+    redirect_to project_pages_domain_path(@project, @domain)
   end
 
   private
@@ -77,7 +78,7 @@ class Projects::PagesDomainsController < Projects::ApplicationController
   end
 
   def update_params
-    params.require(:pages_domain).permit(:user_provided_key, :user_provided_certificate, :auto_ssl_enabled)
+    params.fetch(:pages_domain, {}).permit(:user_provided_key, :user_provided_certificate, :auto_ssl_enabled)
   end
 
   def domain

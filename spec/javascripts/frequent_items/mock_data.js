@@ -135,7 +135,7 @@ export const mockFrequentProjects = [
   },
 ];
 
-export const mockSearchedProjects = [mockRawProject];
+export const mockSearchedProjects = { data: [mockRawProject] };
 export const mockProcessedSearchedProjects = [mockProject];
 
 export const unsortedFrequentItems = [

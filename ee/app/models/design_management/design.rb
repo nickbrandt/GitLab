@@ -7,6 +7,7 @@ module DesignManagement
     include Gitlab::FileTypeDetection
     include Gitlab::Utils::StrongMemoize
     include Referable
+    include Mentionable
 
     belongs_to :project, inverse_of: :designs
     belongs_to :issue
@@ -16,6 +17,7 @@ module DesignManagement
     # This is a polymorphic association, so we can't count on FK's to delete the
     # data
     has_many :notes, as: :noteable, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
+    has_many :user_mentions, class_name: "DesignUserMention"
 
     validates :project, :filename, presence: true
     validates :issue, presence: true, unless: :importing?
@@ -48,6 +50,8 @@ module DesignManagement
 
       joins(join.join_sources).where(actions[:event].not_eq(deletion)).order(:id)
     end
+
+    scope :with_filename, -> (filenames) { where(filename: filenames) }
 
     # Scope called by our REST API to avoid N+1 problems
     scope :with_api_entity_associations, -> { preload(:issue) }

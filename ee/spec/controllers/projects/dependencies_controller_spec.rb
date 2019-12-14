@@ -16,8 +16,10 @@ describe Projects::DependenciesController do
       end
 
       context 'when feature is available' do
+        render_views
+
         before do
-          stub_licensed_features(dependency_list: true)
+          stub_licensed_features(dependency_scanning: true)
         end
 
         it 'renders the show template' do
@@ -25,6 +27,12 @@ describe Projects::DependenciesController do
 
           expect(response).to have_gitlab_http_status(200)
           expect(response).to render_template(:show)
+        end
+
+        it 'renders the side navigation with the correct submenu set as active' do
+          subject
+
+          expect(response.body).to have_active_sub_navigation('Dependency List')
         end
       end
 
@@ -44,7 +52,7 @@ describe Projects::DependenciesController do
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(dependency_list: true)
+          stub_licensed_features(dependency_scanning: true)
         end
 
         it 'returns 404' do

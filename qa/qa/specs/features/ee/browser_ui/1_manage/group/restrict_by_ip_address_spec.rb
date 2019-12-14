@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 require 'securerandom'
-require 'socket'
 
 module QA
-  # https://gitlab.com/gitlab-org/gitlab/issues/34351
-  context 'Manage', :quarantine do
-    describe 'Group access' do
-      LOOPBACK_ADDRESS = '127.0.0.1'
+  context 'Manage' do
+    describe 'Group access', :requires_admin do
+      include Runtime::IPAddress
 
       before(:all) do
         @sandbox_group = Resource::Sandbox.fabricate! do |sandbox_group|
@@ -21,32 +19,23 @@ module QA
         end
       end
 
-      before do
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out if menu.has_personal_area?(wait: 0)
-        end
-
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+      after(:all) do
+        @group.remove_via_api!
       end
 
       context 'when restricted by another ip address' do
         it 'denies access' do
-          @group.sandbox.visit!
+          Flow::Login.while_signed_in_as_admin do
+            @group.sandbox.visit!
 
-          Page::Group::Menu.perform(&:click_group_general_settings_item)
+            Page::Group::Menu.perform(&:click_group_general_settings_item)
 
-          Page::Group::Settings::General.perform do |settings|
-            settings.set_ip_address_restriction(get_next_ip_address)
+            Page::Group::Settings::General.perform do |settings|
+              settings.set_ip_address_restriction(get_next_ip_address(fetch_current_ip_address))
+            end
           end
 
-          Page::Main::Menu.perform do |menu|
-            menu.sign_out if menu.has_personal_area?(wait: 0)
-          end
-
-          Page::Main::Login.perform do |menu|
-            menu.sign_in_using_credentials(user: @user)
-          end
+          Flow::Login.sign_in(as: @user)
 
           @group.sandbox.visit!
           expect(page).to have_text('Page Not Found')
@@ -60,21 +49,17 @@ module QA
 
       context 'when restricted by user\'s ip address' do
         it 'allows access' do
-          @group.sandbox.visit!
+          Flow::Login.while_signed_in_as_admin do
+            @group.sandbox.visit!
 
-          Page::Group::Menu.perform(&:click_group_general_settings_item)
+            Page::Group::Menu.perform(&:click_group_general_settings_item)
 
-          Page::Group::Settings::General.perform do |settings|
-            settings.set_ip_address_restriction(get_current_ip_address)
+            Page::Group::Settings::General.perform do |settings|
+              settings.set_ip_address_restriction(fetch_current_ip_address)
+            end
           end
 
-          Page::Main::Menu.perform do |menu|
-            menu.sign_out if menu.has_personal_area?(wait: 0)
-          end
-
-          Page::Main::Login.perform do |menu|
-            menu.sign_in_using_credentials(user: @user)
-          end
+          Flow::Login.sign_in(as: @user)
 
           @group.sandbox.visit!
           expect(page).to have_text(@group.sandbox.path)
@@ -84,22 +69,12 @@ module QA
         end
       end
 
-      def get_current_ip_address
-        return LOOPBACK_ADDRESS if page.current_host.include?('localhost')
-
-        Socket.ip_address_list.detect { |intf| intf.ipv4_private? }.ip_address
-      end
-
-      def get_next_ip_address
-        current_ip = get_current_ip_address
-
-        QA::Runtime::Logger.info "User's ip address: #{current_ip}"
-
-        current_last_part = current_ip.split(".").pop.to_i
+      def get_next_ip_address(current_ip_address)
+        current_last_part = current_ip_address.split(".").pop.to_i
 
         updated_last_part = current_last_part < 255 ? current_last_part + 1 : 1
 
-        current_ip.split(".")[0...-1].push(updated_last_part).join(".")
+        current_ip_address.split(".")[0...-1].push(updated_last_part).join(".")
       end
     end
   end

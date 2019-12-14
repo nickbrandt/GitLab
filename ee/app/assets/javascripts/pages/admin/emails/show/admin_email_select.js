@@ -38,7 +38,7 @@ const AdminEmailSelect = () => {
           const all = {
             id: 'all',
           };
-          const data = [all].concat(groups, projects);
+          const data = [all].concat(groups, projects.data);
           return query.callback({
             results: data,
           });

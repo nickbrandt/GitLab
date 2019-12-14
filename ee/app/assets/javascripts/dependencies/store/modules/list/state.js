@@ -12,6 +12,7 @@ export default () => ({
   reportInfo: {
     status: REPORT_STATUS.ok,
     jobPath: '',
+    generatedAt: '',
   },
   filter: FILTER.all,
   sortField: 'name',

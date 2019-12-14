@@ -47,7 +47,7 @@ module BlobHelper
   def edit_blob_button(project = @project, ref = @ref, path = @path, options = {})
     return unless blob = readable_blob(options, path, project, ref)
 
-    common_classes = "btn js-edit-blob #{options[:extra_class]}"
+    common_classes = "btn btn-primary js-edit-blob #{options[:extra_class]}"
 
     edit_button_tag(blob,
                     common_classes,
@@ -62,7 +62,7 @@ module BlobHelper
     return unless blob = readable_blob(options, path, project, ref)
 
     edit_button_tag(blob,
-                    'btn btn-default',
+                    'btn btn-inverted btn-primary ide-edit-button',
                     _('Web IDE'),
                     ide_edit_path(project, ref, path, options),
                     project,
@@ -108,7 +108,7 @@ module BlobHelper
       path,
       label:      _("Delete"),
       action:     "delete",
-      btn_class:  "remove",
+      btn_class:  "default",
       modal_type: "remove"
     )
   end
@@ -141,11 +141,7 @@ module BlobHelper
     if @build && @entry
       raw_project_job_artifacts_url(@project, @build, path: @entry.path, **kwargs)
     elsif @snippet
-      if @snippet.project_id
-        raw_project_snippet_url(@project, @snippet, **kwargs)
-      else
-        raw_snippet_url(@snippet, **kwargs)
-      end
+      gitlab_raw_snippet_url(@snippet)
     elsif @blob
       project_raw_url(@project, @id, **kwargs)
     end
@@ -219,14 +215,29 @@ module BlobHelper
     return if blob.binary? || blob.stored_externally?
 
     title = _('Open raw')
-    link_to icon('file-code-o'), blob_raw_path, class: 'btn btn-sm has-tooltip', target: '_blank', rel: 'noopener noreferrer', title: title, data: { container: 'body' }
+    link_to sprite_icon('doc-code'),
+      external_storage_url_or_path(blob_raw_path),
+      class: 'btn btn-sm has-tooltip',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+      aria: { label: title },
+      title: title,
+      data: { container: 'body' }
   end
 
   def download_blob_button(blob)
     return if blob.empty?
 
     title = _('Download')
-    link_to sprite_icon('download'), blob_raw_path(inline: false), download: @path, class: 'btn btn-sm has-tooltip', target: '_blank', rel: 'noopener noreferrer', title: title, data: { container: 'body' }
+    link_to sprite_icon('download'),
+      external_storage_url_or_path(blob_raw_path(inline: false)),
+      download: @path,
+      class: 'btn btn-sm has-tooltip',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+      aria: { label: title },
+      title: title,
+      data: { container: 'body' }
   end
 
   def blob_render_error_reason(viewer)

@@ -16,7 +16,8 @@ module Gitlab
           ALLOWED_KEYS = %i[tags script only except rules type image services
                             allow_failure type stage when start_in artifacts cache
                             dependencies before_script needs after_script variables
-                            environment coverage retry parallel extends interruptible timeout].freeze
+                            environment coverage retry parallel extends interruptible timeout
+                            resource_group].freeze
 
           REQUIRED_BY_NEEDS = %i[stage].freeze
 
@@ -36,9 +37,7 @@ module Gitlab
               if: :has_rules?
 
             with_options allow_nil: true do
-              validates :tags, array_of_strings: true
               validates :allow_failure, boolean: true
-              validates :interruptible, boolean: true
               validates :parallel, numericality: { only_integer: true,
                                                    greater_than_or_equal_to: 2,
                                                    less_than_or_equal_to: 50 }
@@ -47,15 +46,13 @@ module Gitlab
                 message: "should be one of: #{ALLOWED_WHEN.join(', ')}"
               }
 
-              validates :timeout, duration: { limit: ChronicDuration.output(Project::MAX_BUILD_TIMEOUT) }
-
               validates :dependencies, array_of_strings: true
-              validates :needs, array_of_strings: true
               validates :extends, array_of_strings_or_string: true
               validates :rules, array_of_hashes: true
+              validates :resource_group, type: String
             end
 
-            validates :start_in, duration: { limit: '1 day' }, if: :delayed?
+            validates :start_in, duration: { limit: '1 week' }, if: :delayed?
             validates :start_in, absence: true, if: -> { has_rules? || !delayed? }
 
             validate do
@@ -101,6 +98,22 @@ module Gitlab
             description: 'Services that will be used to execute this job.',
             inherit: true
 
+          entry :interruptible, ::Gitlab::Config::Entry::Boolean,
+            description: 'Set jobs interruptible value.',
+            inherit: true
+
+          entry :timeout, Entry::Timeout,
+            description: 'Timeout duration of this job.',
+            inherit: true
+
+          entry :retry, Entry::Retry,
+            description: 'Retry configuration for this job.',
+            inherit: true
+
+          entry :tags, ::Gitlab::Config::Entry::ArrayOfStrings,
+            description: 'Set the tags.',
+            inherit: true
+
           entry :only, Entry::Policy,
             description: 'Refs policy this job will be executed for.',
             default: Entry::Policy::DEFAULT_ONLY,
@@ -112,6 +125,14 @@ module Gitlab
 
           entry :rules, Entry::Rules,
             description: 'List of evaluable Rules to determine job inclusion.',
+            inherit: false,
+            metadata: {
+              allowed_when: %w[on_success on_failure always never manual delayed].freeze
+            }
+
+          entry :needs, Entry::Needs,
+            description: 'Needs configuration for this job.',
+            metadata: { allowed_needs: %i[job] },
             inherit: false
 
           entry :variables, Entry::Variables,
@@ -130,10 +151,6 @@ module Gitlab
             description: 'Coverage configuration for this job.',
             inherit: false
 
-          entry :retry, Entry::Retry,
-            description: 'Retry configuration for this job.',
-            inherit: false
-
           helpers :before_script, :script, :stage, :type, :after_script,
                   :cache, :image, :services, :only, :except, :variables,
                   :artifacts, :environment, :coverage, :retry, :rules,
@@ -141,7 +158,7 @@ module Gitlab
 
           attributes :script, :tags, :allow_failure, :when, :dependencies,
                      :needs, :retry, :parallel, :extends, :start_in, :rules,
-                     :interruptible, :timeout
+                     :interruptible, :timeout, :resource_group
 
           def self.matching?(name, config)
             !name.to_s.start_with?('.') &&
@@ -161,7 +178,7 @@ module Gitlab
               @entries.delete(:type)
 
               # This is something of a hack, see issue for details:
-              # https://gitlab.com/gitlab-org/gitlab-foss/issues/67150
+              # https://gitlab.com/gitlab-org/gitlab/issues/31685
               if !only_defined? && has_rules?
                 @entries.delete(:only)
                 @entries.delete(:except)
@@ -221,7 +238,8 @@ module Gitlab
               artifacts: artifacts_value,
               after_script: after_script_value,
               ignore: ignored?,
-              needs: needs_defined? ? needs_value : nil }
+              needs: needs_defined? ? needs_value : nil,
+              resource_group: resource_group }
           end
         end
       end

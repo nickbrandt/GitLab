@@ -19,7 +19,7 @@ module Gitlab
     # See https://github.com/docker/distribution/blob/master/reference/regexp.go.
     #
     def container_repository_name_regex
-      @container_repository_regex ||= %r{\A[a-z0-9]+((?:[._/]|__|[-])[a-z0-9]+)*\Z}
+      @container_repository_regex ||= %r{\A[a-z0-9]+((?:[._/]|__|[-]{0,10})[a-z0-9]+)*\Z}
     end
 
     ##
@@ -120,13 +120,22 @@ module Gitlab
       @breakline_regex ||= /\r\n|\r|\n/
     end
 
+    # https://docs.aws.amazon.com/general/latest/gr/acct-identifiers.html
+    def aws_account_id_regex
+      /\A\d{12}\z/
+    end
+
+    def aws_account_id_message
+      'must be a 12-digit number'
+    end
+
     # https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
     def aws_arn_regex
       /\Aarn:\S+\z/
     end
 
     def aws_arn_regex_message
-      "must be a valid Amazon Resource Name"
+      'must be a valid Amazon Resource Name'
     end
 
     def utc_date_regex

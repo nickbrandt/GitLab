@@ -18,7 +18,7 @@ module EE
         'clusters-path': clusterable.index_path,
         'metrics-endpoint': clusterable.metrics_cluster_path(cluster, format: :json),
         'dashboard-endpoint': clusterable.metrics_dashboard_path(cluster),
-        'documentation-path': help_page_path('administration/monitoring/prometheus/index.md'),
+        'documentation-path': help_page_path('user/project/clusters/index', anchor: 'monitoring-your-kubernetes-cluster-ultimate'),
         'empty-getting-started-svg-path': image_path('illustrations/monitoring/getting_started.svg'),
         'empty-loading-svg-path': image_path('illustrations/monitoring/loading.svg'),
         'empty-no-data-svg-path': image_path('illustrations/monitoring/no_data.svg'),

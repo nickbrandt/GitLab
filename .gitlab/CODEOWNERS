@@ -3,12 +3,12 @@
 *.rake @gitlab-org/maintainers/rails-backend
 
 # Technical writing team are the default reviewers for everything in `doc/`
-/doc/ @axil @marcia @eread @mikelewis
+/doc/ @gl-docsteam
 
 # Frontend maintainers should see everything in `app/assets/`
-app/assets/ @ClemMakesApps @fatihacet @filipa @mikegreiling @timzallmann @kushalpandya @pslaughter @wortschi @ntepluhina @iamphill
-*.scss @annabeldunstone @ClemMakesApps @fatihacet @filipa @mikegreiling @timzallmann @kushalpandya @pslaughter @wortschi @ntepluhina @iamphill
-/scripts/frontend/ @ClemMakesApps @fatihacet @filipa @mikegreiling @timzallmann @kushalpandya @pslaughter @wortschi @ntepluhina @iamphill
+app/assets/ @gitlab-org/maintainers/frontend
+*.scss @annabeldunstone @gitlab-org/maintainers/frontend
+/scripts/frontend/ @gitlab-org/maintainers/frontend
 
 # Database maintainers should review changes in `db/`
 db/ @gitlab-org/maintainers/database

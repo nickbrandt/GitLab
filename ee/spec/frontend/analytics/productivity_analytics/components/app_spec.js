@@ -19,17 +19,16 @@ describe('ProductivityApp component', () => {
   let mock;
 
   const propsData = {
-    endpoint: TEST_HOST,
     emptyStateSvgPath: TEST_HOST,
     noAccessSvgPath: TEST_HOST,
   };
 
   const actionSpies = {
-    updateSelectedItems: jest.fn(),
     setSortField: jest.fn(),
     setPage: jest.fn(),
     toggleSortOrder: jest.fn(),
     setColumnMetric: jest.fn(),
+    resetMainChartSelection: jest.fn(),
   };
 
   const mainChartData = { 1: 2, 2: 3 };
@@ -47,6 +46,8 @@ describe('ProductivityApp component', () => {
         glFeatures: { productivityAnalyticsScatterplotEnabled: scatterplotEnabled },
       },
     });
+
+    wrapper.vm.$store.dispatch('setEndpoint', TEST_HOST);
   };
 
   beforeEach(() => {
@@ -59,6 +60,7 @@ describe('ProductivityApp component', () => {
   });
 
   const findMainMetricChart = () => wrapper.find({ ref: 'mainChart' });
+  const findClearFilterButton = () => wrapper.find({ ref: 'clearChartFiltersBtn' });
   const findSecondaryChartsSection = () => wrapper.find({ ref: 'secondaryCharts' });
   const findTimeBasedMetricChart = () => wrapper.find({ ref: 'timeBasedChart' });
   const findCommitBasedMetricChart = () => wrapper.find({ ref: 'commitBasedChart' });
@@ -82,10 +84,12 @@ describe('ProductivityApp component', () => {
 
     describe('with a group being selected', () => {
       beforeEach(() => {
-        wrapper.vm.$store.dispatch('filters/setDateRange', {
+        wrapper.vm.$store.dispatch('filters/setInitialData', {
           skipFetch: true,
-          startDate: new Date('2019-09-01'),
-          endDate: new Date('2019-09-02'),
+          data: {
+            mergedAtAfter: new Date('2019-09-01'),
+            mergedAtBefore: new Date('2019-09-02'),
+          },
         });
         wrapper.vm.$store.dispatch('filters/setGroupNamespace', 'gitlab-org');
         mock.onGet(wrapper.vm.$store.state.endpoint).replyOnce(200);
@@ -161,6 +165,8 @@ describe('ProductivityApp component', () => {
 
             describe('when an item on the chart is clicked', () => {
               beforeEach(() => {
+                jest.spyOn(store, 'dispatch');
+
                 const data = {
                   chart: null,
                   params: {
@@ -176,10 +182,26 @@ describe('ProductivityApp component', () => {
               });
 
               it('dispatches updateSelectedItems action', () => {
-                expect(actionSpies.updateSelectedItems).toHaveBeenCalledWith({
+                expect(store.dispatch).toHaveBeenCalledWith('charts/updateSelectedItems', {
                   chartKey: chartKeys.main,
                   item: 0,
                 });
+              });
+            });
+
+            describe('when the main chart has selected items', () => {
+              beforeEach(() => {
+                wrapper.vm.$store.state.charts.charts[chartKeys.main].selected = [1];
+              });
+
+              it('renders the "Clear chart data" button', () => {
+                expect(findClearFilterButton().exists()).toBe(true);
+              });
+
+              it('dispatches resetMainChartSelection action when the user clicks on the "Clear chart data" button', () => {
+                findClearFilterButton().vm.$emit('click');
+
+                expect(actionSpies.resetMainChartSelection).toHaveBeenCalled();
               });
             });
 

@@ -15,25 +15,38 @@ module EE
             include ::Gitlab::Config::Entry::Inheritable
 
             ALLOWED_KEYS = %i[trigger stage allow_failure only except
-                              when extends variables needs].freeze
+                              when extends variables needs rules].freeze
 
             validations do
               validates :config, allowed_keys: ALLOWED_KEYS
               validates :config, presence: true
               validates :name, presence: true
               validates :name, type: Symbol
-
-              validate do
-                unless trigger.present? || needs.present?
-                  errors.add(:config, 'should contain either a trigger or a needs:pipeline')
-                end
-              end
+              validates :config, disallowed_keys: {
+                  in: %i[only except when start_in],
+                  message: 'key may not be used with `rules`'
+                },
+                if: :has_rules?
 
               with_options allow_nil: true do
                 validates :when,
                   inclusion: { in: %w[on_success on_failure always],
                                message: 'should be on_success, on_failure or always' }
                 validates :extends, type: String
+                validates :rules, array_of_hashes: true
+              end
+
+              validate on: :composed do
+                unless trigger.present? || bridge_needs.present?
+                  errors.add(:config, 'should contain either a trigger or a needs:pipeline')
+                end
+              end
+
+              validate on: :composed do
+                next unless bridge_needs.present?
+                next if bridge_needs.one?
+
+                errors.add(:config, 'should contain at most one bridge need')
               end
             end
 
@@ -41,9 +54,10 @@ module EE
               description: 'CI/CD Bridge downstream trigger definition.',
               inherit: false
 
-            entry :needs, ::EE::Gitlab::Ci::Config::Entry::Needs,
+            entry :needs, ::Gitlab::Ci::Config::Entry::Needs,
               description: 'CI/CD Bridge needs dependency definition.',
-              inherit: false
+              inherit: false,
+              metadata: { allowed_needs: %i[bridge job] }
 
             entry :stage, ::Gitlab::Ci::Config::Entry::Stage,
               description: 'Pipeline stage this job will be executed into.',
@@ -57,6 +71,13 @@ module EE
             entry :except, ::Gitlab::Ci::Config::Entry::Policy,
               description: 'Refs policy this job will be executed for.',
               inherit: false
+
+            entry :rules, ::Gitlab::Ci::Config::Entry::Rules,
+              description: 'List of evaluable Rules to determine job inclusion.',
+              inherit: false,
+              metadata: {
+                allowed_when: %w[on_success on_failure always never manual delayed].freeze
+              }
 
             entry :variables, ::Gitlab::Ci::Config::Entry::Variables,
               description: 'Environment variables available for this job.',
@@ -76,6 +97,21 @@ module EE
               true
             end
 
+            def compose!(deps = nil)
+              super do
+                # This is something of a hack, see issue for details:
+                # https://gitlab.com/gitlab-org/gitlab/issues/31685
+                if !only_defined? && has_rules?
+                  @entries.delete(:only)
+                  @entries.delete(:except)
+                end
+              end
+            end
+
+            def has_rules?
+              @config&.key?(:rules)
+            end
+
             def name
               @metadata[:name]
             end
@@ -89,8 +125,13 @@ module EE
                 when: when_value,
                 extends: extends_value,
                 variables: (variables_value if variables_defined?),
+                rules: (rules_value if has_rules?),
                 only: only_value,
                 except: except_value }.compact
+            end
+
+            def bridge_needs
+              needs_value[:bridge] if needs_value
             end
 
             private

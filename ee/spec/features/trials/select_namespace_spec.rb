@@ -9,7 +9,6 @@ describe 'Trial Select Namespace', :js do
   let(:user) { create(:user) }
 
   before do
-    stub_feature_flags(improved_trial_signup: true)
     allow(Gitlab).to receive(:com?).and_return(true).at_least(:once)
     sign_in(user)
   end

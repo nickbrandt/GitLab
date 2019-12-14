@@ -1,0 +1,5 @@
+---
+title: Adjust group members API to include group SAML info
+merge_request: 20357
+author:
+type: added

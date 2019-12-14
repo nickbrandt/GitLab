@@ -637,7 +637,6 @@ describe EE::NotificationService, :mailer do
         let!(:rule) { create(:approval_project_rule, project: project, users: project_approvers, approvals_required: 1 )}
 
         before do
-          merge_request.target_project.update(approvals_before_merge: 1)
           reset_delivered_emails!
         end
 
@@ -648,7 +647,7 @@ describe EE::NotificationService, :mailer do
         end
 
         it 'does not email the approvers when approval is not necessary' do
-          rule.update(approvals_required: 0)
+          project.approval_rules.update_all(approvals_required: 0)
           notification.new_merge_request(merge_request, @u_disabled)
 
           project_approvers.each { |approver| should_not_email(approver) }

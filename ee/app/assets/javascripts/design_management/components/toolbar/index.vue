@@ -1,4 +1,5 @@
 <script>
+import { GlButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -12,6 +13,7 @@ export default {
     Icon,
     Pagination,
     DeleteButton,
+    GlButton,
   },
   mixins: [timeagoMixin],
   props: {
@@ -23,7 +25,7 @@ export default {
       type: Boolean,
       required: true,
     },
-    name: {
+    filename: {
       type: String,
       required: false,
       default: '',
@@ -40,6 +42,10 @@ export default {
     },
     isLatestVersion: {
       type: Boolean,
+      required: true,
+    },
+    image: {
+      type: String,
       required: true,
     },
   },
@@ -75,7 +81,7 @@ export default {
   computed: {
     updatedText() {
       return sprintf(__('Updated %{updated_at} by %{updated_by}'), {
-        updated_at: this.timeFormated(this.updatedAt),
+        updated_at: this.timeFormatted(this.updatedAt),
         updated_by: this.updatedBy.name,
       });
     },
@@ -87,22 +93,25 @@ export default {
 </script>
 
 <template>
-  <header class="d-flex w-100 p-2 bg-white align-items-center js-design-header">
+  <header class="d-flex p-2 bg-white align-items-center js-design-header">
     <router-link
       :to="{
         name: 'designs',
         query: $route.query,
       }"
       :aria-label="s__('DesignManagement|Go back to designs')"
-      class="mr-3 text-plain"
+      class="mr-3 text-plain d-flex justify-content-center align-items-center"
     >
       <icon :size="18" name="close" />
     </router-link>
-    <div>
-      <h2 class="m-0">{{ name }}</h2>
+    <div class="overflow-hidden d-flex align-items-center">
+      <h2 class="m-0 str-truncated-100">{{ filename }}</h2>
       <small v-if="updatedAt" class="text-secondary">{{ updatedText }}</small>
     </div>
-    <pagination :id="id" class="ml-auto" />
+    <pagination :id="id" class="ml-auto flex-shrink-0" />
+    <gl-button :href="image" class="mr-2">
+      <icon :size="18" name="download" />
+    </gl-button>
     <delete-button
       v-if="isLatestVersion && canDeleteDesign"
       :is-deleting="isDeleting"

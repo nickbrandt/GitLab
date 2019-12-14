@@ -1,7 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import RightPane from '~/ide/components/panes/right.vue';
 import EERightPane from 'ee/ide/components/panes/right.vue';
+import RightPane from '~/ide/components/panes/right.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);

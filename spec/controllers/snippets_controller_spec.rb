@@ -53,6 +53,16 @@ describe SnippetsController do
 
         expect(response).to have_gitlab_http_status(200)
       end
+
+      context 'when user is not allowed to create a personal snippet' do
+        let(:user) { create(:user, :external) }
+
+        it 'responds with status 404' do
+          get :new
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
     end
 
     context 'when not signed in' do
@@ -215,6 +225,20 @@ describe SnippetsController do
       expect(snippet.description).to eq('Description')
     end
 
+    context 'when user is not allowed to create a personal snippet' do
+      let(:user) { create(:user, :external) }
+
+      it 'responds with status 404' do
+        aggregate_failures do
+          expect do
+            create_snippet(visibility_level: Snippet::PUBLIC)
+          end.not_to change { Snippet.count }
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+    end
+
     context 'when the snippet description contains a file' do
       include FileMoverHelpers
 
@@ -251,7 +275,9 @@ describe SnippetsController do
 
     context 'when the snippet is spam' do
       before do
-        allow_any_instance_of(AkismetService).to receive(:spam?).and_return(true)
+        allow_next_instance_of(AkismetService) do |instance|
+          allow(instance).to receive(:spam?).and_return(true)
+        end
       end
 
       context 'when the snippet is private' do
@@ -323,7 +349,9 @@ describe SnippetsController do
 
     context 'when the snippet is spam' do
       before do
-        allow_any_instance_of(AkismetService).to receive(:spam?).and_return(true)
+        allow_next_instance_of(AkismetService) do |instance|
+          allow(instance).to receive(:spam?).and_return(true)
+        end
       end
 
       context 'when the snippet is private' do
@@ -431,7 +459,9 @@ describe SnippetsController do
     let(:snippet) { create(:personal_snippet, :public, author: user) }
 
     before do
-      allow_any_instance_of(AkismetService).to receive_messages(submit_spam: true)
+      allow_next_instance_of(AkismetService) do |instance|
+        allow(instance).to receive_messages(submit_spam: true)
+      end
       stub_application_setting(akismet_enabled: true)
     end
 

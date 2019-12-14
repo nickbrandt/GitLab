@@ -29,12 +29,20 @@ class ClusterablePresenter < Gitlab::View::Presenter::Delegated
     new_polymorphic_path([clusterable, :cluster], options)
   end
 
+  def authorize_aws_role_path
+    polymorphic_path([clusterable, :clusters], action: :authorize_aws_role)
+  end
+
   def create_user_clusters_path
     polymorphic_path([clusterable, :clusters], action: :create_user)
   end
 
   def create_gcp_clusters_path
     polymorphic_path([clusterable, :clusters], action: :create_gcp)
+  end
+
+  def create_aws_clusters_path
+    polymorphic_path([clusterable, :clusters], action: :create_aws)
   end
 
   def cluster_status_cluster_path(cluster, params = {})
@@ -46,6 +54,10 @@ class ClusterablePresenter < Gitlab::View::Presenter::Delegated
   end
 
   def update_applications_cluster_path(cluster, application)
+    raise NotImplementedError
+  end
+
+  def clear_cluster_cache_path(cluster)
     raise NotImplementedError
   end
 

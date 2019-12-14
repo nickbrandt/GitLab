@@ -241,6 +241,17 @@ describe QuickActions::InterpretService do
               expect(updates).to be_empty
             end
           end
+
+          context 'when issue is already added to epic' do
+            it 'returns error message' do
+              issue = create(:issue, project: project, epic: epic)
+
+              _, updates, message = service.execute(content, issue)
+
+              expect(updates).to be_empty
+              expect(message).to eq("Issue #{issue.to_reference} has already been added to epic #{epic.to_reference}.")
+            end
+          end
         end
 
         context 'when epic does not exist' do
@@ -693,23 +704,6 @@ describe QuickActions::InterpretService do
 
           expect(merge_request.approved_by_users).to be_empty
         end
-      end
-    end
-
-    context 'submit_review command' do
-      let(:merge_request) { create(:merge_request, source_project: project) }
-      let(:content) { '/submit_review' }
-      let!(:draft_note) { create(:draft_note, merge_request: merge_request, author: current_user) }
-
-      before do
-        stub_licensed_features(batch_comments: true)
-      end
-
-      it 'submits the users current review' do
-        _, _, message = service.execute(content, merge_request)
-
-        expect { draft_note.reload }.to raise_error(ActiveRecord::RecordNotFound)
-        expect(message).to eq('Submitted the current review.')
       end
     end
 

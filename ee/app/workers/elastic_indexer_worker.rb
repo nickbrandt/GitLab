@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class ElasticIndexerWorker
   include ApplicationWorker
   include Elasticsearch::Model::Client::ClassMethods
@@ -46,17 +47,6 @@ class ElasticIndexerWorker
   def clear_project_data(record_id, es_id)
     remove_children_documents('project', record_id, es_id)
     IndexStatus.for_project(record_id).delete_all
-  end
-
-  def remove_documents_by_project_id(record_id)
-    client.delete_by_query({
-      index: Project.__elasticsearch__.index_name,
-      body: {
-        query: {
-          term: { "project_id" => record_id }
-        }
-      }
-    })
   end
 
   def remove_children_documents(parent_type, parent_record_id, parent_es_id)

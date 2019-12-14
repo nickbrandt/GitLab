@@ -57,7 +57,7 @@ Rails.application.routes.draw do
 
   # Sign up
   get 'users/sign_up/welcome' => 'registrations#welcome'
-  patch 'users/sign_up/update_role' => 'registrations#update_role'
+  patch 'users/sign_up/update_registration' => 'registrations#update_registration'
 
   # Search
   get 'search' => 'search#show'
@@ -118,6 +118,8 @@ Rails.application.routes.draw do
       draw :trial
       draw :trial_registration
       draw :country
+      draw :country_state
+      draw :subscription
     end
 
     Gitlab.ee do
@@ -142,6 +144,8 @@ Rails.application.routes.draw do
       collection do
         post :create_user
         post :create_gcp
+        post :create_aws
+        post :authorize_aws_role
       end
 
       member do
@@ -159,6 +163,7 @@ Rails.application.routes.draw do
         end
 
         get :cluster_status, format: :json
+        delete :clear_cache
       end
     end
   end

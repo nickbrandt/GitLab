@@ -3,20 +3,18 @@
 class Clusters::ClustersController < Clusters::BaseController
   include RoutableActions
 
-  before_action :cluster, except: [:index, :new, :create_gcp, :create_user]
+  before_action :cluster, only: [:cluster_status, :show, :update, :destroy, :clear_cache]
   before_action :generate_gcp_authorize_url, only: [:new]
   before_action :validate_gcp_token, only: [:new]
   before_action :gcp_cluster, only: [:new]
   before_action :user_cluster, only: [:new]
-  before_action :authorize_create_cluster!, only: [:new]
+  before_action :authorize_create_cluster!, only: [:new, :authorize_aws_role]
   before_action :authorize_update_cluster!, only: [:update]
-  before_action :authorize_admin_cluster!, only: [:destroy]
+  before_action :authorize_admin_cluster!, only: [:destroy, :clear_cache]
   before_action :update_applications_status, only: [:cluster_status]
-  before_action only: [:new, :create_gcp] do
-    push_frontend_feature_flag(:create_eks_clusters)
-  end
   before_action only: [:show] do
     push_frontend_feature_flag(:enable_cluster_application_elastic_stack)
+    push_frontend_feature_flag(:enable_cluster_application_crossplane)
   end
 
   helper_method :token_in_session
@@ -41,12 +39,14 @@ class Clusters::ClustersController < Clusters::BaseController
   end
 
   def new
-    return unless Feature.enabled?(:create_eks_clusters)
+    if params[:provider] == 'aws'
+      @aws_role = current_user.aws_role || Aws::Role.new
+      @aws_role.ensure_role_external_id!
+      @instance_types = load_instance_types.to_json
 
-    @gke_selected = params[:provider] == 'gke'
-    @eks_selected = params[:provider] == 'eks'
-
-    return redirect_to @authorize_url if @gke_selected && @authorize_url && !@valid_gcp_token
+    elsif params[:provider] == 'gcp'
+      redirect_to @authorize_url if @authorize_url && !@valid_gcp_token
+    end
   end
 
   # Overridding ActionController::Metal#status is NOT a good idea
@@ -89,13 +89,12 @@ class Clusters::ClustersController < Clusters::BaseController
   end
 
   def destroy
-    if cluster.destroy
-      flash[:notice] = _('Kubernetes cluster integration was successfully removed.')
-      redirect_to clusterable.index_path, status: :found
-    else
-      flash[:notice] = _('Kubernetes cluster integration was not removed.')
-      render :show
-    end
+    response = Clusters::DestroyService
+      .new(current_user, destroy_params)
+      .execute(cluster)
+
+    flash[:notice] = response[:message]
+    redirect_to clusterable.index_path, status: :found
   end
 
   def create_gcp
@@ -110,8 +109,22 @@ class Clusters::ClustersController < Clusters::BaseController
       generate_gcp_authorize_url
       validate_gcp_token
       user_cluster
+      params[:provider] = 'gcp'
 
       render :new, locals: { active_tab: 'create' }
+    end
+  end
+
+  def create_aws
+    @aws_cluster = ::Clusters::CreateService
+      .new(current_user, create_aws_cluster_params)
+      .execute
+      .present(current_user: current_user)
+
+    if @aws_cluster.persisted?
+      head :created, location: @aws_cluster.show_path
+    else
+      render status: :unprocessable_entity, json: @aws_cluster.errors
     end
   end
 
@@ -132,7 +145,26 @@ class Clusters::ClustersController < Clusters::BaseController
     end
   end
 
+  def authorize_aws_role
+    response = Clusters::Aws::AuthorizeRoleService.new(
+      current_user,
+      params: aws_role_params
+    ).execute
+
+    render json: response.body, status: response.status
+  end
+
+  def clear_cache
+    cluster.delete_cached_resources!
+
+    redirect_to cluster.show_path, notice: _('Cluster cache cleared.')
+  end
+
   private
+
+  def destroy_params
+    params.permit(:cleanup)
+  end
 
   def update_params
     if cluster.provided_by_user?
@@ -184,6 +216,28 @@ class Clusters::ClustersController < Clusters::BaseController
       )
   end
 
+  def create_aws_cluster_params
+    params.require(:cluster).permit(
+      :enabled,
+      :name,
+      :environment_scope,
+      :managed,
+      provider_aws_attributes: [
+        :key_name,
+        :role_arn,
+        :region,
+        :vpc_id,
+        :instance_type,
+        :num_nodes,
+        :security_group_id,
+        subnet_ids: []
+      ]).merge(
+        provider_type: :aws,
+        platform_type: :kubernetes,
+        clusterable: clusterable.subject
+      )
+  end
+
   def create_user_cluster_params
     params.require(:cluster).permit(
       :enabled,
@@ -203,9 +257,12 @@ class Clusters::ClustersController < Clusters::BaseController
       )
   end
 
+  def aws_role_params
+    params.require(:cluster).permit(:role_arn, :role_external_id)
+  end
+
   def generate_gcp_authorize_url
-    params = Feature.enabled?(:create_eks_clusters) ? { provider: :gke } : {}
-    state = generate_session_key_redirect(clusterable.new_path(params).to_s)
+    state = generate_session_key_redirect(clusterable.new_path(provider: :gcp).to_s)
 
     @authorize_url = GoogleApi::CloudPlatform::Client.new(
       nil, callback_google_api_auth_url,
@@ -244,6 +301,19 @@ class Clusters::ClustersController < Clusters::BaseController
     GoogleApi::CloudPlatform::Client.new_session_key_for_redirect_uri do |key|
       session[key] = uri
     end
+  end
+
+  ##
+  # Unfortunately the EC2 API doesn't provide a list of
+  # possible instance types. There is a workaround, using
+  # the Pricing API, but instead of requiring the
+  # user to grant extra permissions for this we use the
+  # values that validate the CloudFormation template.
+  def load_instance_types
+    stack_template = File.read(Rails.root.join('vendor', 'aws', 'cloudformation', 'eks_cluster.yaml'))
+    instance_types = YAML.safe_load(stack_template).dig('Parameters', 'NodeInstanceType', 'AllowedValues')
+
+    instance_types.map { |type| Hash(name: type, value: type) }
   end
 
   def update_applications_status

@@ -1,6 +1,6 @@
+import { PathIdSeparator } from 'ee/related_issues/constants';
 import createGqClient from '~/lib/graphql';
 
-import { PathIdSeparator } from 'ee/related_issues/constants';
 import { ChildType } from '../constants';
 
 export const gqClient = createGqClient();
@@ -9,13 +9,34 @@ export const gqClient = createGqClient();
  * Returns a numeric representation of item
  * order in an array.
  *
- * This method is to be used as comparision
+ * This method is to be used as comparison
  * function for Array.sort
  *
- * @param {cbject} childA
- * @param {object} childB
+ * @param {Object} childA
+ * @param {Object} childB
  */
 export const sortChildren = (childA, childB) => childA.relativePosition - childB.relativePosition;
+
+/**
+ * Returns a numeric representation of item, by state,
+ * opened items first, closed items last
+ * Used to sort epics and issues
+ *
+ * This method is to be used as comparison
+ * function for Array.sort
+ *
+ * @param {Array} items
+ */
+const stateOrder = ['opened', 'closed'];
+export const sortByState = (a, b) => stateOrder.indexOf(a.state) - stateOrder.indexOf(b.state);
+
+/**
+ * Returns sorted array, using sortChildren and sortByState
+ * Used to sort epics and issues
+ *
+ * @param {Array} items
+ */
+export const applySorts = array => array.sort(sortChildren).sort(sortByState);
 
 /**
  * Returns formatted child item to include additional
@@ -72,8 +93,9 @@ export const extractChildIssues = issues =>
  * Parses Graph query response and updates
  * children array to include issues within it
  * and then sorts everything based on `relativePosition`
+ * and state
  *
  * @param {Object} responseRoot
  */
 export const processQueryResponse = ({ epic }) =>
-  [].concat(extractChildEpics(epic.children), extractChildIssues(epic.issues)).sort(sortChildren);
+  applySorts([...extractChildEpics(epic.children), ...extractChildIssues(epic.issues)]);

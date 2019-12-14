@@ -15,17 +15,17 @@ module Geo
 
       class << self
         def for_model(model)
-          inner_join_file_registry
+          inner_join_registry
             .where(model_id: model.id, model_type: model.class.name)
         end
 
-        def inner_join_file_registry
+        def inner_join_registry
           joins(:registry)
         end
 
-        def missing_file_registry
-          left_outer_join_file_registry
-            .where(file_registry_table[:id].eq(nil))
+        def missing_registry
+          left_outer_join_registry
+            .where(registry_table[:id].eq(nil))
         end
 
         # Searches for a list of uploads based on the query given in `query`.
@@ -40,15 +40,15 @@ module Geo
 
         private
 
-        def file_registry_table
+        def registry_table
           Geo::UploadRegistry.arel_table
         end
 
-        def left_outer_join_file_registry
+        def left_outer_join_registry
           join_statement =
             arel_table
-              .join(file_registry_table, Arel::Nodes::OuterJoin)
-              .on(arel_table[:id].eq(file_registry_table[:file_id]))
+              .join(registry_table, Arel::Nodes::OuterJoin)
+              .on(arel_table[:id].eq(registry_table[:file_id]))
 
           joins(join_statement.join_sources)
         end

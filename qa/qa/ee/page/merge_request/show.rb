@@ -5,6 +5,8 @@ module QA
     module Page
       module MergeRequest
         module Show
+          include Page::Component::LicenseManagement
+
           def self.prepended(page)
             page.module_eval do
               view 'app/assets/javascripts/vue_merge_request_widget/components/states/sha_mismatch.vue' do
@@ -57,8 +59,33 @@ module QA
                 element :approvals_summary_content
               end
 
+              view 'ee/app/assets/javascripts/vue_merge_request_widget/components/merge_immediately_confirmation_dialog.vue' do
+                element :merge_immediately_button
+              end
+
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/modal.vue' do
+                element :vulnerability_modal_content
+              end
+
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/event_item.vue' do
+                element :event_item_content
+              end
+
               view 'ee/app/assets/javascripts/vue_shared/security_reports/components/modal_footer.vue' do
                 element :resolve_split_button
+                element :create_issue_button
+              end
+
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/dismiss_button.vue' do
+                element :dismiss_with_comment_button
+              end
+
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/dismissal_comment_box_toggle.vue' do
+                element :dismiss_comment_field
+              end
+
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/dismissal_comment_modal_footer.vue' do
+                element :add_and_dismiss_button
               end
             end
           end
@@ -79,6 +106,8 @@ module QA
 
           def click_approve
             click_element :approve_button
+
+            find_element :approve_button, text: "Revoke approval"
           end
 
           def start_review
@@ -112,8 +141,32 @@ module QA
             check_element :unresolve_review_discussion_checkbox
           end
 
+          def expand_license_report
+            within_element(:license_report_widget) do
+              click_element(:expand_report_button)
+            end
+          end
+
+          def license_report_expanded?
+            within_element(:license_report_widget) do
+              has_element?(:expand_report_button, text: "Collapse")
+            end
+          end
+
+          def approve_license_with_mr(name)
+            expand_license_report unless license_report_expanded?
+            approve_license(name)
+          end
+
+          def blacklist_license_with_mr(name)
+            expand_license_report unless license_report_expanded?
+            blacklist_license(name)
+          end
+
           def expand_vulnerability_report
-            click_element :expand_report_button
+            within_element :vulnerability_report_grouped do
+              click_element :expand_report_button unless has_content? 'Collapse'
+            end
           end
 
           def click_vulnerability(name)
@@ -122,23 +175,53 @@ module QA
             end
           end
 
+          def dismiss_vulnerability_with_reason(name, reason)
+            expand_vulnerability_report
+            click_vulnerability(name)
+            click_element :dismiss_with_comment_button
+            find_element(:dismiss_comment_field).fill_in with: reason
+            click_element :add_and_dismiss_button
+
+            wait(reload: false) do
+              has_no_element?(:vulnerability_modal_content)
+            end
+          end
+
           def resolve_vulnerability_with_mr(name)
             expand_vulnerability_report
             click_vulnerability(name)
+
+            previous_page = page.current_url
             click_element :resolve_split_button
+
+            wait(max: 15, reload: false) do
+              page.current_url != previous_page
+            end
+          end
+
+          def create_vulnerability_issue(name)
+            expand_vulnerability_report
+            click_vulnerability(name)
+
+            previous_page = page.current_url
+            click_element(:create_issue_button)
+
+            wait(max: 15, reload: false) do
+              page.current_url != previous_page
+            end
           end
 
           def has_vulnerability_report?(timeout: 60)
             wait(reload: true, max: timeout, interval: 1) do
               finished_loading?
-              has_element?(:vulnerability_report_grouped, wait: 1)
+              has_element?(:vulnerability_report_grouped, wait: 10)
             end
             find_element(:vulnerability_report_grouped).has_no_content?("is loading")
           end
 
-          def has_total_vulnerability_count_of?(expected)
+          def has_vulnerability_count?
             # Match text cut off in order to find both "1 vulnerability" and "X vulnerabilities"
-            find_element(:vulnerability_report_grouped).has_content?(/Security scanning detected #{expected}( new)? vulnerabilit/)
+            find_element(:vulnerability_report_grouped).has_content?(/Security scanning detected/)
           end
 
           def has_sast_vulnerability_count_of?(expected)
@@ -157,8 +240,30 @@ module QA
             find_element(:dast_scan_report).has_content?(/DAST detected #{expected}( new)? vulnerabilit/)
           end
 
+          def has_opened_dismissed_vulnerability?(reason = nil)
+            within_element(:vulnerability_modal_content) do
+              dismissal_found = has_element?(:event_item_content, text: /Dismissed on pipeline #\d+/)
+
+              if dismissal_found && reason
+                dismissal_found = has_element?(:event_item_content, text: reason)
+              end
+
+              dismissal_found
+            end
+          end
+
           def num_approvals_required
             approvals_content.match(/Requires (\d+) more approvals/)[1].to_i
+          end
+
+          def skip_merge_train_and_merge_immediately
+            click_element :merge_moment_dropdown
+            click_element :merge_immediately_option
+
+            # Wait for the warning modal dialog to appear
+            wait_for_animated_element :merge_immediately_button
+
+            click_element :merge_immediately_button
           end
 
           def merge_via_merge_train

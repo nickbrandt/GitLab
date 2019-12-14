@@ -1,0 +1,32 @@
+/* Checkout Page */
+.subscriptions-layout-html {
+  .container {
+    margin: 0;
+    max-width: none;
+    padding-top: 40px;
+  }
+
+  .checkout-pane {
+    border-bottom: 1px solid $gray-200;
+    flex-grow: 1;
+    flex-shrink: 0;
+    padding-right: $gl-padding;
+    padding-left: $gl-padding;
+
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      border-bottom: 0;
+      border-right: 1px solid $border-color;
+    }
+  }
+
+  .summary-pane {
+    padding-bottom: $gl-padding;
+    padding-right: $gl-padding;
+    padding-left: $gl-padding;
+
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      padding-left: $gl-padding * 3;
+      padding-right: $gl-padding * 3;
+    }
+  }
+}

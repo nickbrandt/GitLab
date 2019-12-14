@@ -4,12 +4,18 @@ class Deployment < ApplicationRecord
   include AtomicInternalId
   include IidRoutes
   include AfterCommitQueue
+  include UpdatedAtFilterable
+  include Gitlab::Utils::StrongMemoize
 
   belongs_to :project, required: true
   belongs_to :environment, required: true
   belongs_to :cluster, class_name: 'Clusters::Cluster', optional: true
   belongs_to :user
   belongs_to :deployable, polymorphic: true, optional: true # rubocop:disable Cop/PolymorphicAssociations
+  has_many :deployment_merge_requests
+
+  has_many :merge_requests,
+    through: :deployment_merge_requests
 
   has_internal_id :iid, scope: :project, init: ->(s) do
     Deployment.where(project: s.project).maximum(:iid) if s&.project
@@ -121,6 +127,12 @@ class Deployment < ApplicationRecord
     @scheduled_actions ||= deployable.try(:other_scheduled_actions)
   end
 
+  def playable_build
+    strong_memoize(:playable_build) do
+      deployable.try(:playable?) ? deployable : nil
+    end
+  end
+
   def includes_commit?(commit)
     return false unless commit
 
@@ -149,6 +161,18 @@ class Deployment < ApplicationRecord
       project.deployments.joins(:environment)
       .where(environments: { name: self.environment.name }, ref: self.ref)
       .where.not(id: self.id)
+      .order(id: :desc)
+      .take
+  end
+
+  def previous_environment_deployment
+    project
+      .deployments
+      .success
+      .joins(:environment)
+      .where(environments: { name: environment.name })
+      .where.not(id: self.id)
+      .order(id: :desc)
       .take
   end
 
@@ -179,6 +203,18 @@ class Deployment < ApplicationRecord
     # TODO: use deployment's user once https://gitlab.com/gitlab-org/gitlab-foss/issues/66442
     # is completed.
     deployable&.user || user
+  end
+
+  def link_merge_requests(relation)
+    select = relation.select(['merge_requests.id', id]).to_sql
+
+    # We don't use `Gitlab::Database.bulk_insert` here so that we don't need to
+    # first pluck lots of IDs into memory.
+    DeploymentMergeRequest.connection.execute(<<~SQL)
+      INSERT INTO #{DeploymentMergeRequest.table_name}
+      (merge_request_id, deployment_id)
+      #{select}
+    SQL
   end
 
   private

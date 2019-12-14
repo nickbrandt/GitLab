@@ -1,5 +1,17 @@
 import Vue from 'vue';
+import AccessorUtilities from '~/lib/utils/accessor';
+import createFlash from '~/flash';
+import { __ } from '~/locale';
 import * as types from './mutation_types';
+import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
+
+export const updatePageInfo = (state, headers) => {
+  const pageInfo = parseIntPagination(normalizeHeaders(headers));
+  Vue.set(state.pageInfo, 'currentPage', pageInfo.page);
+  Vue.set(state.pageInfo, 'nextPage', pageInfo.nextPage);
+  Vue.set(state.pageInfo, 'totalResults', pageInfo.total);
+  Vue.set(state.pageInfo, 'totalPages', pageInfo.totalPages);
+};
 
 export default {
   [types.SET_PROJECT_ENDPOINT_LIST](state, url) {
@@ -8,9 +20,17 @@ export default {
   [types.SET_PROJECT_ENDPOINT_ADD](state, url) {
     state.projectEndpoints.add = url;
   },
-  [types.SET_PROJECTS](state, projects) {
-    state.projects = projects || [];
+  [types.SET_PROJECTS](state, projects = []) {
+    state.projects = projects;
     state.isLoadingProjects = false;
+    if (AccessorUtilities.isLocalStorageAccessSafe()) {
+      localStorage.setItem(state.projectEndpoints.list, state.projects.map(p => p.id));
+    } else {
+      createFlash(
+        __('Project order will not be saved as local storage is not available.'),
+        'warning',
+      );
+    }
   },
   [types.SET_SEARCH_QUERY](state, query) {
     state.searchQuery = query;
@@ -33,8 +53,18 @@ export default {
     state.isLoadingProjects = true;
   },
   [types.RECEIVE_PROJECTS_SUCCESS](state, projects) {
-    state.projects = projects;
+    let projectIds = [];
+    if (AccessorUtilities.isLocalStorageAccessSafe()) {
+      projectIds = (localStorage.getItem(state.projectEndpoints.list) || '').split(',');
+    }
+    // order Projects by ID, with any unassigned ones added to the end
+    state.projects = projects.sort(
+      (a, b) => projectIds.indexOf(a.id.toString()) - projectIds.indexOf(b.id.toString()),
+    );
     state.isLoadingProjects = false;
+    if (AccessorUtilities.isLocalStorageAccessSafe()) {
+      localStorage.setItem(state.projectEndpoints.list, state.projects.map(p => p.id));
+    }
   },
   [types.RECEIVE_PROJECTS_ERROR](state) {
     state.projects = null;
@@ -54,11 +84,17 @@ export default {
 
     state.searchCount += 1;
   },
+  [types.RECEIVE_NEXT_PAGE_SUCCESS](state, { data, headers }) {
+    state.projectSearchResults = state.projectSearchResults.concat(data);
+    updatePageInfo(state, headers);
+  },
   [types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, results) {
-    state.projectSearchResults = results;
+    state.projectSearchResults = results.data;
     Vue.set(state.messages, 'noResults', state.projectSearchResults.length === 0);
     Vue.set(state.messages, 'searchError', false);
     Vue.set(state.messages, 'minimumQuery', false);
+
+    updatePageInfo(state, results.headers);
 
     state.searchCount = Math.max(0, state.searchCount - 1);
   },
@@ -72,6 +108,7 @@ export default {
   },
   [types.MINIMUM_QUERY_MESSAGE](state) {
     state.projectSearchResults = [];
+    state.pageInfo.totalResults = 0;
     Vue.set(state.messages, 'noResults', false);
     Vue.set(state.messages, 'minimumQuery', true);
     Vue.set(state.messages, 'searchError', false);

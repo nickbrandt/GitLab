@@ -51,14 +51,14 @@ describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
       it { expect(report.version).to eql('1.1') }
       it { expect(report.licenses.count).to eq(3) }
 
-      it { expect(report.licenses[0].id).to be_nil }
+      it { expect(report.licenses[0].id).to eql('BSD-4-Clause') }
       it { expect(report.licenses[0].name).to eql('BSD') }
-      it { expect(report.licenses[0].url).to eql('http://spdx.org/licenses/BSD-3-Clause.json') }
+      it { expect(report.licenses[0].url).to eql('http://spdx.org/licenses/BSD-4-Clause.json') }
       it { expect(report.licenses[0].count).to be(2) }
       it { expect(report.licenses[0].dependencies.count).to be(2) }
       it { expect(report.licenses[0].dependencies.map(&:name)).to contain_exactly('b', 'c') }
 
-      it { expect(report.licenses[1].id).to be_nil }
+      it { expect(report.licenses[1].id).to eql('MIT') }
       it { expect(report.licenses[1].name).to eql('MIT') }
       it { expect(report.licenses[1].url).to eql('http://opensource.org/licenses/mit-license') }
       it { expect(report.licenses[1].count).to be(2) }

@@ -741,20 +741,26 @@ describe Ci::Build do
 
       before do
         needs.to_a.each do |need|
-          create(:ci_build_need, build: final, name: need)
+          create(:ci_build_need, build: final, **need)
         end
       end
 
       subject { final.dependencies }
 
-      context 'when depedencies are defined' do
+      context 'when dependencies are defined' do
         let(:dependencies) { %w(rspec staging) }
 
         it { is_expected.to contain_exactly(rspec_test, staging) }
       end
 
       context 'when needs are defined' do
-        let(:needs) { %w(build rspec staging) }
+        let(:needs) do
+          [
+            { name: 'build',   artifacts: true },
+            { name: 'rspec',   artifacts: true },
+            { name: 'staging', artifacts: true }
+          ]
+        end
 
         it { is_expected.to contain_exactly(build, rspec_test, staging) }
 
@@ -767,11 +773,42 @@ describe Ci::Build do
         end
       end
 
+      context 'when need artifacts are defined' do
+        let(:needs) do
+          [
+            { name: 'build',   artifacts: true },
+            { name: 'rspec',   artifacts: false },
+            { name: 'staging', artifacts: true }
+          ]
+        end
+
+        it { is_expected.to contain_exactly(build, staging) }
+      end
+
       context 'when needs and dependencies are defined' do
         let(:dependencies) { %w(rspec staging) }
-        let(:needs) { %w(build rspec staging) }
+        let(:needs) do
+          [
+            { name: 'build',   artifacts: true },
+            { name: 'rspec',   artifacts: true },
+            { name: 'staging', artifacts: true }
+          ]
+        end
 
         it { is_expected.to contain_exactly(rspec_test, staging) }
+      end
+
+      context 'when needs and dependencies contradict' do
+        let(:dependencies) { %w(rspec staging) }
+        let(:needs) do
+          [
+            { name: 'build',   artifacts: true },
+            { name: 'rspec',   artifacts: false },
+            { name: 'staging', artifacts: true }
+          ]
+        end
+
+        it { is_expected.to contain_exactly(staging) }
       end
 
       context 'when nor dependencies or needs are defined' do
@@ -1160,6 +1197,54 @@ describe Ci::Build do
       end
     end
 
+    describe '#expanded_kubernetes_namespace' do
+      let(:build) { create(:ci_build, environment: environment, options: options) }
+
+      subject { build.expanded_kubernetes_namespace }
+
+      context 'environment and namespace are not set' do
+        let(:environment) { nil }
+        let(:options) { nil }
+
+        it { is_expected.to be_nil }
+      end
+
+      context 'environment is specified' do
+        let(:environment) { 'production' }
+
+        context 'namespace is not set' do
+          let(:options) { nil }
+
+          it { is_expected.to be_nil }
+        end
+
+        context 'namespace is provided' do
+          let(:options) do
+            {
+              environment: {
+                name: environment,
+                kubernetes: {
+                  namespace: namespace
+                }
+              }
+            }
+          end
+
+          context 'with a static value' do
+            let(:namespace) { 'production' }
+
+            it { is_expected.to eq namespace }
+          end
+
+          context 'with a dynamic value' do
+            let(:namespace) { 'deploy-$CI_COMMIT_REF_NAME'}
+
+            it { is_expected.to eq 'deploy-master' }
+          end
+        end
+      end
+    end
+
     describe '#starts_environment?' do
       subject { build.starts_environment? }
 
@@ -1187,6 +1272,68 @@ describe Ci::Build do
         end
 
         it { is_expected.to be_falsey }
+      end
+    end
+
+    describe '#requires_resource?' do
+      subject { build.requires_resource? }
+
+      context 'when build needs a resource from a resource group' do
+        let(:resource_group) { create(:ci_resource_group, project: project) }
+        let(:build) { create(:ci_build, resource_group: resource_group, project: project) }
+
+        context 'when build has not retained a resource' do
+          it { is_expected.to eq(true) }
+        end
+
+        context 'when build has retained a resource' do
+          before do
+            resource_group.retain_resource_for(build)
+          end
+
+          it { is_expected.to eq(false) }
+
+          context 'when ci_resource_group feature flag is disabled' do
+            before do
+              stub_feature_flags(ci_resource_group: false)
+            end
+
+            it { is_expected.to eq(false) }
+          end
+        end
+      end
+
+      context 'when build does not need a resource from a resource group' do
+        let(:build) { create(:ci_build, project: project) }
+
+        it { is_expected.to eq(false) }
+      end
+    end
+
+    describe '#retains_resource?' do
+      subject { build.retains_resource? }
+
+      context 'when build needs a resource from a resource group' do
+        let(:resource_group) { create(:ci_resource_group, project: project) }
+        let(:build) { create(:ci_build, resource_group: resource_group, project: project) }
+
+        context 'when build has retained a resource' do
+          before do
+            resource_group.retain_resource_for(build)
+          end
+
+          it { is_expected.to eq(true) }
+        end
+
+        context 'when build has not retained a resource' do
+          it { is_expected.to eq(false) }
+        end
+      end
+
+      context 'when build does not need a resource from a resource group' do
+        let(:build) { create(:ci_build, project: project) }
+
+        it { is_expected.to eq(false) }
       end
     end
 
@@ -2183,9 +2330,13 @@ describe Ci::Build do
           { key: 'CI_REGISTRY_USER', value: 'gitlab-ci-token', public: true, masked: false },
           { key: 'CI_REGISTRY_PASSWORD', value: 'my-token', public: false, masked: true },
           { key: 'CI_REPOSITORY_URL', value: build.repo_url, public: false, masked: false },
+          { key: 'CI_JOB_NAME', value: 'test', public: true, masked: false },
+          { key: 'CI_JOB_STAGE', value: 'test', public: true, masked: false },
+          { key: 'CI_NODE_TOTAL', value: '1', public: true, masked: false },
+          { key: 'CI_BUILD_NAME', value: 'test', public: true, masked: false },
+          { key: 'CI_BUILD_STAGE', value: 'test', public: true, masked: false },
           { key: 'CI', value: 'true', public: true, masked: false },
           { key: 'GITLAB_CI', value: 'true', public: true, masked: false },
-          { key: 'GITLAB_FEATURES', value: project.licensed_features.join(','), public: true, masked: false },
           { key: 'CI_SERVER_HOST', value: Gitlab.config.gitlab.host, public: true, masked: false },
           { key: 'CI_SERVER_NAME', value: 'GitLab', public: true, masked: false },
           { key: 'CI_SERVER_VERSION', value: Gitlab::VERSION, public: true, masked: false },
@@ -2193,21 +2344,7 @@ describe Ci::Build do
           { key: 'CI_SERVER_VERSION_MINOR', value: Gitlab.version_info.minor.to_s, public: true, masked: false },
           { key: 'CI_SERVER_VERSION_PATCH', value: Gitlab.version_info.patch.to_s, public: true, masked: false },
           { key: 'CI_SERVER_REVISION', value: Gitlab.revision, public: true, masked: false },
-          { key: 'CI_JOB_NAME', value: 'test', public: true, masked: false },
-          { key: 'CI_JOB_STAGE', value: 'test', public: true, masked: false },
-          { key: 'CI_COMMIT_SHA', value: build.sha, public: true, masked: false },
-          { key: 'CI_COMMIT_SHORT_SHA', value: build.short_sha, public: true, masked: false },
-          { key: 'CI_COMMIT_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
-          { key: 'CI_COMMIT_REF_NAME', value: build.ref, public: true, masked: false },
-          { key: 'CI_COMMIT_REF_SLUG', value: build.ref_slug, public: true, masked: false },
-          { key: 'CI_NODE_TOTAL', value: '1', public: true, masked: false },
-          { key: 'CI_DEFAULT_BRANCH', value: project.default_branch, public: true, masked: false },
-          { key: 'CI_BUILD_REF', value: build.sha, public: true, masked: false },
-          { key: 'CI_BUILD_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
-          { key: 'CI_BUILD_REF_NAME', value: build.ref, public: true, masked: false },
-          { key: 'CI_BUILD_REF_SLUG', value: build.ref_slug, public: true, masked: false },
-          { key: 'CI_BUILD_NAME', value: 'test', public: true, masked: false },
-          { key: 'CI_BUILD_STAGE', value: 'test', public: true, masked: false },
+          { key: 'GITLAB_FEATURES', value: project.licensed_features.join(','), public: true, masked: false },
           { key: 'CI_PROJECT_ID', value: project.id.to_s, public: true, masked: false },
           { key: 'CI_PROJECT_NAME', value: project.path, public: true, masked: false },
           { key: 'CI_PROJECT_TITLE', value: project.title, public: true, masked: false },
@@ -2217,16 +2354,26 @@ describe Ci::Build do
           { key: 'CI_PROJECT_URL', value: project.web_url, public: true, masked: false },
           { key: 'CI_PROJECT_VISIBILITY', value: 'private', public: true, masked: false },
           { key: 'CI_PROJECT_REPOSITORY_LANGUAGES', value: project.repository_languages.map(&:name).join(',').downcase, public: true, masked: false },
+          { key: 'CI_DEFAULT_BRANCH', value: project.default_branch, public: true, masked: false },
           { key: 'CI_PAGES_DOMAIN', value: Gitlab.config.pages.host, public: true, masked: false },
           { key: 'CI_PAGES_URL', value: project.pages_url, public: true, masked: false },
           { key: 'CI_API_V4_URL', value: 'http://localhost/api/v4', public: true, masked: false },
           { key: 'CI_PIPELINE_IID', value: pipeline.iid.to_s, public: true, masked: false },
-          { key: 'CI_CONFIG_PATH', value: pipeline.ci_yaml_file_path, public: true, masked: false },
           { key: 'CI_PIPELINE_SOURCE', value: pipeline.source, public: true, masked: false },
+          { key: 'CI_CONFIG_PATH', value: pipeline.config_path, public: true, masked: false },
+          { key: 'CI_COMMIT_SHA', value: build.sha, public: true, masked: false },
+          { key: 'CI_COMMIT_SHORT_SHA', value: build.short_sha, public: true, masked: false },
+          { key: 'CI_COMMIT_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
+          { key: 'CI_COMMIT_REF_NAME', value: build.ref, public: true, masked: false },
+          { key: 'CI_COMMIT_REF_SLUG', value: build.ref_slug, public: true, masked: false },
           { key: 'CI_COMMIT_MESSAGE', value: pipeline.git_commit_message, public: true, masked: false },
           { key: 'CI_COMMIT_TITLE', value: pipeline.git_commit_title, public: true, masked: false },
           { key: 'CI_COMMIT_DESCRIPTION', value: pipeline.git_commit_description, public: true, masked: false },
-          { key: 'CI_COMMIT_REF_PROTECTED', value: (!!pipeline.protected_ref?).to_s, public: true, masked: false }
+          { key: 'CI_COMMIT_REF_PROTECTED', value: (!!pipeline.protected_ref?).to_s, public: true, masked: false },
+          { key: 'CI_BUILD_REF', value: build.sha, public: true, masked: false },
+          { key: 'CI_BUILD_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
+          { key: 'CI_BUILD_REF_NAME', value: build.ref, public: true, masked: false },
+          { key: 'CI_BUILD_REF_SLUG', value: build.ref_slug, public: true, masked: false }
         ]
       end
 
@@ -2235,7 +2382,7 @@ describe Ci::Build do
         build.yaml_variables = []
       end
 
-      it { is_expected.to include(*predefined_variables) }
+      it { is_expected.to eq(predefined_variables) }
 
       describe 'variables ordering' do
         context 'when variables hierarchy is stubbed' do
@@ -2449,6 +2596,7 @@ describe Ci::Build do
 
       before do
         build.update(tag: true)
+        pipeline.update(tag: true)
       end
 
       it { is_expected.to include(tag_variable) }
@@ -2667,11 +2815,17 @@ describe Ci::Build do
       it { is_expected.to include(deployment_variable) }
     end
 
+    context 'when project has default CI config path' do
+      let(:ci_config_path) { { key: 'CI_CONFIG_PATH', value: '.gitlab-ci.yml', public: true, masked: false } }
+
+      it { is_expected.to include(ci_config_path) }
+    end
+
     context 'when project has custom CI config path' do
       let(:ci_config_path) { { key: 'CI_CONFIG_PATH', value: 'custom', public: true, masked: false } }
 
       before do
-        project.update(ci_config_path: 'custom')
+        expect_any_instance_of(Project).to receive(:ci_config_path) { 'custom' }
       end
 
       it { is_expected.to include(ci_config_path) }
@@ -2943,6 +3097,32 @@ describe Ci::Build do
     end
   end
 
+  describe '#deployment_variables' do
+    let(:build) { create(:ci_build, environment: environment) }
+    let(:environment) { 'production' }
+    let(:kubernetes_namespace) { 'namespace' }
+    let(:project_variables) { double }
+
+    subject { build.deployment_variables(environment: environment) }
+
+    before do
+      allow(build).to receive(:expanded_kubernetes_namespace)
+        .and_return(kubernetes_namespace)
+
+      allow(build.project).to receive(:deployment_variables)
+        .with(environment: environment, kubernetes_namespace: kubernetes_namespace)
+        .and_return(project_variables)
+    end
+
+    it { is_expected.to eq(project_variables) }
+
+    context 'environment is nil' do
+      let(:environment) { nil }
+
+      it { is_expected.to be_empty }
+    end
+  end
+
   describe '#scoped_variables_hash' do
     context 'when overriding CI variables' do
       before do
@@ -3080,10 +3260,20 @@ describe Ci::Build do
     rescue StateMachines::InvalidTransition
     end
 
-    it 'ensures pipeline ref existence' do
-      expect(job.pipeline.persistent_ref).to receive(:create).once
+    context 'for pipeline ref existence' do
+      it 'ensures pipeline ref creation' do
+        expect(job.pipeline.persistent_ref).to receive(:create).once
 
-      run_job_without_exception
+        run_job_without_exception
+      end
+
+      it 'ensures that it is not run in database transaction' do
+        expect(job.pipeline.persistent_ref).to receive(:create) do
+          expect(Gitlab::Database).not_to be_inside_transaction
+        end
+
+        run_job_without_exception
+      end
     end
 
     shared_examples 'saves data on transition' do
@@ -3332,7 +3522,7 @@ describe Ci::Build do
       end
 
       it 'can drop the build' do
-        expect(Gitlab::Sentry).to receive(:track_exception)
+        expect(Gitlab::Sentry).to receive(:track_and_raise_for_dev_exception)
 
         expect { build.drop! }.not_to raise_error
 
@@ -3933,6 +4123,72 @@ describe Ci::Build do
 
     it 'returns invalid dependencies' do
       expect(job.invalid_dependencies).to eq([pre_stage_job_invalid])
+    end
+  end
+
+  describe '#execute_hooks' do
+    context 'with project hooks' do
+      before do
+        create(:project_hook, project: project, job_events: true)
+      end
+
+      it 'execute hooks' do
+        expect_any_instance_of(ProjectHook).to receive(:async_execute)
+
+        build.execute_hooks
+      end
+    end
+
+    context 'without relevant project hooks' do
+      before do
+        create(:project_hook, project: project, job_events: false)
+      end
+
+      it 'does not execute a hook' do
+        expect_any_instance_of(ProjectHook).not_to receive(:async_execute)
+
+        build.execute_hooks
+      end
+    end
+
+    context 'with project services' do
+      before do
+        create(:service, active: true, job_events: true, project: project)
+      end
+
+      it 'execute services' do
+        expect_any_instance_of(Service).to receive(:async_execute)
+
+        build.execute_hooks
+      end
+    end
+
+    context 'without relevant project services' do
+      before do
+        create(:service, active: true, job_events: false, project: project)
+      end
+
+      it 'execute services' do
+        expect_any_instance_of(Service).not_to receive(:async_execute)
+
+        build.execute_hooks
+      end
+    end
+  end
+
+  describe '#environment_auto_stop_in' do
+    subject { build.environment_auto_stop_in }
+
+    context 'when build option has environment auto_stop_in' do
+      let(:build) { create(:ci_build, options: { environment: { name: 'test', auto_stop_in: '1 day' } }) }
+
+      it { is_expected.to eq('1 day') }
+    end
+
+    context 'when build option does not have environment auto_stop_in' do
+      let(:build) { create(:ci_build) }
+
+      it { is_expected.to be_nil }
     end
   end
 end

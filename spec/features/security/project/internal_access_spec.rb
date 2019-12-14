@@ -7,10 +7,6 @@ describe "Internal Project Access" do
 
   set(:project) { create(:project, :internal, :repository) }
 
-  before do
-    stub_feature_flags(job_log_json: false)
-  end
-
   describe "Project should be internal" do
     describe '#internal?' do
       subject { project.internal? }
@@ -89,7 +85,7 @@ describe "Internal Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/settings/members" do
+  describe "GET /:project_path/-/settings/members" do
     subject { project_settings_members_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -103,7 +99,7 @@ describe "Internal Project Access" do
     it { is_expected.to be_denied_for(:external) }
   end
 
-  describe "GET /:project_path/settings/ci_cd" do
+  describe "GET /:project_path/-/settings/ci_cd" do
     subject { project_settings_ci_cd_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -117,7 +113,7 @@ describe "Internal Project Access" do
     it { is_expected.to be_denied_for(:external) }
   end
 
-  describe "GET /:project_path/settings/repository" do
+  describe "GET /:project_path/-/settings/repository" do
     subject { project_settings_repository_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -264,7 +260,9 @@ describe "Internal Project Access" do
 
     before do
       # Speed increase
-      allow_any_instance_of(Project).to receive(:branches).and_return([])
+      allow_next_instance_of(Project) do |instance|
+        allow(instance).to receive(:branches).and_return([])
+      end
     end
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -283,7 +281,9 @@ describe "Internal Project Access" do
 
     before do
       # Speed increase
-      allow_any_instance_of(Project).to receive(:tags).and_return([])
+      allow_next_instance_of(Project) do |instance|
+        allow(instance).to receive(:tags).and_return([])
+      end
     end
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -297,7 +297,7 @@ describe "Internal Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/settings/integrations" do
+  describe "GET /:project_path/-/settings/integrations" do
     subject { project_settings_integrations_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -466,7 +466,7 @@ describe "Internal Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/environments" do
+  describe "GET /:project_path/-/environments" do
     subject { project_environments_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }
@@ -480,7 +480,7 @@ describe "Internal Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/environments/:id" do
+  describe "GET /:project_path/-/environments/:id" do
     let(:environment) { create(:environment, project: project) }
     subject { project_environment_path(project, environment) }
 
@@ -495,7 +495,7 @@ describe "Internal Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/environments/:id/deployments" do
+  describe "GET /:project_path/-/environments/:id/deployments" do
     let(:environment) { create(:environment, project: project) }
     subject { project_environment_deployments_path(project, environment) }
 
@@ -510,7 +510,7 @@ describe "Internal Project Access" do
     it { is_expected.to be_denied_for(:visitor) }
   end
 
-  describe "GET /:project_path/environments/new" do
+  describe "GET /:project_path/-/environments/new" do
     subject { new_project_environment_path(project) }
 
     it { is_expected.to be_allowed_for(:admin) }

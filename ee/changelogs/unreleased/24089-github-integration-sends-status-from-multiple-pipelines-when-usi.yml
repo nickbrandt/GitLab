@@ -1,0 +1,6 @@
+---
+title: Prefer sending external pull request pipeline statuses over general statuses
+  to GitHub
+merge_request: 20364
+author:
+type: fixed

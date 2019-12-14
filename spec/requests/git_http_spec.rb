@@ -452,11 +452,11 @@ describe 'Git HTTP requests' do
           context "when authentication fails" do
             context "when the user is IP banned" do
               before do
-                stub_rack_attack_setting(enabled: true)
+                stub_rack_attack_setting(enabled: true, ip_whitelist: [])
               end
 
               it "responds with status 403" do
-                expect(Rack::Attack::Allow2Ban).to receive(:filter).and_return(true)
+                expect(Rack::Attack::Allow2Ban).to receive(:banned?).and_return(true)
                 expect(Gitlab::AuthLogger).to receive(:error).with({
                   message: 'Rack_Attack',
                   env: :blocklist,

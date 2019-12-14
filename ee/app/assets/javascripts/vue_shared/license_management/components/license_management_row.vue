@@ -1,10 +1,10 @@
 <script>
 import { mapActions } from 'vuex';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { getIssueStatusFromLicenseStatus } from 'ee/vue_shared/license_management/store/utils';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import IssueStatusIcon from '~/reports/components/issue_status_icon.vue';
-import { getIssueStatusFromLicenseStatus } from 'ee/vue_shared/license_management/store/utils';
 
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 
@@ -55,9 +55,9 @@ export default {
 };
 </script>
 <template>
-  <div>
+  <div data-qa-selector="license_compliance_row">
     <issue-status-icon :status="status" class="float-left append-right-default" />
-    <span class="js-license-name">{{ license.name }}</span>
+    <span class="js-license-name" data-qa-selector="license_name_content">{{ license.name }}</span>
     <div class="float-right">
       <div class="d-flex">
         <gl-dropdown

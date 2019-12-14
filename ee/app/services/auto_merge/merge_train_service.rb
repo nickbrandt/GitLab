@@ -26,15 +26,20 @@ module AutoMerge
       super do
         if merge_request.merge_train&.destroy
           SystemNoteService.cancel_merge_train(merge_request, project, current_user)
-          AutoMergeProcessWorker.perform_async(next_merge_request.id) if next_merge_request
+          next_merge_request.merge_train.stale! if next_merge_request
         end
       end
     end
 
-    def abort(merge_request, reason)
-      super do
+    def abort(merge_request, reason, process_next: true)
+      # Before dropping a merge request from a merge train, get the next
+      # merge request in order to refresh it later.
+      next_merge_request = merge_request.merge_train&.next
+
+      super(merge_request, reason) do
         if merge_request.merge_train&.destroy
           SystemNoteService.abort_merge_train(merge_request, project, current_user, reason)
+          next_merge_request.merge_train.stale! if next_merge_request && process_next
         end
       end
     end

@@ -17,6 +17,7 @@ describe DesignManagement::Design do
     it { is_expected.to have_many(:actions) }
     it { is_expected.to have_many(:versions) }
     it { is_expected.to have_many(:notes).dependent(:delete_all) }
+    it { is_expected.to have_many(:user_mentions) }
   end
 
   describe 'validations' do
@@ -141,6 +142,18 @@ describe DesignManagement::Design do
 
           expect(history).to eq(versions.map(&:second))
         end
+      end
+    end
+
+    describe '.with_filename' do
+      it 'returns correct design when passed a single filename' do
+        expect(described_class.with_filename(design1.filename)).to eq([design1])
+      end
+
+      it 'returns correct designs when passed an Array of filenames' do
+        expect(
+          described_class.with_filename([design1, design2].map(&:filename))
+        ).to contain_exactly(design1, design2)
       end
     end
 

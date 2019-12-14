@@ -1,14 +1,13 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
 
-import axios from '~/lib/utils/axios_utils';
-
 import EpicApp from 'ee/epic/components/epic_app.vue';
 import createStore from 'ee/epic/store';
 
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import issueShowData from 'spec/issue_show/mock_data';
 import { TEST_HOST } from 'spec/test_constants';
+import axios from '~/lib/utils/axios_utils';
 import { mockEpicMeta, mockEpicData } from '../mock_data';
 
 describe('EpicAppComponent', () => {

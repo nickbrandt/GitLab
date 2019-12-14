@@ -49,3 +49,5 @@ export const npmFiles = [
     download_path: '/-/package_files/2/download',
   },
 ];
+
+export const packageList = [mavenPackage, npmPackage];

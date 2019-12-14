@@ -81,6 +81,7 @@ describe Projects::Settings::CiCdController do
 
     it 'resets runner registration token' do
       expect { subject }.to change { project.reload.runners_token }
+      expect(flash[:toast]).to eq('New runners registration token has been generated!')
     end
 
     it 'redirects the user to admin runners page' do
@@ -106,7 +107,7 @@ describe Projects::Settings::CiCdController do
       subject
 
       expect(response).to have_gitlab_http_status(302)
-      expect(flash[:notice]).to eq("Pipelines settings for '#{project.name}' were successfully updated.")
+      expect(flash[:toast]).to eq("Pipelines settings for '#{project.name}' were successfully updated.")
     end
 
     context 'when updating the auto_devops settings' do
@@ -125,12 +126,14 @@ describe Projects::Settings::CiCdController do
 
       context 'when run_auto_devops_pipeline is true' do
         before do
-          expect_any_instance_of(Projects::UpdateService).to receive(:run_auto_devops_pipeline?).and_return(true)
+          expect_next_instance_of(Projects::UpdateService) do |instance|
+            expect(instance).to receive(:run_auto_devops_pipeline?).and_return(true)
+          end
         end
 
         context 'when the project repository is empty' do
-          it 'sets a warning flash' do
-            expect(subject).to set_flash[:warning]
+          it 'sets a notice flash' do
+            expect(subject).to set_flash[:notice]
           end
 
           it 'does not queue a CreatePipelineWorker' do
@@ -143,10 +146,10 @@ describe Projects::Settings::CiCdController do
         context 'when the project repository is not empty' do
           let(:project) { create(:project, :repository) }
 
-          it 'sets a success flash' do
+          it 'displays a toast message' do
             allow(CreatePipelineWorker).to receive(:perform_async).with(project.id, user.id, project.default_branch, :web, any_args)
 
-            expect(subject).to set_flash[:success]
+            expect(subject).to set_flash[:toast]
           end
 
           it 'queues a CreatePipelineWorker' do
@@ -159,7 +162,9 @@ describe Projects::Settings::CiCdController do
 
       context 'when run_auto_devops_pipeline is not true' do
         before do
-          expect_any_instance_of(Projects::UpdateService).to receive(:run_auto_devops_pipeline?).and_return(false)
+          expect_next_instance_of(Projects::UpdateService) do |instance|
+            expect(instance).to receive(:run_auto_devops_pipeline?).and_return(false)
+          end
         end
 
         it 'does not queue a CreatePipelineWorker' do

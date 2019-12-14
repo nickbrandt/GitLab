@@ -18,7 +18,7 @@ describe Ci::CompareContainerScanningReportsService do
       let!(:base_pipeline) { create(:ee_ci_pipeline) }
       let!(:head_pipeline) { create(:ee_ci_pipeline, :with_container_scanning_report, project: project) }
 
-      it 'reports new licenses' do
+      it 'reports new, existing and fixed vulnerabilities' do
         expect(subject[:status]).to eq(:parsed)
         expect(subject[:data]['added'].count).to eq(8)
         expect(subject[:data]['existing'].count).to eq(0)

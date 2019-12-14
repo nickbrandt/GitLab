@@ -40,17 +40,17 @@ scheduling into milestones. Labelling is a task for everyone.
 
 Most issues will have labels for at least one of the following:
 
-- Type: ~feature, ~bug, ~backstage, etc.
-- Stage: ~"devops::plan", ~"devops::create", etc.
-- Group: ~"group::source code", ~"group::knowledge", ~"group::editor", etc.
-- Category: ~"Category:Code Analytics", ~"Category:DevOps Score", ~"Category:Templates", etc.
-- Feature: ~wiki, ~ldap, ~api, ~issues, ~"merge requests", etc.
-- Department: ~UX, ~Quality
-- Team: ~"Technical Writing", ~Delivery
-- Specialization: ~frontend, ~backend, ~documentation
-- Release Scoping: ~Deliverable, ~Stretch, ~"Next Patch Release"
-- Priority: ~P1, ~P2, ~P3, ~P4
-- Severity: ~S1, ~S2, ~S3, ~S4
+- Type: `~feature`, `~bug`, `~backstage`, etc.
+- Stage: `~"devops::plan"`, `~"devops::create"`, etc.
+- Group: `~"group::source code"`, `~"group::knowledge"`, `~"group::editor"`, etc.
+- Category: `~"Category:Code Analytics"`, `~"Category:DevOps Score"`, `~"Category:Templates"`, etc.
+- Feature: `~wiki`, `~ldap`, `~api`, `~issues`, `~"merge requests"`, etc.
+- Department: `~UX`, `~Quality`
+- Team: `~"Technical Writing"`, `~Delivery`
+- Specialization: `~frontend`, `~backend`, `~documentation`
+- Release Scoping: `~Deliverable`, `~Stretch`, `~"Next Patch Release"`
+- Priority: `~P1`, `~P2`, `~P3`, `~P4`
+- Severity: ~`S1`, `~S2`, `~S3`, `~S4`
 
 All labels, their meaning and priority are defined on the
 [labels page](https://gitlab.com/gitlab-org/gitlab-foss/-/labels).
@@ -210,7 +210,7 @@ If you are an expert in a particular area, it makes it easier to find issues to
 work on. You can also subscribe to those labels to receive an email each time an
 issue is labeled with a feature label corresponding to your expertise.
 
-Examples of feature labels are ~wiki, ~ldap, ~api, ~issues, ~"merge requests" etc.
+Examples of feature labels are `~wiki`, `~ldap`, `~api`, `~issues`, `~"merge requests"` etc.
 
 #### Naming and color convention
 
@@ -268,7 +268,7 @@ Each issue scheduled for the current milestone should be labeled ~Deliverable
 or ~"Stretch". Any open issue for a previous milestone should be labeled
 ~"Next Patch Release", or otherwise rescheduled to a different milestone.
 
-#### Priority labels
+### Priority labels
 
 Priority labels help us define the time a ~bug fix should be completed. Priority determines how quickly the defect turnaround time must be.
 If there are multiple defects, the priority decides which defect has to be fixed immediately versus later.

@@ -75,71 +75,6 @@ describe Ci::Pipeline, :mailer do
     end
   end
 
-  describe '.sort_by_merge_request_pipelines' do
-    subject { described_class.sort_by_merge_request_pipelines }
-
-    context 'when branch pipelines exist' do
-      let!(:branch_pipeline_1) { create(:ci_pipeline, source: :push) }
-      let!(:branch_pipeline_2) { create(:ci_pipeline, source: :push) }
-
-      it 'returns pipelines order by id' do
-        expect(subject).to eq([branch_pipeline_2,
-                               branch_pipeline_1])
-      end
-    end
-
-    context 'when merge request pipelines exist' do
-      let!(:merge_request_pipeline_1) do
-        create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request)
-      end
-
-      let!(:merge_request_pipeline_2) do
-        create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request)
-      end
-
-      let(:merge_request) do
-        create(:merge_request,
-               source_project: project,
-               source_branch: 'feature',
-               target_project: project,
-               target_branch: 'master')
-      end
-
-      it 'returns pipelines order by id' do
-        expect(subject).to eq([merge_request_pipeline_2,
-                               merge_request_pipeline_1])
-      end
-    end
-
-    context 'when both branch pipeline and merge request pipeline exist' do
-      let!(:branch_pipeline_1) { create(:ci_pipeline, source: :push) }
-      let!(:branch_pipeline_2) { create(:ci_pipeline, source: :push) }
-
-      let!(:merge_request_pipeline_1) do
-        create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request)
-      end
-
-      let!(:merge_request_pipeline_2) do
-        create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request)
-      end
-
-      let(:merge_request) do
-        create(:merge_request,
-               source_project: project,
-               source_branch: 'feature',
-               target_project: project,
-               target_branch: 'master')
-      end
-
-      it 'returns merge request pipeline first' do
-        expect(subject).to eq([merge_request_pipeline_2,
-                               merge_request_pipeline_1,
-                               branch_pipeline_2,
-                               branch_pipeline_1])
-      end
-    end
-  end
-
   describe '.for_sha' do
     subject { described_class.for_sha(sha) }
 
@@ -226,39 +161,6 @@ describe Ci::Pipeline, :mailer do
     end
   end
 
-  describe '.detached_merge_request_pipelines' do
-    subject { described_class.detached_merge_request_pipelines(merge_request, sha) }
-
-    let!(:pipeline) do
-      create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request, sha: merge_request.diff_head_sha)
-    end
-
-    let(:merge_request) { create(:merge_request) }
-    let(:sha) { merge_request.diff_head_sha }
-
-    it 'returns detached merge request pipelines' do
-      is_expected.to eq([pipeline])
-    end
-
-    context 'when sha does not exist' do
-      let(:sha) { 'abc' }
-
-      it 'returns empty array' do
-        is_expected.to be_empty
-      end
-    end
-
-    context 'when pipeline is merge request pipeline' do
-      let!(:pipeline) do
-        create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request, source_sha: merge_request.diff_head_sha)
-      end
-
-      it 'returns empty array' do
-        is_expected.to be_empty
-      end
-    end
-  end
-
   describe '#detached_merge_request_pipeline?' do
     subject { pipeline.detached_merge_request_pipeline? }
 
@@ -275,39 +177,6 @@ describe Ci::Pipeline, :mailer do
       let(:target_sha) { merge_request.target_branch_sha }
 
       it { is_expected.to be_falsy }
-    end
-  end
-
-  describe '.merge_request_pipelines' do
-    subject { described_class.merge_request_pipelines(merge_request, source_sha) }
-
-    let!(:pipeline) do
-      create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request, source_sha: merge_request.diff_head_sha)
-    end
-
-    let(:merge_request) { create(:merge_request) }
-    let(:source_sha) { merge_request.diff_head_sha }
-
-    it 'returns merge pipelines' do
-      is_expected.to eq([pipeline])
-    end
-
-    context 'when source sha is empty' do
-      let(:source_sha) { nil }
-
-      it 'returns empty array' do
-        is_expected.to be_empty
-      end
-    end
-
-    context 'when pipeline is detached merge request pipeline' do
-      let!(:pipeline) do
-        create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request, sha: merge_request.diff_head_sha)
-      end
-
-      it 'returns empty array' do
-        is_expected.to be_empty
-      end
     end
   end
 
@@ -330,25 +199,6 @@ describe Ci::Pipeline, :mailer do
     end
   end
 
-  describe '#merge_train_pipeline?' do
-    subject { pipeline.merge_train_pipeline? }
-
-    let!(:pipeline) do
-      create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request, ref: ref, target_sha: 'xxx')
-    end
-
-    let(:merge_request) { create(:merge_request) }
-    let(:ref) { 'refs/merge-requests/1/train' }
-
-    it { is_expected.to be_truthy }
-
-    context 'when ref is merge ref' do
-      let(:ref) { 'refs/merge-requests/1/merge' }
-
-      it { is_expected.to be_falsy }
-    end
-  end
-
   describe '#merge_request_ref?' do
     subject { pipeline.merge_request_ref? }
 
@@ -359,43 +209,19 @@ describe Ci::Pipeline, :mailer do
     end
   end
 
-  describe '#merge_train_ref?' do
-    subject { pipeline.merge_train_ref? }
-
-    it 'calls Mergetrain#merge_train_ref?' do
-      expect(MergeRequest).to receive(:merge_train_ref?).with(pipeline.ref)
-
-      subject
-    end
-  end
-
   describe '#merge_request_event_type' do
     subject { pipeline.merge_request_event_type }
 
-    before do
-      allow(pipeline).to receive(:merge_request_event?) { true }
-    end
-
-    context 'when pipeline is merge train pipeline' do
-      before do
-        allow(pipeline).to receive(:merge_train_pipeline?) { true }
-      end
-
-      it { is_expected.to eq(:merge_train) }
-    end
+    let(:pipeline) { merge_request.all_pipelines.last }
 
     context 'when pipeline is merge request pipeline' do
-      before do
-        allow(pipeline).to receive(:merge_request_pipeline?) { true }
-      end
+      let(:merge_request) { create(:merge_request, :with_merge_request_pipeline) }
 
       it { is_expected.to eq(:merged_result) }
     end
 
     context 'when pipeline is detached merge request pipeline' do
-      before do
-        allow(pipeline).to receive(:detached_merge_request_pipeline?) { true }
-      end
+      let(:merge_request) { create(:merge_request, :with_detached_merge_request_pipeline) }
 
       it { is_expected.to eq(:detached) }
     end
@@ -495,50 +321,6 @@ describe Ci::Pipeline, :mailer do
         expect(Gitlab::Utils).to receive(:slugify).with(merge_request.source_branch)
 
         subject
-      end
-    end
-  end
-
-  describe '.triggered_for_branch' do
-    subject { described_class.triggered_for_branch(ref) }
-
-    let(:project) { create(:project, :repository) }
-    let(:ref) { 'feature' }
-    let!(:pipeline) { create(:ci_pipeline, ref: ref) }
-
-    it 'returns the pipeline' do
-      is_expected.to eq([pipeline])
-    end
-
-    context 'when sha is not specified' do
-      it 'returns the pipeline' do
-        expect(described_class.triggered_for_branch(ref)).to eq([pipeline])
-      end
-    end
-
-    context 'when pipeline is triggered for tag' do
-      let(:ref) { 'v1.1.0' }
-      let!(:pipeline) { create(:ci_pipeline, ref: ref, tag: true) }
-
-      it 'does not return the pipeline' do
-        is_expected.to be_empty
-      end
-    end
-
-    context 'when pipeline is triggered for merge_request' do
-      let!(:merge_request) do
-        create(:merge_request,
-          :with_merge_request_pipeline,
-          source_project: project,
-          source_branch: ref,
-          target_project: project,
-          target_branch: 'master')
-      end
-
-      let(:pipeline) { merge_request.pipelines_for_merge_request.first }
-
-      it 'does not return the pipeline' do
-        is_expected.to be_empty
       end
     end
   end
@@ -808,13 +590,24 @@ describe Ci::Pipeline, :mailer do
     it 'includes all predefined variables in a valid order' do
       keys = subject.map { |variable| variable[:key] }
 
-      expect(keys).to eq %w[CI_PIPELINE_IID
-                            CI_CONFIG_PATH
-                            CI_PIPELINE_SOURCE
-                            CI_COMMIT_MESSAGE
-                            CI_COMMIT_TITLE
-                            CI_COMMIT_DESCRIPTION
-                            CI_COMMIT_REF_PROTECTED]
+      expect(keys).to eq %w[
+        CI_PIPELINE_IID
+        CI_PIPELINE_SOURCE
+        CI_CONFIG_PATH
+        CI_COMMIT_SHA
+        CI_COMMIT_SHORT_SHA
+        CI_COMMIT_BEFORE_SHA
+        CI_COMMIT_REF_NAME
+        CI_COMMIT_REF_SLUG
+        CI_COMMIT_MESSAGE
+        CI_COMMIT_TITLE
+        CI_COMMIT_DESCRIPTION
+        CI_COMMIT_REF_PROTECTED
+        CI_BUILD_REF
+        CI_BUILD_BEFORE_SHA
+        CI_BUILD_REF_NAME
+        CI_BUILD_REF_SLUG
+      ]
     end
 
     context 'when source is merge request' do
@@ -979,141 +772,6 @@ describe Ci::Pipeline, :mailer do
   end
 
   describe 'pipeline stages' do
-    describe '#stage_seeds' do
-      let(:pipeline) { build(:ci_pipeline, config: config) }
-      let(:config) { { rspec: { script: 'rake' } } }
-
-      it 'returns preseeded stage seeds object' do
-        expect(pipeline.stage_seeds)
-          .to all(be_a Gitlab::Ci::Pipeline::Seed::Base)
-        expect(pipeline.stage_seeds.count).to eq 1
-      end
-
-      context 'when no refs policy is specified' do
-        let(:config) do
-          { production: { stage: 'deploy', script: 'cap prod' },
-            rspec: { stage: 'test', script: 'rspec' },
-            spinach: { stage: 'test', script: 'spinach' } }
-        end
-
-        it 'correctly fabricates a stage seeds object' do
-          seeds = pipeline.stage_seeds
-
-          expect(seeds.size).to eq 2
-          expect(seeds.first.attributes[:name]).to eq 'test'
-          expect(seeds.second.attributes[:name]).to eq 'deploy'
-          expect(seeds.dig(0, 0, :name)).to eq 'rspec'
-          expect(seeds.dig(0, 1, :name)).to eq 'spinach'
-          expect(seeds.dig(1, 0, :name)).to eq 'production'
-        end
-      end
-
-      context 'when refs policy is specified' do
-        let(:pipeline) do
-          build(:ci_pipeline, ref: 'feature', tag: true, config: config)
-        end
-
-        let(:config) do
-          { production: { stage: 'deploy', script: 'cap prod', only: ['master'] },
-            spinach: { stage: 'test', script: 'spinach', only: ['tags'] } }
-        end
-
-        it 'returns stage seeds only assigned to master to master' do
-          seeds = pipeline.stage_seeds
-
-          expect(seeds.size).to eq 1
-          expect(seeds.first.attributes[:name]).to eq 'test'
-          expect(seeds.dig(0, 0, :name)).to eq 'spinach'
-        end
-      end
-
-      context 'when source policy is specified' do
-        let(:pipeline) { build(:ci_pipeline, source: :schedule, config: config) }
-
-        let(:config) do
-          { production: { stage: 'deploy', script: 'cap prod', only: ['triggers'] },
-            spinach: { stage: 'test', script: 'spinach', only: ['schedules'] } }
-        end
-
-        it 'returns stage seeds only assigned to schedules' do
-          seeds = pipeline.stage_seeds
-
-          expect(seeds.size).to eq 1
-          expect(seeds.first.attributes[:name]).to eq 'test'
-          expect(seeds.dig(0, 0, :name)).to eq 'spinach'
-        end
-      end
-
-      context 'when kubernetes policy is specified' do
-        let(:config) do
-          {
-            spinach: { stage: 'test', script: 'spinach' },
-            production: {
-              stage: 'deploy',
-              script: 'cap',
-              only: { kubernetes: 'active' }
-            }
-          }
-        end
-
-        context 'when kubernetes is active' do
-          context 'when user configured kubernetes from CI/CD > Clusters' do
-            let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
-            let(:project) { cluster.project }
-            let(:pipeline) { build(:ci_pipeline, project: project, config: config) }
-
-            it 'returns seeds for kubernetes dependent job' do
-              seeds = pipeline.stage_seeds
-
-              expect(seeds.size).to eq 2
-              expect(seeds.dig(0, 0, :name)).to eq 'spinach'
-              expect(seeds.dig(1, 0, :name)).to eq 'production'
-            end
-          end
-        end
-
-        context 'when kubernetes is not active' do
-          it 'does not return seeds for kubernetes dependent job' do
-            seeds = pipeline.stage_seeds
-
-            expect(seeds.size).to eq 1
-            expect(seeds.dig(0, 0, :name)).to eq 'spinach'
-          end
-        end
-      end
-
-      context 'when variables policy is specified' do
-        let(:config) do
-          { unit: { script: 'minitest', only: { variables: ['$CI_PIPELINE_SOURCE'] } },
-            feature: { script: 'spinach', only: { variables: ['$UNDEFINED'] } } }
-        end
-
-        it 'returns stage seeds only when variables expression is truthy' do
-          seeds = pipeline.stage_seeds
-
-          expect(seeds.size).to eq 1
-          expect(seeds.dig(0, 0, :name)).to eq 'unit'
-        end
-      end
-    end
-
-    describe '#seeds_size' do
-      context 'when refs policy is specified' do
-        let(:config) do
-          { production: { stage: 'deploy', script: 'cap prod', only: ['master'] },
-            spinach: { stage: 'test', script: 'spinach', only: ['tags'] } }
-        end
-
-        let(:pipeline) do
-          build(:ci_pipeline, ref: 'feature', tag: true, config: config)
-        end
-
-        it 'returns real seeds size' do
-          expect(pipeline.seeds_size).to eq 1
-        end
-      end
-    end
-
     describe 'legacy stages' do
       before do
         create(:commit_status, pipeline: pipeline,
@@ -1180,7 +838,9 @@ describe Ci::Pipeline, :mailer do
                                       stage_idx: 0,
                                       status: 'success')
 
-                pipeline.process!
+                Ci::ProcessPipelineService
+                  .new(pipeline)
+                  .execute
               end
 
               it 'ignores the previous state' do
@@ -2065,17 +1725,6 @@ describe Ci::Pipeline, :mailer do
     end
   end
 
-  describe '.latest_for_shas' do
-    let(:sha) { 'abc' }
-
-    it 'returns latest pipeline for sha' do
-      create(:ci_pipeline, sha: sha)
-      pipeline2 = create(:ci_pipeline, sha: sha)
-
-      expect(described_class.latest_for_shas(sha)).to contain_exactly(pipeline2)
-    end
-  end
-
   describe '.latest_successful_ids_per_project' do
     let(:projects) { create_list(:project, 2) }
     let!(:pipeline1) { create(:ci_pipeline, :success, project: projects[0]) }
@@ -2186,161 +1835,6 @@ describe Ci::Pipeline, :mailer do
     end
   end
 
-  describe '#ci_yaml_file_path' do
-    subject { pipeline.ci_yaml_file_path }
-
-    %i[unknown_source repository_source].each do |source|
-      context source.to_s do
-        before do
-          pipeline.config_source = described_class.config_sources.fetch(source)
-        end
-
-        it 'returns the path from project' do
-          allow(pipeline.project).to receive(:ci_config_path) { 'custom/path' }
-
-          is_expected.to eq('custom/path')
-        end
-
-        it 'returns default when custom path is nil' do
-          allow(pipeline.project).to receive(:ci_config_path) { nil }
-
-          is_expected.to eq('.gitlab-ci.yml')
-        end
-
-        it 'returns default when custom path is empty' do
-          allow(pipeline.project).to receive(:ci_config_path) { '' }
-
-          is_expected.to eq('.gitlab-ci.yml')
-        end
-      end
-    end
-
-    context 'when pipeline is for auto-devops' do
-      before do
-        pipeline.config_source = 'auto_devops_source'
-      end
-
-      it 'does not return config file' do
-        is_expected.to be_nil
-      end
-    end
-  end
-
-  describe '#set_config_source' do
-    context 'when pipelines does not contain needed data and auto devops is disabled' do
-      before do
-        stub_application_setting(auto_devops_enabled: false)
-      end
-
-      it 'defines source to be unknown' do
-        pipeline.set_config_source
-
-        expect(pipeline).to be_unknown_source
-      end
-    end
-
-    context 'when pipeline contains all needed data' do
-      let(:pipeline) do
-        create(:ci_pipeline, project: project,
-                             sha: '1234',
-                             ref: 'master',
-                             source: :push)
-      end
-
-      context 'when the repository has a config file' do
-        before do
-          allow(project.repository).to receive(:gitlab_ci_yml_for)
-            .and_return('config')
-        end
-
-        it 'defines source to be from repository' do
-          pipeline.set_config_source
-
-          expect(pipeline).to be_repository_source
-        end
-
-        context 'when loading an object' do
-          let(:new_pipeline) { Ci::Pipeline.find(pipeline.id) }
-
-          it 'does not redefine the source' do
-            # force to overwrite the source
-            pipeline.unknown_source!
-
-            expect(new_pipeline).to be_unknown_source
-          end
-        end
-      end
-
-      context 'when the repository does not have a config file' do
-        let(:implied_yml) { Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content }
-
-        context 'auto devops enabled' do
-          before do
-            allow(project).to receive(:ci_config_path) { 'custom' }
-          end
-
-          it 'defines source to be auto devops' do
-            pipeline.set_config_source
-
-            expect(pipeline).to be_auto_devops_source
-          end
-        end
-      end
-    end
-  end
-
-  describe '#ci_yaml_file' do
-    let(:implied_yml) { Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content }
-
-    context 'the source is unknown' do
-      before do
-        pipeline.unknown_source!
-      end
-
-      it 'returns the configuration if found' do
-        allow(pipeline.project.repository).to receive(:gitlab_ci_yml_for)
-          .and_return('config')
-
-        expect(pipeline.ci_yaml_file).to be_a(String)
-        expect(pipeline.ci_yaml_file).not_to eq(implied_yml)
-        expect(pipeline.yaml_errors).to be_nil
-      end
-
-      it 'sets yaml errors if not found' do
-        expect(pipeline.ci_yaml_file).to be_nil
-        expect(pipeline.yaml_errors)
-            .to start_with('Failed to load CI/CD config file')
-      end
-    end
-
-    context 'the source is the repository' do
-      before do
-        pipeline.repository_source!
-      end
-
-      it 'returns the configuration if found' do
-        allow(pipeline.project.repository).to receive(:gitlab_ci_yml_for)
-          .and_return('config')
-
-        expect(pipeline.ci_yaml_file).to be_a(String)
-        expect(pipeline.ci_yaml_file).not_to eq(implied_yml)
-        expect(pipeline.yaml_errors).to be_nil
-      end
-    end
-
-    context 'when the source is auto_devops_source' do
-      before do
-        stub_application_setting(auto_devops_enabled: true)
-        pipeline.auto_devops_source!
-      end
-
-      it 'finds the implied config' do
-        expect(pipeline.ci_yaml_file).to eq(implied_yml)
-        expect(pipeline.yaml_errors).to be_nil
-      end
-    end
-  end
-
   describe '#update_status' do
     context 'when pipeline is empty' do
       it 'updates does not change pipeline status' do
@@ -2400,7 +1894,7 @@ describe Ci::Pipeline, :mailer do
       let(:pipeline) { create(:ci_pipeline, status: :created) }
 
       it 'returns detailed status for created pipeline' do
-        expect(subject.text).to eq 'created'
+        expect(subject.text).to eq s_('CiStatusText|created')
       end
     end
 
@@ -2408,7 +1902,7 @@ describe Ci::Pipeline, :mailer do
       let(:pipeline) { create(:ci_pipeline, status: :pending) }
 
       it 'returns detailed status for pending pipeline' do
-        expect(subject.text).to eq 'pending'
+        expect(subject.text).to eq s_('CiStatusText|pending')
       end
     end
 
@@ -2416,7 +1910,7 @@ describe Ci::Pipeline, :mailer do
       let(:pipeline) { create(:ci_pipeline, status: :running) }
 
       it 'returns detailed status for running pipeline' do
-        expect(subject.text).to eq 'running'
+        expect(subject.text).to eq s_('CiStatus|running')
       end
     end
 
@@ -2424,7 +1918,7 @@ describe Ci::Pipeline, :mailer do
       let(:pipeline) { create(:ci_pipeline, status: :success) }
 
       it 'returns detailed status for successful pipeline' do
-        expect(subject.text).to eq 'passed'
+        expect(subject.text).to eq s_('CiStatusText|passed')
       end
     end
 
@@ -2432,7 +1926,7 @@ describe Ci::Pipeline, :mailer do
       let(:pipeline) { create(:ci_pipeline, status: :failed) }
 
       it 'returns detailed status for failed pipeline' do
-        expect(subject.text).to eq 'failed'
+        expect(subject.text).to eq s_('CiStatusText|failed')
       end
     end
 
@@ -2440,7 +1934,7 @@ describe Ci::Pipeline, :mailer do
       let(:pipeline) { create(:ci_pipeline, status: :canceled) }
 
       it 'returns detailed status for canceled pipeline' do
-        expect(subject.text).to eq 'canceled'
+        expect(subject.text).to eq s_('CiStatusText|canceled')
       end
     end
 
@@ -2448,7 +1942,7 @@ describe Ci::Pipeline, :mailer do
       let(:pipeline) { create(:ci_pipeline, status: :skipped) }
 
       it 'returns detailed status for skipped pipeline' do
-        expect(subject.text).to eq 'skipped'
+        expect(subject.text).to eq s_('CiStatusText|skipped')
       end
     end
 
@@ -2456,7 +1950,7 @@ describe Ci::Pipeline, :mailer do
       let(:pipeline) { create(:ci_pipeline, status: :manual) }
 
       it 'returns detailed status for blocked pipeline' do
-        expect(subject.text).to eq 'blocked'
+        expect(subject.text).to eq s_('CiStatusText|blocked')
       end
     end
 
@@ -2468,7 +1962,7 @@ describe Ci::Pipeline, :mailer do
       end
 
       it 'retruns detailed status for successful pipeline with warnings' do
-        expect(subject.label).to eq 'passed with warnings'
+        expect(subject.label).to eq(s_('CiStatusLabel|passed with warnings'))
       end
     end
   end
@@ -2762,7 +2256,9 @@ describe Ci::Pipeline, :mailer do
     let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: 'master', sha: 'a288a022a53a5a944fae87bcec6efc87b7061808') }
 
     it "returns merge requests whose `diff_head_sha` matches the pipeline's SHA" do
-      allow_any_instance_of(MergeRequest).to receive(:diff_head_sha) { 'a288a022a53a5a944fae87bcec6efc87b7061808' }
+      allow_next_instance_of(MergeRequest) do |instance|
+        allow(instance).to receive(:diff_head_sha) { 'a288a022a53a5a944fae87bcec6efc87b7061808' }
+      end
       merge_request = create(:merge_request, source_project: project, head_pipeline: pipeline, source_branch: pipeline.ref)
 
       expect(pipeline.merge_requests_as_head_pipeline).to eq([merge_request])
@@ -2776,7 +2272,9 @@ describe Ci::Pipeline, :mailer do
 
     it "doesn't return merge requests whose `diff_head_sha` doesn't match the pipeline's SHA" do
       create(:merge_request, source_project: project, source_branch: pipeline.ref)
-      allow_any_instance_of(MergeRequest).to receive(:diff_head_sha) { '97de212e80737a608d939f648d959671fb0a0142b' }
+      allow_next_instance_of(MergeRequest) do |instance|
+        allow(instance).to receive(:diff_head_sha) { '97de212e80737a608d939f648d959671fb0a0142b' }
+      end
 
       expect(pipeline.merge_requests_as_head_pipeline).to be_empty
     end
@@ -2886,24 +2384,19 @@ describe Ci::Pipeline, :mailer do
   end
 
   describe '#has_yaml_errors?' do
-    context 'when pipeline has errors' do
-      let(:pipeline) do
-        create(:ci_pipeline, config: { rspec: nil })
+    context 'when yaml_errors is set' do
+      before do
+        pipeline.yaml_errors = 'File not found'
       end
 
-      it 'contains yaml errors' do
+      it 'returns true if yaml_errors is set' do
         expect(pipeline).to have_yaml_errors
+        expect(pipeline.yaml_errors).to include('File not foun')
       end
     end
 
-    context 'when pipeline does not have errors' do
-      let(:pipeline) do
-        create(:ci_pipeline, config: { rspec: { script: 'rake test' } })
-      end
-
-      it 'does not contain yaml errors' do
-        expect(pipeline).not_to have_yaml_errors
-      end
+    it 'returns false if yaml_errors is not set' do
+      expect(pipeline).not_to have_yaml_errors
     end
   end
 

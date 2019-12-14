@@ -207,6 +207,14 @@ FactoryBot.define do
       trigger_request factory: :ci_trigger_request
     end
 
+    trait :resource_group do
+      waiting_for_resource_at { 5.minutes.ago }
+
+      after(:build) do |build, evaluator|
+        build.resource_group = create(:ci_resource_group, project: build.project)
+      end
+    end
+
     after(:build) do |build, evaluator|
       build.project ||= build.pipeline.project
     end
@@ -369,6 +377,14 @@ FactoryBot.define do
       options do
         {
             artifacts: { reports: { container_scanning: 'gl-container-scanning-report.json' } }
+        }
+      end
+    end
+
+    trait :license_management do
+      options do
+        {
+            artifacts: { reports: { license_management: 'gl-license-management-report.json' } }
         }
       end
     end

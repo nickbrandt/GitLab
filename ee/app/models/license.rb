@@ -13,6 +13,7 @@ class License < ApplicationRecord
     burndown_charts
     code_owners
     contribution_analytics
+    description_diffs
     elastic_search
     export_issues
     group_bulk_edit
@@ -40,6 +41,7 @@ class License < ApplicationRecord
   ].freeze
 
   EEP_FEATURES = EES_FEATURES + %i[
+    adjourned_deletion_for_projects_and_groups
     admin_audit_log
     auditor_user
     batch_comments
@@ -94,8 +96,10 @@ class License < ApplicationRecord
     scoped_labels
     service_desk
     smartcard_auth
+    group_timelogs
     type_of_work_analytics
     unprotection_restrictions
+    ci_project_subscriptions
   ]
   EEP_FEATURES.freeze
 
@@ -103,20 +107,20 @@ class License < ApplicationRecord
     cluster_health
     container_scanning
     dast
-    dependency_list
     dependency_scanning
     epics
     group_ip_restriction
     incident_management
     insights
-    licenses_list
     license_management
+    personal_access_token_expiration_policy
     pod_logs
     prometheus_alerts
     pseudonymizer
     report_approver_rules
     sast
     security_dashboard
+    threat_monitoring
     tracing
     web_ide_terminal
   ]
@@ -261,6 +265,14 @@ class License < ApplicationRecord
 
     def global_feature?(feature)
       GLOBAL_FEATURES.include?(feature)
+    end
+
+    def eligible_for_trial?
+      Gitlab::CurrentSettings.license_trial_ends_on.nil?
+    end
+
+    def trial_ends_on
+      Gitlab::CurrentSettings.license_trial_ends_on
     end
   end
 
@@ -417,9 +429,24 @@ class License < ApplicationRecord
     HistoricalData.max_historical_user_count(license: self, from: from, to: to)
   end
 
+  def maximum_user_count
+    [historical_max, current_active_users_count].max
+  end
+
   def historical_max_with_default_period
     @historical_max_with_default_period ||=
       historical_max
+  end
+
+  def update_trial_setting
+    return unless license.restrictions[:trial]
+    return if license.expires_at.nil?
+
+    settings = ApplicationSetting.current
+    return if settings.nil?
+    return if settings.license_trial_ends_on.present?
+
+    settings.update license_trial_ends_on: license.expires_at
   end
 
   private

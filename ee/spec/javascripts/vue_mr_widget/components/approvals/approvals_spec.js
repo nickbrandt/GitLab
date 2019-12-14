@@ -1,6 +1,5 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
-import eventHub from '~/vue_merge_request_widget/event_hub';
 import Approvals from 'ee/vue_merge_request_widget/components/approvals/approvals.vue';
 import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/approvals_summary.vue';
 import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/approvals_summary_optional.vue';
@@ -13,13 +12,13 @@ import {
   APPROVE_ERROR,
   UNAPPROVE_ERROR,
 } from 'ee/vue_merge_request_widget/components/approvals/messages';
+import eventHub from '~/vue_merge_request_widget/event_hub';
 
 const localVue = createLocalVue();
 const TEST_HELP_PATH = 'help/path';
 const TEST_PASSWORD = 'password';
 const testApprovedBy = () => [1, 7, 10].map(id => ({ id }));
 const testApprovals = () => ({
-  has_approval_rules: true,
   approved: false,
   approved_by: testApprovedBy().map(user => ({ user })),
   approval_rules_left: [],

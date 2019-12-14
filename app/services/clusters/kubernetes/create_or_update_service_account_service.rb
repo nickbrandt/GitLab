@@ -49,6 +49,14 @@ module Clusters
 
         create_or_update_knative_serving_role
         create_or_update_knative_serving_role_binding
+
+        create_or_update_crossplane_database_role
+        create_or_update_crossplane_database_role_binding
+
+        return unless knative_serving_namespace
+
+        create_or_update_knative_version_role
+        create_or_update_knative_version_role_binding
       end
 
       private
@@ -60,6 +68,12 @@ module Clusters
           service_account_namespace,
           kubeclient
         ).ensure_exists!
+      end
+
+      def knative_serving_namespace
+        kubeclient.get_namespace(Clusters::Kubernetes::KNATIVE_SERVING_NAMESPACE)
+      rescue Kubeclient::ResourceNotFoundError
+        nil
       end
 
       def create_role_or_cluster_role_binding
@@ -76,6 +90,22 @@ module Clusters
 
       def create_or_update_knative_serving_role_binding
         kubeclient.update_role_binding(knative_serving_role_binding_resource)
+      end
+
+      def create_or_update_crossplane_database_role
+        kubeclient.update_role(crossplane_database_role_resource)
+      end
+
+      def create_or_update_crossplane_database_role_binding
+        kubeclient.update_role_binding(crossplane_database_role_binding_resource)
+      end
+
+      def create_or_update_knative_version_role
+        kubeclient.update_cluster_role(knative_version_role_resource)
+      end
+
+      def create_or_update_knative_version_role_binding
+        kubeclient.update_cluster_role_binding(knative_version_role_binding_resource)
       end
 
       def service_account_resource
@@ -132,6 +162,49 @@ module Clusters
           role_kind: :Role,
           namespace: service_account_namespace,
           service_account_name: service_account_name
+        ).generate
+      end
+
+      def crossplane_database_role_resource
+        Gitlab::Kubernetes::Role.new(
+          name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_NAME,
+          namespace: service_account_namespace,
+          rules: [{
+            apiGroups: %w(database.crossplane.io),
+            resources: %w(postgresqlinstances),
+            verbs: %w(get list create watch)
+          }]
+        ).generate
+      end
+
+      def crossplane_database_role_binding_resource
+        Gitlab::Kubernetes::RoleBinding.new(
+          name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_BINDING_NAME,
+          role_name: Clusters::Kubernetes::GITLAB_CROSSPLANE_DATABASE_ROLE_NAME,
+          role_kind: :Role,
+          namespace: service_account_namespace,
+          service_account_name: service_account_name
+        ).generate
+      end
+
+      def knative_version_role_resource
+        Gitlab::Kubernetes::ClusterRole.new(
+          name: Clusters::Kubernetes::GITLAB_KNATIVE_VERSION_ROLE_NAME,
+          rules: [{
+            apiGroups: %w(apps),
+            resources: %w(deployments),
+            verbs: %w(list get)
+          }]
+        ).generate
+      end
+
+      def knative_version_role_binding_resource
+        subjects = [{ kind: 'ServiceAccount', name: service_account_name, namespace: service_account_namespace }]
+
+        Gitlab::Kubernetes::ClusterRoleBinding.new(
+          Clusters::Kubernetes::GITLAB_KNATIVE_VERSION_ROLE_BINDING_NAME,
+          Clusters::Kubernetes::GITLAB_KNATIVE_VERSION_ROLE_NAME,
+          subjects
         ).generate
       end
     end

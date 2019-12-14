@@ -13,10 +13,12 @@ import {
   mockInitialConfig,
   mockParentItem,
   mockEpic1,
-  mockIssue1,
+  mockIssue2,
 } from '../mock_data';
 
 const { epic } = mockQueryResponse.data.group;
+
+const localVue = createLocalVue();
 
 const createComponent = ({
   parentItem = mockParentItem,
@@ -24,7 +26,6 @@ const createComponent = ({
   issuesPageInfo = epic.issues.pageInfo,
 } = {}) => {
   const store = createDefaultStore();
-  const localVue = createLocalVue();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
   store.dispatch('setInitialParentItem', mockParentItem);
@@ -44,7 +45,7 @@ const createComponent = ({
     pageInfo: issuesPageInfo,
   });
 
-  return shallowMount(TreeRoot, {
+  return shallowMount(localVue.extend(TreeRoot), {
     localVue,
     store,
     stubs: {
@@ -55,6 +56,7 @@ const createComponent = ({
       parentItem,
       children,
     },
+    sync: false,
   });
 };
 
@@ -138,7 +140,7 @@ describe('RelatedItemsTree', () => {
             });
 
             it('returns value of `epicIssueId` prop when item is an Issue', () => {
-              expect(wrapper.vm.getItemId(wrapper.vm.children[2])).toBe(mockIssue1.epicIssueId);
+              expect(wrapper.vm.getItemId(wrapper.vm.children[2])).toBe(mockIssue2.epicIssueId);
             });
           });
 
@@ -166,7 +168,7 @@ describe('RelatedItemsTree', () => {
                 }),
               ).toEqual(
                 jasmine.objectContaining({
-                  id: mockIssue1.epicIssueId,
+                  id: mockIssue2.epicIssueId,
                 }),
               );
             });
@@ -192,7 +194,7 @@ describe('RelatedItemsTree', () => {
                 }),
               ).toEqual(
                 jasmine.objectContaining({
-                  adjacentReferenceId: mockIssue1.epicIssueId,
+                  adjacentReferenceId: mockIssue2.epicIssueId,
                 }),
               );
             });

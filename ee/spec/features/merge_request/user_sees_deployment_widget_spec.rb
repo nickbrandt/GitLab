@@ -10,7 +10,7 @@ describe 'Merge request > User sees deployment widget', :js do
     let(:role) { :developer }
     let(:ref) { merge_request.target_branch }
     let(:sha) { project.commit(ref).id }
-    let(:pipeline) { create(:ci_pipeline_without_jobs, sha: sha, project: project, ref: ref) }
+    let(:pipeline) { create(:ci_pipeline, sha: sha, project: project, ref: ref) }
     let!(:manual) { }
 
     before do

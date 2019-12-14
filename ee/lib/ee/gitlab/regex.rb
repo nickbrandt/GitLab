@@ -6,8 +6,29 @@ module EE
       extend ActiveSupport::Concern
 
       class_methods do
+        def conan_file_name_regex
+          @conan_file_name_regex ||=
+            %r{\A#{(::Packages::ConanFileMetadatum::RECIPE_FILES + ::Packages::ConanFileMetadatum::PACKAGE_FILES).join("|")}\z}.freeze
+        end
+
+        def conan_package_reference_regex
+          @conan_package_reference_regex ||= %r{\A[A-Za-z0-9]+\z}.freeze
+        end
+
+        def conan_revision_regex
+          @conan_revision_regex ||= %r{\A0\z}.freeze
+        end
+
+        def conan_recipe_component_regex
+          @conan_recipe_component_regex ||= %r{\A(\w[.+-]?)+\z}.freeze
+        end
+
         def package_name_regex
           @package_name_regex ||= %r{\A\@?(([\w\-\.\+]*)\/)*([\w\-\.]+)@?(([\w\-\.\+]*)\/)*([\w\-\.]*)\z}.freeze
+        end
+
+        def maven_file_name_regex
+          @maven_file_name_regex ||= %r{\A[A-Za-z0-9\.\_\-\+]+\z}.freeze
         end
 
         def maven_path_regex

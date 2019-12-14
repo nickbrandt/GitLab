@@ -1,8 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 
-import Icon from '~/vue_shared/components/icon.vue';
-
 import DropdownButton from 'ee/vue_shared/components/sidebar/epics_select/dropdown_button.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
 describe('EpicsSelect', () => {
   describe('DropdownButton', () => {

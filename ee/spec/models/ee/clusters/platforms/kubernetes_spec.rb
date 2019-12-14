@@ -146,7 +146,7 @@ describe Clusters::Platforms::Kubernetes do
 
     shared_examples 'successful log request' do
       it do
-        expect(subject[:logs]).to eq("\"Log 1\\nLog 2\\nLog 3\"")
+        expect(subject[:logs]).to eq(["Log 1", "Log 2", "Log 3"])
         expect(subject[:status]).to eq(:success)
         expect(subject[:pod_name]).to eq(pod_name)
         expect(subject[:container_name]).to eq(container)
@@ -163,6 +163,19 @@ describe Clusters::Platforms::Kubernetes do
     context 'with reactive cache' do
       before do
         synchronous_reactive_cache(service)
+      end
+
+      context 'when ElasticSearch is enabled' do
+        let(:cluster) { create(:cluster, :project, platform_kubernetes: service) }
+        let!(:elastic_stack) { create(:clusters_applications_elastic_stack, cluster: cluster) }
+
+        before do
+          expect_any_instance_of(::Clusters::Applications::ElasticStack).to receive(:elasticsearch_client).at_least(:once).and_return(Elasticsearch::Transport::Client.new)
+          expect_any_instance_of(::Gitlab::Elasticsearch::Logs).to receive(:pod_logs).and_return(["Log 1", "Log 2", "Log 3"])
+          stub_feature_flags(enable_cluster_application_elastic_stack: true)
+        end
+
+        include_examples 'successful log request'
       end
 
       context 'when kubernetes responds with valid logs' do
@@ -304,11 +317,11 @@ describe Clusters::Platforms::Kubernetes do
         expect_next_instance_of(Gitlab::EtagCaching::Store) do |store|
           expect(store).to receive(:touch)
             .with(
-              ::Gitlab::Routing.url_helpers.k8s_pod_logs_project_environment_path(
+              ::Gitlab::Routing.url_helpers.k8s_project_logs_path(
                 environment.project,
-                environment,
-                opts['pod_name'],
-                opts['container_name'],
+                environment_name: environment.name,
+                pod_name: opts['pod_name'],
+                container_name: opts['container_name'],
                 format: :json
               )
             )

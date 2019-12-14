@@ -93,7 +93,7 @@ describe Projects::PipelinesController do
     end
 
     context 'when performing gitaly calls', :request_store do
-      it 'limits the Gitaly requests', :sidekiq_might_not_need_inline do
+      it 'limits the Gitaly requests' do
         # Isolate from test preparation (Repository#exists? is also cached in RequestStore)
         RequestStore.end!
         RequestStore.clear!
@@ -101,8 +101,9 @@ describe Projects::PipelinesController do
 
         expect(::Gitlab::GitalyClient).to receive(:allow_ref_name_caching).and_call_original
 
+        # ListCommitsByOid, RepositoryExists, HasLocalBranches
         expect { get_pipelines_index_json }
-          .to change { Gitlab::GitalyClient.get_request_count }.by(2)
+          .to change { Gitlab::GitalyClient.get_request_count }.by(3)
       end
     end
 
@@ -149,7 +150,7 @@ describe Projects::PipelinesController do
   end
 
   describe 'GET show.json' do
-    let(:pipeline) { create(:ci_pipeline_with_one_job, project: project) }
+    let(:pipeline) { create(:ci_pipeline, project: project) }
 
     it 'returns the pipeline' do
       get_pipeline_json

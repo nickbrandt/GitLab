@@ -4,7 +4,6 @@ import Vue from 'vue';
 import { GlFormCheckbox } from '@gitlab/ui';
 
 import EksClusterConfigurationForm from '~/create_cluster/eks_cluster/components/eks_cluster_configuration_form.vue';
-import RegionDropdown from '~/create_cluster/eks_cluster/components/region_dropdown.vue';
 import eksClusterFormState from '~/create_cluster/eks_cluster/store/state';
 import clusterDropdownStoreState from '~/create_cluster/eks_cluster/store/cluster_dropdown/state';
 
@@ -21,6 +20,7 @@ describe('EksClusterConfigurationForm', () => {
   let subnetsState;
   let keyPairsState;
   let securityGroupsState;
+  let instanceTypesState;
   let vpcsActions;
   let rolesActions;
   let regionsActions;
@@ -32,6 +32,7 @@ describe('EksClusterConfigurationForm', () => {
   beforeEach(() => {
     state = eksClusterFormState();
     actions = {
+      createCluster: jest.fn(),
       setClusterName: jest.fn(),
       setEnvironmentScope: jest.fn(),
       setKubernetesVersion: jest.fn(),
@@ -41,6 +42,8 @@ describe('EksClusterConfigurationForm', () => {
       setRole: jest.fn(),
       setKeyPair: jest.fn(),
       setSecurityGroup: jest.fn(),
+      setInstanceType: jest.fn(),
+      setNodeCount: jest.fn(),
       setGitlabManagedCluster: jest.fn(),
     };
     regionsActions = {
@@ -79,6 +82,9 @@ describe('EksClusterConfigurationForm', () => {
     securityGroupsState = {
       ...clusterDropdownStoreState(),
     };
+    instanceTypesState = {
+      ...clusterDropdownStoreState(),
+    };
     store = new Vuex.Store({
       state,
       actions,
@@ -113,6 +119,10 @@ describe('EksClusterConfigurationForm', () => {
           state: securityGroupsState,
           actions: securityGroupsActions,
         },
+        instanceTypes: {
+          namespaced: true,
+          state: instanceTypesState,
+        },
       },
     });
   });
@@ -124,6 +134,7 @@ describe('EksClusterConfigurationForm', () => {
       propsData: {
         gitlabManagedClusterHelpPath: '',
         kubernetesIntegrationHelpPath: '',
+        externalLinkIcon: '',
       },
     });
   });
@@ -132,15 +143,33 @@ describe('EksClusterConfigurationForm', () => {
     vm.destroy();
   });
 
+  const setAllConfigurationFields = () => {
+    store.replaceState({
+      ...state,
+      clusterName: 'cluster name',
+      environmentScope: '*',
+      selectedRegion: 'region',
+      selectedRole: 'role',
+      selectedKeyPair: 'key pair',
+      selectedVpc: 'vpc',
+      selectedSubnet: 'subnet',
+      selectedSecurityGroup: 'group',
+      selectedInstanceType: 'small-1',
+    });
+  };
+
+  const findCreateClusterButton = () => vm.find('.js-create-cluster');
   const findClusterNameInput = () => vm.find('[id=eks-cluster-name]');
   const findEnvironmentScopeInput = () => vm.find('[id=eks-environment-scope]');
   const findKubernetesVersionDropdown = () => vm.find('[field-id="eks-kubernetes-version"]');
-  const findRegionDropdown = () => vm.find(RegionDropdown);
+  const findRegionDropdown = () => vm.find('[field-id="eks-region"]');
   const findKeyPairDropdown = () => vm.find('[field-id="eks-key-pair"]');
   const findVpcDropdown = () => vm.find('[field-id="eks-vpc"]');
   const findSubnetDropdown = () => vm.find('[field-id="eks-subnet"]');
   const findRoleDropdown = () => vm.find('[field-id="eks-role"]');
   const findSecurityGroupDropdown = () => vm.find('[field-id="eks-security-group"]');
+  const findInstanceTypeDropdown = () => vm.find('[field-id="eks-instance-type"');
+  const findNodeCountInput = () => vm.find('[id="eks-node-count"]');
   const findGitlabManagedClusterCheckbox = () => vm.find(GlFormCheckbox);
 
   describe('when mounted', () => {
@@ -180,11 +209,13 @@ describe('EksClusterConfigurationForm', () => {
   });
 
   it('sets regions to RegionDropdown regions property', () => {
-    expect(findRegionDropdown().props('regions')).toBe(regionsState.items);
+    expect(findRegionDropdown().props('items')).toBe(regionsState.items);
   });
 
   it('sets loadingRegionsError to RegionDropdown error property', () => {
-    expect(findRegionDropdown().props('error')).toBe(regionsState.loadingItemsError);
+    regionsState.loadingItemsError = new Error();
+
+    expect(findRegionDropdown().props('hasErrors')).toEqual(true);
   });
 
   it('disables KeyPairDropdown when no region is selected', () => {
@@ -329,6 +360,34 @@ describe('EksClusterConfigurationForm', () => {
         undefined,
       );
     });
+
+    it('cleans selected vpc', () => {
+      expect(actions.setVpc).toHaveBeenCalledWith(expect.anything(), { vpc: null }, undefined);
+    });
+
+    it('cleans selected key pair', () => {
+      expect(actions.setKeyPair).toHaveBeenCalledWith(
+        expect.anything(),
+        { keyPair: null },
+        undefined,
+      );
+    });
+
+    it('cleans selected subnet', () => {
+      expect(actions.setSubnet).toHaveBeenCalledWith(
+        expect.anything(),
+        { subnet: null },
+        undefined,
+      );
+    });
+
+    it('cleans selected security group', () => {
+      expect(actions.setSecurityGroup).toHaveBeenCalledWith(
+        expect.anything(),
+        { securityGroup: null },
+        undefined,
+      );
+    });
   });
 
   it('dispatches setClusterName when cluster name input changes', () => {
@@ -381,8 +440,10 @@ describe('EksClusterConfigurationForm', () => {
 
   describe('when vpc is selected', () => {
     const vpc = { name: 'vpc-1' };
+    const region = 'east-1';
 
     beforeEach(() => {
+      state.selectedRegion = region;
       findVpcDropdown().vm.$emit('input', vpc);
     });
 
@@ -390,14 +451,34 @@ describe('EksClusterConfigurationForm', () => {
       expect(actions.setVpc).toHaveBeenCalledWith(expect.anything(), { vpc }, undefined);
     });
 
+    it('cleans selected subnet', () => {
+      expect(actions.setSubnet).toHaveBeenCalledWith(
+        expect.anything(),
+        { subnet: null },
+        undefined,
+      );
+    });
+
+    it('cleans selected security group', () => {
+      expect(actions.setSecurityGroup).toHaveBeenCalledWith(
+        expect.anything(),
+        { securityGroup: null },
+        undefined,
+      );
+    });
+
     it('dispatches fetchSubnets action', () => {
-      expect(subnetsActions.fetchItems).toHaveBeenCalledWith(expect.anything(), { vpc }, undefined);
+      expect(subnetsActions.fetchItems).toHaveBeenCalledWith(
+        expect.anything(),
+        { vpc, region },
+        undefined,
+      );
     });
 
     it('dispatches fetchSecurityGroups action', () => {
       expect(securityGroupsActions.fetchItems).toHaveBeenCalledWith(
         expect.anything(),
-        { vpc },
+        { vpc, region },
         undefined,
       );
     });
@@ -452,6 +533,78 @@ describe('EksClusterConfigurationForm', () => {
         { securityGroup },
         undefined,
       );
+    });
+  });
+
+  describe('when instance type is selected', () => {
+    const instanceType = 'small-1';
+
+    beforeEach(() => {
+      findInstanceTypeDropdown().vm.$emit('input', instanceType);
+    });
+
+    it('dispatches setInstanceType action', () => {
+      expect(actions.setInstanceType).toHaveBeenCalledWith(
+        expect.anything(),
+        { instanceType },
+        undefined,
+      );
+    });
+  });
+
+  it('dispatches setNodeCount when node count input changes', () => {
+    const nodeCount = 5;
+
+    findNodeCountInput().vm.$emit('input', nodeCount);
+
+    expect(actions.setNodeCount).toHaveBeenCalledWith(expect.anything(), { nodeCount }, undefined);
+  });
+
+  describe('when all cluster configuration fields are set', () => {
+    beforeEach(() => {
+      setAllConfigurationFields();
+    });
+
+    it('enables create cluster button', () => {
+      expect(findCreateClusterButton().props('disabled')).toBe(false);
+    });
+  });
+
+  describe('when at least one cluster configuration field is not set', () => {
+    beforeEach(() => {
+      setAllConfigurationFields();
+      store.replaceState({
+        ...state,
+        clusterName: '',
+      });
+    });
+
+    it('disables create cluster button', () => {
+      expect(findCreateClusterButton().props('disabled')).toBe(true);
+    });
+  });
+
+  describe('when isCreatingCluster', () => {
+    beforeEach(() => {
+      setAllConfigurationFields();
+      store.replaceState({
+        ...state,
+        isCreatingCluster: true,
+      });
+    });
+
+    it('sets create cluster button as loading', () => {
+      expect(findCreateClusterButton().props('loading')).toBe(true);
+    });
+  });
+
+  describe('clicking create cluster button', () => {
+    beforeEach(() => {
+      findCreateClusterButton().vm.$emit('click');
+    });
+
+    it('dispatches createCluster action', () => {
+      expect(actions.createCluster).toHaveBeenCalled();
     });
   });
 });

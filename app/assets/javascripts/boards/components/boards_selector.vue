@@ -168,7 +168,7 @@ export default {
       }
 
       const recentBoardsPromise = new Promise((resolve, reject) =>
-        gl.boardService
+        boardsStore
           .recentBoards()
           .then(resolve)
           .catch(err => {
@@ -184,7 +184,7 @@ export default {
           }),
       );
 
-      Promise.all([gl.boardService.allBoards(), recentBoardsPromise])
+      Promise.all([boardsStore.allBoards(), recentBoardsPromise])
         .then(([allBoards, recentBoards]) => [allBoards.data, recentBoards.data])
         .then(([allBoardsJson, recentBoardsJson]) => {
           this.loading = false;
@@ -315,8 +315,7 @@ export default {
 
           <gl-dropdown-item
             v-if="showDelete"
-            class="text-danger"
-            data-qa-selector="delete_board_button"
+            class="text-danger js-delete-board"
             @click.prevent="showPage('delete')"
           >
             {{ s__('IssueBoards|Delete board') }}

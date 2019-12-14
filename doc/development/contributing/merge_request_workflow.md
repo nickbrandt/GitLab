@@ -69,7 +69,7 @@ request is as follows:
       the issue(s) once the merge request is merged.
 1. If you're allowed to (Core team members, for example), set a relevant milestone
    and [labels](issue_workflow.md).
-1. If the MR changes the UI, it should include *Before* and *After* screenshots.
+1. If the MR changes the UI, you'll need approval from a Product Designer (UX), based on the appropriate [product category](https://about.gitlab.com/handbook/product/categories/). UI changes should use available components from the GitLab Design System, [Pajamas](https://design.gitlab.com/). The MR must include *Before* and *After* screenshots.
 1. If the MR changes CSS classes, please include the list of affected pages, which
    can be found by running `grep css-class ./app -R`.
 1. Be prepared to answer questions and incorporate feedback into your MR with new
@@ -222,7 +222,7 @@ requirements.
    on the CI server.
 1. Regressions and bugs are covered with tests that reduce the risk of the issue happening
    again.
-1. Performance/scalability implications have been considered, addressed, and tested.
+1. [Performance guidelines](../merge_request_performance_guidelines.md) have been followed.
 1. [Documented](../documentation/index.md) in the `/doc` directory.
 1. [Changelog entry added](../changelog.md), if necessary.
 1. Reviewed by relevant (UX/FE/BE/tech writing) reviewers and all concerns are addressed.
@@ -248,3 +248,16 @@ request:
 1. The [GitLab Development Kit](https://gitlab.com/gitlab-org/gitlab-development-kit).
 1. The [CI environment preparation](https://gitlab.com/gitlab-org/gitlab/blob/master/scripts/prepare_build.sh).
 1. The [Omnibus package creator](https://gitlab.com/gitlab-org/omnibus-gitlab).
+
+### Incremental improvements
+
+We allow engineering time to fix small problems (with or without an
+issue) that are incremental improvements, such as:
+
+1. Unprioritized bug fixes (e.g. [Banner alerting of project move is
+showing up everywhere](https://gitlab.com/gitlab-org/gitlab/merge_requests/18985))
+1. Documentation improvements
+1. Rubocop or Code Quality improvements
+
+Tag a merge request with ~"Stuff that should Just Work" to track work in
+this area.

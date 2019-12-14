@@ -23,12 +23,18 @@ module Projects
         result &&= mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::WIKI)
       end
 
+      if project.design_repository.exists?
+        result &&= mirror_repository(new_repository_storage_key, type: Gitlab::GlRepository::DESIGN)
+      end
+
       if result
         mark_old_paths_for_archive
 
         project.update(repository_storage: new_repository_storage_key, repository_read_only: false)
         project.leave_pool_repository
         project.track_project_repository
+
+        enqueue_housekeeping
       else
         project.update(repository_read_only: false)
       end
@@ -71,11 +77,31 @@ module Projects
                                           wiki.disk_path,
                                           "#{new_project_path}.wiki")
         end
+
+        if design_repository.exists?
+          GitlabShellWorker.perform_async(:mv_repository,
+                                          old_repository_storage,
+                                          design_repository.disk_path,
+                                          "#{new_project_path}.design")
+        end
       end
     end
 
     def moved_path(path)
       "#{path}+#{project.id}+moved+#{Time.now.to_i}"
+    end
+
+    # The underlying FetchInternalRemote call uses a `git fetch` to move data
+    # to the new repository, which leaves it in a less-well-packed state,
+    # lacking bitmaps and commit graphs. Housekeeping will boost performance
+    # significantly.
+    def enqueue_housekeeping
+      return unless Gitlab::CurrentSettings.housekeeping_enabled?
+      return unless Feature.enabled?(:repack_after_shard_migration, project)
+
+      Projects::HousekeepingService.new(project, :gc).execute
+    rescue Projects::HousekeepingService::LeaseTaken
+      # No action required
     end
 
     def wait_for_pushes(type)

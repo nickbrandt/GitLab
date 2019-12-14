@@ -88,7 +88,7 @@ module Resolvers
     # But that's the epic we need in order to scope the find to only children of this epic,
     # using the `parent_id`
     def parent
-      resolver_object if resolver_object.is_a?(EpicPresenter)
+      resolver_object if resolver_object.is_a?(Epic)
     end
 
     def group

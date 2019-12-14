@@ -14,12 +14,8 @@ module LicenseHelper
     active_user_count - User.active.excluding_guests.count
   end
 
-  def max_historical_user_count
-    HistoricalData.max_historical_user_count
-  end
-
-  def current_active_user_count
-    License.current&.current_active_users_count || 0
+  def maximum_user_count
+    License.current&.maximum_user_count || 0
   end
 
   def license_message(signed_in: signed_in?, is_admin: current_user&.admin?)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::ImportExport::AttributeCleaner do
@@ -24,7 +26,10 @@ describe Gitlab::ImportExport::AttributeCleaner do
       '_html' => '<p>perfectly ordinary html</p>',
       'cached_markdown_version' => 12345,
       'group_id' => 99,
-      'commit_id' => 99
+      'commit_id' => 99,
+      'issue_ids' => [1, 2, 3],
+      'merge_request_ids' => [1, 2, 3],
+      'note_ids' => [1, 2, 3]
     }
   end
 

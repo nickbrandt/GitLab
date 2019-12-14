@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::FileFinder do
   describe '#find' do
     let(:project) { create(:project, :public, :repository) }
+
     subject { described_class.new(project, project.default_branch) }
 
     it_behaves_like 'file finder' do

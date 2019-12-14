@@ -1,5 +1,5 @@
 <script>
-import { GlEmptyState, GlDaterangePicker } from '@gitlab/ui';
+import { GlEmptyState, GlDaterangePicker, GlLoadingIcon } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
@@ -7,18 +7,24 @@ import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { PROJECTS_PER_PAGE, DEFAULT_DAYS_IN_PAST } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
+import Scatterplot from '../../shared/components/scatterplot.vue';
+import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
+import { LAST_ACTIVITY_AT } from '../../shared/constants';
 
 export default {
   name: 'CycleAnalytics',
   components: {
+    GlLoadingIcon,
     GlEmptyState,
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
     SummaryTable,
     StageTable,
     GlDaterangePicker,
+    StageDropdownFilter,
+    Scatterplot,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -43,13 +49,17 @@ export default {
   },
   computed: {
     ...mapState([
+      'featureFlags',
       'isLoading',
       'isLoadingStage',
+      'isLoadingChartData',
+      'isLoadingDurationChart',
       'isEmptyStage',
-      'isAddingCustomStage',
+      'isSavingCustomStage',
+      'isCreatingCustomStage',
+      'isEditingCustomStage',
       'selectedGroup',
-      'selectedProjectIds',
-      'selectedStageName',
+      'selectedStage',
       'stages',
       'summary',
       'labels',
@@ -58,8 +68,9 @@ export default {
       'errorCode',
       'startDate',
       'endDate',
+      'tasksByType',
     ]),
-    ...mapGetters(['currentStage', 'defaultStage', 'hasNoAccessError', 'currentGroupPath']),
+    ...mapGetters(['hasNoAccessError', 'currentGroupPath', 'durationChartPlottableData']),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -69,39 +80,50 @@ export default {
     shouldDisplayFilters() {
       return this.selectedGroup && !this.errorCode;
     },
+    shouldDisplayDurationChart() {
+      return !this.isLoadingDurationChart && !this.isLoading;
+    },
     dateRange: {
       get() {
         return { startDate: this.startDate, endDate: this.endDate };
       },
       set({ startDate, endDate }) {
-        this.setDateRange({ startDate, endDate });
+        this.setDateRange({
+          startDate,
+          endDate,
+        });
       },
     },
   },
   mounted() {
     this.initDateRange();
+    this.setFeatureFlags({
+      hasDurationChart: this.glFeatures.cycleAnalyticsScatterplotEnabled,
+      hasTasksByTypeChart: this.glFeatures.tasksByTypeChart,
+    });
   },
   methods: {
     ...mapActions([
-      'fetchGroupLabels',
       'fetchCycleAnalyticsData',
       'fetchStageData',
-      'setCycleAnalyticsDataEndpoint',
-      'setStageDataEndpoint',
       'setSelectedGroup',
       'setSelectedProjects',
-      'setSelectedTimeframe',
-      'fetchStageData',
-      'setSelectedStageName',
+      'setSelectedStage',
       'hideCustomStageForm',
       'showCustomStageForm',
       'setDateRange',
+      'fetchTasksByTypeData',
+      'updateSelectedDurationChartStages',
+      'createCustomStage',
+      'updateStage',
+      'removeStage',
+      'setFeatureFlags',
+      'editCustomStage',
+      'updateStage',
     ]),
     onGroupSelect(group) {
-      this.setCycleAnalyticsDataEndpoint(group.full_path);
       this.setSelectedGroup(group);
       this.fetchCycleAnalyticsData();
-      this.fetchGroupLabels(this.currentGroupPath);
     },
     onProjectsSelect(projects) {
       const projectIds = projects.map(value => value.id);
@@ -110,17 +132,31 @@ export default {
     },
     onStageSelect(stage) {
       this.hideCustomStageForm();
-      this.setSelectedStageName(stage.name);
-      this.setStageDataEndpoint(this.currentStage.slug);
-      this.fetchStageData(this.currentStage.name);
+      this.setSelectedStage(stage);
+      this.fetchStageData(this.selectedStage.slug);
     },
     onShowAddStageForm() {
       this.showCustomStageForm();
+    },
+    onShowEditStageForm(initData = {}) {
+      this.editCustomStage(initData);
     },
     initDateRange() {
       const endDate = new Date(Date.now());
       const startDate = getDateInPast(endDate, DEFAULT_DAYS_IN_PAST);
       this.setDateRange({ skipFetch: true, startDate, endDate });
+    },
+    onCreateCustomStage(data) {
+      this.createCustomStage(data);
+    },
+    onUpdateCustomStage(data) {
+      this.updateStage(data);
+    },
+    onRemoveStage(id) {
+      this.removeStage(id);
+    },
+    onDurationStageSelect(stages) {
+      this.updateSelectedDurationChartStages(stages);
     },
   },
   groupsQueryParams: {
@@ -129,7 +165,7 @@ export default {
   projectsQueryParams: {
     per_page: PROJECTS_PER_PAGE,
     with_shared: false,
-    order_by: 'last_activity_at',
+    order_by: LAST_ACTIVITY_AT,
   },
 };
 </script>
@@ -196,25 +232,60 @@ export default {
         "
       />
       <div v-else-if="!errorCode">
-        <summary-table class="js-summary-table" :items="summary" />
-        <stage-table
-          v-if="currentStage"
-          class="js-stage-table"
-          :current-stage="currentStage"
-          :stages="stages"
-          :is-loading="isLoadingStage"
-          :is-empty-stage="isEmptyStage"
-          :is-adding-custom-stage="isAddingCustomStage"
-          :current-stage-events="currentStageEvents"
-          :custom-stage-form-events="customStageFormEvents"
-          :labels="labels"
-          :no-data-svg-path="noDataSvgPath"
-          :no-access-svg-path="noAccessSvgPath"
-          :can-edit-stages="hasCustomizableCycleAnalytics"
-          @selectStage="onStageSelect"
-          @showAddStageForm="onShowAddStageForm"
-        />
+        <div v-if="isLoading">
+          <gl-loading-icon class="mt-4" size="md" />
+        </div>
+        <div v-else>
+          <summary-table class="js-summary-table" :items="summary" />
+          <stage-table
+            v-if="selectedStage"
+            class="js-stage-table"
+            :current-stage="selectedStage"
+            :stages="stages"
+            :is-loading="isLoadingStage"
+            :is-empty-stage="isEmptyStage"
+            :is-saving-custom-stage="isSavingCustomStage"
+            :is-creating-custom-stage="isCreatingCustomStage"
+            :is-editing-custom-stage="isEditingCustomStage"
+            :current-stage-events="currentStageEvents"
+            :custom-stage-form-events="customStageFormEvents"
+            :labels="labels"
+            :no-data-svg-path="noDataSvgPath"
+            :no-access-svg-path="noAccessSvgPath"
+            :can-edit-stages="hasCustomizableCycleAnalytics"
+            @selectStage="onStageSelect"
+            @editStage="onShowEditStageForm"
+            @showAddStageForm="onShowAddStageForm"
+            @hideStage="onUpdateCustomStage"
+            @removeStage="onRemoveStage"
+            @createStage="onCreateCustomStage"
+            @updateStage="onUpdateCustomStage"
+          />
+        </div>
       </div>
+      <template v-if="featureFlags.hasDurationChart">
+        <template v-if="shouldDisplayDurationChart">
+          <div class="mt-3 d-flex">
+            <h4 class="mt-0">{{ s__('CycleAnalytics|Days to completion') }}</h4>
+            <stage-dropdown-filter
+              v-if="stages.length"
+              class="ml-auto"
+              :stages="stages"
+              @selected="onDurationStageSelect"
+            />
+          </div>
+          <scatterplot
+            v-if="durationChartPlottableData"
+            :x-axis-title="s__('CycleAnalytics|Date')"
+            :y-axis-title="s__('CycleAnalytics|Total days to completion')"
+            :scatter-data="durationChartPlottableData"
+          />
+          <div v-else ref="duration-chart-no-data" class="bs-callout bs-callout-info">
+            {{ __('There is no data available. Please change your selection.') }}
+          </div>
+        </template>
+        <gl-loading-icon v-else-if="!isLoading" size="md" class="my-4 py-4" />
+      </template>
     </div>
   </div>
 </template>

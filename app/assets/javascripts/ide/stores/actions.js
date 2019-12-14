@@ -1,9 +1,9 @@
 import $ from 'jquery';
 import Vue from 'vue';
+import _ from 'underscore';
 import { __, sprintf } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import flash from '~/flash';
-import _ from 'underscore';
 import * as types from './mutation_types';
 import { decorateFiles } from '../lib/files';
 import { stageKeys } from '../constants';
@@ -20,7 +20,7 @@ export const discardAllChanges = ({ state, commit, dispatch }) => {
     commit(types.DISCARD_FILE_CHANGES, file.path);
 
     if (file.tempFile) {
-      dispatch('closeFile', file.path);
+      dispatch('closeFile', file);
     }
   });
 

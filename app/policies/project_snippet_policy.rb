@@ -28,7 +28,7 @@ class ProjectSnippetPolicy < BasePolicy
     all?(private_snippet | (internal_snippet & external_user),
          ~project.guest,
          ~is_author,
-         ~full_private_access)
+         ~can?(:read_all_resources))
   end.prevent :read_project_snippet
 
   rule { internal_snippet & ~is_author & ~admin }.policy do
@@ -45,6 +45,9 @@ class ProjectSnippetPolicy < BasePolicy
   end
 
   rule { ~can?(:read_project_snippet) }.prevent :create_note
+
+  # Aliasing the ability to ease GraphQL permissions check
+  rule { can?(:read_project_snippet) }.enable :read_snippet
 end
 
 ProjectSnippetPolicy.prepend_if_ee('EE::ProjectSnippetPolicy')

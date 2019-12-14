@@ -18,4 +18,12 @@ class DashboardGroupMilestone < GlobalMilestone
     milestones = milestones.search_title(params[:search_title]) if params[:search_title].present?
     Milestone.filter_by_state(milestones, params[:state]).map { |m| new(m) }
   end
+
+  def dashboard_milestone?
+    true
+  end
+
+  def merge_requests_enabled?
+    true
+  end
 end

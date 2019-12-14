@@ -1,16 +1,15 @@
-import flash from '~/flash';
-import { s__ } from '~/locale';
 import Api from 'ee/api';
-import axios from '~/lib/utils/axios_utils';
-import httpStatusCodes from '~/lib/utils/http_status';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-
 import {
-  addRelatedIssueErrorMap,
   issuableTypesMap,
+  itemAddFailureTypesMap,
   pathIndeterminateErrorMap,
   relatedIssuesRemoveErrorMap,
 } from 'ee/related_issues/constants';
+import flash from '~/flash';
+import { s__ } from '~/locale';
+import axios from '~/lib/utils/axios_utils';
+import httpStatusCodes from '~/lib/utils/http_status';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import { processQueryResponse, formatChildItem, gqClient } from '../utils/epic_utils';
 import { ChildType, ChildState } from '../constants';
@@ -25,20 +24,23 @@ export const setInitialConfig = ({ commit }, data) => commit(types.SET_INITIAL_C
 export const setInitialParentItem = ({ commit }, data) =>
   commit(types.SET_INITIAL_PARENT_ITEM, data);
 
-export const setChildrenCount = ({ commit, state }, { children, isRemoved = false }) => {
-  const [epicsCount, issuesCount] = children.reduce(
-    (acc, item) => {
-      if (item.type === ChildType.Epic) {
-        acc[0] += isRemoved ? -1 : 1;
-      } else {
-        acc[1] += isRemoved ? -1 : 1;
-      }
-      return acc;
-    },
-    [state.epicsCount || 0, state.issuesCount || 0],
-  );
+export const setChildrenCount = ({ commit, state }, data) =>
+  commit(types.SET_CHILDREN_COUNT, { ...state.descendantCounts, ...data });
 
-  commit(types.SET_CHILDREN_COUNT, { epicsCount, issuesCount });
+export const updateChildrenCount = ({ state, dispatch }, { item, isRemoved = false }) => {
+  const descendantCounts = {};
+
+  if (item.type === ChildType.Epic) {
+    descendantCounts[`${item.state}Epics`] = isRemoved
+      ? state.descendantCounts[`${item.state}Epics`] - 1
+      : state.descendantCounts[`${item.state}Epics`] + 1;
+  } else {
+    descendantCounts[`${item.state}Issues`] = isRemoved
+      ? state.descendantCounts[`${item.state}Issues`] - 1
+      : state.descendantCounts[`${item.state}Issues`] + 1;
+  }
+
+  dispatch('setChildrenCount', descendantCounts);
 };
 
 export const expandItem = ({ commit }, data) => commit(types.EXPAND_ITEM, data);
@@ -54,8 +56,6 @@ export const setItemChildren = (
     isSubItem,
     append,
   });
-
-  dispatch('setChildrenCount', { children });
 
   if (isSubItem) {
     dispatch('expandItem', {
@@ -117,6 +117,10 @@ export const fetchItems = ({ dispatch }, { parentItem, isSubItem = false }) => {
         parentItem,
         pageInfo: data.group.epic.issues.pageInfo,
       });
+
+      if (!isSubItem) {
+        dispatch('setChildrenCount', data.group.epic.descendantCounts);
+      }
     })
     .catch(() => {
       dispatch('receiveItemsFailure', {
@@ -235,7 +239,7 @@ export const removeItem = ({ dispatch }, { parentItem, item }) => {
         item,
       });
 
-      dispatch('setChildrenCount', { children: [item], isRemoved: true });
+      dispatch('updateChildrenCount', { item, isRemoved: true });
     })
     .catch(({ status }) => {
       dispatch('receiveRemoveItemFailure', {
@@ -286,11 +290,13 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { rawItems 
   });
 
   commit(types.RECEIVE_ADD_ITEM_SUCCESS, {
-    insertAt: getters.isEpic ? 0 : getters.issuesBeginAtIndex,
+    insertAt: 0,
     items,
   });
 
-  dispatch('setChildrenCount', { children: items });
+  items.forEach(item => {
+    dispatch('updateChildrenCount', { item });
+  });
 
   dispatch('setItemChildrenFlags', {
     children: items,
@@ -301,14 +307,8 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { rawItems 
   dispatch('setItemInputValue', '');
   dispatch('toggleAddItemForm', { toggleState: false });
 };
-export const receiveAddItemFailure = ({ commit, state }, data = {}) => {
-  commit(types.RECEIVE_ADD_ITEM_FAILURE);
-
-  let errorMessage = addRelatedIssueErrorMap[state.issuableType];
-  if (data.message) {
-    errorMessage = data.message;
-  }
-  flash(errorMessage);
+export const receiveAddItemFailure = ({ commit }, { itemAddFailureType } = {}) => {
+  commit(types.RECEIVE_ADD_ITEM_FAILURE, { itemAddFailureType });
 };
 export const addItem = ({ state, dispatch, getters }) => {
   dispatch('requestAddItem');
@@ -323,8 +323,23 @@ export const addItem = ({ state, dispatch, getters }) => {
         rawItems: data.issuables.slice(0, state.pendingReferences.length),
       });
     })
-    .catch(({ data }) => {
-      dispatch('receiveAddItemFailure', data);
+    .catch(data => {
+      const { response } = data;
+      if (response.status === 404) {
+        dispatch('receiveAddItemFailure', { itemAddFailureType: itemAddFailureTypesMap.NOT_FOUND });
+      }
+      // Ignore 409 conflict when the issue or epic is already attached to epic
+      /* eslint-disable @gitlab/i18n/no-non-i18n-strings */
+      else if (
+        response.status === 409 &&
+        response.data.message === 'Epic hierarchy level too deep'
+      ) {
+        dispatch('receiveAddItemFailure', {
+          itemAddFailureType: itemAddFailureTypesMap.MAX_NUMBER_OF_CHILD_EPICS,
+        });
+      } else {
+        dispatch('receiveAddItemFailure');
+      }
     });
 };
 
@@ -342,11 +357,11 @@ export const receiveCreateItemSuccess = ({ state, commit, dispatch, getters }, {
   });
 
   commit(types.RECEIVE_CREATE_ITEM_SUCCESS, {
-    insertAt: getters.issuesBeginAtIndex > 0 ? getters.issuesBeginAtIndex - 1 : 0,
+    insertAt: 0,
     item,
   });
 
-  dispatch('setChildrenCount', { children: [item] });
+  dispatch('updateChildrenCount', { item });
 
   dispatch('setItemChildrenFlags', {
     children: [item],

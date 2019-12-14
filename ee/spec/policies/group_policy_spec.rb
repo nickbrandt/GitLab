@@ -61,6 +61,64 @@ describe GroupPolicy do
     it { is_expected.not_to be_allowed(:read_group_contribution_analytics) }
   end
 
+  context 'when timelogs report feature is enabled' do
+    before do
+      stub_licensed_features(group_timelogs: true)
+    end
+
+    context 'admin' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_allowed(:read_group_timelogs) }
+    end
+
+    context 'with owner' do
+      let(:current_user) { owner }
+
+      it { is_expected.to be_allowed(:read_group_timelogs) }
+    end
+
+    context 'with maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_allowed(:read_group_timelogs) }
+    end
+
+    context 'with reporter' do
+      let(:current_user) { reporter }
+
+      it { is_expected.to be_allowed(:read_group_timelogs) }
+    end
+
+    context 'with guest' do
+      let(:current_user) { guest }
+
+      it { is_expected.to be_disallowed(:read_group_timelogs) }
+    end
+
+    context 'with non member' do
+      let(:current_user) { create(:user) }
+
+      it { is_expected.to be_disallowed(:read_group_timelogs) }
+    end
+
+    context 'with anonymous' do
+      let(:current_user) { nil }
+
+      it { is_expected.to be_disallowed(:read_group_timelogs) }
+    end
+  end
+
+  context 'when timelogs report feature is disabled' do
+    let(:current_user) { admin }
+
+    before do
+      stub_licensed_features(group_timelogs: false)
+    end
+
+    it { is_expected.to be_disallowed(:read_group_timelogs) }
+  end
+
   describe 'per group SAML' do
     let(:current_user) { maintainer }
 
@@ -444,5 +502,31 @@ describe GroupPolicy do
 
   describe 'view_type_of_work_charts' do
     include_examples 'analytics policy', :view_type_of_work_charts
+  end
+
+  describe '#read_group_saml_identity' do
+    let_it_be(:saml_provider) { create(:saml_provider, group: group, enabled: true) }
+
+    context 'for owner' do
+      let(:current_user) { owner }
+
+      it { is_expected.to be_allowed(:read_group_saml_identity) }
+
+      context 'without Group SAML enabled' do
+        before do
+          saml_provider.update(enabled: false)
+        end
+
+        it { is_expected.to be_disallowed(:read_group_saml_identity) }
+      end
+    end
+
+    %w[maintainer developer reporter guest].each do |role|
+      context "for #{role}" do
+        let(:current_user) { public_send(role) }
+
+        it { is_expected.to be_disallowed(:read_group_saml_identity) }
+      end
+    end
   end
 end

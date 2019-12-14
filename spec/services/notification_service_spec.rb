@@ -154,6 +154,7 @@ describe NotificationService, :mailer do
 
   describe '#async' do
     let(:async) { notification.async }
+
     set(:key) { create(:personal_key) }
 
     it 'returns an Async object with the correct parent' do
@@ -206,6 +207,18 @@ describe NotificationService, :mailer do
 
       it 'sends email to key owner' do
         expect { notification.new_gpg_key(key) }.to change { ActionMailer::Base.deliveries.size }.by(1)
+      end
+    end
+  end
+
+  describe 'AccessToken' do
+    describe '#access_token_about_to_expire' do
+      let_it_be(:user) { create(:user) }
+
+      it 'sends email to the token owner' do
+        expect(notification.access_token_about_to_expire(user)).to be_truthy
+
+        should_email user
       end
     end
   end
@@ -869,6 +882,18 @@ describe NotificationService, :mailer do
         should_email(user_4)
       end
 
+      it 'adds "subscribed" reason to subscriber emails' do
+        user_1 = create(:user)
+        label = create(:label, project: project, issues: [issue])
+        issue.reload
+        label.subscribe(user_1)
+
+        notification.new_issue(issue, @u_disabled)
+
+        email = find_email_for(user_1)
+        expect(email).to have_header('X-GitLab-NotificationReason', NotificationReason::SUBSCRIBED)
+      end
+
       it_behaves_like 'project emails are disabled' do
         let(:notification_target)  { issue }
         let(:notification_trigger) { notification.new_issue(issue, @u_disabled) }
@@ -1271,6 +1296,17 @@ describe NotificationService, :mailer do
       it_behaves_like 'project emails are disabled' do
         let(:notification_target)  { issue }
         let(:notification_trigger) { notification.close_issue(issue, @u_disabled) }
+      end
+
+      it 'adds "subscribed" reason to subscriber emails' do
+        user_1 = create(:user)
+        issue.subscribe(user_1)
+        issue.reload
+
+        notification.close_issue(issue, @u_disabled)
+
+        email = find_email_for(user_1)
+        expect(email).to have_header('X-GitLab-NotificationReason', NotificationReason::SUBSCRIBED)
       end
     end
 

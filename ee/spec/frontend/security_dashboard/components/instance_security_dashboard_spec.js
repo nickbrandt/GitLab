@@ -161,8 +161,6 @@ describe('Instance Security Dashboard component', () => {
       expect(wrapper.find(ProjectManager).exists()).toBe(false);
 
       expectComponentWithProps(SecurityDashboard, {
-        dashboardDocumentation,
-        emptyStateSvgPath: emptyDashboardStateSvgPath,
         vulnerabilitiesEndpoint,
         vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,

@@ -1,9 +1,9 @@
 <script>
 import { GlButton } from '@gitlab/ui';
-import { s__ } from '~/locale';
 import DismissButton from 'ee/vue_shared/security_reports/components/dismiss_button.vue';
-import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
+import { s__ } from '~/locale';
+import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {
   name: 'ModalFooter',
@@ -122,6 +122,7 @@ export default {
       :label="actionButtons[0].name"
       container-class="btn btn-success btn-inverted"
       class="js-action-button"
+      data-qa-selector="create_issue_button"
       @click="$emit(actionButtons[0].action)"
     />
   </div>

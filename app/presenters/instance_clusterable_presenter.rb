@@ -37,6 +37,11 @@ class InstanceClusterablePresenter < ClusterablePresenter
     update_applications_admin_cluster_path(cluster, application)
   end
 
+  override :clear_cluster_cache_path
+  def clear_cluster_cache_path(cluster)
+    clear_cache_admin_cluster_path(cluster)
+  end
+
   override :cluster_path
   def cluster_path(cluster, params = {})
     admin_cluster_path(cluster, params)
@@ -50,6 +55,16 @@ class InstanceClusterablePresenter < ClusterablePresenter
   override :create_gcp_clusters_path
   def create_gcp_clusters_path
     create_gcp_admin_clusters_path
+  end
+
+  override :create_aws_clusters_path
+  def create_aws_clusters_path
+    create_aws_admin_clusters_path
+  end
+
+  override :authorize_aws_role_path
+  def authorize_aws_role_path
+    authorize_aws_role_admin_clusters_path
   end
 
   override :empty_state_help_text

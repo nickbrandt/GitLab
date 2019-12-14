@@ -1,10 +1,10 @@
 import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
-import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import { createStoreOptions } from 'ee/approvals/stores';
 import projectSettingsModule from 'ee/approvals/stores/modules/project_settings';
 import ProjectRules from 'ee/approvals/components/project_settings/project_rules.vue';
-import RuleControls from 'ee/approvals/components/rule_controls.vue';
+import RuleInput from 'ee/approvals/components/mr_edit/rule_input.vue';
+import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import { createProjectRules } from '../../mocks';
 
 const TEST_RULES = createProjectRules();
@@ -15,18 +15,13 @@ localVue.use(Vuex);
 const findCell = (tr, name) => tr.find(`td.js-${name}`);
 
 const getRowData = tr => {
-  const summary = findCell(tr, 'summary');
   const name = findCell(tr, 'name');
   const members = findCell(tr, 'members');
-  const controls = findCell(tr, 'controls');
   const approvalsRequired = findCell(tr, 'approvals-required');
-
   return {
     name: name.text(),
-    summary: summary.text(),
     approvers: members.find(UserAvatarList).props('items'),
-    approvalsRequired: Number(approvalsRequired.text()),
-    ruleControl: controls.find(RuleControls).props('rule'),
+    approvalsRequired: approvalsRequired.find(RuleInput).props('rule').approvalsRequired,
   };
 };
 
@@ -60,18 +55,25 @@ describe('Approvals ProjectRules', () => {
     it('renders row for each rule', () => {
       factory();
 
-      const rows = wrapper.findAll('tbody tr');
+      const rows = wrapper.findAll('tbody tr').filter((tr, index) => index !== 0);
       const data = rows.wrappers.map(getRowData);
 
       expect(data).toEqual(
-        TEST_RULES.map(rule => ({
+        TEST_RULES.filter((rule, index) => index !== 0).map(rule => ({
           name: rule.name,
-          summary: jasmine.stringMatching(`${rule.approvalsRequired} approval.*from ${rule.name}`),
-          approvalsRequired: rule.approvalsRequired,
           approvers: rule.approvers,
-          ruleControl: rule,
+          approvalsRequired: rule.approvalsRequired,
         })),
       );
+    });
+
+    it('should always have any_approver rule', () => {
+      factory();
+      const hasAnyApproverRule = store.modules.approvals.state.rules.some(
+        rule => rule.ruleType === 'any_approver',
+      );
+
+      expect(hasAnyApproverRule).toBe(true);
     });
   });
 
@@ -92,10 +94,10 @@ describe('Approvals ProjectRules', () => {
       expect(findCell(row, 'name').exists()).toBe(false);
     });
 
-    it('renders single summary', () => {
-      expect(findCell(row, 'summary').text()).toEqual(
-        `${rule.approvalsRequired} approvals required from ${rule.approvers.length} members`,
-      );
+    it('should only display 1 rule', () => {
+      factory();
+
+      expect(store.modules.approvals.state.rules.length).toBe(1);
     });
   });
 
@@ -112,13 +114,6 @@ describe('Approvals ProjectRules', () => {
     beforeEach(() => {
       factory();
       rows = wrapper.findAll('tbody tr');
-    });
-
-    it('should render the popover for the Vulnerability-Check group', () => {
-      const firstRow = rows.at(0);
-      const nameCell = findCell(firstRow, 'name');
-
-      expect(nameCell.find('.js-help').exists()).toBeTruthy();
     });
 
     it('should not render the popover for a standard approval group', () => {

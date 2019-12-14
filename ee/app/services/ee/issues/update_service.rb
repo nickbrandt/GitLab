@@ -17,18 +17,6 @@ module EE
         result
       end
 
-      override :filter_params
-      def filter_params(issue)
-        epic_iid = params.delete(:epic_iid)
-        group = issue.project.group
-        if epic_iid.present? && group && can?(current_user, :admin_epic, group)
-          finder = EpicsFinder.new(current_user, group_id: group.id)
-          params[:epic] = finder.find_by!(iid: epic_iid) # rubocop: disable CodeReuse/ActiveRecord
-        end
-
-        super
-      end
-
       private
 
       def handle_epic(issue)

@@ -1,7 +1,7 @@
-import { n__, sprintf } from '~/locale';
-import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 import ReportMapper from 'ee/vue_shared/license_management/report_mapper';
+import { n__, sprintf } from '~/locale';
+import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 
 const toLowerCase = name => name.toLowerCase();
 /**
@@ -56,9 +56,10 @@ const getLicenseStatusByName = (managedLicenses = [], licenseName) =>
   managedLicenses.find(license => caseInsensitiveMatch(license.name, licenseName)) || {};
 
 const getDependenciesByLicenseName = (dependencies = [], licenseName) =>
-  dependencies.filter(dependencyItem =>
-    caseInsensitiveMatch(dependencyItem.license.name, licenseName),
-  );
+  dependencies.filter(dependencyItem => {
+    const licenses = dependencyItem.licenses || [dependencyItem.license];
+    return licenses.find(license => caseInsensitiveMatch(license.name, licenseName));
+  });
 
 /**
  *
@@ -104,6 +105,7 @@ export const parseLicenseReportMetrics = (headMetrics, baseMetrics, managedLicen
     const { id, approvalStatus } = getLicenseStatusByName(managedLicenseList, name);
     const dependencies = getDependenciesByLicenseName(headDependencies, name);
     const url =
+      license.url ||
       (dependencies && dependencies[0] && dependencies[0].license && dependencies[0].license.url) ||
       '';
 

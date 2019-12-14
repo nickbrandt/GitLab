@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { ApolloMutation } from 'vue-apollo';
 import DesignIndex from 'ee/design_management/pages/design/index.vue';
 import DesignDiscussion from 'ee/design_management/components/design_notes/design_discussion.vue';
 import DesignReplyForm from 'ee/design_management/components/design_notes/design_reply_form.vue';
@@ -57,6 +58,9 @@ describe('Design management design index page', () => {
       sync: false,
       propsData: { id: '1' },
       mocks: { $apollo },
+      stubs: {
+        ApolloMutation,
+      },
     });
 
     wrapper.setData({
@@ -122,7 +126,7 @@ describe('Design management design index page', () => {
     });
 
     it('renders correct amount of discussions', () => {
-      expect(wrapper.findAll(DesignDiscussion).length).toBe(1);
+      expect(findDiscussions().length).toBe(1);
     });
   });
 
@@ -165,7 +169,7 @@ describe('Design management design index page', () => {
         findDiscussionForm().vm.$emit('submitForm');
 
         expect(mutate).toHaveBeenCalledWith(mutationVariables);
-        return wrapper.vm.addImageDiffNote();
+        return mutate({ variables: mutationVariables });
       })
       .then(() => {
         expect(findDiscussionForm().exists()).toBe(false);

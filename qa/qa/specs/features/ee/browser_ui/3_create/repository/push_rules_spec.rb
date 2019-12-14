@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # https://gitlab.com/gitlab-org/gitlab/issues/34978
-  context 'Create', :quarantine do
+  context 'Create' do
     context 'Push Rules' do
       describe 'using non signed commits' do
         file_name_limitation = 'denied_file'
@@ -161,8 +160,7 @@ module QA
       end
 
       def prepare
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         @project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'push_rules'

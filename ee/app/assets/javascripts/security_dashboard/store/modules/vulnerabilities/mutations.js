@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
 import { s__, __ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
@@ -99,6 +100,7 @@ export default {
         operating_system: namespace,
         class: className,
       } = location;
+      const fileLocation = getFileLocation(location);
 
       let lineSuffix = '';
 
@@ -113,6 +115,8 @@ export default {
       Vue.set(state.modal.data.file, 'value', file ? `${file}${lineSuffix}` : null);
       Vue.set(state.modal.data.image, 'value', image);
       Vue.set(state.modal.data.namespace, 'value', namespace);
+      Vue.set(state.modal.data.url, 'value', fileLocation);
+      Vue.set(state.modal.data.url, 'url', fileLocation);
     }
 
     Vue.set(state.modal.data.severity, 'value', vulnerability.severity);

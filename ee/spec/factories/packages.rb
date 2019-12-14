@@ -3,7 +3,7 @@ FactoryBot.define do
   factory :package, class: Packages::Package do
     project
     name { 'my/company/app/my-app' }
-    version { '1.0-SNAPSHOT' }
+    sequence(:version) { |n| "1.#{n}-SNAPSHOT" }
     package_type { 'maven' }
 
     factory :maven_package do
@@ -31,14 +31,97 @@ FactoryBot.define do
     end
 
     factory :conan_package do
-      sequence(:name) { |n| "package-#{n}/1.0.0@#{project.full_path.tr('/', '+')}/stable"}
+      conan_metadatum
+
+      after :build do |package|
+        package.conan_metadatum.package_username = Packages::ConanMetadatum.package_username_from(
+          full_path: package.project.full_path
+        )
+      end
+
+      sequence(:name) { |n| "package-#{n}" }
       version { '1.0.0' }
       package_type { 'conan' }
+
+      after :create do |package|
+        create :conan_package_file, :conan_recipe_file, package: package
+        create :conan_package_file, :conan_recipe_manifest, package: package
+        create :conan_package_file, :conan_package_info, package: package
+        create :conan_package_file, :conan_package_manifest, package: package
+        create :conan_package_file, :conan_package, package: package
+      end
     end
   end
 
   factory :package_file, class: Packages::PackageFile do
     package
+
+    factory :conan_package_file do
+      trait(:conan_recipe_file) do
+        after :create do |package_file|
+          create :conan_file_metadatum, :recipe_file, package_file: package_file
+        end
+
+        file { fixture_file_upload('ee/spec/fixtures/conan/recipe_files/conanfile.py') }
+        file_name { 'conanfile.py' }
+        file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
+        file_md5 { '12345abcde' }
+        file_type { 'py' }
+        size { 400.kilobytes }
+      end
+
+      trait(:conan_recipe_manifest) do
+        after :create do |package_file|
+          create :conan_file_metadatum, :recipe_file, package_file: package_file
+        end
+
+        file { fixture_file_upload('ee/spec/fixtures/conan/recipe_files/conanmanifest.txt') }
+        file_name { 'conanmanifest.txt' }
+        file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
+        file_md5 { '12345abcde' }
+        file_type { 'txt' }
+        size { 400.kilobytes }
+      end
+
+      trait(:conan_package_manifest) do
+        after :create do |package_file|
+          create :conan_file_metadatum, :package_file, package_file: package_file
+        end
+
+        file { fixture_file_upload('ee/spec/fixtures/conan/package_files/conanmanifest.txt') }
+        file_name { 'conanmanifest.txt' }
+        file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
+        file_md5 { '12345abcde' }
+        file_type { 'txt' }
+        size { 400.kilobytes }
+      end
+
+      trait(:conan_package_info) do
+        after :create do |package_file|
+          create :conan_file_metadatum, :package_file, package_file: package_file
+        end
+
+        file { fixture_file_upload('ee/spec/fixtures/conan/package_files/conaninfo.txt') }
+        file_name { 'conaninfo.txt' }
+        file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
+        file_md5 { '12345abcde' }
+        file_type { 'txt' }
+        size { 400.kilobytes }
+      end
+
+      trait(:conan_package) do
+        after :create do |package_file|
+          create :conan_file_metadatum, :package_file, package_file: package_file
+        end
+
+        file { fixture_file_upload('ee/spec/fixtures/conan/package_files/conan_package.tgz') }
+        file_name { 'conan_package.tgz' }
+        file_sha1 { 'be93151dc23ac34a82752444556fe79b32c7a1ad' }
+        file_md5 { '12345abcde' }
+        file_type { 'tgz' }
+        size { 400.kilobytes }
+      end
+    end
 
     trait(:jar) do
       file { fixture_file_upload('ee/spec/fixtures/maven/my-app-1.0-20180724.124855-1.jar') }
@@ -83,5 +166,37 @@ FactoryBot.define do
     app_group { 'my.company.app' }
     app_name { 'my-app' }
     app_version { '1.0-SNAPSHOT' }
+  end
+
+  factory :conan_metadatum, class: Packages::ConanMetadatum do
+    package
+    package_username { 'username' }
+    package_channel { 'stable' }
+  end
+
+  factory :conan_file_metadatum, class: Packages::ConanFileMetadatum do
+    package_file
+    recipe_revision { '0' }
+
+    trait(:recipe_file) do
+      conan_file_type { 'recipe_file' }
+    end
+
+    trait(:package_file) do
+      conan_file_type { 'package_file' }
+      package_revision { '0' }
+      conan_package_reference { '123456789' }
+    end
+  end
+
+  factory :packages_dependency, class: Packages::Dependency do
+    sequence(:name) { |n| "@test/package-#{n}"}
+    sequence(:version_pattern) { |n| "~6.2.#{n}" }
+  end
+
+  factory :packages_dependency_link, class: Packages::DependencyLink do
+    package
+    dependency { create(:packages_dependency) }
+    dependency_type { :dependencies }
   end
 end

@@ -41,7 +41,7 @@ module Geo
     # rubocop:disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_ids: [])
       lfs_objects
-        .missing_file_registry
+        .missing_registry
         .id_not_in(except_ids)
         .limit(batch_size)
     end
@@ -50,7 +50,7 @@ module Geo
     # rubocop:disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_ids: [])
       all_lfs_objects
-        .inner_join_lfs_object_registry
+        .inner_join_registry
         .with_files_stored_remotely
         .id_not_in(except_ids)
         .limit(batch_size)

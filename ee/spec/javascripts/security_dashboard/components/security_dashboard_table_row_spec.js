@@ -31,7 +31,7 @@ describe('Security Dashboard Table Row', () => {
 
     it('should render a `–` for confidence', () => {
       expect(vm.confidence).toEqual('–');
-      expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain('–');
+      expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain('–');
     });
 
     it('should not render action buttons', () => {
@@ -63,19 +63,19 @@ describe('Security Dashboard Table Row', () => {
 
     it('should render the confidence', () => {
       expect(
-        vm.$el.querySelectorAll('.table-mobile-content')[2].textContent.toLowerCase(),
+        vm.$el.querySelectorAll('.table-mobile-content')[1].textContent.toLowerCase(),
       ).toContain(props.vulnerability.confidence);
     });
 
     describe('the project name', () => {
       it('should render the name', () => {
-        expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
+        expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
           props.vulnerability.name,
         );
       });
 
       it('should render the project namespace', () => {
-        expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
+        expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
           props.vulnerability.project.full_name,
         );
       });

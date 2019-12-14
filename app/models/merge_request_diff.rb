@@ -10,6 +10,7 @@ class MergeRequestDiff < ApplicationRecord
 
   # Don't display more than 100 commits at once
   COMMITS_SAFE_SIZE = 100
+  BATCH_SIZE = 1000
 
   # Applies to closed or merged MRs when determining whether to migrate their
   # diffs to external storage
@@ -49,13 +50,14 @@ class MergeRequestDiff < ApplicationRecord
   scope :by_commit_sha, ->(sha) do
     joins(:merge_request_diff_commits).where(merge_request_diff_commits: { sha: sha }).reorder(nil)
   end
+  scope :has_diff_files, -> { where(id: MergeRequestDiffFile.select(:merge_request_diff_id)) }
 
   scope :by_project_id, -> (project_id) do
     joins(:merge_request).where(merge_requests: { target_project_id: project_id })
   end
 
   scope :recent, -> { order(id: :desc).limit(100) }
-  scope :files_in_database, -> { where(stored_externally: [false, nil]) }
+  scope :files_in_database, -> { has_diff_files.where(stored_externally: [false, nil]) }
 
   scope :not_latest_diffs, -> do
     merge_requests = MergeRequest.arel_table
@@ -162,7 +164,7 @@ class MergeRequestDiff < ApplicationRecord
     # hooks that run when an attribute was changed are run twice.
     reset
 
-    keep_around_commits
+    keep_around_commits unless importing?
   end
 
   def set_as_latest_diff
@@ -213,12 +215,14 @@ class MergeRequestDiff < ApplicationRecord
     end
   end
 
-  def commits
-    @commits ||= load_commits
+  def commits(limit: nil)
+    strong_memoize(:"commits_#{limit || 'all'}") do
+      load_commits(limit: limit)
+    end
   end
 
   def last_commit_sha
-    commit_shas.first
+    commit_shas(limit: 1).first
   end
 
   def first_commit
@@ -247,14 +251,18 @@ class MergeRequestDiff < ApplicationRecord
     project.commit_by(oid: head_commit_sha)
   end
 
-  def commit_shas
-    merge_request_diff_commits.map(&:sha)
+  def commit_shas(limit: nil)
+    merge_request_diff_commits.limit(limit).pluck(:sha)
   end
 
-  def commits_by_shas(shas)
-    return MergeRequestDiffCommit.none unless shas.present?
+  def includes_any_commits?(shas)
+    return false if shas.blank?
 
-    merge_request_diff_commits.where(sha: shas)
+    # when the number of shas is huge (1000+) we don't want
+    # to pass them all as an SQL param, let's pass them in batches
+    shas.each_slice(BATCH_SIZE).any? do |batched_shas|
+      merge_request_diff_commits.where(sha: batched_shas).exists?
+    end
   end
 
   def diff_refs=(new_diff_refs)
@@ -301,20 +309,25 @@ class MergeRequestDiff < ApplicationRecord
   end
 
   def diffs_in_batch(batch_page, batch_size, diff_options:)
-    Gitlab::Diff::FileCollection::MergeRequestDiffBatch.new(self,
-                                                            batch_page,
-                                                            batch_size,
-                                                            diff_options: diff_options)
+    fetching_repository_diffs(diff_options) do |comparison|
+      if comparison
+        comparison.diffs_in_batch(batch_page, batch_size, diff_options: diff_options)
+      else
+        diffs_in_batch_collection(batch_page, batch_size, diff_options: diff_options)
+      end
+    end
   end
 
   def diffs(diff_options = nil)
-    if without_files? && comparison = diff_refs&.compare_in(project)
+    fetching_repository_diffs(diff_options) do |comparison|
       # It should fetch the repository when diffs are cleaned by the system.
       # We don't keep these for storage overload purposes.
       # See https://gitlab.com/gitlab-org/gitlab-foss/issues/37639
-      comparison.diffs(diff_options)
-    else
-      diffs_collection(diff_options)
+      if comparison
+        comparison.diffs(diff_options)
+      else
+        diffs_collection(diff_options)
+      end
     end
   end
 
@@ -422,6 +435,13 @@ class MergeRequestDiff < ApplicationRecord
 
   private
 
+  def diffs_in_batch_collection(batch_page, batch_size, diff_options:)
+    Gitlab::Diff::FileCollection::MergeRequestDiffBatch.new(self,
+                                                            batch_page,
+                                                            batch_size,
+                                                            diff_options: diff_options)
+  end
+
   def encode_in_base64?(diff_text)
     (diff_text.encoding == Encoding::BINARY && !diff_text.ascii_only?) ||
       diff_text.include?("\0")
@@ -479,6 +499,25 @@ class MergeRequestDiff < ApplicationRecord
     end
   end
 
+  # Yields the block with the repository Compare object if it should
+  # fetch diffs from the repository instead DB.
+  def fetching_repository_diffs(diff_options)
+    return unless block_given?
+
+    diff_options ||= {}
+
+    # Can be read as: fetch the persisted diffs if yielded without the
+    # Compare object.
+    return yield unless without_files? || diff_options[:ignore_whitespace_change]
+    return yield unless diff_refs&.complete?
+
+    comparison = diff_refs.compare_in(repository.project)
+
+    return yield unless comparison
+
+    yield(comparison)
+  end
+
   def use_external_diff?
     return false unless has_attribute?(:external_diff)
     return false unless Gitlab.config.external_diffs.enabled
@@ -529,8 +568,9 @@ class MergeRequestDiff < ApplicationRecord
     end
   end
 
-  def load_commits
-    commits = merge_request_diff_commits.map { |commit| Commit.from_hash(commit.to_hash, project) }
+  def load_commits(limit: nil)
+    commits = merge_request_diff_commits.limit(limit)
+      .map { |commit| Commit.from_hash(commit.to_hash, project) }
 
     CommitCollection
       .new(merge_request.source_project, commits, merge_request.source_branch)

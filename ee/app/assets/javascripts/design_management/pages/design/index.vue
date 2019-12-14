@@ -1,8 +1,9 @@
 <script>
+import { ApolloMutation } from 'vue-apollo';
 import Mousetrap from 'mousetrap';
+import { GlLoadingIcon } from '@gitlab/ui';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
-import { GlLoadingIcon } from '@gitlab/ui';
 import allVersionsMixin from '../../mixins/all_versions';
 import Toolbar from '../../components/toolbar/index.vue';
 import DesignImage from '../../components/image.vue';
@@ -11,11 +12,15 @@ import DesignDiscussion from '../../components/design_notes/design_discussion.vu
 import DesignReplyForm from '../../components/design_notes/design_reply_form.vue';
 import DesignDestroyer from '../../components/design_destroyer.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
+import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
-import { extractDiscussions } from '../../utils/design_management_utils';
+import { extractDiscussions, extractDesign } from '../../utils/design_management_utils';
+import { updateStoreAfterAddImageDiffNote } from '../../utils/cache_update';
+import { ADD_DISCUSSION_COMMENT_ERROR } from '../../utils/error_messages';
 
 export default {
   components: {
+    ApolloMutation,
     DesignImage,
     DesignOverlay,
     DesignDiscussion,
@@ -41,18 +46,25 @@ export default {
         height: 0,
       },
       projectPath: '',
-      isNoteSaving: false,
+      issueId: '',
     };
   },
   apollo: {
+    appData: {
+      query: appDataQuery,
+      manual: true,
+      result({ data: { projectPath, issueIid } }) {
+        this.projectPath = projectPath;
+        this.issueIid = issueIid;
+      },
+    },
     design: {
       query: getDesignQuery,
+      fetchPolicy: 'network-only',
       variables() {
-        return {
-          id: this.id,
-          version: this.designsVersion,
-        };
+        return this.designVariables;
       },
+      update: data => extractDesign(data),
       result({ data }) {
         if (!data) {
           createFlash(s__('DesignManagement|Could not find design, please try again.'));
@@ -84,6 +96,33 @@ export default {
     renderDiscussions() {
       return this.discussions.length || this.annotationCoordinates;
     },
+    designVariables() {
+      return {
+        fullPath: this.projectPath,
+        iid: this.issueIid,
+        filenames: [this.$route.params.id],
+        atVersion: this.designsVersion,
+      };
+    },
+    mutationPayload() {
+      const { x, y, width, height } = this.annotationCoordinates;
+      return {
+        noteableId: this.design.id,
+        body: this.comment,
+        position: {
+          headSha: this.design.diffRefs.headSha,
+          baseSha: this.design.diffRefs.baseSha,
+          startSha: this.design.diffRefs.startSha,
+          x,
+          y,
+          width,
+          height,
+          paths: {
+            newPath: this.design.fullPath,
+          },
+        },
+      };
+    },
   },
   mounted() {
     Mousetrap.bind('esc', this.closeDesign);
@@ -92,71 +131,22 @@ export default {
     Mousetrap.unbind('esc', this.closeDesign);
   },
   methods: {
-    addImageDiffNote() {
-      const { x, y, width, height } = this.annotationCoordinates;
-      this.isNoteSaving = true;
-      return this.$apollo
-        .mutate({
-          mutation: createImageDiffNoteMutation,
-          variables: {
-            input: {
-              noteableId: this.design.id,
-              body: this.comment,
-              position: {
-                headSha: this.design.diffRefs.headSha,
-                baseSha: this.design.diffRefs.baseSha,
-                startSha: this.design.diffRefs.startSha,
-                x,
-                y,
-                width,
-                height,
-                paths: {
-                  newPath: this.design.fullPath,
-                },
-              },
-            },
-          },
-          update: (store, { data: { createImageDiffNote } }) => {
-            const data = store.readQuery({
-              query: getDesignQuery,
-              variables: {
-                id: this.id,
-                version: this.designsVersion,
-              },
-            });
-            const newDiscussion = {
-              __typename: 'DiscussionEdge',
-              node: {
-                // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-                // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-                __typename: 'Discussion',
-                id: createImageDiffNote.note.discussion.id,
-                replyId: createImageDiffNote.note.discussion.replyId,
-                notes: {
-                  __typename: 'NoteConnection',
-                  edges: [
-                    {
-                      __typename: 'NoteEdge',
-                      node: createImageDiffNote.note,
-                    },
-                  ],
-                },
-              },
-            };
-            data.design.discussions.edges.push(newDiscussion);
-            data.design.notesCount += 1;
-            store.writeQuery({ query: getDesignQuery, data });
-          },
-        })
-        .then(() => {
-          this.closeCommentForm();
-          this.isNoteSaving = false;
-        })
-        .catch(e => {
-          this.isNoteSaving = false;
-          createFlash(s__('DesignManagement|Could not create new discussion, please try again.'));
-          throw e;
-        });
+    addImageDiffNoteToStore(
+      store,
+      {
+        data: { createImageDiffNote },
+      },
+    ) {
+      updateStoreAfterAddImageDiffNote(
+        store,
+        createImageDiffNote,
+        getDesignQuery,
+        this.designVariables,
+      );
+    },
+    onMutationError(e) {
+      createFlash(ADD_DISCUSSION_COMMENT_ERROR);
+      throw e;
     },
     openCommentForm(position) {
       const { x, y } = position;
@@ -188,14 +178,17 @@ export default {
     this.closeCommentForm();
     next();
   },
+  createImageDiffNoteMutation,
 };
 </script>
 
 <template>
-  <div class="design-detail fixed-top w-100 position-bottom-0 d-sm-flex justify-content-center">
+  <div
+    class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
+  >
     <gl-loading-icon v-if="isLoading" size="xl" class="align-self-center" />
     <template v-else>
-      <div class="d-flex flex-column w-100">
+      <div class="d-flex overflow-hidden flex-lg-grow-1 flex-column">
         <design-destroyer
           :filenames="[design.filename]"
           :project-path="projectPath"
@@ -207,15 +200,13 @@ export default {
             <toolbar
               :id="id"
               :is-deleting="loading"
-              :name="design.filename"
-              :updated-at="design.updatedAt"
-              :updated-by="design.updatedBy"
               :is-latest-version="isLatestVersion"
+              v-bind="design"
               @delete="mutate()"
             />
           </template>
         </design-destroyer>
-        <div class="d-flex flex-column w-100 h-100 mh-100 position-relative">
+        <div class="d-flex flex-column h-100 mh-100 position-relative">
           <design-image
             :image="design.image"
             :name="design.filename"
@@ -240,14 +231,25 @@ export default {
             :discussion-index="index + 1"
             :markdown-preview-path="markdownPreviewPath"
           />
-          <design-reply-form
+          <apollo-mutation
             v-if="annotationCoordinates"
-            v-model="comment"
-            :is-saving="isNoteSaving"
-            :markdown-preview-path="markdownPreviewPath"
-            @submitForm="addImageDiffNote"
-            @cancelForm="closeCommentForm"
-          />
+            v-slot="{ mutate, loading }"
+            :mutation="$options.createImageDiffNoteMutation"
+            :variables="{
+              input: mutationPayload,
+            }"
+            :update="addImageDiffNoteToStore"
+            @done="closeCommentForm"
+            @error="onMutationError"
+          >
+            <design-reply-form
+              v-model="comment"
+              :is-saving="loading"
+              :markdown-preview-path="markdownPreviewPath"
+              @submitForm="mutate()"
+              @cancelForm="closeCommentForm"
+            />
+          </apollo-mutation>
         </template>
         <h2 v-else class="new-discussion-disclaimer m-0">
           {{ __("Click the image where you'd like to start a new discussion") }}

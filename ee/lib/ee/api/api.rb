@@ -22,6 +22,7 @@ module EE
         mount ::API::FeatureFlagScopes
         mount ::API::ContainerRegistryEvent
         mount ::API::Geo
+        mount ::API::GeoReplication
         mount ::API::GeoNodes
         mount ::API::IssueLinks
         mount ::API::Ldap
@@ -29,16 +30,19 @@ module EE
         mount ::API::License
         mount ::API::ProjectMirror
         mount ::API::ProjectPushRule
+        mount ::API::NugetPackages
         mount ::API::ConanPackages
         mount ::API::MavenPackages
         mount ::API::NpmPackages
-        mount ::API::Packages
+        mount ::API::ProjectPackages
+        mount ::API::GroupPackages
         mount ::API::PackageFiles
         mount ::API::Scim
         mount ::API::ManagedLicenses
         mount ::API::ProjectApprovals
         mount ::API::Vulnerabilities
         mount ::API::VulnerabilityFindings
+        mount ::API::VulnerabilityIssueLinks
         mount ::API::MergeRequestApprovals
         mount ::API::MergeRequestApprovalRules
         mount ::API::ProjectAliases

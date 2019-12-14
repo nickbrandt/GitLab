@@ -54,6 +54,12 @@ FactoryBot.define do
       end
     end
 
+    trait :dast_feature_branch do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :dast_feature_branch, job: build)
+      end
+    end
+
     trait :container_scanning_feature_branch do
       after(:build) do |build|
         build.job_artifacts << create(:ee_ci_job_artifact, :container_scanning_feature_branch, job: build)
@@ -63,6 +69,12 @@ FactoryBot.define do
     trait :corrupted_container_scanning_report do
       after(:build) do |build|
         build.job_artifacts << create(:ee_ci_job_artifact, :corrupted_container_scanning_report, job: build)
+      end
+    end
+
+    trait :deprecated_container_scanning_report do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :deprecated_container_scanning_report, job: build)
       end
     end
 

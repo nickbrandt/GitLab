@@ -6,5 +6,7 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
 
   before_action do
     push_frontend_feature_flag(:customizable_cycle_analytics)
+    push_frontend_feature_flag(:cycle_analytics_scatterplot_enabled)
+    push_frontend_feature_flag(:tasks_by_type_chart)
   end
 end

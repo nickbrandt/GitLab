@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import relatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
 import relatedIssuesService from 'ee/related_issues/services/related_issues_service';
 import {
@@ -8,6 +7,7 @@ import {
   issuable1,
   issuable2,
 } from 'spec/vue_shared/components/issue/related_issuable_mock_data';
+import axios from '~/lib/utils/axios_utils';
 
 describe('RelatedIssuesRoot', () => {
   let RelatedIssuesRoot;
@@ -185,7 +185,9 @@ describe('RelatedIssuesRoot', () => {
         });
       });
 
-      it('displays a message from the backend upon error', done => {
+      // https://gitlab.com/gitlab-org/gitlab/issues/38410
+      // eslint-disable-next-line jasmine/no-disabled-tests
+      xit('displays a message from the backend upon error', done => {
         const input = '#123';
         const message = 'error';
 

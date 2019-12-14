@@ -3,7 +3,7 @@ require 'securerandom'
 
 module QA
   # Issue: https://gitlab.com/gitlab-org/gitlab/issues/35370
-  context 'Create', :docker, :quarantine do
+  context 'Create', :docker, :quarantine, :requires_admin do
     describe 'Jenkins integration' do
       let(:project_name) { "project_with_jenkins_#{SecureRandom.hex(4)}" }
 
@@ -105,8 +105,7 @@ module QA
       end
 
       def login_to_gitlab
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
       end
 
       def patch_host_name(host_name, container_name)
@@ -131,9 +130,8 @@ module QA
 
       def allow_requests_to_local_networks
         Page::Main::Menu.perform(&:sign_out_if_signed_in)
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
-        Page::Main::Menu.perform(&:click_admin_area)
+        Flow::Login.sign_in_as_admin
+        Page::Main::Menu.perform(&:go_to_admin_area)
         Page::Admin::Menu.perform(&:go_to_network_settings)
 
         Page::Admin::Settings::Network.perform do |network|

@@ -4,11 +4,11 @@ require 'prometheus/client'
 def prometheus_default_multiproc_dir
   return unless Rails.env.development? || Rails.env.test?
 
-  if Sidekiq.server?
+  if Gitlab::Runtime.sidekiq?
     Rails.root.join('tmp/prometheus_multiproc_dir/sidekiq')
-  elsif defined?(Unicorn::Worker)
+  elsif Gitlab::Runtime.unicorn?
     Rails.root.join('tmp/prometheus_multiproc_dir/unicorn')
-  elsif defined?(::Puma)
+  elsif Gitlab::Runtime.puma?
     Rails.root.join('tmp/prometheus_multiproc_dir/puma')
   else
     Rails.root.join('tmp/prometheus_multiproc_dir')
@@ -55,9 +55,9 @@ if !Rails.env.test? && Gitlab::Metrics.prometheus_metrics_enabled?
   Gitlab::Cluster::LifecycleEvents.on_master_start do
     ::Prometheus::Client.reinitialize_on_pid_change(force: true)
 
-    if defined?(::Unicorn)
+    if Gitlab::Runtime.unicorn?
       Gitlab::Metrics::Samplers::UnicornSampler.instance(Settings.monitoring.unicorn_sampler_interval).start
-    elsif defined?(::Puma)
+    elsif Gitlab::Runtime.puma?
       Gitlab::Metrics::Samplers::PumaSampler.instance(Settings.monitoring.puma_sampler_interval).start
     end
 
@@ -65,9 +65,16 @@ if !Rails.env.test? && Gitlab::Metrics.prometheus_metrics_enabled?
   end
 end
 
-if defined?(::Unicorn) || defined?(::Puma)
+if Gitlab::Runtime.app_server?
   Gitlab::Cluster::LifecycleEvents.on_master_start do
     Gitlab::Metrics::Exporter::WebExporter.instance.start
+  end
+
+  # DEPRECATED: TO BE REMOVED
+  # This is needed to implement blackout period of `web_exporter`
+  # https://gitlab.com/gitlab-org/gitlab/issues/35343#note_238479057
+  Gitlab::Cluster::LifecycleEvents.on_before_blackout_period do
+    Gitlab::Metrics::Exporter::WebExporter.instance.mark_as_not_running!
   end
 
   Gitlab::Cluster::LifecycleEvents.on_before_graceful_shutdown do

@@ -3,14 +3,13 @@ import Vuex from 'vuex';
 import { createStoreOptions } from 'ee/approvals/stores';
 import MREditModule from 'ee/approvals/stores/modules/mr_edit';
 import MREditApp from 'ee/approvals/components/mr_edit/app.vue';
-import MRFallbackRules from 'ee/approvals/components/mr_edit/mr_fallback_rules.vue';
 import MRRules from 'ee/approvals/components/mr_edit/mr_rules.vue';
 import MRRulesHiddenInputs from 'ee/approvals/components/mr_edit/mr_rules_hidden_inputs.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('EE Approvlas MREditApp', () => {
+describe('EE Approvals MREditApp', () => {
   let wrapper;
   let store;
 
@@ -37,12 +36,8 @@ describe('EE Approvlas MREditApp', () => {
       factory();
     });
 
-    it('renders MR fallback rules', () => {
-      expect(wrapper.find(MRFallbackRules).exists()).toBe(true);
-    });
-
     it('does not render MR rules', () => {
-      expect(wrapper.find(MRRules).exists()).toBe(false);
+      expect(wrapper.find(MRRules).exists()).toBe(true);
     });
 
     it('renders hidden inputs', () => {
@@ -54,10 +49,6 @@ describe('EE Approvlas MREditApp', () => {
     beforeEach(() => {
       store.modules.approvals.state.rules = [{ id: 7, approvers: [] }];
       factory();
-    });
-
-    it('does not render MR fallback rules', () => {
-      expect(wrapper.find(MRFallbackRules).exists()).toBe(false);
     });
 
     it('renders MR rules', () => {

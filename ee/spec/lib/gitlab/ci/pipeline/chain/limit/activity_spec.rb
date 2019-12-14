@@ -21,7 +21,8 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
 
   context 'when active pipelines limit is exceeded' do
     before do
-      gold_plan = create(:gold_plan, active_pipelines_limit: 1)
+      gold_plan = create(:gold_plan)
+      create(:plan_limits, plan: gold_plan, ci_active_pipelines: 1)
       create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
 
       create(:ci_pipeline, project: project, status: 'pending')
@@ -53,9 +54,9 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
     end
 
     it 'logs the error' do
-      expect(Gitlab::Sentry).to receive(:track_acceptable_exception).with(
+      expect(Gitlab::Sentry).to receive(:track_exception).with(
         instance_of(EE::Gitlab::Ci::Limit::LimitExceededError),
-        extra: { project_id: project.id, plan: namespace.actual_plan_name }
+        project_id: project.id, plan: namespace.actual_plan_name
       )
 
       subject
@@ -63,6 +64,12 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
   end
 
   context 'when pipeline activity limit is not exceeded' do
+    before do
+      gold_plan = create(:gold_plan)
+      create(:plan_limits, plan: gold_plan, ci_active_pipelines: 100)
+      create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+    end
+
     it 'does not break the chain' do
       subject
 
@@ -76,7 +83,7 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
     end
 
     it 'does not log any error' do
-      expect(Gitlab::Sentry).not_to receive(:track_acceptable_exception)
+      expect(Gitlab::Sentry).not_to receive(:track_exception)
 
       subject
     end

@@ -7,7 +7,6 @@ module EE
     def for_member(member)
       action = @details[:action]
       old_access_level = @details[:old_access_level]
-      author_name = @author.name
       user_id = member.id
       user_name = member.user ? member.user.name : 'Deleted User'
 
@@ -16,16 +15,26 @@ module EE
         when :destroy
           {
             remove: "user_access",
-            author_name: author_name,
+            author_name: @author.name,
             target_id: user_id,
             target_type: "User",
             target_details: user_name
+          }
+        when :expired
+          {
+            remove: "user_access",
+            author_name: member.created_by ? member.created_by.name : 'Deleted User',
+            target_id: user_id,
+            target_type: "User",
+            target_details: user_name,
+            system_event: true,
+            reason: "access expired on #{member.expires_at}"
           }
         when :create
           {
             add: "user_access",
             as: ::Gitlab::Access.options_with_owner.key(member.access_level.to_i),
-            author_name: author_name,
+            author_name: @author.name,
             target_id: user_id,
             target_type: "User",
             target_details: user_name
@@ -35,7 +44,7 @@ module EE
             change: "access_level",
             from: old_access_level,
             to: member.human_access,
-            author_name: author_name,
+            author_name: @author.name,
             target_id: user_id,
             target_type: "User",
             target_details: user_name

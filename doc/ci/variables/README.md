@@ -284,6 +284,8 @@ export CI_PROJECT_PATH="gitlab-org/gitlab-foss"
 export CI_PROJECT_URL="https://example.com/gitlab-org/gitlab-foss"
 export CI_REGISTRY="registry.example.com"
 export CI_REGISTRY_IMAGE="registry.example.com/gitlab-org/gitlab-foss"
+export CI_REGISTRY_USER="gitlab-ci-token"
+export CI_REGISTRY_PASSWORD="longalfanumstring"
 export CI_RUNNER_ID="10"
 export CI_RUNNER_DESCRIPTION="my runner"
 export CI_RUNNER_TAGS="docker, linux"
@@ -295,10 +297,8 @@ export CI_SERVER_VERSION="8.9.0"
 export CI_SERVER_VERSION_MAJOR="8"
 export CI_SERVER_VERSION_MINOR="9"
 export CI_SERVER_VERSION_PATCH="0"
-export GITLAB_USER_ID="42"
 export GITLAB_USER_EMAIL="user@example.com"
-export CI_REGISTRY_USER="gitlab-ci-token"
-export CI_REGISTRY_PASSWORD="longalfanumstring"
+export GITLAB_USER_ID="42"
 ```
 
 ### `.gitlab-ci.yml` defined variables
@@ -357,7 +357,12 @@ Group-level variables can be added by:
 1. Inputing variable types, keys, and values in the **Variables** section.
    Any variables of [subgroups](../../user/group/subgroups/index.md) will be inherited recursively.
 
-Once you set them, they will be available for all subsequent pipelines.
+Once you set them, they will be available for all subsequent pipelines. Any group-level user defined variables can be viewed in projects by:
+
+1. Navigating to the project's **Settings > CI/CD** page.
+1. Expanding the **Variables** section.
+
+![CI/CD settings - inherited variables](img/inherited_group_variables_v12_5.png)
 
 ## Priority of environment variables
 

@@ -1,9 +1,9 @@
 <script>
-import { s__ } from '~/locale';
 import { mapGetters, mapActions, mapState } from 'vuex';
 import { engineeringNotation, sum, average } from '@gitlab/ui/src/utils/number_utils';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { GlColumnChart, GlChartLegend } from '@gitlab/ui/charts';
+import { s__ } from '~/locale';
 import { getMonthNames } from '~/lib/utils/datetime_utility';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import EmptyState from './empty_state.vue';

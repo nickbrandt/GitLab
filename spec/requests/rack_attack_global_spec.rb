@@ -22,6 +22,7 @@ describe 'Rack Attack global throttles' do
     }
   end
 
+  let(:request_method) { 'GET' }
   let(:requests_per_period) { 1 }
   let(:period_in_seconds) { 10000 }
   let(:period) { period_in_seconds.seconds }
@@ -83,7 +84,7 @@ describe 'Rack Attack global throttles' do
           expect(response).to have_http_status 200
         end
 
-        expect_any_instance_of(Rack::Attack::Request).to receive(:ip).and_return('1.2.3.4')
+        expect_any_instance_of(Rack::Attack::Request).to receive(:ip).at_least(:once).and_return('1.2.3.4')
 
         # would be over limit for the same IP
         get url_that_does_not_require_authentication
@@ -95,6 +96,18 @@ describe 'Rack Attack global throttles' do
           (1 + requests_per_period).times do
             get url_api_internal, params: { secret_token: Gitlab::Shell.secret_token }
             expect(response).to have_http_status 200
+          end
+        end
+      end
+
+      context 'when the request is authenticated by a runner token' do
+        let(:request_jobs_url) { '/api/v4/jobs/request' }
+        let(:runner) { create(:ci_runner) }
+
+        it 'does not cont as unauthenticated' do
+          (1 + requests_per_period).times do
+            post request_jobs_url, params: { token: runner.token }
+            expect(response).to have_http_status 204
           end
         end
       end
@@ -143,15 +156,15 @@ describe 'Rack Attack global throttles' do
     let(:api_partial_url) { '/todos' }
 
     context 'with the token in the query string' do
-      let(:get_args) { [api(api_partial_url, personal_access_token: token)] }
-      let(:other_user_get_args) { [api(api_partial_url, personal_access_token: other_user_token)] }
+      let(:request_args) { [api(api_partial_url, personal_access_token: token)] }
+      let(:other_user_request_args) { [api(api_partial_url, personal_access_token: other_user_token)] }
 
       it_behaves_like 'rate-limited token-authenticated requests'
     end
 
     context 'with the token in the headers' do
-      let(:get_args) { api_get_args_with_token_headers(api_partial_url, personal_access_token_headers(token)) }
-      let(:other_user_get_args) { api_get_args_with_token_headers(api_partial_url, personal_access_token_headers(other_user_token)) }
+      let(:request_args) { api_get_args_with_token_headers(api_partial_url, personal_access_token_headers(token)) }
+      let(:other_user_request_args) { api_get_args_with_token_headers(api_partial_url, personal_access_token_headers(other_user_token)) }
 
       it_behaves_like 'rate-limited token-authenticated requests'
     end
@@ -170,15 +183,15 @@ describe 'Rack Attack global throttles' do
     let(:api_partial_url) { '/todos' }
 
     context 'with the token in the query string' do
-      let(:get_args) { [api(api_partial_url, oauth_access_token: token)] }
-      let(:other_user_get_args) { [api(api_partial_url, oauth_access_token: other_user_token)] }
+      let(:request_args) { [api(api_partial_url, oauth_access_token: token)] }
+      let(:other_user_request_args) { [api(api_partial_url, oauth_access_token: other_user_token)] }
 
       it_behaves_like 'rate-limited token-authenticated requests'
     end
 
     context 'with the token in the headers' do
-      let(:get_args) { api_get_args_with_token_headers(api_partial_url, oauth_token_headers(token)) }
-      let(:other_user_get_args) { api_get_args_with_token_headers(api_partial_url, oauth_token_headers(other_user_token)) }
+      let(:request_args) { api_get_args_with_token_headers(api_partial_url, oauth_token_headers(token)) }
+      let(:other_user_request_args) { api_get_args_with_token_headers(api_partial_url, oauth_token_headers(other_user_token)) }
 
       it_behaves_like 'rate-limited token-authenticated requests'
     end
@@ -190,8 +203,8 @@ describe 'Rack Attack global throttles' do
     let(:throttle_setting_prefix) { 'throttle_authenticated_web' }
 
     context 'with the token in the query string' do
-      let(:get_args) { [rss_url(user), params: nil] }
-      let(:other_user_get_args) { [rss_url(other_user), params: nil] }
+      let(:request_args) { [rss_url(user), params: nil] }
+      let(:other_user_request_args) { [rss_url(other_user), params: nil] }
 
       it_behaves_like 'rate-limited token-authenticated requests'
     end
@@ -206,10 +219,13 @@ describe 'Rack Attack global throttles' do
   end
 
   describe 'protected paths' do
+    let(:request_method) { 'POST' }
+
     context 'unauthenticated requests' do
       let(:protected_path_that_does_not_require_authentication) do
-        '/users/confirmation'
+        '/users/sign_in'
       end
+      let(:post_params) { { user: { login: 'username', password: 'password' } } }
 
       before do
         settings_to_set[:throttle_protected_paths_requests_per_period] = requests_per_period # 1
@@ -224,7 +240,7 @@ describe 'Rack Attack global throttles' do
 
         it 'allows requests over the rate limit' do
           (1 + requests_per_period).times do
-            get protected_path_that_does_not_require_authentication
+            post protected_path_that_does_not_require_authentication, params: post_params
             expect(response).to have_http_status 200
           end
         end
@@ -238,22 +254,22 @@ describe 'Rack Attack global throttles' do
 
         it 'rejects requests over the rate limit' do
           requests_per_period.times do
-            get protected_path_that_does_not_require_authentication
+            post protected_path_that_does_not_require_authentication, params: post_params
             expect(response).to have_http_status 200
           end
 
-          expect_rejection { get protected_path_that_does_not_require_authentication }
+          expect_rejection { post protected_path_that_does_not_require_authentication, params: post_params }
         end
 
-        context 'when Omnibus throttle is present' do
+        context 'when Omnibus throttle should be used' do
           before do
             allow(Gitlab::Throttle)
-              .to receive(:omnibus_protected_paths_present?).and_return(true)
+              .to receive(:should_use_omnibus_protected_paths?).and_return(true)
           end
 
           it 'allows requests over the rate limit' do
             (1 + requests_per_period).times do
-              get protected_path_that_does_not_require_authentication
+              post protected_path_that_does_not_require_authentication, params: post_params
               expect(response).to have_http_status 200
             end
           end
@@ -267,11 +283,11 @@ describe 'Rack Attack global throttles' do
       let(:other_user) { create(:user) }
       let(:other_user_token) { create(:personal_access_token, user: other_user) }
       let(:throttle_setting_prefix) { 'throttle_protected_paths' }
-      let(:api_partial_url) { '/users' }
+      let(:api_partial_url) { '/user/emails' }
 
       let(:protected_paths) do
         [
-          '/api/v4/users'
+          '/api/v4/user/emails'
         ]
       end
 
@@ -281,22 +297,22 @@ describe 'Rack Attack global throttles' do
       end
 
       context 'with the token in the query string' do
-        let(:get_args) { [api(api_partial_url, personal_access_token: token)] }
-        let(:other_user_get_args) { [api(api_partial_url, personal_access_token: other_user_token)] }
+        let(:request_args) { [api(api_partial_url, personal_access_token: token)] }
+        let(:other_user_request_args) { [api(api_partial_url, personal_access_token: other_user_token)] }
 
         it_behaves_like 'rate-limited token-authenticated requests'
       end
 
       context 'with the token in the headers' do
-        let(:get_args) { api_get_args_with_token_headers(api_partial_url, personal_access_token_headers(token)) }
-        let(:other_user_get_args) { api_get_args_with_token_headers(api_partial_url, personal_access_token_headers(other_user_token)) }
+        let(:request_args) { api_get_args_with_token_headers(api_partial_url, personal_access_token_headers(token)) }
+        let(:other_user_request_args) { api_get_args_with_token_headers(api_partial_url, personal_access_token_headers(other_user_token)) }
 
         it_behaves_like 'rate-limited token-authenticated requests'
       end
 
-      context 'when Omnibus throttle is present' do
-        let(:get_args) { [api(api_partial_url, personal_access_token: token)] }
-        let(:other_user_get_args) { [api(api_partial_url, personal_access_token: other_user_token)] }
+      context 'when Omnibus throttle should be used' do
+        let(:request_args) { [api(api_partial_url, personal_access_token: token)] }
+        let(:other_user_request_args) { [api(api_partial_url, personal_access_token: other_user_token)] }
 
         before do
           settings_to_set[:"#{throttle_setting_prefix}_requests_per_period"] = requests_per_period
@@ -305,13 +321,13 @@ describe 'Rack Attack global throttles' do
           stub_application_setting(settings_to_set)
 
           allow(Gitlab::Throttle)
-            .to receive(:omnibus_protected_paths_present?).and_return(true)
+            .to receive(:should_use_omnibus_protected_paths?).and_return(true)
         end
 
         it 'allows requests over the rate limit' do
           (1 + requests_per_period).times do
-            get(*get_args)
-            expect(response).to have_http_status 200
+            post(*request_args)
+            expect(response).not_to have_http_status 429
           end
         end
       end
@@ -320,7 +336,7 @@ describe 'Rack Attack global throttles' do
     describe 'web requests authenticated with regular login' do
       let(:throttle_setting_prefix) { 'throttle_protected_paths' }
       let(:user) { create(:user) }
-      let(:url_that_requires_authentication) { '/dashboard/snippets' }
+      let(:url_that_requires_authentication) { '/users/confirmation' }
 
       let(:protected_paths) do
         [
@@ -335,7 +351,7 @@ describe 'Rack Attack global throttles' do
 
       it_behaves_like 'rate-limited web authenticated requests'
 
-      context 'when Omnibus throttle is present' do
+      context 'when Omnibus throttle should be used' do
         before do
           settings_to_set[:"#{throttle_setting_prefix}_requests_per_period"] = requests_per_period
           settings_to_set[:"#{throttle_setting_prefix}_period_in_seconds"] = period_in_seconds
@@ -343,15 +359,15 @@ describe 'Rack Attack global throttles' do
           stub_application_setting(settings_to_set)
 
           allow(Gitlab::Throttle)
-            .to receive(:omnibus_protected_paths_present?).and_return(true)
+            .to receive(:should_use_omnibus_protected_paths?).and_return(true)
 
           login_as(user)
         end
 
         it 'allows requests over the rate limit' do
           (1 + requests_per_period).times do
-            get url_that_requires_authentication
-            expect(response).to have_http_status 200
+            post url_that_requires_authentication
+            expect(response).not_to have_http_status 429
           end
         end
       end

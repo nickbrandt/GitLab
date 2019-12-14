@@ -7,7 +7,6 @@ describe 'Trial Sign Up', :js do
 
   describe 'on GitLab.com' do
     before do
-      stub_feature_flags(improved_trial_signup: true)
       allow(Gitlab).to receive(:com?).and_return(true).at_least(:once)
     end
 
@@ -46,7 +45,7 @@ describe 'Trial Sign Up', :js do
         wait_for_requests
 
         expect(current_path).to eq(new_trial_path)
-        expect(page).to have_content('Start a Free Trial')
+        expect(page).to have_content('Start a Free Gold Trial')
       end
     end
 

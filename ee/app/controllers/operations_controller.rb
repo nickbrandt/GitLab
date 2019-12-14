@@ -16,14 +16,14 @@ class OperationsController < ApplicationController
 
   def list
     Gitlab::PollingInterval.set_header(response, interval: POLLING_INTERVAL)
-    projects = load_projects(current_user)
+    projects = load_projects
 
     render json: { projects: serialize_as_json(projects) }
   end
 
   def environments_list
     Gitlab::PollingInterval.set_header(response, interval: POLLING_INTERVAL)
-    projects = load_environments_projects(current_user)
+    projects = load_environments_projects
 
     render json: { projects: serialize_as_json_for_environments(projects) }
   end
@@ -31,7 +31,7 @@ class OperationsController < ApplicationController
   def create
     project_ids = params['project_ids']
 
-    result = add_projects(current_user, project_ids)
+    result = add_projects(project_ids)
 
     render json: {
       added: result.added_project_ids,
@@ -43,7 +43,7 @@ class OperationsController < ApplicationController
   def destroy
     project_id = params['project_id']
 
-    if remove_project(current_user, project_id)
+    if remove_project(project_id)
       head :ok
     else
       head :no_content
@@ -57,22 +57,26 @@ class OperationsController < ApplicationController
   end
 
   def environments_dashboard_feature_flag
-    render_404 unless Feature.enabled?(:environments_dashboard, current_user)
+    render_404 unless Feature.enabled?(:environments_dashboard, current_user, default_enabled: true)
   end
 
-  def load_projects(current_user)
+  def load_projects
     Dashboard::Operations::ListService.new(current_user).execute
   end
 
-  def load_environments_projects(current_user)
+  def load_environments_projects
     Dashboard::Environments::ListService.new(current_user).execute
   end
 
-  def add_projects(current_user, project_ids)
-    UsersOpsDashboardProjects::CreateService.new(current_user).execute(project_ids)
+  def add_projects(project_ids)
+    Dashboard::Projects::CreateService.new(
+      current_user,
+      current_user.ops_dashboard_projects,
+      feature: :operations_dashboard
+    ).execute(project_ids)
   end
 
-  def remove_project(current_user, project_id)
+  def remove_project(project_id)
     UsersOpsDashboardProjects::DestroyService.new(current_user).execute(project_id)
   end
 

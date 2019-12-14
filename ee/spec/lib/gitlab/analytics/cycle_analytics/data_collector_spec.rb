@@ -58,11 +58,21 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
     it 'calculates median' do
       expect(round_to_days(data_collector.median.seconds)).to eq(10)
     end
+
+    describe '#duration_chart_data' do
+      subject { data_collector.duration_chart_data }
+
+      it 'loads data ordered by event time' do
+        days = subject.map { |item| round_to_days(item.duration_in_seconds) }
+
+        expect(days).to eq([15, 10, 5])
+      end
+    end
   end
 
   shared_examples 'test various start and end event combinations' do
     context 'when `Issue` based stage is given' do
-      context 'between issue creation time and closing time' do
+      context 'between issue creation time and issue first mentioned in commit time' do
         let(:start_event_identifier) { :issue_created }
         let(:end_event_identifier) { :issue_first_mentioned_in_commit }
 
@@ -72,6 +82,155 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         def create_data_for_end_event(issue, example_class)
           issue.metrics.update!(first_mentioned_in_commit_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue creation time and closing time' do
+        let(:start_event_identifier) { :issue_created }
+        let(:end_event_identifier) { :issue_closed }
+
+        def create_data_for_start_event(example_class)
+          create(:issue, :opened, project: example_class.project)
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.close!
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue first mentioned in commit and first associated with milestone time' do
+        let(:start_event_identifier) { :issue_first_mentioned_in_commit }
+        let(:end_event_identifier) { :issue_first_associated_with_milestone }
+
+        def create_data_for_start_event(example_class)
+          issue = create(:issue, :opened, project: example_class.project)
+          issue.metrics.update!(first_mentioned_in_commit_at: Time.now)
+          issue
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.metrics.update!(first_associated_with_milestone_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue creation time and first added to board time' do
+        let(:start_event_identifier) { :issue_created }
+        let(:end_event_identifier) { :issue_first_added_to_board }
+
+        def create_data_for_start_event(example_class)
+          create(:issue, :opened, project: example_class.project)
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.metrics.update!(first_added_to_board_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue creation time and last edit time' do
+        let(:start_event_identifier) { :issue_created }
+        let(:end_event_identifier) { :issue_last_edited }
+
+        def create_data_for_start_event(example_class)
+          create(:issue, :opened, project: example_class.project)
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.update!(last_edited_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue label added time and label removed time' do
+        let(:start_event_identifier) { :issue_label_added }
+        let(:end_event_identifier) { :issue_label_removed }
+
+        before do
+          stage.start_event_label = label
+          stage.end_event_label = label
+        end
+
+        def create_data_for_start_event(example_class)
+          issue = create(:issue, :opened, project: example_class.project)
+
+          Issues::UpdateService.new(
+            example_class.project,
+            user,
+            label_ids: [example_class.label.id]
+          ).execute(issue)
+
+          issue
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          Issues::UpdateService.new(
+            example_class.project,
+            user,
+            label_ids: []
+          ).execute(resource)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue label added time and another issue label added time' do
+        let(:start_event_identifier) { :issue_label_added }
+        let(:end_event_identifier) { :issue_label_added }
+
+        before do
+          stage.start_event_label = label
+          stage.end_event_label = other_label
+        end
+
+        def create_data_for_start_event(example_class)
+          issue = create(:issue, :opened, project: example_class.project)
+
+          Issues::UpdateService.new(
+            example_class.project,
+            user,
+            label_ids: [example_class.label.id]
+          ).execute(issue)
+
+          issue
+        end
+
+        def create_data_for_end_event(issue, example_class)
+          Issues::UpdateService.new(
+            example_class.project,
+            user,
+            label_ids: [example_class.label.id, example_class.other_label.id]
+          ).execute(issue)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between issue creation time and issue label added time' do
+        let(:start_event_identifier) { :issue_created }
+        let(:end_event_identifier) { :issue_label_added }
+
+        before do
+          stage.end_event_label = label
+        end
+
+        def create_data_for_start_event(example_class)
+          create(:issue, :opened, project: example_class.project)
+        end
+
+        def create_data_for_end_event(issue, example_class)
+          Issues::UpdateService.new(
+            example_class.project,
+            user,
+            label_ids: [example_class.label.id]
+          ).execute(issue)
         end
 
         it_behaves_like 'custom cycle analytics stage'
@@ -127,12 +286,76 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         it_behaves_like 'custom cycle analytics stage'
       end
+
+      describe 'between merge request creation time and close time' do
+        let(:start_event_identifier) { :merge_request_created }
+        let(:end_event_identifier) { :merge_request_closed }
+
+        def create_data_for_start_event(example_class)
+          create(:merge_request, source_project: example_class.project, allow_broken: true)
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.metrics.update!(latest_closed_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between merge request creation time and last edit time' do
+        let(:start_event_identifier) { :merge_request_created }
+        let(:end_event_identifier) { :merge_request_last_edited }
+
+        def create_data_for_start_event(example_class)
+          create(:merge_request, source_project: example_class.project, allow_broken: true)
+        end
+
+        def create_data_for_end_event(resource, example_class)
+          resource.update!(last_edited_at: Time.now)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
+
+      describe 'between merge request label added time and label removed time' do
+        let(:start_event_identifier) { :merge_request_label_added }
+        let(:end_event_identifier) { :merge_request_label_removed }
+
+        before do
+          stage.start_event_label = label
+          stage.end_event_label = label
+        end
+
+        def create_data_for_start_event(example_class)
+          mr = create(:merge_request, source_project: example_class.project, allow_broken: true)
+
+          MergeRequests::UpdateService.new(
+            example_class.project,
+            user,
+            label_ids: [label.id]
+          ).execute(mr)
+
+          mr
+        end
+
+        def create_data_for_end_event(mr, example_class)
+          MergeRequests::UpdateService.new(
+            example_class.project,
+            user,
+            label_ids: []
+          ).execute(mr)
+        end
+
+        it_behaves_like 'custom cycle analytics stage'
+      end
     end
   end
 
   context 'when `Analytics::CycleAnalytics::ProjectStage` is given' do
     it_behaves_like 'test various start and end event combinations' do
-      let_it_be(:project) { create(:project, :repository) }
+      let_it_be(:project) { create(:project, :repository, group: create(:group)) }
+      let_it_be(:label) { create(:group_label, group: project.group) }
+      let_it_be(:other_label) { create(:group_label, group: project.group) }
 
       let(:stage) do
         Analytics::CycleAnalytics::ProjectStage.new(
@@ -153,6 +376,8 @@ describe Gitlab::Analytics::CycleAnalytics::DataCollector do
     it_behaves_like 'test various start and end event combinations' do
       let_it_be(:group) { create(:group) }
       let_it_be(:project) { create(:project, :repository, group: group) }
+      let_it_be(:label) { create(:group_label, group: group) }
+      let_it_be(:other_label) { create(:group_label, group: group) }
 
       let(:stage) do
         Analytics::CycleAnalytics::GroupStage.new(

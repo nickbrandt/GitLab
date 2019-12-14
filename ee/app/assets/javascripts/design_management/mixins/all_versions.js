@@ -21,7 +21,7 @@ export default {
           atVersion: null,
         };
       },
-      update: data => data.project.issue.designs.versions.edges,
+      update: data => data.project.issue.designCollection.versions.edges,
     },
   },
   computed: {
@@ -37,10 +37,17 @@ export default {
         ? `gid://gitlab/DesignManagement::Version/${this.$route.query.version}`
         : null;
     },
+    latestVersionId() {
+      const latestVersion = this.allVersions[0];
+      return latestVersion && findVersionId(latestVersion.node.id);
+    },
     isLatestVersion() {
       if (this.allVersions.length > 0) {
-        const versionId = findVersionId(this.allVersions[0].node.id);
-        return !this.$route.query.version || this.$route.query.version === versionId;
+        return (
+          !this.$route.query.version ||
+          !this.latestVersionId ||
+          this.$route.query.version === this.latestVersionId
+        );
       }
       return true;
     },

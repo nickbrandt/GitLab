@@ -18,6 +18,10 @@ describe API::Settings, 'Settings' do
       expect(json_response['password_authentication_enabled']).to be_truthy
       expect(json_response['plantuml_enabled']).to be_falsey
       expect(json_response['plantuml_url']).to be_nil
+      expect(json_response['default_ci_config_path']).to be_nil
+      expect(json_response['sourcegraph_enabled']).to be_falsey
+      expect(json_response['sourcegraph_url']).to be_nil
+      expect(json_response['sourcegraph_public_only']).to be_truthy
       expect(json_response['default_project_visibility']).to be_a String
       expect(json_response['default_snippet_visibility']).to be_a String
       expect(json_response['default_group_visibility']).to be_a String
@@ -32,6 +36,7 @@ describe API::Settings, 'Settings' do
       expect(json_response['allow_local_requests_from_system_hooks']).to be(true)
       expect(json_response).not_to have_key('performance_bar_allowed_group_path')
       expect(json_response).not_to have_key('performance_bar_enabled')
+      expect(json_response['snippet_size_limit']).to eq(50.megabytes)
     end
   end
 
@@ -44,17 +49,22 @@ describe API::Settings, 'Settings' do
         storages = Gitlab.config.repositories.storages
                      .merge({ 'custom' => 'tmp/tests/custom_repositories' })
         allow(Gitlab.config.repositories).to receive(:storages).and_return(storages)
+        Feature.get(:sourcegraph).enable
       end
 
       it "updates application settings" do
         put api("/application/settings", admin),
           params: {
+            default_ci_config_path: 'debian/salsa-ci.yml',
             default_projects_limit: 3,
             default_project_creation: 2,
             password_authentication_enabled_for_web: false,
             repository_storages: ['custom'],
             plantuml_enabled: true,
             plantuml_url: 'http://plantuml.example.com',
+            sourcegraph_enabled: true,
+            sourcegraph_url: 'https://sourcegraph.com',
+            sourcegraph_public_only: false,
             default_snippet_visibility: 'internal',
             restricted_visibility_levels: ['public'],
             default_artifacts_expire_in: '2 days',
@@ -76,16 +86,21 @@ describe API::Settings, 'Settings' do
             allow_local_requests_from_web_hooks_and_services: true,
             allow_local_requests_from_system_hooks: false,
             push_event_hooks_limit: 2,
-            push_event_activities_limit: 2
+            push_event_activities_limit: 2,
+            snippet_size_limit: 5
           }
 
         expect(response).to have_gitlab_http_status(200)
+        expect(json_response['default_ci_config_path']).to eq('debian/salsa-ci.yml')
         expect(json_response['default_projects_limit']).to eq(3)
         expect(json_response['default_project_creation']).to eq(::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS)
         expect(json_response['password_authentication_enabled_for_web']).to be_falsey
         expect(json_response['repository_storages']).to eq(['custom'])
         expect(json_response['plantuml_enabled']).to be_truthy
         expect(json_response['plantuml_url']).to eq('http://plantuml.example.com')
+        expect(json_response['sourcegraph_enabled']).to be_truthy
+        expect(json_response['sourcegraph_url']).to eq('https://sourcegraph.com')
+        expect(json_response['sourcegraph_public_only']).to eq(false)
         expect(json_response['default_snippet_visibility']).to eq('internal')
         expect(json_response['restricted_visibility_levels']).to eq(['public'])
         expect(json_response['default_artifacts_expire_in']).to eq('2 days')
@@ -108,6 +123,7 @@ describe API::Settings, 'Settings' do
         expect(json_response['allow_local_requests_from_system_hooks']).to eq(false)
         expect(json_response['push_event_hooks_limit']).to eq(2)
         expect(json_response['push_event_activities_limit']).to eq(2)
+        expect(json_response['snippet_size_limit']).to eq(5)
       end
     end
 
@@ -178,7 +194,7 @@ describe API::Settings, 'Settings' do
           snowplow_collector_hostname: "snowplow.example.com",
           snowplow_cookie_domain: ".example.com",
           snowplow_enabled: true,
-          snowplow_site_id: "site_id",
+          snowplow_app_id: "app_id",
           snowplow_iglu_registry_url: 'https://example.com'
         }
       end
@@ -223,26 +239,39 @@ describe API::Settings, 'Settings' do
       end
     end
 
-    context "pendo tracking settings" do
+    context 'EKS integration settings' do
+      let(:attribute_names) { settings.keys.map(&:to_s) }
+      let(:sensitive_attributes) { %w(eks_secret_access_key) }
+      let(:exposed_attributes) { attribute_names - sensitive_attributes }
+
       let(:settings) do
         {
-          pendo_url: "https://pendo.example.com",
-          pendo_enabled: true
+          eks_integration_enabled: true,
+          eks_account_id: '123456789012',
+          eks_access_key_id: 'access-key-id-12',
+          eks_secret_access_key: 'secret-access-key'
         }
       end
 
-      let(:attribute_names) { settings.keys.map(&:to_s) }
-
-      it "includes the attributes in the API" do
+      it 'includes attributes in the API' do
         get api("/application/settings", admin)
 
         expect(response).to have_gitlab_http_status(200)
-        attribute_names.each do |attribute|
+        exposed_attributes.each do |attribute|
           expect(json_response.keys).to include(attribute)
         end
       end
 
-      it "allows updating the settings" do
+      it 'does not include sensitive attributes in the API' do
+        get api("/application/settings", admin)
+
+        expect(response).to have_gitlab_http_status(200)
+        sensitive_attributes.each do |attribute|
+          expect(json_response.keys).not_to include(attribute)
+        end
+      end
+
+      it 'allows updating the settings' do
         put api("/application/settings", admin), params: settings
 
         expect(response).to have_gitlab_http_status(200)
@@ -251,22 +280,16 @@ describe API::Settings, 'Settings' do
         end
       end
 
-      context "missing pendo_url value when pendo_enabled is true" do
-        it "returns a blank parameter error message" do
-          put api("/application/settings", admin), params: { pendo_enabled: true }
+      context 'EKS integration is enabled but params are blank' do
+        let(:settings) { Hash[eks_integration_enabled: true] }
+
+        it 'does not update the settings' do
+          put api("/application/settings", admin), params: settings
 
           expect(response).to have_gitlab_http_status(400)
-          expect(json_response["error"]).to eq("pendo_url is missing")
-        end
-
-        it "handles validation errors" do
-          put api("/application/settings", admin), params: settings.merge({
-                                                                            pendo_url: nil
-                                                                          })
-
-          expect(response).to have_gitlab_http_status(400)
-          message = json_response["message"]
-          expect(message["pendo_url"]).to include("can't be blank")
+          expect(json_response['error']).to include('eks_account_id is missing')
+          expect(json_response['error']).to include('eks_access_key_id is missing')
+          expect(json_response['error']).to include('eks_secret_access_key is missing')
         end
       end
     end
@@ -343,6 +366,15 @@ describe API::Settings, 'Settings' do
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['domain_blacklist_enabled']).to be(true)
         expect(json_response['domain_blacklist']).to eq(['domain3.com', '*.domain4.com'])
+      end
+    end
+
+    context "missing sourcegraph_url value when sourcegraph_enabled is true" do
+      it "returns a blank parameter error message" do
+        put api("/application/settings", admin), params: { sourcegraph_enabled: true }
+
+        expect(response).to have_gitlab_http_status(400)
+        expect(json_response['error']).to eq('sourcegraph_url is missing')
       end
     end
   end

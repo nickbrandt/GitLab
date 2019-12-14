@@ -31,7 +31,7 @@ module Atlassian
         expose :created_at, as: :authorTimestamp
 
         expose :url do |commit, options|
-          project_commits_url(options[:project], commit.id)
+          project_commit_url(options[:project], commit.id)
         end
 
         private

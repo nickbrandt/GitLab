@@ -199,6 +199,13 @@ describe Namespace do
 
       expect(described_class.find_by_pages_host(host)).to eq(namespace)
     end
+
+    it "returns no result if the provided host is not subdomain of the Pages host" do
+      create(:namespace, name: 'namespace.io')
+      host = "namespace.io"
+
+      expect(described_class.find_by_pages_host(host)).to eq(nil)
+    end
   end
 
   describe '#ancestors_upto' do
@@ -278,6 +285,44 @@ describe Namespace do
 
             namespace.update(path: namespace.full_path + '_new')
           end
+        end
+      end
+
+      shared_examples 'move_dir without repository storage feature' do |storage_version|
+        let(:namespace) { create(:namespace) }
+        let(:gitlab_shell) { namespace.gitlab_shell }
+        let!(:project) { create(:project_empty_repo, namespace: namespace, storage_version: storage_version) }
+
+        it 'calls namespace service' do
+          expect(gitlab_shell).to receive(:add_namespace).and_return(true)
+          expect(gitlab_shell).to receive(:mv_namespace).and_return(true)
+
+          namespace.move_dir
+        end
+      end
+
+      shared_examples 'move_dir with repository storage feature' do |storage_version|
+        let(:namespace) { create(:namespace) }
+        let(:gitlab_shell) { namespace.gitlab_shell }
+        let!(:project) { create(:project_empty_repo, namespace: namespace, storage_version: storage_version) }
+
+        it 'does not call namespace service' do
+          expect(gitlab_shell).not_to receive(:add_namespace)
+          expect(gitlab_shell).not_to receive(:mv_namespace)
+
+          namespace.move_dir
+        end
+      end
+
+      context 'project is without repository storage feature' do
+        [nil, 0].each do |storage_version|
+          it_behaves_like 'move_dir without repository storage feature', storage_version
+        end
+      end
+
+      context 'project has repository storage feature' do
+        [1, 2].each do |storage_version|
+          it_behaves_like 'move_dir with repository storage feature', storage_version
         end
       end
 

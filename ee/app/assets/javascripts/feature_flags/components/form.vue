@@ -1,7 +1,14 @@
 <script>
 import Vue from 'vue';
 import _ from 'underscore';
-import { GlButton, GlBadge, GlTooltip, GlTooltipDirective } from '@gitlab/ui';
+import {
+  GlButton,
+  GlBadge,
+  GlTooltip,
+  GlTooltipDirective,
+  GlFormTextarea,
+  GlFormCheckbox,
+} from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
@@ -10,27 +17,33 @@ import EnvironmentsDropdown from './environments_dropdown.vue';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+  ROLLOUT_STRATEGY_USER_ID,
   ALL_ENVIRONMENTS_NAME,
   INTERNAL_ID_PREFIX,
 } from '../constants';
 import { createNewEnvironmentScope } from '../store/modules/helpers';
-import UserWithId from './strategies/user_with_id.vue';
 
 export default {
   components: {
     GlButton,
     GlBadge,
+    GlFormTextarea,
+    GlFormCheckbox,
     GlTooltip,
     ToggleButton,
     Icon,
     EnvironmentsDropdown,
-    UserWithId,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
   },
   mixins: [featureFlagsMixin()],
   props: {
+    active: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     name: {
       type: String,
       required: false,
@@ -77,6 +90,7 @@ export default {
 
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+  ROLLOUT_STRATEGY_USER_ID,
 
   // Matches numbers 0 through 100
   rolloutPercentageRegex: /^[0-9]$|^[1-9][0-9]$|^100$/,
@@ -101,11 +115,6 @@ export default {
     },
     permissionsFlag() {
       return this.glFeatures.featureFlagPermissions;
-    },
-
-    userIds() {
-      const scope = this.formScopes.find(s => Array.isArray(s.rolloutUserIds)) || {};
-      return scope.rolloutUserIds || [];
     },
   },
   methods: {
@@ -152,14 +161,8 @@ export default {
         name: this.formName,
         description: this.formDescription,
         scopes: this.formScopes,
+        active: this.active,
       });
-    },
-
-    updateUserIds(userIds) {
-      this.formScopes = this.formScopes.map(s => ({
-        ...s,
-        rolloutUserIds: userIds,
-      }));
     },
 
     canUpdateScope(scope) {
@@ -186,6 +189,18 @@ export default {
      */
     rolloutPercentageId(index) {
       return `rollout-percentage-${index}`;
+    },
+    rolloutUserId(index) {
+      return `rollout-user-id-${index}`;
+    },
+
+    shouldDisplayIncludeUserIds(scope) {
+      return ![ROLLOUT_STRATEGY_ALL_USERS, ROLLOUT_STRATEGY_USER_ID].includes(
+        scope.rolloutStrategy,
+      );
+    },
+    shouldDisplayUserIds(scope) {
+      return scope.rolloutStrategy === ROLLOUT_STRATEGY_USER_ID || scope.shouldIncludeUserIds;
     },
   },
 };
@@ -279,7 +294,7 @@ export default {
                 <div class="table-mobile-content js-feature-flag-status">
                   <toggle-button
                     :value="scope.active"
-                    :disabled-input="!canUpdateScope(scope)"
+                    :disabled-input="!active || !canUpdateScope(scope)"
                     @change="status => (scope.active = status)"
                   />
                 </div>
@@ -300,12 +315,15 @@ export default {
                       :disabled="!scope.active"
                       class="form-control select-control w-100 js-rollout-strategy"
                     >
-                      <option :value="$options.ROLLOUT_STRATEGY_ALL_USERS">{{
-                        s__('FeatureFlags|All users')
-                      }}</option>
-                      <option :value="$options.ROLLOUT_STRATEGY_PERCENT_ROLLOUT">{{
-                        s__('FeatureFlags|Percent rollout (logged in users)')
-                      }}</option>
+                      <option :value="$options.ROLLOUT_STRATEGY_ALL_USERS">
+                        {{ s__('FeatureFlags|All users') }}
+                      </option>
+                      <option :value="$options.ROLLOUT_STRATEGY_PERCENT_ROLLOUT">
+                        {{ s__('FeatureFlags|Percent rollout (logged in users)') }}
+                      </option>
+                      <option :value="$options.ROLLOUT_STRATEGY_USER_ID">
+                        {{ s__('FeatureFlags|User IDs') }}
+                      </option>
                     </select>
                     <i aria-hidden="true" data-hidden="true" class="fa fa-chevron-down"></i>
                   </div>
@@ -341,6 +359,24 @@ export default {
                       }}
                     </gl-tooltip>
                     <span class="ml-1">%</span>
+                  </div>
+                  <div class="d-flex flex-column align-items-start mt-2 w-100">
+                    <gl-form-checkbox
+                      v-if="shouldDisplayIncludeUserIds(scope)"
+                      v-model="scope.shouldIncludeUserIds"
+                    >
+                      {{ s__('FeatureFlags|Include additional user IDs') }}
+                    </gl-form-checkbox>
+                    <template v-if="shouldDisplayUserIds(scope)">
+                      <label :for="rolloutUserId(index)" class="mb-2">
+                        {{ s__('FeatureFlags|User IDs') }}
+                      </label>
+                      <gl-form-textarea
+                        :id="rolloutUserId(index)"
+                        v-model="scope.rolloutUserIds"
+                        class="w-100"
+                      />
+                    </template>
                   </div>
                 </div>
               </div>
@@ -384,7 +420,11 @@ export default {
                   {{ s__('FeatureFlags|Status') }}
                 </div>
                 <div class="table-mobile-content js-feature-flag-status">
-                  <toggle-button :value="false" @change="createNewScope({ active: true })" />
+                  <toggle-button
+                    :disabled-input="!active"
+                    :value="false"
+                    @change="createNewScope({ active: true })"
+                  />
                 </div>
               </div>
 
@@ -413,7 +453,6 @@ export default {
         </div>
       </div>
     </fieldset>
-    <user-with-id :value="userIds" @input="updateUserIds" />
 
     <div class="form-actions">
       <gl-button

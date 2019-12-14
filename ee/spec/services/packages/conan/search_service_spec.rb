@@ -10,22 +10,11 @@ describe Packages::Conan::SearchService do
 
   subject { described_class.new(user, query: query) }
 
+  before do
+    project.add_developer(user)
+  end
+
   describe '#execute' do
-    context 'feature unavailable' do
-      let(:query) { '' }
-
-      before do
-        stub_feature_flags(conan_package_registry: false)
-      end
-
-      it 'responds with 404 not found' do
-        result = subject.execute
-
-        expect(result.http_status).to eq :not_found
-        expect(result.message).to eq('not found')
-      end
-    end
-
     context 'with wildcard' do
       let(:partial_name) { conan_package.name.first[0, 3] }
       let(:query) { "#{partial_name}*" }
@@ -34,7 +23,7 @@ describe Packages::Conan::SearchService do
         result = subject.execute
 
         expect(result.status).to eq :success
-        expect(result.payload).to eq(results: [conan_package.name, conan_package2.name])
+        expect(result.payload).to eq(results: [conan_package.conan_recipe, conan_package2.conan_recipe])
       end
     end
 
@@ -50,24 +39,24 @@ describe Packages::Conan::SearchService do
     end
 
     context 'with no wildcard' do
-      let(:query) { conan_package.name.split('/').first }
+      let(:query) { conan_package.name }
 
       it 'makes a search using the beginning of the recipe' do
         result = subject.execute
 
         expect(result.status).to eq :success
-        expect(result.payload).to eq(results: [conan_package.name])
+        expect(result.payload).to eq(results: [conan_package.conan_recipe])
       end
     end
 
     context 'with full recipe match' do
-      let(:query) { conan_package.name }
+      let(:query) { conan_package.conan_recipe }
 
       it 'makes an exact search' do
         result = subject.execute
 
         expect(result.status).to eq :success
-        expect(result.payload).to eq(results: [conan_package.name])
+        expect(result.payload).to eq(results: [conan_package.conan_recipe])
       end
     end
 

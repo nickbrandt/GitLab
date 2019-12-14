@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import * as jqueryMatchers from 'custom-jquery-matchers';
 import $ from 'jquery';
-import Translate from '~/vue_shared/translate';
 import { config as testUtilsConfig } from '@vue/test-utils';
+import Translate from '~/vue_shared/translate';
 import { initializeTestTimeout } from './helpers/timeout';
 import { getJSONFixture, loadHTMLFixture, setHTMLFixture } from './helpers/fixtures';
 import { setupManualMocks } from './mocks/mocks_helper';
@@ -39,6 +39,9 @@ Vue.use(Translate);
 Object.defineProperty(global.Element.prototype, 'innerText', {
   get() {
     return this.textContent;
+  },
+  set(value) {
+    this.textContext = value;
   },
   configurable: true, // make it so that it doesn't blow chunks on re-running tests with things like --watch
 });

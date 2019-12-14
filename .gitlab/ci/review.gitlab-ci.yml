@@ -23,8 +23,10 @@ build-qa-image:
   stage: prepare
   script:
     - '[[ ! -d "ee/" ]] || export GITLAB_EDITION="ee"'
+    - export QA_MASTER_IMAGE="${CI_REGISTRY}/${CI_PROJECT_PATH}/gitlab/gitlab-${GITLAB_EDITION}-qa:master"
     - export QA_IMAGE="${CI_REGISTRY}/${CI_PROJECT_PATH}/gitlab/gitlab-${GITLAB_EDITION}-qa:${CI_COMMIT_REF_SLUG}"
-    - time docker build --cache-from gitlab/gitlab-${GITLAB_EDITION}-qa:nightly --tag ${QA_IMAGE} --file ./qa/Dockerfile ./
+    - time docker pull "${QA_MASTER_IMAGE}"
+    - time docker build --cache-from "${QA_MASTER_IMAGE}" --tag ${QA_IMAGE} --file ./qa/Dockerfile ./
     - echo "${CI_JOB_TOKEN}" | docker login --username gitlab-ci-token --password-stdin ${CI_REGISTRY}
     - time docker push ${QA_IMAGE}
 
@@ -94,7 +96,7 @@ schedule:review-build-cng:
   variables:
     HOST_SUFFIX: "${CI_ENVIRONMENT_SLUG}"
     DOMAIN: "-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}"
-    GITLAB_HELM_CHART_REF: "v2.4.4"
+    GITLAB_HELM_CHART_REF: "v2.5.1"
     GITLAB_EDITION: "ce"
   environment:
     name: review/${CI_COMMIT_REF_NAME}
@@ -114,23 +116,14 @@ schedule:review-build-cng:
     - source scripts/utils.sh
     - install_api_client_dependencies_with_apk
     - source scripts/review_apps/review-apps.sh
-    - export REVIEW_APP_CONFIG_CHANGED=$(base_config_changed)
   script:
-    - date
     - check_kube_domain
-    - date
     - ensure_namespace
-    - date
     - install_tiller
-    - date
     - install_external_dns
-    - date
     - download_chart
     - date
     - deploy || (display_deployment_debug && exit 1)
-    - date
-    - add_license
-    - date
   artifacts:
     paths: [review_app_url.txt]
     expire_in: 2 days
@@ -141,13 +134,11 @@ review-deploy:
     - .review-deploy-base
     - .only-review
     - .only:changes-code-qa
-  needs: ["review-build-cng"]
 
 schedule:review-deploy:
   extends:
     - .review-deploy-base
     - .only-review-schedules
-  needs: ["schedule:review-build-cng"]
 
 .base-review-stop:
   extends:
@@ -286,7 +277,7 @@ parallel-spec-reports:
     - .only-review
     - .only:changes-code-qa
   image: ruby:2.6-alpine
-  stage: post-test
+  stage: post-qa
   dependencies: ["review-qa-all"]
   variables:
     NEW_PARALLEL_SPECS_REPORT: qa/report-new.html

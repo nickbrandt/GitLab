@@ -45,6 +45,7 @@ describe('Dependencies mutations', () => {
     const reportInfo = {
       status: REPORT_STATUS.jobFailed,
       job_path: 'foo',
+      generated_at: 'foo',
     };
 
     beforeEach(() => {
@@ -60,6 +61,7 @@ describe('Dependencies mutations', () => {
       expect(state.reportInfo).toEqual({
         status: REPORT_STATUS.jobFailed,
         jobPath: 'foo',
+        generatedAt: 'foo',
       });
     });
   });
@@ -78,6 +80,7 @@ describe('Dependencies mutations', () => {
       expect(state.reportInfo).toEqual({
         status: REPORT_STATUS.ok,
         jobPath: '',
+        generatedAt: '',
       });
     });
   });

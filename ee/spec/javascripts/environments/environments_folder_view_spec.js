@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import environmentsFolderViewComponent from '~/environments/folder/environments_folder_view.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { environmentsList } from 'spec/environments/mock_data';
+import axios from '~/lib/utils/axios_utils';
+import environmentsFolderViewComponent from '~/environments/folder/environments_folder_view.vue';
 
 describe('Environments Folder View', () => {
   let Component;

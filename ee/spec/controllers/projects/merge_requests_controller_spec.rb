@@ -462,23 +462,6 @@ describe Projects::MergeRequestsController do
       end
     end
 
-    context 'when something went wrong on our system' do
-      let(:comparison_status) { {} }
-
-      it 'does not send polling interval' do
-        expect(::Gitlab::PollingInterval).not_to receive(:set_header)
-
-        subject
-      end
-
-      it 'returns 500 HTTP status' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:internal_server_error)
-        expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
-      end
-    end
-
     context 'public project with private builds' do
       let(:comparison_status) { {} }
       let(:project) { create(:project, :public, :builds_private) }
@@ -559,23 +542,6 @@ describe Projects::MergeRequestsController do
 
         expect(response).to have_gitlab_http_status(:bad_request)
         expect(json_response).to eq({ 'status_reason' => 'Failed to parse container scanning reports' })
-      end
-    end
-
-    context 'when something went wrong on our system' do
-      let(:comparison_status) { {} }
-
-      it 'does not send polling interval' do
-        expect(::Gitlab::PollingInterval).not_to receive(:set_header)
-
-        subject
-      end
-
-      it 'returns 500 HTTP status' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:internal_server_error)
-        expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
       end
     end
 
@@ -662,23 +628,6 @@ describe Projects::MergeRequestsController do
       end
     end
 
-    context 'when something went wrong on our system' do
-      let(:comparison_status) { {} }
-
-      it 'does not send polling interval' do
-        expect(::Gitlab::PollingInterval).not_to receive(:set_header)
-
-        subject
-      end
-
-      it 'returns 500 HTTP status' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:internal_server_error)
-        expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
-      end
-    end
-
     context 'public project with private builds' do
       let(:comparison_status) { {} }
       let(:project) { create(:project, :public, :builds_private) }
@@ -688,6 +637,95 @@ describe Projects::MergeRequestsController do
       end
 
       it 'restricts unauthorized access' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  describe 'GET #dast_reports' do
+    let(:merge_request) { create(:ee_merge_request, :with_dast_reports, source_project: project) }
+    let(:params) do
+      {
+        namespace_id: project.namespace.to_param,
+        project_id: project,
+        id: merge_request.iid
+      }
+    end
+
+    subject { get :dast_reports, params: params, format: :json }
+
+    before do
+      allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
+        .with(::Ci::CompareDastReportsService, project.users.first).and_return(comparison_status)
+    end
+
+    context 'when comparison is being processed' do
+      let(:comparison_status) { { status: :parsing } }
+
+      it 'sends polling interval' do
+        expect(::Gitlab::PollingInterval).to receive(:set_header)
+
+        subject
+      end
+
+      it 'returns 204 HTTP status' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:no_content)
+      end
+    end
+
+    context 'when comparison is done' do
+      let(:comparison_status) { { status: :parsed, data: { added: [], fixed: [], existing: [] } } }
+
+      it 'does not send polling interval' do
+        expect(::Gitlab::PollingInterval).not_to receive(:set_header)
+
+        subject
+      end
+
+      it 'returns 200 HTTP status' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response).to eq({ "added" => [], "fixed" => [], "existing" => [] })
+      end
+    end
+
+    context 'when user created corrupted vulnerability reports' do
+      let(:comparison_status) { { status: :error, status_reason: 'Failed to parse DAST reports' } }
+
+      it 'does not send polling interval' do
+        expect(::Gitlab::PollingInterval).not_to receive(:set_header)
+
+        subject
+      end
+
+      it 'returns 400 HTTP status' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(json_response).to eq({ 'status_reason' => 'Failed to parse DAST reports' })
+      end
+    end
+
+    context 'public project with private builds' do
+      let(:comparison_status) { {} }
+      let(:project) { create(:project, :public, :builds_private) }
+
+      it 'restricts access to signed out users' do
+        sign_out user
+
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+
+      it 'restricts access to other users' do
+        sign_in create(:user)
+
         subject
 
         expect(response).to have_gitlab_http_status(404)
@@ -761,23 +799,6 @@ describe Projects::MergeRequestsController do
         expect(json_response).to eq({ 'status_reason' => 'Failed to parse license scanning reports' })
       end
     end
-
-    context 'when something went wrong on our system' do
-      let(:comparison_status) { {} }
-
-      it 'does not send polling interval' do
-        expect(::Gitlab::PollingInterval).not_to receive(:set_header)
-
-        subject
-      end
-
-      it 'returns 500 HTTP status' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:internal_server_error)
-        expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
-      end
-    end
   end
 
   describe 'GET #metrics_reports' do
@@ -847,22 +868,10 @@ describe Projects::MergeRequestsController do
         expect(json_response).to eq({ 'status_reason' => 'Failed to parse test reports' })
       end
     end
+  end
 
-    context 'when something went wrong on our system' do
-      let(:comparison_status) { {} }
-
-      it 'does not send polling interval' do
-        expect(::Gitlab::PollingInterval).not_to receive(:set_header)
-
-        subject
-      end
-
-      it 'returns 500 HTTP status' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:internal_server_error)
-        expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
-      end
-    end
+  it_behaves_like DescriptionDiffActions do
+    let_it_be(:project)  { create(:project, :repository, :public) }
+    let_it_be(:issuable) { create(:merge_request, source_project: project) }
   end
 end

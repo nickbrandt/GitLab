@@ -23,8 +23,8 @@ describe Gitlab::Ci::Config::Entry::Job do
 
       let(:result) do
         %i[before_script script stage type after_script cache
-           image services only except rules variables artifacts
-           environment coverage retry]
+           image services only except rules needs variables artifacts
+           environment coverage retry interruptible timeout tags]
       end
 
       it { is_expected.to match_array result }
@@ -93,7 +93,7 @@ describe Gitlab::Ci::Config::Entry::Job do
 
       context 'when delayed job' do
         context 'when start_in is specified' do
-          let(:config) { { script: 'echo', when: 'delayed', start_in: '1 day' } }
+          let(:config) { { script: 'echo', when: 'delayed', start_in: '1 week' } }
 
           it { expect(entry).to be_valid }
         end
@@ -232,11 +232,9 @@ describe Gitlab::Ci::Config::Entry::Job do
 
       context 'when delayed job' do
         context 'when start_in is specified' do
-          let(:config) { { script: 'echo', when: 'delayed', start_in: '1 day' } }
+          let(:config) { { script: 'echo', when: 'delayed', start_in: '1 week' } }
 
-          it 'returns error about invalid type' do
-            expect(entry).to be_valid
-          end
+          it { expect(entry).to be_valid }
         end
 
         context 'when start_in is empty' do
@@ -257,8 +255,8 @@ describe Gitlab::Ci::Config::Entry::Job do
           end
         end
 
-        context 'when start_in is longer than one day' do
-          let(:config) { { when: 'delayed', start_in: '2 days' } }
+        context 'when start_in is longer than one week' do
+          let(:config) { { when: 'delayed', start_in: '8 days' } }
 
           it 'returns error about exceeding the limit' do
             expect(entry).not_to be_valid
@@ -384,21 +382,6 @@ describe Gitlab::Ci::Config::Entry::Job do
       end
 
       context 'when has needs' do
-        context 'that are not a array of strings' do
-          let(:config) do
-            {
-              stage: 'test',
-              script: 'echo',
-              needs: 'build-job'
-            }
-          end
-
-          it 'returns error about invalid type' do
-            expect(entry).not_to be_valid
-            expect(entry.errors).to include 'job needs should be an array of strings'
-          end
-        end
-
         context 'when have dependencies that are not subset of needs' do
           let(:config) do
             {
@@ -432,21 +415,21 @@ describe Gitlab::Ci::Config::Entry::Job do
 
       context 'when timeout value is not correct' do
         context 'when it is higher than instance wide timeout' do
-          let(:config) { { timeout: '3 months' } }
+          let(:config) { { timeout: '3 months', script: 'test' } }
 
           it 'returns error about value too high' do
             expect(entry).not_to be_valid
             expect(entry.errors)
-              .to include "job timeout should not exceed the limit"
+              .to include "timeout config should not exceed the limit"
           end
         end
 
         context 'when it is not a duration' do
-          let(:config) { { timeout: 100 } }
+          let(:config) { { timeout: 100, script: 'test' } }
 
           it 'returns error about wrong value' do
             expect(entry).not_to be_valid
-            expect(entry.errors).to include 'job timeout should be a duration'
+            expect(entry.errors).to include 'timeout config should be a duration'
           end
         end
       end

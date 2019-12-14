@@ -37,7 +37,7 @@ export default () => {
     })
     .subscribe(({ data }) => {
       if (badge) {
-        badge.textContent = data.project.issue.designs.designs.edges.length;
+        badge.textContent = data.project.issue.designCollection.designs.edges.length;
       }
     });
 

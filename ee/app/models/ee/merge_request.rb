@@ -23,7 +23,7 @@ module EE
       has_many :approver_groups, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approval_rules, class_name: 'ApprovalMergeRequestRule', inverse_of: :merge_request
       has_many :draft_notes
-      has_one :merge_train, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+      has_one :merge_train, inverse_of: :merge_request, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
       has_many :blocks_as_blocker,
                class_name: 'MergeRequestBlock',
@@ -44,6 +44,14 @@ module EE
       participant :participant_approvers
 
       accepts_nested_attributes_for :approval_rules, allow_destroy: true
+
+      state_machine :state_id do
+        after_transition any => :merged do |merge_request|
+          merge_request.merge_train&.merged!
+
+          true
+        end
+      end
     end
 
     class_methods do
@@ -126,62 +134,72 @@ module EE
       end
     end
 
+    def enabled_reports
+      {
+        sast: report_type_enabled?(:sast),
+        container_scanning: report_type_enabled?(:container_scanning),
+        dast: report_type_enabled?(:dast),
+        dependency_scanning: report_type_enabled?(:dependency_scanning),
+        license_management: report_type_enabled?(:license_management)
+      }
+    end
+
     def has_dependency_scanning_reports?
-      actual_head_pipeline&.has_reports?(::Ci::JobArtifact.dependency_list_reports)
+      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.dependency_list_reports))
     end
 
     def compare_dependency_scanning_reports(current_user)
-      unless has_dependency_scanning_reports?
-        return { status: :error, status_reason: 'This merge request does not have dependency scanning reports' }
-      end
+      return missing_report_error("dependency scanning") unless has_dependency_scanning_reports?
 
       compare_reports(::Ci::CompareDependencyScanningReportsService, current_user)
     end
 
     def has_license_management_reports?
-      actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_management_reports)
+      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_management_reports))
     end
 
     def has_container_scanning_reports?
-      actual_head_pipeline&.has_reports?(::Ci::JobArtifact.container_scanning_reports)
+      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.container_scanning_reports))
     end
 
     def compare_container_scanning_reports(current_user)
-      unless has_container_scanning_reports?
-        return { status: :error, status_reason: 'This merge request does not have container scanning reports' }
-      end
+      return missing_report_error("container scanning") unless has_container_scanning_reports?
 
       compare_reports(::Ci::CompareContainerScanningReportsService, current_user)
     end
 
     def has_sast_reports?
-      actual_head_pipeline&.has_reports?(::Ci::JobArtifact.sast_reports)
+      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.sast_reports))
     end
 
     def compare_sast_reports(current_user)
-      unless has_sast_reports?
-        return { status: :error, status_reason: 'This merge request does not have SAST reports' }
-      end
+      return missing_report_error("SAST") unless has_sast_reports?
 
       compare_reports(::Ci::CompareSastReportsService, current_user)
     end
 
+    def has_dast_reports?
+      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.dast_reports))
+    end
+
+    def compare_dast_reports(current_user)
+      return missing_report_error("DAST") unless has_dast_reports?
+
+      compare_reports(::Ci::CompareDastReportsService, current_user)
+    end
+
     def compare_license_management_reports(current_user)
-      unless has_license_management_reports?
-        return { status: :error, status_reason: 'This merge request does not have license management reports' }
-      end
+      return missing_report_error("license management") unless has_license_management_reports?
 
       compare_reports(::Ci::CompareLicenseScanningReportsService, current_user)
     end
 
     def has_metrics_reports?
-      actual_head_pipeline&.has_reports?(::Ci::JobArtifact.metrics_reports)
+      !!(actual_head_pipeline&.has_reports?(::Ci::JobArtifact.metrics_reports))
     end
 
     def compare_metrics_reports
-      unless has_metrics_reports?
-        return { status: :error, status_reason: 'This merge request does not have metrics reports' }
-      end
+      return missing_report_error("metrics") unless has_metrics_reports?
 
       compare_reports(::Ci::CompareMetricsReportsService)
     end
@@ -193,6 +211,16 @@ module EE
       project_rules.find_each do |project_rule|
         project_rule.apply_report_approver_rules_to(self)
       end
+    end
+
+    private
+
+    def missing_report_error(report_type)
+      { status: :error, status_reason: "This merge request does not have #{report_type} reports" }
+    end
+
+    def report_type_enabled?(report_type)
+      !!actual_head_pipeline&.batch_lookup_report_artifact_for_file_type(report_type)
     end
   end
 end

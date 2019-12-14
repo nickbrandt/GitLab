@@ -22,7 +22,6 @@ module QA
               element :boards_dropdown
               element :boards_dropdown_content
               element :create_new_board_button
-              element :delete_board_button
             end
 
             view 'app/assets/javascripts/vue_shared/components/deprecated_modal.vue' do
@@ -127,12 +126,6 @@ module QA
               click_boards_dropdown_button
               click_element(:create_new_board_button)
               set_name(board_name)
-            end
-
-            def delete_current_board
-              click_boards_dropdown_button
-              click_element(:delete_board_button)
-              click_element(:save_changes_button)
             end
 
             def has_modal_board_name_field?

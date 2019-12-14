@@ -7,7 +7,7 @@ module QA
       it 'logs audit events for UI operations' do
         sign_in
 
-        Page::Main::Menu.perform(&:click_admin_area)
+        Page::Main::Menu.perform(&:go_to_admin_area)
         QA::Page::Admin::Menu.perform(&:go_to_monitoring_audit_logs)
         EE::Page::Admin::Monitoring::AuditLog.perform do |audit_log_page|
           expected_events.each do |expected_event|
@@ -17,7 +17,7 @@ module QA
       end
     end
 
-    describe 'Instance audit logs' do
+    describe 'Instance audit logs', :requires_admin do
       context 'Failed sign in' do
         before do
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
@@ -96,7 +96,7 @@ module QA
         before do
           sign_in
           user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
-          Page::Main::Menu.perform(&:click_admin_area)
+          Page::Main::Menu.perform(&:go_to_admin_area)
           Page::Admin::Menu.perform(&:go_to_users_overview)
           Page::Admin::Overview::Users::Index.perform do |index|
             index.search_user(user.username)

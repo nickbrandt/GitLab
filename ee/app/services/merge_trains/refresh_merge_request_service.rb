@@ -19,7 +19,7 @@ module MergeTrains
 
       success(pipeline_created: pipeline_created.present?)
     rescue ProcessError => e
-      drop(e)
+      abort(e)
     end
 
     private
@@ -33,7 +33,7 @@ module MergeTrains
         raise ProcessError, 'merge request is not on a merge train'
       end
 
-      if merge_request.squash?
+      if merge_request.squash? && Feature.disabled?(:merge_train_new_stale_check, project, default_enabled: true)
         raise ProcessError, 'merge train does not support squash merge'
       end
 
@@ -77,14 +77,20 @@ module MergeTrains
       MergeRequests::MergeService.new(project, merge_user, merge_request.merge_params)
                                  .execute(merge_request)
 
-      raise ProcessError, 'failed to merge' unless merge_request.merged?
+      raise ProcessError, "failed to merge. #{merge_request.merge_error}" unless merge_request.merged?
+    end
 
-      merge_train.destroy
+    def stale_pipeline?
+      if Feature.enabled?(:merge_train_new_stale_check, project, default_enabled: true)
+        merge_train.stale?
+      else
+        legacy_stale_pipeline?
+      end
     end
 
     # NOTE: This method works for both no-ff-merge and ff-merge, however,
     #       it doesn't work for squash and merge option.
-    def stale_pipeline?
+    def legacy_stale_pipeline?
       return true unless pipeline_for_merge_train.source_sha == merge_request.diff_head_sha
       return false if pipeline_for_merge_train.target_sha == previous_ref_sha
 
@@ -122,7 +128,8 @@ module MergeTrains
     end
 
     def update_pipeline_for_merge_train(pipeline)
-      merge_train.update!(pipeline: pipeline)
+      merge_train.pipeline = pipeline
+      merge_train.fresh!
     end
 
     def merge_user
@@ -159,9 +166,9 @@ module MergeTrains
       params[:require_recreate]
     end
 
-    def drop(error)
+    def abort(error)
       AutoMerge::MergeTrainService.new(project, merge_user)
-        .abort(merge_request, error.message)
+        .abort(merge_request, error.message, process_next: false)
 
       error(error.message)
     end

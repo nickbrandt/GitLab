@@ -1,30 +1,22 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { GlDropdown, GlDropdownItem, GlFormGroup, GlButton, GlTooltipDirective } from '@gitlab/ui';
-import flash from '~/flash';
-import {
-  canScroll,
-  isScrolledToTop,
-  isScrolledToBottom,
-  scrollDown,
-  scrollUp,
-} from '~/lib/utils/scroll_utils';
-import Icon from '~/vue_shared/components/icon.vue';
-import { __ } from '~/locale';
+import { GlDropdown, GlDropdownItem, GlFormGroup } from '@gitlab/ui';
+import { scrollDown } from '~/lib/utils/scroll_utils';
+import LogControlButtons from './log_control_buttons.vue';
 
 export default {
   components: {
     GlDropdown,
     GlDropdownItem,
     GlFormGroup,
-    GlButton,
-    Icon,
-  },
-  directives: {
-    GlTooltip: GlTooltipDirective,
+    LogControlButtons,
   },
   props: {
-    currentEnvironmentName: {
+    projectFullPath: {
+      type: String,
+      required: true,
+    },
+    environmentName: {
       type: String,
       required: false,
       default: '',
@@ -39,17 +31,6 @@ export default {
       required: false,
       default: '',
     },
-    logsEndpoint: {
-      type: String,
-      required: false,
-      default: '',
-    },
-  },
-  data() {
-    return {
-      scrollToTopEnabled: false,
-      scrollToBottomEnabled: false,
-    };
   },
   computed: {
     ...mapState('environmentLogs', ['environments', 'logs', 'pods']),
@@ -62,47 +43,34 @@ export default {
     trace(val) {
       this.$nextTick(() => {
         if (val) {
-          this.scrollDown();
-        } else {
-          this.updateScrollState();
+          scrollDown();
         }
+        this.$refs.scrollButtons.update();
       });
     },
-  },
-  created() {
-    window.addEventListener('scroll', this.updateScrollState);
   },
   mounted() {
-    this.fetchEnvironments(this.environmentsPath);
+    this.setInitData({
+      projectPath: this.projectFullPath,
+      environmentName: this.environmentName,
+      podName: this.currentPodName,
+    });
 
-    this.setLogsEndpoint(this.logsEndpoint)
-      .then(() => {
-        this.fetchLogs(this.currentPodName);
-      })
-      .catch(() => {
-        flash(__('Something went wrong on our end. Please try again!'));
-      });
-  },
-  destroyed() {
-    window.removeEventListener('scroll', this.updateScrollState);
+    this.fetchEnvironments(this.environmentsPath);
   },
   methods: {
-    ...mapActions('environmentLogs', ['setLogsEndpoint', 'fetchEnvironments', 'fetchLogs']),
-    showPod(podName) {
-      this.fetchLogs(podName);
-    },
-    updateScrollState() {
-      this.scrollToTopEnabled = canScroll() && !isScrolledToTop();
-      this.scrollToBottomEnabled = canScroll() && !isScrolledToBottom();
-    },
-    scrollUp,
-    scrollDown,
+    ...mapActions('environmentLogs', [
+      'setInitData',
+      'showPodLogs',
+      'showEnvironment',
+      'fetchEnvironments',
+    ]),
   },
 };
 </script>
 <template>
   <div class="build-page-pod-logs mt-3">
-    <div class="top-bar d-flex">
+    <div class="top-bar js-top-bar d-flex">
       <div class="row">
         <gl-form-group
           id="environments-dropdown-fg"
@@ -113,7 +81,7 @@ export default {
         >
           <gl-dropdown
             id="environments-dropdown"
-            :text="currentEnvironmentName"
+            :text="environments.current"
             :disabled="environments.isLoading"
             class="d-flex js-environments-dropdown"
             toggle-class="dropdown-menu-toggle"
@@ -121,7 +89,7 @@ export default {
             <gl-dropdown-item
               v-for="env in environments.options"
               :key="env.id"
-              :href="env.logs_path"
+              @click="showEnvironment(env.name)"
             >
               {{ env.name }}
             </gl-dropdown-item>
@@ -136,7 +104,7 @@ export default {
         >
           <gl-dropdown
             id="pods-dropdown"
-            :text="pods.current"
+            :text="pods.current || s__('Environments|No pods to display')"
             :disabled="logs.isLoading"
             class="d-flex js-pods-dropdown"
             toggle-class="dropdown-menu-toggle"
@@ -144,57 +112,21 @@ export default {
             <gl-dropdown-item
               v-for="podName in pods.options"
               :key="podName"
-              @click="showPod(podName)"
+              @click="showPodLogs(podName)"
             >
               {{ podName }}
             </gl-dropdown-item>
           </gl-dropdown>
         </gl-form-group>
       </div>
-      <div class="controllers align-self-end">
-        <div
-          v-gl-tooltip
-          class="controllers-buttons"
-          :title="__('Scroll to top')"
-          aria-labelledby="scroll-to-top"
-        >
-          <gl-button
-            id="scroll-to-top"
-            class="btn-blank js-scroll-to-top"
-            :aria-label="__('Scroll to top')"
-            :disabled="!scrollToTopEnabled"
-            @click="scrollUp()"
-            ><icon name="scroll_up"
-          /></gl-button>
-        </div>
-        <div
-          v-gl-tooltip
-          class="controllers-buttons"
-          :title="__('Scroll to bottom')"
-          aria-labelledby="scroll-to-bottom"
-        >
-          <gl-button
-            id="scroll-to-bottom"
-            class="btn-blank js-scroll-to-bottom"
-            :aria-label="__('Scroll to bottom')"
-            :disabled="!scrollToBottomEnabled"
-            @click="scrollDown()"
-            ><icon name="scroll_down"
-          /></gl-button>
-        </div>
-        <gl-button
-          id="refresh-log"
-          v-gl-tooltip
-          class="ml-1 px-2 js-refresh-log"
-          :title="__('Refresh')"
-          :aria-label="__('Refresh')"
-          @click="showPod(pods.current)"
-        >
-          <icon name="retry" />
-        </gl-button>
-      </div>
+
+      <log-control-buttons
+        ref="scrollButtons"
+        class="controllers align-self-end"
+        @refresh="showPodLogs(pods.current)"
+      />
     </div>
-    <pre class="build-trace js-log-trace"><code class="bash">{{trace}}
+    <pre class="build-trace js-log-trace"><code class="bash js-build-output">{{trace}}
       <div v-if="showLoader" class="build-loader-animation js-build-loader-animation">
         <div class="dot"></div>
         <div class="dot"></div>

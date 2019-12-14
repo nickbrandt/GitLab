@@ -118,6 +118,38 @@ describe MergeRequest do
     end
   end
 
+  describe '#enabled_reports' do
+    let(:project) { create(:project, :repository) }
+
+    where(:report_type, :with_reports) do
+      :sast | :with_sast_reports
+      :container_scanning | :with_container_scanning_reports
+      :dast | :with_dast_reports
+      :dependency_scanning | :with_dependency_scanning_reports
+      :license_management | :with_license_management_reports
+    end
+
+    with_them do
+      subject { merge_request.enabled_reports[report_type] }
+
+      before do
+        stub_licensed_features({ report_type => true })
+      end
+
+      context "when head pipeline has reports" do
+        let(:merge_request) { create(:ee_merge_request, with_reports, source_project: project) }
+
+        it { is_expected.to be_truthy }
+      end
+
+      context "when head pipeline does not have reports" do
+        let(:merge_request) { create(:ee_merge_request, source_project: project) }
+
+        it { is_expected.to be_falsy }
+      end
+    end
+  end
+
   describe '#participant_approvers with approval_rules disabled' do
     let!(:approver) { create(:approver, target: project) }
     let(:code_owners) { [double(:code_owner)] }
@@ -242,6 +274,35 @@ describe MergeRequest do
     end
 
     context 'when head pipeline does not have sast reports' do
+      let(:merge_request) { create(:ee_merge_request, source_project: project) }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#has_dast_reports?' do
+    subject { merge_request.has_dast_reports? }
+
+    let(:project) { create(:project, :repository) }
+
+    before do
+      stub_licensed_features(dast: true)
+    end
+
+    context 'when head pipeline has dast reports' do
+      let(:merge_request) { create(:ee_merge_request, :with_dast_reports, source_project: project) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when pipeline ran for an older commit than the branch head' do
+      let(:pipeline) { create(:ci_empty_pipeline, sha: 'notlatestsha') }
+      let(:merge_request) { create(:ee_merge_request, source_project: project, head_pipeline: pipeline) }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when head pipeline does not have dast reports' do
       let(:merge_request) { create(:ee_merge_request, source_project: project) }
 
       it { is_expected.to be_falsey }
@@ -461,7 +522,7 @@ describe MergeRequest do
             expect_any_instance_of(Ci::CompareLicenseScanningReportsService)
                 .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
 
-            expect(subject[:key]).to include(*[license_1.id, license_1.approval_status, license_2.id, license_2.approval_status])
+            expect(subject[:key]).to include(*[license_1.id, license_1.classification, license_2.id, license_2.classification])
           end
         end
 
@@ -568,7 +629,7 @@ describe MergeRequest do
 
   describe '#mergeable_with_quick_action?' do
     def create_pipeline(status)
-      pipeline = create(:ci_pipeline_with_one_job,
+      pipeline = create(:ci_pipeline,
         project: project,
         ref:     merge_request.source_branch,
         sha:     merge_request.diff_head_sha,
@@ -688,6 +749,34 @@ describe MergeRequest do
       end
 
       it { is_expected.to be_falsy }
+    end
+  end
+
+  describe 'state machine' do
+    context 'when the merge request is on a merge train' do
+      let(:merge_request) do
+        create(:merge_request, :on_train, source_project: project, target_project: project)
+      end
+
+      context 'when the merge request is merged' do
+        it 'ensures to finish merge train' do
+          expect(merge_request.merge_train).to receive(:merged!)
+
+          merge_request.mark_as_merged!
+        end
+      end
+    end
+
+    context 'when the merge request is not on a merge train' do
+      let(:merge_request) do
+        create(:merge_request, source_project: project, target_project: project)
+      end
+
+      context 'when the merge request is merged' do
+        it 'does not raise error' do
+          expect { merge_request.mark_as_merged! }.not_to raise_error
+        end
+      end
     end
   end
 end

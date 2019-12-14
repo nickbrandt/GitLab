@@ -181,6 +181,7 @@ Example response:
     "merge_status": "can_be_merged",
     "sha": "78765a2d5e0a43585945c58e61ba2f822e4d090b",
     "merge_commit_sha": null,
+    "squash_commit_sha": null,
     "user_notes_count": 0,
     "discussion_locked": null,
     "should_remove_source_branch": null,
@@ -583,6 +584,7 @@ Example response:
     "merge_status": "can_be_merged",
     "sha": "78765a2d5e0a43585945c58e61ba2f822e4d090b",
     "merge_commit_sha": null,
+    "squash_commit_sha": null,
     "user_notes_count": 0,
     "discussion_locked": null,
     "should_remove_source_branch": null,
@@ -758,6 +760,7 @@ GET /projects/:id/search
 | `id`                | integer/string   | yes        | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user                |
 | `scope`       | string   | yes        | The scope to search in                |
 | `search`      | string   | yes        | The search query  |
+| `ref`         | string   | no         | The name of a repository branch or tag to search on. The project's default branch is used by default. This is only applicable for scopes: commits, blobs, and wiki_blobs.  |
 
 Search the expression within the specified scope. Currently these scopes are supported: issues, merge_requests, milestones, notes, wiki_blobs, commits, blobs, users.
 
@@ -890,6 +893,7 @@ Example response:
     "merge_status": "can_be_merged",
     "sha": "78765a2d5e0a43585945c58e61ba2f822e4d090b",
     "merge_commit_sha": null,
+    "squash_commit_sha": null,
     "user_notes_count": 0,
     "discussion_locked": null,
     "should_remove_source_branch": null,
@@ -1055,7 +1059,7 @@ Blobs searches are performed on both filenames and contents. Search results:
   times in the content.
 
 ```bash
-curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=blobs&search=installation
+curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/6/search?scope=blobs&search=installation&ref=feature
 ```
 
 Example response:
@@ -1069,7 +1073,7 @@ Example response:
     "path": "README.md",
     "filename": "README.md",
     "id": null,
-    "ref": "master",
+    "ref": "feature",
     "startline": 46,
     "project_id": 6
   }

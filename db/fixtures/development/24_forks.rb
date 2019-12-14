@@ -1,9 +1,9 @@
-require './spec/support/sidekiq'
+require './spec/support/sidekiq_middleware'
 
 Sidekiq::Testing.inline! do
   Gitlab::Seeder.quiet do
-    User.all.sample(10).each do |user|
-      source_project = Project.public_only.sample
+    User.not_mass_generated.sample(10).each do |user|
+      source_project = Project.not_mass_generated.public_only.sample
 
       ##
       # 03_project.rb might not have created a public project because

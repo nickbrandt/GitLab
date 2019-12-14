@@ -44,6 +44,14 @@ bundle exec rspec
 bundle exec rspec spec/[path]/[to]/[spec].rb
 ```
 
+Use [guard](https://github.com/guard/guard) to continuously monitor for changes and only run matching tests:
+
+```sh
+bundle exec guard
+```
+
+When using spring and guard together, use `SPRING=1 bundle exec guard` instead to make use of spring.
+
 ### General guidelines
 
 - Use a single, top-level `describe ClassName` block.
@@ -125,6 +133,8 @@ CHROME_HEADLESS=0 bundle exec rspec some_spec.rb
 ```
 
 The test will go by quickly, but this will give you an idea of what's happening.
+Using `live_debug` with `CHROME_HEADLESS=0` pauses the open browser, and does not
+open the page again. This can be used to debug and inspect elements.
 
 You can also add `byebug` or `binding.pry` to pause execution and [step through](../pry_debugging.md#stepping)
 the test.

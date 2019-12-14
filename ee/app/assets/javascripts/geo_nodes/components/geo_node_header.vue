@@ -1,8 +1,8 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import icon from '~/vue_shared/components/icon.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
-import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {
@@ -42,11 +42,10 @@ export default {
       return this.isNodeHTTP || this.nodeDetailsFailed;
     },
     nodeStatusIconClass() {
-      const iconClasses = 'prepend-left-10 node-status-icon';
-      if (this.nodeDetailsFailed) {
-        return `${iconClasses} status-icon-failure`;
-      }
-      return `${iconClasses} status-icon-warning`;
+      return [
+        'ml-2',
+        { 'text-danger-500': this.nodeDetailsFailed, 'text-warning-500': !this.nodeDetailsFailed },
+      ];
     },
     nodeStatusIconName() {
       if (this.nodeDetailsFailed) {
@@ -70,7 +69,7 @@ export default {
   <div class="card-header">
     <div class="row">
       <div class="col-md-8 clearfix">
-        <span class="d-flex float-left append-right-10">
+        <span class="d-flex align-items-center float-left append-right-10">
           <strong class="node-url"> {{ node.url }} </strong>
           <gl-loading-icon
             v-if="nodeDetailsLoading || node.nodeActionActive"
@@ -87,11 +86,17 @@ export default {
             data-placement="bottom"
           />
         </span>
-        <span class="inline node-type-badges">
-          <span v-if="node.current" class="node-badge current-node">
+        <span class="inline">
+          <span
+            v-if="node.current"
+            class="rounded-pill gl-font-size-12 p-1 text-white bg-success-400"
+          >
             {{ s__('Current node') }}
           </span>
-          <span v-if="node.primary" class="prepend-left-5 node-badge primary-node">
+          <span
+            v-if="node.primary"
+            class="ml-1 rounded-pill gl-font-size-12 p-1 text-white bg-primary-600"
+          >
             {{ s__('Primary') }}
           </span>
         </span>

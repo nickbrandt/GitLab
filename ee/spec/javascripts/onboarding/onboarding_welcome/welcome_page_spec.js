@@ -1,10 +1,12 @@
 import Vue from 'vue';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import component from 'ee/onboarding/onboarding_welcome/components/welcome_page.vue';
 import ActionPopover from 'ee/onboarding/onboarding_helper/components/action_popover.vue';
 import HelpContentPopover from 'ee/onboarding/onboarding_helper/components/help_content_popover.vue';
-import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
-import { shallowMount } from '@vue/test-utils';
 import onboardingUtils from 'ee/onboarding/utils';
+import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
+
+const localVue = createLocalVue();
 
 describe('User onboarding welcome page', () => {
   let wrapper;
@@ -16,7 +18,7 @@ describe('User onboarding welcome page', () => {
   };
 
   function createComponent(propsData) {
-    wrapper = shallowMount(component, { propsData });
+    wrapper = shallowMount(localVue.extend(component), { propsData, localVue, sync: false });
   }
 
   afterEach(() => {

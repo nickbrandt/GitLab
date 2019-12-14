@@ -1,8 +1,8 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Commit from '~/vue_shared/components/commit.vue';
 import component from 'ee/environments_dashboard/components/dashboard/environment.vue';
 import EnvironmentHeader from 'ee/environments_dashboard/components/dashboard/environment_header.vue';
 import Alert from 'ee/vue_shared/dashboards/components/alerts.vue';
+import Commit from '~/vue_shared/components/commit.vue';
 import environment from './mock_environment.json';
 
 const localVue = createLocalVue();
@@ -17,6 +17,8 @@ describe('Environment', () => {
       environment,
     };
     wrapper = shallowMount(Component, {
+      sync: false,
+      attachToDocument: true,
       localVue,
       propsData,
     });
@@ -94,6 +96,8 @@ describe('Environment', () => {
       },
     };
     wrapper = shallowMount(Component, {
+      sync: false,
+      attachToDocument: true,
       localVue,
       propsData,
     });
@@ -112,10 +116,12 @@ describe('Environment', () => {
       },
     };
     wrapper = shallowMount(Component, {
+      sync: false,
+      attachToDocument: true,
       localVue,
       propsData,
     });
 
-    expect(wrapper.text()).toContain('This environment has no deployments yet.');
+    expect(wrapper.text()).toContain('API');
   });
 });

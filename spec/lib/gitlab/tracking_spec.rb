@@ -8,7 +8,7 @@ describe Gitlab::Tracking do
     stub_application_setting(snowplow_enabled: true)
     stub_application_setting(snowplow_collector_hostname: 'gitfoo.com')
     stub_application_setting(snowplow_cookie_domain: '.gitfoo.com')
-    stub_application_setting(snowplow_site_id: '_abc123_')
+    stub_application_setting(snowplow_app_id: '_abc123_')
     stub_application_setting(snowplow_iglu_registry_url: 'https://example.org')
   end
 
@@ -97,7 +97,7 @@ describe Gitlab::Tracking do
           '_property_',
           '_value_',
           nil,
-          timestamp.to_i
+          (timestamp.to_f * 1000).to_i
         )
 
         track_event
@@ -130,7 +130,7 @@ describe Gitlab::Tracking do
         expect(tracker).to receive(:track_self_describing_event).with(
           '_event_json_',
           nil,
-          timestamp.to_i
+          (timestamp.to_f * 1000).to_i
         )
 
         track_event

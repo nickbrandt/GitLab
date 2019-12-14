@@ -1,0 +1,5 @@
+---
+title: Expose time logs for group issues via the GraphQL API
+merge_request: 18689
+author:
+type: added

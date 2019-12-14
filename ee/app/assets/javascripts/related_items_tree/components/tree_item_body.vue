@@ -3,13 +3,13 @@ import { mapState, mapActions } from 'vuex';
 import { GlTooltipDirective, GlModalDirective, GlLink, GlButton } from '@gitlab/ui';
 import _ from 'underscore';
 
+import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
 import { __ } from '~/locale';
 
 import Icon from '~/vue_shared/components/icon.vue';
 import ItemMilestone from '~/vue_shared/components/issue/issue_milestone.vue';
 import ItemAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
 import ItemDueDate from '~/boards/components/issue_due_date.vue';
-import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
 
 import StateTooltip from './state_tooltip.vue';
 
@@ -110,7 +110,11 @@ export default {
   <div class="card card-slim sortable-row flex-grow-1">
     <div
       class="item-body card-body d-flex align-items-center p-2 pl-xl-3"
-      :class="{ 'p-xl-1': userSignedIn, 'item-logged-out pt-xl-2 pb-xl-2': !userSignedIn }"
+      :class="{
+        'p-xl-1': userSignedIn,
+        'item-logged-out pt-xl-2 pb-xl-2': !userSignedIn,
+        'item-closed': isClosed,
+      }"
     >
       <div class="item-contents d-flex align-items-center flex-wrap flex-grow-1 flex-xl-nowrap">
         <div class="item-title d-flex align-items-center mb-1 mb-xl-0">

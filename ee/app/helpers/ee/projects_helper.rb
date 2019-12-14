@@ -38,14 +38,19 @@ module EE
 
       if can?(current_user, :read_project_security_dashboard, @project)
         nav_tabs << :security
+        nav_tabs << :security_configuration
       end
 
       if can?(current_user, :read_dependencies, @project)
         nav_tabs << :dependencies
       end
 
-      if can?(current_user, :read_licenses_list, project)
+      if ::Feature.enabled?(:licenses_list, project) && can?(current_user, :read_licenses, project)
         nav_tabs << :licenses
+      end
+
+      if can?(current_user, :read_threat_monitoring, project)
+        nav_tabs << :threat_monitoring
       end
 
       if ::Gitlab.config.packages.enabled &&
@@ -140,9 +145,11 @@ module EE
 
     def sidebar_security_paths
       %w[
+        projects/security/configuration#show
         projects/security/dashboard#show
         projects/dependencies#show
         projects/licenses#show
+        projects/threat_monitoring#show
       ]
     end
 

@@ -37,16 +37,13 @@ module Gitlab
 
           flush_current_line
 
-          # TODO: replace OpenStruct with a better type
-          # https://gitlab.com/gitlab-org/gitlab/issues/34305
-          OpenStruct.new(
+          Gitlab::Ci::Ansi2json::Result.new(
             lines: @lines,
             state: @state.encode,
             append: append,
             truncated: truncated,
             offset: start_offset,
-            size: stream.tell - start_offset,
-            total: stream.size
+            stream: stream
           )
         end
 
@@ -66,14 +63,12 @@ module Gitlab
           elsif scan_token(scanner, /\e(([@-_])(.*?)?)?$/)
             # stop scanning
             scanner.terminate
-          elsif scan_token(scanner, /</)
-            @state.current_line << '&lt;'
           elsif scan_token(scanner, /\r?\n/)
             flush_current_line
           elsif scan_token(scanner, /\r/)
             # drop last line
             @state.current_line.clear!
-          elsif scan_token(scanner, /.[^\e<\r\ns]*/m)
+          elsif scan_token(scanner, /.[^\e\r\ns]*/m)
             # this is a join from all previous tokens and first letters
             # it always matches at least one character `.`
             # it matches everything that is not start of:

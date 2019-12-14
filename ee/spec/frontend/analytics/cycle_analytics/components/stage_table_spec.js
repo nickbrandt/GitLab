@@ -1,7 +1,13 @@
 import Vue from 'vue';
 import { shallowMount, mount } from '@vue/test-utils';
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
-import { issueEvents, issueStage, allowedStages, groupLabels } from '../mock_data';
+import {
+  issueEvents,
+  issueStage,
+  allowedStages,
+  groupLabels,
+  customStageEvents,
+} from '../mock_data';
 
 let wrapper = null;
 const $sel = {
@@ -28,19 +34,22 @@ function createComponent(props = {}, shallow = false) {
       currentStageEvents: issueEvents,
       labels: groupLabels,
       isLoading: false,
+      isLoadingSummaryData: false,
       isEmptyStage: false,
-      isUserAllowed: true,
-      isAddingCustomStage: false,
+      isSavingCustomStage: false,
+      isCreatingCustomStage: false,
+      isEditingCustomStage: false,
       noDataSvgPath,
       noAccessSvgPath,
       canEditStages: false,
-      customStageFormEvents: [],
+      customStageFormEvents: customStageEvents,
       ...props,
     },
     stubs: {
       'gl-loading-icon': true,
     },
     sync: false,
+    attachToDocument: true,
   });
 }
 
@@ -159,44 +168,8 @@ describe('StageTable', () => {
       expect(wrapper.find($sel.illustration).html()).toContain(noDataSvgPath);
     });
 
-    it('will display the no data title', () => {
+    it('will display the no data message', () => {
       expect(wrapper.html()).toContain("We don't have enough data to show this stage.");
-    });
-
-    it('will display the no data description', () => {
-      expect(wrapper.html()).toContain(
-        'The issue stage shows the time it takes from creating an issue to assigning the issue to a milestone, or add the issue to a list on your Issue Board. Begin creating issues to see data for this stage.',
-      );
-    });
-  });
-
-  describe('isUserAllowed = false', () => {
-    beforeEach(() => {
-      wrapper = createComponent({
-        currentStage: {
-          ...issueStage,
-          isUserAllowed: false,
-        },
-      });
-    });
-
-    afterEach(() => {
-      wrapper.destroy();
-    });
-
-    it('will render the no access illustration', () => {
-      expect(wrapper.find($sel.illustration).exists()).toBeTruthy();
-      expect(wrapper.find($sel.illustration).html()).toContain(noAccessSvgPath);
-    });
-
-    it('will display the no access title', () => {
-      expect(wrapper.html()).toContain('You need permission.');
-    });
-
-    it('will display the no access description', () => {
-      expect(wrapper.html()).toContain(
-        'Want to see the data? Please ask an administrator for access.',
-      );
     });
   });
 

@@ -18,7 +18,7 @@ export default {
         };
       },
       update: data => {
-        const designEdges = propertyOf(data)(['project', 'issue', 'designs', 'designs']);
+        const designEdges = propertyOf(data)(['project', 'issue', 'designCollection', 'designs']);
         if (designEdges) {
           return extractNodes(designEdges);
         }

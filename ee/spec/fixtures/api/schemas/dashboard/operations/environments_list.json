@@ -55,16 +55,12 @@
       "required": [
         "id",
         "name",
-        "size",
-        "within_folder",
         "external_url",
         "environment_path"
       ],
       "properties": {
         "id": { "type": "integer" },
         "name": { "type": "string" },
-        "size": { "type": "integer" },
-        "within_folder": { "type": "boolean" },
         "external_url": { "type": "string" },
         "environment_path": { "type": "string" },
         "last_deployment": { "$ref": "../../../../../../../spec/fixtures/api/schemas/deployment.json" }

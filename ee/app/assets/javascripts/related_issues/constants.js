@@ -9,7 +9,7 @@ export const issuableTypesMap = {
 export const autoCompleteTextMap = {
   true: {
     [issuableTypesMap.ISSUE]: __(' or <#issue id>'),
-    [issuableTypesMap.EPIC]: __(' or <#epic id>'),
+    [issuableTypesMap.EPIC]: __(' or <&epic id>'),
     [issuableTypesMap.MERGE_REQUEST]: __(' or <!merge request id>'),
   },
   false: {
@@ -35,9 +35,20 @@ export const pathIndeterminateErrorMap = {
   [issuableTypesMap.EPIC]: __('We could not determine the path to remove the epic'),
 };
 
+export const itemAddFailureTypesMap = {
+  NOT_FOUND: 'not_found',
+  MAX_NUMBER_OF_CHILD_EPICS: 'conflict',
+};
+
 export const addRelatedIssueErrorMap = {
-  [issuableTypesMap.ISSUE]: __("We can't find an issue that matches what you are looking for."),
-  [issuableTypesMap.EPIC]: __("We can't find an epic that matches what you are looking for."),
+  [issuableTypesMap.ISSUE]: __('Issue cannot be found.'),
+  [issuableTypesMap.EPIC]: __('Epic cannot be found.'),
+};
+
+export const addRelatedItemErrorMap = {
+  [itemAddFailureTypesMap.MAX_NUMBER_OF_CHILD_EPICS]: __(
+    'This epic already has the maximum number of child epics.',
+  ),
 };
 
 /**

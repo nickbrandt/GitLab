@@ -13,7 +13,7 @@ GitLab supports several ways deploy Serverless applications in both Kubernetes E
 
 Currently we support:
 
-- [Knative](#knative): Build Knative applications with Knative and gitlabktl on GKE.
+- [Knative](#knative): Build Knative applications with Knative and `gitlabktl` on GKE and EKS.
 - [AWS Lambda](aws.md): Create serverless applications via the Serverless Framework and GitLab CI.
 
 ## Knative
@@ -36,12 +36,14 @@ With GitLab Serverless, you can deploy both functions-as-a-service (FaaS) and se
 To run Knative on GitLab, you will need:
 
 1. **Existing GitLab project:** You will need a GitLab project to associate all resources. The simplest way to get started:
-
-   - If you are planning on deploying functions, clone the [functions example project](https://gitlab.com/knative-examples/functions) to get started.
-   - If you are planning on deploying a serverless application, clone the sample [Knative Ruby App](https://gitlab.com/knative-examples/knative-ruby-app) to get started.
-
+   - If you are planning on [deploying functions](#deploying-functions),
+     clone the [functions example project](https://gitlab.com/knative-examples/functions) to get
+     started.
+   - If you are planning on [deploying a serverless application](#deploying-serverless-applications),
+     clone the sample [Knative Ruby App](https://gitlab.com/knative-examples/knative-ruby-app) to get
+     started.
 1. **Kubernetes Cluster:** An RBAC-enabled Kubernetes cluster is required to deploy Knative.
-   The simplest way to get started is to add a cluster using [GitLab's GKE integration](../add_remove_clusters.md#add-new-gke-cluster).
+   The simplest way to get started is to add a cluster using [GitLab's GKE integration](../add_remove_clusters.md#gke-cluster).
    The set of minimum recommended cluster specifications to run Knative is 3 nodes, 6 vCPUs, and 22.50 GB memory.
 1. **Helm Tiller:** Helm is a package manager for Kubernetes and is required to install
    Knative.
@@ -58,12 +60,14 @@ To run Knative on GitLab, you will need:
 1. **`serverless.yml`** (for [functions only](#deploying-functions)): When using serverless to deploy functions, the `serverless.yml` file
    will contain the information for all the functions being hosted in the repository as well as a reference to the
    runtime being used.
-1. **`Dockerfile`** (for [applications only](#deploying-serverless-applications): Knative requires a
+1. **`Dockerfile`** (for [applications only](#deploying-serverless-applications)): Knative requires a
    `Dockerfile` in order to build your applications. It should be included at the root of your
    project's repo and expose port `8080`. `Dockerfile` is not require if you plan to build serverless functions
    using our [runtimes](https://gitlab.com/gitlab-org/serverless/runtimes).
 1. **Prometheus** (optional): Installing Prometheus allows you to monitor the scale and traffic of your serverless function/application.
    See [Installing Applications](../index.md#installing-applications) for more information.
+1. **Logging** (optional): Configuring logging allows you to view and search request logs for your serverless function/application.
+   See [Configuring logging](#configuring-logging) for more information.
 
 ## Installing Knative via GitLab's Kubernetes integration
 
@@ -85,7 +89,7 @@ The minimum recommended cluster size to run Knative is 3-nodes, 6 vCPUs, and 22.
    for other platforms [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 
 1. The Ingress is now available at this address and will route incoming requests to the proper service based on the DNS
-   name in the request. To support this, a wildcard DNS A record should be created for the desired domain name. For example,
+   name in the request. To support this, a wildcard DNS record should be created for the desired domain name. For example,
    if your Knative base domain is `knative.info` then you need to create an A record or CNAME record with domain `*.knative.info`
    pointing the ip address or hostname of the Ingress.
 
@@ -114,7 +118,8 @@ You must do the following:
 
 1. Ensure GitLab can manage Knative:
    - For a non-GitLab managed cluster, ensure that the service account for the token
-     provided can manage resources in the `serving.knative.dev` API group.
+     provided can manage resources in the `serving.knative.dev` API group. It will also
+     need list access to the deployments in the `knative-serving` namespace.
    - For a GitLab managed cluster, if you added the cluster in [GitLab 12.1 or later](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/30235),
      then GitLab will already have the required access and you can proceed to the next step.
 
@@ -151,6 +156,19 @@ You must do the following:
        - delete
        - patch
        - watch
+     ---
+     apiVersion: rbac.authorization.k8s.io/v1
+     kind: ClusterRole
+     metadata:
+       name: gitlab-knative-version-role
+     rules:
+     - apiGroups:
+       - apps
+       resources:
+       - deployments
+       verbs:
+       - list
+       - get
      ```
 
      Then run the following command:
@@ -166,21 +184,108 @@ You must do the following:
    or [serverless applications](#deploying-serverless-applications) onto your
    cluster.
 
+## Configuring logging
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/33330) in GitLab 12.5.
+
+### Prerequisites
+
+- A GitLab-managed cluster.
+- `kubectl` installed and working.
+
+Running `kubectl` commands on your cluster requires setting up access to the
+cluster first. For clusters created on:
+
+- GKE, see [GKE Cluster Access](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl)
+- Other platforms, see [Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+
+### Enable request log template
+
+Run the following command to enable request logs:
+
+```shell
+kubectl edit cm -n knative-serving config-observability
+```
+
+Copy the `logging.request-log-template` from the `data._example` field to the data field one level up in the hierarchy.
+
+### Enable request logs
+
+Run the following commands to install Elasticsearch, Kibana, and Filebeat into a `kube-logging` namespace and configure all nodes to forward logs using Filebeat:
+
+```shell
+kubectl apply -f https://gitlab.com/gitlab-org/serverless/configurations/knative/raw/v0.7.0/kube-logging-filebeat.yaml
+kubectl label nodes --all beta.kubernetes.io/filebeat-ready="true"
+```
+
+### Viewing request logs
+
+To view request logs:
+
+1. Run `kubectl proxy`.
+1. Navigate to Kibana UI.
+
+Or:
+
+1. Open the Kibana UI.
+1. Click on **Discover**, then select `filebeat-*` from the dropdown on the left.
+1. Enter `kubernetes.container.name:"queue-proxy" AND message:/httpRequest/` into the search box.
+
+## Supported runtimes
+
+Serverless functions for GitLab can be run using:
+
+- [GitLab-managed](#gitlab-managed-runtimes) runtimes.
+- [OpenFaaS](#openfaas-runtimes) runtimes.
+
+If a runtime is not available for the required programming language, consider deploying a
+[serverless application](#deploying-serverless-applications).
+
+### GitLab-managed runtimes
+
+Currently the following GitLab-managed [runtimes](https://gitlab.com/gitlab-org/serverless/runtimes)
+are available:
+
+- `go` (proof of concept)
+- `nodejs`
+- `ruby`
+
+You must provide a `Dockerfile` to run serverless functions if no runtime is specified.
+
+### OpenFaaS runtimes
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/29253) in GitLab 12.5.
+
+[OpenFaaS classic runtimes](https://github.com/openfaas/templates#templates-in-store) can be used with GitLab serverless.
+
+OpenFaas runtimes are available for the following languages:
+
+- C#
+- Go
+- NodeJS
+- PHP
+- Python
+- Ruby
+
+Runtimes are specified using the pattern: `openfaas/classic/<template_name>`. The following
+example shows how to define a function in `serverless.yml` using an OpenFaaS runtime:
+
+```yaml
+hello:
+  source: ./hello
+  runtime: openfaas/classic/ruby
+  description: "Ruby function using OpenFaaS classic runtime"
+```
+
+`handler` is not needed for OpenFaaS functions. The location of the handler is defined
+by the conventions of the runtime.
+
+See the [`ruby-openfaas-function`](https://gitlab.com/knative-examples/ruby-openfaas-function)
+project for an example of a function using an OpenFaaS runtime.
+
 ## Deploying functions
 
 > Introduced in GitLab 11.6.
-
-Using functions is useful for dealing with independent events without needing
-to maintain a complex unified infrastructure. This allows you to focus on a
-single task that can be executed/scaled automatically and independently.
-
-Currently the following [runtimes](https://gitlab.com/gitlab-org/serverless/runtimes) are offered:
-
-- ruby
-- node.js
-- Dockerfile
-
-`Dockerfile` presence is assumed when a runtime is not specified.
 
 You can find and import all the files referenced in this doc in the
 **[functions example project](https://gitlab.com/knative-examples/functions)**.
@@ -236,17 +341,21 @@ project):
 
    provider:
      name: triggermesh
-     environment:
+     envs:
        FOO: value
+     secrets:
+       - my-secrets
 
    functions:
      echo-js:
        handler: echo-js
        source: ./echo-js
-       runtime: https://gitlab.com/gitlab-org/serverless/runtimes/nodejs
+       runtime: gitlab/runtimes/nodejs
        description: "node.js runtime function"
-       environment:
+       envs:
          MY_FUNCTION: echo-js
+       secrets:
+         - my-secrets
    ```
 
 Explanation of the fields used above:
@@ -263,7 +372,8 @@ Explanation of the fields used above:
 | Parameter | Description |
 |-----------|-------------|
 | `name` | Indicates which provider is used to execute the `serverless.yml` file. In this case, the TriggerMesh middleware. |
-| `environment` | Includes the environment variables to be passed as part of function execution for **all** functions in the file, where `FOO` is the variable name and `BAR` are he variable contents. You may replace this with you own variables. |
+| `envs` | Includes the environment variables to be passed as part of function execution for **all** functions in the file, where `FOO` is the variable name and `BAR` are he variable contents. You may replace this with you own variables. |
+| `secrets` | Includes the contents of the Kubernetes secret as environment variables accessible to be passed as part of function execution for **all** functions in the file. The secrets are expected in ini format. |
 
 ### `functions`
 
@@ -274,9 +384,29 @@ subsequent lines contain the function attributes.
 |-----------|-------------|
 | `handler` | The function's name. |
 | `source` | Directory with sources of a functions. |
-| `runtime` (optional)| The runtime to be used to execute the function. When the runtime is not specified, we assume that `Dockerfile` is present in the function directory specified by `source`. |
+| `runtime` (optional)| The runtime to be used to execute the function. This can be a runtime alias (see [Runtime aliases](#runtime-aliases)), or it can be a full URL to a custom runtime repository. When the runtime is not specified, we assume that `Dockerfile` is present in the function directory specified by `source`. |
 | `description` | A short description of the function. |
-| `environment` | Sets an environment variable for the specific function only. |
+| `envs` | Sets an environment variable for the specific function only. |
+| `secrets` | Includes the contents of the Kubernetes secret as environment variables accessible to be passed as part of function execution for the specific function only. The secrets are expected in ini format. |
+
+### Deployment
+
+#### Runtime aliases
+
+The optional `runtime` parameter can refer to one of the following runtime aliases (also see [Supported runtimes](#supported-runtimes)):
+
+| Runtime alias | Maintained by |
+|-------------|---------------|
+| `gitlab/runtimes/go` | GitLab |
+| `gitlab/runtimes/nodejs` | GitLab |
+| `gitlab/runtimes/ruby` | GitLab |
+| `openfaas/classic/csharp` | OpenFaaS |
+| `openfaas/classic/go` | OpenFaaS |
+| `openfaas/classic/node` | OpenFaaS |
+| `openfaas/classic/php7` | OpenFaaS |
+| `openfaas/classic/python` | OpenFaaS |
+| `openfaas/classic/python3` | OpenFaaS |
+| `openfaas/classic/ruby` | OpenFaaS |
 
 After the `gitlab-ci.yml` template has been added and the `serverless.yml` file
 has been created, pushing a commit to your project will result in a CI pipeline
@@ -313,9 +443,76 @@ The sample function can now be triggered from any HTTP client using a simple `PO
 
      ![function execution](img/function-execution.png)
 
+### Secrets
+
+To access your Kubernetes secrets from within your function, the secrets should be created under the namespace of your serverless deployment.
+
+#### CLI example
+
+```bash
+kubectl create secret generic my-secrets -n "$KUBE_NAMESPACE" --from-literal MY_SECRET=imverysecure
+```
+
+#### Part of deployment job
+
+You can extend your `.gitlab-ci.yml` to create the secrets during deployment using the [environment variables](../../../../ci/variables/README.md)
+stored securely under your GitLab project.
+
+```yaml
+deploy:function:
+  stage: deploy
+  environment: production
+  extends: .serverless:deploy:functions
+  before_script:
+    - kubectl create secret generic my-secret
+        --from-literal MY_SECRET="$GITLAB_SECRET_VARIABLE"
+        --namespace "$KUBE_NAMESPACE"
+        --dry-run -o yaml | kubectl apply -f -
+```
+
+### Running functions locally
+
+Running a function locally is a good way to quickly verify behavior during development.
+
+Running functions locally requires:
+
+- Go 1.12 or newer installed.
+- Docker Engine installed and running.
+- `gitlabktl` installed using the Go package manager:
+
+  ```shell
+  GO111MODULE=on go get gitlab.com/gitlab-org/gitlabktl
+  ```
+
+To run a function locally:
+
+1. Navigate to the root of your GitLab serverless project.
+1. Build your function into a Docker image:
+
+   ```shell
+   gitlabktl serverless build
+   ```
+
+1. Run your function in Docker:
+
+   ```shell
+   docker run -itp 8080:8080 <your_function_name>
+   ```
+
+1. Invoke your function:
+
+   ```shell
+   curl http://localhost:8080
+   ```
+
 ## Deploying Serverless applications
 
 > Introduced in GitLab 11.5.
+
+Serverless applications are an alternative to [serverless functions](#deploying-functions).
+They are useful in scenarios where an existing runtime does not meet the needs of an application,
+such as one written in a language that has no runtime available. Note though that serverless
+applications should be stateless!
 
 NOTE: **Note:**
 You can reference and import the sample [Knative Ruby App](https://gitlab.com/knative-examples/knative-ruby-app) to get started.

@@ -62,7 +62,7 @@ module EE
 
     def group_vulnerabilities_endpoint_path(group)
       params = group_path_params(group)
-      if ::Feature.enabled?(:vulnerability_findings_api)
+      if ::Feature.enabled?(:first_class_vulnerabilities)
         group_security_vulnerability_findings_path(params)
       else
         group_security_vulnerabilities_path(params)
@@ -71,7 +71,7 @@ module EE
 
     def group_vulnerabilities_summary_endpoint_path(group)
       params = group_path_params(group)
-      if ::Feature.enabled?(:vulnerability_findings_api)
+      if ::Feature.enabled?(:first_class_vulnerabilities)
         summary_group_security_vulnerability_findings_path(params)
       else
         summary_group_security_vulnerabilities_path(params)
@@ -80,7 +80,7 @@ module EE
 
     def group_vulnerabilities_history_endpoint_path(group)
       params = group_path_params(group)
-      if ::Feature.enabled?(:vulnerability_findings_api)
+      if ::Feature.enabled?(:first_class_vulnerabilities)
         history_group_security_vulnerability_findings_path(params)
       else
         history_group_security_vulnerabilities_path(params)

@@ -215,49 +215,59 @@ describe('projectsSelector mutations', () => {
 
   describe('RECEIVE_SEARCH_RESULTS_SUCCESS', () => {
     it('sets "projectSearchResults" to be the payload', () => {
-      const payload = [];
+      const payload = { data: [{ id: 1, name: 'test-project' }] };
 
       mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, payload);
 
-      expect(state.projectSearchResults).toBe(payload);
+      expect(state.projectSearchResults).toBe(payload.data);
     });
 
     it('sets "messages.noResults" to be false if the payload is not empty', () => {
+      const payload = { data: [{ id: 1, name: 'test-project' }] };
+
       state.messages.noResults = true;
 
-      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, ['']);
+      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, payload);
 
       expect(state.messages.noResults).toBe(false);
     });
 
     it('sets "messages.searchError" to be false', () => {
+      const payload = { data: [{ id: 1, name: 'test-project' }] };
+
       state.messages.searchError = true;
 
-      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, ['']);
+      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, payload);
 
       expect(state.messages.searchError).toBe(false);
     });
 
     it('sets "messages.minimumQuery" to be false', () => {
+      const payload = { data: [{ id: 1, name: 'test-project' }] };
+
       state.messages.minimumQuery = true;
 
-      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, ['']);
+      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, payload);
 
       expect(state.messages.minimumQuery).toBe(false);
     });
 
     it('decrements "searchCount" by one', () => {
+      const payload = { data: [{ id: 1, name: 'test-project' }] };
+
       state.searchCount = 1;
 
-      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, ['']);
+      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, payload);
 
       expect(state.searchCount).toBe(0);
     });
 
     it('does not decrement "searchCount" into negative', () => {
+      const payload = { data: [{ id: 1, name: 'test-project' }] };
+
       state.searchCount = 0;
 
-      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, ['']);
+      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, payload);
 
       expect(state.searchCount).toBe(0);
     });

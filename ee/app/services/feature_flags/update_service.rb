@@ -21,7 +21,7 @@ module FeatureFlags
 
           success(feature_flag: feature_flag)
         else
-          error(feature_flag.errors.full_messages)
+          error(feature_flag.errors.full_messages, :bad_request)
         end
       end
     end

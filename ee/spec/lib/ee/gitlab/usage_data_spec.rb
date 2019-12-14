@@ -49,8 +49,9 @@ describe Gitlab::UsageData do
           create(:clusters_applications_ingress, :installed, cluster: cluster)
           create(:clusters_applications_knative, :installed, cluster: cluster)
           create(:cluster, :disabled, user: user)
-          create(:cluster, :provided_by_gcp, user: user)
-          create(:cluster, :provided_by_user, user: user)
+          create(:cluster_provider_gcp, :created)
+          create(:cluster_provider_aws, :created)
+          create(:cluster_platform_kubernetes)
           create(:cluster, :group, :disabled, user: user)
           create(:cluster, :group, user: user)
           create(:slack_service, project: project)
@@ -65,6 +66,7 @@ describe Gitlab::UsageData do
             clusters_disabled: 1,
             clusters_enabled: 4,
             clusters_platforms_gke: 1,
+            clusters_platforms_eks: 1,
             clusters_platforms_user: 1,
             group_clusters_disabled: 1,
             group_clusters_enabled: 1,

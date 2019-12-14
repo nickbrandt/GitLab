@@ -338,6 +338,24 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
       it_behaves_like 'no notifications'
     end
+
+    context 'when the payload is too big' do
+      let(:payload) { { 'the-payload-is-too-big' => true } }
+      let(:deep_size_object) { instance_double(Gitlab::Utils::DeepSize, valid?: false) }
+
+      before do
+        allow(Gitlab::Utils::DeepSize).to receive(:new).and_return(deep_size_object)
+      end
+
+      it_behaves_like 'no notifications'
+
+      it 'does not process issues' do
+        expect(IncidentManagement::ProcessPrometheusAlertWorker)
+          .not_to receive(:perform_async)
+
+        subject
+      end
+    end
   end
 
   private

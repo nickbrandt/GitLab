@@ -1,8 +1,8 @@
 <script>
 import _ from 'underscore';
-import { __, sprintf } from '~/locale';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { GlButton } from '@gitlab/ui';
+import { __, sprintf } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {
@@ -99,7 +99,7 @@ export default {
       icon-name="cancel"
       icon-style="ci-status-icon-pending"
     >
-      <div v-html="eventText"></div>
+      <div v-if="feedback.created_at" v-html="eventText"></div>
     </event-item>
     <template v-if="commentDetails && !isCommentingOnDismissal">
       <hr class="my-3" />

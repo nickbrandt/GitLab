@@ -176,6 +176,7 @@ module ApplicationSettingsHelper
       :container_registry_token_expire_delay,
       :default_artifacts_expire_in,
       :default_branch_protection,
+      :default_ci_config_path,
       :default_group_visibility,
       :default_project_creation,
       :default_project_visibility,
@@ -193,6 +194,10 @@ module ApplicationSettingsHelper
       :dsa_key_restriction,
       :ecdsa_key_restriction,
       :ed25519_key_restriction,
+      :eks_integration_enabled,
+      :eks_account_id,
+      :eks_access_key_id,
+      :eks_secret_access_key,
       :email_author_in_body,
       :enabled_git_access_protocol,
       :enforce_terms,
@@ -254,6 +259,9 @@ module ApplicationSettingsHelper
       :shared_runners_text,
       :sign_in_text,
       :signup_enabled,
+      :sourcegraph_enabled,
+      :sourcegraph_url,
+      :sourcegraph_public_only,
       :terminal_max_session_time,
       :terms,
       :throttle_authenticated_api_enabled,
@@ -289,13 +297,12 @@ module ApplicationSettingsHelper
       :snowplow_collector_hostname,
       :snowplow_cookie_domain,
       :snowplow_enabled,
-      :snowplow_site_id,
+      :snowplow_app_id,
       :snowplow_iglu_registry_url,
       :push_event_hooks_limit,
       :push_event_activities_limit,
       :custom_http_clone_url_root,
-      :pendo_enabled,
-      :pendo_url
+      :snippet_size_limit
     ]
   end
 

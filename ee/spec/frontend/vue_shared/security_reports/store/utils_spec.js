@@ -13,6 +13,7 @@ import {
   groupedReportText,
 } from 'ee/vue_shared/security_reports/store/utils';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
+import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
 import {
   formatContainerScanningDescription,
   formatContainerScanningMessage,
@@ -379,6 +380,35 @@ describe('security reports utils', () => {
       const array2 = [{ id: '1234' }, { id: 'abg543' }, { id: '453OJKs' }];
 
       expect(filterByKey(array1, array2, 'id')).toEqual([{ id: '214swfA' }]);
+    });
+  });
+
+  describe('getFileLocation', () => {
+    const hostname = 'https://hostna.me';
+    const path = '/deeply/nested/route';
+
+    it('should return the correct location when passed both a hostname and a path', () => {
+      const result = getFileLocation({ hostname, path });
+
+      expect(result).toEqual(`${hostname}${path}`);
+    });
+
+    it('should return null if the hostname is not present', () => {
+      const result = getFileLocation({ path });
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null if the path is not present', () => {
+      const result = getFileLocation({ hostname });
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null if the argument is undefined', () => {
+      const result = getFileLocation(undefined);
+
+      expect(result).toBeNull();
     });
   });
 

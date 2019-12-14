@@ -118,6 +118,20 @@ describe Analytics::CycleAnalytics::StagesController do
         expect(stage.name).to eq(params[:name])
       end
 
+      context 'hidden attribute' do
+        before do
+          params[:hidden] = true
+        end
+
+        it 'updates the hidden attribute' do
+          subject
+
+          stage.reload
+
+          expect(stage.hidden).to eq(true)
+        end
+      end
+
       context 'when positioning parameter is given' do
         before do
           params[:move_before_id] = create(:cycle_analytics_group_stage, parent: group, relative_position: 10).id
@@ -171,43 +185,48 @@ describe Analytics::CycleAnalytics::StagesController do
         expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
+  end
+
+  describe 'data endpoints' do
+    let(:stage) { create(:cycle_analytics_group_stage, parent: group) }
+
+    before do
+      params[:id] = stage.id
+    end
 
     describe 'GET `median`' do
       subject { get :median, params: params }
 
-      before do
-        params[:created_after] = '2019-01-01'
-        params[:created_before] = '2020-01-01'
-      end
-
-      it 'succeeds' do
+      it 'matches the response schema' do
         subject
 
-        expect(response).to be_successful
         expect(response).to match_response_schema('analytics/cycle_analytics/median', dir: 'ee')
       end
 
-      include_examples 'date parameter examples'
-
+      include_examples 'cycle analytics data endpoint examples'
       include_examples 'group permission check on the controller level'
     end
 
     describe 'GET `records`' do
       subject { get :records, params: params }
 
-      before do
-        params[:created_after] = '2019-01-01'
-        params[:created_before] = '2020-01-01'
-      end
+      include_examples 'cycle analytics data endpoint examples'
+      include_examples 'group permission check on the controller level'
+    end
 
-      it 'succeeds' do
+    describe 'GET `duration_chart`' do
+      subject { get :duration_chart, params: params }
+
+      it 'matches the response schema' do
+        fake_result = [double(MergeRequest, duration_in_seconds: 10, finished_at: Time.now)]
+        expect_any_instance_of(Gitlab::Analytics::CycleAnalytics::DataForDurationChart).to receive(:load).and_return(fake_result)
+
         subject
 
-        expect(response).to be_successful
+        expect(response).to match_response_schema('analytics/cycle_analytics/duration_chart', dir: 'ee')
       end
 
-      include_examples 'date parameter examples'
-
+      include_examples 'cycle analytics data endpoint examples'
       include_examples 'group permission check on the controller level'
     end
   end

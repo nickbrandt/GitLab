@@ -4,7 +4,6 @@ require "spec_helper"
 
 describe API::Services do
   set(:user) { create(:user) }
-  set(:admin) { create(:admin) }
   set(:user2) { create(:user) }
 
   set(:project) do
@@ -88,21 +87,14 @@ describe API::Services do
         expect(response).to have_gitlab_http_status(401)
       end
 
-      it "returns all properties of service #{service} when authenticated as admin" do
-        get api("/projects/#{project.id}/services/#{dashed_service}", admin)
-
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response['properties'].keys).to match_array(service_instance.api_field_names)
-      end
-
-      it "returns properties of service #{service} other than passwords when authenticated as project owner" do
+      it "returns all properties of service #{service}" do
         get api("/projects/#{project.id}/services/#{dashed_service}", user)
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['properties'].keys).to match_array(service_instance.api_field_names)
       end
 
-      it "returns empty hash if properties and data fields are empty" do
+      it "returns empty hash or nil values if properties and data fields are empty" do
         # deprecated services are not valid for update
         initialized_service.update_attribute(:properties, {})
 
@@ -114,7 +106,7 @@ describe API::Services do
         get api("/projects/#{project.id}/services/#{dashed_service}", user)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(json_response['properties'].keys).to be_empty
+        expect(json_response['properties'].values.compact).to be_empty
       end
 
       it "returns error when authenticated but not a project owner" do

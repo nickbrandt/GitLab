@@ -1,4 +1,3 @@
-import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
 import * as actions from 'ee/vue_shared/license_management/store/actions';
 import * as mutationTypes from 'ee/vue_shared/license_management/store/mutation_types';
@@ -12,6 +11,7 @@ import {
   licenseHeadIssues,
   licenseBaseIssues,
 } from 'ee_spec/license_management/mock_data';
+import axios from '~/lib/utils/axios_utils';
 
 describe('License store actions', () => {
   const apiUrlManageLicenses = `${TEST_HOST}/licenses/management`;
@@ -186,16 +186,47 @@ describe('License store actions', () => {
   });
 
   describe('receiveSetLicenseApproval', () => {
-    it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadManagedLicenses', done => {
-      testAction(
-        actions.receiveSetLicenseApproval,
-        null,
-        state,
-        [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
-        [{ type: 'loadManagedLicenses' }],
-      )
-        .then(done)
-        .catch(done.fail);
+    gon.features = gon.features || {};
+    const { parsedLicenseReport } = gon.features;
+
+    afterEach(() => {
+      gon.features.parsedLicenseReport = parsedLicenseReport;
+    });
+
+    describe('with the parsedLicenseReport feature flag enabled', () => {
+      beforeEach(() => {
+        gon.features.parsedLicenseReport = true;
+      });
+
+      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadParsedLicenseReport', done => {
+        testAction(
+          actions.receiveSetLicenseApproval,
+          null,
+          state,
+          [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
+          [{ type: 'loadParsedLicenseReport' }],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('with the parsedLicenseReport feature flag disabled', () => {
+      beforeEach(() => {
+        gon.features.parsedLicenseReport = false;
+      });
+
+      it('commits RECEIVE_SET_LICENSE_APPROVAL and dispatches loadManagedLicenses', done => {
+        testAction(
+          actions.receiveSetLicenseApproval,
+          null,
+          state,
+          [{ type: mutationTypes.RECEIVE_SET_LICENSE_APPROVAL }],
+          [{ type: 'loadManagedLicenses' }],
+        )
+          .then(done)
+          .catch(done.fail);
+      });
     });
   });
 

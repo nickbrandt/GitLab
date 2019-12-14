@@ -9,6 +9,7 @@
     "id": 227,
     "iid": 50,
     "sha": "63492726c2264a0277141d6a6573c3d22ecd7de3",
+    "deployed_at": "2019-02-20T16:15:40.122Z",
     "ref": {
       "name": "master",
       "ref_path": "/root/minimal-ruby-app/tree/master",

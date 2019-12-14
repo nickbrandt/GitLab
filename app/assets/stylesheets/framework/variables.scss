@@ -62,6 +62,9 @@ $gray-dark: darken($gray-light, $darken-dark-factor);
 $gray-darker: #eee;
 $gray-darkest: #c4c4c4;
 
+$purple: #6d49cb;
+$purple-light: #ede8fb;
+
 $black: #000;
 $black-transparent: rgba(0, 0, 0, 0.3);
 $almost-black: #242424;
@@ -325,6 +328,12 @@ $gl-grayish-blue: #7f8fa4;
 $gl-gray-dark: #313236;
 $gl-gray-light: #5c5c5c;
 $gl-header-color: #4c4e54;
+$gl-font-size-12: 12px;
+$gl-font-size-14: 14px;
+$gl-font-size-16: 16px;
+$gl-font-size-20: 20px;
+$gl-font-size-28: 28px;
+$gl-font-size-42: 42px;
 
 $type-scale: (
   1: 12px,
@@ -521,16 +530,6 @@ $pagination-padding-y: 6px;
 $pagination-padding-x: 16px;
 $pagination-line-height: 20px;
 $pagination-disabled-color: #cdcdcd;
-
-/*
-* Toasts
-*/
-$toast-offset: 24px;
-$toast-height: 48px;
-$toast-max-width: 586px;
-$toast-padding-right: 42px;
-$toast-default-margin: 8px;
-$toast-background-opacity: 0.95;
 
 /*
  *  Status icons

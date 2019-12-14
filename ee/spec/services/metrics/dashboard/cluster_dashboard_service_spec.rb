@@ -19,13 +19,7 @@ describe Metrics::Dashboard::ClusterDashboardService, :use_clean_rails_memory_st
     let(:service_call) { described_class.new(*service_params).get_dashboard }
 
     it_behaves_like 'valid dashboard service response'
-
-    it 'caches the unprocessed dashboard for subsequent calls' do
-      expect(YAML).to receive(:safe_load).once.and_call_original
-
-      described_class.new(*service_params).get_dashboard
-      described_class.new(*service_params).get_dashboard
-    end
+    it_behaves_like 'caches the unprocessed dashboard for subsequent calls'
 
     context 'when called with a non-system dashboard' do
       let(:dashboard_path) { 'garbage/dashboard/path' }

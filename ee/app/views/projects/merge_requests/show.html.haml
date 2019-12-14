@@ -20,3 +20,4 @@
     window.gl.mrWidgetData.container_scanning_comparison_path = '#{container_scanning_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:container_scanning)}'
     window.gl.mrWidgetData.dependency_scanning_comparison_path = '#{dependency_scanning_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:dependency_scanning)}'
     window.gl.mrWidgetData.sast_comparison_path = '#{sast_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:sast)}'
+    window.gl.mrWidgetData.dast_comparison_path = '#{dast_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:dast)}'

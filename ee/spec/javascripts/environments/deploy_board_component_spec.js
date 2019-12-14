@@ -1,127 +1,150 @@
 import Vue from 'vue';
+import { mount } from '@vue/test-utils';
 import DeployBoard from 'ee/environments/components/deploy_board_component.vue';
 import { environment } from 'spec/environments/mock_data';
 import { deployBoardMockData } from './mock_data';
 
-describe('Deploy Board', () => {
-  let DeployBoardComponent;
+const projectPath = 'gitlab-org/gitlab-test';
 
-  beforeEach(() => {
-    DeployBoardComponent = Vue.extend(DeployBoard);
-  });
+describe('Deploy Board', () => {
+  let wrapper;
+
+  const createComponent = (props = {}) =>
+    mount(Vue.extend(DeployBoard), {
+      propsData: {
+        deployBoardData: deployBoardMockData,
+        isLoading: false,
+        isEmpty: false,
+        projectPath,
+        environmentName: environment.name,
+        ...props,
+      },
+      sync: false,
+    });
 
   describe('with valid data', () => {
-    let component;
-
-    beforeEach(() => {
-      component = new DeployBoardComponent({
-        propsData: {
-          deployBoardData: deployBoardMockData,
-          isLoading: false,
-          isEmpty: false,
-          logsPath: environment.log_path,
-        },
-      }).$mount();
+    beforeEach(done => {
+      wrapper = createComponent();
+      wrapper.vm.$nextTick(done);
     });
 
     it('should render percentage with completion value provided', () => {
-      expect(
-        component.$el.querySelector('.deploy-board-information .percentage').textContent,
-      ).toEqual(`${deployBoardMockData.completion}%`);
+      expect(wrapper.vm.$refs.percentage.innerText).toEqual(`${deployBoardMockData.completion}%`);
     });
 
     it('should render total instance count', () => {
-      const renderedTotal = component.$el.querySelector('.deploy-board-instances .total-instances');
+      const renderedTotal = wrapper.find('.deploy-board-instances-text');
       const actualTotal = deployBoardMockData.instances.length;
+      const output = `${actualTotal > 1 ? 'Instances' : 'Instance'} (${actualTotal})`;
 
-      expect(renderedTotal.textContent).toEqual(`(${actualTotal})`);
+      expect(renderedTotal.text()).toEqual(output);
     });
 
     it('should render all instances', () => {
-      const instances = component.$el.querySelectorAll('.deploy-board-instances-container a');
+      const instances = wrapper.findAll('.deploy-board-instances-container a');
 
       expect(instances.length).toEqual(deployBoardMockData.instances.length);
-
       expect(
-        instances[2].classList.contains(
-          `deployment-instance-${deployBoardMockData.instances[2].status}`,
-        ),
+        instances.at(1).classes(`deployment-instance-${deployBoardMockData.instances[2].status}`),
       ).toBe(true);
     });
 
     it('should render an abort and a rollback button with the provided url', () => {
-      const buttons = component.$el.querySelectorAll('.deploy-board-actions a');
+      const buttons = wrapper.findAll('.deploy-board-actions a');
 
-      expect(buttons[0].getAttribute('href')).toEqual(deployBoardMockData.rollback_url);
-      expect(buttons[1].getAttribute('href')).toEqual(deployBoardMockData.abort_url);
+      expect(buttons.at(0).attributes('href')).toEqual(deployBoardMockData.rollback_url);
+      expect(buttons.at(1).attributes('href')).toEqual(deployBoardMockData.abort_url);
     });
   });
 
   describe('with empty state', () => {
-    let component;
-
-    beforeEach(() => {
-      component = new DeployBoardComponent({
-        propsData: {
-          deployBoardData: {},
-          isLoading: false,
-          isEmpty: true,
-          logsPath: environment.log_path,
-        },
-      }).$mount();
+    beforeEach(done => {
+      wrapper = createComponent({
+        deployBoardData: {},
+        isLoading: false,
+        isEmpty: true,
+        projectPath,
+        environmentName: environment.name,
+      });
+      wrapper.vm.$nextTick(done);
     });
 
     it('should render the empty state', () => {
-      expect(component.$el.querySelector('.deploy-board-empty-state-svg svg')).toBeDefined();
+      expect(wrapper.find('.deploy-board-empty-state-svg svg')).toBeDefined();
       expect(
-        component.$el.querySelector(
-          '.deploy-board-empty-state-text .deploy-board-empty-state-title',
-        ).textContent,
+        wrapper.find('.deploy-board-empty-state-text .deploy-board-empty-state-title').text(),
       ).toContain('Kubernetes deployment not found');
     });
   });
 
   describe('with loading state', () => {
-    let component;
-
-    beforeEach(() => {
-      component = new DeployBoardComponent({
-        propsData: {
-          deployBoardData: {},
-          isLoading: true,
-          isEmpty: false,
-          logsPath: environment.log_path,
-        },
-      }).$mount();
+    beforeEach(done => {
+      wrapper = createComponent({
+        deployBoardData: {},
+        isLoading: true,
+        isEmpty: false,
+        projectPath,
+        environmentName: environment.name,
+      });
+      wrapper.vm.$nextTick(done);
     });
 
     it('should render loading spinner', () => {
-      expect(component.$el.querySelector('.fa-spin')).toBeDefined();
+      expect(wrapper.find('.fa-spin')).toBeDefined();
     });
   });
 
   describe('with hasLegacyAppLabel equal true', () => {
-    let component;
-
-    beforeEach(() => {
-      component = new DeployBoardComponent({
-        propsData: {
-          isLoading: false,
-          isEmpty: false,
-          logsPath: environment.log_path,
-          hasLegacyAppLabel: true,
-          deployBoardData: {},
-        },
-      }).$mount();
+    beforeEach(done => {
+      wrapper = createComponent({
+        isLoading: false,
+        isEmpty: false,
+        projectPath,
+        environmentName: environment.name,
+        hasLegacyAppLabel: true,
+        deployBoardData: {},
+      });
+      wrapper.vm.$nextTick(done);
     });
 
     it('should render legacy label warning message', () => {
-      const warningMessage = component.$el.querySelector('.bs-callout-warning');
+      const warningMessage = wrapper.find('.bs-callout-warning');
 
       expect(warningMessage).toBeTruthy();
-      expect(warningMessage.innerText).toContain(
+      expect(warningMessage.text()).toContain(
         'Matching on the app label has been removed for deploy boards.',
       );
+    });
+  });
+
+  describe('has legend component', () => {
+    let statuses = [];
+    beforeEach(done => {
+      wrapper = createComponent({
+        isLoading: false,
+        isEmpty: false,
+        logsPath: environment.log_path,
+        hasLegacyAppLabel: true,
+        deployBoardData: deployBoardMockData,
+      });
+      ({ statuses } = wrapper.vm);
+      wrapper.vm.$nextTick(done);
+    });
+
+    it('with all the possible statuses', () => {
+      const deployBoardLegend = wrapper.find('.deploy-board-legend');
+
+      expect(deployBoardLegend).toBeDefined();
+      expect(deployBoardLegend.findAll('a').length).toBe(Object.keys(statuses).length);
+    });
+
+    Object.keys(statuses).forEach(item => {
+      it(`with ${item} text next to deployment instance icon`, () => {
+        expect(wrapper.find(`.deployment-instance-${item}`)).toBeDefined();
+        expect(wrapper.find(`.deployment-instance-${item} + .legend-text`).text()).toBe(
+          statuses[item].text,
+        );
+      });
     });
   });
 });

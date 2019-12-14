@@ -33,16 +33,11 @@ module QA
           push.files = @files
           push.commit_message = 'Add test files'
         end
-
-        Page::Main::Menu.perform(&:sign_out_if_signed_in)
       end
 
-      context 'built-in' do
+      context 'built-in', :requires_admin do
         before do
-          Page::Main::Menu.perform(&:sign_out_if_signed_in)
-
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+          Flow::Login.sign_in_as_admin
 
           @group = Resource::Group.fabricate_via_api!
         end
@@ -69,15 +64,13 @@ module QA
         end
       end
 
-      # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/61
-      context 'instance level', :quarantine do
+      # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/36815 bug_in_code
+      # BUG_IN_CODE
+      context 'instance level', :quarantine, :requires_admin do
         before do
-          Page::Main::Menu.perform(&:sign_out_if_signed_in)
+          Flow::Login.sign_in_as_admin
 
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_admin_credentials)
-
-          Page::Main::Menu.perform(&:click_admin_area)
+          Page::Main::Menu.perform(&:go_to_admin_area)
           Page::Admin::Menu.perform(&:go_to_template_settings)
 
           EE::Page::Admin::Settings::Templates.perform do |templates|
@@ -117,12 +110,7 @@ module QA
 
       context 'group level' do
         before do
-          # Log out if already logged in. This is necessary because
-          # a previous test might have logged in as admin
-          Page::Main::Menu.perform(&:sign_out_if_signed_in)
-
-          Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_credentials)
+          Flow::Login.sign_in
 
           Page::Main::Menu.perform(&:go_to_groups)
           Page::Dashboard::Groups.perform { |groups| groups.click_group(Runtime::Namespace.sandbox_name) }

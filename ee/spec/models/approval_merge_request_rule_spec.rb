@@ -104,6 +104,18 @@ describe ApprovalMergeRequestRule do
     end
   end
 
+  describe '.regular_or_any_approver scope' do
+    it 'returns regular or any-approver rules' do
+      any_approver_rule = create(:any_approver_rule)
+      regular_rule = create(:approval_merge_request_rule)
+      create(:report_approver_rule)
+
+      expect(described_class.regular_or_any_approver).to(
+        contain_exactly(any_approver_rule, regular_rule)
+      )
+    end
+  end
+
   context 'scopes'  do
     set(:rb_rule) { create(:code_owner_rule, name: '*.rb') }
     set(:js_rule) { create(:code_owner_rule, name: '*.js') }
@@ -262,6 +274,8 @@ describe ApprovalMergeRequestRule do
     let!(:approval2) { create(:approval, merge_request: merge_request, user: member2) }
     let!(:approval3) { create(:approval, merge_request: merge_request, user: member3) }
 
+    let(:any_approver_rule) { create(:any_approver_rule, merge_request: merge_request) }
+
     before do
       subject.users = [member1, member2]
     end
@@ -269,8 +283,10 @@ describe ApprovalMergeRequestRule do
     context 'when not merged' do
       it 'does nothing' do
         subject.sync_approved_approvers
+        any_approver_rule.sync_approved_approvers
 
         expect(subject.approved_approvers.reload).to be_empty
+        expect(any_approver_rule.approved_approvers).to be_empty
       end
     end
 
@@ -281,6 +297,12 @@ describe ApprovalMergeRequestRule do
         subject.sync_approved_approvers
 
         expect(subject.approved_approvers.reload).to contain_exactly(member1, member2)
+      end
+
+      it 'stores all the approvals for any-approver rule' do
+        any_approver_rule.sync_approved_approvers
+
+        expect(any_approver_rule.approved_approvers.reload).to contain_exactly(member1, member2, member3)
       end
     end
   end
@@ -314,7 +336,7 @@ describe ApprovalMergeRequestRule do
       let!(:project_approval_rule) { create(:approval_project_rule, :requires_approval, :license_management, project: project) }
       let(:project) { create(:project) }
       let!(:open_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [open_merge_request]) }
-      let!(:blacklist_policy) { create(:software_license_policy, project: project, software_license: license, approval_status: :blacklisted) }
+      let!(:denied_policy) { create(:software_license_policy, project: project, software_license: license, classification: :denied) }
 
       before do
         subject.refresh_required_approvals!(project_approval_rule)

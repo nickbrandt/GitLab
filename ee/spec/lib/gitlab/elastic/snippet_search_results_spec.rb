@@ -52,13 +52,29 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
     end
   end
 
-  context 'when user has full_private_access' do
+  context 'when user has full_private_access', :do_not_mock_admin_mode do
+    include_context 'custom session'
+
     let(:user) { create(:admin) }
     let(:results) { described_class.new(user, 'foo', :any) }
 
-    it 'returns matched snippets' do
-      expect(results.snippet_titles_count).to eq(1)
-      expect(results.snippet_blobs_count).to eq(1)
+    context 'admin mode disabled' do
+      it 'returns nothing' do
+        expect(results.snippet_titles_count).to eq(0)
+        expect(results.snippet_blobs_count).to eq(0)
+      end
+    end
+
+    context 'admin mode enabled' do
+      before do
+        Gitlab::Auth::CurrentUserMode.new(user).request_admin_mode!
+        Gitlab::Auth::CurrentUserMode.new(user).enable_admin_mode!(password: user.password)
+      end
+
+      it 'returns matched snippets' do
+        expect(results.snippet_titles_count).to eq(1)
+        expect(results.snippet_blobs_count).to eq(1)
+      end
     end
   end
 

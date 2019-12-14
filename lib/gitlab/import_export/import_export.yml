@@ -29,6 +29,7 @@ tree:
           - :priorities
       - :issue_assignees
       - :zoom_meetings
+      - :sentry_issue
     - snippets:
       - :award_emoji
       - notes:
@@ -72,6 +73,7 @@ tree:
     - :auto_devops
     - :triggers
     - :pipeline_schedules
+    - :container_expiration_policy
     - :services
     - protected_branches:
       - :merge_access_levels
@@ -163,6 +165,9 @@ excluded_attributes:
     - :identifier
   snippets:
     - :expired_at
+    - :secret
+    - :encrypted_secret_token
+    - :encrypted_secret_token_iv
   merge_request_diff:
     - :external_diff
     - :stored_externally
@@ -198,6 +203,8 @@ excluded_attributes:
     - :artifacts_metadata_store
     - :artifacts_size
     - :commands
+    - :resource_group_id
+    - :waiting_for_resource_at
   push_event_payload:
     - :event_id
   project_badges:
@@ -272,3 +279,4 @@ ee:
         - :unprotect_access_levels
       - protected_environments:
         - :deploy_access_levels
+      - :service_desk_setting

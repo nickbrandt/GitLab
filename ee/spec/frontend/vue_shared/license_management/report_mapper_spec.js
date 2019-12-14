@@ -8,7 +8,7 @@ describe('mapFrom', () => {
     subject = new ReportMapper(true);
   });
 
-  it('converts a v2 schema report to v1', () => {
+  it('converts a v2 schema report to v1.1', () => {
     const report = Builder.forV2()
       .addLicense({ id: 'MIT', name: 'MIT License' })
       .addLicense({ id: 'BSD', name: 'BSD License' })
@@ -19,12 +19,16 @@ describe('mapFrom', () => {
 
     const result = subject.mapFrom(report);
     expect(result).toMatchObject(
-      Builder.forV1()
+      Builder.forV1('1')
         .addLicense({ name: 'BSD License', count: 2 })
         .addLicense({ name: 'MIT License', count: 2 })
         .addDependency({ name: 'x', license: { name: 'MIT License' } })
         .addDependency({ name: 'y', license: { name: 'BSD License' } })
-        .addDependency({ name: 'z', license: { name: 'BSD License, MIT License', url: '' } })
+        .addDependency({
+          name: 'z',
+          license: { name: 'BSD License, MIT License', url: '' },
+          licenses: [{ name: 'BSD License' }, { name: 'MIT License' }],
+        })
         .build(),
     );
   });

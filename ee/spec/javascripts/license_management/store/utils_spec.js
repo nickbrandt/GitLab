@@ -7,7 +7,6 @@ import {
   convertToOldReportFormat,
 } from 'ee/vue_shared/license_management/store/utils';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
-import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import {
   Builder,
   approvedLicense,
@@ -16,6 +15,7 @@ import {
   licenseBaseIssues,
   licenseReport,
 } from 'ee_spec/license_management/mock_data';
+import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 
 describe('utils', () => {
   describe('parseLicenseReportMetrics', () => {
@@ -37,7 +37,7 @@ describe('utils', () => {
       const result = parseLicenseReportMetrics(licenseHeadIssues, licenseBaseIssues);
 
       expect(result[0].name).toBe(licenseHeadIssues.licenses[0].name);
-      expect(result[0].url).toBe(licenseHeadIssues.dependencies[0].license.url);
+      expect(result[0].url).toBe(licenseHeadIssues.licenses[0].url);
     });
 
     it('should omit issues from base report', () => {
@@ -90,7 +90,10 @@ describe('utils', () => {
           status: 'failed',
           name: 'BSD License',
           url: 'https://opensource.org/licenses/BSD',
-          packages: [{ name: 'y', url: 'https://www.example.org/y', description: 'Y' }],
+          packages: [
+            { name: 'y', url: 'https://www.example.org/y', description: 'Y' },
+            { name: 'z', url: 'https://www.example.org/z', description: 'Z' },
+          ],
         }),
       );
     });
@@ -108,14 +111,15 @@ describe('utils', () => {
       const headReport = Builder.forV2()
         .addLicense({ id: 'MIT', name: 'MIT License' })
         .addLicense({ id: 'BSD', name: 'BSD License' })
+        .addLicense({ id: 'MPL-1.1', name: 'Mozilla Public License 1.1' })
         .addDependency({ name: 'x', licenses: ['MIT'] })
         .addDependency({ name: 'y', licenses: ['BSD'] })
-        .addDependency({ name: 'z', licenses: ['BSD', 'MIT'] })
+        .addDependency({ name: 'z', licenses: ['BSD', 'MIT', 'MPL-1.1'] })
         .build();
 
       const result = parseLicenseReportMetrics(headReport, baseReport, policies);
 
-      expect(result.length).toBe(1);
+      expect(result.length).toBe(2);
       expect(result[0]).toEqual(
         jasmine.objectContaining({
           id: 101,
@@ -124,7 +128,22 @@ describe('utils', () => {
           status: 'failed',
           name: 'BSD License',
           url: 'https://opensource.org/licenses/BSD',
-          packages: [{ name: 'y', url: 'https://www.example.org/y', description: 'Y' }],
+          packages: [
+            { name: 'y', url: 'https://www.example.org/y', description: 'Y' },
+            { name: 'z', url: 'https://www.example.org/z', description: 'Z' },
+          ],
+        }),
+      );
+
+      expect(result[1]).toEqual(
+        jasmine.objectContaining({
+          id: undefined,
+          approvalStatus: undefined,
+          count: 1,
+          status: 'neutral',
+          name: 'Mozilla Public License 1.1',
+          url: 'https://opensource.org/licenses/MPL-1.1',
+          packages: [{ name: 'z', url: 'https://www.example.org/z', description: 'Z' }],
         }),
       );
     });

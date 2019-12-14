@@ -1,0 +1,5 @@
+---
+title: Do not trigger count query for pagination without count
+merge_request: 21232
+author:
+type: performance

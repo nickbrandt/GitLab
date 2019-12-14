@@ -16,21 +16,22 @@ class ApplicationController < ActionController::Base
   include ConfirmEmailWarning
   include Gitlab::Tracking::ControllerConcern
   include Gitlab::Experimentation::ControllerConcern
+  include InitializesCurrentUserMode
 
   before_action :authenticate_user!, except: [:route_not_found]
   before_action :enforce_terms!, if: :should_enforce_terms?
   before_action :validate_user_service_ticket!
-  before_action :check_password_expiration
+  before_action :check_password_expiration, if: :html_request?
   before_action :ldap_security_check
-  before_action :sentry_context
+  around_action :sentry_context
   before_action :default_headers
-  before_action :add_gon_variables, unless: [:peek_request?, :json_request?]
+  before_action :add_gon_variables, if: :html_request?
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :require_email, unless: :devise_controller?
   before_action :active_user_check, unless: :devise_controller?
   before_action :set_usage_stats_consent_flag
   before_action :check_impersonation_availability
-  before_action :require_role
+  before_action :required_signup_info
 
   around_action :set_locale
   around_action :set_session_storage
@@ -41,7 +42,6 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception, prepend: true
 
   helper_method :can?
-  helper_method :current_user_mode
   helper_method :import_sources_enabled?, :github_import_enabled?,
     :gitea_import_enabled?, :github_import_configured?,
     :gitlab_import_enabled?, :gitlab_import_configured?,
@@ -58,7 +58,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from Encoding::CompatibilityError do |exception|
     log_exception(exception)
-    render "errors/encoding", layout: "errors", status: 500
+    render "errors/encoding", layout: "errors", status: :internal_server_error
   end
 
   rescue_from ActiveRecord::RecordNotFound do |exception|
@@ -72,6 +72,18 @@ class ApplicationController < ActionController::Base
 
   rescue_from Gitlab::Access::AccessDeniedError do |exception|
     render_403
+  end
+
+  rescue_from Gitlab::Auth::IpBlacklisted do
+    Gitlab::AuthLogger.error(
+      message: 'Rack_Attack',
+      env: :blocklist,
+      remote_ip: request.ip,
+      request_method: request.request_method,
+      path: request.fullpath
+    )
+
+    head :forbidden
   end
 
   rescue_from Gitlab::Auth::TooManyIps do |e|
@@ -153,7 +165,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_exception(exception)
-    Gitlab::Sentry.track_acceptable_exception(exception)
+    Gitlab::Sentry.track_exception(exception)
 
     backtrace_cleaner = request.env["action_dispatch.backtrace_cleaner"]
     application_trace = ActionDispatch::ExceptionWrapper.new(backtrace_cleaner, exception).application_trace
@@ -197,19 +209,19 @@ class ApplicationController < ActionController::Base
   end
 
   def git_not_found!
-    render "errors/git_not_found.html", layout: "errors", status: 404
+    render "errors/git_not_found.html", layout: "errors", status: :not_found
   end
 
   def render_403
     respond_to do |format|
       format.any { head :forbidden }
-      format.html { render "errors/access_denied", layout: "errors", status: 403 }
+      format.html { render "errors/access_denied", layout: "errors", status: :forbidden }
     end
   end
 
   def render_404
     respond_to do |format|
-      format.html { render "errors/not_found", layout: "errors", status: 404 }
+      format.html { render "errors/not_found", layout: "errors", status: :not_found }
       # Prevent the Rails CSRF protector from thinking a missing .js file is a JavaScript file
       format.js { render json: '', status: :not_found, content_type: 'application/json' }
       format.any { head :not_found }
@@ -451,8 +463,8 @@ class ApplicationController < ActionController::Base
     response.headers['Page-Title'] = URI.escape(page_title('GitLab'))
   end
 
-  def peek_request?
-    request.path.start_with?('/-/peek')
+  def html_request?
+    request.format.html?
   end
 
   def json_request?
@@ -462,7 +474,7 @@ class ApplicationController < ActionController::Base
   def should_enforce_terms?
     return false unless Gitlab::CurrentSettings.current_application_settings.enforce_terms
 
-    !(peek_request? || devise_controller?)
+    html_request? && !devise_controller?
   end
 
   def set_usage_stats_consent_flag
@@ -520,8 +532,8 @@ class ApplicationController < ActionController::Base
     @impersonator ||= User.find(session[:impersonator_id]) if session[:impersonator_id]
   end
 
-  def sentry_context
-    Gitlab::Sentry.context(current_user)
+  def sentry_context(&block)
+    Gitlab::Sentry.with_context(current_user, &block)
   end
 
   def allow_gitaly_ref_name_caching
@@ -530,14 +542,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def current_user_mode
-    @current_user_mode ||= Gitlab::Auth::CurrentUserMode.new(current_user)
-  end
-
-  # A user requires a role when they are part of the experimental signup flow (executed by the Growth team). Users
-  # are redirected to the welcome page when their role is required and the experiment is enabled for the current user.
-  def require_role
-    return unless current_user && current_user.role_required? && experiment_enabled?(:signup_flow)
+  # A user requires a role and have the setup_for_company attribute set when they are part of the experimental signup
+  # flow (executed by the Growth team). Users are redirected to the welcome page when their role is required and the
+  # experiment is enabled for the current user.
+  def required_signup_info
+    return unless current_user
+    return unless current_user.role_required?
+    return unless experiment_enabled?(:signup_flow)
 
     store_location_for :user, request.fullpath
 

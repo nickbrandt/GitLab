@@ -1,30 +1,25 @@
 import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
+import trackDashboardLoad from '../monitoring_tracking_helper';
 import statusCodes from '../../lib/utils/http_status';
 import { backOff } from '../../lib/utils/common_utils';
-import { s__, __ } from '../../locale';
+import { s__, sprintf } from '../../locale';
 
-const MAX_REQUESTS = 3;
+import { PROMETHEUS_TIMEOUT } from '../constants';
 
-export function backOffRequest(makeRequestCallback) {
-  let requestCounter = 0;
+function backOffRequest(makeRequestCallback) {
   return backOff((next, stop) => {
     makeRequestCallback()
       .then(resp => {
         if (resp.status === statusCodes.NO_CONTENT) {
-          requestCounter += 1;
-          if (requestCounter < MAX_REQUESTS) {
-            next();
-          } else {
-            stop(new Error(__('Failed to connect to the prometheus server')));
-          }
+          next();
         } else {
           stop(resp);
         }
       })
       .catch(stop);
-  });
+  }, PROMETHEUS_TIMEOUT);
 }
 
 export const setGettingStartedEmptyState = ({ commit }) => {
@@ -33,14 +28,6 @@ export const setGettingStartedEmptyState = ({ commit }) => {
 
 export const setEndpoints = ({ commit }, endpoints) => {
   commit(types.SET_ENDPOINTS, endpoints);
-};
-
-export const setFeatureFlags = (
-  { commit },
-  { prometheusEndpointEnabled, additionalPanelTypesEnabled },
-) => {
-  commit(types.SET_DASHBOARD_ENABLED, prometheusEndpointEnabled);
-  commit(types.SET_ADDITIONAL_PANEL_TYPES_ENABLED, additionalPanelTypesEnabled);
 };
 
 export const setShowErrorBanner = ({ commit }, enabled) => {
@@ -53,17 +40,12 @@ export const requestMetricsDashboard = ({ commit }) => {
 export const receiveMetricsDashboardSuccess = ({ commit, dispatch }, { response, params }) => {
   commit(types.SET_ALL_DASHBOARDS, response.all_dashboards);
   commit(types.RECEIVE_METRICS_DATA_SUCCESS, response.dashboard.panel_groups);
-  dispatch('fetchPrometheusMetrics', params);
+  return dispatch('fetchPrometheusMetrics', params);
 };
 export const receiveMetricsDashboardFailure = ({ commit }, error) => {
   commit(types.RECEIVE_METRICS_DATA_FAILURE, error);
 };
 
-export const requestMetricsData = ({ commit }) => commit(types.REQUEST_METRICS_DATA);
-export const receiveMetricsDataSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_METRICS_DATA_SUCCESS, data);
-export const receiveMetricsDataFailure = ({ commit }, error) =>
-  commit(types.RECEIVE_METRICS_DATA_FAILURE, error);
 export const receiveDeploymentsDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS, data);
 export const receiveDeploymentsDataFailure = ({ commit }) =>
@@ -79,29 +61,7 @@ export const fetchData = ({ dispatch }, params) => {
   dispatch('fetchEnvironmentsData');
 };
 
-export const fetchMetricsData = ({ state, dispatch }, params) => {
-  if (state.useDashboardEndpoint) {
-    return dispatch('fetchDashboard', params);
-  }
-
-  dispatch('requestMetricsData');
-
-  return backOffRequest(() => axios.get(state.metricsEndpoint, { params }))
-    .then(resp => resp.data)
-    .then(response => {
-      if (!response || !response.data || !response.success) {
-        dispatch('receiveMetricsDataFailure', null);
-        createFlash(s__('Metrics|Unexpected metrics data response from prometheus endpoint'));
-      }
-      dispatch('receiveMetricsDataSuccess', response.data);
-    })
-    .catch(error => {
-      dispatch('receiveMetricsDataFailure', error);
-      if (state.setShowErrorBanner) {
-        createFlash(s__('Metrics|There was an error while retrieving metrics'));
-      }
-    });
-};
+export const fetchMetricsData = ({ dispatch }, params) => dispatch('fetchDashboard', params);
 
 export const fetchDashboard = ({ state, dispatch }, params) => {
   dispatch('requestMetricsDashboard');
@@ -113,13 +73,22 @@ export const fetchDashboard = ({ state, dispatch }, params) => {
 
   return backOffRequest(() => axios.get(state.dashboardEndpoint, { params }))
     .then(resp => resp.data)
-    .then(response => {
-      dispatch('receiveMetricsDashboardSuccess', { response, params });
-    })
-    .catch(error => {
-      dispatch('receiveMetricsDashboardFailure', error);
-      if (state.setShowErrorBanner) {
-        createFlash(s__('Metrics|There was an error while retrieving metrics'));
+    .then(response => dispatch('receiveMetricsDashboardSuccess', { response, params }))
+    .catch(e => {
+      dispatch('receiveMetricsDashboardFailure', e);
+      if (state.showErrorBanner) {
+        if (e.response.data && e.response.data.message) {
+          const { message } = e.response.data;
+          createFlash(
+            sprintf(
+              s__('Metrics|There was an error while retrieving metrics. %{message}'),
+              { message },
+              false,
+            ),
+          );
+        } else {
+          createFlash(s__('Metrics|There was an error while retrieving metrics'));
+        }
       }
     });
 };
@@ -156,12 +125,20 @@ export const fetchPrometheusMetric = ({ commit }, { metric, params }) => {
     step,
   };
 
-  return fetchPrometheusResult(metric.prometheus_endpoint_path, queryParams).then(result => {
-    commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
-  });
+  commit(types.REQUEST_METRIC_RESULT, { metricId: metric.metric_id });
+
+  return fetchPrometheusResult(metric.prometheus_endpoint_path, queryParams)
+    .then(result => {
+      commit(types.RECEIVE_METRIC_RESULT_SUCCESS, { metricId: metric.metric_id, result });
+    })
+    .catch(error => {
+      commit(types.RECEIVE_METRIC_RESULT_ERROR, { metricId: metric.metric_id, error });
+      // Continue to throw error so the dashboard can notify using createFlash
+      throw error;
+    });
 };
 
-export const fetchPrometheusMetrics = ({ state, commit, dispatch }, params) => {
+export const fetchPrometheusMetrics = ({ state, commit, dispatch, getters }, params) => {
   commit(types.REQUEST_METRICS_DATA);
 
   const promises = [];
@@ -173,18 +150,25 @@ export const fetchPrometheusMetrics = ({ state, commit, dispatch }, params) => {
     });
   });
 
-  return Promise.all(promises).then(() => {
-    if (state.metricsWithData.length === 0) {
-      commit(types.SET_NO_DATA_EMPTY_STATE);
-    }
-  });
+  return Promise.all(promises)
+    .then(() => {
+      const dashboardType = state.currentDashboard === '' ? 'default' : 'custom';
+      trackDashboardLoad({
+        label: `${dashboardType}_metrics_dashboard`,
+        value: getters.metricsWithData().length,
+      });
+    })
+    .catch(() => {
+      createFlash(s__(`Metrics|There was an error while retrieving metrics`), 'warning');
+    });
 };
 
 export const fetchDeploymentsData = ({ state, dispatch }) => {
   if (!state.deploymentsEndpoint) {
     return Promise.resolve([]);
   }
-  return backOffRequest(() => axios.get(state.deploymentsEndpoint))
+  return axios
+    .get(state.deploymentsEndpoint)
     .then(resp => resp.data)
     .then(response => {
       if (!response || !response.deployments) {

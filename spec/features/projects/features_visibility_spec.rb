@@ -41,24 +41,30 @@ describe 'Edit Project Settings' do
     end
 
     context 'When external issue tracker is enabled and issues enabled on project settings' do
-      it 'does not hide issues tab' do
-        allow_any_instance_of(Project).to receive(:external_issue_tracker).and_return(JiraService.new)
+      it 'does not hide issues tab and hides labels tab' do
+        allow_next_instance_of(Project) do |instance|
+          allow(instance).to receive(:external_issue_tracker).and_return(JiraService.new)
+        end
 
         visit project_path(project)
 
         expect(page).to have_selector('.shortcuts-issues')
+        expect(page).not_to have_selector('.shortcuts-labels')
       end
     end
 
     context 'When external issue tracker is enabled and issues disabled on project settings' do
-      it 'hides issues tab' do
+      it 'hides issues tab and show labels tab' do
         project.issues_enabled = false
         project.save!
-        allow_any_instance_of(Project).to receive(:external_issue_tracker).and_return(JiraService.new)
+        allow_next_instance_of(Project) do |instance|
+          allow(instance).to receive(:external_issue_tracker).and_return(JiraService.new)
+        end
 
         visit project_path(project)
 
         expect(page).not_to have_selector('.shortcuts-issues')
+        expect(page).to have_selector('.shortcuts-labels')
       end
     end
 

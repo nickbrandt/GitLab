@@ -22,8 +22,13 @@ class GroupsWithTemplatesFinder
   attr_reader :group_id
 
   def extended_group_search
-    groups = Group.with_feature_available_in_plan(:group_project_templates)
-    Gitlab::ObjectHierarchy.new(groups).base_and_descendants
+    groups = Group.with_project_templates
+    groups_with_plan = Gitlab::ObjectHierarchy
+      .new(groups)
+      .base_and_ancestors
+      .with_feature_available_in_plan(:group_project_templates)
+
+    Gitlab::ObjectHierarchy.new(groups_with_plan).base_and_descendants
   end
 
   def simple_group_search(groups)

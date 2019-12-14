@@ -1,5 +1,4 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import { mount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Project from 'ee/operations/components/dashboard/project.vue';
@@ -7,6 +6,7 @@ import Dashboard from 'ee/operations/components/dashboard/dashboard.vue';
 import createStore from 'ee/vue_shared/dashboards/store';
 import timeoutPromise from 'spec/helpers/set_timeout_promise_helper';
 import { trimText } from 'spec/helpers/text_helper';
+import axios from '~/lib/utils/axios_utils';
 import { mockProjectData, mockText } from '../../mock_data';
 
 const localVue = createLocalVue();
@@ -95,9 +95,9 @@ describe('dashboard component', () => {
   describe('wrapped components', () => {
     describe('dashboard project component', () => {
       const projectCount = 1;
-      const projects = mockProjectData(projectCount);
 
       beforeEach(() => {
+        const projects = mockProjectData(projectCount);
         store.state.projects = projects;
         wrapper = mountComponent();
       });
@@ -109,16 +109,25 @@ describe('dashboard component', () => {
       });
 
       it('passes each project to the dashboard project component', () => {
-        const [oneProject] = projects;
+        const [oneProject] = store.state.projects;
         const projectComponent = wrapper.find(Project);
 
         expect(projectComponent.props().project).toEqual(oneProject);
       });
 
+      it('dispatches setProjects when projects changes', () => {
+        const dispatch = spyOn(wrapper.vm.$store, 'dispatch');
+        const projects = mockProjectData(3);
+
+        wrapper.vm.projects = projects;
+
+        expect(dispatch).toHaveBeenCalledWith('setProjects', projects);
+      });
+
       describe('when a project is removed', () => {
         it('immediately requests the project list again', done => {
           mockAxios.reset();
-          mockAxios.onDelete(projects[0].remove_path).reply(200);
+          mockAxios.onDelete(store.state.projects[0].remove_path).reply(200);
           mockAxios.onGet(mockListEndpoint).replyOnce(200, { projects: [] });
 
           wrapper.find('button.js-remove-button').vm.$emit('click');

@@ -19,5 +19,9 @@ module Geo
         ::Gitlab::Database::Subquery.self_join(limit(limit)).delete_all
       end
     end
+
+    def consumer_klass_name
+      self.class.name.demodulize
+    end
   end
 end

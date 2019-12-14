@@ -4,6 +4,7 @@ require('spec_helper')
 
 describe Projects::ProjectMembersController do
   let(:user) { create(:user) }
+  let(:group) { create(:group, :public) }
   let(:project) { create(:project, :public) }
 
   describe 'GET index' do
@@ -11,6 +12,35 @@ describe Projects::ProjectMembersController do
       get :index, params: { namespace_id: project.namespace, project_id: project }
 
       expect(response).to have_gitlab_http_status(200)
+    end
+
+    context 'when project belongs to group' do
+      let(:user_in_group) { create(:user) }
+      let(:project_in_group) { create(:project, :public, group: group) }
+
+      before do
+        group.add_owner(user_in_group)
+        project_in_group.add_maintainer(user)
+        sign_in(user)
+      end
+
+      it 'lists inherited project members by default' do
+        get :index, params: { namespace_id: project_in_group.namespace, project_id: project_in_group }
+
+        expect(assigns(:project_members).map(&:user_id)).to contain_exactly(user.id, user_in_group.id)
+      end
+
+      it 'lists direct project members only' do
+        get :index, params: { namespace_id: project_in_group.namespace, project_id: project_in_group, with_inherited_permissions: 'exclude' }
+
+        expect(assigns(:project_members).map(&:user_id)).to contain_exactly(user.id)
+      end
+
+      it 'lists inherited project members only' do
+        get :index, params: { namespace_id: project_in_group.namespace, project_id: project_in_group, with_inherited_permissions: 'only' }
+
+        expect(assigns(:project_members).map(&:user_id)).to contain_exactly(user_in_group.id)
+      end
     end
   end
 
@@ -45,7 +75,9 @@ describe Projects::ProjectMembersController do
       end
 
       it 'adds user to members' do
-        expect_any_instance_of(Members::CreateService).to receive(:execute).and_return(status: :success)
+        expect_next_instance_of(Members::CreateService) do |instance|
+          expect(instance).to receive(:execute).and_return(status: :success)
+        end
 
         post :create, params: {
                         namespace_id: project.namespace,
@@ -59,7 +91,9 @@ describe Projects::ProjectMembersController do
       end
 
       it 'adds no user to members' do
-        expect_any_instance_of(Members::CreateService).to receive(:execute).and_return(status: :failure, message: 'Message')
+        expect_next_instance_of(Members::CreateService) do |instance|
+          expect(instance).to receive(:execute).and_return(status: :failure, message: 'Message')
+        end
 
         post :create, params: {
                         namespace_id: project.namespace,

@@ -49,11 +49,11 @@ describe 'Environments page', :js do
         it 'renders second page of pipelines' do
           visit_environments(project, scope: 'available')
 
-          find('.js-next-button').click
+          find('.page-link.next-page-item').click
           wait_for_requests
 
-          expect(page).to have_selector('.gl-pagination .page', count: 2)
-          expect(find('.gl-pagination .page-item.active .page-link').text).to eq("2")
+          expect(page).to have_selector('.gl-pagination .page-link', count: 4)
+          expect(find('.gl-pagination .page-link.active').text).to eq("2")
         end
       end
 
@@ -71,7 +71,9 @@ describe 'Environments page', :js do
         let!(:application_prometheus) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
 
         before do
-          allow_any_instance_of(Kubeclient::Client).to receive(:proxy_url).and_raise(Kubeclient::HttpError.new(401, 'Unauthorized', nil))
+          allow_next_instance_of(Kubeclient::Client) do |instance|
+            allow(instance).to receive(:proxy_url).and_raise(Kubeclient::HttpError.new(401, 'Unauthorized', nil))
+          end
         end
 
         it 'shows one environment without error' do
@@ -142,8 +144,8 @@ describe 'Environments page', :js do
         expect(page).to have_content('No deployments yet')
       end
 
-      it 'does not show stip button when environment is not stoppable' do
-        expect(page).not_to have_selector(stop_button_selector)
+      it 'shows stop button when environment is not stoppable' do
+        expect(page).to have_selector(stop_button_selector)
       end
     end
 
@@ -203,7 +205,7 @@ describe 'Environments page', :js do
         end
 
         it 'shows a stop button' do
-          expect(page).not_to have_selector(stop_button_selector)
+          expect(page).to have_selector(stop_button_selector)
         end
 
         it 'does not show external link button' do

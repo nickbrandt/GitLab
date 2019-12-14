@@ -108,7 +108,7 @@ module Gitlab
         end
 
         def sync_code_owners_with_approvers
-          return if state_id == merged_state_id || state == closed_state_id
+          return if state_id == merged_state_id || state_id == closed_state_id
 
           Gitlab::GitalyClient.allow_n_plus_1_calls do
             gl_merge_request = ::MergeRequest.find(id)
@@ -138,11 +138,11 @@ module Gitlab
         has_many :approval_rules, class_name: 'ApprovalProjectRule'
 
         def approver_ids
-          @approver_ids ||= Approver.where(target_type: 'Project', target_id: id).joins(:user).pluck('distinct user_id')
+          @approver_ids ||= Approver.where(target_type: 'Project', target_id: id).joins(:user).pluck(Arel.sql('DISTINCT user_id'))
         end
 
         def approver_group_ids
-          @approver_group_ids ||= ApproverGroup.where(target_type: 'Project', target_id: id).joins(:group).pluck('distinct group_id')
+          @approver_group_ids ||= ApproverGroup.where(target_type: 'Project', target_id: id).joins(:group).pluck(Arel.sql('DISTINCT group_id'))
         end
 
         def approvals_required

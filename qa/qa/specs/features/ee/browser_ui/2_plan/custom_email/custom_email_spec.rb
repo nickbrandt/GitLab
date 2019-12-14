@@ -4,11 +4,10 @@ require 'securerandom'
 
 module QA
   context 'Plan' do
-    describe 'Custom email' do
+    describe 'Custom email', :requires_admin do
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
-        Page::Main::Menu.perform(&:click_admin_area)
+        Flow::Login.sign_in_as_admin
+        Page::Main::Menu.perform(&:go_to_admin_area)
         Page::Admin::Menu.perform(&:go_to_preferences_settings)
       end
 

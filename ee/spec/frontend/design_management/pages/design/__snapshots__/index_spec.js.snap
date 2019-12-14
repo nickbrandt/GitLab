@@ -2,7 +2,7 @@
 
 exports[`Design management design index page renders design index 1`] = `
 <div
-  class="design-detail fixed-top w-100 position-bottom-0 d-sm-flex justify-content-center"
+  class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
 >
   <glloadingicon-stub
     class="align-self-center"
@@ -15,7 +15,7 @@ exports[`Design management design index page renders design index 1`] = `
 
 exports[`Design management design index page sets loading state 1`] = `
 <div
-  class="design-detail fixed-top w-100 position-bottom-0 d-sm-flex justify-content-center"
+  class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
 >
   <glloadingicon-stub
     class="align-self-center"

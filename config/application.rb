@@ -22,6 +22,7 @@ module Gitlab
     require_dependency Rails.root.join('lib/gitlab/current_settings')
     require_dependency Rails.root.join('lib/gitlab/middleware/read_only')
     require_dependency Rails.root.join('lib/gitlab/middleware/basic_health_check')
+    require_dependency Rails.root.join('lib/gitlab/runtime')
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
@@ -157,6 +158,8 @@ module Gitlab
     config.assets.paths << "#{config.root}/vendor/assets/fonts"
 
     config.assets.precompile << "print.css"
+    config.assets.precompile << "mailer.css"
+    config.assets.precompile << "mailer_client_specific.css"
     config.assets.precompile << "notify.css"
     config.assets.precompile << "mailers/*.css"
     config.assets.precompile << "page_bundles/ide.css"
@@ -253,8 +256,8 @@ module Gitlab
     caching_config_hash[:compress] = false
     caching_config_hash[:namespace] = Gitlab::Redis::Cache::CACHE_NAMESPACE
     caching_config_hash[:expires_in] = 2.weeks # Cache should not grow forever
-    if Sidekiq.server? # threaded context
-      caching_config_hash[:pool_size] = Sidekiq.options[:concurrency] + 5
+    if Gitlab::Runtime.multi_threaded?
+      caching_config_hash[:pool_size] = Gitlab::Redis::Cache.pool_size
       caching_config_hash[:pool_timeout] = 1
     end
 

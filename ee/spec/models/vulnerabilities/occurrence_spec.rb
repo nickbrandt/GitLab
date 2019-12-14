@@ -284,14 +284,28 @@ describe Vulnerabilities::Occurrence do
     set(:project) { create(:project) }
     set(:project2) { create(:project) }
     let!(:finding1) { create(:vulnerabilities_occurrence, project: project) }
-    let!(:finding2) { create(:vulnerabilities_occurrence, project: project) }
+    let!(:finding2) { create(:vulnerabilities_occurrence, project: project, report_type: :dast) }
     let!(:finding3) { create(:vulnerabilities_occurrence, project: project2) }
 
     before do
       create(
         :vulnerability_feedback,
         :dismissal,
+        project: finding1.project,
         project_fingerprint: finding1.project_fingerprint
+      )
+      create(
+        :vulnerability_feedback,
+        :dismissal,
+        project_fingerprint: finding2.project_fingerprint,
+        project: project2
+      )
+      create(
+        :vulnerability_feedback,
+        :dismissal,
+        category: :sast,
+        project_fingerprint: finding2.project_fingerprint,
+        project: finding2.project
       )
     end
 
@@ -437,13 +451,18 @@ describe Vulnerabilities::Occurrence do
   end
 
   describe '#state' do
-    let(:new_finding) { create(:vulnerabilities_finding) }
+    before do
+      create(:vulnerability, :closed, project: finding_with_issue.project, findings: [finding_with_issue])
+    end
+
+    let(:unresolved_finding) { create(:vulnerabilities_finding) }
     let(:confirmed_finding) { create(:vulnerabilities_finding, :confirmed) }
     let(:resolved_finding) { create(:vulnerabilities_finding, :resolved) }
     let(:dismissed_finding) { create(:vulnerabilities_finding, :dismissed) }
+    let(:finding_with_issue) { create(:vulnerabilities_finding, :with_issue_feedback) }
 
-    it 'returns the expected state for a new finding' do
-      expect(new_finding.state).to eq 'new'
+    it 'returns the expected state for a unresolved finding' do
+      expect(unresolved_finding.state).to eq 'opened'
     end
 
     it 'returns the expected state for a confirmed finding' do

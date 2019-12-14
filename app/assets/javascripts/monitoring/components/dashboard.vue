@@ -1,6 +1,6 @@
 <script>
 import _ from 'underscore';
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import VueDraggable from 'vuedraggable';
 import {
   GlButton,
@@ -11,25 +11,21 @@ import {
   GlModalDirective,
   GlTooltipDirective,
 } from '@gitlab/ui';
-import { __, s__ } from '~/locale';
+import PanelType from 'ee_else_ce/monitoring/components/panel_type.vue';
+import { s__ } from '~/locale';
 import createFlash from '~/flash';
 import Icon from '~/vue_shared/components/icon.vue';
 import { getParameterValues, mergeUrlParams, redirectTo } from '~/lib/utils/url_utility';
 import invalidUrl from '~/lib/utils/invalid_url';
-import PanelType from 'ee_else_ce/monitoring/components/panel_type.vue';
 import DateTimePicker from './date_time_picker/date_time_picker.vue';
-import MonitorTimeSeriesChart from './charts/time_series.vue';
-import MonitorSingleStatChart from './charts/single_stat.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
 import TrackEventDirective from '~/vue_shared/directives/track_event';
-import { getTimeDiff, isValidDate, downloadCSVOptions, generateLinkToChartOptions } from '../utils';
+import { getTimeDiff, isValidDate, getAddMetricTrackingOptions } from '../utils';
 
 export default {
   components: {
     VueDraggable,
-    MonitorTimeSeriesChart,
-    MonitorSingleStatChart,
     PanelType,
     GraphGroup,
     EmptyState,
@@ -103,6 +99,10 @@ export default {
       type: String,
       required: true,
     },
+    emptyNoDataSmallSvgPath: {
+      type: String,
+      required: true,
+    },
     emptyUnableToConnectSvgPath: {
       type: String,
       required: true,
@@ -167,6 +167,7 @@ export default {
       formIsValid: null,
       selectedTimeWindow: {},
       isRearrangingPanels: false,
+      hasValidDates: true,
     };
   },
   computed: {
@@ -179,16 +180,21 @@ export default {
       'showEmptyState',
       'environments',
       'deploymentData',
-      'metricsWithData',
       'useDashboardEndpoint',
       'allDashboards',
       'additionalPanelTypesEnabled',
     ]),
+    ...mapGetters('monitoringDashboard', ['metricsWithData']),
     firstDashboard() {
-      return this.allDashboards[0] || {};
+      return this.environmentsEndpoint.length > 0 && this.allDashboards.length > 0
+        ? this.allDashboards[0]
+        : {};
+    },
+    selectedDashboard() {
+      return this.allDashboards.find(d => d.path === this.currentDashboard) || this.firstDashboard;
     },
     selectedDashboardText() {
-      return this.currentDashboard || this.firstDashboard.display_name;
+      return this.selectedDashboard.display_name;
     },
     showRearrangePanelsBtn() {
       return !this.showEmptyState && this.rearrangePanelsAvailable;
@@ -196,8 +202,13 @@ export default {
     addingMetricsAvailable() {
       return IS_EE && this.canAddMetrics && !this.showEmptyState;
     },
-    alertWidgetAvailable() {
-      return IS_EE && this.prometheusAlertsAvailable && this.alertsEndpoint;
+    hasHeaderButtons() {
+      return (
+        this.addingMetricsAvailable ||
+        this.showRearrangePanelsBtn ||
+        this.selectedDashboard.can_edit ||
+        this.externalDashboardUrl.length
+      );
     },
   },
   created() {
@@ -226,8 +237,10 @@ export default {
       this.selectedTimeWindow = range;
 
       if (!isValidDate(start) || !isValidDate(end)) {
+        this.hasValidDates = false;
         this.showInvalidDateError();
       } else {
+        this.hasValidDates = true;
         this.fetchData(range);
       }
     }
@@ -237,53 +250,17 @@ export default {
       'fetchData',
       'setGettingStartedEmptyState',
       'setEndpoints',
-      'setDashboardEnabled',
       'setPanelGroupMetrics',
     ]),
-    chartsWithData(charts) {
-      if (!this.useDashboardEndpoint) {
-        return charts;
-      }
-      return charts.filter(chart =>
-        chart.metrics.some(metric => this.metricsWithData.includes(metric.metric_id)),
-      );
-    },
-    csvText(graphData) {
-      const chartData = graphData.queries[0].result[0].values;
-      const yLabel = graphData.y_label;
-      const header = `timestamp,${yLabel}\r\n`; // eslint-disable-line @gitlab/i18n/no-non-i18n-strings
-      return chartData.reduce((csv, data) => {
-        const row = data.join(',');
-        return `${csv}${row}\r\n`;
-      }, header);
-    },
-    downloadCsv(graphData) {
-      const data = new Blob([this.csvText(graphData)], { type: 'text/plain' });
-      return window.URL.createObjectURL(data);
-    },
-    // TODO: BEGIN, Duplicated code with panel_type until feature flag is removed
-    // Issue number: https://gitlab.com/gitlab-org/gitlab-foss/issues/63845
-    getGraphAlerts(queries) {
-      if (!this.allAlerts) return {};
-      const metricIdsForChart = queries.map(q => q.metricId);
-      return _.pick(this.allAlerts, alert => metricIdsForChart.includes(alert.metricId));
-    },
-    getGraphAlertValues(queries) {
-      return Object.values(this.getGraphAlerts(queries));
-    },
-    showToast() {
-      this.$toast.show(__('Link copied'));
-    },
-    // TODO: END
-    updateMetrics(key, metrics) {
+    updatePanels(key, panels) {
       this.setPanelGroupMetrics({
-        metrics,
+        panels,
         key,
       });
     },
-    removeMetric(key, metrics, graphIndex) {
+    removePanel(key, panels, graphIndex) {
       this.setPanelGroupMetrics({
-        metrics: metrics.filter((v, i) => i !== graphIndex),
+        panels: panels.filter((v, i) => i !== graphIndex),
         key,
       });
     },
@@ -308,13 +285,12 @@ export default {
       this.$refs.customMetricsForm.submit();
     },
     groupHasData(group) {
-      return this.chartsWithData(group.metrics).length > 0;
+      return this.metricsWithData(group.key).length > 0;
     },
     onDateTimePickerApply(timeWindowUrlParams) {
       return redirectTo(mergeUrlParams(timeWindowUrlParams, window.location.href));
     },
-    downloadCSVOptions,
-    generateLinkToChartOptions,
+    getAddMetricTrackingOptions,
   },
   addMetric: {
     title: s__('Metrics|Add metric'),
@@ -376,7 +352,7 @@ export default {
           </gl-form-group>
 
           <gl-form-group
-            v-if="!showEmptyState"
+            v-if="hasValidDates"
             :label="s__('Metrics|Show last')"
             label-size="sm"
             label-for="monitor-time-window-dropdown"
@@ -390,7 +366,7 @@ export default {
         </template>
 
         <gl-form-group
-          v-if="addingMetricsAvailable || showRearrangePanelsBtn || externalDashboardUrl.length"
+          v-if="hasHeaderButtons"
           label-for="prometheus-graphs-dropdown-buttons"
           class="dropdown-buttons col-md d-md-flex col-lg d-lg-flex align-items-end"
         >
@@ -406,9 +382,10 @@ export default {
             </gl-button>
             <gl-button
               v-if="addingMetricsAvailable"
+              ref="addMetricBtn"
               v-gl-modal="$options.addMetric.modalId"
               variant="outline-success"
-              class="mr-2 mt-1 js-add-metric-button"
+              class="mr-2 mt-1"
             >
               {{ $options.addMetric.title }}
             </gl-button>
@@ -428,6 +405,8 @@ export default {
               <div slot="modal-footer">
                 <gl-button @click="hideAddMetricModal">{{ __('Cancel') }}</gl-button>
                 <gl-button
+                  ref="submitCustomMetricsFormBtn"
+                  v-track-event="getAddMetricTrackingOptions()"
                   :disabled="!formIsValid"
                   variant="success"
                   @click="submitCustomMetricsForm"
@@ -436,6 +415,14 @@ export default {
                 </gl-button>
               </div>
             </gl-modal>
+
+            <gl-button
+              v-if="selectedDashboard.can_edit"
+              class="mt-1 js-edit-link"
+              :href="selectedDashboard.project_blob_path"
+            >
+              {{ __('Edit dashboard') }}
+            </gl-button>
 
             <gl-button
               v-if="externalDashboardUrl.length"
@@ -459,18 +446,18 @@ export default {
         :key="`${groupData.group}.${groupData.priority}`"
         :name="groupData.group"
         :show-panels="showPanels"
-        :collapse-group="groupHasData(groupData)"
+        :collapse-group="!groupHasData(groupData)"
       >
-        <template v-if="additionalPanelTypesEnabled">
+        <div v-if="groupHasData(groupData)">
           <vue-draggable
-            :value="groupData.metrics"
+            :value="groupData.panels"
             group="metrics-dashboard"
             :component-data="{ attrs: { class: 'row mx-0 w-100' } }"
             :disabled="!isRearrangingPanels"
-            @input="updateMetrics(groupData.key, $event)"
+            @input="updatePanels(groupData.key, $event)"
           >
             <div
-              v-for="(graphData, graphIndex) in groupData.metrics"
+              v-for="(graphData, graphIndex) in groupData.panels"
               :key="`panel-type-${graphIndex}`"
               class="col-12 col-lg-6 px-2 mb-2 draggable"
               :class="{ 'draggable-enabled': isRearrangingPanels }"
@@ -479,7 +466,7 @@ export default {
                 <div
                   v-if="isRearrangingPanels"
                   class="draggable-remove js-draggable-remove p-2 w-100 position-absolute d-flex justify-content-end"
-                  @click="removeMetric(groupData.key, groupData.metrics, graphIndex)"
+                  @click="removePanel(groupData.key, groupData.panels, graphIndex)"
                 >
                   <a class="mx-2 p-2 draggable-remove-link" :aria-label="__('Remove')"
                     ><icon name="close"
@@ -498,72 +485,22 @@ export default {
               </div>
             </div>
           </vue-draggable>
-        </template>
-        <template v-else>
-          <monitor-time-series-chart
-            v-for="(graphData, graphIndex) in chartsWithData(groupData.metrics)"
-            :key="graphIndex"
-            class="col-12 col-lg-6 pb-3"
-            :graph-data="graphData"
-            :deployment-data="deploymentData"
-            :thresholds="getGraphAlertValues(graphData.queries)"
-            :project-path="projectPath"
-            group-id="monitor-time-series-chart"
-          >
-            <div
-              class="d-flex align-items-center"
-              :class="alertWidgetAvailable ? 'justify-content-between' : 'justify-content-end'"
-            >
-              <alert-widget
-                v-if="alertWidgetAvailable && graphData"
-                :modal-id="`alert-modal-${index}-${graphIndex}`"
-                :alerts-endpoint="alertsEndpoint"
-                :relevant-queries="graphData.queries"
-                :alerts-to-manage="getGraphAlerts(graphData.queries)"
-                @setAlerts="setAlerts"
-              />
-              <gl-dropdown
-                v-gl-tooltip
-                class="ml-2 mr-3"
-                toggle-class="btn btn-transparent border-0"
-                :right="true"
-                :no-caret="true"
-                :title="__('More actions')"
-              >
-                <template slot="button-content">
-                  <icon name="ellipsis_v" class="text-secondary" />
-                </template>
-                <gl-dropdown-item
-                  v-track-event="downloadCSVOptions(graphData.title)"
-                  :href="downloadCsv(graphData)"
-                  download="chart_metrics.csv"
-                >
-                  {{ __('Download CSV') }}
-                </gl-dropdown-item>
-                <gl-dropdown-item
-                  v-track-event="
-                    generateLinkToChartOptions(
-                      generateLink(groupData.group, graphData.title, graphData.y_label),
-                    )
-                  "
-                  class="js-chart-link"
-                  :data-clipboard-text="
-                    generateLink(groupData.group, graphData.title, graphData.y_label)
-                  "
-                  @click="showToast"
-                >
-                  {{ __('Generate link to chart') }}
-                </gl-dropdown-item>
-                <gl-dropdown-item
-                  v-if="alertWidgetAvailable"
-                  v-gl-modal="`alert-modal-${index}-${graphIndex}`"
-                >
-                  {{ __('Alerts') }}
-                </gl-dropdown-item>
-              </gl-dropdown>
-            </div>
-          </monitor-time-series-chart>
-        </template>
+        </div>
+        <div v-else class="py-5 col col-sm-10 col-md-8 col-lg-7 col-xl-6">
+          <empty-state
+            ref="empty-group"
+            selected-state="noDataGroup"
+            :documentation-path="documentationPath"
+            :settings-path="settingsPath"
+            :clusters-path="clustersPath"
+            :empty-getting-started-svg-path="emptyGettingStartedSvgPath"
+            :empty-loading-svg-path="emptyLoadingSvgPath"
+            :empty-no-data-svg-path="emptyNoDataSvgPath"
+            :empty-no-data-small-svg-path="emptyNoDataSmallSvgPath"
+            :empty-unable-to-connect-svg-path="emptyUnableToConnectSvgPath"
+            :compact="true"
+          />
+        </div>
       </graph-group>
     </div>
     <empty-state
@@ -575,6 +512,7 @@ export default {
       :empty-getting-started-svg-path="emptyGettingStartedSvgPath"
       :empty-loading-svg-path="emptyLoadingSvgPath"
       :empty-no-data-svg-path="emptyNoDataSvgPath"
+      :empty-no-data-small-svg-path="emptyNoDataSmallSvgPath"
       :empty-unable-to-connect-svg-path="emptyUnableToConnectSvgPath"
       :compact="smallEmptyState"
     />

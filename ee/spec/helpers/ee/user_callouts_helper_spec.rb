@@ -177,21 +177,30 @@ describe EE::UserCalloutsHelper do
     set(:gold_plan) { create(:gold_plan) }
     let(:user) { namespace.owner }
 
-    where(:show_gold_trial?, :user_default_dashboard?, :has_no_trial_or_gold_plan?, :should_render?) do
-      true  | true  | true  | true
-      true  | true  | false | false
-      true  | false | true  | false
-      false | true  | true  | false
-      true  | false | false | false
-      false | false | true  | false
-      false | true  | false | false
-      false | false | false | false
+    where(:has_some_namespaces_with_no_trials?, :show_gold_trial?, :user_default_dashboard?, :has_no_trial_or_gold_plan?, :should_render?) do
+      true  | true  | true  | true  | true
+      true  | true  | true  | false | false
+      true  | true  | false | true  | false
+      true  | false | true  | true  | false
+      true  | true  | false | false | false
+      true  | false | false | true  | false
+      true  | false | true  | false | false
+      true  | false | false | false | false
+      false | true  | true  | true  | false
+      false | true  | true  | false | false
+      false | true  | false | true  | false
+      false | false | true  | true  | false
+      false | true  | false | false | false
+      false | false | false | true  | false
+      false | false | true  | false | false
+      false | false | false | false | false
     end
 
     with_them do
       before do
         allow(helper).to receive(:show_gold_trial?) { show_gold_trial? }
         allow(helper).to receive(:user_default_dashboard?) { user_default_dashboard? }
+        allow(helper).to receive(:has_some_namespaces_with_no_trials?) { has_some_namespaces_with_no_trials? }
         namespace.update(plan: gold_plan) unless has_no_trial_or_gold_plan?
       end
 
@@ -210,20 +219,30 @@ describe EE::UserCalloutsHelper do
   describe '#render_billings_gold_trial' do
     using RSpec::Parameterized::TableSyntax
 
-    set(:namespace) { create(:namespace) }
+    let(:namespace) { create(:namespace) }
+    set(:free_plan) { create(:free_plan) }
     set(:silver_plan) { create(:silver_plan) }
     set(:gold_plan) { create(:gold_plan) }
     let(:user) { namespace.owner }
+    let(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace) }
 
-    where(:show_gold_trial?, :gold_plan?, :free_plan?, :should_render?) do
-      true  | false | false | true
-      true  | false | true  | true
-      true  | true  | true  | false
-      true  | true  | false | false
-      false | true  | true  | false
-      false | false | true  | false
-      false | true  | false | false
-      false | false | false | false
+    where(:never_had_trial?, :show_gold_trial?, :gold_plan?, :free_plan?, :should_render?) do
+      true  | true  | false | false | true
+      true  | true  | false | true  | true
+      true  | true  | true  | true  | false
+      true  | true  | true  | false | false
+      true  | false | true  | true  | false
+      true  | false | false | true  | false
+      true  | false | true  | false | false
+      true  | false | false | false | false
+      false | true  | false | false | false
+      false | true  | false | true  | false
+      false | true  | true  | true  | false
+      false | true  | true  | false | false
+      false | false | true  | true  | false
+      false | false | false | true  | false
+      false | false | true  | false | false
+      false | false | false | false | false
     end
 
     with_them do
@@ -231,6 +250,11 @@ describe EE::UserCalloutsHelper do
         allow(helper).to receive(:show_gold_trial?) { show_gold_trial? }
         namespace.update(plan: gold_plan) if gold_plan?
         namespace.update(plan: silver_plan) if !gold_plan? && !free_plan?
+
+        unless never_had_trial?
+          namespace.update(plan: free_plan)
+          namespace.create_gitlab_subscription(trial_ends_on: Date.yesterday)
+        end
       end
 
       it do

@@ -5,6 +5,14 @@ module EE
     extend ActiveSupport::Concern
 
     class_methods do
+      def visible_to_user_and_access_level(user, access_level)
+        where(user: user).where('access_level >= ?', access_level)
+      end
+
+      def pluck_user_ids
+        pluck(:user_id)
+      end
+
       # Get amout of users with highest role they have.
       # If John is developer in one project but maintainer in another he will be
       # counted once as maintainer. This is needed to count users who don't use

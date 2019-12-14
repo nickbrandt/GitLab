@@ -15,9 +15,10 @@ describe Vulnerabilities::OccurrencePresenter do
 
     context 'with a sha' do
       before do
-        allow_any_instance_of(Vulnerabilities::Occurrence).to receive(:sha)
-          .and_return('abc')
+        occurrence.sha = 'abc'
       end
+
+      it { is_expected.to include(occurrence.sha) }
 
       context 'without start_line or end_line' do
         before do

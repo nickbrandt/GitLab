@@ -18,7 +18,9 @@ You can read more about the Docker Registry at
 
 **Omnibus GitLab installations**
 
-All you have to do is configure the domain name under which the Container
+If you are using the Omnibus GitLab built in [Let's Encrypt integration](https://docs.gitlab.com/omnibus/settings/ssl.html#lets-encrypt-integration), as of GitLab 12.5, the Container Registry will be automatically enabled on port 5050 of the default domain.
+
+If you would like to use a separate domain, all you have to do is configure the domain name under which the Container
 Registry will listen to. Read
 [#container-registry-domain-configuration](#container-registry-domain-configuration)
 and pick one of the two options that fits your case.
@@ -455,36 +457,40 @@ If Registry is enabled in your GitLab instance, but you don't need it for your
 project, you can disable it from your project's settings. Read the user guide
 on how to achieve that.
 
-## Disable Container Registry but use GitLab as an auth endpoint
+## Use an external container registry with GitLab as an auth endpoint
 
 **Omnibus GitLab**
 
-You can use GitLab as an auth endpoint and use a non-bundled Container Registry.
+You can use GitLab as an auth endpoint with an external container registry.
 
 1. Open `/etc/gitlab/gitlab.rb` and set necessary configurations:
 
    ```ruby
    gitlab_rails['registry_enabled'] = true
-   gitlab_rails['registry_host'] = "registry.gitlab.example.com"
-   gitlab_rails['registry_port'] = "5005"
    gitlab_rails['registry_api_url'] = "http://localhost:5000"
-   gitlab_rails['registry_path'] = "/var/opt/gitlab/gitlab-rails/shared/registry"
    gitlab_rails['registry_issuer'] = "omnibus-gitlab-issuer"
    ```
 
-1. A certificate keypair is required for GitLab and the Container Registry to
-   communicate securely.  By default Omnibus GitLab will generate one keypair,
-   which is saved to `/var/opt/gitlab/gitlab-rails/etc/gitlab-registry.key`.
-   When using a non-bundled Container Registry, you will need to supply a
-   custom certificate key. To do that, add the following to
-   `/etc/gitlab/gitlab.rb`
+   NOTE: **Note:**
+   `gitlab_rails['registry_enabled'] = true` is needed to enable GitLab's
+   Container Registry features and authentication endpoint. GitLab's bundled
+   Container Registry service will not be started even with this enabled.
+
+1. A certificate-key pair is required for GitLab and the external container
+   registry to communicate securely. You will need to create a certificate-key
+   pair, configuring the external container registry with the public
+   certificate and configuring GitLab with the private key. To do that, add
+   the following to `/etc/gitlab/gitlab.rb`:
 
    ```ruby
-   gitlab_rails['registry_key_path'] = "/custom/path/to/registry-key.key"
    # registry['internal_key'] should contain the contents of the custom key
    # file. Line breaks in the key file should be marked using `\n` character
    # Example:
    registry['internal_key'] = "---BEGIN RSA PRIVATE KEY---\nMIIEpQIBAA\n"
+
+   # Optionally define a custom file for Omnibus GitLab to write the contents
+   # of registry['internal_key'] to.
+   gitlab_rails['registry_key_path'] = "/custom/path/to/registry-key.key"
    ```
 
    NOTE: **Note:**
@@ -494,7 +500,16 @@ You can use GitLab as an auth endpoint and use a non-bundled Container Registry.
    `/var/opt/gitlab/gitlab-rails/etc/gitlab-registry.key` and will populate
    it.
 
-1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+1. To change the container registry URL displayed in the GitLab Container
+   Registry pages, set the following configurations:
+
+   ```ruby
+   gitlab_rails['registry_host'] = "registry.gitlab.example.com"
+   gitlab_rails['registry_port'] = "5005"
+   ```
+
+1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure)
+   for the changes to take effect.
 
 **Installations from source**
 
@@ -877,6 +892,6 @@ The above image shows:
 - The HEAD request to the AWS bucket reported a 403 Unauthorized.
 
 What does this mean? This strongly suggests that the S3 user does not have the right
-[permissions to perform a HEAD request](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html).
+[permissions to perform a HEAD request](https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html).
 The solution: check the [IAM permissions again](https://docs.docker.com/registry/storage-drivers/s3/).
 Once the right permissions were set, the error will go away.

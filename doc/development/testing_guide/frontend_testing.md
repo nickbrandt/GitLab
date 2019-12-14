@@ -26,7 +26,7 @@ If you need to update an existing Karma test file (found in `spec/javascripts`),
 need to migrate the whole spec to Jest. Simply updating the Karma spec to test your change
 is fine. It is probably more appropriate to migrate to Jest in a separate merge request.
 
-If you need to create a new test file, we strongly recommend creating one in Jest. This will
+If you create a new test file, it needs to be created in Jest. This will
 help support our migration and we think you'll love using Jest.
 
 As always, please use discretion. Jest solves a lot of issues we experienced in Karma and
@@ -501,6 +501,39 @@ it('waits for an event', () => {
 });
 ```
 
+#### Ensuring that tests are isolated
+
+Tests are normally architected in a pattern which requires a recurring setup and breakdown of the component under test. This is done by making use of the `beforeEach` and `afterEach` hooks.
+
+Example
+
+```javascript
+  let wrapper;
+
+  beforeEach(() => {
+    wrapper = mount(Component);
+  });
+
+  afterEach(() => {
+    wrapper.destroy();
+  });
+```
+
+When looking at this initially you'd suspect that the component is setup before each test and then broken down afterwards, providing isolation between tests.
+
+This is however not entirely true as the `destroy` method does not remove everything which has been mutated on the `wrapper` object. For functional components, destroy only removes the rendered DOM elements from the document.
+
+In order to ensure that a clean wrapper object and DOM are being used in each test, the breakdown of the component should rather be performed as follows:
+
+```javascript
+  afterEach(() => {
+    wrapper.destroy();
+    wrapper = null;
+  });
+```
+
+See also the [Vue Test Utils documention on `destroy`](https://vue-test-utils.vuejs.org/api/wrapper/#destroy).
+
 #### Migrating flaky Karma tests to Jest
 
 Some of our Karma tests are flaky because they access the properties of a shared scope.
@@ -519,6 +552,7 @@ For running the frontend tests, you need the following commands:
 
 - `rake frontend:fixtures` (re-)generates [fixtures](#frontend-test-fixtures).
 - `yarn test` executes the tests.
+- `yarn jest` executes only the Jest tests.
 
 As long as the fixtures don't change, `yarn test` is sufficient (and saves you some time).
 
@@ -558,6 +592,24 @@ glob otherwise your shell may split it into multiple arguments:
 ```bash
 # Run all specs named `file_spec` within the IDE subdirectory
 yarn karma -f 'spec/javascripts/ide/**/file_spec.js'
+```
+
+It is also possible to target individual Jest / RSpec tests:
+
+```bash
+# Run specific jest file
+yarn jest ./path/to/local_spec.js
+# Run specific jest folder
+yarn jest ./path/to/folder/
+# Run all jest files which path contain term
+yarn jest term
+```
+
+```bash
+# Run specific rspec file
+rspec ./path/to/local_spec.rb
+# Run specific block within rspec file
+rspec ./path/to/local_spec.rb:15
 ```
 
 ## Frontend test fixtures

@@ -3,11 +3,12 @@
 module Clusters
   module Aws
     class FetchCredentialsService
-      attr_reader :provider
+      attr_reader :provision_role
 
       MissingRoleError = Class.new(StandardError)
 
-      def initialize(provider)
+      def initialize(provision_role, provider: nil)
+        @provision_role = provision_role
         @provider = provider
       end
 
@@ -18,42 +19,57 @@ module Clusters
           client: client,
           role_arn: provision_role.role_arn,
           role_session_name: session_name,
-          external_id: provision_role.role_external_id
+          external_id: provision_role.role_external_id,
+          policy: session_policy
         ).credentials
       end
 
       private
 
-      def provision_role
-        provider.created_by_user.aws_role
-      end
+      attr_reader :provider
 
       def client
-        ::Aws::STS::Client.new(credentials: gitlab_credentials, region: provider.region)
+        ::Aws::STS::Client.new(credentials: gitlab_credentials, region: region)
       end
 
       def gitlab_credentials
         ::Aws::Credentials.new(access_key_id, secret_access_key)
       end
 
-      ##
-      # This setting is not yet configurable or documented as these
-      # services are not currently used. This will be addressed in
-      # https://gitlab.com/gitlab-org/gitlab/merge_requests/18307
       def access_key_id
-        Gitlab.config.kubernetes.provisioners.aws.access_key_id
+        Gitlab::CurrentSettings.eks_access_key_id
+      end
+
+      def secret_access_key
+        Gitlab::CurrentSettings.eks_secret_access_key
+      end
+
+      def region
+        provider&.region || Clusters::Providers::Aws::DEFAULT_REGION
       end
 
       ##
-      # This setting is not yet configurable or documented as these
-      # services are not currently used. This will be addressed in
-      # https://gitlab.com/gitlab-org/gitlab/merge_requests/18307
-      def secret_access_key
-        Gitlab.config.kubernetes.provisioners.aws.secret_access_key
+      # If we haven't created a provider record yet,
+      # we restrict ourselves to read only access so
+      # that we can safely expose credentials to the
+      # frontend (to be used when populating the
+      # creation form).
+      def session_policy
+        if provider.nil?
+          File.read(read_only_policy)
+        end
+      end
+
+      def read_only_policy
+        Rails.root.join('vendor', 'aws', 'iam', "eks_cluster_read_only_policy.json")
       end
 
       def session_name
-        "gitlab-eks-cluster-#{provider.cluster_id}-user-#{provider.created_by_user_id}"
+        if provider.present?
+          "gitlab-eks-cluster-#{provider.cluster_id}-user-#{provision_role.user_id}"
+        else
+          "gitlab-eks-autofill-user-#{provision_role.user_id}"
+        end
       end
     end
   end

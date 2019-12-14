@@ -86,6 +86,7 @@ describe Git::BranchPushService, services: true do
                 after: newrev,
                 ref: ref,
                 checkout_sha: SeedRepo::Commit::ID,
+                variables_attributes: [],
                 push_options: {}
               }).and_call_original
 
@@ -107,7 +108,7 @@ describe Git::BranchPushService, services: true do
       end
 
       it 'reports an error' do
-        allow(Sidekiq).to receive(:server?).and_return(true)
+        allow(Gitlab::Runtime).to receive(:sidekiq?).and_return(true)
         expect(Sidekiq.logger).to receive(:warn)
 
         expect { subject }.not_to change { Ci::Pipeline.count }

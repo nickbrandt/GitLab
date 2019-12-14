@@ -57,7 +57,7 @@ module UsersHelper
 
     unless user.association(:status).loaded?
       exception = RuntimeError.new("Status was not preloaded")
-      Gitlab::Sentry.track_exception(exception, extra: { user: user.inspect })
+      Gitlab::Sentry.track_and_raise_for_dev_exception(exception, user: user.inspect)
     end
 
     return unless user.status
@@ -95,6 +95,14 @@ module UsersHelper
     tabs
   end
 
+  def trials_link_url
+    'https://about.gitlab.com/free-trial/'
+  end
+
+  def trials_allowed?(user)
+    false
+  end
+
   def get_current_user_menu_items
     items = []
 
@@ -105,6 +113,7 @@ module UsersHelper
     items << :help
     items << :profile if can?(current_user, :read_user, current_user)
     items << :settings if can?(current_user, :update_user, current_user)
+    items << :start_trial if trials_allowed?(current_user)
 
     items
   end

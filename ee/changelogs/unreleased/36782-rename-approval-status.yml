@@ -1,0 +1,5 @@
+---
+title: Rename software_license_policies.approval_status to software_license_policies.classification
+merge_request: 20414
+author:
+type: changed

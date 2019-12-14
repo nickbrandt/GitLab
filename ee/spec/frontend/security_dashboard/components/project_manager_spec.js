@@ -5,9 +5,9 @@ import createDefaultState from 'ee/security_dashboard/store/modules/project_sele
 
 import { GlButton } from '@gitlab/ui';
 
-import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import ProjectManager from 'ee/security_dashboard/components/project_manager.vue';
 import ProjectList from 'ee/security_dashboard/components/project_list.vue';
+import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);

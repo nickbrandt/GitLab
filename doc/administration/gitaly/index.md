@@ -89,6 +89,10 @@ your GitLab installation has three repository storages: `default`,
 `storage1` and `storage2`. You can use as little as just one server with one
 repository storage if desired.
 
+Note: **Note:** The token referred to throughout the Gitaly documentation is
+just an arbitrary password selected by the administrator. It is unrelated to
+tokens created for the GitLab API or other similar web API tokens.
+
 ### 1. Installation
 
 First install Gitaly on each Gitaly server using either
@@ -217,6 +221,8 @@ Git operations in GitLab will result in an API error.
    ```toml
    listen_addr = '0.0.0.0:8075'
 
+   internal_socket_dir = '/var/opt/gitlab/gitaly'
+
    [auth]
    token = 'abc123secret'
 
@@ -328,7 +334,10 @@ When you tail the Gitaly logs on your Gitaly server you should see requests
 coming in. One sure way to trigger a Gitaly request is to clone a repository
 from your GitLab server over HTTP.
 
-DANGER: **Danger:** If you have [custom server-side Git hooks](../custom_hooks.md#custom-server-side-git-hooks) configured, either per repository or globally, you must move these to the Gitaly node. If you have multiple Gitaly nodes, copy your custom hook(s) to all nodes.
+DANGER: **Danger:**
+If you have [custom server-side Git hooks](../custom_hooks.md) configured,
+either per repository or globally, you must move these to the Gitaly node.
+If you have multiple Gitaly nodes, copy your custom hook(s) to all nodes.
 
 ### Disabling the Gitaly service in a cluster environment
 
@@ -407,11 +416,11 @@ To configure Gitaly with TLS:
    ```
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on client node(s).
-1. Create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
+1. On the Gitaly server, create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
 
    ```sh
    sudo mkdir -p /etc/gitlab/ssl
-   sudo chmod 700 /etc/gitlab/ssl
+   sudo chmod 755 /etc/gitlab/ssl
    sudo cp key.pem cert.pem /etc/gitlab/ssl/
    ```
 
@@ -555,6 +564,9 @@ a few things that you need to do:
    including [incremental logging](../job_logs.md#new-incremental-logging-architecture).
 1. Configure [object storage for LFS objects](../lfs/lfs_administration.md#storing-lfs-objects-in-remote-object-storage).
 1. Configure [object storage for uploads](../uploads.md#using-object-storage-core-only).
+1. Configure [object storage for Merge Request Diffs](../merge_request_diffs.md#using-object-storage).
+1. Configure [object storage for Packages](../packages/index.md#using-object-storage) (Optional Feature).
+1. Configure [object storage for Dependency Proxy](../packages/dependency_proxy.md#using-object-storage) (Optional Feature).
 
 NOTE: **Note:**
 One current feature of GitLab that still requires a shared directory (NFS) is
@@ -708,6 +720,14 @@ result as you did in the beginning:
 Note that `enforced="true"`, meaning that authentication is being enforced.
 
 ## Troubleshooting Gitaly
+
+### Checking versions when using standalone Gitaly nodes
+
+When using standalone Gitaly nodes, you must make sure they are the same version
+as GitLab to ensure full compatibility. Check **Admin Area > Gitaly Servers** on
+your GitLab instance and confirm all Gitaly Servers are `Up to date`.
+
+![Gitaly standalone software versions diagram](img/gitlab_gitaly_version_mismatch_v12_4.png)
 
 ### `gitaly-debug`
 

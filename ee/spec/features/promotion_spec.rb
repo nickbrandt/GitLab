@@ -319,16 +319,16 @@ describe 'Promotions', :js do
       visit project_issue_path(project, issue)
       wait_for_requests
 
-      find('.js-weight-sidebar-callout .btn-link').click
+      find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
 
-      expect(find('.promotion-issue-sidebar-message')).to have_content 'Improve issues management with Issue weight and GitLab Enterprise Edition'
+      expect(find('.promotion-issue-weight-sidebar-message')).to have_content 'Improve issues management with Issue weight and GitLab Enterprise Edition'
     end
 
     it 'is removed after dismissal' do
       visit project_issue_path(project, issue)
       wait_for_requests
 
-      find('.js-weight-sidebar-callout .btn-link').click
+      find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
       find('.js-weight-sidebar-callout .js-close-callout').click
 
       expect(page).not_to have_selector('.js-weight-sidebar-callout')
@@ -338,7 +338,7 @@ describe 'Promotions', :js do
       visit project_issue_path(project, issue)
       wait_for_requests
 
-      find('.js-weight-sidebar-callout .btn-link').click
+      find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
       find('.js-weight-sidebar-callout .js-close-callout').click
       visit project_issue_path(project, issue)
 
@@ -349,8 +349,8 @@ describe 'Promotions', :js do
       visit project_issue_path(project, issue)
       wait_for_requests
 
-      find('.js-weight-sidebar-callout .btn-link').click
-      find('.js-weight-sidebar-callout .dropdown-menu-close').click
+      find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
+      find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
 
       expect(page).to have_selector('.js-weight-sidebar-callout')
       expect(page).to have_selector('.promotion-issue-sidebar-message', visible: false)

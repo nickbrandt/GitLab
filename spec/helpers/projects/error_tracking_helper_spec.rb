@@ -75,4 +75,26 @@ describe Projects::ErrorTrackingHelper do
       end
     end
   end
+
+  describe '#error_details_data' do
+    let(:issue_id) { 1234 }
+    let(:route_params) { [project.owner, project, issue_id, { format: :json }] }
+    let(:details_path) { details_namespace_project_error_tracking_index_path(*route_params) }
+    let(:stack_trace_path) { stack_trace_namespace_project_error_tracking_index_path(*route_params) }
+    let(:issues_path) { project_issues_path(project) }
+
+    let(:result) { helper.error_details_data(project, issue_id) }
+
+    it 'returns the correct details path' do
+      expect(result['issue-details-path']).to eq details_path
+    end
+
+    it 'returns the correct stack trace path' do
+      expect(result['issue-stack-trace-path']).to eq stack_trace_path
+    end
+
+    it 'creates an issue and redirects to issue show page' do
+      expect(result['project-issues-path']).to eq issues_path
+    end
+  end
 end

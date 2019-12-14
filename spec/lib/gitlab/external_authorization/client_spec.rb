@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::ExternalAuthorization::Client do
   let(:user) { build(:user, email: 'dummy_user@example.com') }
   let(:dummy_url) { 'https://dummy.net/' }
+
   subject(:client) { described_class.new(user, 'dummy_label') }
 
   before do

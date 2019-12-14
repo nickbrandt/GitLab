@@ -37,6 +37,7 @@ module EE
         :geo_node_allowed_ips,
         :help_text,
         :lock_memberships_to_ldap,
+        :max_personal_access_token_lifetime,
         :pseudonymizer_enabled,
         :repository_size_limit,
         :shared_runners_minutes,

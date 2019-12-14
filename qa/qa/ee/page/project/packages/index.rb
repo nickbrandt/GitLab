@@ -6,7 +6,7 @@ module QA
       module Project
         module Packages
           class Index < QA::Page::Base
-            view 'ee/app/views/projects/packages/packages/index.html.haml' do
+            view 'ee/app/views/projects/packages/packages/_legacy_package_list.html.haml' do
               element :package_row
               element :package_link
             end

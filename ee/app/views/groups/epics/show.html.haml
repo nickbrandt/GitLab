@@ -13,91 +13,50 @@
 
 #epic-app-root{ data: epic_show_app_data(@epic) }
 
-- if Feature.enabled?(:epic_trees, @group)
-  .epic-tabs-holder
-    .epic-tabs-container.js-epic-tabs-container
-      %ul.epic-tabs.nav-tabs.nav.nav-links.scrolling-tabs
-        %li.tree-tab
-          %a#tree-tab.active{ href: '#tree', data: { toggle: 'tab' } }
-            = _('Epics and Issues')
-        %li.roadmap-tab
-          %a#roadmap-tab{ href: '#roadmap', data: { toggle: 'tab' } }
-            = _('Roadmap')
+.epic-tabs-holder
+  .epic-tabs-container.js-epic-tabs-container
+    %ul.epic-tabs.nav-tabs.nav.nav-links.scrolling-tabs
+      %li.tree-tab
+        %a#tree-tab.active{ href: '#tree', data: { toggle: 'tab' } }
+          = _('Epics and Issues')
+      %li.roadmap-tab
+        %a#roadmap-tab{ href: '#roadmap', data: { toggle: 'tab' } }
+          = _('Roadmap')
 
-  .tab-content.epic-tabs-content.js-epic-tabs-content
-    #tree.tab-pane.show.active
-      .row
-        %section.col-md-12
-          #js-tree{ data: { id: @epic.to_global_id,
-            iid: @epic.iid,
-            full_path: @group.full_path,
-            auto_complete_epics: 'true',
-            auto_complete_issues: 'false',
-            user_signed_in: current_user.present? ? 'true' : 'false',
-            initial: issuable_initial_data(@epic).to_json } }
-    #roadmap.tab-pane
-      .row
-        %section.col-md-12
-          #js-roadmap{ data: { epics_path: group_epics_path(@group, parent_id: @epic.id, format: :json),
-            group_id: @group.id,
-            iid: @epic.iid,
-            full_path: @group.full_path,
-            empty_state_illustration: image_path('illustrations/epics/roadmap.svg'),
-            has_filters_applied: 'false',
-            new_epic_endpoint: group_epics_path(@group),
-            preset_type: roadmap_layout,
-            epics_state: 'all',
-            sorted_by: roadmap_sort_order,
-            inner_height: '600',
-            child_epics: 'true' } }
-  %hr.epic-discussion-separator.mt-1.mb-0
-  .d-flex.justify-content-between.content-block.content-block-small.emoji-list-container.js-noteable-awards
-    = render 'award_emoji/awards_block', awardable: @epic, inline: true
-    .d-flex.flex-wrap.align-items-center.justify-content-lg-end
-      #js-vue-discussion-filter{ data: { default_filter: current_user&.notes_filter_for(@epic),
-        notes_filters: UserPreference.notes_filters.to_json } }
-  .row
-    %section.col-md-12
-      %script.js-notes-data{ type: "application/json" }= initial_notes_data(true).to_json.html_safe
-      .issuable-discussion
-        = render 'discussion'
-- else # Everything below will go away once we remove this feature flag
-  .content-block.content-block-small.emoji-list-container.js-noteable-awards
-    = render 'award_emoji/awards_block', awardable: @epic, inline: true
-
-  .epic-tabs-holder
-    .epic-tabs-container.js-epic-tabs-container
-      %ul.epic-tabs.nav-tabs.nav.nav-links.scrolling-tabs
-        %li.notes-tab.qa-notes-tab
-          %a#discussion-tab.active{ href: '#discussion', data: { toggle: 'tab' } }
-            = _('Discussion')
-            %span.badge.badge-pill= @epic.notes.user.count
-        %li.roadmap-tab
-          %a#roadmap-tab{ href: '#roadmap', data: { toggle: 'tab' } }
-            = _('Roadmap')
-      .d-flex.flex-wrap.align-items-center.justify-content-lg-end
-        #js-vue-discussion-filter{ data: { default_filter: current_user&.notes_filter_for(@epic),
-          notes_filters: UserPreference.notes_filters.to_json } }
-
-  .tab-content.epic-tabs-content.js-epic-tabs-content
-    #discussion.tab-pane.show.active
-      .row
-        %section.col-md-12
-          %script.js-notes-data{ type: "application/json" }= initial_notes_data(true).to_json.html_safe
-          .issuable-discussion
-            = render 'discussion'
-    #roadmap.tab-pane
-      .row
-        %section.col-md-12
-          #js-roadmap{ data: { epics_path: group_epics_path(@group, parent_id: @epic.id, format: :json),
-            group_id: @group.id,
-            iid: @epic.iid,
-            full_path: @group.full_path,
-            empty_state_illustration: image_path('illustrations/epics/roadmap.svg'),
-            has_filters_applied: 'false',
-            new_epic_endpoint: group_epics_path(@group),
-            preset_type: roadmap_layout,
-            epics_state: 'all',
-            sorted_by: roadmap_sort_order,
-            inner_height: '600',
-            child_epics: 'true' } }
+.tab-content.epic-tabs-content.js-epic-tabs-content
+  #tree.tab-pane.show.active
+    .row
+      %section.col-md-12
+        #js-tree{ data: { id: @epic.to_global_id,
+          iid: @epic.iid,
+          full_path: @group.full_path,
+          auto_complete_epics: 'true',
+          auto_complete_issues: 'true',
+          user_signed_in: current_user.present? ? 'true' : 'false',
+          initial: issuable_initial_data(@epic).to_json } }
+  #roadmap.tab-pane
+    .row
+      %section.col-md-12
+        #js-roadmap{ data: { epics_path: group_epics_path(@group, parent_id: @epic.id, format: :json),
+          group_id: @group.id,
+          iid: @epic.iid,
+          full_path: @group.full_path,
+          empty_state_illustration: image_path('illustrations/epics/roadmap.svg'),
+          has_filters_applied: 'false',
+          new_epic_endpoint: group_epics_path(@group),
+          preset_type: roadmap_layout,
+          epics_state: 'all',
+          sorted_by: roadmap_sort_order,
+          inner_height: '600',
+          child_epics: 'true' } }
+%hr.epic-discussion-separator.mt-1.mb-0
+.d-flex.justify-content-between.content-block.content-block-small.emoji-list-container.js-noteable-awards
+  = render 'award_emoji/awards_block', awardable: @epic, inline: true
+  .d-flex.flex-wrap.align-items-center.justify-content-lg-end
+    #js-vue-discussion-filter{ data: { default_filter: current_user&.notes_filter_for(@epic),
+      notes_filters: UserPreference.notes_filters.to_json } }
+.row
+  %section.col-md-12
+    %script.js-notes-data{ type: "application/json" }= initial_notes_data(true).to_json.html_safe
+    .issuable-discussion
+      = render 'discussion'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::GithubImport::SequentialImporter do
@@ -7,8 +9,9 @@ describe Gitlab::GithubImport::SequentialImporter do
       project = double(:project, id: 1, repository: repository)
       importer = described_class.new(project, token: 'foo')
 
-      expect_any_instance_of(Gitlab::GithubImport::Importer::RepositoryImporter)
-        .to receive(:execute)
+      expect_next_instance_of(Gitlab::GithubImport::Importer::RepositoryImporter) do |instance|
+        expect(instance).to receive(:execute)
+      end
 
       described_class::SEQUENTIAL_IMPORTERS.each do |klass|
         instance = double(:instance)

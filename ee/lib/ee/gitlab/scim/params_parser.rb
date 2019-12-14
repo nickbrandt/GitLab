@@ -4,23 +4,7 @@ module EE
   module Gitlab
     module Scim
       class ParamsParser
-        FILTER_OPERATORS = %w[eq].freeze
         OPERATIONS_OPERATORS = %w[Replace Add].freeze
-
-        ATTRIBUTE_MAP = {
-          id: :extern_uid,
-          displayName: :name,
-          'name.formatted': :name,
-          'emails[type eq "work"].value': :email,
-          active: :active,
-          externalId: :extern_uid,
-          userName: :username
-        }.with_indifferent_access.freeze
-
-        COERCED_VALUES = {
-          'True' => true,
-          'False' => false
-        }.freeze
 
         def initialize(params)
           @params = params.with_indifferent_access
@@ -28,57 +12,46 @@ module EE
         end
 
         def deprovision_user?
-          result[:active] == false
+          update_params[:active] == false
         end
 
-        def result
-          @result ||= process
+        def post_params
+          @post_params ||= process_post_params
+        end
+
+        def update_params
+          @update_params ||= process_operations
+        end
+
+        def filter_params
+          @filter_params ||= filter_parser.params
+        end
+
+        def filter_operator
+          filter_parser.operator.to_sym if filter_parser.valid?
         end
 
         private
 
-        def process
-          if @params[:filter]
-            process_filter
-          elsif @params[:Operations]
-            process_operations
-          else
-            # SCIM POST params
-            process_params
-          end
-        end
-
-        def process_filter
-          attribute, operator, value = @params[:filter].split(' ')
-
-          return {} unless FILTER_OPERATORS.include?(operator)
-          return {} unless ATTRIBUTE_MAP[attribute]
-
-          { ATTRIBUTE_MAP[attribute] => coerce(value) }
+        def filter_parser
+          @filter_parser ||= FilterParser.new(@params[:filter])
         end
 
         def process_operations
           @params[:Operations].each_with_object({}) do |operation, hash|
             next unless OPERATIONS_OPERATORS.include?(operation[:op])
 
-            attribute = ATTRIBUTE_MAP[operation[:path]]
-
-            hash[attribute] = coerce(operation[:value]) if attribute
+            hash.merge!(AttributeTransform.new(operation[:path]).map_to(operation[:value]))
           end
         end
 
-        def process_params
+        def process_post_params
           overwrites = { email: parse_emails, name: parse_name }.compact
-          parse_params.merge(overwrites)
-        end
 
-        def parse_params
           # compact can remove :active if the value for that is nil
-          @params.except(:email, :name).compact.each_with_object({}) do |(param, value), hash|
-            attribute = ATTRIBUTE_MAP[param]
-
-            hash[attribute] = coerce(value) if attribute
-          end
+          @params.except(overwrites.keys).compact.each_with_object({}) do |(param, value), hash|
+            hash.merge!(AttributeTransform.new(param).map_to(value))
+          end.merge(overwrites)
         end
 
         def parse_emails
@@ -98,15 +71,6 @@ module EE
           formatted_name = name[:formatted]&.presence
           formatted_name ||= [name[:givenName], name[:familyName]].compact.join(' ')
           @hash[:name] = formatted_name
-        end
-
-        def coerce(value)
-          return value unless value.is_a?(String)
-
-          value = value.delete('\"')
-          coerced = COERCED_VALUES[value]
-
-          coerced.nil? ? value : coerced
         end
       end
     end

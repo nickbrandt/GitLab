@@ -94,6 +94,25 @@ module ApplicationHelper
     sanitize(str, tags: %w(a span))
   end
 
+  def body_data
+    {
+      page: body_data_page,
+      page_type_id: controller.params[:id],
+      find_file: find_file_path,
+      group: "#{@group&.path}"
+    }.merge(project_data)
+  end
+
+  def project_data
+    return {} unless @project
+
+    {
+      project_id: @project.id,
+      project: @project.path,
+      namespace_id: @project.namespace&.id
+    }
+  end
+
   def body_data_page
     [*controller.controller_path.split('/'), controller.action_name].compact.join(':')
   end
@@ -322,6 +341,15 @@ module ApplicationHelper
       commands: commands_project_autocomplete_sources_path(object, type: noteable_type, type_id: params[:id]),
       snippets: snippets_project_autocomplete_sources_path(object)
     }
+  end
+
+  def asset_to_string(name)
+    app = Rails.application
+    if Rails.configuration.assets.compile
+      app.assets.find_asset(name).to_s
+    else
+      controller.view_context.render(file: Rails.root.join('public/assets', app.assets_manifest.assets[name]).to_s)
+    end
   end
 
   private

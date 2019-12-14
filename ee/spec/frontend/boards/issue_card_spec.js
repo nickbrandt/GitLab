@@ -1,8 +1,8 @@
 import { mount } from '@vue/test-utils';
-import ListLabel from '~/boards/models/label';
-import IssueCardInner from '~/boards/components/issue_card_inner.vue';
 import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
 import ListIssueEE from 'ee/boards/models/issue';
+import ListLabel from '~/boards/models/label';
+import IssueCardInner from '~/boards/components/issue_card_inner.vue';
 import defaultStore from '~/boards/stores';
 
 describe('Issue card component', () => {
@@ -22,6 +22,7 @@ describe('Issue card component', () => {
         ...props,
       },
       sync: false,
+      attachToDocument: true,
     });
   };
 

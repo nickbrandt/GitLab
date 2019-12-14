@@ -8,17 +8,20 @@ module EE
       APPROVAL_RENDERING_ACTIONS = [:approve, :approvals, :unapprove].freeze
 
       prepended do
+        include DescriptionDiffActions
+
         before_action only: [:show] do
           push_frontend_feature_flag(:sast_merge_request_report_api, default_enabled: true)
           push_frontend_feature_flag(:dast_merge_request_report_api)
           push_frontend_feature_flag(:container_scanning_merge_request_report_api, default_enabled: true)
           push_frontend_feature_flag(:dependency_scanning_merge_request_report_api, default_enabled: true)
-          push_frontend_feature_flag(:parsed_license_report)
+          push_frontend_feature_flag(:parsed_license_report, default_enabled: true)
+          push_frontend_feature_flag(:anonymous_visual_review_feedback)
         end
 
         before_action :whitelist_query_limiting_ee_merge, only: [:merge]
         before_action :whitelist_query_limiting_ee_show, only: [:show]
-        before_action :authorize_read_pipeline!, only: [:container_scanning_reports, :dependency_scanning_reports, :sast_reports]
+        before_action :authorize_read_pipeline!, only: [:container_scanning_reports, :dependency_scanning_reports, :sast_reports, :dast_reports]
       end
 
       def approve
@@ -61,6 +64,10 @@ module EE
 
       def sast_reports
         reports_response(merge_request.compare_sast_reports(current_user))
+      end
+
+      def dast_reports
+        reports_response(merge_request.compare_dast_reports(current_user))
       end
 
       def metrics_reports

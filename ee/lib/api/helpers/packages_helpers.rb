@@ -7,14 +7,19 @@ module API
         not_found! unless ::Gitlab.config.packages.enabled
       end
 
-      def authorize_packages_feature!
-        forbidden! unless user_project.feature_available?(:packages)
+      def authorize_packages_access!(subject)
+        require_packages_enabled!
+        authorize_packages_feature!(subject)
+        authorize_read_package!(subject)
       end
 
-      def authorize_download_package!
-        authorize!(:read_package, user_project)
+      def authorize_packages_feature!(subject)
+        forbidden! unless subject.feature_available?(:packages)
       end
-      alias_method :authorize_read_package!, :authorize_download_package!
+
+      def authorize_read_package!(subject)
+        authorize!(:read_package, subject)
+      end
 
       def authorize_create_package!
         authorize!(:create_package, user_project)

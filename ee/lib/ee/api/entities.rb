@@ -44,6 +44,8 @@ module EE
           expose :external_authorization_classification_label,
                  if: ->(_, _) { License.feature_available?(:external_authorization_service_api_management) }
           expose :packages_enabled, if: ->(project, _) { project.feature_available?(:packages) }
+          expose :service_desk_enabled, if: ->(project, _) { project.feature_available?(:service_desk) }
+          expose :service_desk_address, if: ->(project, _) { project.feature_available?(:service_desk) }
         end
       end
 
@@ -79,6 +81,16 @@ module EE
         end
       end
 
+      module Member
+        extend ActiveSupport::Concern
+
+        prepended do
+          expose :group_saml_identity,
+                 using: ::API::Entities::Identity,
+                 if:  -> (member, options) { Ability.allowed?(options[:current_user], :read_group_saml_identity, member.source) }
+        end
+      end
+
       module ProtectedRefAccess
         extend ActiveSupport::Concern
 
@@ -109,9 +121,12 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
-          expose :epic_iid,
-                 if: -> (issue, options) { ::Ability.allowed?(options[:current_user], :read_epic, issue.project&.group) } do |issue|
-            issue.epic&.iid
+          with_options if: -> (issue, options) { ::Ability.allowed?(options[:current_user], :read_epic, issue.project&.group) } do
+            expose :epic_iid do |issue|
+              issue.epic&.iid
+            end
+
+            expose :epic, using: EpicBaseEntity
           end
         end
       end
@@ -134,7 +149,7 @@ module EE
             namespace.billable_members_count(options[:requested_hosted_plan])
           end
           expose :plan, if: ->(namespace, opts) { ::Ability.allowed?(opts[:current_user], :admin_namespace, namespace) } do |namespace, _|
-            namespace.actual_plan&.name
+            namespace.actual_plan_name
           end
         end
       end
@@ -168,7 +183,8 @@ module EE
         prepended do
           expose :milestone, using: ::API::Entities::Milestone, if: -> (entity, _) { entity.milestone? }
           expose :user, as: :assignee, using: ::API::Entities::UserSafe, if: -> (entity, _) { entity.assignee? }
-          expose :max_issue_count, if: -> (list, _) { list.board.resource_parent.feature_available?(:wip_limits) }
+          expose :max_issue_count, if: -> (list, _) { list.wip_limits_available? }
+          expose :max_issue_weight, if: -> (list, _) { list.wip_limits_available? }
         end
       end
 
@@ -516,7 +532,7 @@ module EE
         expose :approval_rules_left, using: ApprovalRuleShort
 
         expose :has_approval_rules do |approval_state|
-          approval_state.has_non_fallback_rules?
+          approval_state.user_defined_rules.present?
         end
 
         expose :merge_request_approvers_available do |approval_state|
@@ -539,6 +555,7 @@ module EE
           :starts_at,
           :expires_at,
           :historical_max,
+          :maximum_user_count,
           :licensee,
           :add_ons
 
@@ -768,22 +785,8 @@ module EE
       class UnleashFeature < Grape::Entity
         expose :name
         expose :description, unless: ->(feature) { feature.description.nil? }
-        # The UI has a single field for user ids for whom the feature flag should be enabled across all scopes.
-        # Each scope is given a userWithId strategy with the list of user ids.
-        # However, the user can also directly toggle the active field of a scope.
-        # So if the user has entered user ids, and disabled the scope, we need to send an enabled scope with
-        # the list of user ids.
-        # See: https://gitlab.com/gitlab-org/gitlab/issues/14011
-        expose :active, as: :enabled do |feature|
-          feature.active || feature.userwithid_strategy.present?
-        end
-        expose :strategies do |feature|
-          if !feature.active && feature.userwithid_strategy.present?
-            feature.userwithid_strategy
-          else
-            feature.strategies
-          end
-        end
+        expose :active, as: :enabled
+        expose :strategies
       end
 
       class GitlabSubscription < Grape::Entity
@@ -808,6 +811,35 @@ module EE
         end
       end
 
+      module ConanPackage
+        class ConanPackageManifest < Grape::Entity
+          expose :package_urls, merge: true
+        end
+
+        class ConanPackageSnapshot < Grape::Entity
+          expose :package_snapshot, merge: true
+        end
+
+        class ConanRecipeManifest < Grape::Entity
+          expose :recipe_urls, merge: true
+        end
+
+        class ConanRecipeSnapshot < Grape::Entity
+          expose :recipe_snapshot, merge: true
+        end
+
+        class ConanUploadUrls < Grape::Entity
+          expose :upload_urls, merge: true
+        end
+      end
+
+      module Nuget
+        class ServiceIndex < Grape::Entity
+          expose :version
+          expose :resources
+        end
+      end
+
       class NpmPackage < Grape::Entity
         expose :name
         expose :versions
@@ -828,7 +860,8 @@ module EE
       end
 
       class ManagedLicense < Grape::Entity
-        expose :id, :name, :approval_status
+        expose :id, :name
+        expose :approval_status
       end
 
       class ProjectAlias < Grape::Entity
@@ -849,7 +882,7 @@ module EE
         private
 
         def can_read_vulnerabilities?(user, project)
-          Ability.allowed?(user, :read_project_security_dashboard, project)
+          Ability.allowed?(user, :read_vulnerability, project)
         end
       end
 
@@ -872,6 +905,42 @@ module EE
         expose :created_at
         expose :updated_at
         expose :scopes, using: Scope
+      end
+
+      class Vulnerability < Grape::Entity
+        expose :id
+        expose :title
+        expose :description
+
+        expose :state
+        expose :severity
+        expose :confidence
+        expose :report_type
+
+        expose :project, using: ::API::Entities::ProjectIdentity
+
+        expose :author_id
+        expose :updated_by_id
+        expose :last_edited_by_id
+        expose :resolved_by_id
+        expose :closed_by_id
+
+        expose :start_date
+        expose :due_date
+
+        expose :created_at
+        expose :updated_at
+        expose :last_edited_at
+        expose :resolved_at
+        expose :closed_at
+      end
+
+      class VulnerabilityRelatedIssue < ::API::Entities::IssueBasic
+        # vulnerability_link_* attributes come from joined Vulnerabilities::IssueLink record
+        expose :vulnerability_link_id
+        expose :vulnerability_link_type do |related_issue|
+          ::Vulnerabilities::IssueLink.link_types.key(related_issue.vulnerability_link_type)
+        end
       end
     end
   end

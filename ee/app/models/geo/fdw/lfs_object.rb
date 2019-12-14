@@ -17,45 +17,45 @@ module Geo
 
       class << self
         def failed
-          inner_join_lfs_object_registry
+          inner_join_registry
             .merge(Geo::LfsObjectRegistry.failed)
         end
 
-        def inner_join_lfs_object_registry
+        def inner_join_registry
           join_statement =
             arel_table
-              .join(lfs_object_registry_table, Arel::Nodes::InnerJoin)
-              .on(arel_table[:id].eq(lfs_object_registry_table[:lfs_object_id]))
+              .join(registry_table, Arel::Nodes::InnerJoin)
+              .on(arel_table[:id].eq(registry_table[:lfs_object_id]))
 
           joins(join_statement.join_sources)
         end
 
-        def missing_file_registry
-          left_outer_join_lfs_object_registry
-            .where(lfs_object_registry_table[:id].eq(nil))
+        def missing_registry
+          left_outer_join_registry
+            .where(registry_table[:id].eq(nil))
         end
 
         def missing_on_primary
-          inner_join_lfs_object_registry
+          inner_join_registry
             .merge(Geo::LfsObjectRegistry.synced.missing_on_primary)
         end
 
         def synced
-          inner_join_lfs_object_registry
+          inner_join_registry
             .merge(Geo::LfsObjectRegistry.synced)
         end
 
         private
 
-        def lfs_object_registry_table
+        def registry_table
           Geo::LfsObjectRegistry.arel_table
         end
 
-        def left_outer_join_lfs_object_registry
+        def left_outer_join_registry
           join_statement =
             arel_table
-              .join(lfs_object_registry_table, Arel::Nodes::OuterJoin)
-              .on(arel_table[:id].eq(lfs_object_registry_table[:lfs_object_id]))
+              .join(registry_table, Arel::Nodes::OuterJoin)
+              .on(arel_table[:id].eq(registry_table[:lfs_object_id]))
 
           joins(join_statement.join_sources)
         end

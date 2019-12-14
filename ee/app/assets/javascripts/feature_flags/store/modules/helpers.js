@@ -21,15 +21,21 @@ export const mapToScopesViewModel = scopesFromRails =>
       strat => strat.name === ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
     );
 
-    const rolloutStrategy = percentStrategy ? percentStrategy.name : ROLLOUT_STRATEGY_ALL_USERS;
-
     const rolloutPercentage = fetchPercentageParams(percentStrategy) || DEFAULT_PERCENT_ROLLOUT;
 
     const userStrategy = (s.strategies || []).find(
       strat => strat.name === ROLLOUT_STRATEGY_USER_ID,
     );
 
-    const rolloutUserIds = (fetchUserIdParams(userStrategy) || '').split(',').filter(id => id);
+    const rolloutStrategy =
+      (percentStrategy && percentStrategy.name) ||
+      (userStrategy && userStrategy.name) ||
+      ROLLOUT_STRATEGY_ALL_USERS;
+
+    const rolloutUserIds = (fetchUserIdParams(userStrategy) || '')
+      .split(',')
+      .filter(id => id)
+      .join(', ');
 
     return {
       id: s.id,
@@ -43,6 +49,7 @@ export const mapToScopesViewModel = scopesFromRails =>
 
       // eslint-disable-next-line no-underscore-dangle
       shouldBeDestroyed: Boolean(s._destroy),
+      shouldIncludeUserIds: rolloutUserIds.length > 0,
     };
   });
 /**
@@ -59,7 +66,10 @@ export const mapFromScopesViewModel = params => {
     }
 
     const userIdParameters = {};
-    if (Array.isArray(s.rolloutUserIds) && s.rolloutUserIds.length > 0) {
+
+    if (s.shouldIncludeUserIds || s.rolloutStrategy === ROLLOUT_STRATEGY_USER_ID) {
+      userIdParameters.userIds = (s.rolloutUserIds || '').replace(/, /g, ',');
+    } else if (Array.isArray(s.rolloutUserIds) && s.rolloutUserIds.length > 0) {
       userIdParameters.userIds = s.rolloutUserIds.join(',');
     }
 
@@ -88,13 +98,16 @@ export const mapFromScopesViewModel = params => {
     };
   });
 
-  return {
+  const model = {
     operations_feature_flag: {
       name: params.name,
       description: params.description,
+      active: params.active,
       scopes_attributes: scopes,
     },
   };
+
+  return model;
 };
 
 /**
@@ -113,7 +126,7 @@ export const createNewEnvironmentScope = (overrides = {}, featureFlagPermissions
     id: _.uniqueId(INTERNAL_ID_PREFIX),
     rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
     rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-    rolloutUserIds: [],
+    rolloutUserIds: '',
   };
 
   const newScope = {

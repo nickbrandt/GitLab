@@ -47,7 +47,7 @@ module Geo
     # rubocop: disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_file_ids: [])
       attachments
-        .missing_file_registry
+        .missing_registry
         .id_not_in(except_file_ids)
         .limit(batch_size)
     end
@@ -56,7 +56,7 @@ module Geo
     # rubocop: disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_file_ids: [])
       all_attachments
-        .inner_join_file_registry
+        .inner_join_registry
         .with_files_stored_remotely
         .id_not_in(except_file_ids)
         .limit(batch_size)
@@ -95,7 +95,7 @@ module Geo
     end
 
     def registries_for_attachments
-      attachments.inner_join_file_registry
+      attachments.inner_join_registry
     end
   end
 end

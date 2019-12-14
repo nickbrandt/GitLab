@@ -32,15 +32,30 @@ Management projects are restricted to the following:
 
 ## Usage
 
+To use a cluster management project for a cluster:
+
+1. Select the project.
+1. Configure your pipelines.
+1. Set an environment scope.
+
 ### Selecting a cluster management project
 
-This will be implemented as part of [this
-issue](https://gitlab.com/gitlab-org/gitlab/issues/32810).
+To select a cluster management project to use:
+
+1. Navigate to the appropriate configuration page. For a:
+   - [Project-level cluster](../project/clusters/index.md), navigate to your project's
+     **Operations > Kubernetes** page.
+   - [Group-level cluster](../group/clusters/index.md), navigate to your group's **Kubernetes**
+     page.
+1. Select the project using **Cluster management project field** in the **Advanced settings**
+   section.
+
+![Selecting a cluster management project under Advanced settings](img/advanced-settings-cluster-management-project-v12_5.png)
 
 ### Configuring your pipeline
 
 After designating a project as the management project for the cluster,
-write a [`.gitlab-ci,yml`](../../ci/yaml/README.md) in that project. For example:
+write a [`.gitlab-ci.yml`](../../ci/yaml/README.md) in that project. For example:
 
 ```yaml
 configure cluster:
@@ -68,7 +83,7 @@ to a management project:
 | Staging     | `staging`         |
 | Production  | `production`      |
 
-The the following environments set in
+The following environments set in
 [`.gitlab-ci.yml`](../../ci/yaml/README.md) will deploy to the
 Development, Staging, and Production cluster respectively.
 
@@ -93,17 +108,4 @@ configure production cluster:
   script: kubectl get namespaces
   environment:
     name: production
-```
-
-## Enabling this feature
-
-This feature is disabled by default. To enable this feature, enable the
-feature flag `:cluster_management_project`.
-
-To check if the feature flag is enabled on your GitLab instance,
-please ask an administrator to execute the following in a Rails console:
-
-```ruby
-Feature.enabled?(:cluster_management_project)     # Check if it's enabled or not.
-Feature.disable(:cluster_management_project)      # Disable the feature flag.
 ```

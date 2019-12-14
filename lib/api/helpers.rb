@@ -9,6 +9,7 @@ module API
     GITLAB_SHARED_SECRET_HEADER = "Gitlab-Shared-Secret"
     SUDO_PARAM = :sudo
     API_USER_ENV = 'gitlab.api.user'
+    API_EXCEPTION_ENV = 'gitlab.api.exception'
 
     def declared_params(options = {})
       options = { include_parent_namespaces: false }.merge(options)
@@ -383,9 +384,13 @@ module API
     def handle_api_exception(exception)
       if report_exception?(exception)
         define_params_for_grape_middleware
-        Gitlab::Sentry.context(current_user)
-        Gitlab::Sentry.track_acceptable_exception(exception, extra: params)
+        Gitlab::Sentry.with_context(current_user) do
+          Gitlab::Sentry.track_exception(exception, params)
+        end
       end
+
+      # This is used with GrapeLogging::Loggers::ExceptionLogger
+      env[API_EXCEPTION_ENV] = exception
 
       # lifted from https://github.com/rails/rails/blob/master/actionpack/lib/action_dispatch/middleware/debug_exceptions.rb#L60
       trace = exception.backtrace
@@ -451,6 +456,17 @@ module API
       end
     end
 
+    def track_event(action = action_name, **args)
+      category = args.delete(:category) || self.options[:for].name
+      raise "invalid category" unless category
+
+      ::Gitlab::Tracking.event(category, action.to_s, **args)
+    rescue => error
+      Rails.logger.warn( # rubocop:disable Gitlab/RailsLogger
+        "Tracking event failed for action: #{action}, category: #{category}, message: #{error.message}"
+      )
+    end
+
     protected
 
     def project_finder_params_ce
@@ -464,6 +480,8 @@ module API
       finder_params[:user] = params.delete(:user) if params[:user]
       finder_params[:custom_attributes] = params[:custom_attributes] if params[:custom_attributes]
       finder_params[:min_access_level] = params[:min_access_level] if params[:min_access_level]
+      finder_params[:id_after] = params[:id_after] if params[:id_after]
+      finder_params[:id_before] = params[:id_before] if params[:id_before]
       finder_params
     end
 

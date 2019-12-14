@@ -14,6 +14,7 @@ class Issue < ApplicationRecord
   include TimeTrackable
   include ThrottledTouch
   include LabelEventable
+  include IgnorableColumns
 
   DueDateStruct                   = Struct.new(:title, :name).freeze
   NoDueDate                       = DueDateStruct.new('No Due Date', '0').freeze
@@ -41,6 +42,10 @@ class Issue < ApplicationRecord
   has_many :issue_assignees
   has_many :assignees, class_name: "User", through: :issue_assignees
   has_many :zoom_meetings
+  has_many :user_mentions, class_name: "IssueUserMention"
+  has_one :sentry_issue
+
+  accepts_nested_attributes_for :sentry_issue
 
   validates :project, presence: true
 
@@ -55,16 +60,20 @@ class Issue < ApplicationRecord
   scope :due_between, ->(from_date, to_date) { where('issues.due_date >= ?', from_date).where('issues.due_date <= ?', to_date) }
   scope :due_tomorrow, -> { where(due_date: Date.tomorrow) }
 
-  scope :order_due_date_asc, -> { reorder('issues.due_date IS NULL, issues.due_date ASC') }
-  scope :order_due_date_desc, -> { reorder('issues.due_date IS NULL, issues.due_date DESC') }
-  scope :order_closest_future_date, -> { reorder('CASE WHEN issues.due_date >= CURRENT_DATE THEN 0 ELSE 1 END ASC, ABS(CURRENT_DATE - issues.due_date) ASC') }
+  scope :order_due_date_asc, -> { reorder(::Gitlab::Database.nulls_last_order('due_date', 'ASC')) }
+  scope :order_due_date_desc, -> { reorder(::Gitlab::Database.nulls_last_order('due_date', 'DESC')) }
+  scope :order_closest_future_date, -> { reorder(Arel.sql('CASE WHEN issues.due_date >= CURRENT_DATE THEN 0 ELSE 1 END ASC, ABS(CURRENT_DATE - issues.due_date) ASC')) }
   scope :order_relative_position_asc, -> { reorder(::Gitlab::Database.nulls_last_order('relative_position', 'ASC')) }
 
-  scope :preload_associations, -> { preload(:labels, project: :namespace) }
+  scope :preload_associated_models, -> { preload(:labels, project: :namespace) }
   scope :with_api_entity_associations, -> { preload(:timelogs, :assignees, :author, :notes, :labels, project: [:route, { namespace: :route }] ) }
 
   scope :public_only, -> { where(confidential: false) }
   scope :confidential_only, -> { where(confidential: true) }
+
+  scope :counts_by_state, -> { reorder(nil).group(:state_id).count }
+
+  ignore_column :state, remove_with: '12.7', remove_after: '2019-12-22'
 
   after_commit :expire_etag_cache
   after_save :ensure_metrics, unless: :imported?
@@ -72,7 +81,7 @@ class Issue < ApplicationRecord
   attr_spammable :title, spam_title: true
   attr_spammable :description, spam_description: true
 
-  state_machine :state_id, initial: :opened do
+  state_machine :state_id, initial: :opened, initialize: false do
     event :close do
       transition [:opened] => :closed
     end
@@ -138,8 +147,8 @@ class Issue < ApplicationRecord
   def self.sort_by_attribute(method, excluded_labels: [])
     case method.to_s
     when 'closest_future_date', 'closest_future_date_asc' then order_closest_future_date
-    when 'due_date', 'due_date_asc'                       then order_due_date_asc
-    when 'due_date_desc'                                  then order_due_date_desc
+    when 'due_date', 'due_date_asc'                       then order_due_date_asc.with_order_id_desc
+    when 'due_date_desc'                                  then order_due_date_desc.with_order_id_desc
     when 'relative_position', 'relative_position_asc'     then order_relative_position_asc.with_order_id_desc
     else
       super

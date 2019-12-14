@@ -19,6 +19,7 @@ export default {
     state.errorLoading = false;
     state.reportInfo.status = reportInfo.status;
     state.reportInfo.jobPath = reportInfo.job_path;
+    state.reportInfo.generatedAt = reportInfo.generated_at;
     state.initialized = true;
   },
   [types.RECEIVE_DEPENDENCIES_ERROR](state) {
@@ -29,6 +30,7 @@ export default {
     state.reportInfo = {
       status: REPORT_STATUS.ok,
       jobPath: '',
+      generatedAt: '',
     };
     state.initialized = true;
   },

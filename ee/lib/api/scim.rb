@@ -62,7 +62,7 @@ module API
         # rubocop: disable CodeReuse/ActiveRecord
         def update_scim_user(identity)
           parser = EE::Gitlab::Scim::ParamsParser.new(params)
-          parsed_hash = parser.result
+          parsed_hash = parser.update_params
 
           if parser.deprovision_user?
             destroy_identity(identity)
@@ -95,8 +95,6 @@ module API
           detail 'This feature was introduced in GitLab 11.10.'
         end
         get do
-          scim_error!(message: 'Missing filter params') unless params[:filter]
-
           group = find_and_authenticate_group!(params[:group])
 
           results = ScimFinder.new(group).search(params)
@@ -106,6 +104,8 @@ module API
 
           result_set = { resources: response_page, total_results: results.count, items_per_page: per_page(params[:count]), start_index: params[:startIndex] }
           present result_set, with: ::EE::Gitlab::Scim::Users
+        rescue ScimFinder::UnsupportedFilter
+          scim_error!(message: 'Unsupported Filter')
         end
 
         desc 'Get a SAML user' do
@@ -129,7 +129,7 @@ module API
         post do
           group = find_and_authenticate_group!(params[:group])
           parser = EE::Gitlab::Scim::ParamsParser.new(params)
-          result = EE::Gitlab::Scim::ProvisioningService.new(group, parser.result).execute
+          result = EE::Gitlab::Scim::ProvisioningService.new(group, parser.post_params).execute
 
           case result.status
           when :success

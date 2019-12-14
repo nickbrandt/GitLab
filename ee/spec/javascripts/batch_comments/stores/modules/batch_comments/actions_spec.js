@@ -1,7 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
 import * as actions from 'ee/batch_comments/stores/modules/batch_comments/actions';
+import axios from '~/lib/utils/axios_utils';
 
 describe('Batch comments store actions', () => {
   let res = {};

@@ -1,8 +1,8 @@
 <script>
 import { mapActions } from 'vuex';
 import { GlButton, GlSkeletonLoading } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
 import VulnerabilityIssueLink from './vulnerability_issue_link.vue';
 
@@ -69,9 +69,17 @@ export default {
       <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
     </div>
 
+    <div class="table-section section-10 ml-md-2">
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Confidence') }}</div>
+      <div class="table-mobile-content text-capitalize">{{ confidence }}</div>
+    </div>
+
     <div class="table-section flex-grow-1">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
-      <div class="table-mobile-content vulnerability-info">
+      <div
+        class="table-mobile-content vulnerability-info"
+        data-qa-selector="vulnerability_info_content"
+      >
         <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
         <template v-else>
           <gl-button
@@ -102,11 +110,6 @@ export default {
           </span>
         </template>
       </div>
-    </div>
-
-    <div class="table-section section-10 ml-md-2">
-      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Confidence') }}</div>
-      <div class="table-mobile-content text-capitalize">{{ confidence }}</div>
     </div>
 
     <div class="table-section section-20">

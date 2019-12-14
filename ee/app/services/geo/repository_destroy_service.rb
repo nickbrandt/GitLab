@@ -35,8 +35,9 @@ module Geo
     # rubocop: disable CodeReuse/ActiveRecord
     def destroy_registry_entries
       ::Geo::ProjectRegistry.where(project_id: id).delete_all
+      ::Geo::DesignRegistry.where(project_id: id).delete_all
 
-      log_info("Project registry entry removed", project_id: id)
+      log_info("Registry entries removed", project_id: id)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 

@@ -1,8 +1,8 @@
 <script>
-import axios from '~/lib/utils/axios_utils';
-import { __ } from '~/locale';
 import $ from 'jquery';
 import { GlSkeletonLoading } from '@gitlab/ui';
+import axios from '~/lib/utils/axios_utils';
+import { __ } from '~/locale';
 
 const { CancelToken } = axios;
 let axiosSource;
@@ -15,6 +15,11 @@ export default {
     content: {
       type: String,
       required: true,
+    },
+    filePath: {
+      type: String,
+      required: false,
+      default: '',
     },
     projectPath: {
       type: String,
@@ -48,6 +53,7 @@ export default {
         this.isLoading = true;
         const postBody = {
           text: this.content,
+          path: this.filePath,
         };
         const postOptions = {
           cancelToken: axiosSource.token,

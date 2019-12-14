@@ -10,6 +10,15 @@ require_relative '../config/initializers/0_inject_enterprise_edition_module'
 
 module QA
   ##
+  # Helper classes to represent frequently used sequences of actions
+  # (e.g., login)
+  #
+  module Flow
+    autoload :Login, 'qa/flow/login'
+    autoload :Project, 'qa/flow/project'
+  end
+
+  ##
   # GitLab QA runtime classes, mostly singletons.
   #
   module Runtime
@@ -25,6 +34,9 @@ module QA
     autoload :Fixtures, 'qa/runtime/fixtures'
     autoload :Logger, 'qa/runtime/logger'
     autoload :GPG, 'qa/runtime/gpg'
+    autoload :MailHog, 'qa/runtime/mail_hog'
+    autoload :IPAddress, 'qa/runtime/ip_address'
+    autoload :Search, 'qa/runtime/search'
 
     module API
       autoload :Client, 'qa/runtime/api/client'
@@ -122,6 +134,7 @@ module QA
         autoload :Kubernetes, 'qa/scenario/test/integration/kubernetes'
         autoload :Mattermost, 'qa/scenario/test/integration/mattermost'
         autoload :ObjectStorage, 'qa/scenario/test/integration/object_storage'
+        autoload :SMTP, 'qa/scenario/test/integration/smtp'
       end
 
       module Sanity
@@ -157,6 +170,7 @@ module QA
     module Dashboard
       autoload :Projects, 'qa/page/dashboard/projects'
       autoload :Groups, 'qa/page/dashboard/groups'
+      autoload :Welcome, 'qa/page/dashboard/welcome'
 
       module Snippet
         autoload :New, 'qa/page/dashboard/snippet/new'
@@ -322,6 +336,7 @@ module QA
 
     module Admin
       autoload :Menu, 'qa/page/admin/menu'
+      autoload :NewSession, 'qa/page/admin/new_session'
 
       module Settings
         autoload :Repository, 'qa/page/admin/settings/repository'
@@ -412,6 +427,7 @@ module QA
       autoload :Maven, 'qa/service/docker_run/maven'
       autoload :NodeJs, 'qa/service/docker_run/node_js'
       autoload :GitlabRunner, 'qa/service/docker_run/gitlab_runner'
+      autoload :MailHog, 'qa/service/docker_run/mail_hog'
     end
   end
 

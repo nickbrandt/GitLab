@@ -9,6 +9,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   include ToggleAwardEmoji
   include IssuableCollections
   include RecordUserLastActivity
+  include SourcegraphGon
 
   skip_before_action :merge_request, only: [:index, :bulk_update]
   before_action :whitelist_query_limiting, only: [:assign_related_issues, :update]
@@ -19,10 +20,13 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   before_action :check_user_can_push_to_source_branch!, only: [:rebase]
   before_action only: [:show] do
     push_frontend_feature_flag(:diffs_batch_load, @project)
+    push_frontend_feature_flag(:single_mr_diff_view, @project)
   end
 
   before_action do
     push_frontend_feature_flag(:vue_issuable_sidebar, @project.group)
+    push_frontend_feature_flag(:release_search_filter, @project, default_enabled: true)
+    push_frontend_feature_flag(:async_mr_widget, @project)
   end
 
   around_action :allow_gitaly_ref_name_caching, only: [:index, :show, :discussions]
@@ -89,7 +93,10 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     # Get commits from repository
     # or from cache if already merged
     @commits =
-      set_commits_for_rendering(@merge_request.commits.with_latest_pipeline)
+      set_commits_for_rendering(
+        @merge_request.recent_commits.with_latest_pipeline(@merge_request.source_branch),
+          commits_count: @merge_request.commits_count
+      )
 
     render json: { html: view_to_html_string('projects/merge_requests/_commits') }
   end
@@ -213,11 +220,16 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def ci_environments_status
-    environments = if ci_environments_status_on_merge_result?
-                     EnvironmentStatus.after_merge_request(@merge_request, current_user)
-                   else
-                     EnvironmentStatus.for_merge_request(@merge_request, current_user)
-                   end
+    environments =
+      if ci_environments_status_on_merge_result?
+        if Feature.enabled?(:deployment_merge_requests_widget, @project)
+          EnvironmentStatus.for_deployed_merge_request(@merge_request, current_user)
+        else
+          EnvironmentStatus.after_merge_request(@merge_request, current_user)
+        end
+      else
+        EnvironmentStatus.for_merge_request(@merge_request, current_user)
+      end
 
     render json: EnvironmentStatusSerializer.new(current_user: current_user).represent(environments)
   end
@@ -251,7 +263,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def merge_params_attributes
-    [:should_remove_source_branch, :commit_message, :squash_commit_message, :squash, :auto_merge_strategy]
+    MergeRequest::KNOWN_MERGE_PARAMS
   end
 
   def auto_merge_requested?
@@ -291,7 +303,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
     return :sha_mismatch if params[:sha] != @merge_request.diff_head_sha
 
-    @merge_request.update(merge_error: nil, squash: merge_params.fetch(:squash, false))
+    @merge_request.update(merge_error: nil, squash: params.fetch(:squash, false))
 
     if auto_merge_requested?
       if merge_request.auto_merge_enabled?
@@ -363,7 +375,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     when :error
       render json: { status_reason: report_comparison[:status_reason] }, status: :bad_request
     else
-      render json: { status_reason: 'Unknown error' }, status: :internal_server_error
+      raise "Failed to build comparison response as comparison yielded unknown status '#{report_comparison[:status]}'"
     end
   end
 

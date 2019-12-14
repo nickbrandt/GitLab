@@ -405,7 +405,7 @@ describe Projects::MergeRequestsController do
       end
 
       it 'starts the merge immediately with permitted params' do
-        expect(MergeWorker).to receive(:perform_async).with(merge_request.id, anything, { 'squash' => false })
+        expect(MergeWorker).to receive(:perform_async).with(merge_request.id, anything, { 'sha' => merge_request.diff_head_sha })
 
         merge_with_sha
       end
@@ -432,9 +432,14 @@ describe Projects::MergeRequestsController do
         let(:message) { 'My custom squash commit message' }
 
         it 'passes the same message to SquashService', :sidekiq_might_not_need_inline do
-          params = { squash: '1', squash_commit_message: message }
+          params = { squash: '1',
+                     squash_commit_message: message,
+                     sha: merge_request.diff_head_sha }
+          expected_squash_params = { squash_commit_message: message,
+                                     sha: merge_request.diff_head_sha,
+                                     merge_request: merge_request }
 
-          expect_next_instance_of(MergeRequests::SquashService, project, user, params.merge(merge_request: merge_request)) do |squash_service|
+          expect_next_instance_of(MergeRequests::SquashService, project, user, expected_squash_params) do |squash_service|
             expect(squash_service).to receive(:execute).and_return({
               status: :success,
               squash_sha: SecureRandom.hex(20)
@@ -615,7 +620,7 @@ describe Projects::MergeRequestsController do
       end
 
       it "prevents deletion if destroy_confirm is not set" do
-        expect(Gitlab::Sentry).to receive(:track_acceptable_exception).and_call_original
+        expect(Gitlab::Sentry).to receive(:track_exception).and_call_original
 
         delete :destroy, params: { namespace_id: project.namespace, project_id: project, id: merge_request.iid }
 
@@ -624,7 +629,7 @@ describe Projects::MergeRequestsController do
       end
 
       it "prevents deletion in JSON format if destroy_confirm is not set" do
-        expect(Gitlab::Sentry).to receive(:track_acceptable_exception).and_call_original
+        expect(Gitlab::Sentry).to receive(:track_exception).and_call_original
 
         delete :destroy, params: { namespace_id: project.namespace, project_id: project, id: merge_request.iid, format: 'json' }
 
@@ -889,23 +894,6 @@ describe Projects::MergeRequestsController do
         end
       end
 
-      context 'when something went wrong on our system' do
-        let(:report) { {} }
-
-        it 'does not send polling interval' do
-          expect(Gitlab::PollingInterval).not_to receive(:set_header)
-
-          subject
-        end
-
-        it 'returns 500 HTTP status' do
-          subject
-
-          expect(response).to have_gitlab_http_status(:internal_server_error)
-          expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
-        end
-      end
-
       context 'when feature flag :ci_expose_arbitrary_artifacts_in_mr is disabled' do
         let(:job_options) do
           {
@@ -1063,23 +1051,6 @@ describe Projects::MergeRequestsController do
         expect(json_response).to eq({ 'status_reason' => 'Failed to parse test reports' })
       end
     end
-
-    context 'when something went wrong on our system' do
-      let(:comparison_status) { {} }
-
-      it 'does not send polling interval' do
-        expect(Gitlab::PollingInterval).not_to receive(:set_header)
-
-        subject
-      end
-
-      it 'returns 500 HTTP status' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:internal_server_error)
-        expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
-      end
-    end
   end
 
   describe 'POST remove_wip' do
@@ -1102,7 +1073,7 @@ describe Projects::MergeRequestsController do
     end
 
     it 'renders MergeRequest as JSON' do
-      expect(json_response.keys).to include('id', 'iid', 'description')
+      expect(json_response.keys).to include('id', 'iid')
     end
   end
 
@@ -1136,7 +1107,7 @@ describe Projects::MergeRequestsController do
     it 'renders MergeRequest as JSON' do
       subject
 
-      expect(json_response.keys).to include('id', 'iid', 'description')
+      expect(json_response.keys).to include('id', 'iid')
     end
   end
 
@@ -1255,9 +1226,9 @@ describe Projects::MergeRequestsController do
         environment2 = create(:environment, project: forked)
         create(:deployment, :succeed, environment: environment2, sha: sha, ref: 'master', deployable: build)
 
-        # TODO address the last 5 queries
-        # See https://gitlab.com/gitlab-org/gitlab-foss/issues/63952 (5 queries)
-        leeway = 5
+        # TODO address the last 3 queries
+        # See https://gitlab.com/gitlab-org/gitlab-foss/issues/63952 (3 queries)
+        leeway = 3
         expect { get_ci_environments_status }.not_to exceed_all_query_limit(control_count + leeway)
       end
     end
@@ -1306,6 +1277,28 @@ describe Projects::MergeRequestsController do
           expect { get_ci_environments_status }
             .to change { Gitlab::GitalyClient.get_request_count }.by_at_most(1)
         end
+      end
+    end
+
+    it 'uses the explicitly linked deployments' do
+      expect(EnvironmentStatus)
+        .to receive(:for_deployed_merge_request)
+        .with(merge_request, user)
+        .and_call_original
+
+      get_ci_environments_status(environment_target: 'merge_commit')
+    end
+
+    context 'when the deployment_merge_requests_widget feature flag is disabled' do
+      it 'uses the deployments retrieved using CI builds' do
+        stub_feature_flags(deployment_merge_requests_widget: false)
+
+        expect(EnvironmentStatus)
+          .to receive(:after_merge_request)
+          .with(merge_request, user)
+          .and_call_original
+
+        get_ci_environments_status(environment_target: 'merge_commit')
       end
     end
 

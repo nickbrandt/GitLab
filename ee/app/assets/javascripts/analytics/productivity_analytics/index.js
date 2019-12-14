@@ -1,13 +1,12 @@
 import Vue from 'vue';
 import { mapState, mapActions } from 'vuex';
-import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { defaultDaysInPast } from './constants';
 import store from './store';
 import FilterDropdowns from './components/filter_dropdowns.vue';
 import DateRange from '../shared/components/daterange.vue';
 import ProductivityAnalyticsApp from './components/app.vue';
 import FilteredSearchProductivityAnalytics from './filtered_search_productivity_analytics';
-import { getLabelsEndpoint, getMilestonesEndpoint } from './utils';
+import { getLabelsEndpoint, getMilestonesEndpoint, getDefaultStartDate } from './utils';
 
 export default () => {
   const container = document.getElementById('js-productivity-analytics');
@@ -20,10 +19,17 @@ export default () => {
   const appContainer = container.querySelector('.js-productivity-analytics-app-container');
 
   const { endpoint, emptyStateSvgPath, noAccessSvgPath } = appContainer.dataset;
+  const { startDate: computedStartDate } = timeframeContainer.dataset;
 
-  const now = new Date(Date.now());
-  const defaultStartDate = getDateInPast(now, defaultDaysInPast);
-  const defaultEndDate = now;
+  const minDate = computedStartDate ? new Date(computedStartDate) : null;
+  const mergedAtAfter = getDefaultStartDate(minDate, defaultDaysInPast);
+  const mergedAtBefore = new Date(Date.now());
+
+  const initialData = {
+    mergedAtAfter,
+    mergedAtBefore,
+    minDate,
+  };
 
   let filterManager;
 
@@ -31,7 +37,16 @@ export default () => {
   new Vue({
     el: groupProjectSelectContainer,
     store,
+    created() {
+      this.setEndpoint(endpoint);
+
+      // let's not fetch data since we might not have a groupNamespace selected yet
+      // this just populates the store with the initial data and waits for a groupNamespace to be set
+      this.setInitialData({ skipFetch: true, data: initialData });
+    },
     methods: {
+      ...mapActions(['setEndpoint']),
+      ...mapActions('filters', ['setInitialData']),
       onGroupSelected({ groupNamespace, groupId }) {
         this.initFilteredSearch({ groupNamespace, groupId });
       },
@@ -80,11 +95,6 @@ export default () => {
     computed: {
       ...mapState('filters', ['groupNamespace', 'startDate', 'endDate']),
     },
-    mounted() {
-      // let's not fetch data since we might not have a groupNamespace selected yet
-      // this just populates the store with the initial data and waits for a groupNamespace to be set
-      this.setDateRange({ startDate: defaultStartDate, endDate: defaultEndDate, skipFetch: true });
-    },
     methods: {
       ...mapActions('filters', ['setDateRange']),
       onDateRangeChange({ startDate, endDate }) {
@@ -95,8 +105,9 @@ export default () => {
       return h(DateRange, {
         props: {
           show: this.groupNamespace !== null,
-          startDate: defaultStartDate,
-          endDate: defaultEndDate,
+          startDate: mergedAtAfter,
+          endDate: mergedAtBefore,
+          minDate,
         },
         on: {
           change: this.onDateRangeChange,
@@ -112,7 +123,6 @@ export default () => {
     render(h) {
       return h(ProductivityAnalyticsApp, {
         props: {
-          endpoint,
           emptyStateSvgPath,
           noAccessSvgPath,
         },

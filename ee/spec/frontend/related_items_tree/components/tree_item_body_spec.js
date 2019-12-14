@@ -1,11 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton, GlLink } from '@gitlab/ui';
 
-import Icon from '~/vue_shared/components/icon.vue';
-import ItemMilestone from '~/vue_shared/components/issue/issue_milestone.vue';
-import ItemDueDate from '~/boards/components/issue_due_date.vue';
 import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
-import ItemAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
 
 import TreeItemBody from 'ee/related_items_tree/components/tree_item_body.vue';
 import StateTooltip from 'ee/related_items_tree/components/state_tooltip.vue';
@@ -14,6 +10,10 @@ import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { ChildType, ChildState } from 'ee/related_items_tree/constants';
 import { PathIdSeparator } from 'ee/related_issues/constants';
+import ItemAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
+import ItemDueDate from '~/boards/components/issue_due_date.vue';
+import ItemMilestone from '~/vue_shared/components/issue/issue_milestone.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
 import {
   mockParentItem,
@@ -28,9 +28,10 @@ const mockItem = Object.assign({}, mockIssue1, {
   assignees: epicUtils.extractIssueAssignees(mockIssue1.assignees),
 });
 
+const localVue = createLocalVue();
+
 const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   const store = createDefaultStore();
-  const localVue = createLocalVue();
   const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
   store.dispatch('setInitialParentItem', mockParentItem);
@@ -46,6 +47,8 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
   });
 
   return shallowMount(TreeItemBody, {
+    attachToDocument: true,
+    sync: false,
     localVue,
     store,
     propsData: {
@@ -293,6 +296,10 @@ describe('RelatedItemsTree', () => {
     describe('template', () => {
       it('renders item body element without class `item-logged-out` when user is signed in', () => {
         expect(wrapper.find('.item-body').classes()).not.toContain('item-logged-out');
+      });
+
+      it('renders item body element without class `item-closed` when item state is opened', () => {
+        expect(wrapper.find('.item-body').classes()).not.toContain('item-closed');
       });
 
       it('renders item state icon for large screens', () => {

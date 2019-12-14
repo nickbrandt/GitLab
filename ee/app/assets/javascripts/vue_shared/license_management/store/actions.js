@@ -131,7 +131,11 @@ export const requestSetLicenseApproval = ({ commit }) => {
 };
 export const receiveSetLicenseApproval = ({ commit, dispatch }) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL);
-  dispatch('loadManagedLicenses');
+  if (gon.features && gon.features.parsedLicenseReport) {
+    dispatch('loadParsedLicenseReport');
+  } else {
+    dispatch('loadManagedLicenses');
+  }
 };
 export const receiveSetLicenseApprovalError = ({ commit }, error) => {
   commit(types.RECEIVE_SET_LICENSE_APPROVAL_ERROR, error);

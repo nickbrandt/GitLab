@@ -8,6 +8,8 @@ module Gitlab
         class StageEvent
           include Gitlab::CycleAnalytics::MetricsTables
 
+          delegate :label_based?, to: :class
+
           def initialize(params)
             @params = params
           end
@@ -33,6 +35,10 @@ module Gitlab
           # Optionally a StageEvent may apply additional filtering or join other tables on the base query.
           def apply_query_customization(query)
             query
+          end
+
+          def self.label_based?
+            false
           end
 
           private

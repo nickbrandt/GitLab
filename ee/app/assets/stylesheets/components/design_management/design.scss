@@ -2,10 +2,6 @@
   object-fit: contain;
 }
 
-.design-detail {
-  overflow-y: scroll;
-}
-
 .design-list-item .design-event {
   top: $gl-padding;
   right: $gl-padding;
@@ -22,7 +18,9 @@
   padding: 0 $gl-padding;
   padding-top: 50px;
   background-color: $white-light;
+  flex-shrink: 0;
   min-width: 400px;
+  flex-basis: 28%;
 
   li {
     list-style: none;
@@ -57,6 +55,10 @@
       a {
         color: inherit;
       }
+
+      .note-text a {
+        color: $blue-600;
+      }
     }
 
     .reply-wrapper {
@@ -74,7 +76,7 @@
   }
 }
 
-@media (max-width: map-get($grid-breakpoints, sm)) {
+@media (max-width: map-get($grid-breakpoints, lg)) {
   .design-detail {
     overflow-y: scroll;
   }
@@ -82,5 +84,7 @@
   .image-notes {
     overflow-y: auto;
     min-width: 100%;
+    flex-grow: 1;
+    flex-basis: auto;
   }
 }

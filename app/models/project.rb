@@ -31,6 +31,7 @@ class Project < ApplicationRecord
   include FeatureGate
   include OptionallySearch
   include FromUnion
+  include IgnorableColumns
   extend Gitlab::Cache::RequestCache
 
   extend Gitlab::ConfigHelper
@@ -62,23 +63,9 @@ class Project < ApplicationRecord
 
   cache_markdown_field :description, pipeline: :description
 
-  delegate :feature_available?, :builds_enabled?, :wiki_enabled?, :merge_requests_enabled?,
-    :issues_enabled?, :pages_enabled?, :public_pages?, :private_pages?,
-    :merge_requests_access_level, :issues_access_level, :wiki_access_level,
-    :snippets_access_level, :builds_access_level, :repository_access_level,
-    to: :project_feature, allow_nil: true
-
-  delegate :base_dir, :disk_path, to: :storage
-
-  delegate :scheduled?, :started?, :in_progress?,
-    :failed?, :finished?,
-    prefix: :import, to: :import_state, allow_nil: true
-
-  delegate :no_import?, to: :import_state, allow_nil: true
-
   # TODO: remove once GitLab 12.5 is released
   # https://gitlab.com/gitlab-org/gitlab/issues/34638
-  self.ignored_columns += %i[merge_requests_require_code_owner_approval]
+  ignore_column :merge_requests_require_code_owner_approval, remove_after: '2019-12-01', remove_with: '12.6'
 
   default_value_for :archived, false
   default_value_for :resolve_outdated_diff_discussions, false
@@ -92,6 +79,7 @@ class Project < ApplicationRecord
   default_value_for :snippets_enabled, gitlab_config_features.snippets
   default_value_for :only_allow_merge_if_all_discussions_are_resolved, false
   default_value_for :remove_source_branch_after_merge, true
+  default_value_for(:ci_config_path) { Gitlab::CurrentSettings.default_ci_config_path }
 
   add_authentication_token_field :runners_token, encrypted: -> { Feature.enabled?(:projects_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
 
@@ -109,8 +97,11 @@ class Project < ApplicationRecord
     unless: :ci_cd_settings,
     if: proc { ProjectCiCdSetting.available? }
 
+  after_create :create_container_expiration_policy,
+               unless: :container_expiration_policy
+
   after_create :create_pages_metadatum,
-    unless: :pages_metadatum
+               unless: :pages_metadatum
 
   after_create :set_timestamps_for_create
   after_update :update_forks_visibility_level
@@ -182,6 +173,7 @@ class Project < ApplicationRecord
   has_one :microsoft_teams_service
   has_one :packagist_service
   has_one :hangouts_chat_service
+  has_one :unify_circuit_service
 
   has_one :root_of_fork_network,
           foreign_key: 'root_project_id',
@@ -192,6 +184,7 @@ class Project < ApplicationRecord
   has_one :forked_from_project, through: :fork_network_member
   has_many :forked_to_members, class_name: 'ForkNetworkMember', foreign_key: 'forked_from_project_id'
   has_many :forks, through: :forked_to_members, source: :project, inverse_of: :forked_from_project
+  has_many :fork_network_projects, through: :fork_network, source: :projects
 
   has_one :import_state, autosave: true, class_name: 'ProjectImportState', inverse_of: :project
   has_one :import_export_upload, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -258,6 +251,7 @@ class Project < ApplicationRecord
   # which is not managed by the DB. Hence we're still using dependent: :destroy
   # here.
   has_many :container_repositories, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+  has_one :container_expiration_policy, inverse_of: :project
 
   has_many :commit_statuses
   # The relation :all_pipelines is intended to be used when we want to get the
@@ -286,10 +280,12 @@ class Project < ApplicationRecord
   has_many :variables, class_name: 'Ci::Variable'
   has_many :triggers, class_name: 'Ci::Trigger'
   has_many :environments
+  has_many :environments_for_dashboard, -> { from(with_rank.unfoldered.available, :environments).where('rank <= 3') }, class_name: 'Environment'
   has_many :deployments
   has_many :pipeline_schedules, class_name: 'Ci::PipelineSchedule'
   has_many :project_deploy_tokens
   has_many :deploy_tokens, through: :project_deploy_tokens
+  has_many :resource_groups, class_name: 'Ci::ResourceGroup', inverse_of: :project
 
   has_one :auto_devops, class_name: 'ProjectAutoDevops', inverse_of: :project, autosave: true
   has_many :custom_attributes, class_name: 'ProjectCustomAttribute'
@@ -307,11 +303,14 @@ class Project < ApplicationRecord
 
   has_one :pages_metadatum, class_name: 'ProjectPagesMetadatum', inverse_of: :project
 
+  has_many :import_failures, inverse_of: :project
+
   accepts_nested_attributes_for :variables, allow_destroy: true
   accepts_nested_attributes_for :project_feature, update_only: true
   accepts_nested_attributes_for :import_data
   accepts_nested_attributes_for :auto_devops, update_only: true
   accepts_nested_attributes_for :ci_cd_settings, update_only: true
+  accepts_nested_attributes_for :container_expiration_policy, update_only: true
 
   accepts_nested_attributes_for :remote_mirrors,
                                 allow_destroy: true,
@@ -321,6 +320,15 @@ class Project < ApplicationRecord
   accepts_nested_attributes_for :metrics_setting, update_only: true, allow_destroy: true
   accepts_nested_attributes_for :grafana_integration, update_only: true, allow_destroy: true
 
+  delegate :feature_available?, :builds_enabled?, :wiki_enabled?, :merge_requests_enabled?,
+    :issues_enabled?, :pages_enabled?, :public_pages?, :private_pages?,
+    :merge_requests_access_level, :issues_access_level, :wiki_access_level,
+    :snippets_access_level, :builds_access_level, :repository_access_level,
+    to: :project_feature, allow_nil: true
+  delegate :scheduled?, :started?, :in_progress?, :failed?, :finished?,
+    prefix: :import, to: :import_state, allow_nil: true
+  delegate :base_dir, :disk_path, to: :storage
+  delegate :no_import?, to: :import_state, allow_nil: true
   delegate :name, to: :owner, allow_nil: true, prefix: true
   delegate :members, to: :team, prefix: true
   delegate :add_user, :add_users, to: :team
@@ -372,9 +380,17 @@ class Project < ApplicationRecord
   scope :pending_delete, -> { where(pending_delete: true) }
   scope :without_deleted, -> { where(pending_delete: false) }
 
-  scope :with_storage_feature, ->(feature) { where('storage_version >= :version', version: HASHED_STORAGE_FEATURES[feature]) }
-  scope :without_storage_feature, ->(feature) { where('storage_version < :version OR storage_version IS NULL', version: HASHED_STORAGE_FEATURES[feature]) }
-  scope :with_unmigrated_storage, -> { where('storage_version < :version OR storage_version IS NULL', version: LATEST_STORAGE_VERSION) }
+  scope :with_storage_feature, ->(feature) do
+    where(arel_table[:storage_version].gteq(HASHED_STORAGE_FEATURES[feature]))
+  end
+  scope :without_storage_feature, ->(feature) do
+    where(arel_table[:storage_version].lt(HASHED_STORAGE_FEATURES[feature])
+        .or(arel_table[:storage_version].eq(nil)))
+  end
+  scope :with_unmigrated_storage, -> do
+    where(arel_table[:storage_version].lt(LATEST_STORAGE_VERSION)
+        .or(arel_table[:storage_version].eq(nil)))
+  end
 
   # last_activity_at is throttled every minute, but last_repository_updated_at is updated with every push
   scope :sorted_by_activity, -> { reorder(Arel.sql("GREATEST(COALESCE(last_activity_at, '1970-01-01'), COALESCE(last_repository_updated_at, '1970-01-01')) DESC")) }
@@ -394,7 +410,9 @@ class Project < ApplicationRecord
   scope :with_push, -> { joins(:events).where('events.action = ?', Event::PUSHED) }
   scope :with_project_feature, -> { joins('LEFT JOIN project_features ON projects.id = project_features.project_id') }
   scope :with_statistics, -> { includes(:statistics) }
+  scope :with_service, ->(service) { joins(service).eager_load(service) }
   scope :with_shared_runners, -> { where(shared_runners_enabled: true) }
+  scope :with_container_registry, -> { where(container_registry_enabled: true) }
   scope :inside_path, ->(path) do
     # We need routes alias rs for JOIN so it does not conflict with
     # includes(:route) which we use in ProjectsFinder.
@@ -432,6 +450,7 @@ class Project < ApplicationRecord
   scope :with_merge_requests_available_for_user, ->(current_user) { with_feature_available_for_user(:merge_requests, current_user) }
   scope :with_merge_requests_enabled, -> { with_feature_enabled(:merge_requests) }
   scope :with_remote_mirrors, -> { joins(:remote_mirrors).where(remote_mirrors: { enabled: true }).distinct }
+  scope :with_limit, -> (maximum) { limit(maximum) }
 
   scope :with_group_runners_enabled, -> do
     joins(:ci_cd_settings)
@@ -460,13 +479,6 @@ class Project < ApplicationRecord
 
   # Used by Projects::CleanupService to hold a map of rewritten object IDs
   mount_uploader :bfg_object_map, AttachmentUploader
-
-  # Returns a project, if it is not about to be removed.
-  #
-  # id - The ID of the project to retrieve.
-  def self.find_without_deleted(id)
-    without_deleted.find_by_id(id)
-  end
 
   def self.eager_load_namespace_and_owner
     includes(namespace: :owner)
@@ -521,7 +533,11 @@ class Project < ApplicationRecord
 
   # This scope returns projects where user has access to both the project and the feature.
   def self.filter_by_feature_visibility(feature, user)
-    with_feature_available_for_user(feature, user).public_or_visible_to_user(user)
+    with_feature_available_for_user(feature, user)
+      .public_or_visible_to_user(
+        user,
+        ProjectFeature.required_minimum_access_level_for_private_project(feature)
+      )
   end
 
   scope :active, -> { joins(:issues, :notes, :merge_requests).order('issues.created_at, notes.created_at, merge_requests.created_at DESC') }
@@ -543,7 +559,11 @@ class Project < ApplicationRecord
     #
     # query - The search query as a String.
     def search(query)
-      fuzzy_search(query, [:path, :name, :description])
+      if Feature.enabled?(:project_search_by_full_path, default_enabled: true)
+        joins(:route).fuzzy_search(query, [Route.arel_table[:path], :name, :description])
+      else
+        fuzzy_search(query, [:path, :name, :description])
+      end
     end
 
     def search_by_title(query)
@@ -661,6 +681,11 @@ class Project < ApplicationRecord
     end
   end
 
+  def preload_protected_branches
+    preloader = ActiveRecord::Associations::Preloader.new
+    preloader.preload(self, protected_branches: [:push_access_levels, :merge_access_levels])
+  end
+
   # returns all ancestor-groups upto but excluding the given namespace
   # when no namespace is given, all ancestors upto the top are returned
   def ancestors_upto(top = nil, hierarchy_order: nil)
@@ -713,6 +738,10 @@ class Project < ApplicationRecord
 
   def daily_statistics_enabled?
     Feature.enabled?(:project_daily_statistics, self, default_enabled: true)
+  end
+
+  def unlink_forks_upon_visibility_decrease_enabled?
+    Feature.enabled?(:unlink_fork_network_upon_visibility_decrease, self)
   end
 
   def empty_repo?
@@ -1234,8 +1263,9 @@ class Project < ApplicationRecord
 
   def all_clusters
     group_clusters = Clusters::Cluster.joins(:groups).where(cluster_groups: { group_id: ancestors_upto } )
+    instance_clusters = Clusters::Cluster.instance_type
 
-    Clusters::Cluster.from_union([clusters, group_clusters])
+    Clusters::Cluster.from_union([clusters, group_clusters, instance_clusters])
   end
 
   def items_for(entity)
@@ -1533,6 +1563,7 @@ class Project < ApplicationRecord
 
   # update visibility_level of forks
   def update_forks_visibility_level
+    return if unlink_forks_upon_visibility_decrease_enabled?
     return unless visibility_level < visibility_level_before_last_save
 
     forks.each do |forked_project|
@@ -1552,7 +1583,9 @@ class Project < ApplicationRecord
   end
 
   def wiki
-    @wiki ||= ProjectWiki.new(self, self.owner)
+    strong_memoize(:wiki) do
+      ProjectWiki.new(self, self.owner)
+    end
   end
 
   def jira_tracker_active?
@@ -1772,7 +1805,6 @@ class Project < ApplicationRecord
     InternalId.flush_records!(project: self)
 
     import_state.finish
-    import_state.remove_jid
     update_project_counter_caches
     after_create_default_branch
     join_pool_repository
@@ -1867,9 +1899,18 @@ class Project < ApplicationRecord
   end
 
   def predefined_variables
-    visibility = Gitlab::VisibilityLevel.string_level(visibility_level)
-
     Gitlab::Ci::Variables::Collection.new
+      .concat(predefined_ci_server_variables)
+      .concat(predefined_project_variables)
+      .concat(pages_variables)
+      .concat(container_registry_variables)
+      .concat(auto_devops_variables)
+      .concat(api_variables)
+  end
+
+  def predefined_project_variables
+    Gitlab::Ci::Variables::Collection.new
+      .append(key: 'GITLAB_FEATURES', value: licensed_features.join(','))
       .append(key: 'CI_PROJECT_ID', value: id.to_s)
       .append(key: 'CI_PROJECT_NAME', value: path)
       .append(key: 'CI_PROJECT_TITLE', value: title)
@@ -1877,16 +1918,28 @@ class Project < ApplicationRecord
       .append(key: 'CI_PROJECT_PATH_SLUG', value: full_path_slug)
       .append(key: 'CI_PROJECT_NAMESPACE', value: namespace.full_path)
       .append(key: 'CI_PROJECT_URL', value: web_url)
-      .append(key: 'CI_PROJECT_VISIBILITY', value: visibility)
+      .append(key: 'CI_PROJECT_VISIBILITY', value: Gitlab::VisibilityLevel.string_level(visibility_level))
       .append(key: 'CI_PROJECT_REPOSITORY_LANGUAGES', value: repository_languages.map(&:name).join(',').downcase)
-      .concat(pages_variables)
-      .concat(container_registry_variables)
-      .concat(auto_devops_variables)
-      .concat(api_variables)
+      .append(key: 'CI_DEFAULT_BRANCH', value: default_branch)
+  end
+
+  def predefined_ci_server_variables
+    Gitlab::Ci::Variables::Collection.new
+      .append(key: 'CI', value: 'true')
+      .append(key: 'GITLAB_CI', value: 'true')
+      .append(key: 'CI_SERVER_HOST', value: Gitlab.config.gitlab.host)
+      .append(key: 'CI_SERVER_NAME', value: 'GitLab')
+      .append(key: 'CI_SERVER_VERSION', value: Gitlab::VERSION)
+      .append(key: 'CI_SERVER_VERSION_MAJOR', value: Gitlab.version_info.major.to_s)
+      .append(key: 'CI_SERVER_VERSION_MINOR', value: Gitlab.version_info.minor.to_s)
+      .append(key: 'CI_SERVER_VERSION_PATCH', value: Gitlab.version_info.patch.to_s)
+      .append(key: 'CI_SERVER_REVISION', value: Gitlab.revision)
   end
 
   def pages_variables
     Gitlab::Ci::Variables::Collection.new.tap do |variables|
+      break unless pages_enabled?
+
       variables.append(key: 'CI_PAGES_DOMAIN', value: Gitlab.config.pages.host)
       variables.append(key: 'CI_PAGES_URL', value: pages_url)
     end
@@ -1911,7 +1964,7 @@ class Project < ApplicationRecord
   end
 
   def default_environment
-    production_first = "(CASE WHEN name = 'production' THEN 0 ELSE 1 END), id ASC"
+    production_first = Arel.sql("(CASE WHEN name = 'production' THEN 0 ELSE 1 END), id ASC")
 
     environments
       .with_state(:available)
@@ -1952,12 +2005,16 @@ class Project < ApplicationRecord
     end
   end
 
-  def deployment_variables(environment:)
+  def deployment_variables(environment:, kubernetes_namespace: nil)
     platform = deployment_platform(environment: environment)
 
     return [] unless platform.present?
 
-    platform.predefined_variables(project: self, environment_name: environment)
+    platform.predefined_variables(
+      project: self,
+      environment_name: environment,
+      kubernetes_namespace: kubernetes_namespace
+    )
   end
 
   def auto_devops_variables
@@ -2022,10 +2079,16 @@ class Project < ApplicationRecord
   end
 
   def default_merge_request_target
-    if forked_from_project&.merge_requests_enabled?
-      forked_from_project
-    else
+    return self unless forked_from_project
+    return self unless forked_from_project.merge_requests_enabled?
+
+    # When our current visibility is more restrictive than the source project,
+    # (e.g., the fork is `private` but the parent is `public`), target the less
+    # permissive project
+    if visibility_level_value < forked_from_project.visibility_level_value
       self
+    else
+      forked_from_project
     end
   end
 
@@ -2222,12 +2285,13 @@ class Project < ApplicationRecord
   # Git objects are only poolable when the project is or has:
   # - Hashed storage -> The object pool will have a remote to its members, using relative paths.
   #                     If the repository path changes we would have to update the remote.
-  # - Public         -> User will be able to fetch Git objects that might not exist
-  #                     in their own repository.
+  # - not private    -> The visibility level or repository access level has to be greater than private
+  #                     to prevent fetching objects that might not exist
   # - Repository     -> Else the disk path will be empty, and there's nothing to pool
   def git_objects_poolable?
     hashed_storage?(:repository) &&
-      public? &&
+      visibility_level > Gitlab::VisibilityLevel::PRIVATE &&
+      repository_access_level > ProjectFeature::PRIVATE &&
       repository_exists? &&
       Gitlab::CurrentSettings.hashed_storage_enabled
   end

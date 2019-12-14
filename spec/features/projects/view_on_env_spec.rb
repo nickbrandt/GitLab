@@ -9,8 +9,13 @@ describe 'View on environment', :js do
   let(:user) { project.creator }
 
   before do
+    stub_feature_flags(single_mr_diff_view: false)
+    stub_feature_flags(diffs_batch_load: false)
+
     project.add_maintainer(user)
   end
+
+  it_behaves_like 'rendering a single diff version'
 
   context 'when the branch has a route map' do
     let(:route_map) do
@@ -26,7 +31,7 @@ describe 'View on environment', :js do
         user,
         start_branch: branch_name,
         branch_name: branch_name,
-        commit_message: "Add .gitlab/route-map.yml",
+        commit_message: 'Add .gitlab/route-map.yml',
         file_path: '.gitlab/route-map.yml',
         file_content: route_map
       ).execute
@@ -37,9 +42,9 @@ describe 'View on environment', :js do
         user,
         start_branch: branch_name,
         branch_name: branch_name,
-        commit_message: "Update feature",
+        commit_message: 'Update feature',
         file_path: file_path,
-        file_content: "# Noop"
+        file_content: '# Noop'
       ).execute
     end
 

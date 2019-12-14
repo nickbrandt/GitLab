@@ -12,6 +12,8 @@ import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.gra
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
+import { UPLOAD_DESIGN_ERROR } from '../utils/error_messages';
+import { updateStoreAfterUploadDesign } from '../utils/cache_update';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 
@@ -44,13 +46,16 @@ export default {
       permissions: {
         createDesign: false,
       },
-      isSaving: false,
+      filesToBeSaved: [],
       selectedDesigns: [],
     };
   },
   computed: {
     isLoading() {
       return this.$apollo.queries.designs.loading || this.$apollo.queries.permissions.loading;
+    },
+    isSaving() {
+      return this.filesToBeSaved.length > 0;
     },
     canCreateDesign() {
       return this.permissions.createDesign;
@@ -98,7 +103,8 @@ export default {
         return null;
       }
 
-      const optimisticResponse = Array.from(files).map(file => ({
+      this.filesToBeSaved = Array.from(files);
+      const optimisticResponse = this.filesToBeSaved.map(file => ({
         // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
         // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
         __typename: 'Design',
@@ -131,8 +137,6 @@ export default {
         },
       }));
 
-      this.isSaving = true;
-
       return this.$apollo
         .mutate({
           mutation: uploadDesignMutation,
@@ -145,53 +149,7 @@ export default {
             hasUpload: true,
           },
           update: (store, { data: { designManagementUpload } }) => {
-            const data = store.readQuery(this.projectQueryBody);
-
-            const newDesigns = data.project.issue.designs.designs.edges.reduce((acc, design) => {
-              if (!acc.find(d => d.filename === design.node.filename)) {
-                acc.push(design.node);
-              }
-
-              return acc;
-            }, designManagementUpload.designs);
-
-            let newVersionNode;
-            const findNewVersions = designManagementUpload.designs.find(design => design.versions);
-
-            if (findNewVersions) {
-              const findNewVersionsEdges = findNewVersions.versions.edges;
-
-              if (findNewVersionsEdges && findNewVersionsEdges.length) {
-                newVersionNode = [findNewVersionsEdges[0]];
-              }
-            }
-
-            const newVersions = [
-              ...(newVersionNode || []),
-              ...data.project.issue.designs.versions.edges,
-            ];
-
-            const updatedDesigns = {
-              __typename: 'DesignCollection',
-              designs: {
-                __typename: 'DesignConnection',
-                edges: newDesigns.map(design => ({
-                  __typename: 'DesignEdge',
-                  node: design,
-                })),
-              },
-              versions: {
-                __typename: 'DesignVersionConnection',
-                edges: newVersions,
-              },
-            };
-
-            data.project.issue.designs = updatedDesigns;
-
-            store.writeQuery({
-              ...this.projectQueryBody,
-              data,
-            });
+            updateStoreAfterUploadDesign(store, designManagementUpload, this.projectQueryBody);
           },
           optimisticResponse: {
             // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
@@ -207,11 +165,11 @@ export default {
           this.$router.push({ name: 'designs' });
         })
         .catch(e => {
-          createFlash(s__('DesignManagement|Error uploading a new design. Please try again'));
+          createFlash(UPLOAD_DESIGN_ERROR);
           throw e;
         })
         .finally(() => {
-          this.isSaving = false;
+          this.filesToBeSaved = [];
         });
     },
     changeSelectedDesigns(filename) {
@@ -231,6 +189,12 @@ export default {
     isDesignSelected(filename) {
       return this.selectedDesigns.includes(filename);
     },
+    isDesignToBeSaved(filename) {
+      return this.filesToBeSaved.some(file => file.name === filename);
+    },
+    canSelectDesign(filename) {
+      return this.isLatestVersion && this.canCreateDesign && !this.isDesignToBeSaved(filename);
+    },
     onDesignDelete() {
       this.selectedDesigns = [];
       if (this.$route.query.version) this.$router.push({ name: 'designs' });
@@ -248,7 +212,7 @@ export default {
     <header v-if="showToolbar" class="row-content-block border-top-0 p-2 d-flex">
       <div class="d-flex justify-content-between align-items-center w-100">
         <design-version-dropdown />
-        <div class="d-flex">
+        <div v-if="hasDesigns" class="d-flex qa-selector-toolbar">
           <gl-button
             v-if="isLatestVersion"
             variant="link"
@@ -264,6 +228,7 @@ export default {
             @done="onDesignDelete"
           >
             <delete-button
+              v-if="isLatestVersion"
               :is-deleting="loading"
               button-class="btn-danger btn-inverted mr-2"
               :has-selected-designs="hasSelectedDesigns"
@@ -284,9 +249,9 @@ export default {
       </div>
       <ol v-else-if="hasDesigns" class="list-unstyled row">
         <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
-          <design v-bind="design" />
+          <design v-bind="design" :is-loading="isDesignToBeSaved(design.filename)" />
           <input
-            v-if="isLatestVersion && canCreateDesign"
+            v-if="canSelectDesign(design.filename)"
             :checked="isDesignSelected(design.filename)"
             type="checkbox"
             class="design-checkbox"

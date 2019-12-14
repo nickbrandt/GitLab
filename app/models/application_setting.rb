@@ -93,6 +93,10 @@ class ApplicationSetting < ApplicationRecord
             presence: true,
             if: :plantuml_enabled
 
+  validates :sourcegraph_url,
+            presence: true,
+            if: :sourcegraph_enabled
+
   validates :snowplow_collector_hostname,
             presence: true,
             hostname: true,
@@ -102,11 +106,6 @@ class ApplicationSetting < ApplicationRecord
             addressable_url: true,
             allow_blank: true,
             if: :snowplow_enabled
-
-  validates :pendo_url,
-            presence: true,
-            public_url: true,
-            if: :pendo_enabled
 
   validates :max_attachment_size,
             presence: true,
@@ -224,6 +223,8 @@ class ApplicationSetting < ApplicationRecord
   validates :push_event_activities_limit,
             numericality: { greater_than_or_equal_to: 0 }
 
+  validates :snippet_size_limit, numericality: { only_integer: true, greater_than: 0 }
+
   SUPPORTED_KEY_TYPES.each do |type|
     validates :"#{type}_key_restriction", presence: true, key_restriction: { type: type }
   end
@@ -274,11 +275,33 @@ class ApplicationSetting < ApplicationRecord
             presence: true,
             if: :lets_encrypt_terms_of_service_accepted?
 
+  validates :eks_integration_enabled,
+            inclusion: { in: [true, false] }
+
+  validates :eks_account_id,
+            format: { with: Gitlab::Regex.aws_account_id_regex,
+                      message: Gitlab::Regex.aws_account_id_message },
+            if: :eks_integration_enabled?
+
+  validates :eks_access_key_id,
+            length: { in: 16..128 },
+            if: :eks_integration_enabled?
+
+  validates :eks_secret_access_key,
+            presence: true,
+            if: :eks_integration_enabled?
+
   validates_with X509CertificateCredentialsValidator,
                  certificate: :external_auth_client_cert,
                  pkey: :external_auth_client_key,
                  pass: :external_auth_client_key_pass,
                  if: -> (setting) { setting.external_auth_client_cert.present? }
+
+  validates :default_ci_config_path,
+    format: { without: %r{(\.{2}|\A/)},
+              message: N_('cannot include leading slash or directory traversal.') },
+    length: { maximum: 255 },
+    allow_blank: true
 
   attr_encrypted :asset_proxy_secret_key,
                  mode: :per_attribute_iv,
@@ -286,23 +309,25 @@ class ApplicationSetting < ApplicationRecord
                  algorithm: 'aes-256-cbc',
                  insecure_mode: true
 
-  attr_encrypted :external_auth_client_key,
-                 mode: :per_attribute_iv,
-                 key: Settings.attr_encrypted_db_key_base_truncated,
-                 algorithm: 'aes-256-gcm',
-                 encode: true
+  private_class_method def self.encryption_options_base_truncated_aes_256_gcm
+    {
+      mode: :per_attribute_iv,
+      key: Settings.attr_encrypted_db_key_base_truncated,
+      algorithm: 'aes-256-gcm',
+      encode: true
+    }
+  end
 
-  attr_encrypted :external_auth_client_key_pass,
-                 mode: :per_attribute_iv,
-                 key: Settings.attr_encrypted_db_key_base_truncated,
-                 algorithm: 'aes-256-gcm',
-                 encode: true
-
-  attr_encrypted :lets_encrypt_private_key,
-                 mode: :per_attribute_iv,
-                 key: Settings.attr_encrypted_db_key_base_truncated,
-                 algorithm: 'aes-256-gcm',
-                 encode: true
+  attr_encrypted :external_auth_client_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :external_auth_client_key_pass, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :lets_encrypt_private_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :eks_secret_access_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :akismet_api_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :elasticsearch_aws_secret_access_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :recaptcha_private_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :recaptcha_site_key, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :slack_app_secret, encryption_options_base_truncated_aes_256_gcm
+  attr_encrypted :slack_app_verification_token, encryption_options_base_truncated_aes_256_gcm
 
   before_validation :ensure_uuid!
 
@@ -313,6 +338,10 @@ class ApplicationSetting < ApplicationRecord
     reset_memoized_terms
   end
   after_commit :expire_performance_bar_allowed_user_ids_cache, if: -> { previous_changes.key?('performance_bar_allowed_group_id') }
+
+  def sourcegraph_url_is_com?
+    !!(sourcegraph_url =~ /\Ahttps:\/\/(www\.)?sourcegraph\.com/)
+  end
 
   def self.create_from_defaults
     transaction(requires_new: true) do

@@ -5,7 +5,17 @@
     {
       "properties": {
         "weight": { "type": ["integer", "null"] },
-        "epic_iid": { "type": ["integer", "null"] }
+        "epic_iid": { "type": ["integer", "null"] },
+        "epic": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "integer" },
+            "iid": { "type": "integer" },
+            "group_id": { "type": "integer" },
+            "title": { "type": "string" },
+            "url": { "type": "string" }
+          }
+        }
       }
     }
   ]

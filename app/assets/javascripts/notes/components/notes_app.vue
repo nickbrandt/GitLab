@@ -1,5 +1,4 @@
 <script>
-import { __ } from '~/locale';
 import { mapGetters, mapActions } from 'vuex';
 import { getLocationHash, doesHashExistInUrl } from '../../lib/utils/url_utility';
 import Flash from '../../flash';
@@ -14,6 +13,7 @@ import placeholderNote from '../../vue_shared/components/notes/placeholder_note.
 import placeholderSystemNote from '../../vue_shared/components/notes/placeholder_system_note.vue';
 import skeletonLoadingContainer from '../../vue_shared/components/notes/skeleton_note.vue';
 import highlightCurrentUser from '~/behaviors/markdown/highlight_current_user';
+import { __ } from '~/locale';
 import initUserPopovers from '../../user_popovers';
 
 export default {
@@ -71,6 +71,9 @@ export default {
       'userCanReply',
       'discussionTabCounter',
     ]),
+    discussionTabCounterText() {
+      return this.isLoading ? '' : this.discussionTabCounter;
+    },
     noteableType() {
       return this.noteableData.noteableType;
     },
@@ -95,9 +98,9 @@ export default {
         this.fetchNotes();
       }
     },
-    allDiscussions() {
-      if (this.discussionsCount && !this.isLoading) {
-        this.discussionsCount.textContent = this.discussionTabCounter;
+    discussionTabCounterText(val) {
+      if (this.discussionsCount) {
+        this.discussionsCount.textContent = val;
       }
     },
   },
@@ -122,6 +125,8 @@ export default {
         this.toggleAward({ awardName, noteId });
       });
     }
+
+    window.addEventListener('hashchange', this.handleHashChanged);
   },
   updated() {
     this.$nextTick(() => {
@@ -131,6 +136,7 @@ export default {
   },
   beforeDestroy() {
     this.stopPolling();
+    window.removeEventListener('hashchange', this.handleHashChanged);
   },
   methods: {
     ...mapActions([
@@ -138,7 +144,6 @@ export default {
       'fetchDiscussions',
       'poll',
       'toggleAward',
-      'scrollToNoteIfNeeded',
       'setNotesData',
       'setNoteableData',
       'setUserData',
@@ -151,6 +156,13 @@ export default {
       'convertToDiscussion',
       'stopPolling',
     ]),
+    handleHashChanged() {
+      const noteId = this.checkLocationHash();
+
+      if (noteId) {
+        this.setTargetNoteHash(getLocationHash());
+      }
+    },
     fetchNotes() {
       if (this.isFetching) return null;
 
@@ -194,6 +206,8 @@ export default {
           this.expandDiscussion({ discussionId: discussion.id });
         }
       }
+
+      return noteId;
     },
     startReplying(discussionId) {
       return this.convertToDiscussion(discussionId)

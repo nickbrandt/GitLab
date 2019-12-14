@@ -128,9 +128,31 @@ automatically. If you are using [Auto DevOps](../../../topics/autodevops/index.m
 need to explicitly provide the `KUBE_NAMESPACE` [deployment variable](#deployment-variables)
 that will be used by your deployment jobs, otherwise a namespace will be created for you.
 
-NOTE: **Note:**
-If you [install applications](#installing-applications) on your cluster, GitLab will create
-the resources required to run these even if you have chosen to manage your own cluster.
+#### Important notes
+
+Note the following with GitLab and clusters:
+
+- If you [install applications](#installing-applications) on your cluster, GitLab will
+  create the resources required to run these even if you have chosen to manage your own
+  cluster.
+- Be aware that manually managing resources that have been created by GitLab, like
+  namespaces and service accounts, can cause unexpected errors. If this occurs, try
+  [clearing the cluster cache](#clearing-the-cluster-cache).
+
+#### Clearing the cluster cache
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/31759) in GitLab 12.6.
+
+If you choose to allow GitLab to manage your cluster for you, GitLab stores a cached
+version of the namespaces and service accounts it creates for your projects. If you
+modify these resources in your cluster manually, this cache can fall out of sync with
+your cluster, which can cause deployment jobs to fail.
+
+To clear the cache:
+
+1. Navigate to your project’s **Operations > Kubernetes** page, and select your cluster.
+1. Expand the **Advanced settings** section.
+1. Click **Clear cluster cache**.
 
 ### Base domain
 
@@ -247,7 +269,7 @@ GitLab CI/CD build environment.
 | -------- | ----------- |
 | `KUBE_URL` | Equal to the API URL. |
 | `KUBE_TOKEN` | The Kubernetes token of the [environment service account](add_remove_clusters.md#access-controls). |
-| `KUBE_NAMESPACE` | The Kubernetes namespace is auto-generated if not specified. The default value is `<project_name>-<project_id>-<environment>`. You can overwrite it to use different one if needed, otherwise the `KUBE_NAMESPACE` variable will receive the default value. |
+| `KUBE_NAMESPACE` | The namespace associated with the project's deployment service account. In the format `<project_name>-<project_id>-<environment>`. For GitLab-managed clusters, a matching namespace is automatically created by GitLab in the cluster. |
 | `KUBE_CA_PEM_FILE` | Path to a file containing PEM data. Only present if a custom CA bundle was specified. |
 | `KUBE_CA_PEM` | (**deprecated**) Raw PEM data. Only if a custom CA bundle was specified. |
 | `KUBECONFIG` | Path to a file containing `kubeconfig` for this deployment. CA bundle would be embedded if specified. This config also embeds the same token defined in `KUBE_TOKEN` so you likely will only need this variable. This variable name is also automatically picked up by `kubectl` so you won't actually need to reference it explicitly if using `kubectl`. |
@@ -259,6 +281,16 @@ service account of the cluster integration.
 
 NOTE: **Note:**
 If your cluster was created before GitLab 12.2, default `KUBE_NAMESPACE` will be set to `<project_name>-<project_id>`.
+
+When deploying a custom namespace:
+
+- The custom namespace must exist in your cluster.
+- The project's deployment service account must have permission to deploy to the namespace.
+- `KUBECONFIG` must be updated to use the custom namespace instead of the GitLab-provided default (this is [not automatic](https://gitlab.com/gitlab-org/gitlab/issues/31519)).
+- If deploying with Auto DevOps, you must *also* override `KUBE_NAMESPACE` with the custom namespace.
+
+CAUTION: **Caution:**
+GitLab does not save custom namespaces in the database. So while deployments work with custom namespaces, GitLab's integration for already-deployed environments will not pick up the customized values. For example, [Deploy Boards](../deploy_boards.md) will not work as intended for those deployments. For more information, see the [related issue](https://gitlab.com/gitlab-org/gitlab/issues/27630).
 
 ### Troubleshooting
 

@@ -2,6 +2,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 import Toolbar from 'ee/design_management/components/toolbar/index.vue';
 import DeleteButton from 'ee/design_management/components/delete_button.vue';
+import { GlButton } from '@gitlab/ui';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
@@ -34,11 +35,12 @@ describe('Design management toolbar component', () => {
         isLatestVersion: true,
         isLoading,
         isDeleting: false,
-        name: 'test.jpg',
+        filename: 'test.jpg',
         updatedAt: updatedAt.toString(),
         updatedBy: {
           name: 'Test Name',
         },
+        image: '/-/designs/306/7f747adcd4693afadbe968d7ba7d983349b9012d',
         ...props,
       },
       stubs: {
@@ -109,5 +111,11 @@ describe('Design management toolbar component', () => {
       wrapper.find(DeleteButton).vm.$emit('deleteSelectedDesigns');
       expect(wrapper.emitted().delete).toBeTruthy();
     });
+  });
+
+  it('renders download button with correct link', () => {
+    expect(wrapper.find(GlButton).attributes('href')).toBe(
+      '/-/designs/306/7f747adcd4693afadbe968d7ba7d983349b9012d',
+    );
   });
 });

@@ -1,8 +1,8 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import _ from 'underscore';
-import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import ApprovedIcon from 'ee/vue_merge_request_widget/components/approvals/approved_icon.vue';
 import ApprovalsList from 'ee/vue_merge_request_widget/components/approvals/approvals_list.vue';
+import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 
 const localVue = createLocalVue();
 
@@ -35,6 +35,7 @@ const testRuleFallback = () => ({
   id: 'fallback',
   name: '',
   fallback: true,
+  rule_type: 'any_approver',
   approvals_required: 3,
   approved_by: [{ id: 1 }, { id: 2 }],
   approvers: [],

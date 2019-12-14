@@ -1,17 +1,16 @@
+import Api from 'ee/api';
 import { backOff } from '~/lib/utils/common_utils';
+import httpStatusCodes from '~/lib/utils/http_status';
 import axios from '~/lib/utils/axios_utils';
 import flash from '~/flash';
 import { s__ } from '~/locale';
 import * as types from './mutation_types';
 
-const requestUntilData = (url, params) =>
+const requestLogsUntilData = ({ projectPath, environmentName, podName }) =>
   backOff((next, stop) => {
-    axios
-      .get(url, {
-        params,
-      })
+    Api.getPodLogs({ projectPath, environmentName, podName })
       .then(res => {
-        if (!res.data) {
+        if (res.status === httpStatusCodes.ACCEPTED) {
           next();
           return;
         }
@@ -22,8 +21,22 @@ const requestUntilData = (url, params) =>
       });
   });
 
-export const setLogsEndpoint = ({ commit }, logsEndpoint) => {
-  commit(types.SET_LOGS_ENDPOINT, logsEndpoint);
+export const setInitData = ({ dispatch, commit }, { projectPath, environmentName, podName }) => {
+  commit(types.SET_PROJECT_PATH, projectPath);
+  commit(types.SET_PROJECT_ENVIRONMENT, environmentName);
+  commit(types.SET_CURRENT_POD_NAME, podName);
+  dispatch('fetchLogs');
+};
+
+export const showPodLogs = ({ dispatch, commit }, podName) => {
+  commit(types.SET_CURRENT_POD_NAME, podName);
+  dispatch('fetchLogs');
+};
+
+export const showEnvironment = ({ dispatch, commit }, environmentName) => {
+  commit(types.SET_PROJECT_ENVIRONMENT, environmentName);
+  commit(types.SET_CURRENT_POD_NAME, null);
+  dispatch('fetchLogs');
 };
 
 export const fetchEnvironments = ({ commit }, environmentsPath) => {
@@ -40,20 +53,20 @@ export const fetchEnvironments = ({ commit }, environmentsPath) => {
     });
 };
 
-export const fetchLogs = ({ commit, state }, podName) => {
-  if (podName) {
-    commit(types.SET_CURRENT_POD_NAME, podName);
-  }
+export const fetchLogs = ({ commit, state }) => {
+  const params = {
+    projectPath: state.projectPath,
+    environmentName: state.environments.current,
+    podName: state.pods.current,
+  };
+
   commit(types.REQUEST_PODS_DATA);
   commit(types.REQUEST_LOGS_DATA);
-  return requestUntilData(state.logs.endpoint, { pod_name: podName })
-    .then(({ data }) => {
-      const { pods, logs } = data;
 
-      // Set first pod as default, if none is set
-      if (!podName && pods[0]) {
-        commit(types.SET_CURRENT_POD_NAME, pods[0]);
-      }
+  return requestLogsUntilData(params)
+    .then(({ data }) => {
+      const { pod_name, pods, logs } = data;
+      commit(types.SET_CURRENT_POD_NAME, pod_name);
 
       commit(types.RECEIVE_PODS_DATA_SUCCESS, pods);
       commit(types.RECEIVE_LOGS_DATA_SUCCESS, logs);

@@ -506,7 +506,7 @@ describe ProjectsController do
           expect { update_project path: 'renamed_path' }
             .not_to change { project.reload.path }
 
-          expect(controller).to set_flash.now[:alert].to(/container registry tags/)
+          expect(controller).to set_flash.now[:alert].to(s_('UpdateProject|Cannot rename project because it contains container registry tags!'))
           expect(response).to have_gitlab_http_status(200)
         end
       end
@@ -645,7 +645,7 @@ describe ProjectsController do
 
         expect(project.namespace).to eq(old_namespace)
         expect(response).to have_gitlab_http_status(200)
-        expect(flash[:alert]).to eq 'Please select a new namespace for your project.'
+        expect(flash[:alert]).to eq s_('TransferProject|Please select a new namespace for your project.')
       end
     end
   end
@@ -797,7 +797,7 @@ describe ProjectsController do
               format: :js)
 
           expect(forked_project.reload.forked?).to be_falsey
-          expect(flash[:notice]).to eq('The fork relationship has been removed.')
+          expect(flash[:notice]).to eq(s_('The fork relationship has been removed.'))
           expect(response).to render_template(:remove_fork)
         end
       end
@@ -837,8 +837,7 @@ describe ProjectsController do
       get :refs, params: { namespace_id: project.namespace, id: project, sort: 'updated_desc' }
 
       expect(json_response['Branches']).to include('master')
-      expect(json_response['Tags'].first).to eq('v1.1.0')
-      expect(json_response['Tags'].last).to eq('v1.0.0')
+      expect(json_response['Tags']).to include('v1.0.0')
       expect(json_response['Commits']).to be_nil
     end
 
@@ -925,6 +924,30 @@ describe ProjectsController do
                                 }
 
         expect(json_response['body']).to match(/\!#{merge_request.iid} \(closed\)/)
+      end
+    end
+
+    context 'when path parameter is provided' do
+      let(:project_with_repo) { create(:project, :repository) }
+      let(:preview_markdown_params) do
+        {
+          namespace_id: project_with_repo.namespace,
+          id: project_with_repo,
+          text: "![](./logo-white.png)\n",
+          path: 'files/images/README.md'
+        }
+      end
+
+      before do
+        project_with_repo.add_maintainer(user)
+      end
+
+      it 'renders JSON body with image links expanded' do
+        expanded_path = "/#{project_with_repo.full_path}/raw/master/files/images/logo-white.png"
+
+        post :preview_markdown, params: preview_markdown_params
+
+        expect(json_response['body']).to include(expanded_path)
       end
     end
   end
@@ -1032,45 +1055,34 @@ describe ProjectsController do
     end
   end
 
-  describe '#export' do
+  describe 'project export' do
     before do
       sign_in(user)
 
       project.add_maintainer(user)
     end
 
-    context 'when project export is enabled' do
-      it 'returns 302' do
-        get :export, params: { namespace_id: project.namespace, id: project }
+    shared_examples 'rate limits project export endpoint' do
+      before do
+        allow(::Gitlab::ApplicationRateLimiter)
+          .to receive(:throttled?)
+          .and_return(true)
+      end
 
+      it 'prevents requesting project export' do
+        get action, params: { namespace_id: project.namespace, id: project }
+
+        expect(flash[:alert]).to eq('This endpoint has been requested too many times. Try again later.')
         expect(response).to have_gitlab_http_status(302)
       end
     end
 
-    context 'when project export is disabled' do
-      before do
-        stub_application_setting(project_export_enabled?: false)
-      end
+    describe '#export' do
+      let(:action) { :export }
 
-      it 'returns 404' do
-        get :export, params: { namespace_id: project.namespace, id: project }
-
-        expect(response).to have_gitlab_http_status(404)
-      end
-    end
-  end
-
-  describe '#download_export' do
-    before do
-      sign_in(user)
-
-      project.add_maintainer(user)
-    end
-
-    context 'object storage enabled' do
       context 'when project export is enabled' do
         it 'returns 302' do
-          get :download_export, params: { namespace_id: project.namespace, id: project }
+          get action, params: { namespace_id: project.namespace, id: project }
 
           expect(response).to have_gitlab_http_status(302)
         end
@@ -1082,66 +1094,96 @@ describe ProjectsController do
         end
 
         it 'returns 404' do
-          get :download_export, params: { namespace_id: project.namespace, id: project }
+          get action, params: { namespace_id: project.namespace, id: project }
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when the endpoint receives requests above the limit', :clean_gitlab_redis_cache do
+        include_examples 'rate limits project export endpoint'
+      end
+    end
+
+    describe '#download_export' do
+      let(:action) { :download_export }
+
+      context 'object storage enabled' do
+        context 'when project export is enabled' do
+          it 'returns 302' do
+            get action, params: { namespace_id: project.namespace, id: project }
+
+            expect(response).to have_gitlab_http_status(302)
+          end
+        end
+
+        context 'when project export is disabled' do
+          before do
+            stub_application_setting(project_export_enabled?: false)
+          end
+
+          it 'returns 404' do
+            get action, params: { namespace_id: project.namespace, id: project }
+
+            expect(response).to have_gitlab_http_status(404)
+          end
+        end
+
+        context 'when the endpoint receives requests above the limit', :clean_gitlab_redis_cache do
+          include_examples 'rate limits project export endpoint'
+        end
+      end
+    end
+
+    describe '#remove_export' do
+      let(:action) { :remove_export }
+
+      context 'when project export is enabled' do
+        it 'returns 302' do
+          post action, params: { namespace_id: project.namespace, id: project }
+
+          expect(response).to have_gitlab_http_status(302)
+        end
+      end
+
+      context 'when project export is disabled' do
+        before do
+          stub_application_setting(project_export_enabled?: false)
+        end
+
+        it 'returns 404' do
+          post action, params: { namespace_id: project.namespace, id: project }
 
           expect(response).to have_gitlab_http_status(404)
         end
       end
     end
-  end
 
-  describe '#remove_export' do
-    before do
-      sign_in(user)
+    describe '#generate_new_export' do
+      let(:action) { :generate_new_export }
 
-      project.add_maintainer(user)
-    end
+      context 'when project export is enabled' do
+        it 'returns 302' do
+          post action, params: { namespace_id: project.namespace, id: project }
 
-    context 'when project export is enabled' do
-      it 'returns 302' do
-        post :remove_export, params: { namespace_id: project.namespace, id: project }
-
-        expect(response).to have_gitlab_http_status(302)
-      end
-    end
-
-    context 'when project export is disabled' do
-      before do
-        stub_application_setting(project_export_enabled?: false)
+          expect(response).to have_gitlab_http_status(302)
+        end
       end
 
-      it 'returns 404' do
-        post :remove_export, params: { namespace_id: project.namespace, id: project }
+      context 'when project export is disabled' do
+        before do
+          stub_application_setting(project_export_enabled?: false)
+        end
 
-        expect(response).to have_gitlab_http_status(404)
-      end
-    end
-  end
+        it 'returns 404' do
+          post action, params: { namespace_id: project.namespace, id: project }
 
-  describe '#generate_new_export' do
-    before do
-      sign_in(user)
-
-      project.add_maintainer(user)
-    end
-
-    context 'when project export is enabled' do
-      it 'returns 302' do
-        post :generate_new_export, params: { namespace_id: project.namespace, id: project }
-
-        expect(response).to have_gitlab_http_status(302)
-      end
-    end
-
-    context 'when project export is disabled' do
-      before do
-        stub_application_setting(project_export_enabled?: false)
+          expect(response).to have_gitlab_http_status(404)
+        end
       end
 
-      it 'returns 404' do
-        post :generate_new_export, params: { namespace_id: project.namespace, id: project }
-
-        expect(response).to have_gitlab_http_status(404)
+      context 'when the endpoint receives requests above the limit', :clean_gitlab_redis_cache do
+        include_examples 'rate limits project export endpoint'
       end
     end
   end

@@ -430,7 +430,7 @@ e.g. when renaming the email address to some existing one.
 ## User deletion
 
 Deletes a user. Available only for administrators.
-This returns a `204 No Content` status code if the operation was successfully or `404` if the resource was not found.
+This returns a `204 No Content` status code if the operation was successfully, `404` if the resource was not found or `409` if the user cannot be soft deleted.
 
 ```
 DELETE /users/:id
@@ -1124,7 +1124,7 @@ Parameters:
 
 ## Block user
 
-Blocks the specified user.  Available only for admin.
+Blocks the specified user. Available only for admin.
 
 ```
 POST /users/:id/block
@@ -1139,7 +1139,7 @@ Will return `201 OK` on success, `404 User Not Found` is user cannot be found or
 
 ## Unblock user
 
-Unblocks the specified user.  Available only for admin.
+Unblocks the specified user. Available only for admin.
 
 ```
 POST /users/:id/unblock

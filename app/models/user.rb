@@ -56,9 +56,6 @@ class User < ApplicationRecord
   BLOCKED_MESSAGE = "Your account has been blocked. Please contact your GitLab " \
                     "administrator if you think this is an error."
 
-  # Removed in GitLab 12.3. Keep until after 2019-09-22.
-  self.ignored_columns += %i[support_bot]
-
   MINIMUM_INACTIVE_DAYS = 180
 
   # Override Devise::Models::Trackable#update_tracked_fields!
@@ -243,6 +240,8 @@ class User < ApplicationRecord
   delegate :time_display_relative, :time_display_relative=, to: :user_preference
   delegate :time_format_in_24h, :time_format_in_24h=, to: :user_preference
   delegate :show_whitespace_in_diffs, :show_whitespace_in_diffs=, to: :user_preference
+  delegate :sourcegraph_enabled, :sourcegraph_enabled=, to: :user_preference
+  delegate :setup_for_company, :setup_for_company=, to: :user_preference
 
   accepts_nested_attributes_for :user_preference, update_only: true
 
@@ -310,6 +309,13 @@ class User < ApplicationRecord
   scope :with_emails, -> { preload(:emails) }
   scope :with_dashboard, -> (dashboard) { where(dashboard: dashboard) }
   scope :with_public_profile, -> { where(private_profile: false) }
+
+  scope :with_expiring_and_not_notified_personal_access_tokens, ->(at) do
+    where('EXISTS (?)',
+          ::PersonalAccessToken
+            .where('personal_access_tokens.user_id = users.id')
+            .expiring_and_not_notified(at).select(1))
+  end
 
   def self.with_visible_profile(user)
     return with_public_profile if user.nil?
@@ -990,8 +996,12 @@ class User < ApplicationRecord
     @ldap_identity ||= identities.find_by(["provider LIKE ?", "ldap%"])
   end
 
+  def matches_identity?(provider, extern_uid)
+    identities.where(provider: provider, extern_uid: extern_uid).exists?
+  end
+
   def project_deploy_keys
-    DeployKey.in_projects(authorized_projects.select(:id)).distinct(:id)
+    @project_deploy_keys ||= DeployKey.in_projects(authorized_projects.select(:id)).distinct(:id)
   end
 
   def highest_role
@@ -1423,14 +1433,13 @@ class User < ApplicationRecord
   # flow means we don't call that automatically (and can't conveniently do so).
   #
   # See:
-  #   <https://github.com/plataformatec/devise/blob/v4.0.0/lib/devise/models/lockable.rb#L92>
+  #   <https://github.com/plataformatec/devise/blob/v4.7.1/lib/devise/models/lockable.rb#L104>
   #
   # rubocop: disable CodeReuse/ServiceClass
   def increment_failed_attempts!
     return if ::Gitlab::Database.read_only?
 
-    self.failed_attempts ||= 0
-    self.failed_attempts += 1
+    increment_failed_attempts
 
     if attempts_exceeded?
       lock_access! unless access_locked?
@@ -1458,7 +1467,7 @@ class User < ApplicationRecord
   # Does the user have access to all private groups & projects?
   # Overridden in EE to also check auditor?
   def full_private_access?
-    admin?
+    can?(:read_all_resources)
   end
 
   def update_two_factor_requirement

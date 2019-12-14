@@ -3,15 +3,17 @@
 module Operations
   class FeatureFlagsClient < ApplicationRecord
     include TokenAuthenticatable
+    include IgnorableColumns
 
     self.table_name = 'operations_feature_flags_clients'
+    ignore_column :token, remove_after: '2019-12-15', remove_with: '12.6'
 
     belongs_to :project
 
     validates :project, presence: true
     validates :token, presence: true
 
-    add_authentication_token_field :token, encrypted: :optional
+    add_authentication_token_field :token, encrypted: :required
 
     before_validation :ensure_token!
 

@@ -39,7 +39,7 @@ module EE
         links << :analytics if ::Gitlab::Analytics.any_features_enabled?
 
         if can?(current_user, :read_operations_dashboard)
-          links << :environments if ::Feature.enabled?(:environments_dashboard, current_user)
+          links << :environments if ::Feature.enabled?(:environments_dashboard, current_user, default_enabled: true)
           links << :operations
         end
 

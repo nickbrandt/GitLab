@@ -1,11 +1,11 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { GlLink } from '@gitlab/ui';
-import ReportSection from '~/reports/components/report_section.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
 import SetLicenseApprovalModal from 'ee/vue_shared/license_management/components/set_approval_status_modal.vue';
 import { componentNames } from 'ee/reports/components/issue_body';
+import Icon from '~/vue_shared/components/icon.vue';
+import ReportSection from '~/reports/components/report_section.vue';
 
 import createStore from './store';
 
@@ -136,6 +136,7 @@ export default {
       :class="reportSectionClass"
       :always-open="alwaysOpen"
       class="license-report-widget mr-report"
+      data-qa-selector="license_report_widget"
     >
       <template #success>
         {{ licenseSummaryText }}

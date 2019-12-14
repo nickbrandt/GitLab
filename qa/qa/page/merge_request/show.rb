@@ -26,7 +26,7 @@ module QA
         end
 
         view 'app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_merged.vue' do
-          element :merged_status, 'The changes were merged into' # rubocop:disable QA/ElementWithPattern
+          element :merged_status_content
         end
 
         view 'app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_rebase.vue' do
@@ -86,12 +86,28 @@ module QA
           has_element?(:merge_moment_dropdown)
         end
 
+        def merged?
+          has_element? :merged_status_content, text: 'The changes were merged into'
+        end
+
         def merge_immediately
+          wait(reload: false) do
+            finished_loading?
+          end
+
           if has_merge_options?
-            click_element :merge_moment_dropdown
+            retry_until do
+              click_element :merge_moment_dropdown
+              has_element? :merge_immediately_option
+            end
+
             click_element :merge_immediately_option
           else
             click_element :merge_button
+          end
+
+          wait(reload: false) do
+            merged?
           end
         end
 
@@ -122,9 +138,8 @@ module QA
         end
 
         def has_label?(label)
-          page.within(element_selector_css(:labels_block)) do
-            element = find('span', text: label)
-            !element.nil?
+          within_element(:labels_block) do
+            !!has_element?(:label, label_name: label)
           end
         end
 

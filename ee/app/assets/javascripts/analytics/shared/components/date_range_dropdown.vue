@@ -1,6 +1,6 @@
 <script>
-import { __, sprintf } from '~/locale';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { __, sprintf } from '~/locale';
 
 export default {
   components: {

@@ -96,10 +96,10 @@ describe('EE Approvals App', () => {
         };
       });
 
-      it('does not show Rules', () => {
+      it('does show Rules', () => {
         factory();
 
-        expect(findRules().exists()).toBe(false);
+        expect(findRules().exists()).toBe(true);
       });
 
       it('shows loading icon if loading', () => {

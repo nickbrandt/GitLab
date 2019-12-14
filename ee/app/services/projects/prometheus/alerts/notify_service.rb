@@ -7,6 +7,7 @@ module Projects
         include Gitlab::Utils::StrongMemoize
 
         def execute(token)
+          return false unless valid_payload_size?
           return false unless valid_version?
           return false unless valid_alert_manager_token?(token)
 
@@ -18,6 +19,10 @@ module Projects
         end
 
         private
+
+        def valid_payload_size?
+          Gitlab::Utils::DeepSize.new(params).valid?
+        end
 
         def incident_management_available?
           project.feature_available?(:incident_management)

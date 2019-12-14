@@ -1,9 +1,10 @@
 <script>
 import _ from 'underscore';
+import ApprovalCheckRulePopover from 'ee/approvals/components/approval_check_rule_popover.vue';
+import EmptyRuleName from 'ee/approvals/components/empty_rule_name.vue';
+import { RULE_TYPE_CODE_OWNER, RULE_TYPE_ANY_APPROVER } from 'ee/approvals/constants';
 import { sprintf, __ } from '~/locale';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
-import ApprovalCheckRulePopover from 'ee/approvals/components/approval_check_rule_popover.vue';
-import { RULE_TYPE_CODE_OWNER } from 'ee/approvals/constants';
 import ApprovedIcon from './approved_icon.vue';
 
 export default {
@@ -11,6 +12,7 @@ export default {
     UserAvatarList,
     ApprovedIcon,
     ApprovalCheckRulePopover,
+    EmptyRuleName,
   },
   props: {
     approvalRules: {
@@ -18,6 +20,11 @@ export default {
       required: true,
     },
     securityApprovalsHelpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    eligibleApproversDocsPath: {
       type: String,
       required: false,
       default: '',
@@ -71,6 +78,7 @@ export default {
       });
     },
   },
+  ruleTypeAnyApprover: RULE_TYPE_ANY_APPROVER,
 };
 </script>
 
@@ -94,21 +102,30 @@ export default {
       </tr>
       <tr v-for="rule in rules" :key="rule.id">
         <td class="w-0"><approved-icon :is-approved="rule.approved" /></td>
-        <td :colspan="rule.fallback ? 2 : 1">
+        <td :colspan="rule.rule_type === $options.ruleTypeAnyApprover ? 2 : 1">
           <div class="d-none d-sm-block js-name" :class="rule.nameClass">
-            {{ rule.name }}
+            <empty-rule-name
+              v-if="rule.rule_type === $options.ruleTypeAnyApprover"
+              :eligible-approvers-docs-path="eligibleApproversDocsPath"
+            />
+            <span v-else>{{ rule.name }}</span>
             <approval-check-rule-popover
               :rule="rule"
               :security-approvals-help-page-path="securityApprovalsHelpPagePath"
             />
           </div>
           <div class="d-flex d-sm-none flex-column js-summary">
-            <span>{{ summaryText(rule) }}</span>
+            <empty-rule-name
+              v-if="rule.rule_type === $options.ruleTypeAnyApprover"
+              :eligible-approvers-docs-path="eligibleApproversDocsPath"
+            />
+            <span v-else>{{ summaryText(rule) }}</span>
             <user-avatar-list
               v-if="!rule.fallback"
               class="mt-2"
               :items="rule.approvers"
               :img-size="24"
+              empty-text=""
             />
             <div v-if="rule.approved_by.length" class="mt-2">
               <span>{{ s__('MRApprovals|Approved by') }}</span>
@@ -120,8 +137,11 @@ export default {
             </div>
           </div>
         </td>
-        <td v-if="!rule.fallback" class="d-none d-sm-table-cell js-approvers">
-          <div><user-avatar-list :items="rule.approvers" :img-size="24" /></div>
+        <td
+          v-if="rule.rule_type !== $options.ruleTypeAnyApprover"
+          class="d-none d-sm-table-cell js-approvers"
+        >
+          <div><user-avatar-list :items="rule.approvers" :img-size="24" empty-text="" /></div>
         </td>
         <td class="w-0 d-none d-sm-table-cell text-nowrap js-pending">
           {{ pendingApprovalsText(rule) }}

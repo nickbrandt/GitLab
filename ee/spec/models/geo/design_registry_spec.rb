@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Geo::DesignRegistry, :geo do
-  set(:design_registry) { create(:geo_design_registry) }
+  let!(:design_registry) { create(:geo_design_registry) }
 
   describe 'relationships' do
     it { is_expected.to belong_to(:project) }
@@ -11,6 +11,35 @@ describe Geo::DesignRegistry, :geo do
 
   it_behaves_like 'a Geo registry' do
     let(:registry) { create(:geo_design_registry) }
+  end
+
+  describe '#search', :geo_fdw do
+    let!(:failed_registry) { create(:geo_design_registry, :sync_failed) }
+    let!(:synced_registry) { create(:geo_design_registry, :synced) }
+
+    it 'all the registries' do
+      result = described_class.search({})
+
+      expect(result.count).to eq(3)
+    end
+
+    it 'finds by state' do
+      result = described_class.search({ sync_status: :failed })
+
+      expect(result.count).to eq(1)
+      expect(result.first.state).to eq('failed')
+    end
+
+    it 'finds by name' do
+      project = create(:project, name: 'bla')
+      create(:design, project: project)
+      create(:geo_design_registry, project: project)
+
+      result = described_class.search({ search: 'bla' })
+
+      expect(result.count).to eq(1)
+      expect(result.first.project_id).to eq(project.id)
+    end
   end
 
   describe '#finish_sync!' do

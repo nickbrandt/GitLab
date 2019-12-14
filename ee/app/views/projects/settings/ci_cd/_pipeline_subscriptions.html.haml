@@ -1,0 +1,18 @@
+- expanded = expanded_by_default?
+
+%section.settings.no-animate#pipeline-subscriptions{ class: ('expanded' if expanded) }
+  .settings-header
+    %h4
+      = _("Pipeline subscriptions")
+    %button.btn.js-settings-toggle{ type: 'button' }
+      = expanded ? _('Collapse') : _('Expand')
+    %p
+      = _("Set up pipeline subscriptions for this project.")
+    %p
+      - default_branch_docs = link_to(_("default branch"), help_page_path('user/project/repository/branches', anchor: 'default-branch'))
+      = _("Subscriptions allow successfully completed pipelines on the %{default_branch_docs} of the subscribed project to trigger a new pipeline on the default branch of this project.").html_safe % { default_branch_docs: default_branch_docs }
+    %p
+      = _("There is a limit of 100 subscriptions from or to a project.")
+
+  .settings-content
+    = render 'projects/settings/subscriptions/index'

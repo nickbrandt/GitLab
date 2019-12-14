@@ -6,8 +6,7 @@ module QA
       let(:issue_title) { "My Awesome Issue #{SecureRandom.hex(8)}" }
 
       it 'user promotes issue to an epic' do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.act { sign_in_using_credentials }
+        Flow::Login.sign_in
 
         group = Resource::Group.fabricate_via_api!
 
@@ -39,6 +38,8 @@ module QA
         group.visit!
         Page::Group::Menu.perform(&:click_group_epics_link)
         QA::EE::Page::Group::Epic::Index.perform do |index|
+          expect(index).to have_epic_title(issue_title)
+
           index.click_first_epic(QA::EE::Page::Group::Epic::Show)
         end
 

@@ -5,6 +5,7 @@ require 'spec_helper'
 describe Environment, :use_clean_rails_memory_store_caching do
   include ReactiveCachingHelpers
   using RSpec::Parameterized::TableSyntax
+  include RepoHelpers
 
   let(:project) { create(:project, :stubbed_repository) }
   subject(:environment) { create(:environment, project: project) }
@@ -440,6 +441,16 @@ describe Environment, :use_clean_rails_memory_store_caching do
     end
   end
 
+  describe '#reset_auto_stop' do
+    subject { environment.reset_auto_stop }
+
+    let(:environment) { create(:environment, :auto_stopped) }
+
+    it 'nullifies the auto_stop_at' do
+      expect { subject }.to change(environment, :auto_stop_at).from(Time).to(nil)
+    end
+  end
+
   describe '#actions_for' do
     let(:deployment) { create(:deployment, :success, environment: environment) }
     let(:pipeline) { deployment.deployable.pipeline }
@@ -483,7 +494,9 @@ describe Environment, :use_clean_rails_memory_store_caching do
     subject { environment.last_deployment }
 
     before do
-      allow_any_instance_of(Deployment).to receive(:create_ref)
+      allow_next_instance_of(Deployment) do |instance|
+        allow(instance).to receive(:create_ref)
+      end
     end
 
     context 'when there is an old deployment record' do
@@ -499,6 +512,14 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
       context 'when there is a deployment record with running status' do
         let!(:deployment) { create(:deployment, :running, environment: environment) }
+
+        it 'returns the previous deployment' do
+          is_expected.to eq(previous_deployment)
+        end
+      end
+
+      context 'when there is a deployment record with failed status' do
+        let!(:deployment) { create(:deployment, :failed, environment: environment) }
 
         it 'returns the previous deployment' do
           is_expected.to eq(previous_deployment)
@@ -553,6 +574,89 @@ describe Environment, :use_clean_rails_memory_store_caching do
         let!(:deployment) { create(:deployment, :canceled, environment: environment) }
 
         it { is_expected.to eq(deployment) }
+      end
+    end
+  end
+
+  describe '#last_visible_pipeline' do
+    let(:user) { create(:user) }
+    let_it_be(:project) { create(:project, :repository) }
+    let(:environment) { create(:environment, project: project) }
+    let(:commit) { project.commit }
+
+    let(:success_pipeline) do
+      create(:ci_pipeline, :success, project: project, user: user, sha: commit.sha)
+    end
+
+    let(:failed_pipeline) do
+      create(:ci_pipeline, :failed, project: project, user: user, sha: commit.sha)
+    end
+
+    it 'uses the last deployment even if it failed' do
+      pipeline = create(:ci_pipeline, project: project, user: user, sha: commit.sha)
+      ci_build = create(:ci_build, project: project, pipeline: pipeline)
+      create(:deployment, :failed, project: project, environment: environment, deployable: ci_build, sha: commit.sha)
+
+      last_pipeline = environment.last_visible_pipeline
+
+      expect(last_pipeline).to eq(pipeline)
+    end
+
+    it 'returns nil if there is no deployment' do
+      create(:ci_build, project: project, pipeline: success_pipeline)
+
+      expect(environment.last_visible_pipeline).to be_nil
+    end
+
+    it 'does not return an invisible pipeline' do
+      failed_pipeline = create(:ci_pipeline, project: project, user: user, sha: commit.sha)
+      ci_build_a = create(:ci_build, project: project, pipeline: failed_pipeline)
+      create(:deployment, :failed, project: project, environment: environment, deployable: ci_build_a, sha: commit.sha)
+      pipeline = create(:ci_pipeline, project: project, user: user, sha: commit.sha)
+      ci_build_b = create(:ci_build, project: project, pipeline: pipeline)
+      create(:deployment, :created, project: project, environment: environment, deployable: ci_build_b, sha: commit.sha)
+
+      last_pipeline = environment.last_visible_pipeline
+
+      expect(last_pipeline).to eq(failed_pipeline)
+    end
+
+    context 'for the environment' do
+      it 'returns the last pipeline' do
+        pipeline = create(:ci_pipeline, project: project, user: user, sha: commit.sha)
+        ci_build = create(:ci_build, project: project, pipeline: pipeline)
+        create(:deployment, :success, project: project, environment: environment, deployable: ci_build, sha: commit.sha)
+
+        last_pipeline = environment.last_visible_pipeline
+
+        expect(last_pipeline).to eq(pipeline)
+      end
+
+      context 'with multiple deployments' do
+        it 'returns the last pipeline' do
+          pipeline_a = create(:ci_pipeline, project: project, user: user)
+          pipeline_b = create(:ci_pipeline, project: project, user: user)
+          ci_build_a = create(:ci_build, project: project, pipeline: pipeline_a)
+          ci_build_b = create(:ci_build, project: project, pipeline: pipeline_b)
+          create(:deployment, :success, project: project, environment: environment, deployable: ci_build_a)
+          create(:deployment, :success, project: project, environment: environment, deployable: ci_build_b)
+
+          last_pipeline = environment.last_visible_pipeline
+
+          expect(last_pipeline).to eq(pipeline_b)
+        end
+      end
+
+      context 'with multiple pipelines' do
+        it 'returns the last pipeline' do
+          create(:ci_build, project: project, pipeline: success_pipeline)
+          ci_build_b = create(:ci_build, project: project, pipeline: failed_pipeline)
+          create(:deployment, :failed, project: project, environment: environment, deployable: ci_build_b, sha: commit.sha)
+
+          last_pipeline = environment.last_visible_pipeline
+
+          expect(last_pipeline).to eq(failed_pipeline)
+        end
       end
     end
   end
@@ -652,6 +756,12 @@ describe Environment, :use_clean_rails_memory_store_caching do
       allow(environment).to receive(:deployment_platform).and_return(double)
     end
 
+    context 'reactive cache configuration' do
+      it 'does not continue to spawn jobs' do
+        expect(described_class.reactive_cache_lifetime).to be < described_class.reactive_cache_refresh_interval
+      end
+    end
+
     context 'reactive cache is empty' do
       before do
         stub_reactive_cache(environment, nil)
@@ -724,6 +834,14 @@ describe Environment, :use_clean_rails_memory_store_caching do
         context 'and no deployments' do
           it { is_expected.to be_truthy }
         end
+
+        context 'and the prometheus adapter is not configured' do
+          before do
+            allow(environment.prometheus_adapter).to receive(:configured?).and_return(false)
+          end
+
+          it { is_expected.to be_falsy }
+        end
       end
 
       context 'without a monitoring service' do
@@ -757,6 +875,14 @@ describe Environment, :use_clean_rails_memory_store_caching do
           .and_return(:fake_metrics)
 
         is_expected.to eq(:fake_metrics)
+      end
+
+      context 'and the prometheus client is not present' do
+        before do
+          allow(environment.prometheus_adapter).to receive(:promethus_client).and_return(nil)
+        end
+
+        it { is_expected.to be_nil }
       end
     end
 
@@ -933,7 +1059,9 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
   describe '#prometheus_adapter' do
     it 'calls prometheus adapter service' do
-      expect_any_instance_of(Prometheus::AdapterService).to receive(:prometheus_adapter)
+      expect_next_instance_of(Prometheus::AdapterService) do |instance|
+        expect(instance).to receive(:prometheus_adapter)
+      end
 
       subject.prometheus_adapter
     end
@@ -965,6 +1093,52 @@ describe Environment, :use_clean_rails_memory_store_caching do
             .with(cluster, environment).and_return(:finder)
 
           is_expected.to eq :finder
+        end
+      end
+    end
+  end
+
+  describe '#auto_stop_in' do
+    subject { environment.auto_stop_in }
+
+    context 'when environment will be expired' do
+      let(:environment) { build(:environment, :will_auto_stop) }
+
+      it 'returns when it will expire' do
+        Timecop.freeze { is_expected.to eq(1.day.to_i) }
+      end
+    end
+
+    context 'when environment is not expired' do
+      let(:environment) { build(:environment) }
+
+      it { is_expected.to be_nil }
+    end
+  end
+
+  describe '#auto_stop_in=' do
+    subject { environment.auto_stop_in = value }
+
+    let(:environment) { build(:environment) }
+
+    where(:value, :expected_result) do
+      '2 days'   | 2.days.to_i
+      '1 week'   | 1.week.to_i
+      '2h20min'  | 2.hours.to_i + 20.minutes.to_i
+      'abcdef'   | ChronicDuration::DurationParseError
+      ''         | nil
+      nil        | nil
+    end
+    with_them do
+      it 'sets correct auto_stop_in' do
+        Timecop.freeze do
+          if expected_result.is_a?(Integer) || expected_result.nil?
+            subject
+
+            expect(environment.auto_stop_in).to eq(expected_result)
+          else
+            expect { subject }.to raise_error(expected_result)
+          end
         end
       end
     end

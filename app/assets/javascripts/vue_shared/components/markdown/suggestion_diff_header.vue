@@ -1,6 +1,6 @@
 <script>
-import Icon from '~/vue_shared/components/icon.vue';
 import { GlButton, GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: { Icon, GlButton, GlLoadingIcon },
@@ -55,7 +55,7 @@ export default {
     <gl-button
       v-else-if="canApply"
       v-gl-tooltip.viewport="__('This also resolves the discussion')"
-      class="btn-inverted qa-apply-btn js-apply-btn"
+      class="btn-inverted js-apply-btn"
       :disabled="isApplying"
       variant="success"
       @click="applySuggestion"

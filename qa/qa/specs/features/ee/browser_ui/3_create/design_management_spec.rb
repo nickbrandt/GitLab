@@ -9,8 +9,7 @@ module QA
       let(:annotation) { "This design is great!" }
 
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
       end
 
       it 'user adds a design and annotation' do

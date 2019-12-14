@@ -2,11 +2,11 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 
 import RelatedItemsTreeHeader from 'ee/related_items_tree/components/related_items_tree_header.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { issuableTypesMap } from 'ee/related_issues/constants';
 import EpicActionsSplitButton from 'ee/related_items_tree/components/epic_actions_split_button.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
 import {
   mockParentItem,
@@ -28,8 +28,11 @@ const createComponent = ({ slots } = {}) => {
     isSubItem: false,
     children,
   });
+  store.dispatch('setChildrenCount', mockParentItem.descendantCounts);
 
   return shallowMount(RelatedItemsTreeHeader, {
+    attachToDocument: true,
+    sync: false,
     localVue,
     store,
     slots,
@@ -121,18 +124,25 @@ describe('RelatedItemsTree', () => {
 
       describe('click event', () => {
         let toggleAddItemForm;
+        let setItemInputValue;
 
         beforeEach(() => {
+          setItemInputValue = jasmine.createSpy();
           toggleAddItemForm = jasmine.createSpy();
           wrapper.vm.$store.hotUpdate({
             actions: {
+              setItemInputValue,
               toggleAddItemForm,
             },
           });
         });
 
-        it('dispatches toggleAddItemForm action', () => {
+        it('dispatches setItemInputValue and toggleAddItemForm action', () => {
           findAddIssuesButton().vm.$emit('click');
+
+          expect(setItemInputValue).toHaveBeenCalled();
+
+          expect(setItemInputValue.calls.mostRecent().args[1]).toEqual('');
 
           expect(toggleAddItemForm).toHaveBeenCalled();
 

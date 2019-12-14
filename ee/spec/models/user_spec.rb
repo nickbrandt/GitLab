@@ -24,6 +24,8 @@ describe User do
     it { is_expected.to have_many(:reviews) }
     it { is_expected.to have_many(:vulnerability_feedback) }
     it { is_expected.to have_many(:path_locks).dependent(:destroy) }
+    it { is_expected.to have_many(:users_security_dashboard_projects) }
+    it { is_expected.to have_many(:security_dashboard_projects) }
   end
 
   describe 'nested attributes' do
@@ -79,6 +81,19 @@ describe User do
 
         expect(described_class.humans).to match_array([human])
         expect(described_class.bots).to match_array([bot])
+      end
+    end
+
+    describe 'with_invalid_expires_at_tokens' do
+      it 'only includes users with invalid tokens' do
+        valid_pat = create(:personal_access_token, expires_at: 7.days.from_now)
+        invalid_pat1 = create(:personal_access_token, expires_at: nil)
+        invalid_pat2 = create(:personal_access_token, expires_at: 20.days.from_now)
+
+        users_with_invalid_tokens = described_class.with_invalid_expires_at_tokens(15.days.from_now)
+
+        expect(users_with_invalid_tokens).to contain_exactly(invalid_pat1.user, invalid_pat2.user)
+        expect(users_with_invalid_tokens).not_to include valid_pat.user
       end
     end
   end

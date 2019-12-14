@@ -3,6 +3,7 @@
 module QA
   # Quarantined because relative URL isn't supported
   # See https://gitlab.com/gitlab-org/gitlab/issues/13833
+  # BUG_IN_CODE
   context 'Create', :quarantine do
     describe 'Web IDE web terminal', :docker do
       before do
@@ -42,8 +43,7 @@ module QA
           END
         end
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         project.visit!
       end

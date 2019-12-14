@@ -21,6 +21,8 @@ module EE
 
         after_save :stick_build_if_status_changed
         delegate :service_specification, to: :runner_session, allow_nil: true
+
+        scope :license_scan, -> { joins(:job_artifacts).merge(::Ci::JobArtifact.license_management) }
       end
 
       def shared_runners_minutes_limit_enabled?
@@ -70,7 +72,7 @@ module EE
       end
 
       def collect_dependency_list_reports!(dependency_list_report)
-        if project.feature_available?(:dependency_list)
+        if project.feature_available?(:dependency_scanning)
           dependency_list = ::Gitlab::Ci::Parsers::Security::DependencyList.new(project, sha)
 
           each_report(::Ci::JobArtifact::DEPENDENCY_LIST_REPORT_FILE_TYPES) do |file_type, blob|
@@ -82,7 +84,7 @@ module EE
       end
 
       def collect_licenses_for_dependency_list!(dependency_list_report)
-        if project.feature_available?(:dependency_list)
+        if project.feature_available?(:dependency_scanning)
           dependency_list = ::Gitlab::Ci::Parsers::Security::DependencyList.new(project, sha)
 
           each_report(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES) do |file_type, blob|

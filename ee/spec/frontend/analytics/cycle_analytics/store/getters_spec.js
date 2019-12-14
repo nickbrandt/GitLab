@@ -1,78 +1,15 @@
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
-import { allowedStages as stages } from '../mock_data';
+import {
+  startDate,
+  endDate,
+  transformedDurationData,
+  durationChartPlottableData,
+} from '../mock_data';
 
 let state = null;
+const selectedProjectIds = [5, 8, 11];
 
 describe('Cycle analytics getters', () => {
-  describe('with default state', () => {
-    beforeEach(() => {
-      state = {
-        stages: [],
-        selectedStageName: null,
-      };
-    });
-
-    afterEach(() => {
-      state = null;
-    });
-
-    describe('currentStage', () => {
-      it('will return null', () => {
-        expect(getters.currentStage(state)).toEqual(null);
-      });
-    });
-
-    describe('defaultStage', () => {
-      it('will return null', () => {
-        expect(getters.defaultStage(state)).toEqual(null);
-      });
-    });
-  });
-
-  describe('with a set of stages', () => {
-    beforeEach(() => {
-      state = {
-        stages,
-        selectedStageName: null,
-      };
-    });
-
-    afterEach(() => {
-      state = null;
-    });
-
-    describe('currentStage', () => {
-      it('will return null', () => {
-        expect(getters.currentStage(state)).toEqual(null);
-      });
-    });
-
-    describe('defaultStage', () => {
-      it('will return the first stage', () => {
-        expect(getters.defaultStage(state)).toEqual(stages[0]);
-      });
-    });
-  });
-
-  describe('with a set of stages and a stage selected', () => {
-    beforeEach(() => {
-      state = {
-        stages,
-        selectedStageName: stages[2].name,
-      };
-    });
-
-    afterEach(() => {
-      state = null;
-    });
-
-    describe('currentStage', () => {
-      it('will return null', () => {
-        expect(getters.currentStage(state)).toEqual(stages[2]);
-      });
-    });
-  });
-
   describe('hasNoAccessError', () => {
     beforeEach(() => {
       state = {
@@ -109,6 +46,53 @@ describe('Cycle analytics getters', () => {
         state = { selectedGroup: value };
         expect(getters.currentGroupPath(state)).toEqual(null);
       });
+    });
+  });
+
+  describe('cycleAnalyticsRequestParams', () => {
+    beforeEach(() => {
+      const fullPath = 'cool-beans';
+      state = {
+        selectedGroup: {
+          fullPath,
+        },
+        startDate,
+        endDate,
+        selectedProjectIds,
+      };
+    });
+
+    it.each`
+      param               | value
+      ${'created_after'}  | ${'2018-12-15'}
+      ${'created_before'} | ${'2019-01-14'}
+      ${'project_ids'}    | ${[5, 8, 11]}
+    `('should return the $param with value $value', ({ param, value }) => {
+      expect(getters.cycleAnalyticsRequestParams(state)).toMatchObject({ [param]: value });
+    });
+  });
+
+  describe('durationChartPlottableData', () => {
+    it('returns plottable data for selected stages', () => {
+      const stateWithDurationData = {
+        startDate,
+        endDate,
+        durationData: transformedDurationData,
+      };
+
+      expect(getters.durationChartPlottableData(stateWithDurationData)).toEqual(
+        durationChartPlottableData,
+      );
+    });
+
+    it('returns null if there is no plottable data for the selected stages', () => {
+      const stateWithDurationData = {
+        startDate,
+        endDate,
+        durationData: [],
+      };
+
+      expect(getters.durationChartPlottableData(stateWithDurationData)).toBeNull();
     });
   });
 });

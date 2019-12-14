@@ -3,7 +3,8 @@
 require 'spec_helper'
 
 describe Epic do
-  set(:group) { create(:group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
   let(:project) { create(:project, group: group) }
 
   describe 'associations' do
@@ -15,6 +16,7 @@ describe Epic do
     it { is_expected.to belong_to(:parent) }
     it { is_expected.to have_many(:epic_issues) }
     it { is_expected.to have_many(:children) }
+    it { is_expected.to have_many(:user_mentions).class_name("EpicUserMention") }
   end
 
   describe 'validations' do
@@ -352,7 +354,6 @@ describe Epic do
   end
 
   describe '#issues_readable_by' do
-    let(:user) { create(:user) }
     let(:group) { create(:group, :private) }
     let(:project) { create(:project, group: group) }
     let(:project2) { create(:project, group: group) }
@@ -400,7 +401,6 @@ describe Epic do
   end
 
   describe '#reopen' do
-    let(:user) { create(:user) }
     subject(:epic) { create(:epic, state: 'closed', closed_at: Time.now, closed_by: user) }
 
     it 'sets closed_at to nil when an epic is reopend' do
@@ -538,6 +538,22 @@ describe Epic do
     it_behaves_like "a class that supports relative positioning" do
       let(:factory) { :epic }
       let(:default_params) { {} }
+    end
+  end
+
+  describe '.related_issues' do
+    it 'returns epic issues ordered by relative position' do
+      epic1 = create(:epic, group: group)
+      epic2 = create(:epic, group: group)
+      issue1 = create(:issue, project: project)
+      issue2 = create(:issue, project: project)
+      create(:issue, project: project)
+      create(:epic_issue, epic: epic1, issue: issue1, relative_position: 5)
+      create(:epic_issue, epic: epic2, issue: issue2, relative_position: 2)
+
+      result = described_class.related_issues(ids: [epic1.id, epic2.id])
+
+      expect(result.pluck(:id)).to eq [issue2.id, issue1.id]
     end
   end
 

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
 import geoNodeHealthStatusComponent from 'ee/geo_nodes/components/geo_node_health_status.vue';
+import { HEALTH_STATUS_ICON, HEALTH_STATUS_CLASS } from 'ee/geo_nodes/constants';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockNodeDetails } from '../mock_data';
 
@@ -16,38 +17,38 @@ describe('GeoNodeHealthStatusComponent', () => {
   describe('computed', () => {
     describe('healthCssClass', () => {
       it('returns CSS class representing `status` prop value', () => {
-        const vm = createComponent('Healthy');
+        const vm = createComponent('healthy');
 
-        expect(vm.healthCssClass).toBe('geo-node-healthy');
+        expect(vm.healthCssClass).toBe(HEALTH_STATUS_CLASS.healthy);
         vm.$destroy();
       });
     });
 
     describe('statusIconName', () => {
       it('returns icon name representing `status` prop value', () => {
-        let vm = createComponent('Healthy');
+        let vm = createComponent('healthy');
 
-        expect(vm.statusIconName).toBe('status_success');
+        expect(vm.statusIconName).toBe(HEALTH_STATUS_ICON.healthy);
         vm.$destroy();
 
-        vm = createComponent('Unhealthy');
+        vm = createComponent('unhealthy');
 
-        expect(vm.statusIconName).toBe('status_failed');
+        expect(vm.statusIconName).toBe(HEALTH_STATUS_ICON.unhealthy);
         vm.$destroy();
 
-        vm = createComponent('Disabled');
+        vm = createComponent('disabled');
 
-        expect(vm.statusIconName).toBe('status_canceled');
+        expect(vm.statusIconName).toBe(HEALTH_STATUS_ICON.disabled);
         vm.$destroy();
 
-        vm = createComponent('Unknown');
+        vm = createComponent('unknown');
 
-        expect(vm.statusIconName).toBe('status_warning');
+        expect(vm.statusIconName).toBe(HEALTH_STATUS_ICON.unknown);
         vm.$destroy();
 
-        vm = createComponent('Offline');
+        vm = createComponent('offline');
 
-        expect(vm.statusIconName).toBe('status_canceled');
+        expect(vm.statusIconName).toBe(HEALTH_STATUS_ICON.offline);
         vm.$destroy();
       });
     });
@@ -60,7 +61,7 @@ describe('GeoNodeHealthStatusComponent', () => {
       expect(vm.$el.classList.contains('detail-section-item')).toBe(true);
       expect(vm.$el.querySelector('.node-detail-title').innerText.trim()).toBe('Health status');
 
-      const iconContainerEl = vm.$el.querySelector('.node-detail-value.node-health-status');
+      const iconContainerEl = vm.$el.querySelector('.node-health-status');
 
       expect(iconContainerEl).not.toBeNull();
       expect(iconContainerEl.querySelector('svg use').getAttribute('xlink:href')).toContain(

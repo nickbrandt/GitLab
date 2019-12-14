@@ -101,8 +101,7 @@ describe Elastic::IndexRecordService, :elastic do
         'issue',
         'merge_request',
         'milestone',
-        'note',
-        'snippet'
+        'note'
       )
     end
 
@@ -278,7 +277,7 @@ describe Elastic::IndexRecordService, :elastic do
     note = nil
 
     Sidekiq::Testing.inline! do
-      project = create :project, :repository
+      project = create :project, :repository, :public
       note = create :note, project: project, note: 'note_1'
       Gitlab::Elastic::Helper.refresh_index
     end
@@ -324,16 +323,17 @@ describe Elastic::IndexRecordService, :elastic do
   context 'when updating an Issue' do
     context 'when changing the confidential value' do
       it 'updates issue notes excluding system notes' do
+        project = create(:project, :public)
         issue = nil
         Sidekiq::Testing.disable! do
-          issue = create(:issue, confidential: false)
-          subject.execute(issue.project, true)
+          issue = create(:issue, project: project, confidential: false)
+          subject.execute(project, true)
           subject.execute(issue, false)
-          create(:note, note: 'the_normal_note', noteable: issue, project: issue.project)
-          create(:note, note: 'the_system_note', system: true, noteable: issue, project: issue.project)
+          create(:note, note: 'the_normal_note', noteable: issue, project: project)
+          create(:note, note: 'the_system_note', system: true, noteable: issue, project: project)
         end
 
-        options = { project_ids: [issue.project.id] }
+        options = { project_ids: [project.id] }
 
         Sidekiq::Testing.inline! do
           expect(subject.execute(issue, false, 'changed_fields' => ['confidential'])).to eq(true)

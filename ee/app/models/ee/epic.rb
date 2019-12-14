@@ -51,6 +51,7 @@ module EE
 
       has_many :epic_issues
       has_many :issues, through: :epic_issues
+      has_many :user_mentions, class_name: "EpicUserMention"
 
       validates :group, presence: true
       validate :validate_parent, on: :create
@@ -61,12 +62,13 @@ module EE
       scope :for_ids, -> (ids) { where(id: ids) }
       scope :in_parents, -> (parent_ids) { where(parent_id: parent_ids) }
       scope :inc_group, -> { includes(:group) }
+      scope :in_selected_groups, -> (groups) { where(group_id: groups) }
       scope :in_milestone, -> (milestone_id) { joins(:issues).where(issues: { milestone_id: milestone_id }) }
       scope :in_issues, -> (issues) { joins(:epic_issues).where(epic_issues: { issue_id: issues }).distinct }
       scope :has_parent, -> { where.not(parent_id: nil) }
 
       scope :order_start_or_end_date_asc, -> do
-        reorder("COALESCE(start_date, end_date) ASC NULLS FIRST")
+        reorder(Arel.sql("COALESCE(start_date, end_date) ASC NULLS FIRST"))
       end
 
       scope :order_start_date_asc, -> do
@@ -92,6 +94,8 @@ module EE
       scope :with_api_entity_associations, -> { preload(:author, :labels, group: :route) }
       scope :start_date_inherited, -> { where(start_date_is_fixed: [nil, false]) }
       scope :due_date_inherited, -> { where(due_date_is_fixed: [nil, false]) }
+
+      scope :counts_by_state, -> { group(:state_id).count }
 
       MAX_HIERARCHY_DEPTH = 5
 
@@ -191,6 +195,14 @@ module EE
       def deepest_relationship_level
         ::Gitlab::ObjectHierarchy.new(self.where(parent_id: nil)).max_descendants_depth
       end
+
+      def related_issues(ids:, preload: nil)
+        ::Issue.select('issues.*, epic_issues.id as epic_issue_id, epic_issues.relative_position, epic_issues.epic_id as epic_id')
+          .joins(:epic_issue)
+          .preload(preload)
+          .where("epic_issues.epic_id": ids)
+          .order('epic_issues.relative_position, epic_issues.id')
+      end
     end
 
     def resource_parent
@@ -276,6 +288,10 @@ module EE
       hierarchy.descendants
     end
 
+    def base_and_descendants
+      hierarchy.base_and_descendants
+    end
+
     def has_ancestor?(epic)
       ancestors.exists?(epic.id)
     end
@@ -321,11 +337,7 @@ module EE
     end
 
     def issues_readable_by(current_user, preload: nil)
-      related_issues = ::Issue.select('issues.*, epic_issues.id as epic_issue_id, epic_issues.relative_position')
-        .joins(:epic_issue)
-        .preload(preload)
-        .where("epic_issues.epic_id = #{id}")
-        .order('epic_issues.relative_position, epic_issues.id')
+      related_issues = self.class.related_issues(ids: id, preload: preload)
 
       Ability.issues_readable_by_user(related_issues, current_user)
     end

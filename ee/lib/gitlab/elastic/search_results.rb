@@ -167,26 +167,9 @@ module Gitlab
       def eager_load(es_result, page, eager:)
         paginated_base = es_result.page(page).per(per_page)
         relation = paginated_base.records.includes(eager) # rubocop:disable CodeReuse/ActiveRecord
-        filtered_results = []
-        permitted_results = relation.select do |o|
-          ability = :"read_#{o.to_ability_name}"
-          if Ability.allowed?(current_user, ability, o)
-            true
-          else
-            # Redact any search result the user may not have access to. This
-            # could be due to incorrect data in the index or a bug in our query
-            # so we log this as an error.
-            filtered_results << { ability: ability, id: o.id, class_name: o.class.name }
-            false
-          end
-        end
-
-        if filtered_results.any?
-          logger.error(message: "redacted_search_results", filtered: filtered_results, current_user_id: current_user&.id, query: query)
-        end
 
         Kaminari.paginate_array(
-          permitted_results,
+          relation,
           total_count: paginated_base.total_count,
           limit: per_page,
           offset: per_page * (page - 1)
@@ -247,7 +230,7 @@ module Gitlab
             additional_filter: repository_filter
           }
 
-          Repository.search(
+          Repository.elastic_search(
             query,
             type: :blob,
             options: opt.merge({ highlight: true })
@@ -263,7 +246,7 @@ module Gitlab
             additional_filter: wiki_filter
           }
 
-          ProjectWiki.search(
+          ProjectWiki.elastic_search(
             query,
             type: :wiki_blob,
             options: opt.merge({ highlight: true })
@@ -379,10 +362,6 @@ module Gitlab
 
       def per_page
         20
-      end
-
-      def logger
-        @logger ||= Gitlab::ProjectServiceLogger.build
       end
     end
   end

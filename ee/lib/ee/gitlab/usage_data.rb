@@ -137,7 +137,9 @@ module EE
                                          projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
                                          projects_with_packages: count(::Packages::Package.select('distinct project_id')),
                                          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
-                                         projects_with_tracing_enabled: count(ProjectTracingSetting)
+                                         projects_with_tracing_enabled: count(ProjectTracingSetting),
+                                         projects_with_alerts_service_enabled: count(AlertsService.active),
+                                         template_repositories:  count(::Project.with_repos_templates) + count(::Project.with_groups_level_repos_templates)
                                        },
                                        service_desk_counts,
                                        security_products_usage,
@@ -192,6 +194,7 @@ module EE
             clusters_disabled: ::Clusters::Cluster.disabled.distinct_count_by(:user_id),
             clusters_enabled: ::Clusters::Cluster.enabled.distinct_count_by(:user_id),
             clusters_platforms_gke: ::Clusters::Cluster.gcp_installed.enabled.distinct_count_by(:user_id),
+            clusters_platforms_eks: ::Clusters::Cluster.aws_installed.enabled.distinct_count_by(:user_id),
             clusters_platforms_user: ::Clusters::Cluster.user_provided.enabled.distinct_count_by(:user_id),
             group_clusters_disabled: ::Clusters::Cluster.disabled.group_type.distinct_count_by(:user_id),
             group_clusters_enabled: ::Clusters::Cluster.enabled.group_type.distinct_count_by(:user_id),

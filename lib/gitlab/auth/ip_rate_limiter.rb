@@ -9,38 +9,42 @@ module Gitlab
 
       def initialize(ip)
         @ip = ip
-        @banned = false
+      end
+
+      def reset!
+        return if skip_rate_limit?
+
+        Rack::Attack::Allow2Ban.reset(ip, config)
+      end
+
+      def register_fail!
+        return false if skip_rate_limit?
+
+        # Allow2Ban.filter will return false if this IP has not failed too often yet
+        Rack::Attack::Allow2Ban.filter(ip, config) do
+          # We return true to increment the count for this IP
+          true
+        end
+      end
+
+      def banned?
+        return false if skip_rate_limit?
+
+        Rack::Attack::Allow2Ban.banned?(ip)
+      end
+
+      private
+
+      def skip_rate_limit?
+        !enabled? || trusted_ip?
       end
 
       def enabled?
         config.enabled
       end
 
-      def reset!
-        Rack::Attack::Allow2Ban.reset(ip, config)
-      end
-
-      def register_fail!
-        # Allow2Ban.filter will return false if this IP has not failed too often yet
-        @banned = Rack::Attack::Allow2Ban.filter(ip, config) do
-          # If we return false here, the failure for this IP is ignored by Allow2Ban
-          # If we return true here, the count for the IP is incremented.
-          ip_can_be_banned?
-        end
-      end
-
-      def banned?
-        @banned
-      end
-
-      private
-
       def config
         Gitlab.config.rack_attack.git_basic_auth
-      end
-
-      def ip_can_be_banned?
-        !trusted_ip?
       end
 
       def trusted_ip?

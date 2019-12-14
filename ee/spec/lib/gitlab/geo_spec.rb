@@ -80,6 +80,30 @@ describe Gitlab::Geo, :geo, :request_store do
     end
   end
 
+  describe '.current_node_misconfigured?' do
+    it 'returns true when current node is not set' do
+      expect(described_class.current_node_misconfigured?).to be_truthy
+    end
+
+    it 'returns false when primary' do
+      stub_current_geo_node(primary_node)
+
+      expect(described_class.current_node_misconfigured?).to be_falsey
+    end
+
+    it 'returns false when secondary' do
+      stub_current_geo_node(secondary_node)
+
+      expect(described_class.current_node_misconfigured?).to be_falsey
+    end
+
+    it 'returns false when Geo is disabled' do
+      GeoNode.delete_all
+
+      expect(described_class.current_node_misconfigured?).to be_falsey
+    end
+  end
+
   describe '.secondary?' do
     context 'when current node is a secondary node' do
       before do

@@ -87,9 +87,7 @@ describe('GeoNodeDetailsComponent', () => {
       vm.errorMessage = 'Foobar';
 
       vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.node-health-message-container a').getAttribute('href')).toBe(
-          '/foo/bar',
-        );
+        expect(vm.$el.querySelector('.bg-danger-100 a').getAttribute('href')).toBe('/foo/bar');
         done();
       });
     });

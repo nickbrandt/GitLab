@@ -1,12 +1,13 @@
 <script>
-import { __, s__ } from '~/locale';
 import { GlTooltipDirective, GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
+import { __, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import StageNavItem from './stage_nav_item.vue';
 import StageEventList from './stage_event_list.vue';
 import StageTableHeader from './stage_table_header.vue';
 import AddStageButton from './add_stage_button.vue';
 import CustomStageForm from './custom_stage_form.vue';
+import { STAGE_ACTIONS } from '../constants';
 
 export default {
   name: 'StageTable',
@@ -40,7 +41,15 @@ export default {
       type: Boolean,
       required: true,
     },
-    isAddingCustomStage: {
+    isCreatingCustomStage: {
+      type: Boolean,
+      required: true,
+    },
+    isEditingCustomStage: {
+      type: Boolean,
+      required: true,
+    },
+    isSavingCustomStage: {
       type: Boolean,
       required: true,
     },
@@ -71,11 +80,14 @@ export default {
   },
   computed: {
     stageName() {
-      return this.currentStage ? this.currentStage.legend : __('Related Issues');
+      return this.currentStage ? this.currentStage.title : __('Related Issues');
     },
     shouldDisplayStage() {
       const { currentStageEvents = [], isLoading, isEmptyStage } = this;
       return currentStageEvents.length && !isLoading && !isEmptyStage;
+    },
+    customStageFormActive() {
+      return this.isCreatingCustomStage;
     },
     stageHeaders() {
       return [
@@ -95,23 +107,21 @@ export default {
           title: this.stageName,
           description: __('The collection of events added to the data gathered for that stage.'),
           classes: 'event-header pl-3',
+          displayHeader: !this.customStageFormActive,
         },
         {
           title: __('Total Time'),
           description: __('The time taken by each data entry gathered by that stage.'),
           classes: 'total-time-header pr-5 text-right',
+          displayHeader: !this.customStageFormActive,
         },
       ];
     },
-  },
-  methods: {
-    selectStage(stage) {
-      this.$emit('selectStage', stage);
-    },
-    showAddStageForm() {
-      this.$emit('showAddStageForm');
+    customStageInitialData() {
+      return this.isEditingCustomStage ? this.currentStage : {};
     },
   },
+  STAGE_ACTIONS,
 };
 </script>
 <template>
@@ -121,7 +131,8 @@ export default {
         <nav class="col-headers">
           <ul>
             <stage-table-header
-              v-for="({ title, description, classes }, i) in stageHeaders"
+              v-for="({ title, description, classes, displayHeader = true }, i) in stageHeaders"
+              v-show="displayHeader"
               :key="`stage-header-${i}`"
               :header-classes="classes"
               :title="title"
@@ -138,29 +149,33 @@ export default {
               :key="`ca-stage-title-${stage.title}`"
               :title="stage.title"
               :value="stage.value"
-              :is-active="!isAddingCustomStage && stage.name === currentStage.name"
-              :is-user-allowed="stage.isUserAllowed"
-              @select="selectStage(stage)"
+              :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
+              :can-edit="canEditStages"
+              :is-default-stage="!stage.custom"
+              @remove="$emit($options.STAGE_ACTIONS.REMOVE, stage.id)"
+              @hide="$emit($options.STAGE_ACTIONS.HIDE, { id: stage.id, hidden: true })"
+              @select="$emit($options.STAGE_ACTIONS.SELECT, stage)"
+              @edit="$emit($options.STAGE_ACTIONS.EDIT, stage)"
             />
             <add-stage-button
               v-if="canEditStages"
-              :active="isAddingCustomStage"
-              @showform="showAddStageForm"
+              :active="customStageFormActive"
+              @showform="$emit('showAddStageForm')"
             />
           </ul>
         </nav>
         <div class="section stage-events">
           <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
-          <gl-empty-state
-            v-else-if="currentStage && !currentStage.isUserAllowed"
-            :title="__('You need permission.')"
-            :description="__('Want to see the data? Please ask an administrator for access.')"
-            :svg-path="noAccessSvgPath"
-          />
           <custom-stage-form
-            v-else-if="isAddingCustomStage"
+            v-else-if="isCreatingCustomStage || isEditingCustomStage"
             :events="customStageFormEvents"
             :labels="labels"
+            :is-saving-custom-stage="isSavingCustomStage"
+            :initial-fields="customStageInitialData"
+            :is-editing-custom-stage="isEditingCustomStage"
+            @submit="$emit('submit', $event)"
+            @createStage="$emit($options.STAGE_ACTIONS.CREATE, $event)"
+            @updateStage="$emit($options.STAGE_ACTIONS.UPDATE, $event)"
           />
           <template v-else>
             <stage-event-list

@@ -541,7 +541,7 @@ args: {
 }
 ```
 
-GitLab will sign the request with the provided private key. GitLab will include the configured public x500 certificate in the metadata for your Identity Provider to validate the signature of the received request with. For more information on this option, see the [ruby-saml gem documentation](https://github.com/onelogin/ruby-saml/tree/v1.7.0). The `ruby-saml` gem is used by the [omniauth-saml gem](https://github.com/omniauth/omniauth-saml) to implement the client side of the SAML authentication.
+GitLab will sign the request with the provided private key. GitLab will include the configured public x500 certificate in the metadata for your Identity Provider to validate the signature of the received request with. For more information on this option, see the [Ruby SAML gem documentation](https://github.com/onelogin/ruby-saml/tree/v1.7.0). The Ruby SAML gem is used by the [OmniAuth SAML gem](https://github.com/omniauth/omniauth-saml) to implement the client side of the SAML authentication.
 
 ## Troubleshooting
 
@@ -572,7 +572,7 @@ installations from source. Restart Unicorn using the `sudo gitlab-ctl restart un
 command on Omnibus installations and `sudo service gitlab restart` on installations
 from source.
 
-You may also find the [SSO Tracer](https://addons.mozilla.org/en-US/firefox/addon/sso-tracer/)
+You may also find the [SAML Tracer](https://addons.mozilla.org/en-US/firefox/addon/saml-tracer/)
 (Firefox) and [SAML Chrome Panel](https://chrome.google.com/webstore/detail/saml-chrome-panel/paijfdbeoenhembfhkhllainmocckace)
 (Chrome) browser extensions useful in your debugging.
 

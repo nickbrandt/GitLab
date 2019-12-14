@@ -55,6 +55,17 @@ describe Milestone do
       end
     end
 
+    describe 'title' do
+      it { is_expected.to validate_presence_of(:title) }
+
+      it 'is invalid if title would be empty after sanitation' do
+        milestone = build(:milestone, project: project, title: '<img src=x onerror=prompt(1)>')
+
+        expect(milestone).not_to be_valid
+        expect(milestone.errors[:title]).to include("can't be blank")
+      end
+    end
+
     describe 'milestone_releases' do
       let(:milestone) { build(:milestone, project: project) }
 
@@ -92,6 +103,40 @@ describe Milestone do
 
     it "sanitizes title" do
       expect(milestone.title).to eq("foo & bar -> 2.2")
+    end
+  end
+
+  describe '#merge_requests_enabled?' do
+    context "per project" do
+      it "is true for projects with MRs enabled" do
+        project = create(:project, :merge_requests_enabled)
+        milestone = create(:milestone, project: project)
+
+        expect(milestone.merge_requests_enabled?).to be(true)
+      end
+
+      it "is false for projects with MRs disabled" do
+        project = create(:project, :repository_enabled, :merge_requests_disabled)
+        milestone = create(:milestone, project: project)
+
+        expect(milestone.merge_requests_enabled?).to be(false)
+      end
+
+      it "is false for projects with repository disabled" do
+        project = create(:project, :repository_disabled)
+        milestone = create(:milestone, project: project)
+
+        expect(milestone.merge_requests_enabled?).to be(false)
+      end
+    end
+
+    context "per group" do
+      let(:group) { create(:group) }
+      let(:milestone) { create(:milestone, group: group) }
+
+      it "is always true for groups, for performance reasons" do
+        expect(milestone.merge_requests_enabled?).to be(true)
+      end
     end
   end
 

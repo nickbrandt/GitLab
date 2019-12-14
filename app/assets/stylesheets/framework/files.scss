@@ -258,17 +258,6 @@
       }
     }
   }
-
-  .file-editor {
-    .ace_underline {
-      text-decoration: none;
-    }
-
-    .ace_line a {
-      pointer-events: auto;
-      color: inherit;
-    }
-  }
 }
 
 span.idiff {
@@ -345,10 +334,6 @@ span.idiff {
     padding: $gl-padding-8 $gl-padding;
     margin: 0;
     border-radius: $border-radius-default $border-radius-default 0 0;
-
-    &.is-stuck {
-      border-radius: 0;
-    }
   }
 
   .file-header-content {
@@ -385,6 +370,10 @@ span.idiff {
     line-height: 28px;
     display: inline-block;
     float: none;
+  }
+
+  .file-actions .ide-edit-button {
+    z-index: 2;
   }
 
   @include media-breakpoint-down(xs) {

@@ -69,7 +69,7 @@ exports[`Design management index page designs renders designs list and header wi
       <designversiondropdown-stub />
        
       <div
-        class="d-flex"
+        class="d-flex qa-selector-toolbar"
       >
         <glbutton-stub
           class="mr-2 js-select-all"
@@ -158,25 +158,6 @@ exports[`Design management index page designs renders designs list and header wi
 </div>
 `;
 
-exports[`Design management index page designs renders empty text 1`] = `
-<div>
-  <!---->
-   
-  <div
-    class="mt-4"
-  >
-    <glemptystate-stub
-      description="Upload and view the latest designs for this issue. Consistent and easy to find, so everyone is up to date."
-      title="The one place for your designs"
-    />
-  </div>
-   
-  <routerview-stub
-    name="default"
-  />
-</div>
-`;
-
 exports[`Design management index page designs renders error 1`] = `
 <div>
   <!---->
@@ -210,6 +191,25 @@ exports[`Design management index page designs renders loading icon 1`] = `
       color="orange"
       label="Loading"
       size="md"
+    />
+  </div>
+   
+  <routerview-stub
+    name="default"
+  />
+</div>
+`;
+
+exports[`Design management index page when has no designs renders empty text 1`] = `
+<div>
+  <!---->
+   
+  <div
+    class="mt-4"
+  >
+    <glemptystate-stub
+      description="Upload and view the latest designs for this issue. Consistent and easy to find, so everyone is up to date."
+      title="The one place for your designs"
     />
   </div>
    

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Gpg do
@@ -63,7 +65,7 @@ describe Gitlab::Gpg do
     it 'downcases the email' do
       public_key = double(:key)
       fingerprints = double(:fingerprints)
-      uid = double(:uid, name: 'Nannie Bernhard', email: 'NANNIE.BERNHARD@EXAMPLE.COM')
+      uid = double(:uid, name: +'Nannie Bernhard', email: +'NANNIE.BERNHARD@EXAMPLE.COM')
       raw_key = double(:raw_key, uids: [uid])
       allow(Gitlab::Gpg::CurrentKeyChain).to receive(:fingerprints_from_key).with(public_key).and_return(fingerprints)
       allow(GPGME::Key).to receive(:find).with(:public, anything).and_return([raw_key])
@@ -78,8 +80,8 @@ describe Gitlab::Gpg do
     it 'rejects non UTF-8 names and addresses' do
       public_key = double(:key)
       fingerprints = double(:fingerprints)
-      email = "\xEEch@test.com".force_encoding('ASCII-8BIT')
-      uid = double(:uid, name: 'Test User', email: email)
+      email = (+"\xEEch@test.com").force_encoding('ASCII-8BIT')
+      uid = double(:uid, name: +'Test User', email: email)
       raw_key = double(:raw_key, uids: [uid])
       allow(Gitlab::Gpg::CurrentKeyChain).to receive(:fingerprints_from_key).with(public_key).and_return(fingerprints)
       allow(GPGME::Key).to receive(:find).with(:public, anything).and_return([raw_key])
@@ -175,6 +177,25 @@ describe Gitlab::Gpg do
       end.not_to raise_error
     end
 
+    it 'tracks an exception when cleaning up the tmp dir fails' do
+      expected_exception = described_class::CleanupError.new('cleanup failed')
+      expected_tmp_dir = nil
+
+      expect(described_class).to receive(:cleanup_tmp_dir).and_raise(expected_exception)
+      allow(Gitlab::Sentry).to receive(:track_and_raise_for_dev_exception)
+
+      described_class.using_tmp_keychain do
+        expected_tmp_dir = described_class.current_home_dir
+        FileUtils.touch(File.join(expected_tmp_dir, 'dummy.file'))
+      end
+
+      expect(Gitlab::Sentry).to have_received(:track_and_raise_for_dev_exception).with(
+        expected_exception,
+        issue_url: 'https://gitlab.com/gitlab-org/gitlab/issues/20918',
+        tmp_dir: expected_tmp_dir, contents: ['dummy.file']
+      )
+    end
+
     shared_examples 'multiple deletion attempts of the tmp-dir' do |seconds|
       let(:tmp_dir) do
         tmp_dir = Dir.mktmpdir
@@ -209,22 +230,13 @@ describe Gitlab::Gpg do
 
         expect(File.exist?(tmp_dir)).to be false
       end
-
-      it 'does not retry when the feature flag is disabled' do
-        stub_feature_flags(gpg_cleanup_retries: false)
-
-        expect(FileUtils).to receive(:remove_entry).with(tmp_dir, true).and_call_original
-        expect(Retriable).not_to receive(:retriable)
-
-        described_class.using_tmp_keychain {}
-      end
     end
 
     it_behaves_like 'multiple deletion attempts of the tmp-dir', described_class::FG_CLEANUP_RUNTIME_S
 
     context 'when running in Sidekiq' do
       before do
-        allow(Sidekiq).to receive(:server?).and_return(true)
+        allow(Gitlab::Runtime).to receive(:sidekiq?).and_return(true)
       end
 
       it_behaves_like 'multiple deletion attempts of the tmp-dir', described_class::BG_CLEANUP_RUNTIME_S

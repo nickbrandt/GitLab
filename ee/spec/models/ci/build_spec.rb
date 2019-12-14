@@ -240,7 +240,7 @@ describe Ci::Build do
 
     context 'with available licensed feature' do
       before do
-        stub_licensed_features(dependency_list: true)
+        stub_licensed_features(dependency_scanning: true)
       end
 
       it 'parses blobs and add the results to the report' do
@@ -277,7 +277,7 @@ describe Ci::Build do
 
     context 'with available licensed feature' do
       before do
-        stub_licensed_features(dependency_list: true)
+        stub_licensed_features(dependency_scanning: true)
       end
 
       it 'parses blobs and add found license' do
@@ -348,6 +348,15 @@ describe Ci::Build do
       let(:merge_request) { create(:merge_request, :on_train, :with_merge_train_pipeline) }
 
       it { is_expected.to be false }
+    end
+  end
+
+  describe ".license_scan" do
+    it 'returns only license artifacts' do
+      create(:ci_build, job_artifacts: [create(:ci_job_artifact, :zip)])
+      build_with_license_scan = create(:ci_build, job_artifacts: [create(:ci_job_artifact, file_type: :license_management, file_format: :raw)])
+
+      expect(described_class.license_scan).to contain_exactly(build_with_license_scan)
     end
   end
 end

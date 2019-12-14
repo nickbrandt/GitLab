@@ -1,7 +1,9 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { GlButton, GlFormInput } from '@gitlab/ui';
+import { GlFormInput } from '@gitlab/ui';
+import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import ErrorTrackingForm from '~/error_tracking_settings/components/error_tracking_form.vue';
+import createStore from '~/error_tracking_settings/store';
 import { defaultProps } from '../mock';
 
 const localVue = createLocalVue();
@@ -9,15 +11,18 @@ localVue.use(Vuex);
 
 describe('error tracking settings form', () => {
   let wrapper;
+  let store;
 
   function mountComponent() {
     wrapper = shallowMount(ErrorTrackingForm, {
       localVue,
+      store,
       propsData: defaultProps,
     });
   }
 
   beforeEach(() => {
+    store = createStore();
     mountComponent();
   });
 
@@ -38,13 +43,15 @@ describe('error tracking settings form', () => {
           .attributes('id'),
       ).toBe('error-tracking-token');
 
-      expect(wrapper.findAll(GlButton).exists()).toBe(true);
+      expect(wrapper.findAll(LoadingButton).exists()).toBe(true);
     });
 
     it('is rendered with labels and placeholders', () => {
       const pageText = wrapper.text();
 
-      expect(pageText).toContain('Find your hostname in your Sentry account settings page');
+      expect(pageText).toContain(
+        "If you self-host Sentry, enter the full URL of your Sentry instance. If you're using Sentry's hosted solution, enter https://sentry.io",
+      );
       expect(pageText).toContain(
         "After adding your Auth Token, use the 'Connect' button to load projects",
       );
@@ -59,9 +66,21 @@ describe('error tracking settings form', () => {
     });
   });
 
+  describe('loading projects', () => {
+    beforeEach(() => {
+      store.state.isLoadingProjects = true;
+    });
+
+    it('shows loading spinner', () => {
+      const { label, loading } = wrapper.find(LoadingButton).props();
+      expect(loading).toBe(true);
+      expect(label).toBe('Connecting');
+    });
+  });
+
   describe('after a successful connection', () => {
     beforeEach(() => {
-      wrapper.setProps({ connectSuccessful: true });
+      store.state.connectSuccessful = true;
     });
 
     it('shows the success checkmark', () => {
@@ -77,7 +96,7 @@ describe('error tracking settings form', () => {
 
   describe('after an unsuccessful connection', () => {
     beforeEach(() => {
-      wrapper.setProps({ connectError: true });
+      store.state.connectError = true;
     });
 
     it('does not show the check mark', () => {

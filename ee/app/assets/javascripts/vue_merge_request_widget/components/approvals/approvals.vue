@@ -50,7 +50,7 @@ export default {
       return this.mr.approvals || {};
     },
     hasFooter() {
-      return Boolean(this.approvals.has_approval_rules);
+      return Boolean(this.mr.approvals);
     },
     approvedBy() {
       return this.approvals.approved_by ? this.approvals.approved_by.map(x => x.user) : [];
@@ -243,6 +243,7 @@ export default {
       :approval-rules="mr.approvalRules"
       :is-loading-rules="isLoadingRules"
       :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
+      :eligible-approvers-docs-path="mr.eligibleApproversDocsPath"
     />
   </mr-widget-container>
 </template>

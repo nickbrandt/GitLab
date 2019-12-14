@@ -14,6 +14,7 @@ module Clusters
       Applications::Helm.application_name => Applications::Helm,
       Applications::Ingress.application_name => Applications::Ingress,
       Applications::CertManager.application_name => Applications::CertManager,
+      Applications::Crossplane.application_name => Applications::Crossplane,
       Applications::Prometheus.application_name => Applications::Prometheus,
       Applications::Runner.application_name => Applications::Runner,
       Applications::Jupyter.application_name => Applications::Jupyter,
@@ -22,6 +23,7 @@ module Clusters
     }.freeze
     DEFAULT_ENVIRONMENT = '*'
     KUBE_INGRESS_BASE_DOMAIN = 'KUBE_INGRESS_BASE_DOMAIN'
+    APPLICATIONS_ASSOCIATIONS = APPLICATIONS.values.map(&:association_name).freeze
 
     belongs_to :user
     belongs_to :management_project, class_name: '::Project', optional: true
@@ -32,6 +34,7 @@ module Clusters
 
     has_many :cluster_groups, class_name: 'Clusters::Group'
     has_many :groups, through: :cluster_groups, class_name: '::Group'
+    has_many :groups_projects, through: :groups, source: :projects, class_name: '::Project'
 
     # we force autosave to happen when we save `Cluster` model
     has_one :provider_gcp, class_name: 'Clusters::Providers::Gcp', autosave: true
@@ -47,6 +50,7 @@ module Clusters
     has_one_cluster_application :helm
     has_one_cluster_application :ingress
     has_one_cluster_application :cert_manager
+    has_one_cluster_application :crossplane
     has_one_cluster_application :prometheus
     has_one_cluster_application :runner
     has_one_cluster_application :jupyter
@@ -56,6 +60,7 @@ module Clusters
     has_many :kubernetes_namespaces
 
     accepts_nested_attributes_for :provider_gcp, update_only: true
+    accepts_nested_attributes_for :provider_aws, update_only: true
     accepts_nested_attributes_for :platform_kubernetes, update_only: true
 
     validates :name, cluster_name: true
@@ -73,6 +78,7 @@ module Clusters
     delegate :status, to: :provider, allow_nil: true
     delegate :status_reason, to: :provider, allow_nil: true
     delegate :on_creation?, to: :provider, allow_nil: true
+    delegate :knative_pre_installed?, to: :provider, allow_nil: true
 
     delegate :active?, to: :platform_kubernetes, prefix: true, allow_nil: true
     delegate :rbac?, to: :platform_kubernetes, prefix: true, allow_nil: true
@@ -113,7 +119,7 @@ module Clusters
     scope :aws_installed, -> { aws_provided.joins(:provider_aws).merge(Clusters::Providers::Aws.with_status(:created)) }
 
     scope :managed, -> { where(managed: true) }
-
+    scope :with_persisted_applications, -> { eager_load(*APPLICATIONS_ASSOCIATIONS) }
     scope :default_environment, -> { where(environment_scope: DEFAULT_ENVIRONMENT) }
 
     scope :for_project_namespace, -> (namespace_id) { joins(:projects).where(projects: { namespace_id: namespace_id }) }
@@ -172,6 +178,13 @@ module Clusters
       end
     end
 
+    def all_projects
+      return projects if project_type?
+      return groups_projects if group_type?
+
+      ::Project.all
+    end
+
     def status_name
       return cleanup_status_name if cleanup_errored?
       return :cleanup_ongoing unless cleanup_not_started?
@@ -191,9 +204,13 @@ module Clusters
       { connection_status: retrieve_connection_status }
     end
 
+    def persisted_applications
+      APPLICATIONS_ASSOCIATIONS.map(&method(:public_send)).compact
+    end
+
     def applications
-      APPLICATIONS.values.map do |application_class|
-        public_send(application_class.association_name) || public_send("build_#{application_class.association_name}") # rubocop:disable GitlabSecurity/PublicSend
+      APPLICATIONS_ASSOCIATIONS.map do |association_name|
+        public_send(association_name) || public_send("build_#{association_name}") # rubocop:disable GitlabSecurity/PublicSend
       end
     end
 
@@ -232,14 +249,9 @@ module Clusters
     end
 
     def kubernetes_namespace_for(environment)
-      project = environment.project
-      persisted_namespace = Clusters::KubernetesNamespaceFinder.new(
-        self,
-        project: project,
-        environment_name: environment.name
-      ).execute
-
-      persisted_namespace&.namespace || Gitlab::Kubernetes::DefaultNamespace.new(self, project: project).from_environment_slug(environment.slug)
+      managed_namespace(environment) ||
+        ci_configured_namespace(environment) ||
+        default_namespace(environment)
     end
 
     def allow_user_defined_namespace?
@@ -258,8 +270,23 @@ module Clusters
       end
     end
 
-    def knative_pre_installed?
-      provider&.knative_pre_installed?
+    def delete_cached_resources!
+      kubernetes_namespaces.delete_all(:delete_all)
+    end
+
+    def clusterable
+      return unless cluster_type
+
+      case cluster_type
+      when 'project_type'
+        project
+      when 'group_type'
+        group
+      when 'instance_type'
+        instance
+      else
+        raise NotImplementedError
+      end
     end
 
     private
@@ -276,6 +303,25 @@ module Clusters
       end
     end
 
+    def managed_namespace(environment)
+      Clusters::KubernetesNamespaceFinder.new(
+        self,
+        project: environment.project,
+        environment_name: environment.name
+      ).execute&.namespace
+    end
+
+    def ci_configured_namespace(environment)
+      environment.last_deployable&.expanded_kubernetes_namespace
+    end
+
+    def default_namespace(environment)
+      Gitlab::Kubernetes::DefaultNamespace.new(
+        self,
+        project: environment.project
+      ).from_environment_slug(environment.slug)
+    end
+
     def instance_domain
       @instance_domain ||= Gitlab::CurrentSettings.auto_devops_domain
     end
@@ -289,7 +335,7 @@ module Clusters
     rescue Kubeclient::HttpError => e
       kubeclient_error_status(e.message)
     rescue => e
-      Gitlab::Sentry.track_acceptable_exception(e, extra: { cluster_id: id })
+      Gitlab::Sentry.track_exception(e, cluster_id: id)
 
       :unknown_failure
     else

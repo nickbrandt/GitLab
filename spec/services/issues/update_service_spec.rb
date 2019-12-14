@@ -151,6 +151,7 @@ describe Issues::UpdateService, :mailer do
 
       context 'when current user cannot admin issues in the project' do
         let(:guest) { create(:user) }
+
         before do
           project.add_guest(guest)
         end
@@ -606,6 +607,24 @@ describe Issues::UpdateService, :mailer do
         end
       end
 
+      context 'when same id is passed as add_label_ids and remove_label_ids' do
+        let(:params) { { add_label_ids: [label.id], remove_label_ids: [label.id] } }
+
+        context 'for a label assigned to an issue' do
+          it 'removes the label' do
+            issue.update(labels: [label])
+
+            expect(result.label_ids).to be_empty
+          end
+        end
+
+        context 'for a label not assigned to an issue' do
+          it 'does not add the label' do
+            expect(result.label_ids).to be_empty
+          end
+        end
+      end
+
       context 'when duplicate label titles are given' do
         let(:params) do
           { labels: [label3.title, label3.title] }
@@ -671,8 +690,9 @@ describe Issues::UpdateService, :mailer do
 
       context 'valid canonical_issue_id' do
         it 'calls the duplicate service with both issues' do
-          expect_any_instance_of(Issues::DuplicateService)
-            .to receive(:execute).with(issue, canonical_issue)
+          expect_next_instance_of(Issues::DuplicateService) do |service|
+            expect(service).to receive(:execute).with(issue, canonical_issue)
+          end
 
           update_issue(canonical_issue_id: canonical_issue.id)
         end

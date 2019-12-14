@@ -12,23 +12,21 @@ Milestones allow you to organize issues and merge requests into a cohesive group
 
 ## Milestones as Agile sprints
 
-Milestones can be used as Agile sprints.
-Set the milestone start date and due date to represent
-the start and end of your Agile sprint.
-Set the milestone title to the name of your Agile sprint,
-such as `November 2018 sprint`.
-Add an issue to your Agile sprint by associating
-the milestone to the issue.
+Milestones can be used as Agile sprints so that you can track all issues and merge requests related to a particular sprint. To do so:
+
+1. Set the milestone start date and due date to represent the start and end of your Agile sprint.
+1. Set the milestone title to the name of your Agile sprint, such as `November 2018 sprint`.
+1. Add an issue to your Agile sprint by associating the desired milestone from the issue's right-hand sidebar.
 
 ## Milestones as releases
 
-Milestones can be used as releases.
-Set the milestone due date to represent the release date of your release.
-(And leave the milestone start date blank.)
-Set the milestone title to the version of your release,
-such as `Version 9.4`.
-Add an issue to your release by associating
-the milestone to the issue.
+Similarily, milestones can be used as releases. To do so:
+
+1. Set the milestone due date to represent the release date of your release and leave the milestone start date blank.
+1. Set the milestone title to the version of your release, such as `Version 9.4`.
+1. Add an issue to your release by associating the desired milestone from the issue's right-hand sidebar.
+
+Additionally, you can integrate milestones with GitLab's [Releases feature](../releases/index.md#releases-associated-with-milestones).
 
 ## Project milestones and group milestones
 
@@ -70,8 +68,8 @@ If you are expanding from a few projects to a larger number of projects within t
 
 From the project milestone list page, you can promote a project milestone to a group milestone. This will merge all project milestones across all projects in this group with the same name into a single group milestones. All issues and merge requests that previously were assigned one of these project milestones will now be assigned the new group milestones. This action cannot be reversed and the changes are permanent.
 
->**Note:**
-Not all features on the project milestone view are available on the group milestone view. If you promote a project milestone to a group milestone, you will lose these features. See [Milestone view](#milestone-view) to see which features are missing from the group milestone view.
+CAUTION: **Caution:**
+From GitLab 12.4 and earlier, some information is lost when you promote a project milestone to a group milestone. Not all features on the project milestone view are available on the group milestone view. If you promote a project milestone to a group milestone, you will lose these features. See [Milestone view](#milestone-view) to see which features are missing from the group milestone view.
 
 ![Promote milestone](img/milestones_promote_milestone.png)
 
@@ -103,30 +101,21 @@ When filtering by milestone, in addition to choosing a specific project mileston
 
 ## Milestone view
 
-Not all features in the project milestone view are available in the group milestone view. This table summarizes the differences:
-
-| Feature                              | Project milestone view | Group milestone view |
-|--------------------------------------|:----------------------:|:--------------------:|
-| Title and description                | ✓                      | ✓                    |
-| Issues assigned to milestone         | ✓                      |                      |
-| Merge requests assigned to milestone | ✓                      |                      |
-| Participants and labels used         | ✓                      |                      |
-| Percentage complete                  | ✓                      | ✓                    |
-| Start date and due date              | ✓                      | ✓                    |
-| Total issue time spent               | ✓                      | ✓                    |
-| Total issue weight                   | ✓                      |                      |
-| Burndown chart **[STARTER}**         | ✓                      | ✓                    |
-
 The milestone view shows the title and description.
 
-### Project milestone features
+There are also tabs below these that show the following:
 
-These features are only available for project milestones and not group milestones.
-
-- Issues assigned to the milestone are displayed in three columns: Unstarted issues, ongoing issues, and completed issues.
-- Merge requests assigned to the milestone are displayed in four columns: Work in progress merge requests, waiting for merge, rejected, and closed.
-- Participants and labels that are used in issues and merge requests that have the milestone assigned are displayed.
-- [Burndown chart](#project-burndown-charts-starter).
+- **Issues**: Shows all issues assigned to the milestone. These are displayed in three columns named:
+  - Unstarted Issues (open and unassigned)
+  - Ongoing Issues (open and assigned)
+  - Completed Issues (closed)
+- **Merge Requests**: Shows all merge requests assigned to the milestone. These are displayed in four columns named:
+  - Work in progress (open and unassigned)
+  - Waiting for merge (open and unassigned)
+  - Rejected (closed)
+  - Merged
+- **Participants**: Shows all assignees of issues assigned to the milestone.
+- **Labels**: Shows all labels that are used in issues assigned to the milestone.
 
 ### Project Burndown Charts **(STARTER)**
 
@@ -144,9 +133,8 @@ The milestone sidebar on the milestone view shows the following:
 
 - Percentage complete, which is calculated as number of closed issues divided by total number of issues.
 - The start date and due date.
-- The total time spent on all issues that have the milestone assigned.
-
-For project milestones only, the milestone sidebar shows the total issue weight of all issues that have the milestone assigned.
+- The total time spent on all issues assigned to the milestone.
+- The total issue weight of all issues assigned to the milestone.
 
 ![Project milestone page](img/milestones_project_milestone_page.png)
 

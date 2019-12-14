@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::HealthChecks::PumaCheck do
@@ -20,6 +22,7 @@ describe Gitlab::HealthChecks::PumaCheck do
 
   context 'when Puma is not loaded' do
     before do
+      allow(Gitlab::Runtime).to receive(:puma?).and_return(false)
       hide_const('Puma')
     end
 
@@ -31,6 +34,7 @@ describe Gitlab::HealthChecks::PumaCheck do
 
   context 'when Puma is loaded' do
     before do
+      allow(Gitlab::Runtime).to receive(:puma?).and_return(true)
       stub_const('Puma', Module.new)
     end
 

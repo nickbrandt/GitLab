@@ -1,11 +1,11 @@
 import Cookies from 'js-cookie';
-import AccessorUtilities from '~/lib/utils/accessor';
 import {
   ONBOARDING_DISMISSED_COOKIE_NAME,
   STORAGE_KEY,
   ONBOARDING_PROPS_DEFAULTS,
 } from 'ee/onboarding/constants';
 import onboardingUtils from 'ee/onboarding/utils';
+import AccessorUtilities from '~/lib/utils/accessor';
 
 describe('User onboarding utils', () => {
   beforeEach(() => {

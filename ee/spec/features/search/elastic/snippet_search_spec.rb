@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Snippet elastic search', :js, :elastic, :sidekiq_might_not_need_inline do
+describe 'Snippet elastic search', :js, :elastic, :aggregate_failures, :sidekiq_might_not_need_inline do
   let(:public_project) { create(:project, :public) }
   let(:authorized_user) { create(:user) }
   let(:authorized_project) { create(:project, namespace: authorized_user.namespace) }
@@ -31,13 +31,16 @@ describe 'Snippet elastic search', :js, :elastic, :sidekiq_might_not_need_inline
     submit_search('snippet')
   end
 
+  # TODO: Reenable support for public/internal project snippets
+  # https://gitlab.com/gitlab-org/gitlab/issues/35760
+
   context 'as anonymous user' do
     let(:current_user) { nil }
 
     it 'finds only public snippets' do
       within('.results') do
         expect(page).to have_content('public personal snippet')
-        expect(page).to have_content('public project snippet')
+        expect(page).not_to have_content('public project snippet')
 
         expect(page).not_to have_content('internal personal snippet')
         expect(page).not_to have_content('internal project snippet')
@@ -57,10 +60,10 @@ describe 'Snippet elastic search', :js, :elastic, :sidekiq_might_not_need_inline
     it 'finds only public and internal snippets' do
       within('.results') do
         expect(page).to have_content('public personal snippet')
-        expect(page).to have_content('public project snippet')
+        expect(page).not_to have_content('public project snippet')
 
         expect(page).to have_content('internal personal snippet')
-        expect(page).to have_content('internal project snippet')
+        expect(page).not_to have_content('internal project snippet')
 
         expect(page).not_to have_content('private personal snippet')
         expect(page).not_to have_content('private project snippet')
@@ -77,10 +80,10 @@ describe 'Snippet elastic search', :js, :elastic, :sidekiq_might_not_need_inline
     it 'finds only public, internal, and authorized private snippets' do
       within('.results') do
         expect(page).to have_content('public personal snippet')
-        expect(page).to have_content('public project snippet')
+        expect(page).not_to have_content('public project snippet')
 
         expect(page).to have_content('internal personal snippet')
-        expect(page).to have_content('internal project snippet')
+        expect(page).not_to have_content('internal project snippet')
 
         expect(page).not_to have_content('private personal snippet')
         expect(page).not_to have_content('private project snippet')

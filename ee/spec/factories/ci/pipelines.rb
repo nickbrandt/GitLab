@@ -7,7 +7,7 @@ FactoryBot.define do
       config_source { :webide_source }
     end
 
-    %i[license_management dependency_list dependency_scanning sast container_scanning].each do |report_type|
+    %i[license_management dependency_list dependency_scanning sast dast container_scanning].each do |report_type|
       trait "with_#{report_type}_report".to_sym do
         status { :success }
 
@@ -54,6 +54,14 @@ FactoryBot.define do
 
       after(:build) do |pipeline, evaluator|
         pipeline.builds << build(:ee_ci_build, :sast_feature_branch, pipeline: pipeline, project: pipeline.project)
+      end
+    end
+
+    trait :with_dast_feature_branch do
+      status { :success }
+
+      after(:build) do |pipeline, evaluator|
+        pipeline.builds << build(:ee_ci_build, :dast_feature_branch, pipeline: pipeline, project: pipeline.project)
       end
     end
 

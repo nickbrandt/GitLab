@@ -4,7 +4,8 @@ require 'spec_helper'
 
 describe Gitlab::Ci::Pipeline::Seed::Build do
   let(:project) { create(:project, :repository) }
-  let(:pipeline) { create(:ci_empty_pipeline, project: project) }
+  let(:head_sha) { project.repository.head_commit.id }
+  let(:pipeline) { create(:ci_empty_pipeline, project: project, sha: head_sha) }
   let(:attributes) { { name: 'rspec', ref: 'master' } }
   let(:previous_stages) { [] }
 
@@ -68,6 +69,101 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
 
         it { is_expected.to include(when: 'never') }
       end
+    end
+
+    context 'with cache:key' do
+      let(:attributes) do
+        {
+          name: 'rspec',
+          ref: 'master',
+          cache: {
+            key: 'a-value'
+          }
+        }
+      end
+
+      it { is_expected.to include(options: { cache: { key: 'a-value' } }) }
+    end
+
+    context 'with cache:key:files' do
+      let(:attributes) do
+        {
+          name: 'rspec',
+          ref: 'master',
+          cache: {
+            key: {
+              files: ['VERSION']
+            }
+          }
+        }
+      end
+
+      it 'includes cache options' do
+        cache_options = {
+          options: {
+            cache: {
+              key: 'f155568ad0933d8358f66b846133614f76dd0ca4'
+            }
+          }
+        }
+
+        is_expected.to include(cache_options)
+      end
+    end
+
+    context 'with cache:key:prefix' do
+      let(:attributes) do
+        {
+          name: 'rspec',
+          ref: 'master',
+          cache: {
+            key: {
+              prefix: 'something'
+            }
+          }
+        }
+      end
+
+      it { is_expected.to include(options: { cache: { key: 'something-default' } }) }
+    end
+
+    context 'with cache:key:files and prefix' do
+      let(:attributes) do
+        {
+          name: 'rspec',
+          ref: 'master',
+          cache: {
+            key: {
+              files: ['VERSION'],
+              prefix: 'something'
+            }
+          }
+        }
+      end
+
+      it 'includes cache options' do
+        cache_options = {
+          options: {
+            cache: {
+              key: 'something-f155568ad0933d8358f66b846133614f76dd0ca4'
+            }
+          }
+        }
+
+        is_expected.to include(cache_options)
+      end
+    end
+
+    context 'with empty cache' do
+      let(:attributes) do
+        {
+          name: 'rspec',
+          ref: 'master',
+          cache: {}
+        }
+      end
+
+      it { is_expected.to include(options: {}) }
     end
   end
 
@@ -133,6 +229,15 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
           it 'returns a job without deployment' do
             expect(subject.deployment).to be_nil
           end
+        end
+      end
+
+      context 'when job belongs to a resource group' do
+        let(:attributes) { { name: 'rspec', ref: 'master', resource_group_key: 'iOS' } }
+
+        it 'returns a job with resource group' do
+          expect(subject.resource_group).not_to be_nil
+          expect(subject.resource_group.key).to eq('iOS')
         end
       end
     end
@@ -756,7 +861,7 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
 
       it "returns an error" do
         expect(subject.errors).to contain_exactly(
-          "rspec: one job can only need 5 others, but you have listed 6. See needs keyword documentation for more details")
+          "rspec: one job can only need 10 others, but you have listed 11. See needs keyword documentation for more details")
       end
     end
 
@@ -772,11 +877,5 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
           "rspec: one job can only need 50 others, but you have listed 51. See needs keyword documentation for more details")
       end
     end
-  end
-
-  describe '#scoped_variables_hash' do
-    subject { seed_build.scoped_variables_hash }
-
-    it { is_expected.to eq(seed_build.to_resource.scoped_variables_hash) }
   end
 end

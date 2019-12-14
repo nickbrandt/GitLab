@@ -47,6 +47,18 @@ module Gitlab
     Gitlab.config.gitlab.url == COM_URL || gl_subdomain?
   end
 
+  def self.canary?
+    Gitlab::Utils.to_boolean(ENV['CANARY'])
+  end
+
+  def self.com_and_canary?
+    com? && canary?
+  end
+
+  def self.com_but_not_canary?
+    com? && !canary?
+  end
+
   def self.org?
     Gitlab.config.gitlab.url == 'https://dev.gitlab.org'
   end
@@ -88,8 +100,8 @@ module Gitlab
   end
 
   def self.process_name
-    return 'sidekiq' if Sidekiq.server?
-    return 'console' if defined?(Rails::Console)
+    return 'sidekiq' if Gitlab::Runtime.sidekiq?
+    return 'console' if Gitlab::Runtime.console?
     return 'test' if Rails.env.test?
 
     'web'

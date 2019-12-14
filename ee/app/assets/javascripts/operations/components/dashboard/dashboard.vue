@@ -8,6 +8,7 @@ import {
   GlButton,
   GlDashboardSkeleton,
 } from '@gitlab/ui';
+import VueDraggable from 'vuedraggable';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import DashboardProject from './project.vue';
 
@@ -19,6 +20,7 @@ export default {
     GlLoadingIcon,
     GlButton,
     ProjectSelector,
+    VueDraggable,
   },
   directives: {
     'gl-modal': GlModalDirective,
@@ -44,15 +46,21 @@ export default {
   modalId: 'add-projects-modal',
   computed: {
     ...mapState([
-      'projects',
-      'projectTokens',
       'isLoadingProjects',
       'selectedProjects',
       'projectSearchResults',
       'searchCount',
-      'searchQuery',
       'messages',
+      'pageInfo',
     ]),
+    projects: {
+      get() {
+        return this.$store.state.projects;
+      },
+      set(projects) {
+        this.setProjects(projects);
+      },
+    },
     isSearchingProjects() {
       return this.searchCount > 0;
     },
@@ -69,6 +77,7 @@ export default {
   },
   methods: {
     ...mapActions([
+      'fetchNextPage',
       'fetchSearchResults',
       'addProjectsToDashboard',
       'fetchProjects',
@@ -76,6 +85,7 @@ export default {
       'clearSearchResults',
       'toggleSelectedProject',
       'setSearchQuery',
+      'setProjects',
     ]),
     addProjects() {
       this.addProjectsToDashboard();
@@ -118,8 +128,10 @@ export default {
         :show-loading-indicator="isSearchingProjects"
         :show-minimum-search-query-message="messages.minimumQuery"
         :show-search-error-message="messages.searchError"
+        :total-results="pageInfo.totalResults"
         @searched="searched"
         @projectClicked="projectClicked"
+        @bottomReached="fetchNextPage"
       />
     </gl-modal>
 
@@ -136,11 +148,16 @@ export default {
       </gl-button>
     </div>
     <div class="prepend-top-default">
-      <div v-if="projects.length" class="row prepend-top-default dashboard-cards">
+      <vue-draggable
+        v-if="projects.length"
+        v-model="projects"
+        group="dashboard-projects"
+        class="row prepend-top-default dashboard-cards"
+      >
         <div v-for="project in projects" :key="project.id" class="col-12 col-md-6 col-xl-4 px-2">
           <dashboard-project :project="project" />
         </div>
-      </div>
+      </vue-draggable>
       <div v-else-if="!isLoadingProjects" class="row prepend-top-20 text-center">
         <div class="col-12 d-flex justify-content-center svg-content">
           <img :src="emptyDashboardSvgPath" class="js-empty-state-svg col-12 prepend-top-20" />

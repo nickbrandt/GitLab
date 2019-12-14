@@ -54,10 +54,14 @@ describe Geo::RepositoryDestroyService do
         service.execute
       end
 
-      it 'removes the tracking entry' do
+      it 'removes the tracking entries' do
         create(:geo_project_registry, project: project)
+        create(:geo_design_registry, project: project)
 
-        expect { service.execute }.to change(Geo::ProjectRegistry, :count).by(-1)
+        service.execute
+
+        expect(Geo::ProjectRegistry.where(project: project)).to be_empty
+        expect(Geo::DesignRegistry.where(project: project)).to be_empty
       end
     end
 
@@ -92,10 +96,14 @@ describe Geo::RepositoryDestroyService do
         service.execute
       end
 
-      it 'removes the tracking entry' do
+      it 'removes the tracking entries' do
         create(:geo_project_registry, project: project)
+        create(:geo_design_registry, project: project)
 
-        expect { service.execute }.to change(Geo::ProjectRegistry, :count).by(-1)
+        service.execute
+
+        expect(Geo::ProjectRegistry.where(project: project)).to be_empty
+        expect(Geo::DesignRegistry.where(project: project)).to be_empty
       end
     end
 
@@ -110,12 +118,14 @@ describe Geo::RepositoryDestroyService do
         service.execute
       end
 
-      it 'removes the tracking entry' do
+      it 'removes the tracking entries' do
         create(:geo_project_registry, project: project)
+        create(:geo_design_registry, project: project)
 
         expect { service.execute }.to raise_error RuntimeError, 'storage not found: "broken"'
 
         expect(Geo::ProjectRegistry.where(project: project)).to be_empty
+        expect(Geo::DesignRegistry.where(project: project)).to be_empty
       end
     end
   end

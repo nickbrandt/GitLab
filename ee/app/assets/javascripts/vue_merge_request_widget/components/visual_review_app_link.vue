@@ -1,7 +1,7 @@
 <script>
+import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
-import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 
 export default {
@@ -86,20 +86,7 @@ export default {
         ),
         step3: sprintf(
           s__(
-            'VisualReviewApp|%{stepStart}Step 3%{stepEnd}. Open the Review App and provide a %{linkStart}personal access token%{linkEnd}.',
-          ),
-          {
-            stepStart: '<strong>',
-            stepEnd: '</strong>',
-            linkStart:
-              '<a href="https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html">',
-            linkEnd: '</a>',
-          },
-          false,
-        ),
-        step4: sprintf(
-          s__(
-            `VisualReviewApp|%{stepStart}Step 4%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}%{mrId}%{stepStart}.`,
+            `VisualReviewApp|%{stepStart}Step 3%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}%{mrId}%{stepStart}.`,
           ),
           {
             stepStart: '<strong>',
@@ -111,8 +98,8 @@ export default {
           },
           false,
         ),
-        step5: sprintf(
-          s__('VisualReviewApp|%{stepStart}Step 5%{stepEnd}. Leave feedback in the Review App.'),
+        step4: sprintf(
+          s__('VisualReviewApp|%{stepStart}Step 4%{stepEnd}. Leave feedback in the Review App.'),
           {
             stepStart: '<strong>',
             stepEnd: '</strong>',
@@ -145,7 +132,14 @@ export default {
       ok-variant="success"
     >
       <template slot="modal-ok">
-        <a :href="link" target="_blank" rel="noopener noreferrer nofollow" class="text-white">
+        <a
+          :href="link"
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          class="text-white js-review-app-link"
+          data-track-event="open_review_app"
+          data-track-label="review_app"
+        >
           {{ s__('VisualReviewApp|Open review app') }}
           <icon class="fwhite" name="external-link" />
         </a>
@@ -165,9 +159,8 @@ export default {
         </div>
       </div>
       <p v-html="instructionText.step2"></p>
-      <p v-html="instructionText.step3"></p>
       <p>
-        <span v-html="instructionText.step4"></span>
+        <span v-html="instructionText.step3"></span>
         <modal-copy-button
           :title="copyToClipboard.mrId"
           :text="appMetadata.mergeRequestId.toString()"
@@ -175,7 +168,7 @@ export default {
           css-classes="border-0 gl-pt-0 gl-pr-0 gl-pl-1 gl-pb-0"
         />
       </p>
-      <p v-html="instructionText.step5"></p>
+      <p v-html="instructionText.step4"></p>
     </gl-modal>
   </div>
 </template>

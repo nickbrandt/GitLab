@@ -45,7 +45,7 @@ module API
       end
       params do
         requires :tag_name,    type: String, desc: 'The name of the tag', as: :tag
-        requires :name,        type: String, desc: 'The name of the release'
+        optional :name,        type: String, desc: 'The name of the release'
         requires :description, type: String, desc: 'The release notes'
         optional :ref,         type: String, desc: 'The commit sha or branch name'
         optional :assets, type: Hash do
@@ -57,6 +57,7 @@ module API
         optional :milestones, type: Array, desc: 'The titles of the related milestones', default: []
         optional :released_at, type: DateTime, desc: 'The date when the release will be/was ready. Defaults to the current time.'
       end
+      route_setting :authentication, job_token_allowed: true
       post ':id/releases' do
         authorize_create_release!
 

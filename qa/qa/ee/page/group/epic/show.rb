@@ -8,14 +8,6 @@ module QA
           class Show < QA::Page::Base
             include QA::Page::Component::Issuable::Common
 
-            view 'app/assets/javascripts/issue_show/components/title.vue' do
-              element :title, required: true
-            end
-
-            view 'app/assets/javascripts/vue_shared/components/issue/related_issuable_item.vue' do
-              element :remove_related_issue_button
-            end
-
             view 'ee/app/assets/javascripts/epic/components/epic_header.vue' do
               element :close_reopen_epic_button
             end
@@ -28,8 +20,12 @@ module QA
               element :add_issue_input
             end
 
-            view 'ee/app/assets/javascripts/related_issues/components/related_issues_block.vue' do
-              element :related_issuable_item
+            view 'ee/app/assets/javascripts/related_items_tree/components/tree_item.vue' do
+              element :related_issue_item
+            end
+
+            view 'ee/app/assets/javascripts/related_items_tree/components/tree_item_body.vue' do
+              element :remove_issue_button
             end
 
             view 'ee/app/assets/javascripts/related_issues/constants.js' do
@@ -49,7 +45,9 @@ module QA
             end
 
             def remove_issue_from_epic
-              click_element :remove_related_issue_button
+              click_element :remove_issue_button
+              # Capybara code is used below due to the modal being defined in the @gitlab/ui project
+              find('#item-remove-confirmation___BV_modal_footer_ .btn-danger').click
             end
 
             def click_edit_button
@@ -66,12 +64,12 @@ module QA
               click_element :close_reopen_epic_button
             end
 
-            def has_related_issuable_item?
-              has_element?(:related_issuable_item)
+            def has_related_issue_item?
+              has_element?(:related_issue_item)
             end
 
-            def has_no_related_issuable_item?
-              has_no_element?(:related_issuable_item)
+            def has_no_related_issue_item?
+              has_no_element?(:related_issue_item)
             end
           end
         end

@@ -25,11 +25,14 @@ describe 'User comments on a diff', :js do
   let(:user) { create(:user) }
 
   before do
+    stub_feature_flags(single_mr_diff_view: false)
     project.add_maintainer(user)
     sign_in(user)
 
     visit(diffs_project_merge_request_path(project, merge_request))
   end
+
+  it_behaves_like 'rendering a single diff version'
 
   context 'single suggestion note' do
     it 'hides suggestion popover' do
@@ -94,7 +97,9 @@ describe 'User comments on a diff', :js do
   end
 
   context 'multiple suggestions in expanded lines' do
-    it 'suggestions are appliable' do
+    # Report issue: https://gitlab.com/gitlab-org/gitlab/issues/38277
+    # Fix issue: https://gitlab.com/gitlab-org/gitlab/issues/39095
+    it 'suggestions are appliable', :quarantine do
       diff_file = merge_request.diffs(paths: ['files/ruby/popen.rb']).diff_files.first
       hash = Digest::SHA1.hexdigest(diff_file.file_path)
 
@@ -135,6 +140,10 @@ describe 'User comments on a diff', :js do
 
       # Making sure it's not a Front-end cache.
       visit(diffs_project_merge_request_path(project, merge_request))
+
+      page.within '.line-resolve-all-container' do
+        page.find('.discussion-next-btn').click
+      end
 
       expect_appliable_suggestions(2)
 

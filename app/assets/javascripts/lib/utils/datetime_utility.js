@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _ from 'underscore';
-import timeago from 'timeago.js';
+import * as timeago from 'timeago.js';
 import dateFormat from 'dateformat';
 import { languageCode, s__, __, n__ } from '../../locale';
 
@@ -78,11 +78,11 @@ export const getDayName = date =>
  * @param {date} datetime
  * @returns {String}
  */
-export const formatDate = datetime => {
+export const formatDate = (datetime, format = 'mmm d, yyyy h:MMtt Z') => {
   if (_.isString(datetime) && datetime.match(/\d+-\d+\d+ /)) {
     throw new Error(__('Invalid date'));
   }
-  return dateFormat(datetime, 'mmm d, yyyy h:MMtt Z');
+  return dateFormat(datetime, format);
 };
 
 /**
@@ -92,79 +92,71 @@ export const formatDate = datetime => {
  */
 const timeagoLanguageCode = languageCode().replace(/-/g, '_');
 
-let timeagoInstance;
-
 /**
- * Sets a timeago Instance
+ * Registers timeago locales
  */
-export const getTimeago = () => {
-  if (!timeagoInstance) {
-    const memoizedLocaleRemaining = () => {
-      const cache = [];
+const memoizedLocaleRemaining = () => {
+  const cache = [];
 
-      const timeAgoLocaleRemaining = [
-        () => [s__('Timeago|just now'), s__('Timeago|right now')],
-        () => [s__('Timeago|just now'), s__('Timeago|%s seconds remaining')],
-        () => [s__('Timeago|1 minute ago'), s__('Timeago|1 minute remaining')],
-        () => [s__('Timeago|%s minutes ago'), s__('Timeago|%s minutes remaining')],
-        () => [s__('Timeago|1 hour ago'), s__('Timeago|1 hour remaining')],
-        () => [s__('Timeago|%s hours ago'), s__('Timeago|%s hours remaining')],
-        () => [s__('Timeago|1 day ago'), s__('Timeago|1 day remaining')],
-        () => [s__('Timeago|%s days ago'), s__('Timeago|%s days remaining')],
-        () => [s__('Timeago|1 week ago'), s__('Timeago|1 week remaining')],
-        () => [s__('Timeago|%s weeks ago'), s__('Timeago|%s weeks remaining')],
-        () => [s__('Timeago|1 month ago'), s__('Timeago|1 month remaining')],
-        () => [s__('Timeago|%s months ago'), s__('Timeago|%s months remaining')],
-        () => [s__('Timeago|1 year ago'), s__('Timeago|1 year remaining')],
-        () => [s__('Timeago|%s years ago'), s__('Timeago|%s years remaining')],
-      ];
+  const timeAgoLocaleRemaining = [
+    () => [s__('Timeago|just now'), s__('Timeago|right now')],
+    () => [s__('Timeago|just now'), s__('Timeago|%s seconds remaining')],
+    () => [s__('Timeago|1 minute ago'), s__('Timeago|1 minute remaining')],
+    () => [s__('Timeago|%s minutes ago'), s__('Timeago|%s minutes remaining')],
+    () => [s__('Timeago|1 hour ago'), s__('Timeago|1 hour remaining')],
+    () => [s__('Timeago|%s hours ago'), s__('Timeago|%s hours remaining')],
+    () => [s__('Timeago|1 day ago'), s__('Timeago|1 day remaining')],
+    () => [s__('Timeago|%s days ago'), s__('Timeago|%s days remaining')],
+    () => [s__('Timeago|1 week ago'), s__('Timeago|1 week remaining')],
+    () => [s__('Timeago|%s weeks ago'), s__('Timeago|%s weeks remaining')],
+    () => [s__('Timeago|1 month ago'), s__('Timeago|1 month remaining')],
+    () => [s__('Timeago|%s months ago'), s__('Timeago|%s months remaining')],
+    () => [s__('Timeago|1 year ago'), s__('Timeago|1 year remaining')],
+    () => [s__('Timeago|%s years ago'), s__('Timeago|%s years remaining')],
+  ];
 
-      return (number, index) => {
-        if (cache[index]) {
-          return cache[index];
-        }
-        cache[index] = timeAgoLocaleRemaining[index] && timeAgoLocaleRemaining[index]();
-        return cache[index];
-      };
-    };
-
-    const memoizedLocale = () => {
-      const cache = [];
-
-      const timeAgoLocale = [
-        () => [s__('Timeago|just now'), s__('Timeago|right now')],
-        () => [s__('Timeago|just now'), s__('Timeago|in %s seconds')],
-        () => [s__('Timeago|1 minute ago'), s__('Timeago|in 1 minute')],
-        () => [s__('Timeago|%s minutes ago'), s__('Timeago|in %s minutes')],
-        () => [s__('Timeago|1 hour ago'), s__('Timeago|in 1 hour')],
-        () => [s__('Timeago|%s hours ago'), s__('Timeago|in %s hours')],
-        () => [s__('Timeago|1 day ago'), s__('Timeago|in 1 day')],
-        () => [s__('Timeago|%s days ago'), s__('Timeago|in %s days')],
-        () => [s__('Timeago|1 week ago'), s__('Timeago|in 1 week')],
-        () => [s__('Timeago|%s weeks ago'), s__('Timeago|in %s weeks')],
-        () => [s__('Timeago|1 month ago'), s__('Timeago|in 1 month')],
-        () => [s__('Timeago|%s months ago'), s__('Timeago|in %s months')],
-        () => [s__('Timeago|1 year ago'), s__('Timeago|in 1 year')],
-        () => [s__('Timeago|%s years ago'), s__('Timeago|in %s years')],
-      ];
-
-      return (number, index) => {
-        if (cache[index]) {
-          return cache[index];
-        }
-        cache[index] = timeAgoLocale[index] && timeAgoLocale[index]();
-        return cache[index];
-      };
-    };
-
-    timeago.register(timeagoLanguageCode, memoizedLocale());
-    timeago.register(`${timeagoLanguageCode}-remaining`, memoizedLocaleRemaining());
-
-    timeagoInstance = timeago();
-  }
-
-  return timeagoInstance;
+  return (number, index) => {
+    if (cache[index]) {
+      return cache[index];
+    }
+    cache[index] = timeAgoLocaleRemaining[index] && timeAgoLocaleRemaining[index]();
+    return cache[index];
+  };
 };
+
+const memoizedLocale = () => {
+  const cache = [];
+
+  const timeAgoLocale = [
+    () => [s__('Timeago|just now'), s__('Timeago|right now')],
+    () => [s__('Timeago|just now'), s__('Timeago|in %s seconds')],
+    () => [s__('Timeago|1 minute ago'), s__('Timeago|in 1 minute')],
+    () => [s__('Timeago|%s minutes ago'), s__('Timeago|in %s minutes')],
+    () => [s__('Timeago|1 hour ago'), s__('Timeago|in 1 hour')],
+    () => [s__('Timeago|%s hours ago'), s__('Timeago|in %s hours')],
+    () => [s__('Timeago|1 day ago'), s__('Timeago|in 1 day')],
+    () => [s__('Timeago|%s days ago'), s__('Timeago|in %s days')],
+    () => [s__('Timeago|1 week ago'), s__('Timeago|in 1 week')],
+    () => [s__('Timeago|%s weeks ago'), s__('Timeago|in %s weeks')],
+    () => [s__('Timeago|1 month ago'), s__('Timeago|in 1 month')],
+    () => [s__('Timeago|%s months ago'), s__('Timeago|in %s months')],
+    () => [s__('Timeago|1 year ago'), s__('Timeago|in 1 year')],
+    () => [s__('Timeago|%s years ago'), s__('Timeago|in %s years')],
+  ];
+
+  return (number, index) => {
+    if (cache[index]) {
+      return cache[index];
+    }
+    cache[index] = timeAgoLocale[index] && timeAgoLocale[index]();
+    return cache[index];
+  };
+};
+
+timeago.register(timeagoLanguageCode, memoizedLocale());
+timeago.register(`${timeagoLanguageCode}-remaining`, memoizedLocaleRemaining());
+
+export const getTimeago = () => timeago;
 
 /**
  * For the given elements, sets a tooltip with a formatted date.
@@ -172,10 +164,8 @@ export const getTimeago = () => {
  * @param {Boolean} setTimeago
  */
 export const localTimeAgo = ($timeagoEls, setTimeago = true) => {
-  getTimeago();
-
   $timeagoEls.each((i, el) => {
-    $(el).text(timeagoInstance.format($(el).attr('datetime'), timeagoLanguageCode));
+    $(el).text(timeago.format($(el).attr('datetime'), timeagoLanguageCode));
   });
 
   if (!setTimeago) {
@@ -207,9 +197,7 @@ export const timeFor = (time, expiredLabel) => {
   if (new Date(time) < new Date()) {
     return expiredLabel || s__('Timeago|Past due');
   }
-  return getTimeago()
-    .format(time, `${timeagoLanguageCode}-remaining`)
-    .trim();
+  return timeago.format(time, `${timeagoLanguageCode}-remaining`).trim();
 };
 
 export const getDayDifference = (a, b) => {
@@ -459,7 +447,7 @@ export const parsePikadayDate = dateString => {
 /**
  * Used `onSelect` method in pickaday
  * @param {Date} date UTC format
- * @return {String} Date formated in yyyy-mm-dd
+ * @return {String} Date formatted in yyyy-mm-dd
  */
 export const pikadayToString = date => {
   const day = pad(date.getDate());
@@ -525,8 +513,8 @@ export const stringifyTime = (timeObject, fullNameFormat = false) => {
 
       if (fullNameFormat && isNonZero) {
         // Remove traling 's' if unit value is singular
-        const formatedUnitName = unitValue > 1 ? unitName : unitName.replace(/s$/, '');
-        return `${memo} ${unitValue} ${formatedUnitName}`;
+        const formattedUnitName = unitValue > 1 ? unitName : unitName.replace(/s$/, '');
+        return `${memo} ${unitValue} ${formattedUnitName}`;
       }
 
       return isNonZero ? `${memo} ${unitValue}${unitName.charAt(0)}` : memo;
@@ -541,7 +529,7 @@ export const stringifyTime = (timeObject, fullNameFormat = false) => {
  * The result cannot become negative.
  *
  * @param endDate date string that the time difference is calculated for
- * @return {number} number of milliseconds remaining until the given date
+ * @return {Number} number of milliseconds remaining until the given date
  */
 export const calculateRemainingMilliseconds = endDate => {
   const remainingMilliseconds = new Date(endDate).getTime() - Date.now();
@@ -552,11 +540,22 @@ export const calculateRemainingMilliseconds = endDate => {
  * Subtracts a given number of days from a given date and returns the new date.
  *
  * @param {Date} date the date that we will substract days from
- * @param {number} daysInPast number of days that are subtracted from a given date
+ * @param {Number} daysInPast number of days that are subtracted from a given date
  * @returns {Date} Date in past as Date object
  */
 export const getDateInPast = (date, daysInPast) =>
   new Date(newDate(date).setDate(date.getDate() - daysInPast));
+
+/*
+ * Appending T00:00:00 makes JS assume local time and prevents it from shifting the date
+ * to match the user's time zone. We want to display the date in server time for now, to
+ * be consistent with the "edit issue -> due date" UI.
+ */
+
+export const newDateAsLocaleTime = date => {
+  const suffix = 'T00:00:00';
+  return new Date(`${date}${suffix}`);
+};
 
 export const beginOfDayTime = 'T00:00:00Z';
 export const endOfDayTime = 'T23:59:59Z';
@@ -583,3 +582,27 @@ export const getDatesInRange = (d1, d2, formatter = x => x) => {
 
   return range.map(formatter);
 };
+
+/**
+ * Converts the supplied number of seconds to milliseconds.
+ *
+ * @param {Number} seconds
+ * @return {Number} number of milliseconds
+ */
+export const secondsToMilliseconds = seconds => seconds * 1000;
+
+/**
+ * Converts the supplied number of seconds to days.
+ *
+ * @param {Number} seconds
+ * @return {Number} number of days
+ */
+export const secondsToDays = seconds => Math.round(seconds / 86400);
+
+/**
+ * Returns the date after the date provided
+ *
+ * @param {Date} date the initial date
+ * @return {Date} the date following the date provided
+ */
+export const dayAfter = date => new Date(newDate(date).setDate(date.getDate() + 1));

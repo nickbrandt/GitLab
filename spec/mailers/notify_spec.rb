@@ -990,7 +990,8 @@ describe Notify do
         end
 
         context 'when a comment on an existing discussion' do
-          let!(:second_note) { create(model, author: note_author, noteable: nil, in_reply_to: note) }
+          let(:first_note) { create_note }
+          let(:note) { create(model, author: note_author, noteable: nil, in_reply_to: first_note) }
 
           it 'contains an introduction' do
             is_expected.to have_body_text 'commented on a'
@@ -1000,7 +1001,11 @@ describe Notify do
 
       describe 'on a commit' do
         let(:commit) { project.commit }
-        let(:note) { create(:discussion_note_on_commit, commit_id: commit.id, project: project, author: note_author) }
+        let(:note) { create_note }
+
+        def create_note
+          create(:discussion_note_on_commit, commit_id: commit.id, project: project, author: note_author)
+        end
 
         before do
           allow(note).to receive(:noteable).and_return(commit)
@@ -1027,8 +1032,12 @@ describe Notify do
       end
 
       describe 'on a merge request' do
-        let(:note) { create(:discussion_note_on_merge_request, noteable: merge_request, project: project, author: note_author) }
+        let(:note) { create_note }
         let(:note_on_merge_request_path) { project_merge_request_path(project, merge_request, anchor: "note_#{note.id}") }
+
+        def create_note
+          create(:discussion_note_on_merge_request, noteable: merge_request, project: project, author: note_author)
+        end
 
         before do
           allow(note).to receive(:noteable).and_return(merge_request)
@@ -1055,8 +1064,12 @@ describe Notify do
       end
 
       describe 'on an issue' do
-        let(:note) { create(:discussion_note_on_issue, noteable: issue, project: project, author: note_author) }
+        let(:note) { create_note }
         let(:note_on_issue_path) { project_issue_path(project, issue, anchor: "note_#{note.id}") }
+
+        def create_note
+          create(:discussion_note_on_issue, noteable: issue, project: project, author: note_author)
+        end
 
         before do
           allow(note).to receive(:noteable).and_return(issue)
@@ -1095,7 +1108,9 @@ describe Notify do
 
         context 'when note is not on text' do
           before do
-            allow_any_instance_of(DiffDiscussion).to receive(:on_text?).and_return(false)
+            allow_next_instance_of(DiffDiscussion) do |instance|
+              allow(instance).to receive(:on_text?).and_return(false)
+            end
           end
 
           it 'does not include diffs with character-level highlighting' do
@@ -1132,7 +1147,8 @@ describe Notify do
         end
 
         context 'when a comment on an existing discussion' do
-          let!(:second_note) { create(model, author: note_author, noteable: nil, in_reply_to: note) }
+          let(:first_note) { create(model) }
+          let(:note) { create(model, author: note_author, noteable: nil, in_reply_to: first_note) }
 
           it 'contains an introduction' do
             is_expected.to have_body_text 'commented on a discussion on'

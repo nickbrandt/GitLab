@@ -24,6 +24,9 @@ describe Gitlab::UsageData do
       create(:prometheus_alert, project: projects[0])
       create(:prometheus_alert, project: projects[1])
 
+      create(:alerts_service, project: projects[0])
+      create(:alerts_service, :inactive, project: projects[1])
+
       create(:package, project: projects[0])
       create(:package, project: projects[0])
       create(:package, project: projects[1])
@@ -83,17 +86,20 @@ describe Gitlab::UsageData do
         projects_with_packages
         projects_with_prometheus_alerts
         projects_with_tracing_enabled
+        projects_with_alerts_service_enabled
         sast_jobs
         design_management_designs_create
         design_management_designs_update
         design_management_designs_delete
         user_preferences_group_overview_details
         user_preferences_group_overview_security_dashboard
+        template_repositories
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
       expect(count_data[:projects_with_packages]).to eq(2)
       expect(count_data[:feature_flags]).to eq(1)
+      expect(count_data[:projects_with_alerts_service_enabled]).to eq(1)
     end
 
     it 'has integer value for epic relationship level' do

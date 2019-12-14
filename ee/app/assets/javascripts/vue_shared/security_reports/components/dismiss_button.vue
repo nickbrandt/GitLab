@@ -1,7 +1,7 @@
 <script>
+import { GlButton, GlTooltipDirective } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
-import { GlButton, GlTooltipDirective } from '@gitlab/ui';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {
@@ -65,6 +65,7 @@ export default {
       :disabled="disabled"
       :title="s__('vulnerability|Add comment & dismiss')"
       variant="close"
+      data-qa-selector="dismiss_with_comment_button"
       class="js-dismiss-with-comment "
       @click="$emit('openDismissalCommentBox')"
     >

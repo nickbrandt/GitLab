@@ -25,9 +25,9 @@ module EE
 
       def update_elasticsearch_containers(klass, new_container_ids)
         return unless application_setting.elasticsearch_limit_indexing?
-
-        new_container_ids = new_container_ids&.split(",") unless new_container_ids.is_a?(Array)
         return if new_container_ids.nil?
+
+        new_container_ids = new_container_ids.split(',').map(&:to_i) unless new_container_ids.is_a?(Array)
 
         # Destroy any containers that have been removed. This runs callbacks, etc
         klass.remove_all(except: new_container_ids)
@@ -36,7 +36,7 @@ module EE
         new_container_ids -= klass.target_ids
 
         # Add new containers
-        new_container_ids.each { |id| klass.create(klass.target_attr_name => id) }
+        new_container_ids.each { |id| klass.create!(klass.target_attr_name => id) }
       end
     end
   end

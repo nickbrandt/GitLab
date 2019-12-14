@@ -4,8 +4,7 @@ module QA
   context 'Create' do
     describe 'File Locking' do
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
 
         @user_one = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
         @user_two = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
@@ -29,8 +28,7 @@ module QA
         end
       end
 
-      # Bug issue: https://gitlab.com/gitlab-org/gitlab/issues/35254
-      it 'locks a directory and tries to push as a second user', :quarantine do
+      it 'locks a directory and tries to push as a second user' do
         push branch: 'master', file: 'directory/file', as_user: @user_one
 
         sign_out_and_sign_in_as user: @user_one
@@ -61,7 +59,8 @@ module QA
         end
       end
 
-      it 'creates a merge request and fails to merge' do
+      # https://gitlab.com/gitlab-org/gitlab/issues/43105
+      it 'creates a merge request and fails to merge', :quarantine do
         push branch: 'test', as_user: @user_one
 
         merge_request = Resource::MergeRequest.fabricate_via_api! do |merge_request|

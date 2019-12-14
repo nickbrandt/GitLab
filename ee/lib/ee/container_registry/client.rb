@@ -33,20 +33,28 @@ module EE
         faraday.head("/v2/#{name}/blobs/#{digest}").success?
       end
 
+      # Pulls a blob from the Registry.
       # We currently use Faraday 0.12 which does not support streaming download yet
       # Given that we aim to migrate to HTTP.rb client and that updating Faraday is potentialy
-      # dangerous, we use HTTP.rb here
+      # dangerous, we use HTTP.rb here.
+      #
+      # @return {Object} Returns a Tempfile object or nil when no success
       def pull_blob(name, digest)
         file = Tempfile.new("blob-#{digest}")
 
         response = HTTP
           .headers({ "Authorization" => "Bearer #{@options[:token]}" }) # rubocop:disable Gitlab/ModuleWithInstanceVariables
-          .follow
           .get("#{@base_uri}/v2/#{name}/blobs/#{digest}") # rubocop:disable Gitlab/ModuleWithInstanceVariables
+
+        raise Error.new("Pull Blob error: #{response.body}") unless response.status.redirect?
+
+        response = HTTP.get(response['Location'])
         response.body.each do |chunk|
           file.binmode
           file.write(chunk)
         end
+
+        raise Error.new("Could not download the blob: #{digest}") unless response.status.success?
 
         file
       ensure

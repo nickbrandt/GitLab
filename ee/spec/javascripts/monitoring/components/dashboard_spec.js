@@ -1,20 +1,44 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import { GlModal, GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlModal, GlButton } from '@gitlab/ui';
 import Dashboard from 'ee/monitoring/components/dashboard.vue';
+import {
+  metricsGroupsAPIResponse,
+  mockApiEndpoint,
+  mockedQueryResultPayload,
+  environmentData,
+} from 'spec/monitoring/mock_data';
+import propsData from 'spec/monitoring/components/dashboard_spec';
+import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
+import Tracking from '~/tracking';
 import { createStore } from '~/monitoring/stores';
 import axios from '~/lib/utils/axios_utils';
-import { metricsGroupsAPIResponse, mockApiEndpoint } from 'spec/monitoring/mock_data';
-import propsData from 'spec/monitoring/components/dashboard_spec';
-import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
-import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
+import * as types from '~/monitoring/stores/mutation_types';
+
+const localVue = createLocalVue();
 
 describe('Dashboard', () => {
   let Component;
   let mock;
   let store;
-  let vm;
-  const localVue = createLocalVue();
+  let wrapper;
+
+  const findAddMetricButton = () => wrapper.vm.$refs.addMetricBtn;
+
+  const createComponent = (props = {}) => {
+    wrapper = shallowMount(localVue.extend(Component), {
+      propsData: {
+        ...propsData,
+        ...props,
+      },
+      stubs: {
+        GlButton,
+      },
+      store,
+      sync: false,
+      localVue,
+    });
+  };
 
   beforeEach(() => {
     setFixtures(`
@@ -37,129 +61,109 @@ describe('Dashboard', () => {
     mock.restore();
   });
 
-  describe('metrics with alert', () => {
-    describe('with license', () => {
-      beforeEach(() => {
-        vm = shallowMount(Component, {
-          propsData: {
-            ...propsData,
-            hasMetrics: true,
-            prometheusAlertsAvailable: true,
-            alertsEndpoint: '/endpoint',
-          },
-          store,
-        });
-      });
-
-      it('shows alert widget and dropdown item', done => {
-        setTimeout(() => {
-          expect(vm.find(AlertWidget).exists()).toBe(true);
-          expect(
-            vm
-              .findAll(GlDropdownItem)
-              .filter(i => i.text() === 'Alerts')
-              .exists(),
-          ).toBe(true);
-
-          done();
-        });
-      });
-
-      it('shows More actions dropdown on chart', done => {
-        setTimeout(() => {
-          expect(
-            vm
-              .findAll(GlDropdown)
-              .filter(d => d.attributes('data-original-title') === 'More actions')
-              .exists(),
-          ).toBe(true);
-
-          done();
-        });
-      });
-    });
-
-    describe('without license', () => {
-      beforeEach(() => {
-        vm = shallowMount(Component, {
-          propsData: {
-            ...propsData,
-            hasMetrics: true,
-            prometheusAlertsAvailable: false,
-            alertsEndpoint: '/endpoint',
-          },
-          store,
-        });
-      });
-
-      it('does not show alert widget', done => {
-        setTimeout(() => {
-          expect(vm.find(AlertWidget).exists()).toBe(false);
-          expect(
-            vm
-              .findAll(GlDropdownItem)
-              .filter(i => i.text() === 'Alerts')
-              .exists(),
-          ).toBe(false);
-
-          done();
-        });
-      });
-    });
-  });
+  function setupComponentStore(component) {
+    component.vm.$store.commit(
+      `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+      metricsGroupsAPIResponse,
+    );
+    component.vm.$store.commit(
+      `monitoringDashboard/${types.RECEIVE_METRIC_RESULT_SUCCESS}`,
+      mockedQueryResultPayload,
+    );
+    component.vm.$store.commit(
+      `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
+      environmentData,
+    );
+  }
 
   describe('add custom metrics', () => {
+    const defaultProps = {
+      customMetricsPath: '/endpoint',
+      hasMetrics: true,
+      documentationPath: '/path/to/docs',
+      settingsPath: '/path/to/settings',
+      clustersPath: '/path/to/clusters',
+      projectPath: '/path/to/project',
+      metricsEndpoint: mockApiEndpoint,
+      tagsPath: '/path/to/tags',
+      emptyGettingStartedSvgPath: '/path/to/getting-started.svg',
+      emptyLoadingSvgPath: '/path/to/loading.svg',
+      emptyNoDataSvgPath: '/path/to/no-data.svg',
+      emptyNoDataSmallSvgPath: '/path/to/no-data-small.svg',
+      emptyUnableToConnectSvgPath: '/path/to/unable-to-connect.svg',
+      environmentsEndpoint: '/root/hello-prometheus/environments/35',
+      currentEnvironmentName: 'production',
+      prometheusAlertsAvailable: true,
+      alertsEndpoint: '/endpoint',
+    };
+
     describe('when not available', () => {
       beforeEach(() => {
-        vm = shallowMount(Component, {
-          propsData: {
-            ...propsData,
-            customMetricsAvailable: false,
-            customMetricsPath: '/endpoint',
-            hasMetrics: true,
-            prometheusAlertsAvailable: true,
-            alertsEndpoint: '/endpoint',
-          },
-          store,
+        createComponent({
+          customMetricsAvailable: false,
+          ...defaultProps,
         });
       });
 
-      it('does not render add button on the dashboard', done => {
-        setTimeout(() => {
-          expect(vm.element.querySelector('.js-add-metric-button')).toBe(null);
-          done();
-        });
+      it('does not render add button on the dashboard', () => {
+        expect(findAddMetricButton()).toBeUndefined();
       });
     });
 
     describe('when available', () => {
+      let origPage;
+
       beforeEach(done => {
-        vm = shallowMount(Component, {
-          propsData: {
-            ...propsData,
-            customMetricsAvailable: true,
-            customMetricsPath: '/endpoint',
-            hasMetrics: true,
-            prometheusAlertsAvailable: true,
-            alertsEndpoint: '/endpoint',
-          },
-          store,
+        spyOn(Tracking, 'event');
+
+        createComponent({
+          customMetricsAvailable: true,
+          ...defaultProps,
         });
 
-        setTimeout(done);
+        setupComponentStore(wrapper);
+
+        origPage = document.body.dataset.page;
+        document.body.dataset.page = 'projects:environments:metrics';
+
+        wrapper.vm.$nextTick(done);
+      });
+
+      afterEach(() => {
+        document.body.dataset.page = origPage;
       });
 
       it('renders add button on the dashboard', () => {
-        expect(vm.element.querySelector('.js-add-metric-button').innerText).toContain('Add metric');
+        expect(findAddMetricButton()).toBeDefined();
       });
 
       it('uses modal for custom metrics form', () => {
-        expect(vm.find(GlModal).exists()).toBe(true);
-        expect(vm.find(GlModal).attributes().modalid).toBe('add-metric');
+        expect(wrapper.find(GlModal).exists()).toBe(true);
+        expect(wrapper.find(GlModal).attributes().modalid).toBe('add-metric');
+      });
+
+      it('adding new metric is tracked', done => {
+        const submitButton = wrapper.vm.$refs.submitCustomMetricsFormBtn;
+        wrapper.setData({ formIsValid: true });
+        wrapper.vm.$nextTick(() => {
+          submitButton.$el.click();
+          wrapper.vm.$nextTick(() => {
+            expect(Tracking.event).toHaveBeenCalledWith(
+              document.body.dataset.page,
+              'click_button',
+              {
+                label: 'add_new_metric',
+                property: 'modal',
+                value: undefined,
+              },
+            );
+            done();
+          });
+        });
       });
 
       it('renders custom metrics form fields', () => {
-        expect(vm.find(CustomMetricsFormFields).exists()).toBe(true);
+        expect(wrapper.find(CustomMetricsFormFields).exists()).toBe(true);
       });
     });
   });

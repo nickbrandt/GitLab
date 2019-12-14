@@ -38,6 +38,10 @@ describe Project do
     it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
     it { is_expected.to have_many(:packages).class_name('Packages::Package') }
     it { is_expected.to have_many(:package_files).class_name('Packages::PackageFile') }
+    it { is_expected.to have_many(:upstream_project_subscriptions) }
+    it { is_expected.to have_many(:upstream_projects) }
+    it { is_expected.to have_many(:downstream_project_subscriptions) }
+    it { is_expected.to have_many(:downstream_projects) }
 
     it { is_expected.to have_one(:github_service) }
     it { is_expected.to have_many(:project_aliases) }
@@ -541,8 +545,8 @@ describe Project do
     end
   end
 
-  describe '#beta_feature_available?' do
-    it_behaves_like 'an entity with beta feature support' do
+  describe '#alpha/beta_feature_available?' do
+    it_behaves_like 'an entity with alpha/beta feature support' do
       let(:entity) { create(:project) }
     end
   end
@@ -992,16 +996,17 @@ describe Project do
     end
   end
 
-  describe '#visible_regular_approval_rules' do
+  describe '#visible_user_defined_rules' do
     let(:project) { create(:project) }
     let!(:approval_rules) { create_list(:approval_project_rule, 2, project: project) }
+    let!(:any_approver_rule) { create(:approval_project_rule, rule_type: :any_approver, project: project) }
 
     before do
       stub_licensed_features(multiple_approval_rules: true)
     end
 
     it 'returns all approval rules' do
-      expect(project.visible_regular_approval_rules).to contain_exactly(*approval_rules)
+      expect(project.visible_user_defined_rules).to eq([any_approver_rule, *approval_rules])
     end
 
     context 'when multiple approval rules is not available' do
@@ -1010,35 +1015,30 @@ describe Project do
       end
 
       it 'returns the first approval rule' do
-        expect(project.visible_regular_approval_rules).to contain_exactly(approval_rules.first)
+        expect(project.visible_user_defined_rules).to eq([any_approver_rule])
       end
     end
   end
 
   describe '#min_fallback_approvals' do
-    let(:project) { create(:project, approvals_before_merge: 1) }
+    let(:project) { create(:project) }
 
-    it 'returns approvals before merge if there are no rules' do
-      expect(project.min_fallback_approvals).to eq(1)
+    before do
+      create(:approval_project_rule, project: project, rule_type: :any_approver, approvals_required: 2)
+      create(:approval_project_rule, project: project, approvals_required: 2)
+      create(:approval_project_rule, project: project, approvals_required: 3)
+
+      stub_licensed_features(multiple_approval_rules: true)
     end
 
-    context 'when approval rules are present' do
-      before do
-        create(:approval_project_rule, project: project, approvals_required: 2)
-        create(:approval_project_rule, project: project, approvals_required: 3)
+    it 'returns the maximum requirement' do
+      expect(project.min_fallback_approvals).to eq(3)
+    end
 
-        stub_licensed_features(multiple_approval_rules: true)
-      end
+    it 'returns the first rule requirement if there is a rule' do
+      stub_licensed_features(multiple_approval_rules: false)
 
-      it 'returns the maximum requirement' do
-        expect(project.min_fallback_approvals).to eq(3)
-      end
-
-      it 'returns the first rule requirement if there is a rule' do
-        stub_licensed_features(multiple_approval_rules: false)
-
-        expect(project.min_fallback_approvals).to eq(2)
-      end
+      expect(project.min_fallback_approvals).to eq(2)
     end
   end
 
@@ -1378,9 +1378,9 @@ describe Project do
 
   describe '#latest_pipeline_with_security_reports' do
     let(:project) { create(:project) }
-    let!(:pipeline_1) { create(:ci_pipeline_without_jobs, project: project) }
-    let!(:pipeline_2) { create(:ci_pipeline_without_jobs, project: project) }
-    let!(:pipeline_3) { create(:ci_pipeline_without_jobs, project: project) }
+    let!(:pipeline_1) { create(:ci_pipeline, project: project) }
+    let!(:pipeline_2) { create(:ci_pipeline, project: project) }
+    let!(:pipeline_3) { create(:ci_pipeline, project: project) }
 
     subject { project.latest_pipeline_with_security_reports }
 
@@ -1413,6 +1413,31 @@ describe Project do
         it "prefers the new reports" do
           is_expected.to eq(pipeline_2)
         end
+      end
+    end
+  end
+
+  describe '#latest_pipeline_with_reports' do
+    let(:project) { create(:project) }
+    let!(:pipeline_1) { create(:ee_ci_pipeline, :with_sast_report, project: project) }
+    let!(:pipeline_2) { create(:ee_ci_pipeline, :with_sast_report, project: project) }
+    let!(:pipeline_3) { create(:ee_ci_pipeline, :with_dependency_scanning_report, project: project) }
+
+    subject { project.latest_pipeline_with_reports(reports) }
+
+    context 'when reports are found' do
+      let(:reports) { ::Ci::JobArtifact.sast_reports }
+
+      it "returns the latest pipeline with reports of right type" do
+        is_expected.to eq(pipeline_2)
+      end
+    end
+
+    context 'when reports are not found' do
+      let(:reports) { ::Ci::JobArtifact.metrics_reports }
+
+      it 'returns nothing' do
+        is_expected.to be_nil
       end
     end
   end
@@ -1704,7 +1729,8 @@ describe Project do
     end
 
     context 'when there is access token' do
-      let!(:instance) { create(:operations_feature_flags_client, project: project, token: 'token') }
+      let(:token_encrypted) { Gitlab::CryptoHelper.aes256_gcm_encrypt('token') }
+      let!(:instance) { create(:operations_feature_flags_client, project: project, token_encrypted: token_encrypted) }
 
       it "provides an existing one" do
         is_expected.to eq('token')
@@ -1874,27 +1900,28 @@ describe Project do
     end
   end
 
-  describe "#design_management_enabled?" do
+  describe '#design_management_enabled?' do
     let(:project) { build(:project) }
 
-    where(
-      feature_enabled: [false, true],
-      license_enabled: [false, true],
-      lfs_enabled: [false, true]
-    )
+    where(:license_enabled, :lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
+      false | false | false | false | false
+      true  | false | false | false | false
+      true  | true  | false | false | true
+      true  | true  | false | true  | false
+      true  | true  | true  | false | true
+      true  | true  | true  | true  | true
+    end
 
     with_them do
       before do
         stub_licensed_features(design_management: license_enabled)
-        stub_feature_flags(design_management_flag: feature_enabled)
+        stub_feature_flags(design_management_require_hashed_storage: hash_storage_required)
         expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
+        allow(project).to receive(:hashed_storage?).with(:repository).and_return(hashed_storage_enabled)
       end
 
-      # Design management is only available if all dependencies are enabled
-      let(:expected) { feature_enabled && license_enabled && lfs_enabled }
-
-      it "knows if design management is available" do
-        expect(project.design_management_enabled?).to be(expected)
+      it do
+        expect(project.design_management_enabled?).to be(expectation)
       end
     end
   end
@@ -2318,6 +2345,66 @@ describe Project do
           let(:package_type) { nil }
         end
       end
+    end
+  end
+
+  describe 'caculate template repositories' do
+    let(:group1) { create(:group) }
+    let(:group2) { create(:group) }
+    let(:group2_sub1) { create(:group, parent: group2) }
+    let(:group2_sub2) { create(:group, parent: group2) }
+
+    before do
+      stub_ee_application_setting(custom_project_templates_group_id: group2.id)
+      group2.update(custom_project_templates_group_id: group2_sub2.id)
+      create(:project, group: group1)
+
+      2.times do
+        create(:project, group: group2)
+      end
+      3.times do
+        create(:project, group: group2_sub1)
+      end
+      4.times do
+        create(:project, group: group2_sub2)
+      end
+    end
+
+    it 'counts instance level templates' do
+      expect(described_class.with_repos_templates.count).to eq(2)
+    end
+
+    it 'counts group level templates' do
+      expect(described_class.with_groups_level_repos_templates.count).to eq(4)
+    end
+  end
+
+  describe '#license_compliance' do
+    it { expect(subject.license_compliance).to be_instance_of(::SCA::LicenseCompliance) }
+  end
+
+  describe '#expire_caches_before_rename' do
+    let(:project) { create(:project, :repository) }
+    let(:repo)    { double(:repo, exists?: true, before_delete: true) }
+    let(:wiki)    { double(:wiki, exists?: true, before_delete: true) }
+    let(:design)  { double(:design, exists?: true) }
+
+    it 'expires the caches of the design repository' do
+      allow(Repository).to receive(:new)
+        .with('foo', project)
+        .and_return(repo)
+
+      allow(Repository).to receive(:new)
+        .with('foo.wiki', project)
+        .and_return(wiki)
+
+      allow(Repository).to receive(:new)
+        .with('foo.design', project)
+        .and_return(design)
+
+      expect(design).to receive(:before_delete)
+
+      project.expire_caches_before_rename('foo')
     end
   end
 end

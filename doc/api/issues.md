@@ -113,6 +113,7 @@ Example response:
       "id" : 76,
       "title" : "Consequatur vero maxime deserunt laboriosam est voluptas dolorem.",
       "created_at" : "2016-01-04T15:31:51.081Z",
+      "moved_to_id" : null,
       "iid" : 6,
       "labels" : ["foo", "bar"],
       "upvotes": 4,
@@ -577,20 +578,31 @@ the `weight` parameter:
 ```
 
 Users on GitLab [Ultimate](https://about.gitlab.com/pricing/) will additionally see
-the `epic_iid` property:
+the `epic` property:
 
-```json
+```javascript
 {
    "project_id" : 4,
    "description" : "Omnis vero earum sunt corporis dolor et placeat.",
-   "epic_iid" : 42,
-   ...
+   "epic": {
+   "epic_iid" : 5, //deprecated, use `iid` of the `epic` attribute
+   "epic": {
+     "id" : 42,
+     "iid" : 5,
+     "title": "My epic epic",
+     "url" : "/groups/h5bp/-/epics/5",
+     "group_id": 8
+   },
+   // ...
 }
 ```
 
 **Note**: `assignee` column is deprecated, now we show it as a single-sized array `assignees` to conform to the GitLab EE API.
 
 **Note**: The `closed_by` attribute was [introduced in GitLab 10.6][ce-17042]. This value will only be present for issues which were closed after GitLab 10.6 and when the user account that closed the issue still exists.
+
+**Note**: The `epic_iid` attribute is deprecated and [will be removed in 13.0](https://gitlab.com/gitlab-org/gitlab/issues/35157).
+Please use `iid` of the `epic` attribute instead.
 
 ## New issue
 
@@ -615,7 +627,8 @@ POST /projects/:id/issues
 | `merge_request_to_resolve_discussions_of` | integer        | no       | The IID of a merge request in which to resolve all issues. This will fill the issue with a default description and mark all discussions as resolved. When passing a description or title, these values will take precedence over the default values.|
 | `discussion_to_resolve`                   | string         | no       | The ID of a discussion to resolve. This will fill in the issue with a default description and mark the discussion as resolved. Use in combination with `merge_request_to_resolve_discussions_of`. |
 | `weight` **(STARTER)**                    | integer        | no       | The weight of the issue. Valid values are greater than or equal to 0. |
-| `epic_iid` **(ULTIMATE)** | integer | no | IID of the epic to add the issue to. Valid values are greater than or equal to 0. |
+| `epic_id` **(ULTIMATE)** | integer | no | ID of the epic to add the issue to. Valid values are greater than or equal to 0. |
+| `epic_iid` **(ULTIMATE)** | integer | no | IID of the epic to add the issue to. Valid values are greater than or equal to 0. (deprecated, [will be removed in 13.0](https://gitlab.com/gitlab-org/gitlab/issues/35157)) |
 
 ```bash
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/4/issues?title=Issues%20with%20auth&labels=bug
@@ -717,7 +730,8 @@ PUT /projects/:id/issues/:issue_iid
 | `due_date`     | string  | no       | Date time string in the format YEAR-MONTH-DAY, e.g. `2016-03-11`                                           |
 | `weight` **(STARTER)** | integer | no | The weight of the issue. Valid values are greater than or equal to 0. 0                                                                    |
 | `discussion_locked` | boolean | no  | Flag indicating if the issue's discussion is locked. If the discussion is locked only project members can add or edit comments. |
-| `epic_iid` **(ULTIMATE)** | integer | no | IID of the epic to add the issue to. Valid values are greater than or equal to 0. |
+| `epic_id` **(ULTIMATE)** | integer | no | ID of the epic to add the issue to. Valid values are greater than or equal to 0. |
+| `epic_iid` **(ULTIMATE)** | integer | no | IID of the epic to add the issue to. Valid values are greater than or equal to 0. (deprecated, [will be removed in 13.0](https://gitlab.com/gitlab-org/gitlab/issues/35157)) |
 
 ```bash
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/4/issues/85?state_event=close
@@ -1416,6 +1430,7 @@ Example response:
     "merge_status": "cannot_be_merged",
     "sha": "3b7b528e9353295c1c125dad281ac5b5deae5f12",
     "merge_commit_sha": null,
+    "squash_commit_sha": null,
     "discussion_locked": null,
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,
@@ -1546,6 +1561,7 @@ Example response:
     "merge_status": "unchecked",
     "sha": "5a62481d563af92b8e32d735f2fa63b94e806835",
     "merge_commit_sha": null,
+    "squash_commit_sha": null,
     "user_notes_count": 1,
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,

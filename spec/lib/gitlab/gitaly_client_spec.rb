@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 # We stub Gitaly in `spec/support/gitaly.rb` for other tests. We don't want
@@ -24,7 +26,7 @@ describe Gitlab::GitalyClient do
 
     context 'running in Unicorn' do
       before do
-        stub_const('Unicorn', 1)
+        allow(Gitlab::Runtime).to receive(:unicorn?).and_return(true)
       end
 
       it { expect(subject.long_timeout).to eq(55) }
@@ -32,7 +34,7 @@ describe Gitlab::GitalyClient do
 
     context 'running in Puma' do
       before do
-        stub_const('Puma', 1)
+        allow(Gitlab::Runtime).to receive(:puma?).and_return(true)
       end
 
       it { expect(subject.long_timeout).to eq(55) }
@@ -53,7 +55,9 @@ describe Gitlab::GitalyClient do
     it 'returns an empty string when the storage is not found in the response' do
       response = double("response")
       allow(response).to receive(:storage_statuses).and_return([])
-      allow_any_instance_of(Gitlab::GitalyClient::ServerService).to receive(:info).and_return(response)
+      allow_next_instance_of(Gitlab::GitalyClient::ServerService) do |instance|
+        allow(instance).to receive(:info).and_return(response)
+      end
 
       expect(described_class.filesystem_id('default')).to eq(nil)
     end
@@ -82,12 +86,11 @@ describe Gitlab::GitalyClient do
 
   describe '.stub_certs' do
     it 'skips certificates if OpenSSLError is raised and report it' do
-      expect(Rails.logger).to receive(:error).at_least(:once)
       expect(Gitlab::Sentry)
-        .to receive(:track_exception)
+        .to receive(:track_and_raise_for_dev_exception)
         .with(
           a_kind_of(OpenSSL::X509::CertificateError),
-          extra: { cert_file: a_kind_of(String) }).at_least(:once)
+          cert_file: a_kind_of(String)).at_least(:once)
 
       expect(OpenSSL::X509::Certificate)
         .to receive(:new)

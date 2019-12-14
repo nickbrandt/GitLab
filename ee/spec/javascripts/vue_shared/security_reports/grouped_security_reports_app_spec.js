@@ -1,14 +1,14 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import component from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
+import GroupedSecurityReportsApp from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import state from 'ee/vue_shared/security_reports/store/state';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import sastState from 'ee/vue_shared/security_reports/store/modules/sast/state';
 import * as sastTypes from 'ee/vue_shared/security_reports/store/modules/sast/mutation_types';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { mount } from '@vue/test-utils';
 import { waitForMutation } from 'spec/helpers/vue_test_utils_helper';
 import { trimText } from 'spec/helpers/text_helper';
+import axios from '~/lib/utils/axios_utils';
 import {
   sastIssues,
   sastIssuesBase,
@@ -19,20 +19,27 @@ import {
 } from './mock_data';
 
 describe('Grouped security reports app', () => {
-  let vm;
+  let wrapper;
   let mock;
-  const Component = Vue.extend(component);
+
+  const createWrapper = (propsData, provide = {}) => {
+    wrapper = mount(GroupedSecurityReportsApp, {
+      propsData,
+      provide,
+      sync: false,
+    });
+  };
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
   });
 
   afterEach(() => {
-    vm.$store.replaceState({
+    wrapper.vm.$store.replaceState({
       ...state(),
       sast: sastState(),
     });
-    vm.$destroy();
+    wrapper.vm.$destroy();
     mock.restore();
   });
 
@@ -48,7 +55,7 @@ describe('Grouped security reports app', () => {
       mock.onGet('dss_base.json').reply(500);
       mock.onGet('vulnerability_feedback_path.json').reply(500, []);
 
-      vm = mountComponent(Component, {
+      createWrapper({
         headBlobPath: 'path',
         baseBlobPath: 'path',
         sastHeadPath: 'sast_head.json',
@@ -72,30 +79,34 @@ describe('Grouped security reports app', () => {
       });
 
       Promise.all([
-        waitForMutation(vm.$store, `sast/${sastTypes.RECEIVE_REPORTS_ERROR}`),
-        waitForMutation(vm.$store, types.RECEIVE_SAST_CONTAINER_ERROR),
-        waitForMutation(vm.$store, types.RECEIVE_DAST_ERROR),
-        waitForMutation(vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_ERROR),
+        waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_REPORTS_ERROR}`),
+        waitForMutation(wrapper.vm.$store, types.RECEIVE_SAST_CONTAINER_ERROR),
+        waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_ERROR),
+        waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_ERROR),
       ])
         .then(done)
         .catch(done.fail);
     });
 
     it('renders error state', () => {
-      expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
-      expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
+      expect(wrapper.vm.$el.querySelector('.gl-spinner')).toBeNull();
+      expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
         'Security scanning failed loading any results',
       );
 
-      expect(vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
+      expect(wrapper.vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
 
-      expect(trimText(vm.$el.textContent)).toContain('SAST: Loading resulted in an error');
-      expect(trimText(vm.$el.textContent)).toContain(
+      expect(trimText(wrapper.vm.$el.textContent)).toContain('SAST: Loading resulted in an error');
+
+      expect(trimText(wrapper.vm.$el.textContent)).toContain(
         'Dependency scanning: Loading resulted in an error',
       );
 
-      expect(vm.$el.textContent).toContain('Container scanning: Loading resulted in an error');
-      expect(vm.$el.textContent).toContain('DAST: Loading resulted in an error');
+      expect(wrapper.vm.$el.textContent).toContain(
+        'Container scanning: Loading resulted in an error',
+      );
+
+      expect(wrapper.vm.$el.textContent).toContain('DAST: Loading resulted in an error');
     });
   });
 
@@ -111,7 +122,7 @@ describe('Grouped security reports app', () => {
       mock.onGet('dss_base.json').reply(200, sastIssuesBase);
       mock.onGet('vulnerability_feedback_path.json').reply(200, []);
 
-      vm = mountComponent(Component, {
+      createWrapper({
         headBlobPath: 'path',
         baseBlobPath: 'path',
         sastHeadPath: 'sast_head.json',
@@ -136,17 +147,17 @@ describe('Grouped security reports app', () => {
     });
 
     it('renders loading summary text + spinner', () => {
-      expect(vm.$el.querySelector('.gl-spinner')).not.toBeNull();
-      expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
+      expect(wrapper.vm.$el.querySelector('.gl-spinner')).not.toBeNull();
+      expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
         'Security scanning is loading',
       );
 
-      expect(vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
+      expect(wrapper.vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
 
-      expect(vm.$el.textContent).toContain('SAST is loading');
-      expect(vm.$el.textContent).toContain('Dependency scanning is loading');
-      expect(vm.$el.textContent).toContain('Container scanning is loading');
-      expect(vm.$el.textContent).toContain('DAST is loading');
+      expect(wrapper.vm.$el.textContent).toContain('SAST is loading');
+      expect(wrapper.vm.$el.textContent).toContain('Dependency scanning is loading');
+      expect(wrapper.vm.$el.textContent).toContain('Container scanning is loading');
+      expect(wrapper.vm.$el.textContent).toContain('DAST is loading');
     });
   });
 
@@ -162,7 +173,7 @@ describe('Grouped security reports app', () => {
       mock.onGet('dss_base.json').reply(200, sastIssuesBase);
       mock.onGet('vulnerability_feedback_path.json').reply(200, []);
 
-      vm = mountComponent(Component, {
+      createWrapper({
         headBlobPath: 'path',
         baseBlobPath: 'path',
         sastHeadPath: 'sast_head.json',
@@ -186,10 +197,10 @@ describe('Grouped security reports app', () => {
       });
 
       Promise.all([
-        waitForMutation(vm.$store, `sast/${sastTypes.RECEIVE_REPORTS}`),
-        waitForMutation(vm.$store, types.RECEIVE_DAST_REPORTS),
-        waitForMutation(vm.$store, types.RECEIVE_SAST_CONTAINER_REPORTS),
-        waitForMutation(vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_REPORTS),
+        waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_REPORTS}`),
+        waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_REPORTS),
+        waitForMutation(wrapper.vm.$store, types.RECEIVE_SAST_CONTAINER_REPORTS),
+        waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_REPORTS),
       ])
         .then(done)
         .catch(done.fail);
@@ -197,45 +208,47 @@ describe('Grouped security reports app', () => {
 
     it('renders reports', () => {
       // It's not loading
-      expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
+      expect(wrapper.vm.$el.querySelector('.gl-spinner')).toBeNull();
 
       // Renders the summary text
-      expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
+      expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
         'Security scanning detected 6 new, and 3 fixed vulnerabilities',
       );
 
       // Renders the expand button
-      expect(vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
+      expect(wrapper.vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
 
       // Renders Sast result
-      expect(trimText(vm.$el.textContent)).toContain(
+      expect(trimText(wrapper.vm.$el.textContent)).toContain(
         'SAST detected 2 new, and 1 fixed vulnerabilities',
       );
 
       // Renders DSS result
-      expect(trimText(vm.$el.textContent)).toContain(
+      expect(trimText(wrapper.vm.$el.textContent)).toContain(
         'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
       );
 
       // Renders container scanning result
-      expect(vm.$el.textContent).toContain(
+      expect(wrapper.vm.$el.textContent).toContain(
         'Container scanning detected 1 new, and 1 fixed vulnerabilities',
       );
 
       // Renders DAST result
-      expect(vm.$el.textContent).toContain('DAST detected 1 new vulnerability');
+      expect(wrapper.vm.$el.textContent).toContain('DAST detected 1 new vulnerability');
     });
 
     it('opens modal with more information', done => {
       setTimeout(() => {
-        vm.$el.querySelector('.break-link').click();
+        wrapper.vm.$el.querySelector('.break-link').click();
 
         Vue.nextTick(() => {
-          expect(vm.$el.querySelector('.modal-title').textContent.trim()).toEqual(
+          expect(wrapper.vm.$el.querySelector('.modal-title').textContent.trim()).toEqual(
             sastIssues[0].message,
           );
 
-          expect(vm.$el.querySelector('.modal-body').textContent).toContain(sastIssues[0].solution);
+          expect(wrapper.vm.$el.querySelector('.modal-body').textContent).toContain(
+            sastIssues[0].solution,
+          );
 
           done();
         });
@@ -244,7 +257,7 @@ describe('Grouped security reports app', () => {
 
     it('has the success icon for fixed vulnerabilities', done => {
       setTimeout(() => {
-        const icon = vm.$el.querySelector(
+        const icon = wrapper.vm.$el.querySelector(
           '.js-sast-container~.js-plain-element .ic-status_success_borderless',
         );
 
@@ -258,7 +271,7 @@ describe('Grouped security reports app', () => {
     const pipelinePath = '/path/to/the/pipeline';
 
     beforeEach(() => {
-      vm = mountComponent(Component, {
+      createWrapper({
         headBlobPath: 'path',
         canCreateIssue: false,
         canCreateMergeRequest: false,
@@ -268,18 +281,34 @@ describe('Grouped security reports app', () => {
     });
 
     it('should calculate the security tab path', () => {
-      expect(vm.securityTab).toEqual(`${pipelinePath}/security`);
+      expect(wrapper.vm.securityTab).toEqual(`${pipelinePath}/security`);
     });
   });
 
   describe('with the reports API enabled', () => {
     describe('container scanning reports', () => {
       const sastContainerEndpoint = 'sast_container.json';
+      const props = {
+        headBlobPath: 'path',
+        baseBlobPath: 'path',
+        sastHelpPath: 'path',
+        sastContainerHelpPath: 'path',
+        dastHelpPath: 'path',
+        dependencyScanningHelpPath: 'path',
+        vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
+        vulnerabilityFeedbackHelpPath: 'path',
+        pipelineId: 123,
+        canCreateIssue: true,
+        canCreateMergeRequest: true,
+        canDismissVulnerability: true,
+      };
+      const provide = {
+        glFeatures: {
+          containerScanningMergeRequestReportApi: true,
+        },
+      };
 
-      beforeEach(done => {
-        gon.features = gon.features || {};
-        gon.features.containerScanningMergeRequestReportApi = true;
-
+      beforeEach(() => {
         gl.mrWidgetData = gl.mrWidgetData || {};
         gl.mrWidgetData.container_scanning_comparison_path = sastContainerEndpoint;
 
@@ -289,45 +318,78 @@ describe('Grouped security reports app', () => {
         });
 
         mock.onGet('vulnerability_feedback_path.json').reply(200, []);
+      });
 
-        vm = mountComponent(Component, {
-          headBlobPath: 'path',
-          baseBlobPath: 'path',
-          sastHelpPath: 'path',
-          sastContainerHelpPath: 'path',
-          dastHelpPath: 'path',
-          dependencyScanningHelpPath: 'path',
-          vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
-          vulnerabilityFeedbackHelpPath: 'path',
-          pipelineId: 123,
-          canCreateIssue: true,
-          canCreateMergeRequest: true,
-          canDismissVulnerability: true,
+      describe('with reports disabled', () => {
+        beforeEach(() => {
+          createWrapper(
+            {
+              ...props,
+              enabledReports: {
+                containerScanning: false,
+              },
+            },
+            provide,
+          );
         });
 
-        waitForMutation(vm.$store, types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS)
-          .then(done)
-          .catch(done.fail);
+        it('should not render the widget', () => {
+          expect(wrapper.vm.$el.querySelector('.js-sast-container')).toBeNull();
+        });
       });
 
-      it('should set setSastContainerDiffEndpoint', () => {
-        expect(vm.sastContainer.paths.diffEndpoint).toEqual(sastContainerEndpoint);
-      });
+      describe('with reports enabled', () => {
+        beforeEach(done => {
+          createWrapper(
+            {
+              ...props,
+              enabledReports: {
+                containerScanning: true,
+              },
+            },
+            provide,
+          );
 
-      it('should display the correct numbers of vulnerabilities', () => {
-        expect(vm.$el.textContent).toContain(
-          'Container scanning detected 2 new, and 1 fixed vulnerabilities',
-        );
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS)
+            .then(done)
+            .catch(done.fail);
+        });
+
+        it('should set setSastContainerDiffEndpoint', () => {
+          expect(wrapper.vm.sastContainer.paths.diffEndpoint).toEqual(sastContainerEndpoint);
+        });
+
+        it('should display the correct numbers of vulnerabilities', () => {
+          expect(wrapper.vm.$el.textContent).toContain(
+            'Container scanning detected 2 new, and 1 fixed vulnerabilities',
+          );
+        });
       });
     });
 
     describe('dependency scanning reports', () => {
       const dependencyScanningEndpoint = 'dependency_scanning.json';
+      const props = {
+        headBlobPath: 'path',
+        baseBlobPath: 'path',
+        sastHelpPath: 'path',
+        sastContainerHelpPath: 'path',
+        dastHelpPath: 'path',
+        dependencyScanningHelpPath: 'path',
+        vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
+        vulnerabilityFeedbackHelpPath: 'path',
+        pipelineId: 123,
+        canCreateIssue: true,
+        canCreateMergeRequest: true,
+        canDismissVulnerability: true,
+      };
+      const provide = {
+        glFeatures: {
+          dependencyScanningMergeRequestReportApi: true,
+        },
+      };
 
-      beforeEach(done => {
-        gon.features = gon.features || {};
-        gon.features.dependencyScanningMergeRequestReportApi = true;
-
+      beforeEach(() => {
         gl.mrWidgetData = gl.mrWidgetData || {};
         gl.mrWidgetData.dependency_scanning_comparison_path = dependencyScanningEndpoint;
 
@@ -337,45 +399,80 @@ describe('Grouped security reports app', () => {
         });
 
         mock.onGet('vulnerability_feedback_path.json').reply(200, []);
+      });
 
-        vm = mountComponent(Component, {
-          headBlobPath: 'path',
-          baseBlobPath: 'path',
-          sastHelpPath: 'path',
-          sastContainerHelpPath: 'path',
-          dastHelpPath: 'path',
-          dependencyScanningHelpPath: 'path',
-          vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
-          vulnerabilityFeedbackHelpPath: 'path',
-          pipelineId: 123,
-          canCreateIssue: true,
-          canCreateMergeRequest: true,
-          canDismissVulnerability: true,
+      describe('with reports disabled', () => {
+        beforeEach(() => {
+          createWrapper(
+            {
+              ...props,
+              enabledReports: {
+                dependencyScanning: false,
+              },
+            },
+            provide,
+          );
         });
 
-        waitForMutation(vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS)
-          .then(done)
-          .catch(done.fail);
+        it('should not render the widget', () => {
+          expect(wrapper.vm.$el.querySelector('.js-dependency-scanning-widget')).toBeNull();
+        });
       });
 
-      it('should set setDependencyScanningDiffEndpoint', () => {
-        expect(vm.dependencyScanning.paths.diffEndpoint).toEqual(dependencyScanningEndpoint);
-      });
+      describe('with reports enabled', () => {
+        beforeEach(done => {
+          createWrapper(
+            {
+              ...props,
+              enabledReports: {
+                dependencyScanning: true,
+              },
+            },
+            provide,
+          );
 
-      it('should display the correct numbers of vulnerabilities', () => {
-        expect(vm.$el.textContent).toContain(
-          'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
-        );
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS)
+            .then(done)
+            .catch(done.fail);
+        });
+
+        it('should set setDependencyScanningDiffEndpoint', () => {
+          expect(wrapper.vm.dependencyScanning.paths.diffEndpoint).toEqual(
+            dependencyScanningEndpoint,
+          );
+        });
+
+        it('should display the correct numbers of vulnerabilities', () => {
+          expect(wrapper.vm.$el.textContent).toContain(
+            'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
+          );
+        });
       });
     });
 
     describe('dast reports', () => {
       const dastEndpoint = 'dast.json';
+      const props = {
+        headBlobPath: 'path',
+        baseBlobPath: 'path',
+        sastHelpPath: 'path',
+        sastContainerHelpPath: 'path',
+        dastHelpPath: 'path',
+        dependencyScanningHelpPath: 'path',
+        vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
+        vulnerabilityFeedbackHelpPath: 'path',
+        pipelineId: 123,
+        canCreateIssue: true,
+        canCreateMergeRequest: true,
+        canDismissVulnerability: true,
+      };
+      const provide = {
+        glFeatures: {
+          dastMergeRequestReportApi: true,
+        },
+      };
 
-      beforeEach(done => {
-        gon.features = gon.features || {};
-        gon.features.dastMergeRequestReportApi = true;
-
+      beforeEach(() => {
         gl.mrWidgetData = gl.mrWidgetData || {};
         gl.mrWidgetData.dast_comparison_path = dastEndpoint;
 
@@ -385,43 +482,78 @@ describe('Grouped security reports app', () => {
         });
 
         mock.onGet('vulnerability_feedback_path.json').reply(200, []);
+      });
 
-        vm = mountComponent(Component, {
-          headBlobPath: 'path',
-          baseBlobPath: 'path',
-          sastHelpPath: 'path',
-          sastContainerHelpPath: 'path',
-          dastHelpPath: 'path',
-          dependencyScanningHelpPath: 'path',
-          vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
-          vulnerabilityFeedbackHelpPath: 'path',
-          pipelineId: 123,
-          canCreateIssue: true,
-          canCreateMergeRequest: true,
-          canDismissVulnerability: true,
+      describe('with reports disabled', () => {
+        beforeEach(() => {
+          createWrapper(
+            {
+              ...props,
+              enabledReports: {
+                dast: false,
+              },
+            },
+            provide,
+          );
         });
 
-        waitForMutation(vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS)
-          .then(done)
-          .catch(done.fail);
+        it('should not render the widget', () => {
+          expect(wrapper.vm.$el.querySelector('.js-dast-widget')).toBeNull();
+        });
       });
 
-      it('should set setDastDiffEndpoint', () => {
-        expect(vm.dast.paths.diffEndpoint).toEqual(dastEndpoint);
-      });
+      describe('with reports enabled', () => {
+        beforeEach(done => {
+          createWrapper(
+            {
+              ...props,
+              enabledReports: {
+                dast: true,
+              },
+            },
+            provide,
+          );
 
-      it('should display the correct numbers of vulnerabilities', () => {
-        expect(vm.$el.textContent).toContain('DAST detected 1 new, and 2 fixed vulnerabilities');
+          waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS)
+            .then(done)
+            .catch(done.fail);
+        });
+
+        it('should set setDastDiffEndpoint', () => {
+          expect(wrapper.vm.dast.paths.diffEndpoint).toEqual(dastEndpoint);
+        });
+
+        it('should display the correct numbers of vulnerabilities', () => {
+          expect(wrapper.vm.$el.textContent).toContain(
+            'DAST detected 1 new, and 2 fixed vulnerabilities',
+          );
+        });
       });
     });
 
     describe('sast reports', () => {
       const sastEndpoint = 'sast.json';
+      const props = {
+        headBlobPath: 'path',
+        baseBlobPath: 'path',
+        sastHelpPath: 'path',
+        sastContainerHelpPath: 'path',
+        dastHelpPath: 'path',
+        dependencyScanningHelpPath: 'path',
+        vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
+        vulnerabilityFeedbackHelpPath: 'path',
+        pipelineId: 123,
+        canCreateIssue: true,
+        canCreateMergeRequest: true,
+        canDismissVulnerability: true,
+      };
+      const provide = {
+        glFeatures: {
+          sastMergeRequestReportApi: true,
+        },
+      };
 
-      beforeEach(done => {
-        gon.features = gon.features || {};
-        gon.features.sastMergeRequestReportApi = true;
-
+      beforeEach(() => {
         gl.mrWidgetData = gl.mrWidgetData || {};
         gl.mrWidgetData.sast_comparison_path = sastEndpoint;
 
@@ -432,33 +564,52 @@ describe('Grouped security reports app', () => {
         });
 
         mock.onGet('vulnerability_feedback_path.json').reply(200, []);
+      });
 
-        vm = mountComponent(Component, {
-          headBlobPath: 'path',
-          baseBlobPath: 'path',
-          sastHelpPath: 'path',
-          sastContainerHelpPath: 'path',
-          dastHelpPath: 'path',
-          dependencyScanningHelpPath: 'path',
-          vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
-          vulnerabilityFeedbackHelpPath: 'path',
-          pipelineId: 123,
-          canCreateIssue: true,
-          canCreateMergeRequest: true,
-          canDismissVulnerability: true,
+      describe('with reports disabled', () => {
+        beforeEach(() => {
+          createWrapper(
+            {
+              ...props,
+              enabledReports: {
+                sast: false,
+              },
+            },
+            provide,
+          );
         });
 
-        waitForMutation(vm.$store, `sast/${sastTypes.RECEIVE_DIFF_SUCCESS}`)
-          .then(done)
-          .catch(done.fail);
+        it('should not render the widget', () => {
+          expect(wrapper.vm.$el.querySelector('.js-sast-widget')).toBeNull();
+        });
       });
 
-      it('should set setSastDiffEndpoint', () => {
-        expect(vm.sast.paths.diffEndpoint).toEqual(sastEndpoint);
-      });
+      describe('with reports enabled', () => {
+        beforeEach(done => {
+          createWrapper(
+            {
+              ...props,
+              enabledReports: {
+                sast: true,
+              },
+            },
+            provide,
+          );
 
-      it('should display the correct numbers of vulnerabilities', () => {
-        expect(vm.$el.textContent).toContain('SAST detected 1 new, and 2 fixed vulnerabilities');
+          waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_DIFF_SUCCESS}`)
+            .then(done)
+            .catch(done.fail);
+        });
+
+        it('should set setSastDiffEndpoint', () => {
+          expect(wrapper.vm.sast.paths.diffEndpoint).toEqual(sastEndpoint);
+        });
+
+        it('should display the correct numbers of vulnerabilities', () => {
+          expect(wrapper.vm.$el.textContent).toContain(
+            'SAST detected 1 new, and 2 fixed vulnerabilities',
+          );
+        });
       });
     });
   });

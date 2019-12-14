@@ -43,6 +43,12 @@ describe GroupClusterablePresenter do
     it { is_expected.to eq(new_group_cluster_path(group)) }
   end
 
+  describe '#authorize_aws_role_path' do
+    subject { presenter.authorize_aws_role_path }
+
+    it { is_expected.to eq(authorize_aws_role_group_clusters_path(group)) }
+  end
+
   describe '#create_user_clusters_path' do
     subject { presenter.create_user_clusters_path }
 
@@ -75,6 +81,12 @@ describe GroupClusterablePresenter do
     subject { presenter.update_applications_cluster_path(cluster, application) }
 
     it { is_expected.to eq(update_applications_group_cluster_path(group, cluster, application)) }
+  end
+
+  describe '#clear_cluster_cache_path' do
+    subject { presenter.clear_cluster_cache_path(cluster) }
+
+    it { is_expected.to eq(clear_cache_group_cluster_path(group, cluster)) }
   end
 
   describe '#cluster_path' do

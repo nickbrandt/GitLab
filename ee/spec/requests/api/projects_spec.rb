@@ -143,7 +143,7 @@ describe API::Projects do
     end
 
     describe 'packages_enabled attribute' do
-      it 'exposed when the feature is available' do
+      it 'is exposed when the feature is available' do
         stub_licensed_features(packages: true)
 
         get api("/projects/#{project.id}", user)
@@ -151,12 +151,32 @@ describe API::Projects do
         expect(json_response).to have_key 'packages_enabled'
       end
 
-      it 'not exposed when the feature is available' do
+      it 'is not exposed when the feature is not available' do
         stub_licensed_features(packages: false)
 
         get api("/projects/#{project.id}", user)
 
         expect(json_response).not_to have_key 'packages_enabled'
+      end
+    end
+
+    describe 'service desk attributes' do
+      it 'are exposed when the feature is available' do
+        stub_licensed_features(service_desk: true)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).to have_key 'service_desk_enabled'
+        expect(json_response).to have_key 'service_desk_address'
+      end
+
+      it 'are not exposed when the feature is not available' do
+        stub_licensed_features(service_desk: false)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).not_to have_key 'service_desk_enabled'
+        expect(json_response).not_to have_key 'service_desk_address'
       end
     end
 
@@ -182,74 +202,167 @@ describe API::Projects do
     end
   end
 
+  # Assumes the following variables are defined:
+  # group
+  # project
+  # new_project_name
+  # api_call
+  shared_examples 'creates projects with templates' do
+    before do
+      group.add_maintainer(user)
+      stub_licensed_features(custom_project_templates: true)
+      stub_ee_application_setting(custom_project_templates_group_id: group.id)
+    end
+
+    it 'creates a project using a template' do
+      expect(ProjectExportWorker).to receive(:perform_async).and_call_original
+
+      Sidekiq::Testing.fake! do
+        expect { api_call }.to change { Project.count }.by(1)
+      end
+
+      expect(response).to have_gitlab_http_status(201)
+
+      project = Project.find(json_response['id'])
+      expect(project.name).to eq(new_project_name)
+    end
+
+    it 'returns a 400 error for an invalid template name' do
+      project_params.delete(:template_project_id)
+      project_params[:template_name] = 'bogus-template'
+
+      expect { api_call }.not_to change { Project.count }
+
+      expect(response).to have_gitlab_http_status(400)
+      expect(json_response['message']['template_name']).to eq(["'bogus-template' is unknown or invalid"])
+    end
+
+    it 'returns a 400 error for an invalid template ID' do
+      project_params.delete(:template_name)
+      new_project = create(:project)
+      project_params[:template_project_id] = new_project.id
+
+      expect { api_call }.not_to change { Project.count }
+
+      expect(response).to have_gitlab_http_status(400)
+      expect(json_response['message']['template_project_id']).to eq(["#{new_project.id} is unknown or invalid"])
+    end
+  end
+
+  shared_context 'base instance template models' do
+    let(:group) { create(:group) }
+    let!(:project) { create(:project, :public, namespace: group) }
+    let(:new_project_name) { "project-#{SecureRandom.hex}" }
+  end
+
+  shared_context 'instance template name' do
+    include_context 'base instance template models'
+
+    let(:project_params) do
+      {
+        template_name: project.name,
+        name: new_project_name,
+        path: new_project_name,
+        use_custom_template: true,
+        namespace_id: group.id
+      }
+    end
+  end
+
+  shared_context 'instance template ID' do
+    include_context 'base instance template models'
+
+    let(:project_params) do
+      {
+        template_project_id: project.id,
+        name: new_project_name,
+        path: new_project_name,
+        use_custom_template: true,
+        namespace_id: group.id
+      }
+    end
+  end
+
+  shared_context 'base group template models' do
+    let(:parent_group) { create(:group) }
+    let(:subgroup) { create(:group, :public, parent: parent_group) }
+    let(:group) { subgroup }
+    let!(:project) { create(:project, :public, namespace: subgroup) }
+    let(:new_project_name) { "project-#{SecureRandom.hex}" }
+  end
+
+  shared_context 'group template name' do
+    include_context 'base group template models'
+
+    let(:project_params) do
+      {
+        template_name: project.name,
+        name: new_project_name,
+        path: new_project_name,
+        use_custom_template: true,
+        group_with_project_templates_id: subgroup.id,
+        namespace_id: subgroup.id
+      }
+    end
+  end
+
+  shared_context 'group template ID' do
+    include_context 'base group template models'
+
+    let(:project_params) do
+      {
+        template_project_id: project.id,
+        name: new_project_name,
+        path: new_project_name,
+        use_custom_template: true,
+        group_with_project_templates_id: subgroup.id,
+        namespace_id: subgroup.id
+      }
+    end
+  end
+
+  describe 'POST /projects/user/:id' do
+    let(:admin) { create(:admin) }
+    let(:api_call) { post api("/projects/user/#{user.id}", admin), params: project_params }
+
+    context 'with templates' do
+      include_context 'instance template name' do
+        it_behaves_like 'creates projects with templates'
+      end
+
+      include_context 'instance template ID' do
+        it_behaves_like 'creates projects with templates'
+      end
+
+      include_context 'group template name' do
+        it_behaves_like 'creates projects with templates'
+      end
+
+      include_context 'group template ID' do
+        it_behaves_like 'creates projects with templates'
+      end
+    end
+  end
+
   describe 'POST /projects' do
-    shared_examples 'creates projects with templates' do
-      before do
-        group.add_maintainer(user)
-        stub_licensed_features(custom_project_templates: true)
-        stub_ee_application_setting(custom_project_templates_group_id: group.id)
+    let(:api_call) { post api('/projects', user), params: project_params }
+
+    context 'with templates' do
+      include_context 'instance template name' do
+        it_behaves_like 'creates projects with templates'
       end
 
-      it 'creates a project using a template' do
-        expect(ProjectExportWorker).to receive(:perform_async).and_call_original
-
-        Sidekiq::Testing.fake! do
-          expect { post api('/projects', user), params: project_params }
-            .to change { Project.count }.by(1)
-        end
-
-        expect(response).to have_gitlab_http_status(201)
-
-        project = Project.find(json_response['id'])
-        expect(project.name).to eq(new_project_name)
+      include_context 'instance template ID' do
+        it_behaves_like 'creates projects with templates'
       end
 
-      it 'returns a 400 error for an invalid template name' do
-        project_params[:template_name] = 'bogus-template'
-
-        expect { post api('/projects', user), params: project_params }
-          .not_to change { Project.count }
-
-        expect(response).to have_gitlab_http_status(400)
-        expect(json_response['message']['template_name']).to eq(["'bogus-template' is unknown or invalid"])
-      end
-    end
-
-    context 'with instance-level templates' do
-      let(:group) { create(:group) }
-      let!(:project) { create(:project, :public, namespace: group) }
-      let(:new_project_name) { "project-#{SecureRandom.hex}" }
-      let(:project_params) do
-        {
-          template_name: project.name,
-          name: new_project_name,
-          path: new_project_name,
-          use_custom_template: true,
-          namespace_id: group.id
-        }
+      include_context 'group template name' do
+        it_behaves_like 'creates projects with templates'
       end
 
-      it_behaves_like 'creates projects with templates'
-    end
-
-    context 'with group templates' do
-      let(:parent_group) { create(:group) }
-      let(:subgroup) { create(:group, :public, parent: parent_group) }
-      let(:group) { subgroup }
-      let!(:project) { create(:project, :public, namespace: subgroup) }
-      let(:new_project_name) { "project-#{SecureRandom.hex}" }
-      let(:project_params) do
-        {
-          template_name: project.name,
-          name: new_project_name,
-          path: new_project_name,
-          use_custom_template: true,
-          group_with_project_templates_id: subgroup.id,
-          namespace_id: subgroup.id
-        }
+      include_context 'group template ID' do
+        it_behaves_like 'creates projects with templates'
       end
-
-      it_behaves_like 'creates projects with templates'
     end
 
     context 'when importing with mirror attributes' do

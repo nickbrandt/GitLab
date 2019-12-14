@@ -6,6 +6,7 @@ import Filters from './filters.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityChart from './vulnerability_chart.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
+import VulnerabilitySeverity from './vulnerability_severity.vue';
 
 export default {
   name: 'SecurityDashboardApp',
@@ -15,16 +16,9 @@ export default {
     SecurityDashboardTable,
     VulnerabilityChart,
     VulnerabilityCountList,
+    VulnerabilitySeverity,
   },
   props: {
-    dashboardDocumentation: {
-      type: String,
-      required: true,
-    },
-    emptyStateSvgPath: {
-      type: String,
-      required: true,
-    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -42,6 +36,11 @@ export default {
     vulnerabilityFeedbackHelpPath: {
       type: String,
       required: true,
+    },
+    vulnerableProjectsEndpoint: {
+      type: String,
+      required: false,
+      default: '',
     },
     lockToProject: {
       type: Object,
@@ -76,14 +75,17 @@ export default {
     isLockedToProject() {
       return this.lockToProject !== null;
     },
+    shouldShowAside() {
+      return this.shouldShowChart || this.shouldShowVulnerabilitySeverities;
+    },
     shouldShowChart() {
       return Boolean(this.vulnerabilitiesHistoryEndpoint);
     },
+    shouldShowVulnerabilitySeverities() {
+      return Boolean(this.vulnerableProjectsEndpoint);
+    },
     shouldShowCountList() {
       return this.isLockedToProject && Boolean(this.vulnerabilitiesCountEndpoint);
-    },
-    showHideDismissedToggle() {
-      return Boolean(gon.features && gon.features.hideDismissedVulnerabilities);
     },
   },
   watch: {
@@ -97,9 +99,7 @@ export default {
       });
     }
     this.setPipelineId(this.pipelineId);
-    if (this.showHideDismissedToggle) {
-      this.setHideDismissedToggleInitialState();
-    }
+    this.setHideDismissedToggleInitialState();
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
     this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
@@ -139,21 +139,26 @@ export default {
 <template>
   <section>
     <header>
-      <filters :show-hide-dismissed-toggle="showHideDismissedToggle" />
+      <filters />
     </header>
 
     <vulnerability-count-list v-if="shouldShowCountList" class="mb-0" />
 
     <div class="row mt-4">
       <article class="col" :class="{ 'col-xl-7': !isLockedToProject }">
-        <security-dashboard-table
-          :dashboard-documentation="dashboardDocumentation"
-          :empty-state-svg-path="emptyStateSvgPath"
-        />
+        <security-dashboard-table>
+          <template #emptyState>
+            <slot name="emptyState"></slot>
+          </template>
+        </security-dashboard-table>
       </article>
 
-      <aside v-if="shouldShowChart" class="col-xl-5">
-        <vulnerability-chart />
+      <aside v-if="shouldShowAside" class="col-xl-5">
+        <vulnerability-chart v-if="shouldShowChart" class="mb-3" />
+        <vulnerability-severity
+          v-if="shouldShowVulnerabilitySeverities"
+          :endpoint="vulnerableProjectsEndpoint"
+        />
       </aside>
     </div>
 

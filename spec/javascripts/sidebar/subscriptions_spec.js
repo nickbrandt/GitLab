@@ -1,8 +1,8 @@
 import Vue from 'vue';
-import subscriptions from '~/sidebar/components/subscriptions/subscriptions.vue';
-import eventHub from '~/sidebar/event_hub';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockTracking } from 'spec/helpers/tracking_helper';
+import subscriptions from '~/sidebar/components/subscriptions/subscriptions.vue';
+import eventHub from '~/sidebar/event_hub';
 
 describe('Subscriptions', function() {
   let vm;
@@ -75,5 +75,26 @@ describe('Subscriptions', function() {
     vm.onClickCollapsedIcon();
 
     expect(vm.$emit).toHaveBeenCalledWith('toggleSidebar');
+  });
+
+  describe('given project emails are disabled', () => {
+    const subscribeDisabledDescription = 'Notifications have been disabled';
+
+    beforeEach(() => {
+      vm = mountComponent(Subscriptions, {
+        subscribed: false,
+        projectEmailsDisabled: true,
+        subscribeDisabledDescription,
+      });
+    });
+
+    it('sets the correct display text', () => {
+      expect(vm.$el.textContent).toContain(subscribeDisabledDescription);
+      expect(vm.$refs.tooltip.dataset.originalTitle).toBe(subscribeDisabledDescription);
+    });
+
+    it('does not render the toggle button', () => {
+      expect(vm.$refs.toggleButton).toBeUndefined();
+    });
   });
 });

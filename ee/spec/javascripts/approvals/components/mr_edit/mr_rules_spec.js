@@ -6,7 +6,7 @@ import MRRules from 'ee/approvals/components/mr_edit/mr_rules.vue';
 import Rules from 'ee/approvals/components/rules.vue';
 import RuleControls from 'ee/approvals/components/rule_controls.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
-import { createMRRule, createMRRuleWithSource } from '../../mocks';
+import { createEmptyRule, createMRRule, createMRRuleWithSource } from '../../mocks';
 
 const { HEADERS } = Rules;
 
@@ -37,7 +37,6 @@ describe('EE Approvals MRRules', () => {
       .find('td.js-members')
       .find(UserAvatarList)
       .props('items');
-  const findRuleApprovalsRequired = () => wrapper.find('td.js-approvals-required input');
   const findRuleControls = () => wrapper.find('td.js-controls').find(RuleControls);
 
   beforeEach(() => {
@@ -59,9 +58,50 @@ describe('EE Approvals MRRules', () => {
   describe('when allow multiple rules', () => {
     beforeEach(() => {
       store.state.settings.allowMultiRule = true;
+      store.state.settings.eligibleApproversDocsPath = 'some/path';
     });
 
-    it('renders headers', () => {
+    it('should always have any_approver rule', () => {
+      store.modules.approvals.state.rules = [createMRRule()];
+      factory();
+
+      expect(store.modules.approvals.state.rules.length).toBe(2);
+    });
+
+    it('should always display any_approver first', () => {
+      store.modules.approvals.state.rules = [createMRRule()];
+      factory();
+
+      expect(store.modules.approvals.state.rules[0].ruleType).toBe('any_approver');
+    });
+
+    it('should only have 1 any_approver', () => {
+      store.modules.approvals.state.rules = [createEmptyRule(), createMRRule()];
+      factory();
+
+      const anyApproverCount = store.modules.approvals.state.rules.filter(
+        rule => rule.ruleType === 'any_approver',
+      );
+
+      expect(anyApproverCount.length).toBe(1);
+    });
+
+    it('renders headers when there are multiple rules', () => {
+      store.modules.approvals.state.rules = [createEmptyRule(), createMRRule()];
+      factory();
+
+      expect(findHeaders()).toEqual([HEADERS.name, HEADERS.members, HEADERS.approvalsRequired, '']);
+    });
+
+    it('renders headers when there is a single any rule', () => {
+      store.modules.approvals.state.rules = [createEmptyRule()];
+      factory();
+
+      expect(findHeaders()).toEqual([HEADERS.members, '', HEADERS.approvalsRequired, '']);
+    });
+
+    it('renders headers when there is a single named rule', () => {
+      store.modules.approvals.state.rules = [createMRRule()];
       factory();
 
       expect(findHeaders()).toEqual([HEADERS.name, HEADERS.members, HEADERS.approvalsRequired, '']);
@@ -83,34 +123,6 @@ describe('EE Approvals MRRules', () => {
       it('shows members', () => {
         expect(findRuleMembers()).toEqual(expected.approvers);
       });
-
-      it('shows approvals required input', () => {
-        const approvalsRequired = findRuleApprovalsRequired();
-
-        expect(Number(approvalsRequired.element.value)).toEqual(expected.approvalsRequired);
-        expect(Number(approvalsRequired.attributes('min'))).toEqual(expected.minApprovalsRequired);
-        expect(approvalsRequired.attributes('disabled')).toBeUndefined();
-      });
-
-      it('does not show controls', () => {
-        const controls = findRuleControls();
-
-        expect(controls.exists()).toBe(false);
-      });
-
-      it('dispatches putRule on change of approvals required', () => {
-        const action = store.modules.approvals.actions.putRule;
-        const approvalsRequired = findRuleApprovalsRequired();
-        const newValue = expected.approvalsRequired + 1;
-
-        approvalsRequired.setValue(newValue);
-
-        expect(action).toHaveBeenCalledWith(
-          jasmine.anything(),
-          { id: expected.id, approvalsRequired: newValue },
-          undefined,
-        );
-      });
     });
 
     describe('with custom MR rule', () => {
@@ -129,20 +141,6 @@ describe('EE Approvals MRRules', () => {
         expect(controls.props('rule')).toEqual(expected);
       });
 
-      describe('without min approvals required', () => {
-        beforeEach(() => {
-          delete approvalRules[0].minApprovalsRequired;
-        });
-
-        it('defaults min approvals required input to 0', () => {
-          factory();
-
-          const input = findRuleApprovalsRequired();
-
-          expect(Number(input.attributes('min'))).toEqual(0);
-        });
-      });
-
       describe('with settings cannot edit', () => {
         beforeEach(() => {
           store.state.settings.canEdit = false;
@@ -154,12 +152,6 @@ describe('EE Approvals MRRules', () => {
 
           expect(controls.exists()).toBe(false);
         });
-
-        it('disables input', () => {
-          const approvalsRequired = findRuleApprovalsRequired();
-
-          expect(approvalsRequired.attributes('disabled')).toBe('disabled');
-        });
       });
     });
   });
@@ -167,23 +159,50 @@ describe('EE Approvals MRRules', () => {
   describe('when allow single rule', () => {
     beforeEach(() => {
       store.state.settings.allowMultiRule = false;
+      store.state.settings.eligibleApproversDocsPath = 'some/path';
     });
 
-    it('does not show name header', () => {
+    it('should only show single regular rule', () => {
+      store.modules.approvals.state.rules = [createMRRule()];
+      factory();
+
+      expect(store.modules.approvals.state.rules[0].ruleType).toBe('regular');
+      expect(store.modules.approvals.state.rules.length).toBe(1);
+    });
+
+    it('should only show single any_approver rule', () => {
+      store.modules.approvals.state.rules = [createEmptyRule()];
+      factory();
+
+      expect(store.modules.approvals.state.rules[0].ruleType).toBe('any_approver');
+      expect(store.modules.approvals.state.rules.length).toBe(1);
+    });
+
+    it('does not show name header for any rule', () => {
+      store.modules.approvals.state.rules = [createEmptyRule()];
       factory();
 
       expect(findHeaders()).not.toContain(HEADERS.name);
     });
 
+    it('does not show approvers header for regular rule', () => {
+      store.modules.approvals.state.rules = [createMRRule()];
+      factory();
+
+      expect(findHeaders()).toEqual([HEADERS.name, HEADERS.members, HEADERS.approvalsRequired, '']);
+    });
+
     describe('with source rule', () => {
+      const expected = createMRRuleWithSource();
+
       beforeEach(() => {
         approvalRules = [createMRRuleWithSource()];
 
         factory();
       });
 
-      it('does not show name', () => {
-        expect(findRuleName().exists()).toBe(false);
+      it('shows name', () => {
+        expect(findRuleName().text()).toEqual(expected.name);
       });
 
       it('shows controls', () => {

@@ -1,0 +1,5 @@
+---
+title: Updated board_service.js to use boardStore directly
+merge_request: 20141
+author: nuwe1
+type: other

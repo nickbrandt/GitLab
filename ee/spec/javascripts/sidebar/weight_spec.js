@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import weight from 'ee/sidebar/components/weight/weight.vue';
-import eventHub from '~/sidebar/event_hub';
-import { ENTER_KEY_CODE } from '~/lib/utils/keycodes';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockTracking, triggerEvent } from 'spec/helpers/tracking_helper';
+import eventHub from '~/sidebar/event_hub';
+import { ENTER_KEY_CODE } from '~/lib/utils/keycodes';
 
 const DEFAULT_PROPS = {
   weightNoneValue: 'None',
@@ -12,9 +12,11 @@ const DEFAULT_PROPS = {
 describe('Weight', function() {
   let vm;
   let Weight;
+  let trackingSpy;
 
   beforeEach(() => {
     Weight = Vue.extend(weight);
+    trackingSpy = mockTracking('_category_', null, spyOn);
   });
 
   afterEach(() => {
@@ -116,12 +118,11 @@ describe('Weight', function() {
       editable: true,
     });
 
-    const spy = mockTracking('_category_', vm.$el, spyOn, afterEach);
-    triggerEvent('.js-weight-edit-link');
+    triggerEvent(vm.$el.querySelector('.js-weight-edit-link'));
 
     vm.$nextTick()
       .then(() => {
-        expect(spy).toHaveBeenCalled();
+        expect(trackingSpy).toHaveBeenCalled();
       })
       .then(done)
       .catch(done.fail);

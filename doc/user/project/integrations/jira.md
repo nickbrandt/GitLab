@@ -20,7 +20,7 @@ Here's how the integration responds when you take the following actions in GitLa
 - **Mention a Jira issue ID** in a commit message or MR (merge request).
   - GitLab hyperlinks to the Jira issue.
   - The Jira issue adds an issue link to the commit/MR in GitLab.
-  - The Jira issue adds a comment reflecting the comment made in GitLab, the comment author, and a link to the commit/MR in GitLab.
+  - The Jira issue adds a comment reflecting the comment made in GitLab, the comment author, and a link to the commit/MR in GitLab, unless this commenting to Jira is [disabled](#disabling-comments-on-jira-issues).
 - **Mention that a commit or MR 'closes', 'resolves', or 'fixes' a Jira issue ID**. When the commit is made on the project's default branch (usually master) or the change is merged to the default branch:
   - GitLab's merge request page displays a note that it "Closed" the Jira issue, with a link to the issue. (Note: Before the merge, an MR will display that it "Closes" the Jira issue.)
   - The Jira issue shows the activity and the Jira issue is closed, or otherwise transitioned.
@@ -59,7 +59,7 @@ When connecting to **Jira Cloud**, which supports authentication via API token, 
 >   higher is required.
 > - GitLab 8.14 introduced a new way to integrate with Jira which greatly simplified
 >   the configuration options you have to enter. If you are using an older version,
->   [follow this documentation][jira-repo-old-docs].
+>   [follow this documentation](https://gitlab.com/gitlab-org/gitlab/blob/8-13-stable-ee/doc/project_services/jira.md).
 > - In order to support Oracle's Access Manager, GitLab will send additional cookies
 >   to enable Basic Auth. The cookie being added to each request is `OBBasicAuth` with
 >   a value of `fromDialog`.
@@ -94,6 +94,15 @@ After saving the configuration, your GitLab project will be able to interact
 with all Jira projects in your Jira instance and you'll see the Jira link on the GitLab project pages that takes you to the appropriate Jira project.
 
 ![Jira service page](img/jira_service_page_v12_2.png)
+
+### Disabling comments on Jira issues
+
+When you reference a Jira issue, it will always link back to the source commit/MR in GitLab, however, you can control whether GitLab will also cross-post a comment to the Jira issue. That functionality is enabled by default.
+
+To disable the automated commenting on Jira issues:
+
+1. Open the [Integrations page](project_services.md#accessing-the-project-services) and select **Jira**.
+1. In the **Event Action** section, uncheck **Comment**.
 
 ## Jira issues
 
@@ -205,4 +214,3 @@ authenticate with the Jira site. You will need to log in to your Jira instance
 and complete the CAPTCHA.
 
 [services-templates]: services_templates.md
-[jira-repo-old-docs]: https://gitlab.com/gitlab-org/gitlab/blob/8-13-stable/doc/project_services/jira.md

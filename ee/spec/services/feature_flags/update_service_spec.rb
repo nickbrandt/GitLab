@@ -43,6 +43,7 @@ describe FeatureFlags::UpdateService do
 
       it 'returns error status' do
         expect(subject[:status]).to eq(:error)
+        expect(subject[:http_status]).to eq(:bad_request)
       end
 
       it 'returns error messages' do

@@ -46,7 +46,7 @@ export default {
 <template>
   <div v-if="designsCount" class="d-flex align-items-center">
     {{ paginationText }}
-    <div class="btn-group ml-3">
+    <div class="btn-group ml-3 mr-3">
       <pagination-button
         :design="previousDesign"
         :title="s__('DesignManagement|Go to previous design')"

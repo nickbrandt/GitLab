@@ -1,4 +1,9 @@
-import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
+import {
+  LICENSE_APPROVAL_STATUS,
+  VERSION_1_0,
+  VERSION_1_1,
+  VERSION_2_0,
+} from 'ee/vue_shared/license_management/constants';
 
 const urlFor = ({ scheme = 'https', host = 'www.example.org', path = '/' }) =>
   `${scheme}://${host}${path}`;
@@ -7,6 +12,7 @@ const licenseUrlFor = name =>
 const dependencyUrlFor = name => urlFor({ path: `/${name}` });
 const normalizeV1License = ({ name, url = licenseUrlFor(name) }) => ({ name, url });
 const V1 = {
+  template: () => ({ licenses: [], dependencies: [] }),
   normalizeLicenseSummary: ({ name, url = licenseUrlFor(name), count = 0 }) => ({
     name,
     url,
@@ -19,7 +25,22 @@ const V1 = {
     license = {},
   }) => ({ dependency: { name, url, description }, license: normalizeV1License(license) }),
 };
+const V1_1 = Object.assign(V1, {
+  template: () => ({ version: VERSION_1_1, licenses: [], dependencies: [] }),
+  normalizeDependency: ({
+    name,
+    url = dependencyUrlFor(name),
+    description = name.toUpperCase(),
+    license = {},
+    licenses = [normalizeV1License(license)],
+  }) => ({
+    dependency: { name, url, description },
+    license: normalizeV1License(license),
+    licenses,
+  }),
+});
 const V2 = {
+  template: () => ({ version: VERSION_2_0, licenses: [], dependencies: [] }),
   normalizeLicenseSummary: ({ id, name, url = licenseUrlFor(id) }) => ({ id, name, url }),
   normalizeDependency: ({
     name,
@@ -30,20 +51,29 @@ const V2 = {
 };
 
 export class Builder {
-  static for(version, template = { licenses: [], dependencies: [] }) {
-    return new Builder(version, template);
+  static for(version) {
+    switch (version) {
+      case VERSION_1_0:
+        return new Builder(V1);
+      case VERSION_1_1:
+        return new Builder(V1_1);
+      case VERSION_2_0:
+        return new Builder(V2);
+      default:
+        return new Builder(V1);
+    }
   }
 
-  static forV1() {
-    return this.for(V1);
+  static forV1(minor = '0') {
+    return this.for(`1.${minor}`);
   }
 
-  static forV2() {
-    return this.for(V2, { version: '2.0', licenses: [], dependencies: [] });
+  static forV2(minor = '0') {
+    return this.for(`2.${minor}`);
   }
 
-  constructor(version, template = { licenses: [], dependencies: [] }) {
-    this.report = template;
+  constructor(version) {
+    this.report = version.template();
     this.version = version;
   }
 

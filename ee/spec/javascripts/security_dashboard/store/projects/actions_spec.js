@@ -1,11 +1,11 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
 
 import createState from 'ee/security_dashboard/store/modules/projects/state';
 import * as types from 'ee/security_dashboard/store/modules/projects/mutation_types';
 import * as actions from 'ee/security_dashboard/store/modules/projects/actions';
+import axios from '~/lib/utils/axios_utils';
 
 import mockData from './data/mock_data.json';
 
@@ -27,8 +27,20 @@ describe('projects actions', () => {
     });
 
     describe('on success', () => {
+      const expectedParams = {
+        include_subgroups: true,
+        with_security_reports: true,
+        with_shared: false,
+      };
+
       beforeEach(() => {
-        mock.onGet(state.projectsEndpoint).replyOnce(200, data);
+        mock.onGet(state.projectsEndpoint).replyOnce(config => {
+          const hasExpectedParams = Object.keys(expectedParams).every(
+            param => config.params[param] === expectedParams[param],
+          );
+
+          return hasExpectedParams ? [200, data] : [400];
+        });
       });
 
       it('should dispatch the request and success actions', done => {

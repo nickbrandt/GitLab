@@ -33,7 +33,7 @@ module EE
           end
         end
 
-        resource :namespaces do
+        resource :namespaces, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
           helpers do
             params :gitlab_subscription_optional_attributes do
               optional :seats, type: Integer, default: 0, desc: 'The number of seats purchased'
@@ -42,6 +42,7 @@ module EE
               optional :end_date, type: Date, desc: 'The date when subscription expires'
               optional :trial, type: Grape::API::Boolean, desc: 'Wether the subscription is trial'
               optional :trial_ends_on, type: Date, desc: 'The date when the trial expires'
+              optional :trial_starts_on, type: Date, desc: 'The date when the trial starts'
             end
           end
 
@@ -82,6 +83,7 @@ module EE
             namespace = find_namespace!(params[:id])
 
             subscription_params = declared_params(include_missing: false)
+            subscription_params[:trial_starts_on] ||= subscription_params[:start_date] if subscription_params[:trial]
             subscription = namespace.create_gitlab_subscription(subscription_params)
             if subscription.persisted?
               present subscription, with: ::EE::API::Entities::GitlabSubscription
@@ -118,7 +120,10 @@ module EE
             not_found!('GitlabSubscription') unless subscription
             bad_request!("Invalid trial expiration date") if trial_ends_on&.past?
 
-            if subscription.update(declared_params(include_missing: false))
+            subscription_params = declared_params(include_missing: false)
+            subscription_params[:trial_starts_on] ||= subscription_params[:start_date] if subscription_params[:trial]
+
+            if subscription.update(subscription_params)
               present subscription, with: ::EE::API::Entities::GitlabSubscription
             else
               render_validation_error!(subscription)

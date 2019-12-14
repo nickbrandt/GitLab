@@ -51,7 +51,7 @@ describe Gitlab::Elastic::Indexer do
         ],
         nil,
         hash_including(
-          'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
+          'ELASTIC_CONNECTION_INFO' => elasticsearch_config.to_json,
           'RAILS_ENV'               => Rails.env,
           'FROM_SHA'                => expected_from_sha,
           'TO_SHA'                  => nil
@@ -80,7 +80,7 @@ describe Gitlab::Elastic::Indexer do
       end
 
       def indexed_wiki_paths_for(term)
-        blobs = ProjectWiki.search(
+        blobs = ProjectWiki.elastic_search(
           term,
           type: :wiki_blob
         )[:wiki_blobs][:results].response
@@ -141,7 +141,7 @@ describe Gitlab::Elastic::Indexer do
         nil,
         hash_including(
           'GITALY_CONNECTION_INFO'  => gitaly_connection_data.to_json,
-          'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
+          'ELASTIC_CONNECTION_INFO' => elasticsearch_config.to_json,
           'RAILS_ENV'               => Rails.env,
           'FROM_SHA'                => expected_from_sha,
           'TO_SHA'                  => to_sha
@@ -213,7 +213,7 @@ describe Gitlab::Elastic::Indexer do
     end
 
     def indexed_file_paths_for(term)
-      blobs = Repository.search(
+      blobs = Repository.elastic_search(
         term,
         type: :blob
       )[:blobs][:results].response
@@ -279,5 +279,11 @@ describe Gitlab::Elastic::Indexer do
     expect(status).not_to be_nil
     expect(status.indexed_at).not_to be_nil
     expect(status.last_commit).to eq(sha)
+  end
+
+  def elasticsearch_config
+    Gitlab::CurrentSettings.elasticsearch_config.merge(
+      index_name: 'gitlab-test'
+    )
   end
 end

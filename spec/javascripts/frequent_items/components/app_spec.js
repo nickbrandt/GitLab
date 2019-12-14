@@ -1,12 +1,12 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import Vue from 'vue';
+import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import axios from '~/lib/utils/axios_utils';
 import appComponent from '~/frequent_items/components/app.vue';
 import eventHub from '~/frequent_items/event_hub';
 import store from '~/frequent_items/store';
 import { FREQUENT_ITEMS, HOUR_IN_MS } from '~/frequent_items/constants';
 import { getTopFrequentItems } from '~/frequent_items/utils';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { currentSession, mockFrequentProjects, mockSearchedProjects } from '../mock_data';
 
 let session;
@@ -247,7 +247,7 @@ describe('Frequent Items App Component', () => {
 
         .then(() => {
           expect(vm.$el.querySelectorAll('.frequent-items-list-container li').length).toBe(
-            mockSearchedProjects.length,
+            mockSearchedProjects.data.length,
           );
         })
         .then(done)

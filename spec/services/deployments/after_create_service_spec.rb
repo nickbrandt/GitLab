@@ -53,6 +53,14 @@ describe Deployments::AfterCreateService do
       service.execute
     end
 
+    it 'links merge requests to deployment' do
+      expect_next_instance_of(Deployments::LinkMergeRequestsService, deployment) do |link_mr_service|
+        expect(link_mr_service).to receive(:execute)
+      end
+
+      service.execute
+    end
+
     it 'returns the deployment' do
       expect(subject.execute).to eq(deployment)
     end
@@ -105,6 +113,21 @@ describe Deployments::AfterCreateService do
 
         expect(subject.environment.name).to eq('review-apps/master')
         expect(subject.environment.external_url).to eq('http://master.review-apps.gitlab.com')
+      end
+    end
+
+    context 'when auto_stop_in are used' do
+      let(:options) do
+        { name: 'production', auto_stop_in: '1 day' }
+      end
+
+      it 'renews auto stop at' do
+        Timecop.freeze do
+          environment.update!(auto_stop_at: nil)
+
+          expect { subject.execute }
+            .to change { environment.reset.auto_stop_at&.round }.from(nil).to(1.day.since.round)
+        end
       end
     end
   end
@@ -234,6 +257,32 @@ describe Deployments::AfterCreateService do
             expect(merge_request.reload.metrics.first_deployed_to_production_at).to eq(previous_time)
           end
         end
+      end
+    end
+  end
+
+  describe '#update_environment' do
+    it 'links the merge requests' do
+      double = instance_double(Deployments::LinkMergeRequestsService)
+
+      allow(Deployments::LinkMergeRequestsService)
+        .to receive(:new)
+        .with(deployment)
+        .and_return(double)
+
+      expect(double).to receive(:execute)
+
+      service.update_environment(deployment)
+    end
+
+    context 'when the tracking of merge requests is disabled' do
+      it 'does nothing' do
+        stub_feature_flags(deployment_merge_requests: false)
+
+        expect(Deployments::LinkMergeRequestsService)
+          .not_to receive(:new)
+
+        service.update_environment(deployment)
       end
     end
   end

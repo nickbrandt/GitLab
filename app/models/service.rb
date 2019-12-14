@@ -40,6 +40,7 @@ class Service < ApplicationRecord
   scope :external_wikis, -> { where(type: 'ExternalWikiService').active }
   scope :active, -> { where(active: true) }
   scope :without_defaults, -> { where(default: false) }
+  scope :by_type, -> (type) { where(type: type) }
 
   scope :push_hooks, -> { where(push_events: true, active: true) }
   scope :tag_push_hooks, -> { where(tag_push_events: true, active: true) }
@@ -152,6 +153,14 @@ class Service < ApplicationRecord
     else
       events
     end
+  end
+
+  def configurable_event_actions
+    self.class.supported_event_actions
+  end
+
+  def self.supported_event_actions
+    %w()
   end
 
   def supported_events
@@ -280,6 +289,7 @@ class Service < ApplicationRecord
       slack
       teamcity
       microsoft_teams
+      unify_circuit
     ]
 
     if Rails.env.development?

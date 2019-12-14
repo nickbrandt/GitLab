@@ -1,9 +1,14 @@
 import Vue from 'vue';
-import imageDiffViewer from '~/vue_shared/components/diff_viewer/viewers/image_diff_viewer.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { GREEN_BOX_IMAGE_URL, RED_BOX_IMAGE_URL } from 'spec/test_constants';
+import imageDiffViewer from '~/vue_shared/components/diff_viewer/viewers/image_diff_viewer.vue';
 
 describe('ImageDiffViewer', () => {
+  const requiredProps = {
+    diffMode: 'replaced',
+    newPath: GREEN_BOX_IMAGE_URL,
+    oldPath: RED_BOX_IMAGE_URL,
+  };
   let vm;
 
   function createComponent(props) {
@@ -45,11 +50,7 @@ describe('ImageDiffViewer', () => {
   });
 
   it('renders image diff for replaced', done => {
-    createComponent({
-      diffMode: 'replaced',
-      newPath: GREEN_BOX_IMAGE_URL,
-      oldPath: RED_BOX_IMAGE_URL,
-    });
+    createComponent(requiredProps);
 
     setTimeout(() => {
       expect(vm.$el.querySelector('.added img').getAttribute('src')).toBe(GREEN_BOX_IMAGE_URL);
@@ -70,11 +71,12 @@ describe('ImageDiffViewer', () => {
   });
 
   it('renders image diff for new', done => {
-    createComponent({
-      diffMode: 'new',
-      newPath: GREEN_BOX_IMAGE_URL,
-      oldPath: '',
-    });
+    createComponent(
+      Object.assign({}, requiredProps, {
+        diffMode: 'new',
+        oldPath: '',
+      }),
+    );
 
     setTimeout(() => {
       expect(vm.$el.querySelector('.added img').getAttribute('src')).toBe(GREEN_BOX_IMAGE_URL);
@@ -84,11 +86,12 @@ describe('ImageDiffViewer', () => {
   });
 
   it('renders image diff for deleted', done => {
-    createComponent({
-      diffMode: 'deleted',
-      newPath: '',
-      oldPath: RED_BOX_IMAGE_URL,
-    });
+    createComponent(
+      Object.assign({}, requiredProps, {
+        diffMode: 'deleted',
+        newPath: '',
+      }),
+    );
 
     setTimeout(() => {
       expect(vm.$el.querySelector('.deleted img').getAttribute('src')).toBe(RED_BOX_IMAGE_URL);
@@ -119,11 +122,7 @@ describe('ImageDiffViewer', () => {
 
   describe('swipeMode', () => {
     beforeEach(done => {
-      createComponent({
-        diffMode: 'replaced',
-        newPath: GREEN_BOX_IMAGE_URL,
-        oldPath: RED_BOX_IMAGE_URL,
-      });
+      createComponent(requiredProps);
 
       setTimeout(() => {
         done();
@@ -142,11 +141,7 @@ describe('ImageDiffViewer', () => {
 
   describe('onionSkin', () => {
     beforeEach(done => {
-      createComponent({
-        diffMode: 'replaced',
-        newPath: GREEN_BOX_IMAGE_URL,
-        oldPath: RED_BOX_IMAGE_URL,
-      });
+      createComponent(requiredProps);
 
       setTimeout(() => {
         done();

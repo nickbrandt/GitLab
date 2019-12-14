@@ -54,11 +54,12 @@ Click on the service links to see further configuration instructions and details
 | [Prometheus](prometheus.md) | Monitor the performance of your deployed apps |
 | Pushover | Pushover makes it easy to get real-time notifications on your Android device, iPhone, iPad, and Desktop |
 | [Redmine](redmine.md) | Redmine issue tracker |
+| [Unify Circuit](unify_circuit.md) | Receive events notifications in Unify Circuit |
 | [YouTrack](youtrack.md) | YouTrack issue tracker |
 
 ## Push hooks limit
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/31009) in GitLab 12.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/17874) in GitLab 12.4.
 
 If a single push includes changes to more than three branches or tags, services
 supported by `push_hooks` and `tag_push_hooks` events won't be executed.

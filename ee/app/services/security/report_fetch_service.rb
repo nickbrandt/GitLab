@@ -2,17 +2,17 @@
 
 module Security
   class ReportFetchService
+    include Gitlab::Utils::StrongMemoize
+
     def initialize(project, artifact)
       @project = project
       @artifact = artifact
     end
 
-    def self.pipeline_for(project)
-      project.all_pipelines.latest_successful_for_ref(project.default_branch)
-    end
-
     def pipeline
-      @pipeline ||= self.class.pipeline_for(project)
+      strong_memoize(:pipeline) do
+        project.latest_pipeline_with_reports(artifact)
+      end
     end
 
     def build

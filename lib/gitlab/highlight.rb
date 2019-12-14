@@ -61,14 +61,14 @@ module Gitlab
       tokens = lexer.lex(text, continue: continue)
       Timeout.timeout(timeout_time) { @formatter.format(tokens, tag: tag).html_safe }
     rescue Timeout::Error => e
-      Gitlab::Sentry.track_exception(e)
+      Gitlab::Sentry.track_and_raise_for_dev_exception(e)
       highlight_plain(text)
     rescue
       highlight_plain(text)
     end
 
     def timeout_time
-      Sidekiq.server? ? TIMEOUT_BACKGROUND : TIMEOUT_FOREGROUND
+      Gitlab::Runtime.sidekiq? ? TIMEOUT_BACKGROUND : TIMEOUT_FOREGROUND
     end
 
     def link_dependencies(text, highlighted_text)

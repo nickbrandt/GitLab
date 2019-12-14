@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 include ImportExport::CommonUtil
 
@@ -29,9 +31,6 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
         project_tree_restorer = described_class.new(user: @user, shared: @shared, project: @project)
 
-        expect(Gitlab::ImportExport::RelationFactory).to receive(:create).with(hash_including(excluded_keys: ['whatever'])).and_call_original.at_least(:once)
-        allow(project_tree_restorer).to receive(:excluded_keys_for_relation).and_return(['whatever'])
-
         @restored_project_json = project_tree_restorer.restore
       end
     end
@@ -48,11 +47,11 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       it 'restore correct project features' do
         project = Project.find_by_path('project')
 
-        expect(project.project_feature.issues_access_level).to eq(ProjectFeature::DISABLED)
-        expect(project.project_feature.builds_access_level).to eq(ProjectFeature::ENABLED)
-        expect(project.project_feature.snippets_access_level).to eq(ProjectFeature::ENABLED)
-        expect(project.project_feature.wiki_access_level).to eq(ProjectFeature::ENABLED)
-        expect(project.project_feature.merge_requests_access_level).to eq(ProjectFeature::ENABLED)
+        expect(project.project_feature.issues_access_level).to eq(ProjectFeature::PRIVATE)
+        expect(project.project_feature.builds_access_level).to eq(ProjectFeature::PRIVATE)
+        expect(project.project_feature.snippets_access_level).to eq(ProjectFeature::PRIVATE)
+        expect(project.project_feature.wiki_access_level).to eq(ProjectFeature::PRIVATE)
+        expect(project.project_feature.merge_requests_access_level).to eq(ProjectFeature::PRIVATE)
       end
 
       it 'has the project description' do
@@ -210,6 +209,20 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         expect(@project.project_badges.count).to eq(2)
       end
 
+      it 'has snippets' do
+        expect(@project.snippets.count).to eq(1)
+      end
+
+      it 'has award emoji for a snippet' do
+        award_emoji = @project.snippets.first.award_emoji
+
+        expect(award_emoji.map(&:name)).to contain_exactly('thumbsup', 'coffee')
+      end
+
+      it 'restores `ci_cd_settings` : `group_runners_enabled` setting' do
+        expect(@project.ci_cd_settings.group_runners_enabled?).to eq(false)
+      end
+
       it 'restores the correct service' do
         expect(CustomIssueTrackerService.first).not_to be_nil
       end
@@ -219,6 +232,12 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
         expect(meetings.count).to eq(1)
         expect(meetings.first.url).to eq('https://zoom.us/j/123456789')
+      end
+
+      it 'restores sentry issues' do
+        sentry_issue = @project.issues.first.sentry_issue
+
+        expect(sentry_issue.sentry_issue_identifier).to eq(1234567891)
       end
 
       context 'Merge requests' do
@@ -346,7 +365,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         expect(restored_project_json).to eq(true)
       end
 
-      it_behaves_like 'restores project correctly',
+      it_behaves_like 'restores project successfully',
                       issues: 1,
                       labels: 2,
                       label_with_priorities: 'A project label',
@@ -359,7 +378,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
           create(:ci_build, token: 'abcd')
         end
 
-        it_behaves_like 'restores project correctly',
+        it_behaves_like 'restores project successfully',
                         issues: 1,
                         labels: 2,
                         label_with_priorities: 'A project label',
@@ -436,7 +455,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         expect(restored_project_json).to eq(true)
       end
 
-      it_behaves_like 'restores project correctly',
+      it_behaves_like 'restores project successfully',
                       issues: 2,
                       labels: 2,
                       label_with_priorities: 'A project label',
@@ -541,8 +560,9 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
   context 'Minimal JSON' do
     let(:project) { create(:project) }
+    let(:user) { create(:user) }
     let(:tree_hash) { { 'visibility_level' => visibility } }
-    let(:restorer) { described_class.new(user: nil, shared: shared, project: project) }
+    let(:restorer) { described_class.new(user: user, shared: shared, project: project) }
 
     before do
       expect(restorer).to receive(:read_tree_hash) { tree_hash }
@@ -614,6 +634,46 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
             expect(restorer.project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
           end
         end
+      end
+    end
+  end
+
+  context 'JSON with invalid records' do
+    subject(:restored_project_json) { project_tree_restorer.restore }
+
+    let(:user) { create(:user) }
+    let!(:project) { create(:project, :builds_disabled, :issues_disabled, name: 'project', path: 'project') }
+    let(:project_tree_restorer) { described_class.new(user: user, shared: shared, project: project) }
+    let(:correlation_id) { 'my-correlation-id' }
+
+    before do
+      setup_import_export_config('with_invalid_records')
+
+      # Import is running from the rake task, `correlation_id` is not assigned
+      expect(Labkit::Correlation::CorrelationId).to receive(:new_id).and_return(correlation_id)
+      subject
+    end
+
+    context 'when failures occur because a relation fails to be processed' do
+      it_behaves_like 'restores project successfully',
+        issues: 0,
+        labels: 0,
+        label_with_priorities: nil,
+        milestones: 1,
+        first_issue_labels: 0,
+        services: 0,
+        import_failures: 1
+
+      it 'records the failures in the database' do
+        import_failure = ImportFailure.last
+
+        expect(import_failure.project_id).to eq(project.id)
+        expect(import_failure.relation_key).to eq('milestones')
+        expect(import_failure.relation_index).to be_present
+        expect(import_failure.exception_class).to eq('ActiveRecord::RecordInvalid')
+        expect(import_failure.exception_message).to be_present
+        expect(import_failure.correlation_id_value).to eq('my-correlation-id')
+        expect(import_failure.created_at).to be_present
       end
     end
   end

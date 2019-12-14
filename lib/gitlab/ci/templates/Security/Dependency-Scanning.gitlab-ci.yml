@@ -6,7 +6,7 @@
 
 variables:
   DS_ANALYZER_IMAGE_PREFIX: "registry.gitlab.com/gitlab-org/security-products/analyzers"
-  DS_DEFAULT_ANALYZERS: "gemnasium, retire.js, gemnasium-python, gemnasium-maven, bundler-audit"
+  DS_DEFAULT_ANALYZERS: "bundler-audit, retire.js, gemnasium, gemnasium-maven, gemnasium-python"
   DS_MAJOR_VERSION: 2
   DS_DISABLE_DIND: "false"
 
@@ -43,7 +43,6 @@ dependency_scanning:
           DS_ANALYZER_IMAGE_TAG \
           DS_DEFAULT_ANALYZERS \
           DS_EXCLUDED_PATHS \
-          DEP_SCAN_DISABLE_REMOTE_CHECKS \
           DS_DOCKER_CLIENT_NEGOTIATION_TIMEOUT \
           DS_PULL_ANALYZER_IMAGE_TIMEOUT \
           DS_RUN_ANALYZER_TIMEOUT \
@@ -51,6 +50,9 @@ dependency_scanning:
           DS_PIP_DEPENDENCY_PATH \
           PIP_INDEX_URL \
           PIP_EXTRA_INDEX_URL \
+          PIP_REQUIREMENTS_FILE \
+          MAVEN_CLI_OPTS \
+          BUNDLER_AUDIT_UPDATE_DISABLED \
         ) \
         --volume "$PWD:/code" \
         --volume /var/run/docker.sock:/var/run/docker.sock \

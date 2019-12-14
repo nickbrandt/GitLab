@@ -10,4 +10,5 @@ export default () => ({
   isLoading: false,
   hasError: false,
   iid: null,
+  active: true,
 });

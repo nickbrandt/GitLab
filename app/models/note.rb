@@ -37,6 +37,10 @@ class Note < ApplicationRecord
 
   redact_field :note
 
+  TYPES_RESTRICTED_BY_ABILITY = {
+    branch: :download_code
+  }.freeze
+
   # Aliases to make application_helper#edited_time_ago_with_tooltip helper work properly with notes.
   # See https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/10392/diffs#note_28719102
   alias_attribute :last_edited_at, :updated_at
@@ -151,9 +155,9 @@ class Note < ApplicationRecord
   after_initialize :ensure_discussion_id
   before_validation :nullify_blank_type, :nullify_blank_line_code
   before_validation :set_discussion_id, on: :create
-  after_save :keep_around_commit, if: :for_project_noteable?
-  after_save :expire_etag_cache
-  after_save :touch_noteable
+  after_save :keep_around_commit, if: :for_project_noteable?, unless: :importing?
+  after_save :expire_etag_cache, unless: :importing?
+  after_save :touch_noteable, unless: :importing?
   after_destroy :expire_etag_cache
 
   class << self
@@ -341,7 +345,7 @@ class Note < ApplicationRecord
   end
 
   def visible_for?(user)
-    !cross_reference_not_visible_for?(user)
+    !cross_reference_not_visible_for?(user) && system_note_viewable_by?(user)
   end
 
   def award_emoji?
@@ -407,6 +411,10 @@ class Note < ApplicationRecord
   def discussion
     full_discussion = self.noteable.notes.find_discussion(self.discussion_id) if part_of_discussion?
     full_discussion || to_discussion
+  end
+
+  def start_of_discussion?
+    discussion.first_note == self
   end
 
   def part_of_discussion?
@@ -491,7 +499,26 @@ class Note < ApplicationRecord
     project
   end
 
+  def user_mentions
+    noteable.user_mentions.where(note: self)
+  end
+
   private
+
+  # Using this method followed by a call to `save` may result in ActiveRecord::RecordNotUnique exception
+  # in a multithreaded environment. Make sure to use it within a `safe_ensure_unique` block.
+  def model_user_mention
+    user_mentions.first_or_initialize
+  end
+
+  def system_note_viewable_by?(user)
+    return true unless system_note_metadata
+
+    restriction = TYPES_RESTRICTED_BY_ABILITY[system_note_metadata.action.to_sym]
+    return Ability.allowed?(user, restriction, project) if restriction
+
+    true
+  end
 
   def keep_around_commit
     project.repository.keep_around(self.commit_id)

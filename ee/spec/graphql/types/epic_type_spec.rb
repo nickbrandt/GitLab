@@ -5,12 +5,13 @@ require 'spec_helper'
 describe GitlabSchema.types['Epic'] do
   let(:fields) do
     %i[
-      id iid title description state group parent author
+      id iid title description state group parent author labels
       start_date start_date_is_fixed start_date_fixed start_date_from_milestones
       due_date due_date_is_fixed due_date_fixed due_date_from_milestones
       closed_at created_at updated_at children has_children has_issues
       web_path web_url relation_path reference issues user_permissions
       notes discussions relative_position subscribed participants
+      descendant_counts upvotes downvotes
     ]
   end
 

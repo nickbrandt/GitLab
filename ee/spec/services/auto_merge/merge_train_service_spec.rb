@@ -154,18 +154,22 @@ describe AutoMerge::MergeTrainService do
         expect(AutoMergeProcessWorker).to receive(:perform_async).with(merge_request_2.id)
 
         subject
+
+        expect(merge_request_2.reset.merge_train).to be_stale
       end
     end
   end
 
   describe '#abort' do
-    subject { service.abort(merge_request, 'an error') }
+    subject { service.abort(merge_request, 'an error', **args) }
 
     let!(:merge_request) do
       create(:merge_request, :on_train,
         source_project: project, source_branch: 'feature',
         target_project: project, target_branch: 'master')
     end
+
+    let(:args) { {} }
 
     it 'aborts auto merge on the merge request' do
       subject
@@ -185,6 +189,32 @@ describe AutoMerge::MergeTrainService do
         .to receive(:abort_merge_train).with(merge_request, project, user, 'an error')
 
       subject
+    end
+
+    context 'when the other merge request is following the merge request' do
+      let!(:merge_request_2) do
+        create(:merge_request, :on_train,
+          source_project: project, source_branch: 'signed-commits',
+          target_project: project, target_branch: 'master')
+      end
+
+      it 'processes the next merge request on the train' do
+        expect(AutoMergeProcessWorker).to receive(:perform_async).with(merge_request_2.id)
+
+        subject
+
+        expect(merge_request_2.reset.merge_train).to be_stale
+      end
+
+      context 'when process_next is false' do
+        let(:args) { { process_next: false } }
+
+        it 'does not process the next merge request on the train' do
+          expect(AutoMergeProcessWorker).not_to receive(:perform_async)
+
+          subject
+        end
+      end
     end
   end
 

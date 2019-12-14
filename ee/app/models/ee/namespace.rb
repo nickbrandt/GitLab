@@ -10,27 +10,22 @@ module EE
     extend ::Gitlab::Utils::Override
     include ::Gitlab::Utils::StrongMemoize
 
-    FREE_PLAN = 'free'.freeze
-
-    BRONZE_PLAN = 'bronze'.freeze
-    SILVER_PLAN = 'silver'.freeze
-    GOLD_PLAN = 'gold'.freeze
-    EARLY_ADOPTER_PLAN = 'early_adopter'.freeze
-
     NAMESPACE_PLANS_TO_LICENSE_PLANS = {
-      BRONZE_PLAN        => License::STARTER_PLAN,
-      SILVER_PLAN        => License::PREMIUM_PLAN,
-      GOLD_PLAN          => License::ULTIMATE_PLAN,
-      EARLY_ADOPTER_PLAN => License::EARLY_ADOPTER_PLAN
+      Plan::BRONZE        => License::STARTER_PLAN,
+      Plan::SILVER        => License::PREMIUM_PLAN,
+      Plan::GOLD          => License::ULTIMATE_PLAN,
+      Plan::EARLY_ADOPTER => License::EARLY_ADOPTER_PLAN
     }.freeze
 
     LICENSE_PLANS_TO_NAMESPACE_PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.invert.freeze
-    PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.keys.freeze
+    PLANS = (NAMESPACE_PLANS_TO_LICENSE_PLANS.keys + [Plan::FREE]).freeze
 
     CI_USAGE_ALERT_LEVELS = [30, 5].freeze
 
     prepended do
       include EachBatch
+
+      attr_writer :root_ancestor
 
       belongs_to :plan
 
@@ -69,7 +64,7 @@ module EE
       validate :validate_plan_name
       validate :validate_shared_runner_minutes_support
 
-      delegate :trial?, :trial_ends_on, :upgradable?, to: :gitlab_subscription, allow_nil: true
+      delegate :trial?, :trial_ends_on, :trial_starts_on, :upgradable?, to: :gitlab_subscription, allow_nil: true
 
       before_create :sync_membership_lock_with_parent
 
@@ -117,6 +112,7 @@ module EE
       ::Feature.enabled?(feature, self) ||
         (::Feature.enabled?(feature) && feature_available?(feature))
     end
+    alias_method :alpha_feature_available?, :beta_feature_available?
 
     # Checks features (i.e. https://about.gitlab.com/pricing/) availabily
     # for a given Namespace plan. This method should consider ancestor groups
@@ -148,13 +144,25 @@ module EE
     end
 
     def actual_plan
-      subscription = find_or_create_subscription
+      strong_memoize(:actual_plan) do
+        if parent_id
+          root_ancestor.actual_plan
+        else
+          subscription = find_or_create_subscription
+          subscription&.hosted_plan || Plan.free || Plan.default
+        end
+      end
+    end
 
-      subscription&.hosted_plan
+    def actual_limits
+      # We default to PlanLimits.new otherwise a lot of specs would fail
+      # On production each plan should already have associated limits record
+      # https://gitlab.com/gitlab-org/gitlab/issues/36037
+      actual_plan&.limits || PlanLimits.new
     end
 
     def actual_plan_name
-      actual_plan&.name || FREE_PLAN
+      actual_plan&.name || Plan::FREE
     end
 
     def actual_size_limit
@@ -192,6 +200,17 @@ module EE
         shared_runners_minutes.to_i >= actual_shared_runners_minutes_limit
     end
 
+    def shared_runners_remaining_minutes_percent
+      return 0 if shared_runners_remaining_minutes.to_f <= 0
+      return 0 if actual_shared_runners_minutes_limit.to_f == 0
+
+      (shared_runners_remaining_minutes.to_f * 100) / actual_shared_runners_minutes_limit.to_f
+    end
+
+    def shared_runners_remaining_minutes_below_threshold?
+      shared_runners_remaining_minutes_percent.to_i <= last_ci_minutes_usage_notification_level.to_i
+    end
+
     def extra_shared_runners_minutes_used?
       shared_runners_minutes_limit_enabled? &&
         extra_shared_runners_minutes_limit &&
@@ -211,20 +230,6 @@ module EE
       else
         super
       end
-    end
-
-    # TODO, CI/CD Quotas feature check
-    #
-    def max_active_pipelines
-      actual_plan&.active_pipelines_limit.to_i
-    end
-
-    def max_pipeline_size
-      actual_plan&.pipeline_size_limit.to_i
-    end
-
-    def max_active_jobs
-      actual_plan&.active_jobs_limit.to_i
     end
 
     def memoized_plans=(plans)
@@ -252,17 +257,21 @@ module EE
       ::Gitlab.com? &&
         parent_id.nil? &&
         trial_ends_on.blank? &&
-        [EARLY_ADOPTER_PLAN, FREE_PLAN].include?(actual_plan_name)
+        [Plan::EARLY_ADOPTER, Plan::FREE].include?(actual_plan_name)
     end
 
     def trial_active?
       trial? && trial_ends_on.present? && trial_ends_on >= Date.today
     end
 
+    def never_had_trial?
+      trial_ends_on.nil?
+    end
+
     def trial_expired?
       trial_ends_on.present? &&
         trial_ends_on < Date.today &&
-        actual_plan_name == FREE_PLAN
+        actual_plan_name == Plan::FREE
     end
 
     # A namespace may not have a file template project
@@ -282,23 +291,23 @@ module EE
     end
 
     def free_plan?
-      actual_plan_name == FREE_PLAN
+      actual_plan_name == Plan::FREE
     end
 
     def early_adopter_plan?
-      actual_plan_name == EARLY_ADOPTER_PLAN
+      actual_plan_name == Plan::EARLY_ADOPTER
     end
 
     def bronze_plan?
-      actual_plan_name == BRONZE_PLAN
+      actual_plan_name == Plan::BRONZE
     end
 
     def silver_plan?
-      actual_plan_name == SILVER_PLAN
+      actual_plan_name == Plan::SILVER
     end
 
     def gold_plan?
-      actual_plan_name == GOLD_PLAN
+      actual_plan_name == Plan::GOLD
     end
 
     def use_elasticsearch?
@@ -356,6 +365,10 @@ module EE
         start_date: created_at,
         seats: 0
       )
+    end
+
+    def shared_runners_remaining_minutes
+      [actual_shared_runners_minutes_limit.to_f - shared_runners_minutes.to_f, 0].max
     end
   end
 end

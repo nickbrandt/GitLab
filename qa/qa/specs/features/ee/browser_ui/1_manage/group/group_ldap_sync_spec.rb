@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls do
+  context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls, :requires_admin do
     describe 'LDAP Group sync' do
       include Support::Api
 
@@ -68,10 +68,10 @@ module QA
 
           Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
-          EE::Page::Group::Settings::LDAPSync.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
-            page.set_sync_method('LDAP Group cn')
-            page.set_group_cn('Engineering')
-            page.click_add_sync_button
+          EE::Page::Group::Settings::LDAPSync.perform do |settings|
+            settings.set_sync_method('LDAP Group cn')
+            settings.set_group_cn('Engineering')
+            settings.click_add_sync_button
           end
 
           Page::Group::Menu.perform(&:click_group_members_item)
@@ -118,9 +118,9 @@ module QA
 
           Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
-          EE::Page::Group::Settings::LDAPSync.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
-            page.set_user_filter('(&(objectClass=person)(cn=HR*))')
-            page.click_add_sync_button
+          EE::Page::Group::Settings::LDAPSync.perform do |settings|
+            settings.set_user_filter('(&(objectClass=person)(cn=HR*))')
+            settings.click_add_sync_button
           end
 
           Page::Group::Menu.perform(&:click_group_members_item)
@@ -171,10 +171,10 @@ module QA
       end
 
       def verify_users_synced(expected_users)
-        EE::Page::Group::Members.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
-          page.click_sync_now
-          users_synchronised = page.retry_until(reload: true) do
-            expected_users.map { |user| page.has_content?(user) }.all?
+        EE::Page::Group::Members.perform do |members|
+          members.click_sync_now
+          users_synchronised = members.retry_until(reload: true) do
+            expected_users.map { |user| members.has_content?(user) }.all?
           end
           expect(users_synchronised).to be_truthy
         end

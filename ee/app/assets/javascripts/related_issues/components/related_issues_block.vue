@@ -1,13 +1,13 @@
 <script>
-import { __ } from '~/locale';
 import Sortable from 'sortablejs';
+import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
+import sortableConfig from 'ee/sortable/sortable_config';
+import { GlLoadingIcon } from '@gitlab/ui';
+import { __ } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
 import RelatedIssuableItem from '~/vue_shared/components/issue/related_issuable_item.vue';
-import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
 import IssueDueDate from '~/boards/components/issue_due_date.vue';
-import sortableConfig from 'ee/sortable/sortable_config';
-import { GlLoadingIcon } from '@gitlab/ui';
 import AddIssuableForm from './add_issuable_form.vue';
 import { issuableIconMap, issuableQaClassMap } from '../constants';
 
@@ -180,7 +180,7 @@ export default {
           </a>
           <div class="d-inline-flex lh-100 align-middle">
             <div
-              class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge mx-1"
+              class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge mx-1 border-width-1px border-style-solid border-color-default"
             >
               <span class="issue-count-badge-count">
                 <icon :name="issuableTypeIcon" class="mr-1 text-secondary" />

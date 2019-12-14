@@ -58,7 +58,7 @@ class ProjectWiki
   end
 
   def wiki_base_path
-    [Gitlab.config.gitlab.relative_url_root, '/', @project.full_path, '/wikis'].join('')
+    [Gitlab.config.gitlab.relative_url_root, '/', @project.full_path, '/-', '/wikis'].join('')
   end
 
   # Returns the Gitlab::Git::Wiki object.
@@ -158,12 +158,6 @@ class ProjectWiki
     wiki.delete_page(page.path, commit_details(:deleted, message, page.title))
 
     update_project_activity
-  end
-
-  def page_formatted_data(page)
-    page_title, page_dir = page_title_and_dir(page.title)
-
-    wiki.page_formatted_data(title: page_title, dir: page_dir, version: page.version)
   end
 
   def page_title_and_dir(title)

@@ -23,7 +23,6 @@ module Issuable
   include Sortable
   include CreatedAtFilterable
   include UpdatedAtFilterable
-  include IssuableStates
   include ClosedAtFilterable
   include VersionedDescription
 
@@ -100,6 +99,8 @@ module Issuable
     scope :of_milestones, ->(ids) { where(milestone_id: ids) }
     scope :any_milestone, -> { where('milestone_id IS NOT NULL') }
     scope :with_milestone, ->(title) { left_joins_milestones.where(milestones: { title: title }) }
+    scope :any_release, -> { joins_milestone_releases }
+    scope :with_release, -> (tag, project_id) { joins_milestone_releases.where( milestones: { releases: { tag: tag, project_id: project_id } } ) }
     scope :opened, -> { with_state(:opened) }
     scope :only_opened, -> { with_state(:opened) }
     scope :closed, -> { with_state(:closed) }
@@ -118,8 +119,18 @@ module Issuable
     # rubocop:enable GitlabSecurity/SqlInjection
 
     scope :left_joins_milestones,    -> { joins("LEFT OUTER JOIN milestones ON #{table_name}.milestone_id = milestones.id") }
-    scope :order_milestone_due_desc, -> { left_joins_milestones.reorder('milestones.due_date IS NULL, milestones.id IS NULL, milestones.due_date DESC') }
-    scope :order_milestone_due_asc,  -> { left_joins_milestones.reorder('milestones.due_date IS NULL, milestones.id IS NULL, milestones.due_date ASC') }
+    scope :order_milestone_due_desc, -> { left_joins_milestones.reorder(Arel.sql('milestones.due_date IS NULL, milestones.id IS NULL, milestones.due_date DESC')) }
+    scope :order_milestone_due_asc,  -> { left_joins_milestones.reorder(Arel.sql('milestones.due_date IS NULL, milestones.id IS NULL, milestones.due_date ASC')) }
+
+    scope :without_release, -> do
+      joins("LEFT OUTER JOIN milestone_releases ON #{table_name}.milestone_id = milestone_releases.milestone_id")
+        .where('milestone_releases.release_id IS NULL')
+    end
+
+    scope :joins_milestone_releases, -> do
+      joins("JOIN milestone_releases ON #{table_name}.milestone_id = milestone_releases.milestone_id
+             JOIN releases ON milestone_releases.release_id = releases.id").distinct
+    end
 
     scope :without_label, -> { joins("LEFT OUTER JOIN label_links ON label_links.target_type = '#{name}' AND label_links.target_id = #{table_name}.id").where(label_links: { id: nil }) }
     scope :any_label, -> { joins(:label_links).group(:id) }
@@ -154,7 +165,7 @@ module Issuable
     private
 
     def milestone_is_valid
-      errors.add(:milestone_id, message: "is invalid") if milestone_id.present? && !milestone_available?
+      errors.add(:milestone_id, message: "is invalid") if respond_to?(:milestone_id) && milestone_id.present? && !milestone_available?
     end
 
     def description_max_length_for_new_records_is_valid

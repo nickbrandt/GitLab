@@ -17,6 +17,7 @@ const handleUserPopoverMouseOut = event => {
     renderedPopover.$destroy();
     renderedPopover = null;
   }
+  target.removeAttribute('aria-describedby');
 };
 
 /**
@@ -73,8 +74,13 @@ const handleUserPopoverMouseOver = event => {
             location: userData.location,
             bio: userData.bio,
             organization: userData.organization,
+            status: userData.status,
             loaded: true,
           });
+
+          if (userData.status) {
+            return Promise.resolve();
+          }
 
           return UsersCache.retrieveStatusById(userId);
         })

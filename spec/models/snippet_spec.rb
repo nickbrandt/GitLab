@@ -18,6 +18,7 @@ describe Snippet do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to have_many(:notes).dependent(:destroy) }
     it { is_expected.to have_many(:award_emoji).dependent(:destroy) }
+    it { is_expected.to have_many(:user_mentions).class_name("SnippetUserMention") }
   end
 
   describe 'validation' do
@@ -31,6 +32,62 @@ describe Snippet do
     it { is_expected.to validate_presence_of(:content) }
 
     it { is_expected.to validate_inclusion_of(:visibility_level).in_array(Gitlab::VisibilityLevel.values) }
+
+    it do
+      allow(Gitlab::CurrentSettings).to receive(:snippet_size_limit).and_return(1)
+
+      is_expected
+        .to validate_length_of(:content)
+              .is_at_most(Gitlab::CurrentSettings.snippet_size_limit)
+              .with_message("is too long (2 Bytes). The maximum size is 1 Byte.")
+    end
+
+    context 'content validations' do
+      context 'with existing snippets' do
+        let(:snippet) { create(:personal_snippet, content: 'This is a valid content at the time of creation') }
+
+        before do
+          expect(snippet).to be_valid
+
+          stub_application_setting(snippet_size_limit: 2)
+        end
+
+        it 'does not raise a validation error if the content is not changed' do
+          snippet.title = 'new title'
+
+          expect(snippet).to be_valid
+        end
+
+        it 'raises and error if the content is changed and the size is bigger than limit' do
+          snippet.content = snippet.content + "test"
+
+          expect(snippet).not_to be_valid
+        end
+      end
+
+      context 'with new snippets' do
+        let(:limit) { 15 }
+
+        before do
+          stub_application_setting(snippet_size_limit: limit)
+        end
+
+        it 'is valid when content is smaller than the limit' do
+          snippet = build(:personal_snippet, content: 'Valid Content')
+
+          expect(snippet).to be_valid
+        end
+
+        it 'raises error when content is bigger than setting limit' do
+          snippet = build(:personal_snippet, content: 'This is an invalid content')
+
+          aggregate_failures do
+            expect(snippet).not_to be_valid
+            expect(snippet.errors[:content]).to include("is too long (#{snippet.content.size} Bytes). The maximum size is #{limit} Bytes.")
+          end
+        end
+      end
+    end
   end
 
   describe '#to_reference' do
@@ -452,40 +509,19 @@ describe Snippet do
     end
   end
 
-  describe '#embeddable?' do
-    context 'project snippet' do
-      [
-        { project: :public,   snippet: :public,   embeddable: true },
-        { project: :internal, snippet: :public,   embeddable: false },
-        { project: :private,  snippet: :public,   embeddable: false },
-        { project: :public,   snippet: :internal, embeddable: false },
-        { project: :internal, snippet: :internal, embeddable: false },
-        { project: :private,  snippet: :internal, embeddable: false },
-        { project: :public,   snippet: :private,  embeddable: false },
-        { project: :internal, snippet: :private,  embeddable: false },
-        { project: :private,  snippet: :private,  embeddable: false }
-      ].each do |combination|
-        it 'only returns true when both project and snippet are public' do
-          project = create(:project, combination[:project])
-          snippet = create(:project_snippet, combination[:snippet], project: project)
+  describe '#to_json' do
+    let(:snippet) { build(:snippet) }
 
-          expect(snippet.embeddable?).to eq(combination[:embeddable])
-        end
-      end
+    it 'excludes secret_token from generated json' do
+      expect(JSON.parse(to_json).keys).not_to include("secret_token")
     end
 
-    context 'personal snippet' do
-      [
-        { snippet: :public,   embeddable: true },
-        { snippet: :internal, embeddable: false },
-        { snippet: :private,  embeddable: false }
-      ].each do |combination|
-        it 'only returns true when snippet is public' do
-          snippet = create(:personal_snippet, combination[:snippet])
+    it 'does not override existing exclude option value' do
+      expect(JSON.parse(to_json(except: [:id])).keys).not_to include("secret_token", "id")
+    end
 
-          expect(snippet.embeddable?).to eq(combination[:embeddable])
-        end
-      end
+    def to_json(params = {})
+      snippet.to_json(params)
     end
   end
 end

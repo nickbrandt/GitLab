@@ -22,10 +22,33 @@ describe Ci::Pipeline do
     end
   end
 
+  describe '.ci_sources' do
+    subject { described_class.ci_sources }
+
+    let(:all_config_sources) { described_class.config_sources }
+
+    before do
+      all_config_sources.each do |source, _value|
+        create(:ci_pipeline, config_source: source)
+      end
+    end
+
+    it 'contains pipelines having CI only config sources' do
+      expect(subject.map(&:config_source)).to contain_exactly(
+        'auto_devops_source',
+        'external_project_source',
+        'remote_source',
+        'repository_source',
+        'unknown_source'
+      )
+      expect(subject.size).to be < all_config_sources.size
+    end
+  end
+
   describe '#with_vulnerabilities scope' do
-    let!(:pipeline_1) { create(:ci_pipeline_without_jobs, project: project) }
-    let!(:pipeline_2) { create(:ci_pipeline_without_jobs, project: project) }
-    let!(:pipeline_3) { create(:ci_pipeline_without_jobs, project: project) }
+    let!(:pipeline_1) { create(:ci_pipeline, project: project) }
+    let!(:pipeline_2) { create(:ci_pipeline, project: project) }
+    let!(:pipeline_3) { create(:ci_pipeline, project: project) }
 
     before do
       create(:vulnerabilities_occurrence, pipelines: [pipeline_1], project: pipeline.project)
@@ -277,7 +300,7 @@ describe Ci::Pipeline do
     subject { pipeline.dependency_list_report }
 
     before do
-      stub_licensed_features(dependency_list: true)
+      stub_licensed_features(dependency_scanning: true)
     end
 
     context 'when pipeline has a build with dependency list reports' do
@@ -471,27 +494,6 @@ describe Ci::Pipeline do
     end
   end
 
-  describe '#ci_yaml_file_path' do
-    subject { pipeline.ci_yaml_file_path }
-
-    context 'the source is the repository' do
-      let(:implied_yml) { Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content }
-
-      before do
-        pipeline.repository_source!
-      end
-
-      it 'returns the configuration if found' do
-        allow(pipeline.project.repository).to receive(:gitlab_ci_yml_for)
-          .and_return('config')
-
-        expect(pipeline.ci_yaml_file).to be_a(String)
-        expect(pipeline.ci_yaml_file).not_to eq(implied_yml)
-        expect(pipeline.yaml_errors).to be_nil
-      end
-    end
-  end
-
   describe '#latest_merge_request_pipeline?' do
     subject { pipeline.latest_merge_request_pipeline? }
 
@@ -540,6 +542,49 @@ describe Ci::Pipeline do
       let(:merge_request) { create(:merge_request, :on_train, :with_merge_train_pipeline) }
 
       it { is_expected.to be false }
+    end
+  end
+
+  describe '#merge_train_pipeline?' do
+    subject { pipeline.merge_train_pipeline? }
+
+    let!(:pipeline) do
+      create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request, ref: ref, target_sha: 'xxx')
+    end
+
+    let(:merge_request) { create(:merge_request) }
+    let(:ref) { 'refs/merge-requests/1/train' }
+
+    it { is_expected.to be_truthy }
+
+    context 'when ref is merge ref' do
+      let(:ref) { 'refs/merge-requests/1/merge' }
+
+      it { is_expected.to be_falsy }
+    end
+  end
+
+  describe '#merge_request_event_type' do
+    subject { pipeline.merge_request_event_type }
+
+    let(:pipeline) { merge_request.all_pipelines.last }
+
+    context 'when pipeline is merge train pipeline' do
+      let(:merge_request) { create(:merge_request, :with_merge_train_pipeline) }
+
+      it { is_expected.to eq(:merge_train) }
+    end
+
+    context 'when pipeline is merge request pipeline' do
+      let(:merge_request) { create(:merge_request, :with_merge_request_pipeline) }
+
+      it { is_expected.to eq(:merged_result) }
+    end
+
+    context 'when pipeline is detached merge request pipeline' do
+      let(:merge_request) { create(:merge_request, :with_detached_merge_request_pipeline) }
+
+      it { is_expected.to eq(:detached) }
     end
   end
 end

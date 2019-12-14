@@ -1,9 +1,9 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import createFlash from '~/flash';
 import VueRouter from 'vue-router';
 import Index from 'ee/design_management/pages/index.vue';
 import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesign.mutation.graphql';
 import DesignDestroyer from 'ee/design_management/components/design_destroyer.vue';
+import createFlash from '~/flash';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
@@ -56,6 +56,7 @@ describe('Design management index page', () => {
   const findDesignCheckboxes = () => wrapper.findAll('.design-checkbox');
   const findSelectAllButton = () => wrapper.find('.js-select-all');
   const findDeleteButton = () => wrapper.find('deletebutton-stub');
+  const findToolbar = () => wrapper.find('.qa-selector-toolbar');
 
   function createComponent({
     loading = false,
@@ -115,10 +116,12 @@ describe('Design management index page', () => {
       });
     });
 
-    it('renders empty text', () => {
-      createComponent();
+    it('renders a toolbar with buttons when there are designs', () => {
+      createComponent({ designs: mockDesigns, allVersions: [mockVersion] });
 
-      expect(wrapper.element).toMatchSnapshot();
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findToolbar().exists()).toBe(true);
+      });
     });
 
     it('renders designs list and header with upload button', () => {
@@ -135,6 +138,20 @@ describe('Design management index page', () => {
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.element).toMatchSnapshot();
       });
+    });
+  });
+
+  describe('when has no designs', () => {
+    beforeEach(() => {
+      createComponent();
+    });
+
+    it('renders empty text', () => {
+      expect(wrapper.element).toMatchSnapshot();
+    });
+
+    it('does not render a toolbar with buttons', () => {
+      expect(findToolbar().exists()).toBe(false);
     });
   });
 
@@ -233,7 +250,7 @@ describe('Design management index page', () => {
         createFlash.mockReset();
       });
 
-      it('doesn not warn when the max files are uploaded', () => {
+      it('does not warn when the max files are uploaded', () => {
         createComponent();
 
         wrapper.vm.onUploadDesign(new Array(MAXIMUM_FILE_UPLOAD_LIMIT).fill(mockDesigns[0]));
@@ -258,6 +275,10 @@ describe('Design management index page', () => {
 
     it('renders design checkboxes', () => {
       expect(findDesignCheckboxes().length).toBe(mockDesigns.length);
+    });
+
+    it('renders Delete selected button', () => {
+      expect(findDeleteButton().exists()).toBe(true);
     });
 
     it('renders a button with Select all text', () => {
@@ -323,6 +344,10 @@ describe('Design management index page', () => {
 
     it('does not render design checkboxes', () => {
       expect(findDesignCheckboxes().length).toBe(0);
+    });
+
+    it('does not render Delete selected button', () => {
+      expect(findDeleteButton().exists()).toBe(false);
     });
 
     it('does not render Select All button', () => {

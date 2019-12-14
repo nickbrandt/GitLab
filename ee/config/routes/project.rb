@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+scope "/-/push_from_secondary/:geo_node_id" do
+  draw :git_http
+end
+
 constraints(::Constraints::ProjectUrlConstrainer.new) do
   scope(path: '*namespace_id',
         as: :namespace,
@@ -21,11 +25,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         resources :jobs, only: [], constraints: { id: /\d+/ } do
           member do
-            get '/proxy.ws/authorize', to: 'jobs#proxy_websocket_authorize', constraints: { format: nil }
+            get '/proxy.ws/authorize', to: 'jobs#proxy_websocket_authorize', format: false
             get :proxy
           end
         end
 
+        resources :feature_flags
         resource :feature_flags_client, only: [] do
           post :reset_token
         end
@@ -37,10 +42,14 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         namespace :settings do
-          resource :operations, only: [:show, :update] do
+          resource :operations, only: [] do
             member do
               post :reset_alerting_token
             end
+          end
+
+          resource :slack, only: [:destroy, :edit, :update] do
+            get :slack_auth
           end
         end
 
@@ -49,8 +58,55 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get '(*ref)', action: 'show', as: '', constraints: { ref: Gitlab::PathRegex.git_reference_regex }
           end
         end
+
+        resources :subscriptions, only: [:create, :destroy]
+
+        namespace :performance_monitoring do
+          resources :dashboards, only: [:create]
+        end
+
+        resource :licenses, only: [:show]
+        namespace :security do
+          resources :licenses, only: [:index, :create, :update]
+        end
+
+        resource :threat_monitoring, only: [:show], controller: :threat_monitoring
+
+        resources :logs, only: [:index] do
+          collection do
+            get :k8s
+          end
+        end
+
+        resources :protected_environments, only: [:create, :update, :destroy], constraints: { id: /\d+/ } do
+          collection do
+            get 'search'
+          end
+        end
+
+        resources :audit_events, only: [:index]
       end
       # End of the /-/ scope.
+
+      # All new routes should go under /-/ scope.
+      # Look for scope '-' at the top of the file.
+      # rubocop: disable Cop/PutProjectRoutesUnderScope
+
+      resources :path_locks, only: [:index, :destroy] do
+        collection do
+          post :toggle
+        end
+      end
+
+      namespace :prometheus do
+        resources :alerts, constraints: { id: /\d+/ }, only: [:index, :create, :show, :update, :destroy] do
+          post :notify, on: :collection
+        end
+
+        resources :metrics, constraints: { id: %r{[^\/]+} }, only: [] do
+          post :validate_query, on: :collection
+        end
+      end
 
       post 'alerts/notify', to: 'alerting/notifications#create'
 
@@ -67,13 +123,62 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      resources :issues, only: [], constraints: { id: /\d+/ } do
+        member do
+          get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
+          get '/designs(/*vueroute)', to: 'issues#designs', as: :designs, format: false
+        end
+
+        collection do
+          post :export_csv
+          get :service_desk
+        end
+
+        resources :issue_links, only: [:index, :create, :destroy], as: 'links', path: 'links'
+      end
+
+      get '/service_desk' => 'service_desk#show', as: :service_desk
+      put '/service_desk' => 'service_desk#update', as: :service_desk_refresh
+
       resources :merge_requests, only: [], constraints: { id: /\d+/ } do
         member do
+          get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
           get :metrics_reports
           get :license_management_reports
           get :container_scanning_reports
           get :dependency_scanning_reports
           get :sast_reports
+          get :dast_reports
+
+          get :approvals
+          post :approvals, action: :approve
+          delete :approvals, action: :unapprove
+
+          post :rebase
+        end
+
+        resources :approvers, only: :destroy
+        delete 'approvers', to: 'approvers#destroy_via_user_id', as: :approver_via_user_id
+        resources :approver_groups, only: :destroy
+
+        scope module: :merge_requests do
+          resources :drafts, only: [:index, :update, :create, :destroy] do
+            collection do
+              post :publish
+              delete :discard
+            end
+          end
+        end
+      end
+
+      resources :approvers, only: :destroy
+      resources :approver_groups, only: :destroy
+      resources :push_rules, constraints: { id: /\d+/ }, only: [:update]
+
+      resources :pipelines, only: [] do
+        member do
+          get :security
+          get :licenses
         end
       end
 
@@ -83,12 +188,11 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resource :dependencies, only: [:show]
-      resource :licenses, only: [:show]
-
       namespace :security do
+        resource :dashboard, only: [:show], controller: :dashboard
+        resource :configuration, only: [:show], controller: :configuration
+
         resources :dependencies, only: [:index]
-        resources :licenses, only: [:index]
         # We have to define both legacy and new routes for Vulnerability Findings
         # because they are loaded upon application initialization and preloaded by
         # web server.
@@ -105,6 +209,13 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
       end
+
+      resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
+
+      resource :dependencies, only: [:show]
+      # All new routes should go under /-/ scope.
+      # Look for scope '-' at the top of the file.
+      # rubocop: enable Cop/PutProjectRoutesUnderScope
     end
   end
 end

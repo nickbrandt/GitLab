@@ -5,13 +5,23 @@ import {
   eventToOption,
   eventsByIdentifier,
   getLabelEventsIdentifiers,
+  nestQueryStringKeys,
+  flattenDurationChartData,
+  getDurationChartData,
+  transformRawStages,
 } from 'ee/analytics/cycle_analytics/utils';
 import {
   customStageEvents as events,
   labelStartEvent,
   labelStopEvent,
   customStageStartEvents as startEvents,
-  customStageStopEvents as stopEvents,
+  transformedDurationData,
+  flattenedDurationData,
+  durationChartPlottableData,
+  startDate,
+  endDate,
+  issueStage,
+  rawCustomStage,
 } from './mock_data';
 
 const labelEvents = [labelStartEvent, labelStopEvent].map(i => i.identifier);
@@ -23,9 +33,11 @@ describe('Cycle analytics utils', () => {
     });
 
     it('will return false for input that is not a start event', () => {
-      [stopEvents[0], {}, [], null, undefined].forEach(ev => {
-        expect(isStartEvent(ev)).toEqual(false);
-      });
+      [{ identifier: 'fake-event', canBeStartEvent: false }, {}, [], null, undefined].forEach(
+        ev => {
+          expect(isStartEvent(ev)).toEqual(false);
+        },
+      );
     });
   });
 
@@ -100,6 +112,70 @@ describe('Cycle analytics utils', () => {
         expect(eventsByIdentifier(events, items)).toEqual([]);
       });
       expect(eventsByIdentifier([], labelEvents)).toEqual([]);
+    });
+  });
+
+  describe('nestQueryStringKeys', () => {
+    const targetKey = 'foo';
+    const obj = { bar: 10, baz: 'awesome', qux: false, boo: ['lol', 'something'] };
+
+    it('will return an object with each key nested under the targetKey', () => {
+      expect(nestQueryStringKeys(obj, targetKey)).toEqual({
+        'foo[bar]': 10,
+        'foo[baz]': 'awesome',
+        'foo[qux]': false,
+        'foo[boo]': ['lol', 'something'],
+      });
+    });
+
+    it('returns an empty object if the targetKey is not a valid string', () => {
+      ['', null, {}, []].forEach(badStr => {
+        expect(nestQueryStringKeys(obj, badStr)).toEqual({});
+      });
+    });
+
+    it('will return an empty object if given an empty object', () => {
+      [{}, null, [], ''].forEach(tarObj => {
+        expect(nestQueryStringKeys(tarObj, targetKey)).toEqual({});
+      });
+    });
+  });
+
+  describe('flattenDurationChartData', () => {
+    it('flattens the data as expected', () => {
+      const flattenedData = flattenDurationChartData(transformedDurationData);
+
+      expect(flattenedData).toStrictEqual(flattenedDurationData);
+    });
+  });
+
+  describe('cycleAnalyticsDurationChart', () => {
+    it('computes the plottable data as expected', () => {
+      const plottableData = getDurationChartData(transformedDurationData, startDate, endDate);
+
+      expect(plottableData).toStrictEqual(durationChartPlottableData);
+    });
+  });
+
+  describe('transformRawStages', () => {
+    it('retains all the stage properties', () => {
+      const transformed = transformRawStages([issueStage, rawCustomStage]);
+      expect(transformed).toMatchSnapshot();
+    });
+
+    it('converts object properties from snake_case to camelCase', () => {
+      const [transformedCustomStage] = transformRawStages([rawCustomStage]);
+      expect(transformedCustomStage).toMatchObject({
+        endEventIdentifier: 'issue_first_added_to_board',
+        startEventIdentifier: 'issue_first_mentioned_in_commit',
+      });
+    });
+
+    it('sets the slug to the value of the stage id', () => {
+      const transformed = transformRawStages([issueStage, rawCustomStage]);
+      transformed.forEach(t => {
+        expect(t.slug).toEqual(t.id);
+      });
     });
   });
 });

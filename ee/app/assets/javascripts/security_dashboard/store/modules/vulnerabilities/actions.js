@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import axios from '~/lib/utils/axios_utils';
 import downloadPatchHelper from 'ee/vue_shared/security_reports/store/utils/download_patch_helper';
+import axios from '~/lib/utils/axios_utils';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { s__, sprintf } from '~/locale';
 import createFlash from '~/flash';

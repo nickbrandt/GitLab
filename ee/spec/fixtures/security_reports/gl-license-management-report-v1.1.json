@@ -37,12 +37,12 @@
       "licenses": [
         {
           "name": "BSD",
-          "url": "http://spdx.org/licenses/BSD-3-Clause.json"
+          "url": "http://spdx.org/licenses/BSD-4-Clause.json"
         }
       ],
       "license": {
         "name": "BSD",
-        "url": "http://spdx.org/licenses/BSD-3-Clause.json"
+        "url": "http://spdx.org/licenses/BSD-4-Clause.json"
       },
       "dependency": {
         "name": "b",
@@ -59,7 +59,7 @@
         },
         {
           "name": "BSD",
-          "url": "http://spdx.org/licenses/BSD-3-Clause.json"
+          "url": "http://spdx.org/licenses/BSD-4-Clause.json"
         }
       ],
       "license": {

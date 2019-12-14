@@ -17,8 +17,18 @@ module Projects
 
       private
 
+      def can_access_vulnerable?
+        return true unless query_params[:filter] == 'vulnerable'
+
+        can?(current_user, :read_vulnerability, project)
+      end
+
+      def can_collect_dependencies?
+        report_service.able_to_fetch? && can_access_vulnerable?
+      end
+
       def collect_dependencies
-        found_dependencies = report_service.able_to_fetch? ? service.execute : []
+        found_dependencies = can_collect_dependencies? ? service.execute : []
         ::Gitlab::ItemsCollection.new(found_dependencies)
       end
 
@@ -41,7 +51,9 @@ module Projects
       end
 
       def query_params
-        params.permit(:sort, :sort_by, :filter).delete_if do |key, value|
+        return @permitted_params if @permitted_params
+
+        @permitted_params = params.permit(:sort, :sort_by, :filter).delete_if do |key, value|
           match_disallowed(key, value)
         end
       end

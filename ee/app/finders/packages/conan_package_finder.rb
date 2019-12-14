@@ -2,15 +2,15 @@
 
 module Packages
   class ConanPackageFinder
-    attr_reader :query, :current_user
+    attr_reader :current_user, :query
 
-    def initialize(query, current_user)
-      @query = query
+    def initialize(current_user, params)
       @current_user = current_user
+      @query = params[:query]
     end
 
     def execute
-      packages_for_current_user.with_name_like(query).order_name_asc
+      packages_for_current_user.with_name_like(query).order_name_asc if query
     end
 
     private

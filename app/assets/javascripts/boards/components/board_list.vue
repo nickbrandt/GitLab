@@ -71,6 +71,9 @@ export default {
         total: this.list.issuesSize,
       });
     },
+    issuesSizeExceedsMax() {
+      return this.list.maxIssueCount > 0 && this.list.issuesSize > this.list.maxIssueCount;
+    },
   },
   watch: {
     filters: {
@@ -84,7 +87,8 @@ export default {
       this.$nextTick(() => {
         if (
           this.scrollHeight() <= this.listHeight() &&
-          this.list.issuesSize > this.list.issues.length
+          this.list.issuesSize > this.list.issues.length &&
+          this.list.isExpanded
         ) {
           this.list.page += 1;
           this.list.getIssues(false).catch(() => {
@@ -434,7 +438,7 @@ export default {
       ref="list"
       :data-board="list.id"
       :data-board-type="list.type"
-      :class="{ 'is-smaller': showIssueForm }"
+      :class="{ 'is-smaller': showIssueForm, 'bg-danger-100': issuesSizeExceedsMax }"
       class="board-list w-100 h-100 list-unstyled mb-0 p-1 js-board-list"
     >
       <board-card

@@ -1,8 +1,8 @@
 <script>
-import { s__ } from '~/locale';
 import { mapActions, mapState } from 'vuex';
-import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import SafeLink from 'ee/vue_shared/components/safe_link.vue';
+import { s__ } from '~/locale';
+import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import LicensePackages from './license_packages.vue';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 
@@ -45,6 +45,7 @@ export default {
     id="modal-set-license-approval"
     :header-title-text="headerTitleText"
     modal-size="lg"
+    data-qa-selector="license_management_modal"
     @cancel="resetLicenseInModal"
   >
     <slot v-if="currentLicenseInModal">
@@ -93,6 +94,7 @@ export default {
         v-if="canBlacklist"
         class="btn btn-remove btn-inverted js-modal-secondary-action"
         data-dismiss="modal"
+        data-qa-selector="blacklist_license_button"
         @click="blacklistLicense(currentLicenseInModal)"
       >
         {{ s__('LicenseCompliance|Blacklist license') }}
@@ -102,6 +104,7 @@ export default {
         type="button"
         class="btn btn-success js-modal-primary-action"
         data-dismiss="modal"
+        data-qa-selector="approve_license_button"
         @click="approveLicense(currentLicenseInModal)"
       >
         {{ s__('LicenseCompliance|Approve license') }}

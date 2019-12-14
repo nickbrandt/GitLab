@@ -4,8 +4,7 @@ module QA
   context 'Plan' do
     describe 'Epics Management' do
       before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Flow::Login.sign_in
       end
 
       it 'creates, edits, and deletes an epic' do
@@ -44,11 +43,11 @@ module QA
           EE::Page::Group::Epic::Show.perform do |show|
             show.add_issue_to_epic(issue.web_url)
 
-            expect(show).to have_related_issuable_item
+            expect(show).to have_related_issue_item
 
             show.remove_issue_from_epic
 
-            expect(show).to have_no_related_issuable_item
+            expect(show).to have_no_related_issue_item
           end
         end
 

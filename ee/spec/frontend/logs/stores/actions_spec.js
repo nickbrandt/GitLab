@@ -1,20 +1,21 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 
 import testAction from 'helpers/vuex_action_helper';
 import * as types from 'ee/logs/stores/mutation_types';
 import logsPageState from 'ee/logs/stores/state';
-import { setLogsEndpoint, fetchEnvironments, fetchLogs } from 'ee/logs/stores/actions';
+import { setInitData, showPodLogs, fetchEnvironments, fetchLogs } from 'ee/logs/stores/actions';
+import axios from '~/lib/utils/axios_utils';
 
 import flash from '~/flash';
 
 import {
-  mockLogsEndpoint,
+  mockProjectPath,
+  mockPodName,
+  mockEnvironmentsEndpoint,
   mockEnvironments,
   mockPods,
-  mockPodName,
   mockLines,
-  mockEnvironmentsEndpoint,
+  mockEnvName,
 } from '../mock_data';
 
 jest.mock('~/flash');
@@ -31,14 +32,31 @@ describe('Logs Store actions', () => {
     flash.mockClear();
   });
 
-  describe('setLogsEndpoint', () => {
-    it('should commit SET_LOGS_ENDPOINT mutation', done => {
+  describe('setInitData', () => {
+    it('should commit environment and pod name mutation', done => {
       testAction(
-        setLogsEndpoint,
-        mockLogsEndpoint,
+        setInitData,
+        { projectPath: mockProjectPath, environmentName: mockEnvName, podName: mockPodName },
         state,
-        [{ type: types.SET_LOGS_ENDPOINT, payload: mockLogsEndpoint }],
-        [],
+        [
+          { type: types.SET_PROJECT_PATH, payload: mockProjectPath },
+          { type: types.SET_PROJECT_ENVIRONMENT, payload: mockEnvName },
+          { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
+        ],
+        [{ type: 'fetchLogs' }],
+        done,
+      );
+    });
+  });
+
+  describe('showPodLogs', () => {
+    it('should commit pod name', done => {
+      testAction(
+        showPodLogs,
+        mockPodName,
+        state,
+        [{ type: types.SET_CURRENT_POD_NAME, payload: mockPodName }],
+        [{ type: 'fetchLogs' }],
         done,
       );
     });
@@ -81,24 +99,6 @@ describe('Logs Store actions', () => {
         },
       );
     });
-
-    it('should commit RECEIVE_ENVIRONMENTS_DATA_ERROR on error', done => {
-      mock.onGet('/root/autodevops-deploy/environments.json').replyOnce(500);
-      testAction(
-        fetchEnvironments,
-        '/root/autodevops-deploy/environments.json',
-        state,
-        [
-          { type: types.REQUEST_ENVIRONMENTS_DATA },
-          { type: types.RECEIVE_ENVIRONMENTS_DATA_ERROR },
-        ],
-        [],
-        () => {
-          expect(flash).toHaveBeenCalledTimes(1);
-          done();
-        },
-      );
-    });
   });
 
   describe('fetchLogs', () => {
@@ -106,22 +106,35 @@ describe('Logs Store actions', () => {
       mock = new MockAdapter(axios);
     });
 
-    it('should commit logs and pod data when there is pod name defined', done => {
-      state.logs.endpoint = mockLogsEndpoint;
+    afterEach(() => {
+      mock.reset();
+    });
 
-      mock.onGet(mockLogsEndpoint).replyOnce(200, {
-        pods: mockPods,
-        logs: mockLines,
-      });
+    it('should commit logs and pod data when there is pod name defined', done => {
+      state.projectPath = mockProjectPath;
+      state.environments.current = mockEnvName;
+      state.pods.current = mockPodName;
+
+      const endpoint = `/${mockProjectPath}/-/logs/k8s.json`;
+
+      mock
+        .onGet(endpoint, { params: { environment_name: mockEnvName, pod_name: mockPodName } })
+        .reply(200, {
+          pod_name: mockPodName,
+          pods: mockPods,
+          logs: mockLines,
+        });
+
+      mock.onGet(endpoint).replyOnce(202); // mock reactive cache
 
       testAction(
         fetchLogs,
-        mockPodName,
+        null,
         state,
         [
-          { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
           { type: types.REQUEST_PODS_DATA },
           { type: types.REQUEST_LOGS_DATA },
+          { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
           { type: types.RECEIVE_PODS_DATA_SUCCESS, payload: mockPods },
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLines },
         ],
@@ -131,12 +144,17 @@ describe('Logs Store actions', () => {
     });
 
     it('should commit logs and pod data when no pod name defined', done => {
-      state.logs.endpoint = mockLogsEndpoint;
+      state.projectPath = mockProjectPath;
+      state.environments.current = mockEnvName;
 
-      mock.onGet(mockLogsEndpoint).replyOnce(200, {
+      const endpoint = `/${mockProjectPath}/-/logs/k8s.json`;
+
+      mock.onGet(endpoint, { params: { environment_name: mockEnvName } }).reply(200, {
+        pod_name: mockPodName,
         pods: mockPods,
         logs: mockLines,
       });
+      mock.onGet(endpoint).replyOnce(202); // mock reactive cache
 
       testAction(
         fetchLogs,
@@ -145,7 +163,7 @@ describe('Logs Store actions', () => {
         [
           { type: types.REQUEST_PODS_DATA },
           { type: types.REQUEST_LOGS_DATA },
-          { type: types.SET_CURRENT_POD_NAME, payload: mockPods[0] },
+          { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
           { type: types.RECEIVE_PODS_DATA_SUCCESS, payload: mockPods },
           { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLines },
         ],
@@ -154,17 +172,18 @@ describe('Logs Store actions', () => {
       );
     });
 
-    it('should commit logs and pod errors', done => {
-      state.logs.endpoint = mockLogsEndpoint;
+    it('should commit logs and pod errors when backend fails', done => {
+      state.projectPath = mockProjectPath;
+      state.environments.current = mockEnvName;
 
-      mock.onGet(mockLogsEndpoint).replyOnce(500);
+      const endpoint = `/${mockProjectPath}/logs.json?environment_name=${mockEnvName}`;
+      mock.onGet(endpoint).replyOnce(500);
 
       testAction(
         fetchLogs,
-        mockPodName,
+        null,
         state,
         [
-          { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
           { type: types.REQUEST_PODS_DATA },
           { type: types.REQUEST_LOGS_DATA },
           { type: types.RECEIVE_PODS_DATA_ERROR },

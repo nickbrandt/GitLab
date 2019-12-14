@@ -43,7 +43,7 @@ describe('feature flags helpers spec', () => {
       ];
 
       const expected = [
-        {
+        expect.objectContaining({
           id: 3,
           environmentScope: 'environment_scope',
           active: true,
@@ -51,9 +51,9 @@ describe('feature flags helpers spec', () => {
           protected: true,
           rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
           rolloutPercentage: '56',
-          rolloutUserIds: ['123', '234'],
+          rolloutUserIds: '123, 234',
           shouldBeDestroyed: true,
-        },
+        }),
       ];
 
       const actual = mapToScopesViewModel(input);
@@ -85,6 +85,66 @@ describe('feature flags helpers spec', () => {
       expect(mapToScopesViewModel(null)).toEqual([]);
       expect(mapToScopesViewModel(undefined)).toEqual([]);
     });
+
+    describe('with user IDs per environment', () => {
+      let oldGon;
+
+      beforeEach(() => {
+        oldGon = window.gon;
+        window.gon = { features: { featureFlagsUsersPerEnvironment: true } };
+      });
+
+      afterEach(() => {
+        window.gon = oldGon;
+      });
+
+      it('sets the user IDs as a comma separated string', () => {
+        const input = [
+          {
+            id: 3,
+            environment_scope: 'environment_scope',
+            active: true,
+            can_update: true,
+            protected: true,
+            strategies: [
+              {
+                name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+                parameters: {
+                  percentage: '56',
+                },
+              },
+              {
+                name: ROLLOUT_STRATEGY_USER_ID,
+                parameters: {
+                  userIds: '123,234',
+                },
+              },
+            ],
+
+            _destroy: true,
+          },
+        ];
+
+        const expected = [
+          {
+            id: 3,
+            environmentScope: 'environment_scope',
+            active: true,
+            canUpdate: true,
+            protected: true,
+            rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+            rolloutPercentage: '56',
+            rolloutUserIds: '123, 234',
+            shouldBeDestroyed: true,
+            shouldIncludeUserIds: true,
+          },
+        ];
+
+        const actual = mapToScopesViewModel(input);
+
+        expect(actual).toEqual(expected);
+      });
+    });
   });
 
   describe('mapFromScopesViewModel', () => {
@@ -92,6 +152,7 @@ describe('feature flags helpers spec', () => {
       const input = {
         name: 'name',
         description: 'description',
+        active: true,
         scopes: [
           {
             id: 4,
@@ -111,6 +172,7 @@ describe('feature flags helpers spec', () => {
         operations_feature_flag: {
           name: 'name',
           description: 'description',
+          active: true,
           scopes_attributes: [
             {
               id: 4,
@@ -169,6 +231,75 @@ describe('feature flags helpers spec', () => {
 
       expect(actualScopes).toEqual([]);
     });
+    describe('with user IDs per environment', () => {
+      let oldGon;
+
+      beforeEach(() => {
+        oldGon = window.gon;
+        window.gon = { features: { featureFlagsUsersPerEnvironment: true } };
+      });
+
+      afterEach(() => {
+        window.gon = oldGon;
+      });
+
+      it('sets the user IDs as a comma separated string', () => {
+        const input = {
+          name: 'name',
+          description: 'description',
+          scopes: [
+            {
+              id: 4,
+              environmentScope: 'environmentScope',
+              active: true,
+              canUpdate: true,
+              protected: true,
+              shouldBeDestroyed: true,
+              rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+              rolloutPercentage: '48',
+              rolloutUserIds: '123, 234',
+              shouldIncludeUserIds: true,
+            },
+          ],
+        };
+
+        const expected = {
+          operations_feature_flag: {
+            name: 'name',
+            description: 'description',
+            scopes_attributes: [
+              {
+                id: 4,
+                environment_scope: 'environmentScope',
+                active: true,
+                can_update: true,
+                protected: true,
+                _destroy: true,
+                strategies: [
+                  {
+                    name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+                    parameters: {
+                      groupId: PERCENT_ROLLOUT_GROUP_ID,
+                      percentage: '48',
+                    },
+                  },
+                  {
+                    name: ROLLOUT_STRATEGY_USER_ID,
+                    parameters: {
+                      userIds: '123,234',
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        };
+
+        const actual = mapFromScopesViewModel(input);
+
+        expect(actual).toEqual(expected);
+      });
+    });
   });
 
   describe('createNewEnvironmentScope', () => {
@@ -179,7 +310,7 @@ describe('feature flags helpers spec', () => {
         id: expect.stringContaining(INTERNAL_ID_PREFIX),
         rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
         rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-        rolloutUserIds: [],
+        rolloutUserIds: '',
       };
 
       const actual = createNewEnvironmentScope();
@@ -199,7 +330,7 @@ describe('feature flags helpers spec', () => {
         id: expect.stringContaining(INTERNAL_ID_PREFIX),
         rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
         rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-        rolloutUserIds: [],
+        rolloutUserIds: '',
       };
 
       const actual = createNewEnvironmentScope(overrides);

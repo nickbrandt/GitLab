@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Highlight do
@@ -109,7 +111,7 @@ describe Gitlab::Highlight do
       end
 
       it 'utilizes longer timeout for sidekiq' do
-        allow(Sidekiq).to receive(:server?).and_return(true)
+        allow(Gitlab::Runtime).to receive(:sidekiq?).and_return(true)
         expect(Timeout).to receive(:timeout).with(described_class::TIMEOUT_BACKGROUND).and_call_original
 
         subject.highlight("Content")

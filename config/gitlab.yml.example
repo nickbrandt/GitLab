@@ -321,8 +321,8 @@ production: &base
     # external_https: ["1.1.1.1:443", "[2001::1]:443"] # If defined, enables custom domain and certificate support in GitLab Pages
 
     # File that contains the shared secret key for verifying access for gitlab-pages.
-    # Default is '.gitlab_pages_shared_secret' relative to Rails.root (i.e. root of the GitLab app).
-    # secret_file: /home/git/gitlab/.gitlab_pages_shared_secret
+    # Default is '.gitlab_pages_secret' relative to Rails.root (i.e. root of the GitLab app).
+    # secret_file: /home/git/gitlab/.gitlab_pages_secret
 
   ## Mattermost
   ## For enabling Add to Mattermost button
@@ -366,6 +366,9 @@ production: &base
     # Send admin emails once a week
     admin_email_worker:
       cron: "0 0 * * 0"
+    # Send emails for personal tokens which are about to expire
+    personal_access_tokens_expiring_worker:
+      cron: "0 1 * * *"
 
     # Remove outdated repository archives
     repository_archive_cache_worker:
@@ -467,6 +470,13 @@ production: &base
       # enabled: true
       # primary_api_url: http://localhost:5000/ # internal address to the primary registry, will be used by GitLab to directly communicate with primary registry API
 
+  ## Feature Flag https://docs.gitlab.com/ee/user/project/operations/feature_flags.html
+  feature_flags:
+    unleash:
+      # enabled: false
+      # url: https://gitlab.com/api/v4/feature_flags/unleash/<project_id>
+      # app_name: gitlab.com # Environment name of your GitLab instance
+      # instance_id: INSTANCE_ID
 
   #
   # 2. GitLab CI settings
@@ -1025,12 +1035,6 @@ production: &base
     #  enabled: true
     #  address: localhost
     #  port: 8083
-    #  # blackout_seconds:
-    #  #   defines an interval to block healthcheck,
-    #  #   but continue accepting application requests
-    #  #   this allows Load Balancer to notice service
-    #  #   being shutdown and not interrupt any of the clients
-    #  blackout_seconds: 10
 
   ## Prometheus settings
   # Do not modify these settings here. They should be modified in /etc/gitlab/gitlab.rb
@@ -1041,6 +1045,14 @@ production: &base
   prometheus:
     # enable: true
     # listen_address: 'localhost:9090'
+
+  shutdown:
+    #  # blackout_seconds:
+    #  #   defines an interval to block healthcheck,
+    #  #   but continue accepting application requests
+    #  #   this allows Load Balancer to notice service
+    #  #   being shutdown and not interrupt any of the clients
+    #  blackout_seconds: 10
 
   #
   # 5. Extra customization

@@ -135,7 +135,7 @@ describe Groups::UpdateService, '#execute' do
   context 'with project' do
     let(:project) { create(:project, namespace: group) }
 
-    shared_examples 'transfer not allowed' do
+    shared_examples 'with packages' do
       before do
         stub_licensed_features(packages: true)
         group.add_owner(user)
@@ -148,10 +148,16 @@ describe Groups::UpdateService, '#execute' do
           expect(update_group(group, user, path: 'updated')).to be false
           expect(group.errors[:path]).to include('cannot change when group contains projects with NPM packages')
         end
+
+        it 'allows name update' do
+          expect(update_group(group, user, name: 'Updated')).to be true
+          expect(group.errors).to be_empty
+          expect(group.name).to eq('Updated')
+        end
       end
     end
 
-    it_behaves_like 'transfer not allowed'
+    it_behaves_like 'with packages'
 
     context 'located in a subgroup' do
       let(:subgroup) { create(:group, parent: group) }
@@ -161,7 +167,7 @@ describe Groups::UpdateService, '#execute' do
         subgroup.add_owner(user)
       end
 
-      it_behaves_like 'transfer not allowed'
+      it_behaves_like 'with packages'
 
       it 'does allow a path update if there is not a root namespace change' do
         expect(update_group(subgroup, user, path: 'updated')).to be true

@@ -56,6 +56,7 @@ export default {
     return {
       isInputFocused: false,
       isAutoCompleteOpen: false,
+      areEventsAssigned: false,
     };
   },
   computed: {
@@ -73,6 +74,9 @@ export default {
     if (this.focusOnMount) {
       this.$refs.input.focus();
     }
+  },
+  beforeUpdate() {
+    this.setupAutoComplete();
   },
   beforeDestroy() {
     const $input = $(this.$refs.input);
@@ -116,7 +120,13 @@ export default {
         caretPos,
       });
     },
-    onBlur() {
+    onBlur(event) {
+      // Early exit if this Blur event is caused by card header
+      const container = this.$root.$el.querySelector('.js-button-container');
+      if (container && container.contains(event.relatedTarget)) {
+        return;
+      }
+
       this.isInputFocused = false;
 
       // Avoid tokenizing partial input when clicking an autocomplete item
@@ -139,8 +149,11 @@ export default {
         this.gfmAutoComplete.setup($input, this.autoCompleteOptions);
       }
 
-      $input.on('shown-issues.atwho', this.onAutoCompleteToggled.bind(this, true));
-      $input.on('hidden-issues.atwho', this.onAutoCompleteToggled.bind(this, true));
+      if (!this.areEventsAssigned) {
+        $input.on('shown-issues.atwho', this.onAutoCompleteToggled.bind(this, true));
+        $input.on('hidden-issues.atwho', this.onAutoCompleteToggled.bind(this, true));
+      }
+      this.areEventsAssigned = true;
     },
     onIssuableFormWrapperClick() {
       this.$refs.input.focus();
@@ -153,7 +166,7 @@ export default {
   <div
     ref="issuableFormWrapper"
     :class="{ focus: isInputFocused }"
-    class="add-issuable-form-input-wrapper form-control"
+    class="add-issuable-form-input-wrapper form-control gl-field-error-outline"
     role="button"
     @click="onIssuableFormWrapperClick"
   >

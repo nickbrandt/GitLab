@@ -6,6 +6,7 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import { issuableTypesMap } from 'ee/related_issues/constants';
 
 import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
+import SlotSwitch from '~/vue_shared/components/slot_switch.vue';
 import CreateEpicForm from './create_epic_form.vue';
 import CreateIssueForm from './create_issue_form.vue';
 import IssueActionsSplitButton from './issue_actions_split_button.vue';
@@ -16,8 +17,15 @@ import RelatedItemsTreeBody from './related_items_tree_body.vue';
 
 import { OVERFLOW_AFTER } from '../constants';
 
+const FORM_SLOTS = {
+  addItem: 'addItem',
+  createEpic: 'createEpic',
+  createIssue: 'createIssue',
+};
+
 export default {
   OVERFLOW_AFTER,
+  FORM_SLOTS,
   components: {
     GlLoadingIcon,
     RelatedItemsTreeHeader,
@@ -27,6 +35,7 @@ export default {
     TreeItemRemoveModal,
     CreateIssueForm,
     IssueActionsSplitButton,
+    SlotSwitch,
   },
   data() {
     return {
@@ -39,6 +48,8 @@ export default {
       'itemsFetchInProgress',
       'itemsFetchResultEmpty',
       'itemAddInProgress',
+      'itemAddFailure',
+      'itemAddFailureType',
       'itemCreateInProgress',
       'showAddItemForm',
       'showCreateEpicForm',
@@ -56,6 +67,21 @@ export default {
     },
     createIssueEnabled() {
       return gon.features && gon.features.epicNewIssue;
+    },
+    visibleForm() {
+      if (this.showAddItemForm) {
+        return FORM_SLOTS.addItem;
+      }
+
+      if (this.showCreateEpicForm) {
+        return FORM_SLOTS.createEpic;
+      }
+
+      if (this.isCreateIssueFormVisible) {
+        return FORM_SLOTS.createIssue;
+      }
+
+      return null;
     },
   },
   mounted() {
@@ -144,19 +170,25 @@ export default {
           @showCreateIssueForm="showCreateIssueForm"
         />
       </related-items-tree-header>
-      <div
-        v-if="showAddItemForm || showCreateEpicForm || isCreateIssueFormVisible"
+      <slot-switch
+        v-if="visibleForm"
+        :active-slot-names="[visibleForm]"
         class="card-body add-item-form-container"
-        :class="{ 'border-bottom-0': itemsFetchResultEmpty }"
+        :class="{
+          'border-bottom-0': itemsFetchResultEmpty,
+          'gl-show-field-errors': itemAddFailure,
+        }"
       >
         <add-item-form
-          v-if="showAddItemForm"
+          :slot="$options.FORM_SLOTS.addItem"
           :issuable-type="issuableType"
           :input-value="itemInputValue"
           :is-submitting="itemAddInProgress"
           :pending-references="pendingReferences"
           :auto-complete-sources="itemAutoCompleteSources"
           :path-id-separator="itemPathIdSeparator"
+          :has-error="itemAddFailure"
+          :item-add-failure-type="itemAddFailureType"
           @pendingIssuableRemoveRequest="handlePendingItemRemove"
           @addIssuableFormInput="handleAddItemFormInput"
           @addIssuableFormBlur="handleAddItemFormBlur"
@@ -164,16 +196,16 @@ export default {
           @addIssuableFormCancel="handleAddItemFormCancel"
         />
         <create-epic-form
-          v-if="showCreateEpicForm"
+          :slot="$options.FORM_SLOTS.createEpic"
           :is-submitting="itemCreateInProgress"
           @createEpicFormSubmit="handleCreateEpicFormSubmit"
           @createEpicFormCancel="handleCreateEpicFormCancel"
         />
         <create-issue-form
-          v-if="isCreateIssueFormVisible && !showAddItemForm && !showCreateEpicForm"
+          :slot="$options.FORM_SLOTS.createIssue"
           @cancel="isCreateIssueFormVisible = false"
         />
-      </div>
+      </slot-switch>
       <related-items-tree-body
         v-if="!itemsFetchResultEmpty"
         :parent-item="parentItem"

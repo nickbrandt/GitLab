@@ -25,6 +25,10 @@ class GroupsController < Groups::ApplicationController
 
   before_action :user_actions, only: [:show]
 
+  before_action do
+    push_frontend_feature_flag(:vue_issuables_list, @group)
+  end
+
   skip_cross_project_access_check :index, :new, :create, :edit, :update,
                                   :destroy, :projects
   # When loading show as an atom feed, we render events that could leak cross
@@ -112,7 +116,7 @@ class GroupsController < Groups::ApplicationController
   def destroy
     Groups::DestroyService.new(@group, current_user).async_execute
 
-    redirect_to root_path, status: 302, alert: "Group '#{@group.name}' was scheduled for deletion."
+    redirect_to root_path, status: :found, alert: "Group '#{@group.name}' was scheduled for deletion."
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
@@ -177,6 +181,7 @@ class GroupsController < Groups::ApplicationController
       :avatar,
       :description,
       :emails_disabled,
+      :mentions_disabled,
       :lfs_enabled,
       :name,
       :path,

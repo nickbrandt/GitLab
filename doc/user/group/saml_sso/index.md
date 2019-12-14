@@ -2,19 +2,23 @@
 type: reference, howto
 ---
 
-# SAML SSO for GitLab.com Groups **(SILVER ONLY)**
+# SAML SSO for GitLab.com groups **(SILVER ONLY)**
 
 > Introduced in [GitLab.com Silver](https://about.gitlab.com/pricing/) 11.0.
-
-NOTE: **Note:**
-This topic is for SAML on GitLab.com Silver tier and above. For SAML on self-managed GitLab instances, see [SAML OmniAuth Provider](../../../integration/saml.md).
 
 SAML on GitLab.com allows users to be automatically added to a group, and then allows those users to sign into GitLab.com. Users should already have an account on the GitLab instance, or can create one when logging in for the first time.
 
 User synchronization for GitLab.com is partially supported using [SCIM](scim_setup.md).
 
-NOTE: **Note:**
-SAML SSO for GitLab.com groups does not sync users between providers without using SCIM. If a group is not using SCIM, group Owners will still need to manage user accounts (for example, removing users when necessary).
+## Important notes
+
+Note the following:
+
+- This topic is for SAML on GitLab.com Silver tier and above. For SAML on self-managed GitLab
+  instances, see [SAML OmniAuth Provider](../../../integration/saml.md).
+- SAML SSO for GitLab.com groups requires SCIM to sync users between providers. If a
+  group is not using SCIM, group Owners will still need to manage user accounts (for example,
+  removing users when necessary).
 
 ## Configuring your Identity Provider
 
@@ -25,6 +29,23 @@ SAML SSO for GitLab.com groups does not sync users between providers without usi
 1. Once the identity provider is set up, move on to [configuring GitLab](#configuring-gitlab).
 
 ![Issuer and callback for configuring SAML identity provider with GitLab.com](img/group_saml_configuration_information.png)
+
+### NameID
+
+GitLab.com uses the SAML NameID to identify users. The NameID element:
+
+- Is a required field in the SAML response.
+- Must be unique to each user.
+- Must be a persistent value that will never change, such as a randomly generated unique user ID.
+- Is case sensitive. The NameID must match exactly on subsequent login attempts, so should not rely on user input that could change between upper and lower case.
+- Should not be an email address or username. We strongly recommend against these as it is hard to guarantee they will never change, for example when a person's name changes. Email addresses are also case-insensitive, which can result in users being unable to sign in.
+
+CAUTION: **Warning:**
+Once users have signed into GitLab using the SSO SAML setup, changing the `NameID` will break the configuration and potentially lock users out of the GitLab group.
+
+#### NameID Format
+
+We recommend setting the NameID format to `Persistent` unless using a field (such as email) that requires a different format.
 
 ### SSO enforcement
 
@@ -51,39 +72,31 @@ When this option is enabled:
 
 - All existing and new users in the group will be required to log in via the SSO URL associated with the group.
 - On successfully authenticating, GitLab will prompt the user to create a new, dedicated account using the email address received from the configured identity provider.
-- After the group managed account has been created, group activity will require the use of this user account.
+- After the group-managed account has been created, group activity will require the use of this user account.
 
-Since use of the group managed account requires the use of SSO, users of group managed accounts will lose access to these accounts when they are no longer able to authenticate with the connected identity provider. In the case of an offboarded employee who has been removed from your identity provider:
+Since use of the group-managed account requires the use of SSO, users of group-managed accounts will lose access to these accounts when they are no longer able to authenticate with the connected identity provider. In the case of an offboarded employee who has been removed from your identity provider:
 
 - The user will be unable to access the group (their credentials will no longer work on the identity provider when prompted to SSO).
 - Contributions in the group (e.g. issues, merge requests) will remain intact.
 
-### NameID
+#### Assertions
 
-GitLab.com uses the SAML NameID to identify users. The NameID element:
+When using group-managed accounts, the following user details need to be passed to GitLab as SAML
+assertions to be able to create a user.
 
-- Is a required field in the SAML response.
-- Must be unique to each user.
-- Must be a persistent value that will never change, such as a randomly generated unique user ID.
-- Is case sensitive. The NameID must match exactly on subsequent login attempts, so should not rely on user input that could change between upper and lower case.
-
-We strongly recommend against using Email as the NameID as it is hard to guarantee it will never change, for example when a person's name changes. Similarly usernames should be avoided if possible.
-
-### Assertions
-
-| Field | Supported keys |
-|-------|----------------|
+| Field           | Supported keys |
+|-----------------|----------------|
 | Email (required)| `email`, `mail` |
-| Full Name | `name` |
-| First Name | `first_name`, `firstname`, `firstName` |
-| Last Name | `last_name`, `lastname`, `lastName` |
+| Full Name       | `name` |
+| First Name      | `first_name`, `firstname`, `firstName` |
+| Last Name       | `last_name`, `lastname`, `lastName` |
 
 ## Metadata configuration
 
 GitLab provides metadata XML that can be used to configure your Identity Provider.
 
 1. Navigate to the group and click **Settings > SAML SSO**.
-1. Copy the provided **GitLab metadata URL**
+1. Copy the provided **GitLab metadata URL**.
 1. Follow your Identity Provider's documentation and paste the metadata URL when it is requested.
 
 ## Configuring GitLab
@@ -108,12 +121,31 @@ NOTE: **Note:** GitLab is unable to provide support for IdPs that are not listed
 | Azure | [Configuring single sign-on to applications](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/configure-single-sign-on-non-gallery-applications) |
 | Auth0 | [Auth0 as Identity Provider](https://auth0.com/docs/protocols/saml/saml-idp-generic) |
 | G Suite | [Set up your own custom SAML application](https://support.google.com/a/answer/6087519?hl=en) |
-| JumpCloud | [Single Sign On (SSO) with GitLab](https://support.jumpcloud.com/customer/en/portal/articles/2810701-single-sign-on-sso-with-gitlab) |
+| JumpCloud | [Single Sign On (SSO) with GitLab](https://support.jumpcloud.com/support/s/article/single-sign-on-sso-with-gitlab-2019-08-21-10-36-47) |
 | Okta | [Setting up a SAML application in Okta](https://developer.okta.com/docs/guides/saml-application-setup/overview/) |
 | OneLogin | [Use the OneLogin SAML Test Connector](https://onelogin.service-now.com/support?id=kb_article&sys_id=93f95543db109700d5505eea4b96198f) |
 | Ping Identity | [Add and configure a new SAML application](https://support.pingidentity.com/s/document-item?bundleId=pingone&topicId=xsh1564020480660-1.html) |
 
 When [configuring your identify provider](#configuring-your-identity-provider), please consider the notes below for specific providers to help avoid common issues and as a guide for terminology used.
+
+### Azure setup notes
+
+<i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
+For a demo of the Azure SAML setup including SCIM, see [SCIM Provisioning on Azure Using SAML SSO for Groups Demo](https://youtu.be/24-ZxmTeEBU).
+
+| GitLab Setting | Azure Field |
+|--------------|----------------|
+| Identifier   | Identifier (Entity ID) |
+| Assertion consumer service URL | Reply URL (Assertion Consumer Service URL) |
+| Identity provider single sign on URL | Login URL |
+| Certificate fingerprint | Thumbprint |
+
+We recommend:
+
+- **Unique User Identifier (Name identifier)** set to `user.objectID`.
+- **nameid-format** set to persistent.
+
+Set other user attributes and claims according to the [assertions table](#assertions).
 
 ### Okta setup notes
 
@@ -184,6 +216,8 @@ For example, to unlink the `MyOrg` account, the following **Disconnect** button 
 | Certificate fingerprint | Used to confirm that communications over SAML are secure by checking that the server is signing communications with the correct certificate. Also known as a certificate thumbprint. |
 
 ## Troubleshooting
+
+This section contains possible solutions for problems you might encounter.
 
 ### SAML debugging tools
 

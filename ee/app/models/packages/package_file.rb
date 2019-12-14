@@ -3,10 +3,15 @@ class Packages::PackageFile < ApplicationRecord
   include UpdateProjectStatistics
 
   delegate :project, :project_id, to: :package
+  delegate :conan_file_type, to: :conan_file_metadatum
 
   update_project_statistics project_statistics_name: :packages_size
 
   belongs_to :package
+
+  has_one :conan_file_metadatum, inverse_of: :package_file
+
+  accepts_nested_attributes_for :conan_file_metadatum
 
   validates :package, presence: true
   validates :file, presence: true
@@ -14,6 +19,12 @@ class Packages::PackageFile < ApplicationRecord
 
   scope :recent, -> { order(id: :desc) }
   scope :with_files_stored_locally, -> { where(file_store: ::Packages::PackageFileUploader::Store::LOCAL) }
+  scope :with_conan_file_metadata, -> { includes(:conan_file_metadatum) }
+
+  scope :with_conan_file_type, ->(file_type) do
+    joins(:conan_file_metadatum)
+      .where(packages_conan_file_metadata: { conan_file_type: ::Packages::ConanFileMetadatum.conan_file_types[file_type] })
+  end
 
   mount_uploader :file, Packages::PackageFileUploader
 

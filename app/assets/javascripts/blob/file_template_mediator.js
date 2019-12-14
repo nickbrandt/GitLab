@@ -1,6 +1,6 @@
+import $ from 'jquery';
 import Api from '~/api';
 
-import $ from 'jquery';
 import Flash from '../flash';
 import FileTemplateTypeSelector from './template_selectors/type_selector';
 import BlobCiYamlSelector from './template_selectors/ci_yaml_selector';
@@ -118,8 +118,6 @@ export default class FileTemplateMediator {
       }
     });
 
-    this.setFilename(item.name);
-
     if (this.editor.getValue() !== '') {
       this.setTypeSelectorToggleText(item.name);
     }
@@ -133,14 +131,16 @@ export default class FileTemplateMediator {
 
   selectTemplateFile(selector, query, data) {
     const self = this;
+    const { name } = selector.config;
 
     selector.renderLoading();
 
     this.fetchFileTemplate(selector.config.type, query, data)
       .then(file => {
         this.setEditorContent(file);
+        this.setFilename(name);
         selector.renderLoaded();
-        this.typeSelector.setToggleText(selector.config.name);
+        this.typeSelector.setToggleText(name);
         toast(__(`${query} template applied`), {
           action: {
             text: __('Undo'),

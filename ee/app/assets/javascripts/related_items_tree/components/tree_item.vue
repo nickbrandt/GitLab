@@ -77,6 +77,7 @@ export default {
 <template>
   <li
     class="tree-item list-item pt-0 pb-0"
+    data-qa-selector="related_issue_item"
     :class="{
       'has-children': hasChildren,
       'item-expanded': childrenFlags[itemReference].itemExpanded,

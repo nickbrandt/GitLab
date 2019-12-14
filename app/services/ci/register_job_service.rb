@@ -128,13 +128,13 @@ module Ci
     end
 
     def track_exception_for_build(ex, build)
-      Gitlab::Sentry.track_acceptable_exception(ex, extra: {
+      Gitlab::Sentry.track_exception(ex,
         build_id: build.id,
         build_name: build.name,
         build_stage: build.stage,
         pipeline_id: build.pipeline_id,
         project_id: build.project_id
-      })
+      )
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
@@ -149,7 +149,7 @@ module Ci
       # this returns builds that are ordered by number of running builds
       # we prefer projects that don't use shared runners at all
       joins("LEFT JOIN (#{running_builds_for_shared_runners.to_sql}) AS project_builds ON ci_builds.project_id=project_builds.project_id")
-        .order('COALESCE(project_builds.running_builds, 0) ASC', 'ci_builds.id ASC')
+        .order(Arel.sql('COALESCE(project_builds.running_builds, 0) ASC'), 'ci_builds.id ASC')
     end
     # rubocop: enable CodeReuse/ActiveRecord
 

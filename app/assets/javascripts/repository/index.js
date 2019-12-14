@@ -7,6 +7,7 @@ import TreeActionLink from './components/tree_action_link.vue';
 import DirectoryDownloadLinks from './components/directory_download_links.vue';
 import apolloProvider from './graphql';
 import { setTitle } from './utils/title';
+import { updateFormAction } from './utils/dom';
 import { parseBoolean } from '../lib/utils/common_utils';
 import { webIDEUrl } from '../lib/utils/url_utility';
 import { __ } from '../locale';
@@ -16,7 +17,6 @@ export default function setupVueRepositoryList() {
   const { dataset } = el;
   const { projectPath, projectShortPath, ref, fullName } = dataset;
   const router = createRouter(projectPath, ref);
-  const hideOnRootEls = document.querySelectorAll('.js-hide-on-root');
 
   apolloProvider.clients.defaultClient.cache.writeData({
     data: {
@@ -28,20 +28,7 @@ export default function setupVueRepositoryList() {
   });
 
   router.afterEach(({ params: { pathMatch } }) => {
-    const isRoot = pathMatch === undefined || pathMatch === '/';
-
     setTitle(pathMatch, ref, fullName);
-
-    if (!isRoot) {
-      document
-        .querySelectorAll('.js-keep-hidden-on-navigation')
-        .forEach(elem => elem.classList.add('hidden'));
-    }
-
-    document
-      .querySelectorAll('.js-hide-on-navigation')
-      .forEach(elem => elem.classList.toggle('hidden', !isRoot));
-    hideOnRootEls.forEach(elem => elem.classList.toggle('hidden', isRoot));
   });
 
   const breadcrumbEl = document.getElementById('js-repo-breadcrumb');
@@ -56,7 +43,14 @@ export default function setupVueRepositoryList() {
       forkNewBlobPath,
       forkNewDirectoryPath,
       forkUploadBlobPath,
+      uploadPath,
+      newDirPath,
     } = breadcrumbEl.dataset;
+
+    router.afterEach(({ params: { pathMatch = '/' } }) => {
+      updateFormAction('.js-upload-blob-form', uploadPath, pathMatch);
+      updateFormAction('.js-create-dir-form', newDirPath, pathMatch);
+    });
 
     // eslint-disable-next-line no-new
     new Vue({

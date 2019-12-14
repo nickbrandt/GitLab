@@ -1,6 +1,6 @@
 <script>
-import IssueStatusIcon from '~/reports/components/issue_status_icon.vue';
 import { components, componentNames } from 'ee_else_ce/reports/components/issue_body';
+import IssueStatusIcon from '~/reports/components/issue_status_icon.vue';
 
 export default {
   name: 'ReportItem',
@@ -46,6 +46,7 @@ export default {
   <li
     :class="{ 'is-dismissed': issue.isDismissed }"
     class="report-block-list-issue align-items-center"
+    data-qa-selector="report_item_row"
   >
     <issue-status-icon
       v-if="showReportSectionStatusIcon"

@@ -1,9 +1,8 @@
 <script>
-import { mapState, mapActions, mapGetters } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import ModalRuleCreate from './modal_rule_create.vue';
 import ModalRuleRemove from './modal_rule_remove.vue';
-import FallbackRules from './fallback_rules.vue';
 
 export default {
   components: {
@@ -11,7 +10,6 @@ export default {
     ModalRuleRemove,
     GlButton,
     GlLoadingIcon,
-    FallbackRules,
   },
   computed: {
     ...mapState({
@@ -19,7 +17,6 @@ export default {
       isLoading: state => state.approvals.isLoading,
       hasLoaded: state => state.approvals.hasLoaded,
     }),
-    ...mapGetters(['isEmpty']),
     createModalId() {
       return `${this.settings.prefix}-approvals-create-modal`;
     },
@@ -42,12 +39,9 @@ export default {
     <gl-loading-icon v-if="!hasLoaded" :size="2" />
     <template v-else>
       <div class="border-bottom">
-        <slot v-if="isEmpty" name="fallback">
-          <fallback-rules />
-        </slot>
-        <slot v-else name="rules"></slot>
+        <slot name="rules"></slot>
       </div>
-      <div v-if="settings.canEdit" class="border-bottom py-3 px-2">
+      <div v-if="settings.canEdit && settings.allowMultiRule" class="border-bottom py-3 px-2">
         <gl-loading-icon v-if="isLoading" />
         <div v-if="settings.allowMultiRule" class="d-flex">
           <gl-button

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Auth::LDAP::AuthHash do
@@ -56,7 +58,9 @@ describe Gitlab::Auth::LDAP::AuthHash do
     end
 
     before do
-      allow_any_instance_of(Gitlab::Auth::LDAP::Config).to receive(:attributes).and_return(attributes)
+      allow_next_instance_of(Gitlab::Auth::LDAP::Config) do |instance|
+        allow(instance).to receive(:attributes).and_return(attributes)
+      end
     end
 
     it "has the correct username" do
@@ -91,7 +95,7 @@ describe Gitlab::Auth::LDAP::AuthHash do
       let(:given_uid) { 'uid=John Smith,ou=People,dc=example,dc=com' }
 
       before do
-        raw_info[:uid] = ['JOHN']
+        raw_info[:uid] = [+'JOHN']
       end
 
       it 'enabled the username attribute is lower cased' do

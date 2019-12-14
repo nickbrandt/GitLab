@@ -62,28 +62,10 @@ describe Security::StoreReportsService do
         expect { subject }.not_to raise_error
       end
 
-      context 'feature disabled' do
-        before do
-          stub_feature_flags(cache_vulnerability_history: false)
-        end
+      it 'caches vulnerability history' do
+        expect_any_instance_of(Gitlab::Vulnerabilities::HistoryCache).to receive(:fetch)
 
-        it 'does not cache vulnerability history' do
-          expect_any_instance_of(Gitlab::Vulnerabilities::HistoryCache).not_to receive(:fetch)
-
-          subject
-        end
-      end
-
-      context 'feature enabled' do
-        before do
-          stub_feature_flags(cache_vulnerability_history: true)
-        end
-
-        it 'caches vulnerability history' do
-          expect_any_instance_of(Gitlab::Vulnerabilities::HistoryCache).to receive(:fetch)
-
-          subject
-        end
+        subject
       end
     end
   end
