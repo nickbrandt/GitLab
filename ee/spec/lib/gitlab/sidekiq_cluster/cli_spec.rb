@@ -84,6 +84,51 @@ describe Gitlab::SidekiqCluster::CLI do
     end
   end
 
+  describe '#wait_for_termination' do
+    it 'waits for termination of all sub-processes and succeeds after 3 checks' do
+      expect(Gitlab::SidekiqCluster).to receive(:any_alive?)
+        .with(an_instance_of(Array)).and_return(true, true, true, false)
+
+      expect(Gitlab::SidekiqCluster).to receive(:pids_alive)
+        .with([]).and_return([])
+
+      expect(Gitlab::SidekiqCluster).to receive(:signal_processes)
+        .with([], :KILL)
+
+      # Check every 0.1s, for no more than 1 second total
+      cli.wait_for_termination(0.1, 1)
+    end
+
+    context 'with hanging workers' do
+      before do
+        expect(cli).to receive(:write_pid)
+        expect(cli).to receive(:trap_signals)
+        expect(cli).to receive(:start_loop)
+      end
+
+      it 'hard kills workers after timeout expires' do
+        worker_pids = [101, 102, 103]
+        expect(Gitlab::SidekiqCluster).to receive(:start)
+                                            .with([['foo']], default_options)
+                                            .and_return(worker_pids)
+
+        expect(Gitlab::SidekiqCluster).to receive(:any_alive?)
+          .with(worker_pids).and_return(true).at_least(10).times
+
+        expect(Gitlab::SidekiqCluster).to receive(:pids_alive)
+          .with(worker_pids).and_return([102])
+
+        expect(Gitlab::SidekiqCluster).to receive(:signal_processes)
+          .with([102], :KILL)
+
+        cli.run(%w(foo))
+
+        # Check every 0.1s, for no more than 1 second total
+        cli.wait_for_termination(0.1, 1)
+      end
+    end
+  end
+
   describe '#trap_signals' do
     it 'traps the termination and forwarding signals' do
       expect(Gitlab::SidekiqCluster).to receive(:trap_terminate)

@@ -7,6 +7,12 @@ require 'time'
 module Gitlab
   module SidekiqCluster
     class CLI
+      # How often to check for processes when terminating
+      CHECK_TERMINATE_INTERVAL_SECONDS = 1
+      # How long to wait in total when asking for a clean termination
+      # Sidekiq default to self-terminate is 25s
+      TERMINATE_TIMEOUT_SECONDS = 30
+
       CommandError = Class.new(StandardError)
 
       def initialize(log_output = STDERR)
@@ -63,10 +69,19 @@ module Gitlab
         SidekiqCluster.write_pid(@pid) if @pid
       end
 
+      def wait_for_termination(check_interval = CHECK_TERMINATE_INTERVAL_SECONDS, terminate_timeout = TERMINATE_TIMEOUT_SECONDS)
+        deadline = Gitlab::Metrics::System.monotonic_time + terminate_timeout
+        sleep(check_interval) while SidekiqCluster.any_alive?(@processes) && Gitlab::Metrics::System.monotonic_time < deadline
+
+        # Hard-stop any that remain; they're likely stuck
+        SidekiqCluster.signal_processes(SidekiqCluster.pids_alive(@processes), :KILL)
+      end
+
       def trap_signals
         SidekiqCluster.trap_terminate do |signal|
           @alive = false
           SidekiqCluster.signal_processes(@processes, signal)
+          wait_for_termination
         end
 
         SidekiqCluster.trap_forward do |signal|

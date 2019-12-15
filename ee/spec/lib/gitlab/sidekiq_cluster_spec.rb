@@ -146,6 +146,26 @@ describe Gitlab::SidekiqCluster do
     end
   end
 
+  describe '.any_alive?' do
+    it 'returns true if at least one process is alive' do
+      processes = [1, 2]
+
+      allow(described_class).to receive(:signal).with(1, 0).and_return(true)
+      allow(described_class).to receive(:signal).with(2, 0).and_return(false)
+
+      expect(described_class.any_alive?(processes)).to eq(true)
+    end
+
+    it 'returns false when all threads are dead' do
+      processes = [1, 2]
+
+      allow(described_class).to receive(:signal).with(1, 0).and_return(false)
+      allow(described_class).to receive(:signal).with(2, 0).and_return(false)
+
+      expect(described_class.any_alive?(processes)).to eq(false)
+    end
+  end
+
   describe '.write_pid' do
     it 'writes the PID of the current process to the given file' do
       handle = double(:handle)

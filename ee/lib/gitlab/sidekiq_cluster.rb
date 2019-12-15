@@ -143,6 +143,14 @@ module Gitlab
       true
     end
 
+    def self.any_alive?(pids)
+      pids_alive(pids).any?
+    end
+
+    def self.pids_alive(pids)
+      pids.select { |pid| signal(pid, 0) }
+    end
+
     def self.write_pid(path)
       File.open(path, 'w') do |handle|
         handle.write(Process.pid.to_s)
