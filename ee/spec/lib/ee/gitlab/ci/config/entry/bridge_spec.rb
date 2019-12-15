@@ -14,7 +14,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
     # as they do not have sense in context of Bridge
     let(:ignored_inheritable_columns) do
       %i[before_script after_script image services cache interruptible timeout
-         retry tags]
+         retry tags artifacts]
     end
   end
 
