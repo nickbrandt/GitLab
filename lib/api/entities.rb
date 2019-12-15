@@ -166,6 +166,11 @@ module API
       end
     end
 
+    class SentryProjectErrorTrackingSettings < Grape::Entity
+      expose :project_name
+      expose :project_url
+    end
+
     class RemoteMirror < Grape::Entity
       expose :id
       expose :enabled
