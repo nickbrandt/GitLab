@@ -4,11 +4,11 @@ module Resolvers
   class EpicResolver < BaseResolver
     argument :iid, GraphQL::ID_TYPE,
              required: false,
-             description: 'The IID of the epic, e.g., "1"'
+             description: 'IID of the epic, e.g., "1"'
 
     argument :iids, [GraphQL::ID_TYPE],
              required: false,
-             description: 'The list of IIDs of epics, e.g., [1, 2]'
+             description: 'List of IIDs of epics, e.g., [1, 2]'
 
     argument :state, Types::EpicStateEnum,
              required: false,

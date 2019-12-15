@@ -12,22 +12,19 @@ module EE
           end, description: "Indicates if #{feature.to_s.humanize} are enabled for namespace"
         end
 
-        field :epic, # rubocop:disable Graphql/Descriptions
-              ::Types::EpicType,
-              null: true,
+        field :epic, ::Types::EpicType, null: true,
+              description: 'Find a single epic',
               resolver: ::Resolvers::EpicResolver.single
 
-        field :epics, # rubocop:disable Graphql/Descriptions
-              ::Types::EpicType.connection_type,
-              null: true,
+        field :epics, ::Types::EpicType.connection_type, null: true,
+              description: 'Find epics',
               max_page_size: 2000,
               resolver: ::Resolvers::EpicResolver
 
-        field :timelogs,
-              ::Types::TimelogType.connection_type,
-              null: false, complexity: 5,
-              resolver: ::Resolvers::TimelogResolver,
-              description: 'Time logged in issues by group members'
+        field :timelogs, ::Types::TimelogType.connection_type, null: false,
+              description: 'Time logged in issues by group members',
+              complexity: 5,
+              resolver: ::Resolvers::TimelogResolver
       end
     end
   end
