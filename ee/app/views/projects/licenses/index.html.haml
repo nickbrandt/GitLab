@@ -1,6 +1,6 @@
 - breadcrumb_title _('License Compliance')
 - page_title _('License Compliance')
 
-#js-licenses-app{ data: { endpoint: project_security_licenses_path(@project),
+#js-licenses-app{ data: { endpoint: project_licenses_path(@project, format: :json),
   documentation_path: help_page_path('user/application_security/license_compliance/index'),
   empty_state_svg_path: image_path('illustrations/Dependency-list-empty-state.svg') } }
