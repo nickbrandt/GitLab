@@ -56,6 +56,8 @@ gitlab:
       limits:
         cpu: 975m
         memory: 1450M
+    hpa:
+      targetAverageValue: 650m
   task-runner:
     resources:
       requests:
