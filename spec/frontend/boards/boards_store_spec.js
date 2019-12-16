@@ -6,7 +6,7 @@ import eventHub from '~/boards/eventhub';
 import { listObj, listObjDuplicate } from './mock_data';
 
 import ListIssue from '~/boards/models/issue';
-import '~/boards/models/list';
+import List from '~/boards/models/list';
 
 jest.mock('js-cookie');
 
@@ -189,42 +189,31 @@ describe('boardsStore', () => {
         });
     });
   });
-  
-  describe('saveList',() => {
-    const entityType = 'moorhen';
-    const entity.id = 'quack';
-    const expectedRequest = expect.objectContaining({
-      data: JSON.stringify({ list: { [entityType]: entity.id } }),
-    });
+
+  describe('saveList', () => {
+    const id = 'TOO-MUCH';
 
     let requestSpy;
+    let mock;
+    let list;
 
     beforeEach(() => {
       requestSpy = jest.fn();
-      axiosMock.onPost(endpoints.listsEndpoint).replyOnce(config => requestSpy(config));
+      mock = new AxiosMockAdapter(axios);
+      list = new List(listObj);
     });
 
     it('makes a request to save a list', () => {
-      requestSpy.mockReturnValue([200, dummyResponse]);
-      const expectedResponse = expect.objectContaining({ data: dummyResponse });
+      mock.onPost(endpoints.listsEndpoint).reply(200, listObj);
+      mock
+        .onGet(`${endpoints.listsEndpoint}/${listObj.id}/issues?id=${listObj.id}&page=1`)
+        .reply(200, { issues: [createTestIssue()] });
 
-      return expect(boardsStore.saveList(this))
-        .resolves.toEqual(expectedResponse)
-        .then(() => {
-          expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
-        });
+      const expectedResponse = expect.objectContaining({ issues: [createTestIssue()] });
+
+      return expect(boardsStore.saveList(list)).resolves.toEqual(expectedResponse);
     });
-
-    it('fails for error response', () => {
-      requestSpy.mockReturnValue([500]);
-
-      return expect(boardsStore.saveList(this))
-        .rejects.toThrow()
-        .then(() => {
-          expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
-        });
-    });
-  }); 
+  });
 
   describe('getIssuesForList', () => {
     const id = 'TOO-MUCH';
@@ -610,7 +599,6 @@ describe('boardsStore', () => {
       return expect(boardsStore.deleteBoard({ id })).rejects.toThrow();
     });
   });
-
 
   describe('when created', () => {
     beforeEach(() => {
