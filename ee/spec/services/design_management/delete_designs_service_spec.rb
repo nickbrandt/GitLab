@@ -37,6 +37,12 @@ describe DesignManagement::DeleteDesignsService do
     it 'returns successfully', :aggregate_failures do
       expect(response).to include(status: :success)
     end
+
+    it 'saves the user as the author' do
+      version = response[:version]
+
+      expect(version.author).to eq(user)
+    end
   end
 
   before do

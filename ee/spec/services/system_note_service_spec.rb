@@ -53,16 +53,10 @@ describe SystemNoteService do
     subject { described_class.design_version_added(version) }
 
     # default (valid) parameters:
-    let(:n_designs) { 3 }
-    let(:designs) { create_list(:design, n_designs, issue: issue) }
-    let(:user) { build(:user) }
-    let(:version) do
+    let_it_be(:n_designs) { 3 }
+    let_it_be(:designs) { create_list(:design, n_designs, issue: issue) }
+    let_it_be(:version) do
       create(:design_version, issue: issue, designs: designs)
-    end
-
-    before do
-      # Avoid needing to call into gitaly
-      allow(version).to receive(:author).and_return(user)
     end
 
     context 'with one kind of event' do
@@ -81,7 +75,7 @@ describe SystemNoteService do
     end
 
     context 'with a mixture of events' do
-      let(:n_designs) { DesignManagement::Action.events.size }
+      let_it_be(:n_designs) { DesignManagement::Action.events.size }
 
       before do
         designs.each_with_index do |design, i|
