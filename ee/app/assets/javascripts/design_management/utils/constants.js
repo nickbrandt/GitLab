@@ -1,3 +1,0 @@
-const DESIGN_DETAIL_CONTAINER_CLASS = 'design-detail';
-
-export default DESIGN_DETAIL_CONTAINER_CLASS;

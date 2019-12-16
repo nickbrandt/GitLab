@@ -188,23 +188,17 @@ describe('Design management design index page', () => {
             edges: [],
           },
         },
+        errorMessage: 'woops',
       });
     });
     it('container is in correct position in DOM', () => {
-      wrapper.vm.$nextTick(() => {
-        // tests that `design-detail` class exists on Component container,
-        // and that the '.flash-container' element exists and is placed correctly
-        expect(wrapper.element).toMatchSnapshot();
-      });
-    });
-    it('creates flash on mutation error', () => {
-      utils.createDesignDetailFlash = jest.fn();
+      expect(wrapper.element).toMatchSnapshot();
 
-      try {
-        wrapper.vm.onMutationError('test error');
-      } catch (e) {
-        expect(utils.createDesignDetailFlash).toHaveBeenCalled();
-      }
+      // wrapper.vm.$nextTick(() => {
+      //   // tests that `design-detail` class exists on Component container,
+      //   // and that the '.flash-container' element exists and is placed correctly
+      //   expect(wrapper.element).toMatchSnapshot();
+      // });
     });
   });
 });

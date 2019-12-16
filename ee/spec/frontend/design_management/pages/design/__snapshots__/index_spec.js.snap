@@ -19,9 +19,20 @@ exports[`Design management design index page flash container is in correct posit
       <div
         class="p-3"
       >
-        <div
-          class="flash-container"
-        />
+        <glalert-stub
+          dismissible="true"
+          dismisslabel="Dismiss"
+          primarybuttonlink=""
+          primarybuttontext=""
+          secondarybuttonlink=""
+          secondarybuttontext=""
+          title=""
+          variant="danger"
+        >
+          
+            woops
+          
+        </glalert-stub>
       </div>
        
       <designimage-stub

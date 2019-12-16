@@ -21,7 +21,6 @@ import {
   DESIGN_NOT_EXIST_ERROR,
   designDeletionError,
 } from '../../utils/error_messages';
-import DESIGN_DETAIL_CONTAINER_CLASS from '../../utils/constants';
 
 export default {
   components: {
@@ -198,7 +197,6 @@ export default {
     next();
   },
   createImageDiffNoteMutation,
-  DESIGN_DETAIL_CONTAINER_CLASS,
 };
 </script>
 
