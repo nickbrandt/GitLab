@@ -4,6 +4,10 @@ module Gitlab
   module BackgroundMigration
     module UserMentions
       module Models
+        # == IsolatedMentionable concern
+        #
+        # Shortcutted for isolation version of Mentionable to be used in mentions migrations
+        #
         module IsolatedMentionable
           extend ::ActiveSupport::Concern
 

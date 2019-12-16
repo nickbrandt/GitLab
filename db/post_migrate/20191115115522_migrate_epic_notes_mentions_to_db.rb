@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MigrateEpicNotesMentionsToDb < ActiveRecord::Migration[5.2]
+  include Gitlab::Database::MigrationHelpers
+
   DOWNTIME = false
 
   disable_ddl_transaction!
@@ -18,9 +20,10 @@ class MigrateEpicNotesMentionsToDb < ActiveRecord::Migration[5.2]
 
   def up
     disable_statement_timeout do
-      # create temporary index, takes ~25 mins on #database-lab
-      execute "create index #{INDEX_NAME} on notes (id) where note ~~ '%@%'::text AND notes.noteable_type = 'Epic' AND notes.system = false"
+      # create temporary index for notes with mentions, may take well over 1h
+      add_concurrent_index(:notes, :id, where: "note ~~ '%@%'::text AND notes.noteable_type = 'Epic' AND notes.system = false", name: INDEX_NAME)
     end
+
     conditions = "note LIKE '%@%' AND notes.noteable_type = 'Epic' AND epic_user_mentions.epic_id IS NULL"
     join = "LEFT JOIN epic_user_mentions ON notes.id = epic_user_mentions.note_id"
 

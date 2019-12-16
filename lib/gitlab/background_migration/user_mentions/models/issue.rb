@@ -5,7 +5,6 @@ module Gitlab
   module BackgroundMigration
     module UserMentions
       module Models
-
         class Issue < ActiveRecord::Base
           include IsolatedMentionable
           include CacheMarkdownField

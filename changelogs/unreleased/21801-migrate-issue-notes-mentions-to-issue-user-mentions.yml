@@ -1,0 +1,6 @@
+---
+title: Migrate epic, epic notes, snippet, snippet notes, design notes and commit mentions
+  to respective DB tables
+merge_request: 20929
+author:
+type: deprecated

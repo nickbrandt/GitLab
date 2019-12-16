@@ -12,8 +12,8 @@ module Gitlab
 
         def perform(resource_model, join, conditions, with_notes, start_id, end_id)
           isolation_module = "Gitlab::BackgroundMigration::UserMentions::Models"
-          resource_model              = "#{isolation_module}::#{resource_model}".constantize if resource_model.is_a?(String)
-          model                       = with_notes ? "#{isolation_module}::Note".constantize : resource_model
+          resource_model = "#{isolation_module}::#{resource_model}".constantize if resource_model.is_a?(String)
+          model = with_notes ? "#{isolation_module}::Note".constantize : resource_model
           resource_user_mention_model = "Gitlab::BackgroundMigration::UserMentions::Models::#{resource_model.name.demodulize}UserMention".constantize
 
           records = model.joins(join).where(conditions).where(id: start_id..end_id)
