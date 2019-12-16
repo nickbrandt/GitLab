@@ -4,7 +4,6 @@ import DesignIndex from 'ee/design_management/pages/design/index.vue';
 import DesignDiscussion from 'ee/design_management/components/design_notes/design_discussion.vue';
 import DesignReplyForm from 'ee/design_management/components/design_notes/design_reply_form.vue';
 import createImageDiffNoteMutation from 'ee/design_management/graphql/mutations/createImageDiffNote.mutation.graphql';
-import * as utils from 'ee/design_management/utils/design_management_utils';
 import design from '../../mock_data/design';
 
 jest.mock('mousetrap', () => ({
@@ -191,14 +190,8 @@ describe('Design management design index page', () => {
         errorMessage: 'woops',
       });
     });
-    it('container is in correct position in DOM', () => {
+    it('GlAlert is rendered in correct position with correct content', () => {
       expect(wrapper.element).toMatchSnapshot();
-
-      // wrapper.vm.$nextTick(() => {
-      //   // tests that `design-detail` class exists on Component container,
-      //   // and that the '.flash-container' element exists and is placed correctly
-      //   expect(wrapper.element).toMatchSnapshot();
-      // });
     });
   });
 });
