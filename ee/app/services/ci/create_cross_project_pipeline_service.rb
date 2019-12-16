@@ -31,7 +31,12 @@ module Ci
 
     def can_create_cross_pipeline?
       can?(current_user, :update_pipeline, project) &&
-        can?(target_user, :create_pipeline, target_project)
+        can?(target_user, :create_pipeline, target_project) &&
+          can_update_branch?
+    end
+
+    def can_update_branch?
+      ::Gitlab::UserAccess.new(target_user, project: target_project).can_update_branch?(target_ref)
     end
 
     def create_pipeline!

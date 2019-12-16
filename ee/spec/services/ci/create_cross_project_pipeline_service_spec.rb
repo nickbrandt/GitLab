@@ -223,5 +223,19 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
         end
       end
     end
+
+    context 'when user does not have access to push protected branch of downstream project' do
+      before do
+        create(:protected_branch, :maintainers_can_push,
+               project: downstream_project, name: 'feature')
+      end
+
+      it 'changes status of the bridge build' do
+        service.execute(bridge)
+
+        expect(bridge.reload).to be_failed
+        expect(bridge.failure_reason).to eq 'insufficient_bridge_permissions'
+      end
+    end
   end
 end
