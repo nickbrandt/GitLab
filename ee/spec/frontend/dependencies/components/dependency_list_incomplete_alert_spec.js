@@ -1,5 +1,5 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import DependencyListAlert from 'ee/dependencies/components/dependency_list_alert.vue';
+import { GlAlert } from '@gitlab/ui';
 import DependencyListIncompleteAlert from 'ee/dependencies/components/dependency_list_incomplete_alert.vue';
 
 describe('DependencyListIncompleteAlert component', () => {
@@ -24,23 +24,23 @@ describe('DependencyListIncompleteAlert component', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  describe('when the generic alert component emits a close event', () => {
-    let closeListenerSpy;
+  describe('when the GlAlert component emits a dismiss event', () => {
+    let dismissListenerSpy;
 
     beforeEach(() => {
-      closeListenerSpy = jest.fn();
+      dismissListenerSpy = jest.fn();
 
       factory({
         listeners: {
-          close: closeListenerSpy,
+          dismiss: dismissListenerSpy,
         },
       });
 
-      wrapper.find(DependencyListAlert).vm.$emit('close');
+      wrapper.find(GlAlert).vm.$emit('dismiss');
     });
 
     it('calls the given listener', () => {
-      expect(closeListenerSpy).toHaveBeenCalledTimes(1);
+      expect(dismissListenerSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
