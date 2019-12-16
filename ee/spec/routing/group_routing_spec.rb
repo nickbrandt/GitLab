@@ -75,6 +75,14 @@ describe 'Group routing', "routing" do
     end
   end
 
+  describe 'hooks' do
+    it 'routes to hooks edit page' do
+      allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
+
+      expect(get('/groups/gitlabhq/-/hooks/2/edit')).to route_to('groups/hooks#edit', group_id: 'gitlabhq', id: '2')
+    end
+  end
+
   describe 'packages' do
     it 'routes to packages index page' do
       allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
