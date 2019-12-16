@@ -21,6 +21,7 @@ describe Gitlab::Elastic::ProjectSearchResults, :elastic do
 
   describe 'initialize with ref' do
     let(:ref) { 'refs/heads/test' }
+
     subject(:results) { described_class.new(user, query, project.id, ref) }
 
     it { expect(results.project).to eq(project) }

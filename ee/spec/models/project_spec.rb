@@ -1767,6 +1767,7 @@ describe Project do
 
   describe '#object_pool_missing?' do
     let(:pool) { create(:pool_repository, :ready) }
+
     subject { create(:project, :repository, pool_repository: pool) }
 
     it 'returns true when object pool is missing' do

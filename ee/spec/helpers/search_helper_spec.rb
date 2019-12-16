@@ -180,6 +180,7 @@ describe SearchHelper do
     let(:use_elasticsearch) { true }
     let(:scope) { 'commits' }
     let(:search_service) { instance_double(Search::GlobalService, use_elasticsearch?: use_elasticsearch, scope: scope) }
+
     subject { show_switch_to_basic_search?(search_service) }
 
     before do

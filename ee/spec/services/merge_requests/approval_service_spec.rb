@@ -106,6 +106,7 @@ describe MergeRequests::ApprovalService do
         let(:params) do
           { approval_password: 'incorrect' }
         end
+
         it 'raises an error' do
           service_with_params = described_class.new(project, user, params)
           expect { service_with_params.execute(merge_request) }.to raise_error(::MergeRequests::ApprovalService::IncorrectApprovalPasswordError)
@@ -116,6 +117,7 @@ describe MergeRequests::ApprovalService do
         let(:params) do
           { approval_password: 'password' }
         end
+
         it 'does not raise an error' do
           service_with_params = described_class.new(project, user, params)
           expect { service_with_params.execute(merge_request) }.not_to raise_error(::MergeRequests::ApprovalService::IncorrectApprovalPasswordError)

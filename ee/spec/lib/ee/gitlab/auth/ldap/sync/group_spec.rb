@@ -311,6 +311,7 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
       context 'when user inherits higher permissions from parent' do
         let(:parent_group) { create(:group) }
         let(:ldap_group1) { ldap_group_entry(user_dn(user.username)) }
+
         before do
           group.update(parent: parent_group)
           parent_group.add_maintainer(user)
@@ -350,6 +351,7 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
       context 'when user inherits lower permissions from parent' do
         let(:parent_group) { create(:group) }
         let(:ldap_group1) { ldap_group_entry(user_dn(user.username)) }
+
         before do
           group.update(parent: parent_group)
           parent_group.add_reporter(user)
@@ -390,6 +392,7 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
         let(:parent_group) { create(:group) }
         let(:ldap_group1) { ldap_group_entry(user_dn(user.username)) }
         let(:access_requester) { parent_group.request_access(user) }
+
         before do
           group.update(parent: parent_group)
           parent_group.add_owner(create(:user))
@@ -415,6 +418,7 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
       context 'when user inherits permissions from parent and user is no longer in LDAP group' do
         let(:parent_group) { create(:group) }
         let(:ldap_group1) { ldap_group_entry(user_dn('other_user')) }
+
         before do
           group.update(parent: parent_group)
           parent_group.add_maintainer(user)
@@ -434,6 +438,7 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
         let(:group1) { create(:group) }
         let(:group2) { create(:group) }
         let(:group3) { create(:group) }
+
         before do
           group1.add_reporter(user)
 

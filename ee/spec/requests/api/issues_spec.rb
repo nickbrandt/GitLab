@@ -27,6 +27,7 @@ describe API::Issues, :mailer do
            title: issue_title,
            description: issue_description
   end
+
   set(:milestone) { create(:milestone, title: '1.0.0', project: project) }
 
   before(:all) do

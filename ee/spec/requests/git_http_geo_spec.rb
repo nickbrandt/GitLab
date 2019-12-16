@@ -67,6 +67,7 @@ describe "Git HTTP requests (Geo)", :geo do
 
     context 'no Geo JWT token' do
       let(:env) { workhorse_internal_api_request_header }
+
       it { is_expected.to have_gitlab_http_status(:unauthorized) }
     end
 

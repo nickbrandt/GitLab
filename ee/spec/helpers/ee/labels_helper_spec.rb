@@ -52,6 +52,7 @@ describe LabelsHelper do
     context 'when edit_context is a project' do
       let(:edit_context) { create(:project) }
       let(:label) { create(:label, project: edit_context, title: 'bug') }
+
       before do
         data.merge!({
           project_id: edit_context.id,

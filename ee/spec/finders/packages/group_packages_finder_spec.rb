@@ -13,6 +13,7 @@ describe Packages::GroupPackagesFinder do
 
   describe '#execute' do
     let(:params) { { exclude_subgroups: false } }
+
     subject { described_class.new(user, group, params).execute }
 
     shared_examples 'with package type' do |package_type|

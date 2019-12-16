@@ -304,6 +304,7 @@ describe License do
 
     describe '.plan_includes_feature?' do
       let(:feature) { :deploy_board }
+
       subject { described_class.plan_includes_feature?(plan, feature) }
 
       context 'when addon included' do
@@ -669,6 +670,7 @@ describe License do
 
       context 'when the license is the very first trial' do
         let(:tomorrow) { Date.tomorrow }
+
         before do
           gl_license.restrictions = { trial: true }
           gl_license.expires_at = tomorrow
@@ -689,6 +691,7 @@ describe License do
 
       context 'when the license is a repeated trial' do
         let(:yesterday) { Date.yesterday }
+
         before do
           gl_license.restrictions = { trial: true }
           gl_license.expires_at = Date.tomorrow

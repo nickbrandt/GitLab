@@ -73,6 +73,7 @@ shared_examples 'returns paginated packages' do
 
   context 'when viewing the first page' do
     let(:page) { 1 }
+
     it 'returns first 2 packages' do
       get api(url, user), params: { page: page, per_page: per_page }
 
@@ -82,6 +83,7 @@ shared_examples 'returns paginated packages' do
 
   context 'when viewing the second page' do
     let(:page) { 2 }
+
     it 'returns first 2 packages' do
       get api(url, user), params: { page: page, per_page: per_page }
 

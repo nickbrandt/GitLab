@@ -6,6 +6,7 @@ describe Gitlab::Geo::EventGapTracking, :clean_gitlab_redis_cache do
   let(:previous_event_id) { 7 }
   let(:gap_id) { previous_event_id + 1 }
   let(:event_id_with_gap) { previous_event_id + 2 }
+
   subject(:gap_tracking) { described_class.new }
 
   before do

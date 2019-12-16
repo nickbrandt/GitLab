@@ -36,6 +36,7 @@ describe List do
 
   context 'when it is a milestone type' do
     let(:milestone) { build(:milestone, title: 'awesome-release') }
+
     subject { described_class.new(list_type: :milestone, milestone: milestone, board: board) }
 
     it { is_expected.to be_destroyable }

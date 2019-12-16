@@ -176,6 +176,7 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
     context 'when diffing two v1 reports' do
       let(:base_report) { build(:license_scan_report, :version_1) }
       let(:head_report) { build(:license_scan_report, :version_1) }
+
       subject { base_report.diff_with(head_report) }
 
       before do
@@ -196,6 +197,7 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
     context 'when diffing two v2 reports' do
       let(:base_report) { build(:license_scan_report, :version_2) }
       let(:head_report) { build(:license_scan_report, :version_2) }
+
       subject { base_report.diff_with(head_report) }
 
       before do
@@ -216,6 +218,7 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
     context 'when diffing a v1 report with a v2 report' do
       let(:base_report) { build(:license_scan_report, :version_1) }
       let(:head_report) { build(:license_scan_report, :version_2) }
+
       subject { base_report.diff_with(head_report) }
 
       before do
@@ -236,6 +239,7 @@ describe Gitlab::Ci::Reports::LicenseScanning::Report do
     context 'when diffing a v2 report with a v1 report' do
       let(:base_report) { build(:license_scan_report, :version_2) }
       let(:head_report) { build(:license_scan_report, :version_1) }
+
       subject { base_report.diff_with(head_report) }
 
       before do

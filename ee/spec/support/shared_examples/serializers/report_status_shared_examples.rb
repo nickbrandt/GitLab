@@ -7,6 +7,7 @@ shared_examples 'report list' do
     end
 
     let(:request) { double('request') }
+
     set(:project) { create(:project, :repository, :private) }
     set(:developer) { create(:user) }
 

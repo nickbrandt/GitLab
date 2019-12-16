@@ -10,6 +10,7 @@ describe Boards::Lists::CreateService do
 
     context 'when assignee_id param is sent' do
       let(:other_user) { create(:user) }
+
       subject(:service) { described_class.new(project, user, 'assignee_id' => other_user.id) }
 
       before do
@@ -30,6 +31,7 @@ describe Boards::Lists::CreateService do
     context 'when milestone_id param is sent' do
       let(:user) { create(:user) }
       let(:milestone) { create(:milestone, project: project) }
+
       subject(:service) { described_class.new(project, user, 'milestone_id' => milestone.id) }
 
       before do

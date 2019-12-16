@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe LicensesFinder do
   let(:license) { create(:license) }
+
   set(:user) { create(:admin) }
 
   it 'returns a license by id' do

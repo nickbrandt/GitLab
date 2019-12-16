@@ -639,6 +639,7 @@ describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inlin
 
   describe 'Wikis' do
     let(:results) { described_class.new(user, 'term', limit_project_ids) }
+
     subject(:wiki_blobs) { results.objects('wiki_blobs') }
 
     before do

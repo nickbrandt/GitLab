@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Gitlab::Analytics::CycleAnalytics::RequestParams do
   let(:params) { { created_after: '2018-01-01', created_before: '2019-01-01' } }
+
   subject { described_class.new(params) }
 
   describe 'validations' do
