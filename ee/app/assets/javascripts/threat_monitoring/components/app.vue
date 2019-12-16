@@ -1,7 +1,8 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlAlert, GlEmptyState, GlIcon, GlLink } from '@gitlab/ui';
+import { GlAlert, GlEmptyState, GlIcon, GlLink, GlPopover } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import ThreatMonitoringFilters from './threat_monitoring_filters.vue';
 
 export default {
   name: 'ThreatMonitoring',
@@ -10,14 +11,12 @@ export default {
     GlEmptyState,
     GlIcon,
     GlLink,
+    GlPopover,
+    ThreatMonitoringFilters,
   },
   props: {
-    isWafSetup: {
-      type: Boolean,
-      required: true,
-    },
-    endpoint: {
-      type: String,
+    defaultEnvironmentId: {
+      type: Number,
       required: true,
     },
     emptyStateSvgPath: {
@@ -32,15 +31,25 @@ export default {
   data() {
     return {
       showAlert: true,
+
+      // WAF requires the project to have at least one available environment.
+      // An invalid default environment id means there there are no available
+      // environments, therefore the WAF cannot be set up. A valid default
+      // environment id only means that WAF *might* be set up.
+      isWafMaybeSetUp: this.isValidEnvironmentId(this.defaultEnvironmentId),
     };
   },
   created() {
-    if (this.isWafSetup) {
-      this.setEndpoint(this.endpoint);
+    if (this.isWafMaybeSetUp) {
+      this.setCurrentEnvironmentId(this.defaultEnvironmentId);
+      this.fetchEnvironments();
     }
   },
   methods: {
-    ...mapActions('threatMonitoring', ['setEndpoint']),
+    ...mapActions('threatMonitoring', ['fetchEnvironments', 'setCurrentEnvironmentId']),
+    isValidEnvironmentId(id) {
+      return Number.isInteger(id) && id >= 0;
+    },
     dismissAlert() {
       this.showAlert = false;
     },
@@ -52,28 +61,30 @@ export default {
   ),
   alertText: s__(
     `ThreatMonitoring|The graph below is an overview of traffic coming to your
-    application. View the documentation for instructions on how to access the
-    WAF logs to see what type of malicious traffic is trying to access your
-    app.`,
+    application as tracked by the Web Application Firewall (WAF). View the docs
+    for instructions on how to access the WAF logs to see what type of
+    malicious traffic is trying to access your app. The docs link is also
+    accessible by clicking the "?" icon next to the title below.`,
   ),
+  helpPopoverTitle: s__('ThreatMonitoring|At this time, threat monitoring only supports WAF data.'),
 };
 </script>
 
 <template>
   <gl-empty-state
-    v-if="!isWafSetup"
+    v-if="!isWafMaybeSetUp"
     :title="s__('ThreatMonitoring|Web Application Firewall not enabled')"
     :description="$options.emptyStateDescription"
     :svg-path="emptyStateSvgPath"
     :primary-button-link="documentationPath"
-    :primary-button-text="__('Learn more')"
+    :primary-button-text="__('Learn More')"
   />
 
   <section v-else>
     <gl-alert
       v-if="showAlert"
       class="my-3"
-      variant="tip"
+      variant="info"
       :secondary-button-link="documentationPath"
       :secondary-button-text="__('View documentation')"
       @dismiss="dismissAlert"
@@ -84,13 +95,25 @@ export default {
       <h2 class="h4 mb-1">
         {{ s__('ThreatMonitoring|Threat Monitoring') }}
         <gl-link
+          ref="helpLink"
           target="_blank"
           :href="documentationPath"
           :aria-label="s__('ThreatMonitoring|Threat Monitoring help page link')"
         >
           <gl-icon name="question" />
         </gl-link>
+        <gl-popover
+          :target="() => $refs.helpLink"
+          triggers="hover focus"
+          :title="$options.helpPopoverTitle"
+        >
+          <gl-link :href="documentationPath">{{
+            s__('ThreatMonitoring|View WAF documentation')
+          }}</gl-link>
+        </gl-popover>
       </h2>
     </header>
+
+    <threat-monitoring-filters />
   </section>
 </template>

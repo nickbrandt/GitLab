@@ -1,13 +1,22 @@
 import Vue from 'vue';
 import ThreatMonitoringApp from './components/app.vue';
 import createStore from './store';
-import { parseBoolean } from '~/lib/utils/common_utils';
 
 export default () => {
   const el = document.querySelector('#js-threat-monitoring-app');
-  const { isWafSetup, endpoint, emptyStateSvgPath, documentationPath } = el.dataset;
+  const {
+    wafStatisticsEndpoint,
+    environmentsEndpoint,
+    emptyStateSvgPath,
+    documentationPath,
+    defaultEnvironmentId,
+  } = el.dataset;
 
   const store = createStore();
+  store.dispatch('threatMonitoring/setEndpoints', {
+    wafStatisticsEndpoint,
+    environmentsEndpoint,
+  });
 
   return new Vue({
     el,
@@ -15,10 +24,9 @@ export default () => {
     render(createElement) {
       return createElement(ThreatMonitoringApp, {
         props: {
-          isWafSetup: parseBoolean(isWafSetup),
-          endpoint,
           emptyStateSvgPath,
           documentationPath,
+          defaultEnvironmentId: parseInt(defaultEnvironmentId, 10),
         },
       });
     },

@@ -1,13 +1,16 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { GlAlert } from '@gitlab/ui';
+import { GlAlert, GlEmptyState } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/threat_monitoring/store';
 import ThreatMonitoringApp from 'ee/threat_monitoring/components/app.vue';
+import ThreatMonitoringFilters from 'ee/threat_monitoring/components/threat_monitoring_filters.vue';
 
 const localVue = createLocalVue();
-const endpoint = TEST_HOST;
-const emptyStateSvgPath = '/svgs';
+const defaultEnvironmentId = 3;
 const documentationPath = '/docs';
+const emptyStateSvgPath = '/svgs';
+const environmentsEndpoint = `${TEST_HOST}/environments`;
+const wafStatisticsEndpoint = `${TEST_HOST}/waf`;
 
 describe('ThreatMonitoringApp component', () => {
   let store;
@@ -15,8 +18,12 @@ describe('ThreatMonitoringApp component', () => {
 
   const factory = propsData => {
     store = createStore();
+    Object.assign(store.state.threatMonitoring, {
+      environmentsEndpoint,
+      wafStatisticsEndpoint,
+    });
 
-    jest.spyOn(store, 'dispatch');
+    jest.spyOn(store, 'dispatch').mockImplementation();
 
     wrapper = shallowMount(ThreatMonitoringApp, {
       localVue,
@@ -26,54 +33,69 @@ describe('ThreatMonitoringApp component', () => {
     });
   };
 
+  const findAlert = () => wrapper.find(GlAlert);
+
   afterEach(() => {
     wrapper.destroy();
   });
 
-  describe('given the WAF is not set up', () => {
+  describe.each([-1, NaN, Math.PI])(
+    'given an invalid default environment id of %p',
+    invalidEnvironmentId => {
+      beforeEach(() => {
+        factory({
+          defaultEnvironmentId: invalidEnvironmentId,
+          emptyStateSvgPath,
+          documentationPath,
+        });
+      });
+
+      it('dispatches no actions', () => {
+        expect(store.dispatch).not.toHaveBeenCalled();
+      });
+
+      it('shows only the empty state', () => {
+        const emptyState = wrapper.find(GlEmptyState);
+        expect(wrapper.element).toBe(emptyState.element);
+        expect(emptyState.props()).toMatchObject({
+          svgPath: emptyStateSvgPath,
+          primaryButtonLink: documentationPath,
+        });
+      });
+    },
+  );
+
+  describe('given there is a default environment', () => {
     beforeEach(() => {
       factory({
-        isWafSetup: false,
-        endpoint,
+        defaultEnvironmentId,
         emptyStateSvgPath,
         documentationPath,
       });
     });
 
-    it('does not dispatch any store actions', () => {
-      expect(store.dispatch).not.toHaveBeenCalled();
+    it('dispatches the setCurrentEnvironmentId and fetchEnvironments actions', () => {
+      expect(store.dispatch.mock.calls).toEqual([
+        ['threatMonitoring/setCurrentEnvironmentId', defaultEnvironmentId],
+        ['threatMonitoring/fetchEnvironments', undefined],
+      ]);
     });
 
-    it('shows only the empty state', () => {
-      expect(wrapper.element).toMatchSnapshot();
-    });
-  });
-
-  describe('given the WAF is set up', () => {
-    beforeEach(() => {
-      factory({
-        isWafSetup: true,
-        endpoint,
-        emptyStateSvgPath,
-        documentationPath,
-      });
+    it('shows the alert', () => {
+      expect(findAlert().element).toMatchSnapshot();
     });
 
-    it('sets the endpoint on creation', () => {
-      expect(store.dispatch).toHaveBeenCalledWith('threatMonitoring/setEndpoint', endpoint);
-    });
-
-    it('shows the alert and header', () => {
-      expect(wrapper.element).toMatchSnapshot();
+    it('shows the filter bar', () => {
+      expect(wrapper.find(ThreatMonitoringFilters).exists()).toBe(true);
     });
 
     describe('dismissing the alert', () => {
       beforeEach(() => {
-        wrapper.find(GlAlert).vm.$emit('dismiss');
+        findAlert().vm.$emit('dismiss');
       });
 
       it('hides the alert', () => {
-        expect(wrapper.element).toMatchSnapshot();
+        expect(findAlert().exists()).toBe(false);
       });
     });
   });
