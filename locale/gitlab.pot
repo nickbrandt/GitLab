@@ -16563,6 +16563,9 @@ msgstr ""
 msgid "Something went wrong while fetching the registry list."
 msgstr ""
 
+msgid "Something went wrong while initializing the OpenAPI viewer"
+msgstr ""
+
 msgid "Something went wrong while merging this merge request. Please try again."
 msgstr ""
 
