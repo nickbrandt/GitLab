@@ -12,9 +12,7 @@ module QA
       key = nil
 
       before do
-        Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-          Page::Main::Login.perform(&:sign_in_using_credentials)
-
+        QA::Flow::Login.while_signed_in(address: :geo_primary) do
           # Create a new SSH key
           key = Resource::SSHKey.fabricate! do |resource|
             resource.title = key_title
@@ -38,9 +36,7 @@ module QA
       end
 
       it 'proxies wiki commit to primary node and ultmately replicates to secondary node' do
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-          Page::Main::Login.perform(&:sign_in_using_credentials)
-
+        QA::Flow::Login.while_signed_in(address: :geo_secondary) do
           EE::Page::Main::Banner.perform do |banner|
             expect(banner).to have_secondary_read_only_banner
           end
