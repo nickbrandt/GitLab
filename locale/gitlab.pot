@@ -299,6 +299,9 @@ msgstr ""
 msgid "%{link_start}Read more%{link_end} about role permissions"
 msgstr ""
 
+msgid "%{link} can be used for binding events when something is happening within the project."
+msgstr ""
+
 msgid "%{listToShow}, and %{awardsListLength} more."
 msgstr ""
 
@@ -1055,6 +1058,9 @@ msgstr ""
 msgid "Add request manually"
 msgstr ""
 
+msgid "Add system hook"
+msgstr ""
+
 msgid "Add to Slack"
 msgstr ""
 
@@ -1080,6 +1086,9 @@ msgid "Add user(s) to the group:"
 msgstr ""
 
 msgid "Add users to group"
+msgstr ""
+
+msgid "Add webhook"
 msgstr ""
 
 msgid "AddMember|No users specified."
@@ -6254,6 +6263,9 @@ msgstr ""
 msgid "Edit Deploy Key"
 msgstr ""
 
+msgid "Edit Group Hook"
+msgstr ""
+
 msgid "Edit Label"
 msgstr ""
 
@@ -6266,10 +6278,16 @@ msgstr ""
 msgid "Edit Pipeline Schedule %{id}"
 msgstr ""
 
+msgid "Edit Project Hook"
+msgstr ""
+
 msgid "Edit Release"
 msgstr ""
 
 msgid "Edit Snippet"
+msgstr ""
+
+msgid "Edit System Hook"
 msgstr ""
 
 msgid "Edit application"
@@ -8747,6 +8765,9 @@ msgid "Group CI/CD settings"
 msgstr ""
 
 msgid "Group Git LFS status:"
+msgstr ""
+
+msgid "Group Hooks"
 msgstr ""
 
 msgid "Group ID"
@@ -11850,6 +11871,9 @@ msgstr ""
 msgid "No vulnerabilities present"
 msgstr ""
 
+msgid "No webhooks found, add one in the form above."
+msgstr ""
+
 msgid "No, directly import the existing email addresses and usernames."
 msgstr ""
 
@@ -13548,6 +13572,9 @@ msgid "Project Badges"
 msgstr ""
 
 msgid "Project Files"
+msgstr ""
+
+msgid "Project Hooks"
 msgstr ""
 
 msgid "Project ID"
@@ -15309,7 +15336,7 @@ msgstr ""
 msgid "SSH public key"
 msgstr ""
 
-msgid "SSL Verification"
+msgid "SSL Verification:"
 msgstr ""
 
 msgid "Saturday"
@@ -17461,6 +17488,9 @@ msgid "Terms of Service Agreement and Privacy Policy"
 msgstr ""
 
 msgid "Terms of Service and Privacy Policy"
+msgstr ""
+
+msgid "Test"
 msgstr ""
 
 msgid "Test coverage parsing"

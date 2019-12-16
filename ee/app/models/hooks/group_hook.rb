@@ -22,4 +22,8 @@ class GroupHook < ProjectHook
 
   clear_validators!
   validates :url, presence: true, addressable_url: true
+
+  def pluralized_name
+    _('Group Hooks')
+  end
 end
