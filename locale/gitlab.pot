@@ -11353,6 +11353,9 @@ msgstr ""
 msgid "Minimum length is %{minimum_password_length} characters."
 msgstr ""
 
+msgid "Minimum password length (number of characters)"
+msgstr ""
+
 msgid "Minutes"
 msgstr ""
 
@@ -12507,6 +12510,9 @@ msgid "Password"
 msgstr ""
 
 msgid "Password (optional)"
+msgstr ""
+
+msgid "Password Policy Guidelines"
 msgstr ""
 
 msgid "Password authentication is unavailable."
@@ -15797,6 +15803,9 @@ msgid "SecurityDashboard|The security dashboard displays the latest security fin
 msgstr ""
 
 msgid "SecurityDashboard|Unable to add %{invalidProjects}"
+msgstr ""
+
+msgid "See GitLab's %{password_policy_guidelines}"
 msgstr ""
 
 msgid "See metrics"
