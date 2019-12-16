@@ -82,8 +82,10 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
   end
 
   def migrate_instance_cluster?
-    strong_memoize(:migrate_instance_cluster) do
-      Migratable::Cluster.instance_type.has_prometheus_application?
+    if instance_variable_defined?('@migrate_instance_cluster')
+      @migrate_instance_cluster
+    else
+      @migrate_instance_cluster = Migratable::Cluster.instance_type.has_prometheus_application?
     end
   end
 end
