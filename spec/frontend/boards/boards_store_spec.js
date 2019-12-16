@@ -194,7 +194,7 @@ describe('boardsStore', () => {
     const entityType = 'moorhen';
     const entity.id = 'quack';
     const expectedRequest = expect.objectContaining({
-      data: JSON.stringify({ list: { [entityType]: entityId } }),
+      data: JSON.stringify({ list: { [entityType]: entity.id } }),
     });
 
     let requestSpy;
