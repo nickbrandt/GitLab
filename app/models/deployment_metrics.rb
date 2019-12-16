@@ -32,6 +32,10 @@ class DeploymentMetrics
 
   private
 
+  def has_metrics_and_can_query?
+    has_metrics? && prometheus_adapter.can_query?
+  end
+
   # rubocop: disable CodeReuse/ServiceClass
   def prometheus_adapter
     @prometheus_adapter ||= Prometheus::AdapterService.new(project, @deployment).prometheus_adapter
