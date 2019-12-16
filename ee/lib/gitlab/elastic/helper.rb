@@ -47,6 +47,9 @@ module Gitlab
         Project.__elasticsearch__.version(version).delete_index!
       end
 
+      # Calls Elasticsearch refresh API to ensure data is searchable
+      # immediately.
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
       def self.refresh_index
         Project.__elasticsearch__.refresh_index!
       end
