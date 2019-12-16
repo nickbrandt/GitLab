@@ -408,6 +408,29 @@ const boardsStore = {
     return axios.delete(`${this.state.endpoints.listsEndpoint}/${id}`);
   },
 
+  saveList(list) {
+    const entity = list.label || list.assignee || list.milestone;
+    let entityType = '';
+    if (list.label) {
+      entityType = 'label_id';
+    } else if (list.assignee) {
+      entityType = 'assignee_id';
+    } else if (IS_EE && list.milestone) {
+      entityType = 'milestone_id';
+    }
+
+    return this.createList(entity.id, entityType)
+      .then(res => res.data)
+      .then(data => {
+        list.id = data.id;
+        list.type = data.list_type;
+        list.position = data.position;
+        list.label = data.label;
+
+        return list.getIssues();
+      });
+  },
+
   getIssuesForList(id, filter = {}) {
     const data = { id };
     Object.keys(filter).forEach(key => {
@@ -524,29 +547,6 @@ const boardsStore = {
 
   clearMultiSelect() {
     this.multiSelect.list = [];
-  },
-
-  saveList(list) {
-    const entity = list.label || list.assignee || list.milestone;
-    let entityType = '';
-    if (list.label) {
-      entityType = 'label_id';
-    } else if (list.assignee) {
-      entityType = 'assignee_id';
-    } else if (IS_EE && list.milestone) {
-      entityType = 'milestone_id';
-    }
-
-    return this.createList(entity.id, entityType)
-      .then(res => res.data)
-      .then(data => {
-        list.id = data.id;
-        list.type = data.list_type;
-        list.position = data.position;
-        list.label = data.label;
-
-        return list.getIssues();
-      });
   },
 };
 

@@ -189,6 +189,42 @@ describe('boardsStore', () => {
         });
     });
   });
+  
+  describe('saveList',() => {
+    const entityType = 'moorhen';
+    const entity.id = 'quack';
+    const expectedRequest = expect.objectContaining({
+      data: JSON.stringify({ list: { [entityType]: entityId } }),
+    });
+
+    let requestSpy;
+
+    beforeEach(() => {
+      requestSpy = jest.fn();
+      axiosMock.onPost(endpoints.listsEndpoint).replyOnce(config => requestSpy(config));
+    });
+
+    it('makes a request to save a list', () => {
+      requestSpy.mockReturnValue([200, dummyResponse]);
+      const expectedResponse = expect.objectContaining({ data: dummyResponse });
+
+      return expect(boardsStore.saveList(this))
+        .resolves.toEqual(expectedResponse)
+        .then(() => {
+          expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
+        });
+    });
+
+    it('fails for error response', () => {
+      requestSpy.mockReturnValue([500]);
+
+      return expect(boardsStore.saveList(this))
+        .rejects.toThrow()
+        .then(() => {
+          expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
+        });
+    });
+  }); 
 
   describe('getIssuesForList', () => {
     const id = 'TOO-MUCH';
@@ -574,6 +610,7 @@ describe('boardsStore', () => {
       return expect(boardsStore.deleteBoard({ id })).rejects.toThrow();
     });
   });
+
 
   describe('when created', () => {
     beforeEach(() => {
