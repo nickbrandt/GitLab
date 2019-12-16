@@ -500,6 +500,7 @@ then you must use the following procedure to configure [access control](#access-
 
    ```ruby
    gitlab_pages['gitlab_server'] = "https://<your-gitlab-server-URL>"
+   gitlab_pages['access_control'] = true
    ```
 
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
