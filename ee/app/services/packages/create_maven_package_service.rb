@@ -5,7 +5,7 @@ module Packages
       app_group, _, app_name = params[:name].rpartition('/')
       app_group.tr!('/', '.')
 
-      project.packages.create!(
+      package = project.packages.create!(
         name: params[:name],
         version: params[:version],
         package_type: :maven,
@@ -16,6 +16,11 @@ module Packages
           app_version: params[:version]
         }
       )
+
+      build = params[:build]
+      package.create_build_info!(pipeline: build.pipeline) if build.present?
+
+      package
     end
   end
 end

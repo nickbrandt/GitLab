@@ -8,6 +8,7 @@ class Packages::Package < ApplicationRecord
   has_many :dependency_links, inverse_of: :package, class_name: 'Packages::DependencyLink'
   has_one :conan_metadatum, inverse_of: :package
   has_one :maven_metadatum, inverse_of: :package
+  has_one :build_info, inverse_of: :package
 
   accepts_nested_attributes_for :conan_metadatum
   accepts_nested_attributes_for :maven_metadatum

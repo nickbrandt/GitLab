@@ -1,5 +1,17 @@
 # frozen_string_literal: true
 
+shared_examples 'assigns build to package' do
+  context 'with build info' do
+    let(:job) { create(:ci_build, user: user) }
+    let(:params) { super().merge(build: job) }
+
+    it 'assigns the pipeline to the package' do
+      expect(package.build_info).to be_present
+      expect(package.build_info.pipeline).to eq job.pipeline
+    end
+  end
+end
+
 shared_examples 'returns packages' do |container_type, user_type|
   context "for #{user_type}" do
     before do
