@@ -842,6 +842,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `readSnippet` | Boolean! | Whether or not a user can perform `read_snippet` on this resource |
 | `updateSnippet` | Boolean! | Whether or not a user can perform `update_snippet` on this resource |
 | `adminSnippet` | Boolean! | Whether or not a user can perform `admin_snippet` on this resource |
+| `reportSnippet` | Boolean! | Whether or not a user can perform `report_snippet` on this resource |
 
 ### Submodule
 

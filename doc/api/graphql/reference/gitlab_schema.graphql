@@ -5690,6 +5690,11 @@ type SnippetPermissions {
   readSnippet: Boolean!
 
   """
+  Whether or not a user can perform `report_snippet` on this resource
+  """
+  reportSnippet: Boolean!
+
+  """
   Whether or not a user can perform `update_snippet` on this resource
   """
   updateSnippet: Boolean!
