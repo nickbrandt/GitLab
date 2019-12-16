@@ -6,9 +6,7 @@ module QA
       let(:file_to_attach) { File.absolute_path(File.join('spec', 'fixtures', 'banana_sample.gif')) }
 
       it 'user uploads attachment to the primary node' do
-        Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-          Page::Main::Login.perform(&:sign_in_using_credentials)
-
+        QA::Flow::Login.while_signed_in(address: :geo_primary) do
           @project = Resource::Project.fabricate! do |project|
             project.name = 'project-for-issues'
             project.description = 'project for adding issues'
@@ -26,9 +24,7 @@ module QA
           end
         end
 
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do |session|
-          Page::Main::Login.perform(&:sign_in_using_credentials)
-
+        QA::Flow::Login.while_signed_in(address: :geo_secondary) do
           EE::Page::Main::Banner.perform do |banner|
             expect(banner).to have_secondary_read_only_banner
           end
