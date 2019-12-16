@@ -8,7 +8,6 @@ import { issuableTypesMap } from 'ee/related_issues/constants';
 import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
 import CreateIssueForm from 'ee/related_items_tree/components/create_issue_form.vue';
 import IssueActionsSplitButton from 'ee/related_items_tree/components/issue_actions_split_button.vue';
-import { TEST_HOST } from 'spec/test_constants';
 
 import { mockInitialConfig, mockParentItem } from '../mock_data';
 
@@ -283,10 +282,7 @@ describe('RelatedItemsTreeApp', () => {
         wrapper.vm
           .$nextTick()
           .then(() => {
-            const form = findCreateIssueForm();
-
-            expect(form.exists()).toBe(true);
-            expect(form.props().projectsEndpoint).toBe(mockInitialConfig.projectsEndpoint);
+            expect(findCreateIssueForm().exists()).toBe(true);
           })
           .then(done)
           .catch(done.fail);
@@ -315,35 +311,6 @@ describe('RelatedItemsTreeApp', () => {
           })
           .then(done)
           .catch(done.fail);
-      });
-    });
-
-    describe('after create issue form emitted submit event', () => {
-      beforeEach(done => {
-        findIssueActionsSplitButton().vm.$emit('showCreateIssueForm');
-
-        wrapper.vm
-          .$nextTick()
-          .then(done)
-          .catch(done.fail);
-      });
-
-      it('dispatches createNewIssue action', () => {
-        const createNewIssue = jasmine.createSpy('createNewIssue');
-        const store = wrapper.vm.$store;
-        store.hotUpdate({
-          actions: {
-            createNewIssue: (context, payload) => createNewIssue(payload),
-          },
-        });
-
-        const params = {
-          issuesEndpoint: `${TEST_HOST}/issues`,
-          title: 'some new issue',
-        };
-        findCreateIssueForm().vm.$emit('submit', params);
-
-        expect(createNewIssue).toHaveBeenCalledWith(params);
       });
     });
   });
