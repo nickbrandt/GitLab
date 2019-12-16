@@ -19,7 +19,7 @@
     "_links": {
       "type": "object",
       "required": [
-        "details"
+        "web_path"
       ],
       "properties": {
         "details": {

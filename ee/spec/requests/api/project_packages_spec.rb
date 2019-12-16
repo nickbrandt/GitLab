@@ -77,7 +77,7 @@ describe API::ProjectPackages do
       it 'returns no destroy url' do
         subject
 
-        expect(json_response['_links']).not_to include('destroy')
+        expect(json_response['_links']).not_to include('delete_api_path')
       end
     end
 
@@ -85,7 +85,7 @@ describe API::ProjectPackages do
       it 'returns destroy url' do
         subject
 
-        expect(json_response['_links']['destroy']).to be_present
+        expect(json_response['_links']['delete_api_path']).to be_present
       end
     end
 

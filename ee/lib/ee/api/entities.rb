@@ -860,11 +860,11 @@ module EE
         expose :package_type
 
         expose :_links do
-          expose :details do |package|
-            expose_url api_v4_projects_packages_path(package_id: package.id, id: package.project_id)
+          expose :web_path do |package|
+            ::Gitlab::Routing.url_helpers.project_package_path(package.project, package)
           end
 
-          expose :destroy, if: can_destroy(:package, &:project) do |package|
+          expose :delete_api_path, if: can_destroy(:package, &:project) do |package|
             expose_url api_v4_projects_packages_path(package_id: package.id, id: package.project_id)
           end
         end

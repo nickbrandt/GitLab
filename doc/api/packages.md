@@ -74,8 +74,8 @@ Example response:
     "version": "1.0-SNAPSHOT",
     "package_type": "maven",
     "_links": {
-      "details": "/namespace1/project1/-/packages/1",
-      "destroy": "/namespace1/project1/-/packages/1"
+      "web_path": "/namespace1/project1/-/packages/1",
+      "delete_api_path": "/namespace1/project1/-/packages/1"
     }
   },
   {
@@ -84,8 +84,8 @@ Example response:
     "version": "1.0.3",
     "package_type": "npm",
     "_links": {
-      "details": "/namespace1/project1/-/packages/2",
-      "destroy": "/namespace1/project1/-/packages/2"
+      "web_path": "/namespace1/project1/-/packages/1",
+      "delete_api_path": "/namespace1/project1/-/packages/1"
     }
   }
 ]
@@ -95,8 +95,8 @@ By default, the `GET` request will return 20 results, since the API is [paginate
 
 The `_links` object contains the following properties:
 
-- `details`: URL to fetch details about the package.
-- `destroy`: URL to destroy the package. Only available if the request user has permission to do so.
+- `web_path`: The path which you can visit in GitLab and see the details of the package.
+- `delete_api_path`: The API path to delete the package. Only available if the request user has permission to do so.
 
 ## Get a project package
 
@@ -126,16 +126,16 @@ Example response:
   "version": "1.0-SNAPSHOT",
   "package_type": "maven",
   "_links": {
-    "details": "/namespace1/project1/-/packages/1",
-    "destroy": "/namespace1/project1/-/packages/1"
+    "web_path": "/namespace1/project1/-/packages/1",
+    "delete_api_path": "/namespace1/project1/-/packages/1"
   }
 }
 ```
 
 The `_links` object contains the following properties:
 
-- `details`: URL to fetch details about the package.
-- `destroy`: URL to destroy the package. Only available if the request user has permission to do so.
+- `web_path`: The path which you can visit in GitLab and see the details of the package.
+- `delete_api_path`: The API path to delete the package. Only available if the request user has permission to do so.
 
 ## List package files
 
