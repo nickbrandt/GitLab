@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Projects::Security::DependenciesController do
-  describe 'GET index.json' do
+  describe 'GET #index' do
     let_it_be(:developer) { create(:user) }
     let_it_be(:guest) { create(:user) }
     let(:params) { { namespace_id: project.namespace, project_id: project } }
@@ -23,6 +23,21 @@ describe Projects::Security::DependenciesController do
       context 'when feature is available' do
         before do
           stub_licensed_features(dependency_scanning: true, license_management: true, security_dashboard: true)
+        end
+
+        context 'when requesting HTML' do
+          render_views
+          let(:user) { developer }
+
+          before do
+            get :index, params: params, format: :html
+          end
+
+          it { expect(response).to have_http_status(:ok) }
+
+          it 'renders the side navigation with the correct submenu set as active' do
+            expect(response.body).to have_active_sub_navigation('Dependency List')
+          end
         end
 
         context 'when usage ping is collected' do
@@ -213,12 +228,16 @@ describe Projects::Security::DependenciesController do
       context 'when licensed feature is unavailable' do
         let(:user) { developer }
 
-        before do
+        it 'returns 403 for a JSON request' do
           get :index, params: params, format: :json
+
+          expect(response).to have_gitlab_http_status(403)
         end
 
-        it 'returns 403' do
-          expect(response).to have_gitlab_http_status(403)
+        it 'returns a 404 for an HTML request' do
+          get :index, params: params, format: :html
+
+          expect(response).to have_gitlab_http_status(404)
         end
       end
     end
@@ -230,12 +249,18 @@ describe Projects::Security::DependenciesController do
       before do
         stub_licensed_features(dependency_scanning: true)
         project.add_guest(user)
-
-        get :index, params: params, format: :json
       end
 
-      it 'returns 403' do
+      it 'returns 403 for a JSON request' do
+        get :index, params: params, format: :json
+
         expect(response).to have_gitlab_http_status(403)
+      end
+
+      it 'returns a 404 for an HTML request' do
+        get :index, params: params, format: :html
+
+        expect(response).to have_gitlab_http_status(404)
       end
     end
   end

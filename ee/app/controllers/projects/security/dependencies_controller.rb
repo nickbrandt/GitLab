@@ -7,6 +7,9 @@ module Projects
 
       def index
         respond_to do |format|
+          format.html do
+            render status: :ok
+          end
           format.json do
             ::Gitlab::UsageCounters::DependencyList.increment(project.id)
 
@@ -33,7 +36,16 @@ module Projects
       end
 
       def authorize_read_dependency_list!
-        render_403 unless can?(current_user, :read_dependencies, project)
+        return if can?(current_user, :read_dependencies, project)
+
+        respond_to do |format|
+          format.html do
+            render_404
+          end
+          format.json do
+            render_403
+          end
+        end
       end
 
       def dependencies
