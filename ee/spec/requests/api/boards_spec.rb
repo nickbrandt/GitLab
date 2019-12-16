@@ -44,8 +44,6 @@ describe API::Boards do
 
     context 'with WIP limits license' do
       before do
-        stub_licensed_features(wip_limits: true)
-
         get api(url, user)
       end
 
@@ -60,7 +58,7 @@ describe API::Boards do
 
     context 'without WIP limits license' do
       before do
-        stub_licensed_features(wip_limits: false)
+        stub_feature_flags(wip_limits: false)
 
         get api(url, user)
       end

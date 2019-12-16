@@ -69,7 +69,7 @@ module EE
         end
 
         def wip_limits_available?
-          parent.feature_available?(:wip_limits)
+          parent.beta_feature_available?(:wip_limits)
         end
       end
     end

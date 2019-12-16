@@ -36,7 +36,7 @@ module EE
       private
 
       def wip_limits_available?
-        board_parent.feature_available?(:wip_limits)
+        board_parent.beta_feature_available?(:wip_limits)
       end
     end
   end
