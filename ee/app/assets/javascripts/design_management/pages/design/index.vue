@@ -53,7 +53,6 @@ export default {
       projectPath: '',
       issueId: '',
       errorMessage: null,
-      isAlertDismissed: true,
     };
   },
   apollo: {
