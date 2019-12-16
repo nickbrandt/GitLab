@@ -177,7 +177,6 @@
   display: flex;
   width: 100%;
   min-width: 0;
-  border: 1px solid $border-color;
   background-color: $white-light;
 
   @include media-breakpoint-down(sm) {
@@ -187,12 +186,6 @@
 
   &:hover {
     @extend .form-control:hover;
-  }
-
-  &.focus,
-  &.focus:hover {
-    border-color: $blue-300;
-    box-shadow: 0 0 4px $dropdown-input-focus-shadow;
   }
 
   gl-emoji {
@@ -246,6 +239,10 @@
   flex: 1;
   position: relative;
   min-width: 0;
+  border: 1px solid $border-color;
+  border-left: 0;
+  border-radius: 0 3px 3px 0;
+
 }
 
 .filtered-search-input-dropdown-menu {
@@ -271,18 +268,10 @@
 .filtered-search-history-dropdown-toggle-button {
   flex: 1;
   width: auto;
-  border-radius: 0;
-  border: 0;
-  border-right: 1px solid $border-color;
+  border-radius: 3px 0 0 3px;
+  border: 1px solid $border-color;
   color: $gl-text-color-secondary;
   transition: color 0.1s linear;
-
-  &:hover,
-  &:focus {
-    color: $gl-text-color;
-    border-color: $blue-300;
-    outline: none;
-  }
 
   svg {
     height: 14px;
