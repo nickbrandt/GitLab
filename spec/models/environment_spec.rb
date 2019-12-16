@@ -8,6 +8,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
   include RepoHelpers
 
   let(:project) { create(:project, :stubbed_repository) }
+
   subject(:environment) { create(:environment, project: project) }
 
   it { is_expected.to be_kind_of(ReactiveCaching) }
@@ -672,6 +673,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
           context 'with deployment' do
             let!(:deployment) { create(:deployment, :success, environment: environment) }
+
             it { is_expected.to be_truthy }
           end
 
@@ -828,6 +830,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
         context 'and a deployment' do
           let!(:deployment) { create(:deployment, environment: environment) }
+
           it { is_expected.to be_truthy }
         end
 
@@ -862,6 +865,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
   describe '#metrics' do
     let(:project) { create(:prometheus_project) }
+
     subject { environment.metrics }
 
     context 'when the environment has metrics' do
@@ -943,6 +947,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
   describe '#additional_metrics' do
     let(:project) { create(:prometheus_project) }
     let(:metric_params) { [] }
+
     subject { environment.additional_metrics(*metric_params) }
 
     context 'when the environment has additional metrics' do
