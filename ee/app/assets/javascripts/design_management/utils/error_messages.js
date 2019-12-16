@@ -18,3 +18,6 @@ export const UPLOAD_DESIGN_ERROR = s__(
 export const DESIGN_NOT_FOUND_ERROR = s__(
   'DesignManagement|Could not find design, please try again.',
 );
+export const DESIGN_NOT_EXIST_ERROR = s__(
+  'DesignManagement|Requested design version does not exist',
+);

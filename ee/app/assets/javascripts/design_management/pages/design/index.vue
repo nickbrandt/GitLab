@@ -1,8 +1,7 @@
 <script>
 import { ApolloMutation } from 'vue-apollo';
 import Mousetrap from 'mousetrap';
-import { GlLoadingIcon } from '@gitlab/ui';
-import { s__ } from '~/locale';
+import { GlLoadingIcon, GlAlert } from '@gitlab/ui';
 import createFlash from '~/flash';
 import allVersionsMixin from '../../mixins/all_versions';
 import Toolbar from '../../components/toolbar/index.vue';
@@ -14,15 +13,12 @@ import DesignDestroyer from '../../components/design_destroyer.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
-import {
-  extractDiscussions,
-  extractDesign,
-  createDesignDetailFlash,
-} from '../../utils/design_management_utils';
+import { extractDiscussions, extractDesign } from '../../utils/design_management_utils';
 import { updateStoreAfterAddImageDiffNote } from '../../utils/cache_update';
 import {
   ADD_DISCUSSION_COMMENT_ERROR,
   DESIGN_NOT_FOUND_ERROR,
+  DESIGN_NOT_EXIST_ERROR,
   designDeletionError,
 } from '../../utils/error_messages';
 import DESIGN_DETAIL_CONTAINER_CLASS from '../../utils/constants';
@@ -37,6 +33,7 @@ export default {
     Toolbar,
     DesignReplyForm,
     GlLoadingIcon,
+    GlAlert,
   },
   mixins: [allVersionsMixin],
   props: {
@@ -56,6 +53,8 @@ export default {
       },
       projectPath: '',
       issueId: '',
+      errorMessage: null,
+      isAlertDismissed: true,
     };
   },
   apollo: {
@@ -79,7 +78,7 @@ export default {
           this.onQueryError(DESIGN_NOT_FOUND_ERROR);
         }
         if (this.$route.query.version && !this.hasValidVersion) {
-          this.onQueryError(s__('DesignManagement|Requested design version does not exist'));
+          this.onQueryError(DESIGN_NOT_EXIST_ERROR);
         }
       },
       error() {
@@ -147,6 +146,7 @@ export default {
         data: { createImageDiffNote },
       },
     ) {
+      this.onDiffNoteError('hey');
       updateStoreAfterAddImageDiffNote(
         store,
         createImageDiffNote,
@@ -160,9 +160,13 @@ export default {
       createFlash(message);
       this.$router.push({ name: 'designs' });
     },
-    onMutationError(e) {
-      createDesignDetailFlash(ADD_DISCUSSION_COMMENT_ERROR);
+    onDiffNoteError(e) {
+      this.errorMessage = ADD_DISCUSSION_COMMENT_ERROR;
       throw e;
+    },
+    onDesignDeleteError() {
+      this.errorMessage = designDeletionError({ singular: true });
+      this.$router.push({ name: 'designs' });
     },
     openCommentForm(position) {
       const { x, y } = position;
@@ -189,12 +193,6 @@ export default {
         query: this.$route.query,
       });
     },
-    onDesignDeleteError() {
-      const errorMessage = designDeletionError({ singular: true });
-      createDesignDetailFlash(errorMessage);
-
-      this.$router.push({ name: 'designs' });
-    },
   },
   beforeRouteUpdate(to, from, next) {
     this.closeCommentForm();
@@ -207,9 +205,7 @@ export default {
 
 <template>
   <div
-    :class="
-      `${$options.DESIGN_DETAIL_CONTAINER_CLASS} fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row`
-    "
+    class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
   >
     <gl-loading-icon v-if="isLoading" size="xl" class="align-self-center" />
     <template v-else>
@@ -233,7 +229,9 @@ export default {
         </design-destroyer>
         <div class="d-flex flex-column h-100 mh-100 position-relative">
           <div class="p-3">
-            <div class="flash-container"></div>
+            <gl-alert v-if="errorMessage" variant="danger" @dismiss="errorMessage = null">
+              {{ errorMessage }}
+            </gl-alert>
           </div>
           <design-image
             :image="design.image"
@@ -268,7 +266,7 @@ export default {
             }"
             :update="addImageDiffNoteToStore"
             @done="closeCommentForm"
-            @error="onMutationError"
+            @error="onDiffNoteError"
           >
             <design-reply-form
               v-model="comment"
