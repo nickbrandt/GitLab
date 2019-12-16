@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Projects
-  module Security
     class DependenciesController < Projects::ApplicationController
       before_action :authorize_read_dependency_list!
 
@@ -84,5 +83,4 @@ module Projects
         ::Security::DependencyListService.new(pipeline: pipeline, params: query_params)
       end
     end
-  end
 end

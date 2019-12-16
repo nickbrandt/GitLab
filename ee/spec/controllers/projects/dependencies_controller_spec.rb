@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::Security::DependenciesController do
+describe Projects::DependenciesController do
   describe 'GET #index' do
     let_it_be(:developer) { create(:user) }
     let_it_be(:guest) { create(:user) }
