@@ -1,7 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
 
 import createDefaultState from 'ee/related_items_tree/store/state';
-import * as actions from 'ee/related_items_tree/store/actions';
+import actionsModule, * as actions from 'ee/related_items_tree/store/actions';
 import * as types from 'ee/related_items_tree/store/mutation_types';
 
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
@@ -14,6 +14,7 @@ import {
 
 import testAction from 'spec/helpers/vuex_action_helper';
 import axios from '~/lib/utils/axios_utils';
+import { TEST_HOST } from 'spec/test_constants';
 
 import {
   mockInitialConfig,
@@ -1313,6 +1314,95 @@ describe('RelatedItemTree', () => {
             ],
             done,
           );
+        });
+      });
+
+      describe('createNewIssue', () => {
+        const issuesEndpoint = `${TEST_HOST}/issues`;
+        const title = 'new issue title';
+        const epicId = 42;
+        const parentItem = {
+          id: `gid://gitlab/Epic/${epicId}`,
+        };
+        const expectedRequest = jasmine.objectContaining({
+          data: JSON.stringify({
+            epic_id: epicId,
+            title,
+          }),
+        });
+
+        let flashSpy;
+        let axiosMock;
+        let requestSpy;
+        let context;
+        let payload;
+
+        beforeEach(() => {
+          axiosMock = new MockAdapter(axios);
+        });
+
+        afterEach(() => {
+          axiosMock.restore();
+        });
+
+        beforeEach(() => {
+          flashSpy = spyOnDependency(actionsModule, 'flash');
+
+          requestSpy = jasmine.createSpy('request');
+          axiosMock.onPost(issuesEndpoint).replyOnce(config => requestSpy(config));
+
+          context = {
+            state: {
+              parentItem,
+            },
+            dispatch: jasmine.createSpy('dispatch'),
+          };
+
+          payload = {
+            issuesEndpoint,
+            title,
+          };
+        });
+
+        describe('for successful request', () => {
+          beforeEach(() => {
+            requestSpy.and.returnValue([201, '']);
+          });
+
+          it('dispatches fetchItems', done => {
+            actions
+              .createNewIssue(context, payload)
+              .then(() => {
+                expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
+                expect(context.dispatch).toHaveBeenCalledWith(
+                  'fetchItems',
+                  jasmine.objectContaining({ parentItem }),
+                );
+
+                expect(flashSpy).not.toHaveBeenCalled();
+              })
+              .then(done)
+              .catch(done.fail);
+          });
+        });
+
+        describe('for failed request', () => {
+          beforeEach(() => {
+            requestSpy.and.returnValue([500, '']);
+          });
+
+          it('fails and shows flash message', done => {
+            actions
+              .createNewIssue(context, payload)
+              .then(() => done.fail('expected action to throw error!'))
+              .catch(() => {
+                expect(requestSpy).toHaveBeenCalledWith(expectedRequest);
+                expect(context.dispatch).not.toHaveBeenCalled();
+                expect(flashSpy).toHaveBeenCalled();
+              })
+              .then(done)
+              .catch(done.fail);
+          });
         });
       });
     });
