@@ -49,27 +49,27 @@ describe Suggestions::ApplyService do
       expect(commit.author_name).to eq(user.name)
     end
 
-    context 'without a custom suggestion commit messge' do
+    context 'when a custom suggestion commit message' do
       before do
-        project.update!(suggestion_commit_message: nil)
-      end
+        project.update!(suggestion_commit_message: message)
 
-      it 'sets default commit message' do
         apply(suggestion)
-
-        expect(project.repository.commit.message).to eq("Apply suggestion to files/ruby/popen.rb")
-      end
-    end
-
-    context 'with a custom suggestion commit message' do
-      before do
-        project.update!(suggestion_commit_message: 'refactor: %{project_path} %{project_name} %{file_path} %{branch_name} %{user_name}')
       end
 
-      it 'sets custom commit message' do
-        apply(suggestion)
+      context 'is not specified' do
+        let(:message) { nil }
 
-        expect(project.repository.commit.message).to eq("refactor: project-1 Project_1 files/ruby/popen.rb master Test User")
+        it 'sets default commit message' do
+          expect(project.repository.commit.message).to eq("Apply suggestion to files/ruby/popen.rb")
+        end
+      end
+
+      context 'is specified' do
+        let(:message) { 'refactor: %{project_path} %{project_name} %{file_path} %{branch_name} %{user_name}' }
+
+        it 'sets custom commit message' do
+          expect(project.repository.commit.message).to eq("refactor: project-1 Project_1 files/ruby/popen.rb master Test User")
+        end
       end
     end
   end
