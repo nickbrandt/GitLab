@@ -10,29 +10,24 @@ module ConfigurationHelper
     end
   end
 
-  # - flattens hash to list all relation paths
-  def flat_hash(hash, path = [])
-    new_hash = {}
-    hash.each_pair do |key, val|
-      new_hash[path + [key]] = val
-      if val.is_a?(Hash) && val.present?
-        new_hash.merge!(flat_hash(val, path + [key]))
-      end
+  def all_relations(tree, tree_path = [])
+    tree.flat_map do |relation_name, relations|
+      relation_path = tree_path + [relation_name]
+      [relation_path] + all_relations(relations, relation_path)
     end
-    new_hash
   end
 
   def config_hash(config = Gitlab::ImportExport.config_file)
-    Gitlab::ImportExport::Config.new(config: config).to_h.deep_stringify_keys
+    Gitlab::ImportExport::Config.new(config: config).to_h
   end
 
   def relation_paths_for(key, config: Gitlab::ImportExport.config_file)
     # - project is not part of the tree, so it has to be added manually.
-    flat_hash({ "project" => config_hash(config).dig('tree', key.to_s) }).keys
+    all_relations({ project: config_hash(config).dig(:tree, key) })
   end
 
   def relation_names_for(key, config: Gitlab::ImportExport.config_file)
-    names = names_from_tree(config_hash(config).dig('tree', key.to_s))
+    names = names_from_tree(config_hash(config).dig(:tree, key))
     # Remove duplicated or add missing models
     # - project is not part of the tree, so it has to be added manually.
     # - milestone, labels, merge_request have both singular and plural versions in the tree, so remove the duplicates.
@@ -45,11 +40,13 @@ module ConfigurationHelper
     Gitlab::ImportExport::RelationFactory.relation_class(relation_name)
   end
 
-  def parsed_attributes(relation_name, attributes)
-    excluded_attributes = config_hash['excluded_attributes'][relation_name]
-    included_attributes = config_hash['included_attributes'][relation_name]
+  def parsed_attributes(relation_name, attributes, config: Gitlab::ImportExport.config_file)
+    import_export_config = config_hash(config)
+    excluded_attributes = import_export_config[:excluded_attributes][relation_name.to_sym]
+    included_attributes = import_export_config[:included_attributes][relation_name.to_sym]
     attributes = attributes - JSON[excluded_attributes.to_json] if excluded_attributes
     attributes = attributes & JSON[included_attributes.to_json] if included_attributes
+
     attributes
   end
 
