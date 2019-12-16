@@ -1,9 +1,6 @@
-import { TEST_HOST } from 'spec/test_constants';
-
 export const mockInitialConfig = {
-  epicsEndpoint: `${TEST_HOST}/epics`,
-  issuesEndpoint: `${TEST_HOST}/issues`,
-  projectsEndpoint: `${TEST_HOST}/projects`,
+  epicsEndpoint: 'http://test.host',
+  issuesEndpoint: 'http://test.host',
   autoCompleteEpics: true,
   autoCompleteIssues: false,
   userSignedIn: true,

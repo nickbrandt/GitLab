@@ -42,7 +42,6 @@ export default () => {
       this.setInitialConfig({
         epicsEndpoint: initialData.epicLinksEndpoint,
         issuesEndpoint: initialData.issueLinksEndpoint,
-        projectsEndpoint: initialData.projectsEndpoint,
         autoCompleteEpics: parseBoolean(autoCompleteEpics),
         autoCompleteIssues: parseBoolean(autoCompleteIssues),
         userSignedIn: parseBoolean(userSignedIn),

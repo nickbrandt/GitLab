@@ -6,7 +6,7 @@ import {
   relatedIssuesRemoveErrorMap,
 } from 'ee/related_issues/constants';
 import flash from '~/flash';
-import { s__, __ } from '~/locale';
+import { s__ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
 import httpStatusCodes from '~/lib/utils/http_status';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
@@ -75,10 +75,7 @@ export const receiveItemsFailure = ({ commit }, data) => {
   flash(s__('Epics|Something went wrong while fetching child epics.'));
   commit(types.RECEIVE_ITEMS_FAILURE, data);
 };
-export const fetchItems = (
-  { dispatch },
-  { parentItem, isSubItem = false, fetchPolicy = 'cache-first' },
-) => {
+export const fetchItems = ({ dispatch }, { parentItem, isSubItem = false }) => {
   const { iid, fullPath } = parentItem;
 
   dispatch('requestItems', {
@@ -90,7 +87,6 @@ export const fetchItems = (
     .query({
       query: epicChildren,
       variables: { iid, fullPath },
-      fetchPolicy,
     })
     .then(({ data }) => {
       const children = processQueryResponse(data.group);
@@ -446,44 +442,6 @@ export const reorderItem = (
       });
     });
 };
-
-export const createNewIssue = ({ state, dispatch }, { issuesEndpoint, title }) => {
-  const { parentItem } = state;
-
-  // necessary because parentItem comes from GraphQL and we are using REST API here
-  const epicId = parseInt(parentItem.id.replace(/^gid:\/\/gitlab\/Epic\//, ''), 10);
-
-  return axios
-    .post(issuesEndpoint, { epic_id: epicId, title })
-    .then(() =>
-      dispatch('fetchItems', {
-        parentItem,
-        fetchPolicy: 'network-only',
-      }),
-    )
-    .catch(e => {
-      flash(__('Could not create issue'));
-      throw e;
-    });
-};
-
-export const fetchProjects = ({ state, commit }) =>
-  axios
-    .get(state.projectsEndpoint, {
-      params: {
-        include_subgroups: true,
-        order_by: 'last_activity_at',
-        with_issues_enabled: true,
-        with_shared: false,
-      },
-    })
-    .then(({ data }) => {
-      commit(types.SET_PROJECTS, data);
-    })
-    .catch(e => {
-      flash(__('Could not fetch projects'));
-      throw e;
-    });
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
