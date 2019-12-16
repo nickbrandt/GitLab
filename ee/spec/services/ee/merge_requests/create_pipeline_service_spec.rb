@@ -110,5 +110,27 @@ describe MergeRequests::CreatePipelineService, :clean_gitlab_redis_shared_state 
 
       it_behaves_like 'detached merge request pipeline'
     end
+
+    context 'when workflow:rules are specified' do
+      let(:source_branch) { 'feature' }
+      let(:target_branch) { 'feature_conflict' }
+
+      context 'when bridge job is used' do
+        let(:config) do
+          {
+            workflow: {
+              rules: [
+                { if: '$CI_MERGE_REQUEST_ID' }
+              ]
+            },
+            bridge_job: {
+              needs: { pipeline: 'some/project' }
+            }
+          }
+        end
+
+        it_behaves_like 'detached merge request pipeline'
+      end
+    end
   end
 end

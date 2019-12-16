@@ -28,6 +28,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "rspec",
+              only: { refs: %w[branches tags] },
               options: {
                 before_script: ["pwd"],
                 script: ["rspec"]
@@ -120,6 +121,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "rspec",
+              only: { refs: %w[branches tags] },
               options: { script: ["rspec"] },
               interruptible: true,
               allow_failure: false,
@@ -281,8 +283,7 @@ module Gitlab
                   when: "on_success",
                   yaml_variables: [],
                   options: { script: ["rspec"] },
-                  only: { refs: ["branches"] },
-                  except: {} }] },
+                  only: { refs: ["branches"] } }] },
            { name: "deploy",
              index: 3,
              builds:
@@ -293,8 +294,7 @@ module Gitlab
                   when: "on_success",
                   yaml_variables: [],
                   options: { script: ["cap prod"] },
-                  only: { refs: ["tags"] },
-                  except: {} }] },
+                  only: { refs: ["tags"] } }] },
            { name: ".post",
              index: 4,
              builds: [] }]
@@ -631,6 +631,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "rspec",
+              only: { refs: %w[branches tags] },
               options: {
                 before_script: ["pwd"],
                 script: ["rspec"],
@@ -662,6 +663,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "rspec",
+              only: { refs: %w[branches tags] },
               options: {
                 before_script: ["pwd"],
                 script: ["rspec"],
@@ -691,6 +693,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "rspec",
+              only: { refs: %w[branches tags] },
               options: {
                 before_script: ["pwd"],
                 script: ["rspec"],
@@ -716,6 +719,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "rspec",
+              only: { refs: %w[branches tags] },
               options: {
                 before_script: ["pwd"],
                 script: ["rspec"],
@@ -1230,6 +1234,7 @@ module Gitlab
             stage: "test",
             stage_idx: 2,
             name: "rspec",
+            only: { refs: %w[branches tags] },
             options: {
               before_script: ["pwd"],
               script: ["rspec"],
@@ -1527,6 +1532,7 @@ module Gitlab
               stage: "build",
               stage_idx: 1,
               name: "build1",
+              only: { refs: %w[branches tags] },
               options: {
                 script: ["test"]
               },
@@ -1538,6 +1544,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "test1",
+              only: { refs: %w[branches tags] },
               options: { script: ["test"] },
               needs_attributes: [
                 { name: "build1", artifacts: true },
@@ -1565,6 +1572,7 @@ module Gitlab
               stage: "build",
               stage_idx: 1,
               name: "build1",
+              only: { refs: %w[branches tags] },
               options: {
                 script: ["test"]
               },
@@ -1576,6 +1584,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "test1",
+              only: { refs: %w[branches tags] },
               options: { script: ["test"] },
               needs_attributes: [
                 { name: "parallel 1/2", artifacts: false },
@@ -1599,6 +1608,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "test1",
+              only: { refs: %w[branches tags] },
               options: { script: ["test"] },
               needs_attributes: [
                 { name: "parallel 1/2", artifacts: true },
@@ -1626,6 +1636,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "test1",
+              only: { refs: %w[branches tags] },
               options: { script: ["test"] },
               needs_attributes: [
                 { name: "build1", artifacts: true },
@@ -1733,6 +1744,7 @@ module Gitlab
               stage: "test",
               stage_idx: 2,
               name: "normal_job",
+              only: { refs: %w[branches tags] },
               options: {
                 script: ["test"]
               },
@@ -1778,6 +1790,7 @@ module Gitlab
               stage: "build",
               stage_idx: 1,
               name: "job1",
+              only: { refs: %w[branches tags] },
               options: {
                 script: ["execute-script-for-job"]
               },
@@ -1789,6 +1802,7 @@ module Gitlab
               stage: "build",
               stage_idx: 1,
               name: "job2",
+              only: { refs: %w[branches tags] },
               options: {
                 script: ["execute-script-for-job"]
               },
