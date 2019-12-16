@@ -32,21 +32,11 @@ class DeploymentMetrics
 
   private
 
+  # rubocop: disable CodeReuse/ServiceClass
   def prometheus_adapter
-    strong_memoize(:prometheus_adapter) do
-      service = project.find_or_initialize_service('prometheus')
-
-      if service.can_query?
-        service
-      else
-        cluster_prometheus
-      end
-    end
+    @prometheus_adapter ||= Prometheus::AdapterService.new(project, @deployment).prometheus_adapter
   end
-
-  def cluster_prometheus
-    cluster.application_prometheus if cluster&.application_prometheus_available?
-  end
+  # rubocop: enable CodeReuse/ServiceClass
 
   def has_metrics_and_can_query?
     has_metrics? && prometheus_adapter.can_query?
