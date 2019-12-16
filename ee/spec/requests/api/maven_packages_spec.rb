@@ -417,6 +417,7 @@ describe API::MavenPackages do
         upload_file(params.merge(job_token: job.token))
 
         expect(response).to have_gitlab_http_status(200)
+        expect(package.build_info.pipeline).to eq job.pipeline
       end
 
       context 'version is not correct' do

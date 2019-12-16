@@ -234,6 +234,27 @@ describe API::NpmPackages do
 
           expect(response).to have_gitlab_http_status(200)
         end
+
+        context 'with an authenticated job token' do
+          let!(:job) { create(:ci_build, user: user) }
+
+          before do
+            Grape::Endpoint.before_each do |endpoint|
+              expect(endpoint).to receive(:current_authenticated_job) { job }
+            end
+          end
+
+          after do
+            Grape::Endpoint.before_each nil
+          end
+
+          it 'creates the package metadata' do
+            upload_package_with_token(package_name, params)
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(project.reload.packages.find(json_response['id']).build_info.pipeline).to eq job.pipeline
+          end
+        end
       end
 
       context 'package creation fails' do

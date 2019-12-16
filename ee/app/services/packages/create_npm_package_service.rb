@@ -5,6 +5,7 @@ module Packages
       name = params[:name]
       version = params[:versions].keys.first
       version_data = params[:versions][version]
+      build = params[:build]
 
       existing_package = project.packages.npm.with_name(name).with_version(version)
 
@@ -15,6 +16,10 @@ module Packages
         version: version,
         package_type: 'npm'
       )
+
+      if build.present?
+        package.create_build_info!(pipeline: build.pipeline)
+      end
 
       package_file_name = "#{name}-#{version}.tgz"
       attachment = params['_attachments'][package_file_name]

@@ -32,8 +32,11 @@ describe Packages::CreateNpmPackageService do
   describe '#execute' do
     context 'scoped package' do
       let(:package_name) { "@#{namespace.path}/my-app".freeze }
+      let(:package) { subject }
 
       it_behaves_like 'valid package'
+
+      it_behaves_like 'assigns build to package'
     end
 
     context 'invalid package name' do
