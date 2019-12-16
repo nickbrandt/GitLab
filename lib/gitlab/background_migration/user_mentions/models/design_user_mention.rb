@@ -5,13 +5,11 @@ module Gitlab
   module BackgroundMigration
     module UserMentions
       module Models
-        module DesignManagement
-          class DesignUserMention < ActiveRecord::Base
-            self.table_name = 'design_user_mentions'
+        class DesignUserMention < ActiveRecord::Base
+          self.table_name = 'design_user_mentions'
 
-            def self.resource_foreign_key
-              "design_id"
-            end
+          def self.resource_foreign_key
+            "design_id"
           end
         end
       end

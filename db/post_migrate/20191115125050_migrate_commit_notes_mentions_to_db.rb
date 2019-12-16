@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MigrateCommitNotesMentionsToDb < ActiveRecord::Migration[5.2]
+  include Gitlab::Database::MigrationHelpers
+
   DOWNTIME = false
 
   disable_ddl_transaction!
@@ -8,6 +10,7 @@ class MigrateCommitNotesMentionsToDb < ActiveRecord::Migration[5.2]
   DELAY = 2.minutes.to_i
   BATCH_SIZE = 10000
   MIGRATION = 'UserMentions::CreateResourceUserMention'
+  INDEX_NAME = 'commit_mentions_temp_index'
 
   class Note < ActiveRecord::Base
     include EachBatch
@@ -16,6 +19,11 @@ class MigrateCommitNotesMentionsToDb < ActiveRecord::Migration[5.2]
   end
 
   def up
+    disable_statement_timeout do
+      # create temporary index for notes with mentions, may take well over 1h
+      add_concurrent_index(:notes, :id, where: "note ~~ '%@%'::text AND notes.noteable_type = 'Commit' AND notes.system = false", name: INDEX_NAME)
+    end
+
     conditions = "note LIKE '%@%' AND commit_user_mentions.commit_id IS NULL AND notes.noteable_type = 'Commit'"
     join = "LEFT JOIN commit_user_mentions ON notes.id = commit_user_mentions.note_id"
 

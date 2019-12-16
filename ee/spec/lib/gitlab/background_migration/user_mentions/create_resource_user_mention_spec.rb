@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 # rubocop:disable RSpec/FactoriesInMigrationSpecs
-describe Gitlab::BackgroundMigration::CreateResourceUserMention do
+describe Gitlab::BackgroundMigration::UserMentions::CreateResourceUserMention do
   let(:author) { create(:user, username: 'author') }
   let(:non_member) { create(:user, username: 'non_member') }
   let(:member) { create(:user, username: 'member') }

@@ -16,7 +16,7 @@ module Gitlab
           cache_markdown_field :note, pipeline: :note, issuable_state_filter_enabled: true
 
           belongs_to :author, class_name: "User"
-          belongs_to :noteable, polymorphic: true # rubocop:disable Cop/PolymorphicAssociations
+          belongs_to :noteable, polymorphic: true
           belongs_to :project
 
           def for_personal_snippet?
