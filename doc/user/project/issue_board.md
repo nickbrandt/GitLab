@@ -281,6 +281,12 @@ As on another list types, click on the trash icon to remove it.
 
 ![Milestone lists](img/issue_board_milestone_lists.png)
 
+## Work-in-progress limits
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/11403) in GitLab 12.6
+
+To limit the amount of work in progress at one time, you can set a soft limit on the maximum number of issues per list. The limit can be set either per group, or per project. If you exceed the limit, the current number of issues is shown in red. For example, if you have set the limit to `5`, and you move another issue to a list, the title displays `6/5`, with the `6` shown in red.
+
 ### Summary of features per tier
 
 Different issue board features are available in different [GitLab tiers](https://about.gitlab.com/pricing/), as shown in the following table:
