@@ -37,7 +37,6 @@
   }
 
   .design-discussion {
-    padding: $gl-padding 0;
     margin: $gl-padding 0;
 
     &::before {
@@ -63,7 +62,6 @@
 
     .reply-wrapper {
       padding: $gl-padding;
-      padding-bottom: 0;
     }
   }
 
