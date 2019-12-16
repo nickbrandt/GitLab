@@ -41,7 +41,9 @@ describe Ci::ArchiveTraceService, '#execute' do
 
     context 'when job failed to archive trace but did not raise an exception' do
       before do
-        allow_any_instance_of(Gitlab::Ci::Trace).to receive(:archive!) {}
+        allow_next_instance_of(Gitlab::Ci::Trace) do |instance|
+          allow(instance).to receive(:archive!) {}
+        end
       end
 
       it 'leaves a warning message in sidekiq log' do

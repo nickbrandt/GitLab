@@ -13,7 +13,9 @@ describe Ci::CreatePipelineService do
   context 'job:rules' do
     before do
       stub_ci_pipeline_yaml_file(config)
-      allow_any_instance_of(Ci::BuildScheduleWorker).to receive(:perform).and_return(true)
+      allow_next_instance_of(Ci::BuildScheduleWorker) do |instance|
+        allow(instance).to receive(:perform).and_return(true)
+      end
     end
 
     context 'exists:' do
