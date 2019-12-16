@@ -1,81 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ThreatMonitoringApp component given the WAF is not set up shows only the empty state 1`] = `
-<glemptystate-stub
-  description="A Web Application Firewall (WAF) provides monitoring and rules to protect production applications. GitLab adds the modsecurity WAF plug-in when you install the Ingress app in your Kubernetes cluster."
-  primarybuttonlink="/docs"
-  primarybuttontext="Learn more"
-  svgpath="/svgs"
-  title="Web Application Firewall not enabled"
-/>
-`;
-
-exports[`ThreatMonitoringApp component given the WAF is set up dismissing the alert hides the alert 1`] = `
-<section>
-  <!---->
-   
-  <header
-    class="my-3"
-  >
-    <h2
-      class="h4 mb-1"
-    >
-      
-      Threat Monitoring
-      
-      <gllink-stub
-        aria-label="Threat Monitoring help page link"
-        href="/docs"
-        target="_blank"
-      >
-        <glicon-stub
-          name="question"
-          size="16"
-        />
-      </gllink-stub>
-    </h2>
-  </header>
-</section>
-`;
-
-exports[`ThreatMonitoringApp component given the WAF is set up shows the alert and header 1`] = `
-<section>
-  <glalert-stub
-    class="my-3"
-    dismissible="true"
-    dismisslabel="Dismiss"
-    primarybuttonlink=""
-    primarybuttontext=""
-    secondarybuttonlink="/docs"
-    secondarybuttontext="View documentation"
-    title=""
-    variant="tip"
-  >
-    
-    The graph below is an overview of traffic coming to your application. View the documentation for instructions on how to access the WAF logs to see what type of malicious traffic is trying to access your app.
+exports[`ThreatMonitoringApp component given there is a default environment shows the alert 1`] = `
+<glalert-stub
+  class="my-3"
+  dismissible="true"
+  dismisslabel="Dismiss"
+  primarybuttonlink=""
+  primarybuttontext=""
+  secondarybuttonlink="/docs"
+  secondarybuttontext="View documentation"
+  title=""
+  variant="info"
+>
   
-  </glalert-stub>
-   
-  <header
-    class="my-3"
-  >
-    <h2
-      class="h4 mb-1"
-    >
-      
-      Threat Monitoring
-      
-      <gllink-stub
-        aria-label="Threat Monitoring help page link"
-        href="/docs"
-        target="_blank"
-      >
-        <glicon-stub
-          name="question"
-          size="16"
-        />
-      </gllink-stub>
-    </h2>
-  </header>
-</section>
+    The graph below is an overview of traffic coming to your application as tracked by the Web Application Firewall (WAF). View the docs for instructions on how to access the WAF logs to see what type of malicious traffic is trying to access your app. The docs link is also accessible by clicking the "?" icon next to the title below.
+  
+</glalert-stub>
 `;

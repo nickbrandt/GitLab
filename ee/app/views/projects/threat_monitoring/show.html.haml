@@ -1,8 +1,11 @@
 - breadcrumb_title s_("ThreatMonitoring|Threat Monitoring")
 - page_title s_("ThreatMonitoring|Threat Monitoring")
 
+- default_environment_id = @project.default_environment&.id || -1
+
 #js-threat-monitoring-app{ data: { documentation_path: help_page_path('user/clusters/applications', anchor: 'web-application-firewall-modsecurity'),
   empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
-  is_waf_setup: 'false',
-  endpoint: 'dummy',
+  waf_statistics_endpoint: 'dummy',
+  environments_endpoint: project_environments_path(@project),
+  default_environment_id: default_environment_id,
 } }
