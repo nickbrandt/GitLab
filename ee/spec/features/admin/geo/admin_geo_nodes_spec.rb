@@ -199,4 +199,22 @@ describe 'admin Geo Nodes', :js, :geo do
       expect(page).not_to have_css('.card')
     end
   end
+
+  describe 'with no Geo Nodes' do
+    before do
+      geo_node.delete
+      visit admin_geo_nodes_path
+      wait_for_requests
+    end
+
+    it 'hides the New Node button' do
+      expect(page).not_to have_link('New node', href: new_admin_geo_node_path)
+    end
+
+    it 'shows Discover GitLab Geo' do
+      page.within(find('h4')) do
+        expect(page).to have_content('Discover GitLab Geo')
+      end
+    end
+  end
 end
