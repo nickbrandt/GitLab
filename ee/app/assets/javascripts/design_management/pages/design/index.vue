@@ -162,9 +162,9 @@ export default {
       this.errorMessage = ADD_DISCUSSION_COMMENT_ERROR;
       throw e;
     },
-    onDesignDeleteError() {
+    onDesignDeleteError(e) {
       this.errorMessage = designDeletionError({ singular: true });
-      this.$router.push({ name: 'designs' });
+      throw e;
     },
     openCommentForm(position) {
       const { x, y } = position;
