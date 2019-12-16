@@ -9,7 +9,10 @@ import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
 import CreateIssueForm from 'ee/related_items_tree/components/create_issue_form.vue';
 import IssueActionsSplitButton from 'ee/related_items_tree/components/issue_actions_split_button.vue';
 
-import { mockInitialConfig, mockParentItem } from '../mock_data';
+import {
+  mockInitialConfig,
+  mockParentItem,
+} from '../../../javascripts/related_items_tree/mock_data';
 
 const localVue = createLocalVue();
 
@@ -54,7 +57,7 @@ describe('RelatedItemsTreeApp', () => {
 
     describe('handlePendingItemRemove', () => {
       it('calls `removePendingReference` action with provided `index` param', () => {
-        spyOn(wrapper.vm, 'removePendingReference');
+        jest.spyOn(wrapper.vm, 'removePendingReference').mockImplementation();
 
         wrapper.vm.handlePendingItemRemove(0);
 
@@ -67,7 +70,7 @@ describe('RelatedItemsTreeApp', () => {
       const touchedReference = '&2';
 
       it('calls `addPendingReferences` action with provided `untouchedRawReferences` param', () => {
-        spyOn(wrapper.vm, 'addPendingReferences');
+        jest.spyOn(wrapper.vm, 'addPendingReferences').mockImplementation();
 
         wrapper.vm.handleAddItemFormInput({ untouchedRawReferences, touchedReference });
 
@@ -75,7 +78,7 @@ describe('RelatedItemsTreeApp', () => {
       });
 
       it('calls `setItemInputValue` action with provided `touchedReference` param', () => {
-        spyOn(wrapper.vm, 'setItemInputValue');
+        jest.spyOn(wrapper.vm, 'setItemInputValue').mockImplementation();
 
         wrapper.vm.handleAddItemFormInput({ untouchedRawReferences, touchedReference });
 
@@ -87,7 +90,7 @@ describe('RelatedItemsTreeApp', () => {
       const newValue = '&1 &2';
 
       it('calls `addPendingReferences` action with provided `newValue` param', () => {
-        spyOn(wrapper.vm, 'addPendingReferences');
+        jest.spyOn(wrapper.vm, 'addPendingReferences').mockImplementation();
 
         wrapper.vm.handleAddItemFormBlur(newValue);
 
@@ -95,7 +98,7 @@ describe('RelatedItemsTreeApp', () => {
       });
 
       it('calls `setItemInputValue` action with empty string', () => {
-        spyOn(wrapper.vm, 'setItemInputValue');
+        jest.spyOn(wrapper.vm, 'setItemInputValue').mockImplementation();
 
         wrapper.vm.handleAddItemFormBlur(newValue);
 
@@ -106,7 +109,7 @@ describe('RelatedItemsTreeApp', () => {
     describe('handleAddItemFormSubmit', () => {
       it('calls `addItem` action when `pendingReferences` prop in state is not empty', () => {
         const newValue = '&1 &2';
-        spyOn(wrapper.vm, 'addItem');
+        jest.spyOn(wrapper.vm, 'addItem').mockImplementation();
 
         wrapper.vm.handleAddItemFormSubmit(newValue);
 
@@ -117,7 +120,7 @@ describe('RelatedItemsTreeApp', () => {
     describe('handleCreateEpicFormSubmit', () => {
       it('calls `createItem` action with `itemTitle` param', () => {
         const newValue = 'foo';
-        spyOn(wrapper.vm, 'createItem');
+        jest.spyOn(wrapper.vm, 'createItem').mockImplementation();
 
         wrapper.vm.handleCreateEpicFormSubmit(newValue);
 
@@ -129,7 +132,7 @@ describe('RelatedItemsTreeApp', () => {
 
     describe('handleAddItemFormCancel', () => {
       it('calls `toggleAddItemForm` actions with params `toggleState` as `false`', () => {
-        spyOn(wrapper.vm, 'toggleAddItemForm');
+        jest.spyOn(wrapper.vm, 'toggleAddItemForm').mockImplementation();
 
         wrapper.vm.handleAddItemFormCancel();
 
@@ -137,7 +140,7 @@ describe('RelatedItemsTreeApp', () => {
       });
 
       it('calls `setPendingReferences` action with empty array', () => {
-        spyOn(wrapper.vm, 'setPendingReferences');
+        jest.spyOn(wrapper.vm, 'setPendingReferences').mockImplementation();
 
         wrapper.vm.handleAddItemFormCancel();
 
@@ -145,7 +148,7 @@ describe('RelatedItemsTreeApp', () => {
       });
 
       it('calls `setItemInputValue` action with empty string', () => {
-        spyOn(wrapper.vm, 'setItemInputValue');
+        jest.spyOn(wrapper.vm, 'setItemInputValue').mockImplementation();
 
         wrapper.vm.handleAddItemFormCancel();
 
@@ -155,7 +158,7 @@ describe('RelatedItemsTreeApp', () => {
 
     describe('handleCreateEpicFormCancel', () => {
       it('calls `toggleCreateEpicForm` actions with params `toggleState`', () => {
-        spyOn(wrapper.vm, 'toggleCreateEpicForm');
+        jest.spyOn(wrapper.vm, 'toggleCreateEpicForm').mockImplementation();
 
         wrapper.vm.handleCreateEpicFormCancel();
 
@@ -163,7 +166,7 @@ describe('RelatedItemsTreeApp', () => {
       });
 
       it('calls `setItemInputValue` action with empty string', () => {
-        spyOn(wrapper.vm, 'setItemInputValue');
+        jest.spyOn(wrapper.vm, 'setItemInputValue').mockImplementation();
 
         wrapper.vm.handleCreateEpicFormCancel();
 
@@ -182,50 +185,43 @@ describe('RelatedItemsTreeApp', () => {
       });
     });
 
-    it('renders loading icon when `state.itemsFetchInProgress` prop is true', done => {
+    it('renders loading icon when `state.itemsFetchInProgress` prop is true', () => {
       wrapper.vm.$store.dispatch('requestItems', {
         parentItem: mockParentItem,
         isSubItem: false,
       });
 
-      wrapper.vm.$nextTick(() => {
+      return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.find(GlLoadingIcon).isVisible()).toBe(true);
-        done();
       });
     });
 
-    it('renders tree container element when `state.itemsFetchInProgress` prop is false', done => {
-      wrapper.vm.$nextTick(() => {
+    it('renders tree container element when `state.itemsFetchInProgress` prop is false', () =>
+      wrapper.vm.$nextTick().then(() => {
         expect(wrapper.find('.related-items-tree').isVisible()).toBe(true);
-        done();
-      });
-    });
+      }));
 
-    it('renders tree container element with `disabled-content` class when `state.itemsFetchInProgress` prop is false and `state.itemAddInProgress` or `state.itemCreateInProgress` is true', done => {
+    it('renders tree container element with `disabled-content` class when `state.itemsFetchInProgress` prop is false and `state.itemAddInProgress` or `state.itemCreateInProgress` is true', () => {
       wrapper.vm.$store.dispatch('requestAddItem');
 
-      wrapper.vm.$nextTick(() => {
+      return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.find('.related-items-tree.disabled-content').isVisible()).toBe(true);
-        done();
       });
     });
 
-    it('renders tree header component', done => {
-      wrapper.vm.$nextTick(() => {
+    it('renders tree header component', () =>
+      wrapper.vm.$nextTick().then(() => {
         expect(wrapper.find(RelatedItemsTreeHeader).isVisible()).toBe(true);
-        done();
-      });
-    });
+      }));
 
-    it('renders item add/create form container element', done => {
+    it('renders item add/create form container element', () => {
       wrapper.vm.$store.dispatch('toggleAddItemForm', {
         toggleState: true,
         issuableType: issuableTypesMap.Epic,
       });
 
-      wrapper.vm.$nextTick(() => {
+      return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.find('.add-item-form-container').isVisible()).toBe(true);
-        done();
       });
     });
 
@@ -239,14 +235,11 @@ describe('RelatedItemsTreeApp', () => {
   });
 
   describe('with epicNewIssue feature flag enabled', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       window.gon.features = { epicNewIssue: true };
       wrapper = createComponent();
       wrapper.vm.$store.state.itemsFetchInProgress = false;
-      wrapper.vm
-        .$nextTick()
-        .then(done)
-        .catch(done.fail);
+      return wrapper.vm.$nextTick();
     });
 
     afterEach(() => {
@@ -258,59 +251,44 @@ describe('RelatedItemsTreeApp', () => {
     });
 
     describe('after split button emitted showAddIssueForm event', () => {
-      it('shows add item form', done => {
+      it('shows add item form', () => {
         expect(findAddItemForm().exists()).toBe(false);
 
         findIssueActionsSplitButton().vm.$emit('showAddIssueForm');
 
-        wrapper.vm
-          .$nextTick()
-          .then(() => {
-            expect(findAddItemForm().exists()).toBe(true);
-          })
-          .then(done)
-          .catch(done.fail);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(findAddItemForm().exists()).toBe(true);
+        });
       });
     });
 
     describe('after split button emitted showCreateIssueForm event', () => {
-      it('shows create item form', done => {
+      it('shows create item form', () => {
         expect(findCreateIssueForm().exists()).toBe(false);
 
         findIssueActionsSplitButton().vm.$emit('showCreateIssueForm');
 
-        wrapper.vm
-          .$nextTick()
-          .then(() => {
-            expect(findCreateIssueForm().exists()).toBe(true);
-          })
-          .then(done)
-          .catch(done.fail);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(findCreateIssueForm().exists()).toBe(true);
+        });
       });
     });
 
     describe('after create issue form emitted cancel event', () => {
-      beforeEach(done => {
+      beforeEach(() => {
         findIssueActionsSplitButton().vm.$emit('showCreateIssueForm');
 
-        wrapper.vm
-          .$nextTick()
-          .then(done)
-          .catch(done.fail);
+        return wrapper.vm.$nextTick();
       });
 
-      it('hides the form', done => {
+      it('hides the form', () => {
         expect(findCreateIssueForm().exists()).toBe(true);
 
         findCreateIssueForm().vm.$emit('cancel');
 
-        wrapper.vm
-          .$nextTick()
-          .then(() => {
-            expect(findCreateIssueForm().exists()).toBe(false);
-          })
-          .then(done)
-          .catch(done.fail);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(findCreateIssueForm().exists()).toBe(false);
+        });
       });
     });
   });
