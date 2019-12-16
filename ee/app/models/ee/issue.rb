@@ -112,7 +112,7 @@ module EE
     def parent_ids
       return super unless has_group_boards?
 
-      board_group.projects.select(:id)
+      board_group.all_projects.select(:id)
     end
 
     def has_group_boards?
