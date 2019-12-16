@@ -13,11 +13,7 @@ module Clusters
       def execute
         app.make_updating!
 
-        values = load_config(app)
-          .yield_self { |config| update_config(config) }
-          .yield_self { |config| config.to_yaml }
-
-        helm_api.update(upgrade_command(values))
+        helm_api.update(patch_command(values))
 
         ::ClusterWaitForAppUpdateWorker.perform_in(::ClusterWaitForAppUpdateWorker::INTERVAL, app.name, app.id)
       rescue ::Kubeclient::HttpError => ke
@@ -28,14 +24,11 @@ module Clusters
 
       private
 
-      def load_config(app)
-        YAML.safe_load(app.values)
-      end
-
-      def update_config(config)
+      def values
         PrometheusConfigService
           .new(project, cluster, app)
-          .execute(config)
+          .execute
+          .to_yaml
       end
     end
   end

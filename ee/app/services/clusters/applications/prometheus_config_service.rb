@@ -9,7 +9,7 @@ module Clusters
         @app = app
       end
 
-      def execute(config)
+      def execute(config = {})
         if has_alerts?
           generate_alert_manager(config)
         else
@@ -24,6 +24,7 @@ module Clusters
       def reset_alert_manager(config)
         config = set_alert_manager_enabled(config, false)
         config.delete('alertmanagerFiles')
+        config['serverFiles'] ||= {}
         config['serverFiles']['alerts'] = {}
 
         config
@@ -37,6 +38,7 @@ module Clusters
       end
 
       def set_alert_manager_enabled(config, enabled)
+        config['alertmanager'] ||= {}
         config['alertmanager']['enabled'] = enabled
 
         config
@@ -54,6 +56,8 @@ module Clusters
       end
 
       def set_alert_manager_groups(config)
+        config['serverFiles'] ||= {}
+        config['serverFiles']['alerts'] ||= {}
         config['serverFiles']['alerts']['groups'] ||= []
 
         environments_with_alerts.each do |env_name, alerts|
