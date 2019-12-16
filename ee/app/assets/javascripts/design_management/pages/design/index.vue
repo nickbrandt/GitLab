@@ -146,7 +146,6 @@ export default {
         data: { createImageDiffNote },
       },
     ) {
-      this.onDiffNoteError('hey');
       updateStoreAfterAddImageDiffNote(
         store,
         createImageDiffNote,
@@ -256,6 +255,7 @@ export default {
             :noteable-id="design.id"
             :discussion-index="index + 1"
             :markdown-preview-path="markdownPreviewPath"
+            @error="onDiffNoteError"
           />
           <apollo-mutation
             v-if="annotationCoordinates"

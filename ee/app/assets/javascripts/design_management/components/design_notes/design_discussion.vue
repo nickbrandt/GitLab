@@ -7,8 +7,6 @@ import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import DesignNote from './design_note.vue';
 import DesignReplyForm from './design_reply_form.vue';
 import { updateStoreAfterAddDiscussionComment } from '../../utils/cache_update';
-import { ADD_DISCUSSION_COMMENT_ERROR } from '../../utils/error_messages';
-import { createDesignDetailFlash } from '../../utils/design_management_utils';
 
 export default {
   components: {
@@ -83,8 +81,8 @@ export default {
       this.discussionComment = '';
       this.hideForm();
     },
-    onError() {
-      createDesignDetailFlash(ADD_DISCUSSION_COMMENT_ERROR);
+    onError(err) {
+      this.$emit('error', err);
     },
     hideForm() {
       this.isFormRendered = false;
