@@ -21,6 +21,7 @@ module EE
             optional :mirror, type: Grape::API::Boolean, desc: 'Enables pull mirroring in a project'
             optional :mirror_trigger_builds, type: Grape::API::Boolean, desc: 'Pull mirroring triggers builds'
             optional :external_authorization_classification_label, type: String, desc: 'The classification label for the project'
+            optional :service_desk_enabled, type: Grape::API::Boolean, desc: 'Disable or enable the service desk'
           end
 
           params :optional_filter_params_ee do
@@ -53,7 +54,8 @@ module EE
               :external_authorization_classification_label,
               :import_url,
               :packages_enabled,
-              :fallback_approvals_required
+              :fallback_approvals_required,
+              :service_desk_enabled
             ]
           end
         end
