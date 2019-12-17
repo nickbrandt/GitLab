@@ -3663,6 +3663,7 @@ ActiveRecord::Schema.define(version: 2019_12_17_160632) do
 
   create_table "service_desk_settings", primary_key: "project_id", id: :bigint, default: nil, force: :cascade do |t|
     t.string "issue_template_key", limit: 255
+    t.string "outgoing_name", limit: 255
   end
 
   create_table "services", id: :serial, force: :cascade do |t|

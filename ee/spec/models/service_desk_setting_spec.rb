@@ -5,6 +5,7 @@ require 'spec_helper'
 describe ServiceDeskSetting do
   describe 'validations' do
     it { is_expected.to validate_presence_of(:project_id) }
+    it { is_expected.to validate_length_of(:outgoing_name).is_at_most(255) }
   end
 
   describe 'associations' do
