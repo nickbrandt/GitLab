@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Global elastic search', :elastic do
+describe 'Global elastic search', :elastic, :sidekiq_inline do
   let(:user) { create(:user) }
   let(:project) { create(:project, :repository, :wiki_repo, namespace: user.namespace) }
 
@@ -15,21 +15,25 @@ describe 'Global elastic search', :elastic do
 
   shared_examples 'an efficient database result' do
     it 'avoids N+1 database queries' do
-      create(object, creation_args)
+      create(object, *creation_traits, creation_args)
       Gitlab::Elastic::Helper.refresh_index
 
       control_count = ActiveRecord::QueryRecorder.new { visit path }.count
+      expect(page).to have_css('.search-results') # Confirm there are search results to prevent false positives
 
-      create_list(object, 10, creation_args)
+      create_list(object, 10, *creation_traits, creation_args)
       Gitlab::Elastic::Helper.refresh_index
 
       control_count = control_count + (10 * query_count_multiplier) + 1
 
       expect { visit path }.not_to exceed_query_limit(control_count)
+      expect(page).to have_css('.search-results') # Confirm there are search results to prevent false positives
     end
   end
 
   describe 'I do not overload the database' do
+    let(:creation_traits) { [] }
+
     context 'searching issues' do
       let(:object) { :issue }
       let(:creation_args) { { project: project, title: 'initial' } }
@@ -43,18 +47,19 @@ describe 'Global elastic search', :elastic do
       let(:object) { :project }
       let(:creation_args) { { namespace: user.namespace } }
       let(:path) { search_path(search: 'project*', scope: 'projects') }
-      # Each Project requires 5 extra queries: one for each "count" (forks,
-      # open MRs, open Issues) and twice for access level. This should be fixed
-      # per https://gitlab.com/gitlab-org/gitlab/issues/34457
-      let(:query_count_multiplier) { 5 }
+      # Each Project requires 4 extra queries: one for each "count" (forks,
+      # open MRs, open Issues and access levels). This should be fixed per
+      # https://gitlab.com/gitlab-org/gitlab/issues/34457
+      let(:query_count_multiplier) { 4 }
 
       it_behaves_like 'an efficient database result'
     end
 
     context 'searching merge requests' do
       let(:object) { :merge_request }
-      let(:creation_args) { { title: 'initial' } }
-      let(:path) { search_path(search: 'initial*', scope: 'merge_requests') }
+      let(:creation_traits) { [:sequence_source_branch] }
+      let(:creation_args) { { source_project: project, title: 'initial' } }
+      let(:path) { search_path(search: '*', scope: 'merge_requests') }
       let(:query_count_multiplier) { 0 }
 
       it_behaves_like 'an efficient database result'
@@ -63,7 +68,7 @@ describe 'Global elastic search', :elastic do
     context 'searching milestones' do
       let(:object) { :milestone }
       let(:creation_args) { { project: project } }
-      let(:path) { search_path(search: 'milestone*', scope: 'milestones') }
+      let(:path) { search_path(search: '*', scope: 'milestones') }
       let(:query_count_multiplier) { 0 }
 
       it_behaves_like 'an efficient database result'
@@ -77,7 +82,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "has a pagination", :sidekiq_might_not_need_inline do
+    it "has a pagination" do
       visit dashboard_projects_path
 
       submit_search('initial')
@@ -95,7 +100,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "has a pagination", :sidekiq_might_not_need_inline do
+    it "has a pagination" do
       visit dashboard_projects_path
 
       submit_search('foo')
@@ -114,7 +119,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "finds files", :sidekiq_might_not_need_inline do
+    it "finds files" do
       visit dashboard_projects_path
 
       submit_search('application.js')
@@ -155,7 +160,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "finds files", :sidekiq_might_not_need_inline do
+    it "finds files" do
       visit dashboard_projects_path
 
       submit_search('term')
@@ -173,7 +178,7 @@ describe 'Global elastic search', :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "finds commits", :sidekiq_might_not_need_inline do
+    it "finds commits" do
       visit dashboard_projects_path
 
       submit_search('add')
@@ -183,7 +188,7 @@ describe 'Global elastic search', :elastic do
       expect(page).to have_selector('.project-namespace')
     end
 
-    it 'shows proper page 2 results', :sidekiq_might_not_need_inline do
+    it 'shows proper page 2 results' do
       visit dashboard_projects_path
 
       submit_search('add')
@@ -209,7 +214,7 @@ describe 'Global elastic search', :elastic do
       submit_search('project')
     end
 
-    it 'displays result counts for all categories', :sidekiq_might_not_need_inline do
+    it 'displays result counts for all categories' do
       expect(page).to have_content('Projects 1')
       expect(page).to have_content('Issues 1')
       expect(page).to have_content('Merge requests 0')
@@ -226,17 +231,21 @@ describe 'Global elastic search', :elastic do
     it 'allows basic search without Elasticsearch' do
       visit dashboard_projects_path
 
-      submit_search('project')
+      # Disable sidekiq to ensure it does not end up in the index
+      Sidekiq::Testing.disable! do
+        create(:project, namespace: user.namespace, name: 'Will not be found but searchable')
+      end
 
-      # Project won't be found since ES index is not up to date
-      expect(page).not_to have_content('Projects 1')
+      submit_search('searchable')
+
+      expect(page).not_to have_content('Will not be found')
 
       # Since there are no results you have the option to instead use basic
       # search
       click_link 'basic search'
 
       # Project is found now that we are using basic search
-      expect(page).to have_content('Projects 1')
+      expect(page).to have_content('Will not be found')
     end
 
     context 'when performing Commits search' do
