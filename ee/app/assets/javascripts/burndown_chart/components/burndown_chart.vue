@@ -1,6 +1,6 @@
 <script>
 import { GlButton, GlButtonGroup } from '@gitlab/ui';
-import { GlLineChart } from '@gitlab/ui/charts';
+import { GlLineChart } from '@gitlab/ui/dist/charts';
 import dateFormat from 'dateformat';
 import ResizableChartContainer from '~/vue_shared/components/resizable_chart/resizable_chart_container.vue';
 import { s__, __, sprintf } from '~/locale';
