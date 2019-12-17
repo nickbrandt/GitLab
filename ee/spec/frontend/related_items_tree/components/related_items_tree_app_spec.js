@@ -8,13 +8,20 @@ import { issuableTypesMap } from 'ee/related_issues/constants';
 import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
 import CreateIssueForm from 'ee/related_items_tree/components/create_issue_form.vue';
 import IssueActionsSplitButton from 'ee/related_items_tree/components/issue_actions_split_button.vue';
+import { TEST_HOST } from 'spec/test_constants';
+import AxiosMockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
+import { getJSONFixture } from 'helpers/fixtures';
 
+// https://gitlab.com/gitlab-org/gitlab/issues/118456
 import {
   mockInitialConfig,
   mockParentItem,
 } from '../../../javascripts/related_items_tree/mock_data';
 
 const localVue = createLocalVue();
+
+const mockProjects = getJSONFixture('static/projects.json');
 
 const createComponent = () => {
   const store = createDefaultStore();
@@ -30,14 +37,25 @@ const createComponent = () => {
 };
 
 describe('RelatedItemsTreeApp', () => {
+  let axiosMock;
   let wrapper;
 
   const findAddItemForm = () => wrapper.find(AddItemForm);
   const findCreateIssueForm = () => wrapper.find(CreateIssueForm);
   const findIssueActionsSplitButton = () => wrapper.find(IssueActionsSplitButton);
+  const showCreateIssueForm = () => {
+    findIssueActionsSplitButton().vm.$emit('showCreateIssueForm');
+    return axios.waitFor(mockInitialConfig.projectsEndpoint).then(() => wrapper.vm.$nextTick());
+  };
+
+  beforeEach(() => {
+    axiosMock = new AxiosMockAdapter(axios);
+    axiosMock.onGet(mockInitialConfig.projectsEndpoint).replyOnce(200, mockProjects);
+  });
 
   afterEach(() => {
     wrapper.destroy();
+    axiosMock.restore();
   });
 
   describe('methods', () => {
@@ -266,20 +284,17 @@ describe('RelatedItemsTreeApp', () => {
       it('shows create item form', () => {
         expect(findCreateIssueForm().exists()).toBe(false);
 
-        findIssueActionsSplitButton().vm.$emit('showCreateIssueForm');
+        return showCreateIssueForm().then(() => {
+          const form = findCreateIssueForm();
 
-        return wrapper.vm.$nextTick().then(() => {
-          expect(findCreateIssueForm().exists()).toBe(true);
+          expect(form.exists()).toBe(true);
+          expect(form.props().projects).toBe(mockProjects);
         });
       });
     });
 
     describe('after create issue form emitted cancel event', () => {
-      beforeEach(() => {
-        findIssueActionsSplitButton().vm.$emit('showCreateIssueForm');
-
-        return wrapper.vm.$nextTick();
-      });
+      beforeEach(() => showCreateIssueForm());
 
       it('hides the form', () => {
         expect(findCreateIssueForm().exists()).toBe(true);
@@ -288,6 +303,25 @@ describe('RelatedItemsTreeApp', () => {
 
         return wrapper.vm.$nextTick().then(() => {
           expect(findCreateIssueForm().exists()).toBe(false);
+        });
+      });
+    });
+
+    describe('after create issue form emitted submit event', () => {
+      beforeEach(() => showCreateIssueForm());
+
+      it('dispatches createNewIssue action', () => {
+        const issuesEndpoint = `${TEST_HOST}/issues`;
+        axiosMock.onPost(issuesEndpoint).replyOnce(200, {});
+
+        const params = {
+          issuesEndpoint,
+          title: 'some new issue',
+        };
+        findCreateIssueForm().vm.$emit('submit', params);
+
+        return axios.waitFor(issuesEndpoint).then(({ data }) => {
+          expect(JSON.parse(data).title).toBe(params.title);
         });
       });
     });

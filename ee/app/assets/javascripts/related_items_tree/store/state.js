@@ -3,6 +3,7 @@ export default () => ({
   parentItem: {},
   epicsEndpoint: '',
   issuesEndpoint: '',
+  projectsEndpoint: null,
   userSignedIn: false,
 
   children: {},
@@ -38,4 +39,6 @@ export default () => ({
     parentItem: {},
     item: {},
   },
+
+  projects: [],
 });
