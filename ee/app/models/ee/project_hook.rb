@@ -6,6 +6,7 @@ module EE
 
     prepended do
       include CustomModelNaming
+      include Limitable
 
       self.singular_route_key = :hook
     end
