@@ -15,7 +15,6 @@ class AdjournedGroupDeletionWorker
       .with_deletion_schedule
       .find_each(batch_size: 100) # rubocop: disable CodeReuse/ActiveRecord
       .with_index do |group, index|
-
       deletion_schedule = group.deletion_schedule
       delay = index * INTERVAL
 

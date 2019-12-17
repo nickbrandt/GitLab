@@ -342,13 +342,13 @@ describe "Git HTTP requests (Geo)", :geo do
         context 'when gl_id is provided via HTTP headers' do
           context 'but is invalid' do
             where(:geo_gl_id) do
-              [
-                'key-999',
-                'key-1',
-                'key-999',
-                'junk',
-                'junk-1',
-                'kkey-1'
+              %w[
+                key-999
+                key-1
+                key-999
+                junk
+                junk-1
+                kkey-1
               ]
             end
 
