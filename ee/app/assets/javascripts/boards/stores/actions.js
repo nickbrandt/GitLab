@@ -13,6 +13,10 @@ export default {
     commit(types.TOGGLE_LABELS);
   },
 
+  setActiveListId({ commit }, listId) {
+    commit(types.SET_ACTIVE_LIST_ID, listId);
+  },
+
   fetchAllBoards: () => {
     notImplemented();
   },

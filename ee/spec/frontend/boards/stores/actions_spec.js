@@ -18,6 +18,23 @@ describe('toggleShowLabels', () => {
   });
 });
 
+describe('setActiveListId', () => {
+  it('should commit mutation SET_ACTIVE_LIST_ID', done => {
+    const state = {
+      activeListId: 0,
+    };
+
+    testAction(
+      actions.setActiveListId,
+      1,
+      state,
+      [{ type: types.SET_ACTIVE_LIST_ID, payload: 1 }],
+      [],
+      done,
+    );
+  });
+});
+
 describe('fetchAllBoards', () => {
   expectNotImplemented(actions.fetchAllBoards);
 });

@@ -188,7 +188,7 @@ describe 'issue boards', :js do
   end
 
   context 'list settings' do
-    let!(:label) { create(:label, project: project, name: 'Label') }
+    let!(:label) { create(:label, project: project, name: 'Brount') }
     let!(:list) { create(:list, board: board, label: label, position: 1) }
 
     before do
@@ -201,12 +201,30 @@ describe 'issue boards', :js do
       it 'shows the list settings button' do
         expect(page).to have_selector(:button, "List Settings")
       end
+
+      it 'does not show the board list settings sidebar as default state' do
+        expect(page).not_to have_selector(".js-board-settings-sidebar")
+      end
+
+      context 'when settings button is clicked' do
+        it 'shows the board list settings sidebar' do
+          page.within(find(".board:nth-child(2)")) do
+            click_button('List Settings')
+          end
+
+          expect(page.find('.js-board-settings-sidebar').find('.gl-label-text')).to have_text("Brount")
+        end
+      end
     end
 
     context 'When FF is turned off' do
       it 'does not show the list settings button' do
         stub_licensed_features(wip_limits: false)
         expect(page).to have_no_selector(:button, "List Settings")
+      end
+
+      it 'does not show the board list settings sidebar' do
+        expect(page).not_to have_selector(".js-board-settings-sidebar")
       end
     end
   end
