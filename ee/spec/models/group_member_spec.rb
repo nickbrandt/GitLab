@@ -60,6 +60,28 @@ describe GroupMember do
     end
   end
 
+  describe '.with_saml_identity' do
+    let(:saml_provider) { create :saml_provider }
+    let(:group) { saml_provider.group }
+    let!(:member) do
+      create(:group_member, group: group).tap do |m|
+        create(:group_saml_identity, saml_provider: saml_provider, user: m.user)
+      end
+    end
+    let!(:member_without_identity) do
+      create(:group_member, group: group)
+    end
+    let!(:member_with_different_identity) do
+      create(:group_member, group: group).tap do |m|
+        create(:group_saml_identity, user: m.user)
+      end
+    end
+
+    it 'returns members with identity linked to given saml provider' do
+      expect(described_class.with_saml_identity(saml_provider)).to eq([member])
+    end
+  end
+
   describe '#group_saml_identity' do
     subject(:group_saml_identity) { member.group_saml_identity }
 
