@@ -29,7 +29,6 @@ describe('projectSelector actions', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
     mockAxios.restore();
   });
 

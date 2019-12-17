@@ -11,7 +11,6 @@ describe('DismissalCommentModalFooter', () => {
 
   afterEach(() => {
     document.body.dataset.page = origPage;
-    jest.clearAllMocks();
     wrapper.destroy();
   });
 
