@@ -32,10 +32,12 @@ describe Security::StoreReportsService do
 
       context 'when StoreReportService returns an error for a report' do
         let(:reports) { Gitlab::Ci::Reports::Security::Reports.new(pipeline.sha) }
-        let(:sast_report) { reports.get_report('sast') }
-        let(:dast_report) { reports.get_report('dast') }
+        let(:sast_report) { reports.get_report('sast', sast_artifact) }
+        let(:dast_report) { reports.get_report('dast', dast_artifact) }
         let(:success) { { status: :success } }
         let(:error) { { status: :error, message: "something went wrong" } }
+        let(:sast_artifact) { create(:ee_ci_job_artifact, :sast) }
+        let(:dast_artifact) { create(:ee_ci_job_artifact, :dast) }
 
         before do
           allow(pipeline).to receive(:security_reports).and_return(reports)

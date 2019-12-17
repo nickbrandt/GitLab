@@ -6,7 +6,7 @@ describe Security::StoreReportService, '#execute' do
   let(:artifact) { create(:ee_ci_job_artifact, report_type) }
   let(:project) { artifact.project }
   let(:pipeline) { artifact.job.pipeline }
-  let(:report) { pipeline.security_reports.get_report(report_type.to_s) }
+  let(:report) { pipeline.security_reports.get_report(report_type.to_s, artifact) }
 
   before do
     stub_licensed_features(sast: true, dependency_scanning: true, container_scanning: true)
@@ -52,7 +52,7 @@ describe Security::StoreReportService, '#execute' do
     let!(:new_artifact) { create(:ee_ci_job_artifact, :sast, job: new_build) }
     let(:new_build) { create(:ci_build, pipeline: new_pipeline) }
     let(:new_pipeline) { create(:ci_pipeline, project: project) }
-    let(:new_report) { new_pipeline.security_reports.get_report(report_type.to_s) }
+    let(:new_report) { new_pipeline.security_reports.get_report(report_type.to_s, artifact) }
     let(:report_type) { :sast }
 
     let!(:occurrence) do
