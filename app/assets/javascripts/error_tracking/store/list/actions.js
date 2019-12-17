@@ -17,12 +17,14 @@ export function startPolling({ state, commit, dispatch }) {
       params: {
         search_term: state.searchQuery,
         sort: state.sortField,
+        cursor: state.cursor,
       },
     },
     successCallback: ({ data }) => {
       if (!data) {
         return;
       }
+
       commit(types.SET_PAGINATION, data.pagination);
       commit(types.SET_ERRORS, data.errors);
       commit(types.SET_LOADING, false);
@@ -88,6 +90,12 @@ export const sortByField = ({ commit, dispatch }, field) => {
 
 export const setEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_ENDPOINT, endpoint);
+};
+
+export const fetchResults = ({ commit, dispatch }, cursor) => {
+  commit(types.SET_CURSOR, cursor);
+  dispatch('stopPolling');
+  dispatch('startPolling');
 };
 
 export default () => {};
