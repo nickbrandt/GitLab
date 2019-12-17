@@ -6,6 +6,7 @@ class ServiceDeskSetting < ApplicationRecord
   belongs_to :project
   validates :project_id, presence: true
   validate :valid_issue_template
+  validates :outgoing_name, length: { maximum: 255 }, allow_blank: true
 
   def self.update_template_key_for(project:, issue_template_key:)
     return unless issue_template_key
