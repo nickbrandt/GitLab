@@ -52,7 +52,7 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
     end
   end
 
-  context 'when user has full_private_access', :do_not_mock_admin_mode do
+  context 'when user has read_all_resources', :do_not_mock_admin_mode do
     include_context 'custom session'
 
     let(:user) { create(:admin) }

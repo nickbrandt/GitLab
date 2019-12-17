@@ -21,7 +21,7 @@ module Elastic
       private
 
       def confidentiality_filter(query_hash, current_user)
-        return query_hash if current_user && current_user.full_private_access?
+        return query_hash if current_user && current_user.can_read_all_resources?
 
         filter =
           if current_user

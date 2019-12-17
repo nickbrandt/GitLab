@@ -25,7 +25,7 @@ module Elastic
 
       def filter(query_hash, options)
         user = options[:current_user]
-        return query_hash if user&.full_private_access?
+        return query_hash if user&.can_read_all_resources?
 
         filter_conditions =
           filter_personal_snippets(user, options) +
