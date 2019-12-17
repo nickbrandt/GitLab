@@ -728,15 +728,16 @@ Learn more about [variables expressions](../variables/README.md#environment-vari
 Using the `changes` keyword with `only` or `except` makes it possible to define if
 a job should be created based on files modified by a Git push event.
 
-This means the `only:changes` policy is only useful for Pipelines that are
-triggered via `push`, `merge_request_event`, or `external_merge_request_event`.
-If there is no Git push event, `changes` cannot determine if any given file is
-new or old and will return true by default.
+This means the `only:changes` policy is only useful for pipelines with:
 
-CAUTION: **Warning:**
-Pipelines triggered via `web`, `trigger`, `schedule`, `api`, `external`,
-`pipeline`, or `chat`, the pipeline **will have no modified paths and `changes`
-policies will always evaluate to true**.
+- `$CI_PIPELINE_SOURCE == 'push'`
+- `$CI_PIPELINE_SOURCE == 'merge_request_event'`
+- `$CI_PIPELINE_SOURCE == 'external_pull_request_event'`
+
+If there is no Git push event, as is the case in pipelines with
+[any other source](variables/predefined_variables.html#variables-reference),
+`changes` cannot determine if a given file is new or old, and will always
+return true.
 
 For example:
 
