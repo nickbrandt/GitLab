@@ -2,7 +2,8 @@
 
 module QA
   context 'Create' do
-    describe 'Elasticsearch advanced global search with advanced syntax', :orchestrated, :elasticsearch, :requires_admin do
+    # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/43732
+    describe 'Elasticsearch advanced global search with advanced syntax', :orchestrated, :elasticsearch, :requires_admin, :quarantine do
       let(:project_name_suffix) { SecureRandom.hex(8) }
 
       before do
