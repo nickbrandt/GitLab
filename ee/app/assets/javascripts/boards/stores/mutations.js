@@ -9,6 +9,9 @@ export default {
   [mutationTypes.TOGGLE_LABELS]: state => {
     state.isShowingLabels = !state.isShowingLabels;
   },
+  [mutationTypes.SET_ACTIVE_LIST_ID]: (state, id) => {
+    state.activeListId = id;
+  },
 
   [mutationTypes.REQUEST_AVAILABLE_BOARDS]: () => {
     notImplemented();

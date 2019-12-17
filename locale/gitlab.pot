@@ -10223,6 +10223,9 @@ msgstr ""
 msgid "Label"
 msgstr ""
 
+msgid "Label List"
+msgstr ""
+
 msgid "Label actions dropdown"
 msgstr ""
 

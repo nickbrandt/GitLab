@@ -1,3 +1,4 @@
+import { mapActions } from 'vuex';
 import boardPromotionState from 'ee/boards/components/board_promotion_state';
 import Board from '~/boards/components/board';
 import { __, n__, sprintf } from '~/locale';
@@ -26,6 +27,12 @@ export default Board.extend({
           totalWeight,
         },
       );
+    },
+  },
+  methods: {
+    ...mapActions(['setActiveListId']),
+    openSidebarSettings() {
+      this.setActiveListId(this.list.id);
     },
   },
 });
