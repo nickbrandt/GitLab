@@ -119,8 +119,9 @@ describe Gitlab::Email::Handler::CreateNoteHandler do
   context 'when the service desk' do
     let(:project) { create(:project, :public, service_desk_enabled: true) }
     let(:support_bot) { User.support_bot }
-    let(:noteable) { create(:issue, project: project, author: support_bot) }
+    let(:noteable) { create(:issue, project: project, author: support_bot, title: 'service desk issue') }
     let(:note) { create(:note, project: project, noteable: noteable) }
+    let(:email_raw) { fixture_file('emails/valid_reply_with_quick_actions.eml', dir: 'ee') }
 
     let!(:sent_notification) do
       SentNotification.record_note(note, support_bot.id, mail_key)
@@ -138,6 +139,18 @@ describe Gitlab::Email::Handler::CreateNoteHandler do
 
         it 'creates a comment' do
           expect { receiver.execute }.to change { noteable.notes.count }.by(1)
+        end
+
+        context 'when quick actions are present' do
+          it 'strips quick actions from email' do
+            receiver.execute
+            noteable.reload
+
+            expect(note.note).not_to include('/close')
+            expect(note.note).not_to include('/title')
+            expect(noteable.title).to eq('service desk issue')
+            expect(noteable).to be_opened
+          end
         end
       end
 

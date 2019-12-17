@@ -61,16 +61,56 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
         end
 
         context 'and template is present' do
+          def set_template_file(file_name, content)
+            file_path = ".gitlab/issue_templates/#{file_name}.md"
+            project.repository.create_file(user, file_path, content, message: 'message', branch_name: 'master')
+            ServiceDeskSetting.update_template_key_for(project: project, issue_template_key: file_name)
+          end
+
           it 'appends template text to issue description' do
-            template_path = '.gitlab/issue_templates/service_desk.md'
-            project.repository.create_file(user, template_path, 'text from template', message: 'message', branch_name: 'master')
-            ServiceDeskSetting.update_template_key_for(project: project, issue_template_key: 'service_desk')
+            set_template_file('service_desk', 'text from template')
 
             receiver.execute
 
             issue_description = Issue.last.description
             expect(issue_description).to include(expected_description)
             expect(issue_description.lines.last).to eq('text from template')
+          end
+
+          context 'when quick actions are present' do
+            let(:label) { create(:label, project: project, title: 'label1') }
+            let(:milestone) { create(:milestone, project: project) }
+            let!(:user) { create(:user, username: 'user1') }
+
+            before do
+              project.add_developer(user)
+            end
+
+            it 'applies quick action commands present on templates' do
+              file_content = %(Text from template \n/label ~#{label.title} \n/milestone %"#{milestone.name}"")
+              set_template_file('with_slash_commands', file_content)
+
+              receiver.execute
+
+              issue = Issue.last
+              expect(issue.description).to include('Text from template')
+              expect(issue.label_ids).to include(label.id)
+              expect(issue.milestone).to eq(milestone)
+            end
+
+            it 'does not apply quick actions present on user email body' do
+              set_template_file('service_desk1', 'text from template')
+
+              receiver.execute
+
+              issue = Issue.last
+              expect(issue).to be_opened
+              expect(issue.description).not_to include('/label ~label1')
+              expect(issue.description).not_to include('/assign @user1')
+              expect(issue.description).not_to include('/close')
+              expect(issue.assignees).to be_empty
+              expect(issue.milestone).to be_nil
+            end
           end
         end
 
