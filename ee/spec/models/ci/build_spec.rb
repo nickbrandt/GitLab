@@ -247,7 +247,7 @@ describe Ci::Build do
 
       it 'parses blobs and add the results to the report' do
         subject
-        blob_path = "/#{project.full_path}/blob/#{job.sha}/yarn/yarn.lock"
+        blob_path = "/#{project.full_path}/-/blob/#{job.sha}/yarn/yarn.lock"
         mini_portile2 = dependency_list_report.dependencies[0]
         yarn = dependency_list_report.dependencies[20]
 

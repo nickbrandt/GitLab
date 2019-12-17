@@ -36,7 +36,7 @@ const GUIDED_GITLAB_TOUR = [
     },
   },
   {
-    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/tree/master$`, ''),
+    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/tree/master$`, ''),
     getHelpContent: ({ projectName }) => [
       {
         text: sprintf(
@@ -69,7 +69,7 @@ const GUIDED_GITLAB_TOUR = [
     },
   },
   {
-    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/commits/master$`, ''),
+    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/commits/master$`, ''),
     getHelpContent: () => [
       {
         text: s__(
