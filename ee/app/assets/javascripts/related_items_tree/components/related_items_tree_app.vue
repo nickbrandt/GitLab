@@ -60,6 +60,7 @@ export default {
       'issuableType',
       'epicsEndpoint',
       'issuesEndpoint',
+      'projects',
     ]),
     ...mapGetters(['itemAutoCompleteSources', 'itemPathIdSeparator', 'directChildren']),
     disableContents() {
@@ -100,6 +101,8 @@ export default {
       'setItemInputValue',
       'addItem',
       'createItem',
+      'createNewIssue',
+      'fetchProjects',
     ]),
     getRawRefs(value) {
       return value.split(/\s+/).filter(ref => ref.trim().length > 0);
@@ -140,9 +143,11 @@ export default {
       this.toggleAddItemForm({ toggleState: true, issuableType: issuableTypesMap.ISSUE });
     },
     showCreateIssueForm() {
-      this.toggleAddItemForm({ toggleState: false });
-      this.toggleCreateEpicForm({ toggleState: false });
-      this.isCreateIssueFormVisible = true;
+      return this.fetchProjects().then(() => {
+        this.toggleAddItemForm({ toggleState: false });
+        this.toggleCreateEpicForm({ toggleState: false });
+        this.isCreateIssueFormVisible = true;
+      });
     },
   },
 };
@@ -203,7 +208,9 @@ export default {
         />
         <create-issue-form
           :slot="$options.FORM_SLOTS.createIssue"
+          :projects="projects"
           @cancel="isCreateIssueFormVisible = false"
+          @submit="createNewIssue"
         />
       </slot-switch>
       <related-items-tree-body
