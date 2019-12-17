@@ -3,11 +3,11 @@
 module Gitlab
   module Vulnerabilities
     class Summary
-      attr_reader :group, :filters
+      attr_reader :vulnerable, :filters
 
-      def initialize(group, params)
+      def initialize(vulnerable, params)
         @filters = params
-        @group = group
+        @vulnerable = vulnerable
       end
 
       def findings_counter
@@ -34,7 +34,7 @@ module Gitlab
 
         project_ids_to_fetch.each do |project_id|
           project_summary = Gitlab::Vulnerabilities::SummaryCache
-            .new(group, project_id)
+            .new(vulnerable, project_id)
             .fetch
 
           summary_keys.each do |key|
@@ -46,11 +46,11 @@ module Gitlab
       end
 
       def found_vulnerabilities
-        ::Security::VulnerabilityFindingsFinder.new(group, params: filters).execute
+        ::Security::VulnerabilityFindingsFinder.new(vulnerable, params: filters).execute
       end
 
       def use_vulnerability_cache?
-        Feature.enabled?(:cache_vulnerability_summary, group) && !dynamic_filters_included?
+        Feature.enabled?(:cache_vulnerability_summary, vulnerable) && !dynamic_filters_included?
       end
 
       def dynamic_filters_included?
@@ -60,9 +60,11 @@ module Gitlab
       end
 
       def project_ids_to_fetch
-        return filters[:project_id] if filters.key?('project_id')
+        project_ids = vulnerable.is_a?(Project) ? [vulnerable.id] : []
 
-        group.project_ids_with_security_reports
+        return filters[:project_id] + project_ids if filters.key?('project_id')
+
+        vulnerable.is_a?(Group) ? vulnerable.project_ids_with_security_reports : project_ids
       end
     end
   end

@@ -3,17 +3,17 @@
 module Gitlab
   module Vulnerabilities
     class SummaryCache
-      attr_reader :group, :project_id
+      attr_reader :vulnerable, :project_id
 
-      def initialize(group, project_id)
-        @group = group
+      def initialize(vulnerable, project_id)
+        @vulnerable = vulnerable
         @project_id = project_id
       end
 
       def fetch(force: false)
         Rails.cache.fetch(cache_key, force: force, expires_in: 1.day) do
           findings = ::Security::VulnerabilityFindingsFinder
-            .new(group, params: { project_id: [project_id] })
+            .new(vulnerable, params: { project_id: [project_id] })
             .execute(:all)
             .counted_by_severity
 
