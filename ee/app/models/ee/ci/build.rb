@@ -8,6 +8,7 @@ module EE
     # and be included in the `Build` model
     module Build
       extend ActiveSupport::Concern
+      extend ::Gitlab::Utils::Override
 
       LICENSED_PARSER_FEATURES = {
         sast: :sast,
@@ -18,11 +19,18 @@ module EE
 
       prepended do
         include UsageStatistics
+        include FromUnion
 
         after_save :stick_build_if_status_changed
         delegate :service_specification, to: :runner_session, allow_nil: true
 
         scope :license_scan, -> { joins(:job_artifacts).merge(::Ci::JobArtifact.license_management) }
+        scope :max_build_id_by, -> (build_name, ref, project_path) do
+          select('max(ci_builds.id) as id')
+            .by_name(build_name)
+            .for_ref(ref)
+            .for_project_paths(project_path)
+        end
       end
 
       def shared_runners_minutes_limit_enabled?
@@ -109,7 +117,45 @@ module EE
         !merge_train_pipeline? && super
       end
 
+      override :cross_dependencies
+      def cross_dependencies
+        return [] unless user_id
+        return [] unless ::Feature.enabled?(:cross_project_need_artifacts, project, default_enabled: false)
+        return [] unless project.feature_available?(:cross_project_pipelines)
+
+        cross_dependencies_relationship
+          .preload(project: [:project_feature])
+          .select { |job| user.can?(:read_build, job) }
+      end
+
       private
+
+      def cross_dependencies_relationship
+        deps = Array(options[:cross_dependencies])
+        return ::Ci::Build.none unless deps.any?
+
+        relationship_fragments = build_cross_dependencies_fragments(deps, ::Ci::Build.latest.success)
+        return ::Ci::Build.none unless relationship_fragments.any?
+
+        ::Ci::Build
+          .from_union(relationship_fragments)
+          .limit(::Gitlab::Ci::Config::Entry::Needs::NEEDS_CROSS_DEPENDENCIES_LIMIT)
+      end
+
+      def build_cross_dependencies_fragments(deps, search_scope)
+        deps.inject([]) do |fragments, dep|
+          next fragments unless dep[:artifacts]
+
+          fragments << build_cross_dependency_relationship_fragment(dep, search_scope)
+        end
+      end
+
+      def build_cross_dependency_relationship_fragment(dependency, search_scope)
+        args = dependency.values_at(:job, :ref, :project)
+        dep_id = search_scope.max_build_id_by(*args)
+
+        ::Ci::Build.id_in(dep_id)
+      end
 
       def name_in?(names)
         name.in?(Array(names))
