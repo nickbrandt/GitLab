@@ -241,6 +241,31 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
     end
 
+    context 'when bridge has only cross projects dependencies' do
+      let(:config) do
+        {
+          needs: [
+            {
+              project: 'some/project',
+              job: 'some/job',
+              ref: 'some/ref',
+              artifacts: true
+            }
+          ]
+        }
+      end
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+
+      describe '#errors' do
+        it 'returns an error about cross dependencies' do
+          expect(subject.errors).to include('needs config uses invalid types: cross_dependency')
+        end
+      end
+    end
+
     context 'when bridge has bridge and job needs' do
       let(:config) do
         {
@@ -251,6 +276,33 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#valid?' do
         it { is_expected.to be_valid }
+      end
+    end
+
+    context 'when bridge has bridge and cross projects dependencies ' do
+      let(:config) do
+        {
+          trigger: 'other-project',
+          needs: [
+            { pipeline: 'some/other_project' },
+            {
+              project: 'some/project',
+              job: 'some/job',
+              ref: 'some/ref',
+              artifacts: true
+            }
+          ]
+        }
+      end
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+
+      describe '#errors' do
+        it 'returns an error cross dependencies' do
+          expect(subject.errors).to contain_exactly('needs config uses invalid types: cross_dependency')
+        end
       end
     end
 
