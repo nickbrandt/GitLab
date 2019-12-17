@@ -106,6 +106,7 @@ class License < ApplicationRecord
   EEU_FEATURES = EEP_FEATURES + %i[
     cluster_health
     container_scanning
+    credentials_inventory
     dast
     dependency_scanning
     epics
