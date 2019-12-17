@@ -42,4 +42,8 @@ class Vulnerabilities::OccurrenceEntity < Grape::Entity
   def current_user
     return request.current_user if request.respond_to?(:current_user)
   end
+
+  def as_json(*args)
+    serializable_hash(*args).as_json.with_indifferent_access
+  end
 end
