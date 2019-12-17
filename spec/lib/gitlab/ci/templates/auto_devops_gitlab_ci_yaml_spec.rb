@@ -133,6 +133,8 @@ describe 'Auto-DevOps.gitlab-ci.yml' do
     end
 
     with_them do
+      subject(:template) { Gitlab::Template::GitlabCiYmlTemplate.find('Beta/Auto-DevOps') }
+
       let(:user) { create(:admin) }
       let(:project) { create(:project, :custom_repo, files: files) }
       let(:service) { Ci::CreatePipelineService.new(project, user, ref: 'master' ) }

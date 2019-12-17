@@ -1,0 +1,3 @@
+include:
+  - template: Auto-DevOps.gitlab-ci.yml  # https://gitlab.com/gitlab-org/gitlab-foss/blob/master/lib/gitlab/ci/templates/Auto-DevOps.gitlab-ci.yml
+  - template: Jobs/Detect-Buildpack.gitlab-ci.yml  # https://gitlab.com/gitlab-org/gitlab-foss/blob/master/lib/gitlab/ci/templates/Jobs/Detect-Buildpack.gitlab-ci.yml
