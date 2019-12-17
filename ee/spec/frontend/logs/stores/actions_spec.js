@@ -14,7 +14,7 @@ import {
   mockEnvironmentsEndpoint,
   mockEnvironments,
   mockPods,
-  mockLines,
+  mockLogsResult,
   mockEnvName,
 } from '../mock_data';
 
@@ -122,7 +122,7 @@ describe('Logs Store actions', () => {
         .reply(200, {
           pod_name: mockPodName,
           pods: mockPods,
-          logs: mockLines,
+          logs: mockLogsResult,
         });
 
       mock.onGet(endpoint).replyOnce(202); // mock reactive cache
@@ -136,7 +136,7 @@ describe('Logs Store actions', () => {
           { type: types.REQUEST_LOGS_DATA },
           { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
           { type: types.RECEIVE_PODS_DATA_SUCCESS, payload: mockPods },
-          { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLines },
+          { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },
         ],
         [],
         done,
@@ -152,7 +152,7 @@ describe('Logs Store actions', () => {
       mock.onGet(endpoint, { params: { environment_name: mockEnvName } }).reply(200, {
         pod_name: mockPodName,
         pods: mockPods,
-        logs: mockLines,
+        logs: mockLogsResult,
       });
       mock.onGet(endpoint).replyOnce(202); // mock reactive cache
 
@@ -165,7 +165,7 @@ describe('Logs Store actions', () => {
           { type: types.REQUEST_LOGS_DATA },
           { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
           { type: types.RECEIVE_PODS_DATA_SUCCESS, payload: mockPods },
-          { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLines },
+          { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },
         ],
         [],
         done,
