@@ -176,11 +176,8 @@ class ApprovalState
 
   def user_defined_merge_request_rules
     strong_memoize(:user_defined_merge_request_rules) do
-      # Filter out the rules without approvers since such rules aren't useful
       regular_rules =
-        wrapped_rules
-          .select { |rule| rule.regular? && rule.approvers.present? }
-          .sort_by(&:id)
+        wrapped_rules.select(&:regular?).sort_by(&:id)
 
       any_approver_rules =
         wrapped_rules.select(&:any_approver?)

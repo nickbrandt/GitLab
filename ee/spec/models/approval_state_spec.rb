@@ -106,28 +106,6 @@ describe ApprovalState do
       end
     end
 
-    context 'when approval rule on the merge request exists' do
-      before do
-        create(:approval_merge_request_rule, merge_request: merge_request, users: approvers)
-      end
-
-      context 'without approvers' do
-        let(:approvers) { [] }
-
-        it 'returns false' do
-          expect(subject.approval_rules_overwritten?).to eq(false)
-        end
-      end
-
-      context 'with approvers' do
-        let(:approvers) { [create(:user)] }
-
-        it 'returns true' do
-          expect(subject.approval_rules_overwritten?).to eq(true)
-        end
-      end
-    end
-
     context 'when merge request has any approver rule' do
       let!(:any_approver_rule) { create(:any_approver_rule, merge_request: merge_request) }
 
@@ -594,14 +572,10 @@ describe ApprovalState do
       end
 
       context 'when there is one approver required' do
-        let!(:rule) { create_rule(approvals_required: 1, users: []) }
+        let!(:any_approver_rule) { create_rule(rule_type: :any_approver, approvals_required: 1) }
+        let!(:rule) { create_rule(approvals_required: 1, users: [author]) }
 
         context 'when that approver is the MR author' do
-          before do
-            project.update!(approvals_before_merge: 2)
-            rule.users << author
-          end
-
           it_behaves_like 'authors self-approval authorization'
 
           it_behaves_like 'a MR that all members with write access can approve'
@@ -610,29 +584,9 @@ describe ApprovalState do
             expect(subject.can_approve?(nil)).to be_falsey
           end
 
-          it 'fallback rule is used' do
-            expect(subject.approvals_left).to eq(2)
-          end
-
           it 'is not approved' do
+            expect(subject.approvals_left).to eq(2)
             expect(subject.approved?).to eq(false)
-          end
-
-          context 'with project approval rule' do
-            before do
-              create(:approval_project_rule, project: project, approvals_required: 1, users: [approver])
-            end
-
-            context 'with approvers' do
-              let(:approver) { create(:user) }
-
-              it 'requires one approval' do
-                rule = subject.wrapped_approval_rules.last.approval_rule
-
-                expect(rule).to be_a(ApprovalProjectRule)
-                expect(subject.approvers).to eq([approver])
-              end
-            end
           end
         end
       end
@@ -1251,14 +1205,10 @@ describe ApprovalState do
       end
 
       context 'when there is one approver required' do
-        let!(:rule) { create_rule(approvals_required: 1, users: []) }
+        let!(:rule) { create_rule(approvals_required: 1, users: [author]) }
+        let!(:any_approver_rule) { create_rule(rule_type: :any_approver, approvals_required: 1) }
 
         context 'when that approver is the MR author' do
-          before do
-            project.update!(approvals_before_merge: 1)
-            rule.users << author
-          end
-
           it_behaves_like 'authors self-approval authorization'
 
           it_behaves_like 'a MR that all members with write access can approve'
