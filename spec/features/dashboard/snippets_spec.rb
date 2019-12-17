@@ -6,6 +6,7 @@ describe 'Dashboard snippets' do
   context 'when the project has snippets' do
     let(:project) { create(:project, :public) }
     let!(:snippets) { create_list(:project_snippet, 2, :public, author: project.owner, project: project) }
+
     before do
       allow(Snippet).to receive(:default_per_page).and_return(1)
       sign_in(project.owner)
@@ -17,6 +18,7 @@ describe 'Dashboard snippets' do
 
   context 'when there are no project snippets', :js do
     let(:project) { create(:project, :public) }
+
     before do
       sign_in(project.owner)
       visit dashboard_snippets_path
