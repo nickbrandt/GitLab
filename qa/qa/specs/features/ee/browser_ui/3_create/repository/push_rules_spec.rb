@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Create' do
+  # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/34978
+  context 'Create', :quarantine do
     context 'Push Rules' do
       describe 'using non signed commits' do
         file_name_limitation = 'denied_file'
