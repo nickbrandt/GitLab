@@ -36,8 +36,9 @@
 setup-test-env:
   extends:
     - .only-code-qa-rails-job-base
-    - .use-pg9
   stage: prepare
+  variables:
+    SETUP_DB: "false"
   script:
     - bundle exec ruby -Ispec -e 'require "spec_helper" ; TestEnv.init'
     - scripts/gitaly-test-build  # Do not use 'bundle exec' here
