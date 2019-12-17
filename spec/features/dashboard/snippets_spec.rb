@@ -14,6 +14,11 @@ describe 'Dashboard snippets' do
     end
 
     it_behaves_like 'paginated snippets'
+
+    it 'shows new snippet button in header' do
+      parent_element = page.find('.page-title-controls')
+      expect(parent_element).to have_link('New snippet')
+    end
   end
 
   context 'when there are no project snippets', :js do
@@ -29,6 +34,11 @@ describe 'Dashboard snippets' do
 
       expect(element).to have_content("Snippets are small pieces of code or notes that you want to keep.")
       expect(element.find('.svg-content img')['src']).to have_content('illustrations/snippets_empty')
+    end
+
+    it 'shows new snippet button in main content area' do
+      parent_element = page.find('.row.empty-state')
+      expect(parent_element).to have_link('New snippet')
     end
   end
 
@@ -76,6 +86,28 @@ describe 'Dashboard snippets' do
 
       expect(page).to have_selector('.snippet-row', count: 1)
       expect(page).to have_content(snippets[0].title)
+    end
+  end
+
+  context 'as an external user' do
+    let(:user) { create(:user, :external) }
+    before do
+      sign_in(user)
+      visit dashboard_snippets_path
+    end
+
+    context 'without snippets' do
+      it 'hides new snippet button' do
+        expect(page).not_to have_link('New snippet')
+      end
+    end
+
+    context 'with snippets' do
+      let!(:snippets) { create(:personal_snippet, author: user) }
+
+      it 'hides new snippet button' do
+        expect(page).not_to have_link('New snippet')
+      end
     end
   end
 end
