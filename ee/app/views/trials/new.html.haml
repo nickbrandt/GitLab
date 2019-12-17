@@ -20,10 +20,10 @@
     = text_field_tag :phone_number, params[:phone_number], class: 'form-control', required: true
   .form-group
     = label_tag :number_of_users, _('How many users will be evaluating the trial?'), for: :number_of_users, class: 'col-form-label'
-    = number_field_tag :number_of_users, nil, class: 'form-control', required: true, min: 1
+    = number_field_tag :number_of_users, params[:number_of_users], class: 'form-control', required: true, min: 1
   .form-group
     = label_tag :country, _('Country'), class: 'col-form-label'
-    = select_tag :country, options_for_select([[_('Please select a country'), '']]), class: 'select2', required: true, id: 'country_select', data: { countries_end_point: countries_path }
+    = select_tag :country, options_for_select([[_('Please select a country'), '']]), class: 'select2', required: true, id: 'country_select', data: { countries_end_point: countries_path, selected_option: params[:country]}
   = submit_tag _('Continue'), class: 'btn btn-success btn-block'
 
 = render 'skip_trial'
