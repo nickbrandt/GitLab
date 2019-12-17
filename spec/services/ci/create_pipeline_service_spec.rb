@@ -931,6 +931,87 @@ describe Ci::CreatePipelineService do
       end
     end
 
+    context 'with release' do
+      shared_examples_for 'a successful release pipeline' do
+        before do
+          stub_ci_pipeline_yaml_file(YAML.dump(config))
+        end
+
+        it 'is valid config' do
+          pipeline = execute_service
+          build = pipeline.builds.first
+          expect(pipeline).to be_kind_of(Ci::Pipeline)
+          expect(pipeline).to be_valid
+          expect(pipeline.yaml_errors).not_to be_present
+          expect(pipeline).to be_persisted
+          expect(build).to be_kind_of(Ci::Build)
+          expect(build.options).to eq(config[:release].except(:stage, :only).with_indifferent_access)
+        end
+      end
+
+      context 'without $CI_COMMIT_TAG' do
+        it_behaves_like 'a successful release pipeline' do
+          let(:config) do
+            {
+              release: {
+                script: ["make changelog | tee release_changelog.txt"],
+                release: {
+                  tag_name: "v0.06",
+                  description: "./release_changelog.txt"
+                }
+              }
+            }
+          end
+        end
+      end
+
+      context 'with $CI_COMMIT_TAG' do
+        it_behaves_like 'a successful release pipeline' do
+          let(:ref_name) { 'refs/tags/v1.1.0' }
+          let(:config) do
+            {
+              release: {
+                only: ['tags'],
+                script: ["make changelog | tee release_changelog.txt"],
+                release: {
+                  tag_name: "$CI_COMMIT_TAG",
+                  description: "./release_changelog.txt"
+                }
+              }
+            }
+          end
+        end
+      end
+
+      context 'correctly creates builds with release metadata' do
+        it_behaves_like 'a successful release pipeline' do
+          let(:config) do
+            {
+              release: {
+                script: ["make changelog | tee release_changelog.txt"],
+                release: {
+                  name: "Release $CI_TAG_NAME",
+                  tag_name: "v0.06",
+                  description: "./release_changelog.txt",
+                  assets: {
+                    links: [
+                      {
+                        name: "cool-app.zip",
+                        url: "http://my.awesome.download.site/1.0-$CI_COMMIT_SHORT_SHA.zip"
+                      },
+                      {
+                        url: "http://my.awesome.download.site/1.0-$CI_COMMIT_SHORT_SHA.exe"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          end
+        end
+      end
+    end
+
     shared_examples 'when ref is protected' do
       let(:user) { create(:user) }
 
