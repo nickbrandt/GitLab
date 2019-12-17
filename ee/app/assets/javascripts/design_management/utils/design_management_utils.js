@@ -32,4 +32,6 @@ export const extractCurrentDiscussion = (discussions, id) =>
 
 export const findVersionId = id => (id.match('::Version/(.+$)') || [])[1];
 
+export const findNoteId = id => (id.match('DiffNote/(.+$)') || [])[1];
+
 export const extractDesign = data => data.project.issue.designCollection.designs.edges[0].node;
