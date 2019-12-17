@@ -21,6 +21,7 @@
 - cronjob:update_all_mirrors
 - cronjob:pseudonymizer
 - cronjob:update_max_seats_used_for_gitlab_com_subscriptions
+- cronjob:adjourned_projects_deletion_cron
 
 - gcp_cluster:cluster_update_app
 - gcp_cluster:cluster_wait_for_app_update
@@ -74,6 +75,7 @@
 - new_epic
 - project_import_schedule
 - project_update_repository_storage
+- adjourned_project_deletion
 - rebase
 - refresh_license_compliance_checks
 - repository_update_mirror

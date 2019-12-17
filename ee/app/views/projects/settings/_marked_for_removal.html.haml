@@ -1,0 +1,8 @@
+- return unless @project.feature_available?(:marking_project_for_deletion)
+
+- date = permanent_deletion_date(Time.now.utc)
+
+%p
+  = _("Removing a project places it into a read-only state until %{date}, at which point the project will be permanently removed.") %{ date: date }
+  %br
+  = _("Until that time, the project can be restored.")

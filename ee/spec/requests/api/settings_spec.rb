@@ -143,6 +143,13 @@ describe API::Settings, 'EE Settings' do
     it_behaves_like 'settings for licensed features'
   end
 
+  context 'deletion adjourned period' do
+    let(:settings) { { deletion_adjourned_period: 5 } }
+    let(:feature) { :marking_project_for_deletion }
+
+    it_behaves_like 'settings for licensed features'
+  end
+
   context 'custom file template project' do
     let(:settings) { { file_template_project_id: project.id } }
     let(:feature) { :custom_file_templates }

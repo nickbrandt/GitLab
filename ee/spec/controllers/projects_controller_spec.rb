@@ -394,4 +394,96 @@ describe ProjectsController do
       end
     end
   end
+
+  describe 'DELETE #destroy' do
+    let(:owner) { create(:user) }
+    let(:project) { create(:project, namespace: owner.namespace)}
+
+    before do
+      controller.instance_variable_set(:@project, project)
+      sign_in(owner)
+    end
+
+    context 'feature is available' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: true)
+      end
+
+      it 'marks project for deletion' do
+        delete :destroy, params: { namespace_id: project.namespace, id: project }
+
+        expect(project.reload.marked_for_deletion?).to be_truthy
+        expect(response).to have_gitlab_http_status(302)
+        expect(response).to redirect_to(project_path(project))
+      end
+
+      it 'does not mark project for deletion because of error' do
+        message = 'Error'
+
+        expect(::Projects::MarkForDeletionService).to receive_message_chain(:new, :execute).and_return({ status: :error, message: message })
+
+        delete :destroy, params: { namespace_id: project.namespace, id: project }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to render_template(:edit)
+        expect(flash[:alert]).to include(message)
+      end
+
+      context 'when instance setting is set to 0 days' do
+        it 'deletes project right away' do
+          allow(Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(0)
+
+          delete :destroy, params: { namespace_id: project.namespace, id: project }
+
+          expect(project.marked_for_deletion?).to be_falsey
+          expect(response).to have_gitlab_http_status(302)
+          expect(response).to redirect_to(dashboard_projects_path)
+        end
+      end
+    end
+
+    context 'feature is not available' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: false)
+      end
+
+      it 'deletes project right away' do
+        delete :destroy, params: { namespace_id: project.namespace, id: project }
+
+        expect(project.marked_for_deletion?).to be_falsey
+        expect(response).to have_gitlab_http_status(302)
+        expect(response).to redirect_to(dashboard_projects_path)
+      end
+    end
+  end
+
+  describe 'POST #restore' do
+    let(:owner) { create(:user) }
+    let(:project) { create(:project, namespace: owner.namespace)}
+
+    before do
+      controller.instance_variable_set(:@project, project)
+      sign_in(owner)
+    end
+
+    it 'restores project deletion' do
+      post :restore, params: { namespace_id: project.namespace, project_id: project }
+
+      expect(project.reload.marked_for_deletion_at).to be_nil
+      expect(project.reload.archived).to be_falsey
+      expect(response).to have_gitlab_http_status(302)
+      expect(response).to redirect_to(edit_project_path(project))
+    end
+
+    it 'does not restore project because of error' do
+      message = 'Error'
+      expect(::Projects::RestoreService).to receive_message_chain(:new, :execute).and_return({ status: :error, message: message })
+
+      post :restore, params: { namespace_id: project.namespace, project_id: project }
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(response).to render_template(:edit)
+      expect(flash[:alert]).to include(message)
+    end
+  end
 end
