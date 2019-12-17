@@ -66,6 +66,19 @@ will scan your source code for code quality issues. The report will be saved as 
 that you can later download and analyze. Due to implementation limitations we always
 take the latest Code Quality artifact available.
 
+It is also possible to override the URL to the Code Quality image by
+setting the `CODE_QUALITY_IMAGE` variable. This is particularly useful when you want
+to lock into a specific version of Code Quality or use a fork of it:
+
+```
+include:
+  - template: Code-Quality.gitlab-ci.yml
+
+code_quality:
+  variables:
+    CODE_QUALITY_IMAGE: "registry.example.com/codequality-fork:latest"
+```
+
 By default, report artifacts are not downloadable. If you need them downloadable on the
 job details page, you can add `gl-code-quality-report.json` to the artifact paths like so:
 
@@ -102,6 +115,17 @@ automatically extract report data and show it in the merge request widget. While
 old job definitions are still maintained they have been deprecated and may be removed
 in the next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
 configuration to reflect that change.
+
+CAUTION: **Caution:**
+Note that in these old job definitions, the Code Quality image's old versioning
+scheme (e.g. `12-5-stable`) is still being used. But in GitLab 12.6, Code Quality switched to the
+[new versioning scheme](https://gitlab.com/gitlab-org/security-products/codequality/merge_requests/38).
+It is highly recommended to use the vendored template to not worry about manually bumping the image's version,
+but for those who are not yet able to move away from the old job definition, there are [Docker images](https://gitlab.com/gitlab-org/security-products/codequality/container_registry) for
+`12-5-stable`, `12-6-stable`, `12-7-stable`, `12-8-stable`, `12-9-stable`, and `12-10-stable`. These images are just
+copies of `12-4-stable`. No fixes/changes will be backported into these images.
+All further improvements will only be in `0.85.5` onwards. Alternatively, the version (e.g `0.85.5`) can be hardcoded into
+the `SP_VERSION` variable.
 
 For GitLab 11.5 and later, the job should look like:
 
