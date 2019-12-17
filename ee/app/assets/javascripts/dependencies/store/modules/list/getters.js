@@ -9,4 +9,5 @@ export const isJobFailed = state =>
   [REPORT_STATUS.jobFailed, REPORT_STATUS.noDependencies].includes(state.reportInfo.status);
 export const isIncomplete = state => state.reportInfo.status === REPORT_STATUS.incomplete;
 
-export const downloadEndpoint = ({ endpoint }) => `${endpoint}.json`;
+export const downloadEndpoint = ({ endpoint }) =>
+  endpoint.endsWith('.json') ? endpoint : `${endpoint}.json`;
