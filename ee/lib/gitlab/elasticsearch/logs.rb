@@ -51,14 +51,19 @@ module Gitlab
             { "@timestamp": { order: :desc } },
             { "offset": { order: :desc } }
           ],
-          # only return the message field in the response
-          _source: ["message"],
+          # only return these fields in the response
+          _source: ["@timestamp", "message"],
           # fixed limit for now, we should support paginated queries
           size: ::Gitlab::Elasticsearch::Logs::LOGS_LIMIT
         }
 
         response = @client.search body: body
-        result = response.fetch("hits", {}).fetch("hits", []).map { |h| h["_source"]["message"] }
+        result = response.fetch("hits", {}).fetch("hits", []).map do |hit|
+          {
+            timestamp: hit["_source"]["@timestamp"],
+            message: hit["_source"]["message"]
+          }
+        end
 
         # we queried for the N-most recent records but we want them ordered oldest to newest
         result.reverse

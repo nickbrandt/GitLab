@@ -8,7 +8,7 @@ import {
   mockEnvironments,
   mockPods,
   mockPodName,
-  mockLines,
+  mockLogsResult,
 } from '../mock_data';
 
 describe('Logs Store Mutations', () => {
@@ -83,11 +83,11 @@ describe('Logs Store Mutations', () => {
 
   describe('RECEIVE_LOGS_DATA_SUCCESS', () => {
     it('receives logs lines', () => {
-      mutations[types.RECEIVE_LOGS_DATA_SUCCESS](state, mockLines);
+      mutations[types.RECEIVE_LOGS_DATA_SUCCESS](state, mockLogsResult);
 
       expect(state.logs).toEqual(
         expect.objectContaining({
-          lines: mockLines,
+          lines: mockLogsResult,
           isLoading: false,
           isComplete: true,
         }),

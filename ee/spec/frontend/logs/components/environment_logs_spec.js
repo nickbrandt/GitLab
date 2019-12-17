@@ -10,7 +10,8 @@ import {
   mockEnvName,
   mockEnvironments,
   mockPods,
-  mockLines,
+  mockLogsResult,
+  mockTrace,
   mockPodName,
   mockEnvironmentsEndpoint,
 } from '../mock_data';
@@ -152,14 +153,14 @@ describe('EnvironmentLogs', () => {
         [state.pods.current] = state.pods.options;
 
         state.logs.isComplete = false;
-        state.logs.lines = mockLines;
+        state.logs.lines = mockLogsResult;
       });
       actionMocks.showPodLogs.mockImplementation(podName => {
         state.pods.options = mockPods;
         [state.pods.current] = podName;
 
         state.logs.isComplete = false;
-        state.logs.lines = mockLines;
+        state.logs.lines = mockLogsResult;
       });
       actionMocks.fetchEnvironments.mockImplementation(() => {
         state.environments.options = mockEnvironments;
@@ -200,8 +201,8 @@ describe('EnvironmentLogs', () => {
 
     it('populates logs trace', () => {
       const trace = findLogTrace();
-      expect(trace.text().split('\n').length).toBe(mockLines.length);
-      expect(trace.text().split('\n')).toEqual(mockLines);
+      expect(trace.text().split('\n').length).toBe(mockTrace.length);
+      expect(trace.text().split('\n')).toEqual(mockTrace);
     });
 
     it('update control buttons state', () => {
