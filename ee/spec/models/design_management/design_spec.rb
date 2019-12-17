@@ -35,7 +35,7 @@ describe DesignManagement::Design do
 
       expect(design).not_to be_valid
       expect(design.errors[:filename].first).to eq(
-        "Only these extensions are supported: #{extensions.to_sentence}"
+        "does not have a supported extension. Only #{extensions.to_sentence} are supported"
       )
     end
 
@@ -55,7 +55,7 @@ describe DesignManagement::Design do
 
         expect(design).not_to be_valid
         expect(design.errors[:filename].first).to eq(
-          "Only these extensions are supported: #{described_class::SAFE_IMAGE_EXT.to_sentence}"
+          "does not have a supported extension. Only #{described_class::SAFE_IMAGE_EXT.to_sentence} are supported"
         )
       end
     end

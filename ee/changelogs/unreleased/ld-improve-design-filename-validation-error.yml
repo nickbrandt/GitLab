@@ -1,0 +1,5 @@
+---
+title: Improve validation message when a design extension is unsupported
+merge_request: 21888
+author:
+type: changed
