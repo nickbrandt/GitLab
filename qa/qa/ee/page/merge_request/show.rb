@@ -248,8 +248,8 @@ module QA
             find_element(:container_scan_report).has_content?(/Container scanning detected #{expected}( new)? vulnerabilit/)
           end
 
-          def has_dast_vulnerability_count_of?(expected)
-            find_element(:dast_scan_report).has_content?(/DAST detected #{expected}( new)? vulnerabilit/)
+          def has_dast_vulnerability_count?
+            find_element(:dast_scan_report).has_content?(/DAST detected \d*( new)? vulnerabilit/)
           end
 
           def has_opened_dismissed_vulnerability?(reason = nil)
