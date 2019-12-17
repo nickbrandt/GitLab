@@ -181,7 +181,7 @@ module Elastic
       def pick_projects_by_visibility(visibility, user, features)
         condition = { term: { visibility_level: visibility } }
 
-        limit_by_feature(condition, features, include_members_only: user&.full_private_access?)
+        limit_by_feature(condition, features, include_members_only: user&.can_read_all_resources?)
       end
 
       # If a project feature(s) is specified, access is dependent on its visibility

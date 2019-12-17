@@ -24,7 +24,7 @@ module API
         requires :fingerprint, type: String, desc: 'Search for a SSH fingerprint'
       end
       get do
-        authenticated_with_full_private_access!
+        authenticated_with_can_read_all_resources!
 
         finder_params = params.merge(key_type: 'ssh')
 
