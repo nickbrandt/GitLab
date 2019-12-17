@@ -132,6 +132,10 @@
   .linked-pipeline.build {
     height: 41px;
 
+    &::before {
+      content: none;
+    }
+
     // apply custom dimensions to connector before and after for triangle arrow
     &.flat-connector-before {
       @include flat-connector-before($linked-project-column-margin);
