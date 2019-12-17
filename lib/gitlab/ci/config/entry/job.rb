@@ -16,7 +16,8 @@ module Gitlab
           ALLOWED_KEYS = %i[tags script only except rules type image services
                             allow_failure type stage when start_in artifacts cache
                             dependencies before_script needs after_script variables
-                            environment coverage retry parallel extends interruptible timeout].freeze
+                            environment coverage retry parallel extends interruptible
+                            timeout release].freeze
 
           REQUIRED_BY_NEEDS = %i[stage].freeze
 
@@ -60,6 +61,14 @@ module Gitlab
               missing_needs = dependencies - needs
               if missing_needs.any?
                 errors.add(:dependencies, "the #{missing_needs.join(", ")} should be part of needs")
+              end
+            end
+
+            validate do
+              next unless has_commit_tag?
+
+              unless only_tags_present?
+                errors.add(:config, '`only: tags` must be specified with $CI_COMMIT_TAG')
               end
             end
           end
@@ -149,14 +158,18 @@ module Gitlab
             description: 'Coverage configuration for this job.',
             inherit: false
 
+          entry :release, Entry::Release,
+            description: 'This job will produce a release.',
+            inherit: false
+
           helpers :before_script, :script, :stage, :type, :after_script,
                   :cache, :image, :services, :only, :except, :variables,
                   :artifacts, :environment, :coverage, :retry, :rules,
-                  :parallel, :needs, :interruptible
+                  :parallel, :needs, :interruptible, :release
 
           attributes :script, :tags, :allow_failure, :when, :dependencies,
                      :needs, :retry, :parallel, :extends, :start_in, :rules,
-                     :interruptible, :timeout
+                     :interruptible, :timeout, :release
 
           def self.matching?(name, config)
             !name.to_s.start_with?('.') &&
@@ -211,6 +224,16 @@ module Gitlab
             @config.try(:key?, :rules)
           end
 
+          def has_commit_tag?
+            return false unless @config.try(:key?, :release)
+
+            @config.dig(:release, :tag_name)&.include?('$CI_COMMIT_TAG')
+          end
+
+          def only_tags_present?
+            @config.try(:key?, :only) && @config[:only].map(&:to_sym).include?(:tags)
+          end
+
           def ignored?
             allow_failure.nil? ? manual_action? : allow_failure
           end
@@ -241,6 +264,7 @@ module Gitlab
               interruptible: interruptible_defined? ? interruptible_value : nil,
               timeout: has_timeout? ? ChronicDuration.parse(timeout.to_s) : nil,
               artifacts: artifacts_value,
+              release: release_value,
               after_script: after_script_value,
               ignore: ignored?,
               needs: needs_defined? ? needs_value : nil }

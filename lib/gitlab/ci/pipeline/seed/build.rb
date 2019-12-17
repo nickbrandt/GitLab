@@ -18,6 +18,8 @@ module Gitlab
             @seed_attributes = attributes
             @previous_stages = previous_stages
             @needs_attributes = dig(:needs_attributes)
+            @resource_group_key = attributes.delete(:resource_group_key)
+            attributes.fetch(:options, {})&.delete(:release) unless Feature.enabled?(:ci_release_generation, pipeline.project)
 
             @using_rules  = attributes.key?(:rules)
             @using_only   = attributes.key?(:only)

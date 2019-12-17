@@ -24,7 +24,7 @@ describe Gitlab::Ci::Config::Entry::Job do
       let(:result) do
         %i[before_script script stage type after_script cache
            image services only except rules needs variables artifacts
-           environment coverage retry interruptible timeout tags]
+           environment coverage retry interruptible timeout release tags]
       end
 
       it { is_expected.to match_array result }
@@ -121,6 +121,71 @@ describe Gitlab::Ci::Config::Entry::Job do
           end
 
           it { expect(entry).to be_valid }
+        end
+
+        context 'when is a release' do
+          context "tag_name is not $CI_COMMIT_TAG" do
+            let(:config) do
+              {
+                script: ["make changelog | tee release_changelog.txt"],
+                release: {
+                  tag_name: "v0.06",
+                  name: "Release $CI_TAG_NAME",
+                  description: "./release_changelog.txt"
+                }
+              }
+            end
+
+            it { expect(entry).to be_valid }
+          end
+
+          context "tag_name is $CI_COMMIT_TAG and `only: tags` is present" do
+            let(:config) do
+              {
+                script: ["make changelog | tee release_changelog.txt"],
+                only: ["tags"],
+                release: {
+                  tag_name: "$CI_COMMIT_TAG",
+                  name: "Release $CI_TAG_NAME",
+                  description: "./release_changelog.txt"
+                }
+              }
+            end
+
+            it { expect(entry).to be_valid }
+          end
+
+          context 'tag_name includes $CI_COMMIT_TAG in a longer string' do
+            let(:config) do
+              {
+                script: ["make changelog | tee release_changelog.txt"],
+                only: ["tags"],
+                release: {
+                  tag_name: "v$CI_COMMIT_TAG December 2019",
+                  name: "Release $CI_TAG_NAME",
+                  description: "./release_changelog.txt"
+                }
+              }
+            end
+
+            it { expect(entry).to be_valid }
+          end
+
+          context "tag_name is $CI_COMMIT_TAG and `only: tags` is present with other options" do
+            let(:config) do
+              {
+                script: ["make changelog | tee release_changelog.txt"],
+                only: %w[tags web],
+                release: {
+                  tag_name: "$CI_COMMIT_TAG",
+                  name: "Release $CI_TAG_NAME",
+                  description: "./release_changelog.txt"
+                }
+              }
+            end
+
+            it { expect(entry).to be_valid }
+          end
         end
       end
     end
@@ -441,6 +506,80 @@ describe Gitlab::Ci::Config::Entry::Job do
           expect(entry).to be_valid
           expect(entry.errors).to be_empty
           expect(entry.timeout).to eq('1m 1s')
+        end
+      end
+
+      context 'when is a release' do
+        context 'when `release:description` is missing' do
+          let(:config) do
+            {
+              script: ["make changelog | tee release_changelog.txt"],
+              release: {
+                tag_name: "v0.06",
+                name: "Release $CI_TAG_NAME"
+              }
+            }
+          end
+
+          it "returns error" do
+            expect(entry).not_to be_valid
+            expect(entry.errors).to include "release description can't be blank"
+          end
+        end
+
+        context "tag_name is $CI_COMMIT_TAG and `only: tags` is absent" do
+          let(:config) do
+            {
+              script: ["make changelog | tee release_changelog.txt"],
+              release: {
+                tag_name: "$CI_COMMIT_TAG",
+                name: "Release $CI_TAG_NAME",
+                description: "./release_changelog.txt"
+              }
+            }
+          end
+
+          it "returns error about incorrect $CI_COMMIT_TAG configuration" do
+            expect(entry).not_to be_valid
+            expect(entry.errors).to include 'job config `only: tags` must be specified with $CI_COMMIT_TAG'.downcase
+          end
+        end
+
+        context "tag_name includes $CI_COMMIT_TAG and `only: tags` is absent" do
+          let(:config) do
+            {
+              script: ["make changelog | tee release_changelog.txt"],
+              release: {
+                tag_name: "v$CI_COMMIT_TAG December 2019",
+                name: "Release $CI_TAG_NAME",
+                description: "./release_changelog.txt"
+              }
+            }
+          end
+
+          it "returns error about incorrect $CI_COMMIT_TAG configuration" do
+            expect(entry).not_to be_valid
+            expect(entry.errors).to include 'job config `only: tags` must be specified with $CI_COMMIT_TAG'.downcase
+          end
+        end
+
+        context "tag_name is $CI_COMMIT_TAG and `only` is present but `tags` are absent" do
+          let(:config) do
+            {
+              script: ["make changelog | tee release_changelog.txt"],
+              only: ['web'],
+              release: {
+                tag_name: "$CI_COMMIT_TAG",
+                name: "Release $CI_TAG_NAME",
+                description: "./release_changelog.txt"
+              }
+            }
+          end
+
+          it "returns error about incorrect $CI_COMMIT_TAG configuration" do
+            expect(entry).not_to be_valid
+            expect(entry.errors).to include 'job config `only: tags` must be specified with $CI_COMMIT_TAG'.downcase
+          end
         end
       end
     end
