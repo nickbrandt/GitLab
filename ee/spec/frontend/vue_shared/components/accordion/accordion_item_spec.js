@@ -54,8 +54,6 @@ describe('AccordionItem component', () => {
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
-
-    jest.clearAllMocks();
   });
 
   describe('rendering options', () => {

@@ -62,7 +62,6 @@ describe('AlertWidget', () => {
   const findCurrentSettings = () => wrapper.find('.alert-current-setting');
 
   afterEach(() => {
-    jest.clearAllMocks();
     wrapper.destroy();
     wrapper = null;
   });

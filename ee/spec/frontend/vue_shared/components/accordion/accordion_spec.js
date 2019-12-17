@@ -22,8 +22,6 @@ describe('Accordion component', () => {
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
-
-    jest.clearAllMocks();
   });
 
   it('contains a default slot', () => {

@@ -24,10 +24,6 @@ describe('Vulnerable Projects actions', () => {
     state = createState();
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   describe('fetchProjects', () => {
     beforeEach(() => {
       mockAxios = new MockAdapter(axios);

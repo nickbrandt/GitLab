@@ -66,7 +66,6 @@ describe('Project Manager component', () => {
 
   afterEach(() => {
     wrapper.destroy();
-    jest.clearAllMocks();
   });
 
   describe('given the default state', () => {
