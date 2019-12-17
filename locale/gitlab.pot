@@ -10985,6 +10985,9 @@ msgstr ""
 msgid "Maximum lifetime allowable for Personal Access Tokens is active, your expire date must be set before %{maximum_allowable_date}."
 msgstr ""
 
+msgid "Maximum number of %{name} (%{count}) exceeded"
+msgstr ""
+
 msgid "Maximum number of comments exceeded"
 msgstr ""
 
