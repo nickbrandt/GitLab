@@ -11,6 +11,40 @@ module EE
       before_action :log_unarchive_audit_event, only: [:unarchive]
     end
 
+    def restore
+      return access_denied! unless can?(current_user, :remove_project, project)
+
+      result = ::Projects::RestoreService.new(project, current_user, {}).execute
+
+      if result[:status] == :success
+        flash[:notice] = _("Project '%{project_name}' is restored.") % { project_name: project.full_name }
+
+        redirect_to(edit_project_path(project))
+      else
+        flash.now[:alert] = result[:message]
+
+        render 'edit'
+      end
+    end
+
+    override :destroy
+    def destroy
+      return super unless project.adjourned_deletion?
+      return access_denied! unless can?(current_user, :remove_project, project)
+
+      result = ::Projects::MarkForDeletionService.new(project, current_user, {}).execute
+      if result[:status] == :success
+        date = permanent_deletion_date(project.marked_for_deletion_at)
+        flash[:notice] = _("Project '%{project_name}' will be deleted on %{date}") % { date: date, project_name: project.full_name }
+
+        redirect_to(project_path(project), status: :found)
+      else
+        flash.now[:alert] = result[:message]
+
+        render 'edit'
+      end
+    end
+
     override :project_params_attributes
     def project_params_attributes
       super + project_params_ee

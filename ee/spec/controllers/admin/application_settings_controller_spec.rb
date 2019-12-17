@@ -104,6 +104,13 @@ describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
+    context 'project deletion adjourned period' do
+      let(:settings) { { deletion_adjourned_period: 6 } }
+      let(:feature) { :marking_project_for_deletion }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
     context 'additional email footer' do
       let(:settings) { { email_additional_text: 'scary legal footer' } }
       let(:feature) { :email_additional_text }

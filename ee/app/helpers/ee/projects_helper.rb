@@ -116,6 +116,19 @@ module EE
       super || project_feature_flags_path(project)
     end
 
+    override :remove_project_message
+    def remove_project_message(project)
+      return super unless project.feature_available?(:marking_project_for_deletion)
+
+      date = permanent_deletion_date(Time.now.utc)
+      _("Removing a project places it into a read-only state until %{date}, at which point the project will be permanantly removed. Are you ABSOLUTELY sure?") %
+        { date: date }
+    end
+
+    def permanent_deletion_date(date)
+      (date + ::Gitlab::CurrentSettings.deletion_adjourned_period.days).strftime('%F')
+    end
+
     # Given the current GitLab configuration, check whether the GitLab URL for Kerberos is going to be different than the HTTP URL
     def alternative_kerberos_url?
       ::Gitlab.config.alternative_gitlab_kerberos_url?

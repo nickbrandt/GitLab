@@ -113,6 +113,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             end
           end
         end
+
+        post '/restore' => '/projects#restore', as: :restore
       end
       # End of the /-/ scope.
 

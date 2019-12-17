@@ -2255,6 +2255,7 @@ describe Project do
       context 'when number of days is set to more than 0' do
         it 'returns true' do
           stub_application_setting(deletion_adjourned_period: 1)
+
           expect(project.adjourned_deletion?).to eq(true)
         end
       end
@@ -2262,6 +2263,7 @@ describe Project do
       context 'when number of days is set to 0' do
         it 'returns false' do
           stub_application_setting(deletion_adjourned_period: 0)
+
           expect(project.adjourned_deletion?).to eq(false)
         end
       end

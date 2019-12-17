@@ -180,6 +180,24 @@ describe API::Projects do
       end
     end
 
+    describe 'marked_for_deletion attribute' do
+      it 'exposed when the feature is available' do
+        stub_licensed_features(marking_project_for_deletion: true)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).to have_key 'marked_for_deletion_at'
+      end
+
+      it 'not exposed when the feature is not available' do
+        stub_licensed_features(marking_project_for_deletion: false)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).not_to have_key 'marked_for_deletion_at'
+      end
+    end
+
     describe 'repository_storage attribute' do
       context 'when authenticated as an admin' do
         let(:admin) { create(:admin) }
@@ -650,6 +668,94 @@ describe API::Projects do
           expect(response).to have_gitlab_http_status(200)
           expect(json_response['approvals_before_merge']).to eq(3)
         end
+      end
+    end
+  end
+
+  describe 'POST /projects/:id/restore' do
+    context 'feature is available' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: true)
+      end
+
+      it 'restores project' do
+        project.update(archived: true, marked_for_deletion_at: 1.day.ago, deleting_user: user)
+
+        post api("/projects/#{project.id}/restore", user)
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(json_response['archived']).to be_falsey
+        expect(json_response['marked_for_deletion_at']).to be_falsey
+      end
+
+      it 'returns error if project is already being deleted' do
+        message = 'Error'
+        expect(::Projects::RestoreService).to receive_message_chain(:new, :execute).and_return({ status: :error, message: message })
+
+        post api("/projects/#{project.id}/restore", user)
+
+        expect(response).to have_gitlab_http_status(400)
+        expect(json_response["message"]).to eq(message)
+      end
+    end
+
+    context 'feature is not available' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: false)
+      end
+
+      it 'returns error' do
+        post api("/projects/#{project.id}/restore", user)
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  describe 'DELETE /projects/:id' do
+    context 'when feature is available' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: true)
+      end
+
+      it 'marks project for deletion' do
+        delete api("/projects/#{project.id}", user)
+
+        expect(response).to have_gitlab_http_status(202)
+        expect(project.reload.marked_for_deletion?).to be_truthy
+      end
+
+      it 'returns error if project cannot be marked for deletion' do
+        message = 'Error'
+        expect(::Projects::MarkForDeletionService).to receive_message_chain(:new, :execute).and_return({ status: :error, message: message })
+
+        delete api("/projects/#{project.id}", user)
+
+        expect(response).to have_gitlab_http_status(400)
+        expect(json_response["message"]).to eq(message)
+      end
+
+      context 'when instance setting is set to 0 days' do
+        it 'deletes project right away' do
+          allow(Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(0)
+          delete api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(202)
+          expect(project.reload.pending_delete).to eq(true)
+        end
+      end
+    end
+
+    context 'when feature is not available' do
+      before do
+        stub_licensed_features(marking_project_for_deletion: false)
+      end
+
+      it 'deletes project' do
+        delete api("/projects/#{project.id}", user)
+
+        expect(response).to have_gitlab_http_status(202)
+        expect(project.reload.pending_delete).to eq(true)
       end
     end
   end

@@ -2031,13 +2031,16 @@ msgstr ""
 msgid "Archive project"
 msgstr ""
 
+msgid "Archived project! Repository and other project resources are read only"
+msgstr ""
+
 msgid "Archived project! Repository and other project resources are read-only"
 msgstr ""
 
 msgid "Archived projects"
 msgstr ""
 
-msgid "Archiving the project will make it entirely read-only. It is hidden from the dashboard and doesn't show up in searches. <strong>The repository cannot be committed to, and no issues, comments or other entities can be created.</strong>"
+msgid "Archiving the project will make it entirely read only. It is hidden from the dashboard and doesn't show up in searches. %{strong_start}The repository cannot be committed to, and no issues, comments, or other entities can be created.%{strong_end}"
 msgstr ""
 
 msgid "Are you setting up GitLab for a company?"
@@ -5554,6 +5557,9 @@ msgstr ""
 msgid "Default classification label"
 msgstr ""
 
+msgid "Default deletion adjourned period"
+msgstr ""
+
 msgid "Default description template for issues"
 msgstr ""
 
@@ -5663,6 +5669,9 @@ msgid "Deleting the license failed. The license was not found."
 msgstr ""
 
 msgid "Deleting the license failed. You are not permitted to perform this action."
+msgstr ""
+
+msgid "Deletion pending. This project will be removed on %{date}. Repository and other project resources are read-only."
 msgstr ""
 
 msgid "Denied authorization of chat nickname %{user_name}."
@@ -9339,6 +9348,9 @@ msgstr ""
 msgid "How it works"
 msgstr ""
 
+msgid "How many days need to pass between marking entity for deletion and actual removing it."
+msgstr ""
+
 msgid "How many replicas each Elasticsearch shard has."
 msgstr ""
 
@@ -12242,6 +12254,9 @@ msgstr ""
 msgid "Only Project Members"
 msgstr ""
 
+msgid "Only active this projects shows up in the search and on the dashboard."
+msgstr ""
+
 msgid "Only admins"
 msgstr ""
 
@@ -13640,6 +13655,9 @@ msgstr ""
 msgid "Project '%{project_name}' is in the process of being deleted."
 msgstr ""
 
+msgid "Project '%{project_name}' is restored."
+msgstr ""
+
 msgid "Project '%{project_name}' queued for deletion."
 msgstr ""
 
@@ -13647,6 +13665,9 @@ msgid "Project '%{project_name}' was successfully created."
 msgstr ""
 
 msgid "Project '%{project_name}' was successfully updated."
+msgstr ""
+
+msgid "Project '%{project_name}' will be deleted on %{date}"
 msgstr ""
 
 msgid "Project Badges"
@@ -13668,6 +13689,9 @@ msgid "Project access must be granted explicitly to each user."
 msgstr ""
 
 msgid "Project already created"
+msgstr ""
+
+msgid "Project already deleted"
 msgstr ""
 
 msgid "Project and wiki repositories"
@@ -14931,6 +14955,12 @@ msgstr ""
 msgid "Removes time estimate."
 msgstr ""
 
+msgid "Removing a project places it into a read-only state until %{date}, at which point the project will be permanantly removed. Are you ABSOLUTELY sure?"
+msgstr ""
+
+msgid "Removing a project places it into a read-only state until %{date}, at which point the project will be permanently removed."
+msgstr ""
+
 msgid "Removing group will cause all child projects and resources to be removed."
 msgstr ""
 
@@ -15224,6 +15254,12 @@ msgid "Response metrics (NGINX)"
 msgstr ""
 
 msgid "Restart Terminal"
+msgstr ""
+
+msgid "Restore project"
+msgstr ""
+
+msgid "Restoring the project will prevent the project from being removed on this date and restore people's ability to make changes to it."
 msgstr ""
 
 msgid "Restrict access by IP address"
@@ -17881,6 +17917,9 @@ msgstr ""
 msgid "The remote repository is being updated..."
 msgstr ""
 
+msgid "The repository can be commited to, and issues, comments and other entities can be created."
+msgstr ""
+
 msgid "The repository for this project does not exist."
 msgstr ""
 
@@ -18395,6 +18434,9 @@ msgid "This project is archived and cannot be commented on."
 msgstr ""
 
 msgid "This project path either does not exist or is private."
+msgstr ""
+
+msgid "This project will be removed on %{date}"
 msgstr ""
 
 msgid "This repository"
@@ -19157,7 +19199,7 @@ msgstr ""
 msgid "Unarchive project"
 msgstr ""
 
-msgid "Unarchiving the project will restore people's ability to make changes to it. The repository can be committed to, and issues, comments and other entities can be created. <strong>Once active this project shows up in the search and on the dashboard.</strong>"
+msgid "Unarchiving the project will restore people's ability to make changes to it. The repository can be committed to, and issues, comments, and other entities can be created. %{strong_start}Once active, this project shows up in the search and on the dashboard.%{strong_end}"
 msgstr ""
 
 msgid "Unblock"
@@ -19266,6 +19308,9 @@ msgid "Unsubscribes from this %{quick_action_target}."
 msgstr ""
 
 msgid "Until"
+msgstr ""
+
+msgid "Until that time, the project can be restored."
 msgstr ""
 
 msgid "Unverified"
@@ -20949,6 +20994,9 @@ msgstr ""
 msgid "among other things"
 msgstr ""
 
+msgid "archived"
+msgstr ""
+
 msgid "assign yourself"
 msgstr ""
 
@@ -21891,6 +21939,9 @@ msgid "password"
 msgstr ""
 
 msgid "pending comment"
+msgstr ""
+
+msgid "pending removal"
 msgstr ""
 
 msgid "pipeline"
