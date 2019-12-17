@@ -735,7 +735,7 @@ This means the `only:changes` policy is only useful for pipelines with:
 - `$CI_PIPELINE_SOURCE == 'external_pull_request_event'`
 
 If there is no Git push event, as is the case in pipelines with
-[any other source](variables/predefined_variables.html#variables-reference),
+[any other source](../variables/predefined_variables.html#variables-reference),
 `changes` cannot determine if a given file is new or old, and will always
 return true.
 
