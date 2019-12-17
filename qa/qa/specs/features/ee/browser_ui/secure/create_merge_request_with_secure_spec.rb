@@ -11,7 +11,6 @@ module QA
       let(:sast_vuln_count) { 33 }
       let(:dependency_scan_vuln_count) { 4 }
       let(:container_scan_vuln_count) { 8 }
-      let(:dast_vuln_count) { 4 }
       let(:vuln_name) { "Regular Expression Denial of Service in debug" }
       let(:remediable_vuln_name) { "Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js" }
 
@@ -80,7 +79,7 @@ module QA
           expect(merge_request).to have_sast_vulnerability_count_of(sast_vuln_count)
           expect(merge_request).to have_dependency_vulnerability_count_of(dependency_scan_vuln_count)
           expect(merge_request).to have_container_vulnerability_count_of(container_scan_vuln_count)
-          expect(merge_request).to have_dast_vulnerability_count_of(dast_vuln_count)
+          expect(merge_request).to have_dast_vulnerability_count
         end
       end
 
