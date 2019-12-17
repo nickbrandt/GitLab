@@ -207,6 +207,7 @@ describe DiffNote do
 
       it 'does not create diff note file if it is a reply' do
         diff_note = create(:diff_note_on_merge_request, project: project, noteable: merge_request)
+
         expect { create(:diff_note_on_merge_request, noteable: merge_request, in_reply_to: diff_note) }
           .not_to change(NoteDiffFile, :count)
       end
