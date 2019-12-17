@@ -36,6 +36,7 @@
 setup-test-env:
   extends:
     - .only-code-qa-rails-job-base
+    - .use-pg9
   stage: prepare
   variables:
     SETUP_DB: "false"
