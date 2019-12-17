@@ -23,10 +23,6 @@ module QA
       before do
         @executor = "qa-runner-#{Time.now.to_i}"
 
-        # Handle WIP Job Logs flag - https://gitlab.com/gitlab-org/gitlab/issues/31162
-        @job_log_json_flag_enabled = Runtime::Feature.enabled?('job_log_json')
-        Runtime::Feature.disable('job_log_json') if @job_log_json_flag_enabled
-
         Flow::Login.sign_in
 
         @project = Resource::Project.fabricate_via_api! do |p|
@@ -63,8 +59,7 @@ module QA
 
         @project.visit!
         Page::Project::Menu.perform(&:click_ci_cd_pipelines)
-        Page::Project::Pipeline::Index.perform(&:click_on_latest_pipeline)
-        wait_for_job "dast"
+        Page::Project::Pipeline::Index.perform(&:wait_for_latest_pipeline_success)
 
         merge_request.visit!
       end
@@ -113,15 +108,6 @@ module QA
 
           # Context changes as resolve method creates new MR
           expect(merge_request).to have_title remediable_vuln_name
-        end
-      end
-
-      def wait_for_job(job_name)
-        Page::Project::Pipeline::Show.perform do |pipeline|
-          pipeline.click_job(job_name)
-        end
-        Page::Project::Job::Show.perform do |job|
-          expect(job).to be_successful(timeout: 600)
         end
       end
     end
