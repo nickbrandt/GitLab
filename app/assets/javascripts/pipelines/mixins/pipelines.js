@@ -1,5 +1,8 @@
+import Vue from 'vue';
 import Visibility from 'visibilityjs';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlToast } from '@gitlab/ui';
+import { doesHashExistInUrl } from '~/lib/utils/url_utility';
+import { historyPushState, buildUrlWithCurrentLocation } from '~/lib/utils/common_utils';
 import { __ } from '../../locale';
 import createFlash from '../../flash';
 import Poll from '../../lib/utils/poll';
@@ -8,6 +11,8 @@ import SvgBlankState from '../components/blank_state.vue';
 import PipelinesTableComponent from '../components/pipelines_table.vue';
 import eventHub from '../event_hub';
 import { CANCEL_REQUEST } from '../constants';
+
+Vue.use(GlToast);
 
 export default {
   components: {
@@ -56,6 +61,11 @@ export default {
         this.poll.stop();
       }
     });
+
+    if (doesHashExistInUrl('delete_success')) {
+      this.$toast.show(__('The pipeline has been deleted'));
+      historyPushState(buildUrlWithCurrentLocation());
+    }
 
     eventHub.$on('postAction', this.postAction);
     eventHub.$on('retryPipeline', this.postAction);

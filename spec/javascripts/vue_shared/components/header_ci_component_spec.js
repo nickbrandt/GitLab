@@ -36,19 +36,11 @@ describe('Header CI Component', () => {
           isLoading: false,
         },
         {
-          label: 'Go',
-          path: 'path',
-          type: 'link',
-          cssClass: 'link',
-          isLoading: false,
-        },
-        {
           label: 'Delete',
           path: 'path',
-          type: 'ujs-link',
-          cssClass: 'ujs-link',
-          method: 'delete',
-          confirm: 'Are you sure?',
+          type: 'modal-button',
+          cssClass: 'btn-modal',
+          isLoading: false,
         },
       ],
       hasSidebarButton: true,
@@ -86,19 +78,12 @@ describe('Header CI Component', () => {
 
     it('should render provided actions', () => {
       const btn = vm.$el.querySelector('.btn');
-      const link = vm.$el.querySelector('.link');
-      const ujsLink = vm.$el.querySelector('.ujs-link');
+      const btnModal = vm.$el.querySelector('.btn-modal');
 
       expect(btn.tagName).toEqual('BUTTON');
       expect(btn.textContent.trim()).toEqual(props.actions[0].label);
-      expect(link.tagName).toEqual('A');
-      expect(link.textContent.trim()).toEqual(props.actions[1].label);
-      expect(link.getAttribute('href')).toEqual(props.actions[0].path);
-      expect(ujsLink.tagName).toEqual('A');
-      expect(ujsLink.textContent.trim()).toEqual(props.actions[2].label);
-      expect(ujsLink.getAttribute('href')).toEqual(props.actions[2].path);
-      expect(ujsLink.getAttribute('data-method')).toEqual(props.actions[2].method);
-      expect(ujsLink.getAttribute('data-confirm')).toEqual(props.actions[2].confirm);
+      expect(btnModal.tagName).toEqual('BUTTON');
+      expect(btnModal.textContent.trim()).toEqual(props.actions[1].label);
     });
 
     it('should show loading icon', done => {

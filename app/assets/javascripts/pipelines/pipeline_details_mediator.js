@@ -64,6 +64,10 @@ export default class pipelinesMediator {
       );
   }
 
+  stopPipelinePoll() {
+    this.poll.stop();
+  }
+
   /**
    * Backend expects paramets in the following format: `expanded[]=id&expanded[]=id`
    */

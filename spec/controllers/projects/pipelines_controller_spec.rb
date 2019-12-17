@@ -754,7 +754,7 @@ describe Projects::PipelinesController do
       it 'deletes pipeline and redirects' do
         delete_pipeline
 
-        expect(response).to have_gitlab_http_status(302)
+        expect(response).to have_gitlab_http_status(303)
 
         expect { build.reload }.to raise_error(ActiveRecord::RecordNotFound)
         expect { pipeline.reload }.to raise_error(ActiveRecord::RecordNotFound)

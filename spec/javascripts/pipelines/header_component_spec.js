@@ -64,11 +64,12 @@ describe('Pipeline details header', () => {
       vm.$el.querySelector('.js-retry-button').click();
     });
 
-    it('should contain delete button with proper path and method', () => {
-      const link = vm.$el.querySelector('.js-btn-delete-pipeline');
+    it('should fire modal event when delete button action is clicked', () => {
+      vm.$root.$on('bv::modal::show', action => {
+        expect(action.componentId).toEqual('pipeline-delete-modal');
+      });
 
-      expect(link.getAttribute('href')).toContain('path');
-      expect(link.getAttribute('data-method')).toContain('delete');
+      vm.$el.querySelector('.js-btn-delete-pipeline').click();
     });
   });
 });
