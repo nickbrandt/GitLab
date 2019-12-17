@@ -256,7 +256,6 @@ excluded_attributes:
     - :merge_request_id
   notes:
     - :noteable_id
-    - :discussion_id
     - :review_id
   label_links:
     - :label_id
