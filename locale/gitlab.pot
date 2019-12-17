@@ -1720,6 +1720,9 @@ msgstr ""
 msgid "An error occurred while loading issues"
 msgstr ""
 
+msgid "An error occurred while loading the data. Please try again."
+msgstr ""
+
 msgid "An error occurred while loading the file"
 msgstr ""
 
@@ -3149,6 +3152,9 @@ msgid "Changing group path can have unintended side effects."
 msgstr ""
 
 msgid "Charts"
+msgstr ""
+
+msgid "Charts can't be displayed as the request for data has timed out. %{documentationLink}"
 msgstr ""
 
 msgid "Chat"
@@ -4716,7 +4722,13 @@ msgstr ""
 msgid "Connecting..."
 msgstr ""
 
+msgid "Connection failed"
+msgstr ""
+
 msgid "Connection failure"
+msgstr ""
+
+msgid "Connection timed out"
 msgstr ""
 
 msgid "Contact an owner of group %{namespace_name} to upgrade the plan."
@@ -14612,6 +14624,9 @@ msgstr ""
 msgid "Query"
 msgstr ""
 
+msgid "Query cannot be processed"
+msgstr ""
+
 msgid "Query is valid"
 msgstr ""
 
@@ -17717,6 +17732,9 @@ msgstr ""
 msgid "The Issue Tracker is the place to add things that need to be improved or solved in a project. You can register or sign in to create issues for this project."
 msgstr ""
 
+msgid "The Prometheus server responded with \"bad request\". Please check your queries are correct and are supported in your Prometheus version. %{documentationLink}"
+msgstr ""
+
 msgid "The URL to use for connecting to Elasticsearch. Use a comma-separated list to support clustering (e.g., \"http://localhost:9200, http://localhost:9201\")."
 msgstr ""
 
@@ -17747,7 +17765,7 @@ msgstr ""
 msgid "The content of this page is not encoded in UTF-8. Edits can only be made via the Git repository."
 msgstr ""
 
-msgid "The data source is connected, but there is no data to display."
+msgid "The data source is connected, but there is no data to display. %{documentationLink}"
 msgstr ""
 
 msgid "The default CI configuration path for new projects."
@@ -19931,6 +19949,9 @@ msgstr ""
 msgid "Verify SAML Configuration"
 msgstr ""
 
+msgid "Verify configuration"
+msgstr ""
+
 msgid "Version"
 msgstr ""
 
@@ -20138,6 +20159,9 @@ msgid "We could not determine the path to remove the epic"
 msgstr ""
 
 msgid "We could not determine the path to remove the issue"
+msgstr ""
+
+msgid "We couldn't reach the Prometheus server. Either the server no longer exists or the configuration details need updating."
 msgstr ""
 
 msgid "We created a short guided tour that will help you learn the basics of GitLab and how it will help you be better at your job. It should only take a couple of minutes. You will be guided by two types of helpers, best recognized by their color."
