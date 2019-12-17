@@ -218,7 +218,8 @@ describe 'issue boards', :js do
     end
 
     context 'When FF is turned off' do
-      it 'does not show the list settings button' do
+      # https://gitlab.com/gitlab-org/gitlab/issues/118658
+      it 'does not show the list settings button', :quarantine do
         stub_licensed_features(wip_limits: false)
         expect(page).to have_no_selector(:button, "List Settings")
       end
