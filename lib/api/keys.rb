@@ -26,7 +26,9 @@ module API
       get do
         authenticated_with_full_private_access!
 
-        key = KeysFinder.new(current_user, params).execute
+        finder_params = params.merge(key_type: 'ssh')
+
+        key = KeysFinder.new(current_user, finder_params).execute
 
         not_found!('Key') unless key
         present key, with: Entities::SSHKeyWithUser, current_user: current_user

@@ -1184,6 +1184,12 @@ msgstr ""
 msgid "AdminArea|You’re about to stop all jobs.This will halt all current jobs that are running."
 msgstr ""
 
+msgid "AdminCredentials|Personal Access Tokens"
+msgstr ""
+
+msgid "AdminCredentials|SSH Keys"
+msgstr ""
+
 msgid "AdminDashboard|Error loading the statistics. Please try again"
 msgstr ""
 
@@ -1326,6 +1332,9 @@ msgid "AdminUsers|It's you!"
 msgstr ""
 
 msgid "AdminUsers|New user"
+msgstr ""
+
+msgid "AdminUsers|No credentials found"
 msgstr ""
 
 msgid "AdminUsers|No users found"
@@ -5117,6 +5126,9 @@ msgstr ""
 msgid "Created At"
 msgstr ""
 
+msgid "Created On"
+msgstr ""
+
 msgid "Created a branch and a merge request to resolve this issue."
 msgstr ""
 
@@ -5163,6 +5175,9 @@ msgid "Creating graphs uses the data from the Prometheus server. If this takes a
 msgstr ""
 
 msgid "Creation date"
+msgstr ""
+
+msgid "Credentials"
 msgstr ""
 
 msgid "Critical vulnerabilities present"
@@ -7206,6 +7221,9 @@ msgid "Expand sidebar"
 msgstr ""
 
 msgid "Expand up"
+msgstr ""
+
+msgid "Expiration"
 msgstr ""
 
 msgid "Expiration date"
@@ -10237,6 +10255,9 @@ msgstr[1] ""
 msgid "Last %{days} days"
 msgstr ""
 
+msgid "Last Accessed On"
+msgstr ""
+
 msgid "Last Pipeline"
 msgstr ""
 
@@ -11719,6 +11740,9 @@ msgid "No Label"
 msgstr ""
 
 msgid "No Milestone"
+msgstr ""
+
+msgid "No Scopes"
 msgstr ""
 
 msgid "No Tag"
