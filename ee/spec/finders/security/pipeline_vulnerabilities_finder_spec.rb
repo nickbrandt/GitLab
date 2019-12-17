@@ -53,31 +53,33 @@ describe Security::PipelineVulnerabilitiesFinder do
 
       subject { described_class.new(pipeline: pipeline, params: params).execute }
 
-      it 'assigns commit sha to findings' do
-        expect(subject.map(&:sha).uniq).to eq [pipeline.sha]
-      end
+      context 'occurrences' do
+        it 'assigns commit sha to findings' do
+          expect(subject.occurrences.map(&:sha).uniq).to eq([pipeline.sha])
+        end
 
-      context 'by order' do
-        let(:params) { { report_type: %w[sast] } }
-        let!(:high_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :high) }
-        let!(:critical_medium) { build(:vulnerabilities_occurrence, confidence: :medium, severity: :critical) }
-        let!(:critical_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :critical) }
-        let!(:unknown_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :unknown) }
-        let!(:unknown_medium) { build(:vulnerabilities_occurrence, confidence: :medium, severity: :unknown) }
-        let!(:unknown_low) { build(:vulnerabilities_occurrence, confidence: :low, severity: :unknown) }
+        context 'by order' do
+          let(:params) { { report_type: %w[sast] } }
+          let!(:high_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :high) }
+          let!(:critical_medium) { build(:vulnerabilities_occurrence, confidence: :medium, severity: :critical) }
+          let!(:critical_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :critical) }
+          let!(:unknown_high) { build(:vulnerabilities_occurrence, confidence: :high, severity: :unknown) }
+          let!(:unknown_medium) { build(:vulnerabilities_occurrence, confidence: :medium, severity: :unknown) }
+          let!(:unknown_low) { build(:vulnerabilities_occurrence, confidence: :low, severity: :unknown) }
 
-        it 'orders by severity and confidence' do
-          allow_next_instance_of(described_class) do |pipeline_vulnerabilities_finder|
-            allow(pipeline_vulnerabilities_finder).to receive(:filter).and_return([
-                 unknown_low,
-                 unknown_medium,
-                 critical_high,
-                 unknown_high,
-                 critical_medium,
-                 high_high
-          ])
+          it 'orders by severity and confidence' do
+            allow_next_instance_of(described_class) do |pipeline_vulnerabilities_finder|
+              allow(pipeline_vulnerabilities_finder).to receive(:filter).and_return([
+                   unknown_low,
+                   unknown_medium,
+                   critical_high,
+                   unknown_high,
+                   critical_medium,
+                   high_high
+            ])
 
-            expect(subject).to eq([critical_high, critical_medium, high_high, unknown_high, unknown_medium, unknown_low])
+              expect(subject.occurrences).to eq([critical_high, critical_medium, high_high, unknown_high, unknown_medium, unknown_low])
+            end
           end
         end
       end
@@ -88,8 +90,8 @@ describe Security::PipelineVulnerabilitiesFinder do
           let(:sast_report_fingerprints) {pipeline.security_reports.reports['sast'].occurrences.map(&:location).map(&:fingerprint) }
 
           it 'includes only sast' do
-            expect(subject.map(&:location_fingerprint)).to match_array(sast_report_fingerprints)
-            expect(subject.count).to eq sast_count
+            expect(subject.occurrences.map(&:location_fingerprint)).to match_array(sast_report_fingerprints)
+            expect(subject.occurrences.count).to eq(sast_count)
           end
         end
 
@@ -98,8 +100,8 @@ describe Security::PipelineVulnerabilitiesFinder do
           let(:ds_report_fingerprints) {pipeline.security_reports.reports['dependency_scanning'].occurrences.map(&:location).map(&:fingerprint) }
 
           it 'includes only dependency_scanning' do
-            expect(subject.map(&:location_fingerprint)).to match_array(ds_report_fingerprints)
-            expect(subject.count).to eq ds_count
+            expect(subject.occurrences.map(&:location_fingerprint)).to match_array(ds_report_fingerprints)
+            expect(subject.occurrences.count).to eq(ds_count)
           end
         end
 
@@ -108,8 +110,8 @@ describe Security::PipelineVulnerabilitiesFinder do
           let(:dast_report_fingerprints) {pipeline.security_reports.reports['dast'].occurrences.map(&:location).map(&:fingerprint) }
 
           it 'includes only dast' do
-            expect(subject.map(&:location_fingerprint)).to match_array(dast_report_fingerprints)
-            expect(subject.count).to eq dast_count
+            expect(subject.occurrences.map(&:location_fingerprint)).to match_array(dast_report_fingerprints)
+            expect(subject.occurrences.count).to eq(dast_count)
           end
         end
 
@@ -118,8 +120,8 @@ describe Security::PipelineVulnerabilitiesFinder do
 
           it 'includes only container_scanning' do
             fingerprints = pipeline.security_reports.reports['container_scanning'].occurrences.map(&:location).map(&:fingerprint)
-            expect(subject.map(&:location_fingerprint)).to match_array(fingerprints)
-            expect(subject.count).to eq cs_count
+            expect(subject.occurrences.map(&:location_fingerprint)).to match_array(fingerprints)
+            expect(subject.occurrences.count).to eq(cs_count)
           end
         end
       end
@@ -155,8 +157,8 @@ describe Security::PipelineVulnerabilitiesFinder do
           subject { described_class.new(pipeline: pipeline).execute }
 
           it 'returns non-dismissed vulnerabilities' do
-            expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count - feedback.count
-            expect(subject.map(&:project_fingerprint)).not_to include(*feedback.map(&:project_fingerprint))
+            expect(subject.occurrences.count).to eq(cs_count + dast_count + ds_count + sast_count - feedback.count)
+            expect(subject.occurrences.map(&:project_fingerprint)).not_to include(*feedback.map(&:project_fingerprint))
           end
         end
 
@@ -164,8 +166,8 @@ describe Security::PipelineVulnerabilitiesFinder do
           subject { described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning], scope: 'dismissed' } ).execute }
 
           it 'returns non-dismissed vulnerabilities' do
-            expect(subject.count).to eq(ds_count - 1)
-            expect(subject.map(&:project_fingerprint)).not_to include(ds_occurrence.project_fingerprint)
+            expect(subject.occurrences.count).to eq(ds_count - 1)
+            expect(subject.occurrences.map(&:project_fingerprint)).not_to include(ds_occurrence.project_fingerprint)
           end
         end
 
@@ -173,7 +175,7 @@ describe Security::PipelineVulnerabilitiesFinder do
           let(:params) { { report_type: %w[sast dast container_scanning dependency_scanning], scope: 'all' } }
 
           it 'returns all vulnerabilities' do
-            expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count
+            expect(subject.occurrences.count).to eq(cs_count + dast_count + ds_count + sast_count)
           end
         end
       end
@@ -183,7 +185,7 @@ describe Security::PipelineVulnerabilitiesFinder do
           subject { described_class.new(pipeline: pipeline).execute }
 
           it 'returns all vulnerability severity levels' do
-            expect(subject.map(&:severity).uniq).to match_array %w[undefined unknown low medium high critical info]
+            expect(subject.occurrences.map(&:severity).uniq).to match_array(%w[undefined unknown low medium high critical info])
           end
         end
 
@@ -191,7 +193,7 @@ describe Security::PipelineVulnerabilitiesFinder do
           subject { described_class.new(pipeline: pipeline, params: { severity: 'low' } ).execute }
 
           it 'returns only low-severity vulnerabilities' do
-            expect(subject.map(&:severity).uniq).to match_array %w[low]
+            expect(subject.occurrences.map(&:severity).uniq).to match_array(%w[low])
           end
         end
       end
@@ -201,7 +203,7 @@ describe Security::PipelineVulnerabilitiesFinder do
           subject { described_class.new(pipeline: pipeline).execute }
 
           it 'returns all vulnerability confidence levels' do
-            expect(subject.map(&:confidence).uniq).to match_array %w[undefined unknown low medium high]
+            expect(subject.occurrences.map(&:confidence).uniq).to match_array %w[undefined unknown low medium high]
           end
         end
 
@@ -209,7 +211,7 @@ describe Security::PipelineVulnerabilitiesFinder do
           subject { described_class.new(pipeline: pipeline, params: { confidence: 'medium' } ).execute }
 
           it 'returns only medium-confidence vulnerabilities' do
-            expect(subject.map(&:confidence).uniq).to match_array %w[medium]
+            expect(subject.occurrences.map(&:confidence).uniq).to match_array(%w[medium])
           end
         end
       end
@@ -219,9 +221,9 @@ describe Security::PipelineVulnerabilitiesFinder do
           let(:params) { { report_type: %w[sast dast container_scanning dependency_scanning], scope: 'all' } }
 
           it 'filters by all params' do
-            expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count
-            expect(subject.map(&:confidence).uniq).to match_array %w[undefined unknown low medium high]
-            expect(subject.map(&:severity).uniq).to match_array %w[undefined unknown low medium high critical info]
+            expect(subject.occurrences.count).to eq(cs_count + dast_count + ds_count + sast_count)
+            expect(subject.occurrences.map(&:confidence).uniq).to match_array(%w[undefined unknown low medium high])
+            expect(subject.occurrences.map(&:severity).uniq).to match_array(%w[undefined unknown low medium high critical info])
           end
         end
 
@@ -229,7 +231,8 @@ describe Security::PipelineVulnerabilitiesFinder do
           let(:params) { { report_type: %w[code_quality] } }
 
           it 'did not find anything' do
-            is_expected.to be_empty
+            expect(subject.created_at).to be_nil
+            expect(subject.occurrences).to be_empty
           end
         end
       end
@@ -238,7 +241,7 @@ describe Security::PipelineVulnerabilitiesFinder do
         subject { described_class.new(pipeline: pipeline).execute }
 
         it 'returns all report_types' do
-          expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count
+          expect(subject.occurrences.count).to eq(cs_count + dast_count + ds_count + sast_count)
         end
       end
 
@@ -279,14 +282,14 @@ describe Security::PipelineVulnerabilitiesFinder do
         subject { described_class.new(pipeline: pipeline, params: { report_type: %w[sast], scope: 'all' }).execute }
 
         it 'assigns vulnerability records to findings providing them with computed state' do
-          confirmed = subject.find { |f| f.project_fingerprint == confirmed_fingerprint }
-          resolved = subject.find { |f| f.project_fingerprint == resolved_fingerprint }
-          dismissed = subject.find { |f| f.project_fingerprint == dismissed_fingerprint }
+          confirmed = subject.occurrences.find { |f| f.project_fingerprint == confirmed_fingerprint }
+          resolved = subject.occurrences.find { |f| f.project_fingerprint == resolved_fingerprint }
+          dismissed = subject.occurrences.find { |f| f.project_fingerprint == dismissed_fingerprint }
 
           expect(confirmed.state).to eq 'confirmed'
           expect(resolved.state).to eq 'resolved'
           expect(dismissed.state).to eq 'dismissed'
-          expect(subject - [confirmed, resolved, dismissed]).to all have_attributes(state: 'opened')
+          expect(subject.occurrences - [confirmed, resolved, dismissed]).to all(have_attributes(state: 'opened'))
         end
       end
 
@@ -297,7 +300,7 @@ describe Security::PipelineVulnerabilitiesFinder do
           select_proc = proc { |o| o.severity == 'medium' && o.confidence == 'high' }
           report_occurrences = pipeline.security_reports.reports['sast'].occurrences.select(&select_proc)
 
-          found_occurrences = subject.select(&select_proc)
+          found_occurrences = subject.occurrences.select(&select_proc)
 
           found_occurrences.each_with_index do |found, i|
             expect(found.metadata['cve']).to eq(report_occurrences[i].compare_key)

@@ -7,6 +7,7 @@ module Gitlab
         class Report
           UNSAFE_SEVERITIES = %w[unknown high critical].freeze
 
+          attr_reader :created_at
           attr_reader :type
           attr_reader :commit_sha
           attr_reader :occurrences
@@ -15,9 +16,10 @@ module Gitlab
 
           attr_accessor :error
 
-          def initialize(type, commit_sha)
+          def initialize(type, commit_sha, created_at)
             @type = type
             @commit_sha = commit_sha
+            @created_at = created_at
             @occurrences = []
             @scanners = {}
             @identifiers = {}
@@ -40,7 +42,7 @@ module Gitlab
           end
 
           def clone_as_blank
-            Report.new(type, commit_sha)
+            Report.new(type, commit_sha, created_at)
           end
 
           def replace_with!(other)

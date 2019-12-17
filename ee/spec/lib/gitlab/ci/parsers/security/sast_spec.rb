@@ -7,12 +7,13 @@ describe Gitlab::Ci::Parsers::Security::Sast do
     subject(:parser) { described_class.new }
 
     let(:commit_sha) { "d8978e74745e18ce44d88814004d4255ac6a65bb" }
+    let(:created_at) { 2.weeks.ago }
 
     context "when parsing valid reports" do
       where(report_format: %i(sast sast_deprecated))
 
       with_them do
-        let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, commit_sha) }
+        let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, commit_sha, created_at) }
         let(:artifact) { create(:ee_ci_job_artifact, report_format) }
 
         before do
@@ -47,7 +48,7 @@ describe Gitlab::Ci::Parsers::Security::Sast do
     end
 
     context "when parsing an empty report" do
-      let(:report) { Gitlab::Ci::Reports::Security::Report.new('sast', commit_sha) }
+      let(:report) { Gitlab::Ci::Reports::Security::Report.new('sast', commit_sha, created_at) }
       let(:blob) { JSON.generate({}) }
 
       it { expect(parser.parse!(blob, report)).to be_empty }

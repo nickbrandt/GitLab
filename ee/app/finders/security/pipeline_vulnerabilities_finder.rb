@@ -24,13 +24,9 @@ module Security
     end
 
     def execute
-      reports = pipeline_reports
+      requested_reports = pipeline_reports.select { |report_type| requested_type?(report_type) }
 
-      return [] if reports.nil?
-
-      occurrences = reports.each_with_object([]) do |(type, report), occurrences|
-        next unless requested_type?(type)
-
+      occurrences = requested_reports.each_with_object([]) do |(type, report), occurrences|
         raise ParseError, 'JSON parsing failed' if report.error.is_a?(Gitlab::Ci::Parsers::Security::Common::SecurityReportParserError)
 
         normalized_occurrences = normalize_report_occurrences(
@@ -41,7 +37,7 @@ module Security
         occurrences.concat(filtered_occurrences)
       end
 
-      sort_occurrences(occurrences)
+      Gitlab::Ci::Reports::Security::AggregatedReport.new(requested_reports.values, sort_occurrences(occurrences))
     end
 
     private
@@ -63,7 +59,7 @@ module Security
     end
 
     def pipeline_reports
-      pipeline&.security_reports&.reports
+      pipeline&.security_reports&.reports || {}
     end
 
     def vulnerabilities_by_finding_fingerprint(report_type, report)

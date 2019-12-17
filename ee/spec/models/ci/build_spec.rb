@@ -14,6 +14,7 @@ describe Ci::Build do
   end
 
   let(:job) { create(:ci_build, pipeline: pipeline) }
+  let(:artifact) { create(:ee_ci_job_artifact, :sast, job: job, project: job.project) }
 
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { job.shared_runners_minutes_limit_enabled? }
@@ -112,58 +113,59 @@ describe Ci::Build do
 
     context 'when build has a security report' do
       context 'when there is a sast report' do
-        before do
-          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
-        end
+        let!(:artifact) { create(:ee_ci_job_artifact, :sast, job: job, project: job.project) }
 
         it 'parses blobs and add the results to the report' do
           subject
 
-          expect(security_reports.get_report('sast').occurrences.size).to eq(33)
+          expect(security_reports.get_report('sast', artifact).occurrences.size).to eq(33)
+        end
+
+        it 'adds the created date to the report' do
+          subject
+
+          expect(security_reports.get_report('sast', artifact).created_at.to_s).to eq(artifact.created_at.to_s)
         end
       end
 
       context 'when there are multiple reports' do
-        before do
-          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :dependency_scanning, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :container_scanning, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :dast, job: job, project: job.project)
-        end
+        let!(:sast_artifact) { create(:ee_ci_job_artifact, :sast, job: job, project: job.project) }
+        let!(:ds_artifact) { create(:ee_ci_job_artifact, :dependency_scanning, job: job, project: job.project) }
+        let!(:cs_artifact) { create(:ee_ci_job_artifact, :container_scanning, job: job, project: job.project) }
+        let!(:dast_artifact) { create(:ee_ci_job_artifact, :dast, job: job, project: job.project) }
 
         it 'parses blobs and adds the results to the reports' do
           subject
 
-          expect(security_reports.get_report('sast').occurrences.size).to eq(33)
-          expect(security_reports.get_report('dependency_scanning').occurrences.size).to eq(4)
-          expect(security_reports.get_report('container_scanning').occurrences.size).to eq(8)
-          expect(security_reports.get_report('dast').occurrences.size).to eq(20)
+          expect(security_reports.get_report('sast', sast_artifact).occurrences.size).to eq(33)
+          expect(security_reports.get_report('dependency_scanning', ds_artifact).occurrences.size).to eq(4)
+          expect(security_reports.get_report('container_scanning', cs_artifact).occurrences.size).to eq(8)
+          expect(security_reports.get_report('dast', dast_artifact).occurrences.size).to eq(20)
         end
       end
 
       context 'when there is a corrupted sast report' do
-        before do
-          create(:ee_ci_job_artifact, :sast_with_corrupted_data, job: job, project: job.project)
-        end
+        let!(:artifact) { create(:ee_ci_job_artifact, :sast_with_corrupted_data, job: job, project: job.project) }
 
         it 'stores an error' do
           subject
 
-          expect(security_reports.get_report('sast')).to be_errored
+          expect(security_reports.get_report('sast', artifact)).to be_errored
         end
       end
     end
 
     context 'when there is unsupported file type' do
+      let!(:artifact) { create(:ee_ci_job_artifact, :codequality, job: job, project: job.project) }
+
       before do
         stub_const("Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES", %w[codequality])
-        create(:ee_ci_job_artifact, :codequality, job: job, project: job.project)
       end
 
       it 'stores an error' do
         subject
 
-        expect(security_reports.get_report('codequality')).to be_errored
+        expect(security_reports.get_report('codequality', artifact)).to be_errored
       end
     end
   end
