@@ -245,7 +245,7 @@ scope path: '(/-/jira)', constraints: ::Constraints::JiraEncodedUrlConstrainer.n
         project: params[:project_id]
       )
 
-      "/#{project_full_path}/tree/#{params[:id]}"
+      "/#{project_full_path}/-/tree/#{params[:id]}"
     }
   end
 end
