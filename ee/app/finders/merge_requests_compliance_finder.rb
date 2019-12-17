@@ -8,17 +8,22 @@
 #   current_user - which user use
 #   params:
 #     group_id: integer
+#     preloads: array of associations to preload
 #
 class MergeRequestsComplianceFinder < MergeRequestsFinder
   def execute
-    sql = super
-      .select('DISTINCT ON (merge_requests.target_project_id) merge_requests.*, merge_request_metrics.merged_at')
+    # rubocop: disable CodeReuse/ActiveRecord
+    lateral = Event
+      .select(:created_at, :target_id)
+      .where('projects.id = project_id')
+      .merged
+      .recent
+      .limit(1)
       .to_sql
 
-    # rubocop: disable CodeReuse/ActiveRecord
-    MergeRequest
-      .from([Arel.sql("(#{sql}) AS #{MergeRequest.table_name}")])
-      .order('merged_at DESC')
+    sql = find_group_projects.as('projects').to_sql
+    records = Project.select('projects.id, events.target_id as merge_request_id').from([Arel.sql("#{sql} JOIN LATERAL (#{lateral}) #{Event.table_name} ON true")]).order('events.created_at DESC')
+    select_sorted_mrs(records)
     # rubocop: enable CodeReuse/ActiveRecord
   end
 
@@ -26,12 +31,20 @@ class MergeRequestsComplianceFinder < MergeRequestsFinder
 
   def params
     finder_options = {
-      scope: :all,
-      state: :merged,
-      sort: :by_merged_at,
       include_subgroups: true,
       attempt_group_search_optimizations: true
     }
     super.merge(finder_options)
+  end
+
+  def select_sorted_mrs(records)
+    hash = {}
+    records.each { |row| hash[row['merge_request_id']] = nil }
+    mrs = MergeRequest.where(id: hash.keys).preload(params[:preloads]) # rubocop: disable CodeReuse/ActiveRecord
+
+    mrs.each { |mr| hash[mr.id] = mr }
+
+    hash.compact!
+    hash.values # sorted MRs
   end
 end

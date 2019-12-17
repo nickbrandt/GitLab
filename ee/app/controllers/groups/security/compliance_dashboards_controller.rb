@@ -5,12 +5,11 @@ class Groups::Security::ComplianceDashboardsController < Groups::ApplicationCont
   before_action :authorize_compliance_dashboard!
 
   def show
-    preload_for_collection = [:target_project, :metrics, :approved_by_users, source_project: :route, target_project: :namespace]
+    preload_for_collection = [:approved_by_users, :metrics, source_project: :route, target_project: :namespace]
 
-    @merge_requests = MergeRequestsComplianceFinder.new(current_user, { group_id: @group.id })
+    @merge_requests = MergeRequestsComplianceFinder.new(current_user, { group_id: @group.id, preloads: preload_for_collection })
       .execute
-      .preload(preload_for_collection) # rubocop: disable CodeReuse/ActiveRecord
-      .page(params[:page])
+    @merge_requests = Kaminari.paginate_array(@merge_requests).page(params[:page])
   end
 
   private

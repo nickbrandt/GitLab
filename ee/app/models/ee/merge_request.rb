@@ -73,6 +73,7 @@ module EE
       def with_api_entity_associations
         super.preload(:blocking_merge_requests)
       end
+<<<<<<< HEAD
 
       def sort_by_attribute(method, *args)
         if method.to_s == 'review_time_desc'
@@ -91,6 +92,8 @@ module EE
         grouping_columns << ::MergeRequest::Metrics.arel_table[:first_comment_at] if sort.to_s == 'review_time_desc'
         grouping_columns
       end
+=======
+>>>>>>> Change query in finder
     end
 
     override :mergeable?

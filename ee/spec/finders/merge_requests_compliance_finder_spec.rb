@@ -17,10 +17,10 @@ describe MergeRequestsComplianceFinder do
   let(:mr_4) { create(:merge_request, source_project: project_2, source_branch: 'A', state: :merged) }
 
   before do
-    mr_1.metrics.update!(merged_at: 20.minutes.ago)
-    mr_2.metrics.update!(merged_at: 40.minutes.ago)
-    mr_3.metrics.update!(merged_at: 30.minutes.ago)
-    mr_4.metrics.update!(merged_at: 50.minutes.ago)
+    create(:event, :merged, project: project_2, target: mr_4, author: current_user, created_at: 50.minutes.ago, id: 1)
+    create(:event, :merged, project: project_2, target: mr_2, author: current_user, created_at: 40.minutes.ago, id: 2)
+    create(:event, :merged, project: project, target: mr_3, author: current_user, created_at: 30.minutes.ago, id: 3)
+    create(:event, :merged, project: project, target: mr_1, author: current_user, created_at: 20.minutes.ago, id: 4)
   end
 
   context 'when there are merge requests from projects in group' do
@@ -40,8 +40,8 @@ describe MergeRequestsComplianceFinder do
       let(:mr_6) { create(:merge_request, source_project: sub_project, state: :merged) }
 
       before do
-        mr_5.metrics.update!(merged_at: 10.minutes.ago)
-        mr_6.metrics.update!(merged_at: 30.minutes.ago)
+        create(:event, :merged, project: sub_project, target: mr_6, author: current_user, created_at: 30.minutes.ago, id: 6)
+        create(:event, :merged, project: sub_project, target: mr_5, author: current_user, created_at: 10.minutes.ago, id: 7)
       end
 
       it 'shows only most recent Merge Request from each project' do

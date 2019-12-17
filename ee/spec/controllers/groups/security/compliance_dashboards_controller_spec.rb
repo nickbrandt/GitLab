@@ -41,7 +41,7 @@ describe Groups::Security::ComplianceDashboardsController do
           let(:mr_2) { create(:merge_request, source_project: project, source_branch: 'A', state: :merged) }
 
           before do
-            mr_1.metrics.update!(merged_at: 20.minutes.ago)
+            create(:event, :merged, project: project, target: mr_1, author: user)
           end
 
           it 'renders merge request' do
