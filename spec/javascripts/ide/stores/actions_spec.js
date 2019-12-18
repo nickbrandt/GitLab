@@ -319,7 +319,7 @@ describe('Multi-file store actions', () => {
             { type: types.TOGGLE_FILE_OPEN, payload: 'test' },
             { type: types.ADD_FILE_TO_CHANGED, payload: 'test' },
           ],
-          jasmine.objectContaining([
+          jasmine.arrayContaining([
             {
               type: 'setFileActive',
               payload: 'test',
