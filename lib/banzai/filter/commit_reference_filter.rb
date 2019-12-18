@@ -82,6 +82,10 @@ module Banzai
       def only_path?
         context[:only_path]
       end
+
+      def self.parse_symbol(sha, _match_data)
+        sha
+      end
     end
   end
 end

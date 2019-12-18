@@ -45,11 +45,17 @@ module Banzai
         text.gsub(pattern) do |match|
           symbol = $~[object_sym]
           if object_class.reference_valid?(symbol)
-            yield match, symbol.to_i, $~[:project], $~[:namespace], $~
+            yield match, parse_symbol(symbol, $~), $~[:project], $~[:namespace], $~
           else
             match
           end
         end
+      end
+
+      # Transform a symbol extracted from the text to a meaningful value
+      # In most cases these will be integers, so we call #to_i by default
+      def self.parse_symbol(symbol, match_data)
+        symbol.to_i
       end
 
       def object_class
