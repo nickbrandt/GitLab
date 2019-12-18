@@ -118,11 +118,11 @@ describe('error tracking actions', () => {
     });
   });
 
-  describe('fetchResults', () => {
+  describe('fetchPaginatedResults', () => {
     it('should start polling the selected page cursor', () => {
       const cursor = '1576637570000:1:1';
       testAction(
-        actions.fetchResults,
+        actions.fetchPaginatedResults,
         cursor,
         {},
         [{ type: types.SET_CURSOR, payload: cursor }],

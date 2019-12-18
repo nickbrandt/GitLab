@@ -71,7 +71,7 @@ describe('ErrorTrackingList', () => {
       setEndpoint: jest.fn(),
       searchByQuery: jest.fn(),
       sortByField: jest.fn(),
-      fetchResults: jest.fn(),
+      fetchPaginatedResults: jest.fn(),
     };
 
     const state = {
@@ -306,8 +306,8 @@ describe('ErrorTrackingList', () => {
         it('fetches the previous page of results', () => {
           expect(wrapper.find('.prev-page-item').attributes('aria-disabled')).toBe(undefined);
           wrapper.vm.goToPrevPage();
-          expect(actions.fetchResults).toHaveBeenCalled();
-          expect(actions.fetchResults).toHaveBeenLastCalledWith(
+          expect(actions.fetchPaginatedResults).toHaveBeenCalled();
+          expect(actions.fetchPaginatedResults).toHaveBeenLastCalledWith(
             expect.anything(),
             'previousCursor',
             undefined,
@@ -325,8 +325,8 @@ describe('ErrorTrackingList', () => {
           window.scrollTo = jest.fn();
           findPagination().vm.$emit('input', 2);
           expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
-          expect(actions.fetchResults).toHaveBeenCalled();
-          expect(actions.fetchResults).toHaveBeenLastCalledWith(
+          expect(actions.fetchPaginatedResults).toHaveBeenCalled();
+          expect(actions.fetchPaginatedResults).toHaveBeenLastCalledWith(
             expect.anything(),
             'nextCursor',
             undefined,

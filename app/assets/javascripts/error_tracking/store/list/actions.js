@@ -93,7 +93,7 @@ export const setEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_ENDPOINT, endpoint);
 };
 
-export const fetchResults = ({ commit, dispatch }, cursor) => {
+export const fetchPaginatedResults = ({ commit, dispatch }, cursor) => {
   commit(types.SET_CURSOR, cursor);
   dispatch('stopPolling');
   dispatch('startPolling');
