@@ -266,6 +266,11 @@ module Banzai
         text
       end
 
+      def symbol_from_match(match)
+        key = object_sym
+        match[key] if match.names.include?(key.to_s)
+      end
+
       def relation_for_paths(paths)
         klass = parent_type.to_s.camelize.constantize
         result = klass.where_full_path_in(paths)
