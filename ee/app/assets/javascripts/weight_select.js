@@ -11,6 +11,7 @@ function WeightSelect(els, options = {}) {
     const $selectbox = $dropdown.closest('.selectbox');
     const $block = $selectbox.closest('.block');
     const $value = $block.find('.value');
+    // eslint-disable-next-line no-jquery/no-fade
     $block.find('.block-loading').fadeOut();
     const fieldName = options.fieldName || $dropdown.data('fieldName');
     const inputField = $dropdown.closest('.selectbox').find(`input[name='${fieldName}']`);
