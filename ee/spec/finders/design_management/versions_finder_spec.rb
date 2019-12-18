@@ -79,6 +79,20 @@ describe DesignManagement::VersionsFinder do
             it { is_expected.to contain_exactly(version_1, version_2) }
           end
         end
+
+        describe 'returning versions by SHA' do
+          context 'when argument is the first version' do
+            let(:params) { { sha: version_1.sha } }
+
+            it { is_expected.to contain_exactly(version_1) }
+          end
+
+          context 'when argument is the second version' do
+            let(:params) { { sha: version_2.sha } }
+
+            it { is_expected.to contain_exactly(version_2) }
+          end
+        end
       end
     end
   end

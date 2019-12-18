@@ -3,11 +3,23 @@
 FactoryBot.define do
   factory :design, class: DesignManagement::Design do
     issue { create(:issue) }
-    project { issue.project }
+    project { issue&.project || create(:project) }
     sequence(:filename) { |n| "homescreen-#{n}.jpg" }
 
     transient do
       author { issue.author }
+    end
+
+    trait :importing do
+      issue { nil }
+
+      importing { true }
+      imported { false }
+    end
+
+    trait :imported do
+      importing { false }
+      imported { true }
     end
 
     create_versions = ->(design, evaluator, commit_version) do
@@ -37,6 +49,8 @@ FactoryBot.define do
         # and maybe a deletion
         run_action[DesignManagement::DesignAction.new(design, :delete)] if evaluator.deleted
       end
+
+      design.clear_version_cache
     end
 
     trait :with_lfs_file do
