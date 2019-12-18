@@ -46,8 +46,20 @@ module Projects
         access_denied!(%q(You can't commit to this project)) unless user_access(project).can_push_to_branch?(branch)
       end
 
+      def validate_dashboard_template!
+        access_denied! unless dashboard_templates[dashboard]
+      end
+
       def branch
         params.require(:branch)
+      end
+
+      def dashboard
+        params.require(:dashboard)
+      end
+
+      def file_name
+        params.require(:file_name)
       end
 
       def dashboard_attrs
@@ -62,19 +74,15 @@ module Projects
       end
 
       def commit_message
-        params[:commit_message] || "Create custom dashboard #{params.require(:file_name)}"
+        params[:commit_message] || "Create custom dashboard #{file_name}"
       end
 
       def new_dashboard_path
-        File.join(USER_DASHBOARDS_DIR, params.require(:file_name))
+        File.join(USER_DASHBOARDS_DIR, file_name)
       end
 
       def new_dashboard_content
-        File.read(Rails.root.join(params.require(:dashboard)))
-      end
-
-      def validate_dashboard_template!
-        access_denied! unless dashboard_templates[params.require(:dashboard)]
+        File.read(Rails.root.join(dashboard))
       end
 
       def dashboard_templates
