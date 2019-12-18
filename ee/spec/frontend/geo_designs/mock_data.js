@@ -1,3 +1,5 @@
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+
 export const MOCK_GEO_SVG_PATH = 'illustrations/gitlab_geo.svg';
 
 export const MOCK_ISSUES_SVG_PATH = 'illustrations/issues.svg';
@@ -32,7 +34,7 @@ export const MOCK_BASIC_FETCH_RESPONSE = {
 };
 
 export const MOCK_BASIC_FETCH_DATA_MAP = {
-  data: MOCK_BASIC_FETCH_RESPONSE.data,
+  data: convertObjectPropsToCamelCase(MOCK_BASIC_FETCH_RESPONSE.data, { deep: true }),
   perPage: MOCK_BASIC_FETCH_RESPONSE.headers['x-per-page'],
   total: MOCK_BASIC_FETCH_RESPONSE.headers['x-total'],
 };

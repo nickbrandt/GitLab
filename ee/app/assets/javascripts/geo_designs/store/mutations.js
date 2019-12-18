@@ -1,6 +1,14 @@
 import * as types from './mutation_types';
 
 export default {
+  [types.SET_FILTER](state, filterIndex) {
+    state.currentPage = 1;
+    state.currentFilterIndex = filterIndex;
+  },
+  [types.SET_SEARCH](state, search) {
+    state.currentPage = 1;
+    state.searchFilter = search;
+  },
   [types.SET_PAGE](state, page) {
     state.currentPage = page;
   },
