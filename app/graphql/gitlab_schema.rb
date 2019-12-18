@@ -57,12 +57,23 @@ class GitlabSchema < GraphQL::Schema
       object.to_global_id
     end
 
+    # Find an object by looking it up from its global ID, passed as a string.
+    #
+    # This is the composition of 'parse_gid' and 'find_by_gid', see these
+    # methods for further documentation.
     def object_from_id(global_id, ctx = {})
       gid = parse_gid(global_id, ctx)
 
       find_by_gid(gid)
     end
 
+    # Find an object by looking it up from its 'GlobalID'.
+    #
+    # * For `ApplicationRecord`s, this is equivalent to
+    #   `global_id.model_class.find(gid.model_id)`, but more efficient.
+    # * For classes that implement `.lazy_find(global_id)`, this class method
+    #   will be called.
+    # * All other classes will use `GlobalID#find`
     def find_by_gid(gid)
       if gid.model_class < ApplicationRecord
         Gitlab::Graphql::Loaders::BatchModelLoader.new(gid.model_class, gid.model_id).find
@@ -73,6 +84,23 @@ class GitlabSchema < GraphQL::Schema
       end
     end
 
+    # Parse a string to a GlobalID, raising ArgumentError if there are problems
+    # with it.
+    #
+    # Problems that may occur:
+    #  * it may not be syntactically valid
+    #  * it may not match the expected type (see below)
+    #
+    # Options:
+    #  * :expected_type [Class] - the type of object this GlobalID should refer to.
+    #
+    # e.g.
+    #
+    # ```
+    #   gid = GitlabSchema.parse_gid(my_string, expected_type: ::Project)
+    #   project_id = gid.model_id
+    #   gid.model_class == ::Project
+    # ```
     def parse_gid(global_id, ctx = {})
       expected_type = ctx[:expected_type]
       gid = GlobalID.parse(global_id)

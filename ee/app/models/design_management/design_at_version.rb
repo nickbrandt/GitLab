@@ -35,7 +35,7 @@ module DesignManagement
     end
 
     def ==(other)
-      return false unless other.is_a?(self.class)
+      return false unless other && self.class == other.class
 
       other.id == id
     end
