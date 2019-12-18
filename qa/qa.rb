@@ -24,6 +24,7 @@ module QA
   module Runtime
     autoload :Release, 'qa/runtime/release'
     autoload :User, 'qa/runtime/user'
+    autoload :UserCalloutsHelper, 'qa/runtime/user_callouts_helper'
     autoload :Namespace, 'qa/runtime/namespace'
     autoload :Scenario, 'qa/runtime/scenario'
     autoload :Browser, 'qa/runtime/browser'

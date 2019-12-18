@@ -100,6 +100,12 @@ module QA
           title: @title
         }
       end
+
+      def visit!
+        Runtime::UserCalloutsHelper.dismiss_callout("tabs_position_highlight")
+        Runtime::UserCalloutsHelper.dismiss_callout("suggest_popover_dismissed")
+        super
+      end
     end
   end
 end
