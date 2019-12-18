@@ -562,23 +562,49 @@ describe('Cycle analytics actions', () => {
       });
 
       it('dispatches receiveUpdateStageError', done => {
+        const data = {
+          id: stageId,
+          ...payload,
+        };
         testAction(
           actions.updateStage,
-          {
-            id: stageId,
-            ...payload,
-          },
+          data,
           state,
           [],
           [
             { type: 'requestUpdateStage' },
             {
               type: 'receiveUpdateStageError',
-              payload: error,
+              payload: { error, data },
             },
           ],
           done,
         );
+      });
+
+      it('flashes an error if the stage name already exists', done => {
+        actions.receiveUpdateStageError(
+          {
+            commit: () => {},
+            state,
+          },
+          {
+            error: {
+              response: {
+                status: 422,
+                data: {
+                  errors: { name: ['is reserved'] },
+                },
+              },
+            },
+            data: {
+              name: stageId,
+            },
+          },
+        );
+
+        shouldFlashAMessage(`'${stageId}' stage already exists`);
+        done();
       });
 
       it('flashes an error message', done => {

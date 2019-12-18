@@ -259,9 +259,23 @@ export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => 
   dispatch('setSelectedStage', updatedData);
 };
 
-export const receiveUpdateStageError = ({ commit }) => {
+export const receiveUpdateStageError = (
+  { commit },
+  { error: { response: { status = 400, data: errorData } = {} } = {}, data },
+) => {
   commit(types.RECEIVE_UPDATE_STAGE_RESPONSE);
-  createFlash(__('There was a problem saving your custom stage, please try again'));
+  const ERROR_NAME_RESERVED = 'is reserved';
+
+  let message = __('There was a problem saving your custom stage, please try again');
+  if (status && status === httpStatus.UNPROCESSABLE_ENTITY) {
+    const { errors } = errorData;
+    const { name } = data;
+    if (errors.name && errors.name[0] === ERROR_NAME_RESERVED) {
+      message = __(`'${name}' stage already exists`);
+    }
+  }
+
+  createFlash(__(message));
 };
 
 export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
@@ -273,7 +287,7 @@ export const updateStage = ({ dispatch, state }, { id, ...rest }) => {
 
   return Api.cycleAnalyticsUpdateStage(id, fullPath, { ...rest })
     .then(({ data }) => dispatch('receiveUpdateStageSuccess', data))
-    .catch(error => dispatch('receiveUpdateStageError', error));
+    .catch(error => dispatch('receiveUpdateStageError', { error, data: { id, ...rest } }));
 };
 
 export const requestRemoveStage = ({ commit }) => commit(types.REQUEST_REMOVE_STAGE);

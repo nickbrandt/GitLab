@@ -399,6 +399,14 @@ describe 'Group Cycle Analytics', :js do
 
             expect(page.find(stage_save_button)[:disabled]).to eq "true"
           end
+
+          it 'with a default name' do
+            name = 'issue'
+            fill_in name_field, with: name
+            page.find(stage_save_button).click
+
+            expect(page.find('.flash-alert')).to have_text("'#{name}' stage already exists")
+          end
         end
       end
 
