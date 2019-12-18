@@ -15,7 +15,7 @@ import MavenInstallation from './maven_installation.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
-import { formatDate } from '~/lib/utils/datetime_utility';
+import { generatePackageInfo } from '../utils';
 import { __, s__, sprintf } from '~/locale';
 import { PackageType } from '../constants';
 
@@ -106,24 +106,7 @@ export default {
       );
     },
     packageInformation() {
-      return [
-        {
-          label: s__('Name'),
-          value: this.packageEntity.name,
-        },
-        {
-          label: s__('Version'),
-          value: this.packageEntity.version,
-        },
-        {
-          label: s__('Created on'),
-          value: formatDate(this.packageEntity.created_at),
-        },
-        {
-          label: s__('Updated at'),
-          value: formatDate(this.packageEntity.updated_at),
-        },
-      ];
+      return generatePackageInfo(this.packageEntity);
     },
     packageMetadataTitle() {
       switch (this.packageEntity.package_type) {

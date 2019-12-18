@@ -1,4 +1,5 @@
 export const PackageType = {
+  CONAN: 'conan',
   MAVEN: 'maven',
   NPM: 'npm',
 };

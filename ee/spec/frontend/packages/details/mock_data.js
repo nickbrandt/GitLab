@@ -1,3 +1,5 @@
+import { formatDate } from '~/lib/utils/datetime_utility';
+
 export const registryUrl = 'foo/registry';
 
 export const mavenMetadata = {
@@ -40,3 +42,34 @@ export const generateMavenSetupXml = () => `<repositories>
     <url>${registryUrl}</url>
   </snapshotRepository>
 </distributionManagement>`;
+
+export const generateCommonPackageInformation = packageEntity => [
+  {
+    label: 'Version',
+    value: packageEntity.version,
+  },
+  {
+    label: 'Created on',
+    value: formatDate(packageEntity.created_at),
+  },
+  {
+    label: 'Updated at',
+    value: formatDate(packageEntity.updated_at),
+  },
+];
+
+export const generateStandardPackageInformation = packageEntity => [
+  {
+    label: 'Name',
+    value: packageEntity.name,
+  },
+  ...generateCommonPackageInformation(packageEntity),
+];
+
+export const generateConanInformation = conanPackage => [
+  {
+    label: 'Recipe',
+    value: conanPackage.recipe,
+  },
+  ...generateCommonPackageInformation(conanPackage),
+];

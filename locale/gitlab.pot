@@ -14732,6 +14732,9 @@ msgstr ""
 msgid "Recent searches"
 msgstr ""
 
+msgid "Recipe"
+msgstr ""
+
 msgid "Recovery Codes"
 msgstr ""
 
