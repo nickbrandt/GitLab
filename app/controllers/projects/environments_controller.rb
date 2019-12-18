@@ -20,6 +20,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   def index
     @environments = project.environments
       .with_state(params[:scope] || :available)
+    @project = ProjectPresenter.new(project, current_user: current_user)
 
     respond_to do |format|
       format.html
