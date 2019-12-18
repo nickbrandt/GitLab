@@ -46,7 +46,7 @@ export default {
 </script>
 
 <template>
-  <gl-loading-icon v-if="isLoading" />
+  <gl-loading-icon v-if="isLoading" class="mt-2" />
   <package-list v-else @page:changed="onPageChanged" @package:delete="onPackageDeleteRequest">
     <template #empty-state>
       <gl-empty-state
