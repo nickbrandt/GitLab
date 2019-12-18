@@ -1,7 +1,9 @@
+import underscore from 'underscore';
 import {
   extractCurrentDiscussion,
   extractDiscussions,
   findVersionId,
+  designUploadOptimisticResponse,
 } from 'ee/design_management/utils/design_management_utils';
 
 describe('extractCurrentDiscussion', () => {
@@ -66,5 +68,38 @@ describe('version parser', () => {
     const testInvalidVersionString = `gid://gitlab/DesignManagement::Version`;
 
     expect(findVersionId(testInvalidVersionString)).toBeUndefined();
+  });
+});
+
+describe('optimistic responses', () => {
+  it('correctly generated for design upload', () => {
+    jest.spyOn(underscore, 'uniqueId').mockImplementation(() => 1);
+    const expectedResponse = {
+      __typename: 'Mutation',
+      designManagementUpload: {
+        __typename: 'DesignManagementUploadPayload',
+        designs: [
+          {
+            __typename: 'Design',
+            id: -1,
+            image: '',
+            filename: 'test',
+            fullPath: '',
+            notesCount: 0,
+            event: 'NONE',
+            diffRefs: { __typename: 'DiffRefs', baseSha: '', startSha: '', headSha: '' },
+            discussions: { __typename: 'DesignDiscussion', edges: [] },
+            versions: {
+              __typename: 'DesignVersionConnection',
+              edges: {
+                __typename: 'DesignVersionEdge',
+                node: { __typename: 'DesignVersion', id: -1, sha: -1 },
+              },
+            },
+          },
+        ],
+      },
+    };
+    expect(designUploadOptimisticResponse([{ name: 'test' }])).toEqual(expectedResponse);
   });
 });
