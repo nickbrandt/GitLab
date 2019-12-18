@@ -65,15 +65,11 @@ module Banzai
         extras
       end
 
-      private
-
-      def record_identifier(record)
-        record.id
-      end
-
       def parent_records(parent, ids)
         parent.commits_by(oids: ids.to_a)
       end
+
+      private
 
       def noteable
         context[:noteable]
