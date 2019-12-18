@@ -188,21 +188,22 @@ describe 'issue boards', :js do
   end
 
   context 'list settings' do
-    let!(:label) { create(:label, project: project, name: 'Brount') }
-    let!(:list) { create(:list, board: board, label: label, position: 1) }
-
     before do
       project.add_developer(user)
       login_as(user)
-      visit project_boards_path(project)
     end
 
     context 'When FF is turned on' do
-      it 'shows the list settings button' do
-        expect(page).to have_selector(:button, "List Settings")
+      let!(:label) { create(:label, project: project, name: 'Brount') }
+      let!(:list) { create(:list, board: board, label: label, position: 1) }
+
+      before do
+        stub_feature_flags(wip_limits: true)
+        visit project_boards_path(project)
       end
 
-      it 'does not show the board list settings sidebar as default state' do
+      it 'shows the list settings button' do
+        expect(page).to have_selector(:button, "List Settings")
         expect(page).not_to have_selector(".js-board-settings-sidebar")
       end
 
@@ -218,13 +219,13 @@ describe 'issue boards', :js do
     end
 
     context 'When FF is turned off' do
-      # https://gitlab.com/gitlab-org/gitlab/issues/118658
-      it 'does not show the list settings button', :quarantine do
-        stub_licensed_features(wip_limits: false)
-        expect(page).to have_no_selector(:button, "List Settings")
+      before do
+        stub_feature_flags(wip_limits: false)
+        visit project_boards_path(project)
       end
 
-      it 'does not show the board list settings sidebar' do
+      it 'does not show the list settings button' do
+        expect(page).to have_no_selector(:button, "List Settings")
         expect(page).not_to have_selector(".js-board-settings-sidebar")
       end
     end
