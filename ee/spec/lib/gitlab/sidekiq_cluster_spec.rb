@@ -128,19 +128,19 @@ describe Gitlab::SidekiqCluster do
     end
   end
 
+  # In the X_alive? checks, we check negative PIDs sometimes as a simple way
+  # to be sure the pids are definitely for non-existent processes.
+  # Note that -1 is special, and sends the signal to every process we have permission
+  # for, so we use -2, -3 etc
   describe '.all_alive?' do
     it 'returns true if all processes are alive' do
-      processes = [1]
-
-      allow(described_class).to receive(:signal).with(1, 0).and_return(true)
+      processes = [Process.pid]
 
       expect(described_class.all_alive?(processes)).to eq(true)
     end
 
     it 'returns false when a thread was not alive' do
-      processes = [1]
-
-      allow(described_class).to receive(:signal).with(1, 0).and_return(false)
+      processes = [-2]
 
       expect(described_class.all_alive?(processes)).to eq(false)
     end
@@ -148,19 +148,13 @@ describe Gitlab::SidekiqCluster do
 
   describe '.any_alive?' do
     it 'returns true if at least one process is alive' do
-      processes = [1, 2]
-
-      allow(described_class).to receive(:signal).with(1, 0).and_return(true)
-      allow(described_class).to receive(:signal).with(2, 0).and_return(false)
+      processes = [Process.pid, -2]
 
       expect(described_class.any_alive?(processes)).to eq(true)
     end
 
     it 'returns false when all threads are dead' do
-      processes = [1, 2]
-
-      allow(described_class).to receive(:signal).with(1, 0).and_return(false)
-      allow(described_class).to receive(:signal).with(2, 0).and_return(false)
+      processes = [-2, -3]
 
       expect(described_class.any_alive?(processes)).to eq(false)
     end
