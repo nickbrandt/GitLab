@@ -173,4 +173,11 @@ describe('packages_list', () => {
       expect(wrapper.emitted('page:changed')).toEqual([[2]]);
     });
   });
+
+  describe('table component', () => {
+    it('has stacked-md class', () => {
+      const table = findPackageListTable();
+      expect(table.classes()).toContain('b-table-stacked-md');
+    });
+  });
 });
