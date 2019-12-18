@@ -37,41 +37,41 @@ module QA
         let(:issue) { create_issue_resource }
         let(:epic)  { create_epic_resource(issue.project.group) }
 
-        it 'adds/removes issue to/from epic' do
-          epic.visit!
-
-          EE::Page::Group::Epic::Show.perform do |show|
-            show.add_issue_to_epic(issue.web_url)
-
-            expect(show).to have_related_issue_item
-
-            show.remove_issue_from_epic
-
-            expect(show).to have_no_related_issue_item
-          end
-        end
-
-        it 'comments on epic' do
-          epic.visit!
-
-          comment = 'My Epic Comment'
-          EE::Page::Group::Epic::Show.perform do |show|
-            show.add_comment_to_epic(comment)
+        context 'Visit epic first' do
+          before do
+            epic.visit!
           end
 
-          expect(page).to have_content(comment)
-        end
+          it 'adds/removes issue to/from epic' do
+            EE::Page::Group::Epic::Show.perform do |show|
+              show.add_issue_to_epic(issue.web_url)
 
-        it 'closes and reopens an epic' do
-          epic.visit!
+              expect(show).to have_related_issue_item
 
-          EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
+              show.remove_issue_from_epic
 
-          expect(page).to have_content('Closed')
+              expect(show).to have_no_related_issue_item
+            end
+          end
 
-          EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
+          it 'comments on epic' do
+            comment = 'My Epic Comment'
+            EE::Page::Group::Epic::Show.perform do |show|
+              show.add_comment_to_epic(comment)
+            end
 
-          expect(page).to have_content('Open')
+            expect(page).to have_content(comment)
+          end
+
+          it 'closes and reopens an epic' do
+            EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
+
+            expect(page).to have_content('Closed')
+
+            EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
+
+            expect(page).to have_content('Open')
+          end
         end
 
         it 'adds/removes issue to/from epic using quick actions' do
