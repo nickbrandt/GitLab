@@ -79,6 +79,7 @@ describe('error tracking actions', () => {
         query,
         {},
         [
+          { type: types.SET_CURSOR, payload: null },
           { type: types.SET_SEARCH_QUERY, payload: query },
           { type: types.ADD_RECENT_SEARCH, payload: query },
         ],
@@ -95,10 +96,7 @@ describe('error tracking actions', () => {
         actions.sortByField,
         field,
         {},
-        [
-          { type: types.SET_CURSOR, payload: undefined },
-          { type: types.SET_SORT_FIELD, payload: field },
-        ],
+        [{ type: types.SET_CURSOR, payload: null }, { type: types.SET_SORT_FIELD, payload: field }],
         [{ type: 'stopPolling' }, { type: 'startPolling' }],
       );
     });

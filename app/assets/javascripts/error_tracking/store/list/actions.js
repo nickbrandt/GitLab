@@ -76,14 +76,15 @@ export function clearRecentSearches({ commit }) {
 
 export const searchByQuery = ({ commit, dispatch }, query) => {
   const searchQuery = query.trim();
+  commit(types.SET_CURSOR, null);
   commit(types.SET_SEARCH_QUERY, searchQuery);
   commit(types.ADD_RECENT_SEARCH, searchQuery);
   dispatch('stopPolling');
   dispatch('startPolling');
 };
 
-export const sortByField = ({ commit, dispatch }, field, cursor) => {
-  commit(types.SET_CURSOR, cursor);
+export const sortByField = ({ commit, dispatch }, field) => {
+  commit(types.SET_CURSOR, null);
   commit(types.SET_SORT_FIELD, field);
   dispatch('stopPolling');
   dispatch('startPolling');
