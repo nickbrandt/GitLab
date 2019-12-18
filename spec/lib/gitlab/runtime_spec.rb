@@ -41,9 +41,11 @@ describe Gitlab::Runtime do
 
   context "unicorn" do
     let(:unicorn_type) { Module.new }
+    let(:unicorn_server_type) { Class.new }
 
     before do
       stub_const('::Unicorn', unicorn_type)
+      stub_const('::Unicorn::HttpServer', unicorn_server_type)
     end
 
     it "identifies itself" do

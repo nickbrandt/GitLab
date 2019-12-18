@@ -34,7 +34,7 @@ module Gitlab
 
       # For unicorn, we need to check for actual server instances to avoid false positives.
       def unicorn?
-        !!defined?(::Unicorn)
+        !!(defined?(::Unicorn) && defined?(::Unicorn::HttpServer))
       end
 
       def sidekiq?
