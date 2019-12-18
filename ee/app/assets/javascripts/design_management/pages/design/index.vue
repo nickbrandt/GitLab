@@ -52,7 +52,7 @@ export default {
       },
       projectPath: '',
       issueId: '',
-      errorMessage: null,
+      errorMessage: '',
     };
   },
   apollo: {

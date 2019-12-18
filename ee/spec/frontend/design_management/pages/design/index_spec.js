@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlAlert } from '@gitlab/ui';
 import { ApolloMutation } from 'vue-apollo';
 import DesignIndex from 'ee/design_management/pages/design/index.vue';
 import DesignDiscussion from 'ee/design_management/components/design_notes/design_discussion.vue';
@@ -91,6 +92,7 @@ describe('Design management design index page', () => {
     });
 
     expect(wrapper.element).toMatchSnapshot();
+    expect(wrapper.find(GlAlert)).toBeUndefined();
   });
 
   describe('when has no discussions', () => {
@@ -176,7 +178,7 @@ describe('Design management design index page', () => {
       });
   });
 
-  describe('flash', () => {
+  describe('with error', () => {
     beforeEach(() => {
       setDesign();
 
