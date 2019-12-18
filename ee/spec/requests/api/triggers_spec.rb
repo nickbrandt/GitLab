@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe API::Triggers do
   let(:user) { create(:user) }
-  let(:project) { create(:project, :repository, creator: user) }
+  let(:project) { create(:project, :repository, :auto_devops, creator: user) }
 
   describe 'POST /projects/:project_id/trigger/pipeline' do
     context 'when triggering a pipeline from a job token' do
