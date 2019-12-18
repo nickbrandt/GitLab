@@ -92,7 +92,7 @@ describe('Design management design index page', () => {
     });
 
     expect(wrapper.element).toMatchSnapshot();
-    expect(wrapper.find(GlAlert)).toBeUndefined();
+    expect(wrapper.find(GlAlert).exists()).toBe(false);
   });
 
   describe('when has no discussions', () => {

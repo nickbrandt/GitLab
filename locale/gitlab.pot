@@ -5000,10 +5000,16 @@ msgstr ""
 msgid "Could not create project"
 msgstr ""
 
+msgid "Could not delete %{design}. Please try again."
+msgstr ""
+
 msgid "Could not delete chat nickname %{chat_name}."
 msgstr ""
 
 msgid "Could not fetch projects"
+msgstr ""
+
+msgid "Could not find design"
 msgstr ""
 
 msgid "Could not remove the trigger."
@@ -6017,16 +6023,10 @@ msgstr ""
 msgid "DesignManagement|Are you sure you want to delete the selected designs?"
 msgstr ""
 
-msgid "DesignManagement|Could not add a new comment. Please try again"
+msgid "DesignManagement|Could not add a new comment. Please try again."
 msgstr ""
 
 msgid "DesignManagement|Could not create new discussion. Please try again."
-msgstr ""
-
-msgid "DesignManagement|Could not delete %{design}. Please try again"
-msgstr ""
-
-msgid "DesignManagement|Could not find design"
 msgstr ""
 
 msgid "DesignManagement|Delete"
@@ -6041,7 +6041,7 @@ msgstr ""
 msgid "DesignManagement|Deselect all"
 msgstr ""
 
-msgid "DesignManagement|Error uploading a new design. Please try again"
+msgid "DesignManagement|Error uploading a new design. Please try again."
 msgstr ""
 
 msgid "DesignManagement|Go back to designs"
@@ -6051,9 +6051,6 @@ msgid "DesignManagement|Go to next design"
 msgstr ""
 
 msgid "DesignManagement|Go to previous design"
-msgstr ""
-
-msgid "DesignManagement|Requested design version does not exist"
 msgstr ""
 
 msgid "DesignManagement|Requested design version does not exist. Showing latest version instead"
@@ -15193,6 +15190,9 @@ msgid "Request to link SAML account must be authorized"
 msgstr ""
 
 msgid "Requested %{time_ago}"
+msgstr ""
+
+msgid "Requested design version does not exist"
 msgstr ""
 
 msgid "Requests Profiles"

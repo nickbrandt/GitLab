@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Design management design index page flash GlAlert is rendered in correct position with correct content 1`] = `
+exports[`Design management design index page with error GlAlert is rendered in correct position with correct content 1`] = `
 <div
   class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
 >
