@@ -168,6 +168,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      post '/restore' => '/projects#restore', as: :restore
+
       resources :approvers, only: :destroy
       resources :approver_groups, only: :destroy
       resources :push_rules, constraints: { id: /\d+/ }, only: [:update]
