@@ -6,7 +6,7 @@ describe Banzai::Filter::AbstractReferenceFilter do
   let(:project) { create(:project) }
 
   describe '#references_per_parent' do
-    it 'returns a Hash containing references grouped per parent paths' do
+    it 'returns a Hash containing parsed references grouped per parent paths' do
       doc = Nokogiri::HTML.fragment("#1 #{project.full_path}#2")
       filter = described_class.new(doc, project: project)
 
@@ -16,7 +16,7 @@ describe Banzai::Filter::AbstractReferenceFilter do
       refs = filter.references_per_parent
 
       expect(refs).to be_an_instance_of(Hash)
-      expect(refs[project.full_path]).to eq(Set.new(%w[1 2]))
+      expect(refs[project.full_path]).to eq([1, 2].to_set)
     end
   end
 
@@ -26,7 +26,7 @@ describe Banzai::Filter::AbstractReferenceFilter do
       filter = described_class.new(doc, project: project)
 
       expect(filter).to receive(:references_per_parent)
-        .and_return({ project.full_path => Set.new(%w[1]) })
+        .and_return({ project.full_path => [1].to_set })
 
       expect(filter.parent_per_reference)
         .to eq({ project.full_path => project })
@@ -76,9 +76,13 @@ describe Banzai::Filter::AbstractReferenceFilter do
             filter.from_ref_cached('nonexistent/project')
           end
 
-          it "return an empty array for paths that don't exist" do
+          it "returns an empty array for paths that don't exist" do
             expect(filter.find_for_paths(['nonexistent/project']))
               .to eq([])
+          end
+
+          it "does not touch the database" do
+            expect { filter.find_for_paths(['nonexistent/project']) }.not_to exceed_query_limit(0)
           end
         end
       end
