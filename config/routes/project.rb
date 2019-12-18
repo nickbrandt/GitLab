@@ -554,8 +554,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
                                             :forks, :group_links, :import, :avatar, :mirror,
                                             :cycle_analytics, :mattermost, :variables, :triggers,
                                             :environments, :protected_environments, :error_tracking,
-                                            :serverless, :clusters, :audit_events, :wikis, :merge_requests,
-                                            :blob, :tree, :raw, :blame, :commits, :create_dir, :find_file, :files)
+                                            :serverless, :clusters, :audit_events, :wikis, :merge_requests)
     end
 
     # rubocop: disable Cop/PutProjectRoutesUnderScope
