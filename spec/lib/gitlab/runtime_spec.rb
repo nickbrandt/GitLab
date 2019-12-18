@@ -3,12 +3,6 @@
 require 'spec_helper'
 
 describe Gitlab::Runtime do
-  REAL_PATH = $0
-
-  after(:all) do
-    $0 = REAL_PATH
-  end
-
   context "when unknown" do
     it "identifies as :unknown" do
       expect(subject.name).to eq(:unknown)
@@ -17,7 +11,6 @@ describe Gitlab::Runtime do
 
   context "on multiple matches" do
     before do
-      $0 = '/data/cache/bundle-2.5/bin/puma'
       stub_const('::Puma', double)
       stub_const('::Rails::Console', double)
     end
@@ -31,7 +24,6 @@ describe Gitlab::Runtime do
     let(:puma_type) { double('::Puma') }
 
     before do
-      $0 = '/data/cache/bundle-2.5/bin/puma'
       stub_const('::Puma', puma_type)
     end
 
@@ -49,12 +41,9 @@ describe Gitlab::Runtime do
 
   context "unicorn" do
     let(:unicorn_type) { Module.new }
-    let(:unicorn_server_type) { Class.new }
 
     before do
-      $0 = 'unicorn_rails master -E development -c /tmp/unicorn.rb -l 0.0.0.0:8080'
       stub_const('::Unicorn', unicorn_type)
-      stub_const('::Unicorn::HttpServer', unicorn_server_type)
     end
 
     it "identifies itself" do
@@ -73,7 +62,6 @@ describe Gitlab::Runtime do
     let(:sidekiq_type) { double('::Sidekiq') }
 
     before do
-      $0 = '/data/cache/bundle-2.5/bin/sidekiq'
       stub_const('::Sidekiq', sidekiq_type)
       allow(sidekiq_type).to receive(:server?).and_return(true)
     end
@@ -94,7 +82,6 @@ describe Gitlab::Runtime do
     let(:console_type) { double('::Rails::Console') }
 
     before do
-      $0 = 'bin/rails'
       stub_const('::Rails::Console', console_type)
     end
 

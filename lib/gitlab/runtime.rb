@@ -18,16 +18,16 @@ module Gitlab
       end
 
       def puma?
-        !!(defined?(::Puma) && bin == 'puma')
+        !!defined?(::Puma)
       end
 
       # For unicorn, we need to check for actual server instances to avoid false positives.
       def unicorn?
-        !!(defined?(::Unicorn) && defined?(::Unicorn::HttpServer))
+        !!defined?(::Unicorn)
       end
 
       def sidekiq?
-        !!(defined?(::Sidekiq) && Sidekiq.server? && bin == 'sidekiq')
+        !!Sidekiq.server?
       end
 
       def console?
@@ -40,22 +40,6 @@ module Gitlab
 
       def multi_threaded?
         puma? || sidekiq?
-      end
-
-      private
-
-      # Some example values from my system:
-      #   puma: /data/cache/bundle-2.5/bin/puma
-      #   unicorn: unicorn_rails master -E development -c /tmp/unicorn.rb -l 0.0.0.0:8080
-      #   sidekiq: /data/cache/bundle-2.5/bin/sidekiq
-      #   thin: bin/rails
-      #   console: bin/rails
-      def script_name
-        $0
-      end
-
-      def bin
-        File.basename(script_name)
       end
     end
   end
