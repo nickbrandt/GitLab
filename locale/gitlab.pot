@@ -11548,6 +11548,9 @@ msgstr ""
 msgid "More actions"
 msgstr ""
 
+msgid "More details"
+msgstr ""
+
 msgid "More info"
 msgstr ""
 
