@@ -135,8 +135,8 @@ module Gitlab
           setter = "#{key.delete_suffix('_id')}=".to_sym
           next unless object.respond_to?(key) && object.respond_to?(setter)
 
-          if object.public_send(key) == value&.id
-            object.public_send(setter, value)
+          if object.public_send(key) == value&.id # rubocop:disable GitlabSecurity/PublicSend
+            object.public_send(setter, value) # rubocop:disable GitlabSecurity/PublicSend
           end
         end
 
