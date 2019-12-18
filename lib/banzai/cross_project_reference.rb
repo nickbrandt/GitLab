@@ -17,6 +17,10 @@ module Banzai
       return context[:project] || context[:group] unless ref
       return context[:project] if context[:project]&.full_path == ref
 
+      find_parent(ref)
+    end
+
+    def find_parent(ref)
       Project.find_by_full_path(ref)
     end
   end
