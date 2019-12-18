@@ -3,12 +3,10 @@
 module Banzai
   module Filter
     class IssuableReferenceFilter < AbstractReferenceFilter
+      include FindByParent
+
       def record_identifier(record)
         record.iid.to_i
-      end
-
-      def find_object(parent, iid)
-        records_per_parent[parent][iid]
       end
 
       def parent_from_ref(ref)
