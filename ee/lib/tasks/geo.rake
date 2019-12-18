@@ -219,7 +219,7 @@ namespace :geo do
     abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
 
     ActiveRecord::Base.transaction do
-      primary_node = Gitlab::Geo.primary_node
+      primary_node = GeoNode.primary_node
 
       unless primary_node
         abort 'The primary is not set'
@@ -227,7 +227,7 @@ namespace :geo do
 
       primary_node.destroy
 
-      current_node = Gitlab::Geo.current_node
+      current_node = GeoNode.current_node
 
       unless current_node.secondary?
         abort 'This is not a secondary node'
