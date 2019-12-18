@@ -14,7 +14,7 @@ class FixMaxPagesSize < ActiveRecord::Migration[5.2]
 
   def up
     table = ApplicationSetting.arel_table
-    ApplicationSetting.where(table[:max_pages_size].gt(MAX_SIZE)).update(max_pages_size: MAX_SIZE)
+    ApplicationSetting.where(table[:max_pages_size].gt(MAX_SIZE)).update_all(max_pages_size: MAX_SIZE)
   end
 
   def down
