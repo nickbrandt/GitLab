@@ -105,7 +105,7 @@ describe('error tracking actions', () => {
     });
   });
 
-  describe('setEnpoint', () => {
+  describe('setEndpoint', () => {
     it('should set search endpoint', () => {
       const endpoint = 'https://sentry.io';
 
