@@ -276,35 +276,7 @@ module Banzai
         result = klass.where_full_path_in(paths)
         return result if parent_type == :group
 
-        result.includes(:namespace) if parent_type == :project
-      end
-
-      # Returns projects for the given paths.
-      def find_for_paths(paths)
-        if Gitlab::SafeRequestStore.active?
-          cache = refs_cache
-          to_query = paths - cache.keys
-
-          unless to_query.empty?
-            records = relation_for_paths(to_query)
-
-            found = []
-            records.each do |record|
-              ref = record.full_path
-              get_or_set_cache(cache, ref) { record }
-              found << ref
-            end
-
-            not_found = to_query - found
-            not_found.each do |ref|
-              get_or_set_cache(cache, ref) { nil }
-            end
-          end
-
-          cache.slice(*paths).values.compact
-        else
-          relation_for_paths(paths)
-        end
+        result.includes(namespace: [:route]) if parent_type == :project
       end
 
       def current_parent_path
@@ -325,7 +297,11 @@ module Banzai
       end
 
       def refs_cache
-        Gitlab::SafeRequestStore["banzai_#{parent_type}_refs".to_sym] ||= {}
+        if Gitlab::SafeRequestStore.active?
+          Gitlab::SafeRequestStore["banzai_#{parent_type}_refs".to_sym] ||= {}
+        else
+          @refs_cache ||= {}
+        end
       end
 
       def parent_type
