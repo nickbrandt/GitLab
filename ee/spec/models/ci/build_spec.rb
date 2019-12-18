@@ -198,7 +198,7 @@ describe Ci::Build do
 
       context 'when there is a corrupted license management report' do
         before do
-          create(:ee_ci_job_artifact, :corrupted_license_management_report, job: job, project: job.project)
+          create(:ee_ci_job_artifact, :license_scan, :with_corrupted_data, job: job, project: job.project)
         end
 
         it 'raises an error' do

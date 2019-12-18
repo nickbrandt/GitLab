@@ -15,7 +15,7 @@ module Projects
 
           license_compliance = project.license_compliance
           render json: serializer.represent(
-            pageable(license_compliance.policies),
+            pageable(matching_policies_from(license_compliance)),
             build: license_compliance.latest_build_for_default_branch
           )
         end
@@ -63,6 +63,14 @@ module Projects
 
     def render_error_for(result)
       render json: { errors: result[:message].as_json }, status: result.fetch(:http_status, :unprocessable_entity)
+    end
+
+    def matching_policies_from(license_compliance)
+      if params[:detected]
+        license_compliance.detected_policies
+      else
+        license_compliance.policies
+      end
     end
   end
 end

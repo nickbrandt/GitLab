@@ -26,5 +26,15 @@ describe LicenseEntity do
         components: [{ name: 'rails', blob_path: path }]
       })
     end
+
+    context "when the url is blank" do
+      where(url: ['', nil])
+
+      with_them do
+        let(:license) { build(:license_scanning_license, :unknown) }
+
+        it { expect(subject[:url]).to be_nil }
+      end
+    end
   end
 end
