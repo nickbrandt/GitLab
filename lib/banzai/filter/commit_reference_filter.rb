@@ -6,6 +6,8 @@ module Banzai
     #
     # This filter supports cross-project references.
     class CommitReferenceFilter < AbstractReferenceFilter
+      include FindByParent
+
       self.reference_type = :commit
 
       def self.object_class
