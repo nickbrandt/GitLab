@@ -28,7 +28,7 @@ describe('Dependencies getters', () => {
   describe('downloadEndpoint', () => {
     it('should return download endpoint', () => {
       const endpoint = `${TEST_HOST}/dependencies`;
-      expect(getters.downloadEndpoint({ endpoint })).toBe(`${TEST_HOST}/dependencies.json`);
+      expect(getters.downloadEndpoint({ endpoint })).toBe(endpoint);
     });
   });
 
