@@ -4,7 +4,7 @@ require 'vulnerabilities/occurrence_serializer'
 
 module Gitlab
   module Vulnerabilities
-    class Occurence
+    class Occurrence
       attr_reader :vulnerable, :params, :user, :request, :response
 
       def initialize(vulnerable, params, user, request, response)
@@ -43,7 +43,7 @@ module Gitlab
         occurrences = []
 
         project_ids_to_fetch.each do |project_id|
-          occurrences += Gitlab::Vulnerabilities::OccurenceCache
+          occurrences += Gitlab::Vulnerabilities::OccurrenceCache
             .new(vulnerable, project_id, user)
             .fetch
         end
@@ -52,7 +52,7 @@ module Gitlab
       end
 
       def order(vulnerabilities)
-        ordered = vulnerabilities.sort { |x| x['id'] }.sort_by do |x|
+        ordered = vulnerabilities.sort { |x| x['id'] }.reverse.sort_by do |x|
           [
             ::Vulnerabilities::Occurrence::SEVERITY_LEVELS[x['severity']],
             ::Vulnerabilities::Occurrence::CONFIDENCE_LEVELS[x['confidence']]
@@ -63,7 +63,7 @@ module Gitlab
       end
 
       def use_vulnerability_cache?
-        Feature.enabled?(:cache_vulnerability_occurence, vulnerable) && !dynamic_filters_included?
+        Feature.enabled?(:cache_vulnerability_occurrence, vulnerable) && !dynamic_filters_included?
       end
 
       def dynamic_filters_included?

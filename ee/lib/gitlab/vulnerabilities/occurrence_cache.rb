@@ -2,7 +2,7 @@
 
 module Gitlab
   module Vulnerabilities
-    class OccurenceCache
+    class OccurrenceCache
       attr_reader :vulnerable, :project_id, :user
 
       def initialize(vulnerable, project_id, user)
@@ -26,7 +26,7 @@ module Gitlab
       private
 
       def cache_key
-        ['project', project_id, 'findings-occurence']
+        ['project', project_id, 'findings-occurrence']
       end
     end
   end
