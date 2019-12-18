@@ -7795,6 +7795,9 @@ msgstr ""
 msgid "Filter by milestone name"
 msgstr ""
 
+msgid "Filter by name..."
+msgstr ""
+
 msgid "Filter by two-factor authentication"
 msgstr ""
 

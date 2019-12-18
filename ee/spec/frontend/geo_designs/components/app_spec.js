@@ -6,6 +6,7 @@ import store from 'ee/geo_designs/store';
 import GeoDesignsDisabled from 'ee/geo_designs/components/geo_designs_disabled.vue';
 import GeoDesigns from 'ee/geo_designs/components/geo_designs.vue';
 import GeoDesignsEmptyState from 'ee/geo_designs/components/geo_designs_empty_state.vue';
+import GeoDesignsFilterBar from 'ee/geo_designs/components/geo_designs_filter_bar.vue';
 import {
   MOCK_GEO_SVG_PATH,
   MOCK_ISSUES_SVG_PATH,
@@ -60,6 +61,7 @@ describe('GeoDesignsApp', () => {
   const findGlLoadingIcon = () => findGeoDesignsContainer().find(GlLoadingIcon);
   const findGeoDesigns = () => findGeoDesignsContainer().find(GeoDesigns);
   const findGeoDesignsEmptyState = () => findGeoDesignsContainer().find(GeoDesignsEmptyState);
+  const findGeoDesignsFilterBar = () => findGeoDesignsContainer().find(GeoDesignsFilterBar);
 
   describe('template', () => {
     beforeEach(() => {
@@ -97,6 +99,10 @@ describe('GeoDesignsApp', () => {
 
       it('shows designs enabled container', () => {
         expect(findGeoDesignsEnabledContainer().exists()).toBe(true);
+      });
+
+      it('renders the filter bar', () => {
+        expect(findGeoDesignsFilterBar().exists()).toBe(true);
       });
 
       describe('when isLoading = true', () => {

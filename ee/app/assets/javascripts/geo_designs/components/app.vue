@@ -2,6 +2,7 @@
 import { mapActions, mapState } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import GeoDesignsFilterBar from './geo_designs_filter_bar.vue';
 import GeoDesigns from './geo_designs.vue';
 import GeoDesignsEmptyState from './geo_designs_empty_state.vue';
 import GeoDesignsDisabled from './geo_designs_disabled.vue';
@@ -10,6 +11,7 @@ export default {
   name: 'GeoDesignsApp',
   components: {
     GlLoadingIcon,
+    GeoDesignsFilterBar,
     GeoDesigns,
     GeoDesignsEmptyState,
     GeoDesignsDisabled,
@@ -56,6 +58,7 @@ export default {
 <template>
   <article class="geo-designs-container">
     <section v-if="designsEnabled">
+      <geo-designs-filter-bar />
       <gl-loading-icon v-if="isLoading" size="xl" />
       <template v-else>
         <geo-designs v-if="hasDesigns" />

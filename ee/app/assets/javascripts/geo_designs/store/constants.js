@@ -20,3 +20,5 @@ export const STATUS_ICON_CLASS = {
   [FILTER_STATES.FAILED]: 'text-danger',
   [DEFAULT_STATUS]: 'text-muted',
 };
+
+export const DEFAULT_SEARCH_DELAY = 500;
