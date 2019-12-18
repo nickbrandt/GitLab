@@ -19,7 +19,7 @@ describe Gitlab::Ci::Parsers::Security::DependencyList do
       let(:artifact) { create(:ee_ci_job_artifact, :dependency_list) }
 
       it 'parses all files' do
-        blob_path = "/#{project.full_path}/-/blob/#{sha}/yarn/yarn.lock"
+        blob_path = "/#{project.full_path}/blob/#{sha}/yarn/yarn.lock"
 
         expect(report.dependencies.size).to eq(21)
         expect(report.dependencies[0][:name]).to eq('mini_portile2')
