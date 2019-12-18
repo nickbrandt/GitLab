@@ -264,40 +264,6 @@ describe ProjectsController do
       end
     end
 
-    context 'when max_pages_size param is specified' do
-      let(:params) { { max_pages_size: 100 } }
-
-      let(:request) do
-        put :update, params: { namespace_id: project.namespace, id: project, project: params }
-      end
-
-      before do
-        stub_licensed_features(pages_size_limit: true)
-      end
-
-      context 'when user is an admin' do
-        let(:admin) { create(:admin) }
-
-        before do
-          sign_in(admin)
-        end
-
-        it 'updates max_pages_size' do
-          request
-
-          expect(project.reload.max_pages_size).to eq(100)
-        end
-      end
-
-      context 'when user is not an admin' do
-        it 'does not update max_pages_size' do
-          request
-
-          expect(project.reload.max_pages_size).to eq(nil)
-        end
-      end
-    end
-
     context 'repository mirrors' do
       let(:params) do
         {
