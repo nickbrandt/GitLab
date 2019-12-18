@@ -73,6 +73,7 @@ module Banzai
       # Implement in child class
       # Example: project.merge_requests.find
       def find_object(parent_object, id)
+        raise NotImplementedError
       end
 
       # Override if the link reference pattern produces a different ID (global
@@ -84,6 +85,7 @@ module Banzai
       # Implement in child class
       # Example: project_merge_request_url
       def url_for_object(object, parent_object)
+        raise NotImplementedError
       end
 
       def find_object_cached(parent_object, id)
