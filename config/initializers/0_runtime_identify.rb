@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 begin
-  Gitlab::AppLogger.info("Runtime: #{Gitlab::Runtime.name}")
+  current_runtime = Gitlab::Runtime.identify
+  Gitlab::AppLogger.info("Process #{Process.pid} (#{$0}) identified as: #{current_runtime}")
 rescue => e
   message = <<-NOTICE
   \n!! RUNTIME IDENTIFICATION FAILED: #{e}
@@ -10,4 +11,5 @@ rescue => e
   https://gitlab.com/gitlab-org/gitlab/issues/new
   NOTICE
   Gitlab::AppLogger.error(message)
+  Gitlab::ErrorTracking.track_exception(e)
 end

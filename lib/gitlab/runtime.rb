@@ -4,17 +4,28 @@ module Gitlab
   # Provides routines to identify the current runtime as which the application
   # executes, such as whether it is an application server and which one.
   module Runtime
+    AmbiguousProcessError = Class.new(StandardError)
+    UnknownProcessError = Class.new(StandardError)
+
     class << self
-      def name
+      def identify
         matches = []
         matches << :puma if puma?
         matches << :unicorn if unicorn?
         matches << :console if console?
         matches << :sidekiq if sidekiq?
 
-        raise "Ambiguous process match: #{matches}" if matches.size > 1
-
-        matches.first || :unknown
+        if matches.one?
+          matches.first
+        elsif matches.none?
+          raise UnknownProcessError.new(
+            "Failed to identify runtime for process #{Process.pid} (#{$0})"
+          )
+        else
+          raise AmbiguousProcessError.new(
+            "Ambiguous runtime #{matches} for process #{Process.pid} (#{$0})"
+          )
+        end
       end
 
       def puma?

@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe Gitlab::Runtime do
   context "when unknown" do
-    it "identifies as :unknown" do
-      expect(subject.name).to eq(:unknown)
+    it "raises an exception when trying to identify" do
+      expect { subject.identify }.to raise_error(subject::UnknownProcessError)
     end
   end
 
@@ -16,7 +16,7 @@ describe Gitlab::Runtime do
     end
 
     it "raises an exception when trying to identify" do
-      expect { subject.name }.to raise_error(RuntimeError, "Ambiguous process match: [:puma, :console]")
+      expect { subject.identify }.to raise_error(subject::AmbiguousProcessError)
     end
   end
 
@@ -28,7 +28,7 @@ describe Gitlab::Runtime do
     end
 
     it "identifies itself" do
-      expect(subject.name).to eq(:puma)
+      expect(subject.identify).to eq(:puma)
       expect(subject.puma?).to be(true)
     end
 
@@ -47,7 +47,7 @@ describe Gitlab::Runtime do
     end
 
     it "identifies itself" do
-      expect(subject.name).to eq(:unicorn)
+      expect(subject.identify).to eq(:unicorn)
       expect(subject.unicorn?).to be(true)
     end
 
@@ -67,7 +67,7 @@ describe Gitlab::Runtime do
     end
 
     it "identifies itself" do
-      expect(subject.name).to eq(:sidekiq)
+      expect(subject.identify).to eq(:sidekiq)
       expect(subject.sidekiq?).to be(true)
     end
 
@@ -86,7 +86,7 @@ describe Gitlab::Runtime do
     end
 
     it "identifies itself" do
-      expect(subject.name).to eq(:console)
+      expect(subject.identify).to eq(:console)
       expect(subject.console?).to be(true)
     end
 
