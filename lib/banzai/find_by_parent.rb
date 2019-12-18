@@ -35,6 +35,40 @@ module Banzai
         end
       end
 
+      # Returns a Hash containing all object references (e.g. issue IDs) per the
+      # project they belong to.
+      #
+      # e.g.
+      #   references_per_parent = {
+      #     project: {
+      #       'some-path/to-a-project' => Set.new(1,2,3),
+      #       'some-path/to-b-project' => Set.new(1,2),
+      #     }
+      #    }
+      def references_per_parent
+        @references_per ||= {}
+
+        @references_per[parent_type] ||= begin
+          refs = Hash.new { |hash, key| hash[key] = Set.new }
+          regex = Regexp.union([object_class.reference_pattern, object_class.link_reference_pattern].compact)
+
+          nodes.each do |node|
+            node.to_html.scan(regex) do
+              path = if parent_type == :project
+                       full_project_path($~[:namespace], $~[:project])
+                     else
+                       full_group_path($~[:group])
+                     end
+
+              symbol = symbol_from_match($~)
+              refs[path] << self.class.parse_symbol(symbol, $~) if object_class.reference_valid?(symbol)
+            end
+          end
+
+          refs
+        end
+      end
+
       def record_identifier(record)
         record.id
       end
@@ -53,6 +87,34 @@ module Banzai
 
           find_for_paths(refs.to_a).index_by(&:full_path)
         end
+      end
+
+      def find_parent(ref)
+        find_for_paths([ref]).first
+      end
+
+      # Returns projects for the given paths.
+      def find_for_paths(paths)
+        cache = refs_cache
+        to_query = paths - cache.keys
+
+        unless to_query.empty?
+          records = relation_for_paths(to_query)
+
+          found = []
+          records.each do |record|
+            ref = record.full_path
+            get_or_set_cache(cache, ref) { record }
+            found << ref
+          end
+
+          not_found = to_query - found
+          not_found.each do |ref|
+            get_or_set_cache(cache, ref) { nil }
+          end
+        end
+
+        cache.slice(*paths).values.compact
       end
 
       # Implement this method to make use of `records_per_parent`

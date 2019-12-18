@@ -258,49 +258,6 @@ module Banzai
         text
       end
 
-      # Returns a Hash containing all object references (e.g. issue IDs) per the
-      # project they belong to.
-      def references_per_parent
-        @references_per ||= {}
-
-        @references_per[parent_type] ||= begin
-          refs = Hash.new { |hash, key| hash[key] = Set.new }
-
-          regex = Regexp.union(object_class.reference_pattern, object_class.link_reference_pattern)
-
-          nodes.each do |node|
-            node.to_html.scan(regex) do
-              path = if parent_type == :project
-                       full_project_path($~[:namespace], $~[:project])
-                     else
-                       full_group_path($~[:group])
-                     end
-
-              symbol = $~[object_sym]
-              refs[path] << symbol if object_class.reference_valid?(symbol)
-            end
-          end
-
-          refs
-        end
-      end
-
-      # Returns a Hash containing referenced projects grouped per their full
-      # path.
-      def parent_per_reference
-        @per_reference ||= {}
-
-        @per_reference[parent_type] ||= begin
-          refs = Set.new
-
-          references_per_parent.each do |ref, _|
-            refs << ref
-          end
-
-          find_for_paths(refs.to_a).index_by(&:full_path)
-        end
-      end
-
       def relation_for_paths(paths)
         klass = parent_type.to_s.camelize.constantize
         result = klass.where_full_path_in(paths)
@@ -343,24 +300,6 @@ module Banzai
 
       def current_project_namespace_path
         @current_project_namespace_path ||= project&.namespace&.full_path
-      end
-
-      def records_per_parent
-        @_records_per_project ||= {}
-
-        @_records_per_project[object_class.to_s.underscore] ||= begin
-          hash = Hash.new { |h, k| h[k] = {} }
-
-          parent_per_reference.each do |path, parent|
-            record_ids = references_per_parent[path]
-
-            parent_records(parent, record_ids).each do |record|
-              hash[parent][record_identifier(record)] = record
-            end
-          end
-
-          hash
-        end
       end
 
       private
