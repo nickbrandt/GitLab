@@ -253,7 +253,7 @@ const GUIDED_GITLAB_TOUR = [
     },
   },
   {
-    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/merge_requests$`, ''),
+    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/merge_requests$`, ''),
     getHelpContent: () => [
       {
         text: s__(
@@ -270,7 +270,7 @@ const GUIDED_GITLAB_TOUR = [
     },
   },
   {
-    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/merge_requests/[0-9]+$`, ''),
+    forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/merge_requests/[0-9]+$`, ''),
     getHelpContent: () => [
       {
         text: sprintf(
