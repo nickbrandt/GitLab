@@ -38,7 +38,7 @@ module Gitlab
       end
 
       def sidekiq?
-        !!Sidekiq.server?
+        !!(defined?(::Sidekiq) && Sidekiq.server?)
       end
 
       def console?
