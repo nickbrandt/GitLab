@@ -9,7 +9,7 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
 
   DOWNTIME = false
   MIGRATION = 'ActivatePrometheusServicesForSharedClusterApplications'.freeze
-  BATCH_SIZE = 1_000
+  BATCH_SIZE = 500
   DELAY = 2.minutes
 
   disable_ddl_transaction!
@@ -59,10 +59,10 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
   end
 
   def up
-    projects_without_active_prometheus_service.group('projects.id').each_batch(of: migrate_instance_cluster? ? BATCH_SIZE * 5 : BATCH_SIZE) do |batch, index|
-      range = batch.pluck('projects.id')
+    projects_without_active_prometheus_service.group('projects.id').each_batch(of: BATCH_SIZE) do |batch, index|
+      bg_migrations_batch = batch.select('projects.id').map { |project| [MIGRATION, project.id] }
       delay = index * DELAY
-      BackgroundMigrationWorker.perform_in(delay.seconds, MIGRATION, range)
+      BackgroundMigrationWorker.bulk_perform_in(delay.seconds, bg_migrations_batch)
     end
   end
 

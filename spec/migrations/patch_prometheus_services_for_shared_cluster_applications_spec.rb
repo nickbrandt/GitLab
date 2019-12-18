@@ -78,12 +78,14 @@ describe PatchPrometheusServicesForSharedClusterApplications, :migration, :sidek
       it 'schedules a background migration' do
         Sidekiq::Testing.fake! do
           Timecop.freeze do
+            background_migrations = [["ActivatePrometheusServicesForSharedClusterApplications", project_with_inactive_service.id],
+                                     ["ActivatePrometheusServicesForSharedClusterApplications", project_with_active_not_prometheus_service.id],
+                                     ["ActivatePrometheusServicesForSharedClusterApplications", project_with_inactive_not_prometheus_service.id]]
+
             migrate!
 
-            expect(migration_name).to be_scheduled_delayed_migration_with_array(120.seconds, [project_with_inactive_service.id,
-                                                                                              project_with_active_not_prometheus_service.id,
-                                                                                              project_with_inactive_not_prometheus_service.id])
-            expect(BackgroundMigrationWorker.jobs.size).to eq 1
+            enqueued_migrations = BackgroundMigrationWorker.jobs.map { |job| job['args'] }
+            expect(enqueued_migrations).to match_array background_migrations
           end
         end
       end

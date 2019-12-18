@@ -8,7 +8,6 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
   let(:services) { table(:services) }
   let(:namespace) { namespaces.create(name: 'user', path: 'user') }
   let(:project) { projects.create(namespace_id: namespace.id) }
-  let!(:project_records) { [project] }
   let(:columns) do
     %w(project_id active properties type template push_events
        issues_events merge_requests_events tag_push_events
@@ -47,20 +46,20 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
 
   describe '#perform' do
     it 'is idempotent' do
-      subject.perform(project_records.map(&:id))
+      expect { subject.perform(project.id) }.to change { services.order(:id).map { |row| row.attributes } }
 
-      expect { subject.perform(project_records.map(&:id)) }.not_to change { services.order(:id).map { |row| row.attributes } }
+      expect { subject.perform(project.id) }.not_to change { services.order(:id).map { |row| row.attributes } }
     end
 
     context 'non prometheus services' do
       let(:other_type) { 'SomeOtherService' }
 
       before do
-        project_records.each { |proj| services.create(service_params_for(proj).merge(type: other_type)) }
+        services.create(service_params_for(project).merge(type: other_type))
       end
 
       it 'does not change them' do
-        expect { subject.perform(project_records.map(&:id)) }.not_to change { services.where(type: other_type).order(:id).map { |row| row.attributes } }
+        expect { subject.perform(project.id) }.not_to change { services.where(type: other_type).order(:id).map { |row| row.attributes } }
       end
     end
 
@@ -68,67 +67,47 @@ describe Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedCluster
       let(:properties) { '{"api_url":"http://test.dev","manual_configuration":"1"}' }
 
       before do
-        project_records.each { |proj| services.create(service_params_for(proj).merge(properties: properties, active: false)) }
+        services.create(service_params_for(project).merge(properties: properties, active: false))
       end
 
       it 'does not change them' do
-        expect { subject.perform(project_records.map(&:id)) }.not_to change { services.order(:id).map { |row| row.attributes } }
+        expect { subject.perform(project.id) }.not_to change { services.order(:id).map { |row| row.attributes } }
       end
     end
 
     context 'prometheus integration services do not exist' do
       it 'creates missing services entries' do
-        subject.perform(project_records.map(&:id))
+        subject.perform(project.id)
 
         rows = services.order(:id).map { |row| row.attributes.slice(*columns).symbolize_keys }
 
-        expect(expected_rows(project_records)).to eq rows
+        expect(expected_rows([project])).to eq rows
       end
     end
 
     context 'prometheus integration services exist' do
       context 'in active state' do
         before do
-          project_records.each { |proj| services.create(service_params_for(proj)) }
+          services.create(service_params_for(project))
         end
 
         it 'does not change them' do
-          expect { subject.perform(project_records.map(&:id)) }.not_to change { services.order(:id).map { |row| row.attributes } }
+          expect { subject.perform(project.id) }.not_to change { services.order(:id).map { |row| row.attributes } }
         end
       end
 
       context 'not in active state' do
         before do
-          project_records.each { |proj| services.create(service_params_for(proj).merge(active: false)) }
+          services.create(service_params_for(project).merge(active: false))
         end
 
         it 'sets active attribute to true' do
-          rows_before = expected_rows(project_records).map { |row| row.merge(active: false) }
+          rows_before = expected_rows([project]).map { |row| row.merge(active: false) }
 
-          expect { subject.perform(project_records.map(&:id)) }
+          expect { subject.perform(project.id) }
             .to change { services.order(:id).map { |row| row.attributes.slice(*columns).symbolize_keys } }
-              .from(rows_before).to(expected_rows(project_records))
+              .from(rows_before).to(expected_rows([project]))
         end
-      end
-    end
-
-    context 'with partially missing services' do
-      let(:project_with_active_service) { projects.create(namespace_id: namespace.id) }
-      let(:project_with_inactive_service) { projects.create(namespace_id: namespace.id) }
-      let(:project_records) { [project, project_with_active_service, project_with_inactive_service] }
-
-      before do
-        services.create(service_params_for(project_with_active_service))
-        services.create(service_params_for(project_with_inactive_service).merge(active: false))
-      end
-
-      it 'updates not active service and inserts missing ones' do
-        subject.perform(project_records.map(&:id))
-
-        rows = services.order(:project_id).map { |row| row.attributes.slice(*columns).symbolize_keys }
-
-        expect(expected_rows(project_records)).to eq rows
-        expect(rows.size).to be 3
       end
     end
   end
