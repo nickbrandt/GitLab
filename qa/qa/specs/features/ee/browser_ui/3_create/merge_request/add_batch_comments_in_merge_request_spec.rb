@@ -59,7 +59,7 @@ module QA
           commit.update_files(
             [
               {
-                file_path: 'added_file.txt',
+                file_path: merge_request.file_name,
                 content: "File updated"
               }
             ]
