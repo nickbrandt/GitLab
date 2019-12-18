@@ -106,7 +106,7 @@ module GraphqlHelpers
 
   def query_graphql_field(name, attributes = {}, fields = nil)
     field_params = if attributes.present?
-                     "(#{attributes_to_graphql(attributes)})" if attributes.present?
+                     "(#{attributes_to_graphql(attributes)})"
                    else
                      ''
                    end

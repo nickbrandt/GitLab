@@ -19,31 +19,55 @@ describe DesignManagement::DesignAtVersion do
   end
 
   describe '#==' do
-    it 'has structural semantics' do
-      design = create(:design, issue: issue)
-      version = create(:design_version, designs: [design], issue: issue)
+    it 'identifies objects created with the same parameters as equal' do
+      design = build_stubbed(:design, issue: issue)
+      version = build_stubbed(:design_version, designs: [design], issue: issue)
 
-      this = create(:design_at_version, design: design, version: version)
-      other = create(:design_at_version, design: design, version: version)
+      this = build_stubbed(:design_at_version, design: design, version: version)
+      other = build_stubbed(:design_at_version, design: design, version: version)
 
       expect(this).to eq(other)
+      expect(other).to eq(this)
     end
 
-    it 'does not admit false positives' do
-      design = create(:design, issue: issue)
-      version_a = create(:design_version, designs: [design])
-      version_b = create(:design_version, designs: [design])
+    it 'identifies unequal objects as unequal, by virtue of their version' do
+      design = build_stubbed(:design, issue: issue)
+      version_a = build_stubbed(:design_version, designs: [design])
+      version_b = build_stubbed(:design_version, designs: [design])
 
-      this = create(:design_at_version, design: design, version: version_a)
-      other = create(:design_at_version, design: design, version: version_b)
+      this = build_stubbed(:design_at_version, design: design, version: version_a)
+      other = build_stubbed(:design_at_version, design: design, version: version_b)
+
+      expect(this).not_to eq(nil)
+      expect(this).not_to eq(design)
+      expect(this).not_to eq(other)
+      expect(other).not_to eq(this)
+    end
+
+    it 'identifies unequal objects as unequal, by virtue of their design' do
+      design_a = build_stubbed(:design, issue: issue)
+      design_b = build_stubbed(:design, issue: issue)
+      version = build_stubbed(:design_version, designs: [design_a, design_b])
+
+      this = build_stubbed(:design_at_version, design: design_a, version: version)
+      other = build_stubbed(:design_at_version, design: design_b, version: version)
 
       expect(this).not_to eq(other)
+      expect(other).not_to eq(this)
     end
 
     it 'rejects objects with the same id and the wrong class' do
-      dav = create(:design_at_version)
+      dav = build_stubbed(:design_at_version)
 
       expect(dav).not_to eq(OpenStruct.new(id: dav.id))
+    end
+
+    it 'expects objects to be of the same type, not subtypes' do
+      subtype = Class.new(described_class)
+      dav = build_stubbed(:design_at_version)
+      other = subtype.new(design: dav.design, version: dav.version)
+
+      expect(dav).not_to eq(other)
     end
   end
 
