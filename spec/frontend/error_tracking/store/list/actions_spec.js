@@ -90,12 +90,16 @@ describe('error tracking actions', () => {
   describe('sortByField', () => {
     it('should search by query', () => {
       const field = 'frequency';
+      const cursor = '1576637570000:0:0';
 
       testAction(
         actions.sortByField,
-        { field },
+        { field, cursor },
         {},
-        [{ type: types.SET_SORT_FIELD, payload: { field } }],
+        [
+          { type: types.SET_CURSOR, payload: cursor },
+          { type: types.SET_SORT_FIELD, payload: field },
+        ],
         [{ type: 'stopPolling' }, { type: 'startPolling' }],
       );
     });

@@ -82,7 +82,7 @@ export const searchByQuery = ({ commit, dispatch }, query) => {
   dispatch('startPolling');
 };
 
-export const sortByField = ({ commit, dispatch }, field, cursor) => {
+export const sortByField = ({ commit, dispatch }, { field, cursor }) => {
   commit(types.SET_CURSOR, cursor);
   commit(types.SET_SORT_FIELD, field);
   dispatch('stopPolling');
