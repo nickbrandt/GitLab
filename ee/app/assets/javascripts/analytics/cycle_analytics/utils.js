@@ -78,6 +78,28 @@ export const transformRawStages = (stages = []) =>
     name: name.length ? name : title,
   }));
 
+export const arrayToObject = (arr = []) => {
+  return arr.reduce((acc, curr) => {
+    const [key, value] = curr;
+    return { ...acc, [key]: value };
+  }, {});
+};
+
+// converts the series data into key value pairs
+export const transformRawTasksByTypeData = (data = []) => {
+  // TODO: does processing here make sense? if so add specs
+  if (!data.length) return [];
+  return data.map(({ series, ...rest }) =>
+    convertObjectPropsToCamelCase(
+      {
+        ...rest,
+        series: arrayToObject(series),
+      },
+      { deep: true },
+    ),
+  );
+};
+
 export const nestQueryStringKeys = (obj = null, targetKey = '') => {
   if (!obj || !isString(targetKey) || !targetKey.length) return {};
   return Object.entries(obj).reduce((prev, [key, value]) => {
@@ -191,34 +213,44 @@ export const getDurationChartData = (data, startDate, endDate) => {
   return eventData;
 };
 
-// takes the type of work data and converts to a k:v structure
-export const transformRawTypeOfWorkData = raw => {};
+const toUnix = datetime => new Date(datetime).getTime();
+export const orderByDate = (a, b) => toUnix(a) - toUnix(b);
 
-export const prepareLabelDatasetForChart = ({ dataset, range }) =>
-  dataset.reduce(
-    (acc, curr) => {
-      const {
-        label: { title },
-        series: [datapoints],
-      } = curr;
-      acc.seriesNames = [...acc.seriesNames, title];
-      acc.data = [...acc.data, range.map(index => (datapoints[index] ? datapoints[index] : 0))];
-      return acc;
-    },
-    { data: [], seriesNames: [] },
-  );
-
-export const flattenTaskByTypeSeries = series =>
-  series.map(dataSet => {
-    // ignore the date, just return the value
-    return dataSet[1];
-  });
+// TODO: code blocks + specs
+// The api only returns datapoints with a value, 0 values are ignored
+const zeroMissingDataPoints = ({ data, defaultData }) => {
+  // overwrites the default values with any value that was returned from the api
+  return { ...defaultData, ...data };
+};
 
 // TODO: docblocks
-export const getTasksByTypeData = ({ data, startDate, endDate }) => {
-  // TODO: check that the date range and datapoint values are in the same order
-  const range = getDatesInRange(startDate, endDate, toYmd).reverse();
+// Array of values [date, value]
+// ignore the date, just return the value, default sort by ascending date
+export const flattenTaskByTypeSeries = (series = {}) =>
+  Object.entries(series)
+    .sort((a, b) => orderByDate(a[0], b[0]))
+    .map(dataSet => dataSet[1]);
 
+// TODO: docblocks
+// GROSS
+export const getTasksByTypeData = ({ data = [], startDate = null, endDate = null }) => {
+  // TODO: check that the date range and datapoint values are in the same order
+  if (!startDate || !endDate || !data.length) {
+    return {
+      range: [],
+      seriesData: [],
+      seriesNames: [],
+    };
+  }
+
+  const range = getDatesInRange(startDate, endDate, toYmd).sort(orderByDate);
+  const defaultData = range.reduce(
+    (acc, date) => ({
+      ...acc,
+      [date]: 0,
+    }),
+    {},
+  );
   // TODO: handle zero's?
   // TODO: fixup seeded data so it falls in the correct date range
 
@@ -231,11 +263,13 @@ export const getTasksByTypeData = ({ data, startDate, endDate }) => {
       // TODO: double check if BE fills in all the dates and adds zeros
       acc.seriesNames = [...acc.seriesNames, title];
       // TODO: maybe flatmap
-      acc.data = [...acc.data, flattenTaskByTypeSeries(series)];
+      // series is already an object at this point
+      const fullData = zeroMissingDataPoints({ data: series, defaultData });
+      acc.seriesData = [...acc.seriesData, flattenTaskByTypeSeries(fullData)];
       return acc;
     },
     {
-      data: [],
+      seriesData: [],
       seriesNames: [],
     },
   );

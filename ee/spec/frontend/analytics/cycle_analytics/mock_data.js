@@ -7,6 +7,7 @@ import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { getDateInPast, getDatesInRange } from '~/lib/utils/datetime_utility';
 import { mockLabels } from '../../../../../spec/javascripts/vue_shared/components/sidebar/labels_select/mock_data';
 import { toYmd } from 'ee/analytics/shared/utils';
+import { transformRawTasksByTypeData } from 'ee/analytics/cycle_analytics/utils';
 
 const endpoints = {
   customizableCycleAnalyticsStagesAndEvents: 'analytics/cycle_analytics/stages.json', // customizable stages and events endpoint
@@ -70,8 +71,7 @@ export const stageMedians = defaultStages.reduce((acc, stage) => {
 }, {});
 
 export const endDate = new Date(2019, 0, 14);
-// Limit to just 5 days data for testing
-export const startDate = getDateInPast(endDate, 4);
+export const startDate = getDateInPast(endDate, DEFAULT_DAYS_IN_PAST);
 
 export const rawIssueEvents = stageFixtures.issue;
 export const issueEvents = deepCamelCase(stageFixtures.issue);
@@ -125,8 +125,8 @@ export const customStageEvents = [
 
 const dateRange = getDatesInRange(startDate, endDate, toYmd);
 
-export const tasksByTypeData = convertObjectPropsToCamelCase(
-  getJSONFixture('analytics/type_of_work/tasks_by_type.json').map(labelData => {
+export const tasksByTypeData = getJSONFixture('analytics/type_of_work/tasks_by_type.json').map(
+  labelData => {
     // add data points for our mock date range
     const maxValue = 10;
     const series = dateRange.map(date => [date, Math.floor(Math.random() * Math.floor(maxValue))]);
@@ -134,11 +134,10 @@ export const tasksByTypeData = convertObjectPropsToCamelCase(
       ...labelData,
       series,
     };
-  }),
-  {
-    deep: true,
   },
 );
+
+export const transformedTasksByTypeData = transformRawTasksByTypeData(tasksByTypeData);
 
 export const rawDurationData = [
   {

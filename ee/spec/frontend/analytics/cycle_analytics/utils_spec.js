@@ -1,3 +1,5 @@
+import { isNumber } from 'underscore';
+import { getDatesInRange } from '~/lib/utils/datetime_utility';
 import {
   isStartEvent,
   isLabelEvent,
@@ -12,7 +14,10 @@ import {
   isPersistedStage,
   getTasksByTypeData,
   flattenTaskByTypeSeries,
+  orderByDate,
+  arrayToObject, // TODO: dedupe this?
 } from 'ee/analytics/cycle_analytics/utils';
+import { toYmd } from 'ee/analytics/shared/utils';
 import {
   customStageEvents as events,
   labelStartEvent,
@@ -26,6 +31,7 @@ import {
   issueStage,
   rawCustomStage,
   tasksByTypeData,
+  transformedTasksByTypeData,
 } from './mock_data';
 
 const labelEvents = [labelStartEvent, labelStopEvent].map(i => i.identifier);
@@ -203,67 +209,106 @@ describe('Cycle analytics utils', () => {
     });
   });
 
-  describe.skip('flattenTaskByTypeSeries', () => {});
+  describe('flattenTaskByTypeSeries', () => {
+    const dummySeries = arrayToObject([
+      ['2019-01-16', 40],
+      ['2019-01-14', 20],
+      ['2019-01-12', 10],
+      ['2019-01-15', 30],
+    ]);
 
-  describe.only('getTasksByTypeData', () => {
+    let transformedDummySeries = [];
+
+    beforeEach(() => {
+      transformedDummySeries = flattenTaskByTypeSeries(dummySeries);
+    });
+
+    it('extracts the value from an array of datetime / value pairs', () => {
+      expect(transformedDummySeries.every(isNumber)).toEqual(true);
+      Object.values(dummySeries).forEach(v => {
+        expect(transformedDummySeries.includes(v)).toBeTruthy();
+      });
+    });
+
+    it('sorts the items by the datetime parameter', () => {
+      expect(transformedDummySeries).toEqual([10, 20, 30, 40]);
+    });
+  });
+
+  describe('orderByDate', () => {
+    it('sorts dates from the earliest to latest', () => {
+      expect(['2019-01-14', '2019-01-12', '2019-01-16', '2019-01-15'].sort(orderByDate)).toEqual([
+        '2019-01-12',
+        '2019-01-14',
+        '2019-01-15',
+        '2019-01-16',
+      ]);
+    });
+  });
+
+  describe('getTasksByTypeData', () => {
     let transformed = {};
-    const rawData = tasksByTypeData;
-    const labels = rawData.map(d => {
+
+    const range = getDatesInRange(startDate, endDate, toYmd);
+    const seriesData = transformedTasksByTypeData.map(({ series }) => Object.values(series));
+    const labels = transformedTasksByTypeData.map(d => {
       const { label } = d;
       return label.title;
     });
 
-    const data = rawData.map(d => {
-      const { series } = d;
-      return flattenTaskByTypeSeries(series);
-    });
-
-    const range = [];
-    console.log('rawData', rawData);
-    // console.log('labels', labels);
-    console.log('data', data);
-
-    beforeEach(() => {
-      transformed = getTasksByTypeData({ data: rawData, startDate, endDate });
-    });
-
-    it('will return an object with the properties needed for the chart', () => {
-      ['seriesNames', 'data', 'range'].forEach(key => {
-        expect(transformed).toHaveProperty(key);
+    it('will return blank arrays if given no data', () => {
+      [{ data: [], startDate, endDate }, [], {}].forEach(chartData => {
+        transformed = getTasksByTypeData(chartData);
+        ['seriesNames', 'seriesData', 'range'].forEach(key => {
+          expect(transformed[key]).toEqual([]);
+        });
       });
     });
 
-    describe('seriesNames', () => {
-      it('returns the names of all the labels in the dataset', () => {
-        expect(transformed.seriesNames).toEqual(labels);
-      });
-    });
-
-    describe('range', () => {
-      it('returns the date range as an array', () => {
-        expect(transformed.range).toEqual(range);
-      });
-      it('includes each day between the start date and end date', () => {
-        expect(transformed.range).toEqual(range);
-      });
-      it('includes the start date and end date', () => {
-        expect(transformed.range).toContain(startDate);
-        expect(transformed.range).toContain(endDate);
-      });
-    });
-
-    describe('data', () => {
-      it('returns an array of data points', () => {
-        expect(transformed.data).toEqual(data);
+    describe('with data', () => {
+      beforeEach(() => {
+        transformed = getTasksByTypeData({ data: transformedTasksByTypeData, startDate, endDate });
       });
 
-      it('contains an array of data for each label', () => {
-        expect(transformed.data.length).toEqual(labels.length);
+      it('will return an object with the properties needed for the chart', () => {
+        ['seriesNames', 'seriesData', 'range'].forEach(key => {
+          expect(transformed).toHaveProperty(key);
+        });
       });
 
-      it('contains a value for each day in the range', () => {
-        transformed.data.forEach(d => {
-          expect(d.length).toEqual(transformed.range.length);
+      describe('seriesNames', () => {
+        it('returns the names of all the labels in the dataset', () => {
+          expect(transformed.seriesNames).toEqual(labels);
+        });
+      });
+
+      describe('range', () => {
+        it('returns the date range as an array', () => {
+          expect(transformed.range).toEqual(range);
+        });
+
+        it('the start date is the first element', () => {
+          expect(transformed.range[0]).toEqual(toYmd(startDate));
+        });
+
+        it('the end date is the last element', () => {
+          expect(transformed.range[transformed.range.length - 1]).toEqual(toYmd(endDate));
+        });
+      });
+
+      describe('data', () => {
+        it('returns an array of data points', () => {
+          expect(transformed.seriesData).toEqual(seriesData);
+        });
+
+        it('contains an array of data for each label', () => {
+          expect(transformed.seriesData.length).toEqual(labels.length);
+        });
+
+        it('contains a value for each day in the range', () => {
+          transformed.seriesData.forEach(d => {
+            expect(d.length).toEqual(transformed.range.length);
+          });
         });
       });
     });

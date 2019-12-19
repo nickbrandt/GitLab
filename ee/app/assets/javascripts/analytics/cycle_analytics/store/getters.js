@@ -1,7 +1,7 @@
 import dateFormat from 'dateformat';
 import httpStatus from '~/lib/utils/http_status';
 import { dateFormats } from '../../shared/constants';
-import { getDurationChartData } from '../utils';
+import { getDurationChartData, getTasksByTypeData } from '../utils';
 
 export const hasNoAccessError = state => state.errorCode === httpStatus.FORBIDDEN;
 
@@ -25,5 +25,15 @@ export const durationChartPlottableData = state => {
 
   return plottableData.length ? plottableData : null;
 };
-export const tasksByTypeData = state =>
-  state.tasksByType && state.tasksByType.data ? state.tasksByType.data : {};
+
+export const tasksByTypeChartData = ({ tasksByType, startDate, endDate }) => {
+  // TODO: remove this check, return empty data if need be
+  if (tasksByType && tasksByType.data.length) {
+    return getTasksByTypeData({
+      data: tasksByType.data,
+      startDate,
+      endDate,
+    });
+  }
+  return {};
+};
