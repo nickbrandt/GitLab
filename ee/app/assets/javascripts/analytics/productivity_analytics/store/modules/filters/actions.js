@@ -1,3 +1,5 @@
+import { historyPushState } from '~/lib/utils/common_utils';
+import { setUrlParams } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
 import { chartKeys } from '../../../constants';
 
@@ -16,6 +18,8 @@ export const setInitialData = ({ commit, dispatch }, { skipFetch = false, data }
 export const setGroupNamespace = ({ commit, dispatch }, groupNamespace) => {
   commit(types.SET_GROUP_NAMESPACE, groupNamespace);
 
+  historyPushState(setUrlParams({ group_id: groupNamespace }, window.location.href, true));
+
   // let's reset the current selection first
   // with skipReload=true we avoid data from being fetched here
   dispatch('charts/resetMainChartSelection', true, { root: true });
@@ -29,8 +33,16 @@ export const setGroupNamespace = ({ commit, dispatch }, groupNamespace) => {
   });
 };
 
-export const setProjectPath = ({ commit, dispatch }, projectPath) => {
+export const setProjectPath = ({ commit, dispatch, state }, projectPath) => {
   commit(types.SET_PROJECT_PATH, projectPath);
+
+  historyPushState(
+    setUrlParams(
+      { group_id: state.groupNamespace, project_id: projectPath },
+      window.location.href,
+      true,
+    ),
+  );
 
   dispatch('charts/resetMainChartSelection', true, { root: true });
 
@@ -51,6 +63,8 @@ export const setFilters = (
     milestoneTitle: milestone_title,
   });
 
+  historyPushState(setUrlParams({ author_username, 'label_name[]': label_name, milestone_title }));
+
   dispatch('charts/resetMainChartSelection', true, { root: true });
 
   return dispatch('charts/fetchChartData', chartKeys.main, { root: true }).then(() => {
@@ -62,6 +76,8 @@ export const setFilters = (
 
 export const setDateRange = ({ commit, dispatch }, { startDate, endDate }) => {
   commit(types.SET_DATE_RANGE, { startDate, endDate });
+
+  historyPushState(setUrlParams({ merged_at_after: startDate, merged_at_before: endDate }));
 
   dispatch('charts/resetMainChartSelection', true, { root: true });
 

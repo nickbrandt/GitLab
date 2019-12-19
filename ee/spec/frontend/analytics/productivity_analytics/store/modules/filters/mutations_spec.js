@@ -21,12 +21,22 @@ describe('Productivity analytics filter mutations', () => {
   describe(types.SET_INITIAL_DATA, () => {
     it('sets the initial data', () => {
       const initialData = {
+        groupNamespace,
+        projectPath,
+        authorUsername,
+        labelName,
+        milestoneTitle,
         mergedAtAfter: startDate,
         mergedAtBefore: endDate,
         minDate,
       };
       mutations[types.SET_INITIAL_DATA](state, initialData);
 
+      expect(state.groupNamespace).toBe(groupNamespace);
+      expect(state.projectPath).toBe(projectPath);
+      expect(state.authorUsername).toBe(authorUsername);
+      expect(state.labelName).toEqual(labelName);
+      expect(state.milestoneTitle).toBe(milestoneTitle);
       expect(state.startDate).toBe(startDate);
       expect(state.endDate).toBe(endDate);
       expect(state.minDate).toBe(minDate);
@@ -38,6 +48,10 @@ describe('Productivity analytics filter mutations', () => {
       mutations[types.SET_GROUP_NAMESPACE](state, groupNamespace);
 
       expect(state.groupNamespace).toBe(groupNamespace);
+      expect(state.projectPath).toBe(null);
+      expect(state.authorUsername).toBe(null);
+      expect(state.labelName).toEqual([]);
+      expect(state.milestoneTitle).toBe(null);
     });
   });
 
@@ -46,6 +60,9 @@ describe('Productivity analytics filter mutations', () => {
       mutations[types.SET_PROJECT_PATH](state, projectPath);
 
       expect(state.projectPath).toBe(projectPath);
+      expect(state.authorUsername).toBe(null);
+      expect(state.labelName).toEqual([]);
+      expect(state.milestoneTitle).toBe(null);
     });
   });
 
