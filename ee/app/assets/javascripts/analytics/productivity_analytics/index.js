@@ -1,12 +1,16 @@
 import Vue from 'vue';
 import { mapState, mapActions } from 'vuex';
-import { defaultDaysInPast } from './constants';
 import store from './store';
 import FilterDropdowns from './components/filter_dropdowns.vue';
 import DateRange from '../shared/components/daterange.vue';
 import ProductivityAnalyticsApp from './components/app.vue';
 import FilteredSearchProductivityAnalytics from './filtered_search_productivity_analytics';
-import { getLabelsEndpoint, getMilestonesEndpoint, getDefaultStartDate } from './utils';
+import {
+  getLabelsEndpoint,
+  getMilestonesEndpoint,
+  buildGroupFromDataset,
+  buildProjectFromDataset,
+} from './utils';
 
 export default () => {
   const container = document.getElementById('js-productivity-analytics');
@@ -18,18 +22,44 @@ export default () => {
   const timeframeContainer = container.querySelector('.js-timeframe-container');
   const appContainer = container.querySelector('.js-productivity-analytics-app-container');
 
-  const { endpoint, emptyStateSvgPath, noAccessSvgPath } = appContainer.dataset;
-  const { startDate: computedStartDate } = timeframeContainer.dataset;
-
-  const minDate = computedStartDate ? new Date(computedStartDate) : null;
-  const mergedAtAfter = getDefaultStartDate(minDate, defaultDaysInPast);
-  const mergedAtBefore = new Date(Date.now());
-
-  const initialData = {
+  const {
+    authorUsername,
+    labelName,
+    milestoneTitle,
     mergedAtAfter,
     mergedAtBefore,
+  } = container.dataset;
+
+  const mergedAtAfterDate = new Date(mergedAtAfter);
+  const mergedAtBeforeDate = new Date(mergedAtBefore);
+
+  const { endpoint, emptyStateSvgPath, noAccessSvgPath } = appContainer.dataset;
+  const minDate = timeframeContainer.dataset.startDate
+    ? new Date(timeframeContainer.dataset.startDate)
+    : null;
+
+  const group = buildGroupFromDataset(container.dataset);
+  let project = null;
+
+  let initialData = {
+    mergedAtAfter: mergedAtAfterDate,
+    mergedAtBefore: mergedAtBeforeDate,
     minDate,
   };
+
+  // let's set the initial data (from URL query params) only if we receive a valid group from BE
+  if (group) {
+    project = buildProjectFromDataset(container.dataset);
+
+    initialData = {
+      ...initialData,
+      groupNamespace: group.full_path,
+      projectPath: project ? project.path_with_namespace : null,
+      authorUsername,
+      labelName: labelName ? labelName.split(',') : null,
+      milestoneTitle,
+    };
+  }
 
   let filterManager;
 
@@ -38,11 +68,24 @@ export default () => {
     el: groupProjectSelectContainer,
     store,
     created() {
+      // let's not fetch any data by default since we might not have a valid group yet
+      let skipFetch = true;
+
       this.setEndpoint(endpoint);
 
-      // let's not fetch data since we might not have a groupNamespace selected yet
-      // this just populates the store with the initial data and waits for a groupNamespace to be set
-      this.setInitialData({ skipFetch: true, data: initialData });
+      if (group) {
+        this.initFilteredSearch({
+          groupNamespace: group.full_path,
+          groupId: group.id,
+          projectNamespace: project ? project.path_with_namespace : null,
+          projectId: project ? project.id : null,
+        });
+
+        // let's fetch data now since we do have a valid group
+        skipFetch = false;
+      }
+
+      this.setInitialData({ skipFetch, data: initialData });
     },
     methods: {
       ...mapActions(['setEndpoint']),
@@ -80,6 +123,10 @@ export default () => {
     },
     render(h) {
       return h(FilterDropdowns, {
+        props: {
+          group,
+          project,
+        },
         on: {
           groupSelected: this.onGroupSelected,
           projectSelected: this.onProjectSelected,
@@ -105,8 +152,8 @@ export default () => {
       return h(DateRange, {
         props: {
           show: this.groupNamespace !== null,
-          startDate: mergedAtAfter,
-          endDate: mergedAtBefore,
+          startDate: mergedAtAfterDate,
+          endDate: mergedAtBeforeDate,
           minDate,
         },
         on: {
