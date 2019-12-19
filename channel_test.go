@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	envTerminalPath     = fmt.Sprintf("%s/environments/1/terminal.ws", testProject)
+	envTerminalPath     = fmt.Sprintf("%s/-/environments/1/terminal.ws", testProject)
 	jobTerminalPath     = fmt.Sprintf("%s/-/jobs/1/terminal.ws", testProject)
 	servicesProxyWSPath = fmt.Sprintf("%s/-/jobs/1/proxy.ws", testProject)
 )
