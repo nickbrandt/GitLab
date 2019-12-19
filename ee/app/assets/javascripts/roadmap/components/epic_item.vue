@@ -28,14 +28,6 @@ export default {
       type: Number,
       required: true,
     },
-    shellWidth: {
-      type: Number,
-      required: true,
-    },
-    itemWidth: {
-      type: Number,
-      required: true,
-    },
   },
   updated() {
     this.removeHighlight();
@@ -75,8 +67,6 @@ export default {
       :timeframe="timeframe"
       :timeframe-item="timeframeItem"
       :epic="epic"
-      :shell-width="shellWidth"
-      :item-width="itemWidth"
     />
   </div>
 </template>

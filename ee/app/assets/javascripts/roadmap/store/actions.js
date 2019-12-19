@@ -84,7 +84,7 @@ export const receiveEpicsSuccess = (
     // Exclude any Epic that has invalid dates
     // or is already present in Roadmap timeline
     if (
-      formattedEpic.startDate <= formattedEpic.endDate &&
+      formattedEpic.startDate.getTime() <= formattedEpic.endDate.getTime() &&
       state.epicIds.indexOf(formattedEpic.id) < 0
     ) {
       Object.assign(formattedEpic, {
@@ -191,6 +191,8 @@ export const refreshEpicDates = ({ commit, state, getters }) => {
 
   commit(types.SET_EPICS, epics);
 };
+
+export const setBufferSize = ({ commit }, bufferSize) => commit(types.SET_BUFFER_SIZE, bufferSize);
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

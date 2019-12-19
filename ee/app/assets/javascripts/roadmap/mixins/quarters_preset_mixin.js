@@ -10,17 +10,17 @@ export default {
       const quarterEnd = this.timeframeItem.range[2];
 
       return (
-        this.epic.startDate.getTime() >= quarterStart.getTime() &&
-        this.epic.startDate.getTime() <= quarterEnd.getTime()
+        this.epicStartDateValues.time >= quarterStart.getTime() &&
+        this.epicStartDateValues.time <= quarterEnd.getTime()
       );
     },
     /**
      * Check if current epic ends within current quarter (timeline cell)
      */
-    isTimeframeUnderEndDateForQuarter(timeframeItem, epicEndDate) {
+    isTimeframeUnderEndDateForQuarter(timeframeItem) {
       const quarterEnd = timeframeItem.range[2];
 
-      return epicEndDate.getTime() <= quarterEnd.getTime();
+      return this.epicEndDateValues.time <= quarterEnd.getTime();
     },
     /**
      * Return timeline bar width for current quarter (timeline cell) based on
@@ -89,7 +89,7 @@ export default {
       let timelineBarWidth = 0;
 
       const indexOfCurrentQuarter = this.timeframe.indexOf(this.timeframeItem);
-      const cellWidth = this.getCellWidth();
+      const { cellWidth } = this.$options;
       const epicStartDate = this.epic.startDate;
       const epicEndDate = this.epic.endDate;
 
@@ -97,7 +97,7 @@ export default {
         const currentQuarter = this.timeframe[i].range;
 
         if (i === indexOfCurrentQuarter) {
-          if (this.isTimeframeUnderEndDateForQuarter(this.timeframe[i], epicEndDate)) {
+          if (this.isTimeframeUnderEndDateForQuarter(this.timeframe[i])) {
             timelineBarWidth += this.getBarWidthForSingleQuarter(
               cellWidth,
               totalDaysInQuarter(currentQuarter),
@@ -117,7 +117,7 @@ export default {
               date,
             );
           }
-        } else if (this.isTimeframeUnderEndDateForQuarter(this.timeframe[i], epicEndDate)) {
+        } else if (this.isTimeframeUnderEndDateForQuarter(this.timeframe[i])) {
           timelineBarWidth += this.getBarWidthForSingleQuarter(
             cellWidth,
             totalDaysInQuarter(currentQuarter),

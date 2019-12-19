@@ -9,13 +9,7 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import {
-  mockTimeframeInitialDate,
-  mockEpic,
-  mockGroupId,
-  mockShellWidth,
-  mockItemWidth,
-} from '../mock_data';
+import { mockTimeframeInitialDate, mockEpic, mockGroupId } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -24,8 +18,6 @@ const createComponent = ({
   epic = mockEpic,
   timeframe = mockTimeframeMonths,
   currentGroupId = mockGroupId,
-  shellWidth = mockShellWidth,
-  itemWidth = mockItemWidth,
 }) => {
   const Component = Vue.extend(epicItemComponent);
 
@@ -34,8 +26,6 @@ const createComponent = ({
     epic,
     timeframe,
     currentGroupId,
-    shellWidth,
-    itemWidth,
   });
 };
 

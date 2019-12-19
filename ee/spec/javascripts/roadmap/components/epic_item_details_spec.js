@@ -140,7 +140,7 @@ describe('EpicItemDetailsComponent', () => {
 
       expect(epicGroupNameEl).not.toBeNull();
       expect(epicGroupNameEl.innerText.trim()).toContain(mockEpicItem.groupName);
-      expect(epicGroupNameEl.dataset.originalTitle).toBe(mockEpicItem.groupFullName);
+      expect(epicGroupNameEl.getAttribute('title')).toBe(mockEpicItem.groupFullName);
     });
 
     it('renders Epic timeframe', () => {
