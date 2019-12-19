@@ -31,7 +31,7 @@ describe('DependenciesActions component', () => {
     factory({
       propsData: { namespace },
     });
-    store.state[namespace].endpoint = `${TEST_HOST}/dependencies`;
+    store.state[namespace].endpoint = `${TEST_HOST}/dependencies.json`;
     return wrapper.vm.$nextTick();
   });
 

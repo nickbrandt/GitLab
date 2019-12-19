@@ -24,7 +24,7 @@
           %span= _('Security Dashboard')
 
     - if project_nav_tab?(:dependencies)
-      = nav_link(path: 'projects/dependencies#show') do
+      = nav_link(path: 'projects/dependencies#index') do
         = link_to project_dependencies_path(@project), title: _('Dependency List'), data: { qa_selector: 'dependency_list_link' } do
           %span= _('Dependency List')
 

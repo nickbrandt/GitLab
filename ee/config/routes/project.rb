@@ -191,7 +191,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resource :dashboard, only: [:show], controller: :dashboard
         resource :configuration, only: [:show], controller: :configuration
 
-        resources :dependencies, only: [:index]
         # We have to define both legacy and new routes for Vulnerability Findings
         # because they are loaded upon application initialization and preloaded by
         # web server.
@@ -211,7 +210,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
 
-      resource :dependencies, only: [:show]
+      resources :dependencies, only: [:index]
       # All new routes should go under /-/ scope.
       # Look for scope '-' at the top of the file.
       # rubocop: enable Cop/PutProjectRoutesUnderScope
