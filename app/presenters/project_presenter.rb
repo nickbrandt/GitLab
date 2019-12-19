@@ -276,8 +276,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
   end
 
   def kubernetes_cluster_anchor_data
-    if current_user && can?(current_user, :create_cluster, project)
-
+    if can_cluster_be_created?
       if clusters.empty?
         AnchorData.new(false,
                        statistic_icon + _('Add Kubernetes cluster'),
@@ -294,7 +293,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
   end
 
   def gitlab_ci_anchor_data
-    if current_user && can_current_user_push_code? && repository.gitlab_ci_yml.blank? && !auto_devops_enabled?
+    if can_cicd_be_set_up?
       AnchorData.new(false,
                      statistic_icon + _('Set up CI/CD'),
                      add_ci_yml_path)
@@ -304,6 +303,18 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
                      ci_configuration_path,
                     'default')
     end
+  end
+
+  def can_setup_review_app?
+    can_cicd_be_set_up? || can_cluster_be_created?
+  end
+
+  def can_cicd_be_set_up?
+    current_user && can_current_user_push_code? && repository.gitlab_ci_yml.blank? && !auto_devops_enabled?
+  end
+
+  def can_cluster_be_created?
+    current_user && can?(current_user, :create_cluster, project)
   end
 
   def topics_to_show
