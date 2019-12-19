@@ -18,5 +18,6 @@ class FixMaxPagesSize < ActiveRecord::Migration[5.2]
   end
 
   def down
+    # no-op
   end
 end
