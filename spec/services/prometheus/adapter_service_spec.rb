@@ -46,5 +46,25 @@ describe Prometheus::AdapterService do
         end
       end
     end
+
+    context 'when project has a configured cluster' do
+      let!(:cluster) { create(:cluster, :provided_by_gcp, projects: [project]) }
+
+      it 'takes the deployment platform cluster as cluster attribute' do
+        expect(subject.cluster).to eq(project.deployment_platform.cluster)
+      end
+    end
+
+    context 'when a cluster is passed' do
+      subject { described_class.new(project, cluster) }
+
+      it 'becomes the cluster attribute' do
+        expect(subject.cluster).to eq cluster
+      end
+
+      it 'provides a cluster prometheus adapter' do
+        expect(subject.cluster_prometheus_adapter).to eq(cluster.application_prometheus)
+      end
+    end
   end
 end
