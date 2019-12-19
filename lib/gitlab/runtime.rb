@@ -45,7 +45,7 @@ module Gitlab
         !!defined?(::Rails::Console)
       end
 
-      def app_server?
+      def web_server?
         puma? || unicorn?
       end
 

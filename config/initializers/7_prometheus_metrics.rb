@@ -58,7 +58,7 @@ if !Rails.env.test? && Gitlab::Metrics.prometheus_metrics_enabled?
   end
 end
 
-if Gitlab::Runtime.app_server?
+if Gitlab::Runtime.web_server?
   Gitlab::Cluster::LifecycleEvents.on_master_start do
     Gitlab::Metrics::Exporter::WebExporter.instance.start
   end

@@ -382,7 +382,7 @@ module Gitlab
     end
 
     def self.long_timeout
-      if Gitlab::Runtime.app_server?
+      if Gitlab::Runtime.web_server?
         default_timeout
       else
         6.hours
