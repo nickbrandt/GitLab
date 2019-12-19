@@ -50,9 +50,9 @@ UTF-8 strings, in addition to any subprotocol expectations.
 
 Using the terminal as an example, GitLab serves a JavaScript terminal
 emulator to the browser on a URL like
-`https://gitlab.com/group/project/environments/1/terminal`.
+`https://gitlab.com/group/project/-/environments/1/terminal`.
 This opens a websocket connection to, e.g.,
-`wss://gitlab.com/group/project/environments/1/terminal.ws`,
+`wss://gitlab.com/group/project/-/environments/1/terminal.ws`,
 This endpoint doesn't exist in GitLab - only in Workhorse.
 
 When receiving the connection, Workhorse first checks that the

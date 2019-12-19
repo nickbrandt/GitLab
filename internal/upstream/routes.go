@@ -191,7 +191,7 @@ func (u *upstream) configureRoutes() {
 		route("POST", ciAPIPattern+`v1/builds/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))),
 
 		// Terminal websocket
-		wsRoute(projectPattern+`environments/[0-9]+/terminal.ws\z`, channel.Handler(api)),
+		wsRoute(projectPattern+`-/environments/[0-9]+/terminal.ws\z`, channel.Handler(api)),
 		wsRoute(projectPattern+`-/jobs/[0-9]+/terminal.ws\z`, channel.Handler(api)),
 
 		// Proxy Job Services
