@@ -5,7 +5,6 @@ require 'spec_helper'
 describe Projects::PerformanceMonitoring::DashboardsController do
   let_it_be(:user) { create(:user) }
   let_it_be(:namespace) { create(:namespace) }
-  let_it_be(:dashboards) { ['config/prometheus/common_metrics.yml', 'ee/config/prometheus/cluster_metrics.yml'] }
   let!(:project) { create(:project, :repository, name: 'dashboard-project', namespace: namespace) }
   let(:commit_message) { 'test' }
   let(:branch) { "#{Time.current.to_i}_dashboard_new_branch" }
