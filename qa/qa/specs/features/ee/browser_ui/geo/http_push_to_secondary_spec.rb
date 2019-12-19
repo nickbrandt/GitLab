@@ -153,7 +153,7 @@ module QA
             # The git cli produces the 'warning: redirecting to..' output
             # internally.
             expect(push.output).to match(/warning: redirecting to #{absolute_path}/)
-            expect(push.output).to match(/Locking support detected on remote "#{location.uri.to_s}"/)
+            expect(push.output).to match(/Locking support detected on remote "#{location.uri}"/)
 
             # Validate git push worked and new content is visible
             Page::Project::Show.perform do |show|
