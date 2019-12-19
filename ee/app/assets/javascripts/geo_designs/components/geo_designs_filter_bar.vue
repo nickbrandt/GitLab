@@ -2,7 +2,6 @@
 import { mapActions, mapState } from 'vuex';
 import { debounce } from 'underscore';
 import { GlTabs, GlTab, GlFormInput } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
 import { DEFAULT_SEARCH_DELAY } from '../store/constants';
 
 export default {
@@ -11,7 +10,6 @@ export default {
     GlTabs,
     GlTab,
     GlFormInput,
-    Icon,
   },
   computed: {
     ...mapState(['currentFilterIndex', 'filterOptions', 'searchFilter']),
