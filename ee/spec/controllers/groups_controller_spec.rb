@@ -20,4 +20,42 @@ describe GroupsController do
       end
     end
   end
+
+  describe 'PUT #update' do
+    let(:group) { create(:group) }
+
+    context 'when max_pages_size param is specified' do
+      let(:params) { { max_pages_size: 100 } }
+
+      let(:request) do
+        post :update, params: { id: group.to_param, group: params }
+      end
+
+      let(:user) { create(:user) }
+
+      before do
+        stub_licensed_features(pages_size_limit: true)
+        group.add_owner(user)
+        sign_in(user)
+      end
+
+      context 'when user is an admin' do
+        let(:user) { create(:admin) }
+
+        it 'updates max_pages_size' do
+          request
+
+          expect(group.reload.max_pages_size).to eq(100)
+        end
+      end
+
+      context 'when user is not an admin' do
+        it 'does not update max_pages_size' do
+          request
+
+          expect(group.reload.max_pages_size).to eq(nil)
+        end
+      end
+    end
+  end
 end

@@ -88,6 +88,7 @@ class License < ApplicationRecord
     object_storage
     operations_dashboard
     packages
+    pages_size_limit
     productivity_analytics
     project_aliases
     protected_environments
@@ -204,6 +205,7 @@ class License < ApplicationRecord
     ldap_group_sync_filter
     multiple_ldap_servers
     object_storage
+    pages_size_limit
     project_aliases
     repository_size_limit
     required_ci_templates

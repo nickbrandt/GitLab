@@ -162,6 +162,9 @@ module EE
 
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
+      validates :max_pages_size,
+        numericality: { only_integer: true, greater_than: 0, allow_nil: true,
+                        less_than: ::Gitlab::Pages::MAX_SIZE / 1.megabyte }
 
       validates :approvals_before_merge, numericality: true, allow_blank: true
 
