@@ -1,13 +1,6 @@
 <script>
 import _ from 'underscore';
-import {
-  GlButton,
-  GlLink,
-  GlTooltipDirective,
-  GlModalDirective,
-  GlModal,
-  GlToggle,
-} from '@gitlab/ui';
+import { GlButton, GlTooltipDirective, GlModalDirective, GlModal, GlToggle } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -16,7 +9,6 @@ import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT } from '../constants';
 export default {
   components: {
     GlButton,
-    GlLink,
     Icon,
     GlModal,
     GlToggle,

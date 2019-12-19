@@ -2,7 +2,6 @@
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 import Mousetrap from 'mousetrap';
-import Icon from '~/vue_shared/components/icon.vue';
 import { __ } from '~/locale';
 import createFlash from '~/flash';
 import PanelResizer from '~/vue_shared/components/panel_resizer.vue';
@@ -27,7 +26,6 @@ import {
 export default {
   name: 'DiffsApp',
   components: {
-    Icon,
     CompareVersions,
     DiffFile,
     NoChanges,
