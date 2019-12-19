@@ -20048,6 +20048,9 @@ msgstr ""
 msgid "View app"
 msgstr ""
 
+msgid "View blame prior to this change"
+msgstr ""
+
 msgid "View dependency details for your project"
 msgstr ""
 
