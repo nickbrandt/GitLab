@@ -5,6 +5,11 @@ export default () => ({
   projectPath: '',
 
   /**
+   * Full text search
+   */
+  search: '',
+
+  /**
    * Environments list information
    */
   environments: {

@@ -169,6 +169,7 @@ describe('Api', () => {
     const environmentName = 'production';
     const podName = 'pod';
     const containerName = 'container';
+    const search = 'foo +bar';
 
     const getRequest = () => mock.history.get[0];
 
@@ -219,6 +220,22 @@ describe('Api', () => {
           expect(getRequest().params).toEqual({
             environment_name: environmentName,
             pod_name: podName,
+          });
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('calls `axios.get` with pod_name and search', done => {
+      const expectedUrl = `${dummyUrlRoot}/${projectPath}/-/logs/k8s.json`;
+
+      Api.getPodLogs({ projectPath, environmentName, podName, search })
+        .then(() => {
+          expect(getRequest().url).toBe(expectedUrl);
+          expect(getRequest().params).toEqual({
+            environment_name: environmentName,
+            pod_name: podName,
+            search,
           });
         })
         .then(done)

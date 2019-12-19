@@ -29,7 +29,7 @@ module EE
           ::Gitlab::Kubernetes::RolloutStatus.from_deployments(*deployments, pods: pods, legacy_deployments: legacy_deployments)
         end
 
-        def read_pod_logs(environment_id, pod_name, namespace, container: nil)
+        def read_pod_logs(environment_id, pod_name, namespace, container: nil, search: nil)
           # environment_id is required for use in reactive_cache_updated(),
           # to invalidate the ETag cache.
           with_reactive_cache(
@@ -37,7 +37,8 @@ module EE
             'environment_id' => environment_id,
             'pod_name' => pod_name,
             'namespace' => namespace,
-            'container' => container
+            'container' => container,
+            'search' => search
           ) do |result|
             result
           end
@@ -49,11 +50,12 @@ module EE
             container = opts['container']
             pod_name = opts['pod_name']
             namespace = opts['namespace']
+            search = opts['search']
 
-            handle_exceptions(_('Pod not found'), pod_name: pod_name, container_name: container) do
+            handle_exceptions(_('Pod not found'), pod_name: pod_name, container_name: container, search: search) do
               container ||= container_names_of(pod_name, namespace).first
 
-              pod_logs(pod_name, namespace, container: container)
+              pod_logs(pod_name, namespace, container: container, search: search)
             end
           end
         end
@@ -82,9 +84,9 @@ module EE
 
         private
 
-        def pod_logs(pod_name, namespace, container: nil)
+        def pod_logs(pod_name, namespace, container: nil, search: nil)
           logs = if ::Feature.enabled?(:enable_cluster_application_elastic_stack) && elastic_stack_client
-                   elastic_stack_pod_logs(namespace, pod_name, container)
+                   elastic_stack_pod_logs(namespace, pod_name, container, search)
                  else
                    platform_pod_logs(namespace, pod_name, container)
                  end
@@ -113,11 +115,11 @@ module EE
           end
         end
 
-        def elastic_stack_pod_logs(namespace, pod_name, container_name)
+        def elastic_stack_pod_logs(namespace, pod_name, container_name, search)
           client = elastic_stack_client
           return [] if client.nil?
 
-          ::Gitlab::Elasticsearch::Logs.new(client).pod_logs(namespace, pod_name, container_name)
+          ::Gitlab::Elasticsearch::Logs.new(client).pod_logs(namespace, pod_name, container_name, search)
         end
 
         def elastic_stack_client

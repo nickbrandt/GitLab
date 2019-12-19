@@ -9,6 +9,7 @@ import {
   mockPods,
   mockPodName,
   mockLogsResult,
+  mockSearch,
 } from '../mock_data';
 
 describe('Logs Store Mutations', () => {
@@ -33,6 +34,13 @@ describe('Logs Store Mutations', () => {
     it('sets the environment', () => {
       mutations[types.SET_PROJECT_ENVIRONMENT](state, mockEnvName);
       expect(state.environments.current).toEqual(mockEnvName);
+    });
+  });
+
+  describe('SET_SEARCH', () => {
+    it('sets the search', () => {
+      mutations[types.SET_SEARCH](state, mockSearch);
+      expect(state.search).toEqual(mockSearch);
     });
   });
 

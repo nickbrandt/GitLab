@@ -6,6 +6,11 @@ export default {
     state.projectPath = projectPath;
   },
 
+  /** Search data */
+  [types.SET_SEARCH](state, searchQuery) {
+    state.search = searchQuery;
+  },
+
   /** Environments data */
   [types.SET_PROJECT_ENVIRONMENT](state, environmentName) {
     state.environments.current = environmentName;
