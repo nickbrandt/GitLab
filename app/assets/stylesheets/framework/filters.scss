@@ -241,7 +241,7 @@
   min-width: 0;
   border: 1px solid $border-color;
   border-left: 0;
-  border-radius: 0 3px 3px 0;
+  border-radius: 0 $border-radius-base $border-radius-base 0;
 
 }
 
@@ -268,7 +268,7 @@
 .filtered-search-history-dropdown-toggle-button {
   flex: 1;
   width: auto;
-  border-radius: 3px 0 0 3px;
+  border-radius: $border-radius-base 0 0 $border-radius-base;
   border: 1px solid $border-color;
   color: $gl-text-color-secondary;
   transition: color 0.1s linear;
