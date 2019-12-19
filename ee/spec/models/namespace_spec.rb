@@ -79,6 +79,13 @@ describe Namespace do
     end
   end
 
+  context 'validation' do
+    it do
+      is_expected.to validate_numericality_of(:max_pages_size).only_integer.is_greater_than(0)
+                       .is_less_than(::Gitlab::Pages::MAX_SIZE / 1.megabyte)
+    end
+  end
+
   describe 'custom validations' do
     describe '#validate_plan_name' do
       let(:group) { build(:group) }

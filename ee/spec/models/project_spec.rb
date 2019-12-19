@@ -195,6 +195,11 @@ describe Project do
       context 'with same variable keys and different environment scope' do
         it { expect(project).to be_valid }
       end
+
+      it do
+        is_expected.to validate_numericality_of(:max_pages_size).only_integer.is_greater_than(0)
+                         .is_less_than(::Gitlab::Pages::MAX_SIZE / 1.megabyte)
+      end
     end
 
     context 'mirror' do

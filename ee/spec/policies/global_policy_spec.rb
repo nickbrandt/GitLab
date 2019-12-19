@@ -89,4 +89,17 @@ describe GlobalPolicy do
       it { is_expected.not_to be_allowed(:read_security_dashboard) }
     end
   end
+
+  describe 'update_max_pages_size' do
+    context 'when feature is enabled' do
+      before do
+        stub_licensed_features(pages_size_limit: true)
+      end
+
+      it { is_expected.to be_disallowed(:update_max_pages_size) }
+      it { expect(described_class.new(create(:admin), [user])).to be_allowed(:update_max_pages_size) }
+    end
+
+    it { expect(described_class.new(create(:admin), [user])).to be_disallowed(:update_max_pages_size) }
+  end
 end
