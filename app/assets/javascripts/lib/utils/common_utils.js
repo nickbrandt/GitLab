@@ -247,6 +247,7 @@ export const scrollToElement = element => {
   }
   const { top } = $el.offset();
 
+  // eslint-disable-next-line no-jquery/no-animate
   return $('body, html').animate(
     {
       scrollTop: top - contentTop(),
