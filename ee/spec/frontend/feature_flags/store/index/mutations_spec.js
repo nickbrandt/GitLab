@@ -3,7 +3,7 @@ import mutations from 'ee/feature_flags/store/modules/index/mutations';
 import * as types from 'ee/feature_flags/store/modules/index/mutation_types';
 import { mapToScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
-import { getRequestData, rotateData } from '../../mock_data';
+import { getRequestData, rotateData, featureFlag } from '../../mock_data';
 
 describe('Feature flags store Mutations', () => {
   let stateCopy;
@@ -75,9 +75,9 @@ describe('Feature flags store Mutations', () => {
     });
 
     it('should set featureFlags with the transformed data', () => {
-      const expected = getRequestData.feature_flags.map(f => ({
-        ...f,
-        scopes: mapToScopesViewModel(f.scopes || []),
+      const expected = getRequestData.feature_flags.map(flag => ({
+        ...flag,
+        scopes: mapToScopesViewModel(flag.scopes || []),
       }));
 
       expect(stateCopy.featureFlags).toEqual(expected);
@@ -149,6 +149,94 @@ describe('Feature flags store Mutations', () => {
 
     it('should set hasRotateError to true', () => {
       expect(stateCopy.hasRotateError).toBe(true);
+    });
+  });
+
+  describe('UPDATE_FEATURE_FLAG', () => {
+    beforeEach(() => {
+      stateCopy.featureFlags = getRequestData.feature_flags.map(flag => ({
+        ...flag,
+        scopes: mapToScopesViewModel(flag.scopes || []),
+      }));
+      stateCopy.count = { enabled: 1, disabled: 0 };
+
+      mutations[types.UPDATE_FEATURE_FLAG](stateCopy, {
+        ...featureFlag,
+        active: false,
+      });
+    });
+
+    it('should update the flag with the matching ID', () => {
+      expect(stateCopy.featureFlags).toEqual([
+        {
+          ...featureFlag,
+          scopes: mapToScopesViewModel(featureFlag.scopes || []),
+          active: false,
+        },
+      ]);
+    });
+    it('should update the enabled count', () => {
+      expect(stateCopy.count.enabled).toBe(0);
+    });
+    it('should update the disabled count', () => {
+      expect(stateCopy.count.disabled).toBe(1);
+    });
+  });
+  describe('RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS', () => {
+    beforeEach(() => {
+      stateCopy.featureFlags = getRequestData.feature_flags.map(flag => ({
+        ...flag,
+        scopes: mapToScopesViewModel(flag.scopes || []),
+      }));
+      stateCopy.count = { enabled: 1, disabled: 0 };
+
+      mutations[types.RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS](stateCopy, {
+        ...featureFlag,
+        active: false,
+      });
+    });
+
+    it('should update the flag with the matching ID', () => {
+      expect(stateCopy.featureFlags).toEqual([
+        {
+          ...featureFlag,
+          scopes: mapToScopesViewModel(featureFlag.scopes || []),
+          active: false,
+        },
+      ]);
+    });
+    it('should update the enabled count', () => {
+      expect(stateCopy.count.enabled).toBe(0);
+    });
+    it('should update the disabled count', () => {
+      expect(stateCopy.count.disabled).toBe(1);
+    });
+  });
+  describe('RECEIVE_UPDATE_FEATURE_FLAG_ERROR', () => {
+    beforeEach(() => {
+      stateCopy.featureFlags = getRequestData.feature_flags.map(flag => ({
+        ...flag,
+        scopes: mapToScopesViewModel(flag.scopes || []),
+      }));
+      stateCopy.count = { enabled: 1, disabled: 0 };
+
+      mutations[types.RECEIVE_UPDATE_FEATURE_FLAG_ERROR](stateCopy, featureFlag.id);
+    });
+
+    it('should update the flag with the matching ID, toggling active', () => {
+      expect(stateCopy.featureFlags).toEqual([
+        {
+          ...featureFlag,
+          scopes: mapToScopesViewModel(featureFlag.scopes || []),
+          active: false,
+        },
+      ]);
+    });
+    it('should update the enabled count', () => {
+      expect(stateCopy.count.enabled).toBe(0);
+    });
+    it('should update the disabled count', () => {
+      expect(stateCopy.count.disabled).toBe(1);
     });
   });
 });

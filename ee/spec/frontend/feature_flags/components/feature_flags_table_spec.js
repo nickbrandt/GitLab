@@ -1,5 +1,6 @@
 import FeatureFlagsTable from 'ee/feature_flags/components/feature_flags_table.vue';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { GlToggle } from '@gitlab/ui';
 import { trimText } from 'helpers/text_helper';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
@@ -110,6 +111,28 @@ describe('Feature flag table', () => {
       expect(wrapper.find('.js-feature-flag-delete-button').exists()).toBe(true);
       expect(wrapper.find('.js-feature-flag-edit-button').exists()).toBe(true);
       expect(wrapper.find('.js-feature-flag-edit-button').attributes('href')).toEqual('edit/path');
+    });
+  });
+
+  describe('when active and with an update toggle', () => {
+    let toggle;
+
+    beforeEach(() => {
+      props.featureFlags[0].update_path = props.featureFlags[0].destroy_path;
+      createWrapper(props, { provide: { glFeatures: { featureFlagToggle: true } } });
+      toggle = wrapper.find(GlToggle);
+    });
+
+    it('should have a toggle', () => {
+      expect(toggle.exists()).toBe(true);
+      expect(toggle.props('value')).toBe(true);
+    });
+
+    it('should trigger a toggle event', () => {
+      toggle.vm.$emit('change');
+      const flag = { ...props.featureFlags[0], active: !props.featureFlags[0].active };
+
+      expect(wrapper.emitted('toggle-flag')).toEqual([[flag]]);
     });
   });
 

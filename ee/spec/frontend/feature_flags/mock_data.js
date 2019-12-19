@@ -11,6 +11,7 @@ export const featureFlag = {
   name: 'test flag',
   description: 'flag for tests',
   destroy_path: 'feature_flags/1',
+  update_path: 'feature_flags/1',
   edit_path: 'feature_flags/1/edit',
   scopes: [
     {

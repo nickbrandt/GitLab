@@ -1,6 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import store from 'ee/feature_flags/store';
 import FeatureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
 import FeatureFlagsTable from 'ee/feature_flags/components/feature_flags_table.vue';
 import ConfigureFeatureFlagsModal from 'ee/feature_flags/components/configure_feature_flags_modal.vue';
@@ -42,6 +43,7 @@ describe('Feature flags', () => {
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
+    jest.spyOn(store, 'dispatch');
   });
 
   afterEach(() => {
@@ -184,7 +186,7 @@ describe('Feature flags', () => {
 
       it('should render a table with feature flags', () => {
         const table = wrapper.find(FeatureFlagsTable);
-        expect(wrapper.find(FeatureFlagsTable).exists()).toBe(true);
+        expect(table.exists()).toBe(true);
         expect(table.props('featureFlags')).toEqual(
           expect.arrayContaining([
             expect.objectContaining({
@@ -193,6 +195,15 @@ describe('Feature flags', () => {
             }),
           ]),
         );
+      });
+
+      it('should toggle a flag when receiving the toggle-flag event', () => {
+        const table = wrapper.find(FeatureFlagsTable);
+
+        const [flag] = table.props('featureFlags');
+        table.vm.$emit('toggle-flag', flag);
+
+        expect(store.dispatch).toHaveBeenCalledWith('index/toggleFeatureFlag', flag);
       });
 
       it('renders configure button', () => {
