@@ -185,6 +185,10 @@ module QA
             within_element :vulnerability_report_grouped do
               click_on name
             end
+
+            wait(reload: false) do
+              find_element(:vulnerability_modal_content)[:class].include? 'show'
+            end
           end
 
           def dismiss_vulnerability_with_reason(name, reason)
