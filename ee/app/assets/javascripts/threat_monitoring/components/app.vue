@@ -2,6 +2,7 @@
 import { mapActions, mapState } from 'vuex';
 import { GlAlert, GlEmptyState, GlIcon, GlLink, GlPopover } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import axios from '~/lib/utils/axios_utils';
 import ThreatMonitoringFilters from './threat_monitoring_filters.vue';
 import WafLoadingSkeleton from './waf_loading_skeleton.vue';
 import WafStatisticsSummary from './waf_statistics_summary.vue';
@@ -33,10 +34,22 @@ export default {
       type: String,
       required: true,
     },
+    showUserCallout: {
+      type: Boolean,
+      required: true,
+    },
+    userCalloutId: {
+      type: String,
+      required: true,
+    },
+    userCalloutsPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
-      showAlert: true,
+      showAlert: this.showUserCallout,
 
       // WAF requires the project to have at least one available environment.
       // An invalid default environment id means there there are no available
@@ -61,6 +74,10 @@ export default {
     },
     dismissAlert() {
       this.showAlert = false;
+
+      axios.post(this.userCalloutsPath, {
+        feature_name: this.userCalloutId,
+      });
     },
   },
   emptyStateDescription: s__(

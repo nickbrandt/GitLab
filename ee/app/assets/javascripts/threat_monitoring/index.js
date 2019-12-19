@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import ThreatMonitoringApp from './components/app.vue';
 import createStore from './store';
 
@@ -10,6 +11,9 @@ export default () => {
     emptyStateSvgPath,
     documentationPath,
     defaultEnvironmentId,
+    showUserCallout,
+    userCalloutId,
+    userCalloutsPath,
   } = el.dataset;
 
   const store = createStore();
@@ -27,6 +31,9 @@ export default () => {
           emptyStateSvgPath,
           documentationPath,
           defaultEnvironmentId: parseInt(defaultEnvironmentId, 10),
+          showUserCallout: parseBoolean(showUserCallout),
+          userCalloutId,
+          userCalloutsPath,
         },
       });
     },

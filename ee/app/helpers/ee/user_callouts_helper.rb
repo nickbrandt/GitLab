@@ -9,6 +9,7 @@ module EE
     CANARY_DEPLOYMENT = 'canary_deployment'
     GOLD_TRIAL = 'gold_trial'
     GOLD_TRIAL_BILLINGS = 'gold_trial_billings'
+    THREAT_MONITORING_INFO = 'threat_monitoring_info'
 
     def show_canary_deployment_callout?(project)
       !user_dismissed?(CANARY_DEPLOYMENT) &&
@@ -62,6 +63,10 @@ module EE
       return unless show_gold_trial?(user, GOLD_TRIAL_BILLINGS)
 
       render 'shared/gold_trial_callout_content', is_dismissable: !namespace.free_plan?, callout: GOLD_TRIAL_BILLINGS
+    end
+
+    def show_threat_monitoring_info?
+      !user_dismissed?(THREAT_MONITORING_INFO)
     end
 
     private

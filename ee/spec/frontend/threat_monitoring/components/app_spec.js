@@ -1,4 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import { GlAlert, GlEmptyState } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/threat_monitoring/store';
@@ -13,6 +15,8 @@ const documentationPath = '/docs';
 const emptyStateSvgPath = '/svgs';
 const environmentsEndpoint = `${TEST_HOST}/environments`;
 const wafStatisticsEndpoint = `${TEST_HOST}/waf`;
+const userCalloutId = 'threat_monitoring_info';
+const userCalloutsPath = `${TEST_HOST}/user_callouts`;
 
 describe('ThreatMonitoringApp component', () => {
   let store;
@@ -28,7 +32,15 @@ describe('ThreatMonitoringApp component', () => {
     jest.spyOn(store, 'dispatch').mockImplementation();
 
     wrapper = shallowMount(ThreatMonitoringApp, {
-      propsData,
+      propsData: {
+        defaultEnvironmentId,
+        emptyStateSvgPath,
+        documentationPath,
+        showUserCallout: true,
+        userCalloutId,
+        userCalloutsPath,
+        ...propsData,
+      },
       store,
       sync: false,
     });
@@ -49,8 +61,6 @@ describe('ThreatMonitoringApp component', () => {
       beforeEach(() => {
         factory({
           defaultEnvironmentId: invalidEnvironmentId,
-          emptyStateSvgPath,
-          documentationPath,
         });
       });
 
@@ -71,11 +81,7 @@ describe('ThreatMonitoringApp component', () => {
 
   describe('given there is a default environment', () => {
     beforeEach(() => {
-      factory({
-        defaultEnvironmentId,
-        emptyStateSvgPath,
-        documentationPath,
-      });
+      factory();
     });
 
     it('dispatches the setCurrentEnvironmentId and fetchEnvironments actions', () => {
@@ -103,14 +109,39 @@ describe('ThreatMonitoringApp component', () => {
     });
 
     describe('dismissing the alert', () => {
+      let mockAxios;
+
       beforeEach(() => {
+        mockAxios = new MockAdapter(axios);
+        mockAxios.onPost(userCalloutsPath, { feature_name: userCalloutId }).reply(200);
+
         findAlert().vm.$emit('dismiss');
         return wrapper.vm.$nextTick();
+      });
+
+      afterEach(() => {
+        mockAxios.restore();
       });
 
       it('hides the alert', () => {
         expect(findAlert().exists()).toBe(false);
       });
+
+      it('posts the dismissal to the user callouts endpoint', () => {
+        expect(mockAxios.history.post).toHaveLength(1);
+      });
+    });
+  });
+
+  describe('given showUserCallout is false', () => {
+    beforeEach(() => {
+      factory({
+        showUserCallout: false,
+      });
+    });
+
+    it('does not render the alert', () => {
+      expect(findAlert().exists()).toBe(false);
     });
 
     describe('given the statistics are loading', () => {
