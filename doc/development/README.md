@@ -71,6 +71,7 @@ description: 'Learn how to contribute to GitLab.'
 - [Auto DevOps development guide](auto_devops.md)
 - [Mass Inserting Models](mass_insert.md)
 - [Cycle Analytics development guide](cycle_analytics.md)
+- [Issue types vs first-class types](issue_types.md)
 
 ## Performance guides
 
