@@ -203,7 +203,8 @@ module API
           not_found!('GeoNode') unless geo_node
 
           geo_node.destroy!
-          status 204
+
+          no_content!
         end
       end
     end
