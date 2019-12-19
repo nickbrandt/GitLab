@@ -2,9 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
-Next
+v 8.18.0
 
 - Allow inline content disposition for pdf files !446
+- Update environment websocket route !449
 
 v 8.17.0
 
