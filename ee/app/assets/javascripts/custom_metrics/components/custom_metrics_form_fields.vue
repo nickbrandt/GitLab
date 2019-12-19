@@ -1,12 +1,5 @@
 <script>
-import {
-  GlFormInput,
-  GlButton,
-  GlLink,
-  GlFormGroup,
-  GlFormRadioGroup,
-  GlLoadingIcon,
-} from '@gitlab/ui';
+import { GlFormInput, GlLink, GlFormGroup, GlFormRadioGroup, GlLoadingIcon } from '@gitlab/ui';
 import { debounce } from 'underscore';
 import { __, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -46,7 +39,6 @@ function backOffRequest(makeRequestCallback) {
 export default {
   components: {
     GlFormInput,
-    GlButton,
     GlLink,
     GlFormGroup,
     GlFormRadioGroup,

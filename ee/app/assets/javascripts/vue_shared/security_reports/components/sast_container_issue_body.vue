@@ -3,14 +3,12 @@
  * Renders SAST CONTAINER body text
  * [priority]: [name] in [link]:[line]
  */
-import ReportLink from '~/reports/components/report_link.vue';
 import ModalOpenName from '~/reports/components/modal_open_name.vue';
 import { humanize } from '~/lib/utils/text_utility';
 
 export default {
   name: 'SastContainerIssueBody',
   components: {
-    ReportLink,
     ModalOpenName,
   },
   props: {

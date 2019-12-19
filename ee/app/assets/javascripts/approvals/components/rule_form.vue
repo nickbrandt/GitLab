@@ -1,7 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import _ from 'underscore';
-import { GlButton } from '@gitlab/ui';
 import { sprintf, __ } from '~/locale';
 import ApproversList from './approvers_list.vue';
 import ApproversSelect from './approvers_select.vue';
@@ -15,7 +14,6 @@ export default {
   components: {
     ApproversList,
     ApproversSelect,
-    GlButton,
   },
   props: {
     initRule: {

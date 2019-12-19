@@ -3,13 +3,11 @@ import { mapActions } from 'vuex';
 import { GlButton } from '@gitlab/ui';
 import RuleInput from './rule_input.vue';
 import EmptyRuleName from '../empty_rule_name.vue';
-import RuleControls from './../rule_controls.vue';
 
 export default {
   components: {
     RuleInput,
     EmptyRuleName,
-    RuleControls,
     GlButton,
   },
   props: {

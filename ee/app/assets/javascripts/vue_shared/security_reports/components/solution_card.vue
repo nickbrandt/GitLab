@@ -1,11 +1,10 @@
 <script>
-import { GlButton } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import { setUrlFragment } from '~/lib/utils/url_utility';
 
 export default {
   name: 'SolutionCard',
-  components: { GlButton, Icon },
+  components: { Icon },
   props: {
     solution: {
       type: String,

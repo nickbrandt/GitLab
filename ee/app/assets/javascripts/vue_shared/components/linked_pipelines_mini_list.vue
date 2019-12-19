@@ -1,7 +1,6 @@
 <script>
 import { sprintf, s__ } from '~/locale';
 import icon from '~/vue_shared/components/icon.vue';
-import ciStatus from '~/vue_shared/components/ci_icon.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 
 export default {
@@ -9,7 +8,6 @@ export default {
     tooltip,
   },
   components: {
-    ciStatus,
     icon,
   },
   props: {
