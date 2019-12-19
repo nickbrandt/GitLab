@@ -67,10 +67,10 @@ that you can later download and analyze. Due to implementation limitations we al
 take the latest Code Quality artifact available.
 
 It is also possible to override the URL to the Code Quality image by
-setting the `CODE_QUALITY_IMAGE` variable. This is particularly useful when you want
-to lock into a specific version of Code Quality or use a fork of it:
+setting the `CODE_QUALITY_IMAGE` variable. This is particularly useful if you want
+to lock in a specific version of Code Quality, or use a fork of it:
 
-```
+```yaml
 include:
   - template: Code-Quality.gitlab-ci.yml
 
