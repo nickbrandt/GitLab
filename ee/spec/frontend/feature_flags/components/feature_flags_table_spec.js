@@ -1,5 +1,5 @@
 import FeatureFlagsTable from 'ee/feature_flags/components/feature_flags_table.vue';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlToggle } from '@gitlab/ui';
 import { trimText } from 'helpers/text_helper';
 import {
@@ -7,8 +7,6 @@ import {
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
   DEFAULT_PERCENT_ROLLOUT,
 } from 'ee/feature_flags/constants';
-
-const localVue = createLocalVue();
 
 const getDefaultProps = () => ({
   featureFlags: [
@@ -44,7 +42,6 @@ describe('Feature flag table', () => {
     wrapper = shallowMount(FeatureFlagsTable, {
       propsData,
       sync: false,
-      localVue,
       ...opts,
     });
   };

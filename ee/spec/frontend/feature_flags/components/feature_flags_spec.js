@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import store from 'ee/feature_flags/store';
@@ -10,8 +10,6 @@ import NavigationTabs from '~/vue_shared/components/navigation_tabs';
 import TablePagination from '~/vue_shared/components/pagination/table_pagination.vue';
 import axios from '~/lib/utils/axios_utils';
 import { getRequestData } from '../mock_data';
-
-const localVue = createLocalVue();
 
 describe('Feature flags', () => {
   const mockData = {
@@ -32,7 +30,6 @@ describe('Feature flags', () => {
 
   const factory = (propsData = mockData) => {
     wrapper = shallowMount(FeatureFlagsComponent, {
-      localVue,
       propsData,
       sync: false,
     });
@@ -148,7 +145,7 @@ describe('Feature flags', () => {
         it('renders disabled title', () => {
           wrapper.setData({ scope: 'disabled' });
 
-          return localVue.nextTick(() => {
+          return wrapper.vm.$nextTick(() => {
             expect(emptyState.props('title')).toEqual('There are no inactive feature flags');
           });
         });
@@ -158,7 +155,7 @@ describe('Feature flags', () => {
         it('renders enabled title', () => {
           wrapper.setData({ scope: 'enabled' });
 
-          localVue.nextTick(() => {
+          wrapper.vm.$nextTick(() => {
             expect(emptyState.props('title')).toEqual('There are no active feature flags');
           });
         });

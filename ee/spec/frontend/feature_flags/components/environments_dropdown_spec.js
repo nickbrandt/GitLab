@@ -1,11 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
 import { TEST_HOST } from 'spec/test_constants';
 import axios from '~/lib/utils/axios_utils';
-
-const localVue = createLocalVue();
 
 describe('Feature flags > Environments dropdown ', () => {
   let wrapper;
@@ -13,7 +11,6 @@ describe('Feature flags > Environments dropdown ', () => {
 
   const factory = props => {
     wrapper = shallowMount(EnvironmentsDropdown, {
-      localVue,
       propsData: {
         endpoint: `${TEST_HOST}/environments.json'`,
         ...props,
