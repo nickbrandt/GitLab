@@ -95,7 +95,6 @@ export default {
       parseInt(localStorage.getItem(TREE_LIST_WIDTH_STORAGE_KEY), 10) || INITIAL_TREE_WIDTH;
 
     return {
-      assignedDiscussions: false,
       treeWidth,
     };
   },
@@ -114,6 +113,7 @@ export default {
       numVisibleFiles: state => state.diffs.size,
       plainDiffPath: state => state.diffs.plainDiffPath,
       emailPatchPath: state => state.diffs.emailPatchPath,
+      retrievingBatches: state => state.diffs.retrievingBatches,
     }),
     ...mapState('diffs', ['showTreeList', 'isLoading', 'startVersion']),
     ...mapGetters('diffs', ['isParallelView', 'currentDiffIndex']),
@@ -144,9 +144,6 @@ export default {
     isLimitedContainer() {
       return !this.showTreeList && !this.isParallelView && !this.isFluidLayout;
     },
-    shouldSetDiscussions() {
-      return this.isNotesFetched && !this.assignedDiscussions && !this.isLoading;
-    },
   },
   watch: {
     diffViewType() {
@@ -163,10 +160,8 @@ export default {
     },
     isLoading: 'adjustView',
     showTreeList: 'adjustView',
-    shouldSetDiscussions(newVal) {
-      if (newVal) {
-        this.setDiscussions();
-      }
+    retrievingBatches(newVal) {
+      if (!newVal) this.unwatchDiscussions();
     },
   },
   mounted() {
@@ -192,10 +187,14 @@ export default {
   },
   created() {
     this.adjustView();
-    eventHub.$once('fetchedNotesData', this.setDiscussions);
     eventHub.$once('fetchDiffData', this.fetchData);
     eventHub.$on('refetchDiffData', this.refetchDiffData);
     this.CENTERED_LIMITED_CONTAINER_CLASSES = CENTERED_LIMITED_CONTAINER_CLASSES;
+
+    this.unwatchDiscussions = this.$watch(
+      () => `${this.diffFiles.length}:${this.$store.state.notes.discussions.length}`,
+      () => this.setDiscussions(),
+    );
   },
   beforeDestroy() {
     eventHub.$off('fetchDiffData', this.fetchData);
@@ -217,7 +216,6 @@ export default {
       'toggleShowTreeList',
     ]),
     refetchDiffData() {
-      this.assignedDiscussions = false;
       this.fetchData(false);
     },
     startDiffRendering() {
@@ -269,17 +267,13 @@ export default {
       }
     },
     setDiscussions() {
-      if (this.shouldSetDiscussions) {
-        this.assignedDiscussions = true;
-
-        requestIdleCallback(
-          () =>
-            this.assignDiscussionsToDiff()
-              .then(this.$nextTick)
-              .then(this.startTaskList),
-          { timeout: 1000 },
-        );
-      }
+      requestIdleCallback(
+        () =>
+          this.assignDiscussionsToDiff()
+            .then(this.$nextTick)
+            .then(this.startTaskList),
+        { timeout: 1000 },
+      );
     },
     adjustView() {
       if (this.shouldShow) {
