@@ -29,7 +29,7 @@ module API
           exclude_subgroups: params[:exclude_subgroups]
         ).execute
 
-        present paginate(packages), with: EE::API::Entities::Package
+        present paginate(packages), with: EE::API::Entities::Package, user: current_user, group: true
       end
     end
   end

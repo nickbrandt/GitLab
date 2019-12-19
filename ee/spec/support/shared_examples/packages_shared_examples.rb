@@ -27,7 +27,7 @@ shared_examples 'returns packages' do |container_type, user_type|
     it 'returns a valid response schema' do
       subject
 
-      expect(response).to match_response_schema('public_api/v4/packages/packages', dir: 'ee')
+      expect(response).to match_response_schema(package_schema, dir: 'ee')
     end
 
     it 'returns two packages' do
@@ -54,7 +54,7 @@ shared_examples 'returns packages with subgroups' do |container_type, user_type|
     it 'returns a valid response schema' do
       subject
 
-      expect(response).to match_response_schema('public_api/v4/packages/packages', dir: 'ee')
+      expect(response).to match_response_schema(package_schema, dir: 'ee')
     end
 
     it 'returns three packages' do

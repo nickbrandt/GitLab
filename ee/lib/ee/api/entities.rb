@@ -885,6 +885,14 @@ module EE
         end
 
         expose :created_at
+        expose :project_id, if: ->(_, opts) { opts[:group] }
+        expose :project_path, if: ->(_, opts) { opts[:group] }
+
+        private
+
+        def project_path
+          object.project.root_namespace.path
+        end
       end
 
       class PackageFile < Grape::Entity
