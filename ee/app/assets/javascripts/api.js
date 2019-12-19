@@ -92,7 +92,7 @@ export default {
    * @param {string=} params.containerName - Container name, if not set the backend assumes a default one
    * @returns {Promise} Axios promise for the result of a GET request of logs
    */
-  getPodLogs({ projectPath, environmentName, podName, containerName }) {
+  getPodLogs({ projectPath, environmentName, podName, containerName, search }) {
     const url = this.buildUrl(this.podLogsPath).replace(':project_full_path', projectPath);
 
     const params = {
@@ -104,6 +104,9 @@ export default {
     }
     if (containerName) {
       params.container_name = containerName;
+    }
+    if (search) {
+      params.search = search;
     }
 
     return axios.get(url, { params });

@@ -264,7 +264,8 @@ describe Clusters::Platforms::Kubernetes do
             'environment_id' => environment.id,
             'pod_name' => pod_name,
             'namespace' => namespace,
-            'container' => container
+            'container' => container,
+            'search' => nil
           }
         ]
       end

@@ -13,6 +13,7 @@ describe PodLogsService do
     let(:response_pod_name) { pod_name }
     let(:pods) { [pod_name] }
     let(:container_name) { 'container-1' }
+    let(:search) { nil }
     let(:logs) { ['Log 1', 'Log 2', 'Log 3'] }
     let(:result) { subject.execute }
 
@@ -20,7 +21,8 @@ describe PodLogsService do
       ActionController::Parameters.new(
         {
           'pod_name' => pod_name,
-          'container_name' => container_name
+          'container_name' => container_name,
+          'search' => search
         }
       ).permit!
     end
@@ -54,7 +56,7 @@ describe PodLogsService do
     shared_context 'return error' do |message|
       before do
         allow_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
-          .with(environment.id, pod_name, environment.deployment_namespace, container: container_name)
+          .with(environment.id, pod_name, environment.deployment_namespace, container: container_name, search: search)
           .and_return({
             status: :error,
             error: message,
@@ -67,7 +69,7 @@ describe PodLogsService do
     shared_context 'return success' do
       before do
         allow_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
-          .with(environment.id, response_pod_name, environment.deployment_namespace, container: container_name)
+          .with(environment.id, response_pod_name, environment.deployment_namespace, container: container_name, search: search)
           .and_return({
             status: :success,
             logs: ["Log 1", "Log 2", "Log 3"],
@@ -151,7 +153,7 @@ describe PodLogsService do
 
         it 'returns logs of first pod' do
           expect_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
-            .with(environment.id, first_pod_name, environment.deployment_namespace, container: nil)
+            .with(environment.id, first_pod_name, environment.deployment_namespace, container: nil, search: search)
 
           subject.execute
         end
@@ -177,6 +179,16 @@ describe PodLogsService do
         end
       end
 
+      context 'when search is specified' do
+        let(:pod_name) { 'some-pod' }
+        let(:container_name) { nil }
+        let(:search) { 'foo +bar' }
+
+        include_context 'return success'
+
+        it_behaves_like 'success'
+      end
+
       context 'when error is returned' do
         include_context 'return error', 'Kubernetes API returned status code: 400'
 
@@ -188,7 +200,7 @@ describe PodLogsService do
       context 'when nil is returned' do
         before do
           allow_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
-            .with(environment.id, pod_name, environment.deployment_namespace, container: container_name)
+            .with(environment.id, pod_name, environment.deployment_namespace, container: container_name, search: search)
             .and_return(nil)
         end
 

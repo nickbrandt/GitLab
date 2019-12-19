@@ -5,7 +5,7 @@ module Projects
     before_action :authorize_read_pod_logs!
     before_action :environment
     before_action do
-      push_frontend_feature_flag(:environment_logs_use_vue_ui)
+      push_frontend_feature_flag(:enable_cluster_application_elastic_stack)
     end
 
     def index
@@ -38,7 +38,7 @@ module Projects
     end
 
     def filter_params
-      params.permit(:container_name, :pod_name)
+      params.permit(:container_name, :pod_name, :search)
     end
 
     def environment
