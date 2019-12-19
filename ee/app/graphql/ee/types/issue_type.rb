@@ -14,7 +14,7 @@ module EE
               resolve: -> (obj, _args, _ctx) { obj.supports_weight? ? obj.weight : nil }
 
         field :designs, ::Types::DesignManagement::DesignCollectionType, null: true,
-              description: "Deprecated. Use `design_collection`.",
+              description: "Deprecated. Use `design_collection`",
               method: :design_collection,
               deprecation_reason: 'use design_collection'
 
