@@ -94,10 +94,10 @@ schedule:review-build-cng:
   variables:
     HOST_SUFFIX: "${CI_ENVIRONMENT_SLUG}"
     DOMAIN: "-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}"
-    # v2.3.7 + some stability improvements not yet released:
-    # - sidekiq readinessProbe should be `pgrep -f sidekiq`: https://gitlab.com/gitlab-org/charts/gitlab/merge_requests/991
-    # - Allows livenessProbe and readinessProbe to be configured for unicorn: https://gitlab.com/gitlab-org/charts/gitlab/merge_requests/985
-    GITLAB_HELM_CHART_REF: "df7c52dc69df441909880b8f2fd15e938cdb2047"
+    # v2.4.4 + two improvements:
+    # - Allow to pass an EE license when installing the chart: https://gitlab.com/gitlab-org/charts/gitlab/merge_requests/1008
+    # - Allow to customize the livenessProbe for `gitlab-shell`: https://gitlab.com/gitlab-org/charts/gitlab/merge_requests/1021
+    GITLAB_HELM_CHART_REF: "6c655ed77e60f1f7f533afb97bef8c9cb7dc61eb"
     GITLAB_EDITION: "ce"
   environment:
     name: review/${CI_COMMIT_REF_NAME}
@@ -118,21 +118,13 @@ schedule:review-build-cng:
     - install_api_client_dependencies_with_apk
     - source scripts/review_apps/review-apps.sh
   script:
-    - date
     - check_kube_domain
-    - date
     - ensure_namespace
-    - date
     - install_tiller
-    - date
     - install_external_dns
-    - date
     - download_chart
     - date
     - deploy || (display_deployment_debug && exit 1)
-    - date
-    - add_license
-    - date
   artifacts:
     paths: [review_app_url.txt]
     expire_in: 2 days
@@ -152,7 +144,10 @@ schedule:review-deploy:
   needs: ["schedule:review-build-cng"]
 
 .base-review-stop:
-  extends: .review-workflow-base
+  extends:
+    - .review-workflow-base
+    - .only-review
+    - .only:changes-code-qa
   environment:
     action: stop
   variables:
@@ -166,7 +161,7 @@ schedule:review-deploy:
     - source utils.sh
     - source review-apps.sh
 
-review-cleanup-failed-deployment:
+review-stop-failed-deployment:
   extends: .base-review-stop
   stage: prepare
   script:
@@ -174,6 +169,7 @@ review-cleanup-failed-deployment:
 
 review-stop:
   extends: .base-review-stop
+  stage: review
   when: manual
   allow_failure: true
   script:
