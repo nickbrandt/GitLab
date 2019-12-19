@@ -1,0 +1,6 @@
+---
+title: Add hover and focus states to the Recent Searches button in the search bar,
+  and add border radius to the Recent Searches button and the search input field.
+merge_request: 20736
+author:
+type: fixed
