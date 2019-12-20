@@ -1,11 +1,11 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import { createStore } from '~/monitoring/stores';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import PanelType from 'ee/monitoring/components/panel_type.vue';
 import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
+import { createStore } from '~/monitoring/stores';
+import axios from '~/lib/utils/axios_utils';
 import { graphDataPrometheusQueryRange } from '../../../../spec/frontend/monitoring/mock_data';
 
 global.URL.createObjectURL = jest.fn();

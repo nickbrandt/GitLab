@@ -1,12 +1,11 @@
 <script>
-import { GlButton, GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
+import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import _ from 'underscore';
 
 export default {
   name: 'DeleteButton',
   components: {
     GlButton,
-    GlLoadingIcon,
     GlModal,
   },
   directives: {

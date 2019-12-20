@@ -92,13 +92,14 @@ module Projects
     end
 
     # The underlying FetchInternalRemote call uses a `git fetch` to move data
-    # to the new repository, which leaves it in a less-well-packed state and
-    # lacking bitmaps. Housekeeping will boost performance significantly.
+    # to the new repository, which leaves it in a less-well-packed state,
+    # lacking bitmaps and commit graphs. Housekeeping will boost performance
+    # significantly.
     def enqueue_housekeeping
       return unless Gitlab::CurrentSettings.housekeeping_enabled?
       return unless Feature.enabled?(:repack_after_shard_migration, project)
 
-      Projects::HousekeepingService.new(project, :full_repack).execute
+      Projects::HousekeepingService.new(project, :gc).execute
     rescue Projects::HousekeepingService::LeaseTaken
       # No action required
     end

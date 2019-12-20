@@ -154,6 +154,8 @@ describe AutoMerge::MergeTrainService do
         expect(AutoMergeProcessWorker).to receive(:perform_async).with(merge_request_2.id)
 
         subject
+
+        expect(merge_request_2.reset.merge_train).to be_stale
       end
     end
   end
@@ -200,6 +202,8 @@ describe AutoMerge::MergeTrainService do
         expect(AutoMergeProcessWorker).to receive(:perform_async).with(merge_request_2.id)
 
         subject
+
+        expect(merge_request_2.reset.merge_train).to be_stale
       end
 
       context 'when process_next is false' do

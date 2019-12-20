@@ -12,6 +12,7 @@ class Commit
   include StaticModel
   include Presentable
   include ::Gitlab::Utils::StrongMemoize
+  include ActsAsPaginatedDiff
   include CacheMarkdownField
 
   attr_mentionable :safe_message, pipeline: :single_line
@@ -279,6 +280,10 @@ class Commit
 
   def notes
     project.notes.for_commit_id(self.id)
+  end
+
+  def user_mentions
+    CommitUserMention.where(commit_id: self.id)
   end
 
   def discussion_notes

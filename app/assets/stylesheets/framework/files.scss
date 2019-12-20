@@ -207,6 +207,14 @@
           border-left-color: mix($blame-gray, $blame-cyan, $i / 4 * 100%);
         }
       }
+
+      .doc-versions {
+        color: $gray-600;
+
+        &:hover {
+          color: $gray-900;
+        }
+      }
     }
 
     &.logs {
@@ -334,10 +342,6 @@ span.idiff {
     padding: $gl-padding-8 $gl-padding;
     margin: 0;
     border-radius: $border-radius-default $border-radius-default 0 0;
-
-    &.is-stuck {
-      border-radius: 0;
-    }
   }
 
   .file-header-content {
@@ -489,4 +493,9 @@ span.idiff {
 .jupyter-notebook-scrolled {
   overflow-y: auto;
   max-height: 20rem;
+}
+
+#js-openapi-viewer pre.version {
+  background-color: transparent;
+  border: transparent;
 }

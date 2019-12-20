@@ -176,6 +176,7 @@ export default {
         :items="list"
         :fields="headerFields"
         :no-local-sorting="true"
+        stacked="md"
       >
         <template #name="{value}">
           <div ref="col-name" class="flex-truncate-parent">

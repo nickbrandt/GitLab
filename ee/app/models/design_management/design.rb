@@ -7,6 +7,7 @@ module DesignManagement
     include Gitlab::FileTypeDetection
     include Gitlab::Utils::StrongMemoize
     include Referable
+    include Mentionable
 
     belongs_to :project, inverse_of: :designs
     belongs_to :issue
@@ -16,6 +17,7 @@ module DesignManagement
     # This is a polymorphic association, so we can't count on FK's to delete the
     # data
     has_many :notes, as: :noteable, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
+    has_many :user_mentions, class_name: "DesignUserMention"
 
     validates :project, :filename, presence: true
     validates :issue, presence: true, unless: :importing?
@@ -105,9 +107,7 @@ module DesignManagement
     end
 
     def diff_refs
-      strong_memoize(:diff_refs) do
-        head_version.presence && repository.commit(head_version.sha).diff_refs
-      end
+      strong_memoize(:diff_refs) { head_version&.diff_refs }
     end
 
     def clear_version_cache
@@ -156,7 +156,7 @@ module DesignManagement
 
     def user_notes_count_service
       strong_memoize(:user_notes_count_service) do
-        DesignManagement::DesignUserNotesCountService.new(self) # rubocop: disable CodeReuse/ServiceClass
+        ::DesignManagement::DesignUserNotesCountService.new(self) # rubocop: disable CodeReuse/ServiceClass
       end
     end
   end

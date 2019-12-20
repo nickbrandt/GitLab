@@ -28,6 +28,15 @@ const groups = [
 describe('GroupsDropdownFilter component', () => {
   let wrapper;
 
+  const createComponent = (props = {}) => {
+    wrapper = mount(GroupsDropdownFilter, {
+      sync: false,
+      propsData: {
+        ...props,
+      },
+    });
+  };
+
   afterEach(() => {
     wrapper.destroy();
   });
@@ -37,10 +46,9 @@ describe('GroupsDropdownFilter component', () => {
     Api.groups.mockImplementation((term, options, callback) => {
       callback(groups);
     });
-    wrapper = mount(GroupsDropdownFilter);
   });
 
-  const findDropdown = () => wrapper.find('.dropdown');
+  const findDropdown = () => wrapper.find({ ref: 'groupsDropdown' });
   const openDropdown = () => {
     $(findDropdown().element)
       .parent()
@@ -48,13 +56,33 @@ describe('GroupsDropdownFilter component', () => {
   };
   const findDropdownItems = () => findDropdown().findAll('a');
   const findDropdownButton = () => findDropdown().find('button');
+  const findDropdownButtonAvatar = () => findDropdown().find('.gl-avatar');
 
   it('should call glDropdown', () => {
+    createComponent();
     expect($.fn.glDropdown).toHaveBeenCalled();
+  });
+
+  describe('when passed a defaultGroup as prop', () => {
+    beforeEach(() => {
+      createComponent({
+        defaultGroup: groups[0],
+      });
+    });
+
+    it("displays the defaultGroup's name", () => {
+      expect(findDropdownButton().text()).toContain(groups[0].name);
+    });
+
+    it("renders the defaultGroup's avatar", () => {
+      expect(findDropdownButtonAvatar().exists()).toBe(true);
+    });
   });
 
   describe('it renders the items correctly', () => {
     beforeEach(() => {
+      createComponent();
+
       openDropdown();
 
       return wrapper.vm.$nextTick();
@@ -102,6 +130,8 @@ describe('GroupsDropdownFilter component', () => {
 
   describe('on group click', () => {
     beforeEach(() => {
+      createComponent();
+
       openDropdown();
 
       return wrapper.vm.$nextTick();

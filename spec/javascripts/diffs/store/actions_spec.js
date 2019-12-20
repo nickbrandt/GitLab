@@ -1,9 +1,11 @@
 import MockAdapter from 'axios-mock-adapter';
 import Cookies from 'js-cookie';
+import mockDiffFile from 'spec/diffs/mock_data/diff_file';
 import {
   DIFF_VIEW_COOKIE_NAME,
   INLINE_DIFF_VIEW_TYPE,
   PARALLEL_DIFF_VIEW_TYPE,
+  DIFFS_PER_PAGE,
 } from '~/diffs/constants';
 import actions, {
   setBaseConfig,
@@ -44,7 +46,6 @@ import actions, {
 import eventHub from '~/notes/event_hub';
 import * as types from '~/diffs/store/mutation_types';
 import axios from '~/lib/utils/axios_utils';
-import mockDiffFile from 'spec/diffs/mock_data/diff_file';
 import testAction from '../../helpers/vuex_action_helper';
 
 describe('DiffsStoreActions', () => {
@@ -75,6 +76,7 @@ describe('DiffsStoreActions', () => {
       const projectPath = '/root/project';
       const dismissEndpoint = '/-/user_callouts';
       const showSuggestPopover = false;
+      const useSingleDiffStyle = false;
 
       testAction(
         setBaseConfig,
@@ -85,6 +87,7 @@ describe('DiffsStoreActions', () => {
           projectPath,
           dismissEndpoint,
           showSuggestPopover,
+          useSingleDiffStyle,
         },
         {
           endpoint: '',
@@ -93,6 +96,7 @@ describe('DiffsStoreActions', () => {
           projectPath: '',
           dismissEndpoint: '',
           showSuggestPopover: true,
+          useSingleDiffStyle: true,
         },
         [
           {
@@ -104,6 +108,7 @@ describe('DiffsStoreActions', () => {
               projectPath,
               dismissEndpoint,
               showSuggestPopover,
+              useSingleDiffStyle,
             },
           },
         ],
@@ -142,13 +147,15 @@ describe('DiffsStoreActions', () => {
   describe('fetchDiffFilesBatch', () => {
     it('should fetch batch diff files', done => {
       const endpointBatch = '/fetch/diffs_batch';
-      const batch1 = `${endpointBatch}?per_page=10`;
-      const batch2 = `${endpointBatch}?per_page=10&page=2`;
       const mock = new MockAdapter(axios);
       const res1 = { diff_files: [], pagination: { next_page: 2 } };
       const res2 = { diff_files: [], pagination: {} };
-      mock.onGet(batch1).reply(200, res1);
-      mock.onGet(batch2).reply(200, res2);
+      mock
+        .onGet(endpointBatch, { params: { page: undefined, per_page: DIFFS_PER_PAGE, w: '1' } })
+        .reply(200, res1);
+      mock
+        .onGet(endpointBatch, { params: { page: 2, per_page: DIFFS_PER_PAGE, w: '1' } })
+        .reply(200, res2);
 
       testAction(
         fetchDiffFilesBatch,
@@ -156,10 +163,12 @@ describe('DiffsStoreActions', () => {
         { endpointBatch },
         [
           { type: types.SET_BATCH_LOADING, payload: true },
+          { type: types.SET_RETRIEVING_BATCHES, payload: true },
           { type: types.SET_DIFF_DATA_BATCH, payload: { diff_files: res1.diff_files } },
           { type: types.SET_BATCH_LOADING, payload: false },
           { type: types.SET_DIFF_DATA_BATCH, payload: { diff_files: [] } },
           { type: types.SET_BATCH_LOADING, payload: false },
+          { type: types.SET_RETRIEVING_BATCHES, payload: false },
         ],
         [],
         () => {
@@ -208,6 +217,8 @@ describe('DiffsStoreActions', () => {
 
   describe('assignDiscussionsToDiff', () => {
     it('should merge discussions into diffs', done => {
+      window.location.hash = 'ABC_123';
+
       const state = {
         diffFiles: [
           {

@@ -11,9 +11,7 @@ module QA
           project_name = "geo-wiki-project-#{SecureRandom.hex(8)}"
 
           # Create new wiki and push wiki commit
-          Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
+          QA::Flow::Login.while_signed_in(address: :geo_primary) do
             project = Resource::Project.fabricate! do |project|
               project.name = project_name
               project.description = 'Geo project for wiki repo test'
@@ -40,9 +38,7 @@ module QA
           end
 
           # Validate that wiki is synced on secondary node
-          Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
+          QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
             end

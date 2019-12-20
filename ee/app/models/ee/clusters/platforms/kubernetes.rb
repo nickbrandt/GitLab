@@ -29,7 +29,7 @@ module EE
           ::Gitlab::Kubernetes::RolloutStatus.from_deployments(*deployments, pods: pods, legacy_deployments: legacy_deployments)
         end
 
-        def read_pod_logs(environment_id, pod_name, namespace, container: nil)
+        def read_pod_logs(environment_id, pod_name, namespace, container: nil, search: nil)
           # environment_id is required for use in reactive_cache_updated(),
           # to invalidate the ETag cache.
           with_reactive_cache(
@@ -37,7 +37,8 @@ module EE
             'environment_id' => environment_id,
             'pod_name' => pod_name,
             'namespace' => namespace,
-            'container' => container
+            'container' => container,
+            'search' => search
           ) do |result|
             result
           end
@@ -49,11 +50,12 @@ module EE
             container = opts['container']
             pod_name = opts['pod_name']
             namespace = opts['namespace']
+            search = opts['search']
 
-            handle_exceptions(_('Pod not found'), pod_name: pod_name, container_name: container) do
+            handle_exceptions(_('Pod not found'), pod_name: pod_name, container_name: container, search: search) do
               container ||= container_names_of(pod_name, namespace).first
 
-              pod_logs(pod_name, namespace, container: container)
+              pod_logs(pod_name, namespace, container: container, search: search)
             end
           end
         end
@@ -68,11 +70,11 @@ module EE
 
             ::Gitlab::EtagCaching::Store.new.tap do |store|
               store.touch(
-                ::Gitlab::Routing.url_helpers.k8s_pod_logs_project_environment_path(
+                ::Gitlab::Routing.url_helpers.k8s_project_logs_path(
                   environment.project,
-                  environment,
-                  opts['pod_name'],
-                  opts['container_name'],
+                  environment_name: environment.name,
+                  pod_name: opts['pod_name'],
+                  container_name: opts['container_name'],
                   format: :json
                 )
               )
@@ -82,9 +84,9 @@ module EE
 
         private
 
-        def pod_logs(pod_name, namespace, container: nil)
+        def pod_logs(pod_name, namespace, container: nil, search: nil)
           logs = if ::Feature.enabled?(:enable_cluster_application_elastic_stack) && elastic_stack_client
-                   elastic_stack_pod_logs(namespace, pod_name, container)
+                   elastic_stack_pod_logs(namespace, pod_name, container, search)
                  else
                    platform_pod_logs(namespace, pod_name, container)
                  end
@@ -99,17 +101,25 @@ module EE
 
         def platform_pod_logs(namespace, pod_name, container_name)
           logs = kubeclient.get_pod_log(
-            pod_name, namespace, container: container_name, tail_lines: LOGS_LIMIT
+            pod_name, namespace, container: container_name, tail_lines: LOGS_LIMIT, timestamps: true
           ).body
 
-          logs.strip.split("\n")
+          logs.strip.split("\n").map do |line|
+            # message contains a RFC3339Nano timestamp, then a space, then the log line.
+            # resolution of the nanoseconds can vary, so we split on the first space
+            values = line.split(' ', 2)
+            {
+              timestamp: values[0],
+              message: values[1]
+            }
+          end
         end
 
-        def elastic_stack_pod_logs(namespace, pod_name, container_name)
+        def elastic_stack_pod_logs(namespace, pod_name, container_name, search)
           client = elastic_stack_client
           return [] if client.nil?
 
-          ::Gitlab::Elasticsearch::Logs.new(client).pod_logs(namespace, pod_name, container_name)
+          ::Gitlab::Elasticsearch::Logs.new(client).pod_logs(namespace, pod_name, container_name, search)
         end
 
         def elastic_stack_client
@@ -126,7 +136,7 @@ module EE
             status: :error
           }.merge(opts)
         rescue Kubeclient::HttpError => e
-          ::Gitlab::Sentry.track_acceptable_exception(e)
+          ::Gitlab::ErrorTracking.track_exception(e)
 
           {
             error: _('Kubernetes API returned status code: %{error_code}') % {

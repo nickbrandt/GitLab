@@ -71,6 +71,7 @@ class MergeRequest < ApplicationRecord
 
   has_many :merge_request_assignees
   has_many :assignees, class_name: "User", through: :merge_request_assignees
+  has_many :user_mentions, class_name: "MergeRequestUserMention"
 
   has_many :deployment_merge_requests
 
@@ -1121,22 +1122,18 @@ class MergeRequest < ApplicationRecord
     actual_head_pipeline.success?
   end
 
-  def environments_for(current_user)
+  def environments_for(current_user, latest: false)
     return [] unless diff_head_commit
 
-    @environments ||= Hash.new do |h, current_user|
-      envs = EnvironmentsFinder.new(target_project, current_user,
-        ref: target_branch, commit: diff_head_commit, with_tags: true).execute
+    envs = EnvironmentsFinder.new(target_project, current_user,
+      ref: target_branch, commit: diff_head_commit, with_tags: true, find_latest: latest).execute
 
-      if source_project
-        envs.concat EnvironmentsFinder.new(source_project, current_user,
-          ref: source_branch, commit: diff_head_commit).execute
-      end
-
-      h[current_user] = envs.uniq
+    if source_project
+      envs.concat EnvironmentsFinder.new(source_project, current_user,
+        ref: source_branch, commit: diff_head_commit, find_latest: latest).execute
     end
 
-    @environments[current_user]
+    envs.uniq
   end
 
   ##
@@ -1422,6 +1419,12 @@ class MergeRequest < ApplicationRecord
     true
   end
 
+  def pipeline_coverage_delta
+    if base_pipeline&.coverage && head_pipeline&.coverage
+      '%.2f' % (head_pipeline.coverage.to_f - base_pipeline.coverage.to_f)
+    end
+  end
+
   def base_pipeline
     @base_pipeline ||= project.ci_pipelines
       .order(id: :desc)
@@ -1507,7 +1510,7 @@ class MergeRequest < ApplicationRecord
       end
     end
   rescue ActiveRecord::LockWaitTimeout => e
-    Gitlab::Sentry.track_acceptable_exception(e)
+    Gitlab::ErrorTracking.track_exception(e)
     raise RebaseLockTimeout, REBASE_LOCK_MESSAGE
   end
 

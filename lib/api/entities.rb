@@ -188,7 +188,7 @@ module API
     end
 
     class BasicProjectDetails < ProjectIdentity
-      include ::API::ProjectsBatchCounting
+      include ::API::ProjectsRelationBuilder
 
       expose :default_branch, if: -> (project, options) { Ability.allowed?(options[:current_user], :download_code, project) }
       # Avoids an N+1 query: https://github.com/mbleigh/acts-as-taggable-on/issues/91#issuecomment-168273770
@@ -430,7 +430,7 @@ module API
           options: { only_owned: true, limit: projects_limit }
         ).execute
 
-        Entities::Project.preload_and_batch_count!(projects)
+        Entities::Project.prepare_relation(projects)
       end
 
       expose :shared_projects, using: Entities::Project do |group, options|
@@ -440,7 +440,7 @@ module API
           options: { only_shared: true, limit: projects_limit }
         ).execute
 
-        Entities::Project.preload_and_batch_count!(projects)
+        Entities::Project.prepare_relation(projects)
       end
 
       def projects_limit
@@ -1217,7 +1217,7 @@ module API
     end
 
     class BroadcastMessage < Grape::Entity
-      expose :message, :starts_at, :ends_at, :color, :font
+      expose :message, :starts_at, :ends_at, :color, :font, :target_path
     end
 
     class ApplicationStatistics < Grape::Entity
@@ -1672,7 +1672,7 @@ module API
         expose :artifacts, using: Artifacts
         expose :cache, using: Cache
         expose :credentials, using: Credentials
-        expose :dependencies, using: Dependency
+        expose :all_dependencies, as: :dependencies, using: Dependency
         expose :features
       end
     end

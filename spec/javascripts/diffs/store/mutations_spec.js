@@ -10,11 +10,13 @@ describe('DiffsStoreMutations', () => {
       const state = {};
       const endpoint = '/diffs/endpoint';
       const projectPath = '/root/project';
+      const useSingleDiffStyle = false;
 
-      mutations[types.SET_BASE_CONFIG](state, { endpoint, projectPath });
+      mutations[types.SET_BASE_CONFIG](state, { endpoint, projectPath, useSingleDiffStyle });
 
       expect(state.endpoint).toEqual(endpoint);
       expect(state.projectPath).toEqual(projectPath);
+      expect(state.useSingleDiffStyle).toEqual(useSingleDiffStyle);
     });
   });
 
@@ -35,6 +37,16 @@ describe('DiffsStoreMutations', () => {
       mutations[types.SET_BATCH_LOADING](state, false);
 
       expect(state.isBatchLoading).toEqual(false);
+    });
+  });
+
+  describe('SET_RETRIEVING_BATCHES', () => {
+    it('should set retrievingBatches state', () => {
+      const state = {};
+
+      mutations[types.SET_RETRIEVING_BATCHES](state, false);
+
+      expect(state.retrievingBatches).toEqual(false);
     });
   });
 

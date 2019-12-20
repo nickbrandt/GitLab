@@ -31,7 +31,7 @@ module API
         find_params = params.slice(:all_available, :custom_attributes, :owned, :min_access_level)
         find_params[:parent] = find_group!(parent_id) if parent_id
         find_params[:all_available] =
-          find_params.fetch(:all_available, current_user&.full_private_access?)
+          find_params.fetch(:all_available, current_user&.can_read_all_resources?)
 
         groups = GroupsFinder.new(current_user, find_params).execute
         groups = groups.search(params[:search]) if params[:search].present?
@@ -231,7 +231,7 @@ module API
 
         projects, options = with_custom_attributes(projects, options)
 
-        present options[:with].preload_and_batch_count!(projects), options
+        present options[:with].prepare_relation(projects), options
       end
 
       desc 'Get a list of subgroups in this group.' do

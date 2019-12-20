@@ -3,10 +3,10 @@ import { mapState, mapActions } from 'vuex';
 
 import { GlButton, GlTooltipDirective } from '@gitlab/ui';
 
+import { issuableTypesMap } from 'ee/related_issues/constants';
 import { sprintf, s__ } from '~/locale';
 
 import Icon from '~/vue_shared/components/icon.vue';
-import { issuableTypesMap } from 'ee/related_issues/constants';
 
 import EpicActionsSplitButton from './epic_actions_split_button.vue';
 

@@ -36,11 +36,11 @@ export default {
       v-for="design in designs"
       :key="design.id"
       :name="design.name"
-      :project-id="design.project_id"
+      :project-id="design.projectId"
       :sync-status="design.state"
-      :last-synced="design.last_synced_at"
-      :last-verified="design.last_verified_at"
-      :last-checked="design.last_checked_at"
+      :last-synced="design.lastSyncedAt"
+      :last-verified="design.lastVerifiedAt"
+      :last-checked="design.lastCheckedAt"
     />
     <gl-pagination
       v-if="hasDesigns"

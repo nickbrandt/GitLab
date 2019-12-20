@@ -22,6 +22,7 @@ gem 'rugged', '~> 0.28'
 gem 'grape-path-helpers', '~> 1.1'
 
 gem 'faraday', '~> 0.12'
+gem 'marginalia', '~> 1.8.0'
 
 # Authentication libraries
 gem 'devise', '~> 4.6'
@@ -53,7 +54,7 @@ gem 'gssapi', group: :kerberos
 
 # Spam and anti-bot protection
 gem 'recaptcha', '~> 4.11', require: 'recaptcha/rails'
-gem 'akismet', '~> 2.0'
+gem 'akismet', '~> 3.0'
 gem 'invisible_captcha', '~> 0.12.1'
 
 # Two-factor authentication
@@ -101,7 +102,7 @@ gem 'hashie-forbidden_attributes'
 gem 'kaminari', '~> 1.0'
 
 # HAML
-gem 'hamlit', '~> 2.10.0'
+gem 'hamlit', '~> 2.11.0'
 
 # Files attachments
 gem 'carrierwave', '~> 1.3'
@@ -170,8 +171,8 @@ group :unicorn do
 end
 
 group :puma do
-  gem 'puma', '~> 4.3.0', require: false
-  gem 'puma_worker_killer', '~> 0.1.1', require: false
+  gem 'gitlab-puma', '~> 4.3.1.gitlab.2', require: false
+  gem 'gitlab-puma_worker_killer', '~> 0.1.1.gitlab.1', require: false
   gem 'rack-timeout', require: false
 end
 
@@ -242,7 +243,7 @@ gem 'slack-notifier', '~> 1.5.1'
 gem 'hangouts-chat', '~> 0.0.5'
 
 # Asana integration
-gem 'asana', '~> 0.8.1'
+gem 'asana', '~> 0.9'
 
 # FogBugz integration
 gem 'ruby-fogbugz', '~> 0.2.1'
@@ -346,7 +347,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'bullet', '~> 5.5.0', require: !!ENV['ENABLE_BULLET']
+  gem 'bullet', '~> 6.0.2', require: !!ENV['ENABLE_BULLET']
   gem 'pry-byebug', '~> 3.5.1', platform: :mri
   gem 'pry-rails', '~> 0.3.4'
 
@@ -365,11 +366,11 @@ group :development, :test do
   gem 'spring', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
 
-  gem 'gitlab-styles', '~> 2.7', require: false
+  gem 'gitlab-styles', '~> 3.1.0', require: false
   # Pin these dependencies, otherwise a new rule could break the CI pipelines
-  gem 'rubocop', '~> 0.69.0'
-  gem 'rubocop-performance', '~> 1.1.0'
-  gem 'rubocop-rspec', '~> 1.22.1'
+  gem 'rubocop', '~> 0.74.0'
+  gem 'rubocop-performance', '~> 1.4.1'
+  gem 'rubocop-rspec', '~> 1.37.0'
 
   gem 'scss_lint', '~> 0.56.0', require: false
   gem 'haml_lint', '~> 0.34.0', require: false
@@ -416,7 +417,7 @@ end
 
 gem 'octokit', '~> 4.9'
 
-gem 'mail_room', '~> 0.9.1'
+gem 'mail_room', '~> 0.10.0'
 
 gem 'email_reply_trimmer', '~> 0.1'
 gem 'html2text'
@@ -457,7 +458,7 @@ gem 'grpc', '~> 1.24.0'
 
 gem 'google-protobuf', '~> 3.8.0'
 
-gem 'toml-rb', '~> 1.0.0', require: false
+gem 'toml-rb', '~> 1.0.0'
 
 # Feature toggles
 gem 'flipper', '~> 0.17.1'
@@ -476,3 +477,5 @@ gem 'gitlab-net-dns', '~> 0.9.1'
 gem 'countries', '~> 3.0'
 
 gem 'retriable', '~> 3.1.2'
+
+gem 'liquid', '~> 4.0'

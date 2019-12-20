@@ -1,7 +1,10 @@
 <script>
-import { s__, sprintf } from '~/locale';
 import { GlTab, GlTabs } from '@gitlab/ui';
+import { s__, sprintf } from '~/locale';
 import CodeInstruction from './code_instruction.vue';
+import Tracking from '~/tracking';
+import { TrackingActions, TrackingLabels } from '../constants';
+import { trackInstallationTabChange } from '../utils';
 
 export default {
   name: 'MavenInstallation',
@@ -10,6 +13,12 @@ export default {
     GlTab,
     GlTabs,
   },
+  mixins: [
+    Tracking.mixin({
+      label: TrackingLabels.MAVEN_INSTALLATION,
+    }),
+    trackInstallationTabChange,
+  ],
   props: {
     heading: {
       type: String,
@@ -110,13 +119,14 @@ export default {
       false,
     ),
   },
+  trackingActions: { ...TrackingActions },
 };
 </script>
 
 <template>
   <div class="append-bottom-default">
-    <gl-tabs>
-      <gl-tab :title="s__('PackageRegistry|Installation')">
+    <gl-tabs @input="trackInstallationTabChange">
+      <gl-tab :title="s__('PackageRegistry|Installation')" title-item-class="js-installation-tab">
         <div class="prepend-left-default append-right-default">
           <p class="prepend-top-8 font-weight-bold">{{ s__('PackageRegistry|Maven XML') }}</p>
           <p v-html="$options.i18n.xmlText"></p>
@@ -125,6 +135,7 @@ export default {
             :copy-text="s__('PackageRegistry|Copy Maven XML')"
             class="js-maven-xml"
             multiline
+            :tracking-action="$options.trackingActions.COPY_MAVEN_XML"
           />
 
           <p class="prepend-top-default font-weight-bold">
@@ -134,10 +145,11 @@ export default {
             :instruction="mavenCommand"
             :copy-text="s__('PackageRegistry|Copy Maven command')"
             class="js-maven-command"
+            :tracking-action="$options.trackingActions.COPY_MAVEN_COMMAND"
           />
         </div>
       </gl-tab>
-      <gl-tab :title="s__('PackageRegistry|Registry Setup')">
+      <gl-tab :title="s__('PackageRegistry|Registry Setup')" title-item-class="js-setup-tab">
         <div class="prepend-left-default append-right-default">
           <p v-html="$options.i18n.setupText"></p>
           <code-instruction
@@ -145,6 +157,7 @@ export default {
             :copy-text="s__('PackageRegistry|Copy Maven registry XML')"
             class="js-maven-setup-xml"
             multiline
+            :tracking-action="$options.trackingActions.COPY_MAVEN_SETUP"
           />
           <p v-html="helpText"></p>
         </div>

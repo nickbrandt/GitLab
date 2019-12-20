@@ -33,14 +33,6 @@ class Projects::ErrorTrackingController < Projects::ApplicationController
     end
   end
 
-  def list_projects
-    respond_to do |format|
-      format.json do
-        render_project_list_json
-      end
-    end
-  end
-
   private
 
   def render_index_json
@@ -77,31 +69,11 @@ class Projects::ErrorTrackingController < Projects::ApplicationController
 
     return if handle_errors(result)
 
+    result_with_syntax_highlight = Gitlab::ErrorTracking::StackTraceHighlightDecorator.decorate(result[:latest_event])
+
     render json: {
-      error: serialize_error_event(result[:latest_event])
+      error: serialize_error_event(result_with_syntax_highlight)
     }
-  end
-
-  def render_project_list_json
-    service = ErrorTracking::ListProjectsService.new(
-      project,
-      current_user,
-      list_projects_params
-    )
-    result = service.execute
-
-    if result[:status] == :success
-      render json: {
-        projects: serialize_projects(result[:projects])
-      }
-    else
-      return render(
-        status: result[:http_status] || :bad_request,
-        json: {
-          message: result[:message]
-        }
-      )
-    end
   end
 
   def handle_errors(result)
@@ -113,10 +85,6 @@ class Projects::ErrorTrackingController < Projects::ApplicationController
 
   def list_issues_params
     params.permit(:search_term, :sort, :cursor)
-  end
-
-  def list_projects_params
-    params.require(:error_tracking_setting).permit([:api_host, :token])
   end
 
   def issue_details_params
@@ -147,11 +115,5 @@ class Projects::ErrorTrackingController < Projects::ApplicationController
     ErrorTracking::ErrorEventSerializer
       .new(project: project, user: current_user)
       .represent(event)
-  end
-
-  def serialize_projects(projects)
-    ErrorTracking::ProjectSerializer
-      .new(project: project, user: current_user)
-      .represent(projects)
   end
 end

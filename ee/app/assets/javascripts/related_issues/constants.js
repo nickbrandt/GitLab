@@ -9,7 +9,7 @@ export const issuableTypesMap = {
 export const autoCompleteTextMap = {
   true: {
     [issuableTypesMap.ISSUE]: __(' or <#issue id>'),
-    [issuableTypesMap.EPIC]: __(' or <#epic id>'),
+    [issuableTypesMap.EPIC]: __(' or <&epic id>'),
     [issuableTypesMap.MERGE_REQUEST]: __(' or <!merge request id>'),
   },
   false: {

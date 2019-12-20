@@ -1,5 +1,6 @@
-- if current_board_parent.feature_available?(:wip_limits)
+- if current_board_parent.beta_feature_available?(:wip_limits)
   %gl-button.no-drag.rounded-right{ type: "button",
+    "@click" => "openSidebarSettings",
     "v-if" => "isSettingsShown",
     "aria-label" => _("List Settings"),
     "ref" => "settingsBtn",

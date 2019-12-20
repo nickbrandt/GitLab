@@ -3,13 +3,13 @@ import { mapState, mapActions } from 'vuex';
 import { GlTooltipDirective, GlModalDirective, GlLink, GlButton } from '@gitlab/ui';
 import _ from 'underscore';
 
+import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
 import { __ } from '~/locale';
 
 import Icon from '~/vue_shared/components/icon.vue';
 import ItemMilestone from '~/vue_shared/components/issue/issue_milestone.vue';
 import ItemAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
 import ItemDueDate from '~/boards/components/issue_due_date.vue';
-import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
 
 import StateTooltip from './state_tooltip.vue';
 

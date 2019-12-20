@@ -8,6 +8,10 @@ module EE
           ->(obj, opts) { Ability.allowed?(opts[:user], "read_#{attr}".to_sym, yield(obj)) }
         end
 
+        def can_destroy(attr, &block)
+          ->(obj, opts) { Ability.allowed?(opts[:user], "destroy_#{attr}".to_sym, yield(obj)) }
+        end
+
         def expose_restricted(attr, &block)
           expose attr, if: can_read(attr, &block)
         end
@@ -44,6 +48,9 @@ module EE
           expose :external_authorization_classification_label,
                  if: ->(_, _) { License.feature_available?(:external_authorization_service_api_management) }
           expose :packages_enabled, if: ->(project, _) { project.feature_available?(:packages) }
+          expose :service_desk_enabled, if: ->(project, _) { project.feature_available?(:service_desk) }
+          expose :service_desk_address, if: ->(project, _) { project.feature_available?(:service_desk) }
+          expose :marked_for_deletion_at, if: ->(project, _) { project.feature_available?(:marking_project_for_deletion) }
         end
       end
 
@@ -196,6 +203,7 @@ module EE
           expose :email_additional_text, if: ->(_instance, _opts) { ::License.feature_available?(:email_additional_text) }
           expose :file_template_project_id, if: ->(_instance, _opts) { ::License.feature_available?(:custom_file_templates) }
           expose :default_project_deletion_protection, if: ->(_instance, _opts) { ::License.feature_available?(:default_project_deletion_protection) }
+          expose :deletion_adjourned_period, if: ->(_instance, _opts) { ::License.feature_available?(:marking_project_for_deletion) }
         end
       end
 
@@ -783,22 +791,8 @@ module EE
       class UnleashFeature < Grape::Entity
         expose :name
         expose :description, unless: ->(feature) { feature.description.nil? }
-        # The UI has a single field for user ids for whom the feature flag should be enabled across all scopes.
-        # Each scope is given a userWithId strategy with the list of user ids.
-        # However, the user can also directly toggle the active field of a scope.
-        # So if the user has entered user ids, and disabled the scope, we need to send an enabled scope with
-        # the list of user ids.
-        # See: https://gitlab.com/gitlab-org/gitlab/issues/14011
-        expose :active, as: :enabled do |feature|
-          feature.active || feature.userwithid_strategy.present?
-        end
-        expose :strategies do |feature|
-          if !feature.active && feature.userwithid_strategy.present?
-            feature.userwithid_strategy
-          else
-            feature.strategies
-          end
-        end
+        expose :active, as: :enabled
+        expose :strategies
       end
 
       class GitlabSubscription < Grape::Entity
@@ -845,6 +839,13 @@ module EE
         end
       end
 
+      module Nuget
+        class ServiceIndex < Grape::Entity
+          expose :version
+          expose :resources
+        end
+      end
+
       class NpmPackage < Grape::Entity
         expose :name
         expose :versions
@@ -852,10 +853,25 @@ module EE
       end
 
       class Package < Grape::Entity
+        include ::API::Helpers::RelatedResourcesHelpers
+        extend EntityHelpers
+
         expose :id
         expose :name
         expose :version
         expose :package_type
+
+        expose :_links do
+          expose :web_path do |package|
+            ::Gitlab::Routing.url_helpers.project_package_path(package.project, package)
+          end
+
+          expose :delete_api_path, if: can_destroy(:package, &:project) do |package|
+            expose_url api_v4_projects_packages_path(package_id: package.id, id: package.project_id)
+          end
+        end
+
+        expose :created_at
       end
 
       class PackageFile < Grape::Entity
@@ -866,7 +882,7 @@ module EE
 
       class ManagedLicense < Grape::Entity
         expose :id, :name
-        expose :classification, as: :approval_status
+        expose :approval_status
       end
 
       class ProjectAlias < Grape::Entity
@@ -887,7 +903,7 @@ module EE
         private
 
         def can_read_vulnerabilities?(user, project)
-          Ability.allowed?(user, :read_project_security_dashboard, project)
+          Ability.allowed?(user, :read_vulnerability, project)
         end
       end
 

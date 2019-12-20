@@ -159,6 +159,7 @@ describe GitlabSubscription do
 
   describe '#expired?' do
     let(:gitlab_subscription) { create(:gitlab_subscription, end_date: end_date) }
+
     subject { gitlab_subscription.expired? }
 
     context 'when end_date is expired' do
@@ -243,24 +244,12 @@ describe GitlabSubscription do
       expect(GitlabSubscriptionHistory.attribute_names - described_class.attribute_names).to eq(diff_attrs)
     end
 
-    context 'after_create_commit' do
-      it 'logs previous state to gitlab subscription history' do
-        subject.save!
-
-        expect(GitlabSubscriptionHistory.count).to eq(1)
-        expect(GitlabSubscriptionHistory.last.attributes).to include(
-          'gitlab_subscription_id' => subject.id,
-          'change_type' => 'gitlab_subscription_created'
-        )
-      end
-    end
-
     context 'before_update' do
       it 'logs previous state to gitlab subscription history' do
         subject.update! max_seats_used: 42, seats: 13
         subject.update! max_seats_used: 32
 
-        expect(GitlabSubscriptionHistory.count).to eq(2)
+        expect(GitlabSubscriptionHistory.count).to eq(1)
         expect(GitlabSubscriptionHistory.last.attributes).to include(
           'gitlab_subscription_id' => subject.id,
           'change_type' => 'gitlab_subscription_updated',
@@ -279,7 +268,7 @@ describe GitlabSubscription do
 
         subject.destroy!
 
-        expect(GitlabSubscriptionHistory.count).to eq(2)
+        expect(GitlabSubscriptionHistory.count).to eq(1)
         expect(GitlabSubscriptionHistory.last.attributes).to include(
           'gitlab_subscription_id' => subject.id,
           'change_type' => 'gitlab_subscription_destroyed',

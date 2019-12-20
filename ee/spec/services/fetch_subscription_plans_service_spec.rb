@@ -5,6 +5,7 @@ require 'spec_helper'
 describe FetchSubscriptionPlansService do
   describe '#execute' do
     let(:endpoint_url) { 'https://customers.gitlab.com/gitlab_plans' }
+
     subject { described_class.new(plan: 'bronze').execute }
 
     context 'when successully fetching plans data' do

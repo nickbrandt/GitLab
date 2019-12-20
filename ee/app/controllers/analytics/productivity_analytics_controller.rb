@@ -7,6 +7,7 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
 
   before_action :load_group
   before_action :load_project
+  before_action :build_request_params
   before_action -> {
     check_feature_availability!(:productivity_analytics)
   }, if: -> { request.format.json? }
@@ -17,6 +18,8 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
   before_action -> {
     push_frontend_feature_flag(:productivity_analytics_scatterplot_enabled, default_enabled: true)
   }
+
+  before_action :validate_params, only: :show, if: -> { request.format.json? }
 
   include IssuableCollections
 
@@ -65,6 +68,29 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
 
   def default_state
     'merged'
+  end
+
+  def validate_params
+    if @request_params.invalid?
+      render(
+        json: { message: 'Invalid parameters', errors: @request_params.errors },
+        status: :unprocessable_entity
+      )
+    end
+  end
+
+  def build_request_params
+    @request_params ||= Analytics::ProductivityAnalyticsRequestParams.new(allowed_request_params.merge(group: @group, project: @project))
+  end
+
+  def allowed_request_params
+    params.permit(
+      :merged_at_after,
+      :merged_at_before,
+      :author_username,
+      :milestone_title,
+      label_name: []
+    )
   end
 
   def productivity_analytics

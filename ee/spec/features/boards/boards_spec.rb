@@ -174,10 +174,6 @@ describe 'issue boards', :js do
     end
 
     context 'When FF is turned on' do
-      before do
-        stub_licensed_features(wip_limits: true)
-      end
-
       context 'when max issue count is set' do
         let(:total_development_issues) { "1" }
 
@@ -192,30 +188,44 @@ describe 'issue boards', :js do
   end
 
   context 'list settings' do
-    let!(:label) { create(:label, project: project, name: 'Label') }
+    let!(:label) { create(:label, project: project, name: 'Brount') }
     let!(:list) { create(:list, board: board, label: label, position: 1) }
 
     before do
-      stub_licensed_features(wip_limits: wip_limits)
-
       project.add_developer(user)
       login_as(user)
       visit project_boards_path(project)
     end
 
     context 'When FF is turned on' do
-      let(:wip_limits) { true }
-
       it 'shows the list settings button' do
         expect(page).to have_selector(:button, "List Settings")
+      end
+
+      it 'does not show the board list settings sidebar as default state' do
+        expect(page).not_to have_selector(".js-board-settings-sidebar")
+      end
+
+      context 'when settings button is clicked' do
+        it 'shows the board list settings sidebar' do
+          page.within(find(".board:nth-child(2)")) do
+            click_button('List Settings')
+          end
+
+          expect(page.find('.js-board-settings-sidebar').find('.gl-label-text')).to have_text("Brount")
+        end
       end
     end
 
     context 'When FF is turned off' do
-      let(:wip_limits) { false }
-
-      it 'shows the list settings button' do
+      # https://gitlab.com/gitlab-org/gitlab/issues/118658
+      it 'does not show the list settings button', :quarantine do
+        stub_licensed_features(wip_limits: false)
         expect(page).to have_no_selector(:button, "List Settings")
+      end
+
+      it 'does not show the board list settings sidebar' do
+        expect(page).not_to have_selector(".js-board-settings-sidebar")
       end
     end
   end

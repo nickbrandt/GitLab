@@ -29,7 +29,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           constraints: { project_id: Gitlab::PathRegex.project_route_regex },
           module: :projects,
           as: :project) do
-
       # Begin of the /-/ scope.
       # Use this scope for all new project routes.
       scope '-' do
@@ -58,6 +57,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :trace, defaults: { format: 'json' }
             get :raw
             get :terminal
+
+            # This route is also defined in gitlab-workhorse. Make sure to update accordingly.
             get '/terminal.ws/authorize', to: 'jobs#terminal_websocket_authorize', format: false
           end
 
@@ -159,6 +160,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           member do
             put :test
           end
+
+          resources :hook_logs, only: [:show], controller: :service_hook_logs do
+            member do
+              post :retry
+            end
+          end
         end
 
         resources :boards, only: [:index, :show, :create, :update, :destroy], constraints: { id: /\d+/ } do
@@ -224,13 +231,18 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :environments, except: [:destroy] do
           member do
             post :stop
+            post :cancel_auto_stop
             get :terminal
             get :metrics
             get :additional_metrics
             get :metrics_dashboard
+
+            # This route is also defined in gitlab-workhorse. Make sure to update accordingly.
             get '/terminal.ws/authorize', to: 'environments#terminal_websocket_authorize', format: false
 
             get '/prometheus/api/v1/*proxy_path', to: 'environments/prometheus_api#proxy', as: :prometheus_api
+
+            get '/sample_metrics', to: 'environments/sample_metrics#query' if ENV['USE_SAMPLE_METRICS']
           end
 
           collection do
@@ -247,6 +259,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
+        namespace :error_tracking do
+          resources :projects, only: :index
+        end
+
         resources :error_tracking, only: [:index], controller: :error_tracking do
           collection do
             get ':issue_id/details',
@@ -255,7 +271,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get ':issue_id/stack_trace',
               to: 'error_tracking#stack_trace',
               as: 'stack_trace'
-            post :list_projects
           end
         end
 

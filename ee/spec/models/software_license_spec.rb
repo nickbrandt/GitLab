@@ -19,19 +19,19 @@ describe SoftwareLicense do
 
     context 'when a software license with a given name has already been created' do
       let(:mit_license) { create(:software_license, :mit) }
-      let(:result) { subject.create_policy_for!(project: project, name: mit_license.name, classification: :approved) }
+      let(:result) { subject.create_policy_for!(project: project, name: mit_license.name, classification: :allowed) }
 
       specify { expect(result).to be_persisted }
-      specify { expect(result).to be_approved }
+      specify { expect(result).to be_allowed }
       specify { expect(result.software_license).to eql(mit_license) }
     end
 
     context 'when a software license with a given name has NOT been created' do
       let(:license_name) { SecureRandom.uuid }
-      let(:result) { subject.create_policy_for!(project: project, name: license_name, classification: :blacklisted) }
+      let(:result) { subject.create_policy_for!(project: project, name: license_name, classification: :denied) }
 
       specify { expect(result).to be_persisted }
-      specify { expect(result).to be_blacklisted }
+      specify { expect(result).to be_denied }
       specify { expect(result.software_license).to be_persisted }
       specify { expect(result.software_license.name).to eql(license_name) }
     end

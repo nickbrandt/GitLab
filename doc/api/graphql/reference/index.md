@@ -92,26 +92,34 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `errors` | String! => Array | Reasons why the mutation failed. |
 | `note` | Note | The note after mutation |
 
+### CreateSnippetPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `snippet` | Snippet | The snippet after mutation |
+
 ### Design
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `id` | ID! |  |
-| `project` | Project! |  |
-| `issue` | Issue! |  |
-| `notesCount` | Int! | The total count of user-created notes for this design |
-| `filename` | String! |  |
-| `fullPath` | String! |  |
-| `event` | DesignVersionEvent! | The change that happened to the design at this version |
-| `image` | String! |  |
-| `diffRefs` | DiffRefs! |  |
+| `id` | ID! | ID of the design |
+| `project` | Project! | Project associated with the design |
+| `issue` | Issue! | Issue associated with the design |
+| `notesCount` | Int! | Total count of user-created notes for the design |
+| `filename` | String! | Filename of the design file |
+| `fullPath` | String! | Full path of the design file |
+| `event` | DesignVersionEvent! | Type of change made to the design at the version specified by the `atVersion` argument if supplied. Defaults to the latest version |
+| `image` | String! | Image of the design |
+| `diffRefs` | DiffRefs! | Diff refs of the design |
 
 ### DesignCollection
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `project` | Project! |  |
-| `issue` | Issue! |  |
+| `project` | Project! | Project associated with the design collection |
+| `issue` | Issue! | Issue associated with the design collection |
 
 ### DesignManagementDeletePayload
 
@@ -134,8 +142,8 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `id` | ID! |  |
-| `sha` | ID! |  |
+| `id` | ID! | ID of the design version |
+| `sha` | ID! | SHA of the design version |
 
 ### DestroyNotePayload
 
@@ -145,50 +153,58 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `errors` | String! => Array | Reasons why the mutation failed. |
 | `note` | Note | The note after mutation |
 
+### DestroySnippetPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `snippet` | Snippet | The snippet after mutation |
+
 ### DetailedStatus
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `group` | String! |  |
-| `icon` | String! |  |
-| `favicon` | String! |  |
-| `detailsPath` | String! |  |
-| `hasDetails` | Boolean! |  |
-| `label` | String! |  |
-| `text` | String! |  |
-| `tooltip` | String! |  |
+| `group` | String! | Group of the pipeline status |
+| `icon` | String! | Icon of the pipeline status |
+| `favicon` | String! | Favicon of the pipeline status |
+| `detailsPath` | String! | Path of the details for the pipeline status |
+| `hasDetails` | Boolean! | Indicates if the pipeline status has further details |
+| `label` | String! | Label of the pipeline status |
+| `text` | String! | Text of the pipeline status |
+| `tooltip` | String! | Tooltip associated with the pipeline status |
 
 ### DiffPosition
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `diffRefs` | DiffRefs! |  |
-| `filePath` | String! | The path of the file that was changed |
-| `oldPath` | String | The path of the file on the start sha. |
-| `newPath` | String | The path of the file on the head sha. |
-| `positionType` | DiffPositionType! |  |
-| `oldLine` | Int | The line on start sha that was changed |
-| `newLine` | Int | The line on head sha that was changed |
-| `x` | Int | The X postion on which the comment was made |
-| `y` | Int | The Y position on which the comment was made |
-| `width` | Int | The total width of the image |
-| `height` | Int | The total height of the image |
+| `diffRefs` | DiffRefs! | Information about the branch, HEAD, and base at the time of commenting |
+| `filePath` | String! | Path of the file that was changed |
+| `oldPath` | String | Path of the file on the start SHA |
+| `newPath` | String | Path of the file on the HEAD SHA |
+| `positionType` | DiffPositionType! | Type of file the position refers to |
+| `oldLine` | Int | Line on start SHA that was changed |
+| `newLine` | Int | Line on HEAD SHA that was changed |
+| `x` | Int | X position on which the comment was made |
+| `y` | Int | Y position on which the comment was made |
+| `width` | Int | Total width of the image |
+| `height` | Int | Total height of the image |
 
 ### DiffRefs
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `headSha` | String! | The sha of the head at the time the comment was made |
-| `baseSha` | String! | The merge base of the branch the comment was made on |
-| `startSha` | String! | The sha of the branch being compared against |
+| `headSha` | String! | SHA of the HEAD at the time the comment was made |
+| `baseSha` | String! | Merge base of the branch the comment was made on |
+| `startSha` | String! | SHA of the branch being compared against |
 
 ### Discussion
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `id` | ID! |  |
-| `replyId` | ID! | The ID used to reply to this discussion |
-| `createdAt` | Time! |  |
+| `id` | ID! | ID of this discussion |
+| `replyId` | ID! | ID used to reply to this discussion |
+| `createdAt` | Time! | Timestamp of the discussion's creation |
 
 ### Epic
 
@@ -265,13 +281,13 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `createdAt` | Time! | Timestamp of when the issue was created |
 | `updatedAt` | Time! | Timestamp of when the issue was last updated |
 | `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
-| `epic` | Epic | The epic to which issue belongs |
-| `weight` | Int |  |
-| `designs` | DesignCollection |  |
-| `designCollection` | DesignCollection |  |
-| `epicIssueId` | ID! |  |
-| `relationPath` | String |  |
-| `id` | ID | The global id of the epic-issue relation |
+| `epic` | Epic | Epic to which this issue belongs |
+| `weight` | Int | Weight of the issue |
+| `designs` | DesignCollection | Deprecated. Use `design_collection` |
+| `designCollection` | DesignCollection | Collection of design images associated with this issue |
+| `epicIssueId` | ID! | ID of the epic-issue relation |
+| `relationPath` | String | URI path of the epic-issue relation |
+| `id` | ID | Global ID of the epic-issue relation |
 
 ### EpicPermissions
 
@@ -320,8 +336,9 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `webUrl` | String! | Web URL of the group |
 | `avatarUrl` | String | Avatar URL of the group |
 | `parent` | Group | Parent group |
-| `epicsEnabled` | Boolean |  |
-| `epic` | Epic |  |
+| `epicsEnabled` | Boolean | Indicates if Epics are enabled for namespace |
+| `groupTimelogsEnabled` | Boolean | Indicates if Group timelogs are enabled for namespace |
+| `epic` | Epic | Find a single epic |
 
 ### GroupPermissions
 
@@ -359,10 +376,10 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `createdAt` | Time! | Timestamp of when the issue was created |
 | `updatedAt` | Time! | Timestamp of when the issue was last updated |
 | `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
-| `epic` | Epic | The epic to which issue belongs |
-| `weight` | Int |  |
-| `designs` | DesignCollection |  |
-| `designCollection` | DesignCollection |  |
+| `epic` | Epic | Epic to which this issue belongs |
+| `weight` | Int | Weight of the issue |
+| `designs` | DesignCollection | Deprecated. Use `design_collection` |
+| `designCollection` | DesignCollection | Collection of design images associated with this issue |
 
 ### IssuePermissions
 
@@ -393,16 +410,32 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `errors` | String! => Array | Reasons why the mutation failed. |
 | `issue` | Issue | The issue after mutation |
 
+### IssueSetWeightPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `issue` | Issue | The issue after mutation |
+
 ### Label
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `id` | ID! | Label ID |
-| `description` | String | Description of the label (markdown rendered as HTML for caching) |
+| `description` | String | Description of the label (Markdown rendered as HTML for caching) |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
 | `title` | String! | Content of the label |
 | `color` | String! | Background color of the label |
 | `textColor` | String! | Text color of the label |
+
+### MarkAsSpamSnippetPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `snippet` | Snippet | The snippet after mutation |
 
 ### MergeRequest
 
@@ -413,7 +446,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `iid` | String! | Internal ID of the merge request |
 | `title` | String! | Title of the merge request |
 | `titleHtml` | String | The GitLab Flavored Markdown rendering of `title` |
-| `description` | String | Description of the merge request (markdown rendered as HTML for caching) |
+| `description` | String | Description of the merge request (Markdown rendered as HTML for caching) |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
 | `state` | MergeRequestState! | State of the merge request |
 | `createdAt` | Time! | Timestamp of when the merge request was created |
@@ -560,18 +593,18 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `userPermissions` | NotePermissions! | Permissions for the current user on the resource |
-| `id` | ID! |  |
-| `project` | Project | The project this note is associated to |
-| `author` | User! | The user who wrote this note |
-| `resolvedBy` | User | The user that resolved the discussion |
-| `system` | Boolean! | Whether or not this note was created by the system or by a user |
-| `body` | String! | The content note itself |
+| `id` | ID! | ID of the note |
+| `project` | Project | Project associated with the note |
+| `author` | User! | User who wrote this note |
+| `resolvedBy` | User | User that resolved the discussion |
+| `system` | Boolean! | Indicates whether this note was created by the system or by a user |
+| `body` | String! | Content of the note |
 | `bodyHtml` | String | The GitLab Flavored Markdown rendering of `note` |
-| `createdAt` | Time! |  |
-| `updatedAt` | Time! |  |
+| `createdAt` | Time! | Timestamp of the note creation |
+| `updatedAt` | Time! | Timestamp of the note's last activity |
 | `discussion` | Discussion | The discussion this note is a part of |
-| `resolvable` | Boolean! |  |
-| `resolvedAt` | Time | The time the discussion was resolved |
+| `resolvable` | Boolean! | Indicates if this note can be resolved. That is, if it is a resolvable discussion or simply a standalone note |
+| `resolvedAt` | Time | Timestamp of the note's resolution |
 | `position` | DiffPosition | The position of this note on a diff |
 
 ### NotePermissions
@@ -598,19 +631,19 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `userPermissions` | PipelinePermissions! | Permissions for the current user on the resource |
-| `id` | ID! |  |
-| `iid` | String! |  |
-| `sha` | String! |  |
-| `beforeSha` | String |  |
-| `status` | PipelineStatusEnum! |  |
-| `detailedStatus` | DetailedStatus! |  |
+| `id` | ID! | ID of the pipeline |
+| `iid` | String! | Internal ID of the pipeline |
+| `sha` | String! | SHA of the pipeline's commit |
+| `beforeSha` | String | Base SHA of the source branch |
+| `status` | PipelineStatusEnum! | Status of the pipeline (CREATED, PREPARING, PENDING, RUNNING, FAILED, SUCCESS, CANCELED, SKIPPED, MANUAL, SCHEDULED) |
+| `detailedStatus` | DetailedStatus! | Detailed status of the pipeline |
 | `duration` | Int | Duration of the pipeline in seconds |
 | `coverage` | Float | Coverage percentage |
-| `createdAt` | Time! |  |
-| `updatedAt` | Time! |  |
-| `startedAt` | Time |  |
-| `finishedAt` | Time |  |
-| `committedAt` | Time |  |
+| `createdAt` | Time! | Timestamp of the pipeline's creation |
+| `updatedAt` | Time! | Timestamp of the pipeline's last activity |
+| `startedAt` | Time | Timestamp when the pipeline was started |
+| `finishedAt` | Time | Timestamp of the pipeline's completion |
+| `committedAt` | Time | Timestamp of the pipeline's commit |
 
 ### PipelinePermissions
 
@@ -667,6 +700,8 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `mergeRequest` | MergeRequest | A single merge request of the project |
 | `issue` | Issue | A single issue of the project |
 | `sentryDetailedError` | SentryDetailedError | Detailed version of a Sentry error on the project |
+| `serviceDeskEnabled` | Boolean | Indicates if the project has service desk enabled. |
+| `serviceDeskAddress` | String | E-mail address of the service desk. |
 
 ### ProjectPermissions
 
@@ -689,7 +724,6 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `downloadCode` | Boolean! | Whether or not a user can perform `download_code` on this resource |
 | `downloadWikiCode` | Boolean! | Whether or not a user can perform `download_wiki_code` on this resource |
 | `forkProject` | Boolean! | Whether or not a user can perform `fork_project` on this resource |
-| `createProjectSnippet` | Boolean! | Whether or not a user can perform `create_project_snippet` on this resource |
 | `readCommitStatus` | Boolean! | Whether or not a user can perform `read_commit_status` on this resource |
 | `requestAccess` | Boolean! | Whether or not a user can perform `request_access` on this resource |
 | `createPipeline` | Boolean! | Whether or not a user can perform `create_pipeline` on this resource |
@@ -710,6 +744,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `destroyPages` | Boolean! | Whether or not a user can perform `destroy_pages` on this resource |
 | `readPagesContent` | Boolean! | Whether or not a user can perform `read_pages_content` on this resource |
 | `adminOperations` | Boolean! | Whether or not a user can perform `admin_operations` on this resource |
+| `createSnippet` | Boolean! | Whether or not a user can perform `create_snippet` on this resource |
 | `readDesign` | Boolean! | Whether or not a user can perform `read_design` on this resource |
 | `createDesign` | Boolean! | Whether or not a user can perform `create_design` on this resource |
 | `destroyDesign` | Boolean! | Whether or not a user can perform `destroy_design` on this resource |
@@ -748,7 +783,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `storageSize` | Int! | The total storage in bytes |
-| `repositorySize` | Int! | The git repository size in bytes |
+| `repositorySize` | Int! | The Git repository size in bytes |
 | `lfsObjectsSize` | Int! | The LFS objects size in bytes |
 | `buildArtifactsSize` | Int! | The CI artifacts size in bytes |
 | `packagesSize` | Int! | The packages size in bytes |
@@ -787,6 +822,36 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `time` | Time! | Time the error frequency stats were recorded |
 | `count` | Int! | Count of errors received since the previously recorded time |
 
+### Snippet
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `userPermissions` | SnippetPermissions! | Permissions for the current user on the resource |
+| `id` | ID! | Id of the snippet |
+| `title` | String! | Title of the snippet |
+| `project` | Project | The project the snippet is associated with |
+| `author` | User! | The owner of the snippet |
+| `fileName` | String | File Name of the snippet |
+| `content` | String! | Content of the snippet |
+| `description` | String | Description of the snippet |
+| `visibilityLevel` | VisibilityLevelsEnum! | Visibility Level of the snippet |
+| `createdAt` | Time! | Timestamp this snippet was created |
+| `updatedAt` | Time! | Timestamp this snippet was updated |
+| `webUrl` | String! | Web URL of the snippet |
+| `rawUrl` | String! | Raw URL of the snippet |
+| `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
+
+### SnippetPermissions
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `createNote` | Boolean! | Whether or not a user can perform `create_note` on this resource |
+| `awardEmoji` | Boolean! | Whether or not a user can perform `award_emoji` on this resource |
+| `readSnippet` | Boolean! | Whether or not a user can perform `read_snippet` on this resource |
+| `updateSnippet` | Boolean! | Whether or not a user can perform `update_snippet` on this resource |
+| `adminSnippet` | Boolean! | Whether or not a user can perform `admin_snippet` on this resource |
+| `reportSnippet` | Boolean! | Whether or not a user can perform `report_snippet` on this resource |
+
 ### Submodule
 
 | Name  | Type  | Description |
@@ -806,6 +871,15 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | ---   |  ---- | ----------  |
 | `count` | Int! | Number of total tasks |
 | `completedCount` | Int! | Number of completed tasks |
+
+### Timelog
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `date` | Time! | The date when the time tracked was spent at |
+| `timeSpent` | Int! | The time spent displayed in seconds |
+| `user` | User! | The user that logged the time |
+| `issue` | Issue | The issue that logged time was added to |
 
 ### Todo
 
@@ -888,11 +962,26 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `errors` | String! => Array | Reasons why the mutation failed. |
 | `note` | Note | The note after mutation |
 
+### UpdateSnippetPayload
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `clientMutationId` | String | A unique identifier for the client performing the mutation. |
+| `errors` | String! => Array | Reasons why the mutation failed. |
+| `snippet` | Snippet | The snippet after mutation |
+
 ### User
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
+| `userPermissions` | UserPermissions! | Permissions for the current user on the resource |
 | `name` | String! | Human-readable name of the user |
 | `username` | String! | Username of the user. Unique within this instance of GitLab |
 | `avatarUrl` | String! | URL of the user's avatar |
 | `webUrl` | String! | Web URL of the user |
+
+### UserPermissions
+
+| Name  | Type  | Description |
+| ---   |  ---- | ----------  |
+| `createSnippet` | Boolean! | Whether or not a user can perform `create_snippet` on this resource |

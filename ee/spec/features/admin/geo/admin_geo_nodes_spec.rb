@@ -16,7 +16,7 @@ describe 'admin Geo Nodes', :js, :geo do
       wait_for_requests
 
       expect(page).to have_link('New node', href: new_admin_geo_node_path)
-      page.within(find('.geo-node-item', match: :first)) do
+      page.within(find('.card', match: :first)) do
         expect(page).to have_content(geo_node.url)
       end
     end
@@ -86,7 +86,7 @@ describe 'admin Geo Nodes', :js, :geo do
       expect(current_path).to eq admin_geo_nodes_path
       wait_for_requests
 
-      page.within(find('.geo-node-item', match: :first)) do
+      page.within(find('.card', match: :first)) do
         expect(page).to have_content(geo_node.url)
       end
     end
@@ -167,7 +167,7 @@ describe 'admin Geo Nodes', :js, :geo do
       expect(current_path).to eq admin_geo_nodes_path
       wait_for_requests
 
-      page.within(find('.geo-node-item', match: :first)) do
+      page.within(find('.card', match: :first)) do
         expect(page).to have_content('http://newsite.com')
         expect(page).to have_content('Primary')
 
@@ -196,7 +196,25 @@ describe 'admin Geo Nodes', :js, :geo do
 
       expect(current_path).to eq admin_geo_nodes_path
       wait_for_requests
-      expect(page).not_to have_css('.geo-node-item')
+      expect(page).not_to have_css('.card')
+    end
+  end
+
+  describe 'with no Geo Nodes' do
+    before do
+      geo_node.delete
+      visit admin_geo_nodes_path
+      wait_for_requests
+    end
+
+    it 'hides the New Node button' do
+      expect(page).not_to have_link('New node', href: new_admin_geo_node_path)
+    end
+
+    it 'shows Discover GitLab Geo' do
+      page.within(find('h4')) do
+        expect(page).to have_content('Discover GitLab Geo')
+      end
     end
   end
 end

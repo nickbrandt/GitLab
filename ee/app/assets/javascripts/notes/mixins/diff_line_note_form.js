@@ -1,6 +1,6 @@
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { TEXT_DIFF_POSITION_TYPE, IMAGE_DIFF_POSITION_TYPE } from '~/diffs/constants';
 import { getDraftReplyFormData, getDraftFormData } from 'ee/batch_comments/utils';
+import { TEXT_DIFF_POSITION_TYPE, IMAGE_DIFF_POSITION_TYPE } from '~/diffs/constants';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import { clearDraft } from '~/lib/utils/autosave';
@@ -62,8 +62,8 @@ export default {
         ...this.diffFileCommentForm,
       });
 
-      const diffFileHeadSha =
-        this.commit && this.diffFile && this.diffFile.diff_refs && this.diffFile.diff_refs.head_sha;
+      // eslint-disable-next-line camelcase
+      const diffFileHeadSha = this.commit && this?.diffFile?.diff_refs?.head_sha;
 
       postData.data.note.commit_id = diffFileHeadSha || null;
 

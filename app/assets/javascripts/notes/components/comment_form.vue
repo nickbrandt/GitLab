@@ -193,23 +193,10 @@ export default {
         this.stopPolling();
 
         this.saveNote(noteData)
-          .then(res => {
+          .then(() => {
             this.enableButton();
             this.restartPolling();
-
-            if (res.errors) {
-              if (res.errors.commands_only) {
-                this.discard();
-              } else {
-                Flash(
-                  __('Something went wrong while adding your comment. Please try again.'),
-                  'alert',
-                  this.$refs.commentForm,
-                );
-              }
-            } else {
-              this.discard();
-            }
+            this.discard();
 
             if (withIssueAction) {
               this.toggleIssueState();
@@ -349,6 +336,7 @@ export default {
 
             <markdown-field
               ref="markdownField"
+              :is-submitting="isSubmitting"
               :markdown-preview-path="markdownPreviewPath"
               :markdown-docs-path="markdownDocsPath"
               :quick-actions-docs-path="quickActionsDocsPath"

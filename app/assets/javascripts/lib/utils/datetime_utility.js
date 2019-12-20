@@ -392,15 +392,21 @@ export const getTimeframeWindowFrom = (initialStartDate, length) => {
  * @param {Date} date
  * @param {Array} quarter
  */
-export const dayInQuarter = (date, quarter) =>
-  quarter.reduce((acc, month) => {
-    if (date.getMonth() > month.getMonth()) {
+export const dayInQuarter = (date, quarter) => {
+  const dateValues = {
+    date: date.getDate(),
+    month: date.getMonth(),
+  };
+
+  return quarter.reduce((acc, month) => {
+    if (dateValues.month > month.getMonth()) {
       return acc + totalDaysInMonth(month);
-    } else if (date.getMonth() === month.getMonth()) {
-      return acc + date.getDate();
+    } else if (dateValues.month === month.getMonth()) {
+      return acc + dateValues.date;
     }
     return acc + 0;
   }, 0);
+};
 
 window.gl = window.gl || {};
 window.gl.utils = {
@@ -447,7 +453,7 @@ export const parsePikadayDate = dateString => {
 /**
  * Used `onSelect` method in pickaday
  * @param {Date} date UTC format
- * @return {String} Date formated in yyyy-mm-dd
+ * @return {String} Date formatted in yyyy-mm-dd
  */
 export const pikadayToString = date => {
   const day = pad(date.getDate());
@@ -513,8 +519,8 @@ export const stringifyTime = (timeObject, fullNameFormat = false) => {
 
       if (fullNameFormat && isNonZero) {
         // Remove traling 's' if unit value is singular
-        const formatedUnitName = unitValue > 1 ? unitName : unitName.replace(/s$/, '');
-        return `${memo} ${unitValue} ${formatedUnitName}`;
+        const formattedUnitName = unitValue > 1 ? unitName : unitName.replace(/s$/, '');
+        return `${memo} ${unitValue} ${formattedUnitName}`;
       }
 
       return isNonZero ? `${memo} ${unitValue}${unitName.charAt(0)}` : memo;

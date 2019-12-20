@@ -11,6 +11,7 @@ describe EE::Gitlab::Auth::LDAP::AccessLevels do
       uid=janedoe,ou=users,dc=example,dc=com
     )
     end
+
     subject { access_levels }
 
     context 'when access_levels is empty' do
@@ -40,6 +41,7 @@ describe EE::Gitlab::Auth::LDAP::AccessLevels do
           uid=janedoe,ou=users,dc=example,dc=com
         }
       end
+
       before do
         access_levels.set(master_dns, to: Gitlab::Access::MAINTAINER)
         access_levels.set(developer_dns, to: Gitlab::Access::DEVELOPER)

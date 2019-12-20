@@ -8,7 +8,6 @@ class TrialRegistrationsController < RegistrationsController
   skip_before_action :require_no_authentication
 
   before_action :check_if_gl_com
-  before_action :check_if_improved_trials_enabled
   before_action :set_redirect_url, only: [:new]
   before_action :skip_confirmation, only: [:create]
 
@@ -40,11 +39,5 @@ class TrialRegistrationsController < RegistrationsController
 
   def resource
     @resource ||= Users::BuildService.new(current_user, sign_up_params).execute(skip_authorization: true)
-  end
-
-  def check_if_improved_trials_enabled
-    unless Feature.enabled?(:improved_trial_signup)
-      redirect_to("#{EE::SUBSCRIPTIONS_URL}/trials/new?gl_com=true")
-    end
   end
 end

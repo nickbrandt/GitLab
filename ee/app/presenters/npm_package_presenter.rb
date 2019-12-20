@@ -3,10 +3,11 @@
 class NpmPackagePresenter
   include API::Helpers::RelatedResourcesHelpers
 
-  attr_reader :project, :name, :packages
+  attr_reader :name, :packages
 
-  def initialize(project, name, packages)
-    @project = project
+  NPM_VALID_DEPENDENCY_TYPES = %i[dependencies devDependencies bundleDependencies peerDependencies deprecated].freeze
+
+  def initialize(name, packages)
     @name = name
     @packages = packages
   end
@@ -41,13 +42,31 @@ class NpmPackagePresenter
         shasum: package_file.file_sha1,
         tarball: tarball_url(package, package_file)
       }
-    }
+    }.tap do |package_version|
+      package_version.merge!(build_package_dependencies(package))
+    end
   end
 
   def tarball_url(package, package_file)
     expose_url "#{api_v4_projects_path(id: package.project_id)}" \
       "/packages/npm/#{package.name}" \
       "/-/#{package_file.file_name}"
+  end
+
+  def build_package_dependencies(package)
+    return {} if package.dependency_links.empty?
+
+    dependencies = Hash.new { |h, key| h[key] = {} }
+    dependency_links = package.dependency_links
+                              .with_dependency_type(NPM_VALID_DEPENDENCY_TYPES)
+                              .includes_dependency
+
+    dependency_links.find_each do |dependency_link|
+      dependency = dependency_link.dependency
+      dependencies[dependency_link.dependency_type][dependency.name] = dependency.version_pattern
+    end
+
+    dependencies
   end
 
   def sorted_versions

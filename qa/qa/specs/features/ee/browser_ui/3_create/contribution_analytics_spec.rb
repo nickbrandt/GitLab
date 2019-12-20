@@ -35,7 +35,7 @@ module QA
         Page::Project::Issue::Show.perform(&:click_close_issue_button)
 
         mr.visit!
-        Page::MergeRequest::Show.perform(&:merge_immediately)
+        Page::MergeRequest::Show.perform(&:merge!)
 
         group.visit!
         Page::Group::Menu.perform(&:click_group_analytics_item)

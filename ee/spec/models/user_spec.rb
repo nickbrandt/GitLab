@@ -228,11 +228,11 @@ describe User do
     end
   end
 
-  describe '#full_private_access?' do
+  describe '#can_read_all_resources?' do
     it 'returns true for auditor user' do
       user = build(:user, :auditor)
 
-      expect(user.full_private_access?).to be_truthy
+      expect(user.can_read_all_resources?).to be_truthy
     end
   end
 
@@ -657,6 +657,7 @@ describe User do
 
     context 'namespace with input name exists' do
       let(:name) { 'Disney' }
+
       before do
         create(:user, name: 'disney')
       end
@@ -670,6 +671,7 @@ describe User do
 
     context 'namespace with input name and suffix exists' do
       let(:name) { 'Disney' }
+
       before do
         create(:user, name: 'disney')
         create(:user, name: 'disney1')

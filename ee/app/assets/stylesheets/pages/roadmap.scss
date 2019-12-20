@@ -19,30 +19,43 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
   }
 }
 
-@keyframes fadeInDetails {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeinTimelineBar {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 0.75;
-  }
-}
-
 @mixin roadmap-scroll-mixin {
   height: $grid-size;
   width: $details-cell-width;
   pointer-events: none;
+}
+
+html.group-epics-roadmap-html {
+  height: 100%;
+  // We need to reset this just for Roadmap page
+  overflow-y: initial;
+}
+
+.with-performance-bar {
+  .group-epics-roadmap-body {
+    $header-size: $performance-bar-height + $header-height;
+    height: calc(100% - #{$header-size});
+  }
+}
+
+.group-epics-roadmap-body {
+  height: calc(100% - #{$header-height});
+
+  .page-with-contextual-sidebar {
+    height: 100%;
+  }
+
+  .group-epics-roadmap {
+    // This size is total of breadcrumb height and computed height of
+    // filters container (70px)
+    $header-size: $breadcrumb-min-height + 70px;
+    height: calc(100% - #{$header-size});
+  }
+
+  .group-epics-roadmap-wrapper,
+  .group-epics-roadmap .content {
+    height: 100%;
+  }
 }
 
 .epics-details-filters {
@@ -100,6 +113,7 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
 
 .roadmap-container {
   overflow: hidden;
+  height: 100%;
 
   &.overflow-reset {
     overflow: initial;
@@ -108,12 +122,13 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
 
 .roadmap-shell {
   position: relative;
+  height: 100%;
+  width: 100%;
   overflow-x: auto;
 
   .skeleton-loader {
     position: absolute;
     top: $header-item-height;
-    left: $timeline-cell-width / 2;
     width: $details-cell-width;
     height: 100%;
     padding-top: $gl-padding-top;
@@ -171,6 +186,8 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
   }
 
   .timeline-header-item {
+    width: $timeline-cell-width;
+
     &:last-of-type .item-label {
       border-right: 0;
     }
@@ -241,6 +258,8 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
 }
 
 .epics-list-section {
+  height: calc(100% - 60px);
+
   .epics-list-item {
     &:hover {
       .epic-details-cell,
@@ -250,6 +269,8 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
     }
 
     &.epics-list-item-empty {
+      height: 100%;
+
       &:hover {
         .epic-details-cell,
         .epic-timeline-cell {
@@ -295,7 +316,7 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
 
       .epic-title,
       .epic-group-timeframe {
-        animation: fadeInDetails 1s;
+        will-change: contents;
       }
 
       .epic-title {
@@ -327,6 +348,7 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
     }
 
     .epic-timeline-cell {
+      width: $timeline-cell-width;
       background-color: transparent;
       border-right: $border-style;
 
@@ -341,7 +363,7 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
         background-color: $blue-500;
         border-radius: $border-radius-default;
         opacity: 0.75;
-        animation: fadeinTimelineBar 1s;
+        will-change: width, left;
 
         &:hover {
           opacity: 1;

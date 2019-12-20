@@ -25,8 +25,8 @@ module EE
         ::Gitlab::CurrentSettings.lock_memberships_to_ldap?
       end
 
-      condition(:security_dashboard_feature_disabled) do
-        !@subject.feature_available?(:security_dashboard)
+      condition(:security_dashboard_enabled) do
+        @subject.feature_available?(:security_dashboard)
       end
 
       condition(:needs_new_sso_session) do
@@ -49,6 +49,10 @@ module EE
         @subject.saml_provider&.enabled?
       end
 
+      condition(:group_timelogs_available) do
+        @subject.feature_available?(:group_timelogs)
+      end
+
       rule { reporter }.policy do
         enable :admin_list
         enable :admin_board
@@ -56,6 +60,7 @@ module EE
         enable :view_code_analytics
         enable :view_productivity_analytics
         enable :view_type_of_work_charts
+        enable :read_group_timelogs
       end
 
       rule { maintainer }.policy do
@@ -124,13 +129,10 @@ module EE
       end
 
       rule { developer }.policy do
-        enable :read_group_security_dashboard
         enable :admin_merge_request
       end
 
-      rule { security_dashboard_feature_disabled }.policy do
-        prevent :read_group_security_dashboard
-      end
+      rule { security_dashboard_enabled & developer }.enable :read_group_security_dashboard
 
       rule { needs_new_sso_session }.policy do
         prevent :read_group
@@ -143,6 +145,8 @@ module EE
       rule { owner & group_saml_enabled }.policy do
         enable :read_group_saml_identity
       end
+
+      rule { ~group_timelogs_available }.prevent :read_group_timelogs
     end
 
     override :lookup_access_level!

@@ -10,6 +10,7 @@ const getAllProjects = (url, page = '1', projects = []) =>
       page,
       include_subgroups: true,
       with_security_reports: true,
+      with_shared: false,
       order_by: 'path',
       sort: 'asc',
     },

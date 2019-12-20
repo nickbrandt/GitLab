@@ -50,4 +50,8 @@ export default {
     state.extendedTimeframe = extendedTimeframe;
     state.timeframe.push(...extendedTimeframe);
   },
+
+  [types.SET_BUFFER_SIZE](state, bufferSize) {
+    state.bufferSize = bufferSize;
+  },
 };

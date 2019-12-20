@@ -313,6 +313,7 @@ describe ProjectsHelper do
   describe '#link_to_project' do
     let(:group)   { create(:group, name: 'group name with space') }
     let(:project) { create(:project, group: group, name: 'project name with space') }
+
     subject { link_to_project(project) }
 
     it 'returns an HTML link to the project' do
@@ -331,13 +332,13 @@ describe ProjectsHelper do
     end
 
     it 'returns image tag for member avatar' do
-      expect(helper).to receive(:image_tag).with(expected, { width: 16, class: ["avatar", "avatar-inline", "s16"], alt: "", "data-src" => anything })
+      expect(helper).to receive(:image_tag).with(expected, { width: 16, class: %w[avatar avatar-inline s16], alt: "", "data-src" => anything })
 
       helper.link_to_member_avatar(user)
     end
 
     it 'returns image tag with avatar class' do
-      expect(helper).to receive(:image_tag).with(expected, { width: 16, class: ["avatar", "avatar-inline", "s16", "any-avatar-class"], alt: "", "data-src" => anything })
+      expect(helper).to receive(:image_tag).with(expected, { width: 16, class: %w[avatar avatar-inline s16 any-avatar-class], alt: "", "data-src" => anything })
 
       helper.link_to_member_avatar(user, avatar_class: "any-avatar-class")
     end
@@ -544,6 +545,7 @@ describe ProjectsHelper do
 
   describe '#git_user_name' do
     let(:user) { double(:user, name: 'John "A" Doe53') }
+
     before do
       allow(helper).to receive(:current_user).and_return(user)
     end
@@ -566,6 +568,7 @@ describe ProjectsHelper do
 
     context 'user logged in' do
       let(:user) { create(:user) }
+
       before do
         allow(helper).to receive(:current_user).and_return(user)
       end

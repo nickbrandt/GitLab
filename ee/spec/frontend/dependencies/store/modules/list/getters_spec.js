@@ -1,7 +1,7 @@
-import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { TEST_HOST } from 'helpers/test_constants';
 import * as getters from 'ee/dependencies/store/modules/list/getters';
 import { REPORT_STATUS } from 'ee/dependencies/store/modules/list/constants';
+import { getDateInPast } from '~/lib/utils/datetime_utility';
 
 describe('Dependencies getters', () => {
   describe.each`
@@ -28,7 +28,7 @@ describe('Dependencies getters', () => {
   describe('downloadEndpoint', () => {
     it('should return download endpoint', () => {
       const endpoint = `${TEST_HOST}/dependencies`;
-      expect(getters.downloadEndpoint({ endpoint })).toBe(`${TEST_HOST}/dependencies.json`);
+      expect(getters.downloadEndpoint({ endpoint })).toBe(endpoint);
     });
   });
 

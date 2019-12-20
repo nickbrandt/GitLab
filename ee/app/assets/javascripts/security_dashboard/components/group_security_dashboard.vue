@@ -38,6 +38,10 @@ export default {
       type: String,
       required: true,
     },
+    vulnerableProjectsEndpoint: {
+      type: String,
+      required: true,
+    },
   },
   created() {
     this.setProjectsEndpoint(this.projectsEndpoint);
@@ -55,6 +59,7 @@ export default {
     :vulnerabilities-count-endpoint="vulnerabilitiesCountEndpoint"
     :vulnerabilities-history-endpoint="vulnerabilitiesHistoryEndpoint"
     :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
+    :vulnerable-projects-endpoint="vulnerableProjectsEndpoint"
   >
     <template #emptyState>
       <gl-empty-state

@@ -42,62 +42,47 @@ describe('TimelineTodayIndicatorComponent', () => {
     it('returns default data props', () => {
       vm = createComponent({});
 
-      expect(vm.todayBarStyles).toBe('');
-      expect(vm.todayBarReady).toBe(false);
+      expect(vm.todayBarStyles).toEqual({});
+      expect(vm.todayBarReady).toBe(true);
     });
   });
 
   describe('methods', () => {
-    describe('handleEpicsListRender', () => {
+    describe('getTodayBarStyles', () => {
       it('sets `todayBarStyles` and `todayBarReady` props', () => {
         vm = createComponent({});
-        vm.handleEpicsListRender({});
-        const stylesObj = vm.todayBarStyles;
 
-        expect(stylesObj.height).toBe('600px');
+        const stylesObj = vm.getTodayBarStyles();
+
+        expect(stylesObj.height).toBe('calc(100vh - 16px)');
         expect(stylesObj.left).toBe('50%');
-        expect(vm.todayBarReady).toBe(true);
-      });
-
-      it('sets `todayBarReady` prop based on value of provided `todayBarReady` param', () => {
-        vm = createComponent({});
-        vm.handleEpicsListRender({
-          todayBarReady: false,
-        });
-
-        expect(vm.todayBarReady).toBe(false);
       });
     });
   });
 
   describe('mounted', () => {
-    it('binds `epicsListRendered`, `epicsListScrolled` and `refreshTimeline` event listeners via eventHub', () => {
+    it('binds `epicsListScrolled` event listener via eventHub', () => {
       spyOn(eventHub, '$on');
       const vmX = createComponent({});
 
-      expect(eventHub.$on).toHaveBeenCalledWith('epicsListRendered', jasmine.any(Function));
       expect(eventHub.$on).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Function));
-      expect(eventHub.$on).toHaveBeenCalledWith('refreshTimeline', jasmine.any(Function));
       vmX.$destroy();
     });
   });
 
   describe('beforeDestroy', () => {
-    it('unbinds `epicsListRendered`, `epicsListScrolled` and `refreshTimeline` event listeners via eventHub', () => {
+    it('unbinds `epicsListScrolled` event listener via eventHub', () => {
       spyOn(eventHub, '$off');
       const vmX = createComponent({});
       vmX.$destroy();
 
-      expect(eventHub.$off).toHaveBeenCalledWith('epicsListRendered', jasmine.any(Function));
       expect(eventHub.$off).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Function));
-      expect(eventHub.$off).toHaveBeenCalledWith('refreshTimeline', jasmine.any(Function));
     });
   });
 
   describe('template', () => {
     it('renders component container element with class `today-bar`', done => {
       vm = createComponent({});
-      vm.handleEpicsListRender({});
       vm.$nextTick(() => {
         expect(vm.$el.classList.contains('today-bar')).toBe(true);
         done();

@@ -32,7 +32,7 @@ module EE
 
     def environment_logs_data(project, environment)
       {
-        "current-environment-name": environment.name,
+        "environment-name": environment.name,
         "environments-path": project_environments_path(project, format: :json),
         "project-full-path": project.full_path,
         "environment-id": environment.id

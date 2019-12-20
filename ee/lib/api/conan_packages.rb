@@ -10,7 +10,7 @@
 # Technical debt: https://gitlab.com/gitlab-org/gitlab/issues/35798
 module API
   class ConanPackages < Grape::API
-    helpers ::API::Helpers::PackagesHelpers
+    helpers ::API::Helpers::PackagesManagerClientsHelpers
 
     PACKAGE_REQUIREMENTS = {
       package_name: API::NO_SLASH_URL_PART_REGEX,
@@ -27,7 +27,6 @@ module API
     CONAN_REVISION_REGEX = Gitlab::Regex.conan_revision_regex
 
     before do
-      not_found! unless Feature.enabled?(:conan_package_registry)
       require_packages_enabled!
 
       # Personal access token will be extracted from Bearer or Basic authorization
@@ -393,7 +392,7 @@ module API
         # conan sends two upload requests, the first has no file, so we skip record creation if file.size == 0
         ::Packages::Conan::CreatePackageFileService.new(current_package, uploaded_file, params.merge(conan_file_type: file_type)).execute unless params['file.size'] == 0
       rescue ObjectStorage::RemoteStoreError => e
-        Gitlab::Sentry.track_acceptable_exception(e, extra: { file_name: params[:file_name], project_id: project.id })
+        Gitlab::ErrorTracking.track_exception(e, file_name: params[:file_name], project_id: project.id)
 
         forbidden!
       end
@@ -415,7 +414,7 @@ module API
 
       def find_personal_access_token
         personal_access_token = find_personal_access_token_from_conan_jwt ||
-          find_personal_access_token_from_conan_http_basic_auth
+          find_personal_access_token_from_http_basic_auth
 
         personal_access_token || unauthorized!
       end
@@ -433,14 +432,6 @@ module API
         return unless token&.personal_access_token_id && token&.user_id
 
         PersonalAccessToken.find_by_id_and_user_id(token.personal_access_token_id, token.user_id)
-      end
-
-      def find_personal_access_token_from_conan_http_basic_auth
-        encoded_credentials = headers['Authorization'].to_s.split('Basic ', 2).second
-        token = Base64.decode64(encoded_credentials || '').split(':', 2).second
-        return unless token
-
-        PersonalAccessToken.find_by_token(token)
       end
     end
   end

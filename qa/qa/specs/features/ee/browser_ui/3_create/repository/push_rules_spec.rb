@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # https://gitlab.com/gitlab-org/gitlab/issues/34978
+  # Failure issue: https://gitlab.com/gitlab-org/gitlab/issues/34978
   context 'Create', :quarantine do
     context 'Push Rules' do
       describe 'using non signed commits' do

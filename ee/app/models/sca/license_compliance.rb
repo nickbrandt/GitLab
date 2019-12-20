@@ -10,8 +10,12 @@ module SCA
 
     def policies
       strong_memoize(:policies) do
-        new_policies.merge(known_policies).sort.map(&:last)
+        unclassified_policies.merge(known_policies).sort.map(&:last)
       end
+    end
+
+    def detected_policies
+      policies.reject { |policy| policy.dependencies.count.zero? }
     end
 
     def latest_build_for_default_branch
@@ -38,7 +42,7 @@ module SCA
       end
     end
 
-    def new_policies
+    def unclassified_policies
       license_scan_report.licenses.map do |reported_license|
         next if known_policies[reported_license.canonical_id]
 
@@ -48,7 +52,7 @@ module SCA
 
     def pipeline
       strong_memoize(:pipeline) do
-        project.all_pipelines.latest_successful_for_ref(project.default_branch)
+        project.latest_pipeline_with_reports(::Ci::JobArtifact.license_management_reports)
       end
     end
 

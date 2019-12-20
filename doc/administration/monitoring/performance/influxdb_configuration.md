@@ -1,5 +1,9 @@
 # InfluxDB Configuration
 
+CAUTION: **InfluxDB is deprecated in favor of Prometheus:**
+InfluxDB support is scheduled to be removed in GitLab 13.0.
+You are advised to use [Prometheus](../prometheus/index.md) instead.
+
 The default settings provided by [InfluxDB] are not sufficient for a high traffic
 GitLab environment. The settings discussed in this document are based on the
 settings GitLab uses for GitLab.com, depending on your own needs you may need to
@@ -178,7 +182,7 @@ That's it! Now your GitLab instance should send data to InfluxDB.
 
 Read more on:
 
-- [Introduction to GitLab Performance Monitoring](introduction.md)
+- [Introduction to GitLab Performance Monitoring](index.md)
 - [GitLab Configuration](gitlab_configuration.md)
 - [InfluxDB Schema](influxdb_schema.md)
 - [Grafana Install/Configuration](grafana_configuration.md)

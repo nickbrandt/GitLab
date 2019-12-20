@@ -1,6 +1,7 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { componentNames } from 'ee/reports/components/issue_body';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ReportSection from '~/reports/components/report_section.vue';
 import SummaryRow from '~/reports/components/summary_row.vue';
 import IssuesList from '~/reports/components/issues_list.vue';
@@ -18,7 +19,7 @@ export default {
     IssueModal,
     Icon,
   },
-  mixins: [securityReportsMixin],
+  mixins: [securityReportsMixin, glFeatureFlagsMixin()],
   props: {
     enabledReports: {
       type: Object,
@@ -324,7 +325,7 @@ export default {
       fetchSastDiff: 'fetchDiff',
     }),
     isMergeRequestReportApiEnabled(type) {
-      return Boolean(gon.features && gon.features[`${type}MergeRequestReportApi`]);
+      return Boolean(this.glFeatures[`${type}MergeRequestReportApi`]);
     },
     hasReportsType(type) {
       if (this.isMergeRequestReportApiEnabled(type)) {

@@ -1,10 +1,10 @@
 <script>
 import _ from 'underscore';
-import { sprintf, __ } from '~/locale';
-import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import ApprovalCheckRulePopover from 'ee/approvals/components/approval_check_rule_popover.vue';
 import EmptyRuleName from 'ee/approvals/components/empty_rule_name.vue';
 import { RULE_TYPE_CODE_OWNER, RULE_TYPE_ANY_APPROVER } from 'ee/approvals/constants';
+import { sprintf, __ } from '~/locale';
+import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import ApprovedIcon from './approved_icon.vue';
 
 export default {
@@ -137,7 +137,10 @@ export default {
             </div>
           </div>
         </td>
-        <td v-if="!rule.fallback" class="d-none d-sm-table-cell js-approvers">
+        <td
+          v-if="rule.rule_type !== $options.ruleTypeAnyApprover"
+          class="d-none d-sm-table-cell js-approvers"
+        >
           <div><user-avatar-list :items="rule.approvers" :img-size="24" empty-text="" /></div>
         </td>
         <td class="w-0 d-none d-sm-table-cell text-nowrap js-pending">

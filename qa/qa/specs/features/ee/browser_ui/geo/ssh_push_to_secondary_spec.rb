@@ -13,10 +13,7 @@ module QA
           project = nil
           key = nil
 
-          Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-            # Visit the primary node and login
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
+          QA::Flow::Login.while_signed_in(address: :geo_primary) do
             # Create a new SSH key for the user
             key = Resource::SSHKey.fabricate! do |resource|
               resource.title = key_title
@@ -42,10 +39,7 @@ module QA
             project.visit!
           end
 
-          Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-            # Visit the secondary node and login
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
+          QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
             end
@@ -107,10 +101,7 @@ module QA
           project = nil
           key = nil
 
-          Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-            # Visit the primary node and login
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
+          QA::Flow::Login.while_signed_in(address: :geo_primary) do
             # Create a new SSH key for the user
             key = Resource::SSHKey.fabricate! do |resource|
               resource.title = key_title
@@ -136,10 +127,7 @@ module QA
             end
           end
 
-          Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-            # Visit the secondary node and login
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
+          QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
             end
@@ -180,7 +168,7 @@ module QA
 
             ssh_uri = project.repository_ssh_location.git_uri.to_s.gsub(%r{ssh://}, '')
             expect(push.output).to match(%r{We'll help you by proxying this.*request to the primary:.*#{ssh_uri}}m)
-            expect(push.output).to match(/Locking support detected on remote "#{location.uri.to_s}"/)
+            expect(push.output).to match(/Locking support detected on remote "#{location.uri}"/)
 
             # Validate git push worked and new content is visible
             Page::Project::Show.perform do |show|

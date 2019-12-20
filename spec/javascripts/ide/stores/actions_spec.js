@@ -12,6 +12,7 @@ import actions, {
   renameEntry,
   getBranchData,
   createTempEntry,
+  discardAllChanges,
 } from '~/ide/stores/actions';
 import axios from '~/lib/utils/axios_utils';
 import { createStore } from '~/ide/stores';
@@ -60,8 +61,9 @@ describe('Multi-file store actions', () => {
   });
 
   describe('discardAllChanges', () => {
+    let f;
     beforeEach(() => {
-      const f = file('discardAll');
+      f = file('discardAll');
       f.changed = true;
 
       store.state.openFiles.push(f);
@@ -88,6 +90,59 @@ describe('Multi-file store actions', () => {
         })
         .then(done)
         .catch(done.fail);
+    });
+
+    it('closes the temp file and deletes it if it was open', done => {
+      f.tempFile = true;
+
+      testAction(
+        discardAllChanges,
+        undefined,
+        store.state,
+        [{ type: types.REMOVE_ALL_CHANGES_FILES }],
+        [
+          { type: 'closeFile', payload: jasmine.objectContaining({ path: 'discardAll' }) },
+          { type: 'deleteEntry', payload: 'discardAll' },
+        ],
+        done,
+      );
+    });
+
+    it('renames the file to its original name and closes it if it was open', done => {
+      Object.assign(f, {
+        prevPath: 'parent/path/old_name',
+        prevName: 'old_name',
+        prevParentPath: 'parent/path',
+      });
+
+      testAction(
+        discardAllChanges,
+        undefined,
+        store.state,
+        [{ type: types.REMOVE_ALL_CHANGES_FILES }],
+        [
+          { type: 'closeFile', payload: jasmine.objectContaining({ path: 'discardAll' }) },
+          {
+            type: 'renameEntry',
+            payload: { path: 'discardAll', name: 'old_name', parentPath: 'parent/path' },
+          },
+        ],
+        done,
+      );
+    });
+
+    it('discards file changes on all other files', done => {
+      testAction(
+        discardAllChanges,
+        undefined,
+        store.state,
+        [
+          { type: types.DISCARD_FILE_CHANGES, payload: 'discardAll' },
+          { type: types.REMOVE_ALL_CHANGES_FILES },
+        ],
+        [],
+        done,
+      );
     });
   });
 
@@ -264,7 +319,7 @@ describe('Multi-file store actions', () => {
             { type: types.TOGGLE_FILE_OPEN, payload: 'test' },
             { type: types.ADD_FILE_TO_CHANGED, payload: 'test' },
           ],
-          [
+          jasmine.arrayContaining([
             {
               type: 'setFileActive',
               payload: 'test',
@@ -272,7 +327,7 @@ describe('Multi-file store actions', () => {
             {
               type: 'triggerFilesChange',
             },
-          ],
+          ]),
           done,
         );
       });
@@ -290,6 +345,21 @@ describe('Multi-file store actions', () => {
           })
           .then(() => {
             expect(document.querySelector('.flash-alert')).not.toBeNull();
+
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('bursts unused seal', done => {
+        store
+          .dispatch('createTempEntry', {
+            name: 'test',
+            branchId: 'mybranch',
+            type: 'blob',
+          })
+          .then(() => {
+            expect(store.state.unusedSeal).toBe(false);
 
             done();
           })
@@ -593,6 +663,19 @@ describe('Multi-file store actions', () => {
         ],
       );
     });
+
+    it('bursts unused seal', done => {
+      store.state.entries.test = file('test');
+
+      store
+        .dispatch('deleteEntry', 'test')
+        .then(() => {
+          expect(store.state.unusedSeal).toBe(false);
+
+          done();
+        })
+        .catch(done.fail);
+    });
   });
 
   describe('renameEntry', () => {
@@ -692,7 +775,7 @@ describe('Multi-file store actions', () => {
               payload: 'renamed',
             },
           ],
-          [{ type: 'triggerFilesChange' }],
+          [{ type: 'burstUnusedSeal' }, { type: 'triggerFilesChange' }],
           done,
         );
       });
@@ -750,6 +833,20 @@ describe('Multi-file store actions', () => {
             expect(router.push).toHaveBeenCalledWith(`/project/foo-bar.md`);
           })
           .then(done)
+          .catch(done.fail);
+      });
+
+      it('bursts unused seal', done => {
+        store
+          .dispatch('renameEntry', {
+            path: 'orig',
+            name: 'renamed',
+          })
+          .then(() => {
+            expect(store.state.unusedSeal).toBe(false);
+
+            done();
+          })
           .catch(done.fail);
       });
     });

@@ -4,11 +4,11 @@ module Resolvers
   class EpicResolver < BaseResolver
     argument :iid, GraphQL::ID_TYPE,
              required: false,
-             description: 'The IID of the epic, e.g., "1"'
+             description: 'IID of the epic, e.g., "1"'
 
     argument :iids, [GraphQL::ID_TYPE],
              required: false,
-             description: 'The list of IIDs of epics, e.g., [1, 2]'
+             description: 'List of IIDs of epics, e.g., [1, 2]'
 
     argument :state, Types::EpicStateEnum,
              required: false,
@@ -88,7 +88,7 @@ module Resolvers
     # But that's the epic we need in order to scope the find to only children of this epic,
     # using the `parent_id`
     def parent
-      resolver_object if resolver_object.is_a?(EpicPresenter)
+      resolver_object if resolver_object.is_a?(Epic)
     end
 
     def group

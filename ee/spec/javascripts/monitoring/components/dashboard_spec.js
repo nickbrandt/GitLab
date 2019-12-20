@@ -8,7 +8,7 @@ import {
   mockedQueryResultPayload,
   environmentData,
 } from 'spec/monitoring/mock_data';
-import propsData from 'spec/monitoring/components/dashboard_spec';
+import propsData from 'spec/monitoring/components/dashboard_resize_spec';
 import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
 import Tracking from '~/tracking';
 import { createStore } from '~/monitoring/stores';
@@ -67,7 +67,7 @@ describe('Dashboard', () => {
       metricsGroupsAPIResponse,
     );
     component.vm.$store.commit(
-      `monitoringDashboard/${types.SET_QUERY_RESULT}`,
+      `monitoringDashboard/${types.RECEIVE_METRIC_RESULT_SUCCESS}`,
       mockedQueryResultPayload,
     );
     component.vm.$store.commit(
@@ -77,14 +77,31 @@ describe('Dashboard', () => {
   }
 
   describe('add custom metrics', () => {
+    const defaultProps = {
+      customMetricsPath: '/endpoint',
+      hasMetrics: true,
+      documentationPath: '/path/to/docs',
+      settingsPath: '/path/to/settings',
+      clustersPath: '/path/to/clusters',
+      projectPath: '/path/to/project',
+      metricsEndpoint: mockApiEndpoint,
+      tagsPath: '/path/to/tags',
+      emptyGettingStartedSvgPath: '/path/to/getting-started.svg',
+      emptyLoadingSvgPath: '/path/to/loading.svg',
+      emptyNoDataSvgPath: '/path/to/no-data.svg',
+      emptyNoDataSmallSvgPath: '/path/to/no-data-small.svg',
+      emptyUnableToConnectSvgPath: '/path/to/unable-to-connect.svg',
+      environmentsEndpoint: '/root/hello-prometheus/environments/35',
+      currentEnvironmentName: 'production',
+      prometheusAlertsAvailable: true,
+      alertsEndpoint: '/endpoint',
+    };
+
     describe('when not available', () => {
       beforeEach(() => {
         createComponent({
           customMetricsAvailable: false,
-          customMetricsPath: '/endpoint',
-          hasMetrics: true,
-          prometheusAlertsAvailable: true,
-          alertsEndpoint: '/endpoint',
+          ...defaultProps,
         });
       });
 
@@ -101,10 +118,7 @@ describe('Dashboard', () => {
 
         createComponent({
           customMetricsAvailable: true,
-          customMetricsPath: '/endpoint',
-          hasMetrics: true,
-          prometheusAlertsAvailable: true,
-          alertsEndpoint: '/endpoint',
+          ...defaultProps,
         });
 
         setupComponentStore(wrapper);

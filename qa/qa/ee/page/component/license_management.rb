@@ -49,11 +49,13 @@ module QA
           def approve_license(name)
             click_license(name)
             click_element(:approve_license_button)
+            wait_for_animated_element(:license_management_modal)
           end
 
           def blacklist_license(name)
             click_license(name)
             click_element(:blacklist_license_button)
+            wait_for_animated_element(:license_management_modal)
           end
         end
       end

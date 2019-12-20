@@ -11,13 +11,7 @@ describe SoftwareLicensePolicies::UpdateService do
     end
   end
 
-  let(:software_license_policy) do
-    create(
-      :software_license_policy,
-      software_license: create(:software_license, name: 'ExamplePL/2.1'),
-      classification: 'blacklisted'
-    )
-  end
+  let(:software_license_policy) { create(:software_license_policy, :denied) }
 
   before do
     stub_licensed_features(license_management: true)
@@ -52,7 +46,7 @@ describe SoftwareLicensePolicies::UpdateService do
           update_software_license_policy(opts)
 
           expect(software_license_policy).to be_valid
-          expect(software_license_policy.classification).to eq(opts[:approval_status])
+          expect(software_license_policy).to be_allowed
           expect(RefreshLicenseComplianceChecksWorker).to have_received(:perform_async).with(project.id)
         end
       end

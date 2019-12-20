@@ -20,7 +20,8 @@ module Security
       @source_reports = source_reports
       @target_report = ::Gitlab::Ci::Reports::Security::Report.new(
         @source_reports.first.type,
-        @source_reports.first.commit_sha
+        @source_reports.first.commit_sha,
+        @source_reports.first.created_at
       )
       @occurrences = []
     end

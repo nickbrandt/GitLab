@@ -75,7 +75,7 @@ describe('GeoNodeDetailItemComponent', () => {
         itemValueStaleTooltip,
       });
 
-      const iconEl = vm.$el.querySelector('.detail-value-stale-icon');
+      const iconEl = vm.$el.querySelector('.text-warning-500');
 
       expect(iconEl).not.toBeNull();
       expect(iconEl.dataset.originalTitle).toBe(itemValueStaleTooltip);

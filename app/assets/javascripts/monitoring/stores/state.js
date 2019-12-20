@@ -8,12 +8,13 @@ export default () => ({
   emptyState: 'gettingStarted',
   showEmptyState: true,
   showErrorBanner: true,
+
   dashboard: {
     panel_groups: [],
   },
+
   deploymentData: [],
   environments: [],
-  metricsWithData: [],
   allDashboards: [],
   currentDashboard: null,
   projectPath: null,

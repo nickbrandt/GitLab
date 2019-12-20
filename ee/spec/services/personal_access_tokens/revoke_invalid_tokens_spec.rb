@@ -7,6 +7,7 @@ describe PersonalAccessTokens::RevokeInvalidTokens do
 
   describe '#execute' do
     let(:expiration_date) { 10.days.from_now }
+
     let_it_be(:user) { create(:user) }
     let_it_be(:pat) { create(:personal_access_token, expires_at: 5.days.from_now, user: user) }
     let_it_be(:invalid_pat1) { create(:personal_access_token, expires_at: nil, user: user) }

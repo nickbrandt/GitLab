@@ -14,13 +14,13 @@ describe SnippetsHelper do
 
     it 'returns view raw button of embedded snippets for personal snippets' do
       @snippet = create(:personal_snippet, :public)
-      expect(subject).to eq(download_link("#{Settings.gitlab['url']}/snippets/#{@snippet.id}/raw"))
+      expect(subject).to eq(download_link("http://test.host/snippets/#{@snippet.id}/raw"))
     end
 
     it 'returns view raw button of embedded snippets for project snippets' do
       @snippet = create(:project_snippet, :public)
 
-      expect(subject).to eq(download_link("#{Settings.gitlab['url']}/#{@snippet.project.path_with_namespace}/snippets/#{@snippet.id}/raw"))
+      expect(subject).to eq(download_link("http://test.host/#{@snippet.project.path_with_namespace}/snippets/#{@snippet.id}/raw"))
     end
 
     def download_link(url)
@@ -34,13 +34,13 @@ describe SnippetsHelper do
     it 'returns download button of embedded snippets for personal snippets' do
       @snippet = create(:personal_snippet, :public)
 
-      expect(subject).to eq(download_link("#{Settings.gitlab['url']}/snippets/#{@snippet.id}/raw"))
+      expect(subject).to eq(download_link("http://test.host/snippets/#{@snippet.id}/raw"))
     end
 
     it 'returns download button of embedded snippets for project snippets' do
       @snippet = create(:project_snippet, :public)
 
-      expect(subject).to eq(download_link("#{Settings.gitlab['url']}/#{@snippet.project.path_with_namespace}/snippets/#{@snippet.id}/raw"))
+      expect(subject).to eq(download_link("http://test.host/#{@snippet.project.path_with_namespace}/snippets/#{@snippet.id}/raw"))
     end
 
     def download_link(url)
@@ -56,7 +56,7 @@ describe SnippetsHelper do
 
       context 'public' do
         it 'returns a script tag with the snippet full url' do
-          expect(subject).to eq(script_embed("#{Settings.gitlab['url']}/snippets/#{snippet.id}"))
+          expect(subject).to eq(script_embed("http://test.host/snippets/#{snippet.id}"))
         end
       end
     end
@@ -65,7 +65,7 @@ describe SnippetsHelper do
       let(:snippet) { public_project_snippet }
 
       it 'returns a script tag with the snippet full url' do
-        expect(subject).to eq(script_embed("#{Settings.gitlab['url']}/#{snippet.project.path_with_namespace}/snippets/#{snippet.id}"))
+        expect(subject).to eq(script_embed("http://test.host/#{snippet.project.path_with_namespace}/snippets/#{snippet.id}"))
       end
     end
 
@@ -125,6 +125,30 @@ describe SnippetsHelper do
       it 'does not return anything' do
         expect(subject).to be_nil
       end
+    end
+  end
+
+  describe '#snippet_embed_input' do
+    subject { snippet_embed_input(snippet) }
+
+    context 'with PersonalSnippet' do
+      let(:snippet) { public_personal_snippet }
+
+      it 'returns the input component' do
+        expect(subject).to eq embed_input(snippet_url(snippet))
+      end
+    end
+
+    context 'with ProjectSnippet' do
+      let(:snippet) { public_project_snippet }
+
+      it 'returns the input component' do
+        expect(subject).to eq embed_input(project_snippet_url(snippet.project, snippet))
+      end
+    end
+
+    def embed_input(url)
+      "<input type=\"text\" readonly=\"readonly\" class=\"js-snippet-url-area snippet-embed-input form-control\" data-url=\"#{url}\" value=\"<script src=&quot;#{url}.js&quot;></script>\" autocomplete=\"off\"></input>"
     end
   end
 end

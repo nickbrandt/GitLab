@@ -13,6 +13,7 @@ module EE
       include Vulnerable
       include TokenAuthenticatable
       include InsightsFeature
+      include HasTimelogsReport
 
       add_authentication_token_field :saml_discovery_token, unique: false, token_generator: -> { Devise.friendly_token(8) }
 
@@ -57,6 +58,7 @@ module EE
       validate :custom_project_templates_group_allowed, if: :custom_project_templates_group_id_changed?
 
       scope :aimed_for_deletion, -> (date) { joins(:deletion_schedule).where('group_deletion_schedules.marked_for_deletion_on <= ?', date) }
+      scope :with_deletion_schedule, -> { preload(:deletion_schedule) }
 
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })

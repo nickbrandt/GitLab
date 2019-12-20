@@ -78,7 +78,7 @@ describe('GeoDesigns', () => {
         const designs = [...wrapper.vm.$store.state.designs];
 
         for (let i = 0; i < designWrappers.length; i += 1) {
-          expect(designWrappers.at(i).props().projectId).toBe(designs[i].project_id);
+          expect(designWrappers.at(i).props().projectId).toBe(designs[i].projectId);
         }
       });
     });

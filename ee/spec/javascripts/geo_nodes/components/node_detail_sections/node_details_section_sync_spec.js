@@ -89,14 +89,16 @@ describe('NodeDetailsSectionSync', () => {
     });
 
     it('renders show section button element', () => {
-      expect(vm.$el.querySelector('.btn-show-section')).not.toBeNull();
-      expect(vm.$el.querySelector('.btn-show-section > span').innerText.trim()).toBe(
-        'Sync information',
-      );
+      expect(vm.$el.querySelector('.btn-link')).not.toBeNull();
+      expect(vm.$el.querySelector('.btn-link > span').innerText.trim()).toBe('Sync information');
     });
 
-    it('renders section items container element', () => {
-      expect(vm.$el.querySelector('.section-items-container')).not.toBeNull();
+    it('renders section items container element', done => {
+      vm.showSectionItems = true;
+      Vue.nextTick(() => {
+        expect(vm.$el.querySelector('.section-items-container')).not.toBeNull();
+        done();
+      });
     });
   });
 });

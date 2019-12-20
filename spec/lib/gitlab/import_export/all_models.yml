@@ -8,6 +8,7 @@ issues:
 - milestone
 - notes
 - resource_label_events
+- sentry_issue
 - label_links
 - labels
 - last_edited_by
@@ -33,6 +34,7 @@ issues:
 - zoom_meetings
 - vulnerability_links
 - related_vulnerabilities
+- user_mentions
 events:
 - author
 - project
@@ -81,6 +83,7 @@ snippets:
 - notes
 - award_emoji
 - user_agent_detail
+- user_mentions
 releases:
 - author
 - project
@@ -141,6 +144,7 @@ merge_requests:
 - description_versions
 - deployment_merge_requests
 - deployments
+- user_mentions
 external_pull_requests:
 - project
 merge_request_diff:
@@ -439,6 +443,8 @@ project:
 - downstream_project_subscriptions
 - service_desk_setting
 - import_failures
+- container_expiration_policy
+- resource_groups
 award_emoji:
 - awardable
 - user
@@ -538,14 +544,18 @@ design: &design
 - actions
 - versions
 - notes
+- user_mentions
 designs: *design
 actions:
 - design
 - version
 versions: &version
+- author
 - issue
 - designs
 - actions
 zoom_meetings:
+- issue
+sentry_issue:
 - issue
 design_versions: *version

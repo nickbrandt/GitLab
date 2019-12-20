@@ -6,6 +6,7 @@ describe EE::RepositoryCheck::BatchWorker do
   include ::EE::GeoHelpers
 
   let(:shard_name) { 'default' }
+
   subject(:worker) { RepositoryCheck::BatchWorker.new }
 
   before do

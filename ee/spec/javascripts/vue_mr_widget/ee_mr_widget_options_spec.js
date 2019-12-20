@@ -5,7 +5,6 @@ import MRWidgetStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
-import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/constants';
 
 import mockData, {
   baseIssues,
@@ -26,6 +25,7 @@ import {
   sastBaseAllIssues,
   sastHeadAllIssues,
 } from 'ee_spec/vue_shared/security_reports/mock_data';
+import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import axios from '~/lib/utils/axios_utils';
 import { MTWPS_MERGE_STRATEGY, MT_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';

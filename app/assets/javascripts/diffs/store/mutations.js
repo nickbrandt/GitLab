@@ -19,6 +19,7 @@ export default {
       projectPath,
       dismissEndpoint,
       showSuggestPopover,
+      useSingleDiffStyle,
     } = options;
     Object.assign(state, {
       endpoint,
@@ -27,6 +28,7 @@ export default {
       projectPath,
       dismissEndpoint,
       showSuggestPopover,
+      useSingleDiffStyle,
     });
   },
 
@@ -36,6 +38,10 @@ export default {
 
   [types.SET_BATCH_LOADING](state, isBatchLoading) {
     Object.assign(state, { isBatchLoading });
+  },
+
+  [types.SET_RETRIEVING_BATCHES](state, retrievingBatches) {
+    Object.assign(state, { retrievingBatches });
   },
 
   [types.SET_DIFF_DATA](state, data) {

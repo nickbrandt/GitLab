@@ -1,0 +1,5 @@
+---
+title: Create a new database composite index to support cross-project artifacts downloads
+merge_request: 20721
+author:
+type: added

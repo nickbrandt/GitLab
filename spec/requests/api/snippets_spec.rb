@@ -238,7 +238,9 @@ describe API::Snippets do
       end
 
       before do
-        allow_any_instance_of(AkismetService).to receive(:spam?).and_return(true)
+        allow_next_instance_of(AkismetService) do |instance|
+          allow(instance).to receive(:spam?).and_return(true)
+        end
       end
 
       context 'when the snippet is private' do
@@ -325,7 +327,9 @@ describe API::Snippets do
       end
 
       before do
-        allow_any_instance_of(AkismetService).to receive(:spam?).and_return(true)
+        allow_next_instance_of(AkismetService) do |instance|
+          allow(instance).to receive(:spam?).and_return(true)
+        end
       end
 
       context 'when the snippet is private' do
@@ -371,6 +375,7 @@ describe API::Snippets do
 
   describe 'DELETE /snippets/:id' do
     let!(:public_snippet) { create(:personal_snippet, :public, author: user) }
+
     it 'deletes snippet' do
       expect do
         delete api("/snippets/#{public_snippet.id}", user)

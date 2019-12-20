@@ -4,6 +4,7 @@
 class Blob < SimpleDelegator
   include Presentable
   include BlobLanguageFromGitAttributes
+  include BlobActiveModel
 
   CACHE_TIME = 60 # Cache raw blobs referred to by a (mutable) ref for 1 minute
   CACHE_TIME_IMMUTABLE = 3600 # Cache blobs referred to by an immutable reference for 1 hour
@@ -26,6 +27,7 @@ class Blob < SimpleDelegator
     BlobViewer::Markup,
     BlobViewer::Notebook,
     BlobViewer::SVG,
+    BlobViewer::OpenApi,
 
     BlobViewer::Image,
     BlobViewer::Sketch,
@@ -49,6 +51,7 @@ class Blob < SimpleDelegator
     BlobViewer::Contributing,
     BlobViewer::Changelog,
 
+    BlobViewer::CargoToml,
     BlobViewer::Cartfile,
     BlobViewer::ComposerJson,
     BlobViewer::Gemfile,

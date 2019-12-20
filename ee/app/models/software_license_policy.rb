@@ -5,6 +5,11 @@
 # For use in the License Management feature.
 class SoftwareLicensePolicy < ApplicationRecord
   include Presentable
+  # Mapping from old classification names to new names
+  LEGACY_CLASSIFICATION_STATUS = {
+    'approved' => 'allowed',
+    'blacklisted' => 'denied'
+  }.freeze
 
   # Only allows modification of the approval status
   FORM_EDITABLE = %i[approval_status].freeze
@@ -14,8 +19,8 @@ class SoftwareLicensePolicy < ApplicationRecord
   attr_readonly :software_license
 
   enum classification: {
-      blacklisted: 0,
-      approved: 1
+    denied: 0,
+    allowed: 1
   }
 
   # Software license is mandatory, it contains the license informations.
@@ -25,7 +30,7 @@ class SoftwareLicensePolicy < ApplicationRecord
   validates_presence_of :project
   validates :classification, presence: true
 
-  # A license is unique for its project since it can't be approved and blacklisted.
+  # A license is unique for its project since it can't be approved and denied.
   validates :software_license, uniqueness: { scope: :project_id }
 
   scope :ordered, -> { SoftwareLicensePolicy.includes(:software_license).order("software_licenses.name ASC") }
@@ -44,7 +49,15 @@ class SoftwareLicensePolicy < ApplicationRecord
 
   delegate :name, :spdx_identifier, to: :software_license
 
+  def approval_status
+    LEGACY_CLASSIFICATION_STATUS.key(classification) || classification
+  end
+
   def self.workaround_cache_key
     pluck(:id, :classification).flatten
+  end
+
+  def self.to_classification(approval_status)
+    LEGACY_CLASSIFICATION_STATUS.fetch(approval_status, approval_status)
   end
 end

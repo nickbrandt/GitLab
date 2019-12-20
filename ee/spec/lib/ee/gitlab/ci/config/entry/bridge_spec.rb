@@ -13,7 +13,8 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
     # that we know that we don't want to inherit
     # as they do not have sense in context of Bridge
     let(:ignored_inheritable_columns) do
-      %i[before_script after_script image services cache interruptible timeout retry]
+      %i[before_script after_script image services cache interruptible timeout
+         retry tags artifacts]
     end
   end
 
@@ -34,6 +35,17 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
 
       it { is_expected.to be_falsey }
+
+      context 'with rules' do
+        let(:config) do
+          {
+            script: 'ls -al',
+            rules: [{ if: '$VAR == "value"', when: 'always' }]
+          }
+        end
+
+        it { is_expected.to be_falsey }
+      end
     end
 
     context 'when config is a bridge job' do
@@ -43,6 +55,17 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
 
       it { is_expected.to be_truthy }
+
+      context 'with rules' do
+        let(:config) do
+          {
+            trigger: 'other-project',
+            rules: [{ if: '$VAR == "value"', when: 'always' }]
+          }
+        end
+
+        it { is_expected.to be_truthy }
+      end
     end
 
     context 'when config is a hidden job' do
@@ -58,6 +81,16 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
   describe '.new' do
     before do
       subject.compose!
+    end
+
+    let(:base_config) do
+      {
+        trigger: { project: 'some/project', branch: 'feature' },
+        needs: { pipeline: 'other/project' },
+        extends: '.some-key',
+        stage: 'deploy',
+        variables: { VARIABLE: '123' }
+      }
     end
 
     context 'when trigger config is a non-empty string' do
@@ -117,19 +150,55 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
     end
 
-    context 'when bridge configuration contains all supported keys' do
+    context 'when bridge configuration contains trigger, needs, when, extends, stage, only, except, and variables' do
       let(:config) do
-        { trigger: { project: 'some/project', branch: 'feature' },
-          needs: { pipeline: 'other/project' },
+        base_config.merge({
           when: 'always',
-          extends: '.some-key',
-          stage: 'deploy',
           only: { variables: %w[$SOMEVARIABLE] },
-          except: { refs: %w[feature] },
-          variables: { VARIABLE: '123' } }
+          except: { refs: %w[feature] }
+        })
       end
 
       it { is_expected.to be_valid }
+    end
+
+    context 'when bridge configuration uses rules' do
+      let(:config) { base_config.merge({ rules: [{ if: '$VAR == null', when: 'never' }] }) }
+
+      it { is_expected.to be_valid }
+    end
+
+    context 'when bridge configuration uses rules with job:when' do
+      let(:config) do
+        base_config.merge({
+          when: 'always',
+          rules: [{ if: '$VAR == null', when: 'never' }]
+        })
+      end
+
+      it { is_expected.not_to be_valid }
+    end
+
+    context 'when bridge configuration uses rules with only' do
+      let(:config) do
+        base_config.merge({
+          only: { variables: %w[$SOMEVARIABLE] },
+          rules: [{ if: '$VAR == null', when: 'never' }]
+        })
+      end
+
+      it { is_expected.not_to be_valid }
+    end
+
+    context 'when bridge configuration uses rules with except' do
+      let(:config) do
+        base_config.merge({
+          except: { refs: %w[feature] },
+          rules: [{ if: '$VAR == null', when: 'never' }]
+        })
+      end
+
+      it { is_expected.not_to be_valid }
     end
 
     context 'when trigger config is nil' do
@@ -172,6 +241,31 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
     end
 
+    context 'when bridge has only cross projects dependencies' do
+      let(:config) do
+        {
+          needs: [
+            {
+              project: 'some/project',
+              job: 'some/job',
+              ref: 'some/ref',
+              artifacts: true
+            }
+          ]
+        }
+      end
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+
+      describe '#errors' do
+        it 'returns an error about cross dependencies' do
+          expect(subject.errors).to include('needs config uses invalid types: cross_dependency')
+        end
+      end
+    end
+
     context 'when bridge has bridge and job needs' do
       let(:config) do
         {
@@ -182,6 +276,33 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#valid?' do
         it { is_expected.to be_valid }
+      end
+    end
+
+    context 'when bridge has bridge and cross projects dependencies ' do
+      let(:config) do
+        {
+          trigger: 'other-project',
+          needs: [
+            { pipeline: 'some/other_project' },
+            {
+              project: 'some/project',
+              job: 'some/job',
+              ref: 'some/ref',
+              artifacts: true
+            }
+          ]
+        }
+      end
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+
+      describe '#errors' do
+        it 'returns an error cross dependencies' do
+          expect(subject.errors).to contain_exactly('needs config uses invalid types: cross_dependency')
+        end
       end
     end
 

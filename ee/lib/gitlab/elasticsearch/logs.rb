@@ -10,7 +10,7 @@ module Gitlab
         @client = client
       end
 
-      def pod_logs(namespace, pod_name, container_name = nil)
+      def pod_logs(namespace, pod_name, container_name = nil, search = nil)
         query = {
           bool: {
             must: [
@@ -44,6 +44,16 @@ module Gitlab
           }
         end
 
+        unless search.nil?
+          query[:bool][:must] << {
+            simple_query_string: {
+              query: search,
+              fields: [:message],
+              default_operator: :and
+            }
+          }
+        end
+
         body = {
           query: query,
           # reverse order so we can query N-most recent records
@@ -51,14 +61,19 @@ module Gitlab
             { "@timestamp": { order: :desc } },
             { "offset": { order: :desc } }
           ],
-          # only return the message field in the response
-          _source: ["message"],
+          # only return these fields in the response
+          _source: ["@timestamp", "message"],
           # fixed limit for now, we should support paginated queries
           size: ::Gitlab::Elasticsearch::Logs::LOGS_LIMIT
         }
 
         response = @client.search body: body
-        result = response.fetch("hits", {}).fetch("hits", []).map { |h| h["_source"]["message"] }
+        result = response.fetch("hits", {}).fetch("hits", []).map do |hit|
+          {
+            timestamp: hit["_source"]["@timestamp"],
+            message: hit["_source"]["message"]
+          }
+        end
 
         # we queried for the N-most recent records but we want them ordered oldest to newest
         result.reverse

@@ -226,7 +226,7 @@ module QA
       end
 
       def gcloud_region
-        ENV.fetch('GCLOUD_REGION')
+        ENV['GCLOUD_REGION']
       end
 
       def gcloud_num_nodes
@@ -246,6 +246,10 @@ module QA
         return unless github_access_token.empty?
 
         raise ArgumentError, "Please provide GITHUB_ACCESS_TOKEN"
+      end
+
+      def require_admin_access_token!
+        admin_personal_access_token || (raise ArgumentError, "GITLAB_QA_ADMIN_ACCESS_TOKEN is required!")
       end
 
       # Returns true if there is an environment variable that indicates that

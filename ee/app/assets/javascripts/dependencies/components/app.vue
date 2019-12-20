@@ -117,13 +117,13 @@ export default {
   <section v-else>
     <dependency-list-incomplete-alert
       v-if="isIncomplete && !isIncompleteAlertDismissed"
-      @close="dismissIncompleteListAlert"
+      @dismiss="dismissIncompleteListAlert"
     />
 
     <dependency-list-job-failed-alert
       v-if="isJobFailed && !isJobFailedAlertDismissed"
       :job-path="reportInfo.jobPath"
-      @close="dismissJobFailedAlert"
+      @dismiss="dismissJobFailedAlert"
     />
 
     <header class="my-3">

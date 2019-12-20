@@ -1,3 +1,5 @@
+import { uniqueId } from 'underscore';
+
 /**
  * Returns formatted array that doesn't contain
  * `edges`->`node` nesting
@@ -32,4 +34,55 @@ export const extractCurrentDiscussion = (discussions, id) =>
 
 export const findVersionId = id => (id.match('::Version/(.+$)') || [])[1];
 
+export const findNoteId = id => (id.match('DiffNote/(.+$)') || [])[1];
+
 export const extractDesign = data => data.project.issue.designCollection.designs.edges[0].node;
+
+/**
+ * Generates optimistic response for a design upload mutation
+ * @param {Array<File>} files
+ */
+export const designUploadOptimisticResponse = files => {
+  const designs = files.map(file => ({
+    // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+    // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+    __typename: 'Design',
+    id: -uniqueId(),
+    image: '',
+    filename: file.name,
+    fullPath: '',
+    notesCount: 0,
+    event: 'NONE',
+    diffRefs: {
+      __typename: 'DiffRefs',
+      baseSha: '',
+      startSha: '',
+      headSha: '',
+    },
+    discussions: {
+      __typename: 'DesignDiscussion',
+      edges: [],
+    },
+    versions: {
+      __typename: 'DesignVersionConnection',
+      edges: {
+        __typename: 'DesignVersionEdge',
+        node: {
+          __typename: 'DesignVersion',
+          id: -uniqueId(),
+          sha: -uniqueId(),
+        },
+      },
+    },
+  }));
+
+  return {
+    // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+    // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+    __typename: 'Mutation',
+    designManagementUpload: {
+      __typename: 'DesignManagementUploadPayload',
+      designs,
+    },
+  };
+};

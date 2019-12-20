@@ -15,19 +15,25 @@ module EE
             include ::Gitlab::Config::Entry::Inheritable
 
             ALLOWED_KEYS = %i[trigger stage allow_failure only except
-                              when extends variables needs].freeze
+                              when extends variables needs rules].freeze
 
             validations do
               validates :config, allowed_keys: ALLOWED_KEYS
               validates :config, presence: true
               validates :name, presence: true
               validates :name, type: Symbol
+              validates :config, disallowed_keys: {
+                  in: %i[only except when start_in],
+                  message: 'key may not be used with `rules`'
+                },
+                if: :has_rules?
 
               with_options allow_nil: true do
                 validates :when,
                   inclusion: { in: %w[on_success on_failure always],
                                message: 'should be on_success, on_failure or always' }
                 validates :extends, type: String
+                validates :rules, array_of_hashes: true
               end
 
               validate on: :composed do
@@ -66,6 +72,13 @@ module EE
               description: 'Refs policy this job will be executed for.',
               inherit: false
 
+            entry :rules, ::Gitlab::Ci::Config::Entry::Rules,
+              description: 'List of evaluable Rules to determine job inclusion.',
+              inherit: false,
+              metadata: {
+                allowed_when: %w[on_success on_failure always never manual delayed].freeze
+              }
+
             entry :variables, ::Gitlab::Ci::Config::Entry::Variables,
               description: 'Environment variables available for this job.',
               inherit: false
@@ -84,6 +97,28 @@ module EE
               true
             end
 
+            def compose!(deps = nil)
+              super do
+                has_workflow_rules = deps&.workflow&.has_rules?
+
+                # If workflow:rules: or rules: are used
+                # they are considered not compatible
+                # with `only/except` defaults
+                #
+                # Context: https://gitlab.com/gitlab-org/gitlab/merge_requests/21742
+                if has_rules? || has_workflow_rules
+                  # Remove only/except defaults
+                  # defaults are not considered as defined
+                  @entries.delete(:only) unless only_defined?
+                  @entries.delete(:except) unless except_defined?
+                end
+              end
+            end
+
+            def has_rules?
+              @config&.key?(:rules)
+            end
+
             def name
               @metadata[:name]
             end
@@ -97,6 +132,7 @@ module EE
                 when: when_value,
                 extends: extends_value,
                 variables: (variables_value if variables_defined?),
+                rules: (rules_value if has_rules?),
                 only: only_value,
                 except: except_value }.compact
             end

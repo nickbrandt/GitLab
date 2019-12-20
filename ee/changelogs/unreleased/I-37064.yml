@@ -1,0 +1,5 @@
+---
+title: fix CSS shadowbox on focus
+merge_request: 21785
+author: allenlai18
+type: fixed

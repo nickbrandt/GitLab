@@ -84,7 +84,9 @@ describe 'Rack Attack global throttles' do
           expect(response).to have_http_status 200
         end
 
-        expect_any_instance_of(Rack::Attack::Request).to receive(:ip).at_least(:once).and_return('1.2.3.4')
+        expect_next_instance_of(Rack::Attack::Request) do |instance|
+          expect(instance).to receive(:ip).at_least(:once).and_return('1.2.3.4')
+        end
 
         # would be over limit for the same IP
         get url_that_does_not_require_authentication
@@ -96,6 +98,18 @@ describe 'Rack Attack global throttles' do
           (1 + requests_per_period).times do
             get url_api_internal, params: { secret_token: Gitlab::Shell.secret_token }
             expect(response).to have_http_status 200
+          end
+        end
+      end
+
+      context 'when the request is authenticated by a runner token' do
+        let(:request_jobs_url) { '/api/v4/jobs/request' }
+        let(:runner) { create(:ci_runner) }
+
+        it 'does not cont as unauthenticated' do
+          (1 + requests_per_period).times do
+            post request_jobs_url, params: { token: runner.token }
+            expect(response).to have_http_status 204
           end
         end
       end

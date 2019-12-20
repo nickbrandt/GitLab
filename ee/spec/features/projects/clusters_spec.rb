@@ -111,7 +111,7 @@ describe 'EE Clusters', :js do
         context 'when user filled form with environment scope' do
           before do
             click_link 'Add Kubernetes cluster'
-            click_link 'Create new Cluster'
+            click_link 'Create new cluster'
             click_link 'Google GKE'
 
             sleep 2 # wait for ajax
@@ -156,7 +156,7 @@ describe 'EE Clusters', :js do
         context 'when user updates duplicated environment scope' do
           before do
             click_link 'Add Kubernetes cluster'
-            click_link 'Create new Cluster'
+            click_link 'Create new cluster'
             click_link 'Google GKE'
 
             sleep 2 # wait for ajax

@@ -195,6 +195,11 @@ describe Project do
       context 'with same variable keys and different environment scope' do
         it { expect(project).to be_valid }
       end
+
+      it do
+        is_expected.to validate_numericality_of(:max_pages_size).only_integer.is_greater_than(0)
+                         .is_less_than(::Gitlab::Pages::MAX_SIZE / 1.megabyte)
+      end
     end
 
     context 'mirror' do
@@ -545,8 +550,8 @@ describe Project do
     end
   end
 
-  describe '#beta_feature_available?' do
-    it_behaves_like 'an entity with beta feature support' do
+  describe '#alpha/beta_feature_available?' do
+    it_behaves_like 'an entity with alpha/beta feature support' do
       let(:entity) { create(:project) }
     end
   end
@@ -1443,7 +1448,7 @@ describe Project do
   end
 
   describe '#protected_environment_by_name' do
-    let(:project) { create(:project) }
+    let_it_be(:project) { create(:project) }
 
     subject { project.protected_environment_by_name('production') }
 
@@ -1460,19 +1465,27 @@ describe Project do
 
     context 'when Protected Environments feature is available on the project' do
       let(:feature_available) { true }
-      let(:environment) { create(:environment, name: 'production') }
-      let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
-
-      context 'when the project environment exists' do
-        before do
-          protected_environment
-        end
-
-        it { is_expected.to eq(protected_environment) }
-      end
 
       context 'when the project environment does not exists' do
         it { is_expected.to be_nil }
+      end
+
+      context 'when the project environment exists' do
+        let_it_be(:environment) { create(:environment, name: 'production') }
+        let_it_be(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
+
+        it { is_expected.to eq(protected_environment) }
+
+        it 'caches environment name', :request_store do
+          control_count = ActiveRecord::QueryRecorder.new { project.protected_environment_by_name(protected_environment.name) }
+
+          expect do
+            2.times { project.protected_environment_by_name(protected_environment.name) }
+          end.not_to exceed_query_limit(control_count)
+
+          expect(project.protected_environment_by_name('non-existent-env')).to be_nil
+          expect(project.protected_environment_by_name(protected_environment.name)).to eq(protected_environment)
+        end
       end
     end
   end
@@ -1767,6 +1780,7 @@ describe Project do
 
   describe '#object_pool_missing?' do
     let(:pool) { create(:pool_repository, :ready) }
+
     subject { create(:project, :repository, pool_repository: pool) }
 
     it 'returns true when object pool is missing' do
@@ -1903,20 +1917,19 @@ describe Project do
   describe '#design_management_enabled?' do
     let(:project) { build(:project) }
 
-    where(:feature_enabled, :license_enabled, :lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
-      false | false | false | false | false | false
-      true  | false | false | false | false | false
-      true  | true  | false | false | false | false
-      true  | true  | true  | false | false | true
-      true  | true  | true  | false | true  | false
-      true  | true  | true  | true  | false | true
-      true  | true  | true  | true  | true  | true
+    where(:license_enabled, :lfs_enabled, :hashed_storage_enabled, :hash_storage_required, :expectation) do
+      false | false | false | false | false
+      true  | false | false | false | false
+      true  | true  | false | false | true
+      true  | true  | false | true  | false
+      true  | true  | true  | false | true
+      true  | true  | true  | true  | true
     end
 
     with_them do
       before do
         stub_licensed_features(design_management: license_enabled)
-        stub_feature_flags(design_management_flag: feature_enabled, design_management_require_hashed_storage: hash_storage_required)
+        stub_feature_flags(design_management_require_hashed_storage: hash_storage_required)
         expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
         allow(project).to receive(:hashed_storage?).with(:repository).and_return(hashed_storage_enabled)
       end
@@ -2255,6 +2268,7 @@ describe Project do
       context 'when number of days is set to more than 0' do
         it 'returns true' do
           stub_application_setting(deletion_adjourned_period: 1)
+
           expect(project.adjourned_deletion?).to eq(true)
         end
       end
@@ -2262,6 +2276,7 @@ describe Project do
       context 'when number of days is set to 0' do
         it 'returns false' do
           stub_application_setting(deletion_adjourned_period: 0)
+
           expect(project.adjourned_deletion?).to eq(false)
         end
       end
@@ -2382,5 +2397,30 @@ describe Project do
 
   describe '#license_compliance' do
     it { expect(subject.license_compliance).to be_instance_of(::SCA::LicenseCompliance) }
+  end
+
+  describe '#expire_caches_before_rename' do
+    let(:project) { create(:project, :repository) }
+    let(:repo)    { double(:repo, exists?: true, before_delete: true) }
+    let(:wiki)    { double(:wiki, exists?: true, before_delete: true) }
+    let(:design)  { double(:design, exists?: true) }
+
+    it 'expires the caches of the design repository' do
+      allow(Repository).to receive(:new)
+        .with('foo', project)
+        .and_return(repo)
+
+      allow(Repository).to receive(:new)
+        .with('foo.wiki', project)
+        .and_return(wiki)
+
+      allow(Repository).to receive(:new)
+        .with('foo.design', project)
+        .and_return(design)
+
+      expect(design).to receive(:before_delete)
+
+      project.expire_caches_before_rename('foo')
+    end
   end
 end

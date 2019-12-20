@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Gitlab::Prometheus::Queries::ClusterQuery do
   let(:client) { double('prometheus_client', query_range: nil) }
+
   subject { described_class.new(client) }
 
   around do |example|

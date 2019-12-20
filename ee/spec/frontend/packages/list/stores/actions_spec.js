@@ -1,8 +1,8 @@
 import * as actions from 'ee/packages/list/stores/actions';
 import * as types from 'ee/packages/list/stores/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
-import createFlash from '~/flash';
 import Api from 'ee/api';
+import createFlash from '~/flash';
 
 jest.mock('~/flash.js');
 jest.mock('ee/api.js');

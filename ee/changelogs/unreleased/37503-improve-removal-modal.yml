@@ -1,0 +1,5 @@
+---
+title: Replace depricatedModal (Geo) with GlModal
+merge_request: 22125
+author:
+type: changed

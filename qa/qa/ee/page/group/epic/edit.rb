@@ -18,6 +18,9 @@ module QA
 
             def save_changes
               click_element :save_button
+              wait(max: 5, interval: 1, reload: false) do
+                has_no_element?(:save_button)
+              end
             end
 
             def delete_epic

@@ -5,9 +5,7 @@ module QA
     describe 'GitLab Geo project rename replication' do
       it 'user renames project' do
         # create the project and push code
-        Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-          Page::Main::Login.perform(&:sign_in_using_credentials)
-
+        QA::Flow::Login.while_signed_in(address: :geo_primary) do
           project = Resource::Project.fabricate! do |project|
             project.name = 'geo-before-rename'
             project.description = 'Geo project to be renamed'
@@ -44,9 +42,7 @@ module QA
         end
 
         # check renamed project exist on secondary node
-        Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-          Page::Main::Login.perform(&:sign_in_using_credentials)
-
+        QA::Flow::Login.while_signed_in(address: :geo_secondary) do
           EE::Page::Main::Banner.perform do |banner|
             expect(banner).to have_secondary_read_only_banner
           end

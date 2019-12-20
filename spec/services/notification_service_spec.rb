@@ -154,6 +154,7 @@ describe NotificationService, :mailer do
 
   describe '#async' do
     let(:async) { notification.async }
+
     set(:key) { create(:personal_key) }
 
     it 'returns an Async object with the correct parent' do
@@ -206,6 +207,18 @@ describe NotificationService, :mailer do
 
       it 'sends email to key owner' do
         expect { notification.new_gpg_key(key) }.to change { ActionMailer::Base.deliveries.size }.by(1)
+      end
+    end
+  end
+
+  describe 'AccessToken' do
+    describe '#access_token_about_to_expire' do
+      let_it_be(:user) { create(:user) }
+
+      it 'sends email to the token owner' do
+        expect(notification.access_token_about_to_expire(user)).to be_truthy
+
+        should_email user
       end
     end
   end
@@ -2694,7 +2707,7 @@ describe NotificationService, :mailer do
     # User to be participant by default
     # This user does not contain any record in notification settings table
     # It should be treated with a :participating notification_level
-    @u_lazy_participant      = create(:user, username: 'lazy-participant')
+    @u_lazy_participant = create(:user, username: 'lazy-participant')
 
     @u_guest_watcher = create_user_with_notification(:watch, 'guest_watching')
     @u_guest_custom = create_user_with_notification(:custom, 'guest_custom')

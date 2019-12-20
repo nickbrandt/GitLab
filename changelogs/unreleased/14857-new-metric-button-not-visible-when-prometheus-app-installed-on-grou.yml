@@ -1,6 +1,5 @@
 ---
-title: Activate Prometheus service integration for projects with Prometheus application
-  already installed on a shared cluster
-merge_request: 19956
+title: Activate projects Prometheus service integration when Prometheus managed application is installed on shared cluster
+merge_request:
 author:
 type: fixed

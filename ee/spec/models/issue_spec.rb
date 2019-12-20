@@ -161,6 +161,13 @@ describe Issue do
           .to contain_exactly(authorized_issue_b, authorized_issue_c)
     end
 
+    it 'returns issues with valid issue_link_type' do
+      link_types = authorized_issue_a.related_issues(user).map(&:issue_link_type)
+
+      expect(link_types).not_to be_empty
+      expect(link_types).not_to include(nil)
+    end
+
     describe 'when a user cannot read cross project' do
       it 'only returns issues within the same project' do
         expect(Ability).to receive(:allowed?).with(user, :read_all_resources, :global).and_call_original
@@ -259,6 +266,7 @@ describe Issue do
 
   describe '#promoted?' do
     let(:issue) { create(:issue) }
+
     subject { issue.promoted? }
 
     context 'issue not promoted' do
@@ -480,6 +488,7 @@ describe Issue do
 
   describe 'current designs' do
     let(:issue) { create(:issue) }
+
     subject { issue.designs.current }
 
     context 'an issue has no designs' do
@@ -508,6 +517,35 @@ describe Issue do
       let!(:design_c) { create(:design, :with_file, issue: issue) }
 
       it { is_expected.to contain_exactly(design_a, design_c) }
+    end
+  end
+
+  describe "#issue_link_type" do
+    let(:issue) { build(:issue) }
+
+    it 'returns nil for a regular issue' do
+      expect(issue.issue_link_type).to be_nil
+    end
+
+    where(:id, :issue_link_source_id, :issue_link_type_value, :expected) do
+      1 | 1   | 0 | 'relates_to'
+      1 | 1   | 1 | 'blocks'
+      1 | 2   | 3 | 'relates_to'
+      1 | 2   | 1 | 'is_blocked_by'
+      1 | 2   | 2 | 'blocks'
+    end
+
+    with_them do
+      let(:issue) { build(:issue) }
+      subject { issue.issue_link_type }
+
+      before do
+        allow(issue).to receive(:id).and_return(id)
+        allow(issue).to receive(:issue_link_source_id).and_return(issue_link_source_id)
+        allow(issue).to receive(:issue_link_type_value).and_return(issue_link_type_value)
+      end
+
+      it { is_expected.to eq(expected) }
     end
   end
 end

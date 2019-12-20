@@ -2,7 +2,9 @@
 
 exports[`Package code instruction multiline to match the snapshot 1`] = `
 <div>
-  <pre>
+  <pre
+    class="js-instruction-pre"
+  >
     this is some
 multiline text
   </pre>
@@ -14,13 +16,13 @@ exports[`Package code instruction single line to match the default snapshot 1`] 
   class="input-group append-bottom-10"
 >
   <input
-    class="form-control monospace"
+    class="form-control monospace js-instruction-input"
     readonly="readonly"
     type="text"
   />
    
   <span
-    class="input-group-append"
+    class="input-group-append js-instruction-button"
   >
     <button
       class="btn input-group-text btn-secondary btn-default"

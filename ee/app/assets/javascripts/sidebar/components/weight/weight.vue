@@ -1,11 +1,11 @@
 <script>
 import $ from 'jquery';
+import { GlLoadingIcon } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import Tracking from '~/tracking';
 import eventHub from '~/sidebar/event_hub';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
-import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {

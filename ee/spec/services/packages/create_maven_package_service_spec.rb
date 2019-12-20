@@ -10,6 +10,8 @@ describe Packages::CreateMavenPackageService do
   let(:path_with_version) { "#{path}/#{version}" }
 
   describe '#execute' do
+    subject(:package) { described_class.new(project, user, params).execute }
+
     context 'with version' do
       let(:params) do
         {
@@ -20,8 +22,6 @@ describe Packages::CreateMavenPackageService do
       end
 
       it 'creates a new package with metadatum' do
-        package = described_class.new(project, user, params).execute
-
         expect(package).to be_valid
         expect(package.name).to eq(path)
         expect(package.version).to eq(version)
@@ -32,6 +32,8 @@ describe Packages::CreateMavenPackageService do
         expect(package.maven_metadatum.app_name).to eq(app_name)
         expect(package.maven_metadatum.app_version).to eq(version)
       end
+
+      it_behaves_like 'assigns build to package'
     end
 
     context 'without version' do

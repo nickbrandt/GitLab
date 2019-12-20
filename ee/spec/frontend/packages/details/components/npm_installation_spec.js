@@ -1,5 +1,7 @@
 import { mount } from '@vue/test-utils';
 import NpmInstallation from 'ee/packages/details/components/npm_installation.vue';
+import { TrackingActions, TrackingLabels } from 'ee/packages/details/constants';
+import Tracking from '~/tracking';
 
 describe('NpmInstallation', () => {
   let wrapper;
@@ -20,6 +22,8 @@ describe('NpmInstallation', () => {
   const yarnInstall = `yarn add ${packageScopeName}`;
   const yarnSetup = `echo \\"${packageScope}:registry\\" \\"${registryUrl}\\" >> .yarnrc`;
 
+  const installationTab = () => wrapper.find('.js-installation-tab > a');
+  const setupTab = () => wrapper.find('.js-setup-tab > a');
   const installCommand = type => wrapper.find(`.js-${type}-install > input`);
   const setupCommand = type => wrapper.find(`.js-${type}-setup > input`);
 
@@ -71,6 +75,33 @@ describe('NpmInstallation', () => {
     it('renders the correct yarn commands', () => {
       expect(installCommand('yarn').element.value).toBe(yarnInstall);
       expect(setupCommand('yarn').element.value).toBe(yarnSetup);
+    });
+  });
+
+  describe('tab change tracking', () => {
+    let eventSpy;
+    const label = TrackingLabels.NPM_INSTALLATION;
+
+    beforeEach(() => {
+      eventSpy = jest.spyOn(Tracking, 'event');
+      createComponent();
+    });
+
+    it('should track when the setup tab is clicked', () => {
+      setupTab().trigger('click');
+
+      expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.REGISTRY_SETUP, {
+        label,
+      });
+    });
+
+    it('should track when the installation tab is clicked', () => {
+      setupTab().trigger('click');
+      installationTab().trigger('click');
+
+      expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.INSTALLATION, {
+        label,
+      });
     });
   });
 });

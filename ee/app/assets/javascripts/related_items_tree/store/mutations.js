@@ -5,12 +5,20 @@ import * as types from './mutation_types';
 export default {
   [types.SET_INITIAL_CONFIG](
     state,
-    { epicsEndpoint, issuesEndpoint, autoCompleteEpics, autoCompleteIssues, userSignedIn },
+    {
+      epicsEndpoint,
+      issuesEndpoint,
+      autoCompleteEpics,
+      autoCompleteIssues,
+      projectsEndpoint,
+      userSignedIn,
+    },
   ) {
     state.epicsEndpoint = epicsEndpoint;
     state.issuesEndpoint = issuesEndpoint;
     state.autoCompleteEpics = autoCompleteEpics;
     state.autoCompleteIssues = autoCompleteIssues;
+    state.projectsEndpoint = projectsEndpoint;
     state.userSignedIn = userSignedIn;
   },
 
@@ -190,5 +198,9 @@ export default {
 
     // Insert at new position
     state.children[parentItem.reference].splice(newIndex, 0, targetItem);
+  },
+
+  [types.SET_PROJECTS](state, projects) {
+    state.projects = projects;
   },
 };

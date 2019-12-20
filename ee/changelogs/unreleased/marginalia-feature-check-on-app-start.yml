@@ -1,0 +1,5 @@
+---
+title: Added Marginalia feature which can generate PostgreSQL query comments to Gitlab
+merge_request: 21364
+author: BalaKumar
+type: added

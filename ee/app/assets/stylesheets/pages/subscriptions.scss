@@ -1,0 +1,82 @@
+/* Checkout Page */
+.subscriptions-layout-html {
+  .container {
+    margin: 0;
+    max-width: none;
+    padding-top: 40px;
+  }
+
+  .checkout-pane {
+    border-bottom: 1px solid $gray-200;
+    flex-grow: 1;
+    flex-shrink: 0;
+    padding-right: $gl-padding;
+    padding-left: $gl-padding;
+
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      border-bottom: 0;
+      border-right: 1px solid $border-color;
+    }
+  }
+
+  .summary-pane {
+    padding-bottom: $gl-padding;
+    padding-right: $gl-padding;
+    padding-left: $gl-padding;
+
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      padding-left: $gl-padding * 3;
+      padding-right: $gl-padding * 3;
+    }
+  }
+
+  .checkout {
+    align-items: center;
+    flex-grow: 1;
+    margin-top: $gl-padding;
+    max-width: 454px;
+
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      justify-content: inherit !important;
+      margin-top: 36px;
+      max-width: none;
+    }
+
+    .full-width {
+      max-width: 541px;
+      width: 100%;
+    }
+  }
+
+  .bar {
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      width: 400px;
+    }
+
+    .phase {
+      border-bottom: 5px solid $gray-200;
+      color: $gray-700;
+      flex-basis: 100%;
+      font-size: $gl-font-size-12;
+      line-height: $gl-line-height;
+      padding-bottom: $gl-padding-8;
+
+      &.current,
+      &.finished {
+        border-bottom-color: $blue-400;
+      }
+
+      &.current {
+        color: $gray-900;
+      }
+    }
+  }
+
+  .header-title {
+    margin: 24px 0 16px;
+
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      margin-bottom: 32px;
+    }
+  }
+}

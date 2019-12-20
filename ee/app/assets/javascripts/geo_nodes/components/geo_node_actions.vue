@@ -45,8 +45,9 @@ export default {
       eventHub.$emit('showNodeActionModal', {
         actionType: NODE_ACTIONS.TOGGLE,
         node: this.node,
-        modalMessage: s__('GeoNodes|Pausing replication stops the sync process.'),
+        modalMessage: s__('GeoNodes|Pausing replication stops the sync process. Are you sure?'),
         modalActionLabel: this.nodeToggleLabel,
+        modalTitle: __('Pause replication'),
       });
     },
     onRemoveSecondaryNode() {
@@ -55,9 +56,10 @@ export default {
         node: this.node,
         modalKind: 'danger',
         modalMessage: s__(
-          'GeoNodes|Removing a secondary node stops the sync process. It is not currently possible to add back the same node without losing some data. We only recommend setting up a new secondary node in this case. Are you sure?',
+          'GeoNodes|Removing a Geo secondary node stops the synchronization to that node. Are you sure?',
         ),
-        modalActionLabel: __('Remove'),
+        modalActionLabel: __('Remove node'),
+        modalTitle: __('Remove secondary node'),
       });
     },
     onRemovePrimaryNode() {
@@ -66,9 +68,10 @@ export default {
         node: this.node,
         modalKind: 'danger',
         modalMessage: s__(
-          'GeoNodes|Removing a primary node stops the sync process for all nodes. Syncing cannot be resumed without losing some data on all secondaries. In this case we would recommend setting up all nodes from scratch. Are you sure?',
+          'GeoNodes|Removing a Geo primary node stops the synchronization to that node. Are you sure?',
         ),
-        modalActionLabel: __('Remove'),
+        modalActionLabel: __('Remove node'),
+        modalTitle: __('Remove primary node'),
       });
     },
     onRepairNode() {
@@ -79,53 +82,49 @@ export default {
 </script>
 
 <template>
-  <div class="geo-node-actions">
-    <div v-if="isSecondaryNode" class="node-action-container">
-      <a :href="node.geoProjectsUrl" class="btn btn-sm btn-node-action" target="_blank">
-        <icon v-if="!node.current" name="external-link" /> {{ __('Open projects') }}
-      </a>
-    </div>
+  <div class="d-flex align-items-center justify-content-end geo-node-actions">
+    <a v-if="isSecondaryNode" :href="node.geoProjectsUrl" class="btn btn-sm mx-1 " target="_blank">
+      <icon v-if="!node.current" name="external-link" /> {{ __('Open projects') }}
+    </a>
     <template v-if="nodeActionsAllowed">
-      <div v-if="nodeMissingOauth" class="node-action-container">
-        <button type="button" class="btn btn-default btn-sm btn-node-action" @click="onRepairNode">
-          {{ s__('Repair authentication') }}
-        </button>
-      </div>
-      <div v-if="isToggleAllowed" class="node-action-container">
-        <button
-          :class="{
-            'btn-warning': node.enabled,
-            'btn-success': !node.enabled,
-          }"
-          type="button"
-          class="btn btn-sm btn-node-action"
-          @click="onToggleNode"
-        >
-          <icon :name="nodeToggleIcon" />
-          {{ nodeToggleLabel }}
-        </button>
-      </div>
-      <div v-if="nodeEditAllowed" class="node-action-container">
-        <a :href="node.editPath" class="btn btn-sm btn-node-action"> {{ __('Edit') }} </a>
-      </div>
-      <div class="node-action-container">
-        <button
-          v-if="isSecondaryNode"
-          type="button"
-          class="btn btn-sm btn-node-action btn-danger"
-          @click="onRemoveSecondaryNode"
-        >
-          {{ __('Remove') }}
-        </button>
-        <button
-          v-else
-          type="button"
-          class="btn btn-sm btn-node-action btn-danger"
-          @click="onRemovePrimaryNode"
-        >
-          {{ __('Remove') }}
-        </button>
-      </div>
+      <button
+        v-if="nodeMissingOauth"
+        type="button"
+        class="btn btn-sm btn-default mx-1"
+        @click="onRepairNode"
+      >
+        {{ s__('Repair authentication') }}
+      </button>
+      <button
+        v-if="isToggleAllowed"
+        :class="{
+          'btn-warning': node.enabled,
+          'btn-success': !node.enabled,
+        }"
+        type="button"
+        class="btn btn-sm mx-1"
+        @click="onToggleNode"
+      >
+        <icon :name="nodeToggleIcon" />
+        {{ nodeToggleLabel }}
+      </button>
+      <a v-if="nodeEditAllowed" :href="node.editPath" class="btn btn-sm mx-1"> {{ __('Edit') }} </a>
+      <button
+        v-if="isSecondaryNode"
+        type="button"
+        class="btn btn-sm btn-danger mx-1"
+        @click="onRemoveSecondaryNode"
+      >
+        {{ __('Remove') }}
+      </button>
+      <button
+        v-if="!isSecondaryNode"
+        type="button"
+        class="btn btn-sm btn-danger mx-1"
+        @click="onRemovePrimaryNode"
+      >
+        {{ __('Remove') }}
+      </button>
     </template>
   </div>
 </template>

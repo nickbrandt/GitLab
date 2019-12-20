@@ -3,8 +3,14 @@ require 'securerandom'
 
 module QA
   context 'Manage' do
+    include Support::Api
+
+    let(:api_client) { Runtime::API::Client.new(:gitlab) }
+
     shared_examples 'group audit event logs' do |expected_events|
       it 'logs audit events' do
+        wait_for_audit_events(expected_events)
+
         Page::Group::Menu.perform(&:go_to_audit_events_settings)
         expected_events.each do |expected_event|
           expect(page).to have_text(expected_event)
@@ -17,6 +23,10 @@ module QA
         @group = Resource::Group.fabricate_via_api! do |resource|
           resource.path = "test-group-#{SecureRandom.hex(8)}"
         end
+      end
+
+      before do
+        @event_count = get_audit_event_count
       end
 
       let(:project) do
@@ -108,6 +118,19 @@ module QA
         Page::Main::Login.perform do |login|
           as_admin ? login.sign_in_using_admin_credentials : login.sign_in_using_credentials
         end
+      end
+    end
+
+    def get_audit_event_count
+      response = get Runtime::API::Request.new(api_client, "/groups/#{@group.id}/audit_events").url
+      parse_body(response).length
+    end
+
+    def wait_for_audit_events(expected_events)
+      new_event_count = @event_count + expected_events.length
+
+      Support::Retrier.retry_until(sleep_interval: 1) do
+        get_audit_event_count == new_event_count
       end
     end
   end

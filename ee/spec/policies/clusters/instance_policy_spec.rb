@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Clusters::InstancePolicy do
   let(:user) { create(:admin) }
+
   subject { described_class.new(user, Clusters::Instance.new) }
 
   context 'when cluster deployments is available' do

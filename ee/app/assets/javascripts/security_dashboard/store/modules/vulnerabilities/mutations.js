@@ -1,7 +1,7 @@
 import Vue from 'vue';
+import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
 import { s__, __ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
-import getFileLocation from 'ee/vue_shared/security_reports/store/utils/get_file_location';
 import * as types from './mutation_types';
 import { DAYS } from './constants';
 import { isSameVulnerability } from './utils';

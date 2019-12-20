@@ -24,6 +24,7 @@ module DesignManagement
 
       items = design_or_collection.versions
       items = by_earlier_or_equal_to(items)
+      items = by_sha(items)
       items.ordered
     end
 
@@ -33,6 +34,12 @@ module DesignManagement
       return items unless params[:earlier_or_equal_to]
 
       items.earlier_or_equal_to(params[:earlier_or_equal_to])
+    end
+
+    def by_sha(items)
+      return items unless params[:sha]
+
+      items.by_sha(params[:sha])
     end
   end
 end

@@ -1,5 +1,5 @@
 <script>
-import { GlBadge, GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
+import { GlBadge, GlLoadingIcon, GlModalDirective } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -12,7 +12,6 @@ export default {
     AlertWidgetForm,
     GlBadge,
     GlLoadingIcon,
-    GlModal,
     Icon,
   },
   directives: {

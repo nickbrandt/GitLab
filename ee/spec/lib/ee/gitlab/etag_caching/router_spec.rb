@@ -23,7 +23,7 @@ describe Gitlab::EtagCaching::Router do
   context 'k8s pod logs' do
     it 'matches with pod_name and container_name' do
       result = described_class.match(
-        '/environments/7/pods/pod_name/containers/container_name/logs.json'
+        '/environments/7/pods/pod_name/containers/container_name/logs/k8s.json'
       )
 
       expect(result).to be_present
@@ -32,7 +32,7 @@ describe Gitlab::EtagCaching::Router do
 
     it 'matches with pod_name' do
       result = described_class.match(
-        '/environments/7/pods/pod_name/containers/logs.json'
+        '/environments/7/pods/pod_name/containers/logs/k8s.json'
       )
 
       expect(result).to be_present
@@ -41,7 +41,7 @@ describe Gitlab::EtagCaching::Router do
 
     it 'matches without pod_name and container_name' do
       result = described_class.match(
-        '/environments/7/pods/containers/logs.json'
+        '/environments/7/pods/containers/logs/k8s.json'
       )
 
       expect(result).to be_present

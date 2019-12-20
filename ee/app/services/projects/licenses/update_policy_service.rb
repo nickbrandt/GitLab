@@ -17,10 +17,10 @@ module Projects
       private
 
       def change_classification_of(policy)
-        if blacklisted_classification?
-          policy.blacklisted!
+        if denied_classification?
+          policy.denied!
         else
-          policy.approved!
+          policy.allowed!
         end
 
         RefreshLicenseComplianceChecksWorker.perform_async(project.id)
@@ -40,8 +40,8 @@ module Projects
         SoftwareLicensePolicy.classifications.key?(params[:classification])
       end
 
-      def blacklisted_classification?
-        params[:classification] == 'blacklisted'
+      def denied_classification?
+        params[:classification] == 'denied'
       end
     end
   end

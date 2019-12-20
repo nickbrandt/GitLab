@@ -1,5 +1,5 @@
 <script>
-import { GlTable, GlLink, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import { GlTable, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
@@ -8,7 +8,6 @@ export default {
   components: {
     GlEmptyState,
     GlTable,
-    GlLink,
     Icon,
     TimeAgo,
     GlLoadingIcon,
@@ -143,7 +142,8 @@ export default {
               :tooltip-text="instance.tooltip"
               :pod-name="instance.pod_name"
               :stable="instance.stable"
-              :logs-path="`${row.item.environmentPath}/logs`"
+              :project-path="`/${row.item.project.path_with_namespace}`"
+              :environment-name="row.item.name"
             />
           </template>
         </div>

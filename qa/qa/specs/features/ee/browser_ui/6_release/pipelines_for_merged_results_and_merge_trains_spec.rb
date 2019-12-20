@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'securerandom'
+
 module QA
   context 'Release', :docker do
     describe 'Pipelines for merged results and merge trains' do
@@ -48,17 +50,20 @@ module QA
       end
 
       it 'creates a pipeline with merged results' do
+        branch_name = "merged-results-#{SecureRandom.hex(8)}"
+
         # Create a branch that will be merged into master
         Resource::Repository::ProjectPush.fabricate! do |project_push|
           project_push.project = @project
           project_push.new_branch = true
-          project_push.branch_name = 'merged-results'
+          project_push.branch_name = branch_name
+          project_push.file_name = "file-#{SecureRandom.hex(8)}.txt"
         end
 
         # Create a merge request to merge the branch we just created
         Resource::MergeRequest.fabricate_via_api! do |merge_request|
           merge_request.project = @project
-          merge_request.source_branch = 'merged-results'
+          merge_request.source_branch = branch_name
           merge_request.no_preparation = true
         end.visit!
 
@@ -70,8 +75,8 @@ module QA
           expect(pipeline_passed).to be_truthy, "Expected the merged result pipeline to pass."
 
           # The default option is to merge via merge train,
-          # but that will be covered by another test
-          show.merge_immediately
+          # but that is covered by the 'merges via a merge train' test
+          show.skip_merge_train_and_merge_immediately
         end
 
         merged = Page::MergeRequest::Show.perform(&:merged?)
@@ -80,19 +85,21 @@ module QA
       end
 
       it 'merges via a merge train' do
+        branch_name = "merge-train-#{SecureRandom.hex(8)}"
+
         # Create a branch that will be merged into master
         Resource::Repository::ProjectPush.fabricate! do |project_push|
           project_push.project = @project
           project_push.new_branch = true
-          project_push.branch_name = 'merge-train'
-          project_push.file_name = "another_file.txt"
+          project_push.branch_name = branch_name
+          project_push.file_name = "file-#{SecureRandom.hex(8)}.txt"
           project_push.file_content = "merge me"
         end
 
         # Create a merge request to merge the branch we just created
         Resource::MergeRequest.fabricate_via_api! do |merge_request|
           merge_request.project = @project
-          merge_request.source_branch = 'merge-train'
+          merge_request.source_branch = branch_name
           merge_request.no_preparation = true
         end.visit!
 

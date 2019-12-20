@@ -8,7 +8,7 @@ FactoryBot.modify do
     end
 
     trait :on_design do
-      noteable { create(:design, :with_file, project: project) }
+      noteable { create(:design, :with_file, issue: create(:issue, project: project)) }
     end
 
     trait :with_review do

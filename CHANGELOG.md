@@ -2,6 +2,25 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 12.5.5
+
+### Security (1 change)
+
+- Upgrade Akismet gem to v3.0.0. !21786
+
+### Fixed (2 changes)
+
+- Fix error in updating runner session. !20902
+- Fix Asana integration. !21501
+
+
+## 12.5.4
+
+### Security (1 change)
+
+- Update maven_file_name_regex for full string match.
+
+
 ## 12.5.3
 
 ### Fixed (4 changes)
@@ -756,6 +775,13 @@ entry.
 - Remove Postgresql specific setup tasks and move to schema.rb.
 
 
+## 12.3.9
+
+### Security (1 change)
+
+- Update maven_file_name_regex for full string match.
+
+
 ## 12.3.7
 
 ### Security (12 changes)
@@ -1078,6 +1104,10 @@ entry.
 - Remove vue resource from group service. (Lee Tickett)
 - Updates tooltip of 'detached' label/state.
 
+
+## 12.2.11
+
+- No changes.
 
 ## 12.2.8
 
@@ -1792,6 +1822,15 @@ entry.
 - Removes EE differences for app/views/layouts/fullscreen.html.haml.
 - Removes EE differences for app/views/admin/users/show.html.haml.
 
+
+## 12.0.12
+
+- No changes.
+
+## 12.0.10
+
+- No changes.
+- No changes.
 
 ## 12.0.7
 

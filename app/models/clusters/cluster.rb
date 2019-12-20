@@ -34,6 +34,7 @@ module Clusters
 
     has_many :cluster_groups, class_name: 'Clusters::Group'
     has_many :groups, through: :cluster_groups, class_name: '::Group'
+    has_many :groups_projects, through: :groups, source: :projects, class_name: '::Project'
 
     # we force autosave to happen when we save `Cluster` model
     has_one :provider_gcp, class_name: 'Clusters::Providers::Gcp', autosave: true
@@ -177,6 +178,13 @@ module Clusters
       end
     end
 
+    def all_projects
+      return projects if project_type?
+      return groups_projects if group_type?
+
+      ::Project.all
+    end
+
     def status_name
       return cleanup_status_name if cleanup_errored?
       return :cleanup_ongoing unless cleanup_not_started?
@@ -241,14 +249,9 @@ module Clusters
     end
 
     def kubernetes_namespace_for(environment)
-      project = environment.project
-      persisted_namespace = Clusters::KubernetesNamespaceFinder.new(
-        self,
-        project: project,
-        environment_name: environment.name
-      ).execute
-
-      persisted_namespace&.namespace || Gitlab::Kubernetes::DefaultNamespace.new(self, project: project).from_environment_slug(environment.slug)
+      managed_namespace(environment) ||
+        ci_configured_namespace(environment) ||
+        default_namespace(environment)
     end
 
     def allow_user_defined_namespace?
@@ -300,6 +303,25 @@ module Clusters
       end
     end
 
+    def managed_namespace(environment)
+      Clusters::KubernetesNamespaceFinder.new(
+        self,
+        project: environment.project,
+        environment_name: environment.name
+      ).execute&.namespace
+    end
+
+    def ci_configured_namespace(environment)
+      environment.last_deployable&.expanded_kubernetes_namespace
+    end
+
+    def default_namespace(environment)
+      Gitlab::Kubernetes::DefaultNamespace.new(
+        self,
+        project: environment.project
+      ).from_environment_slug(environment.slug)
+    end
+
     def instance_domain
       @instance_domain ||= Gitlab::CurrentSettings.auto_devops_domain
     end
@@ -313,7 +335,7 @@ module Clusters
     rescue Kubeclient::HttpError => e
       kubeclient_error_status(e.message)
     rescue => e
-      Gitlab::Sentry.track_acceptable_exception(e, extra: { cluster_id: id })
+      Gitlab::ErrorTracking.track_exception(e, cluster_id: id)
 
       :unknown_failure
     else

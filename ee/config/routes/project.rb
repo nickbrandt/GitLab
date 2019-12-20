@@ -12,7 +12,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           constraints: { project_id: Gitlab::PathRegex.project_route_regex },
           module: :projects,
           as: :project) do
-
       # Begin of the /-/ scope.
       # Use this scope for all new project routes.
       scope '-' do
@@ -60,16 +59,18 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         resources :subscriptions, only: [:create, :destroy]
-        resources :licenses, only: [:index, :create, :update], controller: 'security/licenses'
 
-        resources :environments, only: [] do
-          member do
-            get :logs
-            get '/pods/(:pod_name)/containers/(:container_name)/logs', to: 'environments#k8s_pod_logs', as: :k8s_pod_logs
-          end
+        namespace :performance_monitoring do
+          resources :dashboards, only: [:create]
+        end
 
+        resources :licenses, only: [:index, :create, :update]
+
+        resource :threat_monitoring, only: [:show], controller: :threat_monitoring
+
+        resources :logs, only: [:index] do
           collection do
-            get :logs, action: :logs_redirect
+            get :k8s
           end
         end
 
@@ -166,6 +167,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      post '/restore' => '/projects#restore', as: :restore
+
       resources :approvers, only: :destroy
       resources :approver_groups, only: :destroy
       resources :push_rules, constraints: { id: /\d+/ }, only: [:update]
@@ -187,8 +190,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resource :dashboard, only: [:show], controller: :dashboard
         resource :configuration, only: [:show], controller: :configuration
 
-        resources :dependencies, only: [:index]
-        resources :licenses, only: [:index, :update]
         # We have to define both legacy and new routes for Vulnerability Findings
         # because they are loaded upon application initialization and preloaded by
         # web server.
@@ -208,9 +209,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
 
-      resource :dependencies, only: [:show]
-      resource :licenses, only: [:show]
-
+      resources :dependencies, only: [:index]
       # All new routes should go under /-/ scope.
       # Look for scope '-' at the top of the file.
       # rubocop: enable Cop/PutProjectRoutesUnderScope

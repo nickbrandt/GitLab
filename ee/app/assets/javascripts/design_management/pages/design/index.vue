@@ -1,9 +1,8 @@
 <script>
 import { ApolloMutation } from 'vue-apollo';
 import Mousetrap from 'mousetrap';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlAlert } from '@gitlab/ui';
 import createFlash from '~/flash';
-import { s__ } from '~/locale';
 import allVersionsMixin from '../../mixins/all_versions';
 import Toolbar from '../../components/toolbar/index.vue';
 import DesignImage from '../../components/image.vue';
@@ -16,7 +15,12 @@ import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
 import { extractDiscussions, extractDesign } from '../../utils/design_management_utils';
 import { updateStoreAfterAddImageDiffNote } from '../../utils/cache_update';
-import { ADD_DISCUSSION_COMMENT_ERROR } from '../../utils/error_messages';
+import {
+  ADD_DISCUSSION_COMMENT_ERROR,
+  DESIGN_NOT_FOUND_ERROR,
+  DESIGN_NOT_EXIST_ERROR,
+  designDeletionError,
+} from '../../utils/error_messages';
 
 export default {
   components: {
@@ -28,6 +32,7 @@ export default {
     Toolbar,
     DesignReplyForm,
     GlLoadingIcon,
+    GlAlert,
   },
   mixins: [allVersionsMixin],
   props: {
@@ -47,6 +52,7 @@ export default {
       },
       projectPath: '',
       issueId: '',
+      errorMessage: '',
     };
   },
   apollo: {
@@ -67,13 +73,14 @@ export default {
       update: data => extractDesign(data),
       result({ data }) {
         if (!data) {
-          createFlash(s__('DesignManagement|Could not find design, please try again.'));
-          this.$router.push({ name: 'designs' });
+          this.onQueryError(DESIGN_NOT_FOUND_ERROR);
         }
         if (this.$route.query.version && !this.hasValidVersion) {
-          createFlash(s__('DesignManagement|Requested design version does not exist'));
-          this.$router.push({ name: 'designs' });
+          this.onQueryError(DESIGN_NOT_EXIST_ERROR);
         }
+      },
+      error() {
+        this.onQueryError(DESIGN_NOT_FOUND_ERROR);
       },
     },
   },
@@ -144,8 +151,18 @@ export default {
         this.designVariables,
       );
     },
-    onMutationError(e) {
-      createFlash(ADD_DISCUSSION_COMMENT_ERROR);
+    onQueryError(message) {
+      // because we redirect user to /designs (the issue page),
+      // we want to create these flashes on the issue page
+      createFlash(message);
+      this.$router.push({ name: 'designs' });
+    },
+    onDiffNoteError(e) {
+      this.errorMessage = ADD_DISCUSSION_COMMENT_ERROR;
+      throw e;
+    },
+    onDesignDeleteError(e) {
+      this.errorMessage = designDeletionError({ singular: true });
       throw e;
     },
     openCommentForm(position) {
@@ -194,7 +211,7 @@ export default {
           :project-path="projectPath"
           :iid="issueIid"
           @done="$router.push({ name: 'designs' })"
-          @error="$router.push({ name: 'designs' })"
+          @error="onDesignDeleteError"
         >
           <template v-slot="{ mutate, loading, error }">
             <toolbar
@@ -207,6 +224,11 @@ export default {
           </template>
         </design-destroyer>
         <div class="d-flex flex-column h-100 mh-100 position-relative">
+          <div class="p-3">
+            <gl-alert v-if="errorMessage" variant="danger" @dismiss="errorMessage = null">
+              {{ errorMessage }}
+            </gl-alert>
+          </div>
           <design-image
             :image="design.image"
             :name="design.filename"
@@ -230,6 +252,7 @@ export default {
             :noteable-id="design.id"
             :discussion-index="index + 1"
             :markdown-preview-path="markdownPreviewPath"
+            @error="onDiffNoteError"
           />
           <apollo-mutation
             v-if="annotationCoordinates"
@@ -240,7 +263,7 @@ export default {
             }"
             :update="addImageDiffNoteToStore"
             @done="closeCommentForm"
-            @error="onMutationError"
+            @error="onDiffNoteError"
           >
             <design-reply-form
               v-model="comment"

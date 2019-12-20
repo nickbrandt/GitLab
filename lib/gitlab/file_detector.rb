@@ -25,6 +25,7 @@ module Gitlab
       route_map: '.gitlab/route-map.yml',
 
       # Dependency files
+      cargo_toml: 'Cargo.toml',
       cartfile: %r{\ACartfile[^/]*\z},
       composer_json: 'composer.json',
       gemfile: /\A(Gemfile|gems\.rb)\z/,
@@ -36,7 +37,10 @@ module Gitlab
       podspec_json: %r{\A[^/]*\.podspec\.json\z},
       podspec: %r{\A[^/]*\.podspec\z},
       requirements_txt: %r{\A[^/]*requirements\.txt\z},
-      yarn_lock: 'yarn.lock'
+      yarn_lock: 'yarn.lock',
+
+      # OpenAPI Specification files
+      openapi: %r{.*(openapi|swagger).*\.(yaml|yml|json)\z}i
     }.freeze
 
     # Returns an Array of file types based on the given paths.

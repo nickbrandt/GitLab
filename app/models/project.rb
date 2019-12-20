@@ -97,8 +97,11 @@ class Project < ApplicationRecord
     unless: :ci_cd_settings,
     if: proc { ProjectCiCdSetting.available? }
 
+  after_create :create_container_expiration_policy,
+               unless: :container_expiration_policy
+
   after_create :create_pages_metadatum,
-    unless: :pages_metadatum
+               unless: :pages_metadatum
 
   after_create :set_timestamps_for_create
   after_update :update_forks_visibility_level
@@ -248,6 +251,7 @@ class Project < ApplicationRecord
   # which is not managed by the DB. Hence we're still using dependent: :destroy
   # here.
   has_many :container_repositories, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+  has_one :container_expiration_policy, inverse_of: :project
 
   has_many :commit_statuses
   # The relation :all_pipelines is intended to be used when we want to get the
@@ -281,6 +285,7 @@ class Project < ApplicationRecord
   has_many :pipeline_schedules, class_name: 'Ci::PipelineSchedule'
   has_many :project_deploy_tokens
   has_many :deploy_tokens, through: :project_deploy_tokens
+  has_many :resource_groups, class_name: 'Ci::ResourceGroup', inverse_of: :project
 
   has_one :auto_devops, class_name: 'ProjectAutoDevops', inverse_of: :project, autosave: true
   has_many :custom_attributes, class_name: 'ProjectCustomAttribute'
@@ -305,6 +310,7 @@ class Project < ApplicationRecord
   accepts_nested_attributes_for :import_data
   accepts_nested_attributes_for :auto_devops, update_only: true
   accepts_nested_attributes_for :ci_cd_settings, update_only: true
+  accepts_nested_attributes_for :container_expiration_policy, update_only: true
 
   accepts_nested_attributes_for :remote_mirrors,
                                 allow_destroy: true,
@@ -329,7 +335,7 @@ class Project < ApplicationRecord
   delegate :add_guest, :add_reporter, :add_developer, :add_maintainer, :add_role, to: :team
   delegate :add_master, to: :team # @deprecated
   delegate :group_runners_enabled, :group_runners_enabled=, :group_runners_enabled?, to: :ci_cd_settings
-  delegate :root_ancestor, to: :namespace, allow_nil: true
+  delegate :root_ancestor, :actual_limits, to: :namespace, allow_nil: true
   delegate :last_pipeline, to: :commit, allow_nil: true
   delegate :external_dashboard_url, to: :metrics_setting, allow_nil: true, prefix: true
   delegate :default_git_depth, :default_git_depth=, to: :ci_cd_settings, prefix: :ci
@@ -369,6 +375,7 @@ class Project < ApplicationRecord
     inclusion: { in: ->(_object) { Gitlab.config.repositories.storages.keys } }
   validates :variables, variable_duplicates: { scope: :environment_scope }
   validates :bfg_object_map, file_size: { maximum: :max_attachment_size }
+  validates :max_artifacts_size, numericality: { only_integer: true, greater_than: 0, allow_nil: true }
 
   # Scopes
   scope :pending_delete, -> { where(pending_delete: true) }
@@ -403,7 +410,9 @@ class Project < ApplicationRecord
   scope :for_milestones, ->(ids) { joins(:milestones).where('milestones.id' => ids).distinct }
   scope :with_push, -> { joins(:events).where('events.action = ?', Event::PUSHED) }
   scope :with_project_feature, -> { joins('LEFT JOIN project_features ON projects.id = project_features.project_id') }
+  scope :inc_routes, -> { includes(:route, namespace: :route) }
   scope :with_statistics, -> { includes(:statistics) }
+  scope :with_service, ->(service) { joins(service).eager_load(service) }
   scope :with_shared_runners, -> { where(shared_runners_enabled: true) }
   scope :with_container_registry, -> { where(container_registry_enabled: true) }
   scope :inside_path, ->(path) do
@@ -734,7 +743,7 @@ class Project < ApplicationRecord
   end
 
   def unlink_forks_upon_visibility_decrease_enabled?
-    Feature.enabled?(:unlink_fork_network_upon_visibility_decrease, self)
+    Feature.enabled?(:unlink_fork_network_upon_visibility_decrease, self, default_enabled: true)
   end
 
   def empty_repo?
@@ -1256,8 +1265,9 @@ class Project < ApplicationRecord
 
   def all_clusters
     group_clusters = Clusters::Cluster.joins(:groups).where(cluster_groups: { group_id: ancestors_upto } )
+    instance_clusters = Clusters::Cluster.instance_type
 
-    Clusters::Cluster.from_union([clusters, group_clusters])
+    Clusters::Cluster.from_union([clusters, group_clusters, instance_clusters])
   end
 
   def items_for(entity)
@@ -1575,7 +1585,9 @@ class Project < ApplicationRecord
   end
 
   def wiki
-    @wiki ||= ProjectWiki.new(self, self.owner)
+    strong_memoize(:wiki) do
+      ProjectWiki.new(self, self.owner)
+    end
   end
 
   def jira_tracker_active?
@@ -2069,10 +2081,16 @@ class Project < ApplicationRecord
   end
 
   def default_merge_request_target
-    if forked_from_project&.merge_requests_enabled?
-      forked_from_project
-    else
+    return self unless forked_from_project
+    return self unless forked_from_project.merge_requests_enabled?
+
+    # When our current visibility is more restrictive than the source project,
+    # (e.g., the fork is `private` but the parent is `public`), target the less
+    # permissive project
+    if visibility_level_value < forked_from_project.visibility_level_value
       self
+    else
+      forked_from_project
     end
   end
 

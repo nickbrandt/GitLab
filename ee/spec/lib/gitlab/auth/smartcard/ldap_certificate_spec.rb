@@ -60,6 +60,7 @@ describe Gitlab::Auth::Smartcard::LDAPCertificate do
 
     context 'user exists but it is using a new ldap certificate' do
       let(:ldap_person_email) { user.email }
+
       let_it_be(:user) { create(:user) }
 
       it 'finds existing user' do

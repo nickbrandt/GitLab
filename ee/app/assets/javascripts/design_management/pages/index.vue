@@ -1,6 +1,5 @@
 <script>
 import { GlLoadingIcon, GlEmptyState, GlButton } from '@gitlab/ui';
-import _ from 'underscore';
 import createFlash from '~/flash';
 import { s__, sprintf } from '~/locale';
 import UploadButton from '../components/upload/button.vue';
@@ -12,8 +11,9 @@ import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.gra
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
-import { UPLOAD_DESIGN_ERROR } from '../utils/error_messages';
+import { UPLOAD_DESIGN_ERROR, designDeletionError } from '../utils/error_messages';
 import { updateStoreAfterUploadDesign } from '../utils/cache_update';
+import { designUploadOptimisticResponse } from '../utils/design_management_utils';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 
@@ -85,8 +85,15 @@ export default {
     },
   },
   methods: {
-    onUploadDesign(files) {
-      if (!this.canCreateDesign) return null;
+    resetFilesToBeSaved() {
+      this.filesToBeSaved = [];
+    },
+    /**
+     * Determine if a design upload is valid, given [files]
+     * @param {Array<File>} files
+     */
+    isValidDesignUpload(files) {
+      if (!this.canCreateDesign) return false;
 
       if (files.length > MAXIMUM_FILE_UPLOAD_LIMIT) {
         createFlash(
@@ -100,77 +107,49 @@ export default {
           ),
         );
 
-        return null;
+        return false;
       }
-
+      return true;
+    },
+    onUploadDesign(files) {
+      // convert to Array so that we have Array methods (.map, .some, etc.)
       this.filesToBeSaved = Array.from(files);
-      const optimisticResponse = this.filesToBeSaved.map(file => ({
-        // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-        __typename: 'Design',
-        id: -_.uniqueId(),
-        image: '',
-        filename: file.name,
-        fullPath: '',
-        notesCount: 0,
-        event: 'NONE',
-        diffRefs: {
-          __typename: 'DiffRefs',
-          baseSha: '',
-          startSha: '',
-          headSha: '',
+      if (!this.isValidDesignUpload(this.filesToBeSaved)) return null;
+
+      const mutationPayload = {
+        optimisticResponse: designUploadOptimisticResponse(this.filesToBeSaved),
+        variables: {
+          files: this.filesToBeSaved,
+          projectPath: this.projectPath,
+          iid: this.issueIid,
         },
-        discussions: {
-          __typename: 'DesignDiscussion',
-          edges: [],
+        context: {
+          hasUpload: true,
         },
-        versions: {
-          __typename: 'DesignVersionConnection',
-          edges: {
-            __typename: 'DesignVersionEdge',
-            node: {
-              __typename: 'DesignVersion',
-              id: -_.uniqueId(),
-              sha: -_.uniqueId(),
-            },
-          },
-        },
-      }));
+        mutation: uploadDesignMutation,
+        update: this.afterUploadDesign,
+      };
 
       return this.$apollo
-        .mutate({
-          mutation: uploadDesignMutation,
-          variables: {
-            files,
-            projectPath: this.projectPath,
-            iid: this.issueIid,
-          },
-          context: {
-            hasUpload: true,
-          },
-          update: (store, { data: { designManagementUpload } }) => {
-            updateStoreAfterUploadDesign(store, designManagementUpload, this.projectQueryBody);
-          },
-          optimisticResponse: {
-            // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
-            // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-            __typename: 'Mutation',
-            designManagementUpload: {
-              __typename: 'DesignManagementUploadPayload',
-              designs: optimisticResponse,
-            },
-          },
-        })
-        .then(() => {
-          this.$router.push({ name: 'designs' });
-        })
-        .catch(e => {
-          createFlash(UPLOAD_DESIGN_ERROR);
-          throw e;
-        })
-        .finally(() => {
-          this.filesToBeSaved = [];
-        });
+        .mutate(mutationPayload)
+        .then(() => this.onUploadDesignDone())
+        .catch(() => this.onUploadDesignError());
+    },
+    afterUploadDesign(
+      store,
+      {
+        data: { designManagementUpload },
+      },
+    ) {
+      updateStoreAfterUploadDesign(store, designManagementUpload, this.projectQueryBody);
+    },
+    onUploadDesignDone() {
+      this.resetFilesToBeSaved();
+      this.$router.push({ name: 'designs' });
+    },
+    onUploadDesignError() {
+      this.resetFilesToBeSaved();
+      createFlash(UPLOAD_DESIGN_ERROR);
     },
     changeSelectedDesigns(filename) {
       if (this.isDesignSelected(filename)) {
@@ -199,6 +178,10 @@ export default {
       this.selectedDesigns = [];
       if (this.$route.query.version) this.$router.push({ name: 'designs' });
     },
+    onDesignDeleteError() {
+      const errorMessage = designDeletionError({ singular: this.selectedDesigns.length === 1 });
+      createFlash(errorMessage);
+    },
   },
   beforeRouteUpdate(to, from, next) {
     this.selectedDesigns = [];
@@ -226,6 +209,7 @@ export default {
             :project-path="projectPath"
             :iid="issueIid"
             @done="onDesignDelete"
+            @error="onDesignDeleteError"
           >
             <delete-button
               v-if="isLatestVersion"

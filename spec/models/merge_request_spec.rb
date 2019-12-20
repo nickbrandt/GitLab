@@ -17,6 +17,7 @@ describe MergeRequest do
     it { is_expected.to belong_to(:merge_user).class_name("User") }
     it { is_expected.to have_many(:assignees).through(:merge_request_assignees) }
     it { is_expected.to have_many(:merge_request_diffs) }
+    it { is_expected.to have_many(:user_mentions).class_name("MergeRequestUserMention") }
 
     context 'for forks' do
       let!(:project) { create(:project) }
@@ -109,6 +110,7 @@ describe MergeRequest do
 
   describe '#squash?' do
     let(:merge_request) { build(:merge_request, squash: squash) }
+
     subject { merge_request.squash? }
 
     context 'disabled in database' do
@@ -382,7 +384,7 @@ describe MergeRequest do
     end
 
     it 'returns target branches sort by updated at desc' do
-      expect(described_class.recent_target_branches).to match_array(['feature', 'merge-test', 'fix'])
+      expect(described_class.recent_target_branches).to match_array(%w[feature merge-test fix])
     end
   end
 
@@ -850,6 +852,7 @@ describe MergeRequest do
 
   describe '#modified_paths' do
     let(:paths) { double(:paths) }
+
     subject(:merge_request) { build(:merge_request) }
 
     before do
@@ -878,6 +881,7 @@ describe MergeRequest do
 
     context 'when no arguments provided' do
       let(:diff) { merge_request.merge_request_diff }
+
       subject(:merge_request) { create(:merge_request, source_branch: 'feature', target_branch: 'master') }
 
       it 'returns affected file paths for merge_request_diff' do
@@ -1553,6 +1557,7 @@ describe MergeRequest do
   describe '#calculate_reactive_cache' do
     let(:project) { create(:project, :repository) }
     let(:merge_request) { create(:merge_request, source_project: project) }
+
     subject { merge_request.calculate_reactive_cache(service_class_name) }
 
     context 'when given an unknown service class name' do
@@ -2321,6 +2326,10 @@ describe MergeRequest do
     let(:project)       { create(:project, :repository) }
     let(:user)          { project.creator }
     let(:merge_request) { create(:merge_request, source_project: project) }
+    let(:source_branch) { merge_request.source_branch }
+    let(:target_branch) { merge_request.target_branch }
+    let(:source_oid) { project.commit(source_branch).id }
+    let(:target_oid) { project.commit(target_branch).id }
 
     before do
       merge_request.source_project.add_maintainer(user)
@@ -2331,12 +2340,20 @@ describe MergeRequest do
       let(:environments) { create_list(:environment, 3, project: project) }
 
       before do
-        create(:deployment, :success, environment: environments.first, ref: 'master', sha: project.commit('master').id)
-        create(:deployment, :success, environment: environments.second, ref: 'feature', sha: project.commit('feature').id)
+        create(:deployment, :success, environment: environments.first, ref: source_branch, sha: source_oid)
+        create(:deployment, :success, environment: environments.second, ref: target_branch, sha: target_oid)
       end
 
       it 'selects deployed environments' do
         expect(merge_request.environments_for(user)).to contain_exactly(environments.first)
+      end
+
+      it 'selects latest deployed environment' do
+        latest_environment = create(:environment, project: project)
+        create(:deployment, :success, environment: latest_environment, ref: source_branch, sha: source_oid)
+
+        expect(merge_request.environments_for(user)).to eq([environments.first, latest_environment])
+        expect(merge_request.environments_for(user, latest: true)).to contain_exactly(latest_environment)
       end
     end
 
@@ -2820,6 +2837,63 @@ describe MergeRequest do
     end
   end
 
+  describe '#pipeline_coverage_delta' do
+    let!(:project)       { create(:project, :repository) }
+    let!(:merge_request) { create(:merge_request, source_project: project) }
+
+    let!(:source_pipeline) do
+      create(:ci_pipeline,
+        project: project,
+        ref: merge_request.source_branch,
+        sha: merge_request.diff_head_sha
+      )
+    end
+
+    let!(:target_pipeline) do
+      create(:ci_pipeline,
+        project: project,
+        ref: merge_request.target_branch,
+        sha: merge_request.diff_base_sha
+      )
+    end
+
+    def create_build(pipeline, coverage, name)
+      create(:ci_build, :success, pipeline: pipeline, coverage: coverage, name: name)
+      merge_request.update_head_pipeline
+    end
+
+    context 'when both source and target branches have coverage information' do
+      it 'returns the appropriate coverage delta' do
+        create_build(source_pipeline, 60.2, 'test:1')
+        create_build(target_pipeline, 50, 'test:2')
+
+        expect(merge_request.pipeline_coverage_delta).to eq('10.20')
+      end
+    end
+
+    context 'when target branch does not have coverage information' do
+      it 'returns nil' do
+        create_build(source_pipeline, 50, 'test:1')
+
+        expect(merge_request.pipeline_coverage_delta).to be_nil
+      end
+    end
+
+    context 'when source branch does not have coverage information' do
+      it 'returns nil for coverage_delta' do
+        create_build(target_pipeline, 50, 'test:1')
+
+        expect(merge_request.pipeline_coverage_delta).to be_nil
+      end
+    end
+
+    context 'neither source nor target branch has coverage information' do
+      it 'returns nil for coverage_delta' do
+        expect(merge_request.pipeline_coverage_delta).to be_nil
+      end
+    end
+  end
+
   describe '#base_pipeline' do
     let(:pipeline_arguments) do
       {
@@ -2974,6 +3048,7 @@ describe MergeRequest do
     describe 'transition to cannot_be_merged' do
       let(:notification_service) { double(:notification_service) }
       let(:todo_service) { double(:todo_service) }
+
       subject { create(:merge_request, state, merge_status: :unchecked) }
 
       before do
@@ -3183,6 +3258,7 @@ describe MergeRequest do
     describe 'when merge_when_pipeline_succeeds? is true' do
       describe 'when merge user is author' do
         let(:user) { create(:user) }
+
         subject do
           create(:merge_request,
                  merge_when_pipeline_succeeds: true,
@@ -3197,6 +3273,7 @@ describe MergeRequest do
 
       describe 'when merge user and author are different users' do
         let(:merge_user) { create(:user) }
+
         subject do
           create(:merge_request,
                  merge_when_pipeline_succeeds: true,

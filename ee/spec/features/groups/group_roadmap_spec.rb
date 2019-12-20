@@ -76,18 +76,6 @@ describe 'group epic roadmap', :js do
           expect(page).to have_selector('.epics-list-item .epic-title', count: 3)
         end
       end
-
-      it 'resizing browser window causes Roadmap to re-render' do
-        page.within('.group-epics-roadmap .roadmap-container') do
-          initial_style = find('.roadmap-shell')[:style]
-
-          page.current_window.resize_to(2500, 1000)
-          wait_for_requests
-
-          expect(find('.roadmap-shell')[:style]).not_to eq(initial_style)
-          restore_window_size
-        end
-      end
     end
 
     describe 'roadmap page with epics state filter' do

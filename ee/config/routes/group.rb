@@ -51,7 +51,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resources :audit_events, only: [:index]
     resources :usage_quotas, only: [:index]
 
-    resources :hooks, only: [:index, :create, :destroy], constraints: { id: /\d+/ } do
+    resources :hooks, only: [:index, :create, :edit, :update, :destroy], constraints: { id: /\d+/ } do
       member do
         post :test
       end

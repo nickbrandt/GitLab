@@ -25,7 +25,8 @@ module Packages
         package_params = {
           name: package_name,
           path: params[:path],
-          version: version
+          version: version,
+          build: params[:build]
         }
 
         package = ::Packages::CreateMavenPackageService

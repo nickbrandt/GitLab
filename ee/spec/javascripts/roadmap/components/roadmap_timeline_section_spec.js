@@ -7,7 +7,7 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockEpic, mockTimeframeInitialDate, mockShellWidth } from '../mock_data';
+import { mockEpic, mockTimeframeInitialDate } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -15,17 +15,13 @@ const createComponent = ({
   presetType = PRESET_TYPES.MONTHS,
   epics = [mockEpic],
   timeframe = mockTimeframeMonths,
-  shellWidth = mockShellWidth,
-  listScrollable = false,
-}) => {
+} = {}) => {
   const Component = Vue.extend(roadmapTimelineSectionComponent);
 
   return mountComponent(Component, {
     presetType,
     epics,
     timeframe,
-    shellWidth,
-    listScrollable,
   });
 };
 
@@ -33,7 +29,7 @@ describe('RoadmapTimelineSectionComponent', () => {
   let vm;
 
   beforeEach(() => {
-    vm = createComponent({});
+    vm = createComponent();
   });
 
   afterEach(() => {
@@ -43,6 +39,18 @@ describe('RoadmapTimelineSectionComponent', () => {
   describe('data', () => {
     it('returns default data props', () => {
       expect(vm.scrolledHeaderClass).toBe('');
+    });
+  });
+
+  describe('computed', () => {
+    describe('sectionContainerStyles', () => {
+      it('returns object containing `width` with value based on epic details cell width, timeline cell width and timeframe length', () => {
+        expect(vm.sectionContainerStyles).toEqual(
+          jasmine.objectContaining({
+            width: '1760px',
+          }),
+        );
+      });
     });
   });
 

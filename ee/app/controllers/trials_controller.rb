@@ -6,7 +6,6 @@ class TrialsController < ApplicationController
   layout 'trial'
 
   before_action :check_if_gl_com
-  before_action :check_if_improved_trials_enabled
   before_action :authenticate_user!
   before_action :find_or_create_namespace, only: :apply
 
@@ -47,12 +46,12 @@ class TrialsController < ApplicationController
   end
 
   def company_params
-    params.permit(:company_name, :company_size, :phone_number, :number_of_users, :country)
+    params.permit(:company_name, :company_size, :first_name, :last_name, :phone_number, :number_of_users, :country)
           .merge(extra_params)
   end
 
   def extra_params
-    attrs = current_user.slice(:first_name, :last_name)
+    attrs = {}
     attrs[:work_email] = current_user.email
     attrs[:uid] = current_user.id
     attrs[:skip_email_confirmation] = true
@@ -61,10 +60,6 @@ class TrialsController < ApplicationController
     attrs[:newsletter_segment] = current_user.email_opted_in
 
     attrs
-  end
-
-  def check_if_improved_trials_enabled
-    render_404 unless Feature.enabled?(:improved_trial_signup)
   end
 
   def apply_trial_params

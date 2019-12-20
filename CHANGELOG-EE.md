@@ -1,5 +1,16 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.5.5
+
+- No changes.
+
+## 12.5.4
+
+### Security (1 change)
+
+- Fix stale Elasticsearch permissions when moving group from public group to private parent group.
+
+
 ## 12.5.3
 
 ### Performance (1 change)
@@ -251,6 +262,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Docs for protected branch code owner approval API. !17132
 
 
+## 12.3.9
+
+### Security (1 change)
+
+- Fix stale Elasticsearch permissions when moving group from public group to private parent group.
+
+
 ## 12.3.7
 
 ### Security (6 changes)
@@ -464,6 +482,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Remove vue-resource from drafts. (Lee Tickett)
 - Changing instance of key-modern icon to key icon.
 - Fixes style-lint errors and warnings for EE builds.scss file.
+
+
+## 12.2.11
+
+### Fixed (1 change)
+
+- Backport the new reliable fetcher. !21198
 
 
 ## 12.2.8
@@ -812,6 +837,21 @@ Please view this file on the master branch, on stable branches it's out of date.
 ### Fixed (1 change)
 
 - Don't send CI usage email notifications for self-hosted instances. !14809
+
+
+## 12.0.12
+
+### Fixed (1 change)
+
+- Backport the new reliable fetcher to 12.0.9. !20532
+
+
+## 12.0.10
+
+- No changes.
+### Fixed (1 change)
+
+- Backport the new reliable fetcher to 12.0.9. !20532
 
 
 ## 12.0.7

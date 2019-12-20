@@ -23,6 +23,7 @@ ICON_STATUS_HTML
 
     describe '#calculate_reactive_cache' do
       let(:pass_unstable) { '0' }
+
       before do
         @service = JenkinsDeprecatedService.new
         allow(@service).to receive_messages(
@@ -73,6 +74,7 @@ ICON_STATUS_HTML
 
     describe 'multiproject enabled' do
       let!(:project) { create(:project) }
+
       before do
         @service = JenkinsDeprecatedService.new
         allow(@service).to receive_messages(

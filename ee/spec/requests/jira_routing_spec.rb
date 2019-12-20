@@ -59,4 +59,14 @@ describe 'Jira referenced paths', type: :request do
       end
     end
   end
+
+  context 'when tree path has an @' do
+    let(:path) { '/group/project/tree/folder-with-@' }
+
+    it 'does not do a redirect' do
+      get path
+
+      expect(response).not_to have_gitlab_http_status(:moved_permanently)
+    end
+  end
 end

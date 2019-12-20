@@ -82,6 +82,7 @@ module Gitlab
             grafana_integrated_projects: count(GrafanaIntegration.enabled),
             groups: count(Group),
             issues: count(Issue),
+            issues_created_from_gitlab_error_tracking_ui: count(SentryIssue),
             issues_with_associated_zoom_link: count(ZoomMeeting.added_to_issue),
             issues_using_zoom_quick_actions: count(ZoomMeeting.select(:issue_id).distinct),
             issues_with_embedded_grafana_charts_approx: ::Gitlab::GrafanaEmbedUsageData.issue_count,
@@ -205,7 +206,6 @@ module Gitlab
           .by_type(:JiraService)
           .includes(:jira_tracker_data)
           .find_in_batches(batch_size: BATCH_SIZE) do |services|
-
           counts = services.group_by do |service|
             # TODO: Simplify as part of https://gitlab.com/gitlab-org/gitlab/issues/29404
             service_url = service.data_fields&.url || (service.properties && service.properties['url'])

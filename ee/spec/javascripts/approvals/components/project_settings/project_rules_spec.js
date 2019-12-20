@@ -1,10 +1,10 @@
 import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
-import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import { createStoreOptions } from 'ee/approvals/stores';
 import projectSettingsModule from 'ee/approvals/stores/modules/project_settings';
 import ProjectRules from 'ee/approvals/components/project_settings/project_rules.vue';
 import RuleInput from 'ee/approvals/components/mr_edit/rule_input.vue';
+import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import { createProjectRules } from '../../mocks';
 
 const TEST_RULES = createProjectRules();

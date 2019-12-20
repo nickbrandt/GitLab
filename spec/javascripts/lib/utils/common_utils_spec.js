@@ -1,6 +1,6 @@
+import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import * as commonUtils from '~/lib/utils/common_utils';
-import MockAdapter from 'axios-mock-adapter';
 import { faviconDataUrl, overlayDataUrl, faviconWithOverlayDataUrl } from './mock_data';
 import breakpointInstance from '~/breakpoints';
 
@@ -88,10 +88,12 @@ describe('common_utils', () => {
   describe('handleLocationHash', () => {
     beforeEach(() => {
       spyOn(window.document, 'getElementById').and.callThrough();
+      jasmine.clock().install();
     });
 
     afterEach(() => {
       window.history.pushState({}, null, '');
+      jasmine.clock().uninstall();
     });
 
     function expectGetElementIdToHaveBeenCalledWith(elementId) {
@@ -171,6 +173,7 @@ describe('common_utils', () => {
 
       window.history.pushState({}, null, '#test');
       commonUtils.handleLocationHash();
+      jasmine.clock().tick(1);
 
       expectGetElementIdToHaveBeenCalledWith('test');
       expectGetElementIdToHaveBeenCalledWith('user-content-test');
@@ -718,6 +721,28 @@ describe('common_utils', () => {
         snakeKey: {
           child_snake_key: 'value',
         },
+      });
+    });
+
+    describe('convertObjectPropsToSnakeCase', () => {
+      it('converts each object key to snake case', () => {
+        const obj = {
+          some: 'some',
+          'cool object': 'cool object',
+          likeThisLongOne: 'likeThisLongOne',
+        };
+
+        expect(commonUtils.convertObjectPropsToSnakeCase(obj)).toEqual({
+          some: 'some',
+          cool_object: 'cool object',
+          like_this_long_one: 'likeThisLongOne',
+        });
+      });
+
+      it('returns an empty object if there are no keys', () => {
+        ['', {}, [], null].forEach(badObj => {
+          expect(commonUtils.convertObjectPropsToSnakeCase(badObj)).toEqual({});
+        });
       });
     });
 

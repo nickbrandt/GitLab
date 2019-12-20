@@ -1,6 +1,5 @@
 import Vuex from 'vuex';
 import { createLocalVue, mount } from '@vue/test-utils';
-import Icon from '~/vue_shared/components/icon.vue';
 import store from 'ee/geo_designs/store';
 import GeoDesignStatus from 'ee/geo_designs/components/geo_design_status.vue';
 import {
@@ -9,6 +8,7 @@ import {
   STATUS_ICON_CLASS,
   DEFAULT_STATUS,
 } from 'ee/geo_designs/store/constants';
+import Icon from '~/vue_shared/components/icon.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);

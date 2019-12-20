@@ -5,8 +5,10 @@ class Packages::Package < ApplicationRecord
   belongs_to :project
   # package_files must be destroyed by ruby code in order to properly remove carrierwave uploads and update project statistics
   has_many :package_files, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+  has_many :dependency_links, inverse_of: :package, class_name: 'Packages::DependencyLink'
   has_one :conan_metadatum, inverse_of: :package
   has_one :maven_metadatum, inverse_of: :package
+  has_one :build_info, inverse_of: :package
 
   accepts_nested_attributes_for :conan_metadatum
   accepts_nested_attributes_for :maven_metadatum
@@ -18,6 +20,9 @@ class Packages::Package < ApplicationRecord
   validates :name,
     presence: true,
     format: { with: Gitlab::Regex.package_name_regex }
+
+  validates :name,
+    uniqueness: { scope: %i[project_id version package_type] }
 
   validate :valid_npm_package_name, if: :npm?
   validate :package_already_taken, if: :npm?

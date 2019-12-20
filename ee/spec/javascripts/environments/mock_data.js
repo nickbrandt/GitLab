@@ -12,7 +12,7 @@ export const environmentsList = [
     stop_path: '/root/review-app/environments/7/stop',
     created_at: '2017-01-31T10:53:46.894Z',
     updated_at: '2017-01-31T10:53:46.894Z',
-    log_path: '/root/review-app/environments/7/logs',
+    project_path: '/root/review-app',
     rollout_status: {},
   },
   {
@@ -29,7 +29,7 @@ export const environmentsList = [
     stop_path: '/root/review-app/environments/12/stop',
     created_at: '2017-02-01T19:42:18.400Z',
     updated_at: '2017-02-01T19:42:18.400Z',
-    log_path: '/root/review-app/environments/12/logs',
+    project_path: '/root/review-app',
     rollout_status: {},
   },
 ];
@@ -140,5 +140,5 @@ export const folder = {
   created_at: '2017-02-01T19:42:18.400Z',
   updated_at: '2017-02-01T19:42:18.400Z',
   rollout_status: {},
-  log_path: '/root/review-app/environments/12/logs',
+  project_path: '/root/review-app',
 };

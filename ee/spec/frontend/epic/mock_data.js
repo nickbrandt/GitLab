@@ -1,6 +1,5 @@
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-
 import { TEST_HOST } from 'spec/test_constants';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 const metaFixture = getJSONFixture('epic/mock_meta.json');
 const meta = JSON.parse(metaFixture.meta);

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'Gcp Cluster', :js do
+describe 'Gcp Cluster', :js, :do_not_mock_admin_mode do
   include GoogleApi::CloudPlatformHelpers
 
   let(:project) { create(:project) }
@@ -29,7 +29,7 @@ describe 'Gcp Cluster', :js do
         visit project_clusters_path(project)
 
         click_link 'Add Kubernetes cluster'
-        click_link 'Create new Cluster'
+        click_link 'Create new cluster'
         click_link 'Google GKE'
       end
 
@@ -131,11 +131,11 @@ describe 'Gcp Cluster', :js do
         end
       end
 
-      context 'when user destroy the cluster' do
+      context 'when user destroys the cluster' do
         before do
-          page.accept_confirm do
-            click_link 'Remove integration'
-          end
+          click_button 'Remove integration and resources'
+          fill_in 'confirm_cluster_name_input', with: cluster.name
+          click_button 'Remove integration'
         end
 
         it 'user sees creation form with the successful message' do
@@ -194,6 +194,7 @@ describe 'Gcp Cluster', :js do
 
   context 'when third party offers are disabled' do
     let(:admin) { create(:admin) }
+
     before do
       stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
       sign_in(admin)

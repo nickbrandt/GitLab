@@ -11,27 +11,33 @@ module Types
 
       alias_method :design, :object
 
-      field :id, GraphQL::ID_TYPE, null: false # rubocop:disable Graphql/Descriptions
-      field :project, Types::ProjectType, null: false # rubocop:disable Graphql/Descriptions
-      field :issue, Types::IssueType, null: false # rubocop:disable Graphql/Descriptions
-      field :notes_count,
-            GraphQL::INT_TYPE,
-            null: false,
+      field :id, GraphQL::ID_TYPE, null: false,
+            description: 'ID of the design'
+      field :project, Types::ProjectType, null: false,
+            description: 'Project associated with the design'
+      field :issue, Types::IssueType, null: false,
+            description: 'Issue associated with the design'
+      field :notes_count, GraphQL::INT_TYPE, null: false,
             method: :user_notes_count,
-            description: 'The total count of user-created notes for this design'
-      field :filename, GraphQL::STRING_TYPE, null: false # rubocop:disable Graphql/Descriptions
-      field :full_path, GraphQL::STRING_TYPE, null: false # rubocop:disable Graphql/Descriptions
-      field :event,
-            Types::DesignManagement::DesignVersionEventEnum,
-            null: false,
-            description: 'The change that happened to the design at this version',
+            description: 'Total count of user-created notes for the design'
+      field :filename, GraphQL::STRING_TYPE, null: false,
+            description: 'Filename of the design file'
+      field :full_path, GraphQL::STRING_TYPE, null: false,
+            description: 'Full path of the design file'
+      field :event, Types::DesignManagement::DesignVersionEventEnum, null: false,
+            description: 'Type of change made to the design at the version specified by the `atVersion` argument '\
+                         'if supplied. Defaults to the latest version',
             extras: [:parent]
-      field :image, GraphQL::STRING_TYPE, null: false, extras: [:parent] # rubocop:disable Graphql/Descriptions
-      field :diff_refs, Types::DiffRefsType, null: false, calls_gitaly: true # rubocop:disable Graphql/Descriptions
+      field :image, GraphQL::STRING_TYPE, null: false,
+            description: 'Image of the design',
+            extras: [:parent]
+      field :diff_refs, Types::DiffRefsType, null: false,
+            description: 'Diff refs of the design',
+            calls_gitaly: true
       field :versions,
             Types::DesignManagement::VersionType.connection_type,
             resolver: Resolvers::DesignManagement::VersionResolver,
-            description: 'All versions related to this design ordered newest first',
+            description: 'All versions related to the design, ordered newest first',
             extras: [:parent]
 
       def image(parent:)

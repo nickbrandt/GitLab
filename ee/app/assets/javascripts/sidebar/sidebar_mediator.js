@@ -1,5 +1,5 @@
-import CESidebarMediator from '~/sidebar/sidebar_mediator';
 import Store from 'ee/sidebar/stores/sidebar_store';
+import CESidebarMediator from '~/sidebar/sidebar_mediator';
 
 export default class SidebarMediator extends CESidebarMediator {
   initSingleton(options) {

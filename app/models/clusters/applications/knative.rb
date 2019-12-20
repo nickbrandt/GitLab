@@ -3,13 +3,15 @@
 module Clusters
   module Applications
     class Knative < ApplicationRecord
-      VERSION = '0.7.0'
+      VERSION = '0.9.0'
       REPOSITORY = 'https://storage.googleapis.com/triggermesh-charts'
       METRICS_CONFIG = 'https://storage.googleapis.com/triggermesh-charts/istio-metrics.yaml'
       FETCH_IP_ADDRESS_DELAY = 30.seconds
       API_GROUPS_PATH = 'config/knative/api_groups.yml'
 
       self.table_name = 'clusters_applications_knative'
+
+      has_one :serverless_domain_cluster, class_name: 'Serverless::DomainCluster', foreign_key: 'clusters_applications_knative_id', inverse_of: :knative
 
       include ::Clusters::Concerns::ApplicationCore
       include ::Clusters::Concerns::ApplicationStatus

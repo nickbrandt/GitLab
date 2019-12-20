@@ -5,8 +5,8 @@ import * as actions from 'ee/epic/store/actions';
 import epicUtils from 'ee/epic/utils/epic_utils';
 import { statusType, dateTypes } from 'ee/epic/constants';
 
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
+import axios from '~/lib/utils/axios_utils';
 
 import { mockEpicMeta, mockEpicData } from '../mock_data';
 

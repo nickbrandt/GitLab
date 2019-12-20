@@ -8,6 +8,7 @@ describe Analytics::TasksByTypeController do
   let(:label) { create(:group_label, group: group) }
   let(:params) { { group_id: group.full_path, label_ids: [label.id], created_after: 10.days.ago, subject: 'Issue' } }
   let!(:issue) { create(:labeled_issue, created_at: 5.days.ago, project: create(:project, group: group), labels: [label]) }
+
   subject { get :show, params: params }
 
   before do

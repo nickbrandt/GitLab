@@ -13,10 +13,7 @@ module QA
           file_name = 'README.md'
           project = nil
 
-          Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-            # Visit the primary node and login
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
+          QA::Flow::Login.while_signed_in(address: :geo_primary) do
             # Create a new Project
             project = Resource::Project.fabricate! do |project|
               project.name = 'geo-project'
@@ -36,10 +33,7 @@ module QA
             project.visit!
           end
 
-          Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-            # Visit the secondary node and login
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
+          QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
             end
@@ -98,10 +92,7 @@ module QA
           file_name_secondary = 'README_MORE.md'
           project = nil
 
-          Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-            # Visit the primary node and login
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
+          QA::Flow::Login.while_signed_in(address: :geo_primary) do
             # Create a new Project
             project = Resource::Project.fabricate! do |project|
               project.name = 'geo-project'
@@ -121,10 +112,7 @@ module QA
             end
           end
 
-          Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-            # Visit the secondary node and login
-            Page::Main::Login.perform(&:sign_in_using_credentials)
-
+          QA::Flow::Login.while_signed_in(address: :geo_secondary) do
             EE::Page::Main::Banner.perform do |banner|
               expect(banner).to have_secondary_read_only_banner
             end
@@ -165,7 +153,7 @@ module QA
             # The git cli produces the 'warning: redirecting to..' output
             # internally.
             expect(push.output).to match(/warning: redirecting to #{absolute_path}/)
-            expect(push.output).to match(/Locking support detected on remote "#{location.uri.to_s}"/)
+            expect(push.output).to match(/Locking support detected on remote "#{location.uri}"/)
 
             # Validate git push worked and new content is visible
             Page::Project::Show.perform do |show|

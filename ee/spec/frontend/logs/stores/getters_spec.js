@@ -1,7 +1,7 @@
 import * as getters from 'ee/logs/stores/getters';
 import logsPageState from 'ee/logs/stores/state';
 
-import { mockLines } from '../mock_data';
+import { mockLogsResult, mockTrace } from '../mock_data';
 
 describe('Logs Store getters', () => {
   let state;
@@ -29,11 +29,11 @@ describe('Logs Store getters', () => {
 
     describe('when state logs are set', () => {
       beforeEach(() => {
-        state.logs.lines = mockLines;
+        state.logs.lines = mockLogsResult;
       });
 
       it('returns an empty string', () => {
-        expect(getters.trace(state)).toEqual(mockLines.join('\n'));
+        expect(getters.trace(state)).toEqual(mockTrace.join('\n'));
       });
     });
   });

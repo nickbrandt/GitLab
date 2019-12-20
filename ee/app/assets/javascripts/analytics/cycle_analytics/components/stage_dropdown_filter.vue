@@ -1,9 +1,9 @@
 <script>
-import { sprintf, s__ } from '~/locale';
 import $ from 'jquery';
 import _ from 'underscore';
-import Icon from '~/vue_shared/components/icon.vue';
 import { GlButton } from '@gitlab/ui';
+import { sprintf, s__ } from '~/locale';
+import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   name: 'StageDropdownFilter',

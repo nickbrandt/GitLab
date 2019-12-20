@@ -5,7 +5,7 @@
 
 .row
   .col-12
-    #js-vue-packages-detail{ data: { package: @package.to_json(include: [:maven_metadatum, :package_files]),
+    #js-vue-packages-detail{ data: { package: @package.to_json(include: [:conan_metadatum, :maven_metadatum, :package_files]),
       package_files: @package_files.to_json(methods: :download_path),
       can_delete: can?(current_user, :destroy_package, @project).to_s,
       destroy_path: project_package_path(@project, @package),

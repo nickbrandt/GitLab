@@ -6,6 +6,7 @@ describe API::Todos do
   set(:group) { create(:group) }
   let(:user) { create(:user) }
   let(:epic) { create(:epic, group: group) }
+
   set(:project) { create(:project, group: group) }
 
   describe 'GET /todos' do

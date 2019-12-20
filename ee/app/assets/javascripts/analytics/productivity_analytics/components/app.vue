@@ -34,10 +34,6 @@ export default {
   },
   mixins: [featureFlagsMixin()],
   props: {
-    endpoint: {
-      type: String,
-      required: true,
-    },
     emptyStateSvgPath: {
       type: String,
       required: true,
@@ -92,14 +88,12 @@ export default {
     },
   },
   mounted() {
-    this.setEndpoint(this.endpoint);
     this.setChartEnabled({
       chartKey: chartKeys.scatterplot,
       isEnabled: this.isScatterplotFeatureEnabled(),
     });
   },
   methods: {
-    ...mapActions(['setEndpoint']),
     ...mapActions('charts', [
       'fetchChartData',
       'setMetricType',

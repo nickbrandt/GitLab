@@ -26,7 +26,7 @@ module EE
           def process_results(results)
             return [] if results.empty?
 
-            if results.is_a?(::Elasticsearch::Model::Response::Response)
+            if results.any? { |result| result.is_a?(::Elasticsearch::Model::Response::Result) && result.respond_to?(:blob) }
               return paginate(results).map { |blob| ::Gitlab::Elastic::SearchResults.parse_search_result(blob) }
             end
 

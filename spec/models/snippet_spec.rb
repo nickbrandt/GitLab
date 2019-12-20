@@ -18,6 +18,7 @@ describe Snippet do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to have_many(:notes).dependent(:destroy) }
     it { is_expected.to have_many(:award_emoji).dependent(:destroy) }
+    it { is_expected.to have_many(:user_mentions).class_name("SnippetUserMention") }
   end
 
   describe 'validation' do
@@ -140,6 +141,7 @@ describe Snippet do
 
   describe "#content_html_invalidated?" do
     let(:snippet) { create(:snippet, content: "md", content_html: "html", file_name: "foo.md") }
+
     it "invalidates the HTML cache of content when the filename changes" do
       expect { snippet.file_name = "foo.rb" }.to change { snippet.content_html_invalidated? }.from(false).to(true)
     end

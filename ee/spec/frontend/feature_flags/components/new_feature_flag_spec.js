@@ -1,12 +1,9 @@
 import Vuex from 'vuex';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Form from 'ee/feature_flags/components/form.vue';
 import newModule from 'ee/feature_flags/store/modules/new';
 import NewFeatureFlag from 'ee/feature_flags/components/new_feature_flag.vue';
 import { ROLLOUT_STRATEGY_ALL_USERS, DEFAULT_PERCENT_ROLLOUT } from 'ee/feature_flags/constants';
-
-const localVue = createLocalVue();
-localVue.use(Vuex);
 
 describe('New feature flag form', () => {
   let wrapper;
@@ -19,7 +16,6 @@ describe('New feature flag form', () => {
 
   const factory = () => {
     wrapper = shallowMount(NewFeatureFlag, {
-      localVue,
       propsData: {
         endpoint: 'feature_flags.json',
         path: '/feature_flags',
@@ -63,7 +59,7 @@ describe('New feature flag form', () => {
       active: true,
       rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
       rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
-      rolloutUserIds: [],
+      rolloutUserIds: '',
     };
     expect(wrapper.vm.scopes).toEqual([defaultScope]);
 

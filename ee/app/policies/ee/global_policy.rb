@@ -13,6 +13,10 @@ module EE
         License.feature_available?(:security_dashboard)
       end
 
+      condition(:pages_size_limit_available) do
+        License.feature_available?(:pages_size_limit)
+      end
+
       rule { ~anonymous & operations_dashboard_available }.enable :read_operations_dashboard
       rule { ~anonymous & security_dashboard_available }.enable :read_security_dashboard
 
@@ -20,6 +24,8 @@ module EE
         enable :read_licenses
         enable :destroy_licenses
       end
+
+      rule { admin & pages_size_limit_available }.enable :update_max_pages_size
 
       rule { support_bot }.prevent :use_quick_actions
 

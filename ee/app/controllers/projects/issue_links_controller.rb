@@ -40,5 +40,9 @@ module Projects
     def link
       @link ||= IssueLink.find(params[:id])
     end
+
+    def create_params
+      params.permit(:link_type, issuable_references: [])
+    end
   end
 end

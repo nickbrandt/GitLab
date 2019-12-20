@@ -1,0 +1,5 @@
+---
+title: Fix GraphQL access to groups with SAML SSO Enforcement
+merge_request: 21922
+author:
+type: fixed

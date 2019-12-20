@@ -12,8 +12,8 @@ module QA
     end
 
     describe 'Project audit logs' do
-      before(:all) do
-        @project = Resource::Project.fabricate_via_api! do |project|
+      let(:project) do
+        Resource::Project.fabricate_via_api! do |project|
           project.name = 'awesome-project'
           project.initialize_with_readme = true
         end
@@ -37,7 +37,7 @@ module QA
 
       context "Add user access as guest" do
         before do
-          @project.visit!
+          project.visit!
 
           Page::Project::Menu.perform(&:go_to_members_settings)
           Page::Project::Settings::Members.perform do |members|
@@ -55,7 +55,7 @@ module QA
           deploy_key_value = key.public_key
 
           Resource::DeployKey.fabricate_via_browser_ui! do |resource|
-            resource.project = @project
+            resource.project = project
             resource.title = deploy_key_title
             resource.key = deploy_key_value
           end
@@ -66,7 +66,7 @@ module QA
 
       context "Change visibility" do
         before do
-          @project.visit!
+          project.visit!
 
           Page::Project::Menu.perform(&:go_to_general_settings)
           Page::Project::Settings::Main.perform do |settings|
@@ -82,7 +82,7 @@ module QA
 
       context "Export file download" do
         before do
-          @project.visit!
+          project.visit!
 
           Page::Project::Menu.perform(&:go_to_general_settings)
           Page::Project::Settings::Main.perform do |settings|
@@ -99,7 +99,7 @@ module QA
 
       context "Project archive and unarchive" do
         before do
-          @project.visit!
+          project.visit!
 
           # Project archive
           Page::Project::Menu.perform(&:go_to_general_settings)

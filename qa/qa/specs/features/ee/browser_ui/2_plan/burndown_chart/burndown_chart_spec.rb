@@ -5,15 +5,8 @@ module QA
     describe 'Burndown chart' do
       include ::QA::Support::Dates
 
-      let(:project) do
-        Resource::Project.fabricate_via_api! do |project|
-          project.name = 'project-to-test-burndown-chart'
-        end
-      end
-
       let(:milestone) do
         QA::EE::Resource::ProjectMilestone.fabricate_via_api! do |m|
-          m.project = project
           m.title = 'v1'
           m.start_date = current_date_yyyy_mm_dd
           m.due_date = next_month_yyyy_mm_dd
@@ -25,8 +18,8 @@ module QA
 
         weight_of_two = 2
 
-        create_issue('Issue 1', project, milestone, weight_of_two)
-        create_issue('Issue 2', project, milestone, weight_of_two)
+        create_issue('Issue 1', milestone.project, milestone, weight_of_two)
+        create_issue('Issue 2', milestone.project, milestone, weight_of_two)
       end
 
       it 'shows burndown chart on milestone page' do

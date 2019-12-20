@@ -170,6 +170,20 @@ describe ProductivityAnalytics do
           long_mr.id => { metric: 30, merged_at: be_like_time(long_mr.merged_at) }
         )
       end
+
+      context 'for multiple labeled mrs' do
+        let(:finder_options) { super().merge(label_name: [label_a.title, label_b.title]) }
+
+        it 'properly returns MRs with metrics calculated' do
+          expected_data = {
+            long_mr.id => { metric: 30, merged_at: be_like_time(long_mr.merged_at) },
+            short_mr.id => { metric: 3, merged_at: be_like_time(short_mr.merged_at) },
+            short_mr_2.id => { metric: 3, merged_at: be_like_time(short_mr_2.merged_at) }
+          }
+
+          expect(scatterplot_data).to match(expected_data)
+        end
+      end
     end
 
     describe '#merge_requests_extended' do

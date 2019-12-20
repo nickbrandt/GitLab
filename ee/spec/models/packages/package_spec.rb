@@ -7,10 +7,16 @@ RSpec.describe Packages::Package, type: :model do
   describe 'relationships' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to have_many(:package_files).dependent(:destroy) }
+    it { is_expected.to have_many(:dependency_links).inverse_of(:package) }
+    it { is_expected.to have_one(:conan_metadatum).inverse_of(:package) }
+    it { is_expected.to have_one(:maven_metadatum).inverse_of(:package) }
   end
 
   describe 'validations' do
+    subject { create(:package) }
+
     it { is_expected.to validate_presence_of(:project) }
+    it { is_expected.to validate_uniqueness_of(:name).scoped_to(:project_id, :version, :package_type) }
 
     describe '#name' do
       it { is_expected.to allow_value("my/domain/com/my-app").for(:name) }
@@ -36,6 +42,18 @@ RSpec.describe Packages::Package, type: :model do
           new_package = build(:maven_package, name: package.name)
 
           expect(new_package).to be_valid
+        end
+      end
+    end
+
+    Packages::Package.package_types.keys.each do |pt|
+      context "project id, name, version and package type uniqueness for package type #{pt}" do
+        let(:package) { create("#{pt}_package") }
+
+        it "will not allow a #{pt} package with same project, name, version and package_type" do
+          new_package = build("#{pt}_package", project: package.project, name: package.name, version: package.version)
+          expect(new_package).not_to be_valid
+          expect(new_package.errors.to_a).to include("Name has already been taken")
         end
       end
     end

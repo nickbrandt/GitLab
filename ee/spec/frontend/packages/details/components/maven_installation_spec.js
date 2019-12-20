@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import MavenInstallation from 'ee/packages/details/components/maven_installation.vue';
+import { TrackingActions, TrackingLabels } from 'ee/packages/details/constants';
 import {
   generateMavenCommand,
   generateXmlCodeBlock,
@@ -7,6 +8,7 @@ import {
   mavenMetadata,
   registryUrl,
 } from '../mock_data';
+import Tracking from '~/tracking';
 
 describe('MavenInstallation', () => {
   let wrapper;
@@ -21,6 +23,8 @@ describe('MavenInstallation', () => {
   const xmlCodeBlock = generateXmlCodeBlock(mavenMetadata);
   const mavenSetupXml = generateMavenSetupXml();
 
+  const installationTab = () => wrapper.find('.js-installation-tab > a');
+  const setupTab = () => wrapper.find('.js-setup-tab > a');
   const xmlCode = () => wrapper.find('.js-maven-xml > pre');
   const mavenCommand = () => wrapper.find('.js-maven-command > input');
   const xmlSetup = () => wrapper.find('.js-maven-setup-xml > pre');
@@ -77,6 +81,32 @@ describe('MavenInstallation', () => {
   describe('setup commands', () => {
     it('renders the correct xml block', () => {
       expect(xmlSetup().text()).toBe(mavenSetupXml);
+    });
+  });
+
+  describe('tab change tracking', () => {
+    let eventSpy;
+    const label = TrackingLabels.MAVEN_INSTALLATION;
+
+    beforeEach(() => {
+      eventSpy = jest.spyOn(Tracking, 'event');
+    });
+
+    it('should track when the setup tab is clicked', () => {
+      setupTab().trigger('click');
+
+      expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.REGISTRY_SETUP, {
+        label,
+      });
+    });
+
+    it('should track when the installation tab is clicked', () => {
+      setupTab().trigger('click');
+      installationTab().trigger('click');
+
+      expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.INSTALLATION, {
+        label,
+      });
     });
   });
 });

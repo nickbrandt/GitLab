@@ -46,6 +46,8 @@ class Namespace < ApplicationRecord
     length: { maximum: 255 },
     namespace_path: true
 
+  validates :max_artifacts_size, numericality: { only_integer: true, greater_than: 0, allow_nil: true }
+
   validate :nesting_level_allowed
 
   validates_associated :runners
@@ -123,8 +125,10 @@ class Namespace < ApplicationRecord
 
     def find_by_pages_host(host)
       gitlab_host = "." + Settings.pages.host.downcase
-      name = host.downcase.delete_suffix(gitlab_host)
+      host = host.downcase
+      return unless host.ends_with?(gitlab_host)
 
+      name = host.delete_suffix(gitlab_host)
       Namespace.find_by_full_path(name)
     end
   end

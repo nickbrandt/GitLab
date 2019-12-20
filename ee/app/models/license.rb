@@ -88,6 +88,7 @@ class License < ApplicationRecord
     object_storage
     operations_dashboard
     packages
+    pages_size_limit
     productivity_analytics
     project_aliases
     protected_environments
@@ -96,6 +97,7 @@ class License < ApplicationRecord
     scoped_labels
     service_desk
     smartcard_auth
+    group_timelogs
     type_of_work_analytics
     unprotection_restrictions
     ci_project_subscriptions
@@ -105,13 +107,13 @@ class License < ApplicationRecord
   EEU_FEATURES = EEP_FEATURES + %i[
     cluster_health
     container_scanning
+    credentials_inventory
     dast
     dependency_scanning
     epics
     group_ip_restriction
     incident_management
     insights
-    licenses_list
     license_management
     personal_access_token_expiration_policy
     pod_logs
@@ -120,6 +122,7 @@ class License < ApplicationRecord
     report_approver_rules
     sast
     security_dashboard
+    threat_monitoring
     tracing
     web_ide_terminal
   ]
@@ -202,6 +205,7 @@ class License < ApplicationRecord
     ldap_group_sync_filter
     multiple_ldap_servers
     object_storage
+    pages_size_limit
     project_aliases
     repository_size_limit
     required_ci_templates

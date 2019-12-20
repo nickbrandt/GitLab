@@ -90,7 +90,10 @@ const bindEvents = () => {
       projectNew.onProjectNameChange($activeTabProjectName, $activeTabProjectPath),
     );
 
-    $projectFieldsForm.find('.js-select-namespace:first').val(subgroupId);
+    $projectFieldsForm
+      .find('.js-select-namespace')
+      .first()
+      .val(subgroupId);
   }
 
   $useCustomTemplateBtn.on('change', chooseTemplate);

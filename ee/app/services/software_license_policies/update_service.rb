@@ -11,14 +11,11 @@ module SoftwareLicensePolicies
       return error("", 403) unless can?(@current_user, :admin_software_license_policy, @project)
       return success(software_license_policy: software_license_policy) unless params[:approval_status].present?
 
-      begin
-        software_license_policy.update(classification: params[:approval_status])
-        RefreshLicenseComplianceChecksWorker.perform_async(project.id)
-      rescue ArgumentError => ex
-        return error(ex.message, 400)
-      end
-
+      software_license_policy.update(classification: SoftwareLicensePolicy.to_classification(params[:approval_status]))
+      RefreshLicenseComplianceChecksWorker.perform_async(project.id)
       success(software_license_policy: software_license_policy)
+    rescue ArgumentError => ex
+      error(ex.message, 400)
     end
   end
 end

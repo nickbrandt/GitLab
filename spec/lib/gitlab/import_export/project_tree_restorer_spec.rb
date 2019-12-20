@@ -31,9 +31,6 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
         project_tree_restorer = described_class.new(user: @user, shared: @shared, project: @project)
 
-        expect(Gitlab::ImportExport::RelationFactory).to receive(:create).with(hash_including(excluded_keys: ['whatever'])).and_call_original.at_least(:once)
-        allow(project_tree_restorer).to receive(:excluded_keys_for_relation).and_return(['whatever'])
-
         @restored_project_json = project_tree_restorer.restore
       end
     end
@@ -235,6 +232,22 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
         expect(meetings.count).to eq(1)
         expect(meetings.first.url).to eq('https://zoom.us/j/123456789')
+      end
+
+      it 'restores sentry issues' do
+        sentry_issue = @project.issues.first.sentry_issue
+
+        expect(sentry_issue.sentry_issue_identifier).to eq(1234567891)
+      end
+
+      it 'restores container_expiration_policy' do
+        policy = Project.find_by_path('project').container_expiration_policy
+
+        aggregate_failures do
+          expect(policy).to be_an_instance_of(ContainerExpirationPolicy)
+          expect(policy).to be_persisted
+          expect(policy.cadence).to eq('3month')
+        end
       end
 
       context 'Merge requests' do
@@ -557,8 +570,9 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
   context 'Minimal JSON' do
     let(:project) { create(:project) }
+    let(:user) { create(:user) }
     let(:tree_hash) { { 'visibility_level' => visibility } }
-    let(:restorer) { described_class.new(user: nil, shared: shared, project: project) }
+    let(:restorer) { described_class.new(user: user, shared: shared, project: project) }
 
     before do
       expect(restorer).to receive(:read_tree_hash) { tree_hash }
@@ -645,7 +659,9 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
     before do
       setup_import_export_config('with_invalid_records')
 
-      Labkit::Correlation::CorrelationId.use_id(correlation_id) { subject }
+      # Import is running from the rake task, `correlation_id` is not assigned
+      expect(Labkit::Correlation::CorrelationId).to receive(:new_id).and_return(correlation_id)
+      subject
     end
 
     context 'when failures occur because a relation fails to be processed' do

@@ -159,14 +159,14 @@ describe Ci::Pipeline do
       let(:build_ds_2) { create(:ci_build, :success, name: 'ds_2', pipeline: pipeline, project: project) }
       let(:build_cs_1) { create(:ci_build, :success, name: 'cs_1', pipeline: pipeline, project: project) }
       let(:build_cs_2) { create(:ci_build, :success, name: 'cs_2', pipeline: pipeline, project: project) }
+      let!(:sast1_artifact) { create(:ee_ci_job_artifact, :sast, job: build_sast_1, project: project) }
+      let!(:sast2_artifact) { create(:ee_ci_job_artifact, :sast, job: build_sast_2, project: project) }
+      let!(:ds1_artifact) { create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds_1, project: project) }
+      let!(:ds2_artifact) { create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds_2, project: project) }
+      let!(:cs1_artifact) { create(:ee_ci_job_artifact, :container_scanning, job: build_cs_1, project: project) }
+      let!(:cs2_artifact) { create(:ee_ci_job_artifact, :container_scanning, job: build_cs_2, project: project) }
 
       before do
-        create(:ee_ci_job_artifact, :sast, job: build_sast_1, project: project)
-        create(:ee_ci_job_artifact, :sast, job: build_sast_2, project: project)
-        create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds_1, project: project)
-        create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds_2, project: project)
-        create(:ee_ci_job_artifact, :container_scanning, job: build_cs_1, project: project)
-        create(:ee_ci_job_artifact, :container_scanning, job: build_cs_2, project: project)
       end
 
       it 'assigns pipeline commit_sha to the reports' do
@@ -178,18 +178,18 @@ describe Ci::Pipeline do
         expect(subject.reports.keys).to contain_exactly('sast', 'dependency_scanning', 'container_scanning')
 
         # for each of report categories, we have merged 2 reports with the same data (fixture)
-        expect(subject.get_report('sast').occurrences.size).to eq(33)
-        expect(subject.get_report('dependency_scanning').occurrences.size).to eq(4)
-        expect(subject.get_report('container_scanning').occurrences.size).to eq(8)
+        expect(subject.get_report('sast', sast1_artifact).occurrences.size).to eq(33)
+        expect(subject.get_report('dependency_scanning', ds1_artifact).occurrences.size).to eq(4)
+        expect(subject.get_report('container_scanning', cs1_artifact).occurrences.size).to eq(8)
       end
 
       context 'when builds are retried' do
         let(:build_sast_1) { create(:ci_build, :retried, name: 'sast_1', pipeline: pipeline, project: project) }
 
         it 'does not take retried builds into account' do
-          expect(subject.get_report('sast').occurrences.size).to eq(33)
-          expect(subject.get_report('dependency_scanning').occurrences.size).to eq(4)
-          expect(subject.get_report('container_scanning').occurrences.size).to eq(8)
+          expect(subject.get_report('sast', sast1_artifact).occurrences.size).to eq(33)
+          expect(subject.get_report('dependency_scanning', ds1_artifact).occurrences.size).to eq(4)
+          expect(subject.get_report('container_scanning', cs1_artifact).occurrences.size).to eq(8)
         end
       end
     end

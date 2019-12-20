@@ -1,8 +1,8 @@
 <script>
+import { GlButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
-import { GlButton } from '@gitlab/ui';
 import Pagination from './pagination.vue';
 import DeleteButton from '../delete_button.vue';
 import permissionsQuery from '../../graphql/queries/permissions.query.graphql';
@@ -81,7 +81,7 @@ export default {
   computed: {
     updatedText() {
       return sprintf(__('Updated %{updated_at} by %{updated_by}'), {
-        updated_at: this.timeFormated(this.updatedAt),
+        updated_at: this.timeFormatted(this.updatedAt),
         updated_by: this.updatedBy.name,
       });
     },

@@ -35,8 +35,10 @@ exports[`packages_list renders 1`] = `
   <table
     aria-busy="false"
     aria-colcount="5"
-    class="table b-table gl-table"
+    aria-describedby="__BVID__9__caption_"
+    class="table b-table gl-table b-table-stacked-md"
     id="__BVID__9"
+    role="table"
   >
     <!---->
     <!---->
@@ -104,66 +106,81 @@ exports[`packages_list renders 1`] = `
         <td
           aria-colindex="1"
           class="text-left"
+          data-label="Name"
           role="cell"
         >
-          <div
-            class="flex-truncate-parent"
-          >
-            <a
-              class="flex-truncate-child"
-              data-qa-selector="package_link"
-              href="#"
+          <div>
+            <div
+              class="flex-truncate-parent"
             >
-              
+              <a
+                class="flex-truncate-child"
+                data-qa-selector="package_link"
+                href="#"
+              >
+                
             Test package
           
-            </a>
+              </a>
+            </div>
           </div>
         </td>
         <td
           aria-colindex="2"
           class="text-center"
+          data-label="Version"
           role="cell"
         >
-          
+          <div>
+            
         1.0.0
       
+          </div>
         </td>
         <td
           aria-colindex="3"
           class="text-center"
+          data-label="Type"
           role="cell"
         >
-          
+          <div>
+            
         maven
       
+          </div>
         </td>
         <td
           aria-colindex="4"
           class="text-center"
+          data-label="Created"
           role="cell"
         >
-          <timeagotooltip-stub
-            cssclass=""
-            time=""
-            tooltipplacement="top"
-          />
+          <div>
+            <timeagotooltip-stub
+              cssclass=""
+              time=""
+              tooltipplacement="top"
+            />
+          </div>
         </td>
         <td
           aria-colindex="5"
           class="text-right"
+          data-label=""
           role="cell"
         >
-          <glbutton-stub
-            aria-label="Remove package"
-            title="Remove package"
-            variant="danger"
-          >
-            <icon-stub
-              name="remove"
-              size="16"
-            />
-          </glbutton-stub>
+          <div>
+            <glbutton-stub
+              aria-label="Remove package"
+              title="Remove package"
+              variant="danger"
+            >
+              <icon-stub
+                name="remove"
+                size="16"
+              />
+            </glbutton-stub>
+          </div>
         </td>
       </tr>
       <tr
@@ -173,66 +190,81 @@ exports[`packages_list renders 1`] = `
         <td
           aria-colindex="1"
           class="text-left"
+          data-label="Name"
           role="cell"
         >
-          <div
-            class="flex-truncate-parent"
-          >
-            <a
-              class="flex-truncate-child"
-              data-qa-selector="package_link"
-              href="#"
+          <div>
+            <div
+              class="flex-truncate-parent"
             >
-              
+              <a
+                class="flex-truncate-child"
+                data-qa-selector="package_link"
+                href="#"
+              >
+                
             @Test/package
           
-            </a>
+              </a>
+            </div>
           </div>
         </td>
         <td
           aria-colindex="2"
           class="text-center"
+          data-label="Version"
           role="cell"
         >
-          
+          <div>
+            
         
       
+          </div>
         </td>
         <td
           aria-colindex="3"
           class="text-center"
+          data-label="Type"
           role="cell"
         >
-          
+          <div>
+            
         npm
       
+          </div>
         </td>
         <td
           aria-colindex="4"
           class="text-center"
+          data-label="Created"
           role="cell"
         >
-          <timeagotooltip-stub
-            cssclass=""
-            time=""
-            tooltipplacement="top"
-          />
+          <div>
+            <timeagotooltip-stub
+              cssclass=""
+              time=""
+              tooltipplacement="top"
+            />
+          </div>
         </td>
         <td
           aria-colindex="5"
           class="text-right"
+          data-label=""
           role="cell"
         >
-          <glbutton-stub
-            aria-label="Remove package"
-            title="Remove package"
-            variant="danger"
-          >
-            <icon-stub
-              name="remove"
-              size="16"
-            />
-          </glbutton-stub>
+          <div>
+            <glbutton-stub
+              aria-label="Remove package"
+              title="Remove package"
+              variant="danger"
+            >
+              <icon-stub
+                name="remove"
+                size="16"
+              />
+            </glbutton-stub>
+          </div>
         </td>
       </tr>
       <!---->

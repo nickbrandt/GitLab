@@ -610,6 +610,7 @@ describe Ci::Build do
 
     context 'artifacts archive is a zip file and metadata exists' do
       let(:build) { create(:ci_build, :artifacts) }
+
       it { is_expected.to be_truthy }
     end
   end
@@ -813,6 +814,27 @@ describe Ci::Build do
 
       context 'when nor dependencies or needs are defined' do
         it { is_expected.to contain_exactly(build, rspec_test, rubocop_test, staging) }
+      end
+    end
+
+    describe '#all_dependencies' do
+      let!(:final_build) do
+        create(:ci_build,
+          pipeline: pipeline, name: 'deploy',
+          stage_idx: 3, stage: 'deploy'
+        )
+      end
+
+      subject { final_build.all_dependencies }
+
+      it 'returns dependencies and cross_dependencies' do
+        dependencies = [1, 2, 3]
+        cross_dependencies = [3, 4]
+
+        allow(final_build).to receive(:dependencies).and_return(dependencies)
+        allow(final_build).to receive(:cross_dependencies).and_return(cross_dependencies)
+
+        is_expected.to match(a_collection_containing_exactly(1, 2, 3, 4))
       end
     end
   end
@@ -1387,6 +1409,7 @@ describe Ci::Build do
 
         describe '#erased?' do
           let!(:build) { create(:ci_build, :trace_artifact, :success, :artifacts) }
+
           subject { build.erased? }
 
           context 'job has not been erased' do
@@ -1448,6 +1471,7 @@ describe Ci::Build do
   describe '#first_pending' do
     let!(:first) { create(:ci_build, pipeline: pipeline, status: 'pending', created_at: Date.yesterday) }
     let!(:second) { create(:ci_build, pipeline: pipeline, status: 'pending') }
+
     subject { described_class.first_pending }
 
     it { is_expected.to be_a(described_class) }
@@ -2224,14 +2248,24 @@ describe Ci::Build do
     end
   end
 
-  describe '#has_expiring_artifacts?' do
+  describe '#has_expiring_archive_artifacts?' do
     context 'when artifacts have expiration date set' do
       before do
         build.update(artifacts_expire_at: 1.day.from_now)
       end
 
-      it 'has expiring artifacts' do
-        expect(build).to have_expiring_artifacts
+      context 'and job artifacts file exists' do
+        let!(:archive) { create(:ci_job_artifact, :archive, job: build) }
+
+        it 'has expiring artifacts' do
+          expect(build).to have_expiring_archive_artifacts
+        end
+      end
+
+      context 'and job artifacts file does not exist' do
+        it 'does not have expiring artifacts' do
+          expect(build).not_to have_expiring_archive_artifacts
+        end
       end
     end
 
@@ -2241,7 +2275,7 @@ describe Ci::Build do
       end
 
       it 'does not have expiring artifacts' do
-        expect(build).not_to have_expiring_artifacts
+        expect(build).not_to have_expiring_archive_artifacts
       end
     end
   end
@@ -2304,6 +2338,7 @@ describe Ci::Build do
           { key: 'CI_COMMIT_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
           { key: 'CI_COMMIT_REF_NAME', value: build.ref, public: true, masked: false },
           { key: 'CI_COMMIT_REF_SLUG', value: build.ref_slug, public: true, masked: false },
+          { key: 'CI_COMMIT_BRANCH', value: build.ref, public: true, masked: false },
           { key: 'CI_COMMIT_MESSAGE', value: pipeline.git_commit_message, public: true, masked: false },
           { key: 'CI_COMMIT_TITLE', value: pipeline.git_commit_title, public: true, masked: false },
           { key: 'CI_COMMIT_DESCRIPTION', value: pipeline.git_commit_description, public: true, masked: false },
@@ -2525,6 +2560,19 @@ describe Ci::Build do
       end
 
       it { is_expected.to include(job_variable) }
+    end
+
+    context 'when build is for branch' do
+      let(:branch_variable) do
+        { key: 'CI_COMMIT_BRANCH', value: 'master', public: true, masked: false }
+      end
+
+      before do
+        build.update(tag: false)
+        pipeline.update(tag: false)
+      end
+
+      it { is_expected.to include(branch_variable) }
     end
 
     context 'when build is for tag' do
@@ -3460,7 +3508,7 @@ describe Ci::Build do
       end
 
       it 'can drop the build' do
-        expect(Gitlab::Sentry).to receive(:track_exception)
+        expect(Gitlab::ErrorTracking).to receive(:track_and_raise_for_dev_exception)
 
         expect { build.drop! }.not_to raise_error
 
@@ -4111,6 +4159,22 @@ describe Ci::Build do
 
         build.execute_hooks
       end
+    end
+  end
+
+  describe '#environment_auto_stop_in' do
+    subject { build.environment_auto_stop_in }
+
+    context 'when build option has environment auto_stop_in' do
+      let(:build) { create(:ci_build, options: { environment: { name: 'test', auto_stop_in: '1 day' } }) }
+
+      it { is_expected.to eq('1 day') }
+    end
+
+    context 'when build option does not have environment auto_stop_in' do
+      let(:build) { create(:ci_build) }
+
+      it { is_expected.to be_nil }
     end
   end
 end

@@ -1,14 +1,10 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import { RULE_TYPE_ANY_APPROVER } from '../../constants';
-import Icon from '~/vue_shared/components/icon.vue';
 
 const ANY_RULE_NAME = 'All Members';
 
 export default {
-  components: {
-    Icon,
-  },
   props: {
     rule: {
       type: Object,

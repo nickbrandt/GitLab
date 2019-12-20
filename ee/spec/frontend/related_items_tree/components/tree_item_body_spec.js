@@ -1,11 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton, GlLink } from '@gitlab/ui';
 
-import Icon from '~/vue_shared/components/icon.vue';
-import ItemMilestone from '~/vue_shared/components/issue/issue_milestone.vue';
-import ItemDueDate from '~/boards/components/issue_due_date.vue';
 import ItemWeight from 'ee/boards/components/issue_card_weight.vue';
-import ItemAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
 
 import TreeItemBody from 'ee/related_items_tree/components/tree_item_body.vue';
 import StateTooltip from 'ee/related_items_tree/components/state_tooltip.vue';
@@ -14,6 +10,10 @@ import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { ChildType, ChildState } from 'ee/related_items_tree/constants';
 import { PathIdSeparator } from 'ee/related_issues/constants';
+import ItemAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
+import ItemDueDate from '~/boards/components/issue_due_date.vue';
+import ItemMilestone from '~/vue_shared/components/issue/issue_milestone.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
 import {
   mockParentItem,

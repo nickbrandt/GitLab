@@ -24,6 +24,7 @@ RSpec.shared_examples 'additional custom metrics query' do
 
   context 'with custom metrics' do
     let!(:metric) { create(:prometheus_metric, project: project) }
+
     before do
       allow(client).to receive(:query_range).with('avg(metric)', any_args).and_return(query_range_result)
     end

@@ -5,13 +5,12 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
   include ApiHelpers
   include HttpIOHelpers
 
-  let(:project) { create(:project, :public) }
+  let(:project) { create(:project, :public, :repository) }
   let(:pipeline) { create(:ci_pipeline, project: project) }
   let(:user) { create(:user) }
 
   before do
     stub_feature_flags(ci_enable_live_trace: true)
-    stub_feature_flags(job_log_json: false)
     stub_not_protect_default_branch
   end
 
@@ -512,7 +511,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
 
     def get_show_json
       expect { get_show(id: job.id, format: :json) }
-        .to change { Gitlab::GitalyClient.get_request_count }.by(1) # ListCommitsByOid
+        .to change { Gitlab::GitalyClient.get_request_count }.by_at_most(2)
     end
 
     def get_show(**extra_params)
@@ -527,7 +526,6 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
 
   describe 'GET trace.json' do
     before do
-      stub_feature_flags(job_log_json: true)
       get_trace
     end
 
@@ -634,6 +632,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
 
   describe 'GET legacy trace.json' do
     before do
+      stub_feature_flags(job_log_json: false)
       get_trace
     end
 

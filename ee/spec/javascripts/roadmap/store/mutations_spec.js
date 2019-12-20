@@ -137,4 +137,14 @@ describe('Roadmap Store Mutations', () => {
       expect(state.timeframe[1]).toBe(extendedTimeframe[0]);
     });
   });
+
+  describe('SET_BUFFER_SIZE', () => {
+    it('Should set `bufferSize` in state', () => {
+      const bufferSize = 10;
+
+      mutations[types.SET_BUFFER_SIZE](state, bufferSize);
+
+      expect(state.bufferSize).toBe(bufferSize);
+    });
+  });
 });

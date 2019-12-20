@@ -13,7 +13,7 @@ GitLab supports several ways deploy Serverless applications in both Kubernetes E
 
 Currently we support:
 
-- [Knative](#knative): Build Knative applications with Knative and `gitlabktl` on GKE.
+- [Knative](#knative): Build Knative applications with Knative and `gitlabktl` on GKE and EKS.
 - [AWS Lambda](aws.md): Create serverless applications via the Serverless Framework and GitLab CI.
 
 ## Knative
@@ -43,7 +43,7 @@ To run Knative on GitLab, you will need:
      clone the sample [Knative Ruby App](https://gitlab.com/knative-examples/knative-ruby-app) to get
      started.
 1. **Kubernetes Cluster:** An RBAC-enabled Kubernetes cluster is required to deploy Knative.
-   The simplest way to get started is to add a cluster using [GitLab's GKE integration](../add_remove_clusters.md#gke-cluster).
+   The simplest way to get started is to add a cluster using GitLab's [GKE integration](../add_remove_clusters.md).
    The set of minimum recommended cluster specifications to run Knative is 3 nodes, 6 vCPUs, and 22.50 GB memory.
 1. **Helm Tiller:** Helm is a package manager for Kubernetes and is required to install
    Knative.
@@ -89,7 +89,7 @@ The minimum recommended cluster size to run Knative is 3-nodes, 6 vCPUs, and 22.
    for other platforms [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 
 1. The Ingress is now available at this address and will route incoming requests to the proper service based on the DNS
-   name in the request. To support this, a wildcard DNS A record should be created for the desired domain name. For example,
+   name in the request. To support this, a wildcard DNS record should be created for the desired domain name. For example,
    if your Knative base domain is `knative.info` then you need to create an A record or CNAME record with domain `*.knative.info`
    pointing the ip address or hostname of the Ingress.
 
@@ -863,3 +863,23 @@ The instructions below relate to installing and running Certbot on a Linux serve
    After your changes are running on your Knative cluster, you can begin using the HTTPS protocol for secure access your deployed Knative services.
    In the event a mistake is made during this process and you need to update the cert, you will need to edit the gateway `knative-ingress-gateway`
    to switch back to `PASSTHROUGH` mode. Once corrections are made, edit the file again so the gateway will use the new certificates.
+
+## Using an older version of `gitlabktl`
+
+There may be situations where you want to run an older version of `gitlabktl`. This
+requires setting an older version of the `gitlabktl` image in the `.gitlab-ci.yml file.`
+
+To set an older version, add `image:` to the `functions:deploy` block. For example:
+
+```yaml
+functions:deploy:
+  extends: .serverless:deploy:functions
+  environment: production
+  image: registry.gitlab.com/gitlab-org/gitlabktl:0.5.0
+```
+
+Different versions are available by changing the version tag at the end of the registry URL in the
+format `registry.gitlab.com/gitlab-org/gitlabktl:<version>`.
+
+For a full inventory of available `gitlabktl` versions, see the `gitlabktl` project's
+[container registry](https://gitlab.com/gitlab-org/gitlabktl/container_registry).

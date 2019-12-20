@@ -14,9 +14,9 @@ describe('GeoDesignsApp', () => {
 
   const propsData = {
     name: mockDesign.name,
-    projectId: mockDesign.project_id,
+    projectId: mockDesign.projectId,
     syncStatus: mockDesign.state,
-    lastSynced: mockDesign.last_synced_at,
+    lastSynced: mockDesign.lastSyncedAt,
     lastVerified: null,
     lastChecked: null,
   };

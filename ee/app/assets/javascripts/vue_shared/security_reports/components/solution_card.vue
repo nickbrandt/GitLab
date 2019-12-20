@@ -1,11 +1,10 @@
 <script>
-import { GlButton } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import { setUrlFragment } from '~/lib/utils/url_utility';
 
 export default {
   name: 'SolutionCard',
-  components: { GlButton, Icon },
+  components: { Icon },
   props: {
     solution: {
       type: String,
@@ -67,7 +66,7 @@ export default {
 };
 </script>
 <template>
-  <div class="card js-solution-card my-4">
+  <div class="card my-4">
     <div v-if="solutionText" class="card-body d-flex align-items-center">
       <div class="col-2 d-flex align-items-center pl-0">
         <div class="circle-icon-container" aria-hidden="true"><icon name="bulb" /></div>

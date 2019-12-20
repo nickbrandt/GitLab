@@ -40,7 +40,7 @@ module API
       packages = ::Packages::NpmPackagesFinder
         .new(project, package_name).execute
 
-      present NpmPackagePresenter.new(project, package_name, packages),
+      present NpmPackagePresenter.new(package_name, packages),
         with: EE::API::Entities::NpmPackage
     end
 
@@ -84,7 +84,7 @@ module API
         authorize_create_package!
 
         created_package = ::Packages::CreateNpmPackageService
-          .new(user_project, current_user, params).execute
+          .new(user_project, current_user, params.merge(build: current_authenticated_job)).execute
 
         if created_package[:status] == :error
           render_api_error!(created_package[:message], created_package[:http_status])

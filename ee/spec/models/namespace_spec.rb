@@ -79,6 +79,13 @@ describe Namespace do
     end
   end
 
+  context 'validation' do
+    it do
+      is_expected.to validate_numericality_of(:max_pages_size).only_integer.is_greater_than(0)
+                       .is_less_than(::Gitlab::Pages::MAX_SIZE / 1.megabyte)
+    end
+  end
+
   describe 'custom validations' do
     describe '#validate_plan_name' do
       let(:group) { build(:group) }
@@ -620,6 +627,7 @@ describe Namespace do
 
   describe '#shared_runners_remaining_minutes_percent' do
     let(:namespace) { build(:namespace) }
+
     subject { namespace.shared_runners_remaining_minutes_percent }
 
     it 'returns the minutes left as a percent of the limit' do
@@ -666,6 +674,7 @@ describe Namespace do
 
   describe '#shared_runners_remaining_minutes_below_threshold?' do
     let(:namespace) { build(:namespace, last_ci_minutes_usage_notification_level: 30) }
+
     subject { namespace.shared_runners_remaining_minutes_below_threshold? }
 
     it 'is true when minutes left is below the notification level' do

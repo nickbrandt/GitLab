@@ -204,7 +204,7 @@ module API
         bad_request!('Missing package file!') unless uploaded_file
 
         package = ::Packages::FindOrCreateMavenPackageService
-          .new(user_project, current_user, params).execute
+          .new(user_project, current_user, params.merge(build: current_authenticated_job)).execute
 
         case format
         when 'sha1'

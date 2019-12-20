@@ -141,12 +141,19 @@ describe Clusters::Platforms::Kubernetes do
     let(:pod_name) { 'pod-1' }
     let(:namespace) { 'app' }
     let(:container) { 'some-container' }
+    let(:expected_logs) do
+      [
+        { message: "Log 1", timestamp: "2019-12-13T14:04:22.123456Z" },
+        { message: "Log 2", timestamp: "2019-12-13T14:04:23.123456Z" },
+        { message: "Log 3", timestamp: "2019-12-13T14:04:24.123456Z" }
+      ]
+    end
 
     subject { service.read_pod_logs(environment.id, pod_name, namespace, container: container) }
 
     shared_examples 'successful log request' do
       it do
-        expect(subject[:logs]).to eq(["Log 1", "Log 2", "Log 3"])
+        expect(subject[:logs]).to eq(expected_logs)
         expect(subject[:status]).to eq(:success)
         expect(subject[:pod_name]).to eq(pod_name)
         expect(subject[:container_name]).to eq(container)
@@ -171,7 +178,7 @@ describe Clusters::Platforms::Kubernetes do
 
         before do
           expect_any_instance_of(::Clusters::Applications::ElasticStack).to receive(:elasticsearch_client).at_least(:once).and_return(Elasticsearch::Transport::Client.new)
-          expect_any_instance_of(::Gitlab::Elasticsearch::Logs).to receive(:pod_logs).and_return(["Log 1", "Log 2", "Log 3"])
+          expect_any_instance_of(::Gitlab::Elasticsearch::Logs).to receive(:pod_logs).and_return(expected_logs)
           stub_feature_flags(enable_cluster_application_elastic_stack: true)
         end
 
@@ -257,7 +264,8 @@ describe Clusters::Platforms::Kubernetes do
             'environment_id' => environment.id,
             'pod_name' => pod_name,
             'namespace' => namespace,
-            'container' => container
+            'container' => container,
+            'search' => nil
           }
         ]
       end
@@ -317,11 +325,11 @@ describe Clusters::Platforms::Kubernetes do
         expect_next_instance_of(Gitlab::EtagCaching::Store) do |store|
           expect(store).to receive(:touch)
             .with(
-              ::Gitlab::Routing.url_helpers.k8s_pod_logs_project_environment_path(
+              ::Gitlab::Routing.url_helpers.k8s_project_logs_path(
                 environment.project,
-                environment,
-                opts['pod_name'],
-                opts['container_name'],
+                environment_name: environment.name,
+                pod_name: opts['pod_name'],
+                container_name: opts['container_name'],
                 format: :json
               )
             )

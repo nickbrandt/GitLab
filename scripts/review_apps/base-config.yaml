@@ -8,6 +8,8 @@ global:
     configureCertmanager: false
     tls:
       secretName: tls-cert
+  initialRootPassword:
+    secret: shared-gitlab-initial-root-password
 certmanager:
   install: false
 gitlab:
@@ -26,8 +28,6 @@ gitlab:
   mailroom:
     enabled: false
   migrations:
-    initialRootPassword:
-      secret: shared-gitlab-initial-root-password
     resources:
       requests:
         cpu: 350m
@@ -44,7 +44,7 @@ gitlab:
         memory: 37.5M
     maxReplicas: 3
     hpa:
-      targetAverageValue: 130m
+      targetAverageValue: 500m
     deployment:
       livenessProbe:
         timeoutSeconds: 5
@@ -56,6 +56,8 @@ gitlab:
       limits:
         cpu: 975m
         memory: 1450M
+    hpa:
+      targetAverageValue: 650m
   task-runner:
     resources:
       requests:
@@ -80,10 +82,10 @@ gitlab:
     workhorse:
       resources:
         requests:
-          cpu: 250m
+          cpu: 400m
           memory: 50M
         limits:
-          cpu: 375m
+          cpu: 600m
           memory: 75M
       readinessProbe:
         initialDelaySeconds: 5  # Default is 0

@@ -3,8 +3,9 @@
 require 'spec_helper'
 
 describe Gitlab::Ci::Reports::Security::Report do
-  let(:report) { described_class.new('sast', commit_sha) }
+  let(:report) { described_class.new('sast', commit_sha, created_at) }
   let(:commit_sha) { "d8978e74745e18ce44d88814004d4255ac6a65bb" }
+  let(:created_at) { 2.weeks.ago }
 
   it { expect(report.type).to eq('sast') }
 
@@ -65,6 +66,7 @@ describe Gitlab::Ci::Reports::Security::Report do
 
       expect(clone.type).to eq(report.type)
       expect(clone.commit_sha).to eq(report.commit_sha)
+      expect(clone.created_at).to eq(report.created_at)
       expect(clone.occurrences).to eq([])
       expect(clone.scanners).to eq({})
       expect(clone.identifiers).to eq({})
@@ -111,7 +113,7 @@ describe Gitlab::Ci::Reports::Security::Report do
       allow(report).to receive(:replace_with!)
     end
 
-    subject { report.merge!(described_class.new('sast', commit_sha)) }
+    subject { report.merge!(described_class.new('sast', commit_sha, created_at)) }
 
     it 'invokes the merge with other report and then replaces this report contents by merge result' do
       subject
@@ -121,7 +123,7 @@ describe Gitlab::Ci::Reports::Security::Report do
   end
 
   describe "#safe?" do
-    subject { described_class.new('sast', commit_sha) }
+    subject { described_class.new('sast', commit_sha, created_at) }
 
     context "when the sast report has an unsafe vulnerability" do
       where(severity: %w[unknown Unknown high High critical Critical])

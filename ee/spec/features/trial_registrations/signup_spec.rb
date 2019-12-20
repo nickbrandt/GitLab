@@ -7,7 +7,6 @@ describe 'Trial Sign Up', :js do
 
   describe 'on GitLab.com' do
     before do
-      stub_feature_flags(improved_trial_signup: true)
       allow(Gitlab).to receive(:com?).and_return(true).at_least(:once)
     end
 

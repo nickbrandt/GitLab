@@ -16,6 +16,10 @@ describe Clusters::Applications::Knative do
     allow(ClusterWaitForIngressIpAddressWorker).to receive(:perform_async)
   end
 
+  describe 'associations' do
+    it { is_expected.to have_one(:serverless_domain_cluster).class_name('Serverless::DomainCluster').with_foreign_key('clusters_applications_knative_id').inverse_of(:knative) }
+  end
+
   describe 'when cloud run is enabled' do
     let(:cluster) { create(:cluster, :provided_by_gcp, :cloud_run_enabled) }
     let(:knative_cloud_run) { create(:clusters_applications_knative, cluster: cluster) }
@@ -119,7 +123,7 @@ describe Clusters::Applications::Knative do
     subject { knative.install_command }
 
     it 'is initialized with latest version' do
-      expect(subject.version).to eq('0.7.0')
+      expect(subject.version).to eq('0.9.0')
     end
 
     it_behaves_like 'a command'
@@ -127,6 +131,7 @@ describe Clusters::Applications::Knative do
 
   describe '#update_command' do
     let!(:current_installed_version) { knative.version = '0.1.0' }
+
     subject { knative.update_command }
 
     it 'is initialized with current version' do

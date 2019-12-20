@@ -565,6 +565,7 @@ describe QuickActions::InterpretService do
 
           context 'when child and parent epics are in different groups' do
             let(:child_epic) { create(:epic, group: group, parent: epic) }
+
             context 'when child epic is in a parent group of the parent epic' do
               before do
                 epic.update!(group: subgroup)

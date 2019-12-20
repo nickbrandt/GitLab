@@ -9,5 +9,11 @@ FactoryBot.define do
       name { 'MIT License' }
       url { 'https://opensource.org/licenses/MIT' }
     end
+
+    trait :unknown do
+      id { 'unknown' }
+      name { 'Unknown' }
+      url { '' }
+    end
   end
 end

@@ -1,0 +1,5 @@
+---
+title: Handle design repositories when moving existing projects to Hashed Storage
+merge_request: 20540
+author:
+type: fixed

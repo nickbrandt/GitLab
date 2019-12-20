@@ -34,21 +34,9 @@ module EE
     #
     # Returns [Array<Note>]: the created Note objects
     def design_version_added(version)
-      events = DesignManagement::Action.events
-      issue = version.issue
-      project = issue.project
-      user = version.author
-      link_href = designs_path(project, issue, version: version.id)
-
-      version.designs_by_event.map do |(event_name, designs)|
-        note_data = design_event_note_data(events[event_name])
-        icon_name = note_data[:icon]
-        n = designs.size
-
-        body = "%s [%d %s](%s)" % [note_data[:past_tense], n, 'design'.pluralize(n), link_href]
-
-        create_note(NoteSummary.new(issue, project, user, body, action: icon_name))
-      end
+      EE::SystemNotes::DesignManagementService.new(noteable: version.issue,
+                                                   project: version.issue.project,
+                                                   author: version.author).design_version_added(version)
     end
 
     # Called when a new discussion is created on a design
@@ -62,18 +50,9 @@ module EE
     # Returns the created Note object
     def design_discussion_added(discussion_note)
       design = discussion_note.noteable
-      issue = design.issue
-      project = design.project
-      user = discussion_note.author
-      body = _('started a discussion on %{design_link}') % {
-        design_link: '[%s](%s)' % [
-          design.filename,
-          designs_path(project, issue, vueroute: design.filename, anchor: dom_id(discussion_note))
-        ]
-      }
-      action = :designs_discussion_added
-
-      create_note(NoteSummary.new(issue, project, user, body, action: action))
+      EE::SystemNotes::DesignManagementService.new(noteable: design.issue,
+                                                   project: design.project,
+                                                   author: discussion_note.author).design_discussion_added(discussion_note)
     end
 
     def epic_issue(epic, issue, user, type)
@@ -272,34 +251,6 @@ module EE
       body = 'automatically closed this issue because the alert resolved.'
 
       create_note(NoteSummary.new(noteable, project, author, body, action: 'closed'))
-    end
-
-    private
-
-    def designs_path(project, issue, params = {})
-      url_helpers.designs_project_issue_path(project, issue, params)
-    end
-
-    # Take one of the `DesignManagement::Action.events` and
-    # return:
-    #   * an English past-tense verb.
-    #   * the name of an icon used in renderin a system note
-    #
-    # We do not currently internationalize our system notes,
-    # instead we just produce English-language descriptions.
-    # See: https://gitlab.com/gitlab-org/gitlab/issues/30408
-    # See: https://gitlab.com/gitlab-org/gitlab/issues/14056
-    def design_event_note_data(event)
-      case event
-      when DesignManagement::Action.events[:creation]
-        { icon: 'designs_added', past_tense: 'added' }
-      when DesignManagement::Action.events[:modification]
-        { icon: 'designs_modified', past_tense: 'updated' }
-      when DesignManagement::Action.events[:deletion]
-        { icon: 'designs_removed', past_tense: 'removed' }
-      else
-        raise "Unknown event: #{event}"
-      end
     end
   end
 end

@@ -55,6 +55,18 @@ module EE
       objects.map { |g| { id: g.id, text: g.full_name } }
     end
 
+    # The admin UI cannot handle so many namespaces so we just hide it. We
+    # assume people doing this are using automation anyway.
+    def elasticsearch_too_many_namespaces?
+      ElasticsearchIndexedNamespace.count > 50
+    end
+
+    # The admin UI cannot handle so many projects so we just hide it. We
+    # assume people doing this are using automation anyway.
+    def elasticsearch_too_many_projects?
+      ElasticsearchIndexedProject.count > 50
+    end
+
     def elasticsearch_namespace_ids
       ElasticsearchIndexedNamespace.target_ids.join(',')
     end
@@ -76,6 +88,7 @@ module EE
         email_additional_text
         file_template_project_id
         default_project_deletion_protection
+        deletion_adjourned_period
       ]
     end
   end

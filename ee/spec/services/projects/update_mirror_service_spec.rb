@@ -325,60 +325,74 @@ describe Projects::UpdateMirrorService do
       end
     end
 
-    context 'updating Lfs objects' do
-      before do
-        stub_fetch_mirror(project)
-      end
-
-      context 'when Lfs is disabled in the project' do
-        it 'does not update Lfs objects' do
-          allow(project).to receive(:lfs_enabled?).and_return(false)
-          expect(Projects::LfsPointers::LfsObjectDownloadListService).not_to receive(:new)
-
-          service.execute
-        end
-      end
-
-      context 'when Lfs is enabled in the project' do
+    context 'updating LFS objects' do
+      context 'when repository does not change' do
         before do
           allow(project).to receive(:lfs_enabled?).and_return(true)
         end
 
-        it 'updates Lfs objects' do
-          expect(Projects::LfsPointers::LfsImportService).to receive(:new).and_call_original
-          expect_any_instance_of(Projects::LfsPointers::LfsObjectDownloadListService).to receive(:execute).and_return({})
+        it 'does not attempt to update LFS objects' do
+          expect(Projects::LfsPointers::LfsImportService).not_to receive(:new)
 
           service.execute
         end
+      end
 
-        context 'when Lfs import fails' do
-          let(:error_message) { 'error_message' }
+      context 'when repository changes' do
+        before do
+          stub_fetch_mirror(project)
+        end
 
+        context 'when Lfs is disabled in the project' do
+          it 'does not update LFS objects' do
+            allow(project).to receive(:lfs_enabled?).and_return(false)
+            expect(Projects::LfsPointers::LfsObjectDownloadListService).not_to receive(:new)
+
+            service.execute
+          end
+        end
+
+        context 'when Lfs is enabled in the project' do
           before do
-            expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: error_message)
+            allow(project).to receive(:lfs_enabled?).and_return(true)
           end
 
-          # Uncomment once https://gitlab.com/gitlab-org/gitlab-foss/issues/61834 is closed
-          # it 'fails mirror operation' do
-          #   expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: 'error message')
+          it 'updates LFS objects' do
+            expect(Projects::LfsPointers::LfsImportService).to receive(:new).and_call_original
+            expect_any_instance_of(Projects::LfsPointers::LfsObjectDownloadListService).to receive(:execute).and_return({})
 
-          #   result = subject.execute
-
-          #   expect(result[:status]).to eq :error
-          #   expect(result[:message]).to eq 'error message'
-          # end
-
-          # Remove once https://gitlab.com/gitlab-org/gitlab-foss/issues/61834 is closed
-          it 'does not fail mirror operation' do
-            result = subject.execute
-
-            expect(result[:status]).to eq :success
+            service.execute
           end
 
-          it 'logs the error' do
-            expect_any_instance_of(Gitlab::UpdateMirrorServiceJsonLogger).to receive(:error).with(hash_including(error_message: error_message))
+          context 'when Lfs import fails' do
+            let(:error_message) { 'error_message' }
 
-            subject.execute
+            before do
+              expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: error_message)
+            end
+
+            # Uncomment once https://gitlab.com/gitlab-org/gitlab-foss/issues/61834 is closed
+            # it 'fails mirror operation' do
+            #   expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: 'error message')
+
+            #   result = subject.execute
+
+            #   expect(result[:status]).to eq :error
+            #   expect(result[:message]).to eq 'error message'
+            # end
+
+            # Remove once https://gitlab.com/gitlab-org/gitlab-foss/issues/61834 is closed
+            it 'does not fail mirror operation' do
+              result = subject.execute
+
+              expect(result[:status]).to eq :success
+            end
+
+            it 'logs the error' do
+              expect_any_instance_of(Gitlab::UpdateMirrorServiceJsonLogger).to receive(:error).with(hash_including(error_message: error_message))
+
+              subject.execute
+            end
           end
         end
       end

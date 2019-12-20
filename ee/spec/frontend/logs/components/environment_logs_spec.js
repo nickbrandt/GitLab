@@ -1,17 +1,17 @@
 import Vue from 'vue';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import { scrollDown } from '~/lib/utils/scroll_utils';
 import EnvironmentLogs from 'ee/logs/components/environment_logs.vue';
 
 import { createStore } from 'ee/logs/stores';
+import { scrollDown } from '~/lib/utils/scroll_utils';
 import {
   mockProjectPath,
-  mockEnvId,
   mockEnvName,
   mockEnvironments,
   mockPods,
-  mockLines,
+  mockLogsResult,
+  mockTrace,
   mockPodName,
   mockEnvironmentsEndpoint,
 } from '../mock_data';
@@ -26,14 +26,14 @@ describe('EnvironmentLogs', () => {
 
   const propsData = {
     projectFullPath: mockProjectPath,
-    environmentId: mockEnvId,
-    currentEnvironmentName: mockEnvName,
+    environmentName: mockEnvName,
     environmentsPath: mockEnvironmentsEndpoint,
   };
 
   const actionMocks = {
     setInitData: jest.fn(),
     showPodLogs: jest.fn(),
+    showEnvironment: jest.fn(),
     fetchEnvironments: jest.fn(),
   };
 
@@ -41,6 +41,7 @@ describe('EnvironmentLogs', () => {
 
   const findEnvironmentsDropdown = () => wrapper.find('.js-environments-dropdown');
   const findPodsDropdown = () => wrapper.find('.js-pods-dropdown');
+  const findSearchBar = () => wrapper.find('.js-logs-search');
   const findLogControlButtons = () => wrapper.find({ name: 'log-control-buttons-stub' });
   const findLogTrace = () => wrapper.find('.js-log-trace');
 
@@ -75,6 +76,10 @@ describe('EnvironmentLogs', () => {
     actionMocks.setInitData.mockReset();
     actionMocks.showPodLogs.mockReset();
     actionMocks.fetchEnvironments.mockReset();
+
+    if (wrapper) {
+      wrapper.destroy();
+    }
   });
 
   it('displays UI elements', () => {
@@ -95,16 +100,13 @@ describe('EnvironmentLogs', () => {
 
     expect(actionMocks.setInitData).toHaveBeenCalledTimes(1);
     expect(actionMocks.setInitData).toHaveBeenLastCalledWith({
-      environmentId: mockEnvId,
       projectPath: mockProjectPath,
+      environmentName: mockEnvName,
       podName: null,
     });
 
     expect(actionMocks.fetchEnvironments).toHaveBeenCalledTimes(1);
     expect(actionMocks.fetchEnvironments).toHaveBeenLastCalledWith(mockEnvironmentsEndpoint);
-
-    expect(findEnvironmentsDropdown().props('text')).toBe(mockEnvName);
-    expect(findPodsDropdown().props('text').length).toBeGreaterThan(0);
   });
 
   describe('loading state', () => {
@@ -117,6 +119,9 @@ describe('EnvironmentLogs', () => {
       state.environments.options = [];
       state.environments.isLoading = true;
 
+      gon.features = gon.features || {};
+      gon.features.enableClusterApplicationElasticStack = true;
+
       initWrapper();
     });
 
@@ -128,6 +133,11 @@ describe('EnvironmentLogs', () => {
     it('displays a disabled pods dropdown', () => {
       expect(findPodsDropdown().attributes('disabled')).toEqual('true');
       expect(findPodsDropdown().findAll(GlDropdownItem).length).toBe(0);
+    });
+
+    it('displays a disabled search bar', () => {
+      expect(findSearchBar().exists()).toEqual(true);
+      expect(findSearchBar().attributes('disabled')).toEqual('true');
     });
 
     it('does not update buttons state', () => {
@@ -144,25 +154,44 @@ describe('EnvironmentLogs', () => {
     });
   });
 
+  describe('elastic stack disabled', () => {
+    beforeEach(() => {
+      gon.features = gon.features || {};
+      gon.features.enableClusterApplicationElasticStack = false;
+
+      initWrapper();
+    });
+
+    it("doesn't display the search bar", () => {
+      expect(findSearchBar().exists()).toEqual(false);
+      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-6');
+      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-6');
+    });
+  });
+
   describe('state with data', () => {
     beforeEach(() => {
       actionMocks.setInitData.mockImplementation(() => {
         state.pods.options = mockPods;
+        state.environments.current = mockEnvName;
         [state.pods.current] = state.pods.options;
 
         state.logs.isComplete = false;
-        state.logs.lines = mockLines;
+        state.logs.lines = mockLogsResult;
       });
       actionMocks.showPodLogs.mockImplementation(podName => {
         state.pods.options = mockPods;
         [state.pods.current] = podName;
 
         state.logs.isComplete = false;
-        state.logs.lines = mockLines;
+        state.logs.lines = mockLogsResult;
       });
       actionMocks.fetchEnvironments.mockImplementation(() => {
         state.environments.options = mockEnvironments;
       });
+
+      gon.features = gon.features || {};
+      gon.features.enableClusterApplicationElasticStack = true;
 
       initWrapper();
     });
@@ -178,15 +207,13 @@ describe('EnvironmentLogs', () => {
 
     it('populates environments dropdown', () => {
       const items = findEnvironmentsDropdown().findAll(GlDropdownItem);
-
       expect(findEnvironmentsDropdown().props('text')).toBe(mockEnvName);
       expect(items.length).toBe(mockEnvironments.length);
       mockEnvironments.forEach((env, i) => {
         const item = items.at(i);
-
         expect(item.text()).toBe(env.name);
-        expect(item.attributes('href')).toBe(env.logs_path);
       });
+      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-4');
     });
 
     it('populates pods dropdown', () => {
@@ -198,12 +225,19 @@ describe('EnvironmentLogs', () => {
         const item = items.at(i);
         expect(item.text()).toBe(pod);
       });
+      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-4');
     });
 
     it('populates logs trace', () => {
       const trace = findLogTrace();
-      expect(trace.text().split('\n').length).toBe(mockLines.length);
-      expect(trace.text().split('\n')).toEqual(mockLines);
+      expect(trace.text().split('\n').length).toBe(mockTrace.length);
+      expect(trace.text().split('\n')).toEqual(mockTrace);
+    });
+
+    it('displays the search bar', () => {
+      expect(findSearchBar().exists()).toEqual(true);
+      expect(findSearchBar().attributes('disabled')).toEqual(undefined);
+      expect(wrapper.find('#search-fg').attributes('class')).toEqual('col-4');
     });
 
     it('update control buttons state', () => {
@@ -215,6 +249,18 @@ describe('EnvironmentLogs', () => {
     });
 
     describe('when user clicks', () => {
+      it('environment name, trace is refreshed', () => {
+        const items = findEnvironmentsDropdown().findAll(GlDropdownItem);
+        const index = 1; // any env
+
+        expect(actionMocks.showEnvironment).toHaveBeenCalledTimes(0);
+
+        items.at(index).vm.$emit('click');
+
+        expect(actionMocks.showEnvironment).toHaveBeenCalledTimes(1);
+        expect(actionMocks.showEnvironment).toHaveBeenLastCalledWith(mockEnvironments[index].name);
+      });
+
       it('pod name, trace is refreshed', () => {
         const items = findPodsDropdown().findAll(GlDropdownItem);
         const index = 2; // any pod

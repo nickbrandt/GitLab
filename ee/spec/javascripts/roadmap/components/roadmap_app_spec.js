@@ -59,10 +59,6 @@ describe('Roadmap AppComponent', () => {
   });
 
   describe('data', () => {
-    it('returns default data props', () => {
-      expect(vm.handleResizeThrottled).toBeDefined();
-    });
-
     describe('when `gon.feature.roadmapGraphql` is true', () => {
       const originalGonFeatures = Object.assign({}, gon.features);
 
@@ -249,35 +245,6 @@ describe('Roadmap AppComponent', () => {
           .then(done)
           .catch(done.fail);
       });
-    });
-  });
-
-  describe('mounted', () => {
-    it('binds window resize event listener', () => {
-      spyOn(window, 'addEventListener');
-      const vmX = createComponent();
-
-      expect(vmX.handleResizeThrottled).toBeDefined();
-      expect(window.addEventListener).toHaveBeenCalledWith(
-        'resize',
-        vmX.handleResizeThrottled,
-        false,
-      );
-      vmX.$destroy();
-    });
-  });
-
-  describe('beforeDestroy', () => {
-    it('unbinds window resize event listener', () => {
-      spyOn(window, 'removeEventListener');
-      const vmX = createComponent();
-      vmX.$destroy();
-
-      expect(window.removeEventListener).toHaveBeenCalledWith(
-        'resize',
-        vmX.handleResizeThrottled,
-        false,
-      );
     });
   });
 

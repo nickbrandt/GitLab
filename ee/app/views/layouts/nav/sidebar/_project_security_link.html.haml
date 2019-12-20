@@ -24,7 +24,7 @@
           %span= _('Security Dashboard')
 
     - if project_nav_tab?(:dependencies)
-      = nav_link(path: 'projects/dependencies#show') do
+      = nav_link(path: 'projects/dependencies#index') do
         = link_to project_dependencies_path(@project), title: _('Dependency List'), data: { qa_selector: 'dependency_list_link' } do
           %span= _('Dependency List')
 
@@ -37,3 +37,8 @@
       = nav_link(path: 'projects/security/configuration#show') do
         = link_to project_security_configuration_path(@project), title: _('Configuration'), data: { qa_selector: 'security_configuration_link'} do
           %span= _('Configuration')
+
+    - if project_nav_tab?(:threat_monitoring)
+      = nav_link(path: 'projects/threat_monitoring#show') do
+        = link_to project_threat_monitoring_path(@project), title: _('Threat Monitoring') do
+          %span= _('Threat Monitoring')

@@ -45,8 +45,12 @@ module EE
         nav_tabs << :dependencies
       end
 
-      if ::Feature.enabled?(:licenses_list) && can?(current_user, :read_licenses_list, project)
+      if ::Feature.enabled?(:licenses_list, project) && can?(current_user, :read_licenses, project)
         nav_tabs << :licenses
+      end
+
+      if can?(current_user, :read_threat_monitoring, project)
+        nav_tabs << :threat_monitoring
       end
 
       if ::Gitlab.config.packages.enabled &&
@@ -112,6 +116,19 @@ module EE
       super || project_feature_flags_path(project)
     end
 
+    override :remove_project_message
+    def remove_project_message(project)
+      return super unless project.feature_available?(:marking_project_for_deletion)
+
+      date = permanent_deletion_date(Time.now.utc)
+      _("Removing a project places it into a read-only state until %{date}, at which point the project will be permanantly removed. Are you ABSOLUTELY sure?") %
+        { date: date }
+    end
+
+    def permanent_deletion_date(date)
+      (date + ::Gitlab::CurrentSettings.deletion_adjourned_period.days).strftime('%F')
+    end
+
     # Given the current GitLab configuration, check whether the GitLab URL for Kerberos is going to be different than the HTTP URL
     def alternative_kerberos_url?
       ::Gitlab.config.alternative_gitlab_kerberos_url?
@@ -145,6 +162,7 @@ module EE
         projects/security/dashboard#show
         projects/dependencies#show
         projects/licenses#show
+        projects/threat_monitoring#show
       ]
     end
 

@@ -38,7 +38,7 @@ module API
       end
       get ':id' do
         vulnerability = Vulnerability.find(params[:id])
-        authorize_vulnerability!(vulnerability, :read_project_security_dashboard)
+        authorize_vulnerability!(vulnerability, :read_vulnerability)
         render_vulnerability(vulnerability)
       end
 

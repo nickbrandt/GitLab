@@ -8,6 +8,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
   include RepoHelpers
 
   let(:project) { create(:project, :stubbed_repository) }
+
   subject(:environment) { create(:environment, project: project) }
 
   it { is_expected.to be_kind_of(ReactiveCaching) }
@@ -36,8 +37,12 @@ describe Environment, :use_clean_rails_memory_store_caching do
     let!(:deployment2) { create(:deployment, environment: environment2) }
     let!(:deployment3) { create(:deployment, environment: environment1) }
 
-    it 'returns the environments in order of having been last deployed' do
+    it 'returns the environments in ascending order of having been last deployed' do
       expect(project.environments.order_by_last_deployed_at.to_a).to eq([environment3, environment2, environment1])
+    end
+
+    it 'returns the environments in descending order of having been last deployed' do
+      expect(project.environments.order_by_last_deployed_at_desc.to_a).to eq([environment1, environment2, environment3])
     end
   end
 
@@ -441,6 +446,16 @@ describe Environment, :use_clean_rails_memory_store_caching do
     end
   end
 
+  describe '#reset_auto_stop' do
+    subject { environment.reset_auto_stop }
+
+    let(:environment) { create(:environment, :auto_stopped) }
+
+    it 'nullifies the auto_stop_at' do
+      expect { subject }.to change(environment, :auto_stop_at).from(Time).to(nil)
+    end
+  end
+
   describe '#actions_for' do
     let(:deployment) { create(:deployment, :success, environment: environment) }
     let(:pipeline) { deployment.deployable.pipeline }
@@ -662,6 +677,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
           context 'with deployment' do
             let!(:deployment) { create(:deployment, :success, environment: environment) }
+
             it { is_expected.to be_truthy }
           end
 
@@ -818,6 +834,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
         context 'and a deployment' do
           let!(:deployment) { create(:deployment, environment: environment) }
+
           it { is_expected.to be_truthy }
         end
 
@@ -852,6 +869,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
   describe '#metrics' do
     let(:project) { create(:prometheus_project) }
+
     subject { environment.metrics }
 
     context 'when the environment has metrics' do
@@ -933,6 +951,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
   describe '#additional_metrics' do
     let(:project) { create(:prometheus_project) }
     let(:metric_params) { [] }
+
     subject { environment.additional_metrics(*metric_params) }
 
     context 'when the environment has additional metrics' do
@@ -1083,6 +1102,52 @@ describe Environment, :use_clean_rails_memory_store_caching do
             .with(cluster, environment).and_return(:finder)
 
           is_expected.to eq :finder
+        end
+      end
+    end
+  end
+
+  describe '#auto_stop_in' do
+    subject { environment.auto_stop_in }
+
+    context 'when environment will be expired' do
+      let(:environment) { build(:environment, :will_auto_stop) }
+
+      it 'returns when it will expire' do
+        Timecop.freeze { is_expected.to eq(1.day.to_i) }
+      end
+    end
+
+    context 'when environment is not expired' do
+      let(:environment) { build(:environment) }
+
+      it { is_expected.to be_nil }
+    end
+  end
+
+  describe '#auto_stop_in=' do
+    subject { environment.auto_stop_in = value }
+
+    let(:environment) { build(:environment) }
+
+    where(:value, :expected_result) do
+      '2 days'   | 2.days.to_i
+      '1 week'   | 1.week.to_i
+      '2h20min'  | 2.hours.to_i + 20.minutes.to_i
+      'abcdef'   | ChronicDuration::DurationParseError
+      ''         | nil
+      nil        | nil
+    end
+    with_them do
+      it 'sets correct auto_stop_in' do
+        Timecop.freeze do
+          if expected_result.is_a?(Integer) || expected_result.nil?
+            subject
+
+            expect(environment.auto_stop_in).to eq(expected_result)
+          else
+            expect { subject }.to raise_error(expected_result)
+          end
         end
       end
     end

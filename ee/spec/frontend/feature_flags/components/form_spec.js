@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlFormTextarea, GlFormCheckbox } from '@gitlab/ui';
 import Form from 'ee/feature_flags/components/form.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
@@ -31,10 +31,7 @@ describe('feature flag form', () => {
   });
 
   const factory = (props = {}) => {
-    const localVue = createLocalVue();
-
     wrapper = shallowMount(Form, {
-      localVue,
       propsData: props,
       provide: {
         glFeatures: {

@@ -53,7 +53,7 @@ describe('ProjectsDropdownFilter component', () => {
     });
   });
 
-  const findDropdown = () => wrapper.find('.dropdown');
+  const findDropdown = () => wrapper.find({ ref: 'projectsDropdown' });
   const openDropdown = () => {
     $(findDropdown().element)
       .parent()
@@ -61,6 +61,7 @@ describe('ProjectsDropdownFilter component', () => {
   };
   const findDropdownItems = () => findDropdown().findAll('a');
   const findDropdownButton = () => findDropdown().find('button');
+  const findDropdownButtonAvatar = () => findDropdown().find('.gl-avatar');
 
   describe('queryParams are applied when fetching data', () => {
     beforeEach(() => {
@@ -84,6 +85,34 @@ describe('ProjectsDropdownFilter component', () => {
         expect.objectContaining({ per_page: 50, with_shared: false, order_by: LAST_ACTIVITY_AT }),
         expect.any(Function),
       );
+    });
+  });
+
+  describe('when passed a an array of defaultProject as prop', () => {
+    beforeEach(() => {
+      createComponent({
+        defaultProjects: [projects[0]],
+      });
+    });
+
+    it("displays the defaultProject's name", () => {
+      expect(findDropdownButton().text()).toContain(projects[0].name);
+    });
+
+    it("renders the defaultProject's avatar", () => {
+      expect(findDropdownButtonAvatar().exists()).toBe(true);
+    });
+
+    it('marks the defaultProject as selected', () => {
+      openDropdown();
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(
+          findDropdownItems()
+            .at(0)
+            .classes('is-active'),
+        ).toBe(true);
+      });
     });
   });
 

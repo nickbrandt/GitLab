@@ -1,11 +1,8 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
-import component from 'ee/feature_flags/components/configure_feature_flags_modal.vue';
-
-const localVue = createLocalVue();
+import Component from 'ee/feature_flags/components/configure_feature_flags_modal.vue';
 
 describe('Configure Feature Flags Modal', () => {
-  const Component = localVue.extend(component);
   let wrapper;
   let propsData;
 
@@ -24,7 +21,6 @@ describe('Configure Feature Flags Modal', () => {
 
     wrapper = shallowMount(Component, {
       propsData,
-      localVue,
       sync: false,
       attachToDocument: true,
     });

@@ -3,6 +3,7 @@ require 'spec_helper'
 
 describe Licenses::DestroyService do
   let(:license) { create(:license) }
+
   set(:user) { create(:admin) }
 
   def destroy_with(user)

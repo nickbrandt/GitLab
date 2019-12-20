@@ -42,6 +42,10 @@ class Issue < ApplicationRecord
   has_many :issue_assignees
   has_many :assignees, class_name: "User", through: :issue_assignees
   has_many :zoom_meetings
+  has_many :user_mentions, class_name: "IssueUserMention"
+  has_one :sentry_issue
+
+  accepts_nested_attributes_for :sentry_issue
 
   validates :project, presence: true
 
@@ -238,7 +242,7 @@ class Issue < ApplicationRecord
 
     return false unless readable_by?(user)
 
-    user.full_private_access? ||
+    user.can_read_all_resources? ||
       ::Gitlab::ExternalAuthorization.access_allowed?(
         user, project.external_authorization_classification_label)
   end

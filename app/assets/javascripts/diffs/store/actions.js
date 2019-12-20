@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import axios from '~/lib/utils/axios_utils';
 import Cookies from 'js-cookie';
+import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import { handleLocationHash, historyPushState, scrollToElement } from '~/lib/utils/common_utils';
@@ -46,6 +46,7 @@ export const setBaseConfig = ({ commit }, options) => {
     projectPath,
     dismissEndpoint,
     showSuggestPopover,
+    useSingleDiffStyle,
   } = options;
   commit(types.SET_BASE_CONFIG, {
     endpoint,
@@ -54,11 +55,15 @@ export const setBaseConfig = ({ commit }, options) => {
     projectPath,
     dismissEndpoint,
     showSuggestPopover,
+    useSingleDiffStyle,
   });
 };
 
 export const fetchDiffFiles = ({ state, commit }) => {
   const worker = new TreeWorker();
+  const urlParams = {
+    w: state.showWhitespace ? '0' : '1',
+  };
 
   commit(types.SET_LOADING, true);
 
@@ -69,9 +74,10 @@ export const fetchDiffFiles = ({ state, commit }) => {
   });
 
   return axios
-    .get(mergeUrlParams({ w: state.showWhitespace ? '0' : '1' }, state.endpoint))
+    .get(mergeUrlParams(urlParams, state.endpoint))
     .then(res => {
       commit(types.SET_LOADING, false);
+
       commit(types.SET_MERGE_REQUEST_DIFFS, res.data.merge_request_diffs || []);
       commit(types.SET_DIFF_DATA, res.data);
 
@@ -84,20 +90,22 @@ export const fetchDiffFiles = ({ state, commit }) => {
 };
 
 export const fetchDiffFilesBatch = ({ commit, state }) => {
-  const baseUrl = `${state.endpointBatch}?per_page=${DIFFS_PER_PAGE}`;
-  const url = page => (page ? `${baseUrl}&page=${page}` : baseUrl);
-
   commit(types.SET_BATCH_LOADING, true);
+  commit(types.SET_RETRIEVING_BATCHES, true);
 
   const getBatch = page =>
     axios
-      .get(url(page))
+      .get(state.endpointBatch, {
+        params: { page, per_page: DIFFS_PER_PAGE, w: state.showWhitespace ? '0' : '1' },
+      })
       .then(({ data: { pagination, diff_files } }) => {
         commit(types.SET_DIFF_DATA_BATCH, { diff_files });
         commit(types.SET_BATCH_LOADING, false);
+        if (!pagination.next_page) commit(types.SET_RETRIEVING_BATCHES, false);
         return pagination.next_page;
       })
-      .then(nextPage => nextPage && getBatch(nextPage));
+      .then(nextPage => nextPage && getBatch(nextPage))
+      .catch(() => commit(types.SET_RETRIEVING_BATCHES, false));
 
   return getBatch()
     .then(handleLocationHash)

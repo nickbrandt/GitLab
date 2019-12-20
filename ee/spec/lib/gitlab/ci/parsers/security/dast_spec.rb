@@ -9,7 +9,7 @@ describe Gitlab::Ci::Parsers::Security::Dast do
     let(:project) { artifact.project }
     let(:pipeline) { artifact.job.pipeline }
     let(:artifact) { create(:ee_ci_job_artifact, :dast) }
-    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline.sha) }
+    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline.sha, 2.weeks.ago) }
     let(:parser) { described_class.new }
 
     where(:report_format,

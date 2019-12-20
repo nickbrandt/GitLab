@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { GlDropdown, GlDropdownItem, GlFormGroup } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlFormGroup, GlSearchBoxByClick } from '@gitlab/ui';
 import { scrollDown } from '~/lib/utils/scroll_utils';
 import LogControlButtons from './log_control_buttons.vue';
 
@@ -9,18 +9,15 @@ export default {
     GlDropdown,
     GlDropdownItem,
     GlFormGroup,
+    GlSearchBoxByClick,
     LogControlButtons,
   },
   props: {
-    environmentId: {
-      type: String,
-      required: true,
-    },
     projectFullPath: {
       type: String,
       required: true,
     },
-    currentEnvironmentName: {
+    environmentName: {
       type: String,
       required: false,
       default: '',
@@ -36,11 +33,19 @@ export default {
       default: '',
     },
   },
+  data() {
+    return {
+      searchQuery: '',
+    };
+  },
   computed: {
     ...mapState('environmentLogs', ['environments', 'logs', 'pods']),
     ...mapGetters('environmentLogs', ['trace']),
     showLoader() {
       return this.logs.isLoading || !this.logs.isComplete;
+    },
+    featureElasticEnabled() {
+      return gon.features && gon.features.enableClusterApplicationElasticStack;
     },
   },
   watch: {
@@ -56,14 +61,20 @@ export default {
   mounted() {
     this.setInitData({
       projectPath: this.projectFullPath,
-      environmentId: this.environmentId,
+      environmentName: this.environmentName,
       podName: this.currentPodName,
     });
 
     this.fetchEnvironments(this.environmentsPath);
   },
   methods: {
-    ...mapActions('environmentLogs', ['setInitData', 'showPodLogs', 'fetchEnvironments']),
+    ...mapActions('environmentLogs', [
+      'setInitData',
+      'setSearch',
+      'showPodLogs',
+      'showEnvironment',
+      'fetchEnvironments',
+    ]),
   },
 };
 </script>
@@ -76,11 +87,11 @@ export default {
           :label="s__('Environments|Environment')"
           label-size="sm"
           label-for="environments-dropdown"
-          class="col-6"
+          :class="featureElasticEnabled ? 'col-4' : 'col-6'"
         >
           <gl-dropdown
             id="environments-dropdown"
-            :text="currentEnvironmentName"
+            :text="environments.current"
             :disabled="environments.isLoading"
             class="d-flex js-environments-dropdown"
             toggle-class="dropdown-menu-toggle"
@@ -88,18 +99,18 @@ export default {
             <gl-dropdown-item
               v-for="env in environments.options"
               :key="env.id"
-              :href="env.logs_path"
+              @click="showEnvironment(env.name)"
             >
               {{ env.name }}
             </gl-dropdown-item>
           </gl-dropdown>
         </gl-form-group>
         <gl-form-group
-          id="environments-dropdown-fg"
+          id="pods-dropdown-fg"
           :label="s__('Environments|Pod logs from')"
           label-size="sm"
           label-for="pods-dropdown"
-          class="col-6"
+          :class="featureElasticEnabled ? 'col-4' : 'col-6'"
         >
           <gl-dropdown
             id="pods-dropdown"
@@ -116,6 +127,24 @@ export default {
               {{ podName }}
             </gl-dropdown-item>
           </gl-dropdown>
+        </gl-form-group>
+        <gl-form-group
+          v-if="featureElasticEnabled"
+          id="search-fg"
+          :label="s__('Environments|Search')"
+          label-size="sm"
+          label-for="search"
+          class="col-4"
+        >
+          <gl-search-box-by-click
+            v-model.trim="searchQuery"
+            :disabled="environments.isLoading"
+            :placeholder="s__('Environments|Search')"
+            class="js-logs-search"
+            type="search"
+            autofocus
+            @submit="setSearch(searchQuery)"
+          />
         </gl-form-group>
       </div>
 

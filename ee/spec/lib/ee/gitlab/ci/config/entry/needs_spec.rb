@@ -6,7 +6,7 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
   subject(:needs) { described_class.new(config) }
 
   before do
-    needs.metadata[:allowed_needs] = %i[job bridge]
+    needs.metadata[:allowed_needs] = %i[job bridge cross_dependency]
   end
 
   describe 'validations' do
@@ -44,6 +44,32 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
         it { is_expected.not_to be_valid }
       end
     end
+
+    context 'with too many cross dependencies' do
+      let(:limit) { described_class::NEEDS_CROSS_DEPENDENCIES_LIMIT }
+
+      let(:config) do
+        Array.new(limit.next) do |index|
+          {
+            project: "project-#{index}",
+            job: 'job-1',
+            ref: 'master',
+            artifacts: true
+          }
+        end
+      end
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+
+      describe '#errors' do
+        it 'returns error about incorrect type' do
+          expect(needs.errors).to contain_exactly(
+            "needs config must be less than or equal to #{limit}")
+        end
+      end
+    end
   end
 
   describe '.compose!' do
@@ -52,7 +78,8 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
         [
           'first_job_name',
           { job: 'second_job_name', artifacts: false },
-          { pipeline: 'some/project' }
+          { pipeline: 'some/project' },
+          { project: 'some/project', job: 'some/job', ref: 'some/ref', artifacts: true }
         ]
       end
 
@@ -71,14 +98,22 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
               { name: 'first_job_name',  artifacts: true },
               { name: 'second_job_name', artifacts: false }
             ],
-            bridge: [{ pipeline: 'some/project' }]
+            bridge: [{ pipeline: 'some/project' }],
+            cross_dependency: [
+              {
+                project: 'some/project',
+                job: 'some/job',
+                ref: 'some/ref',
+                artifacts: true
+              }
+            ]
           )
         end
       end
 
       describe '#descendants' do
         it 'creates valid descendant nodes' do
-          expect(needs.descendants.count).to eq(3)
+          expect(needs.descendants.count).to eq(4)
           expect(needs.descendants)
             .to all(be_an_instance_of(::Gitlab::Ci::Config::Entry::Need))
         end

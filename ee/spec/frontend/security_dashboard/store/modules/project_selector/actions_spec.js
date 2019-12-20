@@ -1,13 +1,12 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import testAction from 'helpers/vuex_action_helper';
-
-import Api from '~/api';
-import createFlash from '~/flash';
 
 import createState from 'ee/security_dashboard/store/modules/project_selector/state';
 import * as types from 'ee/security_dashboard/store/modules/project_selector/mutation_types';
 import * as actions from 'ee/security_dashboard/store/modules/project_selector/actions';
+import createFlash from '~/flash';
+import Api from '~/api';
+import axios from '~/lib/utils/axios_utils';
 
 jest.mock('~/api');
 jest.mock('~/flash');
@@ -30,7 +29,6 @@ describe('projectSelector actions', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
     mockAxios.restore();
   });
 

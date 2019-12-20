@@ -2,9 +2,7 @@
 import { mapState, mapActions } from 'vuex';
 import { n__, sprintf } from '~/locale';
 import { RULE_TYPE_ANY_APPROVER, RULE_TYPE_REGULAR } from '../../constants';
-import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
-import ApprovalCheckRulePopover from '../approval_check_rule_popover.vue';
 import Rules from '../rules.vue';
 import RuleControls from '../rule_controls.vue';
 import EmptyRule from '../mr_edit/empty_rule.vue';
@@ -12,11 +10,9 @@ import RuleInput from '../mr_edit/rule_input.vue';
 
 export default {
   components: {
-    Icon,
     RuleControls,
     Rules,
     UserAvatarList,
-    ApprovalCheckRulePopover,
     EmptyRule,
     RuleInput,
   },

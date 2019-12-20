@@ -110,7 +110,7 @@ describe('ErrorDetails', () => {
       beforeEach(() => {
         store.state.details.loading = false;
         store.state.details.error = {
-          id: 1,
+          id: 129381,
           title: 'Issue title',
           external_url: 'http://sentry.gitlab.net/gitlab',
           first_seen: '2017-05-26T13:32:48Z',
@@ -119,6 +119,13 @@ describe('ErrorDetails', () => {
           user_count: 2,
         };
         mountComponent();
+      });
+
+      it('should send sentry_issue_identifier', () => {
+        const sentryErrorIdInput = wrapper.find(
+          'glforminput-stub[name="issue[sentry_issue_attributes][sentry_issue_identifier]"',
+        );
+        expect(sentryErrorIdInput.attributes('value')).toBe('129381');
       });
 
       it('should set the form values with title and description', () => {
@@ -136,6 +143,49 @@ describe('ErrorDetails', () => {
         wrapper.find('button').trigger('click');
         expect(submitSpy).toHaveBeenCalled();
         submitSpy.mockRestore();
+      });
+    });
+
+    describe('GitLab issue link', () => {
+      const gitlabIssue = 'https://gitlab.example.com/issues/1';
+      const findGitLabLink = () => wrapper.find(`[href="${gitlabIssue}"]`);
+      const findCreateIssueButton = () => wrapper.find('[data-qa-selector="create_issue_button"]');
+
+      describe('is present', () => {
+        beforeEach(() => {
+          store.state.details.loading = false;
+          store.state.details.error = {
+            id: 1,
+            gitlab_issue: gitlabIssue,
+          };
+          mountComponent();
+        });
+
+        it('should display the issue link', () => {
+          expect(findGitLabLink().exists()).toBe(true);
+        });
+
+        it('should not display a create issue button', () => {
+          expect(findCreateIssueButton().exists()).toBe(false);
+        });
+      });
+
+      describe('is not present', () => {
+        beforeEach(() => {
+          store.state.details.loading = false;
+          store.state.details.error = {
+            id: 1,
+            gitlab_issue: null,
+          };
+          mountComponent();
+        });
+
+        it('should not display an issue link', () => {
+          expect(findGitLabLink().exists()).toBe(false);
+        });
+        it('should display the create issue button', () => {
+          expect(findCreateIssueButton().exists()).toBe(true);
+        });
       });
     });
   });
