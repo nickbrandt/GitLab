@@ -31,18 +31,6 @@
               = link_to analytics_cycle_analytics_path do
                 %strong.fly-out-top-item-name
                   = _('Cycle Analytics')
-      - if Gitlab::Analytics.code_analytics_enabled?
-        = nav_link(controller: :code_analytics) do
-          = link_to analytics_code_analytics_path, class: 'qa-sidebar-code-analytics' do
-            .nav-icon-container
-              = sprite_icon('code')
-            %span.nav-item-name
-              = _('Code Analytics')
-          %ul.sidebar-sub-level-items.is-fly-out-only
-            = nav_link(controller: :code_analytics, html_options: { class: "fly-out-top-item qa-sidebar-code-analytics-fly-out" } ) do
-              = link_to analytics_code_analytics_path do
-                %strong.fly-out-top-item-name
-                  = _('Code Analytics')
 
       = render_ce 'layouts/nav/sidebar/instance_statistics_links'
 
