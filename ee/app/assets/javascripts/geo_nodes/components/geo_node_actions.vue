@@ -45,8 +45,9 @@ export default {
       eventHub.$emit('showNodeActionModal', {
         actionType: NODE_ACTIONS.TOGGLE,
         node: this.node,
-        modalMessage: s__('GeoNodes|Pausing replication stops the sync process.'),
+        modalMessage: s__('GeoNodes|Pausing replication stops the sync process. Are you sure?'),
         modalActionLabel: this.nodeToggleLabel,
+        modalTitle: __('Pause replication'),
       });
     },
     onRemoveSecondaryNode() {
@@ -55,9 +56,10 @@ export default {
         node: this.node,
         modalKind: 'danger',
         modalMessage: s__(
-          'GeoNodes|Removing a secondary node stops the sync process. It is not currently possible to add back the same node without losing some data. We only recommend setting up a new secondary node in this case. Are you sure?',
+          'GeoNodes|Removing a Geo secondary node stops the synchronization to that node. Are you sure?',
         ),
-        modalActionLabel: __('Remove'),
+        modalActionLabel: __('Remove node'),
+        modalTitle: __('Remove secondary node'),
       });
     },
     onRemovePrimaryNode() {
@@ -66,9 +68,10 @@ export default {
         node: this.node,
         modalKind: 'danger',
         modalMessage: s__(
-          'GeoNodes|Removing a primary node stops the sync process for all nodes. Syncing cannot be resumed without losing some data on all secondaries. In this case we would recommend setting up all nodes from scratch. Are you sure?',
+          'GeoNodes|Removing a Geo primary node stops the synchronization to that node. Are you sure?',
         ),
-        modalActionLabel: __('Remove'),
+        modalActionLabel: __('Remove node'),
+        modalTitle: __('Remove primary node'),
       });
     },
     onRepairNode() {
