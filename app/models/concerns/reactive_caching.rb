@@ -124,6 +124,8 @@ module ReactiveCaching
 
     # This method is used for debugging purposes and should not be used otherwise.
     def without_reactive_cache(*args, &blk)
+      return with_reactive_cache(*args, &blk) unless Rails.env.development?
+
       data = self.class.reactive_cache_worker_finder.call(id, *args).calculate_reactive_cache(*args)
       yield data
     end
