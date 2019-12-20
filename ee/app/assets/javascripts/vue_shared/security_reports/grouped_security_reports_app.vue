@@ -236,19 +236,9 @@ export default {
     this.setCanCreateIssuePermission(this.canCreateIssue);
     this.setCanCreateFeedbackPermission(this.canCreateFeedback);
 
-    const sastDiffEndpoint = gl && gl.mrWidgetData && gl.mrWidgetData.sast_comparison_path;
-
-    if (this.isMergeRequestReportApiEnabled('sast') && sastDiffEndpoint && this.hasSastReports) {
-      this.setSastDiffEndpoint(sastDiffEndpoint);
-      this.fetchSastDiff();
-    } else if (this.sastHeadPath) {
-      this.setSastHeadPath(this.sastHeadPath);
-
-      if (this.sastBasePath) {
-        this.setSastBasePath(this.sastBasePath);
-      }
-      this.fetchSastReports();
-    }
+    // eslint-disable-next-line camelcase
+    this.setSastDiffEndpoint(gl?.mrWidgetData?.sast_comparison_path);
+    this.fetchSastDiff();
 
     // eslint-disable-next-line camelcase
     this.setSastContainerDiffEndpoint(gl?.mrWidgetData?.container_scanning_comparison_path);
@@ -295,10 +285,7 @@ export default {
       'setDastDiffEndpoint',
     ]),
     ...mapActions('sast', {
-      setSastHeadPath: 'setHeadPath',
-      setSastBasePath: 'setBasePath',
       setSastDiffEndpoint: 'setDiffEndpoint',
-      fetchSastReports: 'fetchReports',
       fetchSastDiff: 'fetchDiff',
     }),
     isMergeRequestReportApiEnabled(type) {

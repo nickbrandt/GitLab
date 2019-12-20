@@ -470,7 +470,7 @@ describe('Grouped security reports app', () => {
         },
       };
 
-      beforeEach(() => {
+      beforeEach(done => {
         gl.mrWidgetData = gl.mrWidgetData || {};
         gl.mrWidgetData.sast_comparison_path = sastEndpoint;
         gl.mrWidgetData.diverged_commits_count = 100;
@@ -483,58 +483,33 @@ describe('Grouped security reports app', () => {
         });
 
         mock.onGet('vulnerability_feedback_path.json').reply(200, []);
+
+        createWrapper({
+          ...props,
+          enabledReports: {
+            sast: true,
+          },
+        });
+
+        waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_DIFF_SUCCESS}`)
+          .then(done)
+          .catch(done.fail);
       });
 
-      describe('with reports disabled', () => {
-        beforeEach(() => {
-          createWrapper(
-            {
-              ...props,
-              enabledReports: {
-                sast: false,
-              },
-            },
-            provide,
-          );
-        });
-
-        it('should not render the widget', () => {
-          expect(wrapper.vm.$el.querySelector('.js-sast-widget')).toBeNull();
-        });
+      it('should set setSastDiffEndpoint', () => {
+        expect(wrapper.vm.sast.paths.diffEndpoint).toEqual(sastEndpoint);
       });
 
-      describe('with reports enabled', () => {
-        beforeEach(done => {
-          createWrapper(
-            {
-              ...props,
-              enabledReports: {
-                sast: true,
-              },
-            },
-            provide,
-          );
+      it('should display the correct numbers of vulnerabilities', () => {
+        expect(wrapper.vm.$el.textContent).toContain(
+          'SAST detected 1 new, and 2 fixed vulnerabilities',
+        );
+      });
 
-          waitForMutation(wrapper.vm.$store, `sast/${sastTypes.RECEIVE_DIFF_SUCCESS}`)
-            .then(done)
-            .catch(done.fail);
-        });
-
-        it('should set setSastDiffEndpoint', () => {
-          expect(wrapper.vm.sast.paths.diffEndpoint).toEqual(sastEndpoint);
-        });
-
-        it('should display the correct numbers of vulnerabilities', () => {
-          expect(wrapper.vm.$el.textContent).toContain(
-            'SAST detected 1 new, and 2 fixed vulnerabilities',
-          );
-        });
-
-        it('should display out of date message for Outdated MR ', () => {
-          expect(wrapper.vm.$el.textContent).toContain(
-            'Security report is out of date. Please incorporate latest changes from master',
-          );
-        });
+      it('should display out of date message for Outdated MR ', () => {
+        expect(wrapper.vm.$el.textContent).toContain(
+          'Security report is out of date. Please incorporate latest changes from master',
+        );
       });
     });
   });
