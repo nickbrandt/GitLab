@@ -29,7 +29,7 @@ describe Gitlab::DatabaseImporters::SelfMonitoring::Project::DeleteService do
       it 'deletes project ID from application settings' do
         subject.execute
 
-        expect(application_setting.instance_administration_project_id).to eq(nil)
+        expect(application_setting.instance_administration_project_id).to be(nil)
       end
     end
 
@@ -50,7 +50,7 @@ describe Gitlab::DatabaseImporters::SelfMonitoring::Project::DeleteService do
       it 'deletes project ID from application settings' do
         subject.execute
 
-        expect(application_setting.instance_administration_project_id).to eq(nil)
+        expect(application_setting.instance_administration_project_id).to be(nil)
       end
     end
   end
