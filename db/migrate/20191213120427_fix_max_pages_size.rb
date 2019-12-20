@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class FixMaxPagesSize < ActiveRecord::Migration[5.2]
-  include Gitlab::Database::MigrationHelpers
-
-  # Set this constant to true if this migration requires downtime.
   DOWNTIME = false
   MAX_SIZE = 1.terabyte / 1.megabyte
 
