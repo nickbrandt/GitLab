@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require Rails.root.join('db', 'post_migrate', '20191115121407_patch_prometheus_services_for_shared_cluster_applications.rb')
+require Rails.root.join('db', 'post_migrate', '20191220102807_patch_prometheus_services_for_shared_cluster_applications.rb')
 
 describe PatchPrometheusServicesForSharedClusterApplications, :migration, :sidekiq do
   RSpec::Matchers.define :be_scheduled_delayed_migration_with_array do |delay, expected|
