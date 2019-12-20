@@ -4,7 +4,7 @@ require 'pathname'
 
 module QA
   context 'Secure', :docker do
-    let(:number_of_dependencies_in_fixture) { 1309 }
+    let(:number_of_dependencies_in_fixture) { 7 }
     let(:dependency_scan_example_vuln) { 'Prototype pollution attack in mixin-deep' }
     let(:container_scan_example_vuln) { 'CVE-2017-18269 in glibc' }
     let(:sast_scan_example_vuln) { 'Cipher with no integrity' }
