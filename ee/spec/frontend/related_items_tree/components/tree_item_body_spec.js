@@ -343,7 +343,7 @@ describe('RelatedItemsTree', () => {
       it('renders item path', () => {
         const pathEl = wrapper.find('.path-id-text');
 
-        expect(pathEl.attributes('data-original-title')).toBe('gitlab-org/gitlab-shell');
+        expect(pathEl.attributes('title')).toBe('gitlab-org/gitlab-shell');
         expect(pathEl.text()).toBe('gitlab-org/gitlab-shell');
       });
 
@@ -381,7 +381,7 @@ describe('RelatedItemsTree', () => {
         const removeButton = wrapper.find(GlButton);
 
         expect(removeButton.isVisible()).toBe(true);
-        expect(removeButton.attributes('data-original-title')).toBe('Remove');
+        expect(removeButton.attributes('title')).toBe('Remove');
       });
     });
   });

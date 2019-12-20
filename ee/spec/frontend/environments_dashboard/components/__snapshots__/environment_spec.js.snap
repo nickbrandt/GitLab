@@ -43,9 +43,7 @@ exports[`Environment matchs the snapshot 1`] = `
            
           <gllink-stub
             class="str-truncated"
-            data-original-title=""
             href="/root/minimal-ruby-app/-/jobs/1097"
-            title=""
           >
             
             production #1097

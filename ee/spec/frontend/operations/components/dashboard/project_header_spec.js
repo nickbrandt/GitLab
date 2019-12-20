@@ -50,7 +50,7 @@ describe('project header component', () => {
     it('renders correct title for removal icon', () => {
       const button = wrapper.find('.js-remove-button');
 
-      expect(button.attributes('data-original-title')).toBe('Remove card');
+      expect(button.attributes('title')).toBe('Remove card');
     });
 
     it('emits project removal link on click', () => {

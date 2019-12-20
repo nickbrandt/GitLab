@@ -9,9 +9,8 @@ exports[`Environment Header has a failed pipeline matches the snapshot 1`] = `
   >
     <gllink-stub
       class="js-environment-link cgray"
-      data-original-title="staging"
       href="/enivronment/1"
-      title=""
+      title="staging"
     >
       <span
         class="js-environment-name bold"
@@ -40,9 +39,8 @@ exports[`Environment Header has errors matches the snapshot 1`] = `
   >
     <gllink-stub
       class="js-environment-link cgray"
-      data-original-title="staging"
       href="/enivronment/1"
-      title=""
+      title="staging"
     >
       <span
         class="js-environment-name bold"
@@ -71,9 +69,8 @@ exports[`Environment Header renders name and link to app matches the snapshot 1`
   >
     <gllink-stub
       class="js-environment-link cgray"
-      data-original-title="staging"
       href="/enivronment/1"
-      title=""
+      title="staging"
     >
       <span
         class="js-environment-name bold"
@@ -102,9 +99,8 @@ exports[`Environment Header with environments grouped into a folder matches the 
   >
     <gllink-stub
       class="js-environment-link cgray"
-      data-original-title="review/testing"
       href="/enivronment/1"
-      title=""
+      title="review/testing"
     >
       <span
         class="js-environment-name bold"
@@ -123,10 +119,9 @@ exports[`Environment Header with environments grouped into a folder matches the 
    
   <icon-stub
     class="dashboard-card-icon"
-    data-original-title="You are looking at the last updated environment"
     name="information"
     size="16"
-    title=""
+    title="You are looking at the last updated environment"
   />
 </div>
 `;

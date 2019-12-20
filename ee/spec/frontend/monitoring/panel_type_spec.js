@@ -78,7 +78,7 @@ describe('Panel Type', () => {
           expect(
             panelType
               .findAll(GlDropdown)
-              .filter(d => d.attributes('data-original-title') === 'More actions')
+              .filter(d => d.attributes('title') === 'More actions')
               .exists(),
           ).toBe(true);
 

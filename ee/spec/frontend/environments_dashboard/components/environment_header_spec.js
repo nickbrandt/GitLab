@@ -79,9 +79,7 @@ describe('Environment Header', () => {
 
     it('shows an icon stating the environment is one of many in a folder', () => {
       expect(wrapper.find(Icon).attributes('name')).toBe('information');
-      expect(wrapper.find(Icon).attributes('data-original-title')).toMatch(
-        /last updated environment/,
-      );
+      expect(wrapper.find(Icon).attributes('title')).toMatch(/last updated environment/);
     });
 
     it('matches the snapshot', () => {

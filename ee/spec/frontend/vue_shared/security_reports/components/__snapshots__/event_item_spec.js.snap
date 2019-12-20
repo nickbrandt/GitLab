@@ -2,17 +2,8 @@
 
 exports[`Event Item with action buttons renders the action buttons 1`] = `
 VueWrapper {
-  "_emitted": Object {
-    "hook:mounted": Array [
-      Array [],
-    ],
-  },
-  "_emittedByOrder": Array [
-    Object {
-      "args": Array [],
-      "name": "hook:mounted",
-    },
-  ],
+  "_emitted": Object {},
+  "_emittedByOrder": Array [],
   "isFunctionalComponent": undefined,
 }
 `;

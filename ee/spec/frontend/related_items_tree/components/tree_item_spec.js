@@ -143,7 +143,7 @@ describe('RelatedItemsTree', () => {
         const chevronButton = wrapper.find(GlButton);
 
         expect(chevronButton.isVisible()).toBe(true);
-        expect(chevronButton.attributes('data-original-title')).toBe('Collapse');
+        expect(chevronButton.attributes('title')).toBe('Collapse');
       });
 
       it('renders expand/collapse icon', () => {
