@@ -15,20 +15,16 @@ import mockData, {
   parsedHeadIssues,
 } from 'ee_spec/vue_mr_widget/mock_data';
 
-import {
-  sastIssues,
-  sastIssuesBase,
-  dockerReport,
-  dockerBaseReport,
-  dast,
-  dastBase,
-  sastBaseAllIssues,
-  sastHeadAllIssues,
-} from 'ee_spec/vue_shared/security_reports/mock_data';
 import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import axios from '~/lib/utils/axios_utils';
 import { MTWPS_MERGE_STRATEGY, MT_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
+import {
+  sastDiffSuccessMock,
+  dastDiffSuccessMock,
+  containerScanningDiffSuccessMock,
+  dependencyScanningDiffSuccessMock,
+} from 'ee_spec/vue_shared/security_reports/mock_data';
 
 describe('ee merge request widget options', () => {
   let vm;
@@ -60,23 +56,26 @@ describe('ee merge request widget options', () => {
     gon.features = {};
   });
 
-  describe('security widget', () => {
+  const VULNERABILITY_FEEDBACK_ENDPOINT = 'vulnerability_feedback_path';
+
+  describe('SAST', () => {
+    const SAST_DIFF_ENDPOINT = 'sast_diff_endpoint';
+
     beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
-        sast: {
-          base_path: 'path.json',
-          head_path: 'head_path.json',
+        enabled_reports: {
+          sast: true,
         },
-        vulnerability_feedback_path: 'vulnerability_feedback_path',
+        sast_comparison_path: SAST_DIFF_ENDPOINT,
+        vulnerability_feedback_path: VULNERABILITY_FEEDBACK_ENDPOINT,
       };
     });
 
     describe('when it is loading', () => {
       it('should render loading indicator', () => {
-        mock.onGet('path.json').reply(200, sastBaseAllIssues);
-        mock.onGet('head_path.json').reply(200, sastHeadAllIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(SAST_DIFF_ENDPOINT).reply(200, sastDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
@@ -88,9 +87,8 @@ describe('ee merge request widget options', () => {
 
     describe('with successful request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(200, sastIssuesBase);
-        mock.onGet('head_path.json').reply(200, sastIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(SAST_DIFF_ENDPOINT).reply(200, sastDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
 
@@ -101,29 +99,7 @@ describe('ee merge request widget options', () => {
               vm.$el.querySelector('.js-sast-widget .report-block-list-issue-description')
                 .textContent,
             ),
-          ).toEqual('SAST detected 2 new, and 1 fixed vulnerabilities');
-          done();
-        }, 0);
-      });
-    });
-
-    describe('with full report and no added or fixed issues', () => {
-      beforeEach(() => {
-        mock.onGet('path.json').reply(200, sastBaseAllIssues);
-        mock.onGet('head_path.json').reply(200, sastBaseAllIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
-
-        vm = mountComponent(Component, { mrData: gl.mrWidgetData });
-      });
-
-      it('renders no new vulnerabilities message', done => {
-        setTimeout(() => {
-          expect(
-            removeBreakLine(
-              vm.$el.querySelector('.js-sast-widget .report-block-list-issue-description')
-                .textContent,
-            ),
-          ).toEqual('SAST detected no new vulnerabilities');
+          ).toEqual('SAST detected 1 new, and 2 fixed vulnerabilities');
           done();
         }, 0);
       });
@@ -131,9 +107,8 @@ describe('ee merge request widget options', () => {
 
     describe('with empty successful request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(200, []);
-        mock.onGet('head_path.json').reply(200, []);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(SAST_DIFF_ENDPOINT).reply(200, { added: [], existing: [] });
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
@@ -153,9 +128,8 @@ describe('ee merge request widget options', () => {
 
     describe('with failed request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(500, []);
-        mock.onGet('head_path.json').reply(500, []);
-        mock.onGet('vulnerability_feedback_path').reply(500, []);
+        mock.onGet(SAST_DIFF_ENDPOINT).reply(500, {});
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(500, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
@@ -171,23 +145,24 @@ describe('ee merge request widget options', () => {
     });
   });
 
-  describe('dependency scanning widget', () => {
+  describe('Dependency Scanning', () => {
+    const DEPENDENCY_SCANNING_ENDPOINT = 'dependency_scanning_diff_endpoint';
+
     beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
-        dependency_scanning: {
-          base_path: 'path.json',
-          head_path: 'head_path.json',
+        enabled_reports: {
+          dependency_scanning: true,
         },
-        vulnerability_feedback_path: 'vulnerability_feedback_path',
+        dependency_scanning_comparison_path: DEPENDENCY_SCANNING_ENDPOINT,
+        vulnerability_feedback_path: VULNERABILITY_FEEDBACK_ENDPOINT,
       };
     });
 
     describe('when it is loading', () => {
       it('should render loading indicator', () => {
-        mock.onGet('path.json').reply(200, sastIssuesBase);
-        mock.onGet('head_path.json').reply(200, sastIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DEPENDENCY_SCANNING_ENDPOINT).reply(200, dependencyScanningDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
@@ -199,9 +174,8 @@ describe('ee merge request widget options', () => {
 
     describe('with successful request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(200, sastIssuesBase);
-        mock.onGet('head_path.json').reply(200, sastIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DEPENDENCY_SCANNING_ENDPOINT).reply(200, dependencyScanningDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
@@ -222,9 +196,12 @@ describe('ee merge request widget options', () => {
 
     describe('with full report and no added or fixed issues', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(200, sastBaseAllIssues);
-        mock.onGet('head_path.json').reply(200, sastBaseAllIssues);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DEPENDENCY_SCANNING_ENDPOINT).reply(200, {
+          added: [],
+          fixed: [],
+          existing: [{ title: 'Mock finding' }],
+        });
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
@@ -245,9 +222,8 @@ describe('ee merge request widget options', () => {
 
     describe('with empty successful request', () => {
       beforeEach(() => {
-        mock.onGet('path.json').reply(200, []);
-        mock.onGet('head_path.json').reply(200, []);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DEPENDENCY_SCANNING_ENDPOINT).reply(200, { added: [], fixed: [], existing: [] });
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
@@ -649,23 +625,24 @@ describe('ee merge request widget options', () => {
     });
   });
 
-  describe('sast container report', () => {
+  describe('Container Scanning', () => {
+    const CONTAINER_SCANNING_ENDPOINT = 'container_scanning';
+
     beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
-        sast_container: {
-          head_path: 'gl-sast-container.json',
-          base_path: 'sast-container-base.json',
+        enabled_reports: {
+          container_scanning: true,
         },
-        vulnerability_feedback_path: 'vulnerability_feedback_path',
+        container_scanning_comparison_path: CONTAINER_SCANNING_ENDPOINT,
+        vulnerability_feedback_path: VULNERABILITY_FEEDBACK_ENDPOINT,
       };
     });
 
     describe('when it is loading', () => {
       it('should render loading indicator', () => {
-        mock.onGet('gl-sast-container.json').reply(200, dockerReport);
-        mock.onGet('sast-container-base.json').reply(200, dockerBaseReport);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(CONTAINER_SCANNING_ENDPOINT).reply(200, containerScanningDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
@@ -677,9 +654,8 @@ describe('ee merge request widget options', () => {
 
     describe('with successful request', () => {
       beforeEach(() => {
-        mock.onGet('gl-sast-container.json').reply(200, dockerReport);
-        mock.onGet('sast-container-base.json').reply(200, dockerBaseReport);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(CONTAINER_SCANNING_ENDPOINT).reply(200, containerScanningDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
@@ -691,7 +667,7 @@ describe('ee merge request widget options', () => {
               vm.$el.querySelector('.js-sast-container .report-block-list-issue-description')
                 .textContent,
             ),
-          ).toEqual('Container scanning detected 1 new, and 1 fixed vulnerabilities');
+          ).toEqual('Container scanning detected 2 new, and 1 fixed vulnerabilities');
           done();
         }, 0);
       });
@@ -699,9 +675,8 @@ describe('ee merge request widget options', () => {
 
     describe('with failed request', () => {
       beforeEach(() => {
-        mock.onGet('gl-sast-container.json').reply(500, {});
-        mock.onGet('sast-container-base.json').reply(500, {});
-        mock.onGet('vulnerability_feedback_path').reply(500, []);
+        mock.onGet(CONTAINER_SCANNING_ENDPOINT).reply(500, {});
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(500, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
@@ -717,23 +692,24 @@ describe('ee merge request widget options', () => {
     });
   });
 
-  describe('dast report', () => {
+  describe('DAST', () => {
+    const DAST_ENDPOINT = 'dast_report';
+
     beforeEach(() => {
       gl.mrWidgetData = {
         ...mockData,
-        dast: {
-          head_path: 'dast.json',
-          base_path: 'dast_base.json',
+        enabled_reports: {
+          dast: true,
         },
-        vulnerability_feedback_path: 'vulnerability_feedback_path',
+        dast_comparison_path: DAST_ENDPOINT,
+        vulnerability_feedback_path: VULNERABILITY_FEEDBACK_ENDPOINT,
       };
     });
 
     describe('when it is loading', () => {
       it('should render loading indicator', () => {
-        mock.onGet('dast.json').reply(200, dast);
-        mock.onGet('dast_base.json').reply(200, dastBase);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DAST_ENDPOINT).reply(200, dastDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
 
@@ -745,9 +721,8 @@ describe('ee merge request widget options', () => {
 
     describe('with successful request', () => {
       beforeEach(() => {
-        mock.onGet('dast.json').reply(200, dast);
-        mock.onGet('dast_base.json').reply(200, dastBase);
-        mock.onGet('vulnerability_feedback_path').reply(200, []);
+        mock.onGet(DAST_ENDPOINT).reply(200, dastDiffSuccessMock);
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });
@@ -758,7 +733,7 @@ describe('ee merge request widget options', () => {
             vm.$el
               .querySelector('.js-dast-widget .report-block-list-issue-description')
               .textContent.trim(),
-          ).toEqual('DAST detected 1 new vulnerability');
+          ).toEqual('DAST detected 1 new, and 2 fixed vulnerabilities');
           done();
         }, 0);
       });
@@ -766,9 +741,8 @@ describe('ee merge request widget options', () => {
 
     describe('with failed request', () => {
       beforeEach(() => {
-        mock.onGet('dast.json').reply(500, {});
-        mock.onGet('dast_base.json').reply(500, {});
-        mock.onGet('vulnerability_feedback_path').reply(500, []);
+        mock.onGet(DAST_ENDPOINT).reply(500, {});
+        mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(500, {});
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
       });

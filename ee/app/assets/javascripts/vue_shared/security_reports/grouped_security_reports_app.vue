@@ -46,46 +46,6 @@ export default {
       required: false,
       default: null,
     },
-    sastHeadPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    sastBasePath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    dastHeadPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    dastBasePath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    sastContainerHeadPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    sastContainerBasePath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    dependencyScanningHeadPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    dependencyScanningBasePath: {
-      type: String,
-      required: false,
-      default: null,
-    },
     sastHelpPath: {
       type: String,
       required: false,
@@ -182,21 +142,16 @@ export default {
       return `${this.pipelinePath}/security`;
     },
     hasContainerScanningReports() {
-      const type = 'containerScanning';
-      if (this.isMergeRequestReportApiEnabled(type)) {
-        return this.enabledReports[type];
-      }
-      const { head, diffEndpoint } = this.sastContainer.paths;
-      return Boolean(head || diffEndpoint);
+      return this.enabledReports.containerScanning;
     },
     hasDependencyScanningReports() {
-      return this.hasReportsType('dependencyScanning');
+      return this.enabledReports.dependencyScanning;
     },
     hasDastReports() {
-      return this.hasReportsType('dast');
+      return this.enabledReports.dast;
     },
     hasSastReports() {
-      return this.hasReportsType('sast');
+      return this.enabledReports.sast;
     },
     subHeadingText() {
       const mrDivergedCommitsCount =
@@ -237,20 +192,36 @@ export default {
     this.setCanCreateFeedbackPermission(this.canCreateFeedback);
 
     // eslint-disable-next-line camelcase
-    this.setSastDiffEndpoint(gl?.mrWidgetData?.sast_comparison_path);
-    this.fetchSastDiff();
+    const sastDiffEndpoint = gl?.mrWidgetData?.sast_comparison_path;
+
+    if (sastDiffEndpoint && this.hasSastReports) {
+      this.setSastDiffEndpoint(sastDiffEndpoint);
+      this.fetchSastDiff();
+    }
 
     // eslint-disable-next-line camelcase
-    this.setSastContainerDiffEndpoint(gl?.mrWidgetData?.container_scanning_comparison_path);
-    this.fetchSastContainerDiff();
+    const containerScanningDiffEndpoint = gl?.mrWidgetData?.container_scanning_comparison_path;
+
+    if (containerScanningDiffEndpoint && this.hasContainerScanningReports) {
+      this.setSastContainerDiffEndpoint(containerScanningDiffEndpoint);
+      this.fetchSastContainerDiff();
+    }
 
     // eslint-disable-next-line camelcase
-    this.setDastDiffEndpoint(gl?.mrWidgetData?.dast_comparison_path);
-    this.fetchDastDiff();
+    const dastDiffEndpoint = gl?.mrWidgetData?.dast_comparison_path;
+
+    if (dastDiffEndpoint && this.hasDastReports) {
+      this.setDastDiffEndpoint(dastDiffEndpoint);
+      this.fetchDastDiff();
+    }
 
     // eslint-disable-next-line camelcase
-    this.setDependencyScanningDiffEndpoint(gl?.mrWidgetData?.dependency_scanning_comparison_path);
-    this.fetchDependencyScanningDiff();
+    const dependencyScanningDiffEndpoint = gl?.mrWidgetData?.dependency_scanning_comparison_path;
+
+    if (dependencyScanningDiffEndpoint && this.hasDependencyScanningReports) {
+      this.setDependencyScanningDiffEndpoint(dependencyScanningDiffEndpoint);
+      this.fetchDependencyScanningDiff();
+    }
   },
   methods: {
     ...mapActions([
@@ -288,20 +259,6 @@ export default {
       setSastDiffEndpoint: 'setDiffEndpoint',
       fetchSastDiff: 'fetchDiff',
     }),
-    isMergeRequestReportApiEnabled(type) {
-      if (['dependencyScanning', 'dast'].includes(type)) {
-        return true;
-      }
-
-      return Boolean(this.glFeatures[`${type}MergeRequestReportApi`]);
-    },
-    hasReportsType(type) {
-      if (this.isMergeRequestReportApiEnabled(type)) {
-        return this.enabledReports[type];
-      }
-      const { head, diffEndpoint } = this[type].paths;
-      return Boolean(head || diffEndpoint);
-    },
   },
 };
 </script>
