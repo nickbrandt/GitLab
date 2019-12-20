@@ -1,7 +1,0 @@
----
-title: Remove the design_management_flag feature flag from the codebase. The feature
-  flag toggles the Design Management feature, and has been enabled by default since
-  12.2.
-merge_request: 20883
-author:
-type: other

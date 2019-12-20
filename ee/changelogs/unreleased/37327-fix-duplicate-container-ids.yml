@@ -1,5 +1,0 @@
----
-title: Fix check for existing ES limited indexing IDs
-merge_request: 20866
-author:
-type: fixed

@@ -1,5 +1,0 @@
----
-title: Update SAST.gitlab-ci.yml - Add kubesec analyzer
-merge_request: 20129
-author:
-type: changed
