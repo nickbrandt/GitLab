@@ -5,7 +5,6 @@
 
 class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migration[5.2]
   include Gitlab::Database::MigrationHelpers
-  include Gitlab::Utils::StrongMemoize
 
   DOWNTIME = false
   MIGRATION = 'ActivatePrometheusServicesForSharedClusterApplications'.freeze
@@ -18,6 +17,7 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
     module Applications
       class Prometheus < ActiveRecord::Base
         self.table_name = 'clusters_applications_prometheus'
+
         enum status: {
           installed: 3,
           updated: 5
@@ -39,7 +39,7 @@ class PatchPrometheusServicesForSharedClusterApplications < ActiveRecord::Migrat
 
       scope :without_active_prometheus_services, -> {
         joins("LEFT JOIN services ON services.project_id = projects.id AND services.type = 'PrometheusService'")
-          .where("(services.id IS NULL OR (services.active = FALSE AND services.properties = '{}'))")
+          .where("services.id IS NULL OR (services.active = FALSE AND services.properties = '{}')")
       }
     end
 
