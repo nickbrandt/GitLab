@@ -8209,13 +8209,13 @@ msgstr ""
 msgid "GeoNodes|Out of sync"
 msgstr ""
 
-msgid "GeoNodes|Pausing replication stops the sync process."
+msgid "GeoNodes|Pausing replication stops the sync process. Are you sure?"
 msgstr ""
 
-msgid "GeoNodes|Removing a primary node stops the sync process for all nodes. Syncing cannot be resumed without losing some data on all secondaries. In this case we would recommend setting up all nodes from scratch. Are you sure?"
+msgid "GeoNodes|Removing a Geo primary node stops the synchronization to that node. Are you sure?"
 msgstr ""
 
-msgid "GeoNodes|Removing a secondary node stops the sync process. It is not currently possible to add back the same node without losing some data. We only recommend setting up a new secondary node in this case. Are you sure?"
+msgid "GeoNodes|Removing a Geo secondary node stops the synchronization to that node. Are you sure?"
 msgstr ""
 
 msgid "GeoNodes|Replication slot WAL"
@@ -14961,13 +14961,22 @@ msgstr ""
 msgid "Remove milestone"
 msgstr ""
 
+msgid "Remove node"
+msgstr ""
+
 msgid "Remove parent epic from an epic"
+msgstr ""
+
+msgid "Remove primary node"
 msgstr ""
 
 msgid "Remove priority"
 msgstr ""
 
 msgid "Remove project"
+msgstr ""
+
+msgid "Remove secondary node"
 msgstr ""
 
 msgid "Remove spent time"

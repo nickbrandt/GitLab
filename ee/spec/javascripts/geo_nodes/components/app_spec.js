@@ -57,12 +57,13 @@ describe('AppComponent', () => {
     it('returns default data props', () => {
       expect(vm.isLoading).toBe(true);
       expect(vm.hasError).toBe(false);
-      expect(vm.showModal).toBe(false);
       expect(vm.targetNode).toBeNull();
       expect(vm.targetNodeActionType).toBe('');
       expect(vm.modalKind).toBe('warning');
       expect(vm.modalMessage).toBe('');
       expect(vm.modalActionLabel).toBe('');
+      expect(vm.modalTitle).toBe('');
+      expect(vm.modalId).toBe('node-action');
     });
   });
 
@@ -330,27 +331,27 @@ describe('AppComponent', () => {
     });
 
     describe('handleNodeAction', () => {
-      it('sets `showModal` to false and calls `toggleNode` when `targetNodeActionType` is `toggle`', () => {
+      it('calls `toggleNode` and `hideNodeActionModal` when `targetNodeActionType` is `toggle`', () => {
         vm.targetNode = { ...mockNode };
         vm.targetNodeActionType = NODE_ACTIONS.TOGGLE;
-        vm.showModal = true;
+        spyOn(vm, 'hideNodeActionModal');
         spyOn(vm, 'toggleNode').and.stub();
 
         vm.handleNodeAction();
 
-        expect(vm.showModal).toBe(false);
+        expect(vm.hideNodeActionModal).toHaveBeenCalled();
         expect(vm.toggleNode).toHaveBeenCalledWith(vm.targetNode);
       });
 
-      it('sets `showModal` to false and calls `removeNode` when `targetNodeActionType` is `remove`', () => {
+      it('calls `removeNode` and `hideNodeActionModal` when `targetNodeActionType` is `remove`', () => {
         vm.targetNode = { ...mockNode };
         vm.targetNodeActionType = NODE_ACTIONS.REMOVE;
-        vm.showModal = true;
+        spyOn(vm, 'hideNodeActionModal');
         spyOn(vm, 'removeNode').and.stub();
 
         vm.handleNodeAction();
 
-        expect(vm.showModal).toBe(false);
+        expect(vm.hideNodeActionModal).toHaveBeenCalled();
         expect(vm.removeNode).toHaveBeenCalledWith(vm.targetNode);
       });
     });
@@ -360,12 +361,16 @@ describe('AppComponent', () => {
       let modalKind;
       let modalMessage;
       let modalActionLabel;
+      let modalTitle;
+      let rootEmit;
 
       beforeEach(() => {
         node = { ...mockNode };
         modalKind = 'warning';
         modalMessage = 'Foobar message';
         modalActionLabel = 'Disable';
+        modalTitle = 'Test title';
+        rootEmit = spyOn(vm.$root, '$emit');
       });
 
       it('sets target node and modal config props on component', () => {
@@ -375,6 +380,7 @@ describe('AppComponent', () => {
           modalKind,
           modalMessage,
           modalActionLabel,
+          modalTitle,
         });
 
         expect(vm.targetNode).toBe(node);
@@ -382,9 +388,10 @@ describe('AppComponent', () => {
         expect(vm.modalKind).toBe(modalKind);
         expect(vm.modalMessage).toBe(modalMessage);
         expect(vm.modalActionLabel).toBe(modalActionLabel);
+        expect(vm.modalTitle).toBe(modalTitle);
       });
 
-      it('sets showModal to `true` when actionType is `toggle` and node is enabled', () => {
+      it('emits `bv::show::modal` when actionType is `toggle` and node is enabled', () => {
         node.enabled = true;
         vm.showNodeActionModal({
           actionType: NODE_ACTIONS.TOGGLE,
@@ -392,9 +399,10 @@ describe('AppComponent', () => {
           modalKind,
           modalMessage,
           modalActionLabel,
+          modalTitle,
         });
 
-        expect(vm.showModal).toBe(true);
+        expect(rootEmit).toHaveBeenCalledWith('bv::show::modal', vm.modalId);
       });
 
       it('calls toggleNode when actionType is `toggle` and node.enabled is `false`', () => {
@@ -407,12 +415,13 @@ describe('AppComponent', () => {
           modalKind,
           modalMessage,
           modalActionLabel,
+          modalTitle,
         });
 
         expect(vm.toggleNode).toHaveBeenCalledWith(vm.targetNode);
       });
 
-      it('sets showModal to `true` when actionType is not `toggle`', () => {
+      it('emits `bv::show::modal` when actionType is not `toggle`', () => {
         node.enabled = true;
         vm.showNodeActionModal({
           actionType: NODE_ACTIONS.REMOVE,
@@ -422,16 +431,16 @@ describe('AppComponent', () => {
           modalActionLabel,
         });
 
-        expect(vm.showModal).toBe(true);
+        expect(rootEmit).toHaveBeenCalledWith('bv::show::modal', vm.modalId);
       });
     });
 
     describe('hideNodeActionModal', () => {
-      it('sets `showModal` to `false`', () => {
-        vm.showModal = true;
+      it('emits `bv::hide::modal`', () => {
+        const rootEmit = spyOn(vm.$root, '$emit');
         vm.hideNodeActionModal();
 
-        expect(vm.showModal).toBe(false);
+        expect(rootEmit).toHaveBeenCalledWith('bv::hide::modal', vm.modalId);
       });
     });
   });

@@ -1,8 +1,7 @@
 <script>
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlModal } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import Flash from '~/flash';
-import DeprecatedModal from '~/vue_shared/components/deprecated_modal.vue';
 import SmartInterval from '~/smart_interval';
 
 import eventHub from '../event_hub';
@@ -13,7 +12,7 @@ import GeoNodeItem from './geo_node_item.vue';
 
 export default {
   components: {
-    DeprecatedModal,
+    GlModal,
     GeoNodeItem,
     GlLoadingIcon,
   },
@@ -43,12 +42,13 @@ export default {
     return {
       isLoading: true,
       hasError: false,
-      showModal: false,
       targetNode: null,
       targetNodeActionType: '',
+      modalTitle: '',
       modalKind: 'warning',
       modalMessage: '',
       modalActionLabel: '',
+      modalId: 'node-action',
     };
   },
   computed: {
@@ -168,7 +168,7 @@ export default {
         });
     },
     handleNodeAction() {
-      this.showModal = false;
+      this.hideNodeActionModal();
 
       if (this.targetNodeActionType === NODE_ACTIONS.TOGGLE) {
         this.toggleNode(this.targetNode);
@@ -182,21 +182,23 @@ export default {
       modalKind = 'warning',
       modalMessage,
       modalActionLabel,
+      modalTitle,
     }) {
       this.targetNode = node;
       this.targetNodeActionType = actionType;
       this.modalKind = modalKind;
       this.modalMessage = modalMessage;
       this.modalActionLabel = modalActionLabel;
+      this.modalTitle = modalTitle;
 
       if (actionType === NODE_ACTIONS.TOGGLE && !node.enabled) {
         this.toggleNode(this.targetNode);
       } else {
-        this.showModal = true;
+        this.$root.$emit('bv::show::modal', this.modalId);
       }
     },
     hideNodeActionModal() {
-      this.showModal = false;
+      this.$root.$emit('bv::hide::modal', this.modalId);
     },
   },
 };
@@ -219,14 +221,17 @@ export default {
       :node-edit-allowed="nodeEditAllowed"
       :geo-troubleshooting-help-path="geoTroubleshootingHelpPath"
     />
-    <deprecated-modal
-      v-show="showModal"
-      :title="__('Are you sure?')"
-      :kind="modalKind"
-      :text="modalMessage"
-      :primary-button-label="modalActionLabel"
+    <gl-modal
+      :modal-id="modalId"
+      :title="modalTitle"
+      :ok-variant="modalKind"
+      :ok-title="modalActionLabel"
       @cancel="hideNodeActionModal"
-      @submit="handleNodeAction"
-    />
+      @ok="handleNodeAction"
+    >
+      <template>
+        {{ modalMessage }}
+      </template>
+    </gl-modal>
   </div>
 </template>
