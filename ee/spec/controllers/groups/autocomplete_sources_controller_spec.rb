@@ -63,7 +63,7 @@ describe Groups::AutocompleteSourcesController do
       expect(json_response).to include(
         {
           'name' => 'close', 'aliases' => [], 'description' => 'Close this epic',
-          'params' => [], 'warning' => ''
+          'params' => [], 'warning' => '', 'icon' => ''
         }
       )
     end
