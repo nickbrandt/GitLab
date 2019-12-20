@@ -1448,7 +1448,7 @@ describe Project do
   end
 
   describe '#protected_environment_by_name' do
-    let(:project) { create(:project) }
+    let_it_be(:project) { create(:project) }
 
     subject { project.protected_environment_by_name('production') }
 
@@ -1465,19 +1465,27 @@ describe Project do
 
     context 'when Protected Environments feature is available on the project' do
       let(:feature_available) { true }
-      let(:environment) { create(:environment, name: 'production') }
-      let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
-
-      context 'when the project environment exists' do
-        before do
-          protected_environment
-        end
-
-        it { is_expected.to eq(protected_environment) }
-      end
 
       context 'when the project environment does not exists' do
         it { is_expected.to be_nil }
+      end
+
+      context 'when the project environment exists' do
+        let_it_be(:environment) { create(:environment, name: 'production') }
+        let_it_be(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
+
+        it { is_expected.to eq(protected_environment) }
+
+        it 'caches environment name', :request_store do
+          control_count = ActiveRecord::QueryRecorder.new { project.protected_environment_by_name(protected_environment.name) }
+
+          expect do
+            2.times { project.protected_environment_by_name(protected_environment.name) }
+          end.not_to exceed_query_limit(control_count)
+
+          expect(project.protected_environment_by_name('non-existent-env')).to be_nil
+          expect(project.protected_environment_by_name(protected_environment.name)).to eq(protected_environment)
+        end
       end
     end
   end
