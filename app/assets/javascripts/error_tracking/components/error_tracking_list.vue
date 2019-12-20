@@ -297,17 +297,17 @@ export default {
           stacked="sm"
           tbody-tr-class="table-row mb-4"
         >
-          <template v-slot:head(error)>
+          <template #head(error)>
             <div class="d-none d-sm-block">{{ __('Open errors') }}</div>
           </template>
-          <template v-slot:head(events)="data">
+          <template #head(events)="data">
             <div class="text-sm-right">{{ data.label }}</div>
           </template>
-          <template v-slot:head(users)="data">
+          <template #head(users)="data">
             <div class="text-sm-right">{{ data.label }}</div>
           </template>
 
-          <template v-slot:error="errors">
+          <template #cell(error)="errors">
             <div class="d-flex flex-column">
               <gl-link class="d-flex mw-100 text-dark" :href="getDetailsLink(errors.item.id)">
                 <strong class="text-truncate">{{ errors.item.title.trim() }}</strong>
@@ -317,20 +317,20 @@ export default {
               </span>
             </div>
           </template>
-          <template v-slot:events="errors">
+          <template #cell(events)="errors">
             <div class="text-right">{{ errors.item.count }}</div>
           </template>
 
-          <template v-slot:users="errors">
+          <template #cell(users)="errors">
             <div class="text-right">{{ errors.item.userCount }}</div>
           </template>
 
-          <template v-slot:lastSeen="errors">
+          <template #cell(lastSeen)="errors">
             <div class="text-md-left text-right">
               <time-ago :time="errors.item.lastSeen" class="text-secondary" />
             </div>
           </template>
-          <template v-slot:ignore="errors">
+          <template #cell(ignore)="errors">
             <gl-button
               ref="ignoreError"
               v-gl-tooltip.hover
@@ -340,7 +340,7 @@ export default {
               <gl-icon name="eye-slash" :size="12" />
             </gl-button>
           </template>
-          <template v-slot:resolved="errors">
+          <template #cell(resolved)="errors">
             <gl-button
               ref="resolveError"
               v-gl-tooltip
@@ -350,7 +350,7 @@ export default {
               <gl-icon name="check-circle" :size="12" />
             </gl-button>
           </template>
-          <template v-slot:details="errors">
+          <template #cell(details)="errors">
             <gl-button
               :href="getDetailsLink(errors.item.id)"
               variant="outline-info"
@@ -359,7 +359,7 @@ export default {
               {{ __('More details') }}
             </gl-button>
           </template>
-          <template v-slot:empty>
+          <template #empty>
             {{ __('No errors to display.') }}
             <gl-link class="js-try-again" @click="restartPolling">
               {{ __('Check again') }}

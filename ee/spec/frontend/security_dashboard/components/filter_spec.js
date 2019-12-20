@@ -20,6 +20,7 @@ describe('Filter component', () => {
       },
       propsData,
       store,
+      attachToDocument: true,
     });
   };
 
