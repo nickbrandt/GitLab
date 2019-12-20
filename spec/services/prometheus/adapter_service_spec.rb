@@ -8,30 +8,6 @@ describe Prometheus::AdapterService do
 
   subject { described_class.new(project, cluster) }
 
-  shared_examples 'adapter service with a deployment-based argument passed in' do
-    subject { described_class.new(project, deployment) }
-
-    it 'becomes the deployment platform attribute' do
-      expect(subject.deployment_platform).to eq deployment
-    end
-
-    context 'when a cluster is tied to the deployment_platform' do
-      it 'provides a cluster prometheus adapter' do
-        allow(deployment).to receive(:cluster).and_return(cluster)
-
-        expect(subject.cluster_prometheus_adapter).to eq(cluster.application_prometheus)
-      end
-    end
-
-    context 'when there is no cluster tied to the deployment platform' do
-      it 'is nil' do
-        allow(deployment).to receive(:cluster).and_return(nil)
-
-        expect(subject.cluster_prometheus_adapter).to be_nil
-      end
-    end
-  end
-
   describe '#prometheus_adapter' do
     context 'prometheus service can execute queries' do
       let(:prometheus_service) { double(:prometheus_service, can_query?: true) }
@@ -69,14 +45,6 @@ describe Prometheus::AdapterService do
           expect(subject.prometheus_adapter).to be_nil
         end
       end
-    end
-
-    it_behaves_like 'adapter service with a deployment-based argument passed in' do
-      let(:deployment) { project.deployment_platform }
-    end
-
-    it_behaves_like 'adapter service with a deployment-based argument passed in' do
-      let(:deployment) { create(:deployment, environment: create(:environment, project: project)) }
     end
   end
 end

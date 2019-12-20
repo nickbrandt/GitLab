@@ -4,7 +4,12 @@ module Prometheus
   class AdapterService
     def initialize(project, deployment_platform = nil)
       @project = project
-      @deployment_platform = deployment_platform ? deployment_platform : project.deployment_platform
+
+      @deployment_platform = if deployment_platform
+                               deployment_platform
+                             else
+                               project.deployment_platform
+                             end
     end
 
     attr_reader :deployment_platform, :project
