@@ -56,13 +56,28 @@ module Packages
 
         full_path = case service_type
                     when :download
-                      "#{base_path}/download" # TODO NUGET API: replace with grape path helper when download endpoint is implemented
+                      api_v4_projects_packages_nuget_download_package_name_package_version_package_filename_path(
+                        {
+                          id: project.id,
+                          package_name: nil,
+                          package_version: nil,
+                          package_filename: nil
+                        },
+                        true
+                      )
                     when :search
-                      "#{base_path}/query" # TODO NUGET API: replace with grape path helper when query endpoint is implemented
+                      "#{base_path}/query"
                     when :metadata
-                      "#{base_path}/metadata" # TODO NUGET API: replace with grape path helper when metadata endpoint is implemented
+                      api_v4_projects_packages_nuget_metadata_package_name_package_version_path(
+                        {
+                          id: project.id,
+                          package_name: nil,
+                          package_version: nil
+                        },
+                        true
+                      )
                     when :publish
-                      base_path # TODO NUGET API: replace with grape path helper when publish endpoint is implemented
+                      base_path
                     end
 
         expose_url(full_path)
