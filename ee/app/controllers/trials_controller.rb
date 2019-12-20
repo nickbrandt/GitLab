@@ -91,7 +91,7 @@ class TrialsController < ApplicationController
 
   def create_group
     name = sanitize(params[:new_group_name])
-    group = Groups::CreateService.new(current_user, name: name, path: name.parameterize).execute
+    group = Groups::CreateService.new(current_user, name: name, path: Namespace.clean_path(name.parameterize)).execute
 
     params[:namespace_id] = group.id if group.persisted?
 
