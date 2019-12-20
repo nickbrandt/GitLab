@@ -11,7 +11,7 @@ import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.gra
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
-import { UPLOAD_DESIGN_ERROR } from '../utils/error_messages';
+import { UPLOAD_DESIGN_ERROR, designDeletionError } from '../utils/error_messages';
 import { updateStoreAfterUploadDesign } from '../utils/cache_update';
 import { designUploadOptimisticResponse } from '../utils/design_management_utils';
 
@@ -178,6 +178,10 @@ export default {
       this.selectedDesigns = [];
       if (this.$route.query.version) this.$router.push({ name: 'designs' });
     },
+    onDesignDeleteError() {
+      const errorMessage = designDeletionError({ singular: this.selectedDesigns.length === 1 });
+      createFlash(errorMessage);
+    },
   },
   beforeRouteUpdate(to, from, next) {
     this.selectedDesigns = [];
@@ -205,6 +209,7 @@ export default {
             :project-path="projectPath"
             :iid="issueIid"
             @done="onDesignDelete"
+            @error="onDesignDeleteError"
           >
             <delete-button
               v-if="isLatestVersion"
