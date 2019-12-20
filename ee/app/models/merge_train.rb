@@ -12,7 +12,10 @@ class MergeTrain < ApplicationRecord
   after_commit :refresh_async, if: -> { saved_change_to_status? && stale? }
 
   after_destroy do |merge_train|
-    run_after_commit { merge_train.cleanup_ref }
+    run_after_commit do
+      merge_train.pipeline&.cancel_running(retries: 1)
+      merge_train.cleanup_ref
+    end
   end
 
   enum status: %i[created merged stale fresh]

@@ -125,6 +125,19 @@ describe AutoMerge::MergeTrainService do
       subject
     end
 
+    context 'when pipeline exists' do
+      before do
+        merge_request.merge_train.update!(pipeline: pipeline)
+      end
+
+      let(:pipeline) { create(:ci_pipeline) }
+      let(:build) { create(:ci_build, :running, pipeline: pipeline) }
+
+      it 'cancels the jobs in the pipeline' do
+        expect { subject }.to change { build.reload.status }.from('running').to('canceled')
+      end
+    end
+
     context 'when train ref exists' do
       before do
         merge_request.project.repository.create_ref(merge_request.target_branch, merge_request.train_ref_path)
