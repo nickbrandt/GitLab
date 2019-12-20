@@ -156,6 +156,9 @@ module EE
           expose :plan, if: ->(namespace, opts) { ::Ability.allowed?(opts[:current_user], :admin_namespace, namespace) } do |namespace, _|
             namespace.actual_plan_name
           end
+          expose :trial_ends_on, if: ->(namespace, opts) { ::Ability.allowed?(opts[:current_user], :admin_namespace, namespace) } do |namespace, _|
+            namespace.trial_ends_on
+          end
         end
       end
 
