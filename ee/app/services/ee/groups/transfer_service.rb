@@ -17,7 +17,7 @@ module EE
         return unless group.packages_feature_available?
 
         npm_packages = Packages::GroupPackagesFinder.new(current_user, group, package_type: :npm).execute
-        if !new_parent_group_has_same_root_ancestor? && npm_packages.exists?
+        if different_root_ancestor? && npm_packages.exists?
           raise_ee_transfer_error(:group_contains_npm_packages)
         end
       end
@@ -44,8 +44,8 @@ module EE
         raise ::Groups::TransferService::TransferError, EE_ERROR_MESSAGES[message]
       end
 
-      def new_parent_group_has_same_root_ancestor?
-        group.root_ancestor == new_parent_group.root_ancestor
+      def different_root_ancestor?
+        group.root_ancestor != new_parent_group&.root_ancestor
       end
     end
   end
