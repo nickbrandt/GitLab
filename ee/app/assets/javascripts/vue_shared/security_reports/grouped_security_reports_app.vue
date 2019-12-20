@@ -250,24 +250,9 @@ export default {
       this.fetchSastReports();
     }
 
-    const sastContainerDiffEndpoint =
-      gl && gl.mrWidgetData && gl.mrWidgetData.container_scanning_comparison_path;
-
-    if (
-      this.isMergeRequestReportApiEnabled('containerScanning') &&
-      sastContainerDiffEndpoint &&
-      this.hasContainerScanningReports
-    ) {
-      this.setSastContainerDiffEndpoint(sastContainerDiffEndpoint);
-      this.fetchSastContainerDiff();
-    } else if (this.sastContainerHeadPath) {
-      this.setSastContainerHeadPath(this.sastContainerHeadPath);
-
-      if (this.sastContainerBasePath) {
-        this.setSastContainerBasePath(this.sastContainerBasePath);
-      }
-      this.fetchSastContainerReports();
-    }
+    // eslint-disable-next-line camelcase
+    this.setSastContainerDiffEndpoint(gl?.mrWidgetData?.container_scanning_comparison_path);
+    this.fetchSastContainerDiff();
 
     // eslint-disable-next-line camelcase
     this.setDastDiffEndpoint(gl?.mrWidgetData?.dast_comparison_path);
@@ -283,9 +268,6 @@ export default {
       'setHeadBlobPath',
       'setBaseBlobPath',
       'setSourceBranch',
-      'setSastContainerHeadPath',
-      'setSastContainerBasePath',
-      'fetchSastContainerReports',
       'setVulnerabilityFeedbackPath',
       'setVulnerabilityFeedbackHelpPath',
       'setCreateVulnerabilityFeedbackIssuePath',
