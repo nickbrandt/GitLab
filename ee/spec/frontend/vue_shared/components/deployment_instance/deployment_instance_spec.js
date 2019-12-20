@@ -1,14 +1,12 @@
-import Vue from 'vue';
 import { shallowMount } from '@vue/test-utils';
 import DeployBoardInstance from 'ee/vue_shared/components/deployment_instance.vue';
-import { folder } from '../../environments/mock_data';
+import { folder } from './mock_data';
 
 describe('Deploy Board Instance', () => {
   let wrapper;
-  const DeployBoardInstanceComponent = Vue.extend(DeployBoardInstance);
 
   const createComponent = (props = {}) =>
-    shallowMount(DeployBoardInstanceComponent, {
+    shallowMount(DeployBoardInstance, {
       propsData: {
         status: 'succeeded',
         ...props,
@@ -28,7 +26,7 @@ describe('Deploy Board Instance', () => {
       });
 
       expect(wrapper.classes('deployment-instance-succeeded')).toBe(true);
-      expect(wrapper.attributes('data-original-title')).toEqual('This is a pod');
+      expect(wrapper.attributes('title')).toEqual('This is a pod');
     });
 
     it('should render a div without tooltip data', done => {
@@ -39,7 +37,7 @@ describe('Deploy Board Instance', () => {
 
       wrapper.vm.$nextTick(() => {
         expect(wrapper.classes('deployment-instance-deploying')).toBe(true);
-        expect(wrapper.attributes('data-original-title')).toEqual('');
+        expect(wrapper.attributes('title')).toEqual('');
         done();
       });
     });
@@ -101,7 +99,7 @@ describe('Deploy Board Instance', () => {
     it('should not have a tooltip', () => {
       wrapper = createComponent();
 
-      expect(wrapper.attributes('data-original-title')).toEqual('');
+      expect(wrapper.attributes('title')).toEqual('');
     });
   });
 });

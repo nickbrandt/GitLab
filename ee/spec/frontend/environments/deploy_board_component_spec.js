@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import { mount } from '@vue/test-utils';
 import DeployBoard from 'ee/environments/components/deploy_board_component.vue';
-import { environment } from 'spec/environments/mock_data';
-import { deployBoardMockData } from './mock_data';
+import { deployBoardMockData, environment } from './mock_data';
 
 const projectPath = 'gitlab-org/gitlab-test';
 
