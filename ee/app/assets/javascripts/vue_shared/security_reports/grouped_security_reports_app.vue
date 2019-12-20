@@ -283,24 +283,8 @@ export default {
       this.fetchDastReports();
     }
 
-    const dependencyScanningDiffEndpoint =
-      gl && gl.mrWidgetData && gl.mrWidgetData.dependency_scanning_comparison_path;
-
-    if (
-      this.isMergeRequestReportApiEnabled('dependencyScanning') &&
-      dependencyScanningDiffEndpoint &&
-      this.hasDependencyScanningReports
-    ) {
-      this.setDependencyScanningDiffEndpoint(dependencyScanningDiffEndpoint);
-      this.fetchDependencyScanningDiff();
-    } else if (this.dependencyScanningHeadPath) {
-      this.setDependencyScanningHeadPath(this.dependencyScanningHeadPath);
-
-      if (this.dependencyScanningBasePath) {
-        this.setDependencyScanningBasePath(this.dependencyScanningBasePath);
-      }
-      this.fetchDependencyScanningReports();
-    }
+    this.setDependencyScanningDiffEndpoint(gl?.mrWidgetData?.dependency_scanning_comparison_path);
+    this.fetchDependencyScanningDiff();
   },
   methods: {
     ...mapActions([
@@ -312,11 +296,8 @@ export default {
       'setSastContainerBasePath',
       'setDastHeadPath',
       'setDastBasePath',
-      'setDependencyScanningHeadPath',
-      'setDependencyScanningBasePath',
       'fetchSastContainerReports',
       'fetchDastReports',
-      'fetchDependencyScanningReports',
       'setVulnerabilityFeedbackPath',
       'setVulnerabilityFeedbackHelpPath',
       'setCreateVulnerabilityFeedbackIssuePath',
@@ -351,6 +332,10 @@ export default {
       fetchSastDiff: 'fetchDiff',
     }),
     isMergeRequestReportApiEnabled(type) {
+      if (['dependencyScanning'].includes(type)) {
+        return true;
+      }
+
       return Boolean(this.glFeatures[`${type}MergeRequestReportApi`]);
     },
     hasReportsType(type) {

@@ -382,13 +382,8 @@ describe('Grouped security reports app', () => {
         canCreateMergeRequest: true,
         canDismissVulnerability: true,
       };
-      const provide = {
-        glFeatures: {
-          dependencyScanningMergeRequestReportApi: true,
-        },
-      };
 
-      beforeEach(() => {
+      beforeEach(done => {
         gl.mrWidgetData = gl.mrWidgetData || {};
         gl.mrWidgetData.dependency_scanning_comparison_path = dependencyScanningEndpoint;
 
@@ -398,54 +393,29 @@ describe('Grouped security reports app', () => {
         });
 
         mock.onGet('vulnerability_feedback_path.json').reply(200, []);
+
+        createWrapper({
+          ...props,
+          enabledReports: {
+            dependencyScanning: true,
+          },
+        });
+
+        waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS)
+          .then(done)
+          .catch(done.fail);
       });
 
-      describe('with reports disabled', () => {
-        beforeEach(() => {
-          createWrapper(
-            {
-              ...props,
-              enabledReports: {
-                dependencyScanning: false,
-              },
-            },
-            provide,
-          );
-        });
-
-        it('should not render the widget', () => {
-          expect(wrapper.vm.$el.querySelector('.js-dependency-scanning-widget')).toBeNull();
-        });
+      it('should set setDependencyScanningDiffEndpoint', () => {
+        expect(wrapper.vm.dependencyScanning.paths.diffEndpoint).toEqual(
+          dependencyScanningEndpoint,
+        );
       });
 
-      describe('with reports enabled', () => {
-        beforeEach(done => {
-          createWrapper(
-            {
-              ...props,
-              enabledReports: {
-                dependencyScanning: true,
-              },
-            },
-            provide,
-          );
-
-          waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS)
-            .then(done)
-            .catch(done.fail);
-        });
-
-        it('should set setDependencyScanningDiffEndpoint', () => {
-          expect(wrapper.vm.dependencyScanning.paths.diffEndpoint).toEqual(
-            dependencyScanningEndpoint,
-          );
-        });
-
-        it('should display the correct numbers of vulnerabilities', () => {
-          expect(wrapper.vm.$el.textContent).toContain(
-            'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
-          );
-        });
+      it('should display the correct numbers of vulnerabilities', () => {
+        expect(wrapper.vm.$el.textContent).toContain(
+          'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
+        );
       });
     });
 
