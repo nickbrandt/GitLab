@@ -59,9 +59,8 @@ module QA
         end
       end
 
-      # https://gitlab.com/gitlab-org/gitlab/issues/40125
-      # BUG_IN_CODE
-      it 'creates a merge request and fails to merge', :quarantine do
+      # Known issue: https://gitlab.com/gitlab-org/gitlab/issues/40125
+      it 'creates a merge request and fails to merge' do
         push branch: 'test', as_user: @user_one
 
         merge_request = Resource::MergeRequest.fabricate_via_api! do |merge_request|
@@ -75,6 +74,7 @@ module QA
         click_lock
         sign_out_and_sign_in_as user: @user_one
         try_to_merge merge_request: merge_request
+        Page::MergeRequest::Show.perform(&:wait_for_merge_request_error_message)
         expect(page).to have_text("locked by #{admin_username}")
       end
 
