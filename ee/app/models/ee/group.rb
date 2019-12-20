@@ -133,7 +133,7 @@ module EE
         # preset root_ancestor for all of them to avoid an additional SQL query
         # done for each group permission check:
         # https://gitlab.com/gitlab-org/gitlab/issues/11539
-        preset_root_ancestor_for(groups) if same_root && ::Feature.enabled?(:preset_group_root)
+        preset_root_ancestor_for(groups) if same_root
 
         DeclarativePolicy.user_scope do
           groups.select { |group| Ability.allowed?(user, :read_epic, group) }

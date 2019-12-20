@@ -253,46 +253,29 @@ describe Group do
         end
       end
 
-      context 'with `preset_group_root` feature flag disabled' do
-        before do
-          stub_feature_flags(preset_group_root: false)
-        end
+      context 'when same_root is false' do
+        let(:params) { { same_root: false } }
 
+        # extra 6 queries:
+        # * getting root_ancestor
+        # * getting root ancestor's saml_provider
+        # * check if group has projects
+        # * max_member_access_for_user_from_shared_groups
+        # * max_member_access_for_user
+        # * self_and_ancestors_ids
         it_behaves_like 'group root ancestor' do
-          let(:params) { {} }
           let(:extra_query_count) { 6 }
         end
       end
 
-      context 'with `preset_group_root` feature flag enabled' do
-        before do
-          stub_feature_flags(preset_group_root: true)
-        end
+      context 'when same_root is true' do
+        let(:params) { { same_root: true } }
 
-        context 'when same_root is false' do
-          let(:params) { { same_root: false } }
-
-          # extra 6 queries:
-          # * getting root_ancestor
-          # * getting root ancestor's saml_provider
-          # * check if group has projects
-          # * max_member_access_for_user_from_shared_groups
-          # * max_member_access_for_user
-          # * self_and_ancestors_ids
-          it_behaves_like 'group root ancestor' do
-            let(:extra_query_count) { 6 }
-          end
-        end
-
-        context 'when same_root is true' do
-          let(:params) { { same_root: true } }
-
-          # avoids 2 queries from the list above:
-          # * getting root ancestor
-          # * getting root ancestor's saml_provider
-          it_behaves_like 'group root ancestor' do
-            let(:extra_query_count) { 4 }
-          end
+        # avoids 2 queries from the list above:
+        # * getting root ancestor
+        # * getting root ancestor's saml_provider
+        it_behaves_like 'group root ancestor' do
+          let(:extra_query_count) { 4 }
         end
       end
     end
