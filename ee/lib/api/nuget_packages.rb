@@ -14,7 +14,14 @@ module API
     AUTHENTICATE_REALM_NAME = 'GitLab Nuget Package Registry'
     POSITIVE_INTEGER_REGEX = %r{\A[1-9]\d*\z}.freeze
 
+    PACKAGE_FILENAME = 'package.nupkg'
+    PACKAGE_FILETYPE = 'application/octet-stream'
+
     default_format :json
+
+    rescue_from ArgumentError do |e|
+      render_api_error!(e.message, 400)
+    end
 
     helpers do
       def find_personal_access_token
@@ -29,14 +36,20 @@ module API
         project = find_project(id)
 
         unless project && can?(current_user, :read_project, project)
-          return unauthorized_project_message
+          return unauthorized_or! { not_found! }
         end
 
         project
       end
 
-      def unauthorized_project_message
-        current_user ? not_found! : unauthorized_with_header!
+      def authorize!(action, subject = :global, reason = nil)
+        return if can?(current_user, action, subject)
+
+        unauthorized_or! { forbidden!(reason) }
+      end
+
+      def unauthorized_or!
+        current_user ? yield : unauthorized_with_header!
       end
 
       def unauthorized_with_header!
@@ -47,7 +60,6 @@ module API
 
     before do
       require_packages_enabled!
-      authenticate_non_get!
     end
 
     params do
@@ -69,6 +81,38 @@ module API
 
           present ::Packages::Nuget::ServiceIndexPresenter.new(authorized_user_project),
             with: EE::API::Entities::Nuget::ServiceIndex
+        end
+
+        # https://docs.microsoft.com/en-us/nuget/api/package-publish-resource
+        desc 'The NuGet Package Content endpoint' do
+          detail 'This feature was introduced in GitLab 12.6'
+        end
+        params do
+          use :workhorse_upload_params
+        end
+        put do
+          authorize_upload!(authorized_user_project)
+
+          package = ::Packages::Nuget::CreatePackageService.new(authorized_user_project, current_user).execute
+
+          file_params = params.merge(
+            file: uploaded_package_file,
+            file_name: PACKAGE_FILENAME,
+            file_type: PACKAGE_FILETYPE
+          )
+
+          track_event('push_package')
+
+          ::Packages::CreatePackageFileService.new(package, file_params).execute
+
+          created!
+        rescue ObjectStorage::RemoteStoreError => e
+          Gitlab::ErrorTracking.track_exception(e, extra: { file_name: params[:file_name], project_id: authorized_user_project.id })
+
+          forbidden!
+        end
+        put 'authorize' do
+          authorize_workhorse!(authorized_user_project)
         end
       end
     end
