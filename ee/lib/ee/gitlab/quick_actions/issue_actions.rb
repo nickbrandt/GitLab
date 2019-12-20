@@ -49,9 +49,23 @@ module EE
             @updates[:epic] = nil
           end
 
-          desc _('Promote issue to an epic')
-          explanation _('Promote issue to an epic.')
-          warning _('may expose confidential information')
+          promote_message = _('Promote issue to an epic')
+          promote_message_confidential = _('Promote confidential issue to a non-confidential epic')
+
+          desc do
+            if quick_action_target.confidential?
+              promote_message_confidential
+            else
+              promote_message
+            end
+          end
+          explanation promote_message
+          warning do
+            if quick_action_target.confidential?
+              promote_message_confidential
+            end
+          end
+          icon 'confidential'
           types Issue
           condition do
             quick_action_target.persisted? &&
@@ -60,7 +74,12 @@ module EE
           end
           command :promote do
             Epics::IssuePromoteService.new(quick_action_target.project, current_user).execute(quick_action_target)
-            @execution_message[:promote] = _('Promoted issue to an epic.')
+
+            @execution_message[:promote] = if quick_action_target.confidential?
+                                             _('Promoted confidential issue to a non-confidential epic. Information in this issue is no longer confidential as epics are public to group members.')
+                                           else
+                                             _('Promoted issue to an epic.')
+                                           end
           end
 
           def extract_epic(params)
