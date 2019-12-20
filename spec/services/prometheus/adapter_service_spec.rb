@@ -8,6 +8,30 @@ describe Prometheus::AdapterService do
 
   subject { described_class.new(project, cluster) }
 
+  shared_examples 'adapter service with a deployment-based argument passed in' do
+    subject { described_class.new(project, deployment) }
+
+    it 'becomes the deployment platform attribute' do
+      expect(subject.deployment_platform).to eq deployment
+    end
+
+    context 'when a cluster is tied to the deployment_platform' do
+      it 'provides a cluster prometheus adapter' do
+        allow(deployment).to receive(:cluster).and_return(cluster)
+
+        expect(subject.cluster_prometheus_adapter).to eq(cluster.application_prometheus)
+      end
+    end
+
+    context 'when there is no cluster tied to the deployment platform' do
+      it 'is nil' do
+        allow(deployment).to receive(:cluster).and_return(nil)
+
+        expect(subject.cluster_prometheus_adapter).to be_nil
+      end
+    end
+  end
+
   describe '#prometheus_adapter' do
     context 'prometheus service can execute queries' do
       let(:prometheus_service) { double(:prometheus_service, can_query?: true) }
@@ -47,24 +71,12 @@ describe Prometheus::AdapterService do
       end
     end
 
-    context 'when project has a configured cluster' do
-      let!(:cluster) { create(:cluster, :provided_by_gcp, projects: [project]) }
-
-      it 'takes the deployment platform cluster as cluster attribute' do
-        expect(subject.cluster).to eq(project.deployment_platform.cluster)
-      end
+    it_behaves_like 'adapter service with a deployment-based argument passed in' do
+      let(:deployment) { project.deployment_platform }
     end
 
-    context 'when a cluster is passed' do
-      subject { described_class.new(project, cluster) }
-
-      it 'becomes the cluster attribute' do
-        expect(subject.cluster).to eq cluster
-      end
-
-      it 'provides a cluster prometheus adapter' do
-        expect(subject.cluster_prometheus_adapter).to eq(cluster.application_prometheus)
-      end
+    it_behaves_like 'adapter service with a deployment-based argument passed in' do
+      let(:deployment) { create(:deployment, environment: create(:environment, project: project)) }
     end
   end
 end

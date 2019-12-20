@@ -227,7 +227,7 @@ class Environment < ApplicationRecord
 
   # rubocop: disable CodeReuse/ServiceClass
   def prometheus_adapter
-    @prometheus_adapter ||= Prometheus::AdapterService.new(project, deployment_platform&.cluster).prometheus_adapter
+    @prometheus_adapter ||= Prometheus::AdapterService.new(project, deployment_platform).prometheus_adapter
   end
   # rubocop: enable CodeReuse/ServiceClass
 
