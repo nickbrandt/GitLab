@@ -1,6 +1,0 @@
----
-title: Allow to login with Smartcard certificates using SAN extensions that only defines
-  one global email identity
-merge_request: 20052
-author:
-type: changed

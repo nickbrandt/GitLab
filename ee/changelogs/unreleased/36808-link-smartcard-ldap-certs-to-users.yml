@@ -1,5 +1,0 @@
----
-title: Link user accounts to new Smartcards certificate ldap identities on login
-merge_request: 20470
-author:
-type: fixed
