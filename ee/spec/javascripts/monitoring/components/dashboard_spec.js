@@ -8,7 +8,7 @@ import {
   mockedQueryResultPayload,
   environmentData,
 } from 'spec/monitoring/mock_data';
-import propsData from 'spec/monitoring/components/dashboard_spec';
+import propsData from 'spec/monitoring/components/dashboard_resize_spec';
 import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
 import Tracking from '~/tracking';
 import { createStore } from '~/monitoring/stores';
