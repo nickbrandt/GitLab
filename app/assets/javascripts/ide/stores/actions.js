@@ -143,10 +143,14 @@ export const stageAllChanges = ({ state, commit, dispatch, getters }) => {
     commit(types.STAGE_CHANGE, { path: file.path, diffInfo: getters.getDiffInfo(file.path) }),
   );
 
-  dispatch('openPendingTab', {
-    file: state.stagedFiles.find(f => f.path === openFile.path),
-    keyPrefix: stageKeys.staged,
-  });
+  const file = getters.getStagedFile(openFile.path);
+
+  if (file) {
+    dispatch('openPendingTab', {
+      file,
+      keyPrefix: stageKeys.staged,
+    });
+  }
 };
 
 export const unstageAllChanges = ({ state, commit, dispatch, getters }) => {
@@ -156,10 +160,14 @@ export const unstageAllChanges = ({ state, commit, dispatch, getters }) => {
     commit(types.UNSTAGE_CHANGE, { path: file.path, diffInfo: getters.getDiffInfo(file.path) }),
   );
 
-  dispatch('openPendingTab', {
-    file: state.changedFiles.find(f => f.path === openFile.path),
-    keyPrefix: stageKeys.unstaged,
-  });
+  const file = getters.getChangedFile(openFile.path);
+
+  if (file) {
+    dispatch('openPendingTab', {
+      file,
+      keyPrefix: stageKeys.unstaged,
+    });
+  }
 };
 
 export const updateViewer = ({ commit }, viewer) => {

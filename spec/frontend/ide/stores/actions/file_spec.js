@@ -673,10 +673,11 @@ describe('IDE store file actions', () => {
 
       actions.stageChange(store, 'path');
 
-      expect(store.commit.calls.allArgs()).toEqual([
-        [types.STAGE_CHANGE, jest.objectContaining({ path: 'path' })],
-        [types.SET_LAST_COMMIT_MSG, ''],
-      ]);
+      expect(store.commit).toHaveBeenCalledWith(
+        types.STAGE_CHANGE,
+        expect.objectContaining({ path: 'path' }),
+      );
+      expect(store.commit).toHaveBeenCalledWith(types.SET_LAST_COMMIT_MSG, '');
     });
   });
 
@@ -689,9 +690,10 @@ describe('IDE store file actions', () => {
 
       actions.unstageChange(store, 'path');
 
-      expect(store.commit.calls.allArgs()).toEqual([
-        [types.UNSTAGE_CHANGE, jest.objectContaining({ path: 'path' })],
-      ]);
+      expect(store.commit).toHaveBeenCalledWith(
+        types.UNSTAGE_CHANGE,
+        expect.objectContaining({ path: 'path' }),
+      );
     });
   });
 

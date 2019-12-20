@@ -417,6 +417,27 @@ describe('Multi-file store actions', () => {
           [types.STAGE_CHANGE, jasmine.objectContaining({ path: file1.path })],
         ]);
       });
+
+      it('opens pending tab if a change exists in that file', () => {
+        stageAllChanges(store);
+
+        expect(store.dispatch.calls.allArgs()).toEqual([
+          [
+            'openPendingTab',
+            { file: { ...file1, staged: true, changed: true }, keyPrefix: 'staged' },
+          ],
+        ]);
+      });
+
+      it('does not open pending tab if no change exists in that file', () => {
+        store.state.entries[file1.path].content = 'test';
+        store.state.stagedFiles = [file1];
+        store.state.changedFiles = [store.state.entries[file1.path]];
+
+        stageAllChanges(store);
+
+        expect(store.dispatch).not.toHaveBeenCalled();
+      });
     });
 
     describe('unstageAllChanges', () => {
@@ -426,6 +447,24 @@ describe('Multi-file store actions', () => {
         expect(store.commit.calls.allArgs()).toEqual([
           [types.UNSTAGE_CHANGE, jasmine.objectContaining({ path: file2.path })],
         ]);
+      });
+
+      it('opens pending tab if a change exists in that file', () => {
+        unstageAllChanges(store);
+
+        expect(store.dispatch.calls.allArgs()).toEqual([
+          ['openPendingTab', { file: file1, keyPrefix: 'unstaged' }],
+        ]);
+      });
+
+      it('does not open pending tab if no change exists in that file', () => {
+        store.state.entries[file1.path].content = 'test';
+        store.state.stagedFiles = [file1];
+        store.state.changedFiles = [store.state.entries[file1.path]];
+
+        unstageAllChanges(store);
+
+        expect(store.dispatch).not.toHaveBeenCalled();
       });
     });
   });
