@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import store from './store';
 import Checkout from './components/checkout.vue';
 
 export default () => {
@@ -6,7 +7,10 @@ export default () => {
 
   return new Vue({
     el: checkoutEl,
-    components: { Checkout },
+    store,
+    components: {
+      Checkout,
+    },
     render(createElement) {
       return createElement('checkout', {});
     },
