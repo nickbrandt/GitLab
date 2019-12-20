@@ -135,7 +135,9 @@ export const handleLocationHash = () => {
     adjustment -= topPadding;
   }
 
-  window.scrollBy(0, adjustment);
+  setTimeout(() => {
+    window.scrollBy(0, adjustment);
+  });
 };
 
 // Check if element scrolled into viewport from above or below
