@@ -45,7 +45,7 @@ describe 'Trial Sign Up', :js do
         wait_for_requests
 
         expect(current_path).to eq(new_trial_path)
-        expect(page).to have_content('Start a Free Gold Trial')
+        expect(page).to have_content('Start your Free Gold Trial')
       end
     end
 
