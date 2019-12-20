@@ -435,13 +435,8 @@ describe('Grouped security reports app', () => {
         canCreateMergeRequest: true,
         canDismissVulnerability: true,
       };
-      const provide = {
-        glFeatures: {
-          dastMergeRequestReportApi: true,
-        },
-      };
 
-      beforeEach(() => {
+      beforeEach(done => {
         gl.mrWidgetData = gl.mrWidgetData || {};
         gl.mrWidgetData.dast_comparison_path = dastEndpoint;
 
@@ -452,58 +447,33 @@ describe('Grouped security reports app', () => {
         });
 
         mock.onGet('vulnerability_feedback_path.json').reply(200, []);
+
+        createWrapper({
+          ...props,
+          enabledReports: {
+            dast: true,
+          },
+        });
+
+        waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS)
+          .then(done)
+          .catch(done.fail);
       });
 
-      describe('with reports disabled', () => {
-        beforeEach(() => {
-          createWrapper(
-            {
-              ...props,
-              enabledReports: {
-                dast: false,
-              },
-            },
-            provide,
-          );
-        });
-
-        it('should not render the widget', () => {
-          expect(wrapper.vm.$el.querySelector('.js-dast-widget')).toBeNull();
-        });
+      it('should set setDastDiffEndpoint', () => {
+        expect(wrapper.vm.dast.paths.diffEndpoint).toEqual(dastEndpoint);
       });
 
-      describe('with reports enabled', () => {
-        beforeEach(done => {
-          createWrapper(
-            {
-              ...props,
-              enabledReports: {
-                dast: true,
-              },
-            },
-            provide,
-          );
+      it('should display the correct numbers of vulnerabilities', () => {
+        expect(wrapper.vm.$el.textContent).toContain(
+          'DAST detected 1 new, and 2 fixed vulnerabilities',
+        );
+      });
 
-          waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS)
-            .then(done)
-            .catch(done.fail);
-        });
-
-        it('should set setDastDiffEndpoint', () => {
-          expect(wrapper.vm.dast.paths.diffEndpoint).toEqual(dastEndpoint);
-        });
-
-        it('should display the correct numbers of vulnerabilities', () => {
-          expect(wrapper.vm.$el.textContent).toContain(
-            'DAST detected 1 new, and 2 fixed vulnerabilities',
-          );
-        });
-
-        it('should display out of date message', () => {
-          expect(wrapper.vm.$el.textContent).toContain(
-            'Security report is out of date. Retry the pipeline for the target branch',
-          );
-        });
+      it('should display out of date message', () => {
+        expect(wrapper.vm.$el.textContent).toContain(
+          'Security report is out of date. Retry the pipeline for the target branch',
+        );
       });
     });
 

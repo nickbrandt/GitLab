@@ -269,20 +269,11 @@ export default {
       this.fetchSastContainerReports();
     }
 
-    const dastDiffEndpoint = gl && gl.mrWidgetData && gl.mrWidgetData.dast_comparison_path;
+    // eslint-disable-next-line camelcase
+    this.setDastDiffEndpoint(gl?.mrWidgetData?.dast_comparison_path);
+    this.fetchDastDiff();
 
-    if (this.isMergeRequestReportApiEnabled('dast') && dastDiffEndpoint && this.hasDastReports) {
-      this.setDastDiffEndpoint(dastDiffEndpoint);
-      this.fetchDastDiff();
-    } else if (this.dastHeadPath) {
-      this.setDastHeadPath(this.dastHeadPath);
-
-      if (this.dastBasePath) {
-        this.setDastBasePath(this.dastBasePath);
-      }
-      this.fetchDastReports();
-    }
-
+    // eslint-disable-next-line camelcase
     this.setDependencyScanningDiffEndpoint(gl?.mrWidgetData?.dependency_scanning_comparison_path);
     this.fetchDependencyScanningDiff();
   },
@@ -294,10 +285,7 @@ export default {
       'setSourceBranch',
       'setSastContainerHeadPath',
       'setSastContainerBasePath',
-      'setDastHeadPath',
-      'setDastBasePath',
       'fetchSastContainerReports',
-      'fetchDastReports',
       'setVulnerabilityFeedbackPath',
       'setVulnerabilityFeedbackHelpPath',
       'setCreateVulnerabilityFeedbackIssuePath',
@@ -332,7 +320,7 @@ export default {
       fetchSastDiff: 'fetchDiff',
     }),
     isMergeRequestReportApiEnabled(type) {
-      if (['dependencyScanning'].includes(type)) {
+      if (['dependencyScanning', 'dast'].includes(type)) {
         return true;
       }
 
