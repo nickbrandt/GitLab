@@ -77,7 +77,7 @@ describe('ee/ide/components/terminal_sync/terminal_sync_status', () => {
     });
 
     it('shows message', () => {
-      expect(wrapper.attributes('data-original-title')).toContain(statusMessage);
+      expect(wrapper.attributes('title')).toContain(statusMessage);
     });
 
     if (!icon) {

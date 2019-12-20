@@ -1,5 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`GeoDesignTimeAgo template when dateString exists TimeAgo sets innerHTML as 09-23-1994 1`] = `"<time title=\\"\\" class=\\"\\" data-original-title=\\"Sep 23, 1994 12:00am GMT+0000\\">25 years ago</time>"`;
+exports[`GeoDesignTimeAgo template when dateString exists TimeAgo sets innerHTML as 09-23-1994 1`] = `"<time title=\\"Sep 23, 1994 12:00am GMT+0000\\" class=\\"\\">25 years ago</time>"`;
 
 exports[`GeoDesignTimeAgo template when dateString is null DefaultText sets innerHTML as props.defaultText 1`] = `"<span>Default Text</span>"`;
