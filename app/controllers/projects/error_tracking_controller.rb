@@ -38,21 +38,6 @@ class Projects::ErrorTrackingController < Projects::ErrorTracking::BaseControlle
 
   private
 
-  def render_sentry_project_settings_json
-    service = ErrorTracking::ProjectSettingsService.new(
-      project,
-      current_user
-    )
-    result = service.execute
-
-    return if handle_errors(result)
-
-    render json: {
-      project_name: result[:project_name],
-      sentry_api_url: result[:sentry_api_url]
-    }
-  end
-
   def render_index_json
     service = ErrorTracking::ListIssuesService.new(
       project,

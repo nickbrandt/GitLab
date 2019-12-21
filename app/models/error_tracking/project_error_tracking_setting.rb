@@ -85,13 +85,6 @@ module ErrorTracking
       end
     end
 
-    def sentry_project_settings
-      {
-        project_name: self.project_name,
-        sentry_api_url: self.sentry_external_url
-      }
-    end
-
     def list_sentry_projects
       { projects: sentry_client.projects }
     end
