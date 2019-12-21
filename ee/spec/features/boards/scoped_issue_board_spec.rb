@@ -132,8 +132,8 @@ describe 'Scoped issue boards', :js do
           filtered_search.click
 
           page.within('#js-dropdown-hint') do
-            expect(page).to have_content('label')
-            expect(page).not_to have_content('assignee')
+            expect(page).to have_content('Label')
+            expect(page).not_to have_content('Assignee')
           end
         end
 
@@ -164,8 +164,8 @@ describe 'Scoped issue boards', :js do
           filtered_search.click
 
           page.within('#js-dropdown-hint') do
-            expect(page).to have_content('label')
-            expect(page).not_to have_content('weight')
+            expect(page).to have_content('Label')
+            expect(page).not_to have_content('Weight')
           end
         end
 
@@ -244,8 +244,8 @@ describe 'Scoped issue boards', :js do
           filtered_search.click
 
           page.within('#js-dropdown-hint') do
-            expect(page).to have_content('label')
-            expect(page).not_to have_content('milestone')
+            expect(page).to have_content('Label')
+            expect(page).not_to have_content('Milestone')
           end
         end
       end
@@ -293,7 +293,7 @@ describe 'Scoped issue boards', :js do
 
           update_board_label(label_title)
 
-          input_filtered_search("label:~#{label_2_title}")
+          input_filtered_search("label=~#{label_2_title}")
 
           expect(page).to have_selector('.board-card', count: 0)
         end
@@ -338,8 +338,8 @@ describe 'Scoped issue boards', :js do
           filtered_search.click
 
           page.within('#js-dropdown-hint') do
-            expect(page).to have_content('label')
-            expect(page).not_to have_content('assignee')
+            expect(page).to have_content('Label')
+            expect(page).not_to have_content('Assignee')
           end
         end
       end
@@ -365,8 +365,8 @@ describe 'Scoped issue boards', :js do
           filtered_search.click
 
           page.within('#js-dropdown-hint') do
-            expect(page).to have_content('label')
-            expect(page).not_to have_content('weight')
+            expect(page).to have_content('Label')
+            expect(page).not_to have_content('Weight')
           end
         end
       end

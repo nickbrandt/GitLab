@@ -21,7 +21,7 @@ describe 'Dropdown weight', :js do
 
   describe 'behavior' do
     it 'loads all the weights when opened' do
-      input_filtered_search('weight:', submit: false, extra_space: false)
+      input_filtered_search('weight=', submit: false, extra_space: false)
 
       expect_filtered_search_dropdown_results(filter_dropdown, 21)
     end
