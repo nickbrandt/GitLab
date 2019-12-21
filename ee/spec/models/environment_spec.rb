@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Environment, :use_clean_rails_memory_store_caching do
   include ReactiveCachingHelpers
 
-  let(:project) { create(:project, :stubbed_repository) }
+  let(:project) { create(:project, :repository) }
   let(:environment) { create(:environment, project: project) }
 
   describe '.deployed_to_cluster' do
@@ -211,10 +211,9 @@ describe Environment, :use_clean_rails_memory_store_caching do
   end
 
   describe '#rollout_status' do
-    let(:cluster) { create(:cluster, :project, :provided_by_user) }
-    let(:project) { cluster.project }
-    let(:environment) { create(:environment, project: project) }
-    let!(:deployment) { create(:deployment, :success, environment: environment) }
+    let!(:cluster) { create(:cluster, :project, :provided_by_user, projects: [project]) }
+    let!(:environment) { create(:environment, project: project) }
+    let!(:deployment) { create(:deployment, :success, environment: environment, project: project) }
 
     subject { environment.rollout_status }
 
