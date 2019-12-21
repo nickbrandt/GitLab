@@ -58,7 +58,7 @@ describe('Issues Filtered Search Token Keys (EE)', () => {
   describe('searchBySymbol', () => {
     it('should return weight tokenKey when found by weight symbol', () => {
       const tokenKeys = IssuableFilteredSearchTokenKeys.get();
-      const match = tokenKeys.find(tk => tk.key === weightTokenKey.key);
+      const match = tokenKeys.find(tk => tk.symbol === weightTokenKey.symbol);
       const result = IssuableFilteredSearchTokenKeys.searchBySymbol(weightTokenKey.symbol);
 
       expect(result).toEqual(match);
