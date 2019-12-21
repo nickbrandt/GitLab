@@ -102,13 +102,6 @@ describe('EE Approvals App', () => {
         expect(findRules().exists()).toBe(true);
       });
 
-      it('shows loading icon if loading', () => {
-        store.modules.approvals.state.isLoading = true;
-        factory();
-
-        expect(findLoadingIcon().exists()).toBe(true);
-      });
-
       it('does not show loading icon if not loading', () => {
         store.modules.approvals.state.isLoading = false;
         factory();
@@ -148,14 +141,6 @@ describe('EE Approvals App', () => {
           null,
           undefined,
         );
-      });
-
-      it('shows loading icon and rules if loading', () => {
-        store.modules.approvals.state.isLoading = true;
-        factory();
-
-        expect(findRules().exists()).toBe(true);
-        expect(findLoadingIcon().exists()).toBe(true);
       });
     });
   });

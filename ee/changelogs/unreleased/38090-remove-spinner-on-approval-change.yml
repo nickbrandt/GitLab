@@ -1,0 +1,5 @@
+---
+title: Remove spinner when approval require input is changed
+merge_request: 22186
+author:
+type: fixed
