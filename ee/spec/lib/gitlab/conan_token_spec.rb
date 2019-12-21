@@ -16,37 +16,57 @@ describe Gitlab::ConanToken do
     allow(Settings).to receive(:attr_encrypted_db_key_base).and_return(base_secret)
   end
 
-  def build_jwt(personal_access_token_id:, user_id:)
+  def build_jwt(access_token_id:, user_id:, expire_time: nil)
     JSONWebToken::HMACToken.new(jwt_secret).tap do |jwt|
-      jwt['pat'] = personal_access_token_id
-      jwt['u'] = user_id || user_id
-      jwt.expire_time = jwt.issued_at + 1.hour
+      jwt['access_token'] = access_token_id
+      jwt['user_id'] = user_id || user_id
+      jwt.expire_time = expire_time || jwt.issued_at + 1.hour
     end
   end
 
   describe '.from_personal_access_token' do
-    it 'sets personal access token id and user id' do
-      personal_access_token = double(id: 123, user_id: 456)
+    it 'sets access token id and user id' do
+      access_token = double(id: 123, user_id: 456)
 
-      token = described_class.from_personal_access_token(personal_access_token)
+      token = described_class.from_personal_access_token(access_token)
 
-      expect(token.personal_access_token_id).to eq(123)
+      expect(token.access_token_id).to eq(123)
+      expect(token.user_id).to eq(456)
+    end
+  end
+
+  describe '.from_job' do
+    it 'sets access token id and user id' do
+      user = double(id: 456)
+      job = double(token: 123, user: user)
+
+      token = described_class.from_job(job)
+
+      expect(token.access_token_id).to eq(123)
       expect(token.user_id).to eq(456)
     end
   end
 
   describe '.decode' do
-    it 'sets personal access token id and user id' do
-      jwt = build_jwt(personal_access_token_id: 123, user_id: 456)
+    it 'sets access token id and user id' do
+      jwt = build_jwt(access_token_id: 123, user_id: 456)
 
       token = described_class.decode(jwt.encoded)
 
-      expect(token.personal_access_token_id).to eq(123)
+      expect(token.access_token_id).to eq(123)
       expect(token.user_id).to eq(456)
     end
 
     it 'returns nil for invalid JWT' do
       expect(described_class.decode('invalid-jwt')).to be_nil
+    end
+
+    it 'returns nil for expired JWT' do
+      jwt = build_jwt(access_token_id: 123,
+                      user_id: 456,
+                      expire_time: Time.zone.now - 2.hours)
+
+      expect(described_class.decode(jwt.encoded)).to be_nil
     end
   end
 
@@ -55,9 +75,9 @@ describe Gitlab::ConanToken do
       allow(SecureRandom).to receive(:uuid).and_return('u-u-i-d')
 
       Timecop.freeze do
-        jwt = build_jwt(personal_access_token_id: 123, user_id: 456)
+        jwt = build_jwt(access_token_id: 123, user_id: 456)
 
-        token = described_class.new(personal_access_token_id: 123, user_id: 456)
+        token = described_class.new(access_token_id: 123, user_id: 456)
 
         expect(token.to_jwt).to eq(jwt.encoded)
       end
