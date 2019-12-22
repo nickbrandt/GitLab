@@ -140,7 +140,7 @@ describe Gitlab::Database::LoadBalancing do
 
     it 'returns false when Sidekiq is being used' do
       allow(described_class).to receive(:hosts).and_return(%w(foo))
-      allow(Sidekiq).to receive(:server?).and_return(true)
+      allow(Gitlab::Runtime).to receive(:sidekiq?).and_return(true)
 
       expect(described_class.enable?).to eq(false)
     end
@@ -153,14 +153,14 @@ describe Gitlab::Database::LoadBalancing do
 
     it 'returns true when load balancing should be enabled' do
       allow(described_class).to receive(:hosts).and_return(%w(foo))
-      allow(Sidekiq).to receive(:server?).and_return(false)
+      allow(Gitlab::Runtime).to receive(:sidekiq?).and_return(false)
 
       expect(described_class.enable?).to eq(true)
     end
 
     it 'returns true when service discovery is enabled' do
       allow(described_class).to receive(:hosts).and_return([])
-      allow(Sidekiq).to receive(:server?).and_return(false)
+      allow(Gitlab::Runtime).to receive(:sidekiq?).and_return(false)
 
       allow(described_class)
         .to receive(:service_discovery_enabled?)
@@ -192,7 +192,7 @@ describe Gitlab::Database::LoadBalancing do
 
       it 'is enabled' do
         allow(described_class).to receive(:hosts).and_return(%w(foo))
-        allow(Sidekiq).to receive(:server?).and_return(false)
+        allow(Gitlab::Runtime).to receive(:sidekiq?).and_return(false)
 
         expect(described_class.enable?).to eq(true)
       end
