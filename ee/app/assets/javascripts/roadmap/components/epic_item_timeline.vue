@@ -31,27 +31,29 @@ export default {
       required: true,
     },
   },
-  data() {
-    const { startDate, endDate } = this.epic;
+  computed: {
+    epicStartDateValues() {
+      const { startDate } = this.epic;
 
-    return {
-      epicStartDateValues: {
+      return {
         day: startDate.getDay(),
         date: startDate.getDate(),
         month: startDate.getMonth(),
         year: startDate.getFullYear(),
         time: startDate.getTime(),
-      },
-      epicEndDateValues: {
+      };
+    },
+    epicEndDateValues() {
+      const { endDate } = this.epic;
+
+      return {
         day: endDate.getDay(),
         date: endDate.getDate(),
         month: endDate.getMonth(),
         year: endDate.getFullYear(),
         time: endDate.getTime(),
-      },
-    };
-  },
-  computed: {
+      };
+    },
     hasStartDate() {
       if (this.presetType === PRESET_TYPES.QUARTERS) {
         return this.hasStartDateForQuarter();

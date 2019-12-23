@@ -33,29 +33,37 @@ describe('EpicItemTimelineComponent', () => {
     vm.$destroy();
   });
 
-  describe('data', () => {
-    it('returns default data props', () => {
+  describe('computed', () => {
+    beforeEach(() => {
       vm = createComponent({});
+    });
 
-      expect(vm.epicStartDateValues).toEqual(
-        jasmine.objectContaining({
-          day: mockEpic.startDate.getDay(),
-          date: mockEpic.startDate.getDate(),
-          month: mockEpic.startDate.getMonth(),
-          year: mockEpic.startDate.getFullYear(),
-          time: mockEpic.startDate.getTime(),
-        }),
-      );
+    describe('epicStartDateValues', () => {
+      it('returns object containing date parts from epic.startDate', () => {
+        expect(vm.epicStartDateValues).toEqual(
+          jasmine.objectContaining({
+            day: mockEpic.startDate.getDay(),
+            date: mockEpic.startDate.getDate(),
+            month: mockEpic.startDate.getMonth(),
+            year: mockEpic.startDate.getFullYear(),
+            time: mockEpic.startDate.getTime(),
+          }),
+        );
+      });
+    });
 
-      expect(vm.epicEndDateValues).toEqual(
-        jasmine.objectContaining({
-          day: mockEpic.endDate.getDay(),
-          date: mockEpic.endDate.getDate(),
-          month: mockEpic.endDate.getMonth(),
-          year: mockEpic.endDate.getFullYear(),
-          time: mockEpic.endDate.getTime(),
-        }),
-      );
+    describe('epicEndDateValues', () => {
+      it('returns object containing date parts from epic.endDate', () => {
+        expect(vm.epicEndDateValues).toEqual(
+          jasmine.objectContaining({
+            day: mockEpic.endDate.getDay(),
+            date: mockEpic.endDate.getDate(),
+            month: mockEpic.endDate.getMonth(),
+            year: mockEpic.endDate.getFullYear(),
+            time: mockEpic.endDate.getTime(),
+          }),
+        );
+      });
     });
   });
 
