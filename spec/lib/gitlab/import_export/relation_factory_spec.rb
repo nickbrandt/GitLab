@@ -120,9 +120,9 @@ describe Gitlab::ImportExport::RelationFactory do
 
     let(:members_mapper) do
       Gitlab::ImportExport::MembersMapper.new(
-          exported_members: [exported_member],
-          user: user,
-          importable: project)
+        exported_members: [exported_member],
+        user: user,
+        importable: project)
     end
 
     let(:relation_hash) do
@@ -133,7 +133,7 @@ describe Gitlab::ImportExport::RelationFactory do
           'source_project_id' => project.id,
           'target_project_id' => project.id,
           'author_id' => user.id,
-          'assignee_id'=> user.id,
+          'assignee_id' => user.id,
           'updated_by_id' => user.id,
           'title' => "MR1",
           'created_at' => "2016-06-14T15:02:36.568Z",
