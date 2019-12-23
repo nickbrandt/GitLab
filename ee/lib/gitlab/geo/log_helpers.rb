@@ -25,7 +25,12 @@ module Gitlab
           class: self.class.name,
           message: message,
           job_id: get_sidekiq_job_id
-        }.compact
+        }.merge(extra_log_data).compact
+      end
+
+      # Intended to be overidden elsewhere
+      def extra_log_data
+        {}
       end
 
       def geo_logger
