@@ -26,18 +26,3 @@ RSpec::Matchers.define :be_scheduled_migration do |*expected|
     "Migration `#{migration}` with args `#{expected.inspect}` not scheduled!"
   end
 end
-
-RSpec::Matchers.define :be_scheduled_delayed_migration_with_array do |delay, expected|
-  match do |migration|
-    BackgroundMigrationWorker.jobs.any? do |job|
-      job['args'][0] == migration &&
-        RSpec::Matchers::BuiltIn::ContainExactly.new(expected).matches?(job['args'][1]) &&
-        job['at'].to_i == (delay.to_i + Time.now.to_i)
-    end
-  end
-
-  failure_message do |migration|
-    "Migration `#{migration}` with args `#{expected.inspect}` " \
-      'not scheduled in expected time!'
-  end
-end

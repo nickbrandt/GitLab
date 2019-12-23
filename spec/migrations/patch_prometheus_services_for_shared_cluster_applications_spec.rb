@@ -6,8 +6,6 @@ require Rails.root.join('db', 'post_migrate', '20191220102807_patch_prometheus_s
 describe PatchPrometheusServicesForSharedClusterApplications, :migration, :sidekiq do
   include MigrationHelpers::PrometheusServiceHelpers
 
-  let(:migration_class) { Gitlab::BackgroundMigration::ActivatePrometheusServicesForSharedClusterApplications }
-  let(:migration_name) { migration_class.to_s.demodulize }
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
   let(:services) { table(:services) }
