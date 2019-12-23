@@ -27,8 +27,6 @@ module EE
 
       rule { admin & pages_size_limit_available }.enable :update_max_pages_size
 
-      rule { support_bot }.prevent :use_quick_actions
-
       rule { ~anonymous }.policy do
         enable :view_productivity_analytics
         enable :view_code_analytics
