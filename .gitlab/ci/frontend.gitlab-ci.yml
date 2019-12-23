@@ -4,6 +4,8 @@
       - vendor/ruby/
       - .yarn-cache/
       - tmp/cache/assets/sprockets
+      - tmp/cache/babel-loader
+      - tmp/cache/vue-loader
 
 .gitlab:assets:compile-metadata:
   extends:
