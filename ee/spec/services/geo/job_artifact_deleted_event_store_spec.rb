@@ -39,7 +39,6 @@ describe Geo::JobArtifactDeletedEventStore do
           class: "Geo::JobArtifactDeletedEventStore",
           host: "localhost",
           job_artifact_id: invalid_job_artifact.id,
-          file_path: nil,
           project_id: project.id,
           project_path: project.full_path,
           storage_version: project.storage_version,

@@ -39,7 +39,6 @@ describe Geo::LfsObjectDeletedEventStore do
           class: "Geo::LfsObjectDeletedEventStore",
           host: "localhost",
           lfs_object_id: invalid_lfs_object.id,
-          file_path: nil,
           message: "Lfs object deleted event could not be created",
           error: "Validation failed: File path can't be blank"
         }
