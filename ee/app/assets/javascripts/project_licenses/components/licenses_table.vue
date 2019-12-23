@@ -32,8 +32,8 @@ export default {
   <div>
     <div class="gl-responsive-table-row table-row-header text-2 bg-secondary-50 px-2" role="row">
       <div
-        v-for="(header, index) in tableHeaders"
-        :key="index"
+        v-for="header in tableHeaders"
+        :key="header.label"
         class="table-section"
         :class="header.className"
         role="rowheader"
@@ -43,8 +43,8 @@ export default {
     </div>
 
     <licenses-table-row
-      v-for="(license, index) in licenses"
-      :key="index"
+      v-for="license in licenses"
+      :key="license.key"
       :license="license"
       :is-loading="isLoading"
     />
