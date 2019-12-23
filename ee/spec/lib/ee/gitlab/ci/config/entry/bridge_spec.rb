@@ -46,7 +46,28 @@ describe Gitlab::Ci::Config::Entry::Bridge do
                                       needs: { bridge: [{ pipeline: 'some/project' }] },
                                       ignore: false,
                                       stage: 'test',
-                                      only: { refs: %w[branches tags] })
+                                      only: { refs: %w[branches tags] },
+                                      scheduling_type: :stage)
+        end
+      end
+    end
+
+    context 'when needs config is a job' do
+      let(:config) { { trigger: { project: 'some/project' }, needs: ['some_job'] } }
+
+      describe '#valid?' do
+        it { is_expected.to be_valid }
+      end
+
+      describe '#value' do
+        it 'is returns a bridge job configuration' do
+          expect(subject.value).to eq(name: :my_bridge,
+                                      trigger: { project: 'some/project' },
+                                      needs: { job: [{ name: 'some_job', artifacts: true }] },
+                                      ignore: false,
+                                      stage: 'test',
+                                      only: { refs: %w[branches tags] },
+                                      scheduling_type: :dag)
         end
       end
     end

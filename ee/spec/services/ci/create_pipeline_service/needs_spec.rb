@@ -49,4 +49,10 @@ describe Ci::CreatePipelineService do
 
     expect(bridge.downstream_project).to eq downstream_project
   end
+
+  it "sets scheduling_type of bridge_dag_job as 'dag'" do
+    bridge = execute.stages.last.bridges.first
+
+    expect(bridge.scheduling_type).to eq('dag')
+  end
 end
