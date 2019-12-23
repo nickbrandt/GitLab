@@ -160,6 +160,8 @@ graph RL;
 
 subgraph "`prepare` stage"
     A
+    B
+    C
     F
     K
     J
@@ -167,8 +169,6 @@ subgraph "`prepare` stage"
     end
 
 subgraph "`test` stage"
-    B --> |needs| A;
-    C --> |needs| A;
     D --> |needs| A;
     H -.-> |needs and depends on| A;
     H -.-> |needs and depends on| K;
