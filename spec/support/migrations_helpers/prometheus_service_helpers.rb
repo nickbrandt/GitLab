@@ -25,5 +25,11 @@ module MigrationHelpers
         deployment_events: false
       }.merge(params)
     end
+
+    def row_attributes(entity)
+      entity.attributes.with_indifferent_access.tap do |hash|
+        hash.merge!(hash.slice(:created_at, :updated_at).transform_values { |v| v.to_s(:db) })
+      end
+    end
   end
 end
