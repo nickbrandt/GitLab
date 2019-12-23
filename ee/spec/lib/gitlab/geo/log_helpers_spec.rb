@@ -23,6 +23,7 @@ describe Gitlab::Geo::LogHelpers do
   context 'Sidekiq context' do
     it 'does not log empty job_id when running outside of job' do
       expect(Gitlab::Geo::Logger).to receive(:error).with({ class: 'FakeLogHelpersConsumer',
+                                                            host: 'localhost',
                                                             message: 'Test message' })
 
       FakeLogHelpersConsumer.new.execute
@@ -30,6 +31,7 @@ describe Gitlab::Geo::LogHelpers do
 
     it 'logs sidekiq_context' do
       expect(Gitlab::Geo::Logger).to receive(:error).with({ class: 'FakeLogHelpersConsumer',
+                                                            host: 'localhost',
                                                             message: 'Test message',
                                                             job_id: '5b9b108c7558fe3c32cc61a5' })
 

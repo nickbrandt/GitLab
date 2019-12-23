@@ -37,6 +37,7 @@ describe Geo::LfsObjectDeletedEventStore do
 
         expected_message = {
           class: "Geo::LfsObjectDeletedEventStore",
+          host: "localhost",
           lfs_object_id: invalid_lfs_object.id,
           file_path: nil,
           message: "Lfs object deleted event could not be created",

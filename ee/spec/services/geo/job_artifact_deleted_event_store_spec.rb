@@ -37,6 +37,7 @@ describe Geo::JobArtifactDeletedEventStore do
 
         expected_message = {
           class: "Geo::JobArtifactDeletedEventStore",
+          host: "localhost",
           job_artifact_id: invalid_job_artifact.id,
           file_path: nil,
           project_id: project.id,
