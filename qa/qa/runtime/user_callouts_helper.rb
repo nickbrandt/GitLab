@@ -35,7 +35,7 @@ module QA
         request_status = Capybara.page.evaluate_script('xhr.status').to_i
 
         unless request_status == 200
-          Runtime::Logger.debug("Request returned status: #{200}")
+          Runtime::Logger.debug("Request returned status: #{request_status}")
           return false
         end
 
