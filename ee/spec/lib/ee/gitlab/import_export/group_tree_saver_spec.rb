@@ -17,7 +17,6 @@ describe Gitlab::ImportExport::GroupTreeSaver do
     let(:group_tree_saver) { described_class.new(group: group, current_user: user, shared: shared) }
 
     let(:saved_group_json) do
-      group_tree_saver.save
       group_json(group_tree_saver.full_path)
     end
 
@@ -30,15 +29,18 @@ describe Gitlab::ImportExport::GroupTreeSaver do
     end
 
     it 'saves successfully' do
-      expect(group_tree_saver.save).to be true
+      expect_successful_save(group_tree_saver)
     end
 
     context 'epics relation' do
       it 'saves top level epics' do
+        expect_successful_save(group_tree_saver)
         expect(saved_group_json['epics'].size).to eq(2)
       end
 
       it 'saves parent of epic' do
+        expect_successful_save(group_tree_saver)
+
         parent = saved_group_json['epics'].first['parent']
 
         expect(parent).not_to be_empty
@@ -46,6 +48,8 @@ describe Gitlab::ImportExport::GroupTreeSaver do
       end
 
       it 'saves epic notes' do
+        expect_successful_save(group_tree_saver)
+
         notes = saved_group_json['epics'].first['notes']
 
         expect(notes).not_to be_empty
@@ -56,20 +60,29 @@ describe Gitlab::ImportExport::GroupTreeSaver do
 
     context 'boards relation' do
       it 'saves top level boards' do
+        expect_successful_save(group_tree_saver)
         expect(saved_group_json['boards'].size).to eq(1)
       end
 
       it 'saves board assignee' do
+        expect_successful_save(group_tree_saver)
         expect(saved_group_json['boards'].first['board_assignee']['assignee_id']).to eq(user.id)
       end
 
       it 'saves board labels' do
+        expect_successful_save(group_tree_saver)
+
         labels = saved_group_json['boards'].first['labels']
 
         expect(labels).not_to be_empty
         expect(labels.first['title']).to eq(label.title)
       end
     end
+  end
+
+  def expect_successful_save(group_tree_saver)
+    expect(group_tree_saver.save).to be true
+    expect(group_tree_saver.shared.errors).to be_empty
   end
 
   def group_json(filename)
