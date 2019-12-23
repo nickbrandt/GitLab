@@ -1,5 +1,6 @@
 import * as types from 'ee/project_licenses/store/modules/list/mutation_types';
 import mutations from 'ee/project_licenses/store/modules/list/mutations';
+import { toLicenseObject } from 'ee/project_licenses/utils/mappers';
 import getInitialState from 'ee/project_licenses/store/modules/list/state';
 import { REPORT_STATUS } from 'ee/project_licenses/store/modules/list/constants';
 import { TEST_HOST } from 'helpers/test_constants';
@@ -31,7 +32,7 @@ describe('Licenses mutations', () => {
   });
 
   describe(types.RECEIVE_LICENSES_SUCCESS, () => {
-    const licenses = [];
+    const licenses = [{ id: 1 }, { id: 2 }];
     const pageInfo = {};
     const reportInfo = {
       status: REPORT_STATUS.jobFailed,
@@ -45,7 +46,7 @@ describe('Licenses mutations', () => {
     it('correctly mutates the state', () => {
       expect(state.isLoading).toBe(false);
       expect(state.errorLoading).toBe(false);
-      expect(state.licenses).toBe(licenses);
+      expect(state.licenses).toEqual(licenses.map(toLicenseObject));
       expect(state.pageInfo).toBe(pageInfo);
       expect(state.initialized).toBe(true);
       expect(state.reportInfo).toEqual({
