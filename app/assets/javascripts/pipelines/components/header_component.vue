@@ -122,7 +122,7 @@ export default {
       <p>
         {{
           __(
-            'Are you sure you want to delete this pipeline? Doing so will expire all pipeline caches and delete all related objects, such as builds, logs, artifacts and triggers. This action cannot be undone.',
+            'Are you sure you want to delete this pipeline? Doing so will expire all pipeline caches and delete all related objects, such as builds, logs, artifacts, and triggers. This action cannot be undone.',
           )
         }}
       </p>

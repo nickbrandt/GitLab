@@ -424,7 +424,7 @@ page, then using the **Delete** button.
 
 CAUTION: **Warning:**
 Deleting a pipeline will expire all pipeline caches, and delete all related objects,
-such as builds, logs, artifacts and triggers. **This action cannot be undone.**
+such as builds, logs, artifacts, and triggers. **This action cannot be undone.**
 
 ## Most Recent Pipeline
 
