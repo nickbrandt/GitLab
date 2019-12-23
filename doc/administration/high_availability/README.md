@@ -250,13 +250,8 @@ vendors a best effort like for like can be used.
 
 - **Supported Users (approximate):** 5,000
 - **Test RPS Rates:** API: 100 RPS, Web: 10 RPS, Git: 10 RPS
-- **Status:** Work-in-progress
 - **Known Issues:** For the latest list of known performance issues head
 [here](https://gitlab.com/gitlab-org/gitlab/issues?label_name%5B%5D=Quality%3Aperformance-issues).
-
-NOTE: **Note:**  This architecture is a work-in-progress of the work so far. The
-Quality team will be certifying this environment in late 2019 or early 2020. The specifications
-may be adjusted prior to certification based on performance testing.
 
 | Service                     | Nodes | Configuration         | GCP type      |
 | ----------------------------|-------|-----------------------|---------------|
