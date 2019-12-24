@@ -167,10 +167,7 @@ schedule:review-deploy:
     - .only-review-schedules
 
 .base-review-stop:
-  extends:
-    - .review-workflow-base
-    - .only-review
-    - .only:changes-code-qa
+  extends: .review-workflow-base
   environment:
     action: stop
   variables:
@@ -187,13 +184,20 @@ schedule:review-deploy:
 review-stop-failed-deployment:
   extends: .base-review-stop
   stage: prepare
+  rules:
+    - <<: *if-canonical-gitlab-and-merge-request
+      changes: *code-qa-patterns
+      when: on_success
   script:
     - delete_failed_release
 
 review-stop:
   extends: .base-review-stop
   stage: review
-  when: manual
+  rules:
+    - <<: *if-canonical-gitlab-and-merge-request
+      changes: *code-qa-patterns
+      when: manual
   allow_failure: true
   script:
     - delete_release
