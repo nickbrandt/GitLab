@@ -3,6 +3,10 @@
 require 'spec_helper'
 
 describe GitlabSubscription do
+  %i[free_plan bronze_plan silver_plan gold_plan early_adopter_plan].each do |plan|
+    let_it_be(plan) { create(plan) }
+  end
+
   describe 'default values' do
     it do
       Timecop.freeze(Date.today + 30) do
@@ -26,6 +30,23 @@ describe GitlabSubscription do
     it { is_expected.to belong_to(:hosted_plan) }
   end
 
+  describe 'scopes' do
+    describe '.with_hosted_plan' do
+      let!(:gold_subscription) { create(:gitlab_subscription, hosted_plan: gold_plan) }
+      let!(:silver_subscription) { create(:gitlab_subscription, hosted_plan: silver_plan) }
+      let!(:early_adopter_subscription) { create(:gitlab_subscription, hosted_plan: early_adopter_plan) }
+
+      let!(:trial_subscription) { create(:gitlab_subscription, hosted_plan: gold_plan, trial: true) }
+
+      it 'scopes to the plan' do
+        expect(described_class.with_hosted_plan('gold')).to contain_exactly(gold_subscription)
+        expect(described_class.with_hosted_plan('silver')).to contain_exactly(silver_subscription)
+        expect(described_class.with_hosted_plan('early_adopter')).to contain_exactly(early_adopter_subscription)
+        expect(described_class.with_hosted_plan('bronze')).to be_empty
+      end
+    end
+  end
+
   describe '#seats_in_use' do
     let!(:user_1)         { create(:user) }
     let!(:user_2)         { create(:user) }
@@ -37,12 +58,6 @@ describe GitlabSubscription do
     let!(:subgroup_1)          { create(:group, parent: group) }
     let!(:subgroup_2)          { create(:group, parent: group) }
     let!(:gitlab_subscription) { create(:gitlab_subscription, namespace: group) }
-
-    before do
-      %i[free_plan bronze_plan silver_plan gold_plan].each do |plan|
-        create(plan)
-      end
-    end
 
     it 'returns count of members' do
       group.add_developer(user_1)
@@ -116,8 +131,6 @@ describe GitlabSubscription do
   end
 
   describe '#seats_owed' do
-    let!(:bronze_plan)         { create(:bronze_plan) }
-    let!(:early_adopter_plan)  { create(:early_adopter_plan) }
     let!(:gitlab_subscription) { create(:gitlab_subscription, subscription_attrs) }
 
     before do
@@ -262,8 +275,7 @@ describe GitlabSubscription do
     context 'after_destroy_commit' do
       it 'logs previous state to gitlab subscription history' do
         group = create(:group)
-        plan = create(:bronze_plan)
-        subject.update! max_seats_used: 37, seats: 11, namespace: group, hosted_plan: plan
+        subject.update! max_seats_used: 37, seats: 11, namespace: group, hosted_plan: bronze_plan
         db_created_at = described_class.last.created_at
 
         subject.destroy!
@@ -275,7 +287,7 @@ describe GitlabSubscription do
           'max_seats_used' => 37,
           'seats' => 11,
           'namespace_id' => group.id,
-          'hosted_plan_id' => plan.id,
+          'hosted_plan_id' => bronze_plan.id,
           'gitlab_subscription_created_at' => db_created_at
         )
       end
