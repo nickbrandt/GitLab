@@ -5,7 +5,7 @@ module EE::Projects::UpdatePagesService
 
   override :max_size_from_settings
   def max_size_from_settings
-    return super unless project.feature_available?(:pages_size_limit)
+    return super unless License.feature_available?(:pages_size_limit)
 
     project.closest_setting(:max_pages_size).megabytes
   end
