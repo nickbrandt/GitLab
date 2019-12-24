@@ -271,10 +271,11 @@ review-qa-all:
       performance: performance.json
 
 review-performance:
-  extends:
-    - .review-performance-base
-    - .only-review
-    - .only:changes-code-qa
+  extends: .review-performance-base
+  rules:
+    - <<: *if-canonical-gitlab-and-merge-request
+      changes: *code-qa-patterns
+      when: on_success
   needs: ["review-deploy"]
   dependencies: ["review-deploy"]
   before_script:
