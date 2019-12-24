@@ -5742,10 +5742,8 @@ msgstr ""
 msgid "CycleAnalyticsStage|should be under a group"
 msgstr ""
 
-msgid "CycleAnalytics|%d project selected"
-msgid_plural "CycleAnalytics|%d projects selected"
-msgstr[0] ""
-msgstr[1] ""
+msgid "CycleAnalytics|%{projectCount} projects selected"
+msgstr ""
 
 msgid "CycleAnalytics|%{stageCount} stages selected"
 msgstr ""
