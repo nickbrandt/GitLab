@@ -131,6 +131,8 @@ module Gitlab
       end
 
       def preload_keys(object, references, value)
+        return object unless value
+
         references.each do |key|
           attribute = key.delete_suffix('_id').to_sym
           next unless object.respond_to?(key) && object.respond_to?(attribute)
