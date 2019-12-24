@@ -66,6 +66,7 @@ module QA
 
         def add_comment_to_diff(text)
           retry_on_exception(reload: true) do
+            finished_loading?
             wait(interval: 5) do
               has_text?("No newline at end of file")
             end
