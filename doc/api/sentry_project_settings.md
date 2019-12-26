@@ -1,8 +1,8 @@
 # Sentry Project Settings API
 
-## Sentry Error Tracking Project Settings 
+## Sentry Error Tracking Project Settings
 
-The Sentry Project Settings API allows you to retrieve sentry error tracking settings for a project.
+The Sentry Project Settings API allows you to retrieve Sentry Error Tracking Settings for a Project.
 
 ### Retrieve Sentry Error Tracking Settings
 
@@ -19,6 +19,7 @@ curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/ap
 ```
 
 Example response:
+
 ```json
 {
   "project_name": "sample sentry project",
