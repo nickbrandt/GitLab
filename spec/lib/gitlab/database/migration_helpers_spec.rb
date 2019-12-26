@@ -325,6 +325,25 @@ describe Gitlab::Database::MigrationHelpers do
           end
         end
       end
+
+      describe 'validate option' do
+        args = [:projects, :users]
+        options = { column: :user_id, on_delete: nil }
+
+        context 'when validate is supplied with a falsey value' do
+          it_behaves_like 'skips validation', args, options.merge(validate: false)
+          it_behaves_like 'skips validation', args, options.merge(validate: nil)
+        end
+
+        context 'when validate is supplied with a truthy value' do
+          it_behaves_like 'performs validation', args, options.merge(validate: true)
+          it_behaves_like 'performs validation', args, options.merge(validate: :yes)
+        end
+
+        context 'when validate is not supplied' do
+          it_behaves_like 'performs validation', args, options
+        end
+      end
     end
   end
 
