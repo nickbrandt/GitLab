@@ -47,7 +47,7 @@ describe Issuable::CommonSystemNotesService do
 
     context 'when resource weight event tracking is enabled' do
       before do
-        stub_feature_flags(track_resource_weight_change_events: true)
+        stub_feature_flags(track_issue_weight_change_events: true)
       end
 
       it 'creates a resource weight event' do
@@ -63,7 +63,7 @@ describe Issuable::CommonSystemNotesService do
 
     context 'when resource weight event tracking is disabled' do
       before do
-        stub_feature_flags(track_resource_weight_change_events: false)
+        stub_feature_flags(track_issue_weight_change_events: false)
       end
 
       it 'does not created a resource weight event' do

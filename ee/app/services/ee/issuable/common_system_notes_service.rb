@@ -29,7 +29,7 @@ module EE
       end
 
       def handle_weight_change_note
-        if issuable.previous_changes.include?('weight')
+        if !issuable.is_a?(Epic) && issuable.previous_changes.include?('weight')
           note = create_weight_change_note
 
           track_weight_change(note)
@@ -43,11 +43,11 @@ module EE
       def track_weight_change(note)
         return unless weight_changes_tracking_enabled?
 
-        EE::ResourceEvents::ChangeWeightService.new(issuable, current_user, note.created_at).execute
+        EE::ResourceEvents::ChangeWeightService.new([issuable], current_user, note.created_at).execute
       end
 
       def weight_changes_tracking_enabled?
-        ::Feature.enabled?(:track_resource_weight_change_events, issuable.project)
+        ::Feature.enabled?(:track_issue_weight_change_events, issuable.project)
       end
     end
   end

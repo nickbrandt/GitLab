@@ -3,32 +3,36 @@
 module EE
   module ResourceEvents
     class ChangeWeightService
-      attr_reader :resource, :user, :event_created_at
+      attr_reader :resources, :user, :event_created_at
 
-      def initialize(resource, user, created_at)
-        @resource = resource
+      def initialize(resources, user, created_at)
+        @resources = resources
         @user = user
         @event_created_at = created_at
       end
 
       def execute
-        create_event_by_issue if first_weight_event?
-
-        ResourceWeightEvent
-          .new(user: user, issue: resource, weight: resource.weight, created_at: event_created_at)
-          .save
+        ::Gitlab::Database.bulk_insert(ResourceWeightEvent.table_name, resource_weight_changes) unless resource_weight_changes.empty?
       end
 
       private
 
-      def first_weight_event?
-        ResourceWeightEvent.by_issue(resource).none?
+      def resource_weight_changes
+        @weight_changes ||= resources.map do |resource|
+          changes = []
+          base_data = { user_id: user.id, issue_id: resource.id }
+
+          changes << base_data.merge({ weight: previous_weight(resource), created_at: resource.updated_at }) if first_weight_event?(resource)
+          changes << base_data.merge({ weight: resource.weight, created_at: event_created_at })
+        end.flatten
       end
 
-      def create_event_by_issue
-        ResourceWeightEvent
-          .new(user: user, issue: resource, weight: resource.weight, created_at: resource.updated_at)
-          .save
+      def previous_weight(resource)
+        resource.previous_changes['weight']&.first
+      end
+
+      def first_weight_event?(resource)
+        previous_weight(resource) && ResourceWeightEvent.by_issue(resource).none?
       end
     end
   end
