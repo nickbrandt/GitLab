@@ -745,6 +745,14 @@ describe MergeRequest do
       it { is_expected.to be_truthy }
     end
 
+    context 'when the merge request was on a merge train' do
+      let(:merge_request) do
+        create(:merge_request, :on_train, status: 'merged', source_project: project, target_project: project)
+      end
+
+      it { is_expected.to be_falsy }
+    end
+
     context 'when the merge request is not on a merge train' do
       let(:merge_request) do
         create(:merge_request, source_project: project, target_project: project)
