@@ -112,6 +112,19 @@ describe MergeTrains::RefreshMergeRequestsService do
         end
       end
 
+      context 'when merge request 1 was on a merge train' do
+        before do
+          allow(merge_request_1.merge_train).to receive(:cleanup_ref)
+          merge_request_1.merge_train.merged!
+        end
+
+        it 'does not refresh' do
+          expect(refresh_service_1).not_to receive(:execute).with(merge_request_1)
+
+          subject
+        end
+      end
+
       context 'when the other thread has already been processing the merge train' do
         let(:lock_key) { "batch_pop_queueing:lock:merge_trains:#{merge_request.target_project_id}:#{merge_request.target_branch}" }
 
@@ -176,6 +189,19 @@ describe MergeTrains::RefreshMergeRequestsService do
           expect(AutoMergeProcessWorker).to receive(:perform_async).with(merge_request_1.id).once
 
           subject
+        end
+
+        context 'when merge request 1 has already been merged' do
+          before do
+            allow(merge_request_1.merge_train).to receive(:cleanup_ref)
+            merge_request_1.merge_train.merged!
+          end
+
+          it 'does not refresh the merge request 1' do
+            expect(AutoMergeProcessWorker).not_to receive(:perform_async).with(merge_request_1.id)
+
+            subject
+          end
         end
       end
     end
