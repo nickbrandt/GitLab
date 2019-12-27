@@ -3,22 +3,19 @@
 module API
   module Helpers
     module Pagination
-      # This returns an ActiveRecord relation
       def paginate(relation)
-        Gitlab::Pagination::OffsetPagination.new(self).paginate(relation)
-      end
+        return paginate_with_offset(relation) unless keyset_pagination_enabled?
 
-      # This applies pagination and executes the query
-      # It always returns an array instead of an ActiveRecord relation
-      def paginate_and_retrieve!(relation)
-        offset_or_keyset_pagination(relation).to_a
+        paginate_with_key(relation)
       end
 
       private
 
-      def offset_or_keyset_pagination(relation)
-        return paginate(relation) unless keyset_pagination_enabled?
+      def paginate_with_offset(relation)
+        Gitlab::Pagination::OffsetPagination.new(self).paginate(relation)
+      end
 
+      def paginate_with_key(relation)
         request_context = Gitlab::Pagination::Keyset::RequestContext.new(self)
 
         unless Gitlab::Pagination::Keyset.available?(request_context, relation)
