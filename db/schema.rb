@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_08_071112) do
+ActiveRecord::Schema.define(version: 2019_12_18_142338) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -4784,4 +4784,42 @@ ActiveRecord::Schema.define(version: 2019_12_08_071112) do
   add_foreign_key "web_hooks", "projects", name: "fk_0c8ca6d9d1", on_delete: :cascade
   add_foreign_key "zoom_meetings", "issues", on_delete: :cascade
   add_foreign_key "zoom_meetings", "projects", on_delete: :cascade
+
+  create_view "users_counts", materialized: true, sql_definition: <<-SQL
+      SELECT sum(x.count) AS total_count,
+      sum(x.only_active) AS total_only_active,
+      sum(x.not_ghost) AS total_not_ghost,
+      sum(x.active_non_ghost_non_bot) AS active_non_ghost_non_bot,
+      sum(x.member_10_active_and_not_ghost_count) AS total_member_10_active_and_not_ghost_count,
+      now() AS refresh_time
+     FROM ( SELECT count(users.id) AS count,
+              sum(
+                  CASE
+                      WHEN ((users.state)::text = 'active'::text) THEN 1
+                      ELSE NULL::integer
+                  END) AS only_active,
+              sum(
+                  CASE
+                      WHEN (users.ghost IS NOT TRUE) THEN 1
+                      ELSE NULL::integer
+                  END) AS not_ghost,
+              sum(
+                  CASE
+                      WHEN (((users.state)::text = 'active'::text) AND (users.ghost IS NOT TRUE) AND (users.bot_type IS NULL)) THEN 1
+                      ELSE NULL::integer
+                  END) AS active_non_ghost_non_bot,
+              0 AS member_10_active_and_not_ghost_count
+             FROM users
+          UNION ALL
+           SELECT 0 AS count,
+              0 AS only_active,
+              0 AS not_ghost,
+              0 AS active_non_ghost_non_bot,
+              count(DISTINCT users.id) AS member_10_active_and_not_ghost_count
+             FROM (users
+               JOIN members ON ((members.user_id = users.id)))
+            WHERE (((users.state)::text = 'active'::text) AND (users.ghost IS NOT TRUE) AND (users.bot_type IS NULL) AND (members.access_level > 10))) x;
+  SQL
+  add_index "users_counts", ["refresh_time"], name: "index_users_counts_on_refresh_time", unique: true
+
 end
