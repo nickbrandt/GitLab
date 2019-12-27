@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class Plan < ApplicationRecord
-  include IgnorableColumns
-
-  ignore_columns %i[active_pipelines_limit pipeline_size_limit active_jobs_limit], remove_after: '2019-12-01', remove_with: '12.6'
-
   DEFAULT = 'default'.freeze
   FREE = 'free'.freeze
   BRONZE = 'bronze'.freeze
