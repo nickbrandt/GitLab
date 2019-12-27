@@ -5,7 +5,7 @@ class CreateResourceWeightEvent < ActiveRecord::Migration[5.2]
 
   def change
     create_table :resource_weight_events do |t|
-      t.references :user, null: false, foreign_key: { on_delete: :cascade },
+      t.references :user, null: false, foreign_key: { on_delete: :nullify },
                    index: { name: 'index_resource_weight_events_on_user_id' }
       t.references :issue, null: false, foreign_key: { on_delete: :cascade },
                    index: false

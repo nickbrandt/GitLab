@@ -348,7 +348,7 @@ describe API::Issues, :mailer do
     it 'adds a note when the weight is changed' do
       expect do
         put api("/projects/#{project.id}/issues/#{issue.iid}", user), params: { weight: 9 }
-      end.to change { Note.count }.by(1)
+      end.to change { ResourceWeightEvent.count }.by(1)
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['weight']).to eq(9)

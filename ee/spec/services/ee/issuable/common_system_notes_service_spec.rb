@@ -8,7 +8,20 @@ describe Issuable::CommonSystemNotesService do
   let(:issuable) { create(:issue) }
 
   context 'on issuable update' do
-    it_behaves_like 'system note creation', { weight: 5 }, 'changed weight to **5**'
+    context 'when weight is changed' do
+      before do
+        issuable.update!(weight: 5)
+      end
+
+      it 'creates a resource label event' do
+        described_class.new(project, user).execute(issuable, old_labels: [])
+        event = issuable.reload.resource_weight_events.last
+
+        expect(event).not_to be_nil
+        expect(event.weight).to eq 5
+        expect(event.user_id).to eq user.id
+      end
+    end
 
     context 'when issuable is an epic' do
       let(:timestamp) { Time.now }
@@ -40,9 +53,8 @@ describe Issuable::CommonSystemNotesService do
       issuable.save
     end
 
-    it 'creates a system note for weight' do
-      expect { subject }.to change { issuable.notes.count }.from(0).to(1)
-      expect(issuable.notes.last.note).to match('changed weight')
+    it 'does not create a common system note for weight' do
+      expect { subject }.not_to change { issuable.notes.count }
     end
 
     context 'when resource weight event tracking is enabled' do
@@ -53,11 +65,10 @@ describe Issuable::CommonSystemNotesService do
       it 'creates a resource weight event' do
         subject
 
-        note = issuable.notes.last
         event = issuable.resource_weight_events.last
 
         expect(event.weight).to eq(5)
-        expect(event.created_at).to eq(note.created_at)
+        expect(event.user_id).to eq(user.id)
       end
     end
 

@@ -12,7 +12,10 @@ module EE
       end
 
       def execute
-        ::Gitlab::Database.bulk_insert(ResourceWeightEvent.table_name, resource_weight_changes) unless resource_weight_changes.empty?
+        unless resource_weight_changes.empty?
+          ::Gitlab::Database.bulk_insert(ResourceWeightEvent.table_name, resource_weight_changes)
+          resources.each(&:expire_note_etag_cache)
+        end
       end
 
       private
