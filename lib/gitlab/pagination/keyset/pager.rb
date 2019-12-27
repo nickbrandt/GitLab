@@ -14,24 +14,16 @@ module Gitlab
           # Validate assumption: The last two columns must match the page order_by
           validate_order!(relation)
 
-          # This performs the database query and retrieves records
-          # We retrieve one record more to check if we have data beyond this page
-          all_records = relation.limit(page.per_page + 1).to_a # rubocop: disable CodeReuse/ActiveRecord
-
-          records_for_page = all_records.first(page.per_page)
-
-          # If we retrieved more records than belong on this page,
-          # we know there's a next page
-          there_is_more = all_records.size > records_for_page.size
-          apply_headers(records_for_page.last, there_is_more)
-
-          records_for_page
+          # This performs the query and retrieves records
+          relation.limit(page.per_page).load.tap do |records| # rubocop: disable CodeReuse/ActiveRecord
+            apply_headers(records.last)
+          end
         end
 
         private
 
-        def apply_headers(last_record_in_page, there_is_more)
-          end_reached = last_record_in_page.nil? || !there_is_more
+        def apply_headers(last_record_in_page)
+          end_reached = last_record_in_page.nil?
           lower_bounds = last_record_in_page&.slice(page.order_by.keys)
 
           next_page = page.next(lower_bounds, end_reached)

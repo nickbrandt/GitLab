@@ -32,9 +32,9 @@ describe Gitlab::Pagination::Keyset::Pager do
     context 'when retrieving the last page' do
       let(:relation) { Project.where('id > ?', Project.maximum(:id) - page.per_page).order(id: :asc) }
 
-      it 'indicates this is the last page' do
+      it 'indicates there is another (likely empty) page' do
         expect(request).to receive(:apply_headers) do |next_page|
-          expect(next_page.end_reached?).to be_truthy
+          expect(next_page.end_reached?).to be_falsey
         end
 
         subject
@@ -53,8 +53,8 @@ describe Gitlab::Pagination::Keyset::Pager do
       end
     end
 
-    it 'returns an array with the loaded records' do
-      expect(subject).to eq(relation.limit(page.per_page).to_a)
+    it 'returns a limited relation' do
+      expect(subject).to eq(relation.limit(page.per_page))
     end
 
     context 'validating the order clause' do
