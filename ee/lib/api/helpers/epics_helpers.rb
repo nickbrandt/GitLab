@@ -41,6 +41,14 @@ module API
         end
       end
       # rubocop: enable CodeReuse/ActiveRecord
+
+      def epic_options
+        {
+          with: EE::API::Entities::Epic,
+          user: current_user,
+          group: user_group
+        }
+      end
     end
   end
 end

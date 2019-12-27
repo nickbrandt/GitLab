@@ -42,7 +42,8 @@ module API
         epics = paginate(find_epics(finder_params: { group_id: user_group.id })).with_api_entity_associations
 
         # issuable_metadata is the standard used by the Todo API
-        present epics, with: EE::API::Entities::Epic, user: current_user, issuable_metadata: issuable_meta_data(epics, 'Epic')
+
+        present epics, epic_options.merge(issuable_metadata: issuable_meta_data(epics, 'Epic'))
       end
 
       desc 'Get details of an epic' do
@@ -54,9 +55,7 @@ module API
       get ':id/(-/)epics/:epic_iid' do
         authorize_can_read!
 
-        present epic, options, user: current_user,
-                               with: EE::API::Entities::Epic,
-                               include_subscribed: true
+        present epic, epic_options.merge(include_subscribed: true)
       end
 
       desc 'Create a new epic' do
@@ -77,7 +76,7 @@ module API
 
         epic = ::Epics::CreateService.new(user_group, current_user, declared_params(include_missing: false)).execute
         if epic.valid?
-          present epic, with: EE::API::Entities::Epic, user: current_user
+          present epic, epic_options
         else
           render_validation_error!(epic)
         end
@@ -106,7 +105,7 @@ module API
         result = ::Epics::UpdateService.new(user_group, current_user, update_params).execute(epic)
 
         if result.valid?
-          present result, with: EE::API::Entities::Epic, user: current_user
+          present result, epic_options
         else
           render_validation_error!(result)
         end

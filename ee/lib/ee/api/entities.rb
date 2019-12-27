@@ -325,6 +325,11 @@ module EE
         expose :state
         expose :web_edit_url, if: can_admin_epic # @deprecated
         expose :web_url
+        expose :references, with: ::API::Entities::IssuableReferences do |epic|
+          epic
+        end
+        # reference is deprecated in favour of references
+        # Introduced [Gitlab 12.6](https://gitlab.com/gitlab-org/gitlab/merge_requests/20354)
         expose :reference, if: { with_reference: true } do |epic|
           epic.to_reference(full: true)
         end
