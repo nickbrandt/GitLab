@@ -1,5 +1,5 @@
 - purchase_link = plan.purchase_link
-- is_current_plan = purchase_link.action == 'current_plan'
+- is_current_plan = plan.code == namespace.actual_plan&.name
 
 .col-md-6.col-lg-3
   .card.mb-5{ class: ("card-active" if is_current_plan) }
@@ -34,5 +34,5 @@
     - if purchase_link
       .card-footer.p-3
         .pull-right{ class: ("invisible" unless purchase_link.action == 'upgrade' || is_current_plan) }
-          - upgrade_button_class = "disabled" if is_current_plan
+          - upgrade_button_class = "disabled" if is_current_plan && !namespace.trial_active?
           = link_to s_('BillingPlan|Upgrade'), plan_purchase_or_upgrade_url(namespace, plan, current_plan), class: "btn btn-success #{upgrade_button_class}"
