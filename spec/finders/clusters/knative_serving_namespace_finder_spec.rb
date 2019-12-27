@@ -9,7 +9,7 @@ describe Clusters::KnativeServingNamespaceFinder do
   let(:project) { cluster.cluster_project.project }
   let(:environment) { create(:environment, project: project) }
 
-  subject { Clusters::KnativeServingNamespaceFinder.new(cluster) }
+  subject { described_class.new(cluster) }
 
   before do
     stub_kubeclient_discover(service.api_url)
