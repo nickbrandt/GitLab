@@ -13,7 +13,7 @@ module EE
       protected
 
       def project_or_wiki
-        @project
+        project
       end
 
       private
