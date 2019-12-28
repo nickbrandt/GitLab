@@ -594,10 +594,25 @@ describe API::Projects do
           expect(json_response.map { |p| p['id'] }).to contain_exactly(public_project.id)
         end
 
-        it 'does not include a link if the end has reached and there is no more data' do
+        it 'still includes a link if the end has reached and there is no more data after this page' do
           get api('/projects', current_user), params: params.merge(id_after: project2.id)
 
+          expect(response.header).to include('Links')
+          expect(response.header['Links']).to include('pagination=keyset')
+          expect(response.header['Links']).to include("id_after=#{project3.id}")
+        end
+
+        it 'does not include a next link when the page does not have any records' do
+          get api('/projects', current_user), params: params.merge(id_after: Project.maximum(:id))
+
           expect(response.header).not_to include('Links')
+        end
+
+        it 'returns an empty array when the page does not have any records' do
+          get api('/projects', current_user), params: params.merge(id_after: Project.maximum(:id))
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to eq([])
         end
 
         it 'responds with 501 if order_by is different from id' do
