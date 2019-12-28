@@ -267,12 +267,12 @@ context is fresh in memory, and improves contributors' experience significantly.
 
 To ensure swift feedback to ready-to-review code, we maintain a `Review-response` Service-level Objective (SLO). The SLO is defined as:
 
-> * review-response SLO = (time when first review response is provided) - (time MR is assigned to reviewer) < 2 business days
+> - review-response SLO = (time when first review response is provided) - (time MR is assigned to reviewer) < 2 business days
 
 If you don't think you'll be able to review a merge request within the `Review-response` SLO
 time frame, let the author know as soon as possible and try to help them find
 another reviewer or maintainer who will be able to, so that they can be unblocked
-and get on with their work quickly. 
+and get on with their work quickly.
 
 Of course, if you are out of office and have
 [communicated](https://about.gitlab.com/handbook/paid-time-off/#communicating-your-time-off)
