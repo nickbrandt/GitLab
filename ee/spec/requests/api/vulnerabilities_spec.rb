@@ -61,6 +61,7 @@ describe API::Vulnerabilities do
   describe 'GET /vulnerabilities/:id' do
     let_it_be(:project) { create(:project, :with_vulnerabilities) }
     let_it_be(:vulnerability) { project.vulnerabilities.first }
+    let_it_be(:finding) { create(:vulnerabilities_occurrence, vulnerability: vulnerability) }
     let(:vulnerability_id) { vulnerability.id }
 
     subject(:get_vulnerability) { get api("/vulnerabilities/#{vulnerability_id}", user) }
@@ -76,6 +77,14 @@ describe API::Vulnerabilities do
         expect(response).to have_gitlab_http_status(200)
         expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
         expect(json_response['id']).to eq vulnerability_id
+      end
+
+      it 'returns the desired findings' do
+        get_vulnerability
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('public_api/v4/vulnerability', dir: 'ee')
+        expect(json_response['finding']['id']).to eq finding.id
       end
 
       it_behaves_like 'responds with "not found" for an unknown vulnerability ID'

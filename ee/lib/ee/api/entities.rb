@@ -953,6 +953,8 @@ module EE
 
         expose :project, using: ::API::Entities::ProjectIdentity
 
+        expose :finding
+
         expose :author_id
         expose :updated_by_id
         expose :last_edited_by_id
