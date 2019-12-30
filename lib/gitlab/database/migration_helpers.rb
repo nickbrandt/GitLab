@@ -198,6 +198,8 @@ module Gitlab
         # long time to complete, but fortunately does not lock the source table
         # while running.
         # Disable this check by passing `validate: false` to the method call
+        # The check will be enforced for new data (inserts) coming in,
+        # but validating existing data is delayed.
         #
         # Note this is a no-op in case the constraint is VALID already
 
