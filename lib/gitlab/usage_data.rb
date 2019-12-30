@@ -4,6 +4,7 @@ module Gitlab
   class UsageData
     APPROXIMATE_COUNT_MODELS = [Label, MergeRequest, Note, Todo].freeze
     BATCH_SIZE = 100
+    LONG_STATEMENT_TIMEOUT = 900000
 
     class << self
       def data(force_refresh: false)
@@ -228,8 +229,12 @@ module Gitlab
         {} # augmented in EE
       end
 
-      def count(relation, count_by: nil, fallback: -1)
-        count_by ? relation.count(count_by) : relation.count
+      def count(relation, count_by: nil, fallback: -1, timeout_fallback: -2)
+        Gitlab::Database::Timeout.with_statement_timeout(LONG_STATEMENT_TIMEOUT) do
+          count_by ? relation.count(count_by) : relation.count
+        end
+      rescue ActiveRecord::QueryCanceled
+        timeout_fallback
       rescue ActiveRecord::StatementInvalid
         fallback
       end

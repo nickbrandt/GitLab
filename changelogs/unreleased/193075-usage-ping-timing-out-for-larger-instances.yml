@@ -1,0 +1,5 @@
+---
+title: Long statement timeouts for usage counters
+merge_request: 22332
+author:
+type: performance
