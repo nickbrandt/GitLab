@@ -42,10 +42,11 @@ describe('LogControlButtons', () => {
     expect(findRefreshBtn().is(GlButton)).toBe(true);
   });
 
-  it('emits a `refresh` event on click on `refersh` button', () => {
+  it('emits a `refresh` event on click on `refresh` button', () => {
     initWrapper();
 
-    expect(wrapper.emitted('refresh')).toHaveLength(0);
+    // An `undefined` value means no event was emitted
+    expect(wrapper.emitted('refresh')).toBe(undefined);
 
     findRefreshBtn().vm.$emit('click');
 
