@@ -69,6 +69,7 @@ export default {
       'startDate',
       'endDate',
       'tasksByType',
+      'medians',
     ]),
     ...mapGetters(['hasNoAccessError', 'currentGroupPath', 'durationChartPlottableData']),
     shouldRenderEmptyState() {
@@ -242,6 +243,7 @@ export default {
             class="js-stage-table"
             :current-stage="selectedStage"
             :stages="stages"
+            :medians="medians"
             :is-loading="isLoadingStage"
             :is-empty-stage="isEmptyStage"
             :is-saving-custom-stage="isSavingCustomStage"

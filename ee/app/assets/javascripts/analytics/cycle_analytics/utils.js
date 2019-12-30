@@ -1,4 +1,4 @@
-import { isString } from 'underscore';
+import { isString, isNumber } from 'underscore';
 import dateFormat from 'dateformat';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
@@ -43,18 +43,19 @@ export const getLabelEventsIdentifiers = (events = []) =>
  * default stages get persisted to storage and will have a numeric id. The new numeric
  * id should then be used to access stage data
  *
- * This will be fixed in https://gitlab.com/gitlab-org/gitlab/merge_requests/19278
  */
+export const isPersistedStage = ({ custom, id }) => custom || isNumber(id);
 
 export const transformRawStages = (stages = []) =>
   stages
-    .map(({ id, title, custom = false, ...rest }) => ({
+    .map(({ id, title, name = '', custom = false, ...rest }) => ({
       ...convertObjectPropsToCamelCase(rest, { deep: true }),
       id,
       title,
-      slug: custom ? id : convertToSnakeCase(title),
       custom,
-      name: title, // editing a stage takes 'name' as a parameter, but the api returns title
+      slug: isPersistedStage({ custom, id }) ? id : convertToSnakeCase(title),
+      // the name field is used to create a stage, but the get request returns title
+      name: name.length ? name : title,
     }))
     .sort((a, b) => a.id > b.id);
 

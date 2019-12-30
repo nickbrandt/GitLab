@@ -102,8 +102,12 @@ describe('Stage', () => {
       ${'Code'}       | ${codeStage}       | ${codeEvents}
       ${'Production'} | ${productionStage} | ${productionEvents}
     `('$name stage will render the list of events', ({ stage, eventList }) => {
-      wrapper = createComponent({ props: { stage, events: eventList } });
-      eventList.forEach((item, index) => {
+      // stages generated from fixtures may not have events
+      const events = eventList.length ? eventList : generateEvents(5);
+      wrapper = createComponent({
+        props: { stage, events },
+      });
+      events.forEach((item, index) => {
         const elem = wrapper.findAll($sel.item).at(index);
         expect(elem.find($sel.title).text()).toContain(item.title);
       });

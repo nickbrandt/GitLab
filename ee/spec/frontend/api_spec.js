@@ -422,14 +422,38 @@ describe('Api', () => {
       it('fetches stage events', done => {
         const response = { events: [] };
         const params = {
-          'cycle_analytics[group_id]': groupId,
-          'cycle_analytics[created_after]': createdAfter,
-          'cycle_analytics[created_before]': createdBefore,
+          group_id: groupId,
+          created_after: createdAfter,
+          created_before: createdBefore,
         };
-        const expectedUrl = `${dummyUrlRoot}/groups/${groupId}/-/cycle_analytics/events/${stageId}.json`;
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}/records`;
         mock.onGet(expectedUrl).reply(200, response);
 
         Api.cycleAnalyticsStageEvents(groupId, stageId, params)
+          .then(responseObj =>
+            expectRequestWithCorrectParameters(responseObj, {
+              response,
+              params,
+              expectedUrl,
+            }),
+          )
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('cycleAnalyticsStageMedian', () => {
+      it('fetches stage events', done => {
+        const response = { value: '5 days ago' };
+        const params = {
+          group_id: groupId,
+          created_after: createdAfter,
+          created_before: createdBefore,
+        };
+        const expectedUrl = `${dummyUrlRoot}/-/analytics/cycle_analytics/stages/${stageId}/median`;
+        mock.onGet(expectedUrl).reply(200, response);
+
+        Api.cycleAnalyticsStageMedian(groupId, stageId, params)
           .then(responseObj =>
             expectRequestWithCorrectParameters(responseObj, {
               response,

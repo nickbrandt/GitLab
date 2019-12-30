@@ -27,6 +27,7 @@ export default () => ({
   stages: [],
   summary: [],
   labels: [],
+  medians: {},
 
   customStageFormEvents: [],
   tasksByType: {

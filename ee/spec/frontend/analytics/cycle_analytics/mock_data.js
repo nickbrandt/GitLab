@@ -14,7 +14,8 @@ import { mockLabels } from '../../../../../spec/javascripts/vue_shared/component
 const endpoints = {
   cycleAnalyticsData: 'cycle_analytics/mock_data.json', // existing cycle analytics data
   customizableCycleAnalyticsStagesAndEvents: 'analytics/cycle_analytics/stages.json', // customizable stages and events endpoint
-  stageEvents: stage => `cycle_analytics/events/${stage}.json`,
+  stageEvents: stage => `analytics/cycle_analytics/stages/${stage}/records.json`,
+  stageMedian: stage => `analytics/cycle_analytics/stages/${stage}/median.json`,
 };
 
 export const groupLabels = mockLabels.map(({ title, ...rest }) => ({ ...rest, name: title }));
@@ -27,7 +28,8 @@ export const group = {
   avatar_url: `${TEST_HOST}/images/home/nasa.svg`,
 };
 
-const getStageById = (stages, id) => stages.find(stage => stage.id === id) || {};
+const getStageByTitle = (stages, title) =>
+  stages.find(stage => stage.title && stage.title.toLowerCase().trim() === title) || {};
 
 export const cycleAnalyticsData = getJSONFixture(endpoints.cycleAnalyticsData);
 
@@ -40,41 +42,47 @@ const dummyState = {};
 // prepare the raw stage data for our components
 mutations[types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS](dummyState, customizableStagesAndEvents);
 
-export const issueStage = getStageById(dummyState.stages, 'issue');
-export const planStage = getStageById(dummyState.stages, 'plan');
-export const reviewStage = getStageById(dummyState.stages, 'review');
-export const codeStage = getStageById(dummyState.stages, 'code');
-export const testStage = getStageById(dummyState.stages, 'test');
-export const stagingStage = getStageById(dummyState.stages, 'staging');
-export const productionStage = getStageById(dummyState.stages, 'production');
+export const issueStage = getStageByTitle(dummyState.stages, 'issue');
+export const planStage = getStageByTitle(dummyState.stages, 'plan');
+export const reviewStage = getStageByTitle(dummyState.stages, 'review');
+export const codeStage = getStageByTitle(dummyState.stages, 'code');
+export const testStage = getStageByTitle(dummyState.stages, 'test');
+export const stagingStage = getStageByTitle(dummyState.stages, 'staging');
+export const productionStage = getStageByTitle(dummyState.stages, 'production');
 
 export const allowedStages = [issueStage, planStage, codeStage];
-
-const rawIssueEvents = getJSONFixture('cycle_analytics/events/issue.json');
-export const rawEvents = rawIssueEvents.events;
 
 const deepCamelCase = obj => convertObjectPropsToCamelCase(obj, { deep: true });
 
 export const defaultStages = ['issue', 'plan', 'review', 'code', 'test', 'staging', 'production'];
 
 const stageFixtures = defaultStages.reduce((acc, stage) => {
-  const { events } = getJSONFixture(endpoints.stageEvents(stage));
+  const events = getJSONFixture(endpoints.stageEvents(stage));
   return {
     ...acc,
-    [stage]: deepCamelCase(events),
+    [stage]: events,
+  };
+}, {});
+
+export const stageMedians = defaultStages.reduce((acc, stage) => {
+  const { value } = getJSONFixture(endpoints.stageMedian(stage));
+  return {
+    ...acc,
+    [stage]: value,
   };
 }, {});
 
 export const endDate = new Date(2019, 0, 14);
 export const startDate = getDateInPast(endDate, DEFAULT_DAYS_IN_PAST);
 
-export const issueEvents = stageFixtures.issue;
-export const planEvents = stageFixtures.plan;
-export const reviewEvents = stageFixtures.review;
-export const codeEvents = stageFixtures.code;
-export const testEvents = stageFixtures.test;
-export const stagingEvents = stageFixtures.staging;
-export const productionEvents = stageFixtures.production;
+export const rawIssueEvents = stageFixtures.issue;
+export const issueEvents = deepCamelCase(stageFixtures.issue);
+export const planEvents = deepCamelCase(stageFixtures.plan);
+export const reviewEvents = deepCamelCase(stageFixtures.review);
+export const codeEvents = deepCamelCase(stageFixtures.code);
+export const testEvents = deepCamelCase(stageFixtures.test);
+export const stagingEvents = deepCamelCase(stageFixtures.staging);
+export const productionEvents = deepCamelCase(stageFixtures.production);
 export const rawCustomStage = {
   title: 'Coolest beans stage',
   hidden: false,
@@ -85,6 +93,8 @@ export const rawCustomStage = {
   start_event_identifier: 'issue_first_mentioned_in_commit',
   end_event_identifier: 'issue_first_added_to_board',
 };
+
+export const medians = stageMedians;
 
 const { events: rawCustomStageEvents } = customizableStagesAndEvents;
 const camelCasedStageEvents = rawCustomStageEvents.map(deepCamelCase);
@@ -130,12 +140,12 @@ export const rawDurationData = [
 
 export const transformedDurationData = [
   {
-    slug: 'issue',
+    slug: 1,
     selected: true,
     data: rawDurationData,
   },
   {
-    slug: 'plan',
+    slug: 2,
     selected: true,
     data: rawDurationData,
   },

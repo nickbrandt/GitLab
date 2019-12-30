@@ -18,7 +18,8 @@ export default {
   cycleAnalyticsTasksByTypePath: '/-/analytics/type_of_work/tasks_by_type',
   cycleAnalyticsSummaryDataPath: '/groups/:group_id/-/cycle_analytics',
   cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/cycle_analytics/stages',
-  cycleAnalyticsStageEventsPath: '/groups/:group_id/-/cycle_analytics/events/:stage_id.json',
+  cycleAnalyticsStageEventsPath: '/-/analytics/cycle_analytics/stages/:stage_id/records',
+  cycleAnalyticsStageMedianPath: '/-/analytics/cycle_analytics/stages/:stage_id/median',
   cycleAnalyticsStagePath: '/-/analytics/cycle_analytics/stages/:stage_id',
   cycleAnalyticsDurationChartPath: '/-/analytics/cycle_analytics/stages/:stage_id/duration_chart',
 
@@ -158,11 +159,13 @@ export default {
   },
 
   cycleAnalyticsStageEvents(groupId, stageId, params = {}) {
-    const url = Api.buildUrl(this.cycleAnalyticsStageEventsPath)
-      .replace(':group_id', groupId)
-      .replace(':stage_id', stageId);
+    const url = Api.buildUrl(this.cycleAnalyticsStageEventsPath).replace(':stage_id', stageId);
+    return axios.get(url, { params: { ...params, group_id: groupId } });
+  },
 
-    return axios.get(url, { params });
+  cycleAnalyticsStageMedian(groupId, stageId, params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsStageMedianPath).replace(':stage_id', stageId);
+    return axios.get(url, { params: { ...params, group_id: groupId } });
   },
 
   cycleAnalyticsCreateStage(groupId, data) {

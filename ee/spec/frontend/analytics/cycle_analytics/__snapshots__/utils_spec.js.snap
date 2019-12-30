@@ -6,10 +6,10 @@ Array [
     "custom": false,
     "description": "Time before an issue gets scheduled",
     "hidden": false,
-    "id": "issue",
+    "id": 1,
     "legend": "",
     "name": "Issue",
-    "slug": "issue",
+    "slug": 1,
     "title": "Issue",
   },
   Object {
