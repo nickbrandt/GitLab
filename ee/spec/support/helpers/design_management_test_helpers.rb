@@ -29,6 +29,10 @@ module DesignManagementTestHelpers
     Gitlab::Routing.url_helpers.designs_project_issue_url(design.project, design.issue, path_options)
   end
 
+  def url_for_designs(issue)
+    Gitlab::Routing.url_helpers.designs_project_issue_url(issue.project, issue)
+  end
+
   private
 
   def act_on_designs(designs, &block)
