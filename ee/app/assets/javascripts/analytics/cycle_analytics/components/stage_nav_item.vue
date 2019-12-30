@@ -1,7 +1,8 @@
 <script>
 import { GlButton } from '@gitlab/ui';
-import StageCardListItem from './stage_card_list_item.vue';
+import { approximateDuration } from '~/lib/utils/datetime_utility';
 import Icon from '~/vue_shared/components/icon.vue';
+import StageCardListItem from './stage_card_list_item.vue';
 
 export default {
   name: 'StageNavItem',
@@ -26,8 +27,8 @@ export default {
       required: true,
     },
     value: {
-      type: String,
-      default: '',
+      type: Number,
+      default: 0,
       required: false,
     },
     canEdit: {
@@ -43,7 +44,10 @@ export default {
   },
   computed: {
     hasValue() {
-      return this.value && this.value.length > 0;
+      return this.value;
+    },
+    median() {
+      return approximateDuration(this.value);
     },
     editable() {
       return this.canEdit;
@@ -74,7 +78,7 @@ export default {
         {{ title }}
       </div>
       <div class="stage-nav-item-cell stage-median mr-4">
-        <span v-if="hasValue">{{ value }}</span>
+        <span v-if="hasValue">{{ median }}</span>
         <span v-else class="stage-empty">{{ __('Not enough data') }}</span>
       </div>
       <div v-show="canEdit && isHover" ref="dropdown" class="dropdown">

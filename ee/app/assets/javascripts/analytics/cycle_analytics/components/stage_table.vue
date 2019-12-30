@@ -27,6 +27,10 @@ export default {
       type: Array,
       required: true,
     },
+    medians: {
+      type: Object,
+      required: true,
+    },
     currentStage: {
       type: Object,
       required: true,
@@ -119,6 +123,11 @@ export default {
       return this.isEditingCustomStage ? this.currentStage : {};
     },
   },
+  methods: {
+    medianValue(id) {
+      return this.medians[id] ? this.medians[id] : null;
+    },
+  },
   STAGE_ACTIONS,
 };
 </script>
@@ -146,7 +155,7 @@ export default {
               v-for="stage in stages"
               :key="`ca-stage-title-${stage.title}`"
               :title="stage.title"
-              :value="stage.value"
+              :value="medianValue(stage.id)"
               :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
               :can-edit="canEditStages"
               :is-default-stage="!stage.custom"

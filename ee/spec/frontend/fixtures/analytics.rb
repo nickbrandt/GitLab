@@ -7,42 +7,84 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   let(:group) { create(:group)}
   let(:project) { create(:project, :repository, namespace: group) }
   let(:user) { create(:user, :admin) }
-  let(:issue) { create(:issue, project: project, created_at: 4.days.ago) }
+  # let(:issue) { create(:issue, project: project, created_at: 4.days.ago) }
   let(:milestone) { create(:milestone, project: project) }
+  # let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
+
+  let(:issue) { create(:issue, project: project, created_at: 4.days.ago) }
+  let(:issue_1) { create(:issue, project: project, created_at: 5.days.ago) }
+  let(:issue_2) { create(:issue, project: project, created_at: 4.days.ago) }
+  let(:issue_3) { create(:issue, project: project, created_at: 3.days.ago) }
+
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
-  let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr.source_branch, sha: mr.source_branch_sha, head_pipeline_of: mr) }
-  let(:build) { create(:ci_build, :success, pipeline: pipeline, author: user) }
+  let(:mr_1) { create(:merge_request, source_project: project, allow_broken: true, created_at: 20.days.ago) }
+  let(:mr_2) { create(:merge_request, source_project: project, allow_broken: true, created_at: 19.days.ago) }
+  let(:mr_3) { create(:merge_request, source_project: project, allow_broken: true, created_at: 18.days.ago) }
 
-  let!(:issue_1) { create(:issue, project: project, created_at: 5.days.ago) }
-  let!(:issue_2) { create(:issue, project: project, created_at: 4.days.ago) }
-  let!(:issue_3) { create(:issue, project: project, created_at: 3.days.ago) }
+  let(:pipeline_1) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr_1.source_branch, sha: mr_1.source_branch_sha, head_pipeline_of: mr_1) }
+  let(:pipeline_2) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr_2.source_branch, sha: mr_2.source_branch_sha, head_pipeline_of: mr_2) }
+  let(:pipeline_3) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr_3.source_branch, sha: mr_3.source_branch_sha, head_pipeline_of: mr_3) }
 
-  let!(:mr_1) { create_merge_request_closing_issue(user, project, issue_1) }
-  let!(:mr_2) { create_merge_request_closing_issue(user, project, issue_2) }
-  let!(:mr_3) { create_merge_request_closing_issue(user, project, issue_3) }
+  let(:build_1) { create(:ci_build, :success, pipeline: pipeline_1, author: user) }
+  let(:build_2) { create(:ci_build, :success, pipeline: pipeline_2, author: user) }
+  let(:build_3) { create(:ci_build, :success, pipeline: pipeline_3, author: user) }
 
   def prepare_cycle_analytics_data
     group.add_maintainer(user)
     project.add_maintainer(user)
 
-    create_cycle(user, project, issue, mr, milestone, pipeline)
-    create_cycle(user, project, issue_2, mr_2, milestone, pipeline)
+    create_cycle(user, project, issue_1, mr_1, milestone, pipeline_1)
+    create_cycle(user, project, issue_2, mr_2, milestone, pipeline_2)
 
     create_commit_referencing_issue(issue_1)
     create_commit_referencing_issue(issue_2)
 
     create_merge_request_closing_issue(user, project, issue_1)
     create_merge_request_closing_issue(user, project, issue_2)
-
     merge_merge_requests_closing_issue(user, project, issue_3)
 
     deploy_master(user, project, environment: 'staging')
     deploy_master(user, project)
   end
 
+  def update_metrics
+    issue_1.metrics.update(first_added_to_board_at: 3.days.ago, first_mentioned_in_commit_at: 2.days.ago)
+    issue_2.metrics.update(first_added_to_board_at: 2.days.ago, first_mentioned_in_commit_at: 1.day.ago)
+
+    mr_1.metrics.update!({
+      merged_at: 5.days.ago,
+      first_deployed_to_production_at: 1.day.ago,
+      latest_build_started_at: 5.days.ago,
+      latest_build_finished_at: 1.day.ago,
+      pipeline: build_1.pipeline
+    })
+
+    mr_2.metrics.update!({
+      merged_at: 10.days.ago,
+      first_deployed_to_production_at: 5.days.ago,
+      latest_build_started_at: 9.days.ago,
+      latest_build_finished_at: 7.days.ago,
+      pipeline: build_2.pipeline
+    })
+  end
+
+  def additional_cycle_analytics_metrics
+    create(:cycle_analytics_group_stage, parent: group)
+
+    update_metrics
+
+    create_cycle(user, project, issue_1, mr_1, milestone, pipeline_1)
+    create_cycle(user, project, issue_2, mr_2, milestone, pipeline_2)
+    create_cycle(user, project, issue_3, mr_3, milestone, pipeline_3)
+    deploy_master(user, project, environment: 'staging')
+  end
+
   before(:all) do
     clean_frontend_fixtures('analytics/')
+    clean_frontend_fixtures('cycle_analytics/')
   end
+
+  default_stages = %w[issue plan review code test staging production]
 
   describe Groups::CycleAnalytics::EventsController, type: :controller do
     render_views
@@ -54,8 +96,6 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
 
       sign_in(user)
     end
-
-    default_stages = %w[issue plan review code test staging production]
 
     default_stages.each do |endpoint|
       it "cycle_analytics/events/#{endpoint}.json" do
@@ -90,9 +130,20 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
   describe Analytics::CycleAnalytics::StagesController, type: :controller do
     render_views
 
+    let(:params) { { created_after: 3.months.ago, created_before: Time.now, group_id: group.full_path } }
+
     before do
       stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
       stub_licensed_features(cycle_analytics_for_groups: true)
+
+      # Persist the default stages
+      Gitlab::Analytics::CycleAnalytics::DefaultStages.all.map do |params|
+        group.cycle_analytics_stages.build(params).save!
+      end
+
+      prepare_cycle_analytics_data
+
+      additional_cycle_analytics_metrics
 
       sign_in(user)
     end
@@ -101,6 +152,22 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       get(:index, params: { group_id: group.name }, format: :json)
 
       expect(response).to be_successful
+    end
+
+    Gitlab::Analytics::CycleAnalytics::DefaultStages.all.each do |stage|
+      it "analytics/cycle_analytics/stages/#{stage[:name]}/records.json" do
+        stage_id = group.cycle_analytics_stages.find_by(name: stage[:name]).id
+        get(:records, params: params.merge({ id: stage_id }), format: :json)
+
+        expect(response).to be_successful
+      end
+
+      it "analytics/cycle_analytics/stages/#{stage[:name]}/median.json" do
+        stage_id = group.cycle_analytics_stages.find_by(name: stage[:name]).id
+        get(:median, params: params.merge({ id: stage_id }), format: :json)
+
+        expect(response).to be_successful
+      end
     end
   end
 

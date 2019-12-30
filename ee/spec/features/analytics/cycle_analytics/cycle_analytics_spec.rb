@@ -167,11 +167,11 @@ describe 'Group Cycle Analytics', :js do
 
     dummy_stages = [
       { title: "Issue", description: "Time before an issue gets scheduled", events_count: 1, median: "5 days" },
-      { title: "Plan", description: "Time before an issue starts implementation", events_count: 1, median: "Not enough data" },
-      { title: "Code", description: "Time until first merge request", events_count: 1, median: "less than a minute" },
-      { title: "Test", description: "Total test time for all commits/merges", events_count: 1, median: "Not enough data" },
-      { title: "Review", description: "Time between merge request creation and merge/close", events_count: 1, median: "less than a minute" },
-      { title: "Staging", description: "From merge request merge until deploy to production", events_count: 1, median: "less than a minute" },
+      { title: "Plan", description: "Time before an issue starts implementation", events_count: 0, median: "Not enough data" },
+      { title: "Code", description: "Time until first merge request", events_count: 0, median: "Not enough data" },
+      { title: "Test", description: "Total test time for all commits/merges", events_count: 0, median: "Not enough data" },
+      { title: "Review", description: "Time between merge request creation and merge/close", events_count: 0, median: "Not enough data" },
+      { title: "Staging", description: "From merge request merge until deploy to production", events_count: 0, median: "Not enough data" },
       { title: "Production", description: "From issue creation until deploy to production", events_count: 1, median: "5 days" }
     ]
 
@@ -187,7 +187,11 @@ describe 'Group Cycle Analytics', :js do
       dummy_stages.each do |stage|
         select_stage(stage[:title])
 
-        expect(page.find('.stage-events .events-description').text).to have_text(stage[:description])
+        if stage[:events_count] == 0
+          expect(page).not_to have_selector('.stage-events .events-description')
+        else
+          expect(page.find('.stage-events .events-description').text).to have_text(stage[:description])
+        end
       end
     end
 

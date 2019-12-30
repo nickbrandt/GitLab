@@ -7,6 +7,7 @@ import {
   allowedStages,
   groupLabels,
   customStageEvents,
+  stageMedians as medians,
 } from '../mock_data';
 
 let wrapper = null;
@@ -43,6 +44,7 @@ function createComponent(props = {}, shallow = false) {
       noAccessSvgPath,
       canEditStages: false,
       customStageFormEvents: customStageEvents,
+      medians,
       ...props,
     },
     stubs: {

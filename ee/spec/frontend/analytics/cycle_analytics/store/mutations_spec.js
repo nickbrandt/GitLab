@@ -4,7 +4,7 @@ import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import {
   cycleAnalyticsData,
-  rawEvents,
+  rawIssueEvents,
   issueEvents as transformedEvents,
   issueStage,
   planStage,
@@ -58,6 +58,8 @@ describe('Cycle analytics mutations', () => {
     ${types.RECEIVE_REMOVE_STAGE_RESPONSE}         | ${'isLoading'}              | ${false}
     ${types.REQUEST_DURATION_DATA}                 | ${'isLoadingDurationChart'} | ${true}
     ${types.RECEIVE_DURATION_DATA_ERROR}           | ${'isLoadingDurationChart'} | ${false}
+    ${types.REQUEST_STAGE_MEDIANS}                 | ${'medians'}                | ${{}}
+    ${types.RECEIVE_STAGE_MEDIANS_ERROR}           | ${'medians'}                | ${{}}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 
@@ -87,7 +89,7 @@ describe('Cycle analytics mutations', () => {
 
   describe(`${types.RECEIVE_STAGE_DATA_SUCCESS}`, () => {
     it('will set the currentStageEvents state item with the camelCased events', () => {
-      mutations[types.RECEIVE_STAGE_DATA_SUCCESS](state, { events: rawEvents });
+      mutations[types.RECEIVE_STAGE_DATA_SUCCESS](state, rawIssueEvents);
 
       expect(state.currentStageEvents).toEqual(transformedEvents);
     });
@@ -99,7 +101,7 @@ describe('Cycle analytics mutations', () => {
     });
 
     it('will set isEmptyStage=false if currentStageEvents.length > 0', () => {
-      mutations[types.RECEIVE_STAGE_DATA_SUCCESS](state, { events: rawEvents });
+      mutations[types.RECEIVE_STAGE_DATA_SUCCESS](state, rawIssueEvents);
 
       expect(state.isEmptyStage).toEqual(false);
     });
@@ -170,20 +172,6 @@ describe('Cycle analytics mutations', () => {
       mutations[types.RECEIVE_SUMMARY_DATA_SUCCESS](state, {
         ...cycleAnalyticsData,
         summary: [{ value: 0, title: 'New Issues' }, { value: 0, title: 'Deploys' }],
-        stats: [
-          {
-            name: 'issue',
-            value: '1 day ago',
-          },
-          {
-            name: 'plan',
-            value: '6 months ago',
-          },
-          {
-            name: 'test',
-            value: null,
-          },
-        ],
       });
     });
 
@@ -192,31 +180,6 @@ describe('Cycle analytics mutations', () => {
         { value: '-', title: 'New Issues' },
         { value: '-', title: 'Deploys' },
       ]);
-    });
-
-    it('will set the median value for each stage', () => {
-      expect(state.stages).toEqual([
-        { slug: 'plan', value: '6 months ago' },
-        { slug: 'issue', value: '1 day ago' },
-        { slug: 'test', value: null },
-      ]);
-    });
-
-    describe('with hidden stages', () => {
-      const mockStages = customizableStagesAndEvents.stages;
-
-      beforeEach(() => {
-        mockStages[0].hidden = true;
-
-        mutations[types.RECEIVE_GROUP_STAGES_AND_EVENTS_SUCCESS](state, {
-          ...customizableStagesAndEvents.events,
-          stages: mockStages,
-        });
-      });
-
-      it('will only return stages that are not hidden', () => {
-        expect(state.stages.map(({ id }) => id)).not.toContain(mockStages[0].id);
-      });
     });
   });
 
@@ -257,6 +220,21 @@ describe('Cycle analytics mutations', () => {
 
       expect(stateWithData.isLoadingDurationChart).toBe(false);
       expect(stateWithData.durationData).toBe(transformedDurationData);
+    });
+  });
+
+  describe(`${types.RECEIVE_STAGE_MEDIANS_SUCCESS}`, () => {
+    it('sets each id as a key in the median object with the corresponding value', () => {
+      const stateWithData = {
+        medians: {},
+      };
+
+      mutations[types.RECEIVE_STAGE_MEDIANS_SUCCESS](stateWithData, [
+        { id: 1, value: 20 },
+        { id: 2, value: 10 },
+      ]);
+
+      expect(stateWithData.medians).toEqual({ '1': 20, '2': 10 });
     });
   });
 });

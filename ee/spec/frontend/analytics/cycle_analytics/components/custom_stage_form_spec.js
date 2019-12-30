@@ -97,12 +97,20 @@ describe('CustomStageForm', () => {
 
         it('selects events with canBeStartEvent=true for the start events dropdown', () => {
           const select = wrapper.find(sel.startEvent);
+          expect(select.html()).toMatchSnapshot();
+        });
 
-          startEvents.forEach(ev => {
-            expect(select.html()).toHaveHtml(
-              `<option value="${ev.identifier}">${ev.name}</option>`,
-            );
-          });
+        it('does not select events with canBeStartEvent=false for the start events dropdown', () => {
+          const select = wrapper.find(sel.startEvent);
+          expect(select.html()).toMatchSnapshot();
+
+          stopEvents
+            .filter(ev => !ev.canBeStartEvent)
+            .forEach(ev => {
+              expect(select.html()).not.toHaveHtml(
+                `<option value="${ev.identifier}">${ev.name}</option>`,
+              );
+            });
         });
       });
 

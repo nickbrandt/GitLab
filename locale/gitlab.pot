@@ -18239,13 +18239,16 @@ msgstr ""
 msgid "There was an error fetching cycle analytics stages."
 msgstr ""
 
-msgid "There was an error fetching data for the chart"
-msgstr ""
-
 msgid "There was an error fetching data for the selected stage"
 msgstr ""
 
+msgid "There was an error fetching data for the tasks by type chart"
+msgstr ""
+
 msgid "There was an error fetching label data for the selected group"
+msgstr ""
+
+msgid "There was an error fetching median data for stages"
 msgstr ""
 
 msgid "There was an error fetching the Designs"

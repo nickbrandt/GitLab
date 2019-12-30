@@ -40,11 +40,9 @@ export default {
     state.isLoadingStage = true;
     state.isEmptyStage = false;
   },
-  [types.RECEIVE_STAGE_DATA_SUCCESS](state, data = {}) {
-    const { events = [] } = data;
-
-    state.currentStageEvents = events.map(({ name = '', ...rest }) =>
-      convertObjectPropsToCamelCase({ title: name, ...rest }, { deep: true }),
+  [types.RECEIVE_STAGE_DATA_SUCCESS](state, events = []) {
+    state.currentStageEvents = events.map(fields =>
+      convertObjectPropsToCamelCase(fields, { deep: true }),
     );
     state.isEmptyStage = !events.length;
     state.isLoadingStage = false;
@@ -59,6 +57,21 @@ export default {
       ...state.tasksByType,
       labelIds: [],
     };
+  },
+  [types.REQUEST_STAGE_MEDIANS](state) {
+    state.medians = {};
+  },
+  [types.RECEIVE_STAGE_MEDIANS_SUCCESS](state, medians = []) {
+    state.medians = medians.reduce(
+      (acc, { id, value }) => ({
+        ...acc,
+        [id]: value,
+      }),
+      {},
+    );
+  },
+  [types.RECEIVE_STAGE_MEDIANS_ERROR](state) {
+    state.medians = {};
   },
   [types.RECEIVE_GROUP_LABELS_SUCCESS](state, data = []) {
     const { tasksByType } = state;
@@ -98,24 +111,11 @@ export default {
     state.summary = [];
   },
   [types.RECEIVE_SUMMARY_DATA_SUCCESS](state, data) {
-    const { stages } = state;
-    const { summary, stats } = data;
+    const { summary } = data;
     state.summary = summary.map(item => ({
       ...item,
       value: item.value || '-',
     }));
-
-    /*
-     * Medians will eventually be fetched from a separate endpoint, which will
-     * include the median calculations for the custom stages, for now we will
-     * grab the medians from the group level cycle analytics endpoint, which does
-     * not include the custom stages
-     * https://gitlab.com/gitlab-org/gitlab/issues/34751
-     */
-    state.stages = stages.map(stage => {
-      const stat = stats.find(m => m.name === stage.slug);
-      return { ...stage, value: stat ? stat.value : null };
-    });
   },
   [types.REQUEST_GROUP_STAGES_AND_EVENTS](state) {
     state.stages = [];
