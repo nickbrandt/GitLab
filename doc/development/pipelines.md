@@ -156,7 +156,7 @@ This is similar to the `.only:variables-canonical-dot-com` + `.except:refs-maste
 CI definitions:
 
 ```yaml
-.if-canonical-gitlab-and-merge-request: &if-canonical-gitlab-and-merge-request
+.if-canonical-gitlab-merge-request: &if-canonical-gitlab-merge-request
   if: '$CI_SERVER_HOST == "gitlab.com" && $CI_PROJECT_NAMESPACE =~ /^gitlab-org($|\/)/ && $CI_MERGE_REQUEST_IID'
 ```
 
@@ -212,7 +212,6 @@ graph RL;
   O[static-analysis];
   P["schedule:package-and-qa<br/>(master schedule only)"];
   Q[package-and-qa];
-  R[package-and-qa-manual];
   S["RSpec<br/>(e.g. rspec unit pg9)"]
   T[retrieve-tests-metadata];
 
@@ -259,8 +258,6 @@ subgraph "`review` stage"
 subgraph "`qa` stage"
     Q --> |needs| C;
     Q --> |needs| F;
-    R --> |needs| C;
-    R --> |needs| F;
     P --> |needs| C;
     P --> |needs| F;
     review-qa-smoke -.-> |needs and depends on| G;
