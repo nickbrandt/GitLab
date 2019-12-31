@@ -320,6 +320,8 @@ module QA
     end
 
     def remove_user_if_exists(username_or_email)
+      QA::Runtime::Logger.debug("Removing user \"#{username_or_email}\" via API")
+
       response = parse_body(get Runtime::API::Request.new(@api_client, "/users?search=#{username_or_email}").url)
 
       delete Runtime::API::Request.new(@api_client, "/users/#{response.first[:id]}").url if response.any?
