@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ResourceWeightEvent < ApplicationRecord
+  include Gitlab::Utils::StrongMemoize
+
   validates :user, presence: true
   validates :issue, presence: true
 

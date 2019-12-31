@@ -4755,7 +4755,7 @@ ActiveRecord::Schema.define(version: 2019_12_18_225624) do
   add_foreign_key "resource_label_events", "merge_requests", on_delete: :cascade
   add_foreign_key "resource_label_events", "users", on_delete: :nullify
   add_foreign_key "resource_weight_events", "issues", on_delete: :cascade
-  add_foreign_key "resource_weight_events", "users", on_delete: :cascade
+  add_foreign_key "resource_weight_events", "users", on_delete: :nullify
   add_foreign_key "reviews", "merge_requests", on_delete: :cascade
   add_foreign_key "reviews", "projects", on_delete: :cascade
   add_foreign_key "reviews", "users", column: "author_id", on_delete: :nullify

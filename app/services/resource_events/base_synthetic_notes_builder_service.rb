@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# We store events about issuable label changes in a separate table (not as
-# other system notes), but we still want to display notes about label changes
-# as classic system notes in UI.  This service generates "synthetic" notes for
-# label event changes.
+# We store events about issuable label changes and weight changes in a separate
+# table (not as other system notes), but we still want to display notes about
+# label changes and weight changes as classic system notes in UI.  This service
+# generates "synthetic" notes for label event changes.
 
 module ResourceEvents
   class BaseSyntheticNotesBuilderService

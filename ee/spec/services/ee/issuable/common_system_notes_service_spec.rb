@@ -70,6 +70,10 @@ describe Issuable::CommonSystemNotesService do
         expect(event.weight).to eq(5)
         expect(event.user_id).to eq(user.id)
       end
+
+      it 'does not create a system note' do
+        expect { subject }.not_to change { Note.count }
+      end
     end
 
     context 'when resource weight event tracking is disabled' do
@@ -79,6 +83,12 @@ describe Issuable::CommonSystemNotesService do
 
       it 'does not created a resource weight event' do
         expect { subject }.not_to change { ResourceWeightEvent.count }
+      end
+
+      it 'does create a system note' do
+        expect { subject }.to change { Note.count }.from(0).to(1)
+
+        expect(Note.first.note).to eq('changed weight to **5**')
       end
     end
   end

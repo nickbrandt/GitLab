@@ -345,10 +345,20 @@ describe API::Issues, :mailer do
       expect(json_response['message']['weight']).to be_present
     end
 
-    it 'adds a note when the weight is changed' do
+    it 'creates a ResourceWeightEvent' do
       expect do
         put api("/projects/#{project.id}/issues/#{issue.iid}", user), params: { weight: 9 }
       end.to change { ResourceWeightEvent.count }.by(1)
+    end
+
+    it 'does not create a system note' do
+      expect do
+        put api("/projects/#{project.id}/issues/#{issue.iid}", user), params: { weight: 9 }
+      end.not_to change { Note.count }
+    end
+
+    it 'adds a note when the weight is changed' do
+      put api("/projects/#{project.id}/issues/#{issue.iid}", user), params: { weight: 9 }
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['weight']).to eq(9)
@@ -365,6 +375,24 @@ describe API::Issues, :mailer do
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['weight']).to be_nil
         expect(issue.reload.read_attribute(:weight)).to be_nil
+      end
+    end
+
+    context 'when issue weight tracking feature flag is not active' do
+      before do
+        stub_feature_flags(track_issue_weight_change_events: false)
+      end
+
+      it 'does not create a ResourceWeightEvent' do
+        expect do
+          put api("/projects/#{project.id}/issues/#{issue.iid}", user), params: { weight: 9 }
+        end.not_to change { ResourceWeightEvent.count }
+      end
+
+      it 'creates a system note' do
+        expect do
+          put api("/projects/#{project.id}/issues/#{issue.iid}", user), params: { weight: 9 }
+        end.to change { Note.count }.by(1)
       end
     end
   end

@@ -29,10 +29,13 @@ module EE
       end
 
       def handle_weight_change
-        return unless weight_changes_tracking_enabled?
         return unless issuable.previous_changes.include?('weight')
 
-        EE::ResourceEvents::ChangeWeightService.new([issuable], current_user, Time.now).execute
+        if weight_changes_tracking_enabled?
+          EE::ResourceEvents::ChangeWeightService.new([issuable], current_user, Time.now).execute
+        else
+          ::SystemNoteService.change_weight_note(issuable, issuable.project, current_user)
+        end
       end
 
       def weight_changes_tracking_enabled?
