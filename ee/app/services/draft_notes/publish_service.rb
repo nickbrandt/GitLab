@@ -3,6 +3,8 @@
 module DraftNotes
   class PublishService < DraftNotes::BaseService
     def execute(draft = nil)
+      return error('Not allowed to create notes') unless can?(current_user, :create_note, merge_request)
+
       if draft
         publish_draft_note(draft)
       else
