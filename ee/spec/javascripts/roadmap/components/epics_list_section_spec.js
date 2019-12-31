@@ -1,6 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-
+import VirtualList from 'vue-virtual-scroll-list';
 import epicsListSectionComponent from 'ee/roadmap/components/epics_list_section.vue';
+import EpicItem from 'ee/roadmap/components/epic_item.vue';
 import createStore from 'ee/roadmap/store';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import {
@@ -46,8 +47,8 @@ const createComponent = ({
     localVue,
     store,
     stubs: {
-      'epic-item': false,
-      'virtual-list': false,
+      EpicItem: false,
+      VirtualList: false,
     },
     propsData: {
       presetType,
@@ -150,12 +151,15 @@ describe('EpicsListSectionComponent', () => {
     });
 
     describe('getEmptyRowContainerStyles', () => {
-      it('returns empty object when there are no epics available to render', () => {
+      it('returns empty object when there are no epics available to render', done => {
         wrapper.setProps({
           epics: [],
         });
 
-        expect(wrapper.vm.getEmptyRowContainerStyles()).toEqual({});
+        wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.getEmptyRowContainerStyles()).toEqual({});
+          done();
+        });
       });
 
       it('returns object containing `height` when there epics available to render', () => {
@@ -211,10 +215,13 @@ describe('EpicsListSectionComponent', () => {
       expect(wrapper.vm.$el.classList.contains('epics-list-section')).toBe(true);
     });
 
-    it('renders virtual-list when roadmapBufferedRendering is `true` and `epics.length` is more than `bufferSize`', () => {
+    it('renders virtual-list when roadmapBufferedRendering is `true` and `epics.length` is more than `bufferSize`', done => {
       wrapper.vm.setBufferSize(5);
 
-      expect(wrapper.find('virtuallist-stub').exists()).toBe(true);
+      wrapper.vm.$nextTick(() => {
+        expect(wrapper.find(VirtualList).exists()).toBe(true);
+        done();
+      });
     });
 
     it('renders epic-item when roadmapBufferedRendering is `false`', () => {
@@ -222,7 +229,7 @@ describe('EpicsListSectionComponent', () => {
         roadmapBufferedRendering: false,
       });
 
-      expect(wrapperFlagOff.find('epicitem-stub').exists()).toBe(true);
+      expect(wrapperFlagOff.find(EpicItem).exists()).toBe(true);
 
       wrapperFlagOff.destroy();
     });
@@ -230,7 +237,7 @@ describe('EpicsListSectionComponent', () => {
     it('renders epic-item when roadmapBufferedRendering is `true` and `epics.length` is less than `bufferSize`', () => {
       wrapper.vm.setBufferSize(50);
 
-      expect(wrapper.find('epicitem-stub').exists()).toBe(true);
+      expect(wrapper.find(EpicItem).exists()).toBe(true);
     });
 
     it('renders empty row element when `epics.length` is less than `bufferSize`', () => {
