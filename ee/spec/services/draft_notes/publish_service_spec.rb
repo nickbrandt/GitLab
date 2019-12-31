@@ -246,4 +246,14 @@ describe DraftNotes::PublishService do
       publish
     end
   end
+
+  context 'user cannot create notes' do
+    before do
+      allow(Ability).to receive(:allowed?).with(user, :create_note, merge_request).and_return(false)
+    end
+
+    it 'returns an error' do
+      expect(publish[:status]).to eq(:error)
+    end
+  end
 end
