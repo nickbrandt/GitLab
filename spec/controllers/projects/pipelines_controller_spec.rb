@@ -756,8 +756,8 @@ describe Projects::PipelinesController do
 
         expect(response).to have_gitlab_http_status(303)
 
-        expect { build.reload }.to raise_error(ActiveRecord::RecordNotFound)
-        expect { pipeline.reload }.to raise_error(ActiveRecord::RecordNotFound)
+        expect(Ci::Build.exists?(build.id)).to be_falsy
+        expect(Ci::Pipeline.exists?(pipeline.id)).to be_falsy
       end
 
       context 'and builds are disabled' do

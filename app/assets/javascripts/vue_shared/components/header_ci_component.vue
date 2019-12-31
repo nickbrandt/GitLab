@@ -1,5 +1,5 @@
 <script>
-import { GlTooltipDirective, GlLink, GlButton, GlModalDirective } from '@gitlab/ui';
+import { GlTooltipDirective, GlLink, GlButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import CiIconBadge from './ci_badge_link.vue';
 import TimeagoTooltip from './time_ago_tooltip.vue';
@@ -24,7 +24,6 @@ export default {
   },
   directives: {
     GlTooltip: GlTooltipDirective,
-    GlModal: GlModalDirective,
   },
   props: {
     status: {
@@ -127,17 +126,6 @@ export default {
           container-class="d-inline"
           :label="action.label"
           @click="onClickAction(action)"
-        />
-
-        <loading-button
-          v-else-if="action.type === 'modal-button'"
-          :key="i"
-          v-gl-modal="action.modal"
-          :loading="action.isLoading"
-          :disabled="action.isLoading"
-          :class="action.cssClass"
-          container-class="d-inline"
-          :label="action.label"
         />
       </template>
     </section>

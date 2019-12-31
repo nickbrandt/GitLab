@@ -35,13 +35,6 @@ describe('Header CI Component', () => {
           cssClass: 'btn',
           isLoading: false,
         },
-        {
-          label: 'Delete',
-          path: 'path',
-          type: 'modal-button',
-          cssClass: 'btn-modal',
-          isLoading: false,
-        },
       ],
       hasSidebarButton: true,
     };
@@ -78,12 +71,9 @@ describe('Header CI Component', () => {
 
     it('should render provided actions', () => {
       const btn = vm.$el.querySelector('.btn');
-      const btnModal = vm.$el.querySelector('.btn-modal');
 
       expect(btn.tagName).toEqual('BUTTON');
       expect(btn.textContent.trim()).toEqual(props.actions[0].label);
-      expect(btnModal.tagName).toEqual('BUTTON');
-      expect(btnModal.textContent.trim()).toEqual(props.actions[1].label);
     });
 
     it('should show loading icon', done => {

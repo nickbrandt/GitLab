@@ -128,7 +128,7 @@ describe PipelineEntity do
         let(:project) { create(:project, namespace: user.namespace) }
         let(:pipeline) { create(:ci_pipeline, project: project) }
 
-        it 'contains cancel path' do
+        it 'contains delete path' do
           expect(subject[:delete_path]).to be_present
         end
       end
@@ -137,7 +137,7 @@ describe PipelineEntity do
         let(:project) { create(:project) }
         let(:pipeline) { create(:ci_pipeline, project: project) }
 
-        it 'does not contain cancel path' do
+        it 'does not contain delete path' do
           expect(subject).not_to have_key(:delete_path)
         end
       end

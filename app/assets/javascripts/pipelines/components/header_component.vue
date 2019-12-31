@@ -4,6 +4,8 @@ import ciHeader from '../../vue_shared/components/header_ci_component.vue';
 import eventHub from '../event_hub';
 import { __ } from '~/locale';
 
+const DELETE_MODAL_ID = 'pipeline-delete-modal';
+
 export default {
   name: 'PipelineHeaderSection',
   components: {
@@ -34,6 +36,11 @@ export default {
     shouldRenderContent() {
       return !this.isLoading && Object.keys(this.pipeline).length;
     },
+    deleteModalConfirmationText() {
+      return __(
+        'Are you sure you want to delete this pipeline? Doing so will expire all pipeline caches and delete all related objects, such as builds, logs, artifacts, and triggers. This action cannot be undone.',
+      );
+    },
   },
 
   watch: {
@@ -43,6 +50,13 @@ export default {
   },
 
   methods: {
+    onActionClicked(action) {
+      if (action.modal) {
+        this.$root.$emit('bv::show::modal', action.modal);
+      } else {
+        this.postAction(action);
+      }
+    },
     postAction(action) {
       const index = this.actions.indexOf(action);
 
@@ -51,7 +65,7 @@ export default {
       eventHub.$emit('headerPostAction', action);
     },
     deletePipeline() {
-      const index = this.actions.findIndex(action => action.modal === 'pipeline-delete-modal');
+      const index = this.actions.findIndex(action => action.modal === DELETE_MODAL_ID);
 
       this.$set(this.actions[index], 'isLoading', true);
 
@@ -85,9 +99,9 @@ export default {
         actions.push({
           label: __('Delete'),
           path: this.pipeline.delete_path,
-          modal: 'pipeline-delete-modal',
+          modal: DELETE_MODAL_ID,
           cssClass: 'js-btn-delete-pipeline btn btn-danger btn-inverted',
-          type: 'modal-button',
+          type: 'button',
           isLoading: false,
         });
       }
@@ -95,6 +109,7 @@ export default {
       return actions;
     },
   },
+  DELETE_MODAL_ID,
 };
 </script>
 <template>
@@ -107,24 +122,20 @@ export default {
       :user="pipeline.user"
       :actions="actions"
       item-name="Pipeline"
-      @actionClicked="postAction"
+      @actionClicked="onActionClicked"
     />
 
     <gl-loading-icon v-if="isLoading" :size="2" class="prepend-top-default append-bottom-default" />
 
     <gl-modal
-      modal-id="pipeline-delete-modal"
+      :modal-id="$options.DELETE_MODAL_ID"
       :title="__('Delete pipeline')"
       :ok-title="__('Delete pipeline')"
       ok-variant="danger"
       @ok="deletePipeline()"
     >
       <p>
-        {{
-          __(
-            'Are you sure you want to delete this pipeline? Doing so will expire all pipeline caches and delete all related objects, such as builds, logs, artifacts, and triggers. This action cannot be undone.',
-          )
-        }}
+        {{ deleteModalConfirmationText }}
       </p>
     </gl-modal>
   </div>

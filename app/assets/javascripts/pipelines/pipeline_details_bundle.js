@@ -80,9 +80,7 @@ export default () => {
         this.mediator.stopPipelinePoll();
         this.mediator.service
           .deleteAction(action.path)
-          .then(response =>
-            redirectTo(setUrlFragment(response.request.responseURL, 'delete_success')),
-          )
+          .then(({ request }) => redirectTo(setUrlFragment(request.responseURL, 'delete_success')))
           .catch(() => Flash(__('An error occurred while deleting the pipeline.')));
       },
     },
