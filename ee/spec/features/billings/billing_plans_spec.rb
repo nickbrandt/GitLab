@@ -82,6 +82,16 @@ describe 'Billing plan pages', :feature do
     end
   end
 
+  shared_examples 'plan with subscription table' do
+    before do
+      visit page_path
+    end
+
+    it 'displays subscription table', :js do
+      expect(page).to have_selector('.js-subscription-table')
+    end
+  end
+
   context 'users profile billing page' do
     let(:page_path) { profile_billings_path }
 
@@ -129,6 +139,8 @@ describe 'Billing plan pages', :feature do
           end
         end
       end
+
+      it_behaves_like 'plan with subscription table'
     end
 
     context 'on bronze plan' do
@@ -141,6 +153,7 @@ describe 'Billing plan pages', :feature do
       it_behaves_like 'plan with header'
       it_behaves_like 'downgradable plan'
       it_behaves_like 'upgradable plan'
+      it_behaves_like 'plan with subscription table'
     end
 
     context 'on silver plan' do
@@ -153,6 +166,7 @@ describe 'Billing plan pages', :feature do
       it_behaves_like 'plan with header'
       it_behaves_like 'downgradable plan'
       it_behaves_like 'upgradable plan'
+      it_behaves_like 'plan with subscription table'
     end
 
     context 'on gold plan' do
@@ -165,6 +179,7 @@ describe 'Billing plan pages', :feature do
       it_behaves_like 'plan with header'
       it_behaves_like 'downgradable plan'
       it_behaves_like 'non-upgradable plan'
+      it_behaves_like 'plan with subscription table'
     end
   end
 
