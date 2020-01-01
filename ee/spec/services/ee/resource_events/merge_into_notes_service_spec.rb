@@ -3,11 +3,17 @@
 require 'spec_helper'
 
 describe ResourceEvents::MergeIntoNotesService do
-  def create_event(params)
+  def create_label_event(params)
     event_params = { action: :add, label: label, issue: resource,
                      user: user }
 
     create(:resource_label_event, event_params.merge(params))
+  end
+
+  def create_weight_event(params, weight = resource.weight)
+    event_params = { issue: resource, user: user }
+
+    create(:resource_weight_event, event_params.merge(params))
   end
 
   set(:project) { create(:project) }
@@ -26,15 +32,15 @@ describe ResourceEvents::MergeIntoNotesService do
     it 'squashes events with same time and author into single note but scoped labels are separated' do
       user2 = create(:user)
 
-      create_event(created_at: time)
-      create_event(created_at: time, label: label2, action: :remove)
-      create_event(created_at: time, label: scoped_label_group1_1, action: :remove)
-      create_event(created_at: time, label: scoped_label_group1_2, action: :add)
-      create_event(created_at: time, label: scoped_label_group2_2, action: :remove)
-      create_event(created_at: time, label: scoped_label_group2_1, action: :add)
-      create_event(created_at: time, label: scoped_label_group3_1, action: :add)
-      create_event(created_at: time, user: user2)
-      create_event(created_at: 1.day.ago, label: label2)
+      create_label_event(created_at: time)
+      create_label_event(created_at: time, label: label2, action: :remove)
+      create_label_event(created_at: time, label: scoped_label_group1_1, action: :remove)
+      create_label_event(created_at: time, label: scoped_label_group1_2, action: :add)
+      create_label_event(created_at: time, label: scoped_label_group2_2, action: :remove)
+      create_label_event(created_at: time, label: scoped_label_group2_1, action: :add)
+      create_label_event(created_at: time, label: scoped_label_group3_1, action: :add)
+      create_label_event(created_at: time, user: user2)
+      create_label_event(created_at: 1.day.ago, label: label2)
 
       notes = described_class.new(resource, user).execute
 
@@ -56,10 +62,10 @@ describe ResourceEvents::MergeIntoNotesService do
     context 'scoped labels' do
       context 'when all labels are automatically removed' do
         it 'adds "automatically removed" message' do
-          create_event(created_at: time, label: scoped_label_group1_1, action: :add)
-          create_event(created_at: time, label: scoped_label_group1_2, action: :remove)
-          create_event(created_at: time, label: scoped_label_group2_1, action: :add)
-          create_event(created_at: time, label: scoped_label_group2_2, action: :remove)
+          create_label_event(created_at: time, label: scoped_label_group1_1, action: :add)
+          create_label_event(created_at: time, label: scoped_label_group1_2, action: :remove)
+          create_label_event(created_at: time, label: scoped_label_group2_1, action: :add)
+          create_label_event(created_at: time, label: scoped_label_group2_2, action: :remove)
 
           note = described_class.new(resource, user).execute.first.note
 
@@ -72,9 +78,9 @@ describe ResourceEvents::MergeIntoNotesService do
 
       context 'when any of the labels is manually removed' do
         it 'adds "removed" message' do
-          create_event(created_at: time, label: scoped_label_group1_1, action: :add)
-          create_event(created_at: time, label: scoped_label_group1_2, action: :remove)
-          create_event(created_at: time, label: scoped_label_group2_1, action: :remove)
+          create_label_event(created_at: time, label: scoped_label_group1_1, action: :add)
+          create_label_event(created_at: time, label: scoped_label_group1_2, action: :remove)
+          create_label_event(created_at: time, label: scoped_label_group2_1, action: :remove)
 
           note = described_class.new(resource, user).execute.first.note
 
@@ -83,6 +89,22 @@ describe ResourceEvents::MergeIntoNotesService do
 
           expect(note).to eq("added #{added_scoped_labels_refs} scoped label and removed #{removed_scoped_labels_refs} labels")
         end
+      end
+    end
+
+    context 'with weight events' do
+      it 'includes the expected notes' do
+        create_weight_event(created_at: time, weight: 3)
+        create_weight_event(created_at: time, weight: 1)
+        create_weight_event(created_at: time, weight: 5)
+
+        notes = described_class.new(resource, user).execute
+
+        expect(notes.size).to eq(3)
+
+        expect(notes[0].note).to eq('changed weight to 3')
+        expect(notes[1].note).to eq('changed weight to 1')
+        expect(notes[2].note).to eq('changed weight to 5')
       end
     end
   end
