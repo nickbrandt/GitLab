@@ -4,7 +4,6 @@ require 'spec_helper'
 
 describe SelfMonitoringProjectCreateWorker do
   let_it_be(:jid) { 'b5b28910d97563e58c2fe55f' }
-  let_it_be(:in_progress_key) { "self_monitoring_create_in_progress:#{jid}" }
   let_it_be(:data_key) { "self_monitoring_create_result:#{jid}" }
 
   describe '#perform' do
@@ -26,16 +25,7 @@ describe SelfMonitoringProjectCreateWorker do
     end
 
     it 'writes output of service to cache' do
-      expect(Rails.cache).to receive(:write)
       expect(Rails.cache).to receive(:write).with(data_key, service_result)
-
-      subject.perform
-    end
-
-    it 'writes an in_progress key' do
-      expect(Rails.cache).to receive(:write).with(in_progress_key, true)
-      expect(Rails.cache).to receive(:write)
-      expect(Rails.cache).to receive(:delete).with(in_progress_key)
 
       subject.perform
     end
@@ -44,10 +34,10 @@ describe SelfMonitoringProjectCreateWorker do
   describe '.status', :use_clean_rails_memory_store_caching do
     subject { described_class.status(jid) }
 
-    it 'returns in_progress when in progress key present' do
-      Rails.cache.write(in_progress_key, true)
+    it 'returns in_progress when job is enqueued' do
+      jid = described_class.perform_async
 
-      expect(subject).to eq(status: :in_progress)
+      expect(described_class.status(jid)).to eq(status: :in_progress)
     end
 
     it 'returns non nil data' do
@@ -62,7 +52,7 @@ describe SelfMonitoringProjectCreateWorker do
 
       expect(subject).to eq(
         status: :unknown,
-        message: 'Job has not started as of yet or job_id is wrong'
+        message: "Status of job with ID \"#{jid}\" could not be determined"
       )
     end
   end

@@ -10155,9 +10155,6 @@ msgstr ""
 msgid "Job has been successfully erased!"
 msgstr ""
 
-msgid "Job has not started as of yet or job_id is wrong"
-msgstr ""
-
 msgid "Job has wrong arguments format."
 msgstr ""
 
@@ -17243,6 +17240,9 @@ msgid "Statistics"
 msgstr ""
 
 msgid "Status"
+msgstr ""
+
+msgid "Status of job with ID \"%{job_id}\" could not be determined"
 msgstr ""
 
 msgid "Status:"

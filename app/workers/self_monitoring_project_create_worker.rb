@@ -14,12 +14,12 @@ class SelfMonitoringProjectCreateWorker
 
   EXCLUSIVE_LEASE_KEY = 'self_monitoring_service_creation_deletion'
 
-  CACHE_IN_PROGRESS_KEY = 'self_monitoring_create_in_progress'
-  CACHE_DATA_KEY        = 'self_monitoring_create_result'
+  CACHE_DATA_KEY = 'self_monitoring_create_result'
 
   def perform
     try_obtain_lease do
-      execute
+      result = Gitlab::DatabaseImporters::SelfMonitoring::Project::CreateService.new.execute
+      Rails.cache.write(self.class.data_key(self.jid), result)
     end
   end
 
@@ -30,7 +30,9 @@ class SelfMonitoringProjectCreateWorker
   #   job has completed, an :output key will be returned with the output of the
   #   service that was executed by this worker.
   def self.status(job_id)
-    if Rails.cache.exist?(self.in_progress_key(job_id))
+    running_or_enqueued = Gitlab::SidekiqStatus.job_status(Array.wrap(job_id)).first
+
+    if running_or_enqueued
       return { status: :in_progress }
     end
 
@@ -39,15 +41,12 @@ class SelfMonitoringProjectCreateWorker
     if data.nil?
       return {
         status: :unknown,
-        message: _('Job has not started as of yet or job_id is wrong')
+        message: _('Status of job with ID "%{job_id}" could not be determined') %
+          { job_id: job_id }
       }
     end
 
     { status: :completed, output: data }
-  end
-
-  def self.in_progress_key(job_id)
-    CACHE_IN_PROGRESS_KEY + ':' + job_id.to_s
   end
 
   def self.data_key(job_id)
@@ -55,15 +54,6 @@ class SelfMonitoringProjectCreateWorker
   end
 
   private
-
-  def execute
-    Rails.cache.write(self.class.in_progress_key(self.jid), true)
-
-    result = Gitlab::DatabaseImporters::SelfMonitoring::Project::CreateService.new.execute
-    Rails.cache.write(self.class.data_key(self.jid), result)
-  ensure
-    Rails.cache.delete(self.class.in_progress_key(self.jid))
-  end
 
   def lease_key
     EXCLUSIVE_LEASE_KEY
