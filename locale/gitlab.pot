@@ -11118,6 +11118,9 @@ msgstr ""
 msgid "May"
 msgstr ""
 
+msgid "Measured in bytes of code. Excludes generated and vendored code."
+msgstr ""
+
 msgid "Median"
 msgstr ""
 
