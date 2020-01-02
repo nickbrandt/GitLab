@@ -6,7 +6,7 @@ import createRouter from './store/router';
 import projectsPlugin from './store/plugins/projects';
 import syncWithRouter from './store/plugins/sync_with_router';
 
-export default function() {
+export default function(dashboardType) {
   const el = document.getElementById('js-group-security-dashboard');
   const { isUnavailable, dashboardDocumentation, emptyStateSvgPath } = el.dataset;
 
@@ -25,7 +25,10 @@ export default function() {
   }
 
   const router = createRouter();
-  const store = createStore({ plugins: [projectsPlugin, syncWithRouter(router)] });
+  const store = createStore({
+    dashboardType,
+    plugins: [projectsPlugin, syncWithRouter(router)],
+  });
   return new Vue({
     el,
     store,
