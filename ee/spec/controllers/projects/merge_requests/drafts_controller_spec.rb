@@ -215,18 +215,42 @@ describe Projects::MergeRequests::DraftsController do
 
   describe 'POST #publish' do
     context 'without permissions' do
-      before do
-        sign_in(user2)
-        project.add_developer(user2)
+      shared_examples_for 'action that does not allow publishing draft note' do
+        it 'does not allow publishing draft note' do
+          expect { action }
+            .to not_change { Note.count }
+            .and not_change { DraftNote.count }
+
+          expect(response).to have_gitlab_http_status(404)
+        end
       end
 
-      it 'does not allow publishing draft note belonging to someone else' do
-        draft = create(:draft_note, merge_request: merge_request, author: user)
+      before do
+        sign_in(user2)
+      end
 
-        expect { post :publish, params: params.merge(id: draft.id) }.to change { Note.count }.by(0)
-          .and change { DraftNote.count }.by(0)
+      context 'when note belongs to someone else' do
+        before do
+          project.add_developer(user2)
+        end
 
-        expect(response).to have_gitlab_http_status(404)
+        it_behaves_like 'action that does not allow publishing draft note' do
+          let!(:draft) { create(:draft_note, merge_request: merge_request, author: user) }
+          let(:action) { post :publish, params: params.merge(id: draft.id) }
+        end
+      end
+
+      context 'when merge request discussion is locked' do
+        let(:project) { create(:project, :public, :merge_requests_public, :repository) }
+
+        before do
+          create(:draft_note, merge_request: merge_request, author: user2)
+          merge_request.update!(discussion_locked: true)
+        end
+
+        it_behaves_like 'action that does not allow publishing draft note' do
+          let(:action) { post :publish, params: params }
+        end
       end
     end
 
