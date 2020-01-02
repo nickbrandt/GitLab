@@ -2,7 +2,7 @@ import flash from '~/flash';
 import { __ } from '~/locale';
 import service from '../../services';
 import * as types from '../mutation_types';
-import { activityBarViews } from '../../constants';
+import { leftSidebarViews } from '../../constants';
 
 export const getMergeRequestsForBranch = ({ commit, state }, { projectId, branchId } = {}) =>
   service
@@ -181,7 +181,7 @@ export const openMergeRequest = (
     )
     .then(mrChanges => {
       if (mrChanges.changes.length) {
-        dispatch('updateActivityBarView', activityBarViews.review);
+        dispatch('leftPane/open', leftSidebarViews.review);
       }
 
       mrChanges.changes.forEach((change, ind) => {

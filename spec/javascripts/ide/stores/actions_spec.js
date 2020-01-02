@@ -5,7 +5,6 @@ import actions, {
   toggleFileFinder,
   setCurrentBranchId,
   setEmptyStateSvgs,
-  updateActivityBarView,
   updateTempFlagForEntry,
   setErrorMessage,
   deleteEntry,
@@ -453,19 +452,6 @@ describe('Multi-file store actions', () => {
         })
         .then(done)
         .catch(done.fail);
-    });
-  });
-
-  describe('updateActivityBarView', () => {
-    it('commits UPDATE_ACTIVITY_BAR_VIEW', done => {
-      testAction(
-        updateActivityBarView,
-        'test',
-        {},
-        [{ type: 'UPDATE_ACTIVITY_BAR_VIEW', payload: 'test' }],
-        [],
-        done,
-      );
     });
   });
 

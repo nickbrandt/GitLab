@@ -53,8 +53,6 @@ describe 'Multi-file editor new file', :js do
       wait_for_requests
     end
 
-    find('.js-ide-edit-mode').click
-
     expect(page).to have_content('file name')
   end
 end

@@ -1,12 +1,18 @@
 <script>
-import { mapState, mapActions, mapGetters } from 'vuex';
-import { sprintf, __ } from '~/locale';
+import { createNamespacedHelpers, mapActions, mapGetters, mapState } from 'vuex';
+import { __, sprintf } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import CommitMessageField from './message_field.vue';
 import Actions from './actions.vue';
 import SuccessMessage from './success_message.vue';
-import { activityBarViews, MAX_WINDOW_HEIGHT_COMPACT } from '../../constants';
+import { leftSidebarViews, MAX_WINDOW_HEIGHT_COMPACT } from '../../constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+
+const {
+  mapState: mapCommitState,
+  mapActions: mapCommitActions,
+  mapGetters: mapCommitGetters,
+} = createNamespacedHelpers('commit');
 
 export default {
   components: {
@@ -23,10 +29,13 @@ export default {
     };
   },
   computed: {
-    ...mapState(['changedFiles', 'stagedFiles', 'currentActivityView', 'lastCommitMsg']),
-    ...mapState('commit', ['commitMessage', 'submitCommitLoading']),
+    ...mapState(['changedFiles', 'stagedFiles', 'lastCommitMsg']),
+    ...mapState('leftPane', {
+      leftPaneCurrentView: 'currentView',
+    }),
+    ...mapCommitState(['commitMessage', 'submitCommitLoading']),
     ...mapGetters(['hasChanges']),
-    ...mapGetters('commit', ['discardDraftButtonDisabled', 'preBuiltCommitMessage']),
+    ...mapCommitGetters(['discardDraftButtonDisabled', 'preBuiltCommitMessage']),
     overviewText() {
       return sprintf(
         this.glFeatures.stageAllByDefault
@@ -46,34 +55,37 @@ export default {
       return this.stagedFiles.length ? __('Commit') : __('Stage & Commit');
     },
 
-    currentViewIsCommitView() {
-      return this.currentActivityView === activityBarViews.commit;
+    leftPaneCurrentViewIsCommitView() {
+      return this.leftPaneCurrentView === leftSidebarViews.commit.name;
     },
   },
   watch: {
-    currentActivityView() {
+    leftPaneCurrentView() {
       if (this.lastCommitMsg) {
         this.isCompact = false;
       } else {
         this.isCompact = !(
-          this.currentViewIsCommitView && window.innerHeight >= MAX_WINDOW_HEIGHT_COMPACT
+          this.leftPaneCurrentViewIsCommitView && window.innerHeight >= MAX_WINDOW_HEIGHT_COMPACT
         );
       }
     },
-
     lastCommitMsg() {
-      this.isCompact =
-        this.currentActivityView !== activityBarViews.commit && this.lastCommitMsg === '';
+      this.isCompact = !this.leftPaneCurrentViewIsCommitView && this.lastCommitMsg === '';
     },
   },
+  mounted: function mounted() {
+    if (this.lastCommitMsg) {
+      this.isCompact = false;
+    }
+  },
   methods: {
-    ...mapActions(['updateActivityBarView']),
-    ...mapActions('commit', ['updateCommitMessage', 'discardDraft', 'commitChanges']),
+    ...mapActions('leftPane', ['open', 'currentView']),
+    ...mapCommitActions(['updateCommitMessage', 'discardDraft', 'commitChanges']),
     toggleIsCompact() {
-      if (this.currentViewIsCommitView) {
+      if (this.leftPaneCurrentViewIsCommitView) {
         this.isCompact = !this.isCompact;
       } else {
-        this.updateActivityBarView(activityBarViews.commit)
+        this.open(leftSidebarViews.commit)
           .then(() => {
             this.isCompact = false;
           })
@@ -102,7 +114,7 @@ export default {
       this.componentHeight = null;
     },
   },
-  activityBarViews,
+  leftSidebarViews,
 };
 </script>
 

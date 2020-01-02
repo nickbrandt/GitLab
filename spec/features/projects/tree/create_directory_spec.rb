@@ -65,8 +65,6 @@ describe 'Multi-file editor new directory', :js do
       wait_for_requests
     end
 
-    find('.js-ide-edit-mode').click
-
     expect(page).to have_content('folder name')
   end
 end

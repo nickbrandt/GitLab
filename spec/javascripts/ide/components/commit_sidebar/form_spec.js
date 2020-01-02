@@ -4,7 +4,7 @@ import getSetTimeoutPromise from 'spec/helpers/set_timeout_promise_helper';
 import { projectData } from 'spec/ide/mock_data';
 import store from '~/ide/stores';
 import CommitForm from '~/ide/components/commit_sidebar/form.vue';
-import { activityBarViews } from '~/ide/constants';
+import { leftSidebarViews } from '~/ide/constants';
 import { resetStore } from '../../helpers';
 
 describe('IDE commit form', () => {
@@ -60,18 +60,19 @@ describe('IDE commit form', () => {
     it('shows form when clicking commit button', done => {
       vm.$el.querySelector('.btn-primary').click();
 
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('form')).not.toBeNull();
-
-        done();
-      });
+      getSetTimeoutPromise()
+        .then(() => {
+          expect(vm.$el.querySelector('form')).not.toBeNull();
+        })
+        .then(done)
+        .catch(done.fail);
     });
 
     it('toggles activity bar view when clicking commit button', done => {
       vm.$el.querySelector('.btn-primary').click();
 
       vm.$nextTick(() => {
-        expect(store.state.currentActivityView).toBe(activityBarViews.commit);
+        expect(store.state.leftPane.currentView).toBe(leftSidebarViews.commit.name);
 
         done();
       });
@@ -79,7 +80,7 @@ describe('IDE commit form', () => {
 
     it('collapses if lastCommitMsg is set to empty and current view is not commit view', done => {
       store.state.lastCommitMsg = 'abc';
-      store.state.currentActivityView = activityBarViews.edit;
+      store.state.leftPane.currentView = leftSidebarViews.ideTree.name;
 
       vm.$nextTick(() => {
         // if commit message is set, form is uncollapsed
@@ -119,21 +120,22 @@ describe('IDE commit form', () => {
         .catch(done.fail);
     });
 
-    it('updating currentActivityView not to commit view sets compact mode', done => {
-      store.state.currentActivityView = 'a';
+    it('updating leftPane.currentView not to commit view sets compact mode', done => {
+      store.state.leftPane.currentView = leftSidebarViews.ideTree.name;
 
-      vm.$nextTick(() => {
-        expect(vm.isCompact).toBe(true);
-
-        done();
-      });
+      getSetTimeoutPromise()
+        .then(() => {
+          expect(vm.isCompact).toBe(true);
+        })
+        .then(done)
+        .catch(done.fail);
     });
 
     it('always opens itself in full view current activity view is not commit view when clicking commit button', done => {
       vm.$el.querySelector('.btn-primary').click();
 
       vm.$nextTick(() => {
-        expect(store.state.currentActivityView).toBe(activityBarViews.commit);
+        expect(store.state.leftPane.currentView).toBe(leftSidebarViews.commit.name);
         expect(vm.isCompact).toBe(false);
 
         done();

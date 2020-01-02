@@ -8,7 +8,7 @@ import actions, {
   openMergeRequest,
 } from '~/ide/stores/actions/merge_request';
 import service from '~/ide/services';
-import { activityBarViews } from '~/ide/constants';
+import { leftSidebarViews } from '~/ide/constants';
 import { resetStore } from '../../helpers';
 
 const TEST_PROJECT = 'abcproject';
@@ -454,10 +454,7 @@ describe('IDE store merge request actions', () => {
 
       openMergeRequest({ state: store.state, dispatch: store.dispatch, getters: mockGetters }, mr)
         .then(() => {
-          expect(store.dispatch).toHaveBeenCalledWith(
-            'updateActivityBarView',
-            activityBarViews.review,
-          );
+          expect(store.dispatch).toHaveBeenCalledWith('leftPane/open', leftSidebarViews.review);
 
           testMergeRequestChanges.changes.forEach((change, i) => {
             expect(store.dispatch).toHaveBeenCalledWith('setFileMrChange', {

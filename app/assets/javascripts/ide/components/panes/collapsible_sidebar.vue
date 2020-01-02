@@ -127,7 +127,7 @@ export default {
             v-for="tabView in aliveTabViews"
             v-show="isActiveView(tabView.name)"
             :key="tabView.name"
-            class="flex-fill js-tab-view"
+            class="js-tab-view flex-fill min-height-0"
           >
             <component :is="tabView.component" />
           </div>

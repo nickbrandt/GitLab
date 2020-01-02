@@ -150,10 +150,6 @@ export const updateDelayViewerUpdated = ({ commit }, delay) => {
   commit(types.UPDATE_DELAY_VIEWER_CHANGE, delay);
 };
 
-export const updateActivityBarView = ({ commit }, view) => {
-  commit(types.UPDATE_ACTIVITY_BAR_VIEW, view);
-};
-
 export const setEmptyStateSvgs = ({ commit }, svgs) => {
   commit(types.SET_EMPTY_STATE_SVGS, svgs);
 };

@@ -8,7 +8,7 @@ module QA
           prepend Page::Component::WebIDE::Alert
           include Page::Component::DropdownFilter
 
-          view 'app/assets/javascripts/ide/components/activity_bar.vue' do
+          view 'app/assets/javascripts/ide/components/panes/left.vue' do
             element :commit_mode_tab
           end
 

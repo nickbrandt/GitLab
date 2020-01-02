@@ -1,11 +1,11 @@
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions, createNamespacedHelpers } from 'vuex';
 import { viewerInformationForPath } from '~/vue_shared/components/content_viewer/lib/viewer_utils';
 import flash from '~/flash';
 import ContentViewer from '~/vue_shared/components/content_viewer/content_viewer.vue';
 import DiffViewer from '~/vue_shared/components/diff_viewer/diff_viewer.vue';
 import {
-  activityBarViews,
+  leftSidebarViews,
   viewerTypes,
   FILE_VIEW_MODE_EDITOR,
   FILE_VIEW_MODE_PREVIEW,
@@ -14,6 +14,8 @@ import Editor from '../lib/editor';
 import ExternalLink from './external_link.vue';
 import FileTemplatesBar from './file_templates/bar.vue';
 import { __ } from '~/locale';
+
+const { mapState: mapLeftPaneState } = createNamespacedHelpers('leftPane');
 
 export default {
   components: {
@@ -29,14 +31,18 @@ export default {
     },
   },
   computed: {
+    ...mapState('leftPane', {
+      leftPaneIsOpen: 'isOpen',
+    }),
+    ...mapLeftPaneState(['currentView']),
     ...mapState('rightPane', {
       rightPaneIsOpen: 'isOpen',
     }),
     ...mapState([
+      'leftPanelCollapsed',
       'rightPanelCollapsed',
       'viewer',
       'panelResizing',
-      'currentActivityView',
       'renderWhitespaceInCode',
     ]),
     ...mapGetters([
@@ -98,7 +104,7 @@ export default {
       if (oldVal.key !== this.file.key) {
         this.initEditor();
 
-        if (this.currentActivityView !== activityBarViews.edit) {
+        if (this.currentView !== leftSidebarViews.ideTree.name) {
           this.setFileViewMode({
             file: this.file,
             viewMode: FILE_VIEW_MODE_EDITOR,
@@ -106,13 +112,16 @@ export default {
         }
       }
     },
-    currentActivityView() {
-      if (this.currentActivityView !== activityBarViews.edit) {
+    currentView() {
+      if (this.currentView !== leftSidebarViews.ideTree.name) {
         this.setFileViewMode({
           file: this.file,
           viewMode: FILE_VIEW_MODE_EDITOR,
         });
       }
+    },
+    leftPanelCollapsed() {
+      this.refreshEditorDimensions();
     },
     rightPanelCollapsed() {
       this.refreshEditorDimensions();
@@ -126,6 +135,9 @@ export default {
       if (!this.panelResizing) {
         this.refreshEditorDimensions();
       }
+    },
+    leftPaneIsOpen() {
+      this.refreshEditorDimensions();
     },
     rightPaneIsOpen() {
       this.refreshEditorDimensions();
@@ -261,7 +273,10 @@ export default {
     },
     refreshEditorDimensions() {
       if (this.showEditor) {
-        this.editor.updateDimensions();
+        // The `$nextTick` is needed to prevent this bug:
+        //   https://gitlab.com/gitlab-org/gitlab/merge_requests/21010#note_260420657
+        // TODO: ...but there's probably a better fix for the root cause, though.
+        this.$nextTick(() => this.editor.updateDimensions());
       }
     },
   },

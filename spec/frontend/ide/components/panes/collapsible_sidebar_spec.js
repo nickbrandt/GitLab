@@ -1,6 +1,5 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { createStore } from '~/ide/stores';
-import paneModule from '~/ide/stores/modules/pane';
 import CollapsibleSidebar from '~/ide/components/panes/collapsible_sidebar.vue';
 import Vuex from 'vuex';
 
@@ -36,7 +35,6 @@ describe('ide/components/panes/collapsible_sidebar.vue', () => {
 
   beforeEach(() => {
     store = createStore();
-    store.registerModule('leftPane', paneModule());
   });
 
   afterEach(() => {

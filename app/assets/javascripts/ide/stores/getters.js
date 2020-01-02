@@ -1,5 +1,5 @@
 import { getChangesCountForFiles, filePathMatches } from './utils';
-import { activityBarViews, packageJsonPath } from '../constants';
+import { leftSidebarViews, packageJsonPath } from '../constants';
 
 export const activeFile = state => state.openFiles.find(file => file.active) || null;
 
@@ -69,9 +69,12 @@ export const getOpenFile = state => path => state.openFiles.find(f => f.path ===
 export const lastOpenedFile = state =>
   [...state.changedFiles, ...state.stagedFiles].sort((a, b) => b.lastOpenedAt - a.lastOpenedAt)[0];
 
-export const isEditModeActive = state => state.currentActivityView === activityBarViews.edit;
-export const isCommitModeActive = state => state.currentActivityView === activityBarViews.commit;
-export const isReviewModeActive = state => state.currentActivityView === activityBarViews.review;
+export const isEditModeActive = state =>
+  state.leftPane.currentView === leftSidebarViews.ideTree.name;
+export const isCommitModeActive = state =>
+  state.leftPane.currentView === leftSidebarViews.commit.name;
+export const isReviewModeActive = state =>
+  state.leftPane.currentView === leftSidebarViews.review.name;
 
 export const someUncommittedChanges = state =>
   Boolean(state.changedFiles.length || state.stagedFiles.length);

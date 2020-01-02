@@ -5,7 +5,7 @@ import axios from '~/lib/utils/axios_utils';
 import store from '~/ide/stores';
 import repoEditor from '~/ide/components/repo_editor.vue';
 import Editor from '~/ide/lib/editor';
-import { activityBarViews, FILE_VIEW_MODE_EDITOR, FILE_VIEW_MODE_PREVIEW } from '~/ide/constants';
+import { FILE_VIEW_MODE_EDITOR, FILE_VIEW_MODE_PREVIEW, leftSidebarViews } from '~/ide/constants';
 import { createComponentWithStore } from '../../helpers/vue_mount_component_helper';
 import setTimeoutPromise from '../../helpers/set_timeout_promise_helper';
 import { file, resetStore } from '../helpers';
@@ -28,6 +28,7 @@ describe('RepoEditor', () => {
     f.tempFile = true;
     vm.$store.state.openFiles.push(f);
     Vue.set(vm.$store.state.entries, f.path, f);
+    vm.$store.state.leftPane.currentView = leftSidebarViews.ideTree.name;
 
     spyOn(vm, 'getFileData').and.returnValue(Promise.resolve());
     spyOn(vm, 'getRawFileData').and.returnValue(Promise.resolve());
@@ -46,6 +47,11 @@ describe('RepoEditor', () => {
   });
 
   const findEditor = () => vm.$el.querySelector('.multi-file-editor-holder');
+  const changeLeftPanelCollapsed = () => {
+    const { state } = vm.$store;
+
+    state.leftPanelCollapsed = !state.leftPanelCollapsed;
+  };
   const changeRightPanelCollapsed = () => {
     const { state } = vm.$store;
 
@@ -303,14 +309,29 @@ describe('RepoEditor', () => {
       spyOn(vm.editor, 'updateDiffView');
     });
 
+    it('calls updateDimensions when leftPanelCollapsed is changed', done => {
+      changeLeftPanelCollapsed();
+
+      vm.$nextTick(() => {
+        vm.$nextTick(() => {
+          expect(vm.editor.updateDimensions).toHaveBeenCalled();
+          expect(vm.editor.updateDiffView).toHaveBeenCalled();
+
+          done();
+        });
+      });
+    });
+
     it('calls updateDimensions when rightPanelCollapsed is changed', done => {
       changeRightPanelCollapsed();
 
       vm.$nextTick(() => {
-        expect(vm.editor.updateDimensions).toHaveBeenCalled();
-        expect(vm.editor.updateDiffView).toHaveBeenCalled();
+        vm.$nextTick(() => {
+          expect(vm.editor.updateDimensions).toHaveBeenCalled();
+          expect(vm.editor.updateDiffView).toHaveBeenCalled();
 
-        done();
+          done();
+        });
       });
     });
 
@@ -341,14 +362,29 @@ describe('RepoEditor', () => {
       });
     });
 
+    it('calls updateDimensions when leftPane is opened', done => {
+      vm.$store.state.leftPane.isOpen = true;
+
+      vm.$nextTick(() => {
+        vm.$nextTick(() => {
+          expect(vm.editor.updateDimensions).toHaveBeenCalled();
+          expect(vm.editor.updateDiffView).toHaveBeenCalled();
+
+          done();
+        });
+      });
+    });
+
     it('calls updateDimensions when rightPane is opened', done => {
       vm.$store.state.rightPane.isOpen = true;
 
       vm.$nextTick(() => {
-        expect(vm.editor.updateDimensions).toHaveBeenCalled();
-        expect(vm.editor.updateDiffView).toHaveBeenCalled();
+        vm.$nextTick(() => {
+          expect(vm.editor.updateDimensions).toHaveBeenCalled();
+          expect(vm.editor.updateDiffView).toHaveBeenCalled();
 
-        done();
+          done();
+        });
       });
     });
   });
@@ -359,7 +395,7 @@ describe('RepoEditor', () => {
     });
 
     it('hides tabs in review mode', done => {
-      vm.$store.state.currentActivityView = activityBarViews.review;
+      vm.$store.state.leftPane.currentView = leftSidebarViews.review.name;
 
       vm.$nextTick(() => {
         expect(vm.$el.querySelector('.nav-links')).toBe(null);
@@ -369,7 +405,7 @@ describe('RepoEditor', () => {
     });
 
     it('hides tabs in commit mode', done => {
-      vm.$store.state.currentActivityView = activityBarViews.commit;
+      vm.$store.state.leftPane.currentView = leftSidebarViews.commit.name;
 
       vm.$nextTick(() => {
         expect(vm.$el.querySelector('.nav-links')).toBe(null);

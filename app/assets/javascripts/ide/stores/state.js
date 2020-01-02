@@ -1,4 +1,4 @@
-import { activityBarViews, viewerTypes } from '../constants';
+import { viewerTypes } from '../constants';
 
 export default () => ({
   currentProjectId: '',
@@ -20,7 +20,6 @@ export default () => ({
   entries: {},
   viewer: viewerTypes.edit,
   delayViewerUpdated: false,
-  currentActivityView: activityBarViews.edit,
   unusedSeal: true,
   fileFindVisible: false,
   links: {},

@@ -121,11 +121,6 @@ export default {
       delayViewerUpdated,
     });
   },
-  [types.UPDATE_ACTIVITY_BAR_VIEW](state, currentActivityView) {
-    Object.assign(state, {
-      currentActivityView,
-    });
-  },
   [types.SET_EMPTY_STATE_SVGS](
     state,
     {

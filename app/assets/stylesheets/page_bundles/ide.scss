@@ -757,11 +757,6 @@ $ide-commit-header-height: 48px;
     margin: 0 auto;
   }
 
-  &:hover {
-    color: $gl-text-color;
-    background-color: $gray-100;
-  }
-
   &:focus {
     color: $gl-text-color;
     background-color: $gray-200;
@@ -1027,19 +1022,18 @@ $ide-commit-header-height: 48px;
 }
 
 .ide-context-header {
-  .ide-merge-requests-dropdown.dropdown-menu {
-    width: 385px;
-    max-height: initial;
+  height: 60px;
+  display: flex;
+  background-color: $gray-light;
+
+  > a,
+  > button {
+    &:hover,
+    &:focus {
+      background-color: $gray-light;  // disable hover highlight in IDE
+    }
   }
 
-  .avatar-container {
-    flex: 0 0 auto;
-    margin-right: 0;
-  }
-
-  .ide-sidebar-project-title {
-    margin-left: $ide-tree-text-start - $ide-project-avatar-end;
-  }
 }
 
 .ide-context-body {
@@ -1080,6 +1074,34 @@ $ide-commit-header-height: 48px;
 .ide-sidebar {
   width: auto;
   min-width: 60px;
+
+  .multi-file-commit-panel-inner {
+    background-color: $white-light;
+  }
+}
+
+.ide-left-sidebar {
+  flex-direction: row-reverse;
+
+  &.multi-file-commit-panel {
+    padding-right: 0;
+  }
+
+  .ide-header-icon {
+    &.ide-sidebar-link {
+      text-decoration: none;
+    }
+
+    padding: 0;
+  }
+
+  .avatar-container {
+    margin: 0;
+  }
+
+  .multi-file-commit-panel-inner {
+    width: 340px;
+  }
 }
 
 .ide-right-sidebar {
@@ -1089,9 +1111,8 @@ $ide-commit-header-height: 48px;
 
   .multi-file-commit-panel-inner {
     width: 350px;
-    padding: $grid-size $gl-padding;
-    background-color: $white-light;
     border-left: 1px solid $white-dark;
+    padding: $grid-size $gl-padding;
   }
 
   .ide-right-sidebar-clientside {

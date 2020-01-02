@@ -17,6 +17,7 @@ export const resetStore = store => {
     branches: branchesState(),
     fileTemplates: fileTemplatesState(),
     rightPane: paneState(),
+    leftPane: paneState(),
   };
   store.replaceState(newState);
 };
