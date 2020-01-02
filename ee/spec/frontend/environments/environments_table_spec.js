@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import EnvironmentTable from '~/environments/components/environments_table.vue';
 import eventHub from '~/environments/event_hub';
-import deployBoardMockData from './mock_data';
+import { deployBoardMockData } from './mock_data';
 
 describe('Environment table', () => {
   let wrapper;
