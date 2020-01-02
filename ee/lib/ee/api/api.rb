@@ -18,6 +18,7 @@ module EE
         mount ::API::EpicIssues
         mount ::API::EpicLinks
         mount ::API::Epics
+        mount ::API::ElasticsearchIndexedNamespaces
         mount ::API::FeatureFlags
         mount ::API::FeatureFlagScopes
         mount ::API::ContainerRegistryEvent
