@@ -15,6 +15,9 @@ module EE
       project.protected_branches.merge_access_by_group(group).destroy_all # rubocop: disable DestroyAll
       project.protected_branches.push_access_by_group(group).destroy_all # rubocop: disable DestroyAll
 
+      # For protected tags
+      project.protected_tags.create_access_by_group(group).delete_all
+
       # For protected environments
       project.protected_environments.deploy_access_levels_by_group(group).delete_all
     end
