@@ -56,7 +56,9 @@ describe('EpicsSelect', () => {
             issueId: 123,
           });
 
-          expect(wrapper.vm.$store.state.issueId).toBe(123);
+          return wrapper.vm.$nextTick().then(() => {
+            expect(wrapper.vm.$store.state.issueId).toBe(123);
+          });
         });
       });
 
@@ -66,7 +68,9 @@ describe('EpicsSelect', () => {
             initialEpic: mockEpic2,
           });
 
-          expect(wrapper.vm.$store.state.selectedEpic).toBe(mockEpic2);
+          return wrapper.vm.$nextTick().then(() => {
+            expect(wrapper.vm.$store.state.selectedEpic).toBe(mockEpic2);
+          });
         });
       });
 

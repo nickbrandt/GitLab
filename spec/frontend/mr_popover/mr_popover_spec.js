@@ -24,7 +24,9 @@ describe('MR Popover', () => {
   it('shows skeleton-loader while apollo is loading', () => {
     wrapper.vm.$apollo.loading = true;
 
-    expect(wrapper.element).toMatchSnapshot();
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 
   describe('loaded state', () => {
