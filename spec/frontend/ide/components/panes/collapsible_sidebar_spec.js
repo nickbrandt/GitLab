@@ -1,0 +1,199 @@
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { createStore } from '~/ide/stores';
+import paneModule from '~/ide/stores/modules/pane';
+import CollapsibleSidebar from '~/ide/components/panes/collapsible_sidebar.vue';
+import Vuex from 'vuex';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
+describe('ide/components/panes/collapsible_sidebar.vue', () => {
+  let wrapper;
+  let store;
+
+  const width = 350;
+  const fakeComponentName = 'fake-component';
+
+  const createComponent = props => {
+    wrapper = shallowMount(CollapsibleSidebar, {
+      localVue,
+      store,
+      propsData: {
+        extensionTabs: [],
+        side: 'right',
+        width,
+        ...props,
+      },
+      slots: {
+        'header-icon': '<div class=".header-icon-slot">SLOT ICON</div>',
+        header: '<div class=".header-slot"/>',
+        footer: '<div class=".footer-slot"/>',
+      },
+    });
+  };
+
+  const findTabButton = () => wrapper.find(`[data-qa-selector="${fakeComponentName}_tab_button"]`);
+
+  beforeEach(() => {
+    store = createStore();
+    store.registerModule('leftPane', paneModule());
+  });
+
+  afterEach(() => {
+    wrapper.destroy();
+    wrapper = null;
+  });
+
+  describe('with a tab', () => {
+    let fakeView;
+    let extensionTabs;
+
+    beforeEach(() => {
+      const FakeComponent = localVue.component(fakeComponentName, {
+        render: () => {},
+      });
+
+      fakeView = {
+        name: fakeComponentName,
+        keepAlive: true,
+        component: FakeComponent,
+      };
+
+      extensionTabs = [
+        {
+          show: true,
+          title: fakeComponentName,
+          views: [fakeView],
+          icon: 'text-description',
+          buttonClasses: ['button-class-1', 'button-class-2'],
+        },
+      ];
+    });
+
+    describe.each`
+      side
+      ${'left'}
+      ${'right'}
+    `('when side=$side', ({ side }) => {
+      it('correctly renders side specific attributes', done => {
+        createComponent({ extensionTabs, side });
+
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            expect(wrapper.classes()).toContain('multi-file-commit-panel');
+            expect(wrapper.classes()).toContain(`ide-${side}-sidebar`);
+            expect(wrapper.find('.multi-file-commit-panel-inner')).not.toBe(null);
+            expect(wrapper.find(`.ide-${side}-sidebar-${fakeComponentName}`)).not.toBe(null);
+            expect(findTabButton().attributes('data-placement')).toEqual(
+              side === 'left' ? 'right' : 'left',
+            );
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('when default side', () => {
+      let button;
+
+      beforeEach(() => {
+        createComponent({ extensionTabs });
+
+        button = findTabButton();
+      });
+
+      it('correctly renders tab-specific classes', done => {
+        store.state.rightPane.currentView = fakeComponentName;
+
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            expect(button.classes()).toContain('button-class-1');
+            expect(button.classes()).toContain('button-class-2');
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+
+      it('can show an open pane tab with an active view', done => {
+        store.state.rightPane.isOpen = true;
+        store.state.rightPane.currentView = fakeComponentName;
+
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            expect(button.classes()).toEqual(
+              expect.arrayContaining(['ide-sidebar-link', 'active']),
+            );
+            expect(button.attributes('data-original-title')).toEqual(fakeComponentName);
+            expect(wrapper.find('.multi-file-commit-panel-inner').exists()).toBe(true);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+
+      it('does not show a pane which is not open', done => {
+        store.state.rightPane.isOpen = false;
+        store.state.rightPane.currentView = fakeComponentName;
+
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            expect(button.classes()).not.toEqual(
+              expect.arrayContaining(['ide-sidebar-link', 'active']),
+            );
+            expect(wrapper.find('.multi-file-commit-panel-inner').exists()).toBe(false);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+
+      describe('when button is clicked', () => {
+        it('opens view', done => {
+          wrapper.vm.$nextTick(() => {
+            button.trigger('click');
+            expect(store.state.rightPane.isOpen).toBeTruthy();
+
+            done();
+          });
+        });
+
+        it('toggles open view if tab is currently active', done => {
+          wrapper.vm.$nextTick(() => {
+            button.trigger('click');
+            expect(store.state.rightPane.isOpen).toBeTruthy();
+
+            button.trigger('click');
+            expect(store.state.rightPane.isOpen).toBeFalsy();
+
+            done();
+          });
+        });
+      });
+
+      it('renders loading icon component when loading', done => {
+        store.state.loading = true;
+
+        wrapper.vm.$nextTick(() => {
+          expect(wrapper.find('.multi-file-loading-container')).not.toBeNull();
+          expect(wrapper.findAll('.multi-file-loading-container').length).toBe(3);
+
+          done();
+        });
+      });
+
+      it('shows header-icon', () => {
+        expect(wrapper.find('.header-icon-slot')).not.toBeNull();
+      });
+
+      it('shows header', () => {
+        expect(wrapper.find('.header-slot')).not.toBeNull();
+      });
+
+      it('shows footer', () => {
+        expect(wrapper.find('.footer-slot')).not.toBeNull();
+      });
+    });
+  });
+});
