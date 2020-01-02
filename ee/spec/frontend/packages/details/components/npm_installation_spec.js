@@ -90,8 +90,10 @@ describe('NpmInstallation', () => {
     it('should track when the setup tab is clicked', () => {
       setupTab().trigger('click');
 
-      expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.REGISTRY_SETUP, {
-        label,
+      return wrapper.vm.$nextTick().then(() => {
+        expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.REGISTRY_SETUP, {
+          label,
+        });
       });
     });
 
