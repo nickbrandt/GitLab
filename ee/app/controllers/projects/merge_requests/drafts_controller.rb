@@ -6,7 +6,7 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
   respond_to :json
 
   before_action :check_draft_notes_available!, except: [:index]
-  before_action :authorize_create_draft!, only: [:create]
+  before_action :authorize_create_note!, only: [:create, :publish]
   before_action :authorize_admin_draft!, only: [:update, :destroy]
   before_action :authorize_admin_draft!, if: -> { action_name == 'publish' && params[:id].present? }
 
@@ -128,7 +128,7 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
     access_denied! unless can?(current_user, :admin_note, draft_note)
   end
 
-  def authorize_create_draft!
+  def authorize_create_note!
     access_denied! unless can?(current_user, :create_note, merge_request)
   end
 
