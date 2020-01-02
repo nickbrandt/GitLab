@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_18_225624) do
+ActiveRecord::Schema.define(version: 2019_12_29_140154) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -871,7 +871,6 @@ ActiveRecord::Schema.define(version: 2019_12_18_225624) do
     t.index ["project_id", "source"], name: "index_ci_pipelines_on_project_id_and_source"
     t.index ["project_id", "status", "config_source"], name: "index_ci_pipelines_on_project_id_and_status_and_config_source"
     t.index ["project_id", "status", "updated_at"], name: "index_ci_pipelines_on_project_id_and_status_and_updated_at"
-    t.index ["project_id"], name: "index_ci_pipelines_on_project_id"
     t.index ["status"], name: "index_ci_pipelines_on_status"
     t.index ["user_id"], name: "index_ci_pipelines_on_user_id"
   end
