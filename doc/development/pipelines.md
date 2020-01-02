@@ -210,7 +210,6 @@ graph RL;
   M[coverage];
   N[pages];
   O[static-analysis];
-  P["schedule:package-and-qa<br/>(master schedule only)"];
   Q[package-and-qa];
   S["RSpec<br/>(e.g. rspec unit pg9)"]
   T[retrieve-tests-metadata];
@@ -258,8 +257,6 @@ subgraph "`review` stage"
 subgraph "`qa` stage"
     Q --> |needs| C;
     Q --> |needs| F;
-    P --> |needs| C;
-    P --> |needs| F;
     review-qa-smoke -.-> |needs and depends on| G;
     review-qa-all -.-> |needs and depends on| G;
     review-performance -.-> |needs and depends on| G;
@@ -268,8 +265,7 @@ subgraph "`qa` stage"
     end
 
 subgraph "`notification` stage"
-    NOTIFICATION1["schedule:package-and-qa:notify-success<br>(on_success)"] -.-> |needs| P;
-    NOTIFICATION2["schedule:package-and-qa:notify-failure<br>(on_failure)"] -.-> |needs| P;
+    NOTIFICATION2["package-and-qa:notify-failure<br>(manual)"] -.-> |needs| Q;
     end
 
 subgraph "`post-test` stage"
