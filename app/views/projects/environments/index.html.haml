@@ -3,7 +3,6 @@
 #environments-list-view{ data: { environments_data: environments_list_data,
   "can-read-environment" => can?(current_user, :read_environment, @project).to_s,
   "can-create-environment" => can?(current_user, :create_environment, @project).to_s,
-  "can-setup-review-app" => @project.can_setup_review_app?,
   "new-environment-path" => new_project_environment_path(@project),
   "help-page-path" => help_page_path("ci/environments"),
   "deploy-boards-help-path" => help_page_path("user/project/deploy_boards", anchor: "enabling-deploy-boards") } }
