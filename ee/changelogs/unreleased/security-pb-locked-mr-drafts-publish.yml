@@ -1,5 +1,0 @@
----
-title: Don't publish drafts if user can't create notes
-merge_request:
-author:
-type: security
