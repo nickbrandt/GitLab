@@ -8,7 +8,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
   include TreeHelper
   include IconsHelper
   include ChecksCollaboration
-  include ReviewAppSetup
+  include Gitlab::Utils::StrongMemoize
 
   presents :project
 
@@ -122,6 +122,20 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
   def license_short_name
     license = repository.license
     license&.nickname || license&.name || 'LICENSE'
+  end
+
+  def can_current_user_push_code?
+    strong_memoize(:can_current_user_push_code) do
+      if empty_repo?
+        can?(current_user, :push_code, project)
+      else
+        can_current_user_push_to_branch?(default_branch)
+      end
+    end
+  end
+
+  def can_current_user_push_to_branch?(branch)
+    user_access(project).can_push_to_branch?(branch)
   end
 
   def can_current_user_push_to_default_branch?
@@ -263,7 +277,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
 
   def kubernetes_cluster_anchor_data
     if can_cluster_be_created?
-      if clusters.empty?
+      if clusters_empty?
         AnchorData.new(false,
                        statistic_icon + _('Add Kubernetes cluster'),
                        new_project_cluster_path(project))
@@ -309,6 +323,26 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
 
   def has_extra_topics?
     count_of_extra_topics_not_shown > 0
+  end
+
+  def can_setup_review_app?
+    strong_memoize(:can_setup_review_app) do
+      cicd_missing? || (can_cluster_be_created? && clusters_empty?)
+    end
+  end
+
+  def can_cluster_be_created?
+    current_user && can?(current_user, :create_cluster, project)
+  end
+
+  def cicd_missing?
+    current_user && can_current_user_push_code? && repository.gitlab_ci_yml.blank? && !auto_devops_enabled?
+  end
+
+  def clusters_empty?
+    strong_memoize(:cluster_missing) do
+      project.clusters.empty?
+    end
   end
 
   private
