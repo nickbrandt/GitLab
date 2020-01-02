@@ -2,6 +2,7 @@ import IssuableFilteredSearchTokenKeys from 'ee/filtered_search/issuable_filtere
 
 describe('Issues Filtered Search Token Keys (EE)', () => {
   const weightTokenKey = {
+    formattedKey: 'Weight',
     key: 'weight',
     type: 'string',
     param: '',
@@ -41,7 +42,7 @@ describe('Issues Filtered Search Token Keys (EE)', () => {
     it('should return weightConditions as part of conditions', () => {
       const weightConditions = conditions.filter(c => c.tokenKey === 'weight');
 
-      expect(weightConditions.length).toBe(2);
+      expect(weightConditions.length).toBe(4);
     });
   });
 
@@ -91,6 +92,7 @@ describe('Issues Filtered Search Token Keys (EE)', () => {
       const weightConditions = conditions.filter(c => c.tokenKey === 'weight');
       const result = IssuableFilteredSearchTokenKeys.searchByConditionKeyValue(
         weightConditions[0].tokenKey,
+        weightConditions[0].operator,
         weightConditions[0].value,
       );
 
