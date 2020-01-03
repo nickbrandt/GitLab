@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-# All examples require the following variables defined:
-#   let_it_be(:jid) { 'b5b28910d97563e58c2fe55f' }
-#   let_it_be(:data_key) { "self_monitoring_delete_result:#{jid}" }
-
 # This shared_example requires the following variables:
 #   let(:service_class) { Gitlab::DatabaseImporters::SelfMonitoring::Project::DeleteService }
 #   let(:service) { instance_double(service_class) }
