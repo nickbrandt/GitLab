@@ -23,4 +23,32 @@ shared_examples 'a GraphQL type with design fields' do
 
     is_expected.to have_graphql_fields(*expected_fields).only
   end
+
+  describe '#image' do
+    let(:schema) { GitlabSchema }
+    let(:query) { GraphQL::Query.new(schema) }
+    let(:context) { double('Context', schema: schema, query: query, parent: nil) }
+    let(:field) { described_class.fields['image'] }
+    let(:args) { GraphQL::Query::Arguments::NO_ARGS }
+    let(:instance) { object_type.authorized_new(object, query.context) }
+
+    it 'resolves to the design image URL' do
+      image = field.resolve(instance, args, context).value
+      sha = design.versions.first.sha
+      url = ::Gitlab::Routing.url_helpers.project_design_url(design.project, design, sha)
+
+      expect(image).to eq(url)
+    end
+
+    it 'has better than O(N) peformance' do
+      baseline = ActiveRecord::QueryRecorder.new { field.resolve(instance, args, context).value }
+      baseline.count
+
+      expect do
+        image_a = field.resolve(instance, args, context)
+        image_b = field.resolve(instance, args, context)
+        expect(image_a.value).to eq(image_b.value)
+      end.not_to exceed_query_limit(baseline)
+    end
+  end
 end
