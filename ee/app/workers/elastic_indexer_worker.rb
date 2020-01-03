@@ -32,13 +32,16 @@ class ElasticIndexerWorker
         client.delete index: klass.index_name, type: klass.document_type, id: es_id
       end
     end
-  rescue Elasticsearch::Transport::Transport::Errors::NotFound, ActiveRecord::RecordNotFound
+  rescue Elasticsearch::Transport::Transport::Errors::NotFound, ActiveRecord::RecordNotFound => e
     # These errors can happen in several cases, including:
     # - A record is updated, then removed before the update is handled
     # - Indexing is enabled, but not every item has been indexed yet - updating
     #   and deleting the un-indexed records will raise exception
     #
     # We can ignore these.
+
+    logger.error(message: 'elastic_indexer_worker_caught_exception', error_class: e.class.name, error_message: e.message)
+
     true
   end
 
@@ -64,5 +67,9 @@ class ElasticIndexerWorker
         }
       }
     })
+  end
+
+  def logger
+    @logger ||= ::Gitlab::Elasticsearch::Logger.build
   end
 end

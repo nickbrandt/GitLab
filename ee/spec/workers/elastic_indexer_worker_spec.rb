@@ -103,4 +103,18 @@ describe ElasticIndexerWorker, :elastic do
       subject.perform("index", 'Project', object.id, object.es_id)
     end.to raise_error
   end
+
+  it 'ignores Elasticsearch::Transport::Transport::Errors::NotFound error' do
+    object = create(:project)
+
+    expect_next_instance_of(Elastic::IndexRecordService) do |service|
+      allow(service).to receive(:execute).and_raise(Elasticsearch::Transport::Transport::Errors::NotFound)
+    end
+
+    expect(subject.perform("index", 'Project', object.id, object.es_id)).to eq(true)
+  end
+
+  it 'ignores missing records' do
+    expect(subject.perform("index", 'Project', -1, 'project_-1')).to eq(true)
+  end
 end
