@@ -50,6 +50,14 @@ describe Elastic::IndexRecordService, :elastic do
           Gitlab::Elastic::Helper.refresh_index
         end.to change { Elasticsearch::Model.search('new').records.size }.by(1)
       end
+
+      it 'ignores Elasticsearch::Transport::Transport::Errors::NotFound errors' do
+        object = create(type)
+
+        allow(object.__elasticsearch__).to receive(:index_document).and_raise(Elasticsearch::Transport::Transport::Errors::NotFound)
+
+        expect(subject.execute(object, true)).to eq(true)
+      end
     end
   end
 
