@@ -16,6 +16,10 @@ module Gitlab
         end
       end
 
+      def finalize(records)
+        # nothing to do
+      end
+
       private
 
       def paginate_with_limit_optimization(relation)

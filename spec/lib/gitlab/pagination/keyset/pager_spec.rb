@@ -15,14 +15,32 @@ describe Gitlab::Pagination::Keyset::Pager do
   describe '#paginate' do
     subject { described_class.new(request).paginate(relation) }
 
-    it 'loads the result relation only once' do
+    it 'does not execute a query' do
       expect do
         subject
-      end.not_to exceed_query_limit(1)
+      end.not_to exceed_query_limit(0)
     end
 
+    it 'returns a limited relation' do
+      expect(subject).to eq(relation.limit(page.per_page))
+    end
+
+    context 'validating the order clause' do
+      let(:page) { Gitlab::Pagination::Keyset::Page.new(order_by: { created_at: :asc }, per_page: 3) }
+
+      it 'raises an error if has a different order clause than the page' do
+        expect { subject }.to raise_error(ArgumentError, /order_by does not match/)
+      end
+    end
+  end
+
+  describe '#finalize' do
+    let(:records) { relation.limit(page.per_page).load }
+
+    subject { described_class.new(request).finalize(records) }
+
     it 'passes information about next page to request' do
-      lower_bounds = relation.limit(page.per_page).last.slice(:id)
+      lower_bounds = records.last.slice(:id)
       expect(page).to receive(:next).with(lower_bounds, false).and_return(next_page)
       expect(request).to receive(:apply_headers).with(next_page)
 
@@ -50,18 +68,6 @@ describe Gitlab::Pagination::Keyset::Pager do
         end
 
         subject
-      end
-    end
-
-    it 'returns a limited relation' do
-      expect(subject).to eq(relation.limit(page.per_page))
-    end
-
-    context 'validating the order clause' do
-      let(:page) { Gitlab::Pagination::Keyset::Page.new(order_by: { created_at: :asc }, per_page: 3) }
-
-      it 'raises an error if has a different order clause than the page' do
-        expect { subject }.to raise_error(ArgumentError, /order_by does not match/)
       end
     end
   end

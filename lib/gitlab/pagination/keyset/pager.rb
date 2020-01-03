@@ -14,10 +14,11 @@ module Gitlab
           # Validate assumption: The last two columns must match the page order_by
           validate_order!(relation)
 
-          # This performs the query and retrieves records
-          relation.limit(page.per_page).load.tap do |records| # rubocop: disable CodeReuse/ActiveRecord
-            apply_headers(records.last)
-          end
+          relation.limit(page.per_page) # rubocop: disable CodeReuse/ActiveRecord
+        end
+
+        def finalize(records)
+          apply_headers(records.last)
         end
 
         private
