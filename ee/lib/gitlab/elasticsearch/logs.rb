@@ -10,7 +10,7 @@ module Gitlab
         @client = client
       end
 
-      def pod_logs(namespace, pod_name, container_name = nil)
+      def pod_logs(namespace, pod_name, container_name = nil, search = nil)
         query = {
           bool: {
             must: [
@@ -40,6 +40,16 @@ module Gitlab
               "kubernetes.container.name" => {
                 query: container_name
               }
+            }
+          }
+        end
+
+        unless search.nil?
+          query[:bool][:must] << {
+            simple_query_string: {
+              query: search,
+              fields: [:message],
+              default_operator: :and
             }
           }
         end

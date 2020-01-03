@@ -12,7 +12,7 @@ module EE
 
         before_action only: [:show] do
           push_frontend_feature_flag(:sast_merge_request_report_api, default_enabled: true)
-          push_frontend_feature_flag(:dast_merge_request_report_api)
+          push_frontend_feature_flag(:dast_merge_request_report_api, default_enabled: true)
           push_frontend_feature_flag(:container_scanning_merge_request_report_api, default_enabled: true)
           push_frontend_feature_flag(:dependency_scanning_merge_request_report_api, default_enabled: true)
           push_frontend_feature_flag(:parsed_license_report, default_enabled: true)

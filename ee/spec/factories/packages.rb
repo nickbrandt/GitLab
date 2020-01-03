@@ -30,6 +30,12 @@ FactoryBot.define do
       end
     end
 
+    factory :nuget_package do
+      sequence(:name) { |n| "NugetPackage#{n}"}
+      version { '1.0.0' }
+      package_type { :nuget }
+    end
+
     factory :conan_package do
       conan_metadatum
 

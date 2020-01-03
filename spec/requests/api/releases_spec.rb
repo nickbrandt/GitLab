@@ -76,7 +76,7 @@ describe API::Releases do
         mr_uri = URI.parse(links['merge_requests_url'])
         issue_uri = URI.parse(links['issues_url'])
 
-        expect(mr_uri.path).to eq("#{path_base}/-/merge_requests")
+        expect(mr_uri.path).to eq("#{path_base}/merge_requests")
         expect(issue_uri.path).to eq("#{path_base}/issues")
         expect(mr_uri.query).to eq(expected_query)
         expect(issue_uri.query).to eq(expected_query)
@@ -339,6 +339,40 @@ describe API::Releases do
           get api("/projects/#{project.id}/releases/v0.1", non_project_member)
 
           expect(response).to have_gitlab_http_status(:ok)
+        end
+
+        context 'when release is associated to a milestone' do
+          let!(:release) do
+            create(:release, tag: 'v0.1', project: project, milestones: [milestone])
+          end
+
+          let(:milestone) { create(:milestone, project: project) }
+
+          it 'exposes milestones' do
+            get api("/projects/#{project.id}/releases/v0.1", non_project_member)
+
+            expect(json_response['milestones'].first['title']).to eq(milestone.title)
+          end
+
+          context 'when project restricts visibility of issues and merge requests' do
+            let!(:project) { create(:project, :repository, :public, :issues_private, :merge_requests_private) }
+
+            it 'does not expose milestones' do
+              get api("/projects/#{project.id}/releases/v0.1", non_project_member)
+
+              expect(json_response['milestones']).to be_nil
+            end
+          end
+
+          context 'when project restricts visibility of issues' do
+            let!(:project) { create(:project, :repository, :public, :issues_private) }
+
+            it 'exposes milestones' do
+              get api("/projects/#{project.id}/releases/v0.1", non_project_member)
+
+              expect(json_response['milestones'].first['title']).to eq(milestone.title)
+            end
+          end
         end
       end
     end

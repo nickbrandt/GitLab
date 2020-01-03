@@ -32,7 +32,7 @@ describe 'Merge Requests > User filters by approvers', :js do
 
   context 'filtering by approver:none' do
     it 'applies the filter' do
-      input_filtered_search('approver:none')
+      input_filtered_search('approver=none')
 
       expect(page).to have_issuable_counts(open: 1, closed: 0, all: 1)
 
@@ -45,7 +45,7 @@ describe 'Merge Requests > User filters by approvers', :js do
 
   context 'filtering by approver:any' do
     it 'applies the filter' do
-      input_filtered_search('approver:any')
+      input_filtered_search('approver=any')
 
       expect(page).to have_issuable_counts(open: 3, closed: 0, all: 3)
 
@@ -58,7 +58,7 @@ describe 'Merge Requests > User filters by approvers', :js do
 
   context 'filtering by approver:@username' do
     it 'applies the filter' do
-      input_filtered_search("approver:@#{first_user.username}")
+      input_filtered_search("approver=@#{first_user.username}")
 
       expect(page).to have_issuable_counts(open: 2, closed: 0, all: 2)
 
@@ -71,7 +71,7 @@ describe 'Merge Requests > User filters by approvers', :js do
 
   context 'filtering by multiple approvers' do
     it 'applies the filter' do
-      input_filtered_search("approver:@#{first_user.username} approver:@#{user.username}")
+      input_filtered_search("approver=@#{first_user.username} approver=@#{user.username}")
 
       expect(page).to have_issuable_counts(open: 1, closed: 0, all: 1)
 
@@ -84,7 +84,7 @@ describe 'Merge Requests > User filters by approvers', :js do
 
   context 'filtering by an approver from a group' do
     it 'applies the filter' do
-      input_filtered_search("approver:@#{group_user.username}")
+      input_filtered_search("approver=@#{group_user.username}")
 
       expect(page).to have_issuable_counts(open: 1, closed: 0, all: 1)
 

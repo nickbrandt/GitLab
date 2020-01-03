@@ -1,5 +1,0 @@
----
-title: Fix Infinity % / Infinity % on Stacked Progress Bar
-merge_request: 21437
-author:
-type: fixed

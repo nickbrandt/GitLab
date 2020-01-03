@@ -1,11 +1,8 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
-import component from 'ee/feature_flags/components/configure_feature_flags_modal.vue';
-
-const localVue = createLocalVue();
+import Component from 'ee/feature_flags/components/configure_feature_flags_modal.vue';
 
 describe('Configure Feature Flags Modal', () => {
-  const Component = localVue.extend(component);
   let wrapper;
   let propsData;
 
@@ -24,7 +21,6 @@ describe('Configure Feature Flags Modal', () => {
 
     wrapper = shallowMount(Component, {
       propsData,
-      localVue,
       sync: false,
       attachToDocument: true,
     });
@@ -33,13 +29,17 @@ describe('Configure Feature Flags Modal', () => {
   describe('rotate token', () => {
     it('should emit a `token` event on click', () => {
       wrapper.find(GlButton).vm.$emit('click');
-      expect(wrapper.emitted('token')).toEqual([[]]);
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emitted('token')).toEqual([[]]);
+      });
     });
 
     it('should display an error if there is a rotate error', () => {
       wrapper.setProps({ hasRotateError: true });
-      expect(wrapper.find('.text-danger')).toExist();
-      expect(wrapper.find('[name="warning"]')).toExist();
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find('.text-danger')).toExist();
+        expect(wrapper.find('[name="warning"]')).toExist();
+      });
     });
 
     it('should be hidden if the user cannot rotate tokens', () => {

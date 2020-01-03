@@ -1,10 +1,15 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import createStore from 'ee/project_licenses/store';
 import LicensesTable from 'ee/project_licenses/components/licenses_table.vue';
+import { toLicenseObject } from 'ee/project_licenses/utils/mappers';
 import { LICENSE_LIST } from 'ee/project_licenses/store/constants';
 import PaginatedLicensesTable from 'ee/project_licenses/components/paginated_licenses_table.vue';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import mockLicensesResponse from '../store/modules/list/data/mock_licenses';
+
+jest.mock('underscore', () => ({
+  uniqueId: () => 'fakeUniqueId',
+}));
 
 describe('PaginatedLicensesTable component', () => {
   const localVue = createLocalVue();
@@ -48,7 +53,7 @@ describe('PaginatedLicensesTable component', () => {
 
   it('passes the correct props to the licenses table', () => {
     expectComponentWithProps(LicensesTable, {
-      licenses: mockLicensesResponse.licenses,
+      licenses: mockLicensesResponse.licenses.map(toLicenseObject),
       isLoading: store.state[namespace].isLoading,
     });
   });

@@ -18,7 +18,8 @@ export default {
   cycleAnalyticsTasksByTypePath: '/-/analytics/type_of_work/tasks_by_type',
   cycleAnalyticsSummaryDataPath: '/groups/:group_id/-/cycle_analytics',
   cycleAnalyticsGroupStagesAndEventsPath: '/-/analytics/cycle_analytics/stages',
-  cycleAnalyticsStageEventsPath: '/groups/:group_id/-/cycle_analytics/events/:stage_id.json',
+  cycleAnalyticsStageEventsPath: '/-/analytics/cycle_analytics/stages/:stage_id/records',
+  cycleAnalyticsStageMedianPath: '/-/analytics/cycle_analytics/stages/:stage_id/median',
   cycleAnalyticsStagePath: '/-/analytics/cycle_analytics/stages/:stage_id',
   cycleAnalyticsDurationChartPath: '/-/analytics/cycle_analytics/stages/:stage_id/duration_chart',
 
@@ -92,7 +93,7 @@ export default {
    * @param {string=} params.containerName - Container name, if not set the backend assumes a default one
    * @returns {Promise} Axios promise for the result of a GET request of logs
    */
-  getPodLogs({ projectPath, environmentName, podName, containerName }) {
+  getPodLogs({ projectPath, environmentName, podName, containerName, search }) {
     const url = this.buildUrl(this.podLogsPath).replace(':project_full_path', projectPath);
 
     const params = {
@@ -104,6 +105,9 @@ export default {
     }
     if (containerName) {
       params.container_name = containerName;
+    }
+    if (search) {
+      params.search = search;
     }
 
     return axios.get(url, { params });
@@ -155,11 +159,13 @@ export default {
   },
 
   cycleAnalyticsStageEvents(groupId, stageId, params = {}) {
-    const url = Api.buildUrl(this.cycleAnalyticsStageEventsPath)
-      .replace(':group_id', groupId)
-      .replace(':stage_id', stageId);
+    const url = Api.buildUrl(this.cycleAnalyticsStageEventsPath).replace(':stage_id', stageId);
+    return axios.get(url, { params: { ...params, group_id: groupId } });
+  },
 
-    return axios.get(url, { params });
+  cycleAnalyticsStageMedian(groupId, stageId, params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsStageMedianPath).replace(':stage_id', stageId);
+    return axios.get(url, { params: { ...params, group_id: groupId } });
   },
 
   cycleAnalyticsCreateStage(groupId, data) {

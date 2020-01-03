@@ -3,7 +3,13 @@ import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
 import * as types from 'ee/logs/stores/mutation_types';
 import logsPageState from 'ee/logs/stores/state';
-import { setInitData, showPodLogs, fetchEnvironments, fetchLogs } from 'ee/logs/stores/actions';
+import {
+  setInitData,
+  setSearch,
+  showPodLogs,
+  fetchEnvironments,
+  fetchLogs,
+} from 'ee/logs/stores/actions';
 import axios from '~/lib/utils/axios_utils';
 
 import flash from '~/flash';
@@ -16,6 +22,7 @@ import {
   mockPods,
   mockLogsResult,
   mockEnvName,
+  mockSearch,
 } from '../mock_data';
 
 jest.mock('~/flash');
@@ -43,6 +50,19 @@ describe('Logs Store actions', () => {
           { type: types.SET_PROJECT_ENVIRONMENT, payload: mockEnvName },
           { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
         ],
+        [{ type: 'fetchLogs' }],
+        done,
+      );
+    });
+  });
+
+  describe('setSearch', () => {
+    it('should commit search mutation', done => {
+      testAction(
+        setSearch,
+        mockSearch,
+        state,
+        [{ type: types.SET_SEARCH, payload: mockSearch }],
         [{ type: 'fetchLogs' }],
         done,
       );
@@ -119,6 +139,43 @@ describe('Logs Store actions', () => {
 
       mock
         .onGet(endpoint, { params: { environment_name: mockEnvName, pod_name: mockPodName } })
+        .reply(200, {
+          pod_name: mockPodName,
+          pods: mockPods,
+          logs: mockLogsResult,
+        });
+
+      mock.onGet(endpoint).replyOnce(202); // mock reactive cache
+
+      testAction(
+        fetchLogs,
+        null,
+        state,
+        [
+          { type: types.REQUEST_PODS_DATA },
+          { type: types.REQUEST_LOGS_DATA },
+          { type: types.SET_CURRENT_POD_NAME, payload: mockPodName },
+          { type: types.RECEIVE_PODS_DATA_SUCCESS, payload: mockPods },
+          { type: types.RECEIVE_LOGS_DATA_SUCCESS, payload: mockLogsResult },
+        ],
+        [],
+        done,
+      );
+    });
+
+    it('should commit logs and pod data when there is pod name and search', done => {
+      state.projectPath = mockProjectPath;
+      state.environments.current = mockEnvName;
+      state.pods.current = mockPodName;
+      state.advancedFeaturesEnabled = true;
+      state.search = mockSearch;
+
+      const endpoint = `/${mockProjectPath}/-/logs/k8s.json`;
+
+      mock
+        .onGet(endpoint, {
+          params: { environment_name: mockEnvName, pod_name: mockPodName, search: mockSearch },
+        })
         .reply(200, {
           pod_name: mockPodName,
           pods: mockPods,

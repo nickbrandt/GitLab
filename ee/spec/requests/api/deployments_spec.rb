@@ -104,7 +104,6 @@ describe API::Deployments do
   end
 
   describe 'PUT /projects/:id/deployments/:deployment_id' do
-    let(:project) { create(:project) }
     let(:deploy) do
       create(
         :deployment,

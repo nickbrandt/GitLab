@@ -32,6 +32,7 @@ module Ci
 
     has_many :stages, -> { order(position: :asc) }, inverse_of: :pipeline
     has_many :statuses, class_name: 'CommitStatus', foreign_key: :commit_id, inverse_of: :pipeline
+    has_many :latest_statuses_ordered_by_stage, -> { latest.order(:stage_idx, :stage) }, class_name: 'CommitStatus', foreign_key: :commit_id, inverse_of: :pipeline
     has_many :processables, -> { processables },
              class_name: 'CommitStatus', foreign_key: :commit_id, inverse_of: :pipeline
     has_many :builds, foreign_key: :commit_id, inverse_of: :pipeline
@@ -45,6 +46,7 @@ module Ci
     has_many :merge_requests_as_head_pipeline, foreign_key: "head_pipeline_id", class_name: 'MergeRequest'
 
     has_many :pending_builds, -> { pending }, foreign_key: :commit_id, class_name: 'Ci::Build'
+    has_many :failed_builds, -> { latest.failed }, foreign_key: :commit_id, class_name: 'Ci::Build', inverse_of: :pipeline
     has_many :retryable_builds, -> { latest.failed_or_canceled.includes(:project) }, foreign_key: :commit_id, class_name: 'Ci::Build'
     has_many :cancelable_statuses, -> { cancelable }, foreign_key: :commit_id, class_name: 'CommitStatus'
     has_many :manual_actions, -> { latest.manual_actions.includes(:project) }, foreign_key: :commit_id, class_name: 'Ci::Build'
@@ -59,8 +61,12 @@ module Ci
     has_one :chat_data, class_name: 'Ci::PipelineChatData'
 
     has_many :triggered_pipelines, through: :sourced_pipelines, source: :pipeline
+    has_many :child_pipelines, -> { merge(Ci::Sources::Pipeline.same_project) }, through: :sourced_pipelines, source: :pipeline
     has_one :triggered_by_pipeline, through: :source_pipeline, source: :source_pipeline
+    has_one :parent_pipeline, -> { merge(Ci::Sources::Pipeline.same_project) }, through: :source_pipeline, source: :source_pipeline
     has_one :source_job, through: :source_pipeline, source: :source_job
+
+    has_one :pipeline_config, class_name: 'Ci::PipelineConfig', inverse_of: :pipeline
 
     accepts_nested_attributes_for :variables, reject_if: :persisted?
 
@@ -95,8 +101,12 @@ module Ci
 
     state_machine :status, initial: :created do
       event :enqueue do
-        transition [:created, :preparing, :skipped, :scheduled] => :pending
+        transition [:created, :waiting_for_resource, :preparing, :skipped, :scheduled] => :pending
         transition [:success, :failed, :canceled] => :running
+      end
+
+      event :request_resource do
+        transition any - [:waiting_for_resource] => :waiting_for_resource
       end
 
       event :prepare do
@@ -135,7 +145,7 @@ module Ci
       # Do not add any operations to this state_machine
       # Create a separate worker for each new operation
 
-      before_transition [:created, :preparing, :pending] => :running do |pipeline|
+      before_transition [:created, :waiting_for_resource, :preparing, :pending] => :running do |pipeline|
         pipeline.started_at = Time.now
       end
 
@@ -158,7 +168,7 @@ module Ci
         end
       end
 
-      after_transition [:created, :preparing, :pending] => :running do |pipeline|
+      after_transition [:created, :waiting_for_resource, :preparing, :pending] => :running do |pipeline|
         pipeline.run_after_commit { PipelineMetricsWorker.perform_async(pipeline.id) }
       end
 
@@ -166,7 +176,7 @@ module Ci
         pipeline.run_after_commit { PipelineMetricsWorker.perform_async(pipeline.id) }
       end
 
-      after_transition [:created, :preparing, :pending, :running] => :success do |pipeline|
+      after_transition [:created, :waiting_for_resource, :preparing, :pending, :running] => :success do |pipeline|
         pipeline.run_after_commit { PipelineSuccessWorker.perform_async(pipeline.id) }
       end
 
@@ -205,6 +215,7 @@ module Ci
     end
 
     scope :internal, -> { where(source: internal_sources) }
+    scope :no_child, -> { where.not(source: :parent_pipeline) }
     scope :ci_sources, -> { where(config_source: ::Ci::PipelineEnums.ci_config_sources_values) }
     scope :for_user, -> (user) { where(user: user) }
     scope :for_sha, -> (sha) { where(sha: sha) }
@@ -317,7 +328,7 @@ module Ci
     end
 
     def self.bridgeable_statuses
-      ::Ci::Pipeline::AVAILABLE_STATUSES - %w[created preparing pending]
+      ::Ci::Pipeline::AVAILABLE_STATUSES - %w[created waiting_for_resource preparing pending]
     end
 
     def stages_count
@@ -377,9 +388,7 @@ module Ci
     end
 
     def legacy_stages_using_composite_status
-      stages = statuses.latest
-        .order(:stage_idx, :stage)
-        .group_by(&:stage)
+      stages = latest_statuses_ordered_by_stage.group_by(&:stage)
 
       stages.map do |stage_name, jobs|
         composite_status = Gitlab::Ci::Status::Composite
@@ -502,10 +511,6 @@ module Ci
       builds.skipped.after_stage(stage_idx).find_each(&:process)
     end
 
-    def child?
-      false
-    end
-
     def latest?
       return false unless git_ref && commit.present?
 
@@ -576,6 +581,7 @@ module Ci
         new_status = latest_builds_status.to_s
         case new_status
         when 'created' then nil
+        when 'waiting_for_resource' then request_resource
         when 'preparing' then prepare
         when 'pending' then enqueue
         when 'running' then run
@@ -685,6 +691,24 @@ module Ci
 
     def all_merge_requests_by_recency
       all_merge_requests.order(id: :desc)
+    end
+
+    # If pipeline is a child of another pipeline, include the parent
+    # and the siblings, otherwise return only itself.
+    def same_family_pipeline_ids
+      if (parent = parent_pipeline)
+        [parent.id] + parent.child_pipelines.pluck(:id)
+      else
+        [self.id]
+      end
+    end
+
+    def child?
+      parent_pipeline.present?
+    end
+
+    def parent?
+      child_pipelines.exists?
     end
 
     def detailed_status(current_user)

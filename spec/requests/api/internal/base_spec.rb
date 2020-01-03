@@ -326,7 +326,7 @@ describe API::Internal::Base do
           expect(json_response["gitaly"]["repository"]["relative_path"]).to eq(project.repository.gitaly_repository.relative_path)
           expect(json_response["gitaly"]["address"]).to eq(Gitlab::GitalyClient.address(project.repository_storage))
           expect(json_response["gitaly"]["token"]).to eq(Gitlab::GitalyClient.token(project.repository_storage))
-          expect(json_response["gitaly"]["features"]).to eq('gitaly-feature-inforef-uploadpack-cache' => 'true', 'gitaly-feature-get-tag-messages-go' => 'true', 'gitaly-feature-filter-shas-with-signatures-go' => 'true')
+          expect(json_response["gitaly"]["features"]).to eq('gitaly-feature-inforef-uploadpack-cache' => 'true', 'gitaly-feature-get-tag-messages-go' => 'true', 'gitaly-feature-filter-shas-with-signatures-go' => 'true', 'gitaly-feature-cache-invalidator' => 'true')
           expect(user.reload.last_activity_on).to eql(Date.today)
         end
       end
@@ -346,7 +346,7 @@ describe API::Internal::Base do
             expect(json_response["gitaly"]["repository"]["relative_path"]).to eq(project.repository.gitaly_repository.relative_path)
             expect(json_response["gitaly"]["address"]).to eq(Gitlab::GitalyClient.address(project.repository_storage))
             expect(json_response["gitaly"]["token"]).to eq(Gitlab::GitalyClient.token(project.repository_storage))
-            expect(json_response["gitaly"]["features"]).to eq('gitaly-feature-inforef-uploadpack-cache' => 'true', 'gitaly-feature-get-tag-messages-go' => 'true', 'gitaly-feature-filter-shas-with-signatures-go' => 'true')
+            expect(json_response["gitaly"]["features"]).to eq('gitaly-feature-inforef-uploadpack-cache' => 'true', 'gitaly-feature-get-tag-messages-go' => 'true', 'gitaly-feature-filter-shas-with-signatures-go' => 'true', 'gitaly-feature-cache-invalidator' => 'true')
             expect(user.reload.last_activity_on).to be_nil
           end
         end
@@ -588,7 +588,7 @@ describe API::Internal::Base do
           expect(json_response["gitaly"]["repository"]["relative_path"]).to eq(project.repository.gitaly_repository.relative_path)
           expect(json_response["gitaly"]["address"]).to eq(Gitlab::GitalyClient.address(project.repository_storage))
           expect(json_response["gitaly"]["token"]).to eq(Gitlab::GitalyClient.token(project.repository_storage))
-          expect(json_response["gitaly"]["features"]).to eq('gitaly-feature-inforef-uploadpack-cache' => 'true', 'gitaly-feature-get-tag-messages-go' => 'true', 'gitaly-feature-filter-shas-with-signatures-go' => 'true')
+          expect(json_response["gitaly"]["features"]).to eq('gitaly-feature-inforef-uploadpack-cache' => 'true', 'gitaly-feature-get-tag-messages-go' => 'true', 'gitaly-feature-filter-shas-with-signatures-go' => 'true', 'gitaly-feature-cache-invalidator' => 'true')
         end
       end
 
@@ -852,7 +852,7 @@ describe API::Internal::Base do
 
       message = <<~MESSAGE.strip
         To create a merge request for #{branch_name}, visit:
-          http://#{Gitlab.config.gitlab.host}/#{project.full_path}/-/merge_requests/new?merge_request%5Bsource_branch%5D=#{branch_name}
+          http://#{Gitlab.config.gitlab.host}/#{project.full_path}/merge_requests/new?merge_request%5Bsource_branch%5D=#{branch_name}
       MESSAGE
 
       expect(json_response['messages']).to include(build_basic_message(message))
@@ -909,7 +909,7 @@ describe API::Internal::Base do
 
         message = <<~MESSAGE.strip
           View merge request for #{branch_name}:
-            http://#{Gitlab.config.gitlab.host}/#{project.full_path}/-/merge_requests/1
+            http://#{Gitlab.config.gitlab.host}/#{project.full_path}/merge_requests/1
         MESSAGE
 
         expect(json_response['messages']).to include(build_basic_message(message))
@@ -999,6 +999,22 @@ describe API::Internal::Base do
     context 'with an orphaned write deploy key' do
       it 'does not try to notify that project moved' do
         allow_any_instance_of(Gitlab::Identifier).to receive(:identify).and_return(nil)
+
+        expect(Gitlab::Checks::ProjectMoved).not_to receive(:fetch_message)
+
+        post api('/internal/post_receive'), params: valid_params
+
+        expect(response).to have_gitlab_http_status(200)
+      end
+    end
+
+    context 'when project is nil' do
+      let(:gl_repository) { 'project-foo' }
+
+      it 'does not try to notify that project moved' do
+        allow(Gitlab::GlRepository).to receive(:parse).and_return([nil, Gitlab::GlRepository::PROJECT])
+
+        expect(Gitlab::Checks::ProjectMoved).not_to receive(:fetch_message)
 
         post api('/internal/post_receive'), params: valid_params
 

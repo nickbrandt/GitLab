@@ -162,6 +162,9 @@ module EE
 
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
+      validates :max_pages_size,
+        numericality: { only_integer: true, greater_than: 0, allow_nil: true,
+                        less_than: ::Gitlab::Pages::MAX_SIZE / 1.megabyte }
 
       validates :approvals_before_merge, numericality: true, allow_blank: true
 
@@ -586,7 +589,11 @@ module EE
     def protected_environment_by_name(environment_name)
       return unless protected_environments_feature_available?
 
-      protected_environments.find_by(name: environment_name)
+      key = "protected_environment_by_name:#{id}:#{environment_name}"
+
+      ::Gitlab::SafeRequestStore.fetch(key) do
+        protected_environments.find_by(name: environment_name)
+      end
     end
 
     override :after_import

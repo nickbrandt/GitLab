@@ -708,6 +708,34 @@ describe QuickActions::InterpretService do
       end
     end
 
+    context 'submit_review command' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:note) do
+        [
+          'I like it',
+          '/submit_review'
+        ]
+      end
+
+      with_them do
+        let(:merge_request) { create(:merge_request, source_project: project) }
+        let(:content) { '/submit_review' }
+        let!(:draft_note) { create(:draft_note, note: note, merge_request: merge_request, author: current_user) }
+
+        before do
+          stub_licensed_features(batch_comments: true)
+        end
+
+        it 'submits the users current review' do
+          _, _, message = service.execute(content, merge_request)
+
+          expect { draft_note.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          expect(message).to eq('Submitted the current review.')
+        end
+      end
+    end
+
     shared_examples 'weight command' do
       it 'populates weight specified by the /weight command' do
         _, updates = service.execute(content, issuable)

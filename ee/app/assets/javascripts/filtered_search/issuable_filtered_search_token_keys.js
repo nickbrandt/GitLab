@@ -7,6 +7,7 @@ import {
 import { __ } from '~/locale';
 
 const weightTokenKey = {
+  formattedKey: __('Weight'),
   key: 'weight',
   type: 'string',
   param: '',
@@ -18,11 +19,25 @@ const weightTokenKey = {
 const weightConditions = [
   {
     url: 'weight=None',
+    operator: '=',
     tokenKey: 'weight',
     value: __('None'),
   },
   {
     url: 'weight=Any',
+    operator: '=',
+    tokenKey: 'weight',
+    value: __('Any'),
+  },
+  {
+    url: 'not[weight]=None',
+    operator: '!=',
+    tokenKey: 'weight',
+    value: __('None'),
+  },
+  {
+    url: 'not[weight]=Any',
+    operator: '!=',
     tokenKey: 'weight',
     value: __('Any'),
   },

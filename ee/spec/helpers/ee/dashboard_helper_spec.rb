@@ -32,8 +32,20 @@ describe DashboardHelper, type: :helper do
           disable_all_analytics_feature_flags
         end
 
-        it 'does not include analytics' do
-          expect(helper.dashboard_nav_links).not_to include(:analytics)
+        context 'and the user has no access to instance statistics features' do
+          before do
+            allow(helper).to receive(:can?) { false }
+          end
+
+          it 'does not include analytics' do
+            expect(helper.dashboard_nav_links).not_to include(:analytics)
+          end
+        end
+
+        context 'and the user has access to instance statistics features' do
+          it 'does include analytics' do
+            expect(helper.dashboard_nav_links).to include(:analytics)
+          end
         end
       end
     end
@@ -95,6 +107,44 @@ describe DashboardHelper, type: :helper do
       end
 
       it { is_expected.to eq(output) }
+    end
+  end
+
+  describe 'analytics_nav_url' do
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+    end
+
+    context 'when any analytics features are enabled' do
+      it 'returns the analytics root path' do
+        expect(helper.analytics_nav_url).to match(analytics_root_path)
+      end
+    end
+
+    context 'when analytics features are disabled' do
+      before do
+        disable_all_analytics_feature_flags
+      end
+
+      context 'and user has access to instance statistics features' do
+        before do
+          allow(helper).to receive(:can?) { true }
+        end
+
+        it 'returns the instance statistics root path' do
+          expect(helper.analytics_nav_url).to match(instance_statistics_root_path)
+        end
+      end
+
+      context 'and user does not have access to instance statistics features' do
+        before do
+          allow(helper).to receive(:can?) { false }
+        end
+
+        it 'returns the not found path' do
+          expect(helper.analytics_nav_url).to match('errors/not_found')
+        end
+      end
     end
   end
 end

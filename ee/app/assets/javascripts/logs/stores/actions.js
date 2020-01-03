@@ -6,9 +6,9 @@ import flash from '~/flash';
 import { s__ } from '~/locale';
 import * as types from './mutation_types';
 
-const requestLogsUntilData = ({ projectPath, environmentName, podName }) =>
+const requestLogsUntilData = params =>
   backOff((next, stop) => {
-    Api.getPodLogs({ projectPath, environmentName, podName })
+    Api.getPodLogs(params)
       .then(res => {
         if (res.status === httpStatusCodes.ACCEPTED) {
           next();
@@ -30,6 +30,11 @@ export const setInitData = ({ dispatch, commit }, { projectPath, environmentName
 
 export const showPodLogs = ({ dispatch, commit }, podName) => {
   commit(types.SET_CURRENT_POD_NAME, podName);
+  dispatch('fetchLogs');
+};
+
+export const setSearch = ({ dispatch, commit }, searchQuery) => {
+  commit(types.SET_SEARCH, searchQuery);
   dispatch('fetchLogs');
 };
 
@@ -58,6 +63,7 @@ export const fetchLogs = ({ commit, state }) => {
     projectPath: state.projectPath,
     environmentName: state.environments.current,
     podName: state.pods.current,
+    search: state.search,
   };
 
   commit(types.REQUEST_PODS_DATA);

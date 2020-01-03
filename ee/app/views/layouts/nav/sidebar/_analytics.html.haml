@@ -3,7 +3,7 @@
     .context-header
       = link_to analytics_root_path, title: _('Analytics') do
         .avatar-container.s40.settings-avatar
-          = sprite_icon('log', size: 24)
+          = sprite_icon('chart', size: 24)
         .sidebar-context-title= _('Analytics')
     %ul.sidebar-top-level-items
       - if Gitlab::Analytics.productivity_analytics_enabled?
@@ -31,16 +31,7 @@
               = link_to analytics_cycle_analytics_path do
                 %strong.fly-out-top-item-name
                   = _('Cycle Analytics')
-      - if Gitlab::Analytics.code_analytics_enabled?
-        = nav_link(controller: :code_analytics) do
-          = link_to analytics_code_analytics_path, class: 'qa-sidebar-code-analytics' do
-            .nav-icon-container
-              = sprite_icon('code')
-            %span.nav-item-name
-              = _('Code Analytics')
-          %ul.sidebar-sub-level-items.is-fly-out-only
-            = nav_link(controller: :code_analytics, html_options: { class: "fly-out-top-item qa-sidebar-code-analytics-fly-out" } ) do
-              = link_to analytics_code_analytics_path do
-                %strong.fly-out-top-item-name
-                  = _('Code Analytics')
+
+      = render_ce 'layouts/nav/sidebar/instance_statistics_links'
+
     = render 'shared/sidebar_toggle_button'

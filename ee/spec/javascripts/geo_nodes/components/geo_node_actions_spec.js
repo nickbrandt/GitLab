@@ -67,21 +67,22 @@ describe('GeoNodeActionsComponent', () => {
 
   describe('methods', () => {
     describe('onToggleNode', () => {
-      it('emits showNodeActionModal with actionType `toggle`, node reference, modalMessage and modalActionLabel', () => {
+      it('emits showNodeActionModal with actionType `toggle`, node reference, modalMessage, modalActionLabel, and modalTitle', () => {
         spyOn(eventHub, '$emit');
         vm.onToggleNode();
 
         expect(eventHub.$emit).toHaveBeenCalledWith('showNodeActionModal', {
           actionType: NODE_ACTIONS.TOGGLE,
           node: vm.node,
-          modalMessage: 'Pausing replication stops the sync process.',
+          modalMessage: 'Pausing replication stops the sync process. Are you sure?',
           modalActionLabel: vm.nodeToggleLabel,
+          modalTitle: 'Pause replication',
         });
       });
     });
 
     describe('onRemovePrimaryNode', () => {
-      it('emits showNodeActionModal with actionType `remove`, node reference, modalKind, modalMessage and modalActionLabel', () => {
+      it('emits showNodeActionModal with actionType `remove`, node reference, modalKind, modalMessage, modalActionLabel, and modalTitle', () => {
         spyOn(eventHub, '$emit');
         vm.onRemovePrimaryNode();
 
@@ -90,14 +91,15 @@ describe('GeoNodeActionsComponent', () => {
           node: vm.node,
           modalKind: 'danger',
           modalMessage:
-            'Removing a primary node stops the sync process for all nodes. Syncing cannot be resumed without losing some data on all secondaries. In this case we would recommend setting up all nodes from scratch. Are you sure?',
-          modalActionLabel: 'Remove',
+            'Removing a Geo primary node stops the synchronization to that node. Are you sure?',
+          modalActionLabel: 'Remove node',
+          modalTitle: 'Remove primary node',
         });
       });
     });
 
     describe('onRemoveSecondaryNode', () => {
-      it('emits showNodeActionModal with actionType `remove`, node reference, modalKind, modalMessage and modalActionLabel', () => {
+      it('emits showNodeActionModal with actionType `remove`, node reference, modalKind, modalMessage, modalActionLabel, and modalTitle', () => {
         spyOn(eventHub, '$emit');
         vm.onRemoveSecondaryNode();
 
@@ -106,8 +108,9 @@ describe('GeoNodeActionsComponent', () => {
           node: vm.node,
           modalKind: 'danger',
           modalMessage:
-            'Removing a secondary node stops the sync process. It is not currently possible to add back the same node without losing some data. We only recommend setting up a new secondary node in this case. Are you sure?',
-          modalActionLabel: 'Remove',
+            'Removing a Geo secondary node stops the synchronization to that node. Are you sure?',
+          modalActionLabel: 'Remove node',
+          modalTitle: 'Remove secondary node',
         });
       });
     });

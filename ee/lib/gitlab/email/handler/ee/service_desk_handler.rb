@@ -56,9 +56,6 @@ module Gitlab
           end
 
           def create_issue!
-            # NB: the support bot is specifically forbidden
-            # from mentioning any entities, or from using
-            # slash commands.
             @issue = Issues::CreateService.new(
               project,
               User.support_bot,
@@ -128,6 +125,10 @@ module Gitlab
 
           def can_handle_legacy_format?
             project_path && project_path.include?('/') && !mail_key.include?('+')
+          end
+
+          def author
+            User.support_bot
           end
         end
       end

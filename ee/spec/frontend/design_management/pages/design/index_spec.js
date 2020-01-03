@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlAlert } from '@gitlab/ui';
 import { ApolloMutation } from 'vue-apollo';
 import DesignIndex from 'ee/design_management/pages/design/index.vue';
 import DesignDiscussion from 'ee/design_management/components/design_notes/design_discussion.vue';
@@ -80,7 +81,9 @@ describe('Design management design index page', () => {
   it('sets loading state', () => {
     createComponent(true);
 
-    expect(wrapper.element).toMatchSnapshot();
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 
   it('renders design index', () => {
@@ -90,7 +93,10 @@ describe('Design management design index page', () => {
       design,
     });
 
-    expect(wrapper.element).toMatchSnapshot();
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.element).toMatchSnapshot();
+      expect(wrapper.find(GlAlert).exists()).toBe(false);
+    });
   });
 
   describe('when has no discussions', () => {
@@ -174,5 +180,24 @@ describe('Design management design index page', () => {
       .then(() => {
         expect(findDiscussionForm().exists()).toBe(false);
       });
+  });
+
+  describe('with error', () => {
+    beforeEach(() => {
+      setDesign();
+
+      wrapper.setData({
+        design: {
+          ...design,
+          discussions: {
+            edges: [],
+          },
+        },
+        errorMessage: 'woops',
+      });
+    });
+    it('GlAlert is rendered in correct position with correct content', () => {
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 });

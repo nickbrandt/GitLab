@@ -12,13 +12,18 @@ import {
   requestRotateInstanceId,
   receiveRotateInstanceIdSuccess,
   receiveRotateInstanceIdError,
+  toggleFeatureFlag,
+  updateFeatureFlag,
+  receiveUpdateFeatureFlagSuccess,
+  receiveUpdateFeatureFlagError,
 } from 'ee/feature_flags/store/modules/index/actions';
+import { mapToScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
 import state from 'ee/feature_flags/store/modules/index/state';
 import * as types from 'ee/feature_flags/store/modules/index/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import axios from '~/lib/utils/axios_utils';
-import { getRequestData, rotateData } from '../../mock_data';
+import { getRequestData, rotateData, featureFlag } from '../../mock_data';
 
 describe('Feature flags actions', () => {
   let mockedState;
@@ -277,6 +282,140 @@ describe('Feature flags actions', () => {
         null,
         mockedState,
         [{ type: types.RECEIVE_ROTATE_INSTANCE_ID_ERROR }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('toggleFeatureFlag', () => {
+    let mock;
+
+    beforeEach(() => {
+      mockedState.featureFlags = getRequestData.feature_flags.map(flag => ({
+        ...flag,
+        scopes: mapToScopesViewModel(flag.scopes || []),
+      }));
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+    describe('success', () => {
+      it('dispatches updateFeatureFlag and receiveUpdateFeatureFlagSuccess', done => {
+        mock.onPut(featureFlag.update_path).replyOnce(200, featureFlag, {});
+
+        testAction(
+          toggleFeatureFlag,
+          featureFlag,
+          mockedState,
+          [],
+          [
+            {
+              type: 'updateFeatureFlag',
+              payload: featureFlag,
+            },
+            {
+              payload: featureFlag,
+              type: 'receiveUpdateFeatureFlagSuccess',
+            },
+          ],
+          done,
+        );
+      });
+    });
+    describe('error', () => {
+      it('dispatches updateFeatureFlag and receiveUpdateFeatureFlagSuccess', done => {
+        mock.onPut(featureFlag.update_path).replyOnce(500);
+
+        testAction(
+          toggleFeatureFlag,
+          featureFlag,
+          mockedState,
+          [],
+          [
+            {
+              type: 'updateFeatureFlag',
+              payload: featureFlag,
+            },
+            {
+              payload: featureFlag.id,
+              type: 'receiveUpdateFeatureFlagError',
+            },
+          ],
+          done,
+        );
+      });
+    });
+  });
+  describe('updateFeatureFlag', () => {
+    beforeEach(() => {
+      mockedState.featureFlags = getRequestData.feature_flags.map(f => ({
+        ...f,
+        scopes: mapToScopesViewModel(f.scopes || []),
+      }));
+    });
+
+    it('commits UPDATE_FEATURE_FLAG with the given flag', done => {
+      testAction(
+        updateFeatureFlag,
+        featureFlag,
+        mockedState,
+        [
+          {
+            type: 'UPDATE_FEATURE_FLAG',
+            payload: featureFlag,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+  describe('receiveUpdateFeatureFlagSuccess', () => {
+    beforeEach(() => {
+      mockedState.featureFlags = getRequestData.feature_flags.map(f => ({
+        ...f,
+        scopes: mapToScopesViewModel(f.scopes || []),
+      }));
+    });
+
+    it('commits RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS with the given flag', done => {
+      testAction(
+        receiveUpdateFeatureFlagSuccess,
+        featureFlag,
+        mockedState,
+        [
+          {
+            type: 'RECEIVE_UPDATE_FEATURE_FLAG_SUCCESS',
+            payload: featureFlag,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+  describe('receiveUpdateFeatureFlagError', () => {
+    beforeEach(() => {
+      mockedState.featureFlags = getRequestData.feature_flags.map(f => ({
+        ...f,
+        scopes: mapToScopesViewModel(f.scopes || []),
+      }));
+    });
+
+    it('commits RECEIVE_UPDATE_FEATURE_FLAG_ERROR with the given flag id', done => {
+      testAction(
+        receiveUpdateFeatureFlagError,
+        featureFlag.id,
+        mockedState,
+        [
+          {
+            type: 'RECEIVE_UPDATE_FEATURE_FLAG_ERROR',
+            payload: featureFlag.id,
+          },
+        ],
         [],
         done,
       );

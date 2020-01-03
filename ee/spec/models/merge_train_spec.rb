@@ -543,6 +543,20 @@ describe MergeTrain do
     end
   end
 
+  describe '#destroy' do
+    subject { merge_train.destroy }
+
+    context 'when merge train has a pipeline' do
+      let(:merge_train) { create(:merge_train, pipeline: pipeline) }
+      let(:pipeline) { create(:ci_pipeline, :running) }
+      let(:build) { create(:ci_build, :running, pipeline: pipeline) }
+
+      it 'cancels the jobs in the pipeline' do
+        expect { subject }.to change { build.reload.status }.from('running').to('canceled')
+      end
+    end
+  end
+
   describe '#cleanup_ref' do
     subject { merge_train.cleanup_ref }
 
@@ -552,6 +566,22 @@ describe MergeTrain do
       expect(merge_train.merge_request).to receive(:cleanup_refs).with(only: :train)
 
       subject
+    end
+  end
+
+  describe '#active?' do
+    subject { merge_train.active? }
+
+    context 'when status is created' do
+      let(:merge_train) { create(:merge_train, :created) }
+
+      it { is_expected.to eq(true) }
+    end
+
+    context 'when status is merged' do
+      let(:merge_train) { create(:merge_train, :merged) }
+
+      it { is_expected.to eq(false) }
     end
   end
 

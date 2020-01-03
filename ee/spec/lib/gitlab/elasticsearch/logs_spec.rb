@@ -17,110 +17,37 @@ describe Gitlab::Elasticsearch::Logs do
   let(:namespace) { "autodevops-deploy-9-production" }
   let(:pod_name) { "production-6866bc8974-m4sk4" }
   let(:container_name) { "auto-deploy-app" }
+  let(:search) { "foo +bar "}
 
-  let(:body) do
-    {
-      query: {
-        bool: {
-            must: [
-                {
-                    match_phrase: {
-                        "kubernetes.pod.name" => {
-                            query: pod_name
-                        }
-                    }
-                },
-                {
-                    match_phrase: {
-                        "kubernetes.namespace" => {
-                            query: namespace
-                        }
-                    }
-                }
-            ]
-        }
-      },
-      sort: [
-        {
-            :@timestamp => {
-                order: :desc
-            }
-        },
-        {
-            offset: {
-                order: :desc
-            }
-        }
-      ],
-      _source: [
-          "@timestamp",
-          "message"
-      ],
-      size: 500
-    }
-  end
+  let(:body) { JSON.parse(fixture_file('lib/elasticsearch/query.json', dir: 'ee')) }
+  let(:body_with_container) { JSON.parse(fixture_file('lib/elasticsearch/query_with_container.json', dir: 'ee')) }
+  let(:body_with_search) { JSON.parse(fixture_file('lib/elasticsearch/query_with_search.json', dir: 'ee')) }
 
-  let(:body_with_container) do
-    {
-      query: {
-        bool: {
-            must: [
-                {
-                    match_phrase: {
-                        "kubernetes.pod.name" => {
-                            query: pod_name
-                        }
-                    }
-                },
-                {
-                    match_phrase: {
-                        "kubernetes.namespace" => {
-                            query: namespace
-                        }
-                    }
-                },
-                {
-                    match_phrase: {
-                        "kubernetes.container.name" => {
-                            query: container_name
-                        }
-                    }
-                }
-            ]
-        }
-      },
-      sort: [
-        {
-            :@timestamp => {
-                order: :desc
-            }
-        },
-        {
-            offset: {
-                order: :desc
-            }
-        }
-      ],
-      _source: [
-          "@timestamp",
-          "message"
-      ],
-      size: 500
-    }
+  RSpec::Matchers.define :a_hash_equal_to_json do |expected|
+    match do |actual|
+      actual.as_json == expected
+    end
   end
 
   describe '#pod_logs' do
     it 'returns the logs as an array' do
-      expect(client).to receive(:search).with(body: body).and_return(es_response)
+      expect(client).to receive(:search).with(body: a_hash_equal_to_json(body)).and_return(es_response)
 
       result = subject.pod_logs(namespace, pod_name)
       expect(result).to eq([es_message_4, es_message_3, es_message_2, es_message_1])
     end
 
     it 'can further filter the logs by container name' do
-      expect(client).to receive(:search).with(body: body_with_container).and_return(es_response)
+      expect(client).to receive(:search).with(body: a_hash_equal_to_json(body_with_container)).and_return(es_response)
 
       result = subject.pod_logs(namespace, pod_name, container_name)
+      expect(result).to eq([es_message_4, es_message_3, es_message_2, es_message_1])
+    end
+
+    it 'can further filter the logs by search' do
+      expect(client).to receive(:search).with(body: a_hash_equal_to_json(body_with_search)).and_return(es_response)
+
+      result = subject.pod_logs(namespace, pod_name, nil, search)
       expect(result).to eq([es_message_4, es_message_3, es_message_2, es_message_1])
     end
   end

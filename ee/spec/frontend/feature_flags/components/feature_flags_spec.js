@@ -1,6 +1,7 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import store from 'ee/feature_flags/store';
 import FeatureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
 import FeatureFlagsTable from 'ee/feature_flags/components/feature_flags_table.vue';
 import ConfigureFeatureFlagsModal from 'ee/feature_flags/components/configure_feature_flags_modal.vue';
@@ -9,8 +10,6 @@ import NavigationTabs from '~/vue_shared/components/navigation_tabs';
 import TablePagination from '~/vue_shared/components/pagination/table_pagination.vue';
 import axios from '~/lib/utils/axios_utils';
 import { getRequestData } from '../mock_data';
-
-const localVue = createLocalVue();
 
 describe('Feature flags', () => {
   const mockData = {
@@ -31,7 +30,6 @@ describe('Feature flags', () => {
 
   const factory = (propsData = mockData) => {
     wrapper = shallowMount(FeatureFlagsComponent, {
-      localVue,
       propsData,
       sync: false,
     });
@@ -42,6 +40,7 @@ describe('Feature flags', () => {
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
+    jest.spyOn(store, 'dispatch');
   });
 
   afterEach(() => {
@@ -146,7 +145,7 @@ describe('Feature flags', () => {
         it('renders disabled title', () => {
           wrapper.setData({ scope: 'disabled' });
 
-          return localVue.nextTick(() => {
+          return wrapper.vm.$nextTick(() => {
             expect(emptyState.props('title')).toEqual('There are no inactive feature flags');
           });
         });
@@ -156,7 +155,7 @@ describe('Feature flags', () => {
         it('renders enabled title', () => {
           wrapper.setData({ scope: 'enabled' });
 
-          localVue.nextTick(() => {
+          wrapper.vm.$nextTick(() => {
             expect(emptyState.props('title')).toEqual('There are no active feature flags');
           });
         });
@@ -184,7 +183,7 @@ describe('Feature flags', () => {
 
       it('should render a table with feature flags', () => {
         const table = wrapper.find(FeatureFlagsTable);
-        expect(wrapper.find(FeatureFlagsTable).exists()).toBe(true);
+        expect(table.exists()).toBe(true);
         expect(table.props('featureFlags')).toEqual(
           expect.arrayContaining([
             expect.objectContaining({
@@ -193,6 +192,15 @@ describe('Feature flags', () => {
             }),
           ]),
         );
+      });
+
+      it('should toggle a flag when receiving the toggle-flag event', () => {
+        const table = wrapper.find(FeatureFlagsTable);
+
+        const [flag] = table.props('featureFlags');
+        table.vm.$emit('toggle-flag', flag);
+
+        expect(store.dispatch).toHaveBeenCalledWith('index/toggleFeatureFlag', flag);
       });
 
       it('renders configure button', () => {

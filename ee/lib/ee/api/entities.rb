@@ -148,13 +148,18 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
+          can_admin_namespace = ->(namespace, opts) { ::Ability.allowed?(opts[:current_user], :admin_namespace, namespace) }
+
           expose :shared_runners_minutes_limit, if: ->(_, options) { options[:current_user]&.admin? }
           expose :extra_shared_runners_minutes_limit, if: ->(_, options) { options[:current_user]&.admin? }
           expose :billable_members_count do |namespace, options|
             namespace.billable_members_count(options[:requested_hosted_plan])
           end
-          expose :plan, if: ->(namespace, opts) { ::Ability.allowed?(opts[:current_user], :admin_namespace, namespace) } do |namespace, _|
+          expose :plan, if: can_admin_namespace do |namespace, _|
             namespace.actual_plan_name
+          end
+          expose :trial_ends_on, if: can_admin_namespace do |namespace, _|
+            namespace.trial_ends_on
           end
         end
       end
@@ -320,15 +325,23 @@ module EE
         expose :state
         expose :web_edit_url, if: can_admin_epic # @deprecated
         expose :web_url
+        expose :references, with: ::API::Entities::IssuableReferences do |epic|
+          epic
+        end
+        # reference is deprecated in favour of references
+        # Introduced [Gitlab 12.6](https://gitlab.com/gitlab-org/gitlab/merge_requests/20354)
         expose :reference, if: { with_reference: true } do |epic|
           epic.to_reference(full: true)
         end
         expose :created_at
         expose :updated_at
         expose :closed_at
-        expose :labels do |epic|
-          # Avoids an N+1 query since labels are preloaded
-          epic.labels.map(&:title).sort
+        expose :labels do |epic, options|
+          if options[:with_labels_details]
+            ::API::Entities::LabelBasic.represent(epic.labels.sort_by(&:title))
+          else
+            epic.labels.map(&:title).sort
+          end
         end
         expose :upvotes do |epic, options|
           if options[:issuable_metadata]
@@ -939,6 +952,8 @@ module EE
         expose :report_type
 
         expose :project, using: ::API::Entities::ProjectIdentity
+
+        expose :finding
 
         expose :author_id
         expose :updated_by_id

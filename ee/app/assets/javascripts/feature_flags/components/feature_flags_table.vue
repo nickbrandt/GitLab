@@ -1,6 +1,6 @@
 <script>
 import _ from 'underscore';
-import { GlButton, GlLink, GlTooltipDirective, GlModalDirective, GlModal } from '@gitlab/ui';
+import { GlButton, GlTooltipDirective, GlModalDirective, GlModal, GlToggle } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -9,9 +9,9 @@ import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT } from '../constants';
 export default {
   components: {
     GlButton,
-    GlLink,
     Icon,
     GlModal,
+    GlToggle,
   },
   directives: {
     GlModalDirective,
@@ -62,6 +62,9 @@ export default {
     modalId() {
       return 'delete-feature-flag';
     },
+    hasFeatureFlagToggle() {
+      return this.glFeatures.featureFlagToggle;
+    },
   },
   methods: {
     scopeTooltipText(scope) {
@@ -94,6 +97,12 @@ export default {
     onSubmit() {
       this.$refs.form.submit();
     },
+    toggleFeatureFlag(flag) {
+      this.$emit('toggle-flag', {
+        ...flag,
+        active: !flag.active,
+      });
+    },
   },
 };
 </script>
@@ -123,7 +132,12 @@ export default {
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
           <div class="table-mobile-content js-feature-flag-status">
-            <span v-if="featureFlag.active" class="badge badge-success">
+            <gl-toggle
+              v-if="hasFeatureFlagToggle && featureFlag.update_path"
+              :value="featureFlag.active"
+              @change="toggleFeatureFlag(featureFlag)"
+            />
+            <span v-else-if="featureFlag.active" class="badge badge-success">
               {{ s__('FeatureFlags|Active') }}
             </span>
             <span v-else class="badge badge-danger">{{ s__('FeatureFlags|Inactive') }}</span>

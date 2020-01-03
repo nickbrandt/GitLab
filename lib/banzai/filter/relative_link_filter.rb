@@ -116,7 +116,7 @@ module Banzai
       end
 
       def process_link_to_upload_attr(html_attr)
-        path_parts = [Addressable::URI.unescape(html_attr.value)]
+        path_parts = [unescape_and_scrub_uri(html_attr.value)]
 
         if project
           path_parts.unshift(relative_url_root, project.full_path)
@@ -152,18 +152,11 @@ module Banzai
 
       def rebuild_relative_uri(uri)
         file_path = nested_file_path_if_exists(uri)
-        resource_type = uri_type(file_path)
-
-        # Repository routes are under /-/ scope now.
-        # Since we craft a path without using route helpers we must
-        # ensure - is added here.
-        prefix = '-' if %w(tree blob raw commits).include?(resource_type.to_s)
 
         uri.path = [
           relative_url_root,
           project.full_path,
-          prefix,
-          resource_type,
+          uri_type(file_path),
           Addressable::URI.escape(ref).gsub('#', '%23'),
           Addressable::URI.escape(file_path)
         ].compact.join('/').squeeze('/').chomp('/')
@@ -179,7 +172,7 @@ module Banzai
       end
 
       def cleaned_file_path(uri)
-        Addressable::URI.unescape(uri.path).scrub.delete("\0").chomp("/")
+        unescape_and_scrub_uri(uri.path).delete("\0").chomp("/")
       end
 
       def relative_file_path(uri)
@@ -191,7 +184,7 @@ module Banzai
       def request_path
         return unless context[:requested_path]
 
-        Addressable::URI.unescape(context[:requested_path]).chomp("/")
+        unescape_and_scrub_uri(context[:requested_path]).chomp("/")
       end
 
       # Convert a relative path into its correct location based on the currently
@@ -272,6 +265,12 @@ module Banzai
 
       def repository
         @repository ||= project&.repository
+      end
+
+      private
+
+      def unescape_and_scrub_uri(uri)
+        Addressable::URI.unescape(uri).scrub
       end
     end
   end

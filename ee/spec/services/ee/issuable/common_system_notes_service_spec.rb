@@ -8,7 +8,20 @@ describe Issuable::CommonSystemNotesService do
   let(:issuable) { create(:issue) }
 
   context 'on issuable update' do
-    it_behaves_like 'system note creation', { weight: 5 }, 'changed weight to **5**'
+    context 'when weight is changed' do
+      before do
+        issuable.update!(weight: 5)
+      end
+
+      it 'creates a resource label event' do
+        described_class.new(project, user).execute(issuable, old_labels: [])
+        event = issuable.reload.resource_weight_events.last
+
+        expect(event).not_to be_nil
+        expect(event.weight).to eq 5
+        expect(event.user_id).to eq user.id
+      end
+    end
 
     context 'when issuable is an epic' do
       let(:timestamp) { Time.now }
@@ -35,12 +48,48 @@ describe Issuable::CommonSystemNotesService do
 
     subject { described_class.new(project, user).execute(issuable, old_labels: [], is_update: false) }
 
-    it 'creates a system note for weight' do
+    before do
       issuable.weight = 5
       issuable.save
+    end
 
-      expect { subject }.to change { issuable.notes.count }.from(0).to(1)
-      expect(issuable.notes.last.note).to match('changed weight')
+    it 'does not create a common system note for weight' do
+      expect { subject }.not_to change { issuable.notes.count }
+    end
+
+    context 'when resource weight event tracking is enabled' do
+      before do
+        stub_feature_flags(track_issue_weight_change_events: true)
+      end
+
+      it 'creates a resource weight event' do
+        subject
+
+        event = issuable.resource_weight_events.last
+
+        expect(event.weight).to eq(5)
+        expect(event.user_id).to eq(user.id)
+      end
+
+      it 'does not create a system note' do
+        expect { subject }.not_to change { Note.count }
+      end
+    end
+
+    context 'when resource weight event tracking is disabled' do
+      before do
+        stub_feature_flags(track_issue_weight_change_events: false)
+      end
+
+      it 'does not created a resource weight event' do
+        expect { subject }.not_to change { ResourceWeightEvent.count }
+      end
+
+      it 'does create a system note' do
+        expect { subject }.to change { Note.count }.from(0).to(1)
+
+        expect(Note.first.note).to eq('changed weight to **5**')
+      end
     end
   end
 end

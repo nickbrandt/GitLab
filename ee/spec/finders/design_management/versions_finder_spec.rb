@@ -15,7 +15,9 @@ describe DesignManagement::VersionsFinder do
   let(:design_or_collection) { issue.design_collection }
   let(:params) { {} }
 
-  subject(:versions) { described_class.new(design_or_collection, user, params).execute }
+  let(:finder) { described_class.new(design_or_collection, user, params) }
+
+  subject(:versions) { finder.execute }
 
   describe '#execute' do
     shared_examples 'returns no results' do
@@ -77,6 +79,48 @@ describe DesignManagement::VersionsFinder do
             let(:params) { { earlier_or_equal_to: version_2 }}
 
             it { is_expected.to contain_exactly(version_1, version_2) }
+          end
+        end
+
+        describe 'returning versions by SHA' do
+          context 'when argument is the first version' do
+            let(:params) { { sha: version_1.sha } }
+
+            it { is_expected.to contain_exactly(version_1) }
+          end
+
+          context 'when argument is the second version' do
+            let(:params) { { sha: version_2.sha } }
+
+            it { is_expected.to contain_exactly(version_2) }
+          end
+        end
+
+        describe 'returning versions by ID' do
+          context 'when argument is the first version' do
+            let(:params) { { version_id: version_1.id } }
+
+            it { is_expected.to contain_exactly(version_1) }
+          end
+
+          context 'when argument is the second version' do
+            let(:params) { { version_id: version_2.id } }
+
+            it { is_expected.to contain_exactly(version_2) }
+          end
+        end
+
+        describe 'mixing id and sha' do
+          context 'when arguments are consistent' do
+            let(:params) { { version_id: version_1.id, sha: version_1.sha } }
+
+            it { is_expected.to contain_exactly(version_1) }
+          end
+
+          context 'when arguments are in-consistent' do
+            let(:params) { { version_id: version_1.id, sha: version_2.sha } }
+
+            it { is_expected.to be_empty }
           end
         end
       end

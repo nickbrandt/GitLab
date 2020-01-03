@@ -90,18 +90,26 @@ describe('NpmInstallation', () => {
     it('should track when the setup tab is clicked', () => {
       setupTab().trigger('click');
 
-      expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.REGISTRY_SETUP, {
-        label,
+      return wrapper.vm.$nextTick().then(() => {
+        expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.REGISTRY_SETUP, {
+          label,
+        });
       });
     });
 
     it('should track when the installation tab is clicked', () => {
       setupTab().trigger('click');
-      installationTab().trigger('click');
 
-      expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.INSTALLATION, {
-        label,
-      });
+      return wrapper.vm
+        .$nextTick()
+        .then(() => {
+          installationTab().trigger('click');
+        })
+        .then(() => {
+          expect(eventSpy).toHaveBeenCalledWith(undefined, TrackingActions.INSTALLATION, {
+            label,
+          });
+        });
     });
   });
 });

@@ -2390,6 +2390,7 @@ describe User, :do_not_mock_admin_mode do
 
   describe '#authorizations_for_projects' do
     let!(:user) { create(:user) }
+
     subject { Project.where("EXISTS (?)", user.authorizations_for_projects) }
 
     it 'includes projects that belong to a user, but no other projects' do
@@ -2637,8 +2638,8 @@ describe User, :do_not_mock_admin_mode do
           add_user(:maintainer)
         end
 
-        it 'loads' do
-          expect(user.ci_owned_runners).to contain_exactly(runner)
+        it 'does not load' do
+          expect(user.ci_owned_runners).to be_empty
         end
       end
 
@@ -2653,6 +2654,20 @@ describe User, :do_not_mock_admin_mode do
       end
     end
 
+    shared_examples :group_member do
+      context 'when the user is owner' do
+        before do
+          add_user(:owner)
+        end
+
+        it 'loads' do
+          expect(user.ci_owned_runners).to contain_exactly(runner)
+        end
+      end
+
+      it_behaves_like :member
+    end
+
     context 'with groups projects runners' do
       let(:group) { create(:group) }
       let!(:project) { create(:project, group: group) }
@@ -2661,7 +2676,7 @@ describe User, :do_not_mock_admin_mode do
         group.add_user(user, access)
       end
 
-      it_behaves_like :member
+      it_behaves_like :group_member
     end
 
     context 'with groups runners' do
@@ -2672,14 +2687,14 @@ describe User, :do_not_mock_admin_mode do
         group.add_user(user, access)
       end
 
-      it_behaves_like :member
+      it_behaves_like :group_member
     end
 
     context 'with other projects runners' do
       let!(:project) { create(:project) }
 
       def add_user(access)
-        project.add_role(user, access)
+        project.add_user(user, access)
       end
 
       it_behaves_like :member
@@ -2697,7 +2712,7 @@ describe User, :do_not_mock_admin_mode do
         subgroup.add_user(another_user, :owner)
       end
 
-      it_behaves_like :member
+      it_behaves_like :group_member
     end
   end
 
@@ -3686,6 +3701,7 @@ describe User, :do_not_mock_admin_mode do
 
   describe '#required_terms_not_accepted?' do
     let(:user) { build(:user) }
+
     subject { user.required_terms_not_accepted? }
 
     context "when terms are not enforced" do

@@ -1,0 +1,5 @@
+---
+title: Limit size of search query for non ES searches
+merge_request: 22208
+author:
+type: other

@@ -22,12 +22,12 @@ describe API::Namespaces do
         expect(group_kind_json_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path',
                                                                  'parent_id', 'members_count_with_descendants',
                                                                  'plan', 'shared_runners_minutes_limit',
-                                                                 'avatar_url', 'web_url',
+                                                                 'avatar_url', 'web_url', 'trial_ends_on',
                                                                  'extra_shared_runners_minutes_limit', 'billable_members_count')
 
         expect(user_kind_json_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path',
                                                                 'parent_id', 'plan', 'shared_runners_minutes_limit',
-                                                                'avatar_url', 'web_url',
+                                                                'avatar_url', 'web_url', 'trial_ends_on',
                                                                 'extra_shared_runners_minutes_limit', 'billable_members_count')
       end
     end
@@ -40,7 +40,7 @@ describe API::Namespaces do
 
         owned_group_response = json_response.find { |resource| resource['id'] == group1.id }
 
-        expect(owned_group_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path',
+        expect(owned_group_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path', 'trial_ends_on',
                                                              'plan', 'parent_id', 'members_count_with_descendants',
                                                              'avatar_url', 'web_url', 'billable_members_count')
       end

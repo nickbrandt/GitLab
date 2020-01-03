@@ -15,21 +15,21 @@ module QA
 
         expect(page).to have_content(epic_title)
 
+        epic_edited_title = 'Epic edited via GUI'
         EE::Page::Group::Epic::Show.perform(&:click_edit_button)
         EE::Page::Group::Epic::Edit.perform do |edit|
-          edited_title = 'Epic edited via GUI'
-          edit.set_title(edited_title)
+          edit.set_title(epic_edited_title)
           edit.save_changes
 
-          expect(edit).to have_content(edited_title)
+          expect(edit).to have_content(epic_edited_title)
         end
 
         epic.visit!
         EE::Page::Group::Epic::Show.perform(&:click_edit_button)
-        EE::Page::Group::Epic::Edit.perform do |edit|
-          edit.delete_epic
+        EE::Page::Group::Epic::Edit.perform(&:delete_epic)
 
-          expect(edit).to have_content('The epic was successfully deleted')
+        EE::Page::Group::Epic::Index.perform do |index|
+          expect(index).to have_no_epic(epic_edited_title)
         end
       end
 

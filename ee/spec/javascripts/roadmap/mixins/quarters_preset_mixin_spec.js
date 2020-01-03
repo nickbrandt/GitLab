@@ -6,7 +6,7 @@ import { getTimeframeForQuartersView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+import { mockTimeframeInitialDate, mockEpic } from '../mock_data';
 
 const mockTimeframeQuarters = getTimeframeForQuartersView(mockTimeframeInitialDate);
 
@@ -15,8 +15,6 @@ const createComponent = ({
   timeframe = mockTimeframeQuarters,
   timeframeItem = mockTimeframeQuarters[0],
   epic = mockEpic,
-  shellWidth = mockShellWidth,
-  itemWidth = mockItemWidth,
 }) => {
   const Component = Vue.extend(EpicItemTimelineComponent);
 
@@ -25,8 +23,6 @@ const createComponent = ({
     timeframe,
     timeframeItem,
     epic,
-    shellWidth,
-    itemWidth,
   });
 };
 
@@ -59,22 +55,34 @@ describe('QuartersPresetMixin', () => {
     });
 
     describe('isTimeframeUnderEndDateForQuarter', () => {
+      const timeframeItem = mockTimeframeQuarters[1];
+
       beforeEach(() => {
         vm = createComponent({});
       });
 
       it('returns true if provided timeframeItem is under epicEndDate', () => {
-        const timeframeItem = mockTimeframeQuarters[1];
         const epicEndDate = mockTimeframeQuarters[1].range[2];
 
-        expect(vm.isTimeframeUnderEndDateForQuarter(timeframeItem, epicEndDate)).toBe(true);
+        vm = createComponent({
+          epic: Object.assign({}, mockEpic, {
+            endDate: epicEndDate,
+          }),
+        });
+
+        expect(vm.isTimeframeUnderEndDateForQuarter(timeframeItem)).toBe(true);
       });
 
       it('returns false if provided timeframeItem is NOT under epicEndDate', () => {
-        const timeframeItem = mockTimeframeQuarters[1];
         const epicEndDate = mockTimeframeQuarters[2].range[1];
 
-        expect(vm.isTimeframeUnderEndDateForQuarter(timeframeItem, epicEndDate)).toBe(false);
+        vm = createComponent({
+          epic: Object.assign({}, mockEpic, {
+            endDate: epicEndDate,
+          }),
+        });
+
+        expect(vm.isTimeframeUnderEndDateForQuarter(timeframeItem)).toBe(false);
       });
     });
 
@@ -132,7 +140,6 @@ describe('QuartersPresetMixin', () => {
     describe('getTimelineBarWidthForQuarters', () => {
       it('returns calculated width value based on Epic.startDate and Epic.endDate', () => {
         vm = createComponent({
-          shellWidth: 2000,
           timeframeItem: mockTimeframeQuarters[0],
           epic: Object.assign({}, mockEpic, {
             startDate: mockTimeframeQuarters[0].range[1],
@@ -140,7 +147,7 @@ describe('QuartersPresetMixin', () => {
           }),
         });
 
-        expect(Math.floor(vm.getTimelineBarWidthForQuarters())).toBe(240);
+        expect(Math.floor(vm.getTimelineBarWidthForQuarters())).toBe(180);
       });
     });
   });

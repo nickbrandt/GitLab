@@ -73,7 +73,7 @@ module API
       end
 
       def serializer_options_for(merge_requests)
-        options = { with: Entities::MergeRequestBasic, current_user: current_user }
+        options = { with: Entities::MergeRequestBasic, current_user: current_user, with_labels_details: declared_params[:with_labels_details] }
 
         if params[:view] == 'simple'
           options[:with] = Entities::MergeRequestSimple
@@ -106,6 +106,7 @@ module API
                         desc: 'Return merge requests sorted in `asc` or `desc` order.'
         optional :milestone, type: String, desc: 'Return merge requests for a specific milestone'
         optional :labels, type: Array[String], coerce_with: Validations::Types::LabelsList.coerce, desc: 'Comma-separated list of label names'
+        optional :with_labels_details, type: Boolean, desc: 'Return titles of labels and other details', default: false
         optional :created_after, type: DateTime, desc: 'Return merge requests created after the specified time'
         optional :created_before, type: DateTime, desc: 'Return merge requests created before the specified time'
         optional :updated_after, type: DateTime, desc: 'Return merge requests updated after the specified time'
@@ -157,11 +158,9 @@ module API
         use :merge_requests_params
       end
       get ":id/merge_requests" do
-        group = find_group!(params[:id])
+        merge_requests = find_merge_requests(group_id: user_group.id, include_subgroups: true)
 
-        merge_requests = find_merge_requests(group_id: group.id, include_subgroups: true)
-
-        present merge_requests, serializer_options_for(merge_requests)
+        present merge_requests, serializer_options_for(merge_requests).merge(group: user_group)
       end
     end
 
@@ -215,7 +214,7 @@ module API
 
         merge_requests = find_merge_requests(project_id: user_project.id)
 
-        options = serializer_options_for(merge_requests)
+        options = serializer_options_for(merge_requests).merge(project: user_project)
         options[:project] = user_project
 
         present merge_requests, options

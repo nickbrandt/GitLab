@@ -1,0 +1,5 @@
+---
+title: Optimize Group#for_epics scope
+merge_request: 22375
+author:
+type: performance

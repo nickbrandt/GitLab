@@ -25,6 +25,6 @@ describe 'Issue Boards add issue modal', :js do
     wait_for_requests
     find('.add-issues-modal .filtered-search').click
 
-    expect(page.find('.filter-dropdown')).to have_content 'weight'
+    expect(page.find('.filter-dropdown')).to have_content 'Weight'
   end
 end

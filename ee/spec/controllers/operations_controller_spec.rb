@@ -105,7 +105,7 @@ describe OperationsController do
     let(:project) { create(:project, :repository) }
     let(:commit) { project.commit }
     let!(:environment) { create(:environment, name: 'production', project: project) }
-    let!(:deployment) { create(:deployment, :success, environment: environment, sha: commit.id, created_at: now) }
+    let!(:deployment) { create(:deployment, :success, environment: environment, sha: commit.id, created_at: now, project: project) }
 
     it_behaves_like 'unlicensed', :get, :list
 
@@ -276,7 +276,7 @@ describe OperationsController do
       end
 
       context 'with a project in the dashboard' do
-        let(:project) { create(:project, :with_avatar) }
+        let(:project) { create(:project, :with_avatar, :repository) }
 
         before do
           project.add_developer(user)

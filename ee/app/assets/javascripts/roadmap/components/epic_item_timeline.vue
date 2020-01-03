@@ -5,11 +5,10 @@ import QuartersPresetMixin from '../mixins/quarters_preset_mixin';
 import MonthsPresetMixin from '../mixins/months_preset_mixin';
 import WeeksPresetMixin from '../mixins/weeks_preset_mixin';
 
-import eventHub from '../event_hub';
-
-import { EPIC_DETAILS_CELL_WIDTH, TIMELINE_CELL_MIN_WIDTH, PRESET_TYPES } from '../constants';
+import { TIMELINE_CELL_MIN_WIDTH, PRESET_TYPES } from '../constants';
 
 export default {
+  cellWidth: TIMELINE_CELL_MIN_WIDTH,
   directives: {
     tooltip,
   },
@@ -31,55 +30,29 @@ export default {
       type: Object,
       required: true,
     },
-    shellWidth: {
-      type: Number,
-      required: true,
-    },
-    itemWidth: {
-      type: Number,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      timelineBarReady: false,
-      timelineBarStyles: '',
-    };
   },
   computed: {
-    itemStyles() {
+    epicStartDateValues() {
+      const { startDate } = this.epic;
+
       return {
-        width: `${this.itemWidth}px`,
+        day: startDate.getDay(),
+        date: startDate.getDate(),
+        month: startDate.getMonth(),
+        year: startDate.getFullYear(),
+        time: startDate.getTime(),
       };
     },
-    showTimelineBar() {
-      return this.hasStartDate();
-    },
-  },
-  watch: {
-    shellWidth() {
-      // Render timeline bar only when shellWidth is updated.
-      this.renderTimelineBar();
-    },
-  },
-  mounted() {
-    eventHub.$on('refreshTimeline', this.renderTimelineBar);
-  },
-  beforeDestroy() {
-    eventHub.$off('refreshTimeline', this.renderTimelineBar);
-  },
-  methods: {
-    /**
-     * Gets cell width based on total number months for
-     * current timeframe and shellWidth excluding details cell width.
-     *
-     * In case cell width is too narrow, we have fixed minimum
-     * cell width (TIMELINE_CELL_MIN_WIDTH) to obey.
-     */
-    getCellWidth() {
-      const minWidth = (this.shellWidth - EPIC_DETAILS_CELL_WIDTH) / this.timeframe.length;
+    epicEndDateValues() {
+      const { endDate } = this.epic;
 
-      return Math.max(minWidth, TIMELINE_CELL_MIN_WIDTH);
+      return {
+        day: endDate.getDay(),
+        date: endDate.getDate(),
+        month: endDate.getMonth(),
+        year: endDate.getFullYear(),
+        time: endDate.getTime(),
+      };
     },
     hasStartDate() {
       if (this.presetType === PRESET_TYPES.QUARTERS) {
@@ -91,35 +64,33 @@ export default {
       }
       return false;
     },
-    /**
-     * Renders timeline bar only if current
-     * timeframe item has startDate for the epic.
-     */
-    renderTimelineBar() {
-      if (this.hasStartDate()) {
+    timelineBarStyles() {
+      let barStyles = {};
+
+      if (this.hasStartDate) {
         if (this.presetType === PRESET_TYPES.QUARTERS) {
           // CSS properties are a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/24
           // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          this.timelineBarStyles = `width: ${this.getTimelineBarWidthForQuarters()}px; ${this.getTimelineBarStartOffsetForQuarters()}`;
+          barStyles = `width: ${this.getTimelineBarWidthForQuarters()}px; ${this.getTimelineBarStartOffsetForQuarters()}`;
         } else if (this.presetType === PRESET_TYPES.MONTHS) {
           // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          this.timelineBarStyles = `width: ${this.getTimelineBarWidthForMonths()}px; ${this.getTimelineBarStartOffsetForMonths()}`;
+          barStyles = `width: ${this.getTimelineBarWidthForMonths()}px; ${this.getTimelineBarStartOffsetForMonths()}`;
         } else if (this.presetType === PRESET_TYPES.WEEKS) {
           // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
-          this.timelineBarStyles = `width: ${this.getTimelineBarWidthForWeeks()}px; ${this.getTimelineBarStartOffsetForWeeks()}`;
+          barStyles = `width: ${this.getTimelineBarWidthForWeeks()}px; ${this.getTimelineBarStartOffsetForWeeks()}`;
         }
-        this.timelineBarReady = true;
       }
+      return barStyles;
     },
   },
 };
 </script>
 
 <template>
-  <span :style="itemStyles" class="epic-timeline-cell" data-qa-selector="epic_timeline_cell">
+  <span class="epic-timeline-cell" data-qa-selector="epic_timeline_cell">
     <div class="timeline-bar-wrapper">
       <a
-        v-if="showTimelineBar"
+        v-if="hasStartDate"
         :href="epic.webUrl"
         :class="{
           'start-date-undefined': epic.startDateUndefined,
@@ -127,8 +98,7 @@ export default {
         }"
         :style="timelineBarStyles"
         class="timeline-bar"
-      >
-      </a>
+      ></a>
     </div>
   </span>
 </template>

@@ -50,7 +50,7 @@ describe('Roadmap Vuex Actions', () => {
   });
 
   describe('setInitialData', () => {
-    it('Should set initial roadmap props', done => {
+    it('should set initial roadmap props', done => {
       const mockRoadmap = {
         foo: 'bar',
         bar: 'baz',
@@ -68,7 +68,7 @@ describe('Roadmap Vuex Actions', () => {
   });
 
   describe('setWindowResizeInProgress', () => {
-    it('Should set value of `state.windowResizeInProgress` based on provided value', done => {
+    it('should set value of `state.windowResizeInProgress` based on provided value', done => {
       testAction(
         actions.setWindowResizeInProgress,
         true,
@@ -148,13 +148,13 @@ describe('Roadmap Vuex Actions', () => {
   });
 
   describe('requestEpics', () => {
-    it('Should set `epicsFetchInProgress` to true', done => {
+    it('should set `epicsFetchInProgress` to true', done => {
       testAction(actions.requestEpics, {}, state, [{ type: 'REQUEST_EPICS' }], [], done);
     });
   });
 
   describe('requestEpicsForTimeframe', () => {
-    it('Should set `epicsFetchForTimeframeInProgress` to true', done => {
+    it('should set `epicsFetchForTimeframeInProgress` to true', done => {
       testAction(
         actions.requestEpicsForTimeframe,
         {},
@@ -167,7 +167,7 @@ describe('Roadmap Vuex Actions', () => {
   });
 
   describe('receiveEpicsSuccess', () => {
-    it('Should set formatted epics array and epicId to IDs array in state based on provided epics list', done => {
+    it('should set formatted epics array and epicId to IDs array in state based on provided epics list', done => {
       testAction(
         actions.receiveEpicsSuccess,
         {
@@ -200,7 +200,7 @@ describe('Roadmap Vuex Actions', () => {
       );
     });
 
-    it('Should set formatted epics array and epicId to IDs array in state based on provided epics list when timeframe was extended', done => {
+    it('should set formatted epics array and epicId to IDs array in state based on provided epics list when timeframe was extended', done => {
       testAction(
         actions.receiveEpicsSuccess,
         { rawEpics: [mockRawEpic], newEpic: true, timeframeExtended: true },
@@ -223,7 +223,7 @@ describe('Roadmap Vuex Actions', () => {
       setFixtures('<div class="flash-container"></div>');
     });
 
-    it('Should set epicsFetchInProgress, epicsFetchForTimeframeInProgress to false and epicsFetchFailure to true', done => {
+    it('should set epicsFetchInProgress, epicsFetchForTimeframeInProgress to false and epicsFetchFailure to true', done => {
       testAction(
         actions.receiveEpicsFailure,
         {},
@@ -234,7 +234,7 @@ describe('Roadmap Vuex Actions', () => {
       );
     });
 
-    it('Should show flash error', () => {
+    it('should show flash error', () => {
       actions.receiveEpicsFailure({ commit: () => {} });
 
       expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
@@ -255,7 +255,7 @@ describe('Roadmap Vuex Actions', () => {
     });
 
     describe('success', () => {
-      it('Should dispatch requestEpics and receiveEpicsSuccess when request is successful', done => {
+      it('should dispatch requestEpics and receiveEpicsSuccess when request is successful', done => {
         mock.onGet(epicsPath).replyOnce(200, rawEpics);
 
         testAction(
@@ -278,7 +278,7 @@ describe('Roadmap Vuex Actions', () => {
     });
 
     describe('failure', () => {
-      it('Should dispatch requestEpics and receiveEpicsFailure when request fails', done => {
+      it('should dispatch requestEpics and receiveEpicsFailure when request fails', done => {
         mock.onGet(epicsPath).replyOnce(500, {});
 
         testAction(
@@ -314,7 +314,7 @@ describe('Roadmap Vuex Actions', () => {
     });
 
     describe('success', () => {
-      it('Should dispatch requestEpicsForTimeframe and receiveEpicsSuccess when request is successful', done => {
+      it('should dispatch requestEpicsForTimeframe and receiveEpicsSuccess when request is successful', done => {
         mock.onGet(mockEpicsPath).replyOnce(200, rawEpics);
 
         testAction(
@@ -337,7 +337,7 @@ describe('Roadmap Vuex Actions', () => {
     });
 
     describe('failure', () => {
-      it('Should dispatch requestEpicsForTimeframe and requestEpicsFailure when request fails', done => {
+      it('should dispatch requestEpicsForTimeframe and requestEpicsFailure when request fails', done => {
         mock.onGet(mockEpicsPath).replyOnce(500, {});
 
         testAction(
@@ -360,7 +360,7 @@ describe('Roadmap Vuex Actions', () => {
   });
 
   describe('extendTimeframe', () => {
-    it('Should prepend to timeframe when called with extend type prepend', done => {
+    it('should prepend to timeframe when called with extend type prepend', done => {
       testAction(
         actions.extendTimeframe,
         { extendAs: EXTEND_AS.PREPEND },
@@ -371,7 +371,7 @@ describe('Roadmap Vuex Actions', () => {
       );
     });
 
-    it('Should append to timeframe when called with extend type append', done => {
+    it('should append to timeframe when called with extend type append', done => {
       testAction(
         actions.extendTimeframe,
         { extendAs: EXTEND_AS.APPEND },
@@ -384,7 +384,7 @@ describe('Roadmap Vuex Actions', () => {
   });
 
   describe('refreshEpicDates', () => {
-    it('Should update epics after refreshing epic dates to match with updated timeframe', done => {
+    it('should update epics after refreshing epic dates to match with updated timeframe', done => {
       const epics = rawEpics.map(epic =>
         epicUtils.formatEpicDetails(epic, state.timeframeStartDate, state.timeframeEndDate),
       );
@@ -394,6 +394,19 @@ describe('Roadmap Vuex Actions', () => {
         {},
         { ...state, timeframe: mockTimeframeMonths.concat(mockTimeframeMonthsAppend), epics },
         [{ type: types.SET_EPICS, payload: epics }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setBufferSize', () => {
+    it('should set bufferSize in store state', done => {
+      testAction(
+        actions.setBufferSize,
+        10,
+        state,
+        [{ type: types.SET_BUFFER_SIZE, payload: 10 }],
         [],
         done,
       );

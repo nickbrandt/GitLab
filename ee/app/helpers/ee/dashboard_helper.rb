@@ -31,6 +31,18 @@ module EE
       !current_license && current_user.admin?
     end
 
+    def analytics_nav_url
+      if ::Gitlab::Analytics.any_features_enabled?
+        return analytics_root_path
+      end
+
+      if can?(current_user, :read_instance_statistics)
+        return instance_statistics_root_path
+      end
+
+      'errors/not_found'
+    end
+
     private
 
     override :get_dashboard_nav_links

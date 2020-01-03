@@ -78,3 +78,5 @@ export const mockTrace = [
   'Dec 13 13:43:48.324Z | 10.36.0.1 - - [16/Oct/2019:06:30:18 UTC] "GET / HTTP/1.1" 200 13',
   'Dec 13 13:43:48.325Z | - -> /',
 ];
+
+export const mockSearch = 'foo +bar';

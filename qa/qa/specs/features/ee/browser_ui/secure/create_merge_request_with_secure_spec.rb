@@ -8,7 +8,7 @@ module QA
   # https://gitlab.com/gitlab-org/gitlab/issues/36559
   context 'Secure', :docker, :quarantine do
     describe 'Security Reports in a Merge Request' do
-      let(:sast_vuln_count) { 33 }
+      let(:sast_vuln_count) { 5 }
       let(:dependency_scan_vuln_count) { 4 }
       let(:container_scan_vuln_count) { 8 }
       let(:vuln_name) { "Regular Expression Denial of Service in debug" }

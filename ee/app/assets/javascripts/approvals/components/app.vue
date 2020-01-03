@@ -14,7 +14,6 @@ export default {
   computed: {
     ...mapState({
       settings: 'settings',
-      isLoading: state => state.approvals.isLoading,
       hasLoaded: state => state.approvals.hasLoaded,
     }),
     createModalId() {
@@ -42,7 +41,6 @@ export default {
         <slot name="rules"></slot>
       </div>
       <div v-if="settings.canEdit && settings.allowMultiRule" class="border-bottom py-3 px-2">
-        <gl-loading-icon v-if="isLoading" />
         <div v-if="settings.allowMultiRule" class="d-flex">
           <gl-button
             class="ml-auto btn-info btn-inverted"

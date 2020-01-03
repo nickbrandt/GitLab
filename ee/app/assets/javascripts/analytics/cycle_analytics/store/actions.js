@@ -29,8 +29,9 @@ export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDat
 };
 
 export const requestStageData = ({ commit }) => commit(types.REQUEST_STAGE_DATA);
-export const receiveStageDataSuccess = ({ commit }, data) =>
+export const receiveStageDataSuccess = ({ commit }, data) => {
   commit(types.RECEIVE_STAGE_DATA_SUCCESS, data);
+};
 
 export const receiveStageDataError = ({ commit }) => {
   commit(types.RECEIVE_STAGE_DATA_ERROR);
@@ -45,13 +46,46 @@ export const fetchStageData = ({ state, dispatch, getters }, slug) => {
 
   dispatch('requestStageData');
 
-  return Api.cycleAnalyticsStageEvents(
-    fullPath,
-    slug,
-    nestQueryStringKeys(cycleAnalyticsRequestParams, 'cycle_analytics'),
-  )
+  return Api.cycleAnalyticsStageEvents(fullPath, slug, cycleAnalyticsRequestParams)
     .then(({ data }) => dispatch('receiveStageDataSuccess', data))
     .catch(error => dispatch('receiveStageDataError', error));
+};
+
+export const requestStageMedianValues = ({ commit }) => commit(types.REQUEST_STAGE_MEDIANS);
+export const receiveStageMedianValuesSuccess = ({ commit }, data) => {
+  commit(types.RECEIVE_STAGE_MEDIANS_SUCCESS, data);
+};
+
+export const receiveStageMedianValuesError = ({ commit }) => {
+  commit(types.RECEIVE_STAGE_MEDIANS_ERROR);
+  createFlash(__('There was an error fetching median data for stages'));
+};
+
+const fetchStageMedian = (currentGroupPath, stageId, params) =>
+  Api.cycleAnalyticsStageMedian(currentGroupPath, stageId, params).then(({ data }) => ({
+    id: stageId,
+    ...data,
+  }));
+
+export const fetchStageMedianValues = ({ state, dispatch, getters }) => {
+  const {
+    currentGroupPath,
+    cycleAnalyticsRequestParams: { created_after, created_before },
+  } = getters;
+
+  const { stages } = state;
+  const params = {
+    group_id: currentGroupPath,
+    created_after,
+    created_before,
+  };
+
+  dispatch('requestStageMedianValues');
+  const stageIds = stages.map(s => s.slug);
+
+  return Promise.all(stageIds.map(stageId => fetchStageMedian(currentGroupPath, stageId, params)))
+    .then(data => dispatch('receiveStageMedianValuesSuccess', data))
+    .catch(err => dispatch('receiveStageMedianValuesError', err));
 };
 
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CYCLE_ANALYTICS_DATA);
@@ -76,9 +110,11 @@ export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
 export const fetchCycleAnalyticsData = ({ dispatch }) => {
   removeError();
 
-  return dispatch('requestCycleAnalyticsData')
+  dispatch('requestCycleAnalyticsData');
+  return Promise.resolve()
     .then(() => dispatch('fetchGroupLabels'))
     .then(() => dispatch('fetchGroupStagesAndEvents'))
+    .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('fetchSummaryData'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
@@ -216,7 +252,7 @@ export const receiveTasksByTypeDataSuccess = ({ commit }, data) =>
 
 export const receiveTasksByTypeDataError = ({ commit }, error) => {
   commit(types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR, error);
-  createFlash(__('There was an error fetching data for the chart'));
+  createFlash(__('There was an error fetching data for the tasks by type chart'));
 };
 export const requestTasksByTypeData = ({ commit }) => commit(types.REQUEST_TASKS_BY_TYPE_DATA);
 

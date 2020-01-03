@@ -27,8 +27,7 @@ exports[`Package code instruction single line to match the default snapshot 1`] 
     <button
       class="btn input-group-text btn-secondary btn-default"
       data-clipboard-text="npm i @my-package"
-      data-original-title="Copy npm install command"
-      title=""
+      title="Copy npm install command"
       type="button"
     >
       <svg

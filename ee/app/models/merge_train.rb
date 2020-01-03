@@ -3,6 +3,8 @@
 class MergeTrain < ApplicationRecord
   include AfterCommitQueue
 
+  ACTIVE_STATUSES = %w[created stale fresh].freeze
+
   belongs_to :target_project, class_name: "Project"
   belongs_to :merge_request, inverse_of: :merge_train
   belongs_to :user
@@ -12,7 +14,10 @@ class MergeTrain < ApplicationRecord
   after_commit :refresh_async, if: -> { saved_change_to_status? && stale? }
 
   after_destroy do |merge_train|
-    run_after_commit { merge_train.cleanup_ref }
+    run_after_commit do
+      merge_train.pipeline&.cancel_running(retries: 1)
+      merge_train.cleanup_ref
+    end
   end
 
   enum status: %i[created merged stale fresh]
@@ -56,7 +61,7 @@ class MergeTrain < ApplicationRecord
     end
 
     def active_statuses
-      statuses.values_at(:created, :stale, :fresh)
+      statuses.values_at(*ACTIVE_STATUSES)
     end
 
     def merged_statuses
@@ -112,6 +117,10 @@ class MergeTrain < ApplicationRecord
 
   def cleanup_ref
     merge_request.cleanup_refs(only: :train)
+  end
+
+  def active?
+    ACTIVE_STATUSES.include?(status)
   end
 
   private

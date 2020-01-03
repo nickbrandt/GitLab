@@ -1,7 +1,6 @@
 <script>
 import { GlTooltipDirective, GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
 import StageNavItem from './stage_nav_item.vue';
 import StageEventList from './stage_event_list.vue';
 import StageTableHeader from './stage_table_header.vue';
@@ -12,7 +11,6 @@ import { STAGE_ACTIONS } from '../constants';
 export default {
   name: 'StageTable',
   components: {
-    Icon,
     GlLoadingIcon,
     GlEmptyState,
     StageEventList,
@@ -27,6 +25,10 @@ export default {
   props: {
     stages: {
       type: Array,
+      required: true,
+    },
+    medians: {
+      type: Object,
       required: true,
     },
     currentStage: {
@@ -121,6 +123,11 @@ export default {
       return this.isEditingCustomStage ? this.currentStage : {};
     },
   },
+  methods: {
+    medianValue(id) {
+      return this.medians[id] ? this.medians[id] : null;
+    },
+  },
   STAGE_ACTIONS,
 };
 </script>
@@ -148,7 +155,7 @@ export default {
               v-for="stage in stages"
               :key="`ca-stage-title-${stage.title}`"
               :title="stage.title"
-              :value="stage.value"
+              :value="medianValue(stage.id)"
               :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
               :can-edit="canEditStages"
               :is-default-stage="!stage.custom"

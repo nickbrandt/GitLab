@@ -15,6 +15,9 @@ module EE
       scope :with_identity_provider, ->(provider) do
         joins(user: :identities).where(identities: { provider: provider })
       end
+      scope :with_saml_identity, ->(provider) do
+        joins(user: :identities).where(identities: { saml_provider_id: provider })
+      end
 
       scope :non_owners, -> { where("members.access_level < ?", ::Gitlab::Access::OWNER) }
     end

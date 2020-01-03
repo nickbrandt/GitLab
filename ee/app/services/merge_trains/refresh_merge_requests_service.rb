@@ -33,8 +33,9 @@ module MergeTrains
       end
 
       if result[:status] == :finished && result[:new_items].present?
-        first_merge_request = MergeTrain.first_in_train_from(result[:new_items])
-        AutoMergeProcessWorker.perform_async(first_merge_request.id)
+        MergeTrain.first_in_train_from(result[:new_items]).try do |merge_request|
+          AutoMergeProcessWorker.perform_async(merge_request.id)
+        end
       end
     end
 

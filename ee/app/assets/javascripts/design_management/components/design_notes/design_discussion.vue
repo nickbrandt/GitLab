@@ -1,6 +1,5 @@
 <script>
 import { ApolloMutation } from 'vue-apollo';
-import createFlash from '~/flash';
 import ReplyPlaceholder from '~/notes/components/discussion_reply_placeholder.vue';
 import allVersionsMixin from '../../mixins/all_versions';
 import createNoteMutation from '../../graphql/mutations/createNote.mutation.graphql';
@@ -8,7 +7,6 @@ import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import DesignNote from './design_note.vue';
 import DesignReplyForm from './design_reply_form.vue';
 import { updateStoreAfterAddDiscussionComment } from '../../utils/cache_update';
-import { ADD_DISCUSSION_COMMENT_ERROR } from '../../utils/error_messages';
 
 export default {
   components: {
@@ -83,8 +81,8 @@ export default {
       this.discussionComment = '';
       this.hideForm();
     },
-    onError() {
-      createFlash(ADD_DISCUSSION_COMMENT_ERROR);
+    onError(err) {
+      this.$emit('error', err);
     },
     hideForm() {
       this.isFormRendered = false;

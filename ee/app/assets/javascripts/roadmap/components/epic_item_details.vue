@@ -1,12 +1,8 @@
 <script>
 import { s__, sprintf } from '~/locale';
 import { dateInWords } from '~/lib/utils/datetime_utility';
-import tooltip from '~/vue_shared/directives/tooltip';
 
 export default {
-  directives: {
-    tooltip,
-  },
   props: {
     epic: {
       type: Object,
@@ -78,22 +74,13 @@ export default {
 <template>
   <span class="epic-details-cell" data-qa-selector="epic_details_cell">
     <div class="epic-title">
-      <a v-tooltip :href="epic.webUrl" :title="epic.title" data-container="body" class="epic-url">
-        {{ epic.title }}
-      </a>
+      <a :href="epic.webUrl" :title="epic.title" class="epic-url">{{ epic.title }}</a>
     </div>
     <div class="epic-group-timeframe">
-      <span
-        v-if="isEpicGroupDifferent"
-        v-tooltip
-        :title="epic.groupFullName"
-        class="epic-group"
-        data-placement="right"
-        data-container="body"
+      <span v-if="isEpicGroupDifferent" :title="epic.groupFullName" class="epic-group"
+        >{{ epic.groupName }} &middot;</span
       >
-        {{ epic.groupName }} &middot;
-      </span>
-      <span class="epic-timeframe" v-html="timeframeString"> </span>
+      <span class="epic-timeframe" v-html="timeframeString"></span>
     </div>
   </span>
 </template>

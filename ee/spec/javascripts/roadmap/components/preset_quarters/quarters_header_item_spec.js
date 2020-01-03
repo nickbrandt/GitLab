@@ -4,7 +4,7 @@ import QuartersHeaderItemComponent from 'ee/roadmap/components/preset_quarters/q
 import { getTimeframeForQuartersView } from 'ee/roadmap/utils/roadmap_utils';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeInitialDate, mockShellWidth, mockItemWidth } from 'ee_spec/roadmap/mock_data';
+import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
 
 const mockTimeframeIndex = 0;
 const mockTimeframeQuarters = getTimeframeForQuartersView(mockTimeframeInitialDate);
@@ -13,8 +13,6 @@ const createComponent = ({
   timeframeIndex = mockTimeframeIndex,
   timeframeItem = mockTimeframeQuarters[mockTimeframeIndex],
   timeframe = mockTimeframeQuarters,
-  shellWidth = mockShellWidth,
-  itemWidth = mockItemWidth,
 }) => {
   const Component = Vue.extend(QuartersHeaderItemComponent);
 
@@ -22,8 +20,6 @@ const createComponent = ({
     timeframeIndex,
     timeframeItem,
     timeframe,
-    shellWidth,
-    itemWidth,
   });
 };
 
@@ -44,14 +40,6 @@ describe('QuartersHeaderItemComponent', () => {
   });
 
   describe('computed', () => {
-    describe('itemStyles', () => {
-      it('returns style object for container element based on value of `itemWidth` prop', () => {
-        vm = createComponent({});
-
-        expect(vm.itemStyles.width).toBe('180px');
-      });
-    });
-
     describe('quarterBeginDate', () => {
       it('returns date object representing quarter begin date for current `timeframeItem`', () => {
         expect(vm.quarterBeginDate).toBe(mockTimeframeQuarters[mockTimeframeIndex].range[0]);

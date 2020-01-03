@@ -137,7 +137,7 @@ gem 'faraday_middleware-aws-signers-v4'
 
 # Markdown and HTML processing
 gem 'html-pipeline', '~> 2.12'
-gem 'deckar01-task_list', '2.2.1'
+gem 'deckar01-task_list', '2.3.1'
 gem 'gitlab-markup', '~> 1.7.0'
 gem 'github-markup', '~> 1.7.0', require: 'github/markup'
 gem 'commonmarker', '~> 0.20'
@@ -148,7 +148,7 @@ gem 'creole', '~> 0.5.0'
 gem 'wikicloth', '0.8.1'
 gem 'asciidoctor', '~> 2.0.10'
 gem 'asciidoctor-include-ext', '~> 0.3.1', require: false
-gem 'asciidoctor-plantuml', '0.0.9'
+gem 'asciidoctor-plantuml', '0.0.10'
 gem 'rouge', '~> 3.11.0'
 gem 'truncato', '~> 0.7.11'
 gem 'bootstrap_form', '~> 4.2.0'
@@ -366,11 +366,11 @@ group :development, :test do
   gem 'spring', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
 
-  gem 'gitlab-styles', '~> 2.7', require: false
+  gem 'gitlab-styles', '~> 3.1.0', require: false
   # Pin these dependencies, otherwise a new rule could break the CI pipelines
-  gem 'rubocop', '~> 0.69.0'
-  gem 'rubocop-performance', '~> 1.1.0'
-  gem 'rubocop-rspec', '~> 1.22.1'
+  gem 'rubocop', '~> 0.74.0'
+  gem 'rubocop-performance', '~> 1.4.1'
+  gem 'rubocop-rspec', '~> 1.37.0'
 
   gem 'scss_lint', '~> 0.56.0', require: false
   gem 'haml_lint', '~> 0.34.0', require: false

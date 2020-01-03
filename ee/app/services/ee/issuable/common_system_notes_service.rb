@@ -11,7 +11,7 @@ module EE
         super
 
         ActiveRecord::Base.no_touching do
-          handle_weight_change_note
+          handle_weight_change
           handle_date_change_note if is_update
         end
       end
@@ -28,14 +28,18 @@ module EE
         end
       end
 
-      def handle_weight_change_note
-        if issuable.previous_changes.include?('weight')
-          create_weight_change_note
+      def handle_weight_change
+        return unless issuable.previous_changes.include?('weight')
+
+        if weight_changes_tracking_enabled?
+          EE::ResourceEvents::ChangeWeightService.new([issuable], current_user, Time.now).execute
+        else
+          ::SystemNoteService.change_weight_note(issuable, issuable.project, current_user)
         end
       end
 
-      def create_weight_change_note
-        ::SystemNoteService.change_weight_note(issuable, issuable.project, current_user)
+      def weight_changes_tracking_enabled?
+        !issuable.is_a?(Epic) && ::Feature.enabled?(:track_issue_weight_change_events, issuable.project)
       end
     end
   end

@@ -1,7 +1,6 @@
 /* Checkout Page */
 .subscriptions-layout-html {
   .container {
-    margin: 0;
     max-width: none;
     padding-top: 40px;
   }
@@ -10,23 +9,10 @@
     border-bottom: 1px solid $gray-200;
     flex-grow: 1;
     flex-shrink: 0;
-    padding-right: $gl-padding;
-    padding-left: $gl-padding;
 
     @media(min-width: map-get($grid-breakpoints, lg)) {
       border-bottom: 0;
       border-right: 1px solid $border-color;
-    }
-  }
-
-  .summary-pane {
-    padding-bottom: $gl-padding;
-    padding-right: $gl-padding;
-    padding-left: $gl-padding;
-
-    @media(min-width: map-get($grid-breakpoints, lg)) {
-      padding-left: $gl-padding * 3;
-      padding-right: $gl-padding * 3;
     }
   }
 
@@ -72,11 +58,71 @@
     }
   }
 
-  .header-title {
-    margin: 24px 0 16px;
+  .checkmark {
+    color: $green-500;
+    margin-top: -1px;
+  }
+
+  .card {
+    margin-bottom: 0;
+    min-height: 32px;
+    padding: $gl-padding;
+    max-width: 541px;
 
     @media(min-width: map-get($grid-breakpoints, lg)) {
-      margin-bottom: 32px;
+      width: 541px;
+    }
+  }
+
+  .gl-form-group,
+  .combined {
+    flex-grow: 1;
+    max-width: 420px;
+
+    .gl-form-input,
+    .gl-form-select {
+      height: 32px;
+    }
+  }
+
+  .number {
+    width: 50%;
+
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      max-width: 202px;
+    }
+  }
+
+  .label {
+    padding: 0;
+    width: 50%;
+
+    .gl-link {
+      font-size: inherit;
+    }
+  }
+
+  .btn {
+    line-height: $gl-line-height-14;
+    padding: $gl-padding-8 $gl-padding-12;
+    width: 100%;
+
+    @media(min-width: map-get($grid-breakpoints, lg)) {
+      width: initial;
+    }
+  }
+
+  .overview {
+    line-height: $gl-line-height-20;
+
+    .btn {
+      height: 24px;
+      padding: 1px 8px;
+      width: 48px;
+
+      @media(min-width: map-get($grid-breakpoints, lg)) {
+        width: initial;
+      }
     }
   }
 }

@@ -7,18 +7,18 @@ export default {
      */
     hasStartDateForMonth() {
       return (
-        this.epic.startDate.getMonth() === this.timeframeItem.getMonth() &&
-        this.epic.startDate.getFullYear() === this.timeframeItem.getFullYear()
+        this.epicStartDateValues.month === this.timeframeItem.getMonth() &&
+        this.epicStartDateValues.year === this.timeframeItem.getFullYear()
       );
     },
     /**
      * Check if current epic ends within current month (timeline cell)
      */
-    isTimeframeUnderEndDateForMonth(timeframeItem, epicEndDate) {
-      if (epicEndDate.getFullYear() <= timeframeItem.getFullYear()) {
-        return epicEndDate.getMonth() === timeframeItem.getMonth();
+    isTimeframeUnderEndDateForMonth(timeframeItem) {
+      if (this.epicEndDateValues.year <= timeframeItem.getFullYear()) {
+        return this.epicEndDateValues.month === timeframeItem.getMonth();
       }
-      return epicEndDate.getTime() < timeframeItem.getTime();
+      return this.epicEndDateValues.time < timeframeItem.getTime();
     },
     /**
      * Return timeline bar width for current month (timeline cell) based on
@@ -42,7 +42,7 @@ export default {
      */
     getTimelineBarStartOffsetForMonths() {
       const daysInMonth = totalDaysInMonth(this.timeframeItem);
-      const startDate = this.epic.startDate.getDate();
+      const startDate = this.epicStartDateValues.date;
 
       if (
         this.epic.startDateOutOfRange ||
@@ -88,9 +88,9 @@ export default {
       let timelineBarWidth = 0;
 
       const indexOfCurrentMonth = this.timeframe.indexOf(this.timeframeItem);
-      const cellWidth = this.getCellWidth();
-      const epicStartDate = this.epic.startDate;
-      const epicEndDate = this.epic.endDate;
+      const { cellWidth } = this.$options;
+      const epicStartDate = this.epicStartDateValues;
+      const epicEndDate = this.epicEndDateValues;
 
       // Start iteration from current month
       for (let i = indexOfCurrentMonth; i < this.timeframe.length; i += 1) {
@@ -99,13 +99,13 @@ export default {
 
         if (i === indexOfCurrentMonth) {
           // If this is current month
-          if (this.isTimeframeUnderEndDateForMonth(this.timeframe[i], epicEndDate)) {
+          if (this.isTimeframeUnderEndDateForMonth(this.timeframe[i])) {
             // If Epic endDate falls under the range of current timeframe month
             // then get width for number of days between start and end dates (inclusive)
             timelineBarWidth += this.getBarWidthForSingleMonth(
               cellWidth,
               daysInMonth,
-              epicEndDate.getDate() - epicStartDate.getDate() + 1,
+              epicEndDate.date - epicStartDate.date + 1,
             );
             // Break as Epic start and end date fall within current timeframe month itself!
             break;
@@ -115,18 +115,17 @@ export default {
             // If start date is first day of the month,
             // we need width of full cell (i.e. total days of month)
             // otherwise, we need width only for date from total days of month.
-            const date =
-              epicStartDate.getDate() === 1 ? daysInMonth : daysInMonth - epicStartDate.getDate();
+            const date = epicStartDate.date === 1 ? daysInMonth : daysInMonth - epicStartDate.date;
             timelineBarWidth += this.getBarWidthForSingleMonth(cellWidth, daysInMonth, date);
           }
-        } else if (this.isTimeframeUnderEndDateForMonth(this.timeframe[i], epicEndDate)) {
+        } else if (this.isTimeframeUnderEndDateForMonth(this.timeframe[i])) {
           // If this is NOT current month but epicEndDate falls under
           // current timeframe month then calculate width
           // based on date of the month
           timelineBarWidth += this.getBarWidthForSingleMonth(
             cellWidth,
             daysInMonth,
-            epicEndDate.getDate(),
+            epicEndDate.date,
           );
           // Break as Epic end date falls within current timeframe month!
           break;

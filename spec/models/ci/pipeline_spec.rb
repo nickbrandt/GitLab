@@ -35,6 +35,7 @@ describe Ci::Pipeline, :mailer do
   it { is_expected.to have_one(:source_pipeline) }
   it { is_expected.to have_one(:triggered_by_pipeline) }
   it { is_expected.to have_one(:source_job) }
+  it { is_expected.to have_one(:pipeline_config) }
 
   it { is_expected.to validate_presence_of(:sha) }
   it { is_expected.to validate_presence_of(:status) }
@@ -1749,7 +1750,7 @@ describe Ci::Pipeline, :mailer do
     subject { described_class.bridgeable_statuses }
 
     it { is_expected.to be_an(Array) }
-    it { is_expected.not_to include('created', 'preparing', 'pending') }
+    it { is_expected.not_to include('created', 'waiting_for_resource', 'preparing', 'pending') }
   end
 
   describe '#status', :sidekiq_might_not_need_inline do
@@ -1758,6 +1759,17 @@ describe Ci::Pipeline, :mailer do
     end
 
     subject { pipeline.reload.status }
+
+    context 'on waiting for resource' do
+      before do
+        allow(build).to receive(:requires_resource?) { true }
+        allow(Ci::ResourceGroups::AssignResourceFromResourceGroupWorker).to receive(:perform_async)
+
+        build.enqueue
+      end
+
+      it { is_expected.to eq('waiting_for_resource') }
+    end
 
     context 'on prepare' do
       before do
@@ -2701,6 +2713,116 @@ describe Ci::Pipeline, :mailer do
 
       it 'returns empty string' do
         is_expected.to be_empty
+      end
+    end
+  end
+
+  describe '#parent_pipeline' do
+    let(:project) { create(:project) }
+    let(:pipeline) { create(:ci_pipeline, project: project) }
+
+    context 'when pipeline is triggered by a pipeline from the same project' do
+      let(:upstream_pipeline) { create(:ci_pipeline, project: pipeline.project) }
+
+      before do
+        create(:ci_sources_pipeline,
+          source_pipeline: upstream_pipeline,
+          source_project: project,
+          pipeline: pipeline,
+          project: project)
+      end
+
+      it 'returns the parent pipeline' do
+        expect(pipeline.parent_pipeline).to eq(upstream_pipeline)
+      end
+
+      it 'is child' do
+        expect(pipeline).to be_child
+      end
+    end
+
+    context 'when pipeline is triggered by a pipeline from another project' do
+      let(:upstream_pipeline) { create(:ci_pipeline) }
+
+      before do
+        create(:ci_sources_pipeline,
+          source_pipeline: upstream_pipeline,
+          source_project: upstream_pipeline.project,
+          pipeline: pipeline,
+          project: project)
+      end
+
+      it 'returns nil' do
+        expect(pipeline.parent_pipeline).to be_nil
+      end
+
+      it 'is not child' do
+        expect(pipeline).not_to be_child
+      end
+    end
+
+    context 'when pipeline is not triggered by a pipeline' do
+      it 'returns nil' do
+        expect(pipeline.parent_pipeline).to be_nil
+      end
+
+      it 'is not child' do
+        expect(pipeline).not_to be_child
+      end
+    end
+  end
+
+  describe '#child_pipelines' do
+    let(:project) { create(:project) }
+    let(:pipeline) { create(:ci_pipeline, project: project) }
+
+    context 'when pipeline triggered other pipelines on same project' do
+      let(:downstream_pipeline) { create(:ci_pipeline, project: pipeline.project) }
+
+      before do
+        create(:ci_sources_pipeline,
+          source_pipeline: pipeline,
+          source_project: pipeline.project,
+          pipeline: downstream_pipeline,
+          project: pipeline.project)
+      end
+
+      it 'returns the child pipelines' do
+        expect(pipeline.child_pipelines).to eq [downstream_pipeline]
+      end
+
+      it 'is parent' do
+        expect(pipeline).to be_parent
+      end
+    end
+
+    context 'when pipeline triggered other pipelines on another project' do
+      let(:downstream_pipeline) { create(:ci_pipeline) }
+
+      before do
+        create(:ci_sources_pipeline,
+          source_pipeline: pipeline,
+          source_project: pipeline.project,
+          pipeline: downstream_pipeline,
+          project: downstream_pipeline.project)
+      end
+
+      it 'returns empty array' do
+        expect(pipeline.child_pipelines).to be_empty
+      end
+
+      it 'is not parent' do
+        expect(pipeline).not_to be_parent
+      end
+    end
+
+    context 'when pipeline did not trigger any pipelines' do
+      it 'returns empty array' do
+        expect(pipeline.child_pipelines).to be_empty
+      end
+
+      it 'is not parent' do
+        expect(pipeline).not_to be_parent
       end
     end
   end

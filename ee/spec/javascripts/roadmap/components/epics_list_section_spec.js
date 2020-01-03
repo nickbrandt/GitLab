@@ -1,13 +1,15 @@
-import Vue from 'vue';
-
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import VirtualList from 'vue-virtual-scroll-list';
 import epicsListSectionComponent from 'ee/roadmap/components/epics_list_section.vue';
+import EpicItem from 'ee/roadmap/components/epic_item.vue';
 import createStore from 'ee/roadmap/store';
-import eventHub from 'ee/roadmap/event_hub';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
-import { PRESET_TYPES } from 'ee/roadmap/constants';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import {
-  mockShellWidth,
+  PRESET_TYPES,
+  EPIC_DETAILS_CELL_WIDTH,
+  TIMELINE_CELL_MIN_WIDTH,
+} from 'ee/roadmap/constants';
+import {
   mockTimeframeInitialDate,
   mockGroupId,
   rawEpics,
@@ -17,7 +19,6 @@ import {
 } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
-
 const store = createStore();
 store.dispatch('setInitialData', {
   currentGroupId: mockGroupId,
@@ -37,147 +38,220 @@ const createComponent = ({
   epics = mockEpics,
   timeframe = mockTimeframeMonths,
   currentGroupId = mockGroupId,
-  shellWidth = mockShellWidth,
-  listScrollable = false,
   presetType = PRESET_TYPES.MONTHS,
-}) => {
-  const Component = Vue.extend(epicsListSectionComponent);
+  roadmapBufferedRendering = true,
+} = {}) => {
+  const localVue = createLocalVue();
 
-  return mountComponent(Component, {
-    presetType,
-    epics,
-    timeframe,
-    currentGroupId,
-    shellWidth,
-    listScrollable,
+  return shallowMount(epicsListSectionComponent, {
+    localVue,
+    store,
+    stubs: {
+      EpicItem: false,
+      VirtualList: false,
+    },
+    propsData: {
+      presetType,
+      epics,
+      timeframe,
+      currentGroupId,
+    },
+    provide: {
+      glFeatures: { roadmapBufferedRendering },
+    },
   });
 };
 
 describe('EpicsListSectionComponent', () => {
-  let vm;
+  let wrapper;
+
+  beforeEach(() => {
+    wrapper = createComponent();
+  });
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   describe('data', () => {
     it('returns default data props', () => {
-      vm = createComponent({});
-
-      expect(vm.shellHeight).toBe(0);
-      expect(vm.emptyRowHeight).toBe(0);
-      expect(vm.showEmptyRow).toBe(false);
-      expect(vm.offsetLeft).toBe(0);
-      expect(vm.showBottomShadow).toBe(false);
+      expect(wrapper.vm.offsetLeft).toBe(0);
+      expect(wrapper.vm.emptyRowContainerStyles).toEqual({});
+      expect(wrapper.vm.showBottomShadow).toBe(false);
+      expect(wrapper.vm.roadmapShellEl).toBeDefined();
     });
   });
 
   describe('computed', () => {
-    beforeEach(() => {
-      vm = createComponent({});
-    });
+    describe('emptyRowContainerVisible', () => {
+      it('returns true when total epics are less than buffer size', () => {
+        wrapper.vm.setBufferSize(wrapper.vm.epics.length + 1);
 
-    describe('emptyRowContainerStyles', () => {
-      it('returns computed style object based on emptyRowHeight prop value', () => {
-        expect(vm.emptyRowContainerStyles.height).toBe('0px');
+        expect(wrapper.vm.emptyRowContainerVisible).toBe(true);
       });
     });
 
-    describe('emptyRowCellStyles', () => {
-      it('returns computed style object based on sectionItemWidth prop value', () => {
-        expect(vm.emptyRowCellStyles.width).toBe('210px');
+    describe('sectionContainerStyles', () => {
+      it('returns style string for container element based on sectionShellWidth', () => {
+        expect(wrapper.vm.sectionContainerStyles.width).toBe(
+          `${EPIC_DETAILS_CELL_WIDTH + TIMELINE_CELL_MIN_WIDTH * wrapper.vm.timeframe.length}px`,
+        );
       });
     });
 
     describe('shadowCellStyles', () => {
       it('returns computed style object based on `offsetLeft` prop value', () => {
-        expect(vm.shadowCellStyles.left).toBe('0px');
+        expect(wrapper.vm.shadowCellStyles.left).toBe('0px');
       });
     });
   });
 
   describe('methods', () => {
-    beforeEach(() => {
-      vm = createComponent({});
-    });
-
     describe('initMounted', () => {
-      it('initializes shellHeight based on window.innerHeight and component element position', done => {
-        vm.$nextTick(() => {
-          expect(vm.shellHeight).toBe(600);
+      it('sets value of `roadmapShellEl` with root component element', () => {
+        expect(wrapper.vm.roadmapShellEl instanceof HTMLElement).toBe(true);
+      });
+
+      it('calls action `setBufferSize` with value based on window.innerHeight and component element position', () => {
+        expect(wrapper.vm.bufferSize).toBe(12);
+      });
+
+      it('sets value of `offsetLeft` with parentElement.offsetLeft', done => {
+        wrapper.vm.$nextTick(() => {
+          // During tests, there's no `$el.parentElement` present
+          // hence offsetLeft is 0.
+          expect(wrapper.vm.offsetLeft).toBe(0);
           done();
         });
       });
 
-      it('calls initEmptyRow() when there are Epics to render', done => {
-        spyOn(vm, 'initEmptyRow').and.callThrough();
+      it('calls `scrollToTodayIndicator` following the component render', done => {
+        spyOn(wrapper.vm, 'scrollToTodayIndicator');
 
-        vm.$nextTick(() => {
-          expect(vm.initEmptyRow).toHaveBeenCalled();
-          done();
+        // Original method implementation waits for render cycle
+        // to complete at 2 levels before scrolling.
+        wrapper.vm.$nextTick(() => {
+          wrapper.vm.$nextTick(() => {
+            expect(wrapper.vm.scrollToTodayIndicator).toHaveBeenCalled();
+            done();
+          });
         });
       });
 
-      it('emits `epicsListRendered` via eventHub', done => {
-        spyOn(eventHub, '$emit');
-
-        vm.$nextTick(() => {
-          expect(eventHub.$emit).toHaveBeenCalledWith('epicsListRendered', jasmine.any(Object));
+      it('sets style object to `emptyRowContainerStyles`', done => {
+        wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.emptyRowContainerStyles).toEqual(
+            jasmine.objectContaining({
+              height: '0px',
+            }),
+          );
           done();
         });
       });
     });
 
-    describe('initEmptyRow', () => {
-      it('sets `emptyRowHeight` and `showEmptyRow` props when shellHeight is greater than approximate height of epics list', done => {
-        vm.$nextTick(() => {
-          expect(vm.emptyRowHeight).toBe(600);
-          expect(vm.showEmptyRow).toBe(true);
+    describe('getEmptyRowContainerStyles', () => {
+      it('returns empty object when there are no epics available to render', done => {
+        wrapper.setProps({
+          epics: [],
+        });
+
+        wrapper.vm.$nextTick(() => {
+          expect(wrapper.vm.getEmptyRowContainerStyles()).toEqual({});
           done();
         });
       });
 
-      it('does not set `emptyRowHeight` and `showEmptyRow` props when shellHeight is less than approximate height of epics list', done => {
-        const initialHeight = window.innerHeight;
-        window.innerHeight = 0;
-        const vmMoreEpics = createComponent({
-          epics: mockEpics.concat(mockEpics).concat(mockEpics),
+      it('returns object containing `height` when there epics available to render', () => {
+        expect(wrapper.vm.getEmptyRowContainerStyles()).toEqual(
+          jasmine.objectContaining({
+            height: '0px',
+          }),
+        );
+      });
+    });
+
+    describe('handleEpicsListScroll', () => {
+      it('toggles value of `showBottomShadow` based on provided `scrollTop`, `clientHeight` & `scrollHeight`', () => {
+        wrapper.vm.handleEpicsListScroll({
+          scrollTop: 5,
+          clientHeight: 5,
+          scrollHeight: 15,
         });
-        vmMoreEpics.$nextTick(() => {
-          expect(vmMoreEpics.emptyRowHeight).toBe(0);
-          expect(vmMoreEpics.showEmptyRow).toBe(false);
-          window.innerHeight = initialHeight; // reset to prevent any side effects
-          done();
+
+        // Math.ceil(scrollTop) + clientHeight < scrollHeight
+        expect(wrapper.vm.showBottomShadow).toBe(true);
+
+        wrapper.vm.handleEpicsListScroll({
+          scrollTop: 15,
+          clientHeight: 5,
+          scrollHeight: 15,
         });
+
+        // Math.ceil(scrollTop) + clientHeight < scrollHeight
+        expect(wrapper.vm.showBottomShadow).toBe(false);
+      });
+    });
+
+    describe('getEpicItemProps', () => {
+      it('returns an object containing props for EpicItem component', () => {
+        expect(wrapper.vm.getEpicItemProps(1)).toEqual(
+          jasmine.objectContaining({
+            key: 1,
+            props: {
+              epic: wrapper.vm.epics[1],
+              presetType: wrapper.vm.presetType,
+              timeframe: wrapper.vm.timeframe,
+              currentGroupId: wrapper.vm.currentGroupId,
+            },
+          }),
+        );
       });
     });
   });
 
   describe('template', () => {
-    beforeEach(() => {
-      vm = createComponent({});
+    it('renders component container element with class `epics-list-section`', () => {
+      expect(wrapper.vm.$el.classList.contains('epics-list-section')).toBe(true);
     });
 
-    it('renders component container element with class `epics-list-section`', done => {
-      vm.$nextTick(() => {
-        expect(vm.$el.classList.contains('epics-list-section')).toBe(true);
+    it('renders virtual-list when roadmapBufferedRendering is `true` and `epics.length` is more than `bufferSize`', done => {
+      wrapper.vm.setBufferSize(5);
+
+      wrapper.vm.$nextTick(() => {
+        expect(wrapper.find(VirtualList).exists()).toBe(true);
         done();
       });
     });
 
-    it('renders component container element with `width` property applied via style attribute', done => {
-      vm.$nextTick(() => {
-        expect(vm.$el.getAttribute('style')).toBe(`width: ${mockShellWidth}px;`);
-        done();
+    it('renders epic-item when roadmapBufferedRendering is `false`', () => {
+      const wrapperFlagOff = createComponent({
+        roadmapBufferedRendering: false,
       });
+
+      expect(wrapperFlagOff.find(EpicItem).exists()).toBe(true);
+
+      wrapperFlagOff.destroy();
     });
 
-    it('renders bottom shadow element when `showBottomShadow` prop is true', done => {
-      vm.showBottomShadow = true;
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.scroll-bottom-shadow')).not.toBe(null);
-        done();
+    it('renders epic-item when roadmapBufferedRendering is `true` and `epics.length` is less than `bufferSize`', () => {
+      wrapper.vm.setBufferSize(50);
+
+      expect(wrapper.find(EpicItem).exists()).toBe(true);
+    });
+
+    it('renders empty row element when `epics.length` is less than `bufferSize`', () => {
+      wrapper.vm.setBufferSize(50);
+
+      expect(wrapper.find('.epics-list-item-empty').exists()).toBe(true);
+    });
+
+    it('renders bottom shadow element when `showBottomShadow` prop is true', () => {
+      wrapper.setData({
+        showBottomShadow: true,
       });
+
+      expect(wrapper.find('.scroll-bottom-shadow').exists()).toBe(true);
     });
   });
 });

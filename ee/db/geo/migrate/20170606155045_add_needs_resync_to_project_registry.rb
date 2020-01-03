@@ -6,8 +6,10 @@ class AddNeedsResyncToProjectRegistry < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
 
   def up
+    # rubocop:disable Migration/AddColumnWithDefault
     add_column_with_default(:project_registry, :resync_repository, :boolean, default: true)
     add_column_with_default(:project_registry, :resync_wiki, :boolean, default: true)
+    # rubocop:enable Migration/AddColumnWithDefault
   end
 
   def down

@@ -34,6 +34,7 @@ module EE
         params_ee << :custom_project_templates_group_id if current_group&.group_project_template_available?
         params_ee << :ip_restriction_ranges if current_group&.feature_available?(:group_ip_restriction)
         params_ee << { allowed_email_domain_attributes: [:id, :domain] } if current_group&.feature_available?(:group_allowed_email_domains)
+        params_ee << :max_pages_size if can?(current_user, :update_max_pages_size)
       end
     end
 

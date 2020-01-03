@@ -1,7 +1,7 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import StageBuildItem from 'ee/analytics/cycle_analytics/components/stage_build_item.vue';
 import { renderTotalTime } from '../helpers';
-import { testStage as stage, testEvents as events } from '../mock_data';
+import { stagingStage as stage, stagingEvents as events } from '../mock_data';
 
 function createComponent(props = {}, shallow = true) {
   const func = shallow ? shallowMount : mount;
@@ -109,6 +109,7 @@ describe('StageBuildItem', () => {
     beforeEach(() => {
       wrapper = createComponent({ withBuildStatus: true }, false);
     });
+
     afterEach(() => {
       wrapper.destroy();
     });

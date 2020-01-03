@@ -1,13 +1,7 @@
 <script>
 import _ from 'underscore';
 import { mapState, mapActions } from 'vuex';
-import {
-  GlLoadingIcon,
-  GlModal,
-  GlModalDirective,
-  GlButton,
-  GlDashboardSkeleton,
-} from '@gitlab/ui';
+import { GlModal, GlModalDirective, GlButton, GlDashboardSkeleton } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import ProjectHeader from './project_header.vue';
@@ -32,7 +26,6 @@ export default {
   components: {
     GlModal,
     GlDashboardSkeleton,
-    GlLoadingIcon,
     GlButton,
     ProjectSelector,
     Environment,

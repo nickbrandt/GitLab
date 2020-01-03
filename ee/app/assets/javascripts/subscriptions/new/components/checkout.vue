@@ -14,7 +14,7 @@ export default {
     <div class="full-width">
       <progress-bar :step="2" />
       <div class="flash-container"></div>
-      <h2 class="header-title">{{ $options.i18n.checkout }}</h2>
+      <h2 class="mt-4 mb-3 mb-lg-5">{{ $options.i18n.checkout }}</h2>
     </div>
   </div>
 </template>

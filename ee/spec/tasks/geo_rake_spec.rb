@@ -261,15 +261,20 @@ describe 'geo rake tasks', :geo do
     end
   end
 
-  describe 'geo:set_secondary_as_primary' do
+  describe 'geo:set_secondary_as_primary', :use_clean_rails_memory_store_caching do
     let!(:current_node) { create(:geo_node) }
     let!(:primary_node) { create(:geo_node, :primary) }
 
     before do
       stub_current_geo_node(current_node)
+
+      allow(GeoNode).to receive(:current_node).and_return(current_node)
     end
 
     it 'removes primary and sets secondary as primary' do
+      # Pre-warming the cache. See https://gitlab.com/gitlab-org/gitlab/-/merge_requests/22021
+      Gitlab::Geo.primary_node
+
       run_rake_task('geo:set_secondary_as_primary')
 
       expect(current_node.primary?).to be_truthy

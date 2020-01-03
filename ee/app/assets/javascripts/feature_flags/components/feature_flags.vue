@@ -174,6 +174,7 @@ export default {
       'setInstanceIdEndpoint',
       'setInstanceId',
       'rotateInstanceId',
+      'toggleFeatureFlag',
     ]),
     onChangeTab(scope) {
       this.scope = scope;
@@ -280,6 +281,7 @@ export default {
       v-else-if="shouldRenderTable"
       :csrf-token="csrfToken"
       :feature-flags="featureFlags"
+      @toggle-flag="toggleFeatureFlag"
     />
 
     <table-pagination v-if="shouldRenderPagination" :change="onChangePage" :page-info="pageInfo" />

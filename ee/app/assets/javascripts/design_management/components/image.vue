@@ -1,11 +1,7 @@
 <script>
 import _ from 'underscore';
-import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
-  components: {
-    GlLoadingIcon,
-  },
   props: {
     image: {
       type: String,

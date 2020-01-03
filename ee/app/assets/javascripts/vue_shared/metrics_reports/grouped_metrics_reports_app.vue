@@ -3,7 +3,6 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import { componentNames } from 'ee/reports/components/issue_body';
 import SmartVirtualList from '~/vue_shared/components/smart_virtual_list.vue';
 import ReportSection from '~/reports/components/report_section.vue';
-import SummaryRow from '~/reports/components/summary_row.vue';
 import ReportItem from '~/reports/components/report_item.vue';
 import { n__, s__, sprintf } from '~/locale';
 import createStore from './store';
@@ -13,7 +12,6 @@ export default {
   store: createStore(),
   components: {
     ReportSection,
-    SummaryRow,
     ReportItem,
     SmartVirtualList,
   },

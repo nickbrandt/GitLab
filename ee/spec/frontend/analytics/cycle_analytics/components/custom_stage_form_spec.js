@@ -97,12 +97,20 @@ describe('CustomStageForm', () => {
 
         it('selects events with canBeStartEvent=true for the start events dropdown', () => {
           const select = wrapper.find(sel.startEvent);
+          expect(select.html()).toMatchSnapshot();
+        });
 
-          startEvents.forEach(ev => {
-            expect(select.html()).toHaveHtml(
-              `<option value="${ev.identifier}">${ev.name}</option>`,
-            );
-          });
+        it('does not select events with canBeStartEvent=false for the start events dropdown', () => {
+          const select = wrapper.find(sel.startEvent);
+          expect(select.html()).toMatchSnapshot();
+
+          stopEvents
+            .filter(ev => !ev.canBeStartEvent)
+            .forEach(ev => {
+              expect(select.html()).not.toHaveHtml(
+                `<option value="${ev.identifier}">${ev.name}</option>`,
+              );
+            });
         });
       });
 
@@ -354,6 +362,7 @@ describe('CustomStageForm', () => {
 
         return Vue.nextTick(() => {
           selectDropdownOption(wrapper, sel.endEvent, 1);
+          return Vue.nextTick();
         });
       });
 
@@ -386,10 +395,15 @@ describe('CustomStageForm', () => {
 
           selectDropdownOption(wrapper, sel.startEvent, startEventIndex);
 
-          return Vue.nextTick(() => {
-            selectDropdownOption(wrapper, sel.endEvent, stopEventIndex);
-            wrapper.find(sel.name).setValue('Cool stage');
-          });
+          return Vue.nextTick()
+            .then(() => {
+              selectDropdownOption(wrapper, sel.endEvent, stopEventIndex);
+              return Vue.nextTick();
+            })
+            .then(() => {
+              wrapper.find(sel.name).setValue('Cool stage');
+              return Vue.nextTick();
+            });
         });
 
         afterEach(() => {
@@ -429,8 +443,10 @@ describe('CustomStageForm', () => {
           ];
 
           wrapper.find(sel.submit).trigger('click');
-          event = findEvent(STAGE_ACTIONS.CREATE);
-          expect(event[0]).toEqual(res);
+          return Vue.nextTick().then(() => {
+            event = findEvent(STAGE_ACTIONS.CREATE);
+            expect(event[0]).toEqual(res);
+          });
         });
       });
     });

@@ -13,6 +13,7 @@ module EE
 
       include Elastic::ApplicationVersionedSearch
       include UsageStatistics
+      include WeightEventable
 
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }

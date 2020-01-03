@@ -1,5 +1,0 @@
----
-title: Hide elasticsearch namespaces and projects when too many in rollout
-merge_request: 21225
-author:
-type: changed

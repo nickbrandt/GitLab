@@ -22,13 +22,16 @@ module Elastic
       update_issue_notes(record, options["changed_fields"]) if record.class == Issue
 
       true
-    rescue Elasticsearch::Transport::Transport::Errors::NotFound, ActiveRecord::RecordNotFound
+    rescue Elasticsearch::Transport::Transport::Errors::NotFound, ActiveRecord::RecordNotFound => e
       # These errors can happen in several cases, including:
       # - A record is updated, then removed before the update is handled
       # - Indexing is enabled, but not every item has been indexed yet - updating
       #   and deleting the un-indexed records will raise exception
       #
       # We can ignore these.
+
+      logger.error(message: 'elastic_index_record_service_caught_exception', error_class: e.class.name, error_message: e.message)
+
       true
     end
 
@@ -87,6 +90,10 @@ module Elastic
     def retry_import(errors, association, options)
       ids = errors.map { |error| error['index']['_id'][/_(\d+)$/, 1] }
       association.id_in(ids).es_import(options)
+    end
+
+    def logger
+      @logger ||= ::Gitlab::Elasticsearch::Logger.build
     end
   end
 end

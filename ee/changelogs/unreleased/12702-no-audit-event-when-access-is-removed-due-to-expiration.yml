@@ -1,5 +1,0 @@
----
-title: Add audit event when member access is removed due to expiration
-merge_request: 20529
-author:
-type: added

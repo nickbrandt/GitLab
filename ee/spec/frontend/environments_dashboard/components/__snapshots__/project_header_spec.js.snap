@@ -52,9 +52,8 @@ exports[`Project Header matches the snapshot 1`] = `
   >
     <button
       class="js-more-actions-toggle d-flex align-items-center ml-2 btn btn-transparent"
-      data-original-title="More actions"
       data-toggle="dropdown"
-      title=""
+      title="More actions"
       type="button"
     >
       <icon-stub

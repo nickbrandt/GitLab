@@ -1,6 +1,6 @@
 <script>
 import { isEqual } from 'underscore';
-import { GlButton, GlFormGroup, GlFormInput, GlFormSelect, GlLoadingIcon } from '@gitlab/ui';
+import { GlFormGroup, GlFormInput, GlFormSelect, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
 import LabelsSelector from './labels_selector.vue';
@@ -25,7 +25,6 @@ const initFields = {
 
 export default {
   components: {
-    GlButton,
     GlFormGroup,
     GlFormInput,
     GlFormSelect,

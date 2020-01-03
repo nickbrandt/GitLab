@@ -18,19 +18,19 @@ import axios from '~/lib/utils/axios_utils';
 import { createStore } from '~/ide/stores';
 import * as types from '~/ide/stores/mutation_types';
 import router from '~/ide/ide_router';
-import { resetStore, file } from '../helpers';
+import { file } from '../helpers';
 import testAction from '../../helpers/vuex_action_helper';
 import eventHub from '~/ide/eventhub';
 
-const store = createStore();
-
 describe('Multi-file store actions', () => {
-  beforeEach(() => {
-    spyOn(router, 'push');
-  });
+  let store;
 
-  afterEach(() => {
-    resetStore(store);
+  beforeEach(() => {
+    store = createStore();
+
+    spyOn(store, 'commit').and.callThrough();
+    spyOn(store, 'dispatch').and.callThrough();
+    spyOn(router, 'push');
   });
 
   describe('redirectToUrl', () => {
@@ -319,7 +319,7 @@ describe('Multi-file store actions', () => {
             { type: types.TOGGLE_FILE_OPEN, payload: 'test' },
             { type: types.ADD_FILE_TO_CHANGED, payload: 'test' },
           ],
-          [
+          jasmine.arrayContaining([
             {
               type: 'setFileActive',
               payload: 'test',
@@ -327,7 +327,7 @@ describe('Multi-file store actions', () => {
             {
               type: 'triggerFilesChange',
             },
-          ],
+          ]),
           done,
         );
       });
@@ -345,6 +345,21 @@ describe('Multi-file store actions', () => {
           })
           .then(() => {
             expect(document.querySelector('.flash-alert')).not.toBeNull();
+
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('bursts unused seal', done => {
+        store
+          .dispatch('createTempEntry', {
+            name: 'test',
+            branchId: 'mybranch',
+            type: 'blob',
+          })
+          .then(() => {
+            expect(store.state.unusedSeal).toBe(false);
 
             done();
           })
@@ -375,58 +390,82 @@ describe('Multi-file store actions', () => {
     });
   });
 
-  describe('stageAllChanges', () => {
-    it('adds all files from changedFiles to stagedFiles', done => {
-      const openFile = { ...file(), path: 'test' };
+  describe('stage/unstageAllChanges', () => {
+    let file1;
+    let file2;
 
-      store.state.openFiles.push(openFile);
-      store.state.stagedFiles.push(openFile);
-      store.state.changedFiles.push(openFile, file('new'));
+    beforeEach(() => {
+      file1 = { ...file('test'), content: 'changed test', raw: 'test' };
+      file2 = { ...file('test2'), content: 'changed test2', raw: 'test2' };
 
-      testAction(
-        stageAllChanges,
-        null,
-        store.state,
-        [
-          { type: types.SET_LAST_COMMIT_MSG, payload: '' },
-          { type: types.STAGE_CHANGE, payload: store.state.changedFiles[0].path },
-          { type: types.STAGE_CHANGE, payload: store.state.changedFiles[1].path },
-        ],
-        [
-          {
-            type: 'openPendingTab',
-            payload: { file: openFile, keyPrefix: 'staged' },
-          },
-        ],
-        done,
-      );
+      store.state.openFiles = [file1];
+      store.state.changedFiles = [file1];
+      store.state.stagedFiles = [{ ...file2, content: 'staged test' }];
+
+      store.state.entries = {
+        [file1.path]: { ...file1 },
+        [file2.path]: { ...file2 },
+      };
     });
-  });
 
-  describe('unstageAllChanges', () => {
-    it('removes all files from stagedFiles after unstaging', done => {
-      const openFile = { ...file(), path: 'test' };
+    describe('stageAllChanges', () => {
+      it('adds all files from changedFiles to stagedFiles', () => {
+        stageAllChanges(store);
 
-      store.state.openFiles.push(openFile);
-      store.state.changedFiles.push(openFile);
-      store.state.stagedFiles.push(openFile, file('new'));
+        expect(store.commit.calls.allArgs()).toEqual([
+          [types.SET_LAST_COMMIT_MSG, ''],
+          [types.STAGE_CHANGE, jasmine.objectContaining({ path: file1.path })],
+        ]);
+      });
 
-      testAction(
-        unstageAllChanges,
-        null,
-        store.state,
-        [
-          { type: types.UNSTAGE_CHANGE, payload: store.state.stagedFiles[0].path },
-          { type: types.UNSTAGE_CHANGE, payload: store.state.stagedFiles[1].path },
-        ],
-        [
-          {
-            type: 'openPendingTab',
-            payload: { file: openFile, keyPrefix: 'unstaged' },
-          },
-        ],
-        done,
-      );
+      it('opens pending tab if a change exists in that file', () => {
+        stageAllChanges(store);
+
+        expect(store.dispatch.calls.allArgs()).toEqual([
+          [
+            'openPendingTab',
+            { file: { ...file1, staged: true, changed: true }, keyPrefix: 'staged' },
+          ],
+        ]);
+      });
+
+      it('does not open pending tab if no change exists in that file', () => {
+        store.state.entries[file1.path].content = 'test';
+        store.state.stagedFiles = [file1];
+        store.state.changedFiles = [store.state.entries[file1.path]];
+
+        stageAllChanges(store);
+
+        expect(store.dispatch).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('unstageAllChanges', () => {
+      it('removes all files from stagedFiles after unstaging', () => {
+        unstageAllChanges(store);
+
+        expect(store.commit.calls.allArgs()).toEqual([
+          [types.UNSTAGE_CHANGE, jasmine.objectContaining({ path: file2.path })],
+        ]);
+      });
+
+      it('opens pending tab if a change exists in that file', () => {
+        unstageAllChanges(store);
+
+        expect(store.dispatch.calls.allArgs()).toEqual([
+          ['openPendingTab', { file: file1, keyPrefix: 'unstaged' }],
+        ]);
+      });
+
+      it('does not open pending tab if no change exists in that file', () => {
+        store.state.entries[file1.path].content = 'test';
+        store.state.stagedFiles = [file1];
+        store.state.changedFiles = [store.state.entries[file1.path]];
+
+        unstageAllChanges(store);
+
+        expect(store.dispatch).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -648,6 +687,19 @@ describe('Multi-file store actions', () => {
         ],
       );
     });
+
+    it('bursts unused seal', done => {
+      store.state.entries.test = file('test');
+
+      store
+        .dispatch('deleteEntry', 'test')
+        .then(() => {
+          expect(store.state.unusedSeal).toBe(false);
+
+          done();
+        })
+        .catch(done.fail);
+    });
   });
 
   describe('renameEntry', () => {
@@ -724,10 +776,6 @@ describe('Multi-file store actions', () => {
         });
       });
 
-      afterEach(() => {
-        resetStore(store);
-      });
-
       it('by default renames an entry and adds to changed', done => {
         testAction(
           renameEntry,
@@ -747,7 +795,7 @@ describe('Multi-file store actions', () => {
               payload: 'renamed',
             },
           ],
-          [{ type: 'triggerFilesChange' }],
+          [{ type: 'burstUnusedSeal' }, { type: 'triggerFilesChange' }],
           done,
         );
       });
@@ -805,6 +853,20 @@ describe('Multi-file store actions', () => {
             expect(router.push).toHaveBeenCalledWith(`/project/foo-bar.md`);
           })
           .then(done)
+          .catch(done.fail);
+      });
+
+      it('bursts unused seal', done => {
+        store
+          .dispatch('renameEntry', {
+            path: 'orig',
+            name: 'renamed',
+          })
+          .then(() => {
+            expect(store.state.unusedSeal).toBe(false);
+
+            done();
+          })
           .catch(done.fail);
       });
     });
@@ -924,18 +986,19 @@ describe('Multi-file store actions', () => {
 
     describe('error', () => {
       let dispatch;
-      const callParams = [
-        {
-          commit() {},
-          state: store.state,
-        },
-        {
-          projectId: 'abc/def',
-          branchId: 'master-testing',
-        },
-      ];
+      let callParams;
 
       beforeEach(() => {
+        callParams = [
+          {
+            commit() {},
+            state: store.state,
+          },
+          {
+            projectId: 'abc/def',
+            branchId: 'master-testing',
+          },
+        ];
         dispatch = jasmine.createSpy('dispatchSpy');
         document.body.innerHTML += '<div class="flash-container"></div>';
       });

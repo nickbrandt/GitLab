@@ -153,7 +153,7 @@ export default {
         ),
         {
           startLink:
-            '<a href="https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html#role-create" target="_blank" rel="noopener noreferrer">',
+            '<a href="https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role" target="_blank" rel="noopener noreferrer">',
           externalLinkIcon: this.externalLinkIcon,
           endLink: '</a>',
         },
@@ -342,7 +342,6 @@ export default {
         :empty-text="s__('ClusterIntegration|Kubernetes version not found')"
         @input="setKubernetesVersion({ kubernetesVersion: $event })"
       />
-      <p class="form-text text-muted" v-html="roleDropdownHelpText"></p>
     </div>
     <div class="form-group">
       <label class="label-bold" for="eks-role">{{ s__('ClusterIntegration|Role name') }}</label>

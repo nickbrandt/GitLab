@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { GlFormTextarea, GlFormCheckbox } from '@gitlab/ui';
 import Form from 'ee/feature_flags/components/form.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
@@ -31,10 +31,7 @@ describe('feature flag form', () => {
   });
 
   const factory = (props = {}) => {
-    const localVue = createLocalVue();
-
     wrapper = shallowMount(Form, {
-      localVue,
       propsData: props,
       provide: {
         glFeatures: {
@@ -306,25 +303,33 @@ describe('feature flag form', () => {
       it('should emit handleSubmit with the updated data', () => {
         wrapper.find('#feature-flag-name').setValue('feature_flag_2');
 
-        wrapper
-          .find('.js-new-scope-name')
-          .find(EnvironmentsDropdown)
-          .vm.$emit('selectEnvironment', 'review');
-
-        wrapper
-          .find('.js-add-new-scope')
-          .find(ToggleButton)
-          .vm.$emit('change', true);
-
-        wrapper.find(ToggleButton).vm.$emit('change', true);
-
         return wrapper.vm
           .$nextTick()
+          .then(() => {
+            wrapper
+              .find('.js-new-scope-name')
+              .find(EnvironmentsDropdown)
+              .vm.$emit('selectEnvironment', 'review');
+
+            return wrapper.vm.$nextTick();
+          })
+          .then(() => {
+            wrapper
+              .find('.js-add-new-scope')
+              .find(ToggleButton)
+              .vm.$emit('change', true);
+          })
+          .then(() => {
+            wrapper.find(ToggleButton).vm.$emit('change', true);
+            return wrapper.vm.$nextTick();
+          })
 
           .then(() => {
             selectFirstRolloutStrategyOption(0);
+            return wrapper.vm.$nextTick();
+          })
+          .then(() => {
             selectFirstRolloutStrategyOption(2);
-
             return wrapper.vm.$nextTick();
           })
           .then(() => {

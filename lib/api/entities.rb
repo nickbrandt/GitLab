@@ -569,6 +569,20 @@ module API
       end
     end
 
+    class IssuableReferences < Grape::Entity
+      expose :short do |issuable|
+        issuable.to_reference
+      end
+
+      expose :relative do |issuable, options|
+        issuable.to_reference(options[:group] || options[:project])
+      end
+
+      expose :full do |issuable|
+        issuable.to_reference(full: true)
+      end
+    end
+
     class Diff < Grape::Entity
       expose :old_path, :new_path, :a_mode, :b_mode
       expose :new_file?, as: :new_file
@@ -676,6 +690,10 @@ module API
         end
       end
 
+      expose :references, with: IssuableReferences do |issue|
+        issue
+      end
+
       # Calculating the value of subscribed field triggers Markdown
       # processing. We can't do that for multiple issues / merge
       # requests in a single API request.
@@ -761,9 +779,12 @@ module API
       expose :author, :assignees, using: Entities::UserBasic
 
       expose :source_project_id, :target_project_id
-      expose :labels do |merge_request|
-        # Avoids an N+1 query since labels are preloaded
-        merge_request.labels.map(&:title).sort
+      expose :labels do |merge_request, options|
+        if options[:with_labels_details]
+          ::API::Entities::LabelBasic.represent(merge_request.labels.sort_by(&:title))
+        else
+          merge_request.labels.map(&:title).sort
+        end
       end
       expose :work_in_progress?, as: :work_in_progress
       expose :milestone, using: Entities::Milestone
@@ -787,8 +808,14 @@ module API
       # Deprecated
       expose :allow_collaboration, as: :allow_maintainer_to_push, if: -> (merge_request, _) { merge_request.for_fork? }
 
+      # reference is deprecated in favour of references
+      # Introduced [Gitlab 12.6](https://gitlab.com/gitlab-org/gitlab/merge_requests/20354)
       expose :reference do |merge_request, options|
         merge_request.to_reference(options[:project])
+      end
+
+      expose :references, with: IssuableReferences do |merge_request|
+        merge_request
       end
 
       expose :web_url do |merge_request|
@@ -1142,7 +1169,7 @@ module API
     end
 
     class LabelBasic < Grape::Entity
-      expose :id, :name, :color, :description, :text_color
+      expose :id, :name, :color, :description, :description_html, :text_color
     end
 
     class Label < LabelBasic
@@ -1336,7 +1363,7 @@ module API
       expose :author, using: Entities::UserBasic, if: -> (release, _) { release.author.present? }
       expose :commit, using: Entities::Commit, if: ->(_, _) { can_download_code? }
       expose :upcoming_release?, as: :upcoming_release
-      expose :milestones, using: Entities::Milestone, if: -> (release, _) { release.milestones.present? }
+      expose :milestones, using: Entities::Milestone, if: -> (release, _) { release.milestones.present? && can_read_milestone? }
       expose :commit_path, expose_nil: false
       expose :tag_path, expose_nil: false
       expose :evidence_sha, expose_nil: false, if: ->(_, _) { can_download_code? }
@@ -1361,6 +1388,10 @@ module API
 
       def can_download_code?
         Ability.allowed?(options[:current_user], :download_code, object.project)
+      end
+
+      def can_read_milestone?
+        Ability.allowed?(options[:current_user], :read_milestone, object.project)
       end
     end
 

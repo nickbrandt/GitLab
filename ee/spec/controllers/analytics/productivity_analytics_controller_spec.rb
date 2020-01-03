@@ -88,6 +88,21 @@ describe Analytics::ProductivityAnalyticsController do
       expect(response).to have_gitlab_http_status(403)
     end
 
+    context 'when invalid params are given' do
+      let(:params) { { group_id: group, merged_at_before: 10.days.ago, merged_at_after: 5.days.ago } }
+
+      before do
+        group.add_owner(current_user)
+      end
+
+      it 'returns 422, unprocessable_entity' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:unprocessable_entity)
+        expect(response).to match_response_schema('analytics/cycle_analytics/validation_error', dir: 'ee')
+      end
+    end
+
     context 'without group_id specified' do
       it 'returns 403' do
         subject

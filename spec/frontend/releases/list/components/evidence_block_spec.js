@@ -39,7 +39,7 @@ describe('Evidence Block', () => {
   });
 
   it('renders the correct hover text for the download', () => {
-    expect(wrapper.find(GlLink).attributes('data-original-title')).toBe('Download evidence JSON');
+    expect(wrapper.find(GlLink).attributes('title')).toBe('Download evidence JSON');
   });
 
   it('renders the correct file link for download', () => {
@@ -53,7 +53,10 @@ describe('Evidence Block', () => {
 
     it('renders the long sha after expansion', () => {
       wrapper.find('.js-text-expander-prepend').trigger('click');
-      expect(wrapper.find('.js-expanded').text()).toBe(release.evidence_sha);
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.find('.js-expanded').text()).toBe(release.evidence_sha);
+      });
     });
   });
 
@@ -63,9 +66,7 @@ describe('Evidence Block', () => {
     });
 
     it('renders the correct hover text', () => {
-      expect(wrapper.find(ClipboardButton).attributes('data-original-title')).toBe(
-        'Copy commit SHA',
-      );
+      expect(wrapper.find(ClipboardButton).attributes('title')).toBe('Copy commit SHA');
     });
 
     it('copies the sha', () => {

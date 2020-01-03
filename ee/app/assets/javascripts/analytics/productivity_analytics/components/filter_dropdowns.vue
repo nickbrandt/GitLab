@@ -10,15 +10,30 @@ export default {
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
   },
+  props: {
+    group: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    project: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+  },
   data() {
     return {
-      groupId: null,
+      groupId: this.group && this.group.id ? this.group.id : null,
     };
   },
   computed: {
     ...mapState('filters', ['groupNamespace']),
     showProjectsDropdownFilter() {
       return Boolean(this.groupId);
+    },
+    projects() {
+      return this.project && Object.keys(this.project).length ? [this.project] : null;
     },
   },
   methods: {
@@ -62,12 +77,14 @@ export default {
     <groups-dropdown-filter
       class="group-select"
       :query-params="$options.groupsQueryParams"
+      :default-group="group"
       @selected="onGroupSelected"
     />
     <projects-dropdown-filter
       v-if="showProjectsDropdownFilter"
       :key="groupId"
       class="project-select"
+      :default-projects="projects"
       :query-params="$options.projectsQueryParams"
       :group-id="groupId"
       @selected="onProjectsSelected"

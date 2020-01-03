@@ -73,13 +73,13 @@ describe TrialsController do
           params = {
               company_name: 'Gitlab',
               company_size: '1-99',
+              first_name: user.first_name,
+              last_name: user.last_name,
               phone_number: '1111111111',
               number_of_users: "20",
               country: 'IN'
           }
           extra_params = {
-              first_name: user.first_name,
-              last_name: user.last_name,
               work_email: user.email,
               uid: user.id,
               skip_email_confirmation: true,

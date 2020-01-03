@@ -77,29 +77,9 @@ describe Group do
       let_it_be(:epic1) { create(:epic) }
       let_it_be(:epic2) { create(:epic) }
 
-      shared_examples '.for_epics examples' do
-        it 'returns groups only for selected epics' do
-          epics = ::Epic.where(id: epic1)
-          expect(described_class.for_epics(epics)).to contain_exactly(epic1.group)
-        end
-      end
-
-      context 'with `optimized_groups_user_can_read_epics_method` feature flag' do
-        before do
-          stub_feature_flags(optimized_groups_user_can_read_epics_method: flag_state)
-        end
-
-        context 'enabled' do
-          let(:flag_state) { true }
-
-          include_examples '.for_epics examples'
-        end
-
-        context 'disabled' do
-          let(:flag_state) { false }
-
-          include_examples '.for_epics examples'
-        end
+      it 'returns groups only for selected epics' do
+        epics = ::Epic.where(id: epic1)
+        expect(described_class.for_epics(epics)).to contain_exactly(epic1.group)
       end
     end
   end

@@ -1,7 +1,7 @@
 <script>
 import { totalDaysInMonth, dayInQuarter, totalDaysInQuarter } from '~/lib/utils/datetime_utility';
 
-import { EPIC_DETAILS_CELL_WIDTH, PRESET_TYPES, DAYS_IN_WEEK } from '../constants';
+import { EPIC_DETAILS_CELL_WIDTH, PRESET_TYPES, DAYS_IN_WEEK, SCROLL_BAR_SIZE } from '../constants';
 
 import eventHub from '../event_hub';
 
@@ -22,29 +22,22 @@ export default {
   },
   data() {
     return {
-      todayBarStyles: '',
-      todayBarReady: false,
+      todayBarStyles: {},
+      todayBarReady: true,
     };
   },
   mounted() {
-    eventHub.$on('epicsListRendered', this.handleEpicsListRender);
     eventHub.$on('epicsListScrolled', this.handleEpicsListScroll);
-    eventHub.$on('refreshTimeline', this.handleEpicsListRender);
+    this.$nextTick(() => {
+      this.todayBarStyles = this.getTodayBarStyles();
+    });
   },
   beforeDestroy() {
-    eventHub.$off('epicsListRendered', this.handleEpicsListRender);
     eventHub.$off('epicsListScrolled', this.handleEpicsListScroll);
-    eventHub.$off('refreshTimeline', this.handleEpicsListRender);
   },
   methods: {
-    /**
-     * This method takes height of current shell
-     * and renders vertical line over the area where
-     * today falls in current timeline
-     */
-    handleEpicsListRender({ todayBarReady }) {
-      let left = 0;
-      let height = 0;
+    getTodayBarStyles() {
+      let left;
 
       // Get total days of current timeframe Item and then
       // get size in % from current date and days in range
@@ -63,21 +56,10 @@ export default {
         left = Math.floor(((this.currentDate.getDay() + 1) / DAYS_IN_WEEK) * 100 - DAYS_IN_WEEK);
       }
 
-      // On initial load, container element height is 0
-      if (this.$root.$el.clientHeight === 0) {
-        height = window.innerHeight - this.$root.$el.offsetTop;
-      } else {
-        // When list is scrollable both vertically and horizontally
-        // We set height using top-level parent container height & position of
-        // today indicator element container.
-        height = this.$root.$el.clientHeight - this.$el.parentElement.offsetTop;
-      }
-
-      this.todayBarStyles = {
-        height: `${height}px`,
+      return {
         left: `${left}%`,
+        height: `calc(100vh - ${this.$el.getBoundingClientRect().y + SCROLL_BAR_SIZE}px)`,
       };
-      this.todayBarReady = todayBarReady === undefined ? true : todayBarReady;
     },
     handleEpicsListScroll() {
       const indicatorX = this.$el.getBoundingClientRect().x;
@@ -91,5 +73,5 @@ export default {
 </script>
 
 <template>
-  <span :class="{ invisible: !todayBarReady }" :style="todayBarStyles" class="today-bar"> </span>
+  <span :class="{ invisible: !todayBarReady }" :style="todayBarStyles" class="today-bar"></span>
 </template>

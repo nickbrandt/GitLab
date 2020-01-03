@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { mapActions } from 'vuex';
 
 import Cookies from 'js-cookie';
-import bp from '~/breakpoints';
+import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import createStore from './store';
@@ -45,7 +45,7 @@ export default (epicCreate = false) => {
 
   // Collapse the sidebar on mobile screens by default
   const bpBreakpoint = bp.getBreakpointSize();
-  if (bpBreakpoint === 'xs' || bpBreakpoint === 'sm') {
+  if (bpBreakpoint === 'xs' || bpBreakpoint === 'sm' || bpBreakpoint === 'md') {
     Cookies.set('collapsed_gutter', true);
   }
 

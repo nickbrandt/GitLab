@@ -104,22 +104,22 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `id` | ID! |  |
-| `project` | Project! |  |
-| `issue` | Issue! |  |
-| `notesCount` | Int! | The total count of user-created notes for this design |
-| `filename` | String! |  |
-| `fullPath` | String! |  |
-| `event` | DesignVersionEvent! | The change that happened to the design at this version |
-| `image` | String! |  |
-| `diffRefs` | DiffRefs! |  |
+| `id` | ID! | ID of the design |
+| `project` | Project! | Project associated with the design |
+| `issue` | Issue! | Issue associated with the design |
+| `notesCount` | Int! | Total count of user-created notes for the design |
+| `filename` | String! | Filename of the design file |
+| `fullPath` | String! | Full path of the design file |
+| `event` | DesignVersionEvent! | Type of change made to the design at the version specified by the `atVersion` argument if supplied. Defaults to the latest version |
+| `image` | String! | Image of the design |
+| `diffRefs` | DiffRefs! | Diff refs of the design |
 
 ### DesignCollection
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `project` | Project! |  |
-| `issue` | Issue! |  |
+| `project` | Project! | Project associated with the design collection |
+| `issue` | Issue! | Issue associated with the design collection |
 
 ### DesignManagementDeletePayload
 
@@ -142,8 +142,8 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `id` | ID! |  |
-| `sha` | ID! |  |
+| `id` | ID! | ID of the design version |
+| `sha` | ID! | SHA of the design version |
 
 ### DestroyNotePayload
 
@@ -165,14 +165,14 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `group` | String! |  |
-| `icon` | String! |  |
-| `favicon` | String! |  |
-| `detailsPath` | String! |  |
-| `hasDetails` | Boolean! |  |
-| `label` | String! |  |
-| `text` | String! |  |
-| `tooltip` | String! |  |
+| `group` | String! | Group of the pipeline status |
+| `icon` | String! | Icon of the pipeline status |
+| `favicon` | String! | Favicon of the pipeline status |
+| `detailsPath` | String! | Path of the details for the pipeline status |
+| `hasDetails` | Boolean! | Indicates if the pipeline status has further details |
+| `label` | String! | Label of the pipeline status |
+| `text` | String! | Text of the pipeline status |
+| `tooltip` | String! | Tooltip associated with the pipeline status |
 
 ### DiffPosition
 
@@ -283,7 +283,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
 | `epic` | Epic | Epic to which this issue belongs |
 | `weight` | Int | Weight of the issue |
-| `designs` | DesignCollection | Deprecated. Use `design_collection`. |
+| `designs` | DesignCollection | Deprecated. Use `design_collection` |
 | `designCollection` | DesignCollection | Collection of design images associated with this issue |
 | `epicIssueId` | ID! | ID of the epic-issue relation |
 | `relationPath` | String | URI path of the epic-issue relation |
@@ -378,7 +378,7 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
 | `epic` | Epic | Epic to which this issue belongs |
 | `weight` | Int | Weight of the issue |
-| `designs` | DesignCollection | Deprecated. Use `design_collection`. |
+| `designs` | DesignCollection | Deprecated. Use `design_collection` |
 | `designCollection` | DesignCollection | Collection of design images associated with this issue |
 
 ### IssuePermissions
@@ -631,19 +631,19 @@ The API can be explored interactively using the [GraphiQL IDE](../index.md#graph
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `userPermissions` | PipelinePermissions! | Permissions for the current user on the resource |
-| `id` | ID! |  |
-| `iid` | String! |  |
-| `sha` | String! |  |
-| `beforeSha` | String |  |
-| `status` | PipelineStatusEnum! |  |
-| `detailedStatus` | DetailedStatus! |  |
+| `id` | ID! | ID of the pipeline |
+| `iid` | String! | Internal ID of the pipeline |
+| `sha` | String! | SHA of the pipeline's commit |
+| `beforeSha` | String | Base SHA of the source branch |
+| `status` | PipelineStatusEnum! | Status of the pipeline (CREATED, WAITING_FOR_RESOURCE, PREPARING, PENDING, RUNNING, FAILED, SUCCESS, CANCELED, SKIPPED, MANUAL, SCHEDULED) |
+| `detailedStatus` | DetailedStatus! | Detailed status of the pipeline |
 | `duration` | Int | Duration of the pipeline in seconds |
 | `coverage` | Float | Coverage percentage |
-| `createdAt` | Time! |  |
-| `updatedAt` | Time! |  |
-| `startedAt` | Time |  |
-| `finishedAt` | Time |  |
-| `committedAt` | Time |  |
+| `createdAt` | Time! | Timestamp of the pipeline's creation |
+| `updatedAt` | Time! | Timestamp of the pipeline's last activity |
+| `startedAt` | Time | Timestamp when the pipeline was started |
+| `finishedAt` | Time | Timestamp of the pipeline's completion |
+| `committedAt` | Time | Timestamp of the pipeline's commit |
 
 ### PipelinePermissions
 

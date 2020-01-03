@@ -41,6 +41,7 @@ describe('EnvironmentLogs', () => {
 
   const findEnvironmentsDropdown = () => wrapper.find('.js-environments-dropdown');
   const findPodsDropdown = () => wrapper.find('.js-pods-dropdown');
+  const findSearchBar = () => wrapper.find('.js-logs-search');
   const findLogControlButtons = () => wrapper.find({ name: 'log-control-buttons-stub' });
   const findLogTrace = () => wrapper.find('.js-log-trace');
 
@@ -118,6 +119,9 @@ describe('EnvironmentLogs', () => {
       state.environments.options = [];
       state.environments.isLoading = true;
 
+      gon.features = gon.features || {};
+      gon.features.enableClusterApplicationElasticStack = true;
+
       initWrapper();
     });
 
@@ -131,6 +135,11 @@ describe('EnvironmentLogs', () => {
       expect(findPodsDropdown().findAll(GlDropdownItem).length).toBe(0);
     });
 
+    it('displays a disabled search bar', () => {
+      expect(findSearchBar().exists()).toEqual(true);
+      expect(findSearchBar().attributes('disabled')).toEqual('true');
+    });
+
     it('does not update buttons state', () => {
       expect(updateControlBtnsMock).not.toHaveBeenCalled();
     });
@@ -142,6 +151,21 @@ describe('EnvironmentLogs', () => {
           .find('.js-build-loader-animation')
           .isVisible(),
       ).toBe(true);
+    });
+  });
+
+  describe('elastic stack disabled', () => {
+    beforeEach(() => {
+      gon.features = gon.features || {};
+      gon.features.enableClusterApplicationElasticStack = false;
+
+      initWrapper();
+    });
+
+    it("doesn't display the search bar", () => {
+      expect(findSearchBar().exists()).toEqual(false);
+      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-6');
+      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-6');
     });
   });
 
@@ -166,6 +190,9 @@ describe('EnvironmentLogs', () => {
         state.environments.options = mockEnvironments;
       });
 
+      gon.features = gon.features || {};
+      gon.features.enableClusterApplicationElasticStack = true;
+
       initWrapper();
     });
 
@@ -186,6 +213,7 @@ describe('EnvironmentLogs', () => {
         const item = items.at(i);
         expect(item.text()).toBe(env.name);
       });
+      expect(wrapper.find('#environments-dropdown-fg').attributes('class')).toEqual('col-4');
     });
 
     it('populates pods dropdown', () => {
@@ -197,12 +225,19 @@ describe('EnvironmentLogs', () => {
         const item = items.at(i);
         expect(item.text()).toBe(pod);
       });
+      expect(wrapper.find('#pods-dropdown-fg').attributes('class')).toEqual('col-4');
     });
 
     it('populates logs trace', () => {
       const trace = findLogTrace();
       expect(trace.text().split('\n').length).toBe(mockTrace.length);
       expect(trace.text().split('\n')).toEqual(mockTrace);
+    });
+
+    it('displays the search bar', () => {
+      expect(findSearchBar().exists()).toEqual(true);
+      expect(findSearchBar().attributes('disabled')).toEqual(undefined);
+      expect(wrapper.find('#search-fg').attributes('class')).toEqual('col-4');
     });
 
     it('update control buttons state', () => {

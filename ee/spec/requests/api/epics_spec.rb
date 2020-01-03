@@ -7,7 +7,7 @@ describe API::Epics do
   let(:group) { create(:group) }
   let(:project) { create(:project, :public, group: group) }
   let(:label) { create(:label) }
-  let(:epic) { create(:labeled_epic, group: group, labels: [label]) }
+  let!(:epic) { create(:labeled_epic, group: group, labels: [label]) }
   let(:params) { nil }
 
   shared_examples 'error requests' do
@@ -85,7 +85,6 @@ describe API::Epics do
       end
 
       it 'avoids N+1 queries', :request_store do
-        epic
         # Avoid polluting queries with inserts for personal access token
         pat = create(:personal_access_token, user: user)
         subgroup_1 = create(:group, parent: group)
@@ -102,6 +101,51 @@ describe API::Epics do
 
         expect { get api(url, personal_access_token: pat), params: params }.not_to exceed_all_query_limit(control)
         expect(response).to have_gitlab_http_status(200)
+      end
+
+      context 'with_label_details' do
+        let(:params) do
+          {
+            include_descendant_groups: true,
+            with_labels_details: true
+          }
+        end
+
+        it 'avoids N+1 queries', :request_store do
+          # Avoid polluting queries with inserts for personal access token
+          pat = create(:personal_access_token, user: user)
+          subgroup_1 = create(:group, parent: group)
+          subgroup_2 = create(:group, parent: subgroup_1)
+          label_1 = create(:group_label, title: 'foo', group: group)
+          epic1 = create(:epic, group: subgroup_2)
+          create(:label_link, label: label_1, target: epic1)
+
+          control = ActiveRecord::QueryRecorder.new(skip_cached: false) do
+            get api(url, personal_access_token: pat), params: params
+          end.count
+
+          label_2 = create(:label)
+          create_list(:labeled_epic, 4, group: group, labels: [label_2])
+
+          expect do
+            get api(url, personal_access_token: pat), params: params
+          end.not_to exceed_all_query_limit(control)
+        end
+
+        it 'returns labels with details' do
+          label_1 = create(:group_label, title: 'foo', group: group)
+          label_2 = create(:label, title: 'bar', project: project)
+
+          create(:label_link, label: label_1, target: epic)
+          create(:label_link, label: label_2, target: epic)
+
+          get api(url), params: { labels: [label.title, label_1.title, label_2.title], with_labels_details: true }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect_paginated_array_response([epic.id])
+          expect(json_response.first['labels'].pluck('name')).to match_array([label.title, label_1.title, label_2.title])
+          expect(json_response.last['labels'].first).to match_schema('/public_api/v4/label_basic')
+        end
       end
     end
 
@@ -294,6 +338,32 @@ describe API::Epics do
         expect_paginated_array_response(epic.id)
       end
 
+      context "#to_reference" do
+        it 'exposes reference path' do
+          get api(url)
+
+          expect(json_response.first['references']['short']).to eq("&#{epic2.iid}")
+          expect(json_response.first['references']['relative']).to eq("&#{epic2.iid}")
+          expect(json_response.first['references']['full']).to eq("#{epic2.group.path}&#{epic2.iid}")
+        end
+
+        context 'referencing from parent group' do
+          let(:parent_group) { create(:group) }
+
+          before do
+            group.update(parent_id: parent_group.id)
+          end
+
+          it 'exposes full reference path' do
+            get api("/groups/#{parent_group.path}/epics")
+
+            expect(json_response.first['references']['short']).to eq("&#{epic2.iid}")
+            expect(json_response.first['references']['relative']).to eq("#{parent_group.path}/#{epic2.group.path}&#{epic2.iid}")
+            expect(json_response.first['references']['full']).to eq("#{parent_group.path}/#{epic2.group.path}&#{epic2.iid}")
+          end
+        end
+      end
+
       it_behaves_like 'can admin epics'
     end
 
@@ -347,8 +417,6 @@ describe API::Epics do
 
       before do
         stub_licensed_features(epics: true)
-
-        epic
       end
 
       it 'excludes descendant group epics' do
@@ -360,7 +428,7 @@ describe API::Epics do
       it 'includes ancestor group epics' do
         get api(url), params: { include_ancestor_groups: true }
 
-        expect_paginated_array_response([epic.id, subgroup2_epic.id, subgroup_epic.id])
+        expect_paginated_array_response([subgroup2_epic.id, subgroup_epic.id, epic.id])
       end
     end
 
@@ -385,14 +453,14 @@ describe API::Epics do
       end
 
       context 'when viewing the first page' do
-        let(:expected) { [epic3.id, epic2.id] }
+        let(:expected) { [epic.id, epic3.id] }
         let(:page) { 1 }
 
         it_behaves_like 'paginated API endpoint'
       end
 
       context 'viewing the second page' do
-        let(:expected) { [epic1.id] }
+        let(:expected) { [epic2.id, epic1.id] }
         let(:page) { 2 }
 
         it_behaves_like 'paginated API endpoint'
@@ -435,6 +503,14 @@ describe API::Epics do
 
         expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
         expect(json_response['closed_at']).to be_present
+      end
+
+      it 'exposes full reference path' do
+        get api(url)
+
+        expect(json_response['references']['short']).to eq("&#{epic.iid}")
+        expect(json_response['references']['relative']).to eq("&#{epic.iid}")
+        expect(json_response['references']['full']).to eq("#{epic.group.path}&#{epic.iid}")
       end
 
       it_behaves_like 'can admin epics'

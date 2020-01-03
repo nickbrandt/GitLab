@@ -27,7 +27,7 @@ class Packages::Package < ApplicationRecord
   validate :valid_npm_package_name, if: :npm?
   validate :package_already_taken, if: :npm?
 
-  enum package_type: { maven: 1, npm: 2, conan: 3 }
+  enum package_type: { maven: 1, npm: 2, conan: 3, nuget: 4 }
 
   scope :with_name, ->(name) { where(name: name) }
   scope :with_name_like, ->(name) { where(arel_table[:name].matches(name)) }

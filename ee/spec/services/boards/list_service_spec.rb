@@ -15,11 +15,11 @@ describe Boards::ListService do
       end
 
       it 'returns boards ordered by name' do
-        board_names = ['a-board', 'B-board', 'c-board'].shuffle
+        board_names = %w[a-board B-board c-board].shuffle
         boards.each_with_index { |board, i| board.update_column(:name, board_names[i]) }
         stub_licensed_features(multiple_group_issue_boards: true)
 
-        expect(service.execute.pluck(:name)).to eq(['a-board', 'B-board', 'c-board'])
+        expect(service.execute.pluck(:name)).to eq(%w[a-board B-board c-board])
       end
     end
   end

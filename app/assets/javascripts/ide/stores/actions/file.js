@@ -191,43 +191,52 @@ export const discardFileChanges = ({ dispatch, state, commit, getters }, path) =
     dispatch('restoreTree', file.parentPath);
   }
 
-  commit(types.DISCARD_FILE_CHANGES, path);
-  commit(types.REMOVE_FILE_FROM_CHANGED, path);
+  if (file.tempFile || file.prevPath) {
+    dispatch('closeFile', file);
 
-  if (file.prevPath) {
-    dispatch('discardFileChanges', file.prevPath);
-  }
-
-  if (file.tempFile && file.opened) {
-    commit(types.TOGGLE_FILE_OPEN, path);
-  } else if (getters.activeFile && file.path === getters.activeFile.path) {
-    dispatch('updateDelayViewerUpdated', true)
-      .then(() => {
-        router.push(`/project${file.url}`);
-      })
-      .catch(e => {
-        throw e;
+    if (file.tempFile) {
+      dispatch('deleteEntry', file.path);
+    } else {
+      dispatch('renameEntry', {
+        path: file.path,
+        name: file.prevName,
+        parentPath: file.prevParentPath,
       });
+    }
+  } else {
+    commit(types.DISCARD_FILE_CHANGES, path);
+
+    if (getters.activeFile && file.path === getters.activeFile.path) {
+      dispatch('updateDelayViewerUpdated', true)
+        .then(() => {
+          router.push(`/project${file.url}`);
+        })
+        .catch(e => {
+          throw e;
+        });
+    }
   }
+
+  commit(types.REMOVE_FILE_FROM_CHANGED, path);
 
   eventHub.$emit(`editor.update.model.new.content.${file.key}`, file.content);
   eventHub.$emit(`editor.update.model.dispose.unstaged-${file.key}`, file.content);
 };
 
-export const stageChange = ({ commit, state, dispatch }, path) => {
-  const stagedFile = state.stagedFiles.find(f => f.path === path);
-  const openFile = state.openFiles.find(f => f.path === path);
+export const stageChange = ({ commit, dispatch, getters }, path) => {
+  const stagedFile = getters.getStagedFile(path);
+  const openFile = getters.getOpenFile(path);
 
-  commit(types.STAGE_CHANGE, path);
+  commit(types.STAGE_CHANGE, { path, diffInfo: getters.getDiffInfo(path) });
   commit(types.SET_LAST_COMMIT_MSG, '');
 
   if (stagedFile) {
     eventHub.$emit(`editor.update.model.new.content.staged-${stagedFile.key}`, stagedFile.content);
   }
 
-  if (openFile && openFile.active) {
-    const file = state.stagedFiles.find(f => f.path === path);
+  const file = getters.getStagedFile(path);
 
+  if (openFile && openFile.active && file) {
     dispatch('openPendingTab', {
       file,
       keyPrefix: stageKeys.staged,
@@ -235,14 +244,14 @@ export const stageChange = ({ commit, state, dispatch }, path) => {
   }
 };
 
-export const unstageChange = ({ commit, dispatch, state }, path) => {
-  const openFile = state.openFiles.find(f => f.path === path);
+export const unstageChange = ({ commit, dispatch, getters }, path) => {
+  const openFile = getters.getOpenFile(path);
 
-  commit(types.UNSTAGE_CHANGE, path);
+  commit(types.UNSTAGE_CHANGE, { path, diffInfo: getters.getDiffInfo(path) });
 
-  if (openFile && openFile.active) {
-    const file = state.changedFiles.find(f => f.path === path);
+  const file = getters.getChangedFile(path);
 
+  if (openFile && openFile.active && file) {
     dispatch('openPendingTab', {
       file,
       keyPrefix: stageKeys.unstaged,

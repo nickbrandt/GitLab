@@ -1,4 +1,5 @@
 import * as types from './mutation_types';
+import { toLicenseObject } from '../../../utils/mappers';
 
 export default {
   [types.SET_LICENSES_ENDPOINT](state, payload) {
@@ -9,7 +10,7 @@ export default {
     state.errorLoading = false;
   },
   [types.RECEIVE_LICENSES_SUCCESS](state, { licenses, reportInfo, pageInfo }) {
-    state.licenses = licenses;
+    state.licenses = licenses.map(toLicenseObject);
     state.pageInfo = pageInfo;
     state.isLoading = false;
     state.errorLoading = false;

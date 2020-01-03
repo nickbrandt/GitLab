@@ -52,7 +52,7 @@ module Packages
       end
 
       def build_service_url(service_type)
-        base_path = "#{api_v4_projects_path(id: project.id)}/packages/nuget"
+        base_path = api_v4_projects_packages_nuget_path(id: project.id)
 
         full_path = case service_type
                     when :download

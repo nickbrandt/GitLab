@@ -81,7 +81,7 @@ module EE
     end
 
     def on_train?
-      merge_train.present?
+      merge_train&.active?
     end
 
     def allows_multiple_assignees?

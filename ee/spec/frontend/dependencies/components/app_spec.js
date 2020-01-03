@@ -113,10 +113,10 @@ describe('DependenciesApp component', () => {
   const expectNoHeader = () => expect(findHeader().exists()).toBe(false);
 
   const expectDependenciesTables = () => {
-    const { wrappers } = findDependenciesTables();
-    expect(wrappers).toHaveLength(2);
-    expect(wrappers[0].props()).toEqual({ namespace: allNamespace });
-    expect(wrappers[1].props()).toEqual({ namespace: vulnerableNamespace });
+    const tables = findDependenciesTables();
+    expect(tables).toHaveLength(2);
+    expect(tables.at(0).props()).toEqual({ namespace: allNamespace });
+    expect(tables.at(1).props()).toEqual({ namespace: vulnerableNamespace });
   };
 
   const expectHeader = () => {

@@ -50,18 +50,20 @@ describe('project header component', () => {
     it('renders correct title for removal icon', () => {
       const button = wrapper.find('.js-remove-button');
 
-      expect(button.attributes('data-original-title')).toBe('Remove card');
+      expect(button.attributes('title')).toBe('Remove card');
     });
 
     it('emits project removal link on click', () => {
       wrapper.find('.js-remove-button').vm.$emit('click');
 
-      expect(wrapper.emittedByOrder()).toContainEqual(
-        expect.objectContaining({
-          name: 'remove',
-          args: [mockOneProject.remove_path],
-        }),
-      );
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.emittedByOrder()).toContainEqual(
+          expect.objectContaining({
+            name: 'remove',
+            args: [mockOneProject.remove_path],
+          }),
+        );
+      });
     });
   });
 

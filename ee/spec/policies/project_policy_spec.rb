@@ -1048,14 +1048,14 @@ describe ProjectPolicy do
         allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).with(project: project).and_return(true)
       end
 
-      it { expect_allowed(:guest_access, :create_note, :read_issue) }
+      it { expect_allowed(:reporter_access, :create_note, :read_issue) }
 
       context 'when issues are protected members only' do
         before do
           project.project_feature.update!(issues_access_level: ProjectFeature::PRIVATE)
         end
 
-        it { expect_allowed(:guest_access, :create_note, :read_issue) }
+        it { expect_allowed(:reporter_access, :create_note, :read_issue) }
       end
     end
   end

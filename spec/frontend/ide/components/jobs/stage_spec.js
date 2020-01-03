@@ -52,7 +52,10 @@ describe('IDE pipeline stage', () => {
     const id = 5;
     createComponent({ stage: { ...defaultProps.stage, id } });
     findHeader().trigger('click');
-    expect(wrapper.emitted().toggleCollapsed[0][0]).toBe(id);
+
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.emitted().toggleCollapsed[0][0]).toBe(id);
+    });
   });
 
   it('emits clickViewLog entity with job', () => {
@@ -62,7 +65,9 @@ describe('IDE pipeline stage', () => {
       .findAll(Item)
       .at(0)
       .vm.$emit('clickViewLog', job);
-    expect(wrapper.emitted().clickViewLog[0][0]).toBe(job);
+    return wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.emitted().clickViewLog[0][0]).toBe(job);
+    });
   });
 
   it('renders stage details & icon', () => {

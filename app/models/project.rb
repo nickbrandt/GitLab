@@ -63,10 +63,6 @@ class Project < ApplicationRecord
 
   cache_markdown_field :description, pipeline: :description
 
-  # TODO: remove once GitLab 12.5 is released
-  # https://gitlab.com/gitlab-org/gitlab/issues/34638
-  ignore_column :merge_requests_require_code_owner_approval, remove_after: '2019-12-01', remove_with: '12.6'
-
   default_value_for :archived, false
   default_value_for :resolve_outdated_diff_discussions, false
   default_value_for :container_registry_enabled, gitlab_config_features.container_registry
@@ -285,6 +281,7 @@ class Project < ApplicationRecord
   has_many :pipeline_schedules, class_name: 'Ci::PipelineSchedule'
   has_many :project_deploy_tokens
   has_many :deploy_tokens, through: :project_deploy_tokens
+  has_many :resource_groups, class_name: 'Ci::ResourceGroup', inverse_of: :project
 
   has_one :auto_devops, class_name: 'ProjectAutoDevops', inverse_of: :project, autosave: true
   has_many :custom_attributes, class_name: 'ProjectCustomAttribute'
@@ -374,6 +371,7 @@ class Project < ApplicationRecord
     inclusion: { in: ->(_object) { Gitlab.config.repositories.storages.keys } }
   validates :variables, variable_duplicates: { scope: :environment_scope }
   validates :bfg_object_map, file_size: { maximum: :max_attachment_size }
+  validates :max_artifacts_size, numericality: { only_integer: true, greater_than: 0, allow_nil: true }
 
   # Scopes
   scope :pending_delete, -> { where(pending_delete: true) }

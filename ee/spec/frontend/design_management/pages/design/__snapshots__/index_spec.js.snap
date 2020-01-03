@@ -4,12 +4,49 @@ exports[`Design management design index page renders design index 1`] = `
 <div
   class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
 >
-  <glloadingicon-stub
-    class="align-self-center"
-    color="orange"
-    label="Loading"
-    size="xl"
-  />
+  <div
+    class="d-flex overflow-hidden flex-lg-grow-1 flex-column"
+  >
+    <designdestroyer-stub
+      filenames="test.jpg"
+      iid="1"
+      projectpath=""
+    />
+     
+    <div
+      class="d-flex flex-column h-100 mh-100 position-relative"
+    >
+      <div
+        class="p-3"
+      >
+        <!---->
+      </div>
+       
+      <designimage-stub
+        image="test.jpg"
+        name="test.jpg"
+      />
+       
+      <designoverlay-stub
+        notes="[object Object]"
+        position="[object Object]"
+      />
+    </div>
+  </div>
+   
+  <div
+    class="image-notes"
+  >
+    <designdiscussion-stub
+      designid="1"
+      discussion="[object Object]"
+      discussionindex="1"
+      markdownpreviewpath="//preview_markdown?target_type=Issue"
+      noteableid="design-id"
+    />
+     
+    <!---->
+  </div>
 </div>
 `;
 
@@ -23,5 +60,66 @@ exports[`Design management design index page sets loading state 1`] = `
     label="Loading"
     size="xl"
   />
+</div>
+`;
+
+exports[`Design management design index page with error GlAlert is rendered in correct position with correct content 1`] = `
+<div
+  class="design-detail fixed-top w-100 position-bottom-0 d-flex justify-content-center flex-column flex-lg-row"
+>
+  <div
+    class="d-flex overflow-hidden flex-lg-grow-1 flex-column"
+  >
+    <designdestroyer-stub
+      filenames="test.jpg"
+      iid="1"
+      projectpath=""
+    />
+     
+    <div
+      class="d-flex flex-column h-100 mh-100 position-relative"
+    >
+      <div
+        class="p-3"
+      >
+        <glalert-stub
+          dismissible="true"
+          dismisslabel="Dismiss"
+          primarybuttonlink=""
+          primarybuttontext=""
+          secondarybuttonlink=""
+          secondarybuttontext=""
+          title=""
+          variant="danger"
+        >
+          
+            woops
+          
+        </glalert-stub>
+      </div>
+       
+      <designimage-stub
+        image="test.jpg"
+        name="test.jpg"
+      />
+       
+      <designoverlay-stub
+        notes=""
+        position="[object Object]"
+      />
+    </div>
+  </div>
+   
+  <div
+    class="image-notes"
+  >
+    <h2
+      class="new-discussion-disclaimer m-0"
+    >
+      
+        Click the image where you'd like to start a new discussion
+      
+    </h2>
+  </div>
 </div>
 `;

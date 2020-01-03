@@ -737,10 +737,10 @@
   resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.88.0.tgz#0a9b72e9591264fcac592ebf9944665c70f48de2"
   integrity sha512-ZgepCvZoB/lFdgttHtu8+9YlRZlVc9MnHDbbqcQCFBvrfOjY1wq12ikxnNbwKj8QNA47TRJvSS0TkHgMWYnbsA==
 
-"@gitlab/ui@8.8.0":
-  version "8.8.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-8.8.0.tgz#c22b4dece89d224c525b3510970f3c61321a6765"
-  integrity sha512-fjAGSgfau28iq+Uhivc5OPwu3ZLUL25gFuW1rKeQFgnkVEaQ9IRvdM8RD9+kgXWUsccsrafQkz/nOUmp85o8yQ==
+"@gitlab/ui@8.10.0":
+  version "8.10.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-8.10.0.tgz#885ea8fe695ccff859821bd4ad4cefbea086e3b6"
+  integrity sha512-bbq+7iiptsNUWtPBQs/ek5uDnkSQ7QGzJwddfZSvQPMuq+50fDSy3Gab1cwvZtSj1fSvAny0ksqbpQl1w+5AgA==
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.3.0"
@@ -985,10 +985,10 @@
     "@sentry/types" "5.10.0"
     tslib "^1.9.3"
 
-"@sourcegraph/code-host-integration@^0.0.14":
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/@sourcegraph/code-host-integration/-/code-host-integration-0.0.14.tgz#e12b08371dc37bf4a468450b008c6e167705e1a8"
-  integrity sha512-S4+K+3RKFd49Btl1D9LOdWXROgXevUwOBwp+vDUuGgzT2d6Y+qjalUJ0t8CjbYzdBdJun+2/Zi1+SXfm+S+xVg==
+"@sourcegraph/code-host-integration@^0.0.16":
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/@sourcegraph/code-host-integration/-/code-host-integration-0.0.16.tgz#5a4b7c965298b5bae87a5bc4b013ba588db304ec"
+  integrity sha512-2ZMKr0BpkmCUkTuXXlqhZ6jtVcqz4N/Kz6B1fghi10XpiRZlDbVCYdpmeKb0ZyR+pHmuxNOmfJu9HbHc/7bPWA==
 
 "@types/anymatch@*":
   version "1.3.0"
@@ -3637,10 +3637,10 @@ decamelize@^1.1.0, decamelize@^1.1.1, decamelize@^1.1.2, decamelize@^1.2.0:
   resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
   integrity sha1-9lNNFRSCabIDUue+4m9QH5oZEpA=
 
-deckar01-task_list@^2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/deckar01-task_list/-/deckar01-task_list-2.2.1.tgz#e1e8a16c4fd6e153e51fd9258fdbee067ebcd86b"
-  integrity sha512-aNAVYAYwONXezSQy2p5M67wjZE+U7JpPotdegbyy1Wq35V6jDhF3qndJYA1rYnY3aI9ifCep6EMGPav/UQaBZw==
+deckar01-task_list@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/deckar01-task_list/-/deckar01-task_list-2.3.1.tgz#f3ffd5319d7b9e27c596dc8d823b13f617ed7db7"
+  integrity sha512-046BmNx8e1Yia07SlSsyWb1h7wlGibcesRaw6Szw2qVppoe/EPtckFDRTY9P/laWiW3xjsfNLE1nOBOTAMKEWQ==
 
 decode-uri-component@^0.2.0:
   version "0.2.0"
@@ -7820,10 +7820,10 @@ monaco-editor-webpack-plugin@^1.7.0:
   dependencies:
     "@types/webpack" "^4.4.19"
 
-monaco-editor@^0.15.6:
-  version "0.15.6"
-  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.15.6.tgz#d63b3b06f86f803464f003b252627c3eb4a09483"
-  integrity sha512-JoU9V9k6KqT9R9Tiw1RTU8ohZ+Xnf9DMg6Ktqqw5hILumwmq7xqa/KLXw513uTUsWbhtnHoSJYYR++u3pkyxJg==
+monaco-editor@0.18.1, monaco-editor@^0.18.1:
+  version "0.18.1"
+  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.18.1.tgz#ced7c305a23109875feeaf395a504b91f6358cfc"
+  integrity sha512-fmL+RFZ2Hrezy+X/5ZczQW51LUmvzfcqOurnkCIRFTyjdVjzR7JvENzI6+VKBJzJdPh6EYL4RoWl92b2Hrk9fw==
 
 mousetrap@^1.4.6:
   version "1.4.6"
@@ -11710,10 +11710,10 @@ vue-template-es2015-compiler@^1.9.0:
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz#1ee3bc9a16ecbf5118be334bb15f9c46f82f5825"
   integrity sha512-4gDntzrifFnCEvyoO8PqyJDmguXgVPxKiIxrBKjIowvL9l+N66196+72XVYR8BBf1Uv1Fgt3bGevJ+sEmxfZzw==
 
-vue-virtual-scroll-list@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/vue-virtual-scroll-list/-/vue-virtual-scroll-list-1.3.1.tgz#efcb83d3a3dcc69cd886fa4de1130a65493e8f76"
-  integrity sha512-PMTxiK9/P1LtgoWWw4n1QnmDDkYqIdWWCNdt1L4JD9g6rwDgnsGsSV10bAnd5n7DQLHGWHjRex+zAbjXWT8t0g==
+vue-virtual-scroll-list@^1.4.4:
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/vue-virtual-scroll-list/-/vue-virtual-scroll-list-1.4.4.tgz#5fca7a13f785899bbfb70471ec4fe222437d8495"
+  integrity sha512-wU7FDpd9Xy4f62pf8SBg/ak21jMI/pdx4s4JPah+z/zuhmeAafQgp8BjtZvvt+b0BZOsOS1FJuCfUH7azTkivQ==
 
 vue@^2.6.10:
   version "2.6.10"

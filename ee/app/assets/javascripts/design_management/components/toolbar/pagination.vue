@@ -1,12 +1,10 @@
 <script>
 import { s__, sprintf } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
 import PaginationButton from './pagination_button.vue';
 import allDesignsMixin from '../../mixins/all_designs';
 
 export default {
   components: {
-    Icon,
     PaginationButton,
   },
   mixins: [allDesignsMixin],

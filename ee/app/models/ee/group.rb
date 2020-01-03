@@ -75,12 +75,8 @@ module EE
       end
 
       scope :for_epics, ->(epics) do
-        if ::Feature.enabled?(:optimized_groups_user_can_read_epics_method)
-          epics_query = epics.select(:group_id)
-          joins("INNER JOIN (#{epics_query.to_sql}) as epics on epics.group_id = namespaces.id")
-        else
-          where(id: epics.select(:group_id))
-        end
+        epics_query = epics.select(:group_id)
+        joins("INNER JOIN (#{epics_query.to_sql}) as epics on epics.group_id = namespaces.id")
       end
 
       state_machine :ldap_sync_status, namespace: :ldap_sync, initial: :ready do
