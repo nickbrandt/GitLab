@@ -5,6 +5,7 @@ require 'spec_helper'
 describe Ci::CreatePipelineService do
   subject(:execute) { service.execute(:push) }
 
+  set(:downstream_project) { create(:project, name: 'project', namespace: create(:namespace, name: 'some'))}
   let(:project) { create(:project, :repository) }
   let(:user) { create(:admin) }
   let(:service) { described_class.new(project, user, { ref: 'refs/heads/master' }) }
@@ -46,6 +47,6 @@ describe Ci::CreatePipelineService do
   it 'persists bridge target project' do
     bridge = execute.stages.last.bridges.first
 
-    expect(bridge.downstream_project).to eq('some/project')
+    expect(bridge.downstream_project).to eq downstream_project
   end
 end

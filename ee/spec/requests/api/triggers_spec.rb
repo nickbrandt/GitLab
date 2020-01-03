@@ -60,7 +60,7 @@ describe API::Triggers do
             expect { subject }.to change(Ci::Pipeline, :count)
 
             expect(response).to have_http_status(201)
-            expect(Ci::Pipeline.last.source).to eq('pipeline')
+            expect(Ci::Pipeline.last.source).to eq('cross_project_pipeline')
             expect(Ci::Pipeline.last.triggered_by_pipeline).not_to be_nil
             expect(Ci::Sources::Pipeline.last).to have_attributes(
               pipeline_id: (a_value > 0),
@@ -94,7 +94,7 @@ describe API::Triggers do
                                 .and change(Ci::PipelineVariable, :count)
 
               expect(response).to have_http_status(201)
-              expect(Ci::Pipeline.last.source).to eq('pipeline')
+              expect(Ci::Pipeline.last.source).to eq('cross_project_pipeline')
               expect(Ci::Pipeline.last.triggered_by_pipeline).not_to be_nil
               expect(Ci::Pipeline.last.variables.map { |v| { v.key => v.value } }.last).to eq(params[:variables])
             end
