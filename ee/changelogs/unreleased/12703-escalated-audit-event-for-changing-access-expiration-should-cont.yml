@@ -1,0 +1,5 @@
+---
+title: Show expiry details in Audit events when changing acesss levels
+merge_request: 22412
+author:
+type: fixed

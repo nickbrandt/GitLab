@@ -57,7 +57,41 @@ module Audit
       changed << "from #{@details[:from]}" if @details[:from]
       changed << "to #{@details[:to]}" if @details[:to]
 
+      if access_level_changed?(value) && expiry_details_available?
+        changed << text_for_expiry_change
+      end
+
       changed.join(' ')
+    end
+
+    # this check is made in order to not show expiry details for older audit events
+    # that has been logged *without* these keys.
+    def expiry_details_available?
+      @details.has_key?(:expiry_from) && @details.has_key?(:expiry_to)
+    end
+
+    def text_for_expiry_change
+      old_expiry = @details[:expiry_from].presence || never_expires_text
+      new_expiry = @details[:expiry_to].presence || never_expires_text
+
+      if expiry_changed?(old_expiry, new_expiry)
+        _('with expiry changing from %{old_expiry} to %{new_expiry}') %
+          { old_expiry: old_expiry, new_expiry: new_expiry }
+      else
+        _('with expiry remaining unchanged at %{old_expiry}') % { old_expiry: old_expiry }
+      end
+    end
+
+    def never_expires_text
+      _('never expires')
+    end
+
+    def expiry_changed?(old_expiry, new_expiry)
+      new_expiry != old_expiry
+    end
+
+    def access_level_changed?(value)
+      value == 'access level'
     end
 
     def target_name

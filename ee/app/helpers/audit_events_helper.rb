@@ -12,6 +12,8 @@ module AuditEventsHelper
       ""
     elsif key.to_s == 'ip_address' && value.blank?
       ""
+    elsif key =~ /^expiry_(from|to)$/ && value.blank?
+      "#{key} <strong>never expires</strong>"
     else
       "#{key} <strong>#{value}</strong>"
     end
