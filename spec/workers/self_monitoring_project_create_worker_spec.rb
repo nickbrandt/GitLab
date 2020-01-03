@@ -9,7 +9,7 @@ describe SelfMonitoringProjectCreateWorker do
   describe '#perform' do
     let(:service_class) { Gitlab::DatabaseImporters::SelfMonitoring::Project::CreateService }
     let(:service) { instance_double(service_class) }
-    let(:service_result) { { status: :success, project: build(:project) } }
+    let(:service_result) { { status: 'success', project_id: 2 } }
 
     before do
       allow(service_class).to receive(:new) { service }
@@ -25,13 +25,21 @@ describe SelfMonitoringProjectCreateWorker do
     end
 
     it 'writes output of service to cache' do
-      expect(Rails.cache).to receive(:write).with(data_key, service_result)
-
       subject.perform
+
+      data = nil
+      ttl = nil
+      Gitlab::Redis::SharedState.with do |redis|
+        ttl = redis.ttl(data_key)
+        data = redis.hgetall(data_key)
+      end
+
+      expect(ttl).to be > 0
+      expect(data).to eq(service_result.slice(:status, :message).stringify_keys)
     end
   end
 
-  describe '.status', :use_clean_rails_memory_store_caching do
+  describe '.status', :clean_gitlab_redis_shared_state do
     subject { described_class.status(jid) }
 
     it 'returns in_progress when job is enqueued' do
@@ -40,20 +48,20 @@ describe SelfMonitoringProjectCreateWorker do
       expect(described_class.status(jid)).to eq(status: :in_progress)
     end
 
-    it 'returns non nil data' do
-      data = { status: :success, project_id: 1 }
-      Rails.cache.write(data_key, data)
-
-      expect(subject).to eq(status: :completed, output: data)
-    end
-
     it 'returns status unknown with nil data' do
-      Rails.cache.write(data_key, nil)
-
       expect(subject).to eq(
         status: :unknown,
         message: "Status of job with ID \"#{jid}\" could not be determined"
       )
+    end
+
+    it 'returns non nil data' do
+      data = { status: 'success' }
+      Gitlab::Redis::SharedState.with do |redis|
+        redis.hset(data_key, *data.to_a.flatten)
+      end
+
+      expect(subject).to eq(status: :completed, output: data)
     end
   end
 end

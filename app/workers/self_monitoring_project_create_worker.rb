@@ -11,15 +11,23 @@ class SelfMonitoringProjectCreateWorker
   feature_category :metrics
 
   LEASE_TIMEOUT = 15.minutes.to_i
+  DATA_KEY_EXPIRY = 15.minutes
 
   EXCLUSIVE_LEASE_KEY = 'self_monitoring_service_creation_deletion'
 
   CACHE_DATA_KEY = 'self_monitoring_create_result'
 
+  SERVICE_RESULT_KEYS_TO_STORE = [:status, :message].freeze
+
   def perform
     try_obtain_lease do
       result = Gitlab::DatabaseImporters::SelfMonitoring::Project::CreateService.new.execute
-      Rails.cache.write(self.class.data_key(self.jid), result)
+      data_to_store = result.slice(*SERVICE_RESULT_KEYS_TO_STORE).to_a.flatten
+
+      Gitlab::Redis::SharedState.with do |redis|
+        redis.hset(self.class.data_key(self.jid), *data_to_store)
+        redis.expire(self.class.data_key(self.jid), DATA_KEY_EXPIRY)
+      end
     end
   end
 
@@ -36,9 +44,12 @@ class SelfMonitoringProjectCreateWorker
       return { status: :in_progress }
     end
 
-    data = Rails.cache.read(self.data_key(job_id))
+    data = nil
+    Gitlab::Redis::SharedState.with do |redis|
+      data = redis.hgetall(self.data_key(job_id))
+    end
 
-    if data.nil?
+    if data.blank?
       return {
         status: :unknown,
         message: _('Status of job with ID "%{job_id}" could not be determined') %
@@ -46,7 +57,7 @@ class SelfMonitoringProjectCreateWorker
       }
     end
 
-    { status: :completed, output: data }
+    { status: :completed, output: data.symbolize_keys }
   end
 
   def self.data_key(job_id)
