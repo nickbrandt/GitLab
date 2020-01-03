@@ -7,8 +7,8 @@ module EE
         extend ::Gitlab::Utils::Override
 
         DASHBOARD_TEMPLATES = {
-          ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH => true,
-          ::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH => true
+          ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH => ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH,
+          ::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH => ::Metrics::Dashboard::ClusterDashboardService::DASHBOARD_PATH
         }.freeze
 
         private

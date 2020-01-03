@@ -6,8 +6,10 @@ describe Projects::PerformanceMonitoring::DashboardsController do
   let_it_be(:user) { create(:user) }
   let_it_be(:namespace) { create(:namespace) }
   let!(:project) { create(:project, :repository, name: 'dashboard-project', namespace: namespace) }
+  let(:repository) { project.repository }
+  let(:branch) { double(name: branch_name) }
   let(:commit_message) { 'test' }
-  let(:branch) { "#{Time.current.to_i}_dashboard_new_branch" }
+  let(:branch_name) { "#{Time.current.to_i}_dashboard_new_branch" }
   let(:dashboard) { 'config/prometheus/common_metrics.yml' }
   let(:file_name) { 'custom_dashboard.yml' }
   let(:params) do
@@ -17,7 +19,7 @@ describe Projects::PerformanceMonitoring::DashboardsController do
       dashboard: dashboard,
       file_name: file_name,
       commit_message: commit_message,
-      branch: branch,
+      branch: branch_name,
       format: :json
     }
   end
@@ -40,9 +42,11 @@ describe Projects::PerformanceMonitoring::DashboardsController do
                 let(:dashboard) { dashboard_template }
 
                 it 'delegates commit creation to service' do
+                  allow(controller).to receive(:repository).and_return(repository)
+                  allow(repository).to receive(:find_branch).and_return(branch)
                   dashboard_attrs = {
                     commit_message: commit_message,
-                    branch_name: branch,
+                    branch_name: branch_name,
                     start_branch: 'master',
                     encoding: 'text',
                     file_path: '.gitlab/dashboards/custom_dashboard.yml',
@@ -60,6 +64,8 @@ describe Projects::PerformanceMonitoring::DashboardsController do
 
             it 'extends dashboard template path to absolute url' do
               allow(::Files::CreateService).to receive(:new).and_return(double(execute: { status: :success }))
+              allow(controller).to receive(:repository).and_return(repository)
+              allow(repository).to receive(:find_branch).and_return(branch)
 
               expect(File).to receive(:read).with(Rails.root.join('config/prometheus/common_metrics.yml')).and_return('')
 
@@ -68,11 +74,7 @@ describe Projects::PerformanceMonitoring::DashboardsController do
 
             context 'selected branch already exists' do
               it 'responds with :created status code', :aggregate_failures do
-                post :create, params: params
-
-                expect(response).to have_gitlab_http_status :created
-
-                params[:file_name] = 'some_new_name.yml'
+                repository.add_branch(user, branch_name, 'master')
 
                 post :create, params: params
 
@@ -83,11 +85,14 @@ describe Projects::PerformanceMonitoring::DashboardsController do
             context 'request format json' do
               it 'returns path to new file' do
                 allow(::Files::CreateService).to receive(:new).and_return(double(execute: { status: :success }))
+                allow(controller).to receive(:repository).and_return(repository)
+
+                expect(repository).to receive(:find_branch).with(branch_name).and_return(branch)
 
                 post :create, params: params
 
                 expect(response).to have_gitlab_http_status :created
-                expect(json_response).to eq('redirect_to' => "/-/ide/project/#{namespace.path}/#{project.name}/edit/#{branch}/-/.gitlab/dashboards/#{file_name}")
+                expect(json_response).to eq('redirect_to' => "/-/ide/project/#{namespace.path}/#{project.name}/edit/#{branch_name}/-/.gitlab/dashboards/#{file_name}")
               end
 
               context 'files create service failure' do
@@ -110,10 +115,13 @@ describe Projects::PerformanceMonitoring::DashboardsController do
 
               it 'redirects to ide with new file' do
                 allow(::Files::CreateService).to receive(:new).and_return(double(execute: { status: :success }))
+                allow(controller).to receive(:repository).and_return(repository)
+
+                expect(repository).to receive(:find_branch).with(branch_name).and_return(branch)
 
                 post :create, params: params
 
-                expect(response).to redirect_to "/-/ide/project/#{namespace.path}/#{project.name}/edit/#{branch}/-/.gitlab/dashboards/#{file_name}"
+                expect(response).to redirect_to "/-/ide/project/#{namespace.path}/#{project.name}/edit/#{branch_name}/-/.gitlab/dashboards/#{file_name}"
               end
 
               context 'files create service failure' do
@@ -145,9 +153,11 @@ describe Projects::PerformanceMonitoring::DashboardsController do
             end
 
             it 'use default commit message' do
+              allow(controller).to receive(:repository).and_return(repository)
+              allow(repository).to receive(:find_branch).and_return(branch)
               dashboard_attrs = {
                 commit_message: 'Create custom dashboard custom_dashboard.yml',
-                branch_name: branch,
+                branch_name: branch_name,
                 start_branch: 'master',
                 encoding: 'text',
                 file_path: ".gitlab/dashboards/custom_dashboard.yml",
@@ -163,7 +173,7 @@ describe Projects::PerformanceMonitoring::DashboardsController do
           end
 
           context 'missing branch' do
-            let(:branch) { nil }
+            let(:branch_name) { nil }
 
             it 'raises ActionController::ParameterMissing' do
               expect { post :create, params: params }.to raise_error ActionController::ParameterMissing

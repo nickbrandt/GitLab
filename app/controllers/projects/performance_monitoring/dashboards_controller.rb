@@ -12,7 +12,7 @@ module Projects
 
       USER_DASHBOARDS_DIR = ::Metrics::Dashboard::ProjectDashboardService::DASHBOARD_ROOT
       DASHBOARD_TEMPLATES = {
-        ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH => true
+        ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH => ::Metrics::Dashboard::SystemDashboardService::DASHBOARD_PATH
       }.freeze
 
       def create
@@ -29,8 +29,8 @@ module Projects
 
       def respond_success
         respond_to do |format|
-          format.html { redirect_to ide_edit_path(project, params[:branch], new_dashboard_path) }
-          format.json { render json: { redirect_to: ide_edit_path(project, params[:branch], new_dashboard_path) }, status: :created }
+          format.html { redirect_to ide_edit_path(project, redirect_safe_branch_name, new_dashboard_path) }
+          format.json { render json: { redirect_to: ide_edit_path(project, redirect_safe_branch_name, new_dashboard_path) }, status: :created }
         end
       end
 
@@ -52,7 +52,7 @@ module Projects
       end
 
       def validate_dashboard_template!
-        access_denied! unless dashboard_templates[params[:dashboard]]
+        access_denied! unless dashboard_template
       end
 
       def dashboard_attrs
@@ -75,11 +75,19 @@ module Projects
       end
 
       def new_dashboard_content
-        File.read(Rails.root.join(params[:dashboard]))
+        File.read(Rails.root.join(dashboard_template))
+      end
+
+      def dashboard_template
+        dashboard_templates[params[:dashboard]]
       end
 
       def dashboard_templates
         DASHBOARD_TEMPLATES
+      end
+
+      def redirect_safe_branch_name
+        repository.find_branch(params[:branch]).name
       end
     end
   end
