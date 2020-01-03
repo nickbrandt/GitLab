@@ -5079,9 +5079,6 @@ msgstr ""
 msgid "Could not find design"
 msgstr ""
 
-msgid "Could not find job to delete self monitoring project"
-msgstr ""
-
 msgid "Could not remove the trigger."
 msgstr ""
 
