@@ -123,7 +123,7 @@ describe PipelineEntity do
       end
     end
 
-    context 'when pipeline is deleteable' do
+    context 'delete path' do
       context 'user has ability to delete pipeline' do
         let(:project) { create(:project, namespace: user.namespace) }
         let(:pipeline) { create(:ci_pipeline, project: project) }

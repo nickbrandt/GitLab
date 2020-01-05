@@ -80,7 +80,6 @@ export default {
           label: __('Retry'),
           path: this.pipeline.retry_path,
           cssClass: 'js-retry-button btn btn-inverted-secondary',
-          type: 'button',
           isLoading: false,
         });
       }
@@ -90,7 +89,6 @@ export default {
           label: __('Cancel running'),
           path: this.pipeline.cancel_path,
           cssClass: 'js-btn-cancel-pipeline btn btn-danger',
-          type: 'button',
           isLoading: false,
         });
       }
@@ -101,7 +99,6 @@ export default {
           path: this.pipeline.delete_path,
           modal: DELETE_MODAL_ID,
           cssClass: 'js-btn-delete-pipeline btn btn-danger btn-inverted',
-          type: 'button',
           isLoading: false,
         });
       }

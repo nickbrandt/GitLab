@@ -31,7 +31,6 @@ describe('Header CI Component', () => {
         {
           label: 'Retry',
           path: 'path',
-          type: 'button',
           cssClass: 'btn',
           isLoading: false,
         },

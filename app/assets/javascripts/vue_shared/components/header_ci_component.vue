@@ -118,7 +118,6 @@ export default {
     <section v-if="actions.length" class="header-action-buttons">
       <template v-for="(action, i) in actions">
         <loading-button
-          v-if="action.type === 'button'"
           :key="i"
           :loading="action.isLoading"
           :disabled="action.isLoading"
