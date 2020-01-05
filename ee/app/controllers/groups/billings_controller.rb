@@ -8,7 +8,7 @@ class Groups::BillingsController < Groups::ApplicationController
 
   def index
     @top_most_group = @group.root_ancestor if @group.has_parent?
-    current_plan = (@top_most_group || @group).actual_plan_name_for_subscription
+    current_plan = (@top_most_group || @group).plan_name_for_upgrading
     @plans_data = FetchSubscriptionPlansService.new(plan: current_plan).execute
   end
 end

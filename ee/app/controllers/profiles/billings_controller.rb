@@ -5,7 +5,7 @@ class Profiles::BillingsController < Profiles::ApplicationController
 
   def index
     @plans_data = FetchSubscriptionPlansService
-      .new(plan: current_user.namespace.actual_plan_name_for_subscription)
+      .new(plan: current_user.namespace.plan_name_for_upgrading)
       .execute
   end
 end

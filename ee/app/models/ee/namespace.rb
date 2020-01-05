@@ -170,7 +170,7 @@ module EE
       actual_plan&.name || Plan::FREE
     end
 
-    def actual_plan_name_for_subscription
+    def plan_name_for_upgrading
       return Plan::FREE if trial_active?
 
       actual_plan_name
