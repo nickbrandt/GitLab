@@ -74,26 +74,5 @@ describe FeatureFlagsFinder do
         subject
       end
     end
-
-    context 'when it is presented for list' do
-      let!(:feature_flag_1) { create(:operations_feature_flag, project: project, active: false) }
-      let!(:feature_flag_2) { create(:operations_feature_flag, project: project, active: false) }
-
-      context 'when there is an active scope' do
-        before do
-          create_scope(feature_flag_1, 'review/*', true)
-        end
-
-        it 'presents a virtual active value' do
-          expect(subject.map(&:active)).to eq([true, false])
-        end
-      end
-
-      context 'when there are no active scopes' do
-        it 'presents a virtual active value' do
-          expect(subject.map(&:active)).to eq([false, false])
-        end
-      end
-    end
   end
 end

@@ -134,7 +134,7 @@ describe API::Unleash do
         feature_flag_2 = json_response['features'].select { |f| f['name'] == 'feature_flag_2' }.first
 
         expect(feature_flag_1['enabled']).to eq(true)
-        expect(feature_flag_2['enabled']).to eq(true)
+        expect(feature_flag_2['enabled']).to eq(false)
       end
     end
 
@@ -160,7 +160,7 @@ describe API::Unleash do
       it_behaves_like 'authenticated request'
       it_behaves_like 'support multiple environments'
 
-      context 'with a list of feature flag' do
+      context 'with a list of feature flags' do
         let(:headers) { { "UNLEASH-INSTANCEID" => client.token, "UNLEASH-APPNAME" => "production" }}
         let!(:enable_feature_flag) { create(:operations_feature_flag, project: project, name: 'feature1', active: true) }
         let!(:disabled_feature_flag) { create(:operations_feature_flag, project: project, name: 'feature2', active: false) }
@@ -245,6 +245,17 @@ describe API::Unleash do
             "userIds" => "max,fred"
           }
         }])
+      end
+
+      it 'returns a disabled feature when the flag is disabled' do
+        flag = create(:operations_feature_flag, project: project, name: 'test_feature', active: false)
+        create(:operations_feature_flag_scope, feature_flag: flag, environment_scope: 'production', active: true)
+        headers = { "UNLEASH-INSTANCEID" => client.token, "UNLEASH-APPNAME" => "production" }
+
+        get api(features_url), headers: headers
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['features'].first['enabled']).to eq(false)
       end
 
       context "with an inactive scope" do

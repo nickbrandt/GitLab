@@ -57,7 +57,7 @@ describe Operations::FeatureFlag do
   describe '.enabled' do
     subject { described_class.enabled }
 
-    context 'when the feature flag has an active scope' do
+    context 'when the feature flag is active' do
       let!(:feature_flag) { create(:operations_feature_flag, active: true) }
 
       it 'returns the flag' do
@@ -65,10 +65,30 @@ describe Operations::FeatureFlag do
       end
     end
 
-    context 'when the feature flag does not have an active scope' do
+    context 'when the feature flag is active and all scopes are inactive' do
+      let!(:feature_flag) { create(:operations_feature_flag, active: true) }
+
+      it 'returns the flag' do
+        feature_flag.default_scope.update!(active: false)
+
+        is_expected.to eq([feature_flag])
+      end
+    end
+
+    context 'when the feature flag is inactive' do
       let!(:feature_flag) { create(:operations_feature_flag, active: false) }
 
       it 'does not return the flag' do
+        is_expected.to be_empty
+      end
+    end
+
+    context 'when the feature flag is inactive and all scopes are active' do
+      let!(:feature_flag) { create(:operations_feature_flag, active: false) }
+
+      it 'does not return the flag' do
+        feature_flag.default_scope.update!(active: true)
+
         is_expected.to be_empty
       end
     end
@@ -77,7 +97,7 @@ describe Operations::FeatureFlag do
   describe '.disabled' do
     subject { described_class.disabled }
 
-    context 'when the feature flag has an active scope' do
+    context 'when the feature flag is active' do
       let!(:feature_flag) { create(:operations_feature_flag, active: true) }
 
       it 'does not return the flag' do
@@ -85,42 +105,31 @@ describe Operations::FeatureFlag do
       end
     end
 
-    context 'when the feature flag does not have an active scope' do
+    context 'when the feature flag is active and all scopes are inactive' do
+      let!(:feature_flag) { create(:operations_feature_flag, active: true) }
+
+      it 'does not return the flag' do
+        feature_flag.default_scope.update!(active: false)
+
+        is_expected.to be_empty
+      end
+    end
+
+    context 'when the feature flag is inactive' do
       let!(:feature_flag) { create(:operations_feature_flag, active: false) }
 
       it 'returns the flag' do
         is_expected.to eq([feature_flag])
       end
     end
-  end
 
-  describe '.for_list' do
-    subject { described_class.for_list }
-
-    context 'when all scopes are active' do
-      let!(:feature_flag) { create(:operations_feature_flag, active: true) }
-      let!(:scope) { create_scope(feature_flag, 'production', true) }
-
-      it 'returns virtual active value' do
-        expect(subject.first.active).to be_truthy
-      end
-    end
-
-    context 'when all scopes are inactive' do
+    context 'when the feature flag is inactive and all scopes are active' do
       let!(:feature_flag) { create(:operations_feature_flag, active: false) }
-      let!(:scope) { create_scope(feature_flag, 'production', false) }
 
-      it 'returns virtual active value' do
-        expect(subject.first.active).to be_falsy
-      end
-    end
+      it 'returns the flag' do
+        feature_flag.default_scope.update!(active: true)
 
-    context 'when one scopes is active' do
-      let!(:feature_flag) { create(:operations_feature_flag, active: false) }
-      let!(:scope) { create_scope(feature_flag, 'production', true) }
-
-      it 'returns virtual active value' do
-        expect(subject.first.active).to be_truthy
+        is_expected.to eq([feature_flag])
       end
     end
   end

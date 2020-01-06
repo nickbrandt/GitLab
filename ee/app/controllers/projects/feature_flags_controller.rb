@@ -94,7 +94,7 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   protected
 
   def feature_flag
-    @feature_flag ||= project.operations_feature_flags.for_list.find(params[:id])
+    @feature_flag ||= project.operations_feature_flags.find(params[:id])
   end
 
   def create_params

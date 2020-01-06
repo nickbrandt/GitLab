@@ -79,11 +79,18 @@ describe Projects::FeatureFlagsController do
       expect(json_response['feature_flags'].second['name']).to eq(feature_flag_inactive.name)
     end
 
-    it 'returns edit path and destroy path' do
+    it 'returns CRUD paths' do
       subject
 
-      expect(json_response['feature_flags'].first['edit_path']).not_to be_nil
-      expect(json_response['feature_flags'].first['destroy_path']).not_to be_nil
+      expected_edit_path = edit_project_feature_flag_path(project, feature_flag_active)
+      expected_update_path = project_feature_flag_path(project, feature_flag_active)
+      expected_destroy_path = project_feature_flag_path(project, feature_flag_active)
+
+      feature_flag_json = json_response['feature_flags'].first
+
+      expect(feature_flag_json['edit_path']).to eq(expected_edit_path)
+      expect(feature_flag_json['update_path']).to eq(expected_update_path)
+      expect(feature_flag_json['destroy_path']).to eq(expected_destroy_path)
     end
 
     it 'returns the summary of feature flags' do
@@ -100,12 +107,26 @@ describe Projects::FeatureFlagsController do
       expect(response).to match_response_schema('feature_flags', dir: 'ee')
     end
 
+    it 'returns false for active when the feature flag is inactive even if it has an active scope' do
+      create(:operations_feature_flag_scope,
+             feature_flag: feature_flag_inactive,
+             environment_scope: 'production',
+             active: true)
+
+      subject
+
+      expect(response).to have_gitlab_http_status(:ok)
+      feature_flag_json = json_response['feature_flags'].second
+
+      expect(feature_flag_json['active']).to eq(false)
+    end
+
     context 'when scope is specified' do
       let(:view_params) do
         { namespace_id: project.namespace, project_id: project, scope: scope }
       end
 
-      context 'when scope is all' do
+      context 'when all feature flags are requested' do
         let(:scope) { 'all' }
 
         it 'returns all feature flags' do
@@ -115,7 +136,7 @@ describe Projects::FeatureFlagsController do
         end
       end
 
-      context 'when scope is enabled' do
+      context 'when enabled feature flags are requested' do
         let(:scope) { 'enabled' }
 
         it 'returns enabled feature flags' do
@@ -126,7 +147,7 @@ describe Projects::FeatureFlagsController do
         end
       end
 
-      context 'when scope is disabled' do
+      context 'when disabled feature flags are requested' do
         let(:scope) { 'disabled' }
 
         it 'returns disabled feature flags' do
@@ -161,13 +182,13 @@ describe Projects::FeatureFlagsController do
         expect(json_response['count']['disabled']).to eq(1)
       end
 
-      it 'recongnizes feature flag 1 as active' do
+      it 'recognizes feature flag 1 as active' do
         subject
 
         expect(json_response['feature_flags'].first['active']).to be_truthy
       end
 
-      it 'recongnizes feature flag 2 as inactive' do
+      it 'recognizes feature flag 2 as inactive' do
         subject
 
         expect(json_response['feature_flags'].second['active']).to be_falsy
@@ -274,10 +295,10 @@ describe Projects::FeatureFlagsController do
                 active: true)
         end
 
-        it 'recongnizes the feature flag as active' do
+        it 'returns false for active' do
           subject
 
-          expect(json_response['active']).to be_truthy
+          expect(json_response['active']).to eq(false)
         end
       end
 
@@ -293,7 +314,7 @@ describe Projects::FeatureFlagsController do
                 active: false)
         end
 
-        it 'recongnizes the feature flag as inactive' do
+        it 'recognizes the feature flag as inactive' do
           subject
 
           expect(json_response['active']).to be_falsy
@@ -358,6 +379,27 @@ describe Projects::FeatureFlagsController do
         subject
 
         expect(json_response['message']).to include('Name has already been taken')
+      end
+    end
+
+    context 'without the active parameter' do
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          operations_feature_flag: {
+            name: 'my_feature_flag'
+          }
+        }
+      end
+
+      it 'creates a flag with active set to true' do
+        expect { subject }.to change { Operations::FeatureFlag.count }.by(1)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('feature_flag', dir: 'ee')
+        expect(json_response['active']).to eq(true)
+        expect(Operations::FeatureFlag.last.active).to eq(true)
       end
     end
 
@@ -593,9 +635,28 @@ describe Projects::FeatureFlagsController do
           .to change { feature_flag.reload.active }.from(true).to(false)
       end
 
-      it "updates default scope's active too" do
+      it "does not change default scope's active" do
         expect { subject }
-          .to change { feature_flag.default_scope.reload.active }.from(true).to(false)
+          .not_to change { feature_flag.default_scope.reload.active }.from(true)
+      end
+
+      it 'updates active from false to true when an inactive feature flag has an active scope' do
+        feature_flag = create(:operations_feature_flag, project: project, name: 'my_flag', active: false)
+        create(:operations_feature_flag_scope, feature_flag: feature_flag, environment_scope: 'production', active: true)
+
+        params = {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: feature_flag.id,
+          operations_feature_flag: { active: true }
+        }
+        put(:update, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('feature_flag', dir: 'ee')
+        expect(json_response['active']).to eq(true)
+        expect(feature_flag.reload.active).to eq(true)
+        expect(feature_flag.default_scope.reload.active).to eq(false)
       end
     end
 

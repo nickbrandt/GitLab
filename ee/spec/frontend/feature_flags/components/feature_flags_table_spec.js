@@ -116,7 +116,7 @@ describe('Feature flag table', () => {
 
     beforeEach(() => {
       props.featureFlags[0].update_path = props.featureFlags[0].destroy_path;
-      createWrapper(props, { provide: { glFeatures: { featureFlagToggle: true } } });
+      createWrapper(props);
       toggle = wrapper.find(GlToggle);
     });
 

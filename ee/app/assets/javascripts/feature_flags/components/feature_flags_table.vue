@@ -62,9 +62,6 @@ export default {
     modalId() {
       return 'delete-feature-flag';
     },
-    hasFeatureFlagToggle() {
-      return this.glFeatures.featureFlagToggle;
-    },
   },
   methods: {
     scopeTooltipText(scope) {
@@ -133,7 +130,7 @@ export default {
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
           <div class="table-mobile-content js-feature-flag-status">
             <gl-toggle
-              v-if="hasFeatureFlagToggle && featureFlag.update_path"
+              v-if="featureFlag.update_path"
               :value="featureFlag.active"
               @change="toggleFeatureFlag(featureFlag)"
             />
