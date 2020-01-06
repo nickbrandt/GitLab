@@ -170,6 +170,12 @@ module EE
       actual_plan&.name || Plan::FREE
     end
 
+    def plan_name_for_upgrading
+      return Plan::FREE if trial_active?
+
+      actual_plan_name
+    end
+
     def actual_size_limit
       ::Gitlab::CurrentSettings.repository_size_limit
     end
