@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Gitlab::Vulnerabilities::SummaryCache do
   let(:group) { create(:group) }
   let(:project) { create(:project, :public, namespace: group) }
-  let(:project_cachec_key) { described_class.new(group, project.id).send(:cache_key) }
+  let(:project_cache_key) { described_class.new(group, project.id).send(:cache_key) }
 
   before do
     create_vulnerabilities(1, project)
@@ -15,7 +15,7 @@ describe Gitlab::Vulnerabilities::SummaryCache do
     it 'reads from cache when records are cached' do
       summary_cache = described_class.new(group, project.id)
 
-      expect(Rails.cache.fetch(project_cachec_key, raw: true)).to be_nil
+      expect(Rails.cache.fetch(project_cache_key, raw: true)).to be_nil
 
       control_count = ActiveRecord::QueryRecorder.new { summary_cache.fetch }
 
