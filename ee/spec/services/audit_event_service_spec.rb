@@ -38,6 +38,24 @@ describe AuditEventService do
       end
     end
 
+    context 'updating membership' do
+      let(:service) do
+        described_class.new(user, project, {
+          action: :update,
+          old_access_level: 'Reporter',
+          old_expiry: Date.today
+        })
+      end
+
+      it 'records the change in expiry date' do
+        event = service.for_member(project_member).security_event
+
+        expect(event[:details][:change]).to eq('access_level')
+        expect(event[:details][:expiry_from]).to eq(Date.today)
+        expect(event[:details][:expiry_to]).to eq(1.day.from_now.to_date)
+      end
+    end
+
     context 'admin audit log licensed' do
       before do
         stub_licensed_features(admin_audit_log: true)
