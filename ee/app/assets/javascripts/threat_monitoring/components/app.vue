@@ -1,8 +1,11 @@
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import { GlAlert, GlEmptyState, GlIcon, GlLink, GlPopover } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import ThreatMonitoringFilters from './threat_monitoring_filters.vue';
+import WafLoadingSkeleton from './waf_loading_skeleton.vue';
+import WafStatisticsSummary from './waf_statistics_summary.vue';
+import WafStatisticsHistory from './waf_statistics_history.vue';
 
 export default {
   name: 'ThreatMonitoring',
@@ -13,6 +16,9 @@ export default {
     GlLink,
     GlPopover,
     ThreatMonitoringFilters,
+    WafLoadingSkeleton,
+    WafStatisticsSummary,
+    WafStatisticsHistory,
   },
   props: {
     defaultEnvironmentId: {
@@ -38,6 +44,9 @@ export default {
       // environment id only means that WAF *might* be set up.
       isWafMaybeSetUp: this.isValidEnvironmentId(this.defaultEnvironmentId),
     };
+  },
+  computed: {
+    ...mapState('threatMonitoring', ['isLoadingWafStatistics']),
   },
   created() {
     if (this.isWafMaybeSetUp) {
@@ -66,7 +75,7 @@ export default {
     malicious traffic is trying to access your app. The docs link is also
     accessible by clicking the "?" icon next to the title below.`,
   ),
-  helpPopoverTitle: s__('ThreatMonitoring|At this time, threat monitoring only supports WAF data.'),
+  helpPopoverText: s__('ThreatMonitoring|At this time, threat monitoring only supports WAF data.'),
 };
 </script>
 
@@ -102,18 +111,19 @@ export default {
         >
           <gl-icon name="question" />
         </gl-link>
-        <gl-popover
-          :target="() => $refs.helpLink"
-          triggers="hover focus"
-          :title="$options.helpPopoverTitle"
-        >
-          <gl-link :href="documentationPath">{{
-            s__('ThreatMonitoring|View WAF documentation')
-          }}</gl-link>
+        <gl-popover :target="() => $refs.helpLink" triggers="hover focus">
+          {{ $options.helpPopoverText }}
         </gl-popover>
       </h2>
     </header>
 
     <threat-monitoring-filters />
+
+    <waf-loading-skeleton v-if="isLoadingWafStatistics" class="mt-3" />
+
+    <template v-else>
+      <waf-statistics-summary class="mt-3" />
+      <waf-statistics-history class="mt-3" />
+    </template>
   </section>
 </template>
