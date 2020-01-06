@@ -21322,14 +21322,6 @@ msgstr ""
 msgid "ciReport|%{reportType} %{status} detected no vulnerabilities for the source branch only"
 msgstr ""
 
-msgid "ciReport|%{reportType} detected %{vulnerabilityCount} vulnerability"
-msgid_plural "ciReport|%{reportType} detected %{vulnerabilityCount} vulnerabilities"
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "ciReport|%{reportType} detected no vulnerabilities"
-msgstr ""
-
 msgid "ciReport|%{reportType} is loading"
 msgstr ""
 
@@ -21487,18 +21479,6 @@ msgid "ciReport|There was an error creating the merge request. Please try again.
 msgstr ""
 
 msgid "ciReport|There was an error dismissing the vulnerability. Please try again."
-msgstr ""
-
-msgid "ciReport|There was an error loading DAST report"
-msgstr ""
-
-msgid "ciReport|There was an error loading SAST report"
-msgstr ""
-
-msgid "ciReport|There was an error loading container scanning report"
-msgstr ""
-
-msgid "ciReport|There was an error loading dependency scanning report"
 msgstr ""
 
 msgid "ciReport|There was an error reverting the dismissal. Please try again."
