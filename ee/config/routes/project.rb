@@ -77,6 +77,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         resources :audit_events, only: [:index]
+
+        namespace :analytics do
+          constraints(::Constraints::FeatureConstrainer.new(:code_review_analytics)) do
+            resources :code_reviews, only: [:index]
+          end
+        end
       end
       # End of the /-/ scope.
 

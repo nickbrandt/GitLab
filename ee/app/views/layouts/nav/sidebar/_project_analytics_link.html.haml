@@ -1,0 +1,22 @@
+- if Feature.enabled?(:code_review_analytics) && @project.feature_available?(:code_review_analytics, current_user)
+  - project_analytics_link = namespace_project_analytics_code_reviews_path(@project.namespace, @project)
+
+  = nav_link controller: :code_review do
+    = link_to project_analytics_link, data: { qa_selector: 'project_analytics_link' } do
+      .nav-icon-container
+        = sprite_icon('chart')
+      %span.nav-item-name
+        = _('Project Analytics')
+
+    %ul.sidebar-sub-level-items
+      = nav_link(controller: :code_review, html_options: { class: "fly-out-top-item" } ) do
+        = link_to project_analytics_link do
+          %strong.fly-out-top-item-name
+            = _('Project Analytics')
+
+      %li.divider.fly-out-top-item
+
+      - if project_nav_tab?(:code_review)
+        = nav_link controller: :code_review do
+          = link_to project_analytics_link, title: _('Code Review') do
+            %span= _('Code Review')
