@@ -7,6 +7,8 @@ import { visitUrl } from '~/lib/utils/url_utility';
 import epicUtils from '../utils/epic_utils';
 import { statusType, statusEvent, dateTypes } from '../constants';
 
+import updateEpic from '../queries/updateEpic.mutation.graphql';
+
 import * as types from './mutation_types';
 
 export const setEpicMeta = ({ commit }, meta) => commit(types.SET_EPIC_META, meta);
@@ -125,23 +127,35 @@ export const requestEpicDateSaveFailure = ({ commit }, data) => {
   );
 };
 export const saveDate = ({ state, dispatch }, { dateType, dateTypeIsFixed, newDate }) => {
-  const requestBody = {
-    [dateType === dateTypes.start ? 'start_date_is_fixed' : 'due_date_is_fixed']: dateTypeIsFixed,
+  const updateEpicInput = {
+    iid: `${state.epicId}`,
+    groupPath: state.groupPath,
+    [dateType === dateTypes.start ? 'startDateIsFixed' : 'dueDateIsFixed']: dateTypeIsFixed,
   };
 
   if (dateTypeIsFixed) {
-    requestBody[dateType === dateTypes.start ? 'start_date_fixed' : 'due_date_fixed'] = newDate;
+    updateEpicInput[dateType === dateTypes.start ? 'startDateFixed' : 'dueDateFixed'] = newDate;
   }
 
   dispatch('requestEpicDateSave', { dateType });
-  axios
-    .put(state.endpoint, requestBody)
-    .then(() => {
-      dispatch('requestEpicDateSaveSuccess', {
-        dateType,
-        dateTypeIsFixed,
-        newDate,
-      });
+  epicUtils.gqClient
+    .mutate({
+      mutation: updateEpic,
+      variables: {
+        updateEpicInput,
+      },
+    })
+    .then(({ data }) => {
+      if (!data?.updateEpic?.errors.length) {
+        dispatch('requestEpicDateSaveSuccess', {
+          dateType,
+          dateTypeIsFixed,
+          newDate,
+        });
+      } else {
+        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+        throw new Error('An error occurred while saving the date');
+      }
     })
     .catch(() => {
       dispatch('requestEpicDateSaveFailure', {
