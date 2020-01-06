@@ -1,9 +1,6 @@
 <script>
 import { GlEmptyState, GlDaterangePicker, GlLoadingIcon } from '@gitlab/ui';
-import { GlStackedColumnChart } from '@gitlab/ui/dist/charts';
 import { mapActions, mapState, mapGetters } from 'vuex';
-import dateFormat from 'dateformat';
-import { s__, sprintf } from '~/locale';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -14,14 +11,14 @@ import Scatterplot from '../../shared/components/scatterplot.vue';
 import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
-import { LAST_ACTIVITY_AT, dateFormats } from '../../shared/constants';
+import { LAST_ACTIVITY_AT } from '../../shared/constants';
+import TasksByTypeChart from './tasks_by_type_chart.vue';
 
 export default {
   name: 'CycleAnalytics',
   components: {
     GlLoadingIcon,
     GlEmptyState,
-    GlStackedColumnChart,
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
     SummaryTable,
@@ -29,6 +26,7 @@ export default {
     GlDaterangePicker,
     StageDropdownFilter,
     Scatterplot,
+    TasksByTypeChart,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -71,6 +69,7 @@ export default {
       'isCreatingCustomStage',
       'isEditingCustomStage',
       'selectedGroup',
+      'selectedProjectIds',
       'selectedStage',
       'stages',
       'summary',
@@ -103,12 +102,7 @@ export default {
       return !this.isLoadingDurationChart && !this.isLoading;
     },
     shouldDisplayTasksByTypeChart() {
-      return (
-        !this.isLoadingTasksByTypeChart &&
-        !this.isLoading &&
-        this.tasksByTypeChartData &&
-        this.tasksByTypeChartData.seriesData
-      );
+      return !this.isLoadingTasksByTypeChart && !this.isLoading && this.tasksByTypeChartData;
     },
     dateRange: {
       get() {
@@ -124,27 +118,22 @@ export default {
     hasDateRangeSet() {
       return this.startDate && this.endDate;
     },
-    chartDataDescription() {
-      if (this.selectedGroup) {
-        const selectedProjectCount = this.setSelectedProjects.length;
-        const { startDate, endDate } = this;
-        const { name: groupName } = this.selectedGroup;
-        const str =
-          selectedProjectCount > 0
-            ? s__(
-                "CycleAnalyticsCharts|Showing data for group '%{groupName}' and %{selectedProjectCount} projects from %{startDate} to %{endDate}",
-              )
-            : s__(
-                "CycleAnalyticsCharts|Showing data for group '%{groupName}' from %{startDate} to %{endDate}",
-              );
-        return sprintf(str, {
-          startDate: dateFormat(startDate, dateFormats.defaultDate),
-          endDate: dateFormat(endDate, dateFormats.defaultDate),
-          groupName,
-          selectedProjectCount,
-        });
-      }
-      return null;
+    selectedTasksByTypeFilters() {
+      const {
+        selectedGroup,
+        startDate,
+        endDate,
+        selectedProjectIds,
+        tasksByType: { subject, labelIds: selectedLabelIds },
+      } = this;
+      return {
+        selectedGroup,
+        selectedProjectIds,
+        startDate,
+        endDate,
+        subject,
+        selectedLabelIds,
+      };
     },
   },
   mounted() {
@@ -153,6 +142,9 @@ export default {
       hasDurationChart: this.glFeatures.cycleAnalyticsScatterplotEnabled,
       hasTasksByTypeChart: this.glFeatures.tasksByTypeChart,
     });
+
+    console.log('mounted::this.glFeatures', this.glFeatures);
+    console.log('mounted::this.featureFlags', this.featureFlags);
   },
   methods: {
     ...mapActions([
@@ -218,9 +210,6 @@ export default {
     per_page: PROJECTS_PER_PAGE,
     with_shared: false,
     order_by: LAST_ACTIVITY_AT,
-  },
-  tasksByTypeChartOptions: {
-    legend: false,
   },
 };
 </script>
@@ -342,41 +331,31 @@ export default {
         </template>
         <gl-loading-icon v-else-if="!isLoading" size="md" class="my-4 py-4" />
       </template>
+      <template v-if="featureFlags.hasTasksByTypeChart">
+        <div v-if="!isLoading">
+          <gl-loading-icon v-if="isLoadingTasksByTypeChart" size="md" class="my-4 py-4" />
+          <div v-else class="tasks-by-type-chart">
+            <tasks-by-type-chart
+              v-if="shouldDisplayTasksByTypeChart"
+              :data="tasksByTypeChartData.seriesData"
+              :group-by="tasksByTypeChartData.range"
+              :series-names="tasksByTypeChartData.seriesNames"
+              :filters="selectedTasksByTypeFilters"
+            />
+            <div v-else>
+              <!-- TODO: move this inside the component -->
+              <div class="row">
+                <div class="col-12">
+                  <h3>{{ __('Type of work') }}</h3>
+                  <div class="bs-callout bs-callout-info">
+                    <p>{{ __('There is no data available. Please change your selection.') }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
-    <template v-if="featureFlags.hasTasksByTypeChart">
-      <div v-if="shouldDisplayTasksByTypeChart">
-        <!-- TODO: move into component file -->
-        <div class="row">
-          <div class="col-12">
-            <h2>{{ __('Type of work') }}</h2>
-            <p v-if="tasksByTypeChartData">
-              {{ __('Showing data for __ groups and __ projects from __ to __') }}
-            </p>
-          </div>
-        </div>
-        <div v-if="tasksByTypeChartData" class="row">
-          <div class="col-12">
-            <header>
-              <h3>{{ __('Tasks by type') }}</h3>
-            </header>
-            <!-- TODO: no data available view -->
-            <section>
-              <gl-stacked-column-chart
-                :option="$options.tasksByTypeChartOptions"
-                :data="tasksByTypeChartData.seriesData"
-                :group-by="tasksByTypeChartData.range"
-                x-axis-type="category"
-                x-axis-title="Date"
-                y-axis-title="Number of tasks"
-                :series-names="tasksByTypeChartData.seriesNames"
-              />
-            </section>
-          </div>
-        </div>
-        <div v-else class="bs-callout bs-callout-info">
-          {{ __('There is no data available. Please change your selection.') }}
-        </div>
-      </div>
-    </template>
   </div>
 </template>

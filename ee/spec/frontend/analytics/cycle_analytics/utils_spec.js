@@ -30,7 +30,6 @@ import {
   endDate,
   issueStage,
   rawCustomStage,
-  tasksByTypeData,
   transformedTasksByTypeData,
 } from './mock_data';
 

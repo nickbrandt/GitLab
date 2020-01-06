@@ -78,12 +78,11 @@ export const transformRawStages = (stages = []) =>
     name: name.length ? name : title,
   }));
 
-export const arrayToObject = (arr = []) => {
-  return arr.reduce((acc, curr) => {
+export const arrayToObject = (arr = []) =>
+  arr.reduce((acc, curr) => {
     const [key, value] = curr;
     return { ...acc, [key]: value };
   }, {});
-};
 
 // converts the series data into key value pairs
 export const transformRawTasksByTypeData = (data = []) => {

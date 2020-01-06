@@ -1,0 +1,107 @@
+<script>
+import { GlStackedColumnChart } from '@gitlab/ui/dist/charts';
+import dateFormat from 'dateformat';
+import { s__, sprintf } from '~/locale';
+import { dateFormats } from '../../shared/constants';
+
+const formattedDate = d => dateFormat(d, dateFormats.defaultDate);
+
+export default {
+  name: 'TasksByTypeChart',
+  components: {
+    GlStackedColumnChart,
+  },
+  props: {
+    filters: {
+      type: Object,
+      required: true,
+    },
+    data: {
+      type: Array,
+      required: true,
+    },
+    groupBy: {
+      type: Array,
+      required: true,
+    },
+    seriesNames: {
+      type: Array,
+      required: true,
+    },
+  },
+  computed: {
+    hasData() {
+      return this.data && this.data.length;
+    },
+    selectedFiltersText() {
+      // TODO: I think we should show labels that have 0 data, currently doesnt appear
+      const { subject, selectedLabelIds } = this.filters;
+      return sprintf(
+        s__('CycleAnalyticsCharts|Showing %{subject} and %{selectedLabelsCount} labels'),
+        {
+          subject,
+          selectedLabelsCount: selectedLabelIds.length,
+        },
+      );
+    },
+    summaryDescription() {
+      const {
+        startDate,
+        endDate,
+        selectedProjectIds,
+        selectedGroup: { name: groupName },
+      } = this.filters;
+
+      const selectedProjectCount = selectedProjectIds.length;
+      const str =
+        selectedProjectCount > 0
+          ? s__(
+              "CycleAnalyticsCharts|Showing data for group '%{groupName}' and %{selectedProjectCount} projects from %{startDate} to %{endDate}",
+            )
+          : s__(
+              "CycleAnalyticsCharts|Showing data for group '%{groupName}' from %{startDate} to %{endDate}",
+            );
+      return sprintf(str, {
+        startDate: formattedDate(startDate),
+        endDate: formattedDate(endDate),
+        groupName,
+        selectedProjectCount,
+      });
+    },
+  },
+  chartOptions: {
+    legend: false,
+  },
+};
+</script>
+<template>
+  <div>
+    <div class="row">
+      <div class="col-12">
+        <h3>{{ __('Type of work') }}</h3>
+        <p v-if="hasData">
+          {{ summaryDescription }}
+        </p>
+      </div>
+    </div>
+    <div v-if="hasData" class="row">
+      <div class="col-12">
+        <header>
+          <h4>{{ __('Tasks by type') }}</h4>
+          <p>{{ selectedFiltersText }}</p>
+        </header>
+        <section>
+          <gl-stacked-column-chart
+            :option="$options.chartOptions"
+            :data="data"
+            :group-by="groupBy"
+            x-axis-type="category"
+            x-axis-title="Date"
+            y-axis-title="Number of tasks"
+            :series-names="seriesNames"
+          />
+        </section>
+      </div>
+    </div>
+  </div>
+</template>

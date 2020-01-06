@@ -131,6 +131,8 @@ export const editCustomStage = ({ commit, dispatch }, selectedStage = {}) => {
 export const requestSummaryData = ({ commit }) => commit(types.REQUEST_SUMMARY_DATA);
 
 export const receiveSummaryDataError = ({ commit }, error) => {
+  console.log('receiveSummaryDataError::error', error);
+
   commit(types.RECEIVE_SUMMARY_DATA_ERROR, error);
   createFlash(__('There was an error while fetching cycle analytics summary data.'));
 };
@@ -246,10 +248,13 @@ export const createCustomStage = ({ dispatch, state }, data) => {
     .catch(error => dispatch('receiveCreateCustomStageError', { error, data }));
 };
 
-export const receiveTasksByTypeDataSuccess = ({ commit }, data) =>
+export const receiveTasksByTypeDataSuccess = ({ commit }, data) => {
+  console.log('receiveTasksByTypeDataSuccess::data', data);
   commit(types.RECEIVE_TASKS_BY_TYPE_DATA_SUCCESS, data);
+};
 
 export const receiveTasksByTypeDataError = ({ commit }, error) => {
+  console.log('receiveTasksByTypeDataError::error', error);
   commit(types.RECEIVE_TASKS_BY_TYPE_DATA_ERROR, error);
   createFlash(__('There was an error fetching data for the tasks by type chart'));
 };

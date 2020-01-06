@@ -219,7 +219,7 @@ describe 'Analytics (JavaScript fixtures)', :sidekiq_inline do
       sign_in(user)
     end
 
-    it 'analytics/type_of_work/tasks_by_type?created_before=":created_before"' do
+    it 'analytics/type_of_work/tasks_by_type.json' do
       params = { group_id: group.full_path, label_ids: [label.id, label2.id, label3.id], created_after: 10.days.ago, subject: 'Issue' }
 
       get(:show, params: params, format: :json)
