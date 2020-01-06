@@ -23,7 +23,7 @@ const $sel = {
   illustration: '.empty-state .svg-content',
 };
 
-const headers = ['Stage', 'Median', issueStage.legend, 'Total Time'];
+const headers = ['Stage', 'Median', issueStage.legend, 'Time'];
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';
 
