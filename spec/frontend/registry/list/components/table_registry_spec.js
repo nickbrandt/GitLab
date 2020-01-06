@@ -76,41 +76,38 @@ describe('table registry', () => {
   });
 
   describe('multi select', () => {
-    it('selecting a row should enable delete button', done => {
+    it('selecting a row should enable delete button', () => {
       const deleteBtn = findDeleteButton();
       const checkboxes = findSelectCheckboxes();
 
       expect(deleteBtn.attributes('disabled')).toBe('disabled');
 
       checkboxes.at(0).trigger('click');
-      wrapper.vm.$nextTick(() => {
+      return wrapper.vm.$nextTick().then(() => {
         expect(deleteBtn.attributes('disabled')).toEqual(undefined);
-        done();
       });
     });
 
-    it('selecting all checkbox should select all rows and enable delete button', done => {
+    it('selecting all checkbox should select all rows and enable delete button', () => {
       const selectAll = findSelectAllCheckbox();
       selectAll.trigger('click');
 
-      wrapper.vm.$nextTick(() => {
+      return wrapper.vm.$nextTick().then(() => {
         const checkboxes = findSelectCheckboxes();
         const checked = checkboxes.filter(w => w.element.checked);
         expect(checked.length).toBe(checkboxes.length);
-        done();
       });
     });
 
-    it('deselecting select all checkbox should deselect all rows and disable delete button', done => {
+    it('deselecting select all checkbox should deselect all rows and disable delete button', () => {
       const checkboxes = findSelectCheckboxes();
       const selectAll = findSelectAllCheckbox();
       selectAll.trigger('click');
       selectAll.trigger('click');
 
-      wrapper.vm.$nextTick(() => {
+      return wrapper.vm.$nextTick().then(() => {
         const checked = checkboxes.filter(w => !w.element.checked);
         expect(checked.length).toBe(checkboxes.length);
-        done();
       });
     });
 

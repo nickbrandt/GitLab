@@ -67,14 +67,13 @@ describe('collapsible registry container', () => {
       expectIsClosed();
     });
 
-    it('should be open when user clicks on closed repo', done => {
+    it('should be open when user clicks on closed repo', () => {
       const toggleRepos = findToggleRepos();
       toggleRepos.at(0).trigger('click');
-      wrapper.vm.$nextTick(() => {
+      return wrapper.vm.$nextTick().then(() => {
         const container = findContainerImageTags();
         expect(container.exists()).toBe(true);
         expect(wrapper.vm.fetchList).toHaveBeenCalled();
-        done();
       });
     });
 
