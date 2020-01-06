@@ -891,7 +891,7 @@ module EE
         private
 
         def project_path
-          object.project.root_namespace.path
+          object.project.full_path
         end
       end
 
