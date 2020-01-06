@@ -123,6 +123,8 @@ module QA
           show.approve_license_with_mr(approved_license_name)
           show.blacklist_license_with_mr(blacklisted_license_name)
 
+          show.wait_for_license_compliance_report
+
           expect(show).to have_approved_license approved_license_name
           expect(show).to have_blacklisted_license blacklisted_license_name
         end
