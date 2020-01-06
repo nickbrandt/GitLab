@@ -98,7 +98,7 @@ module Types
       method: :subscribed?,
       null: false,
       complexity: 5,
-      description: 'Boolean flag for whether the currently logged in user is subscribed to this epic'
+      description: 'Indicates the currently logged in user is subscribed to the epic'
 
     field :issues,
           Types::EpicIssueType.connection_type,
