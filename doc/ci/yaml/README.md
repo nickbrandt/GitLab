@@ -3628,7 +3628,7 @@ having their own custom `script` defined:
 
 ```yaml
 .job_template: &job_definition  # Hidden key that defines an anchor named 'job_definition'
-  image: ruby:2.1
+  image: ruby:2.6
   services:
     - postgres
     - redis
@@ -3650,13 +3650,13 @@ given hash into the current one", and `*` includes the named anchor
 
 ```yaml
 .job_template:
-  image: ruby:2.1
+  image: ruby:2.6
   services:
     - postgres
     - redis
 
 test1:
-  image: ruby:2.1
+  image: ruby:2.6
   services:
     - postgres
     - redis
@@ -3664,7 +3664,7 @@ test1:
     - test1 project
 
 test2:
-  image: ruby:2.1
+  image: ruby:2.6
   services:
     - postgres
     - redis
