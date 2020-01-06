@@ -115,11 +115,11 @@ describe('table registry', () => {
       const multiDeleteItems = jest.fn().mockResolvedValue();
       wrapper.setMethods({ multiDeleteItems });
 
-      Vue.nextTick(() => {
+      wrapper.vm.$nextTick(() => {
         const selectAll = findSelectAllCheckbox();
         selectAll.trigger('click');
 
-        Vue.nextTick(() => {
+        wrapper.vm.$nextTick(() => {
           const deleteBtn = findDeleteButton();
           expect(wrapper.vm.selectedItems).toEqual([0, 1]);
           expect(deleteBtn.attributes('disabled')).toEqual(undefined);
