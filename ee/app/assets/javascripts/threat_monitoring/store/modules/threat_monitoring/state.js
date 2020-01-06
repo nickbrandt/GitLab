@@ -7,13 +7,12 @@ export default () => ({
   wafStatisticsEndpoint: '',
   wafStatistics: {
     totalTraffic: 0,
-    trafficAllowed: 0,
-    trafficBlocked: 0,
+    anomalousTraffic: 0,
     history: {
-      allowed: [],
-      blocked: [],
+      nominal: [],
+      anomalous: [],
     },
   },
-  isWafStatisticsLoading: false,
+  isLoadingWafStatistics: false,
   errorLoadingWafStatistics: false,
 });

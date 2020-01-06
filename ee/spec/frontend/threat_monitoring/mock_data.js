@@ -16,11 +16,10 @@ export const mockEnvironmentsResponse = {
 };
 
 export const mockWafStatisticsResponse = {
-  total_traffic: 31500,
-  traffic_allowed: 0.11,
-  traffic_blocked: 0.89,
+  total_traffic: 2703,
+  anomalous_traffic: 0.03,
   history: {
-    allowed: [['<timestamp>', 25], ['<timestamp>', 30]],
-    blocked: [['<timestamp>', 15], ['<timestamp>', 20]],
+    nominal: [['2019-12-04T00:00:00.000Z', 56], ['2019-12-05T00:00:00.000Z', 2647]],
+    anomalous: [['2019-12-04T00:00:00.000Z', 1], ['2019-12-05T00:00:00.000Z', 83]],
   },
 };
