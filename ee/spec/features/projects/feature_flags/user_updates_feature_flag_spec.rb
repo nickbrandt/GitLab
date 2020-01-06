@@ -9,7 +9,7 @@ describe 'User updates feature flag', :js do
   let(:project) { create(:project, namespace: user.namespace) }
 
   let!(:feature_flag) do
-    create_flag(project, 'ci_live_trace', false,
+    create_flag(project, 'ci_live_trace', true,
                 description: 'For live trace feature')
   end
 
@@ -32,7 +32,7 @@ describe 'User updates feature flag', :js do
 
       within_status do
         expect(find('.project-feature-toggle')['aria-label'])
-          .to eq('Toggle Status: OFF')
+          .to eq('Toggle Status: ON')
       end
     end
   end
@@ -50,11 +50,11 @@ describe 'User updates feature flag', :js do
     it 'shows the updated feature flag' do
       within_feature_flag_row(1) do
         expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
-        expect(page).to have_css('.js-feature-flag-status .badge-danger')
+        expect(page).to have_css('.js-feature-flag-status button.is-checked')
 
         within_feature_flag_scopes do
           expect(page.find('.badge:nth-child(1)')).to have_content('*')
-          expect(page.find('.badge:nth-child(1)')['class']).to include('badge-inactive')
+          expect(page.find('.badge:nth-child(1)')['class']).to include('badge-active')
           expect(page.find('.badge:nth-child(2)')).to have_content('review/*')
           expect(page.find('.badge:nth-child(2)')['class']).to include('badge-inactive')
         end

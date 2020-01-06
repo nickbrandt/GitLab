@@ -32,7 +32,16 @@ module Operations
     end
 
     def self.for_unleash_client(project, environment)
-      select('DISTINCT ON (operations_feature_flag_scopes.feature_flag_id) operations_feature_flag_scopes.*')
+      select_columns = [
+        'DISTINCT ON (operations_feature_flag_scopes.feature_flag_id) operations_feature_flag_scopes.id',
+        '(operations_feature_flags.active AND operations_feature_flag_scopes.active) AS active',
+        'operations_feature_flag_scopes.strategies',
+        'operations_feature_flag_scopes.environment_scope',
+        'operations_feature_flag_scopes.created_at',
+        'operations_feature_flag_scopes.updated_at'
+      ]
+
+      select(select_columns)
         .with_name_and_description
         .where(feature_flag_id: project.operations_feature_flags.select(:id))
         .order(:feature_flag_id)

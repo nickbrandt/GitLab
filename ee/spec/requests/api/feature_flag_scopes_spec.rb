@@ -54,13 +54,13 @@ describe API::FeatureFlagScopes do
           params: params
     end
 
-    let(:feature_flag_1) { create_flag(project, 'flag_1', false) }
-    let(:feature_flag_2) { create_flag(project, 'flag_2', false) }
+    let(:feature_flag_1) { create_flag(project, 'flag_1', true) }
+    let(:feature_flag_2) { create_flag(project, 'flag_2', true) }
 
     before do
-      create_scope(feature_flag_1, 'staging', true)
-      create_scope(feature_flag_1, 'production', false)
-      create_scope(feature_flag_2, 'review/*', true)
+      create_scope(feature_flag_1, 'staging', false)
+      create_scope(feature_flag_1, 'production', true)
+      create_scope(feature_flag_2, 'review/*', false)
     end
 
     context 'when environment is production' do
@@ -73,8 +73,8 @@ describe API::FeatureFlagScopes do
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(response).to match_response_schema('public_api/v4/feature_flag_detailed_scopes', dir: 'ee')
-        expect(json_response.second).to include({ 'name' => 'flag_1', 'active' => false })
-        expect(json_response.first).to include({ 'name' => 'flag_2', 'active' => false })
+        expect(json_response.second).to include({ 'name' => 'flag_1', 'active' => true })
+        expect(json_response.first).to include({ 'name' => 'flag_2', 'active' => true })
       end
     end
 
@@ -85,8 +85,8 @@ describe API::FeatureFlagScopes do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(json_response.second).to include({ 'name' => 'flag_1', 'active' => true })
-        expect(json_response.first).to include({ 'name' => 'flag_2', 'active' => false })
+        expect(json_response.second).to include({ 'name' => 'flag_1', 'active' => false })
+        expect(json_response.first).to include({ 'name' => 'flag_2', 'active' => true })
       end
     end
 
@@ -97,8 +97,8 @@ describe API::FeatureFlagScopes do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(json_response.second).to include({ 'name' => 'flag_1', 'active' => false })
-        expect(json_response.first).to include({ 'name' => 'flag_2', 'active' => true })
+        expect(json_response.second).to include({ 'name' => 'flag_1', 'active' => true })
+        expect(json_response.first).to include({ 'name' => 'flag_2', 'active' => false })
       end
     end
   end

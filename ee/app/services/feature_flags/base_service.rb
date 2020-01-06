@@ -4,7 +4,7 @@ module FeatureFlags
   class BaseService < ::BaseService
     include Gitlab::Utils::StrongMemoize
 
-    AUDITABLE_ATTRIBUTES = %w(name description).freeze
+    AUDITABLE_ATTRIBUTES = %w(name description active).freeze
 
     protected
 

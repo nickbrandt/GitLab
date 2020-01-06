@@ -17,7 +17,6 @@ class FeatureFlagsFinder
 
     items = feature_flags
     items = by_scope(items)
-    items = for_list(items)
 
     items = items.preload_relations if preload
     items.ordered
@@ -34,9 +33,5 @@ class FeatureFlagsFinder
     else
       items
     end
-  end
-
-  def for_list(items)
-    items.for_list
   end
 end
