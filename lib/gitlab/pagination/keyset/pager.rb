@@ -24,10 +24,10 @@ module Gitlab
         private
 
         def apply_headers(last_record_in_page)
-          end_reached = last_record_in_page.nil?
-          lower_bounds = last_record_in_page&.slice(page.order_by.keys)
+          return unless last_record_in_page
 
-          next_page = page.next(lower_bounds, end_reached)
+          lower_bounds = last_record_in_page&.slice(page.order_by.keys)
+          next_page = page.next(lower_bounds)
 
           request.apply_headers(next_page)
         end

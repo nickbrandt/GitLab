@@ -41,7 +41,7 @@ describe Gitlab::Pagination::Keyset::Pager do
 
     it 'passes information about next page to request' do
       lower_bounds = records.last.slice(:id)
-      expect(page).to receive(:next).with(lower_bounds, false).and_return(next_page)
+      expect(page).to receive(:next).with(lower_bounds).and_return(next_page)
       expect(request).to receive(:apply_headers).with(next_page)
 
       subject
@@ -51,9 +51,9 @@ describe Gitlab::Pagination::Keyset::Pager do
       let(:relation) { Project.where('id > ?', Project.maximum(:id) - page.per_page).order(id: :asc) }
 
       it 'indicates there is another (likely empty) page' do
-        expect(request).to receive(:apply_headers) do |next_page|
-          expect(next_page.end_reached?).to be_falsey
-        end
+        lower_bounds = records.last.slice(:id)
+        expect(page).to receive(:next).with(lower_bounds).and_return(next_page)
+        expect(request).to receive(:apply_headers).with(next_page)
 
         subject
       end
@@ -63,9 +63,7 @@ describe Gitlab::Pagination::Keyset::Pager do
       let(:relation) { Project.where('id > ?', Project.maximum(:id) + 1).order(id: :asc) }
 
       it 'indicates this is the last page' do
-        expect(request).to receive(:apply_headers) do |next_page|
-          expect(next_page.end_reached?).to be_truthy
-        end
+        expect(request).not_to receive(:apply_headers)
 
         subject
       end
