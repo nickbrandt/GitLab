@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import Vuex from 'vuex';
 import { mount, createLocalVue } from '@vue/test-utils';
 import createFlash from '~/flash';
@@ -32,10 +31,6 @@ describe('table registry', () => {
     mount(tableRegistry, { ...config, store, localVue, attachToDocument: true, sync: false });
 
   beforeEach(() => {
-    // This is needed due to  console.error called by vue to emit a warning that stop the tests
-    // see  https://github.com/vuejs/vue-test-utils/issues/532
-    Vue.config.silent = true;
-
     store = new Vuex.Store({
       state: {
         isDeleteDisabled: false,
@@ -52,7 +47,6 @@ describe('table registry', () => {
   });
 
   afterEach(() => {
-    Vue.config.silent = false;
     wrapper.destroy();
   });
 
@@ -89,7 +83,7 @@ describe('table registry', () => {
       expect(deleteBtn.attributes('disabled')).toBe('disabled');
 
       checkboxes.at(0).trigger('click');
-      Vue.nextTick(() => {
+      wrapper.vm.$nextTick(() => {
         expect(deleteBtn.attributes('disabled')).toEqual(undefined);
         done();
       });
@@ -99,7 +93,7 @@ describe('table registry', () => {
       const selectAll = findSelectAllCheckbox();
       selectAll.trigger('click');
 
-      Vue.nextTick(() => {
+      wrapper.vm.$nextTick(() => {
         const checkboxes = findSelectCheckboxes();
         const checked = checkboxes.filter(w => w.element.checked);
         expect(checked.length).toBe(checkboxes.length);
@@ -113,7 +107,7 @@ describe('table registry', () => {
       selectAll.trigger('click');
       selectAll.trigger('click');
 
-      Vue.nextTick(() => {
+      wrapper.vm.$nextTick(() => {
         const checked = checkboxes.filter(w => !w.element.checked);
         expect(checked.length).toBe(checkboxes.length);
         done();
