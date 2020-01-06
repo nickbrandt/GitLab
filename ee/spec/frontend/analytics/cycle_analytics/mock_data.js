@@ -48,7 +48,7 @@ export const reviewStage = getStageByTitle(dummyState.stages, 'review');
 export const codeStage = getStageByTitle(dummyState.stages, 'code');
 export const testStage = getStageByTitle(dummyState.stages, 'test');
 export const stagingStage = getStageByTitle(dummyState.stages, 'staging');
-export const productionStage = getStageByTitle(dummyState.stages, 'production');
+export const totalStage = getStageByTitle(dummyState.stages, 'total');
 
 export const allowedStages = [issueStage, planStage, codeStage];
 
@@ -82,7 +82,7 @@ export const reviewEvents = deepCamelCase(stageFixtures.review);
 export const codeEvents = deepCamelCase(stageFixtures.code);
 export const testEvents = deepCamelCase(stageFixtures.test);
 export const stagingEvents = deepCamelCase(stageFixtures.staging);
-export const productionEvents = deepCamelCase(stageFixtures.production);
+export const totalEvents = deepCamelCase(stageFixtures.production);
 export const rawCustomStage = {
   title: 'Coolest beans stage',
   hidden: false,

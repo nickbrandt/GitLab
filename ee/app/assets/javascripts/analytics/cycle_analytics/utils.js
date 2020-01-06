@@ -4,6 +4,7 @@ import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
 import { newDate, dayAfter, secondsToDays } from '~/lib/utils/datetime_utility';
 import { dateFormats } from '../shared/constants';
+import { STAGE_NAME } from './constants';
 
 const EVENT_TYPE_LABEL = 'label';
 
@@ -46,6 +47,25 @@ export const getLabelEventsIdentifiers = (events = []) =>
  */
 export const isPersistedStage = ({ custom, id }) => custom || isNumber(id);
 
+/**
+ * Returns the the correct slug to use for a stage
+ * default stages use the snakecased title of the stage, while custom
+ * stages will have a numeric id
+ *
+ * @param {Object} obj
+ * @param {string} obj.title - title of the stage
+ * @param {number} obj.id - numerical object id available for custom stages
+ * @param {boolean} obj.custom - boolean flag indicating a custom stage
+ * @returns {(number|string)} Returns a numerical id for customs stages and string for default stages
+ */
+const stageUrlSlug = ({ id, title, custom = false }) => {
+  if (custom) return id;
+  // We still use 'production' as the id to access this stage, even though the title is 'Total'
+  return title.toLowerCase() === STAGE_NAME.TOTAL
+    ? STAGE_NAME.PRODUCTION
+    : convertToSnakeCase(title);
+};
+
 export const transformRawStages = (stages = []) =>
   stages
     .map(({ id, title, name = '', custom = false, ...rest }) => ({
@@ -53,7 +73,7 @@ export const transformRawStages = (stages = []) =>
       id,
       title,
       custom,
-      slug: isPersistedStage({ custom, id }) ? id : convertToSnakeCase(title),
+      slug: isPersistedStage({ custom, id }) ? id : stageUrlSlug({ custom, id, title }),
       // the name field is used to create a stage, but the get request returns title
       name: name.length ? name : title,
     }))

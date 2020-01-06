@@ -112,7 +112,7 @@ export default {
           displayHeader: !this.customStageFormActive,
         },
         {
-          title: __('Total Time'),
+          title: __('Time'),
           description: __('The time taken by each data entry gathered by that stage.'),
           classes: 'total-time-header pr-5 text-right',
           displayHeader: !this.customStageFormActive,
