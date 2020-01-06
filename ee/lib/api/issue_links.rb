@@ -39,7 +39,7 @@ module API
         target_issue = find_project_issue(declared_params[:target_issue_iid],
                                           declared_params[:target_project_id])
 
-        create_params = { target_issuable: target_issue, link_type: params[:link_type] }
+        create_params = { target_issuable: target_issue, link_type: declared_params[:link_type] }
 
         result = ::IssueLinks::CreateService
                    .new(source_issue, current_user, create_params)

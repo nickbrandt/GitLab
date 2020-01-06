@@ -48,7 +48,7 @@ Parameters:
     "web_url": "http://example.com/example/example/issues/14",
     "confidential": false,
     "weight": null,
-    "link_type": "relates_to",
+    "link_type": "relates_to"
   }
 ]
 ```

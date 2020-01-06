@@ -30,7 +30,7 @@ describe API::IssueLinks do
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to be_an Array
         expect(json_response.length).to eq(1)
-        expect(json_response.first).to include('iid', 'title', 'issue_link_id', 'link_type')
+        expect(response).to match_response_schema('public_api/v4/issue_links')
       end
     end
   end
@@ -119,14 +119,14 @@ describe API::IssueLinks do
           project.add_reporter(user)
         end
 
-        it 'returns 201' do
+        it 'returns 201 status and contains the expected link response' do
           post api("/projects/#{project.id}/issues/#{issue.iid}/links", user),
                params: { target_project_id: project.id, target_issue_iid: target_issue.iid, link_type: 'blocks' }
 
           expect_link_response(link_type: 'blocks')
         end
 
-        context 'when `issue_link_type` is disabled' do
+        context 'when `issue_link_types` is disabled' do
           before do
             stub_feature_flags(issue_link_types: false)
           end
@@ -148,7 +148,7 @@ describe API::IssueLinks do
 
         def expect_link_response(link_type: 'relates_to')
           expect(response).to have_gitlab_http_status(201)
-          expect(json_response).to include('source_issue', 'target_issue', 'link_type')
+          expect(response).to match_response_schema('public_api/v4/issue_link')
           expect(json_response['link_type']).to eq(link_type)
         end
       end
@@ -212,7 +212,7 @@ describe API::IssueLinks do
           delete api("/projects/#{project.id}/issues/#{issue.iid}/links/#{issue_link.id}", user)
 
           expect(response).to have_gitlab_http_status(200)
-          expect(json_response).to include('source_issue', 'target_issue', 'link_type')
+          expect(response).to match_response_schema('public_api/v4/issue_link')
         end
       end
     end
