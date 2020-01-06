@@ -18,17 +18,6 @@ RSpec.shared_examples 'not accessible if feature flag is disabled' do
   end
 end
 
-RSpec.shared_examples 'handles missing or invalid job_id' do |job_id_param|
-  it "returns bad_request for #{job_id_param}" do
-    get status_create_self_monitoring_project_admin_application_settings_path, params: job_id_param
-
-    aggregate_failures do
-      expect(response).to have_gitlab_http_status(:bad_request)
-      expect(json_response).to eq('message' => '"job_id" must be an alphanumeric value')
-    end
-  end
-end
-
 RSpec.shared_examples 'not accessible to non-admin users' do
   context 'with unauthenticated user' do
     it 'redirects to signin page' do

@@ -85,23 +85,7 @@ describe 'Self-Monitoring project requests' do
       end
 
       context 'with feature flag enabled' do
-        it 'calls .status' do
-          expect(worker_class).to receive(:status).with(job_id).and_call_original
-
-          subject
-        end
-
-        it 'sets polling header' do
-          expect(::Gitlab::PollingInterval).to receive(:set_header)
-
-          subject
-        end
-
         context 'with invalid job_id' do
-          it_behaves_like 'handles missing or invalid job_id', nil
-          it_behaves_like 'handles missing or invalid job_id', job_id: nil
-          it_behaves_like 'handles missing or invalid job_id', job_id: [2]
-
           it 'returns bad_request if job_id too long' do
             get status_create_self_monitoring_project_admin_application_settings_path,
               params: { job_id: 'a' * 51 }
@@ -114,89 +98,74 @@ describe 'Self-Monitoring project requests' do
           end
         end
 
-        context 'different status values' do
+        context 'when self-monitoring project exists' do
+          let(:project) { build(:project) }
+
           before do
-            allow(worker_class).to receive(:status).and_return(status)
+            stub_application_setting(instance_administration_project_id: 1)
+            stub_application_setting(instance_administration_project: project)
           end
 
-          context 'when status returns in_progress' do
-            let(:status) { { status: :in_progress } }
+          it 'does not need job_id' do
+            get status_create_self_monitoring_project_admin_application_settings_path
 
-            it 'returns status accepted' do
-              subject
-
-              aggregate_failures do
-                expect(response).to have_gitlab_http_status(:accepted)
-                expect(json_response).to eq('status' => 'in_progress')
-              end
-            end
-          end
-
-          context 'when status returns unknown' do
-            let(:status) { { status: :unknown, message: 'message' } }
-
-            it 'returns accepted' do
-              subject
-
-              aggregate_failures do
-                expect(response).to have_gitlab_http_status(:accepted)
-                expect(json_response).to eq(
-                  'status' => 'unknown',
-                  'message' => 'message'
-                )
-              end
-            end
-          end
-
-          context 'when status returns completed' do
-            let(:status) { { status: :completed, output: { status: :success } } }
-            let(:project) { build(:project) }
-
-            before do
-              stub_application_setting(instance_administration_project_id: 2)
-              stub_application_setting(instance_administration_project: project)
-            end
-
-            it 'returns output' do
-              subject
-
-              aggregate_failures do
-                expect(response).to have_gitlab_http_status(:success)
-                expect(json_response).to eq(
-                  'status' => 'success',
-                  'project_id' => 2,
-                  'project_full_path' => project.full_path
-                )
-              end
-            end
-          end
-
-          context 'when unexpected status is returned' do
-            let(:status) { { status: :unexpected_status } }
-
-            it 'raises error' do
-              expect { subject }.to raise_error(
-                StandardError, 'SelfMonitoringProjectCreateWorker#status returned ' \
-                  'unknown status "unexpected_status"'
+            aggregate_failures do
+              expect(response).to have_gitlab_http_status(:success)
+              expect(json_response).to eq(
+                'project_id' => 1,
+                'project_full_path' => project.full_path
               )
             end
+          end
 
-            context 'in production' do
-              before do
-                stub_rails_env('production')
-              end
+          it 'returns success' do
+            subject
 
-              it 'returns internal_server_error' do
-                subject
+            aggregate_failures do
+              expect(response).to have_gitlab_http_status(:success)
+              expect(json_response).to eq(
+                'project_id' => 1,
+                'project_full_path' => project.full_path
+              )
+            end
+          end
+        end
 
-                aggregate_failures do
-                  expect(response).to have_gitlab_http_status(:internal_server_error)
-                  expect(json_response).to eq(
-                    'message' => 'SelfMonitoringProjectCreateWorker#status returned ' \
-                      'unknown status "unexpected_status"'
-                  )
-                end
-              end
+        context 'when job is in progress' do
+          before do
+            allow(worker_class).to receive(:in_progress?)
+              .with(job_id)
+              .and_return(true)
+          end
+
+          it 'sets polling header' do
+            expect(::Gitlab::PollingInterval).to receive(:set_header)
+
+            subject
+          end
+
+          it 'returns accepted' do
+            subject
+
+            aggregate_failures do
+              expect(response).to have_gitlab_http_status(:accepted)
+              expect(json_response).to eq('message' => 'Job is in progress')
+            end
+          end
+        end
+
+        context 'when self-monitoring project and job do not exist' do
+          let(:job_id) { nil }
+
+          it 'returns bad_request' do
+            subject
+
+            aggregate_failures do
+              expect(response).to have_gitlab_http_status(:bad_request)
+              expect(json_response).to eq(
+                'message' => 'Self-monitoring project does not exist. Please check ' \
+                  'logs for any error messages'
+              )
             end
           end
         end

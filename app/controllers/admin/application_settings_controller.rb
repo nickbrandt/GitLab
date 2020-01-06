@@ -87,13 +87,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
   def status_create_self_monitoring_project
     return self_monitoring_project_not_implemented unless Feature.enabled?(:self_monitoring_project)
 
-    job_id = params[:job_id]
-
-    unless job_id.present? && job_id.is_a?(String)
-      return render status: :bad_request, json: {
-        message: _('"job_id" must be an alphanumeric value')
-      }
-    end
+    job_id = params[:job_id].to_s
 
     unless job_id.length <= PARAM_JOB_ID_MAX_SIZE
       return render status: :bad_request, json: {
@@ -102,29 +96,19 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
       }
     end
 
-    ::Gitlab::PollingInterval.set_header(response, interval: 3_000)
+    if Gitlab::CurrentSettings.instance_administration_project_id.present?
+      render status: :ok, json: self_monitoring_data
 
-    result = SelfMonitoringProjectCreateWorker.status(job_id)
+    elsif SelfMonitoringProjectCreateWorker.in_progress?(job_id)
+      ::Gitlab::PollingInterval.set_header(response, interval: 3_000)
 
-    if [:in_progress, :unknown].include?(result[:status])
-      render status: :accepted, json: result
+      render status: :accepted, json: { message: _('Job is in progress') }
 
-    elsif result[:status] == :completed
-      data = result[:output].merge(self_monitoring_data)
-
-      render status: :ok, json: data
     else
-      message = _('SelfMonitoringProjectCreateWorker#status returned unknown status "%{status}"') %
-        { status: result[:status] }
-      raise_exception_for_dev(
-        message,
-        { return_value: result }
-      )
-
-      render(
-        status: :internal_server_error,
-        json: { message: message }
-      )
+      render status: :bad_request, json: {
+        message: _('Self-monitoring project does not exist. Please check logs ' \
+          'for any error messages')
+      }
     end
   end
 
@@ -135,13 +119,6 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
       project_id: Gitlab::CurrentSettings.instance_administration_project_id,
       project_full_path: Gitlab::CurrentSettings.instance_administration_project&.full_path
     }
-  end
-
-  def raise_exception_for_dev(message, extra = {})
-    Gitlab::ErrorTracking.track_and_raise_for_dev_exception(
-      StandardError.new(message),
-      extra
-    )
   end
 
   def self_monitoring_project_not_implemented
