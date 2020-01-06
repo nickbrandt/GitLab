@@ -8,7 +8,6 @@ import { approvedLicense } from 'ee_spec/license_management/mock_data';
 
 describe('DeleteConfirmationModal', () => {
   const Component = Vue.extend(DeleteConfirmationModal);
-
   let vm;
   let store;
   let actions;
@@ -20,10 +19,15 @@ describe('DeleteConfirmationModal', () => {
     };
 
     store = new Vuex.Store({
-      state: {
-        currentLicenseInModal: approvedLicense,
+      modules: {
+        licenseManagement: {
+          namespaced: true,
+          state: {
+            currentLicenseInModal: approvedLicense,
+          },
+          actions,
+        },
       },
-      actions,
     });
 
     vm = mountComponentWithStore(Component, { store });
@@ -47,9 +51,11 @@ describe('DeleteConfirmationModal', () => {
 
         store.replaceState({
           ...store.state,
-          currentLicenseInModal: {
-            ...approvedLicense,
-            name,
+          licenseManagement: {
+            currentLicenseInModal: {
+              ...approvedLicense,
+              name,
+            },
           },
         });
 
@@ -89,7 +95,7 @@ describe('DeleteConfirmationModal', () => {
 
         expect(actions.deleteLicense).toHaveBeenCalledWith(
           jasmine.any(Object),
-          store.state.currentLicenseInModal,
+          store.state.licenseManagement.currentLicenseInModal,
           undefined,
         );
       });
