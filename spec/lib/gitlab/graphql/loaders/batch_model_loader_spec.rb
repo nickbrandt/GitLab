@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe Gitlab::Graphql::Loaders::BatchModelLoader do
   describe '#find' do
-    let(:issue) { create(:issue) }
-    let(:user) { create(:user) }
+    let_it_be(:issue) { create(:issue) }
+    let_it_be(:user) { create(:user) }
 
     it 'finds a model by id' do
       issue_result = described_class.new(Issue, issue.id).find
@@ -24,6 +24,15 @@ describe Gitlab::Graphql::Loaders::BatchModelLoader do
         [described_class.new(User, other_user.id).find,
          described_class.new(User, user.id).find,
          described_class.new(Issue, issue.id).find].map(&:sync)
+      end.not_to exceed_query_limit(2)
+    end
+
+    it 'can apply scopes if requested' do
+      found = described_class.new(Project, issue.project_id).find
+      found_b = described_class.new(Project, issue.project_id, :inc_routes).find
+
+      expect do
+        found.sync.full_path == found_b.sync.full_path
       end.not_to exceed_query_limit(2)
     end
   end
