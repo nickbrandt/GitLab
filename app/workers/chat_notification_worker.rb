@@ -3,6 +3,9 @@
 class ChatNotificationWorker
   include ApplicationWorker
 
+  TimeoutExceeded = Class.new(StandardError)
+
+  sidekiq_options retry: false
   feature_category :chatops
   latency_sensitive_worker!
   # TODO: break this into multiple jobs
@@ -19,7 +22,7 @@ class ChatNotificationWorker
       send_response(build)
     end
   rescue Gitlab::Chat::Output::MissingBuildSectionError
-    return if timeout_exceeded?(reschedule_count)
+    raise TimeoutExceeded if timeout_exceeded?(reschedule_count)
 
     # The creation of traces and sections appears to be eventually consistent.
     # As a result it's possible for us to run the above code before the trace
