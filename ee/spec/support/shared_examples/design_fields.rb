@@ -31,6 +31,7 @@ shared_examples 'a GraphQL type with design fields' do
     let(:field) { described_class.fields['image'] }
     let(:args) { GraphQL::Query::Arguments::NO_ARGS }
     let(:instance) { object_type.authorized_new(object, query.context) }
+    let(:instance_b) { object_type.authorized_new(object_b, query.context) }
 
     it 'resolves to the design image URL' do
       image = field.resolve(instance, args, context).value
@@ -40,15 +41,23 @@ shared_examples 'a GraphQL type with design fields' do
       expect(image).to eq(url)
     end
 
-    it 'has better than O(N) peformance' do
-      baseline = ActiveRecord::QueryRecorder.new { field.resolve(instance, args, context).value }
-      baseline.count
-
+    it 'has better than O(N) peformance', :request_store do
+      # One query each for:
+      #  - design_management_versions x each version
+      #    (Request store is needed so that version is fetched only once.)
+      #  - projects
+      #    - routes
+      #    - namespaces
+      #      - routes
+      # So no. of queries is linear in number of versions, with constant
+      # overhead of 4 queries - here summing to 2 + 4 = 6
       expect do
         image_a = field.resolve(instance, args, context)
         image_b = field.resolve(instance, args, context)
+        image_c = field.resolve(instance_b, args, context)
         expect(image_a.value).to eq(image_b.value)
-      end.not_to exceed_query_limit(baseline)
+        expect(image_c.value).not_to eq('')
+      end.not_to exceed_query_limit(6)
     end
   end
 end

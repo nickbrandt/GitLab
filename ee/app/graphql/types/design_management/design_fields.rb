@@ -56,7 +56,7 @@ module Types
       end
 
       def project
-        ::Gitlab::Graphql::Loaders::BatchModelLoader.new(::Project, design.project_id).find
+        ::Gitlab::Graphql::Loaders::BatchModelLoader.new(::Project, design.project_id, :inc_routes).find
       end
 
       def issue
