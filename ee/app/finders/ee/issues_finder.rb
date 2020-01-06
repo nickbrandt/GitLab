@@ -11,13 +11,14 @@ module EE
 
       override :scalar_params
       def scalar_params
-        @scalar_params ||= super + [:weight]
+        @scalar_params ||= super + [:weight, :epic_id]
       end
     end
 
     override :filter_items
     def filter_items(items)
-      by_weight(super)
+      issues = by_weight(super)
+      by_epic(issues)
     end
 
     private
@@ -74,5 +75,23 @@ module EE
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def by_epic?
+      params[:epic_id].present?
+    end
+
+    def filter_by_no_epic?
+      params[:epic_id].to_s.downcase == ::IssuesFinder::FILTER_NONE
+    end
+
+    def by_epic(items)
+      return items unless by_epic?
+
+      if filter_by_no_epic?
+        items.no_epic
+      else
+        items.in_epics(params[:epic_id])
+      end
+    end
   end
 end
